@@ -29,7 +29,9 @@ import { count as wordCount } from '@wordpress/wordcount';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
-	const { textAlign, displayAsRange, averageReadingSpeed } = attributes;
+	const { textAlign, displayAsRange, displayMode, averageReadingSpeed } =
+		attributes;
+
 	const { postId, postType } = context;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
@@ -44,7 +46,7 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 		id: postId,
 	} );
 
-	const minutesToReadString = useMemo( () => {
+	const displayString = useMemo( () => {
 		// Replicates the logic found in getEditedPostContent().
 		let content;
 		if ( contentStructure instanceof Function ) {
@@ -69,38 +71,62 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 		);
 
 		const totalWords = wordCount( content || '', wordCountType );
-		if ( displayAsRange ) {
-			let maxMinutes = Math.max(
+
+		// Add "time to read" part, if enabled.
+		if ( displayMode === 'time' ) {
+			if ( displayAsRange ) {
+				let maxMinutes = Math.max(
+					1,
+					Math.round( ( totalWords / averageReadingSpeed ) * 1.2 )
+				);
+				const minMinutes = Math.max(
+					1,
+					Math.round( ( totalWords / averageReadingSpeed ) * 0.8 )
+				);
+
+				if ( minMinutes === maxMinutes ) {
+					maxMinutes = maxMinutes + 1;
+				}
+				// translators: %1$s: minimum minutes, %2$s: maximum minutes to read the post.
+				const rangeLabel = _x(
+					'%1$s–%2$s minutes',
+					'Range of minutes to read'
+				);
+				return sprintf( rangeLabel, minMinutes, maxMinutes );
+			}
+			const minutesToRead = Math.max(
 				1,
-				Math.round( ( totalWords / averageReadingSpeed ) * 1.2 )
-			);
-			const minMinutes = Math.max(
-				1,
-				Math.round( ( totalWords / averageReadingSpeed ) * 0.8 )
+				Math.round( totalWords / averageReadingSpeed )
 			);
 
-			if ( minMinutes === maxMinutes ) {
-				maxMinutes = maxMinutes + 1;
-			}
-			// translators: %1$s: minimum minutes, %2$s: maximum minutes to read the post.
-			const rangeLabel = _x(
-				'%1$s–%2$s minutes',
-				'Range of minutes to read'
+			return sprintf(
+				/* translators: %s: the number of minutes to read the post. */
+				_n( '%s minute', '%s minutes', minutesToRead ),
+				minutesToRead
 			);
-			return sprintf( rangeLabel, minMinutes, maxMinutes );
 		}
 
-		const minutesToRead = Math.max(
-			1,
-			Math.round( totalWords / averageReadingSpeed )
-		);
-
-		return sprintf(
-			/* translators: %s: the number of minutes to read the post. */
-			_n( '%s minute', '%s minutes', minutesToRead ),
-			minutesToRead
-		);
-	}, [ contentStructure, blocks, displayAsRange, averageReadingSpeed ] );
+		// Add "word count" part, if enabled.
+		if ( displayMode === 'words' ) {
+			return wordCountType === 'words'
+				? sprintf(
+						/* translators: %s: the number of words in the post. */
+						_n( '%s word', '%s words', totalWords ),
+						totalWords.toLocaleString()
+				  )
+				: sprintf(
+						/* translators: %s: the number of characters in the post. */
+						_n( '%s character', '%s characters', totalWords ),
+						totalWords.toLocaleString()
+				  );
+		}
+	}, [
+		contentStructure,
+		blocks,
+		displayAsRange,
+		displayMode,
+		averageReadingSpeed,
+	] );
 
 	const blockProps = useBlockProps( {
 		className: clsx( {
@@ -118,43 +144,45 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 					} }
 				/>
 			</BlockControls>
-			<InspectorControls>
-				<ToolsPanel
-					label={ __( 'Settings' ) }
-					resetAll={ () => {
-						setAttributes( {
-							displayAsRange: true,
-						} );
-					} }
-					dropdownMenuProps={ dropdownMenuProps }
-				>
-					<ToolsPanelItem
-						isShownByDefault
-						label={ _x(
-							'Display as range',
-							'Turns reading time range display on or off'
-						) }
-						hasValue={ () => ! displayAsRange }
-						onDeselect={ () => {
+			{ displayMode === 'time' && (
+				<InspectorControls>
+					<ToolsPanel
+						label={ __( 'Settings' ) }
+						resetAll={ () => {
 							setAttributes( {
 								displayAsRange: true,
 							} );
 						} }
+						dropdownMenuProps={ dropdownMenuProps }
 					>
-						<ToggleControl
-							__nextHasNoMarginBottom
-							label={ __( 'Display as range' ) }
-							checked={ !! displayAsRange }
-							onChange={ () =>
+						<ToolsPanelItem
+							isShownByDefault
+							label={ _x(
+								'Display as range',
+								'Turns reading time range display on or off'
+							) }
+							hasValue={ () => ! displayAsRange }
+							onDeselect={ () => {
 								setAttributes( {
-									displayAsRange: ! displayAsRange,
-								} )
-							}
-						/>
-					</ToolsPanelItem>
-				</ToolsPanel>
-			</InspectorControls>
-			<div { ...blockProps }>{ minutesToReadString }</div>
+									displayAsRange: true,
+								} );
+							} }
+						>
+							<ToggleControl
+								__nextHasNoMarginBottom
+								label={ __( 'Display as range' ) }
+								checked={ !! displayAsRange }
+								onChange={ () =>
+									setAttributes( {
+										displayAsRange: ! displayAsRange,
+									} )
+								}
+							/>
+						</ToolsPanelItem>
+					</ToolsPanel>
+				</InspectorControls>
+			) }
+			<div { ...blockProps }>{ displayString }</div>
 		</>
 	);
 }

@@ -19,6 +19,7 @@ import email from './email';
 import telephone from './telephone';
 import url from './url';
 import integer from './integer';
+import number from './number';
 import radio from './radio';
 import select from './select';
 import text from './text';
@@ -43,6 +44,7 @@ const FORM_CONTROLS: FormControls = {
 	telephone,
 	url,
 	integer,
+	number,
 	password,
 	radio,
 	select,
