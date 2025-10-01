@@ -57,10 +57,10 @@ export default function InspectorControlsTabs( {
 				( tab ) => tab.name === selectedTabId
 			);
 			if ( ! activeTab ) {
-				setSelectedTabId( tabs[ 0 ].name );
+				setSelectedTabId( initialTabName ?? tabs[ 0 ].name );
 			}
 		}
-	}, [ tabs, selectedTabId ] );
+	}, [ tabs, selectedTabId, initialTabName ] );
 
 	return (
 		<div className="block-editor-block-inspector__tabs">
