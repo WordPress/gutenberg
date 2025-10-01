@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   `TextareaControl`: Add default resize: vertical rule ([#71736](https://github.com/WordPress/gutenberg/pull/71736)).
+-   `SearchControl`: Move search icon to prefix position ([#71984](https://github.com/WordPress/gutenberg/pull/71984)).
 
 ### Bug Fixes
 
