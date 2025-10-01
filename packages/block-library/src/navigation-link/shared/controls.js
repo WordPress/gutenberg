@@ -17,7 +17,7 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
  * Internal dependencies
  */
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
-import { updateAttributes } from '../update-attributes';
+import { updateAttributes } from './update-attributes';
 
 /**
  * Shared Controls component for Navigation Link and Navigation Submenu blocks.

@@ -14,7 +14,7 @@ import { Controls } from '../controls';
 
 // Mock the updateAttributes function
 let mockUpdateAttributes;
-jest.mock( '../../update-attributes', () => ( {
+jest.mock( '../update-attributes', () => ( {
 	updateAttributes: ( ...args ) => mockUpdateAttributes( ...args ),
 } ) );
 

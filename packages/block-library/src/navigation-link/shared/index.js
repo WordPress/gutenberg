@@ -6,3 +6,4 @@
  */
 
 export { Controls } from './controls';
+export { updateAttributes } from './update-attributes';
