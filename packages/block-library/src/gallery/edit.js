@@ -213,6 +213,16 @@ export default function GalleryEdit( props ) {
 
 	const newImages = useGetNewImages( images, imageData );
 
+	// Check if there is at least one image with lightbox enabled
+	const hasLightboxImages = lightboxSetting?.enabled
+		? images.filter(
+				( image ) =>
+					image.attributes?.lightbox?.enabled === undefined ||
+					image.attributes?.lightbox?.enabled === true
+		  ).length > 0
+		: images.filter( ( image ) => image.attributes.lightbox?.enabled )
+				.length > 0;
+
 	useEffect( () => {
 		newImages?.forEach( ( newImage ) => {
 			// Update the images data without creating new undo levels.
@@ -735,9 +745,16 @@ export default function GalleryEdit( props ) {
 								}
 								options={ NAVIGATION_BUTTON_TYPE_OPTIONS }
 								size="__unstable-large"
-								help={ __(
-									'Adjust the appearance of buttons in the lightbox.'
-								) }
+								disabled={ ! hasLightboxImages }
+								help={
+									hasLightboxImages
+										? __(
+												'Adjust the appearance of buttons in the lightbox.'
+										  )
+										: __(
+												'Enable lightbox to adjust the appearance of buttons.'
+										  )
+								}
 							/>
 						</ToolsPanelItem>
 					</ToolsPanel>
