@@ -9,7 +9,8 @@
 	"parent": [ "core/accordion-item" ],
 	"usesContext": [
 		"core/accordion-icon-position",
-		"core/accordion-show-icon"
+		"core/accordion-show-icon",
+		"core/accordion-heading-level"
 	],
 	"supports": {
 		"anchor": true,
@@ -51,7 +52,8 @@
 				"fontFamily": true
 			}
 		},
-		"shadow": true
+		"shadow": true,
+		"blockVisibility": false
 	},
 	"attributes": {
 		"openByDefault": {
@@ -65,11 +67,7 @@
 			"role": "content"
 		},
 		"level": {
-			"type": "number",
-			"default": 3
-		},
-		"levelOptions": {
-			"type": "array"
+			"type": "number"
 		},
 		"iconPosition": {
 			"type": "string",

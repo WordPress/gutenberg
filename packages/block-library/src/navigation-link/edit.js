@@ -8,15 +8,7 @@ import clsx from 'clsx';
  */
 import { createBlock } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-	CheckboxControl,
-	TextControl,
-	TextareaControl,
-	ToolbarButton,
-	ToolbarGroup,
-} from '@wordpress/components';
+import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
 import {
@@ -29,9 +21,8 @@ import {
 	useInnerBlocksProps,
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
-import { isURL, prependHTTP, safeDecodeURI } from '@wordpress/url';
+import { isURL, prependHTTP } from '@wordpress/url';
 import { useState, useEffect, useRef } from '@wordpress/element';
-import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
@@ -43,7 +34,7 @@ import { useMergeRefs, usePrevious } from '@wordpress/compose';
 import { LinkUI } from './link-ui';
 import { updateAttributes } from './update-attributes';
 import { getColors } from '../navigation/edit/utils';
-import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import { Controls } from './shared';
 
 const DEFAULT_BLOCK = { name: 'core/navigation-link' };
 const NESTING_BLOCK_NAMES = [
@@ -175,136 +166,6 @@ function getMissingText( type ) {
  * packages/block-library/src/navigation-submenu/edit.js
  * Consider reusing this components for both blocks.
  */
-function Controls( { attributes, setAttributes, setIsEditingControl } ) {
-	const { label, url, description, rel, opensInNewTab } = attributes;
-	const lastURLRef = useRef( url );
-	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
-	return (
-		<ToolsPanel
-			label={ __( 'Settings' ) }
-			resetAll={ () => {
-				setAttributes( {
-					label: '',
-					url: '',
-					description: '',
-					rel: '',
-					opensInNewTab: false,
-				} );
-			} }
-			dropdownMenuProps={ dropdownMenuProps }
-		>
-			<ToolsPanelItem
-				hasValue={ () => !! label }
-				label={ __( 'Text' ) }
-				onDeselect={ () => setAttributes( { label: '' } ) }
-				isShownByDefault
-			>
-				<TextControl
-					__nextHasNoMarginBottom
-					__next40pxDefaultSize
-					label={ __( 'Text' ) }
-					value={ label ? stripHTML( label ) : '' }
-					onChange={ ( labelValue ) => {
-						setAttributes( { label: labelValue } );
-					} }
-					autoComplete="off"
-					onFocus={ () => setIsEditingControl( true ) }
-					onBlur={ () => setIsEditingControl( false ) }
-				/>
-			</ToolsPanelItem>
-
-			<ToolsPanelItem
-				hasValue={ () => !! url }
-				label={ __( 'Link' ) }
-				onDeselect={ () => setAttributes( { url: '' } ) }
-				isShownByDefault
-			>
-				<TextControl
-					__nextHasNoMarginBottom
-					__next40pxDefaultSize
-					label={ __( 'Link' ) }
-					value={ url ? safeDecodeURI( url ) : '' }
-					onChange={ ( urlValue ) => {
-						setAttributes( {
-							url: encodeURI( safeDecodeURI( urlValue ) ),
-						} );
-					} }
-					autoComplete="off"
-					type="url"
-					onFocus={ () => {
-						lastURLRef.current = url;
-						setIsEditingControl( true );
-					} }
-					onBlur={ () => {
-						// Defer the updateAttributes call to ensure entity connection isn't severed by accident.
-						updateAttributes(
-							{ url: ! url ? lastURLRef.current : url },
-							setAttributes,
-							{ ...attributes, url: lastURLRef.current }
-						);
-						setIsEditingControl( false );
-					} }
-				/>
-			</ToolsPanelItem>
-
-			<ToolsPanelItem
-				hasValue={ () => !! opensInNewTab }
-				label={ __( 'Open in new tab' ) }
-				onDeselect={ () => setAttributes( { opensInNewTab: false } ) }
-				isShownByDefault
-			>
-				<CheckboxControl
-					__nextHasNoMarginBottom
-					label={ __( 'Open in new tab' ) }
-					checked={ opensInNewTab }
-					onChange={ ( value ) =>
-						setAttributes( { opensInNewTab: value } )
-					}
-				/>
-			</ToolsPanelItem>
-
-			<ToolsPanelItem
-				hasValue={ () => !! description }
-				label={ __( 'Description' ) }
-				onDeselect={ () => setAttributes( { description: '' } ) }
-				isShownByDefault
-			>
-				<TextareaControl
-					__nextHasNoMarginBottom
-					label={ __( 'Description' ) }
-					value={ description || '' }
-					onChange={ ( descriptionValue ) => {
-						setAttributes( { description: descriptionValue } );
-					} }
-					help={ __(
-						'The description will be displayed in the menu if the current theme supports it.'
-					) }
-				/>
-			</ToolsPanelItem>
-
-			<ToolsPanelItem
-				hasValue={ () => !! rel }
-				label={ __( 'Rel attribute' ) }
-				onDeselect={ () => setAttributes( { rel: '' } ) }
-				isShownByDefault
-			>
-				<TextControl
-					__nextHasNoMarginBottom
-					__next40pxDefaultSize
-					label={ __( 'Rel attribute' ) }
-					value={ rel || '' }
-					onChange={ ( relValue ) => {
-						setAttributes( { rel: relValue } );
-					} }
-					autoComplete="off"
-					help={ __(
-						'The relationship of the linked URL as space-separated link types.'
-					) }
-				/>
-			</ToolsPanelItem>
-		</ToolsPanel>
-	);
-}
 
 export default function NavigationLinkEdit( {
 	attributes,
