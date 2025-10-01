@@ -149,7 +149,6 @@ export default {
 		const metaFields = Object.entries(
 			getPostMetaFields( select, context ) || {}
 		).map( ( [ key, field ] ) => ( {
-			key,
 			label: field.label,
 			args: {
 				key,

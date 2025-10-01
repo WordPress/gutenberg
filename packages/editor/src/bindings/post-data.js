@@ -134,7 +134,6 @@ export default {
 		const postDataFields = Object.entries(
 			getPostDataFields( select, context ) || {}
 		).map( ( [ key, field ] ) => ( {
-			key,
 			label: field.label,
 			args: {
 				key,

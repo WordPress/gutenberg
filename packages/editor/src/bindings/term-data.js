@@ -161,7 +161,6 @@ export default {
 		const termDataFields = Object.entries(
 			getTermDataFields( select, context ) || {}
 		).map( ( [ key, field ] ) => ( {
-			key,
 			label: field.label,
 			type: field.type,
 			args: {
