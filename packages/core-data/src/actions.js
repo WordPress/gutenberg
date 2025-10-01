@@ -729,6 +729,20 @@ export const saveEntityRecord =
 					if ( name === 'wp_template' && persistedRecord ) {
 						edits.status = 'publish';
 					}
+					if (
+						window.__experimentalEnableSync &&
+						entityConfig.syncConfig?.enabled &&
+						entityConfig.syncConfig?.supports?.crdtPersistence
+					) {
+						// Allow sync provider to create meta for the entity before persisting.
+						edits.meta = {
+							...edits.meta,
+							...( await getSyncProvider().createEntityMeta(
+								entityConfig.syncConfig,
+								{ ...persistedRecord, ...edits }
+							) ),
+						};
+					}
 					updatedRecord = await __unstableFetch( {
 						path,
 						method: recordId ? 'PUT' : 'POST',
@@ -742,6 +756,16 @@ export const saveEntityRecord =
 						true,
 						edits
 					);
+					if (
+						window.__experimentalEnableSync &&
+						entityConfig.syncConfig?.enabled &&
+						entityConfig.syncConfig?.supports?.crdtPersistence
+					) {
+						getSyncProvider().updateLastPersistedDate(
+							entityConfig.syncConfig,
+							persistedRecord
+						);
+					}
 				}
 			} catch ( _error ) {
 				hasError = true;

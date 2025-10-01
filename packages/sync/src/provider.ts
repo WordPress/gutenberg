@@ -8,9 +8,11 @@ import { Awareness } from 'y-protocols/awareness';
  * Internal dependencies
  */
 import {
+	CRDT_DOC_VERSION,
 	CRDT_RECORD_MAP_KEY as RECORD_KEY,
 	CRDT_STATE_MAP_KEY as STATE_KEY,
 	CRDT_STATE_PERSISTED_AT_KEY as PERSISTED_AT_KEY,
+	CRDT_STATE_PERSISTED_BY_KEY as PERSISTED_BY_KEY,
 	CRDT_STATE_RESTORED_AT_KEY as RESTORED_AT_KEY,
 	CRDT_STATE_RESTORED_BY_KEY as RESTORED_BY_KEY,
 	LOCAL_SYNC_PROVIDER_ORIGIN,
@@ -149,8 +151,12 @@ export class SyncProvider {
 		stateMap.observe( onStateUpdate );
 
 		// Get the initial document state.
-		const initialDoc = null; // TODO
-		const initialDocIsInvalid = false;
+		const initialDoc = await this.getInitialCRDTDoc(
+			syncConfig,
+			rawRecord
+		);
+		const initialDocIsInvalid =
+			true === initialDoc?.meta?.get( 'invalidated' );
 
 		// Apply the initial document to the current document as a singular update.
 		if ( initialDoc ) {
@@ -235,6 +241,105 @@ export class SyncProvider {
 	}
 
 	/**
+	 * Get the CRDTDoc that represents the initial state of the object data. Custom
+	 * sync providers can override this method to provide a custom initial state.
+	 *
+	 * @param {SyncConfig} syncConfig Sync configuration for the object type.
+	 * @param {ObjectData} rawRecord  Initial data to apply to the document.
+	 */
+	private async getInitialCRDTDoc(
+		syncConfig: SyncConfig,
+		rawRecord: ObjectData
+	): Promise< CRDTDoc | null > {
+		if ( ! syncConfig.supports?.crdtPersistence ) {
+			return null;
+		}
+
+		// Load the persisted document from previous sessions.
+		const persistedDoc = await this.getPersistedCRDTDoc(
+			syncConfig,
+			rawRecord
+		);
+
+		// If it exists and matches the current version, apply it as the base state
+		// of the initial document.
+		if ( ! persistedDoc ) {
+			return null;
+		}
+
+		const stateMap = persistedDoc.getMap( STATE_KEY );
+
+		if ( CRDT_DOC_VERSION !== stateMap.get( 'version' ) ) {
+			// TODO: Implement version migration. We have not yet incremented the
+			// version number, so there is nothing to implement yet.
+			//
+			// invalidated=true indicates that the migration was not possible.
+			persistedDoc.meta?.set( 'invalidated', true );
+		}
+
+		return persistedDoc;
+	}
+
+	/* eslint-disable @typescript-eslint/no-unused-vars */
+
+	/**
+	 * Create meta for the entity, e.g., to persist the CRDT doc against the
+	 * entity. Custom sync providers can override this method to provide their
+	 * implementation.
+	 *
+	 * @param {SyncConfig} _syncConfig Sync configuration for the object type.
+	 * @param {ObjectData} _rawRecord  Raw record representing this object type.
+	 * @return {Promise< Record< string, any > >} Entity meta.
+	 */
+	public async createEntityMeta(
+		_syncConfig: SyncConfig,
+		_rawRecord: ObjectData
+	): Promise< Record< string, any > > {
+		return Promise.resolve( {} );
+	}
+
+	/**
+	 * Get the persisted CRDT document from the object data, e.g., from meta.
+	 * Custom sync providers can override this method to provide their
+	 * implementation.
+	 *
+	 * There are 5 possible states:
+	 *
+	 * 1. No persisted document exists: return null. A new document will be created
+	 *    from the current entity record.
+	 *
+	 * 2. A persisted document exists with a different version: return it. The
+	 *    version mismatch will be detected and the document will be migrated.
+	 *
+	 * 3. A persisted document exists, but its content no longer matches the
+	 *    current entity record (i.e., the entity record was updated outside of
+	 *    the block editor): return it, but mark it as invalidated. The document
+	 *    will be used as the base document and the current entity record will be
+	 *    applied as an update.
+	 *
+	 *    - Mark it as invalidated by setting `invalidated=true` on its meta map.
+	 *
+	 * 4. A persisted document exists, but the entity record has been restored
+	 *    from a revision. This is a special case of #3, but is handled
+	 *    identically.
+	 *
+	 * 5. A persisted document exists: return it. It will be used as the initial
+	 *    document.
+	 *
+	 * @param {SyncConfig} _syncConfig Sync configuration for the object type.
+	 * @param {ObjectData} _rawRecord  Record representing this object type.
+	 * @return {Promise< CRDTDoc | null >} The persisted CRDT document, or null if none exists.
+	 */
+	protected async getPersistedCRDTDoc(
+		_syncConfig: SyncConfig,
+		_rawRecord: ObjectData
+	): Promise< CRDTDoc | null > {
+		return Promise.resolve( null );
+	}
+
+	/* eslint-enable @typescript-eslint/no-unused-vars */
+
+	/**
 	 * Update CRDT document with changes from the local store.
 	 *
 	 * @param {SyncConfig}            syncConfig Sync configuration for the object type.
@@ -294,5 +399,34 @@ export class SyncProvider {
 		// in an update to the store if the blocks have changed.
 
 		handlers.editRecord( changes );
+	}
+
+	/**
+	 * Update the last persisted timestamp in the CRDT document state map. This is
+	 * used by peers as a signal that they need to refetch the persisted entity.
+	 *
+	 * @param {SyncConfig} syncConfig Sync configuration for the object type.
+	 * @param {ObjectData} rawRecord  Raw record representing this object type.
+	 */
+	public updateLastPersistedDate(
+		syncConfig: SyncConfig,
+		rawRecord: ObjectData
+	): void {
+		const objectId = syncConfig.getObjectId( rawRecord );
+		const objectType = syncConfig.objectType;
+		const entityId = this.getEntityId( objectType, objectId );
+		const entityState = this.entityStates.get( entityId );
+
+		if ( ! entityState ) {
+			return;
+		}
+
+		const ydoc = entityState.ydoc;
+
+		ydoc.transact( () => {
+			const stateMap = ydoc.getMap( STATE_KEY );
+			stateMap.set( PERSISTED_AT_KEY, Date.now() );
+			stateMap.set( PERSISTED_BY_KEY, ydoc.clientID );
+		}, LOCAL_SYNC_PROVIDER_ORIGIN );
 	}
 }
