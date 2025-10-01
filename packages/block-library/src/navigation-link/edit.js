@@ -32,7 +32,7 @@ import { useMergeRefs, usePrevious } from '@wordpress/compose';
  * Internal dependencies
  */
 import { LinkUI } from './link-ui';
-import { updateAttributes } from './update-attributes';
+import { updateAttributes } from './shared/update-attributes';
 import { getColors } from '../navigation/edit/utils';
 import { Controls } from './shared';
 

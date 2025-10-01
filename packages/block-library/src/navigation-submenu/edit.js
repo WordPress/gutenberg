@@ -32,8 +32,8 @@ import { useMergeRefs, usePrevious } from '@wordpress/compose';
  */
 import { ItemSubmenuIcon } from './icons';
 import { LinkUI } from '../navigation-link/link-ui';
-import { updateAttributes } from '../navigation-link/update-attributes';
 import { Controls } from '../navigation-link/shared';
+import { updateAttributes } from '../navigation-link/shared/update-attributes';
 import {
 	getColors,
 	getNavigationChildBlockProps,
