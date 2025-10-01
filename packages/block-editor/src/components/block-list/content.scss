@@ -193,6 +193,10 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	// Instead, use styles to visually hide blocks.
 	&.is-block-hidden {
 		visibility: hidden !important;
+		height: 0 !important;
+		overflow: hidden !important;
+		border: none !important;
+		padding: 0 !important;
 	}
 }
 
