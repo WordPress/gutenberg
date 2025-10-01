@@ -9,6 +9,9 @@ import { connectIndexDb } from './connect-indexdb';
 import { createWebRTCConnection } from './create-webrtc-connection';
 import { SyncProvider } from './provider';
 
+/**
+ * Exported instance of Yjs to prevent double instantiation issues.
+ */
 export * as Y from 'yjs';
 export * from './config';
 export { connectIndexDb } from './connect-indexdb';

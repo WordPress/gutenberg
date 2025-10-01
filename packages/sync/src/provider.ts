@@ -40,6 +40,11 @@ interface EntityState {
 	ydoc: CRDTDoc;
 }
 
+/**
+ * The SyncProvider manages access to CRDT documents for multiple entities,
+ * including their lifecycle, connections, and syncing changes between the CRDT
+ * document and the local store.
+ */
 export class SyncProvider {
 	private connectionCreators: ConnectDoc[];
 	private undoManager: UndoManager;
