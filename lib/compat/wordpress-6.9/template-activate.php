@@ -172,11 +172,6 @@ function gutenberg_get_template( $template, $type, $templates ) {
 	return gutenberg_locate_block_template( $template, $type, $templates );
 }
 
-function testtesttest( $templates, $query, $template_type ) {
-	var_dump( $templates, $query, $template_type );
-	return $templates;
-}
-
 ///////////////////////////////////////////////////////////////////////
 // This function is a copy of core's, except for the marked section. //
 ///////////////////////////////////////////////////////////////////////
