@@ -2015,9 +2015,8 @@ describe( 'blocks', () => {
 					mode: 'dropdown',
 					data: [
 						{
-							key: 'field2',
 							label: 'Field 2',
-							value: 'value2',
+							args: { testArg: 'value2' },
 							type: 'string',
 						},
 					],

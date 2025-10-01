@@ -34,7 +34,6 @@ registerBlockBindingsSource( {
 				( [ key, field ] ) => ( {
 					label: field?.label || key,
 					type: field?.type || 'string',
-					value: field?.value,
 					args: {
 						key,
 					},
@@ -82,7 +81,6 @@ registerBlockBindingsSource( {
 				( [ key, field ] ) => ( {
 					label: field?.label || key,
 					type: field?.type || 'string',
-					value: field?.value,
 					args: {
 						key,
 					},
