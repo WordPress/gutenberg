@@ -31,9 +31,8 @@ import { useMergeRefs, usePrevious } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { LinkUI } from './link-ui';
 import { getColors } from '../navigation/edit/utils';
-import { Controls, updateAttributes } from './shared';
+import { Controls, LinkUI, updateAttributes } from './shared';
 
 const DEFAULT_BLOCK = { name: 'core/navigation-link' };
 const NESTING_BLOCK_NAMES = [
