@@ -105,6 +105,7 @@ export default function InspectorControlsTabs( {
 						clientId={ clientId }
 						hasBlockStyles={ hasBlockStyles }
 						isSectionBlock={ isSectionBlock }
+						contentClientIds={ contentClientIds }
 					/>
 				</Tabs.TabPanel>
 				<Tabs.TabPanel tabId={ TAB_CONTENT.name } focusable={ false }>

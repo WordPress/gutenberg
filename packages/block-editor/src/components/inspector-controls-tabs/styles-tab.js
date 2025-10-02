@@ -3,7 +3,8 @@
  */
 import { PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -16,36 +17,116 @@ import { store as blockEditorStore } from '../../store';
 import { ColorEdit } from '../../hooks/color';
 import { ColorToolsPanel } from '../global-styles/color-panel';
 
-function SectionBlockControls( { blockName, clientId } ) {
+function SectionBlockControls( { blockName, clientId, contentClientIds } ) {
 	const settings = useBlockSettings( blockName );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const [ defaultControls, setDefaultControls ] = useState( {
+		text: true,
+		background: true,
+		button: true,
+		heading: true,
+		caption: true,
+		link: true,
+	} );
+
+	const contentBlocks = useSelect(
+		( select ) => {
+			const { getBlock } = select( blockEditorStore );
+
+			// Get only the content-exposed blocks
+			return contentClientIds
+				? contentClientIds
+						.map( ( id ) => getBlock( id ) )
+						.filter( Boolean )
+				: [];
+		},
+		[ contentClientIds ]
+	);
+
+	useEffect( () => {
+		let hasButton = false;
+		let hasHeading = false;
+		let hasCaption = false;
+		let hasLink = false;
+
+		for ( const block of contentBlocks ) {
+			// Check for button blocks
+			if ( block.name === 'core/button' ) {
+				hasButton = true;
+			}
+			// Check for heading blocks
+			if ( block.name === 'core/heading' ) {
+				hasHeading = true;
+			}
+
+			// Check for actual caption content
+			if (
+				block.name === 'core/image' ||
+				block.name === 'core/video' ||
+				block.name === 'core/audio' ||
+				block.name === 'core/gallery'
+			) {
+				const caption = block.attributes?.caption;
+				// Caption can be a string, array, or rich-text object
+				const hasCaptionContent =
+					caption &&
+					( ( typeof caption === 'string' &&
+						caption.trim() !== '' ) ||
+						( Array.isArray( caption ) && caption.length > 0 ) ||
+						( typeof caption === 'object' &&
+							caption.text &&
+							caption.text.trim() !== '' ) );
+				if ( hasCaptionContent ) {
+					hasCaption = true;
+				}
+			}
+
+			// Check for actual link content
+			let blockHasLink = false;
+
+			if ( block.name === 'core/paragraph' ) {
+				// Check if paragraph content contains anchor tags
+				blockHasLink =
+					block.attributes?.content &&
+					block.attributes.content.includes( '<a ' );
+			} else if ( block.name === 'core/heading' ) {
+				// Check if heading content contains anchor tags
+				blockHasLink =
+					block.attributes?.content &&
+					block.attributes.content.includes( '<a ' );
+			} else if ( block.name === 'core/button' ) {
+				// Buttons always have links
+				blockHasLink = !! block.attributes?.url;
+			}
+
+			if ( blockHasLink ) {
+				hasLink = true;
+			}
+		}
+
+		setDefaultControls( {
+			text: true,
+			background: true,
+			button: hasButton,
+			heading: hasHeading,
+			caption: hasCaption,
+			link: hasLink,
+		} );
+	}, [ contentBlocks ] );
 
 	const setAttributes = ( newAttributes ) => {
 		updateBlockAttributes( clientId, newAttributes );
 	};
 
-	// This is needed to force the captions setting to show
-	// but there's probably a right way to do it.
-	const newSettings = { ...settings };
-	newSettings.color.caption = true;
-
 	return (
 		<ColorEdit
 			clientId={ clientId }
 			name={ blockName }
-			settings={ newSettings }
+			settings={ settings }
 			setAttributes={ setAttributes }
 			asWrapper={ ColorToolsPanel }
 			label={ __( 'Color' ) }
-			defaultControls={ {
-				// TODO - this is duplicated in packages/block-editor/src/components/global-styles/color-panel.js
-				text: true,
-				background: true,
-				link: true,
-				heading: true,
-				button: true,
-				caption: true,
-			} }
+			defaultControls={ defaultControls }
 		/>
 	);
 }
@@ -55,6 +136,7 @@ const StylesTab = ( {
 	clientId,
 	hasBlockStyles,
 	isSectionBlock,
+	contentClientIds,
 } ) => {
 	const borderPanelLabel = useBorderPanelLabel( { blockName } );
 
@@ -71,6 +153,7 @@ const StylesTab = ( {
 				<SectionBlockControls
 					blockName={ blockName }
 					clientId={ clientId }
+					contentClientIds={ contentClientIds }
 				/>
 			) }
 			{ ! isSectionBlock && (
