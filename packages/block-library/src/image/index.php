@@ -22,7 +22,36 @@ function render_block_core_image( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$p = new WP_HTML_Tag_Processor( $content );
+	$p = new class( $content ) extends WP_HTML_Tag_Processor {
+		/**
+		 * Return input span for an empty FIGCAPTION element.
+		 *
+		 * Returns span of input for an empty FIGCAPTION, if currently matched on a
+		 * FIGCAPTION opening tag and if the element is properly closed and empty.
+		 *
+		 * @since 6.9.0
+		 *
+		 * @return WP_HTML_Span|false Span of input if the element is empty; otherwise false.
+		 */
+		public function block_core_image_extract_empty_figcaption_element() {
+			$this->set_bookmark( 'here' );
+			$opener = $this->bookmarks['here'];
+
+			// Allow comments within the definition of “empty.”
+			while ( $this->next_token() && '#comment' === $this->get_token_name() ) {
+				continue;
+			}
+
+			if ( 'FIGCAPTION' !== $this->get_tag() || ! $this->is_tag_closer() ) {
+				return false;
+			}
+
+			$this->set_bookmark( 'here' );
+			$closer = $this->bookmarks['here'];
+
+			return new WP_HTML_Span( $opener->start, $closer->start + $closer->length - $opener->start );
+		}
+	};
 
 	if ( ! $p->next_tag( 'img' ) || ! $p->get_attribute( 'src' ) ) {
 		return '';
@@ -57,6 +86,14 @@ function render_block_core_image( $attributes, $content, $block ) {
 		$p->set_attribute( 'data-id', $data_id );
 	}
 
+	/*
+	 * If the `caption` attribute is empty and we encounter a `<figcaption>` element,
+	 * we take note of its span so we can remove it later.
+	 */
+	if ( $p->next_tag( 'FIGCAPTION' ) && empty( $attributes['caption'] ) ) {
+		$figcaption_span = $p->block_core_image_extract_empty_figcaption_element();
+	}
+
 	$link_destination  = isset( $attributes['linkDestination'] ) ? $attributes['linkDestination'] : 'none';
 	$lightbox_settings = block_core_image_get_lightbox_settings( $block->parsed_block );
 
@@ -88,7 +125,11 @@ function render_block_core_image( $attributes, $content, $block ) {
 		remove_filter( 'render_block_core/image', 'block_core_image_render_lightbox', 15 );
 	}
 
-	return $p->get_updated_html();
+	$output = $p->get_updated_html();
+	if ( ! empty( $figcaption_span ) ) {
+		return substr( $output, 0, $figcaption_span->start ) . substr( $output, $figcaption_span->start + $figcaption_span->length );
+	}
+	return $output;
 }
 
 /**
