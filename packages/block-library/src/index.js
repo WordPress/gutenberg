@@ -9,7 +9,6 @@ import {
 	registerBlockType,
 } from '@wordpress/blocks';
 import { createElement } from '@wordpress/element';
-import ServerSideRender from '@wordpress/server-side-render';
 
 /**
  * Internal dependencies
@@ -319,15 +318,38 @@ export const registerCoreBlocks = (
 				title: blockName,
 				edit: function Edit( { attributes } ) {
 					const { useBlockProps } = window.wp.blockEditor;
+					const { useServerSideRender } = window.wp.serverSideRender;
+					const { __, sprintf } = window.wp.i18n;
 					const blockProps = useBlockProps();
-					return createElement(
-						'div',
-						blockProps,
-						createElement( ServerSideRender, {
-							block: blockName,
-							attributes,
-						} )
-					);
+					const { content, status, error } = useServerSideRender( {
+						block: blockName,
+						attributes,
+					} );
+
+					if ( status === 'loading' ) {
+						return createElement(
+							'div',
+							blockProps,
+							__( 'Loading…' )
+						);
+					}
+
+					if ( status === 'error' ) {
+						return createElement(
+							'div',
+							blockProps,
+							sprintf(
+								/* translators: %s: error message describing the problem */
+								__( 'Error loading block: %s' ),
+								error
+							)
+						);
+					}
+
+					return createElement( 'div', {
+						...blockProps,
+						dangerouslySetInnerHTML: { __html: content || '' },
+					} );
 				},
 				save: () => null,
 			} );
