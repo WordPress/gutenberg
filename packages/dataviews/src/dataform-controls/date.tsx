@@ -377,16 +377,13 @@ function CalendarDateControl< Item >( {
 	);
 }
 
-function CalendarDateRangeControl< Item >( {
+function CalendarDateRangeControl( {
 	id,
 	value,
 	onChange,
 	label,
 	hideLabelFromVision,
 	className,
-	data,
-	field,
-	setValue,
 }: {
 	id: string;
 	value: DateRange;
@@ -394,9 +391,6 @@ function CalendarDateRangeControl< Item >( {
 	label: string;
 	hideLabelFromVision?: boolean;
 	className?: string;
-	data: Item;
-	field: any;
-	setValue: any;
 } ) {
 	const [ selectedPresetId, setSelectedPresetId ] = useState< string | null >(
 		null
@@ -417,16 +411,6 @@ function CalendarDateRangeControl< Item >( {
 	const [ calendarMonth, setCalendarMonth ] = useState< Date >( () => {
 		return selectedRange.from || new Date();
 	} );
-
-	// Static error for testing
-	const [ customValidity ] = useState< {
-		type: 'invalid';
-		message: string;
-	} >( {
-		type: 'invalid',
-		message: 'There is an error',
-	} );
-	const validityTargetRef = useRef< HTMLInputElement >( null );
 
 	const updateDateRange = useCallback(
 		( fromDate?: Date | string, toDate?: Date | string ) => {
@@ -488,102 +472,78 @@ function CalendarDateRangeControl< Item >( {
 	const { timezone, l10n } = getSettings();
 
 	return (
-		<div>
-			<BaseControl
-				__nextHasNoMarginBottom
-				id={ id }
-				className={ className }
-				label={ label }
-				hideLabelFromVision={ hideLabelFromVision }
-			>
-				<VStack spacing={ 4 }>
-					{ /* Preset buttons */ }
-					<HStack spacing={ 2 } wrap justify="flex-start">
-						{ DATE_RANGE_PRESETS.map( ( preset ) => {
-							const isSelected = selectedPresetId === preset.id;
-							return (
-								<Button
-									className="dataviews-controls__date-preset"
-									key={ preset.id }
-									variant="tertiary"
-									isPressed={ isSelected }
-									size="small"
-									onClick={ () =>
-										handlePresetClick( preset )
-									}
-								>
-									{ preset.label }
-								</Button>
-							);
-						} ) }
-						<Button
-							className="dataviews-controls__date-preset"
-							variant="tertiary"
-							isPressed={ ! selectedPresetId }
-							size="small"
-							accessibleWhenDisabled={ false }
-							disabled={ !! selectedPresetId }
-						>
-							{ __( 'Custom' ) }
-						</Button>
-					</HStack>
-
-					{ /* Manual date range inputs */ }
-					<HStack spacing={ 2 }>
-						<InputControl
-							__next40pxDefaultSize
-							ref={ validityTargetRef }
-							type="date"
-							label={ __( 'From' ) }
-							hideLabelFromVision
-							value={ value?.[ 0 ] }
-							onChange={ ( newValue ) =>
-								handleManualDateChange( 'from', newValue )
-							}
-							required={ !! field.isValid?.required }
-						/>
-						<InputControl
-							__next40pxDefaultSize
-							type="date"
-							label={ __( 'To' ) }
-							hideLabelFromVision
-							value={ value?.[ 1 ] }
-							onChange={ ( newValue ) =>
-								handleManualDateChange( 'to', newValue )
-							}
-						/>
-					</HStack>
-
-					<DateRangeCalendar
-						style={ { width: '100%' } }
-						selected={ selectedRange }
-						onSelect={ onSelectCalendarRange }
-						month={ calendarMonth }
-						onMonthChange={ setCalendarMonth }
-						timeZone={ timezone.string || undefined }
-						weekStartsOn={ l10n.startOfWeek }
-					/>
-				</VStack>
-			</BaseControl>
-			<div aria-live="polite">
-				{ customValidity && (
-					<p
-						className={ clsx(
-							'components-validated-control__indicator',
-							'is-invalid'
-						) }
+		<BaseControl
+			__nextHasNoMarginBottom
+			id={ id }
+			className={ className }
+			label={ label }
+			hideLabelFromVision={ hideLabelFromVision }
+		>
+			<VStack spacing={ 4 }>
+				{ /* Preset buttons */ }
+				<HStack spacing={ 2 } wrap justify="flex-start">
+					{ DATE_RANGE_PRESETS.map( ( preset ) => {
+						const isSelected = selectedPresetId === preset.id;
+						return (
+							<Button
+								className="dataviews-controls__date-preset"
+								key={ preset.id }
+								variant="tertiary"
+								isPressed={ isSelected }
+								size="small"
+								onClick={ () => handlePresetClick( preset ) }
+							>
+								{ preset.label }
+							</Button>
+						);
+					} ) }
+					<Button
+						className="dataviews-controls__date-preset"
+						variant="tertiary"
+						isPressed={ ! selectedPresetId }
+						size="small"
+						accessibleWhenDisabled={ false }
+						disabled={ !! selectedPresetId }
 					>
-						<Icon
-							className="components-validated-control__indicator-icon"
-							icon={ errorIcon }
-							size={ 16 }
-							fill="currentColor"
-						/>
-						{ customValidity.message }
-					</p>
-				) }
-			</div>
-		</div>
+						{ __( 'Custom' ) }
+					</Button>
+				</HStack>
+
+				{ /* Manual date range inputs */ }
+				<HStack spacing={ 2 }>
+					<InputControl
+						__next40pxDefaultSize
+						type="date"
+						label={ __( 'From' ) }
+						hideLabelFromVision
+						value={ value?.[ 0 ] }
+						onChange={ ( newValue ) =>
+							handleManualDateChange( 'from', newValue )
+						}
+					/>
+					<InputControl
+						__next40pxDefaultSize
+						type="date"
+						label={ __( 'To' ) }
+						hideLabelFromVision
+						value={ value?.[ 1 ] }
+						onChange={ ( newValue ) =>
+							handleManualDateChange( 'to', newValue )
+						}
+					/>
+				</HStack>
+
+				<DateRangeCalendar
+					style={ { width: '100%' } }
+					selected={ selectedRange }
+					onSelect={ onSelectCalendarRange }
+					month={ calendarMonth }
+					onMonthChange={ setCalendarMonth }
+					timeZone={ timezone.string || undefined }
+					weekStartsOn={ l10n.startOfWeek }
+				/>
+			</VStack>
+		</BaseControl>
 	);
 }
 
