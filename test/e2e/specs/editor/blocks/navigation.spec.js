@@ -748,6 +748,19 @@ test.describe( 'Navigation block', () => {
 
 			await expect( linkInput ).toBeDisabled();
 			await expect( linkInput ).toHaveValue( testPage1.link );
+
+			// Todo: we need to find a way to better communicate the relationship
+			// between the control and the input.
+			// Assert that clicking the unlink button:
+			// - unbinds the entity
+			// - enables the input
+			// - clears the input
+			const unlinkButton = settingsControls.getByRole( 'button', {
+				name: 'Unlink and edit',
+			} );
+			await unlinkButton.click();
+			await expect( linkInput ).toBeEnabled();
+			await expect( linkInput ).toHaveValue( '' );
 		} );
 	} );
 } );
