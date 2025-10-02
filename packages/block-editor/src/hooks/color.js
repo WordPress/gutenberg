@@ -267,6 +267,7 @@ export function ColorEdit( {
 	settings,
 	asWrapper,
 	label,
+	defaultControls,
 } ) {
 	const isEnabled = useHasColorPanel( settings );
 
@@ -296,10 +297,12 @@ export function ColorEdit( {
 		return null;
 	}
 
-	const defaultControls = getBlockSupport( name, [
-		COLOR_SUPPORT_KEY,
-		'__experimentalDefaultControls',
-	] );
+	defaultControls = defaultControls
+		? defaultControls
+		: getBlockSupport( name, [
+				COLOR_SUPPORT_KEY,
+				'__experimentalDefaultControls',
+		  ] );
 
 	const enableContrastChecking =
 		Platform.OS === 'web' &&

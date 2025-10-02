@@ -24,14 +24,28 @@ function SectionBlockControls( { blockName, clientId } ) {
 		updateBlockAttributes( clientId, newAttributes );
 	};
 
+	// This is needed to force the captions setting to show
+	// but there's probably a right way to do it.
+	const newSettings = { ...settings };
+	newSettings.color.caption = true;
+
 	return (
 		<ColorEdit
 			clientId={ clientId }
 			name={ blockName }
-			settings={ settings }
+			settings={ newSettings }
 			setAttributes={ setAttributes }
 			asWrapper={ ColorToolsPanel }
 			label={ __( 'Color' ) }
+			defaultControls={ {
+				// TODO - this is duplicated in packages/block-editor/src/components/global-styles/color-panel.js
+				text: true,
+				background: true,
+				link: true,
+				heading: true,
+				button: true,
+				caption: true,
+			} }
 		/>
 	);
 }
