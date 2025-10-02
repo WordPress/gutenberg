@@ -30,20 +30,10 @@
 		box-sizing: border-box;
 	}
 
-	a,
 	svg {
 		width: 100%;
 		height: 100%;
 		transition: transform 0.1s ease-in-out;
-	}
-
-	// Added for a11y. In-block hover/focus controls will be added in future releases.
-	a:hover {
-		transform: scale(1.1);
-	}
-
-	// Deprecated classes as of v2.0.0. Will be removed in v2.5.0.
-	svg {
 		transform: rotate(var(--outermost--icon-block--transform-rotate, 0deg)) scaleX(var(--outermost--icon-block--transform-scale-x, 1)) scaleY(var(--outermost--icon-block--transform-scale-y, 1));
 	}
 

@@ -24,17 +24,7 @@ import { flattenIconsArray, parseIcon } from './utils';
  * @param {Object} props All props passed to this function.
  */
 export default function save( props ) {
-	const {
-		icon,
-		iconName,
-		label,
-		linkRel,
-		linkTarget,
-		linkUrl,
-		title,
-		width,
-		height,
-	} = props.attributes;
+	const { icon, iconName, label, title, width, height } = props.attributes;
 
 	// If there is no icon and no iconName, don't save anything.
 	if ( ! icon && ! iconName ) {
@@ -75,7 +65,7 @@ export default function save( props ) {
 		return null;
 	}
 
-	// If a label is set, add as aria-label. Will overwite any aria-label in
+	// If a label is set, add as aria-label. Will overwrite any aria-label in
 	// custom icons.
 	if ( label ) {
 		printedIcon = {
@@ -125,28 +115,11 @@ export default function save( props ) {
 		marginTop: blockStyles?.marginTop,
 	};
 
-	const rel = linkRel && linkRel.length === 0 ? undefined : linkRel;
-	const target =
-		linkTarget && linkTarget.length === 0 ? undefined : linkTarget;
-
 	const iconMarkup = (
 		<>
-			{ linkUrl ? (
-				<a
-					className={ iconClasses }
-					href={ linkUrl }
-					target={ target }
-					rel={ rel }
-					style={ iconStyles }
-					aria-label={ label ? label : null }
-				>
-					{ printedIcon }
-				</a>
-			) : (
-				<div className={ iconClasses } style={ iconStyles }>
-					{ printedIcon }
-				</div>
-			) }
+			<div className={ iconClasses } style={ iconStyles }>
+				{ printedIcon }
+			</div>
 		</>
 	);
 

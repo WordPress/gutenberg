@@ -14,7 +14,6 @@ import {
 	MenuGroup,
 	MenuItem,
 	NavigableMenu,
-	Popover,
 	TextControl,
 	ToolbarButton,
 	ToolbarGroup,
@@ -28,13 +27,12 @@ import {
 	MediaUpload,
 	useBlockProps,
 	useBlockEditingMode,
-	__experimentalLinkControl as LinkControl,
 	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 } from '@wordpress/block-editor';
-import { useRef, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { displayShortcut, isKeyboardEvent, DOWN } from '@wordpress/keycodes';
-import { code, link, media as mediaIcon } from '@wordpress/icons';
+import { DOWN } from '@wordpress/keycodes';
+import { code, media as mediaIcon } from '@wordpress/icons';
 import { applyFilters } from '@wordpress/hooks';
 
 /**
@@ -56,8 +54,6 @@ import { bolt as defaultIcon } from './icons/bolt';
 import getIcons from './icons';
 import { useToolsPanelDropdownMenuProps } from './utils/hooks';
 
-const NEW_TAB_REL = 'noreferrer noopener';
-
 /**
  * The edit function for the Icon Block.
  *
@@ -65,17 +61,7 @@ const NEW_TAB_REL = 'noreferrer noopener';
  */
 export function Edit( props ) {
 	const { attributes, setAttributes } = props;
-	const {
-		icon,
-		iconName,
-		label,
-		linkRel,
-		linkTarget,
-		linkUrl,
-		title,
-		width,
-		height,
-	} = attributes;
+	const { icon, iconName, label, title, width, height } = attributes;
 
 	// Allowed types for the current user.
 	const { allowedMimeTypes, mediaUpload } = useSelect( ( select ) => {
@@ -96,7 +82,6 @@ export function Edit( props ) {
 	const [ isInserterOpen, setInserterOpen ] = useState( false );
 	const [ isQuickInserterOpen, setQuickInserterOpen ] = useState( false );
 	const [ isCustomInserterOpen, setCustomInserterOpen ] = useState( false );
-	const [ isEditingURL, setIsEditingURL ] = useState( false );
 
 	// Allow users to disable custom SVG icons.
 	const enableCustomIcons = applyFilters(
@@ -105,9 +90,6 @@ export function Edit( props ) {
 	);
 
 	const isContentOnlyMode = useBlockEditingMode() === 'contentOnly';
-	const linkRef = useRef( null );
-	const isURLSet = !! linkUrl;
-	const opensInNewTab = linkTarget === '_blank';
 
 	const iconsAll = flattenIconsArray( getIcons() );
 	const namedIcon = iconsAll.filter( ( i ) => i.name === iconName );
@@ -136,48 +118,12 @@ export function Edit( props ) {
 		}
 	}
 
-	function unlink() {
-		setAttributes( {
-			linkUrl: undefined,
-			linkTarget: undefined,
-			linkRel: undefined,
-		} );
-		setIsEditingURL( false );
-	}
-
 	function resetAll() {
 		setAttributes( {
 			label: undefined,
 			width: undefined,
 			height: undefined,
 		} );
-	}
-
-	function onToggleOpenInNewTab( value ) {
-		const newLinkTarget = value ? '_blank' : undefined;
-
-		let updatedRel = linkRel;
-		if ( newLinkTarget && ! linkRel ) {
-			updatedRel = NEW_TAB_REL;
-		} else if ( ! newLinkTarget && linkRel === NEW_TAB_REL ) {
-			updatedRel = undefined;
-		}
-
-		setAttributes( {
-			linkTarget: newLinkTarget,
-			linkRel: updatedRel,
-		} );
-	}
-
-	function onKeyDown( event ) {
-		if ( isKeyboardEvent.primary( event, 'k' ) ) {
-			// Prevent the command palette from opening.
-			event.preventDefault();
-			setIsEditingURL( true );
-		} else if ( isKeyboardEvent.primaryShift( event, 'k' ) ) {
-			unlink();
-			linkRef.current?.focus();
-		}
 	}
 
 	const openOnArrowDown = ( event ) => {
@@ -279,55 +225,7 @@ export function Edit( props ) {
 							'wp-block-outermost-icon-block__toolbar':
 								! isContentOnlyMode,
 						} ) }
-					>
-						<ToolbarButton
-							ref={ linkRef }
-							name="link"
-							icon={ link }
-							title={ __( 'Link' ) }
-							shortcut={ displayShortcut.primary( 'k' ) }
-							onClick={ () => setIsEditingURL( true ) }
-							isActive={ isURLSet }
-						/>
-						{ isEditingURL && (
-							<Popover
-								className="wp-block-outermost-icon-block__link-popover"
-								anchor={ linkRef?.current }
-								offset={ 12 }
-								placement="bottom"
-								onClose={ () => {
-									setIsEditingURL( false );
-									linkRef.current?.focus();
-								} }
-								focusOnMount={
-									isEditingURL ? 'firstElement' : false
-								}
-								variant="alternate"
-							>
-								<LinkControl
-									value={ { url: linkUrl, opensInNewTab } }
-									onChange={ ( {
-										url: newURL = '',
-										opensInNewTab: newOpensInNewTab,
-									} ) => {
-										setAttributes( { linkUrl: newURL } );
-
-										if (
-											opensInNewTab !== newOpensInNewTab
-										) {
-											onToggleOpenInNewTab(
-												newOpensInNewTab
-											);
-										}
-									} }
-									onRemove={ () => {
-										unlink();
-										linkRef.current?.focus();
-									} }
-								/>
-							</Popover>
-						) }
-					</ToolbarGroup>
+					></ToolbarGroup>
 				</BlockControls>
 			) }
 			<BlockControls group={ isContentOnlyMode ? 'inline' : 'other' }>
@@ -451,17 +349,6 @@ export function Edit( props ) {
 			</InspectorControls>
 
 			<InspectorControls group="advanced">
-				{ linkUrl && (
-					<TextControl
-						label={ __( 'Link rel' ) }
-						value={ linkRel || '' }
-						onChange={ ( value ) =>
-							setAttributes( { linkRel: value } )
-						}
-						__nextHasNoMarginBottom
-						__next40pxDefaultSize
-					/>
-				) }
 				<TextControl
 					label={ __( 'Title attribute' ) }
 					className="outermost-icon-block__title-control"
@@ -552,10 +439,7 @@ export function Edit( props ) {
 			{ blockControls }
 			{ inspectorControls }
 			<div
-				{ ...useBlockProps( {
-					//ref,
-					onKeyDown,
-				} ) }
+				{ ...useBlockProps() }
 				// This is a bit of a hack. we only want the margin styles
 				// applied to the main block div.
 				style={ blockMargin }

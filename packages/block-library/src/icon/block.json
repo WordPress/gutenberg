@@ -24,15 +24,6 @@
 		"title": {
 			"type": "string"
 		},
-		"linkUrl": {
-			"type": "string"
-		},
-		"linkRel": {
-			"type": "string"
-		},
-		"linkTarget": {
-			"type": "string"
-		},
 		"width": {
 			"type": [ "string", "number" ]
 		},
