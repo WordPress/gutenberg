@@ -122,6 +122,7 @@ export default function BlockVisibility() {
 				blockTypes={ filteredBlockTypes }
 				selectedBlockTypes={ selectedBlockTypes }
 				onChange={ onChangeSelectedBlockTypes }
+				showSelectAll={ false }
 			/>
 		</div>
 	);

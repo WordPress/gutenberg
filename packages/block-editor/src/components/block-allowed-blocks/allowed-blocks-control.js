@@ -46,9 +46,9 @@ export default function BlockAllowedBlocksControl( { clientId } ) {
 
 	const selectedBlockTypes =
 		selectedBlockNames === undefined
-			? blockTypes
-			: blockTypes.filter( ( { name } ) =>
-					selectedBlockNames.includes( name )
+			? filteredBlockTypes
+			: filteredBlockTypes.filter( ( blockType ) =>
+					selectedBlockNames.includes( blockType.name )
 			  );
 
 	return (
