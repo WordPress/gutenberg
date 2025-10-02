@@ -36,6 +36,65 @@ export default function BlockManager( {
 		};
 	}, [] );
 
+	// Function to determine which sticky element is active in the viewport
+	const getActiveStickyElement = ( Elements, parentElement ) => {
+		for ( const Element of Elements ) {
+			const rect = Element.getBoundingClientRect();
+
+			// Check if the sticky element is in the viewport
+			if ( rect.top < parentElement.clientHeight && rect.bottom > 0 ) {
+				return Element; // Return the active sticky element
+			}
+		}
+		return null; // No sticky element is active in the viewport
+	};
+
+	useEffect( () => {
+		const container = document.querySelector(
+			'.components-modal__content'
+		);
+		const stickyElements = document.querySelectorAll(
+			'.block-editor-block-manager__category-title'
+		);
+		let activeStickyElement = null;
+
+		if ( ! container || ! stickyElements ) {
+			return;
+		}
+
+		const handleFocusIn = ( event ) => {
+			activeStickyElement = getActiveStickyElement(
+				stickyElements,
+				container
+			);
+			const focusedElement = event.target;
+
+			// Check if the focused element is within the container
+			if ( container.contains( focusedElement ) ) {
+				const stickyBottom =
+					activeStickyElement.getBoundingClientRect().bottom;
+				const focusedRect = focusedElement.getBoundingClientRect();
+
+				// Calculate the desired scroll position
+				if ( focusedRect.top < stickyBottom ) {
+					const offset =
+						container.scrollTop - activeStickyElement.offsetHeight;
+					container.scrollTo( {
+						top: offset,
+						behavior: 'smooth',
+					} );
+				}
+			}
+		};
+
+		container.addEventListener( 'focusin', handleFocusIn );
+
+		// Cleanup the event listener
+		return () => {
+			container.removeEventListener( 'focusin', handleFocusIn );
+		};
+	}, [] );
+
 	function enableAllBlockTypes() {
 		onChange( blockTypes );
 	}
