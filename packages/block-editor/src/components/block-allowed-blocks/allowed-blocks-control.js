@@ -1,11 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { MenuItem } from '@wordpress/components';
+import { BaseControl, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -15,18 +16,16 @@ import { store as blockEditorStore } from '../../store';
 
 export default function BlockAllowedBlocksControl( { clientId } ) {
 	const [ isBlockControlOpened, setIsBlockControlOpened ] = useState( false );
+	const instanceId = useInstanceId(
+		BlockAllowedBlocksControl,
+		'allowed-blocks-control'
+	);
 
 	const { blockTypes, selectedBlockNames } = useSelect(
 		( select ) => {
-			const _blockTypes = select( blocksStore ).getBlockTypes();
 			const { getBlockAttributes } = select( blockEditorStore );
 			return {
-				blockTypes: _blockTypes.filter(
-					( blockType ) =>
-						hasBlockSupport( blockType, 'inserter', true ) &&
-						( ! blockType.parent ||
-							blockType.parent.includes( 'core/post-content' ) )
-				),
+				blockTypes: select( blocksStore ).getBlockTypes(),
 				selectedBlockNames:
 					getBlockAttributes( clientId )?.allowedBlocks,
 			};
@@ -34,7 +33,14 @@ export default function BlockAllowedBlocksControl( { clientId } ) {
 		[ clientId ]
 	);
 
-	if ( ! blockTypes ) {
+	const filteredBlockTypes = blockTypes.filter(
+		( blockType ) =>
+			hasBlockSupport( blockType, 'inserter', true ) &&
+			( ! blockType.parent ||
+				blockType.parent.includes( 'core/post-content' ) )
+	);
+
+	if ( ! filteredBlockTypes ) {
 		return null;
 	}
 
@@ -46,24 +52,34 @@ export default function BlockAllowedBlocksControl( { clientId } ) {
 			  );
 
 	return (
-		<>
-			<MenuItem
-				onClick={ () => {
-					setIsBlockControlOpened( true );
-				} }
-				aria-expanded={ isBlockControlOpened }
-				aria-haspopup="dialog"
+		<div className="block-editor-block-allowed-blocks-control">
+			<BaseControl
+				id={ instanceId }
+				label={ __( 'Allowed Blocks' ) }
+				help={ __(
+					'Specify which blocks are allowed inside this container.'
+				) }
+				__nextHasNoMarginBottom
 			>
-				{ __( 'Manage allowed blocks' ) }
-			</MenuItem>
+				<Button
+					__next40pxDefaultSize
+					variant="secondary"
+					onClick={ () => {
+						setIsBlockControlOpened( true );
+					} }
+					className="block-editor-block-allowed-blocks-control__button"
+				>
+					{ __( 'Manage' ) }
+				</Button>
+			</BaseControl>
 			{ isBlockControlOpened && (
 				<BlockAllowedBlocksModal
 					clientId={ clientId }
-					blockTypes={ blockTypes }
+					blockTypes={ filteredBlockTypes }
 					selectedBlockTypes={ selectedBlockTypes }
 					onClose={ () => setIsBlockControlOpened( false ) }
 				/>
 			) }
-		</>
+		</div>
 	);
 }
