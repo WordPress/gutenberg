@@ -1975,62 +1975,6 @@ describe( 'blocks', () => {
 			);
 		} );
 	} );
-
-	describe( 'backward compatibility', () => {
-		afterEach( () => {
-			unregisterBlockBindingsSource( 'core/testing' );
-		} );
-
-		it( 'should show deprecation warning for getFieldsList but still register source', () => {
-			registerBlockBindingsSource( {
-				name: 'core/testing',
-				label: 'testing',
-				getFieldsList: () => ( {
-					field1: {
-						label: 'Field 1',
-						value: 'value1',
-						type: 'string',
-					},
-				} ),
-			} );
-			expect( console ).toHaveWarnedWith(
-				'getFieldsList in block bindings source is deprecated since version 6.9. Please use editorUI instead. Note: The editorUI property provides more flexibility and better UI integration.'
-			);
-			// Source should still be registered for backward compatibility
-			expect( getBlockBindingsSource( 'core/testing' ) ).toBeDefined();
-		} );
-
-		it( 'should work with both getFieldsList and editorUI (editorUI takes precedence)', () => {
-			registerBlockBindingsSource( {
-				name: 'core/testing',
-				label: 'testing',
-				getFieldsList: () => ( {
-					field1: {
-						label: 'Field 1',
-						value: 'value1',
-						type: 'string',
-					},
-				} ),
-				editorUI: () => ( {
-					mode: 'dropdown',
-					data: [
-						{
-							label: 'Field 2',
-							args: { testArg: 'value2' },
-							type: 'string',
-						},
-					],
-				} ),
-			} );
-			expect( console ).toHaveWarnedWith(
-				'getFieldsList in block bindings source is deprecated since version 6.9. Please use editorUI instead. Note: The editorUI property provides more flexibility and better UI integration.'
-			);
-			const source = getBlockBindingsSource( 'core/testing' );
-			expect( source ).toBeDefined();
-			expect( source.getFieldsList ).toBeDefined();
-			expect( source.editorUI ).toBeDefined();
-		} );
-	} );
 } );
 
 /* eslint-enable react/forbid-elements */

@@ -158,7 +158,6 @@ The function to register a custom source is `registerBlockBindingsSource( args )
     - `setValues`: `function` that allows updating the values connected to the source. (optional)
     - `canUserEditValue`: `function` to determine if the user can edit the value. The user won't be able to edit by default. (optional)
     - `editorUI`: `function` that provides UI configuration for connecting to the source in the editor. (optional)
-    - ~~`getFieldsList`~~: **Deprecated since WordPress 6.9.** Use `editorUI` instead for better UI integration and more flexibility. (optional)
 
 
 This example will show a custom post meta date in the editor and, if it doesn't exist, it will show today's date. The user can edit the value of the date. (Caution: This example does not format the user input as a date—it's only for educational purposes.)
@@ -327,35 +326,6 @@ registerBlockBindingsSource( {
 		};
 	},
 } );
-```
-
-#### Migration from getFieldsList
-
-If you're migrating from the deprecated `getFieldsList` property, here's how to convert it:
-
-**Before (deprecated):**
-
-```js
-getFieldsList( { select, context } ) {
-	return {
-		field1: { label: 'Field 1', value: 'value1', type: 'string' },
-		field2: { label: 'Field 2', value: 'value2', type: 'number' }
-	};
-}
-```
-
-**After (recommended):**
-
-```js
-editorUI( { select, context } ) {
-	return {
-		mode: 'dropdown',
-		data: [
-			{ args: { key: 'field1' }, label: 'Field 1', type: 'string' },
-			{ args: { key: 'field2' }, label: 'Field 2', type: 'number' }
-		]
-	};
-}
 ```
 
 #### Editor registration Core examples

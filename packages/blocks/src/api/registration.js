@@ -3,7 +3,6 @@
  */
 import { select, dispatch } from '@wordpress/data';
 import { _x } from '@wordpress/i18n';
-import deprecated from '@wordpress/deprecated';
 import warning from '@wordpress/warning';
 
 /**
@@ -924,13 +923,6 @@ export const registerBlockBindingsSource = ( source ) => {
 		return;
 	}
 
-	if ( getFieldsList ) {
-		deprecated( 'getFieldsList in block bindings source', {
-			since: '6.9',
-			alternative: 'editorUI',
-			hint: 'The editorUI property provides more flexibility and better UI integration.',
-		} );
-	}
 	// Check the `getFieldsList` property is correct.
 	if ( getFieldsList && typeof getFieldsList !== 'function' ) {
 		// eslint-disable-next-line no-console
