@@ -31,21 +31,31 @@ export default {
 			return {};
 		}
 
-		const { getEntityRecord } = select( coreDataStore );
-
 		// Get the entity type and kind from block attributes
 		const { type, kind } = blockAttributes || {};
 
+		// Validate required attributes exist
+		if ( ! type || ! kind ) {
+			return {};
+		}
+
+		// Validate entity kind is supported
+		if ( kind !== 'post-type' && kind !== 'taxonomy' ) {
+			return {};
+		}
+
+		const { getEntityRecord } = select( coreDataStore );
 		let value = '';
 
 		// Handle post types
 		if ( kind === 'post-type' ) {
-			const post = getEntityRecord(
-				'postType',
-				type || 'post',
-				entityId
-			);
-			value = post?.link || '';
+			const post = getEntityRecord( 'postType', type, entityId );
+
+			if ( ! post ) {
+				return {};
+			}
+
+			value = post.link || '';
 		}
 		// Handle taxonomies
 		else if ( kind === 'taxonomy' ) {
@@ -53,13 +63,18 @@ export default {
 			// See https://github.com/WordPress/gutenberg/issues/71979.
 			const taxonomySlug = type === 'tag' ? 'post_tag' : type;
 			const term = getEntityRecord( 'taxonomy', taxonomySlug, entityId );
-			value = term?.link || '';
+
+			if ( ! term ) {
+				return {};
+			}
+
+			value = term.link || '';
 		}
 
-		// TODO: Add validation to ensure required attributes exist
-		// TODO: Add error handling for invalid entity types or missing data
-		// TODO: Consider property mapping between posts and terms for future keys
-		// TODO: Support additional keys beyond 'url' in the future
+		// If we couldn't get a valid URL, return empty object
+		if ( ! value ) {
+			return {};
+		}
 
 		return {
 			url: value,
