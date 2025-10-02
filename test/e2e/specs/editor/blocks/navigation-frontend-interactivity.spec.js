@@ -131,6 +131,80 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await expect( overlayMenuFirstElement ).toBeHidden();
 			await expect( openMenuButton ).toBeFocused();
 		} );
+
+		test( 'Overlay menu closes on same-page hash links', async ( {
+			page,
+			admin,
+			editor,
+			requestUtils,
+		} ) => {
+			// Create a page with a section that can be targeted by hash
+			const testPage = await requestUtils.createPage( {
+				title: 'Hash Test Page',
+				content: `
+					<!-- wp:heading {"anchor":"test-section"} -->
+					<h2 class="wp-block-heading" id="test-section">Test Section</h2>
+					<!-- /wp:heading -->
+					
+					<!-- wp:paragraph -->
+					<p>This is the target section for hash navigation.</p>
+					<!-- /wp:paragraph -->
+				`,
+				status: 'publish',
+			} );
+
+			// Create navigation menu with hash link
+			await requestUtils.createNavigationMenu( {
+				title: 'Hash menu',
+				content: `
+					<!-- wp:navigation-link {"label":"Jump to Section","type":"custom","url":"#test-section"} /-->
+					<!-- wp:navigation-link {"label":"External Link","type":"custom","url":"http://www.wordpress.org/"} /-->
+				`,
+			} );
+
+			// Set up navigation block in header
+			await admin.visitSiteEditor( {
+				postId: 'emptytheme//header',
+				postType: 'wp_template_part',
+				canvas: 'edit',
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { overlayMenu: 'always' },
+			} );
+			await editor.saveSiteEditorEntities( {
+				isOnlyCurrentEntityDirty: true,
+			} );
+
+			// Navigate to the test page
+			await page.goto( `/?p=${ testPage.id }` );
+
+			const hashLink = page.getByRole( 'link', {
+				name: 'Jump to Section',
+			} );
+			const externalLink = page.getByRole( 'link', {
+				name: 'External Link',
+			} );
+			const openMenuButton = page.getByRole( 'button', {
+				name: 'Open menu',
+			} );
+
+			// Test: overlay opens and hash link is visible
+			await openMenuButton.click();
+			await expect( hashLink ).toBeVisible();
+			await expect( externalLink ).toBeVisible();
+
+			// Test: clicking same-page hash link closes overlay
+			await hashLink.click();
+			await expect( hashLink ).toBeHidden();
+			await expect( externalLink ).toBeHidden();
+
+			// Test: external links don't close overlay (for comparison)
+			await openMenuButton.click();
+			await expect( externalLink ).toBeVisible();
+			// Note: We can't actually test external link navigation in e2e
+			// without leaving the test environment, so we just verify the overlay behavior
+		} );
 	} );
 
 	test.describe( 'Submenu mouse and keyboard interactions', () => {
