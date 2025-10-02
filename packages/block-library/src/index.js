@@ -33,7 +33,6 @@ import * as accordionPanel from './accordion-panel';
 import * as archives from './archives';
 import * as avatar from './avatar';
 import * as audio from './audio';
-import * as breadcrumbs from './breadcrumbs';
 import * as button from './button';
 import * as buttons from './buttons';
 import * as calendar from './calendar';
@@ -88,6 +87,7 @@ import * as paragraph from './paragraph';
 import * as postAuthor from './post-author';
 import * as postAuthorName from './post-author-name';
 import * as postAuthorBiography from './post-author-biography';
+import * as postBreadcrumbs from './post-breadcrumbs';
 import * as postComment from './post-comment';
 import * as postCommentsCount from './post-comments-count';
 import * as postCommentsForm from './post-comments-form';
@@ -217,7 +217,7 @@ const getAllBlocks = () => {
 		postContent,
 		postAuthor,
 		postAuthorName,
-		breadcrumbs,
+		postBreadcrumbs,
 		postComment,
 		postCommentsCount,
 		postCommentsLink,

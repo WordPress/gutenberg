@@ -1,6 +1,6 @@
 [
 	{
-		"blockName": "core/breadcrumbs",
+		"blockName": "core/post-breadcrumbs",
 		"attrs": {},
 		"innerBlocks": [],
 		"innerHTML": "",

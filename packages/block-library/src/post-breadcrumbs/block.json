@@ -1,7 +1,7 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"name": "core/breadcrumbs",
+	"name": "core/post-breadcrumbs",
 	"title": "Breadcrumbs",
 	"category": "theme",
 	"description": "Display a breadcrumb trail only for Pages, or for hierarchical post types. The block is useful to insert in the Pages template.",
@@ -37,7 +37,7 @@
 			"width": true,
 			"style": true,
 			"__experimentalDefaultControls": {
-				"radius": true,
+				"radius": false,
 				"color": true,
 				"width": true,
 				"style": true
@@ -60,5 +60,5 @@
 			"clientNavigation": true
 		}
 	},
-	"style": "wp-block-breadcrumbs"
+	"style": "wp-block-post-breadcrumbs"
 }

@@ -7,8 +7,8 @@ import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
 // These post types are "structural" block lists.
-// We should be allowed to use
-// the post content, template parts and breadcrumbs blocks within them.
+// We should be allowed to use the post content,
+// template parts and breadcrumbs blocks within them.
 const POST_TYPES_ALLOWING_POST_CONTENT_TEMPLATE_PART_BREADCRUMBS = [
 	'wp_block',
 	'wp_template',
@@ -87,7 +87,7 @@ export function useHideBlocksFromInserter( postType, mode ) {
 						postType
 					) &&
 					! isHierarchicalPostType &&
-					blockType.name === 'core/breadcrumbs' &&
+					blockType.name === 'core/post-breadcrumbs' &&
 					mode === 'post-only'
 				) {
 					return false;

@@ -1,12 +1,12 @@
 <?php
 /**
- * Server-side rendering of the `core/breadcrumbs` block.
+ * Server-side rendering of the `core/post-breadcrumbs` block.
  *
  * @package WordPress
  */
 
 /**
- * Renders the `core/breadcrumbs` block on the server.
+ * Renders the `core/post-breadcrumbs` block on the server.
  *
  * @since 6.9.0
  *
@@ -16,7 +16,7 @@
  *
  * @return string Returns the post breadcrumb for hierarchical post types.
  */
-function render_block_core_breadcrumbs( $attributes, $content, $block ) {
+function render_block_core_post_breadcrumbs( $attributes, $content, $block ) {
 	if ( ! isset( $block->context['postId'] ) || ! isset( $block->context['postType'] ) ) {
 		return '';
 	}
@@ -95,16 +95,16 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 }
 
 /**
- * Registers the `core/breadcrumbs` block on the server.
+ * Registers the `core/post-breadcrumbs` block on the server.
  *
  * @since 6.9.0
  */
-function register_block_core_breadcrumbs() {
+function register_block_core_post_breadcrumbs() {
 	register_block_type_from_metadata(
-		__DIR__ . '/breadcrumbs',
+		__DIR__ . '/post-breadcrumbs',
 		array(
-			'render_callback' => 'render_block_core_breadcrumbs',
+			'render_callback' => 'render_block_core_post_breadcrumbs',
 		)
 	);
 }
-add_action( 'init', 'register_block_core_breadcrumbs' );
+add_action( 'init', 'register_block_core_post_breadcrumbs' );
