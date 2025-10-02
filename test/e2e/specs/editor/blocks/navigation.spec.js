@@ -817,14 +817,13 @@ test.describe( 'Navigation block', () => {
 
 			await expect( updatedLinkInput ).toHaveValue( updatedPage.link );
 
-			// Todo: we need to find a way to better communicate the relationship
-			// between the control and the input.
-			// Assert that clicking the unlink button:
-			// - unbinds the entity
-			// - enables the input
-			// - clears the input
+			// Find the button using its name and aria-describedby ID
+			// The button has aria-describedby pointing to the help text element
+			const helpTextId =
+				await linkInput.getAttribute( 'aria-describedby' );
 			const unlinkButton = settingsControls.getByRole( 'button', {
 				name: 'Unsync and edit',
+				description: helpTextId,
 			} );
 			await unlinkButton.click();
 			await expect( linkInput ).toBeEnabled();
