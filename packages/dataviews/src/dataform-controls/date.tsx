@@ -5,7 +5,6 @@ import {
 	BaseControl,
 	Button,
 	privateApis as componentsPrivateApis,
-	__experimentalInputControl as InputControl,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
@@ -16,6 +15,7 @@ import { getDate, getSettings } from '@wordpress/date';
 /**
  * External dependencies
  */
+import deepMerge from 'deepmerge';
 import {
 	format,
 	isValid,
@@ -41,7 +41,9 @@ import {
 import { unlock } from '../lock-unlock';
 import type { DataFormControlProps } from '../types';
 
-const { DateCalendar, DateRangeCalendar } = unlock( componentsPrivateApis );
+const { DateCalendar, DateRangeCalendar, ValidatedInputControl } = unlock(
+	componentsPrivateApis
+);
 
 type DateRange = [ string, string ] | undefined;
 
@@ -139,13 +141,15 @@ const formatDate = ( date?: Date | string ): string => {
 	return typeof date === 'string' ? date : format( date, 'yyyy-MM-dd' );
 };
 
-function CalendarDateControl( {
+function CalendarDateControl< Item >( {
 	id,
 	value,
 	onChange,
 	label,
 	hideLabelFromVision,
 	className,
+	data,
+	field,
 }: {
 	id: string;
 	value: string | undefined;
@@ -153,15 +157,55 @@ function CalendarDateControl( {
 	label: string;
 	hideLabelFromVision?: boolean;
 	className?: string;
+	data: Item;
+	field: DataFormControlProps< Item >[ 'field' ];
 } ) {
 	const [ selectedPresetId, setSelectedPresetId ] = useState< string | null >(
 		null
 	);
+	const [ customValidity, setCustomValidity ] =
+		useState<
+			React.ComponentProps<
+				typeof ValidatedInputControl
+			>[ 'customValidity' ]
+		>( undefined );
 
 	const [ calendarMonth, setCalendarMonth ] = useState< Date >( () => {
 		const parsedDate = parseDate( value );
 		return parsedDate || new Date(); // Default to current month
 	} );
+
+	const onValidateControl = useCallback(
+		( newValue: any ) => {
+			// If field is not required and value is empty, clear validation
+			if ( ! field.isValid?.required && ! newValue ) {
+				setCustomValidity( undefined );
+				return;
+			}
+
+			const message = field.isValid?.custom?.(
+				deepMerge(
+					data,
+					field.setValue( {
+						item: data,
+						value: newValue,
+					} ) as Partial< Item >
+				),
+				field
+			);
+
+			if ( message ) {
+				setCustomValidity( {
+					type: 'invalid',
+					message,
+				} );
+				return;
+			}
+
+			setCustomValidity( undefined );
+		},
+		[ data, field ]
+	);
 
 	const onSelectDate = useCallback(
 		( newDate: Date | undefined | null ) => {
@@ -170,8 +214,14 @@ function CalendarDateControl( {
 				: undefined;
 			onChange( dateValue );
 			setSelectedPresetId( null );
+			// Clear validation error when selecting from calendar
+			if ( dateValue ) {
+				onValidateControl( dateValue );
+			} else {
+				setCustomValidity( undefined );
+			}
 		},
-		[ onChange ]
+		[ onChange, onValidateControl ]
 	);
 
 	const handlePresetClick = useCallback(
@@ -182,8 +232,10 @@ function CalendarDateControl( {
 			setCalendarMonth( presetDate );
 			onChange( dateValue );
 			setSelectedPresetId( preset.id );
+			// Clear validation error when selecting preset
+			onValidateControl( dateValue );
 		},
-		[ onChange ]
+		[ onChange, onValidateControl ]
 	);
 
 	const handleManualDateChange = useCallback(
@@ -244,21 +296,23 @@ function CalendarDateControl( {
 				</HStack>
 
 				{ /* Manual date input */ }
-				<InputControl
+				<ValidatedInputControl
+					required={ !! field.isValid?.required }
+					onValidate={ onValidateControl }
+					customValidity={ customValidity }
 					__next40pxDefaultSize
 					type="date"
 					label={ __( 'Date' ) }
 					hideLabelFromVision
-					value={ value }
+					value={ value ?? '' }
+					help={ field.description }
 					onChange={ handleManualDateChange }
 				/>
 
 				{ /* Calendar widget */ }
 				<DateCalendar
 					style={ { width: '100%' } }
-					selected={
-						value ? parseDate( value ) || undefined : undefined
-					}
+					selected={ value ? parseDate( value ) || undefined : undefined }
 					onSelect={ onSelectDate }
 					month={ calendarMonth }
 					onMonthChange={ setCalendarMonth }
@@ -270,13 +324,15 @@ function CalendarDateControl( {
 	);
 }
 
-function CalendarDateRangeControl( {
+function CalendarDateRangeControl< Item >( {
 	id,
 	value,
 	onChange,
 	label,
 	hideLabelFromVision,
 	className,
+	data,
+	field,
 }: {
 	id: string;
 	value: DateRange;
@@ -284,10 +340,24 @@ function CalendarDateRangeControl( {
 	label: string;
 	hideLabelFromVision?: boolean;
 	className?: string;
+	data: Item;
+	field: DataFormControlProps< Item >[ 'field' ];
 } ) {
 	const [ selectedPresetId, setSelectedPresetId ] = useState< string | null >(
 		null
 	);
+	const [ customValidityFrom, setCustomValidityFrom ] =
+		useState<
+			React.ComponentProps<
+				typeof ValidatedInputControl
+			>[ 'customValidity' ]
+		>( undefined );
+	const [ customValidityTo, setCustomValidityTo ] =
+		useState<
+			React.ComponentProps<
+				typeof ValidatedInputControl
+			>[ 'customValidity' ]
+		>( undefined );
 
 	const selectedRange = useMemo( () => {
 		if ( ! value ) {
@@ -317,6 +387,60 @@ function CalendarDateRangeControl( {
 		[ onChange ]
 	);
 
+	const validateRangeValue = useCallback(
+		(
+			fromValue: string | undefined,
+			toValue: string | undefined,
+			setValidity: ( validity: any ) => void
+		) => {
+			const updatedValue = [ fromValue, toValue ];
+
+			// If field is not required and both values are empty, clear validation
+			if ( ! field.isValid?.required && ! fromValue && ! toValue ) {
+				setValidity( undefined );
+				return;
+			}
+
+			const message = field.isValid?.custom?.(
+				deepMerge(
+					data,
+					field.setValue( {
+						item: data,
+						value: updatedValue,
+					} ) as Partial< Item >
+				),
+				field
+			);
+
+			if ( message ) {
+				setValidity( {
+					type: 'invalid',
+					message,
+				} );
+				return;
+			}
+
+			setValidity( undefined );
+		},
+		[ data, field ]
+	);
+
+	const onValidateControlFrom = useCallback(
+		( newValue: any ) => {
+			const [ , currentTo ] = value || [ undefined, undefined ];
+			validateRangeValue( newValue, currentTo, setCustomValidityFrom );
+		},
+		[ value, validateRangeValue ]
+	);
+
+	const onValidateControlTo = useCallback(
+		( newValue: any ) => {
+			const [ currentFrom ] = value || [ undefined, undefined ];
+			validateRangeValue( currentFrom, newValue, setCustomValidityTo );
+		},
+		[ value, validateRangeValue ]
+	);
+
 	const onSelectCalendarRange = useCallback(
 		(
 			newRange:
@@ -325,8 +449,17 @@ function CalendarDateRangeControl( {
 		) => {
 			updateDateRange( newRange?.from, newRange?.to );
 			setSelectedPresetId( null );
+			// Clear validation errors when selecting from calendar
+			if ( newRange?.from ) {
+				const fromValue = formatDate( newRange.from );
+				onValidateControlFrom( fromValue );
+			}
+			if ( newRange?.to ) {
+				const toValue = formatDate( newRange.to );
+				onValidateControlTo( toValue );
+			}
 		},
-		[ updateDateRange ]
+		[ updateDateRange, onValidateControlFrom, onValidateControlTo ]
 	);
 
 	const handlePresetClick = useCallback(
@@ -335,8 +468,13 @@ function CalendarDateRangeControl( {
 			setCalendarMonth( startDate );
 			updateDateRange( startDate, endDate );
 			setSelectedPresetId( preset.id );
+			// Clear validation errors when selecting preset
+			const fromValue = formatDate( startDate );
+			const toValue = formatDate( endDate );
+			onValidateControlFrom( fromValue );
+			onValidateControlTo( toValue );
 		},
-		[ updateDateRange ]
+		[ updateDateRange, onValidateControlFrom, onValidateControlTo ]
 	);
 
 	const handleManualDateChange = useCallback(
@@ -404,23 +542,31 @@ function CalendarDateRangeControl( {
 
 				{ /* Manual date range inputs */ }
 				<HStack spacing={ 2 }>
-					<InputControl
+					<ValidatedInputControl
+						required={ !! field.isValid?.required }
+						onValidate={ onValidateControlFrom }
+						customValidity={ customValidityFrom }
 						__next40pxDefaultSize
 						type="date"
 						label={ __( 'From' ) }
 						hideLabelFromVision
-						value={ value?.[ 0 ] }
-						onChange={ ( newValue ) =>
+						value={ value?.[ 0 ] ?? '' }
+						help={ field.description }
+						onChange={ ( newValue: string ) =>
 							handleManualDateChange( 'from', newValue )
 						}
 					/>
-					<InputControl
+					<ValidatedInputControl
+						required={ !! field.isValid?.required }
+						onValidate={ onValidateControlTo }
+						customValidity={ customValidityTo }
 						__next40pxDefaultSize
 						type="date"
 						label={ __( 'To' ) }
 						hideLabelFromVision
-						value={ value?.[ 1 ] }
-						onChange={ ( newValue ) =>
+						value={ value?.[ 1 ] ?? '' }
+						help={ field.description }
+						onChange={ ( newValue: string ) =>
 							handleManualDateChange( 'to', newValue )
 						}
 					/>
@@ -508,6 +654,8 @@ export default function DateControl< Item >( {
 				onChange={ onChangeCalendarDateRangeControl }
 				label={ label }
 				hideLabelFromVision={ hideLabelFromVision }
+				data={ data }
+				field={ field }
 			/>
 		);
 	}
@@ -520,6 +668,8 @@ export default function DateControl< Item >( {
 			onChange={ onChangeCalendarDateControl }
 			label={ label }
 			hideLabelFromVision={ hideLabelFromVision }
+			data={ data }
+			field={ field }
 		/>
 	);
 }
