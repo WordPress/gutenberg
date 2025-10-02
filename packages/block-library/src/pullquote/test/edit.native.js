@@ -2,72 +2,33 @@
  * External dependencies
  */
 import {
-	addBlock,
-	getBlock,
 	initializeEditor,
-	selectRangeInRichText,
 	setupCoreBlocks,
-	getEditorHtml,
 	fireEvent,
 	within,
-	waitFor,
-	typeInRichText,
 } from 'test/helpers';
-
-/**
- * WordPress dependencies
- */
-import { ENTER } from '@wordpress/keycodes';
 
 setupCoreBlocks();
 
 describe( 'Pullquote', () => {
-	it( 'should produce expected markup for multiline text', async () => {
+	it( 'should not be present in inserter modal', async () => {
 		// Arrange
 		const screen = await initializeEditor();
-		await addBlock( screen, 'Pullquote' );
-		// Await inner blocks to be rendered
-		const citationBlock = await waitFor( () =>
-			screen.getByPlaceholderText( 'Add citation' )
-		);
 
-		// Act
-		const pullquoteBlock = getBlock( screen, 'Pullquote' );
-		fireEvent.press( pullquoteBlock );
-		const pullquoteTextInput =
-			within( pullquoteBlock ).getByPlaceholderText( 'Add quote' );
-		typeInRichText( pullquoteTextInput, 'A great statement.' );
-		fireEvent( pullquoteTextInput, 'onKeyDown', {
-			nativeEvent: {},
-			preventDefault() {},
-			keyCode: ENTER,
-		} );
-		typeInRichText( pullquoteTextInput, 'Again' );
+		fireEvent.press( screen.getByLabelText( 'Add block' ) );
 
-		const citationTextInput =
-			within( citationBlock ).getByPlaceholderText( 'Add citation' );
-		typeInRichText( citationTextInput, 'A person' );
-		fireEvent( citationTextInput, 'onKeyDown', {
-			nativeEvent: {},
-			preventDefault() {},
-			keyCode: ENTER,
-		} );
-		selectRangeInRichText( citationTextInput, 2 );
-		fireEvent( citationTextInput, 'onKeyDown', {
-			nativeEvent: {},
-			preventDefault() {},
-			keyCode: ENTER,
+		const inserterModal = screen.getByTestId( 'InserterUI-Blocks' );
+		// onScroll event used to force the FlatList to render all items
+		fireEvent.scroll( inserterModal, {
+			nativeEvent: {
+				contentOffset: { y: 0, x: 0 },
+				contentSize: { width: 100, height: 100 },
+				layoutMeasurement: { width: 100, height: 100 },
+			},
 		} );
 
-		// Assert
-		expect( getEditorHtml() ).toMatchInlineSnapshot( `
-		"<!-- wp:pullquote -->
-		<figure class="wp-block-pullquote"><blockquote><p>A great statement.<br>Again</p><cite>A <br>person</cite></blockquote></figure>
-		<!-- /wp:pullquote -->
-
-		<!-- wp:paragraph -->
-		<p></p>
-		<!-- /wp:paragraph -->"
-	` );
+		expect(
+			await within( inserterModal ).queryByText( 'Pullquote' )
+		).toBeNull();
 	} );
 } );

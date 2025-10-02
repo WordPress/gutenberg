@@ -68,10 +68,12 @@ exports[`Block Actions Menu block options duplicates a block 1`] = `
 <!-- /wp:heading -->"
 `;
 
-exports[`Block Actions Menu block options transforms a Paragraph block into a Pullquote block 1`] = `
-"<!-- wp:pullquote -->
-<figure class="wp-block-pullquote"><blockquote><p>Hello!</p></blockquote></figure>
-<!-- /wp:pullquote -->
+exports[`Block Actions Menu block options transforms a Paragraph block into a Quote block 1`] = `
+"<!-- wp:quote -->
+<blockquote class="wp-block-quote"><!-- wp:paragraph -->
+<p>Hello!</p>
+<!-- /wp:paragraph --></blockquote>
+<!-- /wp:quote -->
 
 <!-- wp:spacer -->
 <div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
