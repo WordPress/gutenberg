@@ -249,17 +249,17 @@ function ReadOnlyBlockBindingsPanelItems( { bindings, sources } ) {
 	);
 }
 
-function EditableBlockBindingsPanelItems( { attributes, bindings, sources } ) {
+function EditableBlockBindingsPanelItems( {
+	attributes,
+	bindings,
+	sources,
+	setModalState,
+} ) {
 	const { updateBlockBindings } = useBlockBindingsUtils();
 	const isMobile = useViewportMatch( 'medium', '<' );
-	const [ modalState, setModalState ] = useState( null );
 
 	const handleOpenModal = ( { attribute, sourceKey } ) => {
 		setModalState( { attribute, sourceKey } );
-	};
-
-	const handleCloseModal = () => {
-		setModalState( null );
 	};
 
 	return (
@@ -301,19 +301,6 @@ function EditableBlockBindingsPanelItems( { attributes, bindings, sources } ) {
 					</ToolsPanelItem>
 				);
 			} ) }
-			{ modalState && (
-				<Modal onRequestClose={ handleCloseModal }>
-					{ ( () => {
-						const RenderModalContent =
-							sources[ modalState.sourceKey ].renderModalContent;
-						return (
-							<RenderModalContent
-								attribute={ modalState.attribute }
-							/>
-						);
-					} )() }
-				</Modal>
-			) }
 		</>
 	);
 }
@@ -322,6 +309,11 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 	const blockContext = useContext( BlockContext );
 	const { removeAllBlockBindings } = useBlockBindingsUtils();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+	const [ modalState, setModalState ] = useState( null );
+
+	const handleCloseModal = () => {
+		setModalState( null );
+	};
 
 	// Use useSelect to ensure sources are updated whenever there are updates in block context
 	// or when underlying data changes.
@@ -498,6 +490,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 							attributes={ bindableAttributes }
 							bindings={ filteredBindings }
 							sources={ sources }
+							setModalState={ setModalState }
 						/>
 					) }
 				</ItemGroup>
@@ -513,6 +506,19 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 					</p>
 				</Text>
 			</ToolsPanel>
+			{ modalState && (
+				<Modal onRequestClose={ handleCloseModal }>
+					{ ( () => {
+						const RenderModalContent =
+							sources[ modalState.sourceKey ].renderModalContent;
+						return (
+							<RenderModalContent
+								attribute={ modalState.attribute }
+							/>
+						);
+					} )() }
+				</Modal>
+			) }
 		</InspectorControls>
 	);
 };
