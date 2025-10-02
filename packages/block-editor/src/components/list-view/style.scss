@@ -22,6 +22,10 @@
 	&.is-dragging tbody {
 		pointer-events: none;
 	}
+
+	&.is-focus-mode .block-editor-list-view-leaf:not(.is-selected, .has-selected-child, .is-within-edited-section) {
+		opacity: 0.4;
+	}
 }
 
 .block-editor-list-view-leaf {

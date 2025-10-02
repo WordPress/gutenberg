@@ -45,6 +45,8 @@ import { BlockSettingsDropdown } from '../block-settings-menu/block-settings-dro
 import { focusListItem } from './utils';
 import useClipboardHandler from './use-clipboard-handler';
 
+import { unlock } from '../../lock-unlock';
+
 const expanded = ( state, action ) => {
 	if ( action.type === 'clear' ) {
 		return {};
@@ -119,16 +121,21 @@ function ListViewComponent(
 	const blockIndexes = useListViewBlockIndexes( clientIdsTree );
 
 	const { getBlock } = useSelect( blockEditorStore );
-	const { visibleBlockCount } = useSelect(
+	const { visibleBlockCount, isFocusMode } = useSelect(
 		( select ) => {
-			const { getGlobalBlockCount, getClientIdsOfDescendants } =
-				select( blockEditorStore );
+			const {
+				getGlobalBlockCount,
+				getClientIdsOfDescendants,
+				getSettings,
+				hasBlockSpotlight,
+			} = unlock( select( blockEditorStore ) );
 			const draggedBlockCount =
 				draggedClientIds?.length > 0
 					? getClientIdsOfDescendants( draggedClientIds ).length + 1
 					: 0;
 			return {
 				visibleBlockCount: getGlobalBlockCount() - draggedBlockCount,
+				isFocusMode: getSettings().focusMode || hasBlockSpotlight(),
 			};
 		},
 		[ draggedClientIds ]
@@ -365,6 +372,7 @@ function ListViewComponent(
 					'is-dragging':
 						draggedClientIds?.length > 0 &&
 						blockDropTargetIndex !== undefined,
+					'is-focus-mode': isFocusMode,
 				} ) }
 				aria-label={ __( 'Block navigation structure' ) }
 				ref={ treeGridRef }

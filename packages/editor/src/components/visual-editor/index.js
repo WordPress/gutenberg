@@ -39,6 +39,7 @@ import {
 } from '../../store/constants';
 import { useZoomOutModeExit } from './use-zoom-out-mode-exit';
 import { usePaddingAppender } from './use-padding-appender';
+import { useEditContentOnlySectionExit } from './use-edit-content-only-section-exit';
 
 const {
 	LayoutStyle,
@@ -396,6 +397,7 @@ function VisualEditor( {
 		} ),
 		useZoomOutModeExit(),
 		paddingAppenderRef,
+		useEditContentOnlySectionExit(),
 	] );
 
 	return (
