@@ -234,19 +234,15 @@ function BlockBindingsAttribute( { attribute, binding, source } ) {
 }
 
 function ReadOnlyBlockBindingsPanelItems( { bindings, sources } ) {
-	return (
-		<>
-			{ Object.entries( bindings ).map( ( [ attribute, binding ] ) => (
-				<Item key={ attribute }>
-					<BlockBindingsAttribute
-						attribute={ attribute }
-						binding={ binding }
-						source={ sources?.[ binding?.source ] }
-					/>
-				</Item>
-			) ) }
-		</>
-	);
+	return Object.entries( bindings ).map( ( [ attribute, binding ] ) => (
+		<Item key={ attribute }>
+			<BlockBindingsAttribute
+				attribute={ attribute }
+				binding={ binding }
+				source={ sources?.[ binding?.source ] }
+			/>
+		</Item>
+	) );
 }
 
 function EditableBlockBindingsPanelItems( {
