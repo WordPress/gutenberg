@@ -488,7 +488,7 @@ function LinkControl( {
 						className="block-editor-link-control__search-submit"
 						aria-disabled={ isDisabled }
 					>
-						{ __( 'Save' ) }
+						{ __( 'Apply' ) }
 					</Button>
 				</HStack>
 			) }

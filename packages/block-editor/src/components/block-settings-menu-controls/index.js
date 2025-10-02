@@ -6,6 +6,7 @@ import {
 	MenuGroup,
 	__experimentalStyleProvider as StyleProvider,
 } from '@wordpress/components';
+import { hasBlockSupport } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -24,13 +25,20 @@ import {
 	BlockAllowedBlocksControl,
 	useBlockAllowedBlocks,
 } from '../block-allowed-blocks';
+import { BlockVisibilityMenuItem } from '../block-visibility';
 
 const { Fill, Slot } = createSlotFill( 'BlockSettingsMenuControls' );
 
 const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
-	const { selectedBlocks, selectedClientIds, isContentOnly } = useSelect(
+	const {
+		selectedBlocks,
+		selectedClientIds,
+		isContentOnly,
+		canToggleSelectedBlocksVisibility,
+	} = useSelect(
 		( select ) => {
 			const {
+				getBlocksByClientId,
 				getBlockNamesByClientId,
 				getSelectedBlockClientIds,
 				getBlockEditingMode,
@@ -42,6 +50,11 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 				selectedClientIds: ids,
 				isContentOnly:
 					getBlockEditingMode( ids[ 0 ] ) === 'contentOnly',
+				canToggleSelectedBlocksVisibility: getBlocksByClientId(
+					ids
+				).every( ( block ) =>
+					hasBlockSupport( block.name, 'blockVisibility', true )
+				),
 			};
 		},
 		[ clientIds ]
@@ -60,6 +73,8 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 		selectedClientIds.length === 1 &&
 		canControlAllowedBlocks &&
 		! isContentOnly;
+	const showVisibilityButton =
+		canToggleSelectedBlocksVisibility && ! isContentOnly;
 
 	// Check if current selection of blocks is Groupable or Ungroupable
 	// and pass this props down to ConvertToGroupButton.
@@ -107,6 +122,11 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 						{ showAllowedBlocksButton && (
 							<BlockAllowedBlocksControl
 								clientId={ selectedClientIds[ 0 ] }
+							/>
+						) }
+						{ showVisibilityButton && (
+							<BlockVisibilityMenuItem
+								clientIds={ selectedClientIds }
 							/>
 						) }
 						{ fills }

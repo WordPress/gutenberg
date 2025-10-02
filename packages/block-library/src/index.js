@@ -24,8 +24,8 @@ import ServerSideRender from '@wordpress/server-side-render';
 //
 // See https://github.com/WordPress/gutenberg/pull/40655 for more context.
 import * as accordion from './accordion';
-import * as accordionContent from './accordion-content';
-import * as accordionHeader from './accordion-header';
+import * as accordionItem from './accordion-item';
+import * as accordionHeading from './accordion-heading';
 import * as accordionPanel from './accordion-panel';
 import * as archives from './archives';
 import * as avatar from './avatar';
@@ -246,8 +246,8 @@ const getAllBlocks = () => {
 
 	if ( window?.__experimentalEnableBlockExperiments ) {
 		blocks.push( accordion );
-		blocks.push( accordionContent );
-		blocks.push( accordionHeader );
+		blocks.push( accordionItem );
+		blocks.push( accordionHeading );
 		blocks.push( accordionPanel );
 		blocks.push( termsQuery );
 		blocks.push( termTemplate );

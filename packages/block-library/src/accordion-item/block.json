@@ -1,13 +1,13 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"name": "core/accordion-content",
-	"title": "Accordion Content",
+	"name": "core/accordion-item",
+	"title": "Accordion Item",
 	"category": "design",
-	"description": "Displays a section of content in an accordion, including a header and expandable content.",
+	"description": "Displays a section of content in an accordion, including a heading and expandable content.",
 	"__experimental": true,
 	"parent": [ "core/accordion" ],
-	"allowedBlocks": [ "core/accordion-header", "core/accordion-panel" ],
+	"allowedBlocks": [ "core/accordion-heading", "core/accordion-panel" ],
 	"supports": {
 		"color": {
 			"background": true,
@@ -53,5 +53,5 @@
 		}
 	},
 	"textdomain": "default",
-	"style": "wp-block-accordion-content"
+	"style": "wp-block-accordion-item"
 }

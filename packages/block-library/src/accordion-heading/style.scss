@@ -1,4 +1,4 @@
-.wp-block-accordion-header__toggle {
+.wp-block-accordion-heading__toggle {
 	font-family: inherit;
 	font-size: inherit;
 	font-weight: inherit;
@@ -24,17 +24,17 @@
 	}
 
 	&:hover {
-		.wp-block-accordion-header__toggle-title {
+		.wp-block-accordion-heading__toggle-title {
 			text-decoration: underline;
 		}
 	}
 }
 
-.wp-block-accordion-header__toggle-title {
+.wp-block-accordion-heading__toggle-title {
 	flex: 1;
 }
 
-.wp-block-accordion-header__toggle-icon {
+.wp-block-accordion-heading__toggle-icon {
 	width: 1.2em;
 	height: 1.2em;
 	display: flex;
