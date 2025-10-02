@@ -114,6 +114,9 @@ add_filter( 'query', 'gutenberg_filter_comment_count_query_exclude_block_comment
 global $gutenberg_post_screen_labels;
 $gutenberg_post_screen_labels = array();
 
+global $gutenberg_post_screen_avatar_indicators;
+$gutenberg_post_screen_avatar_indicators = array();
+
 /**
  * Add an "Open Discussion" label next to the title of posts that have unresolved comments.
  *
@@ -124,8 +127,9 @@ $gutenberg_post_screen_labels = array();
  * @param int    $post_id The post ID.
  * @return string The modified post title.
  */
-function gutenberg_add_open_discussion_label_to_post_title( $title, $post_id ) {
+function gutenberg_add_open_discussion_indicator_to_post_title( $title, $post_id ) {
 	global $gutenberg_post_screen_labels;
+	global $gutenberg_post_screen_avatar_indicators;
 
 	if ( ! $post_id || ! function_exists( 'get_current_screen' ) ) {
 		return $title;
@@ -138,19 +142,29 @@ function gutenberg_add_open_discussion_label_to_post_title( $title, $post_id ) {
 		if ( $post && gutenberg_check_post_type_supports_block_comments( $post->post_type ) ) {
 			$unresolved_comments = get_comments(
 				array(
-					'post_id' => $post_id,
-					'type'    => 'block_comment',
-					'status'  => 'hold',
-					'count'   => true,
+					'post_id'  => $post_id,
+					'type'     => 'block_comment',
+					'status'   => 'hold',
+					'per_page' => 100,
 				)
 			);
-			error_log( "Unresolved comments for post $post_id: $unresolved_comments" );
-			if ( $unresolved_comments > 0 ) {
+			if ( count( $unresolved_comments ) > 0 ) {
 				// Note: we can't use a <span> here because of how WordPress sanitizes titles.
 				// Instead, we will insert a JavaScript snippet to add the label later.
 				// For the core backport we will not need this approach - we can use a <span> directly.
 				if ( ! in_array( $post_id, $gutenberg_post_screen_labels, true ) ) {
 					array_push( $gutenberg_post_screen_labels, $post_id );
+
+					// Gather the Avatar urls for authors of the most recent unresolved comments.
+					$avatar_urls = array();
+					foreach ( $unresolved_comments as $comment ) {
+						$gravatar_params = array(
+							'size' => 24,
+							''
+						);
+						$avatar_urls[] = get_avatar_url( $comment->user_id, $gravatar_params );
+					}
+					$gutenberg_post_screen_avatar_indicators[ $post_id ] = $avatar_urls;
 				}
 			}
 		}
@@ -158,29 +172,65 @@ function gutenberg_add_open_discussion_label_to_post_title( $title, $post_id ) {
 	return $title;
 
 }
-add_filter( 'the_title', 'gutenberg_add_open_discussion_label_to_post_title', 10, 2 );
+add_filter( 'the_title', 'gutenberg_add_open_discussion_indicator_to_post_title', 10, 2 );
 
 function gutenberg_insert_open_discussion_label_scripts()  {
 	global $post_id;
 	global $gutenberg_post_screen_labels;
+	global $gutenberg_post_screen_avatar_indicators;
 
 	if ( count( $gutenberg_post_screen_labels ) === 0 ) {
 		return;
 	}
 	$script = '';
-	$label  = __( 'Open Discussion', 'gutenberg' );
 
 	foreach ( $gutenberg_post_screen_labels as $post_id ) {
 		$script = '<script>
-			document.addEventListener("DOMContentLoaded", function() {
-				const titleElement = document.querySelector("a.row-title[href=\'' . get_edit_post_link( $post_id, '' ) . '\']").parentElement;
-				if (titleElement) {
-					const label = document.createElement("span");
-					label.textContent =  ' . wp_json_encode( $label ) . ';
-					titleElement.appendChild(label);
-					// Add any additional styling or classes to the label if needed.
-					label.classList.add("open-discussion-label");
-			}
+			document.addEventListener( "DOMContentLoaded", function() {
+				const titleElement = document.querySelector( "a.row-title[href=\'' . get_edit_post_link( $post_id, '' ) . '\']").parentElement;
+				if ( titleElement ) {
+					// Add avatar indicators.
+					const avatarUrls = ' . wp_json_encode( $gutenberg_post_screen_avatar_indicators[ $post_id ] ) . ';
+					const maxAvatars = 3;
+					let zIndex = maxAvatars;
+					if ( avatarUrls && avatarUrls.length > 0 ) {
+						const avatarContainer = document.createElement( "div" );
+						avatarContainer.style.marginLeft = "8px";
+						avatarContainer.classList.add( "comment-avatar-stack" );
+						urlTracker = [];
+						avatarUrls.forEach( url => {
+							if ( zIndex <= 0 ) {
+								return;
+							}
+							if ( urlTracker.includes( url ) ) {
+								return;
+							}
+							urlTracker.push( url );
+							const img = document.createElement( "img" );
+							img.src = url;
+							img.classList.add( "comment-avatar" );
+							img.style.zIndex = zIndex--;
+							img.alt = "' . __( 'Discussion author avatar', 'gutenberg' ) . '";
+							avatarContainer.appendChild( img );
+						} );
+
+						// If there are over maxAvatars unresolved comments, add a +N indicator.
+						// If there are over 100 comments show 100+.
+						if ( avatarUrls.length > maxAvatars ) {
+							const moreIndicator = document.createElement( "span" );
+							if ( 100 === avatarUrls.length ) {
+								moreIndicator.textContent = "+100";
+							} else {
+								moreIndicator.textContent = "+" + ( avatarUrls.length - maxAvatars );
+							}
+							moreIndicator.style.fontSize = "12px";
+							moreIndicator.style.verticalAlign = "middle";
+							avatarContainer.appendChild( moreIndicator );
+						}
+
+						titleElement.appendChild( avatarContainer );
+					}
+				}
 			} );
 		</script>';
 		echo $script;
@@ -198,21 +248,30 @@ function gutenberg_add_open_discussion_label_styles() {
 	if ( 'edit-post' === $screen->id ) {
 ?>
 	<style>
-		.open-discussion-label {
-			display: inline-block;
-			padding: 3px 8px;
-			font-size: 12px;
-			font-weight: 500;
-			line-height: 1;
-			border-radius: 12px;
-			background-color: #d54e21;
-			color: #ffffff;
-			margin-left: 8px;
+		.comment-avatar-stack {
+			display: inline-flex;
+			align-items: center;
 			vertical-align: middle;
 		}
-		.open-discussion-label:hover {
-			background-color: #a6361a;
-			cursor: default;
+		.comment-avatar{
+			border: 2px solid #fff;
+			border-radius: 50%;
+			flex-shrink: 0;
+			height: 20px;
+			margin-left: -6px;
+			width: 20px;
+			padding: 1px;
+			background: #fff;
+		}
+		.comment-avatar:first-child{
+			border-color: rgb(159, 177, 255);
+			margin-left: 0;
+		}
+		.comment-avatar:nth-child(2){
+			border-color: rgb(122, 0, 223);
+		}
+		.comment-avatar:nth-child(3){
+			border-color: rgb(255, 249, 114);
 		}
 	</style>
 <?php
