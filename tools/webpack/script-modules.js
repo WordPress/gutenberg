@@ -66,38 +66,42 @@ for ( const packageDir of packageDirs ) {
 		);
 	}
 }
+module.exports = function () {
+	const suffix = baseConfig.mode === 'production' ? '.min' : '';
 
-module.exports = {
-	...baseConfig,
-	name: 'script-modules',
-	entry: Object.fromEntries( gutenbergScriptModules.entries() ),
-	experiments: {
-		outputModule: true,
-	},
-	output: {
-		devtoolNamespace: 'wp',
-		filename: '[name].min.js',
-		library: {
-			type: 'module',
+	const config = {
+		...baseConfig,
+		name: 'script-modules',
+		entry: Object.fromEntries( gutenbergScriptModules.entries() ),
+		experiments: {
+			outputModule: true,
 		},
-		path: join( __dirname, '..', '..', 'build-module' ),
-		environment: { module: true },
-		module: true,
-		chunkFormat: 'module',
-		asyncChunks: false,
-	},
-	resolve: {
-		extensions: [ '.js', '.ts', '.tsx' ],
-	},
-	plugins: [
-		...plugins,
-		new DependencyExtractionWebpackPlugin( {
-			combineAssets: true,
-			combinedOutputFile: `./assets.php`,
-		} ),
-	],
-	watchOptions: {
-		ignored: [ '**/node_modules' ],
-		aggregateTimeout: 500,
-	},
+		output: {
+			devtoolNamespace: 'wp',
+			filename: `[name]${ suffix }.js`,
+			library: {
+				type: 'module',
+			},
+			path: join( __dirname, '..', '..', 'build-module' ),
+			environment: { module: true },
+			module: true,
+			chunkFormat: 'module',
+			asyncChunks: false,
+		},
+		resolve: {
+			extensions: [ '.js', '.ts', '.tsx' ],
+		},
+		plugins: [
+			...plugins,
+			new DependencyExtractionWebpackPlugin( {
+				combineAssets: true,
+				combinedOutputFile: `./assets${ suffix }.php`,
+			} ),
+		],
+		watchOptions: {
+			ignored: [ '**/node_modules' ],
+			aggregateTimeout: 500,
+		},
+	};
+	return config;
 };

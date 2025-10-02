@@ -617,6 +617,7 @@ add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
  * @since 19.3.0
  */
 function gutenberg_default_script_modules() {
+	$suffix = wp_scripts_get_suffix();
 	/*
 	 * Expects multidimensional array like:
 	 *
@@ -624,7 +625,7 @@ function gutenberg_default_script_modules() {
 	 *     'interactivity/debug.min.js' => array('dependencies' => array(…), 'version' => '…'),
 	 *     'interactivity-router/index.min.js' => …
 	 */
-	$assets = include gutenberg_dir_path() . '/build-module/assets.php';
+	$assets = include gutenberg_dir_path() . "/build-module/assets{$suffix}.php";
 
 	foreach ( $assets as $file_name => $script_module_data ) {
 		/*
@@ -634,7 +635,7 @@ function gutenberg_default_script_modules() {
 		 *   - interactivity/debug.min.js  => @wordpress/interactivity/debug
 		 *   - block-library/query/view.js => @wordpress/block-library/query/view
 		 */
-		$script_module_id = '@wordpress/' . preg_replace( '~(?:/index)?\.min\.js$~D', '', $file_name, 1 );
+		$script_module_id = '@wordpress/' . preg_replace( '~(?:/index)?(?:\.min)?\.js$~D', '', $file_name, 1 );
 		switch ( $script_module_id ) {
 			/*
 			 * Interactivity exposes two entrypoints, "/index" and "/debug".
