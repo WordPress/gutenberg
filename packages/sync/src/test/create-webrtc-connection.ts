@@ -4,7 +4,6 @@
 import { describe, expect, it, jest, beforeEach } from '@jest/globals';
 import type * as Y from 'yjs';
 
-// Mock WebrtcProviderWithHttpSignaling
 const mockWebrtcProvider = {
 	destroy: jest.fn(),
 };
@@ -17,7 +16,6 @@ jest.mock( '../webrtc-http-stream-signaling', () => {
 	};
 } );
 
-// Mock yjs
 const mockYDoc = {
 	clientID: 12345,
 	meta: new Map(),
@@ -157,7 +155,6 @@ describe( 'createWebRTCConnection', () => {
 				mockYDoc as unknown as Y.Doc
 			);
 
-			// Should not throw
 			expect( () => result.destroy() ).not.toThrow();
 		} );
 	} );

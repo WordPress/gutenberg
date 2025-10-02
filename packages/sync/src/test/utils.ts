@@ -3,7 +3,6 @@
  */
 import { describe, expect, it, jest, beforeEach } from '@jest/globals';
 
-// Mock Yjs with actual Map behavior for get/set
 const mockYMapData = new Map();
 const mockYMap = {
 	get: jest.fn( ( key: string ) => mockYMapData.get( key ) ),
@@ -38,7 +37,6 @@ import {
 
 describe( 'utils', () => {
 	beforeEach( () => {
-		// Reset mock between tests
 		mockYDoc.meta = new Map();
 		mockYMapData.clear();
 		mockYMap.get.mockClear();
@@ -67,7 +65,6 @@ describe( 'utils', () => {
 				author: 'test-user',
 			};
 
-			// Reset and manually populate meta since the actual createYjsDoc uses Map constructor
 			mockYDoc.meta = new Map( Object.entries( documentMeta ) );
 
 			createYjsDoc( documentMeta );

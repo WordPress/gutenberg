@@ -3,7 +3,6 @@
  */
 import { describe, expect, it, jest, beforeEach } from '@jest/globals';
 
-// Mock Yjs
 const mockYDoc = {
 	clientID: 12345,
 	meta: new Map(),
@@ -21,7 +20,6 @@ jest.mock( 'yjs', () => ( {
  */
 import { UndoManager } from '../undo-manager';
 
-// Mock the y-utilities module - create shared instance that all tests use
 const mockYMultiDocUndoManager = {
 	addToScope: jest.fn(),
 	undo: jest.fn(),
@@ -57,10 +55,8 @@ describe( 'UndoManager', () => {
 			expect( instance1 ).toBe( instance2 );
 			expect( instance1 ).toBeInstanceOf( UndoManager );
 
-			// Verify YMultiDocUndoManager was called once (not twice due to singleton)
 			expect( YMultiDocUndoManager ).toHaveBeenCalledTimes( 1 );
 
-			// Verify initialization properties
 			const callArgs = YMultiDocUndoManager.mock.calls[ 0 ];
 			const options = callArgs[ 1 ] as {
 				captureTimeout: number;
@@ -79,7 +75,6 @@ describe( 'UndoManager', () => {
 		it( 'is a no-op as Yjs automatically tracks changes', () => {
 			const undoManager = UndoManager.create();
 
-			// Should not throw
 			expect( () => {
 				undoManager.addRecord();
 			} ).not.toThrow();
@@ -206,18 +201,15 @@ describe( 'UndoManager', () => {
 		it( 'follows typical undo/redo workflow', () => {
 			const undoManager = UndoManager.create();
 
-			// Initially, no undo/redo available
 			mockYMultiDocUndoManager.canUndo.mockReturnValue( false );
 			mockYMultiDocUndoManager.canRedo.mockReturnValue( false );
 
 			expect( undoManager.hasUndo() ).toBe( false );
 			expect( undoManager.hasRedo() ).toBe( false );
 
-			// After some changes, undo becomes available
 			mockYMultiDocUndoManager.canUndo.mockReturnValue( true );
 			expect( undoManager.hasUndo() ).toBe( true );
 
-			// After undo, redo becomes available
 			undoManager.undo();
 			mockYMultiDocUndoManager.canUndo.mockReturnValue( false );
 			mockYMultiDocUndoManager.canRedo.mockReturnValue( true );
@@ -225,7 +217,6 @@ describe( 'UndoManager', () => {
 			expect( undoManager.hasUndo() ).toBe( false );
 			expect( undoManager.hasRedo() ).toBe( true );
 
-			// After redo, undo becomes available again
 			undoManager.redo();
 			mockYMultiDocUndoManager.canUndo.mockReturnValue( true );
 			mockYMultiDocUndoManager.canRedo.mockReturnValue( false );
@@ -244,7 +235,6 @@ describe( 'UndoManager', () => {
 
 			mockYMultiDocUndoManager.canUndo.mockReturnValue( true );
 
-			// Undo should work across both scopes
 			undoManager.undo();
 
 			expect( mockYMultiDocUndoManager.undo ).toHaveBeenCalled();

@@ -3,12 +3,10 @@
  */
 import { describe, expect, it, jest, beforeEach } from '@jest/globals';
 
-// Mock connect-indexdb
 jest.mock( '../connect-indexdb', () => ( {
 	connectIndexDb: jest.fn(),
 } ) );
 
-// Mock create-webrtc-connection
 jest.mock( '../create-webrtc-connection', () => ( {
 	createWebRTCConnection: jest.fn(),
 } ) );
@@ -76,7 +74,6 @@ describe( 'index', () => {
 			const provider1 = getWebRTCSyncProvider();
 			const provider2 = getWebRTCSyncProvider();
 
-			// Should be different instances (not singleton)
 			expect( provider1 ).not.toBe( provider2 );
 		} );
 

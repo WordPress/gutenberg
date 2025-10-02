@@ -9,10 +9,6 @@ import {
 	beforeEach,
 	afterEach,
 } from '@jest/globals';
-
-/**
- * External dependencies
- */
 import type * as Y from 'yjs';
 
 /**
@@ -30,7 +26,6 @@ import {
 } from '../config';
 import type { SyncConfig, RecordHandlers, ObjectData } from '../types';
 
-// Mock Yjs with actual Map behavior for get/set
 const mockYMapData = new Map();
 const mockYMap = {
 	get: jest.fn( ( key: string ) => mockYMapData.get( key ) ),
@@ -61,7 +56,6 @@ jest.mock( 'yjs', () => ( {
 	encodeStateAsUpdate: jest.fn( () => new Uint8Array() ),
 } ) );
 
-// Mock y-protocols
 jest.mock( 'y-protocols/awareness', () => ( {
 	Awareness: jest.fn().mockImplementation( () => ( {
 		destroy: jest.fn(),
@@ -70,14 +64,12 @@ jest.mock( 'y-protocols/awareness', () => ( {
 	} ) ),
 } ) );
 
-// Extend SyncProvider to expose protected members for testing
 class TestSyncProvider extends SyncProvider {
 	public get testEntityStates() {
 		return this.entityStates;
 	}
 }
 
-// Mock the y-utilities module
 jest.mock( '../y-utilities/y-multidoc-undomanager', () => ( {
 	YMultiDocUndoManager: jest.fn().mockImplementation( () => ( {
 		addToScope: jest.fn(),
@@ -97,7 +89,6 @@ describe( 'SyncProvider', () => {
 	beforeEach( () => {
 		jest.clearAllMocks();
 
-		// Reset Yjs mocks
 		mockYDoc.meta = new Map();
 		mockYMapData.clear();
 		mockYMap.get.mockClear();
@@ -157,7 +148,6 @@ describe( 'SyncProvider', () => {
 	} );
 
 	afterEach( () => {
-		// Clean up any lingering entity states
 		if ( syncProvider ) {
 			syncProvider.testEntityStates?.forEach( ( state ) => {
 				state?.discard();
@@ -318,7 +308,6 @@ describe( 'SyncProvider', () => {
 			const state1 = syncProvider.testEntityStates.get( 'post_1' );
 			const state2 = syncProvider.testEntityStates.get( 'post_2' );
 
-			// Both entities should have CRDT docs
 			expect( state1?.ydoc ).toBeDefined();
 			expect( state2?.ydoc ).toBeDefined();
 		} );
@@ -347,7 +336,6 @@ describe( 'SyncProvider', () => {
 				mockHandlers
 			);
 
-			// Verify that observers were set up
 			expect( mockYMap.observeDeep ).toHaveBeenCalled();
 			expect( mockYMap.observe ).toHaveBeenCalled();
 		} );
@@ -490,9 +478,6 @@ describe( 'SyncProvider', () => {
 				mockRawRecord
 			);
 
-			await new Promise( ( resolve ) => setTimeout( resolve, 10 ) );
-
-			// Should not trigger refetch for local changes
 			expect(
 				( mockHandlers.refetchPersistedRecord as jest.Mock ).mock.calls
 					.length

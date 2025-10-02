@@ -3,7 +3,6 @@
  */
 import { describe, expect, it, jest, beforeEach } from '@jest/globals';
 
-// Mock y-indexeddb
 const mockIndexeddbPersistence = {
 	destroy: jest.fn(),
 };
@@ -16,7 +15,6 @@ jest.mock( 'y-indexeddb', () => {
 	};
 } );
 
-// Mock yjs
 const mockYDoc = {
 	clientID: 12345,
 	meta: new Map(),
