@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import type { NormalizedField, SummaryField } from '../types';
+import type { NormalizedField, NormalizedSummaryField } from '../types';
 
 /**
  * Extracts field IDs from various summary field formats.
@@ -9,15 +9,7 @@ import type { NormalizedField, SummaryField } from '../types';
  * @param summary The summary field configuration.
  * @return Array of field IDs.
  */
-function extractSummaryIds( summary: SummaryField ): string[] {
-	if ( ! summary ) {
-		return [];
-	}
-
-	if ( typeof summary === 'string' ) {
-		return [ summary ];
-	}
-
+function extractSummaryIds( summary: NormalizedSummaryField ): string[] {
 	if ( Array.isArray( summary ) ) {
 		return summary.map( ( item ) =>
 			typeof item === 'string' ? item : item.id
@@ -34,13 +26,10 @@ function extractSummaryIds( summary: SummaryField ): string[] {
  * @return The summary fields.
  */
 export const getSummaryFields = < Item >(
-	summaryField: SummaryField,
+	summaryField: NormalizedSummaryField,
 	fields: NormalizedField< Item >[]
 ): NormalizedField< Item >[] => {
-	if (
-		typeof summaryField === 'string' ||
-		( Array.isArray( summaryField ) && summaryField.length > 0 )
-	) {
+	if ( Array.isArray( summaryField ) && summaryField.length > 0 ) {
 		const summaryIds = extractSummaryIds( summaryField );
 		return summaryIds
 			.map( ( summaryId ) =>

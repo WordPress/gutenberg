@@ -9,6 +9,8 @@ import type {
 	NormalizedPanelLayout,
 	NormalizedCardLayout,
 	NormalizedRowLayout,
+	NormalizedCardSummaryField,
+	CardSummaryField,
 } from './types';
 
 interface NormalizedFormField {
@@ -36,11 +38,16 @@ export function normalizeLayout( layout?: Layout ): NormalizedLayout {
 			labelPosition: layout?.labelPosition ?? 'top',
 		} satisfies NormalizedRegularLayout;
 	} else if ( layout?.type === 'panel' ) {
+		const summary = layout.summary ?? [];
+		const normalizedSummary = Array.isArray( summary )
+			? summary
+			: [ summary ];
+
 		normalizedLayout = {
 			type: 'panel',
 			labelPosition: layout?.labelPosition ?? 'side',
 			openAs: layout?.openAs ?? 'dropdown',
-			summary: layout?.summary ?? [],
+			summary: normalizedSummary,
 		} satisfies NormalizedPanelLayout;
 	} else if ( layout?.type === 'card' ) {
 		if ( layout.withHeader === false ) {
@@ -53,6 +60,22 @@ export function normalizeLayout( layout?: Layout ): NormalizedLayout {
 				summary: [],
 			} satisfies NormalizedCardLayout;
 		} else {
+			const summary = layout.summary ?? [];
+
+			const normalizeSummary = (
+				sum: CardSummaryField
+			): NormalizedCardSummaryField => {
+				if ( typeof sum === 'string' ) {
+					return [ { id: sum, visibility: 'always' } ];
+				}
+				return sum.map( ( item ) => {
+					if ( typeof item === 'string' ) {
+						return { id: item, visibility: 'always' };
+					}
+					return { id: item.id, visibility: item.visibility };
+				} );
+			};
+
 			normalizedLayout = {
 				type: 'card',
 				withHeader: true,
@@ -60,7 +83,7 @@ export function normalizeLayout( layout?: Layout ): NormalizedLayout {
 					typeof layout.isOpened === 'boolean'
 						? layout.isOpened
 						: true,
-				summary: layout.summary ?? [],
+				summary: normalizeSummary( summary ),
 			} satisfies NormalizedCardLayout;
 		}
 	} else if ( layout?.type === 'row' ) {

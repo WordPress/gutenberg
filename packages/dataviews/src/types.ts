@@ -790,6 +790,7 @@ export type LayoutType = 'regular' | 'panel' | 'card' | 'row';
 export type LabelPosition = 'top' | 'side' | 'none';
 
 export type PanelSummaryField = string | string[];
+export type NormalizedPanelSummaryField = string[];
 
 export type RegularLayout = {
 	type: 'regular';
@@ -810,15 +811,23 @@ export type NormalizedPanelLayout = {
 	type: 'panel';
 	labelPosition: LabelPosition;
 	openAs: 'dropdown' | 'modal';
-	summary: PanelSummaryField;
+	summary: NormalizedPanelSummaryField;
 };
 
 export type CardSummaryField =
 	| PanelSummaryField // Basic usage: string or string[]
-	| Array< {
-			id: string;
-			visibility: 'always' | 'when-collapsed';
-	  } >;
+	| Array<
+			| string
+			| {
+					id: string;
+					visibility: 'always' | 'when-collapsed';
+			  }
+	  >;
+
+export type NormalizedCardSummaryField = Array< {
+	id: string;
+	visibility: 'always' | 'when-collapsed';
+} >;
 
 export type CardLayout =
 	| {
@@ -848,7 +857,7 @@ export type NormalizedCardLayout =
 			type: 'card';
 			withHeader: true;
 			isOpened: boolean;
-			summary: CardSummaryField;
+			summary: NormalizedCardSummaryField;
 	  };
 
 export type RowLayout = {
@@ -867,7 +876,9 @@ export type NormalizedLayout =
 	| NormalizedCardLayout
 	| NormalizedRowLayout;
 
-export type SummaryField = PanelSummaryField | CardSummaryField;
+export type NormalizedSummaryField =
+	| NormalizedPanelSummaryField
+	| NormalizedCardSummaryField;
 
 export type SimpleFormField = {
 	id: string;
