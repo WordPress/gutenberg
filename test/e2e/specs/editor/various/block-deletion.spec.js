@@ -381,7 +381,7 @@ test.describe( 'Block deletion', () => {
 
 		// Ensure that the block appender button is visible.
 		await expect(
-			editor.canvas.getByRole( 'button', { name: 'Add block' } )
+			editor.canvas.getByRole( 'button', { name: 'Add block to' } )
 		).toBeVisible();
 
 		// TODO: There should be expectations around where focus is placed in

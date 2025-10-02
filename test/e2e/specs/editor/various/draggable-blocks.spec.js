@@ -426,7 +426,7 @@ test.describe( 'Draggable block', () => {
 					name: 'Block: Column',
 				} )
 				.getByRole( 'button', {
-					name: 'Add block',
+					name: 'Add block to Column',
 					includeHidden: true,
 				} );
 

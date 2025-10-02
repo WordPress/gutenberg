@@ -12,7 +12,11 @@ import { Dropdown, Button } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, ifCondition } from '@wordpress/compose';
-import { createBlock, store as blocksStore } from '@wordpress/blocks';
+import {
+	createBlock,
+	store as blocksStore,
+	getBlockType,
+} from '@wordpress/blocks';
 import { plus } from '@wordpress/icons';
 
 /**
@@ -111,6 +115,7 @@ class Inserter extends Component {
 			toggleProps,
 			hasItems,
 			renderToggle = defaultRenderToggle,
+			parentBlockTitle,
 		} = this.props;
 
 		return renderToggle( {
@@ -121,6 +126,7 @@ class Inserter extends Component {
 			hasSingleBlockType,
 			directInsertBlock,
 			toggleProps,
+			parentBlockTitle,
 		} );
 	}
 
@@ -224,6 +230,7 @@ export default compose( [
 				hasInserterItems,
 				getAllowedBlocks,
 				getDirectInsertBlock,
+				getBlock,
 			} = select( blockEditorStore );
 
 			const { getBlockVariations } = select( blocksStore );
@@ -246,6 +253,13 @@ export default compose( [
 				allowedBlockType = allowedBlocks[ 0 ];
 			}
 
+			const parentBlock = rootClientId ? getBlock( rootClientId ) : null;
+			const parentBlockType = parentBlock?.name
+				? getBlockType( parentBlock.name )
+				: null;
+			const parentBlockTitle =
+				parentBlockType?.title || parentBlock?.name || '';
+
 			return {
 				hasItems: hasInserterItems( rootClientId ),
 				hasSingleBlockType,
@@ -253,6 +267,7 @@ export default compose( [
 				allowedBlockType,
 				directInsertBlock,
 				rootClientId,
+				parentBlockTitle,
 			};
 		}
 	),

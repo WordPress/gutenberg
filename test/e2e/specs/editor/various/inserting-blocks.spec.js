@@ -547,7 +547,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			.click();
 		await editor.canvas
 			.getByRole( 'button', {
-				name: 'Add block',
+				name: 'Add block to Group',
 			} )
 			.click();
 		await page.getByRole( 'button', { name: 'Browse All' } ).click();
@@ -595,7 +595,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			.click();
 		await editor.canvas
 			.getByRole( 'button', {
-				name: 'Add block',
+				name: 'Add block to Group',
 			} )
 			.click();
 

@@ -215,7 +215,7 @@ test.describe( 'Navigation block', () => {
 			await editor.insertBlock( { name: 'core/navigation' } );
 
 			const navBlockInserter = editor.canvas.getByRole( 'button', {
-				name: 'Add block',
+				name: 'Add block to Navigation',
 			} );
 			await navBlockInserter.click();
 
@@ -455,7 +455,7 @@ test.describe( 'Navigation block', () => {
 			// Move focus to the submenu navigation appender
 			await page.keyboard.press( 'End' );
 			await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
-			await navigation.useBlockInserter();
+			await navigation.useBlockInserter( 'Submenu' );
 			await navigation.addLinkClose();
 			/**
 			 * TODO: This is not desired behavior. Ideally the
@@ -554,7 +554,7 @@ test.describe( 'Navigation block', () => {
 			await navigation.addPage( 'Dog' );
 			await page.keyboard.press( 'End' );
 			await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
-			await navigation.useBlockInserter();
+			await navigation.useBlockInserter( 'Submenu' );
 			await navigation.addCustomURL( 'https://wordpress.org' );
 			await navigation.expectToHaveTextSelected( 'wordpress.org' );
 
@@ -570,7 +570,7 @@ test.describe( 'Navigation block', () => {
 			// Add a link back so we can delete the first submenu link.
 			await page.keyboard.press( 'End' );
 			await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
-			await navigation.useBlockInserter();
+			await navigation.useBlockInserter( 'Submenu' );
 			await navigation.addCustomURL( 'https://wordpress.org' );
 			await navigation.expectToHaveTextSelected( 'wordpress.org' );
 
@@ -644,7 +644,9 @@ test.describe( 'Navigation block', () => {
 
 		await editor.selectBlocks( navBlock );
 
-		await navBlock.getByRole( 'button', { name: 'Add block' } ).click();
+		await navBlock
+			.getByRole( 'button', { name: 'Add block to Navigation' } )
+			.click();
 
 		// This relies on network so allow additional time for
 		// the request to complete.
@@ -685,8 +687,10 @@ class Navigation {
 		} );
 	}
 
-	getNavBlockInserter() {
-		return this.getNavBlock().getByLabel( 'Add block' );
+	getNavBlockInserter( parentBlockLabel = 'Navigation' ) {
+		return this.getNavBlock().getByLabel(
+			`Add block to ${ parentBlockLabel }`
+		);
 	}
 
 	getLinkControlSearch() {
@@ -702,8 +706,8 @@ class Navigation {
 		} );
 	}
 
-	async useBlockInserter() {
-		const navBlockInserter = this.getNavBlockInserter();
+	async useBlockInserter( parentBlockLabel = 'Navigation' ) {
+		const navBlockInserter = this.getNavBlockInserter( parentBlockLabel );
 
 		// Wait until the nav block inserter is visible before we move on to using it
 		await expect( navBlockInserter ).toBeVisible();

@@ -68,7 +68,9 @@ test.describe( 'Group', () => {
 				'button[aria-label="Group: Gather blocks in a container."]'
 			)
 			.click();
-		await editor.canvas.locator( 'role=button[name="Add block"i]' ).click();
+		await editor.canvas
+			.locator( 'role=button[name="Add block to Group"i]' )
+			.click();
 		await page.click(
 			'role=listbox[name="Blocks"i] >> role=option[name="Paragraph"i]'
 		);

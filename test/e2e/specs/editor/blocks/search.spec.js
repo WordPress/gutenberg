@@ -40,7 +40,7 @@ test.describe( 'Search', () => {
 		} );
 
 		const navBlockInserter = editor.canvas.getByRole( 'button', {
-			name: 'Add block',
+			name: 'Add block to Navigation',
 		} );
 		await navBlockInserter.click();
 

@@ -36,6 +36,7 @@ function ButtonBlockAppender(
 				disabled,
 				isOpen,
 				blockTitle,
+				parentBlockTitle,
 				hasSingleBlockType,
 			} ) => {
 				const isToggleButton = ! hasSingleBlockType;
@@ -48,9 +49,13 @@ function ButtonBlockAppender(
 							),
 							blockTitle
 					  )
-					: _x(
-							'Add block',
-							'Generic label for block inserter button'
+					: sprintf(
+							// translators: %s: the name of the block
+							_x(
+								'Add block to %s',
+								'Label for block inserter button'
+							),
+							parentBlockTitle
 					  );
 
 				return (

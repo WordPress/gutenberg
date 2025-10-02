@@ -75,7 +75,7 @@ test.describe( 'Widgets Customizer', () => {
 
 		// Click on the inline appender.
 		await page.click(
-			'css=.editor-styles-wrapper >> role=button[name="Add block"i]'
+			'css=.editor-styles-wrapper >> role=button[name="Add block to"i]'
 		);
 
 		const inlineInserterSearchBox = page.locator(

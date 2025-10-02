@@ -45,7 +45,7 @@ test.describe( 'Template Part', () => {
 			'[data-type="core/template-part"]'
 		);
 		const addBlockButton = templatePart.locator(
-			'role=button[name="Add block"i]'
+			'role=button[name="Add block to Template Part"i]'
 		);
 		await expect( templatePart ).toBeVisible();
 		await expect( addBlockButton ).toBeVisible();
