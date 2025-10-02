@@ -2544,31 +2544,29 @@ function getDerivedBlockEditingModesUpdates( {
 	} );
 
 	addedBlocks?.forEach( ( addedBlock ) => {
-		traverseBlockTree( nextState, addedBlock.clientId, ( block ) => {
-			const updates = getDerivedBlockEditingModesForTree(
-				nextState,
-				isNavMode,
-				block.clientId
-			);
+		const updates = getDerivedBlockEditingModesForTree(
+			nextState,
+			isNavMode,
+			addedBlock.clientId
+		);
 
-			if ( updates.size ) {
-				if ( ! nextDerivedBlockEditingModes ) {
-					nextDerivedBlockEditingModes = new Map( [
-						...( prevDerivedBlockEditingModes?.size
-							? prevDerivedBlockEditingModes
-							: [] ),
-						...updates,
-					] );
-				} else {
-					nextDerivedBlockEditingModes = new Map( [
-						...( nextDerivedBlockEditingModes?.size
-							? nextDerivedBlockEditingModes
-							: [] ),
-						...updates,
-					] );
-				}
+		if ( updates.size ) {
+			if ( ! nextDerivedBlockEditingModes ) {
+				nextDerivedBlockEditingModes = new Map( [
+					...( prevDerivedBlockEditingModes?.size
+						? prevDerivedBlockEditingModes
+						: [] ),
+					...updates,
+				] );
+			} else {
+				nextDerivedBlockEditingModes = new Map( [
+					...( nextDerivedBlockEditingModes?.size
+						? nextDerivedBlockEditingModes
+						: [] ),
+					...updates,
+				] );
 			}
-		} );
+		}
 	} );
 
 	return nextDerivedBlockEditingModes;
