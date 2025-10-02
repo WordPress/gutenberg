@@ -264,13 +264,21 @@ export default function TermTemplateEdit( {
 		if ( null === terms ) {
 			return null;
 		}
-		return terms.slice( 0, perPage ).filter( ( term ) => {
+		let termsToFilter = terms;
+		// When requesting terms from a specific post, the REST API ignores hierarchical=false
+		// and always returns all terms assigned to the post, so we need to filter by parent here.
+		if ( inherit && ( postId || parent ) ) {
+			termsToFilter = termsToFilter.filter( ( term ) =>
+				parent ? term.parent === parent : term.parent === 0
+			);
+		}
+		return termsToFilter.slice( 0, perPage ).filter( ( term ) => {
 			if ( exclude && exclude.includes( term.id ) ) {
 				return false;
 			}
 			return true;
 		} );
-	}, [ terms, exclude, perPage ] );
+	}, [ terms, inherit, postId, parent, exclude, perPage ] );
 
 	const { blocks, variations, defaultVariation } = useSelect(
 		( select ) => {
