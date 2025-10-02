@@ -149,6 +149,10 @@ export default function FormCardField< Item >( {
 
 	const summaryFields = getSummaryFields< Item >( layout.summary, fields );
 
+	const visibleSummaryFields = summaryFields.filter( ( summaryField ) =>
+		isSummaryFieldVisible( summaryField, layout.summary, isOpen )
+	);
+
 	if ( isCombinedField( field ) ) {
 		const withHeader = !! field.label && layout.withHeader;
 		return (
@@ -158,24 +162,20 @@ export default function FormCardField< Item >( {
 						<span className="dataforms-layouts-card__field-header-label">
 							{ field.label }
 						</span>
-						{ summaryFields.length > 0 && layout.withHeader && (
-							<div className="dataforms-layouts-card__field-summary">
-								{ summaryFields.map(
-									( summaryField ) =>
-										isSummaryFieldVisible(
-											summaryField,
-											layout.summary,
-											isOpen
-										) && (
+						{ visibleSummaryFields.length > 0 &&
+							layout.withHeader && (
+								<div className="dataforms-layouts-card__field-summary">
+									{ visibleSummaryFields.map(
+										( summaryField ) => (
 											<summaryField.render
 												key={ summaryField.id }
 												item={ data }
 												field={ summaryField }
 											/>
 										)
-								) }
-							</div>
-						) }
+									) }
+								</div>
+							) }
 					</CollapsibleCardHeader>
 				) }
 				{ ( isOpen || ! withHeader ) && (
@@ -218,22 +218,15 @@ export default function FormCardField< Item >( {
 					<span className="dataforms-layouts-card__field-header-label">
 						{ fieldDefinition.label }
 					</span>
-					{ summaryFields.length > 0 && layout.withHeader && (
+					{ visibleSummaryFields.length > 0 && layout.withHeader && (
 						<div className="dataforms-layouts-card__field-summary">
-							{ summaryFields.map(
-								( summaryField ) =>
-									isSummaryFieldVisible(
-										summaryField,
-										layout.summary,
-										isOpen
-									) && (
-										<summaryField.render
-											key={ summaryField.id }
-											item={ data }
-											field={ summaryField }
-										/>
-									)
-							) }
+							{ visibleSummaryFields.map( ( summaryField ) => (
+								<summaryField.render
+									key={ summaryField.id }
+									item={ data }
+									field={ summaryField }
+								/>
+							) ) }
 						</div>
 					) }
 				</CollapsibleCardHeader>
