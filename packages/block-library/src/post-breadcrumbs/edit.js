@@ -92,7 +92,11 @@ export default function PostBreadcrumbEdit( {
 				<ol>
 					{ placeholderItems.map( ( text, index ) => (
 						<li key={ index }>
-							<a href={ `#${ text.toLowerCase() }` }>{ text }</a>
+							<a
+								href={ `#post-breadcrumbs-pseudo-link-${ index }` }
+							>
+								{ text }
+							</a>
 						</li>
 					) ) }
 					<li>

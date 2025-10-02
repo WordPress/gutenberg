@@ -1,4 +1,7 @@
 .wp-block-post-breadcrumbs {
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
+
 	ol {
 		list-style: none;
 		margin: 0;
