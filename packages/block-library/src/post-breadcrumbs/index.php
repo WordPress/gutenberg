@@ -72,7 +72,7 @@ function render_block_core_post_breadcrumbs( $attributes, $content, $block ) {
 	// Build wrapper attributes.
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
-			'style' => '--separator: "' . esc_attr( $separator ) . '";',
+			'style'      => '--separator: "' . esc_attr( $separator ) . '";',
 			'aria-label' => __( 'Breadcrumbs' ),
 		)
 	);
