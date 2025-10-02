@@ -4,9 +4,14 @@
 	"name": "core/post-breadcrumbs",
 	"title": "Breadcrumbs",
 	"category": "theme",
-	"description": "Display a breadcrumb trail only for Pages, or for hierarchical post types. The block is useful to insert in the Pages template.",
+	"description": "Display a breadcrumb trail for Pages, hierarchical post types, or taxonomy terms.",
 	"textdomain": "default",
 	"attributes": {
+		"type": {
+			"type": "string",
+			"enum": [ "hierarchical", "terms" ],
+			"default": "hierarchical"
+		},
 		"separator": {
 			"type": "string",
 			"default": "/"

@@ -3,6 +3,7 @@
 		"name": "core/post-breadcrumbs",
 		"isValid": true,
 		"attributes": {
+			"type": "hierarchical",
 			"separator": "/",
 			"showHomeLink": true
 		},
