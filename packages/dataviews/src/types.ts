@@ -215,6 +215,9 @@ export type EditConfig =
  * A dataview field for a specific property of a data type.
  */
 export type Field< Item > = {
+	// <-- new optional flag to control the select placeholder
+	hideSelectItemOption?: boolean;
+
 	/**
 	 * Type of the fields.
 	 */
