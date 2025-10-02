@@ -16,8 +16,8 @@ import {
 /**
  * Internal dependencies
  */
-import DataForm from '../index';
-import { isItemValid } from '../../../validation';
+import DataForm from '../components/dataform';
+import { isItemValid } from '../validation';
 import type {
 	Field,
 	Form,
@@ -26,8 +26,8 @@ import type {
 	RegularLayout,
 	PanelLayout,
 	CardLayout,
-} from '../../../types';
-import { unlock } from '../../../lock-unlock';
+} from '../types';
+import { unlock } from '../lock-unlock';
 
 const { ValidatedTextControl, Badge } = unlock( privateApis );
 

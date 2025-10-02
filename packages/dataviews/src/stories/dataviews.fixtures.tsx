@@ -12,7 +12,7 @@ import {
 /**
  * Internal dependencies
  */
-import type { Field, Action } from '../../../types';
+import type { Field, Action } from '../types';
 
 export type Theme = {
 	slug: string;

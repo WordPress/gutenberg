@@ -29,19 +29,19 @@ import { __, _n } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import DataViews from '../index';
+import DataViews from '../components/dataviews/index';
+import { LAYOUT_GRID, LAYOUT_LIST, LAYOUT_TABLE } from '../constants';
+import { filterSortAndPaginate } from '../filter-and-sort-data-view';
+import type { Field, View } from '../types';
 import {
 	DEFAULT_VIEW,
 	actions,
 	data,
 	fields,
 	type SpaceObject,
-} from './fixtures';
-import { LAYOUT_GRID, LAYOUT_LIST, LAYOUT_TABLE } from '../../../constants';
-import { filterSortAndPaginate } from '../../../filter-and-sort-data-view';
-import type { Field, View } from '../../../types';
+} from './dataviews.fixtures';
 
-import './style.css';
+import './dataviews.style.css';
 
 const meta = {
 	title: 'DataViews/DataViews',

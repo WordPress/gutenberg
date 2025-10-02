@@ -14,10 +14,10 @@ import { starFilled } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import DataViews from '../../components/dataviews/index';
-import DataForm from '../../components/dataform/index';
-import { filterSortAndPaginate } from '../../filter-and-sort-data-view';
-import type { View, Form, Field } from '../../types';
+import DataViews from '../components/dataviews/index';
+import DataForm from '../components/dataform/index';
+import { filterSortAndPaginate } from '../filter-and-sort-data-view';
+import type { View, Form, Field } from '../types';
 
 const meta = {
 	title: 'DataViews/FieldTypes',

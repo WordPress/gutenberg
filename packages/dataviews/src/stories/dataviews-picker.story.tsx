@@ -11,15 +11,11 @@ import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import DataViewsPicker from '../index';
-import {
-	data,
-	fields,
-	type SpaceObject,
-} from '../../dataviews/stories/fixtures';
-import { LAYOUT_PICKER_GRID } from '../../../constants';
-import { filterSortAndPaginate } from '../../../filter-and-sort-data-view';
-import type { ActionButton, View } from '../../../types';
+import DataViewsPicker from '../components/dataviews-picker/index';
+import { LAYOUT_PICKER_GRID } from '../constants';
+import { filterSortAndPaginate } from '../filter-and-sort-data-view';
+import type { ActionButton, View } from '../types';
+import { data, fields, type SpaceObject } from './dataviews.fixtures';
 
 const meta = {
 	title: 'DataViews/DataViewsPicker',
