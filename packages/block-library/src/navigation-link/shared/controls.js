@@ -5,20 +5,53 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalInputControl as InputControl,
+	Button,
 	CheckboxControl,
 	TextControl,
 	TextareaControl,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useRef } from '@wordpress/element';
 import { safeDecodeURI } from '@wordpress/url';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
+import { linkOff as unlinkIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { updateAttributes } from './update-attributes';
+
+/**
+ * Get a human-readable entity type name.
+ *
+ * @param {string} type - The entity type
+ * @param {string} kind - The entity kind
+ * @return {string} Human-readable entity type name
+ */
+function getEntityTypeName( type, kind ) {
+	if ( kind === 'post-type' ) {
+		switch ( type ) {
+			case 'post':
+				return __( 'post' );
+			case 'page':
+				return __( 'page' );
+			default:
+				return type || __( 'post' );
+		}
+	}
+	if ( kind === 'taxonomy' ) {
+		switch ( type ) {
+			case 'category':
+				return __( 'category' );
+			case 'tag':
+				return __( 'tag' );
+			default:
+				return type || __( 'term' );
+		}
+	}
+	return type || __( 'item' );
+}
 
 /**
  * Shared Controls component for Navigation Link and Navigation Submenu blocks.
@@ -30,6 +63,8 @@ import { updateAttributes } from './update-attributes';
  * @param {Object}   props.attributes          - Block attributes
  * @param {Function} props.setAttributes       - Function to update block attributes
  * @param {Function} props.setIsEditingControl - Function to set editing state (optional)
+ * @param {Function} props.updateBlockBindings - Function to update block bindings
+ * @param {boolean}  props.hasUrlBinding       - Whether the URL is bound to an entity
  */
 export function Controls( {
 	attributes,

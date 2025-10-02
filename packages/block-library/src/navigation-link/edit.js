@@ -8,23 +8,9 @@ import clsx from 'clsx';
  */
 import { createBlock } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
-<<<<<<< HEAD
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
-=======
-import {
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-	Button,
-	CheckboxControl,
-	TextControl,
-	TextareaControl,
-	ToolbarButton,
-	ToolbarGroup,
-	__experimentalInputControl as InputControl,
-} from '@wordpress/components';
->>>>>>> f8975048f3e (Initial commit)
 import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
 	BlockControls,
 	InspectorControls,
@@ -36,20 +22,10 @@ import {
 	useBlockEditingMode,
 	useBlockBindingsUtils,
 } from '@wordpress/block-editor';
-<<<<<<< HEAD
 import { isURL, prependHTTP } from '@wordpress/url';
-import { useState, useEffect, useRef } from '@wordpress/element';
-=======
-import { isURL, prependHTTP, safeDecodeURI } from '@wordpress/url';
 import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
-import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
->>>>>>> f8975048f3e (Initial commit)
 import { decodeEntities } from '@wordpress/html-entities';
-import {
-	link as linkIcon,
-	addSubmenu,
-	linkOff as unlinkIcon,
-} from '@wordpress/icons';
+import { link as linkIcon, addSubmenu } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { useMergeRefs, usePrevious } from '@wordpress/compose';
 
@@ -183,222 +159,6 @@ function getMissingText( type ) {
 
 	return missingText;
 }
-
-function getEntityTypeName( type, kind ) {
-	// Return the type name if available, otherwise use fallback based on kind
-	if ( type ) {
-		return type;
-	}
-
-	// Use appropriate fallback based on kind
-	if ( kind === 'post-type' ) {
-		return __( 'post' );
-	}
-
-	if ( kind === 'taxonomy' ) {
-		return __( 'term' );
-	}
-
-	// Default fallback
-	return __( 'item' );
-}
-
-/*
- * Warning, this duplicated in
- * packages/block-library/src/navigation-submenu/edit.js
- * Consider reusing this components for both blocks.
- */
-<<<<<<< HEAD
-=======
-function Controls( {
-	attributes,
-	setAttributes,
-	setIsEditingControl,
-	hasUrlBinding = false,
-	updateBlockBindings,
-} ) {
-	const { label, url, description, rel, opensInNewTab } = attributes;
-	const lastURLRef = useRef( url );
-	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
-
-	// Function to edit the bound link - removes binding and clears url/id to allow picking new entity
-	const editBoundLink = () => {
-		// Remove the binding
-		updateBlockBindings( { url: undefined } );
-
-		// Clear url and id to allow picking a new entity (keep type and kind)
-		setAttributes( {
-			url: undefined,
-			id: undefined,
-		} );
-	};
-	return (
-		<ToolsPanel
-			label={ __( 'Settings' ) }
-			resetAll={ () => {
-				setAttributes( {
-					label: '',
-					url: '',
-					description: '',
-					rel: '',
-					opensInNewTab: false,
-				} );
-			} }
-			dropdownMenuProps={ dropdownMenuProps }
-		>
-			<ToolsPanelItem
-				hasValue={ () => !! label }
-				label={ __( 'Text' ) }
-				onDeselect={ () => setAttributes( { label: '' } ) }
-				isShownByDefault
-			>
-				<TextControl
-					__nextHasNoMarginBottom
-					__next40pxDefaultSize
-					label={ __( 'Text' ) }
-					value={ label ? stripHTML( label ) : '' }
-					onChange={ ( labelValue ) => {
-						setAttributes( { label: labelValue } );
-					} }
-					autoComplete="off"
-					onFocus={ () => setIsEditingControl( true ) }
-					onBlur={ () => setIsEditingControl( false ) }
-				/>
-			</ToolsPanelItem>
-
-			<ToolsPanelItem
-				hasValue={ () => !! url }
-				label={ __( 'Link' ) }
-				onDeselect={ () => {
-					if ( ! hasUrlBinding ) {
-						setAttributes( { url: '' } );
-					}
-				} }
-				isShownByDefault
-			>
-				<InputControl
-					__nextHasNoMarginBottom
-					__next40pxDefaultSize
-					label={ __( 'Link' ) }
-					value={ url ? safeDecodeURI( url ) : '' }
-					onChange={ ( urlValue ) => {
-						if ( hasUrlBinding ) {
-							return; // Prevent editing when URL is bound
-						}
-						setAttributes( {
-							url: encodeURI( safeDecodeURI( urlValue ) ),
-						} );
-					} }
-					autoComplete="off"
-					type="url"
-					disabled={ hasUrlBinding }
-					onFocus={ () => {
-						if ( hasUrlBinding ) {
-							return;
-						}
-						lastURLRef.current = url;
-						setIsEditingControl( true );
-					} }
-					onBlur={ () => {
-						if ( hasUrlBinding ) {
-							return;
-						}
-						// Defer the updateAttributes call to ensure entity connection isn't severed by accident.
-						updateAttributes(
-							{ url: ! url ? lastURLRef.current : url },
-							setAttributes,
-							{ ...attributes, url: lastURLRef.current }
-						);
-						setIsEditingControl( false );
-					} }
-					help={
-						hasUrlBinding &&
-						( () => {
-							const entityType = getEntityTypeName(
-								attributes.type,
-								attributes.kind
-							);
-							return sprintf(
-								/* translators: %s is the entity type (e.g., "page", "post", "category") */
-								__(
-									'Link stays in sync with the selected %s.'
-								),
-								entityType
-							);
-						} )()
-					}
-					suffix={
-						hasUrlBinding && (
-							<Button
-								icon={ unlinkIcon }
-								onClick={ editBoundLink }
-								aria-label={ __( 'Unlink and edit' ) }
-								__next40pxDefaultSize
-							/>
-						)
-					}
-				/>
-			</ToolsPanelItem>
-
-			<ToolsPanelItem
-				hasValue={ () => !! opensInNewTab }
-				label={ __( 'Open in new tab' ) }
-				onDeselect={ () => setAttributes( { opensInNewTab: false } ) }
-				isShownByDefault
-			>
-				<CheckboxControl
-					__nextHasNoMarginBottom
-					label={ __( 'Open in new tab' ) }
-					checked={ opensInNewTab }
-					onChange={ ( value ) =>
-						setAttributes( { opensInNewTab: value } )
-					}
-				/>
-			</ToolsPanelItem>
-
-			<ToolsPanelItem
-				hasValue={ () => !! description }
-				label={ __( 'Description' ) }
-				onDeselect={ () => setAttributes( { description: '' } ) }
-				isShownByDefault
-			>
-				<TextareaControl
-					__nextHasNoMarginBottom
-					label={ __( 'Description' ) }
-					value={ description || '' }
-					onChange={ ( descriptionValue ) => {
-						setAttributes( { description: descriptionValue } );
-					} }
-					help={ __(
-						'The description will be displayed in the menu if the current theme supports it.'
-					) }
-				/>
-			</ToolsPanelItem>
-
-			<ToolsPanelItem
-				hasValue={ () => !! rel }
-				label={ __( 'Rel attribute' ) }
-				onDeselect={ () => setAttributes( { rel: '' } ) }
-				isShownByDefault
-			>
-				<TextControl
-					__nextHasNoMarginBottom
-					__next40pxDefaultSize
-					label={ __( 'Rel attribute' ) }
-					value={ rel || '' }
-					onChange={ ( relValue ) => {
-						setAttributes( { rel: relValue } );
-					} }
-					autoComplete="off"
-					help={ __(
-						'The relationship of the linked URL as space-separated link types.'
-					) }
-				/>
-			</ToolsPanelItem>
-		</ToolsPanel>
-	);
-}
->>>>>>> f8975048f3e (Initial commit)
 
 export default function NavigationLinkEdit( {
 	attributes,
@@ -675,7 +435,6 @@ export default function NavigationLinkEdit( {
 					) }
 				</ToolbarGroup>
 			</BlockControls>
-			{ /* Warning, this duplicated in packages/block-library/src/navigation-submenu/edit.js */ }
 			<InspectorControls>
 				<Controls
 					attributes={ attributes }
