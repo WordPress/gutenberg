@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { _x } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import {
 	__experimentalHStack as HStack,
@@ -36,7 +36,7 @@ export function AddComment( {
 			const selectedBlock = getSelectedBlock();
 			return {
 				clientId: selectedBlock?.clientId,
-				blockCommentId: selectedBlock?.attributes?.blockCommentId,
+				blockCommentId: selectedBlock?.attributes?.metadata?.commentId,
 				isEmptyDefaultBlock: selectedBlock
 					? isUnmodifiedDefaultBlock( selectedBlock )
 					: false,
@@ -53,10 +53,14 @@ export function AddComment( {
 		return null;
 	}
 
+	const commentLabel = __( 'New Comment' );
+
 	return (
 		<VStack
+			className="editor-collab-sidebar-panel__thread is-selected"
 			spacing="3"
-			className="editor-collab-sidebar-panel__thread editor-collab-sidebar-panel__active-thread editor-collab-sidebar-panel__focus-thread"
+			tabIndex={ 0 }
+			role="listitem"
 		>
 			<HStack alignment="left" spacing="3">
 				<CommentAuthorInfo />
@@ -69,6 +73,7 @@ export function AddComment( {
 					setShowCommentBoard( false );
 				} }
 				submitButtonText={ _x( 'Comment', 'Add comment button' ) }
+				labelText={ commentLabel }
 			/>
 		</VStack>
 	);

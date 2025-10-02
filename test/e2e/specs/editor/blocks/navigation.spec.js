@@ -455,7 +455,15 @@ test.describe( 'Navigation block', () => {
 			// Move focus to the submenu navigation appender
 			await page.keyboard.press( 'End' );
 			await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
-			await navigation.useBlockInserter();
+
+			// Use the submenu block inserter
+			const navBlock = navigation.getNavBlock();
+			const submenuBlock = navBlock.getByRole( 'document', {
+				name: 'Block: Submenu',
+			} );
+			const submenuBlockInserter = submenuBlock.getByLabel( 'Add block' );
+			await submenuBlockInserter.click();
+
 			await navigation.addLinkClose();
 			/**
 			 * TODO: This is not desired behavior. Ideally the
@@ -686,7 +694,7 @@ class Navigation {
 	}
 
 	getNavBlockInserter() {
-		return this.getNavBlock().getByLabel( 'Add block' );
+		return this.getNavBlock().getByLabel( 'Add block' ).first();
 	}
 
 	getLinkControlSearch() {

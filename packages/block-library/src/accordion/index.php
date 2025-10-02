@@ -20,7 +20,7 @@ function render_block_core_accordion( $attributes, $content ) {
 
 	if ( $p->next_tag( array( 'class_name' => 'wp-block-accordion' ) ) ) {
 		$p->set_attribute( 'data-wp-interactive', 'core/accordion' );
-		$p->set_attribute( 'data-wp-context', '{ "autoclose": ' . $autoclose . ', "accordionContents": [] }' );
+		$p->set_attribute( 'data-wp-context', '{ "autoclose": ' . $autoclose . ', "accordionItems": [] }' );
 
 		// Only modify content if directives have been set.
 		$content = $p->get_updated_html();

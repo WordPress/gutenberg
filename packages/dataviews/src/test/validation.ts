@@ -65,6 +65,49 @@ describe( 'validation', () => {
 		expect( result ).toBe( false );
 	} );
 
+	it( 'number field is valid if value is finite', () => {
+		const item = { id: 1, price: 2.5 };
+		const fields: Field< {} >[] = [
+			{
+				id: 'price',
+				type: 'number',
+			},
+		];
+		const form = { fields: [ 'price' ] };
+		const result = isItemValid( item, fields, form );
+		expect( result ).toBe( true );
+	} );
+
+	it( 'number field is invalid if value is not finite when not empty', () => {
+		const item = { id: 1, price: Number.NaN };
+		const fields: Field< {} >[] = [
+			{
+				id: 'price',
+				type: 'number',
+			},
+		];
+		const form = { fields: [ 'price' ] };
+		const result = isItemValid( item, fields, form );
+		expect( result ).toBe( false );
+	} );
+
+	it( 'number field with elements is invalid if value is not one of the elements', () => {
+		const item = { id: 1, price: 4.5 };
+		const fields: Field< {} >[] = [
+			{
+				id: 'price',
+				type: 'number',
+				elements: [
+					{ value: 1.5, label: 'Bronze' },
+					{ value: 2.5, label: 'Silver' },
+				],
+			},
+		];
+		const form = { fields: [ 'price' ] };
+		const result = isItemValid( item, fields, form );
+		expect( result ).toBe( false );
+	} );
+
 	it( 'text field is invalid if value is not one of the elements', () => {
 		const item = { id: 1, author: 'not-in-elements' };
 		const fields: Field< {} >[] = [

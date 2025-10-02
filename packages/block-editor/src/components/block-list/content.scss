@@ -93,6 +93,25 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 		}
 	}
 
+
+	// Hidden blocks.
+	// In order for the block toolbar to render correctly, blocks cannot be hidden.
+	// Instead, use styles to visually hide blocks.
+	.block-editor-block-list__block.is-block-hidden {
+		visibility: hidden;
+		overflow: hidden;
+		height: 0;
+		border: none !important;
+		padding: 0 !important;
+	}
+
+	&.is-layout-flex:not(.is-vertical) > .is-block-hidden {
+		width: 0;
+		height: auto;
+		align-self: stretch;
+		white-space: nowrap !important;
+	}
+
 	// Re-enable it on components inside.
 	[class^="components-"] {
 		user-select: text;

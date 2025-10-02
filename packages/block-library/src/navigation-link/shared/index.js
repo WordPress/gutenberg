@@ -1,0 +1,10 @@
+/**
+ * Shared components for Navigation Link and Navigation Submenu blocks.
+ *
+ * This module provides common functionality that can be used by both blocks
+ * to reduce code duplication and ensure consistent behavior.
+ */
+
+export { Controls } from './controls';
+export { updateAttributes } from './update-attributes';
+export { LinkUI } from '../link-ui';

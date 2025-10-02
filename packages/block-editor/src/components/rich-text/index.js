@@ -39,7 +39,6 @@ import FormatEdit from './format-edit';
 import { getAllowedFormats } from './utils';
 import { Content, valueToHTMLString } from './content';
 import { withDeprecations } from './with-deprecations';
-import { canBindBlock } from '../../utils/block-bindings';
 import BlockContext from '../block-context';
 
 export const keyboardShortcutContext = createContext();
@@ -177,9 +176,14 @@ export function RichTextWrapper(
 
 	const { disableBoundBlock, bindingsPlaceholder, bindingsLabel } = useSelect(
 		( select ) => {
+			const { __experimentalBlockBindingsSupportedAttributes } =
+				select( blockEditorStore ).getSettings();
+
 			if (
 				! blockBindings?.[ identifier ] ||
-				! canBindBlock( blockName )
+				! (
+					blockName in __experimentalBlockBindingsSupportedAttributes
+				)
 			) {
 				return {};
 			}

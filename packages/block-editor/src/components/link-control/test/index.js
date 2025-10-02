@@ -795,7 +795,7 @@ describe( 'Manual link entry', () => {
 				}
 
 				const submitButton = screen.queryByRole( 'button', {
-					name: 'Save',
+					name: 'Apply',
 				} );
 
 				// Verify the submission UI is disabled.
@@ -1035,7 +1035,7 @@ describe( 'Link submission', () => {
 		expect( createSubmitButton ).not.toBeInTheDocument();
 
 		const editSubmitButton = screen.getByRole( 'button', {
-			name: 'Save',
+			name: 'Apply',
 		} );
 
 		expect( editSubmitButton ).toBeVisible();
@@ -2033,7 +2033,7 @@ describe( 'Addition Settings UI', () => {
 
 		// check that the "Apply" button is disabled by default.
 		const submitButton = screen.queryByRole( 'button', {
-			name: 'Save',
+			name: 'Apply',
 		} );
 
 		expect( submitButton ).toHaveAttribute( 'aria-disabled', 'true' );
@@ -2489,7 +2489,7 @@ describe( 'Controlling link title text', () => {
 		expect( textInput ).toHaveValue( textValue );
 
 		const submitButton = screen.queryByRole( 'button', {
-			name: 'Save',
+			name: 'Apply',
 		} );
 
 		await user.click( submitButton );

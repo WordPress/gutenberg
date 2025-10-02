@@ -144,6 +144,42 @@ describe( 'DataForm component', () => {
 			}
 		} );
 
+		it( 'should allow decimal input for number fields', async () => {
+			const onChange = jest.fn();
+			const fieldsWithNumber = [
+				...fields,
+				{
+					id: 'price',
+					label: 'Price',
+					type: 'number' as const,
+				},
+			];
+			const formWithNumber = {
+				...form,
+				fields: [ ...form.fields, 'price' ],
+			};
+			render(
+				<Dataform
+					onChange={ onChange }
+					fields={ fieldsWithNumber }
+					form={ formWithNumber }
+					data={ { ...data, price: 2.5 } }
+				/>
+			);
+
+			const priceInput = screen.getByRole( 'spinbutton', {
+				name: /price/i,
+			} );
+			expect( priceInput ).toHaveValue( 2.5 );
+
+			const user = userEvent.setup();
+			await user.clear( priceInput );
+			await user.type( priceInput, '3.75' );
+
+			expect( onChange ).toHaveBeenLastCalledWith( { price: 3.75 } );
+			expect( priceInput ).toHaveValue( 3.75 );
+		} );
+
 		it( 'should wrap fields in HStack when labelPosition is set to side', async () => {
 			const { container } = render(
 				<Dataform
