@@ -3,7 +3,10 @@
  */
 import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import { SearchControl } from '@wordpress/components';
+import {
+	SearchControl,
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useEffect, useState } from '@wordpress/element';
 import { useDebounce } from '@wordpress/compose';
@@ -55,7 +58,7 @@ export default function BlockManager( {
 	}, [ filteredBlockTypes?.length, search, debouncedSpeak ] );
 
 	return (
-		<div className="block-editor-block-manager__content">
+		<VStack className="block-editor-block-manager__content" spacing={ 4 }>
 			<SearchControl
 				__nextHasNoMarginBottom
 				label={ __( 'Search for a block' ) }
@@ -96,6 +99,6 @@ export default function BlockManager( {
 					onChange={ onChange }
 				/>
 			</div>
-		</div>
+		</VStack>
 	);
 }

@@ -1,7 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { Button, Flex, FlexItem, Modal } from '@wordpress/components';
+import {
+	Button,
+	Flex,
+	FlexItem,
+	Modal,
+	__experimentalText as Text,
+	__experimentalHeading as Heading,
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
@@ -37,18 +45,27 @@ export default function BlockAllowedBlocksModal( {
 
 	return (
 		<Modal
-			title={ __( 'Manage allowed blocks' ) }
+			title={ __( 'Allowed blocks' ) }
 			onRequestClose={ onClose }
 			overlayClassName="block-editor-block-allowed-blocks-modal"
 			focusOnMount="firstContentElement"
 			size="medium"
 		>
-			<form
+			<VStack
+				as="form"
 				onSubmit={ ( e ) => {
 					e.preventDefault();
 					handleSubmit();
 				} }
 			>
+				<Heading level={ 4 } as="h2">
+					{ __( 'Manage allowed blocks' ) }
+				</Heading>
+				<Text variant="muted">
+					{ __(
+						'Select which blocks can be added inside this container.'
+					) }
+				</Text>
 				<BlockManager
 					blockTypes={ blockTypes }
 					selectedBlockTypes={ currentSelectedBlockTypes }
@@ -80,7 +97,7 @@ export default function BlockAllowedBlocksModal( {
 						</Button>
 					</FlexItem>
 				</Flex>
-			</form>
+			</VStack>
 		</Modal>
 	);
 }
