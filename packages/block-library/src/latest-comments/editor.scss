@@ -1,0 +1,17 @@
+// Higher specificity - target list via wrapper.
+.wp-block-latest-comments .wp-block-latest-comments {
+	// Remove spacing. Higher specificity required to
+	// override default wp-block layout styles in the Post/Site editor.
+	padding: 0;
+	// These styles prevent duplicate borders in the Latest Comments block caused by
+	// server-side rendering injecting additional styles in the editor. They ensure
+	// consistent appearance in the editor while avoiding conflicts with frontend styles.
+	border: none;
+	border-radius: inherit;
+}
+
+// Reset margin for inner elements of the server-side rendered block
+// to avoid extra spacing introduced in the editor
+ol.wp-block-latest-comments {
+	margin: 0;
+}
