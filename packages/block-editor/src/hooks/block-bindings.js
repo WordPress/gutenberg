@@ -258,47 +258,39 @@ function EditableBlockBindingsPanelItems( {
 		setModalState( { attribute, sourceKey } );
 	};
 
-	return (
-		<>
-			{ attributes.map( ( attribute ) => {
-				const binding = bindings[ attribute ];
-				return (
-					<ToolsPanelItem
-						key={ attribute }
-						hasValue={ () => !! binding }
-						label={ attribute }
-						onDeselect={ () => {
-							updateBlockBindings( {
-								[ attribute ]: undefined,
-							} );
-						} }
-					>
-						<Menu
-							placement={
-								isMobile ? 'bottom-start' : 'left-start'
-							}
-						>
-							<Menu.TriggerButton render={ <Item /> }>
-								<BlockBindingsAttribute
-									attribute={ attribute }
-									binding={ binding }
-									source={ sources?.[ binding?.source ] }
-								/>
-							</Menu.TriggerButton>
-							<Menu.Popover gutter={ isMobile ? 8 : 36 }>
-								<BlockBindingsPanelMenuContent
-									attribute={ attribute }
-									binding={ binding }
-									sources={ sources }
-									onOpenModal={ handleOpenModal }
-								/>
-							</Menu.Popover>
-						</Menu>
-					</ToolsPanelItem>
-				);
-			} ) }
-		</>
-	);
+	return attributes.map( ( attribute ) => {
+		const binding = bindings[ attribute ];
+		return (
+			<ToolsPanelItem
+				key={ attribute }
+				hasValue={ () => !! binding }
+				label={ attribute }
+				onDeselect={ () => {
+					updateBlockBindings( {
+						[ attribute ]: undefined,
+					} );
+				} }
+			>
+				<Menu placement={ isMobile ? 'bottom-start' : 'left-start' }>
+					<Menu.TriggerButton render={ <Item /> }>
+						<BlockBindingsAttribute
+							attribute={ attribute }
+							binding={ binding }
+							source={ sources?.[ binding?.source ] }
+						/>
+					</Menu.TriggerButton>
+					<Menu.Popover gutter={ isMobile ? 8 : 36 }>
+						<BlockBindingsPanelMenuContent
+							attribute={ attribute }
+							binding={ binding }
+							sources={ sources }
+							onOpenModal={ handleOpenModal }
+						/>
+					</Menu.Popover>
+				</Menu>
+			</ToolsPanelItem>
+		);
+	} );
 }
 
 export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
