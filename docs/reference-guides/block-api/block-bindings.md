@@ -232,6 +232,7 @@ The `setValues` function updates all the values of the source of the block bound
 - `dispatch` returns an `object` of the store's action creators. [More about dispatch](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-data/#dispatch).
 - `select` returns an `object` of a given store's selectors. [More info in their docs.](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-data/#select).
 
+
 #### Editor registration Core examples
 
 There are a few examples in Core that can be used as reference.
