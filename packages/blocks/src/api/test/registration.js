@@ -33,6 +33,8 @@ import {
 	getBlockBindingsSource,
 	hasBlockSupport,
 	isReusableBlock,
+	validateType,
+	validateBlockSchema,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 } from '../registration';
 import { BLOCK_ICON_DEFAULT, DEPRECATED_ENTRY_KEYS } from '../constants';
@@ -481,6 +483,7 @@ describe( 'blocks', () => {
 			registerBlockType(
 				{
 					name: blockName,
+					title: 'block title',
 					blockHooks: {
 						'tests/block': 'firstChild',
 					},
@@ -1798,6 +1801,309 @@ describe( 'blocks', () => {
 			expect( console ).toHaveWarnedWith(
 				'Block bindings source "core/non-existing-source" is not registered.'
 			);
+		} );
+	} );
+
+	describe( 'validateType', () => {
+		it( 'should correctly validate string types', () => {
+			expect( validateType( 'hello', 'string' ) ).toBe( true );
+			expect( validateType( 123, 'string' ) ).toBe( false );
+			expect( validateType( null, 'string' ) ).toBe( false );
+			expect( validateType( undefined, 'string' ) ).toBe( false );
+		} );
+
+		it( 'should correctly validate number types', () => {
+			expect( validateType( 123, 'number' ) ).toBe( true );
+			expect( validateType( 3.14, 'number' ) ).toBe( true );
+			expect( validateType( 'hello', 'number' ) ).toBe( false );
+			expect( validateType( null, 'number' ) ).toBe( false );
+		} );
+
+		it( 'should correctly validate integer types', () => {
+			expect( validateType( 123, 'integer' ) ).toBe( true );
+			expect( validateType( 3.14, 'integer' ) ).toBe( false );
+			expect( validateType( '123', 'integer' ) ).toBe( false );
+			expect( validateType( null, 'integer' ) ).toBe( false );
+		} );
+
+		it( 'should consider integer as a valid number', () => {
+			expect( validateType( 123, 'number' ) ).toBe( true );
+			expect( validateType( 123, 'integer' ) ).toBe( true );
+		} );
+
+		it( 'should correctly validate boolean types', () => {
+			expect( validateType( true, 'boolean' ) ).toBe( true );
+			expect( validateType( false, 'boolean' ) ).toBe( true );
+			expect( validateType( 0, 'boolean' ) ).toBe( false );
+			expect( validateType( 1, 'boolean' ) ).toBe( false );
+		} );
+
+		it( 'should correctly validate array types', () => {
+			expect( validateType( [], 'array' ) ).toBe( true );
+			expect( validateType( [ 1, 2, 3 ], 'array' ) ).toBe( true );
+			expect( validateType( {}, 'array' ) ).toBe( false );
+			expect( validateType( null, 'array' ) ).toBe( false );
+		} );
+
+		it( 'should correctly validate object types', () => {
+			expect( validateType( {}, 'object' ) ).toBe( true );
+			expect( validateType( { a: 1 }, 'object' ) ).toBe( true );
+			expect( validateType( [], 'object' ) ).toBe( false ); // Array is not an object in block.json context
+			expect( validateType( null, 'object' ) ).toBe( false );
+		} );
+
+		it( 'should correctly validate null types', () => {
+			expect( validateType( null, 'null' ) ).toBe( true );
+			expect( validateType( undefined, 'null' ) ).toBe( false );
+			expect( validateType( 0, 'null' ) ).toBe( false );
+		} );
+
+		it( 'should correctly validate for multiple expected types (array of strings)', () => {
+			expect( validateType( 'test', [ 'string', 'number' ] ) ).toBe(
+				true
+			);
+			expect( validateType( 123, [ 'string', 'number' ] ) ).toBe( true );
+			expect( validateType( true, [ 'string', 'number' ] ) ).toBe(
+				false
+			);
+			expect( validateType( null, [ 'string', 'null' ] ) ).toBe( true );
+			expect( validateType( [], [ 'object', 'array' ] ) ).toBe( true );
+			expect( validateType( {}, [ 'object', 'array' ] ) ).toBe( true );
+			expect( validateType( 1, [ 'integer', 'string' ] ) ).toBe( true );
+			expect( validateType( 1.5, [ 'integer', 'string' ] ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'should return false for undefined values', () => {
+			expect( validateType( undefined, 'string' ) ).toBe( false );
+			expect( validateType( undefined, 'number' ) ).toBe( false );
+			expect( validateType( undefined, 'object' ) ).toBe( false );
+			expect( validateType( undefined, [ 'string', 'number' ] ) ).toBe(
+				false
+			);
+		} );
+	} );
+
+	describe( 'validateBlockSchema', () => {
+		it( 'should not return errors for a valid block metadata object', () => {
+			const blockMetadataValid = {
+				apiVersion: 2,
+				name: 'core/test-block',
+				title: 'block title',
+				category: 'text',
+				attributes: {
+					message: {
+						type: 'string',
+						default: 'Hello World',
+					},
+				},
+				supports: {
+					align: [ 'wide', 'full' ],
+				},
+			};
+			const errors = validateBlockSchema(
+				'core/test-block',
+				blockMetadataValid
+			);
+			expect( errors.length ).toBe( 0 );
+		} );
+
+		it( 'should return errors for missing required property "name"', () => {
+			const blockMetadataMissingName = {
+				apiVersion: 3,
+				title: 'block title',
+				category: 'text',
+			};
+			const errors = validateBlockSchema(
+				'core/test-block',
+				blockMetadataMissingName
+			);
+			expect( errors.length ).toBeGreaterThan( 0 );
+		} );
+
+		it( 'should return errors for invalid type for "apiVersion"', () => {
+			const blockMetadataInvalidApiVersion = {
+				apiVersion: 'three',
+				name: 'core/test-block',
+				title: 'block title',
+			};
+			const errors = validateBlockSchema(
+				'core/test-block',
+				blockMetadataInvalidApiVersion
+			);
+			expect( errors.length ).toBeGreaterThan( 0 );
+		} );
+
+		it( 'should return errors for additional, disallowed top-level properties', () => {
+			const blockMetadataWithExtraProperty = {
+				apiVersion: 3,
+				name: 'core/test-block',
+				title: 'block title',
+				category: 'text',
+				nonExistentProperty: 'someValue',
+			};
+			const errors = validateBlockSchema(
+				'core/test-block',
+				blockMetadataWithExtraProperty
+			);
+			expect( errors.length ).toBeGreaterThan( 0 );
+		} );
+
+		it( 'should return errors for invalid "name" pattern', () => {
+			const blockMetadataInvalidNamePattern = {
+				apiVersion: 2,
+				name: 'core_test-block',
+				title: 'block title',
+			};
+			const errors = validateBlockSchema(
+				'core/test-block',
+				blockMetadataInvalidNamePattern
+			);
+			expect( errors.length ).toBeGreaterThan( 0 );
+		} );
+
+		it( 'should return errors for an invalid attribute "type" (nested validation)', () => {
+			const blockMetadataInvalidAttributeType = {
+				apiVersion: 2,
+				name: 'core/test-block',
+				title: 'block title',
+				attributes: {
+					content: {
+						type: 'unsupported-type',
+						source: 'html',
+						selector: 'p',
+					},
+				},
+			};
+			const errors = validateBlockSchema(
+				'core/test-block',
+				blockMetadataInvalidAttributeType
+			);
+			expect( errors.length ).toBeGreaterThan( 0 );
+		} );
+
+		it( 'should return errors for `attributes` property missing "type" or "enum" (nested oneOf validation)', () => {
+			const blockMetadataMissingAttributeRequirement = {
+				apiVersion: 2,
+				name: 'core/test-block',
+				title: 'block title',
+				attributes: {
+					missingRequirement: {
+						source: 'html',
+						selector: 'div',
+					},
+				},
+			};
+			const errors = validateBlockSchema(
+				'core/test-block',
+				blockMetadataMissingAttributeRequirement
+			);
+			expect( errors.length ).toBeGreaterThan( 0 );
+		} );
+
+		it( 'should return errors for `supports.align` with an unsupported value (nested array enum validation)', () => {
+			const blockMetadataInvalidSupportsAlign = {
+				apiVersion: 2,
+				name: 'core/test-block',
+				title: 'block title',
+				supports: {
+					align: [ 'left', 'top' ],
+				},
+			};
+			const errors = validateBlockSchema(
+				'core/test-block',
+				blockMetadataInvalidSupportsAlign
+			);
+			expect( errors.length ).toBeGreaterThan( 0 );
+		} );
+
+		it( 'should return errors for `__experimental` property with an invalid type (nested anyOf validation)', () => {
+			const blockMetadataExperimentalNumber = {
+				apiVersion: 2,
+				name: 'core/test-block',
+				title: 'block title',
+				__experimental: 123,
+			};
+			const errors = validateBlockSchema(
+				'core/test-block',
+				blockMetadataExperimentalNumber
+			);
+			expect( errors.length ).toBeGreaterThan( 0 );
+		} );
+
+		it( 'should return errors for `styles` array items containing disallowed properties (additionalProperties: false)', () => {
+			const blockMetadataInvalidStyleItem = {
+				apiVersion: 2,
+				name: 'core/test-block',
+				title: 'block title',
+				styles: [
+					{
+						name: 'default',
+						label: 'Default',
+					},
+					{
+						name: 'invalid-style',
+						label: 'Invalid',
+						extraProperty: 'should-not-be-here',
+					},
+				],
+			};
+			const errors = validateBlockSchema(
+				'core/test-block',
+				blockMetadataInvalidStyleItem
+			);
+			expect( errors.length ).toBeGreaterThan( 0 );
+		} );
+
+		it( 'should return errors for `blockHooks` with an invalid pattern property value (nested enum validation)', () => {
+			const blockMetadataInvalidBlockHooks = {
+				apiVersion: 2,
+				name: 'core/test-block',
+				title: 'block title',
+				blockHooks: {
+					'core/paragraph': 'invalid-position',
+				},
+			};
+			const errors = validateBlockSchema(
+				'core/test-block',
+				blockMetadataInvalidBlockHooks
+			);
+			expect( errors.length ).toBeGreaterThan( 0 );
+		} );
+
+		it( 'should return errors for `variations` array with an invalid item type (nested array item type validation)', () => {
+			const blockMetadataInvalidVariationItem = {
+				apiVersion: 2,
+				name: 'core/test-block',
+				title: 'block title',
+				variations: [
+					{
+						name: 'variation-1',
+						title: 'Variation One',
+					},
+					'not-an-object',
+				],
+			};
+			const errors = validateBlockSchema(
+				'core/test-block',
+				blockMetadataInvalidVariationItem
+			);
+			expect( errors.length ).toBeGreaterThan( 0 );
+		} );
+
+		it( 'should return errors for unknown top-level properties (e.g., typos not in schema.properties)', () => {
+			const blockMetadataTypoField = {
+				apiVersion: 2,
+				name: 'core/test-block',
+				title: 'block title',
+				viewStyleSandles: 'file:./styles.css',
+			};
+			const errors = validateBlockSchema(
+				'core/test-block',
+				blockMetadataTypoField
+			);
+			expect( errors.length ).toBeGreaterThan( 0 );
 		} );
 	} );
 } );
