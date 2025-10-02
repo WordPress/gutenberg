@@ -24,12 +24,12 @@ const translationMap = {
 	h6: __( 'H6' ),
 	'settings.color': __( 'Color' ),
 	'settings.typography': __( 'Typography' ),
+	'settings.shadow': __( 'Shadow' ),
+	'settings.layout': __( 'Layout' ),
 	'styles.color': __( 'Colors' ),
 	'styles.spacing': __( 'Spacing' ),
 	'styles.background': __( 'Background' ),
 	'styles.typography': __( 'Typography' ),
-	'settings.shadow': __( 'Shadow' ),
-	'settings.layout': __( 'Layout' ),
 };
 const getBlockNames = memoize( () =>
 	getBlockTypes().reduce( ( accumulator, { name, title } ) => {
