@@ -21,7 +21,6 @@ import { useSelect } from '@wordpress/data';
 import { parse } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
 import { useMergeRefs, useViewportMatch } from '@wordpress/compose';
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -47,8 +46,6 @@ const {
 	ExperimentalBlockCanvas: BlockCanvas,
 	useFlashEditableBlocks,
 } = unlock( blockEditorPrivateApis );
-
-const { COLORS } = unlock( componentsPrivateApis );
 
 /**
  * These post types have a special editor where they don't allow you to fill the title
@@ -348,11 +345,12 @@ function VisualEditor( {
 				}}
 				${
 					enableResizing
-						? `.block-editor-iframe__html{background:${ COLORS.theme.gray[ 300 ] };display:flex;align-items:center;justify-content:center;min-height:100vh;}.block-editor-iframe__body{width:100%;}`
+						? '.block-editor-iframe__html{background:#ddd;display:flex;align-items:center;justify-content:center;min-height:100vh;}.block-editor-iframe__body{width:100%;}'
 						: ''
 				}`,
 				// The CSS above centers the body content vertically when resizing is enabled and applies a background
 				// color to the iframe HTML element to match the background color of the editor canvas.
+				// TODO: Move the #ddd somewhere else or use a variable.
 			},
 		];
 	}, [ styles, enableResizing ] );
