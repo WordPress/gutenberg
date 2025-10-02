@@ -10,7 +10,13 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { useCallback, useMemo, useRef, useState } from '@wordpress/element';
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getDate, getSettings } from '@wordpress/date';
 import { error as errorIcon } from '@wordpress/icons';
@@ -412,68 +418,26 @@ function CalendarDateRangeControl< Item >( {
 		return selectedRange.from || new Date();
 	} );
 
-	const [ isTouched, setIsTouched ] = useState( false );
-	const [ customValidity, setCustomValidity ] = useState<
-		{ type: 'invalid'; message: string } | undefined
-	>( undefined );
+	// Static error for testing
+	const [ customValidity ] = useState< {
+		type: 'invalid';
+		message: string;
+	} >( {
+		type: 'invalid',
+		message: 'There is an error',
+	} );
 	const validityTargetRef = useRef< HTMLInputElement >( null );
-
-	const onValidate = useCallback(
-		( newValue: DateRange ) => {
-			// Check if required and empty
-			if ( field.isValid?.required && ! newValue ) {
-				setCustomValidity( {
-					type: 'invalid',
-					message: __( 'This field is required.' ),
-				} );
-				return;
-			}
-
-			// Check custom validation (only if value exists)
-			if ( newValue ) {
-				const customMessage = field.isValid?.custom?.(
-					deepMerge(
-						data,
-						setValue( {
-							item: data,
-							value: newValue,
-						} ) as Partial< Item >
-					),
-					field
-				);
-
-				if ( customMessage ) {
-					setCustomValidity( {
-						type: 'invalid',
-						message: customMessage,
-					} );
-					return;
-				}
-			}
-
-			// No errors
-			setCustomValidity( undefined );
-		},
-		[ data, field, setValue ]
-	);
 
 	const updateDateRange = useCallback(
 		( fromDate?: Date | string, toDate?: Date | string ) => {
-			let newValue: DateRange;
 			if ( fromDate && toDate ) {
-				newValue = [ formatDate( fromDate ), formatDate( toDate ) ];
-				onChange( newValue );
-				setIsTouched( true );
-				onValidate( newValue );
+				onChange( [ formatDate( fromDate ), formatDate( toDate ) ] );
 			} else if ( ! fromDate && ! toDate ) {
-				newValue = undefined;
-				onChange( newValue );
-				setIsTouched( true );
-				onValidate( newValue );
+				onChange( undefined );
 			}
 			// Do nothing if only one date is set - wait for both
 		},
-		[ onChange, onValidate ]
+		[ onChange ]
 	);
 
 	const onSelectCalendarRange = useCallback(
@@ -523,24 +487,8 @@ function CalendarDateRangeControl< Item >( {
 
 	const { timezone, l10n } = getSettings();
 
-	const onBlur = ( event: React.FocusEvent< HTMLDivElement > ) => {
-		if ( isTouched ) {
-			return;
-		}
-
-		// Only consider "blurred from the component" if focus has fully left the wrapping div.
-		// This prevents unnecessary blurs from components with multiple focusable elements.
-		if (
-			! event.relatedTarget ||
-			! event.currentTarget.contains( event.relatedTarget )
-		) {
-			setIsTouched( true );
-			onValidate( value );
-		}
-	};
-
 	return (
-		<div onBlur={ onBlur }>
+		<div>
 			<BaseControl
 				__nextHasNoMarginBottom
 				id={ id }
