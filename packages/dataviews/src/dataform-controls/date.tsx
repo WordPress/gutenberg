@@ -418,7 +418,7 @@ function CalendarDateRangeControl< Item >( {
 		return selectedRange.from || new Date();
 	} );
 
-	const [ isTouched, setIsTouched ] = useState( true );
+	const [ isTouched, setIsTouched ] = useState( false );
 	const [ customValidity, setCustomValidity ] = useState<
 		{ type: 'invalid'; message: string } | undefined
 	>( undefined );
