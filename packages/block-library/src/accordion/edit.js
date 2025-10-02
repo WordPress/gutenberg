@@ -48,7 +48,9 @@ export default function Edit( {
 } ) {
 	const registry = useRegistry();
 	const { getBlockOrder } = useSelect( blockEditorStore );
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( {
+		role: 'group',
+	} );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const { updateBlockAttributes, insertBlock } =
 		useDispatch( blockEditorStore );
