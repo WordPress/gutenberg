@@ -45,7 +45,7 @@ const defaultLayouts = {
 					width: '1%',
 				},
 			},
-      showMedia: false,
+		showMedia: false,
 		},
 	},
 	[ LAYOUT_GRID ]: {
