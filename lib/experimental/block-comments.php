@@ -123,7 +123,7 @@ Gutenberg_Discussion_Indicator_Manager::get_instance();
 function gutenberg_add_open_discussion_label_styles() {
 	$screen = get_current_screen();
 	if ( 'edit-post' === $screen->id || 'edit-page' === $screen->id ) {
-?>
+		?>
 	<style>
 		.comment-avatar-stack {
 			display: inline-flex;
@@ -151,7 +151,7 @@ function gutenberg_add_open_discussion_label_styles() {
 			border-color: rgb(255, 249, 114);
 		}
 	</style>
-<?php
+		<?php
 	}
 }
-add_action( 'admin_footer', 'gutenberg_add_open_discussion_label_styles');
+add_action( 'admin_footer', 'gutenberg_add_open_discussion_label_styles' );

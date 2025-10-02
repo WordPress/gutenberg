@@ -81,9 +81,9 @@ class Gutenberg_Discussion_Indicator_Manager {
 						foreach ( $unresolved_comments as $comment ) {
 							$gravatar_params = array(
 								'size' => 24,
-								''
+								'',
 							);
-							$avatar_urls[] = get_avatar_url( $comment->user_id, $gravatar_params );
+							$avatar_urls[]   = get_avatar_url( $comment->user_id, $gravatar_params );
 						}
 						$this->post_screen_avatar_indicators[ $post_id ] = $avatar_urls;
 					}
