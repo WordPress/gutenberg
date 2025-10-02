@@ -111,7 +111,9 @@ function PostEditForm( { postType, postId } ) {
 			].filter(
 				( field ) =>
 					ids.length === 1 ||
-					fieldsWithBulkEditSupport.includes( field )
+					fieldsWithBulkEditSupport.includes(
+						typeof field === 'string' ? field : field.id
+					)
 			),
 		} ),
 		[ ids ]

@@ -12,7 +12,7 @@ import {
  * Internal dependencies
  */
 import DialogWrapper from './dialog-wrapper';
-import { unlock } from '../lock-unlock';
+import { unlock } from '../../lock-unlock';
 
 const { PrivateQuickInserter: QuickInserter } = unlock(
 	blockEditorPrivateApis
