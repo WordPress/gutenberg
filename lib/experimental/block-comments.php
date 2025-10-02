@@ -136,7 +136,7 @@ function gutenberg_add_open_discussion_indicator_to_post_title( $title, $post_id
 	}
 
 	$screen = get_current_screen();
-	if ( 'edit-post' === $screen->id ) {
+	if ( 'edit-post' === $screen->id || 'edit-page' === $screen->id ) {
 		$post = get_post( $post_id );
 
 		if ( $post && gutenberg_check_post_type_supports_block_comments( $post->post_type ) ) {
@@ -245,7 +245,7 @@ add_action( 'admin_footer', 'gutenberg_insert_open_discussion_label_scripts' );
  */
 function gutenberg_add_open_discussion_label_styles() {
 	$screen = get_current_screen();
-	if ( 'edit-post' === $screen->id ) {
+	if ( 'edit-post' === $screen->id || 'edit-page' === $screen->id ) {
 ?>
 	<style>
 		.comment-avatar-stack {
