@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useState, RawHTML, useRef } from '@wordpress/element';
+import { useState, RawHTML } from '@wordpress/element';
 import {
 	__experimentalText as Text,
 	__experimentalHStack as HStack,
@@ -110,7 +110,6 @@ function Thread( {
 	setShowCommentBoard,
 	commentSidebarRef,
 } ) {
-	const threadRef = useRef( null );
 	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 	const relatedBlockElement = useBlockElement( thread.blockClientId );
 	const debouncedToggleBlockHighlight = useDebounce(
@@ -198,7 +197,6 @@ function Thread( {
 			} }
 			tabIndex={ 0 }
 			role="listitem"
-			ref={ threadRef }
 			aria-label={ ariaLabel }
 			aria-expanded={ isSelected }
 		>
