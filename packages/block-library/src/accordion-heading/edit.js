@@ -2,14 +2,19 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import {
 	useBlockProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 	RichText,
 } from '@wordpress/block-editor';
 
-export default function Edit( { attributes, setAttributes, context } ) {
+export default function Edit( {
+	attributes,
+	setAttributes,
+	context,
+	isSelected,
+} ) {
 	const { title } = attributes;
 	const {
 		'core/accordion-icon-position': iconPosition,
@@ -18,7 +23,8 @@ export default function Edit( { attributes, setAttributes, context } ) {
 	} = context;
 	const TagName = 'h' + headingLevel;
 
-	// Set icon attributes.
+	const titleRef = useRef();
+
 	useEffect( () => {
 		if ( iconPosition !== undefined && showIcon !== undefined ) {
 			setAttributes( {
@@ -27,6 +33,18 @@ export default function Edit( { attributes, setAttributes, context } ) {
 			} );
 		}
 	}, [ iconPosition, showIcon, setAttributes ] );
+
+	useEffect( () => {
+		if ( isSelected ) {
+			const timeoutId = setTimeout( () => {
+				titleRef.current?.focus();
+			}, 0 );
+
+			return () => {
+				clearTimeout( timeoutId );
+			};
+		}
+	}, [ isSelected ] );
 
 	const blockProps = useBlockProps();
 	const spacingProps = useSpacingProps( attributes );
@@ -46,6 +64,7 @@ export default function Edit( { attributes, setAttributes, context } ) {
 					</span>
 				) }
 				<RichText
+					ref={ titleRef }
 					withoutInteractiveFormatting
 					disableLineBreaks
 					tagName="span"
