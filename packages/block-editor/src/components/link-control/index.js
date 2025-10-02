@@ -437,35 +437,15 @@ function LinkControl( {
 							}
 							hideLabelFromVision={ ! showTextControl }
 							isEntity={ isEntity }
-							suffix={ ( () => {
-								if ( isEntity ) {
-									return (
-										<Button
-											icon={ linkOff }
-											onClick={ handleUnlink }
-											aria-label={ __( 'Unlink' ) }
-											__next40pxDefaultSize
-										/>
-									);
-								}
-								if ( showActions ) {
-									return undefined;
-								}
-								return (
-									<InputControlSuffixWrapper variant="control">
-										<Button
-											onClick={
-												isDisabled ? noop : handleSubmit
-											}
-											label={ __( 'Submit' ) }
-											icon={ keyboardReturn }
-											className="block-editor-link-control__search-submit"
-											aria-disabled={ isDisabled }
-											size="small"
-										/>
-									</InputControlSuffixWrapper>
-								);
-							} )() }
+							suffix={
+								<SearchSuffixControl
+									isEntity={ isEntity }
+									showActions={ showActions }
+									isDisabled={ isDisabled }
+									onUnlink={ handleUnlink }
+									onSubmit={ handleSubmit }
+								/>
+							}
 						/>
 					</div>
 					{ errorMessage && (
@@ -539,6 +519,53 @@ function LinkControl( {
 
 			{ ! isCreatingPage && renderControlBottom && renderControlBottom() }
 		</div>
+	);
+}
+
+/**
+ * Suffix control component for LinkControl search input.
+ * Handles the display of unlink button for entities and submit button for regular links.
+ *
+ * @param {Object}   props             - Component props
+ * @param {boolean}  props.isEntity    - Whether the link is bound to an entity
+ * @param {boolean}  props.showActions - Whether to show action buttons
+ * @param {boolean}  props.isDisabled  - Whether the submit button should be disabled
+ * @param {Function} props.onUnlink    - Callback when unlink button is clicked
+ * @param {Function} props.onSubmit    - Callback when submit button is clicked
+ */
+function SearchSuffixControl( {
+	isEntity,
+	showActions,
+	isDisabled,
+	onUnlink,
+	onSubmit,
+} ) {
+	if ( isEntity ) {
+		return (
+			<Button
+				icon={ linkOff }
+				onClick={ onUnlink }
+				aria-label={ __( 'Unlink' ) }
+				__next40pxDefaultSize
+			/>
+		);
+	}
+
+	if ( showActions ) {
+		return undefined;
+	}
+
+	return (
+		<InputControlSuffixWrapper variant="control">
+			<Button
+				onClick={ isDisabled ? noop : onSubmit }
+				label={ __( 'Submit' ) }
+				icon={ keyboardReturn }
+				className="block-editor-link-control__search-submit"
+				aria-disabled={ isDisabled }
+				size="small"
+			/>
+		</InputControlSuffixWrapper>
 	);
 }
 
