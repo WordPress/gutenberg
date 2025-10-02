@@ -52,7 +52,7 @@ const defaultLayouts = {
 		layout: {
 			badgeFields: [ 'sync-status' ],
 		},
-    showMedia: false,
+	showMedia: false,
 	},
 };
 const DEFAULT_VIEW = {
