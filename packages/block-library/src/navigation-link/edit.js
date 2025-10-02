@@ -356,6 +356,11 @@ export default function NavigationLinkEdit( {
 			event.stopPropagation();
 			setIsLinkOpen( true );
 			setOpenedBy( ref.current );
+		} else if ( event.key === 'Delete' ) {
+			if ( ! url && ( ! label || label.length === 0 ) ) {
+				event.preventDefault();
+				onReplace( [] );
+			}
 		}
 	}
 
