@@ -304,7 +304,6 @@ export default function TermTemplateEdit( {
 	if ( ! blocks?.length ) {
 		return (
 			<div { ...blockProps }>
-				<p>hello world</p>
 				<BlockVariationPicker
 					icon={ layout }
 					label={ __( 'Term Template' ) }
