@@ -377,13 +377,16 @@ function CalendarDateControl< Item >( {
 	);
 }
 
-function CalendarDateRangeControl( {
+function CalendarDateRangeControl< Item >( {
 	id,
 	value,
 	onChange,
 	label,
 	hideLabelFromVision,
 	className,
+	data,
+	field,
+	setValue,
 }: {
 	id: string;
 	value: DateRange;
@@ -391,6 +394,9 @@ function CalendarDateRangeControl( {
 	label: string;
 	hideLabelFromVision?: boolean;
 	className?: string;
+	data: Item;
+	field: any;
+	setValue: any;
 } ) {
 	const [ selectedPresetId, setSelectedPresetId ] = useState< string | null >(
 		null
@@ -412,6 +418,58 @@ function CalendarDateRangeControl( {
 		return selectedRange.from || new Date();
 	} );
 
+	const [ isTouched, setIsTouched ] = useState( true );
+	const [ customValidity, setCustomValidity ] = useState<
+		{ type: 'invalid'; message: string } | undefined
+	>( undefined );
+
+	const onValidate = useCallback(
+		( newValue: DateRange ) => {
+			// Check if required and either from or to is empty
+			if ( field.isValid?.required ) {
+				if ( ! newValue || ! newValue[ 0 ] || ! newValue[ 1 ] ) {
+					setCustomValidity( {
+						type: 'invalid',
+						message: __( 'This field is required.' ),
+					} );
+					return;
+				}
+			}
+
+			// Check custom validation (only if both dates exist)
+			if ( newValue && newValue[ 0 ] && newValue[ 1 ] ) {
+				const customMessage = field.isValid?.custom?.(
+					deepMerge(
+						data,
+						setValue( {
+							item: data,
+							value: newValue,
+						} ) as Partial< Item >
+					),
+					field
+				);
+
+				if ( customMessage ) {
+					setCustomValidity( {
+						type: 'invalid',
+						message: customMessage,
+					} );
+					return;
+				}
+			}
+
+			// No errors
+			setCustomValidity( undefined );
+		},
+		[ data, field, setValue ]
+	);
+
+	useEffect( () => {
+		if ( isTouched ) {
+			onValidate( value );
+		}
+	}, [ isTouched, value, onValidate ] );
+
 	const updateDateRange = useCallback(
 		( fromDate?: Date | string, toDate?: Date | string ) => {
 			if ( fromDate && toDate ) {
@@ -430,20 +488,35 @@ function CalendarDateRangeControl( {
 				| { from: Date | undefined; to?: Date | undefined }
 				| undefined
 		) => {
+			const dateRangeValue =
+				newRange?.from && newRange?.to
+					? ( [
+							formatDate( newRange.from ),
+							formatDate( newRange.to ),
+					  ] as DateRange )
+					: undefined;
 			updateDateRange( newRange?.from, newRange?.to );
 			setSelectedPresetId( null );
+			setIsTouched( true );
+			onValidate( dateRangeValue );
 		},
-		[ updateDateRange ]
+		[ updateDateRange, onValidate ]
 	);
 
 	const handlePresetClick = useCallback(
 		( preset: ( typeof DATE_RANGE_PRESETS )[ 0 ] ) => {
 			const [ startDate, endDate ] = preset.getValue();
+			const dateRangeValue: DateRange = [
+				formatDate( startDate ),
+				formatDate( endDate ),
+			];
 			setCalendarMonth( startDate );
 			updateDateRange( startDate, endDate );
 			setSelectedPresetId( preset.id );
+			setIsTouched( true );
+			onValidate( dateRangeValue );
 		},
-		[ updateDateRange ]
+		[ updateDateRange, onValidate ]
 	);
 
 	const handleManualDateChange = useCallback(
@@ -455,6 +528,11 @@ function CalendarDateRangeControl( {
 			const updatedFrom = fromOrTo === 'from' ? newValue : currentFrom;
 			const updatedTo = fromOrTo === 'to' ? newValue : currentTo;
 
+			const dateRangeValue =
+				updatedFrom && updatedTo
+					? ( [ updatedFrom, updatedTo ] as DateRange )
+					: undefined;
+
 			updateDateRange( updatedFrom, updatedTo );
 
 			if ( newValue ) {
@@ -465,85 +543,125 @@ function CalendarDateRangeControl( {
 			}
 
 			setSelectedPresetId( null );
+			setIsTouched( true );
+			onValidate( dateRangeValue );
 		},
-		[ value, updateDateRange ]
+		[ value, updateDateRange, onValidate ]
 	);
 
 	const { timezone, l10n } = getSettings();
 
+	const onBlur = ( event: React.FocusEvent< HTMLDivElement > ) => {
+		if ( isTouched ) {
+			return;
+		}
+
+		// Only consider "blurred from the component" if focus has fully left the wrapping div.
+		// This prevents unnecessary blurs from components with multiple focusable elements.
+		if (
+			! event.relatedTarget ||
+			! event.currentTarget.contains( event.relatedTarget )
+		) {
+			setIsTouched( true );
+			onValidate( value );
+		}
+	};
+
 	return (
-		<BaseControl
-			__nextHasNoMarginBottom
-			id={ id }
-			className={ className }
-			label={ label }
-			hideLabelFromVision={ hideLabelFromVision }
-		>
-			<VStack spacing={ 4 }>
-				{ /* Preset buttons */ }
-				<HStack spacing={ 2 } wrap justify="flex-start">
-					{ DATE_RANGE_PRESETS.map( ( preset ) => {
-						const isSelected = selectedPresetId === preset.id;
-						return (
-							<Button
-								className="dataviews-controls__date-preset"
-								key={ preset.id }
-								variant="tertiary"
-								isPressed={ isSelected }
-								size="small"
-								onClick={ () => handlePresetClick( preset ) }
-							>
-								{ preset.label }
-							</Button>
-						);
-					} ) }
-					<Button
-						className="dataviews-controls__date-preset"
-						variant="tertiary"
-						isPressed={ ! selectedPresetId }
-						size="small"
-						accessibleWhenDisabled={ false }
-						disabled={ !! selectedPresetId }
+		<div onBlur={ onBlur }>
+			<BaseControl
+				__nextHasNoMarginBottom
+				id={ id }
+				className={ className }
+				label={ label }
+				hideLabelFromVision={ hideLabelFromVision }
+			>
+				<VStack spacing={ 4 }>
+					{ /* Preset buttons */ }
+					<HStack spacing={ 2 } wrap justify="flex-start">
+						{ DATE_RANGE_PRESETS.map( ( preset ) => {
+							const isSelected = selectedPresetId === preset.id;
+							return (
+								<Button
+									className="dataviews-controls__date-preset"
+									key={ preset.id }
+									variant="tertiary"
+									isPressed={ isSelected }
+									size="small"
+									onClick={ () =>
+										handlePresetClick( preset )
+									}
+								>
+									{ preset.label }
+								</Button>
+							);
+						} ) }
+						<Button
+							className="dataviews-controls__date-preset"
+							variant="tertiary"
+							isPressed={ ! selectedPresetId }
+							size="small"
+							accessibleWhenDisabled={ false }
+							disabled={ !! selectedPresetId }
+						>
+							{ __( 'Custom' ) }
+						</Button>
+					</HStack>
+
+					{ /* Manual date range inputs */ }
+					<HStack spacing={ 2 }>
+						<InputControl
+							__next40pxDefaultSize
+							type="date"
+							label={ __( 'From' ) }
+							hideLabelFromVision
+							value={ value?.[ 0 ] }
+							onChange={ ( newValue ) =>
+								handleManualDateChange( 'from', newValue )
+							}
+						/>
+						<InputControl
+							__next40pxDefaultSize
+							type="date"
+							label={ __( 'To' ) }
+							hideLabelFromVision
+							value={ value?.[ 1 ] }
+							onChange={ ( newValue ) =>
+								handleManualDateChange( 'to', newValue )
+							}
+						/>
+					</HStack>
+
+					<DateRangeCalendar
+						style={ { width: '100%' } }
+						selected={ selectedRange }
+						onSelect={ onSelectCalendarRange }
+						month={ calendarMonth }
+						onMonthChange={ setCalendarMonth }
+						timeZone={ timezone.string || undefined }
+						weekStartsOn={ l10n.startOfWeek }
+					/>
+				</VStack>
+			</BaseControl>
+			<div aria-live="polite">
+				{ customValidity && (
+					<p
+						className={ clsx(
+							'components-validated-control__indicator',
+							'is-invalid'
+						) }
 					>
-						{ __( 'Custom' ) }
-					</Button>
-				</HStack>
-
-				{ /* Manual date range inputs */ }
-				<HStack spacing={ 2 }>
-					<InputControl
-						__next40pxDefaultSize
-						type="date"
-						label={ __( 'From' ) }
-						hideLabelFromVision
-						value={ value?.[ 0 ] }
-						onChange={ ( newValue ) =>
-							handleManualDateChange( 'from', newValue )
-						}
-					/>
-					<InputControl
-						__next40pxDefaultSize
-						type="date"
-						label={ __( 'To' ) }
-						hideLabelFromVision
-						value={ value?.[ 1 ] }
-						onChange={ ( newValue ) =>
-							handleManualDateChange( 'to', newValue )
-						}
-					/>
-				</HStack>
-
-				<DateRangeCalendar
-					style={ { width: '100%' } }
-					selected={ selectedRange }
-					onSelect={ onSelectCalendarRange }
-					month={ calendarMonth }
-					onMonthChange={ setCalendarMonth }
-					timeZone={ timezone.string || undefined }
-					weekStartsOn={ l10n.startOfWeek }
-				/>
-			</VStack>
-		</BaseControl>
+						<Icon
+							className="components-validated-control__indicator-icon"
+							icon={ errorIcon }
+							size={ 16 }
+							fill="currentColor"
+						/>
+						{ customValidity.message }
+					</p>
+				) }
+			</div>
+		</div>
 	);
 }
 
@@ -615,6 +733,9 @@ export default function DateControl< Item >( {
 				onChange={ onChangeCalendarDateRangeControl }
 				label={ label }
 				hideLabelFromVision={ hideLabelFromVision }
+				data={ data }
+				field={ field }
+				setValue={ setValue }
 			/>
 		);
 	}
