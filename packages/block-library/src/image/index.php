@@ -33,28 +33,21 @@ function render_block_core_image( $attributes, $content, $block ) {
 		 *
 		 * @return WP_HTML_Span|false Span of input if the element is empty; otherwise false.
 		 */
-		public function block_core_image_span_of_empty_element() {
-			$tag_name = $this->get_tag();
-			$this->set_bookmark( '_wp_image_block_figcaption' );
-			$opener = $this->bookmarks['_wp_image_block_figcaption'];
+		public function block_core_image_extract_empty_figcaption_element() {
+			$this->set_bookmark( 'here' );
+			$opener = $this->bookmarks['here'];
 
-			if ( ! $this->next_tag(
-				array(
-					'tag_name'    => $tag_name,
-					'tag_closers' => 'visit',
-				)
-			) ) {
-				// No matching closing tag found.
+			// Allow comments within the definition of “empty.”
+			while ( $this->next_token() && '#comment' === $this->get_token_name() ) {
+				continue;
+			}
+
+			if ( 'FIGCAPTION' !== $this->get_tag() || ! $this->is_tag_closer() ) {
 				return false;
 			}
 
-			$this->set_bookmark( '_wp_image_block_figcaption' );
-			$closer = $this->bookmarks['_wp_image_block_figcaption'];
-
-			if ( $closer->start !== $opener->start + $opener->length ) {
-				// Not an empty element.
-				return false;
-			}
+			$this->set_bookmark( 'here' );
+			$closer = $this->bookmarks['here'];
 
 			return new WP_HTML_Span( $opener->start, $closer->start + $closer->length - $opener->start );
 		}
@@ -98,7 +91,7 @@ function render_block_core_image( $attributes, $content, $block ) {
 	 * we take note of its span so we can remove it later.
 	 */
 	if ( $p->next_tag( 'FIGCAPTION' ) && empty( $attributes['caption'] ) ) {
-		$figcaption_span = $p->block_core_image_span_of_empty_element();
+		$figcaption_span = $p->block_core_image_extract_empty_figcaption_element();
 	}
 
 	$link_destination  = isset( $attributes['linkDestination'] ) ? $attributes['linkDestination'] : 'none';
