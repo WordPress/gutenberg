@@ -26,7 +26,7 @@ import type {
 	RegularLayout,
 	PanelLayout,
 	CardLayout,
-	SummaryField,
+	CardSummaryField,
 } from '../../../types';
 import { unlock } from '../../../lock-unlock';
 
@@ -343,7 +343,7 @@ const getLayoutFromStoryArgs = ( {
 	labelPosition?: 'default' | 'top' | 'side' | 'none';
 	openAs?: 'default' | 'dropdown' | 'modal';
 	withHeader?: boolean;
-	summary?: SummaryField;
+	summary?: CardSummaryField;
 } ): Layout | undefined => {
 	let layout: Layout | undefined;
 
@@ -1075,15 +1075,11 @@ const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 			},
 		},
 		{
-			id: 'tax-summary',
+			id: 'plan-summary',
 			type: 'text',
 			readOnly: true,
 			render: ( { item } ) => {
-				return (
-					<Badge>
-						VAT: { item.vat } - Commission: { item.commission }
-					</Badge>
-				);
+				return <Badge>{ item.plan }</Badge>;
 			},
 		},
 	];
@@ -1111,7 +1107,7 @@ const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 				withHeader,
 				summary: [
 					{ id: 'customer-summary', visibility: 'always' },
-					{ id: 'tax-summary', visibility: 'when-collapsed' },
+					{ id: 'plan-summary', visibility: 'when-collapsed' },
 				],
 			} ),
 			fields: [
