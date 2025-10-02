@@ -317,11 +317,17 @@ export const registerCoreBlocks = (
 		window.__unstableAutoRegisterBlocks.forEach( ( blockName ) => {
 			registerBlockType( blockName, {
 				title: blockName,
-				edit: ( { attributes } ) => {
-					return createElement( ServerSideRender, {
-						block: blockName,
-						attributes,
-					} );
+				edit: function Edit( { attributes } ) {
+					const { useBlockProps } = window.wp.blockEditor;
+					const blockProps = useBlockProps();
+					return createElement(
+						'div',
+						blockProps,
+						createElement( ServerSideRender, {
+							block: blockName,
+							attributes,
+						} )
+					);
 				},
 				save: () => null,
 			} );
