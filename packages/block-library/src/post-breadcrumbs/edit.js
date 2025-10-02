@@ -58,16 +58,12 @@ export default function PostBreadcrumbEdit( {
 				style={ {
 					'--separator': `'${ separator }'`,
 				} }
+				inert="true"
 			>
 				<ol>
 					{ placeholderItems.map( ( text, index ) => (
 						<li key={ index }>
-							<a
-								href={ `#${ text.toLowerCase() }` }
-								onClick={ ( event ) => event.preventDefault() }
-							>
-								{ text }
-							</a>
+							<a href={ `#${ text.toLowerCase() }` }>{ text }</a>
 						</li>
 					) ) }
 					<li>
@@ -133,7 +129,7 @@ export default function PostBreadcrumbEdit( {
 				</ToolsPanel>
 			</InspectorControls>
 			<div { ...blockProps }>
-				{ placeholder || <RawHTML>{ content }</RawHTML> }
+				{ placeholder || <RawHTML inert="true">{ content }</RawHTML> }
 			</div>
 		</>
 	);
