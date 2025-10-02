@@ -227,7 +227,16 @@ function gutenberg_resolve_block_template( $template_type, $template_hierarchy, 
 			continue;
 		}
 
-		$templates[] = _build_block_template_result_from_post( $post );
+		$template = _build_block_template_result_from_post( $post );
+
+		// Ensure the active templates are associated with the active theme.
+		// See _build_block_template_object_from_post_object.
+		if ( $template->theme !== get_stylesheet() ) {
+			$remaining_slugs[] = $slug;
+			continue;
+		}
+
+		$templates[] = $template;
 	}
 
 	// For any remaining slugs, use the static template.
