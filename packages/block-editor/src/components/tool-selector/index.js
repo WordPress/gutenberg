@@ -30,6 +30,22 @@ const selectIcon = (
 	</SVG>
 );
 
+/**
+ * ToolSelector component is used to switch between the navigation and edit modes in the block editor.
+ *
+ * @example
+ * ```jsx
+ * import { ToolSelector } from '@wordpress/block-editor';
+ *
+ * function MyToolSelector() {
+ *    return <ToolSelector />;
+ * }
+ * ```
+ *
+ * @param {Object} props Props for the ToolSelector component
+ * @param {Object} ref   Ref for the ToolSelector component
+ * @return {Element} The ToolSelector component
+ */
 function ToolSelector( props, ref ) {
 	const mode = useSelect(
 		( select ) => select( blockEditorStore ).__unstableGetEditorMode(),
