@@ -466,8 +466,11 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 				<ItemGroup isBordered isSeparated>
 					{ bindableAttributes.map( ( attribute ) => {
 						const binding = filteredBindings[ attribute ];
+						const hasCompatibleData = Object.values( sources ).some(
+							( source ) => source.data
+						);
 
-						return readOnly ? (
+						return readOnly || ! hasCompatibleData ? (
 							<ReadOnlyBlockBindingsPanelItem
 								key={ attribute }
 								attribute={ attribute }
