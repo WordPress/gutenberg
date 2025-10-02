@@ -524,19 +524,28 @@ export default function NavigationLinkEdit( {
 								// If there is no link then remove the auto-inserted block.
 								// This avoids empty blocks which can provided a poor UX.
 								if ( ! url ) {
-									// Fixes https://github.com/WordPress/gutenberg/issues/61361
-									// There's a chance we're closing due to the user selecting the browse all button.
-									// Only move focus if the focus is still within the popover ui. If it's not within
-									// the popover, it's because something has taken the focus from the popover, and
-									// we don't want to steal it back.
+									const inspectorControls =
+										document.querySelector(
+											'.editor-sidebar'
+										);
+
+									// Only move focus if the focus is still within the popover UI or Inspector Controls.
+									// If the focus is not within these elements, it means something else has taken the focus
+									// (e.g., outside the editor), and we can safely proceed to remove the block.
 									if (
 										linkUIref.current.contains(
 											window.document.activeElement
+										) ||
+										inspectorControls.contains(
+											window.document.activeElement
 										)
 									) {
-										// Select the previous block to keep focus nearby
-										selectPreviousBlock( clientId, true );
+										// Focus is within the popover or inspector; don't remove the block.
+										return;
 									}
+
+									// Select the previous block to keep focus nearby.
+									selectPreviousBlock( clientId, true );
 
 									// Remove the link.
 									onReplace( [] );
