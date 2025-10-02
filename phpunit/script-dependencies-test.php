@@ -42,9 +42,9 @@ class Test_Script_Dependencies extends WP_UnitTestCase {
 			'wp-block-library',
 			'wp-blocks',
 			'wp-edit-site',
-			'wp-core-data',
 			'wp-editor',
 			'wp-router',
+			'wp-sync',
 			'wp-url',
 			'wp-widgets',
 		);
