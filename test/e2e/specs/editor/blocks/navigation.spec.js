@@ -824,7 +824,7 @@ test.describe( 'Navigation block', () => {
 			// - enables the input
 			// - clears the input
 			const unlinkButton = settingsControls.getByRole( 'button', {
-				name: 'Unlink and edit',
+				name: 'Unsync and edit',
 			} );
 			await unlinkButton.click();
 			await expect( linkInput ).toBeEnabled();

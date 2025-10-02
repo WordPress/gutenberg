@@ -12,6 +12,7 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useRef } from '@wordpress/element';
+import { useInstanceId } from '@wordpress/compose';
 import { safeDecodeURI } from '@wordpress/url';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { linkOff as unlinkIcon } from '@wordpress/icons';
@@ -76,6 +77,8 @@ export function Controls( {
 	const { label, url, description, rel, opensInNewTab } = attributes;
 	const lastURLRef = useRef( url );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+	const inputId = useInstanceId( Controls, 'link-input' );
+	const helpTextId = `${ inputId }__help`;
 
 	const editBoundLink = () => {
 		// Remove the binding
@@ -128,6 +131,7 @@ export function Controls( {
 				<InputControl
 					__nextHasNoMarginBottom
 					__next40pxDefaultSize
+					id={ inputId }
 					label={ __( 'Link' ) }
 					value={ url ? safeDecodeURI( url ) : '' }
 					onChange={ ( urlValue ) => {
@@ -179,7 +183,9 @@ export function Controls( {
 							<Button
 								icon={ unlinkIcon }
 								onClick={ editBoundLink }
-								aria-label={ __( 'Unlink and edit' ) }
+								aria-describedby={ helpTextId }
+								showTooltip
+								label={ __( 'Unsync and edit' ) }
 								__next40pxDefaultSize
 							/>
 						)
