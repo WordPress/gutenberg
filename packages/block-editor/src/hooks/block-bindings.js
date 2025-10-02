@@ -193,9 +193,7 @@ function BlockBindingsPanelMenuContent( {
 					return (
 						<Menu.Item
 							key={ sourceKey }
-							onClick={ () =>
-								onOpenModal( { attribute, sourceKey } )
-							}
+							onClick={ () => onOpenModal( { sourceKey } ) }
 						>
 							<Menu.ItemLabel>{ source.label }</Menu.ItemLabel>
 						</Menu.Item>
@@ -233,64 +231,62 @@ function BlockBindingsAttribute( { attribute, binding, source } ) {
 	);
 }
 
-function ReadOnlyBlockBindingsPanelItems( { bindings, sources } ) {
-	return Object.entries( bindings ).map( ( [ attribute, binding ] ) => (
-		<Item key={ attribute }>
-			<BlockBindingsAttribute
-				attribute={ attribute }
-				binding={ binding }
-				source={ sources?.[ binding?.source ] }
-			/>
-		</Item>
-	) );
+function ReadOnlyBlockBindingsPanelItem( { attribute, binding, source } ) {
+	return (
+		<ToolsPanelItem hasValue={ () => !! binding } label={ attribute }>
+			<Item>
+				<BlockBindingsAttribute
+					attribute={ attribute }
+					binding={ binding }
+					source={ source }
+				/>
+			</Item>
+		</ToolsPanelItem>
+	);
 }
 
-function EditableBlockBindingsPanelItems( {
-	attributes,
-	bindings,
+function EditableBlockBindingsPanelItem( {
+	attribute,
+	binding,
 	sources,
 	setModalState,
 } ) {
 	const { updateBlockBindings } = useBlockBindingsUtils();
 	const isMobile = useViewportMatch( 'medium', '<' );
 
-	const handleOpenModal = ( { attribute, sourceKey } ) => {
+	const handleOpenModal = ( { sourceKey } ) => {
 		setModalState( { attribute, sourceKey } );
 	};
 
-	return attributes.map( ( attribute ) => {
-		const binding = bindings[ attribute ];
-		return (
-			<ToolsPanelItem
-				key={ attribute }
-				hasValue={ () => !! binding }
-				label={ attribute }
-				onDeselect={ () => {
-					updateBlockBindings( {
-						[ attribute ]: undefined,
-					} );
-				} }
-			>
-				<Menu placement={ isMobile ? 'bottom-start' : 'left-start' }>
-					<Menu.TriggerButton render={ <Item /> }>
-						<BlockBindingsAttribute
-							attribute={ attribute }
-							binding={ binding }
-							source={ sources?.[ binding?.source ] }
-						/>
-					</Menu.TriggerButton>
-					<Menu.Popover gutter={ isMobile ? 8 : 36 }>
-						<BlockBindingsPanelMenuContent
-							attribute={ attribute }
-							binding={ binding }
-							sources={ sources }
-							onOpenModal={ handleOpenModal }
-						/>
-					</Menu.Popover>
-				</Menu>
-			</ToolsPanelItem>
-		);
-	} );
+	return (
+		<ToolsPanelItem
+			hasValue={ () => !! binding }
+			label={ attribute }
+			onDeselect={ () => {
+				updateBlockBindings( {
+					[ attribute ]: undefined,
+				} );
+			} }
+		>
+			<Menu placement={ isMobile ? 'bottom-start' : 'left-start' }>
+				<Menu.TriggerButton render={ <Item /> }>
+					<BlockBindingsAttribute
+						attribute={ attribute }
+						binding={ binding }
+						source={ sources?.[ binding?.source ] }
+					/>
+				</Menu.TriggerButton>
+				<Menu.Popover gutter={ isMobile ? 8 : 36 }>
+					<BlockBindingsPanelMenuContent
+						attribute={ attribute }
+						binding={ binding }
+						sources={ sources }
+						onOpenModal={ handleOpenModal }
+					/>
+				</Menu.Popover>
+			</Menu>
+		</ToolsPanelItem>
+	);
 }
 
 export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
@@ -468,19 +464,26 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 				className="block-editor-bindings__panel"
 			>
 				<ItemGroup isBordered isSeparated>
-					{ readOnly ? (
-						<ReadOnlyBlockBindingsPanelItems
-							bindings={ filteredBindings }
-							sources={ sources }
-						/>
-					) : (
-						<EditableBlockBindingsPanelItems
-							attributes={ bindableAttributes }
-							bindings={ filteredBindings }
-							sources={ sources }
-							setModalState={ setModalState }
-						/>
-					) }
+					{ bindableAttributes.map( ( attribute ) => {
+						const binding = filteredBindings[ attribute ];
+
+						return readOnly ? (
+							<ReadOnlyBlockBindingsPanelItem
+								key={ attribute }
+								attribute={ attribute }
+								binding={ binding }
+								source={ sources?.[ binding?.source ] }
+							/>
+						) : (
+							<EditableBlockBindingsPanelItem
+								key={ attribute }
+								attribute={ attribute }
+								binding={ binding }
+								sources={ sources }
+								setModalState={ setModalState }
+							/>
+						);
+					} ) }
 				</ItemGroup>
 				{ /*
 					Use a div element to make the ToolsPanelHiddenInnerWrapper
