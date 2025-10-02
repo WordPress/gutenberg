@@ -250,7 +250,7 @@ export default function NavigationLinkEdit( {
 	// URL binding logic
 	const { updateBlockBindings } = useBlockBindingsUtils( clientId );
 
-	const hasUrlBinding = isSelected && !! metadata?.bindings?.url && !! id;
+	const hasUrlBinding = !! metadata?.bindings?.url && !! id;
 
 	const [ isInvalid, isDraft ] = useIsInvalidLink(
 		kind,
