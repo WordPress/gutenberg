@@ -126,7 +126,7 @@ const LinkControlSearchInput = forwardRef(
 		const helpText = isEntity
 			? sprintf(
 					/* translators: %s: entity type (e.g., page, post) */
-					__( 'Link stays in sync with the selected %s.' ),
+					__( 'Synced with the selected %s.' ),
 					currentLink?.type || 'item'
 			  )
 			: null;

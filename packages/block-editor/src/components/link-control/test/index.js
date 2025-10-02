@@ -2633,7 +2633,7 @@ describe( 'Entity handling', () => {
 
 		// Should show help text indicating this is an entity link
 		expect(
-			screen.getByText( 'Link stays in sync with the selected page.' )
+			screen.getByText( 'Synced with the selected page.' )
 		).toBeVisible();
 	} );
 
@@ -2661,7 +2661,7 @@ describe( 'Entity handling', () => {
 
 		// Should not show entity help text for non-entity links
 		expect(
-			screen.queryByText( 'Link stays in sync with the selected page.' )
+			screen.queryByText( 'Synced with the selected page.' )
 		).not.toBeInTheDocument();
 	} );
 

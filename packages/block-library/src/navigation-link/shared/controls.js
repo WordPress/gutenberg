@@ -169,9 +169,7 @@ export function Controls( {
 							);
 							return sprintf(
 								/* translators: %s is the entity type (e.g., "page", "post", "category") */
-								__(
-									'Link stays in sync with the selected %s.'
-								),
+								__( 'Synced with the selected %s.' ),
 								entityType
 							);
 						} )()
