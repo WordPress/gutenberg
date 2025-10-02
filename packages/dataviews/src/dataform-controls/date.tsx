@@ -615,9 +615,6 @@ export default function DateControl< Item >( {
 				onChange={ onChangeCalendarDateRangeControl }
 				label={ label }
 				hideLabelFromVision={ hideLabelFromVision }
-				data={ data }
-				field={ field }
-				setValue={ setValue }
 			/>
 		);
 	}
