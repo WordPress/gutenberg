@@ -45,12 +45,9 @@ class Gutenberg_Discussion_Indicator_Manager {
 	}
 
 	/**
-	 * Add an "Open Discussion" label next to the title of posts that have unresolved comments.
+	 * Add avatars next to posts titles where the posts has unresolved discussions.
 	 *
-	 * Filter on `the_title` to add the label. Check that the current post type supports block
-	 * comments and that there are unresolved comments before adding the label.
-	 *
-	 * @param string $title The post title.
+	 * @param string $title   The post title.
 	 * @param int    $post_id The post ID.
 	 * @return string The modified post title.
 	 */
@@ -156,6 +153,7 @@ class Gutenberg_Discussion_Indicator_Manager {
 		</script>';
 			echo $script;
 		}
+		// Ensure insert only ever happens once.
 		remove_action( 'admin_footer', array( $this, 'insert_open_discussion_label_scripts' ) );
 	}
 }
