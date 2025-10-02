@@ -25,6 +25,8 @@ export default function Edit( {
 
 	const titleRef = useRef();
 
+	// Set icon attributes.
+
 	useEffect( () => {
 		if ( iconPosition !== undefined && showIcon !== undefined ) {
 			setAttributes( {
