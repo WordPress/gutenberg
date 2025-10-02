@@ -6,7 +6,6 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { __experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue } from '@wordpress/components';
 import {
 	useBlockProps,
 	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
@@ -24,7 +23,7 @@ import { flattenIconsArray, parseIcon } from './utils';
  * @param {Object} props All props passed to this function.
  */
 export default function save( props ) {
-	const { icon, iconName, label, title, width, height } = props.attributes;
+	const { icon, iconName, label, title } = props.attributes;
 
 	// If there is no icon and no iconName, don't save anything.
 	if ( ! icon && ! iconName ) {
@@ -79,21 +78,7 @@ export default function save( props ) {
 
 	const iconClasses = clsx( 'icon-container', borderProps?.className );
 
-	const [ widthQuantity, widthUnit ] =
-		parseQuantityAndUnitFromRawValue( width );
-
-	// Default icon width when there is no height set.
-	let iconWidth = ! height ? '48px' : undefined;
-
-	if ( widthQuantity ) {
-		iconWidth = widthUnit
-			? `${ widthQuantity }${ widthUnit }`
-			: `${ widthQuantity }px`;
-	}
-
 	const iconStyles = {
-		width: iconWidth,
-		height: height || undefined,
 		...blockProps.style,
 		...borderProps.style,
 

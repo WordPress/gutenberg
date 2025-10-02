@@ -19,7 +19,6 @@ import {
 	ToolbarGroup,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -43,7 +42,6 @@ import {
 	IconDropZone,
 	IconPlaceholder,
 	InserterModal,
-	DimensionControl,
 } from './components';
 import {
 	flattenIconsArray,
@@ -61,7 +59,7 @@ import { useToolsPanelDropdownMenuProps } from './utils/hooks';
  */
 export function Edit( props ) {
 	const { attributes, setAttributes } = props;
-	const { icon, iconName, label, title, width, height } = attributes;
+	const { icon, iconName, label, title } = attributes;
 
 	// Allowed types for the current user.
 	const { allowedMimeTypes, mediaUpload } = useSelect( ( select ) => {
@@ -121,8 +119,6 @@ export function Edit( props ) {
 	function resetAll() {
 		setAttributes( {
 			label: undefined,
-			width: undefined,
-			height: undefined,
 		} );
 	}
 
@@ -308,43 +304,6 @@ export function Edit( props ) {
 							__next40pxDefaultSize
 						/>
 					</ToolsPanelItem>
-					<ToolsPanelItem
-						label={ __( 'Width' ) }
-						isShownByDefault
-						hasValue={ () => !! width }
-						onDeselect={ () =>
-							setAttributes( { width: undefined } )
-						}
-					>
-						<DimensionControl
-							label={ __( 'Width' ) }
-							value={ width }
-							onChange={ ( value ) =>
-								setAttributes( { width: value } )
-							}
-							__nextHasNoMarginBottom
-							__next40pxDefaultSize
-						/>
-					</ToolsPanelItem>
-					<ToolsPanelItem
-						label={ __( 'Height' ) }
-						isShownByDefault={ false }
-						hasValue={ () => !! height }
-						onDeselect={ () =>
-							setAttributes( { height: undefined } )
-						}
-					>
-						<DimensionControl
-							label={ __( 'Height' ) }
-							value={ height }
-							onChange={ ( value ) =>
-								setAttributes( { height: value } )
-							}
-							units={ [ 'px', 'em', 'rem', 'vh', 'vw' ] }
-							__nextHasNoMarginBottom
-							__next40pxDefaultSize
-						/>
-					</ToolsPanelItem>
 				</ToolsPanel>
 			</InspectorControls>
 
@@ -378,23 +337,9 @@ export function Edit( props ) {
 
 	const iconClasses = clsx( 'icon-container', borderProps?.className );
 
-	const [ widthQuantity, widthUnit ] =
-		parseQuantityAndUnitFromRawValue( width );
-
-	// Default icon width when there is no height set.
-	let iconWidth = ! height ? '48px' : undefined;
-
-	if ( widthQuantity ) {
-		iconWidth = widthUnit
-			? `${ widthQuantity }${ widthUnit }`
-			: `${ widthQuantity }px`;
-	}
-
 	const iconStyles = {
 		...blockProps.style,
 		...borderProps.style,
-		width: iconWidth,
-		height: height || undefined,
 
 		// Margin is applied to the wrapper container, so unset.
 		marginBottom: undefined,

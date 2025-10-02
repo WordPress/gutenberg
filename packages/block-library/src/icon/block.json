@@ -23,12 +23,6 @@
 		},
 		"title": {
 			"type": "string"
-		},
-		"width": {
-			"type": [ "string", "number" ]
-		},
-		"height": {
-			"type": "string"
 		}
 	},
 	"supports": {
