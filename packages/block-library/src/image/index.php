@@ -23,8 +23,17 @@ function render_block_core_image( $attributes, $content, $block ) {
 	}
 
 	$p = new class( $content ) extends WP_HTML_Tag_Processor {
-		// phpcs:ignore Gutenberg.NamingConventions.ValidBlockLibraryFunctionName.FunctionNameInvalid, Gutenberg.Commenting.SinceTag.MissingMethodSinceTag
-		public function span_of_empty_element() {
+		/**
+		 * Return input span for an empty FIGCAPTION element.
+		 *
+		 * Returns span of input for an empty FIGCAPTION, if currently matched on a
+		 * FIGCAPTION opening tag and if the element is properly closed and empty.
+		 *
+		 * @since 6.9.0
+		 *
+		 * @return WP_HTML_Span|false Span of input if the element is empty; otherwise false.
+		 */
+		public function block_core_image_span_of_empty_element() {
 			$tag_name = $this->get_tag();
 			$this->set_bookmark( '_wp_image_block_figcaption' );
 			$opener = $this->bookmarks['_wp_image_block_figcaption'];
@@ -89,7 +98,7 @@ function render_block_core_image( $attributes, $content, $block ) {
 	 * we take note of its span so we can remove it later.
 	 */
 	if ( $p->next_tag( 'FIGCAPTION' ) && empty( $attributes['caption'] ) ) {
-		$figcaption_span = $p->span_of_empty_element();
+		$figcaption_span = $p->block_core_image_span_of_empty_element();
 	}
 
 	$link_destination  = isset( $attributes['linkDestination'] ) ? $attributes['linkDestination'] : 'none';
