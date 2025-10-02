@@ -27,6 +27,9 @@ export default function TermsQueryInspectorControls( props ) {
 	const { termId } = context;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
+	// Taxonomy is inherited when there is a termId in context and inherit is true.
+	const inheritTaxonomy = inherit && !! termId;
+
 	return (
 		<>
 			<InspectorControls>
@@ -69,7 +72,7 @@ export default function TermsQueryInspectorControls( props ) {
 						<TaxonomyControl
 							taxonomy={ taxonomy }
 							onChange={ setQuery }
-							inherit={ inherit }
+							inherit={ inheritTaxonomy }
 						/>
 					</ToolsPanelItem>
 					<ToolsPanelItem
