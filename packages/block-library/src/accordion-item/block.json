@@ -5,7 +5,6 @@
 	"title": "Accordion Item",
 	"category": "design",
 	"description": "Displays a section of content in an accordion, including a heading and expandable content.",
-	"__experimental": true,
 	"parent": [ "core/accordion" ],
 	"allowedBlocks": [ "core/accordion-heading", "core/accordion-panel" ],
 	"supports": {

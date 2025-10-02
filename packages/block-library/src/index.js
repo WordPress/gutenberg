@@ -150,6 +150,10 @@ const getAllBlocks = () => {
 		quote,
 
 		// Register all remaining core blocks.
+		accordion,
+		accordionItem,
+		accordionHeading,
+		accordionPanel,
 		archives,
 		audio,
 		button,
@@ -245,10 +249,6 @@ const getAllBlocks = () => {
 	];
 
 	if ( window?.__experimentalEnableBlockExperiments ) {
-		blocks.push( accordion );
-		blocks.push( accordionItem );
-		blocks.push( accordionHeading );
-		blocks.push( accordionPanel );
 		blocks.push( termsQuery );
 		blocks.push( termTemplate );
 	}

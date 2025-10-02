@@ -5,7 +5,6 @@
 	"title": "Accordion Panel",
 	"category": "design",
 	"description": "Displays an accordion panel.",
-	"__experimental": true,
 	"parent": [ "core/accordion-item" ],
 	"supports": {
 		"color": {
