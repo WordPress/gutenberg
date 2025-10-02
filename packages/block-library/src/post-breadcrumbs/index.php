@@ -57,12 +57,19 @@ function render_block_core_post_breadcrumbs( $attributes, $content, $block ) {
 			return '';
 		}
 
-		// In case of multiple taxonomies, use the first one.
-		$taxonomy      = reset( $taxonomies );
-		$taxonomy_name = $taxonomy->name;
-		$terms         = get_the_terms( $post_id, $taxonomy_name );
+		// Find the first taxonomy that has terms assigned to this post.
+		$taxonomy_name = null;
+		$terms         = array();
+		foreach ( $taxonomies as $taxonomy ) {
+			$post_terms = get_the_terms( $post_id, $taxonomy->name );
+			if ( ! empty( $post_terms ) && ! is_wp_error( $post_terms ) ) {
+				$taxonomy_name = $taxonomy->name;
+				$terms         = $post_terms;
+				break;
+			}
+		}
 
-		if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) {
+		if ( ! empty( $terms ) ) {
 			// Use the first term (if multiple are assigned).
 			$term = reset( $terms );
 			// Check if taxonomy is hierarchical also add ancestor term links
