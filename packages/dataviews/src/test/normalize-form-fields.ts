@@ -156,7 +156,7 @@ describe( 'normalizeFormFields', () => {
 					withHeader: false,
 					// @ts-ignore - Test intentionally uses invalid type to verify runtime behavior.
 					isOpened: false,
-					summary: [ 'field1' ],
+					summary: [ { id: 'field1', visibility: 'always' } ],
 				},
 				fields: [ 'field1' ],
 			};
@@ -180,7 +180,7 @@ describe( 'normalizeFormFields', () => {
 					type: 'card',
 					withHeader: true,
 					isOpened: false,
-					summary: [ 'field1' ],
+					summary: [ { id: 'field1', visibility: 'always' } ],
 				},
 				fields: [ 'field1' ],
 			};
@@ -192,7 +192,37 @@ describe( 'normalizeFormFields', () => {
 						type: 'card',
 						withHeader: true,
 						isOpened: false,
-						summary: [ 'field1' ],
+						summary: [ { id: 'field1', visibility: 'always' } ],
+					},
+				},
+			] );
+		} );
+
+		it( 'card: normalizes summary to array of objects when it is a string', () => {
+			const form: Form = {
+				layout: {
+					type: 'card',
+					withHeader: true,
+					isOpened: false,
+					summary: [
+						'field2',
+						{ id: 'field1', visibility: 'when-collapsed' },
+					],
+				},
+				fields: [ 'field1' ],
+			};
+			const result = normalizeFormFields( form );
+			expect( result ).toEqual( [
+				{
+					id: 'field1',
+					layout: {
+						type: 'card',
+						withHeader: true,
+						isOpened: false,
+						summary: [
+							{ id: 'field2', visibility: 'always' },
+							{ id: 'field1', visibility: 'when-collapsed' },
+						],
 					},
 				},
 			] );
