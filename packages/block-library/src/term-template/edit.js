@@ -173,6 +173,9 @@ export default function TermTemplateEdit( {
 				order,
 				orderby: orderBy,
 				hide_empty: hideEmpty,
+				// The hierarchical argument is necessary to avoid fetching all terms,
+				// which is the default behavior of the REST API when no parent is set.
+				hierarchical: false,
 				// We fetch the largest number of terms and limit them during rendering, which
 				// allows us to avoid re-fetching data when max terms changes.
 				per_page: 100,

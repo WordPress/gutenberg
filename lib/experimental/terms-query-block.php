@@ -19,12 +19,13 @@ if ( ! function_exists( 'build_query_vars_from_terms_query_block' ) ) {
 	 */
 	function build_query_vars_from_terms_query_block( $block, $page = 1 ) {
 		$query = array(
-			'taxonomy'   => 'category',
-			'number'     => 10,
-			'order'      => 'asc',
-			'orderby'    => 'name',
-			'hide_empty' => true,
-			'parent'     => 0,
+			'taxonomy'     => 'category',
+			'number'       => 10,
+			'order'        => 'asc',
+			'orderby'      => 'name',
+			'hide_empty'   => true,
+			'parent'       => 0,
+			'hierarchical' => false,
 		);
 
 		if ( isset( $block->context['termQuery'] ) ) {
