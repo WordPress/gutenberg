@@ -15,7 +15,7 @@
 - DataViewsPicker: Hide the space reserved for the title when the title is hidden. [#71865](https://github.com/WordPress/gutenberg/pull/71865)
 
 ### Enhancements
-
+- Disable empty `"Select item"` option in `ValidatedSelectControl` when the field is required. (#72042(https://github.com/WordPress/gutenberg/pull/PR_NUMBER))
 - DataViews: Require at least one field to be visible. ([#71625](https://github.com/WordPress/gutenberg/pull/71625))
 - DataViews: Expose `DataViews.FiltersToggled` component to be used in free composition. [#71907](https://github.com/WordPress/gutenberg/pull/71907)
 - DataViews: Add `number` field and refactor `integer` field based on the `number` field. ([#71797](https://github.com/WordPress/gutenberg/pull/71797))
