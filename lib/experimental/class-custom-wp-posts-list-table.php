@@ -5,6 +5,18 @@
  * Extends the core class with only one line changes in the column_title method.
  */
 class Custom_WP_Posts_List_Table extends WP_Posts_List_Table {
+	// Avatar colors matching client side code in https://github.com/WordPress/gutenberg/blob/trunk/packages/editor/src/components/collab-sidebar/utils.js#L20-L29
+	private $avatar_colors = array(
+		'#3858E9', // Blueberry
+		'#9fB1FF', // Blueberry 2
+		'#1D35B4', // Dark Blueberry
+		'#1A1919', // Charcoal 0
+		'#E26F56', // Pomegranate
+		'#33F078', // Acid Green
+		'#FFF972', // Lemon
+		'#7A00DF', // Purple
+	);
+
 	public function column_title( $post ) {
 		// This code is copied from WP_Posts_List_Table and modified to add the avatar images.
 		global $mode;
@@ -120,20 +132,21 @@ class Custom_WP_Posts_List_Table extends WP_Posts_List_Table {
 
 		// Show indicator for any post with unresolved comments.
 		if ( count( $unresolved_comments ) > 0 ) {
-			$maxAvatars = 3;
-			$count = $maxAvatars;
+			$max_avatars = 3;
+			$count = $max_avatars;
 			echo "<div class='comment-avatar-stack' title='" . esc_attr__( 'This post has open discussions', 'gutenberg' ) . "'>";
 			foreach ( array_slice( $unresolved_comments, 0, $max_avatars ) as $comment ) {
 				$gravatar_params = array(
 					'size' => 18,
 					'',
 				);
-				$avatar_urls = get_avatar_url( $comment->user_id, $gravatar_params );
-				echo "<img class='comment-avatar' src='" . esc_url( $avatar_urls ) . "' />";
+				$avatar_urls  = get_avatar_url( $comment->user_id, $gravatar_params );
+				$avatar_color = $this->avatar_colors[ $comment->user_id % count( $this->avatar_colors ) ]; // Matches client side code.
+				echo "<img class='comment-avatar' src='" . esc_url( $avatar_urls ) . "' style='border-color: $avatar_color; z-index: $count--;' />";
 			}
 
 			// Add an overflow indicator if there are more avatars than the max.
-			if ( count( $unresolved_comments ) > $maxAvatars ) {
+			if ( count( $unresolved_comments ) > $max_avatars ) {
 				if ( count( $unresolved_comments ) >= 100 ) {
 					$overflow = __( '100+', 'gutenberg' );
 				} else {

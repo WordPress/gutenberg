@@ -161,18 +161,9 @@ function gutenberg_add_open_discussion_label_styles() {
 			background: #fff;
 		}
 		.comment-avatar:first-child{
-			border-color: rgb(159, 177, 255);
 			margin-left: 0;
-			z-index: 3;
 		}
-		.comment-avatar:nth-child(2){
-			border-color: rgb(122, 0, 223);
-			z-index: 2;
-		}
-		.comment-avatar:nth-child(3){
-			border-color: rgb(255, 249, 114);
-			z-index: 1;
-		}
+
 		.comment-avatar-overflow {
 			align-items:center;
 			display:flex;
