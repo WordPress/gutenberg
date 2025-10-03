@@ -123,10 +123,7 @@ class Custom_WP_Posts_List_Table extends WP_Posts_List_Table {
 			$maxAvatars = 3;
 			$count = $maxAvatars;
 			echo "<div class='comment-avatar-stack' title='" . esc_attr__( 'This post has open discussions', 'gutenberg' ) . "'>";
-			foreach ( $unresolved_comments as $comment ) {
-				if ( $count-- <= 0 ) {
-					break;
-				}
+			foreach ( array_slice( $unresolved_comments, 0, $max_avatars ) as $comment ) {
 				$gravatar_params = array(
 					'size' => 18,
 					'',
