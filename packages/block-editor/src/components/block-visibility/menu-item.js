@@ -72,7 +72,7 @@ export default function BlockVisibilityMenuItem( { clientIds } ) {
 					sprintf(
 						// translators: %s: The shortcut key to access the List view.
 						__(
-							'Block hidden. You can access it via the List view (%s).'
+							'Block hidden. You can access it via the List View (%s).'
 						),
 						listViewShortcut
 					),
