@@ -83,10 +83,12 @@ export type NormalizedCardLayout =
 export type RowLayout = {
 	type: 'row';
 	alignment?: 'start' | 'center' | 'end';
+	styles?: Record< string, { flex?: React.CSSProperties[ 'flex' ] } >;
 };
 export type NormalizedRowLayout = {
 	type: 'row';
 	alignment: 'start' | 'center' | 'end';
+	styles: Record< string, { flex?: React.CSSProperties[ 'flex' ] } >;
 };
 
 export type Layout = RegularLayout | PanelLayout | CardLayout | RowLayout;
