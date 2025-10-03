@@ -7,7 +7,6 @@ import styled from '@emotion/styled';
  * Internal dependencies
  */
 import InputControl from '../input-control';
-import { COLORS } from '../utils';
 
 export const StyledInputControl = styled( InputControl )`
 	input[type='search'] {
@@ -17,9 +16,5 @@ export const StyledInputControl = styled( InputControl )`
 		&::-webkit-search-results-decoration {
 			-webkit-appearance: none;
 		}
-	}
-
-	&:not( :focus-within ) {
-		--wp-components-color-background: ${ COLORS.theme.gray[ 100 ] };
 	}
 `;
