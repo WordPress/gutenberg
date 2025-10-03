@@ -31,7 +31,7 @@ import DataViewsViewConfig, {
 } from '../dataviews-view-config';
 import { normalizeFields } from '../../normalize-fields';
 import type { ActionButton, Field, View, SupportedLayouts } from '../../types';
-import type { SelectionOrUpdater } from '../../private-types';
+import type { SelectionOrUpdater } from '../../types/private';
 type ItemWithId = { id: string };
 
 const isItemClickable = () => false;

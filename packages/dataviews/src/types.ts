@@ -11,7 +11,7 @@ import type {
 /**
  * Internal dependencies
  */
-import type { SetSelection } from './private-types';
+import type { SetSelection } from './types/private';
 
 /**
  * WordPress dependencies
