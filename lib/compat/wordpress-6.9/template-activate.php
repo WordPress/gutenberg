@@ -231,7 +231,7 @@ function gutenberg_resolve_block_template( $template_type, $template_hierarchy, 
 
 		// Ensure the active templates are associated with the active theme.
 		// See _build_block_template_object_from_post_object.
-		if ( $template->theme !== get_stylesheet() ) {
+		if ( get_stylesheet() !== $template->theme ) {
 			$remaining_slugs[] = $slug;
 			continue;
 		}
