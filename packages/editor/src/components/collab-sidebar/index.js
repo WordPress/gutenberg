@@ -331,10 +331,8 @@ export default function CollabSidebar() {
 
 	const { postId } = useSelect( ( select ) => {
 		const { getCurrentPostId } = select( editorStore );
-		const _postId = getCurrentPostId();
-
 		return {
-			postId: _postId,
+			postId: getCurrentPostId(),
 		};
 	}, [] );
 
