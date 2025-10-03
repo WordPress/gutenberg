@@ -242,6 +242,7 @@ function gutenberg_comment_avatars( $post ) {
 				'per_page' => 100,
 			)
 		);
+
 		if ( count( $unresolved_comments ) > 0 ) {
 			$maxAvatars = 3;
 			$count = $maxAvatars;
@@ -256,12 +257,10 @@ function gutenberg_comment_avatars( $post ) {
 				);
 				$avatar_urls = get_avatar_url( $comment->user_id, $gravatar_params );
 				echo "<img class='comment-avatar' src='" . esc_url( $avatar_urls ) . "' />";
-
 			}
 
 			// Add an overflow indicator if there are more avatars than the max.
 			if ( count( $unresolved_comments ) > $maxAvatars ) {
-				// If there are 100 or more unresolved comments, we show "100+".
 				if ( count( $unresolved_comments ) >= 100 ) {
 					$overflow = '100+';
 				} else {
