@@ -422,18 +422,29 @@ function CalendarDateRangeControl< Item >( {
 	const [ customValidity, setCustomValidity ] = useState<
 		{ type: 'invalid'; message: string } | undefined
 	>( undefined );
+	const fromInputRef = useRef< HTMLInputElement >( null );
+	const toInputRef = useRef< HTMLInputElement >( null );
 
 	const onValidate = useCallback(
 		( newValue: DateRange ) => {
-			// Check if required and either from or to is empty
-			if ( field.isValid?.required ) {
-				if ( ! newValue || ! newValue[ 0 ] || ! newValue[ 1 ] ) {
-					setCustomValidity( {
-						type: 'invalid',
-						message: __( 'This field is required.' ),
-					} );
-					return;
-				}
+			// Check HTML5 validity for required fields
+			const fromInput = fromInputRef.current;
+			const toInput = toInputRef.current;
+
+			if ( fromInput && ! fromInput.validity.valid ) {
+				setCustomValidity( {
+					type: 'invalid',
+					message: fromInput.validationMessage,
+				} );
+				return;
+			}
+
+			if ( toInput && ! toInput.validity.valid ) {
+				setCustomValidity( {
+					type: 'invalid',
+					message: toInput.validationMessage,
+				} );
+				return;
 			}
 
 			// Check custom validation (only if both dates exist)
@@ -474,12 +485,14 @@ function CalendarDateRangeControl< Item >( {
 		( fromDate?: Date | string, toDate?: Date | string ) => {
 			if ( fromDate && toDate ) {
 				onChange( [ formatDate( fromDate ), formatDate( toDate ) ] );
+				onValidate( [ formatDate( fromDate ), formatDate( toDate ) ] );
 			} else if ( ! fromDate && ! toDate ) {
 				onChange( undefined );
+				onValidate( undefined );
 			}
 			// Do nothing if only one date is set - wait for both
 		},
-		[ onChange ]
+		[ onChange, onValidate ]
 	);
 
 	const onSelectCalendarRange = useCallback(
@@ -488,35 +501,22 @@ function CalendarDateRangeControl< Item >( {
 				| { from: Date | undefined; to?: Date | undefined }
 				| undefined
 		) => {
-			const dateRangeValue =
-				newRange?.from && newRange?.to
-					? ( [
-							formatDate( newRange.from ),
-							formatDate( newRange.to ),
-					  ] as DateRange )
-					: undefined;
 			updateDateRange( newRange?.from, newRange?.to );
 			setSelectedPresetId( null );
 			setIsTouched( true );
-			onValidate( dateRangeValue );
 		},
-		[ updateDateRange, onValidate ]
+		[ updateDateRange ]
 	);
 
 	const handlePresetClick = useCallback(
 		( preset: ( typeof DATE_RANGE_PRESETS )[ 0 ] ) => {
 			const [ startDate, endDate ] = preset.getValue();
-			const dateRangeValue: DateRange = [
-				formatDate( startDate ),
-				formatDate( endDate ),
-			];
 			setCalendarMonth( startDate );
 			updateDateRange( startDate, endDate );
 			setSelectedPresetId( preset.id );
 			setIsTouched( true );
-			onValidate( dateRangeValue );
 		},
-		[ updateDateRange, onValidate ]
+		[ updateDateRange ]
 	);
 
 	const handleManualDateChange = useCallback(
@@ -527,11 +527,6 @@ function CalendarDateRangeControl< Item >( {
 			];
 			const updatedFrom = fromOrTo === 'from' ? newValue : currentFrom;
 			const updatedTo = fromOrTo === 'to' ? newValue : currentTo;
-
-			const dateRangeValue =
-				updatedFrom && updatedTo
-					? ( [ updatedFrom, updatedTo ] as DateRange )
-					: undefined;
 
 			updateDateRange( updatedFrom, updatedTo );
 
@@ -544,9 +539,8 @@ function CalendarDateRangeControl< Item >( {
 
 			setSelectedPresetId( null );
 			setIsTouched( true );
-			onValidate( dateRangeValue );
 		},
-		[ value, updateDateRange, onValidate ]
+		[ value, updateDateRange ]
 	);
 
 	const { timezone, l10n } = getSettings();
@@ -612,6 +606,7 @@ function CalendarDateRangeControl< Item >( {
 					<HStack spacing={ 2 }>
 						<InputControl
 							__next40pxDefaultSize
+							ref={ fromInputRef }
 							type="date"
 							label={ __( 'From' ) }
 							hideLabelFromVision
@@ -619,9 +614,11 @@ function CalendarDateRangeControl< Item >( {
 							onChange={ ( newValue ) =>
 								handleManualDateChange( 'from', newValue )
 							}
+							required={ !! field.isValid?.required }
 						/>
 						<InputControl
 							__next40pxDefaultSize
+							ref={ toInputRef }
 							type="date"
 							label={ __( 'To' ) }
 							hideLabelFromVision
@@ -629,6 +626,7 @@ function CalendarDateRangeControl< Item >( {
 							onChange={ ( newValue ) =>
 								handleManualDateChange( 'to', newValue )
 							}
+							required={ !! field.isValid?.required }
 						/>
 					</HStack>
 
