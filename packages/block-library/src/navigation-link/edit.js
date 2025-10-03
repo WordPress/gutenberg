@@ -20,7 +20,6 @@ import {
 	getColorClassName,
 	useInnerBlocksProps,
 	useBlockEditingMode,
-	useBlockBindingsUtils,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
 import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
@@ -33,7 +32,7 @@ import { useMergeRefs, usePrevious } from '@wordpress/compose';
  * Internal dependencies
  */
 import { getColors } from '../navigation/edit/utils';
-import { Controls, LinkUI, updateAttributes } from './shared';
+import { Controls, LinkUI, updateAttributes, useEntityBinding } from './shared';
 
 const DEFAULT_BLOCK = { name: 'core/navigation-link' };
 const NESTING_BLOCK_NAMES = [
@@ -248,9 +247,10 @@ export default function NavigationLinkEdit( {
 	const { getBlocks } = useSelect( blockEditorStore );
 
 	// URL binding logic
-	const { updateBlockBindings } = useBlockBindingsUtils( clientId );
-
-	const hasUrlBinding = !! metadata?.bindings?.url && !! id;
+	const { clearBinding, createBinding } = useEntityBinding( {
+		clientId,
+		attributes,
+	} );
 
 	const [ isInvalid, isDraft ] = useIsInvalidLink(
 		kind,
@@ -440,8 +440,7 @@ export default function NavigationLinkEdit( {
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 					setIsEditingControl={ setIsEditingControl }
-					hasUrlBinding={ hasUrlBinding }
-					updateBlockBindings={ updateBlockBindings }
+					clientId={ clientId }
 				/>
 			</InspectorControls>
 			<div { ...blockProps }>
@@ -570,19 +569,11 @@ export default function NavigationLinkEdit( {
 									attributes
 								);
 
-								// Auto-bind URL if a post is selected and no binding exists
-								if (
-									updatedValue.id &&
-									! metadata?.bindings?.url
-								) {
-									updateBlockBindings( {
-										url: {
-											source: 'core/entity',
-											args: {
-												key: 'url',
-											},
-										},
-									} );
+								// Handle URL binding
+								if ( ! updatedValue?.id ) {
+									clearBinding();
+								} else {
+									createBinding();
 								}
 							} }
 						/>

@@ -23,6 +23,14 @@ jest.mock( '../../../utils/hooks', () => ( {
 	useToolsPanelDropdownMenuProps: () => ( {} ),
 } ) );
 
+// Mock the useEntityBinding hook
+jest.mock( '../use-entity-binding', () => ( {
+	useEntityBinding: jest.fn( () => ( {
+		hasUrlBinding: false,
+		clearBinding: jest.fn(),
+	} ) ),
+} ) );
+
 describe( 'Controls', () => {
 	// Initialize the mock function
 	beforeAll( () => {
@@ -39,6 +47,7 @@ describe( 'Controls', () => {
 		},
 		setAttributes: jest.fn(),
 		setIsEditingControl: jest.fn(),
+		clientId: 'test-client-id',
 	};
 
 	beforeEach( () => {
@@ -210,6 +219,12 @@ describe( 'Controls', () => {
 
 	describe( 'URL binding help text', () => {
 		it( 'shows help text when URL is bound to an entity', () => {
+			const { useEntityBinding } = require( '../use-entity-binding' );
+			useEntityBinding.mockReturnValue( {
+				hasUrlBinding: true,
+				clearBinding: jest.fn(),
+			} );
+
 			const propsWithBinding = {
 				...defaultProps,
 				attributes: {
@@ -217,7 +232,6 @@ describe( 'Controls', () => {
 					type: 'page',
 					kind: 'post-type',
 				},
-				hasUrlBinding: true,
 			};
 
 			render( <Controls { ...propsWithBinding } /> );
@@ -228,6 +242,12 @@ describe( 'Controls', () => {
 		} );
 
 		it( 'shows help text for different entity types', () => {
+			const { useEntityBinding } = require( '../use-entity-binding' );
+			useEntityBinding.mockReturnValue( {
+				hasUrlBinding: true,
+				clearBinding: jest.fn(),
+			} );
+
 			const propsWithCategoryBinding = {
 				...defaultProps,
 				attributes: {
@@ -235,7 +255,6 @@ describe( 'Controls', () => {
 					type: 'category',
 					kind: 'taxonomy',
 				},
-				hasUrlBinding: true,
 			};
 
 			render( <Controls { ...propsWithCategoryBinding } /> );
@@ -246,12 +265,13 @@ describe( 'Controls', () => {
 		} );
 
 		it( 'does not show help text when URL is not bound', () => {
-			const propsWithoutBinding = {
-				...defaultProps,
+			const { useEntityBinding } = require( '../use-entity-binding' );
+			useEntityBinding.mockReturnValue( {
 				hasUrlBinding: false,
-			};
+				clearBinding: jest.fn(),
+			} );
 
-			render( <Controls { ...propsWithoutBinding } /> );
+			render( <Controls { ...defaultProps } /> );
 
 			expect(
 				screen.queryByText( /Synced with the selected/ )
@@ -259,6 +279,12 @@ describe( 'Controls', () => {
 		} );
 
 		it( 'shows help text for post entity type', () => {
+			const { useEntityBinding } = require( '../use-entity-binding' );
+			useEntityBinding.mockReturnValue( {
+				hasUrlBinding: true,
+				clearBinding: jest.fn(),
+			} );
+
 			const propsWithPostBinding = {
 				...defaultProps,
 				attributes: {
@@ -266,7 +292,6 @@ describe( 'Controls', () => {
 					type: 'post',
 					kind: 'post-type',
 				},
-				hasUrlBinding: true,
 			};
 
 			render( <Controls { ...propsWithPostBinding } /> );
@@ -277,6 +302,12 @@ describe( 'Controls', () => {
 		} );
 
 		it( 'shows help text for tag entity type', () => {
+			const { useEntityBinding } = require( '../use-entity-binding' );
+			useEntityBinding.mockReturnValue( {
+				hasUrlBinding: true,
+				clearBinding: jest.fn(),
+			} );
+
 			const propsWithTagBinding = {
 				...defaultProps,
 				attributes: {
@@ -284,7 +315,6 @@ describe( 'Controls', () => {
 					type: 'tag',
 					kind: 'taxonomy',
 				},
-				hasUrlBinding: true,
 			};
 
 			render( <Controls { ...propsWithTagBinding } /> );

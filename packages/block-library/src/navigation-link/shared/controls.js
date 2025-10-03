@@ -22,6 +22,7 @@ import { linkOff as unlinkIcon } from '@wordpress/icons';
  */
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { updateAttributes } from './update-attributes';
+import { useEntityBinding } from './use-entity-binding';
 
 /**
  * Get a human-readable entity type name.
@@ -64,15 +65,13 @@ function getEntityTypeName( type, kind ) {
  * @param {Object}   props.attributes          - Block attributes
  * @param {Function} props.setAttributes       - Function to update block attributes
  * @param {Function} props.setIsEditingControl - Function to set editing state (optional)
- * @param {Function} props.updateBlockBindings - Function to update block bindings
- * @param {boolean}  props.hasUrlBinding       - Whether the URL is bound to an entity
+ * @param {string}   props.clientId            - Block client ID
  */
 export function Controls( {
 	attributes,
 	setAttributes,
 	setIsEditingControl = () => {},
-	updateBlockBindings,
-	hasUrlBinding,
+	clientId,
 } ) {
 	const { label, url, description, rel, opensInNewTab } = attributes;
 	const lastURLRef = useRef( url );
@@ -80,9 +79,15 @@ export function Controls( {
 	const inputId = useInstanceId( Controls, 'link-input' );
 	const helpTextId = `${ inputId }__help`;
 
+	// Use the entity binding hook internally
+	const { hasUrlBinding, clearBinding } = useEntityBinding( {
+		clientId,
+		attributes,
+	} );
+
 	const editBoundLink = () => {
 		// Remove the binding
-		updateBlockBindings( { url: undefined } );
+		clearBinding();
 
 		// Clear url and id to allow picking a new entity (keep type and kind)
 		setAttributes( { url: undefined, id: undefined } );
