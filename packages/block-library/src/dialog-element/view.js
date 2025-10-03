@@ -176,6 +176,16 @@ const { actions: privateActions, state: privateState } = store(
 				if ( dialog.isOpen ) {
 					return;
 				}
+				// If already closing, don't start another close animation
+				if ( dialog.isClosing ) {
+					return;
+				}
+				// Only proceed if the dialog element is actually open in the DOM
+				// This prevents the watcher from triggering close animations when the dialog
+				// was never opened in the first place (e.g., on page load when isOpen initializes to false)
+				if ( ! dialogElement.open ) {
+					return;
+				}
 				// Start isClosing animation...
 				privateState.dialogs[ id ].isClosing = true;
 				// Allow for animation to complete...
