@@ -6,28 +6,193 @@
  */
 
 /**
- * Adds an aria-label to the table of contents block content.
+ * Renders the `core/table-of-contents` block on the server.
  *
- * @param array  $attributes Attributes of the block being rendered.
- * @param string $content Content of the block being rendered.
+ * @param array    $attributes Block attributes.
+ * @param string   $content    Block content.
+ * @param WP_Block $block      Block instance.
  *
- * @return string The content of the block being rendered.
+ * @return string Returns the block content.
  */
-function block_core_table_of_contents_render( $attributes, $content ) {
-	if ( ! $content ) {
-		return $content;
+function render_block_core_table_of_contents( $attributes, $content, $block ) {
+	// Extract headings from the block tree.
+	$headings = array();
+
+	global $wp_current_filter;
+	if ( in_array( 'the_content', $wp_current_filter, true ) ) {
+		// Post content context.
+		$post = get_post();
+		if ( $post ) {
+			$blocks = parse_blocks( $post->post_content );
+			$headings = traverse_blocks_for_headings( $blocks, $attributes['maxLevel'] ?? null );
+		}
+	} else {
+		// Template context.
+		global $_wp_current_template_content;
+		if ( ! empty( $_wp_current_template_content ) ) {
+			$blocks = parse_blocks( $_wp_current_template_content );
+			$headings = traverse_blocks_for_headings( $blocks, $attributes['maxLevel'] ?? null );
+		}
 	}
+
+	if ( empty( $headings ) ) {
+		return '';
+	}
+
+	$wrapper_attributes = get_block_wrapper_attributes();
 
 	// Get the aria-label from block attributes, or fallback to localized default.
 	$aria_label = empty( $attributes['ariaLabel'] ) ? __( 'Table of Contents' ) : wp_strip_all_tags( $attributes['ariaLabel'] );
 
-	$p = new WP_HTML_Tag_Processor( $content );
+	$ordered = isset( $attributes['ordered'] ) ? $attributes['ordered'] : true;
+	$list_tag = $ordered ? 'ol' : 'ul';
 
-	if ( $p->next_tag( 'nav' ) ) {
-		$p->set_attribute( 'aria-label', $aria_label );
+	$toc_html = '<nav ' . $wrapper_attributes . ' aria-label="' . esc_attr( $aria_label ) . '">';
+	$toc_html .= '<' . $list_tag . '>';
+	$toc_html .= build_toc_list_html( $headings, $ordered );
+	$toc_html .= '</' . $list_tag . '>';
+	$toc_html .= '</nav>';
+
+	return $toc_html;
+}
+
+/**
+ * Recursively traverse blocks to find all heading blocks.
+ *
+ * @param array $blocks Array of blocks to traverse.
+ * @param int   $max_level Maximum heading level to include.
+ *
+ * @return array Array of heading data.
+ */
+function traverse_blocks_for_headings( $blocks, $max_level = null ) {
+	$headings = array();
+
+	foreach ( $blocks as $block ) {
+		if ( 'core/template-part' === $block['blockName'] ) {
+			$slug = $block['attrs']['slug'] ?? '';
+			$theme = $block['attrs']['theme'] ?? '';
+
+			if ( $slug ) {
+				$template_part = null;
+
+				if ( function_exists( 'get_block_template' ) ) {
+					$template_id = $theme ? $theme . '//' . $slug : get_stylesheet() . '//' . $slug;
+					$template_part = get_block_template( $template_id, 'wp_template_part' );
+				}
+
+				if ( $template_part && ! empty( $template_part->content ) ) {
+					$template_blocks = parse_blocks( $template_part->content );
+					$template_headings = traverse_blocks_for_headings( $template_blocks, $max_level );
+					$headings = array_merge( $headings, $template_headings );
+				}
+			}
+			continue;
+		}
+
+		// Extract headings from heading blocks.
+		if ( 'core/heading' === $block['blockName'] ) {
+			// Default to level 2 if not specified.
+			$level = isset( $block['attrs']['level'] ) ? $block['attrs']['level'] : 2;
+
+			// Skip if level exceeds max level.
+			if ( $max_level && $level > $max_level ) {
+				continue;
+			}
+
+			$content = '';
+			if ( isset( $block['innerHTML'] ) ) {
+				$content = wp_strip_all_tags( $block['innerHTML'] );
+			} elseif ( isset( $block['innerContent'][0] ) ) {
+				$content = wp_strip_all_tags( $block['innerContent'][0] );
+			}
+
+			if ( empty( trim( $content ) ) ) {
+				continue;
+			}
+
+			$anchor = isset( $block['attrs']['anchor'] ) ? $block['attrs']['anchor'] : '';
+
+			$link = '';
+			if ( ! empty( $anchor ) ) {
+				$permalink = get_permalink();
+				if ( $permalink ) {
+					$link = $permalink . '#' . $anchor;
+				}
+			}
+
+			$headings[] = array(
+				'content' => $content,
+				'level'   => $level,
+				'link'    => $link,
+			);
+		}
+
+		if ( ! empty( $block['innerBlocks'] ) ) {
+			$inner_headings = traverse_blocks_for_headings( $block['innerBlocks'], $max_level );
+			$headings = array_merge( $headings, $inner_headings );
+		}
 	}
 
-	return $p->get_updated_html();
+	return $headings;
+}
+
+/**
+ * Build the HTML for the table of contents list.
+ *
+ * @param array $headings Array of heading data.
+ * @param bool  $ordered  Whether to use ordered list.
+ *
+ * @return string HTML for the list.
+ */
+function build_toc_list_html( $headings, $ordered ) {
+	if ( empty( $headings ) ) {
+		return '';
+	}
+
+	$html = '';
+	$list_tag = $ordered ? 'ol' : 'ul';
+	$prev_level = null;
+	$nesting_depth = 0;
+
+	foreach ( $headings as $index => $heading ) {
+		$level = $heading['level'];
+
+		if ( $prev_level === null ) {
+			$prev_level = $level;
+		}
+
+		$depth_change = $level - $prev_level;
+
+		if ( $depth_change < 0 ) {
+			for ( $i = 0; $i < abs( $depth_change ); $i++ ) {
+				$html .= '</li></' . $list_tag . '>';
+				$nesting_depth--;
+			}
+			$html .= '</li>';
+		} elseif ( $depth_change > 0 ) {
+			for ( $i = 0; $i < $depth_change; $i++ ) {
+				$html .= '<' . $list_tag . '>';
+				$nesting_depth++;
+			}
+		} elseif ( $index > 0 ) {
+			$html .= '</li>';
+		}
+
+		if ( ! empty( $heading['link'] ) ) {
+			$html .= '<li><a href="' . esc_url( $heading['link'] ) . '">' . esc_html( $heading['content'] ) . '</a>';
+		} else {
+			$html .= '<li>' . esc_html( $heading['content'] );
+		}
+
+		$prev_level = $level;
+	}
+
+	$html .= '</li>';
+	for ( $i = 0; $i < $nesting_depth; $i++ ) {
+		$html .= '</' . $list_tag . '></li>';
+	}
+
+	return $html;
 }
 
 /**
@@ -37,7 +202,7 @@ function register_block_core_table_of_contents() {
 	register_block_type_from_metadata(
 		__DIR__ . '/table-of-contents',
 		array(
-			'render_callback' => 'block_core_table_of_contents_render',
+			'render_callback' => 'render_block_core_table_of_contents',
 		)
 	);
 }
