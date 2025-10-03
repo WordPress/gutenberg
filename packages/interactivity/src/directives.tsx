@@ -209,111 +209,45 @@ export default () => {
 			context: inheritedContext,
 		} ) => {
 			const { Provider } = inheritedContext;
+			const defaultEntry = context.find( isDefaultDirectiveSuffix );
 			const { client: inheritedClient, server: inheritedServer } =
 				useContext( inheritedContext );
 
-			// Group valid context entries by namespace
-			const entriesByNamespace = useMemo( () => {
-				const namespaceMap = new Map< string, DirectiveEntry[] >();
+			const ns = defaultEntry!.namespace;
+			const client = useRef( proxifyState( ns, {} ) );
+			const server = useRef( proxifyState( ns, {}, { readOnly: true } ) );
 
-				context.forEach( ( entry ) => {
-					// Skip non-default suffixes (they're not valid for context)
-					if ( entry.suffix ) {
-						warn(
-							`Suffixes are not supported in data-wp-context directives.`
-						);
-						return;
-					}
-
-					const { namespace, value } = entry;
-
-					// Validate value is an object
-					if ( ! isPlainObject( value ) ) {
-						warn(
-							`The value of data-wp-context in "${ namespace }" store must be a valid stringified JSON object.`
-						);
-						return;
-					}
-
-					// Group entries by namespace
-					if ( ! namespaceMap.has( namespace ) ) {
-						namespaceMap.set( namespace, [] );
-					}
-					namespaceMap.get( namespace )!.push( entry );
-				} );
-
-				return namespaceMap;
-			}, [ context ] );
-
-			// Create refs for each namespace (one ref per namespace, like trunk approach)
-			const refs = useRef(
-				new Map<
-					string,
-					{ client: object; server: object; lastEntries: string }
-				>()
-			);
-
+			// No change should be made if `defaultEntry` does not exist.
 			const contextStack = useMemo( () => {
 				const result = {
 					client: { ...inheritedClient },
 					server: { ...inheritedServer },
 				};
-
-				// Process each namespace (similar to trunk's single defaultEntry)
-				entriesByNamespace.forEach( ( entries, namespace ) => {
-					// Get or create refs for this namespace (like trunk approach)
-					let namespaceRefs = refs.current.get( namespace );
-					if ( ! namespaceRefs ) {
-						namespaceRefs = {
-							client: proxifyState( namespace, {} ),
-							server: proxifyState(
-								namespace,
-								{},
-								{ readOnly: true }
-							),
-							lastEntries: '',
-						};
-						refs.current.set( namespace, namespaceRefs );
+				if ( defaultEntry ) {
+					const { namespace, value } = defaultEntry;
+					// Check that the value is a JSON object. Send a console warning if not.
+					if ( ! isPlainObject( value ) ) {
+						warn(
+							`The value of data-wp-context in "${ namespace }" store must be a valid stringified JSON object.`
+						);
 					}
-
-					// Create merged context value for this render (like trunk's single value)
-					const mergedValue = {};
-					entries.forEach( ( { value } ) => {
-						deepMerge(
-							mergedValue,
-							deepClone( value ) as object,
-							false
-						);
-					} );
-
-					// Use a simple approach: always merge but track if we've initialized
-					if ( ! namespaceRefs.lastEntries ) {
-						// First time - merge the initial values
-						deepMerge(
-							namespaceRefs.client,
-							deepClone( mergedValue ) as object,
-							false
-						);
-						deepMerge(
-							namespaceRefs.server,
-							deepClone( mergedValue ) as object
-						);
-						namespaceRefs.lastEntries = 'initialized';
-					}
-
-					// Create proxified contexts
+					deepMerge(
+						client.current,
+						deepClone( value ) as object,
+						false
+					);
+					deepMerge( server.current, deepClone( value ) as object );
 					result.client[ namespace ] = proxifyContext(
-						namespaceRefs.client,
+						client.current,
 						inheritedClient[ namespace ]
 					);
 					result.server[ namespace ] = proxifyContext(
-						namespaceRefs.server,
+						server.current,
 						inheritedServer[ namespace ]
 					);
-				} );
-
+				}
 				return result;
-			}, [ entriesByNamespace, inheritedClient, inheritedServer ] );
+			}, [ defaultEntry, inheritedClient, inheritedServer ] );
 
 			return createElement( Provider, { value: contextStack }, children );
 		},
