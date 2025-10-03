@@ -26,12 +26,12 @@ export default function PostBreadcrumbEdit( {
 	context: { postId, postType },
 } ) {
 	const { separator, showHomeLink } = attributes;
-	const postTypeObject = useSelect(
+	const isPostTypeHierarchical = useSelect(
 		( select ) => {
 			if ( ! postType ) {
 				return null;
 			}
-			return select( coreStore ).getPostType( postType );
+			return select( coreStore ).getPostType( postType )?.hierarchical;
 		},
 		[ postType ]
 	);
@@ -47,7 +47,7 @@ export default function PostBreadcrumbEdit( {
 	// If no post context or the post type is not hierarchical, show placeholder.
 	// This is fragile because this block is server side rendered and we'll have to
 	// update the placeholder html if the server side rendering output changes.
-	if ( ! postId || ! postType || ! postTypeObject?.hierarchical ) {
+	if ( ! postId || ! postType || ! isPostTypeHierarchical ) {
 		const placeholderItems = [
 			showHomeLink && __( 'Home' ),
 			__( 'Ancestor' ),
