@@ -122,6 +122,7 @@ function CalendarDateTimeControl< Item >( {
 
 	const onSelectDate = useCallback(
 		( newDate: Date | undefined | null ) => {
+			let dateTimeValue: string | undefined;
 			if ( newDate ) {
 				// Preserve time if it exists in current value, otherwise use current time
 				let finalDateTime = newDate;
@@ -138,7 +139,7 @@ function CalendarDateTimeControl< Item >( {
 					}
 				}
 
-				const dateTimeValue = finalDateTime.toISOString();
+				dateTimeValue = finalDateTime.toISOString();
 				onChange( dateTimeValue );
 				onValidateControl( dateTimeValue );
 
@@ -146,38 +147,37 @@ function CalendarDateTimeControl< Item >( {
 				if ( validationTimeoutRef.current ) {
 					clearTimeout( validationTimeoutRef.current );
 				}
-
-				// Save the currently focused element
-				previousFocusRef.current =
-					baseControlRef.current &&
-					baseControlRef.current.ownerDocument.activeElement;
-
-				// Trigger validation display by simulating focus and blur
-				validationTimeoutRef.current = setTimeout( () => {
-					if ( baseControlRef.current ) {
-						const input = baseControlRef.current.querySelector(
-							'input[type="datetime-local"]'
-						) as HTMLInputElement;
-						if ( input ) {
-							input.focus();
-							input.blur();
-							onChange( dateTimeValue );
-							onValidateControl( dateTimeValue );
-
-							// Restore focus to the previously focused element
-							if (
-								previousFocusRef.current &&
-								previousFocusRef.current instanceof HTMLElement
-							) {
-								previousFocusRef.current.focus();
-							}
-						}
-					}
-				}, 0 );
 			} else {
 				onChange( undefined );
 				onValidateControl( undefined );
 			}
+			// Save the currently focused element
+			previousFocusRef.current =
+				baseControlRef.current &&
+				baseControlRef.current.ownerDocument.activeElement;
+
+			// Trigger validation display by simulating focus and blur and changes
+			validationTimeoutRef.current = setTimeout( () => {
+				if ( baseControlRef.current ) {
+					const input = baseControlRef.current.querySelector(
+						'input[type="datetime-local"]'
+					) as HTMLInputElement;
+					if ( input ) {
+						input.focus();
+						input.blur();
+						onChange( dateTimeValue );
+						onValidateControl( dateTimeValue );
+
+						// Restore focus to the previously focused element
+						if (
+							previousFocusRef.current &&
+							previousFocusRef.current instanceof HTMLElement
+						) {
+							previousFocusRef.current.focus();
+						}
+					}
+				}
+			}, 0 );
 		},
 		[ onChange, value, onValidateControl ]
 	);
