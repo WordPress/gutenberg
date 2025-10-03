@@ -4,6 +4,9 @@
 
 ## 6.32.0 (2025-10-01)
 
+-   Update router regions inside elements with `data-wp-interactive`. ([#71635](https://github.com/WordPress/gutenberg/pull/71635))
+-   Fix nested `data-wp-each` directives using the same items key. ([#71870](https://github.com/WordPress/gutenberg/pull/71870))
+
 ## 6.31.0 (2025-09-17)
 
 ## 6.30.0 (2025-09-03)

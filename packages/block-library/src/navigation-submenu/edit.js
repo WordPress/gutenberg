@@ -31,9 +31,12 @@ import { useMergeRefs, usePrevious } from '@wordpress/compose';
  * Internal dependencies
  */
 import { ItemSubmenuIcon } from './icons';
-import { LinkUI } from '../navigation-link/link-ui';
-import { Controls, updateAttributes } from '../navigation-link/shared';
-
+import {
+	Controls,
+	LinkUI,
+	updateAttributes,
+	useEntityBinding,
+} from '../navigation-link/shared';
 import {
 	getColors,
 	getNavigationChildBlockProps,
@@ -127,6 +130,12 @@ export default function NavigationSubmenuEdit( {
 	const { label, url, description } = attributes;
 
 	const { showSubmenuIcon, maxNestingLevel, openSubmenusOnClick } = context;
+
+	// URL binding logic
+	const { clearBinding, createBinding } = useEntityBinding( {
+		clientId,
+		attributes,
+	} );
 
 	const {
 		__unstableMarkNextChangeAsNotPersistent,
@@ -375,6 +384,7 @@ export default function NavigationSubmenuEdit( {
 				<Controls
 					attributes={ attributes }
 					setAttributes={ setAttributes }
+					clientId={ clientId }
 				/>
 			</InspectorControls>
 			<div { ...blockProps }>
@@ -430,6 +440,13 @@ export default function NavigationSubmenuEdit( {
 									setAttributes,
 									attributes
 								);
+
+								// Handle URL binding
+								if ( ! updatedValue?.id ) {
+									clearBinding();
+								} else {
+									createBinding();
+								}
 							} }
 						/>
 					) }

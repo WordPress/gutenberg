@@ -15,7 +15,7 @@ import { __, sprintf, _n } from '@wordpress/i18n';
  */
 import DataViewsPagination from '../dataviews-pagination';
 import DataViewsContext from '../dataviews-context';
-import type { SetSelection } from '../../private-types';
+import type { SetSelection } from '../../types/private';
 import type { Action } from '../../types';
 
 const EMPTY_ARRAY: [] = [];

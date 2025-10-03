@@ -14,14 +14,15 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useRef, useState, useEffect } from '@wordpress/element';
+import { useInstanceId } from '@wordpress/compose';
 import { focus } from '@wordpress/dom';
 import { ENTER } from '@wordpress/keycodes';
 import { isShallowEqualObjects } from '@wordpress/is-shallow-equal';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { keyboardReturn } from '@wordpress/icons';
+import { keyboardReturn, linkOff } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -108,6 +109,7 @@ import deprecated from '@wordpress/deprecated';
  * @property {boolean=}                   hasTextControl             Whether to add a text field to the UI to update the value.title.
  * @property {string|Function|undefined}  createSuggestionButtonText The text to use in the button that calls createSuggestion.
  * @property {Function}                   renderControlBottom        Optional controls to be rendered at the bottom of the component.
+ * @property {boolean=}                   handleEntities             Whether to handle entity links (links with ID). When true and a link has an ID, the input will be disabled and show an unlink button.
  */
 
 const noop = () => {};
@@ -142,6 +144,7 @@ function LinkControl( {
 	hasRichPreviews = false,
 	hasTextControl = false,
 	renderControlBottom = null,
+	handleEntities = false,
 } ) {
 	if ( withCreateSuggestion === undefined && createSuggestion ) {
 		withCreateSuggestion = true;
@@ -185,6 +188,7 @@ function LinkControl( {
 	const isMountingRef = useRef( true );
 	const wrapperNode = useRef();
 	const textInputRef = useRef();
+	const searchInputRef = useRef();
 	const isEndingEditWithFocusRef = useRef( false );
 
 	const settingsKeys = settings.map( ( { id } ) => id );
@@ -196,6 +200,13 @@ function LinkControl( {
 		setInternalTextInputValue,
 		createSetInternalSettingValueHandler,
 	] = useInternalValue( value );
+
+	// Compute isEntity internally based on handleEntities prop and presence of ID
+	const isEntity = handleEntities && !! internalControlValue?.id;
+
+	// Generate help text ID for accessibility association
+	const baseId = useInstanceId( LinkControl, 'link-control' );
+	const helpTextId = isEntity ? `${ baseId }__help` : null;
 
 	const valueHasChanges =
 		value && ! isShallowEqualObjects( internalControlValue, value );
@@ -336,6 +347,29 @@ function LinkControl( {
 		onCancel?.();
 	};
 
+	const [ shouldFocusSearchInput, setShouldFocusSearchInput ] =
+		useState( false );
+
+	const handleUnlink = () => {
+		// Clear the internal state to remove the ID and re-enable the field
+		// The user will need to submit to commit this change
+		const { id, ...restValue } = internalControlValue;
+		setInternalControlValue( { ...restValue, url: '' } );
+
+		// Request focus after the component re-renders with the cleared state
+		// We can't focus immediately because the input might still be disabled
+		setShouldFocusSearchInput( true );
+	};
+
+	// Focus the search input when requested, once the component has re-rendered
+	// This ensures the input is enabled and ready to receive focus
+	useEffect( () => {
+		if ( shouldFocusSearchInput ) {
+			searchInputRef.current?.focus();
+			setShouldFocusSearchInput( false );
+		}
+	}, [ shouldFocusSearchInput ] );
+
 	const currentUrlInputValue =
 		propInputValue || internalControlValue?.url || '';
 
@@ -389,6 +423,7 @@ function LinkControl( {
 							/>
 						) }
 						<LinkControlSearchInput
+							ref={ searchInputRef }
 							currentLink={ value }
 							className="block-editor-link-control__field block-editor-link-control__search-input"
 							placeholder={ searchInputPlaceholder }
@@ -406,23 +441,30 @@ function LinkControl( {
 								createSuggestionButtonText
 							}
 							hideLabelFromVision={ ! showTextControl }
+							isEntity={ isEntity }
 							suffix={
-								showActions ? undefined : (
-									<InputControlSuffixWrapper variant="control">
-										<Button
-											onClick={
-												isDisabled ? noop : handleSubmit
-											}
-											label={ __( 'Submit' ) }
-											icon={ keyboardReturn }
-											className="block-editor-link-control__search-submit"
-											aria-disabled={ isDisabled }
-											size="small"
-										/>
-									</InputControlSuffixWrapper>
-								)
+								<SearchSuffixControl
+									isEntity={ isEntity }
+									showActions={ showActions }
+									isDisabled={ isDisabled }
+									onUnlink={ handleUnlink }
+									onSubmit={ handleSubmit }
+									helpTextId={ helpTextId }
+								/>
 							}
 						/>
+						{ isEntity && helpTextId && (
+							<p
+								id={ helpTextId }
+								className="block-editor-link-control__help"
+							>
+								{ sprintf(
+									/* translators: %s: entity type (e.g., page, post) */
+									__( 'Synced with the selected %s.' ),
+									internalControlValue?.type || 'item'
+								) }
+							</p>
+						) }
 					</div>
 					{ errorMessage && (
 						<Notice
@@ -495,6 +537,57 @@ function LinkControl( {
 
 			{ ! isCreatingPage && renderControlBottom && renderControlBottom() }
 		</div>
+	);
+}
+
+/**
+ * Suffix control component for LinkControl search input.
+ * Handles the display of unlink button for entities and submit button for regular links.
+ *
+ * @param {Object}   props             - Component props
+ * @param {boolean}  props.isEntity    - Whether the link is bound to an entity
+ * @param {boolean}  props.showActions - Whether to show action buttons
+ * @param {boolean}  props.isDisabled  - Whether the submit button should be disabled
+ * @param {Function} props.onUnlink    - Callback when unlink button is clicked
+ * @param {Function} props.onSubmit    - Callback when submit button is clicked
+ * @param {string}   props.helpTextId  - ID of the help text element for accessibility
+ */
+function SearchSuffixControl( {
+	isEntity,
+	showActions,
+	isDisabled,
+	onUnlink,
+	onSubmit,
+	helpTextId,
+} ) {
+	if ( isEntity ) {
+		return (
+			<Button
+				icon={ linkOff }
+				onClick={ onUnlink }
+				aria-describedby={ helpTextId }
+				showTooltip
+				label={ __( 'Unsync and edit' ) }
+				__next40pxDefaultSize
+			/>
+		);
+	}
+
+	if ( showActions ) {
+		return undefined;
+	}
+
+	return (
+		<InputControlSuffixWrapper variant="control">
+			<Button
+				onClick={ isDisabled ? noop : onSubmit }
+				label={ __( 'Submit' ) }
+				icon={ keyboardReturn }
+				className="block-editor-link-control__search-submit"
+				aria-disabled={ isDisabled }
+				size="small"
+			/>
+		</InputControlSuffixWrapper>
 	);
 }
 

@@ -22,7 +22,7 @@ import {
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
-import { useState, useEffect, useRef } from '@wordpress/element';
+import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
@@ -31,9 +31,8 @@ import { useMergeRefs, usePrevious } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { LinkUI } from './link-ui';
 import { getColors } from '../navigation/edit/utils';
-import { Controls, updateAttributes } from './shared';
+import { Controls, LinkUI, updateAttributes, useEntityBinding } from './shared';
 
 const DEFAULT_BLOCK = { name: 'core/navigation-link' };
 const NESTING_BLOCK_NAMES = [
@@ -160,12 +159,6 @@ function getMissingText( type ) {
 	return missingText;
 }
 
-/*
- * Warning, this duplicated in
- * packages/block-library/src/navigation-submenu/edit.js
- * Consider reusing this components for both blocks.
- */
-
 export default function NavigationLinkEdit( {
 	attributes,
 	isSelected,
@@ -176,7 +169,7 @@ export default function NavigationLinkEdit( {
 	context,
 	clientId,
 } ) {
-	const { id, label, type, url, description, kind } = attributes;
+	const { id, label, type, url, description, kind, metadata } = attributes;
 	const { maxNestingLevel } = context;
 
 	const {
@@ -253,6 +246,12 @@ export default function NavigationLinkEdit( {
 	);
 	const { getBlocks } = useSelect( blockEditorStore );
 
+	// URL binding logic
+	const { clearBinding, createBinding } = useEntityBinding( {
+		clientId,
+		attributes,
+	} );
+
 	const [ isInvalid, isDraft ] = useIsInvalidLink(
 		kind,
 		type,
@@ -263,7 +262,7 @@ export default function NavigationLinkEdit( {
 	/**
 	 * Transform to submenu block.
 	 */
-	const transformToSubmenu = () => {
+	const transformToSubmenu = useCallback( () => {
 		let innerBlocks = getBlocks( clientId );
 		if ( innerBlocks.length === 0 ) {
 			innerBlocks = [ createBlock( 'core/navigation-link' ) ];
@@ -275,7 +274,7 @@ export default function NavigationLinkEdit( {
 			innerBlocks
 		);
 		replaceBlock( clientId, newSubmenu );
-	};
+	}, [ getBlocks, clientId, selectBlock, replaceBlock, attributes ] );
 
 	useEffect( () => {
 		// If block has inner blocks, transform to Submenu.
@@ -285,7 +284,11 @@ export default function NavigationLinkEdit( {
 			__unstableMarkNextChangeAsNotPersistent();
 			transformToSubmenu();
 		}
-	}, [ hasChildren ] );
+	}, [
+		hasChildren,
+		__unstableMarkNextChangeAsNotPersistent,
+		transformToSubmenu,
+	] );
 
 	// If the LinkControl popover is open and the URL has changed, close the LinkControl and focus the label text.
 	useEffect( () => {
@@ -432,19 +435,21 @@ export default function NavigationLinkEdit( {
 					) }
 				</ToolbarGroup>
 			</BlockControls>
-			{ /* Warning, this duplicated in packages/block-library/src/navigation-submenu/edit.js */ }
 			<InspectorControls>
 				<Controls
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 					setIsEditingControl={ setIsEditingControl }
+					clientId={ clientId }
 				/>
 			</InspectorControls>
 			<div { ...blockProps }>
 				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
 				<a className={ classes }>
 					{ /* eslint-enable */ }
-					{ ! url && ! isEditingControl ? (
+					{ ! url &&
+					! isEditingControl &&
+					! metadata?.bindings?.url ? (
 						<div className="wp-block-navigation-link__placeholder-text">
 							<span>{ missingText }</span>
 						</div>
@@ -563,6 +568,13 @@ export default function NavigationLinkEdit( {
 									setAttributes,
 									attributes
 								);
+
+								// Handle URL binding
+								if ( ! updatedValue?.id ) {
+									clearBinding();
+								} else {
+									createBinding();
+								}
 							} }
 						/>
 					) }

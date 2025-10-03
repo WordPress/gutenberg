@@ -5,7 +5,6 @@
 	"title": "Accordion Heading",
 	"category": "design",
 	"description": "Displays an accordion heading.",
-	"__experimental": true,
 	"parent": [ "core/accordion-item" ],
 	"usesContext": [
 		"core/accordion-icon-position",
@@ -25,7 +24,8 @@
 			"__experimentalDefaultControls": {
 				"padding": true
 			},
-			"__experimentalSkipSerialization": true
+			"__experimentalSkipSerialization": true,
+			"__experimentalSelector": ".wp-block-accordion-heading__toggle"
 		},
 		"__experimentalBorder": {
 			"color": true,
