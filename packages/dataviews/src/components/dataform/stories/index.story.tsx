@@ -26,7 +26,6 @@ import type {
 	RegularLayout,
 	PanelLayout,
 	CardLayout,
-	CardSummaryField,
 } from '../../../types';
 import { unlock } from '../../../lock-unlock';
 
@@ -337,13 +336,11 @@ const getLayoutFromStoryArgs = ( {
 	labelPosition,
 	openAs,
 	withHeader,
-	summary,
 }: {
 	type: 'default' | 'regular' | 'panel' | 'card' | 'row';
 	labelPosition?: 'default' | 'top' | 'side' | 'none';
 	openAs?: 'default' | 'dropdown' | 'modal';
 	withHeader?: boolean;
-	summary?: CardSummaryField;
 } ): Layout | undefined => {
 	let layout: Layout | undefined;
 
@@ -373,9 +370,6 @@ const getLayoutFromStoryArgs = ( {
 		if ( withHeader !== undefined ) {
 			// @ts-ignore We want to demo the effects of configuring withHeader.
 			cardLayout.withHeader = withHeader;
-		}
-		if ( summary ) {
-			cardLayout.summary = summary;
 		}
 		layout = cardLayout;
 	}
@@ -1010,6 +1004,7 @@ const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 		hasVat: boolean;
 		vat: number;
 		commission: number;
+		dueDate: string;
 	};
 
 	const customerFields: Field< Customer >[] = [
@@ -1082,6 +1077,14 @@ const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 			type: 'integer',
 		},
 		{
+			id: 'dueDate',
+			label: 'Due Date',
+			type: 'text',
+			render: ( { item } ) => {
+				return <Badge>Due on: { item.dueDate }</Badge>;
+			},
+		},
+		{
 			id: 'plan-summary',
 			type: 'text',
 			readOnly: true,
@@ -1105,6 +1108,7 @@ const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 		hasVat: true,
 		vat: 10,
 		commission: 5,
+		dueDate: 'March 1st, 2028',
 	} );
 
 	const form: Form = useMemo(
@@ -1112,11 +1116,11 @@ const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 			layout: getLayoutFromStoryArgs( {
 				type: 'card',
 				withHeader,
-				summary: 'plan-summary',
 			} ),
 			fields: [
 				{
 					id: 'customerCard',
+					layout: { type: 'card', summary: 'plan-summary' },
 					label: 'Customer',
 					description:
 						'Enter your contact details, plan type, and addresses to complete your customer information.',
@@ -1180,6 +1184,7 @@ const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 					layout: {
 						type: 'card',
 						isOpened: false,
+						summary: [ { id: 'dueDate', visibility: 'always' } ],
 					},
 					children: [ 'vat', 'commission' ],
 				},
