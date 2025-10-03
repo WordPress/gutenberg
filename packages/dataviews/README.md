@@ -1500,8 +1500,15 @@ For example:
 - `type`: `panel`. Required.
 - `labelPosition`: one of `side`, `top`, or `none`. Optional. `top` by default.
 - `summary`: Summary field configuration. Optional. Specifies which field(s) to display in the panel header. Can be:
-    -   A string (single field ID)
-    -   An array of strings (multiple field IDs)
+   	- A string (single field ID)
+    - An array of strings (multiple field IDs)
+
+When no summary fields are explicitly configured, the panel automatically determines which fields to display using this priority:
+
+1. Use `summary` fields if they exist
+2. Fall back to the field definition that matches the form field's id
+3. If the form field id doesn't exist, pick the first child field
+4. If no field definition is found, return empty summary fields
 
 For example:
 ```js
@@ -1516,11 +1523,10 @@ For example:
 
 #### Card
 
-- `type`: `card`. Required.
-- `isOpened`: boolean. Optional. `true` by default.
-- `withHeader`: boolean. Optional. `true` by default.
-- `summary`: Summary field configuration. Optional. Specifies which field(s) to display in the card header. Can be:
-   	-   A string (single field ID)
+-   `type`: `card`. Required.
+-   `isOpened`: boolean. Optional. `true` by default.
+-   `withHeader`: boolean. Optional. `true` by default.
+-   `summary`: Summary field configuration. Optional. Specifies which field(s) to display in the card header. Can be: - A string (single field ID)
     -   An array of strings (multiple field IDs)
     -   An array of objects for per-field visibility control `[{ id: string, visibility: 'always' | 'when-collapsed' }]`
 
@@ -1544,8 +1550,8 @@ For example:
 
 #### Row
 
-- `type`: `row`. Required.
-- `alignment`: one of `start`, `center`, or `end`. Optional. `center` by default.
+-   `type`: `row`. Required.
+-   `alignment`: one of `start`, `center`, or `end`. Optional. `center` by default.
 
 The Row layout displays fields horizontally in a single row. It's particularly useful for grouping related fields that should be displayed side by side. This layout can be used both as a top-level form layout and for individual field groups.
 
