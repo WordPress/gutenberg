@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/class-gutenberg-rest-old-templates-controller.php';
+
 // How does this work?
 // 1. For wp_template, we remove the custom templates controller, so it becomes
 //    a normal posts endpoint, modified slightly to allow auto-drafts.
@@ -28,7 +30,7 @@ function gutenberg_maintain_templates_routes() {
 	// WP_REST_Templates_Controller with a post type.
 	global $wp_post_types;
 	$wp_post_types['wp_template']->rest_base = 'templates';
-	$controller                              = new WP_REST_Templates_Controller( 'wp_template' );
+	$controller                              = new Gutenberg_REST_Old_Templates_Controller( 'wp_template' );
 	$wp_post_types['wp_template']->rest_base = 'wp_template';
 	$controller->register_routes();
 
