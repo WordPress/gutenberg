@@ -251,12 +251,22 @@ test.describe( 'data-wp-context', () => {
 	test( 'should preserve values when navigating back or forward', async ( {
 		page,
 	} ) => {
+		await page.pause();
 		const element = page.getByTestId( 'navigation text' );
 		await page.getByTestId( 'navigate' ).click();
+		await page.waitForURL( ( url ) =>
+			url.href.includes( 'next_page=true' )
+		);
 		await expect( element ).toHaveText( 'first page' );
 		await page.goBack();
+		await page.waitForURL(
+			( url ) => ! url.href.includes( 'next_page=true' )
+		);
 		await expect( element ).toHaveText( 'first page' );
 		await page.goForward();
+		await page.waitForURL( ( url ) =>
+			url.href.includes( 'next_page=true' )
+		);
 		await expect( element ).toHaveText( 'first page' );
 	} );
 
@@ -270,12 +280,21 @@ test.describe( 'data-wp-context', () => {
 		await page.getByTestId( 'add text2' ).click();
 		await expect( text2 ).toHaveText( 'some new text' );
 		await page.getByTestId( 'navigate' ).click();
+		await page.waitForURL( ( url ) =>
+			url.href.includes( 'next_page=true' )
+		);
 		await expect( text ).toHaveText( 'changed dynamically' );
 		await expect( text2 ).toHaveText( 'some new text' );
 		await page.goBack();
+		await page.waitForURL(
+			( url ) => ! url.href.includes( 'next_page=true' )
+		);
 		await expect( text ).toHaveText( 'changed dynamically' );
 		await expect( text2 ).toHaveText( 'some new text' );
 		await page.goForward();
+		await page.waitForURL( ( url ) =>
+			url.href.includes( 'next_page=true' )
+		);
 		await expect( text ).toHaveText( 'changed dynamically' );
 		await expect( text2 ).toHaveText( 'some new text' );
 	} );

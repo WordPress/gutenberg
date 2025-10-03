@@ -208,48 +208,72 @@ export default () => {
 			props: { children },
 			context: inheritedContext,
 		} ) => {
+			const entries = context.filter( isDefaultDirectiveSuffix );
+
+			// Doesn't do anything if there are no default entries.
+			if ( ! entries.length ) {
+				return;
+			}
+
 			const { Provider } = inheritedContext;
-			const defaultEntry = context.find( isDefaultDirectiveSuffix );
 			const { client: inheritedClient, server: inheritedServer } =
 				useContext( inheritedContext );
+			const client = useRef( {} );
+			const server = useRef( {} );
+			const result = {
+				client: { ...inheritedClient },
+				server: { ...inheritedServer },
+			};
+			const namespaces = new Set< string >();
 
-			const ns = defaultEntry!.namespace;
-			const client = useRef( proxifyState( ns, {} ) );
-			const server = useRef( proxifyState( ns, {}, { readOnly: true } ) );
-
-			// No change should be made if `defaultEntry` does not exist.
-			const contextStack = useMemo( () => {
-				const result = {
-					client: { ...inheritedClient },
-					server: { ...inheritedServer },
-				};
-				if ( defaultEntry ) {
-					const { namespace, value } = defaultEntry;
-					// Check that the value is a JSON object. Send a console warning if not.
-					if ( ! isPlainObject( value ) ) {
-						warn(
-							`The value of data-wp-context in "${ namespace }" store must be a valid stringified JSON object.`
-						);
-					}
-					deepMerge(
-						client.current,
-						deepClone( value ) as object,
-						false
-					);
-					deepMerge( server.current, deepClone( value ) as object );
-					result.client[ namespace ] = proxifyContext(
-						client.current,
-						inheritedClient[ namespace ]
-					);
-					result.server[ namespace ] = proxifyContext(
-						server.current,
-						inheritedServer[ namespace ]
+			entries.forEach( ( { value, namespace, uniqueId } ) => {
+				// Checks that the value is a JSON object. Sends a console warning if not.
+				if ( ! isPlainObject( value ) ) {
+					warn(
+						`The value of data-wp-context${
+							uniqueId ? `---${ uniqueId }` : ''
+						} on the ${ namespace } namespace must be a valid stringified JSON object.`
 					);
 				}
-				return result;
-			}, [ defaultEntry, inheritedClient, inheritedServer ] );
 
-			return createElement( Provider, { value: contextStack }, children );
+				// If the namespace doesn't exist yet, initalizes empty
+				// proxified states for that namespace.
+				if ( ! client.current[ namespace ] ) {
+					client.current[ namespace ] = proxifyState( namespace, {} );
+					server.current[ namespace ] = proxifyState(
+						namespace,
+						{},
+						{ readOnly: true }
+					);
+				}
+
+				// Merges the new value with whatever was there before.
+				deepMerge(
+					client.current[ namespace ],
+					deepClone( value ) as object,
+					false
+				);
+				deepMerge(
+					server.current[ namespace ],
+					deepClone( value ) as object
+				);
+
+				// Registers the namespace.
+				namespaces.add( namespace );
+			} );
+
+			namespaces.forEach( ( namespace ) => {
+				result.client[ namespace ] = proxifyContext(
+					client.current[ namespace ],
+					inheritedClient[ namespace ]
+				);
+				result.server[ namespace ] = proxifyContext(
+					server.current[ namespace ],
+					inheritedServer[ namespace ]
+				);
+			} );
+
+			return createElement( Provider, { value: result }, children );
 		},
 		{ priority: 5 }
 	);
