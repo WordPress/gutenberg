@@ -55,7 +55,8 @@ export default function Edit( {
 		<TagName { ...blockProps }>
 			<button
 				className="wp-block-accordion-heading__toggle"
-				style={ spacingProps.style }
+				style={ { ...spacingProps.style } }
+				tabIndex="-1"
 			>
 				{ showIcon && iconPosition === 'left' && (
 					<span
