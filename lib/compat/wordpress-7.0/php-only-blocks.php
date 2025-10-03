@@ -20,7 +20,10 @@ function gutenberg_register_auto_register_blocks() {
 		$has_render_callback    = ! empty( $block_type->render_callback );
 
 		if ( $has_auto_register_flag && $has_render_callback ) {
-			$auto_register_blocks[] = $block_name;
+			$auto_register_blocks[] = array(
+				'name'       => $block_name,
+				'apiVersion' => max( 3, $block_type->api_version ),
+			);
 		}
 	}
 
