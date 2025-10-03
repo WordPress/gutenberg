@@ -206,7 +206,7 @@ describe( 'normalizeFormFields', () => {
 					isOpened: false,
 					summary: [
 						'field2',
-						{ id: 'field1', visibility: 'when-collapsed' },
+						{ id: 'field1', visibility: 'always' },
 					],
 				},
 				fields: [ 'field1' ],
@@ -220,8 +220,8 @@ describe( 'normalizeFormFields', () => {
 						withHeader: true,
 						isOpened: false,
 						summary: [
-							{ id: 'field2', visibility: 'always' },
-							{ id: 'field1', visibility: 'when-collapsed' },
+							{ id: 'field2', visibility: 'when-collapsed' },
+							{ id: 'field1', visibility: 'always' },
 						],
 					},
 				},
