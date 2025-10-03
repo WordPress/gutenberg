@@ -237,7 +237,7 @@ function CommentBoardWrapper( {
 		) {
 			return previousOffset - initialOffsetTop + previousBoardHeight + 20;
 		}
-		return -16;
+		return -16; // Remove top padding of the comment board so first comment visually aligns with block.
 	};
 
 	// Use floating-ui to track the block element's position. The crossAxis offset
