@@ -19,7 +19,7 @@ add_filter(
 			$attributes[] = 'datetime';
 		}
 		if (
-			in_array( $block_type, array( 'core/navigation-link', 'core/navigation-submenu' ), true ) &&
+			in_array( $block_type, array( 'core/navigation-link', 'core/navigation-submenu', 'core/cover' ), true ) &&
 			! in_array( 'url', $attributes, true )
 		) {
 			$attributes[] = 'url';
