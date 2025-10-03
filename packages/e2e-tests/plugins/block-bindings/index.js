@@ -43,7 +43,7 @@ registerBlockBindingsSource( {
 	},
 } );
 
-const ModalButton = ( { fieldKey, fieldLabel, attribute } ) => {
+const ModalButton = ( { fieldKey, fieldLabel, attribute, onCloseModal } ) => {
 	const { updateBlockBindings } = wp.blockEditor.useBlockBindingsUtils();
 
 	return el(
@@ -56,6 +56,7 @@ const ModalButton = ( { fieldKey, fieldLabel, attribute } ) => {
 						args: { key: fieldKey },
 					},
 				} );
+				onCloseModal();
 			},
 			style: {
 				display: 'block',
@@ -86,7 +87,7 @@ registerBlockBindingsSource( {
 					},
 				} )
 			),
-			renderModalContent( { attribute } ) {
+			renderModalContent( { attribute, onCloseModal } ) {
 				return el(
 					'div',
 					{ style: { padding: '20px' } },
@@ -103,6 +104,7 @@ registerBlockBindingsSource( {
 								fieldKey: key,
 								fieldLabel: field?.label || key,
 								attribute,
+								onCloseModal,
 							} )
 					)
 				);

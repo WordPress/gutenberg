@@ -453,6 +453,9 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 		return null;
 	}
 
+	const RenderModalContent =
+		sources[ modalState?.sourceKey ]?.renderModalContent;
+
 	return (
 		<InspectorControls group="bindings">
 			<ToolsPanel
@@ -500,17 +503,12 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 					</p>
 				</Text>
 			</ToolsPanel>
-			{ modalState && (
+			{ RenderModalContent && (
 				<Modal onRequestClose={ handleCloseModal }>
-					{ ( () => {
-						const RenderModalContent =
-							sources[ modalState.sourceKey ].renderModalContent;
-						return (
-							<RenderModalContent
-								attribute={ modalState.attribute }
-							/>
-						);
-					} )() }
+					<RenderModalContent
+						attribute={ modalState.attribute }
+						onCloseModal={ handleCloseModal }
+					/>
 				</Modal>
 			) }
 		</InspectorControls>
