@@ -5,6 +5,7 @@
 ### Enhancements
 
 - Move search icon in search fields to prefix position ([#71984](https://github.com/WordPress/gutenberg/pull/71984)).
+- Flip search icons depending on placement ([#72070](https://github.com/WordPress/gutenberg/pull/72070)).
 
 ### Breaking changes
 
