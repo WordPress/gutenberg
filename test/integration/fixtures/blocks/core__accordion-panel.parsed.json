@@ -7,8 +7,8 @@
 				"blockName": "core/paragraph",
 				"attrs": {},
 				"innerBlocks": [],
-				"innerHTML": "\n\t<p>Accoridion Panel Content</p>\n\t",
-				"innerContent": [ "\n\t<p>Accoridion Panel Content</p>\n\t" ]
+				"innerHTML": "\n\t<p>Accordion  Panel Content</p>\n\t",
+				"innerContent": [ "\n\t<p>Accordion  Panel Content</p>\n\t" ]
 			}
 		],
 		"innerHTML": "\n<div role=\"region\" class=\"wp-block-accordion-panel\">\n\t\n</div>\n",

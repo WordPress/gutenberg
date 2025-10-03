@@ -40,7 +40,7 @@
 								"name": "core/paragraph",
 								"isValid": true,
 								"attributes": {
-									"content": "Accoridion Panel Content",
+									"content": "Accordion  Panel Content",
 									"dropCap": false
 								},
 								"innerBlocks": []

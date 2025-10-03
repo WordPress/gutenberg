@@ -20,9 +20,9 @@
 						"blockName": "core/paragraph",
 						"attrs": {},
 						"innerBlocks": [],
-						"innerHTML": "\n\t\t<p>Accoridion Panel Content</p>\n\t\t",
+						"innerHTML": "\n\t\t<p>Accordion  Panel Content</p>\n\t\t",
 						"innerContent": [
-							"\n\t\t<p>Accoridion Panel Content</p>\n\t\t"
+							"\n\t\t<p>Accordion  Panel Content</p>\n\t\t"
 						]
 					}
 				],
