@@ -434,10 +434,6 @@ const LayoutPanelComponent = ( {
 				'dimensions',
 				'tags',
 				{
-					layout: {
-						type: 'panel',
-						summary: 'discussion',
-					},
 					id: 'discussion',
 					label: 'Discussion',
 					children: [ 'comment_status', 'ping_status' ],
