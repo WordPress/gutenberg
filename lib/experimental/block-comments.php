@@ -302,8 +302,8 @@ function gutenberg_add_open_discussion_label_styles() {
 			border: 2px solid #fff;
 			border-radius: 50%;
 			flex-shrink: 0;
-			height: 22px;
-			width: 22px;
+			height: 18px;
+			width: 18px;
 			padding: 1px;
 			background: #fff;
 		}
@@ -323,6 +323,7 @@ function gutenberg_add_open_discussion_label_styles() {
 		.comment-avatar-overflow {
 			align-items:center;
 			display:flex;
+			font-size: 12px;
 			flex-shrink:0;
 			height:22px;
 			justify-content:center;
