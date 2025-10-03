@@ -287,7 +287,6 @@ function CommentBoardWrapper( {
 				styles={ {
 					backgroundColor,
 				} }
-				activeComment
 			/>
 		</VStack>
 	);
@@ -298,7 +297,6 @@ function CommentBoardWrapper( {
  */
 export default function CollabSidebar() {
 	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
-	const [ activeComment, setActiveComment ] = useState( null );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const isLargeViewport = useViewportMatch( 'xlarge' );
@@ -319,7 +317,6 @@ export default function CollabSidebar() {
 		if ( thread?.clientId ) {
 			selectBlock( thread.clientId );
 		}
-		setActiveComment( thread.id );
 	};
 
 	const offsetsRef = useRef( {} );
@@ -334,7 +331,7 @@ export default function CollabSidebar() {
 		};
 	}, [] );
 
-	const { blockCommentId, selectedBlockClientId } = useSelect( ( select ) => {
+	const { blockCommentId } = useSelect( ( select ) => {
 		const { getBlockAttributes, getSelectedBlockClientId } =
 			select( blockEditorStore );
 		const _clientId = getSelectedBlockClientId();
@@ -343,7 +340,6 @@ export default function CollabSidebar() {
 			blockCommentId: _clientId
 				? getBlockAttributes( _clientId )?.metadata?.commentId
 				: null,
-			selectedBlockClientId: _clientId,
 		};
 	}, [] );
 
@@ -351,12 +347,6 @@ export default function CollabSidebar() {
 		setShowCommentBoard( true );
 		enableComplementaryArea( 'core', collabHistorySidebarName );
 	};
-
-	useEffect( () => {
-		if ( activeComment !== blockCommentId ) {
-			setActiveComment( null );
-		}
-	}, [ selectedBlockClientId ] );
 
 	const { resultComments, unresolvedSortedThreads, totalPages } =
 		useBlockComments( postId );
