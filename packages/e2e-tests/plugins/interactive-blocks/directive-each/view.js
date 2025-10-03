@@ -92,6 +92,10 @@ store( 'directive-each', {
 			const { book } = getContext();
 			state.books.splice( state.books.indexOf( book ), 1 );
 		},
+		removeBookUsingDerivedState() {
+			const book = state.bookItem;
+			state.books.splice( state.books.indexOf( book ), 1 );
+		},
 		rotateBooks() {
 			const book = state.books.pop();
 			state.books.splice( 0, 0, book );

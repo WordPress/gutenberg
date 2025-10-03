@@ -237,7 +237,7 @@
 			<p
 				data-testid="item"
 				data-wp-text="state.bookItem.title"
-				data-wp-on--click="actions.removeBook"
+				data-wp-on--click="actions.removeBookUsingDerivedState"
 			></p>
 		</template>
 		<!-- SSRed elements; they should be removed on hydration -->
