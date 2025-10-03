@@ -13,7 +13,7 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useMemo, useState } from '@wordpress/element';
+import { useMemo, useState, Suspense } from '@wordpress/element';
 import { moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
 
@@ -106,18 +106,20 @@ export function ActionModal< Item >( {
 	const label =
 		typeof action.label === 'string' ? action.label : action.label( items );
 	return (
-		<Modal
-			title={ action.modalHeader || label }
-			__experimentalHideHeader={ !! action.hideModalHeader }
-			onRequestClose={ closeModal }
-			focusOnMount={ action.modalFocusOnMount ?? true }
-			size={ action.modalSize || 'medium' }
-			overlayClassName={ `dataviews-action-modal dataviews-action-modal__${ kebabCase(
-				action.id
-			) }` }
-		>
-			<action.RenderModal items={ items } closeModal={ closeModal } />
-		</Modal>
+		<Suspense fallback={ null }>
+			<Modal
+				title={ action.modalHeader || label }
+				__experimentalHideHeader={ !! action.hideModalHeader }
+				onRequestClose={ closeModal }
+				focusOnMount={ action.modalFocusOnMount ?? true }
+				size={ action.modalSize || 'medium' }
+				overlayClassName={ `dataviews-action-modal dataviews-action-modal__${ kebabCase(
+					action.id
+				) }` }
+			>
+				<action.RenderModal items={ items } closeModal={ closeModal } />
+			</Modal>
+		</Suspense>
 	);
 }
 

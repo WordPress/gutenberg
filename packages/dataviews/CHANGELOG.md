@@ -154,7 +154,8 @@
 ### Breaking Changes
 
 - Fields with `Edit` defined or `type` will automatically be considered as filters unless `filterBy` is set to `false`.
-- Add `renderItemLink` prop support in the `DataViews` component. It replaces `onClickItem`prop and allows integration with router libraries.
+- Add `renderItemLink` prop support in the `DataViews` component. It replaces `onClickItem` prop and allows integration with router libraries.
+- All action modals are wrapped in a `<Suspense>` component with an empty fallback.
 
 ### Internal
 

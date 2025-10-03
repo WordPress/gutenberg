@@ -669,6 +669,8 @@ export interface RenderModalProps< Item > {
 export interface ActionModal< Item > extends ActionBase< Item > {
 	/**
 	 * Modal to render when the action is triggered.
+	 * The modal will be wrapped in a <Suspense> and the default fallback
+	 * behavior is to render nothing until the modal is ready.
 	 */
 	RenderModal: ( {
 		items,

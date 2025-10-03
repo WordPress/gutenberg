@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -145,6 +145,28 @@ function DataViewWrapper( {
 	return <DataViews { ...dataViewProps } />;
 }
 
+function createSuspender< T = number >() {
+	let resolve: ( value: T ) => void;
+	let resolvedValue = undefined as T | undefined;
+	const promise = new Promise( ( res ) => {
+		resolve = res;
+	} );
+
+	return {
+		read: () => {
+			if ( resolvedValue === undefined ) {
+				throw promise;
+			}
+			return resolvedValue;
+		},
+		resolve( value: T ) {
+			resolvedValue = value;
+			resolve( value );
+		},
+		promise,
+	};
+}
+
 // jest.useFakeTimers();
 
 // Tests run against a DataView which is 500px wide.
@@ -271,6 +293,50 @@ describe( 'DataViews component', () => {
 		it( 'should render actions column if actions are supported and passed in', () => {
 			render( <DataViewWrapper actions={ actions } /> );
 			expect( screen.getByText( 'Actions' ) ).toBeInTheDocument();
+		} );
+
+		it( 'hides action modal during loading', async () => {
+			const suspender = createSuspender();
+
+			render(
+				<DataViewWrapper
+					actions={ [
+						{
+							id: 'lazy-action',
+							label: 'Lazy action',
+							RenderModal: () => {
+								const value = suspender.read();
+								return <div>Resolved: { value }</div>;
+							},
+							modalHeader: 'Modal header',
+						},
+					] }
+				/>
+			);
+
+			const user = userEvent.setup();
+			await user.click(
+				screen.getAllByRole( 'button', {
+					name: 'Actions',
+				} )[ 0 ] // Clicks the first action button in the table
+			);
+			await user.click(
+				screen.getByRole( 'menuitem', {
+					name: 'Lazy action',
+				} )
+			);
+
+			expect(
+				screen.queryByText( 'Modal header' )
+			).not.toBeInTheDocument();
+
+			await act( async () => {
+				suspender.resolve( 113 );
+				await suspender.promise;
+			} );
+
+			expect( screen.getByText( 'Modal header' ) ).toBeInTheDocument();
+			expect( screen.getByText( 'Resolved: 113' ) ).toBeInTheDocument();
 		} );
 
 		it( 'should trigger the onClickItem callback if isItemClickable returns true and title field is clicked', async () => {
