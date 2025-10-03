@@ -1,4 +1,9 @@
 /**
+ * Internal dependencies
+ */
+import type { Field } from './field-api';
+
+/**
  * DataForm layouts.
  */
 export type LayoutType = 'regular' | 'panel' | 'card' | 'row';

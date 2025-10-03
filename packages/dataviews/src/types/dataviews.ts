@@ -11,7 +11,13 @@ import type { useFocusOnMount } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import type { SetSelection } from './types/private';
+import type {
+	NormalizedField,
+	Operator,
+	Option,
+	SortDirection,
+} from './field-api';
+import type { SetSelection } from './private';
 
 /**
  * The filters applied to the dataset.
