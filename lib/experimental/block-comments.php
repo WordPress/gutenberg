@@ -111,11 +111,168 @@ function gutenberg_filter_comment_count_query_exclude_block_comments( $query ) {
 }
 add_filter( 'query', 'gutenberg_filter_comment_count_query_exclude_block_comments' );
 
-// Include the discussion indicator manager class.
-require_once __DIR__ . '/class-gutenberg-discussion-indicator-manager.php';
+if ( ! class_exists( 'WP_List_Table' ) ) {
+	require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
+}
 
-// Initialize the singleton instance.
-Gutenberg_Discussion_Indicator_Manager::get_instance();
+if ( ! class_exists( 'WP_Posts_List_Table' ) ) {
+		require_once ABSPATH . 'wp-admin/includes/class-wp-posts-list-table.php';
+}
+
+class Custom_WP_Posts_List_Table extends WP_Posts_List_Table {
+	public function column_title( $post ) {
+		// This code is copied from WP_Posts_List_Table and modified to add the avatar images.
+		global $mode;
+
+		if ( $this->hierarchical_display ) {
+			if ( 0 === $this->current_level && (int) $post->post_parent > 0 ) {
+				// Sent level 0 by accident, by default, or because we don't know the actual level.
+				$find_main_page = (int) $post->post_parent;
+
+				while ( $find_main_page > 0 ) {
+					$parent = get_post( $find_main_page );
+
+					if ( is_null( $parent ) ) {
+						break;
+					}
+
+					++$this->current_level;
+					$find_main_page = (int) $parent->post_parent;
+
+					if ( ! isset( $parent_name ) ) {
+						/** This filter is documented in wp-includes/post-template.php */
+						$parent_name = apply_filters( 'the_title', $parent->post_title, $parent->ID );
+					}
+				}
+			}
+		}
+
+		$can_edit_post = current_user_can( 'edit_post', $post->ID );
+
+		if ( $can_edit_post && 'trash' !== $post->post_status ) {
+			$lock_holder = wp_check_post_lock( $post->ID );
+
+			if ( $lock_holder ) {
+				$lock_holder   = get_userdata( $lock_holder );
+				$locked_avatar = get_avatar( $lock_holder->ID, 18 );
+				/* translators: %s: User's display name. */
+				$locked_text = esc_html( sprintf( __( '%s is currently editing' ), $lock_holder->display_name ) );
+			} else {
+				$locked_avatar = '';
+				$locked_text   = '';
+			}
+
+			echo '<div class="locked-info"><span class="locked-avatar">' . $locked_avatar . '</span> <span class="locked-text">' . $locked_text . "</span></div>\n";
+		}
+
+		$pad = str_repeat( '&#8212; ', $this->current_level );
+		echo '<strong>';
+
+		$title = _draft_or_post_title();
+
+		if ( $can_edit_post && 'trash' !== $post->post_status ) {
+			printf(
+				'<a class="row-title" href="%s" aria-label="%s">%s%s</a>',
+				get_edit_post_link( $post->ID ),
+				/* translators: %s: Post title. */
+				esc_attr( sprintf( __( '&#8220;%s&#8221; (Edit)' ), $title ) ),
+				$pad,
+				$title
+			);
+		} else {
+			printf(
+				'<span>%s%s</span>',
+				$pad,
+				$title
+			);
+		}
+		_post_states( $post );
+
+		// This line is the only difference from the core code.
+		gutenberg_comment_avatars( $post );
+
+		if ( isset( $parent_name ) ) {
+			$post_type_object = get_post_type_object( $post->post_type );
+			echo ' | ' . $post_type_object->labels->parent_item_colon . ' ' . esc_html( $parent_name );
+		}
+
+		echo "</strong>\n";
+
+		if ( 'excerpt' === $mode
+			&& ! is_post_type_hierarchical( $this->screen->post_type )
+			&& current_user_can( 'read_post', $post->ID )
+		) {
+			if ( post_password_required( $post ) ) {
+				echo '<span class="protected-post-excerpt">' . esc_html( get_the_excerpt() ) . '</span>';
+			} else {
+				echo esc_html( get_the_excerpt() );
+			}
+		}
+
+		/** This filter is documented in wp-admin/includes/class-wp-posts-list-table.php */
+		$quick_edit_enabled = apply_filters( 'quick_edit_enabled_for_post_type', true, $post->post_type );
+
+		if ( $quick_edit_enabled ) {
+			get_inline_data( $post );
+		}
+	}
+}
+
+function use_custom_posts_list_table( $class_name ) {
+	if ( 'WP_Posts_List_Table' === $class_name  ) {
+		return 'Custom_WP_Posts_List_Table';
+	}
+	return $class_name;
+}
+add_filter( 'wp_list_table_class_name', 'use_custom_posts_list_table' );
+
+/**
+ * Function to output the avatar HTML for a post ID.
+ *
+ * @param int $post The post object.
+ * @return void
+ */
+function gutenberg_comment_avatars( $post ) {
+	if ( gutenberg_check_post_type_supports_block_comments( $post->post_type ) ) {
+		$unresolved_comments = get_comments(
+			array(
+				'post_id'  => $post->ID,
+				'type'     => 'block_comment',
+				'status'   => 'hold',
+				'per_page' => 100,
+			)
+		);
+		if ( count( $unresolved_comments ) > 0 ) {
+			$maxAvatars = 3;
+			$count = $maxAvatars;
+			echo "<div class='comment-avatar-stack' title='" . esc_attr__( 'This post has open discussions', 'gutenberg' ) . "'>";
+			foreach ( $unresolved_comments as $comment ) {
+				if ( $count-- <= 0 ) {
+					break;
+				}
+				$gravatar_params = array(
+					'size' => 18,
+					'',
+				);
+				$avatar_urls = get_avatar_url( $comment->user_id, $gravatar_params );
+				echo "<img class='comment-avatar' src='" . esc_url( $avatar_urls ) . "' />";
+
+			}
+
+			// Add an overflow indicator if there are more avatars than the max.
+			if ( count( $unresolved_comments ) > $maxAvatars ) {
+				// If there are 100 or more unresolved comments, we show "100+".
+				if ( count( $unresolved_comments ) >= 100 ) {
+					$overflow = '100+';
+				} else {
+					$overflow = "+" . ( count( $unresolved_comments ) - $maxAvatars );
+				}
+				echo "<span class='comment-avatar-overflow'> " . esc_html( $overflow ) . ' </span>';
+			}
+			echo '</div>';
+		}
+	}
+}
 
 /**
  * Add some label styles on the post list table.
@@ -129,26 +286,40 @@ function gutenberg_add_open_discussion_label_styles() {
 			display: inline-flex;
 			align-items: center;
 			vertical-align: middle;
+			padding-left: 6px;
 		}
 		.comment-avatar{
+			margin-left: -6px;
 			border: 2px solid #fff;
 			border-radius: 50%;
 			flex-shrink: 0;
-			height: 20px;
-			margin-left: -6px;
-			width: 20px;
+			height: 22px;
+			width: 22px;
 			padding: 1px;
 			background: #fff;
 		}
 		.comment-avatar:first-child{
 			border-color: rgb(159, 177, 255);
 			margin-left: 0;
+			z-index: 3;
 		}
 		.comment-avatar:nth-child(2){
 			border-color: rgb(122, 0, 223);
+			z-index: 2;
 		}
 		.comment-avatar:nth-child(3){
 			border-color: rgb(255, 249, 114);
+			z-index: 1;
+		}
+		.comment-avatar-overflow {
+			align-items:center;
+			display:flex;
+			flex-shrink:0;
+			height:22px;
+			justify-content:center;
+			margin-left: -4px;
+			padding:0 4px;
+			width:fit-content;
 		}
 	</style>
 		<?php
