@@ -8,11 +8,17 @@
 
 .editor-collab-sidebar {
 	height: 100%;
+	& > div > .editor-collab-sidebar-panel__thread {
+		padding: 0;
+		border: none;
+		position: absolute;
+	}
 }
 
 .editor-collab-sidebar-panel {
 	padding: $grid-unit-20;
 	height: 100%;
+	overflow: hidden;
 }
 
 .editor-collab-sidebar-panel__thread {
@@ -21,6 +27,7 @@
 	border-radius: $radius-large;
 	border: $border-width solid $gray-300;
 	background-color: $gray-100;
+	width: 100%;
 
 	&.is-selected {
 		background-color: $white;
