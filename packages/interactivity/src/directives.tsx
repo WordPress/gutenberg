@@ -220,13 +220,30 @@ const getGlobalEventDirective = (
 	};
 };
 
-const getEvaluatedItemKey = (
+/**
+ * Obtains the given item key based on the passed `eachKey` entry. Used by the
+ * `wp-each` directive.
+ *
+ * The item key is computed using `getEvaluate` with a mocked scope simulating
+ * the specific context that inner directives will inherit, i.e., including the
+ * item under the corresponding item prop.
+ *
+ * @param inheritedValue Inherited context value.
+ * @param namespace      Namespace for the `wp-each` directive.
+ * @param item           Item from the list of items pointed by `wp-each`.
+ * @param itemProp       Prop in which the item is accessible from the context.
+ * @param eachKey        Directive entry pointing to the item's key.
+ * @return The evaluated key for the passed item.
+ */
+const evaluateItemKey = (
 	inheritedValue: any,
 	namespace: string,
 	item: unknown,
 	itemProp: string,
-	eachKey: DirectiveEntry[]
+	eachKey?: DirectiveEntry
 ) => {
+	// Construct a client context with the item. Note that accessing the item
+	// prop is not reactive, as this simulated context is not proxified.
 	const clientContextWithItem = {
 		...inheritedValue.client,
 		[ namespace ]: {
@@ -235,26 +252,41 @@ const getEvaluatedItemKey = (
 		},
 	};
 
+	// Scope must contain the client and the server contexts.
 	const scope = {
 		...getScope(),
 		context: clientContextWithItem,
 		serverContext: inheritedValue.server,
 	};
 
-	return eachKey ? getEvaluate( { scope } )( eachKey[ 0 ] ) : item;
+	// If passed, evaluate `eachKey` entry with the simulated scope. Return
+	// `item` otherwhise.
+	return eachKey ? getEvaluate( { scope } )( eachKey ) : item;
 };
 
+/**
+ * Generates an `Iterable` from the passed items that returns, for each item, a
+ * tuple with the item, its context and its evaluated key. Used by the `wp-each`
+ * directive.
+ *
+ * @param inheritedValue Inherited context value.
+ * @param namespace      Namespace for the `wp-each` directive.
+ * @param items          List of items pointed by `wp-each`.
+ * @param itemProp       Prop in which items are accessible from the context.
+ * @param eachKey        Directive entry pointing to the item's key.
+ * @return Generator that yields items along with their context and key.
+ */
 const useItemContexts = function* (
 	inheritedValue: any,
 	namespace: string,
 	items: Iterable< unknown >,
 	itemProp: string,
-	eachKey: DirectiveEntry[]
-) {
+	eachKey?: DirectiveEntry
+): Generator< [ context: any, key: any ] > {
 	const { current: itemContexts } = useRef< any >( {} );
 
 	for ( const item of items ) {
-		const key = getEvaluatedItemKey(
+		const key = evaluateItemKey(
 			inheritedValue,
 			namespace,
 			item,
@@ -911,7 +943,7 @@ export default () => {
 				namespace,
 				iterable,
 				itemProp,
-				eachKey
+				eachKey?.[ 0 ]
 			);
 
 			for ( const [ itemContext, key ] of itemContexts ) {
