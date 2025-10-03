@@ -26,7 +26,7 @@ import { default as password } from './password';
 import { default as telephone } from './telephone';
 import { default as color } from './color';
 import { default as url } from './url';
-import { renderFromElements } from '../utils';
+import renderFromElements from './utils/render-from-elements';
 import { ALL_OPERATORS, OPERATOR_IS, OPERATOR_IS_NOT } from '../constants';
 
 /**

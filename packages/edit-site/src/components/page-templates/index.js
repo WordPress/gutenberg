@@ -37,6 +37,7 @@ import {
 	previewField,
 	activeField,
 	slugField,
+	useThemeField,
 } from './fields';
 
 const { usePostActions, templateTitleField } = unlock( editorPrivateApis );
@@ -67,7 +68,7 @@ const DEFAULT_VIEW = {
 	titleField: 'title',
 	descriptionField: 'description',
 	mediaField: 'preview',
-	fields: [ 'author', 'active', 'slug' ],
+	fields: [ 'author', 'active', 'slug', 'theme' ],
 	filters: [],
 	...defaultLayouts[ LAYOUT_GRID ],
 };
@@ -119,11 +120,14 @@ export default function PageTemplates() {
 		} ) );
 	}, [ setView, activeView ] );
 
-	const activeTemplatesOption = useSelect(
-		( select ) =>
-			select( coreStore ).getEntityRecord( 'root', 'site' )
-				?.active_templates
-	);
+	const { activeTemplatesOption, activeTheme } = useSelect( ( select ) => {
+		const { getEntityRecord, getCurrentTheme } = select( coreStore );
+		return {
+			activeTemplatesOption: getEntityRecord( 'root', 'site' )
+				?.active_templates,
+			activeTheme: getCurrentTheme(),
+		};
+	} );
 	// Todo: this will have to be better so that we're not fetching all the
 	// records all the time. Active templates query will need to move server
 	// side.
@@ -154,7 +158,9 @@ export default function PageTemplates() {
 				} else {
 					// Replace the template in the array.
 					const template = userRecords.find(
-						( { id } ) => id === activeId
+						( userRecord ) =>
+							userRecord.id === activeId &&
+							userRecord.theme === activeTheme.stylesheet
 					);
 					if ( template ) {
 						const index = _active.findIndex(
@@ -170,7 +176,7 @@ export default function PageTemplates() {
 			}
 		}
 		return _active;
-	}, [ userRecords, staticRecords, activeTemplatesOption ] );
+	}, [ userRecords, staticRecords, activeTemplatesOption, activeTheme ] );
 
 	let _records;
 	let isLoadingData;
@@ -188,15 +194,11 @@ export default function PageTemplates() {
 	const records = useMemo( () => {
 		return _records.map( ( record ) => ( {
 			...record,
-			_isActive:
-				typeof record.id === 'string'
-					? activeTemplatesOption[ record.slug ] === record.id ||
-					  activeTemplatesOption[ record.slug ] === undefined
-					: Object.values( activeTemplatesOption ).includes(
-							record.id
-					  ),
+			_isActive: activeTemplates.find(
+				( template ) => template.id === record.id
+			),
 		} ) );
-	}, [ _records, activeTemplatesOption ] );
+	}, [ _records, activeTemplates ] );
 
 	const users = useSelect(
 		( select ) => {
@@ -232,6 +234,7 @@ export default function PageTemplates() {
 		[ history, path, view?.type ]
 	);
 
+	const themeField = useThemeField();
 	const fields = useMemo( () => {
 		const _fields = [
 			previewField,
@@ -240,6 +243,9 @@ export default function PageTemplates() {
 			activeField,
 			slugField,
 		];
+		if ( activeView === 'user' ) {
+			_fields.push( themeField );
+		}
 		const elements = [];
 		for ( const author in users ) {
 			elements.push( {
@@ -252,7 +258,7 @@ export default function PageTemplates() {
 			elements,
 		} );
 		return _fields;
-	}, [ users ] );
+	}, [ users, activeView ] );
 
 	const { data, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( records, view, fields );
