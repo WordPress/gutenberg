@@ -21,7 +21,7 @@ import {
 	getColorClassName,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
-import { useState, useEffect, useRef } from '@wordpress/element';
+import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { link as linkIcon, removeSubmenu } from '@wordpress/icons';
 import { speak } from '@wordpress/a11y';
 import { createBlock } from '@wordpress/blocks';
@@ -95,7 +95,7 @@ const useIsDraggingWithin = ( elementRef ) => {
 			ownerDocument.removeEventListener( 'dragend', handleDragEnd );
 			ownerDocument.removeEventListener( 'dragenter', handleDragEnter );
 		};
-	}, [] );
+	}, [ elementRef ] );
 
 	return isDraggingWithin;
 };
@@ -140,11 +140,9 @@ export default function NavigationSubmenuEdit( {
 	const {
 		__unstableMarkNextChangeAsNotPersistent,
 		replaceBlock,
-		selectBlock,
+		selectPreviousBlock,
 	} = useDispatch( blockEditorStore );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
-	// Store what element opened the popover, so we know where to return focus to (toolbar button vs navigation link text)
-	const [ openedBy, setOpenedBy ] = useState( null );
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
@@ -152,6 +150,9 @@ export default function NavigationSubmenuEdit( {
 	const isDraggingWithin = useIsDraggingWithin( listItemRef );
 	const itemLabelPlaceholder = __( 'Add text…' );
 	const ref = useRef();
+	const closedByEscapeRef = useRef( false );
+	const isNewLink = useRef( ! url );
+	const hasInitialized = useRef( false );
 
 	const {
 		parentCount,
@@ -216,10 +217,36 @@ export default function NavigationSubmenuEdit( {
 	// This can't be done in the useState call because it conflicts
 	// with the autofocus behavior of the BlockListBlock component.
 	useEffect( () => {
-		if ( ! openSubmenusOnClick && ! url ) {
+		if ( ! hasInitialized.current && ! openSubmenusOnClick && ! url ) {
 			setIsLinkOpen( true );
+			hasInitialized.current = true;
 		}
-	}, [] );
+	}, [ openSubmenusOnClick, url ] );
+
+	// Listen for Escape key at document level when LinkUI is open
+	useEffect( () => {
+		if ( ! isLinkOpen ) {
+			return;
+		}
+
+		const handleEscapeKey = ( event ) => {
+			if ( event.key === 'Escape' ) {
+				closedByEscapeRef.current = true;
+			}
+		};
+
+		// Use capture phase to catch Escape before Popover handles it
+		document.addEventListener( 'keydown', handleEscapeKey, {
+			capture: true,
+		} );
+		return () => {
+			document.removeEventListener( 'keydown', handleEscapeKey, {
+				capture: true,
+			} );
+			// Reset the flag when the LinkUI closes
+			closedByEscapeRef.current = false;
+		};
+	}, [ isLinkOpen ] );
 
 	/**
 	 * The hook shouldn't be necessary but due to a focus loss happening
@@ -243,7 +270,7 @@ export default function NavigationSubmenuEdit( {
 				selectLabelText();
 			}
 		}
-	}, [ url ] );
+	}, [ url, isLinkOpen, label ] );
 
 	/**
 	 * Focus the Link label text and select it.
@@ -276,7 +303,6 @@ export default function NavigationSubmenuEdit( {
 			// If we don't stop propagation, this event bubbles up to the parent submenu item
 			event.stopPropagation();
 			setIsLinkOpen( true );
-			setOpenedBy( ref.current );
 		}
 	}
 
@@ -335,10 +361,10 @@ export default function NavigationSubmenuEdit( {
 
 	const ParentElement = openSubmenusOnClick ? 'button' : 'a';
 
-	function transformToLink() {
+	const transformToLink = useCallback( () => {
 		const newLinkBlock = createBlock( 'core/navigation-link', attributes );
 		replaceBlock( clientId, newLinkBlock );
-	}
+	}, [ attributes, replaceBlock, clientId ] );
 
 	useEffect( () => {
 		// If block becomes empty, transform to Navigation Link.
@@ -348,7 +374,12 @@ export default function NavigationSubmenuEdit( {
 			__unstableMarkNextChangeAsNotPersistent();
 			transformToLink();
 		}
-	}, [ hasChildren, prevHasChildren ] );
+	}, [
+		hasChildren,
+		prevHasChildren,
+		__unstableMarkNextChangeAsNotPersistent,
+		transformToLink,
+	] );
 
 	const canConvertToLink =
 		! selectedBlockHasChildren || onlyDescendantIsEmptyLink;
@@ -363,9 +394,8 @@ export default function NavigationSubmenuEdit( {
 							icon={ linkIcon }
 							title={ __( 'Link' ) }
 							shortcut={ displayShortcut.primary( 'k' ) }
-							onClick={ ( event ) => {
+							onClick={ () => {
 								setIsLinkOpen( true );
-								setOpenedBy( event.currentTarget );
 							} }
 						/>
 					) }
@@ -407,7 +437,6 @@ export default function NavigationSubmenuEdit( {
 						onClick={ () => {
 							if ( ! openSubmenusOnClick && ! url ) {
 								setIsLinkOpen( true );
-								setOpenedBy( ref.current );
 							}
 						} }
 					/>
@@ -421,12 +450,24 @@ export default function NavigationSubmenuEdit( {
 							clientId={ clientId }
 							link={ attributes }
 							onClose={ () => {
+								// If there is no link then remove the auto-inserted block.
+								if ( ! url && isNewLink.current ) {
+									if ( closedByEscapeRef.current ) {
+										// User pressed Escape - select previous block so appender remains visible
+										selectPreviousBlock( clientId );
+									}
+									// Then remove this block
+									onReplace( [] );
+								}
+
 								setIsLinkOpen( false );
-								if ( openedBy ) {
-									openedBy.focus();
-									setOpenedBy( null );
-								} else {
-									selectBlock( clientId );
+
+								if (
+									closedByEscapeRef.current &&
+									isNewLink.current &&
+									ref.current
+								) {
+									ref.current.focus();
 								}
 							} }
 							anchor={ popoverAnchor }
