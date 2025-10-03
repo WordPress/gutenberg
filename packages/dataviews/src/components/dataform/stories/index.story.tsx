@@ -531,6 +531,7 @@ const ValidationComponent = ( {
 		password: string;
 		toggle?: boolean;
 		toggleGroup?: string;
+		arrayWithChildren: Record< string, unknown >[];
 	};
 
 	const [ post, setPost ] = useState< ValidatedItem >( {
@@ -548,9 +549,13 @@ const ValidationComponent = ( {
 		categories: [ 'astronomy' ],
 		countries: [ 'us' ],
 		customEdit: 'custom control',
-		password: 'secretpassword123',
+		password: 'secretPassword123',
 		toggle: undefined,
 		toggleGroup: undefined,
+		arrayWithChildren: [
+			{ day: 'monday', openingHours: 4 },
+			{ day: 'tuesday', openingHours: 6 },
+		],
 	} );
 
 	const customTextRule = ( value: ValidatedItem ) => {
@@ -644,6 +649,34 @@ const ValidationComponent = ( {
 			return 'Value must be Option 1.';
 		}
 
+		return null;
+	};
+
+	const customNestedTextRule = ( value: any ) => {
+		if ( ! /^[a-zA-Z ]+$/.test( value.day ) ) {
+			return 'Value must only contain letters and spaces.';
+		}
+
+		return null;
+	};
+	const customNestedIntegerRule = ( value: any ) => {
+		if ( value.openingHours % 2 !== 0 ) {
+			return 'Integer must be an even number.';
+		}
+
+		return null;
+	};
+	const customNestedParentRule = ( value: ValidatedItem ) => {
+		if (
+			value.arrayWithChildren.some(
+				( item, index ) =>
+					value.arrayWithChildren.findIndex(
+						( otherItem ) => otherItem.day === item.day
+					) !== index
+			)
+		) {
+			return 'There cannot be repeated day values.';
+		}
 		return null;
 	};
 
@@ -854,6 +887,35 @@ const ValidationComponent = ( {
 				custom: maybeCustomRule( customToggleGroupRule ),
 			},
 		},
+		{
+			id: 'arrayWithChildren',
+			type: 'array',
+			label: 'Array with children',
+			children: [
+				{
+					id: 'day',
+					label: 'Day',
+					type: 'text',
+					isValid: {
+						required,
+						custom: custom ? customNestedTextRule : undefined,
+					},
+				},
+				{
+					id: 'openingHours',
+					label: 'Opening Hours',
+					type: 'integer',
+					isValid: {
+						required,
+						custom: custom ? customNestedIntegerRule : undefined,
+					},
+				},
+			],
+			isValid: {
+				required,
+				custom: custom ? customNestedParentRule : undefined,
+			},
+		},
 	];
 
 	const form = {
@@ -874,6 +936,7 @@ const ValidationComponent = ( {
 			'countries',
 			'toggle',
 			'toggleGroup',
+			'arrayWithChildren',
 			'password',
 			'customEdit',
 		],
@@ -1544,6 +1607,150 @@ export const LayoutRow = {
 
 export const LayoutMixed = {
 	render: LayoutMixedComponent,
+};
+
+const DynamicDataComponent = () => {
+	type DynamicProduct = {
+		name: string;
+		cost: number;
+		quantity: number;
+	};
+	type DynamicData = {
+		productList: DynamicProduct[];
+		totalAmount: number;
+	};
+
+	const initialData = {
+		productList: [
+			{
+				name: 'hair protection oil',
+				cost: 10,
+				quantity: 5,
+			},
+			{
+				name: 'hair strength shampoo',
+				cost: 20,
+				quantity: 3,
+			},
+		],
+		totalAmount: 110,
+	};
+
+	const [ data, setData ] = useState< DynamicData >( initialData );
+
+	const form: Form = {
+		layout: { type: 'card' },
+		fields: [
+			{
+				id: 'cardWithRegular',
+				children: [
+					{
+						id: 'productListAsRegular',
+						label: 'Product list',
+						layout: { type: 'regular' },
+						children: [
+							'productList',
+							{
+								id: 'totalAmount',
+								label: 'Total Amount',
+								layout: { type: 'panel' },
+							},
+						],
+					},
+				],
+			},
+			{
+				id: 'cardWithPanel',
+				children: [
+					{
+						id: 'productListAsPanel',
+						label: 'Product list',
+						layout: { type: 'panel', openAs: 'modal' },
+						summary: 'productListSummary',
+						children: [
+							'productList',
+							{
+								id: 'totalAmount',
+								label: 'Total Amount',
+								layout: { type: 'panel' },
+							},
+						],
+					},
+				],
+			},
+		],
+	};
+
+	const _fields: Field< DynamicData >[] = [
+		{
+			id: 'productList',
+			label: 'Product List',
+			type: 'array',
+			Edit: {
+				control: 'table',
+				actions: {
+					delete: 'Remove product',
+					add: 'Add product',
+				},
+			},
+			children: [
+				{
+					id: 'name',
+					label: 'Name',
+					type: 'text',
+				},
+				{
+					id: 'cost',
+					label: 'Cost',
+					type: 'integer',
+				},
+				{
+					id: 'quantity',
+					label: 'Quantity',
+					type: 'integer',
+				},
+			],
+		},
+		{
+			id: 'productListSummary',
+			label: 'Products',
+			type: 'text',
+			getValue: ( { item } ) =>
+				item.productList
+					.map( ( product ) => product.name )
+					.join( ', ' ),
+		},
+		{
+			id: 'totalAmount',
+			label: 'Total Amount',
+			type: 'integer',
+			readOnly: true,
+		},
+	];
+
+	return (
+		<DataForm< DynamicData >
+			data={ data }
+			form={ form }
+			fields={ _fields }
+			onChange={ ( edits ) => {
+				setData( ( prev ) => {
+					const updated = { ...prev, ...edits };
+					return {
+						...updated,
+						totalAmount: updated.productList.reduce(
+							( acc, item ) => acc + item.cost * item.quantity,
+							0
+						),
+					};
+				} );
+			} }
+		/>
+	);
+};
+
+export const DynamicData = {
+	render: DynamicDataComponent,
 };
 
 export const Validation = {

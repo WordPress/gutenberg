@@ -9,6 +9,7 @@ import { __ } from '@wordpress/i18n';
 import type {
 	DataViewRenderFieldProps,
 	NormalizedField,
+	Field,
 	FieldType,
 	FieldTypeDefinition,
 	SortDirection,
@@ -21,7 +22,7 @@ import { default as datetime } from './datetime';
 import { default as date } from './date';
 import { default as boolean } from './boolean';
 import { default as media } from './media';
-import { default as array } from './array';
+import { default as createArray } from './array';
 import { default as password } from './password';
 import { default as telephone } from './telephone';
 import { default as color } from './color';
@@ -35,9 +36,10 @@ import { ALL_OPERATORS, OPERATOR_IS, OPERATOR_IS_NOT } from '../constants';
  *
  * @return A field type definition.
  */
-export default function getFieldTypeDefinition< Item >(
-	type?: FieldType
-): FieldTypeDefinition< Item > {
+export default function getFieldTypeDefinition< Item >( {
+	type,
+	children,
+}: Field< Item > ): FieldTypeDefinition< Item > {
 	if ( 'email' === type ) {
 		return email;
 	}
@@ -71,7 +73,7 @@ export default function getFieldTypeDefinition< Item >(
 	}
 
 	if ( 'array' === type ) {
-		return array;
+		return createArray( children );
 	}
 
 	if ( 'password' === type ) {

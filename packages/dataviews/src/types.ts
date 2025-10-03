@@ -195,6 +195,14 @@ export type EditConfigText = {
 	suffix?: React.ComponentType;
 };
 
+export type EditConfigTable = {
+	control: 'table';
+	actions?: {
+		delete?: string | false;
+		add?: string | false;
+	};
+};
+
 /**
  * Edit configuration for other control types (excluding 'text' and 'textarea').
  */
@@ -209,6 +217,7 @@ export type EditConfigGeneric = {
 export type EditConfig =
 	| EditConfigTextarea
 	| EditConfigText
+	| EditConfigTable
 	| EditConfigGeneric;
 
 /**
@@ -245,6 +254,12 @@ export type Field< Item > = {
 	 * Placeholder for the field.
 	 */
 	placeholder?: string;
+
+	/**
+	 * Children field definitions for array fields with structured data.
+	 * When provided, array fields will render as tables with columns based on children.
+	 */
+	children?: 'text' | Field< any >[];
 
 	/**
 	 * Callback used to render the field. Defaults to `field.getValue`.
@@ -315,7 +330,10 @@ export type Field< Item > = {
 	setValue?: ( args: { item: Item; value: any } ) => DeepPartial< Item >;
 };
 
-export type NormalizedField< Item > = Omit< Field< Item >, 'Edit' > & {
+export type NormalizedField< Item > = Omit<
+	Field< Item >,
+	'Edit' | 'children'
+> & {
 	label: string;
 	header: string | ReactElement;
 	getValue: ( args: { item: Item } ) => any;
@@ -328,6 +346,7 @@ export type NormalizedField< Item > = Omit< Field< Item >, 'Edit' > & {
 	enableSorting: boolean;
 	filterBy: NormalizedFilterByConfig | false;
 	readOnly: boolean;
+	children: 'text' | NormalizedField< any >[];
 };
 
 /**
@@ -355,6 +374,10 @@ export type DataFormControlProps< Item > = {
 		prefix?: React.ComponentType;
 		suffix?: React.ComponentType;
 		rows?: number;
+		actions?: {
+			delete?: string | false;
+			add?: string | false;
+		};
 	};
 };
 

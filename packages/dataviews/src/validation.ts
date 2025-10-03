@@ -59,6 +59,13 @@ export function isItemValid< Item >(
 			if ( field.type === 'boolean' && value !== true ) {
 				return false;
 			}
+
+			if (
+				field.type === 'array' &&
+				( ! Array.isArray( value ) || value.length === 0 )
+			) {
+				return false;
+			}
 		}
 
 		if ( field.isValid.elements ) {
@@ -86,6 +93,24 @@ export function isItemValid< Item >(
 			field.isValid.custom( item, field ) !== null
 		) {
 			return false;
+		}
+
+		// The array field.type can have children.
+		if ( field.type === 'array' && Array.isArray( field.children ) ) {
+			// children is NormalizedField, but we'll use it below
+			// as a parameter to isItemValid, which uses the more permissive
+			// Field. Hence, the cast.
+			const children = field.children as Field<
+				Record< string, unknown >
+			>[];
+
+			return field
+				.getValue( { item } )
+				.every( ( row: Record< string, unknown > ) => {
+					return isItemValid( row, children, {
+						fields: children.map( ( child ) => child.id ),
+					} );
+				} );
 		}
 
 		return true;

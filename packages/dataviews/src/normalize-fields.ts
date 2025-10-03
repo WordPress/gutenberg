@@ -140,9 +140,7 @@ export function normalizeFields< Item >(
 	fields: Field< Item >[]
 ): NormalizedField< Item >[] {
 	return fields.map( ( field ) => {
-		const fieldTypeDefinition = getFieldTypeDefinition< Item >(
-			field.type
-		);
+		const fieldTypeDefinition = getFieldTypeDefinition< Item >( field );
 		const getValue = field.getValue || getValueFromId( field.id );
 		const setValue = field.setValue || setValueFromId( field.id );
 
@@ -195,6 +193,9 @@ export function normalizeFields< Item >(
 				true,
 			filterBy,
 			readOnly: field.readOnly ?? fieldTypeDefinition.readOnly ?? false,
+			children: Array.isArray( field.children )
+				? normalizeFields( field.children )
+				: [],
 		};
 	} );
 }

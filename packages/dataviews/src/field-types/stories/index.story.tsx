@@ -112,6 +112,8 @@ type DataType = {
 	mediaWithElements: string;
 	array: string[];
 	arrayWithElements: string[];
+	arrayWithChildren: Record< string, unknown >[];
+	arrayWithNestedChildren: Record< string, unknown >[];
 	notype: string;
 	notypeWithElements: string;
 	priceWithPrefix?: string;
@@ -153,6 +155,40 @@ const data: DataType[] = [
 			'https://live.staticflickr.com/7398/9458193857_e1256123e3_z.jpg',
 		array: [ 'item1', 'item2', 'item3' ],
 		arrayWithElements: [ 'item1', 'item2', 'item3' ],
+		arrayWithChildren: [
+			{
+				day: 'monday',
+				openingHours: 1,
+			},
+			{
+				day: 'tuesday',
+				openingHours: 2,
+			},
+			{
+				day: 'wednesday',
+				openingHours: 3,
+			},
+		],
+		arrayWithNestedChildren: [
+			{
+				day: 'monday',
+				openingHours: [
+					{ morningOpeningHours: 7, afternoonOpeningHours: 8 },
+				],
+			},
+			{
+				day: 'tuesday',
+				openingHours: [
+					{ morningOpeningHours: 2, afternoonOpeningHours: 4 },
+				],
+			},
+			{
+				day: 'wednesday',
+				openingHours: [
+					{ morningOpeningHours: 1, afternoonOpeningHours: 3 },
+				],
+			},
+		],
 		notype: 'No type',
 		notypeWithElements: 'No type',
 		priceWithPrefix: '25.99',
@@ -458,6 +494,46 @@ const fields: Field< DataType >[] = [
 			{ value: 'item1', label: 'Item 1' },
 			{ value: 'item2', label: 'Item 2' },
 			{ value: 'item3', label: 'Item 3' },
+		],
+	},
+	{
+		id: 'arrayWithChildren',
+		type: 'array',
+		label: 'Array (with children)',
+		description: 'Help for array with children.',
+		children: [
+			{ id: 'day', type: 'text', label: 'Day' },
+			{
+				id: 'openingHours',
+				type: 'integer',
+				label: 'Opening hours',
+			},
+		],
+	},
+	{
+		id: 'arrayWithNestedChildren',
+		type: 'array',
+		label: 'Array (with nested children)',
+		description: 'Help for array with nested children.',
+		children: [
+			{ id: 'day', type: 'text', label: 'Day' },
+			{
+				id: 'openingHours',
+				type: 'array',
+				label: 'Opening hours',
+				children: [
+					{
+						id: 'morningOpeningHours',
+						type: 'integer',
+						label: 'Morning opening hours',
+					},
+					{
+						id: 'afternoonOpeningHours',
+						type: 'integer',
+						label: 'Afternoon opening hours',
+					},
+				],
+			},
 		],
 	},
 	{

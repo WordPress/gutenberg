@@ -129,3 +129,15 @@
 		padding-inline-end: $grid-unit-30;
 	}
 }
+
+// This is part of the field-types array's render.
+.dataviews-array-list > ul {
+	list-style-type: none;
+	padding-inline-start: 0;
+}
+
+// When an array is nested within another array
+// we do want to provide some padding to visually see the difference.
+.dataviews-array-list > ul .dataviews-array-list > ul {
+	padding-inline-start: revert;
+}

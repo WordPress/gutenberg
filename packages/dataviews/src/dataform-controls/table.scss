@@ -1,0 +1,57 @@
+.dataform-control-array-table__table {
+	width: 100%;
+	text-indent: 0;
+	border-color: inherit;
+	border-collapse: collapse;
+	position: relative;
+	color: $gray-700;
+	margin-bottom: auto;
+
+	th {
+		text-align: left;
+		color: $gray-900;
+		font-weight: normal;
+		font-size: $default-font-size;
+	}
+
+	td,
+	th {
+		padding: $grid-unit-15;
+	}
+
+	tr {
+		border-top: 1px solid $gray-100;
+		&.is-hovered {
+			background-color: #f8f8f8;
+		}
+	}
+
+	thead {
+		position: sticky;
+		inset-block-start: 0;
+
+		tr {
+			border: 0;
+		}
+		th {
+			background-color: $white;
+			padding-top: $grid-unit-10;
+			padding-bottom: $grid-unit-10;
+			padding-left: $grid-unit-15;
+			font-size: 11px;
+			text-transform: uppercase;
+			font-weight: 500;
+		}
+	}
+
+	tbody {
+		td {
+			vertical-align: top;
+		}
+	}
+}
+
+.dataform-control-array-table__add-row {
+	border-top: 1px solid $gray-100;
+	padding-top: $grid-unit-15;
+}
