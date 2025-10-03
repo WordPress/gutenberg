@@ -126,4 +126,34 @@ test.describe( 'Template Activate', () => {
 			'Copied from Index.'
 		);
 	} );
+
+	test( 'should deactivate after theme change', async ( {
+		admin,
+		page,
+		requestUtils,
+		editor,
+	} ) => {
+		await admin.visitSiteEditor( { postType: 'wp_template' } );
+		await page.getByRole( 'button', { name: 'Add Template' } ).click();
+		await page.getByRole( 'button', { name: 'Blog Home' } ).click();
+		await page.waitForSelector( 'iframe[name="editor-canvas"]' );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'My home template test.' },
+		} );
+		await page.getByRole( 'button', { name: 'Save', exact: true } ).click();
+		await page.getByRole( 'button', { name: 'Activate' } ).click();
+		await expect( page.locator( '.components-notice' ) ).toContainText(
+			'Template activated.'
+		);
+		await page.goto( '/' );
+		await expect( page.locator( 'body' ) ).toContainText(
+			'My home template test.'
+		);
+		await requestUtils.activateTheme( 'twentytwentyfive' );
+		await page.reload();
+		await expect( page.locator( 'body' ) ).not.toContainText(
+			'My home template test.'
+		);
+	} );
 } );

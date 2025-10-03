@@ -271,12 +271,12 @@ export function CommandMenu() {
 			<div className="commands-command-menu__container">
 				<Command label={ inputLabel } onKeyDown={ onKeyDown }>
 					<div className="commands-command-menu__header">
+						<Icon icon={ inputIcon } />
 						<CommandInput
 							search={ search }
 							setSearch={ setSearch }
 							isOpen={ isOpen }
 						/>
-						<Icon icon={ inputIcon } />
 					</div>
 					<Command.List label={ __( 'Command suggestions' ) }>
 						{ search && ! isLoading && (
