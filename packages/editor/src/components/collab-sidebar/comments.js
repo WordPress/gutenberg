@@ -301,6 +301,16 @@ function Thread( {
 					className="editor-collab-sidebar-panel__child-thread"
 					spacing="2"
 				>
+					<Button
+						className="editor-collab-sidebar-panel__skip-link"
+						variant="link"
+						__next40pxDefaultSize
+						onClick={ () => {
+							replyTextareaRef.current?.focus();
+						} }
+					>
+						{ __( 'New Comment' ) }
+					</Button>
 					<HStack alignment="left" spacing="3" justify="flex-start">
 						<CommentAuthorInfo />
 					</HStack>

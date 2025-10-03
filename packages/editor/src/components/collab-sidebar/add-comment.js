@@ -74,6 +74,7 @@ export function AddComment( {
 				} }
 				submitButtonText={ _x( 'Comment', 'Add comment button' ) }
 				labelText={ commentLabel }
+				shouldFocusTextareaOnMount
 			/>
 		</VStack>
 	);
