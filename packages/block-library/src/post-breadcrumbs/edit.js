@@ -25,36 +25,15 @@ export default function PostBreadcrumbEdit( {
 	setAttributes,
 	context: { postId, postType },
 } ) {
-	const { type, separator, showHomeLink } = attributes;
-	const { isHierarchical, hasTermsAssigned } = useSelect(
+	const { separator, showHomeLink } = attributes;
+	const postTypeObject = useSelect(
 		( select ) => {
 			if ( ! postType ) {
 				return null;
 			}
-			const postTypeObject = select( coreStore ).getPostType( postType );
-			const post = select( coreStore ).getEntityRecord(
-				'postType',
-				postType,
-				postId
-			);
-			const taxonomies = select( coreStore ).getTaxonomies( {
-				type: postType,
-				per_page: -1,
-			} );
-			return {
-				isHierarchical: postTypeObject?.hierarchical,
-				hasTermsAssigned:
-					post &&
-					( taxonomies || [] )
-						.filter(
-							( { visibility } ) => visibility?.publicly_queryable
-						)
-						.some( ( taxonomy ) => {
-							return !! post[ taxonomy.rest_base ]?.length;
-						} ),
-			};
+			return select( coreStore ).getPostType( postType );
 		},
-		[ postType, postId ]
+		[ postType ]
 	);
 	const blockProps = useBlockProps();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
@@ -65,22 +44,14 @@ export default function PostBreadcrumbEdit( {
 		urlQueryArgs: { post_id: postId },
 	} );
 	let placeholder = null;
-	// If no post context, show placeholder.
+	// If no post context or the post type is not hierarchical, show placeholder.
 	// This is fragile because this block is server side rendered and we'll have to
 	// update the placeholder html if the server side rendering output changes.
-	if (
-		! postId ||
-		! postType ||
-		( type === 'hierarchical' && ! isHierarchical ) ||
-		( type === 'terms' && ! hasTermsAssigned )
-	) {
-		let placeholderItems =
-			type === 'terms'
-				? [ __( 'Category' ) ]
-				: [ __( 'Ancestor' ), __( 'Parent' ) ];
-		placeholderItems = [
+	if ( ! postId || ! postType || ! postTypeObject?.hierarchical ) {
+		const placeholderItems = [
 			showHomeLink && __( 'Home' ),
-			...placeholderItems,
+			__( 'Ancestor' ),
+			__( 'Parent' ),
 		].filter( Boolean );
 		placeholder = (
 			<nav

@@ -613,12 +613,12 @@ The author name. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/pac
 
 ## Breadcrumbs
 
-Display a breadcrumb trail for Pages, hierarchical post types, or taxonomy terms. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-breadcrumbs))
+Display a breadcrumb trail only for Pages, or for hierarchical post types. The block is useful to insert in the Pages template. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-breadcrumbs))
 
 -	**Name:** core/post-breadcrumbs
 -	**Category:** theme
 -	**Supports:** color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** separator, showHomeLink, type
+-	**Attributes:** separator, showHomeLink
 
 ## Comment (deprecated)
 
