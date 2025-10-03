@@ -184,21 +184,21 @@ export default function TermTemplateEdit( {
 			// If `inherit` is truthy, adjust the query conditionally to create a better preview.
 			let currentTaxonomy = taxonomy;
 			if ( inherit ) {
+				if ( postId ) {
+					// If we're on a post, get only the terms for the current post.
+					queryArgs.post = postId;
+				}
 				if ( termId ) {
 					// If termId is already provided in context, use that as parent.
 					queryArgs.parent = termId;
 					// Also inherit the taxonomy from the current term.
 					currentTaxonomy = termData?.taxonomy || taxonomy;
 				} else {
+					// If we're inheriting but no termId is available in context, check if we're on a taxonomy archive.
 					const { templateType, templateQuery } =
 						getQueryContextFromTemplate( templateSlug );
 
-					if ( postId ) {
-						// If we're on a post, get only the terms for the current post.
-						queryArgs.post = postId;
-						// We already skipped the termId check so we remove the parent arg.
-						delete queryArgs.parent;
-					} else if ( templateType === 'taxonomy' && templateQuery ) {
+					if ( templateType === 'taxonomy' && templateQuery ) {
 						// Inherit taxonomy from taxonomy archive template slug.
 						currentTaxonomy = templateQuery;
 
