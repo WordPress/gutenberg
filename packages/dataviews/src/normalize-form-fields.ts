@@ -23,6 +23,20 @@ export const DEFAULT_LAYOUT: NormalizedLayout = {
 	labelPosition: 'top',
 };
 
+const normalizeCardSummaryField = (
+	sum: CardSummaryField
+): NormalizedCardSummaryField => {
+	if ( typeof sum === 'string' ) {
+		return [ { id: sum, visibility: 'when-collapsed' } ];
+	}
+	return sum.map( ( item ) => {
+		if ( typeof item === 'string' ) {
+			return { id: item, visibility: 'when-collapsed' };
+		}
+		return { id: item.id, visibility: item.visibility };
+	} );
+};
+
 /**
  * Normalizes a layout configuration based on its type.
  *
@@ -62,20 +76,6 @@ export function normalizeLayout( layout?: Layout ): NormalizedLayout {
 		} else {
 			const summary = layout.summary ?? [];
 
-			const normalizeSummary = (
-				sum: CardSummaryField
-			): NormalizedCardSummaryField => {
-				if ( typeof sum === 'string' ) {
-					return [ { id: sum, visibility: 'when-collapsed' } ];
-				}
-				return sum.map( ( item ) => {
-					if ( typeof item === 'string' ) {
-						return { id: item, visibility: 'when-collapsed' };
-					}
-					return { id: item.id, visibility: item.visibility };
-				} );
-			};
-
 			normalizedLayout = {
 				type: 'card',
 				withHeader: true,
@@ -83,7 +83,7 @@ export function normalizeLayout( layout?: Layout ): NormalizedLayout {
 					typeof layout.isOpened === 'boolean'
 						? layout.isOpened
 						: true,
-				summary: normalizeSummary( summary ),
+				summary: normalizeCardSummaryField( summary ),
 			} satisfies NormalizedCardLayout;
 		}
 	} else if ( layout?.type === 'row' ) {
