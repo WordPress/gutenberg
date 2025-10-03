@@ -15,7 +15,7 @@
 - DataViewsPicker: Hide the space reserved for the title when the title is hidden. [#71865](https://github.com/WordPress/gutenberg/pull/71865)
 
 ### Enhancements
-- DataForm: Disable empty `"Select item"` option in `ValidatedSelectControl` when the field is required. [#72042](https://github.com/WordPress/gutenberg/pull/72042)
+- DataForm: Disable empty `"Select item"` option in `ValidatedSelectControl` . [#72042](https://github.com/WordPress/gutenberg/pull/72042)
 
 - DataViews: Require at least one field to be visible. ([#71625](https://github.com/WordPress/gutenberg/pull/71625))
 - DataViews: Expose `DataViews.FiltersToggled` component to be used in free composition. [#71907](https://github.com/WordPress/gutenberg/pull/71907)
@@ -56,7 +56,6 @@
 - Revert the ability to hide the view config via `config` prop and export a `DataViews.Footer` component to support the "Minimal UI" story. [#71276](https://github.com/WordPress/gutenberg/pull/71276)
 
 ### Enhancements
-
 -   DataForm: add description support for the combined fields and show the description in the Card layout ([#71380](https://github.com/WordPress/gutenberg/pull/71380)).
 -   Add support for hiding the `title` in Grid layouts, with the actions menu rendered over the media preview. [#71369](https://github.com/WordPress/gutenberg/pull/71369)
 
