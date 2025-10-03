@@ -149,6 +149,123 @@ const formatDate = ( date?: Date | string ): string => {
 	return typeof date === 'string' ? date : format( date, 'yyyy-MM-dd' );
 };
 
+function ValidatedDateControl< Item >( {
+	value,
+	field,
+	data,
+	setValue,
+	inputRefs,
+	isTouched,
+	setIsTouched,
+	children,
+}: {
+	value: any;
+	field: any;
+	data: Item;
+	setValue: any;
+	inputRefs:
+		| React.RefObject< HTMLInputElement >
+		| React.RefObject< HTMLInputElement >[];
+	isTouched: boolean;
+	setIsTouched: ( touched: boolean ) => void;
+	children: React.ReactNode;
+} ) {
+	const [ customValidity, setCustomValidity ] = useState<
+		{ type: 'invalid'; message: string } | undefined
+	>( undefined );
+
+	const onValidate = useCallback(
+		( newValue: any ) => {
+			// Check custom validation (only if value exists)
+			if ( newValue ) {
+				const customMessage = field.isValid?.custom?.(
+					deepMerge(
+						data,
+						setValue( {
+							item: data,
+							value: newValue,
+						} ) as Partial< Item >
+					),
+					field
+				);
+
+				if ( customMessage ) {
+					setCustomValidity( {
+						type: 'invalid',
+						message: customMessage,
+					} );
+					return;
+				}
+			}
+
+			// Check HTML5 validity on all refs
+			const refs = Array.isArray( inputRefs ) ? inputRefs : [ inputRefs ];
+			for ( const ref of refs ) {
+				const input = ref.current;
+				if ( input && ! input.validity.valid ) {
+					setCustomValidity( {
+						type: 'invalid',
+						message: input.validationMessage,
+					} );
+					return;
+				}
+			}
+
+			// No errors
+			setCustomValidity( undefined );
+		},
+		[ data, field, setValue, inputRefs ]
+	);
+
+	useEffect( () => {
+		if ( isTouched ) {
+			const timeoutId = setTimeout( () => {
+				onValidate( value );
+			}, 0 );
+			return () => clearTimeout( timeoutId );
+		}
+	}, [ isTouched, value, onValidate ] );
+
+	const onBlur = ( event: React.FocusEvent< HTMLDivElement > ) => {
+		if ( isTouched ) {
+			return;
+		}
+
+		// Only consider "blurred from the component" if focus has fully left the wrapping div.
+		// This prevents unnecessary blurs from components with multiple focusable elements.
+		if (
+			! event.relatedTarget ||
+			! event.currentTarget.contains( event.relatedTarget )
+		) {
+			setIsTouched( true );
+		}
+	};
+
+	return (
+		<div onBlur={ onBlur }>
+			{ children }
+			<div aria-live="polite">
+				{ customValidity && (
+					<p
+						className={ clsx(
+							'components-validated-control__indicator',
+							'is-invalid'
+						) }
+					>
+						<Icon
+							className="components-validated-control__indicator-icon"
+							icon={ errorIcon }
+							size={ 16 }
+							fill="currentColor"
+						/>
+						{ customValidity.message }
+					</p>
+				) }
+			</div>
+		</div>
+	);
+}
+
 function CalendarDateControl< Item >( {
 	id,
 	value,
@@ -180,59 +297,7 @@ function CalendarDateControl< Item >( {
 	} );
 
 	const [ isTouched, setIsTouched ] = useState( false );
-	const [ customValidity, setCustomValidity ] = useState<
-		{ type: 'invalid'; message: string } | undefined
-	>( undefined );
 	const validityTargetRef = useRef< HTMLInputElement >( null );
-
-	const onValidate = useCallback(
-		( newValue: string | undefined ) => {
-			// Check custom validation (only if value exists)
-			if ( newValue ) {
-				const customMessage = field.isValid?.custom?.(
-					deepMerge(
-						data,
-						setValue( {
-							item: data,
-							value: newValue,
-						} ) as Partial< Item >
-					),
-					field
-				);
-
-				if ( customMessage ) {
-					setCustomValidity( {
-						type: 'invalid',
-						message: customMessage,
-					} );
-					return;
-				}
-			}
-
-			// Check HTML5 validity
-			const inputRef = validityTargetRef.current;
-			if ( inputRef && ! inputRef.validity.valid ) {
-				setCustomValidity( {
-					type: 'invalid',
-					message: inputRef.validationMessage,
-				} );
-				return;
-			}
-
-			// No errors
-			setCustomValidity( undefined );
-		},
-		[ data, field, setValue ]
-	);
-
-	useEffect( () => {
-		if ( isTouched ) {
-			const timeoutId = setTimeout( () => {
-				onValidate( value );
-			}, 0 );
-			return () => clearTimeout( timeoutId );
-		}
-	}, [ isTouched, value, onValidate ] );
 
 	const onSelectDate = useCallback(
 		( newDate: Date | undefined | null ) => {
@@ -279,23 +344,16 @@ function CalendarDateControl< Item >( {
 		l10n: { startOfWeek },
 	} = getSettings();
 
-	const onBlur = ( event: React.FocusEvent< HTMLDivElement > ) => {
-		if ( isTouched ) {
-			return;
-		}
-
-		// Only consider "blurred from the component" if focus has fully left the wrapping div.
-		// This prevents unnecessary blurs from components with multiple focusable elements.
-		if (
-			! event.relatedTarget ||
-			! event.currentTarget.contains( event.relatedTarget )
-		) {
-			setIsTouched( true );
-		}
-	};
-
 	return (
-		<div onBlur={ onBlur }>
+		<ValidatedDateControl
+			value={ value }
+			field={ field }
+			data={ data }
+			setValue={ setValue }
+			inputRefs={ validityTargetRef }
+			isTouched={ isTouched }
+			setIsTouched={ setIsTouched }
+		>
 			<BaseControl
 				__nextHasNoMarginBottom
 				id={ id }
@@ -361,25 +419,7 @@ function CalendarDateControl< Item >( {
 					/>
 				</VStack>
 			</BaseControl>
-			<div aria-live="polite">
-				{ customValidity && (
-					<p
-						className={ clsx(
-							'components-validated-control__indicator',
-							'is-invalid'
-						) }
-					>
-						<Icon
-							className="components-validated-control__indicator-icon"
-							icon={ errorIcon }
-							size={ 16 }
-							fill="currentColor"
-						/>
-						{ customValidity.message }
-					</p>
-				) }
-			</div>
-		</div>
+		</ValidatedDateControl>
 	);
 }
 
@@ -425,90 +465,8 @@ function CalendarDateRangeControl< Item >( {
 	} );
 
 	const [ isTouched, setIsTouched ] = useState( false );
-	const [ customValidity, setCustomValidity ] = useState<
-		{ type: 'invalid'; message: string } | undefined
-	>( undefined );
 	const fromInputRef = useRef< HTMLInputElement >( null );
 	const toInputRef = useRef< HTMLInputElement >( null );
-
-	const onValidate = useCallback(
-		( newValue: DateRange ) => {
-			// Check if required and either from or to is empty
-			if ( field.isValid?.required ) {
-				if ( ! newValue || ! newValue[ 0 ] || ! newValue[ 1 ] ) {
-					setCustomValidity( {
-						type: 'invalid',
-						message: __( 'This field is required.' ),
-					} );
-					return;
-				}
-			}
-
-			// Check validation (only if both dates exist)
-			if ( newValue && newValue[ 0 ] && newValue[ 1 ] ) {
-				const customMessage = field.isValid?.custom?.(
-					deepMerge(
-						data,
-						setValue( {
-							item: data,
-							value: newValue,
-						} ) as Partial< Item >
-					),
-					field
-				);
-
-				if ( customMessage ) {
-					setCustomValidity( {
-						type: 'invalid',
-						message: customMessage,
-					} );
-					return;
-				}
-
-				// Check HTML5 validity
-				const fromInput = fromInputRef.current;
-				if (
-					newValue &&
-					newValue[ 0 ] &&
-					fromInput &&
-					! fromInput.validity.valid
-				) {
-					setCustomValidity( {
-						type: 'invalid',
-						message: fromInput.validationMessage,
-					} );
-					return;
-				}
-
-				const toInput = toInputRef.current;
-				if (
-					newValue &&
-					newValue[ 1 ] &&
-					toInput &&
-					! toInput.validity.valid
-				) {
-					setCustomValidity( {
-						type: 'invalid',
-						message: toInput.validationMessage,
-					} );
-					return;
-				}
-			}
-
-			// No errors
-			setCustomValidity( undefined );
-		},
-		[ data, field, setValue ]
-	);
-
-	useEffect( () => {
-		if ( isTouched ) {
-			const timeoutId = setTimeout( () => {
-				onValidate( value );
-			}, 0 );
-			return () => clearTimeout( timeoutId );
-		}
-	}, [ isTouched, value, onValidate ] );
 
 	const updateDateRange = useCallback(
 		( fromDate?: Date | string, toDate?: Date | string ) => {
@@ -572,23 +530,16 @@ function CalendarDateRangeControl< Item >( {
 
 	const { timezone, l10n } = getSettings();
 
-	const onBlur = ( event: React.FocusEvent< HTMLDivElement > ) => {
-		if ( isTouched ) {
-			return;
-		}
-
-		// Only consider "blurred from the component" if focus has fully left the wrapping div.
-		// This prevents unnecessary blurs from components with multiple focusable elements.
-		if (
-			! event.relatedTarget ||
-			! event.currentTarget.contains( event.relatedTarget )
-		) {
-			setIsTouched( true );
-		}
-	};
-
 	return (
-		<div onBlur={ onBlur }>
+		<ValidatedDateControl
+			value={ value }
+			field={ field }
+			data={ data }
+			setValue={ setValue }
+			inputRefs={ [ fromInputRef, toInputRef ] }
+			isTouched={ isTouched }
+			setIsTouched={ setIsTouched }
+		>
 			<BaseControl
 				__nextHasNoMarginBottom
 				id={ id }
@@ -667,25 +618,7 @@ function CalendarDateRangeControl< Item >( {
 					/>
 				</VStack>
 			</BaseControl>
-			<div aria-live="polite">
-				{ customValidity && (
-					<p
-						className={ clsx(
-							'components-validated-control__indicator',
-							'is-invalid'
-						) }
-					>
-						<Icon
-							className="components-validated-control__indicator-icon"
-							icon={ errorIcon }
-							size={ 16 }
-							fill="currentColor"
-						/>
-						{ customValidity.message }
-					</p>
-				) }
-			</div>
-		</div>
+		</ValidatedDateControl>
 	);
 }
 
