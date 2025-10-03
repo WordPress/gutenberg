@@ -91,6 +91,29 @@ registerBlockType( metadata.name, {
 
 _See the [full block example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/minimal-block-ca6eda) of the [code above](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/minimal-block-ca6eda/src/index.js)_
 
+## PHP-only blocks with auto-registration
+
+For blocks that only need server-side rendering, you can register them exclusively in PHP using the [`auto_register`](/docs/reference-guides/block-api/block-supports.md#auto_register) flag and a `render_callback`. These blocks automatically appear in the editor without requiring any JavaScript code and use [dynamic rendering](/docs/getting-started/fundamentals/static-dynamic-rendering.md).
+
+```php
+register_block_type( 'my-plugin/server-block', array(
+	'render_callback' => function( $attributes ) {
+		$wrapper_attributes = get_block_wrapper_attributes();
+
+		return sprintf(
+			'<div %1$s>Server content</div>',
+			$wrapper_attributes
+		);
+	},
+	'supports' => array(
+		'auto_register' => true,
+		'color' => array(
+			'background' => true,
+		),
+	),
+) );
+```
+
 ## Additional resources
 
 - [`register_block_type` PHP function](https://developer.wordpress.org/reference/functions/register_block_type/)
