@@ -189,7 +189,7 @@ class Custom_WP_Posts_List_Table extends WP_Posts_List_Table {
 		_post_states( $post );
 
 		// This line is the only difference from the core code.
-		gutenberg_comment_avatars( $post );
+		gutenberg_comment_indicator_avatars( $post );
 
 		if ( isset( $parent_name ) ) {
 			$post_type_object = get_post_type_object( $post->post_type );
@@ -232,44 +232,43 @@ add_filter( 'wp_list_table_class_name', 'use_custom_posts_list_table' );
  * @param int $post The post object.
  * @return void
  */
-function gutenberg_comment_avatars( $post ) {
-	if ( gutenberg_check_post_type_supports_block_comments( $post->post_type ) ) {
-		$unresolved_comments = get_comments(
-			array(
-				'post_id'  => $post->ID,
-				'type'     => 'block_comment',
-				'status'   => 'hold',
-				'per_page' => 100,
-			)
-		);
+function gutenberg_comment_indicator_avatars( $post ) {
+	$unresolved_comments = get_comments(
+		array(
+			'post_id'  => $post->ID,
+			'type'     => 'block_comment',
+			'status'   => 'hold',
+			'per_page' => 100,
+		)
+	);
 
-		if ( count( $unresolved_comments ) > 0 ) {
-			$maxAvatars = 3;
-			$count = $maxAvatars;
-			echo "<div class='comment-avatar-stack' title='" . esc_attr__( 'This post has open discussions', 'gutenberg' ) . "'>";
-			foreach ( $unresolved_comments as $comment ) {
-				if ( $count-- <= 0 ) {
-					break;
-				}
-				$gravatar_params = array(
-					'size' => 18,
-					'',
-				);
-				$avatar_urls = get_avatar_url( $comment->user_id, $gravatar_params );
-				echo "<img class='comment-avatar' src='" . esc_url( $avatar_urls ) . "' />";
+	// Show indicator for any post with unresolved comments.
+	if ( count( $unresolved_comments ) > 0 ) {
+		$maxAvatars = 3;
+		$count = $maxAvatars;
+		echo "<div class='comment-avatar-stack' title='" . esc_attr__( 'This post has open discussions', 'gutenberg' ) . "'>";
+		foreach ( $unresolved_comments as $comment ) {
+			if ( $count-- <= 0 ) {
+				break;
 			}
-
-			// Add an overflow indicator if there are more avatars than the max.
-			if ( count( $unresolved_comments ) > $maxAvatars ) {
-				if ( count( $unresolved_comments ) >= 100 ) {
-					$overflow = '100+';
-				} else {
-					$overflow = "+" . ( count( $unresolved_comments ) - $maxAvatars );
-				}
-				echo "<span class='comment-avatar-overflow'> " . esc_html( $overflow ) . ' </span>';
-			}
-			echo '</div>';
+			$gravatar_params = array(
+				'size' => 18,
+				'',
+			);
+			$avatar_urls = get_avatar_url( $comment->user_id, $gravatar_params );
+			echo "<img class='comment-avatar' src='" . esc_url( $avatar_urls ) . "' />";
 		}
+
+		// Add an overflow indicator if there are more avatars than the max.
+		if ( count( $unresolved_comments ) > $maxAvatars ) {
+			if ( count( $unresolved_comments ) >= 100 ) {
+				$overflow = '100+';
+			} else {
+				$overflow = "+" . ( count( $unresolved_comments ) - $maxAvatars );
+			}
+			echo "<span class='comment-avatar-overflow'> " . esc_html( $overflow ) . ' </span>';
+		}
+		echo '</div>';
 	}
 }
 
