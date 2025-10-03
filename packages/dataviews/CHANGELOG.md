@@ -2,11 +2,12 @@
 
 ## Unreleased
 
+- DataForm: Add summary field support for both card and panel layouts. [#71576](https://github.com/WordPress/gutenberg/pull/71576)
+
 ### Features
 
 - Introduce a new `DataViewsPicker` component. [#70971](https://github.com/WordPress/gutenberg/pull/70971) and [#71836](https://github.com/WordPress/gutenberg/pull/71836).
 - DataForm: Add support for elements validation in array fields [#71194](https://github.com/WordPress/gutenberg/pull/71194)
-- DataForm: Add support for summary fields in card layouts, allowing display of condensed information in card headers. [#71576](https://github.com/WordPress/gutenberg/pull/71576)
 
 ### Bug Fixes
 
