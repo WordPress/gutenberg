@@ -138,9 +138,13 @@ class Custom_WP_Posts_List_Table extends WP_Posts_List_Table {
 			// Add an overflow indicator if there are more avatars than the max.
 			if ( count( $unresolved_comments ) > $maxAvatars ) {
 				if ( count( $unresolved_comments ) >= 100 ) {
-					$overflow = '100+';
+					$overflow = __( '100+', 'gutenberg' );
 				} else {
-					$overflow = "+" . ( count( $unresolved_comments ) - $maxAvatars );
+					$overflow = sprintf(
+						// translators: %s: Number of participants.
+						__( '+%s', 'gutenberg' ),
+						count( $unresolved_comments ) - $max_avatars
+					);
 				}
 				echo "<span class='comment-avatar-overflow'> " . esc_html( $overflow ) . ' </span>';
 			}
