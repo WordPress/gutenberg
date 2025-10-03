@@ -128,7 +128,7 @@ require_once __DIR__ . '/class-custom-wp-posts-list-table.php';
  * @param string $class_name The original class name.
  * @return string The modified class name.
  */
-function use_custom_posts_list_table( $class_name ) {
+function gutenberg_use_custom_posts_list_table( $class_name ) {
 	if ( 'WP_Posts_List_Table' === $class_name  ) {
 		return 'Custom_WP_Posts_List_Table';
 	}
