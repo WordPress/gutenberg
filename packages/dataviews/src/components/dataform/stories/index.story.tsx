@@ -1067,14 +1067,6 @@ const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 			type: 'integer',
 		},
 		{
-			id: 'customer-summary',
-			type: 'text',
-			readOnly: true,
-			render: ( { item } ) => {
-				return <Badge>{ item.email }</Badge>;
-			},
-		},
-		{
 			id: 'plan-summary',
 			type: 'text',
 			readOnly: true,
@@ -1105,10 +1097,7 @@ const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 			layout: getLayoutFromStoryArgs( {
 				type: 'card',
 				withHeader,
-				summary: [
-					{ id: 'customer-summary', visibility: 'always' },
-					{ id: 'plan-summary', visibility: 'when-collapsed' },
-				],
+				summary: 'plan-summary',
 			} ),
 			fields: [
 				{
