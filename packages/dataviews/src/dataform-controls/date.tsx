@@ -224,6 +224,7 @@ function ValidatedDateControl< Item >( {
 			}, 0 );
 			return () => clearTimeout( timeoutId );
 		}
+		return undefined;
 	}, [ isTouched, value, onValidate ] );
 
 	const onBlur = ( event: React.FocusEvent< HTMLDivElement > ) => {
