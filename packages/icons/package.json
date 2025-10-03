@@ -38,6 +38,7 @@
 		"access": "public"
 	},
 	"scripts": {
+		"prelint": "npm run build",
 		"build": "node bin/generate-library",
 		"clean": "git clean -Xfq src/library"
 	}

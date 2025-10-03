@@ -101,7 +101,7 @@ async function generateIndex() {
 		file.endsWith( '.tsx' )
 	);
 
-	const indexTemplate = tsxFiles
+	let indexTemplate = tsxFiles
 		.map( ( file ) => {
 			const importPath = path.basename( file, '.tsx' );
 
@@ -113,6 +113,9 @@ async function generateIndex() {
 			return `export { default as ${ identifier } } from './${ importPath }';`;
 		} )
 		.join( '\n' );
+
+	// Trailing newlines make ESLint happy
+	indexTemplate += '\n';
 
 	await writeFile( path.join( ICON_LIBRARY_DIR, 'index.ts' ), indexTemplate );
 }
@@ -171,7 +174,8 @@ function svgToTsx( svgContent ) {
 		.map( ( line ) => '\t' + line )
 		.join( '\n' );
 
-	return `/**
+	return `/* eslint-disable prettier/prettier */
+/**
  * WordPress dependencies
  */
 import { ${ Array.from( usedPrimitives )
@@ -181,6 +185,7 @@ import { ${ Array.from( usedPrimitives )
 export default (
 ${ jsxContent }
 );
+/* eslint-enable */
 `;
 }
 
