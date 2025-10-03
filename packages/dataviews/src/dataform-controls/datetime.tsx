@@ -1,20 +1,20 @@
 /**
+ * External dependencies
+ */
+import deepMerge from 'deepmerge';
+import { format, isValid } from 'date-fns';
+
+/**
  * WordPress dependencies
  */
 import {
 	BaseControl,
 	privateApis as componentsPrivateApis,
-	__experimentalInputControl as InputControl,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useCallback, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getDate, getSettings } from '@wordpress/date';
-
-/**
- * External dependencies
- */
-import { format, isValid } from 'date-fns';
 
 /**
  * Internal dependencies
@@ -27,7 +27,7 @@ import RelativeDateControl, {
 } from './relative-date-control';
 import { unlock } from '../lock-unlock';
 
-const { DateCalendar } = unlock( componentsPrivateApis );
+const { DateCalendar, ValidatedInputControl } = unlock( componentsPrivateApis );
 
 const parseDateTime = ( dateTimeString?: string ): Date | null => {
 	if ( ! dateTimeString ) {
@@ -48,13 +48,16 @@ const formatDateTime = ( date?: Date | string ): string => {
 	return format( date, "yyyy-MM-dd'T'HH:mm" );
 };
 
-function CalendarDateTimeControl( {
+function CalendarDateTimeControl< Item >( {
 	id,
 	value,
 	onChange,
 	label,
 	description,
 	hideLabelFromVision,
+	data,
+	field,
+	setValue,
 }: {
 	id: string;
 	value: string | undefined;
@@ -62,11 +65,47 @@ function CalendarDateTimeControl( {
 	label: string;
 	description?: string;
 	hideLabelFromVision?: boolean;
+	data: Item;
+	field: any;
+	setValue: any;
 } ) {
 	const [ calendarMonth, setCalendarMonth ] = useState< Date >( () => {
 		const parsedDate = parseDateTime( value );
 		return parsedDate || new Date(); // Default to current month
 	} );
+
+	const [ customValidity, setCustomValidity ] =
+		useState<
+			React.ComponentProps<
+				typeof ValidatedInputControl
+			>[ 'customValidity' ]
+		>( undefined );
+
+	const onValidateControl = useCallback(
+		( newValue: any ) => {
+			const message = field.isValid?.custom?.(
+				deepMerge(
+					data,
+					setValue( {
+						item: data,
+						value: newValue,
+					} ) as Partial< Item >
+				),
+				field
+			);
+
+			if ( message ) {
+				setCustomValidity( {
+					type: 'invalid',
+					message,
+				} );
+				return;
+			}
+
+			setCustomValidity( undefined );
+		},
+		[ data, field, setValue ]
+	);
 
 	const onSelectDate = useCallback(
 		( newDate: Date | undefined | null ) => {
@@ -88,11 +127,13 @@ function CalendarDateTimeControl( {
 
 				const dateTimeValue = finalDateTime.toISOString();
 				onChange( dateTimeValue );
+				onValidateControl( dateTimeValue );
 			} else {
 				onChange( undefined );
+				onValidateControl( undefined );
 			}
 		},
-		[ onChange, value ]
+		[ onChange, value, onValidateControl ]
 	);
 
 	const handleManualDateTimeChange = useCallback(
@@ -141,8 +182,11 @@ function CalendarDateTimeControl( {
 					weekStartsOn={ startOfWeek }
 				/>
 				{ /* Manual datetime input */ }
-				<InputControl
+				<ValidatedInputControl
 					__next40pxDefaultSize
+					required={ !! field.isValid?.required }
+					onValidate={ onValidateControl }
+					customValidity={ customValidity }
 					type="datetime-local"
 					label={ __( 'Date time' ) }
 					hideLabelFromVision
@@ -204,6 +248,9 @@ export default function DateTime< Item >( {
 			label={ label }
 			description={ description }
 			hideLabelFromVision={ hideLabelFromVision }
+			data={ data }
+			field={ field }
+			setValue={ setValue }
 		/>
 	);
 }

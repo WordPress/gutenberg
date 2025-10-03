@@ -545,6 +545,27 @@ const ValidationComponent = ( {
 	custom: boolean;
 	type: 'regular' | 'panel';
 } ) => {
+	type ValidatedItem = {
+		text: string;
+		select?: string;
+		textWithRadio?: string;
+		textarea: string;
+		email: string;
+		telephone: string;
+		url: string;
+		color: string;
+		integer: number;
+		number: number;
+		boolean: boolean;
+		customEdit: string;
+		categories: string[];
+		countries: string[];
+		password: string;
+		toggle?: boolean;
+		toggleGroup?: string;
+		datetime?: string;
+	};
+
 	const [ post, setPost ] = useState< ValidatedItem >( {
 		text: 'Can have letters and spaces',
 		select: undefined,
@@ -565,6 +586,7 @@ const ValidationComponent = ( {
 		toggleGroup: undefined,
 		date: undefined,
 		dateRange: undefined,
+		datetime: undefined,
 	} );
 
 	const customTextRule = ( value: ValidatedItem ) => {
@@ -684,6 +706,18 @@ const ValidationComponent = ( {
 		today.setHours( 0, 0, 0, 0 );
 		if ( selectedDate < today ) {
 			return 'Date must not be in the past.';
+		}
+
+		return null;
+	};
+	const customDateTimeRule = ( value: ValidatedItem ) => {
+		if ( ! value.datetime ) {
+			return null;
+		}
+		const selectedDateTime = new Date( value.datetime );
+		const now = new Date();
+		if ( selectedDateTime < now ) {
+			return 'Date and time must not be in the past.';
 		}
 
 		return null;
@@ -920,6 +954,15 @@ const ValidationComponent = ( {
 				custom: maybeCustomRule( customDateRangeRule ),
 			},
 		},
+		{
+			id: 'datetime',
+			type: 'datetime',
+			label: 'Date Time',
+			isValid: {
+				required,
+				custom: maybeCustomRule( customDateTimeRule ),
+			},
+		},
 	];
 
 	const form = {
@@ -944,6 +987,7 @@ const ValidationComponent = ( {
 			'customEdit',
 			'date',
 			'dateRange',
+			'datetime',
 		],
 	};
 
