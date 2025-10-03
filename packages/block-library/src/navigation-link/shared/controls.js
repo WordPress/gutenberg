@@ -165,18 +165,12 @@ export function Controls( {
 						setIsEditingControl( false );
 					} }
 					help={
-						hasUrlBinding &&
-						( () => {
-							const entityType = getEntityTypeName(
-								attributes.type,
-								attributes.kind
-							);
-							return sprintf(
-								/* translators: %s is the entity type (e.g., "page", "post", "category") */
-								__( 'Synced with the selected %s.' ),
-								entityType
-							);
-						} )()
+						hasUrlBinding && (
+							<BindingHelpText
+								type={ attributes.type }
+								kind={ attributes.kind }
+							/>
+						)
 					}
 					suffix={
 						hasUrlBinding && (
@@ -249,5 +243,22 @@ export function Controls( {
 				/>
 			</ToolsPanelItem>
 		</ToolsPanel>
+	);
+}
+
+/**
+ * Component to display help text for bound URL attributes.
+ *
+ * @param {Object} props      - Component props
+ * @param {string} props.type - The entity type
+ * @param {string} props.kind - The entity kind
+ * @return {string} Help text for the bound URL
+ */
+function BindingHelpText( { type, kind } ) {
+	const entityType = getEntityTypeName( type, kind );
+	return sprintf(
+		/* translators: %s is the entity type (e.g., "page", "post", "category") */
+		__( 'Synced with the selected %s.' ),
+		entityType
 	);
 }

@@ -207,4 +207,91 @@ describe( 'Controls', () => {
 			opensInNewTab: true,
 		} );
 	} );
+
+	describe( 'URL binding help text', () => {
+		it( 'shows help text when URL is bound to an entity', () => {
+			const propsWithBinding = {
+				...defaultProps,
+				attributes: {
+					...defaultProps.attributes,
+					type: 'page',
+					kind: 'post-type',
+				},
+				hasUrlBinding: true,
+			};
+
+			render( <Controls { ...propsWithBinding } /> );
+
+			expect(
+				screen.getByText( 'Synced with the selected page.' )
+			).toBeInTheDocument();
+		} );
+
+		it( 'shows help text for different entity types', () => {
+			const propsWithCategoryBinding = {
+				...defaultProps,
+				attributes: {
+					...defaultProps.attributes,
+					type: 'category',
+					kind: 'taxonomy',
+				},
+				hasUrlBinding: true,
+			};
+
+			render( <Controls { ...propsWithCategoryBinding } /> );
+
+			expect(
+				screen.getByText( 'Synced with the selected category.' )
+			).toBeInTheDocument();
+		} );
+
+		it( 'does not show help text when URL is not bound', () => {
+			const propsWithoutBinding = {
+				...defaultProps,
+				hasUrlBinding: false,
+			};
+
+			render( <Controls { ...propsWithoutBinding } /> );
+
+			expect(
+				screen.queryByText( /Synced with the selected/ )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'shows help text for post entity type', () => {
+			const propsWithPostBinding = {
+				...defaultProps,
+				attributes: {
+					...defaultProps.attributes,
+					type: 'post',
+					kind: 'post-type',
+				},
+				hasUrlBinding: true,
+			};
+
+			render( <Controls { ...propsWithPostBinding } /> );
+
+			expect(
+				screen.getByText( 'Synced with the selected post.' )
+			).toBeInTheDocument();
+		} );
+
+		it( 'shows help text for tag entity type', () => {
+			const propsWithTagBinding = {
+				...defaultProps,
+				attributes: {
+					...defaultProps.attributes,
+					type: 'tag',
+					kind: 'taxonomy',
+				},
+				hasUrlBinding: true,
+			};
+
+			render( <Controls { ...propsWithTagBinding } /> );
+
+			expect(
+				screen.getByText( 'Synced with the selected tag.' )
+			).toBeInTheDocument();
+		} );
+	} );
 } );
