@@ -299,8 +299,6 @@ function CommentBoardWrapper( {
 export default function CollabSidebar() {
 	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
 	const [ activeComment, setActiveComment ] = useState( null );
-	const [ isNewComment, setIsNewComment ] = useState( false );
-
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const isLargeViewport = useViewportMatch( 'xlarge' );
@@ -357,9 +355,6 @@ export default function CollabSidebar() {
 	useEffect( () => {
 		if ( activeComment !== blockCommentId ) {
 			setActiveComment( null );
-		}
-		if ( isNewComment ) {
-			setIsNewComment( false );
 		}
 	}, [ selectedBlockClientId ] );
 
