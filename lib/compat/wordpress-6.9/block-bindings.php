@@ -18,6 +18,9 @@ add_filter(
 		if ( 'core/post-date' === $block_type && ! in_array( 'datetime', $attributes, true ) ) {
 			$attributes[] = 'datetime';
 		}
+		if ( 'core/cover' === $block_type && ! in_array( 'url', $attributes, true ) ) {
+			$attributes[] = 'url';
+		}
 		return $attributes;
 	},
 	10,

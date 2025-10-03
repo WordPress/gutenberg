@@ -47,6 +47,7 @@ export default function save( { attributes } ) {
 		tagName: Tag,
 		sizeSlug,
 		poster,
+		metadata: { bindings = {} } = {},
 	} = attributes;
 	const overlayColorClass = getColorClassName(
 		'background-color',
@@ -109,7 +110,7 @@ export default function save( { attributes } ) {
 		<Tag { ...useBlockProps.save( { className: classes, style } ) }>
 			{ ! useFeaturedImage &&
 				isImageBackground &&
-				url &&
+				( url || bindings?.url ) &&
 				( isImgElement ? (
 					<img
 						className={ imgClasses }
@@ -127,7 +128,7 @@ export default function save( { attributes } ) {
 						style={ { backgroundPosition, backgroundImage } }
 					/>
 				) ) }
-			{ isVideoBackground && url && (
+			{ isVideoBackground && ( url || bindings?.url ) && (
 				<video
 					className={ clsx(
 						'wp-block-cover__video-background',

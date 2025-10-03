@@ -9,6 +9,9 @@
 	"attributes": {
 		"url": {
 			"type": "string",
+			"source": "attribute",
+			"selector": "img",
+			"attribute": "src",
 			"role": "content"
 		},
 		"useFeaturedImage": {
