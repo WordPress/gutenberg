@@ -83,6 +83,9 @@ store( 'directive-each', {
 				isbn: '9780553573428',
 			},
 		],
+		get bookItem() {
+			return getContext().bookItem;
+		},
 	},
 	actions: {
 		removeBook() {
@@ -112,6 +115,9 @@ store( 'directive-each', {
 		modifyBook() {
 			const [ book ] = state.books;
 			book.title = book.title.toUpperCase();
+		},
+		replaceAllBooks() {
+			state.books = state.books.map( ( book ) => ( { ...book } ) );
 		},
 	},
 } );
