@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking changes
+
+- DataForm: Add summary field support for both card and panel layouts. The `summary` property has been moved from the field level to the layout level, and so fields using `summary` at the field level must now configure it within the `layout` object. Additionally, the first children will only be used as summary for the panel if 1) there is no `layout.summary` and 2) the form field ID doesn't match any existing field. See README for details. [#71576](https://github.com/WordPress/gutenberg/pull/71576)
+
 ## 9.1.0 (2025-10-01)
 
 ### Features

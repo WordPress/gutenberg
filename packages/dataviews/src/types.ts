@@ -790,6 +790,9 @@ export interface SupportedLayouts {
 export type LayoutType = 'regular' | 'panel' | 'card' | 'row';
 export type LabelPosition = 'top' | 'side' | 'none';
 
+export type PanelSummaryField = string | string[];
+export type NormalizedPanelSummaryField = string[];
+
 export type RegularLayout = {
 	type: 'regular';
 	labelPosition?: LabelPosition;
@@ -803,12 +806,29 @@ export type PanelLayout = {
 	type: 'panel';
 	labelPosition?: LabelPosition;
 	openAs?: 'dropdown' | 'modal';
+	summary?: PanelSummaryField;
 };
 export type NormalizedPanelLayout = {
 	type: 'panel';
 	labelPosition: LabelPosition;
 	openAs: 'dropdown' | 'modal';
+	summary: NormalizedPanelSummaryField;
 };
+
+export type CardSummaryField =
+	| PanelSummaryField // Basic usage: string or string[]
+	| Array<
+			| string
+			| {
+					id: string;
+					visibility: 'always' | 'when-collapsed';
+			  }
+	  >;
+
+export type NormalizedCardSummaryField = Array< {
+	id: string;
+	visibility: 'always' | 'when-collapsed';
+} >;
 
 export type CardLayout =
 	| {
@@ -822,6 +842,7 @@ export type CardLayout =
 			type: 'card';
 			withHeader?: true | undefined;
 			isOpened?: boolean;
+			summary?: CardSummaryField;
 	  };
 export type NormalizedCardLayout =
 	| {
@@ -830,11 +851,14 @@ export type NormalizedCardLayout =
 			// isOpened cannot be false if withHeader is false as well.
 			// Otherwise, the card would not be visible.
 			isOpened: true;
+			// Summary is an empty array
+			summary: [];
 	  }
 	| {
 			type: 'card';
 			withHeader: true;
 			isOpened: boolean;
+			summary: NormalizedCardSummaryField;
 	  };
 
 export type RowLayout = {
@@ -853,6 +877,10 @@ export type NormalizedLayout =
 	| NormalizedCardLayout
 	| NormalizedRowLayout;
 
+export type NormalizedSummaryField =
+	| NormalizedPanelSummaryField
+	| NormalizedCardSummaryField;
+
 export type SimpleFormField = {
 	id: string;
 	layout?: Layout;
@@ -864,7 +892,6 @@ export type CombinedFormField = {
 	description?: string;
 	layout?: Layout;
 	children: Array< FormField | string >;
-	summary?: string | string[];
 };
 
 export type FormField = SimpleFormField | CombinedFormField;

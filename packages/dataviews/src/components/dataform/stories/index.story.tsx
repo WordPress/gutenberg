@@ -29,7 +29,7 @@ import type {
 } from '../../../types';
 import { unlock } from '../../../lock-unlock';
 
-const { ValidatedTextControl } = unlock( privateApis );
+const { ValidatedTextControl, Badge } = unlock( privateApis );
 
 type SamplePost = {
 	title: string;
@@ -431,7 +431,6 @@ const LayoutPanelComponent = ( {
 					id: 'discussion',
 					label: 'Discussion',
 					children: [ 'comment_status', 'ping_status' ],
-					summary: 'discussion',
 				},
 				{
 					id: 'address1',
@@ -447,13 +446,19 @@ const LayoutPanelComponent = ( {
 						'flight_status',
 						'gate',
 					],
-					summary: [ 'origin', 'destination', 'flight_status' ],
+					layout: {
+						type: 'panel',
+						summary: [ 'origin', 'destination', 'flight_status' ],
+					},
 				},
 				{
 					id: 'passenger_details',
 					label: 'Passenger Details',
 					children: [ 'author', 'seat' ],
-					summary: [ 'author', 'seat' ],
+					layout: {
+						type: 'panel',
+						summary: [ 'author', 'seat' ],
+					},
 				},
 			],
 		};
@@ -999,6 +1004,7 @@ const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 		hasVat: boolean;
 		vat: number;
 		commission: number;
+		dueDate: string;
 	};
 
 	const customerFields: Field< Customer >[] = [
@@ -1070,6 +1076,22 @@ const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 			label: 'Commission',
 			type: 'integer',
 		},
+		{
+			id: 'dueDate',
+			label: 'Due Date',
+			type: 'text',
+			render: ( { item } ) => {
+				return <Badge>Due on: { item.dueDate }</Badge>;
+			},
+		},
+		{
+			id: 'plan-summary',
+			type: 'text',
+			readOnly: true,
+			render: ( { item } ) => {
+				return <Badge>{ item.plan }</Badge>;
+			},
+		},
 	];
 
 	const [ customer, setCustomer ] = useState< Customer >( {
@@ -1086,6 +1108,7 @@ const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 		hasVat: true,
 		vat: 10,
 		commission: 5,
+		dueDate: 'March 1st, 2028',
 	} );
 
 	const form: Form = useMemo(
@@ -1097,6 +1120,7 @@ const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 			fields: [
 				{
 					id: 'customerCard',
+					layout: { type: 'card', summary: 'plan-summary' },
 					label: 'Customer',
 					description:
 						'Enter your contact details, plan type, and addresses to complete your customer information.',
@@ -1104,7 +1128,10 @@ const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 						{
 							id: 'customerContact',
 							label: 'Contact',
-							layout: { type: 'panel', labelPosition: 'top' },
+							layout: {
+								type: 'panel',
+								labelPosition: 'top',
+							},
 							children: [
 								{
 									id: 'name',
@@ -1157,6 +1184,7 @@ const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 					layout: {
 						type: 'card',
 						isOpened: false,
+						summary: [ { id: 'dueDate', visibility: 'always' } ],
 					},
 					children: [ 'vat', 'commission' ],
 				},

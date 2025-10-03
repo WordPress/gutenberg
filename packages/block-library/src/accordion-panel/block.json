@@ -46,7 +46,6 @@
 			}
 		},
 		"shadow": true,
-		"layout": true,
 		"blockVisibility": false
 	},
 	"attributes": {

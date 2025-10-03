@@ -36,7 +36,7 @@ Displays a section of content in an accordion, including a heading and expandabl
 -	**Category:** design
 -	**Parent:** core/accordion
 -	**Allowed Blocks:** core/accordion-heading, core/accordion-panel
--	**Supports:** color (background, gradients, text), interactivity, layout, shadow, spacing (blockGap, margin), typography (fontSize, lineHeight)
+-	**Supports:** color (background, gradients, text), interactivity, shadow, spacing (blockGap, margin), typography (fontSize, lineHeight)
 -	**Attributes:** openByDefault
 
 ## Accordion Panel
@@ -46,7 +46,7 @@ Displays an accordion panel. ([Source](https://github.com/WordPress/gutenberg/tr
 -	**Name:** core/accordion-panel
 -	**Category:** design
 -	**Parent:** core/accordion-item
--	**Supports:** color (background, gradients, text), interactivity, layout, shadow, spacing (blockGap, padding), typography (fontSize, lineHeight), ~~blockVisibility~~
+-	**Supports:** color (background, gradients, text), interactivity, shadow, spacing (blockGap, padding), typography (fontSize, lineHeight), ~~blockVisibility~~
 -	**Attributes:** allowedBlocks, isSelected, openByDefault, templateLock
 
 ## Archives
@@ -82,7 +82,7 @@ Reuse this design across your site. ([Source](https://github.com/WordPress/guten
 
 -	**Name:** core/block
 -	**Category:** reusable
--	**Supports:** interactivity (clientNavigation), ~~blockVisibility~~, ~~customClassName~~, ~~html~~, ~~inserter~~, ~~renaming~~
+-	**Supports:** interactivity (clientNavigation), ~~customClassName~~, ~~html~~, ~~inserter~~, ~~renaming~~
 -	**Attributes:** content, ref
 
 ## Button
@@ -717,7 +717,6 @@ Post terms. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages
 Show minutes required to finish reading the post. Can also show a word count. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-time-to-read))
 
 -	**Name:** core/post-time-to-read
--	**Experimental:** true
 -	**Category:** theme
 -	**Supports:** color (background, gradients, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** averageReadingSpeed, displayAsRange, displayMode, textAlign
@@ -971,7 +970,7 @@ Edit the different global regions of your site, like the header, footer, sidebar
 
 -	**Name:** core/template-part
 -	**Category:** theme
--	**Supports:** align, interactivity (clientNavigation), ~~blockVisibility~~, ~~html~~, ~~renaming~~, ~~reusable~~
+-	**Supports:** align, interactivity (clientNavigation), ~~html~~, ~~renaming~~, ~~reusable~~
 -	**Attributes:** area, slug, tagName, theme
 
 ## Term Description
