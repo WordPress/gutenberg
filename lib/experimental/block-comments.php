@@ -119,6 +119,11 @@ if ( ! class_exists( 'WP_Posts_List_Table' ) ) {
 		require_once ABSPATH . 'wp-admin/includes/class-wp-posts-list-table.php';
 }
 
+/**
+ * Custom posts list table class to add avatar indicators for posts with open block comments.
+ *
+ * Extends the core class with only one line changes in the column_title method.
+ */
 class Custom_WP_Posts_List_Table extends WP_Posts_List_Table {
 	public function column_title( $post ) {
 		// This code is copied from WP_Posts_List_Table and modified to add the avatar images.
@@ -218,6 +223,12 @@ class Custom_WP_Posts_List_Table extends WP_Posts_List_Table {
 	}
 }
 
+/**
+ * Use the custom posts list table class.
+ *
+ * @param string $class_name The original class name.
+ * @return string The modified class name.
+ */
 function use_custom_posts_list_table( $class_name ) {
 	if ( 'WP_Posts_List_Table' === $class_name  ) {
 		return 'Custom_WP_Posts_List_Table';
