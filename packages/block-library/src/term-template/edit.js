@@ -144,6 +144,7 @@ export default function TermTemplateEdit( {
 			exclude,
 			hideEmpty = true,
 			inherit,
+			context: inheritContext,
 			pages,
 			parent = 0,
 			// Gather extra query args to pass to the REST API call.
@@ -184,7 +185,7 @@ export default function TermTemplateEdit( {
 			// If `inherit` is truthy, adjust the query conditionally to create a better preview.
 			let currentTaxonomy = taxonomy;
 			if ( inherit ) {
-				if ( postId ) {
+				if ( inheritContext === 'post' && postId ) {
 					// If we're on a post, get only the terms for the current post.
 					queryArgs.post = postId;
 				}
@@ -193,7 +194,7 @@ export default function TermTemplateEdit( {
 					queryArgs.parent = termId;
 					// Also inherit the taxonomy from the current term.
 					currentTaxonomy = termData?.taxonomy || taxonomy;
-				} else {
+				} else if ( inheritContext === 'taxonomy_archive' ) {
 					// If we're inheriting but no termId is available in context, check if we're on a taxonomy archive.
 					const { templateType, templateQuery } =
 						getQueryContextFromTemplate( templateSlug );

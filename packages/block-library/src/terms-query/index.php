@@ -27,10 +27,22 @@ function render_block_core_terms_query( $attributes, $content, $block ) {
 
 	if ( $inherit ) {
 		if ( isset( $block->context['termQuery'] ) ) {
+			// Inherit taxonomy from context if available.
 			$query_context['taxonomy'] = $block->context['termQuery']['taxonomy'] ?? $query_context['taxonomy'] ?? 'category';
+			// Inherit query context.
+			$query_context['context'] = $block->context['termQuery']['context'] ?? $query_context['context'] ?? '';
 		}
 		if ( isset( $block->context['termId'] ) ) {
 			$query_context['parent'] = $block->context['termId'] ?? $query_context['parent'] ?? 0;
+		}
+
+		// If this is the top-level query, set the termQuery context value based on whether inheritance is from a post or taxonomy archive.
+		if ( ! isset( $block->context['termQuery'] ) ) {
+			if ( isset( $block->context['postId'] ) || is_single() ) {
+				$query_context['context'] = 'post';
+			} elseif ( is_tax() ) {
+				$query_context['context'] = 'taxonomy_archive';
+			}
 		}
 	}
 

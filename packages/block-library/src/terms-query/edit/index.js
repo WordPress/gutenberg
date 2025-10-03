@@ -3,7 +3,7 @@
  */
 import { useDispatch } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
-import { useCallback, useEffect } from '@wordpress/element';
+import { useCallback, useEffect, useMemo } from '@wordpress/element';
 import {
 	BlockContextProvider,
 	useBlockProps,
@@ -33,12 +33,14 @@ export default function TermsQueryEdit( props ) {
 		parent: initialParent,
 	} = termQuery;
 	const {
-		termQuery: queryContext = {},
+		postId,
+		termQuery: queryContext,
 		taxonomy: contextTaxonomy,
 		termId: termIdContext,
 		templateSlug,
 	} = context;
-	const { taxonomy: queryContextTaxonomy } = queryContext;
+	const { taxonomy: queryContextTaxonomy, context: queryContextContext } =
+		queryContext || {};
 
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
@@ -51,34 +53,71 @@ export default function TermsQueryEdit( props ) {
 	// Maybe inherit parent from parent query.
 	const parent = inherit ? termIdContext : initialParent || 0;
 
-	// Maybe inherit taxonomy from parent query.
-	let taxonomy = inherit
-		? contextTaxonomy || queryContextTaxonomy || initialTaxonomy
-		: initialTaxonomy || FALLBACK_TAXONOMY;
-
-	// If there is still no taxonomy, see if we can get one from the template.
-	if ( ! taxonomy && templateSlug ) {
+	const { taxonomy, inheritContext } = useMemo( () => {
 		const { templateType, templateQuery } =
 			getQueryContextFromTemplate( templateSlug );
 
-		if ( templateType === 'taxonomy' && templateQuery ) {
-			taxonomy = templateQuery;
+		let _inheritContext = queryContextContext || '';
+		if ( ! _inheritContext && ! queryContext && inherit ) {
+			if (
+				postId ||
+				templateType === 'single' ||
+				templateType === 'page'
+			) {
+				_inheritContext = 'post';
+			} else if ( templateType === 'taxonomy' || termIdContext ) {
+				_inheritContext = 'taxonomy_archive';
+			}
 		}
-	}
 
-	// As a last resort, use the fallback taxonomy.
-	if ( ! taxonomy ) {
-		taxonomy = FALLBACK_TAXONOMY;
-	}
+		// Maybe inherit taxonomy from parent query.
+		let _taxonomy = inherit
+			? contextTaxonomy || queryContextTaxonomy || initialTaxonomy
+			: initialTaxonomy || FALLBACK_TAXONOMY;
+
+		// If there is still no taxonomy, see if we can get one from the template.
+		if ( ! _taxonomy && templateSlug ) {
+			if ( templateType === 'taxonomy' && templateQuery ) {
+				_taxonomy = templateQuery;
+			}
+		}
+
+		// As a last resort, use the fallback taxonomy.
+		if ( ! _taxonomy ) {
+			_taxonomy = FALLBACK_TAXONOMY;
+		}
+
+		return {
+			taxonomy: _taxonomy,
+			inheritContext: _inheritContext,
+		};
+	}, [
+		contextTaxonomy,
+		queryContext,
+		queryContextContext,
+		queryContextTaxonomy,
+		inherit,
+		initialTaxonomy,
+		templateSlug,
+		postId,
+		termIdContext,
+	] );
 
 	/**
 	 * The termQuery context is not declared in the block.json file's
 	 * `providesContext` property so that we can control the value without
 	 * being beholden to the block's attribute value, which could be empty.
 	 */
-	const termQueryContextObject = {
-		termQuery: { ...termQuery, parent, taxonomy },
-	};
+	const termQueryContextObject = useMemo( () => {
+		return {
+			termQuery: {
+				...termQuery,
+				parent,
+				taxonomy,
+				context: inheritContext,
+			},
+		};
+	}, [ termQuery, parent, taxonomy, inheritContext ] );
 
 	const setQuery = useCallback(
 		( newQuery ) => {

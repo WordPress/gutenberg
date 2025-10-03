@@ -27,11 +27,15 @@ function render_block_core_term_template( $attributes, $content, $block ) {
 	$inherit = isset( $block->context['termQuery']['inherit'] ) ? $block->context['termQuery']['inherit'] : isset( $block->context['termId'] );
 
 	if ( $inherit ) {
+		$query_context = $block->context['termQuery']['context'] ?? '';
 		// Get the parent term ID from the block context. This is needed if rendering a nested query whether inheriting from a post or taxonomy archive.
 		$parent_term_id = isset( $block->context['termId'] ) ? $block->context['termId'] : null;
 		if ( $parent_term_id && $parent_term_id > 0 ) {
 			$query_args['parent'] = $parent_term_id;
-		} elseif ( is_tax( $query_args['taxonomy'] ) ) {
+		} elseif (
+			'taxonomy_archive' === $query_context
+			&& is_tax( $query_args['taxonomy'] )
+		) {
 			// Get the current term ID from the queried object.
 			$current_term_id = get_queried_object_id();
 			if ( $current_term_id && $current_term_id > 0 ) {
@@ -41,7 +45,7 @@ function render_block_core_term_template( $attributes, $content, $block ) {
 
 		if ( isset( $block->context['postId'] ) ) {
 			$query_args['object_ids'] = array( $block->context['postId'] );
-		} elseif ( is_single() ) {
+		} elseif ( 'post' === $query_context && is_single() ) {
 			$query_args['object_ids'] = array( get_queried_object_id() );
 		}
 	}
