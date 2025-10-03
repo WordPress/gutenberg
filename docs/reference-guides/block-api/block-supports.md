@@ -49,7 +49,7 @@ _**Note:** Since WordPress 6.9._
 -   Type: `boolean`
 -   Default value: `false`
 
-This property adds UI controls which allow the user to select the allowed blocks for the block. To use this feature, pass `attributes.allowedBlocks` as the `allowedBlocks` property in the options object of `useInnerBlocksProps`.
+This property adds UI controls which enable the user to select allowed child blocks for a block container. To use this feature, pass `attributes.allowedBlocks` as the `allowedBlocks` property in the options object of `useInnerBlocksProps`.
 
 ```js
 supports: {

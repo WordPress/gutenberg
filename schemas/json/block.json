@@ -254,7 +254,7 @@
 					"default": true
 				},
 				"allowedBlocks": {
-					"description": "This property adds UI controls which allow the user to select the allowed blocks for the block. Note: To use this feature, pass `attributes.allowedBlocks` as the `allowedBlocks` property in the options object of `useInnerBlocksProps`.",
+					"description": "This property adds UI controls which enable the user to select allowed child blocks for a block container. Note: To use this feature, pass `attributes.allowedBlocks` as the `allowedBlocks` property in the options object of `useInnerBlocksProps`.",
 					"type": "boolean",
 					"default": false
 				},
