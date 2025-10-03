@@ -7,3 +7,4 @@
 
 export { Controls } from './controls';
 export { updateAttributes } from './update-attributes';
+export { LinkUI } from '../link-ui';

@@ -88,6 +88,7 @@ require __DIR__ . '/compat/wordpress-6.8/site-preview.php';
 require __DIR__ . '/compat/wordpress-6.9/customizer-preview-custom-css.php';
 require __DIR__ . '/compat/wordpress-6.9/command-palette.php';
 require __DIR__ . '/compat/wordpress-6.9/preload.php';
+require __DIR__ . '/compat/wordpress-6.9/l10n.php';
 
 // WordPress 7.0 compat.
 require __DIR__ . '/compat/wordpress-7.0/php-only-blocks.php';
@@ -97,7 +98,6 @@ require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/kses.php';
-require __DIR__ . '/experimental/l10n.php';
 require __DIR__ . '/experimental/synchronization.php';
 require __DIR__ . '/experimental/script-modules.php';
 require __DIR__ . '/experimental/posts/load.php';

@@ -31,9 +31,8 @@ import { useMergeRefs, usePrevious } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { LinkUI } from './link-ui';
 import { getColors } from '../navigation/edit/utils';
-import { Controls, updateAttributes } from './shared';
+import { Controls, LinkUI, updateAttributes } from './shared';
 
 const DEFAULT_BLOCK = { name: 'core/navigation-link' };
 const NESTING_BLOCK_NAMES = [
@@ -285,7 +284,11 @@ export default function NavigationLinkEdit( {
 			__unstableMarkNextChangeAsNotPersistent();
 			transformToSubmenu();
 		}
-	}, [ hasChildren ] );
+	}, [
+		hasChildren,
+		__unstableMarkNextChangeAsNotPersistent,
+		transformToSubmenu,
+	] );
 
 	// If the LinkControl popover is open and the URL has changed, close the LinkControl and focus the label text.
 	useEffect( () => {
