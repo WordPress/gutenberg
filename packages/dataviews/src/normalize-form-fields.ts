@@ -66,11 +66,11 @@ export function normalizeLayout( layout?: Layout ): NormalizedLayout {
 				sum: CardSummaryField
 			): NormalizedCardSummaryField => {
 				if ( typeof sum === 'string' ) {
-					return [ { id: sum, visibility: 'always' } ];
+					return [ { id: sum, visibility: 'when-collapsed' } ];
 				}
 				return sum.map( ( item ) => {
 					if ( typeof item === 'string' ) {
-						return { id: item, visibility: 'always' };
+						return { id: item, visibility: 'when-collapsed' };
 					}
 					return { id: item.id, visibility: item.visibility };
 				} );
