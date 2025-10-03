@@ -54,21 +54,8 @@ export default function TermsQueryEdit( props ) {
 	const parent = inherit ? termIdContext : initialParent || 0;
 
 	const { taxonomy, inheritContext } = useMemo( () => {
-		const { templateType, templateQuery } =
+		const { templateType, templateQuery, isSingular } =
 			getQueryContextFromTemplate( templateSlug );
-
-		let _inheritContext = queryContextContext || '';
-		if ( ! _inheritContext && ! queryContext && inherit ) {
-			if (
-				postId ||
-				templateType === 'single' ||
-				templateType === 'page'
-			) {
-				_inheritContext = 'post';
-			} else if ( templateType === 'taxonomy' || termIdContext ) {
-				_inheritContext = 'taxonomy_archive';
-			}
-		}
 
 		// Maybe inherit taxonomy from parent query.
 		let _taxonomy = inherit
@@ -76,15 +63,34 @@ export default function TermsQueryEdit( props ) {
 			: initialTaxonomy || FALLBACK_TAXONOMY;
 
 		// If there is still no taxonomy, see if we can get one from the template.
-		if ( ! _taxonomy && templateSlug ) {
-			if ( templateType === 'taxonomy' && templateQuery ) {
-				_taxonomy = templateQuery;
+		if ( ! _taxonomy && templateType ) {
+			if ( templateType === 'category' ) {
+				_taxonomy = templateType;
+			} else if ( templateType === 'tag' ) {
+				_taxonomy = 'post_tag';
+			} else if ( templateType === 'taxonomy' && templateQuery ) {
+				// Templates for specific term slugs still need to be split.
+				const [ taxSlug ] = templateQuery.split( '-', 1 );
+				_taxonomy = taxSlug;
 			}
 		}
 
 		// As a last resort, use the fallback taxonomy.
 		if ( ! _taxonomy ) {
 			_taxonomy = FALLBACK_TAXONOMY;
+		}
+
+		let _inheritContext = queryContextContext || '';
+		if ( ! _inheritContext && ! queryContext && inherit ) {
+			if ( postId || isSingular ) {
+				_inheritContext = 'post';
+			} else if (
+				templateType === 'taxonomy' ||
+				templateType === _taxonomy ||
+				termIdContext
+			) {
+				_inheritContext = 'taxonomy_archive';
+			}
 		}
 
 		return {

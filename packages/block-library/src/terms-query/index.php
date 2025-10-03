@@ -38,10 +38,15 @@ function render_block_core_terms_query( $attributes, $content, $block ) {
 
 		// If this is the top-level query, set the termQuery context value based on whether inheritance is from a post or taxonomy archive.
 		if ( ! isset( $block->context['termQuery'] ) ) {
-			if ( isset( $block->context['postId'] ) || is_single() ) {
-				$query_context['context'] = 'post';
-			} elseif ( is_tax() ) {
+			// Must check for taxonomy archive first as postId is available in term archives.
+			if ( is_category() || is_tag() || is_tax() ) {
 				$query_context['context'] = 'taxonomy_archive';
+				// Set the taxonomy based on the queried object if not already set.
+				if ( empty( $query_context['taxonomy'] ) ) {
+					$query_context['taxonomy'] = get_queried_object()->taxonomy;
+				}
+			} elseif ( isset( $block->context['postId'] ) || is_single() ) {
+				$query_context['context'] = 'post';
 			}
 		}
 	}

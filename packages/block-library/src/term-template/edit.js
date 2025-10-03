@@ -199,24 +199,37 @@ export default function TermTemplateEdit( {
 					const { templateType, templateQuery } =
 						getQueryContextFromTemplate( templateSlug );
 
-					if ( templateType === 'taxonomy' && templateQuery ) {
-						// Inherit taxonomy from taxonomy archive template slug.
-						currentTaxonomy = templateQuery;
+					let termSlug = '';
+					if (
+						( templateType === currentTaxonomy ||
+							( templateType === 'tag' &&
+								currentTaxonomy === 'post_tag' ) ) &&
+						templateQuery
+					) {
+						termSlug = templateQuery;
+					} else if ( templateType === 'taxonomy' && templateQuery ) {
+						// Get everything after the first '-' as the term slug.
+						termSlug = templateQuery
+							.split( '-' )
+							.slice( 1 )
+							.join( '-' );
+					}
 
+					if ( termSlug ) {
 						// If we're on a specific term archive template, fetch the term ID to use as the parent.
-						const templateTaxonomy = getEntityRecords(
+						const templateTerm = getEntityRecords(
 							'taxonomy',
 							currentTaxonomy,
 							{
 								context: 'view',
 								per_page: 1,
 								_fields: [ 'id' ],
-								slug: templateQuery,
+								slug: termSlug,
 							}
 						);
 
-						if ( templateTaxonomy ) {
-							queryArgs.parent = templateTaxonomy[ 0 ]?.id ?? 0;
+						if ( templateTerm ) {
+							queryArgs.parent = templateTerm[ 0 ]?.id ?? 0;
 						}
 					}
 				}
@@ -241,18 +254,19 @@ export default function TermTemplateEdit( {
 			} );
 		},
 		[
-			taxonomy,
+			parent,
 			order,
 			orderBy,
 			hideEmpty,
-			parent,
+			taxonomy,
 			inherit,
+			previewTaxonomy,
 			restQueryArgs,
+			inheritContext,
+			postId,
 			termId,
 			termData,
-			postId,
 			templateSlug,
-			previewTaxonomy,
 		]
 	);
 
