@@ -315,8 +315,16 @@ export const registerCoreBlocks = (
 	// Auto-register PHP-only blocks with ServerSideRender
 	if ( window.__unstableAutoRegisterBlocks ) {
 		window.__unstableAutoRegisterBlocks.forEach( ( blockName ) => {
+			const existingBlockType =
+				window.wp.blocks.getBlockType( blockName );
+			const apiVersion =
+				existingBlockType && existingBlockType.apiVersion >= 3
+					? existingBlockType.apiVersion
+					: 3;
+
 			registerBlockType( blockName, {
 				title: blockName,
+				apiVersion,
 				edit: ( { attributes } ) => {
 					return createElement( ServerSideRender, {
 						block: blockName,
