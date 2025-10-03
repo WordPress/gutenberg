@@ -128,9 +128,8 @@ export function PrivateBlockToolbar( {
 		// The switch style button appears more prominently with the
 		// content only pattern experiment.
 		const _showSwitchSectionStyleButton =
-			( window?.__experimentalContentOnlyPatternInsertion &&
-				_isZoomOut ) ||
-			isSectionBlock( selectedBlockClientId );
+			window?.__experimentalContentOnlyPatternInsertion &&
+			( _isZoomOut || isSectionBlock( selectedBlockClientId ) );
 
 		return {
 			blockClientId: selectedBlockClientId,
