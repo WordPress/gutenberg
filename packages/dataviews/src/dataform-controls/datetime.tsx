@@ -156,7 +156,8 @@ function CalendarDateTimeControl< Item >( {
 				inputControlRef.current &&
 				inputControlRef.current.ownerDocument.activeElement;
 
-			// Trigger validation display by simulating focus and blur and changes
+			// Trigger validation display by simulating focus, blur, and changes.
+			// Use a timeout to ensure it runs after the value update.
 			validationTimeoutRef.current = setTimeout( () => {
 				if ( inputControlRef.current ) {
 					inputControlRef.current.focus();
@@ -201,11 +202,16 @@ function CalendarDateTimeControl< Item >( {
 		l10n: { startOfWeek },
 	} = getSettings();
 
+	const displayLabel =
+		field.isValid?.required && ! hideLabelFromVision
+			? `${ label } (${ __( 'Required' ) })`
+			: label;
+
 	return (
 		<BaseControl
 			__nextHasNoMarginBottom
 			id={ id }
-			label={ label }
+			label={ displayLabel }
 			help={ description }
 			hideLabelFromVision={ hideLabelFromVision }
 		>
