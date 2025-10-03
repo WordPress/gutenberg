@@ -39,7 +39,7 @@ Displays a section of content in an accordion, including a heading and expandabl
 -	**Category:** design
 -	**Parent:** core/accordion
 -	**Allowed Blocks:** core/accordion-heading, core/accordion-panel
--	**Supports:** color (background, gradients, text), interactivity, layout, shadow, spacing (blockGap, margin), typography (fontSize, lineHeight)
+-	**Supports:** color (background, gradients, text), interactivity, shadow, spacing (blockGap, margin), typography (fontSize, lineHeight), ~~layout~~
 -	**Attributes:** openByDefault
 
 ## Accordion Panel
@@ -50,7 +50,7 @@ Displays an accordion panel. ([Source](https://github.com/WordPress/gutenberg/tr
 -	**Experimental:** true
 -	**Category:** design
 -	**Parent:** core/accordion-item
--	**Supports:** color (background, gradients, text), interactivity, layout, shadow, spacing (blockGap, padding), typography (fontSize, lineHeight), ~~blockVisibility~~
+-	**Supports:** color (background, gradients, text), interactivity, shadow, spacing (blockGap, padding), typography (fontSize, lineHeight), ~~blockVisibility~~, ~~layout~~
 -	**Attributes:** allowedBlocks, isSelected, openByDefault, templateLock
 
 ## Archives

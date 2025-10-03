@@ -47,7 +47,7 @@
 			}
 		},
 		"shadow": true,
-		"layout": true,
+		"layout": false,
 		"blockVisibility": false
 	},
 	"attributes": {
