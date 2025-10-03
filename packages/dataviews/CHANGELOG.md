@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+- Move search icon in search fields to prefix position ([#71984](https://github.com/WordPress/gutenberg/pull/71984)).
+
 ### Breaking changes
 
 - DataForm: Add summary field support for both card and panel layouts. The `summary` property has been moved from the field level to the layout level, and so fields using `summary` at the field level must now configure it within the `layout` object. Additionally, the first children will only be used as summary for the panel if 1) there is no `layout.summary` and 2) the form field ID doesn't match any existing field. See README for details. [#71576](https://github.com/WordPress/gutenberg/pull/71576)
@@ -24,7 +28,6 @@
 - DataViews: Require at least one field to be visible. ([#71625](https://github.com/WordPress/gutenberg/pull/71625))
 - DataViews: Expose `DataViews.FiltersToggled` component to be used in free composition. [#71907](https://github.com/WordPress/gutenberg/pull/71907)
 - DataViews: Add `number` field and refactor `integer` field based on the `number` field. ([#71797](https://github.com/WordPress/gutenberg/pull/71797))
-- Move search icon in search fields to prefix position ([#71984](https://github.com/WordPress/gutenberg/pull/71984)).
 
 ## 9.0.0 (2025-09-17)
 
