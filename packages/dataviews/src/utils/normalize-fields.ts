@@ -37,7 +37,7 @@ const getValueFromId =
 		return value;
 	};
 
-export const setValueFromId =
+const setValueFromId =
 	( id: string ) =>
 	( { value }: { value: any } ) => {
 		const path = id.split( '.' );
