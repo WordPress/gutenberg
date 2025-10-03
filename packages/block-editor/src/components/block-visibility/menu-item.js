@@ -56,7 +56,7 @@ export default function BlockVisibilityMenuItem( { clientIds } ) {
 			if ( blocks.length > 1 ) {
 				createSuccessNotice(
 					sprintf(
-						// translators: %s: The shortcut key to access the List view.
+						// translators: %s: The shortcut key to access the List View.
 						__(
 							'Blocks hidden. You can access them via the List View (%s).'
 						),
