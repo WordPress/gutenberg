@@ -70,7 +70,7 @@ export default function BlockVisibilityMenuItem( { clientIds } ) {
 			} else {
 				createSuccessNotice(
 					sprintf(
-						// translators: %s: The shortcut key to access the List view.
+						// translators: %s: The shortcut key to access the List View.
 						__(
 							'Block hidden. You can access it via the List View (%s).'
 						),
