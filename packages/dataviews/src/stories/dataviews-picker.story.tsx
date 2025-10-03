@@ -13,7 +13,7 @@ import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
  */
 import DataViewsPicker from '../components/dataviews-picker/index';
 import { LAYOUT_PICKER_GRID } from '../constants';
-import { filterSortAndPaginate } from '../filter-and-sort-data-view';
+import filterSortAndPaginate from '../utils/filter-sort-and-paginate';
 import type { ActionButton, View } from '../types';
 import { data, fields, type SpaceObject } from './dataviews.fixtures';
 

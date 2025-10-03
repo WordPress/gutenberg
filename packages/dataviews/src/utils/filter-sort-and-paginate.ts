@@ -35,9 +35,9 @@ import {
 	OPERATOR_NOT_ON,
 	OPERATOR_IN_THE_PAST,
 	OPERATOR_OVER,
-} from './constants';
-import { normalizeFields } from './normalize-fields';
-import type { Field, View } from './types';
+} from '../constants';
+import { normalizeFields } from '../normalize-fields';
+import type { Field, View } from '../types';
 
 function normalizeSearchInput( input = '' ) {
 	return removeAccents( input.trim().toLowerCase() );
@@ -76,7 +76,7 @@ function getRelativeDate( value: number, unit: string ): Date {
  *
  * @return Filtered, sorted and paginated data.
  */
-export function filterSortAndPaginate< Item >(
+export default function filterSortAndPaginate< Item >(
 	data: Item[],
 	view: View,
 	fields: Field< Item >[]

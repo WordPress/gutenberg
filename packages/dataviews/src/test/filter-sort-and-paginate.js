@@ -6,7 +6,7 @@ import { subDays, subYears } from 'date-fns';
 /**
  * Internal dependencies
  */
-import { filterSortAndPaginate } from '../filter-and-sort-data-view';
+import filterSortAndPaginate from '../utils/filter-sort-and-paginate';
 import { data, fields } from '../stories/dataviews.fixtures';
 
 describe( 'filters', () => {
