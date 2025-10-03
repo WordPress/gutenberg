@@ -81,7 +81,7 @@ function CalendarDateTimeControl< Item >( {
 			>[ 'customValidity' ]
 		>( undefined );
 
-	const baseControlRef = useRef< HTMLDivElement >( null );
+	const inputControlRef = useRef< HTMLInputElement >( null );
 	const validationTimeoutRef = useRef< ReturnType< typeof setTimeout > >();
 	const previousFocusRef = useRef< Element | null >( null );
 
@@ -153,28 +153,23 @@ function CalendarDateTimeControl< Item >( {
 			}
 			// Save the currently focused element
 			previousFocusRef.current =
-				baseControlRef.current &&
-				baseControlRef.current.ownerDocument.activeElement;
+				inputControlRef.current &&
+				inputControlRef.current.ownerDocument.activeElement;
 
 			// Trigger validation display by simulating focus and blur and changes
 			validationTimeoutRef.current = setTimeout( () => {
-				if ( baseControlRef.current ) {
-					const input = baseControlRef.current.querySelector(
-						'input[type="datetime-local"]'
-					) as HTMLInputElement;
-					if ( input ) {
-						input.focus();
-						input.blur();
-						onChange( dateTimeValue );
-						onValidateControl( dateTimeValue );
+				if ( inputControlRef.current ) {
+					inputControlRef.current.focus();
+					inputControlRef.current.blur();
+					onChange( dateTimeValue );
+					onValidateControl( dateTimeValue );
 
-						// Restore focus to the previously focused element
-						if (
-							previousFocusRef.current &&
-							previousFocusRef.current instanceof HTMLElement
-						) {
-							previousFocusRef.current.focus();
-						}
+					// Restore focus to the previously focused element
+					if (
+						previousFocusRef.current &&
+						previousFocusRef.current instanceof HTMLElement
+					) {
+						previousFocusRef.current.focus();
 					}
 				}
 			}, 0 );
@@ -207,50 +202,47 @@ function CalendarDateTimeControl< Item >( {
 	} = getSettings();
 
 	return (
-		<div ref={ baseControlRef }>
-			<BaseControl
-				__nextHasNoMarginBottom
-				id={ id }
-				label={ label }
-				help={ description }
-				hideLabelFromVision={ hideLabelFromVision }
-			>
-				<VStack spacing={ 4 }>
-					{ /* Calendar widget */ }
-					<DateCalendar
-						style={ { width: '100%' } }
-						selected={
-							value
-								? parseDateTime( value ) || undefined
-								: undefined
-						}
-						onSelect={ onSelectDate }
-						month={ calendarMonth }
-						onMonthChange={ setCalendarMonth }
-						timeZone={ timezoneString || undefined }
-						weekStartsOn={ startOfWeek }
-					/>
-					{ /* Manual datetime input */ }
-					<ValidatedInputControl
-						__next40pxDefaultSize
-						required={ !! field.isValid?.required }
-						onValidate={ onValidateControl }
-						customValidity={ customValidity }
-						type="datetime-local"
-						label={ __( 'Date time' ) }
-						hideLabelFromVision
-						value={
-							value
-								? formatDateTime(
-										parseDateTime( value ) || undefined
-								  )
-								: ''
-						}
-						onChange={ handleManualDateTimeChange }
-					/>
-				</VStack>
-			</BaseControl>
-		</div>
+		<BaseControl
+			__nextHasNoMarginBottom
+			id={ id }
+			label={ label }
+			help={ description }
+			hideLabelFromVision={ hideLabelFromVision }
+		>
+			<VStack spacing={ 4 }>
+				{ /* Calendar widget */ }
+				<DateCalendar
+					style={ { width: '100%' } }
+					selected={
+						value ? parseDateTime( value ) || undefined : undefined
+					}
+					onSelect={ onSelectDate }
+					month={ calendarMonth }
+					onMonthChange={ setCalendarMonth }
+					timeZone={ timezoneString || undefined }
+					weekStartsOn={ startOfWeek }
+				/>
+				{ /* Manual datetime input */ }
+				<ValidatedInputControl
+					ref={ inputControlRef }
+					__next40pxDefaultSize
+					required={ !! field.isValid?.required }
+					onValidate={ onValidateControl }
+					customValidity={ customValidity }
+					type="datetime-local"
+					label={ __( 'Date time' ) }
+					hideLabelFromVision
+					value={
+						value
+							? formatDateTime(
+									parseDateTime( value ) || undefined
+							  )
+							: ''
+					}
+					onChange={ handleManualDateTimeChange }
+				/>
+			</VStack>
+		</BaseControl>
 	);
 }
 
