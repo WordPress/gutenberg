@@ -335,8 +335,6 @@ export type NormalizedField< Item > = Omit< Field< Item >, 'Edit' > & {
  */
 export type Fields< Item > = Field< Item >[];
 
-export type Data< Item > = Item[];
-
 export type DataFormControlProps< Item > = {
 	data: Item;
 	field: NormalizedField< Item >;
