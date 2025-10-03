@@ -264,12 +264,6 @@ export default function TemplatePartEdit( {
 		);
 	}
 
-	/*
-	 * PROTOTYPE HACK: Using different group props to create visual separation
-	 * between toolbar buttons. WordPress automatically adds separators between
-	 * different BlockControls groups. This avoids the need for custom CSS
-	 * while maintaining the standard toolbar appearance.
-	 */
 	return (
 		<>
 			<RecursionProvider uniqueId={ templatePartId }>
