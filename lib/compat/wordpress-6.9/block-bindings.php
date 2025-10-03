@@ -112,11 +112,11 @@ add_filter( 'render_block', 'gutenberg_block_bindings_render_block', 10, 3 );
 function gutenberg_get_block_bindings_supported_attributes( $block_type ) {
 	// List of block attributes supported by Block Bindings in WP 6.8.
 	$block_bindings_supported_attributes_6_8 = array(
-		'core/paragraph'         => array( 'content' ),
-		'core/heading'           => array( 'content' ),
-		'core/image'             => array( 'id', 'url', 'title', 'alt' ),
-		'core/button'            => array( 'url', 'text', 'linkTarget', 'rel' ),
-		'core/navigation-link'   => array( 'url' ),
+		'core/paragraph'          => array( 'content' ),
+		'core/heading'            => array( 'content' ),
+		'core/image'              => array( 'id', 'url', 'title', 'alt' ),
+		'core/button'             => array( 'url', 'text', 'linkTarget', 'rel' ),
+		'core/navigation-link'    => array( 'url' ),
 		'core/navigation-submenu' => array( 'url' ),
 	);
 
@@ -203,11 +203,11 @@ function gutenberg_process_block_bindings( $instance ) {
 
 	// List of block attributes supported by Block Bindings in WP 6.8.
 	$block_bindings_supported_attributes_6_8 = array(
-		'core/paragraph'         => array( 'content' ),
-		'core/heading'           => array( 'content' ),
-		'core/image'             => array( 'id', 'url', 'title', 'alt' ),
-		'core/button'            => array( 'url', 'text', 'linkTarget', 'rel' ),
-		'core/navigation-link'   => array( 'url' ),
+		'core/paragraph'          => array( 'content' ),
+		'core/heading'            => array( 'content' ),
+		'core/image'              => array( 'id', 'url', 'title', 'alt' ),
+		'core/button'             => array( 'url', 'text', 'linkTarget', 'rel' ),
+		'core/navigation-link'    => array( 'url' ),
 		'core/navigation-submenu' => array( 'url' ),
 	);
 
