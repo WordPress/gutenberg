@@ -11,7 +11,7 @@ import type { Form, FormField, SimpleFormField } from '../types';
 import { getFormFieldLayout } from './index';
 import DataFormContext from '../components/dataform-context';
 import { isCombinedField } from './is-combined-field';
-import normalizeFormFields, { normalizeLayout } from '../normalize-form-fields';
+import normalizeFormFields, { normalizeLayout } from './normalize-form-fields';
 
 const DEFAULT_WRAPPER = ( { children }: { children: React.ReactNode } ) => (
 	<VStack spacing={ 4 }>{ children }</VStack>

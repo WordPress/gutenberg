@@ -26,7 +26,7 @@ import type {
 import DataFormContext from '../../components/dataform-context';
 import { DataFormLayout } from '../data-form-layout';
 import { isCombinedField } from '../is-combined-field';
-import { DEFAULT_LAYOUT, normalizeLayout } from '../../normalize-form-fields';
+import { DEFAULT_LAYOUT, normalizeLayout } from '../normalize-form-fields';
 
 function Header( { title }: { title: string } ) {
 	return (

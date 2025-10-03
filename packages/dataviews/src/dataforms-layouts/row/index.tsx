@@ -16,7 +16,7 @@ import type { FieldLayoutProps, Form, NormalizedRowLayout } from '../../types';
 import DataFormContext from '../../components/dataform-context';
 import { DataFormLayout } from '../data-form-layout';
 import { isCombinedField } from '../is-combined-field';
-import { normalizeLayout } from '../../normalize-form-fields';
+import { normalizeLayout } from '../normalize-form-fields';
 import { getFormFieldLayout } from '..';
 
 function Header( { title }: { title: string } ) {

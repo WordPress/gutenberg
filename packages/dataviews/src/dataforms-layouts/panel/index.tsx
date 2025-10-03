@@ -25,7 +25,7 @@ import type {
 } from '../../types';
 import DataFormContext from '../../components/dataform-context';
 import { isCombinedField } from '../is-combined-field';
-import { normalizeLayout } from '../../normalize-form-fields';
+import { normalizeLayout } from '../normalize-form-fields';
 import PanelDropdown from './dropdown';
 import PanelModal from './modal';
 import { getSummaryFields } from '../get-summary-fields';

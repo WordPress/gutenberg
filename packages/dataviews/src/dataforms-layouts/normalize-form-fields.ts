@@ -11,7 +11,7 @@ import type {
 	NormalizedRowLayout,
 	NormalizedCardSummaryField,
 	CardSummaryField,
-} from './types';
+} from '../types';
 
 interface NormalizedFormField {
 	id: string;

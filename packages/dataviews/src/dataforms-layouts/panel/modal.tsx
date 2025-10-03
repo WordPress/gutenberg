@@ -21,7 +21,7 @@ import { useState, useMemo } from '@wordpress/element';
 import type { Form, FormField, NormalizedField } from '../../types';
 import { DataFormLayout } from '../data-form-layout';
 import { isCombinedField } from '../is-combined-field';
-import { DEFAULT_LAYOUT } from '../../normalize-form-fields';
+import { DEFAULT_LAYOUT } from '../normalize-form-fields';
 import SummaryButton from './summary-button';
 
 function ModalContent< Item >( {

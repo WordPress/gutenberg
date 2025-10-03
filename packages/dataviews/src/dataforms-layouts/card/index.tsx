@@ -20,7 +20,7 @@ import type {
 } from '../../types';
 import { DataFormLayout } from '../data-form-layout';
 import { isCombinedField } from '../is-combined-field';
-import { DEFAULT_LAYOUT, normalizeLayout } from '../../normalize-form-fields';
+import { DEFAULT_LAYOUT, normalizeLayout } from '../normalize-form-fields';
 import { getSummaryFields } from '../get-summary-fields';
 
 export function useCollapsibleCard( initialIsOpen: boolean = true ) {
