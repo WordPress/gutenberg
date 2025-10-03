@@ -426,6 +426,7 @@ class URLInput extends Component {
 			hideLabelFromVision = false,
 			help = null,
 			disabled = false,
+			'aria-describedby': ariaDescribedBy,
 		} = this.props;
 
 		const {
@@ -445,7 +446,6 @@ class URLInput extends Component {
 				'is-full-width': isFullWidth,
 			} ),
 			hideLabelFromVision,
-			help,
 		};
 
 		const inputProps = {
@@ -469,6 +469,8 @@ class URLInput extends Component {
 			ref: this.inputRef,
 			disabled,
 			suffix: this.props.suffix,
+			help,
+			'aria-describedby': ariaDescribedBy,
 		};
 
 		if ( renderControl ) {
