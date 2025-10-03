@@ -137,52 +137,6 @@ function use_custom_posts_list_table( $class_name ) {
 add_filter( 'wp_list_table_class_name', 'use_custom_posts_list_table' );
 
 /**
- * Function to output the avatar HTML for a post ID.
- *
- * @param int $post The post object.
- * @return void
- */
-function gutenberg_comment_indicator_avatars( $post ) {
-	$unresolved_comments = get_comments(
-		array(
-			'post_id'  => $post->ID,
-			'type'     => 'block_comment',
-			'status'   => 'hold',
-			'per_page' => 100,
-		)
-	);
-
-	// Show indicator for any post with unresolved comments.
-	if ( count( $unresolved_comments ) > 0 ) {
-		$maxAvatars = 3;
-		$count = $maxAvatars;
-		echo "<div class='comment-avatar-stack' title='" . esc_attr__( 'This post has open discussions', 'gutenberg' ) . "'>";
-		foreach ( $unresolved_comments as $comment ) {
-			if ( $count-- <= 0 ) {
-				break;
-			}
-			$gravatar_params = array(
-				'size' => 18,
-				'',
-			);
-			$avatar_urls = get_avatar_url( $comment->user_id, $gravatar_params );
-			echo "<img class='comment-avatar' src='" . esc_url( $avatar_urls ) . "' />";
-		}
-
-		// Add an overflow indicator if there are more avatars than the max.
-		if ( count( $unresolved_comments ) > $maxAvatars ) {
-			if ( count( $unresolved_comments ) >= 100 ) {
-				$overflow = '100+';
-			} else {
-				$overflow = "+" . ( count( $unresolved_comments ) - $maxAvatars );
-			}
-			echo "<span class='comment-avatar-overflow'> " . esc_html( $overflow ) . ' </span>';
-		}
-		echo '</div>';
-	}
-}
-
-/**
  * Add some label styles on the post list table.
  */
 function gutenberg_add_open_discussion_label_styles() {
