@@ -337,10 +337,10 @@ export class SyncProvider {
 	/**
 	 * Get the undo manager.
 	 *
-	 * @return {UndoManager | null} The undo manager, or null if unsupported.
+	 * @return {UndoManager} The undo manager.
 	 */
-	public getUndoManager(): UndoManager | null {
-		return this.undoManager ?? null;
+	public getUndoManager(): UndoManager {
+		return this.undoManager;
 	}
 
 	/**
