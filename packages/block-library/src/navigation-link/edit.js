@@ -190,8 +190,6 @@ export default function NavigationLinkEdit( {
 	const linkUIref = useRef();
 	const prevUrl = usePrevious( url );
 	const closedByEscapeRef = useRef( false );
-	// If the link isSelected when mounted, it was just added via an appender
-	const isNewLink = isSelected;
 
 	// Listen for Escape key at document level when LinkUI is open
 	useEffect( () => {
@@ -542,7 +540,7 @@ export default function NavigationLinkEdit( {
 							onClose={ () => {
 								// If there is no link then remove the auto-inserted block.
 								// This avoids empty blocks which can provide a poor UX.
-								if ( ! url && isNewLink ) {
+								if ( ! url ) {
 									if ( closedByEscapeRef.current ) {
 										// User pressed Escape or closed intentionally
 										// Select the previous block so the appender remains visible.
@@ -555,14 +553,6 @@ export default function NavigationLinkEdit( {
 								}
 
 								setIsLinkOpen( false );
-
-								if (
-									closedByEscapeRef.current &&
-									isNewLink &&
-									ref.current
-								) {
-									ref.current.focus();
-								}
 							} }
 							anchor={ popoverAnchor }
 							onRemove={ removeLink }
