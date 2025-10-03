@@ -40,11 +40,6 @@ function gutenberg_block_bindings_entity_get_value( array $source_args, $block_i
 		return null;
 	}
 
-	// TODO: Add validation to ensure required attributes exist
-	// TODO: Add error handling for invalid entity types or missing data
-	// TODO: Consider property mapping between posts and terms for future keys
-	// TODO: Support additional keys beyond 'url' in the future
-
 	try {
 		// Handle post types
 		if ( 'post-type' === $kind ) {
