@@ -1,9 +1,9 @@
 /**
  * Internal dependencies
  */
-import type { DataViewRenderFieldProps } from './types';
+import type { DataViewRenderFieldProps } from '../../types';
 
-export function renderFromElements< Item >( {
+export default function renderFromElements< Item >( {
 	item,
 	field,
 }: DataViewRenderFieldProps< Item > ) {
