@@ -344,6 +344,10 @@ function CalendarDateControl< Item >( {
 		l10n: { startOfWeek },
 	} = getSettings();
 
+	const displayLabel = field.isValid?.required
+		? `${ label } (${ __( 'Required' ) })`
+		: label;
+
 	return (
 		<ValidatedDateControl
 			value={ value }
@@ -358,7 +362,7 @@ function CalendarDateControl< Item >( {
 				__nextHasNoMarginBottom
 				id={ id }
 				className={ className }
-				label={ label }
+				label={ displayLabel }
 				hideLabelFromVision={ hideLabelFromVision }
 			>
 				<VStack spacing={ 4 }>
@@ -530,6 +534,10 @@ function CalendarDateRangeControl< Item >( {
 
 	const { timezone, l10n } = getSettings();
 
+	const displayLabel = field.isValid?.required
+		? `${ label } (${ __( 'Required' ) })`
+		: label;
+
 	return (
 		<ValidatedDateControl
 			value={ value }
@@ -544,7 +552,7 @@ function CalendarDateRangeControl< Item >( {
 				__nextHasNoMarginBottom
 				id={ id }
 				className={ className }
-				label={ label }
+				label={ displayLabel }
 				hideLabelFromVision={ hideLabelFromVision }
 			>
 				<VStack spacing={ 4 }>
