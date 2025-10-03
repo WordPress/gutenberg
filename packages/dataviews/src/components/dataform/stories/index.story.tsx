@@ -538,6 +538,7 @@ const ValidationComponent = ( {
 		url: string;
 		color: string;
 		integer: number;
+		number: number;
 		boolean: boolean;
 		customEdit: string;
 		categories: string[];
@@ -557,6 +558,7 @@ const ValidationComponent = ( {
 		url: 'https://example.com',
 		color: '#ff6600',
 		integer: 2,
+		number: 3.14,
 		boolean: true,
 		categories: [ 'astronomy' ],
 		countries: [ 'us' ],
@@ -627,6 +629,13 @@ const ValidationComponent = ( {
 	const customIntegerRule = ( value: ValidatedItem ) => {
 		if ( value.integer % 2 !== 0 ) {
 			return 'Integer must be an even number.';
+		}
+
+		return null;
+	};
+	const customNumberRule = ( value: ValidatedItem ) => {
+		if ( ! /^\d+\.\d{2}$/.test( value?.number?.toString() ) ) {
+			return 'Number must have exactly two decimal places.';
 		}
 
 		return null;
@@ -766,6 +775,15 @@ const ValidationComponent = ( {
 			},
 		},
 		{
+			id: 'number',
+			type: 'number',
+			label: 'Number',
+			isValid: {
+				required,
+				custom: maybeCustomRule( customNumberRule ),
+			},
+		},
+		{
 			id: 'boolean',
 			type: 'boolean',
 			label: 'Boolean',
@@ -865,6 +883,7 @@ const ValidationComponent = ( {
 			'url',
 			'color',
 			'integer',
+			'number',
 			'boolean',
 			'categories',
 			'countries',

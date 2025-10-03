@@ -12,9 +12,10 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
-import { Icon, lockSmall as lock, pinSmall } from '@wordpress/icons';
+import { Icon, lockSmall as lock, pinSmall, unseen } from '@wordpress/icons';
 import { SPACE, ENTER } from '@wordpress/keycodes';
 import { useSelect } from '@wordpress/data';
+import { hasBlockSupport } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -27,6 +28,7 @@ import { useBlockLock } from '../block-lock';
 import useListViewImages from './use-list-view-images';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+
 const { Badge } = unlock( componentsPrivateApis );
 
 function ListViewBlockSelectButton(
@@ -53,15 +55,31 @@ function ListViewBlockSelectButton(
 		context: 'list-view',
 	} );
 	const { isLocked } = useBlockLock( clientId );
-	const { isContentOnly } = useSelect(
-		( select ) => ( {
-			isContentOnly:
-				select( blockEditorStore ).getBlockEditingMode( clientId ) ===
-				'contentOnly',
-		} ),
-		[ clientId ]
-	);
+	const { canToggleBlockVisibility, isBlockHidden, isContentOnly } =
+		useSelect(
+			( select ) => {
+				const { getBlockName } = select( blockEditorStore );
+				const { isBlockHidden: _isBlockHidden } = unlock(
+					select( blockEditorStore )
+				);
+				return {
+					canToggleBlockVisibility: hasBlockSupport(
+						getBlockName( clientId ),
+						'blockVisibility',
+						true
+					),
+					isBlockHidden: _isBlockHidden( clientId ),
+					isContentOnly:
+						select( blockEditorStore ).getBlockEditingMode(
+							clientId
+						) === 'contentOnly',
+				};
+			},
+			[ clientId ]
+		);
 	const shouldShowLockIcon = isLocked && ! isContentOnly;
+	const shouldShowBlockVisibilityIcon =
+		canToggleBlockVisibility && isBlockHidden;
 	const isSticky = blockInformation?.positionType === 'sticky';
 	const images = useListViewImages( { clientId, isExpanded } );
 
@@ -147,6 +165,11 @@ function ListViewBlockSelectButton(
 						) ) }
 					</span>
 				) : null }
+				{ shouldShowBlockVisibilityIcon && (
+					<span className="block-editor-list-view-block-select-button__block-visibility">
+						<Icon icon={ unseen } />
+					</span>
+				) }
 				{ shouldShowLockIcon && (
 					<span className="block-editor-list-view-block-select-button__lock">
 						<Icon icon={ lock } />

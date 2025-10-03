@@ -104,3 +104,52 @@ test.describe( 'Server-side rendered block', () => {
 		await expect( block ).toHaveText( 'Coffee count: 3' );
 	} );
 } );
+
+test.describe( 'PHP-only auto-register blocks', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activatePlugin(
+			'gutenberg-test-server-side-rendered-block'
+		);
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-server-side-rendered-block'
+		);
+	} );
+
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
+	} );
+
+	test( 'should only register blocks with auto_register flag', async ( {
+		editor,
+	} ) => {
+		// Block with auto_register flag should be insertable
+		await editor.insertBlock( { name: 'test/auto-register-block' } );
+
+		const block = editor.canvas.getByText( 'Auto-register block content' );
+		await expect( block ).toBeVisible();
+
+		// Block without auto_register flag should NOT exist in registry
+		const blockExists = await editor.page.evaluate( () => {
+			return (
+				window.wp.blocks.getBlockType(
+					'test/php-only-no-auto-register'
+				) !== undefined
+			);
+		} );
+		expect( blockExists ).toBe( false );
+	} );
+
+	test( 'should render server-side content for auto-registered blocks', async ( {
+		editor,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'test/auto-register-block',
+		} );
+
+		const block = editor.canvas.getByText( 'Auto-register block content' );
+		await expect( block ).toBeVisible();
+	} );
+} );

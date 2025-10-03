@@ -4,7 +4,7 @@
 	"name": "core/accordion",
 	"title": "Accordion",
 	"category": "design",
-	"description": "Displays a group of accordion headers and associated expandable content.",
+	"description": "Displays a group of accordion headings and associated expandable content.",
 	"example": {},
 	"__experimental": true,
 	"supports": {
@@ -40,6 +40,7 @@
 		},
 		"shadow": true,
 		"layout": true,
+		"ariaLabel": true,
 		"interactivity": true,
 		"typography": {
 			"fontSize": true,
@@ -67,13 +68,21 @@
 		"autoclose": {
 			"type": "boolean",
 			"default": false
+		},
+		"headingLevel": {
+			"type": "number",
+			"default": 3
+		},
+		"levelOptions": {
+			"type": "array"
 		}
 	},
 	"providesContext": {
 		"core/accordion-icon-position": "iconPosition",
-		"core/accordion-show-icon": "showIcon"
+		"core/accordion-show-icon": "showIcon",
+		"core/accordion-heading-level": "headingLevel"
 	},
-	"allowedBlocks": [ "core/accordion-content" ],
+	"allowedBlocks": [ "core/accordion-item" ],
 	"textdomain": "default",
 	"viewScriptModule": "@wordpress/block-library/accordion/view"
 }

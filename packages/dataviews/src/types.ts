@@ -106,6 +106,7 @@ export type Operator =
 export type FieldType =
 	| 'text'
 	| 'integer'
+	| 'number'
 	| 'datetime'
 	| 'date'
 	| 'media'

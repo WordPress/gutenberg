@@ -101,6 +101,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		defaultClassName,
 		isSectionBlock,
 		canMove,
+		isBlockHidden,
 	} = useContext( PrivateBlockContext );
 
 	// translators: %s: Type of block (i.e. Text, Image etc)
@@ -183,6 +184,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				'has-negative-margin': hasNegativeMargin,
 				'is-content-locked-temporarily-editing-as-blocks':
 					isTemporarilyEditingAsBlocks,
+				'is-block-hidden': isBlockHidden,
 			},
 			className,
 			props.className,

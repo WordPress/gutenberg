@@ -15,6 +15,7 @@ import type {
 } from '../types';
 import { default as email } from './email';
 import { default as integer } from './integer';
+import { default as number } from './number';
 import { default as text } from './text';
 import { default as datetime } from './datetime';
 import { default as date } from './date';
@@ -43,6 +44,10 @@ export default function getFieldTypeDefinition< Item >(
 
 	if ( 'integer' === type ) {
 		return integer;
+	}
+
+	if ( 'number' === type ) {
+		return number;
 	}
 
 	if ( 'text' === type ) {

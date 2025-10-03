@@ -939,7 +939,7 @@ Example:
 
 ### `type`
 
-Field type. One of `text`, `integer`, `datetime`.
+Field type. One of `text`, `integer`, `number`, `datetime`, `date`, `media`, `boolean`, `email`, `password`, `telephone`, `color`, `url`, `array`.
 
 If a field declares a `type`, it gets default implementations for the `sort`, `isValid`, and `Edit` functions if no other values are specified.
 
@@ -1132,7 +1132,7 @@ Example:
 
 React component that renders the control to edit the field.
 
--   Type: React component | `string`. If it's a string, it needs to be one of `text`, `integer`, `datetime`, `radio`, `select`.
+-   Type: React component | `string`. If it's a string, it needs to be one of `array`, `checkbox`, `color`, `datetime`, `date`, `email`, `telephone`, `url`, `integer`, `number`, `password`, `radio`, `select`, `text`, `toggle`, `textarea`, `toggleGroup`.
 -   Required by DataForm. Optional if the field provided a `type`.
 -   Props:
     -   `data`: the item to be processed

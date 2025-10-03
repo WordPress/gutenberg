@@ -41,6 +41,10 @@ export function getTransformedMetadata(
 	if ( supports.renaming !== false ) {
 		transformSupportedProps.push( 'name' );
 	}
+	// If it supports block visibility (true by default), add the `blockVisibility` property.
+	if ( supports.blockVisibility !== false ) {
+		transformSupportedProps.push( 'blockVisibility' );
+	}
 
 	if ( window?.__experimentalEnableBlockComment ) {
 		transformSupportedProps.push( 'commentId' );
