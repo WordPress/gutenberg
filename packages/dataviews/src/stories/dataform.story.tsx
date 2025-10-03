@@ -1232,6 +1232,10 @@ const LayoutRowComponent = ( {
 		hasDiscount: boolean;
 		vat: number;
 		commission: number;
+		cost: number;
+		tax: number;
+		quantity: number;
+		total: number;
 	};
 
 	const customerFields: Field< Customer >[] = [
@@ -1322,6 +1326,40 @@ const LayoutRowComponent = ( {
 				{ value: 'yearly', label: 'Yearly' },
 			],
 		},
+		{
+			id: 'cost',
+			label: 'Cost',
+			type: 'integer',
+			readOnly: true,
+		},
+		{
+			id: 'tax',
+			label: 'Tax',
+			type: 'integer',
+			readOnly: true,
+		},
+		{
+			id: 'quantity',
+			label: 'Quantity',
+			type: 'integer',
+			elements: [
+				{ value: 1, label: '1' },
+				{ value: 2, label: '2' },
+				{ value: 3, label: '3' },
+				{ value: 4, label: '4' },
+				{ value: 5, label: '5' },
+				{ value: 6, label: '6' },
+				{ value: 7, label: '7' },
+				{ value: 8, label: '8' },
+				{ value: 9, label: '9' },
+				{ value: 10, label: '10' },
+			],
+		},
+		{
+			id: 'total',
+			label: 'Total',
+			type: 'integer',
+		},
 	];
 
 	const [ customer, setCustomer ] = useState< Customer >( {
@@ -1343,6 +1381,10 @@ const LayoutRowComponent = ( {
 		vat: 10,
 		commission: 5,
 		hasDiscount: true,
+		cost: 100,
+		tax: 20,
+		quantity: 5,
+		total: 600,
 	} );
 
 	const form: Form = useMemo(
@@ -1438,6 +1480,36 @@ const LayoutRowComponent = ( {
 				data={ customer }
 				fields={ customerFields }
 				form={ form }
+				onChange={ ( edits ) =>
+					setCustomer( ( prev ) => ( {
+						...prev,
+						...edits,
+					} ) )
+				}
+			/>
+			<h2>Field widths</h2>
+			<DataForm
+				data={ customer }
+				fields={ customerFields }
+				form={ {
+					fields: [
+						{
+							id: 'product',
+							label: 'Product',
+							layout: {
+								type: 'row',
+								alignment: 'end',
+								styles: {
+									cost: { flex: 1 },
+									tax: { flex: 1 },
+									quantity: { flex: 2 },
+									total: { flex: 2 },
+								},
+							},
+							children: [ 'cost', 'tax', 'quantity', 'total' ],
+						},
+					],
+				} }
 				onChange={ ( edits ) =>
 					setCustomer( ( prev ) => ( {
 						...prev,
