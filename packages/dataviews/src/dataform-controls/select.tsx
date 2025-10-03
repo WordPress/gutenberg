@@ -73,9 +73,20 @@ export default function Select< Item >( {
 	);
 
 	const elements =
-		hasEmptyValue || isMultiple || field.hideSelectItemOption
+		hasEmptyValue || isMultiple
 			? fieldElements
-			: [ { label: __( 'Select item' ), value: '' }, ...fieldElements ];
+			: [
+					// Value can be undefined when:
+					// - the field is not required
+					// - in bulk editing
+					{
+						label: __( 'Select item' ),
+						value: '',
+						// disable only if the field is required and there's already a selection
+						disabled: !! field.isValid?.required && value !== '',
+					},
+					...fieldElements,
+			  ];
 
 	return (
 		<ValidatedSelectControl
