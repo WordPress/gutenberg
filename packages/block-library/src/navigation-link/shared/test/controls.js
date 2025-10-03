@@ -23,6 +23,14 @@ jest.mock( '../../../utils/hooks', () => ( {
 	useToolsPanelDropdownMenuProps: () => ( {} ),
 } ) );
 
+// Mock the useEntityBinding hook
+jest.mock( '../use-entity-binding', () => ( {
+	useEntityBinding: jest.fn( () => ( {
+		hasUrlBinding: false,
+		clearBinding: jest.fn(),
+	} ) ),
+} ) );
+
 describe( 'Controls', () => {
 	// Initialize the mock function
 	beforeAll( () => {
@@ -39,6 +47,7 @@ describe( 'Controls', () => {
 		},
 		setAttributes: jest.fn(),
 		setIsEditingControl: jest.fn(),
+		clientId: 'test-client-id',
 	};
 
 	beforeEach( () => {
@@ -205,6 +214,114 @@ describe( 'Controls', () => {
 		fireEvent.click( checkbox );
 		expect( defaultProps.setAttributes ).toHaveBeenCalledWith( {
 			opensInNewTab: true,
+		} );
+	} );
+
+	describe( 'URL binding help text', () => {
+		it( 'shows help text when URL is bound to an entity', () => {
+			const { useEntityBinding } = require( '../use-entity-binding' );
+			useEntityBinding.mockReturnValue( {
+				hasUrlBinding: true,
+				clearBinding: jest.fn(),
+			} );
+
+			const propsWithBinding = {
+				...defaultProps,
+				attributes: {
+					...defaultProps.attributes,
+					type: 'page',
+					kind: 'post-type',
+				},
+			};
+
+			render( <Controls { ...propsWithBinding } /> );
+
+			expect(
+				screen.getByText( 'Synced with the selected page.' )
+			).toBeInTheDocument();
+		} );
+
+		it( 'shows help text for different entity types', () => {
+			const { useEntityBinding } = require( '../use-entity-binding' );
+			useEntityBinding.mockReturnValue( {
+				hasUrlBinding: true,
+				clearBinding: jest.fn(),
+			} );
+
+			const propsWithCategoryBinding = {
+				...defaultProps,
+				attributes: {
+					...defaultProps.attributes,
+					type: 'category',
+					kind: 'taxonomy',
+				},
+			};
+
+			render( <Controls { ...propsWithCategoryBinding } /> );
+
+			expect(
+				screen.getByText( 'Synced with the selected category.' )
+			).toBeInTheDocument();
+		} );
+
+		it( 'does not show help text when URL is not bound', () => {
+			const { useEntityBinding } = require( '../use-entity-binding' );
+			useEntityBinding.mockReturnValue( {
+				hasUrlBinding: false,
+				clearBinding: jest.fn(),
+			} );
+
+			render( <Controls { ...defaultProps } /> );
+
+			expect(
+				screen.queryByText( /Synced with the selected/ )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'shows help text for post entity type', () => {
+			const { useEntityBinding } = require( '../use-entity-binding' );
+			useEntityBinding.mockReturnValue( {
+				hasUrlBinding: true,
+				clearBinding: jest.fn(),
+			} );
+
+			const propsWithPostBinding = {
+				...defaultProps,
+				attributes: {
+					...defaultProps.attributes,
+					type: 'post',
+					kind: 'post-type',
+				},
+			};
+
+			render( <Controls { ...propsWithPostBinding } /> );
+
+			expect(
+				screen.getByText( 'Synced with the selected post.' )
+			).toBeInTheDocument();
+		} );
+
+		it( 'shows help text for tag entity type', () => {
+			const { useEntityBinding } = require( '../use-entity-binding' );
+			useEntityBinding.mockReturnValue( {
+				hasUrlBinding: true,
+				clearBinding: jest.fn(),
+			} );
+
+			const propsWithTagBinding = {
+				...defaultProps,
+				attributes: {
+					...defaultProps.attributes,
+					type: 'tag',
+					kind: 'taxonomy',
+				},
+			};
+
+			render( <Controls { ...propsWithTagBinding } /> );
+
+			expect(
+				screen.getByText( 'Synced with the selected tag.' )
+			).toBeInTheDocument();
 		} );
 	} );
 } );
