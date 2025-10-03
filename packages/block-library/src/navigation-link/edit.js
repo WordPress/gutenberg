@@ -180,8 +180,6 @@ export default function NavigationLinkEdit( {
 	} = useDispatch( blockEditorStore );
 	// Have the link editing ui open on mount when lacking a url and selected.
 	const [ isLinkOpen, setIsLinkOpen ] = useState( isSelected && ! url );
-	// Store what element opened the popover, so we know where to return focus to (toolbar button vs navigation link text)
-	const [ openedBy, setOpenedBy ] = useState( null );
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
@@ -191,6 +189,33 @@ export default function NavigationLinkEdit( {
 	const ref = useRef();
 	const linkUIref = useRef();
 	const prevUrl = usePrevious( url );
+	const closedByEscapeRef = useRef( false );
+
+	// Listen for Escape key at document level when LinkUI is open
+	useEffect( () => {
+		if ( ! isLinkOpen ) {
+			return;
+		}
+
+		const handleEscapeKey = ( event ) => {
+			if ( event.key === 'Escape' ) {
+				closedByEscapeRef.current = true;
+			}
+		};
+
+		// Use capture phase to catch Escape before Popover handles it
+		// Attach to document to ensure we catch it
+		document.addEventListener( 'keydown', handleEscapeKey, {
+			capture: true,
+		} );
+		return () => {
+			document.removeEventListener( 'keydown', handleEscapeKey, {
+				capture: true,
+			} );
+			// Reset the flag when the LinkUI closes
+			closedByEscapeRef.current = false;
+		};
+	}, [ isLinkOpen ] );
 
 	const {
 		isAtMaxNesting,
@@ -353,7 +378,6 @@ export default function NavigationLinkEdit( {
 			// If this link is a child of a parent submenu item, the parent submenu item event will also open, closing this popover
 			event.stopPropagation();
 			setIsLinkOpen( true );
-			setOpenedBy( ref.current );
 		}
 	}
 
@@ -392,7 +416,6 @@ export default function NavigationLinkEdit( {
 	if ( ! url || isInvalid || isDraft ) {
 		blockProps.onClick = () => {
 			setIsLinkOpen( true );
-			setOpenedBy( ref.current );
 		};
 	}
 
@@ -415,9 +438,8 @@ export default function NavigationLinkEdit( {
 						icon={ linkIcon }
 						title={ __( 'Link' ) }
 						shortcut={ displayShortcut.primary( 'k' ) }
-						onClick={ ( event ) => {
+						onClick={ () => {
 							setIsLinkOpen( true );
-							setOpenedBy( event.currentTarget );
 						} }
 					/>
 					{ ! isAtMaxNesting && (
@@ -517,37 +539,26 @@ export default function NavigationLinkEdit( {
 							link={ attributes }
 							onClose={ () => {
 								// If there is no link then remove the auto-inserted block.
-								// This avoids empty blocks which can provided a poor UX.
+								// This avoids empty blocks which can provide a poor UX.
 								if ( ! url ) {
-									// Fixes https://github.com/WordPress/gutenberg/issues/61361
-									// There's a chance we're closing due to the user selecting the browse all button.
-									// Only move focus if the focus is still within the popover ui. If it's not within
-									// the popover, it's because something has taken the focus from the popover, and
-									// we don't want to steal it back.
-									if (
-										linkUIref.current.contains(
-											window.document.activeElement
-										)
-									) {
-										// Select the previous block to keep focus nearby
-										selectPreviousBlock( clientId, true );
+									if ( closedByEscapeRef.current ) {
+										// User pressed Escape or closed intentionally
+										// Select the previous block so the appender remains visible.
+										// Ideally this would focus the appender instead.
+										selectPreviousBlock( clientId );
 									}
 
-									// Remove the link.
+									// Then remove this block
 									onReplace( [] );
-									return;
 								}
 
 								setIsLinkOpen( false );
-								if ( openedBy ) {
-									openedBy.focus();
-									setOpenedBy( null );
-								} else if ( ref.current ) {
-									// select the ref when adding a new link
+
+								if (
+									closedByEscapeRef.current &&
+									ref.current
+								) {
 									ref.current.focus();
-								} else {
-									// Fallback
-									selectPreviousBlock( clientId, true );
 								}
 							} }
 							anchor={ popoverAnchor }
