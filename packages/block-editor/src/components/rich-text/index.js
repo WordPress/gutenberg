@@ -135,12 +135,8 @@ export function RichTextWrapper(
 			return { isSelected: false };
 		}
 
-		const {
-			getSelectionStart,
-			getSelectionEnd,
-			getBlockEditingMode,
-			isNavigationMode,
-		} = select( blockEditorStore );
+		const { getSelectionStart, getSelectionEnd, getBlockEditingMode } =
+			select( blockEditorStore );
 		const selectionStart = getSelectionStart();
 		const selectionEnd = getSelectionEnd();
 
@@ -161,12 +157,10 @@ export function RichTextWrapper(
 			selectionStart: isSelected ? selectionStart.offset : undefined,
 			selectionEnd: isSelected ? selectionEnd.offset : undefined,
 			isSelected,
-			isContentOnlyWriteMode:
-				isNavigationMode() &&
-				getBlockEditingMode( clientId ) === 'contentOnly',
+			isContentOnly: getBlockEditingMode( clientId ) === 'contentOnly',
 		};
 	};
-	const { selectionStart, selectionEnd, isSelected, isContentOnlyWriteMode } =
+	const { selectionStart, selectionEnd, isSelected, isContentOnly } =
 		useSelect( selector, [
 			clientId,
 			identifier,
@@ -354,7 +348,7 @@ export function RichTextWrapper(
 		identifier,
 		allowedFormats: adjustedAllowedFormats,
 		withoutInteractiveFormatting,
-		disableNoneEssentialFormatting: isContentOnlyWriteMode,
+		disableNoneEssentialFormatting: isContentOnly,
 	} );
 
 	function addEditorOnlyFormats( value ) {
