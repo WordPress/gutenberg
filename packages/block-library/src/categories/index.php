@@ -47,6 +47,12 @@ function render_block_core_categories( $attributes, $content, $block ) {
 			$taxonomy->labels->singular_name
 		);
 
+		$current_category = get_queried_object();
+
+		if ( ! empty( $current_category->slug ) ) {
+			$args['selected'] = $current_category->slug;
+		}
+
 		$show_label     = empty( $attributes['showLabel'] ) ? ' screen-reader-text' : '';
 		$default_label  = $taxonomy->label;
 		$label_text     = ! empty( $attributes['label'] ) ? wp_kses_post( $attributes['label'] ) : $default_label;
@@ -104,7 +110,7 @@ function build_dropdown_script_block_core_categories( $dropdown_id ) {
 	( function() {
 		var dropdown = document.getElementById( '<?php echo esc_js( $dropdown_id ); ?>' );
 		function onCatChange() {
-			if ( dropdown.options[ dropdown.selectedIndex ].value !== -1 ) {
+			if ( dropdown.options[ dropdown.selectedIndex ].value !== '-1' ) {
 				location.href = "<?php echo esc_url( home_url() ); ?>/?" + dropdown.name + '=' + dropdown.options[ dropdown.selectedIndex ].value;
 			}
 		}
