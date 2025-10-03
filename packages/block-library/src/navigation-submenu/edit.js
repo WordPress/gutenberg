@@ -151,7 +151,8 @@ export default function NavigationSubmenuEdit( {
 	const itemLabelPlaceholder = __( 'Add text…' );
 	const ref = useRef();
 	const closedByEscapeRef = useRef( false );
-	const isNewLink = useRef( ! url );
+	// If the link isSelected when mounted, it was just added via an appender
+	const isNewLink = isSelected;
 	const hasInitialized = useRef( false );
 
 	const {
@@ -451,7 +452,7 @@ export default function NavigationSubmenuEdit( {
 							link={ attributes }
 							onClose={ () => {
 								// If there is no link then remove the auto-inserted block.
-								if ( ! url && isNewLink.current ) {
+								if ( ! url && isNewLink ) {
 									if ( closedByEscapeRef.current ) {
 										// User pressed Escape - select previous block so appender remains visible
 										selectPreviousBlock( clientId );
@@ -464,7 +465,7 @@ export default function NavigationSubmenuEdit( {
 
 								if (
 									closedByEscapeRef.current &&
-									isNewLink.current &&
+									isNewLink &&
 									ref.current
 								) {
 									ref.current.focus();
