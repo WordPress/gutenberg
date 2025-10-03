@@ -18,6 +18,7 @@ import { useBlockSelectionClearer } from '../block-selection-clearer';
 import { useBlockCommands } from '../use-block-commands';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { BlockCanvasCover } from '../../index';
 
 // EditorStyles is a memoized component, so avoid passing a new
 // object reference on each render.
@@ -44,6 +45,7 @@ export function ExperimentalBlockCanvas( {
 		( select ) => unlock( select( blockEditorStore ) ).getZoomLevel(),
 		[]
 	);
+
 	const zoomOutIframeProps =
 		zoomLevel !== 100 && ! isTabletViewport
 			? {
@@ -74,6 +76,29 @@ export function ExperimentalBlockCanvas( {
 				>
 					{ children }
 				</WritingFlow>
+
+				<BlockCanvasCover.Slot
+					fillProps={ { containerElement: localRef.current } }
+				>
+					{ ( covers ) =>
+						covers.map( ( cover, index ) => (
+							<div
+								key={ index }
+								className="block-canvas-cover"
+								style={ {
+									position: 'absolute',
+									top: 0,
+									left: 0,
+									width: '100%',
+									height: '100%',
+									pointerEvents: 'none',
+								} }
+							>
+								{ cover }
+							</div>
+						) )
+					}
+				</BlockCanvasCover.Slot>
 			</BlockTools>
 		);
 	}
@@ -95,6 +120,28 @@ export function ExperimentalBlockCanvas( {
 			>
 				<EditorStyles styles={ styles } />
 				{ children }
+				<BlockCanvasCover.Slot
+					fillProps={ { containerElement: localRef.current } }
+				>
+					{ ( covers ) =>
+						covers.map( ( cover, index ) => (
+							<div
+								key={ index }
+								className="block-canvas-cover"
+								style={ {
+									position: 'absolute',
+									top: 0,
+									left: 0,
+									width: '100%',
+									height: '100%',
+									pointerEvents: 'none',
+								} }
+							>
+								{ cover }
+							</div>
+						) )
+					}
+				</BlockCanvasCover.Slot>
 			</Iframe>
 		</BlockTools>
 	);

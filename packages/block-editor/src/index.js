@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { createSlotFill } from '@wordpress/components';
+
+/**
  * Internal dependencies
  */
 import './hooks';
@@ -21,3 +26,5 @@ export * from './utils';
 export { storeConfig, store } from './store';
 export { SETTINGS_DEFAULTS } from './store/defaults';
 export { privateApis } from './private-apis';
+
+export const BlockCanvasCover = createSlotFill( 'BlockCanvasCover' );

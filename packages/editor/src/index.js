@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { createSlotFill } from '@wordpress/components';
+
+/**
  * Internal dependencies
  */
 import './hooks';
@@ -13,3 +18,5 @@ export * from './dataviews/api';
  * Backward compatibility
  */
 export { transformStyles } from '@wordpress/block-editor';
+
+export const VisualEditorOverlay = createSlotFill( 'VisualEditorOverlay' );
