@@ -2719,7 +2719,9 @@ describe( 'Entity handling', () => {
 		expect( searchInput ).toBeDisabled();
 
 		// Click the unlink button
-		const unlinkButton = screen.getByRole( 'button', { name: 'Unlink' } );
+		const unlinkButton = screen.getByRole( 'button', {
+			name: 'Unsync and edit',
+		} );
 		await user.click( unlinkButton );
 
 		// Input should now be enabled and value should be cleared
@@ -2742,6 +2744,99 @@ describe( 'Entity handling', () => {
 			title: 'Test Page', // Component preserves original title
 			type: 'page',
 			url: 'https://example.com/different-page',
+		} );
+	} );
+
+	describe( 'Accessibility association for entity links', () => {
+		it( 'should associate unlink button with help text via aria-describedby', () => {
+			const entityLink = {
+				id: 123,
+				url: 'https://example.com/page',
+				title: 'Test Page',
+				type: 'page',
+			};
+
+			render(
+				<LinkControl
+					value={ entityLink }
+					handleEntities
+					forceIsEditingLink
+				/>
+			);
+
+			// Find the unlink button
+			const unlinkButton = screen.getByRole( 'button', {
+				name: 'Unsync and edit',
+			} );
+
+			// Get the help text ID from the button's aria-describedby
+			const helpTextId = unlinkButton.getAttribute( 'aria-describedby' );
+			expect( helpTextId ).toBeTruthy();
+			expect( helpTextId ).toMatch( /^link-control-\d+__help$/ );
+
+			// Verify the help text element exists with the correct content
+			expect(
+				screen.getByText( 'Synced with the selected page.' )
+			).toBeInTheDocument();
+		} );
+
+		it( 'should generate unique help text IDs for multiple LinkControl instances', () => {
+			const entityLink1 = {
+				id: 123,
+				url: 'https://example.com/page1',
+				title: 'Page 1',
+				type: 'page',
+			};
+
+			const entityLink2 = {
+				id: 456,
+				url: 'https://example.com/page2',
+				title: 'Page 2',
+				type: 'page',
+			};
+
+			render(
+				<div>
+					<LinkControl
+						value={ entityLink1 }
+						handleEntities
+						forceIsEditingLink
+					/>
+					<LinkControl
+						value={ entityLink2 }
+						handleEntities
+						forceIsEditingLink
+					/>
+				</div>
+			);
+
+			const unlinkButtons = screen.getAllByRole( 'button', {
+				name: 'Unsync and edit',
+			} );
+
+			// Get help text IDs from both buttons
+			const helpTextId1 =
+				unlinkButtons[ 0 ].getAttribute( 'aria-describedby' );
+			const helpTextId2 =
+				unlinkButtons[ 1 ].getAttribute( 'aria-describedby' );
+
+			// IDs should be different
+			expect( helpTextId1 ).not.toBe( helpTextId2 );
+
+			// Each button should be associated with its corresponding help text
+			expect( unlinkButtons[ 0 ] ).toHaveAttribute(
+				'aria-describedby',
+				helpTextId1
+			);
+			expect( unlinkButtons[ 1 ] ).toHaveAttribute(
+				'aria-describedby',
+				helpTextId2
+			);
+
+			// Help text elements should exist with correct content
+			expect(
+				screen.getAllByText( 'Synced with the selected page.' )
+			).toHaveLength( 2 );
 		} );
 	} );
 } );

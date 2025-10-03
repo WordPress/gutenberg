@@ -14,8 +14,9 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useRef, useState, useEffect } from '@wordpress/element';
+import { useInstanceId } from '@wordpress/compose';
 import { focus } from '@wordpress/dom';
 import { ENTER } from '@wordpress/keycodes';
 import { isShallowEqualObjects } from '@wordpress/is-shallow-equal';
@@ -202,6 +203,10 @@ function LinkControl( {
 
 	// Compute isEntity internally based on handleEntities prop and presence of ID
 	const isEntity = handleEntities && !! internalControlValue?.id;
+
+	// Generate help text ID for accessibility association
+	const baseId = useInstanceId( LinkControl, 'link-control' );
+	const helpTextId = isEntity ? `${ baseId }__help` : null;
 
 	const valueHasChanges =
 		value && ! isShallowEqualObjects( internalControlValue, value );
@@ -444,9 +449,22 @@ function LinkControl( {
 									isDisabled={ isDisabled }
 									onUnlink={ handleUnlink }
 									onSubmit={ handleSubmit }
+									helpTextId={ helpTextId }
 								/>
 							}
 						/>
+						{ isEntity && helpTextId && (
+							<p
+								id={ helpTextId }
+								className="block-editor-link-control__help"
+							>
+								{ sprintf(
+									/* translators: %s: entity type (e.g., page, post) */
+									__( 'Synced with the selected %s.' ),
+									internalControlValue?.type || 'item'
+								) }
+							</p>
+						) }
 					</div>
 					{ errorMessage && (
 						<Notice
@@ -532,6 +550,7 @@ function LinkControl( {
  * @param {boolean}  props.isDisabled  - Whether the submit button should be disabled
  * @param {Function} props.onUnlink    - Callback when unlink button is clicked
  * @param {Function} props.onSubmit    - Callback when submit button is clicked
+ * @param {string}   props.helpTextId  - ID of the help text element for accessibility
  */
 function SearchSuffixControl( {
 	isEntity,
@@ -539,13 +558,16 @@ function SearchSuffixControl( {
 	isDisabled,
 	onUnlink,
 	onSubmit,
+	helpTextId,
 } ) {
 	if ( isEntity ) {
 		return (
 			<Button
 				icon={ linkOff }
 				onClick={ onUnlink }
-				aria-label={ __( 'Unlink' ) }
+				aria-describedby={ helpTextId }
+				showTooltip
+				label={ __( 'Unsync and edit' ) }
 				__next40pxDefaultSize
 			/>
 		);
