@@ -7,7 +7,7 @@ import { subDays, subYears } from 'date-fns';
  * Internal dependencies
  */
 import { filterSortAndPaginate } from '../filter-and-sort-data-view';
-import { data, fields } from '../components/dataviews/stories/fixtures';
+import { data, fields } from '../stories/dataviews.fixtures';
 
 describe( 'filters', () => {
 	it( 'should return empty if the data is empty', () => {

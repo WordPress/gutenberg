@@ -31,6 +31,22 @@ function gutenberg_maintain_templates_routes() {
 	$controller                              = new WP_REST_Templates_Controller( 'wp_template' );
 	$wp_post_types['wp_template']->rest_base = 'wp_template';
 	$controller->register_routes();
+
+	// Add the same field as wp_registered_template.
+	register_rest_field(
+		'wp_template',
+		'theme',
+		array(
+			'get_callback' => function ( $post_arr ) {
+				$terms = get_the_terms( $post_arr['id'], 'wp_theme' );
+				if ( is_wp_error( $terms ) || empty( $terms ) ) {
+					return null;
+				}
+
+				return $terms[0]->slug;
+			},
+		)
+	);
 }
 
 // 3. We need a route to get that raw static templates from themes and plugins.
@@ -219,7 +235,16 @@ function gutenberg_resolve_block_template( $template_type, $template_hierarchy, 
 			continue;
 		}
 
-		$templates[] = _build_block_template_result_from_post( $post );
+		$template = _build_block_template_result_from_post( $post );
+
+		// Ensure the active templates are associated with the active theme.
+		// See _build_block_template_object_from_post_object.
+		if ( get_stylesheet() !== $template->theme ) {
+			$remaining_slugs[] = $slug;
+			continue;
+		}
+
+		$templates[] = $template;
 	}
 
 	// For any remaining slugs, use the static template.

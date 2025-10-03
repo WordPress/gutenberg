@@ -3,7 +3,7 @@
  * Server-side rendering of the `core/accordion` block.
  *
  * @package WordPress
- * @since 6.6.0
+ * @since 6.9.0
  *
  * @param array $attributes The block attributes.
  * @param string $content The block content.
@@ -32,7 +32,7 @@ function render_block_core_accordion( $attributes, $content ) {
 /**
  * Registers the `core/accordion` block on server.
  *
- * @since 6.6.0
+ * @since 6.9.0
  */
 function register_block_core_accordion() {
 	register_block_type_from_metadata(
