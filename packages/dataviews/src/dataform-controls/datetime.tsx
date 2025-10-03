@@ -12,7 +12,7 @@ import {
 	privateApis as componentsPrivateApis,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { useCallback, useRef, useState } from '@wordpress/element';
+import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getDate, getSettings } from '@wordpress/date';
 
@@ -82,6 +82,17 @@ function CalendarDateTimeControl< Item >( {
 		>( undefined );
 
 	const baseControlRef = useRef< HTMLDivElement >( null );
+	const validationTimeoutRef = useRef< ReturnType< typeof setTimeout > >();
+	const previousFocusRef = useRef< Element | null >( null );
+
+	// Cleanup timeout on unmount
+	useEffect( () => {
+		return () => {
+			if ( validationTimeoutRef.current ) {
+				clearTimeout( validationTimeoutRef.current );
+			}
+		};
+	}, [] );
 
 	const onValidateControl = useCallback(
 		( newValue: any ) => {
@@ -131,7 +142,18 @@ function CalendarDateTimeControl< Item >( {
 				onChange( dateTimeValue );
 				onValidateControl( dateTimeValue );
 
-				setTimeout( () => {
+				// Clear any existing timeout
+				if ( validationTimeoutRef.current ) {
+					clearTimeout( validationTimeoutRef.current );
+				}
+
+				// Save the currently focused element
+				previousFocusRef.current =
+					baseControlRef.current &&
+					baseControlRef.current.ownerDocument.activeElement;
+
+				// Trigger validation display by simulating focus and blur
+				validationTimeoutRef.current = setTimeout( () => {
 					if ( baseControlRef.current ) {
 						const input = baseControlRef.current.querySelector(
 							'input[type="datetime-local"]'
@@ -141,11 +163,17 @@ function CalendarDateTimeControl< Item >( {
 							input.blur();
 							onChange( dateTimeValue );
 							onValidateControl( dateTimeValue );
+
+							// Restore focus to the previously focused element
+							if (
+								previousFocusRef.current &&
+								previousFocusRef.current instanceof HTMLElement
+							) {
+								previousFocusRef.current.focus();
+							}
 						}
 					}
-				}, 10 );
-
-				// Trigger validation display by simulating focus and blur
+				}, 0 );
 			} else {
 				onChange( undefined );
 				onValidateControl( undefined );
