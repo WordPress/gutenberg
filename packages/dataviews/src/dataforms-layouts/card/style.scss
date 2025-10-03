@@ -8,3 +8,9 @@
 	font-size: $font-size-medium;
 	margin-bottom: $grid-unit-20;
 }
+
+.dataforms-layouts-card__field-summary {
+	display: flex;
+	flex-direction: row;
+	gap: $grid-unit-20;
+}

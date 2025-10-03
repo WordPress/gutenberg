@@ -48,7 +48,6 @@ add_action(
 		register_block_type(
 			'test/auto-register-block',
 			array(
-				'api_version'     => 3,
 				'render_callback' => static function () {
 					return '<div>Auto-register block content</div>';
 				},

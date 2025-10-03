@@ -2307,12 +2307,7 @@ function getDerivedBlockEditingModesForTree(
 			let ancestorBlockEditingMode;
 			let parent = state.blocks.parents.get( clientId );
 			while ( parent !== undefined ) {
-				// There's a chance we only just calculated this for the parent,
-				// if so we can return that value for a faster lookup.
-				if ( derivedBlockEditingModes.has( parent ) ) {
-					ancestorBlockEditingMode =
-						derivedBlockEditingModes.get( parent );
-				} else if ( state.blockEditingModes.has( parent ) ) {
+				if ( state.blockEditingModes.has( parent ) ) {
 					// Checking the explicit block editing mode will be slower,
 					// as the block editing mode is more likely to be set on a
 					// distant ancestor.
@@ -2549,31 +2544,29 @@ function getDerivedBlockEditingModesUpdates( {
 	} );
 
 	addedBlocks?.forEach( ( addedBlock ) => {
-		traverseBlockTree( nextState, addedBlock.clientId, ( block ) => {
-			const updates = getDerivedBlockEditingModesForTree(
-				nextState,
-				isNavMode,
-				block.clientId
-			);
+		const updates = getDerivedBlockEditingModesForTree(
+			nextState,
+			isNavMode,
+			addedBlock.clientId
+		);
 
-			if ( updates.size ) {
-				if ( ! nextDerivedBlockEditingModes ) {
-					nextDerivedBlockEditingModes = new Map( [
-						...( prevDerivedBlockEditingModes?.size
-							? prevDerivedBlockEditingModes
-							: [] ),
-						...updates,
-					] );
-				} else {
-					nextDerivedBlockEditingModes = new Map( [
-						...( nextDerivedBlockEditingModes?.size
-							? nextDerivedBlockEditingModes
-							: [] ),
-						...updates,
-					] );
-				}
+		if ( updates.size ) {
+			if ( ! nextDerivedBlockEditingModes ) {
+				nextDerivedBlockEditingModes = new Map( [
+					...( prevDerivedBlockEditingModes?.size
+						? prevDerivedBlockEditingModes
+						: [] ),
+					...updates,
+				] );
+			} else {
+				nextDerivedBlockEditingModes = new Map( [
+					...( nextDerivedBlockEditingModes?.size
+						? nextDerivedBlockEditingModes
+						: [] ),
+					...updates,
+				] );
 			}
-		} );
+		}
 	} );
 
 	return nextDerivedBlockEditingModes;
