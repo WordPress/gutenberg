@@ -1526,14 +1526,15 @@ For example:
 -   `type`: `card`. Required.
 -   `isOpened`: boolean. Optional. `true` by default.
 -   `withHeader`: boolean. Optional. `true` by default.
--   `summary`: Summary field configuration. Optional. Specifies which field(s) to display in the card header. Can be: - A string (single field ID)
+-   `summary`: Summary field configuration. Optional. Specifies which field(s) to display in the card header. Can be:
+    -   A string (single field ID)
     -   An array of strings (multiple field IDs)
     -   An array of objects for per-field visibility control `[{ id: string, visibility: 'always' | 'when-collapsed' }]`
 
 Cards can be collapsed while visible, so you can control when summary fields appear:
 
--   `'always'`: Show the field in both expanded and collapsed states
--   `'when-collapsed'`: Show the field only when the card is collapsed
+-   `'always'`: Show the field in both expanded and collapsed states.
+-   `'when-collapsed'`: Show the field only when the card is collapsed. This is the default.
 
 For example:
 
