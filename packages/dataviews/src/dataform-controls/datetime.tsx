@@ -12,7 +12,7 @@ import {
 	privateApis as componentsPrivateApis,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { useCallback, useState } from '@wordpress/element';
+import { useCallback, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getDate, getSettings } from '@wordpress/date';
 
@@ -81,6 +81,8 @@ function CalendarDateTimeControl< Item >( {
 			>[ 'customValidity' ]
 		>( undefined );
 
+	const baseControlRef = useRef< HTMLDivElement >( null );
+
 	const onValidateControl = useCallback(
 		( newValue: any ) => {
 			const message = field.isValid?.custom?.(
@@ -128,6 +130,22 @@ function CalendarDateTimeControl< Item >( {
 				const dateTimeValue = finalDateTime.toISOString();
 				onChange( dateTimeValue );
 				onValidateControl( dateTimeValue );
+
+				setTimeout( () => {
+					if ( baseControlRef.current ) {
+						const input = baseControlRef.current.querySelector(
+							'input[type="datetime-local"]'
+						) as HTMLInputElement;
+						if ( input ) {
+							input.focus();
+							input.blur();
+							onChange( dateTimeValue );
+							onValidateControl( dateTimeValue );
+						}
+					}
+				}, 10 );
+
+				// Trigger validation display by simulating focus and blur
 			} else {
 				onChange( undefined );
 				onValidateControl( undefined );
@@ -161,46 +179,50 @@ function CalendarDateTimeControl< Item >( {
 	} = getSettings();
 
 	return (
-		<BaseControl
-			__nextHasNoMarginBottom
-			id={ id }
-			label={ label }
-			help={ description }
-			hideLabelFromVision={ hideLabelFromVision }
-		>
-			<VStack spacing={ 4 }>
-				{ /* Calendar widget */ }
-				<DateCalendar
-					style={ { width: '100%' } }
-					selected={
-						value ? parseDateTime( value ) || undefined : undefined
-					}
-					onSelect={ onSelectDate }
-					month={ calendarMonth }
-					onMonthChange={ setCalendarMonth }
-					timeZone={ timezoneString || undefined }
-					weekStartsOn={ startOfWeek }
-				/>
-				{ /* Manual datetime input */ }
-				<ValidatedInputControl
-					__next40pxDefaultSize
-					required={ !! field.isValid?.required }
-					onValidate={ onValidateControl }
-					customValidity={ customValidity }
-					type="datetime-local"
-					label={ __( 'Date time' ) }
-					hideLabelFromVision
-					value={
-						value
-							? formatDateTime(
-									parseDateTime( value ) || undefined
-							  )
-							: ''
-					}
-					onChange={ handleManualDateTimeChange }
-				/>
-			</VStack>
-		</BaseControl>
+		<div ref={ baseControlRef }>
+			<BaseControl
+				__nextHasNoMarginBottom
+				id={ id }
+				label={ label }
+				help={ description }
+				hideLabelFromVision={ hideLabelFromVision }
+			>
+				<VStack spacing={ 4 }>
+					{ /* Calendar widget */ }
+					<DateCalendar
+						style={ { width: '100%' } }
+						selected={
+							value
+								? parseDateTime( value ) || undefined
+								: undefined
+						}
+						onSelect={ onSelectDate }
+						month={ calendarMonth }
+						onMonthChange={ setCalendarMonth }
+						timeZone={ timezoneString || undefined }
+						weekStartsOn={ startOfWeek }
+					/>
+					{ /* Manual datetime input */ }
+					<ValidatedInputControl
+						__next40pxDefaultSize
+						required={ !! field.isValid?.required }
+						onValidate={ onValidateControl }
+						customValidity={ customValidity }
+						type="datetime-local"
+						label={ __( 'Date time' ) }
+						hideLabelFromVision
+						value={
+							value
+								? formatDateTime(
+										parseDateTime( value ) || undefined
+								  )
+								: ''
+						}
+						onChange={ handleManualDateTimeChange }
+					/>
+				</VStack>
+			</BaseControl>
+		</div>
 	);
 }
 
