@@ -187,15 +187,6 @@ function CalendarDateControl< Item >( {
 
 	const onValidate = useCallback(
 		( newValue: string | undefined ) => {
-			// Check if required and empty
-			if ( field.isValid?.required && ! newValue ) {
-				setCustomValidity( {
-					type: 'invalid',
-					message: __( 'This field is required.' ),
-				} );
-				return;
-			}
-
 			// Check custom validation (only if value exists)
 			if ( newValue ) {
 				const customMessage = field.isValid?.custom?.(
@@ -218,11 +209,30 @@ function CalendarDateControl< Item >( {
 				}
 			}
 
+			// Check HTML5 validity
+			const inputRef = validityTargetRef.current;
+			if ( inputRef && ! inputRef.validity.valid ) {
+				setCustomValidity( {
+					type: 'invalid',
+					message: inputRef.validationMessage,
+				} );
+				return;
+			}
+
 			// No errors
 			setCustomValidity( undefined );
 		},
 		[ data, field, setValue ]
 	);
+
+	useEffect( () => {
+		if ( isTouched ) {
+			const timeoutId = setTimeout( () => {
+				onValidate( value );
+			}, 0 );
+			return () => clearTimeout( timeoutId );
+		}
+	}, [ isTouched, value, onValidate ] );
 
 	const onSelectDate = useCallback(
 		( newDate: Date | undefined | null ) => {
@@ -232,9 +242,8 @@ function CalendarDateControl< Item >( {
 			onChange( dateValue );
 			setSelectedPresetId( null );
 			setIsTouched( true );
-			onValidate( dateValue );
 		},
-		[ onChange, onValidate ]
+		[ onChange ]
 	);
 
 	const handlePresetClick = useCallback(
@@ -246,9 +255,8 @@ function CalendarDateControl< Item >( {
 			onChange( dateValue );
 			setSelectedPresetId( preset.id );
 			setIsTouched( true );
-			onValidate( dateValue );
 		},
-		[ onChange, onValidate ]
+		[ onChange ]
 	);
 
 	const handleManualDateChange = useCallback(
@@ -262,9 +270,8 @@ function CalendarDateControl< Item >( {
 			}
 			setSelectedPresetId( null );
 			setIsTouched( true );
-			onValidate( newValue );
 		},
-		[ onChange, onValidate ]
+		[ onChange ]
 	);
 
 	const {
@@ -284,7 +291,6 @@ function CalendarDateControl< Item >( {
 			! event.currentTarget.contains( event.relatedTarget )
 		) {
 			setIsTouched( true );
-			onValidate( value );
 		}
 	};
 
@@ -427,27 +433,18 @@ function CalendarDateRangeControl< Item >( {
 
 	const onValidate = useCallback(
 		( newValue: DateRange ) => {
-			// Check HTML5 validity for required fields
-			const fromInput = fromInputRef.current;
-			const toInput = toInputRef.current;
-
-			if ( fromInput && ! fromInput.validity.valid ) {
-				setCustomValidity( {
-					type: 'invalid',
-					message: fromInput.validationMessage,
-				} );
-				return;
+			// Check if required and either from or to is empty
+			if ( field.isValid?.required ) {
+				if ( ! newValue || ! newValue[ 0 ] || ! newValue[ 1 ] ) {
+					setCustomValidity( {
+						type: 'invalid',
+						message: __( 'This field is required.' ),
+					} );
+					return;
+				}
 			}
 
-			if ( toInput && ! toInput.validity.valid ) {
-				setCustomValidity( {
-					type: 'invalid',
-					message: toInput.validationMessage,
-				} );
-				return;
-			}
-
-			// Check custom validation (only if both dates exist)
+			// Check validation (only if both dates exist)
 			if ( newValue && newValue[ 0 ] && newValue[ 1 ] ) {
 				const customMessage = field.isValid?.custom?.(
 					deepMerge(
@@ -467,6 +464,35 @@ function CalendarDateRangeControl< Item >( {
 					} );
 					return;
 				}
+
+				// Check HTML5 validity
+				const fromInput = fromInputRef.current;
+				if (
+					newValue &&
+					newValue[ 0 ] &&
+					fromInput &&
+					! fromInput.validity.valid
+				) {
+					setCustomValidity( {
+						type: 'invalid',
+						message: fromInput.validationMessage,
+					} );
+					return;
+				}
+
+				const toInput = toInputRef.current;
+				if (
+					newValue &&
+					newValue[ 1 ] &&
+					toInput &&
+					! toInput.validity.valid
+				) {
+					setCustomValidity( {
+						type: 'invalid',
+						message: toInput.validationMessage,
+					} );
+					return;
+				}
 			}
 
 			// No errors
@@ -477,7 +503,10 @@ function CalendarDateRangeControl< Item >( {
 
 	useEffect( () => {
 		if ( isTouched ) {
-			onValidate( value );
+			const timeoutId = setTimeout( () => {
+				onValidate( value );
+			}, 0 );
+			return () => clearTimeout( timeoutId );
 		}
 	}, [ isTouched, value, onValidate ] );
 
@@ -485,14 +514,12 @@ function CalendarDateRangeControl< Item >( {
 		( fromDate?: Date | string, toDate?: Date | string ) => {
 			if ( fromDate && toDate ) {
 				onChange( [ formatDate( fromDate ), formatDate( toDate ) ] );
-				onValidate( [ formatDate( fromDate ), formatDate( toDate ) ] );
 			} else if ( ! fromDate && ! toDate ) {
 				onChange( undefined );
-				onValidate( undefined );
 			}
 			// Do nothing if only one date is set - wait for both
 		},
-		[ onChange, onValidate ]
+		[ onChange ]
 	);
 
 	const onSelectCalendarRange = useCallback(
@@ -557,7 +584,6 @@ function CalendarDateRangeControl< Item >( {
 			! event.currentTarget.contains( event.relatedTarget )
 		) {
 			setIsTouched( true );
-			onValidate( value );
 		}
 	};
 
