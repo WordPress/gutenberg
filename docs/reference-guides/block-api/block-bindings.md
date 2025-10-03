@@ -20,18 +20,18 @@ An example could be connecting an Image block `url` attribute to a function that
 } -->
 ```
 
-
 ## Compatible blocks and their attributes
 
 Right now, not all block attributes are compatible with block bindings. There is some ongoing effort to increase this compatibility, but for now, this is the list:
 
-| Supported Blocks    | Supported Attributes       |
-| ----------------    | --------------------       |
-| Paragraph           | content                    |
-| Heading             | content                    |
-| Image               | id, url, title, alt        |
-| Button              | text, url, linkTarget, rel |
-| Navigation Link     | url                        |
+| Supported Blocks   | Supported Attributes       |
+| ------------------ | -------------------------- |
+| Paragraph          | content                    |
+| Heading            | content                    |
+| Image              | id, url, title, alt        |
+| Button             | text, url, linkTarget, rel |
+| Navigation Link    | url                        |
+| Navigation Submenu | url                        |
 
 ## Registering a custom source
 
@@ -49,11 +49,11 @@ Server registration allows applying a callback that will be executed on the fron
 
 The function to register a custom source is `register_block_bindings_source($name, $args)`:
 
-- `name`: `string` that sets the unique ID for the custom source.
-- `args`: `array` that contains:
-    - `label`: `string` with the human-readable name of the custom source.
-    - `uses_context`: `array` with the block context that is passed to the callback (optional).
-    - `get_value_callback`: `function` that will run on the bound block's render function. It accepts three arguments: `source_args`, `block_instance` and `attribute_name`. This value can be overridden with the filter `block_bindings_source_value`.
+-   `name`: `string` that sets the unique ID for the custom source.
+-   `args`: `array` that contains:
+    -   `label`: `string` with the human-readable name of the custom source.
+    -   `uses_context`: `array` with the block context that is passed to the callback (optional).
+    -   `get_value_callback`: `function` that will run on the bound block's render function. It accepts three arguments: `source_args`, `block_instance` and `attribute_name`. This value can be overridden with the filter `block_bindings_source_value`.
 
 Note that `register_block_bindings_source()` should be called from a handler attached to the `init` hook.
 
@@ -111,11 +111,11 @@ _**Note:** Since WordPress 6.7._
 The value returned by `get_value_callback` can be modified with the `block_bindings_source_value` filter.
 The filter has the following parameters:
 
-- `value`: The value to be filtered.
-- `name`: The name of the source.
-- `source_args`: `array` containing source arguments.
-- `block_instance`: The block instance object.
-- `attribute_name`: The name of the attribute.
+-   `value`: The value to be filtered.
+-   `name`: The name of the source.
+-   `source_args`: `array` containing source arguments.
+-   `block_instance`: The block instance object.
+-   `attribute_name`: The name of the attribute.
 
 Example:
 
@@ -138,10 +138,9 @@ add_filter( 'block_bindings_source_value', 'wpmovies_format_visualization_date',
 
 There are a few examples in Core that can be used as reference.
 
-- Post Meta. [Source code](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/block-bindings/post-meta.php)
-- Pattern overrides. [Source code](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/block-bindings/pattern-overrides.php)
-- Twenty Twenty-Five theme. [Source code](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-content/themes/twentytwentyfive/functions.php)
-
+-   Post Meta. [Source code](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/block-bindings/post-meta.php)
+-   Pattern overrides. [Source code](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/block-bindings/pattern-overrides.php)
+-   Twenty Twenty-Five theme. [Source code](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-content/themes/twentytwentyfive/functions.php)
 
 ### Editor registration
 
@@ -151,21 +150,18 @@ Editor registration on the client allows defining what the bound block will do w
 
 The function to register a custom source is `registerBlockBindingsSource( args )`:
 
-- `args`: `object` with the following structure:
-    - `name`: `string` with the unique and machine-readable name.
-    - `label`: `string` with the human readable name of the custom source. In case it was defined already on the server, the server label will be overridden by this one, in that case, it is not recommended to be defined here. (optional)
-    - `usesContext`: `array` with the block context that the custom source may need. In case it was defined already on the server, it should not be defined here. (optional)
-    - `getValues`: `function` that retrieves the values from the source. (optional)
-    - `setValues`: `function` that allows updating the values connected to the source. (optional)
-    - `canUserEditValue`: `function` to determine if the user can edit the value. The user won't be able to edit by default. (optional)
-
+-   `args`: `object` with the following structure:
+    -   `name`: `string` with the unique and machine-readable name.
+    -   `label`: `string` with the human readable name of the custom source. In case it was defined already on the server, the server label will be overridden by this one, in that case, it is not recommended to be defined here. (optional)
+    -   `usesContext`: `array` with the block context that the custom source may need. In case it was defined already on the server, it should not be defined here. (optional)
+    -   `getValues`: `function` that retrieves the values from the source. (optional)
+    -   `setValues`: `function` that allows updating the values connected to the source. (optional)
+    -   `canUserEditValue`: `function` to determine if the user can edit the value. The user won't be able to edit by default. (optional)
 
 This example will show a custom post meta date in the editor and, if it doesn't exist, it will show today's date. The user can edit the value of the date. (Caution: This example does not format the user input as a date—it's only for educational purposes.)
 
 ```js
-import {
-	registerBlockBindingsSource,
-} from '@wordpress/blocks';
+import { registerBlockBindingsSource } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
 
@@ -215,10 +211,10 @@ registerBlockBindingsSource( {
 
 The `getValues` function retrieves the value from the source on block loading. It receives an `object` as an argument with the following properties:
 
-- `bindings` returns the bindings object of the specific source. It must have the attributes as a key, and the value can be a `string` or an `object` with arguments.
-- `clientId` returns a `string` with the current block client ID.
-- `context` returns an `object` of the current block context, defined in the `usesContext` property. [More about block context.](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-context/).
-- `select` returns an `object` of a given store's selectors. [More info in their docs.](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-data/#select).
+-   `bindings` returns the bindings object of the specific source. It must have the attributes as a key, and the value can be a `string` or an `object` with arguments.
+-   `clientId` returns a `string` with the current block client ID.
+-   `context` returns an `object` of the current block context, defined in the `usesContext` property. [More about block context.](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-context/).
+-   `select` returns an `object` of a given store's selectors. [More info in their docs.](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-data/#select).
 
 The function must return an `object` with this structure:
 `{ 'block attribute' : value }`
@@ -227,19 +223,18 @@ The function must return an `object` with this structure:
 
 The `setValues` function updates all the values of the source of the block bound. It receives an `object` as an argument with the following properties:
 
-- `bindings` returns the bindings object of the specific source. It must have the attributes as a key, and the value can be a `string` or an `object` with arguments. This object contains a `newValue` property with the user's input.
-- `clientId` returns a `string` with the current block client ID.
-- `context` returns an `object` of the current block context, defined in the `usesContext` property. [More about block context.](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-context/).
-- `dispatch` returns an `object` of the store's action creators. [More about dispatch](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-data/#dispatch).
-- `select` returns an `object` of a given store's selectors. [More info in their docs.](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-data/#select).
-
+-   `bindings` returns the bindings object of the specific source. It must have the attributes as a key, and the value can be a `string` or an `object` with arguments. This object contains a `newValue` property with the user's input.
+-   `clientId` returns a `string` with the current block client ID.
+-   `context` returns an `object` of the current block context, defined in the `usesContext` property. [More about block context.](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-context/).
+-   `dispatch` returns an `object` of the store's action creators. [More about dispatch](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-data/#dispatch).
+-   `select` returns an `object` of a given store's selectors. [More info in their docs.](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-data/#select).
 
 #### Editor registration Core examples
 
 There are a few examples in Core that can be used as reference.
 
-- Post Meta. [Source code](https://github.com/WordPress/gutenberg/blob/5afd6c27bfba2be2e06b502257753fbfff1ae9f0/packages/editor/src/bindings/post-meta.js#L74-L146)
-- Pattern overrides. [Source code](https://github.com/WordPress/gutenberg/blob/5afd6c27bfba2be2e06b502257753fbfff1ae9f0/packages/editor/src/bindings/pattern-overrides.js#L8-L100)
+-   Post Meta. [Source code](https://github.com/WordPress/gutenberg/blob/5afd6c27bfba2be2e06b502257753fbfff1ae9f0/packages/editor/src/bindings/post-meta.js#L74-L146)
+-   Pattern overrides. [Source code](https://github.com/WordPress/gutenberg/blob/5afd6c27bfba2be2e06b502257753fbfff1ae9f0/packages/editor/src/bindings/pattern-overrides.js#L8-L100)
 
 ## Unregistering a source
 
@@ -304,11 +299,11 @@ import { useBlockBindingsUtils } from '@wordpress/block-editor';
 const { updateBlockBindings } = useBlockBindingsUtils();
 
 function updateBlockBindingsURLSource( url ) {
-	updateBlockBindings({
+	updateBlockBindings( {
 		url: {
 			source: 'myplugin/new-source',
-		}
-	})
+		},
+	} );
 }
 
 // Remove binding from url attribute.
@@ -330,6 +325,3 @@ function clearBlockBindings() {
 	removeAllBlockBindings();
 }
 ```
-
-
-
