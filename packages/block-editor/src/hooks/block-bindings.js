@@ -507,7 +507,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 				<Modal onRequestClose={ handleCloseModal }>
 					<RenderModalContent
 						attribute={ modalState.attribute }
-						onCloseModal={ handleCloseModal }
+						closeModal={ handleCloseModal }
 					/>
 				</Modal>
 			) }
