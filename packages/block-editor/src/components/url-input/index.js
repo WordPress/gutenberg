@@ -426,7 +426,6 @@ class URLInput extends Component {
 			hideLabelFromVision = false,
 			help = null,
 			disabled = false,
-			'aria-describedby': ariaDescribedBy,
 		} = this.props;
 
 		const {
@@ -470,7 +469,6 @@ class URLInput extends Component {
 			disabled,
 			suffix: this.props.suffix,
 			help,
-			'aria-describedby': ariaDescribedBy,
 		};
 
 		if ( renderControl ) {
