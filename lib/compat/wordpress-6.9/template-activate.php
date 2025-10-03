@@ -206,7 +206,7 @@ function gutenberg_resolve_block_template( $template_type, $template_hierarchy, 
 	//////////////////////////////
 
 	$object            = get_queried_object();
-	$specific_template = get_page_template_slug( $object );
+	$specific_template = $object ? get_page_template_slug( $object ) : null;
 	$active_templates  = (array) get_option( 'active_templates', array() );
 
 	// Remove templates slugs that are deactivated, except if it's the specific
