@@ -142,7 +142,8 @@ class Custom_WP_Posts_List_Table extends WP_Posts_List_Table {
 				);
 				$avatar_urls  = get_avatar_url( $comment->user_id, $gravatar_params );
 				$avatar_color = $this->avatar_colors[ $comment->user_id % count( $this->avatar_colors ) ]; // Matches client side code.
-				echo "<img class='post-list-block-comment-avatar' src='" . esc_url( $avatar_urls ) . "' style='border-color: $avatar_color; z-index: $count--;' />";
+				echo "<img class='post-list-block-comment-avatar' src='" . esc_url( $avatar_urls ) . "' style='border-color: " . $avatar_color .
+					"; z-index: " . $count-- . ";' title='" . esc_attr__( 'Open discussions', 'gutenberg' ) . "'/>";
 			}
 
 			// Add an overflow indicator if there are more avatars than the max.
