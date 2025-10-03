@@ -6,7 +6,8 @@
 			"gutenberg-env",
 			"gutenberg-test-env",
 			"jest",
-			"@testing-library/jest-dom"
+			"@testing-library/jest-dom",
+			"node"
 		]
 	},
 	"references": [

@@ -15,7 +15,6 @@
 		"isolatedModules": true,
 
 		"skipDefaultLibCheck": true,
-		"skipLibCheck": true,
 
 		/* Strict Type-Checking Options */
 		"strict": true,
