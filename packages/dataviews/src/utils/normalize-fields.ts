@@ -6,20 +6,20 @@ import type { FunctionComponent } from 'react';
 /**
  * Internal dependencies
  */
-import getFieldTypeDefinition from './field-types';
+import getFieldTypeDefinition from '../field-types';
 import type {
 	DataViewRenderFieldProps,
 	Field,
 	FieldTypeDefinition,
 	NormalizedFilterByConfig,
 	NormalizedField,
-} from './types';
-import { getControl } from './dataform-controls';
+} from '../types';
+import { getControl } from '../dataform-controls';
 import {
 	ALL_OPERATORS,
 	OPERATOR_BETWEEN,
 	SINGLE_SELECTION_OPERATORS,
-} from './constants';
+} from '../constants';
 
 const getValueFromId =
 	( id: string ) =>
@@ -136,7 +136,7 @@ function getFilterBy< Item >(
  * @param fields Fields config.
  * @return Normalized fields config.
  */
-export function normalizeFields< Item >(
+export default function normalizeFields< Item >(
 	fields: Field< Item >[]
 ): NormalizedField< Item >[] {
 	return fields.map( ( field ) => {

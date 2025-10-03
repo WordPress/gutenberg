@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { normalizeFields } from '../normalize-fields';
+import normalizeFields from './normalize-fields';
 import type { Field, Form } from '../types';
 
 /**
