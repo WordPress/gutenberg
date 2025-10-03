@@ -5,56 +5,48 @@ import { __ } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
 
 /**
- * Gets a list of post data fields with their values and labels
- * to be consumed in the needed callbacks.
+ * Retrieves post data fields with their values and labels.
  * Falls back to defaults if context is missing.
  *
- * @param {Object} select  The select function from the data store.
- * @param {Object} context The block context.
- * @return {Object|null} List of post data fields with value and label.
+ * @param {Function} select  The select function from the data store.
+ * @param {Object} context   The block context.
+ * @return {Object|null}     List of post data fields with value and label.
  */
 function getPostDataFields( select, context ) {
 	const { getEditedEntityRecord } = select( coreDataStore );
 
-	let entityDataValues = {};
-	let dataFields = {};
-
-	if ( context?.postType && context?.postId ) {
-		entityDataValues = getEditedEntityRecord(
-			'postType',
-			context.postType,
-			context.postId
-		) || {};
-	}
-
-	dataFields = {
-		title: {
-			label: __( 'Post Title' ),
-			value: entityDataValues?.title,
-			type: 'string'
-		},
-		status: {
-			label: __( 'Post Status' ),
-			value: entityDataValues?.status,
-			type: 'string'
-		},
-		date: {
-			label: __( 'Post Date' ),
-			value: entityDataValues?.date,
-			type: 'string'
-		},
-		modified: {
-			label: __( 'Post Modified Date' ),
-			value: entityDataValues?.modified,
-			type: 'string'
-		}
-	};
-
-	if ( ! Object.keys( dataFields ).length ) {
+	if ( !context?.postType || !context?.postId ) {
 		return null;
 	}
 
-	return dataFields;
+	const entityDataValues = getEditedEntityRecord(
+		'postType',
+		context.postType,
+		context.postId
+	) || {};
+
+	return {
+		title: {
+			label: __( 'Post Title' ),
+			value: entityDataValues?.title ?? '',
+			type: 'string',
+		},
+		status: {
+			label: __( 'Post Status' ),
+			value: entityDataValues?.status ?? '',
+			type: 'string',
+		},
+		date: {
+			label: __( 'Post Date' ),
+			value: entityDataValues?.date ?? '',
+			type: 'string',
+		},
+		modified: {
+			label: __( 'Post Modified Date' ),
+			value: entityDataValues?.modified ?? '',
+			type: 'string',
+		},
+	};
 }
 
 /**
@@ -65,57 +57,53 @@ export default {
 
 	getValues( { select, context, bindings } ) {
 		const dataFields = getPostDataFields( select, context );
+		if ( !dataFields ) return {};
 
-		const newValues = {};
-		for ( const [ attributeName, source ] of Object.entries( bindings ) ) {
-			const fieldKey = source.args.key ?? source.args.linkKey;
-			const { value: fieldValue, label: fieldLabel } =
-				dataFields?.[ fieldKey ] || {};
-			newValues[ attributeName ] = fieldValue ?? fieldLabel ?? fieldKey;
-		}
-
-		return newValues;
+		return Object.fromEntries(
+			Object.entries( bindings ).map( ( [ attributeName, source ] ) => {
+				const fieldKey = source.args.key ?? source.args.linkKey;
+				const { value: fieldValue, label: fieldLabel } = dataFields[fieldKey] || {};
+				return [ attributeName, fieldValue ?? fieldLabel ?? fieldKey ];
+			} )
+		);
 	},
 
 	setValues( { dispatch, context, bindings } ) {
-		const newData = {};
-		Object.values( bindings ).forEach( ( { args, newValue } ) => {
+		if ( !context?.postType || !context?.postId ) return;
+
+		const newData = Object.values( bindings ).reduce( ( acc, { args, newValue } ) => {
 			const fieldKey = args.key ?? args.linkKey;
-			newData[ fieldKey ] = newValue;
-		} );
+			acc[fieldKey] = newValue;
+			return acc;
+		}, {} );
 
 		dispatch( coreDataStore ).editEntityRecord(
 			'postType',
-			context?.postType,
-			context?.postId,
+			context.postType,
+			context.postId,
 			newData
 		);
 	},
 
 	canUserEditValue( { select, context, args } ) {
-		if ( context?.query || context?.queryId ) {
-			return false;
-		}
-		if ( ! context?.postType ) {
+		if ( context?.query || context?.queryId || !context?.postType ) {
 			return false;
 		}
 
 		const fieldKey = args.key ?? args.linkKey;
 		const fieldValue = getPostDataFields( select, context )?.[ fieldKey ]?.value;
-		if ( fieldValue === undefined ) {
-			return false;
-		}
+		if ( fieldValue === undefined ) return false;
 
 		const canUserEdit = select( coreDataStore ).canUser( 'update', {
 			kind: 'postType',
 			name: context.postType,
-			id: context.postId
+			id: context.postId,
 		} );
 
-		return !! canUserEdit;
+		return !!canUserEdit;
 	},
 
 	getFieldsList( { select, context } ) {
 		return getPostDataFields( select, context );
-	}
+	},
 };
