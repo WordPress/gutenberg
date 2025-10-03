@@ -134,7 +134,7 @@ function gutenberg_use_custom_posts_list_table( $class_name ) {
 	}
 	return $class_name;
 }
-add_filter( 'wp_list_table_class_name', 'use_custom_posts_list_table' );
+add_filter( 'wp_list_table_class_name', 'gutenberg_use_custom_posts_list_table' );
 
 /**
  * Add some label styles on the post list table.
