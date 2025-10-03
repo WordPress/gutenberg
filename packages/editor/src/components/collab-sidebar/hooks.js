@@ -29,10 +29,13 @@ export function useBlockComments( postId ) {
 			const commentId =
 				getBlockAttributes( clientId )?.metadata?.commentId;
 			if ( commentId ) {
-				results[ commentId ] = clientId;
+				results.push( {
+					blockId: clientId,
+					commentId,
+				} );
 			}
 			return results;
-		}, {} );
+		}, [] );
 	}, [] );
 
 	// Process comments to build the tree structure.
@@ -49,7 +52,11 @@ export function useBlockComments( postId ) {
 				...item,
 				reply: [],
 				blockClientId:
-					item.parent === 0 ? blocksWithComments[ item.id ] : null,
+					item.parent === 0
+						? blocksWithComments.find(
+								( block ) => block.commentId === item.id
+						  )
+						: null,
 			};
 		} );
 
@@ -77,16 +84,28 @@ export function useBlockComments( postId ) {
 			updatedResult.map( ( thread ) => [ String( thread.id ), thread ] )
 		);
 
-		// Get comments by block order, filter out undefined threads, and exclude resolved comments.
-		const unresolvedSortedComments = Object.keys( blocksWithComments )
-			.map( ( id ) => threadIdMap.get( id ) )
+		// Get comments by block order, first unresolved, then resolved.
+		const unresolvedSortedComments = blocksWithComments
+			.map( ( { commentId } ) => threadIdMap.get( String( commentId ) ) )
 			.filter(
-				( thread ) =>
-					thread !== undefined && thread.status !== 'approved'
+				( thread ) => thread !== undefined && thread.status === 'hold'
 			);
 
+		const resolvedSortedComments = blocksWithComments
+			.map( ( { commentId } ) => threadIdMap.get( String( commentId ) ) )
+			.filter(
+				( thread ) =>
+					thread !== undefined && thread.status === 'approved'
+			);
+
+		// Combine unresolved comments in block order with resolved comments at the end.
+		const allSortedComments = [
+			...unresolvedSortedComments,
+			...resolvedSortedComments,
+		];
+
 		return {
-			resultComments: updatedResult,
+			resultComments: allSortedComments,
 			unresolvedSortedThreads: unresolvedSortedComments,
 		};
 	}, [ threads, blocksWithComments ] );
