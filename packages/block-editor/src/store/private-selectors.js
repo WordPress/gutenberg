@@ -528,10 +528,7 @@ export function isSectionBlock( state, clientId ) {
 	) {
 		return true;
 	}
-
-	const sectionRootClientId = getSectionRootClientId( state );
-	const sectionClientIds = getBlockOrder( state, sectionRootClientId );
-	return sectionClientIds.includes( clientId );
+	return false;
 }
 
 /**
