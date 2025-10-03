@@ -134,7 +134,7 @@ class Custom_WP_Posts_List_Table extends WP_Posts_List_Table {
 		if ( count( $unresolved_comments ) > 0 ) {
 			$max_avatars = 3;
 			$count = $max_avatars;
-			echo "<div class='comment-avatar-stack' title='" . esc_attr__( 'This post has open discussions', 'gutenberg' ) . "'>";
+			echo "<div class='post-list-block-comment-avatar-stack' title='" . esc_attr__( 'This post has open discussions', 'gutenberg' ) . "'>";
 			foreach ( array_slice( $unresolved_comments, 0, $max_avatars ) as $comment ) {
 				$gravatar_params = array(
 					'size' => 18,
@@ -142,7 +142,7 @@ class Custom_WP_Posts_List_Table extends WP_Posts_List_Table {
 				);
 				$avatar_urls  = get_avatar_url( $comment->user_id, $gravatar_params );
 				$avatar_color = $this->avatar_colors[ $comment->user_id % count( $this->avatar_colors ) ]; // Matches client side code.
-				echo "<img class='comment-avatar' src='" . esc_url( $avatar_urls ) . "' style='border-color: $avatar_color; z-index: $count--;' />";
+				echo "<img class='post-list-block-comment-avatar' src='" . esc_url( $avatar_urls ) . "' style='border-color: $avatar_color; z-index: $count--;' />";
 			}
 
 			// Add an overflow indicator if there are more avatars than the max.
@@ -156,7 +156,7 @@ class Custom_WP_Posts_List_Table extends WP_Posts_List_Table {
 						count( $unresolved_comments ) - $max_avatars
 					);
 				}
-				echo "<span class='comment-avatar-overflow'> " . esc_html( $overflow ) . ' </span>';
+				echo "<span class='post-list-block-comment-avatar-overflow'> " . esc_html( $overflow ) . ' </span>';
 			}
 			echo '</div>';
 		}

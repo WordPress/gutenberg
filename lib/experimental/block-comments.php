@@ -140,17 +140,15 @@ add_filter( 'wp_list_table_class_name', 'gutenberg_use_custom_posts_list_table' 
  * Add some label styles on the post list table.
  */
 function gutenberg_add_open_discussion_label_styles() {
-	$screen = get_current_screen();
-	if ( 'edit-post' === $screen->id || 'edit-page' === $screen->id ) {
-		?>
+?>
 	<style>
-		.comment-avatar-stack {
+		.post-list-block-comment-avatar-stack {
 			display: inline-flex;
 			align-items: center;
 			vertical-align: middle;
 			padding-left: 6px;
 		}
-		.comment-avatar{
+		.post-list-block-comment-avatar{
 			margin-left: -6px;
 			border: 2px solid #fff;
 			border-radius: 50%;
@@ -160,11 +158,11 @@ function gutenberg_add_open_discussion_label_styles() {
 			padding: 1px;
 			background: #fff;
 		}
-		.comment-avatar:first-child{
+		.post-list-block-comment-avatar:first-child{
 			margin-left: 0;
 		}
 
-		.comment-avatar-overflow {
+		.post-list-block-comment-avatar-overflow {
 			align-items:center;
 			display:flex;
 			font-size: 12px;
@@ -176,7 +174,6 @@ function gutenberg_add_open_discussion_label_styles() {
 			width:fit-content;
 		}
 	</style>
-		<?php
-	}
+<?php
 }
 add_action( 'admin_footer', 'gutenberg_add_open_discussion_label_styles' );
