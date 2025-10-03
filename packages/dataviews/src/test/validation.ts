@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { isItemValid } from '../validation';
+import isItemValid from '../utils/is-item-valid';
 import type { Field } from '../types';
 
 describe( 'validation', () => {

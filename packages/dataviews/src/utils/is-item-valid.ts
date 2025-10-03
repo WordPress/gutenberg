@@ -1,8 +1,8 @@
 /**
  * Internal dependencies
  */
-import { normalizeFields } from './normalize-fields';
-import type { Field, Form } from './types';
+import { normalizeFields } from '../normalize-fields';
+import type { Field, Form } from '../types';
 
 /**
  * Whether or not the given item's value is valid according to the fields and form config.
@@ -13,7 +13,7 @@ import type { Field, Form } from './types';
  *
  * @return A boolean indicating if the item is valid (true) or not (false).
  */
-export function isItemValid< Item >(
+export default function isItemValid< Item >(
 	item: Item,
 	fields: Field< Item >[],
 	form: Form
