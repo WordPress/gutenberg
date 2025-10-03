@@ -48,15 +48,14 @@ export function useBlockComments( postId ) {
 
 		// Initialize each object with an empty `reply` array and map blockClientId.
 		allComments.forEach( ( item ) => {
+			const itemBlock = blocksWithComments.find(
+				( block ) => block.commentId === item.id
+			);
+
 			compare[ item.id ] = {
 				...item,
 				reply: [],
-				blockClientId:
-					item.parent === 0
-						? blocksWithComments.find(
-								( block ) => block.commentId === item.id
-						  )
-						: null,
+				blockClientId: item.parent === 0 ? itemBlock?.blockId : null,
 			};
 		} );
 
