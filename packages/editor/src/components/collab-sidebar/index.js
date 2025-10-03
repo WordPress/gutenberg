@@ -229,6 +229,7 @@ function CommentBoardWrapper( {
 		? heights[ previousThreadId ]
 		: 0;
 
+	// If the previous comment board is overlapping this comment, shift it down.
 	const calculateOffset = () => {
 		if (
 			previousOffset &&
@@ -239,6 +240,8 @@ function CommentBoardWrapper( {
 		return -16;
 	};
 
+	// Use floating-ui to track the block element's position. The crossAxis offset
+	// is calculated to avoid overlapping comment boards and will shift the board down.
 	const { y, refs } = useFloating( {
 		placement: 'right-start',
 		middleware: [
@@ -316,7 +319,7 @@ export default function CollabSidebar() {
 	const { selectBlock } = useDispatch( blockEditorStore );
 	const handleThreadClick = ( thread ) => {
 		if ( thread?.clientId ) {
-			selectBlock( thread.clientId ); // Use the action to select the block
+			selectBlock( thread.clientId );
 		}
 		setActiveComment( thread.id );
 	};
