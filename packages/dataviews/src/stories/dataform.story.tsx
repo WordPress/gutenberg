@@ -1330,13 +1330,10 @@ const LayoutRowComponent = ( {
 			id: 'cost',
 			label: 'Cost',
 			type: 'integer',
-			readOnly: true,
-		},
-		{
-			id: 'tax',
-			label: 'Tax',
-			type: 'integer',
-			readOnly: true,
+			setValue: ( { item, value } ) => ( {
+				cost: value,
+				total: Number( value ) * item.quantity,
+			} ),
 		},
 		{
 			id: 'quantity',
@@ -1354,11 +1351,16 @@ const LayoutRowComponent = ( {
 				{ value: 9, label: '9' },
 				{ value: 10, label: '10' },
 			],
+			setValue: ( { item, value } ) => ( {
+				quantity: Number( value ),
+				total: Number( value ) * item.cost,
+			} ),
 		},
 		{
 			id: 'total',
 			label: 'Total',
 			type: 'integer',
+			readOnly: true,
 		},
 	];
 
@@ -1500,13 +1502,12 @@ const LayoutRowComponent = ( {
 								type: 'row',
 								alignment: 'end',
 								styles: {
-									cost: { flex: 1 },
-									tax: { flex: 1 },
-									quantity: { flex: 2 },
-									total: { flex: 2 },
+									total: { flex: 1 },
+									cost: { flex: 3 },
+									quantity: { flex: 3 },
 								},
 							},
-							children: [ 'cost', 'tax', 'quantity', 'total' ],
+							children: [ 'total', 'cost', 'quantity' ],
 						},
 					],
 				} }
