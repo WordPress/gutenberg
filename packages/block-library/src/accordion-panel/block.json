@@ -47,7 +47,8 @@
 			}
 		},
 		"shadow": true,
-		"blockVisibility": false
+		"blockVisibility": false,
+		"contentRole": true
 	},
 	"attributes": {
 		"allowedBlocks": {
