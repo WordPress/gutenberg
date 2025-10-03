@@ -2583,6 +2583,264 @@ describe( 'Controlling link title text', () => {
 	} );
 } );
 
+describe( 'Entity handling', () => {
+	it( 'should enable input when handleEntities is false', () => {
+		const entityLink = {
+			id: 123, // provide an id to be considered an entity
+			url: 'https://example.com/page',
+			title: 'Test Page',
+			type: 'page',
+		};
+
+		render(
+			<LinkControl
+				value={ entityLink }
+				handleEntities={ false }
+				forceIsEditingLink
+			/>
+		);
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+
+		expect( searchInput ).toBeVisible();
+		expect( searchInput ).toBeEnabled();
+	} );
+
+	it( 'should disable input when handleEntities is true and link has id', () => {
+		const entityLink = {
+			id: 123, // provide an id to be considered an entity
+			url: 'https://example.com/page',
+			title: 'Test Page',
+			type: 'page',
+		};
+
+		render(
+			<LinkControl
+				value={ entityLink }
+				handleEntities
+				forceIsEditingLink
+			/>
+		);
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+
+		expect( searchInput ).toBeVisible();
+		expect( searchInput ).toBeDisabled();
+
+		// Should show help text indicating this is an entity link
+		expect(
+			screen.getByText( 'Synced with the selected page.' )
+		).toBeVisible();
+	} );
+
+	it( 'should enable input when handleEntities is true but link has no id', () => {
+		const nonEntityLink = {
+			url: 'https://example.com/external',
+			title: 'External Link',
+			// No id property - not an entity
+		};
+
+		render(
+			<LinkControl
+				value={ nonEntityLink }
+				handleEntities
+				forceIsEditingLink
+			/>
+		);
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+
+		expect( searchInput ).toBeVisible();
+		expect( searchInput ).toBeEnabled();
+
+		// Should not show entity help text for non-entity links
+		expect(
+			screen.queryByText( 'Synced with the selected page.' )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'should allow unlinking and selecting different entity', async () => {
+		const user = userEvent.setup();
+
+		// Mock search suggestions to return multiple entities
+		mockFetchSearchSuggestions.mockImplementation( () =>
+			Promise.resolve( [
+				{
+					id: 456, // Different ID from original entity
+					title: 'Different Page',
+					type: 'page',
+					url: 'https://example.com/different-page',
+				},
+				{
+					id: 789,
+					title: 'Another Post',
+					type: 'post',
+					url: 'https://example.com/another-post',
+				},
+				{
+					id: 101,
+					title: 'Third Option',
+					type: 'page',
+					url: 'https://example.com/third-option',
+				},
+			] )
+		);
+
+		const entityLink = {
+			id: 123, // provide an id to be considered an entity
+			url: 'https://example.com/page',
+			title: 'Test Page',
+			type: 'page',
+		};
+
+		const onChange = jest.fn();
+
+		render(
+			<LinkControl
+				value={ entityLink }
+				handleEntities
+				forceIsEditingLink
+				onChange={ onChange }
+				showInitialSuggestions
+			/>
+		);
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+
+		// Initially should be disabled
+		expect( searchInput ).toBeDisabled();
+
+		// Click the unlink button
+		const unlinkButton = screen.getByRole( 'button', {
+			name: 'Unsync and edit',
+		} );
+		await user.click( unlinkButton );
+
+		// Input should now be enabled and value should be cleared
+		expect( searchInput ).toBeEnabled();
+		expect( searchInput ).toHaveValue( '' );
+
+		// Wait for initial suggestions to appear automatically
+		const suggestionsList = await screen.findByRole( 'listbox' );
+		expect( suggestionsList ).toBeVisible();
+
+		// Click on a different entity suggestion
+		const differentSuggestion = screen.getByRole( 'option', {
+			name: 'Different Page /different-page Page',
+		} );
+		await user.click( differentSuggestion );
+
+		// Verify that onChange was called with the correct entity data
+		expect( onChange ).toHaveBeenCalledWith( {
+			id: 456,
+			title: 'Test Page', // Component preserves original title
+			type: 'page',
+			url: 'https://example.com/different-page',
+		} );
+	} );
+
+	describe( 'Accessibility association for entity links', () => {
+		it( 'should associate unlink button with help text via aria-describedby', () => {
+			const entityLink = {
+				id: 123,
+				url: 'https://example.com/page',
+				title: 'Test Page',
+				type: 'page',
+			};
+
+			render(
+				<LinkControl
+					value={ entityLink }
+					handleEntities
+					forceIsEditingLink
+				/>
+			);
+
+			// Find the unlink button
+			const unlinkButton = screen.getByRole( 'button', {
+				name: 'Unsync and edit',
+			} );
+
+			// Get the help text ID from the button's aria-describedby
+			const helpTextId = unlinkButton.getAttribute( 'aria-describedby' );
+			expect( helpTextId ).toBeTruthy();
+			expect( helpTextId ).toMatch( /^link-control-\d+__help$/ );
+
+			// Verify the help text element exists with the correct content
+			expect(
+				screen.getByText( 'Synced with the selected page.' )
+			).toBeInTheDocument();
+		} );
+
+		it( 'should generate unique help text IDs for multiple LinkControl instances', () => {
+			const entityLink1 = {
+				id: 123,
+				url: 'https://example.com/page1',
+				title: 'Page 1',
+				type: 'page',
+			};
+
+			const entityLink2 = {
+				id: 456,
+				url: 'https://example.com/page2',
+				title: 'Page 2',
+				type: 'page',
+			};
+
+			render(
+				<div>
+					<LinkControl
+						value={ entityLink1 }
+						handleEntities
+						forceIsEditingLink
+					/>
+					<LinkControl
+						value={ entityLink2 }
+						handleEntities
+						forceIsEditingLink
+					/>
+				</div>
+			);
+
+			const unlinkButtons = screen.getAllByRole( 'button', {
+				name: 'Unsync and edit',
+			} );
+
+			// Get help text IDs from both buttons
+			const helpTextId1 =
+				unlinkButtons[ 0 ].getAttribute( 'aria-describedby' );
+			const helpTextId2 =
+				unlinkButtons[ 1 ].getAttribute( 'aria-describedby' );
+
+			// IDs should be different
+			expect( helpTextId1 ).not.toBe( helpTextId2 );
+
+			// Each button should be associated with its corresponding help text
+			expect( unlinkButtons[ 0 ] ).toHaveAttribute(
+				'aria-describedby',
+				helpTextId1
+			);
+			expect( unlinkButtons[ 1 ] ).toHaveAttribute(
+				'aria-describedby',
+				helpTextId2
+			);
+
+			// Help text elements should exist with correct content
+			expect(
+				screen.getAllByText( 'Synced with the selected page.' )
+			).toHaveLength( 2 );
+		} );
+	} );
+} );
+
 function getSettingsDrawerToggle() {
 	return screen.queryByRole( 'button', {
 		name: 'Advanced',

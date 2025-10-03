@@ -15,7 +15,7 @@ import { useMemo, useState } from '@wordpress/element';
 import DataViews from '../components/dataviews';
 import { LAYOUT_GRID, LAYOUT_LIST, LAYOUT_TABLE } from '../constants';
 import type { Action, View } from '../types';
-import { filterSortAndPaginate } from '../filter-and-sort-data-view';
+import filterSortAndPaginate from '../utils/filter-sort-and-paginate';
 
 type Data = {
 	id: number;
