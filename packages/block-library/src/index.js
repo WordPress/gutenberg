@@ -8,7 +8,9 @@ import {
 	setGroupingBlockName,
 	registerBlockType,
 } from '@wordpress/blocks';
-import { createElement } from '@wordpress/element';
+import { useBlockProps } from '@wordpress/block-editor';
+import { useServerSideRender } from '@wordpress/server-side-render';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -317,9 +319,6 @@ export const registerCoreBlocks = (
 			registerBlockType( blockName, {
 				title: blockName,
 				edit: function Edit( { attributes } ) {
-					const { useBlockProps } = window.wp.blockEditor;
-					const { useServerSideRender } = window.wp.serverSideRender;
-					const { __, sprintf } = window.wp.i18n;
 					const blockProps = useBlockProps();
 					const { content, status, error } = useServerSideRender( {
 						block: blockName,
@@ -327,29 +326,31 @@ export const registerCoreBlocks = (
 					} );
 
 					if ( status === 'loading' ) {
-						return createElement(
-							'div',
-							blockProps,
-							__( 'Loading…' )
+						return (
+							<div { ...blockProps }>{ __( 'Loading…' ) }</div>
 						);
 					}
 
 					if ( status === 'error' ) {
-						return createElement(
-							'div',
-							blockProps,
-							sprintf(
-								/* translators: %s: error message describing the problem */
-								__( 'Error loading block: %s' ),
-								error
-							)
+						return (
+							<div { ...blockProps }>
+								{ sprintf(
+									/* translators: %s: error message describing the problem */
+									__( 'Error loading block: %s' ),
+									error
+								) }
+							</div>
 						);
 					}
 
-					return createElement( 'div', {
-						...blockProps,
-						dangerouslySetInnerHTML: { __html: content || '' },
-					} );
+					return (
+						<div
+							{ ...blockProps }
+							dangerouslySetInnerHTML={ {
+								__html: content || '',
+							} }
+						/>
+					);
 				},
 				save: () => null,
 			} );
