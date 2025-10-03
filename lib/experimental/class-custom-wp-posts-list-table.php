@@ -147,5 +147,4 @@ class Custom_WP_Posts_List_Table extends WP_Posts_List_Table {
 			echo '</div>';
 		}
 	}
-
 }
