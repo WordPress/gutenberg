@@ -151,6 +151,8 @@ export { default as justifyCenterVertical } from './library/justify-center-verti
 export { default as justifyRight } from './library/justify-right';
 export { default as justifySpaceBetween } from './library/justify-space-between';
 export { default as justifySpaceBetweenVertical } from './library/justify-space-between-vertical';
+export { default as justifySpaceAround } from './library/justify-space-around';
+export { default as justifySpaceEvenly } from './library/justify-space-evenly';
 export { default as justifyStretch } from './library/justify-stretch';
 export { default as justifyStretchVertical } from './library/justify-stretch-vertical';
 export { default as justifyTop } from './library/justify-top';

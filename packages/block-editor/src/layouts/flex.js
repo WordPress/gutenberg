@@ -7,6 +7,8 @@ import {
 	justifyCenter,
 	justifyRight,
 	justifySpaceBetween,
+	justifySpaceAround,
+	justifySpaceEvenly,
 	justifyStretch,
 	arrowRight,
 	arrowDown,
@@ -38,6 +40,8 @@ const justifyContentMap = {
 	right: 'flex-end',
 	center: 'center',
 	'space-between': 'space-between',
+	'space-around': 'space-around',
+	'space-evenly': 'space-evenly',
 };
 
 // Used with the vertical (column) flex orientation.
@@ -249,7 +253,7 @@ function FlexLayoutJustifyContentControl( {
 	};
 	const allowedControls = [ 'left', 'center', 'right' ];
 	if ( orientation === 'horizontal' ) {
-		allowedControls.push( 'space-between' );
+		allowedControls.push( 'space-between', 'space-around', 'space-evenly' );
 	} else {
 		allowedControls.push( 'stretch' );
 	}
@@ -282,11 +286,23 @@ function FlexLayoutJustifyContentControl( {
 		},
 	];
 	if ( orientation === 'horizontal' ) {
-		justificationOptions.push( {
-			value: 'space-between',
-			icon: justifySpaceBetween,
-			label: __( 'Space between items' ),
-		} );
+		justificationOptions.push(
+			{
+				value: 'space-between',
+				icon: justifySpaceBetween,
+				label: __( 'Space between items' ),
+			},
+			{
+				value: 'space-around',
+				icon: justifySpaceAround,
+				label: __( 'Space around items' ),
+			},
+			{
+				value: 'space-evenly',
+				icon: justifySpaceEvenly,
+				label: __( 'Space evenly between items' ),
+			}
+		);
 	} else {
 		justificationOptions.push( {
 			value: 'stretch',
@@ -363,7 +379,11 @@ function OrientationControl( { layout, onChange } ) {
 					if ( verticalAlignment === 'stretch' ) {
 						newVerticalAlignment = 'top';
 					}
-					if ( justifyContent === 'space-between' ) {
+					if (
+						justifyContent === 'space-between' ||
+						justifyContent === 'space-around' ||
+						justifyContent === 'space-evenly'
+					) {
 						newJustification = 'left';
 					}
 				}

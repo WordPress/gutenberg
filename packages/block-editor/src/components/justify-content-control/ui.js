@@ -7,6 +7,8 @@ import {
 	justifyCenter,
 	justifyRight,
 	justifySpaceBetween,
+	justifySpaceAround,
+	justifySpaceEvenly,
 	justifyStretch,
 } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
@@ -16,6 +18,8 @@ const icons = {
 	center: justifyCenter,
 	right: justifyRight,
 	'space-between': justifySpaceBetween,
+	'space-around': justifySpaceAround,
+	'space-evenly': justifySpaceEvenly,
 	stretch: justifyStretch,
 };
 
@@ -67,6 +71,20 @@ function JustifyContentUI( {
 			title: __( 'Space between items' ),
 			isActive: 'space-between' === value,
 			onClick: () => handleClick( 'space-between' ),
+		},
+		{
+			name: 'space-around',
+			icon: justifySpaceAround,
+			title: __( 'Space around items' ),
+			isActive: 'space-around' === value,
+			onClick: () => handleClick( 'space-around' ),
+		},
+		{
+			name: 'space-evenly',
+			icon: justifySpaceEvenly,
+			title: __( 'Space evenly between items' ),
+			isActive: 'space-evenly' === value,
+			onClick: () => handleClick( 'space-evenly' ),
 		},
 		{
 			name: 'stretch',
