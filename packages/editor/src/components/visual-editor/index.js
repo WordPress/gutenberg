@@ -16,15 +16,11 @@ import {
 	privateApis as blockEditorPrivateApis,
 	__experimentalUseResizeCanvas as useResizeCanvas,
 } from '@wordpress/block-editor';
-import { useEffect, useRef, useMemo, useState } from '@wordpress/element';
+import { useEffect, useRef, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { parse } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
-import {
-	useMergeRefs,
-	useViewportMatch,
-	useResizeObserver,
-} from '@wordpress/compose';
+import { useMergeRefs, useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -106,10 +102,6 @@ function VisualEditor( {
 	contentRef,
 	className,
 } ) {
-	const [ contentHeight, setContentHeight ] = useState( '' );
-	const effectContentHeight = useResizeObserver( ( [ entry ] ) => {
-		setContentHeight( entry.borderBoxSize[ 0 ].blockSize );
-	} );
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const {
 		renderingMode,
@@ -326,7 +318,6 @@ function VisualEditor( {
 		.is-root-container.alignfull { max-width: none; margin-left: auto; margin-right: auto;}
 		.is-root-container.alignfull:where(.is-layout-flow) > :not(.alignleft):not(.alignright) { max-width: none;}`;
 
-	const forceFullHeight = postType === NAVIGATION_POST_TYPE;
 	const enableResizing =
 		[
 			NAVIGATION_POST_TYPE,
@@ -351,7 +342,15 @@ function VisualEditor( {
 					// Some themes will have `min-height: 100vh` for the root container,
 					// which isn't a requirement in auto resize mode.
 					enableResizing ? 'min-height:0!important;' : ''
-				}}`,
+				}}
+				${
+					enableResizing
+						? '.block-editor-iframe__html{background:#ddd;display:flex;align-items:center;justify-content:center;min-height:100vh;}.block-editor-iframe__body{width:100%;}'
+						: ''
+				}`,
+				// The CSS above centers the body content vertically when resizing is enabled and applies a background
+				// color to the iframe HTML element to match the background color of the editor canvas.
+				// TODO: Move the #ddd somewhere else or use a variable.
 			},
 		];
 	}, [ styles, enableResizing ] );
@@ -369,9 +368,6 @@ function VisualEditor( {
 			isEnabled: renderingMode === 'template-locked',
 		} ),
 		useZoomOutModeExit(),
-		// Avoid resize listeners when not needed, these will trigger
-		// unnecessary re-renders when animating the iframe width.
-		enableResizing ? effectContentHeight : null,
 	] );
 
 	return (
@@ -388,12 +384,7 @@ function VisualEditor( {
 				}
 			) }
 		>
-			<ResizableEditor
-				enableResizing={ enableResizing }
-				height={
-					contentHeight && ! forceFullHeight ? contentHeight : '100%'
-				}
-			>
+			<ResizableEditor enableResizing={ enableResizing } height="100%">
 				<BlockCanvas
 					shouldIframe={ ! disableIframe }
 					contentRef={ contentRef }
