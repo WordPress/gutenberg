@@ -46,8 +46,6 @@ module.exports = async ( {
 			);
 		}
 	}
-
-
 	const dependencies = {};
 	const devDependencies = {};
 
