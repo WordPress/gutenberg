@@ -8,15 +8,7 @@ import clsx from 'clsx';
  */
 import { createBlock } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-	TextControl,
-	TextareaControl,
-	ToolbarButton,
-	Tooltip,
-	ToolbarGroup,
-} from '@wordpress/components';
+import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
 import {
@@ -27,10 +19,10 @@ import {
 	store as blockEditorStore,
 	getColorClassName,
 	useInnerBlocksProps,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
-import { isURL, prependHTTP, safeDecodeURI } from '@wordpress/url';
-import { useState, useEffect, useRef } from '@wordpress/element';
-import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
+import { isURL, prependHTTP } from '@wordpress/url';
+import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
@@ -39,11 +31,14 @@ import { useMergeRefs, usePrevious } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { LinkUI } from './link-ui';
-import { updateAttributes } from './update-attributes';
 import { getColors } from '../navigation/edit/utils';
+import { Controls, LinkUI, updateAttributes, useEntityBinding } from './shared';
 
 const DEFAULT_BLOCK = { name: 'core/navigation-link' };
+const NESTING_BLOCK_NAMES = [
+	'core/navigation-link',
+	'core/navigation-submenu',
+];
 
 /**
  * A React hook to determine if it's dragging within the target element.
@@ -96,19 +91,29 @@ const useIsDraggingWithin = ( elementRef ) => {
 	return isDraggingWithin;
 };
 
-const useIsInvalidLink = ( kind, type, id ) => {
+const useIsInvalidLink = ( kind, type, id, enabled ) => {
 	const isPostType =
 		kind === 'post-type' || type === 'post' || type === 'page';
 	const hasId = Number.isInteger( id );
+	const blockEditingMode = useBlockEditingMode();
+
 	const postStatus = useSelect(
 		( select ) => {
 			if ( ! isPostType ) {
 				return null;
 			}
+
+			// Fetching the posts status is an "expensive" operation. Especially for sites with large navigations.
+			// When the block is rendered in a template or other disabled contexts we can skip this check in order
+			// to avoid all these additional requests that don't really add any value in that mode.
+			if ( blockEditingMode === 'disabled' || ! enabled ) {
+				return null;
+			}
+
 			const { getEntityRecord } = select( coreStore );
 			return getEntityRecord( 'postType', type, id )?.status;
 		},
-		[ isPostType, type, id ]
+		[ isPostType, blockEditingMode, enabled, type, id ]
 	);
 
 	// Check Navigation Link validity if:
@@ -154,121 +159,6 @@ function getMissingText( type ) {
 	return missingText;
 }
 
-/*
- * Warning, this duplicated in
- * packages/block-library/src/navigation-submenu/edit.js
- * Consider reusing this components for both blocks.
- */
-function Controls( { attributes, setAttributes, setIsLabelFieldFocused } ) {
-	const { label, url, description, title, rel } = attributes;
-	return (
-		<ToolsPanel label={ __( 'Settings' ) }>
-			<ToolsPanelItem
-				hasValue={ () => !! label }
-				label={ __( 'Text' ) }
-				onDeselect={ () => setAttributes( { label: '' } ) }
-				isShownByDefault
-			>
-				<TextControl
-					__nextHasNoMarginBottom
-					__next40pxDefaultSize
-					label={ __( 'Text' ) }
-					value={ label ? stripHTML( label ) : '' }
-					onChange={ ( labelValue ) => {
-						setAttributes( { label: labelValue } );
-					} }
-					autoComplete="off"
-					onFocus={ () => setIsLabelFieldFocused( true ) }
-					onBlur={ () => setIsLabelFieldFocused( false ) }
-				/>
-			</ToolsPanelItem>
-
-			<ToolsPanelItem
-				hasValue={ () => !! url }
-				label={ __( 'Link' ) }
-				onDeselect={ () => setAttributes( { url: '' } ) }
-				isShownByDefault
-			>
-				<TextControl
-					__nextHasNoMarginBottom
-					__next40pxDefaultSize
-					label={ __( 'Link' ) }
-					value={ url ? safeDecodeURI( url ) : '' }
-					onChange={ ( urlValue ) => {
-						updateAttributes(
-							{ url: urlValue },
-							setAttributes,
-							attributes
-						);
-					} }
-					autoComplete="off"
-				/>
-			</ToolsPanelItem>
-
-			<ToolsPanelItem
-				hasValue={ () => !! description }
-				label={ __( 'Description' ) }
-				onDeselect={ () => setAttributes( { description: '' } ) }
-				isShownByDefault
-			>
-				<TextareaControl
-					__nextHasNoMarginBottom
-					label={ __( 'Description' ) }
-					value={ description || '' }
-					onChange={ ( descriptionValue ) => {
-						setAttributes( { description: descriptionValue } );
-					} }
-					help={ __(
-						'The description will be displayed in the menu if the current theme supports it.'
-					) }
-				/>
-			</ToolsPanelItem>
-
-			<ToolsPanelItem
-				hasValue={ () => !! title }
-				label={ __( 'Title attribute' ) }
-				onDeselect={ () => setAttributes( { title: '' } ) }
-				isShownByDefault
-			>
-				<TextControl
-					__nextHasNoMarginBottom
-					__next40pxDefaultSize
-					label={ __( 'Title attribute' ) }
-					value={ title || '' }
-					onChange={ ( titleValue ) => {
-						setAttributes( { title: titleValue } );
-					} }
-					autoComplete="off"
-					help={ __(
-						'Additional information to help clarify the purpose of the link.'
-					) }
-				/>
-			</ToolsPanelItem>
-
-			<ToolsPanelItem
-				hasValue={ () => !! rel }
-				label={ __( 'Rel attribute' ) }
-				onDeselect={ () => setAttributes( { rel: '' } ) }
-				isShownByDefault
-			>
-				<TextControl
-					__nextHasNoMarginBottom
-					__next40pxDefaultSize
-					label={ __( 'Rel attribute' ) }
-					value={ rel || '' }
-					onChange={ ( relValue ) => {
-						setAttributes( { rel: relValue } );
-					} }
-					autoComplete="off"
-					help={ __(
-						'The relationship of the linked URL as space-separated link types.'
-					) }
-				/>
-			</ToolsPanelItem>
-		</ToolsPanel>
-	);
-}
-
 export default function NavigationLinkEdit( {
 	attributes,
 	isSelected,
@@ -279,9 +169,7 @@ export default function NavigationLinkEdit( {
 	context,
 	clientId,
 } ) {
-	const { id, label, type, url, description, kind } = attributes;
-
-	const [ isInvalid, isDraft ] = useIsInvalidLink( kind, type, id );
+	const { id, label, type, url, description, kind, metadata } = attributes;
 	const { maxNestingLevel } = context;
 
 	const {
@@ -304,15 +192,17 @@ export default function NavigationLinkEdit( {
 	const linkUIref = useRef();
 	const prevUrl = usePrevious( url );
 
-	// Change the label using inspector causes rich text to change focus on firefox.
-	// This is a workaround to keep the focus on the label field when label filed is focused we don't render the rich text.
-	const [ isLabelFieldFocused, setIsLabelFieldFocused ] = useState( false );
+	// Change the `label` and `url` using inspector causes RichText to change focus.
+	// This is a workaround to keep the focus on the field when it's focused we don't render the RichText.
+	// See: https://github.com/WordPress/gutenberg/pull/61374.
+	const [ isEditingControl, setIsEditingControl ] = useState( false );
 
 	const {
 		isAtMaxNesting,
 		isTopLevelLink,
 		isParentOfSelectedBlock,
 		hasChildren,
+		validateLinkStatus,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -321,32 +211,58 @@ export default function NavigationLinkEdit( {
 				getBlockRootClientId,
 				hasSelectedInnerBlock,
 				getBlockParentsByBlockName,
+				getSelectedBlockClientId,
 			} = select( blockEditorStore );
+			const rootClientId = getBlockRootClientId( clientId );
+			const isTopLevel =
+				getBlockName( rootClientId ) === 'core/navigation';
+			const selectedBlockClientId = getSelectedBlockClientId();
+			const rootNavigationClientId = isTopLevel
+				? rootClientId
+				: getBlockParentsByBlockName(
+						clientId,
+						'core/navigation'
+				  )[ 0 ];
+
+			// Enable when the root Navigation block is selected or any of its inner blocks.
+			const enableLinkStatusValidation =
+				selectedBlockClientId === rootNavigationClientId ||
+				hasSelectedInnerBlock( rootNavigationClientId, true );
 
 			return {
 				isAtMaxNesting:
-					getBlockParentsByBlockName( clientId, [
-						'core/navigation-link',
-						'core/navigation-submenu',
-					] ).length >= maxNestingLevel,
-				isTopLevelLink:
-					getBlockName( getBlockRootClientId( clientId ) ) ===
-					'core/navigation',
+					getBlockParentsByBlockName( clientId, NESTING_BLOCK_NAMES )
+						.length >= maxNestingLevel,
+				isTopLevelLink: isTopLevel,
 				isParentOfSelectedBlock: hasSelectedInnerBlock(
 					clientId,
 					true
 				),
 				hasChildren: !! getBlockCount( clientId ),
+				validateLinkStatus: enableLinkStatusValidation,
 			};
 		},
 		[ clientId, maxNestingLevel ]
 	);
 	const { getBlocks } = useSelect( blockEditorStore );
 
+	// URL binding logic
+	const { clearBinding, createBinding } = useEntityBinding( {
+		clientId,
+		attributes,
+	} );
+
+	const [ isInvalid, isDraft ] = useIsInvalidLink(
+		kind,
+		type,
+		id,
+		validateLinkStatus
+	);
+
 	/**
 	 * Transform to submenu block.
 	 */
-	const transformToSubmenu = () => {
+	const transformToSubmenu = useCallback( () => {
 		let innerBlocks = getBlocks( clientId );
 		if ( innerBlocks.length === 0 ) {
 			innerBlocks = [ createBlock( 'core/navigation-link' ) ];
@@ -358,7 +274,7 @@ export default function NavigationLinkEdit( {
 			innerBlocks
 		);
 		replaceBlock( clientId, newSubmenu );
-	};
+	}, [ getBlocks, clientId, selectBlock, replaceBlock, attributes ] );
 
 	useEffect( () => {
 		// If block has inner blocks, transform to Submenu.
@@ -368,7 +284,11 @@ export default function NavigationLinkEdit( {
 			__unstableMarkNextChangeAsNotPersistent();
 			transformToSubmenu();
 		}
-	}, [ hasChildren ] );
+	}, [
+		hasChildren,
+		__unstableMarkNextChangeAsNotPersistent,
+		transformToSubmenu,
+	] );
 
 	// If the LinkControl popover is open and the URL has changed, close the LinkControl and focus the label text.
 	useEffect( () => {
@@ -490,10 +410,6 @@ export default function NavigationLinkEdit( {
 	const placeholderText = `(${
 		isInvalid ? __( 'Invalid' ) : __( 'Draft' )
 	})`;
-	const tooltipText =
-		isInvalid || isDraft
-			? __( 'This item has been deleted, or is a draft' )
-			: __( 'This item is missing a link' );
 
 	return (
 		<>
@@ -519,29 +435,29 @@ export default function NavigationLinkEdit( {
 					) }
 				</ToolbarGroup>
 			</BlockControls>
-			{ /* Warning, this duplicated in packages/block-library/src/navigation-submenu/edit.js */ }
 			<InspectorControls>
 				<Controls
 					attributes={ attributes }
 					setAttributes={ setAttributes }
-					setIsLabelFieldFocused={ setIsLabelFieldFocused }
+					setIsEditingControl={ setIsEditingControl }
+					clientId={ clientId }
 				/>
 			</InspectorControls>
 			<div { ...blockProps }>
 				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
 				<a className={ classes }>
 					{ /* eslint-enable */ }
-					{ ! url ? (
+					{ ! url &&
+					! isEditingControl &&
+					! metadata?.bindings?.url ? (
 						<div className="wp-block-navigation-link__placeholder-text">
-							<Tooltip text={ tooltipText }>
-								<span>{ missingText }</span>
-							</Tooltip>
+							<span>{ missingText }</span>
 						</div>
 					) : (
 						<>
 							{ ! isInvalid &&
 								! isDraft &&
-								! isLabelFieldFocused && (
+								! isEditingControl && (
 									<>
 										<RichText
 											ref={ ref }
@@ -575,30 +491,31 @@ export default function NavigationLinkEdit( {
 										) }
 									</>
 								) }
-							{ ( isInvalid ||
-								isDraft ||
-								isLabelFieldFocused ) && (
-								<div className="wp-block-navigation-link__placeholder-text wp-block-navigation-link__label">
-									<Tooltip text={ tooltipText }>
-										<span
-											aria-label={ __(
-												'Navigation link text'
-											) }
-										>
-											{
-												// Some attributes are stored in an escaped form. It's a legacy issue.
-												// Ideally they would be stored in a raw, unescaped form.
-												// Unescape is used here to "recover" the escaped characters
-												// so they display without encoding.
-												// See `updateAttributes` for more details.
-												`${ decodeEntities( label ) } ${
-													isInvalid || isDraft
-														? placeholderText
-														: ''
-												}`.trim()
-											}
-										</span>
-									</Tooltip>
+							{ ( isInvalid || isDraft || isEditingControl ) && (
+								<div
+									className={ clsx(
+										'wp-block-navigation-link__placeholder-text',
+										'wp-block-navigation-link__label',
+										{
+											'is-invalid': isInvalid,
+											'is-draft': isDraft,
+										}
+									) }
+								>
+									<span>
+										{
+											// Some attributes are stored in an escaped form. It's a legacy issue.
+											// Ideally they would be stored in a raw, unescaped form.
+											// Unescape is used here to "recover" the escaped characters
+											// so they display without encoding.
+											// See `updateAttributes` for more details.
+											`${ decodeEntities( label ) } ${
+												isInvalid || isDraft
+													? placeholderText
+													: ''
+											}`.trim()
+										}
+									</span>
 								</div>
 							) }
 						</>
@@ -651,6 +568,13 @@ export default function NavigationLinkEdit( {
 									setAttributes,
 									attributes
 								);
+
+								// Handle URL binding
+								if ( ! updatedValue?.id ) {
+									clearBinding();
+								} else {
+									createBinding();
+								}
 							} }
 						/>
 					) }

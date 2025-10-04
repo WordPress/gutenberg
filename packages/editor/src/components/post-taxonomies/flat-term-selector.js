@@ -100,10 +100,10 @@ export function FlatTermSelector( { slug, __nextHasNoMarginBottom } ) {
 		( select ) => {
 			const { getCurrentPost, getEditedPostAttribute } =
 				select( editorStore );
-			const { getEntityRecords, getTaxonomy, hasFinishedResolution } =
+			const { getEntityRecords, getEntityRecord, hasFinishedResolution } =
 				select( coreStore );
 			const post = getCurrentPost();
-			const _taxonomy = getTaxonomy( slug );
+			const _taxonomy = getEntityRecord( 'root', 'taxonomy', slug );
 			const _termIds = _taxonomy
 				? getEditedPostAttribute( _taxonomy.rest_base )
 				: EMPTY_ARRAY;
@@ -279,7 +279,7 @@ export function FlatTermSelector( { slug, __nextHasNoMarginBottom } ) {
 
 	const newTermLabel =
 		taxonomy?.labels?.add_new_item ??
-		( slug === 'post_tag' ? __( 'Add new tag' ) : __( 'Add new Term' ) );
+		( slug === 'post_tag' ? __( 'Add Tag' ) : __( 'Add Term' ) );
 	const singularName =
 		taxonomy?.labels?.singular_name ??
 		( slug === 'post_tag' ? __( 'Tag' ) : __( 'Term' ) );

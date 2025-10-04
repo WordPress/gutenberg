@@ -29,7 +29,6 @@ import { useBlockRefProvider } from './use-block-refs';
 import { useIntersectionObserver } from './use-intersection-observer';
 import { useScrollIntoView } from './use-scroll-into-view';
 import { useFlashEditableBlocks } from '../../use-flash-editable-blocks';
-import { canBindBlock } from '../../../utils/block-bindings';
 import { useFirefoxDraggableCompatibility } from './use-firefox-draggable-compatibility';
 
 /**
@@ -102,6 +101,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		defaultClassName,
 		isSectionBlock,
 		canMove,
+		isBlockHidden,
 	} = useContext( PrivateBlockContext );
 
 	// translators: %s: Type of block (i.e. Text, Image etc)
@@ -114,7 +114,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		useBlockRefProvider( clientId ),
 		useFocusHandler( clientId ),
 		useEventHandlers( { clientId, isSelected } ),
-		useIsHovered( { clientId } ),
+		useIsHovered(),
 		useIntersectionObserver(),
 		useMovingAnimation( { triggerAnimationOnChange: index, clientId } ),
 		useDisabled( { isDisabled: ! hasOverlay } ),
@@ -128,14 +128,13 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 
 	const blockEditContext = useBlockEditContext();
 	const hasBlockBindings = !! blockEditContext[ blockBindingsKey ];
-	const bindingsStyle =
-		hasBlockBindings && canBindBlock( name )
-			? {
-					'--wp-admin-theme-color': 'var(--wp-block-synced-color)',
-					'--wp-admin-theme-color--rgb':
-						'var(--wp-block-synced-color--rgb)',
-			  }
-			: {};
+	const bindingsStyle = hasBlockBindings
+		? {
+				'--wp-admin-theme-color': 'var(--wp-block-synced-color)',
+				'--wp-admin-theme-color--rgb':
+					'var(--wp-block-synced-color--rgb)',
+		  }
+		: {};
 
 	// Ensures it warns only inside the `edit` implementation for the block.
 	if ( blockApiVersion < 2 && clientId === blockEditContext.clientId ) {
@@ -185,6 +184,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				'has-negative-margin': hasNegativeMargin,
 				'is-content-locked-temporarily-editing-as-blocks':
 					isTemporarilyEditingAsBlocks,
+				'is-block-hidden': isBlockHidden,
 			},
 			className,
 			props.className,

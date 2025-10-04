@@ -322,58 +322,60 @@ export default function PageListEdit( {
 
 	return (
 		<>
-			<InspectorControls>
-				<ToolsPanel
-					label={ __( 'Settings' ) }
-					resetAll={ () => {
-						setAttributes( { parentPageID: 0 } );
-					} }
-					dropdownMenuProps={ dropdownMenuProps }
-				>
-					{ pagesTree.length > 0 && (
-						<ToolsPanelItem
-							label={ __( 'Parent Page' ) }
-							hasValue={ () => parentPageID !== 0 }
-							onDeselect={ () =>
-								setAttributes( { parentPageID: 0 } )
-							}
-							isShownByDefault
-						>
-							<ComboboxControl
-								__nextHasNoMarginBottom
-								__next40pxDefaultSize
-								className="editor-page-attributes__parent"
-								label={ __( 'Parent' ) }
-								value={ parentPageID }
-								options={ pagesTree }
-								onChange={ ( value ) =>
-									setAttributes( {
-										parentPageID: value ?? 0,
-									} )
+			{ ( pagesTree.length > 0 || allowConvertToLinks ) && (
+				<InspectorControls>
+					<ToolsPanel
+						label={ __( 'Settings' ) }
+						resetAll={ () => {
+							setAttributes( { parentPageID: 0 } );
+						} }
+						dropdownMenuProps={ dropdownMenuProps }
+					>
+						{ pagesTree.length > 0 && (
+							<ToolsPanelItem
+								label={ __( 'Parent Page' ) }
+								hasValue={ () => parentPageID !== 0 }
+								onDeselect={ () =>
+									setAttributes( { parentPageID: 0 } )
 								}
-								help={ __(
-									'Choose a page to show only its subpages.'
-								) }
-							/>
-						</ToolsPanelItem>
-					) }
-
-					{ allowConvertToLinks && (
-						<div style={ { gridColumn: '1 / -1' } }>
-							<p>{ convertDescription }</p>
-							<Button
-								__next40pxDefaultSize
-								variant="primary"
-								accessibleWhenDisabled
-								disabled={ ! hasResolvedPages }
-								onClick={ convertToNavigationLinks }
+								isShownByDefault
 							>
-								{ __( 'Edit' ) }
-							</Button>
-						</div>
-					) }
-				</ToolsPanel>
-			</InspectorControls>
+								<ComboboxControl
+									__nextHasNoMarginBottom
+									__next40pxDefaultSize
+									className="editor-page-attributes__parent"
+									label={ __( 'Parent' ) }
+									value={ parentPageID }
+									options={ pagesTree }
+									onChange={ ( value ) =>
+										setAttributes( {
+											parentPageID: value ?? 0,
+										} )
+									}
+									help={ __(
+										'Choose a page to show only its subpages.'
+									) }
+								/>
+							</ToolsPanelItem>
+						) }
+
+						{ allowConvertToLinks && (
+							<div style={ { gridColumn: '1 / -1' } }>
+								<p>{ convertDescription }</p>
+								<Button
+									__next40pxDefaultSize
+									variant="primary"
+									accessibleWhenDisabled
+									disabled={ ! hasResolvedPages }
+									onClick={ convertToNavigationLinks }
+								>
+									{ __( 'Edit' ) }
+								</Button>
+							</div>
+						) }
+					</ToolsPanel>
+				</InspectorControls>
+			) }
 			{ allowConvertToLinks && (
 				<>
 					<BlockControls group="other">

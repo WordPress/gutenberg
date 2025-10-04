@@ -82,6 +82,39 @@ describe( 'block parser', () => {
 			} );
 		} );
 
+		it( 'should apply aria-label block validation fixes', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					fruit: {
+						type: 'string',
+						source: 'text',
+						selector: 'div',
+					},
+				},
+				supports: {
+					ariaLabel: true,
+				},
+				save: ( { attributes } ) => (
+					<div aria-label={ attributes.ariaLabel }>
+						{ attributes.fruit }
+					</div>
+				),
+			} );
+
+			const block = parseRawBlock( {
+				blockName: 'core/test-block',
+				innerHTML: '<div aria-label="custom-label">Bananas</div>',
+				attrs: { fruit: 'Bananas' },
+			} );
+
+			expect( block.name ).toEqual( 'core/test-block' );
+			expect( block.attributes ).toEqual( {
+				fruit: 'Bananas',
+				ariaLabel: 'custom-label',
+			} );
+		} );
+
 		it( 'should create the requested block if it exists', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 

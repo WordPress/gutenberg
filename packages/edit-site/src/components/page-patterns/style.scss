@@ -4,13 +4,23 @@
 
 .page-patterns-preview-field {
 	display: flex;
+	justify-content: center;
+	align-items: center;
 	flex-direction: column;
 	height: 100%;
 	border-radius: $radius-medium;
 
+	.dataviews-view-grid & {
+		.block-editor-block-preview__container {
+			height: 100%;
+		}
+	}
+
 	.dataviews-view-table & {
 		width: 96px;
 		flex-grow: 0;
+		text-wrap: balance; // Fallback for Safari.
+		text-wrap: pretty;
 	}
 }
 

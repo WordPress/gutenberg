@@ -110,8 +110,8 @@ export function ActionModal< Item >( {
 			title={ action.modalHeader || label }
 			__experimentalHideHeader={ !! action.hideModalHeader }
 			onRequestClose={ closeModal }
-			focusOnMount="firstContentElement"
-			size="medium"
+			focusOnMount={ action.modalFocusOnMount ?? true }
+			size={ action.modalSize || 'medium' }
 			overlayClassName={ `dataviews-action-modal dataviews-action-modal__${ kebabCase(
 				action.id
 			) }` }
@@ -179,24 +179,13 @@ export default function ItemActions< Item >( {
 		);
 	}
 
-	// If all actions are primary, there is no need to render the dropdown.
-	if ( primaryActions.length === eligibleActions.length ) {
-		return (
-			<PrimaryActions
-				item={ item }
-				actions={ primaryActions }
-				registry={ registry }
-			/>
-		);
-	}
-
 	return (
 		<HStack
 			spacing={ 1 }
 			justify="flex-end"
 			className="dataviews-item-actions"
 			style={ {
-				flexShrink: '0',
+				flexShrink: 0,
 				width: 'auto',
 			} }
 		>
@@ -205,11 +194,13 @@ export default function ItemActions< Item >( {
 				actions={ primaryActions }
 				registry={ registry }
 			/>
-			<CompactItemActions
-				item={ item }
-				actions={ eligibleActions }
-				registry={ registry }
-			/>
+			{ primaryActions.length < eligibleActions.length && (
+				<CompactItemActions
+					item={ item }
+					actions={ eligibleActions }
+					registry={ registry }
+				/>
+			) }
 		</HStack>
 	);
 }

@@ -157,6 +157,7 @@ export const useSetAsPostsPageAction = () => {
 
 				return true;
 			},
+			modalFocusOnMount: 'firstContentElement',
 			RenderModal: SetAsPostsPageModal,
 		} ),
 		[ pageForPosts, pageOnFront ]

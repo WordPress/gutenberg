@@ -31,12 +31,17 @@ function Editor( {
 	extraSidebarPanels,
 	...props
 } ) {
-	const { post, template, hasLoadedPost } = useSelect(
+	const { post, template, hasLoadedPost, error } = useSelect(
 		( select ) => {
-			const { getEntityRecord, hasFinishedResolution } =
-				select( coreStore );
+			const {
+				getEntityRecord,
+				getResolutionError,
+				hasFinishedResolution,
+			} = select( coreStore );
+
+			const postArgs = [ 'postType', postType, postId ];
 			return {
-				post: getEntityRecord( 'postType', postType, postId ),
+				post: getEntityRecord( ...postArgs ),
 				template: templateId
 					? getEntityRecord(
 							'postType',
@@ -44,11 +49,12 @@ function Editor( {
 							templateId
 					  )
 					: undefined,
-				hasLoadedPost: hasFinishedResolution( 'getEntityRecord', [
-					'postType',
-					postType,
-					postId,
-				] ),
+				hasLoadedPost: hasFinishedResolution(
+					'getEntityRecord',
+					postArgs
+				),
+				error: getResolutionError( 'getEntityRecord', postArgs )
+					?.message,
 			};
 		},
 		[ postType, postId, templateId ]
@@ -57,10 +63,15 @@ function Editor( {
 	return (
 		<>
 			{ hasLoadedPost && ! post && (
-				<Notice status="warning" isDismissible={ false }>
-					{ __(
-						"You attempted to edit an item that doesn't exist. Perhaps it was deleted?"
-					) }
+				<Notice
+					status={ !! error ? 'error' : 'warning' }
+					isDismissible={ false }
+				>
+					{ ! error
+						? __(
+								"You attempted to edit an item that doesn't exist. Perhaps it was deleted?"
+						  )
+						: error }
 				</Notice>
 			) }
 			{ !! post && (

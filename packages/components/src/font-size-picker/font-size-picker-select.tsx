@@ -7,12 +7,11 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import CustomSelectControl from '../custom-select-control';
-import { parseQuantityAndUnitFromRawValue } from '../unit-control';
 import type {
 	FontSizePickerSelectProps,
 	FontSizePickerSelectOption,
 } from './types';
-import { getCommonSizeUnit, isSimpleCssValue } from './utils';
+import { isSimpleCssValue } from './utils';
 
 const DEFAULT_OPTION: FontSizePickerSelectOption = {
 	key: 'default',
@@ -20,36 +19,14 @@ const DEFAULT_OPTION: FontSizePickerSelectOption = {
 	value: undefined,
 };
 
-const CUSTOM_OPTION: FontSizePickerSelectOption = {
-	key: 'custom',
-	name: __( 'Custom' ),
-};
-
 const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
-	const {
-		__next40pxDefaultSize,
-		fontSizes,
-		value,
-		disableCustomFontSizes,
-		size,
-		onChange,
-		onSelectCustom,
-	} = props;
-
-	const areAllSizesSameUnit = !! getCommonSizeUnit( fontSizes );
+	const { __next40pxDefaultSize, fontSizes, value, size, onChange } = props;
 
 	const options: FontSizePickerSelectOption[] = [
 		DEFAULT_OPTION,
 		...fontSizes.map( ( fontSize ) => {
 			let hint;
-			if ( areAllSizesSameUnit ) {
-				const [ quantity ] = parseQuantityAndUnitFromRawValue(
-					fontSize.size
-				);
-				if ( quantity !== undefined ) {
-					hint = String( quantity );
-				}
-			} else if ( isSimpleCssValue( fontSize.size ) ) {
+			if ( isSimpleCssValue( fontSize.size ) ) {
 				hint = String( fontSize.size );
 			}
 			return {
@@ -59,12 +36,10 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 				hint,
 			};
 		} ),
-		...( disableCustomFontSizes ? [] : [ CUSTOM_OPTION ] ),
 	];
 
-	const selectedOption = value
-		? options.find( ( option ) => option.value === value ) ?? CUSTOM_OPTION
-		: DEFAULT_OPTION;
+	const selectedOption =
+		options.find( ( option ) => option.value === value ) ?? DEFAULT_OPTION;
 
 	return (
 		<CustomSelectControl
@@ -86,11 +61,7 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 			}: {
 				selectedItem: FontSizePickerSelectOption;
 			} ) => {
-				if ( selectedItem === CUSTOM_OPTION ) {
-					onSelectCustom();
-				} else {
-					onChange( selectedItem.value );
-				}
+				onChange( selectedItem.value );
 			} }
 			size={ size }
 		/>

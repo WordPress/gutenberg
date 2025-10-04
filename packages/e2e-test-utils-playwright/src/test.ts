@@ -159,8 +159,8 @@ const test = base.extend<
 
 		await page.close();
 	},
-	pageUtils: async ( { page }, use ) => {
-		await use( new PageUtils( { page } ) );
+	pageUtils: async ( { page, browserName }, use ) => {
+		await use( new PageUtils( { page, browserName } ) );
 	},
 	requestUtils: [
 		async ( {}, use, workerInfo ) => {

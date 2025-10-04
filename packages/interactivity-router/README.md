@@ -17,12 +17,13 @@ The package is intended to be imported dynamically in the `view.js` files of int
 ```js
 /* view.js */
 
-import { store } from '@wordpress/interactivity';
+import { store, withSyncEvent } from '@wordpress/interactivity';
 
 // This is how you would typically use the navigate() action in your block.
 store( 'my-namespace/myblock', {
 	actions: {
-		*goToPage( e ) {
+		// The withSyncEvent() utility needs to be used because preventDefault() requires synchronous event access.
+		goToPage: withSyncEvent( function* ( e ) {
 			e.preventDefault();
 
 			// We import the package dynamically to reduce the initial JS bundle size.
@@ -31,7 +32,7 @@ store( 'my-namespace/myblock', {
 				'@wordpress/interactivity-router'
 			);
 			yield actions.navigate( e.target.href );
-		},
+		} ),
 	},
 } );
 ```
@@ -71,6 +72,8 @@ const { state, actions } = store( 'core/router', {
 
 It defines a region that is updated on navigation. It requires a unique ID as the value and can only be used in root interactive elements, i.e., elements with `data-wp-interactive` that are not nested inside other elements with `data-wp-interactive`.
 
+The value can be a string with the region ID, or a JSON object containing the `id` and an optional `attachTo` property.
+
 Example:
 
 ```html
@@ -80,7 +83,27 @@ Example:
      <li><a href="/post-2">Post 2</a></li>
      <li><a href="/post-3">Post 3</a></li>
   </ul>
-  <a data-wp-on--click="actions.navigate" href="/page/2">
+  <a data-wp-on--click="actions.navigate" href="/page/2">Page 2</a>
+</div>
+```
+
+The `attachTo` property is a CSS selector that points to the parent element where the new router region should be rendered. This is useful for regions that may not exist on the initial page but are present on subsequent pages, like a modal or an overlay.
+
+When navigating between pages:
+
+-   If a region exists on both the current and the new page, its content is updated. `attachTo` is ignored in this case.
+-   If a region without `attachTo` exists on the new page but not on the current one, it is not added to the DOM.
+-   If a region with `attachTo` exists on the new page but not on the current one, it is created and appended to the parent element specified in `attachTo`.
+-   If a region exists on the current page but not on the new one, it is removed from the DOM. `attachTo` is ignored in this case.
+
+Example with `attachTo`:
+
+```html
+<div
+  data-wp-interactive="myblock"
+  data-wp-router-region='{ "id": "myblock/overlay", "attachTo": "body" }'
+>
+  I'm in a new region!
 </div>
 ```
 

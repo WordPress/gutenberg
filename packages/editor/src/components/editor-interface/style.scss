@@ -8,6 +8,5 @@
 }
 
 .editor-visual-editor {
-	// Fits the height to the parent — flex-shrink ensures it doesn’t create overflow.
-	flex: 1 1 0%;
+	flex: 1 0 auto;
 }

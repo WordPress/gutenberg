@@ -3,7 +3,8 @@
  */
 import { useSelect } from '@wordpress/data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -30,9 +31,15 @@ function AppLayout() {
 
 export default function App() {
 	useRegisterSiteEditorRoutes();
-	const routes = useSelect( ( select ) => {
-		return unlock( select( editSiteStore ) ).getRoutes();
+	const { routes, currentTheme, editorSettings } = useSelect( ( select ) => {
+		return {
+			routes: unlock( select( editSiteStore ) ).getRoutes(),
+			currentTheme: select( coreStore ).getCurrentTheme(),
+			// This is a temp solution until the has_theme_json value is available for the current theme.
+			editorSettings: select( editSiteStore ).getSettings(),
+		};
 	}, [] );
+
 	const beforeNavigate = useCallback( ( { path, query } ) => {
 		if ( ! isPreviewingTheme() ) {
 			return { path, query };
@@ -50,11 +57,19 @@ export default function App() {
 		};
 	}, [] );
 
+	const matchResolverArgsValue = useMemo(
+		() => ( {
+			siteData: { currentTheme, editorSettings },
+		} ),
+		[ currentTheme, editorSettings ]
+	);
+
 	return (
 		<RouterProvider
 			routes={ routes }
 			pathArg="p"
 			beforeNavigate={ beforeNavigate }
+			matchResolverArgs={ matchResolverArgsValue }
 		>
 			<AppLayout />
 		</RouterProvider>

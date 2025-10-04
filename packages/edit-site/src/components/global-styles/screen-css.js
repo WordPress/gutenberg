@@ -4,11 +4,13 @@
 import { __ } from '@wordpress/i18n';
 import { ExternalLink } from '@wordpress/components';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
+import { store as editSiteStore } from '../../store';
 import ScreenHeader from './header';
 
 const { useGlobalStyle, AdvancedPanel: StylesAdvancedPanel } = unlock(
@@ -16,9 +18,6 @@ const { useGlobalStyle, AdvancedPanel: StylesAdvancedPanel } = unlock(
 );
 
 function ScreenCSS() {
-	const description = __(
-		'Add your own CSS to customize the appearance and layout of your site.'
-	);
 	const [ style ] = useGlobalStyle( '', undefined, 'user', {
 		shouldDecodeEncode: false,
 	} );
@@ -26,13 +25,19 @@ function ScreenCSS() {
 		shouldDecodeEncode: false,
 	} );
 
+	const { setEditorCanvasContainerView } = unlock(
+		useDispatch( editSiteStore )
+	);
+
 	return (
 		<>
 			<ScreenHeader
-				title={ __( 'CSS' ) }
+				title={ __( 'Additional CSS' ) }
 				description={
 					<>
-						{ description }
+						{ __(
+							'You can add custom CSS to further customize the appearance and layout of your site.'
+						) }
 						<br />
 						<ExternalLink
 							href={ __(
@@ -44,6 +49,9 @@ function ScreenCSS() {
 						</ExternalLink>
 					</>
 				}
+				onBack={ () => {
+					setEditorCanvasContainerView( undefined );
+				} }
 			/>
 			<div className="edit-site-global-styles-screen-css">
 				<StylesAdvancedPanel

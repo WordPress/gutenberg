@@ -9,9 +9,10 @@ import clsx from 'clsx';
 import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 	ToggleControl,
 	SelectControl,
-	PanelBody,
 } from '@wordpress/components';
 import {
 	InspectorControls,
@@ -19,10 +20,16 @@ import {
 	BlockControls,
 	AlignmentToolbar,
 	useBlockProps,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+
+/**
+ * Internal dependencies
+ */
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 export default function PostNavigationLinkEdit( {
 	context: { postType },
@@ -37,6 +44,8 @@ export default function PostNavigationLinkEdit( {
 	},
 	setAttributes,
 } ) {
+	const blockEditingMode = useBlockEditingMode();
+	const showControls = blockEditingMode === 'default';
 	const isNext = type === 'next';
 	let placeholder = isNext ? __( 'Next' ) : __( 'Previous' );
 
@@ -91,73 +100,112 @@ export default function PostNavigationLinkEdit( {
 		return [ selectOption, ...taxonomyOptions ];
 	};
 
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody>
-					<ToggleControl
-						__nextHasNoMarginBottom
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ () => {
+						setAttributes( {
+							showTitle: false,
+							linkLabel: false,
+							arrow: 'none',
+						} );
+					} }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					<ToolsPanelItem
 						label={ __( 'Display the title as a link' ) }
-						help={ __(
-							'If you have entered a custom label, it will be prepended before the title.'
-						) }
-						checked={ !! showTitle }
-						onChange={ () =>
-							setAttributes( {
-								showTitle: ! showTitle,
-							} )
+						isShownByDefault
+						hasValue={ () => showTitle }
+						onDeselect={ () =>
+							setAttributes( { showTitle: false } )
 						}
-					/>
-					{ showTitle && (
+					>
 						<ToggleControl
 							__nextHasNoMarginBottom
-							label={ __(
-								'Include the label as part of the link'
+							label={ __( 'Display the title as a link' ) }
+							help={ __(
+								'If you have entered a custom label, it will be prepended before the title.'
 							) }
-							checked={ !! linkLabel }
+							checked={ !! showTitle }
 							onChange={ () =>
 								setAttributes( {
-									linkLabel: ! linkLabel,
+									showTitle: ! showTitle,
 								} )
 							}
 						/>
+					</ToolsPanelItem>
+					{ showTitle && (
+						<ToolsPanelItem
+							label={ __(
+								'Include the label as part of the link'
+							) }
+							isShownByDefault
+							hasValue={ () => !! linkLabel }
+							onDeselect={ () =>
+								setAttributes( { linkLabel: false } )
+							}
+						>
+							<ToggleControl
+								__nextHasNoMarginBottom
+								label={ __(
+									'Include the label as part of the link'
+								) }
+								checked={ !! linkLabel }
+								onChange={ () =>
+									setAttributes( {
+										linkLabel: ! linkLabel,
+									} )
+								}
+							/>
+						</ToolsPanelItem>
 					) }
-					<ToggleGroupControl
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
+					<ToolsPanelItem
 						label={ __( 'Arrow' ) }
-						value={ arrow }
-						onChange={ ( value ) => {
-							setAttributes( { arrow: value } );
-						} }
-						help={ __(
-							'A decorative arrow for the next and previous link.'
-						) }
-						isBlock
+						isShownByDefault
+						hasValue={ () => arrow !== 'none' }
+						onDeselect={ () => setAttributes( { arrow: 'none' } ) }
 					>
-						<ToggleGroupControlOption
-							value="none"
-							label={ _x(
-								'None',
-								'Arrow option for Next/Previous link'
+						<ToggleGroupControl
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
+							label={ __( 'Arrow' ) }
+							value={ arrow }
+							onChange={ ( value ) => {
+								setAttributes( { arrow: value } );
+							} }
+							help={ __(
+								'A decorative arrow for the next and previous link.'
 							) }
-						/>
-						<ToggleGroupControlOption
-							value="arrow"
-							label={ _x(
-								'Arrow',
-								'Arrow option for Next/Previous link'
-							) }
-						/>
-						<ToggleGroupControlOption
-							value="chevron"
-							label={ _x(
-								'Chevron',
-								'Arrow option for Next/Previous link'
-							) }
-						/>
-					</ToggleGroupControl>
-				</PanelBody>
+							isBlock
+						>
+							<ToggleGroupControlOption
+								value="none"
+								label={ _x(
+									'None',
+									'Arrow option for Next/Previous link'
+								) }
+							/>
+							<ToggleGroupControlOption
+								value="arrow"
+								label={ _x(
+									'Arrow',
+									'Arrow option for Next/Previous link'
+								) }
+							/>
+							<ToggleGroupControlOption
+								value="chevron"
+								label={ _x(
+									'Chevron',
+									'Arrow option for Next/Previous link'
+								) }
+							/>
+						</ToggleGroupControl>
+					</ToolsPanelItem>
+				</ToolsPanel>
 			</InspectorControls>
 			<InspectorControls group="advanced">
 				<SelectControl
@@ -176,14 +224,16 @@ export default function PostNavigationLinkEdit( {
 					) }
 				/>
 			</InspectorControls>
-			<BlockControls>
-				<AlignmentToolbar
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
-				/>
-			</BlockControls>
+			{ showControls && (
+				<BlockControls>
+					<AlignmentToolbar
+						value={ textAlign }
+						onChange={ ( nextAlign ) => {
+							setAttributes( { textAlign: nextAlign } );
+						} }
+					/>
+				</BlockControls>
+			) }
 			<div { ...blockProps }>
 				{ ! isNext && displayArrow && (
 					<span
@@ -198,7 +248,7 @@ export default function PostNavigationLinkEdit( {
 					aria-label={ ariaLabel }
 					placeholder={ placeholder }
 					value={ label }
-					allowedFormats={ [ 'core/bold', 'core/italic' ] }
+					withoutInteractiveFormatting
 					onChange={ ( newLabel ) =>
 						setAttributes( { label: newLabel } )
 					}

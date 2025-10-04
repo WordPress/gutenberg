@@ -35,12 +35,8 @@ import { TEMPLATE_ORIGINS } from '../../utils/constants';
 export function useAddedBy( postType, postId ) {
 	return useSelect(
 		( select ) => {
-			const {
-				getEntityRecord,
-				getMedia,
-				getUser,
-				getEditedEntityRecord,
-			} = select( coreStore );
+			const { getEntityRecord, getUser, getEditedEntityRecord } =
+				select( coreStore );
 			const template = getEditedEntityRecord(
 				'postType',
 				postType,
@@ -77,7 +73,11 @@ export function useAddedBy( postType, postId ) {
 						type: originalSource,
 						icon: globeIcon,
 						imageUrl: siteData?.site_logo
-							? getMedia( siteData.site_logo )?.source_url
+							? getEntityRecord(
+									'postType',
+									'attachment',
+									siteData.site_logo
+							  )?.source_url
 							: undefined,
 						text: authorText,
 						isCustomized: false,
@@ -89,7 +89,7 @@ export function useAddedBy( postType, postId ) {
 						type: 'user',
 						icon: authorIcon,
 						imageUrl: user?.avatar_urls?.[ 48 ],
-						text: authorText,
+						text: authorText ?? user?.name,
 						isCustomized: false,
 					};
 				}

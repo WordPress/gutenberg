@@ -26,10 +26,10 @@ describe( 'uploadMedia', () => {
 		jest.clearAllMocks();
 	} );
 
-	it( 'should do nothing on no files', async () => {
+	it( 'should do nothing on no files', () => {
 		const onError = jest.fn();
 		const onFileChange = jest.fn();
-		await uploadMedia( {
+		uploadMedia( {
 			filesList: [],
 			onError,
 			onFileChange,
@@ -39,10 +39,10 @@ describe( 'uploadMedia', () => {
 		expect( uploadToServer ).not.toHaveBeenCalled();
 	} );
 
-	it( 'should error if allowedTypes contains a partial mime type and the validation fails', async () => {
+	it( 'should error if allowedTypes contains a partial mime type and the validation fails', () => {
 		const onError = jest.fn();
 		const onFileChange = jest.fn();
-		await uploadMedia( {
+		uploadMedia( {
 			allowedTypes: [ 'image' ],
 			filesList: [ xmlFile ],
 			onError,
@@ -60,10 +60,10 @@ describe( 'uploadMedia', () => {
 		expect( uploadToServer ).not.toHaveBeenCalled();
 	} );
 
-	it( 'should error if allowedTypes contains a complete mime type and the validation fails', async () => {
+	it( 'should error if allowedTypes contains a complete mime type and the validation fails', () => {
 		const onError = jest.fn();
 		const onFileChange = jest.fn();
-		await uploadMedia( {
+		uploadMedia( {
 			allowedTypes: [ 'image/gif' ],
 			filesList: [ imageFile ],
 			onError,
@@ -81,10 +81,10 @@ describe( 'uploadMedia', () => {
 		expect( uploadToServer ).not.toHaveBeenCalled();
 	} );
 
-	it( 'should work if allowedTypes contains a complete mime type and the validation succeeds', async () => {
+	it( 'should work if allowedTypes contains a complete mime type and the validation succeeds', () => {
 		const onError = jest.fn();
 		const onFileChange = jest.fn();
-		await uploadMedia( {
+		uploadMedia( {
 			allowedTypes: [ 'image/jpeg' ],
 			filesList: [ imageFile ],
 			onError,
@@ -96,10 +96,10 @@ describe( 'uploadMedia', () => {
 		expect( uploadToServer ).toHaveBeenCalled();
 	} );
 
-	it( 'should error if allowedTypes contains multiple types and the validation fails', async () => {
+	it( 'should error if allowedTypes contains multiple types and the validation fails', () => {
 		const onError = jest.fn();
 		const onFileChange = jest.fn();
-		await uploadMedia( {
+		uploadMedia( {
 			allowedTypes: [ 'video', 'image' ],
 			filesList: [ xmlFile ],
 			onError,
@@ -117,10 +117,10 @@ describe( 'uploadMedia', () => {
 		expect( uploadToServer ).not.toHaveBeenCalled();
 	} );
 
-	it( 'should work if allowedTypes contains multiple types and the validation succeeds', async () => {
+	it( 'should work if allowedTypes contains multiple types and the validation succeeds', () => {
 		const onError = jest.fn();
 		const onFileChange = jest.fn();
-		await uploadMedia( {
+		uploadMedia( {
 			allowedTypes: [ 'video', 'image' ],
 			filesList: [ imageFile ],
 			onError,
@@ -132,10 +132,10 @@ describe( 'uploadMedia', () => {
 		expect( uploadToServer ).toHaveBeenCalled();
 	} );
 
-	it( 'should only fail the invalid file and still allow others to succeed when uploading multiple files', async () => {
+	it( 'should only fail the invalid file and still allow others to succeed when uploading multiple files', () => {
 		const onError = jest.fn();
 		const onFileChange = jest.fn();
-		await uploadMedia( {
+		uploadMedia( {
 			allowedTypes: [ 'image' ],
 			filesList: [ imageFile, xmlFile ],
 			onError,
@@ -154,10 +154,10 @@ describe( 'uploadMedia', () => {
 		expect( uploadToServer ).toHaveBeenCalledTimes( 1 );
 	} );
 
-	it( 'should error if the file size is greater than the maximum', async () => {
+	it( 'should error if the file size is greater than the maximum', () => {
 		const onError = jest.fn();
 		const onFileChange = jest.fn();
-		await uploadMedia( {
+		uploadMedia( {
 			allowedTypes: [ 'image' ],
 			filesList: [ imageFile ],
 			maxUploadFileSize: 1,
@@ -177,9 +177,9 @@ describe( 'uploadMedia', () => {
 		expect( uploadToServer ).not.toHaveBeenCalled();
 	} );
 
-	it( 'should call error handler with the correct error object if file type is not allowed for user', async () => {
+	it( 'should call error handler with the correct error object if file type is not allowed for user', () => {
 		const onError = jest.fn();
-		await uploadMedia( {
+		uploadMedia( {
 			allowedTypes: [ 'image' ],
 			filesList: [ imageFile ],
 			onError,
@@ -195,5 +195,43 @@ describe( 'uploadMedia', () => {
 			} )
 		);
 		expect( uploadToServer ).not.toHaveBeenCalled();
+	} );
+
+	it( 'should throw error when multiple files are selected in single file upload mode', () => {
+		const onError = jest.fn();
+		uploadMedia( {
+			filesList: [ imageFile, xmlFile ],
+			onError,
+			multiple: false,
+		} );
+
+		expect( onError ).toHaveBeenCalledWith(
+			new Error( 'Only one file can be used here.' )
+		);
+		expect( uploadToServer ).not.toHaveBeenCalled();
+	} );
+
+	it( 'should return error that is not an Error object', () => {
+		( uploadToServer as jest.Mock ).mockImplementation( () => {
+			throw {
+				code: 'fetch_error',
+				message: 'Could not get a valid response from the server.',
+			};
+		} );
+
+		const onError = jest.fn();
+		uploadMedia( {
+			filesList: [ imageFile ],
+			onError,
+			multiple: false,
+		} );
+
+		expect( onError ).toHaveBeenCalledWith(
+			new UploadError( {
+				code: 'GENERAL',
+				message: 'Could not get a valid response from the server.',
+				file: imageFile,
+			} )
+		);
 	} );
 } );

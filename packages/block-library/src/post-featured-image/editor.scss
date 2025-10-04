@@ -100,9 +100,9 @@
 
 	// When the Post Featured Image block is linked,
 	// it's wrapped with a disabled <a /> tag.
-	// Restore cursor style so it doesn't appear 'clickable'.
+	// Ensure that the link is not clickable.
 	> a {
-		cursor: default;
+		pointer-events: none;
 	}
 
 	// When the Post Featured Image block is linked,

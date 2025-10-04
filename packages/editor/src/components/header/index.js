@@ -24,6 +24,7 @@ import PostSavedState from '../post-saved-state';
 import PostViewLink from '../post-view-link';
 import PreviewDropdown from '../preview-dropdown';
 import ZoomOutToggle from '../zoom-out-toggle';
+import PostTypeSupportCheck from '../post-type-support-check';
 import { store as editorStore } from '../../store';
 import {
 	TEMPLATE_PART_POST_TYPE,
@@ -31,6 +32,9 @@ import {
 	NAVIGATION_POST_TYPE,
 } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
+
+const isBlockCommentExperimentEnabled =
+	window?.__experimentalEnableBlockComment;
 
 const toolbarVariations = {
 	distractionFreeDisabled: { y: '-50px' },
@@ -65,6 +69,7 @@ function Header( {
 		showIconLabels,
 		hasFixedToolbar,
 		hasBlockSelection,
+		hasSectionRootClientId,
 	} = useSelect( ( select ) => {
 		const { get: getPreference } = select( preferencesStore );
 		const {
@@ -72,6 +77,9 @@ function Header( {
 			getCurrentPostType,
 			isPublishSidebarOpened: _isPublishSidebarOpened,
 		} = select( editorStore );
+		const { getBlockSelectionStart, getSectionRootClientId } = unlock(
+			select( blockEditorStore )
+		);
 
 		return {
 			postType: getCurrentPostType(),
@@ -79,20 +87,21 @@ function Header( {
 			isPublishSidebarOpened: _isPublishSidebarOpened(),
 			showIconLabels: getPreference( 'core', 'showIconLabels' ),
 			hasFixedToolbar: getPreference( 'core', 'fixedToolbar' ),
-			hasBlockSelection:
-				!! select( blockEditorStore ).getBlockSelectionStart(),
+			hasBlockSelection: !! getBlockSelectionStart(),
+			hasSectionRootClientId: !! getSectionRootClientId(),
 		};
 	}, [] );
 
-	const canBeZoomedOut = [ 'post', 'page', 'wp_template' ].includes(
-		postType
-	);
+	const canBeZoomedOut =
+		[ 'post', 'page', 'wp_template' ].includes( postType ) &&
+		hasSectionRootClientId;
 
-	const disablePreviewOption = [
-		NAVIGATION_POST_TYPE,
-		TEMPLATE_PART_POST_TYPE,
-		PATTERN_POST_TYPE,
-	].includes( postType );
+	const disablePreviewOption =
+		[
+			NAVIGATION_POST_TYPE,
+			TEMPLATE_PART_POST_TYPE,
+			PATTERN_POST_TYPE,
+		].includes( postType ) || forceDisableBlockTools;
 
 	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
 		useState( true );
@@ -103,12 +112,6 @@ function Header( {
 			( hasFixedToolbar &&
 				( ! hasBlockSelection || isBlockToolsCollapsed ) ) );
 	const hasBackButton = useHasBackButton();
-
-	const hasSectionRootClientId = useSelect(
-		( select ) =>
-			!! unlock( select( blockEditorStore ) ).getSectionRootClientId(),
-		[]
-	);
 
 	/*
 	 * The edit-post-header classname is only kept for backward compatibility
@@ -177,11 +180,9 @@ function Header( {
 					forceIsAutosaveable={ forceIsDirty }
 				/>
 
-				{ canBeZoomedOut &&
-					isWideViewport &&
-					hasSectionRootClientId && (
-						<ZoomOutToggle disabled={ forceDisableBlockTools } />
-					) }
+				{ isWideViewport && canBeZoomedOut && (
+					<ZoomOutToggle disabled={ forceDisableBlockTools } />
+				) }
 
 				{ ( isWideViewport || ! showIconLabels ) && (
 					<PinnedItems.Slot scope="core" />
@@ -195,7 +196,12 @@ function Header( {
 						}
 					/>
 				) }
-				<CollabSidebar />
+
+				{ isBlockCommentExperimentEnabled && (
+					<PostTypeSupportCheck supportKeys="editor.block-comments">
+						<CollabSidebar />
+					</PostTypeSupportCheck>
+				) }
 
 				{ customSaveButton }
 				<MoreMenu />

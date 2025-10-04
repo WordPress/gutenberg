@@ -1,0 +1,21 @@
+.editor-fields-content-preview {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	border-radius: $radius-medium;
+
+	.dataviews-view-table & {
+		width: 96px;
+		flex-grow: 0;
+	}
+
+	.block-editor-block-preview__container,
+	.editor-fields-content-preview__empty {
+		margin-top: auto;
+		margin-bottom: auto;
+	}
+}
+
+.editor-fields-content-preview__empty {
+	text-align: center;
+}

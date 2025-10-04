@@ -48,7 +48,7 @@ export default function PostCardPanel( {
 	);
 	const { postTitle, icon, labels } = useSelect(
 		( select ) => {
-			const { getEditedEntityRecord, getEntityRecord, getPostType } =
+			const { getEditedEntityRecord, getCurrentTheme, getPostType } =
 				select( coreStore );
 			const { getPostIcon } = unlock( select( editorStore ) );
 			let _title = '';
@@ -59,7 +59,7 @@ export default function PostCardPanel( {
 			);
 			if ( postIds.length === 1 ) {
 				const { default_template_types: templateTypes = [] } =
-					getEntityRecord( 'root', '__unstableBase' ) ?? {};
+					getCurrentTheme() ?? {};
 
 				const _templateInfo = [
 					TEMPLATE_POST_TYPE,
@@ -88,9 +88,9 @@ export default function PostCardPanel( {
 	let title = __( 'No title' );
 	if ( labels?.name && postIds.length > 1 ) {
 		title = sprintf(
-			// translators: %i number of selected items %s: Name of the plural post type e.g: "Posts".
-			__( '%i %s' ),
-			postId.length,
+			// translators: %1$d number of selected items %2$s: Name of the plural post type e.g: "Posts".
+			__( '%1$d %2$s' ),
+			postIds.length,
 			labels?.name
 		);
 	} else if ( postTitle ) {
@@ -118,11 +118,13 @@ export default function PostCardPanel( {
 						<Badge>{ pageTypeBadge }</Badge>
 					) }
 				</Text>
-				<PostActions
-					postType={ postType }
-					postId={ postId }
-					onActionPerformed={ onActionPerformed }
-				/>
+				{ postIds.length === 1 && (
+					<PostActions
+						postType={ postType }
+						postId={ postIds[ 0 ] }
+						onActionPerformed={ onActionPerformed }
+					/>
+				) }
 			</HStack>
 			{ postIds.length > 1 && (
 				<Text className="editor-post-card-panel__description">

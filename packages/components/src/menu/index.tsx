@@ -13,21 +13,21 @@ import { isRTL as isRTLFn } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { useContextSystem, contextConnectWithoutRef } from '../context';
-import type { MenuContext as MenuContextType, MenuProps } from './types';
-import { MenuContext } from './context';
-import { MenuItem } from './item';
-import { MenuCheckboxItem } from './checkbox-item';
-import { MenuRadioItem } from './radio-item';
-import { MenuGroup } from './group';
-import { MenuGroupLabel } from './group-label';
-import { MenuSeparator } from './separator';
-import { MenuItemLabel } from './item-label';
-import { MenuItemHelpText } from './item-help-text';
-import { MenuTriggerButton } from './trigger-button';
-import { MenuSubmenuTriggerItem } from './submenu-trigger-item';
-import { MenuPopover } from './popover';
+import type { ContextProps, Props } from './types';
+import { Context } from './context';
+import { Item } from './item';
+import { CheckboxItem } from './checkbox-item';
+import { RadioItem } from './radio-item';
+import { Group } from './group';
+import { GroupLabel } from './group-label';
+import { Separator } from './separator';
+import { ItemLabel } from './item-label';
+import { ItemHelpText } from './item-help-text';
+import { TriggerButton } from './trigger-button';
+import { SubmenuTriggerItem } from './submenu-trigger-item';
+import { Popover } from './popover';
 
-const UnconnectedMenu = ( props: MenuProps ) => {
+const UnconnectedMenu = ( props: Props ) => {
 	const {
 		children,
 		defaultOpen = false,
@@ -39,10 +39,10 @@ const UnconnectedMenu = ( props: MenuProps ) => {
 		variant,
 	} = useContextSystem<
 		// @ts-expect-error TODO: missing 'className' in MenuProps
-		typeof props & Pick< MenuContextType, 'variant' >
+		typeof props & Pick< ContextProps, 'variant' >
 	>( props, 'Menu' );
 
-	const parentContext = useContext( MenuContext );
+	const parentContext = useContext( Context );
 
 	const rtl = isRTLFn();
 
@@ -84,49 +84,119 @@ const UnconnectedMenu = ( props: MenuProps ) => {
 	);
 
 	return (
-		<MenuContext.Provider value={ contextValue }>
-			{ children }
-		</MenuContext.Provider>
+		<Context.Provider value={ contextValue }>{ children }</Context.Provider>
 	);
 };
 
+/**
+ * Menu is a collection of React components that combine to render
+ * ARIA-compliant [menu](https://www.w3.org/WAI/ARIA/apg/patterns/menu/) and
+ * [menu button](https://www.w3.org/WAI/ARIA/apg/patterns/menubutton/) patterns.
+ *
+ * `Menu` itself is a wrapper component and context provider.
+ * It is responsible for managing the state of the menu and its items, and for
+ * rendering the `Menu.TriggerButton` (or the `Menu.SubmenuTriggerItem`)
+ * component, and the `Menu.Popover` component.
+ */
 export const Menu = Object.assign(
 	contextConnectWithoutRef( UnconnectedMenu, 'Menu' ),
 	{
-		Context: Object.assign( MenuContext, {
+		Context: Object.assign( Context, {
 			displayName: 'Menu.Context',
 		} ),
-		Item: Object.assign( MenuItem, {
+		/**
+		 * Renders a menu item inside the `Menu.Popover` or `Menu.Group` components.
+		 *
+		 * It can optionally contain one instance of the `Menu.ItemLabel` component
+		 * and one instance of the `Menu.ItemHelpText` component.
+		 */
+		Item: Object.assign( Item, {
 			displayName: 'Menu.Item',
 		} ),
-		RadioItem: Object.assign( MenuRadioItem, {
+		/**
+		 * Renders a radio menu item inside the `Menu.Popover` or `Menu.Group`
+		 * components.
+		 *
+		 * It can optionally contain one instance of the `Menu.ItemLabel` component
+		 * and one instance of the `Menu.ItemHelpText` component.
+		 */
+		RadioItem: Object.assign( RadioItem, {
 			displayName: 'Menu.RadioItem',
 		} ),
-		CheckboxItem: Object.assign( MenuCheckboxItem, {
+		/**
+		 * Renders a checkbox menu item inside the `Menu.Popover` or `Menu.Group`
+		 * components.
+		 *
+		 * It can optionally contain one instance of the `Menu.ItemLabel` component
+		 * and one instance of the `Menu.ItemHelpText` component.
+		 */
+		CheckboxItem: Object.assign( CheckboxItem, {
 			displayName: 'Menu.CheckboxItem',
 		} ),
-		Group: Object.assign( MenuGroup, {
+		/**
+		 * Renders a group for menu items.
+		 *
+		 * It should contain one instance of `Menu.GroupLabel` and one or more
+		 * instances of `Menu.Item`, `Menu.RadioItem`, or `Menu.CheckboxItem`.
+		 */
+		Group: Object.assign( Group, {
 			displayName: 'Menu.Group',
 		} ),
-		GroupLabel: Object.assign( MenuGroupLabel, {
+		/**
+		 * Renders a label in a menu group.
+		 *
+		 * This component should be wrapped with `Menu.Group` so the
+		 * `aria-labelledby` is correctly set on the group element.
+		 */
+		GroupLabel: Object.assign( GroupLabel, {
 			displayName: 'Menu.GroupLabel',
 		} ),
-		Separator: Object.assign( MenuSeparator, {
+		/**
+		 * Renders a divider between menu items or menu groups.
+		 */
+		Separator: Object.assign( Separator, {
 			displayName: 'Menu.Separator',
 		} ),
-		ItemLabel: Object.assign( MenuItemLabel, {
+		/**
+		 * Renders a menu item's label text. It should be wrapped with `Menu.Item`,
+		 * `Menu.RadioItem`, or `Menu.CheckboxItem`.
+		 */
+		ItemLabel: Object.assign( ItemLabel, {
 			displayName: 'Menu.ItemLabel',
 		} ),
-		ItemHelpText: Object.assign( MenuItemHelpText, {
+		/**
+		 * Renders a menu item's help text. It should be wrapped with `Menu.Item`,
+		 * `Menu.RadioItem`, or `Menu.CheckboxItem`.
+		 */
+		ItemHelpText: Object.assign( ItemHelpText, {
 			displayName: 'Menu.ItemHelpText',
 		} ),
-		Popover: Object.assign( MenuPopover, {
+		/**
+		 * Renders a dropdown menu element that's controlled by a sibling
+		 * `Menu.TriggerButton` component. It renders a popover and automatically
+		 * focuses on items when the menu is shown.
+		 *
+		 * The only valid children of `Menu.Popover` are `Menu.Item`,
+		 * `Menu.RadioItem`, `Menu.CheckboxItem`, `Menu.Group`, `Menu.Separator`,
+		 * and `Menu` (for nested dropdown menus).
+		 */
+		Popover: Object.assign( Popover, {
 			displayName: 'Menu.Popover',
 		} ),
-		TriggerButton: Object.assign( MenuTriggerButton, {
+		/**
+		 * Renders a menu button that toggles the visibility of a sibling
+		 * `Menu.Popover` component when clicked or when using arrow keys.
+		 */
+		TriggerButton: Object.assign( TriggerButton, {
 			displayName: 'Menu.TriggerButton',
 		} ),
-		SubmenuTriggerItem: Object.assign( MenuSubmenuTriggerItem, {
+		/**
+		 * Renders a menu item that toggles the visibility of a sibling
+		 * `Menu.Popover` component when clicked or when using arrow keys.
+		 *
+		 * This component is used to create a nested dropdown menu.
+		 */
+		SubmenuTriggerItem: Object.assign( SubmenuTriggerItem, {
 			displayName: 'Menu.SubmenuTriggerItem',
 		} ),
 	}

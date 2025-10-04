@@ -7,7 +7,7 @@ import { batch } from '@preact/signals';
 /**
  * Internal dependencies
  */
-import registerDirectives from './directives';
+import registerDirectives, { routerRegions } from './directives';
 import { init, getRegionRootFragment, initialVdom } from './init';
 import { directivePrefix } from './constants';
 import { toVdom } from './vdom';
@@ -16,7 +16,13 @@ import { getNamespace } from './namespaces';
 import { parseServerData, populateServerData } from './store';
 import { proxifyState } from './proxies';
 
-export { store, getConfig, getServerState } from './store';
+export {
+	store,
+	getConfig,
+	getServerState,
+	type AsyncAction,
+	type TypeYield,
+} from './store';
 export { getContext, getServerContext, getElement } from './scopes';
 export {
 	withScope,
@@ -27,6 +33,7 @@ export {
 	useCallback,
 	useMemo,
 	splitTask,
+	withSyncEvent,
 } from './utils';
 
 export { useState, useRef } from 'preact/hooks';
@@ -50,6 +57,7 @@ export const privateApis = ( lock ): any => {
 			parseServerData,
 			populateServerData,
 			batch,
+			routerRegions,
 		};
 	}
 

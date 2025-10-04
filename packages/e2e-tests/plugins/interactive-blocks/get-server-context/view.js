@@ -1,17 +1,22 @@
 /**
  * WordPress dependencies
  */
-import { store, getContext, getServerContext } from '@wordpress/interactivity';
+import {
+	store,
+	getContext,
+	getServerContext,
+	withSyncEvent,
+} from '@wordpress/interactivity';
 
 store( 'test/get-server-context', {
 	actions: {
-		*navigate( e ) {
+		navigate: withSyncEvent( function* ( e ) {
 			e.preventDefault();
 			const { actions } = yield import(
 				'@wordpress/interactivity-router'
 			);
 			yield actions.navigate( e.target.href );
-		},
+		} ),
 		attemptModification() {
 			try {
 				getServerContext().prop = 'updated from client';

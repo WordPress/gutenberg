@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import type { ChangeEvent } from 'react';
+import type { ChangeEvent, ReactNode } from 'react';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -26,7 +27,7 @@ import {
 	Icon,
 } from '@wordpress/components';
 import { __, _x, sprintf } from '@wordpress/i18n';
-import { memo, useContext, useMemo } from '@wordpress/element';
+import { memo, useContext, useMemo, useState } from '@wordpress/element';
 import {
 	chevronDown,
 	chevronUp,
@@ -34,6 +35,7 @@ import {
 	seen,
 	unseen,
 	lock,
+	moreVertical,
 } from '@wordpress/icons';
 import warning from '@wordpress/warning';
 import { useInstanceId } from '@wordpress/compose';
@@ -43,15 +45,12 @@ import { useInstanceId } from '@wordpress/compose';
  */
 import { SORTING_DIRECTIONS, sortIcons, sortLabels } from '../../constants';
 import { VIEW_LAYOUTS } from '../../dataviews-layouts';
-import type { NormalizedField, SupportedLayouts, View } from '../../types';
+import type { NormalizedField, View } from '../../types';
 import DataViewsContext from '../dataviews-context';
+import InfiniteScrollToggle from './infinite-scroll-toggle';
 import { unlock } from '../../lock-unlock';
 
 const { Menu } = unlock( componentsPrivateApis );
-
-interface ViewTypeMenuProps {
-	defaultLayouts?: SupportedLayouts;
-}
 
 const DATAVIEWS_CONFIG_POPOVER_PROPS = {
 	className: 'dataviews-config__popover',
@@ -59,10 +58,9 @@ const DATAVIEWS_CONFIG_POPOVER_PROPS = {
 	offset: 9,
 };
 
-function ViewTypeMenu( {
-	defaultLayouts = { list: {}, grid: {}, table: {} },
-}: ViewTypeMenuProps ) {
-	const { view, onChangeView } = useContext( DataViewsContext );
+export function ViewTypeMenu() {
+	const { view, onChangeView, defaultLayouts } =
+		useContext( DataViewsContext );
 	const availableLayouts = Object.keys( defaultLayouts );
 	if ( availableLayouts.length <= 1 ) {
 		return null;
@@ -101,16 +99,16 @@ function ViewTypeMenu( {
 									case 'list':
 									case 'grid':
 									case 'table':
+									case 'pickerGrid':
 										const viewWithoutLayout = { ...view };
 										if ( 'layout' in viewWithoutLayout ) {
 											delete viewWithoutLayout.layout;
 										}
-										// @ts-expect-error
 										return onChangeView( {
 											...viewWithoutLayout,
 											type: e.target.value,
 											...defaultLayouts[ e.target.value ],
-										} );
+										} as View );
 								}
 								warning( 'Invalid dataview' );
 							} }
@@ -216,9 +214,19 @@ function SortDirectionControl() {
 	);
 }
 
-const PAGE_SIZE_VALUES = [ 10, 20, 50, 100 ];
 function ItemsPerPageControl() {
-	const { view, onChangeView } = useContext( DataViewsContext );
+	const { view, config, onChangeView } = useContext( DataViewsContext );
+	const { infiniteScrollEnabled } = view;
+	if (
+		! config ||
+		! config.perPageSizes ||
+		config.perPageSizes.length < 2 ||
+		config.perPageSizes.length > 6 ||
+		infiniteScrollEnabled
+	) {
+		return null;
+	}
+
 	return (
 		<ToggleGroupControl
 			__nextHasNoMarginBottom
@@ -240,7 +248,7 @@ function ItemsPerPageControl() {
 				} );
 			} }
 		>
-			{ PAGE_SIZE_VALUES.map( ( value ) => {
+			{ config.perPageSizes.map( ( value ) => {
 				return (
 					<ToggleGroupControlOption
 						key={ value }
@@ -253,8 +261,66 @@ function ItemsPerPageControl() {
 	);
 }
 
+function PreviewOptions( {
+	previewOptions,
+	onChangePreviewOption,
+	onMenuOpenChange,
+	activeOption,
+}: {
+	previewOptions?: Array< { label: string; id: string } >;
+	onChangePreviewOption?: ( newPreviewOption: string ) => void;
+	onMenuOpenChange: ( isOpen: boolean ) => void;
+	activeOption?: string;
+} ) {
+	const focusPreviewOptionsField = ( id: string ) => {
+		// Focus the visibility button to avoid focus loss.
+		// Our code is safe against the component being unmounted, so we don't need to worry about cleaning the timeout.
+		// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
+		setTimeout( () => {
+			const element = document.querySelector(
+				`.dataviews-field-control__field-${ id } .dataviews-field-control__field-preview-options-button`
+			);
+			if ( element instanceof HTMLElement ) {
+				element.focus();
+			}
+		}, 50 );
+	};
+	return (
+		<Menu onOpenChange={ onMenuOpenChange }>
+			<Menu.TriggerButton
+				render={
+					<Button
+						className="dataviews-field-control__field-preview-options-button"
+						size="compact"
+						icon={ moreVertical }
+						label={ __( 'Preview' ) }
+					/>
+				}
+			/>
+			<Menu.Popover>
+				{ previewOptions?.map( ( { id, label } ) => {
+					return (
+						<Menu.RadioItem
+							key={ id }
+							value={ id }
+							checked={ id === activeOption }
+							onChange={ () => {
+								onChangePreviewOption?.( id );
+								focusPreviewOptionsField( id );
+							} }
+						>
+							<Menu.ItemLabel>{ label }</Menu.ItemLabel>
+						</Menu.RadioItem>
+					);
+				} ) }
+			</Menu.Popover>
+		</Menu>
+	);
+}
 function FieldItem( {
 	field,
+	label,
+	description,
 	isVisible,
 	isFirst,
 	isLast,
@@ -262,8 +328,12 @@ function FieldItem( {
 	onToggleVisibility,
 	onMoveUp,
 	onMoveDown,
+	previewOptions,
+	onChangePreviewOption,
 }: {
 	field: NormalizedField< any >;
+	label?: string;
+	description?: string;
 	isVisible: boolean;
 	isFirst?: boolean;
 	isLast?: boolean;
@@ -271,7 +341,12 @@ function FieldItem( {
 	onToggleVisibility?: () => void;
 	onMoveUp?: () => void;
 	onMoveDown?: () => void;
+	previewOptions?: Array< { label: string; id: string } >;
+	onChangePreviewOption?: ( newPreviewOption: string ) => void;
 } ) {
+	const [ isChangingPreviewOption, setIsChangingPreviewOption ] =
+		useState< boolean >( false );
+
 	const focusVisibilityField = () => {
 		// Focus the visibility button to avoid focus loss.
 		// Our code is safe against the component being unmounted, so we don't need to worry about cleaning the timeout.
@@ -290,7 +365,17 @@ function FieldItem( {
 		<Item>
 			<HStack
 				expanded
-				className={ `dataviews-field-control__field dataviews-field-control__field-${ field.id }` }
+				className={ clsx(
+					'dataviews-field-control__field',
+					`dataviews-field-control__field-${ field.id }`,
+					// The actions are hidden when the mouse is not hovering the item, or focus
+					// is outside the item.
+					// For actions that require a popover, a menu etc, that would mean that when the interactive element
+					// opens and the focus goes there the actions would be hidden.
+					// To avoid that we add a class to the item, that makes sure actions are visible while there is some
+					// interaction with the item.
+					{ 'is-interacting': isChangingPreviewOption }
+				) }
 				justify="flex-start"
 			>
 				<span className="dataviews-field-control__icon">
@@ -298,8 +383,15 @@ function FieldItem( {
 						<Icon icon={ lock } />
 					) }
 				</span>
-				<span className="dataviews-field-control__label">
-					{ field.label }
+				<span className="dataviews-field-control__label-sub-label-container">
+					<span className="dataviews-field-control__label">
+						{ label || field.label }
+					</span>
+					{ description && (
+						<span className="dataviews-field-control__sub-label">
+							{ description }
+						</span>
+					) }
 				</span>
 				<HStack
 					justify="flex-end"
@@ -366,6 +458,14 @@ function FieldItem( {
 											field.label
 									  )
 							}
+						/>
+					) }
+					{ previewOptions && (
+						<PreviewOptions
+							previewOptions={ previewOptions }
+							onChangePreviewOption={ onChangePreviewOption }
+							onMenuOpenChange={ setIsChangingPreviewOption }
+							activeOption={ field.id }
 						/>
 					) }
 				</HStack>
@@ -461,9 +561,11 @@ function FieldControl() {
 	const hiddenFields = fields.filter(
 		( f ) =>
 			! visibleFieldIds.includes( f.id ) &&
-			! togglableFields.includes( f.id )
+			! togglableFields.includes( f.id ) &&
+			f.type !== 'media' &&
+			f.enableHiding !== false
 	);
-	const visibleFields = visibleFieldIds
+	let visibleFields = visibleFieldIds
 		.map( ( fieldId ) => fields.find( ( f ) => f.id === fieldId ) )
 		.filter( isDefined );
 
@@ -471,34 +573,88 @@ function FieldControl() {
 		return null;
 	}
 	const titleField = fields.find( ( f ) => f.id === view.titleField );
-	const mediaField = fields.find( ( f ) => f.id === view.mediaField );
+	const previewField = fields.find( ( f ) => f.id === view.mediaField );
 	const descriptionField = fields.find(
 		( f ) => f.id === view.descriptionField
 	);
+
+	const previewFields = fields.filter( ( f ) => f.type === 'media' );
+
+	let previewFieldUI;
+	if ( previewFields.length > 1 ) {
+		const isPreviewFieldVisible =
+			isDefined( previewField ) && ( view.showMedia ?? true );
+		previewFieldUI = isDefined( previewField ) && (
+			<FieldItem
+				key={ previewField.id }
+				field={ previewField }
+				label={ __( 'Preview' ) }
+				description={ previewField.label }
+				isVisible={ isPreviewFieldVisible }
+				onToggleVisibility={ () => {
+					onChangeView( {
+						...view,
+						showMedia: ! isPreviewFieldVisible,
+					} );
+				} }
+				canMove={ false }
+				previewOptions={ previewFields.map( ( field ) => ( {
+					label: field.label,
+					id: field.id,
+				} ) ) }
+				onChangePreviewOption={ ( newPreviewId ) =>
+					onChangeView( { ...view, mediaField: newPreviewId } )
+				}
+			/>
+		);
+	}
 	const lockedFields = [
 		{
 			field: titleField,
 			isVisibleFlag: 'showTitle',
 		},
 		{
-			field: mediaField,
+			field: previewField,
 			isVisibleFlag: 'showMedia',
+			ui: previewFieldUI,
 		},
 		{
 			field: descriptionField,
 			isVisibleFlag: 'showDescription',
 		},
 	].filter( ( { field } ) => isDefined( field ) );
-	const visibleLockedFields = lockedFields.filter(
+	let visibleLockedFields = lockedFields.filter(
 		( { field, isVisibleFlag } ) =>
 			// @ts-expect-error
 			isDefined( field ) && ( view[ isVisibleFlag ] ?? true )
-	) as Array< { field: NormalizedField< any >; isVisibleFlag: string } >;
+	) as Array< {
+		field: NormalizedField< any >;
+		isVisibleFlag: string;
+		ui?: ReactNode;
+	} >;
+
+	// If only one locked field is visible, prevent it from being hidden.
+	if ( visibleLockedFields.length === 1 ) {
+		visibleLockedFields = visibleLockedFields.map( ( locked ) => ( {
+			...locked,
+			field: { ...locked.field, enableHiding: false },
+		} ) );
+	}
+
+	// If no locked fields are visible but there are visibleFields, lock the last visible field.
+	if ( visibleLockedFields.length === 0 && visibleFields.length === 1 ) {
+		visibleFields = [ { ...visibleFields[ 0 ], enableHiding: false } ];
+	}
+
 	const hiddenLockedFields = lockedFields.filter(
 		( { field, isVisibleFlag } ) =>
 			// @ts-expect-error
 			isDefined( field ) && ! ( view[ isVisibleFlag ] ?? true )
-	) as Array< { field: NormalizedField< any >; isVisibleFlag: string } >;
+	) as Array< {
+		field: NormalizedField< any >;
+		isVisibleFlag: string;
+		ui?: ReactNode;
+	} >;
 
 	return (
 		<VStack className="dataviews-field-control" spacing={ 6 }>
@@ -507,20 +663,22 @@ function FieldControl() {
 					!! visibleFields?.length ) && (
 					<ItemGroup isBordered isSeparated>
 						{ visibleLockedFields.map(
-							( { field, isVisibleFlag } ) => {
+							( { field, isVisibleFlag, ui } ) => {
 								return (
-									<FieldItem
-										key={ field.id }
-										field={ field }
-										isVisible
-										onToggleVisibility={ () => {
-											onChangeView( {
-												...view,
-												[ isVisibleFlag ]: false,
-											} );
-										} }
-										canMove={ false }
-									/>
+									ui ?? (
+										<FieldItem
+											key={ field.id }
+											field={ field }
+											isVisible
+											onToggleVisibility={ () => {
+												onChangeView( {
+													...view,
+													[ isVisibleFlag ]: false,
+												} );
+											} }
+											canMove={ false }
+										/>
+									)
 								);
 							}
 						) }
@@ -550,20 +708,23 @@ function FieldControl() {
 						<ItemGroup isBordered isSeparated>
 							{ hiddenLockedFields.length > 0 &&
 								hiddenLockedFields.map(
-									( { field, isVisibleFlag } ) => {
+									( { field, isVisibleFlag, ui } ) => {
 										return (
-											<FieldItem
-												key={ field.id }
-												field={ field }
-												isVisible={ false }
-												onToggleVisibility={ () => {
-													onChangeView( {
-														...view,
-														[ isVisibleFlag ]: true,
-													} );
-												} }
-												canMove={ false }
-											/>
+											ui ?? (
+												<FieldItem
+													key={ field.id }
+													field={ field }
+													isVisible={ false }
+													onToggleVisibility={ () => {
+														onChangeView( {
+															...view,
+															[ isVisibleFlag ]:
+																true,
+														} );
+													} }
+													canMove={ false }
+												/>
+											)
 										);
 									}
 								) }
@@ -621,7 +782,7 @@ function SettingsSection( {
 	);
 }
 
-function DataviewsViewConfigDropdown() {
+export function DataviewsViewConfigDropdown() {
 	const { view } = useContext( DataViewsContext );
 	const popoverId = useInstanceId(
 		_DataViewsViewConfig,
@@ -663,6 +824,7 @@ function DataviewsViewConfigDropdown() {
 							{ !! activeLayout?.viewConfigOptions && (
 								<activeLayout.viewConfigOptions />
 							) }
+							<InfiniteScrollToggle />
 							<ItemsPerPageControl />
 						</SettingsSection>
 						<SettingsSection title={ __( 'Properties' ) }>
@@ -675,14 +837,10 @@ function DataviewsViewConfigDropdown() {
 	);
 }
 
-function _DataViewsViewConfig( {
-	defaultLayouts = { list: {}, grid: {}, table: {} },
-}: {
-	defaultLayouts?: SupportedLayouts;
-} ) {
+function _DataViewsViewConfig() {
 	return (
 		<>
-			<ViewTypeMenu defaultLayouts={ defaultLayouts } />
+			<ViewTypeMenu />
 			<DataviewsViewConfigDropdown />
 		</>
 	);

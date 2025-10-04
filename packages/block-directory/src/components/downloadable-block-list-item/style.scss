@@ -15,7 +15,10 @@
 	background: none;
 	border: 0;
 	text-align: left;
-	transition: box-shadow 0.1s linear;
+
+	@media not (prefers-reduced-motion) {
+		transition: box-shadow 0.1s linear;
+	}
 
 	// The item contains absolutely positioned items.
 	// Set `position: relative` on the parent to prevent overflow issues

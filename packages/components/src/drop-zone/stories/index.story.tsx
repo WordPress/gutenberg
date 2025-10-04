@@ -2,15 +2,30 @@
  * External dependencies
  */
 import type { Meta, StoryFn } from '@storybook/react';
+
+/**
+ * WordPress dependencies
+ */
+import { upload, media } from '@wordpress/icons';
+
 /**
  * Internal dependencies
  */
 import DropZone from '..';
 
+const ICONS = { upload, media };
+
 const meta: Meta< typeof DropZone > = {
 	component: DropZone,
 	id: 'components-dropzone',
 	title: 'Components/Selection & Input/File Upload/DropZone',
+	argTypes: {
+		icon: {
+			control: { type: 'select' },
+			options: Object.keys( ICONS ),
+			mapping: ICONS,
+		},
+	},
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },

@@ -8,10 +8,9 @@ import {
 	__experimentalZStack as ZStack,
 	__experimentalVStack as VStack,
 	ColorIndicator,
-	Button,
 } from '@wordpress/components';
 import { isRTL, __ } from '@wordpress/i18n';
-import { Icon, shuffle, chevronLeft, chevronRight } from '@wordpress/icons';
+import { Icon, chevronLeft, chevronRight } from '@wordpress/icons';
 import { useMemo } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
@@ -20,7 +19,6 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
  */
 import Subtitle from './subtitle';
 import { NavigationButtonAsItem } from './navigation-button';
-import { useColorRandomizer } from './hooks';
 import ColorIndicatorWrapper from './color-indicator-wrapper';
 import { unlock } from '../../lock-unlock';
 
@@ -37,8 +35,6 @@ function Palette( { name } ) {
 		'color.defaultPalette',
 		name
 	);
-
-	const [ randomizeThemeColors ] = useColorRandomizer();
 
 	const colors = useMemo(
 		() => [
@@ -87,17 +83,6 @@ function Palette( { name } ) {
 					</HStack>
 				</NavigationButtonAsItem>
 			</ItemGroup>
-			{ window.__experimentalEnableColorRandomizer &&
-				themeColors?.length > 0 && (
-					<Button
-						__next40pxDefaultSize
-						variant="secondary"
-						icon={ shuffle }
-						onClick={ randomizeThemeColors }
-					>
-						{ __( 'Randomize colors' ) }
-					</Button>
-				) }
 		</VStack>
 	);
 }

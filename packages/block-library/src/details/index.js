@@ -20,7 +20,7 @@ export const settings = {
 	icon,
 	example: {
 		attributes: {
-			summary: 'La Mancha',
+			summary: __( 'La Mancha' ),
 			showContent: true,
 		},
 		innerBlocks: [
@@ -50,7 +50,7 @@ export const settings = {
 			return ! hasSummary
 				? __( 'Details. Empty.' )
 				: sprintf(
-						/* translators: accessibility text; summary title. */
+						/* translators: %s: accessibility text; summary title. */
 						__( 'Details. %s' ),
 						summary
 				  );

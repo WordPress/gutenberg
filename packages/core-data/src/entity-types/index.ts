@@ -17,6 +17,7 @@ import type { PostRevision } from './post-revision';
 import type { Settings } from './settings';
 import type { Sidebar } from './sidebar';
 import type { Taxonomy } from './taxonomy';
+import type { Term } from './term';
 import type { Theme } from './theme';
 import type { User } from './user';
 import type { Type } from './type';
@@ -46,6 +47,7 @@ export type {
 	Taxonomy,
 	TemplatePartArea,
 	TemplateType,
+	Term,
 	Theme,
 	Type,
 	Updatable,
@@ -105,6 +107,7 @@ export interface PerPackageEntityRecords< C extends Context > {
 		| Settings< C >
 		| Sidebar< C >
 		| Taxonomy< C >
+		| Term< C >
 		| Theme< C >
 		| User< C >
 		| Type< C >

@@ -314,7 +314,7 @@ function UnforwardedRangeControl(
 						<SimpleTooltip
 							className="components-range-control__tooltip"
 							inputRef={ inputRef }
-							tooltipPosition="bottom"
+							tooltipPlacement="bottom"
 							renderTooltipContent={ renderTooltipContent }
 							show={ isCurrentlyFocused || showTooltip }
 							style={ offsetStyle }
@@ -391,17 +391,18 @@ function UnforwardedRangeControl(
  * import { useState } from '@wordpress/element';
  *
  * const MyRangeControl = () => {
- *   const [ isChecked, setChecked ] = useState( true );
+ *   const [ value, setValue ] = useState();
  *   return (
  *     <RangeControl
  *       __nextHasNoMarginBottom
  *       __next40pxDefaultSize
  *       help="Please select how transparent you would like this."
- *       initialPosition={50}
+ *       initialPosition={ 50 }
  *       label="Opacity"
- *       max={100}
- *       min={0}
- *       onChange={() => {}}
+ *       max={ 100 }
+ *       min={ 0 }
+ *       value={ value }
+ *       onChange={ setValue }
  *     />
  *   );
  * };

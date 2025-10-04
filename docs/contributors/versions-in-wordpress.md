@@ -1,4 +1,4 @@
-# Versions in WordPress
+# Gutenberg versions in WordPress
 
 With each major release of WordPress a new version of Gutenberg is included. This has caused confusion over time as people have tried to figure out how to best debug problems and report bugs appropriately. To make this easier we have made this document to serve as a canonical list of the Gutenberg versions integrated into each major WordPress release. Of note, during the beta period of a WordPress release, additional bug fixes from later Gutenberg releases than those noted are added into the WordPress release where it is needed. If you want details about what's in each Gutenberg release outside of the high level items shared as part of major WordPress releases, please review the [release notes shared on Make Core](https://make.wordpress.org/core/tag/gutenberg-new/).
 
@@ -6,6 +6,8 @@ If anything looks incorrect here, please bring it up in #core-editor in [WordPre
 
 | Gutenberg Versions | WordPress Version |
 | ------------------ | ----------------- |
+| 19.4-20.4          | 6.8               |
+| 18.6-19.3          | 6.7.2             |
 | 18.6-19.3          | 6.7.1             |
 | 18.6-19.3          | 6.7               |
 | 17.8-18.5          | 6.6.2             |

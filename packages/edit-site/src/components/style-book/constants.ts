@@ -168,7 +168,7 @@ export const STYLE_BOOK_ALL_BLOCKS_SUBCATEGORIES: StyleBookCategory[] = [
 	},
 ];
 
-// Style book preview categories are organised slightly differently to the editor ones.
+// Style book preview categories are organized slightly differently to the editor ones.
 export const STYLE_BOOK_PREVIEW_CATEGORIES: StyleBookCategory[] = [
 	{
 		slug: 'overview',

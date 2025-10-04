@@ -97,7 +97,7 @@ function UnforwardedAnglePickerControl(
  *     <AnglePickerControl
  *       value={ angle }
  *       onChange={ setAngle }
- *     </>
+ *     />
  *   );
  * }
  * ```

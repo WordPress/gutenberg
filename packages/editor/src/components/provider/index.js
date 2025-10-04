@@ -171,7 +171,6 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			mode,
 			defaultMode,
 			postTypeEntities,
-			hasLoadedPostObject,
 		} = useSelect(
 			( select ) => {
 				const {
@@ -179,26 +178,33 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					getEditorSelection,
 					getRenderingMode,
 					__unstableIsEditorReady,
-				} = select( editorStore );
+					getDefaultRenderingMode,
+				} = unlock( select( editorStore ) );
 				const { getEntitiesConfig } = select( coreStore );
 
-				const postTypeObject = select( coreStore ).getPostType(
-					post.type
-				);
-
-				const _hasLoadedPostObject = select(
-					coreStore
-				).hasFinishedResolution( 'getPostType', [ post.type ] );
+				const _mode = getRenderingMode();
+				const _defaultMode = getDefaultRenderingMode( post.type );
+				/**
+				 * To avoid content "flash", wait until rendering mode has been resolved.
+				 * This is important for the initial render of the editor.
+				 *
+				 * - Wait for template to be resolved if the default mode is 'template-locked'.
+				 * - Wait for default mode to be resolved otherwise.
+				 */
+				const hasResolvedDefaultMode =
+					_defaultMode === 'template-locked'
+						? hasTemplate
+						: _defaultMode !== undefined;
+				// Wait until the default mode is retrieved and start rendering canvas.
+				const isRenderingModeReady = _defaultMode !== undefined;
 
 				return {
-					hasLoadedPostObject: _hasLoadedPostObject,
 					editorSettings: getEditorSettings(),
 					isReady: __unstableIsEditorReady(),
-					mode: getRenderingMode(),
-					defaultMode:
-						hasTemplate && postTypeObject?.default_rendering_mode
-							? postTypeObject?.default_rendering_mode
-							: 'post-only',
+					mode: isRenderingModeReady ? _mode : undefined,
+					defaultMode: hasResolvedDefaultMode
+						? _defaultMode
+						: undefined,
 					selection: getEditorSelection(),
 					postTypeEntities:
 						post.type === 'wp_template'
@@ -209,12 +215,15 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			[ post.type, hasTemplate ]
 		);
 
-		const shouldRenderTemplate = !! template && mode !== 'post-only';
+		const shouldRenderTemplate = hasTemplate && mode !== 'post-only';
 		const rootLevelPost = shouldRenderTemplate ? template : post;
 		const defaultBlockContext = useMemo( () => {
 			const postContext = {};
 			// If it is a template, try to inherit the post type from the name.
-			if ( post.type === 'wp_template' ) {
+			if (
+				post.type === 'wp_template' ||
+				post.type === 'wp_registered_template'
+			) {
 				if ( post.slug === 'page' ) {
 					postContext.postType = 'page';
 				} else if ( post.slug === 'single' ) {
@@ -326,7 +335,9 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 
 		// Sets the right rendering mode when loading the editor.
 		useEffect( () => {
-			setRenderingMode( defaultMode );
+			if ( defaultMode ) {
+				setRenderingMode( defaultMode );
+			}
 		}, [ defaultMode, setRenderingMode ] );
 
 		useHideBlocksFromInserter( post.type, mode );
@@ -334,7 +345,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		// Register the editor commands.
 		useCommands();
 
-		if ( ! isReady || ! mode || ! hasLoadedPostObject ) {
+		if ( ! isReady || ! mode ) {
 			return null;
 		}
 
@@ -391,14 +402,14 @@ export const ExperimentalEditorProvider = withRegistryProvider(
  *
  * All modification and changes are performed to the `@wordpress/core-data` store.
  *
- * @param {Object}  props                      The component props.
- * @param {Object}  [props.post]               The post object to edit. This is required.
- * @param {Object}  [props.__unstableTemplate] The template object wrapper the edited post.
- *                                             This is optional and can only be used when the post type supports templates (like posts and pages).
- * @param {Object}  [props.settings]           The settings object to use for the editor.
- *                                             This is optional and can be used to override the default settings.
- * @param {Element} [props.children]           Children elements for which the BlockEditorProvider context should apply.
- *                                             This is optional.
+ * @param {Object}          props                      The component props.
+ * @param {Object}          [props.post]               The post object to edit. This is required.
+ * @param {Object}          [props.__unstableTemplate] The template object wrapper the edited post.
+ *                                                     This is optional and can only be used when the post type supports templates (like posts and pages).
+ * @param {Object}          [props.settings]           The settings object to use for the editor.
+ *                                                     This is optional and can be used to override the default settings.
+ * @param {React.ReactNode} [props.children]           Children elements for which the BlockEditorProvider context should apply.
+ *                                                     This is optional.
  *
  * @example
  * ```jsx

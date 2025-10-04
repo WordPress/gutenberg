@@ -54,15 +54,17 @@ function InserterMenu(
 	},
 	ref
 ) {
-	const isZoomOutMode = useSelect(
-		( select ) => unlock( select( blockEditorStore ) ).isZoomOut(),
-		[]
-	);
-	const hasSectionRootClientId = useSelect(
-		( select ) =>
-			!! unlock( select( blockEditorStore ) ).getSectionRootClientId(),
-		[]
-	);
+	const { isZoomOutMode, hasSectionRootClientId } = useSelect( ( select ) => {
+		const { isZoomOut, getSectionRootClientId } = unlock(
+			select( blockEditorStore )
+		);
+
+		return {
+			isZoomOutMode: isZoomOut(),
+			hasSectionRootClientId: !! getSectionRootClientId(),
+		};
+	}, [] );
+
 	const [ filterValue, setFilterValue, delayedFilterValue ] =
 		useDebouncedInput( __experimentalFilterValue );
 	const [ hoveredItem, setHoveredItem ] = useState( null );

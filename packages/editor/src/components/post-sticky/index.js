@@ -29,7 +29,7 @@ export default function PostSticky() {
 			<CheckboxControl
 				className="editor-post-sticky__checkbox-control"
 				label={ __( 'Sticky' ) }
-				help={ __( 'Pin this post to the top of the blog' ) }
+				help={ __( 'Pin this post to the top of the blog.' ) }
 				checked={ postSticky }
 				onChange={ () => editPost( { sticky: ! postSticky } ) }
 				__nextHasNoMarginBottom

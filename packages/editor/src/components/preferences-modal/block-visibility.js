@@ -14,6 +14,7 @@ import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 const { BlockManager } = unlock( blockEditorPrivateApis );
+const EMPTY_ARRAY = [];
 
 export default function BlockVisibility() {
 	const { showBlockTypes, hideBlockTypes } = unlock(
@@ -31,7 +32,7 @@ export default function BlockVisibility() {
 				select( editorStore ).getEditorSettings().allowedBlockTypes,
 			hiddenBlockTypes:
 				select( preferencesStore ).get( 'core', 'hiddenBlockTypes' ) ??
-				[],
+				EMPTY_ARRAY,
 		};
 	}, [] );
 

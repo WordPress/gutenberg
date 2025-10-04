@@ -209,7 +209,7 @@ export function createInfoNotice( content, options ) {
  *             }
  *         >
  *             { __(
- *                 'Generate an snackbar error notice with explicit dismiss button.'
+ *                 'Generate a snackbar error notice with explicit dismiss button.'
  *             ) }
  *         </Button>
  *     );

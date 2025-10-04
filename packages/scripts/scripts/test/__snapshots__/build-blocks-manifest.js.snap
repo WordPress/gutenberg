@@ -6,7 +6,7 @@ exports[`build-blocks-manifest script should generate expected blocks manifest 1
 return array(
 	'custom-header' => array(
 		'$schema' => 'https://schemas.wp.org/trunk/block.json',
-		'apiVersion' => 2,
+		'apiVersion' => 3,
 		'name' => 'my-plugin/custom-header',
 		'title' => 'Custom Header',
 		'category' => 'text',
@@ -39,7 +39,7 @@ return array(
 	),
 	'image-gallery' => array(
 		'$schema' => 'https://schemas.wp.org/trunk/block.json',
-		'apiVersion' => 2,
+		'apiVersion' => 3,
 		'name' => 'my-plugin/image-gallery',
 		'title' => 'Image Gallery',
 		'category' => 'media',
@@ -94,7 +94,7 @@ return array(
 	),
 	'simple-button' => array(
 		'$schema' => 'https://schemas.wp.org/trunk/block.json',
-		'apiVersion' => 2,
+		'apiVersion' => 3,
 		'name' => 'my-plugin/simple-button',
 		'title' => 'Simple Button',
 		'category' => 'design',

@@ -32,8 +32,10 @@
 	height: var(--checkbox-input-size);
 
 	appearance: none;
-	transition: 0.1s border-color ease-in-out;
-	@include reduce-motion("transition");
+
+	@media not (prefers-reduced-motion) {
+		transition: 0.1s border-color ease-in-out;
+	}
 
 	&:focus {
 		@include button-style-outset__focus(var(--wp-admin-theme-color));

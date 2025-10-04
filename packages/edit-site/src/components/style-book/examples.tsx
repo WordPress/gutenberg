@@ -115,8 +115,9 @@ function getOverviewBlockExamples(
 
 	if ( getBlockType( 'core/heading' ) ) {
 		const headingBlock = createBlock( 'core/heading', {
+			// translators: Typography example. Your local alphabet, numbers and some common special characters.
 			content: __(
-				`AaBbCcDdEeFfGgHhiiJjKkLIMmNnOoPpQakRrssTtUuVVWwXxxYyZzOl23356789X{(…)},2!*&:/A@HELFO™`
+				`AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789X{(…)},.-<>?!*&:/A@HELFO™©`
 			),
 			level: 1,
 		} );

@@ -130,7 +130,9 @@
 				background-color: $white;
 				margin: auto;
 				padding: 0;
-				transition: transform 0.5s, z-index 0.5s;
+				@media not ( prefers-reduced-motion ) {
+					transition: transform 0.5s, z-index 0.5s;
+				}
 				z-index: z-index(".block-editor-block-pattern-setup .pattern-slide");
 
 				&.active-slide {

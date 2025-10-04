@@ -873,28 +873,28 @@ const { state } = store( 'myPlugin', {
 } );
 ```
 
-As mentioned above with [`wp-on`](#wp-on), [`wp-on-window`](#wp-on-window), and [`wp-on-document`](#wp-on-document), an async action should be used whenever the `async` versions of the aforementioned directives cannot be used due to the action requiring synchronous access to the `event` object. Synchronous access is required whenever the action needs to call `event.preventDefault()`, `event.stopPropagation()`, or `event.stopImmediatePropagation()`. To ensure that the action code does not contribute to a long task, you may manually yield to the main thread after calling the synchronous event API. For example:
+You may want to add multiple such `yield` points in your action if it is doing a lot of work.
+
+As mentioned above with [`wp-on`](#wp-on), [`wp-on-window`](#wp-on-window), and [`wp-on-document`](#wp-on-document), an async action should be used whenever the `async` versions of the aforementioned directives cannot be used due to the action requiring synchronous access to the `event` object. Synchronous access is required whenever the action needs to call `event.preventDefault()`, `event.stopPropagation()`, or `event.stopImmediatePropagation()`.
+
+To ensure that the action code does not contribute to a long task, you may manually yield to the main thread after calling the synchronous event API. The Interactivity API provides the `splitTask()` function for that purpose, which implements yielding in a cross-browser compatible way. Here is an example:
 
 ```js
-// Note: In WordPress 6.6 this splitTask function is exported by @wordpress/interactivity.
-function splitTask() {
-	return new Promise( ( resolve ) => {
-		setTimeout( resolve, 0 );
-	} );
-}
+import { splitTask } from '@wordpress/interactivity';
 
 store( 'myPlugin', {
 	actions: {
-		handleClick: function* ( event ) {
+		handleClick: withSyncEvent( function* ( event ) {
 			event.preventDefault();
 			yield splitTask();
 			doTheWork();
-		},
+		} ),
 	},
 } );
 ```
 
-You may want to add multiple such `yield` points in your action if it is doing a lot of work.
+You may notice the use of the [`withSyncEvent()`](#withsyncevent) utility function in this example. This is necessary due to an ongoing effort to handle store actions asynchronously by default, unless they require synchronous event access (which this example does due to the call to `event.preventDefault()`). Otherwise a deprecation warning will be triggered, and in a future release the behavior will change accordingly.
+
 
 #### Side Effects
 
@@ -1248,6 +1248,43 @@ store( 'mySliderPlugin', {
 				} ),
 				3_000
 			);
+		},
+	},
+} );
+```
+
+### withSyncEvent()
+
+Actions that require synchronous access to the `event` object need to use the `withSyncEvent()` function to annotate their handler callback. This is necessary due to an ongoing effort to handle store actions asynchronously by default, unless they require synchronous event access. Therefore, as of Gutenberg 20.4 / WordPress 6.8 all actions that require synchronous event access need to use the `withSyncEvent()` function. Otherwise a deprecation warning will be triggered, and in a future release the behavior will change accordingly.
+
+Only very specific event methods and properties require synchronous access, so it is advised to only use `withSyncEvent()` when necessary. The following event methods and properties require synchronous access:
+
+* `event.currentTarget`
+* `event.preventDefault()`
+* `event.stopImmediatePropagation()`
+* `event.stopPropagation()`
+
+Here is an example, where one action requires synchronous event access while the other actions do not:
+
+```js
+// store
+import { store, withSyncEvent } from '@wordpress/interactivity';
+
+store( 'myPlugin', {
+	actions: {
+		// `event.preventDefault()` requires synchronous event access.
+		preventNavigation: withSyncEvent( ( event ) => {
+			event.preventDefault();
+		} ),
+
+		// `event.target` does not require synchronous event access.
+		logTarget: ( event ) => {
+			console.log( 'event target => ', event.target );
+		},
+
+		// Not using `event` at all does not require synchronous event access.
+		logSomething: () => {
+			console.log( 'something' );
 		},
 	},
 } );

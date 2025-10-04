@@ -8,7 +8,6 @@ import {
 	RangeControl,
 	TextareaControl,
 	ToggleControl,
-	SelectControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -36,8 +35,11 @@ import { COVER_MIN_HEIGHT, mediaPosition } from '../shared';
 import { unlock } from '../../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { DEFAULT_MEDIA_SIZE_SLUG } from '../constants';
+import PosterImage from '../../utils/poster-image';
 
-const { cleanEmptyObject, ResolutionTool } = unlock( blockEditorPrivateApis );
+const { cleanEmptyObject, ResolutionTool, HTMLElementControl } = unlock(
+	blockEditorPrivateApis
+);
 
 function CoverHeightInput( {
 	onChange,
@@ -109,6 +111,7 @@ export default function CoverInspectorControls( {
 		minHeightUnit,
 		alt,
 		tagName,
+		poster,
 	} = attributes;
 	const {
 		isVideoBackground,
@@ -128,7 +131,12 @@ export default function CoverInspectorControls( {
 	const image = useSelect(
 		( select ) =>
 			id && isImageBackground
-				? select( coreStore ).getMedia( id, { context: 'view' } )
+				? select( coreStore ).getEntityRecord(
+						'postType',
+						'attachment',
+						id,
+						{ context: 'view' }
+				  )
 				: null,
 		[ id, isImageBackground ]
 	);
@@ -183,27 +191,6 @@ export default function CoverInspectorControls( {
 
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
 
-	const htmlElementMessages = {
-		header: __(
-			'The <header> element should represent introductory content, typically a group of introductory or navigational aids.'
-		),
-		main: __(
-			'The <main> element should be used for the primary content of your document only.'
-		),
-		section: __(
-			"The <section> element should represent a standalone portion of the document that can't be better represented by another element."
-		),
-		article: __(
-			'The <article> element should represent a self-contained, syndicatable portion of the document.'
-		),
-		aside: __(
-			"The <aside> element should represent a portion of a document whose content is only indirectly related to the document's main content."
-		),
-		footer: __(
-			'The <footer> element should represent a footer for its nearest sectioning element (e.g.: <section>, <article>, <main> etc.).'
-		),
-	};
-
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	return (
@@ -218,8 +205,9 @@ export default function CoverInspectorControls( {
 								focalPoint: undefined,
 								isRepeated: false,
 								alt: '',
-								sizeSlug: undefined,
+								poster: undefined,
 							} );
+							updateImage( DEFAULT_MEDIA_SIZE_SLUG );
 						} }
 						dropdownMenuProps={ dropdownMenuProps }
 					>
@@ -228,7 +216,7 @@ export default function CoverInspectorControls( {
 								<ToolsPanelItem
 									label={ __( 'Fixed background' ) }
 									isShownByDefault
-									hasValue={ () => hasParallax }
+									hasValue={ () => !! hasParallax }
 									onDeselect={ () =>
 										setAttributes( {
 											hasParallax: false,
@@ -239,7 +227,7 @@ export default function CoverInspectorControls( {
 									<ToggleControl
 										__nextHasNoMarginBottom
 										label={ __( 'Fixed background' ) }
-										checked={ hasParallax }
+										checked={ !! hasParallax }
 										onChange={ toggleParallax }
 									/>
 								</ToolsPanelItem>
@@ -288,6 +276,16 @@ export default function CoverInspectorControls( {
 									}
 								/>
 							</ToolsPanelItem>
+						) }
+						{ isVideoBackground && (
+							<PosterImage
+								poster={ poster }
+								onChange={ ( posterImage ) =>
+									setAttributes( {
+										poster: posterImage?.url,
+									} )
+								}
+							/>
 						) }
 						{ ! useFeaturedImage && url && ! isVideoBackground && (
 							<ToolsPanelItem
@@ -441,10 +439,12 @@ export default function CoverInspectorControls( {
 				</ToolsPanelItem>
 			</InspectorControls>
 			<InspectorControls group="advanced">
-				<SelectControl
-					__nextHasNoMarginBottom
-					__next40pxDefaultSize
-					label={ __( 'HTML element' ) }
+				<HTMLElementControl
+					tagName={ tagName }
+					onChange={ ( value ) =>
+						setAttributes( { tagName: value } )
+					}
+					clientId={ clientId }
 					options={ [
 						{ label: __( 'Default (<div>)' ), value: 'div' },
 						{ label: '<header>', value: 'header' },
@@ -454,11 +454,6 @@ export default function CoverInspectorControls( {
 						{ label: '<aside>', value: 'aside' },
 						{ label: '<footer>', value: 'footer' },
 					] }
-					value={ tagName }
-					onChange={ ( value ) =>
-						setAttributes( { tagName: value } )
-					}
-					help={ htmlElementMessages[ tagName ] }
 				/>
 			</InspectorControls>
 		</>

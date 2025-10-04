@@ -45,7 +45,8 @@
 	}
 }
 
-.components-snackbar__action.components-button {
+.components-snackbar__action.components-button,
+.components-snackbar__action.components-external-link {
 	margin-left: $grid-unit-40;
 	color: $white;
 	flex-shrink: 0;

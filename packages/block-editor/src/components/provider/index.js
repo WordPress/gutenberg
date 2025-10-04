@@ -4,7 +4,6 @@
 import { useDispatch } from '@wordpress/data';
 import { useEffect, useMemo } from '@wordpress/element';
 import { SlotFillProvider } from '@wordpress/components';
-//eslint-disable-next-line import/no-extraneous-dependencies -- Experimental package, not published.
 import {
 	MediaUploadProvider,
 	store as uploadStore,

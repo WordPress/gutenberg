@@ -20,11 +20,11 @@ import Button from '../../button';
 import Modal from '../../modal';
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
 import { ContextSystemProvider } from '../../context';
-import type { MenuProps } from '../types';
+import type { Props } from '../types';
 
 const meta: Meta< typeof Menu > = {
-	id: 'components-experimental-menu',
-	title: 'Components (Experimental)/Actions/Menu',
+	id: 'components-menu',
+	title: 'Components/Actions/Menu',
 	component: Menu,
 	subcomponents: {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
@@ -183,7 +183,7 @@ export const WithSubmenu: StoryObj< typeof Menu > = {
 };
 
 export const WithCheckboxes: StoryObj< typeof Menu > = {
-	render: function WithCheckboxes( props: MenuProps ) {
+	render: function WithCheckboxes( props: Props ) {
 		const [ isAChecked, setAChecked ] = useState( false );
 		const [ isBChecked, setBChecked ] = useState( true );
 		const [ multipleCheckboxesValue, setMultipleCheckboxesValue ] =
@@ -333,7 +333,7 @@ export const WithCheckboxes: StoryObj< typeof Menu > = {
 };
 
 export const WithRadios: StoryObj< typeof Menu > = {
-	render: function WithRadios( props: MenuProps ) {
+	render: function WithRadios( props: Props ) {
 		const [ radioValue, setRadioValue ] = useState( 'two' );
 		const onRadioChange: React.ComponentProps<
 			typeof Menu.RadioItem
@@ -411,7 +411,7 @@ const modalOnTopOfMenuPopover = css`
 `;
 
 export const WithModals: StoryObj< typeof Menu > = {
-	render: function WithModals( props: MenuProps ) {
+	render: function WithModals( props: Props ) {
 		const [ isOuterModalOpen, setOuterModalOpen ] = useState( false );
 		const [ isInnerModalOpen, setInnerModalOpen ] = useState( false );
 
@@ -527,7 +527,7 @@ const Fill = ( { children }: { children: React.ReactNode } ) => {
 };
 
 export const WithSlotFill: StoryObj< typeof Menu > = {
-	render: ( props: MenuProps ) => {
+	render: ( props: Props ) => {
 		return (
 			<SlotFillProvider>
 				<Menu { ...props }>
@@ -579,7 +579,7 @@ const toolbarVariantContextValue = {
 };
 
 export const ToolbarVariant: StoryObj< typeof Menu > = {
-	render: ( props: MenuProps ) => (
+	render: ( props: Props ) => (
 		// TODO: add toolbar
 		<ContextSystemProvider value={ toolbarVariantContextValue }>
 			<Menu { ...props }>
@@ -619,7 +619,7 @@ export const ToolbarVariant: StoryObj< typeof Menu > = {
 };
 
 export const InsideModal: StoryObj< typeof Menu > = {
-	render: function InsideModal( props: MenuProps ) {
+	render: function InsideModal( props: Props ) {
 		const [ isModalOpen, setModalOpen ] = useState( false );
 		return (
 			<>

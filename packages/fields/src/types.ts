@@ -32,6 +32,9 @@ interface EmbeddedAuthor {
 	author: Author[];
 }
 
+/**
+ * BasePost interface used for all post types.
+ */
 export interface BasePost extends CommonPost {
 	comment_status?: 'open' | 'closed';
 	excerpt?: string | { raw: string; rendered: string };
@@ -100,6 +103,8 @@ export interface PostType {
 		author?: string;
 		thumbnail?: string;
 		comments?: string;
+		editor?: boolean;
+		trackbacks?: boolean;
 	};
 }
 

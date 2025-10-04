@@ -5,7 +5,7 @@ import type { Meta, StoryFn } from '@storybook/react';
 /**
  * WordPress dependencies
  */
-import { useState, createContext, useContext } from '@wordpress/element';
+import { createContext, useContext, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -87,7 +87,6 @@ const DefaultOptions = () => {
 						onClick={ () => {
 							setCurrentColor?.( color );
 						} }
-						aria-label={ name }
 					/>
 				);
 			} ) }
@@ -132,7 +131,7 @@ WithLoopingDisabled.parameters = {
 	docs: {
 		source: {
 			code: `<CircularOptionPicker
-  aria-label="${ WithLoopingDisabled.args[ 'aria-label' ] }"
+  'aria-label': 'Circular Option Picker',
   loop={false}
   options={<DefaultOptions />}
 />`,
@@ -153,7 +152,7 @@ WithDropdownLinkAction.args = {
 	actions: (
 		<CircularOptionPicker.DropdownLinkAction
 			dropdownProps={ {
-				popoverProps: { position: 'top right' },
+				popoverProps: { placement: 'top-end' },
 				renderContent: () => (
 					<div>This is an example of a DropdownLinkAction.</div>
 				),

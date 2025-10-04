@@ -129,6 +129,7 @@
 .post-publish-panel__postpublish .components-panel__body {
 	border-bottom: $border-width solid $gray-200;
 	border-top: none;
+	word-break: break-word;
 }
 
 .post-publish-panel__postpublish-buttons {
@@ -137,9 +138,11 @@
 	flex-wrap: wrap;
 	gap: $grid-unit-20;
 
-	.components-button {
+	.components-button,
+	.components-button.has-icon {
 		justify-content: center;
 		flex: 1;
+		min-width: unset;
 	}
 
 	.components-clipboard-button {
@@ -195,6 +198,7 @@
 }
 
 .editor-post-publish-panel {
+	@include reset;
 	position: fixed;
 	z-index: z-index(".editor-post-publish-panel");
 	background: $white;
@@ -210,9 +214,11 @@
 		left: auto;
 		width: $sidebar-width + $border-width;
 		border-left: $border-width solid $gray-300;
-		transform: translateX(+100%);
-		animation: editor-post-publish-panel__slide-in-animation 0.1s forwards;
-		@include reduce-motion("animation");
+
+		@media not (prefers-reduced-motion) {
+			transform: translateX(+100%);
+			animation: editor-post-publish-panel__slide-in-animation 0.1s forwards;
+		}
 
 		body.is-fullscreen-mode & {
 			top: 0;

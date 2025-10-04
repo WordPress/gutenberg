@@ -13,8 +13,8 @@ function isAndroid() {
  * tapped. This is done via the 'hideTextSelectionContextMenu' method, which
  * is sent back to the Android app, where the dismissal is then handle.
  *
- * @return {void}
  * @see https://github.com/WordPress/gutenberg/pull/34668
+ * @return {void}
  */
 function manageTextSelectionContextMenu() {
 	// Listeners for native context menu visibility changes.

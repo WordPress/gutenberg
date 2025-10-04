@@ -104,8 +104,8 @@
 	flex-shrink: 0;
 }
 
-.edit-site-global-styles__shadows-panel__title,
-.edit-site-global-styles__shadows-panel__options-container {
+.edit-site-global-styles__shadows-panel__options-container,
+.edit-site-global-styles__typography-panel__options-container {
 	height: $grid-unit * 3;
 }
 
@@ -228,9 +228,14 @@
 	}
 }
 
+.edit-site-global-styles-sidebar__navigator-provider {
+	height: 100%;
+}
+
 .edit-site-global-styles-sidebar__navigator-screen {
 	display: flex;
 	flex-direction: column;
+	height: 100%;
 }
 
 .edit-site-global-styles-sidebar__navigator-screen .single-column {

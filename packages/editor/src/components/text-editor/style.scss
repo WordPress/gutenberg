@@ -1,4 +1,5 @@
 .editor-text-editor {
+	@include reset;
 	position: relative;
 	width: 100%;
 	background-color: $white;

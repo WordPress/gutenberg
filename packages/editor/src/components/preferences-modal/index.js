@@ -88,7 +88,7 @@ function PreferencesModalContents( { extraSections = {} } ) {
 									scope="core"
 									featureName="showListViewByDefault"
 									help={ __(
-										'Opens the List View sidebar by default.'
+										'Opens the List View panel by default.'
 									) }
 									label={ __( 'Always open List View' ) }
 								/>
@@ -250,7 +250,7 @@ function PreferencesModalContents( { extraSections = {} } ) {
 									scope="core"
 									featureName="keepCaretInsideBlock"
 									help={ __(
-										'Keeps the text cursor within the block boundaries, aiding users with screen readers by preventing unintentional cursor movement outside the block.'
+										'Keeps the text cursor within blocks while navigating with arrow keys, preventing it from moving to other blocks and enhancing accessibility for keyboard users.'
 									) }
 									label={ __(
 										'Contain text cursor inside block'

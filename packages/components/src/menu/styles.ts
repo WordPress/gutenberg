@@ -12,7 +12,7 @@ import { COLORS, font, rtl, CONFIG } from '../utils';
 import { space } from '../utils/space';
 import Icon from '../icon';
 import { Truncate } from '../truncate';
-import type { MenuContext } from './types';
+import type { ContextProps } from './types';
 
 const ANIMATION_PARAMS = {
 	SCALE_AMOUNT_OUTER: 0.82,
@@ -42,8 +42,8 @@ const TOOLBAR_VARIANT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ TOOLBAR_VAR
 
 const GRID_TEMPLATE_COLS = 'minmax( 0, max-content ) 1fr';
 
-export const MenuPopoverOuterWrapper = styled.div<
-	Pick< MenuContext, 'variant' >
+export const PopoverOuterWrapper = styled.div<
+	Pick< ContextProps, 'variant' >
 >`
 	position: relative;
 
@@ -95,7 +95,7 @@ export const MenuPopoverOuterWrapper = styled.div<
 	}
 `;
 
-export const MenuPopoverInnerWrapper = styled.div`
+export const PopoverInnerWrapper = styled.div`
 	position: relative;
 	/* Same as popover component */
 	/* TODO: is there a way to read the sass variable? */
@@ -219,7 +219,7 @@ const baseItem = css`
 	}
 
 	/* When the item is the trigger of an open submenu */
-	${ MenuPopoverInnerWrapper }:not(:focus) &:not(:focus)[aria-expanded="true"] {
+	${ PopoverInnerWrapper }:not(:focus) &:not(:focus)[aria-expanded="true"] {
 		background-color: ${ LIGHT_BACKGROUND_COLOR };
 		color: ${ COLORS.theme.foreground };
 	}
@@ -229,15 +229,15 @@ const baseItem = css`
 	}
 `;
 
-export const MenuItem = styled( Ariakit.MenuItem )`
+export const Item = styled( Ariakit.MenuItem )`
 	${ baseItem };
 `;
 
-export const MenuCheckboxItem = styled( Ariakit.MenuItemCheckbox )`
+export const CheckboxItem = styled( Ariakit.MenuItemCheckbox )`
 	${ baseItem };
 `;
 
-export const MenuRadioItem = styled( Ariakit.MenuItemRadio )`
+export const RadioItem = styled( Ariakit.MenuItemRadio )`
 	${ baseItem };
 `;
 
@@ -249,14 +249,14 @@ export const ItemPrefixWrapper = styled.span`
 	 * Even when the item is not checked, occupy the same screen space to avoid
 	 * the space collapside when no items are checked.
 	 */
-	${ MenuCheckboxItem } > &,
-	${ MenuRadioItem } > & {
+	${ CheckboxItem } > &,
+	${ RadioItem } > & {
 		/* Same width as the check icons */
 		min-width: ${ space( 6 ) };
 	}
 
-	${ MenuCheckboxItem } > &,
-	${ MenuRadioItem } > &,
+	${ CheckboxItem } > &,
+	${ RadioItem } > &,
 	&:not( :empty ) {
 		margin-inline-end: ${ space( 2 ) };
 	}
@@ -278,7 +278,7 @@ export const ItemPrefixWrapper = styled.span`
 	}
 `;
 
-export const MenuItemContentWrapper = styled.div`
+export const ItemContentWrapper = styled.div`
 	/*
 	 * Always occupy the second column, since the first column
 	 * is taken by the prefix wrapper (when displayed).
@@ -293,7 +293,7 @@ export const MenuItemContentWrapper = styled.div`
 	pointer-events: none;
 `;
 
-export const MenuItemChildrenWrapper = styled.div`
+export const ItemChildrenWrapper = styled.div`
 	flex: 1;
 
 	display: inline-flex;
@@ -317,19 +317,19 @@ export const ItemSuffixWrapper = styled.span`
 	 * When the parent menu item is active, except when it's a non-focused/hovered
 	 * submenu trigger (in that case, color should not be inherited)
 	 */
-	[data-active-item]:not( [data-focus-visible] ) *:not(${ MenuPopoverInnerWrapper }) &,
+	[data-active-item]:not( [data-focus-visible] ) *:not(${ PopoverInnerWrapper }) &,
 	/* When the parent menu item is disabled */
-	[aria-disabled='true'] *:not(${ MenuPopoverInnerWrapper }) & {
+	[aria-disabled='true'] *:not(${ PopoverInnerWrapper }) & {
 		color: inherit;
 	}
 `;
 
-export const MenuGroup = styled( Ariakit.MenuGroup )`
+export const Group = styled( Ariakit.MenuGroup )`
 	/* Ignore this element when calculating the layout. Useful for subgrid */
 	display: contents;
 `;
 
-export const MenuGroupLabel = styled( Ariakit.MenuGroupLabel )`
+export const GroupLabel = styled( Ariakit.MenuGroupLabel )`
 	/* Occupy the width of all grid columns (ie. full width) */
 	grid-column: 1 / -1;
 
@@ -338,8 +338,8 @@ export const MenuGroupLabel = styled( Ariakit.MenuGroupLabel )`
 	padding-inline: ${ ITEM_PADDING_INLINE };
 `;
 
-export const MenuSeparator = styled( Ariakit.MenuSeparator )<
-	Pick< MenuContext, 'variant' >
+export const Separator = styled( Ariakit.MenuSeparator )<
+	Pick< ContextProps, 'variant' >
 >`
 	/* Occupy the width of all grid columns (ie. full width) */
 	grid-column: 1 / -1;
@@ -370,22 +370,22 @@ export const SubmenuChevronIcon = styled( Icon )`
 	) };
 `;
 
-export const MenuItemLabel = styled( Truncate )`
+export const ItemLabel = styled( Truncate )`
 	font-size: ${ font( 'default.fontSize' ) };
 	line-height: 20px;
 	color: inherit;
 `;
 
-export const MenuItemHelpText = styled( Truncate )`
+export const ItemHelpText = styled( Truncate )`
 	font-size: ${ font( 'helpText.fontSize' ) };
 	line-height: 16px;
 	color: ${ LIGHTER_TEXT_COLOR };
 	overflow-wrap: anywhere;
 
 	[data-active-item]:not( [data-focus-visible] )
-		*:not( ${ MenuPopoverInnerWrapper } )
+		*:not( ${ PopoverInnerWrapper } )
 		&,
-	[aria-disabled='true'] *:not( ${ MenuPopoverInnerWrapper } ) & {
+	[aria-disabled='true'] *:not( ${ PopoverInnerWrapper } ) & {
 		color: inherit;
 	}
 `;

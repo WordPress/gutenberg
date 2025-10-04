@@ -18,8 +18,10 @@
 
 	.components-button {
 		border-radius: $grid-unit-05;
-		transition: all 0.1s ease-out;
-		@include reduce-motion("transition");
+
+		@media not (prefers-reduced-motion) {
+			transition: all 0.1s ease-out;
+		}
 
 		&:hover {
 			background: $gray-200;

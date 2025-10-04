@@ -455,6 +455,38 @@ describe( 'Interactivity API', () => {
 			expect( target.message.fontStyle ).toBeUndefined();
 		} );
 
+		it( 'should not overwrite getters that become objects if `override` is false', () => {
+			const target: any = proxifyState( 'test', {
+				get message() {
+					return 'hello';
+				},
+			} );
+
+			const getterSpy = jest.spyOn( target, 'message', 'get' );
+
+			let message: any;
+			const spy = jest.fn( () => ( message = target.message ) );
+			effect( spy );
+
+			expect( spy ).toHaveBeenCalledTimes( 1 );
+			expect( message ).toBe( 'hello' );
+
+			deepMerge(
+				target,
+				{ message: { content: 'hello', fontStyle: 'italic' } },
+				false
+			);
+
+			// The effect callback reads `target.message`, so the getter is executed once as well.
+			expect( spy ).toHaveBeenCalledTimes( 1 );
+			expect( getterSpy ).toHaveBeenCalledTimes( 1 );
+
+			expect( message ).toBe( 'hello' );
+			expect( target.message ).toBe( 'hello' );
+			expect( target.message.content ).toBeUndefined();
+			expect( target.message.fontStyle ).toBeUndefined();
+		} );
+
 		it( 'should keep reactivity of arrays that are initially undefined', () => {
 			const target: any = proxifyState( 'test', {} );
 
@@ -481,6 +513,117 @@ describe( 'Interactivity API', () => {
 			// The effect should be called again
 			expect( spy ).toHaveBeenCalledTimes( 3 );
 			expect( deepValue ).toBe( 'value 2' );
+		} );
+
+		it( 'should overwrite the getters of existing signals asynchronously', async () => {
+			const target: any = proxifyState( 'test', {
+				number: 2,
+				double: 4,
+			} );
+
+			let double: any;
+			const spy = jest.fn( () => ( double = target.double ) );
+			effect( spy );
+
+			expect( spy ).toHaveBeenCalledTimes( 1 );
+			expect( double ).toBe( 4 );
+
+			deepMerge(
+				target,
+				{
+					number: 3,
+					get double() {
+						return this.number * 2;
+					},
+				},
+				true
+			);
+
+			expect( spy ).toHaveBeenCalledTimes( 1 );
+			expect( double ).toBe( 4 );
+
+			// After this await, the `double` getter should have been updated.
+			await Promise.resolve();
+
+			expect( spy ).toHaveBeenCalledTimes( 2 );
+			expect( double ).toBe( 6 );
+		} );
+
+		it( 'should overwrite the getters of existing signals synchronously when accessed immediately after', async () => {
+			const target: any = proxifyState( 'test', {
+				number: 2,
+				double: 4,
+			} );
+
+			let double: any;
+			const spy = jest.fn( () => ( double = target.double ) );
+			effect( spy );
+
+			expect( spy ).toHaveBeenCalledTimes( 1 );
+			expect( double ).toBe( 4 );
+
+			deepMerge(
+				target,
+				{
+					number: 3,
+					get double() {
+						return this.number * 2;
+					},
+				},
+				true
+			);
+
+			expect( spy ).toHaveBeenCalledTimes( 1 );
+			expect( double ).toBe( 4 );
+
+			// Access the getter synchronously.
+			expect( target.double ).toBe( 6 );
+			expect( spy ).toHaveBeenCalledTimes( 2 );
+			expect( double ).toBe( 6 );
+		} );
+
+		it( 'should set the last value for multiple-overwritten getters', async () => {
+			const target: any = proxifyState( 'test', {
+				number: 2,
+				double: 4,
+			} );
+
+			let double: any;
+			const spy = jest.fn( () => ( double = target.double ) );
+			effect( spy );
+
+			expect( spy ).toHaveBeenCalledTimes( 1 );
+			expect( double ).toBe( 4 );
+
+			deepMerge(
+				target,
+				{
+					number: 3,
+					get double() {
+						return this.number * 2;
+					},
+				},
+				true
+			);
+
+			deepMerge(
+				target,
+				{
+					number: 3,
+					get double() {
+						return `${ this.number * 2 }!`;
+					},
+				},
+				true
+			);
+
+			expect( spy ).toHaveBeenCalledTimes( 1 );
+			expect( double ).toBe( 4 );
+
+			// Access the getter synchronously.
+			expect( target.double ).toBe( '6!' );
+			expect( spy ).toHaveBeenCalledTimes( 2 );
+			expect( double ).toBe( '6!' );
 		} );
 
 		describe( 'arrays', () => {

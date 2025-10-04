@@ -40,8 +40,21 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should render custom className', () => {
-			render( <NumberControl className="hello" /> );
-			expect( screen.getByRole( 'spinbutton' ) ).toBeVisible();
+			const { container: withoutClassName } = render( <NumberControl /> );
+
+			const { container: withClassName } = render(
+				<NumberControl className="hello" />
+			);
+
+			expect(
+				// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+				withoutClassName.querySelector( '.components-number-control' )
+			).not.toHaveClass( 'hello' );
+
+			expect(
+				// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+				withClassName.querySelector( '.components-number-control' )
+			).toHaveClass( 'hello' );
 		} );
 	} );
 

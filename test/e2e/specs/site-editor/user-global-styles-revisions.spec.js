@@ -80,7 +80,7 @@ test.describe( 'Style Revisions', () => {
 			.getByRole( 'button', { name: 'Background', exact: true } )
 			.click();
 		await page
-			.getByRole( 'option', { name: 'Color: Luminous vivid amber' } )
+			.getByRole( 'option', { name: 'Luminous vivid amber' } )
 			.click( { force: true } );
 
 		await page.getByRole( 'button', { name: 'Revisions' } ).click();
@@ -269,9 +269,7 @@ test.describe( 'Style Revisions', () => {
 		}
 		await userGlobalStylesRevisions.openStylesPanel();
 		await page.getByRole( 'button', { name: 'Revisions' } ).click();
-		const pagination = page.getByLabel(
-			'Global Styles pagination navigation'
-		);
+		const pagination = page.getByLabel( 'Global Styles pagination' );
 		await expect( pagination ).toContainText( '1 of 2' );
 		await pagination.getByRole( 'button', { name: 'Next page' } ).click();
 		await expect( pagination ).toContainText( '2 of 2' );

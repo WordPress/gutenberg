@@ -240,7 +240,12 @@ directive(
 	'priority-2-init',
 	( { directives: { 'priority-2-init': init }, evaluate } ) => {
 		init.forEach( ( entry ) => {
-			useInit( () => evaluate( entry ) );
+			useInit( () => {
+				const result = evaluate( entry );
+				if ( typeof result === 'function' ) {
+					result();
+				}
+			} );
 		} );
 	},
 	{ priority: 2 }

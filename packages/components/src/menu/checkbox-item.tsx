@@ -13,18 +13,18 @@ import { Icon, check } from '@wordpress/icons';
  * Internal dependencies
  */
 import type { WordPressComponentProps } from '../context';
-import { MenuContext } from './context';
-import type { MenuCheckboxItemProps } from './types';
+import { Context } from './context';
+import type { CheckboxItemProps } from './types';
 import * as Styled from './styles';
 
-export const MenuCheckboxItem = forwardRef<
+export const CheckboxItem = forwardRef<
 	HTMLDivElement,
-	WordPressComponentProps< MenuCheckboxItemProps, 'div', false >
->( function MenuCheckboxItem(
+	WordPressComponentProps< CheckboxItemProps, 'div', false >
+>( function CheckboxItem(
 	{ suffix, children, disabled = false, hideOnClick = false, ...props },
 	ref
 ) {
-	const menuContext = useContext( MenuContext );
+	const menuContext = useContext( Context );
 
 	if ( ! menuContext?.store ) {
 		throw new Error(
@@ -33,7 +33,7 @@ export const MenuCheckboxItem = forwardRef<
 	}
 
 	return (
-		<Styled.MenuCheckboxItem
+		<Styled.CheckboxItem
 			ref={ ref }
 			{ ...props }
 			accessibleWhenDisabled
@@ -50,17 +50,17 @@ export const MenuCheckboxItem = forwardRef<
 				<Icon icon={ check } size={ 24 } />
 			</Ariakit.MenuItemCheck>
 
-			<Styled.MenuItemContentWrapper>
-				<Styled.MenuItemChildrenWrapper>
+			<Styled.ItemContentWrapper>
+				<Styled.ItemChildrenWrapper>
 					{ children }
-				</Styled.MenuItemChildrenWrapper>
+				</Styled.ItemChildrenWrapper>
 
 				{ suffix && (
 					<Styled.ItemSuffixWrapper>
 						{ suffix }
 					</Styled.ItemSuffixWrapper>
 				) }
-			</Styled.MenuItemContentWrapper>
-		</Styled.MenuCheckboxItem>
+			</Styled.ItemContentWrapper>
+		</Styled.CheckboxItem>
 	);
 } );

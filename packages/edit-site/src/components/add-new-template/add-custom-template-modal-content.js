@@ -16,6 +16,8 @@ import {
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useDebouncedInput } from '@wordpress/compose';
+import { focus } from '@wordpress/dom';
+import { safeDecodeURI } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -66,7 +68,7 @@ function SuggestionListItem( {
 					lineHeight={ 1.53846153846 } // 20px
 					className={ `${ baseCssClass }__info` }
 				>
-					{ suggestion.link }
+					{ safeDecodeURI( suggestion.link ) }
 				</Text>
 			) }
 		</Composite.Item>
@@ -165,10 +167,25 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
 	);
 }
 
-function AddCustomTemplateModalContent( { onSelect, entityForSuggestions } ) {
-	const [ showSearchEntities, setShowSearchEntities ] = useState(
-		entityForSuggestions.hasGeneralTemplate
-	);
+function AddCustomTemplateModalContent( {
+	onSelect,
+	entityForSuggestions,
+	onBack,
+	containerRef,
+} ) {
+	const [ showSearchEntities, setShowSearchEntities ] = useState();
+
+	// Focus on the first focusable element when the modal opens.
+	// We handle focus management in the parent modal, just need to focus on the first focusable element.
+	useEffect( () => {
+		if ( containerRef.current ) {
+			const [ firstFocusable ] = focus.focusable.find(
+				containerRef.current
+			);
+			firstFocusable?.focus();
+		}
+	}, [ showSearchEntities ] );
+
 	return (
 		<VStack
 			spacing={ 4 }
@@ -247,6 +264,15 @@ function AddCustomTemplateModalContent( { onSelect, entityForSuggestions } ) {
 							</Text>
 						</FlexItem>
 					</Flex>
+					<Flex justify="right">
+						<Button
+							__next40pxDefaultSize
+							variant="tertiary"
+							onClick={ onBack }
+						>
+							{ __( 'Back' ) }
+						</Button>
+					</Flex>
 				</>
 			) }
 			{ showSearchEntities && (
@@ -260,6 +286,23 @@ function AddCustomTemplateModalContent( { onSelect, entityForSuggestions } ) {
 						entityForSuggestions={ entityForSuggestions }
 						onSelect={ onSelect }
 					/>
+					<Flex justify="right">
+						<Button
+							__next40pxDefaultSize
+							variant="tertiary"
+							onClick={ () => {
+								// If general template exists, go directly back to main screen
+								// instead of showing the choice screen
+								if ( entityForSuggestions.hasGeneralTemplate ) {
+									onBack();
+								} else {
+									setShowSearchEntities( false );
+								}
+							} }
+						>
+							{ __( 'Back' ) }
+						</Button>
+					</Flex>
 				</>
 			) }
 		</VStack>

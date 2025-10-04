@@ -24,6 +24,7 @@ const duplicateTemplatePart: Action< TemplatePart > = {
 	label: _x( 'Duplicate', 'action label' ),
 	isEligible: ( item ) => item.type === 'wp_template_part',
 	modalHeader: _x( 'Duplicate template part', 'action label' ),
+	modalFocusOnMount: 'firstContentElement',
 	RenderModal: ( { items, closeModal } ) => {
 		const [ item ] = items;
 		const blocks = useMemo( () => {

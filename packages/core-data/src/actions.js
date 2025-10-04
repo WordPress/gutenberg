@@ -20,6 +20,7 @@ import { DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
 import { STORE_NAME } from './name';
 import { getSyncProvider } from './sync';
+import logEntityDeprecation from './utils/log-entity-deprecation';
 
 /**
  * Returns an action object used in signalling that authors have been received.
@@ -92,6 +93,16 @@ export function receiveEntityRecords(
 	edits,
 	meta
 ) {
+	// If we receive an auto-draft template, pretend it's already published.
+	if ( kind === 'postType' && name === 'wp_template' ) {
+		records = ( Array.isArray( records ) ? records : [ records ] ).map(
+			( record ) =>
+				record.status === 'auto-draft'
+					? { ...record, status: 'publish' }
+					: record
+		);
+	}
+
 	// Auto drafts should not have titles, but some plugins rely on them so we can't filter this
 	// on the server.
 	if ( kind === 'postType' ) {
@@ -286,6 +297,7 @@ export const deleteEntityRecord =
 		{ __unstableFetch = apiFetch, throwOnError = false } = {}
 	) =>
 	async ( { dispatch, resolveSelect } ) => {
+		logEntityDeprecation( kind, name, 'deleteEntityRecord' );
 		const configs = await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
 			( config ) => config.kind === kind && config.name === name
@@ -363,6 +375,7 @@ export const deleteEntityRecord =
 export const editEntityRecord =
 	( kind, name, recordId, edits, options = {} ) =>
 	( { select, dispatch } ) => {
+		logEntityDeprecation( kind, name, 'editEntityRecord' );
 		const entityConfig = select.getEntityConfig( kind, name );
 		if ( ! entityConfig ) {
 			throw new Error(
@@ -503,6 +516,7 @@ export const saveEntityRecord =
 		} = {}
 	) =>
 	async ( { select, resolveSelect, dispatch } ) => {
+		logEntityDeprecation( kind, name, 'saveEntityRecord' );
 		const configs = await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
 			( config ) => config.kind === kind && config.name === name
@@ -512,6 +526,46 @@ export const saveEntityRecord =
 		}
 		const entityIdKey = entityConfig.key || DEFAULT_ENTITY_KEY;
 		const recordId = record[ entityIdKey ];
+
+		// When called with a theme template ID, trigger the compatibility
+		// logic.
+		if (
+			kind === 'postType' &&
+			name === 'wp_template' &&
+			typeof recordId === 'string' &&
+			! /^\d+$/.test( recordId )
+		) {
+			// Get the theme template.
+			const template = await select.getEntityRecord(
+				'postType',
+				'wp_registered_template',
+				recordId
+			);
+			// Duplicate the theme template and make the edit.
+			const newTemplate = await dispatch.saveEntityRecord(
+				'postType',
+				'wp_template',
+				{
+					...template,
+					...record,
+					id: undefined,
+					type: 'wp_template',
+					status: 'publish',
+				}
+			);
+			// Make the new template active.
+			const activeTemplates = await select.getEntityRecord(
+				'root',
+				'site'
+			);
+			await dispatch.saveEntityRecord( 'root', 'site', {
+				active_templates: {
+					...activeTemplates.active_templates,
+					[ newTemplate.slug ]: newTemplate.id,
+				},
+			} );
+			return newTemplate;
+		}
 
 		const lock = await dispatch.__unstableAcquireStoreLock(
 			STORE_NAME,
@@ -673,6 +727,11 @@ export const saveEntityRecord =
 							),
 						};
 					}
+					// Unless there is no persisted record, set the status to
+					// publish.
+					if ( name === 'wp_template' && persistedRecord ) {
+						edits.status = 'publish';
+					}
 					updatedRecord = await __unstableFetch( {
 						path,
 						method: recordId ? 'PUT' : 'POST',
@@ -781,6 +840,7 @@ export const __experimentalBatch =
 export const saveEditedEntityRecord =
 	( kind, name, recordId, options ) =>
 	async ( { select, dispatch, resolveSelect } ) => {
+		logEntityDeprecation( kind, name, 'saveEditedEntityRecord' );
 		if ( ! select.hasEditsForEntityRecord( kind, name, recordId ) ) {
 			return;
 		}
@@ -814,6 +874,11 @@ export const saveEditedEntityRecord =
 export const __experimentalSaveSpecifiedEntityEdits =
 	( kind, name, recordId, itemsToSave, options ) =>
 	async ( { select, dispatch, resolveSelect } ) => {
+		logEntityDeprecation(
+			kind,
+			name,
+			'__experimentalSaveSpecifiedEntityEdits'
+		);
 		if ( ! select.hasEditsForEntityRecord( kind, name, recordId ) ) {
 			return;
 		}
@@ -974,6 +1039,7 @@ export function receiveDefaultTemplateId( query, templateId ) {
 export const receiveRevisions =
 	( kind, name, recordKey, records, query, invalidateCache = false, meta ) =>
 	async ( { dispatch, resolveSelect } ) => {
+		logEntityDeprecation( kind, name, 'receiveRevisions' );
 		const configs = await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
 			( config ) => config.kind === kind && config.name === name

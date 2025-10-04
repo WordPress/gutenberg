@@ -15,14 +15,14 @@ import { next, previous } from '@wordpress/icons';
  */
 import DataViewsContext from '../dataviews-context';
 
-function DataViewsPagination() {
+export function DataViewsPagination() {
 	const {
 		view,
 		onChangeView,
 		paginationInfo: { totalItems = 0, totalPages },
 	} = useContext( DataViewsContext );
 
-	if ( ! totalItems || ! totalPages ) {
+	if ( ! totalItems || ! totalPages || view.infiniteScrollEnabled ) {
 		return null;
 	}
 
@@ -36,8 +36,8 @@ function DataViewsPagination() {
 				'aria-label':
 					currentPage === page
 						? sprintf(
-								// translators: Current page number in total number of pages
-								__( 'Page %1$s of %2$s' ),
+								// translators: 1: current page number. 2: total number of pages.
+								__( 'Page %1$d of %2$d' ),
 								currentPage,
 								totalPages
 						  )
@@ -65,7 +65,7 @@ function DataViewsPagination() {
 						sprintf(
 							// translators: 1: Current page number, 2: Total number of pages.
 							_x(
-								'<div>Page</div>%1$s<div>of %2$s</div>',
+								'<div>Page</div>%1$s<div>of %2$d</div>',
 								'paging'
 							),
 							'<CurrentPage />',

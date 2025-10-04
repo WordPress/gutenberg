@@ -42,6 +42,7 @@ import {
 	LINK_DESTINATION_MEDIA,
 	LINK_DESTINATION_NONE,
 	ALLOWED_MEDIA_TYPES,
+	DEFAULT_MEDIA_SIZE_SLUG,
 } from './constants';
 
 export const pickRelevantMediaFiles = ( image, size ) => {
@@ -98,7 +99,6 @@ export function ImageEdit( {
 } ) {
 	const {
 		url = '',
-		alt,
 		caption,
 		id,
 		width,
@@ -116,20 +116,15 @@ export function ImageEdit( {
 	// Only observe the max width from the parent container when the parent layout is not flex nor grid.
 	// This won't work for them because the container width changes with the image.
 	// TODO: Find a way to observe the container width for flex and grid layouts.
+	const layoutType = parentLayout?.type || parentLayout?.default?.type;
 	const isMaxWidthContainerWidth =
-		! parentLayout ||
-		( parentLayout.type !== 'flex' && parentLayout.type !== 'grid' );
+		! layoutType || ( layoutType !== 'flex' && layoutType !== 'grid' );
 	const [ maxWidthObserver, maxContentWidth ] = useMaxWidthObserver();
 
 	const [ placeholderResizeListener, { width: placeholderWidth } ] =
 		useResizeObserver();
 
 	const isSmallContainer = placeholderWidth && placeholderWidth < 160;
-
-	const altRef = useRef();
-	useEffect( () => {
-		altRef.current = alt;
-	}, [ alt ] );
 
 	const captionRef = useRef();
 	useEffect( () => {
@@ -239,7 +234,7 @@ export function ImageEdit( {
 
 		// Try to use the previous selected image size if its available
 		// otherwise try the default image size or fallback to "full"
-		let newSize = 'full';
+		let newSize = DEFAULT_MEDIA_SIZE_SLUG;
 		if ( sizeSlug && hasSize( media, sizeSlug ) ) {
 			newSize = sizeSlug;
 		} else if ( hasSize( media, imageDefaultSize ) ) {
@@ -247,6 +242,18 @@ export function ImageEdit( {
 		}
 
 		let mediaAttributes = pickRelevantMediaFiles( media, newSize );
+
+		// Normalize newline characters in caption to <br />
+		// to preserve line breaks in both editor and frontend.
+		if (
+			typeof mediaAttributes.caption === 'string' &&
+			mediaAttributes.caption.includes( '\n' )
+		) {
+			mediaAttributes.caption = mediaAttributes.caption.replace(
+				/\n/g,
+				'<br>'
+			);
+		}
 
 		// If a caption text was meanwhile written by the user,
 		// make sure the text is not overwritten by empty captions.
@@ -262,10 +269,6 @@ export function ImageEdit( {
 			additionalAttributes = {
 				sizeSlug: newSize,
 			};
-		} else {
-			// Keep the same url when selecting the same file, so "Resolution"
-			// option is not changed.
-			additionalAttributes = { url };
 		}
 
 		// Check if default link setting should be used.
@@ -452,7 +455,7 @@ export function ImageEdit( {
 					context={ context }
 					clientId={ clientId }
 					blockEditingMode={ blockEditingMode }
-					parentLayoutType={ parentLayout?.type }
+					parentLayoutType={ layoutType }
 					maxContentWidth={ maxContentWidth }
 				/>
 				<MediaPlaceholder

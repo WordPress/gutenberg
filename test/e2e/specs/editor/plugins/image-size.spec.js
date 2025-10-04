@@ -28,17 +28,17 @@ test.describe( 'changing image size', () => {
 		page,
 		requestUtils,
 	} ) => {
-		const filename = '1024x768_e2e_test_image_size.jpeg';
-		const filepath = path.join( './test/e2e/assets', filename );
+		const fileName = '1024x768_e2e_test_image_size.jpeg';
+		const filePath = path.join( './test/e2e/assets', fileName );
 
 		await admin.createNewPost();
-		const media = await requestUtils.uploadMedia( filepath );
+		const media = await requestUtils.uploadMedia( filePath );
 
 		await editor.insertBlock( {
 			name: 'core/image',
 			attributes: {
 				// Specify alt text so that it can be queried by role selectors.
-				alt: filename,
+				alt: fileName,
 				id: media.id,
 				url: media.source_url,
 			},
@@ -52,7 +52,7 @@ test.describe( 'changing image size', () => {
 
 		// Verify that the custom size was applied to the image.
 		await expect(
-			editor.canvas.locator( `role=img[name="${ filename }"]` )
+			editor.canvas.locator( `role=img[name="${ fileName }"]` )
 		).toHaveCSS( 'width', '499px' );
 		await expect(
 			page.locator( 'role=spinbutton[name="Width"i]' )

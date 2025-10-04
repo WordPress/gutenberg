@@ -14,14 +14,24 @@ import {
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUseColorProps as useColorProps,
 } from '@wordpress/block-editor';
-import { PanelBody, TextControl, CheckboxControl } from '@wordpress/components';
-
+import {
+	TextControl,
+	CheckboxControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
 import { useRef } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 function InputFieldBlock( { attributes, setAttributes, className } ) {
 	const { type, name, label, inlineLabel, required, placeholder, value } =
 		attributes;
 	const blockProps = useBlockProps();
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const ref = useRef();
 	const TagName = type === 'textarea' ? 'textarea' : 'input';
 
@@ -38,30 +48,58 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 		<>
 			{ 'hidden' !== type && (
 				<InspectorControls>
-					<PanelBody title={ __( 'Settings' ) }>
+					<ToolsPanel
+						label={ __( 'Settings' ) }
+						resetAll={ () => {
+							setAttributes( {
+								inlineLabel: false,
+								required: false,
+							} );
+						} }
+						dropdownMenuProps={ dropdownMenuProps }
+					>
 						{ 'checkbox' !== type && (
+							<ToolsPanelItem
+								label={ __( 'Inline label' ) }
+								hasValue={ () => !! inlineLabel }
+								onDeselect={ () =>
+									setAttributes( { inlineLabel: false } )
+								}
+								isShownByDefault
+							>
+								<CheckboxControl
+									__nextHasNoMarginBottom
+									label={ __( 'Inline label' ) }
+									checked={ inlineLabel }
+									onChange={ ( newVal ) => {
+										setAttributes( {
+											inlineLabel: newVal,
+										} );
+									} }
+								/>
+							</ToolsPanelItem>
+						) }
+
+						<ToolsPanelItem
+							label={ __( 'Required' ) }
+							hasValue={ () => !! required }
+							onDeselect={ () =>
+								setAttributes( { required: false } )
+							}
+							isShownByDefault
+						>
 							<CheckboxControl
 								__nextHasNoMarginBottom
-								label={ __( 'Inline label' ) }
-								checked={ inlineLabel }
+								label={ __( 'Required' ) }
+								checked={ required }
 								onChange={ ( newVal ) => {
 									setAttributes( {
-										inlineLabel: newVal,
+										required: newVal,
 									} );
 								} }
 							/>
-						) }
-						<CheckboxControl
-							__nextHasNoMarginBottom
-							label={ __( 'Required' ) }
-							checked={ required }
-							onChange={ ( newVal ) => {
-								setAttributes( {
-									required: newVal,
-								} );
-							} }
-						/>
-					</PanelBody>
+						</ToolsPanelItem>
+					</ToolsPanel>
 				</InspectorControls>
 			) }
 			<InspectorControls group="advanced">

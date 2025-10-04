@@ -16,11 +16,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { store as editorStore } from '../../store';
 import CreateNewTemplateModal from './create-new-template-modal';
 import { useAllowSwitchingTemplates } from './hooks';
-
-const POPOVER_PROPS = {
-	className: 'editor-post-template__dropdown',
-	placement: 'bottom-start',
-};
+import PostPanelRow from '../post-panel-row';
 
 function PostTemplateToggle( { isOpen, onClick } ) {
 	const templateTitle = useSelect( ( select ) => {
@@ -216,17 +212,37 @@ function PostTemplateDropdownContent( { onClose } ) {
 }
 
 function ClassicThemeControl() {
+	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+	// Memoize popoverProps to avoid returning a new object every time.
+	const popoverProps = useMemo(
+		() => ( {
+			// Anchor the popover to the middle of the entire row so that it doesn't
+			// move around when the label changes.
+			anchor: popoverAnchor,
+			className: 'editor-post-template__dropdown',
+			placement: 'left-start',
+			offset: 36,
+			shift: true,
+		} ),
+		[ popoverAnchor ]
+	);
+
 	return (
-		<Dropdown
-			popoverProps={ POPOVER_PROPS }
-			focusOnMount
-			renderToggle={ ( { isOpen, onToggle } ) => (
-				<PostTemplateToggle isOpen={ isOpen } onClick={ onToggle } />
-			) }
-			renderContent={ ( { onClose } ) => (
-				<PostTemplateDropdownContent onClose={ onClose } />
-			) }
-		/>
+		<PostPanelRow label={ __( 'Template' ) } ref={ setPopoverAnchor }>
+			<Dropdown
+				popoverProps={ popoverProps }
+				focusOnMount
+				renderToggle={ ( { isOpen, onToggle } ) => (
+					<PostTemplateToggle
+						isOpen={ isOpen }
+						onClick={ onToggle }
+					/>
+				) }
+				renderContent={ ( { onClose } ) => (
+					<PostTemplateDropdownContent onClose={ onClose } />
+				) }
+			/>
+		</PostPanelRow>
 	);
 }
 

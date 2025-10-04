@@ -29,7 +29,7 @@ const fieldsWithBulkEditSupport = [
 	'status',
 	'date',
 	'author',
-	'comment_status',
+	'discussion',
 ];
 
 function PostEditForm( { postType, postId } ) {
@@ -75,11 +75,15 @@ function PostEditForm( { postType, postId } ) {
 
 	const form = useMemo(
 		() => ( {
-			type: 'panel',
+			layout: {
+				type: 'panel',
+			},
 			fields: [
 				{
 					id: 'featured_media',
-					layout: 'regular',
+					layout: {
+						type: 'regular',
+					},
 				},
 				{
 					id: 'status',
@@ -90,17 +94,25 @@ function PostEditForm( { postType, postId } ) {
 				'date',
 				'slug',
 				'parent',
-				'comment_status',
+				{
+					id: 'discussion',
+					label: __( 'Discussion' ),
+					children: [ 'comment_status', 'ping_status' ],
+				},
 				{
 					label: __( 'Template' ),
-					labelPosition: 'side',
 					id: 'template',
-					layout: 'regular',
+					layout: {
+						type: 'regular',
+						labelPosition: 'side',
+					},
 				},
 			].filter(
 				( field ) =>
 					ids.length === 1 ||
-					fieldsWithBulkEditSupport.includes( field )
+					fieldsWithBulkEditSupport.includes(
+						typeof field === 'string' ? field : field.id
+					)
 			),
 		} ),
 		[ ids ]

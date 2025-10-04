@@ -184,7 +184,7 @@ test.describe( 'Heading', () => {
 
 		await textColor.click();
 		await page
-			.getByRole( 'button', { name: /Custom color picker./i } )
+			.getByRole( 'button', { name: /Custom color picker/i } )
 			.click();
 
 		await page
@@ -220,7 +220,7 @@ test.describe( 'Heading', () => {
 
 		await page
 			.getByRole( 'option', {
-				name: 'Color: Luminous vivid orange',
+				name: 'Luminous vivid orange',
 			} )
 			.click();
 

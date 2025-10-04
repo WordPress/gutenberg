@@ -6,7 +6,6 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalItemGroup as ItemGroup,
 	Button,
-	Flex,
 	FlexItem,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
@@ -134,14 +133,9 @@ function ShadowList( {
 	return (
 		<VStack spacing={ 2 }>
 			<HStack justify="space-between">
-				<Flex
-					align="center"
-					className="edit-site-global-styles__shadows-panel__title"
-				>
-					<Subtitle level={ 3 }>{ label }</Subtitle>
-				</Flex>
-				{ canCreate && (
-					<FlexItem className="edit-site-global-styles__shadows-panel__options-container">
+				<Subtitle level={ 3 }>{ label }</Subtitle>
+				<FlexItem className="edit-site-global-styles__shadows-panel__options-container">
+					{ canCreate && (
 						<Button
 							size="small"
 							icon={ plus }
@@ -150,28 +144,28 @@ function ShadowList( {
 								handleAddShadow();
 							} }
 						/>
-					</FlexItem>
-				) }
-				{ !! shadows?.length && category === 'custom' && (
-					<Menu>
-						<Menu.TriggerButton
-							render={
-								<Button
-									size="small"
-									icon={ moreVertical }
-									label={ __( 'Shadow options' ) }
-								/>
-							}
-						/>
-						<Menu.Popover>
-							<Menu.Item onClick={ onReset }>
-								<Menu.ItemLabel>
-									{ __( 'Remove all custom shadows' ) }
-								</Menu.ItemLabel>
-							</Menu.Item>
-						</Menu.Popover>
-					</Menu>
-				) }
+					) }
+					{ !! shadows?.length && category === 'custom' && (
+						<Menu>
+							<Menu.TriggerButton
+								render={
+									<Button
+										size="small"
+										icon={ moreVertical }
+										label={ __( 'Shadow options' ) }
+									/>
+								}
+							/>
+							<Menu.Popover>
+								<Menu.Item onClick={ onReset }>
+									<Menu.ItemLabel>
+										{ __( 'Remove all custom shadows' ) }
+									</Menu.ItemLabel>
+								</Menu.Item>
+							</Menu.Popover>
+						</Menu>
+					) }
+				</FlexItem>
 			</HStack>
 			{ shadows.length > 0 && (
 				<ItemGroup isBordered isSeparated>

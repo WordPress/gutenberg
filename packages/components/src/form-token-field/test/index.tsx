@@ -1275,6 +1275,45 @@ describe( 'FormTokenField', () => {
 			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
 		} );
 
+		it( 'should match suggestions with half-width and full-width characters', async () => {
+			const user = userEvent.setup();
+
+			const suggestions = [
+				// Half-width characters
+				'WordPress',
+				'Gutenberg',
+				// Full-width characters
+				'ＷｏｒｄＰｒｅｓｓ',
+				'Ｇｕｔｅｎｂｅｒｇ',
+				// Mixed characters
+				'WordＰｒｅｓｓ',
+				'Guteｎｂｅｒｇ',
+			];
+
+			render( <FormTokenFieldWithState suggestions={ suggestions } /> );
+
+			const input = screen.getByRole( 'combobox' );
+
+			// Search with half-width characters.
+			await user.type( input, 'rdp' );
+
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'WordPress',
+				'ＷｏｒｄＰｒｅｓｓ',
+				'WordＰｒｅｓｓ',
+			] );
+
+			// Search with full-width characters.
+			await user.clear( input );
+			await user.type( input, 'ｔｅｎ' );
+
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'Gutenberg',
+				'Ｇｕｔｅｎｂｅｒｇ',
+				'Guteｎｂｅｒｇ',
+			] );
+		} );
+
 		it( 'should re-render if suggestions change', async () => {
 			const user = userEvent.setup();
 

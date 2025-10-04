@@ -16,10 +16,10 @@ const WithWrapperDropZoneElement = () => {
 	const dropZoneRef = useDropZone(
 		{
 			dropZoneElement,
-			onDrop() => {
+			onDrop() {
 				console.log( 'Dropped within the drop zone.' );
 			},
-			onDragEnter() => {
+			onDragEnter() {
 				console.log( 'Dragging within the drop zone' );
 			}
 		}
@@ -37,10 +37,10 @@ const WithWrapperDropZoneElement = () => {
 const WithoutWrapperDropZoneElement = () => {
 	const dropZoneRef = useDropZone(
 		{
-			onDrop() => {
+			onDrop() {
 				console.log( 'Dropped within the drop zone.' );
 			},
-			onDragEnter() => {
+			onDragEnter() {
 				console.log( 'Dragging within the drop zone' );
 			}
 		}

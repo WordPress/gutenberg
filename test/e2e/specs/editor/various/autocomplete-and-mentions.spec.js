@@ -411,7 +411,10 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 					)
 				).toBeVisible();
 				await page.keyboard.press( 'Enter' );
-				await page.keyboard.type( ' test' );
+				// Autocompleter might continue matching right after insertion,
+				// Emulate typing speed to avoid that.
+				// Remove after https://github.com/WordPress/gutenberg/issues/42925 is resolved.
+				await page.keyboard.type( ' test', { delay: 100 } );
 				await page.keyboard.press( 'Enter' );
 			}
 
@@ -568,7 +571,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		// Get the assertive live region screen reader announcement.
 		await expect(
 			page.getByText(
-				'2 results found, use up and down arrow keys to navigate.'
+				'3 results found, use up and down arrow keys to navigate.'
 			)
 		).toBeVisible();
 	} );

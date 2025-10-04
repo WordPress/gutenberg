@@ -22,7 +22,7 @@ To opt-in to the default configuration, extend your own project's `.eslintrc` fi
 }
 ```
 
-Refer to the [ESLint documentation on Shareable Configs](http://eslint.org/docs/developer-guide/shareable-configs) for more information.
+Refer to the [ESLint documentation on Shareable Configs](https://eslint.org/docs/latest/extend/shareable-configs) for more information.
 
 The `recommended` preset will include rules governing an ES2015+ environment, and includes rules from the [`eslint-plugin-jsdoc`](https://github.com/gajus/eslint-plugin-jsdoc), [`eslint-plugin-jsx-a11y`](https://github.com/jsx-eslint/eslint-plugin-jsx-a11y), [`eslint-plugin-react`](https://github.com/yannickcr/eslint-plugin-react), and other similar plugins.
 

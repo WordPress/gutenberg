@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { page, addSubmenu } from '@wordpress/icons';
+import { _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -37,6 +38,12 @@ export const settings = {
 		return label;
 	},
 	edit,
+	example: {
+		attributes: {
+			label: _x( 'About', 'Example link text for Navigation Submenu' ),
+			type: 'page',
+		},
+	},
 	save,
 	transforms,
 };

@@ -135,6 +135,24 @@ const addListItem = ( newListItem ) => {
 
 Why do this? In JavaScript, arrays and objects are passed by reference, so this practice ensures changes won't affect other code that might hold references to the same data. Furthermore, the Gutenberg project follows the philosophy of the Redux library that [state should be immutable](https://redux.js.org/faq/immutable-data#what-are-the-benefits-of-immutability)—data should not be changed directly, but instead a new version of the data created containing the changes.
 
+The `setAttribute` also supports an updater function as an argument. It must be a pure function, which takes current attributes as its only argument and returns updated attributes. This method is helpful when you want to update an value based on a previous state or when working with objects and arrays.
+
+_**Note:** Since WordPress 6.9._
+
+```js
+// Toggle a setting when the user clicks the button.
+const toggleSetting = () =>
+	setAttributes( ( currentAttr ) => ( {
+		mySetting: ! currentAttr.mySetting,
+	} ) );
+
+// Add item to the list.
+const addListItem = ( newListItem ) =>
+	setAttributes( ( currentAttr ) => ( {
+		list: [ ...currentAttr.list, newListItem ],
+	} ) );
+```
+
 ## Save
 
 The `save` function defines the way in which the different attributes should be combined into the final markup, which is then serialized into `post_content`.
@@ -153,9 +171,9 @@ For most blocks, the return value of `save` should be an [instance of WordPress 
 
 _Note:_ While it is possible to return a string value from `save`, it _will be escaped_. If the string includes HTML markup, the markup will be shown on the front of the site verbatim, not as the equivalent HTML node content. If you must return raw HTML from `save`, use `wp.element.RawHTML`. As the name implies, this is prone to [cross-site scripting](https://en.wikipedia.org/wiki/Cross-site_scripting) and therefore is discouraged in favor of a WordPress Element hierarchy whenever possible.
 
-_Note:_ The save function should be a pure function that depends only on the attributes used to invoke it.
-It can not have any side effect or retrieve information from another source, e.g. it is not possible to use the data module inside it `select( store ).selector( ... )`.
+_Note:_ The save function should be a pure and stateless function that depends only on the attributes used to invoke it. It shouldn't use any APIs such as `useState` or `useEffect`, nor retrieve information from another source; for example, it is not possible to use the data module inside - `select( store ).selector( ... )`.
 This is because if the external information changes, the block may be flagged as invalid when the post is later edited ([read more about Validation](#validation)).
+
 If there is a need to have other information as part of the save, developers can consider one of these two alternatives:
 
 -   Use [dynamic blocks](/docs/how-to-guides/block-tutorial/creating-dynamic-blocks.md) and dynamically retrieve the required information on the server.

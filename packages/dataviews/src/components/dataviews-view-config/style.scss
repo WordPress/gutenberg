@@ -68,7 +68,8 @@
 }
 
 .dataviews-field-control__field:hover,
-.dataviews-field-control__field:focus-within {
+.dataviews-field-control__field:focus-within,
+.dataviews-field-control__field.is-interacting {
 	.dataviews-field-control__actions {
 		position: unset;
 		top: unset;
@@ -80,6 +81,18 @@
 	width: $icon-size;
 }
 
-.dataviews-field-control__label {
+.dataviews-field-control__label-sub-label-container {
 	flex-grow: 1;
+}
+
+.dataviews-field-control__label {
+	display: block;
+}
+
+.dataviews-field-control__sub-label {
+	margin-top: $grid-unit-10;
+	margin-bottom: 0;
+	font-size: 11px;
+	font-style: normal;
+	color: $gray-700;
 }

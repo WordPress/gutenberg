@@ -70,8 +70,9 @@
 .wp-block-social-link {
 	display: block;
 	border-radius: 9999px; // This makes it pill-shaped instead of oval, in cases where the image fed is not perfectly sized.
-	transition: transform 0.1s ease;
-	@include reduce-motion("transition");
+	@media not (prefers-reduced-motion) {
+		transition: transform 0.1s ease;
+	}
 
 	// Dimensions.
 	height: auto;
@@ -80,7 +81,6 @@
 		align-items: center;
 		display: flex;
 		line-height: 0;
-		transition: transform 0.1s ease;
 	}
 
 	&:hover {

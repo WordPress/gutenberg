@@ -7,15 +7,15 @@ import { forwardRef, useContext } from '@wordpress/element';
  * Internal dependencies
  */
 import type { WordPressComponentProps } from '../context';
-import { MenuContext } from './context';
-import type { MenuGroupProps } from './types';
+import { Context } from './context';
+import type { GroupProps } from './types';
 import * as Styled from './styles';
 
-export const MenuGroup = forwardRef<
+export const Group = forwardRef<
 	HTMLDivElement,
-	WordPressComponentProps< MenuGroupProps, 'div', false >
->( function MenuGroup( props, ref ) {
-	const menuContext = useContext( MenuContext );
+	WordPressComponentProps< GroupProps, 'div', false >
+>( function Group( props, ref ) {
+	const menuContext = useContext( Context );
 
 	if ( ! menuContext?.store ) {
 		throw new Error(
@@ -24,10 +24,6 @@ export const MenuGroup = forwardRef<
 	}
 
 	return (
-		<Styled.MenuGroup
-			ref={ ref }
-			{ ...props }
-			store={ menuContext.store }
-		/>
+		<Styled.Group ref={ ref } { ...props } store={ menuContext.store } />
 	);
 } );

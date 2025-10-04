@@ -26,22 +26,28 @@ import {
 	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 	useBlockEditingMode,
+	BlockControls,
 } from '@wordpress/block-editor';
 import { EntityProvider, store as coreStore } from '@wordpress/core-data';
 
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
-	PanelBody,
-	ToggleControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	__experimentalVStack as VStack,
+	ToggleControl,
 	Button,
 	Spinner,
 	Notice,
+	ToolbarButton,
+	ToolbarGroup,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
-import { close, Icon } from '@wordpress/icons';
+import { close, Icon, page } from '@wordpress/icons';
+import { createBlock } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
 
 /**
@@ -72,6 +78,48 @@ import DeletedNavigationWarning from './deleted-navigation-warning';
 import AccessibleDescription from './accessible-description';
 import AccessibleMenuDescription from './accessible-menu-description';
 import { unlock } from '../../lock-unlock';
+import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
+import { DEFAULT_BLOCK } from '../constants';
+
+/**
+ * Component that renders the Add page button for the Navigation block.
+ *
+ * @param {Object} props          Component props.
+ * @param {string} props.clientId Block client ID.
+ * @return {JSX.Element|null} The Add page button component or null if not applicable.
+ */
+function NavigationAddPageButton( { clientId } ) {
+	const { insertBlock } = useDispatch( blockEditorStore );
+	const { getBlockCount } = useSelect( blockEditorStore );
+
+	const onAddPage = useCallback( () => {
+		// Get the current number of blocks to insert at the end
+		const blockCount = getBlockCount( clientId );
+
+		// Create a new navigation link block (default block)
+		const newBlock = createBlock( DEFAULT_BLOCK.name, {
+			kind: DEFAULT_BLOCK.attributes.kind,
+			type: DEFAULT_BLOCK.attributes.type,
+		} );
+
+		// Insert the block at the end of the navigation
+		insertBlock( newBlock, blockCount, clientId );
+	}, [ clientId, insertBlock, getBlockCount ] );
+
+	return (
+		<BlockControls>
+			<ToolbarGroup>
+				<ToolbarButton
+					name="add-page"
+					icon={ page }
+					onClick={ onAddPage }
+				>
+					{ __( 'Add page' ) }
+				</ToolbarButton>
+			</ToolbarGroup>
+		</BlockControls>
+	);
+}
 
 function ColorTools( {
 	textColor,
@@ -142,24 +190,32 @@ function ColorTools( {
 						label: __( 'Text' ),
 						onColorChange: setTextColor,
 						resetAllFilter: () => setTextColor(),
+						clearable: true,
+						enableAlpha: true,
 					},
 					{
 						colorValue: backgroundColor.color,
 						label: __( 'Background' ),
 						onColorChange: setBackgroundColor,
 						resetAllFilter: () => setBackgroundColor(),
+						clearable: true,
+						enableAlpha: true,
 					},
 					{
 						colorValue: overlayTextColor.color,
 						label: __( 'Submenu & overlay text' ),
 						onColorChange: setOverlayTextColor,
 						resetAllFilter: () => setOverlayTextColor(),
+						clearable: true,
+						enableAlpha: true,
 					},
 					{
 						colorValue: overlayBackgroundColor.color,
 						label: __( 'Submenu & overlay background' ),
 						onColorChange: setOverlayBackgroundColor,
 						resetAllFilter: () => setOverlayBackgroundColor(),
+						clearable: true,
+						enableAlpha: true,
 					},
 				] }
 				panelId={ clientId }
@@ -583,11 +639,25 @@ function Navigation( {
 		`overlay-menu-preview`
 	);
 
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
 	const stylingInspectorControls = (
 		<>
 			<InspectorControls>
 				{ hasSubmenuIndicatorSetting && (
-					<PanelBody title={ __( 'Display' ) }>
+					<ToolsPanel
+						label={ __( 'Display' ) }
+						resetAll={ () => {
+							setAttributes( {
+								showSubmenuIcon: true,
+								openSubmenusOnClick: false,
+								overlayMenu: 'mobile',
+								hasIcon: true,
+								icon: 'handle',
+							} );
+						} }
+						dropdownMenuProps={ dropdownMenuProps }
+					>
 						{ isResponsive && (
 							<>
 								<Button
@@ -615,88 +685,134 @@ function Navigation( {
 										</>
 									) }
 								</Button>
-								<div id={ overlayMenuPreviewId }>
-									{ overlayMenuPreview && (
+								{ overlayMenuPreview && (
+									<VStack
+										id={ overlayMenuPreviewId }
+										spacing={ 4 }
+										style={ {
+											gridColumn: 'span 2',
+										} }
+									>
 										<OverlayMenuPreview
 											setAttributes={ setAttributes }
 											hasIcon={ hasIcon }
 											icon={ icon }
 											hidden={ ! overlayMenuPreview }
 										/>
-									) }
-								</div>
-							</>
-						) }
-						<ToggleGroupControl
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
-							label={ __( 'Overlay Menu' ) }
-							aria-label={ __( 'Configure overlay menu' ) }
-							value={ overlayMenu }
-							help={ __(
-								'Collapses the navigation options in a menu icon opening an overlay.'
-							) }
-							onChange={ ( value ) =>
-								setAttributes( { overlayMenu: value } )
-							}
-							isBlock
-						>
-							<ToggleGroupControlOption
-								value="never"
-								label={ __( 'Off' ) }
-							/>
-							<ToggleGroupControlOption
-								value="mobile"
-								label={ __( 'Mobile' ) }
-							/>
-							<ToggleGroupControlOption
-								value="always"
-								label={ __( 'Always' ) }
-							/>
-						</ToggleGroupControl>
-						{ hasSubmenus && (
-							<>
-								<h3>{ __( 'Submenus' ) }</h3>
-								<ToggleControl
-									__nextHasNoMarginBottom
-									checked={ openSubmenusOnClick }
-									onChange={ ( value ) => {
-										setAttributes( {
-											openSubmenusOnClick: value,
-											...( value && {
-												showSubmenuIcon: true,
-											} ), // Make sure arrows are shown when we toggle this on.
-										} );
-									} }
-									label={ __( 'Open on click' ) }
-								/>
-
-								<ToggleControl
-									__nextHasNoMarginBottom
-									checked={ showSubmenuIcon }
-									onChange={ ( value ) => {
-										setAttributes( {
-											showSubmenuIcon: value,
-										} );
-									} }
-									disabled={ attributes.openSubmenusOnClick }
-									label={ __( 'Show arrow' ) }
-								/>
-
-								{ submenuAccessibilityNotice && (
-									<div>
-										<Notice
-											spokenMessage={ null }
-											status="warning"
-											isDismissible={ false }
-										>
-											{ submenuAccessibilityNotice }
-										</Notice>
-									</div>
+									</VStack>
 								) }
 							</>
 						) }
-					</PanelBody>
+
+						<ToolsPanelItem
+							hasValue={ () => overlayMenu !== 'mobile' }
+							label={ __( 'Overlay Menu' ) }
+							onDeselect={ () =>
+								setAttributes( { overlayMenu: 'mobile' } )
+							}
+							isShownByDefault
+						>
+							<ToggleGroupControl
+								__next40pxDefaultSize
+								__nextHasNoMarginBottom
+								label={ __( 'Overlay Menu' ) }
+								aria-label={ __( 'Configure overlay menu' ) }
+								value={ overlayMenu }
+								help={ __(
+									'Collapses the navigation options in a menu icon opening an overlay.'
+								) }
+								onChange={ ( value ) =>
+									setAttributes( { overlayMenu: value } )
+								}
+								isBlock
+							>
+								<ToggleGroupControlOption
+									value="never"
+									label={ __( 'Off' ) }
+								/>
+								<ToggleGroupControlOption
+									value="mobile"
+									label={ __( 'Mobile' ) }
+								/>
+								<ToggleGroupControlOption
+									value="always"
+									label={ __( 'Always' ) }
+								/>
+							</ToggleGroupControl>
+						</ToolsPanelItem>
+
+						{ hasSubmenus && (
+							<>
+								<h3 className="wp-block-navigation__submenu-header">
+									{ __( 'Submenus' ) }
+								</h3>
+								<ToolsPanelItem
+									hasValue={ () => openSubmenusOnClick }
+									label={ __( 'Open on click' ) }
+									onDeselect={ () =>
+										setAttributes( {
+											openSubmenusOnClick: false,
+											showSubmenuIcon: true,
+										} )
+									}
+									isShownByDefault
+								>
+									<ToggleControl
+										__nextHasNoMarginBottom
+										checked={ openSubmenusOnClick }
+										onChange={ ( value ) => {
+											setAttributes( {
+												openSubmenusOnClick: value,
+												...( value && {
+													showSubmenuIcon: true,
+												} ), // Make sure arrows are shown when we toggle this on.
+											} );
+										} }
+										label={ __( 'Open on click' ) }
+									/>
+								</ToolsPanelItem>
+
+								<ToolsPanelItem
+									hasValue={ () => ! showSubmenuIcon }
+									label={ __( 'Show arrow' ) }
+									onDeselect={ () =>
+										setAttributes( {
+											showSubmenuIcon: true,
+										} )
+									}
+									isDisabled={
+										attributes.openSubmenusOnClick
+									}
+									isShownByDefault
+								>
+									<ToggleControl
+										__nextHasNoMarginBottom
+										checked={ showSubmenuIcon }
+										onChange={ ( value ) => {
+											setAttributes( {
+												showSubmenuIcon: value,
+											} );
+										} }
+										disabled={
+											attributes.openSubmenusOnClick
+										}
+										label={ __( 'Show arrow' ) }
+									/>
+								</ToolsPanelItem>
+
+								{ submenuAccessibilityNotice && (
+									<Notice
+										spokenMessage={ null }
+										status="warning"
+										isDismissible={ false }
+										className="wp-block-navigation__submenu-accessibility-notice"
+									>
+										{ submenuAccessibilityNotice }
+									</Notice>
+								) }
+							</>
+						) }
+					</ToolsPanel>
 				) }
 			</InspectorControls>
 			<InspectorControls group="color">
@@ -866,6 +982,9 @@ function Navigation( {
 					blockEditingMode={ blockEditingMode }
 				/>
 				{ blockEditingMode === 'default' && stylingInspectorControls }
+				{ blockEditingMode === 'contentOnly' && isEntityAvailable && (
+					<NavigationAddPageButton clientId={ clientId } />
+				) }
 				{ blockEditingMode === 'default' && isEntityAvailable && (
 					<InspectorControls group="advanced">
 						{ hasResolvedCanUserUpdateNavigationMenu &&

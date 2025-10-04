@@ -10,6 +10,7 @@ const BUNDLED_PACKAGES = [
 	'@wordpress/interface',
 	'@wordpress/sync',
 	'@wordpress/undo-manager',
+	'@wordpress/upload-media',
 	'@wordpress/fields',
 ];
 

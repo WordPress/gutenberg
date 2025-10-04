@@ -18,6 +18,10 @@ npm install @wordpress/fields --save
 
 Author field for BasePost.
 
+### BasePost
+
+Undocumented declaration.
+
 ### BasePostWithEmbeddedAuthor
 
 Undocumented declaration.
@@ -42,6 +46,10 @@ Date field for BasePost.
 ### deletePost
 
 Delete action for Templates, Patterns and Template Parts.
+
+### discussionField
+
+Discussion field for BasePost with custom render logic.
 
 ### duplicatePattern
 
@@ -86,6 +94,10 @@ Title for the pattern entity.
 ### permanentlyDeletePost
 
 Delete action for PostWithPermissions.
+
+### pingStatusField
+
+Ping status field for BasePost.
 
 ### PostType
 

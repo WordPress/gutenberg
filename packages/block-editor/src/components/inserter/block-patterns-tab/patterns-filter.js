@@ -25,7 +25,7 @@ import {
 const getShouldDisableSyncFilter = ( sourceFilter ) =>
 	sourceFilter !== 'all' && sourceFilter !== 'user';
 const getShouldHideSourcesFilter = ( category ) => {
-	return category?.name === myPatternsCategory.name;
+	return category.name === myPatternsCategory.name;
 };
 
 const PATTERN_SOURCE_MENU_OPTIONS = [
@@ -60,7 +60,7 @@ export function PatternsFilter( {
 	// the user may be confused when switching to another category if the haven't explicitly set
 	// this filter themselves.
 	const currentPatternSourceFilter =
-		category?.name === myPatternsCategory.name
+		category.name === myPatternsCategory.name
 			? INSERTER_PATTERN_TYPES.user
 			: patternSourceFilter;
 

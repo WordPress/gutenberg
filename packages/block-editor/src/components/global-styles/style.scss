@@ -24,14 +24,40 @@
 .block-editor-global-styles__shadow-dropdown {
 	display: block;
 	padding: 0;
+	position: relative;
+	border: 1px solid $gray-300;
+	border-radius: $radius-small;
+}
 
-	button {
-		width: 100%;
-		padding: $grid-unit-10;
+.block-editor-global-styles-filters-panel__dropdown-toggle,
+.block-editor-global-styles__shadow-dropdown-toggle {
+	width: 100%;
+	padding: $grid-unit-10;
 
-		&.is-open {
-			background-color: $gray-100;
-		}
+	&.is-open {
+		background-color: $gray-100;
+	}
+}
+
+.block-editor-global-styles__shadow-editor__remove-button {
+	position: absolute;
+	right: 0;
+	top: $grid-unit;
+	margin: auto $grid-unit auto;
+	opacity: 0;
+	@media not (prefers-reduced-motion) {
+		transition: opacity 0.1s ease-in-out;
+	}
+
+	.block-editor-global-styles__shadow-dropdown:hover &,
+	&:focus,
+	&:hover {
+		opacity: 1;
+	}
+
+	@media (hover: none) {
+		// Show reset button on devices that do not support hover.
+		opacity: 1;
 	}
 }
 
@@ -53,7 +79,9 @@
 	box-sizing: border-box;
 
 	transform: scale(1);
-	transition: transform 0.1s ease;
+	@media not ( prefers-reduced-motion ) {
+		transition: transform 0.1s ease;
+	}
 	will-change: transform;
 
 	&:focus {
@@ -74,4 +102,26 @@
 	// CSS input is always LTR regardless of language.
 	/*rtl:ignore*/
 	direction: ltr;
+}
+
+.block-editor-panel-duotone-settings__reset {
+	position: absolute;
+	right: 0;
+	top: $grid-unit;
+	margin: auto $grid-unit auto;
+	opacity: 0;
+	@media not (prefers-reduced-motion) {
+		transition: opacity 0.1s ease-in-out;
+	}
+
+	.block-editor-global-styles-filters-panel__dropdown:hover &,
+	&:focus,
+	&:hover {
+		opacity: 1;
+	}
+
+	@media (hover: none) {
+		// Show reset button on devices that do not support hover.
+		opacity: 1;
+	}
 }

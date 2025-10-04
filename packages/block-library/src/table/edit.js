@@ -16,6 +16,7 @@ import {
 	useBlockProps,
 	__experimentalUseColorProps as useColorProps,
 	__experimentalUseBorderProps as useBorderProps,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import {
@@ -106,6 +107,7 @@ function TableEdit( {
 
 	const colorProps = useColorProps( attributes );
 	const borderProps = useBorderProps( attributes );
+	const blockEditingMode = useBlockEditingMode();
 
 	const tableRef = useRef();
 	const [ hasTableCreated, setHasTableCreated ] = useState( false );
@@ -455,7 +457,7 @@ function TableEdit( {
 
 	return (
 		<figure { ...useBlockProps( { ref: tableRef } ) }>
-			{ ! isEmpty && (
+			{ ! isEmpty && blockEditingMode === 'default' && (
 				<>
 					<BlockControls group="block">
 						<AlignmentControl
@@ -605,7 +607,9 @@ function TableEdit( {
 					isSelected={ isSingleSelected }
 					insertBlocksAfter={ insertBlocksAfter }
 					label={ __( 'Table caption text' ) }
-					showToolbarButton={ isSingleSelected }
+					showToolbarButton={
+						isSingleSelected && blockEditingMode === 'default'
+					}
 				/>
 			) }
 		</figure>

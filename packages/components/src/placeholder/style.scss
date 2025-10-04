@@ -173,8 +173,10 @@
 	.components-button {
 		opacity: 0;
 		pointer-events: none;
-		transition: opacity 0.1s linear;
-		@include reduce-motion("transition");
+
+		@media not (prefers-reduced-motion) {
+			transition: opacity 0.1s linear;
+		}
 	}
 
 	.is-selected > & {

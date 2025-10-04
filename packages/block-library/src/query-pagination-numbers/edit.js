@@ -67,7 +67,7 @@ export default function QueryPaginationNumbersEdit( {
 				>
 					<ToolsPanelItem
 						label={ __( 'Number of links' ) }
-						hasValue={ () => midSize !== undefined }
+						hasValue={ () => midSize !== 2 }
 						onDeselect={ () => setAttributes( { midSize: 2 } ) }
 						isShownByDefault
 					>

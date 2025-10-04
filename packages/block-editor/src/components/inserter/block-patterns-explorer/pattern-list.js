@@ -21,6 +21,7 @@ import {
 	INSERTER_PATTERN_TYPES,
 	allPatternsCategory,
 	myPatternsCategory,
+	starterPatternsCategory,
 } from '../block-patterns-tab/utils';
 
 function PatternsListHeader( { filterValue, filteredBlockPatternsLength } ) {
@@ -52,6 +53,7 @@ function PatternList( {
 	selectedCategory,
 	patternCategories,
 	rootClientId,
+	onModalClose,
 } ) {
 	const container = useRef();
 	const debouncedSpeak = useDebounce( speak, 500 );
@@ -81,6 +83,12 @@ function PatternList( {
 			if (
 				selectedCategory === myPatternsCategory.name &&
 				pattern.type === INSERTER_PATTERN_TYPES.user
+			) {
+				return true;
+			}
+			if (
+				selectedCategory === starterPatternsCategory.name &&
+				pattern.blockTypes?.includes( 'core/post-content' )
 			) {
 				return true;
 			}
@@ -152,7 +160,10 @@ function PatternList( {
 					<>
 						<BlockPatternsList
 							blockPatterns={ pagingProps.categoryPatterns }
-							onClickPattern={ onClickPattern }
+							onClickPattern={ ( pattern, blocks ) => {
+								onClickPattern( pattern, blocks );
+								onModalClose();
+							} }
 							isDraggable={ false }
 						/>
 						<BlockPatternsPaging { ...pagingProps } />

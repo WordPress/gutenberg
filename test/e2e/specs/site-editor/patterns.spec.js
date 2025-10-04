@@ -43,21 +43,21 @@ test.describe( 'Patterns', () => {
 		await expect( patterns.content ).toContainText( 'No results' );
 
 		await patterns.content
-			.getByRole( 'button', { name: 'add new pattern' } )
+			.getByRole( 'button', { name: 'add pattern' } )
 			.click();
 
 		const addNewMenuItem = page
 			.getByRole( 'menu', {
-				name: 'add new pattern',
+				name: 'add pattern',
 			} )
 			.getByRole( 'menuitem', {
-				name: 'add new pattern',
+				name: 'add pattern',
 			} );
 		await expect( addNewMenuItem ).toBeFocused();
 		await addNewMenuItem.click();
 
 		const createPatternDialog = page.getByRole( 'dialog', {
-			name: 'add new pattern',
+			name: 'add pattern',
 		} );
 		await createPatternDialog
 			.getByRole( 'textbox', { name: 'Name' } )

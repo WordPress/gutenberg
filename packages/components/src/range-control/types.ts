@@ -269,9 +269,9 @@ export type ThumbProps = {
 
 export type TooltipProps = {
 	show?: boolean;
-	position?: string;
+	placement?: string;
 	inputRef?: MutableRefObject< HTMLElement | undefined >;
-	tooltipPosition?: string;
+	tooltipPlacement?: string;
 	value?: ControlledRangeValue;
 	renderTooltipContent?: (
 		value?: ControlledRangeValue

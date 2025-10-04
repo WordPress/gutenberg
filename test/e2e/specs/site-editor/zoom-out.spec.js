@@ -90,7 +90,7 @@ test.describe( 'Zoom Out', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.visitSiteEditor( {
 			postId: 'twentytwentyfour//index',
-			postType: 'wp_template',
+			postType: 'wp_registered_template',
 			canvas: 'edit',
 		} );
 	} );
@@ -234,7 +234,7 @@ test.describe( 'Zoom Out', () => {
 		await expect( fourthSectionStart ).not.toBeInViewport();
 	} );
 
-	test( 'Zoom out selected section has three items in options menu', async ( {
+	test( 'Zoom out selected section has four items in options menu', async ( {
 		page,
 	} ) => {
 		// open the inserter
@@ -263,8 +263,8 @@ test.describe( 'Zoom Out', () => {
 			.getByRole( 'menu', { name: 'Options' } )
 			.getByRole( 'menuitem' );
 
-		// we expect 3 items in the options menu
-		await expect( optionsMenu ).toHaveCount( 3 );
+		// we expect 4 items in the options menu
+		await expect( optionsMenu ).toHaveCount( 4 );
 	} );
 
 	test( 'Zoom Out cannot be activated when the section root is missing', async ( {

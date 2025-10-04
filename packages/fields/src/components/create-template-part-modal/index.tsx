@@ -128,9 +128,7 @@ export function CreateTemplatePartModalContents( {
 
 	const defaultTemplatePartAreas = useSelect(
 		( select ) =>
-			select( coreStore ).getEntityRecord< {
-				default_template_part_areas: Array< TemplatePartArea >;
-			} >( 'root', '__unstableBase' )?.default_template_part_areas,
+			select( coreStore ).getCurrentTheme()?.default_template_part_areas,
 		[]
 	);
 
@@ -195,64 +193,66 @@ export function CreateTemplatePartModalContents( {
 					onChange={ setTitle }
 					required
 				/>
-				<fieldset>
+				<fieldset className="fields-create-template-part-modal__area-fieldset">
 					<BaseControl.VisualLabel as="legend">
 						{ __( 'Area' ) }
 					</BaseControl.VisualLabel>
 					<div className="fields-create-template-part-modal__area-radio-group">
-						{ ( defaultTemplatePartAreas ?? [] ).map( ( item ) => {
-							const icon = getTemplatePartIcon( item.icon );
-							return (
-								<div
-									key={ item.area }
-									className="fields-create-template-part-modal__area-radio-wrapper"
-								>
-									<input
-										type="radio"
-										id={ getAreaRadioId(
-											item.area,
-											instanceId
-										) }
-										name={ `fields-create-template-part-modal__area-${ instanceId }` }
-										value={ item.area }
-										checked={ area === item.area }
-										onChange={ () => {
-											setArea( item.area );
-										} }
-										aria-describedby={ getAreaRadioDescriptionId(
-											item.area,
-											instanceId
-										) }
-									/>
-									<Icon
-										icon={ icon }
-										className="fields-create-template-part-modal__area-radio-icon"
-									/>
-									<label
-										htmlFor={ getAreaRadioId(
-											item.area,
-											instanceId
-										) }
-										className="fields-create-template-part-modal__area-radio-label"
+						{ ( defaultTemplatePartAreas ?? [] ).map(
+							( item: TemplatePartArea ) => {
+								const icon = getTemplatePartIcon( item.icon );
+								return (
+									<div
+										key={ item.area }
+										className="fields-create-template-part-modal__area-radio-wrapper"
 									>
-										{ item.label }
-									</label>
-									<Icon
-										icon={ check }
-										className="fields-create-template-part-modal__area-radio-checkmark"
-									/>
-									<p
-										className="fields-create-template-part-modal__area-radio-description"
-										id={ getAreaRadioDescriptionId(
-											item.area,
-											instanceId
-										) }
-									>
-										{ item.description }
-									</p>
-								</div>
-							);
-						} ) }
+										<input
+											type="radio"
+											id={ getAreaRadioId(
+												item.area,
+												instanceId
+											) }
+											name={ `fields-create-template-part-modal__area-${ instanceId }` }
+											value={ item.area }
+											checked={ area === item.area }
+											onChange={ () => {
+												setArea( item.area );
+											} }
+											aria-describedby={ getAreaRadioDescriptionId(
+												item.area,
+												instanceId
+											) }
+										/>
+										<Icon
+											icon={ icon }
+											className="fields-create-template-part-modal__area-radio-icon"
+										/>
+										<label
+											htmlFor={ getAreaRadioId(
+												item.area,
+												instanceId
+											) }
+											className="fields-create-template-part-modal__area-radio-label"
+										>
+											{ item.label }
+										</label>
+										<Icon
+											icon={ check }
+											className="fields-create-template-part-modal__area-radio-checkmark"
+										/>
+										<p
+											className="fields-create-template-part-modal__area-radio-description"
+											id={ getAreaRadioDescriptionId(
+												item.area,
+												instanceId
+											) }
+										>
+											{ item.description }
+										</p>
+									</div>
+								);
+							}
+						) }
 					</div>
 				</fieldset>
 				<HStack justify="right">

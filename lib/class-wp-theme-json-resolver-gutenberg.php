@@ -2,7 +2,7 @@
 /**
  * WP_Theme_JSON_Resolver_Gutenberg class
  *
- * @package Gutenberg
+ * @package gutenberg
  * @since 5.8.0
  */
 
@@ -359,7 +359,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			}
 			if ( current_theme_supports( 'experimental-link-color' ) ) {
 				_doing_it_wrong(
-					current_theme_supports( 'experimental-link-color' ),
+					"add_theme_support( 'experimental-link-color' )",
 					__( '`experimental-link-color` is no longer supported. Use `link-color` instead.', 'gutenberg' ),
 					'6.3.0'
 				);

@@ -149,6 +149,7 @@ function gutenberg_render_dimensions_support( $block_content, $block ) {
 	return $block_content;
 }
 
+remove_filter( 'render_block', 'wp_render_dimensions_support', 10 );
 add_filter( 'render_block', 'gutenberg_render_dimensions_support', 10, 2 );
 
 // Register the block support.

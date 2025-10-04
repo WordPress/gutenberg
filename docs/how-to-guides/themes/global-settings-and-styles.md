@@ -111,7 +111,7 @@ body {
 
 ## Specification
 
-This specification is the same for the three different origins that use this format: core, themes, and users. Themes can override core's defaults by creating a file called `theme.json`. Users, via the site editor, will also be able to override theme's or core's preferences via an user interface that is being worked on.
+This specification is the same for the three different origins that use this format: core, themes, and users. Themes can override core's defaults by creating a file called `theme.json`. Users, via the site editor, will also be able to override theme's or core's preferences via a user interface that is being worked on.
 
 ```json
 {
@@ -1034,7 +1034,7 @@ h3 {
 {% end %}
 ##### Element pseudo selectors
 
-Pseudo selectors `:hover`, `:focus`, `:visited`, `:active`, `:link`, `:any-link` are supported by Gutenberg.
+Pseudo selectors `:hover`, `:focus`, `:focus-visible`, `:visited`, `:active`, `:link`, `:any-link` are supported by Gutenberg.
 
 ```json
 "elements": {

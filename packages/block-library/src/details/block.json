@@ -15,7 +15,20 @@
 		"summary": {
 			"type": "rich-text",
 			"source": "rich-text",
-			"selector": "summary"
+			"selector": "summary",
+			"role": "content"
+		},
+		"name": {
+			"type": "string",
+			"source": "attribute",
+			"attribute": "name",
+			"selector": ".wp-block-details"
+		},
+		"allowedBlocks": {
+			"type": "array"
+		},
+		"placeholder": {
+			"type": "string"
 		}
 	},
 	"supports": {

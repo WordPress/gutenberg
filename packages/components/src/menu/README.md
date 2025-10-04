@@ -1,344 +1,591 @@
-# `Menu`
+# Menu
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
+<!-- This file is generated automatically and cannot be edited directly. Make edits via TypeScript types and TSDocs. -->
 
-`Menu` displays a menu to the user (such as a set of actions or functions). The menu is rendered in a popover (this pattern is also known as a "Dropdown menu"), which is triggered by a button.
+🔒 This component is locked as a [private API](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-private-apis/). We do not yet recommend using this outside of the Gutenberg project.
 
-## Design guidelines
+<p class="callout callout-info">See the <a href="https://wordpress.github.io/gutenberg/?path=/docs/components-menu--docs">WordPress Storybook</a> for more detailed, interactive documentation.</p>
 
-### Usage
+Menu is a collection of React components that combine to render
+ARIA-compliant [menu](https://www.w3.org/WAI/ARIA/apg/patterns/menu/) and
+[menu button](https://www.w3.org/WAI/ARIA/apg/patterns/menubutton/) patterns.
 
-#### When to use a `Menu`
+`Menu` itself is a wrapper component and context provider.
+It is responsible for managing the state of the menu and its items, and for
+rendering the `Menu.TriggerButton` (or the `Menu.SubmenuTriggerItem`)
+component, and the `Menu.Popover` component.
 
-Use a `Menu` when you want users to:
+## Props
 
--   Choose an action or change a setting from a list, AND
--   Only see the available choices contextually.
+### `as`
 
-`Menu` is a React component to render an expandable menu of buttons. It is similar in purpose to a `<select>` element, with the distinction that it does not maintain a value. Instead, each option behaves as an action button.
+ - Type: `"symbol" | "object" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | "base" | "bdi" | "bdo" | "big" | "blockquote" | "body" | "br" | "button" | "canvas" | ... 516 more ... | ("view" & FunctionComponent<...>)`
+ - Required: No
 
-If you need to display all the available options at all times, consider using a Toolbar instead. Use a `Menu` to display a list of actions after the user interacts with a button.
+The HTML element or React component to render the component as.
 
-**Do**
-Use a `Menu` to display a list of actions after the user interacts with an icon.
+### `children`
 
-**Don’t** use a `Menu` for important actions that should always be visible. Use a `Toolbar` instead.
+ - Type: `ReactNode`
+ - Required: No
 
-**Don’t**
-Don’t use a `Menu` for frequently used actions. Use a `Toolbar` instead.
+The elements, which should include one instance of the `Menu.TriggerButton`
+component and one instance of the `Menu.Popover` component.
 
-#### Behavior
+### `defaultOpen`
 
-Generally, the parent button should indicate that interacting with it will show a `Menu`.
+ - Type: `boolean`
+ - Required: No
+ - Default: `false`
 
-The parent button should retain the same visual styling regardless of whether the `Menu` is displayed or not.
+Whether the menu popover and its contents should be visible by default.
 
-#### Placement
+Note: this prop will be overridden by the `open` prop if it is
+provided (meaning the component will be used in "controlled" mode).
 
-The `Menu` should typically appear directly below, or below and to the left of, the parent button. If there isn’t enough space below to display the full `Menu`, it can be displayed instead above the parent button.
+### `open`
 
-## Development guidelines
+ - Type: `boolean`
+ - Required: No
 
-This component is still highly experimental, and it's not normally accessible to consumers of the `@wordpress/components` package.
+Whether the menu popover and its contents should be visible.
+Should be used in conjunction with `onOpenChange` in order to control
+the open state of the menu popover.
 
-The component exposes a set of components that are meant to be used in combination with each other in order to implement a `Menu` correctly.
+Note: this prop will set the component in "controlled" mode, and it will
+override the `defaultOpen` prop.
 
-### `Menu`
+### `onOpenChange`
 
-The root component, used to specify the menu's trigger and its contents.
+ - Type: `(open: boolean) => void`
+ - Required: No
 
-#### Props
+A callback that gets called when the `open` state changes.
 
-The component accepts the following props:
+### `placement`
 
-##### `trigger`: `React.ReactNode`
-
-The button triggering the menu popover.
-
--   Required: yes
-
-##### `children`: `React.ReactNode`
-
-The contents of the menu (ie. one or more menu items).
-
--   Required: yes
-
-##### `defaultOpen`: `boolean`
-
-The open state of the menu popover when it is initially rendered. Use when not wanting to control its open state.
-
--   Required: no
--   Default: `false`
-
-##### `open`: `boolean`
-
-The controlled open state of the menu popover. Must be used in conjunction with `onOpenChange`.
-
--   Required: no
-
-##### `onOpenChange`: `(open: boolean) => void`
-
-Event handler called when the open state of the menu popover changes.
-
--   Required: no
-
-##### `modal`: `boolean`
-
-The modality of the menu popover. When set to true, interaction with outside elements will be disabled and only menu content will be visible to screen readers.
-
--   Required: no
--   Default: `true`
-
-##### `placement`: ``'top' | 'top-start' | 'top-end' | 'right' | 'right-start' | 'right-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'left' | 'left-start' | 'left-end'`
+ - Type: `"top" | "bottom" | "left" | "right" | "top-start" | "bottom-start" | "left-start" | "right-start" | "top-end" | "bottom-end" | ...`
+ - Required: No
+ - Default: `'bottom-start' for root-level menus, 'right-start' for submenus`
 
 The placement of the menu popover.
 
--   Required: no
--   Default: `'bottom-start'` for root-level menus, `'right-start'` for nested menus
+## Subcomponents
 
-##### `gutter`: `number`
+### Menu.TriggerButton
 
-The distance in pixels from the trigger.
-
--   Required: no
--   Default: `8` for root-level menus, `16` for nested menus
-
-##### `shift`: `number`
-
-The skidding of the popover along the anchor element. Can be set to negative values to make the popover shift to the opposite side.
-
--   Required: no
--   Default: `0` for root-level menus, `-8` for nested menus
-
-### `Menu.Item`
-
-Used to render a menu item.
+Renders a menu button that toggles the visibility of a sibling
+`Menu.Popover` component when clicked or when using arrow keys.
 
 #### Props
 
-The component accepts the following props:
+##### `accessibleWhenDisabled`
 
-##### `children`: `React.ReactNode`
+ - Type: `boolean`
+ - Required: No
 
-The contents of the item
+Indicates whether the element should be focusable even when it is
+`disabled`.
 
--   Required: yes
+This is important when discoverability is a concern. For example:
 
-##### `prefix`: `React.ReactNode`
+> A toolbar in an editor contains a set of special smart paste functions
+that are disabled when the clipboard is empty or when the function is not
+applicable to the current content of the clipboard. It could be helpful to
+keep the disabled buttons focusable if the ability to discover their
+functionality is primarily via their presence on the toolbar.
 
-The contents of the item's prefix.
+Learn more on [Focusability of disabled
+controls](https://www.w3.org/WAI/ARIA/apg/practices/keyboard-interface/#focusabilityofdisabledcontrols).
 
--   Required: no
+##### `children`
 
-##### `suffix`: `React.ReactNode`
+ - Type: `ReactNode`
+ - Required: No
 
-The contents of the item's suffix.
+The contents of the menu trigger button.
 
--   Required: no
+##### `disabled`
 
-##### `hideOnClick`: `boolean`
+ - Type: `boolean`
+ - Required: No
+ - Default: `false`
 
-Whether to hide the menu popover when the menu item is clicked.
+Determines if the element is disabled. This sets the `aria-disabled`
+attribute accordingly, enabling support for all elements, including those
+that don't support the native `disabled` attribute.
 
--   Required: no
--   Default: `true`
+This feature can be combined with the `accessibleWhenDisabled` prop to
+make disabled elements still accessible via keyboard.
 
-##### `disabled`: `boolean`
+##### `render`
 
-Determines if the element is disabled.
+ - Type: `ReactElement<any, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
+ - Required: No
 
--   Required: no
--   Default: `false`
+Allows the component to be rendered as a different HTML element or React
+component. The value can be a React element or a function that takes in the
+original component props and gives back a React element with the props
+merged.
 
-### `Menu.CheckboxItem`
+### Menu.Popover
 
-Used to render a checkbox item.
+Renders a dropdown menu element that's controlled by a sibling
+`Menu.TriggerButton` component. It renders a popover and automatically
+focuses on items when the menu is shown.
 
-#### Props
-
-The component accepts the following props:
-
-##### `children`: `React.ReactNode`
-
-The contents of the item
-
--   Required: yes
-
-##### `suffix`: `React.ReactNode`
-
-The contents of the item's suffix.
-
--   Required: no
-
-##### `hideOnClick`: `boolean`
-
-Whether to hide the menu popover when the menu item is clicked.
-
--   Required: no
--   Default: `false`
-
-##### `disabled`: `boolean`
-
-Determines if the element is disabled.
-
--   Required: no
--   Default: `false`
-
-##### `name`: `string`
-
-The checkbox item's name.
-
--   Required: yes
-
-##### `value`: `string`
-
-The checkbox item's value, useful when using multiple checkbox items
-associated to the same `name`.
-
--   Required: no
-
-##### `checked`: `boolean`
-
-The checkbox item's value, useful when using multiple checkbox items
-associated to the same `name`.
-
--   Required: no
-
-##### `defaultChecked`: `boolean`
-
-The checked state of the checkbox menu item when it is initially rendered. Use when not wanting to control its checked state.
-
--   Required: no
-
-##### `onChange`: `( event: React.ChangeEvent< HTMLInputElement > ) => void;`
-
-Event handler called when the checked state of the checkbox menu item changes.
-
--   Required: no
-
-### `Menu.RadioItem`
-
-Used to render a radio item.
+The only valid children of `Menu.Popover` are `Menu.Item`,
+`Menu.RadioItem`, `Menu.CheckboxItem`, `Menu.Group`, `Menu.Separator`,
+and `Menu` (for nested dropdown menus).
 
 #### Props
 
-The component accepts the following props:
+##### `children`
 
-##### `children`: `React.ReactNode`
+ - Type: `ReactNode`
+ - Required: No
 
-The contents of the item
+The contents of the menu popover, which should include instances of the
+`Menu.Item`, `Menu.CheckboxItem`, `Menu.RadioItem`, `Menu.Group`, and
+`Menu.Separator` components.
 
--   Required: yes
+##### `gutter`
 
-##### `suffix`: `React.ReactNode`
+ - Type: `number`
+ - Required: No
+ - Default: `8 for root-level menus, 16 for nested menus`
 
-The contents of the item's suffix.
+The distance between the popover and the anchor element.
 
--   Required: no
+##### `hideOnEscape`
 
-##### `hideOnClick`: `boolean`
+ - Type: `BooleanOrCallback<KeyboardEvent | React.KeyboardEvent<Element>>`
+ - Required: No
+ - Default: ``( event ) => { event.preventDefault(); return true; }``
 
-Whether to hide the menu popover when the menu item is clicked.
+Determines if the menu popover will hide when the user presses the
+Escape key.
 
--   Required: no
--   Default: `false`
+This prop can be either a boolean or a function that accepts an event as an
+argument and returns a boolean. The event object represents the keydown
+event that initiated the hide action, which could be either a native
+keyboard event or a React synthetic event.
 
-##### `disabled`: `boolean`
+##### `modal`
 
-Determines if the element is disabled.
+ - Type: `boolean`
+ - Required: No
+ - Default: `true`
 
--   Required: no
--   Default: `false`
+The modality of the menu popover. When set to true, interaction with
+outside elements will be disabled and only menu content will be visible to
+screen readers.
 
-##### `name`: `string`
+Determines whether the menu popover is modal. Modal dialogs have distinct
+states and behaviors:
+- The `portal` and `preventBodyScroll` props are set to `true`. They can
+  still be manually set to `false`.
+- When the dialog is open, element tree outside it will be inert.
+
+##### `shift`
+
+ - Type: `number`
+ - Required: No
+ - Default: `0 for root-level menus, -8 for nested menus`
+
+The skidding of the popover along the anchor element. Can be set to
+negative values to make the popover shift to the opposite side.
+
+### Menu.Item
+
+Renders a menu item inside the `Menu.Popover` or `Menu.Group` components.
+
+It can optionally contain one instance of the `Menu.ItemLabel` component
+and one instance of the `Menu.ItemHelpText` component.
+
+#### Props
+
+##### `children`
+
+ - Type: `ReactNode`
+ - Required: Yes
+
+The contents of the menu item, which could include one instance of the
+`Menu.ItemLabel` component and/or one instance of the `Menu.ItemHelpText`
+component.
+
+##### `disabled`
+
+ - Type: `boolean`
+ - Required: No
+ - Default: `false`
+
+Determines if the element is disabled. This sets the `aria-disabled`
+attribute accordingly, enabling support for all elements, including those
+that don't support the native `disabled` attribute.
+
+##### `hideOnClick`
+
+ - Type: `BooleanOrCallback<MouseEvent<HTMLElement, MouseEvent>>`
+ - Required: No
+ - Default: `true`
+
+Determines if the menu should hide when this item is clicked.
+
+**Note**: This behavior isn't triggered if this menu item is rendered as a
+link and modifier keys are used to either open the link in a new tab or
+download it.
+
+##### `prefix`
+
+ - Type: `ReactNode`
+ - Required: No
+
+The contents of the menu item's prefix, such as an icon.
+
+##### `render`
+
+ - Type: `ReactElement<any, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
+ - Required: No
+
+Allows the component to be rendered as a different HTML element or React
+component. The value can be a React element or a function that takes in the
+original component props and gives back a React element with the props
+merged.
+
+##### `suffix`
+
+ - Type: `ReactNode`
+ - Required: No
+
+The contents of the menu item's suffix, such as a keyboard shortcut.
+
+### Menu.RadioItem
+
+Renders a radio menu item inside the `Menu.Popover` or `Menu.Group`
+components.
+
+It can optionally contain one instance of the `Menu.ItemLabel` component
+and one instance of the `Menu.ItemHelpText` component.
+
+#### Props
+
+##### `children`
+
+ - Type: `ReactNode`
+ - Required: Yes
+
+The contents of the menu item, which could include one instance of the
+`Menu.ItemLabel` component and/or one instance of the `Menu.ItemHelpText`
+component.
+
+##### `checked`
+
+ - Type: `boolean`
+ - Required: No
+
+The controlled checked state of the radio menu item.
+
+Note: this prop will override the `defaultChecked` prop.
+
+##### `disabled`
+
+ - Type: `boolean`
+ - Required: No
+ - Default: `false`
+
+Determines if the element is disabled. This sets the `aria-disabled`
+attribute accordingly, enabling support for all elements, including those
+that don't support the native `disabled` attribute.
+
+##### `defaultChecked`
+
+ - Type: `boolean`
+ - Required: No
+
+The checked state of the radio menu item when it is initially rendered.
+Use when not wanting to control its checked state.
+
+Note: this prop will be overriden by the `checked` prop, if it is defined.
+
+##### `hideOnClick`
+
+ - Type: `BooleanOrCallback<MouseEvent<HTMLElement, MouseEvent>>`
+ - Required: No
+ - Default: `false`
+
+Determines if the menu should hide when this item is clicked.
+
+**Note**: This behavior isn't triggered if this menu item is rendered as a
+link and modifier keys are used to either open the link in a new tab or
+download it.
+
+##### `name`
+
+ - Type: `string`
+ - Required: Yes
 
 The radio item's name.
 
--   Required: yes
+##### `onChange`
 
-##### `value`: `string | number`
+ - Type: `BivariantCallback<(event: ChangeEvent<HTMLInputElement>) => void>`
+ - Required: No
+
+A function that is called when the checkbox's checked state changes.
+
+##### `render`
+
+ - Type: `ReactElement<any, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
+ - Required: No
+
+Allows the component to be rendered as a different HTML element or React
+component. The value can be a React element or a function that takes in the
+original component props and gives back a React element with the props
+merged.
+
+##### `suffix`
+
+ - Type: `ReactNode`
+ - Required: No
+
+The contents of the menu item's suffix, such as a keyboard shortcut.
+
+##### `value`
+
+ - Type: `string | number`
+ - Required: Yes
 
 The radio item's value.
 
--   Required: yes
+### Menu.CheckboxItem
 
-##### `checked`: `boolean`
+Renders a checkbox menu item inside the `Menu.Popover` or `Menu.Group`
+components.
 
-The checkbox item's value, useful when using multiple checkbox items
+It can optionally contain one instance of the `Menu.ItemLabel` component
+and one instance of the `Menu.ItemHelpText` component.
+
+#### Props
+
+##### `children`
+
+ - Type: `ReactNode`
+ - Required: Yes
+
+The contents of the menu item, which could include one instance of the
+`Menu.ItemLabel` component and/or one instance of the `Menu.ItemHelpText`
+component.
+
+##### `checked`
+
+ - Type: `boolean`
+ - Required: No
+
+The controlled checked state of the checkbox menu item.
+
+Note: this prop will override the `defaultChecked` prop.
+
+##### `disabled`
+
+ - Type: `boolean`
+ - Required: No
+ - Default: `false`
+
+Determines if the element is disabled. This sets the `aria-disabled`
+attribute accordingly, enabling support for all elements, including those
+that don't support the native `disabled` attribute.
+
+##### `defaultChecked`
+
+ - Type: `boolean`
+ - Required: No
+
+The checked state of the checkbox menu item when it is initially rendered.
+Use when not wanting to control its checked state.
+
+Note: this prop will be overriden by the `checked` prop, if it is defined.
+
+##### `hideOnClick`
+
+ - Type: `BooleanOrCallback<MouseEvent<HTMLElement, MouseEvent>>`
+ - Required: No
+ - Default: `false`
+
+Determines if the menu should hide when this item is clicked.
+
+**Note**: This behavior isn't triggered if this menu item is rendered as a
+link and modifier keys are used to either open the link in a new tab or
+download it.
+
+##### `name`
+
+ - Type: `string`
+ - Required: Yes
+
+The checkbox menu item's name.
+
+##### `onChange`
+
+ - Type: `ChangeEventHandler<HTMLInputElement>`
+ - Required: No
+
+A function that is called when the checkbox's checked state changes.
+
+##### `render`
+
+ - Type: `ReactElement<any, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
+ - Required: No
+
+Allows the component to be rendered as a different HTML element or React
+component. The value can be a React element or a function that takes in the
+original component props and gives back a React element with the props
+merged.
+
+##### `suffix`
+
+ - Type: `ReactNode`
+ - Required: No
+
+The contents of the menu item's suffix, such as a keyboard shortcut.
+
+##### `value`
+
+ - Type: `string | number | readonly string[]`
+ - Required: No
+
+The checkbox item's value, useful when using multiple checkbox menu items
 associated to the same `name`.
 
--   Required: no
+### Menu.ItemLabel
 
-##### `defaultChecked`: `boolean`
-
-The checked state of the radio menu item when it is initially rendered. Use when not wanting to control its checked state.
-
--   Required: no
-
-##### `onChange`: `( event: React.ChangeEvent< HTMLInputElement > ) => void;`
-
-Event handler called when the checked radio menu item changes.
-
--   Required: no
-
-### `Menu.ItemLabel`
-
-Used to render the menu item's label.
+Renders a menu item's label text. It should be wrapped with `Menu.Item`,
+`Menu.RadioItem`, or `Menu.CheckboxItem`.
 
 #### Props
 
-The component accepts the following props:
+##### `as`
 
-##### `children`: `React.ReactNode`
+ - Type: `"symbol" | "object" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | ...`
+ - Required: No
 
-The label contents.
+The HTML element or React component to render the component as.
 
--   Required: yes
+### Menu.ItemHelpText
 
-### `Menu.ItemHelpText`
-
-Used to render the menu item's help text.
-
-#### Props
-
-The component accepts the following props:
-
-##### `children`: `React.ReactNode`
-
-The help text contents.
-
--   Required: yes
-
-### `Menu.Group`
-
-Used to group menu items.
+Renders a menu item's help text. It should be wrapped with `Menu.Item`,
+`Menu.RadioItem`, or `Menu.CheckboxItem`.
 
 #### Props
 
-The component accepts the following props:
+##### `as`
 
-##### `children`: `React.ReactNode`
+ - Type: `"symbol" | "object" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | ...`
+ - Required: No
 
-The contents of the menu group (ie. an optional menu group label and one or more menu items).
+The HTML element or React component to render the component as.
 
--   Required: yes
+### Menu.Group
 
-### `Menu.GroupLabel`
+Renders a group for menu items.
 
-Used to render a group label. The label text should be kept as short as possible.
+It should contain one instance of `Menu.GroupLabel` and one or more
+instances of `Menu.Item`, `Menu.RadioItem`, or `Menu.CheckboxItem`.
 
 #### Props
 
-The component accepts the following props:
+##### `children`
 
-##### `children`: `React.ReactNode`
+ - Type: `ReactNode`
+ - Required: Yes
 
-The contents of the menu group label.
+The contents of the menu group, which should include one instance of the
+`Menu.GroupLabel` component and one or more instances of `Menu.Item`,
+`Menu.CheckboxItem`, and `Menu.RadioItem`.
 
--   Required: yes
+### Menu.GroupLabel
 
-### `Menu.Separator`
+Renders a label in a menu group.
 
-Used to render a visual separator.
+This component should be wrapped with `Menu.Group` so the
+`aria-labelledby` is correctly set on the group element.
+
+#### Props
+
+##### `children`
+
+ - Type: `ReactNode`
+ - Required: Yes
+
+The contents of the menu group label, which should provide an accessible
+label for the menu group.
+
+### Menu.Separator
+
+Renders a divider between menu items or menu groups.
+
+#### Props
+
+### Menu.SubmenuTriggerItem
+
+Renders a menu item that toggles the visibility of a sibling
+`Menu.Popover` component when clicked or when using arrow keys.
+
+This component is used to create a nested dropdown menu.
+
+#### Props
+
+##### `children`
+
+ - Type: `ReactNode`
+ - Required: Yes
+
+The contents of the menu item, which could include one instance of the
+`Menu.ItemLabel` component and/or one instance of the `Menu.ItemHelpText`
+component.
+
+##### `disabled`
+
+ - Type: `boolean`
+ - Required: No
+ - Default: `false`
+
+Determines if the element is disabled. This sets the `aria-disabled`
+attribute accordingly, enabling support for all elements, including those
+that don't support the native `disabled` attribute.
+
+##### `hideOnClick`
+
+ - Type: `BooleanOrCallback<MouseEvent<HTMLElement, MouseEvent>>`
+ - Required: No
+ - Default: `true`
+
+Determines if the menu should hide when this item is clicked.
+
+**Note**: This behavior isn't triggered if this menu item is rendered as a
+link and modifier keys are used to either open the link in a new tab or
+download it.
+
+##### `prefix`
+
+ - Type: `ReactNode`
+ - Required: No
+
+The contents of the menu item's prefix, such as an icon.
+
+##### `render`
+
+ - Type: `ReactElement<any, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
+ - Required: No
+
+Allows the component to be rendered as a different HTML element or React
+component. The value can be a React element or a function that takes in the
+original component props and gives back a React element with the props
+merged.
+
+##### `suffix`
+
+ - Type: `ReactNode`
+ - Required: No
+
+The contents of the menu item's suffix, such as a keyboard shortcut.

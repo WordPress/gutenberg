@@ -54,29 +54,18 @@ const GridVisualizerGrid = forwardRef(
 		const [ isDroppingAllowed, setIsDroppingAllowed ] = useState( false );
 
 		useEffect( () => {
-			const observers = [];
-			for ( const element of [ gridElement, ...gridElement.children ] ) {
-				const observer = new window.ResizeObserver( () => {
-					setGridInfo( getGridInfo( gridElement ) );
-				} );
-				observer.observe( element );
-				observers.push( observer );
-			}
-
-			const mutationObserver = new window.MutationObserver( () => {
+			const resizeCallback = () =>
 				setGridInfo( getGridInfo( gridElement ) );
-			} );
-			mutationObserver.observe( gridElement, {
-				attributeFilter: [ 'style', 'class' ],
-				childList: true,
-				subtree: true,
-			} );
-			observers.push( mutationObserver );
-
+			// Both border-box and content-box are observed as they may change
+			// independently. This requires two observers because a single one
+			// can’t be made to monitor both on the same element.
+			const borderBoxSpy = new window.ResizeObserver( resizeCallback );
+			borderBoxSpy.observe( gridElement, { box: 'border-box' } );
+			const contentBoxSpy = new window.ResizeObserver( resizeCallback );
+			contentBoxSpy.observe( gridElement );
 			return () => {
-				for ( const observer of observers ) {
-					observer.disconnect();
-				}
+				borderBoxSpy.disconnect();
+				contentBoxSpy.disconnect();
 			};
 		}, [ gridElement ] );
 

@@ -4,6 +4,7 @@
 import { useInstanceId } from '@wordpress/compose';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
@@ -165,6 +166,14 @@ function BoxControl( {
 		size: undefined,
 	} );
 	const sidesToRender = getAllowedSides( sides );
+
+	if ( ( presets && ! presetKey ) || ( ! presets && presetKey ) ) {
+		const definedProp = presets ? 'presets' : 'presetKey';
+		const missingProp = presets ? 'presetKey' : 'presets';
+		warning(
+			`wp.components.BoxControl: the '${ missingProp }' prop is required when the '${ definedProp }' prop is defined.`
+		);
+	}
 
 	return (
 		<Grid

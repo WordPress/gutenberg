@@ -214,7 +214,7 @@ If you are publishing new versions of packages, note that there are versioning r
 
 ## TypeScript
 
-The [TypeScript](http://www.typescriptlang.org/) language is a typed superset of JavaScript that compiles to plain JavaScript.
+The [TypeScript](https://www.typescriptlang.org/) language is a typed superset of JavaScript that compiles to plain JavaScript.
 Gutenberg does not use the TypeScript language, however TypeScript has powerful tooling that can be applied to JavaScript projects.
 
 Gutenberg uses TypeScript for several reasons, including:

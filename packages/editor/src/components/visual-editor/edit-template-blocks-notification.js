@@ -94,7 +94,7 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 			size="medium"
 		>
 			{ __(
-				'You’ve tried to select a block that is part of a template, which may be used on other posts and pages. Would you like to edit the template?'
+				'You’ve tried to select a block that is part of a template that may be used elsewhere on your site. Would you like to edit the template?'
 			) }
 		</ConfirmDialog>
 	);

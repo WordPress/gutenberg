@@ -30,7 +30,7 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 					resetAll={ () => {
 						setAttributes( {
 							displayAsDropdown: false,
-							showLabel: false,
+							showLabel: true,
 							showPostCounts: false,
 							type: 'monthly',
 						} );
@@ -61,9 +61,9 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 						<ToolsPanelItem
 							label={ __( 'Show label' ) }
 							isShownByDefault
-							hasValue={ () => showLabel }
+							hasValue={ () => ! showLabel }
 							onDeselect={ () =>
-								setAttributes( { showLabel: false } )
+								setAttributes( { showLabel: true } )
 							}
 						>
 							<ToggleControl
@@ -102,7 +102,7 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 					<ToolsPanelItem
 						label={ __( 'Group by' ) }
 						isShownByDefault
-						hasValue={ () => !! type }
+						hasValue={ () => type !== 'monthly' }
 						onDeselect={ () =>
 							setAttributes( { type: 'monthly' } )
 						}

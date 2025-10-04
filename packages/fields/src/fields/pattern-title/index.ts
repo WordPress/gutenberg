@@ -20,6 +20,7 @@ const patternTitleField: Field< Pattern > = {
 	render: PatternTitleView,
 	enableHiding: false,
 	enableGlobalSearch: true,
+	filterBy: false,
 };
 
 /**

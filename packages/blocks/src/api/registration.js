@@ -123,6 +123,19 @@ import { unlock } from '../lock-unlock';
  *                                              then no preview is shown.
  */
 
+/**
+ * An object describing a Block Bindings source.
+ *
+ * @typedef {Object} WPBlockBindingsSource
+ *
+ * @property {string}   name               The unique and machine-readable name.
+ * @property {string}   [label]            Human-readable label. Optional when it is defined in the server.
+ * @property {Array}    [usesContext]      Optional array of context needed by the source only in the editor.
+ * @property {Function} [getValues]        Optional function to get the values from the source.
+ * @property {Function} [setValues]        Optional function to update multiple values connected to the source.
+ * @property {Function} [canUserEditValue] Optional function to determine if the user can edit the value.
+ */
+
 function isObject( object ) {
 	return object !== null && typeof object === 'object';
 }
@@ -769,13 +782,7 @@ export const unregisterBlockVariation = ( blockName, variationName ) => {
  *
  * @since 6.7.0 Introduced in WordPress core.
  *
- * @param {Object}   source                    Properties of the source to be registered.
- * @param {string}   source.name               The unique and machine-readable name.
- * @param {string}   [source.label]            Human-readable label. Optional when it is defined in the server.
- * @param {Array}    [source.usesContext]      Optional array of context needed by the source only in the editor.
- * @param {Function} [source.getValues]        Optional function to get the values from the source.
- * @param {Function} [source.setValues]        Optional function to update multiple values connected to the source.
- * @param {Function} [source.canUserEditValue] Optional function to determine if the user can edit the value.
+ * @param {WPBlockBindingsSource} source Object describing a block bindings source.
  *
  * @example
  * ```js

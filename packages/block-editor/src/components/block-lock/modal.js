@@ -84,6 +84,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
 			) }
 			overlayClassName="block-editor-block-lock-modal"
 			onRequestClose={ onClose }
+			size="small"
 		>
 			<form
 				onSubmit={ ( event ) => {

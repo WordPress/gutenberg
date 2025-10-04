@@ -327,12 +327,7 @@ function ShadowEditor( { shadow, onChange } ) {
 		<>
 			<VStack spacing={ 2 }>
 				<HStack justify="space-between">
-					<Flex
-						align="center"
-						className="edit-site-global-styles__shadows-panel__title"
-					>
-						<Subtitle level={ 3 }>{ __( 'Shadows' ) }</Subtitle>
-					</Flex>
+					<Subtitle level={ 3 }>{ __( 'Shadows' ) }</Subtitle>
 					<FlexItem className="edit-site-global-styles__shadows-panel__options-container">
 						<Button
 							size="small"

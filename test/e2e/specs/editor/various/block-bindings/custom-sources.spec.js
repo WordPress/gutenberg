@@ -697,7 +697,7 @@ test.describe( 'Registered sources', () => {
 				.getByRole( 'button', { name: 'Edit link', exact: true } )
 				.click();
 			await page
-				.getByPlaceholder( 'Search or type URL' )
+				.getByPlaceholder( 'Paste or type URL' )
 				.fill( testingImgSrc );
 			await pageUtils.pressKeys( 'Enter' );
 
@@ -1069,7 +1069,9 @@ test.describe( 'Registered sources', () => {
 			await expect( initialButton ).toHaveText( 'Text Field Value' );
 			// Second block should be an empty paragraph block.
 			await expect( newEmptyButton ).toHaveText( '' );
-			await expect( newEmptyButton ).toBeEditable();
+			await expect(
+				newEmptyButton.getByRole( 'textbox' )
+			).toBeEditable();
 		} );
 		test( 'should show placeholder prompt when value is empty and can edit', async ( {
 			editor,

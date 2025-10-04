@@ -66,7 +66,10 @@ export interface NavigationOptions {
 }
 
 const RoutesContext = createContext< Match | null >( null );
+RoutesContext.displayName = 'RoutesContext';
+
 export const ConfigContext = createContext< Config >( { pathArg: 'p' } );
+ConfigContext.displayName = 'ConfigContext';
 
 const locationMemo = new WeakMap();
 function getLocationWithQuery() {
@@ -153,7 +156,8 @@ export function useHistory() {
 export default function useMatch(
 	location: LocationWithQuery,
 	matcher: RouteRecognizer,
-	pathArg: string
+	pathArg: string,
+	matchResolverArgs: Record< string, any >
 ): Match {
 	const { query: rawQuery = {} } = location;
 
@@ -178,7 +182,11 @@ export default function useMatch(
 					if ( typeof value === 'function' ) {
 						return [
 							key,
-							value( { query, params: result.params } ),
+							value( {
+								query,
+								params: result.params,
+								...matchResolverArgs,
+							} ),
 						];
 					}
 					return [ key, value ];
@@ -193,7 +201,7 @@ export default function useMatch(
 			query,
 			path: addQueryArgs( path, query ),
 		};
-	}, [ matcher, rawQuery, pathArg ] );
+	}, [ matcher, rawQuery, pathArg, matchResolverArgs ] );
 }
 
 export function RouterProvider( {
@@ -201,11 +209,13 @@ export function RouterProvider( {
 	pathArg,
 	beforeNavigate,
 	children,
+	matchResolverArgs,
 }: {
 	routes: Route[];
 	pathArg: string;
 	beforeNavigate?: BeforeNavigate;
 	children: React.ReactNode;
+	matchResolverArgs: Record< string, any >;
 } ) {
 	const location = useSyncExternalStore(
 		history.listen,
@@ -214,14 +224,14 @@ export function RouterProvider( {
 	);
 	const matcher = useMemo( () => {
 		const ret = new RouteRecognizer();
-		routes.forEach( ( route ) => {
+		( routes ?? [] ).forEach( ( route ) => {
 			ret.add( [ { path: route.path, handler: route } ], {
 				as: route.name,
 			} );
 		} );
 		return ret;
 	}, [ routes ] );
-	const match = useMatch( location, matcher, pathArg );
+	const match = useMatch( location, matcher, pathArg, matchResolverArgs );
 	const config = useMemo(
 		() => ( { beforeNavigate, pathArg } ),
 		[ beforeNavigate, pathArg ]

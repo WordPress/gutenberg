@@ -60,7 +60,7 @@ A block which embeds the TinyMCE editor as a block, TinyMCE was the base of the 
 
 ## Dynamic block
 
-A type of block where the content of which may change and cannot be determined at the time of saving a post, instead calculated any time the post is shown on the front of a site. These blocks may save fallback content or no content at all in their JavaScript implementation, instead deferring to a PHP block implementation for runtime rendering.
+A type of block in which the content may change and cannot be determined at the time of saving a post, instead calculated any time the post is shown on the front of a site. These blocks may save fallback content or no content at all in their JavaScript implementation, instead deferring to a PHP block implementation for runtime rendering.
 
 ## Full Site Editing
 

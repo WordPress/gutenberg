@@ -74,6 +74,7 @@ Settings related to borders.
 | radius | Allow users to set custom border radius. | `boolean` | `false` |
 | style | Allow users to set custom border styles. | `boolean` | `false` |
 | width | Allow users to set custom border widths. | `boolean` | `false` |
+| radiusSizes | Border radius size presets for the border radius selector. | `[ { name, slug, size } ]` |  |
 
 ---
 

@@ -60,9 +60,12 @@ $resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // M
 	position: absolute;
 	top: calc(50% - 1px);
 	right: calc(50% - 1px);
-	transition: transform 0.1s ease-in;
-	@include reduce-motion("transition");
-	will-change: transform;
+
+	@media not (prefers-reduced-motion) {
+		transition: transform 0.1s ease-in;
+		will-change: transform;
+	}
+
 	opacity: 0;
 }
 
@@ -102,18 +105,20 @@ $resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // M
 .components-resizable-box__side-handle.components-resizable-box__handle-bottom:hover::before,
 .components-resizable-box__side-handle.components-resizable-box__handle-top:active::before,
 .components-resizable-box__side-handle.components-resizable-box__handle-bottom:active::before {
-	animation: components-resizable-box__top-bottom-animation 0.1s ease-out 0s;
-	animation-fill-mode: forwards;
-	@include reduce-motion("animation");
+	@media not (prefers-reduced-motion) {
+		animation: components-resizable-box__top-bottom-animation 0.1s ease-out 0s;
+		animation-fill-mode: forwards;
+	}
 }
 
 .components-resizable-box__side-handle.components-resizable-box__handle-left:hover::before,
 .components-resizable-box__side-handle.components-resizable-box__handle-right:hover::before,
 .components-resizable-box__side-handle.components-resizable-box__handle-left:active::before,
 .components-resizable-box__side-handle.components-resizable-box__handle-right:active::before {
-	animation: components-resizable-box__left-right-animation 0.1s ease-out 0s;
-	animation-fill-mode: forwards;
-	@include reduce-motion("animation");
+	@media not (prefers-reduced-motion) {
+		animation: components-resizable-box__left-right-animation 0.1s ease-out 0s;
+		animation-fill-mode: forwards;
+	}
 }
 
 /* This CSS is shown only to Safari, which has a bug with table-caption making it jumpy.

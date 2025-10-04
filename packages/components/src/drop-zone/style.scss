@@ -46,9 +46,8 @@
 		.components-drop-zone__content {
 			opacity: 1;
 
-			transition: opacity 0.2s ease-in-out;
-			@media (prefers-reduced-motion) {
-				transition: none;
+			@media not (prefers-reduced-motion) {
+				transition: opacity 0.2s ease-in-out;
 			}
 		}
 
@@ -56,12 +55,10 @@
 			opacity: 1;
 			transform: scale(1);
 
-			transition:
-				opacity 0.1s ease-in-out 0.1s,
-				transform 0.1s ease-in-out 0.1s;
-
-			@media (prefers-reduced-motion) {
-				transition: none;
+			@media not (prefers-reduced-motion) {
+				transition:
+					opacity 0.1s ease-in-out 0.1s,
+					transform 0.1s ease-in-out 0.1s;
 			}
 		}
 	}

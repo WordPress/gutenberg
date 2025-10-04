@@ -69,19 +69,19 @@ export function PatternCategoryPreviews( {
 					return false;
 				}
 
-				if ( category.name === allPatternsCategory?.name ) {
+				if ( category.name === allPatternsCategory.name ) {
 					return true;
 				}
 
 				if (
-					category.name === myPatternsCategory?.name &&
+					category.name === myPatternsCategory.name &&
 					pattern.type === INSERTER_PATTERN_TYPES.user
 				) {
 					return true;
 				}
 
 				if (
-					category.name === starterPatternsCategory?.name &&
+					category.name === starterPatternsCategory.name &&
 					pattern.blockTypes?.includes( 'core/post-content' )
 				) {
 					return true;
@@ -149,7 +149,7 @@ export function PatternCategoryPreviews( {
 							level={ 4 }
 							as="div"
 						>
-							{ category?.label }
+							{ category.label }
 						</Heading>
 					</FlexBlock>
 					<PatternsFilter
