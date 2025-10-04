@@ -35,17 +35,17 @@ module.exports = async ( {
 	 * @param {string} packageArg The package to install.
 	 */
 	function checkDependency( packageArg ) {
-        const { type } = npmPackageArg( packageArg );
-        if (
-            ! [ 'git', 'tag', 'version', 'range', 'remote', 'alias' ].includes(
-                type
-            ) 
-        ) {
-            throw new Error(
-                `Provided package type "${ type }" is not supported.`
-            );
-        }
-    }
+		const { type } = npmPackageArg( packageArg );
+		if (
+			! [ 'git', 'tag', 'version', 'range', 'remote', 'alias' ].includes(
+				type
+			)
+		) {
+			throw new Error(
+				`Provided package type "${ type }" is not supported.`
+			);
+		}
+	}
 
 
 	const dependencies = {};
