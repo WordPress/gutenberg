@@ -29,6 +29,35 @@ import {
 import { getScope } from './scopes';
 import { proxifyState, proxifyContext, deepMerge } from './proxies';
 
+const warnUniqueIdWithTwoHyphens = (
+	prefix: string,
+	suffix: string,
+	uniqueId?: string
+) => {
+	if ( globalThis.SCRIPT_DEBUG ) {
+		return `The usage of data-wp-${ prefix }--${ suffix }${
+			uniqueId ? `--${ uniqueId }` : ''
+		} (two hyphens for unique ID) is deprecated and will stop working in WordPress 7.0. Please use data-wp-${ prefix }${
+			uniqueId ? `--${ suffix }---${ uniqueId }` : `---${ suffix }`
+		} (three hyphens for unique ID) from now on.`;
+	}
+	return '';
+};
+
+const warnUniqueIdNotSupported = ( prefix: string, uniqueId: string ) => {
+	if ( globalThis.SCRIPT_DEBUG ) {
+		return `Unique IDs are not supported for the data-wp-${ prefix } directive. Ignoring the directive with unique ID "${ uniqueId }".`;
+	}
+	return '';
+};
+
+const warnWithSyncEvent = ( wrongPrefix: string, rightPrefix: string ) => {
+	if ( globalThis.SCRIPT_DEBUG ) {
+		return `The usage of data-wp-${ wrongPrefix } is deprecated and will stop working in WordPress 7.0. Please, use data-wp-${ rightPrefix } with the withSyncEvent() helper from now on.`;
+	}
+	return '';
+};
+
 /**
  * Recursively clones the passed object.
  *
@@ -71,16 +100,20 @@ function wrapEventAsync( event: Event ) {
 			const value = target[ prop ];
 			switch ( prop ) {
 				case 'currentTarget':
-					warn(
-						`Accessing the synchronous event.${ prop } property in a store action without wrapping it in withSyncEvent() is deprecated and will stop working in WordPress 6.9. Please wrap the store action in withSyncEvent().`
-					);
+					if ( globalThis.SCRIPT_DEBUG ) {
+						warn(
+							`Accessing the synchronous event.${ prop } property in a store action without wrapping it in withSyncEvent() is deprecated and will stop working in WordPress 7.0. Please wrap the store action in withSyncEvent().`
+						);
+					}
 					break;
 				case 'preventDefault':
 				case 'stopImmediatePropagation':
 				case 'stopPropagation':
-					warn(
-						`Using the synchronous event.${ prop }() function in a store action without wrapping it in withSyncEvent() is deprecated and will stop working in WordPress 6.9. Please wrap the store action in withSyncEvent().`
-					);
+					if ( globalThis.SCRIPT_DEBUG ) {
+						warn(
+							`Using the synchronous event.${ prop }() function in a store action without wrapping it in withSyncEvent() is deprecated and will stop working in WordPress 7.0. Please wrap the store action in withSyncEvent().`
+						);
+					}
 					break;
 			}
 			if ( value instanceof Function ) {
@@ -148,7 +181,19 @@ const getGlobalEventDirective = (
 		directives[ `on-${ type }` ]
 			.filter( isNonDefaultDirectiveSuffix )
 			.forEach( ( entry ) => {
-				const eventName = entry.suffix.split( '--', 1 )[ 0 ];
+				const suffixParts = entry.suffix.split( '--', 1 );
+				const eventName = suffixParts[ 0 ];
+				if ( globalThis.SCRIPT_DEBUG ) {
+					if ( suffixParts[ 1 ] ) {
+						warn(
+							warnUniqueIdWithTwoHyphens(
+								`on-${ type }`,
+								suffixParts[ 0 ],
+								suffixParts[ 1 ]
+							)
+						);
+					}
+				}
 				useInit( () => {
 					const cb = ( event: Event ) => {
 						const result = evaluate( entry );
@@ -180,6 +225,14 @@ const getGlobalAsyncEventDirective = (
 		directives[ `on-async-${ type }` ]
 			.filter( isNonDefaultDirectiveSuffix )
 			.forEach( ( entry ) => {
+				if ( globalThis.SCRIPT_DEBUG ) {
+					warn(
+						warnWithSyncEvent(
+							`on-async-${ type }`,
+							`on-${ type }`
+						)
+					);
+				}
 				const eventName = entry.suffix.split( '--', 1 )[ 0 ];
 				useInit( () => {
 					const cb = async ( event: Event ) => {
@@ -212,6 +265,11 @@ export default () => {
 
 			// Doesn't do anything if there are no default entries.
 			if ( ! entries.length ) {
+				if ( globalThis.SCRIPT_DEBUG ) {
+					warn(
+						'The usage of data-wp-context--unique-id (two hyphens) is not supported. To add a unique ID to the directive, please use data-wp-context---unique-id (three hyphens) instead.'
+					);
+				}
 				return;
 			}
 
@@ -228,12 +286,14 @@ export default () => {
 
 			entries.forEach( ( { value, namespace, uniqueId } ) => {
 				// Checks that the value is a JSON object. Sends a console warning if not.
-				if ( ! isPlainObject( value ) ) {
-					warn(
-						`The value of data-wp-context${
-							uniqueId ? `---${ uniqueId }` : ''
-						} on the ${ namespace } namespace must be a valid stringified JSON object.`
-					);
+				if ( globalThis.SCRIPT_DEBUG ) {
+					if ( ! isPlainObject( value ) ) {
+						warn(
+							`The value of data-wp-context${
+								uniqueId ? `---${ uniqueId }` : ''
+							} on the ${ namespace } namespace must be a valid stringified JSON object.`
+						);
+					}
 				}
 
 				// If the namespace doesn't exist yet, initalizes empty
@@ -281,6 +341,11 @@ export default () => {
 	// data-wp-watch--[name]
 	directive( 'watch', ( { directives: { watch }, evaluate } ) => {
 		watch.forEach( ( entry ) => {
+			if ( globalThis.SCRIPT_DEBUG ) {
+				if ( entry.suffix ) {
+					warnUniqueIdWithTwoHyphens( 'watch', entry.suffix );
+				}
+			}
 			useWatch( () => {
 				let start;
 				if ( globalThis.IS_GUTENBERG_PLUGIN ) {
@@ -317,6 +382,11 @@ export default () => {
 	// data-wp-init--[name]
 	directive( 'init', ( { directives: { init }, evaluate } ) => {
 		init.forEach( ( entry ) => {
+			if ( globalThis.SCRIPT_DEBUG ) {
+				if ( entry.suffix ) {
+					warnUniqueIdWithTwoHyphens( 'init', entry.suffix );
+				}
+			}
 			// TODO: Replace with useEffect to prevent unneeded scopes.
 			useInit( () => {
 				let start;
@@ -355,11 +425,22 @@ export default () => {
 	directive( 'on', ( { directives: { on }, element, evaluate } ) => {
 		const events = new Map< string, Set< DirectiveEntry > >();
 		on.filter( isNonDefaultDirectiveSuffix ).forEach( ( entry ) => {
-			const event = entry.suffix.split( '--' )[ 0 ];
-			if ( ! events.has( event ) ) {
-				events.set( event, new Set< DirectiveEntry >() );
+			const suffixParts = entry.suffix.split( '--' );
+			if ( globalThis.SCRIPT_DEBUG ) {
+				if ( suffixParts[ 1 ] ) {
+					warn(
+						warnUniqueIdWithTwoHyphens(
+							'on',
+							suffixParts[ 0 ],
+							suffixParts[ 1 ]
+						)
+					);
+				}
 			}
-			events.get( event )!.add( entry );
+			if ( ! events.has( suffixParts[ 0 ] ) ) {
+				events.set( suffixParts[ 0 ], new Set< DirectiveEntry >() );
+			}
+			events.get( suffixParts[ 0 ] )!.add( entry );
 		} );
 
 		events.forEach( ( entries, eventType ) => {
@@ -408,6 +489,9 @@ export default () => {
 	directive(
 		'on-async',
 		( { directives: { 'on-async': onAsync }, element, evaluate } ) => {
+			if ( globalThis.SCRIPT_DEBUG ) {
+				warnWithSyncEvent( 'on-async', 'on' );
+			}
 			const events = new Map< string, Set< DirectiveEntry > >();
 			onAsync
 				.filter( isNonDefaultDirectiveSuffix )
@@ -458,9 +542,9 @@ export default () => {
 				.filter( isNonDefaultDirectiveSuffix )
 				.forEach( ( entry ) => {
 					if ( entry.uniqueId ) {
-						warn(
-							`Unique IDs are not supported for the data-wp-class directive. Ignoring directive with unique ID "${ entry.uniqueId }".`
-						);
+						if ( globalThis.SCRIPT_DEBUG ) {
+							warnUniqueIdNotSupported( 'class', entry.uniqueId );
+						}
 						return;
 					}
 					const className = entry.suffix;
@@ -507,9 +591,9 @@ export default () => {
 	directive( 'style', ( { directives: { style }, element, evaluate } ) => {
 		style.filter( isNonDefaultDirectiveSuffix ).forEach( ( entry ) => {
 			if ( entry.uniqueId ) {
-				warn(
-					`Unique IDs are not supported for the data-wp-style directive. Ignoring directive with unique ID "${ entry.uniqueId }".`
-				);
+				if ( globalThis.SCRIPT_DEBUG ) {
+					warnUniqueIdNotSupported( 'style', entry.uniqueId );
+				}
 				return;
 			}
 			const styleProp = entry.suffix;
@@ -550,9 +634,9 @@ export default () => {
 	directive( 'bind', ( { directives: { bind }, element, evaluate } ) => {
 		bind.filter( isNonDefaultDirectiveSuffix ).forEach( ( entry ) => {
 			if ( entry.uniqueId ) {
-				warn(
-					`Unique IDs are not supported for the data-wp-bind directive. Ignoring directive with unique ID "${ entry.uniqueId }".`
-				);
+				if ( globalThis.SCRIPT_DEBUG ) {
+					warnUniqueIdNotSupported( 'bind', entry.uniqueId );
+				}
 				return;
 			}
 			const attribute = entry.suffix;
@@ -644,7 +728,7 @@ export default () => {
 		} ) => {
 			// Shown deprecation warning
 			warn(
-				'The "data-wp-ignore" directive of the Interactivity API is deprecated since version 6.9 and will be removed in version 7.0.'
+				'The data-wp-ignore directive is deprecated and will be removed in version 7.0.'
 			);
 
 			// Preserve the initial inner HTML
@@ -658,44 +742,44 @@ export default () => {
 
 	// data-wp-text
 	directive( 'text', ( { directives: { text }, element, evaluate } ) => {
-		const entry = text.find( isDefaultDirectiveSuffix );
-		if ( ! entry ) {
-			// Check if there are entries with unique IDs and warn
-			text.forEach( ( e ) => {
-				if ( e.uniqueId ) {
-					warn(
-						`Unique IDs are not supported for the data-wp-text directive. Ignoring directive with unique ID "${ e.uniqueId }".`
-					);
-				}
-			} );
-			element.props.children = null;
-			return;
-		}
-
-		// Check if the default entry has a unique ID and warn
-		if ( entry.uniqueId ) {
-			warn(
-				`Unique IDs are not supported for the data-wp-text directive. Ignoring directive with unique ID "${ entry.uniqueId }".`
-			);
-			element.props.children = null;
-			return;
-		}
-
-		try {
-			let result = evaluate( entry );
-			if ( typeof result === 'function' ) {
-				result = result();
+		const entries = text.filter( isDefaultDirectiveSuffix );
+		// Doesn't do anything if there are no default entries.
+		if ( ! entries.length ) {
+			if ( globalThis.SCRIPT_DEBUG ) {
+				warn(
+					'The usage of data-wp-text--suffix is not supported. Please use data-wp-text instead.'
+				);
 			}
-			element.props.children =
-				typeof result === 'object' ? null : result.toString();
-		} catch ( e ) {
-			element.props.children = null;
+			return;
 		}
+		entries.forEach( ( entry ) => {
+			if ( entry.uniqueId ) {
+				if ( globalThis.SCRIPT_DEBUG ) {
+					warnUniqueIdNotSupported( 'text', entry.uniqueId );
+				}
+				return;
+			}
+			try {
+				let result = evaluate( entry );
+				if ( typeof result === 'function' ) {
+					result = result();
+				}
+				element.props.children =
+					typeof result === 'object' ? null : result.toString();
+			} catch ( e ) {
+				element.props.children = null;
+			}
+		} );
 	} );
 
 	// data-wp-run
 	directive( 'run', ( { directives: { run }, evaluate } ) => {
 		run.forEach( ( entry ) => {
+			if ( globalThis.SCRIPT_DEBUG ) {
+				if ( entry.suffix ) {
+					warnUniqueIdWithTwoHyphens( 'run', entry.suffix );
+				}
+			}
 			let result = evaluate( entry );
 			if ( typeof result === 'function' ) {
 				result = result();
@@ -714,6 +798,11 @@ export default () => {
 			evaluate,
 		} ) => {
 			if ( element.type !== 'template' ) {
+				if ( globalThis.SCRIPT_DEBUG ) {
+					warn(
+						'The data-wp-each directive can only be used on <template> elements.'
+					);
+				}
 				return;
 			}
 
@@ -721,7 +810,18 @@ export default () => {
 			const inheritedValue = useContext( inheritedContext );
 
 			const [ entry ] = each;
-			const { namespace } = entry;
+			const { namespace, suffix, uniqueId } = entry;
+
+			if ( globalThis.SCRIPT_DEBUG ) {
+				if ( each.length > 1 ) {
+					warn(
+						'The usage of multiple data-wp-each directives on the same element is not supported. Please pick only one.'
+					);
+				}
+				if ( uniqueId ) {
+					warnUniqueIdNotSupported( 'each', uniqueId );
+				}
+			}
 
 			let iterable = evaluate( entry );
 			if ( typeof iterable === 'function' ) {
@@ -732,9 +832,7 @@ export default () => {
 				return;
 			}
 
-			const itemProp = isNonDefaultDirectiveSuffix( entry )
-				? kebabToCamelCase( entry.suffix )
-				: 'item';
+			const itemProp = suffix ? kebabToCamelCase( suffix ) : 'item';
 
 			const result: VNode< any >[] = [];
 
