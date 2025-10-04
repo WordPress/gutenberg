@@ -1,14 +1,14 @@
 <?php
 /**
- * Icon registration examples using WP_Icons_Registry.
+ * Icon registration using WP_Icons_Registry.
  *
  * @package Gutenberg
  */
 
 /**
- * Example: Register icons from a directory.
+ * Register core icons from the `@wordpress/icons` package.
  */
-function gutenberg_register_icons_from_directory() {
+function gutenberg_register_core_icons() {
 	if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 		return;
 	}
@@ -20,7 +20,6 @@ function gutenberg_register_icons_from_directory() {
 		return;
 	}
 
-	// Get all SVG files from the directory
 	$svg_files = glob( $icons_directory . '*.svg' );
 
 	foreach ( $svg_files as $svg_file ) {
@@ -31,11 +30,10 @@ function gutenberg_register_icons_from_directory() {
 			continue;
 		}
 
-		// Create a human-readable title from the filename
 		$title = ucwords( str_replace( array( '-', '_' ), ' ', $icon_name ) );
 
 		$registry->register(
-			$icon_name,
+			'core/' . $icon_name,
 			array(
 				'title'   => $title,
 				'content' => $svg_content,
@@ -43,22 +41,22 @@ function gutenberg_register_icons_from_directory() {
 		);
 	}
 }
-add_action( 'rest_api_init', 'gutenberg_register_icons_from_directory' );
+add_action( 'rest_api_init', 'gutenberg_register_core_icons' );
 
 /**
  * Example to register custom icons.
  */
-function gutenberg_register_custom_icons() {
+function gutenberg_custom_register_custom_icons() {
 	if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 		return;
 	}
 	$registry = WP_Icons_Registry::get_instance();
 	$registry->register(
-		'my-custom-icon',
+		'custom/my-custom-icon',
 		array(
 			'title'   => 'Custom Icon',
 			'content' => '<svg fill="red" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10"/></svg>',
 		)
 	);
 }
-add_action( 'rest_api_init', 'gutenberg_register_custom_icons' );
+add_action( 'rest_api_init', 'gutenberg_custom_register_custom_icons' );
