@@ -2,19 +2,14 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import {
 	useBlockProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 	RichText,
 } from '@wordpress/block-editor';
 
-export default function Edit( {
-	attributes,
-	setAttributes,
-	context,
-	isSelected,
-} ) {
+export default function Edit( { attributes, setAttributes, context } ) {
 	const { title } = attributes;
 	const {
 		'core/accordion-icon-position': iconPosition,
@@ -23,10 +18,7 @@ export default function Edit( {
 	} = context;
 	const TagName = 'h' + headingLevel;
 
-	const titleRef = useRef();
-
 	// Set icon attributes.
-
 	useEffect( () => {
 		if ( iconPosition !== undefined && showIcon !== undefined ) {
 			setAttributes( {
@@ -36,18 +28,6 @@ export default function Edit( {
 		}
 	}, [ iconPosition, showIcon, setAttributes ] );
 
-	useEffect( () => {
-		if ( isSelected ) {
-			const timeoutId = setTimeout( () => {
-				titleRef.current?.focus();
-			}, 0 );
-
-			return () => {
-				clearTimeout( timeoutId );
-			};
-		}
-	}, [ isSelected ] );
-
 	const blockProps = useBlockProps();
 	const spacingProps = useSpacingProps( attributes );
 
@@ -55,7 +35,7 @@ export default function Edit( {
 		<TagName { ...blockProps }>
 			<button
 				className="wp-block-accordion-heading__toggle"
-				style={ { ...spacingProps.style } }
+				style={ spacingProps.style }
 				tabIndex="-1"
 			>
 				{ showIcon && iconPosition === 'left' && (
@@ -67,7 +47,6 @@ export default function Edit( {
 					</span>
 				) }
 				<RichText
-					ref={ titleRef }
 					withoutInteractiveFormatting
 					disableLineBreaks
 					tagName="span"
