@@ -55,12 +55,31 @@ export const Error: Story = {
 
 export const InsideAnchor: Story = {
 	render: ( args ) => (
-		<a href="#badge-link">
+		<a href="#badge-link" style={ { display: 'flex' } }>
 			View details <Badge { ...args } />
 		</a>
 	),
 	args: {
 		children: 'New',
 		intent: 'info',
+	},
+};
+
+export const InsideDivAnchor: Story = {
+	render: ( args ) => (
+		<div
+			style={ {
+				textDecoration: 'underline',
+				display: 'flex',
+				alignItems: 'center',
+			} }
+		>
+			<span>Some text</span>
+			<Badge { ...args } />
+		</div>
+	),
+	args: {
+		intent: 'info',
+		children: 'A badge',
 	},
 };
