@@ -5,7 +5,7 @@
  * Extends the core class with only one line changes in the column_title method.
  */
 class Custom_WP_Posts_List_Table extends WP_Posts_List_Table {
-	// Avatar colors matching client side code in https://github.com/WordPress/gutenberg/blob/trunk/packages/editor/src/components/collab-sidebar/utils.js#L20-L29
+	// Avatar colors matching client side code in https://github.com/WordPress/gutenberg/blob/41e1fe574ecc5c6719d25f77db3a314825c914c4/packages/editor/src/components/collab-sidebar/utils.js#L20-L29
 	private $avatar_colors = array(
 		'#3858E9', // Blueberry
 		'#9fB1FF', // Blueberry 2
