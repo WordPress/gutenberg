@@ -34,13 +34,15 @@ export default function TermsQueryEdit( props ) {
 	} = termQuery;
 	const {
 		postId,
-		termQuery: queryContext,
+		termQuery: contextTermQuery,
 		taxonomy: contextTaxonomy,
 		termId: termIdContext,
 		templateSlug,
 	} = context;
-	const { taxonomy: queryContextTaxonomy, context: queryContextContext } =
-		queryContext || {};
+	const {
+		taxonomy: contextTermQueryTaxonomy,
+		context: contextTermQueryContext,
+	} = contextTermQuery || {};
 
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
@@ -59,7 +61,7 @@ export default function TermsQueryEdit( props ) {
 
 		// Maybe inherit taxonomy from parent query.
 		let _taxonomy = inherit
-			? contextTaxonomy || queryContextTaxonomy || initialTaxonomy
+			? contextTaxonomy || contextTermQueryTaxonomy || initialTaxonomy
 			: initialTaxonomy || FALLBACK_TAXONOMY;
 
 		// If there is still no taxonomy, see if we can get one from the template.
@@ -80,8 +82,8 @@ export default function TermsQueryEdit( props ) {
 			_taxonomy = FALLBACK_TAXONOMY;
 		}
 
-		let _inheritContext = queryContextContext || '';
-		if ( ! _inheritContext && ! queryContext && inherit ) {
+		let _inheritContext = contextTermQueryContext || '';
+		if ( ! _inheritContext && ! contextTermQuery && inherit ) {
 			if ( postId || isSingular ) {
 				_inheritContext = 'post';
 			} else if (
@@ -99,9 +101,9 @@ export default function TermsQueryEdit( props ) {
 		};
 	}, [
 		contextTaxonomy,
-		queryContext,
-		queryContextContext,
-		queryContextTaxonomy,
+		contextTermQuery,
+		contextTermQueryContext,
+		contextTermQueryTaxonomy,
 		inherit,
 		initialTaxonomy,
 		templateSlug,
@@ -114,7 +116,7 @@ export default function TermsQueryEdit( props ) {
 	 * `providesContext` property so that we can control the value without
 	 * being beholden to the block's attribute value, which could be empty.
 	 */
-	const termQueryContextObject = useMemo( () => {
+	const termcontextTermQueryObject = useMemo( () => {
 		return {
 			termQuery: {
 				...termQuery,
@@ -167,7 +169,7 @@ export default function TermsQueryEdit( props ) {
 	 * either on mount or when the inherit flag changes.
 	 */
 	useEffect( () => {
-		if ( inherit && initialTaxonomy ) {
+		if ( inherit && initialTaxonomy && contextTermQuery ) {
 			__unstableMarkNextChangeAsNotPersistent();
 			const inheritedTermQuery = {
 				...termQuery,
@@ -184,6 +186,7 @@ export default function TermsQueryEdit( props ) {
 		initialTaxonomy,
 		__unstableMarkNextChangeAsNotPersistent,
 		termQuery,
+		contextTermQuery,
 		setAttributes,
 	] );
 
@@ -194,11 +197,11 @@ export default function TermsQueryEdit( props ) {
 				attributes={ {
 					...attributes,
 					// Pass context-derived termQuery for controls to use.
-					termQuery: termQueryContextObject.termQuery,
+					termQuery: termcontextTermQueryObject.termQuery,
 				} }
 				setQuery={ setQuery }
 			/>
-			<BlockContextProvider value={ termQueryContextObject }>
+			<BlockContextProvider value={ termcontextTermQueryObject }>
 				<TagName { ...innerBlocksProps } />
 			</BlockContextProvider>
 		</>
