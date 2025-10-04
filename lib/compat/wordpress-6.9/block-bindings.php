@@ -121,8 +121,9 @@ function gutenberg_get_block_bindings_supported_attributes( $block_type ) {
 	);
 
 	$supported_block_attributes =
-		$block_bindings_supported_attributes_6_8[ $block_type ] ??
-		array();
+		isset( $block_type, $block_bindings_supported_attributes_6_8[ $block_type ] ) ?
+			$block_bindings_supported_attributes_6_8[ $block_type ] :
+			array();
 
 	/**
 	 * Filters the supported block attributes for block bindings.
