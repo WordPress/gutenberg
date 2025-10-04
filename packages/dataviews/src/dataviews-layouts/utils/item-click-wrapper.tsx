@@ -3,6 +3,11 @@
  */
 import type { ReactNode, ReactElement, ComponentProps } from 'react';
 
+/**
+ * WordPress dependencies
+ */
+import { cloneElement } from '@wordpress/element';
+
 function getClickableItemProps< Item >( {
 	item,
 	isItemClickable,
@@ -69,11 +74,24 @@ export function ItemClickWrapper< Item >( {
 
 	// If we have a renderItemLink, use it
 	if ( renderItemLink ) {
-		return renderItemLink( {
+		const renderedElement = renderItemLink( {
 			item,
 			className: `${ className } ${ className }--clickable`,
 			...extraProps,
 			children,
+		} );
+
+		// Clone the element and enhance onClick to stop propagation
+		return cloneElement( renderedElement, {
+			onClick: ( event: React.MouseEvent ) => {
+				// Always stop propagation to prevent selection
+				event.stopPropagation();
+
+				// If consumer provided an onClick, call it
+				if ( renderedElement.props.onClick ) {
+					renderedElement.props.onClick( event );
+				}
+			},
 		} );
 	}
 
