@@ -92,3 +92,48 @@ function gutenberg_auto_draft_get_sample_permalink( $permalink, $id, $title, $na
 	return $permalink;
 }
 add_filter( 'get_sample_permalink', 'gutenberg_auto_draft_get_sample_permalink', 10, 5 );
+/**
+ * Registers the Icons REST API routes.
+ */
+function gutenberg_register_icons_controller() {
+	$icons_controller = new WP_REST_Icons_Controller();
+	$icons_controller->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_icons_controller' );
+
+/**
+ * Loads all SVG icons from the icons package and registers them with WP_Icons_Registry.
+ */
+function gutenberg_load_icons_from_package() {
+	if ( ! class_exists( 'WP_Icons_Registry' ) ) {
+		return;
+	}
+	$icons_directory = __DIR__ . '/../../packages/icons/src/library/';
+
+	if ( ! is_dir( $icons_directory ) ) {
+		return;
+	}
+
+	$svg_files = glob( $icons_directory . '*.svg' );
+	$registry  = WP_Icons_Registry::get_instance();
+
+	foreach ( $svg_files as $svg_file ) {
+		$icon_name   = basename( $svg_file, '.svg' );
+		$svg_content = file_get_contents( $svg_file );
+
+		if ( false === $svg_content ) {
+			continue;
+		}
+
+		$title = ucwords( str_replace( array( '-', '_' ), ' ', $icon_name ) );
+
+		$registry->register(
+			$icon_name,
+			array(
+				'title'   => $title,
+				'content' => $svg_content,
+			)
+		);
+	}
+}
+add_action( 'rest_api_init', 'gutenberg_load_icons_from_package' );

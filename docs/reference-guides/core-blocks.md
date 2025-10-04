@@ -431,6 +431,12 @@ Add custom HTML code and preview it as you edit. ([Source](https://github.com/Wo
 -	**Supports:** interactivity (clientNavigation), ~~className~~, ~~customClassName~~, ~~html~~
 -	**Attributes:** content
 
+## Icon
+
+undefined ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/icon))
+
+-	**Name:** core/icon
+
 ## Image
 
 Insert an image to make a visual statement. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/image))

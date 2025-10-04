@@ -68,6 +68,7 @@ import * as group from './group';
 import * as heading from './heading';
 import * as homeLink from './home-link';
 import * as html from './html';
+import * as icon from './icon';
 import * as image from './image';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
@@ -176,6 +177,7 @@ const getAllBlocks = () => {
 		file,
 		group,
 		html,
+		icon,
 		latestComments,
 		latestPosts,
 		mediaText,

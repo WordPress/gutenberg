@@ -201,6 +201,15 @@ export const rootEntitiesConfig = [
 		plural: 'statuses',
 		key: 'slug',
 	},
+	{
+		name: 'icon',
+		kind: 'root',
+		baseURL: '/wp/v2/icons',
+		baseURLParams: { context: 'edit' },
+		plural: 'icons',
+		label: __( 'Icons' ),
+		key: 'name',
+	},
 ];
 
 export const deprecatedEntities = {
