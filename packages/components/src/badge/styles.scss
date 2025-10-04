@@ -14,14 +14,14 @@ $badge-colors: (
 
 	background-color: color-mix(in srgb, $white 90%, var(--base-color));
 	color: color-mix(in srgb, $black 50%, var(--base-color));
-	padding: 0 $grid-unit-10;
+	padding: $grid-unit-05 $grid-unit-10 0 $grid-unit-10;
 	min-height: $grid-unit-30;
 	max-width: 100%;
 	border-radius: $radius-small;
 	font-size: $font-size-small;
 	font-weight: 400;
-	line-height: $font-line-height-small;
-	display: inline-flex;
+	line-height: $font-line-height-small - $grid-unit-05;
+	display: inline-block;
 	align-items: center;
 	gap: 2px;
 
@@ -50,4 +50,5 @@ $badge-colors: (
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
+	display: inline-block;
 }

@@ -52,3 +52,15 @@ export const Error: Story = {
 		intent: 'error',
 	},
 };
+
+export const InsideAnchor: Story = {
+	render: ( args ) => (
+		<a href="#badge-link">
+			View details <Badge { ...args } />
+		</a>
+	),
+	args: {
+		children: 'New',
+		intent: 'info',
+	},
+};
