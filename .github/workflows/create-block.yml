@@ -1,7 +1,6 @@
 name: Create Block
 
 on:
-    pull_request:
     push:
         branches: [trunk, wp/latest]
 

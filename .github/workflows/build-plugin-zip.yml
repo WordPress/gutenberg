@@ -1,7 +1,6 @@
 name: Build Gutenberg Plugin Zip
 
 on:
-    pull_request:
     push:
         branches:
             - trunk
