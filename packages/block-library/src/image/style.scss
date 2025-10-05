@@ -208,6 +208,7 @@
 	cursor: zoom-out;
 
 	.wp-lightbox-close-button {
+		font-family: inherit;
 		position: absolute;
 		top: calc(env(safe-area-inset-top) + 16px); // equivalent to $grid-unit-20
 		right: calc(env(safe-area-inset-right) + 16px); // equivalent to $grid-unit-20
@@ -217,7 +218,7 @@
 		min-width: 40px; // equivalent to $button-size-next-default-40px
 		min-height: 40px; // equivalent to $button-size-next-default-40px
 		display: flex;
-		gap: 4px;
+		gap: 8px;
 		align-items: center;
 		justify-content: center;
 
@@ -266,6 +267,7 @@
 	}
 
 	.wp-lightbox-navigation-button {
+		font-family: inherit;
 		min-width: 40px; // equivalent to $button-size-next-default-40px
 		min-height: 40px; // equivalent to $button-size-next-default-40px;
 		gap: 4px;
