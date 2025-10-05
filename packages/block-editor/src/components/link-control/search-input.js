@@ -44,7 +44,6 @@ const LinkControlSearchInput = forwardRef(
 			createSuggestionButtonText,
 			hideLabelFromVision = false,
 			suffix,
-			isEntity = false,
 		},
 		ref
 	) => {
@@ -153,9 +152,8 @@ const LinkControlSearchInput = forwardRef(
 							);
 						}
 					} }
-					inputRef={ ref }
+					ref={ ref }
 					suffix={ suffix }
-					disabled={ isEntity }
 				/>
 				{ children }
 			</div>

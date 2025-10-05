@@ -52,7 +52,7 @@ class URLInput extends Component {
 		this.handleOnClick = this.handleOnClick.bind( this );
 		this.bindSuggestionNode = this.bindSuggestionNode.bind( this );
 		this.autocompleteRef = props.autocompleteRef || createRef();
-		this.inputRef = props.inputRef || createRef();
+		this.inputRef = createRef();
 		this.updateSuggestions = debounce(
 			this.updateSuggestions.bind( this ),
 			200
@@ -424,8 +424,6 @@ class URLInput extends Component {
 			__experimentalRenderControl: renderControl,
 			value = '',
 			hideLabelFromVision = false,
-			help = null,
-			disabled = false,
 		} = this.props;
 
 		const {
@@ -452,10 +450,10 @@ class URLInput extends Component {
 			value,
 			required: true,
 			type: 'text',
-			onChange: disabled ? () => {} : this.onChange, // Disable onChange when disabled
-			onFocus: disabled ? () => {} : this.onFocus, // Disable onFocus when disabled
+			onChange: this.onChange,
+			onFocus: this.onFocus,
 			placeholder,
-			onKeyDown: disabled ? () => {} : this.onKeyDown, // Disable onKeyDown when disabled
+			onKeyDown: this.onKeyDown,
 			role: 'combobox',
 			'aria-label': label ? undefined : __( 'URL' ), // Ensure input always has an accessible label
 			'aria-expanded': showSuggestions,
@@ -466,9 +464,7 @@ class URLInput extends Component {
 					? `${ suggestionOptionIdPrefix }-${ selectedSuggestion }`
 					: undefined,
 			ref: this.inputRef,
-			disabled,
 			suffix: this.props.suffix,
-			help,
 		};
 
 		if ( renderControl ) {
