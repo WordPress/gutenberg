@@ -14,9 +14,11 @@ import {
 import {
 	__experimentalTreeGridCell as TreeGridCell,
 	__experimentalTreeGridItem as TreeGridItem,
+	Icon,
+	Tooltip,
 } from '@wordpress/components';
 import { useInstanceId, useDebounce } from '@wordpress/compose';
-import { moreVertical } from '@wordpress/icons';
+import { moreVertical, lock as lockIcon } from '@wordpress/icons';
 import {
 	useCallback,
 	useMemo,
@@ -25,7 +27,7 @@ import {
 	memo,
 } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
@@ -81,6 +83,34 @@ function ListViewBlock( {
 
 	const { isLocked, canEdit, canMove } = useBlockLock( clientId );
 
+	// Defensive check for contentOnly state. Some codepaths store this on attributes,
+	// some expose it as a property or a selector. Try common options so this works
+	// across versions.
+	const isContentOnly = useSelect(
+		( select ) => {
+			const blockObj = select( blockEditorStore ).getBlock( clientId );
+			if ( blockObj ) {
+				if ( !! blockObj.attributes?.contentOnly ) {
+					return true;
+				}
+				if ( !! blockObj.isContentOnly ) {
+					return true;
+				}
+			}
+			// Some stores might expose a selector like isBlockContentOnly.
+			if ( typeof select.isBlockContentOnly === 'function' ) {
+				try {
+					return !! select.isBlockContentOnly( clientId );
+				} catch ( e ) {
+					// ignore selector errors and fallback to attribute checks.
+					return false;
+				}
+			}
+			return false;
+		},
+		[ clientId ]
+	);
+
 	const isFirstSelectedBlock =
 		isSelected && selectedClientIds[ 0 ] === clientId;
 	const isLastSelectedBlock =
@@ -116,6 +146,7 @@ function ListViewBlock( {
 	const { getGroupingBlockName } = useSelect( blocksStore );
 
 	const blockInformation = useBlockDisplayInformation( clientId );
+	const blockLabel = blockInformation?.title || blockName;
 
 	const pasteStyles = usePasteStyles();
 
@@ -308,7 +339,6 @@ function ListViewBlock( {
 			updateFocusAndSelection( newlySelectedBlocks[ 0 ], false );
 		} else if ( isMatch( 'core/block-editor/select-all', event ) ) {
 			event.preventDefault();
-
 			const { firstBlockRootClientId, selectedBlockClientIds } =
 				getBlocksToUpdate();
 			const blockClientIds = getBlockOrder( firstBlockRootClientId );
@@ -322,7 +352,7 @@ function ListViewBlock( {
 			// as the array of siblings of the currently focused block may be a different
 			// set of blocks from the current block selection if the user is focused
 			// on a different part of the list view from the block selection.
-			if ( isShallowEqual( selectedBlockClientIds, blockClientIds ) ) {
+			if ( isShallowEqual( selectedClientIds, blockClientIds ) ) {
 				// Only select up a level if the first block is not the root block.
 				// This ensures that the block selection can't break out of the root block
 				// used by the list view, if the list view is only showing a partial hierarchy.
@@ -521,7 +551,7 @@ function ListViewBlock( {
 		'is-dragging': isDragged,
 		'has-single-cell': ! showBlockActions,
 		'is-synced': blockInformation?.isSynced,
-		'is-draggable': canMove,
+		'is-draggable': canMove && ! isContentOnly && ! isLocked,
 		'is-displacement-normal': displacement === 'normal',
 		'is-displacement-up': displacement === 'up',
 		'is-displacement-down': displacement === 'down',
@@ -586,6 +616,11 @@ function ListViewBlock( {
 							selectedClientIds={ selectedClientIds }
 							ariaDescribedBy={ descriptionId }
 						/>
+						{ isContentOnly && (
+							<span className="block-editor-list-view-block__badge">
+								{ __( 'Content only' ) }
+							</span>
+						) }
 						<AriaReferencedText id={ descriptionId }>
 							{ [
 								blockPositionDescription,
@@ -605,26 +640,122 @@ function ListViewBlock( {
 						withoutGridItem
 					>
 						<TreeGridItem>
-							{ ( { ref, tabIndex, onFocus } ) => (
-								<BlockMoverUpButton
-									orientation="vertical"
-									clientIds={ [ clientId ] }
-									ref={ ref }
-									tabIndex={ tabIndex }
-									onFocus={ onFocus }
-								/>
-							) }
+							{ ( { ref, tabIndex, onFocus } ) =>
+								canMove && ! isContentOnly && ! isLocked ? (
+									<BlockMoverUpButton
+										orientation="vertical"
+										clientIds={ [ clientId ] }
+										ref={ ref }
+										tabIndex={ tabIndex }
+										onFocus={ onFocus }
+									/>
+								) : (
+									<Tooltip
+										text={
+											isLocked
+												? sprintf(
+														__( '%s — locked' ),
+														blockLabel
+												  )
+												: isContentOnly
+												? sprintf(
+														__(
+															'%s — content only (cannot be moved)'
+														),
+														blockLabel
+												  )
+												: sprintf(
+														__(
+															'%s — dragging disabled'
+														),
+														blockLabel
+												  )
+										}
+									>
+										<span
+											className="block-editor-list-view-block__mover-disabled"
+											role="img"
+											aria-label={
+												isLocked
+													? sprintf(
+															__( '%s — locked' ),
+															blockLabel
+													  )
+													: sprintf(
+															__(
+																'%s — cannot be moved'
+															),
+															blockLabel
+													  )
+											}
+											ref={ ref }
+											tabIndex={ tabIndex }
+											onFocus={ onFocus }
+										>
+											<Icon icon={ lockIcon } />
+										</span>
+									</Tooltip>
+								)
+							}
 						</TreeGridItem>
 						<TreeGridItem>
-							{ ( { ref, tabIndex, onFocus } ) => (
-								<BlockMoverDownButton
-									orientation="vertical"
-									clientIds={ [ clientId ] }
-									ref={ ref }
-									tabIndex={ tabIndex }
-									onFocus={ onFocus }
-								/>
-							) }
+							{ ( { ref, tabIndex, onFocus } ) =>
+								canMove && ! isContentOnly && ! isLocked ? (
+									<BlockMoverDownButton
+										orientation="vertical"
+										clientIds={ [ clientId ] }
+										ref={ ref }
+										tabIndex={ tabIndex }
+										onFocus={ onFocus }
+									/>
+								) : (
+									<Tooltip
+										text={
+											isLocked
+												? sprintf(
+														__( '%s — locked' ),
+														blockLabel
+												  )
+												: isContentOnly
+												? sprintf(
+														__(
+															'%s — content only (cannot be moved)'
+														),
+														blockLabel
+												  )
+												: sprintf(
+														__(
+															'%s — dragging disabled'
+														),
+														blockLabel
+												  )
+										}
+									>
+										<span
+											className="block-editor-list-view-block__mover-disabled"
+											role="img"
+											aria-label={
+												isLocked
+													? sprintf(
+															__( '%s — locked' ),
+															blockLabel
+													  )
+													: sprintf(
+															__(
+																'%s — cannot be moved'
+															),
+															blockLabel
+													  )
+											}
+											ref={ ref }
+											tabIndex={ tabIndex }
+											onFocus={ onFocus }
+										>
+											<Icon icon={ lockIcon } />
+										</span>
+									</Tooltip>
+								)
+							}
 						</TreeGridItem>
 					</TreeGridCell>
 				</>

@@ -1,3 +1,30 @@
+.block-editor-list-view-block__badge {
+	font-size: 11px;
+	color: var(--wp-admin-theme-color, #555);
+	background: transparent;
+	border: 1px solid rgba(0, 0, 0, 0.06);
+	border-radius: 4px;
+	padding: 2px 6px;
+	margin-left: 8px;
+	vertical-align: middle;
+}
+
+.block-editor-list-view-block__mover-disabled {
+	opacity: 0.45;
+	cursor: not-allowed;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
+	border-radius: 2px;
+}
+
+.block-editor-list-view-block__mover-disabled svg {
+	width: 14px;
+	height: 14px;
+}
+
 .block-editor-list-view-tree {
 	width: 100%;
 	border-collapse: collapse;
@@ -32,6 +59,7 @@
 	}
 
 	.block-editor-list-view-block-select-button {
+
 		// When a row is expanded, retain the dark color.
 		&[aria-expanded="true"] {
 			color: inherit;
@@ -44,6 +72,7 @@
 
 		svg {
 			fill: currentColor;
+
 			// Optimize for high contrast modes.
 			// See also https://blogs.windows.com/msedgedev/2020/09/17/styling-for-windows-high-contrast-with-new-standards-for-forced-colors/.
 			@media (forced-colors: active) {
@@ -53,6 +82,7 @@
 	}
 
 	&:not(.is-selected) .block-editor-list-view-block-select-button {
+
 		// While components are being dragged, ensure that hover styles are not applied.
 		// This resolves a bug where while dragging, the hover styles would be applied to
 		// the wrong list item while scrolling long lists, particularly in Chrome.
@@ -67,10 +97,13 @@
 	&.is-selected td {
 		background: var(--wp-admin-theme-color);
 	}
+
 	&.is-selected.is-synced td {
 		background: var(--wp-block-synced-color);
 	}
+
 	&.is-synced:not(.is-selected) .block-editor-list-view-block-contents {
+
 		&:hover,
 		&:focus,
 		.block-editor-block-icon {
@@ -81,26 +114,28 @@
 			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-block-synced-color);
 		}
 	}
+
 	&.is-selected .block-editor-list-view-block-contents,
 	&.is-selected .components-button.has-icon {
 		color: $white;
 	}
+
 	&.is-selected .block-editor-list-view-block-contents:focus {
 		&::after {
 			box-shadow:
 				inset 0 0 0 1px $white,
-				0 0 0 var(--wp-admin-border-width-focus)
-				var(--wp-admin-theme-color);
+				0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		}
 	}
+
 	&.is-selected.is-synced .block-editor-list-view-block-contents:focus {
 		&::after {
 			box-shadow:
 				inset 0 0 0 1px $white,
-				0 0 0 var(--wp-admin-border-width-focus)
-				var(--wp-block-synced-color);
+				0 0 0 var(--wp-admin-border-width-focus) var(--wp-block-synced-color);
 		}
 	}
+
 	&.is-selected .block-editor-list-view-block__menu:focus {
 		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $white;
 	}
@@ -109,41 +144,53 @@
 	&.is-first-selected td:first-child {
 		border-top-left-radius: $radius-small;
 	}
+
 	&.is-first-selected td:last-child {
 		border-top-right-radius: $radius-small;
 	}
+
 	&.is-last-selected td:first-child {
 		border-bottom-left-radius: $radius-small;
 	}
+
 	&.is-last-selected td:last-child {
 		border-bottom-right-radius: $radius-small;
 	}
+
 	&.is-branch-selected:not(.is-selected):not(.is-synced-branch) {
 		background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
 	}
+
 	&.is-synced-branch.is-branch-selected {
 		background: rgba(var(--wp-block-synced-color--rgb), 0.04);
 	}
+
 	&.is-branch-selected.is-first-selected td:first-child {
 		border-top-left-radius: $radius-small;
 	}
+
 	&.is-branch-selected.is-first-selected td:last-child {
 		border-top-right-radius: $radius-small;
 	}
+
 	&[data-expanded="false"] {
 		&.is-branch-selected.is-first-selected td:first-child {
 			border-top-left-radius: $radius-small;
 		}
+
 		&.is-branch-selected.is-first-selected td:last-child {
 			border-top-right-radius: $radius-small;
 		}
+
 		&.is-branch-selected.is-last-selected td:first-child {
 			border-bottom-left-radius: $radius-small;
 		}
+
 		&.is-branch-selected.is-last-selected td:last-child {
 			border-bottom-right-radius: $radius-small;
 		}
 	}
+
 	&.is-branch-selected:not(.is-selected) td {
 		border-radius: 0;
 	}
@@ -155,25 +202,28 @@
 	// without attaching the transition to the list view leaf itself. This prevents rows
 	// from animating too much once the user has dropped the block.
 	&.is-displacement-normal {
-		@media not ( prefers-reduced-motion ) {
+		@media not (prefers-reduced-motion) {
 			transition: transform 0.2s;
 		}
+
 		transform: translateY(0);
 
 	}
 
 	&.is-displacement-up {
-		@media not ( prefers-reduced-motion ) {
+		@media not (prefers-reduced-motion) {
 			transition: transform 0.2s;
 		}
+
 		transform: translateY(-32px);
 
 	}
 
 	&.is-displacement-down {
-		@media not ( prefers-reduced-motion ) {
+		@media not (prefers-reduced-motion) {
 			transition: transform 0.2s;
 		}
+
 		transform: translateY(32px);
 
 	}
@@ -184,28 +234,29 @@
 	// worth of space for the visual indicator of where a block will be placed when dropped.
 	&.is-after-dragged-blocks {
 
-		@media not ( prefers-reduced-motion ) {
+		@media not (prefers-reduced-motion) {
 			transition: transform 0.2s;
 		}
+
 		transform: translateY(calc(var(--wp-admin--list-view-dragged-items-height, 32px) * -1));
 
 	}
 
 	&.is-after-dragged-blocks.is-displacement-up {
-		@media not ( prefers-reduced-motion ) {
+		@media not (prefers-reduced-motion) {
 			transition: transform 0.2s;
 		}
+
 		transform: translateY(calc(-32px + var(--wp-admin--list-view-dragged-items-height, 32px) * -1));
 
 	}
 
 	&.is-after-dragged-blocks.is-displacement-down {
-		@media not ( prefers-reduced-motion ) {
+		@media not (prefers-reduced-motion) {
 			transition: transform 0.2s;
 		}
-		transform:
-			translateY(calc(32px + var(--wp-admin--list-view-dragged-items-height, 32px) *
-			-1));
+
+		transform: translateY(calc(32px + var(--wp-admin--list-view-dragged-items-height, 32px) * -1));
 
 	}
 
@@ -231,7 +282,8 @@
 		align-items: center;
 		width: 100%;
 		height: $grid-unit-40;
-		padding: ($grid-unit-15 * 0.5) $grid-unit-05 ($grid-unit-15 * 0.5) 0;
+		padding: ($grid-unit-15 * 0.5) $grid-unit-05 (
+			$grid-unit-15 * 0.5) 0;
 		text-align: left;
 		position: relative;
 		white-space: nowrap;
@@ -243,7 +295,8 @@
 		font-weight: 400;
 		margin: 0;
 		text-decoration: none;
-		@media not ( prefers-reduced-motion ) {
+
+		@media not (prefers-reduced-motion) {
 			transition: box-shadow 0.1s linear;
 		}
 
@@ -261,187 +314,188 @@
 			content: "";
 			position: absolute;
 			top: 0;
-			right: -(24px + 5px); // Icon size + padding.
-			bottom: 0;
-			left: 0;
-			border-radius: inherit;
-			box-shadow:
-				inset 0 0 0 var(--wp-admin-border-width-focus)
-				var(--wp-admin-theme-color);
-			z-index: 2;
-			pointer-events: none;
-		}
-	}
-
-	// Fix focus styling width when one row has fewer cells.
-	&.has-single-cell .block-editor-list-view-block-contents:focus::after {
-		right: 0;
-	}
-
-	&.is-nesting .block-editor-list-view__menu,
-	.block-editor-list-view-block__menu:focus {
+			right: -(24px + 5px
+			); // Icon size + padding.
+		bottom: 0;
+		left: 0;
+		border-radius: inherit;
 		box-shadow:
-			inset 0 0 0 var(--wp-admin-border-width-focus)
-			var(--wp-admin-theme-color);
-		z-index: 1;
+			inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		z-index: 2;
+		pointer-events: none;
+	}
+}
+
+// Fix focus styling width when one row has fewer cells.
+&.has-single-cell .block-editor-list-view-block-contents:focus::after {
+	right: 0;
+}
+
+&.is-nesting .block-editor-list-view__menu,
+.block-editor-list-view-block__menu:focus {
+	box-shadow:
+		inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+	z-index: 1;
+}
+
+&.is-visible .block-editor-list-view-block-contents {
+	opacity: 1;
+	@include animation__fade-in;
+}
+
+.block-editor-block-icon {
+	margin-right: $grid-unit-10 * 0.5; // 6px.
+	flex: 0 0 $icon-size;
+}
+
+.block-editor-list-view-block__menu-cell,
+.block-editor-list-view-block__mover-cell,
+.block-editor-list-view-block__contents-cell {
+	padding: 0;
+}
+
+.block-editor-list-view-block__menu-cell,
+.block-editor-list-view-block__mover-cell {
+	line-height: 0;
+	width: $button-size-small + $grid-unit-05;
+	vertical-align: middle;
+
+	>* {
+		opacity: 0;
 	}
 
-	&.is-visible .block-editor-list-view-block-contents {
-		opacity: 1;
-		@include animation__fade-in;
-	}
-
-	.block-editor-block-icon {
-		margin-right: $grid-unit-10 * 0.5; // 6px.
-		flex: 0 0 $icon-size;
-	}
-
-	.block-editor-list-view-block__menu-cell,
-	.block-editor-list-view-block__mover-cell,
-	.block-editor-list-view-block__contents-cell {
-		padding: 0;
-	}
-
-	.block-editor-list-view-block__menu-cell,
-	.block-editor-list-view-block__mover-cell {
-		line-height: 0;
-		width: $button-size-small + $grid-unit-05;
-		vertical-align: middle;
-
-		> * {
-			opacity: 0;
+	// Show on hover, visible, when focused, and show above to keep the hit area size.
+	&:hover,
+	&:focus-within,
+	&.is-visible {
+		>* {
+			opacity: 1;
 		}
-
-		// Show on hover, visible, when focused, and show above to keep the hit area size.
-		&:hover,
-		&:focus-within,
-		&.is-visible {
-			> * {
-				opacity: 1;
-			}
-		}
 	}
+}
 
-	.block-editor-list-view-block__mover-cell-alignment-wrapper {
-		display: flex;
-		height: 100%;
-		flex-direction: column;
-		align-items: center;
-	}
+.block-editor-list-view-block__mover-cell-alignment-wrapper {
+	display: flex;
+	height: 100%;
+	flex-direction: column;
+	align-items: center;
+}
 
-	// Keep the tap target large but the focus target small.
-	.block-editor-block-mover-button {
+// Keep the tap target large but the focus target small.
+.block-editor-block-mover-button {
+	position: relative;
+	width: $button-size;
+	height: $button-size-small;
+
+	// Position the icon.
+	svg {
 		position: relative;
-		width: $button-size;
 		height: $button-size-small;
+	}
 
-		// Position the icon.
+	&.is-up-button {
+		margin-top: -$grid-unit-15 * 0.5;
+		align-items: flex-end;
+
 		svg {
-			position: relative;
-			height: $button-size-small;
-		}
-
-		&.is-up-button {
-			margin-top: -$grid-unit-15 * 0.5;
-			align-items: flex-end;
-			svg {
-				bottom: -$grid-unit-05;
-			}
-		}
-
-		&.is-down-button {
-			margin-bottom: -$grid-unit-15 * 0.5;
-			align-items: flex-start;
-			svg {
-				top: -$grid-unit-05;
-			}
-		}
-
-		// Tweak size and position of focus ring.
-		&::before {
-			height: 16px;
-			min-width: 100%;
-			left: 0;
-			right: 0;
+			bottom: -$grid-unit-05;
 		}
 	}
 
-	.block-editor-inserter__toggle {
-		background: $gray-900;
-		color: $white;
-		height: $grid-unit-30;
-		margin: 6px 6px 6px 1px;
-		min-width: $grid-unit-30;
+	&.is-down-button {
+		margin-bottom: -$grid-unit-15 * 0.5;
+		align-items: flex-start;
 
-		&:active {
-			color: $white;
+		svg {
+			top: -$grid-unit-05;
 		}
 	}
 
-	// Style lock and position icons in line with image previews.
-	.block-editor-list-view-block-select-button__label-wrapper svg {
-		left: $grid-unit-05 * 0.5; // 2px.
-		position: relative;
-	}
-
-	.block-editor-list-view-block-select-button__title {
-		flex: 1;
-		position: relative;
-
-		.components-truncate {
-			position: absolute;
-			width: 100%;
-			transform: translateY(-50%);
-		}
-	}
-
-	.block-editor-list-view-block-select-button__anchor-wrapper {
-		position: relative;
-		max-width: min(110px, 40%);
-		width: 100%;
-	}
-
-	.block-editor-list-view-block-select-button__anchor {
-		position: absolute;
+	// Tweak size and position of focus ring.
+	&::before {
+		height: 16px;
+		min-width: 100%;
+		left: 0;
 		right: 0;
+	}
+}
+
+.block-editor-inserter__toggle {
+	background: $gray-900;
+	color: $white;
+	height: $grid-unit-30;
+	margin: 6px 6px 6px 1px;
+	min-width: $grid-unit-30;
+
+	&:active {
+		color: $white;
+	}
+}
+
+// Style lock and position icons in line with image previews.
+.block-editor-list-view-block-select-button__label-wrapper svg {
+	left: $grid-unit-05 * 0.5; // 2px.
+	position: relative;
+}
+
+.block-editor-list-view-block-select-button__title {
+	flex: 1;
+	position: relative;
+
+	.components-truncate {
+		position: absolute;
+		width: 100%;
 		transform: translateY(-50%);
 	}
+}
 
-	&.is-selected .block-editor-list-view-block-select-button__anchor {
-		background: rgba($black, 0.3);
-		color: $white;
+.block-editor-list-view-block-select-button__anchor-wrapper {
+	position: relative;
+	max-width: min(110px, 40%);
+	width: 100%;
+}
+
+.block-editor-list-view-block-select-button__anchor {
+	position: absolute;
+	right: 0;
+	transform: translateY(-50%);
+}
+
+&.is-selected .block-editor-list-view-block-select-button__anchor {
+	background: rgba($black, 0.3);
+	color: $white;
+}
+
+.block-editor-list-view-block-select-button__block-visibility,
+.block-editor-list-view-block-select-button__lock,
+.block-editor-list-view-block-select-button__sticky {
+	line-height: 0;
+}
+
+.block-editor-list-view-block-select-button__images {
+	display: flex;
+}
+
+.block-editor-list-view-block-select-button__image {
+	background-size: cover;
+	width: 18px;
+	height: 18px;
+	border-radius: $radius-x-small;
+
+	&:not(:only-child) {
+		box-shadow: 0 0 0 $radius-small $white;
 	}
 
-	.block-editor-list-view-block-select-button__block-visibility,
-	.block-editor-list-view-block-select-button__lock,
-	.block-editor-list-view-block-select-button__sticky {
-		line-height: 0;
+	&:not(:first-child) {
+		margin-left: #{$grid-unit-15 * -0.5};
 	}
+}
 
-	.block-editor-list-view-block-select-button__images {
-		display: flex;
+&.is-selected .block-editor-list-view-block-select-button__image {
+	&:not(:only-child) {
+		box-shadow: 0 0 0 $radius-small var(--wp-admin-theme-color);
 	}
-
-	.block-editor-list-view-block-select-button__image {
-		background-size: cover;
-		width: 18px;
-		height: 18px;
-		border-radius: $radius-x-small;
-
-		&:not(:only-child) {
-			box-shadow: 0 0 0 $radius-small $white;
-		}
-
-		&:not(:first-child) {
-			margin-left: #{$grid-unit-15 * -0.5};
-		}
-	}
-
-	&.is-selected .block-editor-list-view-block-select-button__image {
-		&:not(:only-child) {
-			box-shadow: 0 0 0 $radius-small var(--wp-admin-theme-color);
-		}
-	}
+}
 }
 
 // First level of indentation is aria-level 2, max indent is 8.
@@ -454,6 +508,7 @@ $block-navigation-max-indent: 8;
 
 .block-editor-list-view-block__contents-cell,
 .block-editor-list-view-appender__cell {
+
 	.block-editor-list-view-block__contents-container,
 	.block-editor-list-view-appender__container {
 		display: flex;
@@ -475,11 +530,12 @@ $block-navigation-max-indent: 8;
 // indentation in `use-list-view-drop-zone.js` must be updated as well
 // to ensure the drop zone is aligned with the indentation.
 @for $i from 0 to $block-navigation-max-indent {
-	.block-editor-list-view-leaf[aria-level="#{ $i + 1 }"]
-	.block-editor-list-view__expander {
-		@if $i - 1 >= 0 {
+	.block-editor-list-view-leaf[aria-level="#{ $i + 1 }"] .block-editor-list-view__expander {
+		@if $i - 1>=0 {
 			margin-left: ($grid-unit-30 * $i); // Effectively centers the expander below the parent's icon.
-		} @else {
+		}
+
+		@else {
 			margin-left: 0;
 		}
 	}
@@ -490,23 +546,22 @@ $block-navigation-max-indent: 8;
 }
 
 // Point downwards when open.
-.block-editor-list-view-leaf[data-expanded="true"]
-.block-editor-list-view__expander
-svg {
+.block-editor-list-view-leaf[data-expanded="true"] .block-editor-list-view__expander svg {
 	visibility: visible;
-	@media not ( prefers-reduced-motion ) {
+
+	@media not (prefers-reduced-motion) {
 		transition: transform 0.2s ease;
 	}
+
 	transform: rotate(90deg);
 }
 
 // Point rightwards when closed
-.block-editor-list-view-leaf[data-expanded="false"]
-.block-editor-list-view__expander
-svg {
+.block-editor-list-view-leaf[data-expanded="false"] .block-editor-list-view__expander svg {
 	visibility: visible;
 	transform: rotate(0deg);
-	@media not ( prefers-reduced-motion ) {
+
+	@media not (prefers-reduced-motion) {
 		transition: transform 0.2s ease;
 	}
 }
