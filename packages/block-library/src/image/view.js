@@ -43,14 +43,22 @@ const { state, actions, callbacks } = store(
 			selectedImageId: null,
 			selectedGalleryId: null,
 			get galleryImages() {
-				return state.selectedGalleryId
-					? Object.entries( state.metadata )
-							.filter(
-								( [ , value ] ) =>
-									value.galleryId === state.selectedGalleryId
-							)
-							.map( ( [ key ] ) => key )
-					: [ state.selectedImageId ];
+				if ( ! state.selectedGalleryId ) {
+					return [ state.selectedImageId ];
+				}
+
+				// Get all images in this gallery and sort by galleryOrder
+				return Object.entries( state.metadata )
+					.filter(
+						( [ , value ] ) =>
+							value.galleryId === state.selectedGalleryId
+					)
+					.sort( ( [ , a ], [ , b ] ) => {
+						const orderA = a.order ?? 0;
+						const orderB = b.order ?? 0;
+						return orderA - orderB;
+					} )
+					.map( ( [ key ] ) => key );
 			},
 			get selectedImageIndex() {
 				return state.galleryImages.findIndex(

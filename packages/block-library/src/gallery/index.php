@@ -150,6 +150,11 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 		}
 	}
 
+	// Randomize image IDs when `randomOrder` setting is enabled
+	if ( ! empty( $attributes['randomOrder'] ) && ! empty( $image_ids ) ) {
+		shuffle( $image_ids );
+	}
+
 	$processed_content->set_attribute( 'data-wp-interactive', 'core/gallery' );
 	$processed_content->set_attribute(
 		'data-wp-context',
@@ -177,6 +182,8 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 									: sprintf( __( 'Enlarged image %1$s of %2$s: %3$s' ), $i + 1, count( $image_ids ), $alt ),
 								/* translators: %1$s: current image index, %2$s: total number of images */
 								'triggerButtonAriaLabel' => sprintf( __( 'Enlarge %1$s of %2$s' ), $i + 1, count( $image_ids ) ),
+								// This metadata is used to store the order of the images in the gallery.
+								'order'                  => $i,
 							),
 						),
 					)
@@ -215,13 +222,22 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 	}
 	$image_blocks = $matches[0];
 
-	// Randomize the order of Image blocks.
-	shuffle( $image_blocks );
+	// Reorder image blocks according to the randomized `$image_ids` order
+	$reordered_blocks = array();
+	foreach ( $image_ids as $image_id ) {
+		foreach ( $image_blocks as $block ) {
+			if ( strpos( $block, $image_id ) !== false ) {
+				$reordered_blocks[] = $block;
+				break;
+			}
+		}
+	}
+
 	$i       = 0;
 	$content = preg_replace_callback(
 		$pattern,
-		static function () use ( $image_blocks, &$i ) {
-			$new_image_block = $image_blocks[ $i ];
+		static function () use ( $reordered_blocks, &$i ) {
+			$new_image_block = $reordered_blocks[ $i ];
 			++$i;
 			return $new_image_block;
 		},
