@@ -129,10 +129,10 @@ function Thread( {
 		debouncedToggleBlockHighlight( thread.blockClientId, false );
 	};
 
-	const handleCommentSelect = ( { blockClientId } ) => {
+	const handleCommentSelect = () => {
 		setShowCommentBoard( false );
 		setSelectedThread( thread.id );
-		selectBlock( blockClientId, null );
+		selectBlock( thread.blockClientId, null );
 	};
 
 	const focusThread = () => {
@@ -175,7 +175,7 @@ function Thread( {
 			} ) }
 			id={ `thread-${ thread.id }` }
 			spacing="2"
-			onClick={ () => handleCommentSelect( thread ) }
+			onClick={ handleCommentSelect }
 			onMouseEnter={ onMouseEnter }
 			onMouseLeave={ onMouseLeave }
 			onFocus={ onMouseEnter }
@@ -189,7 +189,7 @@ function Thread( {
 					if ( isSelected ) {
 						unselectThread();
 					} else {
-						handleCommentSelect( thread );
+						handleCommentSelect();
 					}
 				}
 				// Collapse thread and focus the thread.
