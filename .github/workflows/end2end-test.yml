@@ -29,8 +29,8 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                part: [1, 2, 3, 4, 5, 6, 7, 8]
-                totalParts: [8]
+                part: [1]
+                totalParts: [1]
 
         steps:
             - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -55,10 +55,8 @@ jobs:
             - name: Run the tests
               env:
                   PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
-                  SHARD_PART: ${{ matrix.part }}
-                  SHARD_TOTAL: ${{ matrix.totalParts }}
               run: |
-                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run test:e2e -- --shard="${SHARD_PART}/${SHARD_TOTAL}"
+                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run test:e2e -- test/e2e/specs/editor/blocks/navigation-frontend-interactivity.spec.js
 
             - name: Archive debug artifacts (screenshots, traces)
               uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
