@@ -762,7 +762,6 @@ export default function GalleryEdit( props ) {
 									aspectRatio: 'auto',
 								} ) }
 								isShownByDefault
-								panelId={ clientId }
 							>
 								<SelectControl
 									__next40pxDefaultSize
