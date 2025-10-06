@@ -21,11 +21,17 @@ export function useBlockComments( postId ) {
 		{ enabled: !! postId && typeof postId === 'number' }
 	);
 
-	const blocksWithComments = useSelect( ( select ) => {
-		const { getBlockAttributes, getClientIdsWithDescendants } =
-			select( blockEditorStore );
+	const { getBlockAttributes } = useSelect( blockEditorStore );
+	const { clientIds } = useSelect( ( select ) => {
+		const { getClientIdsWithDescendants } = select( blockEditorStore );
+		return {
+			clientIds: getClientIdsWithDescendants(),
+		};
+	}, [] );
 
-		return getClientIdsWithDescendants().reduce( ( results, clientId ) => {
+	// Process comments to build the tree structure.
+	const { resultComments, unresolvedSortedThreads } = useMemo( () => {
+		const blocksWithComments = clientIds.reduce( ( results, clientId ) => {
 			const commentId =
 				getBlockAttributes( clientId )?.metadata?.commentId;
 			if ( commentId ) {
@@ -33,10 +39,7 @@ export function useBlockComments( postId ) {
 			}
 			return results;
 		}, {} );
-	}, [] );
 
-	// Process comments to build the tree structure.
-	const { resultComments, unresolvedSortedThreads } = useMemo( () => {
 		// Create a compare to store the references to all objects by id.
 		const compare = {};
 		const result = [];
@@ -104,7 +107,7 @@ export function useBlockComments( postId ) {
 			resultComments: allSortedComments,
 			unresolvedSortedThreads: unresolvedSortedComments,
 		};
-	}, [ threads, blocksWithComments ] );
+	}, [ clientIds, threads, getBlockAttributes ] );
 
 	return { resultComments, unresolvedSortedThreads, totalPages };
 }
