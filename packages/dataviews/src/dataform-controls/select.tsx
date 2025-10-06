@@ -80,7 +80,7 @@ export default function Select< Item >( {
 					// - the field is not required
 					// - in bulk editing
 					{
-						label: __( 'Select item' ),
+						label: __( 'Select' ),
 						value: '',
 						// disable only if the field is required and there's already a selection
 						disabled: !! field.isValid?.required && value !== '',
