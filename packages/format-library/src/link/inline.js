@@ -38,7 +38,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { createLinkFormat, isValidHref, getFormatBoundary } from './utils';
 import { link as settings } from './index';
 
-const TogglableSettingComponent = ( { setting, value, onChange } ) => {
+const CSSClassesSettingComponent = ( { setting, value, onChange } ) => {
 	const hasValue = value ? value?.cssClasses?.length > 0 : false;
 	const [ inputVisible, setInputVisible ] = useState( hasValue );
 
@@ -62,7 +62,7 @@ const TogglableSettingComponent = ( { setting, value, onChange } ) => {
 	};
 
 	return (
-		<div className="block-editor-link-control__toggleable-setting">
+		<div className="block-editor-link-control__css-classes-setting">
 			<CheckboxControl
 				__nextHasNoMarginBottom
 				label={ setting.title }
@@ -95,7 +95,7 @@ const LINK_SETTINGS = [
 		title: __( 'Additional CSS class(es)' ),
 		render: ( setting, value, onChange ) => {
 			return (
-				<TogglableSettingComponent
+				<CSSClassesSettingComponent
 					setting={ setting }
 					value={ value }
 					onChange={ onChange }
