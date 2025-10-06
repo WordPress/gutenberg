@@ -229,12 +229,15 @@ test.describe( 'Block Comments', () => {
 			comment: 'Third block comment',
 		} );
 
-		const threads = page.locator( '.editor-collab-sidebar-panel__thread' );
-		const activeThread = page.locator(
-			'.editor-collab-sidebar-panel__thread.is-selected'
-		);
+		const threadsContainer = page
+			.getByRole( 'region', {
+				name: 'Editor settings',
+			} )
+			.getByRole( 'list' );
+		const threads = threadsContainer.getByRole( 'listitem' );
+		const activeThread = threadsContainer.locator( '.is-selected' );
 		const replyTextbox = activeThread.getByRole( 'textbox', {
-			name: 'Comment',
+			name: 'Reply to',
 		} );
 
 		// Comment and reply textbox should active for last inserter block.
