@@ -29,7 +29,6 @@ import { useBlockBindingsUtils } from '../utils/block-bindings';
 import { unlock } from '../lock-unlock';
 import InspectorControls from '../components/inspector-controls';
 import BlockContext from '../components/block-context';
-import { useBlockEditContext } from '../components/block-edit';
 import { store as blockEditorStore } from '../store';
 
 const { Menu } = unlock( componentsPrivateApis );
@@ -55,34 +54,19 @@ function BlockBindingsPanelMenuContent( {
 	sources,
 	onOpenModal,
 } ) {
-	const { clientId } = useBlockEditContext();
 	const { updateBlockBindings } = useBlockBindingsUtils();
 	const isMobile = useViewportMatch( 'medium', '<' );
 	const blockContext = useContext( BlockContext );
-	const { attributeType, select } = useSelect(
-		( _select ) => {
-			const { name: blockName } =
-				_select( blockEditorStore ).getBlock( clientId );
-			const _attributeType =
-				getBlockType( blockName ).attributes?.[ attribute ]?.type;
-			return {
-				attributeType:
-					_attributeType === 'rich-text' ? 'string' : _attributeType,
-				select: _select,
-			};
-		},
-		[ clientId, attribute ]
-	);
+	const { select } = useSelect( ( _select ) => {
+		return {
+			select: _select,
+		};
+	}, [] );
 	return (
 		<Menu placement={ isMobile ? 'bottom-start' : 'left-start' }>
 			{ Object.entries( sources ).map( ( [ sourceKey, source ] ) => {
-				// Only show sources that have compatible data for this specific attribute.
-				const sourceDataItems = source.data?.filter(
-					( item ) => item?.type === attributeType
-				);
-
 				const noItemsAvailable =
-					! sourceDataItems || sourceDataItems.length === 0;
+					! source.data || source.data?.length === 0;
 
 				if ( source.mode === 'dropdown' ) {
 					return (
@@ -105,7 +89,7 @@ function BlockBindingsPanelMenuContent( {
 							{ ! noItemsAvailable && (
 								<Menu.Popover gutter={ 8 }>
 									<Menu.Group>
-										{ sourceDataItems.map( ( item ) => {
+										{ source.data.map( ( item ) => {
 											const itemBindings = {
 												source: sourceKey,
 												args: item?.args || {
