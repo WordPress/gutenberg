@@ -110,13 +110,25 @@ function traverse_blocks_for_headings( $blocks, $max_level = null ) {
 				continue;
 			}
 
+			// Get anchor from block attributes, or generate one from content.
 			$anchor = isset( $block['attrs']['anchor'] ) ? $block['attrs']['anchor'] : '';
+			if ( empty( $anchor ) && function_exists( 'sanitize_title' ) ) {
+				$anchor = sanitize_title( $content );
+			}
 
 			$link = '';
 			if ( ! empty( $anchor ) ) {
-				$permalink = get_permalink();
-				if ( $permalink ) {
-					$link = $permalink . '#' . $anchor;
+				// In template context, use the current URL rather than get_permalink()
+				// which may return a post in the loop.
+				global $wp;
+				if ( isset( $wp->request ) ) {
+					$current_url = home_url( $wp->request );
+				} else {
+					$current_url = get_permalink();
+				}
+
+				if ( $current_url ) {
+					$link = $current_url . '#' . $anchor;
 				}
 			}
 
