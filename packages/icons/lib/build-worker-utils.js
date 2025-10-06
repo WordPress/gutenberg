@@ -24,17 +24,20 @@ async function buildSVG( file ) {
 		return false;
 	}
 
+	const FgRed = '\x1b[31m';
+	const Reset = '\x1b[0m';
+
 	try {
 		await execFile( 'git', [ 'ls-files', '--error-unmatch', file ] );
 	} catch {
 		throw new Error(
-			`Cannot generate icon from untracked SVG file '${ path.basename(
+			`${ FgRed }Cannot generate icon from untracked SVG file '${ path.basename(
 				file
-			) }'.
-Please add it to Git, then restart:
+			) }'.${ Reset }
+${ FgRed }Please add it to Git, then restart:${ Reset }
 
-	git add ${ path.relative( '', file ) }
-	npm run dev
+${ FgRed }	git add ${ path.relative( '', file ) }${ Reset }
+${ FgRed }	npm run dev${ Reset }
 `
 		);
 	}
