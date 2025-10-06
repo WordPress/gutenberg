@@ -92,6 +92,20 @@ export function ItemClickWrapper< Item >( {
 					renderedElement.props.onClick( event );
 				}
 			},
+			onKeyDown: ( event: React.KeyboardEvent ) => {
+				if (
+					event.key === 'Enter' ||
+					event.key === '' ||
+					event.key === ' '
+				) {
+					// Prevents onChangeSelection from triggering.
+					event.stopPropagation();
+					// If consumer provided an onKeyDown, call it
+					if ( renderedElement.props.onKeyDown ) {
+						renderedElement.props.onKeyDown( event );
+					}
+				}
+			},
 		} );
 	}
 
