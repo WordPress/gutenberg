@@ -87,7 +87,7 @@ export function useHideBlocksFromInserter( postType, mode ) {
 						postType
 					) &&
 					! isHierarchicalPostType &&
-					blockType.name === 'core/post-breadcrumbs' &&
+					blockType.name === 'core/breadcrumbs' &&
 					mode === 'post-only'
 				) {
 					return false;

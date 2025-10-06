@@ -20,7 +20,7 @@ import { useServerSideRender } from '@wordpress/server-side-render';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 const separatorDefaultValue = '/';
 
-export default function PostBreadcrumbEdit( {
+export default function BreadcrumbEdit( {
 	attributes,
 	setAttributes,
 	context: { postId, postType },
@@ -40,7 +40,7 @@ export default function PostBreadcrumbEdit( {
 	const { content } = useServerSideRender( {
 		attributes,
 		skipBlockSupportAttributes: true,
-		block: 'core/post-breadcrumbs',
+		block: 'core/breadcrumbs',
 		urlQueryArgs: { post_id: postId },
 	} );
 	let placeholder = null;
@@ -63,9 +63,7 @@ export default function PostBreadcrumbEdit( {
 				<ol>
 					{ placeholderItems.map( ( text, index ) => (
 						<li key={ index }>
-							<a
-								href={ `#post-breadcrumbs-pseudo-link-${ index }` }
-							>
+							<a href={ `#breadcrumbs-pseudo-link-${ index }` }>
 								{ text }
 							</a>
 						</li>
