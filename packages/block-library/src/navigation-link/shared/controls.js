@@ -61,18 +61,12 @@ function getEntityTypeName( type, kind ) {
  * This component provides the inspector controls (ToolsPanel) that are identical
  * between both navigation blocks.
  *
- * @param {Object}   props                     - Component props
- * @param {Object}   props.attributes          - Block attributes
- * @param {Function} props.setAttributes       - Function to update block attributes
- * @param {Function} props.setIsEditingControl - Function to set editing state (optional)
- * @param {string}   props.clientId            - Block client ID
+ * @param {Object}   props               - Component props
+ * @param {Object}   props.attributes    - Block attributes
+ * @param {Function} props.setAttributes - Function to update block attributes
+ * @param {string}   props.clientId      - Block client ID
  */
-export function Controls( {
-	attributes,
-	setAttributes,
-	setIsEditingControl = () => {},
-	clientId,
-} ) {
+export function Controls( { attributes, setAttributes, clientId } ) {
 	const { label, url, description, rel, opensInNewTab } = attributes;
 	const lastURLRef = useRef( url );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
@@ -122,8 +116,6 @@ export function Controls( {
 						setAttributes( { label: labelValue } );
 					} }
 					autoComplete="off"
-					onFocus={ () => setIsEditingControl( true ) }
-					onBlur={ () => setIsEditingControl( false ) }
 				/>
 			</ToolsPanelItem>
 
@@ -155,7 +147,6 @@ export function Controls( {
 							return;
 						}
 						lastURLRef.current = url;
-						setIsEditingControl( true );
 					} }
 					onBlur={ () => {
 						if ( hasUrlBinding ) {
@@ -167,7 +158,6 @@ export function Controls( {
 							setAttributes,
 							{ ...attributes, url: lastURLRef.current }
 						);
-						setIsEditingControl( false );
 					} }
 					help={
 						hasUrlBinding && (

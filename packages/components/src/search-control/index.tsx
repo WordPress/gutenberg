@@ -9,7 +9,7 @@ import type { ForwardedRef } from 'react';
  */
 import { useInstanceId, useMergeRefs } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { Icon, search, closeSmall } from '@wordpress/icons';
+import { search, closeSmall } from '@wordpress/icons';
 import { forwardRef, useMemo, useRef } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
@@ -22,7 +22,7 @@ import { InputControlSuffixWrapper } from '../input-control/input-suffix-wrapper
 import type { WordPressComponentProps } from '../context/wordpress-component';
 import type { SearchControlProps, SuffixItemProps } from './types';
 import { ContextSystemProvider } from '../context';
-import { StyledInputControl } from './styles';
+import { StyledInputControl, StyledIcon } from './styles';
 
 function SuffixItem( {
 	searchRef,
@@ -120,7 +120,7 @@ function UnforwardedSearchControl(
 				value={ value ?? '' }
 				prefix={
 					<InputControlPrefixWrapper variant="icon">
-						<Icon icon={ search } fill="currentColor" />
+						<StyledIcon icon={ search } fill="currentColor" />
 					</InputControlPrefixWrapper>
 				}
 				suffix={
