@@ -332,26 +332,28 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 							select,
 							context,
 						} );
-						const hasCompatibleData = _bindableAttributes.some(
+
+						const allowedAttributeTypes = _bindableAttributes.map(
 							( attribute ) => {
-								const _attributeType =
+								const attributeType =
 									getBlockType( blockName ).attributes?.[
 										attribute
 									]?.type;
-								const attributeType =
-									_attributeType === 'rich-text'
-										? 'string'
-										: _attributeType;
-
-								return editorUIResult.data?.some(
-									( item ) => item?.type === attributeType
-								);
+								return attributeType === 'rich-text'
+									? 'string'
+									: attributeType;
 							}
 						);
 
-						if ( hasCompatibleData ) {
+						const compatibleData = editorUIResult?.data?.filter(
+							( item ) =>
+								allowedAttributeTypes.includes( item?.type )
+						);
+
+						if ( compatibleData?.length > 0 ) {
 							_sources[ sourceName ] = {
 								...editorUIResult,
+								data: compatibleData,
 								label,
 								getValues,
 							};
