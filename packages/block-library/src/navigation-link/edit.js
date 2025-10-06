@@ -176,7 +176,6 @@ export default function NavigationLinkEdit( {
 		replaceBlock,
 		__unstableMarkNextChangeAsNotPersistent,
 		selectBlock,
-		selectPreviousBlock,
 	} = useDispatch( blockEditorStore );
 	// Have the link editing ui open on mount when lacking a url and selected.
 	const [ isLinkOpen, setIsLinkOpen ] = useState( isSelected && ! url );
@@ -190,6 +189,15 @@ export default function NavigationLinkEdit( {
 	const linkUIref = useRef();
 	const prevUrl = usePrevious( url );
 	const closedByEscapeRef = useRef( false );
+	const isNewLink = useRef( ! url );
+
+	// On mount, if this is a new link without a URL and it's selected,
+	// select the parent navigation block instead to keep the appender visible.
+	useEffect( () => {
+		if ( isNewLink.current && isSelected && ! url ) {
+			selectBlock( rootNavigationClientId );
+		}
+	}, [] );
 
 	// Listen for Escape key at document level when LinkUI is open
 	useEffect( () => {
@@ -223,6 +231,7 @@ export default function NavigationLinkEdit( {
 		isParentOfSelectedBlock,
 		hasChildren,
 		validateLinkStatus,
+		rootNavigationClientId,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -237,7 +246,7 @@ export default function NavigationLinkEdit( {
 			const isTopLevel =
 				getBlockName( rootClientId ) === 'core/navigation';
 			const selectedBlockClientId = getSelectedBlockClientId();
-			const rootNavigationClientId = isTopLevel
+			const rootNavClientId = isTopLevel
 				? rootClientId
 				: getBlockParentsByBlockName(
 						clientId,
@@ -246,8 +255,8 @@ export default function NavigationLinkEdit( {
 
 			// Enable when the root Navigation block is selected or any of its inner blocks.
 			const enableLinkStatusValidation =
-				selectedBlockClientId === rootNavigationClientId ||
-				hasSelectedInnerBlock( rootNavigationClientId, true );
+				selectedBlockClientId === rootNavClientId ||
+				hasSelectedInnerBlock( rootNavClientId, true );
 
 			return {
 				isAtMaxNesting:
@@ -260,6 +269,7 @@ export default function NavigationLinkEdit( {
 				),
 				hasChildren: !! getBlockCount( clientId ),
 				validateLinkStatus: enableLinkStatusValidation,
+				rootNavigationClientId: rootNavClientId,
 			};
 		},
 		[ clientId, maxNestingLevel ]
@@ -538,21 +548,13 @@ export default function NavigationLinkEdit( {
 							clientId={ clientId }
 							link={ attributes }
 							onClose={ () => {
+								setIsLinkOpen( false );
+
 								// If there is no link then remove the auto-inserted block.
 								// This avoids empty blocks which can provide a poor UX.
 								if ( ! url ) {
-									if ( closedByEscapeRef.current ) {
-										// User pressed Escape or closed intentionally
-										// Select the previous block so the appender remains visible.
-										// Ideally this would focus the appender instead.
-										selectPreviousBlock( clientId );
-									}
-
-									// Then remove this block
 									onReplace( [] );
 								}
-
-								setIsLinkOpen( false );
 							} }
 							anchor={ popoverAnchor }
 							onRemove={ removeLink }
