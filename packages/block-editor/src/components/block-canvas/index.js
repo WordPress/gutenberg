@@ -77,9 +77,7 @@ export function ExperimentalBlockCanvas( {
 					{ children }
 				</WritingFlow>
 
-				<BlockCanvasCover.Slot
-					fillProps={ { containerElement: localRef.current } }
-				>
+				<BlockCanvasCover.Slot fillProps={ { containerRef: localRef } }>
 					{ ( covers ) =>
 						covers.map( ( cover, index ) => (
 							<div
@@ -120,9 +118,7 @@ export function ExperimentalBlockCanvas( {
 			>
 				<EditorStyles styles={ styles } />
 				{ children }
-				<BlockCanvasCover.Slot
-					fillProps={ { containerElement: localRef.current } }
-				>
+				<BlockCanvasCover.Slot fillProps={ { containerRef: localRef } }>
 					{ ( covers ) =>
 						covers.map( ( cover, index ) => (
 							<div
