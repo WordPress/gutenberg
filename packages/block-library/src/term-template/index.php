@@ -32,7 +32,7 @@ function render_block_core_term_template( $attributes, $content, $block ) {
 
 	$query_args = array(
 		'taxonomy'   => $query['taxonomy'] ?? 'category',
-		'number'     => $query['maxTerms'] ?? 10,
+		'number'     => $query['perPage'] ?? 10,
 		'order'      => $query['order'] ?? 'asc',
 		'orderby'    => $query['orderBy'] ?? 'name',
 		'hide_empty' => $query['hideEmpty'] ?? true,

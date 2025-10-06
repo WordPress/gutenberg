@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { useCallback } from '@wordpress/element';
 import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 
 /**
@@ -16,20 +17,18 @@ export default function TermsQueryEdit( {
 	clientId,
 	name,
 } ) {
-	const { termQuery = {}, tagName: TagName = 'div' } = attributes;
+	const { tagName: TagName = 'div' } = attributes;
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
 	} );
-
-	const setQuery = ( newQuery ) => {
-		setAttributes( {
-			termQuery: {
-				...termQuery,
-				...newQuery,
-			},
-		} );
-	};
+	const setQuery = useCallback(
+		( newQuery ) =>
+			setAttributes( ( prevAttributes ) => ( {
+				termQuery: { ...prevAttributes.termQuery, ...newQuery },
+			} ) ),
+		[ setAttributes ]
+	);
 	return (
 		<>
 			<TermsQueryInspectorControls

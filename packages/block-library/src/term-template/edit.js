@@ -198,7 +198,7 @@ export default function TermTemplateEdit( {
 			orderBy,
 			hideEmpty,
 			hierarchical,
-			maxTerms = 10,
+			perPage = 10,
 		} = {},
 	},
 	__unstableLayoutClassNames,
@@ -362,7 +362,7 @@ export default function TermTemplateEdit( {
 					  )
 					: blockContexts &&
 					  blockContexts
-							.slice( 0, maxTerms )
+							.slice( 0, perPage )
 							.map( ( blockContext ) => (
 								<BlockContextProvider
 									key={ blockContext.termId }

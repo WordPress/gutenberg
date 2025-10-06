@@ -12,7 +12,7 @@
 		"termQuery": {
 			"type": "object",
 			"default": {
-				"maxTerms": 10,
+				"perPage": 10,
 				"taxonomy": "category",
 				"order": "asc",
 				"orderBy": "name",

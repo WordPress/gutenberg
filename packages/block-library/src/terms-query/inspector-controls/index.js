@@ -88,7 +88,7 @@ export default function TermsQueryInspectorControls( {
 								hideEmpty: true,
 								hierarchical: false,
 								parent: false,
-								maxTerms: 10,
+								perPage: 10,
 							},
 							termsToShow: 'all',
 						} );
