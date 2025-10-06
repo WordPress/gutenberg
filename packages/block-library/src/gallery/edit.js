@@ -758,9 +758,6 @@ export default function GalleryEdit( props ) {
 								}
 								label={ __( 'Aspect ratio' ) }
 								onDeselect={ () => setAspectRatio( 'auto' ) }
-								resetAllFilter={ () => ( {
-									aspectRatio: 'auto',
-								} ) }
 								isShownByDefault
 							>
 								<SelectControl
