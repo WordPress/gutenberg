@@ -382,27 +382,14 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 								} )
 							);
 
-							const hasCompatibleData = _bindableAttributes.some(
-								( attribute ) => {
-									const _attributeType =
-										getBlockType( blockName ).attributes?.[
-											attribute
-										]?.type;
-									const attributeType =
-										_attributeType === 'rich-text'
-											? 'string'
-											: _attributeType;
-
-									return data.some(
-										( item ) => item?.type === attributeType
-									);
-								}
+							const compatibleData = data?.filter( ( item ) =>
+								allowedAttributeTypes.includes( item?.type )
 							);
 
-							if ( hasCompatibleData ) {
+							if ( compatibleData?.length > 0 ) {
 								_sources[ sourceName ] = {
 									mode: 'dropdown', // Default mode for backward compatibility
-									data,
+									data: compatibleData,
 									label,
 									getValues,
 								};
