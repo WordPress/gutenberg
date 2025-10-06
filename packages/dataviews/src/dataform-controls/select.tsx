@@ -25,6 +25,7 @@ export default function Select< Item >( {
 	hideLabelFromVision,
 }: DataFormControlProps< Item > ) {
 	const { type, label, description, getValue, setValue } = field;
+
 	const [ customValidity, setCustomValidity ] =
 		useState<
 			React.ComponentProps<
@@ -71,23 +72,30 @@ export default function Select< Item >( {
 	const hasEmptyValue = fieldElements.some(
 		( { value: elementValue } ) => elementValue === ''
 	);
-	const hasSelection = fieldElements.some(
-		( { value: elementValue } ) => elementValue === value
-	);
 
+	// Determine whether the control currently has a selection.
+	// For single-select: value is non-empty (not null/undefined/'').
+	// For multi-select: value is an array with length > 0.
+	const hasSelection = Array.isArray( value )
+		? value.length > 0
+		: value !== undefined && value !== null && value !== '';
+
+	/**
+	 * Behavior:
+	 * - If elements already include an empty value, just use fieldElements.
+	 * - If the field is multiple (array) we don't inject a placeholder — use fieldElements.
+	 * - Otherwise inject a placeholder item with label "Select" (no ellipsis).
+	 *   The placeholder is disabled once there's a selection to prevent re-selection.
+	 */
 	const elements =
 		hasEmptyValue || isMultiple
 			? fieldElements
 			: [
-					/*
-					 * Value can be undefined when:
-					 * - the field is not required
-					 * - in bulk editing
-					 */
 					{
 						label: __( 'Select' ),
 						value: '',
-						disabled: !! field.isValid?.required && hasSelection,
+						// Disable the placeholder once a selection exists (single-select only).
+						disabled: !! hasSelection,
 					},
 					...fieldElements,
 			  ];
