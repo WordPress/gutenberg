@@ -215,10 +215,6 @@ function CommentBoardWrapper( {
 	backgroundColor,
 	previousThreadId,
 	commentSidebarRef,
-	offsetsRef,
-	updateOffsets,
-	updateHeight,
-	heights,
 } ) {
 	const blockRef = useRef();
 	useBlockElementRef( thread.blockClientId, blockRef );
@@ -226,6 +222,22 @@ function CommentBoardWrapper( {
 	const selectedBlockElementRect = blockRef.current?.getBoundingClientRect();
 
 	const initialOffsetTop = selectedBlockElementRect?.top;
+
+	const [ heights, setHeights ] = useState( {} );
+
+	const updateHeight = ( id, newHeight ) => {
+		setHeights( ( prev ) => {
+			if ( prev[ id ] !== newHeight ) {
+				return { ...prev, [ id ]: newHeight };
+			}
+			return prev;
+		} );
+	};
+
+	const offsetsRef = useRef( {} );
+	const updateOffsets = ( id, offset ) => {
+		offsetsRef.current[ id ] = offset;
+	};
 
 	const previousOffset = previousThreadId
 		? offsetsRef.current[ previousThreadId ]
@@ -308,28 +320,6 @@ export default function CollabSidebar() {
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const isLargeViewport = useViewportMatch( 'xlarge' );
 
-	const [ heights, setHeights ] = useState( {} );
-
-	const updateHeight = ( id, newHeight ) => {
-		setHeights( ( prev ) => {
-			if ( prev[ id ] !== newHeight ) {
-				return { ...prev, [ id ]: newHeight };
-			}
-			return prev;
-		} );
-	};
-
-	const { selectBlock } = useDispatch( blockEditorStore );
-	const handleThreadClick = ( thread ) => {
-		if ( thread?.clientId ) {
-			selectBlock( thread.clientId );
-		}
-	};
-
-	const offsetsRef = useRef( {} );
-	const updateOffsets = ( id, offset ) => {
-		offsetsRef.current[ id ] = offset;
-	};
 	const commentSidebarRef = useRef( null );
 
 	const { postId } = useSelect( ( select ) => {
@@ -438,16 +428,9 @@ export default function CollabSidebar() {
 											setShowCommentBoard
 										}
 										backgroundColor={ backgroundColor }
-										offsetsRef={ offsetsRef }
-										updateOffsets={ updateOffsets }
-										updateHeight={ updateHeight }
-										heights={ heights }
 										previousThreadId={
 											unresolvedSortedThreads[ index - 1 ]
 												?.id
-										}
-										onClick={ () =>
-											handleThreadClick( thread )
 										}
 										commentSidebarRef={ commentSidebarRef }
 									/>
