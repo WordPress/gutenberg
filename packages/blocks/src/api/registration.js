@@ -141,7 +141,8 @@ import { unlock } from '../lock-unlock';
  *
  * @property {string}   mode                 The UI mode - either 'dropdown' or 'modal'.
  * @property {Array}    [data]               Array of field data items.
- * @property {Function} [renderModalContent] Required for modal mode. Function that renders the modal content. Receives an object with this key: updateBlockBindings.
+ * @property {Function} [renderModalContent] Required for modal mode. Function that renders the modal content.
+ *                                           Receives an object with the `attribute` that is being changed, and a `closeModal` function to close the modal.
  */
 
 /**
