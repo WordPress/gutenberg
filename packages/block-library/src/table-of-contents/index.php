@@ -51,7 +51,39 @@ function render_block_core_table_of_contents( $attributes ) {
 	$toc_html .= '</' . $list_tag . '>';
 	$toc_html .= '</nav>';
 
-	return $toc_html;
+	return block_core_table_of_contents_add_full_urls( $toc_html );
+}
+
+/**
+ * Convert relative anchor links (#heading-id) to full URLs using HTML API.
+ *
+ * @param string $html The HTML content to process.
+ *
+ * @return string HTML with full URLs.
+ */
+function block_core_table_of_contents_add_full_urls( $html ) {
+	global $wp;
+	if ( isset( $wp->request ) ) {
+		$current_url = home_url( $wp->request );
+	} else {
+		$current_url = get_permalink();
+	}
+
+	if ( empty( $current_url ) ) {
+		return $html;
+	}
+
+	$processor = new WP_HTML_Tag_Processor( $html );
+	while ( $processor->next_tag( 'a' ) ) {
+		$href = $processor->get_attribute( 'href' );
+
+		// Only modify relative anchor links (starting with #).
+		if ( $href && '#' === substr( $href, 0, 1 ) ) {
+			$processor->set_attribute( 'href', $current_url . $href );
+		}
+	}
+
+	return $processor->get_updated_html();
 }
 
 /**
@@ -114,26 +146,10 @@ function block_core_table_of_contents_traverse_blocks( $blocks, $max_level = nul
 				$anchor = sanitize_title( $content );
 			}
 
-			$link = '';
-			if ( ! empty( $anchor ) ) {
-				// In template context, use the current URL rather than get_permalink()
-				// which may return a post in the loop.
-				global $wp;
-				if ( isset( $wp->request ) ) {
-					$current_url = home_url( $wp->request );
-				} else {
-					$current_url = get_permalink();
-				}
-
-				if ( $current_url ) {
-					$link = $current_url . '#' . $anchor;
-				}
-			}
-
 			$headings[] = array(
 				'content' => $content,
 				'level'   => $level,
-				'link'    => $link,
+				'link'    => ! empty( $anchor ) ? '#' . $anchor : '',
 			);
 		}
 
