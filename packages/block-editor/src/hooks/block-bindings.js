@@ -331,15 +331,15 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 						}
 					);
 
-					if ( editorUI ) {
-						// Populate context.
-						const context = {};
-						if ( usesContext?.length ) {
-							for ( const key of usesContext ) {
-								context[ key ] = blockContext[ key ];
-							}
+					// Populate context.
+					const context = {};
+					if ( usesContext?.length ) {
+						for ( const key of usesContext ) {
+							context[ key ] = blockContext[ key ];
 						}
+					}
 
+					if ( editorUI ) {
 						const editorUIResult = editorUI( {
 							select,
 							context,
@@ -360,12 +360,6 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 						}
 					} else if ( getFieldsList ) {
 						// Backward compatibility: Convert getFieldsList to editorUI format
-						const context = {};
-						if ( usesContext?.length ) {
-							for ( const key of usesContext ) {
-								context[ key ] = blockContext[ key ];
-							}
-						}
 
 						const fieldsListResult = getFieldsList( {
 							select,
