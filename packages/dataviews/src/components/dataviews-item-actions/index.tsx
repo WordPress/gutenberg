@@ -77,7 +77,6 @@ function ButtonTrigger< Item >( {
 			icon={ action.icon }
 			disabled={ !! action.disabled }
 			accessibleWhenDisabled
-			isDestructive={ action.isDestructive }
 			size="compact"
 			onClick={ onClick }
 		/>

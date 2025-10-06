@@ -287,11 +287,6 @@ interface ActionBase< Item > {
 	disabled?: boolean;
 
 	/**
-	 * Whether the action is destructive.
-	 */
-	isDestructive?: boolean;
-
-	/**
 	 * Whether the action is a primary action.
 	 */
 	isPrimary?: boolean;
