@@ -75,6 +75,7 @@ export default function FormRowField< Item >( {
 							<div
 								key={ nestedField.id }
 								className="dataforms-layouts-row__field-control"
+								style={ layout.styles[ nestedField.id ] }
 							>
 								<FieldLayout
 									data={ data }

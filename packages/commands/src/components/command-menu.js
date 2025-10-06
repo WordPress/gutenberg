@@ -271,7 +271,10 @@ export function CommandMenu() {
 			<div className="commands-command-menu__container">
 				<Command label={ inputLabel } onKeyDown={ onKeyDown }>
 					<div className="commands-command-menu__header">
-						<Icon icon={ inputIcon } />
+						<Icon
+							className="commands-command-menu__header-search-icon"
+							icon={ inputIcon }
+						/>
 						<CommandInput
 							search={ search }
 							setSearch={ setSearch }

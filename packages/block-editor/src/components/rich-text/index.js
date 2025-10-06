@@ -2,6 +2,7 @@
  * External dependencies
  */
 import clsx from 'clsx';
+import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
  * WordPress dependencies
@@ -218,13 +219,19 @@ export function RichTextWrapper(
 
 			const { getBlockAttributes } = select( blockEditorStore );
 			const blockAttributes = getBlockAttributes( clientId );
-			const fieldsList = blockBindingsSource?.getFieldsList?.( {
-				select,
-				context: blockBindingsContext,
-			} );
+			let clientSideFieldLabel = null;
+			if ( blockBindingsSource?.editorUI ) {
+				const editorUIResult = blockBindingsSource.editorUI( {
+					select,
+					context: blockBindingsContext,
+				} );
+				clientSideFieldLabel = editorUIResult.data?.find( ( item ) =>
+					fastDeepEqual( item.args, relatedBinding?.args )
+				)?.label;
+			}
+
 			const bindingKey =
-				fieldsList?.[ relatedBinding?.args?.key ]?.label ??
-				blockBindingsSource?.label;
+				clientSideFieldLabel ?? blockBindingsSource?.label;
 
 			const _bindingsPlaceholder = _disableBoundBlock
 				? bindingKey

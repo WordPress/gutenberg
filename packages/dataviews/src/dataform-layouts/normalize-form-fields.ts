@@ -90,6 +90,7 @@ export function normalizeLayout( layout?: Layout ): NormalizedLayout {
 		normalizedLayout = {
 			type: 'row',
 			alignment: layout?.alignment ?? 'center',
+			styles: layout?.styles ?? {},
 		} satisfies NormalizedRowLayout;
 	}
 

@@ -33,6 +33,7 @@ import * as accordionPanel from './accordion-panel';
 import * as archives from './archives';
 import * as avatar from './avatar';
 import * as audio from './audio';
+import * as breadcrumbs from './breadcrumbs';
 import * as button from './button';
 import * as buttons from './buttons';
 import * as calendar from './calendar';
@@ -160,6 +161,7 @@ const getAllBlocks = () => {
 		accordionPanel,
 		archives,
 		audio,
+		breadcrumbs,
 		button,
 		buttons,
 		calendar,

@@ -8,6 +8,7 @@ import {
 	__experimentalHeading as Heading,
 	__experimentalText as Text,
 	__experimentalVStack as VStack,
+	Button,
 } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
@@ -28,6 +29,8 @@ export default function PatternsHeader( {
 	type,
 	titleId,
 	descriptionId,
+	isModifiedView = false,
+	resetView = () => {},
 } ) {
 	const { patternCategories } = usePatternCategories();
 	const templatePartAreas = useSelect(
@@ -74,6 +77,11 @@ export default function PatternsHeader( {
 					{ title }
 				</Heading>
 				<HStack expanded={ false }>
+					{ isModifiedView && (
+						<Button __next40pxDefaultSize onClick={ resetView }>
+							{ __( 'Reset View' ) }
+						</Button>
+					) }
 					<AddNewPattern />
 					{ !! patternCategory?.id && (
 						<DropdownMenu

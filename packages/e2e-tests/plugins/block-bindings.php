@@ -69,7 +69,9 @@ function gutenberg_test_block_bindings_registration() {
 				if ( ! isset( $source_args['key'] ) || ! isset( $fields_list[ $source_args['key'] ] ) ) {
 					return null;
 				}
-				return $fields_list[ $source_args['key'] ]['value']; },
+				return $fields_list[ $source_args['key'] ]['value'];
+			},
+			'uses_context'       => array( 'postType', 'postId' ),
 		)
 	);
 	register_block_bindings_source(
