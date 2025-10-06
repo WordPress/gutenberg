@@ -96,6 +96,8 @@ const LABEL_TYPE_MAPPING = {
  * @type {Record<string,string>}
  */
 const LABEL_FEATURE_MAPPING = {
+	'[Feature] Real-time Collaboration': 'Collaboration',
+	'[Feature] Block Commenting': 'Collaboration',
 	'[Feature] Widgets Screen': 'Widgets Editor',
 	'[Feature] Widgets Customizer': 'Widgets Editor',
 	'[Feature] Design Tools': 'Design Tools',

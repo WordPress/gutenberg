@@ -844,6 +844,17 @@ export const fields: Field< SpaceObject >[] = [
 			{ value: 'Ice giant', label: 'Ice giant' },
 			{ value: 'Terrestrial', label: 'Terrestrial' },
 			{ value: 'Gas giant', label: 'Gas giant' },
+			{ value: 'Dwarf planet', label: 'Dwarf planet' },
+			{ value: 'Asteroid', label: 'Asteroid' },
+			{ value: 'Comet', label: 'Comet' },
+			{ value: 'Kuiper belt object', label: 'Kuiper belt object' },
+			{ value: 'Protoplanet', label: 'Protoplanet' },
+			{ value: 'Planetesimal', label: 'Planetesimal' },
+			{ value: 'Minor planet', label: 'Minor planet' },
+			{
+				value: 'Trans-Neptunian object',
+				label: 'Trans-Neptunian object',
+			},
 		],
 		filterBy: {
 			operators: [ 'is', 'isNot' ],

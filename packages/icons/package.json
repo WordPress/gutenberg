@@ -36,5 +36,9 @@
 	},
 	"publishConfig": {
 		"access": "public"
+	},
+	"scripts": {
+		"prelint": "npm run build",
+		"build": "node bin/generate-library"
 	}
 }

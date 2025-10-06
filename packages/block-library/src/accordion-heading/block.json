@@ -5,7 +5,6 @@
 	"title": "Accordion Heading",
 	"category": "design",
 	"description": "Displays an accordion heading.",
-	"__experimental": true,
 	"parent": [ "core/accordion-item" ],
 	"usesContext": [
 		"core/accordion-icon-position",

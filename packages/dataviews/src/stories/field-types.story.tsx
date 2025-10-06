@@ -16,7 +16,7 @@ import { starFilled } from '@wordpress/icons';
  */
 import DataViews from '../components/dataviews/index';
 import DataForm from '../components/dataform/index';
-import { filterSortAndPaginate } from '../filter-and-sort-data-view';
+import filterSortAndPaginate from '../utils/filter-sort-and-paginate';
 import type { View, Form, Field } from '../types';
 
 const meta = {

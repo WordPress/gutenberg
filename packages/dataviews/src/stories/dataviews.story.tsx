@@ -31,7 +31,7 @@ import { __, _n } from '@wordpress/i18n';
  */
 import DataViews from '../components/dataviews/index';
 import { LAYOUT_GRID, LAYOUT_LIST, LAYOUT_TABLE } from '../constants';
-import { filterSortAndPaginate } from '../filter-and-sort-data-view';
+import filterSortAndPaginate from '../utils/filter-sort-and-paginate';
 import type { Field, View } from '../types';
 import {
 	DEFAULT_VIEW,
