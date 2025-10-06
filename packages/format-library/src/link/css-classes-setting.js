@@ -28,10 +28,15 @@ const CSSClassesSettingComponent = ( { setting, value, onChange } ) => {
 	const instanceId = useInstanceId( CSSClassesSettingComponent );
 	const controlledRegionId = `css-classes-setting-${ instanceId }`;
 
+	// Sanitize user input: replace commas with spaces, collapse repeated spaces, and trim
 	const handleSettingChange = ( newValue ) => {
+		const sanitizedValue =
+			typeof newValue === 'string'
+				? newValue.replace( /,/g, ' ' ).replace( /\s+/g, ' ' ).trim()
+				: newValue;
 		onChange( {
 			...value,
-			[ setting.id ]: newValue,
+			[ setting.id ]: sanitizedValue,
 		} );
 	};
 

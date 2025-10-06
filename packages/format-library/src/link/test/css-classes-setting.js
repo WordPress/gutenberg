@@ -81,12 +81,14 @@ describe( 'CSSClassesSettingComponent', () => {
 		} );
 		expect( input ).toBeVisible();
 
-		// Type classes
-		await user.type( input, 'btn btn-primary' );
+		// Type classes (including commas) - commas should be converted to spaces
+		await user.type( input, 'btn,btn-primary  ,  btn-secondary' );
 
 		// onChange should have been called with the updated value object
 		expect( onChange ).toHaveBeenCalledWith(
-			expect.objectContaining( { cssClasses: 'btn btn-primary' } )
+			expect.objectContaining( {
+				cssClasses: 'btn btn-primary btn-secondary',
+			} )
 		);
 	} );
 
