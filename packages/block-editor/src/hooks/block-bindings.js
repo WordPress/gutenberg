@@ -301,18 +301,24 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 
 	const registeredSources = getBlockBindingsSources();
 
-	// Use useSelect to ensure sources are updated whenever there are updates in block context
-	// or when underlying data changes.
-	const { sources, canUpdateBlockBindings, bindableAttributes } = useSelect(
+	const { bindableAttributes } = useSelect(
 		( select ) => {
 			const { __experimentalBlockBindingsSupportedAttributes } =
 				select( blockEditorStore ).getSettings();
-			const _bindableAttributes =
-				__experimentalBlockBindingsSupportedAttributes?.[ blockName ];
-			if ( ! _bindableAttributes || _bindableAttributes.length === 0 ) {
-				return EMPTY_OBJECT;
-			}
+			return {
+				bindableAttributes:
+					__experimentalBlockBindingsSupportedAttributes?.[
+						blockName
+					] ?? [],
+			};
+		},
+		[ blockName ]
+	);
 
+	// Use useSelect to ensure sources are updated whenever there are updates in block context
+	// or when underlying data changes.
+	const { sources, canUpdateBlockBindings } = useSelect(
+		( select ) => {
 			const _sources = {};
 			Object.entries( registeredSources ).forEach(
 				( [
@@ -332,7 +338,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 							select,
 							context,
 						} );
-						const hasCompatibleData = _bindableAttributes.some(
+						const hasCompatibleData = bindableAttributes.some(
 							( attribute ) => {
 								const _attributeType =
 									getBlockType( blockName ).attributes?.[
@@ -380,7 +386,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 								} )
 							);
 
-							const hasCompatibleData = _bindableAttributes.some(
+							const hasCompatibleData = bindableAttributes.some(
 								( attribute ) => {
 									const _attributeType =
 										getBlockType( blockName ).attributes?.[
@@ -427,10 +433,9 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 				canUpdateBlockBindings:
 					select( blockEditorStore ).getSettings()
 						.canUpdateBlockBindings,
-				bindableAttributes: _bindableAttributes,
 			};
 		},
-		[ blockContext, blockName, registeredSources ]
+		[ blockContext, blockName, registeredSources, bindableAttributes ]
 	);
 
 	// Return early if there are no bindable attributes.
