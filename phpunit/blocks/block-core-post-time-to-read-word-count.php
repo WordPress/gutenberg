@@ -1,15 +1,15 @@
 <?php
 /**
- * Tests_L10n_wpWordcount class
+ * Tests for block_core_post_time_to_read_word_count function
  *
  * @package WordPress
  */
 
-class Tests_L10n_wpWordcount extends WP_UnitTestCase {
+class Block_Post_Time_To_Read_Word_Count_Test extends WP_UnitTestCase {
 	/**
 	 * Tests that words are counted correctly based on the type
 	 *
-	 * @covers ::wp_word_count
+	 * @covers ::gutenberg_block_core_post_time_to_read_word_count
 	 *
 	 * @dataProvider data_get_string_variations
 	 *
@@ -19,13 +19,9 @@ class Tests_L10n_wpWordcount extends WP_UnitTestCase {
 	 * @param int    $characters_including_spaces Expected value if the count type is based on single character including spaces.
 	 */
 	public function test_word_count( $input_string, $words, $characters_excluding_spaces, $characters_including_spaces ) {
-		$settings = array(
-			'shortcodes' => array( 'shortcode' ),
-		);
-
-		$this->assertEquals( wp_word_count( $input_string, 'words', $settings ), $words );
-		$this->assertEquals( wp_word_count( $input_string, 'characters_excluding_spaces', $settings ), $characters_excluding_spaces );
-		$this->assertEquals( wp_word_count( $input_string, 'characters_including_spaces', $settings ), $characters_including_spaces );
+		$this->assertEquals( gutenberg_block_core_post_time_to_read_word_count( $input_string, 'words' ), $words );
+		$this->assertEquals( gutenberg_block_core_post_time_to_read_word_count( $input_string, 'characters_excluding_spaces' ), $characters_excluding_spaces );
+		$this->assertEquals( gutenberg_block_core_post_time_to_read_word_count( $input_string, 'characters_including_spaces' ), $characters_including_spaces );
 	}
 
 	/**
@@ -70,12 +66,6 @@ class Tests_L10n_wpWordcount extends WP_UnitTestCase {
 				'words'                       => 3,
 				'characters_excluding_spaces' => 14,
 				'characters_including_spaces' => 14,
-			),
-			'Shortcodes'     => array(
-				'string'                      => 'one [shortcode attribute="value"]two[/shortcode]three',
-				'words'                       => 3,
-				'characters_excluding_spaces' => 11,
-				'characters_including_spaces' => 12,
 			),
 			'Astrals'        => array(
 				'string'                      => json_decode( '"\uD83D\uDCA9"' ),
