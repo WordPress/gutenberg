@@ -18,7 +18,7 @@ export { metadata, name };
 export const settings = {
 	icon,
 	edit,
-	save: () => null, // Dynamic block - no save function needed
+	save: () => null,
 	example: {
 		innerBlocks: [
 			{
