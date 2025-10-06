@@ -3,7 +3,8 @@
 ## Unreleased
 
 ### Enhancements
-- DataForm: Disable empty `"Select item"` option in `ValidatedSelectControl` when the field is required. [#72042](https://github.com/WordPress/gutenberg/pull/72042)
+
+- DataForm: rename "Select item" to "Select" and disable empty `"Select"` option when the field is required and other option has been selected. [#72042](https://github.com/WordPress/gutenberg/pull/72042)
 - Move search icon in search fields to prefix position ([#71984](https://github.com/WordPress/gutenberg/pull/71984)).
 
 ### Breaking changes
