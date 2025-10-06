@@ -17,22 +17,22 @@ export default function MaxTermsControl( { attributes, setQuery } ) {
 
 	return (
 		<ToolsPanelItem
-			hasValue={ () => termQuery.perPage !== 10 }
+			hasValue={ () => termQuery.maxTerms !== 10 }
 			label={ __( 'Max terms' ) }
-			onDeselect={ () => setQuery( { perPage: 10 } ) }
+			onDeselect={ () => setQuery( { maxTerms: 10 } ) }
 			isShownByDefault
 		>
 			<RangeControl
 				__nextHasNoMarginBottom
 				__next40pxDefaultSize
 				label={ __( 'Max terms' ) }
-				value={ termQuery.perPage }
+				value={ termQuery.maxTerms }
 				min={ 0 }
 				max={ 100 }
-				onChange={ ( perPage ) => {
+				onChange={ ( maxTerms ) => {
 					// Show all terms (-1) when 0 is selected.
 					setQuery( {
-						perPage: perPage === 0 ? -1 : perPage,
+						maxTerms: maxTerms === 0 ? -1 : maxTerms,
 					} );
 				} }
 				help={ __(

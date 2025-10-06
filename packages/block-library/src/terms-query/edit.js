@@ -1,10 +1,46 @@
 /**
+ * WordPress dependencies
+ */
+import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
+
+/**
  * Internal dependencies
  */
-import TermsQueryContent from './terms-query-content';
+import TermsQueryInspectorControls from './inspector-controls';
 
-const TermsQueryEdit = ( props ) => {
-	return <TermsQueryContent { ...props } />;
-};
+const TEMPLATE = [ [ 'core/term-template' ] ];
 
-export default TermsQueryEdit;
+export default function TermsQueryEdit( {
+	attributes,
+	setAttributes,
+	clientId,
+	name,
+} ) {
+	const { termQuery = {}, tagName: TagName = 'div' } = attributes;
+	const blockProps = useBlockProps();
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		template: TEMPLATE,
+	} );
+
+	const setQuery = ( newQuery ) => {
+		setAttributes( {
+			termQuery: {
+				...termQuery,
+				...newQuery,
+			},
+		} );
+	};
+	return (
+		<>
+			<TermsQueryInspectorControls
+				name={ name }
+				attributes={ attributes }
+				setQuery={ setQuery }
+				setAttributes={ setAttributes }
+				clientId={ clientId }
+				tagName={ TagName }
+			/>
+			<TagName { ...innerBlocksProps } />
+		</>
+	);
+}
