@@ -636,7 +636,6 @@ export default function GalleryEdit( props ) {
 								columns: undefined,
 								imageCrop: true,
 								randomOrder: false,
-								aspectRatio: 'auto',
 							} );
 
 setAspectRatio( 'auto' );
