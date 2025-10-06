@@ -48,7 +48,9 @@ export default function Edit( {
 } ) {
 	const registry = useRegistry();
 	const { getBlockOrder } = useSelect( blockEditorStore );
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( {
+		role: 'group',
+	} );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const { updateBlockAttributes, insertBlock } =
 		useDispatch( blockEditorStore );
@@ -56,7 +58,7 @@ export default function Edit( {
 	const isContentOnlyMode = blockEditingMode === 'contentOnly';
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		template: [ [ ACCORDION_BLOCK_NAME ], [ ACCORDION_BLOCK_NAME ] ],
+		template: [ [ ACCORDION_BLOCK_NAME ] ],
 		defaultBlock: ACCORDION_BLOCK,
 		directInsert: true,
 		templateInsertUpdatesSelection: true,

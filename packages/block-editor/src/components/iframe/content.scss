@@ -35,7 +35,7 @@
 		// Apply an X translation to center the scaled content within the available space.
 		transform: translateX(calc((#{$scale-container-width} - #{$container-width}) / 2 / #{$scale}));
 		scale: $scale;
-		background-color: $gray-300;
+		background-color: var(--wp-editor-canvas-background);
 
 		// Chrome seems to respect that transform scale shouldn't affect the layout size of the element,
 		// so we need to adjust the height of the content to match the scale by using negative margins.

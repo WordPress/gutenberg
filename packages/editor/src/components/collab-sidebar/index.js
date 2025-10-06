@@ -180,7 +180,6 @@ function CollabSidebarContent( {
 					setShowCommentBoard={ setShowCommentBoard }
 				/>
 				<Comments
-					key={ getSelectedBlockClientId() }
 					threads={ comments }
 					onEditComment={ onEditComment }
 					onAddReply={ addNewComment }
