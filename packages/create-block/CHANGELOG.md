@@ -3,7 +3,7 @@
 ## Unreleased
 
 ## Enhancement 
-- created block support alias ([#72079](https://github.com/WordPress/gutenberg/pull/72079)).
+- Enable `alias` package installation ([#72079](https://github.com/WordPress/gutenberg/pull/72079)).
 
 ## 4.75.0 (2025-10-01)
 
