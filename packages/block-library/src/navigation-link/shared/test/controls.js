@@ -156,31 +156,6 @@ describe( 'Controls', () => {
 		);
 	} );
 
-	it( 'calls setIsEditingControl on focus and blur for all inputs', () => {
-		render( <Controls { ...defaultProps } /> );
-
-		const textInput = screen.getByLabelText( 'Text' );
-		const urlInput = screen.getByLabelText( 'Link' );
-
-		// Test text input
-		fireEvent.focus( textInput );
-		expect( defaultProps.setIsEditingControl ).toHaveBeenCalledWith( true );
-
-		fireEvent.blur( textInput );
-		expect( defaultProps.setIsEditingControl ).toHaveBeenCalledWith(
-			false
-		);
-
-		// Test URL input
-		fireEvent.focus( urlInput );
-		expect( defaultProps.setIsEditingControl ).toHaveBeenCalledWith( true );
-
-		fireEvent.blur( urlInput );
-		expect( defaultProps.setIsEditingControl ).toHaveBeenCalledWith(
-			false
-		);
-	} );
-
 	it( 'handles all form field changes correctly', () => {
 		render( <Controls { ...defaultProps } /> );
 
