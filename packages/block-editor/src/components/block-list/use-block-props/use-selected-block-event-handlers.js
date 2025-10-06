@@ -5,15 +5,12 @@ import { isTextField } from '@wordpress/dom';
 import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
-import { createRoot } from '@wordpress/element';
-import { store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
-import BlockDraggableChip from '../../../components/block-draggable/draggable-chip';
 
 /**
  * Adds block behaviour:
@@ -24,9 +21,9 @@ import BlockDraggableChip from '../../../components/block-draggable/draggable-ch
  * @param {string} clientId Block client ID.
  */
 export function useEventHandlers( { clientId, isSelected } ) {
-	const { getBlockType } = useSelect( blocksStore );
-	const { getBlockRootClientId, isZoomOut, hasMultiSelection, getBlockName } =
-		unlock( useSelect( blockEditorStore ) );
+	const { getBlockRootClientId, isZoomOut, hasMultiSelection } = unlock(
+		useSelect( blockEditorStore )
+	);
 	const {
 		insertAfterBlock,
 		removeBlock,
@@ -105,20 +102,6 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				const selection = defaultView.getSelection();
 				selection.removeAllRanges();
 
-				const domNode = document.createElement( 'div' );
-				const root = createRoot( domNode );
-				root.render(
-					<BlockDraggableChip
-						icon={ getBlockType( getBlockName( clientId ) ).icon }
-					/>
-				);
-				document.body.appendChild( domNode );
-				domNode.style.position = 'absolute';
-				domNode.style.top = '0';
-				domNode.style.left = '0';
-				domNode.style.zIndex = '1000';
-				domNode.style.pointerEvents = 'none';
-
 				// Setting the drag chip as the drag image actually works, but
 				// the behaviour is slightly different in every browser. In
 				// Safari, it animates, in Firefox it's slightly transparent...
@@ -134,31 +117,98 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				ownerDocument.body.appendChild( dragElement );
 				event.dataTransfer.setDragImage( dragElement, 0, 0 );
 
-				let offset = { x: 0, y: 0 };
+				const rect = node.getBoundingClientRect();
 
-				if ( document !== ownerDocument ) {
-					const frame = defaultView.frameElement;
-					if ( frame ) {
-						const rect = frame.getBoundingClientRect();
-						offset = { x: rect.left, y: rect.top };
+				const clone = node.cloneNode( true );
+				clone.style.visibility = 'hidden';
+
+				// Remove the id and leave it on the clone so that drop target
+				// calculations are correct.
+				const id = node.id;
+				node.id = null;
+
+				let _scale = 1;
+
+				let parentElement = node;
+
+				while ( ( parentElement = parentElement.parentElement ) ) {
+					const { scale } =
+						defaultView.getComputedStyle( parentElement );
+					if ( scale && scale !== 'none' ) {
+						_scale = parseFloat( scale );
+						break;
 					}
 				}
 
-				// chip handle offset
-				offset.x -= 58;
+				let bgColor = 'transparent';
 
-				function over( e ) {
-					domNode.style.transform = `translate( ${
-						e.clientX + offset.x
-					}px, ${ e.clientY + offset.y }px )`;
+				parentElement = node;
+
+				while ( ( parentElement = parentElement.parentElement ) ) {
+					const { backgroundColor } =
+						defaultView.getComputedStyle( parentElement );
+					if (
+						backgroundColor &&
+						backgroundColor !== 'transparent' &&
+						backgroundColor !== 'rgba(0, 0, 0, 0)'
+					) {
+						bgColor = backgroundColor;
+						break;
+					}
 				}
 
-				over( event );
+				const inverted = 1 / _scale;
+
+				node.after( clone );
+
+				node.style.position = 'fixed';
+				node.style.top = `${ rect.top }px`;
+				node.style.left = `${ rect.left }px`;
+				node.style.width = `${ rect.width * inverted }px`;
+
+				const originX = event.clientX - rect.left;
+				const originY = event.clientY - rect.top;
+
+				// Scale everything to 200px.
+				const dragScale = rect.height > 200 ? 200 / rect.height : 1;
+
+				node.style.zIndex = '1000';
+				node.style.transformOrigin = '0 0';
+				node.style.transformOrigin = `${ originX }px ${ originY }px`;
+				node.style.transition = 'transform 0.2s ease-out';
+				node.style.transform = `scale(${ dragScale })`;
+				node.style.margin = '0';
+				node.style.opacity = '0.9';
+				node.style.backgroundColor = bgColor;
+
+				let hasStarted = false;
+
+				function over( e ) {
+					if ( ! hasStarted ) {
+						hasStarted = true;
+						node.style.pointerEvents = 'none';
+					}
+					node.style.top = `${ e.clientY * inverted - originY }px`;
+					node.style.left = `${ e.clientX * inverted - originX }px`;
+				}
 
 				function end() {
 					ownerDocument.removeEventListener( 'dragover', over );
 					ownerDocument.removeEventListener( 'dragend', end );
-					domNode.remove();
+					node.style.transform = '';
+					node.style.transformOrigin = '';
+					node.style.transition = '';
+					node.style.zIndex = '';
+					node.style.position = '';
+					node.style.top = '';
+					node.style.left = '';
+					node.style.width = '';
+					node.style.pointerEvents = '';
+					node.style.margin = '';
+					node.style.opacity = '';
+					node.style.backgroundColor = '';
+					clone.remove();
+					node.id = id;
 					dragElement.remove();
 					stopDraggingBlocks();
 					document.body.classList.remove(
