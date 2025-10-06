@@ -95,8 +95,6 @@ function UnforwardedSearchControl(
 				_overrides: { __nextHasNoMarginBottom },
 				__associatedWPComponentName: 'SearchControl',
 			},
-			// `isBorderless` is still experimental and not a public prop for InputControl yet.
-			InputBase: { isBorderless: true },
 		} ),
 		[ __nextHasNoMarginBottom ]
 	);
