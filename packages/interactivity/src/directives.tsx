@@ -283,7 +283,7 @@ const useItemContexts = function* (
 	itemProp: string,
 	eachKey?: DirectiveEntry
 ): Generator< [ item: unknown, context: any, key: any ] > {
-	const { current: itemContexts } = useRef< any >( {} );
+	const { current: itemContexts } = useRef< Map< any, any > >( new Map() );
 
 	for ( const item of items ) {
 		const key = evaluateItemKey(
@@ -294,18 +294,21 @@ const useItemContexts = function* (
 			eachKey
 		);
 
-		if ( ! itemContexts[ key ] ) {
-			itemContexts[ key ] = proxifyContext(
-				proxifyState( namespace, {
-					// Inits the item prop in the context to shadow it in case
-					// it was inherited from the parent context. The actual
-					// value is set in the `wp-each` directive later on.
-					[ itemProp ]: undefined,
-				} ),
-				inheritedValue.client[ namespace ]
+		if ( ! itemContexts.has( key ) ) {
+			itemContexts.set(
+				key,
+				proxifyContext(
+					proxifyState( namespace, {
+						// Inits the item prop in the context to shadow it in case
+						// it was inherited from the parent context. The actual
+						// value is set in the `wp-each` directive later on.
+						[ itemProp ]: undefined,
+					} ),
+					inheritedValue.client[ namespace ]
+				)
 			);
 		}
-		yield [ item, itemContexts[ key ], key ];
+		yield [ item, itemContexts.get( key ), key ];
 	}
 };
 
