@@ -121,6 +121,8 @@ export function useEventHandlers( { clientId, isSelected } ) {
 
 				const clone = node.cloneNode( true );
 				clone.style.visibility = 'hidden';
+				// Maybe remove the clone now that it's relative?
+				clone.style.display = 'none';
 
 				// Remove the id and leave it on the clone so that drop target
 				// calculations are correct.
@@ -161,10 +163,23 @@ export function useEventHandlers( { clientId, isSelected } ) {
 
 				node.after( clone );
 
-				node.style.position = 'fixed';
-				node.style.top = `${ rect.top }px`;
-				node.style.left = `${ rect.left }px`;
-				node.style.width = `${ rect.width * inverted }px`;
+				// Get scroll position.
+				const originScrollTop = defaultView.scrollY;
+				const originScrollLeft = defaultView.scrollX;
+				const originClientX = event.clientX;
+				const originClientY = event.clientY;
+
+				// We can't use position fixed because it will behave different
+				// if the html element is is scaled or transformed (position
+				// will no longer be relative to the viewport). The downside of
+				// relative is that we have to listen to scroll events. On the
+				// upside we don't have to clone to keep a space. Absolute
+				// positioning might be weird because it will be based on the
+				// positioned parent, but it might be worth a try.
+				node.style.position = 'relative';
+				node.style.top = `${ 0 }px`;
+				node.style.left = `${ 0 }px`;
+				// node.style.width = `${ rect.width * inverted }px`;
 
 				const originX = event.clientX - rect.left;
 				const originY = event.clientY - rect.top;
@@ -174,10 +189,12 @@ export function useEventHandlers( { clientId, isSelected } ) {
 
 				node.style.zIndex = '1000';
 				node.style.transformOrigin = '0 0';
-				node.style.transformOrigin = `${ originX }px ${ originY }px`;
+				node.style.transformOrigin = `${ originX * inverted }px ${
+					originY * inverted
+				}px`;
 				node.style.transition = 'transform 0.2s ease-out';
 				node.style.transform = `scale(${ dragScale })`;
-				node.style.margin = '0';
+				// node.style.margin = '0';
 				node.style.opacity = '0.9';
 				node.style.backgroundColor = bgColor;
 
@@ -188,8 +205,22 @@ export function useEventHandlers( { clientId, isSelected } ) {
 						hasStarted = true;
 						node.style.pointerEvents = 'none';
 					}
-					node.style.top = `${ e.clientY * inverted - originY }px`;
-					node.style.left = `${ e.clientX * inverted - originX }px`;
+					const scrollTop = defaultView.scrollY;
+					const scrollLeft = defaultView.scrollX;
+					node.style.top = `${
+						( e.clientY -
+							originClientY +
+							scrollTop -
+							originScrollTop ) *
+						inverted
+					}px`;
+					node.style.left = `${
+						( e.clientX -
+							originClientX +
+							scrollLeft -
+							originScrollLeft ) *
+						inverted
+					}px`;
 				}
 
 				function end() {
@@ -202,9 +233,9 @@ export function useEventHandlers( { clientId, isSelected } ) {
 					node.style.position = '';
 					node.style.top = '';
 					node.style.left = '';
-					node.style.width = '';
+					// node.style.width = '';
 					node.style.pointerEvents = '';
-					node.style.margin = '';
+					// node.style.margin = '';
 					node.style.opacity = '';
 					node.style.backgroundColor = '';
 					clone.remove();
@@ -222,6 +253,7 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				ownerDocument.addEventListener( 'dragover', over );
 				ownerDocument.addEventListener( 'dragend', end );
 				ownerDocument.addEventListener( 'drop', end );
+				ownerDocument.addEventListener( 'scroll', over );
 
 				startDraggingBlocks( [ clientId ] );
 				// Important because it hides the block toolbar.
