@@ -12,7 +12,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { forwardRef } from '@wordpress/element';
-import { Icon, edit as editIcon } from '@wordpress/icons';
+import { Icon, pencil as editIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
