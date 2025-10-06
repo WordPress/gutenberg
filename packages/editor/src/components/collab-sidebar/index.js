@@ -280,14 +280,14 @@ function CommentBoardWrapper( {
 		if ( y !== null && y !== 0 ) {
 			updateOffsets( thread.id, y, refs.floating?.current?.clientHeight );
 		}
-	}, [ y, updateOffsets ] );
+	}, [ y, refs.floating, thread.id ] );
 
 	useEffect( () => {
 		if ( refs.floating?.current ) {
 			const newHeight = refs.floating?.current.scrollHeight;
 			updateHeight( thread.id, newHeight );
 		}
-	}, [ thread.id, updateHeight ] );
+	}, [ thread.id, refs.floating ] );
 
 	return (
 		<VStack
