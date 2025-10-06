@@ -1,19 +1,20 @@
 /**
  * WordPress dependencies
  */
+import { Page } from '@wordpress/admin-ui';
 import { __ } from '@wordpress/i18n';
-import { useMemo, useId } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
-import { useEntityRecords } from '@wordpress/core-data';
+import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useView } from '@wordpress/views';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import Page from '../page';
 import {
 	LAYOUT_GRID,
 	LAYOUT_TABLE,
@@ -24,7 +25,7 @@ import {
 import usePatternSettings from './use-pattern-settings';
 import { unlock } from '../../lock-unlock';
 import usePatterns, { useAugmentPatternsWithPermissions } from './use-patterns';
-import PatternsHeader from './header';
+import PatternsActions from './actions';
 import { useEditPostAction } from '../dataviews-actions';
 import {
 	patternStatusField,
@@ -32,6 +33,8 @@ import {
 	templatePartAuthorField,
 } from './fields';
 import { addQueryArgs } from '@wordpress/url';
+import usePatternCategories from '../sidebar-navigation-screen-patterns/use-pattern-categories';
+import { Button } from '@wordpress/components';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { usePostActions, patternTitleField } = unlock( editorPrivateApis );
@@ -63,6 +66,34 @@ const DEFAULT_VIEW = {
 	filters: [],
 	...defaultLayouts[ LAYOUT_GRID ],
 };
+
+function usePagePatternsHeader( type, categoryId ) {
+	const { patternCategories } = usePatternCategories();
+	const templatePartAreas = useSelect(
+		( select ) =>
+			select( coreStore ).getCurrentTheme()
+				?.default_template_part_areas || [],
+		[]
+	);
+	let title, description, patternCategory;
+	if ( type === TEMPLATE_PART_POST_TYPE ) {
+		const templatePartArea = templatePartAreas.find(
+			( area ) => area.area === categoryId
+		);
+		title = templatePartArea?.label || __( 'All Template Parts' );
+		description =
+			templatePartArea?.description ||
+			__( 'Includes every template part defined for any area.' );
+	} else if ( type === PATTERN_TYPES.user && !! categoryId ) {
+		patternCategory = patternCategories.find(
+			( category ) => category.name === categoryId
+		);
+		title = patternCategory?.label;
+		description = patternCategory?.description;
+	}
+
+	return { title, description };
+}
 
 export default function DataviewsPatterns() {
 	const { path, query } = useLocation();
@@ -158,26 +189,36 @@ export default function DataviewsPatterns() {
 		}
 		return [ editAction, ...patternActions ].filter( Boolean );
 	}, [ editAction, postType, templatePartActions, patternActions ] );
-	const id = useId();
 	const settings = usePatternSettings();
+	const { title, description } = usePagePatternsHeader(
+		postType,
+		categoryId
+	);
+
 	// Wrap everything in a block editor provider.
 	// This ensures 'styles' that are needed for the previews are synced
 	// from the site editor store to the block editor store.
 	return (
 		<ExperimentalBlockEditorProvider settings={ settings }>
 			<Page
-				title={ __( 'Patterns content' ) }
 				className="edit-site-page-patterns-dataviews"
-				hideTitleFromUI
+				title={ title }
+				subTitle={ description }
+				actions={
+					<>
+						{ isModified && (
+							<Button
+								__next40pxDefaultSize
+								onClick={ resetToDefault }
+							>
+								{ __( 'Reset view' ) }
+							</Button>
+						) }
+						<PatternsActions />
+					</>
+				}
+				hasPadding={ false }
 			>
-				<PatternsHeader
-					categoryId={ categoryId }
-					type={ postType }
-					titleId={ `${ id }-title` }
-					descriptionId={ `${ id }-description` }
-					isModifiedView={ isModified }
-					resetView={ resetToDefault }
-				/>
 				<DataViews
 					key={ categoryId + postType }
 					paginationInfo={ paginationInfo }

@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { Page } from '@wordpress/admin-ui';
 import { Button } from '@wordpress/components';
 import {
 	store as coreStore,
@@ -19,7 +20,6 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import Page from '../page';
 import {
 	useDefaultViews,
 	defaultLayouts,
@@ -295,6 +295,7 @@ export default function PostList( { postType } ) {
 					</>
 				)
 			}
+			hasPadding={ false }
 		>
 			<DataViews
 				key={ activeView }
