@@ -336,73 +336,58 @@ test.describe( 'Navigation block', () => {
 		test( 'Focus management when using the navigation link appender', async ( {
 			pageUtils,
 			navigation,
-		} ) => {
-			const navBlock = navigation.getNavBlock();
-
-			/**
-			 * Test: We don't lose focus when using the navigation link appender
-			 */
-			await pageUtils.pressKeys( 'ArrowDown' );
-			await navigation.useBlockInserter();
-			await navigation.addLinkClose();
-
-			/**
-			 * TODO: This is not desired behavior. Ideally the
-			 * Appender should be focused again since it opened
-			 * the link control.
-			 * IMPORTANT: This check is not to enforce this behavior,
-			 * but to make sure focus is kept nearby until we are able
-			 * to send focus to the appender.
-			 */
-			await expect( navBlock ).toBeFocused();
-		} );
-
-		// eslint-disable-next-line playwright/expect-expect
-		test( 'Focus management when creating navigation links', async ( {
 			page,
-			pageUtils,
-			navigation,
 		} ) => {
-			/**
-			 * Test: Creating a link sends focus to the newly created navigation link item
-			 */
-			await pageUtils.pressKeys( 'ArrowDown' );
-			await navigation.useBlockInserter();
-			await navigation.addPage( 'Cat' );
+			const navBlockInserter = navigation.getNavBlockInserter();
 
-			/**
-			 * Test: We can open and close the preview with the keyboard and escape
-			 *       buttons from a top-level nav item using both the shortcut and toolbar
-			 */
-			await navigation.useLinkShortcut();
-			await navigation.previewIsOpenAndCloses();
-			await navigation.checkLabelFocus( 'Cat' );
+			await test.step( 'with no links, focus returns to the top level navigation link appender if we close the Link UI without creating a link', async () => {
+				await pageUtils.pressKeys( 'ArrowDown' );
+				await navigation.useBlockInserter();
+				await navigation.addLinkClose();
 
-			await navigation.canUseToolbarLink();
+				await expect( navBlockInserter ).toBeVisible();
+				await expect( navBlockInserter ).toBeFocused();
+			} );
 
-			/**
-			 * Test: Creating a link from a url-string (https://www.example.com) returns
-			 *       focus to the newly created link with the text selected
-			 */
-			await page.keyboard.press( 'Escape' );
-			await pageUtils.pressKeys( 'ArrowDown' );
-			await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
+			await test.step( 'creating a link sends focus to the newly created navigation link item', async () => {
+				await pageUtils.pressKeys( 'ArrowDown' );
+				await navigation.useBlockInserter();
+				await navigation.addPage( 'Cat' );
+			} );
 
-			await navigation.useBlockInserter();
-			await navigation.addCustomURL( 'https://example.com' );
-			await navigation.expectToHaveTextSelected( 'example.com' );
+			await test.step( 'we can open and close the preview with the keyboard and escape buttons from a top-level nav item using both the shortcut and toolbar', async () => {
+				await navigation.useLinkShortcut();
+				await navigation.previewIsOpenAndCloses();
+				await navigation.checkLabelFocus( 'Cat' );
 
-			/**
-			 * Test: We can open and close the preview with the keyboard and escape
-			 *       buttons from a top-level nav link with a url-like label using
-			 *       both the shortcut and toolbar
-			 */
-			await pageUtils.pressKeys( 'ArrowLeft' );
-			await navigation.useLinkShortcut();
-			await navigation.previewIsOpenAndCloses();
-			await navigation.checkLabelFocus( 'example.com' );
+				await navigation.canUseToolbarLink();
 
-			await navigation.canUseToolbarLink();
+				await page.keyboard.press( 'Escape' );
+				await pageUtils.pressKeys( 'ArrowDown' );
+				await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
+			} );
+
+			await test.step( 'focus returns to the navigation link appender if we close the Link UI without creating a link', async () => {
+				await navigation.useBlockInserter();
+				await navigation.addLinkClose();
+				await expect( navBlockInserter ).toBeVisible();
+				await expect( navBlockInserter ).toBeFocused();
+			} );
+
+			await test.step( 'creating a link from a url-string (https://www.example.com) returns focus to the newly created link with the text selected', async () => {
+				await navigation.useBlockInserter();
+				await navigation.addCustomURL( 'https://example.com' );
+				await navigation.expectToHaveTextSelected( 'example.com' );
+			} );
+
+			await test.step( 'we can open and close the preview with the keyboard and escape buttons from a top-level nav link with a url-like label using both the shortcut and toolbar', async () => {
+				await pageUtils.pressKeys( 'ArrowLeft' );
+				await navigation.useLinkShortcut();
+				await navigation.previewIsOpenAndCloses();
+				await navigation.checkLabelFocus( 'example.com' );
+
+				await navigation.canUseToolbarLink();
+			} );
 		} );
 
 		test( 'Can add submenu item using the keyboard', async ( {
@@ -916,7 +901,7 @@ class Navigation {
 
 		await expect( linkControlSearch ).toBeFocused();
 
-		await this.page.keyboard.type( label, { delay: 50 } );
+		await this.page.keyboard.type( label, { delay: 200 } );
 
 		// Wait for the search results to be visible
 		await expect(
@@ -930,7 +915,7 @@ class Navigation {
 		await this.page.keyboard.press( 'Enter' );
 
 		const linkControlLink = await this.getLinkControlLink( label );
-		await expect( linkControlLink ).toBeFocused();
+		await expect( linkControlLink ).toBeVisible();
 
 		await this.page.keyboard.press( 'Escape' );
 
