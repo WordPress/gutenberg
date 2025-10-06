@@ -86,7 +86,7 @@ function gutenberg_register_block_bindings_term_data_source() {
 	register_block_bindings_source(
 		'core/term-data',
 		array(
-			'label'              => _x( 'Term Data', 'block bindings source', 'default' ),
+			'label'              => _x( 'Term Data', 'block bindings source' ),
 			'get_value_callback' => 'gutenberg_block_bindings_term_data_get_value',
 			'uses_context'       => array( 'termId', 'taxonomy' ),
 		)
