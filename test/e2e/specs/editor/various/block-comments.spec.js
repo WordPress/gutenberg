@@ -144,6 +144,14 @@ test.describe( 'Block Comments', () => {
 			comment: 'Test comment to resolve.',
 		} );
 
+		const thread = page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'listitem', {
+				name: 'Comment: Test comment to resolve.',
+			} );
+		await thread.click();
+		await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+
 		const resolveButton = page.getByRole( 'button', { name: 'Resolve' } );
 		await resolveButton.click();
 		await expect( resolveButton ).toBeDisabled();
@@ -152,6 +160,8 @@ test.describe( 'Block Comments', () => {
 				.getByRole( 'button', { name: 'Dismiss this notice' } )
 				.filter( { hasText: 'Comment marked as resolved.' } )
 		).toBeVisible();
+		await expect( thread ).toBeFocused();
+		await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
 
 		await blockCommentUtils.clickBlockCommentActionMenuItem( 'Reopen' );
 		await expect( resolveButton ).toBeEnabled();
@@ -283,6 +293,79 @@ test.describe( 'Block Comments', () => {
 			// Collapse the comment with Enter key.
 			await page.keyboard.press( 'Enter' );
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+		} );
+
+		test( 'should collapse a comment with Escape key', async ( {
+			page,
+			blockCommentUtils,
+		} ) => {
+			await blockCommentUtils.addBlockWithComment( {
+				type: 'core/heading',
+				attributes: { content: 'Testing block comments' },
+				comment: 'Test comment escape',
+			} );
+
+			const thread = page
+				.getByRole( 'region', {
+					name: 'Editor settings',
+				} )
+				.getByRole( 'listitem', {
+					name: 'Comment: Test comment escape',
+				} );
+
+			await thread.click();
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+
+			// Collapse the comment with Escape key.
+			await page.keyboard.press( 'Escape' );
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+		} );
+
+		test( 'should collapse a comment after canceling comment form', async ( {
+			page,
+			blockCommentUtils,
+		} ) => {
+			await blockCommentUtils.addBlockWithComment( {
+				type: 'core/heading',
+				attributes: { content: 'Testing block comments' },
+				comment: 'Test comment',
+			} );
+
+			const thread = page
+				.getByRole( 'region', {
+					name: 'Editor settings',
+				} )
+				.getByRole( 'listitem', {
+					name: 'Comment: Test comment',
+				} );
+
+			await thread.click();
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+			await thread.getByRole( 'button', { name: 'Cancel' } ).click();
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+			await expect( thread ).toBeFocused();
+		} );
+
+		test( 'should have accessible name for the comment threads', async ( {
+			page,
+			blockCommentUtils,
+		} ) => {
+			await blockCommentUtils.addBlockWithComment( {
+				type: 'core/heading',
+				attributes: { content: 'Testing block comments' },
+				comment: 'Test comment',
+			} );
+
+			const thread = page
+				.getByRole( 'region', {
+					name: 'Editor settings',
+				} )
+				.getByRole( 'listitem' );
+
+			await thread.focus();
+			await expect( thread ).toHaveAccessibleName(
+				'Comment: Test comment'
+			);
 		} );
 	} );
 } );
