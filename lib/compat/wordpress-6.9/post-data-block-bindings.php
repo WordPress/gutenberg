@@ -23,10 +23,28 @@ function gutenberg_block_bindings_post_data_get_value( array $source_args, $bloc
 		return null;
 	}
 
-	if ( empty( $block_instance->context['postId'] ) ) {
+	// Hardcoded exception for navigation blocks (temporary for WP 6.9)
+	// TODO: Replace with proper binding configuration API in WP 7.0
+	// See https://github.com/WordPress/gutenberg/pull/71002
+	$block_name          = $block_instance->name ?? '';
+	$is_navigation_block = in_array(
+		$block_name,
+		array( 'core/navigation-link', 'core/navigation-submenu' ),
+		true
+	);
+
+	if ( $is_navigation_block ) {
+		// Navigation blocks: read from block attributes
+		$post_id = $block_instance->attributes['id'] ?? null;
+	} else {
+		// All other blocks: use context
+		$post_id = $block_instance->context['postId'] ?? null;
+	}
+
+	// If we don't have an entity ID, bail early.
+	if ( empty( $post_id ) ) {
 		return null;
 	}
-	$post_id = $block_instance->context['postId'];
 
 	// If a post isn't public, we need to prevent unauthorized users from accessing the post data.
 	$post = get_post( $post_id );
@@ -45,6 +63,11 @@ function gutenberg_block_bindings_post_data_get_value( array $source_args, $bloc
 		} else {
 			return '';
 		}
+	}
+
+	if ( 'link' === $source_args['key'] ) {
+		$permalink = get_permalink( $post_id );
+		return is_wp_error( $permalink ) ? null : esc_url( $permalink );
 	}
 }
 

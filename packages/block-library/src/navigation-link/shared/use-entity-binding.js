@@ -17,11 +17,13 @@ import { useBlockBindingsUtils } from '@wordpress/block-editor';
  */
 export function useEntityBinding( { clientId, attributes } ) {
 	const { updateBlockBindings } = useBlockBindingsUtils( clientId );
-	const { metadata, id } = attributes;
+	const { metadata, id, kind } = attributes;
 
-	// Check if there's a URL binding with the core/entity source
-	const hasUrlBinding =
-		metadata?.bindings?.url?.source === 'core/entity' && !! id;
+	const hasUrlBinding = !! metadata?.bindings?.url && !! id;
+	const expectedSource =
+		kind === 'post-type' ? 'core/post-data' : 'core/term-data';
+	const hasCorrectBinding =
+		hasUrlBinding && metadata?.bindings?.url?.source === expectedSource;
 
 	const clearBinding = useCallback( () => {
 		// Only clear if there's actually a valid binding to clear
@@ -32,18 +34,20 @@ export function useEntityBinding( { clientId, attributes } ) {
 	}, [ hasUrlBinding, updateBlockBindings ] );
 
 	const createBinding = useCallback( () => {
+		const source =
+			kind === 'post-type' ? 'core/post-data' : 'core/term-data';
 		updateBlockBindings( {
 			url: {
-				source: 'core/entity',
+				source,
 				args: {
-					key: 'url',
+					key: 'link',
 				},
 			},
 		} );
-	}, [ updateBlockBindings ] );
+	}, [ updateBlockBindings, kind ] );
 
 	return {
-		hasUrlBinding,
+		hasUrlBinding: hasCorrectBinding,
 		clearBinding,
 		createBinding,
 	};
