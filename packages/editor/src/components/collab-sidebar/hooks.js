@@ -29,7 +29,7 @@ export function useBlockComments( postId ) {
 			const commentId =
 				getBlockAttributes( clientId )?.metadata?.commentId;
 			if ( commentId ) {
-				results[ commentId ] = clientId;
+				results[ clientId ] = commentId;
 			}
 			return results;
 		}, {} );
@@ -45,11 +45,14 @@ export function useBlockComments( postId ) {
 
 		// Initialize each object with an empty `reply` array and map blockClientId.
 		allComments.forEach( ( item ) => {
+			const itemBlock = Object.keys( blocksWithComments ).find(
+				( key ) => blocksWithComments[ key ] === item.id
+			);
+
 			compare[ item.id ] = {
 				...item,
 				reply: [],
-				blockClientId:
-					item.parent === 0 ? blocksWithComments[ item.id ] : null,
+				blockClientId: item.parent === 0 ? itemBlock : null,
 			};
 		} );
 
@@ -77,16 +80,28 @@ export function useBlockComments( postId ) {
 			updatedResult.map( ( thread ) => [ String( thread.id ), thread ] )
 		);
 
-		// Get comments by block order, filter out undefined threads, and exclude resolved comments.
-		const unresolvedSortedComments = Object.keys( blocksWithComments )
-			.map( ( id ) => threadIdMap.get( id ) )
+		// Get comments by block order, first unresolved, then resolved.
+		const unresolvedSortedComments = Object.values( blocksWithComments )
+			.map( ( commentId ) => threadIdMap.get( String( commentId ) ) )
 			.filter(
-				( thread ) =>
-					thread !== undefined && thread.status !== 'approved'
+				( thread ) => thread !== undefined && thread.status === 'hold'
 			);
 
+		const resolvedSortedComments = Object.values( blocksWithComments )
+			.map( ( commentId ) => threadIdMap.get( String( commentId ) ) )
+			.filter(
+				( thread ) =>
+					thread !== undefined && thread.status === 'approved'
+			);
+
+		// Combine unresolved comments in block order with resolved comments at the end.
+		const allSortedComments = [
+			...unresolvedSortedComments,
+			...resolvedSortedComments,
+		];
+
 		return {
-			resultComments: updatedResult,
+			resultComments: allSortedComments,
 			unresolvedSortedThreads: unresolvedSortedComments,
 		};
 	}, [ threads, blocksWithComments ] );
