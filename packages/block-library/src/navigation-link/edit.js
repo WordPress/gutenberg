@@ -192,10 +192,10 @@ export default function NavigationLinkEdit( {
 	const isNewLink = useRef( ! url );
 
 	// On mount, if this is a new link without a URL and it's selected,
-	// select the parent navigation block instead to keep the appender visible.
+	// select the parent block (submenu or navigation) instead to keep the appender visible.
 	useEffect( () => {
 		if ( isNewLink.current && isSelected && ! url ) {
-			selectBlock( rootNavigationClientId );
+			selectBlock( parentBlockClientId );
 		}
 	}, [] );
 
@@ -231,7 +231,7 @@ export default function NavigationLinkEdit( {
 		isParentOfSelectedBlock,
 		hasChildren,
 		validateLinkStatus,
-		rootNavigationClientId,
+		parentBlockClientId,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -243,8 +243,8 @@ export default function NavigationLinkEdit( {
 				getSelectedBlockClientId,
 			} = select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientId );
-			const isTopLevel =
-				getBlockName( rootClientId ) === 'core/navigation';
+			const parentBlockName = getBlockName( rootClientId );
+			const isTopLevel = parentBlockName === 'core/navigation';
 			const selectedBlockClientId = getSelectedBlockClientId();
 			const rootNavClientId = isTopLevel
 				? rootClientId
@@ -252,6 +252,12 @@ export default function NavigationLinkEdit( {
 						clientId,
 						'core/navigation'
 				  )[ 0 ];
+
+			// Get the immediate parent - if it's a submenu, use it; otherwise use the navigation block
+			const parentBlockId =
+				parentBlockName === 'core/navigation-submenu'
+					? rootClientId
+					: rootNavClientId;
 
 			// Enable when the root Navigation block is selected or any of its inner blocks.
 			const enableLinkStatusValidation =
@@ -269,7 +275,7 @@ export default function NavigationLinkEdit( {
 				),
 				hasChildren: !! getBlockCount( clientId ),
 				validateLinkStatus: enableLinkStatusValidation,
-				rootNavigationClientId: rootNavClientId,
+				parentBlockClientId: parentBlockId,
 			};
 		},
 		[ clientId, maxNestingLevel ]

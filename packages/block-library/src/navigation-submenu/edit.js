@@ -137,11 +137,8 @@ export default function NavigationSubmenuEdit( {
 		attributes,
 	} );
 
-	const {
-		__unstableMarkNextChangeAsNotPersistent,
-		replaceBlock,
-		selectPreviousBlock,
-	} = useDispatch( blockEditorStore );
+	const { __unstableMarkNextChangeAsNotPersistent, replaceBlock } =
+		useDispatch( blockEditorStore );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
@@ -449,17 +446,12 @@ export default function NavigationSubmenuEdit( {
 							clientId={ clientId }
 							link={ attributes }
 							onClose={ () => {
+								setIsLinkOpen( false );
+
 								// If there is no link then remove the auto-inserted block.
 								if ( ! url ) {
-									if ( closedByEscapeRef.current ) {
-										// User pressed Escape - select previous block so appender remains visible
-										selectPreviousBlock( clientId );
-									}
-									// Then remove this block
 									onReplace( [] );
 								}
-
-								setIsLinkOpen( false );
 							} }
 							anchor={ popoverAnchor }
 							onRemove={ () => {
