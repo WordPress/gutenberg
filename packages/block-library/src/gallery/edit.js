@@ -140,7 +140,7 @@ export default function GalleryEdit( props ) {
 		linkTarget,
 		linkTo,
 		sizeSlug,
-		aspectRatio = 'auto',
+		aspectRatio,
 	} = attributes;
 
 	const {
