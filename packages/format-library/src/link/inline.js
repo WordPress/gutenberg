@@ -1,18 +1,10 @@
 /**
  * WordPress dependencies
  */
-import {
-	useState,
-	useMemo,
-	createInterpolateElement,
-} from '@wordpress/element';
+import { useMemo, createInterpolateElement } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
-import {
-	Popover,
-	__experimentalInputControl as InputControl,
-	CheckboxControl,
-} from '@wordpress/components';
+import { Popover } from '@wordpress/components';
 import { prependHTTP } from '@wordpress/url';
 import {
 	create,
@@ -37,52 +29,9 @@ import { useDispatch, useSelect } from '@wordpress/data';
  */
 import { createLinkFormat, isValidHref, getFormatBoundary } from './utils';
 import { link as settings } from './index';
+import CSSClassesSettingComponent from './css-classes-setting';
 
-const CSSClassesSettingComponent = ( { setting, value, onChange } ) => {
-	const hasValue = value ? value?.cssClasses?.length > 0 : false;
-	const [ inputVisible, setInputVisible ] = useState( hasValue );
-
-	const handleSettingChange = ( newValue ) => {
-		onChange( {
-			...value,
-			[ setting.id ]: newValue,
-		} );
-	};
-
-	const handleCheckboxChange = () => {
-		if ( inputVisible ) {
-			if ( hasValue ) {
-				// Reset the value.
-				handleSettingChange( '' );
-			}
-			setInputVisible( false );
-		} else {
-			setInputVisible( true );
-		}
-	};
-
-	return (
-		<div className="block-editor-link-control__css-classes-setting">
-			<CheckboxControl
-				__nextHasNoMarginBottom
-				label={ setting.title }
-				onChange={ handleCheckboxChange }
-				checked={ inputVisible || hasValue }
-				help={ setting?.help }
-			/>
-			{ inputVisible && (
-				<InputControl
-					label={ setting.title }
-					value={ value?.cssClasses }
-					onChange={ handleSettingChange }
-					help={ __( 'Separate multiple classes with spaces.' ) }
-					__unstableInputWidth="100%"
-					__next40pxDefaultSize
-				/>
-			) }
-		</div>
-	);
-};
+// CSSClassesSettingComponent moved to its own file and imported above.
 
 const LINK_SETTINGS = [
 	...LinkControl.DEFAULT_LINK_SETTINGS,
