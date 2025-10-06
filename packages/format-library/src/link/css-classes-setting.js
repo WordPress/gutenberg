@@ -2,10 +2,12 @@
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
+import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import {
 	__experimentalInputControl as InputControl,
 	CheckboxControl,
+	VisuallyHidden,
 } from '@wordpress/components';
 
 /**
@@ -23,6 +25,8 @@ import {
 const CSSClassesSettingComponent = ( { setting, value, onChange } ) => {
 	const hasValue = value ? value?.cssClasses?.length > 0 : false;
 	const [ isSettingActive, setIsSettingActive ] = useState( hasValue );
+	const instanceId = useInstanceId( CSSClassesSettingComponent );
+	const controlledRegionId = `css-classes-setting-${ instanceId }`;
 
 	const handleSettingChange = ( newValue ) => {
 		onChange( {
@@ -44,24 +48,31 @@ const CSSClassesSettingComponent = ( { setting, value, onChange } ) => {
 	};
 
 	return (
-		<div className="block-editor-link-control__css-classes-setting">
+		<fieldset className="block-editor-link-control__css-classes-setting">
+			<VisuallyHidden as="legend">{ setting.title }</VisuallyHidden>
 			<CheckboxControl
 				__nextHasNoMarginBottom
 				label={ setting.title }
 				onChange={ handleCheckboxChange }
 				checked={ isSettingActive || hasValue }
+				aria-expanded={ isSettingActive }
+				aria-controls={
+					isSettingActive ? controlledRegionId : undefined
+				}
 			/>
 			{ isSettingActive && (
-				<InputControl
-					label={ setting.title }
-					value={ value?.cssClasses }
-					onChange={ handleSettingChange }
-					help={ __( 'Separate multiple classes with spaces.' ) }
-					__unstableInputWidth="100%"
-					__next40pxDefaultSize
-				/>
+				<div id={ controlledRegionId }>
+					<InputControl
+						label={ __( 'CSS classes' ) }
+						value={ value?.cssClasses }
+						onChange={ handleSettingChange }
+						help={ __( 'Separate multiple classes with spaces.' ) }
+						__unstableInputWidth="100%"
+						__next40pxDefaultSize
+					/>
+				</div>
 			) }
-		</div>
+		</fieldset>
 	);
 };
 

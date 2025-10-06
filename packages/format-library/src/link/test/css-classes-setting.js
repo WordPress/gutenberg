@@ -32,10 +32,16 @@ describe( 'CSSClassesSettingComponent', () => {
 		} );
 		expect( checkbox ).toBeVisible();
 
+		// aria-expanded should reflect collapsed state
+		expect( checkbox ).toHaveAttribute( 'aria-expanded', 'false' );
+
+		// aria-controls should not be present when region is not rendered
+		expect( checkbox ).not.toHaveAttribute( 'aria-controls' );
+
 		// Input should not be in the document initially
 		expect(
 			screen.queryByRole( 'textbox', {
-				name: 'Additional CSS class(es)',
+				name: 'CSS classes',
 			} )
 		).not.toBeInTheDocument();
 	} );
@@ -59,11 +65,19 @@ describe( 'CSSClassesSettingComponent', () => {
 		const checkbox = screen.getByRole( 'checkbox', {
 			name: 'Additional CSS class(es)',
 		} );
+		// starts collapsed
+		expect( checkbox ).toHaveAttribute( 'aria-expanded', 'false' );
 		await user.click( checkbox );
+		// now expanded
+		expect( checkbox ).toHaveAttribute( 'aria-expanded', 'true' );
+
+		// aria-controls should be present when expanded
+		const regionId = checkbox.getAttribute( 'aria-controls' );
+		expect( regionId ).toBeTruthy();
 
 		// Input should appear
 		const input = screen.getByRole( 'textbox', {
-			name: 'Additional CSS class(es)',
+			name: 'CSS classes',
 		} );
 		expect( input ).toBeVisible();
 
@@ -95,14 +109,21 @@ describe( 'CSSClassesSettingComponent', () => {
 			name: 'Additional CSS class(es)',
 		} );
 
+		// Initially expanded and has aria-controls
+		expect( checkbox ).toHaveAttribute( 'aria-expanded', 'true' );
+		const initialRegionId = checkbox.getAttribute( 'aria-controls' );
+		expect( initialRegionId ).toBeTruthy();
+
 		// Initially visible because there is a value
 		const input = screen.getByRole( 'textbox', {
-			name: 'Additional CSS class(es)',
+			name: 'CSS classes',
 		} );
 		expect( input ).toBeVisible();
 
 		// Toggle off
 		await user.click( checkbox );
+		// aria-expanded should now be false
+		expect( checkbox ).toHaveAttribute( 'aria-expanded', 'false' );
 
 		// Should have called onChange with cleared value
 		expect( onChange ).toHaveBeenCalledWith(
@@ -111,8 +132,11 @@ describe( 'CSSClassesSettingComponent', () => {
 		// Input should be hidden afterwards
 		expect(
 			screen.queryByRole( 'textbox', {
-				name: 'Additional CSS class(es)',
+				name: 'CSS classes',
 			} )
 		).not.toBeInTheDocument();
+
+		// aria-controls should be removed when collapsed
+		expect( checkbox ).not.toHaveAttribute( 'aria-controls' );
 	} );
 } );
