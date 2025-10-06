@@ -560,6 +560,9 @@ export default function NavigationLinkEdit( {
 								// This avoids empty blocks which can provide a poor UX.
 								if ( ! url ) {
 									onReplace( [] );
+								} else if ( isNewLink.current ) {
+									// If we just created a new link, select it
+									selectBlock( clientId );
 								}
 							} }
 							anchor={ popoverAnchor }
