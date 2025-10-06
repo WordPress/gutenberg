@@ -163,21 +163,12 @@ export const getEntityRecord =
 				if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 					const objectId = entityConfig.getSyncObjectId( key );
 
-					// Loads the persisted document.
-					await getSyncProvider().bootstrap(
-						entityConfig.syncObjectType,
-						objectId,
-						( rawRecord ) => {
-							dispatch.receiveEntityRecords(
-								kind,
-								name,
-								rawRecord,
-								query
-							);
-						}
+					getSyncProvider().register(
+						entityConfig.syncObjectType + '--edit',
+						entityConfig.syncConfig
 					);
 
-					// Bootstraps the edited document as well (and load from peers).
+					// Bootstraps the edited document (and load from peers).
 					await getSyncProvider().bootstrap(
 						entityConfig.syncObjectType + '--edit',
 						objectId,
