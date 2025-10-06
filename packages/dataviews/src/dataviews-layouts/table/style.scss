@@ -133,12 +133,6 @@
 			}
 		}
 	}
-	// Header select all checkbox should always be visible.
-	thead tr {
-		.components-checkbox-control__input.components-checkbox-control__input {
-			opacity: 1;
-		}
-	}
 	thead {
 		position: sticky;
 		inset-block-start: 0;
@@ -146,6 +140,10 @@
 
 		tr {
 			border: 0;
+			// Header select all checkbox should always be visible.
+			.components-checkbox-control__input.components-checkbox-control__input {
+				opacity: 1;
+			}
 		}
 		th {
 			background-color: $white;
