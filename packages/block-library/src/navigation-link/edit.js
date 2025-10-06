@@ -192,6 +192,9 @@ export default function NavigationLinkEdit( {
 
 	// On mount, if this is a new link without a URL and it's selected,
 	// select the parent block (submenu or navigation) instead to keep the appender visible.
+	// This helps us return focus to the appender if the user closes the link ui without creating a link.
+	// If we leave focus on this block, then when we close the link without creating a link, focus will
+	// be lost during the new block selection process.
 	useEffect( () => {
 		if ( isNewLink.current && isSelected && ! url ) {
 			selectBlock( parentBlockClientId );

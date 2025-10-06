@@ -147,7 +147,6 @@ export default function NavigationSubmenuEdit( {
 	const isDraggingWithin = useIsDraggingWithin( listItemRef );
 	const itemLabelPlaceholder = __( 'Add text…' );
 	const ref = useRef();
-	const closedByEscapeRef = useRef( false );
 	const hasInitialized = useRef( false );
 
 	const {
@@ -218,31 +217,6 @@ export default function NavigationSubmenuEdit( {
 			hasInitialized.current = true;
 		}
 	}, [ openSubmenusOnClick, url ] );
-
-	// Listen for Escape key at document level when LinkUI is open
-	useEffect( () => {
-		if ( ! isLinkOpen ) {
-			return;
-		}
-
-		const handleEscapeKey = ( event ) => {
-			if ( event.key === 'Escape' ) {
-				closedByEscapeRef.current = true;
-			}
-		};
-
-		// Use capture phase to catch Escape before Popover handles it
-		document.addEventListener( 'keydown', handleEscapeKey, {
-			capture: true,
-		} );
-		return () => {
-			document.removeEventListener( 'keydown', handleEscapeKey, {
-				capture: true,
-			} );
-			// Reset the flag when the LinkUI closes
-			closedByEscapeRef.current = false;
-		};
-	}, [ isLinkOpen ] );
 
 	/**
 	 * The hook shouldn't be necessary but due to a focus loss happening
@@ -447,11 +421,6 @@ export default function NavigationSubmenuEdit( {
 							link={ attributes }
 							onClose={ () => {
 								setIsLinkOpen( false );
-
-								// If there is no link then remove the auto-inserted block.
-								if ( ! url ) {
-									onReplace( [] );
-								}
 							} }
 							anchor={ popoverAnchor }
 							onRemove={ () => {
