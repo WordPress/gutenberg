@@ -131,6 +131,9 @@ function render_block_core_cover( $attributes, $content ) {
 		: null;
 
 	if ( ! ( $attributes['hasParallax'] || $attributes['isRepeated'] ) ) {
+		if ( $has_bindings_url && ! $uses_featured_image ) {
+			return $content;
+		}
 		$attr = array(
 			'class'           => 'wp-block-cover__image-background',
 			'data-object-fit' => 'cover',

@@ -3,6 +3,7 @@
  */
 import { useState } from '@wordpress/element';
 
+import { getBlockBindingsSource } from '@wordpress/blocks';
 import {
 	BlockControls,
 	MediaReplaceFlow,
@@ -10,6 +11,7 @@ import {
 	__experimentalBlockFullHeightAligmentControl as FullHeightAlignmentControl,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { MenuItem } from '@wordpress/components';
 import { link } from '@wordpress/icons';
@@ -28,13 +30,20 @@ export default function CoverBlockControls( {
 	setAttributes,
 	onSelectMedia,
 	currentSettings,
+	context,
 	toggleUseFeaturedImage,
 	onClearMedia,
 	onSelectEmbedUrl,
 	blockEditingMode,
 } ) {
-	const { contentPosition, id, useFeaturedImage, minHeight, minHeightUnit } =
-		attributes;
+	const {
+		contentPosition,
+		id,
+		useFeaturedImage,
+		minHeight,
+		minHeightUnit,
+		metadata,
+	} = attributes;
 	const { hasInnerBlocks, url } = currentSettings;
 
 	const [ prevMinHeightValue, setPrevMinHeightValue ] = useState( minHeight );
@@ -80,6 +89,25 @@ export default function CoverBlockControls( {
 			} ),
 		} );
 	};
+
+	const { lockUrlControls = false } = useSelect(
+		( select ) => {
+			const blockBindingsSource = getBlockBindingsSource(
+				metadata?.bindings?.url?.source
+			);
+
+			return {
+				lockUrlControls:
+					!! metadata?.bindings?.url &&
+					! blockBindingsSource?.canUserEditValue?.( {
+						select,
+						context,
+						args: metadata?.bindings?.url?.args,
+					} ),
+			};
+		},
+		[ context, metadata?.bindings?.url ]
+	);
 
 	return (
 		<>

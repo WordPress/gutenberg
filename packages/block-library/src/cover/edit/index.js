@@ -87,7 +87,7 @@ function CoverEdit( {
 	setAttributes,
 	setOverlayColor,
 	toggleSelection,
-	context: { postId, postType },
+	context,
 } ) {
 	const {
 		contentPosition,
@@ -110,6 +110,7 @@ function CoverEdit( {
 		sizeSlug,
 		poster,
 	} = attributes;
+	const { postId, postType } = context;
 
 	const [ featuredImage ] = useEntityProp(
 		'postType',
@@ -521,6 +522,7 @@ function CoverEdit( {
 			toggleUseFeaturedImage={ toggleUseFeaturedImage }
 			onClearMedia={ onClearMedia }
 			blockEditingMode={ blockEditingMode }
+			context={ context }
 		/>
 	);
 
