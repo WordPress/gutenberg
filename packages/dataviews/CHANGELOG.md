@@ -5,6 +5,7 @@
 ### Enhancements
 
 - Move search icon in search fields to prefix position ([#71984](https://github.com/WordPress/gutenberg/pull/71984)).
+- DataViews: Improve renderItemLink event propagation handling. ([#72081](https://github.com/WordPress/gutenberg/pull/72081)).
 
 ### Breaking changes
 
