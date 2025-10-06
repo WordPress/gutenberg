@@ -1,0 +1,11 @@
+[
+	{
+		"name": "core/breadcrumbs",
+		"isValid": true,
+		"attributes": {
+			"separator": "/",
+			"showHomeLink": true
+		},
+		"innerBlocks": []
+	}
+]

@@ -643,7 +643,7 @@ Example:
 const form = {
 	layout: {
 		type: 'panel',
-		labelPosition: 'side'
+		labelPosition: 'side',
 	},
 	fields: [
 		'title',
@@ -1235,9 +1235,9 @@ Example:
 
 Object that contains the validation rules for the field. If a rule is not met, the control will be marked as invalid and a message will be displayed.
 
-- `required`: boolean indicating whether the field is required or not.
-- `elements`: boolean restricting selection to the provided list of elements only. Used with the `array` field type.
-- `custom`: a function that validates a field's value. If the value is invalid, the function should return a string explaining why the value is invalid. Otherwise, the function must return null.
+-   `required`: boolean indicating whether the field is required or not.
+-   `elements`: boolean restricting selection to the provided list of elements only. Used with the `array` field type.
+-   `custom`: a function that validates a field's value. If the value is invalid, the function should return a string explaining why the value is invalid. Otherwise, the function must return null.
 
 Example:
 
@@ -1280,9 +1280,9 @@ Fields that define their own Edit component have access to the validation rules 
 
 ```js
 {
-  Edit: ( { field }) => {
-	  return <input required={ !! field.isValid.required } />
-  }
+	Edit: ( { field } ) => {
+		return <input required={ !! field.isValid.required } />;
+	};
 }
 ```
 
@@ -1409,8 +1409,8 @@ Operators:
 | `contains`           | Text           | `CONTAINS`. The item's field contains the given substring.                                           | Title contains: Mars                               |
 | `notContains`        | Text           | `NOT CONTAINS`. The item's field does not contain the given substring.                               | Description doesn't contain: photo                 |
 | `startsWith`         | Text           | `STARTS WITH`. The item's field starts with the given substring.                                     | Title starts with: Mar                             |
-| `on`                 | Date           | `ON`. The item's field is on a given date (date equality using proper date parsing).                | Date is on: 2024-01-01                             |
-| `notOn`              | Date           | `NOT ON`. The item's field is not on a given date (date inequality using proper date parsing).      | Date is not on: 2024-01-01                         |
+| `on`                 | Date           | `ON`. The item's field is on a given date (date equality using proper date parsing).                 | Date is on: 2024-01-01                             |
+| `notOn`              | Date           | `NOT ON`. The item's field is not on a given date (date inequality using proper date parsing).       | Date is not on: 2024-01-01                         |
 | `before`             | Date           | `BEFORE`. The item's field is before a given date.                                                   | Date is before 2024-01-01                          |
 | `after`              | Date           | `AFTER`. The item's field is after a given date.                                                     | Date is after 2024-01-01                           |
 | `beforeInc`          | Date           | `BEFORE (Inc)`. The item's field is before a given date, including the date.                         | Date is before 2024-01-01, including 2024-01-01    |
@@ -1480,8 +1480,8 @@ Represents the type of layout used to render the field. It'll be one of Regular,
 
 #### Regular
 
-- `type`: `regular`. Required.
-- `labelPosition`: one of `side`, `top`, or `none`. Optional. `top` by default.
+-   `type`: `regular`. Required.
+-   `labelPosition`: one of `side`, `top`, or `none`. Optional. `top` by default.
 
 For example:
 
@@ -1499,6 +1499,16 @@ For example:
 
 - `type`: `panel`. Required.
 - `labelPosition`: one of `side`, `top`, or `none`. Optional. `top` by default.
+- `summary`: Summary field configuration. Optional. Specifies which field(s) to display in the panel header. Can be:
+   	- A string (single field ID)
+    - An array of strings (multiple field IDs)
+
+When no summary fields are explicitly configured, the panel automatically determines which fields to display using this priority:
+
+1. Use `summary` fields if they exist
+2. Fall back to the field definition that matches the form field's id
+3. If the form field id doesn't exist, pick the first child field
+4. If no field definition is found, return empty summary fields
 
 For example:
 ```js
@@ -1513,9 +1523,18 @@ For example:
 
 #### Card
 
-- `type`: `card`. Required.
-- `isOpened`: boolean. Optional. `true` by default.
-- `withHeader`: boolean. Optional. `true` by default.
+-   `type`: `card`. Required.
+-   `isOpened`: boolean. Optional. `true` by default.
+-   `withHeader`: boolean. Optional. `true` by default.
+-   `summary`: Summary field configuration. Optional. Specifies which field(s) to display in the card header. Can be:
+    -   A string (single field ID)
+    -   An array of strings (multiple field IDs)
+    -   An array of objects for per-field visibility control `[{ id: string, visibility: 'always' | 'when-collapsed' }]`
+
+Cards can be collapsed while visible, so you can control when summary fields appear:
+
+-   `'always'`: Show the field in both expanded and collapsed states.
+-   `'when-collapsed'`: Show the field only when the card is collapsed. This is the default.
 
 For example:
 
@@ -1532,8 +1551,8 @@ For example:
 
 #### Row
 
-- `type`: `row`. Required.
-- `alignment`: one of `start`, `center`, or `end`. Optional. `center` by default.
+-   `type`: `row`. Required.
+-   `alignment`: one of `start`, `center`, or `end`. Optional. `center` by default.
 
 The Row layout displays fields horizontally in a single row. It's particularly useful for grouping related fields that should be displayed side by side. This layout can be used both as a top-level form layout and for individual field groups.
 
@@ -1576,7 +1595,9 @@ Example:
 ```js
 {
 	id: 'status',
-	layout: 'panel',
+	layout: {
+		type: 'panel',
+	},
 	label: 'Combined Field',
 	children: [ 'field1', 'field2' ],
 }

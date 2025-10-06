@@ -6,8 +6,8 @@
 	"category": "design",
 	"description": "Displays a group of accordion headings and associated expandable content.",
 	"example": {},
-	"__experimental": true,
 	"supports": {
+		"anchor": true,
 		"html": false,
 		"align": [ "wide", "full" ],
 		"background": {

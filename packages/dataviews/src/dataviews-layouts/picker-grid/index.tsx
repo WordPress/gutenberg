@@ -32,7 +32,7 @@ import type {
 	ViewPickerGrid as ViewPickerGridType,
 	ViewPickerGridProps,
 } from '../../types';
-import type { SetSelection } from '../../private-types';
+import type { SetSelection } from '../../types/private';
 import { GridItems } from '../utils/grid-items';
 const { Badge } = unlock( componentsPrivateApis );
 import getDataByGroup from '../utils/get-data-by-group';

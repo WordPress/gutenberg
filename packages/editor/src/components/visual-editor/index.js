@@ -345,12 +345,11 @@ function VisualEditor( {
 				}}
 				${
 					enableResizing
-						? '.block-editor-iframe__html{background:#ddd;display:flex;align-items:center;justify-content:center;min-height:100vh;}.block-editor-iframe__body{width:100%;}'
+						? '.block-editor-iframe__html{background:var(--wp-editor-canvas-background);display:flex;align-items:center;justify-content:center;min-height:100vh;}.block-editor-iframe__body{width:100%;}'
 						: ''
 				}`,
 				// The CSS above centers the body content vertically when resizing is enabled and applies a background
 				// color to the iframe HTML element to match the background color of the editor canvas.
-				// TODO: Move the #ddd somewhere else or use a variable.
 			},
 		];
 	}, [ styles, enableResizing ] );

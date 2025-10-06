@@ -671,6 +671,165 @@ test.describe( 'Navigation block', () => {
 			} )
 		).toHaveLength( 1 );
 	} );
+
+	test.describe( 'Navigation Link Entity bindings', () => {
+		// eslint-disable-next-line no-unused-vars
+		let testPage1, testPage2, testPage3;
+
+		test.beforeEach( async ( { requestUtils } ) => {
+			testPage1 = await requestUtils.createPage( {
+				title: 'Test Page 1',
+				status: 'publish',
+			} );
+
+			testPage2 = await requestUtils.createPage( {
+				title: 'Test Page 2',
+				status: 'publish',
+			} );
+
+			testPage3 = await requestUtils.createPage( {
+				title: 'Test Page 3',
+				status: 'publish',
+			} );
+		} );
+
+		test.afterEach( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllPages();
+		} );
+
+		test( 'can bind to a page', async ( {
+			editor,
+			page,
+			admin,
+			navigation,
+			requestUtils,
+			pageUtils,
+		} ) => {
+			await admin.createNewPost();
+
+			// create an empty menu for use - avoids Page List block
+			const menu = await requestUtils.createNavigationMenu( {
+				title: 'Test Menu',
+				content: '',
+			} );
+
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: {
+					ref: menu.id,
+				},
+			} );
+
+			// Insert a link to a Page
+			await expect( navigation.getNavBlockInserter() ).toBeVisible();
+			await pageUtils.pressKeys( 'ArrowDown' );
+			await navigation.useBlockInserter();
+			await navigation.addPage( 'Test Page 1' );
+
+			// Select the Nav Link block we just inserted
+			// await editor.selectBlocks( navBlock );
+
+			// Check the Inspector controls for the Nav Link block
+			// to verify the Link field is:
+			// - disabled
+			// - has the correct URL matching the page URL
+			// - has the correct help text (description)
+			await editor.openDocumentSettingsSidebar();
+			const settingsControls = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'tabpanel', { name: 'Settings' } );
+
+			await expect( settingsControls ).toBeVisible();
+
+			const linkInput = settingsControls.getByRole( 'textbox', {
+				name: 'Link',
+				description: 'Synced with the selected page',
+			} );
+
+			await expect( linkInput ).toBeDisabled();
+			await expect( linkInput ).toHaveValue( testPage1.link );
+
+			// Save the Post and check frontend
+			const postId = await editor.publishPost();
+
+			// Navigate to the frontend post page
+			await page.goto( `/?p=${ postId }` );
+
+			// Verify the navigation link on the frontend has the correct URL
+			const frontendLink = page.getByRole( 'link', {
+				name: 'Test Page 1',
+			} );
+			await expect( frontendLink ).toHaveAttribute(
+				'href',
+				testPage1.link
+			);
+
+			// Update the page slug via REST API
+			const updatedPage = await requestUtils.rest( {
+				method: 'PUT',
+				path: `/wp/v2/pages/${ testPage1.id }`,
+				data: {
+					slug: 'page-1-changed',
+				},
+			} );
+
+			// Check that the frontend immediately shows the updated URL
+			await page.goto( `/?p=${ postId }` );
+
+			const updatedFrontendLink = page.getByRole( 'link', {
+				name: 'Test Page 1',
+			} );
+			await expect( updatedFrontendLink ).toHaveAttribute(
+				'href',
+				updatedPage.link
+			);
+
+			// Now check that the editor also shows the updated URL
+			await admin.editPost( postId );
+
+			// Wait for and select the Navigation block first
+			const navBlock = navigation.getNavBlock();
+			await expect( navBlock ).toBeVisible();
+			await editor.selectBlocks( navBlock );
+
+			// Then select the Navigation Link block
+			const navLinkBlock = navBlock
+				.getByRole( 'document', {
+					name: 'Block: Page Link',
+				} )
+				.first(); // there is a draggable ghost block so we need to select the actual block!
+
+			await expect( navLinkBlock ).toBeVisible( {
+				// Wait for the Navigation Link block to be available
+				timeout: 10000,
+			} );
+			await editor.selectBlocks( navLinkBlock );
+
+			// Check that the link input now shows the updated URL
+			await editor.openDocumentSettingsSidebar();
+			const updatedLinkInput = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'tabpanel', { name: 'Settings' } )
+				.getByRole( 'textbox', {
+					name: 'Link',
+					description: 'Synced with the selected page',
+				} );
+
+			await expect( updatedLinkInput ).toHaveValue( updatedPage.link );
+
+			// Find the button using its name and aria-describedby ID
+			// The button has aria-describedby pointing to the help text element
+			const helpTextId =
+				await linkInput.getAttribute( 'aria-describedby' );
+			const unlinkButton = settingsControls.getByRole( 'button', {
+				name: 'Unsync and edit',
+				description: helpTextId,
+			} );
+			await unlinkButton.click();
+			await expect( linkInput ).toBeEnabled();
+			await expect( linkInput ).toHaveValue( '' );
+		} );
+	} );
 } );
 
 class Navigation {
@@ -758,6 +917,13 @@ class Navigation {
 		await expect( linkControlSearch ).toBeFocused();
 
 		await this.page.keyboard.type( label, { delay: 50 } );
+
+		// Wait for the search results to be visible
+		await expect(
+			this.page.getByRole( 'listbox', {
+				name: 'Search results',
+			} )
+		).toBeVisible();
 
 		await this.pageUtils.pressKeys( 'ArrowDown' );
 

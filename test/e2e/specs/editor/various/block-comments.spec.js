@@ -243,6 +243,48 @@ test.describe( 'Block Comments', () => {
 		await expect( activeThread ).toContainText( 'Second block comment' );
 		await expect( replyTextbox ).toBeVisible();
 	} );
+
+	test.describe( 'Keyboard navigation', () => {
+		test( 'should expand or collapse a comment with Enter key', async ( {
+			editor,
+			page,
+			blockCommentUtils,
+		} ) => {
+			await blockCommentUtils.addBlockWithComment( {
+				type: 'core/heading',
+				attributes: { content: 'Testing block comments' },
+				comment: 'Test comment',
+			} );
+
+			// Click on the title field to deselect the block and the comment.
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.focus();
+
+			const thread = page
+				.getByRole( 'region', {
+					name: 'Editor settings',
+				} )
+				.getByRole( 'listitem', {
+					name: 'Comment: Test comment',
+				} );
+
+			// Expand the comment with Enter key.
+			await thread.focus();
+			await page.keyboard.press( 'Enter' );
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+
+			// The related block should be selected, but the focus should remain on the comment.
+			await expect(
+				editor.canvas.getByText( 'Testing block comments' )
+			).toHaveClass( /is-selected/ );
+			await expect( thread ).toBeFocused();
+
+			// Collapse the comment with Enter key.
+			await page.keyboard.press( 'Enter' );
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+		} );
+	} );
 } );
 
 class BlockCommentUtils {
