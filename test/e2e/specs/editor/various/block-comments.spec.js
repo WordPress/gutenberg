@@ -246,7 +246,7 @@ test.describe( 'Block Comments', () => {
 
 		// Clicking on a block comment should make it active.
 		await threads.last().click();
-		await expect( activeThread ).toContainText( 'First block comment' );
+		await expect( activeThread ).toContainText( 'Third block comment' );
 		await expect( replyTextbox ).toBeVisible();
 
 		// Clicking on a block in canvas should make its comment active.
