@@ -12,6 +12,7 @@ const BUNDLED_PACKAGES = [
 	'@wordpress/undo-manager',
 	'@wordpress/upload-media',
 	'@wordpress/fields',
+	'@wordpress/views',
 ];
 
 /**

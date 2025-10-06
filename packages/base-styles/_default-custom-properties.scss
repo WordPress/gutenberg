@@ -1,5 +1,6 @@
 @use "./mixins";
 @use "./functions";
+@use "./colors";
 
 // It is important to include these styles in all built stylesheets.
 // This allows to CSS variables post CSS plugin to generate fallbacks.
@@ -10,5 +11,6 @@
 	// This CSS variable is not used in Gutenberg project,
 	// but is maintained for backwards compatibility.
 	--wp-bound-block-color: var(--wp-block-synced-color);
+	--wp-editor-canvas-background: colors.$gray-300;
 	@include mixins.admin-scheme(#007cba);
 }
