@@ -61,10 +61,10 @@ function getEntityTypeName( type, kind ) {
  * This component provides the inspector controls (ToolsPanel) that are identical
  * between both navigation blocks.
  *
- * @param {Object}   props                     - Component props
- * @param {Object}   props.attributes          - Block attributes
- * @param {Function} props.setAttributes       - Function to update block attributes
- * @param {string}   props.clientId            - Block client ID
+ * @param {Object}   props               - Component props
+ * @param {Object}   props.attributes    - Block attributes
+ * @param {Function} props.setAttributes - Function to update block attributes
+ * @param {string}   props.clientId      - Block client ID
  */
 export function Controls( { attributes, setAttributes, clientId } ) {
 	const { label, url, description, rel, opensInNewTab } = attributes;
