@@ -175,7 +175,7 @@ export default function DataviewsPatterns() {
 					type={ postType }
 					titleId={ `${ id }-title` }
 					descriptionId={ `${ id }-description` }
-					isModifedView={ isModified }
+					isModifiedView={ isModified }
 					resetView={ resetToDefault }
 				/>
 				<DataViews

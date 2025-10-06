@@ -29,7 +29,7 @@ export default function PatternsHeader( {
 	type,
 	titleId,
 	descriptionId,
-	isModifedView = false,
+	isModifiedView = false,
 	resetView = () => {},
 } ) {
 	const { patternCategories } = usePatternCategories();
@@ -77,7 +77,7 @@ export default function PatternsHeader( {
 					{ title }
 				</Heading>
 				<HStack expanded={ false }>
-					{ isModifedView && (
+					{ isModifiedView && (
 						<Button __next40pxDefaultSize onClick={ resetView }>
 							{ __( 'Reset View' ) }
 						</Button>
