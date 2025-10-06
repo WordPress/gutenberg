@@ -135,13 +135,14 @@
 	display: block;
 }
 
+// Visually hidden until focused (skip link pattern)
 .editor-collab-sidebar-panel__skip-link {
 	position: absolute;
+	top: -9999px;
 	right: -9999px;
 	overflow: hidden;
 	clip-path: inset(50%);
 	background: $white !important;
-
 	&:focus {
 		top: $grid-unit-10;
 		right: $grid-unit-10;
