@@ -29,13 +29,10 @@ export function useBlockComments( postId ) {
 			const commentId =
 				getBlockAttributes( clientId )?.metadata?.commentId;
 			if ( commentId ) {
-				results.push( {
-					blockId: clientId,
-					commentId,
-				} );
+				results[ clientId ] = commentId;
 			}
 			return results;
-		}, [] );
+		}, {} );
 	}, [] );
 
 	// Process comments to build the tree structure.
@@ -48,14 +45,14 @@ export function useBlockComments( postId ) {
 
 		// Initialize each object with an empty `reply` array and map blockClientId.
 		allComments.forEach( ( item ) => {
-			const itemBlock = blocksWithComments.find(
-				( block ) => block.commentId === item.id
+			const itemBlock = Object.keys( blocksWithComments ).find(
+				( key ) => blocksWithComments[ key ] === item.id
 			);
 
 			compare[ item.id ] = {
 				...item,
 				reply: [],
-				blockClientId: item.parent === 0 ? itemBlock?.blockId : null,
+				blockClientId: item.parent === 0 ? itemBlock : null,
 			};
 		} );
 
@@ -84,14 +81,14 @@ export function useBlockComments( postId ) {
 		);
 
 		// Get comments by block order, first unresolved, then resolved.
-		const unresolvedSortedComments = blocksWithComments
-			.map( ( { commentId } ) => threadIdMap.get( String( commentId ) ) )
+		const unresolvedSortedComments = Object.values( blocksWithComments )
+			.map( ( commentId ) => threadIdMap.get( String( commentId ) ) )
 			.filter(
 				( thread ) => thread !== undefined && thread.status === 'hold'
 			);
 
-		const resolvedSortedComments = blocksWithComments
-			.map( ( { commentId } ) => threadIdMap.get( String( commentId ) ) )
+		const resolvedSortedComments = Object.values( blocksWithComments )
+			.map( ( commentId ) => threadIdMap.get( String( commentId ) ) )
 			.filter(
 				( thread ) =>
 					thread !== undefined && thread.status === 'approved'
