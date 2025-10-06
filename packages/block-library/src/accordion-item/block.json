@@ -8,6 +8,7 @@
 	"parent": [ "core/accordion" ],
 	"allowedBlocks": [ "core/accordion-heading", "core/accordion-panel" ],
 	"supports": {
+		"html": false,
 		"color": {
 			"background": true,
 			"gradients": true
