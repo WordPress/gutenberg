@@ -93,17 +93,13 @@ export function getCommentExcerpt( text, excerptLength = 10 ) {
  *
  * @typedef {import('@wordpress/element').RefObject} RefObject
  *
- * @param {string}       commentId             The ID of the comment thread to focus.
- * @param {?HTMLElement} commentSidebarElement The container element to search within.
- * @param {string}       additionalSelector    The additional selector to focus on.
+ * @param {string}       commentId          The ID of the comment thread to focus.
+ * @param {?HTMLElement} container          The container element to search within.
+ * @param {string}       additionalSelector The additional selector to focus on.
  */
-export function focusCommentThread(
-	commentId,
-	commentSidebarElement,
-	additionalSelector
-) {
+export function focusCommentThread( commentId, container, additionalSelector ) {
 	const getFocusElement = () => {
-		const commentThread = commentSidebarElement?.querySelector(
+		const commentThread = container?.querySelector(
 			`[role=listitem][id="comment-thread-${ commentId }"]`
 		);
 		if ( additionalSelector ) {
