@@ -319,6 +319,18 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 					sourceName,
 					{ editorUI, getFieldsList, usesContext, label, getValues },
 				] ) => {
+					const allowedAttributeTypes = _bindableAttributes.map(
+						( attribute ) => {
+							const attributeType =
+								getBlockType( blockName ).attributes?.[
+									attribute
+								]?.type;
+							return attributeType === 'rich-text'
+								? 'string'
+								: attributeType;
+						}
+					);
+
 					if ( editorUI ) {
 						// Populate context.
 						const context = {};
@@ -332,18 +344,6 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 							select,
 							context,
 						} );
-
-						const allowedAttributeTypes = _bindableAttributes.map(
-							( attribute ) => {
-								const attributeType =
-									getBlockType( blockName ).attributes?.[
-										attribute
-									]?.type;
-								return attributeType === 'rich-text'
-									? 'string'
-									: attributeType;
-							}
-						);
 
 						const compatibleData = editorUIResult?.data?.filter(
 							( item ) =>
