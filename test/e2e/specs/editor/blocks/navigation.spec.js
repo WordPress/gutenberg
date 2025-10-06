@@ -1005,16 +1005,26 @@ class Navigation {
 	async previewIsOpenAndCloses() {
 		const linkPopover = this.getLinkPopover();
 		await expect( linkPopover ).toBeVisible();
-		// Expect focus to be within the link control. We could be more exact here, but it would be more brittle that way. We really care if focus is within it or not.
-		expect(
-			await this.page.evaluate( () => {
-				const { activeElement } =
-					document.activeElement?.contentDocument ?? document;
-				return !! activeElement.closest(
-					'.components-popover__content .block-editor-link-control'
-				);
-			} )
-		).toBe( true );
+
+		// Wait for focus to be within the link control
+		// We could be more exact here, but it would be more brittle that way. We really care if focus is within it or not.
+		await expect
+			.poll(
+				async () => {
+					return await this.page.evaluate( () => {
+						const { activeElement } =
+							document.activeElement?.contentDocument ?? document;
+						return !! activeElement.closest(
+							'.components-popover__content .block-editor-link-control'
+						);
+					} );
+				},
+				{
+					message: 'Focus should be within the link control',
+					timeout: 500,
+				}
+			)
+			.toBe( true );
 
 		await this.page.keyboard.press( 'Escape' );
 
