@@ -299,10 +299,10 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 		setModalState( null );
 	};
 
+	const registeredSources = getBlockBindingsSources();
+
 	// Use useSelect to ensure sources are updated whenever there are updates in block context
 	// or when underlying data changes.
-	// Still needs a fix regarding _sources scope.
-	const _sources = {};
 	const { sources, canUpdateBlockBindings, bindableAttributes } = useSelect(
 		( select ) => {
 			const { __experimentalBlockBindingsSupportedAttributes } =
@@ -313,7 +313,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 				return EMPTY_OBJECT;
 			}
 
-			const registeredSources = getBlockBindingsSources();
+			const _sources = {};
 			Object.entries( registeredSources ).forEach(
 				( [
 					sourceName,
@@ -430,8 +430,9 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 				bindableAttributes: _bindableAttributes,
 			};
 		},
-		[ blockContext, blockName ]
+		[ blockContext, blockName, registeredSources ]
 	);
+
 	// Return early if there are no bindable attributes.
 	if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
 		return null;
