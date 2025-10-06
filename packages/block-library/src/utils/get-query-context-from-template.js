@@ -10,7 +10,6 @@ export function getQueryContextFromTemplate( templateSlug ) {
 	if ( ! templateSlug ) {
 		return { isSingular: true };
 	}
-	let isSingular = false;
 	let templateType = templateSlug === 'wp' ? 'custom' : templateSlug;
 	let templateQuery = null;
 	const singularTemplates = [ '404', 'blank', 'single', 'page', 'custom' ];
@@ -24,7 +23,7 @@ export function getQueryContextFromTemplate( templateSlug ) {
 		templateType = templateTypeFromSlug;
 		templateQuery = queryFromTemplateSlug;
 	}
-	isSingular = singularTemplates.includes( templateType );
+	const isSingular = singularTemplates.includes( templateType );
 
 	return { isSingular, templateType, templateQuery };
 }
