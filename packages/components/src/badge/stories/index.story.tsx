@@ -55,9 +55,23 @@ export const Error: Story = {
 
 export const InsideAnchor: Story = {
 	render: ( args ) => (
-		<a href="#badge-link" style={ { display: 'flex' } }>
-			View details <Badge { ...args } />
-		</a>
+		<>
+			<a
+				href="#badge-link"
+				style={ { display: 'flex', marginBottom: '16px' } }
+			>
+				display: flex - View details <Badge { ...args } />
+			</a>
+			<a
+				href="#badge-link"
+				style={ { display: 'block', marginBottom: '16px' } }
+			>
+				display: block - View details <Badge { ...args } />
+			</a>
+			<a href="#badge-link" style={ { display: 'inline-block' } }>
+				display: inline-block - View details <Badge { ...args } />
+			</a>
+		</>
 	),
 	args: {
 		children: 'New',
@@ -65,18 +79,40 @@ export const InsideAnchor: Story = {
 	},
 };
 
-export const InsideDivAnchor: Story = {
+export const InsideDiv: Story = {
 	render: ( args ) => (
-		<div
-			style={ {
-				textDecoration: 'underline',
-				display: 'flex',
-				alignItems: 'center',
-			} }
-		>
-			<span>Some text</span>
-			<Badge { ...args } />
-		</div>
+		<>
+			<div
+				style={ {
+					textDecoration: 'underline',
+					display: 'flex',
+					alignItems: 'center',
+					marginBottom: '16px',
+				} }
+			>
+				<span>display: flex - Some text</span>
+				<Badge { ...args } />
+			</div>
+			<div
+				style={ {
+					textDecoration: 'underline',
+					display: 'block',
+					marginBottom: '16px',
+				} }
+			>
+				<span>display: block - Some text</span>
+				<Badge { ...args } />
+			</div>
+			<div
+				style={ {
+					textDecoration: 'underline',
+					display: 'inline-block',
+				} }
+			>
+				<span>display: inline-block - Some text</span>
+				<Badge { ...args } />
+			</div>
+		</>
 	),
 	args: {
 		intent: 'info',
