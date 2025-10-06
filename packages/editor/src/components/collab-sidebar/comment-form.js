@@ -39,7 +39,7 @@ function CommentForm( {
 	thread,
 	submitButtonText,
 	labelText,
-	shouldFocusTextareaOnMount = true,
+	shouldFocusTextareaOnMount,
 } ) {
 	const [ inputComment, setInputComment ] = useState(
 		thread?.content?.raw ?? ''
