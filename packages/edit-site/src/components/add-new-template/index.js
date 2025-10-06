@@ -26,7 +26,7 @@ import {
 	calendar,
 	category,
 	commentAuthorAvatar,
-	edit,
+	pencil,
 	home,
 	layout,
 	list,
@@ -315,7 +315,7 @@ function NewTemplateModal( { onClose } ) {
 						title={ __( 'Custom template' ) }
 						direction="row"
 						className="edit-site-add-new-template__custom-template-button"
-						icon={ edit }
+						icon={ pencil }
 						onClick={ () =>
 							setModalContent(
 								modalContentMap.customGenericTemplate

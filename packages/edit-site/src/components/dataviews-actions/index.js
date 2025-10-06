@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { edit } from '@wordpress/icons';
+import { pencil } from '@wordpress/icons';
 import { useMemo } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -32,7 +32,7 @@ export const useSetActiveTemplateAction = () => {
 					: __( 'Activate' );
 			},
 			isPrimary: true,
-			icon: edit,
+			icon: pencil,
 			isEligible( item ) {
 				return (
 					! ( item.slug === 'index' && item.source === 'theme' ) &&
@@ -83,7 +83,7 @@ export const useEditPostAction = () => {
 			id: 'edit-post',
 			label: __( 'Edit' ),
 			isPrimary: true,
-			icon: edit,
+			icon: pencil,
 			isEligible( post ) {
 				if ( post.status === 'trash' ) {
 					return false;

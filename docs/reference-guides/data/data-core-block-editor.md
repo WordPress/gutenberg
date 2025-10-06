@@ -1620,7 +1620,7 @@ Returns an action object used in signalling that the block with the specified cl
 _Parameters_
 
 -   _clientId_ `string`: Block client ID.
--   _initialPosition_ `0|-1|null`: Optional initial position. Pass as -1 to reflect reverse selection.
+-   _initialPosition_ `0|-1|null`: Optional initial position. Pass -1 to reflect reverse selection or `null` to prevent focusing the block.
 
 _Returns_
 

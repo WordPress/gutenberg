@@ -46,6 +46,7 @@ function CollabSidebarContent( {
 	setShowCommentBoard,
 	styles,
 	comments,
+	commentSidebarRef,
 } ) {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
@@ -182,7 +183,11 @@ function CollabSidebarContent( {
 	};
 
 	return (
-		<div className="editor-collab-sidebar-panel" style={ styles }>
+		<div
+			className="editor-collab-sidebar-panel"
+			style={ styles }
+			ref={ commentSidebarRef }
+		>
 			<VStack role="list" spacing="3">
 				<AddComment
 					onSubmit={ addNewComment }
@@ -190,13 +195,13 @@ function CollabSidebarContent( {
 					setShowCommentBoard={ setShowCommentBoard }
 				/>
 				<Comments
-					key={ getSelectedBlockClientId() }
 					threads={ comments }
 					onEditComment={ onEditComment }
 					onAddReply={ addNewComment }
 					onCommentDelete={ onCommentDelete }
 					showCommentBoard={ showCommentBoard }
 					setShowCommentBoard={ setShowCommentBoard }
+					commentSidebarRef={ commentSidebarRef }
 				/>
 			</VStack>
 		</div>
@@ -209,6 +214,7 @@ function CommentBoardWrapper( {
 	setShowCommentBoard,
 	backgroundColor,
 	previousThreadId,
+	commentSidebarRef,
 	offsetsRef,
 	updateOffsets,
 	updateHeight,
@@ -282,6 +288,7 @@ function CommentBoardWrapper( {
 		>
 			<CollabSidebarContent
 				comments={ [ thread ] }
+				commentSidebarRef={ commentSidebarRef }
 				showCommentBoard={ showCommentBoard }
 				setShowCommentBoard={ setShowCommentBoard }
 				styles={ {
@@ -323,6 +330,7 @@ export default function CollabSidebar() {
 	const updateOffsets = ( id, offset ) => {
 		offsetsRef.current[ id ] = offset;
 	};
+	const commentSidebarRef = useRef( null );
 
 	const { postId } = useSelect( ( select ) => {
 		const { getCurrentPostId } = select( editorStore );
@@ -400,6 +408,7 @@ export default function CollabSidebar() {
 					comments={ resultComments }
 					showCommentBoard={ showCommentBoard }
 					setShowCommentBoard={ setShowCommentBoard }
+					commentSidebarRef={ commentSidebarRef }
 				/>
 			</PluginSidebar>
 			{ isLargeViewport && (
@@ -440,6 +449,7 @@ export default function CollabSidebar() {
 										onClick={ () =>
 											handleThreadClick( thread )
 										}
+										commentSidebarRef={ commentSidebarRef }
 									/>
 								);
 							} ) }
