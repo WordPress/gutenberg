@@ -36,6 +36,7 @@
 		{ "path": "../router" },
 		{ "path": "../style-engine" },
 		{ "path": "../url" },
+		{ "path": "../views" },
 		{ "path": "../wordcount" }
 	],
 	// NOTE: This package is being progressively typed. You are encouraged to

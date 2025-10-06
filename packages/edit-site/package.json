@@ -67,6 +67,7 @@
 		"@wordpress/style-engine": "file:../style-engine",
 		"@wordpress/url": "file:../url",
 		"@wordpress/viewport": "file:../viewport",
+		"@wordpress/views": "file:../views",
 		"@wordpress/widgets": "file:../widgets",
 		"@wordpress/wordcount": "file:../wordcount",
 		"change-case": "^4.1.2",

@@ -296,6 +296,9 @@
 			"node ./bin/api-docs/are-api-docs-unstaged.js",
 			"node ./bin/packages/lint-staged-typecheck.js"
 		],
+		"packages/icons/src/library/*": [
+			"npm run -w packages/icons build"
+		],
 		"**/tsconfig.json": [
 			"npm run lint:tsconfig"
 		]
