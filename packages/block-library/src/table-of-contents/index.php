@@ -40,10 +40,10 @@ function render_block_core_table_of_contents( $attributes ) {
 	$wrapper_attributes = get_block_wrapper_attributes();
 
 	// Get the aria-label from block attributes, or fallback to localized default.
-	$aria_label  = empty( $attributes['ariaLabel'] ) ? __( 'Table of Contents' ) : wp_strip_all_tags( $attributes['ariaLabel'] );
+	$aria_label = empty( $attributes['ariaLabel'] ) ? __( 'Table of Contents' ) : wp_strip_all_tags( $attributes['ariaLabel'] );
 
-	$ordered     = isset( $attributes['ordered'] ) ? $attributes['ordered'] : true;
-	$list_tag    = $ordered ? 'ol' : 'ul';
+	$ordered  = isset( $attributes['ordered'] ) ? $attributes['ordered'] : true;
+	$list_tag = $ordered ? 'ol' : 'ul';
 
 	$toc_html  = '<nav ' . $wrapper_attributes . ' aria-label="' . esc_attr( $aria_label ) . '">';
 	$toc_html .= '<' . $list_tag . '>';
@@ -63,12 +63,12 @@ function render_block_core_table_of_contents( $attributes ) {
  * @return array Array of heading data.
  */
 function block_core_table_of_contents_traverse_blocks( $blocks, $max_level = null ) {
-	$headings  = array();
+	$headings = array();
 
 	foreach ( $blocks as $block ) {
 		if ( 'core/template-part' === $block['blockName'] ) {
-			$slug   = $block['attrs']['slug'] ?? '';
-			$theme  = $block['attrs']['theme'] ?? '';
+			$slug  = $block['attrs']['slug'] ?? '';
+			$theme = $block['attrs']['theme'] ?? '';
 
 			if ( $slug ) {
 				$template_part = null;
@@ -167,7 +167,7 @@ function block_core_table_of_contents_build_list( $headings, $ordered ) {
 	foreach ( $headings as $index => $heading ) {
 		$level = $heading['level'];
 
-		if ( $prev_level === null ) {
+		if ( null === $prev_level ) {
 			$prev_level = $level;
 		}
 
