@@ -188,7 +188,6 @@ export default function NavigationLinkEdit( {
 	const ref = useRef();
 	const linkUIref = useRef();
 	const prevUrl = usePrevious( url );
-	const closedByEscapeRef = useRef( false );
 	const isNewLink = useRef( ! url );
 
 	// On mount, if this is a new link without a URL and it's selected,
@@ -198,32 +197,6 @@ export default function NavigationLinkEdit( {
 			selectBlock( parentBlockClientId );
 		}
 	}, [] );
-
-	// Listen for Escape key at document level when LinkUI is open
-	useEffect( () => {
-		if ( ! isLinkOpen ) {
-			return;
-		}
-
-		const handleEscapeKey = ( event ) => {
-			if ( event.key === 'Escape' ) {
-				closedByEscapeRef.current = true;
-			}
-		};
-
-		// Use capture phase to catch Escape before Popover handles it
-		// Attach to document to ensure we catch it
-		document.addEventListener( 'keydown', handleEscapeKey, {
-			capture: true,
-		} );
-		return () => {
-			document.removeEventListener( 'keydown', handleEscapeKey, {
-				capture: true,
-			} );
-			// Reset the flag when the LinkUI closes
-			closedByEscapeRef.current = false;
-		};
-	}, [ isLinkOpen ] );
 
 	const {
 		isAtMaxNesting,
