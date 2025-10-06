@@ -370,6 +370,53 @@ test.describe( 'Block Comments', () => {
 				'Comment: Test comment'
 			);
 		} );
+
+		test( 'should expand and focus the thread after clicking the "x more replies" button', async ( {
+			editor,
+			page,
+			blockCommentUtils,
+		} ) => {
+			await blockCommentUtils.addBlockWithComment( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing block comments' },
+				comment: 'Test comment',
+			} );
+			const replyForm = page.getByRole( 'textbox', { name: 'Reply to' } );
+			const replyButton = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Reply', exact: true } );
+
+			await replyForm.fill( 'First reply' );
+			await replyButton.click();
+			await replyForm.fill( 'Second reply' );
+			await replyButton.click();
+
+			// Check that two replies were added successfully.
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'Reply added successfully.' } )
+			).toHaveCount( 2 );
+
+			// Click on the title field to deselect the block and the comment.
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.focus();
+
+			const thread = page
+				.getByRole( 'region', {
+					name: 'Editor settings',
+				} )
+				.getByRole( 'listitem', {
+					name: 'Comment: Test comment',
+				} );
+
+			await thread
+				.getByRole( 'button', { name: '1 more reply' } )
+				.click();
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+			await expect( thread ).toBeFocused();
+		} );
 	} );
 } );
 
