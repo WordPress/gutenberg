@@ -638,7 +638,8 @@ export default function GalleryEdit( props ) {
 								randomOrder: false,
 							} );
 
-setAspectRatio( 'auto' );
+							setAspectRatio( 'auto' );
+
 							if ( sizeSlug !== DEFAULT_MEDIA_SIZE_SLUG ) {
 								updateImagesSize( DEFAULT_MEDIA_SIZE_SLUG );
 							}
