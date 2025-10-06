@@ -71,19 +71,23 @@ export default function Select< Item >( {
 	const hasEmptyValue = fieldElements.some(
 		( { value: elementValue } ) => elementValue === ''
 	);
+	const hasSelection = fieldElements.some(
+		( { value: elementValue } ) => elementValue === value
+	);
 
 	const elements =
 		hasEmptyValue || isMultiple
 			? fieldElements
 			: [
-					// Value can be undefined when:
-					// - the field is not required
-					// - in bulk editing
+					/*
+					 * Value can be undefined when:
+					 * - the field is not required
+					 * - in bulk editing
+					 */
 					{
 						label: __( 'Select' ),
 						value: '',
-						// disable only if the field is required and there's already a selection
-						disabled: !! field.isValid?.required && value !== '',
+						disabled: !! field.isValid?.required && hasSelection,
 					},
 					...fieldElements,
 			  ];
