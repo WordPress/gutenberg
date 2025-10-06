@@ -219,7 +219,7 @@ function gutenberg_process_block_bindings( $instance ) {
 	 * except if we're dealing with the button block, since WP 6.8 capitalizes its
 	 * tag name (e.g. <DIV>).
 	 */
-	if ( 'core/button' !== $block_type && isset( $block_bindings_supported_attributes_6_8[ $block_type ] ) ) {
+	if ( 'core/button' !== $block_type && isset( $block_type, $block_bindings_supported_attributes_6_8[ $block_type ] ) ) {
 		$supported_block_attributes = array_diff(
 			$supported_block_attributes,
 			$block_bindings_supported_attributes_6_8[ $block_type ]
