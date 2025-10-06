@@ -132,6 +132,7 @@ function Thread( {
 	const handleCommentSelect = () => {
 		setShowCommentBoard( false );
 		setSelectedThread( thread.id );
+		// pass `null` as the second parameter to prevent focusing the block.
 		selectBlock( thread.blockClientId, null );
 	};
 
