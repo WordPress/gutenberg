@@ -21,17 +21,11 @@ export function useBlockComments( postId ) {
 		{ enabled: !! postId && typeof postId === 'number' }
 	);
 
-	const { getBlockAttributes } = useSelect( blockEditorStore );
-	const { clientIds } = useSelect( ( select ) => {
-		const { getClientIdsWithDescendants } = select( blockEditorStore );
+	const blocksWithComments = useSelect( ( select ) => {
+		const { getBlockAttributes, getClientIdsWithDescendants } =
+			select( blockEditorStore );
 
-		return {
-			clientIds: getClientIdsWithDescendants(),
-		};
-	}, [] );
-
-	const blocksWithComments = useMemo( () => {
-		return clientIds.reduce( ( results, clientId ) => {
+		return getClientIdsWithDescendants().reduce( ( results, clientId ) => {
 			const commentId =
 				getBlockAttributes( clientId )?.metadata?.commentId;
 			if ( commentId ) {
@@ -39,7 +33,7 @@ export function useBlockComments( postId ) {
 			}
 			return results;
 		}, {} );
-	}, [ clientIds, getBlockAttributes ] );
+	}, [] );
 
 	// Process comments to build the tree structure.
 	const { resultComments, unresolvedSortedThreads } = useMemo( () => {
