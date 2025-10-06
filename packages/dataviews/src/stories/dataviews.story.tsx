@@ -93,8 +93,7 @@ export const Default = ( { perPageSizes = [ 10, 25, 50, 100 ] } ) => {
 			renderItemLink={ ( { item, ...props }: { item: SpaceObject } ) => (
 				<button
 					style={ { background: 'none', border: 'none', padding: 0 } }
-					onClick={ ( e ) => {
-						e.stopPropagation();
+					onClick={ () => {
 						// eslint-disable-next-line no-alert
 						alert( 'Clicked: ' + item.name.title );
 					} }

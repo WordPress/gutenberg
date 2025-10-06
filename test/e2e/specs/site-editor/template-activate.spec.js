@@ -50,7 +50,7 @@ test.describe( 'Template Activate', () => {
 			'.dataviews-view-grid__card:has-text("Index (Copy)")'
 		);
 
-		expect( await indexCopy.textContent() ).toContain( 'Inactive' );
+		await expect( indexCopy ).toContainText( 'Inactive' );
 
 		actionsButton = indexCopy.getByRole( 'button', {
 			name: 'Actions',

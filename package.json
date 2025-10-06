@@ -205,6 +205,7 @@
 		"format": "wp-scripts format",
 		"preformat:php": "npm run other:update-packages:php",
 		"format:php": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script format",
+		"prelint": "npm run --if-present --workspaces prelint",
 		"lint": "concurrently \"npm run lint:lockfile\" \"npm run lint:tsconfig\" \"npm run lint:js\" \"npm run lint:pkg-json\" \"npm run lint:css\"",
 		"lint:css": "wp-scripts lint-style \"**/*.scss\"",
 		"lint:css:fix": "npm run lint:css -- --fix",
@@ -273,6 +274,7 @@
 			"wp-scripts format"
 		],
 		"*.{js,ts,tsx}": [
+			"npm run prelint",
 			"wp-scripts lint-js"
 		],
 		"*.scss": [
