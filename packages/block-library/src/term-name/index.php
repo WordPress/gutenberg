@@ -8,6 +8,8 @@
 /**
  * Renders the `core/term-name` block on the server.
  *
+ * @since 6.9.0
+ *
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
  * @param WP_Block $block      Block instance.
@@ -16,7 +18,17 @@
  */
 function render_block_core_term_name( $attributes, $content, $block ) {
 	$term_name = '';
-	$context   = apply_filters( 'render_block_context', $block->context, $block->parsed_block, null );
+
+	/**
+	 * Filters the block context to get the current term ID and taxonomy.
+	 *
+	 * @since 6.9.0
+	 *
+	 * @param array $context The block context.
+	 * @param array $parsed_block The parsed block.
+	 * @param WP_Block|null $parent_block The parent block.
+	 */
+	$context = apply_filters( 'render_block_context', $block->context, $block->parsed_block, null );
 
 	if ( isset( $context['termId'] ) && isset( $context['taxonomy'] ) ) {
 		$term = get_term( $context['termId'], $context['taxonomy'] );
@@ -61,6 +73,8 @@ function render_block_core_term_name( $attributes, $content, $block ) {
 
 /**
  * Registers the `core/term-name` block on the server.
+ *
+ * @since 6.9.0
  */
 function register_block_core_term_name() {
 	register_block_type_from_metadata(
