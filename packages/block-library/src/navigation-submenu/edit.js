@@ -160,6 +160,7 @@ export default function NavigationSubmenuEdit( {
 		hasChildren,
 		selectedBlockHasChildren,
 		onlyDescendantIsEmptyLink,
+		getBlockAttributes,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -169,6 +170,7 @@ export default function NavigationSubmenuEdit( {
 				getBlock,
 				getBlockCount,
 				getBlockOrder,
+				getBlockAttributes: _getBlockAttributes,
 			} = select( blockEditorStore );
 
 			let _onlyDescendantIsEmptyLink;
@@ -204,6 +206,7 @@ export default function NavigationSubmenuEdit( {
 				hasChildren: !! getBlockCount( clientId ),
 				selectedBlockHasChildren: !! selectedBlockChildren?.length,
 				onlyDescendantIsEmptyLink: _onlyDescendantIsEmptyLink,
+				getBlockAttributes: _getBlockAttributes,
 			};
 		},
 		[ clientId ]
@@ -336,9 +339,13 @@ export default function NavigationSubmenuEdit( {
 	const ParentElement = openSubmenusOnClick ? 'button' : 'a';
 
 	const transformToLink = useCallback( () => {
-		const newLinkBlock = createBlock( 'core/navigation-link', attributes );
+		const currentAttributes = getBlockAttributes( clientId );
+		const newLinkBlock = createBlock(
+			'core/navigation-link',
+			currentAttributes
+		);
 		replaceBlock( clientId, newLinkBlock );
-	}, [ attributes, replaceBlock, clientId ] );
+	}, [ replaceBlock, clientId, getBlockAttributes ] );
 
 	useEffect( () => {
 		// If block becomes empty, transform to Navigation Link.
