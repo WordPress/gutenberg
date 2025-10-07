@@ -72,7 +72,7 @@ describe( 'useEntityBinding', () => {
 		expect( result.current.hasUrlBinding ).toBe( true );
 	} );
 
-	it( 'should clear binding when clearBinding is called', () => {
+	it( 'should clear binding when clearBinding is called and binding exists', () => {
 		const attributes = {
 			metadata: {
 				bindings: {
@@ -97,11 +97,55 @@ describe( 'useEntityBinding', () => {
 		} );
 
 		expect( mockUpdateBlockBindings ).toHaveBeenCalledWith( {
-			url: {
-				source: null,
-				args: null,
-			},
+			url: undefined,
 		} );
+	} );
+
+	it( 'should NOT clear binding when clearBinding is called and no binding exists', () => {
+		const attributes = {
+			metadata: {},
+			id: null,
+		};
+
+		const { result } = renderHook( () =>
+			useEntityBinding( {
+				clientId: 'test-client-id',
+				attributes,
+			} )
+		);
+
+		act( () => {
+			result.current.clearBinding();
+		} );
+
+		expect( mockUpdateBlockBindings ).not.toHaveBeenCalled();
+	} );
+
+	it( 'should NOT clear binding when binding metadata exists but source is null', () => {
+		const attributes = {
+			metadata: {
+				bindings: {
+					url: {
+						source: null,
+						args: null,
+					},
+				},
+			},
+			id: 123,
+		};
+
+		const { result } = renderHook( () =>
+			useEntityBinding( {
+				clientId: 'test-client-id',
+				attributes,
+			} )
+		);
+
+		act( () => {
+			result.current.clearBinding();
+		} );
+
+		expect( mockUpdateBlockBindings ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should create binding when createBinding is called', () => {
