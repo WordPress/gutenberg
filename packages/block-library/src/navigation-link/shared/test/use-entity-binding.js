@@ -8,20 +8,19 @@
 import { renderHook, act } from '@testing-library/react';
 
 /**
- * WordPress dependencies
- */
-import { useBlockBindingsUtils } from '@wordpress/block-editor';
-
-/**
  * Internal dependencies
  */
 import { useEntityBinding } from '../use-entity-binding';
 
-// Mock the useBlockBindingsUtils hook
+// Mock the entire @wordpress/block-editor module
 jest.mock( '@wordpress/block-editor', () => ( {
-	...jest.requireActual( '@wordpress/block-editor' ),
 	useBlockBindingsUtils: jest.fn(),
 } ) );
+
+/**
+ * WordPress dependencies
+ */
+import { useBlockBindingsUtils } from '@wordpress/block-editor';
 
 describe( 'useEntityBinding', () => {
 	const mockUpdateBlockBindings = jest.fn();
