@@ -2,13 +2,13 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState, useMemo, useId, useEffect } from '@wordpress/element';
+import { useMemo, useId } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
-import { usePrevious } from '@wordpress/compose';
 import { useEntityRecords } from '@wordpress/core-data';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { useView } from '@wordpress/views';
 
 /**
  * Internal dependencies
@@ -31,6 +31,7 @@ import {
 	previewField,
 	templatePartAuthorField,
 } from './fields';
+import { addQueryArgs } from '@wordpress/url';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { usePostActions, patternTitleField } = unlock( editorPrivateApis );
@@ -55,8 +56,6 @@ const defaultLayouts = {
 };
 const DEFAULT_VIEW = {
 	type: LAYOUT_GRID,
-	search: '',
-	page: 1,
 	perPage: 20,
 	titleField: 'title',
 	mediaField: 'preview',
@@ -66,14 +65,29 @@ const DEFAULT_VIEW = {
 };
 
 export default function DataviewsPatterns() {
-	const {
-		query: { postType = 'wp_block', categoryId: categoryIdFromURL },
-	} = useLocation();
+	const { path, query } = useLocation();
+	const { postType = 'wp_block', categoryId: categoryIdFromURL } = query;
 	const history = useHistory();
 	const categoryId = categoryIdFromURL || PATTERN_DEFAULT_CATEGORY;
-	const [ view, setView ] = useState( DEFAULT_VIEW );
-	const previousCategoryId = usePrevious( categoryId );
-	const previousPostType = usePrevious( postType );
+	const { view, updateView, isModified, resetToDefault } = useView( {
+		kind: 'postType',
+		name: postType,
+		slug: categoryId,
+		defaultView: DEFAULT_VIEW,
+		queryParams: {
+			page: Number( query.pageNumber ?? 1 ),
+			search: query.search,
+		},
+		onChangeQueryParams: ( params ) => {
+			history.navigate(
+				addQueryArgs( path, {
+					...query,
+					pageNumber: params.page,
+					search: params.search,
+				} )
+			);
+		},
+	} );
 	const viewSyncStatus = view.filters?.find(
 		( { field } ) => field === 'sync-status'
 	)?.value;
@@ -115,15 +129,6 @@ export default function DataviewsPatterns() {
 		return _fields;
 	}, [ postType, authors ] );
 
-	// Reset the page number when the category changes.
-	useEffect( () => {
-		if (
-			previousCategoryId !== categoryId ||
-			previousPostType !== postType
-		) {
-			setView( ( prevView ) => ( { ...prevView, page: 1 } ) );
-		}
-	}, [ categoryId, previousCategoryId, previousPostType, postType ] );
 	const { data, paginationInfo } = useMemo( () => {
 		// Search is managed server-side as well as filters for patterns.
 		// However, the author filter in template parts is done client-side.
@@ -170,6 +175,8 @@ export default function DataviewsPatterns() {
 					type={ postType }
 					titleId={ `${ id }-title` }
 					descriptionId={ `${ id }-description` }
+					isModifiedView={ isModified }
+					resetView={ resetToDefault }
 				/>
 				<DataViews
 					key={ categoryId + postType }
@@ -195,7 +202,7 @@ export default function DataviewsPatterns() {
 						);
 					} }
 					view={ view }
-					onChangeView={ setView }
+					onChangeView={ updateView }
 					defaultLayouts={ defaultLayouts }
 				/>
 			</Page>

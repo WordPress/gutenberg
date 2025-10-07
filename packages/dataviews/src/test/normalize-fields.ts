@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { normalizeFields } from '../normalize-fields';
+import normalizeFields from '../utils/normalize-fields';
 import type { Field } from '../types';
 
 describe( 'normalizeFields: default getValue', () => {
@@ -189,6 +189,28 @@ describe( 'normalizeFields: default getValue', () => {
 				{
 					id: 'user',
 					type: 'integer',
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+			const result = normalizedFields[ 0 ].filterBy;
+			expect( result ).toStrictEqual( {
+				operators: [
+					'is',
+					'isNot',
+					'lessThan',
+					'greaterThan',
+					'lessThanOrEqual',
+					'greaterThanOrEqual',
+					'between',
+				],
+			} );
+		} );
+
+		it( 'returns the field type definition for number fields', () => {
+			const fields: Field< {} >[] = [
+				{
+					id: 'price',
+					type: 'number',
 				},
 			];
 			const normalizedFields = normalizeFields( fields );

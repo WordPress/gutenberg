@@ -5,8 +5,7 @@
 	"title": "Accordion Panel",
 	"category": "design",
 	"description": "Displays an accordion panel.",
-	"__experimental": true,
-	"parent": [ "core/accordion-content" ],
+	"parent": [ "core/accordion-item" ],
 	"supports": {
 		"color": {
 			"background": true,
@@ -47,7 +46,8 @@
 			}
 		},
 		"shadow": true,
-		"layout": true
+		"blockVisibility": false,
+		"contentRole": true
 	},
 	"attributes": {
 		"allowedBlocks": {

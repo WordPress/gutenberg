@@ -65,7 +65,7 @@ function gutenberg_register_block_bindings_post_data_source() {
 		array(
 			'label'              => _x( 'Post Data', 'block bindings source' ),
 			'get_value_callback' => 'gutenberg_block_bindings_post_data_get_value',
-			'uses_context'       => array( 'postId' ),
+			'uses_context'       => array( 'postId', 'postType' ),
 		)
 	);
 }

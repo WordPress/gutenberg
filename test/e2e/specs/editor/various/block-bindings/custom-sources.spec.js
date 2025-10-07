@@ -763,7 +763,7 @@ test.describe( 'Registered sources', () => {
 		} );
 	} );
 
-	test.describe( 'getFieldsList', () => {
+	test.describe( 'UI Editor', () => {
 		test( 'should be possible to update attribute value through bindings UI', async ( {
 			editor,
 			page,
@@ -779,7 +779,12 @@ test.describe( 'Registered sources', () => {
 				.click();
 			await page.getByRole( 'button', { name: 'content' } ).click();
 			await page
-				.getByRole( 'menuitemradio' )
+				.getByRole( 'menuitem', {
+					name: 'Complete Source',
+				} )
+				.click();
+			await page
+				.getByRole( 'menuitemcheckbox' )
 				.filter( { hasText: 'Text Field Label' } )
 				.click();
 			const paragraphBlock = editor.canvas.getByRole( 'document', {
@@ -914,13 +919,18 @@ test.describe( 'Registered sources', () => {
 				},
 			} );
 			await page.getByRole( 'button', { name: 'content' } ).click();
+			await page
+				.getByRole( 'menuitem', {
+					name: 'Complete Source',
+				} )
+				.click();
 			const textField = page
-				.getByRole( 'menuitemradio' )
+				.getByRole( 'menuitemcheckbox' )
 				.filter( { hasText: 'Text Field Label' } );
 			await expect( textField ).toBeVisible();
 			await expect( textField ).toBeChecked();
 			const urlField = page
-				.getByRole( 'menuitemradio' )
+				.getByRole( 'menuitemcheckbox' )
 				.filter( { hasText: 'URL Field Label' } );
 			await expect( urlField ).toBeVisible();
 			await expect( urlField ).not.toBeChecked();
@@ -1208,5 +1218,118 @@ test.describe( 'Registered sources', () => {
 			name: 'content',
 		} );
 		await expect( contentButton ).toContainText( 'Invalid source' );
+	} );
+
+	test.describe( 'Modal source', () => {
+		test( 'should open modal and allow field selection', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+			} );
+
+			// Open the bindings panel
+			await page.getByLabel( 'Attributes options' ).click();
+			await page
+				.getByRole( 'menuitemcheckbox', {
+					name: 'Show content',
+				} )
+				.click();
+
+			// Click on the content binding button
+			await page
+				.getByRole( 'button', {
+					name: 'content',
+				} )
+				.click();
+
+			// Click on the modal source
+			await page
+				.getByRole( 'menuitem', {
+					name: 'Modal Source',
+				} )
+				.click();
+
+			// Modal should be visible
+			const modal = page.getByRole( 'dialog' );
+			await expect( modal ).toBeVisible();
+
+			// Check modal content
+			await expect( modal ).toContainText(
+				'Select a field from the modal'
+			);
+			await expect( modal ).toContainText(
+				'This is a modal interface for selecting fields.'
+			);
+
+			// Click on a field button in the modal
+			const fieldButton = modal.getByRole( 'button', {
+				name: 'Text Field Label',
+			} );
+			await expect( fieldButton ).toBeVisible();
+			await fieldButton.click();
+
+			// Modal should close and binding should be applied
+			await expect( modal ).toBeHidden();
+
+			// Check that the paragraph shows the bound value
+			const paragraphBlock = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await expect( paragraphBlock ).toHaveText( 'Text Field Value' );
+		} );
+
+		test( 'should show modal source in attributes panel', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: {
+					content: 'fallback content',
+					metadata: {
+						bindings: {
+							content: {
+								source: 'testing/modal-source',
+								args: {
+									key: 'text_field',
+								},
+							},
+						},
+					},
+				},
+			} );
+
+			// Check that the binding shows the modal source label
+			const contentButton = page.getByRole( 'button', {
+				name: 'content',
+			} );
+			await expect( contentButton ).toContainText( 'Text Field Label' );
+		} );
+	} );
+
+	test.describe( 'Source compatibility filtering', () => {
+		test( 'should show compatible sources enabled and incompatible sources disabled', async ( {
+			editor,
+			page,
+		} ) => {
+			// Test string attribute - paragraph content
+			await editor.insertBlock( { name: 'core/image' } );
+			await page.getByLabel( 'Attributes options' ).click();
+			await page
+				.getByRole( 'menuitemcheckbox', { name: 'Show id' } )
+				.click();
+			await page.getByRole( 'button', { name: 'id' } ).click();
+
+			// String sources enabled, number source disabled for string attribute
+			await expect(
+				page.getByRole( 'menuitem', { name: 'Complete Source' } )
+			).toBeDisabled();
+
+			await expect(
+				page.getByRole( 'menuitem', { name: 'Modal Source' } )
+			).toBeEnabled();
+		} );
 	} );
 } );

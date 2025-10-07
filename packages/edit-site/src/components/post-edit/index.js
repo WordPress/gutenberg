@@ -29,7 +29,7 @@ const fieldsWithBulkEditSupport = [
 	'status',
 	'date',
 	'author',
-	'comment_status',
+	'discussion',
 ];
 
 function PostEditForm( { postType, postId } ) {
@@ -94,7 +94,11 @@ function PostEditForm( { postType, postId } ) {
 				'date',
 				'slug',
 				'parent',
-				'comment_status',
+				{
+					id: 'discussion',
+					label: __( 'Discussion' ),
+					children: [ 'comment_status', 'ping_status' ],
+				},
 				{
 					label: __( 'Template' ),
 					id: 'template',
@@ -106,7 +110,9 @@ function PostEditForm( { postType, postId } ) {
 			].filter(
 				( field ) =>
 					ids.length === 1 ||
-					fieldsWithBulkEditSupport.includes( field )
+					fieldsWithBulkEditSupport.includes(
+						typeof field === 'string' ? field : field.id
+					)
 			),
 		} ),
 		[ ids ]
