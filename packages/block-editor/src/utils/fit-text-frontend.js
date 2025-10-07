@@ -81,5 +81,4 @@ function initializeAllFitText() {
 	elements.forEach( initializeFitText );
 }
 
-document.addEventListener( 'DOMContentLoaded', initializeAllFitText );
 window.addEventListener( 'load', initializeAllFitText );

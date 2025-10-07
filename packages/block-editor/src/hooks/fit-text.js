@@ -166,7 +166,12 @@ function useFitText( { fitText, name, clientId } ) {
  * @param {string}   props.name          Block name.
  * @param {boolean}  props.fitText       Whether fit text is enabled.
  */
-export function FitTextControl( { clientId, fitText, setAttributes, name } ) {
+export function FitTextControl( {
+	clientId,
+	fitText = false,
+	setAttributes,
+	name,
+} ) {
 	if ( ! hasBlockSupport( name, FIT_TEXT_SUPPORT_KEY ) ) {
 		return null;
 	}

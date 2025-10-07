@@ -12,7 +12,7 @@ const variations = [
 			'Text automatically resizes to fit the container width.'
 		),
 		attributes: { fitText: true },
-		scope: [ 'block', 'inserter' ],
+		scope: [ 'inserter' ],
 		isActive: ( blockAttributes ) => blockAttributes.fitText,
 		icon: textColor,
 		example: {
