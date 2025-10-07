@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
+import {
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
 import { InspectorControls } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 
@@ -27,6 +30,7 @@ export default function TermsQueryInspectorControls( {
 	clientId,
 } ) {
 	const { termQuery } = attributes;
+	const { taxonomy } = termQuery;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const { templateSlug } = useSelect( ( select ) => {
@@ -45,12 +49,11 @@ export default function TermsQueryInspectorControls( {
 	const taxonomies = usePublicTaxonomies();
 
 	const isTaxonomyHierarchical = taxonomies.find(
-		( taxonomy ) => taxonomy.slug === termQuery.taxonomy
+		( _taxonomy ) => _taxonomy.slug === taxonomy
 	)?.hierarchical;
 
 	const isTaxonomyMatchingTemplate =
-		typeof templateSlug === 'string' &&
-		templateSlug.includes( termQuery.taxonomy );
+		typeof templateSlug === 'string' && templateSlug.includes( taxonomy );
 
 	// Only display the inherit control if the taxonomy is hierarchical and matches the current template.
 	const displayInheritControl =
@@ -80,11 +83,21 @@ export default function TermsQueryInspectorControls( {
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
 				>
-					<TaxonomyControl
-						attributes={ attributes }
-						setQuery={ setQuery }
-						setAttributes={ setAttributes }
-					/>
+					<ToolsPanelItem
+						hasValue={ () => taxonomy !== 'category' }
+						label={ __( 'Taxonomy' ) }
+						onDeselect={ () => {
+							setQuery( { taxonomy: 'category' } );
+						} }
+						isShownByDefault
+					>
+						<TaxonomyControl
+							taxonomy={ taxonomy }
+							onChange={ ( value ) =>
+								setQuery( { taxonomy: value } )
+							}
+						/>
+					</ToolsPanelItem>
 					<OrderingControls
 						attributes={ attributes }
 						setQuery={ setQuery }

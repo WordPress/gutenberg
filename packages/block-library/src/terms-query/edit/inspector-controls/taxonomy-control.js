@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalToolsPanelItem as ToolsPanelItem,
-	SelectControl,
-} from '@wordpress/components';
+import { SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -12,39 +9,23 @@ import { __ } from '@wordpress/i18n';
  */
 import { usePublicTaxonomies } from '../../utils';
 
-export default function TaxonomyControl( {
-	attributes,
-	setQuery,
-	setAttributes,
-} ) {
-	const { termQuery } = attributes;
-
+export default function TaxonomyControl( { taxonomy, onChange } ) {
 	const taxonomies = usePublicTaxonomies();
-	const taxonomyOptions = taxonomies.map( ( taxonomy ) => ( {
-		label: taxonomy.name,
-		value: taxonomy.slug,
+	const taxonomyOptions = taxonomies.map( ( _taxonomy ) => ( {
+		label: _taxonomy.name,
+		value: _taxonomy.slug,
 	} ) );
 
 	return (
-		<ToolsPanelItem
-			hasValue={ () => termQuery.taxonomy !== 'category' }
+		<SelectControl
+			__nextHasNoMarginBottom
+			__next40pxDefaultSize
 			label={ __( 'Taxonomy' ) }
-			onDeselect={ () => {
-				setQuery( { taxonomy: 'category' } );
+			options={ taxonomyOptions }
+			value={ taxonomy }
+			onChange={ ( selectedTaxonomy ) => {
+				onChange( selectedTaxonomy );
 			} }
-			isShownByDefault
-		>
-			<SelectControl
-				__nextHasNoMarginBottom
-				__next40pxDefaultSize
-				label={ __( 'Taxonomy' ) }
-				options={ taxonomyOptions }
-				value={ termQuery.taxonomy }
-				onChange={ ( selectedTaxonomy ) => {
-					setQuery( { taxonomy: selectedTaxonomy } );
-					setAttributes( { termsToShow: 'all' } );
-				} }
-			/>
-		</ToolsPanelItem>
+		/>
 	);
 }
