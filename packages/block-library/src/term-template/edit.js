@@ -157,7 +157,7 @@ export default function TermTemplateEdit( {
 	// Nested terms are returned by default from REST API as long as parent is not set.
 	// If we want to show nested terms, we must not set parent at all.
 	if ( parent || ! hierarchical ) {
-		queryArgs.parent = parent;
+		queryArgs.parent = parent || 0;
 	}
 
 	const { records: terms, isResolving } = useEntityRecords(
