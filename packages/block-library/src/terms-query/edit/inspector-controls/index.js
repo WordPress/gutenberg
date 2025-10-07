@@ -4,14 +4,13 @@
 import { __ } from '@wordpress/i18n';
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
 import { InspectorControls } from '@wordpress/block-editor';
-import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { useToolsPanelDropdownMenuProps } from '../../../utils/hooks';
+import { usePublicTaxonomies } from '../../utils';
 import TaxonomyControl from './taxonomy-control';
 import OrderingControls from './ordering-controls';
 import EmptyTermsControl from './empty-terms-control';
@@ -19,20 +18,6 @@ import HierarchyControl from './hierarchy-control';
 import InheritControl from './inherit-control';
 import MaxTermsControl from './max-terms-control';
 import AdvancedControls from './advanced-controls';
-
-const usePublicTaxonomies = () => {
-	const taxonomies = useSelect(
-		( select ) => select( coreStore ).getTaxonomies( { per_page: -1 } ),
-		[]
-	);
-	return useMemo( () => {
-		return (
-			taxonomies?.filter(
-				( { visibility } ) => visibility?.publicly_queryable
-			) || []
-		);
-	}, [ taxonomies ] );
-};
 
 export default function TermsQueryInspectorControls( {
 	attributes,
@@ -43,7 +28,6 @@ export default function TermsQueryInspectorControls( {
 } ) {
 	const { termQuery } = attributes;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
-	const taxonomies = usePublicTaxonomies();
 
 	const { templateSlug } = useSelect( ( select ) => {
 		// @wordpress/block-library should not depend on @wordpress/editor.
@@ -58,10 +42,7 @@ export default function TermsQueryInspectorControls( {
 		};
 	}, [] );
 
-	const taxonomyOptions = taxonomies.map( ( taxonomy ) => ( {
-		label: taxonomy.name,
-		value: taxonomy.slug,
-	} ) );
+	const taxonomies = usePublicTaxonomies();
 
 	const isTaxonomyHierarchical = taxonomies.find(
 		( taxonomy ) => taxonomy.slug === termQuery.taxonomy
@@ -95,7 +76,6 @@ export default function TermsQueryInspectorControls( {
 								parent: false,
 								perPage: 10,
 							},
-							termsToShow: 'all',
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
@@ -104,7 +84,6 @@ export default function TermsQueryInspectorControls( {
 						attributes={ attributes }
 						setQuery={ setQuery }
 						setAttributes={ setAttributes }
-						taxonomyOptions={ taxonomyOptions }
 					/>
 					<OrderingControls
 						attributes={ attributes }

@@ -1,19 +1,29 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	SelectControl,
 } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import { usePublicTaxonomies } from '../../utils';
 
 export default function TaxonomyControl( {
 	attributes,
 	setQuery,
 	setAttributes,
-	taxonomyOptions,
 } ) {
 	const { termQuery } = attributes;
+
+	const taxonomies = usePublicTaxonomies();
+	const taxonomyOptions = taxonomies.map( ( taxonomy ) => ( {
+		label: taxonomy.name,
+		value: taxonomy.slug,
+	} ) );
 
 	return (
 		<ToolsPanelItem
@@ -21,7 +31,6 @@ export default function TaxonomyControl( {
 			label={ __( 'Taxonomy' ) }
 			onDeselect={ () => {
 				setQuery( { taxonomy: 'category' } );
-				setAttributes( { termsToShow: 'all' } );
 			} }
 			isShownByDefault
 		>
