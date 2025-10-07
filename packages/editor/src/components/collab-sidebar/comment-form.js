@@ -25,12 +25,13 @@ import { sanitizeCommentString } from './utils';
 /**
  * EditComment component.
  *
- * @param {Object}   props                  - The component props.
- * @param {Function} props.onSubmit         - The function to call when updating the comment.
- * @param {Function} props.onCancel         - The function to call when canceling the comment update.
- * @param {Object}   props.thread           - The comment thread object.
- * @param {string}   props.submitButtonText - The text to display on the submit button.
- * @param {string?}  props.labelText        - The label text for the comment input.
+ * @param {Object}   props                            - The component props.
+ * @param {Function} props.onSubmit                   - The function to call when updating the comment.
+ * @param {Function} props.onCancel                   - The function to call when canceling the comment update.
+ * @param {Object}   props.thread                     - The comment thread object.
+ * @param {string}   props.submitButtonText           - The text to display on the submit button.
+ * @param {string?}  props.labelText                  - The label text for the comment input.
+ * @param {boolean}  props.shouldFocusTextareaOnMount - Whether to focus the textarea on mount.
  * @return {React.ReactNode} The CommentForm component.
  */
 function CommentForm( {
