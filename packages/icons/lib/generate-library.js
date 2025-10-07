@@ -70,12 +70,16 @@ async function cleanup() {
 }
 
 // Generate src/library/*.tsx based on the available SVG files.
-async function generateTsxFiles() {
-	const svgFiles = ( await readdir( ICON_LIBRARY_DIR ) ).filter( ( file ) =>
-		// Stricter than just checking for SVG suffix, thereby avoiding hidden
-		// files and characters that would get in the way of camel-casing.
-		file.match( /^[a-z0-9--]+\.svg$/ )
-	);
+async function generateTsxFiles( svgFiles ) {
+	if ( svgFiles ) {
+		// Argument passed by caller at ./build-worker-utils.js
+	} else {
+		svgFiles = ( await readdir( ICON_LIBRARY_DIR ) ).filter( ( file ) =>
+			// Stricter than just checking for SVG suffix, thereby avoiding hidden
+			// files and characters that would get in the way of camel-casing.
+			file.match( /^[a-z0-9--]+\.svg$/ )
+		);
+	}
 
 	await Promise.all(
 		svgFiles.map( async ( svgFile ) => {
@@ -189,4 +193,10 @@ ${ jsxContent }
 `;
 }
 
-main();
+if ( module === require.main ) {
+	main();
+}
+
+module.exports = {
+	generateTsxFiles,
+};

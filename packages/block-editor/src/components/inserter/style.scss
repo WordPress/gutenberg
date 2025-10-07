@@ -467,14 +467,9 @@ $block-inserter-tabs-height: 44px;
 
 	.block-editor-inserter__media-panel-search {
 		margin-bottom: $grid-unit-30;
-		// TODO: Consider using the Theme component to automatically adapt to a gray background.
 		@include break-medium() {
 			margin-bottom: 0;
 			padding: $grid-unit-20 $grid-unit-30 $grid-unit-20;
-
-			&:not(:focus-within) {
-				--wp-components-color-background: #{$white};
-			}
 		}
 	}
 }

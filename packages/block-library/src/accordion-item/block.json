@@ -42,7 +42,8 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
-		}
+		},
+		"contentRole": true
 	},
 	"attributes": {
 		"openByDefault": {

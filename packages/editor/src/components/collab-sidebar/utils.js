@@ -86,3 +86,39 @@ export function getCommentExcerpt( text, excerptLength = 10 ) {
 	const isTrimmed = trimmedExcerpt !== rawText;
 	return isTrimmed ? trimmedExcerpt + '…' : trimmedExcerpt;
 }
+
+/**
+ * Shift focus to the comment thread associated with a particular comment ID.
+ * If an additional selector is provided, the focus will be shifted to the element matching the selector.
+ *
+ * @typedef {import('@wordpress/element').RefObject} RefObject
+ *
+ * @param {string}       commentId          The ID of the comment thread to focus.
+ * @param {?HTMLElement} container          The container element to search within.
+ * @param {string}       additionalSelector The additional selector to focus on.
+ */
+export function focusCommentThread( commentId, container, additionalSelector ) {
+	const getFocusElement = () => {
+		const commentThread = container?.querySelector(
+			`[role=listitem][id="comment-thread-${ commentId }"]`
+		);
+		if ( additionalSelector ) {
+			return commentThread?.querySelector( additionalSelector );
+		}
+		return commentThread;
+	};
+
+	let focusElement = getFocusElement();
+	if ( focusElement ) {
+		focusElement.focus();
+	} else {
+		// The element hasn't been painted yet. Defer focusing on the next frame.
+		window.requestAnimationFrame( () => {
+			focusElement = getFocusElement();
+			// Ignore if the element still doesn't exist.
+			if ( focusElement ) {
+				focusElement.focus();
+			}
+		} );
+	}
+}
