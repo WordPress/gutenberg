@@ -69,7 +69,7 @@ export default function BlockAllowedBlocksControl( { clientId } ) {
 					} }
 					className="block-editor-block-allowed-blocks-control__button"
 				>
-					{ __( 'Manage' ) }
+					{ __( 'Manage allowed blocks' ) }
 				</Button>
 			</BaseControl>
 			{ isBlockControlOpened && (
