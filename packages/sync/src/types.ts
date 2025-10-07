@@ -23,7 +23,6 @@ export interface SyncConfig {
 		ydoc: Y.Doc,
 		changes: Partial< ObjectData >
 	) => void;
-	enabled: boolean;
 	getChangesFromCRDTDoc: ( ydoc: Y.Doc ) => ObjectData;
 	getInitialObjectData: ( record: ObjectData ) => ObjectData;
 	getObjectId: ( data: ObjectData ) => ObjectID;

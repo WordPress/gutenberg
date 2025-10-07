@@ -408,10 +408,7 @@ export const editEntityRecord =
 				return acc;
 			}, {} ),
 		};
-		if (
-			window.__experimentalEnableSync &&
-			entityConfig.syncConfig?.enabled
-		) {
+		if ( window.__experimentalEnableSync && entityConfig.syncConfig ) {
 			if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 				const objectId = entityConfig.syncConfig.getObjectId( record );
 				getSyncProvider().update(

@@ -306,13 +306,6 @@ async function loadPostTypeEntities() {
 			__unstable_rest_base: postType.rest_base,
 			syncConfig: {
 				/**
-				 * Is syncing enabled for this entity?
-				 *
-				 * @type {boolean}
-				 */
-				enabled: true,
-
-				/**
 				 * Apply changes from the local editor to the local CRDT document so
 				 * that those changes can be synced to other peers (via the provider).
 				 *
@@ -436,7 +429,6 @@ async function loadSiteEntity() {
 		kind: 'root',
 		baseURL: '/wp/v2/settings',
 		syncConfig: {
-			enabled: false,
 			applyChangesToCRDTDoc: defaultApplyChangesToCRDTDoc,
 			getChangesFromCRDTDoc: defaultGetChangesFromCRDTDoc,
 			getObjectId: () => 'index',

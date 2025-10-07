@@ -157,7 +157,7 @@ export const getEntityRecord =
 			// Entity supports syncing.
 			if (
 				window.__experimentalEnableSync &&
-				entityConfig.syncConfig?.enabled &&
+				entityConfig.syncConfig &&
 				! query
 			) {
 				if ( globalThis.IS_GUTENBERG_PLUGIN ) {
