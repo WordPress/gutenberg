@@ -31,6 +31,7 @@
 		"@babel/runtime": "7.25.7",
 		"@react-spring/web": "^9.4.5",
 		"@wordpress/a11y": "file:../a11y",
+		"@wordpress/admin-ui": "file:../admin-ui",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/blob": "file:../blob",
 		"@wordpress/block-editor": "file:../block-editor",
