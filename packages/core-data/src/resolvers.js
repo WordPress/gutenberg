@@ -184,27 +184,30 @@ export const getEntityRecord =
 								transientConfig.read( recordWithTransients );
 						} );
 
-					getSyncProvider().register(
-						objectType,
-						entityConfig.syncConfig
-					);
-
 					// Bootstraps the edited document (and load from peers).
 					await getSyncProvider().bootstrap(
+						entityConfig.syncConfig,
 						objectType,
 						objectId,
 						recordWithTransients,
-						( edits ) => {
-							dispatch( {
-								type: 'EDIT_ENTITY_RECORD',
-								kind,
-								name,
-								recordId: key,
-								edits,
-								meta: {
-									undo: undefined,
-								},
-							} );
+						{
+							// Handle edits sourced from the sync provider.
+							editRecord: ( edits ) => {
+								if ( ! Object.keys( edits ).length ) {
+									return;
+								}
+
+								dispatch( {
+									type: 'EDIT_ENTITY_RECORD',
+									kind,
+									name,
+									recordId: key,
+									edits,
+									meta: {
+										undo: undefined,
+									},
+								} );
+							},
 						}
 					);
 				}

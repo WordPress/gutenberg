@@ -167,10 +167,11 @@ describe( 'getEntityRecord', () => {
 		expect( getSyncProvider ).toHaveBeenCalled();
 		expect( mockBootstrap ).toHaveBeenCalledTimes( 1 );
 		expect( mockBootstrap ).toHaveBeenCalledWith(
+			{},
 			'postType/post',
 			1,
 			POST_RECORD,
-			expect.any( Function )
+			{ editRecord: expect.any( Function ) }
 		);
 	} );
 
@@ -223,10 +224,11 @@ describe( 'getEntityRecord', () => {
 		expect( getSyncProvider ).toHaveBeenCalled();
 		expect( mockBootstrap ).toHaveBeenCalledTimes( 1 );
 		expect( mockBootstrap ).toHaveBeenCalledWith(
+			{},
 			'postType/post',
 			1,
 			{ ...POST_RECORD, foo: 'bar' },
-			expect.any( Function )
+			{ editRecord: expect.any( Function ) }
 		);
 	} );
 

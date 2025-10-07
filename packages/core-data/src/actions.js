@@ -10,6 +10,7 @@ import { v4 as uuid } from 'uuid';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
+import { LOCAL_EDITOR_ORIGIN } from '@wordpress/sync';
 
 /**
  * Internal dependencies
@@ -413,7 +414,12 @@ export const editEntityRecord =
 				const objectType = `${ kind }/${ name }`;
 				const objectId = recordId;
 
-				getSyncProvider().update( objectType, objectId, edit.edits );
+				getSyncProvider().updateCRDTDoc(
+					objectType,
+					objectId,
+					edit.edits,
+					LOCAL_EDITOR_ORIGIN
+				);
 			}
 		}
 		if ( ! options.undoIgnore ) {

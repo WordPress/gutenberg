@@ -8,6 +8,7 @@ import { IndexeddbPersistence } from 'y-indexeddb';
 /** @typedef {import('./types').ObjectID} ObjectID */
 /** @typedef {import('./types').CRDTDoc} CRDTDoc */
 /** @typedef {import('./types').ConnectDoc} ConnectDoc */
+/** @typedef {import('./types').ConnectDocResult} ConnectDocResult */
 
 /**
  * Connect function to the IndexedDB persistence provider.
@@ -16,15 +17,13 @@ import { IndexeddbPersistence } from 'y-indexeddb';
  * @param {ObjectType} objectType The object type.
  * @param {CRDTDoc}    doc        The CRDT document.
  *
- * @return {Promise<() => void>} Promise that resolves when the connection is established.
+ * @return {Promise< ConnectDocResult >} Promise that resolves when the connection is established.
  */
 export function connectIndexDb( objectId, objectType, doc ) {
 	const roomName = `${ objectType }-${ objectId }`;
 	const provider = new IndexeddbPersistence( roomName, doc );
 
-	return new Promise( ( resolve ) => {
-		provider.on( 'synced', () => {
-			resolve( () => provider.destroy() );
-		} );
+	return Promise.resolve( {
+		destroy: () => provider.destroy(),
 	} );
 }

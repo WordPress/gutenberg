@@ -12,11 +12,19 @@ export type ObjectType = string;
 // are not many expectations that can hold on its shape.
 export interface ObjectData extends Record< string, unknown > {}
 
+export interface ConnectDocResult {
+	destroy: () => void;
+}
+
 export type ConnectDoc = (
 	id: ObjectID,
 	type: ObjectType,
-	doc: CRDTDoc
-) => Promise< () => void >;
+	ydoc: Y.Doc
+) => Promise< ConnectDocResult >;
+
+export interface RecordHandlers {
+	editRecord: ( data: Partial< ObjectData > ) => void;
+}
 
 export interface SyncConfig {
 	applyChangesToCRDTDoc: (
@@ -24,17 +32,5 @@ export interface SyncConfig {
 		changes: Partial< ObjectData >
 	) => void;
 	getChangesFromCRDTDoc: ( ydoc: Y.Doc ) => ObjectData;
-	supports: Record< string, true >;
+	supports?: Record< string, true >;
 }
-
-export type SyncProvider = {
-	register: ( type: ObjectType, config: SyncConfig ) => void;
-	bootstrap: (
-		type: ObjectType,
-		objectId: ObjectID,
-		record: ObjectData,
-		handleChanges: ( data: any ) => void
-	) => Promise< void >;
-	update: ( type: ObjectType, id: ObjectID, data: any ) => void;
-	discard: ( type: ObjectType, id: ObjectID ) => Promise< void >;
-};
