@@ -18,6 +18,13 @@ const iconsBuildUtils = require( '../../packages/icons/lib/build-worker-utils' )
 const isDev = process.env.NODE_ENV === 'development';
 
 /**
+ * List of packages that use the v2 build pipeline.
+ *
+ * @type {string[]}
+ */
+const V2BUILD_PACKAGES = [ 'hooks' ];
+
+/**
  * Path to packages directory.
  *
  * @type {string}
@@ -204,6 +211,24 @@ const BUILD_TASK_BY_EXTENSION = {
 
 module.exports = async ( file, callback ) => {
 	const extension = path.extname( file );
+	const packageName = getPackageName( file );
+
+	// Use esbuild for packages in the v2 pipeline
+	if (
+		V2BUILD_PACKAGES.includes( packageName ) &&
+		[ '.js', '.ts', '.tsx' ].includes( extension )
+	) {
+		try {
+			const buildWithEsbuild = require( './build-worker-esbuild' );
+			await buildWithEsbuild( file );
+			callback();
+			return;
+		} catch ( error ) {
+			callback( error );
+			return;
+		}
+	}
+
 	const task = BUILD_TASK_BY_EXTENSION[ extension ];
 
 	if ( ! task ) {

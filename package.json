@@ -87,6 +87,7 @@
 		"babel-plugin-transform-remove-console": "6.9.4",
 		"benchmark": "2.1.4",
 		"browserslist": "4.25.1",
+		"browserslist-to-esbuild": "2.1.1",
 		"caniuse-lite": "1.0.30001731",
 		"chalk": "4.1.1",
 		"change-case": "4.1.2",
