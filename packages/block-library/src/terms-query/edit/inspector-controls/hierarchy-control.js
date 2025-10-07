@@ -13,13 +13,13 @@ export default function HierarchyControl( { attributes, setQuery } ) {
 	return (
 		<ToolsPanelItem
 			hasValue={ () => termQuery.hierarchical !== false }
-			label={ __( 'Show hierarchy' ) }
+			label={ __( 'Include nested terms' ) }
 			onDeselect={ () => setQuery( { hierarchical: false } ) }
 			isShownByDefault
 		>
 			<ToggleControl
 				__nextHasNoMarginBottom
-				label={ __( 'Show hierarchy' ) }
+				label={ __( 'Include nested terms' ) }
 				checked={ termQuery.hierarchical }
 				onChange={ ( hierarchical ) => {
 					setQuery( { hierarchical } );

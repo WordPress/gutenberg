@@ -14,9 +14,9 @@ import { useMemo } from '@wordpress/element';
 import { useToolsPanelDropdownMenuProps } from '../../../utils/hooks';
 import TaxonomyControl from './taxonomy-control';
 import OrderingControls from './ordering-controls';
-import DisplayOptions from './display-options';
-import HierarchyControl from './hierarchy-control';
 import EmptyTermsControl from './empty-terms-control';
+import HierarchyControl from './hierarchy-control';
+import InheritControl from './inherit-control';
 import MaxTermsControl from './max-terms-control';
 import AdvancedControls from './advanced-controls';
 
@@ -41,7 +41,7 @@ export default function TermsQueryInspectorControls( {
 	TagName,
 	clientId,
 } ) {
-	const { termQuery, termsToShow } = attributes;
+	const { termQuery } = attributes;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const taxonomies = usePublicTaxonomies();
 
@@ -71,7 +71,7 @@ export default function TermsQueryInspectorControls( {
 		typeof templateSlug === 'string' &&
 		templateSlug.includes( termQuery.taxonomy );
 
-	const displaySubtermsControl =
+	const displayInheritControl =
 		isTaxonomyHierarchical && isTaxonomyMatchingTemplate;
 
 	return (
@@ -109,22 +109,22 @@ export default function TermsQueryInspectorControls( {
 						attributes={ attributes }
 						setQuery={ setQuery }
 					/>
-					<DisplayOptions
-						attributes={ attributes }
-						setAttributes={ setAttributes }
-						displayTopLevelControl={ isTaxonomyHierarchical }
-						displaySubtermsControl={ displaySubtermsControl }
-					/>
-					<MaxTermsControl
-						attributes={ attributes }
-						setQuery={ setQuery }
-					/>
-					{ isTaxonomyHierarchical && termsToShow === 'all' && (
+					{ isTaxonomyHierarchical && (
 						<HierarchyControl
 							attributes={ attributes }
 							setQuery={ setQuery }
 						/>
 					) }
+					{ displayInheritControl && (
+						<InheritControl
+							attributes={ attributes }
+							setAttributes={ setAttributes }
+						/>
+					) }
+					<MaxTermsControl
+						attributes={ attributes }
+						setQuery={ setQuery }
+					/>
 				</ToolsPanel>
 			</InspectorControls>
 			<AdvancedControls

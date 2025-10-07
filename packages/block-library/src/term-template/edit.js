@@ -129,7 +129,6 @@ export default function TermTemplateEdit( {
 	clientId,
 	setAttributes,
 	context: {
-		termsToShow,
 		termQuery: {
 			taxonomy,
 			order,
@@ -167,18 +166,9 @@ export default function TermTemplateEdit( {
 		if ( ! terms ) {
 			return [];
 		}
-		let termsToFilter = terms;
-		if ( termsToShow === 'top-level' ) {
-			termsToFilter = termsToFilter.filter( ( term ) => ! term.parent );
-		}
-		if ( termsToShow === 'subterms' ) {
-			termsToFilter = termsToFilter.filter( ( term ) => term.parent );
-		}
 		// Limit to the number of terms defined by perPage.
-		return perPage === 0
-			? termsToFilter
-			: termsToFilter.slice( 0, perPage );
-	}, [ terms, termsToShow, perPage ] );
+		return perPage === 0 ? terms : terms.slice( 0, perPage );
+	}, [ terms, perPage ] );
 
 	const { blocks, variations, defaultVariation } = useSelect(
 		( select ) => {

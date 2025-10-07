@@ -27,11 +27,6 @@
 				"hierarchical": false
 			}
 		},
-		"termsToShow": {
-			"type": "string",
-			"default": "all",
-			"enum": [ "all", "top-level", "subterms" ]
-		},
 		"tagName": {
 			"type": "string",
 			"default": "div"
@@ -42,8 +37,7 @@
 	},
 	"providesContext": {
 		"termQueryId": "termQueryId",
-		"termQuery": "termQuery",
-		"termsToShow": "termsToShow"
+		"termQuery": "termQuery"
 	},
 	"supports": {
 		"align": [ "wide", "full" ],
