@@ -81,29 +81,29 @@ async function buildJS( file ) {
 	);
 	const target = browserslistToEsbuild();
 
-	// Build CommonJS version
-	const resultCJS = await esbuild.build( {
-		entryPoints: [ file ],
-		outfile: destPathCJS,
-		bundle: false,
-		platform: 'node',
-		format: 'cjs',
-		sourcemap: true,
-		target,
-		write: false,
-	} );
-
-	// Build ESM version
-	const resultESM = await esbuild.build( {
-		entryPoints: [ file ],
-		outfile: destPathESM,
-		bundle: false,
-		platform: 'neutral',
-		format: 'esm',
-		sourcemap: true,
-		target,
-		write: false,
-	} );
+	// Build both CJS and ESM in parallel
+	const [ resultCJS, resultESM ] = await Promise.all( [
+		esbuild.build( {
+			entryPoints: [ file ],
+			outfile: destPathCJS,
+			bundle: false,
+			platform: 'node',
+			format: 'cjs',
+			sourcemap: true,
+			target,
+			write: false,
+		} ),
+		esbuild.build( {
+			entryPoints: [ file ],
+			outfile: destPathESM,
+			bundle: false,
+			platform: 'neutral',
+			format: 'esm',
+			sourcemap: true,
+			target,
+			write: false,
+		} ),
+	] );
 
 	// Write CJS output
 	await Promise.all( [
