@@ -4,36 +4,8 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Navigation block', () => {
-	test.beforeEach( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllMenus();
-	} );
-
-	test.beforeAll( async ( { requestUtils } ) => {
-		// We need pages to be published so the Link Control can return pages
-		await requestUtils.createPage( {
-			title: 'Cat',
-			status: 'publish',
-		} );
-		await requestUtils.createPage( {
-			title: 'Dog',
-			status: 'publish',
-		} );
-		await requestUtils.createPage( {
-			title: 'Walrus',
-			status: 'publish',
-		} );
-	} );
-
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMenus();
-	} );
-
-	test.afterEach( async ( { requestUtils } ) => {
-		await Promise.all( [
-			requestUtils.deleteAllPosts(),
-			requestUtils.deleteAllPages(),
-			requestUtils.deleteAllMenus(),
-		] );
 	} );
 
 	test.use( {
@@ -43,6 +15,14 @@ test.describe( 'Navigation block', () => {
 	} );
 
 	test.describe( 'As a user I want the navigation block to fallback to the best possible default', () => {
+		test.afterEach( async ( { requestUtils } ) => {
+			await Promise.all( [
+				requestUtils.deleteAllPosts(),
+				requestUtils.deleteAllPages(),
+				requestUtils.deleteAllMenus(),
+			] );
+		} );
+
 		test( 'default to a list of pages if there are no menus', async ( {
 			admin,
 			editor,
@@ -316,6 +296,22 @@ test.describe( 'Navigation block', () => {
 	} );
 
 	test.describe( 'Focus management', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			// We need pages to be published so the Link Control can return pages
+			await requestUtils.createPage( {
+				title: 'Cat',
+				status: 'publish',
+			} );
+			await requestUtils.createPage( {
+				title: 'Dog',
+				status: 'publish',
+			} );
+			await requestUtils.createPage( {
+				title: 'Walrus',
+				status: 'publish',
+			} );
+		} );
+
 		test.beforeEach(
 			async ( { admin, editor, requestUtils, navigation } ) => {
 				await admin.createNewPost();
@@ -332,6 +328,10 @@ test.describe( 'Navigation block', () => {
 				await expect( navBlockInserter ).toBeVisible();
 			}
 		);
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllMenus();
+		} );
 
 		test( 'Focus management when using the navigation link appender', async ( {
 			pageUtils,
@@ -1005,16 +1005,26 @@ class Navigation {
 	async previewIsOpenAndCloses() {
 		const linkPopover = this.getLinkPopover();
 		await expect( linkPopover ).toBeVisible();
-		// Expect focus to be within the link control. We could be more exact here, but it would be more brittle that way. We really care if focus is within it or not.
-		expect(
-			await this.page.evaluate( () => {
-				const { activeElement } =
-					document.activeElement?.contentDocument ?? document;
-				return !! activeElement.closest(
-					'.components-popover__content .block-editor-link-control'
-				);
-			} )
-		).toBe( true );
+
+		// Wait for focus to be within the link control
+		// We could be more exact here, but it would be more brittle that way. We really care if focus is within it or not.
+		await expect
+			.poll(
+				async () => {
+					return await this.page.evaluate( () => {
+						const { activeElement } =
+							document.activeElement?.contentDocument ?? document;
+						return !! activeElement.closest(
+							'.components-popover__content .block-editor-link-control'
+						);
+					} );
+				},
+				{
+					message: 'Focus should be within the link control',
+					timeout: 500,
+				}
+			)
+			.toBe( true );
 
 		await this.page.keyboard.press( 'Escape' );
 
