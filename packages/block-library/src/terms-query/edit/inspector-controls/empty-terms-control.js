@@ -8,9 +8,7 @@ export default function EmptyTermsControl( { value, onChange, ...props } ) {
 		<ToggleControl
 			__nextHasNoMarginBottom
 			checked={ ! value }
-			onChange={
-				( showEmpty ) => onChange( ! showEmpty ) // ToggleControl returns the inverse of hideEmpty.
-			}
+			onChange={ ( showEmpty ) => onChange( ! showEmpty ) }
 			{ ...props }
 		/>
 	);
