@@ -351,9 +351,8 @@ async function loadPostTypeEntities() {
 
 				/**
 				 * This initial object data represents the data that will be synced via
-				 * the CRDT document, which may differ from the entity record. There may
-				 * be properties that should not be synced, or properties that are
-				 * derived from the record.
+				 * the CRDT document, which may include properties that are derived from
+				 * the record (e.g., `blocks` derived from `content`).
 				 *
 				 * @param {import('@wordpress/sync').ObjectData} record
 				 * @return {import('@wordpress/sync').ObjectData} The initial data
