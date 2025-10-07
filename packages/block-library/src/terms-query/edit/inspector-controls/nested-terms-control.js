@@ -3,15 +3,11 @@
  */
 import { ToggleControl } from '@wordpress/components';
 
-export default function NestedTermsControl( {
-	hierarchical,
-	onChange,
-	...props
-} ) {
+export default function NestedTermsControl( { value, onChange, ...props } ) {
 	return (
 		<ToggleControl
 			__nextHasNoMarginBottom
-			checked={ hierarchical }
+			checked={ value }
 			onChange={ onChange }
 			{ ...props }
 		/>

@@ -4,12 +4,12 @@
 import { __ } from '@wordpress/i18n';
 import { RangeControl } from '@wordpress/components';
 
-export default function MaxTermsControl( { perPage, onChange, ...props } ) {
+export default function MaxTermsControl( { value, onChange, ...props } ) {
 	return (
 		<RangeControl
 			__nextHasNoMarginBottom
 			__next40pxDefaultSize
-			value={ perPage }
+			value={ value }
 			min={ 0 }
 			max={ 100 }
 			onChange={ onChange }

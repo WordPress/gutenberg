@@ -109,7 +109,7 @@ export default function TermsQueryInspectorControls( {
 					>
 						<TaxonomyControl
 							label={ taxonomyControlLabel }
-							taxonomy={ taxonomy }
+							value={ taxonomy }
 							onChange={ ( value ) =>
 								setQuery( { taxonomy: value } )
 							}
@@ -142,7 +142,7 @@ export default function TermsQueryInspectorControls( {
 					>
 						<EmptyTermsControl
 							label={ emptyTermsControlLabel }
-							hideEmpty={ hideEmpty }
+							value={ hideEmpty }
 							onChange={ ( value ) =>
 								setQuery( { hideEmpty: value } )
 							}
@@ -157,7 +157,7 @@ export default function TermsQueryInspectorControls( {
 						>
 							<InheritControl
 								label={ inheritControlLabel }
-								inherit={ inherit }
+								value={ inherit }
 								onChange={ setQuery }
 							/>
 						</ToolsPanelItem>
@@ -173,7 +173,7 @@ export default function TermsQueryInspectorControls( {
 						>
 							<NestedTermsControl
 								label={ nestedTermsControlLabel }
-								hierarchical={ hierarchical }
+								value={ hierarchical }
 								onChange={ ( value ) =>
 									setQuery( { hierarchical: value } )
 								}
@@ -188,7 +188,7 @@ export default function TermsQueryInspectorControls( {
 					>
 						<MaxTermsControl
 							label={ maxTermsControlLabel }
-							perPage={ perPage }
+							value={ perPage }
 							onChange={ ( value ) =>
 								setQuery( { perPage: value } )
 							}

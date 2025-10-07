@@ -8,11 +8,11 @@ import { SelectControl } from '@wordpress/components';
  */
 import { usePublicTaxonomies } from '../../utils';
 
-export default function TaxonomyControl( { taxonomy, onChange, ...props } ) {
+export default function TaxonomyControl( { value, onChange, ...props } ) {
 	const taxonomies = usePublicTaxonomies();
-	const taxonomyOptions = taxonomies.map( ( _taxonomy ) => ( {
-		label: _taxonomy.name,
-		value: _taxonomy.slug,
+	const taxonomyOptions = taxonomies.map( ( taxonomy ) => ( {
+		label: taxonomy.name,
+		value: taxonomy.slug,
 	} ) );
 
 	return (
@@ -20,7 +20,7 @@ export default function TaxonomyControl( { taxonomy, onChange, ...props } ) {
 			__nextHasNoMarginBottom
 			__next40pxDefaultSize
 			options={ taxonomyOptions }
-			value={ taxonomy }
+			value={ value }
 			onChange={ onChange }
 			{ ...props }
 		/>

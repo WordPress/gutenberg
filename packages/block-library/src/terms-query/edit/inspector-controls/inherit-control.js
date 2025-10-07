@@ -3,16 +3,16 @@
  */
 import { ToggleControl } from '@wordpress/components';
 
-export default function InheritControl( { inherit, onChange, ...props } ) {
+export default function InheritControl( { value, onChange, ...props } ) {
 	return (
 		<ToggleControl
 			__nextHasNoMarginBottom
-			checked={ inherit }
-			onChange={ ( value ) =>
+			checked={ value }
+			onChange={ ( inherit ) =>
 				onChange( {
-					inherit: value,
+					inherit,
 					// When enabling inherit, hierarchical is not supported.
-					...( value ? { hierarchical: false } : {} ),
+					...( inherit ? { hierarchical: false } : {} ),
 				} )
 			}
 			{ ...props }
