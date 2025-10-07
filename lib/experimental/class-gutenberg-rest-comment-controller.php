@@ -101,8 +101,8 @@ class Gutenberg_REST_Comment_Controller extends WP_REST_Comments_Controller {
 
 		// Re-map edit context capabilities when requesting `block_comment` type.
 		// Note: This is only relevant change for the backport.
-		$edit_cap = 'block_comment' === $comment->comment_type ? 'edit_posts' : 'moderate_comments';
-		if ( ! empty( $request['context'] ) && 'edit' === $request['context'] && ! current_user_can( $edit_cap ) ) {
+		$edit_cap = 'block_comment' === $comment->comment_type ? array( 'edit_comment', $comment->comment_ID ) : array( 'moderate_comments' );
+		if ( ! empty( $request['context'] ) && 'edit' === $request['context'] && ! current_user_can( ...$edit_cap ) ) {
 			return new WP_Error(
 				'rest_forbidden_context',
 				__( 'Sorry, you are not allowed to edit comments.', 'gutenberg' ),

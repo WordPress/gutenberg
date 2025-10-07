@@ -51,24 +51,25 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_Test_REST_TestCase {
 	/**
 	 * Create a test post with standard comments and block comments.
 	 *
-	 * @return int The post ID.
+	 * @return string $role The role of the user creating the post.
 	 */
-	function create_test_post_with_block_comment( $user_id ) {
+	public function create_test_post_with_block_comment( $role ) {
+		$user_id = self::$user_ids[ $role ];
 		$post_id = $this->factory->post->create(
 			array(
 				'post_title'   => 'Test Post for Block Comments',
 				'post_content' => 'This is a test post to check block comment permissions.',
-				'post_status'  => 'publish',
+				'post_status'  => 'contributor' === $role ? 'draft' : 'publish',
 				'post_author'  => $user_id,
 			)
 		);
 
 		for ( $i = 0; $i < self::$num_comments; $i++ ) {
-			$cid = $this->factory->comment->create(
+			$this->factory->comment->create(
 				array(
 					'comment_post_ID'  => $post_id,
 					'comment_type'     => 'block_comment',
-					'comment_approved' => $i % 2 === 0 ? 1 : 0,
+					'comment_approved' => 0 === $i % 2 ? 1 : 0,
 				)
 			);
 		}
@@ -171,7 +172,7 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_Test_REST_TestCase {
 	 */
 	public function test_block_comment_get_items_permissions_edit_context( $role, $post_author_role, $can_read ) {
 		wp_set_current_user( self::$user_ids[ $role ] );
-		$post_id = $this->create_test_post_with_block_comment( self::$user_ids[ $post_author_role ] );
+		$post_id = $this->create_test_post_with_block_comment( $post_author_role );
 
 		$request = new WP_REST_Request( 'GET', '/wp/v2/comments' );
 		$request->set_param( 'post', $post_id );
@@ -192,16 +193,61 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_Test_REST_TestCase {
 		wp_delete_post( $post_id, true );
 	}
 
+	/**
+	 * Test that for each user role, the permissions are correct when accessing a comment.
+	 *
+	 * @param string $role The user role to test.
+	 * @param string $post_author_role The role of the post author.
+	 * @param bool $can_read The expected permission result.
+	 *
+	 * @dataProvider data_block_comment_get_items_permissions_data_provider
+	 */
+	public function test_block_comment_get_item_permissions_edit_context( $role, $post_author_role, $can_read ) {
+		wp_set_current_user( self::$user_ids[ $role ] );
+
+		$post_id = $this->factory->post->create(
+			array(
+				'post_title'   => 'Test Post for Block Comments',
+				'post_content' => 'This is a test post to check block comment permissions.',
+				'post_status'  => 'contributor' === $post_author_role ? 'draft' : 'publish',
+				'post_author'  => self::$user_ids[ $post_author_role ],
+			)
+		);
+
+		$comment_id = $this->factory->comment->create(
+			array(
+				'comment_post_ID'  => $post_id,
+				'comment_type'     => 'block_comment',
+				// Test with unapproved comment, which is more restrictive.
+				'comment_approved' => 0,
+				'user_id'          => self::$user_ids[ $post_author_role ],
+			)
+		);
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/comments/' . $comment_id );
+		$request->set_param( 'context', 'edit' );
+		$response = rest_get_server()->dispatch( $request );
+
+		if ( $can_read ) {
+			$comment = $response->get_data();
+			$this->assertEquals( $comment_id, $comment['id'] );
+
+		} else {
+			$this->assertErrorResponse( 'rest_forbidden_context', $response, 403 );
+		}
+
+		wp_delete_post( $post_id, true );
+	}
+
 	public function data_block_comment_get_items_permissions_data_provider() {
 		return array(
 			'Administrator can see block comments on other posts' => array( 'administrator', 'author', true ),
 			'Editor can see block comments on other posts' => array( 'editor', 'contributor', true ),
 			'Author cannot see block comments on other posts' => array( 'author', 'editor', false ),
 			'Contributor cannot see block comments on other posts' => array( 'contributor', 'author', false ),
-			'Subscriber cannot see block comments'         => array( 'subscriber', 'contributor', false ),
+			'Subscriber cannot see block comments'         => array( 'subscriber', 'author', false ),
 			'Author can see block comments on own post'    => array( 'author', 'author', true ),
-			// Reason: It only returns partial data for contributors, only unit tests, not sure why.
-			// 'Contributor can see block comments on own post' => array( 'contributor', 'contributor', true ),
+			'Contributor can see block comments on own post' => array( 'contributor', 'contributor', true ),
 		);
 	}
 }
