@@ -1,11 +1,15 @@
 /**
  * External dependencies
  */
-const { promisify } = require( 'util' );
-const fs = require( 'fs' );
-const path = require( 'path' );
-const esbuild = require( 'esbuild' );
-const makeDir = require( 'make-dir' );
+import { promisify } from 'util';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import esbuild from 'esbuild';
+import makeDir from 'make-dir';
+import browserslistToEsbuild from 'browserslist-to-esbuild';
+
+const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
 
 /**
  * Path to packages directory.
@@ -75,10 +79,6 @@ async function buildJS( file ) {
 	] );
 
 	// Get target from browserslist config
-	const { default: browserslistToEsbuild } = await import(
-		// eslint-disable-next-line import/no-unresolved
-		'browserslist-to-esbuild'
-	);
 	const target = browserslistToEsbuild();
 
 	// Build both CJS and ESM in parallel
@@ -118,4 +118,4 @@ async function buildJS( file ) {
 	] );
 }
 
-module.exports = buildJS;
+export default buildJS;
