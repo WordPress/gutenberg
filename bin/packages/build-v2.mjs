@@ -314,12 +314,22 @@ function getPackageName( filename ) {
 async function buildAll() {
 	console.log( '🔨 Building v2 packages...\n' );
 
-	for ( const packageName of V2_PACKAGES ) {
-		const buildTime = await buildPackage( packageName, { silent: true } );
-		console.log( `✔ ${ packageName } (${ buildTime }ms)` );
-	}
+	const startTime = Date.now();
 
-	console.log( '\n🎉 All v2 packages built successfully!' );
+	// Build all packages in parallel, logging each as it completes
+	await Promise.all(
+		V2_PACKAGES.map( async ( packageName ) => {
+			const buildTime = await buildPackage( packageName, {
+				silent: true,
+			} );
+			console.log( `✔ ${ packageName } (${ buildTime }ms)` );
+		} )
+	);
+
+	const totalTime = Date.now() - startTime;
+	console.log(
+		`\n🎉 All v2 packages built successfully! (${ totalTime }ms total)`
+	);
 }
 
 /**
