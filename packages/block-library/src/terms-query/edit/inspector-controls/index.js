@@ -11,7 +11,7 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
+import { useToolsPanelDropdownMenuProps } from '../../../utils/hooks';
 import TaxonomyControl from './taxonomy-control';
 import OrderingControls from './ordering-controls';
 import DisplayOptions from './display-options';

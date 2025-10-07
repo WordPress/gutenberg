@@ -17,7 +17,7 @@ import TermsQueryInspectorControls from './inspector-controls';
 
 const TEMPLATE = [ [ 'core/term-template' ] ];
 
-export default function TermsQueryContent( {
+export default function TermsQueryEdit( {
 	attributes,
 	setAttributes,
 	clientId,
@@ -31,7 +31,7 @@ export default function TermsQueryContent( {
 
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
-	const instanceId = useInstanceId( TermsQueryContent );
+	const instanceId = useInstanceId( TermsQueryEdit );
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
