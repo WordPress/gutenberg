@@ -286,9 +286,10 @@ function makeBlocksSerializable( blocks ) {
  */
 async function loadPostTypeEntities() {
 	const postTypes = await apiFetch( {
-		path: '/wp/v2/types?context=view',
+		path: '/wp/v2/types?context=edit',
 	} );
 	return Object.entries( postTypes ?? {} ).map( ( [ name, postType ] ) => {
+		const isSyncEnabled = postType.supports?.[ 'collaborative-editing' ];
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
 			name
 		);
@@ -314,58 +315,71 @@ async function loadPostTypeEntities() {
 					: String( record.id ) ),
 			__unstablePrePersist: isTemplate ? undefined : prePersistPostType,
 			__unstable_rest_base: postType.rest_base,
-			syncConfig: {
-				/**
-				 * Apply changes from the local editor to the local CRDT document so
-				 * that those changes can be synced to other peers (via the provider).
-				 *
-				 * @param {import('@wordpress/sync').CRDTDoc}               crdtDoc
-				 * @param {Partial< import('@wordpress/sync').ObjectData >} changes
-				 * @return {void}
-				 */
-				applyChangesToCRDTDoc: ( crdtDoc, changes ) => {
-					const document = crdtDoc.getMap( 'document' );
+			syncConfig: isSyncEnabled
+				? {
+						/**
+						 * Apply changes from the local editor to the local CRDT document so
+						 * that those changes can be synced to other peers (via the provider).
+						 *
+						 * @param {import('@wordpress/sync').CRDTDoc}               crdtDoc
+						 * @param {Partial< import('@wordpress/sync').ObjectData >} changes
+						 * @return {void}
+						 */
+						applyChangesToCRDTDoc: ( crdtDoc, changes ) => {
+							const document = crdtDoc.getMap( 'document' );
 
-					Object.entries( changes ).forEach( ( [ key, value ] ) => {
-						if ( ! syncedProperties.has( key ) ) {
-							return;
-						}
+							Object.entries( changes ).forEach(
+								( [ key, value ] ) => {
+									if ( ! syncedProperties.has( key ) ) {
+										return;
+									}
 
-						if ( typeof value !== 'function' ) {
-							if ( key === 'blocks' ) {
-								if ( ! serialisableBlocksCache.has( value ) ) {
-									serialisableBlocksCache.set(
-										value,
-										makeBlocksSerializable( value )
-									);
+									if ( typeof value !== 'function' ) {
+										if ( key === 'blocks' ) {
+											if (
+												! serialisableBlocksCache.has(
+													value
+												)
+											) {
+												serialisableBlocksCache.set(
+													value,
+													makeBlocksSerializable(
+														value
+													)
+												);
+											}
+
+											value =
+												serialisableBlocksCache.get(
+													value
+												);
+										}
+
+										if ( document.get( key ) !== value ) {
+											document.set( key, value );
+										}
+									}
 								}
+							);
+						},
 
-								value = serialisableBlocksCache.get( value );
-							}
+						/**
+						 * Extract changes from a CRDT document that can be used to update the
+						 * local editor state.
+						 *
+						 * @param {import('@wordpress/sync').CRDTDoc} crdtDoc
+						 * @return {Partial< import('@wordpress/sync').ObjectData >} Changes to record
+						 */
+						getChangesFromCRDTDoc: defaultGetChangesFromCRDTDoc,
 
-							if ( document.get( key ) !== value ) {
-								document.set( key, value );
-							}
-						}
-					} );
-				},
-
-				/**
-				 * Extract changes from a CRDT document that can be used to update the
-				 * local editor state.
-				 *
-				 * @param {import('@wordpress/sync').CRDTDoc} crdtDoc
-				 * @return {Partial< import('@wordpress/sync').ObjectData >} Changes to record
-				 */
-				getChangesFromCRDTDoc: defaultGetChangesFromCRDTDoc,
-
-				/**
-				 * Sync features supported by the entity.
-				 *
-				 * @type {Record< string, boolean >}
-				 */
-				supports: {},
-			},
+						/**
+						 * Sync features supported by the entity.
+						 *
+						 * @type {Record< string, boolean >}
+						 */
+						supports: {},
+				  }
+				: undefined,
 			supportsPagination: true,
 			getRevisionsUrl: ( parentId, revisionId ) =>
 				`/${ namespace }/${
