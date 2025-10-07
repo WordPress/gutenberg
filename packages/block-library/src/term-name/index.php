@@ -1,0 +1,71 @@
+<?php
+/**
+ * Server-side rendering of the `core/term-name` block.
+ *
+ * @package WordPress
+ */
+
+/**
+ * Renders the `core/term-name` block on the server.
+ *
+ * @param array    $attributes Block attributes.
+ * @param string   $content    Block default content.
+ * @param WP_Block $block      Block instance.
+ *
+ * @return string Returns the name of the current taxonomy term wrapped inside a heading tag.
+ */
+function render_block_core_term_name( $attributes, $content, $block ) {
+	$term_name = '';
+	$context   = apply_filters( 'render_block_context', $block->context, $block->parsed_block, null );
+
+	if ( isset( $context['termId'] ) && isset( $context['taxonomy'] ) ) {
+		$term = get_term( $context['termId'], $context['taxonomy'] );
+		if ( $term && ! is_wp_error( $term ) ) {
+			$term_name = $term->name;
+		}
+	}
+
+	if ( empty( $term_name ) ) {
+		return '';
+	}
+
+	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
+		$term_link = get_term_link( $context['termId'], $context['taxonomy'] );
+		if ( ! is_wp_error( $term_link ) ) {
+			$term_name = sprintf(
+				'<a href="%1$s" target="%2$s">%3$s</a>',
+				esc_url( $term_link ),
+				esc_attr( $attributes['linkTarget'] ),
+				$term_name
+			);
+		}
+	}
+
+	$classes = array();
+	if ( isset( $attributes['textAlign'] ) ) {
+		$classes[] = 'has-text-align-' . $attributes['textAlign'];
+	}
+	if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
+		$classes[] = 'has-link-color';
+	}
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classes ) ) );
+
+	return sprintf(
+		'<div %s>%s</div>',
+		$wrapper_attributes,
+		$term_name
+	);
+}
+
+/**
+ * Registers the `core/term-name` block on the server.
+ */
+function register_block_core_term_name() {
+	register_block_type_from_metadata(
+		__DIR__ . '/term-name',
+		array(
+			'render_callback' => 'render_block_core_term_name',
+		)
+	);
+}
+add_action( 'init', 'register_block_core_term_name' );
