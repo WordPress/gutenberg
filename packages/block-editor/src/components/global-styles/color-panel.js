@@ -125,24 +125,18 @@ export function ColorToolsPanel( {
 		onChange( updatedValue );
 	};
 
-	const toolsPanelProps = {
-		resetAll,
-		panelId,
-		hasInnerWrapper: true,
-		headingLevel: 3,
-		className: 'color-block-support-panel',
-		__experimentalFirstVisibleItemClass: 'first',
-		__experimentalLastVisibleItemClass: 'last',
-		dropdownMenuProps,
-	};
-
-	// Only add label if it's not an empty string
-	if ( label !== '' ) {
-		toolsPanelProps.label = label || __( 'Elements' );
-	}
-
 	return (
-		<ToolsPanel { ...toolsPanelProps }>
+		<ToolsPanel
+			label={ label || __( 'Elements' ) }
+			resetAll={ resetAll }
+			panelId={ panelId }
+			hasInnerWrapper
+			headingLevel={ 3 }
+			className="color-block-support-panel"
+			__experimentalFirstVisibleItemClass="first"
+			__experimentalLastVisibleItemClass="last"
+			dropdownMenuProps={ dropdownMenuProps }
+		>
 			<div className="color-block-support-panel__inner-wrapper">
 				{ children }
 			</div>
