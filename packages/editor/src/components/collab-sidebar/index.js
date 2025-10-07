@@ -97,6 +97,8 @@ function CollabSidebarContent( {
 					isDismissible: true,
 				}
 			);
+
+			return savedRecord;
 		} catch ( error ) {
 			onError( error );
 		}
@@ -178,6 +180,7 @@ function CollabSidebarContent( {
 					onSubmit={ addNewComment }
 					showCommentBoard={ showCommentBoard }
 					setShowCommentBoard={ setShowCommentBoard }
+					commentSidebarRef={ commentSidebarRef }
 				/>
 				<Comments
 					threads={ comments }
