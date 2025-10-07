@@ -36,7 +36,9 @@ test.describe( 'Push to Global Styles button', () => {
 		// Navigate to Styles -> Blocks -> Heading -> Typography
 		await topBar.getByRole( 'button', { name: 'Styles' } ).click();
 		await settingsPanel.getByRole( 'button', { name: 'Blocks' } ).click();
-		await settingsPanel.getByRole( 'button', { name: 'Heading' } ).click();
+		await settingsPanel
+			.getByRole( 'button', { name: 'Heading', exact: true } )
+			.click();
 
 		// Headings should not have uppercase
 		await expect(

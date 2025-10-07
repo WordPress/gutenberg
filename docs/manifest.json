@@ -1998,6 +1998,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/views",
+		"slug": "packages-views",
+		"markdown_source": "../packages/views/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/warning",
 		"slug": "packages-warning",
 		"markdown_source": "../packages/warning/README.md",

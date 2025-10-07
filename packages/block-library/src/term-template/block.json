@@ -9,11 +9,6 @@
 	"description": "Contains the block elements used to render a taxonomy term, like the name, description, and more.",
 	"textdomain": "default",
 	"usesContext": [ "termQuery", "termsToShow" ],
-	"attributes": {
-		"namespace": {
-			"type": "string"
-		}
-	},
 	"supports": {
 		"reusable": false,
 		"html": false,

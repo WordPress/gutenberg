@@ -32,7 +32,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __, _x, sprintf } from '@wordpress/i18n';
-import { edit } from '@wordpress/icons';
+import { pencil } from '@wordpress/icons';
 import { DOWN } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 
@@ -174,7 +174,7 @@ export default function PostDateEdit( {
 										return (
 											<ToolbarButton
 												aria-expanded={ isOpen }
-												icon={ edit }
+												icon={ pencil }
 												title={ __( 'Change Date' ) }
 												onClick={ onToggle }
 												onKeyDown={ openOnArrowDown }
