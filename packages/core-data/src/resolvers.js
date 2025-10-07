@@ -157,12 +157,10 @@ export const getEntityRecord =
 			// Entity supports syncing.
 			if (
 				window.__experimentalEnableSync &&
-				entityConfig.syncConfig &&
+				entityConfig.syncConfig?.enabled &&
 				! query
 			) {
 				if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-					const objectId = entityConfig.getSyncObjectId( key );
-
 					getSyncProvider().register(
 						entityConfig.syncObjectType + '--edit',
 						entityConfig.syncConfig
@@ -171,7 +169,7 @@ export const getEntityRecord =
 					// Bootstraps the edited document (and load from peers).
 					await getSyncProvider().bootstrap(
 						entityConfig.syncObjectType + '--edit',
-						objectId,
+						record,
 						( edits ) => {
 							dispatch( {
 								type: 'EDIT_ENTITY_RECORD',
