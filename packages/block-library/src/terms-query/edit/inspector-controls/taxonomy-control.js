@@ -23,9 +23,7 @@ export default function TaxonomyControl( { taxonomy, onChange } ) {
 			label={ __( 'Taxonomy' ) }
 			options={ taxonomyOptions }
 			value={ taxonomy }
-			onChange={ ( selectedTaxonomy ) => {
-				onChange( selectedTaxonomy );
-			} }
+			onChange={ onChange }
 		/>
 	);
 }
