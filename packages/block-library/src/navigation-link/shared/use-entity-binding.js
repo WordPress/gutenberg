@@ -16,8 +16,7 @@ import { useBlockBindingsUtils } from '@wordpress/block-editor';
  * @return {Object} Hook return value
  */
 export function useEntityBinding( { clientId, attributes } ) {
-	const { updateBlockBindings, removeBlockBinding } =
-		useBlockBindingsUtils( clientId );
+	const { updateBlockBindings } = useBlockBindingsUtils( clientId );
 	const { metadata, id } = attributes;
 
 	// Check if there's a URL binding with a valid source (not null)
@@ -29,10 +28,10 @@ export function useEntityBinding( { clientId, attributes } ) {
 	const clearBinding = useCallback( () => {
 		// Only clear if there's actually a binding to clear
 		if ( hasBindingMetadata ) {
-			// Remove the URL binding
-			removeBlockBinding( 'url' );
+			// Remove the URL binding by setting it to undefined
+			updateBlockBindings( { url: undefined } );
 		}
-	}, [ hasBindingMetadata, removeBlockBinding ] );
+	}, [ hasBindingMetadata, updateBlockBindings ] );
 
 	const createBinding = useCallback( () => {
 		updateBlockBindings( {

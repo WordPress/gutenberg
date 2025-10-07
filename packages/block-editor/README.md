@@ -894,15 +894,13 @@ Retrieves the existing utils needed to update the block `bindings` metadata. The
 It contains the following utils:
 
 -   `updateBlockBindings`: Updates the value of the bindings connected to block attributes. It can be used to remove a specific binding by setting the value to `undefined`.
--   `removeBlockBinding`: Removes the binding for a specific attribute.
 -   `removeAllBlockBindings`: Removes the bindings property of the `metadata` attribute.
 
 _Usage_
 
 ```js
 import { useBlockBindingsUtils } from '@wordpress/block-editor';
-const { updateBlockBindings, removeBlockBinding, removeAllBlockBindings } =
-	useBlockBindingsUtils();
+const { updateBlockBindings, removeAllBlockBindings } = useBlockBindingsUtils();
 
 // Update url and alt attributes.
 updateBlockBindings( {
@@ -922,9 +920,6 @@ updateBlockBindings( {
 
 // Remove binding from url attribute.
 updateBlockBindings( { url: undefined } );
-
-// Alternative: Remove binding from url attribute.
-removeBlockBinding( 'url' );
 
 // Remove bindings from all attributes.
 removeAllBlockBindings();
