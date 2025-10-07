@@ -1,12 +1,7 @@
-/**
- * External dependencies
- */
-import type { ReactNode } from 'react';
-
 export type SectionProps = {
-	description: ReactNode;
-	title: ReactNode;
-	children: ReactNode;
+	description: React.ReactNode;
+	title: React.ReactNode;
+	children: React.ReactNode;
 };
 
 const Section = ( { description, title, children }: SectionProps ) => (

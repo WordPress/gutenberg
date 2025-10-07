@@ -23,17 +23,13 @@ import { isRTL, __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-/**
- * External dependencies
- */
-import type { ReactNode } from 'react';
 
 const { Tabs } = unlock( componentsPrivateApis );
 
 const PREFERENCES_MENU = 'preferences-menu';
 
 export type PreferencesModalTabsProps = {
-	sections: { name: string; tabLabel: string; content: ReactNode }[];
+	sections: { name: string; tabLabel: string; content: React.ReactNode }[];
 };
 export default function PreferencesModalTabs( {
 	sections,
@@ -51,7 +47,7 @@ export default function PreferencesModalTabs( {
 	const { tabs, sectionsContentMap } = useMemo( () => {
 		let mappedTabs: {
 			tabs: { name: string; title: string }[];
-			sectionsContentMap: Record< string, ReactNode >;
+			sectionsContentMap: Record< string, React.ReactNode >;
 		} = {
 			tabs: [],
 			sectionsContentMap: {},
