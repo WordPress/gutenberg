@@ -18,7 +18,8 @@
 				"orderBy": "name",
 				"hideEmpty": true,
 				"parent": false,
-				"hierarchical": false
+				"hierarchical": false,
+				"inherit": false
 			}
 		},
 		"tagName": {
