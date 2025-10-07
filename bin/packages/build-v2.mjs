@@ -16,7 +16,6 @@ import browserslistToEsbuild from 'browserslist-to-esbuild';
 /**
  * Internal dependencies
  */
-import buildJSFile from './build-worker-esbuild.mjs';
 import { V2_PACKAGES } from './v2-packages.js';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
@@ -164,6 +163,49 @@ async function bundlePackage( packageName ) {
 }
 
 /**
+ * Transpile source files for a package (both CJS and ESM).
+ *
+ * @param {string}   packageDir Package directory path.
+ * @param {string[]} srcFiles   Array of source file paths.
+ */
+async function transpilePackage( packageDir, srcFiles ) {
+	const buildDir = path.join( packageDir, 'build' );
+	const buildModuleDir = path.join( packageDir, 'build-module' );
+
+	await Promise.all( [
+		mkdir( buildDir, { recursive: true } ),
+		mkdir( buildModuleDir, { recursive: true } ),
+	] );
+
+	const target = browserslistToEsbuild();
+
+	await Promise.all( [
+		// CJS build
+		esbuild.build( {
+			entryPoints: srcFiles,
+			outdir: buildDir,
+			outbase: path.join( packageDir, 'src' ),
+			bundle: false,
+			platform: 'node',
+			format: 'cjs',
+			sourcemap: true,
+			target,
+		} ),
+		// ESM build
+		esbuild.build( {
+			entryPoints: srcFiles,
+			outdir: buildModuleDir,
+			outbase: path.join( packageDir, 'src' ),
+			bundle: false,
+			platform: 'neutral',
+			format: 'esm',
+			sourcemap: true,
+			target,
+		} ),
+	] );
+}
+
+/**
  * Build a single package (transpile + bundle).
  *
  * @param {string}  packageName    Package name.
@@ -197,9 +239,7 @@ async function buildPackage( packageName, { silent = false } = {} ) {
 			`  📝 Transpiling ${ srcFiles.length } source file(s)...`
 		);
 	}
-	for ( const file of srcFiles ) {
-		await buildJSFile( file );
-	}
+	await transpilePackage( packageDir, srcFiles );
 
 	// Step 2: Bundle for WordPress (if wpScript is true)
 	if ( packageJson.wpScript ) {
