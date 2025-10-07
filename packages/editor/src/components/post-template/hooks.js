@@ -66,7 +66,7 @@ function useTemplates( postType ) {
 			const userTemplates = select( coreStore ).getEntityRecords(
 				'postType',
 				'wp_template',
-				{ per_page: -1, post_type: postType }
+				{ per_page: -1 }
 			);
 			if ( ! currentTheme || ! registeredTemplates || ! userTemplates ) {
 				return [];
