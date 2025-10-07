@@ -12,8 +12,6 @@ export const defaultLayouts = {
 
 const DEFAULT_VIEW = {
 	type: 'grid',
-	search: '',
-	page: 1,
 	perPage: 20,
 	sort: {
 		field: 'title',
