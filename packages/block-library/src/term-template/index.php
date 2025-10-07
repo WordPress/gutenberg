@@ -30,15 +30,15 @@ function render_block_core_term_template( $attributes, $content, $block ) {
 	$query = $query_block_context['termQuery'];
 
 	$query_args = array(
-		'taxonomy'     => $query['taxonomy'] ?? 'category',
-		'number'       => $query['perPage'] ?? 10,
-		'order'        => $query['order'] ?? 'asc',
-		'orderby'      => $query['orderBy'] ?? 'name',
-		'hierarchical' => $query['hierarchical'] ?? false,
-		'hide_empty'   => $query['hideEmpty'] ?? true,
+		'taxonomy'   => $query['taxonomy'] ?? 'category',
+		'number'     => $query['perPage'] ?? 10,
+		'order'      => $query['order'] ?? 'asc',
+		'orderby'    => $query['orderBy'] ?? 'name',
+		'hide_empty' => $query['hideEmpty'] ?? true,
 	);
 
-	// We set parent only when inheriting from the taxonomy archive context, otherwise hierarchical is ignored.
+	// We set parent only when inheriting from the taxonomy archive context or not
+	// showing nested terms, otherwise nested terms are not displayed.
 	if (
 		isset( $query['inherit'] )
 		&& $query['inherit']
@@ -54,6 +54,8 @@ function render_block_core_term_template( $attributes, $content, $block ) {
 		if ( $current_term_id && $current_term_id > 0 ) {
 			$query_args['parent'] = $current_term_id;
 		}
+	} elseif ( empty( $query['hierarchical'] ) ) {
+		$query_args['parent'] = 0;
 	}
 
 	$terms_query = new WP_Term_Query( $query_args );
