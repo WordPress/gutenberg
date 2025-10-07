@@ -31,7 +31,6 @@ import {
  */
 import PostTitle from '../post-title';
 import { store as editorStore } from '../../store';
-import { VisualEditorOverlay } from '../../index';
 import { unlock } from '../../lock-unlock';
 import EditTemplateBlocksNotification from './edit-template-blocks-notification';
 import ResizableEditor from '../resizable-editor';
@@ -494,25 +493,6 @@ function VisualEditor( {
 					</RecursionProvider>
 				</BlockCanvas>
 			</ResizableEditor>
-			<VisualEditorOverlay.Slot>
-				{ ( overlays ) =>
-					overlays.map( ( overlay, index ) => (
-						<div
-							key={ index }
-							style={ {
-								position: 'fixed',
-								top: 0,
-								left: 0,
-								width: '100%',
-								height: '100%',
-								pointerEvents: 'none',
-							} }
-						>
-							{ overlay }
-						</div>
-					) )
-				}
-			</VisualEditorOverlay.Slot>
 		</div>
 	);
 }
