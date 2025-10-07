@@ -115,7 +115,10 @@ function build_dropdown_script_block_core_categories( $dropdown_id ) {
 	})( <?php echo wp_json_encode( $exports, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ); ?> );
 	</script>
 	<?php
-	return wp_get_inline_script_tag( str_replace( array( '<script>', '</script>' ), '', ob_get_clean() ) );
+	return wp_get_inline_script_tag(
+		trim( str_replace( array( '<script>', '</script>' ), '', ob_get_clean() ) ) .
+		"\n//# sourceURL=" . rawurlencode( __FUNCTION__ )
+	);
 }
 
 /**
