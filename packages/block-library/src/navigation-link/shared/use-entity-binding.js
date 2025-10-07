@@ -19,19 +19,16 @@ export function useEntityBinding( { clientId, attributes } ) {
 	const { updateBlockBindings } = useBlockBindingsUtils( clientId );
 	const { metadata, id } = attributes;
 
-	// Check if there's a URL binding with a valid source (not null)
+	// Check if there's a URL binding with a valid source
 	const hasUrlBinding = !! metadata?.bindings?.url?.source && !! id;
 
-	// Check if there's ANY binding metadata (even if cleared/null)
-	const hasBindingMetadata = !! metadata?.bindings?.url;
-
 	const clearBinding = useCallback( () => {
-		// Only clear if there's actually a binding to clear
-		if ( hasBindingMetadata ) {
+		// Only clear if there's actually a valid binding to clear
+		if ( hasUrlBinding ) {
 			// Remove the URL binding by setting it to undefined
 			updateBlockBindings( { url: undefined } );
 		}
-	}, [ hasBindingMetadata, updateBlockBindings ] );
+	}, [ hasUrlBinding, updateBlockBindings ] );
 
 	const createBinding = useCallback( () => {
 		updateBlockBindings( {
