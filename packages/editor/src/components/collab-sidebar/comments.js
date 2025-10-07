@@ -116,9 +116,9 @@ function Thread( {
 	setShowCommentBoard,
 	commentSidebarRef,
 } ) {
-	const { toggleBlockHighlight, selectBlock } =
-		useDispatch( blockEditorStore );
-	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
+	const { toggleBlockHighlight, selectBlock, toggleBlockSpotlight } = unlock(
+		useDispatch( blockEditorStore )
+	);
 	const relatedBlockElement = useBlockElement( thread.blockClientId );
 	const debouncedToggleBlockHighlight = useDebounce(
 		toggleBlockHighlight,
