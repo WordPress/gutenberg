@@ -61,8 +61,8 @@ export default function TermNameEdit( {
 	const TagName = tagName;
 
 	let termNameDisplay = termName;
-	if ( isLink && term ) {
-		const termLink = term.link || '#';
+	if ( isLink ) {
+		const termLink = term?.link || '#';
 		termNameDisplay = (
 			<a href={ termLink } onClick={ ( e ) => e.preventDefault() }>
 				{ termName }
