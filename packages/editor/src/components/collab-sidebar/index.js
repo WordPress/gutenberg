@@ -275,7 +275,7 @@ function CommentBoardWrapper( {
 			const newHeight = refs.floating?.current.scrollHeight;
 			updateHeight( thread.id, newHeight );
 		}
-	}, [ thread.id, refs.floating ] );
+	}, [ thread.id, updateHeight ] );
 
 	return (
 		<VStack
