@@ -72,11 +72,8 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 
 		const totalWords = wordCount( content || '', wordCountType );
 
-		const parts = [];
-
 		// Add "time to read" part, if enabled.
 		if ( displayMode === 'time' ) {
-			let timeString;
 			if ( displayAsRange ) {
 				let maxMinutes = Math.max(
 					1,
@@ -95,48 +92,34 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 					'%1$s–%2$s minutes',
 					'Range of minutes to read'
 				);
-				timeString = sprintf( rangeLabel, minMinutes, maxMinutes );
-			} else {
-				const minutesToRead = Math.max(
-					1,
-					Math.round( totalWords / averageReadingSpeed )
-				);
-
-				timeString = sprintf(
-					/* translators: %s: the number of minutes to read the post. */
-					_n( '%s minute', '%s minutes', minutesToRead ),
-					minutesToRead
-				);
+				return sprintf( rangeLabel, minMinutes, maxMinutes );
 			}
-			parts.push( timeString );
+			const minutesToRead = Math.max(
+				1,
+				Math.round( totalWords / averageReadingSpeed )
+			);
+
+			return sprintf(
+				/* translators: %s: the number of minutes to read the post. */
+				_n( '%s minute', '%s minutes', minutesToRead ),
+				minutesToRead
+			);
 		}
 
 		// Add "word count" part, if enabled.
 		if ( displayMode === 'words' ) {
-			const wordCountString =
-				wordCountType === 'words'
-					? sprintf(
-							/* translators: %s: the number of words in the post. */
-							_n( '%s word', '%s words', totalWords ),
-							totalWords.toLocaleString()
-					  )
-					: sprintf(
-							/* translators: %s: the number of characters in the post. */
-							_n( '%s character', '%s characters', totalWords ),
-							totalWords.toLocaleString()
-					  );
-			parts.push( wordCountString );
+			return wordCountType === 'words'
+				? sprintf(
+						/* translators: %s: the number of words in the post. */
+						_n( '%s word', '%s words', totalWords ),
+						totalWords.toLocaleString()
+				  )
+				: sprintf(
+						/* translators: %s: the number of characters in the post. */
+						_n( '%s character', '%s characters', totalWords ),
+						totalWords.toLocaleString()
+				  );
 		}
-
-		if ( parts.length === 1 ) {
-			return parts[ 0 ];
-		}
-		return parts.map( ( part, index ) => (
-			<span key={ index }>
-				{ part }
-				{ index < parts.length - 1 && <br /> }
-			</span>
-		) );
 	}, [
 		contentStructure,
 		blocks,

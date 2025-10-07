@@ -2,13 +2,14 @@
  * External dependencies
  */
 import clsx from 'clsx';
+import type { ForwardedRef } from 'react';
 
 /**
  * WordPress dependencies
  */
 import { useInstanceId, useMergeRefs } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { Icon, search, closeSmall } from '@wordpress/icons';
+import { search, closeSmall } from '@wordpress/icons';
 import { forwardRef, useMemo, useRef } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
@@ -16,11 +17,12 @@ import deprecated from '@wordpress/deprecated';
  * Internal dependencies
  */
 import Button from '../button';
+import { InputControlPrefixWrapper } from '../input-control/input-prefix-wrapper';
+import { InputControlSuffixWrapper } from '../input-control/input-suffix-wrapper';
 import type { WordPressComponentProps } from '../context/wordpress-component';
 import type { SearchControlProps, SuffixItemProps } from './types';
-import type { ForwardedRef } from 'react';
 import { ContextSystemProvider } from '../context';
-import { StyledInputControl, SuffixItemWrapper } from './styles';
+import { StyledInputControl, StyledIcon } from './styles';
 
 function SuffixItem( {
 	searchRef,
@@ -29,7 +31,7 @@ function SuffixItem( {
 	onClose,
 }: SuffixItemProps ) {
 	if ( ! onClose && ! value ) {
-		return <Icon icon={ search } />;
+		return null;
 	}
 
 	if ( onClose ) {
@@ -44,12 +46,14 @@ function SuffixItem( {
 	};
 
 	return (
-		<Button
-			size="small"
-			icon={ closeSmall }
-			label={ onClose ? __( 'Close search' ) : __( 'Reset search' ) }
-			onClick={ onClose ?? onReset }
-		/>
+		<InputControlSuffixWrapper variant="control">
+			<Button
+				size="small"
+				icon={ closeSmall }
+				label={ onClose ? __( 'Close search' ) : __( 'Reset search' ) }
+				onClick={ onClose ?? onReset }
+			/>
+		</InputControlSuffixWrapper>
 	);
 }
 
@@ -91,8 +95,6 @@ function UnforwardedSearchControl(
 				_overrides: { __nextHasNoMarginBottom },
 				__associatedWPComponentName: 'SearchControl',
 			},
-			// `isBorderless` is still experimental and not a public prop for InputControl yet.
-			InputBase: { isBorderless: true },
 		} ),
 		[ __nextHasNoMarginBottom ]
 	);
@@ -114,15 +116,18 @@ function UnforwardedSearchControl(
 				autoComplete="off"
 				placeholder={ placeholder }
 				value={ value ?? '' }
+				prefix={
+					<InputControlPrefixWrapper variant="icon">
+						<StyledIcon icon={ search } fill="currentColor" />
+					</InputControlPrefixWrapper>
+				}
 				suffix={
-					<SuffixItemWrapper size={ size }>
-						<SuffixItem
-							searchRef={ searchRef }
-							value={ value }
-							onChange={ onChange }
-							onClose={ onClose }
-						/>
-					</SuffixItemWrapper>
+					<SuffixItem
+						searchRef={ searchRef }
+						value={ value }
+						onChange={ onChange }
+						onClose={ onClose }
+					/>
 				}
 				{ ...filteredRestProps }
 			/>

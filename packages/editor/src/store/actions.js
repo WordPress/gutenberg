@@ -18,7 +18,7 @@ import {
 	doActionAsync,
 } from '@wordpress/hooks';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -264,7 +264,7 @@ export const savePost =
 			try {
 				await doActionAsync(
 					'editor.savePost',
-					{ id: previousRecord.id },
+					{ id: previousRecord.id, type: previousRecord.type },
 					options
 				);
 			} catch ( err ) {
@@ -272,6 +272,10 @@ export const savePost =
 			}
 		}
 		dispatch( { type: 'REQUEST_POST_UPDATE_FINISH', options } );
+
+		if ( ! options.isAutosave && previousRecord.type === 'wp_template' ) {
+			templateActivationNotice( { select, dispatch, registry } );
+		}
 
 		if ( error ) {
 			const args = getNotificationArgumentsForSaveFail( {
@@ -306,6 +310,93 @@ export const savePost =
 			}
 		}
 	};
+
+async function templateActivationNotice( { select, registry } ) {
+	const editorSettings = select.getEditorSettings();
+
+	// Don't open for focused entity.
+	if ( editorSettings.onNavigateToPreviousEntityRecord ) {
+		return;
+	}
+
+	const { id, slug } = select.getCurrentPost();
+	const site = await registry
+		.select( coreStore )
+		.getEntityRecord( 'root', 'site' );
+
+	// Already active.
+	if ( site.active_templates[ slug ] === id ) {
+		return;
+	}
+
+	await registry.dispatch( noticesStore ).createNotice(
+		'info',
+		sprintf(
+			// translators: %s: template slug
+			__( 'This is a "%s" template. Do you want to activate it?' ),
+			slug
+		),
+		{
+			id: 'template-activate-notice',
+			actions: [
+				{
+					label: __( 'Activate' ),
+					onClick: async () => {
+						await registry
+							.dispatch( noticesStore )
+							.removeNotice( 'template-activate-notice' );
+						await registry
+							.dispatch( noticesStore )
+							.createNotice(
+								'info',
+								__( 'Activating template…' ),
+								{
+									id: 'template-activating-notice',
+								}
+							);
+						try {
+							const currentSite = await registry
+								.select( coreStore )
+								.getEntityRecord( 'root', 'site' );
+							await registry
+								.dispatch( coreStore )
+								.saveEntityRecord(
+									'root',
+									'site',
+									{
+										active_templates: {
+											...currentSite.active_templates,
+											[ slug ]: id,
+										},
+									},
+									{ throwOnError: true }
+								);
+							await registry
+								.dispatch( noticesStore )
+								.removeNotice( 'template-activating-notice' );
+							await registry
+								.dispatch( noticesStore )
+								.createSuccessNotice(
+									__( 'Template activated.' )
+								);
+						} catch ( error ) {
+							await registry
+								.dispatch( noticesStore )
+								.removeNotice( 'template-activating-notice' );
+							await registry
+								.dispatch( noticesStore )
+								.createErrorNotice(
+									__( 'Template activation failed.' )
+								);
+							// Rethrow for debugging.
+							throw error;
+						}
+					},
+				},
+			],
+		}
+	);
+}
 
 /**
  * Action for refreshing the current post.
