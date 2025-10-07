@@ -40,16 +40,14 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 			esc_html__( 'Home' )
 		);
 	}
-
-	// Map breadcrumb types to their corresponding functions.
-	$breadcrumb_type_map = array(
-		'hierarchical' => 'get_hierarchical_post_type_breadcrumbs',
-		'terms'        => 'get_terms_breadcrumbs',
-	);
+	$supported_types = array( 'hierarchical', 'terms' );
 	// If `type` is not set to a specific breadcrumb type, determine it based on the block's default heuristics.
-	$breadcrumbs_type = isset( $breadcrumb_type_map[ $type ] ) ? $type : get_breadcrumbs_type( $post_type );
-	$breadcrumb_items = array_merge( $breadcrumb_items, call_user_func( $breadcrumb_type_map[ $breadcrumbs_type ], $post_id, $post_type ) );
-
+	$breadcrumbs_type = in_array( $type, $supported_types, true ) ? $type : block_core_breadcrumbs_get_breadcrumbs_type( $post_type );
+	if ( 'hierarchical' === $breadcrumbs_type ) {
+		$breadcrumb_items = array_merge( $breadcrumb_items, block_core_breadcrumbs_get_hierarchical_post_type_breadcrumbs( $post_id ) );
+	} else {
+		$breadcrumb_items = array_merge( $breadcrumb_items, block_core_breadcrumbs_get_terms_breadcrumbs( $post_id, $post_type ) );
+	}
 	// Add current post title (not linked).
 	$breadcrumb_items[] = sprintf( '<span aria-current="page">%s</span>', get_the_title( $post ) );
 	$wrapper_attributes = get_block_wrapper_attributes(
@@ -85,7 +83,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
  *
  * @return string The breadcrumb type..
  */
-function get_breadcrumbs_type( $post_type ) {
+function block_core_breadcrumbs_get_breadcrumbs_type( $post_type ) {
 	return is_post_type_hierarchical( $post_type ) ? 'hierarchical' : 'terms';
 }
 
@@ -95,14 +93,13 @@ function get_breadcrumbs_type( $post_type ) {
  * @since 6.9.0
  *
  * @param int    $post_id   The post ID.
- * @param string $post_type The post type name.
  *
  * @return array Array of breadcrumb HTML items.
  */
-function get_hierarchical_post_type_breadcrumbs( $post_id, $post_type ) {
+function block_core_breadcrumbs_get_hierarchical_post_type_breadcrumbs( $post_id ) {
 	$breadcrumb_items = array();
-	$ancestors = get_post_ancestors( $post_id );
-	$ancestors = array_reverse( $ancestors );
+	$ancestors        = get_post_ancestors( $post_id );
+	$ancestors        = array_reverse( $ancestors );
 
 	foreach ( $ancestors as $ancestor_id ) {
 		$breadcrumb_items[] = sprintf(
@@ -128,7 +125,7 @@ function get_hierarchical_post_type_breadcrumbs( $post_id, $post_type ) {
  *
  * @return array Array of breadcrumb HTML items.
  */
-function get_terms_breadcrumbs( $post_id, $post_type ) {
+function block_core_breadcrumbs_get_terms_breadcrumbs( $post_id, $post_type ) {
 	$breadcrumb_items = array();
 	// Get public taxonomies for this post type.
 	$taxonomies = wp_filter_object_list(

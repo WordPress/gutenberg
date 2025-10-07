@@ -26,7 +26,7 @@ const typeDefaultValue = 'auto';
 const BREADCRUMB_TYPES = {
 	auto: {
 		help: __(
-			'Uses heuristics to automatically choose between hierarchical or terms based on the post type.'
+			'Try to automatically determine the best type of breadcrumb for the template.'
 		),
 	},
 	hierarchical: {
