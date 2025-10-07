@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { ToggleControl } from '@wordpress/components';
-
 /**
  * Internal dependencies
  */
