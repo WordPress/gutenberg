@@ -73,6 +73,7 @@ export function replacePatternOverridesDefaultBinding(
  * @typedef {Object} WPBlockBindingsUtils
  *
  * @property {Function} updateBlockBindings    Updates the value of the bindings connected to block attributes.
+ * @property {Function} removeBlockBinding     Removes the binding for a specific attribute.
  * @property {Function} removeAllBlockBindings Removes the bindings property of the `metadata` attribute.
  */
 
@@ -82,6 +83,7 @@ export function replacePatternOverridesDefaultBinding(
  *
  * It contains the following utils:
  * - `updateBlockBindings`: Updates the value of the bindings connected to block attributes. It can be used to remove a specific binding by setting the value to `undefined`.
+ * - `removeBlockBinding`: Removes the binding for a specific attribute.
  * - `removeAllBlockBindings`: Removes the bindings property of the `metadata` attribute.
  *
  * @since 6.7.0 Introduced in WordPress core.
@@ -93,7 +95,7 @@ export function replacePatternOverridesDefaultBinding(
  * @example
  * ```js
  * import { useBlockBindingsUtils } from '@wordpress/block-editor'
- * const { updateBlockBindings, removeAllBlockBindings } = useBlockBindingsUtils();
+ * const { updateBlockBindings, removeBlockBinding, removeAllBlockBindings } = useBlockBindingsUtils();
  *
  * // Update url and alt attributes.
  * updateBlockBindings( {
@@ -113,6 +115,9 @@ export function replacePatternOverridesDefaultBinding(
  *
  * // Remove binding from url attribute.
  * updateBlockBindings( { url: undefined } );
+ *
+ * // Alternative: Remove binding from url attribute.
+ * removeBlockBinding( 'url' );
  *
  * // Remove bindings from all attributes.
  * removeAllBlockBindings();
@@ -181,6 +186,44 @@ export function useBlockBindingsUtils( clientId ) {
 	};
 
 	/**
+	 * Removes the binding for a specific attribute.
+	 *
+	 * @param {string} attribute The attribute name to remove the binding from.
+	 *
+	 * @example
+	 * ```js
+	 * import { useBlockBindingsUtils } from '@wordpress/block-editor'
+	 *
+	 * const { removeBlockBinding } = useBlockBindingsUtils();
+	 * removeBlockBinding( 'url' );
+	 * ```
+	 */
+	const removeBlockBinding = ( attribute ) => {
+		const { metadata: { bindings, ...metadata } = {} } =
+			getBlockAttributes( blockClientId );
+
+		if ( ! bindings || ! bindings[ attribute ] ) {
+			return;
+		}
+
+		const newBindings = { ...bindings };
+		delete newBindings[ attribute ];
+
+		const newMetadata = {
+			...metadata,
+			bindings: newBindings,
+		};
+
+		if ( isObjectEmpty( newMetadata.bindings ) ) {
+			delete newMetadata.bindings;
+		}
+
+		updateBlockAttributes( blockClientId, {
+			metadata: isObjectEmpty( newMetadata ) ? undefined : newMetadata,
+		} );
+	};
+
+	/**
 	 * Removes the bindings property of the `metadata` attribute.
 	 *
 	 * @example
@@ -199,5 +242,5 @@ export function useBlockBindingsUtils( clientId ) {
 		} );
 	};
 
-	return { updateBlockBindings, removeAllBlockBindings };
+	return { updateBlockBindings, removeBlockBinding, removeAllBlockBindings };
 }
