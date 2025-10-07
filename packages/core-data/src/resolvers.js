@@ -9,6 +9,7 @@ import { camelCase } from 'change-case';
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import apiFetch from '@wordpress/api-fetch';
+import { syncManager } from '@wordpress/sync';
 
 /**
  * Internal dependencies
@@ -23,7 +24,6 @@ import {
 	ALLOWED_RESOURCE_ACTIONS,
 	RECEIVE_INTERMEDIATE_RESULTS,
 } from './utils';
-import { getSyncProvider } from './sync';
 import { fetchBlockPatterns } from './fetch';
 
 /**
@@ -165,7 +165,7 @@ export const getEntityRecord =
 					const objectId = key;
 
 					// Use the new transient "read/write" config to compute transients for
-					// the sync provider. Otherwise these transients are not available
+					// the sync manager. Otherwise these transients are not available
 					// if / until the record is edited. Use a copy of the record so that
 					// it does not change the behavior outside this experimental flag.
 					const recordWithTransients = { ...record };
@@ -184,27 +184,30 @@ export const getEntityRecord =
 								transientConfig.read( recordWithTransients );
 						} );
 
-					getSyncProvider().register(
-						objectType,
-						entityConfig.syncConfig
-					);
-
-					// Bootstraps the edited document (and load from peers).
-					await getSyncProvider().bootstrap(
+					// Load the entity record for syncing.
+					await syncManager.load(
+						entityConfig.syncConfig,
 						objectType,
 						objectId,
 						recordWithTransients,
-						( edits ) => {
-							dispatch( {
-								type: 'EDIT_ENTITY_RECORD',
-								kind,
-								name,
-								recordId: key,
-								edits,
-								meta: {
-									undo: undefined,
-								},
-							} );
+						{
+							// Handle edits sourced from the sync manager.
+							editRecord: ( edits ) => {
+								if ( ! Object.keys( edits ).length ) {
+									return;
+								}
+
+								dispatch( {
+									type: 'EDIT_ENTITY_RECORD',
+									kind,
+									name,
+									recordId: key,
+									edits,
+									meta: {
+										undo: undefined,
+									},
+								} );
+							},
 						}
 					);
 				}

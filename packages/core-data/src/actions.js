@@ -10,6 +10,7 @@ import { v4 as uuid } from 'uuid';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
+import { LOCAL_EDITOR_ORIGIN, syncManager } from '@wordpress/sync';
 
 /**
  * Internal dependencies
@@ -19,7 +20,6 @@ import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
 import { STORE_NAME } from './name';
-import { getSyncProvider } from './sync';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 
 /**
@@ -413,7 +413,12 @@ export const editEntityRecord =
 				const objectType = `${ kind }/${ name }`;
 				const objectId = recordId;
 
-				getSyncProvider().update( objectType, objectId, edit.edits );
+				syncManager.update(
+					objectType,
+					objectId,
+					edit.edits,
+					LOCAL_EDITOR_ORIGIN
+				);
 			}
 		}
 		if ( ! options.undoIgnore ) {
