@@ -1,13 +1,16 @@
+/**
+ * External dependencies
+ */
+import type * as Y from 'yjs';
+
+export type CRDTDoc = Y.Doc;
+export type EntityID = string;
 export type ObjectID = string;
 export type ObjectType = string;
-export type ObjectData = any;
-export type CRDTDoc = any;
 
-export type ObjectConfig = {
-	fetch: ( id: ObjectID ) => Promise< ObjectData >;
-	applyChangesToDoc: ( doc: CRDTDoc, data: any ) => void;
-	fromCRDTDoc: ( doc: CRDTDoc ) => any;
-};
+// Object data represents any entity record, post, term, user, site, etc. There
+// are not many expectations that can hold on its shape.
+export interface ObjectData extends Record< string, unknown > {}
 
 export type ConnectDoc = (
 	id: ObjectID,
@@ -15,13 +18,25 @@ export type ConnectDoc = (
 	doc: CRDTDoc
 ) => Promise< () => void >;
 
+export interface SyncConfig {
+	applyChangesToCRDTDoc: (
+		ydoc: Y.Doc,
+		changes: Partial< ObjectData >
+	) => void;
+	enabled: boolean;
+	getChangesFromCRDTDoc: ( ydoc: Y.Doc ) => ObjectData;
+	getInitialObjectData: ( record: ObjectData ) => ObjectData;
+	getObjectId: ( data: ObjectData ) => ObjectID;
+	objectType: ObjectType;
+}
+
 export type SyncProvider = {
-	register: ( type: ObjectType, config: ObjectConfig ) => void;
+	register: ( type: ObjectType, config: SyncConfig ) => void;
 	bootstrap: (
 		type: ObjectType,
-		id: ObjectID,
+		rawRecord: ObjectData,
 		handleChanges: ( data: any ) => void
-	) => Promise< CRDTDoc >;
+	) => Promise< void >;
 	update: ( type: ObjectType, id: ObjectID, data: any ) => void;
-	discard: ( type: ObjectType, id: ObjectID ) => Promise< CRDTDoc >;
+	discard: ( type: ObjectType, id: ObjectID ) => Promise< void >;
 };

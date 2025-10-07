@@ -10,6 +10,14 @@ import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 import { RichTextData } from '@wordpress/rich-text';
 
+/**
+ * Internal dependencies
+ */
+import {
+	defaultApplyChangesToCRDTDoc,
+	defaultGetChangesFromCRDTDoc,
+} from './utils/crdt';
+
 export const DEFAULT_ENTITY_KEY = 'id';
 const POST_RAW_ATTRIBUTES = [ 'title', 'excerpt', 'content' ];
 
@@ -297,13 +305,23 @@ async function loadPostTypeEntities() {
 			__unstablePrePersist: isTemplate ? undefined : prePersistPostType,
 			__unstable_rest_base: postType.rest_base,
 			syncConfig: {
-				fetch: async ( id ) => {
-					return apiFetch( {
-						path: `/${ namespace }/${ postType.rest_base }/${ id }?context=edit`,
-					} );
-				},
-				applyChangesToDoc: ( doc, changes ) => {
-					const document = doc.getMap( 'document' );
+				/**
+				 * Is syncing enabled for this entity?
+				 *
+				 * @type {boolean}
+				 */
+				enabled: true,
+
+				/**
+				 * Apply changes from the local editor to the local CRDT document so
+				 * that those changes can be synced to other peers (via the provider).
+				 *
+				 * @param {import('@wordpress/sync').CRDTDoc}               crdtDoc
+				 * @param {Partial< import('@wordpress/sync').ObjectData >} changes
+				 * @return {void}
+				 */
+				applyChangesToCRDTDoc: ( crdtDoc, changes ) => {
+					const document = crdtDoc.getMap( 'document' );
 
 					Object.entries( changes ).forEach( ( [ key, value ] ) => {
 						if ( ! syncedProperties.has( key ) ) {
@@ -328,12 +346,42 @@ async function loadPostTypeEntities() {
 						}
 					} );
 				},
-				fromCRDTDoc: ( doc ) => {
-					return doc.getMap( 'document' ).toJSON();
-				},
+
+				/**
+				 * Extract changes from a CRDT document that can be used to update the
+				 * local editor state.
+				 *
+				 * @param {import('@wordpress/sync').CRDTDoc} crdtDoc
+				 * @return {Partial< import('@wordpress/sync').ObjectData >} Changes to record
+				 */
+				getChangesFromCRDTDoc: defaultGetChangesFromCRDTDoc,
+
+				/**
+				 * This initial object data represents the data that will be synced via
+				 * the CRDT document, which may differ from the entity record. There may
+				 * be properties that should not be synced, or properties that are
+				 * derived from the record.
+				 *
+				 * @param {import('@wordpress/sync').ObjectData} record
+				 * @return {import('@wordpress/sync').ObjectData} The initial data
+				 */
+				getInitialObjectData: ( record ) => record,
+
+				/**
+				 * Get the immutable identifier for an entity record.
+				 *
+				 * @param {import('@wordpress/sync').ObjectData} record
+				 * @return {import('@wordpress/sync').ObjectID} The entity's ID
+				 */
+				getObjectId: ( { id } ) => id,
+
+				/**
+				 * The object type for the entity, used to scope CRDT documents.
+				 *
+				 * @type {import('@wordpress/sync').ObjectType}
+				 */
+				objectType: `postType/${ postType.slug }`,
 			},
-			syncObjectType: 'postType/' + postType.name,
-			getSyncObjectId: ( id ) => id,
 			supportsPagination: true,
 			getRevisionsUrl: ( parentId, revisionId ) =>
 				`/${ namespace }/${
@@ -381,23 +429,12 @@ async function loadSiteEntity() {
 		kind: 'root',
 		baseURL: '/wp/v2/settings',
 		syncConfig: {
-			fetch: async () => {
-				return apiFetch( { path: '/wp/v2/settings' } );
-			},
-			applyChangesToDoc: ( doc, changes ) => {
-				const document = doc.getMap( 'document' );
-				Object.entries( changes ).forEach( ( [ key, value ] ) => {
-					if ( document.get( key ) !== value ) {
-						document.set( key, value );
-					}
-				} );
-			},
-			fromCRDTDoc: ( doc ) => {
-				return doc.getMap( 'document' ).toJSON();
-			},
+			enabled: false,
+			applyChangesToCRDTDoc: defaultApplyChangesToCRDTDoc,
+			getChangesFromCRDTDoc: defaultGetChangesFromCRDTDoc,
+			getObjectId: () => 'index',
+			objectType: 'root/site',
 		},
-		syncObjectType: 'root/site',
-		getSyncObjectId: () => 'index',
 		meta: {},
 	};
 
