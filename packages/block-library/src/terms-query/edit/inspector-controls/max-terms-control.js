@@ -10,11 +10,6 @@ import {
 export default function MaxTermsControl( { attributes, setQuery } ) {
 	const { termQuery } = attributes;
 
-	// Only show pagination control when not hierarchical.
-	if ( termQuery.hierarchical ) {
-		return null;
-	}
-
 	return (
 		<ToolsPanelItem
 			hasValue={ () => termQuery.perPage !== 10 }
@@ -30,10 +25,7 @@ export default function MaxTermsControl( { attributes, setQuery } ) {
 				min={ 0 }
 				max={ 100 }
 				onChange={ ( perPage ) => {
-					// Show all terms (-1) when 0 is selected.
-					setQuery( {
-						perPage: perPage === 0 ? -1 : perPage,
-					} );
+					setQuery( { perPage } );
 				} }
 				help={ __(
 					'Limit the number of terms you want to show. To show all terms, use 0 (zero).'

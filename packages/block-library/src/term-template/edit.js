@@ -175,7 +175,9 @@ export default function TermTemplateEdit( {
 			termsToFilter = termsToFilter.filter( ( term ) => term.parent );
 		}
 		// Limit to the number of terms defined by perPage.
-		return termsToFilter.slice( 0, perPage );
+		return perPage === 0
+			? termsToFilter
+			: termsToFilter.slice( 0, perPage );
 	}, [ terms, termsToShow, perPage ] );
 
 	const { blocks, variations, defaultVariation } = useSelect(
