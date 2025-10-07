@@ -49,9 +49,7 @@ export const pagesRoute = {
 			if ( ! isBlockTheme ) {
 				return undefined;
 			}
-			const isListView =
-				( query.layout === 'list' || ! query.layout ) &&
-				query.isCustom !== 'true';
+			const isListView = query.layout === 'list' || ! query.layout;
 			return isListView ? <Editor /> : undefined;
 		},
 		mobile( { siteData } ) {
@@ -72,9 +70,7 @@ export const pagesRoute = {
 	},
 	widths: {
 		content( { query } ) {
-			const isListView =
-				( query.layout === 'list' || ! query.layout ) &&
-				query.isCustom !== 'true';
+			const isListView = query.layout === 'list' || ! query.layout;
 			return isListView ? 380 : undefined;
 		},
 		edit( { query } ) {

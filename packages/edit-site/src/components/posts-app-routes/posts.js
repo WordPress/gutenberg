@@ -36,9 +36,7 @@ export const postsRoute = {
 		),
 		content: <PostList postType="post" />,
 		preview( { query } ) {
-			const isListView =
-				( query.layout === 'list' || ! query.layout ) &&
-				query.isCustom !== 'true';
+			const isListView = query.layout === 'list' || ! query.layout;
 			return isListView ? <Editor isPostsList /> : undefined;
 		},
 		mobile: <MobilePostsView />,
@@ -52,9 +50,7 @@ export const postsRoute = {
 	},
 	widths: {
 		content( { query } ) {
-			const isListView =
-				( query.layout === 'list' || ! query.layout ) &&
-				query.isCustom !== 'true';
+			const isListView = query.layout === 'list' || ! query.layout;
 			return isListView ? 380 : undefined;
 		},
 		edit( { query } ) {
