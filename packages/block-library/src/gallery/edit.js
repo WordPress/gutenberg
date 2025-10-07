@@ -215,7 +215,7 @@ export default function GalleryEdit( props ) {
 	} ) );
 	const aspectRatioOptions = [
 		{
-			label: _x( 'Original', 'Aspect ratio option for Gallery images' ),
+			label: _x( 'Original', 'Aspect ratio option for dimensions control' ),
 			value: 'auto',
 		},
 		...( showDefaultRatios ? defaultOptions || [] : [] ),
