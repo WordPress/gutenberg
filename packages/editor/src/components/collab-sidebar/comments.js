@@ -208,7 +208,11 @@ function Thread( {
 				variant="secondary"
 				size="compact"
 				onClick={ () => {
-					focusCommentThread( thread.id, commentSidebarRef.current, 'textarea' );
+					focusCommentThread(
+						thread.id,
+						commentSidebarRef.current,
+						'textarea'
+					);
 				} }
 			>
 				{ __( 'Add New Comment' ) }
