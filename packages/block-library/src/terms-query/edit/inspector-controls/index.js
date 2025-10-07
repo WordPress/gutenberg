@@ -17,7 +17,7 @@ import { usePublicTaxonomies } from '../../utils';
 import TaxonomyControl from './taxonomy-control';
 import OrderControl from './order-control';
 import EmptyTermsControl from './empty-terms-control';
-import HierarchyControl from './hierarchy-control';
+import NestedTermsControl from './nested-terms-control';
 import InheritControl from './inherit-control';
 import MaxTermsControl from './max-terms-control';
 import AdvancedControls from './advanced-controls';
@@ -152,7 +152,7 @@ export default function TermsQueryInspectorControls( {
 							}
 							isShownByDefault
 						>
-							<HierarchyControl
+							<NestedTermsControl
 								hierarchical={ hierarchical }
 								onChange={ ( value ) =>
 									setQuery( { hierarchical: value } )

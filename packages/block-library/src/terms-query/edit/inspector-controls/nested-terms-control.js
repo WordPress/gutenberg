@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { ToggleControl } from '@wordpress/components';
 
-export default function HierarchyControl( { hierarchical, onChange } ) {
+export default function NestedTermsControl( { hierarchical, onChange } ) {
 	return (
 		<ToggleControl
 			__nextHasNoMarginBottom
