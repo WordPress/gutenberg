@@ -144,7 +144,7 @@ function useFitText( { fitText, name, clientId } ) {
 				if ( blockElement ) {
 					applyFitText();
 				}
-			}, 100 );
+			}, 1000 );
 
 			return () => clearTimeout( timer );
 		}
