@@ -77,15 +77,13 @@ export function Comments( {
 		const nextThread = threads[ currentIndex + 1 ];
 		const prevThread = threads[ currentIndex - 1 ];
 
-		// Store the focus logic to execute after deletion completes
+		// Store the focus logic to execute after deletion completes.
 		const focusAfterDeletion = () => {
 			if ( nextThread ) {
 				setSelectedThread( nextThread.id );
-				// Use the utility function to focus the thread without triggering dropdown
 				focusCommentThread( nextThread.id, commentSidebarRef.current );
 			} else if ( prevThread ) {
 				setSelectedThread( prevThread.id );
-				// Use the utility function to focus the thread without triggering dropdown
 				focusCommentThread( prevThread.id, commentSidebarRef.current );
 			} else {
 				setSelectedThread( null );
@@ -99,7 +97,7 @@ export function Comments( {
 			}
 		};
 
-		// Execute deletion and focus after completion
+		// Execute deletion and focus after completion.
 		onCommentDelete( comment ).then( focusAfterDeletion );
 	};
 
