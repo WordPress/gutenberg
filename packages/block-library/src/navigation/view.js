@@ -23,6 +23,41 @@ const focusableSelectors = [
 // capture the clicks, instead of relying on the focusout event.
 document.addEventListener( 'click', () => {} );
 
+/**
+ * Checks if a link element is a same-page anchor link.
+ *
+ * @param {HTMLElement} linkElement - The anchor element to check.
+ * @return {boolean} True if the link is a same-page anchor link, false otherwise.
+ */
+function isSamePageAnchorLink( linkElement ) {
+	if ( ! linkElement || linkElement.tagName !== 'A' ) {
+		return false;
+	}
+
+	const href = linkElement.getAttribute( 'href' );
+	if ( ! href ) {
+		return false;
+	}
+
+	// Check if it's a simple anchor link (starts with #)
+	if ( href.startsWith( '#' ) ) {
+		return true;
+	}
+
+	// Check if it's a full URL pointing to the same page with an anchor
+	try {
+		const linkUrl = new URL( linkElement.href );
+		return (
+			linkUrl.hash &&
+			linkUrl.pathname === window.location.pathname &&
+			linkUrl.search === window.location.search
+		);
+	} catch ( e ) {
+		// Invalid URL
+		return false;
+	}
+}
+
 const { state, actions } = store(
 	'core/navigation',
 	{
@@ -151,6 +186,26 @@ const { state, actions } = store(
 				// event.relatedTarget === The element receiving focus (if any)
 				// When focusout is outside the document,
 				// `window.document.activeElement` doesn't change.
+
+				// Check if the event target is an anchor link with a hash (same-page anchor)
+				const clickedLink = event.target.closest( 'a' );
+				if (
+					clickedLink &&
+					type === 'overlay' &&
+					isSamePageAnchorLink( clickedLink )
+				) {
+					// Remove has-modal-open immediately to allow scrolling
+					document.documentElement.classList.remove(
+						'has-modal-open'
+					);
+
+					// Close menu after a short delay to allow anchor navigation
+					setTimeout( () => {
+						actions.closeMenu( 'click' );
+						actions.closeMenu( 'focus' );
+					}, 50 );
+					return;
+				}
 
 				// The event.relatedTarget is null when something outside the navigation menu is clicked. This is only necessary for Safari.
 				if (
