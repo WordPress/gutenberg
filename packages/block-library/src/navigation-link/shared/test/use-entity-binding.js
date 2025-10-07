@@ -32,43 +32,114 @@ describe( 'useEntityBinding', () => {
 		} );
 	} );
 
-	it( 'should return hasUrlBinding as false when no binding exists', () => {
-		const attributes = {
-			metadata: {},
-			id: null,
-		};
+	describe( 'hasUrlBinding', () => {
+		it( 'should return false when no binding exists', () => {
+			const attributes = {
+				metadata: {},
+				id: null,
+			};
 
-		const { result } = renderHook( () =>
-			useEntityBinding( {
-				clientId: 'test-client-id',
-				attributes,
-			} )
-		);
+			const { result } = renderHook( () =>
+				useEntityBinding( {
+					clientId: 'test-client-id',
+					attributes,
+				} )
+			);
 
-		expect( result.current.hasUrlBinding ).toBe( false );
-	} );
+			expect( result.current.hasUrlBinding ).toBe( false );
+		} );
 
-	it( 'should return hasUrlBinding as true when binding exists', () => {
-		const attributes = {
-			metadata: {
-				bindings: {
-					url: {
-						source: 'core/entity',
-						args: { key: 'url' },
+		it( 'should return true when core/entity binding exists with id', () => {
+			const attributes = {
+				metadata: {
+					bindings: {
+						url: {
+							source: 'core/entity',
+							args: { key: 'url' },
+						},
 					},
 				},
-			},
-			id: 123,
-		};
+				id: 123,
+			};
 
-		const { result } = renderHook( () =>
-			useEntityBinding( {
-				clientId: 'test-client-id',
-				attributes,
-			} )
-		);
+			const { result } = renderHook( () =>
+				useEntityBinding( {
+					clientId: 'test-client-id',
+					attributes,
+				} )
+			);
 
-		expect( result.current.hasUrlBinding ).toBe( true );
+			expect( result.current.hasUrlBinding ).toBe( true );
+		} );
+
+		it( 'should return false when source is not core/entity', () => {
+			const attributes = {
+				metadata: {
+					bindings: {
+						url: {
+							source: 'some-other-source',
+							args: { key: 'url' },
+						},
+					},
+				},
+				id: 123,
+			};
+
+			const { result } = renderHook( () =>
+				useEntityBinding( {
+					clientId: 'test-client-id',
+					attributes,
+				} )
+			);
+
+			expect( result.current.hasUrlBinding ).toBe( false );
+		} );
+
+		it( 'should return false when core/entity binding exists but no id', () => {
+			const attributes = {
+				metadata: {
+					bindings: {
+						url: {
+							source: 'core/entity',
+							args: { key: 'url' },
+						},
+					},
+				},
+				id: null,
+			};
+
+			const { result } = renderHook( () =>
+				useEntityBinding( {
+					clientId: 'test-client-id',
+					attributes,
+				} )
+			);
+
+			expect( result.current.hasUrlBinding ).toBe( false );
+		} );
+
+		it( 'should return false when binding source is null', () => {
+			const attributes = {
+				metadata: {
+					bindings: {
+						url: {
+							source: null,
+							args: null,
+						},
+					},
+				},
+				id: 123,
+			};
+
+			const { result } = renderHook( () =>
+				useEntityBinding( {
+					clientId: 'test-client-id',
+					attributes,
+				} )
+			);
+
+			expect( result.current.hasUrlBinding ).toBe( false );
+		} );
 	} );
 
 	it( 'should clear binding when clearBinding is called and binding exists', () => {
