@@ -15,7 +15,7 @@ import {
 } from '@wordpress/block-editor';
 import {
 	ToggleControl,
-	TextControl,
+	SelectControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -32,7 +32,7 @@ export default function TermNameEdit( {
 	setAttributes,
 	context: { termId, taxonomy },
 } ) {
-	const { textAlign, isLink, linkTarget } = attributes;
+	const { textAlign, tagName = 'div', isLink } = attributes;
 
 	const term = useSelect(
 		( select ) => {
@@ -58,15 +58,13 @@ export default function TermNameEdit( {
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
+	const TagName = tagName;
+
 	let termNameDisplay = termName;
 	if ( isLink && term ) {
 		const termLink = term.link || '#';
 		termNameDisplay = (
-			<a
-				href={ termLink }
-				target={ linkTarget }
-				onClick={ ( e ) => e.preventDefault() }
-			>
+			<a href={ termLink } onClick={ ( e ) => e.preventDefault() }>
 				{ termName }
 			</a>
 		);
@@ -87,12 +85,38 @@ export default function TermNameEdit( {
 					label={ __( 'Settings' ) }
 					resetAll={ () => {
 						setAttributes( {
+							tagName: 'div',
 							isLink: false,
-							linkTarget: '_self',
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
 				>
+					<ToolsPanelItem
+						hasValue={ () => tagName !== 'div' }
+						label={ __( 'HTML element' ) }
+						onDeselect={ () => setAttributes( { tagName: 'div' } ) }
+						isShownByDefault
+					>
+						<SelectControl
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
+							label={ __( 'HTML element' ) }
+							value={ tagName }
+							options={ [
+								{ label: __( 'Default (div)' ), value: 'div' },
+								{ label: __( 'Paragraph (p)' ), value: 'p' },
+								{ label: __( 'Heading 1 (h1)' ), value: 'h1' },
+								{ label: __( 'Heading 2 (h2)' ), value: 'h2' },
+								{ label: __( 'Heading 3 (h3)' ), value: 'h3' },
+								{ label: __( 'Heading 4 (h4)' ), value: 'h4' },
+								{ label: __( 'Heading 5 (h5)' ), value: 'h5' },
+								{ label: __( 'Heading 6 (h6)' ), value: 'h6' },
+							] }
+							onChange={ ( value ) =>
+								setAttributes( { tagName: value } )
+							}
+						/>
+					</ToolsPanelItem>
 					<ToolsPanelItem
 						hasValue={ () => !! isLink }
 						label={ __( 'Make term name a link' ) }
@@ -108,30 +132,9 @@ export default function TermNameEdit( {
 							checked={ isLink }
 						/>
 					</ToolsPanelItem>
-					{ isLink && (
-						<ToolsPanelItem
-							hasValue={ () => linkTarget !== '_self' }
-							label={ __( 'Link target' ) }
-							onDeselect={ () =>
-								setAttributes( { linkTarget: '_self' } )
-							}
-						>
-							<TextControl
-								__nextHasNoMarginBottom
-								__next40pxDefaultSize
-								label={ __( 'Link target' ) }
-								value={ linkTarget }
-								onChange={ ( newLinkTarget ) =>
-									setAttributes( {
-										linkTarget: newLinkTarget,
-									} )
-								}
-							/>
-						</ToolsPanelItem>
-					) }
 				</ToolsPanel>
 			</InspectorControls>
-			<div { ...blockProps }>{ termNameDisplay }</div>
+			<TagName { ...blockProps }>{ termNameDisplay }</TagName>
 		</>
 	);
 }

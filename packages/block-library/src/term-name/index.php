@@ -29,13 +29,14 @@ function render_block_core_term_name( $attributes, $content, $block ) {
 		return '';
 	}
 
+	$tag_name = isset( $attributes['tagName'] ) ? $attributes['tagName'] : 'div';
+
 	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
 		$term_link = get_term_link( $context['termId'], $context['taxonomy'] );
 		if ( ! is_wp_error( $term_link ) ) {
 			$term_name = sprintf(
-				'<a href="%1$s" target="%2$s">%3$s</a>',
+				'<a href="%1$s">%2$s</a>',
 				esc_url( $term_link ),
-				esc_attr( $attributes['linkTarget'] ),
 				$term_name
 			);
 		}
@@ -51,7 +52,8 @@ function render_block_core_term_name( $attributes, $content, $block ) {
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classes ) ) );
 
 	return sprintf(
-		'<div %s>%s</div>',
+		'<%1$s %2$s>%3$s</%1$s>',
+		$tag_name,
 		$wrapper_attributes,
 		$term_name
 	);

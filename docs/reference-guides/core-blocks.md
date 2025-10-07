@@ -998,7 +998,7 @@ Displays the name of a taxonomy term. ([Source](https://github.com/WordPress/gut
 -	**Name:** core/term-name
 -	**Category:** theme
 -	**Supports:** align (full, wide), color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** isLink, linkTarget, textAlign
+-	**Attributes:** isLink, tagName, textAlign
 
 ## Term Template
 

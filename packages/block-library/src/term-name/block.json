@@ -11,13 +11,13 @@
 		"textAlign": {
 			"type": "string"
 		},
+		"tagName": {
+			"type": "string",
+			"default": "div"
+		},
 		"isLink": {
 			"type": "boolean",
 			"default": false
-		},
-		"linkTarget": {
-			"type": "string",
-			"default": "_self"
 		}
 	},
 	"supports": {
