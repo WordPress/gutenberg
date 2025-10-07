@@ -15,7 +15,6 @@ import { useToolsPanelDropdownMenuProps } from '../../../utils/hooks';
 import TaxonomyControl from './taxonomy-control';
 import OrderingControls from './ordering-controls';
 import DisplayOptions from './display-options';
-import HierarchyControl from './hierarchy-control';
 import EmptyTermsControl from './empty-terms-control';
 import MaxTermsControl from './max-terms-control';
 import AdvancedControls from './advanced-controls';
@@ -41,7 +40,7 @@ export default function TermsQueryInspectorControls( {
 	TagName,
 	clientId,
 } ) {
-	const { termQuery, termsToShow } = attributes;
+	const { termQuery } = attributes;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const taxonomies = usePublicTaxonomies();
 
@@ -119,12 +118,6 @@ export default function TermsQueryInspectorControls( {
 						attributes={ attributes }
 						setQuery={ setQuery }
 					/>
-					{ isTaxonomyHierarchical && termsToShow === 'all' && (
-						<HierarchyControl
-							attributes={ attributes }
-							setQuery={ setQuery }
-						/>
-					) }
 				</ToolsPanel>
 			</InspectorControls>
 			<AdvancedControls
