@@ -87,13 +87,13 @@ Reuse this design across your site. ([Source](https://github.com/WordPress/guten
 
 ## Breadcrumbs
 
-Display a breadcrumb trail only for Pages, or for hierarchical post types. The block is useful to insert in the Pages template. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/breadcrumbs))
+Display a breadcrumb trail for hierarchical post types or based on taxonomy terms. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/breadcrumbs))
 
 -	**Name:** core/breadcrumbs
 -	**Experimental:** true
 -	**Category:** theme
 -	**Supports:** color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** separator, showHomeLink
+-	**Attributes:** separator, showHomeLink, type
 
 ## Button
 

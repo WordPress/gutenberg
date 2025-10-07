@@ -6,6 +6,7 @@ import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import {
 	ToggleControl,
 	TextControl,
+	SelectControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -18,22 +19,65 @@ import { useServerSideRender } from '@wordpress/server-side-render';
  * Internal dependencies
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+
 const separatorDefaultValue = '/';
+const typeDefaultValue = 'auto';
+
+const BREADCRUMB_TYPES = {
+	auto: {
+		help: __(
+			'Uses heuristics to automatically choose between hierarchical or terms based on the post type.'
+		),
+	},
+	hierarchical: {
+		help: __(
+			'Shows breadcrumbs based on post hierarchy. Only works for hierarchical post types.'
+		),
+		placeholderItems: [ __( 'Ancestor' ), __( 'Parent' ) ],
+	},
+	terms: {
+		help: __(
+			'Shows breadcrumbs based on taxonomy terms. Chooses the first taxonomy with assigned terms and includes ancestors if the taxonomy is hierarchical.'
+		),
+		placeholderItems: [ __( 'Category' ) ],
+	},
+};
 
 export default function BreadcrumbEdit( {
 	attributes,
 	setAttributes,
-	context: { postId, postType },
+	context: { postId, postType, templateSlug },
 } ) {
-	const { separator, showHomeLink } = attributes;
-	const isPostTypeHierarchical = useSelect(
+	const { separator, showHomeLink, type } = attributes;
+	const { isPostTypeHierarchical, hasTermsAssigned } = useSelect(
 		( select ) => {
 			if ( ! postType ) {
-				return null;
+				return {};
 			}
-			return select( coreStore ).getPostType( postType )?.hierarchical;
+			const post = select( coreStore ).getEntityRecord(
+				'postType',
+				postType,
+				postId
+			);
+			const taxonomies = select( coreStore ).getTaxonomies( {
+				type: postType,
+				per_page: -1,
+			} );
+			return {
+				isPostTypeHierarchical:
+					select( coreStore ).getPostType( postType )?.hierarchical,
+				hasTermsAssigned:
+					post &&
+					( taxonomies || [] )
+						.filter(
+							( { visibility } ) => visibility?.publicly_queryable
+						)
+						.some( ( taxonomy ) => {
+							return !! post[ taxonomy.rest_base ]?.length;
+						} ),
+			};
 		},
-		[ postType ]
+		[ postType, postId ]
 	);
 	const blockProps = useBlockProps();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
@@ -43,15 +87,35 @@ export default function BreadcrumbEdit( {
 		block: 'core/breadcrumbs',
 		urlQueryArgs: { post_id: postId },
 	} );
+	// TODO: this should be handled better when we add more types.
+	let breadcrumbsType;
+	const isSpecificSupportedTypeSet = [ 'hierarchical', 'terms' ].includes(
+		type
+	);
+	if ( isSpecificSupportedTypeSet ) {
+		breadcrumbsType = type;
+	} else {
+		breadcrumbsType = isPostTypeHierarchical ? 'hierarchical' : 'terms';
+	}
 	let placeholder = null;
-	// If no post context or the post type is not hierarchical, show placeholder.
 	// This is fragile because this block is server side rendered and we'll have to
 	// update the placeholder html if the server side rendering output changes.
-	if ( ! postId || ! postType || ! isPostTypeHierarchical ) {
+	const showPlaceholder =
+		! postId ||
+		! postType ||
+		// When `templateSlug` is set only show placeholder if the post type is not.
+		// This is needed because when we are showing the template in post editor we
+		// want to show the real breadcrumbs if we have the post type.
+		( templateSlug && ! postType ) ||
+		( breadcrumbsType === 'hierarchical' && ! isPostTypeHierarchical ) ||
+		( breadcrumbsType === 'terms' && ! hasTermsAssigned );
+	if ( showPlaceholder ) {
 		const placeholderItems = [
 			showHomeLink && __( 'Home' ),
-			__( 'Ancestor' ),
-			__( 'Parent' ),
+			// For now if we are adding this in a template show a generic placeholder.
+			...( templateSlug && ! isSpecificSupportedTypeSet
+				? [ __( 'Page' ) ]
+				: BREADCRUMB_TYPES[ breadcrumbsType ].placeholderItems ),
 		].filter( Boolean );
 		placeholder = (
 			<nav
@@ -84,10 +148,46 @@ export default function BreadcrumbEdit( {
 						setAttributes( {
 							separator: separatorDefaultValue,
 							showHomeLink: true,
+							type: typeDefaultValue,
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
 				>
+					<ToolsPanelItem
+						label={ __( 'Type' ) }
+						isShownByDefault
+						hasValue={ () => type !== typeDefaultValue }
+						onDeselect={ () =>
+							setAttributes( {
+								type: typeDefaultValue,
+							} )
+						}
+					>
+						<SelectControl
+							__nextHasNoMarginBottom
+							__next40pxDefaultSize
+							label={ __( 'Type' ) }
+							value={ type }
+							onChange={ ( value ) =>
+								setAttributes( { type: value } )
+							}
+							options={ [
+								{
+									label: __( 'Auto' ),
+									value: 'auto',
+								},
+								{
+									label: __( 'Hierarchical' ),
+									value: 'hierarchical',
+								},
+								{
+									label: __( 'Terms' ),
+									value: 'terms',
+								},
+							] }
+							help={ BREADCRUMB_TYPES[ type ].help }
+						/>
+					</ToolsPanelItem>
 					<ToolsPanelItem
 						label={ __( 'Show home link' ) }
 						isShownByDefault
@@ -138,7 +238,11 @@ export default function BreadcrumbEdit( {
 				</ToolsPanel>
 			</InspectorControls>
 			<div { ...blockProps }>
-				{ placeholder || <RawHTML inert="true">{ content }</RawHTML> }
+				{ showPlaceholder ? (
+					placeholder
+				) : (
+					<RawHTML inert="true">{ content }</RawHTML>
+				) }
 			</div>
 		</>
 	);
