@@ -70,38 +70,38 @@ export function Comments( {
 		};
 	}, [] );
 	const [ selectedThread = blockCommentId, setSelectedThread ] = useState();
-	const [ focusTarget, setFocusTarget ] = useState( null );
 	const relatedBlockElement = useBlockElement( selectedBlockClientId );
 
 	const handleDelete = ( comment ) => {
 		const currentIndex = threads.findIndex( ( t ) => t.id === comment.id );
-		onCommentDelete( comment );
 		const nextThread = threads[ currentIndex + 1 ];
 		const prevThread = threads[ currentIndex - 1 ];
-		if ( nextThread ) {
-			setSelectedThread( nextThread.id );
-			setFocusTarget( nextThread.id );
-		} else if ( prevThread ) {
-			setSelectedThread( prevThread.id );
-			setFocusTarget( prevThread.id );
-		} else {
-			setSelectedThread( null );
-			setShowCommentBoard( false );
-			if ( relatedBlockElement ) {
-				relatedBlockElement.scrollIntoView( {
-					behavior: 'instant',
-					block: 'center',
-				} );
-			}
-		}
-	};
 
-	// Focus the target thread when focusTarget changes
-	useEffect( () => {
-		if ( focusTarget ) {
-			setFocusTarget( null );
-		}
-	}, [ focusTarget ] );
+		// Store the focus logic to execute after deletion completes
+		const focusAfterDeletion = () => {
+			if ( nextThread ) {
+				setSelectedThread( nextThread.id );
+				// Use the utility function to focus the thread without triggering dropdown
+				focusCommentThread( nextThread.id, commentSidebarRef.current );
+			} else if ( prevThread ) {
+				setSelectedThread( prevThread.id );
+				// Use the utility function to focus the thread without triggering dropdown
+				focusCommentThread( prevThread.id, commentSidebarRef.current );
+			} else {
+				setSelectedThread( null );
+				setShowCommentBoard( false );
+				if ( relatedBlockElement ) {
+					relatedBlockElement.scrollIntoView( {
+						behavior: 'instant',
+						block: 'center',
+					} );
+				}
+			}
+		};
+
+		// Execute deletion and focus after completion
+		onCommentDelete( comment ).then( focusAfterDeletion );
+	};
 
 	// Auto-select the related comment thread when a block is selected.
 	useEffect( () => {
@@ -135,7 +135,6 @@ export function Comments( {
 			isSelected={ selectedThread === thread.id }
 			setSelectedThread={ setSelectedThread }
 			setShowCommentBoard={ setShowCommentBoard }
-			focusTarget={ focusTarget }
 			commentSidebarRef={ commentSidebarRef }
 		/>
 	) );
@@ -149,7 +148,6 @@ function Thread( {
 	isSelected,
 	setSelectedThread,
 	setShowCommentBoard,
-	focusTarget,
 	commentSidebarRef,
 } ) {
 	const { toggleBlockHighlight, selectBlock } =
@@ -160,13 +158,6 @@ function Thread( {
 		toggleBlockHighlight,
 		50
 	);
-
-	// Focus this thread if it's the target
-	useEffect( () => {
-		if ( focusTarget === thread.id && threadRef.current ) {
-			threadRef.current.focus();
-		}
-	}, [ focusTarget, thread.id ] );
 
 	const onMouseEnter = () => {
 		debouncedToggleBlockHighlight( thread.blockClientId, true );
