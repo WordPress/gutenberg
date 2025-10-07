@@ -39,6 +39,5 @@ export function getDefaultView( activeView ) {
 					},
 			  ]
 			: [],
-		...defaultLayouts[ DEFAULT_VIEW.type ],
 	};
 }
