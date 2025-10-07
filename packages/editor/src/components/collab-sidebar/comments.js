@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useState, RawHTML, useRef, useEffect } from '@wordpress/element';
+import { useState, RawHTML, useEffect } from '@wordpress/element';
 import {
 	__experimentalText as Text,
 	__experimentalHStack as HStack,
@@ -33,7 +33,7 @@ import {
 import { unlock } from '../../lock-unlock';
 import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
-import { getCommentExcerpt } from './utils';
+import { getCommentExcerpt, focusCommentThread } from './utils';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 const { Menu } = unlock( componentsPrivateApis );
@@ -47,6 +47,7 @@ const { Menu } = unlock( componentsPrivateApis );
  * @param {Function} props.onAddReply          - The function to add a reply to a comment.
  * @param {Function} props.onCommentDelete     - The function to delete a comment.
  * @param {Function} props.setShowCommentBoard - The function to set the comment board visibility.
+ * @param {Ref}      props.commentSidebarRef   - The ref to the comment sidebar.
  * @return {React.ReactNode} The rendered Comments component.
  */
 export function Comments( {
@@ -55,6 +56,7 @@ export function Comments( {
 	onAddReply,
 	onCommentDelete,
 	setShowCommentBoard,
+	commentSidebarRef,
 } ) {
 	const [ selectedThread, setSelectedThread ] = useState();
 
@@ -99,6 +101,7 @@ export function Comments( {
 			isSelected={ selectedThread === thread.id }
 			setSelectedThread={ setSelectedThread }
 			setShowCommentBoard={ setShowCommentBoard }
+			commentSidebarRef={ commentSidebarRef }
 		/>
 	) );
 }
@@ -111,8 +114,8 @@ function Thread( {
 	isSelected,
 	setSelectedThread,
 	setShowCommentBoard,
+	commentSidebarRef,
 } ) {
-	const threadRef = useRef( null );
 	const { toggleBlockHighlight, selectBlock } =
 		useDispatch( blockEditorStore );
 	const relatedBlockElement = useBlockElement( thread.blockClientId );
@@ -134,10 +137,6 @@ function Thread( {
 		setSelectedThread( thread.id );
 		// pass `null` as the second parameter to prevent focusing the block.
 		selectBlock( thread.blockClientId, null );
-	};
-
-	const focusThread = () => {
-		threadRef.current?.focus();
 	};
 
 	const unselectThread = () => {
@@ -174,7 +173,7 @@ function Thread( {
 			className={ clsx( 'editor-collab-sidebar-panel__thread', {
 				'is-selected': isSelected,
 			} ) }
-			id={ `thread-${ thread.id }` }
+			id={ `comment-thread-${ thread.id }` }
 			spacing="2"
 			onClick={ handleCommentSelect }
 			onMouseEnter={ onMouseEnter }
@@ -196,12 +195,11 @@ function Thread( {
 				// Collapse thread and focus the thread.
 				if ( event.key === 'Escape' ) {
 					unselectThread();
-					focusThread();
+					focusCommentThread( thread.id, commentSidebarRef.current );
 				}
 			} }
 			tabIndex={ 0 }
 			role="listitem"
-			ref={ threadRef }
 			aria-label={ ariaLabel }
 			aria-expanded={ isSelected }
 		>
@@ -217,7 +215,10 @@ function Thread( {
 					onEditComment( params );
 					if ( status === 'approved' ) {
 						unselectThread();
-						focusThread();
+						focusCommentThread(
+							thread.id,
+							commentSidebarRef.current
+						);
 					}
 				} }
 				onDelete={ onCommentDelete }
@@ -252,7 +253,13 @@ function Thread( {
 						size="compact"
 						variant="tertiary"
 						className="editor-collab-sidebar-panel__more-reply-button"
-						onClick={ () => setSelectedThread( thread.id ) }
+						onClick={ () => {
+							setSelectedThread( thread.id );
+							focusCommentThread(
+								thread.id,
+								commentSidebarRef.current
+							);
+						} }
 					>
 						{ sprintf(
 							// translators: %s: number of replies.
@@ -302,9 +309,12 @@ function Thread( {
 								} );
 							} }
 							onCancel={ ( event ) => {
-								threadRef.current?.focus();
 								event.stopPropagation(); // Prevent the parent onClick from being triggered
 								unselectThread();
+								focusCommentThread(
+									thread.id,
+									commentSidebarRef.current
+								);
 							} }
 							submitButtonText={
 								'approved' === thread.status

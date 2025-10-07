@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch, subscribe } from '@wordpress/data';
 import { __experimentalVStack as VStack } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { comment as commentIcon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
@@ -31,6 +31,7 @@ function CollabSidebarContent( {
 	setShowCommentBoard,
 	styles,
 	comments,
+	commentSidebarRef,
 } ) {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
@@ -167,7 +168,11 @@ function CollabSidebarContent( {
 	};
 
 	return (
-		<div className="editor-collab-sidebar-panel" style={ styles }>
+		<div
+			className="editor-collab-sidebar-panel"
+			style={ styles }
+			ref={ commentSidebarRef }
+		>
 			<VStack role="list" spacing="3">
 				<AddComment
 					onSubmit={ addNewComment }
@@ -181,6 +186,7 @@ function CollabSidebarContent( {
 					onCommentDelete={ onCommentDelete }
 					showCommentBoard={ showCommentBoard }
 					setShowCommentBoard={ setShowCommentBoard }
+					commentSidebarRef={ commentSidebarRef }
 				/>
 			</VStack>
 		</div>
@@ -195,6 +201,7 @@ export default function CollabSidebar() {
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const isLargeViewport = useViewportMatch( 'medium' );
+	const commentSidebarRef = useRef( null );
 
 	const { postId } = useSelect( ( select ) => {
 		const { getCurrentPostId } = select( editorStore );
@@ -270,6 +277,7 @@ export default function CollabSidebar() {
 					comments={ resultComments }
 					showCommentBoard={ showCommentBoard }
 					setShowCommentBoard={ setShowCommentBoard }
+					commentSidebarRef={ commentSidebarRef }
 				/>
 			</PluginSidebar>
 			{ isLargeViewport && (
@@ -284,6 +292,7 @@ export default function CollabSidebar() {
 						comments={ unresolvedSortedThreads }
 						showCommentBoard={ showCommentBoard }
 						setShowCommentBoard={ setShowCommentBoard }
+						commentSidebarRef={ commentSidebarRef }
 						styles={ {
 							backgroundColor,
 						} }

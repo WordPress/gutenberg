@@ -30,26 +30,18 @@ const getOptions = ( displayTopLevelControl, displaySubtermsControl ) => {
 	return options;
 };
 
-const allTermsQuery = {
-	include: [],
-	exclude: [],
-	parent: false,
-};
-
-const topLevelTermsQuery = {
-	include: [],
-	exclude: [],
-	parent: 0,
-	hierarchical: false,
-};
-
 const getQueryAttributes = ( value ) => {
 	if ( value === 'top-level' ) {
-		return topLevelTermsQuery;
+		return {
+			parent: 0,
+			hierarchical: false,
+		};
 	}
 
 	// For 'all' and 'subterms', we fetch all terms and then filter them as the tree is built in Term Template.
-	return allTermsQuery;
+	return {
+		parent: false,
+	};
 };
 
 export default function DisplayOptions( {

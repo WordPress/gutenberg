@@ -192,11 +192,6 @@ export default function NavigationLinkEdit( {
 	const linkUIref = useRef();
 	const prevUrl = usePrevious( url );
 
-	// Change the `label` and `url` using inspector causes RichText to change focus.
-	// This is a workaround to keep the focus on the field when it's focused we don't render the RichText.
-	// See: https://github.com/WordPress/gutenberg/pull/61374.
-	const [ isEditingControl, setIsEditingControl ] = useState( false );
-
 	const {
 		isAtMaxNesting,
 		isTopLevelLink,
@@ -439,7 +434,6 @@ export default function NavigationLinkEdit( {
 				<Controls
 					attributes={ attributes }
 					setAttributes={ setAttributes }
-					setIsEditingControl={ setIsEditingControl }
 					clientId={ clientId }
 				/>
 			</InspectorControls>
@@ -447,51 +441,47 @@ export default function NavigationLinkEdit( {
 				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
 				<a className={ classes }>
 					{ /* eslint-enable */ }
-					{ ! url &&
-					! isEditingControl &&
-					! metadata?.bindings?.url ? (
+					{ ! url && ! metadata?.bindings?.url ? (
 						<div className="wp-block-navigation-link__placeholder-text">
 							<span>{ missingText }</span>
 						</div>
 					) : (
 						<>
-							{ ! isInvalid &&
-								! isDraft &&
-								! isEditingControl && (
-									<>
-										<RichText
-											ref={ ref }
-											identifier="label"
-											className="wp-block-navigation-item__label"
-											value={ label }
-											onChange={ ( labelValue ) =>
-												setAttributes( {
-													label: labelValue,
-												} )
-											}
-											onMerge={ mergeBlocks }
-											onReplace={ onReplace }
-											__unstableOnSplitAtEnd={ () =>
-												insertBlocksAfter(
-													createBlock(
-														'core/navigation-link'
-													)
+							{ ! isInvalid && ! isDraft && (
+								<>
+									<RichText
+										ref={ ref }
+										identifier="label"
+										className="wp-block-navigation-item__label"
+										value={ label }
+										onChange={ ( labelValue ) =>
+											setAttributes( {
+												label: labelValue,
+											} )
+										}
+										onMerge={ mergeBlocks }
+										onReplace={ onReplace }
+										__unstableOnSplitAtEnd={ () =>
+											insertBlocksAfter(
+												createBlock(
+													'core/navigation-link'
 												)
-											}
-											aria-label={ __(
-												'Navigation link text'
-											) }
-											placeholder={ itemLabelPlaceholder }
-											withoutInteractiveFormatting
-										/>
-										{ description && (
-											<span className="wp-block-navigation-item__description">
-												{ description }
-											</span>
+											)
+										}
+										aria-label={ __(
+											'Navigation link text'
 										) }
-									</>
-								) }
-							{ ( isInvalid || isDraft || isEditingControl ) && (
+										placeholder={ itemLabelPlaceholder }
+										withoutInteractiveFormatting
+									/>
+									{ description && (
+										<span className="wp-block-navigation-item__description">
+											{ description }
+										</span>
+									) }
+								</>
+							) }
+							{ ( isInvalid || isDraft ) && (
 								<div
 									className={ clsx(
 										'wp-block-navigation-link__placeholder-text',

@@ -36,8 +36,6 @@ function render_block_core_term_template( $attributes, $content, $block ) {
 		'order'      => $query['order'] ?? 'asc',
 		'orderby'    => $query['orderBy'] ?? 'name',
 		'hide_empty' => $query['hideEmpty'] ?? true,
-		'include'    => $query['include'] ?? array(),
-		'exclude'    => $query['exclude'] ?? array(),
 	);
 
 	// We set parent to 0 only if we show all terms as hierarchical or we show top-level terms.
