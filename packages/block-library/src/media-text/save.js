@@ -6,7 +6,12 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useInnerBlocksProps, useBlockProps } from '@wordpress/block-editor';
+import {
+	RichText,
+	useInnerBlocksProps,
+	useBlockProps,
+	__experimentalGetElementClassName,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -33,6 +38,7 @@ export default function save( { attributes } ) {
 		href,
 		linkTarget,
 		rel,
+		caption,
 	} = attributes;
 	const mediaSizeSlug = attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
 	const newRel = ! rel ? undefined : rel;
@@ -47,12 +53,21 @@ export default function save( { attributes } ) {
 		: {};
 
 	let image = mediaUrl ? (
-		<img
-			src={ mediaUrl }
-			alt={ mediaAlt }
-			className={ imageClasses || null }
-			style={ positionStyles }
-		/>
+		<>
+			<img
+				src={ mediaUrl }
+				alt={ mediaAlt }
+				className={ imageClasses || null }
+				style={ positionStyles }
+			/>
+			{ ! RichText.isEmpty( caption ) && (
+				<RichText.Content
+					className={ __experimentalGetElementClassName( 'caption' ) }
+					tagName="figcaption"
+					value={ caption }
+				/>
+			) }
+		</>
 	) : null;
 
 	if ( href ) {

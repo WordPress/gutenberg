@@ -96,6 +96,12 @@
 		"useFeaturedImage": {
 			"type": "boolean",
 			"default": false
+		},
+		"caption": {
+			"type": "rich-text",
+			"source": "rich-text",
+			"selector": "figcaption",
+			"role": "content"
 		}
 	},
 	"usesContext": [ "postId", "postType" ],

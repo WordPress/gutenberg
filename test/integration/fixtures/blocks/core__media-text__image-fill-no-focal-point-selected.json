@@ -11,7 +11,8 @@
 			"mediaWidth": 50,
 			"isStackedOnMobile": true,
 			"imageFill": true,
-			"useFeaturedImage": false
+			"useFeaturedImage": false,
+			"caption": ""
 		},
 		"innerBlocks": [
 			{

@@ -79,6 +79,11 @@ function render_block_core_media_text( $attributes, $content ) {
 	// in order to display the featured image.
 	$media_size_slug = isset( $attributes['mediaSizeSlug'] ) ? $attributes['mediaSizeSlug'] : 'full';
 	$image_tag       = '<img class="wp-block-media-text__featured_image">';
+	$caption         = get_the_post_thumbnail_caption();
+	$image_tag      .= sprintf(
+		'<figcaption class="wp-element-caption">%1$s</figcaption>',
+		$caption
+	);
 	$content         = preg_replace(
 		'/(<figure\s+id="' . preg_quote( $unique_id, '/' ) . '"\s+class="wp-block-media-text__media"\s*>)/',
 		'$1' . $image_tag,

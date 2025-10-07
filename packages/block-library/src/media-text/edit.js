@@ -76,6 +76,7 @@ function attributesFromMedia( {
 				mediaLink: undefined,
 				href: undefined,
 				focalPoint: undefined,
+				caption: undefined,
 				useFeaturedImage: false,
 			} );
 			return;
@@ -129,6 +130,7 @@ function attributesFromMedia( {
 			mediaLink: media.link || undefined,
 			href: newHref,
 			focalPoint: undefined,
+			caption: media.caption,
 			useFeaturedImage: false,
 		} );
 	};
@@ -185,6 +187,7 @@ function MediaTextEdit( {
 		verticalAlignment,
 		allowedBlocks,
 		useFeaturedImage,
+		caption,
 	} = attributes;
 
 	const [ featuredImage ] = useEntityProp(
@@ -237,6 +240,9 @@ function MediaTextEdit( {
 		: '';
 	const featuredImageAlt = useFeaturedImage
 		? featuredImageMedia?.alt_text
+		: '';
+	const featuredImageCaption = useFeaturedImage
+		? featuredImageMedia?.caption?.rendered
 		: '';
 
 	const toggleUseFeaturedImage = () => {
@@ -522,6 +528,7 @@ function MediaTextEdit( {
 					refMedia={ refMedia }
 					enableResize={ blockEditingMode === 'default' }
 					toggleUseFeaturedImage={ toggleUseFeaturedImage }
+					setAttributes={ setAttributes }
 					{ ...{
 						focalPoint,
 						imageFill,
@@ -536,6 +543,9 @@ function MediaTextEdit( {
 						useFeaturedImage,
 						featuredImageURL,
 						featuredImageAlt,
+						caption: useFeaturedImage
+							? featuredImageCaption
+							: caption,
 					} }
 				/>
 				{ mediaPosition !== 'right' && <div { ...innerBlocksProps } /> }

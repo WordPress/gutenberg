@@ -10,7 +10,8 @@
 			"mediaType": "image",
 			"mediaWidth": 50,
 			"isStackedOnMobile": true,
-			"useFeaturedImage": false
+			"useFeaturedImage": false,
+			"caption": ""
 		},
 		"innerBlocks": [
 			{

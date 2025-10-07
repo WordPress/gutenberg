@@ -8,13 +8,14 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/image' ],
-			transform: ( { alt, url, id, anchor } ) =>
+			transform: ( { alt, url, id, anchor, caption } ) =>
 				createBlock( 'core/media-text', {
 					mediaAlt: alt,
 					mediaId: id,
 					mediaUrl: url,
 					mediaType: 'image',
 					anchor,
+					caption,
 				} ),
 		},
 		{
@@ -106,11 +107,12 @@ const transforms = {
 			isMatch: ( { mediaType, mediaUrl } ) => {
 				return ! mediaUrl || mediaType === 'image';
 			},
-			transform: ( { mediaAlt, mediaId, mediaUrl, anchor } ) => {
+			transform: ( { mediaAlt, mediaId, mediaUrl, caption, anchor } ) => {
 				return createBlock( 'core/image', {
 					alt: mediaAlt,
 					id: mediaId,
 					url: mediaUrl,
+					caption,
 					anchor,
 				} );
 			},

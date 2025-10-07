@@ -15,7 +15,8 @@
 				"x": 0.84,
 				"y": 0.84
 			},
-			"useFeaturedImage": false
+			"useFeaturedImage": false,
+			"caption": ""
 		},
 		"innerBlocks": [
 			{

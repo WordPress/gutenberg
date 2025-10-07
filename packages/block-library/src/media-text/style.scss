@@ -12,6 +12,13 @@
 	&.has-media-on-the-right {
 		grid-template-columns: 1fr 50%;
 	}
+
+	// Supply caption styles to Media-Text blocks, even if the theme hasn't opted in.
+	// Reason being: the new markup, <figcaptions>, are not likely to be styled in the majority of existing themes,
+	// so we supply the styles so as to not appear broken or unstyled in those themes.
+	:where(figcaption) {
+		@include caption-style();
+	}
 }
 
 .wp-block-media-text.is-vertically-aligned-top {
