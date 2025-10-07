@@ -21,7 +21,7 @@ import {
 	getColorClassName,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
-import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
+import { useState, useEffect, useRef } from '@wordpress/element';
 import { link as linkIcon, removeSubmenu } from '@wordpress/icons';
 import { speak } from '@wordpress/a11y';
 import { createBlock } from '@wordpress/blocks';
@@ -95,7 +95,7 @@ const useIsDraggingWithin = ( elementRef ) => {
 			ownerDocument.removeEventListener( 'dragend', handleDragEnd );
 			ownerDocument.removeEventListener( 'dragenter', handleDragEnter );
 		};
-	}, [ elementRef ] );
+	}, [] );
 
 	return isDraggingWithin;
 };
@@ -147,7 +147,6 @@ export default function NavigationSubmenuEdit( {
 	const isDraggingWithin = useIsDraggingWithin( listItemRef );
 	const itemLabelPlaceholder = __( 'Add text…' );
 	const ref = useRef();
-	const hasInitialized = useRef( false );
 
 	const {
 		parentCount,
@@ -212,11 +211,10 @@ export default function NavigationSubmenuEdit( {
 	// This can't be done in the useState call because it conflicts
 	// with the autofocus behavior of the BlockListBlock component.
 	useEffect( () => {
-		if ( ! hasInitialized.current && ! openSubmenusOnClick && ! url ) {
+		if ( ! openSubmenusOnClick && ! url ) {
 			setIsLinkOpen( true );
-			hasInitialized.current = true;
 		}
-	}, [ openSubmenusOnClick, url ] );
+	}, [] );
 
 	/**
 	 * The hook shouldn't be necessary but due to a focus loss happening
@@ -240,7 +238,7 @@ export default function NavigationSubmenuEdit( {
 				selectLabelText();
 			}
 		}
-	}, [ url, isLinkOpen, label ] );
+	}, [ url ] );
 
 	/**
 	 * Focus the Link label text and select it.
@@ -331,10 +329,10 @@ export default function NavigationSubmenuEdit( {
 
 	const ParentElement = openSubmenusOnClick ? 'button' : 'a';
 
-	const transformToLink = useCallback( () => {
+	function transformToLink() {
 		const newLinkBlock = createBlock( 'core/navigation-link', attributes );
 		replaceBlock( clientId, newLinkBlock );
-	}, [ attributes, replaceBlock, clientId ] );
+	}
 
 	useEffect( () => {
 		// If block becomes empty, transform to Navigation Link.
@@ -344,12 +342,7 @@ export default function NavigationSubmenuEdit( {
 			__unstableMarkNextChangeAsNotPersistent();
 			transformToLink();
 		}
-	}, [
-		hasChildren,
-		prevHasChildren,
-		__unstableMarkNextChangeAsNotPersistent,
-		transformToLink,
-	] );
+	}, [ hasChildren, prevHasChildren ] );
 
 	const canConvertToLink =
 		! selectedBlockHasChildren || onlyDescendantIsEmptyLink;
