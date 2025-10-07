@@ -8,8 +8,8 @@ import { useMemo } from '@wordpress/element';
  */
 import type { DataFormProps } from '../../types';
 import { DataFormProvider } from '../dataform-context';
-import { normalizeFields } from '../../normalize-fields';
-import { DataFormLayout } from '../../dataforms-layouts/data-form-layout';
+import normalizeFields from '../../utils/normalize-fields';
+import { DataFormLayout } from '../../dataform-layouts/data-form-layout';
 
 export default function DataForm< Item >( {
 	data,

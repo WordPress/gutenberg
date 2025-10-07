@@ -11,6 +11,7 @@ import { selectBlockPatternsKey } from './private-keys';
 import { unlock } from '../lock-unlock';
 import { STORE_NAME } from './constants';
 import { getSectionRootClientId } from './private-selectors';
+import { getBlockEditingMode } from './selectors';
 import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-tab/utils';
 
 export const isFiltered = Symbol( 'isFiltered' );
@@ -138,7 +139,7 @@ export const getInsertBlockTypeDependants =
 			state.blocks.byClientId.get( rootClientId ),
 			state.settings.allowedBlockTypes,
 			state.settings.templateLock,
-			state.blockEditingModes,
+			getBlockEditingMode( state, rootClientId ),
 			select( STORE_NAME ).__unstableGetEditorMode( state ),
 			getSectionRootClientId( state ),
 		];

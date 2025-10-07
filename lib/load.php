@@ -45,6 +45,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-6.9/block-bindings.php';
 	require __DIR__ . '/compat/wordpress-6.9/post-data-block-bindings.php';
 	require __DIR__ . '/compat/wordpress-6.9/term-data-block-bindings.php';
+	require __DIR__ . '/compat/wordpress-6.9/entity-block-bindings.php';
 	require __DIR__ . '/compat/wordpress-6.9/rest-api.php';
 	require __DIR__ . '/compat/wordpress-6.9/class-gutenberg-hierarchical-sort.php';
 
@@ -163,9 +164,6 @@ require __DIR__ . '/block-supports/background.php';
 require __DIR__ . '/block-supports/block-style-variations.php';
 require __DIR__ . '/block-supports/aria-label.php';
 require __DIR__ . '/block-supports/block-visibility.php';
-
-// Data views.
-require_once __DIR__ . '/experimental/data-views.php';
 
 // Client-side media processing.
 if ( gutenberg_is_experiment_enabled( 'gutenberg-media-processing' ) ) {

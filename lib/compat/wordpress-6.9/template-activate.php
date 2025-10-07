@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/class-gutenberg-rest-old-templates-controller.php';
+
 // How does this work?
 // 1. For wp_template, we remove the custom templates controller, so it becomes
 //    a normal posts endpoint, modified slightly to allow auto-drafts.
@@ -28,9 +30,25 @@ function gutenberg_maintain_templates_routes() {
 	// WP_REST_Templates_Controller with a post type.
 	global $wp_post_types;
 	$wp_post_types['wp_template']->rest_base = 'templates';
-	$controller                              = new WP_REST_Templates_Controller( 'wp_template' );
+	$controller                              = new Gutenberg_REST_Old_Templates_Controller( 'wp_template' );
 	$wp_post_types['wp_template']->rest_base = 'wp_template';
 	$controller->register_routes();
+
+	// Add the same field as wp_registered_template.
+	register_rest_field(
+		'wp_template',
+		'theme',
+		array(
+			'get_callback' => function ( $post_arr ) {
+				$terms = get_the_terms( $post_arr['id'], 'wp_theme' );
+				if ( is_wp_error( $terms ) || empty( $terms ) ) {
+					return null;
+				}
+
+				return $terms[0]->slug;
+			},
+		)
+	);
 }
 
 // 3. We need a route to get that raw static templates from themes and plugins.
@@ -188,7 +206,7 @@ function gutenberg_resolve_block_template( $template_type, $template_hierarchy, 
 	//////////////////////////////
 
 	$object            = get_queried_object();
-	$specific_template = get_page_template_slug( $object );
+	$specific_template = $object ? get_page_template_slug( $object ) : null;
 	$active_templates  = (array) get_option( 'active_templates', array() );
 
 	// Remove templates slugs that are deactivated, except if it's the specific
@@ -219,7 +237,16 @@ function gutenberg_resolve_block_template( $template_type, $template_hierarchy, 
 			continue;
 		}
 
-		$templates[] = _build_block_template_result_from_post( $post );
+		$template = _build_block_template_result_from_post( $post );
+
+		// Ensure the active templates are associated with the active theme.
+		// See _build_block_template_object_from_post_object.
+		if ( get_stylesheet() !== $template->theme ) {
+			$remaining_slugs[] = $slug;
+			continue;
+		}
+
+		$templates[] = $template;
 	}
 
 	// For any remaining slugs, use the static template.

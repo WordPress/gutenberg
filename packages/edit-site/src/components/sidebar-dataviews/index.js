@@ -10,19 +10,17 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useDefaultViews } from './default-views';
 import { unlock } from '../../lock-unlock';
 import DataViewItem from './dataview-item';
-import CustomDataViewsList from './custom-dataviews-list';
 
 const { useLocation } = unlock( routerPrivateApis );
 
 export default function DataViewsSidebarContent( { postType } ) {
 	const {
-		query: { activeView = 'all', isCustom = 'false' },
+		query: { activeView = 'all' },
 	} = useLocation();
 	const defaultViews = useDefaultViews( { postType } );
 	if ( ! postType ) {
 		return null;
 	}
-	const isCustomBoolean = isCustom === 'true';
 
 	return (
 		<>
@@ -35,22 +33,11 @@ export default function DataViewsSidebarContent( { postType } ) {
 							title={ dataview.title }
 							icon={ dataview.icon }
 							type={ dataview.view.type }
-							isActive={
-								! isCustomBoolean &&
-								dataview.slug === activeView
-							}
-							isCustom={ false }
+							isActive={ dataview.slug === activeView }
 						/>
 					);
 				} ) }
 			</ItemGroup>
-			{ window?.__experimentalCustomViews && (
-				<CustomDataViewsList
-					activeView={ activeView }
-					type={ postType }
-					isCustom
-				/>
-			) }
 		</>
 	);
 }

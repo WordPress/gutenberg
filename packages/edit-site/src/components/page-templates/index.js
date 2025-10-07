@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
+import { useState, useMemo, useCallback } from '@wordpress/element';
 import {
 	privateApis as corePrivateApis,
 	store as coreStore,
@@ -13,19 +13,15 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { addQueryArgs } from '@wordpress/url';
 import { useSelect } from '@wordpress/data';
 import { useEvent } from '@wordpress/compose';
+import { useView } from '@wordpress/views';
+import { Button } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import Page from '../page';
 import AddNewTemplate from '../add-new-template';
-import {
-	TEMPLATE_POST_TYPE,
-	OPERATOR_IS_ANY,
-	LAYOUT_GRID,
-	LAYOUT_TABLE,
-	LAYOUT_LIST,
-} from '../../utils/constants';
+import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
 import {
 	useEditPostAction,
@@ -37,93 +33,49 @@ import {
 	previewField,
 	activeField,
 	slugField,
+	useThemeField,
 } from './fields';
+import { defaultLayouts, getDefaultView } from './view-utils';
 
 const { usePostActions, templateTitleField } = unlock( editorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 const { useEntityRecordsWithPermissions } = unlock( corePrivateApis );
 
-const defaultLayouts = {
-	[ LAYOUT_TABLE ]: {
-		showMedia: false,
-	},
-	[ LAYOUT_GRID ]: {
-		showMedia: true,
-	},
-	[ LAYOUT_LIST ]: {
-		showMedia: false,
-	},
-};
-
-const DEFAULT_VIEW = {
-	type: LAYOUT_GRID,
-	search: '',
-	page: 1,
-	perPage: 20,
-	sort: {
-		field: 'title',
-		direction: 'asc',
-	},
-	titleField: 'title',
-	descriptionField: 'description',
-	mediaField: 'preview',
-	fields: [ 'author', 'active', 'slug' ],
-	filters: [],
-	...defaultLayouts[ LAYOUT_GRID ],
-};
-
 export default function PageTemplates() {
 	const { path, query } = useLocation();
-	const { activeView = 'active', layout, postId } = query;
+	const { activeView = 'active', postId } = query;
 	const [ selection, setSelection ] = useState( [ postId ] );
 	const defaultView = useMemo( () => {
-		const usedType = layout ?? DEFAULT_VIEW.type;
+		return getDefaultView( activeView );
+	}, [ activeView ] );
+	const { view, updateView, isModified, resetToDefault } = useView( {
+		kind: 'postType',
+		name: TEMPLATE_POST_TYPE,
+		slug: activeView,
+		defaultView,
+		queryParams: {
+			page: query.pageNumber,
+			search: query.search,
+		},
+		onChangeQueryParams: ( newQueryParams ) => {
+			history.navigate(
+				addQueryArgs( path, {
+					...query,
+					pageNumber: newQueryParams.page,
+					search: newQueryParams.search || undefined,
+				} )
+			);
+		},
+	} );
+
+	const { activeTemplatesOption, activeTheme } = useSelect( ( select ) => {
+		const { getEntityRecord, getCurrentTheme } = select( coreStore );
 		return {
-			...DEFAULT_VIEW,
-			type: usedType,
-			filters: ! [ 'active', 'user' ].includes( activeView )
-				? [
-						{
-							field: 'author',
-							operator: 'isAny',
-							value: [ activeView ],
-						},
-				  ]
-				: [],
-			...defaultLayouts[ usedType ],
+			activeTemplatesOption: getEntityRecord( 'root', 'site' )
+				?.active_templates,
+			activeTheme: getCurrentTheme(),
 		};
-	}, [ layout, activeView ] );
-	const [ view, setView ] = useState( defaultView );
-
-	// Sync the layout from the URL to the view state.
-	useEffect( () => {
-		setView( ( currentView ) => ( {
-			...currentView,
-			type: layout ?? DEFAULT_VIEW.type,
-		} ) );
-	}, [ setView, layout ] );
-
-	// Sync the active view from the URL to the view state.
-	useEffect( () => {
-		setView( ( currentView ) => ( {
-			...currentView,
-			filters: ! [ 'active', 'user' ].includes( activeView )
-				? [
-						{
-							field: 'author',
-							operator: OPERATOR_IS_ANY,
-							value: [ activeView ],
-						},
-				  ]
-				: [],
-		} ) );
-	}, [ setView, activeView ] );
-
-	const activeTemplatesOption = useSelect(
-		( select ) =>
-			select( coreStore ).getEntityRecord( 'root', 'site' )
-				?.active_templates
-	);
+	} );
 	// Todo: this will have to be better so that we're not fetching all the
 	// records all the time. Active templates query will need to move server
 	// side.
@@ -154,7 +106,9 @@ export default function PageTemplates() {
 				} else {
 					// Replace the template in the array.
 					const template = userRecords.find(
-						( { id } ) => id === activeId
+						( userRecord ) =>
+							userRecord.id === activeId &&
+							userRecord.theme === activeTheme.stylesheet
 					);
 					if ( template ) {
 						const index = _active.findIndex(
@@ -170,7 +124,7 @@ export default function PageTemplates() {
 			}
 		}
 		return _active;
-	}, [ userRecords, staticRecords, activeTemplatesOption ] );
+	}, [ userRecords, staticRecords, activeTemplatesOption, activeTheme ] );
 
 	let _records;
 	let isLoadingData;
@@ -188,15 +142,11 @@ export default function PageTemplates() {
 	const records = useMemo( () => {
 		return _records.map( ( record ) => ( {
 			...record,
-			_isActive:
-				typeof record.id === 'string'
-					? activeTemplatesOption[ record.slug ] === record.id ||
-					  activeTemplatesOption[ record.slug ] === undefined
-					: Object.values( activeTemplatesOption ).includes(
-							record.id
-					  ),
+			_isActive: activeTemplates.find(
+				( template ) => template.id === record.id
+			),
 		} ) );
-	}, [ _records, activeTemplatesOption ] );
+	}, [ _records, activeTemplates ] );
 
 	const users = useSelect(
 		( select ) => {
@@ -221,7 +171,7 @@ export default function PageTemplates() {
 	const onChangeSelection = useCallback(
 		( items ) => {
 			setSelection( items );
-			if ( view?.type === LAYOUT_LIST ) {
+			if ( view?.type === 'list' ) {
 				history.navigate(
 					addQueryArgs( path, {
 						postId: items.length === 1 ? items[ 0 ] : undefined,
@@ -232,6 +182,7 @@ export default function PageTemplates() {
 		[ history, path, view?.type ]
 	);
 
+	const themeField = useThemeField();
 	const fields = useMemo( () => {
 		const _fields = [
 			previewField,
@@ -240,6 +191,9 @@ export default function PageTemplates() {
 			activeField,
 			slugField,
 		];
+		if ( activeView === 'user' ) {
+			_fields.push( themeField );
+		}
 		const elements = [];
 		for ( const author in users ) {
 			elements.push( {
@@ -252,7 +206,7 @@ export default function PageTemplates() {
 			elements,
 		} );
 		return _fields;
-	}, [ users ] );
+	}, [ users, activeView ] );
 
 	const { data, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( records, view, fields );
@@ -273,21 +227,33 @@ export default function PageTemplates() {
 	);
 
 	const onChangeView = useEvent( ( newView ) => {
-		setView( newView );
-		if ( newView.type !== layout ) {
-			history.navigate(
-				addQueryArgs( path, {
-					layout: newView.type,
-				} )
-			);
+		if ( newView.type !== view.type ) {
+			// Find a way to retrigger the routing resolution.
+			history.invalidate();
 		}
+		updateView( newView );
 	} );
 
 	return (
 		<Page
 			className="edit-site-page-templates"
 			title={ __( 'Templates' ) }
-			actions={ <AddNewTemplate /> }
+			actions={
+				<>
+					{ isModified && (
+						<Button
+							__next40pxDefaultSize
+							onClick={ () => {
+								resetToDefault();
+								history.invalidate();
+							} }
+						>
+							{ __( 'Reset view' ) }
+						</Button>
+					) }
+					<AddNewTemplate />
+				</>
+			}
 		>
 			<DataViews
 				key={ activeView }

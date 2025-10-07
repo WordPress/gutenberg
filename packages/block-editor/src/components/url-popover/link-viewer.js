@@ -8,7 +8,7 @@ import clsx from 'clsx';
  */
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-import { edit } from '@wordpress/icons';
+import { pencil } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -38,7 +38,7 @@ export default function LinkViewer( {
 			/>
 			{ onEditLinkClick && (
 				<Button
-					icon={ edit }
+					icon={ pencil }
 					label={ __( 'Edit' ) }
 					onClick={ onEditLinkClick }
 					size="compact"

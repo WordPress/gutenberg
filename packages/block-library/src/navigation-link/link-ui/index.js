@@ -66,7 +66,7 @@ export function getSuggestionsQuery( type, kind ) {
 }
 
 function UnforwardedLinkUI( props, ref ) {
-	const { label, url, opensInNewTab, type, kind } = props.link;
+	const { label, url, opensInNewTab, type, kind, id } = props.link;
 	const postType = type || 'page';
 
 	const [ addingBlock, setAddingBlock ] = useState( false );
@@ -85,8 +85,11 @@ function UnforwardedLinkUI( props, ref ) {
 			url,
 			opensInNewTab,
 			title: label && stripHTML( label ),
+			kind,
+			type,
+			id,
 		} ),
-		[ label, opensInNewTab, url ]
+		[ label, opensInNewTab, url, kind, type, id ]
 	);
 
 	const handlePageCreated = ( pageLink ) => {
@@ -142,6 +145,7 @@ function UnforwardedLinkUI( props, ref ) {
 						onChange={ props.onChange }
 						onRemove={ props.onRemove }
 						onCancel={ props.onCancel }
+						handleEntities
 						renderControlBottom={ () => {
 							// Don't show the tools when there is submitted link (preview state).
 							if ( link?.url?.length ) {

@@ -14,7 +14,14 @@ import {
 } from '@wordpress/components';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { filterURLForDisplay, safeDecodeURI } from '@wordpress/url';
-import { Icon, globe, info, linkOff, edit, copySmall } from '@wordpress/icons';
+import {
+	Icon,
+	globe,
+	info,
+	linkOff,
+	pencil,
+	copySmall,
+} from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
@@ -153,7 +160,7 @@ export default function LinkPreview( {
 					</span>
 				</span>
 				<Button
-					icon={ edit }
+					icon={ pencil }
 					label={ __( 'Edit link' ) }
 					onClick={ onEditClick }
 					size="compact"

@@ -2,6 +2,29 @@
 
 ## Unreleased
 
+### Enhancements
+
+- Dataviews: Make header table view select all checkbox always visible. ([#72050](https://github.com/WordPress/gutenberg/pull/72050))
+- Move search icon in search fields to prefix position ([#71984](https://github.com/WordPress/gutenberg/pull/71984)).
+- Flip search icons depending on placement ([#72070](https://github.com/WordPress/gutenberg/pull/72070)).
+- DataViews: Improve renderItemLink event propagation handling. ([#72081](https://github.com/WordPress/gutenberg/pull/72081)).
+- Normalize search field styles ([#72072](https://github.com/WordPress/gutenberg/pull/72072)).
+
+### Breaking changes
+
+- DataForm: Add summary field support for both card and panel layouts. The `summary` property has been moved from the field level to the layout level, and so fields using `summary` at the field level must now configure it within the `layout` object. Additionally, the first children will only be used as summary for the panel if 1) there is no `layout.summary` and 2) the form field ID doesn't match any existing field. See README for details. [#71576](https://github.com/WordPress/gutenberg/pull/71576)
+- Remove `Data< Item >` type, as it is no longer used internally for a long time. [#72051](https://github.com/WordPress/gutenberg/pull/72051)
+
+### Features
+
+- DataForm: add a style prop to set the width of elements in the row layout. [#72066](https://github.com/WordPress/gutenberg/pull/72066)
+
+### Code Quality
+
+- Reorganizes normalize-form-fields and renames `dataforms-layouts/` to `dataform-layout/` to follow the naming schema of any other folder in the package. [#72056](https://github.com/WordPress/gutenberg/pull/72056)
+- Moves `utils.ts` to `field-types/utils/render-from-elements.ts`, so it's collocated where it is used. [#72058](https://github.com/WordPress/gutenberg/pull/72058)
+- Centralize all top-level utilities in a `utils/` folder, sets a name that reflects on the function name, and uses the default exports. [#72063](https://github.com/WordPress/gutenberg/pull/72063)
+
 ## 9.1.0 (2025-10-01)
 
 ### Features
