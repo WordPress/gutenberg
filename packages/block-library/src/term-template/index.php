@@ -44,7 +44,7 @@ function render_block_core_term_template( $attributes, $content, $block ) {
 		&& $query['inherit']
 		&& (
 			is_tax( $query_args['taxonomy'] )
-			// Built-in taxonomies have special conditional tags.
+			// is_tax() does not detect built-in category or tag archives, only custom taxonomies.
 			|| ( 'category' === $query_args['taxonomy'] && is_category() )
 			|| ( 'post_tag' === $query_args['taxonomy'] && is_tag() )
 		)
