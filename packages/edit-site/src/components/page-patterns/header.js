@@ -79,7 +79,7 @@ export default function PatternsHeader( {
 				<HStack expanded={ false }>
 					{ isModifiedView && (
 						<Button __next40pxDefaultSize onClick={ resetView }>
-							{ __( 'Reset View' ) }
+							{ __( 'Reset view' ) }
 						</Button>
 					) }
 					<AddNewPattern />
