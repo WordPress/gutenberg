@@ -30,8 +30,15 @@ export default function TermsQueryInspectorControls( {
 	clientId,
 } ) {
 	const { termQuery } = attributes;
-	const { taxonomy, orderBy, order, hideEmpty, inherit, hierarchical } =
-		termQuery;
+	const {
+		taxonomy,
+		orderBy,
+		order,
+		hideEmpty,
+		inherit,
+		hierarchical,
+		perPage,
+	} = termQuery;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const { templateSlug } = useSelect( ( select ) => {
@@ -160,10 +167,19 @@ export default function TermsQueryInspectorControls( {
 							/>
 						</ToolsPanelItem>
 					) }
-					<MaxTermsControl
-						attributes={ attributes }
-						setQuery={ setQuery }
-					/>
+					<ToolsPanelItem
+						hasValue={ () => perPage !== 10 }
+						label={ __( 'Max terms' ) }
+						onDeselect={ () => setQuery( { perPage: 10 } ) }
+						isShownByDefault
+					>
+						<MaxTermsControl
+							perPage={ perPage }
+							onChange={ ( value ) =>
+								setQuery( { perPage: value } )
+							}
+						/>
+					</ToolsPanelItem>
 				</ToolsPanel>
 			</InspectorControls>
 			<AdvancedControls
