@@ -247,8 +247,10 @@ function Thread( {
 						size="compact"
 						variant="tertiary"
 						className="editor-collab-sidebar-panel__more-reply-button"
-						onClick={ () => {
-							setExpanded( true );
+						onMouseDown={ ( event ) => {
+							// This prevents a loss of focus when the button is removed,
+							// which would otherwise trigger an unwanted `onBlur` event.
+							event.preventDefault();
 							focusCommentThread(
 								thread.id,
 								commentSidebarRef.current
