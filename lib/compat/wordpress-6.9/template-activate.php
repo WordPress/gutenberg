@@ -71,14 +71,16 @@ function gutenberg_setup_static_template() {
 		'active_templates',
 		array(
 			'type'         => 'object',
+			// Do not set the default value to an empty array! For some reason
+			// that will prevent the option from being set to an empty array.
 			'show_in_rest' => array(
 				'schema' => array(
 					'type'                 => 'object',
-					// properties can be integers or false (deactivated).
+					// Properties can be integers, strings, or false
+					// (deactivated).
 					'additionalProperties' => true,
 				),
 			),
-			'default'      => array(),
 			'label'        => 'Active Templates',
 		)
 	);
@@ -438,9 +440,9 @@ function gutenberg_set_active_template_theme( $changes, $request ) {
 // is active.
 add_action( 'init', 'gutenberg_migrate_existing_templates' );
 function gutenberg_migrate_existing_templates() {
-	$active_templates = get_option( 'active_templates' );
+	$active_templates = get_option( 'active_templates', false );
 
-	if ( $active_templates ) {
+	if ( false !== $active_templates ) {
 		return;
 	}
 
