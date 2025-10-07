@@ -8,7 +8,7 @@ import {
 } from '@wordpress/core-data';
 import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
@@ -43,28 +43,12 @@ const getDefaultView = ( defaultViews, activeView ) => {
 	return defaultViews.find( ( { slug } ) => slug === activeView )?.view;
 };
 
-const getCustomView = ( editedEntityRecord ) => {
-	if ( ! editedEntityRecord?.content ) {
-		return undefined;
-	}
-
-	const content = JSON.parse( editedEntityRecord.content );
-	if ( ! content ) {
-		return undefined;
-	}
-
-	return {
-		...content,
-		...defaultLayouts[ content.type ],
-	};
-};
-
 /**
- * This function abstracts working with default & custom views by
+ * This function abstracts working with default views by
  * providing a [ state, setState ] tuple based on the URL parameters.
  *
  * Consumers use the provided tuple to work with state
- * and don't have to deal with the specifics of default & custom views.
+ * and don't have to deal with the specifics.
  *
  * @param {string} postType Post type to retrieve default views for.
  * @return {Array} The [ state, setState ] tuple.
@@ -72,39 +56,15 @@ const getCustomView = ( editedEntityRecord ) => {
 function useView( postType ) {
 	const {
 		path,
-		query: { activeView = 'all', isCustom = 'false', layout },
+		query: { activeView = 'all', layout },
 	} = useLocation();
 	const history = useHistory();
-
 	const defaultViews = useDefaultViews( { postType } );
-	const { editEntityRecord } = useDispatch( coreStore );
-	const editedEntityRecord = useSelect(
-		( select ) => {
-			if ( isCustom !== 'true' ) {
-				return undefined;
-			}
 
-			const { getEditedEntityRecord } = select( coreStore );
-			return getEditedEntityRecord(
-				'postType',
-				'wp_dataviews',
-				Number( activeView )
-			);
-		},
-		[ activeView, isCustom ]
-	);
 	const [ view, setView ] = useState( () => {
-		let initialView;
-		if ( isCustom === 'true' ) {
-			initialView = getCustomView( editedEntityRecord ) ?? {
-				type: layout ?? LAYOUT_LIST,
-			};
-		} else {
-			initialView = getDefaultView( defaultViews, activeView ) ?? {
-				type: layout ?? LAYOUT_LIST,
-			};
-		}
-
+		const initialView = getDefaultView( defaultViews, activeView ) ?? {
+			type: layout ?? LAYOUT_LIST,
+		};
 		const type = layout ?? initialView.type;
 		return {
 			...initialView,
@@ -115,18 +75,6 @@ function useView( postType ) {
 
 	const setViewWithUrlUpdate = useEvent( ( newView ) => {
 		setView( newView );
-
-		if ( isCustom === 'true' && editedEntityRecord?.id ) {
-			editEntityRecord(
-				'postType',
-				'wp_dataviews',
-				editedEntityRecord?.id,
-				{
-					content: JSON.stringify( newView ),
-				}
-			);
-		}
-
 		const currentUrlLayout = layout ?? LAYOUT_LIST;
 		if ( newView.type !== currentUrlLayout ) {
 			history.navigate(
@@ -157,15 +105,9 @@ function useView( postType ) {
 		onUrlLayoutChange();
 	}, [ onUrlLayoutChange, layout ] );
 
-	// When activeView or isCustom URL parameters change, reset the view.
+	// When activeView URL parameters change, reset the view.
 	const onUrlActiveViewChange = useEvent( () => {
-		let newView;
-		if ( isCustom === 'true' ) {
-			newView = getCustomView( editedEntityRecord );
-		} else {
-			newView = getDefaultView( defaultViews, activeView );
-		}
-
+		const newView = getDefaultView( defaultViews, activeView );
 		if ( newView ) {
 			const type = layout ?? newView.type;
 			setView( {
@@ -177,13 +119,7 @@ function useView( postType ) {
 	} );
 	useEffect( () => {
 		onUrlActiveViewChange();
-	}, [
-		onUrlActiveViewChange,
-		activeView,
-		isCustom,
-		defaultViews,
-		editedEntityRecord,
-	] );
+	}, [ onUrlActiveViewChange, activeView ] );
 
 	return [ view, setViewWithUrlUpdate ];
 }
@@ -202,25 +138,18 @@ export default function PostList( { postType } ) {
 	const [ view, setView ] = useView( postType );
 	const history = useHistory();
 	const location = useLocation();
-	const {
-		postId,
-		quickEdit = false,
-		isCustom,
-		activeView = 'all',
-	} = location.query;
+	const { postId, quickEdit = false, activeView = 'all' } = location.query;
 	const [ selection, setSelection ] = useState( postId?.split( ',' ) ?? [] );
 	const onChangeSelection = useCallback(
 		( items ) => {
 			setSelection( items );
-			if ( ( location.query.isCustom ?? 'false' ) === 'false' ) {
-				history.navigate(
-					addQueryArgs( location.path, {
-						postId: items.join( ',' ),
-					} )
-				);
-			}
+			history.navigate(
+				addQueryArgs( location.path, {
+					postId: items.join( ',' ),
+				} )
+			);
 		},
-		[ location.path, location.query.isCustom, history ]
+		[ location.path, history ]
 	);
 
 	const { isLoading: isLoadingFields, fields: fields } = usePostFields( {
@@ -368,7 +297,7 @@ export default function PostList( { postType } ) {
 			}
 		>
 			<DataViews
-				key={ activeView + isCustom }
+				key={ activeView }
 				paginationInfo={ paginationInfo }
 				fields={ fields }
 				actions={ actions }
