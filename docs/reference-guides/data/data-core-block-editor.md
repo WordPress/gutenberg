@@ -821,6 +821,18 @@ _Returns_
 
 -   `0|-1|null`: Initial position.
 
+### getSelectedTab
+
+Returns the selected tab.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `string`: The selected tab.
+
 ### getSelectionEnd
 
 Returns the current selection end block client ID, attribute key and text offset.
@@ -1709,6 +1721,18 @@ Action that enables or disables the navigation mode.
 _Parameters_
 
 -   _isNavigationMode_ `boolean`: Enable/Disable navigation mode.
+
+### setSelectedTab
+
+Sets the selected tab.
+
+_Parameters_
+
+-   _tab_ `string`: The selected tab. Takes `patterns`, `blocks` or `media`.
+
+_Returns_
+
+-   `Object`: Action object.
 
 ### setTemplateValidity
 

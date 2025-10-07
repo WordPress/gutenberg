@@ -6,11 +6,21 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
+import { useSelect } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { plus } from '@wordpress/icons';
-import { _x } from '@wordpress/i18n';
+import { _x, sprintf } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
 
 function ZoomOutModeInserterButton( { onClick } ) {
+	const selectedTab = useSelect( ( select ) => {
+		return select( blockEditorStore ).getSelectedTab();
+	}, [] );
+
 	return (
 		<Button
 			variant="primary"
@@ -21,9 +31,10 @@ function ZoomOutModeInserterButton( { onClick } ) {
 				'block-editor-block-tools__zoom-out-mode-inserter-button'
 			) }
 			onClick={ onClick }
-			label={ _x(
-				'Add pattern',
-				'Generic label for pattern inserter button'
+			label={ sprintf(
+				/* translators: %s: tab name (e.g. "pattern" or "block") */
+				_x( 'Add %s', 'Label for zoom out mode inserter button.' ),
+				selectedTab
 			) }
 		/>
 	);

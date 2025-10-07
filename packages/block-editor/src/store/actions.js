@@ -2159,3 +2159,17 @@ export function unsetBlockEditingMode( clientId = '' ) {
 		clientId,
 	};
 }
+
+/**
+ * Sets the selected tab.
+ *
+ * @param {string} tab The selected tab. Takes `patterns`, `blocks` or `media`.
+ *
+ * @return {Object} Action object.
+ */
+export function setSelectedTab( tab ) {
+	return {
+		type: 'SET_SELECTED_TAB',
+		tab,
+	};
+}

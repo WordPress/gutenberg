@@ -12,12 +12,13 @@ import {
 	useCallback,
 	useMemo,
 	useRef,
+	useEffect,
 	useLayoutEffect,
 } from '@wordpress/element';
 import { VisuallyHidden, SearchControl, Popover } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useDebouncedInput, useViewportMatch } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -87,7 +88,14 @@ function InserterMenu(
 
 		return 'blocks';
 	}
+
 	const [ selectedTab, setSelectedTab ] = useState( getInitialTab() );
+	const { setSelectedTab: setInserterSelectedTab } =
+		useDispatch( blockEditorStore );
+
+	useEffect( () => {
+		setInserterSelectedTab( selectedTab );
+	}, [ selectedTab, setInserterSelectedTab ] );
 
 	const shouldUseZoomOut =
 		hasSectionRootClientId &&

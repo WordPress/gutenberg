@@ -13,7 +13,7 @@ import {
 import { useReducedMotion } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -34,6 +34,7 @@ export function ZoomOutSeparator( {
 		blockInsertionPointVisible,
 		blockInsertionPoint,
 		blocksBeingDragged,
+		selectedTab,
 	} = useSelect( ( select ) => {
 		const {
 			getInsertionPoint,
@@ -42,6 +43,7 @@ export function ZoomOutSeparator( {
 			isBlockInsertionPointVisible,
 			getBlockInsertionPoint,
 			getDraggedBlockClientIds,
+			getSelectedTab,
 		} = unlock( select( blockEditorStore ) );
 
 		const root = getSectionRootClientId();
@@ -53,6 +55,7 @@ export function ZoomOutSeparator( {
 			blockInsertionPoint: getBlockInsertionPoint(),
 			blockInsertionPointVisible: isBlockInsertionPointVisible(),
 			blocksBeingDragged: getDraggedBlockClientIds(),
+			selectedTab: getSelectedTab(),
 		};
 	}, [] );
 
@@ -161,7 +164,11 @@ export function ZoomOutSeparator( {
 							delay: 0.125,
 						} }
 					>
-						{ __( 'Drop pattern.' ) }
+						{ sprintf(
+							/* translators: %s: tab name (e.g. "pattern" or "block") */
+							__( 'Drop %s.' ),
+							selectedTab
+						) }
 					</motion.div>
 				</motion.div>
 			) }

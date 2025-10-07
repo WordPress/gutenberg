@@ -3175,6 +3175,17 @@ export const isGroupable = createRegistrySelector(
 );
 
 /**
+ * Returns the selected tab.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string} The selected tab.
+ */
+export function getSelectedTab( state ) {
+	return state.selectedTab;
+}
+
+/**
  * DO-NOT-USE in production.
  * This selector is created for internal/experimental only usage and may be
  * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
