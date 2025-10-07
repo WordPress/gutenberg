@@ -12,6 +12,7 @@ function gutenberg_modify_wp_template_post_type_args( $args, $post_type ) {
 		$args['rest_controller_class']           = 'Gutenberg_REST_Templates_Controller';
 		$args['autosave_rest_controller_class']  = null;
 		$args['revisions_rest_controller_class'] = null;
+		$args['supports']                        = array_merge( $args['supports'], array( 'custom-fields' ) );
 	}
 	return $args;
 }
@@ -40,13 +41,30 @@ function gutenberg_maintain_templates_routes() {
 		'theme',
 		array(
 			'get_callback' => function ( $post_arr ) {
+				// add_additional_fields_to_object is also called for the old
+				// templates controller, so we need to check if the id is an
+				// integer to make sure it's the proper post type endpoint.
+				if ( ! is_int( $post_arr['id'] ) ) {
+					return null;
+				}
 				$terms = get_the_terms( $post_arr['id'], 'wp_theme' );
 				if ( is_wp_error( $terms ) || empty( $terms ) ) {
 					return null;
 				}
-
 				return $terms[0]->slug;
 			},
+		)
+	);
+
+	// Allow setting the is_wp_suggestion meta field, which partly determines if
+	// a template is a custom template.
+	register_post_meta(
+		'wp_template',
+		'is_wp_suggestion',
+		array(
+			'type'         => 'boolean',
+			'show_in_rest' => true,
+			'single'       => true,
 		)
 	);
 }
