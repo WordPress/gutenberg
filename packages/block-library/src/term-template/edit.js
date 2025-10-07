@@ -154,7 +154,8 @@ export default function TermTemplateEdit( {
 		per_page: 100,
 	};
 
-	// Hierarchical is default from REST API as long as parent is not set.
+	// Nested terms are returned by default from REST API as long as parent is not set.
+	// If we want to show nested terms, we must not set parent at all.
 	if ( parent || ! hierarchical ) {
 		queryArgs.parent = parent;
 	}
