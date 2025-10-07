@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useState, RawHTML, useRef, useEffect } from '@wordpress/element';
+import { useState, RawHTML, useEffect } from '@wordpress/element';
 import {
 	__experimentalText as Text,
 	__experimentalHStack as HStack,
@@ -151,7 +151,6 @@ function Thread( {
 	const { toggleBlockHighlight, selectBlock } =
 		useDispatch( blockEditorStore );
 	const relatedBlockElement = useBlockElement( thread.blockClientId );
-	const threadRef = useRef();
 	const debouncedToggleBlockHighlight = useDebounce(
 		toggleBlockHighlight,
 		50
@@ -203,7 +202,6 @@ function Thread( {
 		// Disable reason: role="listitem" does in fact support aria-expanded.
 		// eslint-disable-next-line jsx-a11y/role-supports-aria-props
 		<VStack
-			ref={ threadRef }
 			className={ clsx( 'editor-collab-sidebar-panel__thread', {
 				'is-selected': isSelected,
 			} ) }
