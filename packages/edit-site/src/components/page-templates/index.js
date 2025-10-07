@@ -228,7 +228,7 @@ export default function PageTemplates() {
 
 	const onChangeView = useEvent( ( newView ) => {
 		if ( newView.type !== view.type ) {
-			// Find a way to retrigger the routing resolution.
+			// Retrigger the routing areas resolution.
 			history.invalidate();
 		}
 		updateView( newView );
