@@ -27,7 +27,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 	$post = get_post( $post_id );
 	// Exclude breadcrumbs from special contexts like archives, search, 404, etc.
 	// until they are explicitly supported.
-	if ( ! $post || is_archive() || is_search() || is_404() || is_home() ) {
+	if ( ! $post || is_archive() || is_search() || is_404() || is_home() || is_front_page() ) {
 		return '';
 	}
 
