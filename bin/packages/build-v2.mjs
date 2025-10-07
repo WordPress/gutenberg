@@ -6,6 +6,7 @@
 import { readFile, writeFile } from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { parseArgs } from 'node:util';
 import esbuild from 'esbuild';
 import glob from 'fast-glob';
 import watch from 'node-watch';
@@ -393,12 +394,19 @@ async function watchMode() {
  * Main entry point.
  */
 async function main() {
-	const args = process.argv.slice( 2 );
-	const isWatch = args.includes( '--watch' );
+	const { values } = parseArgs( {
+		options: {
+			watch: {
+				type: 'boolean',
+				short: 'w',
+				default: false,
+			},
+		},
+	} );
 
 	await buildAll();
 
-	if ( isWatch ) {
+	if ( values.watch ) {
 		console.log( '\n👀 Watching for changes...\n' );
 		await watchMode();
 	}
