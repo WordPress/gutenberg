@@ -106,9 +106,9 @@ function build_dropdown_script_block_core_categories( $dropdown_id ) {
 	( ( [ dropdownId, homeUrl ] ) => {
 		document.getElementById( dropdownId ).addEventListener( 'change', ( event ) => {
 			const dropdown = /** @type {HTMLSelectElement} */ ( event.target );
-			if ( dropdown.selectedIndex >= 0 && dropdown.options[ dropdown.selectedIndex ].value !== '-1' ) {
+			if ( dropdown.value && dropdown.value !== '-1' ) {
 				const url = new URL( homeUrl );
-				url.searchParams.set( dropdown.name, dropdown.options[ dropdown.selectedIndex ].value );
+				url.searchParams.set( dropdown.name, dropdown.value );
 				location.href = url.href;
 			}
 		} );
