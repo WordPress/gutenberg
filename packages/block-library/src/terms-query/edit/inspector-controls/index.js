@@ -15,7 +15,7 @@ import { useSelect } from '@wordpress/data';
 import { useToolsPanelDropdownMenuProps } from '../../../utils/hooks';
 import { usePublicTaxonomies } from '../../utils';
 import TaxonomyControl from './taxonomy-control';
-import OrderingControls from './ordering-controls';
+import OrderControl from './order-control';
 import EmptyTermsControl from './empty-terms-control';
 import HierarchyControl from './hierarchy-control';
 import InheritControl from './inherit-control';
@@ -30,7 +30,7 @@ export default function TermsQueryInspectorControls( {
 	clientId,
 } ) {
 	const { termQuery } = attributes;
-	const { taxonomy } = termQuery;
+	const { taxonomy, orderBy, order } = termQuery;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const { templateSlug } = useSelect( ( select ) => {
@@ -98,10 +98,24 @@ export default function TermsQueryInspectorControls( {
 							}
 						/>
 					</ToolsPanelItem>
-					<OrderingControls
-						attributes={ attributes }
-						setQuery={ setQuery }
-					/>
+					<ToolsPanelItem
+						hasValue={ () => orderBy !== 'name' || order !== 'asc' }
+						label={ __( 'Order by' ) }
+						onDeselect={ () =>
+							setQuery( { orderBy: 'name', order: 'asc' } )
+						}
+						isShownByDefault
+					>
+						<OrderControl
+							{ ...{ orderBy, order } }
+							onChange={ ( newOrderBy, newOrder ) => {
+								setQuery( {
+									orderBy: newOrderBy,
+									order: newOrder,
+								} );
+							} }
+						/>
+					</ToolsPanelItem>
 					<EmptyTermsControl
 						attributes={ attributes }
 						setQuery={ setQuery }
