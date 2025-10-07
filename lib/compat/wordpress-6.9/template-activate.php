@@ -256,7 +256,9 @@ function gutenberg_resolve_block_template( $template_type, $template_hierarchy, 
 			$templates,
 			array(
 				'slug__in' => array_map(
-					fn( $template ) => $template->slug,
+					function ( $template ) {
+						return $template->slug;
+					},
 					$templates
 				),
 			),
