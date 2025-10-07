@@ -12,10 +12,10 @@ import {
 	BlockControls,
 	AlignmentControl,
 	InspectorControls,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import {
 	ToggleControl,
-	SelectControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -26,6 +26,9 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import { unlock } from '../lock-unlock';
+
+const { HTMLElementControl } = unlock( blockEditorPrivateApis );
 
 export default function TermNameEdit( {
 	attributes,
@@ -80,43 +83,37 @@ export default function TermNameEdit( {
 					} }
 				/>
 			</BlockControls>
+			<InspectorControls group="advanced">
+				<HTMLElementControl
+					__next40pxDefaultSize
+					__nextHasNoMarginBottom
+					label={ __( 'HTML element' ) }
+					value={ tagName }
+					options={ [
+						{ label: __( 'Default (div)' ), value: 'div' },
+						{ label: __( 'Paragraph (p)' ), value: 'p' },
+						{ label: __( 'Heading 1 (h1)' ), value: 'h1' },
+						{ label: __( 'Heading 2 (h2)' ), value: 'h2' },
+						{ label: __( 'Heading 3 (h3)' ), value: 'h3' },
+						{ label: __( 'Heading 4 (h4)' ), value: 'h4' },
+						{ label: __( 'Heading 5 (h5)' ), value: 'h5' },
+						{ label: __( 'Heading 6 (h6)' ), value: 'h6' },
+					] }
+					onChange={ ( value ) =>
+						setAttributes( { tagName: value } )
+					}
+				/>
+			</InspectorControls>
 			<InspectorControls>
 				<ToolsPanel
 					label={ __( 'Settings' ) }
 					resetAll={ () => {
 						setAttributes( {
-							tagName: 'div',
 							isLink: false,
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
 				>
-					<ToolsPanelItem
-						hasValue={ () => tagName !== 'div' }
-						label={ __( 'HTML element' ) }
-						onDeselect={ () => setAttributes( { tagName: 'div' } ) }
-						isShownByDefault
-					>
-						<SelectControl
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
-							label={ __( 'HTML element' ) }
-							value={ tagName }
-							options={ [
-								{ label: __( 'Default (div)' ), value: 'div' },
-								{ label: __( 'Paragraph (p)' ), value: 'p' },
-								{ label: __( 'Heading 1 (h1)' ), value: 'h1' },
-								{ label: __( 'Heading 2 (h2)' ), value: 'h2' },
-								{ label: __( 'Heading 3 (h3)' ), value: 'h3' },
-								{ label: __( 'Heading 4 (h4)' ), value: 'h4' },
-								{ label: __( 'Heading 5 (h5)' ), value: 'h5' },
-								{ label: __( 'Heading 6 (h6)' ), value: 'h6' },
-							] }
-							onChange={ ( value ) =>
-								setAttributes( { tagName: value } )
-							}
-						/>
-					</ToolsPanelItem>
 					<ToolsPanelItem
 						hasValue={ () => !! isLink }
 						label={ __( 'Make term name a link' ) }
