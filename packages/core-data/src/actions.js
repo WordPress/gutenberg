@@ -412,7 +412,7 @@ export const editEntityRecord =
 			if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 				const objectId = entityConfig.syncConfig.getObjectId( record );
 				getSyncProvider().update(
-					entityConfig.syncObjectType + '--edit',
+					entityConfig.syncConfig.objectType + '--edit',
 					objectId,
 					edit.edits
 				);
