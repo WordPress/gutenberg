@@ -338,6 +338,40 @@ async function buildAll() {
 async function watchMode() {
 	let packagesToRebuild = new Set();
 	const rebuilding = new Set();
+	let rebuildTimeoutId = null;
+
+	async function processRebuilds() {
+		const packages = Array.from( packagesToRebuild );
+		if ( packages.length === 0 ) {
+			rebuildTimeoutId = null;
+			return;
+		}
+
+		packagesToRebuild = new Set();
+
+		for ( const packageName of packages ) {
+			if ( rebuilding.has( packageName ) ) {
+				continue;
+			}
+
+			rebuilding.add( packageName );
+
+			try {
+				const buildTime = await buildPackage( packageName, {
+					silent: true,
+				} );
+				console.log( `✅ ${ packageName } (${ buildTime }ms)` );
+			} catch ( error ) {
+				console.log(
+					`❌ ${ packageName } - Error: ${ error.message }`
+				);
+			} finally {
+				rebuilding.delete( packageName );
+			}
+		}
+
+		rebuildTimeoutId = null;
+	}
 
 	watch(
 		PACKAGES_DIR,
@@ -353,36 +387,15 @@ async function watchMode() {
 			}
 
 			packagesToRebuild.add( packageName );
+
+			// Only schedule a rebuild if one isn't already scheduled
+			if ( rebuildTimeoutId ) {
+				return;
+			}
+
+			rebuildTimeoutId = setTimeout( processRebuilds, 100 );
 		}
 	);
-
-	setInterval( async () => {
-		const packages = Array.from( packagesToRebuild );
-		if ( packages.length > 0 ) {
-			packagesToRebuild = new Set();
-
-			for ( const packageName of packages ) {
-				if ( rebuilding.has( packageName ) ) {
-					continue;
-				}
-
-				rebuilding.add( packageName );
-
-				try {
-					const buildTime = await buildPackage( packageName, {
-						silent: true,
-					} );
-					console.log( `✅ ${ packageName } (${ buildTime }ms)` );
-				} catch ( error ) {
-					console.log(
-						`❌ ${ packageName } - Error: ${ error.message }`
-					);
-				} finally {
-					rebuilding.delete( packageName );
-				}
-			}
-		}
-	}, 100 );
 }
 
 /**
