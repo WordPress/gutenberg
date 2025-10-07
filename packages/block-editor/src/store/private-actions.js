@@ -488,14 +488,14 @@ export function resetZoomLevel() {
 /**
  * Toggles whether the block linked to a comment is considered selected.
  *
- * @param {string}  clientId               The block's clientId.
- * @param {boolean} isBlockCommentSelected Whether the block comment is selected.
+ * @param {string}  clientId          The block's clientId.
+ * @param {boolean} hasBlockSpotlight Whether the block comment is selected.
  * @return {Object} Action object.
  */
-export function toggleBlockCommentSelected( clientId, isBlockCommentSelected ) {
+export function toggleBlockSpotlight( clientId, hasBlockSpotlight ) {
 	return {
-		type: 'TOGGLE_IS_BLOCK_COMMENT_SELECTED',
+		type: 'TOGGLE_BLOCK_SPOTLIGHT',
 		clientId,
-		isBlockCommentSelected,
+		hasBlockSpotlight,
 	};
 }

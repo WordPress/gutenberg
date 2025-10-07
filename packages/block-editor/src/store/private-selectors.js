@@ -707,13 +707,13 @@ export const isBlockHidden = ( state, clientId ) => {
 };
 
 /**
- * Returns the clientId of the block whose linked comment is selected, or null.
+ * Returns true if the current spotlighted block matches the block clientId.
  *
  * @param {Object} state    Global application state.
  * @param {string} clientId The block to check.
  *
- * @return {boolean} Whether the block is linked to a comment and is selected.
+ * @return {boolean} Whether the block is currently spotlighted.
  */
-export function isBlockCommentSelected( state, clientId ) {
-	return state.commentSelectedBlock === clientId;
+export function hasBlockSpotlight( state, clientId ) {
+	return state.hasBlockSpotlight === clientId;
 }

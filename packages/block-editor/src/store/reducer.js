@@ -1874,19 +1874,19 @@ export function highlightedBlock( state, action ) {
 }
 
 /**
- * Reducer returning the clientId of the block whose linked comment is selected.
+ * Reducer returning current spotlighted block.
  *
  * @param {string|null} state  Current clientId or null.
  * @param {Object}      action Dispatched action.
  *
  * @return {string|null} Updated state.
  */
-export function commentSelectedBlock( state, action ) {
+export function hasBlockSpotlight( state, action ) {
 	switch ( action.type ) {
-		case 'TOGGLE_IS_BLOCK_COMMENT_SELECTED':
-			const { clientId, isBlockCommentSelected } = action;
+		case 'TOGGLE_BLOCK_SPOTLIGHT':
+			const { clientId, hasBlockSpotlight: _hasBlockSpotlight } = action;
 
-			if ( isBlockCommentSelected ) {
+			if ( _hasBlockSpotlight ) {
 				return clientId;
 			} else if ( state === clientId ) {
 				return null;
@@ -2162,7 +2162,7 @@ const combinedReducers = combineReducers( {
 	openedBlockSettingsMenu,
 	registeredInserterMediaCategories,
 	zoomLevel,
-	commentSelectedBlock,
+	hasBlockSpotlight,
 } );
 
 /**
