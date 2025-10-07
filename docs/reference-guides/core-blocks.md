@@ -10,47 +10,43 @@ This page lists the blocks included in the block-library package.
 
 ## Accordion
 
-Displays a group of accordion headers and associated expandable content. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion))
+Displays a group of accordion headings and associated expandable content. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion))
 
 -	**Name:** core/accordion
--	**Experimental:** true
 -	**Category:** design
--	**Allowed Blocks:** core/accordion-content
--	**Supports:** align (full, wide), background (backgroundImage, backgroundSize), color (background, gradients, text), interactivity, layout, shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** autoclose, iconPosition, showIcon
+-	**Allowed Blocks:** core/accordion-item
+-	**Supports:** align (full, wide), anchor, ariaLabel, background (backgroundImage, backgroundSize), color (background, gradients, text), contentRole, interactivity, layout, shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Attributes:** autoclose, headingLevel, iconPosition, levelOptions, showIcon
 
-## Accordion Content
+## Accordion Heading
 
-Displays a section of content in an accordion, including a header and expandable content. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion-content))
+Displays an accordion heading. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion-heading))
 
--	**Name:** core/accordion-content
--	**Experimental:** true
+-	**Name:** core/accordion-heading
+-	**Category:** design
+-	**Parent:** core/accordion-item
+-	**Supports:** anchor, color (background, gradients, text), interactivity, shadow, spacing (padding), typography (fontSize), ~~align~~, ~~blockVisibility~~
+-	**Attributes:** iconPosition, level, openByDefault, showIcon, title
+
+## Accordion Item
+
+Displays a section of content in an accordion, including a heading and expandable content. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion-item))
+
+-	**Name:** core/accordion-item
 -	**Category:** design
 -	**Parent:** core/accordion
--	**Allowed Blocks:** core/accordion-header, core/accordion-panel
--	**Supports:** color (background, gradients, text), interactivity, layout, shadow, spacing (blockGap, margin), typography (fontSize, lineHeight)
+-	**Allowed Blocks:** core/accordion-heading, core/accordion-panel
+-	**Supports:** color (background, gradients, text), contentRole, interactivity, shadow, spacing (blockGap, margin), typography (fontSize, lineHeight)
 -	**Attributes:** openByDefault
-
-## Accordion Header
-
-Displays an accordion header. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion-header))
-
--	**Name:** core/accordion-header
--	**Experimental:** true
--	**Category:** design
--	**Parent:** core/accordion-content
--	**Supports:** anchor, color (background, gradients, text), interactivity, shadow, spacing (padding), typography (fontSize), ~~align~~
--	**Attributes:** iconPosition, level, levelOptions, openByDefault, showIcon, title
 
 ## Accordion Panel
 
 Displays an accordion panel. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion-panel))
 
 -	**Name:** core/accordion-panel
--	**Experimental:** true
 -	**Category:** design
--	**Parent:** core/accordion-content
--	**Supports:** color (background, gradients, text), interactivity, layout, shadow, spacing (blockGap, padding), typography (fontSize, lineHeight)
+-	**Parent:** core/accordion-item
+-	**Supports:** color (background, gradients, text), contentRole, interactivity, shadow, spacing (blockGap, padding), typography (fontSize, lineHeight), ~~blockVisibility~~
 -	**Attributes:** allowedBlocks, isSelected, openByDefault, templateLock
 
 ## Archives
@@ -88,6 +84,15 @@ Reuse this design across your site. ([Source](https://github.com/WordPress/guten
 -	**Category:** reusable
 -	**Supports:** interactivity (clientNavigation), ~~customClassName~~, ~~html~~, ~~inserter~~, ~~renaming~~
 -	**Attributes:** content, ref
+
+## Breadcrumbs
+
+Display a breadcrumb trail only for Pages, or for hierarchical post types. The block is useful to insert in the Pages template. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/breadcrumbs))
+
+-	**Name:** core/breadcrumbs
+-	**Category:** theme
+-	**Supports:** color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Attributes:** separator, showHomeLink
 
 ## Button
 
@@ -585,7 +590,7 @@ Show a block pattern. ([Source](https://github.com/WordPress/gutenberg/tree/trun
 
 -	**Name:** core/pattern
 -	**Category:** theme
--	**Supports:** interactivity (clientNavigation), ~~html~~, ~~inserter~~, ~~renaming~~
+-	**Supports:** interactivity (clientNavigation), ~~blockVisibility~~, ~~html~~, ~~inserter~~, ~~renaming~~
 -	**Attributes:** slug
 
 ## Author
@@ -721,7 +726,6 @@ Post terms. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages
 Show minutes required to finish reading the post. Can also show a word count. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-time-to-read))
 
 -	**Name:** core/post-time-to-read
--	**Experimental:** true
 -	**Category:** theme
 -	**Supports:** color (background, gradients, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** averageReadingSpeed, displayAsRange, displayMode, textAlign
@@ -996,7 +1000,6 @@ Contains the block elements used to render a taxonomy term, like the name, descr
 -	**Category:** theme
 -	**Ancestor:** core/terms-query
 -	**Supports:** align (full, wide), color (background, gradients, link, text), interactivity (clientNavigation), layout (allowEditing, allowSwitching, default), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:** namespace
 
 ## Terms Query
 
@@ -1007,7 +1010,7 @@ An advanced block that allows displaying taxonomy terms based on different query
 -	**Category:** theme
 -	**Allowed Blocks:** core/term-template
 -	**Supports:** align (full, wide), interactivity, ~~html~~
--	**Attributes:** namespace, tagName, termQuery, termQueryId, termsToShow
+-	**Attributes:** tagName, termQuery, termsToShow
 
 ## Text Columns (deprecated)
 

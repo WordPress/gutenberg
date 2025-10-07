@@ -6,25 +6,8 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { space } from '../utils/space';
 import InputControl from '../input-control';
-import { COLORS } from '../utils';
-import type { SearchControlProps } from './types';
-
-const inlinePadding = ( {
-	size,
-}: Required< Pick< SearchControlProps, 'size' > > ) => {
-	return space( size === 'compact' ? 1 : 2 );
-};
-
-export const SuffixItemWrapper = styled.div`
-	display: flex;
-	padding-inline-end: ${ inlinePadding };
-
-	svg {
-		fill: currentColor;
-	}
-`;
+import Icon from '../icon';
 
 export const StyledInputControl = styled( InputControl )`
 	input[type='search'] {
@@ -35,8 +18,10 @@ export const StyledInputControl = styled( InputControl )`
 			-webkit-appearance: none;
 		}
 	}
+`;
 
-	&:not( :focus-within ) {
-		--wp-components-color-background: ${ COLORS.theme.gray[ 100 ] };
+export const StyledIcon = styled( Icon )`
+	&:dir( ltr ) {
+		transform: scaleX( -1 );
 	}
 `;

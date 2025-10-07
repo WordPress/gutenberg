@@ -135,7 +135,7 @@ export default {
 	},
 	canUserEditValue( { select, context, args } ) {
 		// Terms are typically read-only when displayed.
-		if ( context?.termQuery || context?.termQueryId ) {
+		if ( context?.termQuery ) {
 			return false;
 		}
 
@@ -154,6 +154,25 @@ export default {
 		return false;
 	},
 	getFieldsList( { select, context } ) {
+		// Deprecated, will be removed after 6.9.
 		return getTermDataFields( select, context );
+	},
+	editorUI( { select, context } ) {
+		const termDataFields = Object.entries(
+			getTermDataFields( select, context ) || {}
+		).map( ( [ key, field ] ) => ( {
+			label: field.label,
+			type: field.type,
+			args: {
+				key,
+			},
+		} ) );
+		/*
+		 * We need to define the data as [{ label: string, value: any, type: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#type-validation }]
+		 */
+		return {
+			mode: 'dropdown',
+			data: termDataFields,
+		};
 	},
 };

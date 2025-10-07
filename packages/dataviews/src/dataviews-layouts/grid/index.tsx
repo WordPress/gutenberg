@@ -38,7 +38,7 @@ import type {
 	ViewGrid as ViewGridType,
 	ViewGridProps,
 } from '../../types';
-import type { SetSelection } from '../../private-types';
+import type { SetSelection } from '../../types/private';
 import { ItemClickWrapper } from '../utils/item-click-wrapper';
 import { GridItems } from '../utils/grid-items';
 const { Badge } = unlock( componentsPrivateApis );

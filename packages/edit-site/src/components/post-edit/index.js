@@ -98,7 +98,6 @@ function PostEditForm( { postType, postId } ) {
 					id: 'discussion',
 					label: __( 'Discussion' ),
 					children: [ 'comment_status', 'ping_status' ],
-					summary: 'discussion',
 				},
 				{
 					label: __( 'Template' ),
@@ -111,7 +110,9 @@ function PostEditForm( { postType, postId } ) {
 			].filter(
 				( field ) =>
 					ids.length === 1 ||
-					fieldsWithBulkEditSupport.includes( field )
+					fieldsWithBulkEditSupport.includes(
+						typeof field === 'string' ? field : field.id
+					)
 			),
 		} ),
 		[ ids ]
