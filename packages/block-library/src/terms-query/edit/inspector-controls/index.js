@@ -30,7 +30,7 @@ export default function TermsQueryInspectorControls( {
 	clientId,
 } ) {
 	const { termQuery } = attributes;
-	const { taxonomy, orderBy, order, hideEmpty } = termQuery;
+	const { taxonomy, orderBy, order, hideEmpty, inherit } = termQuery;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const { templateSlug } = useSelect( ( select ) => {
@@ -130,10 +130,17 @@ export default function TermsQueryInspectorControls( {
 						/>
 					</ToolsPanelItem>
 					{ displayInheritControl && (
-						<InheritControl
-							attributes={ attributes }
-							setAttributes={ setAttributes }
-						/>
+						<ToolsPanelItem
+							hasValue={ () => inherit !== false }
+							label={ __( 'Inherit parent term from archive' ) }
+							onDeselect={ () => setQuery( { inherit: false } ) }
+							isShownByDefault
+						>
+							<InheritControl
+								inherit={ inherit }
+								onChange={ setQuery }
+							/>
+						</ToolsPanelItem>
 					) }
 					{ displayHierarchicalControl && (
 						<HierarchyControl

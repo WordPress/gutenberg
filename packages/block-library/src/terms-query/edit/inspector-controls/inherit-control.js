@@ -2,36 +2,21 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	__experimentalToolsPanelItem as ToolsPanelItem,
-	ToggleControl,
-} from '@wordpress/components';
+import { ToggleControl } from '@wordpress/components';
 
-export default function InheritControl( { attributes, setAttributes } ) {
-	const { termQuery } = attributes;
-
+export default function InheritControl( { inherit, onChange } ) {
 	return (
-		<ToolsPanelItem
-			hasValue={ () => termQuery.inherit !== false }
+		<ToggleControl
+			__nextHasNoMarginBottom
 			label={ __( 'Inherit parent term from archive' ) }
-			onDeselect={ () => setAttributes( { inherit: false } ) }
-			isShownByDefault
-		>
-			<ToggleControl
-				__nextHasNoMarginBottom
-				label={ __( 'Inherit parent term from archive' ) }
-				checked={ termQuery.inherit }
-				onChange={ ( inherit ) => {
-					setAttributes( {
-						termQuery: {
-							...termQuery,
-							inherit,
-							// When enabling inherit, hierarchical is not supported.
-							...( inherit ? { hierarchical: false } : {} ),
-						},
-					} );
-				} }
-			/>
-		</ToolsPanelItem>
+			checked={ inherit }
+			onChange={ ( value ) =>
+				onChange( {
+					inherit: value,
+					// When enabling inherit, hierarchical is not supported.
+					...( value ? { hierarchical: false } : {} ),
+				} )
+			}
+		/>
 	);
 }
