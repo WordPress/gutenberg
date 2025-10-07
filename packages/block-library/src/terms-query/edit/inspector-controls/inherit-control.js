@@ -22,7 +22,14 @@ export default function InheritControl( { attributes, setAttributes } ) {
 				label={ __( 'Inherit parent term from archive' ) }
 				checked={ termQuery.inherit }
 				onChange={ ( inherit ) => {
-					setAttributes( { termQuery: { ...termQuery, inherit } } );
+					setAttributes( {
+						termQuery: {
+							...termQuery,
+							inherit,
+							// When enabling inherit, hierarchical is not supported.
+							...( inherit ? { hierarchical: false } : {} ),
+						},
+					} );
 				} }
 			/>
 		</ToolsPanelItem>
