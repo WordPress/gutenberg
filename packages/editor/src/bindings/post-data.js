@@ -4,27 +4,27 @@
 import { __ } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
 
-/**
+ /**
  * Retrieves post data fields with their values and labels.
- * Falls back to defaults if context is missing.
- *
+  * Falls back to defaults if context is missing.
+  *
  * @param {Function} select  The select function from the data store.
- * @param {Object} context   The block context.
- * @return {Object|null}     List of post data fields with value and label.
+  * @param {Object} context   The block context.
+  * @return {Object|null}     List of post data fields with value and label.
  */
-function getPostDataFields( select, context ) {
-	const { getEditedEntityRecord } = select( coreDataStore );
-
-	if ( !context?.postType || !context?.postId ) {
-		return null;
-	}
-
-	const entityDataValues = getEditedEntityRecord(
-		'postType',
-		context.postType,
-		context.postId
-	) || {};
-
+ function getPostDataFields(select, context) {
+     if (!context?.postType || !context?.postId) {
+        return null;
+    }
+    const { getEditedEntityRecord } = select(coreDataStore);
+    const entityDataValues =
+         getEditedEntityRecord(
+            'postType',
+            context.postType,
+            context.postId
+        ) || {};
+    // ... rest of the function
+ }
 	return {
 		title: {
 			label: __( 'Post Title' ),
