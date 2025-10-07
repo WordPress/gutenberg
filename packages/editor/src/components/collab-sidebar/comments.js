@@ -107,7 +107,7 @@ function Thread( {
 	setShowCommentBoard,
 	commentSidebarRef,
 } ) {
-	const [ isExpanded, setExpanded ] = useState( false );
+	const [ isExpanded, setExpanded ] = useState( isSelected );
 	const { toggleBlockHighlight, selectBlock, toggleBlockSpotlight } = unlock(
 		useDispatch( blockEditorStore )
 	);
@@ -387,6 +387,10 @@ const CommentBoard = ( { thread, parent, onEdit, onDelete } ) => {
 				/>
 				<FlexItem
 					className="editor-collab-sidebar-panel__comment-status"
+					onMouseDown={ ( event ) => {
+						// Prevent the thread from being selected.
+						event.preventDefault();
+					} }
 					onClick={ ( event ) => {
 						// Prevent the thread from being selected.
 						event.stopPropagation();
