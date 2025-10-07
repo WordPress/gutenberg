@@ -2,14 +2,13 @@
  * WordPress dependencies
  */
 import { SelectControl } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { usePublicTaxonomies } from '../../utils';
 
-export default function TaxonomyControl( { taxonomy, onChange } ) {
+export default function TaxonomyControl( { taxonomy, onChange, ...props } ) {
 	const taxonomies = usePublicTaxonomies();
 	const taxonomyOptions = taxonomies.map( ( _taxonomy ) => ( {
 		label: _taxonomy.name,
@@ -20,10 +19,10 @@ export default function TaxonomyControl( { taxonomy, onChange } ) {
 		<SelectControl
 			__nextHasNoMarginBottom
 			__next40pxDefaultSize
-			label={ __( 'Taxonomy' ) }
 			options={ taxonomyOptions }
 			value={ taxonomy }
 			onChange={ onChange }
+			{ ...props }
 		/>
 	);
 }

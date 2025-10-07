@@ -71,6 +71,14 @@ export default function TermsQueryInspectorControls( {
 	const displayHierarchicalControl =
 		isTaxonomyHierarchical && ! termQuery.inherit;
 
+	// Labels shared between ToolsPanelItem and its child control.
+	const taxonomyControlLabel = __( 'Taxonomy' );
+	const orderByControlLabel = __( 'Order by' );
+	const emptyTermsControlLabel = __( 'Show empty terms' );
+	const inheritControlLabel = __( 'Inherit parent term from archive' );
+	const nestedTermsControlLabel = __( 'Show nested terms' );
+	const maxTermsControlLabel = __( 'Max terms' );
+
 	return (
 		<>
 			<InspectorControls>
@@ -93,13 +101,14 @@ export default function TermsQueryInspectorControls( {
 				>
 					<ToolsPanelItem
 						hasValue={ () => taxonomy !== 'category' }
-						label={ __( 'Taxonomy' ) }
+						label={ taxonomyControlLabel }
 						onDeselect={ () => {
 							setQuery( { taxonomy: 'category' } );
 						} }
 						isShownByDefault
 					>
 						<TaxonomyControl
+							label={ taxonomyControlLabel }
 							taxonomy={ taxonomy }
 							onChange={ ( value ) =>
 								setQuery( { taxonomy: value } )
@@ -108,13 +117,14 @@ export default function TermsQueryInspectorControls( {
 					</ToolsPanelItem>
 					<ToolsPanelItem
 						hasValue={ () => orderBy !== 'name' || order !== 'asc' }
-						label={ __( 'Order by' ) }
+						label={ orderByControlLabel }
 						onDeselect={ () =>
 							setQuery( { orderBy: 'name', order: 'asc' } )
 						}
 						isShownByDefault
 					>
 						<OrderControl
+							label={ orderByControlLabel }
 							{ ...{ orderBy, order } }
 							onChange={ ( newOrderBy, newOrder ) => {
 								setQuery( {
@@ -126,11 +136,12 @@ export default function TermsQueryInspectorControls( {
 					</ToolsPanelItem>
 					<ToolsPanelItem
 						hasValue={ () => hideEmpty !== true }
-						label={ __( 'Show empty terms' ) }
+						label={ emptyTermsControlLabel }
 						onDeselect={ () => setQuery( { hideEmpty: true } ) }
 						isShownByDefault
 					>
 						<EmptyTermsControl
+							label={ emptyTermsControlLabel }
 							hideEmpty={ hideEmpty }
 							onChange={ ( value ) =>
 								setQuery( { hideEmpty: value } )
@@ -140,11 +151,12 @@ export default function TermsQueryInspectorControls( {
 					{ displayInheritControl && (
 						<ToolsPanelItem
 							hasValue={ () => inherit !== false }
-							label={ __( 'Inherit parent term from archive' ) }
+							label={ inheritControlLabel }
 							onDeselect={ () => setQuery( { inherit: false } ) }
 							isShownByDefault
 						>
 							<InheritControl
+								label={ inheritControlLabel }
 								inherit={ inherit }
 								onChange={ setQuery }
 							/>
@@ -153,13 +165,14 @@ export default function TermsQueryInspectorControls( {
 					{ displayHierarchicalControl && (
 						<ToolsPanelItem
 							hasValue={ () => hierarchical !== false }
-							label={ __( 'Include nested terms' ) }
+							label={ nestedTermsControlLabel }
 							onDeselect={ () =>
 								setQuery( { hierarchical: false } )
 							}
 							isShownByDefault
 						>
 							<NestedTermsControl
+								label={ nestedTermsControlLabel }
 								hierarchical={ hierarchical }
 								onChange={ ( value ) =>
 									setQuery( { hierarchical: value } )
@@ -169,11 +182,12 @@ export default function TermsQueryInspectorControls( {
 					) }
 					<ToolsPanelItem
 						hasValue={ () => perPage !== 10 }
-						label={ __( 'Max terms' ) }
+						label={ maxTermsControlLabel }
 						onDeselect={ () => setQuery( { perPage: 10 } ) }
 						isShownByDefault
 					>
 						<MaxTermsControl
+							label={ maxTermsControlLabel }
 							perPage={ perPage }
 							onChange={ ( value ) =>
 								setQuery( { perPage: value } )

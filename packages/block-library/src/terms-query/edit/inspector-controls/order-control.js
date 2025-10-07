@@ -4,12 +4,11 @@
 import { __ } from '@wordpress/i18n';
 import { SelectControl } from '@wordpress/components';
 
-export default function OrderControl( { orderBy, order, onChange } ) {
+export default function OrderControl( { orderBy, order, onChange, ...props } ) {
 	return (
 		<SelectControl
 			__nextHasNoMarginBottom
 			__next40pxDefaultSize
-			label={ __( 'Order by' ) }
 			options={ [
 				{
 					label: __( 'Name: A → Z' ),
@@ -33,6 +32,7 @@ export default function OrderControl( { orderBy, order, onChange } ) {
 				const [ newOrderBy, newOrder ] = value.split( '/' );
 				onChange( newOrderBy, newOrder );
 			} }
+			{ ...props }
 		/>
 	);
 }

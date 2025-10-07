@@ -1,14 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { ToggleControl } from '@wordpress/components';
 
-export default function InheritControl( { inherit, onChange } ) {
+export default function InheritControl( { inherit, onChange, ...props } ) {
 	return (
 		<ToggleControl
 			__nextHasNoMarginBottom
-			label={ __( 'Inherit parent term from archive' ) }
 			checked={ inherit }
 			onChange={ ( value ) =>
 				onChange( {
@@ -17,6 +15,7 @@ export default function InheritControl( { inherit, onChange } ) {
 					...( value ? { hierarchical: false } : {} ),
 				} )
 			}
+			{ ...props }
 		/>
 	);
 }

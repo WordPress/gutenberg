@@ -4,12 +4,11 @@
 import { __ } from '@wordpress/i18n';
 import { RangeControl } from '@wordpress/components';
 
-export default function MaxTermsControl( { perPage, onChange } ) {
+export default function MaxTermsControl( { perPage, onChange, ...props } ) {
 	return (
 		<RangeControl
 			__nextHasNoMarginBottom
 			__next40pxDefaultSize
-			label={ __( 'Max terms' ) }
 			value={ perPage }
 			min={ 0 }
 			max={ 100 }
@@ -17,6 +16,7 @@ export default function MaxTermsControl( { perPage, onChange } ) {
 			help={ __(
 				'Limit the number of terms you want to show. To show all terms, use 0 (zero).'
 			) }
+			{ ...props }
 		/>
 	);
 }
