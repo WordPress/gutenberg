@@ -333,15 +333,7 @@ async function watchMode() {
 	let rebuildTimeoutId = null;
 
 	async function processRebuilds() {
-		const packages = Array.from( packagesToRebuild );
-		if ( packages.length === 0 ) {
-			rebuildTimeoutId = null;
-			return;
-		}
-
-		packagesToRebuild = new Set();
-
-		for ( const packageName of packages ) {
+		for ( const packageName of packagesToRebuild ) {
 			if ( rebuilding.has( packageName ) ) {
 				continue;
 			}
@@ -362,6 +354,7 @@ async function watchMode() {
 			}
 		}
 
+		packagesToRebuild.clear();
 		rebuildTimeoutId = null;
 	}
 
