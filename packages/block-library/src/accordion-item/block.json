@@ -30,6 +30,7 @@
 			}
 		},
 		"shadow": true,
+		"layout": true,
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
