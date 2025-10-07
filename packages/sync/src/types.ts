@@ -28,6 +28,7 @@ export interface SyncConfig {
 	getInitialObjectData: ( record: ObjectData ) => ObjectData;
 	getObjectId: ( data: ObjectData ) => ObjectID;
 	objectType: ObjectType;
+	supports: Record< string, true >;
 }
 
 export type SyncProvider = {

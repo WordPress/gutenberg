@@ -381,6 +381,13 @@ async function loadPostTypeEntities() {
 				 * @type {import('@wordpress/sync').ObjectType}
 				 */
 				objectType: `postType/${ postType.slug }`,
+
+				/**
+				 * Sync features supported by the entity.
+				 *
+				 * @type {Record< string, boolean >}
+				 */
+				supports: {},
 			},
 			supportsPagination: true,
 			getRevisionsUrl: ( parentId, revisionId ) =>
@@ -434,6 +441,7 @@ async function loadSiteEntity() {
 			getChangesFromCRDTDoc: defaultGetChangesFromCRDTDoc,
 			getObjectId: () => 'index',
 			objectType: 'root/site',
+			supports: {},
 		},
 		meta: {},
 	};
