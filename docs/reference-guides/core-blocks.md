@@ -15,7 +15,7 @@ Displays a group of accordion headings and associated expandable content. ([Sour
 -	**Name:** core/accordion
 -	**Category:** design
 -	**Allowed Blocks:** core/accordion-item
--	**Supports:** align (full, wide), anchor, ariaLabel, background (backgroundImage, backgroundSize), color (background, gradients, text), interactivity, layout, shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), anchor, ariaLabel, background (backgroundImage, backgroundSize), color (background, gradients, text), contentRole, interactivity, layout, shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** autoclose, headingLevel, iconPosition, levelOptions, showIcon
 
 ## Accordion Heading
@@ -36,7 +36,7 @@ Displays a section of content in an accordion, including a heading and expandabl
 -	**Category:** design
 -	**Parent:** core/accordion
 -	**Allowed Blocks:** core/accordion-heading, core/accordion-panel
--	**Supports:** color (background, gradients, text), interactivity, shadow, spacing (blockGap, margin), typography (fontSize, lineHeight)
+-	**Supports:** color (background, gradients, text), contentRole, interactivity, shadow, spacing (blockGap, margin), typography (fontSize, lineHeight)
 -	**Attributes:** openByDefault
 
 ## Accordion Panel
@@ -46,7 +46,7 @@ Displays an accordion panel. ([Source](https://github.com/WordPress/gutenberg/tr
 -	**Name:** core/accordion-panel
 -	**Category:** design
 -	**Parent:** core/accordion-item
--	**Supports:** color (background, gradients, text), interactivity, shadow, spacing (blockGap, padding), typography (fontSize, lineHeight), ~~blockVisibility~~
+-	**Supports:** color (background, gradients, text), contentRole, interactivity, shadow, spacing (blockGap, padding), typography (fontSize, lineHeight), ~~blockVisibility~~
 -	**Attributes:** allowedBlocks, isSelected, openByDefault, templateLock
 
 ## Archives
@@ -1000,7 +1000,6 @@ Contains the block elements used to render a taxonomy term, like the name, descr
 -	**Category:** theme
 -	**Ancestor:** core/terms-query
 -	**Supports:** align (full, wide), color (background, gradients, link, text), interactivity (clientNavigation), layout (allowEditing, allowSwitching, default), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:** namespace
 
 ## Terms Query
 
@@ -1011,7 +1010,7 @@ An advanced block that allows displaying taxonomy terms based on different query
 -	**Category:** theme
 -	**Allowed Blocks:** core/term-template
 -	**Supports:** align (full, wide), interactivity, ~~html~~
--	**Attributes:** namespace, tagName, termQuery, termQueryId
+-	**Attributes:** tagName, termQuery
 
 ## Text Columns (deprecated)
 
