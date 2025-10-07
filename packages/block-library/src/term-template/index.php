@@ -51,7 +51,7 @@ function render_block_core_term_template( $attributes, $content, $block ) {
 	) {
 		// Get the current term ID from the queried object.
 		$current_term_id = get_queried_object_id();
-		if ( $current_term_id && $current_term_id > 0 ) {
+		if ( $current_term_id > 0 ) {
 			$query_args['parent'] = $current_term_id;
 		}
 	} elseif ( empty( $query['hierarchical'] ) ) {
