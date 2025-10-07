@@ -69,12 +69,8 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_Test_REST_TestCase {
 					'comment_post_ID'  => $post_id,
 					'comment_type'     => 'block_comment',
 					'comment_approved' => $i % 2 === 0 ? 1 : 0,
-					// 'user_id'          => $user_id,
 				)
 			);
-
-			$comment = get_comment( $cid );
-			var_dump( $comment->user_id );
 		}
 
 		return $post_id;
@@ -182,7 +178,7 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_Test_REST_TestCase {
 		$request->set_param( 'type', 'block_comment' );
 		$request->set_param( 'status', 'all' );
 		$request->set_param( 'per_page', 100 );
-		$request->set_param( 'context', 'view' );
+		$request->set_param( 'context', 'edit' );
 		$response = rest_get_server()->dispatch( $request );
 
 		if ( $can_read ) {
@@ -199,11 +195,11 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_Test_REST_TestCase {
 	public function data_get_block_comment_permissions_data_provider() {
 		return array(
 			'Administrator can see block comments on other posts' => array( 'administrator', 'author', true ),
-			'Editor can see block comments on other posts'        => array( 'editor', 'contributor', true ),
-			'Author cannot see block comments on other posts'     => array( 'author', 'editor', false ),
+			'Editor can see block comments on other posts' => array( 'editor', 'contributor', true ),
+			'Author cannot see block comments on other posts' => array( 'author', 'editor', false ),
 			'Contributor cannot see block comments on other posts' => array( 'contributor', 'author', false ),
-			'Subscriber cannot see block comments'  => array( 'subscriber', 'contributor', false ),
-			'Author can see block comments on own post' => array( 'author', 'author', true ),
+			'Subscriber cannot see block comments'         => array( 'subscriber', 'contributor', false ),
+			'Author can see block comments on own post'    => array( 'author', 'author', true ),
 			// Reason: It only returns partial data for contributors, only unit tests, not sure why.
 			// 'Contributor can see block comments on own post' => array( 'contributor', 'contributor', true ),
 		);
