@@ -251,6 +251,23 @@ function gutenberg_resolve_block_template( $template_type, $template_hierarchy, 
 		$templates[] = $template;
 	}
 
+	// Apply the filter to the active templates for backward compatibility.
+	if ( ! empty( $templates ) ) {
+		$templates = apply_filters(
+			'get_block_templates',
+			$templates,
+			array(
+				'slug__in' => array_map(
+					function ( $template ) {
+						return $template->slug;
+					},
+					$templates
+				),
+			),
+			'wp_template'
+		);
+	}
+
 	// For any remaining slugs, use the static template.
 	$query     = array(
 		'slug__in' => $remaining_slugs,
