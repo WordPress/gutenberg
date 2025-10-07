@@ -71,8 +71,13 @@ export default function TermsQueryInspectorControls( {
 		typeof templateSlug === 'string' &&
 		templateSlug.includes( termQuery.taxonomy );
 
+	// Only display the inherit control if the taxonomy is hierarchical and matches the current template.
 	const displayInheritControl =
 		isTaxonomyHierarchical && isTaxonomyMatchingTemplate;
+
+	// Only display the hierarchical control if the taxonomy is hierarchical and not inheriting.
+	const displayHierarchicalControl =
+		isTaxonomyHierarchical && ! termQuery.inherit;
 
 	return (
 		<>
@@ -109,16 +114,16 @@ export default function TermsQueryInspectorControls( {
 						attributes={ attributes }
 						setQuery={ setQuery }
 					/>
-					{ isTaxonomyHierarchical && (
-						<HierarchyControl
-							attributes={ attributes }
-							setQuery={ setQuery }
-						/>
-					) }
 					{ displayInheritControl && (
 						<InheritControl
 							attributes={ attributes }
 							setAttributes={ setAttributes }
+						/>
+					) }
+					{ displayHierarchicalControl && (
+						<HierarchyControl
+							attributes={ attributes }
+							setQuery={ setQuery }
 						/>
 					) }
 					<MaxTermsControl

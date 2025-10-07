@@ -146,7 +146,6 @@ export default function TermTemplateEdit( {
 
 	const queryArgs = {
 		hide_empty: hideEmpty,
-		hierarchical,
 		order,
 		orderby: orderBy,
 		// To preview the data the closest to the frontend, we fetch the largest number of terms
@@ -155,8 +154,8 @@ export default function TermTemplateEdit( {
 		per_page: 100,
 	};
 
-	// Parent is only added if not 0, otherwise hierarchical is ignored.
-	if ( parent ) {
+	// Hierarchical is default from REST API as long as parent is not set.
+	if ( parent || ! hierarchical ) {
 		queryArgs.parent = parent;
 	}
 

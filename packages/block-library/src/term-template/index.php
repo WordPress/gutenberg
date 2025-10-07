@@ -30,17 +30,17 @@ function render_block_core_term_template( $attributes, $content, $block ) {
 	$query = $query_block_context['termQuery'];
 
 	$query_args = array(
-		'taxonomy'   => $query['taxonomy'] ?? 'category',
-		'number'     => $query['perPage'] ?? 10,
-		'order'      => $query['order'] ?? 'asc',
-		'orderby'    => $query['orderBy'] ?? 'name',
-		'hide_empty' => $query['hideEmpty'] ?? true,
-		'include'    => $query['include'] ?? array(),
-		'exclude'    => $query['exclude'] ?? array(),
+		'taxonomy'     => $query['taxonomy'] ?? 'category',
+		'number'       => $query['perPage'] ?? 10,
+		'order'        => $query['order'] ?? 'asc',
+		'orderby'      => $query['orderBy'] ?? 'name',
+		'hierarchical' => $query['hierarchical'] ?? false,
+		'hide_empty'   => $query['hideEmpty'] ?? true,
+		'include'      => $query['include'] ?? array(),
+		'exclude'      => $query['exclude'] ?? array(),
 	);
 
-	// We set parent to 0 unless inheriting from the taxonomy archive context.
-	$query_args['parent'] = 0;
+	// We set parent only when inheriting from the taxonomy archive context, otherwise hierarchical is ignored.
 	if (
 		isset( $query['inherit'] )
 		&& $query['inherit']
