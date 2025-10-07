@@ -3,17 +3,9 @@
  */
 import type {
 	ActionObject,
-	OmitFirstArg,
 	StoreState,
 	WPPreferencesPersistenceLayer,
 } from './types';
-
-type ToggleRetArgs = {
-	select: {
-		get: OmitFirstArg< ( typeof import('./selectors') )[ 'get' ] >;
-	};
-	dispatch: { set: typeof set };
-};
 
 /**
  * Returns an action object used in signalling that a preference should be
@@ -23,7 +15,8 @@ type ToggleRetArgs = {
  * @param {string} name  The preference name.
  */
 export function toggle( scope: string, name: string ) {
-	return function ( { select, dispatch }: ToggleRetArgs ) {
+	// @ts-expect-error We cannot properly type this until we have a fully-typed datastore
+	return function ( { select, dispatch } ) {
 		const currentValue = select.get( scope, name );
 		dispatch.set( scope, name, ! currentValue );
 	};
