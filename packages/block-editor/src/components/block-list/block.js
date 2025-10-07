@@ -567,6 +567,7 @@ function BlockListBlockProvider( props ) {
 				getBlockAttributes,
 				canRemoveBlock,
 				canMoveBlock,
+				isBlockCommentSelected,
 
 				getSettings,
 				getTemporarilyEditingAsBlocks,
@@ -710,6 +711,7 @@ function BlockListBlockProvider( props ) {
 					? blocksWithSameName[ 0 ]
 					: false,
 				isBlockHidden: _isBlockHidden( clientId ),
+				isBlockCommentSelected: isBlockCommentSelected( clientId ),
 			};
 		},
 		[ clientId, rootClientId ]
@@ -753,6 +755,7 @@ function BlockListBlockProvider( props ) {
 		defaultClassName,
 		originalBlockClientId,
 		isBlockHidden,
+		isBlockCommentSelected,
 	} = selectedProps;
 
 	// Users of the editor.BlockListBlock filter used to be able to
@@ -802,6 +805,7 @@ function BlockListBlockProvider( props ) {
 		themeSupportsLayout,
 		canMove,
 		isBlockHidden,
+		isBlockCommentSelected,
 	};
 
 	if (

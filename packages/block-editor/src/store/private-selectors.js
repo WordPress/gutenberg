@@ -705,3 +705,15 @@ export const isBlockHidden = ( state, clientId ) => {
 	const attributes = state.blocks.attributes.get( clientId );
 	return attributes?.metadata?.blockVisibility === false;
 };
+
+/**
+ * Returns the clientId of the block whose linked comment is selected, or null.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId The block to check.
+ *
+ * @return {boolean} Whether the block is linked to a comment and is selected.
+ */
+export function isBlockCommentSelected( state, clientId ) {
+	return state.commentSelectedBlock === clientId;
+}

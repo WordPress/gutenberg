@@ -118,6 +118,9 @@ function Thread( {
 } ) {
 	const { toggleBlockHighlight, selectBlock } =
 		useDispatch( blockEditorStore );
+	const { toggleBlockCommentSelected } = unlock(
+		useDispatch( blockEditorStore )
+	);
 	const relatedBlockElement = useBlockElement( thread.blockClientId );
 	const debouncedToggleBlockHighlight = useDebounce(
 		toggleBlockHighlight,
@@ -137,11 +140,13 @@ function Thread( {
 		setSelectedThread( thread.id );
 		// pass `null` as the second parameter to prevent focusing the block.
 		selectBlock( thread.blockClientId, null );
+		toggleBlockCommentSelected( thread.blockClientId, true );
 	};
 
 	const unselectThread = () => {
 		setSelectedThread( null );
 		setShowCommentBoard( false );
+		toggleBlockCommentSelected( thread.blockClientId, false );
 	};
 
 	const replies = thread?.reply;
