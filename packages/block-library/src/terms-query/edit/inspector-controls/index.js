@@ -30,7 +30,7 @@ export default function TermsQueryInspectorControls( {
 	clientId,
 } ) {
 	const { termQuery } = attributes;
-	const { taxonomy, orderBy, order } = termQuery;
+	const { taxonomy, orderBy, order, hideEmpty } = termQuery;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const { templateSlug } = useSelect( ( select ) => {
@@ -116,10 +116,19 @@ export default function TermsQueryInspectorControls( {
 							} }
 						/>
 					</ToolsPanelItem>
-					<EmptyTermsControl
-						attributes={ attributes }
-						setQuery={ setQuery }
-					/>
+					<ToolsPanelItem
+						hasValue={ () => hideEmpty !== true }
+						label={ __( 'Show empty terms' ) }
+						onDeselect={ () => setQuery( { hideEmpty: true } ) }
+						isShownByDefault
+					>
+						<EmptyTermsControl
+							hideEmpty={ hideEmpty }
+							onChange={ ( value ) =>
+								setQuery( { hideEmpty: value } )
+							}
+						/>
+					</ToolsPanelItem>
 					{ displayInheritControl && (
 						<InheritControl
 							attributes={ attributes }
