@@ -3,7 +3,7 @@
 /**
  * External dependencies
  */
-import { readFile, writeFile, mkdir } from 'fs/promises';
+import { readFile, writeFile } from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import esbuild from 'esbuild';
@@ -131,9 +131,6 @@ async function bundlePackage( packageName ) {
 	const packageDir = path.join( PACKAGES_DIR, packageName );
 	const entryPoint = path.join( packageDir, 'build-module', 'index.js' );
 	const outputDir = path.join( PACKAGES_DIR, '..', 'build', packageName );
-
-	await mkdir( outputDir, { recursive: true } );
-
 	const target = browserslistToEsbuild();
 	const globalName = `wp.${ kebabToCamelCase( packageName ) }`;
 
@@ -171,12 +168,6 @@ async function bundlePackage( packageName ) {
 async function transpilePackage( packageDir, srcFiles ) {
 	const buildDir = path.join( packageDir, 'build' );
 	const buildModuleDir = path.join( packageDir, 'build-module' );
-
-	await Promise.all( [
-		mkdir( buildDir, { recursive: true } ),
-		mkdir( buildModuleDir, { recursive: true } ),
-	] );
-
 	const target = browserslistToEsbuild();
 
 	await Promise.all( [
