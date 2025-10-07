@@ -7,7 +7,11 @@ import fastDeepEqual from 'fast-deep-equal/es6';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { getBlockBindingsSources, getBlockType } from '@wordpress/blocks';
+import {
+	getBlockBindingsSource,
+	getBlockBindingsSources,
+	getBlockType,
+} from '@wordpress/blocks';
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
@@ -206,8 +210,9 @@ function BlockBindingsPanelMenuContent( {
 	);
 }
 
-function BlockBindingsAttribute( { attribute, binding, source } ) {
+function BlockBindingsAttribute( { attribute, binding } ) {
 	const { source: sourceName, args } = binding || {};
+	const source = getBlockBindingsSource( sourceName );
 	const isSourceInvalid = ! source;
 	return (
 		<VStack className="block-editor-bindings__item" spacing={ 0 }>
@@ -231,14 +236,13 @@ function BlockBindingsAttribute( { attribute, binding, source } ) {
 	);
 }
 
-function ReadOnlyBlockBindingsPanelItem( { attribute, binding, source } ) {
+function ReadOnlyBlockBindingsPanelItem( { attribute, binding } ) {
 	return (
 		<ToolsPanelItem hasValue={ () => !! binding } label={ attribute }>
 			<Item>
 				<BlockBindingsAttribute
 					attribute={ attribute }
 					binding={ binding }
-					source={ source }
 				/>
 			</Item>
 		</ToolsPanelItem>
@@ -273,7 +277,6 @@ function EditableBlockBindingsPanelItem( {
 					<BlockBindingsAttribute
 						attribute={ attribute }
 						binding={ binding }
-						source={ sources?.[ binding?.source ] }
 					/>
 				</Menu.TriggerButton>
 				<Menu.Popover gutter={ isMobile ? 8 : 36 }>
@@ -477,7 +480,6 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 								key={ attribute }
 								attribute={ attribute }
 								binding={ binding }
-								source={ sources?.[ binding?.source ] }
 							/>
 						) : (
 							<EditableBlockBindingsPanelItem
