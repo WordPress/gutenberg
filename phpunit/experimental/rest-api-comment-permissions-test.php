@@ -167,9 +167,9 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_Test_REST_TestCase {
 	 * @param string $post_author_role The role of the post author.
 	 * @param bool $can_read The expected permission result.
 	 *
-	 * @dataProvider data_get_block_comment_permissions_data_provider
+	 * @dataProvider data_block_comment_get_items_permissions_data_provider
 	 */
-	public function test_get_block_comment_permissions_edit_context( $role, $post_author_role, $can_read ) {
+	public function test_block_comment_get_items_permissions_edit_context( $role, $post_author_role, $can_read ) {
 		wp_set_current_user( self::$user_ids[ $role ] );
 		$post_id = $this->create_test_post_with_block_comment( self::$user_ids[ $post_author_role ] );
 
@@ -192,7 +192,7 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_Test_REST_TestCase {
 		wp_delete_post( $post_id, true );
 	}
 
-	public function data_get_block_comment_permissions_data_provider() {
+	public function data_block_comment_get_items_permissions_data_provider() {
 		return array(
 			'Administrator can see block comments on other posts' => array( 'administrator', 'author', true ),
 			'Editor can see block comments on other posts' => array( 'editor', 'contributor', true ),
