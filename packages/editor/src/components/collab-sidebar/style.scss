@@ -143,6 +143,7 @@
 	overflow: hidden;
 	clip-path: inset(50%);
 	background: $white !important;
+
 	&:focus {
 		top: $grid-unit-10;
 		right: $grid-unit-10;

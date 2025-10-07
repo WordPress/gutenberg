@@ -269,14 +269,10 @@ export default function CollabSidebar() {
 				onClick={ () => {
 					openCollabBoard();
 					if ( commentSidebarRef?.current && currentThread ) {
-<<<<<<< HEAD
-						focusCommentThread( currentThread.id, commentSidebarRef.current );
-=======
 						focusCommentThread(
 							currentThread.id,
 							commentSidebarRef.current
 						);
->>>>>>> b62b21031e (Implement utils functionality)
 					}
 				} }
 				thread={ currentThread }
