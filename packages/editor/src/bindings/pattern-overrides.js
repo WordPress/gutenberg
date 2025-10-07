@@ -3,6 +3,11 @@
  */
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../store';
+
 const CONTENT = 'content';
 
 /**
@@ -96,6 +101,15 @@ export default {
 						{}
 					),
 				},
+			},
+		} );
+		// Trigger save detection by marking content as edited.
+		dispatch( editorStore ).editPost( {
+			content: ( { blocks: blocksForSerialization = [] } ) => {
+				const {
+					__unstableSerializeAndClean,
+				} = require( '@wordpress/blocks' );
+				return __unstableSerializeAndClean( blocksForSerialization );
 			},
 		} );
 	},
