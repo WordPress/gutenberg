@@ -149,12 +149,16 @@ export default function TermTemplateEdit( {
 		hierarchical,
 		order,
 		orderby: orderBy,
-		parent,
 		// To preview the data the closest to the frontend, we fetch the largest number of terms
 		// and limit them during rendering. This is because WP_Term_Query fetches data in hierarchical manner,
 		// while in editor we build the hierarchy manually. It also allows us to avoid re-fetching data when max terms changes.
 		per_page: 100,
 	};
+
+	// Parent is only added if not 0, otherwise hierarchical is ignored.
+	if ( parent ) {
+		queryArgs.parent = parent;
+	}
 
 	const { records: terms, isResolving } = useEntityRecords(
 		'taxonomy',
