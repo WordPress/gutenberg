@@ -30,7 +30,8 @@ export default function TermsQueryInspectorControls( {
 	clientId,
 } ) {
 	const { termQuery } = attributes;
-	const { taxonomy, orderBy, order, hideEmpty, inherit } = termQuery;
+	const { taxonomy, orderBy, order, hideEmpty, inherit, hierarchical } =
+		termQuery;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const { templateSlug } = useSelect( ( select ) => {
@@ -143,10 +144,21 @@ export default function TermsQueryInspectorControls( {
 						</ToolsPanelItem>
 					) }
 					{ displayHierarchicalControl && (
-						<HierarchyControl
-							attributes={ attributes }
-							setQuery={ setQuery }
-						/>
+						<ToolsPanelItem
+							hasValue={ () => hierarchical !== false }
+							label={ __( 'Include nested terms' ) }
+							onDeselect={ () =>
+								setQuery( { hierarchical: false } )
+							}
+							isShownByDefault
+						>
+							<HierarchyControl
+								hierarchical={ hierarchical }
+								onChange={ ( value ) =>
+									setQuery( { hierarchical: value } )
+								}
+							/>
+						</ToolsPanelItem>
 					) }
 					<MaxTermsControl
 						attributes={ attributes }
