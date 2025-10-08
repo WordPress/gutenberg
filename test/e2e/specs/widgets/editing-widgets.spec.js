@@ -215,7 +215,7 @@ test.describe( 'Widgets screen', () => {
 		await page.keyboard.type( 'Heading' );
 
 		await inlineQuickInserter
-			.getByRole( 'option', { name: 'Heading' } )
+			.getByRole( 'option', { name: 'Heading', exact: true } )
 			.click();
 
 		await expect(

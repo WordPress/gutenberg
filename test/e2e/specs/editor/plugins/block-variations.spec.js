@@ -174,7 +174,7 @@ test.describe( 'Block variations', () => {
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/Heading' );
-		await page.getByRole( 'option', { name: 'Heading' } ).click();
+		await page.getByRole( 'option', { name: 'Heading', exact: true } ).click();
 		await page.keyboard.type( '/Success Message' );
 		await page.getByRole( 'option', { name: 'Success Message' } ).click();
 
