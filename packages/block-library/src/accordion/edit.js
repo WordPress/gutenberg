@@ -127,7 +127,6 @@ export default function Edit( {
 							autoclose: false,
 							showIcon: true,
 							iconPosition: 'right',
-							headingLevel: 3,
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
