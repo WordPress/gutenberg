@@ -50,8 +50,9 @@ function InlineUI( { value, onChange, activeAttributes, contentRef } ) {
 			return;
 		}
 
-		const match = result.match( /<math[^>]*>(.*)<\/math>/s );
-		const newMathML = match ? match[ 1 ] : result;
+		const doc = document.implementation.createHTMLDocument( '' );
+		doc.body.innerHTML = result;
+		const mathML = doc.body.querySelector( 'math' ).innerHTML;
 
 		const newReplacements = value.replacements.slice();
 		newReplacements[ value.start ] = {
@@ -59,7 +60,7 @@ function InlineUI( { value, onChange, activeAttributes, contentRef } ) {
 			attributes: {
 				'data-latex': newLatex,
 			},
-			innerHTML: newMathML,
+			innerHTML: mathML,
 		};
 
 		onChange( {
