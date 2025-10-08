@@ -176,12 +176,9 @@ export default function NavigationLinkEdit( {
 		replaceBlock,
 		__unstableMarkNextChangeAsNotPersistent,
 		selectBlock,
-		selectPreviousBlock,
 	} = useDispatch( blockEditorStore );
 	// Have the link editing ui open on mount when lacking a url and selected.
 	const [ isLinkOpen, setIsLinkOpen ] = useState( isSelected && ! url );
-	// Store what element opened the popover, so we know where to return focus to (toolbar button vs navigation link text)
-	const [ openedBy, setOpenedBy ] = useState( null );
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
@@ -191,6 +188,7 @@ export default function NavigationLinkEdit( {
 	const ref = useRef();
 	const linkUIref = useRef();
 	const prevUrl = usePrevious( url );
+	const isNewLink = useRef( ! url );
 
 	const {
 		isAtMaxNesting,
@@ -198,6 +196,7 @@ export default function NavigationLinkEdit( {
 		isParentOfSelectedBlock,
 		hasChildren,
 		validateLinkStatus,
+		parentBlockClientId,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -209,8 +208,8 @@ export default function NavigationLinkEdit( {
 				getSelectedBlockClientId,
 			} = select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientId );
-			const isTopLevel =
-				getBlockName( rootClientId ) === 'core/navigation';
+			const parentBlockName = getBlockName( rootClientId );
+			const isTopLevel = parentBlockName === 'core/navigation';
 			const selectedBlockClientId = getSelectedBlockClientId();
 			const rootNavigationClientId = isTopLevel
 				? rootClientId
@@ -218,6 +217,12 @@ export default function NavigationLinkEdit( {
 						clientId,
 						'core/navigation'
 				  )[ 0 ];
+
+			// Get the immediate parent - if it's a submenu, use it; otherwise use the navigation block
+			const parentBlockId =
+				parentBlockName === 'core/navigation-submenu'
+					? rootClientId
+					: rootNavigationClientId;
 
 			// Enable when the root Navigation block is selected or any of its inner blocks.
 			const enableLinkStatusValidation =
@@ -235,6 +240,7 @@ export default function NavigationLinkEdit( {
 				),
 				hasChildren: !! getBlockCount( clientId ),
 				validateLinkStatus: enableLinkStatusValidation,
+				parentBlockClientId: parentBlockId,
 			};
 		},
 		[ clientId, maxNestingLevel ]
@@ -270,6 +276,17 @@ export default function NavigationLinkEdit( {
 		);
 		replaceBlock( clientId, newSubmenu );
 	}, [ getBlocks, clientId, selectBlock, replaceBlock, attributes ] );
+
+	// On mount, if this is a new link without a URL and it's selected,
+	// select the parent block (submenu or navigation) instead to keep the appender visible.
+	// This helps us return focus to the appender if the user closes the link ui without creating a link.
+	// If we leave focus on this block, then when we close the link without creating a link, focus will
+	// be lost during the new block selection process.
+	useEffect( () => {
+		if ( isNewLink.current && isSelected && ! url ) {
+			selectBlock( parentBlockClientId );
+		}
+	}, [] ); // eslint-disable-line react-hooks/exhaustive-deps
 
 	useEffect( () => {
 		// If block has inner blocks, transform to Submenu.
@@ -353,7 +370,6 @@ export default function NavigationLinkEdit( {
 			// If this link is a child of a parent submenu item, the parent submenu item event will also open, closing this popover
 			event.stopPropagation();
 			setIsLinkOpen( true );
-			setOpenedBy( ref.current );
 		}
 	}
 
@@ -392,7 +408,6 @@ export default function NavigationLinkEdit( {
 	if ( ! url || isInvalid || isDraft ) {
 		blockProps.onClick = () => {
 			setIsLinkOpen( true );
-			setOpenedBy( ref.current );
 		};
 	}
 
@@ -415,9 +430,8 @@ export default function NavigationLinkEdit( {
 						icon={ linkIcon }
 						title={ __( 'Link' ) }
 						shortcut={ displayShortcut.primary( 'k' ) }
-						onClick={ ( event ) => {
+						onClick={ () => {
 							setIsLinkOpen( true );
-							setOpenedBy( event.currentTarget );
 						} }
 					/>
 					{ ! isAtMaxNesting && (
@@ -516,38 +530,14 @@ export default function NavigationLinkEdit( {
 							clientId={ clientId }
 							link={ attributes }
 							onClose={ () => {
+								setIsLinkOpen( false );
 								// If there is no link then remove the auto-inserted block.
 								// This avoids empty blocks which can provided a poor UX.
 								if ( ! url ) {
-									// Fixes https://github.com/WordPress/gutenberg/issues/61361
-									// There's a chance we're closing due to the user selecting the browse all button.
-									// Only move focus if the focus is still within the popover ui. If it's not within
-									// the popover, it's because something has taken the focus from the popover, and
-									// we don't want to steal it back.
-									if (
-										linkUIref.current.contains(
-											window.document.activeElement
-										)
-									) {
-										// Select the previous block to keep focus nearby
-										selectPreviousBlock( clientId, true );
-									}
-
-									// Remove the link.
 									onReplace( [] );
-									return;
-								}
-
-								setIsLinkOpen( false );
-								if ( openedBy ) {
-									openedBy.focus();
-									setOpenedBy( null );
-								} else if ( ref.current ) {
-									// select the ref when adding a new link
-									ref.current.focus();
-								} else {
-									// Fallback
-									selectPreviousBlock( clientId, true );
+								} else if ( isNewLink.current ) {
+									// If we just created a new link, select it
+									selectBlock( clientId );
 								}
 							} }
 							anchor={ popoverAnchor }

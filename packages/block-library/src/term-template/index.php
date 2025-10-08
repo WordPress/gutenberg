@@ -27,8 +27,7 @@ function render_block_core_term_template( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$query         = $query_block_context['termQuery'];
-	$terms_to_show = $query_block_context['termsToShow'] ?? 'all';
+	$query = $query_block_context['termQuery'];
 
 	$query_args = array(
 		'taxonomy'   => $query['taxonomy'] ?? 'category',
@@ -38,18 +37,23 @@ function render_block_core_term_template( $attributes, $content, $block ) {
 		'hide_empty' => $query['hideEmpty'] ?? true,
 	);
 
-	// We set parent to 0 only if we show all terms as hierarchical or we show top-level terms.
-	if ( ( 'all' === $terms_to_show && ! empty( $query['hierarchical'] ) ) || 'top-level' === $terms_to_show ) {
+	// We set parent only when inheriting from the taxonomy archive context or not
+	// showing nested terms, otherwise nested terms are not displayed.
+	if (
+		isset( $query['inherit'] )
+		&& $query['inherit']
+		&& (
+			is_tax( $query_args['taxonomy'] )
+			// is_tax() does not detect built-in category or tag archives, only custom taxonomies.
+			|| ( 'category' === $query_args['taxonomy'] && is_category() )
+			|| ( 'post_tag' === $query_args['taxonomy'] && is_tag() )
+		)
+	) {
+		// Get the current term ID from the queried object.
+		$current_term_id      = get_queried_object_id();
+		$query_args['parent'] = $current_term_id;
+	} elseif ( empty( $query['hierarchical'] ) ) {
 		$query_args['parent'] = 0;
-	} elseif ( 'subterms' === $terms_to_show ) {
-		// Check if we're in a taxonomy archive context.
-		if ( is_tax( $query_args['taxonomy'] ) ) {
-			// Get the current term ID from the queried object.
-			$current_term_id = get_queried_object_id();
-			if ( $current_term_id && $current_term_id > 0 ) {
-				$query_args['parent'] = $current_term_id;
-			}
-		}
 	}
 
 	$terms_query = new WP_Term_Query( $query_args );
@@ -59,13 +63,39 @@ function render_block_core_term_template( $attributes, $content, $block ) {
 		return '';
 	}
 
-	// Handle hierarchical list.
-	$is_hierarchical = ! empty( $query['hierarchical'] );
+	$content = '';
+	foreach ( $terms as $term ) {
+		// Get an instance of the current Term Template block.
+		$block_instance = $block->parsed_block;
 
-	if ( $is_hierarchical ) {
-		$content = render_block_core_term_template_hierarchical( $terms, $block, $query_args );
-	} else {
-		$content = render_block_core_term_template_flat( $terms, $block );
+		// Set the block name to one that does not correspond to an existing registered block.
+		// This ensures that for the inner instances of the Term Template block, we do not render any block supports.
+		$block_instance['blockName'] = 'core/null';
+
+		$term_id  = $term->term_id;
+		$taxonomy = $term->taxonomy;
+
+		$filter_block_context = static function ( $context ) use ( $term_id, $taxonomy ) {
+			$context['termId']   = $term_id;
+			$context['taxonomy'] = $taxonomy;
+			return $context;
+		};
+
+		$block_content = '';
+
+		// Use an early priority to so that other 'render_block_context' filters have access to the values.
+		add_filter( 'render_block_context', $filter_block_context, 1 );
+
+		// Render the inner blocks of the Term Template block with `dynamic` set to `false` to prevent calling
+		// `render_callback` and ensure that no wrapper markup is included.
+		$block_content .= ( new WP_Block( $block_instance ) )->render( array( 'dynamic' => false ) );
+
+		remove_filter( 'render_block_context', $filter_block_context, 1 );
+
+		// Wrap the render inner blocks in a `li` element with the appropriate term classes.
+		$term_classes = implode( ' ', array( 'wp-block-term', "term-{$term->term_id}", $term->taxonomy, "taxonomy-{$term->taxonomy}" ) );
+
+		$content .= '<li class="' . esc_attr( $term_classes ) . '">' . $block_content . '</li>';
 	}
 
 	$classnames = 'wp-block-term-template';
@@ -76,140 +106,11 @@ function render_block_core_term_template( $attributes, $content, $block ) {
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => trim( $classnames ) ) );
 
-	// Default list layout.
 	return sprintf(
 		'<ul %s>%s</ul>',
 		$wrapper_attributes,
 		$content
 	);
-}
-
-/**
- * Renders terms in a flat list structure.
- *
- * @since 6.9.0
- *
- * @param array    $terms Array of WP_Term objects.
- * @param WP_Block $block Block instance.
- *
- * @return string HTML content for flat terms list.
- */
-function render_block_core_term_template_flat( $terms, $block ) {
-	$content = '';
-	foreach ( $terms as $term ) {
-		$content .= render_block_core_term_template_single( $term, $block );
-	}
-	return $content;
-}
-
-/**
- * Renders terms in a hierarchical structure.
- *
- * @since 6.9.0
- *
- * @param array    $terms Array of WP_Term objects.
- * @param WP_Block $block Block instance.
- * @param array    $base_query_args Base query arguments.
- *
- * @return string HTML content for hierarchical terms list.
- */
-function render_block_core_term_template_hierarchical( $terms, $block, $base_query_args ) {
-	$content = '';
-
-	foreach ( $terms as $term ) {
-		$term_content     = render_block_core_term_template_single( $term, $block );
-		$children_content = render_block_core_term_template_get_children( $term->term_id, $block, $base_query_args );
-
-		if ( ! empty( $children_content ) ) {
-			$term_content = str_replace( '</li>', '<ul>' . $children_content . '</ul></li>', $term_content );
-		}
-
-		$content .= $term_content;
-	}
-
-	return $content;
-}
-
-/**
- * Gets and renders children of a specific term.
- *
- * @since 6.9.0
- *
- * @param int      $parent_term_id Parent term ID.
- * @param WP_Block $block          Block instance.
- * @param array    $base_query_args Base query arguments.
- *
- * @return string HTML content for children terms.
- */
-function render_block_core_term_template_get_children( $parent_term_id, $block, $base_query_args ) {
-	$child_query_args           = $base_query_args;
-	$child_query_args['parent'] = $parent_term_id;
-
-	$child_terms_query = new WP_Term_Query( $child_query_args );
-	$child_terms       = $child_terms_query->get_terms();
-
-	if ( ! $child_terms || is_wp_error( $child_terms ) ) {
-		return '';
-	}
-
-	$content = '';
-
-	foreach ( $child_terms as $child_term ) {
-		$term_content     = render_block_core_term_template_single( $child_term, $block );
-		$children_content = render_block_core_term_template_get_children( $child_term->term_id, $block, $base_query_args );
-
-		if ( ! empty( $children_content ) ) {
-			$term_content = str_replace( '</li>', '<ul>' . $children_content . '</ul></li>', $term_content );
-		}
-
-		$content .= $term_content;
-	}
-
-	return $content;
-}
-
-/**
- * Renders a single term with its inner blocks.
- *
- * @since 6.9.0
- *
- * @param WP_Term  $term  Term object.
- * @param WP_Block $block Block instance.
- *
- * @return string HTML content for a single term.
- */
-function render_block_core_term_template_single( $term, $block ) {
-	$inner_blocks  = $block->inner_blocks;
-	$block_content = '';
-
-	if ( ! empty( $inner_blocks ) ) {
-		$term_id  = $term->term_id;
-		$taxonomy = $term->taxonomy;
-
-		$filter_block_context = static function ( $context ) use ( $term_id, $taxonomy ) {
-			$context['termId']   = $term_id;
-			$context['taxonomy'] = $taxonomy;
-			return $context;
-		};
-
-		add_filter( 'render_block_context', $filter_block_context, 1 );
-
-		foreach ( $inner_blocks as $inner_block ) {
-			if ( method_exists( $inner_block, 'refresh_context_dependents' ) ) {
-				// WP_Block::refresh_context_dependents() was introduced in WordPress 6.8.
-				$inner_block->refresh_context_dependents();
-				$block_content .= $inner_block->render( array( 'dynamic' => true ) );
-			} else {
-				$block_content = ( new WP_Block( $inner_block->parsed_block ) )->render( array( 'dynamic' => false ) );
-			}
-		}
-		remove_filter( 'render_block_context', $filter_block_context, 1 );
-	}
-
-	$term_classes = implode( ' ', array( 'wp-block-term', 'term-' . $term->term_id ) );
-
-	// Default list layout
-	return '<li class="' . esc_attr( $term_classes ) . '">' . $block_content . '</li>';
 }
 
 /**

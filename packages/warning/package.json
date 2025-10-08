@@ -24,8 +24,18 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.js",
+			"require": "./build/index.js"
+		},
+		"./package.json": "./package.json",
+		"./babel-plugin": "./babel-plugin.js"
+	},
 	"react-native": "src/index",
 	"wpScript": true,
+	"wpScriptDefaultExport": true,
 	"types": "build-types",
 	"sideEffects": false,
 	"publishConfig": {

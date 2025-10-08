@@ -102,6 +102,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		isSectionBlock,
 		canMove,
 		isBlockHidden,
+		hasBlockSpotlight,
 	} = useContext( PrivateBlockContext );
 
 	// translators: %s: Type of block (i.e. Text, Image etc)
@@ -185,6 +186,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				'is-content-locked-temporarily-editing-as-blocks':
 					isTemporarilyEditingAsBlocks,
 				'is-block-hidden': isBlockHidden,
+				'is-spotlighted': hasBlockSpotlight,
 			},
 			className,
 			props.className,

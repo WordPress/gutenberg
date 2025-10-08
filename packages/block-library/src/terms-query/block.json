@@ -18,13 +18,9 @@
 				"orderBy": "name",
 				"hideEmpty": true,
 				"parent": false,
-				"hierarchical": false
+				"hierarchical": false,
+				"inherit": false
 			}
-		},
-		"termsToShow": {
-			"type": "string",
-			"default": "all",
-			"enum": [ "all", "top-level", "subterms" ]
 		},
 		"tagName": {
 			"type": "string",
@@ -32,8 +28,7 @@
 		}
 	},
 	"providesContext": {
-		"termQuery": "termQuery",
-		"termsToShow": "termsToShow"
+		"termQuery": "termQuery"
 	},
 	"supports": {
 		"align": [ "wide", "full" ],

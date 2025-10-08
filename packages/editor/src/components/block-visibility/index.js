@@ -5,6 +5,8 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 import { useMemo } from '@wordpress/element';
+import { Button } from '@wordpress/components';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
@@ -67,6 +69,13 @@ export default function BlockVisibility() {
 		( blockType ) => ! hiddenBlockTypes.includes( blockType.name )
 	);
 
+	const numberOfHiddenBlocks =
+		filteredBlockTypes.length - selectedBlockTypes.length;
+
+	function enableAllBlockTypes() {
+		onChangeSelectedBlockTypes( filteredBlockTypes );
+	}
+
 	const onChangeSelectedBlockTypes = ( newSelectedBlockTypes ) => {
 		if ( selectedBlockTypes.length > newSelectedBlockTypes.length ) {
 			const blockTypesToHide = selectedBlockTypes.filter(
@@ -88,10 +97,33 @@ export default function BlockVisibility() {
 	};
 
 	return (
-		<BlockManager
-			blockTypes={ filteredBlockTypes }
-			selectedBlockTypes={ selectedBlockTypes }
-			onChange={ onChangeSelectedBlockTypes }
-		/>
+		<div className="editor-block-visibility">
+			{ !! numberOfHiddenBlocks && (
+				<div className="editor-block-visibility__disabled-blocks-count">
+					{ sprintf(
+						/* translators: %d: number of blocks. */
+						_n(
+							'%d block is hidden.',
+							'%d blocks are hidden.',
+							numberOfHiddenBlocks
+						),
+						numberOfHiddenBlocks
+					) }
+					<Button
+						__next40pxDefaultSize
+						variant="link"
+						onClick={ enableAllBlockTypes }
+					>
+						{ __( 'Reset' ) }
+					</Button>
+				</div>
+			) }
+			<BlockManager
+				blockTypes={ filteredBlockTypes }
+				selectedBlockTypes={ selectedBlockTypes }
+				onChange={ onChangeSelectedBlockTypes }
+				showSelectAll={ false }
+			/>
+		</div>
 	);
 }

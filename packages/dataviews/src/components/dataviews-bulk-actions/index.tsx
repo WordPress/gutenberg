@@ -171,7 +171,6 @@ function ActionTrigger< Item >( {
 			accessibleWhenDisabled
 			label={ label }
 			icon={ action.icon }
-			isDestructive={ action.isDestructive }
 			size="compact"
 			onClick={ onClick }
 			isBusy={ isBusy }

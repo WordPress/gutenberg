@@ -253,6 +253,11 @@
 					"type": "boolean",
 					"default": true
 				},
+				"allowedBlocks": {
+					"description": "This property adds UI controls which enable the user to select allowed child blocks for a block container. Note: To use this feature, pass `attributes.allowedBlocks` as the `allowedBlocks` property in the options object of `useInnerBlocksProps`.",
+					"type": "boolean",
+					"default": false
+				},
 				"ariaLabel": {
 					"description": "ARIA-labels let you define an accessible label for elements. This property allows enabling the definition of an aria-label for the block, without exposing a UI field.",
 					"type": "boolean",
