@@ -300,7 +300,18 @@ export function applySelection( { startPath, endPath }, current ) {
 		//
 		// See: https://github.com/Microsoft/TypeScript/issues/5901#issuecomment-431649653
 		if ( activeElement instanceof defaultView.HTMLElement ) {
-			activeElement.focus();
+			// Don't restore focus to BODY or HTML elements, as this can cause
+			// unwanted focus changes. In Firefox, focusing BODY inside an iframe
+			// can cause the parent document to focus the iframe itself.
+			// Only restore focus to meaningful focusable elements.
+			const tagName = activeElement.tagName;
+			const isContentEditable = activeElement.isContentEditable;
+			const isMeaningfulElement =
+				tagName !== 'BODY' && tagName !== 'HTML' && tagName !== 'DIV';
+
+			if ( isContentEditable || isMeaningfulElement ) {
+				activeElement.focus();
+			}
 		}
 	}
 }
