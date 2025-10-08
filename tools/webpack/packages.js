@@ -24,6 +24,7 @@ const packageDirs = readdirSync(
 	}
 ).flatMap( ( dirent ) => ( dirent.isDirectory() ? [ dirent.name ] : [] ) );
 const { baseConfig, plugins, stylesTransform } = require( './shared' );
+const { V2_PACKAGES } = require( '../../bin/packages/v2-packages' );
 
 const WORDPRESS_NAMESPACE = '@wordpress/';
 
@@ -95,6 +96,11 @@ const bundledPackagesPhpConfig = [
 /** @type {Array<string>} */
 const gutenbergScripts = [];
 for ( const packageDir of packageDirs ) {
+	// Skip v2 packages - they're built with bin/packages/build-v2.js
+	if ( V2_PACKAGES.includes( packageDir ) ) {
+		continue;
+	}
+
 	const packageJson = require(
 		`${ WORDPRESS_NAMESPACE }${ packageDir }/package.json`
 	);

@@ -14,15 +14,9 @@ const postcss = require( 'postcss' );
  */
 const getBabelConfig = require( './get-babel-config' );
 const iconsBuildUtils = require( '../../packages/icons/lib/build-worker-utils' );
+const { V2_PACKAGES } = require( './v2-packages' );
 
 const isDev = process.env.NODE_ENV === 'development';
-
-/**
- * List of packages that use the v2 build pipeline.
- *
- * @type {string[]}
- */
-const V2BUILD_PACKAGES = [ 'hooks' ];
 
 /**
  * Path to packages directory.
@@ -210,25 +204,13 @@ const BUILD_TASK_BY_EXTENSION = {
 };
 
 module.exports = async ( file, callback ) => {
-	const extension = path.extname( file );
 	const packageName = getPackageName( file );
-
-	// Use esbuild for packages in the v2 pipeline
-	if (
-		V2BUILD_PACKAGES.includes( packageName ) &&
-		[ '.js', '.ts', '.tsx' ].includes( extension )
-	) {
-		try {
-			const buildWithEsbuild = require( './build-worker-esbuild' );
-			await buildWithEsbuild( file );
-			callback();
-			return;
-		} catch ( error ) {
-			callback( error );
-			return;
-		}
+	// Skip v2 packages - they're built by bin/packages/build-v2.js
+	if ( V2_PACKAGES.includes( packageName ) ) {
+		callback();
+		return;
 	}
-
+	const extension = path.extname( file );
 	const task = BUILD_TASK_BY_EXTENSION[ extension ];
 
 	if ( ! task ) {
