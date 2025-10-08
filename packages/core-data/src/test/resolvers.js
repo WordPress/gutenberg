@@ -174,6 +174,62 @@ describe( 'getEntityRecord', () => {
 		);
 	} );
 
+	it( 'provides transient properties when read/write config is supplied', async () => {
+		const POST_RECORD = { id: 1, title: 'Test Post' };
+		const POST_RESPONSE = {
+			json: () => Promise.resolve( POST_RECORD ),
+		};
+		const ENTITIES_WITH_SYNC = [
+			{
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				baseURLParams: { context: 'edit' },
+				syncConfig: {},
+				transientEdits: {
+					foo: {
+						read: () => 'bar',
+					},
+				},
+			},
+		];
+
+		window.__experimentalEnableSync = true;
+
+		const mockBootstrap = jest.fn();
+		getSyncProvider.mockReturnValue( {
+			bootstrap: mockBootstrap,
+			register: jest.fn(),
+		} );
+
+		const resolveSelectWithSync = {
+			getEntitiesConfig: jest.fn( () => ENTITIES_WITH_SYNC ),
+			getEditedEntityRecord: jest.fn(),
+		};
+
+		triggerFetch.mockImplementation( () => POST_RESPONSE );
+
+		await getEntityRecord(
+			'postType',
+			'post',
+			1
+		)( {
+			dispatch,
+			registry,
+			resolveSelect: resolveSelectWithSync,
+		} );
+
+		// Verify bootstrap was called with correct arguments.
+		expect( getSyncProvider ).toHaveBeenCalled();
+		expect( mockBootstrap ).toHaveBeenCalledTimes( 1 );
+		expect( mockBootstrap ).toHaveBeenCalledWith(
+			'postType/post',
+			1,
+			{ ...POST_RECORD, foo: 'bar' },
+			expect.any( Function )
+		);
+	} );
+
 	it( 'does not bootstrap entity when query is present', async () => {
 		const POST_RECORD = { id: 1, title: 'Test Post' };
 		const POST_RESPONSE = {
