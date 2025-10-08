@@ -67,6 +67,50 @@ function wordpressExternalsPlugin() {
 		setup( build ) {
 			const dependencies = new Set();
 
+			// Map of vendor packages to their global variables and handles
+			const vendorExternals = {
+				react: { global: 'React', handle: 'react' },
+				'react-dom': { global: 'ReactDOM', handle: 'react-dom' },
+				'react/jsx-runtime': {
+					global: 'ReactJSXRuntime',
+					handle: 'react-jsx-runtime',
+				},
+				'react/jsx-dev-runtime': {
+					global: 'ReactJSXRuntime',
+					handle: 'react-jsx-runtime',
+				},
+				moment: { global: 'moment', handle: 'moment' },
+				lodash: { global: 'lodash', handle: 'lodash' },
+				'lodash-es': { global: 'lodash', handle: 'lodash' },
+				jquery: { global: 'jQuery', handle: 'jquery' },
+			};
+
+			// Handle vendor packages
+			for ( const [ packageName, config ] of Object.entries(
+				vendorExternals
+			) ) {
+				build.onResolve(
+					{
+						filter: new RegExp(
+							`^${ packageName.replace(
+								/[.*+?^${}()|[\]\\]/g,
+								'\\$&'
+							) }$`
+						),
+					},
+					( args ) => {
+						// Track dependency for asset file
+						dependencies.add( config.handle );
+
+						return {
+							path: args.path,
+							namespace: 'vendor-external',
+							pluginData: { global: config.global },
+						};
+					}
+				);
+			}
+
 			// Handle all @wordpress/* packages
 			build.onResolve( { filter: /^@wordpress\// }, ( args ) => {
 				// Track dependency for asset file
@@ -78,6 +122,18 @@ function wordpressExternalsPlugin() {
 					namespace: 'wordpress-external',
 				};
 			} );
+
+			build.onLoad(
+				{ filter: /.*/, namespace: 'vendor-external' },
+				( args ) => {
+					const global = args.pluginData.global;
+
+					return {
+						contents: `module.exports = window.${ global };`,
+						loader: 'js',
+					};
+				}
+			);
 
 			build.onLoad(
 				{ filter: /.*/, namespace: 'wordpress-external' },
