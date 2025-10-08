@@ -26,7 +26,7 @@ const blocksTransientEdits = {
 	blocks: {
 		read: ( record ) => parse( record.content?.raw ?? '' ),
 		write: ( record ) => ( {
-			content: __unstableSerializeAndClean( record.content ),
+			content: __unstableSerializeAndClean( record.blocks ),
 		} ),
 	},
 };
