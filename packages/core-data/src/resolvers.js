@@ -164,6 +164,26 @@ export const getEntityRecord =
 					const objectType = `${ kind }/${ name }`;
 					const objectId = key;
 
+					// Use the new transient "read/write" config to compute transients for
+					// the sync provider. Otherwise these transients are not available
+					// if / until the record is edited. Use a copy of the record so that
+					// it does not change the behavior outside this experimental flag.
+					const recordWithTransients = { ...record };
+					Object.entries( entityConfig.transientEdits ?? {} )
+						.filter(
+							( [ propName, transientConfig ] ) =>
+								undefined ===
+									recordWithTransients[ propName ] &&
+								transientConfig &&
+								'object' === typeof transientConfig &&
+								'read' in transientConfig &&
+								'function' === typeof transientConfig.read
+						)
+						.forEach( ( [ propName, transientConfig ] ) => {
+							recordWithTransients[ propName ] =
+								transientConfig.read( recordWithTransients );
+						} );
+
 					getSyncProvider().register(
 						objectType,
 						entityConfig.syncConfig
@@ -173,7 +193,7 @@ export const getEntityRecord =
 					await getSyncProvider().bootstrap(
 						objectType,
 						objectId,
-						record,
+						recordWithTransients,
 						( edits ) => {
 							dispatch( {
 								type: 'EDIT_ENTITY_RECORD',

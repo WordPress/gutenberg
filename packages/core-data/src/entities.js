@@ -7,6 +7,7 @@ import { capitalCase, pascalCase } from 'change-case';
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
+import { __unstableSerializeAndClean, parse } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { RichTextData } from '@wordpress/rich-text';
 
@@ -20,6 +21,15 @@ import {
 
 export const DEFAULT_ENTITY_KEY = 'id';
 const POST_RAW_ATTRIBUTES = [ 'title', 'excerpt', 'content' ];
+
+const blocksTransientEdits = {
+	blocks: {
+		read: ( record ) => parse( record.content?.raw ?? '' ),
+		write: ( record ) => ( {
+			content: __unstableSerializeAndClean( record.content ),
+		} ),
+	},
+};
 
 export const rootEntitiesConfig = [
 	{
@@ -291,7 +301,7 @@ async function loadPostTypeEntities() {
 			name,
 			label: postType.name,
 			transientEdits: {
-				blocks: true,
+				...blocksTransientEdits,
 				selection: true,
 			},
 			mergedEdits: { meta: true },
