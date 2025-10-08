@@ -207,6 +207,12 @@ async function bundlePackage( packageName ) {
 			target,
 			platform: 'browser',
 			globalName,
+			alias: {
+				'moment-timezone/moment-timezone':
+					'moment-timezone/builds/moment-timezone-with-data-1970-2030',
+				'moment-timezone/moment-timezone-utils':
+					'moment-timezone/builds/moment-timezone-with-data-1970-2030',
+			},
 		};
 
 		// For packages with default exports, add a footer to properly expose the default
