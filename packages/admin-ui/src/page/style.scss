@@ -1,6 +1,8 @@
 .admin-ui-page {
 	display: flex;
 	height: 100%;
+	background: $white;
+	color: $gray-800;
 	position: relative;
 	z-index: 1;
 	flex-flow: column;
