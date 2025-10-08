@@ -215,7 +215,7 @@ HTML;
 		$content = <<<HTML
 		<!-- wp:query {"queryId":0,"query":{"inherit":true},"enhancedPagination":true} -->
 		<div class="wp-block-query">
-			<!-- wp:post-content {"align":"wide"} --><!-- /wp:post-content -->
+			<!-- wp:test/plugin-block /-->
 		</div>
 		<!-- /wp:query -->
 HTML;
