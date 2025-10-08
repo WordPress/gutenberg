@@ -6,7 +6,6 @@ import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
-import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -16,11 +15,6 @@ import { store as blockEditorStore } from '../../store';
 
 export default function BlockAllowedBlocksControl( { clientId } ) {
 	const [ isBlockControlOpened, setIsBlockControlOpened ] = useState( false );
-	const instanceId = useInstanceId(
-		BlockAllowedBlocksControl,
-		'allowed-blocks-control'
-	);
-
 	const { blockTypes, selectedBlockNames } = useSelect(
 		( select ) => {
 			const { getBlockAttributes } = select( blockEditorStore );
@@ -54,13 +48,14 @@ export default function BlockAllowedBlocksControl( { clientId } ) {
 	return (
 		<div className="block-editor-block-allowed-blocks-control">
 			<BaseControl
-				id={ instanceId }
-				label={ __( 'Allowed Blocks' ) }
 				help={ __(
 					'Specify which blocks are allowed inside this container.'
 				) }
 				__nextHasNoMarginBottom
 			>
+				<BaseControl.VisualLabel>
+					{ __( 'Allowed Blocks' ) }
+				</BaseControl.VisualLabel>
 				<Button
 					__next40pxDefaultSize
 					variant="secondary"
