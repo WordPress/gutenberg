@@ -21,17 +21,10 @@ import temml from 'temml';
 const name = 'core/math';
 const title = __( 'Math' );
 
-function InlineUI( { value, onChange, contentRef } ) {
-	const format = value.replacements[ value.start ];
-	const [ latex, setLatex ] = useState( () => {
-		if ( ! format?.innerHTML ) {
-			return '';
-		}
-		const match = format.innerHTML.match(
-			/<annotation[^>]*encoding="application\/x-tex"[^>]*>(.*?)<\/annotation>/s
-		);
-		return match ? match[ 1 ] : '';
-	} );
+function InlineUI( { value, onChange, activeAttributes, contentRef } ) {
+	const [ latex, setLatex ] = useState(
+		activeAttributes?.[ 'data-latex' ] || ''
+	);
 	const [ error, setError ] = useState( null );
 
 	const popoverAnchor = useAnchor( {
@@ -63,6 +56,9 @@ function InlineUI( { value, onChange, contentRef } ) {
 		const newReplacements = value.replacements.slice();
 		newReplacements[ value.start ] = {
 			type: name,
+			attributes: {
+				'data-latex': newLatex,
+			},
 			innerHTML: newMathML,
 		};
 
@@ -118,6 +114,9 @@ function Edit( {
 				onClick={ () => {
 					const newValue = insertObject( value, {
 						type: name,
+						attributes: {
+							'data-latex': '',
+						},
 						innerHTML: '',
 					} );
 					newValue.start = newValue.end - 1;
@@ -143,6 +142,9 @@ export const math = {
 	title,
 	tagName: 'math',
 	className: null,
+	attributes: {
+		'data-latex': 'data-latex',
+	},
 	contentEditable: false,
 	edit: Edit,
 };
