@@ -2,7 +2,12 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import {
+	BlockBindingsDropdown,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { store as coreDataStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Gets a list of post data fields with their values and labels
@@ -59,6 +64,45 @@ function getPostDataFields( select, context ) {
 	}
 
 	return dataFields;
+}
+
+function EditorUI( { attribute, binding, source, sourceKey, context } ) {
+	// FIXME: Pass blockName as prop instead?
+	// FIXME: Compute context here? Might be needed to avoid the `useSelect` warning.
+	const { data, selectedBlock } = useSelect(
+		( select ) => {
+			return {
+				selectedBlock: select( blockEditorStore ).getSelectedBlock(),
+				data: getPostDataFields( select, context ), // FIXME: Inline code; otherwise, we'll continue to face the `useSelect` warning.
+			};
+		},
+		[ context ]
+	);
+
+	if ( selectedBlock?.name !== 'core/post-date' ) {
+		return null;
+	}
+
+	const dataArray = Object.entries( data || {} ).map(
+		( [ key, field ] ) => ( {
+			label: field.label,
+			args: {
+				key,
+			},
+			value: field.value, // Or compute via getValues()?
+			type: field.type,
+		} )
+	);
+
+	return (
+		<BlockBindingsDropdown
+			attribute={ attribute }
+			binding={ binding }
+			data={ dataArray }
+			source={ source }
+			sourceKey={ sourceKey }
+		/>
+	);
 }
 
 /**
@@ -126,26 +170,5 @@ export default {
 		// Deprecated, will be removed after 6.9.
 		return getPostDataFields( select, context );
 	},
-	editorUI( { select, context } ) {
-		const selectedBlock = select( 'core/block-editor' ).getSelectedBlock();
-		if ( selectedBlock?.name !== 'core/post-date' ) {
-			return {};
-		}
-		const postDataFields = Object.entries(
-			getPostDataFields( select, context ) || {}
-		).map( ( [ key, field ] ) => ( {
-			label: field.label,
-			args: {
-				key,
-			},
-			type: field.type,
-		} ) );
-		/*
-		 * We need to define the data as [{ label: string, value: any, type: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#type-validation }]
-		 */
-		return {
-			mode: 'dropdown',
-			data: postDataFields,
-		};
-	},
+	editorUI: EditorUI,
 };

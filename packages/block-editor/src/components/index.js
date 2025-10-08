@@ -13,6 +13,7 @@ export {
 } from './block-alignment-control';
 export { default as __experimentalBlockFullHeightAligmentControl } from './block-full-height-alignment-control';
 export { default as __experimentalBlockAlignmentMatrixControl } from './block-alignment-matrix-control';
+export { BlockBindingsDropdown } from './block-bindings';
 export { default as BlockBreadcrumb } from './block-breadcrumb';
 export { default as __experimentalUseBlockOverlayActive } from './block-content-overlay';
 export { BlockContextProvider } from './block-context';

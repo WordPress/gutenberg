@@ -100,6 +100,10 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-alignment-control/README.md>
 
+### BlockBindingsDropdown
+
+Undocumented declaration.
+
 ### BlockBreadcrumb
 
 Block breadcrumb component, displaying the hierarchy of the current block selection as a breadcrumb.
