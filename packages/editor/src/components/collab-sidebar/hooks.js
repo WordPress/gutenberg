@@ -176,6 +176,8 @@ export function useBlockCommentsActions() {
 					isDismissible: true,
 				}
 			);
+
+			return savedRecord;
 		} catch ( error ) {
 			onError( error );
 		}
