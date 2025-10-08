@@ -336,73 +336,61 @@ test.describe( 'Navigation block', () => {
 		test( 'Focus management when using the navigation link appender', async ( {
 			pageUtils,
 			navigation,
-		} ) => {
-			const navBlock = navigation.getNavBlock();
-
-			/**
-			 * Test: We don't lose focus when using the navigation link appender
-			 */
-			await pageUtils.pressKeys( 'ArrowDown' );
-			await navigation.useBlockInserter();
-			await navigation.addLinkClose();
-
-			/**
-			 * TODO: This is not desired behavior. Ideally the
-			 * Appender should be focused again since it opened
-			 * the link control.
-			 * IMPORTANT: This check is not to enforce this behavior,
-			 * but to make sure focus is kept nearby until we are able
-			 * to send focus to the appender.
-			 */
-			await expect( navBlock ).toBeFocused();
-		} );
-
-		// eslint-disable-next-line playwright/expect-expect
-		test( 'Focus management when creating navigation links', async ( {
 			page,
-			pageUtils,
-			navigation,
 		} ) => {
-			/**
-			 * Test: Creating a link sends focus to the newly created navigation link item
-			 */
-			await pageUtils.pressKeys( 'ArrowDown' );
-			await navigation.useBlockInserter();
-			await navigation.addPage( 'Cat' );
+			const navBlockInserter = navigation.getNavBlockInserter();
 
-			/**
-			 * Test: We can open and close the preview with the keyboard and escape
-			 *       buttons from a top-level nav item using both the shortcut and toolbar
-			 */
-			await navigation.useLinkShortcut();
-			await navigation.previewIsOpenAndCloses();
-			await navigation.checkLabelFocus( 'Cat' );
+			await test.step( 'with no links, focus returns to the top level navigation link appender if we close the Link UI without creating a link', async () => {
+				await pageUtils.pressKeys( 'ArrowDown' );
+				await navigation.useBlockInserter();
+				await navigation.addLinkClose();
 
-			await navigation.canUseToolbarLink();
+				await expect( navBlockInserter ).toBeVisible();
+				await expect( navBlockInserter ).toBeFocused();
+			} );
 
-			/**
-			 * Test: Creating a link from a url-string (https://www.example.com) returns
-			 *       focus to the newly created link with the text selected
-			 */
-			await page.keyboard.press( 'Escape' );
+			await test.step( 'creating a link sends focus to the newly created navigation link item', async () => {
+				await pageUtils.pressKeys( 'ArrowDown' );
+				await navigation.useBlockInserter();
+				await navigation.addPage( 'Cat' );
+			} );
+
+			await test.step( 'can use the shortcut to open the preview with the keyboard and escape keypress sends focus back to the navigation link block', async () => {
+				await navigation.useLinkShortcut();
+				await navigation.previewIsOpenAndCloses();
+				await navigation.checkLabelFocus( 'Cat' );
+			} );
+
+			await test.step( 'can use the toolbar link to open the preview and escape keypress sends focus back to the toolbar link button', async () => {
+				await navigation.canUseToolbarLink();
+
+				await page.keyboard.press( 'Escape' );
+			} );
+
 			await pageUtils.pressKeys( 'ArrowDown' );
 			await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
 
-			await navigation.useBlockInserter();
-			await navigation.addCustomURL( 'https://example.com' );
-			await navigation.expectToHaveTextSelected( 'example.com' );
+			await test.step( 'focus returns to the navigation link appender if we close the Link UI without creating a link', async () => {
+				await navigation.useBlockInserter();
+				await navigation.addLinkClose();
+				await expect( navBlockInserter ).toBeVisible();
+				await expect( navBlockInserter ).toBeFocused();
+			} );
 
-			/**
-			 * Test: We can open and close the preview with the keyboard and escape
-			 *       buttons from a top-level nav link with a url-like label using
-			 *       both the shortcut and toolbar
-			 */
-			await pageUtils.pressKeys( 'ArrowLeft' );
-			await navigation.useLinkShortcut();
-			await navigation.previewIsOpenAndCloses();
-			await navigation.checkLabelFocus( 'example.com' );
+			await test.step( 'creating a link from a url-string (https://www.example.com) returns focus to the newly created link with the text selected', async () => {
+				await navigation.useBlockInserter();
+				await navigation.addCustomURL( 'https://example.com' );
+				await navigation.expectToHaveTextSelected( 'example.com' );
+			} );
 
-			await navigation.canUseToolbarLink();
+			await test.step( 'we can open and close the preview with the keyboard and escape buttons from a top-level nav link with a url-like label using both the shortcut and toolbar', async () => {
+				await pageUtils.pressKeys( 'ArrowLeft' );
+				await navigation.useLinkShortcut();
+				await navigation.previewIsOpenAndCloses();
+				await navigation.checkLabelFocus( 'example.com' );
+
+				await navigation.canUseToolbarLink();
+			} );
 		} );
 
 		test( 'Can add submenu item using the keyboard', async ( {
@@ -411,69 +399,71 @@ test.describe( 'Navigation block', () => {
 			navigation,
 			page,
 		} ) => {
-			await pageUtils.pressKeys( 'ArrowDown' );
-			await navigation.useBlockInserter();
-			await navigation.addPage( 'Cat' );
-
-			/**
-			 * Test: Can add submenu item using the keyboard
-			 */
-			navigation.useToolbarButton( 'Add submenu' );
-
-			// Expect the submenu Add link to be present
-			await expect(
-				editor.canvas.locator( 'a' ).filter( { hasText: 'Add link' } )
-			).toBeVisible();
-
-			await pageUtils.pressKeys( 'ArrowDown' );
-			// There is a bug that won't allow us to press Enter to add the link: https://github.com/WordPress/gutenberg/issues/60051
-			// TODO: Use Enter after that bug is resolved
-			await navigation.useLinkShortcut();
-
-			await navigation.addPage( 'Dog' );
-
-			/**
-			 * Test: We can open and close the preview with the keyboard and escape
-			 *       buttons from a submenu nav item using both the shortcut and toolbar
-			 */
-			await navigation.useLinkShortcut();
-			await navigation.previewIsOpenAndCloses();
-			await navigation.checkLabelFocus( 'Dog' );
-
-			await navigation.canUseToolbarLink();
-
-			// Return to nav label from toolbar
-			await page.keyboard.press( 'Escape' );
-
-			// We should be at the first position on the label
-			await navigation.checkLabelFocus( 'Dog' );
-
-			/**
-			 * Test: We don't lose focus when closing the submenu appender
-			 */
-
-			// Move focus to the submenu navigation appender
-			await page.keyboard.press( 'End' );
-			await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
-
-			// Use the submenu block inserter
-			const navBlock = navigation.getNavBlock();
-			const submenuBlock = navBlock.getByRole( 'document', {
-				name: 'Block: Submenu',
+			await test.step( 'create a top level navigation link', async () => {
+				await pageUtils.pressKeys( 'ArrowDown' );
+				await navigation.useBlockInserter();
+				await navigation.addPage( 'Cat' );
 			} );
-			const submenuBlockInserter = submenuBlock.getByLabel( 'Add block' );
-			await submenuBlockInserter.click();
 
-			await navigation.addLinkClose();
-			/**
-			 * TODO: This is not desired behavior. Ideally the
-			 * Appender should be focused again since it opened
-			 * the link control.
-			 * IMPORTANT: This check is not to enforce this behavior,
-			 * but to make sure focus is kept nearby until we are able
-			 * to send focus to the appender. It is falling back to the previous sibling.
-			 */
-			await navigation.checkLabelFocus( 'Dog' );
+			await test.step( 'can add submenu item using the keyboard', async () => {
+				navigation.useToolbarButton( 'Add submenu' );
+
+				// Expect the submenu Add link to be present
+				await expect(
+					editor.canvas
+						.locator( 'a' )
+						.filter( { hasText: 'Add link' } )
+				).toBeVisible();
+
+				await pageUtils.pressKeys( 'ArrowDown' );
+				// There is a bug that won't allow us to press Enter to add the link: https://github.com/WordPress/gutenberg/issues/60051
+				// TODO: Use Enter after that bug is resolved
+				await navigation.useLinkShortcut();
+
+				await navigation.addPage( 'Dog' );
+			} );
+
+			await test.step( 'can use the shortcut to open the preview with the keyboard and escape keypress sends focus back to the navigation link block in the submenu', async () => {
+				await navigation.useLinkShortcut();
+				await navigation.previewIsOpenAndCloses();
+				await navigation.checkLabelFocus( 'Dog' );
+			} );
+
+			await test.step( 'can use the toolbar link to open the preview and escape keypress sends focus back to the toolbar link button', async () => {
+				await navigation.canUseToolbarLink();
+
+				// Return to nav label from toolbar
+				await page.keyboard.press( 'Escape' );
+
+				// We should be at the first position on the label
+				await navigation.checkLabelFocus( 'Dog' );
+			} );
+
+			await test.step( 'focus returns to the submenu appender when exiting the submenu link creation without creating a link', async () => {
+				// Move focus to the submenu navigation appender
+				await page.keyboard.press( 'End' );
+				await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
+
+				await pageUtils.pressKeys( 'ArrowDown' );
+
+				// Use the submenu block inserter
+				const navBlock = navigation.getNavBlock();
+				const submenuBlock = navBlock.getByRole( 'document', {
+					name: 'Block: Submenu',
+				} );
+
+				const submenuBlockInserter =
+					submenuBlock.getByLabel( 'Add block' );
+				await expect( submenuBlockInserter ).toBeVisible();
+				await expect( submenuBlockInserter ).toBeFocused();
+
+				await page.keyboard.press( 'Enter' );
+
+				await navigation.addLinkClose();
+
+				await expect( submenuBlockInserter ).toBeVisible();
+				await expect( submenuBlockInserter ).toBeFocused();
+			} );
 		} );
 
 		test( 'Can add submenu item(custom-link) using the keyboard', async ( {
