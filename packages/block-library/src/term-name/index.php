@@ -41,7 +41,7 @@ function render_block_core_term_name( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$tag_name = isset( $attributes['tagName'] ) ? $attributes['tagName'] : 'div';
+	$tag_name = isset( $attributes['tagName'] ) ? $attributes['tagName'] : 'p';
 
 	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
 		$term_link = get_term_link( $context['termId'], $context['taxonomy'] );

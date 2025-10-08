@@ -14,7 +14,7 @@
 		},
 		"tagName": {
 			"type": "string",
-			"default": "div"
+			"default": "p"
 		},
 		"isLink": {
 			"type": "boolean",

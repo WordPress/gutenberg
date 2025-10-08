@@ -12,7 +12,7 @@ import {
 	BlockControls,
 	AlignmentControl,
 	InspectorControls,
-	privateApis as blockEditorPrivateApis,
+	HeadingLevelDropdown,
 } from '@wordpress/block-editor';
 import {
 	ToggleControl,
@@ -26,16 +26,13 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
-import { unlock } from '../lock-unlock';
-
-const { HTMLElementControl } = unlock( blockEditorPrivateApis );
 
 export default function TermNameEdit( {
 	attributes,
 	setAttributes,
 	context: { termId, taxonomy },
 } ) {
-	const { textAlign, tagName = 'div', isLink } = attributes;
+	const { textAlign, tagName = 'p', isLink } = attributes;
 
 	const term = useSelect(
 		( select ) => {
@@ -76,6 +73,19 @@ export default function TermNameEdit( {
 	return (
 		<>
 			<BlockControls group="block">
+				<HeadingLevelDropdown
+					value={
+						tagName === 'p'
+							? 0
+							: parseInt( tagName.replace( 'h', '' ) )
+					}
+					options={ [ 0, 1, 2, 3, 4, 5, 6 ] }
+					onChange={ ( newLevel ) => {
+						setAttributes( {
+							tagName: newLevel === 0 ? 'p' : `h${ newLevel }`,
+						} );
+					} }
+				/>
 				<AlignmentControl
 					value={ textAlign }
 					onChange={ ( nextAlign ) => {
@@ -83,27 +93,6 @@ export default function TermNameEdit( {
 					} }
 				/>
 			</BlockControls>
-			<InspectorControls group="advanced">
-				<HTMLElementControl
-					__next40pxDefaultSize
-					__nextHasNoMarginBottom
-					label={ __( 'HTML element' ) }
-					value={ tagName }
-					options={ [
-						{ label: __( 'Default (div)' ), value: 'div' },
-						{ label: __( 'Paragraph (p)' ), value: 'p' },
-						{ label: __( 'Heading 1 (h1)' ), value: 'h1' },
-						{ label: __( 'Heading 2 (h2)' ), value: 'h2' },
-						{ label: __( 'Heading 3 (h3)' ), value: 'h3' },
-						{ label: __( 'Heading 4 (h4)' ), value: 'h4' },
-						{ label: __( 'Heading 5 (h5)' ), value: 'h5' },
-						{ label: __( 'Heading 6 (h6)' ), value: 'h6' },
-					] }
-					onChange={ ( value ) =>
-						setAttributes( { tagName: value } )
-					}
-				/>
-			</InspectorControls>
 			<InspectorControls>
 				<ToolsPanel
 					label={ __( 'Settings' ) }
