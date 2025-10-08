@@ -17,6 +17,11 @@
  * @return string Returns the post breadcrumb for hierarchical post types.
  */
 function render_block_core_breadcrumbs( $attributes, $content, $block ) {
+	// Exclude breadcrumbs from special contexts like archives, search, 404, etc.
+	// until they are explicitly supported.
+	if ( is_archive() || is_search() || is_404() || is_home() || is_front_page() ) {
+		return '';
+	}
 	if ( ! isset( $block->context['postId'] ) || ! isset( $block->context['postType'] ) ) {
 		return '';
 	}
@@ -25,9 +30,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 	$post_type = $block->context['postType'];
 
 	$post = get_post( $post_id );
-	// Exclude breadcrumbs from special contexts like archives, search, 404, etc.
-	// until they are explicitly supported.
-	if ( ! $post || is_archive() || is_search() || is_404() || is_home() || is_front_page() ) {
+	if ( ! $post ) {
 		return '';
 	}
 
@@ -40,10 +43,10 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 			esc_html__( 'Home' )
 		);
 	}
-	$supported_types = array( 'hierarchical', 'terms' );
+	$supported_types = array( 'postWithAncestors', 'postWithTerms' );
 	// If `type` is not set to a specific breadcrumb type, determine it based on the block's default heuristics.
 	$breadcrumbs_type = in_array( $type, $supported_types, true ) ? $type : block_core_breadcrumbs_get_breadcrumbs_type( $post_type );
-	if ( 'hierarchical' === $breadcrumbs_type ) {
+	if ( 'postWithAncestors' === $breadcrumbs_type ) {
 		$breadcrumb_items = array_merge( $breadcrumb_items, block_core_breadcrumbs_get_hierarchical_post_type_breadcrumbs( $post_id ) );
 	} else {
 		$breadcrumb_items = array_merge( $breadcrumb_items, block_core_breadcrumbs_get_terms_breadcrumbs( $post_id, $post_type ) );
@@ -81,10 +84,10 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
  *
  * @param string $post_type The post type name.
  *
- * @return string The breadcrumb type..
+ * @return string The breadcrumb type.
  */
 function block_core_breadcrumbs_get_breadcrumbs_type( $post_type ) {
-	return is_post_type_hierarchical( $post_type ) ? 'hierarchical' : 'terms';
+	return is_post_type_hierarchical( $post_type ) ? 'postWithAncestors' : 'postWithTerms';
 }
 
 /**

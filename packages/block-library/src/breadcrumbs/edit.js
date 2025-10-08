@@ -29,13 +29,13 @@ const BREADCRUMB_TYPES = {
 			'Try to automatically determine the best type of breadcrumb for the template.'
 		),
 	},
-	hierarchical: {
+	postWithAncestors: {
 		help: __(
 			'Shows breadcrumbs based on post hierarchy. Only works for hierarchical post types.'
 		),
 		placeholderItems: [ __( 'Ancestor' ), __( 'Parent' ) ],
 	},
-	terms: {
+	postWithTerms: {
 		help: __(
 			'Shows breadcrumbs based on taxonomy terms. Chooses the first taxonomy with assigned terms and includes ancestors if the taxonomy is hierarchical.'
 		),
@@ -89,13 +89,16 @@ export default function BreadcrumbEdit( {
 	} );
 	// TODO: this should be handled better when we add more types.
 	let breadcrumbsType;
-	const isSpecificSupportedTypeSet = [ 'hierarchical', 'terms' ].includes(
-		type
-	);
+	const isSpecificSupportedTypeSet = [
+		'postWithAncestors',
+		'postWithTerms',
+	].includes( type );
 	if ( isSpecificSupportedTypeSet ) {
 		breadcrumbsType = type;
 	} else {
-		breadcrumbsType = isPostTypeHierarchical ? 'hierarchical' : 'terms';
+		breadcrumbsType = isPostTypeHierarchical
+			? 'postWithAncestors'
+			: 'postWithTerms';
 	}
 	let placeholder = null;
 	// This is fragile because this block is server side rendered and we'll have to
@@ -107,8 +110,9 @@ export default function BreadcrumbEdit( {
 		// This is needed because when we are showing the template in post editor we
 		// want to show the real breadcrumbs if we have the post type.
 		( templateSlug && ! postType ) ||
-		( breadcrumbsType === 'hierarchical' && ! isPostTypeHierarchical ) ||
-		( breadcrumbsType === 'terms' && ! hasTermsAssigned );
+		( breadcrumbsType === 'postWithAncestors' &&
+			! isPostTypeHierarchical ) ||
+		( breadcrumbsType === 'postWithTerms' && ! hasTermsAssigned );
 	if ( showPlaceholder ) {
 		const placeholderItems = [
 			showHomeLink && __( 'Home' ),
@@ -177,12 +181,12 @@ export default function BreadcrumbEdit( {
 									value: 'auto',
 								},
 								{
-									label: __( 'Hierarchical' ),
-									value: 'hierarchical',
+									label: __( 'Post with ancestors' ),
+									value: 'postWithAncestors',
 								},
 								{
-									label: __( 'Terms' ),
-									value: 'terms',
+									label: __( 'Post with terms' ),
+									value: 'postWithTerms',
 								},
 							] }
 							help={ BREADCRUMB_TYPES[ type ].help }

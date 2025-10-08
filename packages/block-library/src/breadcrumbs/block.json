@@ -11,7 +11,7 @@
 		"type": {
 			"type": "string",
 			"default": "auto",
-			"enum": [ "auto", "terms", "hierarchical" ]
+			"enum": [ "auto", "postWithTerms", "postWithAncestors" ]
 		},
 		"separator": {
 			"type": "string",
