@@ -7,9 +7,7 @@ jest.mock( '@wordpress/api-fetch' );
 
 // Mock the sync provider
 jest.mock( '../sync', () => ( {
-	getSyncProvider: jest.fn( () => ( {
-		bootstrap: jest.fn(),
-	} ) ),
+	getSyncProvider: jest.fn(),
 } ) );
 
 /**
@@ -50,6 +48,10 @@ describe( 'getEntityRecord', () => {
 		} );
 		triggerFetch.mockReset();
 		getSyncProvider.mockClear();
+	} );
+
+	afterEach( () => {
+		delete window.__experimentalEnableSync;
 	} );
 
 	it( 'yields with requested post type', async () => {
@@ -121,13 +123,10 @@ describe( 'getEntityRecord', () => {
 		);
 	} );
 
-	it( 'bootstraps sync provider when experimentalEnableSync is enabled', async () => {
+	it( 'bootstraps entity with sync provider when __experimentalEnableSync is true', async () => {
 		const POST_RECORD = { id: 1, title: 'Test Post' };
 		const POST_RESPONSE = {
 			json: () => Promise.resolve( POST_RECORD ),
-			headers: {
-				get: () => null,
-			},
 		};
 		const ENTITIES_WITH_SYNC = [
 			{
@@ -135,17 +134,16 @@ describe( 'getEntityRecord', () => {
 				kind: 'postType',
 				baseURL: '/wp/v2/posts',
 				baseURLParams: { context: 'edit' },
-				syncConfig: {
-					enabled: true,
-					objectType: 'postType/post',
-				},
+				syncConfig: {},
 			},
 		];
 
 		window.__experimentalEnableSync = true;
+
 		const mockBootstrap = jest.fn();
 		getSyncProvider.mockReturnValue( {
 			bootstrap: mockBootstrap,
+			register: jest.fn(),
 		} );
 
 		const resolveSelectWithSync = {
@@ -165,28 +163,21 @@ describe( 'getEntityRecord', () => {
 			resolveSelect: resolveSelectWithSync,
 		} );
 
-		// Verify bootstrap was called with correct arguments
+		// Verify bootstrap was called with correct arguments.
+		expect( getSyncProvider ).toHaveBeenCalled();
 		expect( mockBootstrap ).toHaveBeenCalledTimes( 1 );
 		expect( mockBootstrap ).toHaveBeenCalledWith(
-			ENTITIES_WITH_SYNC[ 0 ].syncConfig,
+			'postType/post',
+			1,
 			POST_RECORD,
-			expect.objectContaining( {
-				editRecord: expect.any( Function ),
-				getEditedRecord: expect.any( Function ),
-				refetchPersistedRecord: expect.any( Function ),
-			} )
+			expect.any( Function )
 		);
-
-		delete window.__experimentalEnableSync;
 	} );
 
-	it( 'does not bootstrap sync when query is present', async () => {
+	it( 'does not bootstrap entity when query is present', async () => {
 		const POST_RECORD = { id: 1, title: 'Test Post' };
 		const POST_RESPONSE = {
 			json: () => Promise.resolve( POST_RECORD ),
-			headers: {
-				get: () => null,
-			},
 		};
 		const ENTITIES_WITH_SYNC = [
 			{
@@ -194,19 +185,11 @@ describe( 'getEntityRecord', () => {
 				kind: 'postType',
 				baseURL: '/wp/v2/posts',
 				baseURLParams: { context: 'edit' },
-				syncConfig: {
-					enabled: true,
-					objectType: 'postType/post',
-				},
+				syncConfig: {},
 			},
 		];
 
 		window.__experimentalEnableSync = true;
-
-		const mockBootstrap = jest.fn();
-		getSyncProvider.mockReturnValue( {
-			bootstrap: mockBootstrap,
-		} );
 
 		const resolveSelectWithSync = {
 			getEntitiesConfig: jest.fn( () => ENTITIES_WITH_SYNC ),
@@ -215,25 +198,19 @@ describe( 'getEntityRecord', () => {
 		triggerFetch.mockImplementation( () => POST_RESPONSE );
 
 		// Call with a query parameter
-		await getEntityRecord( 'postType', 'post', 1, { context: 'view' } )( {
+		await getEntityRecord( 'postType', 'post', 1, { foo: 'bar' } )( {
 			dispatch,
 			registry,
 			resolveSelect: resolveSelectWithSync,
 		} );
 
-		// Verify bootstrap was NOT called
-		expect( mockBootstrap ).not.toHaveBeenCalled();
-
-		delete window.__experimentalEnableSync;
+		expect( getSyncProvider ).not.toHaveBeenCalled();
 	} );
 
-	it( 'does not bootstrap sync when experimentalEnableSync is disabled', async () => {
+	it( 'does not bootstrap entity when __experimentalEnableSync is undefined', async () => {
 		const POST_RECORD = { id: 1, title: 'Test Post' };
 		const POST_RESPONSE = {
 			json: () => Promise.resolve( POST_RECORD ),
-			headers: {
-				get: () => null,
-			},
 		};
 		const ENTITIES_WITH_SYNC = [
 			{
@@ -241,17 +218,9 @@ describe( 'getEntityRecord', () => {
 				kind: 'postType',
 				baseURL: '/wp/v2/posts',
 				baseURLParams: { context: 'edit' },
-				syncConfig: {
-					enabled: true,
-					objectType: 'postType/post',
-				},
+				syncConfig: {},
 			},
 		];
-
-		const mockBootstrap = jest.fn();
-		getSyncProvider.mockReturnValue( {
-			bootstrap: mockBootstrap,
-		} );
 
 		const resolveSelectWithSync = {
 			getEntitiesConfig: jest.fn( () => ENTITIES_WITH_SYNC ),
@@ -269,8 +238,7 @@ describe( 'getEntityRecord', () => {
 			resolveSelect: resolveSelectWithSync,
 		} );
 
-		// Verify bootstrap was NOT called
-		expect( mockBootstrap ).not.toHaveBeenCalled();
+		expect( getSyncProvider ).not.toHaveBeenCalled();
 	} );
 } );
 
