@@ -7,7 +7,6 @@ import {
 	FlexItem,
 	Modal,
 	__experimentalText as Text,
-	__experimentalHeading as Heading,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
@@ -45,7 +44,7 @@ export default function BlockAllowedBlocksModal( {
 
 	return (
 		<Modal
-			title={ __( 'Allowed blocks' ) }
+			title={ __( 'Manage allowed blocks' ) }
 			onRequestClose={ onClose }
 			overlayClassName="block-editor-block-allowed-blocks-modal"
 			focusOnMount="firstContentElement"
@@ -57,11 +56,9 @@ export default function BlockAllowedBlocksModal( {
 					e.preventDefault();
 					handleSubmit();
 				} }
+				spacing="4"
 			>
-				<Heading level={ 4 } as="h2">
-					{ __( 'Manage allowed blocks' ) }
-				</Heading>
-				<Text variant="muted">
+				<Text>
 					{ __(
 						'Select which blocks can be added inside this container.'
 					) }
