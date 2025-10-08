@@ -290,28 +290,58 @@ export function applySelection( { startPath, endPath }, current ) {
 
 	selection.addRange( range );
 
-	// This function is not intended to cause a shift in focus. Since the above
-	// selection manipulations may shift focus, ensure that focus is restored to
-	// its previous state.
-	if ( activeElement !== ownerDocument.activeElement ) {
-		// The `instanceof` checks protect against edge cases where the focused
-		// element is not of the interface HTMLElement (does not have a `focus`
-		// or `blur` property).
-		//
-		// See: https://github.com/Microsoft/TypeScript/issues/5901#issuecomment-431649653
-		if ( activeElement instanceof defaultView.HTMLElement ) {
-			// In Firefox, when you click off the canvas, the BODY becomes the active element.
-			// 1. User types in canvas → switches to sidebar input
-			// 2. Inside the iframe, activeElement is now BODY (default when nothing specific is focused)
-			// 3. RichText updates from typing in sidebar → calls selection.addRange(range)
-			// 4. addRange() moves focus from BODY to the contentEditable DIV
-			// 5. Code detects focus changed, tries to restore by calling body.focus()
-			// 6. In Firefox: calling focus() on BODY inside an iframe focuses the iframe itself in the parent document
-			// 7. Sidebar input loses focus → cursor jumps to iframe
-			// By checking to see if the active element is BODY, we prevent firefox from stealing focus to the canvas.
-			if ( activeElement.tagName !== 'BODY' ) {
+	// Restore activeElement to make selection.addRange() behavior consistent across browsers.
+	// In Firefox, addRange() can change activeElement (e.g., BODY → contentEditable DIV).
+	// In Chrome, addRange() does not change activeElement.
+	// We restore activeElement to match Chrome's behavior and avoid focus management issues.
+	if (
+		activeElement !== ownerDocument.activeElement &&
+		activeElement instanceof defaultView.HTMLElement
+	) {
+		// In Firefox, calling focus() on BODY inside an iframe focuses the iframe
+		// in the parent document, stealing focus from inputs/textareas in the parent.
+		// Check parent document to avoid stealing focus.
+		if ( activeElement.tagName === 'BODY' ) {
+			let shouldRestoreFocus = true;
+			let parentActiveElement = null;
+			try {
+				if (
+					defaultView.parent &&
+					defaultView.parent !== defaultView
+				) {
+					parentActiveElement =
+						defaultView.parent.document.activeElement;
+					// Don't restore BODY focus if parent has an interactive element focused
+					// (INPUT, TEXTAREA, etc.). This prevents stealing focus from sidebar inputs.
+					// Restore BODY when parent has BODY or IFRAME focused (normal editing flow).
+					const isInteractiveElement =
+						parentActiveElement &&
+						parentActiveElement.tagName !== 'BODY' &&
+						parentActiveElement.tagName !== 'IFRAME';
+					shouldRestoreFocus = ! isInteractiveElement;
+				}
+			} catch ( e ) {
+				// Cross-origin iframe, can't access parent - assume safe to restore
+				shouldRestoreFocus = true;
+			}
+
+			console.log( '[to-dom] BODY restoration check', {
+				shouldRestoreFocus,
+				parentActiveElement: parentActiveElement?.tagName,
+				parentActiveElementClass: parentActiveElement?.className,
+				currentActiveElement: ownerDocument.activeElement?.tagName,
+			} );
+
+			if ( shouldRestoreFocus ) {
 				activeElement.focus();
 			}
+		} else {
+			console.log(
+				'[to-dom] Restoring non-BODY element:',
+				activeElement.tagName
+			);
+			// Always restore focus to non-BODY elements
+			activeElement.focus();
 		}
 	}
 }
