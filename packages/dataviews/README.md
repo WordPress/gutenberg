@@ -318,7 +318,6 @@ const actions = [
 	{
 		id: 'delete',
 		label: 'Delete',
-		isDestructive: true,
 		supportsBulk: true,
 		RenderModal: ( { items, closeModal, onActionPerformed } ) => (
 			<div>
@@ -788,13 +787,6 @@ Function that determines whether the action can be performed for a given record.
 	isEligible: ( item ) => item.status === 'published';
 }
 ```
-
-### `isDestructive`
-
-Whether the action can delete data, in which case the UI communicates it via a red color.
-
--   Type: `boolean`
--   Optional
 
 ### `supportsBulk`
 
