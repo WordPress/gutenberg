@@ -29,18 +29,13 @@ import { unlock } from '../../../lock-unlock';
  */
 export function useFocusFirstElement( { clientId, initialPosition } ) {
 	const ref = useRef();
-	const { isBlockSelected, isMultiSelecting, isZoomOut } = unlock(
+	const { isBlockSelected, isMultiSelecting } = unlock(
 		useSelect( blockEditorStore )
 	);
 
 	useEffect( () => {
 		// Check if the block is still selected at the time this effect runs.
-		// @ZOOMOUTMODE
-		if (
-			! isBlockSelected( clientId ) ||
-			isMultiSelecting() ||
-			isZoomOut()
-		) {
+		if ( ! isBlockSelected( clientId ) || isMultiSelecting() ) {
 			return;
 		}
 
