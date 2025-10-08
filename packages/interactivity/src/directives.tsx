@@ -541,13 +541,9 @@ export default () => {
 			classNames
 				.filter( isNonDefaultDirectiveSuffix )
 				.forEach( ( entry ) => {
-					if ( entry.uniqueId ) {
-						if ( globalThis.SCRIPT_DEBUG ) {
-							warnUniqueIdNotSupported( 'class', entry.uniqueId );
-						}
-						return;
-					}
-					const className = entry.suffix;
+					const className = entry.uniqueId
+						? `${ entry.suffix }---${ entry.uniqueId }`
+						: entry.suffix;
 					let result = evaluate( entry );
 					if ( typeof result === 'function' ) {
 						result = result();
