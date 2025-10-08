@@ -11,12 +11,8 @@ import TermsQueryInspectorControls from './inspector-controls';
 
 const TEMPLATE = [ [ 'core/term-template' ] ];
 
-export default function TermsQueryEdit( {
-	attributes,
-	setAttributes,
-	clientId,
-	name,
-} ) {
+export default function TermsQueryEdit( props ) {
+	const { attributes, setAttributes } = props;
 	const { tagName: TagName = 'div' } = attributes;
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
@@ -31,14 +27,7 @@ export default function TermsQueryEdit( {
 	);
 	return (
 		<>
-			<TermsQueryInspectorControls
-				name={ name }
-				attributes={ attributes }
-				setQuery={ setQuery }
-				setAttributes={ setAttributes }
-				clientId={ clientId }
-				tagName={ TagName }
-			/>
+			<TermsQueryInspectorControls { ...props } setQuery={ setQuery } />
 			<TagName { ...innerBlocksProps } />
 		</>
 	);

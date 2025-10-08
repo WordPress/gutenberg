@@ -17,9 +17,8 @@
 				"order": "asc",
 				"orderBy": "name",
 				"hideEmpty": true,
-				"parent": false,
-				"hierarchical": false,
-				"inherit": false
+				"showNested": false,
+				"parent": false
 			}
 		},
 		"tagName": {
@@ -30,6 +29,7 @@
 	"providesContext": {
 		"termQuery": "termQuery"
 	},
+	"usesContext": [ "termId" ],
 	"supports": {
 		"align": [ "wide", "full" ],
 		"html": false,
