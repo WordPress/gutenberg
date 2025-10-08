@@ -56,6 +56,60 @@ function kebabToCamelCase( str ) {
 }
 
 /**
+ * Plugin to handle moment-timezone aliases.
+ * Redirects moment-timezone imports to use pre-built bundles with limited data.
+ *
+ * @return {Object} esbuild plugin.
+ */
+function momentTimezoneAliasPlugin() {
+	return {
+		name: 'moment-timezone-alias',
+		async setup( build ) {
+			// Resolve paths at plugin creation time
+			const { createRequire } = await import( 'module' );
+			const require = createRequire( import.meta.url );
+
+			const preBuiltBundlePath = require.resolve(
+				'moment-timezone/builds/moment-timezone-with-data-1970-2030'
+			);
+			const momentTimezoneUtilsPath = require.resolve(
+				'moment-timezone/moment-timezone-utils.js'
+			);
+
+			// Redirect main moment-timezone files to pre-built bundle
+			build.onResolve(
+				{ filter: /^moment-timezone\/moment-timezone$/ },
+				() => {
+					return { path: preBuiltBundlePath };
+				}
+			);
+
+			// For utils, we need to load it but ensure it works with the pre-built bundle
+			// The utils file tries to require('./') which would load index.js
+			// We need to make sure it gets the pre-built bundle instead
+			build.onResolve(
+				{ filter: /^moment-timezone\/moment-timezone-utils$/ },
+				() => {
+					return { path: momentTimezoneUtilsPath };
+				}
+			);
+
+			// Intercept the require('./') call inside moment-timezone-utils
+			// and redirect it to the pre-built bundle
+			build.onResolve( { filter: /^\.\/$/ }, ( args ) => {
+				// Only intercept if this is coming from moment-timezone-utils
+				if (
+					args.importer &&
+					args.importer.includes( 'moment-timezone-utils' )
+				) {
+					return { path: preBuiltBundlePath };
+				}
+			} );
+		},
+	};
+}
+
+/**
  * WordPress externals and asset plugin.
  * Inspired by wp-build's wordpressExternalsAndAssetPlugin.
  *
@@ -207,12 +261,6 @@ async function bundlePackage( packageName ) {
 			target,
 			platform: 'browser',
 			globalName,
-			alias: {
-				'moment-timezone/moment-timezone':
-					'moment-timezone/builds/moment-timezone-with-data-1970-2030',
-				'moment-timezone/moment-timezone-utils':
-					'moment-timezone/builds/moment-timezone-with-data-1970-2030',
-			},
 		};
 
 		// For packages with default exports, add a footer to properly expose the default
@@ -227,12 +275,16 @@ async function bundlePackage( packageName ) {
 				...baseConfig,
 				outfile: path.join( outputDir, 'index.min.js' ),
 				minify: true,
-				plugins: [ wordpressExternalsPlugin() ],
+				plugins: [
+					momentTimezoneAliasPlugin(),
+					wordpressExternalsPlugin(),
+				],
 			} ),
 			esbuild.build( {
 				...baseConfig,
 				outfile: path.join( outputDir, 'index.js' ),
 				minify: false,
+				plugins: [ momentTimezoneAliasPlugin() ],
 			} )
 		);
 	}
