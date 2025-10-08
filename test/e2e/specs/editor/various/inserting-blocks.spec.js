@@ -512,7 +512,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			.click();
 		await page
 			.getByRole( 'listbox', { name: 'Text' } )
-			.getByRole( 'option', { name: 'Heading' } )
+			.getByRole( 'option', { name: 'Heading', exact: true } )
 			.hover();
 
 		await expect( insertingBlocksUtils.indicator ).toBeVisible();
