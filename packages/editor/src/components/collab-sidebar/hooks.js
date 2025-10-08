@@ -228,8 +228,13 @@ export function useBlockCommentsActions() {
 			);
 
 			if ( ! comment.parent ) {
-				updateBlockAttributes( getSelectedBlockClientId(), {
-					blockCommentId: undefined,
+				const clientId = getSelectedBlockClientId();
+				const metadata = getBlockAttributes( clientId )?.metadata;
+				updateBlockAttributes( clientId, {
+					metadata: {
+						...metadata,
+						commentId: undefined,
+					},
 				} );
 			}
 
