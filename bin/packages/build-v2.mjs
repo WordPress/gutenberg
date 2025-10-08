@@ -181,38 +181,50 @@ async function bundlePackage( packageName ) {
 /**
  * Transpile source files for a package (both CJS and ESM).
  *
- * @param {string}   packageDir Package directory path.
- * @param {string[]} srcFiles   Array of source file paths.
+ * @param {string}   packageDir  Package directory path.
+ * @param {string[]} srcFiles    Array of source file paths.
+ * @param {Object}   packageJson Package.json contents.
  */
-async function transpilePackage( packageDir, srcFiles ) {
+async function transpilePackage( packageDir, srcFiles, packageJson ) {
 	const buildDir = path.join( packageDir, 'build' );
 	const buildModuleDir = path.join( packageDir, 'build-module' );
 	const target = browserslistToEsbuild();
 
-	await Promise.all( [
-		// CJS build
-		esbuild.build( {
-			entryPoints: srcFiles,
-			outdir: buildDir,
-			outbase: path.join( packageDir, 'src' ),
-			bundle: false,
-			platform: 'node',
-			format: 'cjs',
-			sourcemap: true,
-			target,
-		} ),
-		// ESM build
-		esbuild.build( {
-			entryPoints: srcFiles,
-			outdir: buildModuleDir,
-			outbase: path.join( packageDir, 'src' ),
-			bundle: false,
-			platform: 'neutral',
-			format: 'esm',
-			sourcemap: true,
-			target,
-		} ),
-	] );
+	const builds = [];
+
+	// Only build CJS if package has 'main' property
+	if ( packageJson.main ) {
+		builds.push(
+			esbuild.build( {
+				entryPoints: srcFiles,
+				outdir: buildDir,
+				outbase: path.join( packageDir, 'src' ),
+				bundle: false,
+				platform: 'node',
+				format: 'cjs',
+				sourcemap: true,
+				target,
+			} )
+		);
+	}
+
+	// Only build ESM if package has 'module' property
+	if ( packageJson.module ) {
+		builds.push(
+			esbuild.build( {
+				entryPoints: srcFiles,
+				outdir: buildModuleDir,
+				outbase: path.join( packageDir, 'src' ),
+				bundle: false,
+				platform: 'neutral',
+				format: 'esm',
+				sourcemap: true,
+				target,
+			} )
+		);
+	}
+
+	await Promise.all( builds );
 }
 
 /**
@@ -224,6 +236,8 @@ async function transpilePackage( packageDir, srcFiles ) {
 async function transpilePackageFiles( packageName ) {
 	const startTime = Date.now();
 	const packageDir = path.join( PACKAGES_DIR, packageName );
+	const packageJsonPath = path.join( packageDir, 'package.json' );
+	const packageJson = JSON.parse( await readFile( packageJsonPath, 'utf8' ) );
 
 	const srcFiles = await glob(
 		normalizePath(
@@ -234,7 +248,7 @@ async function transpilePackageFiles( packageName ) {
 		}
 	);
 
-	await transpilePackage( packageDir, srcFiles );
+	await transpilePackage( packageDir, srcFiles, packageJson );
 
 	return Date.now() - startTime;
 }
