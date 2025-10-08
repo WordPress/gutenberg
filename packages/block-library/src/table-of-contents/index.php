@@ -188,13 +188,13 @@ function block_core_table_of_contents_build_list( $headings, $ordered ) {
 		if ( 0 > $depth_change ) {
 			for ( $i = 0; $i < abs( $depth_change ); $i++ ) {
 				$html .= '</li></' . $list_tag . '>';
-				$nesting_depth--;
+				--$nesting_depth;
 			}
 			$html .= '</li>';
 		} elseif ( $depth_change > 0 ) {
 			for ( $i = 0; $i < $depth_change; $i++ ) {
 				$html .= '<' . $list_tag . '>';
-				$nesting_depth++;
+				++$nesting_depth;
 			}
 		} elseif ( $index > 0 ) {
 			$html .= '</li>';
