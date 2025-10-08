@@ -817,6 +817,7 @@ export default () => {
 				if ( uniqueId ) {
 					warnUniqueIdNotSupported( 'each', uniqueId );
 				}
+				return;
 			}
 
 			let iterable = evaluate( entry );
