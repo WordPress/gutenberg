@@ -9,6 +9,7 @@
 - Flip search icons depending on placement ([#72070](https://github.com/WordPress/gutenberg/pull/72070)).
 - DataViews: Improve renderItemLink event propagation handling. ([#72081](https://github.com/WordPress/gutenberg/pull/72081)).
 - Normalize search field styles ([#72072](https://github.com/WordPress/gutenberg/pull/72072)).
+- DataForm control for `date` supports `required` and `custom` validation [#72048](https://github.com/WordPress/gutenberg/pull/72048).
 
 ### Breaking changes
 

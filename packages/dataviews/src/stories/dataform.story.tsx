@@ -28,6 +28,7 @@ import type {
 	CardLayout,
 } from '../types';
 import { unlock } from '../lock-unlock';
+import DateControl from '../dataform-controls/date';
 
 const { ValidatedTextControl, Badge } = unlock( privateApis );
 
@@ -509,6 +510,32 @@ function CustomEditControl< Item >( {
 	);
 }
 
+type ValidatedItem = {
+	text: string;
+	select?: string;
+	textWithRadio?: string;
+	textarea: string;
+	email: string;
+	telephone: string;
+	url: string;
+	color: string;
+	integer: number;
+	number: number;
+	boolean: boolean;
+	customEdit: string;
+	categories: string[];
+	countries: string[];
+	password: string;
+	toggle?: boolean;
+	toggleGroup?: string;
+	date?: string;
+	dateRange?: [ string, string ];
+};
+
+const DateRangeEdit = ( props: DataFormControlProps< ValidatedItem > ) => {
+	return <DateControl { ...props } operator="between" />;
+};
+
 const ValidationComponent = ( {
 	required,
 	type,
@@ -518,26 +545,6 @@ const ValidationComponent = ( {
 	custom: boolean;
 	type: 'regular' | 'panel';
 } ) => {
-	type ValidatedItem = {
-		text: string;
-		select?: string;
-		textWithRadio?: string;
-		textarea: string;
-		email: string;
-		telephone: string;
-		url: string;
-		color: string;
-		integer: number;
-		number: number;
-		boolean: boolean;
-		customEdit: string;
-		categories: string[];
-		countries: string[];
-		password: string;
-		toggle?: boolean;
-		toggleGroup?: string;
-	};
-
 	const [ post, setPost ] = useState< ValidatedItem >( {
 		text: 'Can have letters and spaces',
 		select: undefined,
@@ -556,6 +563,8 @@ const ValidationComponent = ( {
 		password: 'secretpassword123',
 		toggle: undefined,
 		toggleGroup: undefined,
+		date: undefined,
+		dateRange: undefined,
 	} );
 
 	const customTextRule = ( value: ValidatedItem ) => {
@@ -663,6 +672,39 @@ const ValidationComponent = ( {
 			return 'Password must contain at least one number.';
 		}
 
+		return null;
+	};
+
+	const customDateRule = ( value: ValidatedItem ) => {
+		if ( ! value.date ) {
+			return null;
+		}
+		const selectedDate = new Date( value.date );
+		const today = new Date();
+		today.setHours( 0, 0, 0, 0 );
+		if ( selectedDate < today ) {
+			return 'Date must not be in the past.';
+		}
+
+		return null;
+	};
+
+	const customDateRangeRule = ( value: ValidatedItem ) => {
+		if ( ! value.dateRange ) {
+			return null;
+		}
+		const [ fromDate, toDate ] = value.dateRange;
+		if ( ! fromDate || ! toDate ) {
+			return null;
+		}
+		const from = new Date( fromDate );
+		const to = new Date( toDate );
+		const daysDiff = Math.ceil(
+			( to.getTime() - from.getTime() ) / ( 1000 * 60 * 60 * 24 )
+		);
+		if ( daysDiff > 30 ) {
+			return 'Date range must not exceed 30 days.';
+		}
 		return null;
 	};
 
@@ -859,6 +901,25 @@ const ValidationComponent = ( {
 				custom: maybeCustomRule( customToggleGroupRule ),
 			},
 		},
+		{
+			id: 'date',
+			type: 'date',
+			label: 'Date',
+			isValid: {
+				required,
+				custom: maybeCustomRule( customDateRule ),
+			},
+		},
+		{
+			id: 'dateRange',
+			type: 'date',
+			label: 'Date Range',
+			Edit: DateRangeEdit,
+			isValid: {
+				required,
+				custom: maybeCustomRule( customDateRangeRule ),
+			},
+		},
 	];
 
 	const form = {
@@ -881,6 +942,8 @@ const ValidationComponent = ( {
 			'toggleGroup',
 			'password',
 			'customEdit',
+			'date',
+			'dateRange',
 		],
 	};
 
