@@ -28,21 +28,21 @@ function parseDirectiveName( directiveName: string ): {
 	}
 
 	// Finds the first "--" to separate the prefix.
-	const delimIndex = name.indexOf( '--' );
+	const suffixIndex = name.indexOf( '--' );
 
 	// If "--" is not found, everything is part of the prefix.
-	if ( delimIndex === -1 ) {
+	if ( suffixIndex === -1 ) {
 		return { prefix: name, suffix: null, uniqueId: null };
 	}
 
 	// The prefix is the part before the first "--".
-	const prefix = name.substring( 0, delimIndex );
+	const prefix = name.substring( 0, suffixIndex );
 	// The remaining is the part that starts from "--".
-	const remaining = name.substring( delimIndex );
+	const remaining = name.substring( suffixIndex );
 
-	// If the suffix starts with "---" (and not "----"), there is no suffix and
+	// If the suffix starts with "---" (but not "----"), there is no suffix and
 	// the remaining is the unique ID.
-	if ( remaining.startsWith( '---' ) && ! remaining.startsWith( '----' ) ) {
+	if ( remaining.startsWith( '---' ) && remaining[ 3 ] !== '-' ) {
 		return {
 			prefix,
 			suffix: null,
@@ -52,18 +52,18 @@ function parseDirectiveName( directiveName: string ): {
 
 	// Otherwise, the remaining is a potential suffix. The first two dashes are
 	// removed.
-	let suffix = remaining.substring( 2 );
+	let suffix: string | null = remaining.substring( 2 );
 	// Search for "---" for a unique ID within the suffix.
-	const idIndexInSuffix = suffix.indexOf( '---' );
+	const uniqueIdIndex = suffix.indexOf( '---' );
 
-	// If "---" is found (and not "----"), split the suffix and the unique ID.
+	// If "---" is found, split the suffix and the unique ID.
 	if (
-		idIndexInSuffix !== -1 &&
-		! suffix.substring( idIndexInSuffix ).startsWith( '----' )
+		uniqueIdIndex !== -1 &&
+		suffix.substring( uniqueIdIndex )[ 3 ] !== '-'
 	) {
-		const uniqueId = suffix.substring( idIndexInSuffix + 3 ) || null;
-		suffix = suffix.substring( 0, idIndexInSuffix );
-		return { prefix, suffix: suffix || null, uniqueId };
+		const uniqueId = suffix.substring( uniqueIdIndex + 3 ) || null;
+		suffix = suffix.substring( 0, uniqueIdIndex ) || null;
+		return { prefix, suffix, uniqueId };
 	}
 
 	// Otherwise, the rest is the entire suffix.
@@ -182,7 +182,9 @@ export function toVdom( root: Node ): ComponentChild {
 			>( ( obj, [ name, ns, value ] ) => {
 				const directiveParsed = parseDirectiveName( name );
 				if ( directiveParsed === null ) {
-					warn( `Found malformed directive name: ${ name }.` );
+					if ( globalThis.SCRIPT_DEBUG ) {
+						warn( `Found malformed directive name: ${ name }.` );
+					}
 					return obj;
 				}
 				const { prefix, suffix, uniqueId } = directiveParsed;
