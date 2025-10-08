@@ -7,6 +7,7 @@
 	"description": "Displays an accordion panel.",
 	"parent": [ "core/accordion-item" ],
 	"supports": {
+		"html": false,
 		"color": {
 			"background": true,
 			"gradients": true
