@@ -300,16 +300,16 @@ export function applySelection( { startPath, endPath }, current ) {
 		//
 		// See: https://github.com/Microsoft/TypeScript/issues/5901#issuecomment-431649653
 		if ( activeElement instanceof defaultView.HTMLElement ) {
-			// Don't restore focus to BODY or HTML elements, as this can cause
-			// unwanted focus changes. In Firefox, focusing BODY inside an iframe
-			// can cause the parent document to focus the iframe itself.
-			// Only restore focus to meaningful focusable elements.
-			const tagName = activeElement.tagName;
-			const isContentEditable = activeElement.isContentEditable;
-			const isMeaningfulElement =
-				tagName !== 'BODY' && tagName !== 'HTML' && tagName !== 'DIV';
-
-			if ( isContentEditable || isMeaningfulElement ) {
+			// In Firefox, when you click off the canvas, the BODY becomes the active element.
+			// 1. User types in canvas → switches to sidebar input
+			// 2. Inside the iframe, activeElement is now BODY (default when nothing specific is focused)
+			// 3. RichText updates from typing in sidebar → calls selection.addRange(range)
+			// 4. addRange() moves focus from BODY to the contentEditable DIV
+			// 5. Code detects focus changed, tries to restore by calling body.focus()
+			// 6. In Firefox: calling focus() on BODY inside an iframe focuses the iframe itself in the parent document
+			// 7. Sidebar input loses focus → cursor jumps to iframe
+			// By checking to see if the active element is BODY, we prevent firefox from stealing focus to the canvas.
+			if ( activeElement.tagName !== 'BODY' ) {
 				activeElement.focus();
 			}
 		}
