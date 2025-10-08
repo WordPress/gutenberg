@@ -410,12 +410,10 @@ export const editEntityRecord =
 		};
 		if ( window.__experimentalEnableSync && entityConfig.syncConfig ) {
 			if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-				const objectId = entityConfig.getSyncObjectId( recordId );
-				getSyncProvider().update(
-					entityConfig.syncObjectType + '--edit',
-					objectId,
-					edit.edits
-				);
+				const objectType = `${ kind }/${ name }`;
+				const objectId = recordId;
+
+				getSyncProvider().update( objectType, objectId, edit.edits );
 			}
 		}
 		if ( ! options.undoIgnore ) {
