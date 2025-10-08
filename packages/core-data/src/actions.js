@@ -523,6 +523,26 @@ export const saveEntityRecord =
 		const entityIdKey = entityConfig.key || DEFAULT_ENTITY_KEY;
 		const recordId = record[ entityIdKey ];
 
+		// Evaluate optimized edits.
+		// (Function edits that should be evaluated on save to avoid expensive computations on every edit.)
+		for ( const [ key, value ] of Object.entries( record ) ) {
+			if ( typeof value === 'function' ) {
+				const evaluatedValue = value(
+					select.getEditedEntityRecord( kind, name, recordId )
+				);
+				dispatch.editEntityRecord(
+					kind,
+					name,
+					recordId,
+					{
+						[ key ]: evaluatedValue,
+					},
+					{ undoIgnore: true }
+				);
+				record[ key ] = evaluatedValue;
+			}
+		}
+
 		// When called with a theme template ID, trigger the compatibility
 		// logic.
 		if (
@@ -537,25 +557,6 @@ export const saveEntityRecord =
 				'wp_registered_template',
 				recordId
 			);
-			// Evaluate optimized edits.
-			// (Function edits that should be evaluated on save to avoid expensive computations on every edit.)
-			for ( const [ key, value ] of Object.entries( record ) ) {
-				if ( typeof value === 'function' ) {
-					const evaluatedValue = value(
-						select.getEditedEntityRecord( kind, name, recordId )
-					);
-					dispatch.editEntityRecord(
-						kind,
-						name,
-						recordId,
-						{
-							[ key ]: evaluatedValue,
-						},
-						{ undoIgnore: true }
-					);
-					record[ key ] = evaluatedValue;
-				}
-			}
 			// Duplicate the theme template and make the edit.
 			const newTemplate = await dispatch.saveEntityRecord(
 				'postType',
@@ -589,26 +590,6 @@ export const saveEntityRecord =
 		);
 
 		try {
-			// Evaluate optimized edits.
-			// (Function edits that should be evaluated on save to avoid expensive computations on every edit.)
-			for ( const [ key, value ] of Object.entries( record ) ) {
-				if ( typeof value === 'function' ) {
-					const evaluatedValue = value(
-						select.getEditedEntityRecord( kind, name, recordId )
-					);
-					dispatch.editEntityRecord(
-						kind,
-						name,
-						recordId,
-						{
-							[ key ]: evaluatedValue,
-						},
-						{ undoIgnore: true }
-					);
-					record[ key ] = evaluatedValue;
-				}
-			}
-
 			dispatch( {
 				type: 'SAVE_ENTITY_RECORD_START',
 				kind,
