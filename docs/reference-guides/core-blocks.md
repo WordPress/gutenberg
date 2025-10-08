@@ -1010,7 +1010,7 @@ An advanced block that allows displaying taxonomy terms based on different query
 -	**Category:** theme
 -	**Allowed Blocks:** core/term-template
 -	**Supports:** align (full, wide), interactivity, ~~html~~
--	**Attributes:** tagName, termQuery, termsToShow
+-	**Attributes:** tagName, termQuery
 
 ## Text Columns (deprecated)
 
