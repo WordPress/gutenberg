@@ -10,7 +10,7 @@ import {
 /**
  * Internal dependencies
  */
-import { unlock } from '../../lock-unlock';
+import { unlock } from '../../../lock-unlock';
 
 const { HTMLElementControl } = unlock( blockEditorPrivateApis );
 

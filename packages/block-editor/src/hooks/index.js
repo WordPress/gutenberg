@@ -10,6 +10,7 @@ import './compat';
 import align from './align';
 import background from './background';
 import './lock';
+import allowedBlocks from './allowed-blocks';
 import anchor from './anchor';
 import ariaLabel from './aria-label';
 import customClassName from './custom-class-name';
@@ -48,6 +49,7 @@ createBlockEditFilter(
 		blockHooks,
 		blockBindingsPanel,
 		childLayout,
+		allowedBlocks,
 	].filter( Boolean )
 );
 createBlockListBlockFilter( [

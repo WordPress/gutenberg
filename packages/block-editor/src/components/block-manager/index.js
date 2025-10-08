@@ -3,7 +3,11 @@
  */
 import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import { SearchControl, Button } from '@wordpress/components';
+import {
+	SearchControl,
+	CheckboxControl,
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useEffect, useState } from '@wordpress/element';
 import { useDebounce } from '@wordpress/compose';
@@ -21,11 +25,13 @@ import BlockManagerCategory from './category';
  * @param {Array}    props.blockTypes         An array of blocks.
  * @param {Array}    props.selectedBlockTypes An array of selected blocks.
  * @param {Function} props.onChange           Function to be called when the selected blocks change.
+ * @param {boolean}  props.showSelectAll      Whether to show the select all checkbox.
  */
 export default function BlockManager( {
 	blockTypes,
 	selectedBlockTypes,
 	onChange,
+	showSelectAll = true,
 } ) {
 	const debouncedSpeak = useDebounce( speak, 500 );
 	const [ search, setSearch ] = useState( '' );
@@ -36,15 +42,17 @@ export default function BlockManager( {
 		};
 	}, [] );
 
-	function enableAllBlockTypes() {
-		onChange( blockTypes );
-	}
-
 	const filteredBlockTypes = blockTypes.filter( ( blockType ) => {
 		return ! search || isMatchingSearchTerm( blockType, search );
 	} );
 
-	const numberOfHiddenBlocks = blockTypes.length - selectedBlockTypes.length;
+	const isIndeterminate =
+		selectedBlockTypes.length > 0 &&
+		selectedBlockTypes.length !== blockTypes.length;
+
+	const isAllChecked =
+		blockTypes.length > 0 &&
+		selectedBlockTypes.length === blockTypes.length;
 
 	// Announce search results on change
 	useEffect( () => {
@@ -61,27 +69,7 @@ export default function BlockManager( {
 	}, [ filteredBlockTypes?.length, search, debouncedSpeak ] );
 
 	return (
-		<div className="block-editor-block-manager__content">
-			{ !! numberOfHiddenBlocks && (
-				<div className="block-editor-block-manager__disabled-blocks-count">
-					{ sprintf(
-						/* translators: %d: number of blocks. */
-						_n(
-							'%d block is hidden.',
-							'%d blocks are hidden.',
-							numberOfHiddenBlocks
-						),
-						numberOfHiddenBlocks
-					) }
-					<Button
-						__next40pxDefaultSize
-						variant="link"
-						onClick={ enableAllBlockTypes }
-					>
-						{ __( 'Reset' ) }
-					</Button>
-				</div>
-			) }
+		<VStack className="block-editor-block-manager__content" spacing={ 4 }>
 			<SearchControl
 				__nextHasNoMarginBottom
 				label={ __( 'Search for a block' ) }
@@ -90,6 +78,22 @@ export default function BlockManager( {
 				onChange={ ( nextSearch ) => setSearch( nextSearch ) }
 				className="block-editor-block-manager__search"
 			/>
+			{ showSelectAll && (
+				<CheckboxControl
+					className="block-editor-block-manager__select-all"
+					label={ __( 'Select all' ) }
+					checked={ isAllChecked }
+					onChange={ () => {
+						if ( isAllChecked ) {
+							onChange( [] );
+						} else {
+							onChange( blockTypes );
+						}
+					} }
+					indeterminate={ isIndeterminate }
+					__nextHasNoMarginBottom
+				/>
+			) }
 			<div
 				tabIndex="0"
 				role="region"
@@ -122,6 +126,6 @@ export default function BlockManager( {
 					onChange={ onChange }
 				/>
 			</div>
-		</div>
+		</VStack>
 	);
 }

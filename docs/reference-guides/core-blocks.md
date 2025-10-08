@@ -400,8 +400,8 @@ Gather blocks in a layout container. ([Source](https://github.com/WordPress/gute
 
 -	**Name:** core/group
 -	**Category:** design
--	**Supports:** align (full, wide), anchor, ariaLabel, background (backgroundImage, backgroundSize), color (background, button, gradients, heading, link, text), dimensions (minHeight), interactivity (clientNavigation), layout (allowSizingOnChildren), position (sticky), shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** allowedBlocks, tagName, templateLock
+-	**Supports:** align (full, wide), allowedBlocks, anchor, ariaLabel, background (backgroundImage, backgroundSize), color (background, button, gradients, heading, link, text), dimensions (minHeight), interactivity (clientNavigation), layout (allowSizingOnChildren), position (sticky), shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Attributes:** tagName, templateLock
 
 ## Heading
 
@@ -1010,7 +1010,7 @@ An advanced block that allows displaying taxonomy terms based on different query
 -	**Category:** theme
 -	**Allowed Blocks:** core/term-template
 -	**Supports:** align (full, wide), interactivity, ~~html~~
--	**Attributes:** tagName, termQuery, termsToShow
+-	**Attributes:** tagName, termQuery
 
 ## Text Columns (deprecated)
 
