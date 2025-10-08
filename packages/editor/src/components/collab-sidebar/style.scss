@@ -8,12 +8,12 @@
 
 .editor-collab-sidebar {
 	height: 100%;
-	& > div > .editor-collab-sidebar-panel__thread {
+	overflow: hidden;
+	& .editor-collab-sidebar-panel__thread.is-floating {
 		padding: 0;
 		border: none;
 		position: absolute;
 	}
-	overflow: hidden;
 }
 
 .editor-collab-sidebar-panel {
