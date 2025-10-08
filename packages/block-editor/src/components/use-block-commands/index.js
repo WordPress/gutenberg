@@ -319,7 +319,7 @@ const getQuickActionsCommands = () =>
 						uniqueByBlock: true,
 					} );
 				},
-				icon: hasHiddenBlock ? unseen : seen,
+				icon: hasHiddenBlock ? seen : unseen,
 			} );
 		}
 
