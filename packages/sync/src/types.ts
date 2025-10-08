@@ -24,7 +24,6 @@ export interface SyncConfig {
 		changes: Partial< ObjectData >
 	) => void;
 	getChangesFromCRDTDoc: ( ydoc: Y.Doc ) => ObjectData;
-	getInitialObjectData: ( record: ObjectData ) => ObjectData;
 	supports: Record< string, true >;
 }
 

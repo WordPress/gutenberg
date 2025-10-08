@@ -360,16 +360,6 @@ async function loadPostTypeEntities() {
 				getChangesFromCRDTDoc: defaultGetChangesFromCRDTDoc,
 
 				/**
-				 * This initial object data represents the data that will be synced via
-				 * the CRDT document, which may include properties that are derived from
-				 * the record (e.g., `blocks` derived from `content`).
-				 *
-				 * @param {import('@wordpress/sync').ObjectData} record
-				 * @return {import('@wordpress/sync').ObjectData} The initial data
-				 */
-				getInitialObjectData: ( record ) => record,
-
-				/**
 				 * Sync features supported by the entity.
 				 *
 				 * @type {Record< string, boolean >}
