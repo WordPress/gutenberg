@@ -125,79 +125,17 @@ function TermTemplateBlockPreview( {
 // Prevent re-rendering of the block preview when the terms data changes.
 const MemoizedTermTemplateBlockPreview = memo( TermTemplateBlockPreview );
 
-/**
- * Builds a hierarchical tree structure from flat terms array.
- *
- * @param {Array} terms Array of term objects.
- * @return {Array} Tree structure with parent/child relationships.
- */
-function buildTermsTree( terms ) {
-	const termsById = {};
-	const rootTerms = [];
-
-	terms.forEach( ( term ) => {
-		termsById[ term.id ] = {
-			term,
-			children: [],
-		};
-	} );
-
-	terms.forEach( ( term ) => {
-		if ( term.parent && termsById[ term.parent ] ) {
-			termsById[ term.parent ].children.push( termsById[ term.id ] );
-		} else {
-			rootTerms.push( termsById[ term.id ] );
-		}
-	} );
-
-	return rootTerms;
-}
-
-/**
- * Renders a single term node and its children recursively.
- *
- * @param {Object}   termNode   Term node with term object and children.
- * @param {Function} renderTerm Function to render individual terms.
- * @return {JSX.Element} Rendered term node with children.
- */
-function renderTermNode( termNode, renderTerm ) {
-	return (
-		<li className="wp-block-term">
-			{ renderTerm( termNode.term ) }
-			{ termNode.children.length > 0 && (
-				<ul>
-					{ termNode.children.map( ( child ) =>
-						renderTermNode( child, renderTerm )
-					) }
-				</ul>
-			) }
-		</li>
-	);
-}
-
-/**
- * Checks if a term is the currently active term.
- *
- * @param {number} termId               The term ID to check.
- * @param {number} activeBlockContextId The currently active block context ID.
- * @param {Array}  blockContexts        Array of block contexts.
- * @return {boolean} True if the term is active, false otherwise.
- */
-function isActiveTerm( termId, activeBlockContextId, blockContexts ) {
-	return termId === ( activeBlockContextId || blockContexts[ 0 ]?.termId );
-}
-
 export default function TermTemplateEdit( {
 	clientId,
 	setAttributes,
 	context: {
-		termsToShow,
 		termQuery: {
 			taxonomy,
 			order,
 			orderBy,
 			hideEmpty,
-			hierarchical,
+			hierarchical = false,
+			parent = 0,
 			perPage = 10,
 		} = {},
 	},
@@ -207,14 +145,20 @@ export default function TermTemplateEdit( {
 	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 
 	const queryArgs = {
+		hide_empty: hideEmpty,
 		order,
 		orderby: orderBy,
-		hide_empty: hideEmpty,
 		// To preview the data the closest to the frontend, we fetch the largest number of terms
 		// and limit them during rendering. This is because WP_Term_Query fetches data in hierarchical manner,
 		// while in editor we build the hierarchy manually. It also allows us to avoid re-fetching data when max terms changes.
 		per_page: 100,
 	};
+
+	// Nested terms are returned by default from REST API as long as parent is not set.
+	// If we want to show nested terms, we must not set parent at all.
+	if ( parent || ! hierarchical ) {
+		queryArgs.parent = parent || 0;
+	}
 
 	const { records: terms, isResolving } = useEntityRecords(
 		'taxonomy',
@@ -226,14 +170,9 @@ export default function TermTemplateEdit( {
 		if ( ! terms ) {
 			return [];
 		}
-		if ( termsToShow === 'top-level' ) {
-			return terms.filter( ( term ) => ! term.parent );
-		}
-		if ( termsToShow === 'subterms' ) {
-			return terms.filter( ( term ) => term.parent );
-		}
-		return terms;
-	}, [ terms, termsToShow ] );
+		// Limit to the number of terms defined by perPage.
+		return perPage === 0 ? terms : terms.slice( 0, perPage );
+	}, [ terms, perPage ] );
 
 	const { blocks, variations, defaultVariation } = useSelect(
 		( select ) => {
@@ -319,77 +258,37 @@ export default function TermTemplateEdit( {
 		return <p { ...blockProps }> { __( 'No terms found.' ) }</p>;
 	}
 
-	const renderTerm = ( term ) => {
-		const blockContext = {
-			taxonomy,
-			termId: term.id,
-			classList: `term-${ term.id }`,
-			termData: term,
-		};
-
-		return (
-			<BlockContextProvider key={ term.id } value={ blockContext }>
-				{ isActiveTerm(
-					term.id,
-					activeBlockContextId,
-					blockContexts
-				) ? (
-					<TermTemplateInnerBlocks
-						classList={ blockContext.classList }
-					/>
-				) : null }
-				<MemoizedTermTemplateBlockPreview
-					blocks={ blocks }
-					blockContextId={ term.id }
-					classList={ blockContext.classList }
-					setActiveBlockContextId={ setActiveBlockContextId }
-					isHidden={ isActiveTerm(
-						term.id,
-						activeBlockContextId,
-						blockContexts
-					) }
-				/>
-			</BlockContextProvider>
-		);
-	};
-
 	return (
 		<>
 			<ul { ...blockProps }>
-				{ hierarchical
-					? buildTermsTree( filteredTerms ).map( ( termNode ) =>
-							renderTermNode( termNode, renderTerm )
-					  )
-					: blockContexts &&
-					  blockContexts
-							.slice( 0, perPage )
-							.map( ( blockContext ) => (
-								<BlockContextProvider
-									key={ blockContext.termId }
-									value={ blockContext }
-								>
-									{ blockContext.termId ===
+				{ blockContexts &&
+					blockContexts.map( ( blockContext ) => (
+						<BlockContextProvider
+							key={ blockContext.termId }
+							value={ blockContext }
+						>
+							{ blockContext.termId ===
+							( activeBlockContextId ||
+								blockContexts[ 0 ]?.termId ) ? (
+								<TermTemplateInnerBlocks
+									classList={ blockContext.classList }
+								/>
+							) : null }
+							<MemoizedTermTemplateBlockPreview
+								blocks={ blocks }
+								blockContextId={ blockContext.termId }
+								classList={ blockContext.classList }
+								setActiveBlockContextId={
+									setActiveBlockContextId
+								}
+								isHidden={
+									blockContext.termId ===
 									( activeBlockContextId ||
-										blockContexts[ 0 ]?.termId ) ? (
-										<TermTemplateInnerBlocks
-											classList={ blockContext.classList }
-										/>
-									) : null }
-									<MemoizedTermTemplateBlockPreview
-										blocks={ blocks }
-										blockContextId={ blockContext.termId }
-										classList={ blockContext.classList }
-										setActiveBlockContextId={
-											setActiveBlockContextId
-										}
-										isHidden={
-											blockContext.termId ===
-											( activeBlockContextId ||
-												blockContexts[ 0 ]?.termId )
-										}
-									/>
-								</BlockContextProvider>
-							) ) }
+										blockContexts[ 0 ]?.termId )
+								}
+							/>
+						</BlockContextProvider>
+					) ) }
 			</ul>
 		</>
 	);

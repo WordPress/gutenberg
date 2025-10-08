@@ -40,20 +40,31 @@ test.describe( 'Block Comments', () => {
 		await expect( topBarButton ).toBeVisible();
 	} );
 
-	test( 'can add a comment to a block', async ( {
-		page,
-		blockCommentUtils,
-	} ) => {
-		await blockCommentUtils.addBlockWithComment( {
-			type: 'core/paragraph',
+	test( 'can add a comment to a block', async ( { editor, page } ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
 			attributes: { content: 'Testing block comments' },
-			comment: 'Test comment',
 		} );
+		await editor.clickBlockOptionsMenuItem( 'Comment' );
+		await page
+			.getByRole( 'textbox', {
+				name: 'New Comment',
+				exact: true,
+			} )
+			.fill( 'A test comment' );
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Comment', exact: true } )
+			.click();
+		const thread = page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'listitem', {
+				name: 'Comment: A test comment',
+			} );
 
-		// Currently, the class locator is the easiest way to find the comment text.
-		await expect(
-			page.locator( '.editor-collab-sidebar-panel__user-comment' )
-		).toHaveText( 'Test comment' );
+		await expect( thread ).toBeVisible();
+		// Should focus the newly added comment thread.
+		await expect( thread ).toBeFocused();
 	} );
 
 	test( 'can reply to a block comment', async ( {
@@ -65,7 +76,7 @@ test.describe( 'Block Comments', () => {
 			attributes: { content: 'Testing block comments' },
 			comment: 'Test comment',
 		} );
-		const commentForm = page.getByRole( 'textbox', { name: 'Comment' } );
+		const commentForm = page.getByRole( 'textbox', { name: 'Reply to' } );
 		const commentText = page
 			.locator( '.editor-collab-sidebar-panel__user-comment' )
 			.last();
@@ -192,7 +203,7 @@ test.describe( 'Block Comments', () => {
 		).toBeVisible();
 
 		await page.locator( '.editor-collab-sidebar-panel__thread' ).click();
-		const commentForm = page.getByRole( 'textbox', { name: 'Comment' } );
+		const commentForm = page.getByRole( 'textbox', { name: 'Reply to' } );
 		await commentForm.fill( 'Test reply that reopens the comment.' );
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
@@ -460,7 +471,10 @@ class BlockCommentUtils {
 				} );
 				await this.#editor.clickBlockOptionsMenuItem( 'Comment' );
 				await this.#page
-					.getByRole( 'textbox', { name: 'Comment' } )
+					.getByRole( 'textbox', {
+						name: 'New Comment',
+						exact: true,
+					} )
 					.fill( comment );
 				await this.#page
 					.getByRole( 'region', { name: 'Editor settings' } )

@@ -135,7 +135,7 @@ export default {
 	},
 	canUserEditValue( { select, context, args } ) {
 		// Terms are typically read-only when displayed.
-		if ( context?.termQuery || context?.termQueryId ) {
+		if ( context?.termQuery ) {
 			return false;
 		}
 

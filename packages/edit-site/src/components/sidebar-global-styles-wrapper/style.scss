@@ -1,4 +1,4 @@
-.edit-site-styles .edit-site-page-content {
+.edit-site-styles .admin-ui-page__content {
 	.edit-site-global-styles-screen-root {
 		box-shadow: none;
 		& > div > hr {
@@ -21,21 +21,13 @@
 			outline: none;
 		}
 	}
-	.edit-site-page-header {
-		padding-left: $grid-unit-60;
-		padding-right: $grid-unit-60;
-		@container (max-width: 430px) {
-			padding-left: $grid-unit-30;
-			padding-right: $grid-unit-30;
-		}
-	}
 	.edit-site-sidebar-button {
 		color: $gray-900;
 	}
 }
 
 .show-icon-labels {
-	.edit-site-styles .edit-site-page-content {
+	.edit-site-styles .admin-ui-page__content {
 		.edit-site-page-header__actions {
 			.components-button.has-icon {
 				width: auto;

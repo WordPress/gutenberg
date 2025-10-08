@@ -19,7 +19,6 @@ import {
 	getBlockName,
 	getTemplateLock,
 	getClientIdsWithDescendants,
-	isNavigationMode,
 	getBlockRootClientId,
 	getBlockAttributes,
 } from './selectors';
@@ -529,16 +528,7 @@ export function isSectionBlock( state, clientId ) {
 	) {
 		return true;
 	}
-
-	// Template parts become sections in navigation mode.
-	const _isNavigationMode = isNavigationMode( state );
-	if ( _isNavigationMode && isTemplatePart ) {
-		return true;
-	}
-
-	const sectionRootClientId = getSectionRootClientId( state );
-	const sectionClientIds = getBlockOrder( state, sectionRootClientId );
-	return _isNavigationMode && sectionClientIds.includes( clientId );
+	return false;
 }
 
 /**
@@ -705,3 +695,15 @@ export const isBlockHidden = ( state, clientId ) => {
 	const attributes = state.blocks.attributes.get( clientId );
 	return attributes?.metadata?.blockVisibility === false;
 };
+
+/**
+ * Returns true if the current spotlighted block matches the block clientId.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId The block to check.
+ *
+ * @return {boolean} Whether the block is currently spotlighted.
+ */
+export function hasBlockSpotlight( state, clientId ) {
+	return state.hasBlockSpotlight === clientId;
+}

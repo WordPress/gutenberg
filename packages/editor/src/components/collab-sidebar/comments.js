@@ -116,8 +116,9 @@ function Thread( {
 	setShowCommentBoard,
 	commentSidebarRef,
 } ) {
-	const { toggleBlockHighlight, selectBlock } =
-		useDispatch( blockEditorStore );
+	const { toggleBlockHighlight, selectBlock, toggleBlockSpotlight } = unlock(
+		useDispatch( blockEditorStore )
+	);
 	const relatedBlockElement = useBlockElement( thread.blockClientId );
 	const debouncedToggleBlockHighlight = useDebounce(
 		toggleBlockHighlight,
@@ -137,11 +138,13 @@ function Thread( {
 		setSelectedThread( thread.id );
 		// pass `null` as the second parameter to prevent focusing the block.
 		selectBlock( thread.blockClientId, null );
+		toggleBlockSpotlight( thread.blockClientId, true );
 	};
 
 	const unselectThread = () => {
 		setSelectedThread( null );
 		setShowCommentBoard( false );
+		toggleBlockSpotlight( thread.blockClientId, false );
 	};
 
 	const replies = thread?.reply;
@@ -222,7 +225,6 @@ function Thread( {
 					}
 				} }
 				onDelete={ onCommentDelete }
-				status={ thread.status }
 			/>
 			{ isSelected &&
 				replies.map( ( reply ) => (
@@ -234,16 +236,9 @@ function Thread( {
 					>
 						<CommentBoard
 							thread={ reply }
-							onEdit={
-								'approved' !== thread.status
-									? onEditComment
-									: undefined
-							}
-							onDelete={
-								'approved' !== thread.status
-									? onCommentDelete
-									: undefined
-							}
+							parent={ thread }
+							onEdit={ onEditComment }
+							onDelete={ onCommentDelete }
 						/>
 					</VStack>
 				) ) }
@@ -276,14 +271,9 @@ function Thread( {
 			{ ! isSelected && lastReply && (
 				<CommentBoard
 					thread={ lastReply }
-					onEdit={
-						'approved' !== thread.status ? onEditComment : undefined
-					}
-					onDelete={
-						'approved' !== thread.status
-							? onCommentDelete
-							: undefined
-					}
+					parent={ thread }
+					onEdit={ onEditComment }
+					onDelete={ onCommentDelete }
 				/>
 			) }
 			{ isSelected && (
@@ -336,7 +326,7 @@ function Thread( {
 	);
 }
 
-const CommentBoard = ( { thread, onEdit, onDelete, status } ) => {
+const CommentBoard = ( { thread, parent, onEdit, onDelete } ) => {
 	const [ actionState, setActionState ] = useState( false );
 	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
 
@@ -352,34 +342,38 @@ const CommentBoard = ( { thread, onEdit, onDelete, status } ) => {
 	};
 
 	const actions = [
-		onEdit &&
-			status !== 'approved' && {
-				id: 'edit',
-				title: _x( 'Edit', 'Edit comment' ),
-				onClick: () => {
-					setActionState( 'edit' );
-				},
+		{
+			id: 'edit',
+			title: _x( 'Edit', 'Edit comment' ),
+			isEligible: ( { status } ) => status !== 'approved',
+			onClick: () => {
+				setActionState( 'edit' );
 			},
-		onDelete && {
+		},
+		{
+			id: 'reopen',
+			title: _x( 'Reopen', 'Reopen comment' ),
+			isEligible: ( { status } ) => status === 'approved',
+			onClick: () => {
+				onEdit( { id: thread.id, status: 'hold' } );
+			},
+		},
+		{
 			id: 'delete',
 			title: _x( 'Delete', 'Delete comment' ),
+			isEligible: () => true,
 			onClick: () => {
 				setActionState( 'delete' );
 				setShowConfirmDialog( true );
 			},
 		},
-		onEdit &&
-			status === 'approved' && {
-				id: 'reopen',
-				title: _x( 'Reopen', 'Reopen comment' ),
-				onClick: () => {
-					onEdit( { id: thread.id, status: 'hold' } );
-				},
-			},
 	];
 
-	const canResolve = thread?.parent === 0;
-	const moreActions = actions.filter( ( item ) => item?.onClick );
+	const canResolve = thread.parent === 0;
+	const moreActions =
+		parent?.status !== 'approved'
+			? actions.filter( ( item ) => item.isEligible( thread ) )
+			: [];
 
 	return (
 		<>
@@ -406,8 +400,10 @@ const CommentBoard = ( { thread, onEdit, onDelete, status } ) => {
 								) }
 								size="small"
 								icon={ published }
-								disabled={ status === 'approved' }
-								accessibleWhenDisabled={ status === 'approved' }
+								disabled={ thread.status === 'approved' }
+								accessibleWhenDisabled={
+									thread.status === 'approved'
+								}
 								onClick={ () => {
 									onEdit( {
 										id: thread.id,
@@ -475,10 +471,7 @@ const CommentBoard = ( { thread, onEdit, onDelete, status } ) => {
 					onCancel={ handleCancel }
 					confirmButtonText={ __( 'Delete' ) }
 				>
-					{
-						// translators: message displayed when confirming an action
-						__( 'Are you sure you want to delete this comment?' )
-					}
+					{ __( 'Are you sure you want to delete this comment?' ) }
 				</ConfirmDialog>
 			) }
 		</>

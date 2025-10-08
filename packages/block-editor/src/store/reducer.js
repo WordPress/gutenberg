@@ -1874,6 +1874,45 @@ export function highlightedBlock( state, action ) {
 }
 
 /**
+ * Reducer returning current spotlighted block.
+ *
+ * @param {string|null} state  Current clientId or null.
+ * @param {Object}      action Dispatched action.
+ *
+ * @return {string|null} Updated state.
+ */
+export function hasBlockSpotlight( state, action ) {
+	switch ( action.type ) {
+		case 'TOGGLE_BLOCK_SPOTLIGHT':
+			const { clientId, hasBlockSpotlight: _hasBlockSpotlight } = action;
+
+			if ( _hasBlockSpotlight ) {
+				return clientId;
+			} else if ( state === clientId ) {
+				return null;
+			}
+			return state;
+		case 'SELECT_BLOCK':
+			if ( action.clientId !== state ) {
+				return null;
+			}
+			return state;
+		case 'SELECTION_CHANGE':
+			if (
+				action.start?.clientId !== state ||
+				action.end?.clientId !== state
+			) {
+				return null;
+			}
+			return state;
+		case 'CLEAR_SELECTED_BLOCK':
+			return null;
+	}
+
+	return state;
+}
+
+/**
  * Reducer returning current expanded block in the list view.
  *
  * @param {string|null} state  Current expanded block.
@@ -2125,6 +2164,7 @@ const combinedReducers = combineReducers( {
 	openedBlockSettingsMenu,
 	registeredInserterMediaCategories,
 	zoomLevel,
+	hasBlockSpotlight,
 } );
 
 /**
