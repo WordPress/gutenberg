@@ -638,9 +638,9 @@ export default () => {
 						element.ref as RefObject< HTMLElement >
 					 ).current!.style.removeProperty( styleProp );
 				} else {
-					( element.ref as RefObject< HTMLElement > ).current!.style[
-						styleProp
-					] = result;
+					(
+						element.ref as RefObject< HTMLElement >
+					 ).current!.style.setProperty( styleProp, result );
 				}
 			} );
 		} );
