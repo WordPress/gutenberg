@@ -49,26 +49,15 @@ const formatDateTime = ( date?: Date | string ): string => {
 };
 
 function CalendarDateTimeControl< Item >( {
-	id,
-	value,
-	onChange,
-	label,
-	description,
-	hideLabelFromVision,
 	data,
 	field,
-	setValue,
-}: {
-	id: string;
-	value: string | undefined;
-	onChange: ( value: string | undefined ) => void;
-	label: string;
-	description?: string;
-	hideLabelFromVision?: boolean;
-	data: Item;
-	field: any;
-	setValue: any;
-} ) {
+	onChange,
+	hideLabelFromVision,
+}: DataFormControlProps< Item > ) {
+	const { id, label, description, setValue, getValue } = field;
+	const fieldValue = getValue( { item: data } );
+	const value = typeof fieldValue === 'string' ? fieldValue : undefined;
+
 	const [ calendarMonth, setCalendarMonth ] = useState< Date >( () => {
 		const parsedDate = parseDateTime( value );
 		return parsedDate || new Date(); // Default to current month
@@ -84,6 +73,12 @@ function CalendarDateTimeControl< Item >( {
 	const inputControlRef = useRef< HTMLInputElement >( null );
 	const validationTimeoutRef = useRef< ReturnType< typeof setTimeout > >();
 	const previousFocusRef = useRef< Element | null >( null );
+
+	const onChangeCallback = useCallback(
+		( newValue: string | undefined ) =>
+			onChange( setValue( { item: data, value: newValue } ) ),
+		[ data, onChange, setValue ]
+	);
 
 	// Cleanup timeout on unmount
 	useEffect( () => {
@@ -140,7 +135,7 @@ function CalendarDateTimeControl< Item >( {
 				}
 
 				dateTimeValue = finalDateTime.toISOString();
-				onChange( dateTimeValue );
+				onChangeCallback( dateTimeValue );
 				onValidateControl( dateTimeValue );
 
 				// Clear any existing timeout
@@ -148,7 +143,7 @@ function CalendarDateTimeControl< Item >( {
 					clearTimeout( validationTimeoutRef.current );
 				}
 			} else {
-				onChange( undefined );
+				onChangeCallback( undefined );
 				onValidateControl( undefined );
 			}
 			// Save the currently focused element
@@ -162,7 +157,7 @@ function CalendarDateTimeControl< Item >( {
 				if ( inputControlRef.current ) {
 					inputControlRef.current.focus();
 					inputControlRef.current.blur();
-					onChange( dateTimeValue );
+					onChangeCallback( dateTimeValue );
 					onValidateControl( dateTimeValue );
 
 					// Restore focus to the previously focused element
@@ -175,7 +170,7 @@ function CalendarDateTimeControl< Item >( {
 				}
 			}, 0 );
 		},
-		[ onChange, value, onValidateControl ]
+		[ onChangeCallback, value, onValidateControl ]
 	);
 
 	const handleManualDateTimeChange = useCallback(
@@ -183,7 +178,7 @@ function CalendarDateTimeControl< Item >( {
 			if ( newValue ) {
 				// Convert from datetime-local format to ISO string
 				const dateTime = new Date( newValue );
-				onChange( dateTime.toISOString() );
+				onChangeCallback( dateTime.toISOString() );
 
 				// Update calendar month to match
 				const parsedDate = parseDateTime( dateTime.toISOString() );
@@ -191,10 +186,10 @@ function CalendarDateTimeControl< Item >( {
 					setCalendarMonth( parsedDate );
 				}
 			} else {
-				onChange( undefined );
+				onChangeCallback( undefined );
 			}
 		},
-		[ onChange ]
+		[ onChangeCallback ]
 	);
 
 	const {
@@ -259,17 +254,11 @@ export default function DateTime< Item >( {
 	hideLabelFromVision,
 	operator,
 }: DataFormControlProps< Item > ) {
-	const { id, label, description, getValue, setValue } = field;
+	const { id, label, getValue, setValue } = field;
 	const value = getValue( { item: data } );
 
 	const onChangeRelativeDateControl = useCallback(
 		( newValue: DateRelative ) =>
-			onChange( setValue( { item: data, value: newValue } ) ),
-		[ data, onChange, setValue ]
-	);
-
-	const onChangeCalendarDateTimeControl = useCallback(
-		( newValue: string | undefined ) =>
 			onChange( setValue( { item: data, value: newValue } ) ),
 		[ data, onChange, setValue ]
 	);
@@ -290,15 +279,10 @@ export default function DateTime< Item >( {
 
 	return (
 		<CalendarDateTimeControl
-			id={ id }
-			value={ typeof value === 'string' ? value : undefined }
-			onChange={ onChangeCalendarDateTimeControl }
-			label={ label }
-			description={ description }
-			hideLabelFromVision={ hideLabelFromVision }
 			data={ data }
 			field={ field }
-			setValue={ setValue }
+			onChange={ onChange }
+			hideLabelFromVision={ hideLabelFromVision }
 		/>
 	);
 }
