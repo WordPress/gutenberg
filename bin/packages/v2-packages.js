@@ -6,6 +6,7 @@
  * @type {string[]}
  */
 const V2_PACKAGES = [
+	'a11y',
 	'api-fetch',
 	'autop',
 	'blob',

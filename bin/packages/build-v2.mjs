@@ -134,46 +134,96 @@ async function bundlePackage( packageName ) {
 	const packageJsonPath = path.join( packageDir, 'package.json' );
 	const packageJson = JSON.parse( await readFile( packageJsonPath, 'utf8' ) );
 
-	// Skip if package doesn't need WordPress bundling
-	if ( ! packageJson.wpScript ) {
+	const builds = [];
+
+	// Bundle wpScript (IIFE format for global wp.* namespace)
+	if ( packageJson.wpScript ) {
+		const entryPoint = path.join( packageDir, 'build-module', 'index.js' );
+		const outputDir = path.join( PACKAGES_DIR, '..', 'build', packageName );
+		const target = browserslistToEsbuild();
+		const globalName = `wp.${ kebabToCamelCase( packageName ) }`;
+
+		const baseConfig = {
+			entryPoints: [ entryPoint ],
+			bundle: true,
+			sourcemap: true,
+			format: 'iife',
+			target,
+			platform: 'browser',
+			globalName,
+		};
+
+		// For packages with default exports, add a footer to properly expose the default
+		if ( packageJson.wpScriptDefaultExport ) {
+			baseConfig.footer = {
+				js: `if (typeof ${ globalName } === 'object' && ${ globalName }.default) { ${ globalName } = ${ globalName }.default; }`,
+			};
+		}
+
+		builds.push(
+			esbuild.build( {
+				...baseConfig,
+				outfile: path.join( outputDir, 'index.min.js' ),
+				minify: true,
+				plugins: [ wordpressExternalsPlugin() ],
+			} ),
+			esbuild.build( {
+				...baseConfig,
+				outfile: path.join( outputDir, 'index.js' ),
+				minify: false,
+			} )
+		);
+	}
+
+	// Bundle wpScriptModuleExports (ESM format for Script Modules API)
+	if ( packageJson.wpScriptModuleExports ) {
+		const target = browserslistToEsbuild();
+		const rootBuildModuleDir = path.join(
+			PACKAGES_DIR,
+			'..',
+			'build-module',
+			packageName
+		);
+
+		// Normalize to object format
+		const exports =
+			typeof packageJson.wpScriptModuleExports === 'string'
+				? { '.': packageJson.wpScriptModuleExports }
+				: packageJson.wpScriptModuleExports;
+
+		// Bundle each export
+		for ( const [ exportName, exportPath ] of Object.entries( exports ) ) {
+			// Convert export name to file name: '.' -> 'index', './debug' -> 'debug'
+			const fileName =
+				exportName === '.'
+					? 'index'
+					: exportName.replace( /^\.\//, '' );
+			const entryPoint = path.join( packageDir, exportPath );
+
+			builds.push(
+				esbuild.build( {
+					entryPoints: [ entryPoint ],
+					outfile: path.join(
+						rootBuildModuleDir,
+						`${ fileName }.min.js`
+					),
+					bundle: true,
+					sourcemap: true,
+					format: 'esm',
+					target,
+					platform: 'browser',
+					minify: true,
+					plugins: [ wordpressExternalsPlugin() ],
+				} )
+			);
+		}
+	}
+
+	if ( builds.length === 0 ) {
 		return false;
 	}
 
-	const entryPoint = path.join( packageDir, 'build-module', 'index.js' );
-	const outputDir = path.join( PACKAGES_DIR, '..', 'build', packageName );
-	const target = browserslistToEsbuild();
-	const globalName = `wp.${ kebabToCamelCase( packageName ) }`;
-
-	const baseConfig = {
-		entryPoints: [ entryPoint ],
-		bundle: true,
-		sourcemap: true,
-		format: 'iife',
-		target,
-		platform: 'browser',
-		globalName,
-	};
-
-	// For packages with default exports, add a footer to properly expose the default
-	if ( packageJson.wpScriptDefaultExport ) {
-		baseConfig.footer = {
-			js: `if (typeof ${ globalName } === 'object' && ${ globalName }.default) { ${ globalName } = ${ globalName }.default; }`,
-		};
-	}
-
-	await Promise.all( [
-		esbuild.build( {
-			...baseConfig,
-			outfile: path.join( outputDir, 'index.min.js' ),
-			minify: true,
-			plugins: [ wordpressExternalsPlugin() ],
-		} ),
-		esbuild.build( {
-			...baseConfig,
-			outfile: path.join( outputDir, 'index.js' ),
-			minify: false,
-		} ),
-	] );
+	await Promise.all( builds );
 
 	return true;
 }
