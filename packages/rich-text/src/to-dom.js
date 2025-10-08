@@ -290,44 +290,52 @@ export function applySelection( { startPath, endPath }, current ) {
 
 	selection.addRange( range );
 
-	// Restore activeElement to make selection.addRange() behavior consistent across browsers.
+	// This function is not intended to cause a shift in focus. Since the above
+	// selection manipulations may shift focus, ensure that focus is restored to
+	// its previous state.
+	//
 	// In Firefox, addRange() can change activeElement (e.g., BODY → contentEditable DIV).
 	// In Chrome, addRange() does not change activeElement.
 	// We restore activeElement to match Chrome's behavior and avoid focus management issues.
+	//
+	// In Firefox, when you click off the canvas, the BODY becomes the active element.
+	// 1. User types in canvas → switches to sidebar input
+	// 2. Inside the iframe, activeElement is now BODY (default when nothing specific is focused)
+	// 3. RichText updates from typing in sidebar → calls selection.addRange(range)
+	// 4. addRange() (within this function) moves focus from BODY to the contentEditable DIV
+	// 5. (where we're at in the code now) Code detects focus changed, and determines if we should restore focus
+	// 6. If a non-body item is focused, we restore focus to the canvas. That means they were working in
+	//   the canvas, and we should honor that focus placement.
+	// 7. If the body is focused, that means we're outside of the editing canvas. This normally means we want to
+	//   to preserve focus outside the canvas, such as when editing the navigation block text field from the inspector
+	//   (see https://github.com/WordPress/gutenberg/pull/72071)
+	// 8. If the parent document ALSO has no focused element, then we restore focus to the canvas. This happens when
+	//   we do a block transformation, split block content, indent a list item from the toolbar, etc. In those cases,
+	//   we want to restore focus to the canvas since the parent document also has no intentionally focused element.
 	if (
 		activeElement !== ownerDocument.activeElement &&
 		activeElement instanceof defaultView.HTMLElement
 	) {
-		// In Firefox, when you click off the canvas, the BODY becomes the active element.
-		// 1. User types in canvas → switches to sidebar input
-		// 2. Inside the iframe, activeElement is now BODY (default when nothing specific is focused)
-		// 3. RichText updates from typing in sidebar → calls selection.addRange(range)
-		// 4. addRange() moves focus from BODY to the contentEditable DIV
-		// 5. Code detects focus changed, tries to restore by calling body.focus()
-		// 6. In Firefox: calling focus() on BODY inside an iframe focuses the iframe itself in the parent document
-		// 7. Sidebar input loses focus → cursor jumps to iframe
-		// By checking to see if the active element is BODY and
 		if ( activeElement.tagName === 'BODY' ) {
 			let shouldRestoreFocus;
 			try {
+				// Check if the parent document has an active element. If the body is focused from the parent frame,
+				// then we assume it's due to a focus loss or because they're working intentionally in the canvas and
+				// we should restore focus to the canvas.
 				if (
 					defaultView.parent &&
 					defaultView.parent !== defaultView
 				) {
 					const parentActiveElement =
 						defaultView.parent.document.activeElement;
-					// If nothing is currently focused on the parent, then we assume the user
-					// is in normal editing flow within the canvas and we should restore focus
-					// to the canvas.
-					// If the parent has an element focused (such as input, div, etc.), then we assume
-					// the user has intended to place focus there.
+
 					shouldRestoreFocus =
 						parentActiveElement &&
-						( parentActiveElement.tagName === 'BODY' ||
-							parentActiveElement.tagName === 'IFRAME' );
+						parentActiveElement.tagName === 'BODY';
 				}
 			} catch ( e ) {
-				// Cross-origin iframe, can't access parent - assume safe to restore
+				// Cross-origin iframe, we can't access parent - assume it is safe to
+				// restore as we likely don't want the BODY element to be focused
 				shouldRestoreFocus = true;
 			}
 
