@@ -10,9 +10,9 @@ export default function InheritControl( { value, onChange, ...props } ) {
 			checked={ value }
 			onChange={ ( inherit ) =>
 				onChange( {
-					inherit,
-					// When enabling inherit, hierarchical is not supported.
-					...( inherit ? { hierarchical: false } : {} ),
+					parent: inherit ? 'inherit' : false,
+					// When enabling inherit, showNested is not supported.
+					...( inherit ? { showNested: false } : {} ),
 				} )
 			}
 			{ ...props }

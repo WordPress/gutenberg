@@ -23,10 +23,10 @@ import AdvancedControls from './advanced-controls';
 
 export default function TermsQueryInspectorControls( {
 	attributes,
-	setQuery,
 	setAttributes,
 	clientId,
-	templateSlug,
+	context,
+	setQuery,
 } ) {
 	const { termQuery, tagName: TagName } = attributes;
 	const {
@@ -34,10 +34,11 @@ export default function TermsQueryInspectorControls( {
 		orderBy,
 		order,
 		hideEmpty,
-		inherit,
+		parent = false,
 		showNested,
 		perPage,
 	} = termQuery;
+	const { termId, templateSlug } = context;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const taxonomies = usePublicTaxonomies();
@@ -53,11 +54,11 @@ export default function TermsQueryInspectorControls( {
 
 	// Only display the inherit control if the taxonomy is hierarchical and matches the current template.
 	const displayInheritControl =
-		isTaxonomyHierarchical && isTaxonomyMatchingTemplate;
+		isTaxonomyHierarchical && ( isTaxonomyMatchingTemplate || termId );
 
-	// Only display the showNested control if the taxonomy is hierarchical and not inheriting.
+	// Only display the show nested control if the taxonomy is hierarchical and not inheriting.
 	const displayShowNestedControl =
-		isTaxonomyHierarchical && ! termQuery.inherit;
+		isTaxonomyHierarchical && termQuery.parent === false;
 
 	// Labels shared between ToolsPanelItem and its child control.
 	const taxonomyControlLabel = __( 'Taxonomy' );
@@ -138,14 +139,14 @@ export default function TermsQueryInspectorControls( {
 					</ToolsPanelItem>
 					{ displayInheritControl && (
 						<ToolsPanelItem
-							hasValue={ () => inherit !== false }
+							hasValue={ () => parent !== false }
 							label={ inheritControlLabel }
-							onDeselect={ () => setQuery( { inherit: false } ) }
+							onDeselect={ () => setQuery( { parent: false } ) }
 							isShownByDefault
 						>
 							<InheritControl
 								label={ inheritControlLabel }
-								value={ inherit }
+								value={ parent === 'inherit' }
 								onChange={ setQuery }
 							/>
 						</ToolsPanelItem>
