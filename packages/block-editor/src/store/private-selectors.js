@@ -19,7 +19,6 @@ import {
 	getBlockName,
 	getTemplateLock,
 	getClientIdsWithDescendants,
-	isNavigationMode,
 	getBlockRootClientId,
 	getBlockAttributes,
 } from './selectors';
@@ -529,16 +528,7 @@ export function isSectionBlock( state, clientId ) {
 	) {
 		return true;
 	}
-
-	// Template parts become sections in navigation mode.
-	const _isNavigationMode = isNavigationMode( state );
-	if ( _isNavigationMode && isTemplatePart ) {
-		return true;
-	}
-
-	const sectionRootClientId = getSectionRootClientId( state );
-	const sectionClientIds = getBlockOrder( state, sectionRootClientId );
-	return _isNavigationMode && sectionClientIds.includes( clientId );
+	return false;
 }
 
 /**
