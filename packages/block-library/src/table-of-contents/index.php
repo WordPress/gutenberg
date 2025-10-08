@@ -63,7 +63,6 @@ function render_block_core_table_of_contents( $attributes ) {
  * @return string HTML with full URLs.
  */
 function block_core_table_of_contents_add_full_urls( $html ) {
-	global $wp;
 	$current_url = get_permalink();
 
 	if ( empty( $current_url ) ) {
