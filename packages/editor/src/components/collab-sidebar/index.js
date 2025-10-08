@@ -26,6 +26,7 @@ import {
 	useBlockCommentsActions,
 	useEnableFloatingSidebar,
 } from './hooks';
+import { focusCommentThread } from './utils';
 
 function CollabSidebarContent( {
 	showCommentBoard,
@@ -89,11 +90,6 @@ export default function CollabSidebar() {
 			: null;
 	}, [] );
 
-	const openCollabBoard = () => {
-		setShowCommentBoard( true );
-		enableComplementaryArea( 'core', collabHistorySidebarName );
-	};
-
 	const { resultComments, unresolvedSortedThreads, totalPages } =
 		useBlockComments( postId );
 	useEnableFloatingSidebar( resultComments.length > 0 );
@@ -114,15 +110,35 @@ export default function CollabSidebar() {
 		return null;
 	}
 
+	// Trigger opening the sidebar a bit earlier, on mouse down.
+	// This ensures there's sidebar reference when focus is shifted to the comment thread.
+	function openTheSidebar() {
+		enableComplementaryArea( 'core', collabHistorySidebarName );
+	}
+
+	function transferFocusToThread() {
+		setShowCommentBoard( ! blockCommentId );
+		focusCommentThread(
+			blockCommentId,
+			commentSidebarRef.current,
+			'textarea'
+		);
+	}
+
 	return (
 		<>
 			{ blockCommentId && (
 				<CommentAvatarIndicator
 					thread={ currentThread }
 					hasMoreComments={ hasMoreComments }
+					onMouseDown={ openTheSidebar }
+					onClick={ transferFocusToThread }
 				/>
 			) }
-			<AddCommentMenuItem onClick={ openCollabBoard } />
+			<AddCommentMenuItem
+				onMouseDown={ openTheSidebar }
+				onClick={ transferFocusToThread }
+			/>
 			<PluginSidebar
 				identifier={ collabHistorySidebarName }
 				// translators: Comments sidebar title

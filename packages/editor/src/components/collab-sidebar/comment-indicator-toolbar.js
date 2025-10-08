@@ -19,7 +19,12 @@ import { getAvatarBorderColor } from './utils';
 
 const { CommentIconToolbarSlotFill } = unlock( blockEditorPrivateApis );
 
-const CommentAvatarIndicator = ( { onClick, thread, hasMoreComments } ) => {
+const CommentAvatarIndicator = ( {
+	onClick,
+	onMouseDown,
+	thread,
+	hasMoreComments,
+} ) => {
 	const threadParticipants = useMemo( () => {
 		if ( ! thread ) {
 			return [];
@@ -100,6 +105,7 @@ const CommentAvatarIndicator = ( { onClick, thread, hasMoreComments } ) => {
 				} ) }
 				label={ _x( 'View comments', 'View comment thread' ) }
 				onClick={ onClick }
+				onMouseDown={ onMouseDown }
 				showTooltip
 			>
 				<div className="comment-avatar-stack">
