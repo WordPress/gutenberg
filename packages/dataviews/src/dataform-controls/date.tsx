@@ -268,30 +268,18 @@ function ValidatedDateControl< Item >( {
 }
 
 function CalendarDateControl< Item >( {
-	id,
-	value,
-	onChange,
-	label,
-	hideLabelFromVision,
-	className,
 	data,
 	field,
-	setValue,
-}: {
-	id: string;
-	value: string | undefined;
-	onChange: ( value: string | undefined ) => void;
-	label: string;
-	hideLabelFromVision?: boolean;
-	className?: string;
-	data: Item;
-	field: any;
-	setValue: any;
-} ) {
+	onChange,
+	hideLabelFromVision,
+}: DataFormControlProps< Item > ) {
+	const { id, label, setValue, getValue } = field;
 	const [ selectedPresetId, setSelectedPresetId ] = useState< string | null >(
 		null
 	);
 
+	const fieldValue = getValue( { item: data } );
+	const value = typeof fieldValue === 'string' ? fieldValue : undefined;
 	const [ calendarMonth, setCalendarMonth ] = useState< Date >( () => {
 		const parsedDate = parseDate( value );
 		return parsedDate || new Date(); // Default to current month
@@ -300,16 +288,22 @@ function CalendarDateControl< Item >( {
 	const [ isTouched, setIsTouched ] = useState( false );
 	const validityTargetRef = useRef< HTMLInputElement >( null );
 
+	const onChangeCallback = useCallback(
+		( newValue: string | undefined ) =>
+			onChange( setValue( { item: data, value: newValue } ) ),
+		[ data, onChange, setValue ]
+	);
+
 	const onSelectDate = useCallback(
 		( newDate: Date | undefined | null ) => {
 			const dateValue = newDate
 				? format( newDate, 'yyyy-MM-dd' )
 				: undefined;
-			onChange( dateValue );
+			onChangeCallback( dateValue );
 			setSelectedPresetId( null );
 			setIsTouched( true );
 		},
-		[ onChange ]
+		[ onChangeCallback ]
 	);
 
 	const handlePresetClick = useCallback(
@@ -318,16 +312,16 @@ function CalendarDateControl< Item >( {
 			const dateValue = formatDate( presetDate );
 
 			setCalendarMonth( presetDate );
-			onChange( dateValue );
+			onChangeCallback( dateValue );
 			setSelectedPresetId( preset.id );
 			setIsTouched( true );
 		},
-		[ onChange ]
+		[ onChangeCallback ]
 	);
 
 	const handleManualDateChange = useCallback(
 		( newValue?: string ) => {
-			onChange( newValue );
+			onChangeCallback( newValue );
 			if ( newValue ) {
 				const parsedDate = parseDate( newValue );
 				if ( parsedDate ) {
@@ -337,7 +331,7 @@ function CalendarDateControl< Item >( {
 			setSelectedPresetId( null );
 			setIsTouched( true );
 		},
-		[ onChange ]
+		[ onChangeCallback ]
 	);
 
 	const {
@@ -362,7 +356,7 @@ function CalendarDateControl< Item >( {
 			<BaseControl
 				__nextHasNoMarginBottom
 				id={ id }
-				className={ className }
+				className={ 'dataviews-controls__date' }
 				label={ displayLabel }
 				hideLabelFromVision={ hideLabelFromVision }
 			>
@@ -563,7 +557,7 @@ function CalendarDateRangeControl< Item >( {
 			<BaseControl
 				__nextHasNoMarginBottom
 				id={ id }
-				className={ 'dataviews-controls__date' }
+				className="dataviews-controls__date"
 				label={ displayLabel }
 				hideLabelFromVision={ hideLabelFromVision }
 			>
@@ -659,12 +653,6 @@ export default function DateControl< Item >( {
 		[ data, onChange, setValue ]
 	);
 
-	const onChangeCalendarDateControl = useCallback(
-		( newValue: string | undefined ) =>
-			onChange( setValue( { item: data, value: newValue } ) ),
-		[ data, onChange, setValue ]
-	);
-
 	if ( operator === OPERATOR_IN_THE_PAST || operator === OPERATOR_OVER ) {
 		return (
 			<RelativeDateControl
@@ -692,15 +680,10 @@ export default function DateControl< Item >( {
 
 	return (
 		<CalendarDateControl
-			className="dataviews-controls__date"
-			id={ id }
-			value={ typeof value === 'string' ? value : undefined }
-			onChange={ onChangeCalendarDateControl }
-			label={ label }
-			hideLabelFromVision={ hideLabelFromVision }
 			data={ data }
 			field={ field }
-			setValue={ setValue }
+			onChange={ onChange }
+			hideLabelFromVision={ hideLabelFromVision }
 		/>
 	);
 }
