@@ -286,7 +286,7 @@ export default function NavigationLinkEdit( {
 		if ( isNewLink.current && isSelected && ! url ) {
 			selectBlock( parentBlockClientId );
 		}
-	}, [] );
+	}, [] ); // eslint-disable-line react-hooks/exhaustive-deps
 
 	useEffect( () => {
 		// If block has inner blocks, transform to Submenu.
