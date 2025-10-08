@@ -19,19 +19,9 @@
 function render_block_core_term_name( $attributes, $content, $block ) {
 	$term_name = '';
 
-	/**
-	 * Filters the block context to get the current term ID and taxonomy.
-	 *
-	 * @since 6.9.0
-	 *
-	 * @param array $context The block context.
-	 * @param array $parsed_block The parsed block.
-	 * @param WP_Block|null $parent_block The parent block.
-	 */
-	$context = apply_filters( 'render_block_context', $block->context, $block->parsed_block, null );
-
-	if ( isset( $context['termId'] ) && isset( $context['taxonomy'] ) ) {
-		$term = get_term( $context['termId'], $context['taxonomy'] );
+	// Get term from context or from the current query.
+	if ( isset( $block->context['termId'] ) && isset( $block->context['taxonomy'] ) ) {
+		$term = get_term( $block->context['termId'], $block->context['taxonomy'] );
 	} else {
 		$term = get_queried_object();
 		if ( ! $term instanceof WP_Term ) {
