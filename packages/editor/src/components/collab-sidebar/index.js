@@ -132,14 +132,14 @@ function FloatingCommentBoard( {
 		if ( y !== null && y !== 0 ) {
 			updateOffsets( thread.id, y, refs.floating?.current?.clientHeight );
 		}
-	}, [ y, refs.floating, thread.id ] );
+	}, [ y, refs.floating, thread.id, updateOffsets ] );
 
 	useEffect( () => {
 		if ( refs.floating?.current ) {
 			const newHeight = refs.floating?.current.scrollHeight;
 			updateHeight( thread.id, newHeight );
 		}
-	}, [ thread.id, updateHeight ] );
+	}, [ thread.id, updateHeight, refs.floating ] );
 	const { onCreate, onEdit, onDelete } = useBlockCommentsActions();
 
 	return (
