@@ -141,10 +141,6 @@ export default {
 
 		return true;
 	},
-	getFieldsList( { select, context } ) {
-		// Deprecated, will be removed after 6.9.
-		return getPostMetaFields( select, context );
-	},
 	editorUI( { select, context } ) {
 		const metaFields = Object.entries(
 			getPostMetaFields( select, context ) || {}

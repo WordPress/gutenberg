@@ -393,11 +393,9 @@ function getMergedUsesContext( existingUsesContext = [], newUsesContext = [] ) {
 export function blockBindingsSources( state = {}, action ) {
 	switch ( action.type ) {
 		case 'ADD_BLOCK_BINDINGS_SOURCE':
-			// Only open this API in Gutenberg and for `core/post-meta` for the moment.
+			// Only open this API in Gutenberg, will be removed in about 3 months after 6.9.
 			let getFieldsList;
 			if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-				getFieldsList = action.getFieldsList;
-			} else if ( action.name === 'core/post-meta' ) {
 				getFieldsList = action.getFieldsList;
 			}
 			return {

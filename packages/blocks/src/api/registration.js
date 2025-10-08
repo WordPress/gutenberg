@@ -830,9 +830,24 @@ export const registerBlockBindingsSource = ( source ) => {
 		getValues,
 		setValues,
 		canUserEditValue,
-		getFieldsList,
 		editorUI,
 	} = source;
+	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+		const { getFieldsList } = source;
+		if ( getFieldsList ) {
+			warning(
+				'The getFieldsList function only works on Gutenberg and will be removed in a future release.Please use the editorUI property instead.'
+			);
+		}
+		// Check the `getFieldsList` property is correct.
+		if ( getFieldsList && typeof getFieldsList !== 'function' ) {
+			// eslint-disable-next-line no-console
+			warning(
+				'Block bindings source getFieldsList must be a function.'
+			);
+			return;
+		}
+	}
 
 	const existingSource = unlock(
 		select( blocksStore )
@@ -921,13 +936,6 @@ export const registerBlockBindingsSource = ( source ) => {
 	// Check the `canUserEditValue` property is correct.
 	if ( canUserEditValue && typeof canUserEditValue !== 'function' ) {
 		warning( 'Block bindings source canUserEditValue must be a function.' );
-		return;
-	}
-
-	// Check the `getFieldsList` property is correct.
-	if ( getFieldsList && typeof getFieldsList !== 'function' ) {
-		// eslint-disable-next-line no-console
-		warning( 'Block bindings source getFieldsList must be a function.' );
 		return;
 	}
 
