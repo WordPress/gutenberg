@@ -35,6 +35,7 @@ const WORDPRESS_NAMESPACE = '@wordpress/';
 // This list must be kept in sync with the matching list in packages/dependency-extraction-webpack-plugin/lib/util.js
 // !!
 const BUNDLED_PACKAGES = [
+	'@wordpress/admin-ui',
 	'@wordpress/dataviews',
 	'@wordpress/dataviews/wp',
 	'@wordpress/icons',
