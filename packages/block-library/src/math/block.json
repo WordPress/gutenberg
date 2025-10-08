@@ -10,8 +10,6 @@
 	"attributes": {
 		"latex": {
 			"type": "string",
-			"source": "text",
-			"selector": "math annotation[encoding='application/x-tex']",
 			"role": "content"
 		}
 	}

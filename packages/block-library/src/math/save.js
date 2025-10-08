@@ -22,19 +22,18 @@ export default function save( { attributes } ) {
 			annotate: true,
 			throwOnError: true,
 		} );
+		const doc = document.implementation.createHTMLDocument( '' );
+		doc.body.innerHTML = mathML;
+		mathML = doc.body.querySelector( 'math' ).innerHTML;
 	} catch ( err ) {
-		mathML = latex;
+		return <div { ...useBlockProps.save() }>{ latex }</div>;
 	}
-
-	// Extract the MathML content (remove outer <math> tag)
-	const match = mathML.match( /<math[^>]*>(.*)<\/math>/s );
-	const innerHTML = match ? match[ 1 ] : mathML;
 
 	return (
 		<math
 			{ ...useBlockProps.save() }
 			display="block"
-			dangerouslySetInnerHTML={ { __html: innerHTML } }
+			dangerouslySetInnerHTML={ { __html: mathML } }
 		/>
 	);
 }
