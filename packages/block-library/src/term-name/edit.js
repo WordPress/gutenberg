@@ -31,7 +31,7 @@ export default function TermNameEdit( {
 	setAttributes,
 	context: { termId, taxonomy },
 } ) {
-	const { textAlign, tagName = 'p', isLink } = attributes;
+	const { textAlign, level = 0, isLink } = attributes;
 	const { term } = useTermName( termId, taxonomy );
 
 	const termName = term?.name || __( 'Term Name' );
@@ -44,7 +44,7 @@ export default function TermNameEdit( {
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	const TagName = tagName;
+	const TagName = level === 0 ? 'p' : `h${ level }`;
 
 	let termNameDisplay = termName;
 	if ( isLink ) {
@@ -62,16 +62,10 @@ export default function TermNameEdit( {
 		<>
 			<BlockControls group="block">
 				<HeadingLevelDropdown
-					value={
-						tagName === 'p'
-							? 0
-							: parseInt( tagName.replace( 'h', '' ) )
-					}
+					value={ level }
 					options={ [ 0, 1, 2, 3, 4, 5, 6 ] }
 					onChange={ ( newLevel ) => {
-						setAttributes( {
-							tagName: newLevel === 0 ? 'p' : `h${ newLevel }`,
-						} );
+						setAttributes( { level: newLevel } );
 					} }
 				/>
 				<AlignmentControl

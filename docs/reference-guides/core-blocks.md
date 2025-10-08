@@ -999,7 +999,7 @@ Displays the name of a taxonomy term. ([Source](https://github.com/WordPress/gut
 -	**Experimental:** true
 -	**Category:** theme
 -	**Supports:** align (full, wide), color (background, gradients, link, text), interactivity (clientNavigation), spacing (padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** isLink, tagName, textAlign
+-	**Attributes:** isLink, level, textAlign
 
 ## Term Template
 
