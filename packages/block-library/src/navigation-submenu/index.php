@@ -83,9 +83,9 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	$url = $attributes['url'] ?? '';
 	if ( isset( $attributes['metadata']['bindings']['url']['source'] ) ) {
 		$binding = $attributes['metadata']['bindings']['url'];
-		$source = get_block_bindings_source( $binding['source'] );
+		$source  = get_block_bindings_source( $binding['source'] );
 		if ( $source ) {
-			$source_args = $binding['args'] ?? array();
+			$source_args  = $binding['args'] ?? array();
 			$resolved_url = $source->get_value( $source_args, $block, 'url' );
 			if ( $resolved_url ) {
 				$url = $resolved_url;
