@@ -486,10 +486,10 @@ export function resetZoomLevel() {
 }
 
 /**
- * Toggles whether the block linked to a comment is considered selected.
+ * Action that toggles the spotlighted block state.
  *
  * @param {string}  clientId          The block's clientId.
- * @param {boolean} hasBlockSpotlight Whether the block comment is selected.
+ * @param {boolean} hasBlockSpotlight The spotlight state.
  * @return {Object} Action object.
  */
 export function toggleBlockSpotlight( clientId, hasBlockSpotlight ) {

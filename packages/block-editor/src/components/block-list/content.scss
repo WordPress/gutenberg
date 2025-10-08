@@ -315,7 +315,7 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	}
 }
 
-// Spotlight the only block whose comment is selected.
+// Spotlight the selected block.
 .is-root-container:has(.is-spotlighted) {
 	.block-editor-block-list__block:not(.has-child-selected) {
 		opacity: 0.2;
