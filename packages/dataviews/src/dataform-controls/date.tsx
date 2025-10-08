@@ -429,26 +429,34 @@ function CalendarDateControl< Item >( {
 }
 
 function CalendarDateRangeControl< Item >( {
-	id,
-	value,
-	onChange,
-	label,
-	hideLabelFromVision,
-	className,
 	data,
 	field,
-	setValue,
-}: {
-	id: string;
-	value: DateRange;
-	onChange: ( value: DateRange ) => void;
-	label: string;
-	hideLabelFromVision?: boolean;
-	className?: string;
-	data: Item;
-	field: any;
-	setValue: any;
-} ) {
+	onChange,
+	hideLabelFromVision,
+}: DataFormControlProps< Item > ) {
+	const { id, label, getValue, setValue } = field;
+	let value: DateRange;
+	const fieldValue = getValue( { item: data } );
+	if (
+		Array.isArray( fieldValue ) &&
+		fieldValue.length === 2 &&
+		fieldValue.every( ( date ) => typeof date === 'string' )
+	) {
+		value = fieldValue as DateRange;
+	}
+
+	const onChangeCallback = useCallback(
+		( newValue: DateRange ) => {
+			onChange(
+				setValue( {
+					item: data,
+					value: newValue,
+				} )
+			);
+		},
+		[ data, onChange, setValue ]
+	);
+
 	const [ selectedPresetId, setSelectedPresetId ] = useState< string | null >(
 		null
 	);
@@ -476,13 +484,16 @@ function CalendarDateRangeControl< Item >( {
 	const updateDateRange = useCallback(
 		( fromDate?: Date | string, toDate?: Date | string ) => {
 			if ( fromDate && toDate ) {
-				onChange( [ formatDate( fromDate ), formatDate( toDate ) ] );
+				onChangeCallback( [
+					formatDate( fromDate ),
+					formatDate( toDate ),
+				] );
 			} else if ( ! fromDate && ! toDate ) {
-				onChange( undefined );
+				onChangeCallback( undefined );
 			}
 			// Do nothing if only one date is set - wait for both
 		},
-		[ onChange ]
+		[ onChangeCallback ]
 	);
 
 	const onSelectCalendarRange = useCallback(
@@ -552,7 +563,7 @@ function CalendarDateRangeControl< Item >( {
 			<BaseControl
 				__nextHasNoMarginBottom
 				id={ id }
-				className={ className }
+				className={ 'dataviews-controls__date' }
 				label={ displayLabel }
 				hideLabelFromVision={ hideLabelFromVision }
 			>
@@ -648,18 +659,6 @@ export default function DateControl< Item >( {
 		[ data, onChange, setValue ]
 	);
 
-	const onChangeCalendarDateRangeControl = useCallback(
-		( newValue: DateRange ) => {
-			onChange(
-				setValue( {
-					item: data,
-					value: newValue,
-				} )
-			);
-		},
-		[ data, onChange, setValue ]
-	);
-
 	const onChangeCalendarDateControl = useCallback(
 		( newValue: string | undefined ) =>
 			onChange( setValue( { item: data, value: newValue } ) ),
@@ -681,27 +680,12 @@ export default function DateControl< Item >( {
 	}
 
 	if ( operator === OPERATOR_BETWEEN ) {
-		let dateRangeValue: DateRange;
-		if (
-			Array.isArray( value ) &&
-			value.length === 2 &&
-			value.every( ( date ) => typeof date === 'string' )
-		) {
-			// Ensure the value is expected format
-			dateRangeValue = value as DateRange;
-		}
-
 		return (
 			<CalendarDateRangeControl
-				className="dataviews-controls__date"
-				id={ id }
-				value={ dateRangeValue }
-				onChange={ onChangeCalendarDateRangeControl }
-				label={ label }
-				hideLabelFromVision={ hideLabelFromVision }
 				data={ data }
 				field={ field }
-				setValue={ setValue }
+				onChange={ onChange }
+				hideLabelFromVision={ hideLabelFromVision }
 			/>
 		);
 	}
