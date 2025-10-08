@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { MenuItem } from '@wordpress/components';
-import { _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { comment as commentIcon } from '@wordpress/icons';
 
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
@@ -14,7 +14,7 @@ import { unlock } from '../../lock-unlock';
 
 const { CommentIconSlotFill } = unlock( blockEditorPrivateApis );
 
-const AddCommentButton = ( { onClick } ) => {
+const AddCommentMenuItem = ( { onClick } ) => {
 	return (
 		<CommentIconSlotFill.Fill>
 			{ ( { onClose } ) => (
@@ -26,11 +26,11 @@ const AddCommentButton = ( { onClick } ) => {
 					} }
 					aria-haspopup="dialog"
 				>
-					{ _x( 'Comment', 'Add comment button' ) }
+					{ __( 'Comment' ) }
 				</MenuItem>
 			) }
 		</CommentIconSlotFill.Fill>
 	);
 };
 
-export default AddCommentButton;
+export default AddCommentMenuItem;
