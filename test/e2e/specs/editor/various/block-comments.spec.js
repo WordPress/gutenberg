@@ -10,12 +10,6 @@ test.use( {
 } );
 
 test.describe( 'Block Comments', () => {
-	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.setGutenbergExperiments( [
-			'gutenberg-block-comment',
-		] );
-	} );
-
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
 	} );
