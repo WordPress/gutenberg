@@ -49,14 +49,12 @@ export const createSyncProvider = ( connectLocal, connectRemote ) => {
 	 * Fetch data from local database or remote source.
 	 *
 	 * @param {ObjectType} objectType    Object type to load.
-	 * @param {ObjectData} rawRecord     Raw entity record.
+	 * @param {ObjectID}   objectId      Object ID.
+	 * @param {ObjectData} record        Entity record.
 	 * @param {Function}   handleChanges Callback to call when data changes.
 	 */
-	async function bootstrap( objectType, rawRecord, handleChanges ) {
+	async function bootstrap( objectType, objectId, record, handleChanges ) {
 		const doc = new Y.Doc();
-		const objectData =
-			config[ objectType ].getInitialObjectData( rawRecord );
-		const objectId = config[ objectType ].getObjectId( rawRecord );
 		docs[ objectType ] = docs[ objectType ] || {};
 		docs[ objectType ][ objectId ] = doc;
 
@@ -79,7 +77,7 @@ export const createSyncProvider = ( connectLocal, connectRemote ) => {
 		}
 
 		doc.transact( () => {
-			config[ objectType ].applyChangesToCRDTDoc( doc, objectData );
+			config[ objectType ].applyChangesToCRDTDoc( doc, record );
 		} );
 
 		listeners[ objectType ] = listeners[ objectType ] || {};

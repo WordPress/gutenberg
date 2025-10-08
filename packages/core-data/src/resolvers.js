@@ -161,14 +161,18 @@ export const getEntityRecord =
 				! query
 			) {
 				if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+					const objectType = `${ kind }/${ name }`;
+					const objectId = key;
+
 					getSyncProvider().register(
-						entityConfig.syncConfig.objectType + '--edit',
+						objectType,
 						entityConfig.syncConfig
 					);
 
 					// Bootstraps the edited document (and load from peers).
 					await getSyncProvider().bootstrap(
-						entityConfig.syncConfig.objectType + '--edit',
+						objectType,
+						objectId,
 						record,
 						( edits ) => {
 							dispatch( {

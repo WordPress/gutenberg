@@ -25,8 +25,6 @@ export interface SyncConfig {
 	) => void;
 	getChangesFromCRDTDoc: ( ydoc: Y.Doc ) => ObjectData;
 	getInitialObjectData: ( record: ObjectData ) => ObjectData;
-	getObjectId: ( data: ObjectData ) => ObjectID;
-	objectType: ObjectType;
 	supports: Record< string, true >;
 }
 
@@ -34,7 +32,8 @@ export type SyncProvider = {
 	register: ( type: ObjectType, config: SyncConfig ) => void;
 	bootstrap: (
 		type: ObjectType,
-		rawRecord: ObjectData,
+		objectId: ObjectID,
+		record: ObjectData,
 		handleChanges: ( data: any ) => void
 	) => Promise< void >;
 	update: ( type: ObjectType, id: ObjectID, data: any ) => void;

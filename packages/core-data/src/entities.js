@@ -360,21 +360,6 @@ async function loadPostTypeEntities() {
 				getInitialObjectData: ( record ) => record,
 
 				/**
-				 * Get the immutable identifier for an entity record.
-				 *
-				 * @param {import('@wordpress/sync').ObjectData} record
-				 * @return {import('@wordpress/sync').ObjectID} The entity's ID
-				 */
-				getObjectId: ( { id } ) => id,
-
-				/**
-				 * The object type for the entity, used to scope CRDT documents.
-				 *
-				 * @type {import('@wordpress/sync').ObjectType}
-				 */
-				objectType: `postType/${ postType.slug }`,
-
-				/**
 				 * Sync features supported by the entity.
 				 *
 				 * @type {Record< string, boolean >}
@@ -430,9 +415,6 @@ async function loadSiteEntity() {
 		syncConfig: {
 			applyChangesToCRDTDoc: defaultApplyChangesToCRDTDoc,
 			getChangesFromCRDTDoc: defaultGetChangesFromCRDTDoc,
-			getObjectId: () => 'index',
-			objectType: 'root/site',
-			supports: {},
 		},
 		meta: {},
 	};
