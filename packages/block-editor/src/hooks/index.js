@@ -23,6 +23,7 @@ import duotone from './duotone';
 import fontFamily from './font-family';
 import fontSize from './font-size';
 import textAlign from './text-align';
+import fitText from './fit-text';
 import border from './border';
 import position from './position';
 import blockStyleVariation from './block-style-variation';
@@ -43,6 +44,7 @@ createBlockEditFilter(
 		customClassName,
 		style,
 		duotone,
+		fitText,
 		position,
 		layout,
 		contentLockUI,
@@ -62,6 +64,7 @@ createBlockListBlockFilter( [
 	duotone,
 	fontFamily,
 	fontSize,
+	fitText,
 	border,
 	position,
 	blockStyleVariation,
@@ -74,6 +77,7 @@ createBlockSaveFilter( [
 	ariaLabel,
 	customClassName,
 	border,
+	fitText,
 	color,
 	style,
 	fontFamily,
