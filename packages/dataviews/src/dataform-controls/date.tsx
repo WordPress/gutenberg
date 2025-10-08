@@ -356,7 +356,7 @@ function CalendarDateControl< Item >( {
 			<BaseControl
 				__nextHasNoMarginBottom
 				id={ id }
-				className={ 'dataviews-controls__date' }
+				className="dataviews-controls__date"
 				label={ displayLabel }
 				hideLabelFromVision={ hideLabelFromVision }
 			>
