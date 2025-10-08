@@ -62,9 +62,11 @@ export default function TermNameEdit( {
 
 	let termNameDisplay = termName;
 	if ( isLink ) {
-		const termLink = term?.link || '#';
 		termNameDisplay = (
-			<a href={ termLink } onClick={ ( e ) => e.preventDefault() }>
+			<a
+				href="#term-name-pseudo-link"
+				onClick={ ( e ) => e.preventDefault() }
+			>
 				{ termName }
 			</a>
 		);
