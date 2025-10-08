@@ -15,10 +15,17 @@
 function render_block_core_table_of_contents( $attributes ) {
 	// Extract headings from the block tree.
 	$headings = array();
+	$content  = '';
 
 	global $wp_current_filter;
 	if ( in_array( 'the_content', $wp_current_filter, true ) ) {
 		// Post content context.
+		$post = get_post();
+		if ( $post ) {
+			$content = $post->post_content;
+		}
+	} elseif ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+		// Editor context.
 		$post = get_post();
 		if ( $post ) {
 			$content = $post->post_content;
@@ -29,6 +36,10 @@ function render_block_core_table_of_contents( $attributes ) {
 		if ( ! empty( $_wp_current_template_content ) ) {
 			$content = $_wp_current_template_content;
 		}
+	}
+
+	if ( empty( $content ) ) {
+		return '';
 	}
 
 	$blocks   = parse_blocks( $content );

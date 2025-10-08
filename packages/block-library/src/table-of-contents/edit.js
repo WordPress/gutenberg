@@ -36,7 +36,7 @@ import {
  */
 import TableOfContentsList from './list';
 import { linearToNestedHeadingList } from './utils';
-import { useObserveHeadings } from './hooks';
+import { getLatestHeadings } from './hooks';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 /** @typedef {import('./utils').HeadingData} HeadingData */
@@ -46,7 +46,6 @@ import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
  *
  * @param {Object}                       props                                   The props.
  * @param {Object}                       props.attributes                        The block attributes.
- * @param {HeadingData[]}                props.attributes.headings               The list of data for each heading in the post.
  * @param {boolean}                      props.attributes.onlyIncludeCurrentPage Whether to only include headings from the current page (if the post is paginated).
  * @param {number|undefined}             props.attributes.maxLevel               The maximum heading level to include, or null to include all levels.
  * @param {boolean}                      props.attributes.ordered                Whether to display as an ordered list (true) or unordered list (false).
@@ -56,16 +55,17 @@ import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
  * @return {Component} The component.
  */
 export default function TableOfContentsEdit( {
-	attributes: {
-		headings = [],
-		onlyIncludeCurrentPage,
-		maxLevel,
-		ordered = true,
-	},
+	attributes: { onlyIncludeCurrentPage, maxLevel, ordered = true },
 	clientId,
 	setAttributes,
 } ) {
-	useObserveHeadings( clientId );
+	// Get headings so they can be previewed in the editor.
+	const headings = useSelect(
+		( select ) => {
+			return getLatestHeadings( select, clientId );
+		},
+		[ clientId ]
+	);
 
 	const blockProps = useBlockProps();
 	const instanceId = useInstanceId(

@@ -1,17 +1,11 @@
 /**
- * External dependencies
- */
-import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-
-/**
  * WordPress dependencies
  */
-import { useRegistry } from '@wordpress/data';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-import { useEffect } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
 
-function getLatestHeadings( select, clientId ) {
+export function getLatestHeadings( select, clientId ) {
 	const {
 		getBlockAttributes,
 		getBlockName,
@@ -19,6 +13,8 @@ function getLatestHeadings( select, clientId ) {
 		getClientIdsOfDescendants,
 		getBlocks,
 	} = select( blockEditorStore );
+
+	const { getEditedEntityRecord } = select( coreStore );
 
 	const isPaginated = getBlocksByName( 'core/nextpage' ).length !== 0;
 	const { onlyIncludeCurrentPage, maxLevel } =
@@ -117,12 +113,34 @@ function getLatestHeadings( select, clientId ) {
 						.replace( /^-+|-+$/g, '' );
 				}
 
+				// Get the full permalink for consistency with server-side rendering.
+				// eslint-disable-next-line @wordpress/data-no-store-string-literals
+				const { getCurrentPostId, getCurrentPostType } =
+					select( 'core/editor' );
+				const currentPostId = getCurrentPostId();
+				const currentPostType = getCurrentPostType();
+
+				let permalink = '';
+				if ( currentPostId && currentPostType ) {
+					const post = getEditedEntityRecord(
+						'postType',
+						currentPostType,
+						currentPostId
+					);
+					permalink = post?.link || '';
+				}
+
+				let fullLink = '';
+				if ( anchor && permalink ) {
+					fullLink = `${ permalink }#${ anchor }`;
+				} else if ( anchor ) {
+					fullLink = `#${ anchor }`;
+				}
+
 				latestHeadings.push( {
 					content,
 					level: headingAttributes.level,
-					// Store only the anchor (with # prefix), not full URL
-					// Full URL will be added server-side
-					link: anchor ? `#${ anchor }` : '',
+					link: fullLink,
 					page: isPaginated && headingPage > 1 ? headingPage : null,
 				} );
 			}
@@ -130,40 +148,4 @@ function getLatestHeadings( select, clientId ) {
 	}
 
 	return latestHeadings;
-}
-
-function observeCallback( select, dispatch, clientId ) {
-	const { getBlockAttributes } = select( blockEditorStore );
-	const { updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent } =
-		dispatch( blockEditorStore );
-
-	/**
-	 * If the block no longer exists in the store, skip the update.
-	 * The "undo" action recreates the block and provides a new `clientId`.
-	 * The hook still might be observing the changes while the old block unmounts.
-	 */
-	const attributes = getBlockAttributes( clientId );
-	if ( attributes === null ) {
-		return;
-	}
-
-	const headings = getLatestHeadings( select, clientId );
-	if ( ! fastDeepEqual( headings, attributes.headings ) ) {
-		// Executing the update in a microtask ensures that the non-persistent marker doesn't affect an attribute triggering the change.
-		window.queueMicrotask( () => {
-			__unstableMarkNextChangeAsNotPersistent();
-			updateBlockAttributes( clientId, { headings } );
-		} );
-	}
-}
-
-export function useObserveHeadings( clientId ) {
-	const registry = useRegistry();
-	useEffect( () => {
-		// Todo: Limit subscription to block editor store when data no longer depends on `getPermalink`.
-		// See: https://github.com/WordPress/gutenberg/pull/45513
-		return registry.subscribe( () =>
-			observeCallback( registry.select, registry.dispatch, clientId )
-		);
-	}, [ registry, clientId ] );
 }

@@ -9,13 +9,6 @@
 	"keywords": [ "document outline", "summary" ],
 	"textdomain": "default",
 	"attributes": {
-		"headings": {
-			"type": "array",
-			"items": {
-				"type": "object"
-			},
-			"default": []
-		},
 		"onlyIncludeCurrentPage": {
 			"type": "boolean",
 			"default": false
