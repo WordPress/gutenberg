@@ -311,3 +311,21 @@
 >
 	<template data-wp-each="state.eachIterator"><p data-wp-text="context.item"></p></template>
 </div>
+<div
+	data-wp-interactive="directive-each"
+	data-testid="each-with-multiple-directives"
+>
+	<template
+		data-wp-each="state.eachArray"
+		data-wp-each--id1="state.eachArray"
+	>
+		<p data-wp-text="context.item"></p>
+	</template>
+	<template
+		data-wp-each="state.eachArray"
+		data-wp-each---unique-id="state.eachArray"
+	>
+		<p data-wp-text="context.item"></p>
+	</template>
+</div>
+
