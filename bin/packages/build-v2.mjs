@@ -127,9 +127,18 @@ function wordpressExternalsPlugin() {
  * Bundle a package for WordPress using esbuild.
  *
  * @param {string} packageName Package name.
+ * @return {Promise<boolean>} True if the package was bundled, false otherwise.
  */
 async function bundlePackage( packageName ) {
 	const packageDir = path.join( PACKAGES_DIR, packageName );
+	const packageJsonPath = path.join( packageDir, 'package.json' );
+	const packageJson = JSON.parse( await readFile( packageJsonPath, 'utf8' ) );
+
+	// Skip if package doesn't need WordPress bundling
+	if ( ! packageJson.wpScript ) {
+		return false;
+	}
+
 	const entryPoint = path.join( packageDir, 'build-module', 'index.js' );
 	const outputDir = path.join( PACKAGES_DIR, '..', 'build', packageName );
 	const target = browserslistToEsbuild();
@@ -145,6 +154,13 @@ async function bundlePackage( packageName ) {
 		globalName,
 	};
 
+	// For packages with default exports, add a footer to properly expose the default
+	if ( packageJson.wpScriptDefaultExport ) {
+		baseConfig.footer = {
+			js: `if (typeof ${ globalName } === 'object' && ${ globalName }.default) { ${ globalName } = ${ globalName }.default; }`,
+		};
+	}
+
 	await Promise.all( [
 		esbuild.build( {
 			...baseConfig,
@@ -158,6 +174,8 @@ async function bundlePackage( packageName ) {
 			minify: false,
 		} ),
 	] );
+
+	return true;
 }
 
 /**
@@ -198,25 +216,15 @@ async function transpilePackage( packageDir, srcFiles ) {
 }
 
 /**
- * Build a single package (transpile + bundle).
+ * Transpile a single package's source files.
  *
- * @param {string}  packageName    Package name.
- * @param {Object}  options        Build options.
- * @param {boolean} options.silent If true, suppress console output.
+ * @param {string} packageName Package name.
  * @return {Promise<number>} Build time in milliseconds.
  */
-async function buildPackage( packageName, { silent = false } = {} ) {
+async function transpilePackageFiles( packageName ) {
 	const startTime = Date.now();
 	const packageDir = path.join( PACKAGES_DIR, packageName );
 
-	if ( ! silent ) {
-		console.log( `📦 Building ${ packageName }...` );
-	}
-
-	const packageJsonPath = path.join( packageDir, 'package.json' );
-	const packageJson = JSON.parse( await readFile( packageJsonPath, 'utf8' ) );
-
-	// Step 1: Transpile source files
 	const srcFiles = await glob(
 		normalizePath(
 			path.join( packageDir, `src/**/*.${ SOURCE_EXTENSIONS }` )
@@ -226,27 +234,9 @@ async function buildPackage( packageName, { silent = false } = {} ) {
 		}
 	);
 
-	if ( ! silent ) {
-		console.log(
-			`  📝 Transpiling ${ srcFiles.length } source file(s)...`
-		);
-	}
 	await transpilePackage( packageDir, srcFiles );
 
-	// Step 2: Bundle for WordPress (if wpScript is true)
-	if ( packageJson.wpScript ) {
-		if ( ! silent ) {
-			console.log( '  📦 Bundling for WordPress...' );
-		}
-		await bundlePackage( packageName );
-	}
-
-	const buildTime = Date.now() - startTime;
-	if ( ! silent ) {
-		console.log( `  ✅ ${ packageName } built successfully\n` );
-	}
-
-	return buildTime;
+	return Date.now() - startTime;
 }
 
 /**
@@ -308,13 +298,25 @@ async function buildAll() {
 
 	const startTime = Date.now();
 
-	// Build all packages in parallel, logging each as it completes
+	// Phase 1: Transpile all packages in parallel
+	console.log( '📝 Phase 1: Transpiling packages...\n' );
 	await Promise.all(
 		V2_PACKAGES.map( async ( packageName ) => {
-			const buildTime = await buildPackage( packageName, {
-				silent: true,
-			} );
-			console.log( `✔ ${ packageName } (${ buildTime }ms)` );
+			const buildTime = await transpilePackageFiles( packageName );
+			console.log( `✔ Transpiled ${ packageName } (${ buildTime }ms)` );
+		} )
+	);
+
+	// Phase 2: Bundle packages with wpScript in parallel
+	console.log( '\n📦 Phase 2: Bundling packages...\n' );
+	await Promise.all(
+		V2_PACKAGES.map( async ( packageName ) => {
+			const startBundleTime = Date.now();
+			const isBundled = await bundlePackage( packageName );
+			const buildTime = Date.now() - startBundleTime;
+			if ( isBundled ) {
+				console.log( `✔ Bundled ${ packageName } (${ buildTime }ms)` );
+			}
 		} )
 	);
 
@@ -328,7 +330,7 @@ async function buildAll() {
  * Watch mode for development.
  */
 async function watchMode() {
-	let packagesToRebuild = new Set();
+	const packagesToRebuild = new Set();
 	const rebuilding = new Set();
 	let rebuildTimeoutId = null;
 
@@ -341,9 +343,12 @@ async function watchMode() {
 			rebuilding.add( packageName );
 
 			try {
-				const buildTime = await buildPackage( packageName, {
-					silent: true,
-				} );
+				const startTime = Date.now();
+
+				await transpilePackageFiles( packageName );
+				await bundlePackage( packageName );
+
+				const buildTime = Date.now() - startTime;
 				console.log( `✅ ${ packageName } (${ buildTime }ms)` );
 			} catch ( error ) {
 				console.log(

@@ -31,9 +31,16 @@
 	],
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.js",
+			"require": "./build/index.js"
+		},
+		"./package.json": "./package.json"
+	},
 	"dependencies": {
-		"@axe-core/puppeteer": "^4.0.0",
-		"@babel/runtime": "7.25.7"
+		"@axe-core/puppeteer": "^4.0.0"
 	},
 	"peerDependencies": {
 		"jest": ">=29",
