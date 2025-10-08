@@ -19,7 +19,7 @@ function gutenberg_get_site_editor_redirection_6_9() {
 
 	// The following redirects are for the new permalinks in the site editor.
 	// /wp_template/tt5//home -> /wp_registered_template/tt5//home
-	if ( isset( $_GET['p'] ) && preg_match( '#^/wp_template/([a-zA-Z0-9-]+//[a-zA-Z0-9-]+)$#', $_GET['p'], $matches ) ) {
+	if ( isset( $_REQUEST['p'] ) && preg_match( '#^/wp_template/([a-zA-Z0-9-]+//[a-zA-Z0-9-]+)$#', $_REQUEST['p'], $matches ) ) {
 		return add_query_arg( array( 'p' => '/wp_registered_template/' . $matches[1] ), remove_query_arg( array( 'p' ) ) );
 	}
 
