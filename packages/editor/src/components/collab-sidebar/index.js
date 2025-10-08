@@ -280,9 +280,7 @@ function CommentBoardWrapper( {
 	return (
 		<VStack
 			ref={ refs.setFloating }
-			className={ clsx( 'editor-collab-sidebar-panel__thread', {
-				'editor-collab-sidebar-panel__active-thread': false,
-			} ) }
+			className="editor-collab-sidebar-panel__thread is-floating"
 			spacing="0"
 			style={ { top: y } }
 		>
