@@ -194,6 +194,30 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * Verify that when querying block comments for multiple posts, if the user does not have
+	 * permission to read comments on all of the posts, a 403 is returned.
+	 */
+	public function test_block_comment_get_items_permissions_mixed_post_authors() {
+		$author_post_id = $this->create_test_post_with_block_comment( 'author' );
+		$editor_post_id = $this->create_test_post_with_block_comment( 'editor' );
+
+		wp_set_current_user( self::$user_ids['author'] );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/comments' );
+		$request->set_param( 'post', array( $author_post_id, $editor_post_id ) );
+		$request->set_param( 'type', 'block_comment' );
+		$request->set_param( 'status', 'all' );
+		$request->set_param( 'per_page', 100 );
+		$request->set_param( 'context', 'edit' );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_forbidden_context', $response, 403 );
+
+		wp_delete_post( $author_post_id, true );
+		wp_delete_post( $editor_post_id, true );
+	}
+
+	/**
 	 * Test that for each user role, the permissions are correct when accessing a comment.
 	 *
 	 * @param string $role The user role to test.
