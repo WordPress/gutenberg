@@ -68,8 +68,14 @@ export function ItemClickWrapper< Item >( {
 	className?: string;
 	children: ReactNode;
 } ) {
+	// Always render a wrapper element so layout and styling relying on the wrapper
+	// still works even if the item is not clickable.
 	if ( ! isItemClickable( item ) ) {
-		return children;
+		return (
+			<div className={ className } { ...extraProps }>
+				{ children }
+			</div>
+		);
 	}
 
 	// If we have a renderItemLink, use it
