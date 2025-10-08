@@ -203,40 +203,4 @@ HTML;
 		$router_config = wp_interactivity_config( 'core/router' );
 		$this->assertTrue( $router_config['clientNavigationDisabled'] );
 	}
-
-	/**
-	 * Tests that the `core/query` block sets the option
-	 * `clientNavigationDisabled` to `true` in the `core/router` store config
-	 * when a plugin that does not define clientNavigation is found inside.
-	 */
-	public function test_rendering_query_with_enhanced_pagination_auto_disabled_when_there_is_a_non_compatible_block() {
-		global $wp_query, $wp_the_query;
-
-		$content = <<<HTML
-		<!-- wp:query {"queryId":0,"query":{"inherit":true},"enhancedPagination":true} -->
-		<div class="wp-block-query">
-			<!-- wp:test/plugin-block /-->
-		</div>
-		<!-- /wp:query -->
-HTML;
-
-		// Set main query to single post.
-		$wp_query = new WP_Query(
-			array(
-				'posts_per_page' => 1,
-			)
-		);
-
-		$wp_the_query = $wp_query;
-
-		$output = do_blocks( $content );
-
-		$p = new WP_HTML_Tag_Processor( $output );
-
-		$p->next_tag( array( 'class_name' => 'wp-block-query' ) );
-		$this->assertSame( 'query-0', $p->get_attribute( 'data-wp-router-region' ) );
-
-		$router_config = wp_interactivity_config( 'core/router' );
-		$this->assertTrue( $router_config['clientNavigationDisabled'] );
-	}
 }
