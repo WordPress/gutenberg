@@ -14,7 +14,7 @@ import { unlock } from '../../lock-unlock';
 
 const { CommentIconSlotFill } = unlock( blockEditorPrivateApis );
 
-const AddCommentMenuItem = ( { onClick, onMouseDown } ) => {
+const AddCommentMenuItem = ( { onClick } ) => {
 	return (
 		<CommentIconSlotFill.Fill>
 			{ ( { onClose } ) => (
@@ -24,7 +24,6 @@ const AddCommentMenuItem = ( { onClick, onMouseDown } ) => {
 						onClick();
 						onClose();
 					} }
-					onMouseDown={ onMouseDown }
 					aria-haspopup="dialog"
 				>
 					{ __( 'Comment' ) }

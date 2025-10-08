@@ -110,20 +110,24 @@ export default function CollabSidebar() {
 		return null;
 	}
 
-	// Trigger opening the sidebar a bit earlier, on mouse down.
-	// This ensures there's sidebar reference when focus is shifted to the comment thread.
-	function openTheSidebar() {
+	async function openTheSidebar() {
 		enableComplementaryArea( 'core', collabHistorySidebarName );
-	}
+		const activeArea = await getActiveComplementaryArea( 'core' );
 
-	function transferFocusToThread() {
-		setShowCommentBoard( ! blockCommentId );
-		focusCommentThread(
-			blockCommentId,
-			commentSidebarRef.current,
-			// Focus a comment thread when there's a selected block with a comment.
-			! blockCommentId ? 'textarea' : undefined
-		);
+		// Move focus to the target element after the sidebar has opened.
+		if (
+			[ collabHistorySidebarName, collabSidebarName ].includes(
+				activeArea
+			)
+		) {
+			setShowCommentBoard( ! blockCommentId );
+			focusCommentThread(
+				blockCommentId,
+				commentSidebarRef.current,
+				// Focus a comment thread when there's a selected block with a comment.
+				! blockCommentId ? 'textarea' : undefined
+			);
+		}
 	}
 
 	return (
@@ -132,14 +136,10 @@ export default function CollabSidebar() {
 				<CommentAvatarIndicator
 					thread={ currentThread }
 					hasMoreComments={ hasMoreComments }
-					onMouseDown={ openTheSidebar }
-					onClick={ transferFocusToThread }
+					onClick={ openTheSidebar }
 				/>
 			) }
-			<AddCommentMenuItem
-				onMouseDown={ openTheSidebar }
-				onClick={ transferFocusToThread }
-			/>
+			<AddCommentMenuItem onClick={ openTheSidebar } />
 			<PluginSidebar
 				identifier={ collabHistorySidebarName }
 				// translators: Comments sidebar title
