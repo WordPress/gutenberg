@@ -73,11 +73,10 @@ function CollabSidebarContent( {
 	);
 }
 
-function CommentBoardWrapper( {
+function FloatingCommentBoard( {
 	thread,
 	showCommentBoard,
 	setShowCommentBoard,
-	backgroundColor,
 	previousThreadId,
 	commentSidebarRef,
 	offsetsRef,
@@ -141,6 +140,7 @@ function CommentBoardWrapper( {
 			updateHeight( thread.id, newHeight );
 		}
 	}, [ thread.id, updateHeight ] );
+	const { onCreate, onEdit, onDelete } = useBlockCommentsActions();
 
 	return (
 		<VStack
@@ -149,14 +149,14 @@ function CommentBoardWrapper( {
 			spacing="0"
 			style={ { top: y } }
 		>
-			<CollabSidebarContent
-				comments={ [ thread ] }
-				commentSidebarRef={ commentSidebarRef }
+			<Comments
+				threads={ [ thread ] }
+				onEditComment={ onEdit }
+				onAddReply={ onCreate }
+				onCommentDelete={ onDelete }
 				showCommentBoard={ showCommentBoard }
 				setShowCommentBoard={ setShowCommentBoard }
-				styles={ {
-					backgroundColor,
-				} }
+				commentSidebarRef={ commentSidebarRef }
 			/>
 		</VStack>
 	);
@@ -282,23 +282,22 @@ export default function CollabSidebar() {
 					backgroundColor={ backgroundColor }
 				>
 					<div
-						className="editor-collab-sidebar__background"
+						className="editor-collab-sidebar-panel"
 						style={ {
 							backgroundColor,
-							height: '100%',
 						} }
+						ref={ commentSidebarRef }
 					>
 						{ unresolvedSortedThreads.length > 0 &&
 							unresolvedSortedThreads.map( ( thread, index ) => {
 								return (
-									<CommentBoardWrapper
+									<FloatingCommentBoard
 										key={ thread.id }
 										thread={ thread }
 										showCommentBoard={ showCommentBoard }
 										setShowCommentBoard={
 											setShowCommentBoard
 										}
-										backgroundColor={ backgroundColor }
 										offsetsRef={ offsetsRef }
 										updateOffsets={ updateOffsets }
 										updateHeight={ updateHeight }
