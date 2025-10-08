@@ -19,8 +19,7 @@
 					"content": "My Content",
 					"dropCap": false,
 					"placeholder": "Content…",
-					"fontSize": "large",
-					"fitText": false
+					"fontSize": "large"
 				},
 				"innerBlocks": []
 			}

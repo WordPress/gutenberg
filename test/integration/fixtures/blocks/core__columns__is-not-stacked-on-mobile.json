@@ -17,8 +17,7 @@
 						"isValid": true,
 						"attributes": {
 							"content": "Column One, Paragraph One",
-							"dropCap": false,
-							"fitText": false
+							"dropCap": false
 						},
 						"innerBlocks": []
 					},
@@ -27,8 +26,7 @@
 						"isValid": true,
 						"attributes": {
 							"content": "Column One, Paragraph Two",
-							"dropCap": false,
-							"fitText": false
+							"dropCap": false
 						},
 						"innerBlocks": []
 					}
@@ -44,8 +42,7 @@
 						"isValid": true,
 						"attributes": {
 							"content": "Column Two, Paragraph One",
-							"dropCap": false,
-							"fitText": false
+							"dropCap": false
 						},
 						"innerBlocks": []
 					},
@@ -54,8 +51,7 @@
 						"isValid": true,
 						"attributes": {
 							"content": "Column Three, Paragraph One",
-							"dropCap": false,
-							"fitText": false
+							"dropCap": false
 						},
 						"innerBlocks": []
 					}

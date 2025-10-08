@@ -17,7 +17,6 @@
 						"attributes": {
 							"content": "Column One, Paragraph One",
 							"dropCap": false,
-							"fitText": false,
 							"className": "layout-column-1"
 						},
 						"innerBlocks": []
@@ -28,7 +27,6 @@
 						"attributes": {
 							"content": "Column One, Paragraph Two",
 							"dropCap": false,
-							"fitText": false,
 							"className": "layout-column-1"
 						},
 						"innerBlocks": []
@@ -46,7 +44,6 @@
 						"attributes": {
 							"content": "Column Two, Paragraph One",
 							"dropCap": false,
-							"fitText": false,
 							"className": "layout-column-2"
 						},
 						"innerBlocks": []
@@ -64,7 +61,6 @@
 						"attributes": {
 							"content": "Column Three, Paragraph One",
 							"dropCap": false,
-							"fitText": false,
 							"className": "layout-column-3"
 						},
 						"innerBlocks": []

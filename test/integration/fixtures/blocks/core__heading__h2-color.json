@@ -5,8 +5,7 @@
 		"attributes": {
 			"content": "Text",
 			"level": 2,
-			"textColor": "accent",
-			"fitText": false
+			"textColor": "accent"
 		},
 		"innerBlocks": []
 	}

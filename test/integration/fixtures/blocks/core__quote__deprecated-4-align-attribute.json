@@ -13,8 +13,7 @@
 				"isValid": true,
 				"attributes": {
 					"content": "Quote with the align attribute. Example: {\"align\":\"right\"}",
-					"dropCap": false,
-					"fitText": false
+					"dropCap": false
 				},
 				"innerBlocks": []
 			}

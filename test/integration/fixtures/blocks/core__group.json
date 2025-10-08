@@ -16,8 +16,7 @@
 				"isValid": true,
 				"attributes": {
 					"content": "This is a group block.",
-					"dropCap": false,
-					"fitText": false
+					"dropCap": false
 				},
 				"innerBlocks": []
 			},
@@ -26,8 +25,7 @@
 				"isValid": true,
 				"attributes": {
 					"content": "Group block content.",
-					"dropCap": false,
-					"fitText": false
+					"dropCap": false
 				},
 				"innerBlocks": []
 			}

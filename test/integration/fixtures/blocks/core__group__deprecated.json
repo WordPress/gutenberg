@@ -14,8 +14,7 @@
 				"isValid": true,
 				"attributes": {
 					"content": "test",
-					"dropCap": false,
-					"fitText": false
+					"dropCap": false
 				},
 				"innerBlocks": []
 			}

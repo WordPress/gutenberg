@@ -18,8 +18,7 @@
 				"attributes": {
 					"content": "My Content",
 					"dropCap": false,
-					"placeholder": "Content…",
-					"fitText": false
+					"placeholder": "Content…"
 				},
 				"innerBlocks": []
 			}

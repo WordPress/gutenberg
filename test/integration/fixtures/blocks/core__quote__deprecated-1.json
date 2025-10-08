@@ -11,8 +11,7 @@
 				"isValid": true,
 				"attributes": {
 					"content": "Testing deprecated quote block...",
-					"dropCap": false,
-					"fitText": false
+					"dropCap": false
 				},
 				"innerBlocks": []
 			}

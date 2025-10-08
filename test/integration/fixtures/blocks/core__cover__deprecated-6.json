@@ -19,8 +19,7 @@
 					"content": "\n\t\t\tGuten Berg!\n\t\t",
 					"dropCap": false,
 					"placeholder": "Write title…",
-					"fontSize": "large",
-					"fitText": false
+					"fontSize": "large"
 				},
 				"innerBlocks": []
 			}
@@ -51,8 +50,7 @@
 				"isValid": true,
 				"attributes": {
 					"content": "",
-					"dropCap": false,
-					"fitText": false
+					"dropCap": false
 				},
 				"innerBlocks": []
 			}
@@ -81,8 +79,7 @@
 					"content": "test",
 					"dropCap": false,
 					"placeholder": "Write title…",
-					"fontSize": "large",
-					"fitText": false
+					"fontSize": "large"
 				},
 				"innerBlocks": []
 			}

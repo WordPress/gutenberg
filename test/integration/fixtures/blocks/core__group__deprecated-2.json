@@ -12,8 +12,7 @@
 				"isValid": true,
 				"attributes": {
 					"content": "My paragraph",
-					"dropCap": false,
-					"fitText": false
+					"dropCap": false
 				},
 				"innerBlocks": []
 			}

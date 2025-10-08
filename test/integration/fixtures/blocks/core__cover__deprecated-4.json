@@ -23,8 +23,7 @@
 					"content": "<strong>Cover Block</strong>",
 					"dropCap": false,
 					"placeholder": "Write title…",
-					"fontSize": "large",
-					"fitText": false
+					"fontSize": "large"
 				},
 				"innerBlocks": []
 			}

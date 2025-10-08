@@ -21,8 +21,7 @@
 					"content": "\n                Guten Berg!\n        ",
 					"dropCap": false,
 					"placeholder": "Write title…",
-					"fontSize": "large",
-					"fitText": false
+					"fontSize": "large"
 				},
 				"innerBlocks": []
 			}

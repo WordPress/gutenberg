@@ -45,7 +45,6 @@ function addAttributes( settings ) {
 			...settings.attributes,
 			fitText: {
 				type: 'boolean',
-				default: false,
 			},
 		},
 	};
@@ -180,15 +179,17 @@ export function FitTextControl( {
 			<ToolsPanelItem
 				hasValue={ () => fitText }
 				label={ __( 'Fit text' ) }
-				onDeselect={ () => setAttributes( { fitText: false } ) }
-				resetAllFilter={ () => ( { fitText: false } ) }
+				onDeselect={ () => setAttributes( { fitText: undefined } ) }
+				resetAllFilter={ () => ( { fitText: undefined } ) }
 				panelId={ clientId }
 			>
 				<ToggleControl
 					__nextHasNoMarginBottom
 					label={ __( 'Fit text' ) }
 					checked={ fitText }
-					onChange={ () => setAttributes( { fitText: ! fitText } ) }
+					onChange={ () =>
+						setAttributes( { fitText: ! fitText || undefined } )
+					}
 					help={
 						fitText
 							? __( 'Text will resize to fit its container.' )
