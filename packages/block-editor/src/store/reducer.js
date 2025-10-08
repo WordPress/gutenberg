@@ -1893,18 +1893,13 @@ export function hasBlockSpotlight( state, action ) {
 			}
 			return state;
 		case 'SELECT_BLOCK':
+		case 'SELECTION_CHANGE':
 			if ( action.clientId !== state ) {
 				return null;
 			}
 			return state;
 		case 'CLEAR_SELECTED_BLOCK':
 			return null;
-		case 'SELECTION_CHANGE': {
-			if ( ! action.clientId && ! action.start && ! action.end ) {
-				return null;
-			}
-			return state;
-		}
 	}
 
 	return state;
