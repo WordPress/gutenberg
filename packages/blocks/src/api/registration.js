@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { select, dispatch } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 import { _x } from '@wordpress/i18n';
 import warning from '@wordpress/warning';
 
@@ -835,9 +836,12 @@ export const registerBlockBindingsSource = ( source ) => {
 	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 		const { getFieldsList } = source;
 		if ( getFieldsList ) {
-			warning(
-				'The getFieldsList function only works on Gutenberg and will be removed in a future release.Please use the editorUI property instead.'
-			);
+			deprecated( 'getFieldsList', {
+				since: '21.9.0',
+				version: '22.5.0',
+				alternative: 'editorUI',
+				plugin: 'Gutenberg',
+			} );
 		}
 		// Check the `getFieldsList` property is correct.
 		if ( getFieldsList && typeof getFieldsList !== 'function' ) {

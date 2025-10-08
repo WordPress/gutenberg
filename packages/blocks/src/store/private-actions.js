@@ -47,20 +47,7 @@ export function addUnprocessedBlockType( name, blockType ) {
  * @param {string} source Name of the source to register.
  */
 export function addBlockBindingsSource( source ) {
-	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-		return {
-			type: 'ADD_BLOCK_BINDINGS_SOURCE',
-			name: source.name,
-			label: source.label,
-			usesContext: source.usesContext,
-			getValues: source.getValues,
-			setValues: source.setValues,
-			canUserEditValue: source.canUserEditValue,
-			getFieldsList: source.getFieldsList,
-			editorUI: source.editorUI,
-		};
-	}
-	return {
+	const action = {
 		type: 'ADD_BLOCK_BINDINGS_SOURCE',
 		name: source.name,
 		label: source.label,
@@ -70,6 +57,12 @@ export function addBlockBindingsSource( source ) {
 		canUserEditValue: source.canUserEditValue,
 		editorUI: source.editorUI,
 	};
+	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+		return {
+			...action,
+			getFieldsList: source.getFieldsList,
+		};
+	}
 }
 
 /**
