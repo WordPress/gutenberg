@@ -42,6 +42,34 @@ function render_block() {
 }
 ```
 
+## allowedBlocks
+
+_**Note:** Since WordPress 6.9._
+
+-   Type: `boolean`
+-   Default value: `false`
+
+This property adds UI controls which enable the user to select allowed child blocks for a block container. To use this feature, pass `attributes.allowedBlocks` as the `allowedBlocks` property in the options object of `useInnerBlocksProps`.
+
+```js
+supports: {
+	allowedBlocks: true
+}
+```
+
+```jsx
+import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
+
+function Edit( { attributes } ) {
+	const { allowedBlocks } = attributes;
+	const blockProps = useBlockProps();
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		allowedBlocks
+	} );
+	return <div { ...innerBlocksProps } />;
+}
+```
+
 ## anchor
 
 -   Type: `boolean`
