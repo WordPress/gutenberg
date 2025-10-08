@@ -484,10 +484,15 @@ function gutenberg_migrate_existing_templates() {
 		),
 		// Only get templates that are not inactive by default.
 		'meta_query'          => array(
+			'relation' => 'OR',
 			array(
 				'key'     => 'is_inactive_by_default',
-				'value'   => true,
-				'compare' => '!=',
+				'compare' => 'NOT EXISTS',
+			),
+			array(
+				'key'     => 'is_inactive_by_default',
+				'value'   => false,
+				'compare' => '=',
 			),
 		),
 	);
