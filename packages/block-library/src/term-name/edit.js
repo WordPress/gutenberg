@@ -19,13 +19,12 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import { useTermName } from './use-term-name';
 
 export default function TermNameEdit( {
 	attributes,
@@ -33,20 +32,7 @@ export default function TermNameEdit( {
 	context: { termId, taxonomy },
 } ) {
 	const { textAlign, tagName = 'p', isLink } = attributes;
-
-	const term = useSelect(
-		( select ) => {
-			if ( ! termId || ! taxonomy ) {
-				return null;
-			}
-			return select( coreStore ).getEntityRecord(
-				'taxonomy',
-				taxonomy,
-				termId
-			);
-		},
-		[ termId, taxonomy ]
-	);
+	const { term } = useTermName( termId, taxonomy );
 
 	const termName = term?.name || __( 'Term Name' );
 

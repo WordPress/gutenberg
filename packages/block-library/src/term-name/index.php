@@ -32,19 +32,22 @@ function render_block_core_term_name( $attributes, $content, $block ) {
 
 	if ( isset( $context['termId'] ) && isset( $context['taxonomy'] ) ) {
 		$term = get_term( $context['termId'], $context['taxonomy'] );
-		if ( $term && ! is_wp_error( $term ) ) {
-			$term_name = $term->name;
+	} else {
+		$term = get_queried_object();
+		if ( ! $term instanceof WP_Term ) {
+			$term = null;
 		}
 	}
 
-	if ( empty( $term_name ) ) {
+	if ( ! $term || is_wp_error( $term ) ) {
 		return '';
 	}
 
-	$tag_name = isset( $attributes['tagName'] ) ? $attributes['tagName'] : 'p';
+	$term_name = $term->name;
+	$tag_name  = isset( $attributes['tagName'] ) ? $attributes['tagName'] : 'p';
 
 	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
-		$term_link = get_term_link( $context['termId'], $context['taxonomy'] );
+		$term_link = get_term_link( $term );
 		if ( ! is_wp_error( $term_link ) ) {
 			$term_name = sprintf(
 				'<a href="%1$s">%2$s</a>',
