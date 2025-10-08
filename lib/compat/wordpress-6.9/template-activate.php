@@ -468,6 +468,11 @@ function gutenberg_set_active_template_theme( $changes, $request ) {
 	$changes->tax_input = array(
 		'wp_theme' => isset( $request['theme'] ) ? $request['theme'] : get_stylesheet(),
 	);
+	// All new templates saved will receive meta so we can distinguish between
+	// templates created the old way as edits and templates created the new way.
+	$changes->meta_input = array(
+		'is_inactive_by_default' => true,
+	);
 	return $changes;
 }
 
@@ -493,6 +498,19 @@ function gutenberg_migrate_existing_templates() {
 				'taxonomy' => 'wp_theme',
 				'field'    => 'name',
 				'terms'    => get_stylesheet(),
+			),
+		),
+		// Only get templates that are not inactive by default.
+		'meta_query'          => array(
+			'relation' => 'OR',
+			array(
+				'key'     => 'is_inactive_by_default',
+				'compare' => 'NOT EXISTS',
+			),
+			array(
+				'key'     => 'is_inactive_by_default',
+				'value'   => false,
+				'compare' => '=',
 			),
 		),
 	);
