@@ -121,7 +121,8 @@ export default function CollabSidebar() {
 		focusCommentThread(
 			blockCommentId,
 			commentSidebarRef.current,
-			'textarea'
+			// Focus a comment thread when there's a selected block with a comment.
+			! blockCommentId ? 'textarea' : undefined
 		);
 	}
 
