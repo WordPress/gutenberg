@@ -1,1 +1,0 @@
-<?php return array('dependencies' => array('@wordpress/interactivity'), 'version' => '1.0.0');
