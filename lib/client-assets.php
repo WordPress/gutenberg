@@ -617,16 +617,37 @@ add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
  * @since 19.3.0
  */
 function gutenberg_default_script_modules() {
+	$all_assets = array();
+
 	/*
+	 * Load combined assets.php for v1 packages (webpack build).
 	 * Expects multidimensional array like:
 	 *
 	 *     'interactivity/index.min.js' => array('dependencies' => array(…), 'version' => '…'),
 	 *     'interactivity/debug.min.js' => array('dependencies' => array(…), 'version' => '…'),
 	 *     'interactivity-router/index.min.js' => …
 	 */
-	$assets = include gutenberg_dir_path() . '/build-module/assets.php';
+	$combined_assets_file = gutenberg_dir_path() . '/build-module/assets.php';
+	if ( file_exists( $combined_assets_file ) ) {
+		$all_assets = include $combined_assets_file;
+	}
 
-	foreach ( $assets as $file_name => $script_module_data ) {
+	/*
+	 * Load individual asset files for v2 packages (esbuild build).
+	 * Follows the same pattern as regular scripts in gutenberg_register_packages_scripts().
+	 */
+	foreach ( glob( gutenberg_dir_path() . 'build-module/*/*.min.js' ) as $path ) {
+		$asset_file = substr( $path, 0, -3 ) . '.asset.php';
+		if ( ! file_exists( $asset_file ) ) {
+			continue;
+		}
+
+		$asset                    = require $asset_file;
+		$file_name                = str_replace( gutenberg_dir_path() . 'build-module/', '', $path );
+		$all_assets[ $file_name ] = $asset;
+	}
+
+	foreach ( $all_assets as $file_name => $script_module_data ) {
 		/*
 		 * Build the WordPress Script Module ID from the file name.
 		 * Prepend `@wordpress/` and remove extensions and `/index` if present:
