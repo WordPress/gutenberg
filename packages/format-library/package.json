@@ -45,7 +45,8 @@
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/rich-text": "file:../rich-text",
-		"@wordpress/url": "file:../url"
+		"@wordpress/url": "file:../url",
+		"temml": "^0.10.33"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",

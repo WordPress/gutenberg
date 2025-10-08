@@ -100,7 +100,7 @@ function fromFormat( {
 	// When a format is declared as non editable, make it non editable in the
 	// editor.
 	if ( isEditableTree && formatType.contentEditable === false ) {
-		// elementAttributes.contenteditable = 'false';
+		elementAttributes.contenteditable = 'false';
 	}
 
 	return {
@@ -257,14 +257,16 @@ export function toTree( {
 				} );
 			} else if ( formatType?.contentEditable === false ) {
 				// For non editable formats, render the stored inner HTML.
-				pointer = append( getParent( pointer ), {
-					type: 'span',
-					attributes: {
-						contenteditable: 'false',
-					},
-				} );
+				// pointer = append( getParent( pointer ), {
+				// 	type: 'span',
+				// 	attributes: {
+				// 		contenteditable: 'false',
+				// 		'data-rich-text-format-type': type,
+				// 	},
+				// } );
 				pointer = append(
-					pointer,
+					// pointer,
+					getParent( pointer ),
 					fromFormat( {
 						...replacement,
 						isEditableTree,
