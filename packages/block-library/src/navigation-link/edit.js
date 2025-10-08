@@ -553,7 +553,6 @@ export default function NavigationLinkEdit( {
 							anchor={ popoverAnchor }
 							onRemove={ removeLink }
 							onChange={ ( updatedValue ) => {
-								// updateAttributes determines the final state and returns metadata
 								const { isEntityLink } = updateAttributes(
 									updatedValue,
 									setAttributes,
