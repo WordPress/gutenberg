@@ -511,32 +511,6 @@ function CustomEditControl< Item >( {
 	);
 }
 
-type ValidatedItem = {
-	text: string;
-	select?: string;
-	textWithRadio?: string;
-	textarea: string;
-	email: string;
-	telephone: string;
-	url: string;
-	color: string;
-	integer: number;
-	number: number;
-	boolean: boolean;
-	customEdit: string;
-	categories: string[];
-	countries: string[];
-	password: string;
-	toggle?: boolean;
-	toggleGroup?: string;
-	date?: string;
-	dateRange?: [ string, string ];
-};
-
-const DateRangeEdit = ( props: DataFormControlProps< ValidatedItem > ) => {
-	return <DateControl { ...props } operator="between" />;
-};
-
 const ValidationComponent = ( {
 	required,
 	type,
@@ -567,6 +541,10 @@ const ValidationComponent = ( {
 		date?: string;
 		dateRange?: string;
 		datetime?: string;
+	};
+
+	const DateRangeEdit = ( props: DataFormControlProps< ValidatedItem > ) => {
+		return <DateControl { ...props } operator="between" />;
 	};
 
 	const [ post, setPost ] = useState< ValidatedItem >( {
