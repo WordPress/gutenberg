@@ -8,7 +8,6 @@ import { IndexeddbPersistence } from 'y-indexeddb';
 /** @typedef {import('./types').ObjectID} ObjectID */
 /** @typedef {import('./types').CRDTDoc} CRDTDoc */
 /** @typedef {import('./types').ConnectDoc} ConnectDoc */
-/** @typedef {import('./types').SyncProvider} SyncProvider */
 
 /**
  * Connect function to the IndexedDB persistence provider.
