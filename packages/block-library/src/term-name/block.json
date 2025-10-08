@@ -34,7 +34,6 @@
 			}
 		},
 		"spacing": {
-			"margin": true,
 			"padding": true
 		},
 		"typography": {
@@ -59,7 +58,6 @@
 			"width": true,
 			"style": true,
 			"__experimentalDefaultControls": {
-				"radius": true,
 				"color": true,
 				"width": true,
 				"style": true
