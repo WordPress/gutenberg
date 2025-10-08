@@ -165,7 +165,6 @@ test.describe( 'Block Comments', () => {
 
 		const resolveButton = page.getByRole( 'button', { name: 'Resolve' } );
 		await resolveButton.click();
-		await expect( resolveButton ).toBeDisabled();
 		await expect(
 			page
 				.getByRole( 'button', { name: 'Dismiss this notice' } )
@@ -173,6 +172,9 @@ test.describe( 'Block Comments', () => {
 		).toBeVisible();
 		await expect( thread ).toBeFocused();
 		await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+
+		await thread.click();
+		await expect( resolveButton ).toBeDisabled();
 
 		await blockCommentUtils.clickBlockCommentActionMenuItem( 'Reopen' );
 		await expect( resolveButton ).toBeEnabled();
@@ -195,7 +197,6 @@ test.describe( 'Block Comments', () => {
 
 		const resolveButton = page.getByRole( 'button', { name: 'Resolve' } );
 		await resolveButton.click();
-		await expect( resolveButton ).toBeDisabled();
 		await expect(
 			page
 				.getByRole( 'button', { name: 'Dismiss this notice' } )
@@ -203,6 +204,7 @@ test.describe( 'Block Comments', () => {
 		).toBeVisible();
 
 		await page.locator( '.editor-collab-sidebar-panel__thread' ).click();
+		await expect( resolveButton ).toBeDisabled();
 		const commentForm = page.getByRole( 'textbox', { name: 'Reply to' } );
 		await commentForm.fill( 'Test reply that reopens the comment.' );
 		await page
