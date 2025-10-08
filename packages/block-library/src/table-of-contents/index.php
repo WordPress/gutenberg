@@ -21,17 +21,18 @@ function render_block_core_table_of_contents( $attributes ) {
 		// Post content context.
 		$post = get_post();
 		if ( $post ) {
-			$blocks   = parse_blocks( $post->post_content );
-			$headings = block_core_table_of_contents_traverse_blocks( $blocks, $attributes['maxLevel'] ?? null );
+			$content = $post->post_content;
 		}
 	} else {
 		// Template context.
 		global $_wp_current_template_content;
 		if ( ! empty( $_wp_current_template_content ) ) {
-			$blocks   = parse_blocks( $_wp_current_template_content );
-			$headings = block_core_table_of_contents_traverse_blocks( $blocks, $attributes['maxLevel'] ?? null );
+			$content = $_wp_current_template_content;
 		}
 	}
+
+	$blocks   = parse_blocks( $content );
+	$headings = block_core_table_of_contents_traverse_blocks( $blocks, $attributes['maxLevel'] ?? null );
 
 	if ( empty( $headings ) ) {
 		return '';
