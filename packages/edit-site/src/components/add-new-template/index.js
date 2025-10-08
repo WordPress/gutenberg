@@ -26,7 +26,7 @@ import {
 	calendar,
 	category,
 	commentAuthorAvatar,
-	edit,
+	pencil,
 	home,
 	layout,
 	list,
@@ -225,7 +225,8 @@ function NewTemplateModal( { onClose } ) {
 				sprintf(
 					// translators: %s: Title of the created post or template, e.g: "Hello world".
 					__( '"%s" successfully created.' ),
-					decodeEntities( newTemplate.title?.rendered || title )
+					decodeEntities( newTemplate.title?.rendered || title ) ||
+						__( '(no title)' )
 				),
 				{
 					type: 'snackbar',
@@ -314,7 +315,7 @@ function NewTemplateModal( { onClose } ) {
 						title={ __( 'Custom template' ) }
 						direction="row"
 						className="edit-site-add-new-template__custom-template-button"
-						icon={ edit }
+						icon={ pencil }
 						onClick={ () =>
 							setModalContent(
 								modalContentMap.customGenericTemplate

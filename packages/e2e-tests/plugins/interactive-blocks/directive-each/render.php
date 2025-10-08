@@ -329,3 +329,15 @@
 	</template>
 </div>
 
+
+<ul 
+	data-wp-interactive="directive-each"
+	data-testid="nested-with-same-item-key"
+>
+	<template data-wp-each="context.list" data-wp-context='{"list":["parent1","parent2"]}'>
+		<template data-wp-each="context.list" data-wp-context='{"list":["child1","child2"]}'>
+			<li data-wp-text="context.item"></li>
+		</template>
+		<li data-wp-text="context.item"></li>
+	</template>
+</ul>

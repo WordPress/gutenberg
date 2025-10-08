@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "21.7.0-rc.1",
+	"version": "21.8.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -87,6 +87,7 @@
 		"babel-plugin-transform-remove-console": "6.9.4",
 		"benchmark": "2.1.4",
 		"browserslist": "4.25.1",
+		"browserslist-to-esbuild": "2.1.1",
 		"caniuse-lite": "1.0.30001731",
 		"chalk": "4.1.1",
 		"change-case": "4.1.2",
@@ -205,6 +206,7 @@
 		"format": "wp-scripts format",
 		"preformat:php": "npm run other:update-packages:php",
 		"format:php": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script format",
+		"prelint": "npm run --if-present --workspaces prelint",
 		"lint": "concurrently \"npm run lint:lockfile\" \"npm run lint:tsconfig\" \"npm run lint:js\" \"npm run lint:pkg-json\" \"npm run lint:css\"",
 		"lint:css": "wp-scripts lint-style \"**/*.scss\"",
 		"lint:css:fix": "npm run lint:css -- --fix",
@@ -273,6 +275,7 @@
 			"wp-scripts format"
 		],
 		"*.{js,ts,tsx}": [
+			"npm run prelint",
 			"wp-scripts lint-js"
 		],
 		"*.scss": [
@@ -293,6 +296,9 @@
 			"npm run docs:theme-ref",
 			"node ./bin/api-docs/are-api-docs-unstaged.js",
 			"node ./bin/packages/lint-staged-typecheck.js"
+		],
+		"packages/icons/src/library/*": [
+			"npm run -w packages/icons build"
 		],
 		"**/tsconfig.json": [
 			"npm run lint:tsconfig"

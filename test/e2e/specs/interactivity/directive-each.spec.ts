@@ -444,6 +444,21 @@ test.describe( 'data-wp-each', () => {
 		}
 	} );
 
+	test( 'should support nested lists with the same item key', async ( {
+		page,
+	} ) => {
+		const mainElement = page.getByTestId( 'nested-with-same-item-key' );
+		const listItems = mainElement.getByRole( 'listitem' );
+		await expect( listItems ).toHaveText( [
+			'child1',
+			'child2',
+			'parent1',
+			'child1',
+			'child2',
+			'parent2',
+		] );
+	} );
+
 	test( 'should do nothing when used on non-template elements', async ( {
 		page,
 	} ) => {

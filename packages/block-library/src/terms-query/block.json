@@ -9,34 +9,25 @@
 	"keywords": [ "terms", "taxonomy", "categories", "tags", "list" ],
 	"textdomain": "default",
 	"attributes": {
-		"termQueryId": {
-			"type": "number"
-		},
 		"termQuery": {
 			"type": "object",
 			"default": {
 				"perPage": 10,
-				"pages": 0,
 				"taxonomy": "category",
 				"order": "asc",
 				"orderBy": "name",
 				"hideEmpty": true,
-				"include": [],
-				"exclude": [],
-				"parent": 0,
-				"hierarchical": false
+				"parent": false,
+				"hierarchical": false,
+				"inherit": false
 			}
 		},
 		"tagName": {
 			"type": "string",
 			"default": "div"
-		},
-		"namespace": {
-			"type": "string"
 		}
 	},
 	"providesContext": {
-		"termQueryId": "termQueryId",
 		"termQuery": "termQuery"
 	},
 	"supports": {

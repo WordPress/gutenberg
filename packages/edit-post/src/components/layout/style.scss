@@ -6,10 +6,7 @@
 	display: flex;
 	flex-direction: column;
 	overflow: hidden;
-
-	&.is-resizable {
-		padding-block-start: $grid-unit-30;
-	}
+	padding-block-start: $button-size-compact;
 }
 
 .edit-post-meta-boxes-main__presenter {
@@ -18,11 +15,14 @@
 	// Windows High Contrast mode will show this outline, but not the shadow.
 	outline: 1px solid transparent;
 	position: relative;
-	z-index: 1;
+	// Re-resizable adds an invisible overlay during resizes (apparently meant to avoid text selections)
+	// and this has to appear in front of it or else click events will be blocked on touch devices.
+	z-index: 10000;
+	inset: 0 0 auto;
+	height: $button-size-compact;
 
-	// Button style reset for both toggle or resizable.
-	.is-toggle-only > &,
-	.is-resizable.edit-post-meta-boxes-main & > button {
+	// Style reset for both toggle and separator buttons.
+	> button {
 		appearance: none;
 		padding: 0;
 		border: none;
@@ -30,10 +30,10 @@
 		background-color: transparent;
 	}
 
-	.is-toggle-only > & {
-		flex-shrink: 0;
+	> button[aria-expanded] {
 		cursor: pointer;
-		height: $button-size-compact;
+		width: 100%;
+		display: flex;
 		justify-content: space-between;
 		align-items: center;
 		padding-inline: $grid-unit-30 $grid-unit-15;
@@ -52,54 +52,59 @@
 		}
 	}
 
-	.is-resizable.edit-post-meta-boxes-main & {
-		inset: 0 0 auto;
+	button[role="separator"] {
+		cursor: row-resize;
+		width: $grid-unit-80;
+		margin: auto;
+		position: absolute;
+		inset: 0;
 
-		> button {
-			cursor: inherit;
-			width: $grid-unit-80;
-			height: $grid-unit-30;
-			margin: auto;
-
-			&::before {
-				content: "";
-				background-color: $gray-300;
-				// Windows High Contrast mode will show this outline, but not the background-color.
-				outline: 2px solid transparent;
-				outline-offset: -2px;
-				position: absolute;
-				inset-block: calc(50% - #{$grid-unit-05} / 2) auto;
-				transform: translateX(-50%);
-				width: inherit;
-				height: $grid-unit-05;
-				border-radius: $radius-small;
-				@media not (prefers-reduced-motion) {
-					transition: width 0.3s ease-out;
-				}
+		&::before {
+			content: "";
+			background-color: $gray-300;
+			// Windows High Contrast mode will show this outline, but not the background-color.
+			outline: 2px solid transparent;
+			outline-offset: -2px;
+			position: absolute;
+			inset-block: calc(50% - #{$grid-unit-05} / 2) auto;
+			transform: translateX(-50%);
+			width: inherit;
+			height: $grid-unit-05;
+			border-radius: $radius-small;
+			@media not (prefers-reduced-motion) {
+				transition: width 0.3s ease-out;
 			}
 		}
 
-		&:is(:hover, :focus-within) > button::before {
+		&:is(:hover, :focus-visible)::before {
 			background-color: var(--wp-admin-theme-color);
 			width: $grid-unit-80 + $grid-unit-20;
 		}
 	}
 }
 
+// Enlarge the toggle/resizable hit area on touch devices.
 @media (pointer: coarse) {
-	.is-resizable.edit-post-meta-boxes-main {
-		padding-block-start: $button-size-compact;
-
-		.edit-post-meta-boxes-main__presenter > button {
-			height: $button-size-compact;
-		}
+	.edit-post-meta-boxes-main {
+		padding-block-start: $button-size;
+	}
+	.edit-post-meta-boxes-main__presenter {
+		height: $button-size;
 	}
 }
 
 .edit-post-meta-boxes-main__liner {
-	overflow: auto;
-	// Keep the contents behind the resize handle or details summary.
+	// Enable scrolling only for the split view.
+	.edit-post-meta-boxes-main & {
+		overflow: auto;
+	}
+	// Keep the contents behind the resize handle.
 	isolation: isolate;
+
+	// While resizing override hidden attribute in case starting from closed state.
+	.is-resizing.edit-post-meta-boxes-main & {
+		display: unset;
+	}
 }
 
 // In case the canvas is not iframe’d.

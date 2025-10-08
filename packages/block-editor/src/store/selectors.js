@@ -1711,7 +1711,6 @@ const canInsertBlockTypeUnmemoized = (
 	// In write mode, check if this container allows insertion.
 	if (
 		blockEditingMode === 'contentOnly' &&
-		isNavigationMode( state ) &&
 		! isContainerInsertableToInWriteMode( state, blockName, rootClientId )
 	) {
 		return false;
@@ -1873,7 +1872,6 @@ export function canRemoveBlock( state, clientId ) {
 	// Check if the parent container allows insertion/removal in write mode
 	if (
 		blockEditingMode === 'contentOnly' &&
-		isNavigationMode( state ) &&
 		! isContainerInsertableToInWriteMode(
 			state,
 			getBlockName( state, rootClientId ),

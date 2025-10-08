@@ -7,6 +7,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { useMemo, useCallback } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { blockMeta, post, archive } from '@wordpress/icons';
+import { safeDecodeURI } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -28,6 +29,20 @@ const getValueFromObjectPath = ( object, path ) => {
 	} );
 	return value;
 };
+
+/**
+ * Helper that adds a prefix to a post slug. The slug needs to be URL-decoded first,
+ * so that we have raw Unicode characters there. The server will truncate the slug to
+ * 200 characters, respecing Unicode char boundary. On the other hand, the server
+ * doesn't detect urlencoded octet boundary and can possibly construct slugs that
+ * are not valid urlencoded strings.
+ * @param {string} prefix The prefix to add to the slug.
+ * @param {string} slug   The slug to add the prefix to.
+ * @return {string} The slug with the prefix.
+ */
+function prefixSlug( prefix, slug ) {
+	return `${ prefix }-${ safeDecodeURI( slug ) }`;
+}
 
 /**
  * Helper util to map records to add a `name` prop from a
@@ -306,7 +321,10 @@ export const usePostTypeMenuItems = ( onClickMenuItem ) => {
 								};
 							},
 							getSpecificTemplate: ( suggestion ) => {
-								const templateSlug = `${ templatePrefixes[ slug ] }-${ suggestion.slug }`;
+								const templateSlug = prefixSlug(
+									templatePrefixes[ slug ],
+									suggestion.slug
+								);
 								return {
 									title: templateSlug,
 									slug: templateSlug,
@@ -460,7 +478,10 @@ export const useTaxonomiesMenuItems = ( onClickMenuItem ) => {
 								};
 							},
 							getSpecificTemplate: ( suggestion ) => {
-								const templateSlug = `${ templatePrefixes[ slug ] }-${ suggestion.slug }`;
+								const templateSlug = prefixSlug(
+									templatePrefixes[ slug ],
+									suggestion.slug
+								);
 								return {
 									title: templateSlug,
 									slug: templateSlug,
@@ -545,7 +566,10 @@ export function useAuthorMenuItem( onClickMenuItem ) {
 						};
 					},
 					getSpecificTemplate: ( suggestion ) => {
-						const templateSlug = `author-${ suggestion.slug }`;
+						const templateSlug = prefixSlug(
+							'author',
+							suggestion.slug
+						);
 						return {
 							title: sprintf(
 								// translators: %s: Name of the author e.g: "Admin".

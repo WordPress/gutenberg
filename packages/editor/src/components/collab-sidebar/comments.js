@@ -6,24 +6,37 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useState, RawHTML } from '@wordpress/element';
+import { useState, RawHTML, useEffect } from '@wordpress/element';
 import {
+	__experimentalText as Text,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalConfirmDialog as ConfirmDialog,
 	Button,
-	DropdownMenu,
+	FlexItem,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { useDebounce } from '@wordpress/compose';
+
 import { published, moreVertical } from '@wordpress/icons';
-import { __, _x, _n, sprintf } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import { __, _x, sprintf, _n } from '@wordpress/i18n';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
+import {
+	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
+import { getCommentExcerpt, focusCommentThread } from './utils';
+
+const { useBlockElement } = unlock( blockEditorPrivateApis );
+const { Menu } = unlock( componentsPrivateApis );
 
 /**
  * Renders the Comments component.
@@ -33,10 +46,8 @@ import CommentForm from './comment-form';
  * @param {Function} props.onEditComment       - The function to handle comment editing.
  * @param {Function} props.onAddReply          - The function to add a reply to a comment.
  * @param {Function} props.onCommentDelete     - The function to delete a comment.
- * @param {Function} props.onCommentResolve    - The function to mark a comment as resolved.
- * @param {Function} props.onCommentReopen     - The function to reopen a resolved comment.
- * @param {boolean}  props.showCommentBoard    - Whether to show the comment board.
  * @param {Function} props.setShowCommentBoard - The function to set the comment board visibility.
+ * @param {Ref}      props.commentSidebarRef   - The ref to the comment sidebar.
  * @return {React.ReactNode} The rendered Comments component.
  */
 export function Comments( {
@@ -44,84 +55,55 @@ export function Comments( {
 	onEditComment,
 	onAddReply,
 	onCommentDelete,
-	onCommentResolve,
-	onCommentReopen,
-	showCommentBoard,
 	setShowCommentBoard,
+	commentSidebarRef,
 } ) {
-	const { blockCommentId } = useSelect( ( select ) => {
+	const [ selectedThread, setSelectedThread ] = useState();
+
+	const blockCommentId = useSelect( ( select ) => {
 		const { getBlockAttributes, getSelectedBlockClientId } =
 			select( blockEditorStore );
-		const _clientId = getSelectedBlockClientId();
-
-		return {
-			blockCommentId: _clientId
-				? getBlockAttributes( _clientId )?.blockCommentId
-				: null,
-		};
+		const clientId = getSelectedBlockClientId();
+		return clientId
+			? getBlockAttributes( clientId )?.metadata?.commentId
+			: null;
 	}, [] );
 
-	const [ focusThread, setFocusThread ] = useState(
-		showCommentBoard && blockCommentId ? blockCommentId : null
-	);
+	// Auto-select the related comment thread when a block is selected.
+	useEffect( () => {
+		setSelectedThread( blockCommentId ?? undefined );
+	}, [ blockCommentId ] );
 
-	const clearThreadFocus = () => {
-		setFocusThread( null );
-		setShowCommentBoard( false );
-	};
+	const hasThreads = Array.isArray( threads ) && threads.length > 0;
+	if ( ! hasThreads ) {
+		return (
+			<VStack
+				alignment="left"
+				className="editor-collab-sidebar-panel__thread"
+				justify="flex-start"
+				spacing="2"
+			>
+				{
+					// translators: message displayed when there are no comments available
+					__( 'No comments available' )
+				}
+			</VStack>
+		);
+	}
 
-	return (
-		<>
-			{
-				// If there are no comments, show a message indicating no comments are available.
-				( ! Array.isArray( threads ) || threads.length === 0 ) && (
-					<VStack
-						alignment="left"
-						className="editor-collab-sidebar-panel__thread"
-						justify="flex-start"
-						spacing="3"
-					>
-						{
-							// translators: message displayed when there are no comments available
-							__( 'No comments available' )
-						}
-					</VStack>
-				)
-			}
-			{ Array.isArray( threads ) &&
-				threads.length > 0 &&
-				threads.map( ( thread ) => (
-					<VStack
-						key={ thread.id }
-						className={ clsx(
-							'editor-collab-sidebar-panel__thread',
-							{
-								'editor-collab-sidebar-panel__active-thread':
-									blockCommentId &&
-									blockCommentId === thread.id,
-								'editor-collab-sidebar-panel__focus-thread':
-									focusThread && focusThread === thread.id,
-							}
-						) }
-						id={ thread.id }
-						spacing="3"
-						onClick={ () => setFocusThread( thread.id ) }
-					>
-						<Thread
-							thread={ thread }
-							onAddReply={ onAddReply }
-							onCommentDelete={ onCommentDelete }
-							onCommentResolve={ onCommentResolve }
-							onCommentReopen={ onCommentReopen }
-							onEditComment={ onEditComment }
-							isFocused={ focusThread === thread.id }
-							clearThreadFocus={ clearThreadFocus }
-							setFocusThread={ setFocusThread }
-						/>
-					</VStack>
-				) ) }
-		</>
-	);
+	return threads.map( ( thread ) => (
+		<Thread
+			key={ thread.id }
+			thread={ thread }
+			onAddReply={ onAddReply }
+			onCommentDelete={ onCommentDelete }
+			onEditComment={ onEditComment }
+			isSelected={ selectedThread === thread.id }
+			setSelectedThread={ setSelectedThread }
+			setShowCommentBoard={ setShowCommentBoard }
+			commentSidebarRef={ commentSidebarRef }
+		/>
+	) );
 }
 
 function Thread( {
@@ -129,66 +111,169 @@ function Thread( {
 	onEditComment,
 	onAddReply,
 	onCommentDelete,
-	onCommentResolve,
-	onCommentReopen,
-	isFocused,
-	clearThreadFocus,
-	setFocusThread,
+	isSelected,
+	setSelectedThread,
+	setShowCommentBoard,
+	commentSidebarRef,
 } ) {
+	const { toggleBlockHighlight, selectBlock } =
+		useDispatch( blockEditorStore );
+	const relatedBlockElement = useBlockElement( thread.blockClientId );
+	const debouncedToggleBlockHighlight = useDebounce(
+		toggleBlockHighlight,
+		50
+	);
+
+	const onMouseEnter = () => {
+		debouncedToggleBlockHighlight( thread.blockClientId, true );
+	};
+
+	const onMouseLeave = () => {
+		debouncedToggleBlockHighlight( thread.blockClientId, false );
+	};
+
+	const handleCommentSelect = () => {
+		setShowCommentBoard( false );
+		setSelectedThread( thread.id );
+		// pass `null` as the second parameter to prevent focusing the block.
+		selectBlock( thread.blockClientId, null );
+	};
+
+	const unselectThread = () => {
+		setSelectedThread( null );
+		setShowCommentBoard( false );
+	};
+
+	const replies = thread?.reply;
+	const lastReply = !! replies.length
+		? replies[ replies.length - 1 ]
+		: undefined;
+	const restReplies = !! replies.length ? replies.slice( 0, -1 ) : [];
+
+	const commentExcerpt = getCommentExcerpt(
+		stripHTML( thread.content.rendered ),
+		10
+	);
+	const ariaLabel = relatedBlockElement
+		? sprintf(
+				// translators: %s: comment excerpt
+				__( 'Comment: %s' ),
+				commentExcerpt
+		  )
+		: sprintf(
+				// translators: %s: comment excerpt
+				__( 'Original block deleted. Comment: %s' ),
+				commentExcerpt
+		  );
+
 	return (
-		<>
+		// Disable reason: role="listitem" does in fact support aria-expanded.
+		// eslint-disable-next-line jsx-a11y/role-supports-aria-props
+		<VStack
+			className={ clsx( 'editor-collab-sidebar-panel__thread', {
+				'is-selected': isSelected,
+			} ) }
+			id={ `comment-thread-${ thread.id }` }
+			spacing="2"
+			onClick={ handleCommentSelect }
+			onMouseEnter={ onMouseEnter }
+			onMouseLeave={ onMouseLeave }
+			onFocus={ onMouseEnter }
+			onBlur={ onMouseLeave }
+			onKeyDown={ ( event ) => {
+				// Expand or Collapse thread.
+				if (
+					event.key === 'Enter' &&
+					event.currentTarget === event.target
+				) {
+					if ( isSelected ) {
+						unselectThread();
+					} else {
+						handleCommentSelect();
+					}
+				}
+				// Collapse thread and focus the thread.
+				if ( event.key === 'Escape' ) {
+					unselectThread();
+					focusCommentThread( thread.id, commentSidebarRef.current );
+				}
+			} }
+			tabIndex={ 0 }
+			role="listitem"
+			aria-label={ ariaLabel }
+			aria-expanded={ isSelected }
+		>
+			{ ! relatedBlockElement && (
+				<Text as="p" weight={ 500 } variant="muted">
+					{ __( 'Original block deleted.' ) }
+				</Text>
+			) }
 			<CommentBoard
 				thread={ thread }
-				onResolve={ onCommentResolve }
-				onReopen={ onCommentReopen }
-				onEdit={ onEditComment }
+				onEdit={ ( params = {} ) => {
+					const { status } = params;
+					onEditComment( params );
+					if ( status === 'approved' ) {
+						unselectThread();
+						focusCommentThread(
+							thread.id,
+							commentSidebarRef.current
+						);
+					}
+				} }
 				onDelete={ onCommentDelete }
-				status={ thread.status }
 			/>
-			{ 0 < thread?.reply?.length && (
-				<>
-					{ ! isFocused && (
-						<Button
-							__next40pxDefaultSize
-							variant="link"
-							className="editor-collab-sidebar-panel__show-more-reply"
-							onClick={ () => setFocusThread( thread.id ) }
-						>
-							{ sprintf(
-								// translators: %s: number of replies.
-								_n(
-									'%s more reply',
-									'%s more replies',
-									thread?.reply?.length
-								),
-								thread?.reply?.length
-							) }
-						</Button>
-					) }
-
-					{ isFocused &&
-						thread.reply.map( ( reply ) => (
-							<VStack
-								key={ reply.id }
-								className="editor-collab-sidebar-panel__child-thread"
-								id={ reply.id }
-								spacing="2"
-							>
-								{ 'approved' !== thread.status && (
-									<CommentBoard
-										thread={ reply }
-										onEdit={ onEditComment }
-										onDelete={ onCommentDelete }
-									/>
-								) }
-								{ 'approved' === thread.status && (
-									<CommentBoard thread={ reply } />
-								) }
-							</VStack>
-						) ) }
-				</>
+			{ isSelected &&
+				replies.map( ( reply ) => (
+					<VStack
+						key={ reply.id }
+						className="editor-collab-sidebar-panel__child-thread"
+						id={ reply.id }
+						spacing="2"
+					>
+						<CommentBoard
+							thread={ reply }
+							parent={ thread }
+							onEdit={ onEditComment }
+							onDelete={ onCommentDelete }
+						/>
+					</VStack>
+				) ) }
+			{ ! isSelected && restReplies.length > 0 && (
+				<HStack className="editor-collab-sidebar-panel__more-reply-separator">
+					<Button
+						size="compact"
+						variant="tertiary"
+						className="editor-collab-sidebar-panel__more-reply-button"
+						onClick={ () => {
+							setSelectedThread( thread.id );
+							focusCommentThread(
+								thread.id,
+								commentSidebarRef.current
+							);
+						} }
+					>
+						{ sprintf(
+							// translators: %s: number of replies.
+							_n(
+								'%s more reply',
+								'%s more replies',
+								restReplies.length
+							),
+							restReplies.length
+						) }
+					</Button>
+				</HStack>
 			) }
-			{ isFocused && (
+			{ ! isSelected && lastReply && (
+				<CommentBoard
+					thread={ lastReply }
+					parent={ thread }
+					onEdit={ onEditComment }
+					onDelete={ onCommentDelete }
+				/>
+			) }
+			{ isSelected && (
 				<VStack
 					className="editor-collab-sidebar-panel__child-thread"
 					spacing="2"
@@ -196,57 +281,54 @@ function Thread( {
 					<HStack alignment="left" spacing="3" justify="flex-start">
 						<CommentAuthorInfo />
 					</HStack>
-					<VStack
-						spacing="3"
-						className="editor-collab-sidebar-panel__comment-field"
-					>
+					<VStack spacing="2">
 						<CommentForm
 							onSubmit={ ( inputComment ) => {
 								if ( 'approved' === thread.status ) {
-									onCommentReopen( thread.id );
+									onEditComment( {
+										id: thread.id,
+										status: 'hold',
+									} );
 								}
-								onAddReply( inputComment, thread.id );
+								onAddReply( {
+									content: inputComment,
+									parent: thread.id,
+								} );
 							} }
 							onCancel={ ( event ) => {
 								event.stopPropagation(); // Prevent the parent onClick from being triggered
-								clearThreadFocus();
+								unselectThread();
+								focusCommentThread(
+									thread.id,
+									commentSidebarRef.current
+								);
 							} }
-							placeholderText={
-								'approved' === thread.status &&
-								__(
-									'Adding a comment will re-open this discussion….'
-								)
-							}
 							submitButtonText={
 								'approved' === thread.status
-									? _x(
-											'Reopen & Reply',
-											'Reopen comment and add reply'
-									  )
-									: _x( 'Reply', 'Add reply comment' )
+									? __( 'Reopen & Reply' )
+									: __( 'Reply' )
 							}
 							rows={ 'approved' === thread.status ? 2 : 4 }
+							labelText={ sprintf(
+								// translators: %1$s: comment identifier, %2$s: author name
+								__( 'Reply to Comment %1$s by %2$s' ),
+								thread.id,
+								thread?.author_name || 'Unknown'
+							) }
 						/>
 					</VStack>
 				</VStack>
 			) }
-		</>
+		</VStack>
 	);
 }
 
-const CommentBoard = ( {
-	thread,
-	onResolve,
-	onReopen,
-	onEdit,
-	onDelete,
-	status,
-} ) => {
+const CommentBoard = ( { thread, parent, onEdit, onDelete } ) => {
 	const [ actionState, setActionState ] = useState( false );
 	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
 
 	const handleConfirmDelete = () => {
-		onDelete( thread.id );
+		onDelete( thread );
 		setActionState( false );
 		setShowConfirmDialog( false );
 	};
@@ -257,30 +339,38 @@ const CommentBoard = ( {
 	};
 
 	const actions = [
-		onEdit &&
-			status !== 'approved' && {
-				title: _x( 'Edit', 'Edit comment' ),
-				onClick: () => {
-					setActionState( 'edit' );
-				},
+		{
+			id: 'edit',
+			title: _x( 'Edit', 'Edit comment' ),
+			isEligible: ( { status } ) => status !== 'approved',
+			onClick: () => {
+				setActionState( 'edit' );
 			},
-		onDelete && {
+		},
+		{
+			id: 'reopen',
+			title: _x( 'Reopen', 'Reopen comment' ),
+			isEligible: ( { status } ) => status === 'approved',
+			onClick: () => {
+				onEdit( { id: thread.id, status: 'hold' } );
+			},
+		},
+		{
+			id: 'delete',
 			title: _x( 'Delete', 'Delete comment' ),
+			isEligible: () => true,
 			onClick: () => {
 				setActionState( 'delete' );
 				setShowConfirmDialog( true );
 			},
 		},
-		onReopen &&
-			status === 'approved' && {
-				title: _x( 'Reopen', 'Reopen comment' ),
-				onClick: () => {
-					onReopen( thread.id );
-				},
-			},
 	];
 
-	const moreActions = actions.filter( ( item ) => item?.onClick );
+	const canResolve = thread.parent === 0;
+	const moreActions =
+		parent?.status !== 'approved'
+			? actions.filter( ( item ) => item.isEligible( thread ) )
+			: [];
 
 	return (
 		<>
@@ -289,10 +379,17 @@ const CommentBoard = ( {
 					avatar={ thread?.author_avatar_urls?.[ 48 ] }
 					name={ thread?.author_name }
 					date={ thread?.date }
+					userId={ thread?.author }
 				/>
-				<span className="editor-collab-sidebar-panel__comment-status">
-					<HStack alignment="right" justify="flex-end" spacing="0">
-						{ 0 === thread?.parent && onResolve && (
+				<FlexItem
+					className="editor-collab-sidebar-panel__comment-status"
+					onClick={ ( event ) => {
+						// Prevent the thread from being selected.
+						event.stopPropagation();
+					} }
+				>
+					<HStack spacing="0">
+						{ canResolve && (
 							<Button
 								label={ _x(
 									'Resolve',
@@ -300,36 +397,64 @@ const CommentBoard = ( {
 								) }
 								size="small"
 								icon={ published }
-								disabled={ status === 'approved' }
-								accessibleWhenDisabled={ status === 'approved' }
+								disabled={ thread.status === 'approved' }
+								accessibleWhenDisabled={
+									thread.status === 'approved'
+								}
 								onClick={ () => {
-									onResolve( thread.id );
+									onEdit( {
+										id: thread.id,
+										status: 'approved',
+									} );
 								} }
 							/>
 						) }
-						{ 0 < moreActions.length && (
-							<DropdownMenu
-								icon={ moreVertical }
-								label={ _x(
-									'Select an action',
-									'Select comment action'
-								) }
-								className="editor-collab-sidebar-panel__comment-dropdown-menu"
-								controls={ moreActions }
+						<Menu placement="bottom-end">
+							<Menu.TriggerButton
+								render={
+									<Button
+										size="small"
+										icon={ moreVertical }
+										label={ __( 'Actions' ) }
+										disabled={ ! moreActions.length }
+										accessibleWhenDisabled
+									/>
+								}
 							/>
-						) }
+							<Menu.Popover>
+								{ moreActions.map( ( action ) => (
+									<Menu.Item
+										key={ action.id }
+										onClick={ () => action.onClick() }
+									>
+										<Menu.ItemLabel>
+											{ action.title }
+										</Menu.ItemLabel>
+									</Menu.Item>
+								) ) }
+							</Menu.Popover>
+						</Menu>
 					</HStack>
-				</span>
+				</FlexItem>
 			</HStack>
 			{ 'edit' === actionState ? (
 				<CommentForm
 					onSubmit={ ( value ) => {
-						onEdit( thread.id, value );
+						onEdit( {
+							id: thread.id,
+							content: value,
+						} );
 						setActionState( false );
 					} }
 					onCancel={ () => handleCancel() }
 					thread={ thread }
 					submitButtonText={ _x( 'Update', 'verb' ) }
+					labelText={ sprintf(
+						// translators: %1$s: comment identifier, %2$s: author name.
+						__( 'Edit Comment %1$s by %2$s' ),
+						thread.id,
+						thread?.author_name || 'Unknown'
+					) }
 				/>
 			) : (
 				<RawHTML className="editor-collab-sidebar-panel__user-comment">
@@ -343,10 +468,7 @@ const CommentBoard = ( {
 					onCancel={ handleCancel }
 					confirmButtonText={ __( 'Delete' ) }
 				>
-					{
-						// translators: message displayed when confirming an action
-						__( 'Are you sure you want to delete this comment?' )
-					}
+					{ __( 'Are you sure you want to delete this comment?' ) }
 				</ConfirmDialog>
 			) }
 		</>

@@ -166,6 +166,14 @@
 	<button data-testid="async navigate" data-wp-on--click="actions.asyncNavigate">Async Navigate</button>
 </div>
 
+<!-- Count of succesfull client-side navigations -->
+<div
+	data-testid="navigation count"
+	data-wp-interactive="directive-context-navigate"
+	data-wp-watch="callbacks.updateNavigationCount"
+	data-wp-text="state.navigationCount"
+></div>
+
 <div
 	data-wp-interactive='{"namespace": "directive-context-non-default"}'
 	data-wp-context--non-default='{ "text": "non default" }'

@@ -8,12 +8,21 @@ const babel = require( '@babel/core' );
 const makeDir = require( 'make-dir' );
 const sass = require( 'sass' );
 const postcss = require( 'postcss' );
+
 /**
  * Internal dependencies
  */
 const getBabelConfig = require( './get-babel-config' );
+const iconsBuildUtils = require( '../../packages/icons/lib/build-worker-utils' );
 
 const isDev = process.env.NODE_ENV === 'development';
+
+/**
+ * List of packages that use the v2 build pipeline.
+ *
+ * @type {string[]}
+ */
+const V2BUILD_PACKAGES = [ 'hooks' ];
 
 /**
  * Path to packages directory.
@@ -179,6 +188,14 @@ async function buildJS( file ) {
 	}
 }
 
+// This build task is only meant for regenerating icons in the icons library at
+// packages/icons/src/library. Let it delegate to that package's own handler.
+async function buildSVG( file ) {
+	if ( ! ( await iconsBuildUtils.buildSVG( file ) ) ) {
+		throw new Error( `No handler for SVG file: ${ file }` );
+	}
+}
+
 /**
  * Object of build tasks per file extension.
  *
@@ -189,10 +206,29 @@ const BUILD_TASK_BY_EXTENSION = {
 	'.js': buildJS,
 	'.ts': buildJS,
 	'.tsx': buildJS,
+	'.svg': buildSVG,
 };
 
 module.exports = async ( file, callback ) => {
 	const extension = path.extname( file );
+	const packageName = getPackageName( file );
+
+	// Use esbuild for packages in the v2 pipeline
+	if (
+		V2BUILD_PACKAGES.includes( packageName ) &&
+		[ '.js', '.ts', '.tsx' ].includes( extension )
+	) {
+		try {
+			const buildWithEsbuild = require( './build-worker-esbuild' );
+			await buildWithEsbuild( file );
+			callback();
+			return;
+		} catch ( error ) {
+			callback( error );
+			return;
+		}
+	}
+
 	const task = BUILD_TASK_BY_EXTENSION[ extension ];
 
 	if ( ! task ) {

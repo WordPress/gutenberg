@@ -7,7 +7,7 @@ import { batch } from '@preact/signals';
 /**
  * Internal dependencies
  */
-import registerDirectives from './directives';
+import registerDirectives, { routerRegions } from './directives';
 import { init, getRegionRootFragment, initialVdom } from './init';
 import { toVdom } from './vdom';
 import { directive } from './hooks';
@@ -55,6 +55,7 @@ export const privateApis = ( lock ): any => {
 			parseServerData,
 			populateServerData,
 			batch,
+			routerRegions,
 		};
 	}
 
