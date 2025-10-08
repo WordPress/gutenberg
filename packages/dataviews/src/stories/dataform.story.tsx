@@ -564,6 +564,8 @@ const ValidationComponent = ( {
 		password: string;
 		toggle?: boolean;
 		toggleGroup?: string;
+		date?: string;
+		dateRange?: string;
 		datetime?: string;
 	};
 
