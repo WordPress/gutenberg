@@ -57,10 +57,6 @@ export const useSetActiveTemplateAction = () => {
 						activeTemplates[ item.slug ] = item.id;
 					}
 				}
-				// To do: figure out why the REST API deletes the option when
-				// it's set to an empty object. That would trigger the migration
-				// function, which will make all templates in the database active.
-				activeTemplates.__preventCollapse = 0;
 				await editEntityRecord( 'root', 'site', undefined, {
 					active_templates: activeTemplates,
 				} );

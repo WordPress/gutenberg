@@ -1,19 +1,19 @@
 {
-	"name": "@wordpress/hooks",
-	"version": "4.32.0",
-	"description": "WordPress hooks library.",
+	"name": "@wordpress/admin-ui",
+	"version": "1.0.0",
+	"description": "Generic components to be used in the Admin UI.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
-		"gutenberg",
-		"hooks"
+		"admin",
+		"ui"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/hooks/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/admin-ui/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
-		"directory": "packages/hooks"
+		"directory": "packages/admin-ui"
 	},
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
@@ -24,17 +24,15 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
-	"exports": {
-		".": {
-			"types": "./build-types/index.d.ts",
-			"import": "./build-module/index.js",
-			"require": "./build/index.js"
-		},
-		"./package.json": "./package.json"
-	},
 	"react-native": "src/index",
-	"wpScript": true,
 	"types": "build-types",
+	"sideEffects": false,
+	"dependencies": {
+		"@babel/runtime": "7.25.7",
+		"@wordpress/components": "file:../components",
+		"@wordpress/element": "file:../element",
+		"clsx": "^2.1.1"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

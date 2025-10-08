@@ -313,6 +313,7 @@ async function loadPostTypeEntities() {
 			name
 		);
 		const namespace = postType?.rest_namespace ?? 'wp/v2';
+		const syncedProperties = new Set( [ 'blocks' ] );
 		return {
 			kind: 'postType',
 			baseURL: `/${ namespace }/${ postType.rest_base }`,
@@ -343,6 +344,10 @@ async function loadPostTypeEntities() {
 					const document = doc.getMap( 'document' );
 
 					Object.entries( changes ).forEach( ( [ key, value ] ) => {
+						if ( ! syncedProperties.has( key ) ) {
+							return;
+						}
+
 						if ( typeof value !== 'function' ) {
 							if ( key === 'blocks' ) {
 								if ( ! serialisableBlocksCache.has( value ) ) {

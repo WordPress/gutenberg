@@ -34,10 +34,6 @@ export default function DataViewItem( {
 	if ( slug === 'all' ) {
 		slug = undefined;
 	}
-	const query = {
-		layout: type,
-		activeView: slug,
-	};
 	return (
 		<HStack
 			justify="flex-start"
@@ -47,7 +43,9 @@ export default function DataViewItem( {
 		>
 			<SidebarNavigationItem
 				icon={ iconToUse }
-				to={ addQueryArgs( path, query ) }
+				to={ addQueryArgs( path, {
+					activeView: slug,
+				} ) }
 				aria-current={ isActive ? 'true' : undefined }
 			>
 				{ title }

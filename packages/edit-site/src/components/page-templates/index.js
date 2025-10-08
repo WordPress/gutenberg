@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { Page } from '@wordpress/admin-ui';
 import { __ } from '@wordpress/i18n';
 import { useState, useMemo, useCallback } from '@wordpress/element';
 import {
@@ -19,7 +20,6 @@ import { Button } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import Page from '../page';
 import AddNewTemplate from '../add-new-template';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
@@ -228,7 +228,7 @@ export default function PageTemplates() {
 
 	const onChangeView = useEvent( ( newView ) => {
 		if ( newView.type !== view.type ) {
-			// Find a way to retrigger the routing resolution.
+			// Retrigger the routing areas resolution.
 			history.invalidate();
 		}
 		updateView( newView );
@@ -254,6 +254,7 @@ export default function PageTemplates() {
 					<AddNewTemplate />
 				</>
 			}
+			hasPadding={ false }
 		>
 			<DataViews
 				key={ activeView }

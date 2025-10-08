@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { Page } from '@wordpress/admin-ui';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -21,7 +22,6 @@ import { seen, moreVertical } from '@wordpress/icons';
  * Internal dependencies
  */
 import GlobalStylesUI from '../global-styles/ui';
-import Page from '../page';
 import { unlock } from '../../lock-unlock';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
@@ -120,25 +120,21 @@ export default function GlobalStylesUIWrapper() {
 	const [ section, onChangeSection ] = useSection();
 
 	return (
-		<>
-			<Page
-				actions={
-					! isMobileViewport ? (
-						<GlobalStylesPageActions
-							isStyleBookOpened={ isStyleBookOpened }
-							setIsStyleBookOpened={ setIsStyleBookOpened }
-							path={ path }
-						/>
-					) : null
-				}
-				className="edit-site-styles"
-				title={ __( 'Styles' ) }
-			>
-				<GlobalStylesUI
-					path={ section }
-					onPathChange={ onChangeSection }
-				/>
-			</Page>
-		</>
+		<Page
+			actions={
+				! isMobileViewport ? (
+					<GlobalStylesPageActions
+						isStyleBookOpened={ isStyleBookOpened }
+						setIsStyleBookOpened={ setIsStyleBookOpened }
+						path={ path }
+					/>
+				) : null
+			}
+			className="edit-site-styles"
+			title={ __( 'Styles' ) }
+			hasPadding={ false }
+		>
+			<GlobalStylesUI path={ section } onPathChange={ onChangeSection } />
+		</Page>
 	);
 }

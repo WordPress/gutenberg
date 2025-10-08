@@ -1,0 +1,43 @@
+.admin-ui-page {
+	height: 100%;
+	background: $white;
+	color: $gray-800;
+	container: admin-ui-page / inline-size;
+
+	@media not (prefers-reduced-motion) {
+		transition: width ease-out 0.2s;
+	}
+}
+
+.admin-ui-page__header {
+	padding: $grid-unit-20 $grid-unit-60;
+	border-bottom: 1px solid $gray-100;
+	background: $white;
+	position: sticky;
+	top: 0;
+
+	@container (max-width: 430px) {
+		padding: $grid-unit-20 $grid-unit-30;
+	}
+}
+
+.admin-ui-page__header-subtitle {
+	padding-block-end: $grid-unit-10;
+	color: $gray-700;
+	@include body-medium();
+	margin: 0;
+}
+
+.admin-ui-page__content {
+	flex-grow: 1;
+	overflow: auto;
+	display: flex;
+	flex-direction: column;
+
+	&.has-padding {
+		padding: $grid-unit-20 $grid-unit * 2.5;
+		@container (max-width: 430px) {
+			padding: $grid-unit-20 $grid-unit-30;
+		}
+	}
+}

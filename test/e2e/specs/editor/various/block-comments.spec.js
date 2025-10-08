@@ -65,7 +65,7 @@ test.describe( 'Block Comments', () => {
 			attributes: { content: 'Testing block comments' },
 			comment: 'Test comment',
 		} );
-		const commentForm = page.getByRole( 'textbox', { name: 'Comment' } );
+		const commentForm = page.getByRole( 'textbox', { name: 'Reply to' } );
 		const commentText = page
 			.locator( '.editor-collab-sidebar-panel__user-comment' )
 			.last();
@@ -192,7 +192,7 @@ test.describe( 'Block Comments', () => {
 		).toBeVisible();
 
 		await page.locator( '.editor-collab-sidebar-panel__thread' ).click();
-		const commentForm = page.getByRole( 'textbox', { name: 'Comment' } );
+		const commentForm = page.getByRole( 'textbox', { name: 'Reply to' } );
 		await commentForm.fill( 'Test reply that reopens the comment.' );
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
@@ -460,7 +460,10 @@ class BlockCommentUtils {
 				} );
 				await this.#editor.clickBlockOptionsMenuItem( 'Comment' );
 				await this.#page
-					.getByRole( 'textbox', { name: 'Comment' } )
+					.getByRole( 'textbox', {
+						name: 'New Comment',
+						exact: true,
+					} )
 					.fill( comment );
 				await this.#page
 					.getByRole( 'region', { name: 'Editor settings' } )
