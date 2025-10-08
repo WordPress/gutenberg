@@ -113,13 +113,88 @@ function momentTimezoneAliasPlugin() {
  * WordPress externals and asset plugin.
  * Inspired by wp-build's wordpressExternalsAndAssetPlugin.
  *
+ * @param {string} assetName Optional. The name of the asset file to generate (without .asset.php extension). Defaults to 'index.min'.
  * @return {Object} esbuild plugin.
  */
-function wordpressExternalsPlugin() {
+function wordpressExternalsPlugin( assetName = 'index.min' ) {
 	return {
 		name: 'wordpress-externals',
 		setup( build ) {
 			const dependencies = new Set();
+			const moduleDependencies = new Map();
+			const packageJsonCache = new Map();
+
+			/**
+			 * Get package.json info for a WordPress package.
+			 *
+			 * @param {string} packageName The package name (without @wordpress/ prefix).
+			 * @return {Promise<Object|null>} Package.json object or null if not found.
+			 */
+			async function getPackageInfo( packageName ) {
+				if ( packageJsonCache.has( packageName ) ) {
+					return packageJsonCache.get( packageName );
+				}
+
+				const packageJsonPath = path.join(
+					PACKAGES_DIR,
+					packageName,
+					'package.json'
+				);
+
+				try {
+					const packageJson = JSON.parse(
+						await readFile( packageJsonPath, 'utf8' )
+					);
+					packageJsonCache.set( packageName, packageJson );
+					return packageJson;
+				} catch ( error ) {
+					packageJsonCache.set( packageName, null );
+					return null;
+				}
+			}
+
+			/**
+			 * Check if a package import is a script module.
+			 * A package is considered a script module if it has wpScriptModuleExports
+			 * and the specific import path (root or subpath) is declared in wpScriptModuleExports.
+			 *
+			 * @param {Object}      packageJson Package.json object.
+			 * @param {string|null} subpath     Subpath after package name, or null for root import.
+			 * @return {boolean} True if the import is a script module.
+			 */
+			function isScriptModuleImport( packageJson, subpath ) {
+				const { wpScriptModuleExports } = packageJson;
+
+				if ( ! wpScriptModuleExports ) {
+					return false;
+				}
+
+				// Root import: @wordpress/package-name
+				if ( ! subpath ) {
+					// Check if wpScriptModuleExports is a string or has "." key
+					if ( typeof wpScriptModuleExports === 'string' ) {
+						return true;
+					}
+					if (
+						typeof wpScriptModuleExports === 'object' &&
+						wpScriptModuleExports[ '.' ]
+					) {
+						return true;
+					}
+					return false;
+				}
+
+				// Subpath import: @wordpress/package-name/subpath
+				// Check if wpScriptModuleExports has "./subpath" key
+				if (
+					typeof wpScriptModuleExports === 'object' &&
+					wpScriptModuleExports[ `./${ subpath }` ]
+				) {
+					return true;
+				}
+
+				return false;
+			}
 
 			// Map of vendor packages to their global variables and handles
 			const vendorExternals = {
@@ -166,15 +241,60 @@ function wordpressExternalsPlugin() {
 			}
 
 			// Handle all @wordpress/* packages
-			build.onResolve( { filter: /^@wordpress\// }, ( args ) => {
-				// Track dependency for asset file
-				const wpHandle = args.path.replace( '@wordpress/', 'wp-' );
-				dependencies.add( wpHandle );
+			build.onResolve( { filter: /^@wordpress\// }, async ( args ) => {
+				// Parse the import: @wordpress/package-name or @wordpress/package-name/subpath
+				const fullPath = args.path.replace( '@wordpress/', '' );
+				const [ packageName, ...subpathParts ] = fullPath.split( '/' );
+				const subpath =
+					subpathParts.length > 0 ? subpathParts.join( '/' ) : null;
+				const wpHandle = `wp-${ packageName }`;
 
-				return {
-					path: args.path,
-					namespace: 'wordpress-external',
-				};
+				// Get package.json for the package
+				const packageJson = await getPackageInfo( packageName );
+
+				if ( ! packageJson ) {
+					// Package not found, let esbuild handle it (will likely error)
+					return undefined;
+				}
+
+				// Check if this is a script module
+				const isScriptModule = isScriptModuleImport(
+					packageJson,
+					subpath
+				);
+
+				// Determine import kind: dynamic or static
+				const kind =
+					args.kind === 'dynamic-import' ? 'dynamic' : 'static';
+
+				// If it's a script module, keep as ESM import (external)
+				if ( isScriptModule ) {
+					// Track module dependency with kind using @wordpress/ format
+					if ( kind === 'static' ) {
+						moduleDependencies.set( args.path, 'static' );
+					} else if ( ! moduleDependencies.has( args.path ) ) {
+						moduleDependencies.set( args.path, 'dynamic' );
+					}
+
+					return {
+						path: args.path,
+						external: true,
+					};
+				}
+
+				// If it has wpScript, convert to global variable
+				if ( packageJson.wpScript ) {
+					// Track regular script dependency using wp- handle format
+					dependencies.add( wpHandle );
+
+					return {
+						path: args.path,
+						namespace: 'wordpress-external',
+					};
+				}
+
+				// Otherwise, bundle it (not external)
+				return undefined;
 			} );
 
 			build.onLoad(
@@ -210,13 +330,42 @@ function wordpressExternalsPlugin() {
 					return;
 				}
 
+				// Format regular script dependencies
 				const dependenciesString = Array.from( dependencies )
 					.sort()
 					.map( ( dep ) => `'${ dep }'` )
 					.join( ', ' );
 
+				// Format module dependencies as array of arrays with 'id' and 'import' keys
+				const moduleDependenciesArray = Array.from(
+					moduleDependencies.entries()
+				)
+					.sort( ( [ a ], [ b ] ) => a.localeCompare( b ) )
+					.map(
+						( [ dep, kind ] ) =>
+							`array('id' => '${ dep }', 'import' => '${ kind }')`
+					);
+
+				const moduleDependenciesString =
+					moduleDependenciesArray.length > 0
+						? moduleDependenciesArray.join( ', ' )
+						: '';
+
 				const version = Date.now();
-				const assetContent = `<?php return array('dependencies' => array(${ dependenciesString }), 'version' => '${ version }');`;
+
+				// Build asset content with both dependencies and module_dependencies
+				const parts = [
+					`'dependencies' => array(${ dependenciesString })`,
+				];
+				if ( moduleDependenciesString ) {
+					parts.push(
+						`'module_dependencies' => array(${ moduleDependenciesString })`
+					);
+				}
+				parts.push( `'version' => '${ version }'` );
+				const assetContent = `<?php return array(${ parts.join(
+					', '
+				) });`;
 
 				// Write asset file
 				const outputDir =
@@ -225,7 +374,7 @@ function wordpressExternalsPlugin() {
 
 				const assetFilePath = path.join(
 					outputDir,
-					'index.min.asset.php'
+					`${ assetName }.asset.php`
 				);
 				await writeFile( assetFilePath, assetContent );
 			} );
@@ -277,7 +426,7 @@ async function bundlePackage( packageName ) {
 				minify: true,
 				plugins: [
 					momentTimezoneAliasPlugin(),
-					wordpressExternalsPlugin(),
+					wordpressExternalsPlugin( 'index.min' ),
 				],
 			} ),
 			esbuild.build( {
@@ -327,7 +476,9 @@ async function bundlePackage( packageName ) {
 					target,
 					platform: 'browser',
 					minify: true,
-					plugins: [ wordpressExternalsPlugin() ],
+					plugins: [
+						wordpressExternalsPlugin( `${ fileName }.min` ),
+					],
 				} )
 			);
 		}
