@@ -389,6 +389,7 @@ test.describe( 'Template Part', () => {
 		// Type within a first block.
 		const paragraph = editor.canvas.getByRole( 'document', {
 			name: 'Paragraph',
+			exact: true,
 		} );
 		await editor.selectBlocks( paragraph );
 		await page.keyboard.type( 'Modify' );

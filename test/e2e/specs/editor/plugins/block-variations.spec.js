@@ -77,7 +77,12 @@ test.describe( 'Block variations', () => {
 			page
 				.getByRole( 'listbox', { name: 'Blocks' } )
 				.getByRole( 'option' )
-		).toHaveText( [ 'Paragraph', 'Success Message', 'Warning Message' ] );
+		).toHaveText( [
+			'Paragraph',
+			'Stretchy Paragraph',
+			'Success Message',
+			'Warning Message',
+		] );
 	} );
 
 	test( 'Insert the Success Message block variation', async ( {

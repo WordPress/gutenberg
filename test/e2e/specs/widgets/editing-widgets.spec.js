@@ -162,6 +162,7 @@ test.describe( 'Widgets screen', () => {
 
 		const paragraphBlock = inlineQuickInserter.getByRole( 'option', {
 			name: 'Paragraph',
+			exact: true,
 		} );
 		await paragraphBlock.click();
 
