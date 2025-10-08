@@ -43,7 +43,6 @@ class Test_Script_Dependencies extends WP_UnitTestCase {
 			'wp-edit-site',
 			'wp-editor',
 			'wp-router',
-			'wp-sync',
 			'wp-widgets',
 		);
 
