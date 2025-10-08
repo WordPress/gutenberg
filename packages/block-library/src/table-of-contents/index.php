@@ -63,11 +63,7 @@ function render_block_core_table_of_contents( $attributes ) {
  */
 function block_core_table_of_contents_add_full_urls( $html ) {
 	global $wp;
-	if ( isset( $wp->request ) ) {
-		$current_url = home_url( $wp->request );
-	} else {
-		$current_url = get_permalink();
-	}
+	$current_url = get_permalink();
 
 	if ( empty( $current_url ) ) {
 		return $html;
