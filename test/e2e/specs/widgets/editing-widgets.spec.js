@@ -709,7 +709,10 @@ class WidgetsScreen {
 			} )
 			.fill( blockName );
 
-		return blockLibrary.getByRole( 'option', { name: blockName } );
+		return blockLibrary.getByRole( 'option', {
+			name: blockName,
+			exact: true,
+		} );
 	};
 
 	saveWidgets = async () => {
