@@ -833,11 +833,12 @@ export default () => {
 					warn(
 						'The usage of multiple data-wp-each directives on the same element is not supported. Please pick only one.'
 					);
+					return;
 				}
 				if ( uniqueId ) {
 					warnUniqueIdNotSupported( 'each', uniqueId );
+					return;
 				}
-				return;
 			}
 
 			let iterable = evaluate( entry );
