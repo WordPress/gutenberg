@@ -1,4 +1,4 @@
-.edit-site-styles .admin-ui-page__content {
+.edit-site-styles {
 	.edit-site-global-styles-screen-root {
 		box-shadow: none;
 		& > div > hr {
@@ -27,7 +27,7 @@
 }
 
 .show-icon-labels {
-	.edit-site-styles .admin-ui-page__content {
+	.edit-site-styles {
 		.edit-site-page-header__actions {
 			.components-button.has-icon {
 				width: auto;

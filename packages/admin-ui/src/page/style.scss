@@ -1,8 +1,9 @@
 .admin-ui-page {
+	display: flex;
 	height: 100%;
-	background: $white;
-	color: $gray-800;
-	container: admin-ui-page / inline-size;
+	position: relative;
+	z-index: 1;
+	flex-flow: column;
 
 	@media not (prefers-reduced-motion) {
 		transition: width ease-out 0.2s;
@@ -28,16 +29,3 @@
 	margin: 0;
 }
 
-.admin-ui-page__content {
-	flex-grow: 1;
-	overflow: auto;
-	display: flex;
-	flex-direction: column;
-
-	&.has-padding {
-		padding: $grid-unit-20 $grid-unit * 2.5;
-		@container (max-width: 430px) {
-			padding: $grid-unit-20 $grid-unit-30;
-		}
-	}
-}
