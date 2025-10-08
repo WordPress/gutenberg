@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, _n, sprintf } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	hasBlockSupport,
 	store as blocksStore,
@@ -297,21 +297,10 @@ const getQuickActionsCommands = () =>
 				( block ) =>
 					block.attributes.metadata?.blockVisibility === false
 			);
-			const blockVisibilityLabel = hasHiddenBlock
-				? _n(
-						'Show selected block',
-						'Show selected blocks',
-						blocks.length
-				  )
-				: _n(
-						'Hide selected block',
-						'Hide selected blocks',
-						blocks.length
-				  );
 
 			commands.push( {
 				name: 'core/toggle-block-visibility',
-				label: blockVisibilityLabel,
+				label: hasHiddenBlock ? __( 'Show' ) : __( 'Hide' ),
 				callback: () => {
 					const attributesByClientId = Object.fromEntries(
 						blocks?.map( ( { clientId, attributes } ) => [
