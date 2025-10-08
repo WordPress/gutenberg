@@ -2,17 +2,19 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useMemo } from '@wordpress/element';
+import { useEffect, useMemo } from '@wordpress/element';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
 import { decodeEntities } from '@wordpress/html-entities';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import { collabSidebarName } from './constants';
 
 export function useBlockComments( postId ) {
 	const queryArgs = {
@@ -248,4 +250,25 @@ export function useBlockCommentsActions() {
 	};
 
 	return { onCreate, onEdit, onDelete };
+}
+
+export function useEnableFloatingSidebar( enabled = false ) {
+	const registry = useRegistry();
+	useEffect( () => {
+		if ( ! enabled ) {
+			return;
+		}
+
+		return registry.subscribe( () => {
+			const activeSidebar = registry
+				.select( interfaceStore )
+				.getActiveComplementaryArea( 'core' );
+
+			if ( ! activeSidebar ) {
+				registry
+					.dispatch( interfaceStore )
+					.enableComplementaryArea( 'core', collabSidebarName );
+			}
+		} );
+	}, [ enabled, registry ] );
 }

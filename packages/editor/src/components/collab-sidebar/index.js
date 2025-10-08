@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useSelect, useDispatch, subscribe } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { __experimentalVStack as VStack } from '@wordpress/components';
 import { useState, useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
@@ -21,7 +21,11 @@ import { store as editorStore } from '../../store';
 import AddCommentMenuItem from './comment-menu-item';
 import CommentAvatarIndicator from './comment-indicator-toolbar';
 import { useGlobalStylesContext } from '../global-styles-provider';
-import { useBlockComments, useBlockCommentsActions } from './hooks';
+import {
+	useBlockComments,
+	useBlockCommentsActions,
+	useEnableFloatingSidebar,
+} from './hooks';
 
 function CollabSidebarContent( {
 	showCommentBoard,
@@ -65,7 +69,6 @@ function CollabSidebarContent( {
 export default function CollabSidebar() {
 	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
-	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const commentSidebarRef = useRef( null );
 
@@ -93,23 +96,13 @@ export default function CollabSidebar() {
 
 	const { resultComments, unresolvedSortedThreads, totalPages } =
 		useBlockComments( postId );
+	useEnableFloatingSidebar( resultComments.length > 0 );
 
 	const hasMoreComments = totalPages && totalPages > 1;
 
 	// Get the global styles to set the background color of the sidebar.
 	const { merged: GlobalStyles } = useGlobalStylesContext();
 	const backgroundColor = GlobalStyles?.styles?.color?.background;
-
-	if ( 0 < resultComments.length ) {
-		const unsubscribe = subscribe( () => {
-			const activeSidebar = getActiveComplementaryArea( 'core' );
-
-			if ( ! activeSidebar ) {
-				enableComplementaryArea( 'core', collabSidebarName );
-				unsubscribe();
-			}
-		} );
-	}
 
 	// Find the current thread for the selected block.
 	const currentThread = blockCommentId
