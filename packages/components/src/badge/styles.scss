@@ -17,7 +17,6 @@ $badge-colors: (
 	padding: 2px $grid-unit-10;
 	min-height: $grid-unit-30;
 	border-radius: $radius-small;
-	line-height: 0;
 
 	&:where(.is-default) {
 		background-color: $gray-100;
