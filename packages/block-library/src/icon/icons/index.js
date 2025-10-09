@@ -17,6 +17,7 @@ import {
 	capturePhoto,
 	captureVideo,
 	category,
+	cautionFilled,
 	chartBar,
 	check,
 	chevronDown,
@@ -68,7 +69,6 @@ import {
 	trendingUp,
 	undo,
 	video,
-	warning,
 	wordpress,
 } from '@wordpress/icons';
 
