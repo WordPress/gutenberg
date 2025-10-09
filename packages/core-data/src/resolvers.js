@@ -66,18 +66,6 @@ export const getCurrentUser =
 export const getEntityRecord =
 	( kind, name, key = '', query ) =>
 	async ( { select, dispatch, registry, resolveSelect } ) => {
-		// For back-compat, we allow querying for static templates through
-		// wp_template.
-		if (
-			kind === 'postType' &&
-			name === 'wp_template' &&
-			typeof key === 'string' &&
-			// __experimentalGetDirtyEntityRecords always calls getEntityRecord
-			// with a string key, so we need that it's not a numeric ID.
-			! /^\d+$/.test( key )
-		) {
-			name = 'wp_registered_template';
-		}
 		const configs = await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
@@ -125,7 +113,14 @@ export const getEntityRecord =
 			}
 
 			const path = addQueryArgs(
-				entityConfig.baseURL + ( key ? '/' + key : '' ),
+				( kind === 'postType' &&
+				name === 'wp_template' &&
+				typeof key === 'string' &&
+				// __experimentalGetDirtyEntityRecords always calls getEntityRecord
+				// with a string key, so we need that it's not a numeric ID.
+				! /^\d+$/.test( key )
+					? '/wp/v2/templates'
+					: entityConfig.baseURL ) + ( key ? '/' + key : '' ),
 				{
 					...entityConfig.baseURLParams,
 					...query,

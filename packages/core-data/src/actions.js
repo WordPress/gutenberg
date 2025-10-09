@@ -324,7 +324,14 @@ export const deleteEntityRecord =
 
 			let hasError = false;
 			try {
-				let path = `${ entityConfig.baseURL }/${ recordId }`;
+				let path = `${
+					kind === 'postType' &&
+					name === 'wp_template' &&
+					typeof recordId === 'string' &&
+					! /^\d+$/.test( recordId )
+						? '/wp/v2/templates'
+						: entityConfig.baseURL
+				}/${ recordId }`;
 
 				if ( query ) {
 					path = addQueryArgs( path, query );
@@ -521,46 +528,6 @@ export const saveEntityRecord =
 		const entityIdKey = entityConfig.key || DEFAULT_ENTITY_KEY;
 		const recordId = record[ entityIdKey ];
 
-		// When called with a theme template ID, trigger the compatibility
-		// logic.
-		if (
-			kind === 'postType' &&
-			name === 'wp_template' &&
-			typeof recordId === 'string' &&
-			! /^\d+$/.test( recordId )
-		) {
-			// Get the theme template.
-			const template = await select.getEntityRecord(
-				'postType',
-				'wp_registered_template',
-				recordId
-			);
-			// Duplicate the theme template and make the edit.
-			const newTemplate = await dispatch.saveEntityRecord(
-				'postType',
-				'wp_template',
-				{
-					...template,
-					...record,
-					id: undefined,
-					type: 'wp_template',
-					status: 'publish',
-				}
-			);
-			// Make the new template active.
-			const activeTemplates = await select.getEntityRecord(
-				'root',
-				'site'
-			);
-			await dispatch.saveEntityRecord( 'root', 'site', {
-				active_templates: {
-					...activeTemplates.active_templates,
-					[ newTemplate.slug ]: newTemplate.id,
-				},
-			} );
-			return newTemplate;
-		}
-
 		const lock = await dispatch.__unstableAcquireStoreLock(
 			STORE_NAME,
 			[ 'entities', 'records', kind, name, recordId || uuid() ],
@@ -599,9 +566,14 @@ export const saveEntityRecord =
 			let error;
 			let hasError = false;
 			try {
-				const path = `${ entityConfig.baseURL }${
-					recordId ? '/' + recordId : ''
-				}`;
+				const path = `${
+					kind === 'postType' &&
+					name === 'wp_template' &&
+					typeof recordId === 'string' &&
+					! /^\d+$/.test( recordId )
+						? '/wp/v2/templates'
+						: entityConfig.baseURL
+				}${ recordId ? '/' + recordId : '' }`;
 				const persistedRecord = select.getRawEntityRecord(
 					kind,
 					name,

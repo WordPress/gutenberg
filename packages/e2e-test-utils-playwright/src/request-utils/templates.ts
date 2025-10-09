@@ -18,7 +18,7 @@ interface CreateTemplatePayload {
 }
 
 const PATH_MAPPING = {
-	wp_template: '/wp/v2/templates',
+	wp_template: '/wp/v2/wp_template',
 	wp_template_part: '/wp/v2/template-parts',
 };
 

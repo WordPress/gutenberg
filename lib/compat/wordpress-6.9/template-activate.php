@@ -524,3 +524,50 @@ function gutenberg_migrate_existing_templates() {
 
 	update_option( 'active_templates', $active_templates );
 }
+
+add_action( 'save_post_wp_template', 'gutenberg_maybe_update_active_templates' );
+function gutenberg_maybe_update_active_templates( $post_id ) {
+	$post = get_post( $post_id );
+	$is_inactive_by_default = get_post_meta( $post_id, 'is_inactive_by_default', true );
+	if ( $is_inactive_by_default ) {
+		return;
+	}
+	$active_templates = get_option( 'active_templates', array() );
+	$active_templates[ $post->post_name ] = $post->ID;
+	update_option( 'active_templates', $active_templates );
+}
+
+add_action( 'pre_get_block_template', 'gutenberg_get_block_template', 10, 3 );
+
+function gutenberg_get_block_template( $output, $id, $template_type ) {
+	$parts = explode( '//', $id, 2 );
+	if ( count( $parts ) < 2 ) {
+		return null;
+	}
+	list( $theme, $slug ) = $parts;
+	$active_templates = get_option( 'active_templates', array() );
+
+	if ( ! empty( $active_templates[ $slug ] ) ) {
+		$post = get_post( $active_templates[ $slug ] );
+		if ( $post && 'publish' === $post->post_status ) {
+			$template = _build_block_template_result_from_post( $post );
+
+			if ( ! is_wp_error( $template ) ) {
+				return $template;
+			}
+		}
+	}
+
+	$block_template = get_block_file_template( $id, $template_type );
+
+	/**
+	 * Filters the queried block template object after it's been fetched.
+	 *
+	 * @since 5.9.0
+	 *
+	 * @param WP_Block_Template|null $block_template The found block template, or null if there isn't one.
+	 * @param string                 $id             Template unique identifier (example: 'theme_slug//template_slug').
+	 * @param string                 $template_type  Template type. Either 'wp_template' or 'wp_template_part'.
+	 */
+	return apply_filters( 'get_block_template', $block_template, $id, $template_type );
+}
