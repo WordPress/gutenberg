@@ -17,8 +17,8 @@ import { ToolbarGroup, ToolbarDropdownMenu } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { useTermCount } from './use-term-count';
 import { bareNumber, numberInParenthesis } from './icons';
+import { useTermCount } from './use-term-count';
 
 export default function TermCountEdit( {
 	attributes,
@@ -66,33 +66,40 @@ export default function TermCountEdit( {
 		},
 	];
 
-	let termCountDisplay = termCount;
-	if ( hasParenthesis ) {
-		termCountDisplay = sprintf(
-			/* translators: %d: term count number. */
-			__( '(%d)' ),
-			termCount
-		);
-	}
+	const controls = (
+		<BlockControls group="block">
+			<ToolbarGroup>
+				<ToolbarDropdownMenu
+					icon={ getDisplayTypeIcon() }
+					label={ __( 'Change display type' ) }
+					controls={ displayTypeControls }
+				/>
+			</ToolbarGroup>
+			<AlignmentControl
+				value={ textAlign }
+				onChange={ ( nextAlign ) => {
+					setAttributes( { textAlign: nextAlign } );
+				} }
+			/>
+		</BlockControls>
+	);
+
+	// Render output based on the selected display type.
+	const renderDisplay = () => {
+		if ( hasParenthesis ) {
+			return sprintf(
+				/* translators: %d: term count number. */
+				__( '(%d)' ),
+				termCount
+			);
+		}
+		return termCount;
+	};
 
 	return (
-		<>
-			<BlockControls group="block">
-				<ToolbarGroup>
-					<ToolbarDropdownMenu
-						icon={ getDisplayTypeIcon() }
-						label={ __( 'Change display type' ) }
-						controls={ displayTypeControls }
-					/>
-				</ToolbarGroup>
-				<AlignmentControl
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
-				/>
-			</BlockControls>
-			<div { ...blockProps }>{ termCountDisplay }</div>
-		</>
+		<div { ...blockProps }>
+			{ controls }
+			{ renderDisplay() }
+		</div>
 	);
 }
