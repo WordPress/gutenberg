@@ -699,11 +699,10 @@ export const isBlockHidden = ( state, clientId ) => {
 /**
  * Returns true if the current spotlighted block matches the block clientId.
  *
- * @param {Object} state    Global application state.
- * @param {string} clientId The block to check.
+ * @param {Object} state Global application state.
  *
  * @return {boolean} Whether the block is currently spotlighted.
  */
-export function hasBlockSpotlight( state, clientId ) {
-	return state.hasBlockSpotlight === clientId;
+export function hasBlockSpotlight( state ) {
+	return !! state.hasBlockSpotlight;
 }
