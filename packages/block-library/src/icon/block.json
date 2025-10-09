@@ -12,11 +12,11 @@
 			"source": "html",
 			"selector": ".icon-container",
 			"default": "",
-			"__experimentalRole": "content"
+			"role": "content"
 		},
 		"iconName": {
 			"type": "string",
-			"__experimentalRole": "content"
+			"role": "content"
 		},
 		"label": {
 			"type": "string"
