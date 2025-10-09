@@ -34,7 +34,6 @@ function render_block_core_term_count( $attributes, $content, $block ) {
 	}
 
 	$term_count = $term->count;
-	$tag_name   = isset( $attributes['tagName'] ) ? $attributes['tagName'] : 'p';
 
 	if ( isset( $attributes['hasParenthesis'] ) && $attributes['hasParenthesis'] ) {
 		$term_count = sprintf(
@@ -53,8 +52,7 @@ function render_block_core_term_count( $attributes, $content, $block ) {
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classes ) ) );
 
 	return sprintf(
-		'<%1$s %2$s>%3$s</%1$s>',
-		$tag_name,
+		'<div %2$s>%3$s</div>',
 		$wrapper_attributes,
 		$term_count
 	);
