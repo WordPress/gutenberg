@@ -996,7 +996,6 @@ Display the description of categories, tags and custom taxonomies when viewing a
 Displays the name of a taxonomy term. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/term-name))
 
 -	**Name:** core/term-name
--	**Experimental:** true
 -	**Category:** theme
 -	**Supports:** align (full, wide), color (background, gradients, link, text), interactivity (clientNavigation), spacing (padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** isLink, level, textAlign

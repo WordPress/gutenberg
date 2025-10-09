@@ -251,6 +251,7 @@ const getAllBlocks = () => {
 		homeLink,
 		logInOut,
 		termDescription,
+		termName,
 		queryTitle,
 		postAuthorBiography,
 	];
@@ -258,7 +259,6 @@ const getAllBlocks = () => {
 	if ( window?.__experimentalEnableBlockExperiments ) {
 		blocks.push( termsQuery );
 		blocks.push( termTemplate );
-		blocks.push( termName );
 	}
 
 	if ( window?.__experimentalEnableFormBlocks ) {
