@@ -37,7 +37,6 @@ import {
 	commentAuthorAvatar,
 	desktop,
 	download,
-	edit,
 	external,
 	file,
 	gallery,
@@ -252,11 +251,6 @@ const wordpressIcons = [
 		title: __( 'Download' ),
 		icon: download,
 		categories: [ 'media' ],
-	},
-	{
-		name: 'edit',
-		title: __( 'Edit' ),
-		icon: edit,
 	},
 	{
 		name: 'external',

@@ -10,7 +10,7 @@
 		"icon": {
 			"type": "string",
 			"source": "html",
-			"selector": ".icon-container",
+			"selector": ".wp-block-icon",
 			"default": "",
 			"role": "content"
 		},
@@ -32,6 +32,7 @@
 		"interactivity": {
 			"clientNavigation": true
 		},
+		"ariaLabel": false,
 		"__experimentalBorder": {
 			"color": true,
 			"radius": true,
