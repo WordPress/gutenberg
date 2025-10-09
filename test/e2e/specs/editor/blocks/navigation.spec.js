@@ -819,6 +819,59 @@ test.describe( 'Navigation block', () => {
 			await expect( linkInput ).toBeEnabled();
 			await expect( linkInput ).toHaveValue( '' );
 		} );
+
+		test( 'existing links with id but no binding remain editable', async ( {
+			editor,
+			page,
+			admin,
+			navigation,
+			requestUtils,
+		} ) => {
+			await admin.createNewPost();
+
+			// Create a menu with an existing link that has id but no binding
+			// This simulates existing sites before the binding feature
+			const menu = await requestUtils.createNavigationMenu( {
+				title: 'Test Menu',
+				content: `<!-- wp:navigation-link {"label":"Support","type":"page","id":${ testPage1.id },"url":"${ testPage1.link }","kind":"post-type"} /-->`,
+			} );
+
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: {
+					ref: menu.id,
+				},
+			} );
+
+			// Select the Navigation Link block
+			const navBlock = navigation.getNavBlock();
+			await editor.selectBlocks( navBlock );
+
+			const navLinkBlock = navBlock
+				.getByRole( 'document', {
+					name: 'Block: Page Link',
+				} )
+				.first();
+
+			await editor.selectBlocks( navLinkBlock );
+
+			// Check the Inspector controls for the Nav Link block
+			// to verify the Link field is enabled (not locked in entity mode)
+			await editor.openDocumentSettingsSidebar();
+			const settingsControls = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'tabpanel', { name: 'Settings' } );
+
+			await expect( settingsControls ).toBeVisible();
+
+			const linkInput = settingsControls.getByRole( 'textbox', {
+				name: 'Link',
+			} );
+
+			// For existing links with id but no binding, the input should be enabled
+			await expect( linkInput ).toBeEnabled();
+			await expect( linkInput ).toHaveValue( testPage1.link );
+		} );
 	} );
 } );
 
