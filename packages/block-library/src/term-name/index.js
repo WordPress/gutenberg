@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { tag as icon } from '@wordpress/icons';
+import { termName as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
