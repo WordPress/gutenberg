@@ -150,7 +150,7 @@ export function useBlockCommentsActions() {
 					post: getCurrentPostId(),
 					content,
 					status: 'hold',
-					comment_type: 'block_comment',
+					type: 'block_comment',
 					parent: parent || 0,
 				},
 				{ throwOnError: true }
