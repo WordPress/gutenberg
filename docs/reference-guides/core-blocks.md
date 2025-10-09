@@ -46,8 +46,8 @@ Displays an accordion panel. ([Source](https://github.com/WordPress/gutenberg/tr
 -	**Name:** core/accordion-panel
 -	**Category:** design
 -	**Parent:** core/accordion-item
--	**Supports:** color (background, gradients, text), contentRole, interactivity, shadow, spacing (blockGap, padding), typography (fontSize, lineHeight), ~~blockVisibility~~, ~~html~~
--	**Attributes:** allowedBlocks, isSelected, openByDefault, templateLock
+-	**Supports:** allowedBlocks, color (background, gradients, text), contentRole, interactivity, shadow, spacing (blockGap, padding), typography (fontSize, lineHeight), ~~blockVisibility~~, ~~html~~
+-	**Attributes:** isSelected, openByDefault, templateLock
 
 ## Archives
 
@@ -147,8 +147,8 @@ A single column within a columns block. ([Source](https://github.com/WordPress/g
 -	**Name:** core/column
 -	**Category:** design
 -	**Parent:** core/columns
--	**Supports:** anchor, color (background, button, gradients, heading, link, text), interactivity (clientNavigation), layout, shadow, spacing (blockGap, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:** allowedBlocks, templateLock, verticalAlignment, width
+-	**Supports:** allowedBlocks, anchor, color (background, button, gradients, heading, link, text), interactivity (clientNavigation), layout, shadow, spacing (blockGap, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Attributes:** templateLock, verticalAlignment, width
 
 ## Columns
 
@@ -295,8 +295,8 @@ Add an image or video with a text overlay. ([Source](https://github.com/WordPres
 
 -	**Name:** core/cover
 -	**Category:** media
--	**Supports:** align, anchor, color (heading, text, ~~background~~, ~~enableContrastChecker~~), dimensions (aspectRatio), filter (duotone), interactivity (clientNavigation), layout (~~allowJustification~~), shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** allowedBlocks, alt, backgroundType, contentPosition, customGradient, customOverlayColor, dimRatio, focalPoint, gradient, hasParallax, id, isDark, isRepeated, isUserOverlayColor, minHeight, minHeightUnit, overlayColor, poster, sizeSlug, tagName, templateLock, url, useFeaturedImage
+-	**Supports:** align, allowedBlocks, anchor, color (heading, text, ~~background~~, ~~enableContrastChecker~~), dimensions (aspectRatio), filter (duotone), interactivity (clientNavigation), layout (~~allowJustification~~), shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Attributes:** alt, backgroundType, contentPosition, customGradient, customOverlayColor, dimRatio, focalPoint, gradient, hasParallax, id, isDark, isRepeated, isUserOverlayColor, minHeight, minHeightUnit, overlayColor, poster, sizeSlug, tagName, templateLock, url, useFeaturedImage
 
 ## Details
 
@@ -304,8 +304,8 @@ Hide and show additional content. ([Source](https://github.com/WordPress/gutenbe
 
 -	**Name:** core/details
 -	**Category:** text
--	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), layout (~~allowEditing~~), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** allowedBlocks, name, placeholder, showContent, summary
+-	**Supports:** align (full, wide), allowedBlocks, anchor, color (background, gradients, link, text), interactivity (clientNavigation), layout (~~allowEditing~~), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Attributes:** name, placeholder, showContent, summary
 
 ## Embed
 
@@ -494,8 +494,8 @@ Set media and words side-by-side for a richer layout. ([Source](https://github.c
 
 -	**Name:** core/media-text
 -	**Category:** media
--	**Supports:** align (full, wide), anchor, color (background, gradients, heading, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** align, allowedBlocks, focalPoint, href, imageFill, isStackedOnMobile, linkClass, linkDestination, linkTarget, mediaAlt, mediaId, mediaLink, mediaPosition, mediaSizeSlug, mediaType, mediaUrl, mediaWidth, rel, useFeaturedImage, verticalAlignment
+-	**Supports:** align (full, wide), allowedBlocks, anchor, color (background, gradients, heading, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Attributes:** align, focalPoint, href, imageFill, isStackedOnMobile, linkClass, linkDestination, linkTarget, mediaAlt, mediaId, mediaLink, mediaPosition, mediaSizeSlug, mediaType, mediaUrl, mediaWidth, rel, useFeaturedImage, verticalAlignment
 
 ## Unsupported
 
@@ -841,7 +841,7 @@ Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Ju
 
 -	**Name:** core/quote
 -	**Category:** text
--	**Supports:** align (full, left, right, wide), anchor, background (backgroundImage, backgroundSize), color (background, gradients, heading, link, text), dimensions (minHeight), interactivity (clientNavigation), layout (~~allowEditing~~), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, left, right, wide), allowedBlocks, anchor, background (backgroundImage, backgroundSize), color (background, gradients, heading, link, text), dimensions (minHeight), interactivity (clientNavigation), layout (~~allowEditing~~), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** citation, textAlign, value
 
 ## Read More
