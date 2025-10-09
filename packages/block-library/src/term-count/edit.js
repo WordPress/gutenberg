@@ -12,7 +12,6 @@ import {
 	BlockControls,
 	AlignmentControl,
 	InspectorControls,
-	HeadingLevelDropdown,
 } from '@wordpress/block-editor';
 import {
 	ToggleControl,
@@ -31,7 +30,7 @@ export default function TermCountEdit( {
 	setAttributes,
 	context: { termId, taxonomy },
 } ) {
-	const { textAlign, tagName = 'p', hasParenthesis } = attributes;
+	const { textAlign, hasParenthesis } = attributes;
 	const term = useTermCount( termId, taxonomy );
 
 	const termCount = term?.termCount || 0;
@@ -43,8 +42,6 @@ export default function TermCountEdit( {
 	} );
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
-
-	const TagName = tagName;
 
 	let termCountDisplay = termCount;
 	if ( hasParenthesis ) {
@@ -58,19 +55,6 @@ export default function TermCountEdit( {
 	return (
 		<>
 			<BlockControls group="block">
-				<HeadingLevelDropdown
-					value={
-						tagName === 'p'
-							? 0
-							: parseInt( tagName.replace( 'h', '' ) )
-					}
-					options={ [ 0, 1, 2, 3, 4, 5, 6 ] }
-					onChange={ ( newLevel ) => {
-						setAttributes( {
-							tagName: newLevel === 0 ? 'p' : `h${ newLevel }`,
-						} );
-					} }
-				/>
 				<AlignmentControl
 					value={ textAlign }
 					onChange={ ( nextAlign ) => {
@@ -109,7 +93,7 @@ export default function TermCountEdit( {
 					</ToolsPanelItem>
 				</ToolsPanel>
 			</InspectorControls>
-			<TagName { ...blockProps }>{ termCountDisplay }</TagName>
+			<div { ...blockProps }>{ termCountDisplay }</div>
 		</>
 	);
 }

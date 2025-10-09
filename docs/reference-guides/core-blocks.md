@@ -990,7 +990,7 @@ Displays the count of a taxonomy term. ([Source](https://github.com/WordPress/gu
 -	**Experimental:** true
 -	**Category:** theme
 -	**Supports:** align (full, wide), color (background, gradients, link, text), interactivity (clientNavigation), spacing (padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** hasParenthesis, tagName, textAlign
+-	**Attributes:** hasParenthesis, textAlign
 
 ## Term Description
 

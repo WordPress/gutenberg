@@ -12,10 +12,6 @@
 		"textAlign": {
 			"type": "string"
 		},
-		"tagName": {
-			"type": "string",
-			"default": "p"
-		},
 		"hasParenthesis": {
 			"type": "boolean",
 			"default": true
