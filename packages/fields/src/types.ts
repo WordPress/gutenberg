@@ -58,6 +58,24 @@ export interface BasePostWithEmbeddedAuthor extends BasePost {
 	_embedded: EmbeddedAuthor;
 }
 
+interface FeaturedMedia {
+	title: {
+		rendered: string;
+	};
+	source_url: string;
+	media_details: {
+		sizes: Record< string, { width: number; source_url: string } >;
+	};
+}
+
+interface EmbeddedFeaturedMedia {
+	'wp:featuredmedia': FeaturedMedia[];
+}
+
+export interface BasePostWithEmbeddedFeaturedMedia extends BasePost {
+	_embedded: EmbeddedFeaturedMedia;
+}
+
 export interface Template extends CommonPost {
 	type: 'wp_template';
 	is_custom: boolean;
