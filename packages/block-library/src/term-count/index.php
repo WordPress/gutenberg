@@ -42,17 +42,10 @@ function render_block_core_term_count( $attributes, $content, $block ) {
 		);
 	}
 
-	$classes = array();
-	if ( isset( $attributes['textAlign'] ) ) {
-		$classes[] = 'has-text-align-' . $attributes['textAlign'];
-	}
-	if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
-		$classes[] = 'has-link-color';
-	}
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classes ) ) );
+	$wrapper_attributes = get_block_wrapper_attributes();
 
 	return sprintf(
-		'<div %2$s>%3$s</div>',
+		'<div %1$s>%2$s</div>',
 		$wrapper_attributes,
 		$term_count
 	);

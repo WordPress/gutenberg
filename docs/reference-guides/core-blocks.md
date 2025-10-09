@@ -989,8 +989,8 @@ Displays the count of a taxonomy term. ([Source](https://github.com/WordPress/gu
 -	**Name:** core/term-count
 -	**Experimental:** true
 -	**Category:** theme
--	**Supports:** align (full, wide), color (background, gradients, link, text), interactivity (clientNavigation), spacing (padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** hasParenthesis, textAlign
+-	**Supports:** color (background, gradients, text), interactivity (clientNavigation), spacing (padding), typography (fontSize, lineHeight), ~~html~~
+-	**Attributes:** hasParenthesis
 
 ## Term Description
 

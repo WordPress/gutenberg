@@ -1,17 +1,8 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import {
-	useBlockProps,
-	BlockControls,
-	AlignmentControl,
-} from '@wordpress/block-editor';
+import { useBlockProps, BlockControls } from '@wordpress/block-editor';
 import { ToolbarGroup, ToolbarDropdownMenu } from '@wordpress/components';
 
 /**
@@ -25,16 +16,12 @@ export default function TermCountEdit( {
 	setAttributes,
 	context: { termId, taxonomy },
 } ) {
-	const { textAlign, hasParenthesis } = attributes;
+	const { hasParenthesis } = attributes;
 	const term = useTermCount( termId, taxonomy );
 
 	const termCount = term?.termCount || 0;
 
-	const blockProps = useBlockProps( {
-		classCount: clsx( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-		} ),
-	} );
+	const blockProps = useBlockProps();
 
 	const getDisplayTypeIcon = () => {
 		switch ( hasParenthesis ) {
@@ -75,12 +62,6 @@ export default function TermCountEdit( {
 					controls={ displayTypeControls }
 				/>
 			</ToolbarGroup>
-			<AlignmentControl
-				value={ textAlign }
-				onChange={ ( nextAlign ) => {
-					setAttributes( { textAlign: nextAlign } );
-				} }
-			/>
 		</BlockControls>
 	);
 

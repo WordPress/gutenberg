@@ -9,24 +9,18 @@
 	"textdomain": "default",
 	"usesContext": [ "termId", "taxonomy" ],
 	"attributes": {
-		"textAlign": {
-			"type": "string"
-		},
 		"hasParenthesis": {
 			"type": "boolean",
 			"default": true
 		}
 	},
 	"supports": {
-		"align": [ "wide", "full" ],
 		"html": false,
 		"color": {
 			"gradients": true,
-			"link": true,
 			"__experimentalDefaultControls": {
 				"background": true,
-				"text": true,
-				"link": true
+				"text": true
 			}
 		},
 		"spacing": {
