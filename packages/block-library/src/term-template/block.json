@@ -13,13 +13,7 @@
 		"reusable": false,
 		"html": false,
 		"align": [ "wide", "full" ],
-		"layout": {
-			"allowSwitching": true,
-			"allowEditing": true,
-			"default": {
-				"type": "flex"
-			}
-		},
+		"layout": true,
 		"color": {
 			"gradients": true,
 			"link": true,
@@ -64,5 +58,5 @@
 		}
 	},
 	"style": "wp-block-term-template",
-	"variations": "file:./variations.js"
+	"editorStyle": "wp-block-term-template-editor"
 }
