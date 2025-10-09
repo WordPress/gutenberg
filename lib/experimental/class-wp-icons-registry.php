@@ -26,6 +26,15 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 		private static $instance = null;
 
 		/**
+		 * Constructs the controller.
+		 *
+		 * Temporary. See method `register_core_icons` for rationale.
+		 */
+		public function __construct() {
+			$this->register_core_icons();
+		}
+
+		/**
 		 * Registers an icon.
 		 *
 		 *
@@ -41,7 +50,7 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 		 * }
 		 * @return bool True if the icon was registered with success and false otherwise.
 		 */
-		public function register( $icon_name, $icon_properties ) {
+		private function register( $icon_name, $icon_properties ) {
 			if ( ! isset( $icon_name ) || ! is_string( $icon_name ) ) {
 				_doing_it_wrong(
 					__METHOD__,
@@ -88,7 +97,7 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 		 * @param string $icon_name Icon name including namespace.
 		 * @return bool True if the icon was unregistered with success and false otherwise.
 		 */
-		public function unregister( $icon_name ) {
+		private function unregister( $icon_name ) {
 			if ( ! $this->is_registered( $icon_name ) ) {
 				_doing_it_wrong(
 					__METHOD__,
@@ -199,6 +208,43 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 			}
 
 			return self::$instance;
+		}
+
+		/**
+		 * Registers core icons from the `@wordpress/icons` package.
+		 *
+		 * Exists only temporarily as this new class (and associated features)
+		 * is in testing. Hard-coding the registration of core icons by calling
+		 * this method in the constructor allows us to keep method `register`
+		 * private for this release.
+		 */
+		private function register_core_icons() {
+			$icons_directory = __DIR__ . '/../../packages/icons/src/library/';
+
+			if ( ! is_dir( $icons_directory ) ) {
+				return;
+			}
+
+			$svg_files = glob( $icons_directory . '*.svg' );
+
+			foreach ( $svg_files as $svg_file ) {
+				$icon_name   = basename( $svg_file, '.svg' );
+				$svg_content = file_get_contents( $svg_file );
+
+				if ( false === $svg_content ) {
+					continue;
+				}
+
+				$title = ucwords( str_replace( array( '-', '_' ), ' ', $icon_name ) );
+
+				$this->register(
+					'core/' . $icon_name,
+					array(
+						'title'   => $title,
+						'content' => $svg_content,
+					)
+				);
+			}
 		}
 	}
 }

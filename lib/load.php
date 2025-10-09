@@ -64,7 +64,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	}
 
 	// PoC: Infrastructure to register icons and expose them via the REST API.
-	require_once __DIR__ . '/experimental/icon.php';
 	require_once __DIR__ . '/experimental/class-wp-icons-registry.php';
 	require_once __DIR__ . '/experimental/class-wp-rest-icons-controller.php';
 }
