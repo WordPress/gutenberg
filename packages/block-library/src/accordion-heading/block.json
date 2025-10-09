@@ -40,6 +40,10 @@
 			}
 		},
 		"typography": {
+			"__experimentalSkipSerialization": [
+				"textDecoration",
+				"letterSpacing"
+			],
 			"fontSize": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
@@ -54,6 +58,16 @@
 		},
 		"shadow": true,
 		"blockVisibility": false
+	},
+	"selectors": {
+		"root": ".wp-block-accordion-heading",
+		"typography": {
+			"fontSize": ".wp-block-accordion-heading",
+			"__experimentalFontFamily": ".wp-block-accordion-heading",
+			"__experimentalFontWeight": ".wp-block-accordion-heading",
+			"__experimentalFontStyle": ".wp-block-accordion-heading",
+			"__experimentalTextTransform": ".wp-block-accordion-heading"
+		}
 	},
 	"attributes": {
 		"openByDefault": {
