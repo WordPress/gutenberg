@@ -31,6 +31,29 @@ if ( ! class_exists( 'WP_REST_Icons_Controller' ) ) {
 						'methods'             => WP_REST_Server::READABLE,
 						'callback'            => array( $this, 'get_items' ),
 						'permission_callback' => array( $this, 'get_items_permissions_check' ),
+						'args'                => $this->get_collection_params(),
+					),
+					'schema' => array( $this, 'get_public_item_schema' ),
+				)
+			);
+
+			register_rest_route(
+				$this->namespace,
+				'/' . $this->rest_base . '/(?P<name>[a-z][a-z0-9-]*/[a-z][a-z0-9-]*)',
+				array(
+					'args'   => array(
+						'name' => array(
+							'description' => __( 'Icon name.', 'gutenberg' ),
+							'type'        => 'string',
+						),
+					),
+					array(
+						'methods'             => WP_REST_Server::READABLE,
+						'callback'            => array( $this, 'get_item' ),
+						'permission_callback' => array( $this, 'get_item_permissions_check' ),
+						'args'                => array(
+							'context' => $this->get_context_param( array( 'default' => 'view' ) ),
+						),
 					),
 					'schema' => array( $this, 'get_public_item_schema' ),
 				)
@@ -73,7 +96,14 @@ if ( ! class_exists( 'WP_REST_Icons_Controller' ) ) {
 		public function get_items( $request ) {
 			$response = array();
 			$icons    = WP_Icons_Registry::get_instance()->get_all_registered();
+			$search   = $request->get_param( 'search' );
+
 			foreach ( $icons as $icon ) {
+				// Filter by search query if provided
+				if ( ! empty( $search ) && false === stripos( $icon['name'], $search ) ) {
+					continue;
+				}
+
 				$prepared_icon = $this->prepare_item_for_response( $icon, $request );
 				$response[]    = $this->prepare_response_for_collection( $prepared_icon );
 			}
@@ -146,6 +176,74 @@ if ( ! class_exists( 'WP_REST_Icons_Controller' ) ) {
 			$this->schema = $schema;
 
 			return $this->add_additional_fields_schema( $this->schema );
+		}
+
+		/**
+		 * Checks if a given request has access to read a specific icon.
+		 *
+		 * @param WP_REST_Request $request Full details about the request.
+		 * @return true|WP_Error True if the request has read access for the item, WP_Error object otherwise.
+		 */
+		public function get_item_permissions_check( $request ) {
+			$check = $this->get_items_permissions_check( $request );
+			if ( is_wp_error( $check ) ) {
+				return $check;
+			}
+
+			$icon = $this->get_icon( $request['name'] );
+			if ( is_wp_error( $icon ) ) {
+				return $icon;
+			}
+
+			return true;
+		}
+
+		/**
+		 * Retrieves a specific icon.
+		 *
+		 * @param WP_REST_Request $request Full details about the request.
+		 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+		 */
+		public function get_item( $request ) {
+			$icon = $this->get_icon( $request['name'] );
+			if ( is_wp_error( $icon ) ) {
+				return $icon;
+			}
+
+			$data = $this->prepare_item_for_response( $icon, $request );
+			return rest_ensure_response( $data );
+		}
+
+		/**
+		 * Retrieves a specific icon from the registry.
+		 *
+		 * @param string $name Icon name.
+		 * @return array|WP_Error Icon data on success, or WP_Error object on failure.
+		 */
+		public function get_icon( $name ) {
+			$registry = WP_Icons_Registry::get_instance();
+			$icon     = $registry->get_registered( $name );
+
+			if ( null === $icon ) {
+				return new WP_Error(
+					'rest_icon_invalid_name',
+					__( 'Invalid icon name.', 'gutenberg' ),
+					array( 'status' => 404 )
+				);
+			}
+
+			return $icon;
+		}
+
+		/**
+		 * Retrieves the query params for the icons collection.
+		 *
+		 * @return array Collection parameters.
+		 */
+		public function get_collection_params() {
+			$query_params                       = parent::get_collection_params();
+			$query_params['context']['default'] = 'view';
+			return $query_params;
 		}
 	}
 }
