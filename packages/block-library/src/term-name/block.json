@@ -6,6 +6,7 @@
 	"title": "Term Name",
 	"category": "theme",
 	"description": "Displays the name of a taxonomy term.",
+	"keywords": [ "term title" ],
 	"textdomain": "default",
 	"usesContext": [ "termId", "taxonomy" ],
 	"attributes": {
