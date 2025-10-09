@@ -182,7 +182,7 @@ export default function TermTemplateEdit( {
 							icon: list,
 							title: _x(
 								'List view',
-								'Post template block display setting'
+								'Term template block display setting'
 							),
 							onClick: () =>
 								setDisplayLayout( { type: 'default' } ),
@@ -194,7 +194,7 @@ export default function TermTemplateEdit( {
 							icon: grid,
 							title: _x(
 								'Grid view',
-								'Post template block display setting'
+								'Term template block display setting'
 							),
 							onClick: () =>
 								setDisplayLayout( {
