@@ -421,17 +421,20 @@ export default function NavigationSubmenuEdit( {
 								speak( __( 'Link removed.' ), 'assertive' );
 							} }
 							onChange={ ( updatedValue ) => {
-								updateAttributes(
+								// updateAttributes determines the final state and returns metadata
+								const { isEntityLink } = updateAttributes(
 									updatedValue,
 									setAttributes,
 									attributes
 								);
 
-								// Handle URL binding
-								if ( ! updatedValue?.id ) {
-									clearBinding();
-								} else {
+								// Handle URL binding based on the final computed state
+								// Only create bindings for entity links (posts, pages, taxonomies)
+								// Never create bindings for custom links (manual URLs)
+								if ( isEntityLink ) {
 									createBinding();
+								} else {
+									clearBinding();
 								}
 							} }
 						/>
