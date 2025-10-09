@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __experimentalVStack as VStack } from '@wordpress/components';
-import { useState, useRef, useEffect } from '@wordpress/element';
+import { useState, useRef, useEffect, useCallback } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { comment as commentIcon } from '@wordpress/icons';
 import {
@@ -81,46 +81,21 @@ function FloatingCommentBoard( {
 	thread,
 	showCommentBoard,
 	setShowCommentBoard,
-	previousThreadId,
 	commentSidebarRef,
-	offsetsRef,
-	updateOffsets,
+	calculatedOffset,
 	updateHeight,
-	heights,
+	onPositionCalculated,
+	setBlockRef,
 } ) {
 	const blockRef = useRef();
 	useBlockElementRef( thread.blockClientId, blockRef );
 
-	const selectedBlockElementRect = blockRef.current?.getBoundingClientRect();
-
-	const initialOffsetTop = selectedBlockElementRect?.top;
-
-	const previousOffset = previousThreadId
-		? offsetsRef.current[ previousThreadId ]
-		: 0;
-
-	const previousBoardHeight = heights[ previousThreadId ]
-		? heights[ previousThreadId ]
-		: 0;
-
-	// If the previous comment board is overlapping this comment, shift it down.
-	const calculateOffset = () => {
-		if (
-			previousOffset &&
-			initialOffsetTop < previousOffset + previousBoardHeight
-		) {
-			return previousOffset - initialOffsetTop + previousBoardHeight + 20;
-		}
-		return -16; // Remove top padding of the comment board so first comment visually aligns with block.
-	};
-
-	// Use floating-ui to track the block element's position. The crossAxis offset
-	// is calculated to avoid overlapping comment boards and will shift the board down.
+	// Use floating-ui to track the block element's position with the calculated offset.
 	const { y, refs } = useFloating( {
 		placement: 'right-start',
 		middleware: [
 			offsetMiddleware( {
-				crossAxis: calculateOffset(),
+				crossAxis: calculatedOffset || -16,
 			} ),
 		],
 		whileElementsMounted: autoUpdate,
@@ -130,20 +105,37 @@ function FloatingCommentBoard( {
 		if ( blockRef.current ) {
 			refs.setReference( blockRef.current );
 		}
-	}, [ blockRef, refs ] );
+	}, [ blockRef, refs, setBlockRef ] );
 
-	useEffect( () => {
-		if ( y !== null && y !== 0 ) {
-			updateOffsets( thread.id, y, refs.floating?.current?.clientHeight );
-		}
-	}, [ y, refs.floating, thread.id, updateOffsets ] );
-
+	// Track height changes.
 	useEffect( () => {
 		if ( refs.floating?.current ) {
-			const newHeight = refs.floating?.current.scrollHeight;
-			updateHeight( thread.id, newHeight );
+			setBlockRef( thread.id, refs.floating.current );
+
+			const observer = new ResizeObserver( ( entries ) => {
+				for ( const entry of entries ) {
+					const newHeight = entry.target.scrollHeight;
+					updateHeight( thread.id, newHeight );
+				}
+			} );
+
+			observer.observe( refs.floating.current );
+
+			// Initial height
+			const initialHeight = refs.floating.current.scrollHeight;
+			updateHeight( thread.id, initialHeight );
+
+			return () => observer.disconnect();
 		}
 	}, [ thread.id, updateHeight, refs.floating ] );
+
+	// Report the calculated absolute position back to parent
+	useEffect( () => {
+		if ( y !== null && y !== 0 ) {
+			onPositionCalculated( thread.id, y );
+		}
+	}, [ y, thread.id, onPositionCalculated ] );
+
 	const { onCreate, onEdit, onDelete } = useBlockCommentsActions();
 
 	return (
@@ -175,15 +167,22 @@ export default function CollabSidebar() {
 	const isLargeViewport = useViewportMatch( 'medium' );
 
 	const [ heights, setHeights ] = useState( {} );
+	const [ boardOffsets, setBoardOffsets ] = useState( {} );
+	const [ commentRefs, setCommentRefs ] = useState( {} );
+	const absolutePositionsRef = useRef( {} );
 
-	const updateHeight = ( id, newHeight ) => {
+	const updateHeight = useCallback( ( id, newHeight ) => {
 		setHeights( ( prev ) => {
 			if ( prev[ id ] !== newHeight ) {
 				return { ...prev, [ id ]: newHeight };
 			}
 			return prev;
 		} );
-	};
+	}, [] );
+
+	const onPositionCalculated = useCallback( ( id, absoluteY ) => {
+		absolutePositionsRef.current[ id ] = absoluteY;
+	}, [] );
 
 	const { selectBlock } = useDispatch( blockEditorStore );
 	const handleThreadClick = ( thread ) => {
@@ -192,10 +191,6 @@ export default function CollabSidebar() {
 		}
 	};
 
-	const offsetsRef = useRef( {} );
-	const updateOffsets = ( id, offset ) => {
-		offsetsRef.current[ id ] = offset;
-	};
 	const commentSidebarRef = useRef( null );
 
 	const { postId } = useSelect( ( select ) => {
@@ -227,6 +222,69 @@ export default function CollabSidebar() {
 	useEnableFloatingSidebar( resultComments.length > 0 );
 
 	const hasMoreComments = totalPages && totalPages > 1;
+
+	const setBlockRef = useCallback( ( id, ref ) => {
+		commentRefs[ id ] = ref;
+		setCommentRefs( commentRefs );
+	}, [] );
+
+
+	// Centralized offset calculator that calculates crossAxis offsets
+	// to prevent overlaps when boards change height or new boards are added.
+	const calculateAllOffsets = useCallback( () => {
+		const offsets = {};
+		let previousThreadData = null;
+
+		unresolvedSortedThreads.forEach( ( thread ) => {
+
+			const blockElement = commentRefs[ thread.id ];
+			const blockRect = blockElement?.getBoundingClientRect();
+			const blockTop = blockRect?.top || 0;
+			const boardHeight = blockRect?.height || 0;
+
+			// Default offset (remove padding so first comment aligns with block)
+			let crossAxisOffset = -16;
+
+			// Check if we need additional offset to avoid overlap with previous board
+			if ( previousThreadData ) {
+				const previousBlockTop = previousThreadData.blockTop;
+				const previousOffset = previousThreadData.offset;
+				const previousHeight = previousThreadData.height;
+
+				// Calculate where the previous board's bottom would be
+				const previousBoardBottom =
+					previousHeight + previousBlockTop;
+
+				// Calculate where this board would naturally appear
+				const currentBoardTop = blockTop - 16;
+
+				// Check if there's overlap.
+				if ( currentBoardTop < previousBoardBottom + 20 ) {
+					// Need to shift down to avoid overlap
+					const additionalOffset =
+						previousBoardBottom + 20 - blockTop;
+					crossAxisOffset = additionalOffset;
+				}
+			}
+
+			offsets[ thread.id ] = crossAxisOffset;
+
+			// Store data for next iteration
+			previousThreadData = {
+				blockTop,
+				offset: crossAxisOffset,
+				height: boardHeight,
+			};
+		} );
+
+		return offsets;
+	}, [ unresolvedSortedThreads ] );
+
+	// Recalculate offsets whenever heights change, threads change, or comment board state changes
+	useEffect( () => {
+		const newOffsets = calculateAllOffsets();
+		setBoardOffsets( newOffsets );
+	}, [ calculateAllOffsets, showCommentBoard, heights, blockCommentId ] );
 
 	// Get the global styles to set the background color of the sidebar.
 	const { merged: GlobalStyles } = useGlobalStylesContext();
@@ -282,7 +340,7 @@ export default function CollabSidebar() {
 						ref={ commentSidebarRef }
 					>
 						{ unresolvedSortedThreads.length > 0 &&
-							unresolvedSortedThreads.map( ( thread, index ) => {
+							unresolvedSortedThreads.map( ( thread ) => {
 								return (
 									<FloatingCommentBoard
 										key={ thread.id }
@@ -291,18 +349,18 @@ export default function CollabSidebar() {
 										setShowCommentBoard={
 											setShowCommentBoard
 										}
-										offsetsRef={ offsetsRef }
-										updateOffsets={ updateOffsets }
+										calculatedOffset={
+											boardOffsets[ thread.id ]
+										}
 										updateHeight={ updateHeight }
-										heights={ heights }
-										previousThreadId={
-											unresolvedSortedThreads[ index - 1 ]
-												?.id
+										onPositionCalculated={
+											onPositionCalculated
 										}
 										onClick={ () =>
 											handleThreadClick( thread )
 										}
 										commentSidebarRef={ commentSidebarRef }
+										setBlockRef={ setBlockRef }
 									/>
 								);
 							} ) }
