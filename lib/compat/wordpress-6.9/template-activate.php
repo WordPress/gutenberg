@@ -540,6 +540,9 @@ function gutenberg_maybe_update_active_templates( $post_id ) {
 add_action( 'pre_get_block_template', 'gutenberg_get_block_template', 10, 3 );
 
 function gutenberg_get_block_template( $output, $id, $template_type ) {
+	if ( 'wp_template' !== $template_type ) {
+		return $output;
+	}
 	$parts = explode( '//', $id, 2 );
 	if ( count( $parts ) < 2 ) {
 		return null;
