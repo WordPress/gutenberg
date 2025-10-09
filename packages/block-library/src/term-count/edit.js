@@ -11,19 +11,14 @@ import {
 	useBlockProps,
 	BlockControls,
 	AlignmentControl,
-	InspectorControls,
 } from '@wordpress/block-editor';
-import {
-	ToggleControl,
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-} from '@wordpress/components';
+import { ToolbarGroup, ToolbarDropdownMenu } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { useTermCount } from './use-term-count';
+import { bareNumber, numberInParenthesis } from './icons';
 
 export default function TermCountEdit( {
 	attributes,
@@ -41,7 +36,35 @@ export default function TermCountEdit( {
 		} ),
 	} );
 
-	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+	const getDisplayTypeIcon = () => {
+		switch ( hasParenthesis ) {
+			case true:
+				return numberInParenthesis;
+			case false:
+				return bareNumber;
+		}
+	};
+
+	const displayTypeControls = [
+		{
+			role: 'menuitemradio',
+			title: __( 'In Parenthesis' ),
+			isActive: hasParenthesis === true,
+			icon: numberInParenthesis,
+			onClick: () => {
+				setAttributes( { hasParenthesis: true } );
+			},
+		},
+		{
+			role: 'menuitemradio',
+			title: __( 'Bare Number' ),
+			isActive: hasParenthesis === false,
+			icon: bareNumber,
+			onClick: () => {
+				setAttributes( { hasParenthesis: false } );
+			},
+		},
+	];
 
 	let termCountDisplay = termCount;
 	if ( hasParenthesis ) {
@@ -55,6 +78,13 @@ export default function TermCountEdit( {
 	return (
 		<>
 			<BlockControls group="block">
+				<ToolbarGroup>
+					<ToolbarDropdownMenu
+						icon={ getDisplayTypeIcon() }
+						label={ __( 'Change display type' ) }
+						controls={ displayTypeControls }
+					/>
+				</ToolbarGroup>
 				<AlignmentControl
 					value={ textAlign }
 					onChange={ ( nextAlign ) => {
@@ -62,37 +92,6 @@ export default function TermCountEdit( {
 					} }
 				/>
 			</BlockControls>
-			<InspectorControls>
-				<ToolsPanel
-					label={ __( 'Settings' ) }
-					resetAll={ () => {
-						setAttributes( {
-							hasParenthesis: false,
-						} );
-					} }
-					dropdownMenuProps={ dropdownMenuProps }
-				>
-					<ToolsPanelItem
-						hasValue={ () => !! hasParenthesis }
-						label={ __( 'Make term count a link' ) }
-						onDeselect={ () =>
-							setAttributes( { hasParenthesis: false } )
-						}
-						isShownByDefault
-					>
-						<ToggleControl
-							__nextHasNoMarginBottom
-							label={ __( 'Show term count in parenthesis' ) }
-							onChange={ () =>
-								setAttributes( {
-									hasParenthesis: ! hasParenthesis,
-								} )
-							}
-							checked={ hasParenthesis }
-						/>
-					</ToolsPanelItem>
-				</ToolsPanel>
-			</InspectorControls>
 			<div { ...blockProps }>{ termCountDisplay }</div>
 		</>
 	);
