@@ -56,6 +56,60 @@ function kebabToCamelCase( str ) {
 }
 
 /**
+ * Plugin to handle moment-timezone aliases.
+ * Redirects moment-timezone imports to use pre-built bundles with limited data.
+ *
+ * @return {Object} esbuild plugin.
+ */
+function momentTimezoneAliasPlugin() {
+	return {
+		name: 'moment-timezone-alias',
+		async setup( build ) {
+			// Resolve paths at plugin creation time
+			const { createRequire } = await import( 'module' );
+			const require = createRequire( import.meta.url );
+
+			const preBuiltBundlePath = require.resolve(
+				'moment-timezone/builds/moment-timezone-with-data-1970-2030'
+			);
+			const momentTimezoneUtilsPath = require.resolve(
+				'moment-timezone/moment-timezone-utils.js'
+			);
+
+			// Redirect main moment-timezone files to pre-built bundle
+			build.onResolve(
+				{ filter: /^moment-timezone\/moment-timezone$/ },
+				() => {
+					return { path: preBuiltBundlePath };
+				}
+			);
+
+			// For utils, we need to load it but ensure it works with the pre-built bundle
+			// The utils file tries to require('./') which would load index.js
+			// We need to make sure it gets the pre-built bundle instead
+			build.onResolve(
+				{ filter: /^moment-timezone\/moment-timezone-utils$/ },
+				() => {
+					return { path: momentTimezoneUtilsPath };
+				}
+			);
+
+			// Intercept the require('./') call inside moment-timezone-utils
+			// and redirect it to the pre-built bundle
+			build.onResolve( { filter: /^\.\/$/ }, ( args ) => {
+				// Only intercept if this is coming from moment-timezone-utils
+				if (
+					args.importer &&
+					args.importer.includes( 'moment-timezone-utils' )
+				) {
+					return { path: preBuiltBundlePath };
+				}
+			} );
+		},
+	};
+}
+
+/**
  * WordPress externals and asset plugin.
  * Inspired by wp-build's wordpressExternalsAndAssetPlugin.
  *
@@ -66,6 +120,50 @@ function wordpressExternalsPlugin() {
 		name: 'wordpress-externals',
 		setup( build ) {
 			const dependencies = new Set();
+
+			// Map of vendor packages to their global variables and handles
+			const vendorExternals = {
+				react: { global: 'React', handle: 'react' },
+				'react-dom': { global: 'ReactDOM', handle: 'react-dom' },
+				'react/jsx-runtime': {
+					global: 'ReactJSXRuntime',
+					handle: 'react-jsx-runtime',
+				},
+				'react/jsx-dev-runtime': {
+					global: 'ReactJSXRuntime',
+					handle: 'react-jsx-runtime',
+				},
+				moment: { global: 'moment', handle: 'moment' },
+				lodash: { global: 'lodash', handle: 'lodash' },
+				'lodash-es': { global: 'lodash', handle: 'lodash' },
+				jquery: { global: 'jQuery', handle: 'jquery' },
+			};
+
+			// Handle vendor packages
+			for ( const [ packageName, config ] of Object.entries(
+				vendorExternals
+			) ) {
+				build.onResolve(
+					{
+						filter: new RegExp(
+							`^${ packageName.replace(
+								/[.*+?^${}()|[\]\\]/g,
+								'\\$&'
+							) }$`
+						),
+					},
+					( args ) => {
+						// Track dependency for asset file
+						dependencies.add( config.handle );
+
+						return {
+							path: args.path,
+							namespace: 'vendor-external',
+							pluginData: { global: config.global },
+						};
+					}
+				);
+			}
 
 			// Handle all @wordpress/* packages
 			build.onResolve( { filter: /^@wordpress\// }, ( args ) => {
@@ -78,6 +176,18 @@ function wordpressExternalsPlugin() {
 					namespace: 'wordpress-external',
 				};
 			} );
+
+			build.onLoad(
+				{ filter: /.*/, namespace: 'vendor-external' },
+				( args ) => {
+					const global = args.pluginData.global;
+
+					return {
+						contents: `module.exports = window.${ global };`,
+						loader: 'js',
+					};
+				}
+			);
 
 			build.onLoad(
 				{ filter: /.*/, namespace: 'wordpress-external' },
@@ -134,46 +244,100 @@ async function bundlePackage( packageName ) {
 	const packageJsonPath = path.join( packageDir, 'package.json' );
 	const packageJson = JSON.parse( await readFile( packageJsonPath, 'utf8' ) );
 
-	// Skip if package doesn't need WordPress bundling
-	if ( ! packageJson.wpScript ) {
+	const builds = [];
+
+	// Bundle wpScript (IIFE format for global wp.* namespace)
+	if ( packageJson.wpScript ) {
+		const entryPoint = path.join( packageDir, 'build-module', 'index.js' );
+		const outputDir = path.join( PACKAGES_DIR, '..', 'build', packageName );
+		const target = browserslistToEsbuild();
+		const globalName = `wp.${ kebabToCamelCase( packageName ) }`;
+
+		const baseConfig = {
+			entryPoints: [ entryPoint ],
+			bundle: true,
+			sourcemap: true,
+			format: 'iife',
+			target,
+			platform: 'browser',
+			globalName,
+		};
+
+		// For packages with default exports, add a footer to properly expose the default
+		if ( packageJson.wpScriptDefaultExport ) {
+			baseConfig.footer = {
+				js: `if (typeof ${ globalName } === 'object' && ${ globalName }.default) { ${ globalName } = ${ globalName }.default; }`,
+			};
+		}
+
+		builds.push(
+			esbuild.build( {
+				...baseConfig,
+				outfile: path.join( outputDir, 'index.min.js' ),
+				minify: true,
+				plugins: [
+					momentTimezoneAliasPlugin(),
+					wordpressExternalsPlugin(),
+				],
+			} ),
+			esbuild.build( {
+				...baseConfig,
+				outfile: path.join( outputDir, 'index.js' ),
+				minify: false,
+				plugins: [ momentTimezoneAliasPlugin() ],
+			} )
+		);
+	}
+
+	// Bundle wpScriptModuleExports (ESM format for Script Modules API)
+	if ( packageJson.wpScriptModuleExports ) {
+		const target = browserslistToEsbuild();
+		const rootBuildModuleDir = path.join(
+			PACKAGES_DIR,
+			'..',
+			'build-module',
+			packageName
+		);
+
+		// Normalize to object format
+		const exports =
+			typeof packageJson.wpScriptModuleExports === 'string'
+				? { '.': packageJson.wpScriptModuleExports }
+				: packageJson.wpScriptModuleExports;
+
+		// Bundle each export
+		for ( const [ exportName, exportPath ] of Object.entries( exports ) ) {
+			// Convert export name to file name: '.' -> 'index', './debug' -> 'debug'
+			const fileName =
+				exportName === '.'
+					? 'index'
+					: exportName.replace( /^\.\//, '' );
+			const entryPoint = path.join( packageDir, exportPath );
+
+			builds.push(
+				esbuild.build( {
+					entryPoints: [ entryPoint ],
+					outfile: path.join(
+						rootBuildModuleDir,
+						`${ fileName }.min.js`
+					),
+					bundle: true,
+					sourcemap: true,
+					format: 'esm',
+					target,
+					platform: 'browser',
+					minify: true,
+					plugins: [ wordpressExternalsPlugin() ],
+				} )
+			);
+		}
+	}
+
+	if ( builds.length === 0 ) {
 		return false;
 	}
 
-	const entryPoint = path.join( packageDir, 'build-module', 'index.js' );
-	const outputDir = path.join( PACKAGES_DIR, '..', 'build', packageName );
-	const target = browserslistToEsbuild();
-	const globalName = `wp.${ kebabToCamelCase( packageName ) }`;
-
-	const baseConfig = {
-		entryPoints: [ entryPoint ],
-		bundle: true,
-		sourcemap: true,
-		format: 'iife',
-		target,
-		platform: 'browser',
-		globalName,
-	};
-
-	// For packages with default exports, add a footer to properly expose the default
-	if ( packageJson.wpScriptDefaultExport ) {
-		baseConfig.footer = {
-			js: `if (typeof ${ globalName } === 'object' && ${ globalName }.default) { ${ globalName } = ${ globalName }.default; }`,
-		};
-	}
-
-	await Promise.all( [
-		esbuild.build( {
-			...baseConfig,
-			outfile: path.join( outputDir, 'index.min.js' ),
-			minify: true,
-			plugins: [ wordpressExternalsPlugin() ],
-		} ),
-		esbuild.build( {
-			...baseConfig,
-			outfile: path.join( outputDir, 'index.js' ),
-			minify: false,
-		} ),
-	] );
+	await Promise.all( builds );
 
 	return true;
 }
