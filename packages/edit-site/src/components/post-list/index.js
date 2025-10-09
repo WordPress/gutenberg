@@ -254,7 +254,6 @@ export default function PostList( { postType } ) {
 					) }
 				</>
 			}
-			hasPadding={ false }
 		>
 			<DataViews
 				key={ activeView }

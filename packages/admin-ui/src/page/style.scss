@@ -32,6 +32,20 @@
 	margin: 0;
 }
 
+.admin-ui-page__content {
+	flex-grow: 1;
+	overflow: auto;
+	display: flex;
+	flex-direction: column;
+
+	&.has-padding {
+		padding: $grid-unit-20 $grid-unit * 2.5;
+		@container (max-width: 430px) {
+			padding: $grid-unit-20 $grid-unit-30;
+		}
+	}
+}
+
 // Show button text labels when preference is enabled.
 .show-icon-labels {
 	.admin-ui-page__header-actions {
