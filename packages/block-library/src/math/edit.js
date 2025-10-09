@@ -51,13 +51,12 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 							<TextControl
 								__nextHasNoMarginBottom
 								__next40pxDefaultSize
-								label={ __( 'LaTeX' ) }
+								label={ __( 'LaTeX math syntax' ) }
 								value={ latex }
 								onChange={ ( newLatex ) => {
 									setAttributes( { latex: newLatex } );
 								} }
 								placeholder={ __( 'e.g., x^2, \\frac{a}{b}' ) }
-								help={ __( 'Enter LaTeX math notation' ) }
 							/>
 							{ error && (
 								<Notice status="error" isDismissible={ false }>

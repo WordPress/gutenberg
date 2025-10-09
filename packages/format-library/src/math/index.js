@@ -11,7 +11,7 @@ import {
 	Notice,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { symbol } from '@wordpress/icons';
+import { math as icon } from '@wordpress/icons';
 
 /**
  * External dependencies
@@ -82,11 +82,10 @@ function InlineUI( { value, onChange, activeAttributes, contentRef } ) {
 					<TextControl
 						__nextHasNoMarginBottom
 						__next40pxDefaultSize
-						label={ __( 'LaTeX' ) }
+						label={ __( 'LaTeX math syntax' ) }
 						value={ latex }
 						onChange={ handleLatexChange }
 						placeholder={ __( 'e.g., x^2, \\frac{a}{b}' ) }
-						help={ __( 'Enter LaTeX math notation' ) }
 					/>
 					{ error && (
 						<Notice status="error" isDismissible={ false }>
@@ -110,7 +109,7 @@ function Edit( {
 	return (
 		<>
 			<RichTextToolbarButton
-				icon={ symbol }
+				icon={ icon }
 				title={ title }
 				onClick={ () => {
 					const newValue = insertObject( value, {

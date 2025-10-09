@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { symbol as icon } from '@wordpress/icons';
+import { math as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
