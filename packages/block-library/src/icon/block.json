@@ -37,7 +37,6 @@
 			"radius": true,
 			"style": true,
 			"width": true,
-			"__experimentalSelector": ".icon-container",
 			"__experimentalSkipSerialization": true,
 			"__experimentalDefaultControls": {
 				"color": false,

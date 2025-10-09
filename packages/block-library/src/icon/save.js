@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -73,50 +68,17 @@ export default function save( props ) {
 		};
 	}
 
-	const blockProps = useBlockProps.save();
 	const borderProps = getBorderClassesAndStyles( props.attributes );
-
-	const iconClasses = clsx( 'icon-container', borderProps?.className );
-
-	const iconStyles = {
-		...blockProps.style,
-		...borderProps.style,
-
-		// Margin is applied to the wrapper container, so unset.
-		marginBottom: undefined,
-		marginLeft: undefined,
-		marginRight: undefined,
-		marginTop: undefined,
-	};
-
-	const blockStyles = useBlockProps.save()?.style;
-
-	// And even though margin is set on the main block div, we need to handle it
-	// manually since all other styles are applied to the inner div.
-	const blockMargin = {
-		marginBottom: blockStyles?.marginBottom,
-		marginLeft: blockStyles?.marginLeft,
-		marginRight: blockStyles?.marginRight,
-		marginTop: blockStyles?.marginTop,
-	};
-
-	const iconMarkup = (
-		<>
-			<div className={ iconClasses } style={ iconStyles }>
-				{ printedIcon }
-			</div>
-		</>
-	);
 
 	return (
 		<div
-			{ ...useBlockProps.save() }
-			// This is a bit of a hack. we only want the margin styles
-			// applied to the main block div.
-			style={ blockMargin }
+			{ ...useBlockProps.save( {
+				className: borderProps?.className,
+				style: { ...borderProps.style },
+			} ) }
 			title={ title }
 		>
-			{ iconMarkup }
+			{ printedIcon }
 		</div>
 	);
 }
