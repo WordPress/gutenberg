@@ -104,6 +104,17 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_Test_REST_TestCase {
 		$this->assertErrorResponse( 'rest_comment_not_supported_post_type', $response, 403 );
 	}
 
+	public function test_create_block_comment_require_login() {
+		wp_set_current_user( 0 );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->set_param( 'post', self::$post_id );
+		$request->set_param( 'type', 'block_comment' );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_comment_login_required', $response, 401 );
+	}
+
 	public function test_cannot_create_block_comment_without_post_type_support() {
 		register_post_type(
 			'no-block-comments',
@@ -232,7 +243,6 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_Test_REST_TestCase {
 
 		$this->assertSame( 'comment', $new_comment->comment_type );
 	}
-
 
 	/**
 	 * Test that for each user role, the permissions are correct when accessing comments.

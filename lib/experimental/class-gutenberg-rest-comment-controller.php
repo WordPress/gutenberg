@@ -135,7 +135,15 @@ class Gutenberg_REST_Comment_Controller extends WP_REST_Comments_Controller {
 		$is_block_comment = ! empty( $request['type'] ) && 'block_comment' === $request['type'];
 
 		// Note: This is only relevant change for the backport.
-		if ( ! is_user_logged_in() && ! $is_block_comment ) {
+		if ( ! is_user_logged_in() && $is_block_comment ) {
+			return new WP_Error(
+				'rest_comment_login_required',
+				__( 'Sorry, you must be logged in to comment.', 'gutenberg' ),
+				array( 'status' => 401 )
+			);
+		}
+
+		if ( ! is_user_logged_in() ) {
 			if ( get_option( 'comment_registration' ) ) {
 				return new WP_Error(
 					'rest_comment_login_required',
