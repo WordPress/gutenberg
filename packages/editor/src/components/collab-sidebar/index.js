@@ -69,6 +69,7 @@ function CollabSidebarContent( {
  */
 export default function CollabSidebar() {
 	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
+	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const commentSidebarRef = useRef( null );
