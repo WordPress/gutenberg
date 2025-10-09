@@ -98,11 +98,14 @@ export function getCommentExcerpt( text, excerptLength = 10 ) {
  * @param {string}       additionalSelector The additional selector to focus on.
  */
 export function focusCommentThread( commentId, container, additionalSelector ) {
-	if ( ! commentId || ! container ) {
+	if ( ! container ) {
 		return;
 	}
 
-	const threadSelector = `[role=listitem][id="comment-thread-${ commentId }"]`;
+	// A thread without a commentId is a new comment thread.
+	const threadSelector = commentId
+		? `[role=listitem][id="comment-thread-${ commentId }"]`
+		: '[role=listitem]:not([id])';
 	const selector = additionalSelector
 		? `${ threadSelector } ${ additionalSelector }`
 		: threadSelector;

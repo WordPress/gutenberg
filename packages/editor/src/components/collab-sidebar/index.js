@@ -26,6 +26,7 @@ import {
 	useBlockCommentsActions,
 	useEnableFloatingSidebar,
 } from './hooks';
+import { focusCommentThread } from './utils';
 
 function CollabSidebarContent( {
 	showCommentBoard,
@@ -68,6 +69,7 @@ function CollabSidebarContent( {
  */
 export default function CollabSidebar() {
 	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
+	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const commentSidebarRef = useRef( null );
@@ -89,11 +91,6 @@ export default function CollabSidebar() {
 			: null;
 	}, [] );
 
-	const openCollabBoard = () => {
-		setShowCommentBoard( true );
-		enableComplementaryArea( 'core', collabHistorySidebarName );
-	};
-
 	const { resultComments, unresolvedSortedThreads, totalPages } =
 		useBlockComments( postId );
 	useEnableFloatingSidebar( resultComments.length > 0 );
@@ -114,15 +111,36 @@ export default function CollabSidebar() {
 		return null;
 	}
 
+	async function openTheSidebar() {
+		enableComplementaryArea( 'core', collabHistorySidebarName );
+		const activeArea = await getActiveComplementaryArea( 'core' );
+
+		// Move focus to the target element after the sidebar has opened.
+		if (
+			[ collabHistorySidebarName, collabSidebarName ].includes(
+				activeArea
+			)
+		) {
+			setShowCommentBoard( ! blockCommentId );
+			focusCommentThread(
+				blockCommentId,
+				commentSidebarRef.current,
+				// Focus a comment thread when there's a selected block with a comment.
+				! blockCommentId ? 'textarea' : undefined
+			);
+		}
+	}
+
 	return (
 		<>
 			{ blockCommentId && (
 				<CommentAvatarIndicator
 					thread={ currentThread }
 					hasMoreComments={ hasMoreComments }
+					onClick={ openTheSidebar }
 				/>
 			) }
-			<AddCommentMenuItem onClick={ openCollabBoard } />
+			<AddCommentMenuItem onClick={ openTheSidebar } />
 			<PluginSidebar
 				identifier={ collabHistorySidebarName }
 				// translators: Comments sidebar title
