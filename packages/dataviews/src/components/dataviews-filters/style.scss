@@ -317,9 +317,7 @@
 	.dataviews-filters__search-widget-filter-combobox__input {
 		@include input-control;
 		display: block;
-		padding: 0 $grid-unit-40 0 $grid-unit-10;
-		background: $gray-100;
-		border: none;
+		padding: 0 $grid-unit-10 0 $grid-unit-40;
 		width: 100%;
 		height: $grid-unit-40;
 
@@ -354,13 +352,17 @@
 
 	.dataviews-filters__search-widget-filter-combobox__icon {
 		position: absolute;
-		right: $grid-unit-15;
-		top: 50%;
-		transform: translateY(-50%);
+		inset-inline-start: $grid-unit-15;
+		top: 0;
+		bottom: 0;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		width: $icon-size;
+
+		&:dir(ltr) {
+			transform: scaleX(-1);
+		}
 	}
 }
 

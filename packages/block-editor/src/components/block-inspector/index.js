@@ -301,6 +301,7 @@ const BlockInspectorSingleBlock = ( {
 			<BlockCard
 				{ ...blockInformation }
 				className={ isBlockSynced && 'is-synced' }
+				allowParentNavigation
 			>
 				{ window?.__experimentalContentOnlyPatternInsertion && (
 					<EditContentsButton clientId={ clientId } />

@@ -86,3 +86,53 @@ export function getCommentExcerpt( text, excerptLength = 10 ) {
 	const isTrimmed = trimmedExcerpt !== rawText;
 	return isTrimmed ? trimmedExcerpt + '…' : trimmedExcerpt;
 }
+
+/**
+ * Shift focus to the comment thread associated with a particular comment ID.
+ * If an additional selector is provided, the focus will be shifted to the element matching the selector.
+ *
+ * @typedef {import('@wordpress/element').RefObject} RefObject
+ *
+ * @param {string}       commentId          The ID of the comment thread to focus.
+ * @param {?HTMLElement} container          The container element to search within.
+ * @param {string}       additionalSelector The additional selector to focus on.
+ */
+export function focusCommentThread( commentId, container, additionalSelector ) {
+	if ( ! container ) {
+		return;
+	}
+
+	// A thread without a commentId is a new comment thread.
+	const threadSelector = commentId
+		? `[role=listitem][id="comment-thread-${ commentId }"]`
+		: '[role=listitem]:not([id])';
+	const selector = additionalSelector
+		? `${ threadSelector } ${ additionalSelector }`
+		: threadSelector;
+
+	return new Promise( ( resolve ) => {
+		if ( container.querySelector( selector ) ) {
+			return resolve( container.querySelector( selector ) );
+		}
+
+		let timer = null;
+		// Wait for the element to be added to the DOM.
+		const observer = new window.MutationObserver( () => {
+			if ( container.querySelector( selector ) ) {
+				clearTimeout( timer );
+				observer.disconnect();
+				resolve( container.querySelector( selector ) );
+			}
+		} );
+		observer.observe( container, {
+			childList: true,
+			subtree: true,
+		} );
+
+		// Stop trying after 3 seconds.
+		timer = setTimeout( () => {
+			observer.disconnect();
+			resolve( null );
+		}, 3000 );
+	} ).then( ( element ) => element?.focus() );
+}

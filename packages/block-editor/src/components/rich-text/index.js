@@ -2,6 +2,7 @@
  * External dependencies
  */
 import clsx from 'clsx';
+import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
  * WordPress dependencies
@@ -134,12 +135,8 @@ export function RichTextWrapper(
 			return { isSelected: false };
 		}
 
-		const {
-			getSelectionStart,
-			getSelectionEnd,
-			getBlockEditingMode,
-			isNavigationMode,
-		} = select( blockEditorStore );
+		const { getSelectionStart, getSelectionEnd, getBlockEditingMode } =
+			select( blockEditorStore );
 		const selectionStart = getSelectionStart();
 		const selectionEnd = getSelectionEnd();
 
@@ -160,12 +157,10 @@ export function RichTextWrapper(
 			selectionStart: isSelected ? selectionStart.offset : undefined,
 			selectionEnd: isSelected ? selectionEnd.offset : undefined,
 			isSelected,
-			isContentOnlyWriteMode:
-				isNavigationMode() &&
-				getBlockEditingMode( clientId ) === 'contentOnly',
+			isContentOnly: getBlockEditingMode( clientId ) === 'contentOnly',
 		};
 	};
-	const { selectionStart, selectionEnd, isSelected, isContentOnlyWriteMode } =
+	const { selectionStart, selectionEnd, isSelected, isContentOnly } =
 		useSelect( selector, [
 			clientId,
 			identifier,
@@ -218,13 +213,19 @@ export function RichTextWrapper(
 
 			const { getBlockAttributes } = select( blockEditorStore );
 			const blockAttributes = getBlockAttributes( clientId );
-			const fieldsList = blockBindingsSource?.getFieldsList?.( {
-				select,
-				context: blockBindingsContext,
-			} );
+			let clientSideFieldLabel = null;
+			if ( blockBindingsSource?.editorUI ) {
+				const editorUIResult = blockBindingsSource.editorUI( {
+					select,
+					context: blockBindingsContext,
+				} );
+				clientSideFieldLabel = editorUIResult.data?.find( ( item ) =>
+					fastDeepEqual( item.args, relatedBinding?.args )
+				)?.label;
+			}
+
 			const bindingKey =
-				fieldsList?.[ relatedBinding?.args?.key ]?.label ??
-				blockBindingsSource?.label;
+				clientSideFieldLabel ?? blockBindingsSource?.label;
 
 			const _bindingsPlaceholder = _disableBoundBlock
 				? bindingKey
@@ -347,7 +348,7 @@ export function RichTextWrapper(
 		identifier,
 		allowedFormats: adjustedAllowedFormats,
 		withoutInteractiveFormatting,
-		disableNoneEssentialFormatting: isContentOnlyWriteMode,
+		disableNoneEssentialFormatting: isContentOnly,
 	} );
 
 	function addEditorOnlyFormats( value ) {

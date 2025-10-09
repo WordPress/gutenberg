@@ -8,10 +8,13 @@ const babel = require( '@babel/core' );
 const makeDir = require( 'make-dir' );
 const sass = require( 'sass' );
 const postcss = require( 'postcss' );
+
 /**
  * Internal dependencies
  */
 const getBabelConfig = require( './get-babel-config' );
+const iconsBuildUtils = require( '../../packages/icons/lib/build-worker-utils' );
+const { V2_PACKAGES } = require( './v2-packages' );
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -179,6 +182,14 @@ async function buildJS( file ) {
 	}
 }
 
+// This build task is only meant for regenerating icons in the icons library at
+// packages/icons/src/library. Let it delegate to that package's own handler.
+async function buildSVG( file ) {
+	if ( ! ( await iconsBuildUtils.buildSVG( file ) ) ) {
+		throw new Error( `No handler for SVG file: ${ file }` );
+	}
+}
+
 /**
  * Object of build tasks per file extension.
  *
@@ -189,9 +200,16 @@ const BUILD_TASK_BY_EXTENSION = {
 	'.js': buildJS,
 	'.ts': buildJS,
 	'.tsx': buildJS,
+	'.svg': buildSVG,
 };
 
 module.exports = async ( file, callback ) => {
+	const packageName = getPackageName( file );
+	// Skip v2 packages - they're built by bin/packages/build-v2.js
+	if ( V2_PACKAGES.includes( packageName ) ) {
+		callback();
+		return;
+	}
 	const extension = path.extname( file );
 	const task = BUILD_TASK_BY_EXTENSION[ extension ];
 

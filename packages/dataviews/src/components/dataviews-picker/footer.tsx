@@ -15,7 +15,7 @@ import { __, sprintf, _n } from '@wordpress/i18n';
  */
 import DataViewsPagination from '../dataviews-pagination';
 import DataViewsContext from '../dataviews-context';
-import type { SetSelection } from '../../private-types';
+import type { SetSelection } from '../../types/private';
 import type { Action } from '../../types';
 
 const EMPTY_ARRAY: [] = [];
@@ -99,8 +99,7 @@ function ActionButtons< Item >( {
 					return null;
 				}
 
-				const { id, label, icon, isPrimary, isDestructive, callback } =
-					action;
+				const { id, label, icon, isPrimary, callback } = action;
 
 				const _label =
 					typeof label === 'string' ? label : label( items );
@@ -122,7 +121,6 @@ function ActionButtons< Item >( {
 							setActionInProgress( null );
 						} }
 						size="compact"
-						isDestructive={ isDestructive }
 						variant={ variant }
 					>
 						{ _label }

@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/class-gutenberg-rest-old-templates-controller.php';
+
 // How does this work?
 // 1. For wp_template, we remove the custom templates controller, so it becomes
 //    a normal posts endpoint, modified slightly to allow auto-drafts.
@@ -10,6 +12,7 @@ function gutenberg_modify_wp_template_post_type_args( $args, $post_type ) {
 		$args['rest_controller_class']           = 'Gutenberg_REST_Templates_Controller';
 		$args['autosave_rest_controller_class']  = null;
 		$args['revisions_rest_controller_class'] = null;
+		$args['supports']                        = array_merge( $args['supports'], array( 'custom-fields' ) );
 	}
 	return $args;
 }
@@ -28,9 +31,42 @@ function gutenberg_maintain_templates_routes() {
 	// WP_REST_Templates_Controller with a post type.
 	global $wp_post_types;
 	$wp_post_types['wp_template']->rest_base = 'templates';
-	$controller                              = new WP_REST_Templates_Controller( 'wp_template' );
+	$controller                              = new Gutenberg_REST_Old_Templates_Controller( 'wp_template' );
 	$wp_post_types['wp_template']->rest_base = 'wp_template';
 	$controller->register_routes();
+
+	// Add the same field as wp_registered_template.
+	register_rest_field(
+		'wp_template',
+		'theme',
+		array(
+			'get_callback' => function ( $post_arr ) {
+				// add_additional_fields_to_object is also called for the old
+				// templates controller, so we need to check if the id is an
+				// integer to make sure it's the proper post type endpoint.
+				if ( ! is_int( $post_arr['id'] ) ) {
+					return null;
+				}
+				$terms = get_the_terms( $post_arr['id'], 'wp_theme' );
+				if ( is_wp_error( $terms ) || empty( $terms ) ) {
+					return null;
+				}
+				return $terms[0]->slug;
+			},
+		)
+	);
+
+	// Allow setting the is_wp_suggestion meta field, which partly determines if
+	// a template is a custom template.
+	register_post_meta(
+		'wp_template',
+		'is_wp_suggestion',
+		array(
+			'type'         => 'boolean',
+			'show_in_rest' => true,
+			'single'       => true,
+		)
+	);
 }
 
 // 3. We need a route to get that raw static templates from themes and plugins.
@@ -53,14 +89,16 @@ function gutenberg_setup_static_template() {
 		'active_templates',
 		array(
 			'type'         => 'object',
+			// Do not set the default value to an empty array! For some reason
+			// that will prevent the option from being set to an empty array.
 			'show_in_rest' => array(
 				'schema' => array(
 					'type'                 => 'object',
-					// properties can be integers or false (deactivated).
+					// Properties can be integers, strings, or false
+					// (deactivated).
 					'additionalProperties' => true,
 				),
 			),
-			'default'      => array(),
 			'label'        => 'Active Templates',
 		)
 	);
@@ -188,7 +226,7 @@ function gutenberg_resolve_block_template( $template_type, $template_hierarchy, 
 	//////////////////////////////
 
 	$object            = get_queried_object();
-	$specific_template = get_page_template_slug( $object );
+	$specific_template = $object ? get_page_template_slug( $object ) : null;
 	$active_templates  = (array) get_option( 'active_templates', array() );
 
 	// Remove templates slugs that are deactivated, except if it's the specific
@@ -219,7 +257,33 @@ function gutenberg_resolve_block_template( $template_type, $template_hierarchy, 
 			continue;
 		}
 
-		$templates[] = _build_block_template_result_from_post( $post );
+		$template = _build_block_template_result_from_post( $post );
+
+		// Ensure the active templates are associated with the active theme.
+		// See _build_block_template_object_from_post_object.
+		if ( get_stylesheet() !== $template->theme ) {
+			$remaining_slugs[] = $slug;
+			continue;
+		}
+
+		$templates[] = $template;
+	}
+
+	// Apply the filter to the active templates for backward compatibility.
+	if ( ! empty( $templates ) ) {
+		$templates = apply_filters(
+			'get_block_templates',
+			$templates,
+			array(
+				'slug__in' => array_map(
+					function ( $template ) {
+						return $template->slug;
+					},
+					$templates
+				),
+			),
+			'wp_template'
+		);
 	}
 
 	// For any remaining slugs, use the static template.
@@ -404,6 +468,11 @@ function gutenberg_set_active_template_theme( $changes, $request ) {
 	$changes->tax_input = array(
 		'wp_theme' => isset( $request['theme'] ) ? $request['theme'] : get_stylesheet(),
 	);
+	// All new templates saved will receive meta so we can distinguish between
+	// templates created the old way as edits and templates created the new way.
+	$changes->meta_input = array(
+		'is_inactive_by_default' => true,
+	);
 	return $changes;
 }
 
@@ -411,9 +480,9 @@ function gutenberg_set_active_template_theme( $changes, $request ) {
 // is active.
 add_action( 'init', 'gutenberg_migrate_existing_templates' );
 function gutenberg_migrate_existing_templates() {
-	$active_templates = get_option( 'active_templates' );
+	$active_templates = get_option( 'active_templates', false );
 
-	if ( $active_templates ) {
+	if ( false !== $active_templates ) {
 		return;
 	}
 
@@ -429,6 +498,19 @@ function gutenberg_migrate_existing_templates() {
 				'taxonomy' => 'wp_theme',
 				'field'    => 'name',
 				'terms'    => get_stylesheet(),
+			),
+		),
+		// Only get templates that are not inactive by default.
+		'meta_query'          => array(
+			'relation' => 'OR',
+			array(
+				'key'     => 'is_inactive_by_default',
+				'compare' => 'NOT EXISTS',
+			),
+			array(
+				'key'     => 'is_inactive_by_default',
+				'value'   => false,
+				'compare' => '=',
 			),
 		),
 	);

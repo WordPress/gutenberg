@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { Page } from '@wordpress/admin-ui';
 import { Button } from '@wordpress/components';
 import {
 	store as coreStore,
@@ -8,22 +9,18 @@ import {
 } from '@wordpress/core-data';
 import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { drawerRight } from '@wordpress/icons';
 import { useEvent, usePrevious } from '@wordpress/compose';
 import { addQueryArgs } from '@wordpress/url';
+import { useView } from '@wordpress/views';
 
 /**
  * Internal dependencies
  */
-import Page from '../page';
-import {
-	useDefaultViews,
-	defaultLayouts,
-} from '../sidebar-dataviews/default-views';
 import {
 	OPERATOR_IS_ANY,
 	OPERATOR_IS_NONE,
@@ -33,160 +30,12 @@ import {
 import AddNewPostModal from '../add-new-post';
 import { unlock } from '../../lock-unlock';
 import { useEditPostAction } from '../dataviews-actions';
+import { defaultLayouts, getDefaultView } from './view-utils';
 
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 const EMPTY_ARRAY = [];
-
-const getDefaultView = ( defaultViews, activeView ) => {
-	return defaultViews.find( ( { slug } ) => slug === activeView )?.view;
-};
-
-const getCustomView = ( editedEntityRecord ) => {
-	if ( ! editedEntityRecord?.content ) {
-		return undefined;
-	}
-
-	const content = JSON.parse( editedEntityRecord.content );
-	if ( ! content ) {
-		return undefined;
-	}
-
-	return {
-		...content,
-		...defaultLayouts[ content.type ],
-	};
-};
-
-/**
- * This function abstracts working with default & custom views by
- * providing a [ state, setState ] tuple based on the URL parameters.
- *
- * Consumers use the provided tuple to work with state
- * and don't have to deal with the specifics of default & custom views.
- *
- * @param {string} postType Post type to retrieve default views for.
- * @return {Array} The [ state, setState ] tuple.
- */
-function useView( postType ) {
-	const {
-		path,
-		query: { activeView = 'all', isCustom = 'false', layout },
-	} = useLocation();
-	const history = useHistory();
-
-	const defaultViews = useDefaultViews( { postType } );
-	const { editEntityRecord } = useDispatch( coreStore );
-	const editedEntityRecord = useSelect(
-		( select ) => {
-			if ( isCustom !== 'true' ) {
-				return undefined;
-			}
-
-			const { getEditedEntityRecord } = select( coreStore );
-			return getEditedEntityRecord(
-				'postType',
-				'wp_dataviews',
-				Number( activeView )
-			);
-		},
-		[ activeView, isCustom ]
-	);
-	const [ view, setView ] = useState( () => {
-		let initialView;
-		if ( isCustom === 'true' ) {
-			initialView = getCustomView( editedEntityRecord ) ?? {
-				type: layout ?? LAYOUT_LIST,
-			};
-		} else {
-			initialView = getDefaultView( defaultViews, activeView ) ?? {
-				type: layout ?? LAYOUT_LIST,
-			};
-		}
-
-		const type = layout ?? initialView.type;
-		return {
-			...initialView,
-			type,
-			...defaultLayouts[ type ],
-		};
-	} );
-
-	const setViewWithUrlUpdate = useEvent( ( newView ) => {
-		setView( newView );
-
-		if ( isCustom === 'true' && editedEntityRecord?.id ) {
-			editEntityRecord(
-				'postType',
-				'wp_dataviews',
-				editedEntityRecord?.id,
-				{
-					content: JSON.stringify( newView ),
-				}
-			);
-		}
-
-		const currentUrlLayout = layout ?? LAYOUT_LIST;
-		if ( newView.type !== currentUrlLayout ) {
-			history.navigate(
-				addQueryArgs( path, {
-					layout: newView.type,
-				} )
-			);
-		}
-	} );
-
-	// When layout URL param changes, update the view type
-	// without affecting any other config.
-	const onUrlLayoutChange = useEvent( () => {
-		setView( ( prevView ) => {
-			const newType = layout ?? LAYOUT_LIST;
-			if ( newType === prevView.type ) {
-				return prevView;
-			}
-
-			return {
-				...prevView,
-				type: newType,
-				...defaultLayouts[ newType ],
-			};
-		} );
-	} );
-	useEffect( () => {
-		onUrlLayoutChange();
-	}, [ onUrlLayoutChange, layout ] );
-
-	// When activeView or isCustom URL parameters change, reset the view.
-	const onUrlActiveViewChange = useEvent( () => {
-		let newView;
-		if ( isCustom === 'true' ) {
-			newView = getCustomView( editedEntityRecord );
-		} else {
-			newView = getDefaultView( defaultViews, activeView );
-		}
-
-		if ( newView ) {
-			const type = layout ?? newView.type;
-			setView( {
-				...newView,
-				type,
-				...defaultLayouts[ type ],
-			} );
-		}
-	} );
-	useEffect( () => {
-		onUrlActiveViewChange();
-	}, [
-		onUrlActiveViewChange,
-		activeView,
-		isCustom,
-		defaultViews,
-		editedEntityRecord,
-	] );
-
-	return [ view, setViewWithUrlUpdate ];
-}
 
 const DEFAULT_STATUSES = 'draft,future,pending,private,publish'; // All but 'trash'.
 
@@ -199,28 +48,55 @@ function getItemLevel( item ) {
 }
 
 export default function PostList( { postType } ) {
-	const [ view, setView ] = useView( postType );
+	const { path, query } = useLocation();
+	const { activeView = 'all', postId, quickEdit = false } = query;
 	const history = useHistory();
-	const location = useLocation();
-	const {
-		postId,
-		quickEdit = false,
-		isCustom,
-		activeView = 'all',
-	} = location.query;
+	const postTypeObject = useSelect(
+		( select ) => {
+			const { getPostType } = select( coreStore );
+			return getPostType( postType );
+		},
+		[ postType ]
+	);
+	const { view, updateView, isModified, resetToDefault } = useView( {
+		kind: 'postType',
+		name: postType,
+		slug: activeView,
+		queryParams: {
+			page: query.pageNumber,
+			search: query.search,
+		},
+		onChangeQueryParams: ( newQueryParams ) => {
+			history.navigate(
+				addQueryArgs( path, {
+					...query,
+					pageNumber: newQueryParams.page,
+					search: newQueryParams.search || undefined,
+				} )
+			);
+		},
+		defaultView: getDefaultView( postTypeObject, activeView ),
+	} );
+
+	const onChangeView = useEvent( ( newView ) => {
+		if ( newView.type !== view.type ) {
+			// Retrigger the routing areas resolution.
+			history.invalidate();
+		}
+		updateView( newView );
+	} );
+
 	const [ selection, setSelection ] = useState( postId?.split( ',' ) ?? [] );
 	const onChangeSelection = useCallback(
 		( items ) => {
 			setSelection( items );
-			if ( ( location.query.isCustom ?? 'false' ) === 'false' ) {
-				history.navigate(
-					addQueryArgs( location.path, {
-						postId: items.join( ',' ),
-					} )
-				);
-			}
+			history.navigate(
+				addQueryArgs( path, {
+					postId: items.join( ',' ),
+				} )
+			);
 		},
-		[ location.path, location.query.isCustom, history ]
+		[ path, history ]
 	);
 
 	const { isLoading: isLoadingFields, fields: fields } = usePostFields( {
@@ -294,12 +170,12 @@ export default function PostList( { postType } ) {
 	useEffect( () => {
 		if ( postIdWasDeleted ) {
 			history.navigate(
-				addQueryArgs( location.path, {
+				addQueryArgs( path, {
 					postId: undefined,
 				} )
 			);
 		}
-	}, [ history, postIdWasDeleted, location.path ] );
+	}, [ history, postIdWasDeleted, path ] );
 
 	const paginationInfo = useMemo(
 		() => ( {
@@ -346,36 +222,48 @@ export default function PostList( { postType } ) {
 		<Page
 			title={ labels?.name }
 			actions={
-				labels?.add_new_item &&
-				canCreateRecord && (
-					<>
+				<>
+					{ isModified && (
 						<Button
-							variant="primary"
-							onClick={ openModal }
 							__next40pxDefaultSize
+							onClick={ () => {
+								resetToDefault();
+								history.invalidate();
+							} }
 						>
-							{ labels.add_new_item }
+							{ __( 'Reset view' ) }
 						</Button>
-						{ showAddPostModal && (
-							<AddNewPostModal
-								postType={ postType }
-								onSave={ handleNewPage }
-								onClose={ closeModal }
-							/>
-						) }
-					</>
-				)
+					) }
+					{ labels?.add_new_item && canCreateRecord && (
+						<>
+							<Button
+								variant="primary"
+								onClick={ openModal }
+								__next40pxDefaultSize
+							>
+								{ labels.add_new_item }
+							</Button>
+							{ showAddPostModal && (
+								<AddNewPostModal
+									postType={ postType }
+									onSave={ handleNewPage }
+									onClose={ closeModal }
+								/>
+							) }
+						</>
+					) }
+				</>
 			}
 		>
 			<DataViews
-				key={ activeView + isCustom }
+				key={ activeView }
 				paginationInfo={ paginationInfo }
 				fields={ fields }
 				actions={ actions }
 				data={ data || EMPTY_ARRAY }
 				isLoading={ isLoadingData || isLoadingFields }
 				view={ view }
-				onChangeView={ setView }
+				onChangeView={ onChangeView }
 				selection={ selection }
 				onChangeSelection={ onChangeSelection }
 				isItemClickable={ ( item ) => item.status !== 'trash' }
@@ -396,7 +284,7 @@ export default function PostList( { postType } ) {
 							label={ __( 'Details' ) }
 							onClick={ () => {
 								history.navigate(
-									addQueryArgs( location.path, {
+									addQueryArgs( path, {
 										quickEdit: quickEdit ? undefined : true,
 									} )
 								);

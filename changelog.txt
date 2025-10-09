@@ -1,6 +1,6 @@
 == Changelog ==
 
-= 21.8.0-rc.1 =
+= 21.8.0 =
 
 ## Changelog
 
@@ -12,7 +12,10 @@
 
 ### Enhancements
 
+#### Block Comments
+- Improve comments panel close icon label. ([71701](https://github.com/WordPress/gutenberg/pull/71701))
 - Add Discussion Field with tracksback and comment status agreagetd on Post/Page Quick Edit. ([71949](https://github.com/WordPress/gutenberg/pull/71949))
+- Fields package: Add Storybook examples. ([71864](https://github.com/WordPress/gutenberg/pull/71864))
 - Block Comment: Display message when there is no related block. ([71968](https://github.com/WordPress/gutenberg/pull/71968))
 - Block Comment: Improve comment thread outline. ([71961](https://github.com/WordPress/gutenberg/pull/71961))
 - Block Comment: Improve related block highlighting. ([71932](https://github.com/WordPress/gutenberg/pull/71932))
@@ -26,10 +29,6 @@
 - Block Comments: Simplify action callbacks. ([71892](https://github.com/WordPress/gutenberg/pull/71892))
 - Block Comments: Update 'Actions' menu design. ([71877](https://github.com/WordPress/gutenberg/pull/71877))
 - Block Comments: Update editing flow. ([71889](https://github.com/WordPress/gutenberg/pull/71889))
-- DataViews: Expose FiltersToggled subcomponent. ([71907](https://github.com/WordPress/gutenberg/pull/71907))
-- Fields package: Add Storybook examples. ([71864](https://github.com/WordPress/gutenberg/pull/71864))
-- Improve comments panel close icon label. ([71701](https://github.com/WordPress/gutenberg/pull/71701))
-- Post Editor: Add the back button animation similar to the site editor. ([71929](https://github.com/WordPress/gutenberg/pull/71929))
 
 #### Block Library
 - Accordion Blocks: Organize block supports. ([71823](https://github.com/WordPress/gutenberg/pull/71823))
@@ -51,6 +50,7 @@
 - Add support for elements validation in DataForm's array fields. ([71194](https://github.com/WordPress/gutenberg/pull/71194))
 - Export DataViewsPicker from dataviews package. ([71836](https://github.com/WordPress/gutenberg/pull/71836))
 - Prevent hiding the last visible field. ([71625](https://github.com/WordPress/gutenberg/pull/71625))
+- DataViews: Expose FiltersToggled subcomponent. ([71907](https://github.com/WordPress/gutenberg/pull/71907))
 
 #### Block Editor
 - Add configurable timeout parameter to flashBlock. ([71752](https://github.com/WordPress/gutenberg/pull/71752))
@@ -62,6 +62,8 @@
 
 #### Block bindings
 - Communicate supported block attributes from server side. ([71820](https://github.com/WordPress/gutenberg/pull/71820))
+- Image block: Conditionally remove empty `<figcaption>`. ([71893](https://github.com/WordPress/gutenberg/pull/71893))
+- Navigation Link: Use block bindings to dynamically fetch the URL in the editor and on front end. ([71630](https://github.com/WordPress/gutenberg/pull/71630))
 
 #### Write mode
 - Try adding content roles to navigation blocks. ([71747](https://github.com/WordPress/gutenberg/pull/71747))
@@ -71,6 +73,7 @@
 
 #### Post Editor
 - PostTypeSupportCheck: Handle support keys sub-features. ([71723](https://github.com/WordPress/gutenberg/pull/71723))
+- Post Editor: Add the back button animation similar to the site editor. ([71929](https://github.com/WordPress/gutenberg/pull/71929))
 
 #### Patterns
 - Block Inspector: Add content tab for section blocks. ([71714](https://github.com/WordPress/gutenberg/pull/71714))
@@ -103,6 +106,13 @@
 - Fix comment counts with filter. ([71874](https://github.com/WordPress/gutenberg/pull/71874))
 - Template activation: Don't set site option on edit. ([71811](https://github.com/WordPress/gutenberg/pull/71811))
 - Template activation: Fix saveEntityRecord with theme ID. ([71798](https://github.com/WordPress/gutenberg/pull/71798))
+- Template activation: redirect theme templates urls to wp_registered_template ([72003](https://github.com/WordPress/gutenberg/pull/72003)
+- Template activation: add meta to all newly created templates ([72156](https://github.com/WordPress/gutenberg/pull/72156)
+- Template activation: reduce templates listed as options for post/page ([72141](https://github.com/WordPress/gutenberg/pull/72141)
+- Template activation: call get_block_templates filter when short-circuiting ([71840](https://github.com/WordPress/gutenberg/pull/71840)
+- Template activation: allow empty array to be set ([72011](https://github.com/WordPress/gutenberg/pull/72011)
+- Template activation: fix /lookup endpoint to use custom resolve function ([72049](https://github.com/WordPress/gutenberg/pull/72049)
+- Template activation: ignore templates not associated with active theme ([72029](https://github.com/WordPress/gutenberg/pull/72029)
 
 #### Block Library
 - Accordion Block: Hide "Add" button when multiple blocks are selected. ([71750](https://github.com/WordPress/gutenberg/pull/71750))
