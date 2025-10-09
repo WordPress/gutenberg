@@ -527,12 +527,12 @@ function gutenberg_migrate_existing_templates() {
 
 add_action( 'save_post_wp_template', 'gutenberg_maybe_update_active_templates' );
 function gutenberg_maybe_update_active_templates( $post_id ) {
-	$post = get_post( $post_id );
+	$post                   = get_post( $post_id );
 	$is_inactive_by_default = get_post_meta( $post_id, 'is_inactive_by_default', true );
 	if ( $is_inactive_by_default ) {
 		return;
 	}
-	$active_templates = get_option( 'active_templates', array() );
+	$active_templates                     = get_option( 'active_templates', array() );
 	$active_templates[ $post->post_name ] = $post->ID;
 	update_option( 'active_templates', $active_templates );
 }
@@ -545,14 +545,14 @@ function gutenberg_get_block_template( $output, $id, $template_type ) {
 		return null;
 	}
 	list( $theme, $slug ) = $parts;
-	$active_templates = get_option( 'active_templates', array() );
+	$active_templates     = get_option( 'active_templates', array() );
 
 	if ( ! empty( $active_templates[ $slug ] ) ) {
 		$post = get_post( $active_templates[ $slug ] );
 		if ( $post && 'publish' === $post->post_status ) {
 			$template = _build_block_template_result_from_post( $post );
 
-			if ( ! is_wp_error( $template ) ) {
+			if ( ! is_wp_error( $template ) && $theme === $template->theme ) {
 				return $template;
 			}
 		}
