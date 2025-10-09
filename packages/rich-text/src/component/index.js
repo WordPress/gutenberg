@@ -151,8 +151,25 @@ export function useRichText( {
 	}
 
 	function applyFromProps() {
+		const previousRecord = recordRef.current;
 		setRecordFromProps();
-		applyRecord( recordRef.current );
+		const newRecord = recordRef.current;
+
+		// Check if content length changed (text was added/removed, not just formatted)
+		const contentLengthChanged =
+			previousRecord &&
+			previousRecord.text?.length !== newRecord.text?.length;
+
+		// Check if focus is on this element
+		const hasFocus = ref.current?.contains(
+			ref.current.ownerDocument.activeElement
+		);
+
+		// Only skip selection if content changed AND focus is elsewhere
+		// (e.g., typing in sidebar input)
+		const shouldApplySelection = ! ( contentLengthChanged && ! hasFocus );
+
+		applyRecord( newRecord, { domOnly: ! shouldApplySelection } );
 	}
 
 	const didMountRef = useRef( false );
