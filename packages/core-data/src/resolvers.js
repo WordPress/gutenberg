@@ -115,6 +115,7 @@ export const getEntityRecord =
 			const path = addQueryArgs(
 				( kind === 'postType' &&
 				name === 'wp_template' &&
+				key &&
 				typeof key === 'string' &&
 				// __experimentalGetDirtyEntityRecords always calls getEntityRecord
 				// with a string key, so we need that it's not a numeric ID.

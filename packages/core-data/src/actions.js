@@ -327,6 +327,7 @@ export const deleteEntityRecord =
 				let path = `${
 					kind === 'postType' &&
 					name === 'wp_template' &&
+					recordId &&
 					typeof recordId === 'string' &&
 					! /^\d+$/.test( recordId )
 						? '/wp/v2/templates'
@@ -569,6 +570,7 @@ export const saveEntityRecord =
 				const path = `${
 					kind === 'postType' &&
 					name === 'wp_template' &&
+					recordId &&
 					typeof recordId === 'string' &&
 					! /^\d+$/.test( recordId )
 						? '/wp/v2/templates'
