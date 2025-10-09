@@ -6,9 +6,9 @@ import { applyFilters } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import { connectIndexDb } from './connect-indexdb';
-import { createWebRTCConnection } from './create-webrtc-connection';
-import type { ProviderCreator } from './types';
+import { createIndexedDbProvider } from './indexeddb-provider';
+import { createWebRTCProvider } from './webrtc-provider';
+import type { ProviderCreator } from '../types';
 
 let providerCreators: ProviderCreator[] | null = null;
 
@@ -26,8 +26,8 @@ function getDefaultProviderCreators(): ProviderCreator[] {
 	}
 
 	return [
-		connectIndexDb,
-		createWebRTCConnection( {
+		createIndexedDbProvider,
+		createWebRTCProvider( {
 			password: window?.__experimentalCollaborativeEditingSecret,
 			signaling: [ signalingUrl ],
 		} ),

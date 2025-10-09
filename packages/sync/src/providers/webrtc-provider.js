@@ -21,7 +21,7 @@ import { WebrtcProviderWithHttpSignaling } from './webrtc-http-stream-signaling'
  * @param {string|undefined} config.password
  * @return {ProviderCreator} Promise that resolves when the connection is established.
  */
-export function createWebRTCConnection( { signaling, password } ) {
+export function createWebRTCProvider( { signaling, password } ) {
 	return function (
 		/** @type {ObjectType} */ objectType,
 		/** @type {ObjectID} */ objectId,
