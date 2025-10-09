@@ -48,12 +48,10 @@
 		},
 		"shadow": true,
 		"blockVisibility": false,
-		"contentRole": true
+		"contentRole": true,
+		"allowedBlocks": true
 	},
 	"attributes": {
-		"allowedBlocks": {
-			"type": "array"
-		},
 		"templateLock": {
 			"type": [ "string", "boolean" ],
 			"enum": [ "all", "insert", "contentOnly", false ],
