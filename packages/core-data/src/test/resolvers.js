@@ -2,10 +2,14 @@
  * WordPress dependencies
  */
 import triggerFetch from '@wordpress/api-fetch';
-import { syncManager } from '@wordpress/sync';
+
+/**
+ * Internal dependencies
+ */
+import { syncManager } from '../sync';
 
 jest.mock( '@wordpress/api-fetch' );
-jest.mock( '@wordpress/sync', () => ( {
+jest.mock( '../sync', () => ( {
 	syncManager: {
 		load: jest.fn(),
 	},

@@ -1,11 +1,12 @@
 /**
  * WordPress dependencies
  */
-import {
-	type CRDTDoc,
-	CRDT_RECORD_MAP_KEY,
-	type ObjectData,
-} from '@wordpress/sync';
+import { type CRDTDoc, type ObjectData } from '@wordpress/sync';
+
+/**
+ * Internal dependencies
+ */
+import { CRDT_RECORD_MAP_KEY } from '../sync';
 
 export function defaultApplyChangesToCRDTDoc(
 	crdtDoc: CRDTDoc,

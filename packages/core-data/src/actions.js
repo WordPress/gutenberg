@@ -10,7 +10,6 @@ import { v4 as uuid } from 'uuid';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
-import { LOCAL_EDITOR_ORIGIN, syncManager } from '@wordpress/sync';
 
 /**
  * Internal dependencies
@@ -20,6 +19,7 @@ import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
 import { STORE_NAME } from './name';
+import { LOCAL_EDITOR_ORIGIN, syncManager } from './sync';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 
 /**

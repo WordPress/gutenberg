@@ -9,13 +9,13 @@ import { camelCase } from 'change-case';
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import apiFetch from '@wordpress/api-fetch';
-import { syncManager } from '@wordpress/sync';
 
 /**
  * Internal dependencies
  */
 import { STORE_NAME } from './name';
 import { additionalEntityConfigLoaders, DEFAULT_ENTITY_KEY } from './entities';
+import { syncManager } from './sync';
 import {
 	forwardResolver,
 	getNormalizedCommaSeparable,
