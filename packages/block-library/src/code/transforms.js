@@ -64,13 +64,10 @@ const transforms = {
 			type: 'block',
 			blocks: [ 'core/paragraph' ],
 			transform: ( attributes ) => {
-				const { content, metadata } = attributes;
+				const { content } = attributes;
 				return createBlock( 'core/paragraph', {
+					...getTransformedAttributes( attributes, 'core/paragraph' ),
 					content,
-					metadata: getTransformedAttributes(
-						metadata,
-						'core/paragraph'
-					),
 				} );
 			},
 		},
