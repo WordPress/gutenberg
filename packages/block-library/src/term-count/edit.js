@@ -23,20 +23,11 @@ export default function TermCountEdit( {
 
 	const blockProps = useBlockProps();
 
-	const getDisplayTypeIcon = () => {
-		switch ( hasParenthesis ) {
-			case true:
-				return numberInParenthesis;
-			case false:
-				return bareNumber;
-		}
-	};
-
 	const displayTypeControls = [
 		{
 			role: 'menuitemradio',
 			title: __( 'In Parenthesis' ),
-			isActive: hasParenthesis === true,
+			isActive: hasParenthesis,
 			icon: numberInParenthesis,
 			onClick: () => {
 				setAttributes( { hasParenthesis: true } );
@@ -45,7 +36,7 @@ export default function TermCountEdit( {
 		{
 			role: 'menuitemradio',
 			title: __( 'Bare Number' ),
-			isActive: hasParenthesis === false,
+			isActive: ! hasParenthesis,
 			icon: bareNumber,
 			onClick: () => {
 				setAttributes( { hasParenthesis: false } );
@@ -53,34 +44,28 @@ export default function TermCountEdit( {
 		},
 	];
 
-	const controls = (
-		<BlockControls group="block">
-			<ToolbarGroup>
-				<ToolbarDropdownMenu
-					icon={ getDisplayTypeIcon() }
-					label={ __( 'Change display type' ) }
-					controls={ displayTypeControls }
-				/>
-			</ToolbarGroup>
-		</BlockControls>
-	);
-
-	// Render output based on the selected display type.
-	const renderDisplay = () => {
-		if ( hasParenthesis ) {
-			return sprintf(
-				/* translators: %d: term count number. */
-				__( '(%d)' ),
-				termCount
-			);
-		}
-		return termCount;
-	};
-
 	return (
-		<div { ...blockProps }>
-			{ controls }
-			{ renderDisplay() }
-		</div>
+		<>
+			<BlockControls group="block">
+				<ToolbarGroup>
+					<ToolbarDropdownMenu
+						icon={
+							hasParenthesis ? numberInParenthesis : bareNumber
+						}
+						label={ __( 'Change display type' ) }
+						controls={ displayTypeControls }
+					/>
+				</ToolbarGroup>
+			</BlockControls>
+			<div { ...blockProps }>
+				{ hasParenthesis
+					? sprintf(
+							/* translators: %d: term count number. */
+							__( '(%d)' ),
+							termCount
+					  )
+					: termCount }
+			</div>
+		</>
 	);
 }
