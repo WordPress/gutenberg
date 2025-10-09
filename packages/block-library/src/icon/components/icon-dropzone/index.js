@@ -33,8 +33,8 @@ export default function IconDropZone( props ) {
 						setAttributes
 					);
 				},
-				onError() {
-					displayMessages( 'fileTypeUploadError' );
+				onError( message ) {
+					createErrorNotice( message, { type: 'snackbar' } );
 				},
 			} );
 		} else {

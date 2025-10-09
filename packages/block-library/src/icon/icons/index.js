@@ -423,9 +423,9 @@ const wordpressIcons = [
 		categories: [ 'blocks' ],
 	},
 	{
-		name: 'warning',
+		name: 'cautionFilled',
 		title: __( 'Warning' ),
-		icon: warning,
+		icon: cautionFilled,
 	},
 	{
 		name: 'wordpress',
