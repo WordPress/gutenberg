@@ -165,11 +165,11 @@ export function useRichText( {
 			ref.current.ownerDocument.activeElement
 		);
 
-		// Only skip selection if content changed AND focus is elsewhere
-		// (e.g., typing in sidebar input)
-		const shouldApplySelection = ! ( contentLengthChanged && ! hasFocus );
+		// Skip re-applying the selection state when content changed from external source
+		// (e.g., typing in sidebar input changes canvas text)
+		const skipSelection = contentLengthChanged && ! hasFocus;
 
-		applyRecord( newRecord, { domOnly: ! shouldApplySelection } );
+		applyRecord( newRecord, { domOnly: skipSelection } );
 	}
 
 	const didMountRef = useRef( false );
