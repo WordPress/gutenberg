@@ -1,34 +1,25 @@
 /**
  * WordPress dependencies
  */
-import { useCallback } from '@wordpress/element';
-import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import TermsQueryInspectorControls from './inspector-controls';
+import TermsQueryContent from './terms-query-content';
+import TermsQueryPlaceholder from './terms-query-placeholder';
 
-const TEMPLATE = [ [ 'core/term-template' ] ];
+const TermsQueryEdit = ( props ) => {
+	const hasInnerBlocks = useSelect(
+		( select ) =>
+			!! select( blockEditorStore ).getBlocks( props.clientId ).length,
+		[ props.clientId ]
+	);
+	const Component = hasInnerBlocks
+		? TermsQueryContent
+		: TermsQueryPlaceholder;
+	return <Component { ...props } />;
+};
 
-export default function TermsQueryEdit( props ) {
-	const { attributes, setAttributes } = props;
-	const { tagName: TagName = 'div' } = attributes;
-	const blockProps = useBlockProps();
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		template: TEMPLATE,
-	} );
-	const setQuery = useCallback(
-		( newQuery ) =>
-			setAttributes( ( prevAttributes ) => ( {
-				termQuery: { ...prevAttributes.termQuery, ...newQuery },
-			} ) ),
-		[ setAttributes ]
-	);
-	return (
-		<>
-			<TermsQueryInspectorControls { ...props } setQuery={ setQuery } />
-			<TagName { ...innerBlocksProps } />
-		</>
-	);
-}
+export default TermsQueryEdit;
