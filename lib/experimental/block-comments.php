@@ -41,7 +41,6 @@ if ( ! function_exists( 'update_comment_type_in_rest_api_6_8' ) ) {
 	function update_comment_type_in_rest_api_6_8( $prepared_comment, $request ) {
 		if ( ! empty( $request['comment_type'] ) && 'block_comment' === $request['comment_type'] ) {
 			$prepared_comment['comment_type']     = $request['comment_type'];
-			$prepared_comment['comment_approved'] = $request['comment_approved'];
 		}
 
 		return $prepared_comment;

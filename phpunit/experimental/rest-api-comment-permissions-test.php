@@ -161,6 +161,32 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_Test_REST_TestCase {
 		$this->assertSame( 'Call me Ishmael.', $new_comment->comment_content );
 	}
 
+	public function test_create_block_comment_status() {
+		wp_set_current_user( self::$user_ids['author'] );
+		$post_id = $this->factory->post->create();
+
+		$params   = array(
+			'post'         => $post_id,
+			'author_name'  => 'Ishmael',
+			'author_email' => 'herman-melville@earthlink.net',
+			'author_url'   => 'https://en.wikipedia.org/wiki/Herman_Melville',
+			'content'      => 'Comic Book Guy',
+			'author'       => self::$user_ids['author'],
+			'comment_type' => 'block_comment',
+			'status'       => 'hold',
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+
+		$response    = rest_get_server()->dispatch( $request );
+		$data        = $response->get_data();
+		$new_comment = get_comment( $data['id'] );
+
+		$this->assertSame( '0', $new_comment->comment_approved );
+	}
+
 	/**
 	 * Test that for each user role, the permissions are correct when accessing comments.
 	 *

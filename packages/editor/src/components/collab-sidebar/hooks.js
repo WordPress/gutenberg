@@ -149,8 +149,8 @@ export function useBlockCommentsActions() {
 				{
 					post: getCurrentPostId(),
 					content,
+					status: 'hold',
 					comment_type: 'block_comment',
-					comment_approved: 0,
 					parent: parent || 0,
 				},
 				{ throwOnError: true }

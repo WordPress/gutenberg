@@ -188,7 +188,8 @@ class Gutenberg_REST_Comment_Controller extends WP_REST_Comments_Controller {
 			}
 		}
 
-		if ( isset( $request['status'] ) && ! current_user_can( 'moderate_comments' ) ) {
+		// Note: This is only relevant change for the backport.
+		if ( isset( $request['status'] ) && ! $is_block_comment && ! current_user_can( 'moderate_comments' ) ) {
 			return new WP_Error(
 				'rest_comment_invalid_status',
 				/* translators: %s: Request parameter. */
