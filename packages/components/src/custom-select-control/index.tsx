@@ -84,7 +84,7 @@ function CustomSelectControl< T extends CustomSelectOption >(
 	const store = Ariakit.useSelectStore< string >( {
 		async setValue( nextValue ) {
 			const nextOption = options.find(
-				( item ) => item.name === nextValue
+				( item ) => item.key === nextValue
 			);
 
 			if ( ! onChange || ! nextOption ) {
@@ -108,12 +108,12 @@ function CustomSelectControl< T extends CustomSelectOption >(
 			};
 			onChange( changeObject );
 		},
-		value: value?.name,
+		value: value?.key,
 		// Setting the first option as a default value when no value is provided
 		// is already done natively by the underlying Ariakit component,
 		// but doing this explicitly avoids the `onChange` callback from firing
 		// on initial render, thus making this implementation closer to the v1.
-		defaultValue: options[ 0 ]?.name,
+		defaultValue: options[ 0 ]?.key,
 	} );
 
 	const children = options
@@ -134,7 +134,7 @@ function CustomSelectControl< T extends CustomSelectOption >(
 			return (
 				<CustomSelectItem
 					key={ key }
-					value={ name }
+					value={ key }
 					children={ hint ? withHint : name }
 					style={ style }
 					className={ clsx(
@@ -151,20 +151,21 @@ function CustomSelectControl< T extends CustomSelectOption >(
 
 	const currentValue = Ariakit.useStoreState( store, 'value' );
 
-	const renderSelectedValueHint = () => {
-		const selectedOptionHint = options
+	const selectedOption =
+		options
 			?.map( applyOptionDeprecations )
-			?.find( ( { name } ) => currentValue === name )?.hint;
+			?.find( ( { key } ) => currentValue === key ) ?? options[ 0 ];
 
+	const renderSelectedValue = () => {
 		return (
 			<Styled.SelectedExperimentalHintWrapper>
-				{ currentValue }
-				{ selectedOptionHint && (
+				{ selectedOption.name }
+				{ showSelectedHint && selectedOption.hint && (
 					<Styled.SelectedExperimentalHintItem
 						// Keeping the classname for legacy reasons
 						className="components-custom-select-control__hint"
 					>
-						{ selectedOptionHint }
+						{ selectedOption.hint }
 					</Styled.SelectedExperimentalHintItem>
 				) }
 			</Styled.SelectedExperimentalHintWrapper>
@@ -188,9 +189,7 @@ function CustomSelectControl< T extends CustomSelectOption >(
 		<>
 			<_CustomSelect
 				aria-describedby={ descriptionId }
-				renderSelectedValue={
-					showSelectedHint ? renderSelectedValueHint : undefined
-				}
+				renderSelectedValue={ renderSelectedValue }
 				size={ translatedSize }
 				store={ store }
 				className={ clsx(
@@ -205,7 +204,7 @@ function CustomSelectControl< T extends CustomSelectOption >(
 			</_CustomSelect>
 			<VisuallyHidden>
 				<span id={ descriptionId }>
-					{ getDescribedBy( currentValue, describedBy ) }
+					{ getDescribedBy( selectedOption.name, describedBy ) }
 				</span>
 			</VisuallyHidden>
 		</>
