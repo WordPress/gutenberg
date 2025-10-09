@@ -46,7 +46,7 @@ Displays an accordion panel. ([Source](https://github.com/WordPress/gutenberg/tr
 -	**Name:** core/accordion-panel
 -	**Category:** design
 -	**Parent:** core/accordion-item
--	**Supports:** allowedBlocks, color (background, gradients, text), contentRole, interactivity, shadow, spacing (blockGap, padding), typography (fontSize, lineHeight), ~~blockVisibility~~, ~~html~~
+-	**Supports:** allowedBlocks, color (background, gradients, text), contentRole, interactivity, layout (~~allowEditing~~), shadow, spacing (blockGap, padding), typography (fontSize, lineHeight), ~~blockVisibility~~, ~~html~~
 -	**Attributes:** isSelected, openByDefault, templateLock
 
 ## Archives
