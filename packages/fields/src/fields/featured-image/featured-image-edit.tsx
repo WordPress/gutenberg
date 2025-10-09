@@ -2,10 +2,12 @@
  * WordPress dependencies
  */
 import { Button, __experimentalGrid as Grid } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 import { useCallback, useRef } from '@wordpress/element';
 // @ts-ignore
 import { MediaUpload } from '@wordpress/media-utils';
 import { lineSolid } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 import type { DataFormControlProps } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
 
@@ -20,6 +22,17 @@ export const FeaturedImageEdit = ( {
 	onChange,
 }: DataFormControlProps< BasePostWithEmbeddedFeaturedMedia > ) => {
 	const { id } = field;
+
+	const value = field.getValue( { item: data } );
+
+	const media = useSelect(
+		( select ) => {
+			const { getEntityRecord } = select( coreStore );
+			return getEntityRecord( 'postType', 'attachment', value );
+		},
+		[ value ]
+	);
+
 	const onChangeControl = useCallback(
 		( newValue: number ) =>
 			onChange( {
@@ -28,7 +41,6 @@ export const FeaturedImageEdit = ( {
 		[ id, onChange ]
 	);
 
-	const media = data?._embedded?.[ 'wp:featuredmedia' ]?.[ 0 ];
 	const url = media?.source_url;
 	const title = media?.title?.rendered;
 	const ref = useRef( null );
