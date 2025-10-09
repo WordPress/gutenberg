@@ -1,8 +1,20 @@
+.wp-block-accordion {
+	.wp-block {
+		&.wp-block-accordion-panel {
+			margin: 0;
+		}
+	}
+}
+
 .wp-block-accordion-panel {
 	// Prevent blockGap from Accordion Content block from adding extra margin between accordions.
 	&[inert],
 	&[aria-hidden="true"] {
 		display: none;
 		margin-block-start: 0;
+	}
+
+	p {
+		margin: 0;
 	}
 }

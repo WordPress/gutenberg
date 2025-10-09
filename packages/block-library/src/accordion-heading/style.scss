@@ -1,7 +1,41 @@
+@mixin accordion-inherit-style {
+	background-color: inherit;
+	border-color: inherit;
+	color: inherit;
+}
+
 // The .wp-block-accordion selector is needed to make this CSS stronger
 // than the default heading padding when background color is applied.
+// than the default button background, color and border styles.
 .wp-block-accordion .wp-block-accordion-heading {
+	margin: 0;
 	padding: 0;
+}
+
+.wp-block-accordion {
+	.wp-block {
+		&.wp-block-accordion-heading {
+			margin: 0;
+		}
+	}
+	.wp-block-accordion-item {
+		.wp-block-accordion-heading {
+			width: 100%;
+
+			&.has-text-color,
+			&.has-background {
+				.wp-block-accordion-heading__toggle {
+					text-decoration: none;
+					@include accordion-inherit-style;
+
+					&:hover,
+					&:focus {
+						@include accordion-inherit-style;
+					}
+				}
+			}
+		}
+	}
 }
 
 .wp-block-accordion-heading__toggle {
