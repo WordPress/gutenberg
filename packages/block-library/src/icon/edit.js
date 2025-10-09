@@ -332,30 +332,7 @@ export function Edit( props ) {
 		</>
 	);
 
-	const blockProps = useBlockProps();
 	const borderProps = getBorderClassesAndStyles( attributes );
-
-	const iconClasses = clsx( 'icon-container', borderProps?.className );
-
-	const iconStyles = {
-		...blockProps.style,
-		...borderProps.style,
-
-		// Margin is applied to the wrapper container, so unset.
-		marginBottom: undefined,
-		marginLeft: undefined,
-		marginRight: undefined,
-		marginTop: undefined,
-	};
-
-	// And even though margin is set on the main block div, we need to handle it
-	// manually since all other styles are applied to the inner div.
-	const blockMargin = {
-		marginBottom: blockProps.style?.marginBottom,
-		marginLeft: blockProps.style?.marginLeft,
-		marginRight: blockProps.style?.marginRight,
-		marginTop: blockProps.style?.marginTop,
-	};
 
 	const iconMarkup = (
 		<>
@@ -372,9 +349,7 @@ export function Edit( props ) {
 					isSVGUploadAllowed={ isSVGUploadAllowed }
 				/>
 			) : (
-				<div className={ iconClasses } style={ iconStyles }>
-					{ printedIcon }
-				</div>
+				<>{ printedIcon }</>
 			) }
 		</>
 	);
@@ -384,10 +359,10 @@ export function Edit( props ) {
 			{ blockControls }
 			{ inspectorControls }
 			<div
-				{ ...useBlockProps() }
-				// This is a bit of a hack. we only want the margin styles
-				// applied to the main block div.
-				style={ blockMargin }
+				{ ...useBlockProps( {
+					className: borderProps?.className,
+					style: { ...borderProps.style },
+				} ) }
 			>
 				{ iconMarkup }
 				<IconDropZone

@@ -7,29 +7,6 @@
 	display: flex;
 	line-height: 0;
 
-	// Unset border styling inherited from block props.
-	&.has-border-color {
-		border: none;
-	}
-
-	&.has-icon-color,
-	.has-icon-color {
-		svg {
-			color: currentColor;
-		}
-
-		&:not(.has-no-icon-fill-color) {
-			svg {
-				fill: currentColor;
-			}
-		}
-	}
-
-	// box-sizing is set in the Editor but not on the frontend.
-	.icon-container {
-		box-sizing: border-box;
-	}
-
 	svg {
 		width: 100%;
 		height: 100%;
