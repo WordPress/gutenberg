@@ -33,6 +33,7 @@
 	"main": "index.js",
 	"dependencies": {
 		"@babel/core": "7.25.7",
+		"@babel/plugin-syntax-import-attributes": "7.26.0",
 		"@babel/plugin-transform-react-jsx": "7.25.7",
 		"@babel/plugin-transform-runtime": "7.25.7",
 		"@babel/preset-env": "7.25.7",
