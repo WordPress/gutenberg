@@ -3,6 +3,7 @@
 	"extends": "../../tsconfig.base.json",
 	"references": [
 		{ "path": "../a11y" },
+		{ "path": "../admin-ui" },
 		{ "path": "../api-fetch" },
 		{ "path": "../autop" },
 		{ "path": "../blob" },

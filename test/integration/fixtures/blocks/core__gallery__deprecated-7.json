@@ -12,7 +12,8 @@
 			"fixedHeight": true,
 			"linkTo": "media",
 			"sizeSlug": "large",
-			"allowResize": false
+			"allowResize": false,
+			"aspectRatio": "auto"
 		},
 		"innerBlocks": [
 			{

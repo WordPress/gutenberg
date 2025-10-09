@@ -24,6 +24,7 @@ const packageDirs = readdirSync(
 	}
 ).flatMap( ( dirent ) => ( dirent.isDirectory() ? [ dirent.name ] : [] ) );
 const { baseConfig, plugins, stylesTransform } = require( './shared' );
+const { V2_PACKAGES } = require( '../../bin/packages/v2-packages' );
 
 const WORDPRESS_NAMESPACE = '@wordpress/';
 
@@ -35,6 +36,7 @@ const WORDPRESS_NAMESPACE = '@wordpress/';
 // This list must be kept in sync with the matching list in packages/dependency-extraction-webpack-plugin/lib/util.js
 // !!
 const BUNDLED_PACKAGES = [
+	'@wordpress/admin-ui',
 	'@wordpress/dataviews',
 	'@wordpress/dataviews/wp',
 	'@wordpress/icons',
@@ -94,6 +96,11 @@ const bundledPackagesPhpConfig = [
 /** @type {Array<string>} */
 const gutenbergScripts = [];
 for ( const packageDir of packageDirs ) {
+	// Skip v2 packages - they're built with bin/packages/build-v2.js
+	if ( V2_PACKAGES.includes( packageDir ) ) {
+		continue;
+	}
+
 	const packageJson = require(
 		`${ WORDPRESS_NAMESPACE }${ packageDir }/package.json`
 	);
@@ -109,17 +116,6 @@ for ( const packageDir of packageDirs ) {
 	gutenbergScripts.push( packageDir );
 }
 
-const exportDefaultPackages = [
-	'api-fetch',
-	'deprecated',
-	'dom-ready',
-	'redux-routine',
-	'token-list',
-	'server-side-render',
-	'shortcode',
-	'warning',
-];
-
 const copiedVendors = {
 	'react.js': 'react/umd/react.development.js',
 	'react.min.js': 'react/umd/react.production.min.js',
@@ -131,19 +127,24 @@ module.exports = {
 	...baseConfig,
 	name: 'packages',
 	entry: Object.fromEntries(
-		gutenbergScripts.map( ( packageName ) => [
-			packageName,
-			{
-				import: `./packages/${ packageName }`,
-				library: {
-					name: [ 'wp', camelCaseDash( packageName ) ],
-					type: 'window',
-					export: exportDefaultPackages.includes( packageName )
-						? 'default'
-						: undefined,
+		gutenbergScripts.map( ( packageName ) => {
+			const packageJson = require(
+				`${ WORDPRESS_NAMESPACE }${ packageName }/package.json`
+			);
+			return [
+				packageName,
+				{
+					import: `./packages/${ packageName }`,
+					library: {
+						name: [ 'wp', camelCaseDash( packageName ) ],
+						type: 'window',
+						export: packageJson.wpScriptDefaultExport
+							? 'default'
+							: undefined,
+					},
 				},
-			},
-		] )
+			];
+		} )
 	),
 	output: {
 		devtoolNamespace: 'wp',

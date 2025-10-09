@@ -208,4 +208,19 @@ export const updateAttributes = (
 	}
 
 	setAttributes( attributes );
+
+	// Return metadata about the final state for binding decisions.
+	// We need to distinguish between:
+	// 1. Property not set in attributes (use blockAttributes fallback)
+	// 2. Property explicitly set to undefined (means "remove this")
+	// Using 'in' operator checks if property exists, even if undefined.
+	// This is critical for severing: attributes.id = undefined means "remove the ID",
+	// not "keep the old ID from blockAttributes".
+	const finalId = 'id' in attributes ? attributes.id : blockAttributes.id;
+	const finalKind =
+		'kind' in attributes ? attributes.kind : blockAttributes.kind;
+
+	return {
+		isEntityLink: !! finalId && finalKind !== 'custom',
+	};
 };

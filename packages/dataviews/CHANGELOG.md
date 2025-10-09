@@ -9,11 +9,14 @@
 - Flip search icons depending on placement ([#72070](https://github.com/WordPress/gutenberg/pull/72070)).
 - DataViews: Improve renderItemLink event propagation handling. ([#72081](https://github.com/WordPress/gutenberg/pull/72081)).
 - Normalize search field styles ([#72072](https://github.com/WordPress/gutenberg/pull/72072)).
+- DataForm control for `date` supports `required` and `custom` validation [#72048](https://github.com/WordPress/gutenberg/pull/72048).
+- DataForm control for `datetime` supports `required` and `custom` validation. [#72060](https://github.com/WordPress/gutenberg/pull/72060).
 
 ### Breaking changes
 
 - DataForm: Add summary field support for both card and panel layouts. The `summary` property has been moved from the field level to the layout level, and so fields using `summary` at the field level must now configure it within the `layout` object. Additionally, the first children will only be used as summary for the panel if 1) there is no `layout.summary` and 2) the form field ID doesn't match any existing field. See README for details. [#71576](https://github.com/WordPress/gutenberg/pull/71576)
 - Remove `Data< Item >` type, as it is no longer used internally for a long time. [#72051](https://github.com/WordPress/gutenberg/pull/72051)
+- Remove `isDestructive` prop from actions API. Destructive actions should be communicated via flow (opens modal to confirm) and color should be used in the modal. [#72111](https://github.com/WordPress/gutenberg/pull/72111)
 
 ### Features
 
@@ -36,6 +39,7 @@
 
 - DataViews: keep non-hideable fields out of the hidden-fields list when they’re already invisible. [#71729](https://github.com/WordPress/gutenberg/pull/71729/)
 - DataViewsPicker: Hide the space reserved for the title when the title is hidden. [#71865](https://github.com/WordPress/gutenberg/pull/71865)
+- Always render a wrapper for media field (prevents layout break when 'itemClickable' is false). [#72078](https://github.com/WordPress/gutenberg/pull/72078).
 
 ### Enhancements
 

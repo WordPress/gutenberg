@@ -231,6 +231,7 @@ export const link = {
 		_id: 'id',
 		target: 'target',
 		rel: 'rel',
+		class: 'class',
 	},
 	[ essentialFormatKey ]: true,
 	__unstablePasteRule( value, { html, plainText } ) {

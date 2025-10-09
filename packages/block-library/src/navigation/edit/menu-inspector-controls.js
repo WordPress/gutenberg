@@ -23,7 +23,11 @@ import { unlock } from '../../lock-unlock';
 import DeletedNavigationWarning from './deleted-navigation-warning';
 import useNavigationMenu from '../use-navigation-menu';
 import LeafMoreMenu from './leaf-more-menu';
-import { LinkUI, updateAttributes } from '../../navigation-link/shared';
+import {
+	LinkUI,
+	updateAttributes,
+	useEntityBinding,
+} from '../../navigation-link/shared';
 
 const actionLabel =
 	/* translators: %s: The name of a menu. */ __( "Switch to '%s'" );
@@ -42,6 +46,12 @@ function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
 	);
 	const blockWasJustInserted = insertedBlock?.clientId === block.clientId;
 	const showLinkControls = supportsLinkControls && blockWasJustInserted;
+
+	// Get binding utilities for the inserted block
+	const { createBinding, clearBinding } = useEntityBinding( {
+		clientId: insertedBlock?.clientId,
+		attributes: insertedBlock?.attributes || {},
+	} );
 
 	if ( ! showLinkControls ) {
 		return null;
@@ -100,11 +110,22 @@ function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
 				cleanupInsertedBlock();
 			} }
 			onChange={ ( updatedValue ) => {
-				updateAttributes(
+				// updateAttributes determines the final state and returns metadata
+				const { isEntityLink } = updateAttributes(
 					updatedValue,
 					setInsertedBlockAttributes( insertedBlock?.clientId ),
 					insertedBlock?.attributes
 				);
+
+				// Handle URL binding based on the final computed state
+				// Only create bindings for entity links (posts, pages, taxonomies)
+				// Never create bindings for custom links (manual URLs)
+				if ( isEntityLink ) {
+					createBinding();
+				} else {
+					clearBinding();
+				}
+
 				setInsertedBlock( null );
 			} }
 		/>

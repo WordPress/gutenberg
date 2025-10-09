@@ -1422,7 +1422,9 @@ test.describe( 'List (@firefox)', () => {
 		);
 
 		await page.getByRole( 'button', { name: 'List', exact: true } ).click();
-		await page.getByRole( 'menuitem', { name: 'Paragraph' } ).click();
+		await page
+			.getByRole( 'menuitem', { name: 'Paragraph', exact: true } )
+			.click();
 
 		expect( await editor.getEditedPostContent() )
 			.toBe( `<!-- wp:paragraph -->
