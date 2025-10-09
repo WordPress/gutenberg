@@ -88,7 +88,6 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 		// We're using a pseudo element to overflow placeholder borders
 		// and any border inside the block itself.
 		&::after {
-			@include selected-block-focus();
 			z-index: 1;
 		}
 	}
@@ -220,13 +219,6 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 		}
 	}
 
-	&.is-hovered:not(.is-selected),
-	&:not(.rich-text):not([contenteditable="true"]).is-selected {
-
-		&::after {
-			@include selected-block-focus();
-		}
-	}
 }
 
 // Colorize outlines for template parts and synced patterns (.is-reusable).
