@@ -124,6 +124,7 @@ function gutenberg_reregister_core_block_types() {
 				'table-of-contents.php'            => 'core/table-of-contents',
 				'tag-cloud.php'                    => 'core/tag-cloud',
 				'template-part.php'                => 'core/template-part',
+				'term-count.php'                   => 'core/term-count',
 				'term-description.php'             => 'core/term-description',
 				'term-name.php'                    => 'core/term-name',
 				'terms-query.php'                  => 'core/terms-query',
