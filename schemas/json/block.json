@@ -613,6 +613,11 @@
 								}
 							],
 							"default": false
+						},
+						"fitText": {
+							"description": "Enable fit text support for the block. This allows text content to automatically adjust its font size to fit within the block's dimensions.",
+							"type": "boolean",
+							"default": false
 						}
 					}
 				},

@@ -213,6 +213,7 @@ function Thread( {
 			) }
 			<CommentBoard
 				thread={ thread }
+				isExpanded={ isSelected }
 				onEdit={ ( params = {} ) => {
 					const { status } = params;
 					onEditComment( params );
@@ -237,6 +238,7 @@ function Thread( {
 						<CommentBoard
 							thread={ reply }
 							parent={ thread }
+							isExpanded={ isSelected }
 							onEdit={ onEditComment }
 							onDelete={ onCommentDelete }
 						/>
@@ -272,6 +274,7 @@ function Thread( {
 				<CommentBoard
 					thread={ lastReply }
 					parent={ thread }
+					isExpanded={ isSelected }
 					onEdit={ onEditComment }
 					onDelete={ onCommentDelete }
 				/>
@@ -326,7 +329,7 @@ function Thread( {
 	);
 }
 
-const CommentBoard = ( { thread, parent, onEdit, onDelete } ) => {
+const CommentBoard = ( { thread, parent, isExpanded, onEdit, onDelete } ) => {
 	const [ actionState, setActionState ] = useState( false );
 	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
 
@@ -384,61 +387,63 @@ const CommentBoard = ( { thread, parent, onEdit, onDelete } ) => {
 					date={ thread?.date }
 					userId={ thread?.author }
 				/>
-				<FlexItem
-					className="editor-collab-sidebar-panel__comment-status"
-					onClick={ ( event ) => {
-						// Prevent the thread from being selected.
-						event.stopPropagation();
-					} }
-				>
-					<HStack spacing="0">
-						{ canResolve && (
-							<Button
-								label={ _x(
-									'Resolve',
-									'Mark comment as resolved'
-								) }
-								size="small"
-								icon={ published }
-								disabled={ thread.status === 'approved' }
-								accessibleWhenDisabled={
-									thread.status === 'approved'
-								}
-								onClick={ () => {
-									onEdit( {
-										id: thread.id,
-										status: 'approved',
-									} );
-								} }
-							/>
-						) }
-						<Menu placement="bottom-end">
-							<Menu.TriggerButton
-								render={
-									<Button
-										size="small"
-										icon={ moreVertical }
-										label={ __( 'Actions' ) }
-										disabled={ ! moreActions.length }
-										accessibleWhenDisabled
-									/>
-								}
-							/>
-							<Menu.Popover>
-								{ moreActions.map( ( action ) => (
-									<Menu.Item
-										key={ action.id }
-										onClick={ () => action.onClick() }
-									>
-										<Menu.ItemLabel>
-											{ action.title }
-										</Menu.ItemLabel>
-									</Menu.Item>
-								) ) }
-							</Menu.Popover>
-						</Menu>
-					</HStack>
-				</FlexItem>
+				{ isExpanded && (
+					<FlexItem
+						className="editor-collab-sidebar-panel__comment-status"
+						onClick={ ( event ) => {
+							// Prevent the thread from being selected.
+							event.stopPropagation();
+						} }
+					>
+						<HStack spacing="0">
+							{ canResolve && (
+								<Button
+									label={ _x(
+										'Resolve',
+										'Mark comment as resolved'
+									) }
+									size="small"
+									icon={ published }
+									disabled={ thread.status === 'approved' }
+									accessibleWhenDisabled={
+										thread.status === 'approved'
+									}
+									onClick={ () => {
+										onEdit( {
+											id: thread.id,
+											status: 'approved',
+										} );
+									} }
+								/>
+							) }
+							<Menu placement="bottom-end">
+								<Menu.TriggerButton
+									render={
+										<Button
+											size="small"
+											icon={ moreVertical }
+											label={ __( 'Actions' ) }
+											disabled={ ! moreActions.length }
+											accessibleWhenDisabled
+										/>
+									}
+								/>
+								<Menu.Popover>
+									{ moreActions.map( ( action ) => (
+										<Menu.Item
+											key={ action.id }
+											onClick={ () => action.onClick() }
+										>
+											<Menu.ItemLabel>
+												{ action.title }
+											</Menu.ItemLabel>
+										</Menu.Item>
+									) ) }
+								</Menu.Popover>
+							</Menu>
+						</HStack>
+					</FlexItem>
+				) }
 			</HStack>
 			{ 'edit' === actionState ? (
 				<CommentForm

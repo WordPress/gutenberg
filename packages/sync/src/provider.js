@@ -6,9 +6,10 @@ import * as Y from 'yjs';
 
 /** @typedef {import('./types').ObjectType} ObjectType */
 /** @typedef {import('./types').ObjectID} ObjectID */
-/** @typedef {import('./types').ObjectConfig} ObjectConfig */
+/** @typedef {import('./types').ObjectData} ObjectData */
 /** @typedef {import('./types').CRDTDoc} CRDTDoc */
 /** @typedef {import('./types').ConnectDoc} ConnectDoc */
+/** @typedef {import('./types').SyncConfig} SyncConfig */
 /** @typedef {import('./types').SyncProvider} SyncProvider */
 
 /**
@@ -20,7 +21,7 @@ import * as Y from 'yjs';
  */
 export const createSyncProvider = ( connectLocal, connectRemote ) => {
 	/**
-	 * @type {Record<string,ObjectConfig>}
+	 * @type {Record<string,SyncConfig>}
 	 */
 	const config = {};
 
@@ -37,8 +38,8 @@ export const createSyncProvider = ( connectLocal, connectRemote ) => {
 	/**
 	 * Registers an object type.
 	 *
-	 * @param {ObjectType}   objectType   Object type to register.
-	 * @param {ObjectConfig} objectConfig Object config.
+	 * @param {ObjectType} objectType   Object type to register.
+	 * @param {SyncConfig} objectConfig Object config.
 	 */
 	function register( objectType, objectConfig ) {
 		config[ objectType ] = objectConfig;
@@ -48,16 +49,17 @@ export const createSyncProvider = ( connectLocal, connectRemote ) => {
 	 * Fetch data from local database or remote source.
 	 *
 	 * @param {ObjectType} objectType    Object type to load.
-	 * @param {ObjectID}   objectId      Object ID to load.
+	 * @param {ObjectID}   objectId      Object ID.
+	 * @param {ObjectData} record        Entity record.
 	 * @param {Function}   handleChanges Callback to call when data changes.
 	 */
-	async function bootstrap( objectType, objectId, handleChanges ) {
+	async function bootstrap( objectType, objectId, record, handleChanges ) {
 		const doc = new Y.Doc();
 		docs[ objectType ] = docs[ objectType ] || {};
 		docs[ objectType ][ objectId ] = doc;
 
 		const updateHandler = () => {
-			const data = config[ objectType ].fromCRDTDoc( doc );
+			const data = config[ objectType ].getChangesFromCRDTDoc( doc );
 			handleChanges( data );
 		};
 		doc.on( 'update', updateHandler );
@@ -74,14 +76,9 @@ export const createSyncProvider = ( connectLocal, connectRemote ) => {
 			await connectRemote( objectId, objectType, doc );
 		}
 
-		const loadRemotely = config[ objectType ].fetch;
-		if ( loadRemotely ) {
-			loadRemotely( objectId ).then( ( data ) => {
-				doc.transact( () => {
-					config[ objectType ].applyChangesToDoc( doc, data );
-				} );
-			} );
-		}
+		doc.transact( () => {
+			config[ objectType ].applyChangesToCRDTDoc( doc, record );
+		} );
 
 		listeners[ objectType ] = listeners[ objectType ] || {};
 		listeners[ objectType ][ objectId ] = () => {
@@ -103,7 +100,7 @@ export const createSyncProvider = ( connectLocal, connectRemote ) => {
 			throw 'Error doc ' + objectType + ' ' + objectId + ' not found';
 		}
 		doc.transact( () => {
-			config[ objectType ].applyChangesToDoc( doc, data );
+			config[ objectType ].applyChangesToCRDTDoc( doc, data );
 		} );
 	}
 
