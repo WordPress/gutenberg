@@ -31,6 +31,9 @@
 			}
 		},
 		"shadow": true,
+		"layout": {
+			"allowEditing": false
+			},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
