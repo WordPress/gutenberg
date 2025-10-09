@@ -158,7 +158,7 @@ function IconInsertButtons( { customIcon, isSVG, onClear, onInsert } ) {
 			<Button
 				label={ __( 'Insert custom icon' ) }
 				variant="primary"
-				// eslint-disable-next-line no-restricted-syntax
+				accessibleWhenDisabled
 				disabled={ ! isSVG || ! customIcon }
 				onClick={ onInsert }
 				__next40pxDefaultSize
