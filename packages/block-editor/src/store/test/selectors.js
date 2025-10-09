@@ -4397,7 +4397,6 @@ describe( 'getBlockEditingMode', () => {
 	const baseState = {
 		blockEditingModes: new Map( [] ),
 		derivedBlockEditingModes: new Map( [] ),
-		derivedNavModeBlockEditingModes: new Map( [] ),
 	};
 
 	const hasContentRoleAttribute = jest.fn( () => false );

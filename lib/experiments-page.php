@@ -164,18 +164,6 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-editor-write-mode',
-		__( 'Simplified site editing', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enables Write mode in the Site Editor for a simplified editing experience.', 'gutenberg' ),
-			'id'    => 'gutenberg-editor-write-mode',
-		)
-	);
-
-	add_settings_field(
 		'gutenberg-full-page-client-side-navigation',
 		__( 'Interactivity API: Full-page client-side navigation', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
