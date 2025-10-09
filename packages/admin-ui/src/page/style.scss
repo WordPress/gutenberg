@@ -32,3 +32,24 @@
 	margin: 0;
 }
 
+// Show button text labels when preference is enabled.
+.show-icon-labels {
+	.admin-ui-page__header-actions {
+		.components-button.has-icon {
+			width: auto;
+			padding: 0 $grid-unit-10;
+
+			// Hide the button icons when labels are set to display...
+			svg {
+				display: none;
+			}
+			// ... and display labels.
+			&::after {
+				content: attr(aria-label);
+				font-size: $helptext-font-size;
+			}
+		}
+
+	}
+}
+
