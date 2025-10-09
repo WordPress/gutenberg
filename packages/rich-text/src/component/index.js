@@ -171,9 +171,11 @@ export function useRichText( {
 			return;
 		}
 
-		if ( ref.current.ownerDocument.activeElement !== ref.current ) {
-			ref.current.focus();
-		}
+		// Always call focus() to force browsers to re-synchronize the visual caret
+		// with the selection range after DOM mutations. Without this, the caret may
+		// appear at the wrong position or not appear at all (Firefox), even though
+		// the Selection API reports the correct position.
+		ref.current.focus();
 
 		applyRecord( recordRef.current );
 		hadSelectionUpdateRef.current = false;
