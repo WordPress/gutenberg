@@ -19,7 +19,7 @@
 function render_block_core_term_name( $attributes, $content, $block ) {
 	$term_name = '';
 
-		/**
+	/**
 	 * Filters the block context to get the current term ID and taxonomy.
 	 *
 	 * @since 6.9.0
