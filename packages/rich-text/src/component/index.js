@@ -151,14 +151,17 @@ export function useRichText( {
 	}
 
 	function applyFromProps() {
-		const previousRecord = recordRef.current;
+		// Get previous value before updating
+		const previousValue = _valueRef.current;
+
 		setRecordFromProps();
-		const newRecord = recordRef.current;
 
 		// Check if content length changed (text was added/removed, not just formatted)
 		const contentLengthChanged =
-			previousRecord &&
-			previousRecord.text?.length !== newRecord.text?.length;
+			previousValue &&
+			typeof previousValue === 'string' &&
+			typeof value === 'string' &&
+			previousValue.length !== value.length;
 
 		// Check if focus is on this element
 		const hasFocus = ref.current?.contains(
@@ -169,7 +172,7 @@ export function useRichText( {
 		// (e.g., typing in sidebar input changes canvas text)
 		const skipSelection = contentLengthChanged && ! hasFocus;
 
-		applyRecord( newRecord, { domOnly: skipSelection } );
+		applyRecord( recordRef.current, { domOnly: skipSelection } );
 	}
 
 	const didMountRef = useRef( false );
