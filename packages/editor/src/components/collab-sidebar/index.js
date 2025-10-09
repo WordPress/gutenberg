@@ -155,7 +155,7 @@ export default function CollabSidebar() {
 					commentSidebarRef={ commentSidebarRef }
 				/>
 			</PluginSidebar>
-			{ isLargeViewport && (
+			{ isLargeViewport && unresolvedSortedThreads.length > 0 && (
 				<PluginSidebar
 					isPinnable={ false }
 					header={ false }
