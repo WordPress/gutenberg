@@ -544,10 +544,7 @@ test.describe( 'List View', () => {
 		await editor.insertBlock( { name: 'core/file' } );
 		await editor.insertBlock( {
 			name: 'core/group',
-			innerBlocks: [
-				{ name: 'core/paragraph' },
-				{ name: 'core/pullquote' },
-			],
+			innerBlocks: [ { name: 'core/paragraph' }, { name: 'core/quote' } ],
 		} );
 
 		// Open List View.
@@ -561,12 +558,12 @@ test.describe( 'List View', () => {
 			} )
 			.click();
 
-		// Move down to group block, expand, and then move to the paragraph block.
-		await page.keyboard.press( 'ArrowDown' );
-		await page.keyboard.press( 'ArrowRight' );
+		// Expand group block, then move to quote block, and copy.
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'ArrowDown' );
 		await pageUtils.pressKeys( 'primary+c' );
+
+		// Move up to paragraph block and paste.
 		await page.keyboard.press( 'ArrowUp' );
 		await pageUtils.pressKeys( 'primary+v' );
 
@@ -580,15 +577,15 @@ test.describe( 'List View', () => {
 				{ name: 'core/file', selected: false, focused: false },
 				{
 					name: 'core/group',
-					selected: true,
+					selected: false,
 					innerBlocks: [
 						{
-							name: 'core/pullquote',
-							selected: false,
-							focused: true,
+							name: 'core/quote',
+							selected: true,
+							focused: false,
 						},
 						{
-							name: 'core/pullquote',
+							name: 'core/quote',
 							selected: false,
 							focused: false,
 						},
@@ -688,10 +685,7 @@ test.describe( 'List View', () => {
 		await editor.insertBlock( { name: 'core/file' } );
 		await editor.insertBlock( {
 			name: 'core/group',
-			innerBlocks: [
-				{ name: 'core/pullquote' },
-				{ name: 'core/pullquote' },
-			],
+			innerBlocks: [ { name: 'core/quote' }, { name: 'core/quote' } ],
 		} );
 
 		// Open List View.
@@ -715,7 +709,7 @@ test.describe( 'List View', () => {
 			)
 			.toMatchObject( [
 				{ name: 'core/heading', selected: false, focused: false },
-				{ name: 'core/file', selected: true, focused: true },
+				{ name: 'core/file', selected: true, focused: false },
 			] );
 
 		await pageUtils.pressKeys( 'primary+v' );
@@ -730,15 +724,15 @@ test.describe( 'List View', () => {
 				{
 					name: 'core/group',
 					selected: true,
-					focused: true,
+					focused: false,
 					innerBlocks: [
 						{
-							name: 'core/pullquote',
+							name: 'core/quote',
 							selected: false,
 							focused: false,
 						},
 						{
-							name: 'core/pullquote',
+							name: 'core/quote',
 							selected: false,
 							focused: false,
 						},
@@ -756,7 +750,7 @@ test.describe( 'List View', () => {
 		// Insert some blocks of different types.
 		await editor.insertBlock( {
 			name: 'core/group',
-			innerBlocks: [ { name: 'core/pullquote' } ],
+			innerBlocks: [ { name: 'core/quote' } ],
 		} );
 		await editor.insertBlock( {
 			name: 'core/columns',
@@ -884,7 +878,7 @@ test.describe( 'List View', () => {
 		// Insert some blocks of different types.
 		await editor.insertBlock( {
 			name: 'core/group',
-			innerBlocks: [ { name: 'core/pullquote' } ],
+			innerBlocks: [ { name: 'core/quote' } ],
 		} );
 		await editor.insertBlock( {
 			name: 'core/columns',
