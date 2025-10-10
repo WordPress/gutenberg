@@ -12,6 +12,7 @@ import type {
 	NormalizedField,
 	FieldTypeDefinition,
 } from '../types';
+import renderFromElements from './utils/render-from-elements';
 import {
 	OPERATOR_IS,
 	OPERATOR_IS_NOT,
@@ -25,7 +26,6 @@ import {
 	OPERATOR_IS_NOT_ALL,
 	OPERATOR_BETWEEN,
 } from '../constants';
-import { renderFromElements } from '../utils';
 
 function sort( a: any, b: any, direction: SortDirection ) {
 	return direction === 'asc' ? a - b : b - a;

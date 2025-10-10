@@ -12,9 +12,9 @@ import type { useFocusOnMount } from '@wordpress/compose';
  * Internal dependencies
  */
 import type {
+	FieldElementsSource,
 	NormalizedField,
 	Operator,
-	Option,
 	SortDirection,
 } from './field-api';
 import type { SetSelection } from './private';
@@ -58,7 +58,7 @@ export interface NormalizedFilter {
 	/**
 	 * The list of options to pick from when using the field as a filter.
 	 */
-	elements: Option[];
+	elements: FieldElementsSource;
 
 	/**
 	 * Is a single selection filter.
