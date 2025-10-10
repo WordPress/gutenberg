@@ -164,16 +164,6 @@ export default function CollabSidebar() {
 	const [ heights, setHeights ] = useState( {} );
 	const [ boardOffsets, setBoardOffsets ] = useState( {} );
 	const [ blockRefs, setBlockRefs ] = useState( {} );
-
-	const blockCommentId = useSelect( ( select ) => {
-		const { getBlockAttributes, getSelectedBlockClientId } =
-			select( blockEditorStore );
-		const clientId = getSelectedBlockClientId();
-		return clientId
-			? getBlockAttributes( clientId )?.metadata?.commentId
-			: null;
-	}, [] );
-
 	const [ selectedThread, setSelectedThread ] = useState( null );
 
 	const updateHeight = useCallback( ( id, newHeight ) => {
@@ -192,6 +182,15 @@ export default function CollabSidebar() {
 		return {
 			postId: getCurrentPostId(),
 		};
+	}, [] );
+
+	const blockCommentId = useSelect( ( select ) => {
+		const { getBlockAttributes, getSelectedBlockClientId } =
+			select( blockEditorStore );
+		const clientId = getSelectedBlockClientId();
+		return clientId
+			? getBlockAttributes( clientId )?.metadata?.commentId
+			: null;
 	}, [] );
 
 	const { resultComments, unresolvedSortedThreads, totalPages } =
