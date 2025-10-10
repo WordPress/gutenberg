@@ -9,6 +9,7 @@
 ### Enhancements
 
 - Update `check` to be more optically balanced. ([#72101](https://github.com/WordPress/gutenberg/pull/72101))
+- Add new `timeToRead` and `wordCount` icons. ([#72240](https://github.com/WordPress/gutenberg/pull/72240))
 
 ## 10.32.0 (2025-10-01)
 
