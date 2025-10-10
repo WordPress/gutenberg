@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { edit } from '@wordpress/icons';
+import { pencil } from '@wordpress/icons';
 import { useMemo } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -17,6 +17,9 @@ import { unlock } from '../../lock-unlock';
 const { useHistory } = unlock( routerPrivateApis );
 
 export const useSetActiveTemplateAction = () => {
+	const activeTheme = useSelect( ( select ) =>
+		select( coreStore ).getCurrentTheme()
+	);
 	const { getEntityRecord } = useSelect( coreStore );
 	const { editEntityRecord, saveEditedEntityRecord } =
 		useDispatch( coreStore );
@@ -29,9 +32,12 @@ export const useSetActiveTemplateAction = () => {
 					: __( 'Activate' );
 			},
 			isPrimary: true,
-			icon: edit,
+			icon: pencil,
 			isEligible( item ) {
-				return ! ( item.slug === 'index' && item.source === 'theme' );
+				return (
+					! ( item.slug === 'index' && item.source === 'theme' ) &&
+					item.theme === activeTheme.stylesheet
+				);
 			},
 			async callback( items ) {
 				const deactivate = items.some( ( item ) => item._isActive );
@@ -51,17 +57,18 @@ export const useSetActiveTemplateAction = () => {
 						activeTemplates[ item.slug ] = item.id;
 					}
 				}
-				// To do: figure out why the REST API deletes the option when
-				// it's set to an empty object. That would trigger the migration
-				// function, which will make all templates in the database active.
-				activeTemplates.__preventCollapse = 0;
 				await editEntityRecord( 'root', 'site', undefined, {
 					active_templates: activeTemplates,
 				} );
 				await saveEditedEntityRecord( 'root', 'site' );
 			},
 		} ),
-		[ editEntityRecord, saveEditedEntityRecord, getEntityRecord ]
+		[
+			editEntityRecord,
+			saveEditedEntityRecord,
+			getEntityRecord,
+			activeTheme,
+		]
 	);
 };
 
@@ -72,7 +79,7 @@ export const useEditPostAction = () => {
 			id: 'edit-post',
 			label: __( 'Edit' ),
 			isPrimary: true,
-			icon: edit,
+			icon: pencil,
 			isEligible( post ) {
 				if ( post.status === 'trash' ) {
 					return false;

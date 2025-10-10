@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/data",
-	"version": "10.31.1-next.233ccab9b.0",
+	"version": "10.32.0",
 	"description": "Data module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -25,12 +25,20 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"react-native": "./src/index.js",
+			"import": "./build-module/index.js",
+			"default": "./build/index.js"
+		},
+		"./package.json": "./package.json"
+	},
 	"react-native": "src/index",
 	"wpScript": true,
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "7.25.7",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/element": "file:../element",

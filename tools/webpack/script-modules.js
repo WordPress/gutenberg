@@ -13,6 +13,7 @@ const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extrac
  * Internal dependencies
  */
 const { baseConfig, plugins } = require( './shared' );
+const { V2_PACKAGES } = require( '../../bin/packages/v2-packages' );
 
 const WORDPRESS_NAMESPACE = '@wordpress/';
 
@@ -26,6 +27,11 @@ const packageDirs = readdirSync(
 /** @type {Map<string, string>} */
 const gutenbergScriptModules = new Map();
 for ( const packageDir of packageDirs ) {
+	// Skip v2 packages - they're built with build-v2.mjs
+	if ( V2_PACKAGES.includes( packageDir ) ) {
+		continue;
+	}
+
 	const packageJson = require( `@wordpress/${ packageDir }/package.json` );
 
 	if ( ! Object.hasOwn( packageJson, 'wpScriptModuleExports' ) ) {

@@ -293,7 +293,6 @@ Private exports:
 - `ComplementaryAreaMoreMenuItem`
 - `FullscreenMode`
 - `InterfaceSkeleton`
-- `NavigableRegion`
 - `PinnedItems`
 
 ### `core/editor` store

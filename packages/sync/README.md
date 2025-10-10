@@ -28,6 +28,10 @@ _Returns_
 
 -   `Promise<() => void>`: Promise that resolves when the connection is established.
 
+### CRDT_RECORD_MAP_KEY
+
+Root-level key for the CRDT document that holds the entity record data.
+
 ### createSyncProvider
 
 Create a sync provider.

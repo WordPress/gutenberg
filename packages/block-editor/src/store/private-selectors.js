@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { createSelector, createRegistrySelector } from '@wordpress/data';
-import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
+import {
+	hasBlockSupport,
+	privateApis as blocksPrivateApis,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -16,7 +19,6 @@ import {
 	getBlockName,
 	getTemplateLock,
 	getClientIdsWithDescendants,
-	isNavigationMode,
 	getBlockRootClientId,
 	getBlockAttributes,
 } from './selectors';
@@ -526,16 +528,7 @@ export function isSectionBlock( state, clientId ) {
 	) {
 		return true;
 	}
-
-	// Template parts become sections in navigation mode.
-	const _isNavigationMode = isNavigationMode( state );
-	if ( _isNavigationMode && isTemplatePart ) {
-		return true;
-	}
-
-	const sectionRootClientId = getSectionRootClientId( state );
-	const sectionClientIds = getBlockOrder( state, sectionRootClientId );
-	return _isNavigationMode && sectionClientIds.includes( clientId );
+	return false;
 }
 
 /**
@@ -684,4 +677,32 @@ export function getClosestAllowedInsertionPointForPattern(
  */
 export function getInsertionPoint( state ) {
 	return state.insertionPoint;
+}
+
+/**
+ * Returns true if the block is hidden, or false otherwise.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Client ID of the block.
+ *
+ * @return {boolean} Whether the block is hidden.
+ */
+export const isBlockHidden = ( state, clientId ) => {
+	const blockName = getBlockName( state, clientId );
+	if ( ! hasBlockSupport( state, blockName, 'blockVisibility', true ) ) {
+		return false;
+	}
+	const attributes = state.blocks.attributes.get( clientId );
+	return attributes?.metadata?.blockVisibility === false;
+};
+
+/**
+ * Returns true if the current spotlighted block matches the block clientId.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the block is currently spotlighted.
+ */
+export function hasBlockSpotlight( state ) {
+	return !! state.hasBlockSpotlight;
 }

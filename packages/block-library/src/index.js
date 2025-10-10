@@ -6,7 +6,13 @@ import {
 	setFreeformContentHandlerName,
 	setUnregisteredTypeHandlerName,
 	setGroupingBlockName,
+	registerBlockType,
+	store as blocksStore,
 } from '@wordpress/blocks';
+import { select } from '@wordpress/data';
+import { useBlockProps } from '@wordpress/block-editor';
+import { useServerSideRender } from '@wordpress/server-side-render';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -21,12 +27,13 @@ import {
 //
 // See https://github.com/WordPress/gutenberg/pull/40655 for more context.
 import * as accordion from './accordion';
-import * as accordionContent from './accordion-content';
-import * as accordionHeader from './accordion-header';
+import * as accordionItem from './accordion-item';
+import * as accordionHeading from './accordion-heading';
 import * as accordionPanel from './accordion-panel';
 import * as archives from './archives';
 import * as avatar from './avatar';
 import * as audio from './audio';
+import * as breadcrumbs from './breadcrumbs';
 import * as button from './button';
 import * as buttons from './buttons';
 import * as calendar from './calendar';
@@ -122,6 +129,7 @@ import * as tableOfContents from './table-of-contents';
 import * as tagCloud from './tag-cloud';
 import * as templatePart from './template-part';
 import * as termDescription from './term-description';
+import * as termName from './term-name';
 import * as termsQuery from './terms-query';
 import * as termTemplate from './term-template';
 import * as textColumns from './text-columns';
@@ -130,6 +138,7 @@ import * as video from './video';
 import * as footnotes from './footnotes';
 
 import isBlockMetadataExperimental from './utils/is-block-metadata-experimental';
+import { unlock } from './lock-unlock';
 
 /**
  * Function to get all the block-library blocks in an array
@@ -147,8 +156,13 @@ const getAllBlocks = () => {
 		quote,
 
 		// Register all remaining core blocks.
+		accordion,
+		accordionItem,
+		accordionHeading,
+		accordionPanel,
 		archives,
 		audio,
+		breadcrumbs,
 		button,
 		buttons,
 		calendar,
@@ -237,15 +251,12 @@ const getAllBlocks = () => {
 		homeLink,
 		logInOut,
 		termDescription,
+		termName,
 		queryTitle,
 		postAuthorBiography,
 	];
 
 	if ( window?.__experimentalEnableBlockExperiments ) {
-		blocks.push( accordion );
-		blocks.push( accordionContent );
-		blocks.push( accordionHeader );
-		blocks.push( accordionPanel );
 		blocks.push( termsQuery );
 		blocks.push( termTemplate );
 	}
@@ -308,6 +319,56 @@ export const registerCoreBlocks = (
 	blocks = __experimentalGetCoreBlocks()
 ) => {
 	blocks.forEach( ( { init } ) => init() );
+
+	// Auto-register PHP-only blocks with ServerSideRender
+	if ( window.__unstableAutoRegisterBlocks ) {
+		window.__unstableAutoRegisterBlocks.forEach( ( blockName ) => {
+			const bootstrappedBlockType = unlock(
+				select( blocksStore )
+			).getBootstrappedBlockType( blockName );
+			const bootstrappedApiVersion = bootstrappedBlockType.apiVersion;
+
+			registerBlockType( blockName, {
+				title: blockName,
+				...( bootstrappedApiVersion < 3 && { apiVersion: 3 } ),
+				edit: function Edit( { attributes } ) {
+					const blockProps = useBlockProps();
+					const { content, status, error } = useServerSideRender( {
+						block: blockName,
+						attributes,
+					} );
+
+					if ( status === 'loading' ) {
+						return (
+							<div { ...blockProps }>{ __( 'Loading…' ) }</div>
+						);
+					}
+
+					if ( status === 'error' ) {
+						return (
+							<div { ...blockProps }>
+								{ sprintf(
+									/* translators: %s: error message describing the problem */
+									__( 'Error loading block: %s' ),
+									error
+								) }
+							</div>
+						);
+					}
+
+					return (
+						<div
+							{ ...blockProps }
+							dangerouslySetInnerHTML={ {
+								__html: content || '',
+							} }
+						/>
+					);
+				},
+				save: () => null,
+			} );
+		} );
+	}
 
 	setDefaultBlockName( paragraph.name );
 	if (

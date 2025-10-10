@@ -6,6 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
+import { NavigableRegion } from '@wordpress/admin-ui';
 import {
 	AutosaveMonitor,
 	LocalAutosaveMonitor,
@@ -76,7 +77,7 @@ import { useMetaBoxInitialization } from '../meta-boxes/use-meta-box-initializat
 
 const { getLayoutStyles } = unlock( blockEditorPrivateApis );
 const { useCommandContext } = unlock( commandsPrivateApis );
-const { Editor, FullscreenMode, NavigableRegion } = unlock( editorPrivateApis );
+const { Editor, FullscreenMode } = unlock( editorPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 const DESIGN_POST_TYPES = [
 	'wp_template',
@@ -599,7 +600,7 @@ function Layout( {
 							sprintf(
 								// translators: %s: Title of the created post or template, e.g: "Hello world".
 								__( '"%s" successfully created.' ),
-								decodeEntities( title )
+								decodeEntities( title ) || __( '(no title)' )
 							),
 							{
 								type: 'snackbar',

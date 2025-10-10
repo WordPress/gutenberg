@@ -374,7 +374,7 @@ export const deleteEntityRecord =
  */
 export const editEntityRecord =
 	( kind, name, recordId, edits, options = {} ) =>
-	async ( { select, dispatch, resolveSelect } ) => {
+	( { select, dispatch } ) => {
 		logEntityDeprecation( kind, name, 'editEntityRecord' );
 		const entityConfig = select.getEntityConfig( kind, name );
 		if ( ! entityConfig ) {
@@ -410,66 +410,33 @@ export const editEntityRecord =
 		};
 		if ( window.__experimentalEnableSync && entityConfig.syncConfig ) {
 			if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-				const objectId = entityConfig.getSyncObjectId( recordId );
-				getSyncProvider().update(
-					entityConfig.syncObjectType + '--edit',
-					objectId,
-					edit.edits
-				);
+				const objectType = `${ kind }/${ name }`;
+				const objectId = recordId;
+
+				getSyncProvider().update( objectType, objectId, edit.edits );
 			}
-		} else {
-			if ( ! options.undoIgnore ) {
-				select.getUndoManager().addRecord(
-					[
-						{
-							id: { kind, name, recordId },
-							changes: Object.keys( edits ).reduce(
-								( acc, key ) => {
-									acc[ key ] = {
-										from: editedRecord[ key ],
-										to: edits[ key ],
-									};
-									return acc;
-								},
-								{}
-							),
-						},
-					],
-					options.isCached
-				);
-				// Temporary solution until we find the right UX: when the user
-				// modifies a template, we automatically set it active.
-				// It can be unchecked in multi-entity saving.
-				// This is to keep the current behaviour where templates are
-				// immediately active.
-				if (
-					! options.isCached &&
-					kind === 'postType' &&
-					name === 'wp_template'
-				) {
-					const site = await resolveSelect.getEntityRecord(
-						'root',
-						'site'
-					);
-					await dispatch.editEntityRecord(
-						'root',
-						'site',
-						undefined,
-						{
-							active_templates: {
-								...site.active_templates,
-								[ record.slug ]: record.id,
-							},
-						},
-						{ isCached: true }
-					);
-				}
-			}
-			dispatch( {
-				type: 'EDIT_ENTITY_RECORD',
-				...edit,
-			} );
 		}
+		if ( ! options.undoIgnore ) {
+			select.getUndoManager().addRecord(
+				[
+					{
+						id: { kind, name, recordId },
+						changes: Object.keys( edits ).reduce( ( acc, key ) => {
+							acc[ key ] = {
+								from: editedRecord[ key ],
+								to: edits[ key ],
+							};
+							return acc;
+						}, {} ),
+					},
+				],
+				options.isCached
+			);
+		}
+		dispatch( {
+			type: 'EDIT_ENTITY_RECORD',
+			...edit,
+		} );
 	};
 
 /**
@@ -553,6 +520,46 @@ export const saveEntityRecord =
 		}
 		const entityIdKey = entityConfig.key || DEFAULT_ENTITY_KEY;
 		const recordId = record[ entityIdKey ];
+
+		// When called with a theme template ID, trigger the compatibility
+		// logic.
+		if (
+			kind === 'postType' &&
+			name === 'wp_template' &&
+			typeof recordId === 'string' &&
+			! /^\d+$/.test( recordId )
+		) {
+			// Get the theme template.
+			const template = await select.getEntityRecord(
+				'postType',
+				'wp_registered_template',
+				recordId
+			);
+			// Duplicate the theme template and make the edit.
+			const newTemplate = await dispatch.saveEntityRecord(
+				'postType',
+				'wp_template',
+				{
+					...template,
+					...record,
+					id: undefined,
+					type: 'wp_template',
+					status: 'publish',
+				}
+			);
+			// Make the new template active.
+			const activeTemplates = await select.getEntityRecord(
+				'root',
+				'site'
+			);
+			await dispatch.saveEntityRecord( 'root', 'site', {
+				active_templates: {
+					...activeTemplates.active_templates,
+					[ newTemplate.slug ]: newTemplate.id,
+				},
+			} );
+			return newTemplate;
+		}
 
 		const lock = await dispatch.__unstableAcquireStoreLock(
 			STORE_NAME,

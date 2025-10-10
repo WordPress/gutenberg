@@ -4,8 +4,14 @@
 /**
  * External dependencies
  */
-import { h as createElement, type VNode, type RefObject } from 'preact';
+import {
+	h as createElement,
+	cloneElement,
+	type VNode,
+	type RefObject,
+} from 'preact';
 import { useContext, useMemo, useRef } from 'preact/hooks';
+import { signal, type Signal } from '@preact/signals';
 
 /**
  * Internal dependencies
@@ -198,6 +204,20 @@ const getGlobalAsyncEventDirective = (
 			} );
 	};
 };
+
+/**
+ * Relates each router region with its current vDOM content. Used by the
+ * `router-region` directive.
+ *
+ * Keys are router region IDs, and values are signals with the corresponding
+ * VNode rendered inside. If the value is `null`, that means the regions should
+ * not be rendered. If the value is `undefined`, the region is already contained
+ * inside another router region and does not need to change its children.
+ */
+export const routerRegions = new Map<
+	string,
+	Signal< VNode | null | undefined >
+>();
 
 export default () => {
 	// data-wp-context
@@ -718,4 +738,34 @@ export default () => {
 	);
 
 	directive( 'each-child', () => null, { priority: 1 } );
+
+	directive(
+		'router-region',
+		( { directives: { 'router-region': routerRegion } } ) => {
+			const entry = routerRegion.find( isDefaultDirectiveSuffix );
+			if ( ! entry ) {
+				return;
+			}
+
+			const regionId =
+				typeof entry.value === 'string'
+					? entry.value
+					: ( entry.value as any ).id;
+
+			if ( ! routerRegions.has( regionId ) ) {
+				routerRegions.set( regionId, signal() );
+			}
+
+			// Get the content of this router region.
+			const vdom = routerRegions.get( regionId )!.value;
+
+			if ( vdom && typeof vdom.type !== 'string' ) {
+				// The scope needs to be injected.
+				const previousScope = getScope();
+				return cloneElement( vdom, { previousScope } );
+			}
+			return vdom;
+		},
+		{ priority: 1 }
+	);
 };

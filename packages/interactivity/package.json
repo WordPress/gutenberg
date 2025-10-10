@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/interactivity",
-	"version": "6.31.1-next.233ccab9b.0",
+	"version": "6.32.0",
 	"description": "Package that provides a standard and simple way to handle the frontend interactivity of Gutenberg blocks.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -24,6 +24,15 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"react-native": "./src/index.js",
+			"import": "./build-module/index.js",
+			"default": "./build/index.js"
+		},
+		"./package.json": "./package.json"
+	},
 	"react-native": "src/index",
 	"wpScriptModuleExports": {
 		".": "./build-module/index.js",

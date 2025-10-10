@@ -2,7 +2,22 @@
 
 ## Unreleased
 
-## 30.5.0-next.0 (2025-09-26)
+### Enhancements
+
+-   `SearchControl`: Move search icon to prefix position ([#71984](https://github.com/WordPress/gutenberg/pull/71984)).
+-   `SearchControl`: Flip search icon depending on placement ([#72070](https://github.com/WordPress/gutenberg/pull/72070)).
+-   `SearchControl`: Normalize styles ([#72072](https://github.com/WordPress/gutenberg/pull/72072)).
+-   `CheckboxControl`, `RadioControl`, `ToggleControl` (`FormToggle`): Ensure elements are focused when clicked in Safari ([#72115](https://github.com/WordPress/gutenberg/pull/72115)).
+
+### Bug Fixes
+
+-   `ValidatedCheckboxControl`, `ValidatedRadioControl`, `ValidatedToggleControl`: Fix issue where validation may not be triggered in Safari when elements are toggled by clicking ([#72115](https://github.com/WordPress/gutenberg/pull/72115)).
+
+### Internal
+
+-   Replace usage of extinct icons `edit` and `warning` with `pencil` and `cautionFilled`, respectively ([#72105](https://github.com/WordPress/gutenberg/pull/72105)).
+
+## 30.5.0 (2025-10-01)
 
 ### Enhancements
 

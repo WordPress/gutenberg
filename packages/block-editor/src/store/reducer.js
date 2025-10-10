@@ -1874,6 +1874,45 @@ export function highlightedBlock( state, action ) {
 }
 
 /**
+ * Reducer returning current spotlighted block.
+ *
+ * @param {string|null} state  Current clientId or null.
+ * @param {Object}      action Dispatched action.
+ *
+ * @return {string|null} Updated state.
+ */
+export function hasBlockSpotlight( state, action ) {
+	switch ( action.type ) {
+		case 'TOGGLE_BLOCK_SPOTLIGHT':
+			const { clientId, hasBlockSpotlight: _hasBlockSpotlight } = action;
+
+			if ( _hasBlockSpotlight ) {
+				return clientId;
+			} else if ( state === clientId ) {
+				return null;
+			}
+			return state;
+		case 'SELECT_BLOCK':
+			if ( action.clientId !== state ) {
+				return null;
+			}
+			return state;
+		case 'SELECTION_CHANGE':
+			if (
+				action.start?.clientId !== state ||
+				action.end?.clientId !== state
+			) {
+				return null;
+			}
+			return state;
+		case 'CLEAR_SELECTED_BLOCK':
+			return null;
+	}
+
+	return state;
+}
+
+/**
  * Reducer returning current expanded block in the list view.
  *
  * @param {string|null} state  Current expanded block.
@@ -2125,6 +2164,7 @@ const combinedReducers = combineReducers( {
 	openedBlockSettingsMenu,
 	registeredInserterMediaCategories,
 	zoomLevel,
+	hasBlockSpotlight,
 } );
 
 /**
@@ -2307,12 +2347,7 @@ function getDerivedBlockEditingModesForTree(
 			let ancestorBlockEditingMode;
 			let parent = state.blocks.parents.get( clientId );
 			while ( parent !== undefined ) {
-				// There's a chance we only just calculated this for the parent,
-				// if so we can return that value for a faster lookup.
-				if ( derivedBlockEditingModes.has( parent ) ) {
-					ancestorBlockEditingMode =
-						derivedBlockEditingModes.get( parent );
-				} else if ( state.blockEditingModes.has( parent ) ) {
+				if ( state.blockEditingModes.has( parent ) ) {
 					// Checking the explicit block editing mode will be slower,
 					// as the block editing mode is more likely to be set on a
 					// distant ancestor.
@@ -2549,31 +2584,29 @@ function getDerivedBlockEditingModesUpdates( {
 	} );
 
 	addedBlocks?.forEach( ( addedBlock ) => {
-		traverseBlockTree( nextState, addedBlock.clientId, ( block ) => {
-			const updates = getDerivedBlockEditingModesForTree(
-				nextState,
-				isNavMode,
-				block.clientId
-			);
+		const updates = getDerivedBlockEditingModesForTree(
+			nextState,
+			isNavMode,
+			addedBlock.clientId
+		);
 
-			if ( updates.size ) {
-				if ( ! nextDerivedBlockEditingModes ) {
-					nextDerivedBlockEditingModes = new Map( [
-						...( prevDerivedBlockEditingModes?.size
-							? prevDerivedBlockEditingModes
-							: [] ),
-						...updates,
-					] );
-				} else {
-					nextDerivedBlockEditingModes = new Map( [
-						...( nextDerivedBlockEditingModes?.size
-							? nextDerivedBlockEditingModes
-							: [] ),
-						...updates,
-					] );
-				}
+		if ( updates.size ) {
+			if ( ! nextDerivedBlockEditingModes ) {
+				nextDerivedBlockEditingModes = new Map( [
+					...( prevDerivedBlockEditingModes?.size
+						? prevDerivedBlockEditingModes
+						: [] ),
+					...updates,
+				] );
+			} else {
+				nextDerivedBlockEditingModes = new Map( [
+					...( nextDerivedBlockEditingModes?.size
+						? nextDerivedBlockEditingModes
+						: [] ),
+					...updates,
+				] );
 			}
-		} );
+		}
 	} );
 
 	return nextDerivedBlockEditingModes;
