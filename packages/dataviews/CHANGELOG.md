@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## 10.0.0-next.0 (2025-10-10)
-
 ### Enhancements
 
 - Dataviews: Make header table view select all checkbox always visible. ([#72050](https://github.com/WordPress/gutenberg/pull/72050))
