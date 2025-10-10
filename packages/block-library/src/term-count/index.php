@@ -17,8 +17,6 @@
  * @return string Returns the count of the current taxonomy term wrapped inside a heading tag.
  */
 function render_block_core_term_count( $attributes, $content, $block ) {
-	$term_count = '';
-
 	// Get term from context or from the current query.
 	if ( isset( $block->context['termId'] ) && isset( $block->context['taxonomy'] ) ) {
 		$term = get_term( $block->context['termId'], $block->context['taxonomy'] );
@@ -36,9 +34,7 @@ function render_block_core_term_count( $attributes, $content, $block ) {
 	$term_count = $term->count;
 
 	// Format the term count based on bracket type.
-	$bracket_type = isset( $attributes['bracketType'] ) ? $attributes['bracketType'] : 'round';
-
-	switch ( $bracket_type ) {
+	switch ( $attributes['bracketType'] ) {
 		case 'none':
 			// No formatting needed.
 			break;
