@@ -217,64 +217,7 @@ function useFitText( { fitText, name, clientId } ) {
 	// Trigger fit text recalculation when content changes
 	useEffect( () => {
 		if ( fitText && blockElement && hasFitTextSupport ) {
-			let throttleTimer = null;
-			let debounceTimer = null;
-			let idleCallbackId = null;
-
-			// Clear any existing timers
-			const clearTimers = () => {
-				if ( throttleTimer ) {
-					clearTimeout( throttleTimer );
-					throttleTimer = null;
-				}
-				if ( debounceTimer ) {
-					clearTimeout( debounceTimer );
-					debounceTimer = null;
-				}
-				if ( idleCallbackId && window.cancelIdleCallback ) {
-					window.cancelIdleCallback( idleCallbackId );
-					idleCallbackId = null;
-				}
-				// Clear any pending delay timeout
-				if ( delayTimeoutRef.current ) {
-					clearTimeout( delayTimeoutRef.current );
-					delayTimeoutRef.current = null;
-				}
-			};
-
-			// Run calculation when browser is idle
-			const scheduleIdleCalculation = () => {
-				clearTimers();
-
-				if ( window.requestIdleCallback ) {
-					idleCallbackId = window.requestIdleCallback(
-						() => {
-							if ( blockElement ) {
-								applyFitText();
-							}
-						},
-						{ timeout: 300 } // Fallback timeout
-					);
-				} else {
-					// Fallback for browsers without requestIdleCallback
-					throttleTimer = setTimeout( () => {
-						if ( blockElement ) {
-							applyFitText();
-						}
-					}, 300 );
-				}
-
-				// Schedule final accurate calculation after changes stop
-				debounceTimer = setTimeout( () => {
-					if ( blockElement ) {
-						applyFitText();
-					}
-				}, 200 );
-			};
-
-			scheduleIdleCalculation();
-
-			return clearTimers;
+			applyFitText();
 		}
 	}, [
 		blockAttributes,
