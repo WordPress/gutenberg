@@ -135,6 +135,25 @@
 	display: block;
 }
 
+// Visually hidden until focused (skip link pattern)
+.editor-collab-sidebar-panel__skip-link {
+	position: absolute;
+	top: -9999px;
+	right: -9999px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	background: $white !important;
+	z-index: -1;
+
+	&:focus {
+		top: $grid-unit-10;
+		right: $grid-unit-10;
+		overflow: visible;
+		clip-path: none;
+		z-index: 1;
+	}
+}
+
 // Comment avatar indicators.
 .comment-avatar-indicator {
 	position: relative;
