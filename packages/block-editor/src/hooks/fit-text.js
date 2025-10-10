@@ -152,20 +152,35 @@ function useFitText( { fitText, name, clientId } ) {
 				// Animate: reset to current, then transition to final
 				styleElement.textContent = `${ blockSelector } { font-size: ${ currentFontSize }px !important; }`;
 
+				// Calculate proportional animation duration based on font size change
+				const fontSizeDifference = Math.abs(
+					finalFontSize - currentFontSize
+				);
+				// Map 1px-40px difference to 50-200ms duration
+				// 1px = 50ms, >= 40px = 200ms, between = proportional
+				const duration =
+					fontSizeDifference >= 40
+						? 0.2
+						: Math.max( 0.05, ( fontSizeDifference / 40 ) * 0.2 );
+
 				animationFrameRef.current = window.requestAnimationFrame(
 					() => {
 						animationFrameRef.current = null;
-						const transitionRule = `${ blockSelector } { transition: font-size 1s ease-out; }`;
+						const transitionRule = `${ blockSelector } { transition: font-size ${ duration }s ease-out; }`;
 						styleElement.textContent = `${ transitionRule } ${ blockSelector } { font-size: ${ finalFontSize }px !important; }`;
 
-						animationTimeoutRef.current = setTimeout( () => {
-							animationTimeoutRef.current = null;
-							isApplyingRef.current = false;
-						}, 1050 );
+						// Timeout slightly longer than animation duration
+						animationTimeoutRef.current = setTimeout(
+							() => {
+								animationTimeoutRef.current = null;
+								isApplyingRef.current = false;
+							},
+							duration * 1000 + 10
+						);
 					}
 				);
 			}
-		}, 100 );
+		}, 20 );
 	}, [
 		blockElement,
 		clientId,
