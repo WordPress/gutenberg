@@ -9,6 +9,7 @@ import {
 	SelectControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	Spinner,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -49,37 +50,49 @@ export default function BreadcrumbEdit( {
 	context: { postId, postType, templateSlug },
 } ) {
 	const { separator, showHomeLink, type } = attributes;
-	const { post, isPostTypeHierarchical, hasTermsAssigned } = useSelect(
-		( select ) => {
-			if ( ! postType ) {
-				return {};
-			}
-			const _post = select( coreStore ).getEntityRecord(
-				'postType',
-				postType,
-				postId
-			);
-			const taxonomies = select( coreStore ).getTaxonomies( {
-				type: postType,
-				per_page: -1,
-			} );
-			return {
-				post: _post,
-				isPostTypeHierarchical:
-					select( coreStore ).getPostType( postType )?.hierarchical,
-				hasTermsAssigned:
-					_post &&
-					( taxonomies || [] )
-						.filter(
-							( { visibility } ) => visibility?.publicly_queryable
-						)
-						.some( ( taxonomy ) => {
-							return !! _post[ taxonomy.rest_base ]?.length;
-						} ),
-			};
-		},
-		[ postType, postId ]
-	);
+	const { post, isPostTypeHierarchical, hasTermsAssigned, isLoading } =
+		useSelect(
+			( select ) => {
+				if ( ! postType ) {
+					return {};
+				}
+				const _post = select( coreStore ).getEntityRecord(
+					'postType',
+					postType,
+					postId
+				);
+				const postTypeObject =
+					select( coreStore ).getPostType( postType );
+				const postTypeHasTaxonomies =
+					postTypeObject && postTypeObject.taxonomies.length;
+				let taxonomies;
+				if ( postTypeHasTaxonomies ) {
+					taxonomies = select( coreStore ).getTaxonomies( {
+						type: postType,
+						per_page: -1,
+					} );
+				}
+				return {
+					post: _post,
+					isPostTypeHierarchical: postTypeObject?.hierarchical,
+					hasTermsAssigned:
+						_post &&
+						( taxonomies || [] )
+							.filter(
+								( { visibility } ) =>
+									visibility?.publicly_queryable
+							)
+							.some( ( taxonomy ) => {
+								return !! _post[ taxonomy.rest_base ]?.length;
+							} ),
+					isLoading:
+						! _post ||
+						! postTypeObject ||
+						( postTypeHasTaxonomies && ! taxonomies ),
+				};
+			},
+			[ postType, postId ]
+		);
 
 	// Counter used to cache-bust `useServerSideRender`
 	//
@@ -103,6 +116,14 @@ export default function BreadcrumbEdit( {
 		block: 'core/breadcrumbs',
 		urlQueryArgs: { post_id: postId, invalidationKey },
 	} );
+
+	if ( isLoading ) {
+		return (
+			<div { ...blockProps }>
+				<Spinner />
+			</div>
+		);
+	}
 	// TODO: this should be handled better when we add more types.
 	let breadcrumbsType;
 	const isSpecificSupportedTypeSet = [
