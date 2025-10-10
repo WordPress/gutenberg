@@ -38,24 +38,14 @@ function TemplatePartNavigationEditButton( { clientId } ) {
 
 	const { hasNavigationBlocks, firstNavigationBlockId } = useSelect(
 		( select ) => {
-			const { getBlocksByName, getBlockParentsByBlockName } =
+			const { getClientIdsOfDescendants, getBlockName } =
 				select( blockEditorStore );
 
-			// Check for Navigation blocks within this Template Part
-			const allNavigationBlocks = getBlocksByName(
-				NAVIGATION_BLOCK_NAME
+			const descendants = getClientIdsOfDescendants( clientId );
+			const navigationBlocksInTemplatePart = descendants.filter(
+				( blockId ) => getBlockName( blockId ) === NAVIGATION_BLOCK_NAME
 			);
-			const navigationBlocksInTemplatePart = allNavigationBlocks.filter(
-				( blockId ) => {
-					// Check if this Navigation block is a descendant of the current Template Part
-					const templatePartParents = getBlockParentsByBlockName(
-						blockId,
-						TEMPLATE_PART_BLOCK_NAME,
-						true
-					);
-					return templatePartParents.includes( clientId );
-				}
-			);
+
 			const _hasNavigationBlocks =
 				navigationBlocksInTemplatePart.length > 0;
 			const _firstNavigationBlockId = _hasNavigationBlocks
