@@ -168,7 +168,10 @@ describe( 'getEntityRecord', () => {
 			'postType/post',
 			1,
 			POST_RECORD,
-			{ editRecord: expect.any( Function ) }
+			{
+				editRecord: expect.any( Function ),
+				getEditedRecord: expect.any( Function ),
+			}
 		);
 	} );
 
@@ -218,7 +221,10 @@ describe( 'getEntityRecord', () => {
 			'postType/post',
 			1,
 			{ ...POST_RECORD, foo: 'bar' },
-			{ editRecord: expect.any( Function ) }
+			{
+				editRecord: expect.any( Function ),
+				getEditedRecord: expect.any( Function ),
+			}
 		);
 	} );
 
