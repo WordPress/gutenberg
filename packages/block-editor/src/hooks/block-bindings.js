@@ -438,20 +438,10 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 	}
 	// Filter bindings to only show bindable attributes.
 	const { bindings } = metadata || {};
-	const filteredBindings = { ...bindings };
-	Object.keys( filteredBindings ).forEach( ( key ) => {
-		if ( ! bindableAttributes.includes( key ) ) {
-			delete filteredBindings[ key ];
-		}
-	} );
 
 	// Lock the UI when the user can't update bindings or there are no fields to connect to.
 	const readOnly =
 		! canUpdateBlockBindings || ! Object.keys( sources ).length;
-
-	if ( readOnly && Object.keys( filteredBindings ).length === 0 ) {
-		return null;
-	}
 
 	const RenderModalContent =
 		sources[ modalState?.sourceKey ]?.renderModalContent;
@@ -468,7 +458,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 			>
 				<ItemGroup isBordered isSeparated>
 					{ bindableAttributes.map( ( attribute ) => {
-						const binding = filteredBindings[ attribute ];
+						const binding = bindings?.[ attribute ];
 						const hasCompatibleData = Object.values( sources ).some(
 							( source ) => source.data
 						);
