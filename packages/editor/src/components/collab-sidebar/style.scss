@@ -21,6 +21,7 @@
 	border-radius: $radius-large;
 	border: $border-width solid $gray-300;
 	background-color: $gray-100;
+	overflow: hidden;
 
 	&.is-selected {
 		background-color: $white;
