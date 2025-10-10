@@ -13,6 +13,7 @@
 			"linkTo": "none",
 			"sizeSlug": "large",
 			"allowResize": false,
+			"aspectRatio": "auto",
 			"className": "columns-2"
 		},
 		"innerBlocks": [

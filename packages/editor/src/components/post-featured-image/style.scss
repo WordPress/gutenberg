@@ -1,6 +1,10 @@
 .editor-post-featured-image {
 	padding: 0;
 
+	.hidden {
+		display: none;
+	}
+
 	.components-spinner {
 		position: absolute;
 		top: 50%;

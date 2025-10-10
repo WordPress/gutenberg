@@ -90,6 +90,7 @@ require __DIR__ . '/compat/wordpress-6.9/customizer-preview-custom-css.php';
 require __DIR__ . '/compat/wordpress-6.9/command-palette.php';
 require __DIR__ . '/compat/wordpress-6.9/preload.php';
 require __DIR__ . '/compat/wordpress-6.9/l10n.php';
+require __DIR__ . '/compat/wordpress-6.9/site-editor-redirect.php';
 
 // WordPress 7.0 compat.
 require __DIR__ . '/compat/wordpress-7.0/php-only-blocks.php';
@@ -164,9 +165,6 @@ require __DIR__ . '/block-supports/background.php';
 require __DIR__ . '/block-supports/block-style-variations.php';
 require __DIR__ . '/block-supports/aria-label.php';
 require __DIR__ . '/block-supports/block-visibility.php';
-
-// Data views.
-require_once __DIR__ . '/experimental/data-views.php';
 
 // Client-side media processing.
 if ( gutenberg_is_experiment_enabled( 'gutenberg-media-processing' ) ) {

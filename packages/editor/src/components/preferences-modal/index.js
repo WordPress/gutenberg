@@ -18,7 +18,7 @@ import { store as interfaceStore } from '@wordpress/interface';
 import EnablePanelOption from './enable-panel';
 import EnablePluginDocumentSettingPanelOption from './enable-plugin-document-setting-panel';
 import EnablePublishSidebarOption from './enable-publish-sidebar';
-import BlockVisibility from './block-visibility';
+import BlockVisibility from '../block-visibility';
 import PostTaxonomies from '../post-taxonomies';
 import PostFeaturedImageCheck from '../post-featured-image/check';
 import PostExcerptCheck from '../post-excerpt/check';

@@ -1,10 +1,20 @@
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
-import { useEntityRecords } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
+import { useEffect, useMemo } from '@wordpress/element';
+import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as noticesStore } from '@wordpress/notices';
+import { decodeEntities } from '@wordpress/html-entities';
+import { store as interfaceStore } from '@wordpress/interface';
+
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
+import { collabSidebarName } from './constants';
 
 export function useBlockComments( postId ) {
 	const queryArgs = {
@@ -21,11 +31,17 @@ export function useBlockComments( postId ) {
 		{ enabled: !! postId && typeof postId === 'number' }
 	);
 
-	const blocksWithComments = useSelect( ( select ) => {
-		const { getBlockAttributes, getClientIdsWithDescendants } =
-			select( blockEditorStore );
+	const { getBlockAttributes } = useSelect( blockEditorStore );
+	const { clientIds } = useSelect( ( select ) => {
+		const { getClientIdsWithDescendants } = select( blockEditorStore );
+		return {
+			clientIds: getClientIdsWithDescendants(),
+		};
+	}, [] );
 
-		return getClientIdsWithDescendants().reduce( ( results, clientId ) => {
+	// Process comments to build the tree structure.
+	const { resultComments, unresolvedSortedThreads } = useMemo( () => {
+		const blocksWithComments = clientIds.reduce( ( results, clientId ) => {
 			const commentId =
 				getBlockAttributes( clientId )?.metadata?.commentId;
 			if ( commentId ) {
@@ -33,10 +49,7 @@ export function useBlockComments( postId ) {
 			}
 			return results;
 		}, {} );
-	}, [] );
 
-	// Process comments to build the tree structure.
-	const { resultComments, unresolvedSortedThreads } = useMemo( () => {
 		// Create a compare to store the references to all objects by id.
 		const compare = {};
 		const result = [];
@@ -104,7 +117,158 @@ export function useBlockComments( postId ) {
 			resultComments: allSortedComments,
 			unresolvedSortedThreads: unresolvedSortedComments,
 		};
-	}, [ threads, blocksWithComments ] );
+	}, [ clientIds, threads, getBlockAttributes ] );
 
 	return { resultComments, unresolvedSortedThreads, totalPages };
+}
+
+export function useBlockCommentsActions() {
+	const { createNotice } = useDispatch( noticesStore );
+	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
+	const { getCurrentPostId } = useSelect( editorStore );
+	const { getBlockAttributes, getSelectedBlockClientId } =
+		useSelect( blockEditorStore );
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+
+	const onError = ( error ) => {
+		const errorMessage =
+			error.message && error.code !== 'unknown_error'
+				? decodeEntities( error.message )
+				: __( 'An error occurred while performing an update.' );
+		createNotice( 'error', errorMessage, {
+			type: 'snackbar',
+			isDismissible: true,
+		} );
+	};
+
+	const onCreate = async ( { content, parent } ) => {
+		try {
+			const savedRecord = await saveEntityRecord(
+				'root',
+				'comment',
+				{
+					post: getCurrentPostId(),
+					content,
+					comment_type: 'block_comment',
+					comment_approved: 0,
+					parent: parent || 0,
+				},
+				{ throwOnError: true }
+			);
+
+			// If it's a main comment, update the block attributes with the comment id.
+			if ( ! parent && savedRecord?.id ) {
+				const clientId = getSelectedBlockClientId();
+				const metadata = getBlockAttributes( clientId )?.metadata;
+				updateBlockAttributes( clientId, {
+					metadata: {
+						...metadata,
+						commentId: savedRecord.id,
+					},
+				} );
+			}
+
+			createNotice(
+				'snackbar',
+				parent
+					? __( 'Reply added successfully.' )
+					: __( 'Comment added successfully.' ),
+				{
+					type: 'snackbar',
+					isDismissible: true,
+				}
+			);
+
+			return savedRecord;
+		} catch ( error ) {
+			onError( error );
+		}
+	};
+
+	const onEdit = async ( { id, content, status } ) => {
+		const messageType = status ? status : 'updated';
+		const messages = {
+			approved: __( 'Comment marked as resolved.' ),
+			hold: __( 'Comment reopened.' ),
+			updated: __( 'Comment updated.' ),
+		};
+
+		try {
+			await saveEntityRecord(
+				'root',
+				'comment',
+				{
+					id,
+					content,
+					status,
+				},
+				{ throwOnError: true }
+			);
+			createNotice(
+				'snackbar',
+				messages[ messageType ] ?? __( 'Comment updated.' ),
+				{
+					type: 'snackbar',
+					isDismissible: true,
+				}
+			);
+		} catch ( error ) {
+			onError( error );
+		}
+	};
+
+	const onDelete = async ( comment ) => {
+		try {
+			await deleteEntityRecord(
+				'root',
+				'comment',
+				comment.id,
+				undefined,
+				{
+					throwOnError: true,
+				}
+			);
+
+			if ( ! comment.parent ) {
+				const clientId = getSelectedBlockClientId();
+				const metadata = getBlockAttributes( clientId )?.metadata;
+				updateBlockAttributes( clientId, {
+					metadata: {
+						...metadata,
+						commentId: undefined,
+					},
+				} );
+			}
+
+			createNotice( 'snackbar', __( 'Comment deleted successfully.' ), {
+				type: 'snackbar',
+				isDismissible: true,
+			} );
+		} catch ( error ) {
+			onError( error );
+		}
+	};
+
+	return { onCreate, onEdit, onDelete };
+}
+
+export function useEnableFloatingSidebar( enabled = false ) {
+	const registry = useRegistry();
+	useEffect( () => {
+		if ( ! enabled ) {
+			return;
+		}
+
+		return registry.subscribe( () => {
+			const activeSidebar = registry
+				.select( interfaceStore )
+				.getActiveComplementaryArea( 'core' );
+
+			if ( ! activeSidebar ) {
+				registry
+					.dispatch( interfaceStore )
+					.enableComplementaryArea( 'core', collabSidebarName );
+			}
+		} );
+	}, [ enabled, registry ] );
 }

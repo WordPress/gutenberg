@@ -43,7 +43,7 @@ test.describe( 'Pattern Overrides', () => {
 			await admin.visitSiteEditor( { postType: 'wp_block' } );
 
 			await page
-				.getByRole( 'region', { name: 'Patterns content' } )
+				.getByRole( 'region', { name: 'All patterns' } )
 				.getByRole( 'button', { name: 'add pattern' } )
 				.click();
 
