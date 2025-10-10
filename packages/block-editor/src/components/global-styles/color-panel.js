@@ -155,6 +155,8 @@ const popoverProps = {
 	placement: 'left-start',
 	offset: 36,
 	shift: true,
+	flip: true,
+	resize: false,
 };
 
 const { Tabs } = unlock( componentsPrivateApis );

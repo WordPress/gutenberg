@@ -40,6 +40,7 @@ export default function Header( {
 				<HStack
 					style={ { width: 'auto', flexShrink: 0 } }
 					spacing={ 2 }
+					className="admin-ui-page__header-actions"
 				>
 					{ actions }
 				</HStack>

@@ -17,7 +17,7 @@ function Page( {
 	children,
 	className,
 	actions,
-	hasPadding = true,
+	hasPadding = false,
 }: {
 	breadcrumbs?: React.ReactNode;
 	badges?: React.ReactNode;
@@ -41,13 +41,13 @@ function Page( {
 					actions={ actions }
 				/>
 			) }
-			<div
-				className={ clsx( 'admin-ui-page__content', {
-					'has-padding': hasPadding,
-				} ) }
-			>
-				{ children }
-			</div>
+			{ hasPadding ? (
+				<div className="admin-ui-page__content has-padding">
+					{ children }
+				</div>
+			) : (
+				children
+			) }
 		</NavigableRegion>
 	);
 }

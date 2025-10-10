@@ -217,7 +217,6 @@ export default function DataviewsPatterns() {
 						<PatternsActions />
 					</>
 				}
-				hasPadding={ false }
 			>
 				<DataViews
 					key={ categoryId + postType }

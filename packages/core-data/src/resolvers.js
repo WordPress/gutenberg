@@ -161,17 +161,39 @@ export const getEntityRecord =
 				! query
 			) {
 				if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-					const objectId = entityConfig.getSyncObjectId( key );
+					const objectType = `${ kind }/${ name }`;
+					const objectId = key;
+
+					// Use the new transient "read/write" config to compute transients for
+					// the sync provider. Otherwise these transients are not available
+					// if / until the record is edited. Use a copy of the record so that
+					// it does not change the behavior outside this experimental flag.
+					const recordWithTransients = { ...record };
+					Object.entries( entityConfig.transientEdits ?? {} )
+						.filter(
+							( [ propName, transientConfig ] ) =>
+								undefined ===
+									recordWithTransients[ propName ] &&
+								transientConfig &&
+								'object' === typeof transientConfig &&
+								'read' in transientConfig &&
+								'function' === typeof transientConfig.read
+						)
+						.forEach( ( [ propName, transientConfig ] ) => {
+							recordWithTransients[ propName ] =
+								transientConfig.read( recordWithTransients );
+						} );
 
 					getSyncProvider().register(
-						entityConfig.syncObjectType + '--edit',
+						objectType,
 						entityConfig.syncConfig
 					);
 
 					// Bootstraps the edited document (and load from peers).
 					await getSyncProvider().bootstrap(
-						entityConfig.syncObjectType + '--edit',
+						objectType,
 						objectId,
+						recordWithTransients,
 						( edits ) => {
 							dispatch( {
 								type: 'EDIT_ENTITY_RECORD',
