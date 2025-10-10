@@ -26,10 +26,9 @@ export default function TermsQueryInspectorControls( {
 	attributes,
 	setQuery,
 	setAttributes,
-	TagName,
 	clientId,
 } ) {
-	const { termQuery } = attributes;
+	const { termQuery, tagName: TagName } = attributes;
 	const {
 		taxonomy,
 		orderBy,

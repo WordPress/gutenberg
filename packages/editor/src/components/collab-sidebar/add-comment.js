@@ -7,26 +7,22 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
 import { focusCommentThread } from './utils';
 
-/**
- * Renders the UI for adding a comment in the Gutenberg editor's collaboration sidebar.
- *
- * @param {Object}   props                     - The component props.
- * @param {Function} props.onSubmit            - A callback function to be called when the user submits a comment.
- * @param {boolean}  props.showCommentBoard    - The function to edit the comment.
- * @param {Function} props.setShowCommentBoard - The function to delete the comment.
- * @param {Ref}      props.commentSidebarRef   - The ref to the comment sidebar.
- * @return {React.ReactNode} The rendered comment input UI.
- */
+const { useBlockElement } = unlock( blockEditorPrivateApis );
+
 export function AddComment( {
 	onSubmit,
 	showCommentBoard,
@@ -44,8 +40,10 @@ export function AddComment( {
 					? isUnmodifiedDefaultBlock( selectedBlock )
 					: false,
 			};
-		}
+		},
+		[]
 	);
+	const blockElement = useBlockElement( clientId );
 
 	if (
 		! showCommentBoard ||
@@ -55,8 +53,6 @@ export function AddComment( {
 	) {
 		return null;
 	}
-
-	const commentLabel = __( 'New Comment' );
 
 	return (
 		<VStack
@@ -75,9 +71,10 @@ export function AddComment( {
 				} }
 				onCancel={ () => {
 					setShowCommentBoard( false );
+					blockElement?.focus();
 				} }
 				submitButtonText={ _x( 'Comment', 'Add comment button' ) }
-				labelText={ commentLabel }
+				labelText={ __( 'New Comment' ) }
 			/>
 		</VStack>
 	);

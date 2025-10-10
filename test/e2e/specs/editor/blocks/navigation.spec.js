@@ -596,6 +596,93 @@ test.describe( 'Navigation block', () => {
 			await pageUtils.pressKeys( 'ArrowDown' );
 			await expect( navigation.getNavBlockInserter() ).toBeFocused();
 		} );
+
+		test( 'should preserve focus in sidebar text input when typing (@firefox)', async ( {
+			page,
+			editor,
+			requestUtils,
+			pageUtils,
+		} ) => {
+			// Create a navigation menu with one link
+			const createdMenu = await requestUtils.createNavigationMenu( {
+				title: 'Test Menu',
+				content: `<!-- wp:navigation-link {"label":"Home","url":"https://example.com"} /-->`,
+			} );
+
+			// Insert the navigation block
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: {
+					ref: createdMenu?.id,
+				},
+			} );
+
+			// Click on the navigation link label in the canvas to edit it
+			const linkLabel = editor.canvas.getByRole( 'textbox', {
+				name: 'Navigation link text',
+			} );
+			await linkLabel.click();
+			await pageUtils.pressKeys( 'primary+a' );
+			await page.keyboard.type( 'Updated Home' );
+
+			// Open the document settings sidebar
+			await editor.openDocumentSettingsSidebar();
+
+			// Tab to the sidebar settings panel
+			// First tab should go to the settings sidebar
+			await page.keyboard.press( 'Tab' );
+
+			// Find the text input in the sidebar
+			const textInput = page.getByRole( 'textbox', {
+				name: 'Text',
+			} );
+
+			// Tab until we reach the Text field in the sidebar
+			// This may take multiple tabs depending on other controls
+			for ( let i = 0; i < 10; i++ ) {
+				const focusedElement = await page.evaluate( () => {
+					const el = document.activeElement;
+					return {
+						tagName: el?.tagName,
+						label:
+							el?.getAttribute( 'aria-label' ) ||
+							el?.labels?.[ 0 ]?.textContent,
+						id: el?.id,
+					};
+				} );
+
+				if (
+					focusedElement.label?.includes( 'Text' ) &&
+					focusedElement.tagName === 'INPUT'
+				) {
+					break;
+				}
+
+				await page.keyboard.press( 'Tab' );
+			}
+
+			await expect( textInput ).toBeFocused();
+			await pageUtils.pressKeys( 'ArrowRight' );
+			// Type in the sidebar text input
+			await page.keyboard.type( ' Extra' );
+
+			// Verify the text was actually typed (change happened)
+			await expect( textInput ).toHaveValue( 'Updated Home Extra' );
+
+			// Tab again to move to the next field
+			await page.keyboard.press( 'Tab' );
+
+			// Check that focus is still within the document sidebar
+			const focusIsInSidebar = await page.evaluate( () => {
+				const activeEl = document.activeElement;
+				const sidebar = document.querySelector(
+					'.interface-interface-skeleton__sidebar'
+				);
+				return sidebar?.contains( activeEl );
+			} );
+
+			expect( focusIsInSidebar ).toBe( true );
+		} );
 	} );
 
 	test( 'Adding new links to a navigation block with existing inner blocks triggers creation of a single Navigation Menu', async ( {
@@ -818,6 +905,59 @@ test.describe( 'Navigation block', () => {
 			await unlinkButton.click();
 			await expect( linkInput ).toBeEnabled();
 			await expect( linkInput ).toHaveValue( '' );
+		} );
+
+		test( 'existing links with id but no binding remain editable', async ( {
+			editor,
+			page,
+			admin,
+			navigation,
+			requestUtils,
+		} ) => {
+			await admin.createNewPost();
+
+			// Create a menu with an existing link that has id but no binding
+			// This simulates existing sites before the binding feature
+			const menu = await requestUtils.createNavigationMenu( {
+				title: 'Test Menu',
+				content: `<!-- wp:navigation-link {"label":"Support","type":"page","id":${ testPage1.id },"url":"${ testPage1.link }","kind":"post-type"} /-->`,
+			} );
+
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: {
+					ref: menu.id,
+				},
+			} );
+
+			// Select the Navigation Link block
+			const navBlock = navigation.getNavBlock();
+			await editor.selectBlocks( navBlock );
+
+			const navLinkBlock = navBlock
+				.getByRole( 'document', {
+					name: 'Block: Page Link',
+				} )
+				.first();
+
+			await editor.selectBlocks( navLinkBlock );
+
+			// Check the Inspector controls for the Nav Link block
+			// to verify the Link field is enabled (not locked in entity mode)
+			await editor.openDocumentSettingsSidebar();
+			const settingsControls = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'tabpanel', { name: 'Settings' } );
+
+			await expect( settingsControls ).toBeVisible();
+
+			const linkInput = settingsControls.getByRole( 'textbox', {
+				name: 'Link',
+			} );
+
+			// For existing links with id but no binding, the input should be enabled
+			await expect( linkInput ).toBeEnabled();
+			await expect( linkInput ).toHaveValue( testPage1.link );
 		} );
 	} );
 } );

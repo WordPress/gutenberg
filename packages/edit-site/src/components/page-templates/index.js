@@ -254,7 +254,6 @@ export default function PageTemplates() {
 					<AddNewTemplate />
 				</>
 			}
-			hasPadding={ false }
 		>
 			<DataViews
 				key={ activeView }

@@ -644,6 +644,7 @@ function gutenberg_default_script_modules() {
 
 		$asset                    = require $asset_file;
 		$file_name                = str_replace( gutenberg_dir_path() . 'build-module/', '', $path );
+		$asset['dependencies']    = $asset['module_dependencies'] ?? array();
 		$all_assets[ $file_name ] = $asset;
 	}
 
