@@ -108,7 +108,7 @@ function block_core_breadcrumbs_get_hierarchical_post_type_breadcrumbs( $post_id
 		$breadcrumb_items[] = sprintf(
 			'<a href="%s">%s</a>',
 			esc_url( get_permalink( $ancestor_id ) ),
-			esc_html( get_the_title( $ancestor_id ) )
+			get_the_title( $ancestor_id )
 		);
 	}
 	return $breadcrumb_items;
