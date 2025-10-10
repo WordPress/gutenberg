@@ -22,27 +22,13 @@ function SectionBlockControls( { blockName, clientId, contentClientIds } ) {
 
 	const { hasButton, hasHeading } = useSelect(
 		( select ) => {
-			const { getBlockName } = select( blockEditorStore );
-			let foundButton = false;
-			let foundHeading = false;
-
-			for ( const contentClientId of contentClientIds ) {
-				const name = getBlockName( contentClientId );
-				if ( name === 'core/heading' ) {
-					foundHeading = true;
-				}
-				if ( name === 'core/button' ) {
-					foundButton = true;
-				}
-
-				if ( foundHeading && foundButton ) {
-					break;
-				}
-			}
-
+			const blockNames =
+				select( blockEditorStore ).getBlockNamesByClientId(
+					contentClientIds
+				);
 			return {
-				hasButton: foundButton,
-				hasHeading: foundHeading,
+				hasButton: blockNames.includes( 'core/button' ),
+				hasHeading: blockNames.includes( 'core/heading' ),
 			};
 		},
 		[ contentClientIds ]
