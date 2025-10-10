@@ -34,6 +34,7 @@ import { unlock } from '../../lock-unlock';
 import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
 import { getCommentExcerpt, focusCommentThread } from './utils';
+import { useFloatingThread } from './hooks';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 const { Menu } = unlock( componentsPrivateApis );
@@ -48,6 +49,7 @@ const { Menu } = unlock( componentsPrivateApis );
  * @param {Function} props.onCommentDelete     - The function to delete a comment.
  * @param {Function} props.setShowCommentBoard - The function to set the comment board visibility.
  * @param {Ref}      props.commentSidebarRef   - The ref to the comment sidebar.
+ * @param {boolean}  props.isFloating          - Whether to render floating threads.
  * @return {React.ReactNode} The rendered Comments component.
  */
 export function Comments( {
@@ -57,6 +59,7 @@ export function Comments( {
 	onCommentDelete,
 	setShowCommentBoard,
 	commentSidebarRef,
+	isFloating = false,
 } ) {
 	const [ selectedThread, setSelectedThread ] = useState();
 
@@ -91,7 +94,7 @@ export function Comments( {
 		);
 	}
 
-	return threads.map( ( thread ) => (
+	return threads.map( ( thread, index ) => (
 		<Thread
 			key={ thread.id }
 			thread={ thread }
@@ -102,6 +105,8 @@ export function Comments( {
 			setSelectedThread={ setSelectedThread }
 			setShowCommentBoard={ setShowCommentBoard }
 			commentSidebarRef={ commentSidebarRef }
+			isFloating={ isFloating }
+			previousThreadId={ threads[ index - 1 ]?.id }
 		/>
 	) );
 }
@@ -115,7 +120,15 @@ function Thread( {
 	setSelectedThread,
 	setShowCommentBoard,
 	commentSidebarRef,
+	isFloating = false,
+	previousThreadId,
 } ) {
+	const { y, refs } = useFloatingThread( {
+		isFloating,
+		thread,
+		previousThreadId,
+	} );
+
 	const { toggleBlockHighlight, selectBlock, toggleBlockSpotlight } = unlock(
 		useDispatch( blockEditorStore )
 	);
@@ -175,9 +188,10 @@ function Thread( {
 		<VStack
 			className={ clsx( 'editor-collab-sidebar-panel__thread', {
 				'is-selected': isSelected,
+				'is-floating': isFloating,
 			} ) }
 			id={ `comment-thread-${ thread.id }` }
-			spacing="2"
+			spacing={ isFloating ? '0' : '2' }
 			onClick={ handleCommentSelect }
 			onMouseEnter={ onMouseEnter }
 			onMouseLeave={ onMouseLeave }
@@ -205,6 +219,8 @@ function Thread( {
 			role="listitem"
 			aria-label={ ariaLabel }
 			aria-expanded={ isSelected }
+			ref={ isFloating ? refs.setFloating : undefined }
+			style={ isFloating ? { top: y } : undefined }
 		>
 			<Button
 				className="editor-collab-sidebar-panel__skip-link"

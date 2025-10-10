@@ -1,11 +1,29 @@
 /**
+ * External dependencies
+ */
+import {
+	useFloating,
+	offset as offsetMiddleware,
+	autoUpdate,
+} from '@floating-ui/react-dom';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useEffect, useMemo } from '@wordpress/element';
+import {
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+	useCallback,
+} from '@wordpress/element';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as interfaceStore } from '@wordpress/interface';
@@ -15,6 +33,9 @@ import { store as interfaceStore } from '@wordpress/interface';
  */
 import { store as editorStore } from '../../store';
 import { collabSidebarName } from './constants';
+import { unlock } from '../../lock-unlock';
+
+const { useBlockElementRef } = unlock( blockEditorPrivateApis );
 
 export function useBlockComments( postId ) {
 	const queryArgs = {
@@ -271,4 +292,89 @@ export function useEnableFloatingSidebar( enabled = false ) {
 			}
 		} );
 	}, [ enabled, registry ] );
+}
+
+export function useFloatingThread( { isFloating, thread, previousThreadId } ) {
+	const blockRef = useRef();
+	useBlockElementRef( thread.blockClientId, blockRef );
+
+	// Floating-specific state management
+	const [ heights, setHeights ] = useState( {} );
+	const offsetsRef = useRef( {} );
+
+	const updateHeight = useCallback( ( id, newHeight ) => {
+		setHeights( ( prev ) => {
+			if ( prev[ id ] !== newHeight ) {
+				return { ...prev, [ id ]: newHeight };
+			}
+			return prev;
+		} );
+	}, [] );
+
+	const updateOffsets = useCallback( ( id, offset ) => {
+		offsetsRef.current[ id ] = offset;
+	}, [] );
+
+	const selectedBlockElementRect = isFloating
+		? blockRef.current?.getBoundingClientRect()
+		: null;
+	const initialOffsetTop = selectedBlockElementRect?.top;
+
+	const previousOffset =
+		isFloating && previousThreadId
+			? offsetsRef.current[ previousThreadId ]
+			: 0;
+
+	const previousBoardHeight =
+		isFloating && heights[ previousThreadId ]
+			? heights[ previousThreadId ]
+			: 0;
+
+	// If the previous comment board is overlapping this comment, shift it down.
+	const calculateOffset = () => {
+		if (
+			previousOffset &&
+			initialOffsetTop < previousOffset + previousBoardHeight
+		) {
+			return previousOffset - initialOffsetTop + previousBoardHeight + 20;
+		}
+		return -16; // Remove top padding of the comment board so first comment visually aligns with block.
+	};
+
+	// Use floating-ui to track the block element's position. The crossAxis offset
+	// is calculated to avoid overlapping comment boards and will shift the board down.
+	const { y, refs } = useFloating( {
+		placement: 'right-start',
+		middleware: [
+			offsetMiddleware( {
+				crossAxis: calculateOffset(),
+			} ),
+		],
+		whileElementsMounted: autoUpdate,
+	} );
+
+	useEffect( () => {
+		if ( isFloating && blockRef.current ) {
+			refs.setReference( blockRef.current );
+		}
+	}, [ isFloating, blockRef, refs ] );
+
+	useEffect( () => {
+		if ( isFloating && y !== null && y !== 0 ) {
+			updateOffsets( thread.id, y, refs.floating?.current?.clientHeight );
+		}
+	}, [ isFloating, y, refs.floating, thread.id, updateOffsets ] );
+
+	useEffect( () => {
+		if ( isFloating && refs.floating?.current ) {
+			const newHeight = refs.floating?.current.scrollHeight;
+			updateHeight( thread.id, newHeight );
+		}
+	}, [ isFloating, thread.id, updateHeight, refs.floating ] );
+
+	return {
+		blockRef,
+		y,
+		refs,
+	};
 }
