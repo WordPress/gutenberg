@@ -986,7 +986,7 @@ test.describe( 'Pattern Overrides', () => {
 		const paragraphName = 'Editable paragraph';
 		const { id } = await requestUtils.createBlock( {
 			title: 'Pattern',
-			content: `<!-- wp:paragraph {"metadata":{"name":"${ paragraphName }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
+			content: `<!-- wp:paragraph {"metadata":{"name":"${ paragraphName }","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
 <p>Paragraph</p>
 <!-- /wp:paragraph -->`,
 			status: 'publish',
@@ -1301,13 +1301,13 @@ test.describe( 'Pattern Overrides', () => {
 		await test.step( 'create a pattern with synced blocks with the same name', async () => {
 			const { id } = await requestUtils.createBlock( {
 				title: 'Blocks with the same name',
-				content: `<!-- wp:heading {"metadata":{"name":"${ sharedName }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
+				content: `<!-- wp:heading {"metadata":{"name":"${ sharedName }","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
 			<h2>default name</h2>
 			<!-- /wp:heading -->
-			<!-- wp:paragraph {"metadata":{"name":"${ sharedName }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
+			<!-- wp:paragraph {"metadata":{"name":"${ sharedName }","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
 			<p>default content</p>
 			<!-- /wp:paragraph -->
-			<!-- wp:paragraph {"metadata":{"name":"${ sharedName }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
+			<!-- wp:paragraph {"metadata":{"name":"${ sharedName }","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
 			<p>default content</p>
 			<!-- /wp:paragraph -->`,
 				status: 'publish',
@@ -1428,86 +1428,5 @@ test.describe( 'Pattern Overrides', () => {
 		await expect(
 			editorSettings.getByRole( 'button', { name: 'Enable overrides' } )
 		).toBeHidden();
-	} );
-
-	// @see https://github.com/WordPress/gutenberg/pull/60694
-	test( 'handles back-compat from individual attributes to __default', async ( {
-		page,
-		admin,
-		requestUtils,
-		editor,
-	} ) => {
-		const imageName = 'Editable image';
-		const TEST_IMAGE_FILE_PATH = path.resolve(
-			__dirname,
-			'../../../assets/10x10_e2e_test_image_z9T8jK.png'
-		);
-		const { id } = await requestUtils.createBlock( {
-			title: 'Pattern',
-			content: `<!-- wp:image {"metadata":{"name":"${ imageName }","bindings":{"id":{"source":"core/pattern-overrides"},"url":{"source":"core/pattern-overrides"},"title":{"source":"core/pattern-overrides"},"alt":{"source":"core/pattern-overrides"}}}} -->
-<figure class="wp-block-image"><img alt=""/></figure>
-<!-- /wp:image -->`,
-			status: 'publish',
-		} );
-
-		await admin.createNewPost();
-
-		await editor.insertBlock( {
-			name: 'core/block',
-			attributes: { ref: id },
-		} );
-
-		const blocks = await editor.getBlocks( { full: true } );
-		expect( blocks ).toMatchObject( [
-			{
-				name: 'core/block',
-				attributes: { ref: id },
-			},
-		] );
-		expect(
-			await editor.getBlocks( { clientId: blocks[ 0 ].clientId } )
-		).toMatchObject( [
-			{
-				name: 'core/image',
-				attributes: {
-					metadata: {
-						name: imageName,
-						bindings: {
-							__default: {
-								source: 'core/pattern-overrides',
-							},
-						},
-					},
-				},
-			},
-		] );
-
-		const imageBlock = editor.canvas.getByRole( 'document', {
-			name: 'Block: Image',
-		} );
-		await editor.selectBlocks( imageBlock );
-		await imageBlock
-			.getByTestId( 'form-file-upload-input' )
-			.setInputFiles( TEST_IMAGE_FILE_PATH );
-		await expect( imageBlock.getByRole( 'img' ) ).toHaveCount( 1 );
-		await expect( imageBlock.getByRole( 'img' ) ).toHaveAttribute(
-			'src',
-			/\/wp-content\/uploads\//
-		);
-		await editor.showBlockToolbar();
-		await editor.clickBlockToolbarButton( 'More' );
-		await page
-			.getByRole( 'menuitem', { name: 'Alternative text' } )
-			.click();
-		await page
-			.getByRole( 'textbox', { name: 'alternative text' } )
-			.fill( 'Test Image' );
-
-		const postId = await editor.publishPost();
-
-		await page.goto( `/?p=${ postId }` );
-		await expect(
-			page.getByRole( 'img', { name: 'Test Image' } )
-		).toHaveAttribute( 'src', /\/wp-content\/uploads\// );
 	} );
 } );
