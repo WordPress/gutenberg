@@ -21,12 +21,15 @@ function render_block_core_term_description( $attributes, $content, $block ) {
 
 	// Get term from context or from the current query.
 	if ( isset( $block->context['termId'] ) && isset( $block->context['taxonomy'] ) ) {
-		$term_description = get_term( $block->context['termId'], $block->context['taxonomy'] );
+		$term = get_term( $block->context['termId'], $block->context['taxonomy'] );
+		if ( $term && ! is_wp_error( $term ) ) {
+			$term_description = $term->description;
+		}
 	} elseif ( is_category() || is_tag() || is_tax() ) {
 		$term_description = term_description();
 	}
 
-	if ( ! $term_description || is_wp_error( $term_description ) ) {
+	if ( empty( $term_description ) ) {
 		return '';
 	}
 
