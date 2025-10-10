@@ -206,6 +206,20 @@ function Thread( {
 			aria-label={ ariaLabel }
 			aria-expanded={ isSelected }
 		>
+			<Button
+				className="editor-collab-sidebar-panel__skip-link"
+				variant="secondary"
+				size="compact"
+				onClick={ () => {
+					focusCommentThread(
+						thread.id,
+						commentSidebarRef.current,
+						'textarea'
+					);
+				} }
+			>
+				{ __( 'Add New Comment' ) }
+			</Button>
 			{ ! relatedBlockElement && (
 				<Text as="p" weight={ 500 } variant="muted">
 					{ __( 'Original block deleted.' ) }

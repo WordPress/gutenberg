@@ -6,76 +6,37 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
+import { ToolbarGroup } from '@wordpress/components';
+import { list, grid } from '@wordpress/icons';
 import { memo, useMemo, useState } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { layout } from '@wordpress/icons';
-import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
+import { __, _x } from '@wordpress/i18n';
 import {
+	BlockControls,
 	BlockContextProvider,
 	__experimentalUseBlockPreview as useBlockPreview,
-	__experimentalBlockVariationPicker as BlockVariationPicker,
 	useBlockProps,
 	useInnerBlocksProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useEntityRecords } from '@wordpress/core-data';
-import {
-	createBlocksFromInnerBlocksTemplate,
-	store as blocksStore,
-} from '@wordpress/blocks';
 
 const TEMPLATE = [
 	[
-		'core/group',
+		'core/paragraph',
 		{
-			layout: {
-				type: 'flex',
-				orientation: 'horizontal',
-			},
-			style: {
-				spacing: {
-					blockGap: '0.5rem',
-				},
-			},
 			metadata: {
-				name: __( 'Term Name with Count' ),
+				name: __( 'Term Name' ),
+				bindings: {
+					content: {
+						source: 'core/term-data',
+						args: {
+							key: 'name',
+						},
+					},
+				},
 			},
 		},
-		[
-			[
-				'core/paragraph',
-				{
-					metadata: {
-						name: __( 'Term Name' ),
-						bindings: {
-							content: {
-								source: 'core/term-data',
-								args: {
-									key: 'name',
-								},
-							},
-						},
-					},
-				},
-			],
-			[
-				'core/paragraph',
-				{
-					placeholder: __( '(count)' ),
-					metadata: {
-						name: __( 'Term Count' ),
-						bindings: {
-							content: {
-								source: 'core/term-data',
-								args: {
-									key: 'count',
-								},
-							},
-						},
-					},
-				},
-			],
-		],
 	],
 ];
 
@@ -127,6 +88,7 @@ const MemoizedTermTemplateBlockPreview = memo( TermTemplateBlockPreview );
 
 export default function TermTemplateEdit( {
 	clientId,
+	attributes: { layout },
 	setAttributes,
 	context: {
 		termQuery: {
@@ -141,8 +103,8 @@ export default function TermTemplateEdit( {
 	},
 	__unstableLayoutClassNames,
 } ) {
+	const { type: layoutType, columnCount = 3 } = layout || {};
 	const [ activeBlockContextId, setActiveBlockContextId ] = useState();
-	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 
 	const queryArgs = {
 		hide_empty: hideEmpty,
@@ -174,28 +136,13 @@ export default function TermTemplateEdit( {
 		return perPage === 0 ? terms : terms.slice( 0, perPage );
 	}, [ terms, perPage ] );
 
-	const { blocks, variations, defaultVariation } = useSelect(
-		( select ) => {
-			const { getBlocks } = select( blockEditorStore );
-			const { getBlockVariations, getDefaultBlockVariation } =
-				select( blocksStore );
-
-			return {
-				blocks: getBlocks( clientId ),
-				variations: getBlockVariations( 'core/term-template', 'block' ),
-				defaultVariation: getDefaultBlockVariation(
-					'core/term-template',
-					'block'
-				),
-			};
-		},
+	const blocks = useSelect(
+		( select ) => select( blockEditorStore ).getBlocks( clientId ),
 		[ clientId ]
 	);
-
 	const blockProps = useBlockProps( {
 		className: __unstableLayoutClassNames,
 	} );
-
 	const blockContexts = useMemo(
 		() =>
 			filteredTerms?.map( ( term ) => ( {
@@ -207,46 +154,9 @@ export default function TermTemplateEdit( {
 		[ filteredTerms, taxonomy ]
 	);
 
-	// Show variation picker if no blocks exist.
-	if ( ! blocks?.length ) {
-		return (
-			<div { ...blockProps }>
-				<BlockVariationPicker
-					icon={ layout }
-					label={ __( 'Term Template' ) }
-					variations={ variations }
-					instructions={ __(
-						'Choose a layout for displaying terms:'
-					) }
-					onSelect={ ( nextVariation = defaultVariation ) => {
-						if ( nextVariation.attributes ) {
-							setAttributes( nextVariation.attributes );
-						}
-						if ( nextVariation.innerBlocks ) {
-							replaceInnerBlocks(
-								clientId,
-								createBlocksFromInnerBlocksTemplate(
-									nextVariation.innerBlocks
-								),
-								true
-							);
-						}
-					} }
-					allowSkip
-				/>
-			</div>
-		);
-	}
-
 	if ( isResolving ) {
 		return (
 			<ul { ...blockProps }>
-				<li className="wp-block-term term-loading">
-					<div className="term-loading-placeholder" />
-				</li>
-				<li className="wp-block-term term-loading">
-					<div className="term-loading-placeholder" />
-				</li>
 				<li className="wp-block-term term-loading">
 					<div className="term-loading-placeholder" />
 				</li>
@@ -258,37 +168,70 @@ export default function TermTemplateEdit( {
 		return <p { ...blockProps }> { __( 'No terms found.' ) }</p>;
 	}
 
+	const setDisplayLayout = ( newDisplayLayout ) =>
+		setAttributes( ( prevAttributes ) => ( {
+			layout: { ...prevAttributes.layout, ...newDisplayLayout },
+		} ) );
+
 	return (
 		<>
+			<BlockControls>
+				<ToolbarGroup
+					controls={ [
+						{
+							icon: list,
+							title: _x(
+								'List view',
+								'Term template block display setting'
+							),
+							onClick: () =>
+								setDisplayLayout( { type: 'default' } ),
+							isActive:
+								layoutType === 'default' ||
+								layoutType === 'constrained',
+						},
+						{
+							icon: grid,
+							title: _x(
+								'Grid view',
+								'Term template block display setting'
+							),
+							onClick: () =>
+								setDisplayLayout( {
+									type: 'grid',
+									columnCount,
+								} ),
+							isActive: layoutType === 'grid',
+						},
+					] }
+				/>
+			</BlockControls>
 			<ul { ...blockProps }>
-				{ blockContexts &&
-					blockContexts.map( ( blockContext ) => (
-						<BlockContextProvider
-							key={ blockContext.termId }
-							value={ blockContext }
-						>
-							{ blockContext.termId ===
-							( activeBlockContextId ||
-								blockContexts[ 0 ]?.termId ) ? (
-								<TermTemplateInnerBlocks
-									classList={ blockContext.classList }
-								/>
-							) : null }
-							<MemoizedTermTemplateBlockPreview
-								blocks={ blocks }
-								blockContextId={ blockContext.termId }
+				{ blockContexts?.map( ( blockContext ) => (
+					<BlockContextProvider
+						key={ blockContext.termId }
+						value={ blockContext }
+					>
+						{ blockContext.termId ===
+						( activeBlockContextId ||
+							blockContexts[ 0 ]?.termId ) ? (
+							<TermTemplateInnerBlocks
 								classList={ blockContext.classList }
-								setActiveBlockContextId={
-									setActiveBlockContextId
-								}
-								isHidden={
-									blockContext.termId ===
-									( activeBlockContextId ||
-										blockContexts[ 0 ]?.termId )
-								}
 							/>
-						</BlockContextProvider>
-					) ) }
+						) : null }
+						<MemoizedTermTemplateBlockPreview
+							blocks={ blocks }
+							blockContextId={ blockContext.termId }
+							classList={ blockContext.classList }
+							setActiveBlockContextId={ setActiveBlockContextId }
+							isHidden={
+								blockContext.termId ===
+								( activeBlockContextId ||
+									blockContexts[ 0 ]?.termId )
+							}
+						/>
+					</BlockContextProvider>
+				) ) }
 			</ul>
 		</>
 	);
