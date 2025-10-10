@@ -745,7 +745,7 @@ function isV2SourceFile( filename ) {
 		path.relative( process.cwd(), filename )
 	);
 
-	if ( ! /\/src\/.+\.(js|ts|tsx)$/.test( relativePath ) ) {
+	if ( ! /\/src\/.+\.(js|ts|tsx|scss)$/.test( relativePath ) ) {
 		return false;
 	}
 
@@ -841,6 +841,7 @@ async function watchMode() {
 				const startTime = Date.now();
 
 				await transpilePackage( packageName );
+				await compileStyles( packageName );
 				await bundlePackage( packageName );
 
 				const buildTime = Date.now() - startTime;
