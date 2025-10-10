@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { wordCount } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -32,7 +33,7 @@ const variations = [
 		scope: [ 'inserter', 'transform' ],
 		isActive: ( blockAttributes ) =>
 			blockAttributes?.displayMode === 'words',
-		icon,
+		icon: wordCount,
 	},
 ];
 
