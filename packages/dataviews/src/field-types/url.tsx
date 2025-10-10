@@ -26,9 +26,10 @@ import {
 } from '../constants';
 
 function sort( valueA: any, valueB: any, direction: SortDirection ) {
-	return direction === 'asc'
-		? valueA.localeCompare( valueB )
-		: valueB.localeCompare( valueA );
+	const a = valueA === null || valueA === undefined ? '' : String( valueA );
+	const b = valueB === null || valueB === undefined ? '' : String( valueB );
+
+	return direction === 'asc' ? a.localeCompare( b ) : b.localeCompare( a );
 }
 
 export default {

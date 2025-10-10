@@ -98,9 +98,13 @@ export default function getFieldTypeDefinition< Item >(
 				return direction === 'asc' ? a - b : b - a;
 			}
 
+			// Coerce values to strings before calling localeCompare.
+			const stringA = a === null || a === undefined ? '' : String( a );
+			const stringB = b === null || b === undefined ? '' : String( b );
+
 			return direction === 'asc'
-				? a.localeCompare( b )
-				: b.localeCompare( a );
+				? stringA.localeCompare( stringB )
+				: stringB.localeCompare( stringA );
 		},
 		isValid: {
 			custom: ( item: any, field: NormalizedField< any > ) => {

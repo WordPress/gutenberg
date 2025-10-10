@@ -25,10 +25,13 @@ import {
 	OPERATOR_STARTS_WITH,
 } from '../constants';
 
+// Coerce values to strings to avoid calling localeCompare on
+// undefined/null or non-string values which would throw.
 function sort( valueA: any, valueB: any, direction: SortDirection ) {
-	return direction === 'asc'
-		? valueA.localeCompare( valueB )
-		: valueB.localeCompare( valueA );
+	const a = valueA === null || valueA === undefined ? '' : String( valueA );
+	const b = valueB === null || valueB === undefined ? '' : String( valueB );
+
+	return direction === 'asc' ? a.localeCompare( b ) : b.localeCompare( a );
 }
 
 export default {
