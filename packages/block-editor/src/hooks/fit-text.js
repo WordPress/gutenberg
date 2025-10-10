@@ -86,7 +86,7 @@ function useFitText( { fitText, name, clientId } ) {
 			delayTimeoutRef.current = null;
 		}
 		if ( animationFrameRef.current ) {
-			cancelAnimationFrame( animationFrameRef.current );
+			window.cancelAnimationFrame( animationFrameRef.current );
 			animationFrameRef.current = null;
 		}
 		if ( animationTimeoutRef.current ) {
@@ -111,78 +111,68 @@ function useFitText( { fitText, name, clientId } ) {
 		// Always delay to let DOM settle (placeholders, etc)
 		delayTimeoutRef.current = setTimeout( () => {
 			delayTimeoutRef.current = null;
-			performCalculation();
+			isApplyingRef.current = true;
+
+			// Get or create style element with unique ID
+			const styleId = `fit-text-${ clientId }`;
+			let styleElement =
+				blockElement.ownerDocument.getElementById( styleId );
+			if ( ! styleElement ) {
+				styleElement =
+					blockElement.ownerDocument.createElement( 'style' );
+				styleElement.id = styleId;
+				blockElement.ownerDocument.head.appendChild( styleElement );
+			}
+
+			const blockSelector = `#block-${ clientId }`;
+			const computedStyle = window.getComputedStyle( blockElement );
+			const currentFontSize = parseFloat( computedStyle.fontSize );
+
+			// Run calculation without transitions
+			const applyStylesFn = ( css ) => {
+				styleElement.textContent = css;
+			};
+
+			optimizeFitText( blockElement, blockSelector, applyStylesFn );
+
+			const finalFontSize = parseFloat(
+				window.getComputedStyle( blockElement ).fontSize
+			);
+
+			// Check if this is the first calculation (initial load)
+			const isFirstCalculation = isFirstCalculationRef.current;
+			if ( isFirstCalculation ) {
+				isFirstCalculationRef.current = false;
+			}
+
+			if ( isFirstCalculation ) {
+				// First load: no animation
+				isApplyingRef.current = false;
+			} else {
+				// Animate: reset to current, then transition to final
+				styleElement.textContent = `${ blockSelector } { font-size: ${ currentFontSize }px !important; }`;
+
+				animationFrameRef.current = window.requestAnimationFrame(
+					() => {
+						animationFrameRef.current = null;
+						const transitionRule = `${ blockSelector } { transition: font-size 1s ease-out; }`;
+						styleElement.textContent = `${ transitionRule } ${ blockSelector } { font-size: ${ finalFontSize }px !important; }`;
+
+						animationTimeoutRef.current = setTimeout( () => {
+							animationTimeoutRef.current = null;
+							isApplyingRef.current = false;
+						}, 1050 );
+					}
+				);
+			}
 		}, 100 );
-	}, [ blockElement, clientId, hasFitTextSupport, fitText, cancelPendingOperations ] );
-
-	const performCalculation = useCallback( () => {
-		if ( ! blockElement || ! hasFitTextSupport || ! fitText ) {
-			return;
-		}
-
-		isApplyingRef.current = true;
-
-		// Get or create style element with unique ID
-		const styleId = `fit-text-${ clientId }`;
-		let styleElement = blockElement.ownerDocument.getElementById( styleId );
-		if ( ! styleElement ) {
-			styleElement = blockElement.ownerDocument.createElement( 'style' );
-			styleElement.id = styleId;
-			blockElement.ownerDocument.head.appendChild( styleElement );
-		}
-
-		const blockSelector = `#block-${ clientId }`;
-
-		// Store the current font size before calculation
-		const computedStyle = window.getComputedStyle( blockElement );
-		const currentFontSize = parseFloat( computedStyle.fontSize );
-
-		// Run calculation without transitions (applyStylesFn will be called during binary search)
-		const applyStylesFn = ( css ) => {
-			// No transition during binary search calculation
-			styleElement.textContent = css;
-		};
-
-		const finalFontSize = optimizeFitText(
-			blockElement,
-			blockSelector,
-			applyStylesFn
-		);
-
-		// Check if this is the first calculation (initial load)
-		const isFirstCalculation = isFirstCalculationRef.current;
-		if ( isFirstCalculation ) {
-			isFirstCalculationRef.current = false;
-		}
-
-		if ( isFirstCalculation ) {
-			// First load: no animation, instant sizing
-			styleElement.textContent = `${ blockSelector } { font-size: ${ finalFontSize }px !important; }`;
-			isApplyingRef.current = false;
-		} else {
-			// All subsequent changes: animate from current to final size
-			// Reset to current size without transition
-			styleElement.textContent = `${ blockSelector } { font-size: ${ currentFontSize }px !important; }`;
-
-			// Use requestAnimationFrame to apply the transition
-			animationFrameRef.current = requestAnimationFrame( () => {
-				animationFrameRef.current = null;
-
-				// Now apply the final size with transition
-				const transitionRule = `${ blockSelector } { transition: font-size 1s ease-out; }`;
-				styleElement.textContent =
-					transitionRule +
-					'\n' +
-					`${ blockSelector } { font-size: ${ finalFontSize }px !important; }`;
-
-				// Reset the flag after transition completes
-				animationTimeoutRef.current = setTimeout( () => {
-					animationTimeoutRef.current = null;
-					isApplyingRef.current = false;
-				}, 1050 ); // Slightly longer than transition duration
-			} );
-		}
-	}, [ blockElement, clientId, hasFitTextSupport, fitText ] );
+	}, [
+		blockElement,
+		clientId,
+		hasFitTextSupport,
+		fitText,
+		cancelPendingOperations,
+	] );
 
 	useEffect( () => {
 		if (
