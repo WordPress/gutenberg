@@ -17,6 +17,13 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
 
+// Block name constants
+const NAVIGATION_BLOCK_NAME = 'core/navigation';
+const TEMPLATE_PART_BLOCK_NAME = 'core/template-part';
+
+// Complementary area identifier for the block inspector
+const BLOCK_INSPECTOR_AREA = 'edit-post/block';
+
 /**
  * Component that renders the "Edit navigation" button for template parts
  * that contain navigation blocks.
@@ -35,13 +42,15 @@ function TemplatePartNavigationEditButton( { clientId } ) {
 				select( blockEditorStore );
 
 			// Check for Navigation blocks within this Template Part
-			const allNavigationBlocks = getBlocksByName( 'core/navigation' );
+			const allNavigationBlocks = getBlocksByName(
+				NAVIGATION_BLOCK_NAME
+			);
 			const navigationBlocksInTemplatePart = allNavigationBlocks.filter(
 				( blockId ) => {
 					// Check if this Navigation block is a descendant of the current Template Part
 					const templatePartParents = getBlockParentsByBlockName(
 						blockId,
-						'core/template-part',
+						TEMPLATE_PART_BLOCK_NAME,
 						true
 					);
 					return templatePartParents.includes( clientId );
@@ -66,11 +75,11 @@ function TemplatePartNavigationEditButton( { clientId } ) {
 			// Select the first Navigation block
 			selectBlock( firstNavigationBlockId );
 
-			// Flash the block for 1 second to make it obvious
+			// Flash the block for 500ms to make it obvious
 			flashBlock( firstNavigationBlockId, 500 );
 
 			// Enable the complementary area (inspector)
-			enableComplementaryArea( 'core', 'edit-post/block' );
+			enableComplementaryArea( 'core', BLOCK_INSPECTOR_AREA );
 		}
 	}, [
 		firstNavigationBlockId,
@@ -110,7 +119,7 @@ function TemplatePartNavigationEditButton( { clientId } ) {
  */
 const withTemplatePartNavigationEditButton = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const isTemplatePart = props.name === 'core/template-part';
+		const isTemplatePart = props.name === TEMPLATE_PART_BLOCK_NAME;
 
 		return (
 			<>
