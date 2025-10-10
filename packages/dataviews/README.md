@@ -1371,7 +1371,7 @@ Example:
 }
 ```
 
-By default, we add an empty value (label: "Select item"). The label can be overriden by providing an empty element (`{ value: '', label: 'Custom label for empty value'}`).
+The consumer must provide any empty/placeholder element in field.elements (for example { value: '', label: 'Select' }). DataForm will no longer inject a placeholder automatically.
 
 ### `filterBy`
 
