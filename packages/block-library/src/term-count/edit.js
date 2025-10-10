@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useBlockProps, BlockControls } from '@wordpress/block-editor';
-import { ToolbarGroup, ToolbarDropdownMenu } from '@wordpress/components';
+import { ToolbarDropdownMenu } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -67,13 +67,11 @@ export default function TermCountEdit( {
 	return (
 		<>
 			<BlockControls group="block">
-				<ToolbarGroup>
-					<ToolbarDropdownMenu
-						icon={ getBracketIcon( bracketType ) }
-						label={ __( 'Change bracket type' ) }
-						controls={ bracketTypeControls }
-					/>
-				</ToolbarGroup>
+				<ToolbarDropdownMenu
+					icon={ getBracketIcon( bracketType ) }
+					label={ __( 'Change bracket type' ) }
+					controls={ bracketTypeControls }
+				/>
 			</BlockControls>
 			<div { ...blockProps }>
 				{ formatTermCount( termCount, bracketType ) }
