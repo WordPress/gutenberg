@@ -3,11 +3,16 @@
  */
 import triggerFetch from '@wordpress/api-fetch';
 
-jest.mock( '@wordpress/api-fetch' );
+/**
+ * Internal dependencies
+ */
+import { syncManager } from '../sync';
 
-// Mock the sync provider
+jest.mock( '@wordpress/api-fetch' );
 jest.mock( '../sync', () => ( {
-	getSyncProvider: jest.fn(),
+	syncManager: {
+		load: jest.fn(),
+	},
 } ) );
 
 /**
@@ -21,7 +26,6 @@ import {
 	getAutosaves,
 	getCurrentUser,
 } from '../resolvers';
-import { getSyncProvider } from '../sync';
 
 describe( 'getEntityRecord', () => {
 	const POST_TYPE = { slug: 'post' };
@@ -47,7 +51,7 @@ describe( 'getEntityRecord', () => {
 			finishResolutions: jest.fn(),
 		} );
 		triggerFetch.mockReset();
-		getSyncProvider.mockClear();
+		syncManager.load.mockClear();
 	} );
 
 	afterEach( () => {
@@ -123,7 +127,7 @@ describe( 'getEntityRecord', () => {
 		);
 	} );
 
-	it( 'bootstraps entity with sync provider when __experimentalEnableSync is true', async () => {
+	it( 'loads entity with sync manager when __experimentalEnableSync is true', async () => {
 		const POST_RECORD = { id: 1, title: 'Test Post' };
 		const POST_RESPONSE = {
 			json: () => Promise.resolve( POST_RECORD ),
@@ -139,12 +143,6 @@ describe( 'getEntityRecord', () => {
 		];
 
 		window.__experimentalEnableSync = true;
-
-		const mockBootstrap = jest.fn();
-		getSyncProvider.mockReturnValue( {
-			bootstrap: mockBootstrap,
-			register: jest.fn(),
-		} );
 
 		const resolveSelectWithSync = {
 			getEntitiesConfig: jest.fn( () => ENTITIES_WITH_SYNC ),
@@ -163,14 +161,14 @@ describe( 'getEntityRecord', () => {
 			resolveSelect: resolveSelectWithSync,
 		} );
 
-		// Verify bootstrap was called with correct arguments.
-		expect( getSyncProvider ).toHaveBeenCalled();
-		expect( mockBootstrap ).toHaveBeenCalledTimes( 1 );
-		expect( mockBootstrap ).toHaveBeenCalledWith(
+		// Verify load was called with correct arguments.
+		expect( syncManager.load ).toHaveBeenCalledTimes( 1 );
+		expect( syncManager.load ).toHaveBeenCalledWith(
+			{},
 			'postType/post',
 			1,
 			POST_RECORD,
-			expect.any( Function )
+			{ editRecord: expect.any( Function ) }
 		);
 	} );
 
@@ -196,12 +194,6 @@ describe( 'getEntityRecord', () => {
 
 		window.__experimentalEnableSync = true;
 
-		const mockBootstrap = jest.fn();
-		getSyncProvider.mockReturnValue( {
-			bootstrap: mockBootstrap,
-			register: jest.fn(),
-		} );
-
 		const resolveSelectWithSync = {
 			getEntitiesConfig: jest.fn( () => ENTITIES_WITH_SYNC ),
 			getEditedEntityRecord: jest.fn(),
@@ -219,18 +211,18 @@ describe( 'getEntityRecord', () => {
 			resolveSelect: resolveSelectWithSync,
 		} );
 
-		// Verify bootstrap was called with correct arguments.
-		expect( getSyncProvider ).toHaveBeenCalled();
-		expect( mockBootstrap ).toHaveBeenCalledTimes( 1 );
-		expect( mockBootstrap ).toHaveBeenCalledWith(
+		// Verify load was called with correct arguments.
+		expect( syncManager.load ).toHaveBeenCalledTimes( 1 );
+		expect( syncManager.load ).toHaveBeenCalledWith(
+			{},
 			'postType/post',
 			1,
 			{ ...POST_RECORD, foo: 'bar' },
-			expect.any( Function )
+			{ editRecord: expect.any( Function ) }
 		);
 	} );
 
-	it( 'does not bootstrap entity when query is present', async () => {
+	it( 'does not load entity when query is present', async () => {
 		const POST_RECORD = { id: 1, title: 'Test Post' };
 		const POST_RESPONSE = {
 			json: () => Promise.resolve( POST_RECORD ),
@@ -260,10 +252,10 @@ describe( 'getEntityRecord', () => {
 			resolveSelect: resolveSelectWithSync,
 		} );
 
-		expect( getSyncProvider ).not.toHaveBeenCalled();
+		expect( syncManager.load ).not.toHaveBeenCalled();
 	} );
 
-	it( 'does not bootstrap entity when __experimentalEnableSync is undefined', async () => {
+	it( 'does not load entity when __experimentalEnableSync is undefined', async () => {
 		const POST_RECORD = { id: 1, title: 'Test Post' };
 		const POST_RESPONSE = {
 			json: () => Promise.resolve( POST_RECORD ),
@@ -294,7 +286,7 @@ describe( 'getEntityRecord', () => {
 			resolveSelect: resolveSelectWithSync,
 		} );
 
-		expect( getSyncProvider ).not.toHaveBeenCalled();
+		expect( syncManager.load ).not.toHaveBeenCalled();
 	} );
 } );
 

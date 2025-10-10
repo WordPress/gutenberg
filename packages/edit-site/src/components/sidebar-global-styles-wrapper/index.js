@@ -132,7 +132,6 @@ export default function GlobalStylesUIWrapper() {
 			}
 			className="edit-site-styles"
 			title={ __( 'Styles' ) }
-			hasPadding={ false }
 		>
 			<GlobalStylesUI path={ section } onPathChange={ onChangeSection } />
 		</Page>

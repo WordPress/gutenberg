@@ -17,6 +17,7 @@ import {
 	InspectorControls,
 	RichText,
 	useBlockProps,
+	useBlockEditingMode,
 	store as blockEditorStore,
 	getColorClassName,
 } from '@wordpress/block-editor';
@@ -129,7 +130,16 @@ export default function NavigationSubmenuEdit( {
 } ) {
 	const { label, url, description } = attributes;
 
-	const { showSubmenuIcon, maxNestingLevel, openSubmenusOnClick } = context;
+	const {
+		showSubmenuIcon,
+		maxNestingLevel,
+		openSubmenusOnClick: contextOpenSubmenusOnClick,
+	} = context;
+	const blockEditingMode = useBlockEditingMode();
+
+	// Force click-only behavior in contentOnly mode to prevent hover dropdowns
+	const openSubmenusOnClick =
+		blockEditingMode !== 'default' ? true : contextOpenSubmenusOnClick;
 
 	// URL binding logic
 	const { clearBinding, createBinding } = useEntityBinding( {
@@ -421,17 +431,20 @@ export default function NavigationSubmenuEdit( {
 								speak( __( 'Link removed.' ), 'assertive' );
 							} }
 							onChange={ ( updatedValue ) => {
-								updateAttributes(
+								// updateAttributes determines the final state and returns metadata
+								const { isEntityLink } = updateAttributes(
 									updatedValue,
 									setAttributes,
 									attributes
 								);
 
-								// Handle URL binding
-								if ( ! updatedValue?.id ) {
-									clearBinding();
-								} else {
+								// Handle URL binding based on the final computed state
+								// Only create bindings for entity links (posts, pages, taxonomies)
+								// Never create bindings for custom links (manual URLs)
+								if ( isEntityLink ) {
 									createBinding();
+								} else {
+									clearBinding();
 								}
 							} }
 						/>

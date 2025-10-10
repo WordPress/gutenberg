@@ -42,7 +42,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		$breadcrumb_items[] = sprintf(
 			'<a href="%s">%s</a>',
 			esc_url( home_url() ),
-			esc_html( __( 'Home' ) )
+			esc_html__( 'Home' )
 		);
 	}
 
@@ -53,16 +53,15 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		$breadcrumb_items[] = sprintf(
 			'<a href="%s">%s</a>',
 			esc_url( get_permalink( $ancestor_id ) ),
-			esc_html( get_the_title( $ancestor_id ) )
+			get_the_title( $ancestor_id )
 		);
 	}
 
 	// Add current post title (not linked).
-	$breadcrumb_items[] = sprintf( '<span>%s</span>', esc_html( get_the_title( $post ) ) );
-
+	$breadcrumb_items[] = sprintf( '<span>%s</span>', get_the_title( $post ) );
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
-			'style'      => '--separator: "' . esc_attr( $separator ) . '";',
+			'style'      => '--separator: "' . addcslashes( $separator, '\\"' ) . '";',
 			'aria-label' => __( 'Breadcrumbs' ),
 		)
 	);
@@ -73,7 +72,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		implode(
 			'',
 			array_map(
-				function ( $item ) {
+				static function ( $item ) {
 					return '<li>' . $item . '</li>';
 				},
 				$breadcrumb_items

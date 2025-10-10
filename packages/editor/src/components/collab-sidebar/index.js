@@ -30,6 +30,7 @@ import {
 	useBlockCommentsActions,
 	useEnableFloatingSidebar,
 } from './hooks';
+import { focusCommentThread } from './utils';
 
 /**
  * External dependencies
@@ -156,11 +157,22 @@ function FloatingCommentBoard( {
  */
 export default function CollabSidebar() {
 	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
+	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const [ heights, setHeights ] = useState( {} );
 	const [ boardOffsets, setBoardOffsets ] = useState( {} );
 	const [ blockRefs, setBlockRefs ] = useState( {} );
+
+	const blockCommentId = useSelect( ( select ) => {
+		const { getBlockAttributes, getSelectedBlockClientId } =
+			select( blockEditorStore );
+		const clientId = getSelectedBlockClientId();
+		return clientId
+			? getBlockAttributes( clientId )?.metadata?.commentId
+			: null;
+	}, [] );
+
 	const [ selectedThread, setSelectedThread ] = useState( null );
 
 	const updateHeight = useCallback( ( id, newHeight ) => {
@@ -180,23 +192,6 @@ export default function CollabSidebar() {
 			postId: getCurrentPostId(),
 		};
 	}, [] );
-
-	const { blockCommentId } = useSelect( ( select ) => {
-		const { getBlockAttributes, getSelectedBlockClientId } =
-			select( blockEditorStore );
-		const _clientId = getSelectedBlockClientId();
-
-		return {
-			blockCommentId: _clientId
-				? getBlockAttributes( _clientId )?.metadata?.commentId
-				: null,
-		};
-	}, [] );
-
-	const openCollabBoard = () => {
-		setShowCommentBoard( true );
-		enableComplementaryArea( 'core', collabHistorySidebarName );
-	};
 
 	const { resultComments, unresolvedSortedThreads, totalPages } =
 		useBlockComments( postId );
@@ -278,15 +273,36 @@ export default function CollabSidebar() {
 		return null;
 	}
 
+	async function openTheSidebar() {
+		enableComplementaryArea( 'core', collabHistorySidebarName );
+		const activeArea = await getActiveComplementaryArea( 'core' );
+
+		// Move focus to the target element after the sidebar has opened.
+		if (
+			[ collabHistorySidebarName, collabSidebarName ].includes(
+				activeArea
+			)
+		) {
+			setShowCommentBoard( ! blockCommentId );
+			focusCommentThread(
+				blockCommentId,
+				commentSidebarRef.current,
+				// Focus a comment thread when there's a selected block with a comment.
+				! blockCommentId ? 'textarea' : undefined
+			);
+		}
+	}
+
 	return (
 		<>
 			{ blockCommentId && (
 				<CommentAvatarIndicator
 					thread={ currentThread }
 					hasMoreComments={ hasMoreComments }
+					onClick={ openTheSidebar }
 				/>
 			) }
-			<AddCommentMenuItem onClick={ openCollabBoard } />
+			<AddCommentMenuItem onClick={ openTheSidebar } />
 			<PluginSidebar
 				identifier={ collabHistorySidebarName }
 				// translators: Comments sidebar title
@@ -301,7 +317,7 @@ export default function CollabSidebar() {
 					commentSidebarRef={ commentSidebarRef }
 				/>
 			</PluginSidebar>
-			{ isLargeViewport && (
+			{ isLargeViewport && unresolvedSortedThreads.length > 0 && (
 				<PluginSidebar
 					isPinnable={ false }
 					header={ false }

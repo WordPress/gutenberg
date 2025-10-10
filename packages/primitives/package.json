@@ -25,6 +25,13 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"exports": {
+		".": {
+			"import": "./build-module/index.js",
+			"default": "./build/index.js"
+		},
+		"./package.json": "./package.json"
+	},
 	"react-native": "src/index",
 	"wpScript": true,
 	"types": "build-types",
@@ -32,7 +39,6 @@
 		"src/**/*.scss"
 	],
 	"dependencies": {
-		"@babel/runtime": "7.25.7",
 		"@wordpress/element": "file:../element",
 		"clsx": "^2.1.1"
 	},

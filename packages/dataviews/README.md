@@ -1371,7 +1371,6 @@ Example:
 }
 ```
 
-By default, we add an empty value (label: "Select item"). The label can be overriden by providing an empty element (`{ value: '', label: 'Custom label for empty value'}`).
 
 ### `filterBy`
 

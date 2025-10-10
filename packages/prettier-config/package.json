@@ -27,6 +27,10 @@
 		"lib/index.js"
 	],
 	"main": "lib/index.js",
+	"exports": {
+		".": "./lib/index.js",
+		"./package.json": "./package.json"
+	},
 	"types": "build-types",
 	"peerDependencies": {
 		"prettier": ">=3"

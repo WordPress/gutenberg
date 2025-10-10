@@ -334,9 +334,11 @@ export function BlockSettingsDropdown( {
 											</MenuItem>
 										</>
 									) }
-									<CommentIconSlotFill.Slot
-										fillProps={ { onClose } }
-									/>
+									{ count === 1 && (
+										<CommentIconSlotFill.Slot
+											fillProps={ { onClose } }
+										/>
+									) }
 								</MenuGroup>
 								{ canCopyStyles && ! isContentOnly && (
 									<MenuGroup>

@@ -8,7 +8,7 @@ import warning from '@wordpress/warning';
 /**
  * Internal dependencies
  */
-import i18nBlockSchema from './i18n-block.json';
+import i18nBlockSchema from './i18n-block.json' with { type: 'json' };
 import { store as blocksStore } from '../store';
 import { unlock } from '../lock-unlock';
 

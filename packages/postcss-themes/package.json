@@ -31,6 +31,10 @@
 		"index.js"
 	],
 	"main": "index.js",
+	"exports": {
+		".": "./index.js",
+		"./package.json": "./package.json"
+	},
 	"peerDependencies": {
 		"postcss": "^8.0.0"
 	},

@@ -24,6 +24,16 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.js",
+			"default": "./build/index.js"
+		},
+		"./README.md": "./README.md",
+		"./CONTRIBUTING.md": "./CONTRIBUTING.md",
+		"./package.json": "./package.json"
+	},
 	"react-native": "src/index",
 	"wpScript": true,
 	"types": "build-types",
@@ -33,7 +43,6 @@
 	],
 	"dependencies": {
 		"@ariakit/react": "^0.4.15",
-		"@babel/runtime": "7.25.7",
 		"@emotion/cache": "^11.7.1",
 		"@emotion/css": "^11.7.1",
 		"@emotion/react": "^11.7.1",
@@ -45,6 +54,7 @@
 		"@types/highlight-words-core": "1.2.1",
 		"@use-gesture/react": "^10.3.1",
 		"@wordpress/a11y": "file:../a11y",
+		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/date": "file:../date",
 		"@wordpress/deprecated": "file:../deprecated",

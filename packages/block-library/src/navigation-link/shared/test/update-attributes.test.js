@@ -1133,4 +1133,175 @@ describe( 'updateAttributes', () => {
 			);
 		} );
 	} );
+
+	describe( 'Return value metadata', () => {
+		describe( 'isEntityLink', () => {
+			it( 'should return true for entity links with id and non-custom kind', () => {
+				const setAttributes = jest.fn();
+				const linkSuggestion = {
+					id: 123,
+					kind: 'post-type',
+					type: 'page',
+					url: 'https://example.com/page',
+					title: 'Test Page',
+				};
+
+				const result = updateAttributes(
+					linkSuggestion,
+					setAttributes
+				);
+
+				expect( result ).toEqual( {
+					isEntityLink: true,
+				} );
+			} );
+
+			it( 'should return false for custom links even with id', () => {
+				const setAttributes = jest.fn();
+				const linkSuggestion = {
+					id: 123,
+					kind: 'custom',
+					type: 'custom',
+					url: 'https://example.com/custom',
+					title: 'Custom Link',
+				};
+
+				const result = updateAttributes(
+					linkSuggestion,
+					setAttributes
+				);
+
+				expect( result ).toEqual( {
+					isEntityLink: false,
+				} );
+			} );
+
+			it( 'should return false for links without id', () => {
+				const setAttributes = jest.fn();
+				const linkSuggestion = {
+					url: 'https://example.com',
+					title: 'Example',
+				};
+
+				const result = updateAttributes(
+					linkSuggestion,
+					setAttributes
+				);
+
+				expect( result ).toEqual( {
+					isEntityLink: false,
+				} );
+			} );
+
+			it( 'should return false when entity link is severed', () => {
+				const setAttributes = jest.fn();
+				const blockAttributes = {
+					id: 123,
+					type: 'page',
+					kind: 'post-type',
+					url: 'https://example.com/original-page',
+				};
+
+				const updatedValue = {
+					url: 'https://example.com/different-page',
+				};
+
+				const result = updateAttributes(
+					updatedValue,
+					setAttributes,
+					blockAttributes
+				);
+
+				// Should return false because the link was severed and converted to custom
+				expect( result ).toEqual( {
+					isEntityLink: false,
+				} );
+			} );
+
+			it( 'should return true when entity link is preserved through query string change', () => {
+				const setAttributes = jest.fn();
+				const blockAttributes = {
+					id: 123,
+					type: 'page',
+					kind: 'post-type',
+					url: 'https://example.com/page',
+				};
+
+				const updatedValue = {
+					url: 'https://example.com/page?foo=bar',
+				};
+
+				const result = updateAttributes(
+					updatedValue,
+					setAttributes,
+					blockAttributes
+				);
+
+				// Should return true because entity link is preserved
+				expect( result ).toEqual( {
+					isEntityLink: true,
+				} );
+			} );
+
+			it( 'should return false for mailto links', () => {
+				const setAttributes = jest.fn();
+				const linkSuggestion = {
+					id: 'mailto:test@example.com',
+					type: 'mailto',
+					url: 'mailto:test@example.com',
+					title: 'mailto:test@example.com',
+				};
+
+				const result = updateAttributes(
+					linkSuggestion,
+					setAttributes
+				);
+
+				// mailto links have kind: 'custom', so isEntityLink should be false
+				expect( result ).toEqual( {
+					isEntityLink: false,
+				} );
+			} );
+
+			it( 'should return false for tel links', () => {
+				const setAttributes = jest.fn();
+				const linkSuggestion = {
+					id: 'tel:5555555',
+					type: 'tel',
+					url: 'tel:5555555',
+					title: 'tel:5555555',
+				};
+
+				const result = updateAttributes(
+					linkSuggestion,
+					setAttributes
+				);
+
+				// tel links have kind: 'custom', so isEntityLink should be false
+				expect( result ).toEqual( {
+					isEntityLink: false,
+				} );
+			} );
+
+			it( 'should return true for taxonomy links', () => {
+				const setAttributes = jest.fn();
+				const linkSuggestion = {
+					id: 5,
+					kind: 'taxonomy',
+					type: 'category',
+					url: 'https://example.com/category/news',
+					title: 'News',
+				};
+
+				const result = updateAttributes(
+					linkSuggestion,
+					setAttributes
+				);
+
+				expect( result ).toEqual( {
+					isEntityLink: true,
+				} );
+			} );
+		} );
+	} );
 } );

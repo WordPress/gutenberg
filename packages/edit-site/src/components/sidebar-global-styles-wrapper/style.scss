@@ -1,4 +1,4 @@
-.edit-site-styles .admin-ui-page__content {
+.edit-site-styles {
 	.edit-site-global-styles-screen-root {
 		box-shadow: none;
 		& > div > hr {
@@ -26,24 +26,3 @@
 	}
 }
 
-.show-icon-labels {
-	.edit-site-styles .admin-ui-page__content {
-		.edit-site-page-header__actions {
-			.components-button.has-icon {
-				width: auto;
-				padding: 0 $grid-unit-10;
-
-				// Hide the button icons when labels are set to display...
-				svg {
-					display: none;
-				}
-				// ... and display labels.
-				&::after {
-					content: attr(aria-label);
-					font-size: $helptext-font-size;
-				}
-			}
-
-		}
-	}
-}
