@@ -64,8 +64,6 @@ function useFitText( { fitText, name, clientId } ) {
 	const isApplyingRef = useRef( false );
 	const isFirstCalculationRef = useRef( true );
 	const delayTimeoutRef = useRef( null );
-	const animationFrameRef = useRef( null );
-	const animationTimeoutRef = useRef( null );
 
 	// Monitor block attribute changes
 	// Any attribute may change the available space.
@@ -79,22 +77,6 @@ function useFitText( { fitText, name, clientId } ) {
 		[ clientId ]
 	);
 
-	// Cleanup function to cancel all pending async operations
-	const cancelPendingOperations = useCallback( () => {
-		if ( delayTimeoutRef.current ) {
-			clearTimeout( delayTimeoutRef.current );
-			delayTimeoutRef.current = null;
-		}
-		if ( animationFrameRef.current ) {
-			cancelAnimationFrame( animationFrameRef.current );
-			animationFrameRef.current = null;
-		}
-		if ( animationTimeoutRef.current ) {
-			clearTimeout( animationTimeoutRef.current );
-			animationTimeoutRef.current = null;
-		}
-	}, [] );
-
 	const applyFitText = useCallback( () => {
 		if ( ! blockElement || ! hasFitTextSupport || ! fitText ) {
 			return;
@@ -105,15 +87,18 @@ function useFitText( { fitText, name, clientId } ) {
 			return;
 		}
 
-		// Cancel any pending operations before starting new one
-		cancelPendingOperations();
+		// Clear any existing delay timeout
+		if ( delayTimeoutRef.current ) {
+			clearTimeout( delayTimeoutRef.current );
+			delayTimeoutRef.current = null;
+		}
 
 		// Always delay to let DOM settle (placeholders, etc)
 		delayTimeoutRef.current = setTimeout( () => {
 			delayTimeoutRef.current = null;
 			performCalculation();
 		}, 100 );
-	}, [ blockElement, clientId, hasFitTextSupport, fitText, cancelPendingOperations ] );
+	}, [ blockElement, clientId, hasFitTextSupport, fitText ] );
 
 	const performCalculation = useCallback( () => {
 		if ( ! blockElement || ! hasFitTextSupport || ! fitText ) {
@@ -164,25 +149,26 @@ function useFitText( { fitText, name, clientId } ) {
 			// Reset to current size without transition
 			styleElement.textContent = `${ blockSelector } { font-size: ${ currentFontSize }px !important; }`;
 
-			// Use requestAnimationFrame to apply the transition
-			animationFrameRef.current = requestAnimationFrame( () => {
-				animationFrameRef.current = null;
+			// Use two requestAnimationFrame to ensure browser renders the reset
+			requestAnimationFrame( () => {
+				requestAnimationFrame( () => {
+					// Now apply the final size with transition
+					const transitionRule = `${ blockSelector } { transition: font-size 1s ease-out; }`;
+					styleElement.textContent =
+						transitionRule +
+						'\n' +
+						`${ blockSelector } { font-size: ${ finalFontSize }px !important; }`;
 
-				// Now apply the final size with transition
-				const transitionRule = `${ blockSelector } { transition: font-size 1s ease-out; }`;
-				styleElement.textContent =
-					transitionRule +
-					'\n' +
-					`${ blockSelector } { font-size: ${ finalFontSize }px !important; }`;
-
-				// Reset the flag after transition completes
-				animationTimeoutRef.current = setTimeout( () => {
-					animationTimeoutRef.current = null;
-					isApplyingRef.current = false;
-				}, 1050 ); // Slightly longer than transition duration
+					// Reset the flag after transition completes
+					setTimeout( () => {
+						isApplyingRef.current = false;
+					}, 1050 ); // Slightly longer than transition duration
+				} );
 			} );
 		}
-	}, [ blockElement, clientId, hasFitTextSupport, fitText ] );
+		},
+		[ blockElement, clientId, hasFitTextSupport, fitText ]
+	);
 
 	useEffect( () => {
 		if (
@@ -213,8 +199,11 @@ function useFitText( { fitText, name, clientId } ) {
 				resizeObserver.disconnect();
 			}
 
-			// Cancel all pending operations
-			cancelPendingOperations();
+			// Clear any pending delay timeout
+			if ( delayTimeoutRef.current ) {
+				clearTimeout( delayTimeoutRef.current );
+				delayTimeoutRef.current = null;
+			}
 
 			const styleId = `fit-text-${ clientId }`;
 			const styleElement =
@@ -223,14 +212,7 @@ function useFitText( { fitText, name, clientId } ) {
 				styleElement.remove();
 			}
 		};
-	}, [
-		fitText,
-		clientId,
-		applyFitText,
-		blockElement,
-		hasFitTextSupport,
-		cancelPendingOperations,
-	] );
+	}, [ fitText, clientId, applyFitText, blockElement, hasFitTextSupport ] );
 
 	// Trigger fit text recalculation when content changes
 	useEffect( () => {
