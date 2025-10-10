@@ -17,6 +17,7 @@ import { sassPlugin } from 'esbuild-sass-plugin';
 import postcss from 'postcss';
 import autoprefixer from 'autoprefixer';
 import rtlcss from 'rtlcss';
+import cssnano from 'cssnano';
 
 /**
  * Internal dependencies
@@ -424,7 +425,10 @@ function resolveEntryPoint( packageDir, packageJson ) {
 		if ( rootExport ) {
 			// If it's an object with conditions, prefer 'import' over 'default'
 			if ( typeof rootExport === 'object' ) {
-				const entryFile = rootExport.import || rootExport.default || rootExport.require;
+				const entryFile =
+					rootExport.import ||
+					rootExport.default ||
+					rootExport.require;
 				if ( entryFile ) {
 					return path.join( packageDir, entryFile );
 				}
@@ -556,10 +560,11 @@ async function bundlePackage( packageName ) {
 		}
 	}
 
-	// Copy CSS files from build-style to build directory (for wpScript packages)
+	// Process CSS files from build-style to build directory (for wpScript packages)
 	if ( packageJson.wpScript ) {
 		const buildStyleDir = path.join( packageDir, 'build-style' );
 		const outputDir = path.join( PACKAGES_DIR, '..', 'build', packageName );
+		const isProduction = process.env.NODE_ENV === 'production';
 
 		try {
 			// Find CSS files in build-style directory
@@ -571,11 +576,41 @@ async function bundlePackage( packageName ) {
 				// Ensure output directory exists
 				await mkdir( outputDir, { recursive: true } );
 
-				// Copy each CSS file
+				// Process each CSS file
 				for ( const cssFile of cssFiles ) {
 					const filename = path.basename( cssFile );
 					const destPath = path.join( outputDir, filename );
-					builds.push( copyFile( cssFile, destPath ) );
+
+					if ( isProduction ) {
+						// In production, minify CSS with cssnano
+						builds.push(
+							( async () => {
+								const cssContent = await readFile(
+									cssFile,
+									'utf8'
+								);
+								const result = await postcss( [
+									cssnano( {
+										preset: [
+											'default',
+											{
+												discardComments: {
+													removeAll: true,
+												},
+											},
+										],
+									} ),
+								] ).process( cssContent, {
+									from: cssFile,
+									to: destPath,
+								} );
+								await writeFile( destPath, result.css );
+							} )()
+						);
+					} else {
+						// In development, just copy the file
+						builds.push( copyFile( cssFile, destPath ) );
+					}
 				}
 			}
 		} catch ( error ) {
