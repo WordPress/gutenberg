@@ -841,7 +841,6 @@ async function watchMode() {
 				const startTime = Date.now();
 
 				await transpilePackage( packageName );
-				await compileStyles( packageName );
 				await bundlePackage( packageName );
 
 				const buildTime = Date.now() - startTime;
