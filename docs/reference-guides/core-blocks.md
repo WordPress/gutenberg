@@ -984,7 +984,7 @@ Edit the different global regions of your site, like the header, footer, sidebar
 
 ## Term Count
 
-Displays the count of a taxonomy term. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/term-count))
+Displays the post count of a taxonomy term. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/term-count))
 
 -	**Name:** core/term-count
 -	**Experimental:** true

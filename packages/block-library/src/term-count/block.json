@@ -5,7 +5,7 @@
 	"name": "core/term-count",
 	"title": "Term Count",
 	"category": "theme",
-	"description": "Displays the count of a taxonomy term.",
+	"description": "Displays the post count of a taxonomy term.",
 	"textdomain": "default",
 	"usesContext": [ "termId", "taxonomy" ],
 	"attributes": {
