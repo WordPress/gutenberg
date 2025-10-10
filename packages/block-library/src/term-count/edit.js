@@ -14,22 +14,22 @@ import { useTermCount } from './use-term-count';
 const BRACKET_TYPES = {
 	none: { label: __( 'No Brackets' ) },
 	round: {
-		label: __( 'Round Brackets' ),
+		label: __( 'Round brackets' ),
 		before: '(',
 		after: ')',
 	},
 	square: {
-		label: __( 'Square Brackets' ),
+		label: __( 'Square brackets' ),
 		before: '[',
 		after: ']',
 	},
 	curly: {
-		label: __( 'Curly Brackets' ),
+		label: __( 'Curly brackets' ),
 		before: '{',
 		after: '}',
 	},
 	angle: {
-		label: __( 'Angle Brackets' ),
+		label: __( 'Angle brackets' ),
 		before: '<',
 		after: '>',
 	},
