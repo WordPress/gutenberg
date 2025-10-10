@@ -62,6 +62,8 @@ function useFitText( { fitText, name, clientId } ) {
 	const hasFitTextSupport = hasBlockSupport( name, FIT_TEXT_SUPPORT_KEY );
 	const blockElement = useBlockElement( clientId );
 	const isApplyingRef = useRef( false );
+	const isFirstCalculationRef = useRef( true );
+	const delayTimeoutRef = useRef( null );
 
 	// Monitor block attribute changes
 	// Any attribute may change the available space.
@@ -82,6 +84,24 @@ function useFitText( { fitText, name, clientId } ) {
 
 		// Prevent infinite loop from ResizeObserver triggering during our own changes
 		if ( isApplyingRef.current ) {
+			return;
+		}
+
+		// Clear any existing delay timeout
+		if ( delayTimeoutRef.current ) {
+			clearTimeout( delayTimeoutRef.current );
+			delayTimeoutRef.current = null;
+		}
+
+		// Always delay to let DOM settle (placeholders, etc)
+		delayTimeoutRef.current = setTimeout( () => {
+			delayTimeoutRef.current = null;
+			performCalculation();
+		}, 100 );
+	}, [ blockElement, clientId, hasFitTextSupport, fitText ] );
+
+	const performCalculation = useCallback( () => {
+		if ( ! blockElement || ! hasFitTextSupport || ! fitText ) {
 			return;
 		}
 
@@ -114,26 +134,41 @@ function useFitText( { fitText, name, clientId } ) {
 			applyStylesFn
 		);
 
-		// Reset to current size without transition
-		styleElement.textContent = `${ blockSelector } { font-size: ${ currentFontSize }px !important; }`;
+		// Check if this is the first calculation (initial load)
+		const isFirstCalculation = isFirstCalculationRef.current;
+		if ( isFirstCalculation ) {
+			isFirstCalculationRef.current = false;
+		}
 
-		// Use two requestAnimationFrame to ensure browser renders the reset
-		requestAnimationFrame( () => {
+		if ( isFirstCalculation ) {
+			// First load: no animation, instant sizing
+			styleElement.textContent = `${ blockSelector } { font-size: ${ finalFontSize }px !important; }`;
+			isApplyingRef.current = false;
+		} else {
+			// All subsequent changes: animate from current to final size
+			// Reset to current size without transition
+			styleElement.textContent = `${ blockSelector } { font-size: ${ currentFontSize }px !important; }`;
+
+			// Use two requestAnimationFrame to ensure browser renders the reset
 			requestAnimationFrame( () => {
-				// Now apply the final size with transition
-				const transitionRule = `${ blockSelector } { transition: font-size 1s ease-out; }`;
-				styleElement.textContent =
-					transitionRule +
-					'\n' +
-					`${ blockSelector } { font-size: ${ finalFontSize }px !important; }`;
+				requestAnimationFrame( () => {
+					// Now apply the final size with transition
+					const transitionRule = `${ blockSelector } { transition: font-size 1s ease-out; }`;
+					styleElement.textContent =
+						transitionRule +
+						'\n' +
+						`${ blockSelector } { font-size: ${ finalFontSize }px !important; }`;
 
-				// Reset the flag after transition completes
-				setTimeout( () => {
-					isApplyingRef.current = false;
-				}, 1050 ); // Slightly longer than transition duration
+					// Reset the flag after transition completes
+					setTimeout( () => {
+						isApplyingRef.current = false;
+					}, 1050 ); // Slightly longer than transition duration
+				} );
 			} );
-		} );
-	}, [ blockElement, clientId, hasFitTextSupport, fitText ] );
+		}
+		},
+		[ blockElement, clientId, hasFitTextSupport, fitText ]
+	);
 
 	useEffect( () => {
 		if (
@@ -162,6 +197,12 @@ function useFitText( { fitText, name, clientId } ) {
 		return () => {
 			if ( resizeObserver ) {
 				resizeObserver.disconnect();
+			}
+
+			// Clear any pending delay timeout
+			if ( delayTimeoutRef.current ) {
+				clearTimeout( delayTimeoutRef.current );
+				delayTimeoutRef.current = null;
 			}
 
 			const styleId = `fit-text-${ clientId }`;
@@ -193,6 +234,11 @@ function useFitText( { fitText, name, clientId } ) {
 				if ( idleCallbackId && window.cancelIdleCallback ) {
 					window.cancelIdleCallback( idleCallbackId );
 					idleCallbackId = null;
+				}
+				// Clear any pending delay timeout
+				if ( delayTimeoutRef.current ) {
+					clearTimeout( delayTimeoutRef.current );
+					delayTimeoutRef.current = null;
 				}
 			};
 
