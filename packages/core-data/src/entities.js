@@ -9,14 +9,16 @@ import { capitalCase, pascalCase } from 'change-case';
 import apiFetch from '@wordpress/api-fetch';
 import { __unstableSerializeAndClean, parse } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
-import { RichTextData } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
  */
 import {
+	applyPostChangesToCRDTDoc,
 	defaultApplyChangesToCRDTDoc,
 	defaultGetChangesFromCRDTDoc,
+	getPostChangesFromCRDTDoc,
+	getSyncedPropertiesForPostType,
 } from './utils/crdt';
 
 export const DEFAULT_ENTITY_KEY = 'id';
@@ -256,29 +258,6 @@ export const prePersistPostType = ( persistedRecord, edits ) => {
 	return newEdits;
 };
 
-const serialisableBlocksCache = new WeakMap();
-
-function makeBlockAttributesSerializable( attributes ) {
-	const newAttributes = { ...attributes };
-	for ( const [ key, value ] of Object.entries( attributes ) ) {
-		if ( value instanceof RichTextData ) {
-			newAttributes[ key ] = value.valueOf();
-		}
-	}
-	return newAttributes;
-}
-
-function makeBlocksSerializable( blocks ) {
-	return blocks.map( ( block ) => {
-		const { innerBlocks, attributes, ...rest } = block;
-		return {
-			...rest,
-			attributes: makeBlockAttributesSerializable( attributes ),
-			innerBlocks: makeBlocksSerializable( innerBlocks ),
-		};
-	} );
-}
-
 /**
  * Returns the list of post type entities.
  *
@@ -286,14 +265,14 @@ function makeBlocksSerializable( blocks ) {
  */
 async function loadPostTypeEntities() {
 	const postTypes = await apiFetch( {
-		path: '/wp/v2/types?context=view',
+		path: '/wp/v2/types?context=edit',
 	} );
 	return Object.entries( postTypes ?? {} ).map( ( [ name, postType ] ) => {
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
 			name
 		);
 		const namespace = postType?.rest_namespace ?? 'wp/v2';
-		const syncedProperties = new Set( [ 'blocks' ] );
+		const syncedProperties = getSyncedPropertiesForPostType( postType );
 
 		/**
 		 * @type {import('@wordpress/sync').SyncConfig}
@@ -307,41 +286,29 @@ async function loadPostTypeEntities() {
 			 * @param {Partial< import('@wordpress/sync').ObjectData >} changes
 			 * @return {void}
 			 */
-			applyChangesToCRDTDoc: ( crdtDoc, changes ) => {
-				const document = crdtDoc.getMap( 'document' );
-
-				Object.entries( changes ).forEach( ( [ key, value ] ) => {
-					if ( ! syncedProperties.has( key ) ) {
-						return;
-					}
-
-					if ( typeof value !== 'function' ) {
-						if ( key === 'blocks' ) {
-							if ( ! serialisableBlocksCache.has( value ) ) {
-								serialisableBlocksCache.set(
-									value,
-									makeBlocksSerializable( value )
-								);
-							}
-
-							value = serialisableBlocksCache.get( value );
-						}
-
-						if ( document.get( key ) !== value ) {
-							document.set( key, value );
-						}
-					}
-				} );
-			},
+			applyChangesToCRDTDoc: ( crdtDoc, changes ) =>
+				applyPostChangesToCRDTDoc(
+					crdtDoc,
+					changes,
+					postType,
+					syncedProperties
+				),
 
 			/**
 			 * Extract changes from a CRDT document that can be used to update the
 			 * local editor state.
 			 *
-			 * @param {import('@wordpress/sync').CRDTDoc} crdtDoc
+			 * @param {import('@wordpress/sync').CRDTDoc}    crdtDoc
+			 * @param {import('@wordpress/sync').ObjectData} record
 			 * @return {Partial< import('@wordpress/sync').ObjectData >} Changes to record
 			 */
-			getChangesFromCRDTDoc: defaultGetChangesFromCRDTDoc,
+			getChangesFromCRDTDoc: ( crdtDoc, record ) =>
+				getPostChangesFromCRDTDoc(
+					crdtDoc,
+					record,
+					postType,
+					syncedProperties
+				),
 
 			/**
 			 * Sync features supported by the entity.

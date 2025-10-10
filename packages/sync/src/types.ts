@@ -44,20 +44,15 @@ export type ProviderCreator = (
 
 export interface RecordHandlers {
 	editRecord: ( data: Partial< ObjectData > ) => void;
-	getEditedRecord: () => ObjectData;
+	getEditedRecord: () => Promise< ObjectData >;
 }
 
 export interface SyncConfig {
 	applyChangesToCRDTDoc: (
 		ydoc: Y.Doc,
-		changes: Partial< ObjectData >,
-		record: ObjectData
+		changes: Partial< ObjectData >
 	) => void;
-	getChangesFromCRDTDoc: (
-		ydoc: Y.Doc,
-		record: ObjectData,
-		origin: Origin
-	) => ObjectData;
+	getChangesFromCRDTDoc: ( ydoc: Y.Doc, record: ObjectData ) => ObjectData;
 	supports?: Record< string, true >;
 }
 

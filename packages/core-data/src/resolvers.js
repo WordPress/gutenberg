@@ -208,6 +208,13 @@ export const getEntityRecord =
 									},
 								} );
 							},
+							// Get the current entity record (with edits)
+							getEditedRecord: async () =>
+								await resolveSelect.getEditedEntityRecord(
+									kind,
+									name,
+									key
+								),
 						}
 					);
 				}

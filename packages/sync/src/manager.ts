@@ -17,7 +17,6 @@ import type {
 	ObjectID,
 	ObjectData,
 	ObjectType,
-	Origin,
 	ProviderCreator,
 	RecordHandlers,
 	SyncConfig,
@@ -94,7 +93,7 @@ export function createSyncManager(): SyncManager {
 				return;
 			}
 
-			updateEntityRecord( objectType, objectId, transaction.origin );
+			void updateEntityRecord( objectType, objectId );
 		};
 
 		const entityState: EntityState = {
@@ -119,7 +118,7 @@ export function createSyncManager(): SyncManager {
 		recordMap.observeDeep( onRecordUpdate );
 
 		ydoc.transact( () => {
-			syncConfig.applyChangesToCRDTDoc( ydoc, record, record );
+			syncConfig.applyChangesToCRDTDoc( ydoc, record );
 		}, LOCAL_SYNC_MANAGER_ORIGIN );
 	}
 
@@ -168,7 +167,7 @@ export function createSyncManager(): SyncManager {
 		const ydoc = entityState?.ydoc;
 
 		ydoc?.transact( () => {
-			syncConfig?.applyChangesToCRDTDoc( ydoc, changes, record );
+			syncConfig?.applyChangesToCRDTDoc( ydoc, changes );
 		}, origin );
 	}
 
@@ -178,13 +177,11 @@ export function createSyncManager(): SyncManager {
 	 *
 	 * @param {ObjectType} objectType Object type of record to update.
 	 * @param {ObjectID}   objectId   Object ID of record to update.
-	 * @param {Origin}     origin     The origin of change.
 	 */
-	function updateEntityRecord(
+	async function updateEntityRecord(
 		objectType: ObjectType,
-		objectId: ObjectID,
-		origin: Origin
-	): void {
+		objectId: ObjectID
+	): Promise< void > {
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
 
@@ -198,8 +195,7 @@ export function createSyncManager(): SyncManager {
 		// them against the current entity record.
 		const changes = syncConfig.getChangesFromCRDTDoc(
 			ydoc,
-			handlers.getEditedRecord(),
-			origin
+			await handlers.getEditedRecord()
 		);
 
 		// This is a good spot to debug to see which changes are being synced. Note
