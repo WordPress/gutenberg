@@ -28,7 +28,6 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "7.25.7",
 		"@wordpress/components": "file:../components",
 		"@wordpress/element": "file:../element",
 		"clsx": "^2.1.1"

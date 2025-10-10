@@ -27,6 +27,10 @@
 		"index.js"
 	],
 	"main": "index.js",
+	"exports": {
+		".": "./index.js",
+		"./package.json": "./package.json"
+	},
 	"publishConfig": {
 		"access": "public"
 	}
