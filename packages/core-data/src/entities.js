@@ -294,6 +294,63 @@ async function loadPostTypeEntities() {
 		);
 		const namespace = postType?.rest_namespace ?? 'wp/v2';
 		const syncedProperties = new Set( [ 'blocks' ] );
+
+		/**
+		 * @type {import('@wordpress/sync').SyncConfig}
+		 */
+		const syncConfig = {
+			/**
+			 * Apply changes from the local editor to the local CRDT document so
+			 * that those changes can be synced to other peers (via the provider).
+			 *
+			 * @param {import('@wordpress/sync').CRDTDoc}               crdtDoc
+			 * @param {Partial< import('@wordpress/sync').ObjectData >} changes
+			 * @return {void}
+			 */
+			applyChangesToCRDTDoc: ( crdtDoc, changes ) => {
+				const document = crdtDoc.getMap( 'document' );
+
+				Object.entries( changes ).forEach( ( [ key, value ] ) => {
+					if ( ! syncedProperties.has( key ) ) {
+						return;
+					}
+
+					if ( typeof value !== 'function' ) {
+						if ( key === 'blocks' ) {
+							if ( ! serialisableBlocksCache.has( value ) ) {
+								serialisableBlocksCache.set(
+									value,
+									makeBlocksSerializable( value )
+								);
+							}
+
+							value = serialisableBlocksCache.get( value );
+						}
+
+						if ( document.get( key ) !== value ) {
+							document.set( key, value );
+						}
+					}
+				} );
+			},
+
+			/**
+			 * Extract changes from a CRDT document that can be used to update the
+			 * local editor state.
+			 *
+			 * @param {import('@wordpress/sync').CRDTDoc} crdtDoc
+			 * @return {Partial< import('@wordpress/sync').ObjectData >} Changes to record
+			 */
+			getChangesFromCRDTDoc: defaultGetChangesFromCRDTDoc,
+
+			/**
+			 * Sync features supported by the entity.
+			 *
+			 * @type {Record< string, boolean >}
+			 */
+			supports: {},
+		};
+
 		return {
 			kind: 'postType',
 			baseURL: `/${ namespace }/${ postType.rest_base }`,
@@ -314,58 +371,7 @@ async function loadPostTypeEntities() {
 					: String( record.id ) ),
 			__unstablePrePersist: isTemplate ? undefined : prePersistPostType,
 			__unstable_rest_base: postType.rest_base,
-			syncConfig: {
-				/**
-				 * Apply changes from the local editor to the local CRDT document so
-				 * that those changes can be synced to other peers (via the provider).
-				 *
-				 * @param {import('@wordpress/sync').CRDTDoc}               crdtDoc
-				 * @param {Partial< import('@wordpress/sync').ObjectData >} changes
-				 * @return {void}
-				 */
-				applyChangesToCRDTDoc: ( crdtDoc, changes ) => {
-					const document = crdtDoc.getMap( 'document' );
-
-					Object.entries( changes ).forEach( ( [ key, value ] ) => {
-						if ( ! syncedProperties.has( key ) ) {
-							return;
-						}
-
-						if ( typeof value !== 'function' ) {
-							if ( key === 'blocks' ) {
-								if ( ! serialisableBlocksCache.has( value ) ) {
-									serialisableBlocksCache.set(
-										value,
-										makeBlocksSerializable( value )
-									);
-								}
-
-								value = serialisableBlocksCache.get( value );
-							}
-
-							if ( document.get( key ) !== value ) {
-								document.set( key, value );
-							}
-						}
-					} );
-				},
-
-				/**
-				 * Extract changes from a CRDT document that can be used to update the
-				 * local editor state.
-				 *
-				 * @param {import('@wordpress/sync').CRDTDoc} crdtDoc
-				 * @return {Partial< import('@wordpress/sync').ObjectData >} Changes to record
-				 */
-				getChangesFromCRDTDoc: defaultGetChangesFromCRDTDoc,
-
-				/**
-				 * Sync features supported by the entity.
-				 *
-				 * @type {Record< string, boolean >}
-				 */
-				supports: {},
-			},
+			syncConfig,
 			supportsPagination: true,
 			getRevisionsUrl: ( parentId, revisionId ) =>
 				`/${ namespace }/${
