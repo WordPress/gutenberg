@@ -119,7 +119,7 @@ function FloatingCommentBoard( {
 		}
 	}, [ thread.id, refs.floating, setBlockRef ] );
 
-	// When a thread is expanded or collapsed, recalculate its height after a short delay.
+	// When the selected thread changes, update heights, triggering offset recalculation.
 	useEffect( () => {
 		if ( refs.floating?.current ) {
 			const newHeight = refs.floating.current.scrollHeight;
@@ -208,30 +208,45 @@ export default function CollabSidebar() {
 		setBlockRefs( ( prev ) => ( { ...prev, [ id ]: blockRef } ) );
 	}, [] );
 
-	// Centralized offset calculator that calculates the positions for each thread.
+	/**
+	 * Calculate the y offsets for all comment threads. Account for potentially
+	 * overlapping threads and adjust their positions accordingly.
+	 */
 	const calculateAllOffsets = () => {
 		const offsets = {};
 		let previousThreadData = null;
 
+		// Co thru the comment threads from top to bottom.
 		unresolvedSortedThreads.forEach( ( thread ) => {
-			// Find the top of the thread. This is the normalized top position for the floater.
+			if ( ! blockRefs[ thread.id ] ) {
+				return;
+			}
+			// The thread's starting top position is determined by its
+			// associated block's position.
 			const blockElement = blockRefs[ thread.id ];
 			const blockRect = blockElement?.getBoundingClientRect();
 			const threadTop = blockRect?.top || 0;
+
+			// Heights are tracked by the comment threads themselves.
 			const threadHeight = heights[ thread.id ] || 0;
 
+			// By default, remove the top margin by shifting the block up
+			// so it more precisely aligns with the block.
 			let additionalOffset = -16;
-			// The first block does not need to move.
+
+			// The first block never needs to be adjusted.
 			if ( previousThreadData ) {
+				// Check if the thread overlaps with the previous one.
 				const previousBottom =
 					previousThreadData.threadTop +
 					previousThreadData.threadHeight;
 				if ( threadTop < previousBottom ) {
-					// Shift down to avoid overlap.
-					additionalOffset = previousBottom - threadTop + 24;
+					// Shift down by the difference plus a margin to avoid overlap.
+					additionalOffset = previousBottom - threadTop + 20;
 				}
 			}
 
+			// Store the current thread's position and height for the next iteration.
 			previousThreadData = {
 				threadTop: threadTop + additionalOffset,
 				threadHeight,
@@ -243,11 +258,11 @@ export default function CollabSidebar() {
 		return offsets;
 	};
 
-	// Recalculate offsets.
+	// Recalculate offsets whenever the heights change.
 	useEffect( () => {
 		const newOffsets = calculateAllOffsets();
 		setBoardOffsets( newOffsets );
-	}, [ blockCommentId, heights, calculateAllOffsets ] );
+	}, [ heights, calculateAllOffsets ] );
 
 	// Get the global styles to set the background color of the sidebar.
 	const { merged: GlobalStyles } = useGlobalStylesContext();
