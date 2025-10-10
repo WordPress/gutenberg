@@ -15,10 +15,16 @@ export type NormalizedPanelSummaryField = string[];
 export type RegularLayout = {
 	type: 'regular';
 	labelPosition?: LabelPosition;
+	/**
+	 * Spacing between individual fields when using the regular layout.
+	 * Defaults to 4.
+	 */
+	spacing?: number;
 };
 export type NormalizedRegularLayout = {
 	type: 'regular';
 	labelPosition: LabelPosition;
+	spacing: number;
 };
 
 export type PanelLayout = {
@@ -56,12 +62,22 @@ export type CardLayout =
 			// isOpened cannot be false if withHeader is false as well.
 			// Otherwise, the card would not be visible.
 			isOpened?: true;
+			/**
+			 * Spacing between separate cards when using the card layout.
+			 * Defaults to 4.
+			 */
+			spacing?: number;
 	  }
 	| {
 			type: 'card';
 			withHeader?: true | undefined;
 			isOpened?: boolean;
 			summary?: CardSummaryField;
+			/**
+			 * Spacing between separate cards when using the card layout.
+			 * Defaults to 4.
+			 */
+			spacing?: number;
 	  };
 export type NormalizedCardLayout =
 	| {
@@ -72,12 +88,14 @@ export type NormalizedCardLayout =
 			isOpened: true;
 			// Summary is an empty array
 			summary: [];
+			spacing: number;
 	  }
 	| {
 			type: 'card';
 			withHeader: true;
 			isOpened: boolean;
 			summary: NormalizedCardSummaryField;
+			spacing: number;
 	  };
 
 export type RowLayout = {
