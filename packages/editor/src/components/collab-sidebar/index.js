@@ -107,13 +107,14 @@ function FloatingCommentBoard( {
 		whileElementsMounted: autoUpdate,
 	} );
 
+	// Store the block reference for each thread.
 	useEffect( () => {
 		if ( blockRef.current ) {
 			refs.setReference( blockRef.current );
 		}
 	}, [ blockRef, refs ] );
 
-	// Track height changes.
+	// Track thread heights.
 	useEffect( () => {
 		if ( refs.floating?.current ) {
 			setBlockRef( thread.id, blockRef.current );
