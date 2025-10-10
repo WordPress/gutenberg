@@ -22,6 +22,12 @@ export type EntityID = string;
 export type ObjectID = string;
 export type ObjectType = string;
 
+// An origin is a value passed by the transactor to identify the source of a
+// change. It can be any value, and is not used internally by Yjs. Origins are
+// preserved locally, while a remote change will have the provider instance as
+// its origin.
+export type Origin = any;
+
 // Object data represents any entity record, post, term, user, site, etc. There
 // are not many expectations that can hold on its shape.
 export interface ObjectData extends Record< string, unknown > {}
@@ -38,14 +44,20 @@ export type ProviderCreator = (
 
 export interface RecordHandlers {
 	editRecord: ( data: Partial< ObjectData > ) => void;
+	getEditedRecord: () => ObjectData;
 }
 
 export interface SyncConfig {
 	applyChangesToCRDTDoc: (
 		ydoc: Y.Doc,
-		changes: Partial< ObjectData >
+		changes: Partial< ObjectData >,
+		record: ObjectData
 	) => void;
-	getChangesFromCRDTDoc: ( ydoc: Y.Doc ) => ObjectData;
+	getChangesFromCRDTDoc: (
+		ydoc: Y.Doc,
+		record: ObjectData,
+		origin: Origin
+	) => ObjectData;
 	supports?: Record< string, true >;
 }
 
@@ -62,6 +74,7 @@ export interface SyncManager {
 		objectType: ObjectType,
 		objectId: ObjectID,
 		changes: Partial< ObjectData >,
+		record: ObjectData,
 		origin: string
 	) => void;
 }

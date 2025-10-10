@@ -17,6 +17,7 @@ import type {
 	ObjectID,
 	ObjectData,
 	ObjectType,
+	Origin,
 	ProviderCreator,
 	RecordHandlers,
 	SyncConfig,
@@ -93,7 +94,7 @@ export function createSyncManager(): SyncManager {
 				return;
 			}
 
-			updateEntityRecord( objectType, objectId );
+			updateEntityRecord( objectType, objectId, transaction.origin );
 		};
 
 		const entityState: EntityState = {
@@ -118,7 +119,7 @@ export function createSyncManager(): SyncManager {
 		recordMap.observeDeep( onRecordUpdate );
 
 		ydoc.transact( () => {
-			syncConfig.applyChangesToCRDTDoc( ydoc, record );
+			syncConfig.applyChangesToCRDTDoc( ydoc, record, record );
 		}, LOCAL_SYNC_MANAGER_ORIGIN );
 	}
 
@@ -151,12 +152,14 @@ export function createSyncManager(): SyncManager {
 	 * @param {ObjectType}            objectType Object type.
 	 * @param {ObjectID}              objectId   Object ID.
 	 * @param {Partial< ObjectData >} changes    Updates to make.
+	 * @param {ObjectData}            record     Current entity record.
 	 * @param {string}                origin     The source of change.
 	 */
 	function updateCRDTDoc(
 		objectType: ObjectType,
 		objectId: ObjectID,
 		changes: Partial< ObjectData >,
+		record: ObjectData,
 		origin: string
 	): void {
 		const entityId = getEntityId( objectType, objectId );
@@ -165,7 +168,7 @@ export function createSyncManager(): SyncManager {
 		const ydoc = entityState?.ydoc;
 
 		ydoc?.transact( () => {
-			syncConfig?.applyChangesToCRDTDoc( ydoc, changes );
+			syncConfig?.applyChangesToCRDTDoc( ydoc, changes, record );
 		}, origin );
 	}
 
@@ -175,10 +178,12 @@ export function createSyncManager(): SyncManager {
 	 *
 	 * @param {ObjectType} objectType Object type of record to update.
 	 * @param {ObjectID}   objectId   Object ID of record to update.
+	 * @param {Origin}     origin     The origin of change.
 	 */
 	function updateEntityRecord(
 		objectType: ObjectType,
-		objectId: ObjectID
+		objectId: ObjectID,
+		origin: Origin
 	): void {
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
@@ -191,7 +196,11 @@ export function createSyncManager(): SyncManager {
 
 		// Determine which synced properties have actually changed by comparing
 		// them against the current entity record.
-		const changes = syncConfig.getChangesFromCRDTDoc( ydoc );
+		const changes = syncConfig.getChangesFromCRDTDoc(
+			ydoc,
+			handlers.getEditedRecord(),
+			origin
+		);
 
 		// This is a good spot to debug to see which changes are being synced. Note
 		// that `blocks` will always appear in the changes, but will only result
