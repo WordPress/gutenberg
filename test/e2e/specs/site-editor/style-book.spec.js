@@ -19,9 +19,6 @@ test.describe( 'Style Book', () => {
 	} );
 
 	test.beforeEach( async ( { admin, editor, styleBook, page } ) => {
-		await page.addInitScript( () => {
-			window.__experimentalEditorWriteMode = true;
-		} );
 		await admin.visitSiteEditor();
 		await editor.canvas.locator( 'body' ).click();
 		await styleBook.open();
