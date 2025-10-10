@@ -227,8 +227,8 @@ getEntityRecord.shouldInvalidate = ( action, kind, name ) => {
 		kind === 'root' &&
 		name === 'site' &&
 		( ( action.type === 'RECEIVE_ITEMS' &&
-			// Makeing sure persistedEdits is set seems to be the only way of
-			// knowing if it's an update or fetch.
+			// Making sure persistedEdits is set seems to be the only way of
+			// knowing whether it's an update or fetch.
 			action.persistedEdits &&
 			action.persistedEdits.status !== 'auto-draft' ) ||
 			action.type === 'REMOVE_ITEMS' ) &&
