@@ -20,6 +20,7 @@ import {
 	OPERATOR_BETWEEN,
 	SINGLE_SELECTION_OPERATORS,
 } from '../constants';
+import hasElements from './has-elements';
 
 const getValueFromId =
 	( id: string ) =>
@@ -81,7 +82,7 @@ function getFilterBy< Item >(
 		);
 
 		// The `between` operator is not supported when elements are provided.
-		if ( field.elements && operators.includes( OPERATOR_BETWEEN ) ) {
+		if ( hasElements( field ) && operators.includes( OPERATOR_BETWEEN ) ) {
 			operators = operators.filter(
 				( operator ) => operator !== OPERATOR_BETWEEN
 			);
@@ -119,7 +120,10 @@ function getFilterBy< Item >(
 
 	let defaultOperators = fieldTypeDefinition.filterBy.defaultOperators;
 	// The `between` operator is not supported when elements are provided.
-	if ( field.elements && defaultOperators.includes( OPERATOR_BETWEEN ) ) {
+	if (
+		hasElements( field ) &&
+		defaultOperators.includes( OPERATOR_BETWEEN )
+	) {
 		defaultOperators = defaultOperators.filter(
 			( operator ) => operator !== OPERATOR_BETWEEN
 		);
@@ -188,6 +192,7 @@ export default function normalizeFields< Item >(
 			sort,
 			isValid,
 			Edit,
+			hasElements: hasElements( field ),
 			enableHiding: field.enableHiding ?? true,
 			enableSorting:
 				field.enableSorting ??

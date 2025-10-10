@@ -6,7 +6,7 @@ import type {
 	SortDirection,
 	FieldTypeDefinition,
 } from '../types';
-import renderFromElements from './utils/render-from-elements';
+import RenderFromElements from './utils/render-from-elements';
 import {
 	OPERATOR_CONTAINS,
 	OPERATOR_IS,
@@ -33,8 +33,8 @@ export default {
 	},
 	Edit: 'text',
 	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
-		return field.elements
-			? renderFromElements( { item, field } )
+		return field.hasElements
+			? RenderFromElements( { item, field } )
 			: field.getValue( { item } );
 	},
 	enableSorting: true,

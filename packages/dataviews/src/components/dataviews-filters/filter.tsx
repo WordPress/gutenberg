@@ -61,6 +61,7 @@ import type {
 	View,
 	NormalizedField,
 } from '../../types';
+import useElements from '../../hooks/use-elements';
 
 interface FilterTextProps {
 	activeElements: Option[];
@@ -480,8 +481,10 @@ export default function Filter( {
 
 	let activeElements: Option[] = [];
 
-	if ( filter.elements.length > 0 ) {
-		activeElements = filter.elements.filter( ( element ) => {
+	const { elements } = useElements( filter.elements, filter.getElements );
+
+	if ( elements.length > 0 ) {
+		activeElements = elements.filter( ( element ) => {
 			if ( filter.singleSelection ) {
 				return element.value === filterInView?.value;
 			}
@@ -594,13 +597,14 @@ export default function Filter( {
 				return (
 					<VStack spacing={ 0 } justify="flex-start">
 						<OperatorSelector { ...commonProps } />
-						{ commonProps.filter.elements.length > 0 ? (
+						{ commonProps.filter.hasElements ? (
 							<SearchWidget
 								{ ...commonProps }
 								filter={ {
 									...commonProps.filter,
-									elements: commonProps.filter.elements,
+									elements,
 								} }
+								fields={ fields }
 							/>
 						) : (
 							<InputWidget { ...commonProps } fields={ fields } />

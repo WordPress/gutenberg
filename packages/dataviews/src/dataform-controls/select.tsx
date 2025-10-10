@@ -1,13 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { privateApis } from '@wordpress/components';
-import { useCallback } from '@wordpress/element';
+import { privateApis, Spinner } from '@wordpress/components';
+import { useCallback, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import type { DataFormControlProps } from '../types';
+import useElements from '../hooks/use-elements';
 import { unlock } from '../lock-unlock';
 import getCustomValidity from './utils/get-custom-validity';
 
@@ -31,7 +32,18 @@ export default function Select< Item >( {
 		[ data, onChange, setValue ]
 	);
 
-	const elements = field?.elements ?? [];
+	const { elements, isLoading } = useElements(
+		field.elements,
+		field.getElements
+	);
+
+	if ( isLoading ) {
+		return <Spinner />;
+	}
+
+	if ( elements.length === 0 ) {
+		return null;
+	}
 
 	return (
 		<ValidatedSelectControl

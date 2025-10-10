@@ -2,14 +2,28 @@
  * Internal dependencies
  */
 import type { DataViewRenderFieldProps } from '../../types';
+import useElements from '../../hooks/use-elements';
 
-export default function renderFromElements< Item >( {
+export default function RenderFromElements< Item >( {
 	item,
 	field,
 }: DataViewRenderFieldProps< Item > ) {
+	const { elements, isLoading } = useElements(
+		field.elements,
+		field.getElements
+	);
+
 	const value = field.getValue( { item } );
+	if ( isLoading ) {
+		return value;
+	}
+
+	if ( elements.length === 0 ) {
+		return value;
+	}
+
 	return (
-		field?.elements?.find( ( element ) => element.value === value )
-			?.label || field.getValue( { item } )
+		elements?.find( ( element ) => element.value === value )?.label ||
+		field.getValue( { item } )
 	);
 }

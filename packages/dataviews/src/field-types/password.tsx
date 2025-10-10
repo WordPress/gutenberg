@@ -6,7 +6,7 @@ import type {
 	SortDirection,
 	FieldTypeDefinition,
 } from '../types';
-import renderFromElements from './utils/render-from-elements';
+import RenderFromElements from './utils/render-from-elements';
 
 /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
 function sort( valueA: any, valueB: any, direction: SortDirection ) {
@@ -22,8 +22,8 @@ export default {
 	},
 	Edit: 'password',
 	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
-		return field.elements
-			? renderFromElements( { item, field } )
+		return field.hasElements
+			? RenderFromElements( { item, field } )
 			: '••••••••';
 	},
 	enableSorting: false,

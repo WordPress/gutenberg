@@ -25,6 +25,7 @@ import {
 	OPERATOR_IS_NOT_ALL,
 	OPERATOR_BETWEEN,
 } from '../constants';
+import RenderFromElements from './utils/render-from-elements';
 
 function sort( a: any, b: any, direction: SortDirection ) {
 	return direction === 'asc' ? a - b : b - a;
@@ -50,21 +51,9 @@ export default {
 	},
 	Edit: 'number',
 	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
-		const value = field.getValue( { item } );
-		if ( ! isEmpty( value ) && field.elements ) {
-			const numericValue = Number( value );
-			const match = field.elements.find(
-				( element ) =>
-					Number.isFinite( Number( element.value ) ) &&
-					Number( element.value ) === numericValue
-			);
-			if ( match ) {
-				return match.label;
-			}
-		}
-
-		// TODO: remove this hardcoded value when the decimal number is configurable
-		return Number( value ).toFixed( 2 );
+		return field.hasElements
+			? RenderFromElements( { item, field } )
+			: Number( field.getValue( { item } ) ).toFixed( 2 );
 	},
 	enableSorting: true,
 	filterBy: {

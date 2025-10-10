@@ -282,6 +282,11 @@ export type Field< Item > = {
 	elements?: Option[];
 
 	/**
+	 * Retrieval function for elements.
+	 */
+	getElements?: () => Promise< Option[] >;
+
+	/**
 	 * Filter config for the field.
 	 */
 	filterBy?: FilterByConfig | false;
@@ -312,6 +317,7 @@ export type NormalizedField< Item > = Omit< Field< Item >, 'Edit' > & {
 	setValue: ( args: { item: Item; value: any } ) => DeepPartial< Item >;
 	render: ComponentType< DataViewRenderFieldProps< Item > >;
 	Edit: ComponentType< DataFormControlProps< Item > > | null;
+	hasElements: boolean;
 	sort: ( a: Item, b: Item, direction: SortDirection ) => number;
 	isValid: Rules< Item >;
 	enableHiding: boolean;

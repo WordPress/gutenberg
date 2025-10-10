@@ -12,14 +12,26 @@ import clsx from 'clsx';
 import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState, useMemo, useDeferredValue } from '@wordpress/element';
-import { VisuallyHidden, Icon, Composite } from '@wordpress/components';
+import {
+	VisuallyHidden,
+	Icon,
+	Composite,
+	Spinner,
+} from '@wordpress/components';
 import { search, check } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { getCurrentValue } from './utils';
-import type { Filter, NormalizedFilter, View, Option } from '../../types';
+import type {
+	Filter,
+	NormalizedFilter,
+	NormalizedField,
+	View,
+	Option,
+} from '../../types';
+import useElements from '../../hooks/use-elements';
 
 interface SearchWidgetProps {
 	view: View;
@@ -27,6 +39,7 @@ interface SearchWidgetProps {
 		elements: Option[];
 	};
 	onChangeView: ( view: View ) => void;
+	fields: NormalizedField< any >[];
 }
 
 function normalizeSearchInput( input = '' ) {
@@ -322,6 +335,27 @@ function ComboboxList( { view, filter, onChangeView }: SearchWidgetProps ) {
 }
 
 export default function SearchWidget( props: SearchWidgetProps ) {
-	const Widget = props.filter.elements.length > 10 ? ComboboxList : ListBox;
-	return <Widget { ...props } />;
+	const { elements, isLoading } = useElements(
+		props.filter.elements,
+		props.filter.getElements
+	);
+
+	if ( isLoading ) {
+		return (
+			<div className="dataviews-filters__search-widget-loading">
+				<Spinner />
+			</div>
+		);
+	}
+
+	if ( elements.length === 0 ) {
+		return (
+			<div className="dataviews-filters__search-widget-loading">
+				{ __( 'No elements found' ) }
+			</div>
+		);
+	}
+
+	const Widget = elements.length > 10 ? ComboboxList : ListBox;
+	return <Widget { ...props } filter={ { ...props.filter, elements } } />;
 }
