@@ -66,8 +66,6 @@ export default function Select< Item >( {
 		[ data, field, setValue ]
 	);
 
-	// Use field.elements as-is. The DataForm layer no longer injects an
-	// empty/placeholder option. Consumers must provide an empty element if needed.
 	const elements = field?.elements ?? [];
 
 	return (

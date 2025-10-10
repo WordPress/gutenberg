@@ -1371,7 +1371,6 @@ Example:
 }
 ```
 
-The consumer must provide any empty/placeholder element in field.elements (for example { value: '', label: 'Select' }). DataForm will no longer inject a placeholder automatically.
 
 ### `filterBy`
 
