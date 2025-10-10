@@ -11,5 +11,6 @@
  */
 export * as Y from 'yjs';
 
-export * from './private-apis';
+export { CRDT_RECORD_MAP_KEY, LOCAL_EDITOR_ORIGIN } from './config';
+export { createSyncManager } from './manager';
 export type * from './types';
