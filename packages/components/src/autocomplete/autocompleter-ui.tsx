@@ -22,12 +22,12 @@ import { __, _n, sprintf } from '@wordpress/i18n';
  */
 import getDefaultUseItems from './get-default-use-items';
 import Button from '../button';
-import Popover from '../popover';
 import { VisuallyHidden } from '../visually-hidden';
 import { createPortal } from 'react-dom';
 import type { AutocompleterUIProps, KeyedOption, WPCompleter } from './types';
+import DropdownMenu from '../dropdown-menu';
 
-type ListBoxProps = {
+type DropdownItemsProps = {
 	items: KeyedOption[];
 	onSelect: ( option: KeyedOption ) => void;
 	selectedIndex: number;
@@ -37,7 +37,7 @@ type ListBoxProps = {
 	Component?: React.ElementType;
 };
 
-function ListBox( {
+function DropdownItems( {
 	items,
 	onSelect,
 	selectedIndex,
@@ -45,11 +45,10 @@ function ListBox( {
 	listBoxId,
 	className,
 	Component = 'div',
-}: ListBoxProps ) {
+}: DropdownItemsProps ) {
 	return (
 		<Component
 			id={ listBoxId }
-			role="listbox"
 			className="components-autocomplete__results"
 		>
 			{ items.map( ( option, index ) => (
@@ -175,28 +174,37 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
 		}
 
 		return (
-			<>
-				<Popover
-					focusOnMount={ false }
-					onClose={ onReset }
-					placement="top-start"
+			<div>
+				<DropdownMenu
+					label={ __( 'Select a block.' ) }
+					defaultOpen
+					icon={ <></> }
 					className="components-autocomplete__popover"
-					anchor={ popoverAnchor }
 					ref={ popoverRefs }
+					popoverProps={ {
+						anchor: popoverAnchor,
+						onClose: onReset,
+					} }
+					onClose={ onReset }
+					focusOnMount={ false }
 				>
-					<ListBox
-						items={ items }
-						onSelect={ onSelect }
-						selectedIndex={ selectedIndex }
-						instanceId={ instanceId }
-						listBoxId={ listBoxId }
-						className={ className }
-					/>
-				</Popover>
+					{ () => (
+						<>
+							<DropdownItems
+								items={ items }
+								onSelect={ onSelect }
+								selectedIndex={ selectedIndex }
+								instanceId={ instanceId }
+								listBoxId={ listBoxId }
+								className={ className }
+							/>
+						</>
+					) }
+				</DropdownMenu>
 				{ contentRef.current &&
 					needsA11yCompat &&
 					createPortal(
-						<ListBox
+						<DropdownItems
 							items={ items }
 							onSelect={ onSelect }
 							selectedIndex={ selectedIndex }
@@ -207,7 +215,7 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
 						/>,
 						contentRef.current.ownerDocument.body
 					) }
-			</>
+			</div>
 		);
 	}
 

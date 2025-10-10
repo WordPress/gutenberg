@@ -142,6 +142,12 @@ export type DropdownMenuProps = {
 	 */
 	controls?: DropdownOption[] | DropdownOption[][];
 	/**
+	 * Prop to control whether the dropdown menu should focus on mount.
+	 *
+	 * @default true
+	 */
+	focusOnMount?: boolean;
+	/**
 	 * The controlled open state of the dropdown menu.
 	 * Must be used in conjunction with `onToggle`.
 	 */
