@@ -12,7 +12,7 @@ import { getBracketIcon } from './icons';
 import { useTermCount } from './use-term-count';
 
 const BRACKET_TYPES = {
-	none: { label: __( 'No Brackets' ) },
+	none: { label: __( 'No brackets' ) },
 	round: {
 		label: __( 'Round brackets' ),
 		before: '(',
