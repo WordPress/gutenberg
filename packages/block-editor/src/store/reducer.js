@@ -2793,9 +2793,9 @@ export function withDerivedBlockEditingModes( reducer ) {
 				break;
 			}
 			case 'RESET_BLOCKS':
-			case 'SET_EDITOR_MODE': {
-				// case 'RESET_ZOOM_LEVEL':
-				// case 'SET_ZOOM_LEVEL': {
+			case 'SET_EDITOR_MODE':
+			case 'RESET_ZOOM_LEVEL':
+			case 'SET_ZOOM_LEVEL': {
 				// Recompute the entire tree if the editor mode or zoom level changes,
 				// or if all the blocks are reset.
 				return {
