@@ -108,7 +108,7 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 
 		$actual = gutenberg_render_background_support( $wrapper, $block );
 
-		$this->assertEqualHTML(
+		$this->assertSame(
 			$expected_wrapper,
 			$actual,
 			'Background block wrapper markup should be correct'
