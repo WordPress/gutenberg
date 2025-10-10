@@ -142,29 +142,37 @@ function BlockInspector() {
 				getClientIdsOfDescendants,
 				getBlockName,
 				getBlockEditingMode,
-				getBlockParentsByBlockName,
 			} = unlock( select( blockEditorStore ) );
 
 			const descendants = getClientIdsOfDescendants(
 				selectedBlockClientId
 			);
+
+			// Temporary workaround for issue #71991
+			// Exclude Navigation block children from Content sidebar until proper
+			// drill-down experience is implemented (see #65699)
+			// This prevents a poor UX where all Nav block sub-items are shown
+			// when the parent block is in contentOnly mode.
+			// Build a Set of all navigation block descendants for efficient lookup
+			const navigationDescendants = new Set();
+			descendants.forEach( ( clientId ) => {
+				if ( getBlockName( clientId ) === 'core/navigation' ) {
+					const navChildren = getClientIdsOfDescendants( clientId );
+					navChildren.forEach( ( childId ) =>
+						navigationDescendants.add( childId )
+					);
+				}
+			} );
+
 			return descendants.filter( ( current ) => {
-				// Temporary workaround for issue #71991
-				// Exclude Navigation block children from Content sidebar until proper
-				// drill-down experience is implemented (see #65699)
-				// This prevents a poor UX where all Nav block sub-items are shown
-				// when the parent block is in contentOnly mode.
-				const navigationAncestors = getBlockParentsByBlockName(
-					current,
-					'core/navigation',
-					true
-				);
-				const isNavigationDescendant = navigationAncestors.length > 0;
+				// Exclude navigation block children
+				if ( navigationDescendants.has( current ) ) {
+					return false;
+				}
 
 				return (
 					getBlockName( current ) !== 'core/list-item' &&
-					getBlockEditingMode( current ) === 'contentOnly' &&
-					! isNavigationDescendant
+					getBlockEditingMode( current ) === 'contentOnly'
 				);
 			} );
 		},
