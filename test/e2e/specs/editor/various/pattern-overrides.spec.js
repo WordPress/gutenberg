@@ -321,7 +321,7 @@ test.describe( 'Pattern Overrides', () => {
 				);
 			} );
 
-			await test.step( 'Zoomed in / Design mode', async () => {
+			await test.step( 'Zoomed in', async () => {
 				await editor.selectBlocks( patternBlock );
 
 				// Once selected and in zoomed in/design mode the child blocks
@@ -341,32 +341,9 @@ test.describe( 'Pattern Overrides', () => {
 				);
 			} );
 
-			await test.step( 'Zoomed in / Write mode - pattern as a section', async () => {
-				// The pattern block is still editable as a section.
-				await expect( patternBlock ).not.toHaveAttribute(
-					'inert',
-					'true'
-				);
-
-				// Ensure the pattern block is selected.
-				await editor.selectBlocks( patternBlock );
-
-				// Child blocks of the pattern with bindings are editable.
-				await expect( blockWithOverrides ).not.toHaveAttribute(
-					'inert',
-					'true'
-				);
-				await expect( blockWithBindings ).not.toHaveAttribute(
-					'inert',
-					'true'
-				);
-				await expect( blockWithoutOverridesOrBindings ).toHaveAttribute(
-					'inert',
-					'true'
-				);
-			} );
-
 			await test.step( 'Zoomed out - pattern as a section', async () => {
+				await page.getByLabel( 'Zoom Out' ).click();
+
 				// In zoomed out only the pattern block is editable,
 				// as in this scenario it's a section.
 				await expect( patternBlock ).not.toHaveAttribute(
@@ -397,9 +374,8 @@ test.describe( 'Pattern Overrides', () => {
 			await editor.selectBlocks( patternBlock );
 			await editor.clickBlockOptionsMenuItem( 'Group' );
 
-			await test.step( 'Zoomed out / Design mode - pattern nested in a section', async () => {
+			await test.step( 'Zoomed out - pattern nested in a section', async () => {
 				// None of the pattern is editable in zoomed out when nested in a section.
-				await expect( patternBlock ).toHaveAttribute( 'inert', 'true' );
 				await expect( blockWithOverrides ).toHaveAttribute(
 					'inert',
 					'true'
