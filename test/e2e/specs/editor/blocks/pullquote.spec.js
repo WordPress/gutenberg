@@ -23,12 +23,6 @@ test.describe( 'Pullquote', () => {
 
 		await editor.transformBlockTo( 'core/quote' );
 
-		expect( await editor.getEditedPostContent() ).toBe(
-			`<!-- wp:quote -->
-<blockquote class="wp-block-quote"><!-- wp:paragraph -->
-<p>First line.<br>Second line.</p>
-<!-- /wp:paragraph --><cite>Awesome Citation</cite></blockquote>
-<!-- /wp:quote -->`
-		);
+		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

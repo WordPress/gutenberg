@@ -4,7 +4,6 @@
 import { createBlock } from '@wordpress/blocks';
 
 const transforms = {
-	from: [],
 	to: [
 		{
 			type: 'block',
