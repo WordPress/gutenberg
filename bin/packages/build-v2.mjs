@@ -35,6 +35,19 @@ const TEST_FILE_PATTERNS = [
 	/\.(spec|test)\.(js|ts|tsx)$/,
 ];
 
+// Define global variables for feature flagging, matching webpack's DefinePlugin behavior
+const define = {
+	'globalThis.IS_GUTENBERG_PLUGIN': JSON.stringify(
+		Boolean( process.env.npm_package_config_IS_GUTENBERG_PLUGIN )
+	),
+	'globalThis.IS_WORDPRESS_CORE': JSON.stringify(
+		Boolean( process.env.npm_package_config_IS_WORDPRESS_CORE )
+	),
+	'globalThis.SCRIPT_DEBUG': JSON.stringify(
+		process.env.NODE_ENV === 'development'
+	),
+};
+
 /**
  * Normalize path separators for cross-platform compatibility.
  *
@@ -434,6 +447,7 @@ async function bundlePackage( packageName ) {
 				...baseConfig,
 				outfile: path.join( outputDir, 'index.min.js' ),
 				minify: true,
+				define,
 				plugins: [
 					momentTimezoneAliasPlugin(),
 					wordpressExternalsPlugin( 'index.min', 'iife' ),
@@ -443,6 +457,7 @@ async function bundlePackage( packageName ) {
 				...baseConfig,
 				outfile: path.join( outputDir, 'index.js' ),
 				minify: false,
+				define,
 				plugins: [
 					momentTimezoneAliasPlugin(),
 					wordpressExternalsPlugin( 'index.min', 'iife' ),
@@ -489,6 +504,7 @@ async function bundlePackage( packageName ) {
 					target,
 					platform: 'browser',
 					minify: true,
+					define,
 					plugins: [
 						wordpressExternalsPlugin( `${ fileName }.min`, 'esm' ),
 					],
