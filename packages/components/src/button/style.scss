@@ -1,3 +1,8 @@
+@use "sass:color";
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "../utils/theme-variables" as *;
+
 /**
  * For easier testing of potential regressions, you can use a Button variant matrix
  * available in a special Storybook instance by running `npm run storybook:e2e:dev`.
@@ -196,15 +201,15 @@
 	 */
 	&.is-destructive {
 		--wp-components-color-accent: #{$alert-red};
-		--wp-components-color-accent-darker-10: #{darken($alert-red, 10%)};
-		--wp-components-color-accent-darker-20: #{darken($alert-red, 20%)};
+		--wp-components-color-accent-darker-10: #{color.scale($alert-red, $lightness: -10%)};
+		--wp-components-color-accent-darker-20: #{color.scale($alert-red, $lightness: -20%)};
 
 		// Only the default variant is styled differently from the non-destructive counterparts.
 		&:not(.is-primary):not(.is-secondary):not(.is-tertiary):not(.is-link) {
 			color: $alert-red;
 
 			&:hover:not(:disabled, [aria-disabled="true"]) {
-				color: darken($alert-red, 20%);
+				color: color.scale($alert-red, $lightness: -20%);
 			}
 
 			&:focus {
@@ -289,10 +294,10 @@
 		background-image: linear-gradient(
 			-45deg,
 			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
-			darken($white, 2%) 33%,
-			darken($white, 12%) 33%,
-			darken($white, 12%) 70%,
-			darken($white, 2%) 70%
+			color.scale($white, $lightness: -2%) 33%,
+			color.scale($white, $lightness: -12%) 33%,
+			color.scale($white, $lightness: -12%) 70%,
+			color.scale($white, $lightness: -2%) 70%
 		);
 		/* stylelint-enable */
 	}

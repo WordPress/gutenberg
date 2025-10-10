@@ -13,6 +13,10 @@ import watch from 'node-watch';
 // See https://github.com/WordPress/gutenberg/issues/72136
 // eslint-disable-next-line import/no-unresolved
 import browserslistToEsbuild from 'browserslist-to-esbuild';
+import { sassPlugin } from 'esbuild-sass-plugin';
+import postcss from 'postcss';
+import autoprefixer from 'autoprefixer';
+import rtlcss from 'rtlcss';
 
 /**
  * Internal dependencies
@@ -513,6 +517,33 @@ async function bundlePackage( packageName ) {
 		}
 	}
 
+	// Copy CSS files from build-style to build directory (for wpScript packages)
+	if ( packageJson.wpScript ) {
+		const buildStyleDir = path.join( packageDir, 'build-style' );
+		const outputDir = path.join( PACKAGES_DIR, '..', 'build', packageName );
+
+		try {
+			// Find CSS files in build-style directory
+			const cssFiles = await glob(
+				normalizePath( path.join( buildStyleDir, '*.css' ) )
+			);
+
+			if ( cssFiles.length > 0 ) {
+				// Ensure output directory exists
+				await mkdir( outputDir, { recursive: true } );
+
+				// Copy each CSS file
+				for ( const cssFile of cssFiles ) {
+					const filename = path.basename( cssFile );
+					const destPath = path.join( outputDir, filename );
+					builds.push( copyFile( cssFile, destPath ) );
+				}
+			}
+		} catch ( error ) {
+			// build-style doesn't exist or is empty - that's fine, not all packages have styles
+		}
+	}
+
 	if ( builds.length === 0 ) {
 		return false;
 	}
@@ -625,7 +656,80 @@ async function transpilePackage( packageName ) {
 		}
 	}
 
+	await compileStyles( packageName );
+
 	await Promise.all( builds );
+
+	return Date.now() - startTime;
+}
+
+/**
+ * Compile styles for a single package.
+ *
+ * @param {string} packageName Package name.
+ * @return {Promise<number|null>} Build time in milliseconds, or null if no styles.
+ */
+async function compileStyles( packageName ) {
+	const packageDir = path.join( PACKAGES_DIR, packageName );
+	const styleEntryPath = path.join( packageDir, 'src', 'style.scss' );
+
+	// Check if style entry point exists
+	try {
+		await readFile( styleEntryPath );
+	} catch {
+		return null;
+	}
+
+	const startTime = Date.now();
+	const buildStyleDir = path.join( packageDir, 'build-style' );
+
+	// Create build-style directory
+	await mkdir( buildStyleDir, { recursive: true } );
+
+	// Build with Sass plugin
+	await esbuild.build( {
+		entryPoints: [ styleEntryPath ],
+		outdir: buildStyleDir,
+		bundle: true,
+		write: false,
+		loader: {
+			'.scss': 'css',
+		},
+		plugins: [
+			sassPlugin( {
+				loadPaths: [
+					'node_modules',
+					path.join( PACKAGES_DIR, 'base-styles' ),
+				],
+				async transform( source ) {
+					// Process with autoprefixer for LTR version
+					const ltrResult = await postcss( [
+						autoprefixer( { grid: true } ),
+					] ).process( source, { from: undefined } );
+
+					// Process with rtlcss for RTL version
+					const rtlResult = await postcss( [ rtlcss() ] ).process(
+						ltrResult.css,
+						{ from: undefined }
+					);
+
+					// Write both versions
+					await Promise.all( [
+						writeFile(
+							path.join( buildStyleDir, 'style.css' ),
+							ltrResult.css
+						),
+						writeFile(
+							path.join( buildStyleDir, 'style-rtl.css' ),
+							rtlResult.css
+						),
+					] );
+
+					return '';
+				},
+			} ),
+		],
+	} );
 
 	return Date.now() - startTime;
 }

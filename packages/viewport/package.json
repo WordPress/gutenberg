@@ -26,7 +26,6 @@
 	"module": "build-module/index.js",
 	"exports": {
 		".": {
-			"react-native": "./src/index.js",
 			"import": "./build-module/index.js",
 			"default": "./build/index.js"
 		},

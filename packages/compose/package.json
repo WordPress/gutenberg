@@ -29,7 +29,6 @@
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
-			"react-native": "./src/index.js",
 			"import": "./build-module/index.js",
 			"default": "./build/index.js"
 		},

@@ -1,3 +1,8 @@
+@use "sass:color";
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "../utils/theme-variables" as *;
+
 .components-notice {
 	display: flex;
 	font-family: $default-font;
@@ -14,17 +19,17 @@
 
 	&.is-success {
 		border-left-color: $alert-green;
-		background-color: lighten($alert-green, 45%);
+		background-color: color.scale($alert-green, $lightness: +45%);
 	}
 
 	&.is-warning {
 		border-left-color: $alert-yellow;
-		background-color: lighten($alert-yellow, 35%);
+		background-color: color.scale($alert-yellow, $lightness: +35%);
 	}
 
 	&.is-error {
 		border-left-color: $alert-red;
-		background-color: lighten($alert-red, 35%);
+		background-color: color.scale($alert-red, $lightness: +35%);
 	}
 }
 

@@ -16,6 +16,7 @@
 ### Internal
 
 -   Replace usage of extinct icons `edit` and `warning` with `pencil` and `cautionFilled`, respectively ([#72105](https://github.com/WordPress/gutenberg/pull/72105)).
+-   Move the package to v2 build pipeline. Rewrite styles to be dart-sass compatible ([#72242](https://github.com/WordPress/gutenberg/pull/72242)).
 
 ## 30.5.0 (2025-10-01)
 
