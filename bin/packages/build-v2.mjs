@@ -3,7 +3,7 @@
 /**
  * External dependencies
  */
-import { readFile, writeFile } from 'fs/promises';
+import { readFile, writeFile, copyFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { parseArgs } from 'node:util';
@@ -34,6 +34,19 @@ const TEST_FILE_PATTERNS = [
 	/\/(benchmark|__mocks__|__tests__|test|storybook|stories)\/.+/,
 	/\.(spec|test)\.(js|ts|tsx)$/,
 ];
+
+// Define global variables for feature flagging, matching webpack's DefinePlugin behavior
+const define = {
+	'globalThis.IS_GUTENBERG_PLUGIN': JSON.stringify(
+		Boolean( process.env.npm_package_config_IS_GUTENBERG_PLUGIN )
+	),
+	'globalThis.IS_WORDPRESS_CORE': JSON.stringify(
+		Boolean( process.env.npm_package_config_IS_WORDPRESS_CORE )
+	),
+	'globalThis.SCRIPT_DEBUG': JSON.stringify(
+		process.env.NODE_ENV === 'development'
+	),
+};
 
 /**
  * Normalize path separators for cross-platform compatibility.
@@ -113,10 +126,14 @@ function momentTimezoneAliasPlugin() {
  * WordPress externals and asset plugin.
  * Inspired by wp-build's wordpressExternalsAndAssetPlugin.
  *
- * @param {string} assetName Optional. The name of the asset file to generate (without .asset.php extension). Defaults to 'index.min'.
+ * @param {string} assetName   Optional. The name of the asset file to generate (without .asset.php extension). Defaults to 'index.min'.
+ * @param {string} buildFormat Optional. The build format: 'iife' for scripts or 'esm' for script modules. Defaults to 'iife'.
  * @return {Object} esbuild plugin.
  */
-function wordpressExternalsPlugin( assetName = 'index.min' ) {
+function wordpressExternalsPlugin(
+	assetName = 'index.min',
+	buildFormat = 'iife'
+) {
 	return {
 		name: 'wordpress-externals',
 		setup( build ) {
@@ -257,11 +274,17 @@ function wordpressExternalsPlugin( assetName = 'index.min' ) {
 					return undefined;
 				}
 
-				// Check if this is a script module
-				const isScriptModule = isScriptModuleImport(
+				// Check if this is a script module or a script dependency.
+				let isScriptModule = isScriptModuleImport(
 					packageJson,
 					subpath
 				);
+				let isScript = packageJson.wpScript;
+				if ( isScriptModule && isScript ) {
+					// If the package is both a script and a script module, we should rely on the format being built
+					isScript = buildFormat === 'iife';
+					isScriptModule = buildFormat === 'esm';
+				}
 
 				// Determine import kind: dynamic or static
 				const kind =
@@ -283,7 +306,7 @@ function wordpressExternalsPlugin( assetName = 'index.min' ) {
 				}
 
 				// If it has wpScript, convert to global variable
-				if ( packageJson.wpScript ) {
+				if ( isScript ) {
 					// Track regular script dependency using wp- handle format
 					dependencies.add( wpHandle );
 
@@ -424,16 +447,21 @@ async function bundlePackage( packageName ) {
 				...baseConfig,
 				outfile: path.join( outputDir, 'index.min.js' ),
 				minify: true,
+				define,
 				plugins: [
 					momentTimezoneAliasPlugin(),
-					wordpressExternalsPlugin( 'index.min' ),
+					wordpressExternalsPlugin( 'index.min', 'iife' ),
 				],
 			} ),
 			esbuild.build( {
 				...baseConfig,
 				outfile: path.join( outputDir, 'index.js' ),
 				minify: false,
-				plugins: [ momentTimezoneAliasPlugin() ],
+				define,
+				plugins: [
+					momentTimezoneAliasPlugin(),
+					wordpressExternalsPlugin( 'index.min', 'iife' ),
+				],
 			} )
 		);
 	}
@@ -476,8 +504,9 @@ async function bundlePackage( packageName ) {
 					target,
 					platform: 'browser',
 					minify: true,
+					define,
 					plugins: [
-						wordpressExternalsPlugin( `${ fileName }.min` ),
+						wordpressExternalsPlugin( `${ fileName }.min`, 'esm' ),
 					],
 				} )
 			);
@@ -494,66 +523,18 @@ async function bundlePackage( packageName ) {
 }
 
 /**
- * Transpile source files for a package (both CJS and ESM).
- *
- * @param {string}   packageDir  Package directory path.
- * @param {string[]} srcFiles    Array of source file paths.
- * @param {Object}   packageJson Package.json contents.
- */
-async function transpilePackage( packageDir, srcFiles, packageJson ) {
-	const buildDir = path.join( packageDir, 'build' );
-	const buildModuleDir = path.join( packageDir, 'build-module' );
-	const target = browserslistToEsbuild();
-
-	const builds = [];
-
-	// Only build CJS if package has 'main' property
-	if ( packageJson.main ) {
-		builds.push(
-			esbuild.build( {
-				entryPoints: srcFiles,
-				outdir: buildDir,
-				outbase: path.join( packageDir, 'src' ),
-				bundle: false,
-				platform: 'node',
-				format: 'cjs',
-				sourcemap: true,
-				target,
-			} )
-		);
-	}
-
-	// Only build ESM if package has 'module' property
-	if ( packageJson.module ) {
-		builds.push(
-			esbuild.build( {
-				entryPoints: srcFiles,
-				outdir: buildModuleDir,
-				outbase: path.join( packageDir, 'src' ),
-				bundle: false,
-				platform: 'neutral',
-				format: 'esm',
-				sourcemap: true,
-				target,
-			} )
-		);
-	}
-
-	await Promise.all( builds );
-}
-
-/**
- * Transpile a single package's source files.
+ * Transpile a single package's source files and copy JSON files.
  *
  * @param {string} packageName Package name.
  * @return {Promise<number>} Build time in milliseconds.
  */
-async function transpilePackageFiles( packageName ) {
+async function transpilePackage( packageName ) {
 	const startTime = Date.now();
 	const packageDir = path.join( PACKAGES_DIR, packageName );
 	const packageJsonPath = path.join( packageDir, 'package.json' );
 	const packageJson = JSON.parse( await readFile( packageJsonPath, 'utf8' ) );
 
+	// Find source files to transpile
 	const srcFiles = await glob(
 		normalizePath(
 			path.join( packageDir, `src/**/*.${ SOURCE_EXTENSIONS }` )
@@ -563,7 +544,88 @@ async function transpilePackageFiles( packageName ) {
 		}
 	);
 
-	await transpilePackage( packageDir, srcFiles, packageJson );
+	// Find JSON files to copy
+	const jsonFiles = await glob(
+		normalizePath( path.join( packageDir, 'src/**/*.json' ) ),
+		{
+			ignore: IGNORE_PATTERNS,
+		}
+	);
+
+	const buildDir = path.join( packageDir, 'build' );
+	const buildModuleDir = path.join( packageDir, 'build-module' );
+	const srcDir = path.join( packageDir, 'src' );
+	const target = browserslistToEsbuild();
+
+	const builds = [];
+
+	// Build CJS and copy JSON files to build directory
+	if ( packageJson.main ) {
+		builds.push(
+			esbuild.build( {
+				entryPoints: srcFiles,
+				outdir: buildDir,
+				outbase: srcDir,
+				bundle: false,
+				platform: 'node',
+				format: 'cjs',
+				sourcemap: true,
+				target,
+				jsx: 'automatic',
+				jsxImportSource: 'react',
+				loader: {
+					'.js': 'jsx',
+				},
+			} )
+		);
+
+		// Copy JSON files to build directory
+		for ( const jsonFile of jsonFiles ) {
+			const relativePath = path.relative( srcDir, jsonFile );
+			const destPath = path.join( buildDir, relativePath );
+			const destDir = path.dirname( destPath );
+			builds.push(
+				mkdir( destDir, { recursive: true } ).then( () =>
+					copyFile( jsonFile, destPath )
+				)
+			);
+		}
+	}
+
+	// Build ESM and copy JSON files to build-module directory
+	if ( packageJson.module ) {
+		builds.push(
+			esbuild.build( {
+				entryPoints: srcFiles,
+				outdir: buildModuleDir,
+				outbase: srcDir,
+				bundle: false,
+				platform: 'neutral',
+				format: 'esm',
+				sourcemap: true,
+				target,
+				jsx: 'automatic',
+				jsxImportSource: 'react',
+				loader: {
+					'.js': 'jsx',
+				},
+			} )
+		);
+
+		// Copy JSON files to build-module directory
+		for ( const jsonFile of jsonFiles ) {
+			const relativePath = path.relative( srcDir, jsonFile );
+			const destPath = path.join( buildModuleDir, relativePath );
+			const destDir = path.dirname( destPath );
+			builds.push(
+				mkdir( destDir, { recursive: true } ).then( () =>
+					copyFile( jsonFile, destPath )
+				)
+			);
+		}
+	}
+
+	await Promise.all( builds );
 
 	return Date.now() - startTime;
 }
@@ -631,7 +693,7 @@ async function buildAll() {
 	console.log( '📝 Phase 1: Transpiling packages...\n' );
 	await Promise.all(
 		V2_PACKAGES.map( async ( packageName ) => {
-			const buildTime = await transpilePackageFiles( packageName );
+			const buildTime = await transpilePackage( packageName );
 			console.log( `✔ Transpiled ${ packageName } (${ buildTime }ms)` );
 		} )
 	);
@@ -674,7 +736,7 @@ async function watchMode() {
 			try {
 				const startTime = Date.now();
 
-				await transpilePackageFiles( packageName );
+				await transpilePackage( packageName );
 				await bundlePackage( packageName );
 
 				const buildTime = Date.now() - startTime;

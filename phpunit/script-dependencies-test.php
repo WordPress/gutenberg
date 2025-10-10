@@ -39,10 +39,8 @@ class Test_Script_Dependencies extends WP_UnitTestCase {
 			'react',
 			'wp-block-editor',
 			'wp-block-library',
-			'wp-blocks',
 			'wp-edit-site',
 			'wp-editor',
-			'wp-router',
 			'wp-widgets',
 		);
 
