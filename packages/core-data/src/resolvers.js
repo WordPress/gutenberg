@@ -112,21 +112,25 @@ export const getEntityRecord =
 				}
 			}
 
-			const path = addQueryArgs(
-				( kind === 'postType' &&
+			let { baseURL } = entityConfig;
+
+			// For "string" IDs, use the old templates endpoint.
+			if (
+				kind === 'postType' &&
 				name === 'wp_template' &&
 				key &&
 				typeof key === 'string' &&
-				// __experimentalGetDirtyEntityRecords always calls getEntityRecord
-				// with a string key, so we need that it's not a numeric ID.
 				! /^\d+$/.test( key )
-					? '/wp/v2/templates'
-					: entityConfig.baseURL ) + ( key ? '/' + key : '' ),
-				{
-					...entityConfig.baseURLParams,
-					...query,
-				}
-			);
+			) {
+				baseURL =
+					baseURL.slice( 0, baseURL.lastIndexOf( '/' ) ) +
+					'/templates';
+			}
+
+			const path = addQueryArgs( baseURL + ( key ? '/' + key : '' ), {
+				...entityConfig.baseURLParams,
+				...query,
+			} );
 			const response = await apiFetch( { path, parse: false } );
 			const record = await response.json();
 			const permissions = getUserPermissionsFromAllowHeader(

@@ -323,16 +323,20 @@ export const deleteEntityRecord =
 			} );
 
 			let hasError = false;
+			let { baseURL } = entityConfig;
+			if (
+				kind === 'postType' &&
+				name === 'wp_template' &&
+				recordId &&
+				typeof recordId === 'string' &&
+				! /^\d+$/.test( recordId )
+			) {
+				baseURL =
+					baseURL.slice( 0, baseURL.lastIndexOf( '/' ) ) +
+					'/templates';
+			}
 			try {
-				let path = `${
-					kind === 'postType' &&
-					name === 'wp_template' &&
-					recordId &&
-					typeof recordId === 'string' &&
-					! /^\d+$/.test( recordId )
-						? '/wp/v2/templates'
-						: entityConfig.baseURL
-				}/${ recordId }`;
+				let path = `${ baseURL }/${ recordId }`;
 
 				if ( query ) {
 					path = addQueryArgs( path, query );
@@ -566,16 +570,21 @@ export const saveEntityRecord =
 			let updatedRecord;
 			let error;
 			let hasError = false;
+			let { baseURL } = entityConfig;
+			// For "string" IDs, use the old templates endpoint.
+			if (
+				kind === 'postType' &&
+				name === 'wp_template' &&
+				recordId &&
+				typeof recordId === 'string' &&
+				! /^\d+$/.test( recordId )
+			) {
+				baseURL =
+					baseURL.slice( 0, baseURL.lastIndexOf( '/' ) ) +
+					'/templates';
+			}
 			try {
-				const path = `${
-					kind === 'postType' &&
-					name === 'wp_template' &&
-					recordId &&
-					typeof recordId === 'string' &&
-					! /^\d+$/.test( recordId )
-						? '/wp/v2/templates'
-						: entityConfig.baseURL
-				}${ recordId ? '/' + recordId : '' }`;
+				const path = `${ baseURL }${ recordId ? '/' + recordId : '' }`;
 				const persistedRecord = select.getRawEntityRecord(
 					kind,
 					name,
