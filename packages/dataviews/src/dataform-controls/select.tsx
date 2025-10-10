@@ -8,7 +8,6 @@ import deepMerge from 'deepmerge';
  */
 import { privateApis } from '@wordpress/components';
 import { useCallback, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -68,37 +67,9 @@ export default function Select< Item >( {
 		[ data, field, setValue ]
 	);
 
-	const fieldElements = field?.elements ?? [];
-	const hasEmptyValue = fieldElements.some(
-		( { value: elementValue } ) => elementValue === ''
-	);
-
-	// Determine whether the control currently has a selection.
-	// For single-select: value is non-empty (not null/undefined/'').
-	// For multi-select: value is an array with length > 0.
-	const hasSelection = Array.isArray( value )
-		? value.length > 0
-		: value !== undefined && value !== null && value !== '';
-
-	/**
-	 * Behavior:
-	 * - If elements already include an empty value, just use fieldElements.
-	 * - If the field is multiple (array) we don't inject a placeholder — use fieldElements.
-	 * - Otherwise inject a placeholder item with label "Select" (no ellipsis).
-	 *   The placeholder is disabled once there's a selection to prevent re-selection.
-	 */
-	const elements =
-		hasEmptyValue || isMultiple
-			? fieldElements
-			: [
-					{
-						label: __( 'Select' ),
-						value: '',
-						// Disable the placeholder once a selection exists (single-select only).
-						disabled: !! hasSelection,
-					},
-					...fieldElements,
-			  ];
+	// Use field.elements as-is. The DataForm layer no longer injects an
+	// empty/placeholder option. Consumers must provide an empty element if needed.
+	const elements = field?.elements ?? [];
 
 	return (
 		<ValidatedSelectControl
