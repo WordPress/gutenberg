@@ -216,6 +216,18 @@ export const getEntityRecord =
 		}
 	};
 
+getEntityRecord.shouldInvalidate = ( action, kind, name ) => {
+	return (
+		kind === 'root' &&
+		name === 'site' &&
+		// Unfortunately there's no way to distinguish between updating and
+		// receiving.
+		( action.type === 'RECEIVE_ITEMS' || action.type === 'REMOVE_ITEMS' ) &&
+		action.kind === 'postType' &&
+		action.name === 'wp_template'
+	);
+};
+
 export const getTemplateAutoDraftId =
 	( staticTemplateId ) =>
 	async ( { resolveSelect, dispatch } ) => {
@@ -893,7 +905,7 @@ export const getDefaultTemplateId =
 
 getDefaultTemplateId.shouldInvalidate = ( action ) => {
 	return (
-		action.type === 'EDIT_ENTITY_RECORD' &&
+		action.type === 'RECEIVE_ITEMS' &&
 		action.kind === 'root' &&
 		action.name === 'site'
 	);
