@@ -19,17 +19,17 @@
 
 	&.is-success {
 		border-left-color: $alert-green;
-		background-color: color.scale($alert-green, $lightness: +45%);
+		background-color: color.adjust($alert-green, $lightness: +45%);
 	}
 
 	&.is-warning {
 		border-left-color: $alert-yellow;
-		background-color: color.scale($alert-yellow, $lightness: +35%);
+		background-color: color.adjust($alert-yellow, $lightness: +35%);
 	}
 
 	&.is-error {
 		border-left-color: $alert-red;
-		background-color: color.scale($alert-red, $lightness: +35%);
+		background-color: color.adjust($alert-red, $lightness: +35%);
 	}
 }
 
