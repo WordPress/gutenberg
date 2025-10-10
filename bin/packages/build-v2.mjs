@@ -804,6 +804,7 @@ async function compileStyles( packageName ) {
 				},
 				plugins: [
 					sassPlugin( {
+						embedded: true,
 						loadPaths: [
 							'node_modules',
 							path.join( PACKAGES_DIR, 'base-styles' ),
