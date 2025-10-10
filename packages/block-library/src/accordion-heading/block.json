@@ -60,13 +60,9 @@
 		"blockVisibility": false
 	},
 	"selectors": {
-		"root": ".wp-block-accordion-heading",
 		"typography": {
-			"fontSize": ".wp-block-accordion-heading",
-			"__experimentalFontFamily": ".wp-block-accordion-heading",
-			"__experimentalFontWeight": ".wp-block-accordion-heading",
-			"__experimentalFontStyle": ".wp-block-accordion-heading",
-			"__experimentalTextTransform": ".wp-block-accordion-heading"
+			"letterSpacing": ".wp-block-accordion-heading .wp-block-accordion-heading__toggle-title",
+			"textDecoration": ".wp-block-accordion-heading .wp-block-accordion-heading__toggle-title"
 		}
 	},
 	"attributes": {
