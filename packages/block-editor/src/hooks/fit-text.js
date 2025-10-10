@@ -3,7 +3,7 @@
  */
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
-import { useEffect, useCallback } from '@wordpress/element';
+import { useEffect, useCallback, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
@@ -61,6 +61,7 @@ function addAttributes( settings ) {
 function useFitText( { fitText, name, clientId } ) {
 	const hasFitTextSupport = hasBlockSupport( name, FIT_TEXT_SUPPORT_KEY );
 	const blockElement = useBlockElement( clientId );
+	const isApplyingRef = useRef( false );
 
 	// Monitor block attribute changes
 	// Any attribute may change the available space.
@@ -79,6 +80,13 @@ function useFitText( { fitText, name, clientId } ) {
 			return;
 		}
 
+		// Prevent infinite loop from ResizeObserver triggering during our own changes
+		if ( isApplyingRef.current ) {
+			return;
+		}
+
+		isApplyingRef.current = true;
+
 		// Get or create style element with unique ID
 		const styleId = `fit-text-${ clientId }`;
 		let styleElement = blockElement.ownerDocument.getElementById( styleId );
@@ -90,11 +98,41 @@ function useFitText( { fitText, name, clientId } ) {
 
 		const blockSelector = `#block-${ clientId }`;
 
+		// Store the current font size before calculation
+		const computedStyle = window.getComputedStyle( blockElement );
+		const currentFontSize = parseFloat( computedStyle.fontSize );
+
+		// Run calculation without transitions (applyStylesFn will be called during binary search)
 		const applyStylesFn = ( css ) => {
+			// No transition during binary search calculation
 			styleElement.textContent = css;
 		};
 
-		optimizeFitText( blockElement, blockSelector, applyStylesFn );
+		const finalFontSize = optimizeFitText(
+			blockElement,
+			blockSelector,
+			applyStylesFn
+		);
+
+		// Reset to current size without transition
+		styleElement.textContent = `${ blockSelector } { font-size: ${ currentFontSize }px !important; }`;
+
+		// Use two requestAnimationFrame to ensure browser renders the reset
+		requestAnimationFrame( () => {
+			requestAnimationFrame( () => {
+				// Now apply the final size with transition
+				const transitionRule = `${ blockSelector } { transition: font-size 1s ease-out; }`;
+				styleElement.textContent =
+					transitionRule +
+					'\n' +
+					`${ blockSelector } { font-size: ${ finalFontSize }px !important; }`;
+
+				// Reset the flag after transition completes
+				setTimeout( () => {
+					isApplyingRef.current = false;
+				}, 1050 ); // Slightly longer than transition duration
+			} );
+		} );
 	}, [ blockElement, clientId, hasFitTextSupport, fitText ] );
 
 	useEffect( () => {
@@ -138,14 +176,59 @@ function useFitText( { fitText, name, clientId } ) {
 	// Trigger fit text recalculation when content changes
 	useEffect( () => {
 		if ( fitText && blockElement && hasFitTextSupport ) {
-			// Small delay to ensure DOM has updated after content changes
-			const timer = setTimeout( () => {
-				if ( blockElement ) {
-					applyFitText();
-				}
-			}, 1000 );
+			let throttleTimer = null;
+			let debounceTimer = null;
+			let idleCallbackId = null;
 
-			return () => clearTimeout( timer );
+			// Clear any existing timers
+			const clearTimers = () => {
+				if ( throttleTimer ) {
+					clearTimeout( throttleTimer );
+					throttleTimer = null;
+				}
+				if ( debounceTimer ) {
+					clearTimeout( debounceTimer );
+					debounceTimer = null;
+				}
+				if ( idleCallbackId && window.cancelIdleCallback ) {
+					window.cancelIdleCallback( idleCallbackId );
+					idleCallbackId = null;
+				}
+			};
+
+			// Run calculation when browser is idle
+			const scheduleIdleCalculation = () => {
+				clearTimers();
+
+				if ( window.requestIdleCallback ) {
+					idleCallbackId = window.requestIdleCallback(
+						() => {
+							if ( blockElement ) {
+								applyFitText();
+							}
+						},
+						{ timeout: 300 } // Fallback timeout
+					);
+				} else {
+					// Fallback for browsers without requestIdleCallback
+					throttleTimer = setTimeout( () => {
+						if ( blockElement ) {
+							applyFitText();
+						}
+					}, 300 );
+				}
+
+				// Schedule final accurate calculation after changes stop
+				debounceTimer = setTimeout( () => {
+					if ( blockElement ) {
+						applyFitText();
+					}
+				}, 200 );
+			};
+
+			scheduleIdleCalculation();
+
+			return clearTimers;
 		}
 	}, [
 		blockAttributes,

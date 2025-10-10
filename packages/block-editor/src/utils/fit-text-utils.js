@@ -56,10 +56,11 @@ function findOptimalFontSize( textElement, elementSelector, applyStylesFn ) {
  * @param {HTMLElement} textElement     The text element (paragraph, heading, etc.)
  * @param {string}      elementSelector CSS selector for the text element
  * @param {Function}    applyStylesFn   Function to apply CSS styles (pass empty string to clear)
+ * @return {number} The optimal font size in pixels
  */
 export function optimizeFitText( textElement, elementSelector, applyStylesFn ) {
 	if ( ! textElement ) {
-		return;
+		return 0;
 	}
 
 	applyStylesFn( '' );
@@ -72,4 +73,6 @@ export function optimizeFitText( textElement, elementSelector, applyStylesFn ) {
 
 	const cssRule = generateCSSRule( elementSelector, optimalSize );
 	applyStylesFn( cssRule );
+
+	return optimalSize;
 }
