@@ -21,7 +21,7 @@ import { store as interfaceStore } from '@wordpress/interface';
  * @param {string} props.clientId The template part block client ID.
  * @return {JSX.Element|null} The Edit navigation button component or null if not applicable.
  */
-function TemplatePartNavigationButton( { clientId } ) {
+function TemplatePartNavigationEditButton( { clientId } ) {
 	const { selectBlock, flashBlock } = useDispatch( blockEditorStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
@@ -95,7 +95,7 @@ function TemplatePartNavigationButton( { clientId } ) {
 /**
  * Higher-order component that adds the Edit navigation button to template part blocks.
  */
-const withTemplatePartNavigationButton = createHigherOrderComponent(
+const withTemplatePartNavigationEditButton = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const isTemplatePart = props.name === 'core/template-part';
 
@@ -103,17 +103,19 @@ const withTemplatePartNavigationButton = createHigherOrderComponent(
 			<>
 				<BlockEdit key="edit" { ...props } />
 				{ props.isSelected && isTemplatePart && (
-					<TemplatePartNavigationButton clientId={ props.clientId } />
+					<TemplatePartNavigationEditButton
+						clientId={ props.clientId }
+					/>
 				) }
 			</>
 		);
 	},
-	'withTemplatePartNavigationButton'
+	'withTemplatePartNavigationEditButton'
 );
 
 // Register the filter.
 addFilter(
 	'editor.BlockEdit',
-	'core/editor/with-template-part-navigation-button',
-	withTemplatePartNavigationButton
+	'core/editor/with-template-part-navigation-edit-button',
+	withTemplatePartNavigationEditButton
 );
