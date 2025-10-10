@@ -36,10 +36,17 @@ function TemplatePartNavigationEditButton( { clientId } ) {
 	const { selectBlock, flashBlock } = useDispatch( blockEditorStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
-	const { hasNavigationBlocks, firstNavigationBlockId } = useSelect(
+	const {
+		hasNavigationBlocks,
+		firstNavigationBlockId,
+		isNavigationEditable,
+	} = useSelect(
 		( select ) => {
-			const { getClientIdsOfDescendants, getBlockName } =
-				select( blockEditorStore );
+			const {
+				getClientIdsOfDescendants,
+				getBlockName,
+				getBlockEditingMode,
+			} = select( blockEditorStore );
 
 			const descendants = getClientIdsOfDescendants( clientId );
 			const navigationBlocksInTemplatePart = descendants.filter(
@@ -55,6 +62,11 @@ function TemplatePartNavigationEditButton( { clientId } ) {
 			return {
 				hasNavigationBlocks: _hasNavigationBlocks,
 				firstNavigationBlockId: _firstNavigationBlockId,
+				// We can't use the useBlockEditingMode hook here because the current
+				// context is the template part, not the navigation block.
+				isNavigationEditable:
+					getBlockEditingMode( _firstNavigationBlockId ) !==
+					'disabled',
 			};
 		},
 		[ clientId ]
@@ -78,8 +90,8 @@ function TemplatePartNavigationEditButton( { clientId } ) {
 		enableComplementaryArea,
 	] );
 
-	// Only show if template part contains navigation blocks
-	if ( ! hasNavigationBlocks ) {
+	// Only show if template part contains navigation blocks and they are editable
+	if ( ! hasNavigationBlocks || ! isNavigationEditable ) {
 		return null;
 	}
 
