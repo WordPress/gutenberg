@@ -69,36 +69,29 @@ export function Comments( {
 			selectedBlockClientId: clientId,
 		};
 	}, [] );
+	const { selectBlock } = useDispatch( blockEditorStore );
 	const [ selectedThread = blockCommentId, setSelectedThread ] = useState();
-	const relatedBlockElement = useBlockElement( selectedBlockClientId );
 
-	const handleDelete = ( comment ) => {
+	const handleDelete = async ( comment ) => {
 		const currentIndex = threads.findIndex( ( t ) => t.id === comment.id );
 		const nextThread = threads[ currentIndex + 1 ];
 		const prevThread = threads[ currentIndex - 1 ];
 
-		// Store the focus logic to execute after deletion completes.
-		const focusAfterDeletion = () => {
-			if ( nextThread ) {
-				setSelectedThread( nextThread.id );
-				focusCommentThread( nextThread.id, commentSidebarRef.current );
-			} else if ( prevThread ) {
-				setSelectedThread( prevThread.id );
-				focusCommentThread( prevThread.id, commentSidebarRef.current );
-			} else {
-				setSelectedThread( null );
-				setShowCommentBoard( false );
-				if ( relatedBlockElement ) {
-					relatedBlockElement.scrollIntoView( {
-						behavior: 'instant',
-						block: 'center',
-					} );
-				}
-			}
-		};
+		await onCommentDelete( comment );
 
-		// Execute deletion and focus after completion.
-		onCommentDelete( comment ).then( focusAfterDeletion );
+		// Focus logic after deletion completes.
+		if ( nextThread ) {
+			setSelectedThread( nextThread.id );
+			focusCommentThread( nextThread.id, commentSidebarRef.current );
+		} else if ( prevThread ) {
+			setSelectedThread( prevThread.id );
+			focusCommentThread( prevThread.id, commentSidebarRef.current );
+		} else {
+			setSelectedThread( null );
+			setShowCommentBoard( false );
+			// Focus the parent block instead of just scrolling into view.
+			selectBlock( selectedBlockClientId );
+		}
 	};
 
 	// Auto-select the related comment thread when a block is selected.
