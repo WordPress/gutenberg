@@ -39,7 +39,6 @@ import {
 	offset as offsetMiddleware,
 	autoUpdate,
 } from '@floating-ui/react-dom';
-import { set } from 'date-fns';
 const { useBlockElementRef } = unlock( blockEditorPrivateApis );
 
 function CollabSidebarContent( {
@@ -48,6 +47,8 @@ function CollabSidebarContent( {
 	styles,
 	comments,
 	commentSidebarRef,
+	selectedThread,
+	setSelectedThread,
 } ) {
 	const { onCreate, onEdit, onDelete } = useBlockCommentsActions();
 
@@ -72,6 +73,8 @@ function CollabSidebarContent( {
 					showCommentBoard={ showCommentBoard }
 					setShowCommentBoard={ setShowCommentBoard }
 					commentSidebarRef={ commentSidebarRef }
+					selectedThread={ selectedThread }
+					setSelectedThread={ setSelectedThread }
 				/>
 			</VStack>
 		</div>
@@ -85,10 +88,9 @@ function FloatingCommentBoard( {
 	commentSidebarRef,
 	calculatedOffset,
 	updateHeight,
-	onPositionCalculated,
-	setCommentAndBlockRef,
-	selectedThreadId,
-	handleThreadClick,
+	setBlockRef,
+	selectedThread,
+	setSelectedThread,
 } ) {
 	const blockRef = useRef();
 	useBlockElementRef( thread.blockClientId, blockRef );
@@ -113,26 +115,17 @@ function FloatingCommentBoard( {
 	// Track height changes.
 	useEffect( () => {
 		if ( refs.floating?.current ) {
-			setCommentAndBlockRef( thread.id, refs.floating.current, blockRef.current );
+			setBlockRef( thread.id, blockRef.current );
 		}
-	}, [ thread.id, refs.floating ] );
+	}, [ thread.id, refs.floating, setBlockRef ] );
 
 	// When a thread is expanded or collapsed, recalculate its height after a short delay.
 	useEffect( () => {
 		if ( refs.floating?.current ) {
-			setTimeout( () => {
-				const newHeight = refs.floating.current.scrollHeight;
-				updateHeight( thread.id, newHeight );
-			}, 1000 );
+			const newHeight = refs.floating.current.scrollHeight;
+			updateHeight( thread.id, newHeight );
 		}
-	}, [ showCommentBoard, thread.id, updateHeight, refs.floating, selectedThreadId ] );
-
-	// Report the calculated absolute position back to parent
-	useEffect( () => {
-		if ( y !== null && y !== 0 ) {
-			onPositionCalculated( thread.id, y );
-		}
-	}, [ y, thread.id, onPositionCalculated, calculatedOffset ] );
+	}, [ thread.id, updateHeight, refs.floating, selectedThread ] );
 
 	const { onCreate, onEdit, onDelete } = useBlockCommentsActions();
 
@@ -141,7 +134,6 @@ function FloatingCommentBoard( {
 			ref={ refs.setFloating }
 			className="editor-collab-sidebar-panel__thread is-floating"
 			spacing="0"
-			onClick={ () => handleThreadClick( thread ) }
 			style={ { top: y } }
 		>
 			<Comments
@@ -152,6 +144,8 @@ function FloatingCommentBoard( {
 				showCommentBoard={ showCommentBoard }
 				setShowCommentBoard={ setShowCommentBoard }
 				commentSidebarRef={ commentSidebarRef }
+				selectedThread={ selectedThread }
+				setSelectedThread={ setSelectedThread }
 			/>
 		</VStack>
 	);
@@ -164,17 +158,12 @@ export default function CollabSidebar() {
 	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const isLargeViewport = useViewportMatch( 'medium' );
-
 	const [ heights, setHeights ] = useState( {} );
 	const [ boardOffsets, setBoardOffsets ] = useState( {} );
-	const [ commentRefs, setCommentRefs ] = useState( {} );
 	const [ blockRefs, setBlockRefs ] = useState( {} );
-	const [ selectedThreadId, setSelectedThreadId ] = useState( null );
-	const absolutePositionsRef = useRef( {} );
-
+	const [ selectedThread, setSelectedThread ] = useState( null );
 
 	const updateHeight = useCallback( ( id, newHeight ) => {
-		console.log( 'update height', id, newHeight );
 		setHeights( ( prev ) => {
 			if ( prev[ id ] !== newHeight ) {
 				return { ...prev, [ id ]: newHeight };
@@ -182,19 +171,6 @@ export default function CollabSidebar() {
 			return prev;
 		} );
 	}, [] );
-
-	const onPositionCalculated = useCallback( ( id, absoluteY ) => {
-		absolutePositionsRef.current[ id ] = absoluteY;
-	}, [] );
-
-	const { selectBlock } = useDispatch( blockEditorStore );
-	const handleThreadClick = ( thread ) => {
-		console.log( 'handleThreadClick', thread );
-		if ( thread?.clientId ) {
-			selectBlock( thread.clientId );
-		}
-		setSelectedThreadId( thread.id );
-	};
 
 	const commentSidebarRef = useRef( null );
 
@@ -228,23 +204,16 @@ export default function CollabSidebar() {
 
 	const hasMoreComments = totalPages && totalPages > 1;
 
-	const setCommentAndBlockRef = useCallback( ( id, commentRef, blockRef ) => {
-		commentRefs[ id ] = commentRef;
-		setCommentRefs( commentRefs );
-		blockRefs[ id ] = blockRef;
-		setBlockRefs( blockRefs );
+	const setBlockRef = useCallback( ( id, blockRef ) => {
+		setBlockRefs( ( prev ) => ( { ...prev, [ id ]: blockRef } ) );
 	}, [] );
-
 
 	// Centralized offset calculator that calculates the positions for each thread.
 	const calculateAllOffsets = () => {
 		const offsets = {};
 		let previousThreadData = null;
 
-		console.log( 'heights', { ...heights } );
-
 		unresolvedSortedThreads.forEach( ( thread ) => {
-
 			// Find the top of the thread. This is the normalized top position for the floater.
 			const blockElement = blockRefs[ thread.id ];
 			const blockRect = blockElement?.getBoundingClientRect();
@@ -253,8 +222,10 @@ export default function CollabSidebar() {
 
 			let additionalOffset = -16;
 			// The first block does not need to move.
-			if ( previousThreadData) {
-				const previousBottom = previousThreadData.threadTop + previousThreadData.threadHeight;
+			if ( previousThreadData ) {
+				const previousBottom =
+					previousThreadData.threadTop +
+					previousThreadData.threadHeight;
 				if ( threadTop < previousBottom ) {
 					// Shift down to avoid overlap.
 					additionalOffset = previousBottom - threadTop + 24;
@@ -267,19 +238,16 @@ export default function CollabSidebar() {
 			};
 
 			offsets[ thread.id ] = additionalOffset;
-
 		} );
 
 		return offsets;
-	}
+	};
 
 	// Recalculate offsets.
 	useEffect( () => {
-		//console.log( 'calculateAllOffsets' );
 		const newOffsets = calculateAllOffsets();
-		console.log( 'new offsets', { ...newOffsets } );
 		setBoardOffsets( newOffsets );
-	}, [ blockCommentId, heights ] );
+	}, [ blockCommentId, heights, calculateAllOffsets ] );
 
 	// Get the global styles to set the background color of the sidebar.
 	const { merged: GlobalStyles } = useGlobalStylesContext();
@@ -348,11 +316,10 @@ export default function CollabSidebar() {
 											boardOffsets[ thread.id ]
 										}
 										updateHeight={ updateHeight }
-										onPositionCalculated={ onPositionCalculated }
-										handleThreadClick={ handleThreadClick }
 										commentSidebarRef={ commentSidebarRef }
-										setCommentAndBlockRef={ setCommentAndBlockRef }
-										selectedThreadId={ selectedThreadId }
+										setBlockRef={ setBlockRef }
+										selectedThread={ selectedThread }
+										setSelectedThread={ setSelectedThread }
 									/>
 								);
 							} ) }

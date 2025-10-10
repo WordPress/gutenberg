@@ -48,6 +48,9 @@ const { Menu } = unlock( componentsPrivateApis );
  * @param {Function} props.onCommentDelete     - The function to delete a comment.
  * @param {Function} props.setShowCommentBoard - The function to set the comment board visibility.
  * @param {Ref}      props.commentSidebarRef   - The ref to the comment sidebar.
+ * @param {string}   props.selectedThread      - The ID of the currently selected comment thread.
+ * @param {Function} props.setSelectedThread   - The function to set the selected comment thread.
+ *
  * @return {React.ReactNode} The rendered Comments component.
  */
 export function Comments( {
@@ -57,9 +60,9 @@ export function Comments( {
 	onCommentDelete,
 	setShowCommentBoard,
 	commentSidebarRef,
+	selectedThread,
+	setSelectedThread,
 } ) {
-	const [ selectedThread, setSelectedThread ] = useState();
-
 	const blockCommentId = useSelect( ( select ) => {
 		const { getBlockAttributes, getSelectedBlockClientId } =
 			select( blockEditorStore );
@@ -72,7 +75,7 @@ export function Comments( {
 	// Auto-select the related comment thread when a block is selected.
 	useEffect( () => {
 		setSelectedThread( blockCommentId ?? undefined );
-	}, [ blockCommentId ] );
+	}, [ blockCommentId, setSelectedThread ] );
 
 	const hasThreads = Array.isArray( threads ) && threads.length > 0;
 	if ( ! hasThreads ) {
