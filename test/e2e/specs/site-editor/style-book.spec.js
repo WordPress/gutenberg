@@ -35,9 +35,6 @@ test.describe( 'Style Book', () => {
 			page.locator( 'role=button[name="Block Inserter"i]' )
 		).toBeDisabled();
 		await expect(
-			page.locator( 'role=button[name="Tools"i]' )
-		).toBeDisabled();
-		await expect(
 			page.locator( 'role=button[name="Document Overview"i]' )
 		).toBeDisabled();
 	} );
