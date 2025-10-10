@@ -35,11 +35,28 @@ function render_block_core_term_count( $attributes, $content, $block ) {
 
 	$term_count = $term->count;
 
-	if ( isset( $attributes['hasParenthesis'] ) && $attributes['hasParenthesis'] ) {
-		$term_count = sprintf(
-			'(%d)',
-			$term_count
-		);
+	// Format the term count based on bracket type.
+	$bracket_type = isset( $attributes['bracketType'] ) ? $attributes['bracketType'] : 'round';
+
+	switch ( $bracket_type ) {
+		case 'none':
+			// No formatting needed.
+			break;
+		case 'round':
+			$term_count = "({$term_count})";
+			break;
+		case 'square':
+			$term_count = "[{$term_count}]";
+			break;
+		case 'curly':
+			$term_count = "{{$term_count}}";
+			break;
+		case 'angle':
+			$term_count = "<{$term_count}>";
+			break;
+		default:
+			// Default to no formatting for unknown types.
+			break;
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes();

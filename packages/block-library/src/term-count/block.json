@@ -9,9 +9,10 @@
 	"textdomain": "default",
 	"usesContext": [ "termId", "taxonomy" ],
 	"attributes": {
-		"hasParenthesis": {
-			"type": "boolean",
-			"default": true
+		"bracketType": {
+			"type": "string",
+			"enum": [ "none", "round", "square", "curly", "angle" ],
+			"default": "round"
 		}
 	},
 	"supports": {

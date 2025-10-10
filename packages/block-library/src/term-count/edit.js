@@ -1,70 +1,82 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useBlockProps, BlockControls } from '@wordpress/block-editor';
 import { ToolbarGroup, ToolbarDropdownMenu } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import { bareNumber, numberInParenthesis } from './icons';
+import { getBracketIcon } from './icons';
 import { useTermCount } from './use-term-count';
+
+const BRACKET_TYPES = {
+	none: { label: __( 'No Brackets' ) },
+	round: {
+		label: __( 'Round Brackets' ),
+		before: '(',
+		after: ')',
+	},
+	square: {
+		label: __( 'Square Brackets' ),
+		before: '[',
+		after: ']',
+	},
+	curly: {
+		label: __( 'Curly Brackets' ),
+		before: '{',
+		after: '}',
+	},
+	angle: {
+		label: __( 'Angle Brackets' ),
+		before: '<',
+		after: '>',
+	},
+};
 
 export default function TermCountEdit( {
 	attributes,
 	setAttributes,
 	context: { termId, taxonomy },
 } ) {
-	const { hasParenthesis } = attributes;
+	const { bracketType } = attributes;
 	const term = useTermCount( termId, taxonomy );
 
 	const termCount = term?.termCount || 0;
 
 	const blockProps = useBlockProps();
 
-	const displayTypeControls = [
-		{
+	const bracketTypeControls = Object.entries( BRACKET_TYPES ).map(
+		( [ type, { label } ] ) => ( {
 			role: 'menuitemradio',
-			title: __( 'In Parenthesis' ),
-			isActive: hasParenthesis,
-			icon: numberInParenthesis,
+			title: label,
+			isActive: bracketType === type,
+			icon: getBracketIcon( type ),
 			onClick: () => {
-				setAttributes( { hasParenthesis: true } );
+				setAttributes( { bracketType: type } );
 			},
-		},
-		{
-			role: 'menuitemradio',
-			title: __( 'Bare Number' ),
-			isActive: ! hasParenthesis,
-			icon: bareNumber,
-			onClick: () => {
-				setAttributes( { hasParenthesis: false } );
-			},
-		},
-	];
+		} )
+	);
+
+	const formatTermCount = ( count, type ) => {
+		const { before = '', after = '' } = BRACKET_TYPES[ type ] || {};
+		return `${ before }${ count }${ after }`;
+	};
 
 	return (
 		<>
 			<BlockControls group="block">
 				<ToolbarGroup>
 					<ToolbarDropdownMenu
-						icon={
-							hasParenthesis ? numberInParenthesis : bareNumber
-						}
-						label={ __( 'Change display type' ) }
-						controls={ displayTypeControls }
+						icon={ getBracketIcon( bracketType ) }
+						label={ __( 'Change bracket type' ) }
+						controls={ bracketTypeControls }
 					/>
 				</ToolbarGroup>
 			</BlockControls>
 			<div { ...blockProps }>
-				{ hasParenthesis
-					? sprintf(
-							/* translators: %d: term count number. */
-							__( '(%d)' ),
-							termCount
-					  )
-					: termCount }
+				{ formatTermCount( termCount, bracketType ) }
 			</div>
 		</>
 	);
