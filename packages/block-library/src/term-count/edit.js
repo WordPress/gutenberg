@@ -8,28 +8,38 @@ import { ToolbarDropdownMenu } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { getBracketIcon } from './icons';
+import {
+	bareNumber,
+	numberInParenthesis,
+	numberInSquareBrackets,
+	numberInCurlyBrackets,
+	numberInAngleBrackets,
+} from './icons';
 import { useTermCount } from './use-term-count';
 
 const BRACKET_TYPES = {
-	none: { label: __( 'No brackets' ) },
+	none: { label: __( 'No brackets' ), icon: bareNumber },
 	round: {
 		label: __( 'Round brackets' ),
+		icon: numberInParenthesis,
 		before: '(',
 		after: ')',
 	},
 	square: {
 		label: __( 'Square brackets' ),
+		icon: numberInSquareBrackets,
 		before: '[',
 		after: ']',
 	},
 	curly: {
 		label: __( 'Curly brackets' ),
+		icon: numberInCurlyBrackets,
 		before: '{',
 		after: '}',
 	},
 	angle: {
 		label: __( 'Angle brackets' ),
+		icon: numberInAngleBrackets,
 		before: '<',
 		after: '>',
 	},
@@ -48,11 +58,11 @@ export default function TermCountEdit( {
 	const blockProps = useBlockProps();
 
 	const bracketTypeControls = Object.entries( BRACKET_TYPES ).map(
-		( [ type, { label } ] ) => ( {
+		( [ type, { label, icon } ] ) => ( {
 			role: 'menuitemradio',
 			title: label,
 			isActive: bracketType === type,
-			icon: getBracketIcon( type ),
+			icon,
 			onClick: () => {
 				setAttributes( { bracketType: type } );
 			},
@@ -68,7 +78,7 @@ export default function TermCountEdit( {
 		<>
 			<BlockControls group="block">
 				<ToolbarDropdownMenu
-					icon={ getBracketIcon( bracketType ) }
+					icon={ BRACKET_TYPES[ bracketType ]?.icon ?? bareNumber }
 					label={ __( 'Change bracket type' ) }
 					controls={ bracketTypeControls }
 				/>

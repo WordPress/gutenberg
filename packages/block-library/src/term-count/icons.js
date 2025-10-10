@@ -57,26 +57,3 @@ export const numberInAngleBrackets = (
 		<Path d="M 18.970703,16.53125 23.5,12 18.970703,7.46875 17.910156,8.53125 21.378906,12 17.910156,15.46875 Z M 5.0292969,7.46875 0.5,12 5.0292969,16.53125 6.0898438,15.46875 2.6210938,12 6.0898438,8.53125 Z M 10,6 9.609375,9 H 7 v 1.5 H 9.4121094 L 9.0878906,13 H 7 v 1.5 H 8.890625 L 8.5,17.5 H 10 l 0.390625,-3 h 2.5 L 12.5,17.5 H 14 l 0.390625,-3 H 17 V 13 h -2.412109 l 0.324218,-2.5 H 17 V 9 H 15.109375 L 15.5,6 H 14 l -0.390625,3 h -2.5 L 11.5,6 Z m 0.912109,4.5 h 2.5 L 13.087891,13 h -2.5 z" />
 	</SVG>
 );
-
-/**
- * Helper function to get the appropriate icon for a bracket type.
- *
- * @param {string} bracketType Bracket type.
- * @return {JSX.Element} Icon element.
- */
-export function getBracketIcon( bracketType ) {
-	switch ( bracketType ) {
-		case 'none':
-			return bareNumber;
-		case 'round':
-			return numberInParenthesis;
-		case 'square':
-			return numberInSquareBrackets;
-		case 'curly':
-			return numberInCurlyBrackets;
-		case 'angle':
-			return numberInAngleBrackets;
-		default:
-			return bareNumber;
-	}
-}
