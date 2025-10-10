@@ -42,6 +42,7 @@ test.describe( 'calling saveEntityRecord with a theme template ID', () => {
 				);
 		} );
 		expect( template.content.raw ).toEqual( 'test' );
+		expect( template.theme ).toEqual( 'emptytheme' );
 		await admin.visitSiteEditor( {
 			postType: 'wp_template',
 			activeView: 'user',
@@ -82,6 +83,7 @@ test.describe( 'calling saveEntityRecord with a theme template ID', () => {
 		expect( template.status ).toEqual( 'publish' );
 		expect( template.wp_id ).toEqual( 0 );
 		expect( template.is_custom ).toEqual( false );
+		expect( template.theme ).toEqual( 'emptytheme' );
 	} );
 
 	test( 'getEditedEntityRecord should work as expected', async ( {
@@ -103,5 +105,6 @@ test.describe( 'calling saveEntityRecord with a theme template ID', () => {
 		expect( template.status ).toEqual( 'publish' );
 		expect( template.wp_id ).toEqual( 0 );
 		expect( template.is_custom ).toEqual( false );
+		expect( template.theme ).toEqual( 'emptytheme' );
 	} );
 } );
