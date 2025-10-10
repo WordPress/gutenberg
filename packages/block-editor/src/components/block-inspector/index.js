@@ -142,16 +142,31 @@ function BlockInspector() {
 				getClientIdsOfDescendants,
 				getBlockName,
 				getBlockEditingMode,
+				getBlockParentsByBlockName,
 			} = unlock( select( blockEditorStore ) );
 
 			const descendants = getClientIdsOfDescendants(
 				selectedBlockClientId
 			);
-			return descendants.filter(
-				( current ) =>
+			return descendants.filter( ( current ) => {
+				// Temporary workaround for issue #71991
+				// Exclude Navigation block children from Content sidebar until proper
+				// drill-down experience is implemented (see #65699)
+				// This prevents a poor UX where all Nav block sub-items are shown
+				// when the parent block is in contentOnly mode.
+				const navigationAncestors = getBlockParentsByBlockName(
+					current,
+					'core/navigation',
+					true
+				);
+				const isNavigationDescendant = navigationAncestors.length > 0;
+
+				return (
 					getBlockName( current ) !== 'core/list-item' &&
-					getBlockEditingMode( current ) === 'contentOnly'
-			);
+					getBlockEditingMode( current ) === 'contentOnly' &&
+					! isNavigationDescendant
+				);
+			} );
 		},
 		[ isSectionBlock, selectedBlockClientId ]
 	);
