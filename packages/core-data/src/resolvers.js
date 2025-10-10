@@ -216,13 +216,18 @@ export const getEntityRecord =
 		}
 	};
 
+// Whenever a template is saved, the active templates might be updated, so
+// invalidate the site settings when a template is updated or deleted.
 getEntityRecord.shouldInvalidate = ( action, kind, name ) => {
 	return (
 		kind === 'root' &&
 		name === 'site' &&
-		// Unfortunately there's no way to distinguish between updating and
-		// receiving.
-		( action.type === 'RECEIVE_ITEMS' || action.type === 'REMOVE_ITEMS' ) &&
+		( ( action.type === 'RECEIVE_ITEMS' &&
+			// Makeing sure persistedEdits is set seems to be the only way of
+			// knowing if it's an update or fetch.
+			action.persistedEdits &&
+			action.persistedEdits.status !== 'auto-draft' ) ||
+			action.type === 'REMOVE_ITEMS' ) &&
 		action.kind === 'postType' &&
 		action.name === 'wp_template'
 	);
