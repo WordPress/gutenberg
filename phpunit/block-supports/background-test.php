@@ -65,7 +65,9 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 	}
 
 	private function get_apostrophe_entity() {
-		return version_compare( get_bloginfo( 'version' ), '6.9', '>=' ) ? '&apos;' : '&#039;';
+		// WP 6.9+ has get_block_bindings_supported_attributes() and uses &apos;
+		// WP 6.8 and earlier use &#039;
+		return function_exists( 'get_block_bindings_supported_attributes' ) ? '&apos;' : '&#039;';
 	}
 
 	/**
@@ -83,9 +85,6 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 	 * @param string $wrapper             Existing markup for the block wrapper.
 	 */
 	public function test_background_block_support( $theme_name, $block_name, $background_settings, $background_style, $expected_wrapper, $wrapper ) {
-		// Replace the placeholder with the actual apostrophe encoding based on WP version.
-		$expected_wrapper = str_replace( '{{APOS}}', $this->get_apostrophe_entity(), $expected_wrapper );
-
 		switch_theme( $theme_name );
 		$this->test_block_name = $block_name;
 
@@ -128,9 +127,9 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 	 * @return array
 	 */
 	public function data_background_block_support() {
-		// Use a placeholder that will be replaced in the test method
-		// when WordPress is fully loaded and get_bloginfo() is available.
-		$apos = '{{APOS}}';
+		// Get the appropriate apostrophe encoding based on WordPress version.
+		// function_exists() works in data providers, unlike get_bloginfo().
+		$apos = $this->get_apostrophe_entity();
 
 		return array(
 			'background image style is applied' => array(
