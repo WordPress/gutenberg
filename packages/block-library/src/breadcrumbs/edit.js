@@ -12,7 +12,7 @@ import {
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { RawHTML } from '@wordpress/element';
+import { useEffect, useState, RawHTML } from '@wordpress/element';
 import { useServerSideRender } from '@wordpress/server-side-render';
 
 /**
@@ -49,12 +49,12 @@ export default function BreadcrumbEdit( {
 	context: { postId, postType, templateSlug },
 } ) {
 	const { separator, showHomeLink, type } = attributes;
-	const { isPostTypeHierarchical, hasTermsAssigned } = useSelect(
+	const { post, isPostTypeHierarchical, hasTermsAssigned } = useSelect(
 		( select ) => {
 			if ( ! postType ) {
 				return {};
 			}
-			const post = select( coreStore ).getEntityRecord(
+			const _post = select( coreStore ).getEntityRecord(
 				'postType',
 				postType,
 				postId
@@ -64,28 +64,44 @@ export default function BreadcrumbEdit( {
 				per_page: -1,
 			} );
 			return {
+				post: _post,
 				isPostTypeHierarchical:
 					select( coreStore ).getPostType( postType )?.hierarchical,
 				hasTermsAssigned:
-					post &&
+					_post &&
 					( taxonomies || [] )
 						.filter(
 							( { visibility } ) => visibility?.publicly_queryable
 						)
 						.some( ( taxonomy ) => {
-							return !! post[ taxonomy.rest_base ]?.length;
+							return !! _post[ taxonomy.rest_base ]?.length;
 						} ),
 			};
 		},
 		[ postType, postId ]
 	);
+
+	// Counter used to cache-bust `useServerSideRender`
+	//
+	// This is a catch-all signal to re-render the block when a post's title,
+	// parent ID, or terms change.
+	//
+	// This is fundamentally imperfect, because there are other entities which
+	// could change in the meantime (the titles of ancestor posts, or the
+	// labels of taxonomy terms), hence the choice to re-render systematically
+	// upon saving.
+	const [ invalidationKey, setInvalidationKey ] = useState( 0 );
+	useEffect( () => {
+		setInvalidationKey( ( c ) => c + 1 );
+	}, [ post ] );
+
 	const blockProps = useBlockProps();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const { content } = useServerSideRender( {
 		attributes,
 		skipBlockSupportAttributes: true,
 		block: 'core/breadcrumbs',
-		urlQueryArgs: { post_id: postId },
+		urlQueryArgs: { post_id: postId, invalidationKey },
 	} );
 	// TODO: this should be handled better when we add more types.
 	let breadcrumbsType;
