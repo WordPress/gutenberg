@@ -9,7 +9,6 @@ import { useViewportMatch } from '@wordpress/compose';
 import { comment as commentIcon } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
-import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies

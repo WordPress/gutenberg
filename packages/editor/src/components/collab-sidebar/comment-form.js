@@ -15,7 +15,7 @@ import {
 	VisuallyHidden,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useInstanceId, useFocusOnMount } from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -25,13 +25,12 @@ import { sanitizeCommentString } from './utils';
 /**
  * EditComment component.
  *
- * @param {Object}   props                            - The component props.
- * @param {Function} props.onSubmit                   - The function to call when updating the comment.
- * @param {Function} props.onCancel                   - The function to call when canceling the comment update.
- * @param {Object}   props.thread                     - The comment thread object.
- * @param {string}   props.submitButtonText           - The text to display on the submit button.
- * @param {string?}  props.labelText                  - The label text for the comment input.
- * @param {boolean}  props.shouldFocusTextareaOnMount - Whether to focus the textarea on mount.
+ * @param {Object}   props                  - The component props.
+ * @param {Function} props.onSubmit         - The function to call when updating the comment.
+ * @param {Function} props.onCancel         - The function to call when canceling the comment update.
+ * @param {Object}   props.thread           - The comment thread object.
+ * @param {string}   props.submitButtonText - The text to display on the submit button.
+ * @param {string?}  props.labelText        - The label text for the comment input.
  * @return {React.ReactNode} The CommentForm component.
  */
 function CommentForm( {
@@ -40,14 +39,12 @@ function CommentForm( {
 	thread,
 	submitButtonText,
 	labelText,
-	shouldFocusTextareaOnMount,
 } ) {
 	const [ inputComment, setInputComment ] = useState(
 		thread?.content?.raw ?? ''
 	);
 
 	const inputId = useInstanceId( CommentForm, 'comment-input' );
-	const focusOnMountRef = useFocusOnMount( shouldFocusTextareaOnMount );
 	const isDisabled =
 		inputComment === thread?.content?.raw ||
 		! sanitizeCommentString( inputComment ).length;
@@ -68,7 +65,6 @@ function CommentForm( {
 				}
 				rows={ 1 }
 				maxRows={ 20 }
-				ref={ shouldFocusTextareaOnMount ? focusOnMountRef : null }
 			/>
 			<HStack spacing="2" justify="flex-end" wrap>
 				<Button size="compact" variant="tertiary" onClick={ onCancel }>
