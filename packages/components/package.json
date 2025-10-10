@@ -30,6 +30,8 @@
 			"import": "./build-module/index.js",
 			"default": "./build/index.js"
 		},
+		"./README.md": "./README.md",
+		"./CONTRIBUTING.md": "./CONTRIBUTING.md",
 		"./package.json": "./package.json"
 	},
 	"react-native": "src/index",
