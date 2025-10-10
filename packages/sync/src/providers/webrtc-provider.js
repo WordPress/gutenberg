@@ -8,10 +8,10 @@
  */
 import { WebrtcProviderWithHttpSignaling } from './webrtc-http-stream-signaling';
 
-/** @typedef {import('./types').ObjectType} ObjectType */
-/** @typedef {import('./types').ObjectID} ObjectID */
-/** @typedef {import('./types').CRDTDoc} CRDTDoc */
-/** @typedef {import('./types').ProviderCreator} ProviderCreator */
+/** @typedef {import('../types').ObjectType} ObjectType */
+/** @typedef {import('../types').ObjectID} ObjectID */
+/** @typedef {import('../types').CRDTDoc} CRDTDoc */
+/** @typedef {import('../types').ProviderCreator} ProviderCreator */
 
 /**
  * Function that creates a new WebRTC Connection.

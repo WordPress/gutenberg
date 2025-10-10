@@ -4,11 +4,11 @@
 // @ts-ignore
 import { IndexeddbPersistence } from 'y-indexeddb';
 
-/** @typedef {import('./types').ObjectType} ObjectType */
-/** @typedef {import('./types').ObjectID} ObjectID */
-/** @typedef {import('./types').CRDTDoc} CRDTDoc */
-/** @typedef {import('./types').ProviderCreator} ProviderCreator */
-/** @typedef {import('./types').ProviderCreatorResult} ProviderCreatorResult */
+/** @typedef {import('../types').ObjectType} ObjectType */
+/** @typedef {import('../types').ObjectID} ObjectID */
+/** @typedef {import('../types').CRDTDoc} CRDTDoc */
+/** @typedef {import('../types').ProviderCreator} ProviderCreator */
+/** @typedef {import('../types').ProviderCreatorResult} ProviderCreatorResult */
 
 /**
  * Connect function to the IndexedDB persistence provider.
