@@ -362,7 +362,7 @@ function LinkControl( {
 			id: undefined,
 			kind: undefined,
 			type: undefined,
-			url: '',
+			url: undefined,
 		} );
 
 		// Request focus after the component re-renders with the cleared state
