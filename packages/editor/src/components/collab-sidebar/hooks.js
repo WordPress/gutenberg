@@ -122,7 +122,7 @@ export function useBlockComments( postId ) {
 	return { resultComments, unresolvedSortedThreads, totalPages };
 }
 
-export function useBlockCommentsActions( commentUpdated ) {
+export function useBlockCommentsActions( reflowComments ) {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
 	const { getCurrentPostId } = useSelect( editorStore );
@@ -178,10 +178,10 @@ export function useBlockCommentsActions( commentUpdated ) {
 					isDismissible: true,
 				}
 			);
-			setTimeout( commentUpdated, 300 );
+			setTimeout( reflowComments, 300 );
 			return savedRecord;
 		} catch ( error ) {
-			commentUpdated();
+			reflowComments();
 			onError( error );
 		}
 	};
@@ -213,9 +213,9 @@ export function useBlockCommentsActions( commentUpdated ) {
 					isDismissible: true,
 				}
 			);
-			commentUpdated();
+			reflowComments();
 		} catch ( error ) {
-			commentUpdated();
+			reflowComments();
 			onError( error );
 		}
 	};
@@ -247,9 +247,9 @@ export function useBlockCommentsActions( commentUpdated ) {
 				type: 'snackbar',
 				isDismissible: true,
 			} );
-			commentUpdated();
+			reflowComments();
 		} catch ( error ) {
-			commentUpdated();
+			reflowComments();
 			onError( error );
 		}
 	};

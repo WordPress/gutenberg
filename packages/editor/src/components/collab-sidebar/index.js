@@ -76,7 +76,7 @@ function CollabSidebarContent( {
 					commentSidebarRef={ commentSidebarRef }
 					selectedThread={ selectedThread }
 					setSelectedThread={ setSelectedThread }
-					commentUpdated={ () => {} }
+					reflowComments={ () => {} }
 				/>
 			</VStack>
 		</div>
@@ -124,7 +124,7 @@ function FloatingCommentBoard( {
 		}
 	}, [ thread.id, refs.floating, setBlockRef ] );
 
-	const commentUpdated = () => {
+	const reflowComments = () => {
 		setCommentLastUpdated( Date.now() );
 	};
 
@@ -143,7 +143,7 @@ function FloatingCommentBoard( {
 	] );
 
 	const { onCreate, onEdit, onDelete } =
-		useBlockCommentsActions( commentUpdated );
+		useBlockCommentsActions( reflowComments );
 
 	return (
 		<VStack
@@ -162,7 +162,7 @@ function FloatingCommentBoard( {
 				commentSidebarRef={ commentSidebarRef }
 				selectedThread={ selectedThread }
 				setSelectedThread={ setSelectedThread }
-				commentUpdated={ commentUpdated }
+				reflowComments={ reflowComments }
 			/>
 		</VStack>
 	);

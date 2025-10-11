@@ -31,7 +31,7 @@ import { sanitizeCommentString } from './utils';
  * @param {Object}   props.thread           - The comment thread object.
  * @param {string}   props.submitButtonText - The text to display on the submit button.
  * @param {string?}  props.labelText        - The label text for the comment input.
- * @param {Function} props.commentUpdated   - The function to call when the comment is updated.
+ * @param {Function} props.reflowComments   - The function to call when the comment is updated.
  * @return {React.ReactNode} The CommentForm component.
  */
 function CommentForm( {
@@ -40,13 +40,14 @@ function CommentForm( {
 	thread,
 	submitButtonText,
 	labelText,
-	commentUpdated,
+	reflowComments,
 } ) {
 	const [ inputComment, setInputComment ] = useState(
 		thread?.content?.raw ?? ''
 	);
 
-	const debouncedCommentUpdated = useDebounce( commentUpdated, 100 );
+	// As the user types, the textarea may grow or shrink so we regularly trigger a comment reflow
+	const debouncedCommentUpdated = useDebounce( reflowComments, 100 );
 
 	const updateComment = ( value ) => {
 		setInputComment( value );

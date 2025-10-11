@@ -50,7 +50,7 @@ const { Menu } = unlock( componentsPrivateApis );
  * @param {Ref}      props.commentSidebarRef   - The ref to the comment sidebar.
  * @param {string}   props.selectedThread      - The ID of the currently selected comment thread.
  * @param {Function} props.setSelectedThread   - The function to set the selected comment thread.
- * @param {Function} props.commentUpdated      - The function to call indicating a comment is updated.
+ * @param {Function} props.reflowComments      - The function to call indicating a comment is updated.
  *
  * @return {React.ReactNode} The rendered Comments component.
  */
@@ -63,7 +63,7 @@ export function Comments( {
 	commentSidebarRef,
 	selectedThread,
 	setSelectedThread,
-	commentUpdated,
+	reflowComments,
 } ) {
 	const { blockCommentId, selectedBlockClientId } = useSelect( ( select ) => {
 		const { getBlockAttributes, getSelectedBlockClientId } =
@@ -133,7 +133,7 @@ export function Comments( {
 			setSelectedThread={ setSelectedThread }
 			setShowCommentBoard={ setShowCommentBoard }
 			commentSidebarRef={ commentSidebarRef }
-			commentUpdated={ commentUpdated }
+			reflowComments={ reflowComments }
 		/>
 	) );
 }
@@ -147,7 +147,7 @@ function Thread( {
 	setSelectedThread,
 	setShowCommentBoard,
 	commentSidebarRef,
-	commentUpdated,
+	reflowComments,
 } ) {
 	const { toggleBlockHighlight, selectBlock, toggleBlockSpotlight } = unlock(
 		useDispatch( blockEditorStore )
@@ -273,7 +273,7 @@ function Thread( {
 					}
 				} }
 				onDelete={ onCommentDelete }
-				commentUpdated={ commentUpdated }
+				reflowComments={ reflowComments }
 			/>
 			{ isSelected &&
 				replies.map( ( reply ) => (
@@ -289,7 +289,7 @@ function Thread( {
 							isExpanded={ isSelected }
 							onEdit={ onEditComment }
 							onDelete={ onCommentDelete }
-							commentUpdated={ commentUpdated }
+							reflowComments={ reflowComments }
 						/>
 					</VStack>
 				) ) }
@@ -326,7 +326,7 @@ function Thread( {
 					isExpanded={ isSelected }
 					onEdit={ onEditComment }
 					onDelete={ onCommentDelete }
-					commentUpdated={ commentUpdated }
+					reflowComments={ reflowComments }
 				/>
 			) }
 			{ isSelected && (
@@ -372,7 +372,7 @@ function Thread( {
 								thread?.author_name || 'Unknown'
 							) }
 							thread={ thread }
-							commentUpdated={ commentUpdated }
+							reflowComments={ reflowComments }
 						/>
 					</VStack>
 				</VStack>
@@ -387,7 +387,7 @@ const CommentBoard = ( {
 	isExpanded,
 	onEdit,
 	onDelete,
-	commentUpdated,
+	reflowComments,
 } ) => {
 	const [ actionState, setActionState ] = useState( false );
 	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
@@ -522,7 +522,7 @@ const CommentBoard = ( {
 						thread.id,
 						thread?.author_name || 'Unknown'
 					) }
-					commentUpdated={ commentUpdated }
+					reflowComments={ reflowComments }
 				/>
 			) : (
 				<RawHTML className="editor-collab-sidebar-panel__user-comment">
