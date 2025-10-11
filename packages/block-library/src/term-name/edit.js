@@ -24,7 +24,7 @@ import {
  * Internal dependencies
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
-import { useTermName } from './use-term-name';
+import { useTermData } from '../utils/use-context-data';
 
 export default function TermNameEdit( {
 	attributes,
@@ -32,7 +32,7 @@ export default function TermNameEdit( {
 	context: { termId, taxonomy },
 } ) {
 	const { textAlign, level = 0, isLink } = attributes;
-	const { term } = useTermName( termId, taxonomy );
+	const { term } = useTermData( termId, taxonomy );
 
 	const termName = term?.name || __( 'Term Name' );
 

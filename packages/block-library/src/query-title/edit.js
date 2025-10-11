@@ -24,7 +24,7 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { useArchiveLabel } from './use-archive-label';
+import { useArchiveData } from '../utils/use-context-data';
 import { usePostTypeLabel } from './use-post-type-label';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
@@ -42,7 +42,7 @@ export default function QueryTitleEdit( {
 	setAttributes,
 	context: { query },
 } ) {
-	const { archiveTypeLabel, archiveNameLabel } = useArchiveLabel();
+	const { archiveTypeLabel, archiveNameLabel } = useArchiveData();
 	const { postTypeLabel } = usePostTypeLabel( query?.postType );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
