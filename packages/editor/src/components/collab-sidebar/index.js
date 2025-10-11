@@ -329,6 +329,7 @@ export default function CollabSidebar() {
 					showCommentBoard={ showCommentBoard }
 					setShowCommentBoard={ setShowCommentBoard }
 					commentSidebarRef={ commentSidebarRef }
+					setSelectedThread={ setSelectedThread }
 				/>
 			</PluginSidebar>
 			{ isLargeViewport && unresolvedSortedThreads.length > 0 && (
