@@ -5,7 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __experimentalVStack as VStack } from '@wordpress/components';
 import { useState, useRef, useEffect, useCallback } from '@wordpress/element';
-import { useViewportMatch, useDebounce } from '@wordpress/compose';
+import { useViewportMatch } from '@wordpress/compose';
 import { comment as commentIcon } from '@wordpress/icons';
 import {
 	store as blockEditorStore,
@@ -124,11 +124,9 @@ function FloatingCommentBoard( {
 		}
 	}, [ thread.id, refs.floating, setBlockRef ] );
 
-	const commentUpdatedDebounced = () => {
+	const commentUpdated = () => {
 		setCommentLastUpdated( Date.now() );
 	};
-
-	const commentUpdated = useDebounce( commentUpdatedDebounced, 150 );
 
 	// When the selected thread changes, update heights, triggering offset recalculation.
 	useEffect( () => {

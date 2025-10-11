@@ -15,7 +15,7 @@ import {
 	VisuallyHidden,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useInstanceId } from '@wordpress/compose';
+import { useInstanceId, useDebounce } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -46,9 +46,10 @@ function CommentForm( {
 		thread?.content?.raw ?? ''
 	);
 
+	const debouncedCommentUpdated = useDebounce( commentUpdated, 100 );
+
 	const updateComment = ( value ) => {
 		setInputComment( value );
-		commentUpdated( thread.id );
 	};
 
 	const inputId = useInstanceId( CommentForm, 'comment-input' );
@@ -67,9 +68,10 @@ function CommentForm( {
 			<TextareaAutosize
 				id={ inputId }
 				value={ inputComment ?? '' }
-				onChange={ ( comment ) =>
-					updateComment( comment.target.value )
-				}
+				onChange={ ( comment ) => {
+					updateComment( comment.target.value );
+					debouncedCommentUpdated();
+				} }
 				rows={ 1 }
 				maxRows={ 20 }
 			/>
