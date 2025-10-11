@@ -78,7 +78,7 @@ export default {
 	},
 	Edit: 'color',
 	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
-		if ( Array.isArray( field.elements ) ) {
+		if ( field.elements ) {
 			return renderFromElements( { item, field } );
 		}
 

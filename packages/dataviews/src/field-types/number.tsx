@@ -59,7 +59,7 @@ export default {
 	},
 	Edit: 'number',
 	render: ( { item, field }: DataViewRenderFieldProps< any > ) =>
-		Array.isArray( field.elements )
+		field.elements
 			? renderFromElements( { item, field } )
 			: Number( field.getValue( { item } ) ).toFixed( 2 ), // TODO: remove this hardcoded value when the decimal number is configurable
 	enableSorting: true,

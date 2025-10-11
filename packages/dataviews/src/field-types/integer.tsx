@@ -55,7 +55,7 @@ export default {
 	},
 	Edit: 'integer',
 	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
-		return Array.isArray( field.elements )
+		return field.elements
 			? renderFromElements( { item, field } )
 			: field.getValue( { item } );
 	},

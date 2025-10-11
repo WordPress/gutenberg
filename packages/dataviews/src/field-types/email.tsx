@@ -61,7 +61,7 @@ export default {
 	},
 	Edit: 'email',
 	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
-		return Array.isArray( field.elements )
+		return field.elements
 			? renderFromElements( { item, field } )
 			: field.getValue( { item } );
 	},

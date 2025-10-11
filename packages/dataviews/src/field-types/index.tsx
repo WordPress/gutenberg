@@ -117,7 +117,7 @@ export default function getFieldTypeDefinition< Item >(
 		},
 		Edit: null,
 		render: ( { item, field }: DataViewRenderFieldProps< Item > ) => {
-			return Array.isArray( field.elements )
+			return field.elements
 				? renderFromElements( { item, field } )
 				: field.getValue( { item } );
 		},
