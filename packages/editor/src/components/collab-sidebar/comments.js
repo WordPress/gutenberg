@@ -381,7 +381,14 @@ function Thread( {
 	);
 }
 
-const CommentBoard = ( { thread, parent, isExpanded, onEdit, onDelete, commentUpdated } ) => {
+const CommentBoard = ( {
+	thread,
+	parent,
+	isExpanded,
+	onEdit,
+	onDelete,
+	commentUpdated,
+} ) => {
 	const [ actionState, setActionState ] = useState( false );
 	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
 
