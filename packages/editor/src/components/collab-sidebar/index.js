@@ -51,7 +51,7 @@ function CollabSidebarContent( {
 	selectedThread,
 	setSelectedThread,
 } ) {
-	const { onCreate, onEdit, onDelete } = useBlockCommentsActions();
+	const { onCreate, onEdit, onDelete } = useBlockCommentsActions( () => {} );
 
 	return (
 		<div
@@ -142,7 +142,8 @@ function FloatingCommentBoard( {
 		commentLastUpdated,
 	] );
 
-	const { onCreate, onEdit, onDelete } = useBlockCommentsActions();
+	const { onCreate, onEdit, onDelete } =
+		useBlockCommentsActions( commentUpdated );
 
 	return (
 		<VStack
