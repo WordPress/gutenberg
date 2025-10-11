@@ -1,4 +1,8 @@
 /**
+ * 
+ */
+
+/**
  * External dependencies
  */
 import clsx from 'clsx';
@@ -6,22 +10,41 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { RichText, useBlockProps } from '@wordpress/block-editor';
-import { isRTL } from '@wordpress/i18n';
+import { RichText, useBlockProps, InnerBlocks } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { align, content, dropCap, direction } = attributes;
-	const className = clsx( {
-		'has-drop-cap':
-			align === ( isRTL() ? 'left' : 'right' ) || align === 'center'
-				? false
-				: dropCap,
-		[ `has-text-align-${ align }` ]: align,
-	} );
+    const {
+        summary,
+        summaryLevel,
+        summaryId,
+        contentId,
+        showContent,
+    } = attributes;
 
-	return (
-		<p { ...useBlockProps.save( { className, dir: direction } ) }>
-			<RichText.Content value={ content } />
-		</p>
-	);
+     const className = clsx( 'wp-block-details', {
+        'is-open': !! showContent,
+    } );
+
+    const blockProps = useBlockProps.save( { className } );
+
+     const TagName = summaryLevel ? summaryLevel : 'span';
+
+    return (
+        <div { ...blockProps }>
+            <details open={ !! showContent }>
+                <summary id={ summaryId } aria-controls={ contentId }>
+                    <RichText.Content
+                        tagName={ TagName }
+                        className={ summaryLevel ? 'wp-block-details-summary-heading' : undefined }
+                        value={ summary }
+                    />
+                </summary>
+
+                <div id={ contentId } role="region" aria-labelledby={ summaryId }>
+                    <InnerBlocks.Content />
+                </div>
+            </details>
+        </div>
+    );
 }
+

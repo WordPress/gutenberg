@@ -55,3 +55,8 @@ p.has-text-align-right[style*="writing-mode:vertical-rl"],
 p.has-text-align-left[style*="writing-mode:vertical-lr"] {
 	rotate: 180deg;
 }
+.wp-block-details-summary-heading {
+  display: inline;
+  margin: 0;
+  line-height: inherit;
+}
