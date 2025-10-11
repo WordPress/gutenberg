@@ -39,6 +39,13 @@ export function useBlockComments( postId ) {
 		};
 	}, [] );
 
+	const { blockIds } = useSelect( ( select ) => {
+		const { getBlockOrder } = select( blockEditorStore );
+		return {
+			blockIds: getBlockOrder(),
+		};
+	}, [] );
+
 	// Process comments to build the tree structure.
 	const { resultComments, unresolvedSortedThreads } = useMemo( () => {
 		const blocksWithComments = clientIds.reduce( ( results, clientId ) => {
@@ -116,10 +123,11 @@ export function useBlockComments( postId ) {
 		return {
 			resultComments: allSortedComments,
 			unresolvedSortedThreads: unresolvedSortedComments,
+			blockIds,
 		};
 	}, [ clientIds, threads, getBlockAttributes ] );
 
-	return { resultComments, unresolvedSortedThreads, totalPages };
+	return { resultComments, unresolvedSortedThreads, totalPages, blockIds };
 }
 
 export function useBlockCommentsActions( reflowComments ) {

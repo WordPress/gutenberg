@@ -208,7 +208,7 @@ export default function CollabSidebar() {
 			: null;
 	}, [] );
 
-	const { resultComments, unresolvedSortedThreads, totalPages } =
+	const { resultComments, unresolvedSortedThreads, totalPages, blockIds } =
 		useBlockComments( postId );
 	useEnableFloatingSidebar( resultComments.length > 0 );
 
@@ -271,7 +271,7 @@ export default function CollabSidebar() {
 		};
 		const newOffsets = calculateAllOffsets();
 		setBoardOffsets( newOffsets );
-	}, [ heights ] );
+	}, [ heights, blockIds ] );
 
 	// Get the global styles to set the background color of the sidebar.
 	const { merged: GlobalStyles } = useGlobalStylesContext();
