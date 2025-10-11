@@ -50,6 +50,7 @@ const { Menu } = unlock( componentsPrivateApis );
  * @param {Ref}      props.commentSidebarRef   - The ref to the comment sidebar.
  * @param {string}   props.selectedThread      - The ID of the currently selected comment thread.
  * @param {Function} props.setSelectedThread   - The function to set the selected comment thread.
+ * @param {Function} props.commentUpdated      - The function to call indicating a comment is updated.
  *
  * @return {React.ReactNode} The rendered Comments component.
  */
@@ -62,6 +63,7 @@ export function Comments( {
 	commentSidebarRef,
 	selectedThread,
 	setSelectedThread,
+	commentUpdated,
 } ) {
 	const { blockCommentId, selectedBlockClientId } = useSelect( ( select ) => {
 		const { getBlockAttributes, getSelectedBlockClientId } =
@@ -131,6 +133,7 @@ export function Comments( {
 			setSelectedThread={ setSelectedThread }
 			setShowCommentBoard={ setShowCommentBoard }
 			commentSidebarRef={ commentSidebarRef }
+			commentUpdated={ commentUpdated }
 		/>
 	) );
 }
@@ -144,6 +147,7 @@ function Thread( {
 	setSelectedThread,
 	setShowCommentBoard,
 	commentSidebarRef,
+	commentUpdated,
 } ) {
 	const { toggleBlockHighlight, selectBlock, toggleBlockSpotlight } = unlock(
 		useDispatch( blockEditorStore )
@@ -269,6 +273,7 @@ function Thread( {
 					}
 				} }
 				onDelete={ onCommentDelete }
+				commentUpdated={ commentUpdated }
 			/>
 			{ isSelected &&
 				replies.map( ( reply ) => (
@@ -284,6 +289,7 @@ function Thread( {
 							isExpanded={ isSelected }
 							onEdit={ onEditComment }
 							onDelete={ onCommentDelete }
+							commentUpdated={ commentUpdated }
 						/>
 					</VStack>
 				) ) }
@@ -320,6 +326,7 @@ function Thread( {
 					isExpanded={ isSelected }
 					onEdit={ onEditComment }
 					onDelete={ onCommentDelete }
+					commentUpdated={ commentUpdated }
 				/>
 			) }
 			{ isSelected && (
@@ -364,6 +371,8 @@ function Thread( {
 								thread.id,
 								thread?.author_name || 'Unknown'
 							) }
+							thread={ thread }
+							commentUpdated={ commentUpdated }
 						/>
 					</VStack>
 				</VStack>
@@ -372,7 +381,14 @@ function Thread( {
 	);
 }
 
-const CommentBoard = ( { thread, parent, isExpanded, onEdit, onDelete } ) => {
+const CommentBoard = ( {
+	thread,
+	parent,
+	isExpanded,
+	onEdit,
+	onDelete,
+	commentUpdated,
+} ) => {
 	const [ actionState, setActionState ] = useState( false );
 	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
 
@@ -506,6 +522,7 @@ const CommentBoard = ( { thread, parent, isExpanded, onEdit, onDelete } ) => {
 						thread.id,
 						thread?.author_name || 'Unknown'
 					) }
+					commentUpdated={ commentUpdated }
 				/>
 			) : (
 				<RawHTML className="editor-collab-sidebar-panel__user-comment">

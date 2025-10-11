@@ -76,6 +76,7 @@ function CollabSidebarContent( {
 					commentSidebarRef={ commentSidebarRef }
 					selectedThread={ selectedThread }
 					setSelectedThread={ setSelectedThread }
+					commentUpdated={ () => {} }
 				/>
 			</VStack>
 		</div>
@@ -93,6 +94,8 @@ function FloatingCommentBoard( {
 	selectedThread,
 	setSelectedThread,
 } ) {
+	const [ commentLastUpdated, setCommentLastUpdated ] = useState( null );
+
 	const blockRef = useRef();
 	useBlockElementRef( thread.blockClientId, blockRef );
 
@@ -121,13 +124,23 @@ function FloatingCommentBoard( {
 		}
 	}, [ thread.id, refs.floating, setBlockRef ] );
 
+	const commentUpdated = () => {
+		setCommentLastUpdated( Date.now() );
+	};
+
 	// When the selected thread changes, update heights, triggering offset recalculation.
 	useEffect( () => {
 		if ( refs.floating?.current ) {
 			const newHeight = refs.floating.current.scrollHeight;
 			updateHeight( thread.id, newHeight );
 		}
-	}, [ thread.id, updateHeight, refs.floating, selectedThread ] );
+	}, [
+		thread.id,
+		updateHeight,
+		refs.floating,
+		selectedThread,
+		commentLastUpdated,
+	] );
 
 	const { onCreate, onEdit, onDelete } = useBlockCommentsActions();
 
@@ -148,6 +161,7 @@ function FloatingCommentBoard( {
 				commentSidebarRef={ commentSidebarRef }
 				selectedThread={ selectedThread }
 				setSelectedThread={ setSelectedThread }
+				commentUpdated={ commentUpdated }
 			/>
 		</VStack>
 	);
@@ -203,61 +217,60 @@ export default function CollabSidebar() {
 		setBlockRefs( ( prev ) => ( { ...prev, [ id ]: blockRef } ) );
 	}, [] );
 
-	/**
-	 * Calculate the y offsets for all comment threads. Account for potentially
-	 * overlapping threads and adjust their positions accordingly.
-	 */
-	const calculateAllOffsets = () => {
-		const offsets = {};
-		let previousThreadData = null;
-
-		// Co thru the comment threads from top to bottom.
-		unresolvedSortedThreads.forEach( ( thread ) => {
-			if ( ! blockRefs[ thread.id ] ) {
-				return;
-			}
-			// The thread's starting top position is determined by its
-			// associated block's position.
-			const blockElement = blockRefs[ thread.id ];
-			const blockRect = blockElement?.getBoundingClientRect();
-			const threadTop = blockRect?.top || 0;
-
-			// Heights are tracked by the comment threads themselves.
-			const threadHeight = heights[ thread.id ] || 0;
-
-			// By default, remove the top margin by shifting the block up
-			// so it more precisely aligns with the block.
-			let additionalOffset = -16;
-
-			// The first block never needs to be adjusted.
-			if ( previousThreadData ) {
-				// Check if the thread overlaps with the previous one.
-				const previousBottom =
-					previousThreadData.threadTop +
-					previousThreadData.threadHeight;
-				if ( threadTop < previousBottom ) {
-					// Shift down by the difference plus a margin to avoid overlap.
-					additionalOffset = previousBottom - threadTop + 20;
-				}
-			}
-
-			// Store the current thread's position and height for the next iteration.
-			previousThreadData = {
-				threadTop: threadTop + additionalOffset,
-				threadHeight,
-			};
-
-			offsets[ thread.id ] = additionalOffset;
-		} );
-
-		return offsets;
-	};
-
 	// Recalculate offsets whenever the heights change.
 	useEffect( () => {
+		/**
+		 * Calculate the y offsets for all comment threads. Account for potentially
+		 * overlapping threads and adjust their positions accordingly.
+		 */
+		const calculateAllOffsets = () => {
+			const offsets = {};
+			let previousThreadData = null;
+
+			// Co thru the comment threads from top to bottom.
+			unresolvedSortedThreads.forEach( ( thread ) => {
+				if ( ! blockRefs[ thread.id ] ) {
+					return;
+				}
+				// The thread's starting top position is determined by its
+				// associated block's position.
+				const blockElement = blockRefs[ thread.id ];
+				const blockRect = blockElement?.getBoundingClientRect();
+				const threadTop = blockRect?.top || 0;
+
+				// Heights are tracked by the comment threads themselves.
+				const threadHeight = heights[ thread.id ] || 0;
+
+				// By default, remove the top margin by shifting the block up
+				// so it more precisely aligns with the block.
+				let additionalOffset = -16;
+
+				// The first block never needs to be adjusted.
+				if ( previousThreadData ) {
+					// Check if the thread overlaps with the previous one.
+					const previousBottom =
+						previousThreadData.threadTop +
+						previousThreadData.threadHeight;
+					if ( threadTop < previousBottom ) {
+						// Shift down by the difference plus a margin to avoid overlap.
+						additionalOffset = previousBottom - threadTop + 20;
+					}
+				}
+
+				// Store the current thread's position and height for the next iteration.
+				previousThreadData = {
+					threadTop: threadTop + additionalOffset,
+					threadHeight,
+				};
+
+				offsets[ thread.id ] = additionalOffset;
+			} );
+
+			return offsets;
+		};
 		const newOffsets = calculateAllOffsets();
 		setBoardOffsets( newOffsets );
-	}, [ heights, calculateAllOffsets ] );
+	}, [ heights ] );
 
 	// Get the global styles to set the background color of the sidebar.
 	const { merged: GlobalStyles } = useGlobalStylesContext();

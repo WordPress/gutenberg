@@ -31,6 +31,7 @@ import { sanitizeCommentString } from './utils';
  * @param {Object}   props.thread           - The comment thread object.
  * @param {string}   props.submitButtonText - The text to display on the submit button.
  * @param {string?}  props.labelText        - The label text for the comment input.
+ * @param {Function} props.commentUpdated   - The function to call when the comment is updated.
  * @return {React.ReactNode} The CommentForm component.
  */
 function CommentForm( {
@@ -39,10 +40,16 @@ function CommentForm( {
 	thread,
 	submitButtonText,
 	labelText,
+	commentUpdated,
 } ) {
 	const [ inputComment, setInputComment ] = useState(
 		thread?.content?.raw ?? ''
 	);
+
+	const updateComment = ( value ) => {
+		setInputComment( value );
+		commentUpdated( thread.id );
+	};
 
 	const inputId = useInstanceId( CommentForm, 'comment-input' );
 	const isDisabled =
@@ -61,7 +68,7 @@ function CommentForm( {
 				id={ inputId }
 				value={ inputComment ?? '' }
 				onChange={ ( comment ) =>
-					setInputComment( comment.target.value )
+					updateComment( comment.target.value )
 				}
 				rows={ 1 }
 				maxRows={ 20 }
