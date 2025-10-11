@@ -819,7 +819,7 @@ function isV2SourceFile( filename ) {
 		path.relative( process.cwd(), filename )
 	);
 
-	if ( ! /\/src\/.+\.(js|ts|tsx)$/.test( relativePath ) ) {
+	if ( ! /\/src\/.+\.(js|ts|tsx|scss)$/.test( relativePath ) ) {
 		return false;
 	}
 

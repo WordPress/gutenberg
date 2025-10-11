@@ -40,6 +40,10 @@
 			}
 		},
 		"typography": {
+			"__experimentalSkipSerialization": [
+				"textDecoration",
+				"letterSpacing"
+			],
 			"fontSize": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
@@ -54,6 +58,12 @@
 		},
 		"shadow": true,
 		"blockVisibility": false
+	},
+	"selectors": {
+		"typography": {
+			"letterSpacing": ".wp-block-accordion-heading .wp-block-accordion-heading__toggle-title",
+			"textDecoration": ".wp-block-accordion-heading .wp-block-accordion-heading__toggle-title"
+		}
 	},
 	"attributes": {
 		"openByDefault": {
