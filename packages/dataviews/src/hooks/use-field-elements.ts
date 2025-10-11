@@ -7,19 +7,13 @@ import { useEffect, useRef, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import type { FieldElementsSource, Option } from '../types';
+import resolveFieldElements from '../utils/resolve-field-elements';
 
 type UseFieldElementsResult = {
 	elements: Option[];
 	isResolving: boolean;
 	error?: unknown;
 };
-
-function toPromise< T >( value: T | Promise< T > ): Promise< T > {
-	if ( value && typeof ( value as Promise< T > ).then === 'function' ) {
-		return value as Promise< T >;
-	}
-	return Promise.resolve( value );
-}
 
 export function useFieldElements(
 	source: FieldElementsSource | undefined
@@ -56,13 +50,13 @@ export function useFieldElements(
 		setIsResolving( true );
 		setError( undefined );
 
-		toPromise( typeof source === 'function' ? source() : source )
+		resolveFieldElements( source )
 			.then( ( result ) => {
 				if ( ! isMounted || requestId !== requestIdRef.current ) {
 					return;
 				}
 
-				setElements( Array.isArray( result ) ? result : [] );
+				setElements( result );
 			} )
 			.catch( ( err ) => {
 				if ( ! isMounted || requestId !== requestIdRef.current ) {
