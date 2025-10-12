@@ -175,7 +175,7 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_Test_REST_TestCase {
 
 	public function test_create_block_comment_status() {
 		wp_set_current_user( self::$user_ids['author'] );
-		$post_id = $this->factory->post->create();
+		$post_id = $this->factory->post->create( array( 'post_author' => self::$user_ids['author'] ) );
 
 		$params = array(
 			'post'         => $post_id,
