@@ -4,6 +4,7 @@
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 
 export function getLatestHeadings( select, clientId ) {
 	const {
@@ -147,4 +148,19 @@ export function getLatestHeadings( select, clientId ) {
 	}
 
 	return latestHeadings;
+}
+
+/**
+ * Hook to get the latest headings.
+ *
+ * @param {string} clientId The block's client ID.
+ * @return {Array} Array of heading objects with content, level, link, and page properties.
+ */
+export function useHeadings( clientId ) {
+	return useSelect(
+		( select ) => {
+			return getLatestHeadings( select, clientId );
+		},
+		[ clientId ]
+	);
 }

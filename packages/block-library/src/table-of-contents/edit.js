@@ -36,7 +36,7 @@ import {
  */
 import TableOfContentsList from './list';
 import { linearToNestedHeadingList } from './utils';
-import { getLatestHeadings } from './hooks';
+import { useHeadings } from './hooks';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 /** @typedef {import('./utils').HeadingData} HeadingData */
@@ -60,12 +60,7 @@ export default function TableOfContentsEdit( {
 	setAttributes,
 } ) {
 	// Get headings so they can be previewed in the editor.
-	const headings = useSelect(
-		( select ) => {
-			return getLatestHeadings( select, clientId );
-		},
-		[ clientId ]
-	);
+	const headings = useHeadings( clientId );
 
 	const blockProps = useBlockProps();
 	const instanceId = useInstanceId(
