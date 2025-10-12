@@ -6,6 +6,9 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
+// Cache for memoizing heading results.
+const headingCache = new Map();
+
 export function getLatestHeadings( select, clientId ) {
 	const {
 		getBlockAttributes,
@@ -15,11 +18,39 @@ export function getLatestHeadings( select, clientId ) {
 		getBlocks,
 	} = select( blockEditorStore );
 
-	const { getEditedEntityRecord } = select( coreStore );
-
 	const isPaginated = getBlocksByName( 'core/nextpage' ).length !== 0;
 	const { onlyIncludeCurrentPage, maxLevel } =
 		getBlockAttributes( clientId ) ?? {};
+
+	const allBlocks = getBlocks();
+	const nextPageBlocks = getBlocksByName( 'core/nextpage' );
+	const postContentBlocks = getBlocksByName( 'core/post-content' );
+
+	const headingBlocks = allBlocks.filter(
+		( block ) => block.name === 'core/heading'
+	);
+	const headingData = headingBlocks.map( ( block ) => ( {
+		clientId: block.clientId,
+		content: block.attributes?.content || '',
+		level: block.attributes?.level || 1,
+		anchor: block.attributes?.anchor || '',
+	} ) );
+
+	const cacheKey = JSON.stringify( {
+		clientId,
+		onlyIncludeCurrentPage,
+		maxLevel,
+		isPaginated,
+		blocksCount: allBlocks.length,
+		nextPageCount: nextPageBlocks.length,
+		postContentCount: postContentBlocks.length,
+		headingData,
+	} );
+
+	// Check if we have a cached result for this data.
+	if ( headingCache.has( cacheKey ) ) {
+		return headingCache.get( cacheKey );
+	}
 
 	// Get post-content block client ID.
 	const [ postContentClientId = '' ] = getBlocksByName( 'core/post-content' );
@@ -117,6 +148,7 @@ export function getLatestHeadings( select, clientId ) {
 				// Get the full permalink for consistency with server-side rendering.
 				const { getCurrentPostId, getCurrentPostType } =
 					select( 'core/editor' );
+				const { getEditedEntityRecord } = select( coreStore );
 				const currentPostId = getCurrentPostId();
 				const currentPostType = getCurrentPostType();
 
@@ -145,6 +177,15 @@ export function getLatestHeadings( select, clientId ) {
 				} );
 			}
 		}
+	}
+
+	// Cache the result and clean up old entries.
+	headingCache.set( cacheKey, latestHeadings );
+
+	// Keep only the most recent 50 entries to prevent memory leaks.
+	if ( headingCache.size > 50 ) {
+		const firstKey = headingCache.keys().next().value;
+		headingCache.delete( firstKey );
 	}
 
 	return latestHeadings;
