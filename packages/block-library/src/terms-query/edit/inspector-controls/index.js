@@ -35,7 +35,7 @@ export default function TermsQueryInspectorControls( {
 		order,
 		hideEmpty,
 		inherit,
-		hierarchical,
+		showNested,
 		perPage,
 	} = termQuery;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
@@ -66,8 +66,8 @@ export default function TermsQueryInspectorControls( {
 	const displayInheritControl =
 		isTaxonomyHierarchical && isTaxonomyMatchingTemplate;
 
-	// Only display the hierarchical control if the taxonomy is hierarchical and not inheriting.
-	const displayHierarchicalControl =
+	// Only display the showNested control if the taxonomy is hierarchical and not inheriting.
+	const displayShowNestedControl =
 		isTaxonomyHierarchical && ! termQuery.inherit;
 
 	// Labels shared between ToolsPanelItem and its child control.
@@ -90,7 +90,7 @@ export default function TermsQueryInspectorControls( {
 								order: 'asc',
 								orderBy: 'name',
 								hideEmpty: true,
-								hierarchical: false,
+								showNested: false,
 								parent: false,
 								perPage: 10,
 							},
@@ -161,20 +161,20 @@ export default function TermsQueryInspectorControls( {
 							/>
 						</ToolsPanelItem>
 					) }
-					{ displayHierarchicalControl && (
+					{ displayShowNestedControl && (
 						<ToolsPanelItem
-							hasValue={ () => hierarchical !== false }
+							hasValue={ () => showNested !== false }
 							label={ nestedTermsControlLabel }
 							onDeselect={ () =>
-								setQuery( { hierarchical: false } )
+								setQuery( { showNested: false } )
 							}
 							isShownByDefault
 						>
 							<NestedTermsControl
 								label={ nestedTermsControlLabel }
-								value={ hierarchical }
+								value={ showNested }
 								onChange={ ( value ) =>
-									setQuery( { hierarchical: value } )
+									setQuery( { showNested: value } )
 								}
 							/>
 						</ToolsPanelItem>
