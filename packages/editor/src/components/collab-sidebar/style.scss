@@ -9,13 +9,6 @@
 .editor-collab-sidebar {
 	height: 100%;
 	overflow: hidden;
-	& .editor-collab-sidebar-panel__thread.is-floating {
-		padding: 0;
-		border: none;
-		position: absolute;
-		width: 250px;
-		margin-top: 16px;
-	}
 }
 
 .editor-collab-sidebar-panel {
@@ -41,6 +34,14 @@
 	&:focus {
 		outline: var(--wp-admin-border-width-focus) solid var(--wp-admin-theme-color);
 		outline-offset: calc((-1 * var(--wp-admin-border-width-focus)));
+	}
+
+	&.is-floating {
+		padding: 16px;
+		border: none;
+		position: absolute;
+		width: 250px;
+		margin-top: 16px;
 	}
 }
 

@@ -4,19 +4,15 @@
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __experimentalVStack as VStack } from '@wordpress/components';
-import { useState, useRef, useEffect, useCallback } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { comment as commentIcon } from '@wordpress/icons';
-import {
-	store as blockEditorStore,
-	privateApis as blockEditorPrivateApis,
-} from '@wordpress/block-editor';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../lock-unlock';
 import PluginSidebar from '../plugin-sidebar';
 import { collabHistorySidebarName, collabSidebarName } from './constants';
 import { Comments } from './comments';
@@ -32,137 +28,46 @@ import {
 } from './hooks';
 import { focusCommentThread } from './utils';
 
-/**
- * External dependencies
- */
-import {
-	useFloating,
-	offset as offsetMiddleware,
-	autoUpdate,
-} from '@floating-ui/react-dom';
-const { useBlockElementRef } = unlock( blockEditorPrivateApis );
-
 function CollabSidebarContent( {
 	showCommentBoard,
 	setShowCommentBoard,
 	styles,
 	comments,
 	commentSidebarRef,
-	selectedThread,
-	setSelectedThread,
+	reflowComments,
+	commentLastUpdated,
+	isFloating = false,
 } ) {
-	const { onCreate, onEdit, onDelete } = useBlockCommentsActions( () => {} );
+	const { onCreate, onEdit, onDelete } =
+		useBlockCommentsActions( reflowComments );
 
 	return (
-		<div
+		<VStack
 			className="editor-collab-sidebar-panel"
 			style={ styles }
+			role="list"
+			spacing="3"
 			ref={ commentSidebarRef }
 		>
-			<VStack role="list" spacing="3">
+			{ ! isFloating && (
 				<AddComment
 					onSubmit={ onCreate }
 					showCommentBoard={ showCommentBoard }
 					setShowCommentBoard={ setShowCommentBoard }
 					commentSidebarRef={ commentSidebarRef }
 				/>
-				<Comments
-					threads={ comments }
-					onEditComment={ onEdit }
-					onAddReply={ onCreate }
-					onCommentDelete={ onDelete }
-					showCommentBoard={ showCommentBoard }
-					setShowCommentBoard={ setShowCommentBoard }
-					commentSidebarRef={ commentSidebarRef }
-					selectedThread={ selectedThread }
-					setSelectedThread={ setSelectedThread }
-					reflowComments={ () => {} }
-				/>
-			</VStack>
-		</div>
-	);
-}
-
-function FloatingCommentBoard( {
-	thread,
-	showCommentBoard,
-	setShowCommentBoard,
-	commentSidebarRef,
-	calculatedOffset,
-	updateHeight,
-	setBlockRef,
-	selectedThread,
-	setSelectedThread,
-} ) {
-	const [ commentLastUpdated, setCommentLastUpdated ] = useState( null );
-
-	const blockRef = useRef();
-	useBlockElementRef( thread.blockClientId, blockRef );
-
-	// Use floating-ui to track the block element's position with the calculated offset.
-	const { y, refs } = useFloating( {
-		placement: 'right-start',
-		middleware: [
-			offsetMiddleware( {
-				crossAxis: calculatedOffset || -16,
-			} ),
-		],
-		whileElementsMounted: autoUpdate,
-	} );
-
-	// Store the block reference for each thread.
-	useEffect( () => {
-		if ( blockRef.current ) {
-			refs.setReference( blockRef.current );
-		}
-	}, [ blockRef, refs ] );
-
-	// Track thread heights.
-	useEffect( () => {
-		if ( refs.floating?.current ) {
-			setBlockRef( thread.id, blockRef.current );
-		}
-	}, [ thread.id, refs.floating, setBlockRef ] );
-
-	const reflowComments = () => {
-		setCommentLastUpdated( Date.now() );
-	};
-
-	// When the selected thread changes, update heights, triggering offset recalculation.
-	useEffect( () => {
-		if ( refs.floating?.current ) {
-			const newHeight = refs.floating.current.scrollHeight;
-			updateHeight( thread.id, newHeight );
-		}
-	}, [
-		thread.id,
-		updateHeight,
-		refs.floating,
-		selectedThread,
-		commentLastUpdated,
-	] );
-
-	const { onCreate, onEdit, onDelete } =
-		useBlockCommentsActions( reflowComments );
-
-	return (
-		<VStack
-			ref={ refs.setFloating }
-			className="editor-collab-sidebar-panel__thread is-floating"
-			spacing="0"
-			style={ { top: y } }
-		>
+			) }
 			<Comments
-				threads={ [ thread ] }
+				threads={ comments }
 				onEditComment={ onEdit }
 				onAddReply={ onCreate }
 				onCommentDelete={ onDelete }
 				showCommentBoard={ showCommentBoard }
 				setShowCommentBoard={ setShowCommentBoard }
 				commentSidebarRef={ commentSidebarRef }
-				selectedThread={ selectedThread }
-				setSelectedThread={ setSelectedThread }
 				reflowComments={ reflowComments }
+				commentLastUpdated={ commentLastUpdated }
+				isFloating={ isFloating }
 			/>
 		</VStack>
 	);
@@ -176,19 +81,6 @@ export default function CollabSidebar() {
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const [ heights, setHeights ] = useState( {} );
-	const [ boardOffsets, setBoardOffsets ] = useState( {} );
-	const [ blockRefs, setBlockRefs ] = useState( {} );
-	const [ selectedThread, setSelectedThread ] = useState( null );
-
-	const updateHeight = useCallback( ( id, newHeight ) => {
-		setHeights( ( prev ) => {
-			if ( prev[ id ] !== newHeight ) {
-				return { ...prev, [ id ]: newHeight };
-			}
-			return prev;
-		} );
-	}, [] );
 
 	const commentSidebarRef = useRef( null );
 
@@ -208,70 +100,16 @@ export default function CollabSidebar() {
 			: null;
 	}, [] );
 
-	const { resultComments, unresolvedSortedThreads, totalPages, blockIds } =
-		useBlockComments( postId );
+	const {
+		resultComments,
+		unresolvedSortedThreads,
+		totalPages,
+		reflowComments,
+		commentLastUpdated,
+	} = useBlockComments( postId );
 	useEnableFloatingSidebar( resultComments.length > 0 );
 
 	const hasMoreComments = totalPages && totalPages > 1;
-
-	const setBlockRef = useCallback( ( id, blockRef ) => {
-		setBlockRefs( ( prev ) => ( { ...prev, [ id ]: blockRef } ) );
-	}, [] );
-
-	// Recalculate offsets whenever the heights change.
-	useEffect( () => {
-		/**
-		 * Calculate the y offsets for all comment threads. Account for potentially
-		 * overlapping threads and adjust their positions accordingly.
-		 */
-		const calculateAllOffsets = () => {
-			const offsets = {};
-			let previousThreadData = null;
-
-			// Co thru the comment threads from top to bottom.
-			unresolvedSortedThreads.forEach( ( thread ) => {
-				if ( ! blockRefs[ thread.id ] ) {
-					return;
-				}
-				// The thread's starting top position is determined by its
-				// associated block's position.
-				const blockElement = blockRefs[ thread.id ];
-				const blockRect = blockElement?.getBoundingClientRect();
-				const threadTop = blockRect?.top || 0;
-
-				// Heights are tracked by the comment threads themselves.
-				const threadHeight = heights[ thread.id ] || 0;
-
-				// By default, remove the top margin by shifting the block up
-				// so it more precisely aligns with the block.
-				let additionalOffset = -16;
-
-				// The first block never needs to be adjusted.
-				if ( previousThreadData ) {
-					// Check if the thread overlaps with the previous one.
-					const previousBottom =
-						previousThreadData.threadTop +
-						previousThreadData.threadHeight;
-					if ( threadTop < previousBottom ) {
-						// Shift down by the difference plus a margin to avoid overlap.
-						additionalOffset = previousBottom - threadTop + 20;
-					}
-				}
-
-				// Store the current thread's position and height for the next iteration.
-				previousThreadData = {
-					threadTop: threadTop + additionalOffset,
-					threadHeight,
-				};
-
-				offsets[ thread.id ] = additionalOffset;
-			} );
-
-			return offsets;
-		};
-		const newOffsets = calculateAllOffsets();
-		setBoardOffsets( newOffsets );
-	}, [ heights, blockIds ] );
 
 	// Get the global styles to set the background color of the sidebar.
 	const { merged: GlobalStyles } = useGlobalStylesContext();
@@ -329,7 +167,8 @@ export default function CollabSidebar() {
 					showCommentBoard={ showCommentBoard }
 					setShowCommentBoard={ setShowCommentBoard }
 					commentSidebarRef={ commentSidebarRef }
-					setSelectedThread={ setSelectedThread }
+					reflowComments={ reflowComments }
+					commentLastUpdated={ commentLastUpdated }
 				/>
 			</PluginSidebar>
 			{ isLargeViewport && unresolvedSortedThreads.length > 0 && (
@@ -341,35 +180,15 @@ export default function CollabSidebar() {
 					headerClassName="editor-collab-sidebar__header"
 					backgroundColor={ backgroundColor }
 				>
-					<div
-						className="editor-collab-sidebar-panel"
-						style={ {
-							backgroundColor,
-						} }
-						ref={ commentSidebarRef }
-					>
-						{ unresolvedSortedThreads.length > 0 &&
-							unresolvedSortedThreads.map( ( thread ) => {
-								return (
-									<FloatingCommentBoard
-										key={ thread.id }
-										thread={ thread }
-										showCommentBoard={ showCommentBoard }
-										setShowCommentBoard={
-											setShowCommentBoard
-										}
-										calculatedOffset={
-											boardOffsets[ thread.id ]
-										}
-										updateHeight={ updateHeight }
-										commentSidebarRef={ commentSidebarRef }
-										setBlockRef={ setBlockRef }
-										selectedThread={ selectedThread }
-										setSelectedThread={ setSelectedThread }
-									/>
-								);
-							} ) }
-					</div>
+					<CollabSidebarContent
+						comments={ unresolvedSortedThreads }
+						showCommentBoard={ showCommentBoard }
+						setShowCommentBoard={ setShowCommentBoard }
+						commentSidebarRef={ commentSidebarRef }
+						reflowComments={ reflowComments }
+						commentLastUpdated={ commentLastUpdated }
+						isFloating
+					/>
 				</PluginSidebar>
 			) }
 		</>
