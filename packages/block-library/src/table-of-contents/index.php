@@ -74,7 +74,12 @@ function render_block_core_table_of_contents( $attributes ) {
  * @return string HTML with full URLs.
  */
 function block_core_table_of_contents_add_full_urls( $html ) {
-	$current_url = get_permalink();
+	global $_wp_current_template_content;
+	if ( ! empty( $_wp_current_template_content ) ) {
+		$current_url = home_url( $_SERVER['REQUEST_URI'] );
+	} else {
+		$current_url = get_permalink();
+	}
 
 	if ( empty( $current_url ) ) {
 		return $html;

@@ -3,7 +3,6 @@
  */
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
 // Cache for memoizing heading results.
@@ -129,45 +128,15 @@ export function getLatestHeadings( select, clientId ) {
 					headingAttributes.content.replace( /(<br *\/?>)+/g, ' ' )
 				);
 
-				// Use explicit anchor or generate one from content
-				let anchor =
+				// Use anchor from heading block attributes
+				const anchor =
 					typeof headingAttributes.anchor === 'string' &&
 					headingAttributes.anchor !== ''
 						? headingAttributes.anchor
 						: null;
 
-				// Auto-generate anchor from content if not set
-				if ( ! anchor && content ) {
-					anchor = content
-						.toLowerCase()
-						.replace( /[^\w\s-]/g, '' )
-						.replace( /[\s_]+/g, '-' )
-						.replace( /^-+|-+$/g, '' );
-				}
-
-				// Get the full permalink for consistency with server-side rendering.
-				const { getCurrentPostId, getCurrentPostType } =
-					select( 'core/editor' );
-				const { getEditedEntityRecord } = select( coreStore );
-				const currentPostId = getCurrentPostId();
-				const currentPostType = getCurrentPostType();
-
-				let permalink = '';
-				if ( currentPostId && currentPostType ) {
-					const post = getEditedEntityRecord(
-						'postType',
-						currentPostType,
-						currentPostId
-					);
-					permalink = post?.link || '';
-				}
-
-				let fullLink = '';
-				if ( anchor && permalink ) {
-					fullLink = `${ permalink }#${ anchor }`;
-				} else if ( anchor ) {
-					fullLink = `#${ anchor }`;
-				}
+				// Use relative anchor links
+				const fullLink = anchor ? `#${ anchor }` : '';
 
 				latestHeadings.push( {
 					content,
