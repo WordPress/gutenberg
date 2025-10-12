@@ -3,6 +3,7 @@
  */
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
 // Cache for memoizing heading results.
@@ -135,8 +136,29 @@ export function getLatestHeadings( select, clientId ) {
 						? headingAttributes.anchor
 						: null;
 
-				// Use relative anchor links
-				const fullLink = anchor ? `#${ anchor }` : '';
+				// Get the full permalink for accurate preview in the editor
+				const { getCurrentPostId, getCurrentPostType } =
+					select( 'core/editor' );
+				const { getEditedEntityRecord } = select( coreStore );
+				const currentPostId = getCurrentPostId();
+				const currentPostType = getCurrentPostType();
+
+				let permalink = '';
+				if ( currentPostId && currentPostType ) {
+					const post = getEditedEntityRecord(
+						'postType',
+						currentPostType,
+						currentPostId
+					);
+					permalink = post?.link || '';
+				}
+
+				let fullLink = '';
+				if ( anchor && permalink ) {
+					fullLink = `${ permalink }#${ anchor }`;
+				} else if ( anchor ) {
+					fullLink = `#${ anchor }`;
+				}
 
 				latestHeadings.push( {
 					content,
