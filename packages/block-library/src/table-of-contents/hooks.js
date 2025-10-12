@@ -114,7 +114,6 @@ export function getLatestHeadings( select, clientId ) {
 				}
 
 				// Get the full permalink for consistency with server-side rendering.
-				// eslint-disable-next-line @wordpress/data-no-store-string-literals
 				const { getCurrentPostId, getCurrentPostType } =
 					select( 'core/editor' );
 				const currentPostId = getCurrentPostId();
