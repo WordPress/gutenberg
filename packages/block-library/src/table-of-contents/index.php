@@ -21,7 +21,7 @@ function render_block_core_table_of_contents( $attributes ) {
 
 	if ( in_array( 'the_content', $wp_current_filter, true ) || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
 		// Post content context.
-		$post = get_post();
+		$post    = get_post();
 		$content = $post ? $post->post_content : '';
 	} else {
 		// Template context.
