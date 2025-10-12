@@ -430,6 +430,115 @@ test.describe( 'Block Comments', () => {
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
 			await expect( thread ).toBeFocused();
 		} );
+
+		test( 'should focus appropriate element when comment is deleted', async ( {
+			page,
+			editor,
+			blockCommentUtils,
+		} ) => {
+			await blockCommentUtils.addBlockWithComment( {
+				type: 'core/paragraph',
+				attributes: { content: 'First block content' },
+				comment: 'First block comment',
+			} );
+			await blockCommentUtils.addBlockWithComment( {
+				type: 'core/paragraph',
+				attributes: { content: 'Second block content' },
+				comment: 'Second block comment',
+			} );
+			await blockCommentUtils.addBlockWithComment( {
+				type: 'core/paragraph',
+				attributes: { content: 'Third block content' },
+				comment: 'Third block comment',
+			} );
+			const firstThread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'listitem', {
+					name: 'Comment: First block comment',
+				} );
+			const secondThread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'listitem', {
+					name: 'Comment: Second block comment',
+				} );
+			const thirdThread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'listitem', {
+					name: 'Comment: Third block comment',
+				} );
+
+			await firstThread.click();
+			await blockCommentUtils.clickBlockCommentActionMenuItem( 'Delete' );
+			await page
+				.getByRole( 'dialog' )
+				.getByRole( 'button', { name: 'Delete' } )
+				.click();
+			await expect(
+				secondThread,
+				'focus should move to the next comment if there is one'
+			).toBeFocused();
+
+			await thirdThread.click();
+			await blockCommentUtils.clickBlockCommentActionMenuItem( 'Delete' );
+			await page
+				.getByRole( 'dialog' )
+				.getByRole( 'button', { name: 'Delete' } )
+				.click();
+			await expect(
+				secondThread,
+				"focus should move to the previous comment if there isn't a next one"
+			).toBeFocused();
+
+			await secondThread.click();
+			await blockCommentUtils.clickBlockCommentActionMenuItem( 'Delete' );
+			await page
+				.getByRole( 'dialog' )
+				.getByRole( 'button', { name: 'Delete' } )
+				.click();
+			const secondBlock = editor.canvas
+				.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} )
+				.nth( 1 );
+			await expect(
+				secondBlock,
+				"focus should move to the block if there isn't a next or previous comment"
+			).toBeFocused();
+		} );
+
+		test( 'should focus comment thread when reply is deleted', async ( {
+			page,
+			blockCommentUtils,
+		} ) => {
+			await blockCommentUtils.addBlockWithComment( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing block comments' },
+				comment: 'Test comment',
+			} );
+			const commentForm = page.getByRole( 'textbox', {
+				name: 'Reply to',
+			} );
+			await commentForm.fill( 'Test reply' );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Reply', exact: true } )
+				.click();
+			await blockCommentUtils.clickBlockCommentActionMenuItem(
+				'Delete',
+				1
+			);
+			await page
+				.getByRole( 'dialog' )
+				.getByRole( 'button', { name: 'Delete' } )
+				.click();
+			const thread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'listitem', {
+					name: 'Comment: Test comment',
+				} );
+
+			await expect( thread ).toBeFocused();
+		} );
 	} );
 } );
 
@@ -491,10 +600,11 @@ class BlockCommentUtils {
 		);
 	}
 
-	async clickBlockCommentActionMenuItem( actionName ) {
+	async clickBlockCommentActionMenuItem( actionName, index = 0 ) {
 		await this.#page
 			.getByRole( 'region', { name: 'Editor settings' } )
 			.getByRole( 'button', { name: 'Actions' } )
+			.nth( index )
 			.click();
 		await this.#page.getByRole( 'menuitem', { name: actionName } ).click();
 	}
