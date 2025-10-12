@@ -53,7 +53,11 @@ import TabbedSidebar from './components/tabbed-sidebar';
 import CommentIconSlotFill from './components/collab/block-comment-icon-slot';
 import CommentIconToolbarSlotFill from './components/collab/block-comment-icon-toolbar-slot';
 import HTMLElementControl from './components/html-element-control';
-import { useBlockElement } from './components/block-list/use-block-props/use-block-refs';
+import {
+	useBlockElement,
+	useBlockElementRef,
+} from './components/block-list/use-block-props/use-block-refs';
+
 /**
  * Private @wordpress/block-editor APIs.
  */
@@ -105,4 +109,5 @@ lock( privateApis, {
 	mediaEditKey,
 	essentialFormatKey,
 	useBlockElement,
+	useBlockElementRef,
 } );

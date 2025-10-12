@@ -430,6 +430,72 @@ test.describe( 'Block Comments', () => {
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
 			await expect( thread ).toBeFocused();
 		} );
+
+		test( 'should focus comment form after clicking "Add new comment" skip link button', async ( {
+			page,
+			blockCommentUtils,
+		} ) => {
+			await blockCommentUtils.addBlockWithComment( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing block comments' },
+				comment: 'Test comment',
+			} );
+			const thread = page
+				.getByRole( 'region', {
+					name: 'Editor settings',
+				} )
+				.getByRole( 'listitem', {
+					name: 'Comment: Test comment',
+				} );
+			const addNewCommentButton = thread.getByRole( 'button', {
+				name: 'Add new comment',
+			} );
+			await thread.focus();
+			await page.keyboard.press( 'Tab' );
+
+			await expect( addNewCommentButton ).toBeFocused();
+
+			await page.keyboard.press( 'Enter' );
+
+			await expect(
+				page.getByRole( 'textbox', { name: 'Reply to' } )
+			).toBeFocused();
+		} );
+
+		test( 'should focus block after clicking "Back to block" skip link button', async ( {
+			editor,
+			page,
+			blockCommentUtils,
+		} ) => {
+			await blockCommentUtils.addBlockWithComment( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing block comments' },
+				comment: 'Test comment',
+			} );
+			const thread = page
+				.getByRole( 'region', {
+					name: 'Editor settings',
+				} )
+				.getByRole( 'listitem', {
+					name: 'Comment: Test comment',
+				} );
+			const backToBlockButton = thread.getByRole( 'button', {
+				name: 'Back to block',
+			} );
+			await thread.focus();
+			await page.keyboard.press( 'Tab' );
+			await page.keyboard.press( 'Tab' );
+
+			await expect( backToBlockButton ).toBeFocused();
+
+			await page.keyboard.press( 'Enter' );
+
+			await expect(
+				editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} )
+			).toBeFocused();
+		} );
 	} );
 } );
 
