@@ -17,25 +17,15 @@ function render_block_core_table_of_contents( $attributes ) {
 	$headings = array();
 	$content  = '';
 
-	global $wp_current_filter;
-	if ( in_array( 'the_content', $wp_current_filter, true ) ) {
+	global $wp_current_filter, $_wp_current_template_content;
+
+	if ( in_array( 'the_content', $wp_current_filter, true ) || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
 		// Post content context.
 		$post = get_post();
-		if ( $post ) {
-			$content = $post->post_content;
-		}
-	} elseif ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
-		// Editor context.
-		$post = get_post();
-		if ( $post ) {
-			$content = $post->post_content;
-		}
+		$content = $post ? $post->post_content : '';
 	} else {
 		// Template context.
-		global $_wp_current_template_content;
-		if ( ! empty( $_wp_current_template_content ) ) {
-			$content = $_wp_current_template_content;
-		}
+		$content = $_wp_current_template_content ?? '';
 	}
 
 	if ( empty( $content ) ) {
