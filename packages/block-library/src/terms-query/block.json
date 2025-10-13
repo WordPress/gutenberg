@@ -6,13 +6,7 @@
 	"title": "Terms Query",
 	"category": "theme",
 	"description": "An advanced block that allows displaying taxonomy terms based on different query parameters and visual configurations.",
-	"keywords": [
-		"terms",
-		"taxonomy",
-		"categories",
-		"tags",
-		"list"
-	],
+	"keywords": [ "terms", "taxonomy", "categories", "tags", "list" ],
 	"textdomain": "default",
 	"attributes": {
 		"termQuery": {
@@ -33,20 +27,12 @@
 			"default": "div"
 		}
 	},
-	"usesContext": [
-		"templateSlug"
-	],
+	"usesContext": [ "templateSlug" ],
 	"providesContext": {
 		"termQuery": "termQuery"
 	},
-	"usesContext": [
-		"termId"
-	],
 	"supports": {
-		"align": [
-			"wide",
-			"full"
-		],
+		"align": [ "wide", "full" ],
 		"html": false,
 		"layout": true,
 		"interactivity": true
