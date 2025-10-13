@@ -146,7 +146,7 @@ export default function TermsQueryInspectorControls( {
 							help={
 								hasIncludeFilter
 									? __(
-											'When specific terms are included, the order is based on their inclusion order.'
+											'When specific terms are selected, the order is based on their selection order.'
 									  )
 									: undefined
 							}
@@ -206,7 +206,7 @@ export default function TermsQueryInspectorControls( {
 								help={
 									hasIncludeFilter
 										? __(
-												'When specific terms are included strictly display those terms.'
+												'When specific terms are selected, only those are displayed.'
 										  )
 										: undefined
 								}
