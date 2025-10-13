@@ -50,7 +50,9 @@ function extractTranslatorKeys( commentText ) {
 	while (
 		( match = REGEXP_COMMENT_PLACEHOLDER.exec( commentBody ) ) !== null
 	) {
-		keys.set( match[ 1 ], keys.get( match[ 1 ] ) || match[ 2 ] === ':' );
+		const rawKey = match[ 1 ];
+		const hasColon = match.groups?.colon?.trim() === ':';
+		keys.set( rawKey, keys.get( rawKey ) || hasColon );
 	}
 
 	return keys;
@@ -210,8 +212,6 @@ module.exports = {
 									return isValidType && isUnused;
 							  } )
 							: [];
-
-						// console.log({extra, keysInComment, placeholdersUsed});
 
 						if ( extra.length > 0 ) {
 							context.report( {

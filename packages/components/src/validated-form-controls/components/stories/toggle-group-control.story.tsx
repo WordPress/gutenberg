@@ -16,7 +16,8 @@ import { ValidatedToggleGroupControl } from '../toggle-group-control';
 import { ToggleGroupControlOption } from '../../../toggle-group-control';
 
 const meta: Meta< typeof ValidatedToggleGroupControl > = {
-	title: 'Components (Experimental)/Validated Form Controls/ValidatedToggleGroupControl',
+	title: 'Components/Selection & Input/Validated Form Controls/ValidatedToggleGroupControl',
+	id: 'components-validatedtogglegroupcontrol',
 	component: ValidatedToggleGroupControl,
 	tags: [ 'status-private' ],
 	decorators: formDecorator,
@@ -35,6 +36,12 @@ export const Default: StoryObj< typeof ValidatedToggleGroupControl > = {
 					typeof ValidatedToggleGroupControl
 				>[ 'value' ]
 			>( '1' );
+		const [ customValidity, setCustomValidity ] =
+			useState<
+				React.ComponentProps<
+					typeof ValidatedToggleGroupControl
+				>[ 'customValidity' ]
+			>( undefined );
 
 		return (
 			<ValidatedToggleGroupControl
@@ -44,6 +51,17 @@ export const Default: StoryObj< typeof ValidatedToggleGroupControl > = {
 					setValue( newValue );
 					onChange?.( newValue );
 				} }
+				onValidate={ ( v ) => {
+					if ( v === '2' ) {
+						setCustomValidity( {
+							type: 'invalid',
+							message: 'Option 2 is not allowed.',
+						} );
+					} else {
+						setCustomValidity( undefined );
+					}
+				} }
+				customValidity={ customValidity }
 			/>
 		);
 	},
@@ -57,10 +75,4 @@ Default.args = {
 		<ToggleGroupControlOption value="2" key="2" label="Option 2" />,
 	],
 	help: 'Selecting option 2 will trigger an error.',
-	customValidator: ( value ) => {
-		if ( value === '2' ) {
-			return 'Option 2 is not allowed.';
-		}
-		return undefined;
-	},
 };

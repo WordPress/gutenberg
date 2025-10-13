@@ -94,6 +94,10 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 		field.filterBy !== false &&
 		! field.filterBy?.isPrimary;
 
+	if ( ! isSortable && ! canMove && ! isHidable && ! canAddFilter ) {
+		return header;
+	}
+
 	return (
 		<Menu>
 			<Menu.TriggerButton

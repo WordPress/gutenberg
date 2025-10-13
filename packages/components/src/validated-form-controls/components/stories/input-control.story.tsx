@@ -22,7 +22,8 @@ import InputControlSuffixWrapper from '../../../input-control/input-suffix-wrapp
 import { Button } from '../../../button';
 
 const meta: Meta< typeof ValidatedInputControl > = {
-	title: 'Components (Experimental)/Validated Form Controls/ValidatedInputControl',
+	title: 'Components/Selection & Input/Validated Form Controls/ValidatedInputControl',
+	id: 'components-validatedinputcontrol',
 	component: ValidatedInputControl,
 	tags: [ 'status-private' ],
 	decorators: formDecorator,
@@ -45,6 +46,12 @@ export const Default: StoryObj< typeof ValidatedInputControl > = {
 			useState<
 				React.ComponentProps< typeof ValidatedInputControl >[ 'value' ]
 			>( '' );
+		const [ customValidity, setCustomValidity ] =
+			useState<
+				React.ComponentProps<
+					typeof ValidatedInputControl
+				>[ 'customValidity' ]
+			>( undefined );
 
 		return (
 			<ValidatedInputControl
@@ -54,6 +61,17 @@ export const Default: StoryObj< typeof ValidatedInputControl > = {
 					setValue( newValue );
 					onChange?.( newValue, ...rest );
 				} }
+				onValidate={ ( v ) => {
+					if ( v?.toLowerCase() === 'error' ) {
+						setCustomValidity( {
+							type: 'invalid',
+							message: 'The word "error" is not allowed.',
+						} );
+					} else {
+						setCustomValidity( undefined );
+					}
+				} }
+				customValidity={ customValidity }
 			/>
 		);
 	},
@@ -62,12 +80,6 @@ Default.args = {
 	required: true,
 	label: 'Input',
 	help: 'The word "error" will trigger an error.',
-	customValidator: ( value ) => {
-		if ( value?.toLowerCase() === 'error' ) {
-			return 'The word "error" is not allowed.';
-		}
-		return undefined;
-	},
 };
 
 /**
@@ -82,6 +94,12 @@ export const Password: StoryObj< typeof ValidatedInputControl > = {
 				React.ComponentProps< typeof ValidatedInputControl >[ 'value' ]
 			>( '' );
 		const [ visible, setVisible ] = useState( false );
+		const [ customValidity, setCustomValidity ] =
+			useState<
+				React.ComponentProps<
+					typeof ValidatedInputControl
+				>[ 'customValidity' ]
+			>( undefined );
 
 		return (
 			<ValidatedInputControl
@@ -104,6 +122,34 @@ export const Password: StoryObj< typeof ValidatedInputControl > = {
 					setValue( newValue );
 					onChange?.( newValue, ...rest );
 				} }
+				onValidate={ ( v ) => {
+					if ( ! /\d/.test( v ?? '' ) ) {
+						setCustomValidity( {
+							type: 'invalid',
+							message:
+								'Password must include at least one number.',
+						} );
+						return;
+					}
+					if ( ! /[A-Z]/.test( v ?? '' ) ) {
+						setCustomValidity( {
+							type: 'invalid',
+							message:
+								'Password must include at least one capital letter.',
+						} );
+						return;
+					}
+					if ( ! /[!@£$%^&*#]/.test( v ?? '' ) ) {
+						setCustomValidity( {
+							type: 'invalid',
+							message:
+								'Password must include at least one symbol.',
+						} );
+						return;
+					}
+					setCustomValidity( undefined );
+				} }
+				customValidity={ customValidity }
 			/>
 		);
 	},
@@ -113,18 +159,6 @@ Password.args = {
 	label: 'Password',
 	help: 'Minimum 8 characters, include a number, capital letter, and symbol (!@£$%^&*#).',
 	minLength: 8,
-	customValidator: ( value ) => {
-		if ( ! /\d/.test( value ?? '' ) ) {
-			return 'Password must include at least one number.';
-		}
-		if ( ! /[A-Z]/.test( value ?? '' ) ) {
-			return 'Password must include at least one capital letter.';
-		}
-		if ( ! /[!@£$%^&*#]/.test( value ?? '' ) ) {
-			return 'Password must include at least one symbol.';
-		}
-		return undefined;
-	},
 };
 Password.argTypes = {
 	suffix: { control: false },

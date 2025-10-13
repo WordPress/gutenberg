@@ -117,7 +117,7 @@ function countCharacters(
 export function count(
 	text: string,
 	type: Strategy,
-	userSettings: UserSettings
+	userSettings?: UserSettings
 ): number {
 	const settings = loadSettings( type, userSettings );
 	let matchRegExp: RegExp;

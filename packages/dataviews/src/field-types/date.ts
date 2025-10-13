@@ -13,7 +13,7 @@ import type {
 	NormalizedField,
 	FieldTypeDefinition,
 } from '../types';
-import { renderFromElements } from '../utils';
+import renderFromElements from './utils/render-from-elements';
 import {
 	OPERATOR_ON,
 	OPERATOR_NOT_ON,

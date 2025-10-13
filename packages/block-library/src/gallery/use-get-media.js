@@ -26,11 +26,15 @@ export default function useGetMedia( innerBlockImages ) {
 			}
 
 			return (
-				select( coreStore ).getMediaItems( {
-					include: imageIds.join( ',' ),
-					per_page: -1,
-					orderby: 'include',
-				} ) ?? EMPTY_IMAGE_MEDIA
+				select( coreStore ).getEntityRecords(
+					'postType',
+					'attachment',
+					{
+						include: imageIds.join( ',' ),
+						per_page: -1,
+						orderby: 'include',
+					}
+				) ?? EMPTY_IMAGE_MEDIA
 			);
 		},
 		[ innerBlockImages ]

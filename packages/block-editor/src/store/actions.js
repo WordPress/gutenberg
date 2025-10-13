@@ -155,22 +155,26 @@ export function receiveBlocks( blocks ) {
 /**
  * Action that updates attributes of multiple blocks with the specified client IDs.
  *
- * @param {string|string[]} clientIds     Block client IDs.
- * @param {Object}          attributes    Block attributes to be merged. Should be keyed by clientIds if
- *                                        uniqueByBlock is true.
- * @param {boolean}         uniqueByBlock true if each block in clientIds array has a unique set of attributes
+ * @param {string|string[]} clientIds                     Block client IDs.
+ * @param {Object}          attributes                    Block attributes to be merged. Should be keyed by clientIds if `options.uniqueByBlock` is true.
+ * @param {Object}          options                       Updating options.
+ * @param {boolean}         [options.uniqueByBlock=false] Whether each block in clientIds array has a unique set of attributes.
  * @return {Object} Action object.
  */
 export function updateBlockAttributes(
 	clientIds,
 	attributes,
-	uniqueByBlock = false
+	options = { uniqueByBlock: false }
 ) {
+	if ( typeof options === 'boolean' ) {
+		options = { uniqueByBlock: options };
+	}
+
 	return {
 		type: 'UPDATE_BLOCK_ATTRIBUTES',
 		clientIds: castArray( clientIds ),
 		attributes,
-		uniqueByBlock,
+		options,
 	};
 }
 
@@ -198,8 +202,8 @@ export function updateBlock( clientId, updates ) {
  * reflects a reverse selection.
  *
  * @param {string}    clientId        Block client ID.
- * @param {0|-1|null} initialPosition Optional initial position. Pass as -1 to
- *                                    reflect reverse selection.
+ * @param {0|-1|null} initialPosition Optional initial position. Pass -1 to reflect reverse selection
+ *                                    or `null` to prevent focusing the block.
  *
  * @return {Object} Action object.
  */
@@ -1662,19 +1666,6 @@ export const __unstableMarkAutomaticChange =
 	};
 
 /**
- * Action that enables or disables the navigation mode.
- *
- * @param {boolean} isNavigationMode Enable/Disable navigation mode.
- */
-export const setNavigationMode =
-	( isNavigationMode = true ) =>
-	( { dispatch } ) => {
-		dispatch.__unstableSetEditorMode(
-			isNavigationMode ? 'navigation' : 'edit'
-		);
-	};
-
-/**
  * Action that sets the editor mode
  *
  * @param {string} mode Editor mode
@@ -1872,12 +1863,13 @@ export function toggleBlockHighlight( clientId, isHighlighted ) {
  * Action that "flashes" the block with a given `clientId` by rhythmically highlighting it.
  *
  * @param {string} clientId Target block client ID.
+ * @param {number} timeout  Duration in milliseconds to keep the highlight. Defaults to 150ms.
  */
 export const flashBlock =
-	( clientId ) =>
+	( clientId, timeout = 150 ) =>
 	async ( { dispatch } ) => {
 		dispatch( toggleBlockHighlight( clientId, true ) );
-		await new Promise( ( resolve ) => setTimeout( resolve, 150 ) );
+		await new Promise( ( resolve ) => setTimeout( resolve, timeout ) );
 		dispatch( toggleBlockHighlight( clientId, false ) );
 	};
 

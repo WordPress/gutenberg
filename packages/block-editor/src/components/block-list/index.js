@@ -40,17 +40,23 @@ import { ZoomOutSeparator } from './zoom-out-separator';
 import { unlock } from '../../lock-unlock';
 
 export const IntersectionObserver = createContext();
+IntersectionObserver.displayName = 'IntersectionObserverContext';
+
 const pendingBlockVisibilityUpdatesPerRegistry = new WeakMap();
 
 function Root( { className, ...settings } ) {
 	const { isOutlineMode, isFocusMode, temporarilyEditingAsBlocks } =
 		useSelect( ( select ) => {
-			const { getSettings, getTemporarilyEditingAsBlocks, isTyping } =
-				unlock( select( blockEditorStore ) );
+			const {
+				getSettings,
+				getTemporarilyEditingAsBlocks,
+				isTyping,
+				hasBlockSpotlight,
+			} = unlock( select( blockEditorStore ) );
 			const { outlineMode, focusMode } = getSettings();
 			return {
 				isOutlineMode: outlineMode && ! isTyping(),
-				isFocusMode: focusMode,
+				isFocusMode: focusMode || hasBlockSpotlight(),
 				temporarilyEditingAsBlocks: getTemporarilyEditingAsBlocks(),
 			};
 		}, [] );
@@ -177,6 +183,8 @@ function Items( {
 				getTemplateLock,
 				getBlockEditingMode,
 				isSectionBlock,
+				isContainerInsertableToInWriteMode,
+				getBlockName,
 				isZoomOut: _isZoomOut,
 				canInsertBlockType,
 			} = unlock( select( blockEditorStore ) );
@@ -213,7 +221,11 @@ function Items( {
 				visibleBlocks: __unstableGetVisibleBlocks(),
 				isZoomOut: _isZoomOut(),
 				shouldRenderAppender:
-					! isSectionBlock( rootClientId ) &&
+					( ! isSectionBlock( rootClientId ) ||
+						isContainerInsertableToInWriteMode(
+							getBlockName( selectedBlockClientId ),
+							rootClientId
+						) ) &&
 					getBlockEditingMode( rootClientId ) !== 'disabled' &&
 					! getTemplateLock( rootClientId ) &&
 					hasAppender &&

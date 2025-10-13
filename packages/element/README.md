@@ -54,11 +54,11 @@ Concatenate two or more React children objects.
 
 _Parameters_
 
--   _childrenArguments_ `...?Object`: Array of children arguments (array of arrays/strings/objects) to concatenate.
+-   _childrenArguments_ `ReactNode[][]`: - Array of children arguments (array of arrays/strings/objects) to concatenate.
 
 _Returns_
 
--   `Array`: The concatenated value.
+-   `ReactNode[]`: The concatenated value.
 
 ### createContext
 
@@ -110,11 +110,11 @@ You would have something like this as the conversionMap value:
 _Parameters_
 
 -   _interpolatedString_ `string`: The interpolation string to be parsed.
--   _conversionMap_ `Record<string, Element>`: The map used to convert the string to a react element.
+-   _conversionMap_ `Record< string, ReactElement >`: The map used to convert the string to a react element.
 
 _Returns_
 
--   `Element`: A wp element.
+-   `ReactElement`: A wp element.
 
 ### createPortal
 
@@ -209,7 +209,7 @@ Checks if the provided WP element is empty.
 
 _Parameters_
 
--   _element_ `*`: WP element to check.
+-   _element_ `unknown`: WP element to check.
 
 _Returns_
 
@@ -312,13 +312,9 @@ Serializes a React element to string.
 
 _Parameters_
 
--   _element_ `import('react').ReactNode`: Element to serialize.
--   _context_ `[Object]`: Context object.
--   _legacyContext_ `[Object]`: Legacy context object.
-
-_Returns_
-
--   `string`: Serialized element.
+-   _element_ `React.ReactNode`:
+-   _context_ `any`:
+-   _legacyContext_ `Record< string, any >`:
 
 ### startTransition
 
@@ -342,12 +338,12 @@ Switches the nodeName of all the elements in the children object.
 
 _Parameters_
 
--   _children_ `?Object`: Children object.
+-   _children_ `ReactNode`: Children object.
 -   _nodeName_ `string`: Node name.
 
 _Returns_
 
--   `?Object`: The updated children object.
+-   `ReactNode`: The updated children object.
 
 ### unmountComponentAtNode
 

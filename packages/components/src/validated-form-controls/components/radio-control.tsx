@@ -17,7 +17,8 @@ type Value = RadioControlProps[ 'selected' ];
 const UnforwardedValidatedRadioControl = (
 	{
 		required,
-		customValidator,
+		onValidate,
+		customValidity,
 		onChange,
 		markWhenOptional,
 		...restProps
@@ -35,9 +36,10 @@ const UnforwardedValidatedRadioControl = (
 			markWhenOptional={ markWhenOptional }
 			// TODO: Upstream limitation - RadioControl does not accept a ref.
 			ref={ mergedRefs }
-			customValidator={ () => {
-				return customValidator?.( valueRef.current );
+			onValidate={ () => {
+				return onValidate?.( valueRef.current );
 			} }
+			customValidity={ customValidity }
 			getValidityTarget={ () =>
 				validityTargetRef.current?.querySelector< HTMLInputElement >(
 					'input[type="radio"]'

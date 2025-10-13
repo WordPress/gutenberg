@@ -40,6 +40,7 @@ import {
 	globalStylesLinksDataKey,
 	sectionRootClientIdKey,
 	mediaEditKey,
+	essentialFormatKey,
 } from './store/private-keys';
 import { requiresWrapperOnCopy } from './components/writing-flow/utils';
 import { PrivateRichText } from './components/rich-text/';
@@ -52,6 +53,8 @@ import TabbedSidebar from './components/tabbed-sidebar';
 import CommentIconSlotFill from './components/collab/block-comment-icon-slot';
 import CommentIconToolbarSlotFill from './components/collab/block-comment-icon-toolbar-slot';
 import HTMLElementControl from './components/html-element-control';
+import { useBlockElement } from './components/block-list/use-block-props/use-block-refs';
+
 /**
  * Private @wordpress/block-editor APIs.
  */
@@ -101,4 +104,6 @@ lock( privateApis, {
 	CommentIconSlotFill,
 	CommentIconToolbarSlotFill,
 	mediaEditKey,
+	essentialFormatKey,
+	useBlockElement,
 } );

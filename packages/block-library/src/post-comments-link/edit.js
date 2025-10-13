@@ -60,7 +60,13 @@ function PostCommentsLinkEdit( { context, attributes, setAttributes } ) {
 	);
 
 	if ( ! post ) {
-		return null;
+		return (
+			<div { ...blockProps }>
+				<Warning>
+					{ __( 'Post Comments Link block: post not found.' ) }
+				</Warning>
+			</div>
+		);
 	}
 
 	const { link } = post;

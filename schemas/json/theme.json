@@ -75,6 +75,28 @@
 							"description": "Allow users to set custom border widths.",
 							"type": "boolean",
 							"default": false
+						},
+						"radiusSizes": {
+							"description": "Border radius size presets for the border radius selector.\nGenerates a custom property (`--wp--preset--border-radius--{slug}`) per preset value.",
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"name": {
+										"description": "Name of the border radius size preset, translatable.",
+										"type": "string"
+									},
+									"slug": {
+										"description": "Unique identifier for the border raidus size preset.",
+										"type": "string"
+									},
+									"size": {
+										"description": "CSS border-radius value, including units.",
+										"type": "string"
+									}
+								},
+								"additionalProperties": false
+							}
 						}
 					},
 					"additionalProperties": false
@@ -1813,6 +1835,12 @@
 					"$ref": "#/definitions/stylesPropertiesComplete"
 				},
 				"cite": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				"select": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				"textInput": {
 					"$ref": "#/definitions/stylesPropertiesComplete"
 				}
 			},

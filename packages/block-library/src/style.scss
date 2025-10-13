@@ -1,6 +1,10 @@
+@import "./accordion-item/style.scss";
+@import "./accordion-heading/style.scss";
+@import "./accordion-panel/style.scss";
 @import "./archives/style.scss";
 @import "./avatar/style.scss";
 @import "./audio/style.scss";
+@import "./breadcrumbs/style.scss";
 @import "./button/style.scss";
 @import "./buttons/style.scss";
 @import "./calendar/style.scss";
@@ -66,7 +70,10 @@
 @import "./tag-cloud/style.scss";
 @import "./table/style.scss";
 @import "./table-of-contents/style.scss";
+@import "./term-count/style.scss";
 @import "./term-description/style.scss";
+@import "./term-name/style.scss";
+@import "./term-template/style.scss";
 @import "./text-columns/style.scss";
 @import "./verse/style.scss";
 @import "./video/style.scss";

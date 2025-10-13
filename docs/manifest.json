@@ -1428,6 +1428,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/admin-ui",
+		"slug": "packages-admin-ui",
+		"markdown_source": "../packages/admin-ui/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/annotations",
 		"slug": "packages-annotations",
 		"markdown_source": "../packages/annotations/README.md",
@@ -1998,6 +2004,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/views",
+		"slug": "packages-views",
+		"markdown_source": "../packages/views/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/warning",
 		"slug": "packages-warning",
 		"markdown_source": "../packages/warning/README.md",
@@ -2288,8 +2300,20 @@
 	{
 		"title": "Gutenberg Release Process",
 		"slug": "release",
-		"markdown_source": "../docs/contributors/code/release.md",
+		"markdown_source": "../docs/contributors/code/release/README.md",
 		"parent": "code"
+	},
+	{
+		"title": "Gutenberg plugin releases",
+		"slug": "plugin-release",
+		"markdown_source": "../docs/contributors/code/release/plugin-release.md",
+		"parent": "release"
+	},
+	{
+		"title": "Packages releases to NPM and WordPress Core updates",
+		"slug": "package-release-and-core-updates",
+		"markdown_source": "../docs/contributors/code/release/package-release-and-core-updates.md",
+		"parent": "release"
 	},
 	{
 		"title": "Cherry-picking automation",

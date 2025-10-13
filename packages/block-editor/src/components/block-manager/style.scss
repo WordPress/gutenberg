@@ -4,32 +4,6 @@
 	text-align: center;
 }
 
-.block-editor-block-manager__search {
-	margin: $grid-unit-20 0;
-}
-
-.block-editor-block-manager__disabled-blocks-count {
-	border: $border-width solid $gray-300;
-	border-width: $border-width 0;
-	// Cover up horizontal areas off the sides of the box rectangle
-	box-shadow: -$grid-unit-40 0 0 0 $white, $grid-unit-40 0 0 0 $white;
-	padding: $grid-unit-10;
-	background-color: $white;
-	text-align: center;
-	position: sticky;
-	// When sticking, tuck the top border beneath the modal header border
-	top: ($grid-unit-05 + 1) * -1;
-	z-index: z-index(".block-editor-block-manager__disabled-blocks-count");
-
-	// Stick the category titles to the bottom
-	~ .block-editor-block-manager__results .block-editor-block-manager__category-title {
-		top: $grid-unit-40 - 1;
-	}
-	.is-link {
-		margin-left: 12px;
-	}
-}
-
 .block-editor-block-manager__category {
 	margin: 0 0 $grid-unit-30 0;
 }

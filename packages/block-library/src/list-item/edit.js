@@ -18,6 +18,7 @@ import {
 } from '@wordpress/icons';
 import { useMergeRefs } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
+import { displayShortcut } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -53,6 +54,7 @@ export function IndentUI( { clientId } ) {
 			<ToolbarButton
 				icon={ isRTL() ? formatOutdentRTL : formatOutdent }
 				title={ __( 'Outdent' ) }
+				shortcut={ displayShortcut.shift( 'Tab' ) }
 				description={ __( 'Outdent list item' ) }
 				disabled={ ! canOutdent }
 				onClick={ () => outdentListItem() }
@@ -60,6 +62,7 @@ export function IndentUI( { clientId } ) {
 			<ToolbarButton
 				icon={ isRTL() ? formatIndentRTL : formatIndent }
 				title={ __( 'Indent' ) }
+				shortcut="Tab"
 				description={ __( 'Indent list item' ) }
 				disabled={ ! canIndent }
 				onClick={ () => indentListItem() }

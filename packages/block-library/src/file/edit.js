@@ -80,7 +80,11 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 			media:
 				id === undefined
 					? undefined
-					: select( coreStore ).getMedia( id ),
+					: select( coreStore ).getEntityRecord(
+							'postType',
+							'attachment',
+							id
+					  ),
 		} ),
 		[ id ]
 	);

@@ -13,3 +13,4 @@ export const DEFAULT_GLOBAL_STYLES_CONTEXT = {
 export const GlobalStylesContext = createContext(
 	DEFAULT_GLOBAL_STYLES_CONTEXT
 );
+GlobalStylesContext.displayName = 'GlobalStylesContext';

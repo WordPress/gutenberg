@@ -1,3 +1,4 @@
+@import "../../admin-ui/src/style.scss";
 @import "./components/back-button/style.scss";
 @import "./components/layout/style.scss";
 @import "./components/meta-boxes/meta-boxes-area/style.scss";
@@ -15,12 +16,6 @@ body.js.block-editor-page {
 	}
 }
 
-// Target the editor UI excluding the non-iframed visual editor contents, metaboxes
-//  and custom fields areas.
-.editor-header,
-.editor-text-editor,
-.editor-sidebar,
-.editor-post-publish-panel,
 .edit-post-visual-editor.is-iframed {
 	@include reset;
 }

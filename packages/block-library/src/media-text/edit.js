@@ -199,9 +199,14 @@ function MediaTextEdit( {
 			return {
 				featuredImageMedia:
 					featuredImage && useFeaturedImage
-						? select( coreStore ).getMedia( featuredImage, {
-								context: 'view',
-						  } )
+						? select( coreStore ).getEntityRecord(
+								'postType',
+								'attachment',
+								featuredImage,
+								{
+									context: 'view',
+								}
+						  )
 						: undefined,
 			};
 		},
@@ -213,9 +218,14 @@ function MediaTextEdit( {
 			return {
 				image:
 					mediaId && isSelected
-						? select( coreStore ).getMedia( mediaId, {
-								context: 'view',
-						  } )
+						? select( coreStore ).getEntityRecord(
+								'postType',
+								'attachment',
+								mediaId,
+								{
+									context: 'view',
+								}
+						  )
 						: null,
 			};
 		},

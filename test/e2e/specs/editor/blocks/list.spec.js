@@ -746,7 +746,7 @@ test.describe( 'List (@firefox)', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/quote' } );
 		await page.keyboard.type( '/list' );
-		await page.keyboard.press( 'Enter' );
+		await page.getByRole( 'option', { name: 'List', exact: true } ).click();
 		await page.keyboard.type( 'aaa' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Enter' );
@@ -1422,7 +1422,9 @@ test.describe( 'List (@firefox)', () => {
 		);
 
 		await page.getByRole( 'button', { name: 'List', exact: true } ).click();
-		await page.getByRole( 'menuitem', { name: 'Paragraph' } ).click();
+		await page
+			.getByRole( 'menuitem', { name: 'Paragraph', exact: true } )
+			.click();
 
 		expect( await editor.getEditedPostContent() )
 			.toBe( `<!-- wp:paragraph -->

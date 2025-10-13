@@ -4,3 +4,4 @@ export const selectBlockPatternsKey = Symbol( 'selectBlockPatternsKey' );
 export const reusableBlocksSelectKey = Symbol( 'reusableBlocksSelect' );
 export const sectionRootClientIdKey = Symbol( 'sectionRootClientIdKey' );
 export const mediaEditKey = Symbol( 'mediaEditKey' );
+export const essentialFormatKey = Symbol( 'essentialFormat' );

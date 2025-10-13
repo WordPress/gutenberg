@@ -14,3 +14,7 @@
 .editor-post-summary .components-v-stack:empty {
 	display: none;
 }
+
+.editor-sidebar {
+	@include reset;
+}

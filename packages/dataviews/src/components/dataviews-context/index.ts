@@ -18,7 +18,7 @@ import type {
 	SupportedLayouts,
 	NormalizedFilter,
 } from '../../types';
-import type { SetSelection } from '../../private-types';
+import type { SetSelection } from '../../types/private';
 import { LAYOUT_TABLE } from '../../constants';
 
 type DataViewsContextType< Item > = {
@@ -54,8 +54,10 @@ type DataViewsContextType< Item > = {
 	filters: NormalizedFilter[];
 	isShowingFilter: boolean;
 	setIsShowingFilter: ( value: boolean ) => void;
-	perPageSizes: number[];
+	config: { perPageSizes: number[] };
 	empty?: ReactNode;
+	hasInfiniteScrollHandler: boolean;
+	itemListLabel?: string;
 };
 
 const DataViewsContext = createContext< DataViewsContextType< any > >( {
@@ -81,7 +83,12 @@ const DataViewsContext = createContext< DataViewsContextType< any > >( {
 	filters: [],
 	isShowingFilter: false,
 	setIsShowingFilter: () => {},
-	perPageSizes: [],
+	hasInfiniteScrollHandler: false,
+	config: {
+		perPageSizes: [],
+	},
 } );
+
+DataViewsContext.displayName = 'DataViewsContext';
 
 export default DataViewsContext;

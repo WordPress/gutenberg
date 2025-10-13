@@ -59,6 +59,15 @@ $block-editor-link-control-number-of-actions: 1;
 	position: relative;
 }
 
+.block-editor-link-control__help {
+	padding: 0 $grid-unit-20;
+	margin-top: -$grid-unit-10;
+	margin-bottom: 0;
+	font-size: $helptext-font-size;
+	font-style: normal;
+	color: $gray-700;
+}
+
 // Provides positioning context for search actions
 .block-editor-link-control__search-input-container,
 .block-editor-link-control__search-input-wrapper {
@@ -144,7 +153,6 @@ $block-editor-link-control-number-of-actions: 1;
 
 	.components-menu-item__shortcut {
 		color: $gray-700;
-		text-transform: capitalize;
 		white-space: nowrap; // tags shouldn't go over two lines.
 	}
 
@@ -355,11 +363,15 @@ $block-editor-link-control-number-of-actions: 1;
 .block-editor-link-control__setting {
 	margin-bottom: 0;
 	flex: 1;
-	padding: $grid-unit-10 0 $grid-unit-10 $grid-unit-30;
+	padding: $grid-unit-10 $grid-unit-30;
+
+	.components-base-control:not(.components-input-control) {
+		.components-base-control__field {
+			display: flex; // don't allow label to wrap under checkbox.
+		}
+	}
 
 	.components-base-control__field {
-		display: flex; // don't allow label to wrap under checkbox.
-
 		.components-checkbox-control__label {
 			color: $gray-900;
 		}

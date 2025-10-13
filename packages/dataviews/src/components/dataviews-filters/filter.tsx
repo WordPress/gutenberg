@@ -497,8 +497,9 @@ export default function Filter( {
 	}
 
 	const isPrimary = filter.isPrimary;
-	const hasValues = filterInView?.value !== undefined;
-	const canResetOrRemove = ! isPrimary || hasValues;
+	const isLocked = filterInView?.isLocked;
+	const hasValues = ! isLocked && filterInView?.value !== undefined;
+	const canResetOrRemove = ! isLocked && ( ! isPrimary || hasValues );
 	return (
 		<Dropdown
 			defaultOpen={ openedFilter === filter.field }
@@ -523,17 +524,26 @@ export default function Filter( {
 								{
 									'has-reset': canResetOrRemove,
 									'has-values': hasValues,
+									'is-not-clickable': isLocked,
 								}
 							) }
 							role="button"
-							tabIndex={ 0 }
-							onClick={ onToggle }
+							tabIndex={ isLocked ? -1 : 0 }
+							onClick={ () => {
+								if ( ! isLocked ) {
+									onToggle();
+								}
+							} }
 							onKeyDown={ ( event ) => {
-								if ( [ ENTER, SPACE ].includes( event.key ) ) {
+								if (
+									! isLocked &&
+									[ ENTER, SPACE ].includes( event.key )
+								) {
 									onToggle();
 									event.preventDefault();
 								}
 							} }
+							aria-disabled={ isLocked }
 							aria-pressed={ isOpen }
 							aria-expanded={ isOpen }
 							ref={ toggleRef }

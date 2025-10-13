@@ -9,6 +9,7 @@ import { createSelector, createRegistrySelector } from '@wordpress/data';
 import { getDefaultTemplateId, getEntityRecord, type State } from './selectors';
 import { STORE_NAME } from './name';
 import { unlock } from './lock-unlock';
+import logEntityDeprecation from './utils/log-entity-deprecation';
 
 type EntityRecordKey = string | number;
 
@@ -97,6 +98,7 @@ export function getEntityRecordPermissions(
 	name: string,
 	id: string
 ) {
+	logEntityDeprecation( kind, name, 'getEntityRecordPermissions' );
 	return getEntityRecordsPermissions( state, kind, name, id )[ 0 ];
 }
 
@@ -161,6 +163,9 @@ export const getHomePage = createRegistrySelector( ( select ) =>
 			return { postType: 'wp_template', postId: frontPageTemplateId };
 		},
 		( state ) => [
+			// Even though getDefaultTemplateId.shouldInvalidate returns true when root/site changes,
+			// it doesn't seem to invalidate this cache, I'm not sure why.
+			getEntityRecord( state, 'root', 'site' ),
 			getEntityRecord( state, 'root', '__unstableBase' ),
 			getDefaultTemplateId( state, {
 				slug: 'front-page',
@@ -235,13 +240,38 @@ export const getTemplateId = createRegistrySelector(
 		// First see if the post/page has an assigned template and fetch it.
 		const currentTemplateSlug = editedEntity.template;
 		if ( currentTemplateSlug ) {
-			const currentTemplate = select( STORE_NAME )
-				.getEntityRecords( 'postType', 'wp_template', {
-					per_page: -1,
-				} )
-				?.find( ( { slug } ) => slug === currentTemplateSlug );
-			if ( currentTemplate ) {
-				return currentTemplate.id;
+			const userTemplates = select( STORE_NAME ).getEntityRecords(
+				'postType',
+				'wp_template',
+				{ per_page: -1 }
+			);
+			if ( ! userTemplates ) {
+				return;
+			}
+			const userTemplateWithSlug = userTemplates.find(
+				( { slug } ) => slug === currentTemplateSlug
+			);
+
+			if ( userTemplateWithSlug ) {
+				return userTemplateWithSlug.id;
+			}
+
+			const registeredTemplates = select( STORE_NAME ).getEntityRecords(
+				'postType',
+				'wp_registered_template',
+				{ per_page: -1 }
+			);
+
+			if ( ! registeredTemplates ) {
+				return;
+			}
+
+			const registeredTemplateWithSlug = registeredTemplates.find(
+				( { slug } ) => slug === currentTemplateSlug
+			);
+
+			if ( registeredTemplateWithSlug ) {
+				return registeredTemplateWithSlug.id;
 			}
 		}
 		// If no template is assigned, use the default template.
@@ -263,3 +293,10 @@ export const getTemplateId = createRegistrySelector(
 		} );
 	}
 );
+
+export function getTemplateAutoDraftId(
+	state: State,
+	staticTemplateId: string
+) {
+	return state.templateAutoDraftId[ staticTemplateId ];
+}

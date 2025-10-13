@@ -28,6 +28,7 @@ import BlockControls from '../block-controls';
 import __unstableBlockToolbarLastItem from './block-toolbar-last-item';
 import BlockSettingsMenu from '../block-settings-menu';
 import { BlockLockToolbar } from '../block-lock';
+import { BlockVisibilityToolbar } from '../block-visibility';
 import { BlockGroupToolbar } from '../convert-to-group-buttons';
 import BlockEditVisuallyButton from '../block-edit-visually-button';
 import { useShowHoveredOrFocusedGestures } from './utils';
@@ -73,9 +74,8 @@ export function PrivateBlockToolbar( {
 		showSlots,
 		showGroupButtons,
 		showLockButtons,
+		showBlockVisibilityButton,
 		showSwitchSectionStyleButton,
-		hasFixedToolbar,
-		isNavigationMode,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockName,
@@ -87,10 +87,8 @@ export function PrivateBlockToolbar( {
 			getBlockAttributes,
 			getBlockParentsByBlockName,
 			getTemplateLock,
-			getSettings,
 			getParentSectionBlock,
 			isZoomOut,
-			isNavigationMode: _isNavigationMode,
 			isSectionBlock,
 		} = unlock( select( blockEditorStore ) );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
@@ -101,7 +99,6 @@ export function PrivateBlockToolbar( {
 		const parentBlockName = getBlockName( parentClientId );
 		const parentBlockType = getBlockType( parentBlockName );
 		const editingMode = getBlockEditingMode( selectedBlockClientId );
-		const isNavigationModeEnabled = _isNavigationMode();
 		const _isDefaultEditingMode = editingMode === 'default';
 		const _blockName = getBlockName( selectedBlockClientId );
 		const isValid = selectedBlockClientIds.every( ( id ) =>
@@ -128,6 +125,12 @@ export function PrivateBlockToolbar( {
 
 		const _isZoomOut = isZoomOut();
 
+		// The switch style button appears more prominently with the
+		// content only pattern experiment.
+		const _showSwitchSectionStyleButton =
+			window?.__experimentalContentOnlyPatternInsertion &&
+			( _isZoomOut || isSectionBlock( selectedBlockClientId ) );
+
 		return {
 			blockClientId: selectedBlockClientId,
 			blockClientIds: selectedBlockClientIds,
@@ -153,13 +156,8 @@ export function PrivateBlockToolbar( {
 			showSlots: ! _isZoomOut,
 			showGroupButtons: ! _isZoomOut,
 			showLockButtons: ! _isZoomOut,
-			showSwitchSectionStyleButton:
-				_isZoomOut ||
-				( isNavigationModeEnabled &&
-					editingMode === 'contentOnly' &&
-					isSectionBlock( selectedBlockClientId ) ), // Zoom out or Write Mode Section Blocks
-			hasFixedToolbar: getSettings().hasFixedToolbar,
-			isNavigationMode: isNavigationModeEnabled,
+			showBlockVisibilityButton: ! _isZoomOut,
+			showSwitchSectionStyleButton: _showSwitchSectionStyleButton,
 		};
 	}, [] );
 
@@ -186,7 +184,6 @@ export function PrivateBlockToolbar( {
 	// Shifts the toolbar to make room for the parent block selector.
 	const classes = clsx( 'block-editor-block-contextual-toolbar', {
 		'has-parent': showParentSelector,
-		'is-inverted-toolbar': isNavigationMode && ! hasFixedToolbar,
 	} );
 
 	const innerClasses = clsx( 'block-editor-block-toolbar', {
@@ -221,6 +218,12 @@ export function PrivateBlockToolbar( {
 						>
 							<ToolbarGroup className="block-editor-block-toolbar__block-controls">
 								<BlockSwitcher clientIds={ blockClientIds } />
+								{ isDefaultEditingMode &&
+									showBlockVisibilityButton && (
+										<BlockVisibilityToolbar
+											clientIds={ blockClientIds }
+										/>
+									) }
 								{ ! isMultiToolbar &&
 									isDefaultEditingMode &&
 									showLockButtons && (

@@ -24,8 +24,8 @@ describe( 'editMediaEntity', () => {
 		resolveSelect = {
 			getEntitiesConfig: jest.fn( () => [
 				{
-					kind: 'root',
-					name: 'media',
+					kind: 'postType',
+					name: 'attachment',
 					baseURL: '/wp/v2/media',
 				},
 			] ),
@@ -82,14 +82,14 @@ describe( 'editMediaEntity', () => {
 
 		expect( dispatch.__unstableAcquireStoreLock ).toHaveBeenCalledWith(
 			'core',
-			[ 'entities', 'records', 'root', 'media', recordId ],
+			[ 'entities', 'records', 'postType', 'attachment', recordId ],
 			{ exclusive: true }
 		);
 
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'SAVE_ENTITY_RECORD_START',
-			kind: 'root',
-			name: 'media',
+			kind: 'postType',
+			name: 'attachment',
 			recordId,
 		} );
 
@@ -100,8 +100,8 @@ describe( 'editMediaEntity', () => {
 		} );
 
 		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
-			'root',
-			'media',
+			'postType',
+			'attachment',
 			[ updatedRecord ],
 			undefined,
 			true,
@@ -111,8 +111,8 @@ describe( 'editMediaEntity', () => {
 
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'SAVE_ENTITY_RECORD_FINISH',
-			kind: 'root',
-			name: 'media',
+			kind: 'postType',
+			name: 'attachment',
 			recordId,
 			error: undefined,
 		} );
@@ -137,15 +137,15 @@ describe( 'editMediaEntity', () => {
 
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'SAVE_ENTITY_RECORD_START',
-			kind: 'root',
-			name: 'media',
+			kind: 'postType',
+			name: 'attachment',
 			recordId,
 		} );
 
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'SAVE_ENTITY_RECORD_FINISH',
-			kind: 'root',
-			name: 'media',
+			kind: 'postType',
+			name: 'attachment',
 			recordId,
 			error: apiError,
 		} );

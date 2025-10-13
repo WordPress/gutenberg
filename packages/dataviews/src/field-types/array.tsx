@@ -59,18 +59,10 @@ const arrayFieldType: FieldTypeDefinition< any > = {
 				return __( 'Every value must be a string.' );
 			}
 
-			if ( field?.elements ) {
-				const validValues = field.elements.map( ( f ) => f.value );
-				if (
-					! value.every( ( v: any ) => validValues.includes( v ) )
-				) {
-					return __( 'Value must be one of the elements.' );
-				}
-			}
 			return null;
 		},
 	},
-	Edit: null, // Not implemented yet
+	Edit: 'array', // Use array control
 	render,
 	enableSorting: true,
 	filterBy: {

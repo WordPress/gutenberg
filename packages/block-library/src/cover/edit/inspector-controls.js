@@ -131,7 +131,12 @@ export default function CoverInspectorControls( {
 	const image = useSelect(
 		( select ) =>
 			id && isImageBackground
-				? select( coreStore ).getMedia( id, { context: 'view' } )
+				? select( coreStore ).getEntityRecord(
+						'postType',
+						'attachment',
+						id,
+						{ context: 'view' }
+				  )
 				: null,
 		[ id, isImageBackground ]
 	);
