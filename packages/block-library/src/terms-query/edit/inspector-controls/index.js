@@ -46,10 +46,33 @@ export default function TermsQueryInspectorControls( {
 		( _taxonomy ) => _taxonomy.slug === taxonomy
 	)?.hierarchical;
 
-	const isTaxonomyMatchingTemplate = templateSlug?.startsWith(
-		// `Tags` are a special case in WP template hierarchy.
-		taxonomy === 'post_tag' ? 'tag' : taxonomy
+	const taxonomyMatches = templateSlug?.match(
+		/^(category|tag|taxonomy-([^-]+))$|^(((category|tag)|taxonomy-([^-]+))-(.+))$/
 	);
+	let _taxonomyFromTemplate;
+	if ( taxonomyMatches ) {
+		// Extract taxonomy type from template context.
+		// Pattern 1: Taxonomy only (no specific term).
+		// e.g., "category", "tag", or "taxonomy-genre".
+		if ( taxonomyMatches[ 1 ] ) {
+			_taxonomyFromTemplate =
+				taxonomyMatches[ 2 ] || // Custom taxonomy name (e.g., "genre" from "taxonomy-genre").
+				taxonomyMatches[ 1 ]; // Built-in taxonomy ("category" or "tag").
+		}
+		// Pattern 2: Taxonomy with specific term.
+		// e.g., "category-news", "tag-javascript", or "taxonomy-genre-fiction".
+		else if ( taxonomyMatches[ 3 ] ) {
+			_taxonomyFromTemplate =
+				taxonomyMatches[ 6 ] || // Custom taxonomy name (e.g., "genre" from "taxonomy-genre-fiction").
+				taxonomyMatches[ 4 ]; // Built-in taxonomy type ("category" or "tag" from full match).
+		}
+		_taxonomyFromTemplate =
+			// `Tags` are a special case in WP template hierarchy.
+			_taxonomyFromTemplate === 'tag'
+				? 'post_tag'
+				: _taxonomyFromTemplate;
+	}
+	const isTaxonomyMatchingTemplate = taxonomy === _taxonomyFromTemplate;
 
 	// Only display the inherit control if the taxonomy is hierarchical and matches the current template.
 	const displayInheritControl =
