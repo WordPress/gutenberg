@@ -11,6 +11,15 @@ test.describe( 'data-wp-each', () => {
 
 	test.beforeEach( async ( { interactivityUtils: utils, page } ) => {
 		await page.goto( utils.getLink( 'test/directive-each' ) );
+
+		// Scroll to page bottom to trigger hydration of out-of-viewport interactive regions.
+		await page.evaluate(
+			`window.scrollTo( {
+				top: document.body.scrollHeight,
+				left: 0,
+				behavior: 'instant',
+			} );`
+		);
 	} );
 
 	test.afterAll( async ( { interactivityUtils: utils } ) => {
@@ -524,7 +533,8 @@ test.describe( 'data-wp-each', () => {
 		test( `does not error with non-iterable values: ${ testId }`, async ( {
 			page,
 		} ) => {
-			await expect( page.getByTestId( testId ) ).toBeEmpty();
+			const element = page.getByTestId( testId );
+			await expect( element ).toBeEmpty();
 		} );
 	}
 
