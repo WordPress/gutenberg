@@ -208,7 +208,7 @@ function BlockBindingsPanelMenuContent( {
 
 function BlockBindingsAttribute( { attribute, binding, source } ) {
 	const { source: sourceName, args } = binding || {};
-	const isSourceInvalid = ! source;
+	const isSourceInvalid = ! sourceName;
 	return (
 		<VStack className="block-editor-bindings__item" spacing={ 0 }>
 			<Text truncate>{ attribute }</Text>
@@ -412,6 +412,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 						 * by other means (e.g. code editor).
 						 */
 						_sources[ sourceName ] = {
+							data: [],
 							label,
 							getValues,
 						};
@@ -439,9 +440,13 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 	// Filter bindings to only show bindable attributes.
 	const { bindings } = metadata || {};
 
+	// Check if all sources have empty data arrays
+	const hasCompatibleData = Object.values( sources ).some(
+		( source ) => source.data && source.data.length > 0
+	);
+
 	// Lock the UI when the user can't update bindings or there are no fields to connect to.
-	const readOnly =
-		! canUpdateBlockBindings || ! Object.keys( sources ).length;
+	const readOnly = ! canUpdateBlockBindings || ! hasCompatibleData;
 
 	const RenderModalContent =
 		sources[ modalState?.sourceKey ]?.renderModalContent;
@@ -459,11 +464,8 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 				<ItemGroup isBordered isSeparated>
 					{ bindableAttributes.map( ( attribute ) => {
 						const binding = bindings?.[ attribute ];
-						const hasCompatibleData = Object.values( sources ).some(
-							( source ) => source.data
-						);
 
-						return readOnly || ! hasCompatibleData ? (
+						return readOnly ? (
 							<ReadOnlyBlockBindingsPanelItem
 								key={ attribute }
 								attribute={ attribute }
