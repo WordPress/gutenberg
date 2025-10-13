@@ -557,7 +557,7 @@ function gutenberg_get_block_template( $output, $id, $template_type ) {
 	//////////////////////////////
 	// START CORE MODIFICATIONS //
 	//////////////////////////////
-	$active_templates     = get_option( 'active_templates', array() );
+	$active_templates = get_option( 'active_templates', array() );
 
 	if ( ! empty( $active_templates[ $slug ] ) ) {
 		if ( is_int( $active_templates[ $slug ] ) ) {
@@ -569,7 +569,7 @@ function gutenberg_get_block_template( $output, $id, $template_type ) {
 					return $template;
 				}
 			}
-		} else if ( $active_templates[ $slug ] === false ) {
+		} elseif ( false === $active_templates[ $slug ] ) {
 			return null;
 		}
 	}
@@ -577,7 +577,7 @@ function gutenberg_get_block_template( $output, $id, $template_type ) {
 	// END CORE MODIFICATIONS //
 	////////////////////////////
 
-	$wp_query_args        = array(
+	$wp_query_args  = array(
 		'post_name__in'  => array( $slug ),
 		'post_type'      => $template_type,
 		'post_status'    => array( 'auto-draft', 'draft', 'publish', 'trash' ),
@@ -591,8 +591,8 @@ function gutenberg_get_block_template( $output, $id, $template_type ) {
 			),
 		),
 	);
-	$template_query       = new WP_Query( $wp_query_args );
-	$posts                = $template_query->posts;
+	$template_query = new WP_Query( $wp_query_args );
+	$posts          = $template_query->posts;
 
 	if ( count( $posts ) > 0 ) {
 		$template = _build_block_template_result_from_post( $posts[0] );
@@ -665,7 +665,7 @@ function gutenberg_get_block_templates( $output, $query = array(), $template_typ
 	//////////////////////////////
 	// START CORE MODIFICATIONS //
 	//////////////////////////////
-	$active_templates     = get_option( 'active_templates', array() );
+	$active_templates = get_option( 'active_templates', array() );
 	////////////////////////////
 	// END CORE MODIFICATIONS //
 	////////////////////////////
@@ -697,7 +697,7 @@ function gutenberg_get_block_templates( $output, $query = array(), $template_typ
 		if ( $template->is_custom ) {
 			// Custom templates don't need to be activated, leave them be.
 			$query_result[] = $template;
-		} else if ( isset( $active_templates[ $template->slug ] ) && $active_templates[ $template->slug ] === $post->ID ) {
+		} elseif ( isset( $active_templates[ $template->slug ] ) && $active_templates[ $template->slug ] === $post->ID ) {
 			// Only include active templates.
 			$query_result[] = $template;
 		}
