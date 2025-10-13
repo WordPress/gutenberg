@@ -18,6 +18,7 @@ import postcss from 'postcss';
 import autoprefixer from 'autoprefixer';
 import rtlcss from 'rtlcss';
 import cssnano from 'cssnano';
+import babel from 'esbuild-plugin-babel';
 
 /**
  * Internal dependencies
@@ -52,6 +53,21 @@ const define = {
 		process.env.NODE_ENV === 'development'
 	),
 };
+
+/**
+ * Create emotion babel plugin for esbuild.
+ * This plugin enables emotion's babel transformations for proper CSS-in-JS handling.
+ *
+ * @return {Object} esbuild plugin.
+ */
+function emotionBabelPlugin() {
+	return babel( {
+		filter: /\.[jt]sx?$/,
+		config: {
+			plugins: [ '@emotion/babel-plugin' ],
+		},
+	} );
+}
 
 /**
  * Normalize path separators for cross-platform compatibility.
@@ -489,26 +505,25 @@ async function bundlePackage( packageName ) {
 			};
 		}
 
+		const bundlePlugins = [
+			momentTimezoneAliasPlugin(),
+			wordpressExternalsPlugin( 'index.min', 'iife' ),
+		];
+
 		builds.push(
 			esbuild.build( {
 				...baseConfig,
 				outfile: path.join( outputDir, 'index.min.js' ),
 				minify: true,
 				define,
-				plugins: [
-					momentTimezoneAliasPlugin(),
-					wordpressExternalsPlugin( 'index.min', 'iife' ),
-				],
+				plugins: bundlePlugins,
 			} ),
 			esbuild.build( {
 				...baseConfig,
 				outfile: path.join( outputDir, 'index.js' ),
 				minify: false,
 				define,
-				plugins: [
-					momentTimezoneAliasPlugin(),
-					wordpressExternalsPlugin( 'index.min', 'iife' ),
-				],
+				plugins: bundlePlugins,
 			} )
 		);
 	}
@@ -538,6 +553,10 @@ async function bundlePackage( packageName ) {
 					: exportName.replace( /^\.\//, '' );
 			const entryPoint = path.join( packageDir, exportPath );
 
+			const modulePlugins = [
+				wordpressExternalsPlugin( `${ fileName }.min`, 'esm' ),
+			];
+
 			builds.push(
 				esbuild.build( {
 					entryPoints: [ entryPoint ],
@@ -552,9 +571,7 @@ async function bundlePackage( packageName ) {
 					platform: 'browser',
 					minify: true,
 					define,
-					plugins: [
-						wordpressExternalsPlugin( `${ fileName }.min`, 'esm' ),
-					],
+					plugins: modulePlugins,
 				} )
 			);
 		}
@@ -664,6 +681,11 @@ async function transpilePackage( packageName ) {
 
 	const builds = [];
 
+	// Check if this is the components package that needs emotion babel plugin
+	// Ideally we should remove this exception and move away from emotion.
+	const needsEmotionPlugin = packageName === 'components';
+	const plugins = needsEmotionPlugin ? [ emotionBabelPlugin() ] : [];
+
 	// Build CJS and copy JSON files to build directory
 	if ( packageJson.main ) {
 		builds.push(
@@ -681,6 +703,7 @@ async function transpilePackage( packageName ) {
 				loader: {
 					'.js': 'jsx',
 				},
+				plugins,
 			} )
 		);
 
@@ -714,6 +737,7 @@ async function transpilePackage( packageName ) {
 				loader: {
 					'.js': 'jsx',
 				},
+				plugins,
 			} )
 		);
 
