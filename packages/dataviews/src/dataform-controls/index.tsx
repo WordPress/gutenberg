@@ -10,6 +10,7 @@ import type {
 	DataFormControlProps,
 	Field,
 	FieldTypeDefinition,
+	EditConfig,
 } from '../types';
 import checkbox from './checkbox';
 import datetime from './datetime';
@@ -18,6 +19,7 @@ import email from './email';
 import telephone from './telephone';
 import url from './url';
 import integer from './integer';
+import number from './number';
 import radio from './radio';
 import select from './select';
 import text from './text';
@@ -42,6 +44,7 @@ const FORM_CONTROLS: FormControls = {
 	telephone,
 	url,
 	integer,
+	number,
 	password,
 	radio,
 	select,
@@ -50,6 +53,23 @@ const FORM_CONTROLS: FormControls = {
 	textarea,
 	toggleGroup,
 };
+
+function isEditConfig( value: any ): value is EditConfig {
+	return (
+		value && typeof value === 'object' && typeof value.control === 'string'
+	);
+}
+
+function createConfiguredControl( config: EditConfig ) {
+	const { control, ...controlConfig } = config;
+	const BaseControlType = getControlByType( control );
+
+	return function ConfiguredControl< Item >(
+		props: DataFormControlProps< Item >
+	) {
+		return <BaseControlType { ...props } config={ controlConfig } />;
+	};
+}
 
 export function getControl< Item >(
 	field: Field< Item >,
@@ -63,12 +83,20 @@ export function getControl< Item >(
 		return getControlByType( field.Edit );
 	}
 
+	if ( isEditConfig( field.Edit ) ) {
+		return createConfiguredControl( field.Edit );
+	}
+
 	if ( field.elements && field.type !== 'array' ) {
 		return getControlByType( 'select' );
 	}
 
 	if ( typeof fieldTypeDefinition.Edit === 'string' ) {
 		return getControlByType( fieldTypeDefinition.Edit );
+	}
+
+	if ( isEditConfig( fieldTypeDefinition.Edit ) ) {
+		return createConfiguredControl( fieldTypeDefinition.Edit );
 	}
 
 	return fieldTypeDefinition.Edit;

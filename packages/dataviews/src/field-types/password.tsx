@@ -12,7 +12,7 @@ import type {
 	NormalizedField,
 	FieldTypeDefinition,
 } from '../types';
-import { renderFromElements } from '../utils';
+import renderFromElements from './utils/render-from-elements';
 
 /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
 function sort( valueA: any, valueB: any, direction: SortDirection ) {

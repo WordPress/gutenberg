@@ -107,7 +107,9 @@ class Tests_Blocks_Render_Post_Time_To_Read extends WP_UnitTestCase {
 		$GLOBALS['post'] = self::$no_content_post;
 
 		$page_id       = self::$no_content_post->ID;
-		$attributes    = array();
+		$attributes    = array(
+			'displayMode' => 'time',
+		);
 		$parsed_blocks = parse_blocks( '<!-- wp:post-time-to-read /-->' );
 		$parsed_block  = $parsed_blocks[0];
 		$context       = array( 'postId' => $page_id );
@@ -129,7 +131,9 @@ class Tests_Blocks_Render_Post_Time_To_Read extends WP_UnitTestCase {
 		$GLOBALS['post'] = self::$less_than_one_minute_post;
 
 		$page_id       = self::$less_than_one_minute_post->ID;
-		$attributes    = array();
+		$attributes    = array(
+			'displayMode' => 'time',
+		);
 		$parsed_blocks = parse_blocks( '<!-- wp:post-time-to-read /-->' );
 		$parsed_block  = $parsed_blocks[0];
 		$context       = array( 'postId' => $page_id );
@@ -151,7 +155,9 @@ class Tests_Blocks_Render_Post_Time_To_Read extends WP_UnitTestCase {
 		$GLOBALS['post'] = self::$one_minute_post;
 
 		$page_id       = self::$one_minute_post->ID;
-		$attributes    = array();
+		$attributes    = array(
+			'displayMode' => 'time',
+		);
 		$parsed_blocks = parse_blocks( '<!-- wp:post-time-to-read /-->' );
 		$parsed_block  = $parsed_blocks[0];
 		$context       = array( 'postId' => $page_id );
@@ -173,7 +179,9 @@ class Tests_Blocks_Render_Post_Time_To_Read extends WP_UnitTestCase {
 		$GLOBALS['post'] = self::$two_minutes_post;
 
 		$page_id       = self::$two_minutes_post->ID;
-		$attributes    = array();
+		$attributes    = array(
+			'displayMode' => 'time',
+		);
 		$parsed_blocks = parse_blocks( '<!-- wp:post-time-to-read /-->' );
 		$parsed_block  = $parsed_blocks[0];
 		$context       = array( 'postId' => $page_id );
@@ -181,6 +189,30 @@ class Tests_Blocks_Render_Post_Time_To_Read extends WP_UnitTestCase {
 
 		$actual   = gutenberg_render_block_core_post_time_to_read( $attributes, '', $block );
 		$expected = '<div class="wp-block-post-time-to-read">2 minutes</div>';
+
+		$this->assertSame( $expected, $actual );
+	}
+
+	/**
+	 * @covers ::render_block_core_post_time_to_read
+	 */
+	public function test_show_word_count_only() {
+		global $wp_query;
+
+		$wp_query->post  = self::$two_minutes_post;
+		$GLOBALS['post'] = self::$two_minutes_post;
+
+		$page_id       = self::$two_minutes_post->ID;
+		$attributes    = array(
+			'displayMode' => 'words',
+		);
+		$parsed_blocks = parse_blocks( '<!-- wp:post-time-to-read /-->' );
+		$parsed_block  = $parsed_blocks[0];
+		$context       = array( 'postId' => $page_id );
+		$block         = new WP_Block( $parsed_block, $context );
+
+		$actual   = gutenberg_render_block_core_post_time_to_read( $attributes, '', $block );
+		$expected = '<div class="wp-block-post-time-to-read">341 words</div>';
 
 		$this->assertSame( $expected, $actual );
 	}

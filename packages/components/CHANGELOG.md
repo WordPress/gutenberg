@@ -2,15 +2,51 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `SearchControl`: Move search icon to prefix position ([#71984](https://github.com/WordPress/gutenberg/pull/71984)).
+-   `SearchControl`: Flip search icon depending on placement ([#72070](https://github.com/WordPress/gutenberg/pull/72070)).
+-   `SearchControl`: Normalize styles ([#72072](https://github.com/WordPress/gutenberg/pull/72072)).
+-   `Badge`: Avoid propagating text-decoration styles from ancestors into the component ([#72097](https://github.com/WordPress/gutenberg/pull/72097)).
+-   `CheckboxControl`, `RadioControl`, `ToggleControl` (`FormToggle`): Ensure elements are focused when clicked in Safari ([#72115](https://github.com/WordPress/gutenberg/pull/72115)).
+
+### Bug Fixes
+
+-   `ValidatedCheckboxControl`, `ValidatedRadioControl`, `ValidatedToggleControl`: Fix issue where validation may not be triggered in Safari when elements are toggled by clicking ([#72115](https://github.com/WordPress/gutenberg/pull/72115)).
+
+### Internal
+
+-   Replace usage of extinct icons `edit` and `warning` with `pencil` and `cautionFilled`, respectively ([#72105](https://github.com/WordPress/gutenberg/pull/72105)).
+-   Move the package to v2 build pipeline. Rewrite styles to be dart-sass compatible ([#72242](https://github.com/WordPress/gutenberg/pull/72242)).
+
+## 30.5.0 (2025-10-01)
+
+### Enhancements
+
+-   `TextareaControl`: Add default resize: vertical rule ([#71736](https://github.com/WordPress/gutenberg/pull/71736)).
+
+### Bug Fixes
+
+-   `Button`: Fix incorrect padding with text and right icon ([#71464](https://github.com/WordPress/gutenberg/pull/71464)).
+
+### Internal
+
+-   Expose `ValidatedFormTokenField` via private APIs [#71194](https://github.com/WordPress/gutenberg/pull/71194)
+
+## 30.4.0 (2025-09-17)
+
 ### Bug Fixes
 
 -   `Modal`: Fix modal headings and labels to use proper editor text color instead of wp-admin colors ([#71311](https://github.com/WordPress/gutenberg/pull/71311)).
 
 ### Internal
 
+-   Expose `ValidatedRadioControl` via private API's ([#71664](https://github.com/WordPress/gutenberg/pull/71664)).
 -   `ValidatedCheckboxControl`: Expose the component under private API's ([#71505](https://github.com/WordPress/gutenberg/pull/71505/)).
 -   Expose `ValidatedTextareaControl` via Private APIs ([#71495](https://github.com/WordPress/gutenberg/pull/71495))
 -   Add support for ValidatedFormTokenField [#71350](https://github.com/WordPress/gutenberg/pull/71350).
+-   Expose `ValidatedSelectControl` via Private APIs ([#71665](https://github.com/WordPress/gutenberg/pull/71665))
+-   Expose `ValidatedToggleGroupControl` via private APIs. Also properly detects `undefined` values for `required` validation ([#71666](https://github.com/WordPress/gutenberg/pull/71666)).
 
 ## 30.3.0 (2025-09-03)
 

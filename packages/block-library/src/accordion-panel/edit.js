@@ -9,6 +9,7 @@ export default function Edit( { attributes } ) {
 
 	const blockProps = useBlockProps( {
 		'aria-hidden': ! isSelected && ! openByDefault,
+		role: 'region',
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {

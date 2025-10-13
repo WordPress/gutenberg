@@ -105,18 +105,5 @@ function register_block_core_post_date() {
 			'render_callback' => 'render_block_core_post_date',
 		)
 	);
-
-	// The following filter can be removed once the minimum required WordPress version is 6.9 or newer.
-	add_filter(
-		'block_bindings_supported_attributes_core/post-date',
-		function ( $attributes ) {
-			if ( ! in_array( 'datetime', $attributes, true ) ) {
-				$attributes[] = 'datetime';
-			}
-			return $attributes;
-		},
-		10,
-		3
-	);
 }
 add_action( 'init', 'register_block_core_post_date' );

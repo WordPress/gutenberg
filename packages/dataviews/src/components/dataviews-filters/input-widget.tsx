@@ -32,13 +32,52 @@ export default function InputWidget( {
 	const currentFilter = view.filters?.find(
 		( f ) => f.field === filter.field
 	);
-
-	const field = fields.find( ( f ) => f.id === filter.field );
 	const currentValue = getCurrentValue( filter, currentFilter );
+
+	/*
+	 * We are reusing the field.Edit component for filters. By doing so,
+	 * we get for free a filter control specific to the field type
+	 * and other aspects of the field API (Edit control configuration, etc.).
+	 *
+	 * This approach comes with an issue: the field.Edit controls work with getValue
+	 * and setValue methods, which take an item (Item) as parameter. But, at this point,
+	 * we don't have an item and we don't know how to create one, either.
+	 *
+	 * So, what we do is to prepare the data and the relevant field configuration
+	 * as if Item was a plain object whose keys are the field ids:
+	 *
+	 * {
+	 *   [ fieldOne.id ]: value,
+	 *   [ fieldTwo.id ]: value,
+	 * }
+	 *
+	 */
+	const field = useMemo( () => {
+		const currentField = fields.find( ( f ) => f.id === filter.field );
+		if ( currentField ) {
+			return {
+				...currentField,
+				// Deactivate validation for filters.
+				isValid: {
+					required: false,
+					custom: () => null,
+				},
+				// Configure getValue/setValue as if Item was a plain object.
+				getValue: ( { item }: { item: any } ) =>
+					item[ currentField.id ],
+				setValue: ( { value }: { value: any } ) => ( {
+					[ currentField.id ]: value,
+				} ),
+			};
+		}
+		return currentField;
+	}, [ fields, filter.field ] );
+
 	const data = useMemo( () => {
 		return ( view.filters ?? [] ).reduce(
-			( acc, f ) => {
-				acc[ f.field ] = f.value;
+			( acc, activeFilter ) => {
+				// We can now assume the field is stored as a Item prop.
+				acc[ activeFilter.field ] = activeFilter.value;
 				return acc;
 			},
 			{} as Record< string, any >
@@ -49,7 +88,7 @@ export default function InputWidget( {
 		if ( ! field || ! currentFilter ) {
 			return;
 		}
-		const nextValue = updatedData[ field.id ];
+		const nextValue = field.getValue( { item: updatedData } );
 		if ( fastDeepEqual( nextValue, currentValue ) ) {
 			return;
 		}

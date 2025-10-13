@@ -52,14 +52,57 @@ export function useAllowSwitchingTemplates() {
 }
 
 function useTemplates( postType ) {
-	return useSelect(
-		( select ) =>
-			select( coreStore ).getEntityRecords( 'postType', 'wp_template', {
-				per_page: -1,
-				post_type: postType,
-			} ),
-		[ postType ]
-	);
+	// To do: create a new selector to checks if templates exist at all instead
+	// of and unbound request. In the modal, the user templates should be
+	// paginated and we should not make an unbound request.
+	const { defaultTemplateTypes, registeredTemplates, userTemplates } =
+		useSelect(
+			( select ) => {
+				return {
+					defaultTemplateTypes:
+						select( coreStore ).getCurrentTheme()
+							?.default_template_types,
+					registeredTemplates: select( coreStore ).getEntityRecords(
+						'postType',
+						'wp_registered_template',
+						{
+							per_page: -1,
+							post_type: postType,
+						}
+					),
+					userTemplates: select( coreStore ).getEntityRecords(
+						'postType',
+						'wp_template',
+						{ per_page: -1 }
+					),
+				};
+			},
+			[ postType ]
+		);
+
+	return useMemo( () => {
+		if (
+			! defaultTemplateTypes ||
+			! registeredTemplates ||
+			! userTemplates
+		) {
+			return [];
+		}
+		return [
+			...registeredTemplates,
+			...userTemplates.filter(
+				( template ) =>
+					// Only give "custom" templates as an option, which
+					// means the is_wp_suggestion meta field is not set and
+					// the slug is not found in the default template types.
+					// https://github.com/WordPress/wordpress-develop/blob/97382397b2bd7c85aef6d4cd1c10bafd397957fc/src/wp-includes/block-template-utils.php#L858-L867
+					! template.meta.is_wp_suggestion &&
+					! defaultTemplateTypes.find(
+						( type ) => type.slug === template.slug
+					)
+			),
+		];
+	}, [ registeredTemplates, userTemplates, defaultTemplateTypes ] );
 }
 
 export function useAvailableTemplates( postType ) {
@@ -71,7 +114,7 @@ export function useAvailableTemplates( postType ) {
 			allowSwitchingTemplate &&
 			templates?.filter(
 				( template ) =>
-					template.is_custom &&
+					( template.is_custom || template.type === 'wp_template' ) &&
 					template.slug !== currentTemplateSlug &&
 					!! template.content.raw // Skip empty templates.
 			),

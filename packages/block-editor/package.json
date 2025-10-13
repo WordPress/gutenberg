@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-editor",
-	"version": "15.3.0",
+	"version": "15.5.0",
 	"description": "Generic block editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -27,6 +27,9 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"wpScript": true,
+	"wpScriptModuleExports": {
+		"./utils/fit-text-frontend": "./build-module/utils/fit-text-frontend.js"
+	},
 	"sideEffects": [
 		"build-style/**",
 		"src/**/*.scss",

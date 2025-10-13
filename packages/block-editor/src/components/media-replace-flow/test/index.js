@@ -119,7 +119,7 @@ describe( 'General media replace flow', () => {
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Save',
+				name: 'Apply',
 			} )
 		);
 

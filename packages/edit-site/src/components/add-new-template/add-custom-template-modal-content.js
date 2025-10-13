@@ -17,6 +17,7 @@ import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useDebouncedInput } from '@wordpress/compose';
 import { focus } from '@wordpress/dom';
+import { safeDecodeURI } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -67,7 +68,7 @@ function SuggestionListItem( {
 					lineHeight={ 1.53846153846 } // 20px
 					className={ `${ baseCssClass }__info` }
 				>
-					{ suggestion.link }
+					{ safeDecodeURI( suggestion.link ) }
 				</Text>
 			) }
 		</Composite.Item>
@@ -172,9 +173,7 @@ function AddCustomTemplateModalContent( {
 	onBack,
 	containerRef,
 } ) {
-	const [ showSearchEntities, setShowSearchEntities ] = useState(
-		entityForSuggestions.hasGeneralTemplate
-	);
+	const [ showSearchEntities, setShowSearchEntities ] = useState();
 
 	// Focus on the first focusable element when the modal opens.
 	// We handle focus management in the parent modal, just need to focus on the first focusable element.

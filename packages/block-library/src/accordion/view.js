@@ -1,38 +1,87 @@
 /**
  * WordPress dependencies
  */
-import { store, getContext } from '@wordpress/interactivity';
+import { store, getContext, withSyncEvent } from '@wordpress/interactivity';
 
-const { state } = store( 'core/accordion', {
+store( 'core/accordion', {
 	state: {
 		get isOpen() {
-			const { isOpen, id } = getContext();
-			return isOpen.includes( id );
+			const { id, accordionItems } = getContext();
+			const accordionItem = accordionItems.find(
+				( item ) => item.id === id
+			);
+			return accordionItem ? accordionItem.isOpen : false;
 		},
 	},
 	actions: {
 		toggle: () => {
 			const context = getContext();
-			const { id, autoclose } = context;
+			const { id, autoclose, accordionItems } = context;
+			const accordionItem = accordionItems.find(
+				( item ) => item.id === id
+			);
 
 			if ( autoclose ) {
-				context.isOpen = state.isOpen ? [] : [ id ];
-			} else if ( state.isOpen ) {
-				context.isOpen = context.isOpen.filter(
-					( item ) => item !== id
-				);
+				accordionItems.forEach( ( item ) => {
+					item.isOpen =
+						item.id === id ? ! accordionItem.isOpen : false;
+				} );
 			} else {
-				context.isOpen.push( id );
+				accordionItem.isOpen = ! accordionItem.isOpen;
 			}
 		},
+		handleKeyDown: withSyncEvent( ( event ) => {
+			if (
+				event.key !== 'ArrowUp' &&
+				event.key !== 'ArrowDown' &&
+				event.key !== 'Home' &&
+				event.key !== 'End'
+			) {
+				return;
+			}
+
+			event.preventDefault();
+			const context = getContext();
+			const { id, accordionItems } = context;
+			const currentIndex = accordionItems.findIndex(
+				( item ) => item.id === id
+			);
+
+			let nextIndex;
+
+			switch ( event.key ) {
+				case 'ArrowUp':
+					nextIndex = Math.max( 0, currentIndex - 1 );
+					break;
+				case 'ArrowDown':
+					nextIndex = Math.min(
+						currentIndex + 1,
+						accordionItems.length - 1
+					);
+					break;
+				case 'Home':
+					nextIndex = 0;
+					break;
+				case 'End':
+					nextIndex = accordionItems.length - 1;
+					break;
+			}
+
+			const nextId = accordionItems[ nextIndex ].id;
+			const nextButton = document.getElementById( nextId );
+			if ( nextButton ) {
+				nextButton.focus();
+			}
+		} ),
 	},
 	callbacks: {
-		initIsOpen: () => {
+		initAccordionItems: () => {
 			const context = getContext();
 			const { id, openByDefault } = context;
-			if ( openByDefault ) {
-				context.isOpen.push( id );
-			}
+			context.accordionItems.push( {
+				id,
+				isOpen: openByDefault,
+			} );
 		},
 	},
 } );
