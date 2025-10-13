@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useState, RawHTML, useEffect, useRef } from '@wordpress/element';
+import { useState, RawHTML, useEffect } from '@wordpress/element';
 import {
 	__experimentalText as Text,
 	__experimentalHStack as HStack,
@@ -35,9 +35,7 @@ import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
 import { getCommentExcerpt, focusCommentThread } from './utils';
 
-const { useBlockElement, useBlockElementRef } = unlock(
-	blockEditorPrivateApis
-);
+const { useBlockElement } = unlock( blockEditorPrivateApis );
 const { Menu } = unlock( componentsPrivateApis );
 
 /**
@@ -146,8 +144,6 @@ function Thread( {
 	const { toggleBlockHighlight, selectBlock, toggleBlockSpotlight } = unlock(
 		useDispatch( blockEditorStore )
 	);
-	const blockRef = useRef();
-	useBlockElementRef( thread.blockClientId, blockRef );
 	const relatedBlockElement = useBlockElement( thread.blockClientId );
 	const debouncedToggleBlockHighlight = useDebounce(
 		toggleBlockHighlight,
@@ -374,7 +370,7 @@ function Thread( {
 				size="compact"
 				onClick={ ( event ) => {
 					event.stopPropagation();
-					blockRef.current?.focus();
+					relatedBlockElement?.focus();
 				} }
 			>
 				{ __( 'Back to block' ) }
