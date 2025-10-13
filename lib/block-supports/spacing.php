@@ -124,12 +124,12 @@ function gutenberg_get_spacing_size_value( $preset, $settings = array() ) {
 
 	// Build clamp() only when explicit min/preferred/max are provided via fluid object.
 	if ( is_array( $fluid_spacing_settings ) && ! empty( $fluid_spacing_settings ) ) {
-		$min        = isset( $fluid_spacing_settings['min'] ) ? trim( (string) $fluid_spacing_settings['min'] ) : '';
-		$preferred  = isset( $fluid_spacing_settings['preferred'] ) ? trim( (string) $fluid_spacing_settings['preferred'] ) : trim( (string) $size );
-		$max        = isset( $fluid_spacing_settings['max'] ) ? trim( (string) $fluid_spacing_settings['max'] ) : '';
+		$min       = isset( $fluid_spacing_settings['min'] ) ? trim( (string) $fluid_spacing_settings['min'] ) : '';
+		$preferred = isset( $fluid_spacing_settings['preferred'] ) ? trim( (string) $fluid_spacing_settings['preferred'] ) : trim( (string) $size );
+		$max       = isset( $fluid_spacing_settings['max'] ) ? trim( (string) $fluid_spacing_settings['max'] ) : '';
 
 		// All three are required to form a valid clamp().
-		if ( $min !== '' && $preferred !== '' && $max !== '' ) {
+		if ( '' !== $min && '' !== $preferred && '' !== $max ) {
 			return sprintf( 'clamp(%s, %s, %s)', $min, $preferred, $max );
 		}
 	}
