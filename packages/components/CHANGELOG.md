@@ -9,6 +9,7 @@
 -   `SearchControl`: Normalize styles ([#72072](https://github.com/WordPress/gutenberg/pull/72072)).
 -   `Badge`: Avoid propagating text-decoration styles from ancestors into the component ([#72097](https://github.com/WordPress/gutenberg/pull/72097)).
 -   `CheckboxControl`, `RadioControl`, `ToggleControl` (`FormToggle`): Ensure elements are focused when clicked in Safari ([#72115](https://github.com/WordPress/gutenberg/pull/72115)).
+-   `FontSizePicker`: Change selection of font size presets to `selectedSlug`, not `size` ([#71703](https://github.com/WordPress/gutenberg/pull/71703))
 
 ### Bug Fixes
 
