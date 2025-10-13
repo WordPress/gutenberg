@@ -336,7 +336,20 @@ export const getEntityRecords =
 				};
 			}
 
-			const path = addQueryArgs( entityConfig.baseURL, {
+			let { baseURL } = entityConfig;
+			const { combinedTemplates = true } = query;
+
+			if (
+				kind === 'postType' &&
+				name === 'wp_template' &&
+				combinedTemplates
+			) {
+				baseURL =
+					baseURL.slice( 0, baseURL.lastIndexOf( '/' ) ) +
+					'/templates';
+			}
+
+			const path = addQueryArgs( baseURL, {
 				...entityConfig.baseURLParams,
 				...query,
 			} );
