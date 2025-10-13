@@ -70,8 +70,8 @@ export function Comments( {
 	const [ boardOffsets, setBoardOffsets ] = useState( {} );
 	const [ blockRefs, setBlockRefs ] = useState( {} );
 
-	const { blockCommentId, selectedBlockClientId } = useSelect( ( select ) => {
-		const { getBlockAttributes, getSelectedBlockClientId } =
+	const { blockCommentId, selectedBlockClientId, blockIds } = useSelect( ( select ) => {
+		const { getBlockAttributes, getSelectedBlockClientId, getBlockOrder } =
 			select( blockEditorStore );
 		const clientId = getSelectedBlockClientId();
 		return {
@@ -79,15 +79,11 @@ export function Comments( {
 				? getBlockAttributes( clientId )?.metadata?.commentId
 				: null,
 			selectedBlockClientId: clientId,
+			blockIds: getBlockOrder(),
 		};
 	}, [] );
 
 	const relatedBlockElement = useBlockElement( selectedBlockClientId );
-
-	const blockIds = useSelect( ( select ) => {
-		const { getBlockOrder } = select( blockEditorStore );
-		return getBlockOrder();
-	}, [] );
 
 	const handleDelete = async ( comment ) => {
 		const currentIndex = threads.findIndex( ( t ) => t.id === comment.id );
