@@ -2,8 +2,7 @@
  * External dependencies
  */
 import { v4 as uuidv4 } from 'uuid';
-import * as math from 'lib0/math';
-import * as fun from 'lib0/function';
+import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
  * WordPress dependencies
@@ -100,7 +99,7 @@ function areBlocksEqual( gblock: Block, yblock: YBlock ): boolean {
 		innerBlocks: null,
 		clientId: null,
 	};
-	const res = fun.equalityDeep(
+	const res = fastDeepEqual(
 		Object.assign( {}, gblock, overwrites ),
 		Object.assign( {}, yblockAsJson, overwrites )
 	);
@@ -222,7 +221,7 @@ export function mergeCrdtBlocks(
 	//
 	// @credit Kevin Jahns (dmonad)
 	// @link https://github.com/WordPress/gutenberg/pull/68483
-	const numOfCommonEntries = math.min(
+	const numOfCommonEntries = Math.min(
 		blocksToSync.length ?? 0,
 		yblocks.length
 	);
@@ -254,11 +253,11 @@ export function mergeCrdtBlocks(
 	}
 
 	const numOfUpdatesNeeded = numOfCommonEntries - left - right;
-	const numOfInsertionsNeeded = math.max(
+	const numOfInsertionsNeeded = Math.max(
 		0,
 		blocksToSync.length - yblocks.length
 	);
-	const numOfDeletionsNeeded = math.max(
+	const numOfDeletionsNeeded = Math.max(
 		0,
 		yblocks.length - blocksToSync.length
 	);
@@ -286,7 +285,7 @@ export function mergeCrdtBlocks(
 					Object.entries( value ).forEach(
 						( [ attributeName, attributeValue ] ) => {
 							if (
-								fun.equalityDeep(
+								fastDeepEqual(
 									currentAttributes?.get( attributeName ),
 									attributeValue
 								)
@@ -347,9 +346,7 @@ export function mergeCrdtBlocks(
 				}
 
 				default:
-					if (
-						! fun.equalityDeep( block[ key ], yblock.get( key ) )
-					) {
+					if ( ! fastDeepEqual( block[ key ], yblock.get( key ) ) ) {
 						yblock.set( key, value );
 					}
 			}

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import * as fun from 'lib0/function';
+import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
  * WordPress dependencies
@@ -280,7 +280,7 @@ function haveValuesChanged< ValueType = any >(
 	currentValue: ValueType,
 	newValue: ValueType
 ): boolean {
-	return ! fun.equalityDeep( currentValue, newValue );
+	return ! fastDeepEqual( currentValue, newValue );
 }
 
 function mergeValue< ValueType = any >(
