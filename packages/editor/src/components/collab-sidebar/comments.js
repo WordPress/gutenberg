@@ -14,12 +14,11 @@ import {
 	__experimentalConfirmDialog as ConfirmDialog,
 	Button,
 	FlexItem,
-	Icon,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useDebounce } from '@wordpress/compose';
 
-import { published, moreVertical, seen } from '@wordpress/icons';
+import { published, moreVertical } from '@wordpress/icons';
 import { __, _x, sprintf, _n } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
@@ -109,7 +108,7 @@ export function Comments( {
 				justify="flex-start"
 				spacing="2"
 			>
-				<PrivacyInfoText />
+				<Text>{ __( 'Only logged in users can see Notes' ) }</Text>
 				{
 					// translators: message displayed when there are no comments available
 					__( 'No comments available' )
@@ -120,7 +119,7 @@ export function Comments( {
 
 	return (
 		<VStack spacing="3">
-			<PrivacyInfoText />
+			<Text>{ __( 'Only logged in users can see Notes' ) }</Text>
 			{ threads.map( ( thread ) => (
 				<Thread
 					key={ thread.id }
@@ -528,23 +527,3 @@ const CommentBoard = ( { thread, parent, isExpanded, onEdit, onDelete } ) => {
 		</>
 	);
 };
-
-/**
- * Privacy info text component that displays information about notes visibility.
- *
- * @return {React.ReactNode} The rendered PrivacyInfoText component.
- */
-function PrivacyInfoText() {
-	return (
-		<HStack
-			alignment="left"
-			spacing="2"
-			className="editor-collab-sidebar-panel__privacy-info"
-		>
-			<Icon icon={ seen } size={ 26 } />
-			<Text as="span" variant="muted" size="small">
-				{ __( 'Only logged in users can see Notes' ) }
-			</Text>
-		</HStack>
-	);
-}
