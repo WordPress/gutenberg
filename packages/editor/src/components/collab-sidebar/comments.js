@@ -101,19 +101,7 @@ export function Comments( {
 
 	const hasThreads = Array.isArray( threads ) && threads.length > 0;
 	if ( ! hasThreads ) {
-		return (
-			<VStack
-				alignment="left"
-				className="editor-collab-sidebar-panel__thread"
-				justify="flex-start"
-				spacing="2"
-			>
-				{
-					// translators: message displayed when there are no comments available
-					__( 'No comments available' )
-				}
-			</VStack>
-		);
+		return <></>;
 	}
 
 	return threads.map( ( thread ) => (
