@@ -14,21 +14,17 @@ describe( 'resolveFieldElements', () => {
 		expect( result ).toBe( source );
 	} );
 
-	it( 'resolves promise sources', async () => {
-		const result = await resolveFieldElements(
-			Promise.resolve( [ optionA ] )
-		);
-		expect( result ).toEqual( [ optionA ] );
-	} );
-
-	it( 'resolves function sources', async () => {
-		const source = () => [ optionA ];
+	it( 'resolves async function sources', async () => {
+		const source = async () => [ optionA ];
 		const result = await resolveFieldElements( source );
 		expect( result ).toEqual( [ optionA ] );
 	} );
 
-	it( 'resolves function returning promises', async () => {
-		const source = () => Promise.resolve( [ optionB ] );
+	it( 'resolves async function sources with delay', async () => {
+		const source = async () => {
+			await Promise.resolve();
+			return [ optionB ];
+		};
 		const result = await resolveFieldElements( source );
 		expect( result ).toEqual( [ optionB ] );
 	} );

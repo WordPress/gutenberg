@@ -254,16 +254,19 @@ describe( 'DataForm component', () => {
 			).toBeInTheDocument();
 		} );
 
-		it( 'should resolve select elements supplied as a promise instance', async () => {
+		it( 'should resolve select elements supplied via async function', async () => {
 			const promiseFields = [
 				{
 					id: 'promisedAuthor',
 					label: 'Promised Author',
 					type: 'integer' as const,
-					elements: Promise.resolve( [
-						{ value: 1, label: 'Jane' },
-						{ value: 2, label: 'John' },
-					] ),
+					elements: async () => {
+						await Promise.resolve();
+						return [
+							{ value: 1, label: 'Jane' },
+							{ value: 2, label: 'John' },
+						];
+					},
 				},
 			];
 

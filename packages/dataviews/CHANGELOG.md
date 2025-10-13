@@ -11,6 +11,7 @@
 - Normalize search field styles ([#72072](https://github.com/WordPress/gutenberg/pull/72072)).
 - DataForm control for `date` supports `required` and `custom` validation [#72048](https://github.com/WordPress/gutenberg/pull/72048).
 - DataForm control for `datetime` supports `required` and `custom` validation. [#72060](https://github.com/WordPress/gutenberg/pull/72060).
+- DataViews: lazy load elements data [#71930](https://github.com/WordPress/gutenberg/pull/71930)
 
 ### Breaking changes
 
@@ -35,7 +36,6 @@
 
 - Introduce a new `DataViewsPicker` component. [#70971](https://github.com/WordPress/gutenberg/pull/70971) and [#71836](https://github.com/WordPress/gutenberg/pull/71836).
 - DataForm: Add support for elements validation in array fields [#71194](https://github.com/WordPress/gutenberg/pull/71194)
-- DataViews: lazy load elements data [#71930](https://github.com/WordPress/gutenberg/pull/71930)
 
 ### Bug Fixes
 

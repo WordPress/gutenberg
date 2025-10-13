@@ -22,10 +22,7 @@ export interface Option< Value extends any = any > {
 	description?: string;
 }
 
-export type FieldElementsSource =
-	| Option[]
-	| Promise< Option[] >
-	| ( () => Option[] | Promise< Option[] > );
+export type FieldElementsSource = Option[] | ( () => Promise< Option[] > );
 
 export interface FilterByConfig {
 	/**

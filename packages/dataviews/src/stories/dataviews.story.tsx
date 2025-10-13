@@ -174,11 +174,11 @@ export const LazyElements = () => {
 
 	const lazyFields = useMemo( () => {
 		return fields.map( ( field ) => {
-			if ( field.id !== 'categories' ) {
+			if ( ! [ 'type', 'categories' ].includes( field.id ) ) {
 				return field;
 			}
 
-			const categoryElements = Array.isArray( field.elements )
+			const elements = Array.isArray( field.elements )
 				? field.elements
 				: [];
 
@@ -188,7 +188,7 @@ export const LazyElements = () => {
 					await new Promise( ( resolve ) => {
 						setTimeout( resolve, 600 );
 					} );
-					return categoryElements;
+					return elements;
 				},
 			};
 		} );

@@ -60,9 +60,9 @@ describe( 'renderFromElements', () => {
 		} );
 	} );
 
-	it( 'renders async options provided as a promise', async () => {
+	it( 'renders options provided as a static array', async () => {
 		const field = createField(
-			Promise.resolve( [ { value: 'approved', label: 'Approved' } ] ),
+			[ { value: 'approved', label: 'Approved' } ],
 			'approved'
 		);
 		const item = { status: 'approved' };
@@ -76,6 +76,26 @@ describe( 'renderFromElements', () => {
 		await waitFor( () => {
 			expect( screen.getByTestId( 'value' ) ).toHaveTextContent(
 				'Approved'
+			);
+		} );
+	} );
+
+	it( 'renders async options returned after a delay', async () => {
+		const field = createField( async () => {
+			await new Promise( ( resolve ) => setTimeout( resolve, 5 ) );
+			return [ { value: 'rejected', label: 'Rejected' } ];
+		}, 'rejected' );
+		const item = { status: 'rejected' };
+
+		render(
+			<div data-testid="value">
+				{ renderFromElements( { item, field } ) }
+			</div>
+		);
+
+		await waitFor( () => {
+			expect( screen.getByTestId( 'value' ) ).toHaveTextContent(
+				'Rejected'
 			);
 		} );
 	} );

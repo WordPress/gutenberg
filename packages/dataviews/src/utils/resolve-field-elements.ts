@@ -21,7 +21,11 @@ export default async function resolveFieldElements(
 		return source;
 	}
 
-	const result = await ( typeof source === 'function' ? source() : source );
+	if ( typeof source !== 'function' ) {
+		return [];
+	}
+
+	const result = await source();
 
 	if ( Array.isArray( result ) ) {
 		return result;
