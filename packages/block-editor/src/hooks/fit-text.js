@@ -193,7 +193,9 @@ export function FitTextControl( {
 					help={
 						fitText
 							? __( 'Text will resize to fit its container.' )
-							: __( 'Resize text to fit its container.' )
+							: __(
+									'Font size setting is overriden when enabled'
+							  )
 					}
 				/>
 			</ToolsPanelItem>
