@@ -24,6 +24,7 @@ export function useShowBlockTools() {
 			getBlockMode,
 			getSettings,
 			__unstableGetEditorMode,
+			isZoomOut,
 			isTyping,
 			isBlockInterfaceHidden,
 		} = unlock( select( blockEditorStore ) );
@@ -38,12 +39,14 @@ export function useShowBlockTools() {
 			hasSelectedBlock &&
 			isUnmodifiedDefaultBlock( block, 'content' ) &&
 			getBlockMode( clientId ) !== 'html';
+		const isZoomOutMode = isZoomOut();
 		const _showEmptyBlockSideInserter =
 			clientId &&
 			! isTyping() &&
 			// Hide the block inserter on the navigation mode.
 			// See https://github.com/WordPress/gutenberg/pull/66636#discussion_r1824728483.
 			editorMode !== 'navigation' &&
+			! isZoomOutMode &&
 			isEmptyDefaultBlock;
 		const _showBlockToolbarPopover =
 			! isBlockInterfaceHidden() &&
