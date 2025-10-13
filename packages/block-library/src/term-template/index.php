@@ -17,17 +17,11 @@
  * @return string Returns the output of the term template.
  */
 function render_block_core_term_template( $attributes, $content, $block ) {
-	if ( ! isset( $block->context ) || ! isset( $attributes ) ) {
+	if ( ! isset( $block->context ) || empty( $block->context['termQuery'] ) ) {
 		return '';
 	}
 
-	$query_block_context = $block->context;
-
-	if ( empty( $query_block_context['termQuery'] ) ) {
-		return '';
-	}
-
-	$query = $query_block_context['termQuery'];
+	$query = $block->context['termQuery'];
 
 	$query_args = array(
 		'number'     => $query['perPage'],
@@ -53,12 +47,17 @@ function render_block_core_term_template( $attributes, $content, $block ) {
 	} else {
 		// If not inheriting set `taxonomy` from the block attribute.
 		$query_args['taxonomy'] = $query['taxonomy'];
-	}
 
-	// Set `parent` if we are not inheriting from the taxonomy archive context and not
-	// showing nested terms, otherwise nested terms are not displayed.
-	if ( ! $inherit_query && empty( $query['showNested'] ) ) {
-		$query_args['parent'] = 0;
+		// If we are including specific terms we ignore `showNested` argument.
+		if ( ! empty( $query['include'] ) ) {
+			$query_args['include'] = array_unique( array_map( 'intval', $query['include'] ) );
+			$query_args['orderby'] = 'include';
+			$query_args['order']   = 'asc';
+		} elseif ( empty( $query['showNested'] ) ) {
+			// We set parent only when inheriting from the taxonomy archive context or not
+			// showing nested terms, otherwise nested terms are not displayed.
+			$query_args['parent'] = 0;
+		}
 	}
 
 	$terms_query = new WP_Term_Query( $query_args );
