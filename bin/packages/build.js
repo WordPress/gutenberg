@@ -8,7 +8,12 @@ const path = require( 'path' );
 const glob = require( 'fast-glob' );
 const ProgressBar = require( 'progress' );
 const workerFarm = require( 'worker-farm' );
-const { Readable, Transform } = require( 'stream' );
+
+/**
+ * Internal dependencies
+ */
+const { groupByDepth } = require( './dependency-graph' );
+const { V2_PACKAGES } = require( './v2-packages' );
 
 const files = process.argv.slice( 2 );
 
@@ -48,18 +53,6 @@ function parseImportStatements( file ) {
 	return fileContent.toString().match( /@import "(.*?)"/g );
 }
 
-function isFileImportedInStyleEntry( file, importStatements ) {
-	const packageName = getPackageName( file );
-	const regex = new RegExp( `/${ packageName }/`, 'g' );
-
-	return (
-		importStatements &&
-		importStatements.find( ( importStatement ) =>
-			importStatement.match( regex )
-		)
-	);
-}
-
 /**
  * Finds all stylesheet entry points that contain import statements
  * that include the given file name
@@ -69,14 +62,21 @@ function isFileImportedInStyleEntry( file, importStatements ) {
  * @return {Array} List of entry points that import the styles from the file.
  */
 function findStyleEntriesThatImportFile( file ) {
+	const packageName = getPackageName( file );
+	const regex = new RegExp( `/${ packageName }/`, 'g' );
+
 	const entriesWithImport = stylesheetEntryPoints.reduce(
 		( acc, entryPoint ) => {
 			const styleEntryImportStatements =
 				parseImportStatements( entryPoint );
 
-			if (
-				isFileImportedInStyleEntry( file, styleEntryImportStatements )
-			) {
+			const isImported =
+				styleEntryImportStatements &&
+				styleEntryImportStatements.find( ( importStatement ) =>
+					importStatement.match( regex )
+				);
+
+			if ( isImported ) {
 				acc.push( entryPoint );
 			}
 
@@ -89,192 +89,152 @@ function findStyleEntriesThatImportFile( file ) {
 }
 
 /**
- * Returns a stream transform which maps an individual stylesheet to its
- * package entrypoint. Unlike JavaScript which uses an external bundler to
- * efficiently manage rebuilds by entrypoints, stylesheets are rebuilt fresh
- * in their entirety from the build script.
+ * Get all v1 packages (non-v2 packages).
  *
- * @return {Transform} Stream transform instance.
+ * @return {string[]} Array of v1 package names.
  */
-function createStyleEntryTransform() {
-	const packages = new Set();
+function getV1Packages() {
+	const allPackages = fs
+		.readdirSync( PACKAGES_DIR, { withFileTypes: true } )
+		.filter( ( dirent ) => dirent.isDirectory() )
+		.map( ( dirent ) => dirent.name );
 
-	return new Transform( {
-		objectMode: true,
-		async transform( file, encoding, callback ) {
-			// Only stylesheets are subject to this transform.
-			if ( path.extname( file ) !== '.scss' ) {
-				this.push( file );
-				callback();
-				return;
-			}
-
-			// Only operate once per package, assuming entries are common.
-			const packageName = getPackageName( file );
-			if ( packages.has( packageName ) ) {
-				callback();
-				return;
-			}
-
-			packages.add( packageName );
-			const entries = await glob(
-				path
-					.resolve( PACKAGES_DIR, packageName, 'src/*.scss' )
-					.replace( /\\/g, '/' )
-			);
-
-			// Account for the specific case where block styles in
-			// block-library package also need rebuilding.
-			if (
-				packageName === 'block-library' &&
-				[ 'style.scss', 'editor.scss', 'theme.scss' ].includes(
-					path.basename( file )
-				)
-			) {
-				entries.push( file );
-			}
-
-			entries.forEach( ( entry ) => this.push( entry ) );
-
-			// Find other stylesheets that need to be rebuilt because
-			// they import the styles that are being transformed.
-			const styleEntries = findStyleEntriesThatImportFile( file );
-
-			// Rebuild stylesheets that import the styles being transformed.
-			if ( styleEntries.length ) {
-				styleEntries.forEach( ( entry ) => stream.push( entry ) );
-			}
-
-			callback();
-		},
-	} );
+	return allPackages.filter(
+		( packageName ) => ! V2_PACKAGES.includes( packageName )
+	);
 }
 
 /**
- * Returns a stream transform which maps an individual block.json to the
- * index.js that imports it. Presently, babel resolves the import of json
- * files by inlining them as a JavaScript primitive in the importing file.
- * This transform ensures the importing file is rebuilt.
- *
- * @return {Transform} Stream transform instance.
+ * Main build function.
  */
-function createBlockJsonEntryTransform() {
-	const blocks = new Set();
+async function main() {
+	let filesToBuild = files;
 
-	return new Transform( {
-		objectMode: true,
-		async transform( file, encoding, callback ) {
-			const matches =
-				/block-library[\/\\]src[\/\\](.*)[\/\\]block.json$/.exec(
-					file
+	// If no specific files provided, collect all files to build
+	if ( filesToBuild.length === 0 ) {
+		const allFiles = await glob(
+			[
+				`${ PACKAGES_DIR }/*/src/**/*.{js,ts,tsx}`,
+				`${ PACKAGES_DIR }/*/src/*.scss`,
+				`${ PACKAGES_DIR }/block-library/src/**/*.js`,
+				`${ PACKAGES_DIR }/block-library/src/*/style.scss`,
+				`${ PACKAGES_DIR }/block-library/src/*/theme.scss`,
+				`${ PACKAGES_DIR }/block-library/src/*/editor.scss`,
+				`${ PACKAGES_DIR }/block-library/src/*.scss`,
+			],
+			{
+				ignore: [
+					`**/benchmark/**`,
+					`**/{__mocks__,__tests__,test}/**`,
+					`**/{storybook,stories}/**`,
+					`**/e2e-test-utils-playwright/**`,
+				],
+				onlyFiles: true,
+			}
+		);
+
+		// Apply transforms
+		const transformedFiles = new Set();
+		for ( const file of allFiles ) {
+			// Style entry transform
+			if ( path.extname( file ) === '.scss' ) {
+				const packageName = getPackageName( file );
+				const entries = await glob(
+					path
+						.resolve( PACKAGES_DIR, packageName, 'src/*.scss' )
+						.replace( /\\/g, '/' )
 				);
-			const blockName = matches ? matches[ 1 ] : undefined;
 
-			// Only block.json files in the block-library folder are subject to this transform.
-			if ( ! blockName ) {
-				this.push( file );
-				callback();
-				return;
+				// Account for the specific case where block styles in
+				// block-library package also need rebuilding.
+				if (
+					packageName === 'block-library' &&
+					[ 'style.scss', 'editor.scss', 'theme.scss' ].includes(
+						path.basename( file )
+					)
+				) {
+					entries.push( file );
+				}
+
+				entries.forEach( ( entry ) => transformedFiles.add( entry ) );
+
+				// Find other stylesheets that need to be rebuilt because
+				// they import the styles that are being transformed.
+				const styleEntries = findStyleEntriesThatImportFile( file );
+				styleEntries.forEach( ( entry ) =>
+					transformedFiles.add( entry )
+				);
+			} else {
+				transformedFiles.add( file );
 			}
+		}
 
-			// Only operate once per block, assuming entries are common.
-			if ( blockName && blocks.has( blockName ) ) {
-				callback();
-				return;
-			}
+		filesToBuild = Array.from( transformedFiles );
+	}
 
-			blocks.add( blockName );
-			this.push( file.replace( 'block.json', 'index.js' ) );
-			callback();
-		},
-	} );
-}
+	// Group files by their package's dependency level
+	const v1Packages = getV1Packages();
+	const packageLevels = groupByDepth( v1Packages );
 
-let onFileComplete = () => {};
+	console.log(
+		`Building ${ v1Packages.length } v1 packages in ${ packageLevels.length } dependency level(s)...\n`
+	);
 
-let stream;
-
-if ( files.length ) {
-	stream = new Readable( { encoding: 'utf8' } );
-	files.forEach( ( file ) => {
-		stream.push( file );
-	} );
-
-	stream.push( null );
-	stream = stream
-		.pipe( createStyleEntryTransform() )
-		.pipe( createBlockJsonEntryTransform() );
-} else {
 	const bar = new ProgressBar( 'Build Progress: [:bar] :percent', {
 		width: 30,
 		incomplete: ' ',
-		total: 1,
+		total: filesToBuild.length,
 	} );
 
-	bar.tick( 0 );
+	// Build packages level by level
+	for ( let i = 0; i < packageLevels.length; i++ ) {
+		const packagesInLevel = packageLevels[ i ];
+		const filesInLevel = filesToBuild.filter( ( file ) => {
+			const packageName = getPackageName( file );
+			return packagesInLevel.includes( packageName );
+		} );
 
-	stream = glob.stream(
-		[
-			`${ PACKAGES_DIR }/*/src/**/*.{js,ts,tsx}`,
-			`${ PACKAGES_DIR }/*/src/*.scss`,
-			`${ PACKAGES_DIR }/block-library/src/**/*.js`,
-			`${ PACKAGES_DIR }/block-library/src/*/style.scss`,
-			`${ PACKAGES_DIR }/block-library/src/*/theme.scss`,
-			`${ PACKAGES_DIR }/block-library/src/*/editor.scss`,
-			`${ PACKAGES_DIR }/block-library/src/*.scss`,
-		],
-		{
-			ignore: [
-				`**/benchmark/**`,
-				`**/{__mocks__,__tests__,test}/**`,
-				`**/{storybook,stories}/**`,
-				`**/e2e-test-utils-playwright/**`,
-			],
-			onlyFiles: true,
+		if ( filesInLevel.length === 0 ) {
+			continue;
 		}
-	);
 
-	// Pause to avoid data flow which would begin on the `data` event binding,
-	// but should wait until worker processing below.
-	//
-	// See: https://nodejs.org/api/stream.html#stream_two_reading_modes
-	stream.pause().on( 'data', ( file ) => {
-		bar.total = files.push( file );
-	} );
+		// Track progress
+		let completed = 0;
+		const levelPromise = new Promise( ( resolve, reject ) => {
+			const worker = workerFarm( require.resolve( './build-worker' ) );
+			let hasError = false;
 
-	onFileComplete = () => {
-		bar.tick();
-	};
+			const onComplete = ( error ) => {
+				if ( error ) {
+					hasError = true;
+					console.error( error );
+				}
+
+				++completed;
+				bar.tick();
+
+				if ( completed === filesInLevel.length ) {
+					workerFarm.end( worker );
+					if ( hasError ) {
+						reject( new Error( 'Build failed with errors' ) );
+					} else {
+						resolve();
+					}
+				}
+			};
+
+			filesInLevel.forEach( ( file ) => {
+				worker( file, onComplete );
+			} );
+		} );
+
+		await levelPromise;
+	}
+
+	console.log( '\n✅ Build complete!' );
 }
 
-const worker = workerFarm( require.resolve( './build-worker' ) );
-
-let ended = false,
-	complete = 0;
-
-stream
-	.on( 'data', ( file ) =>
-		worker( file, ( error ) => {
-			onFileComplete();
-
-			if ( error ) {
-				// If an error occurs, the process can't be ended immediately since
-				// other workers are likely pending. Optimally, it would end at the
-				// earliest opportunity (after the current round of workers has had
-				// the chance to complete), but this is not made directly possible
-				// through `worker-farm`. Instead, ensure at least that when the
-				// process does exit, it exits with a non-zero code to reflect the
-				// fact that an error had occurred.
-				process.exitCode = 1;
-
-				console.error( error );
-			}
-
-			++complete;
-			if ( ended && complete === files.length ) {
-				workerFarm.end( worker );
-			}
-		} )
-	)
-	.on( 'end', () => ( ended = true ) )
-	.resume();
+main().catch( ( error ) => {
+	console.error( '\n❌ Build failed:', error );
+	process.exit( 1 );
+} );

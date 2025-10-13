@@ -171,6 +171,7 @@
 		"style-loader": "3.2.1",
 		"terser": "5.32.0",
 		"terser-webpack-plugin": "5.3.10",
+		"toposort": "2.0.2",
 		"typescript": "5.7.2",
 		"uuid": "9.0.1",
 		"webdriverio": "8.16.20",
