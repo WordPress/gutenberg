@@ -27,11 +27,11 @@ export function useEntityBinding( { clientId, attributes } ) {
 
 	const clearBinding = useCallback( () => {
 		// Only clear if there's actually a valid binding to clear
-		if ( hasUrlBinding ) {
+		if ( hasCorrectBinding ) {
 			// Remove the URL binding by setting it to undefined
 			updateBlockBindings( { url: undefined } );
 		}
-	}, [ hasUrlBinding, updateBlockBindings ] );
+	}, [ hasCorrectBinding, updateBlockBindings ] );
 
 	const createBinding = useCallback( () => {
 		const source =

@@ -49,17 +49,18 @@ describe( 'useEntityBinding', () => {
 			expect( result.current.hasUrlBinding ).toBe( false );
 		} );
 
-		it( 'should return true when core/entity binding exists with id', () => {
+		it( 'should return true when core/post-data binding exists with id for post-type', () => {
 			const attributes = {
 				metadata: {
 					bindings: {
 						url: {
-							source: 'core/entity',
-							args: { key: 'url' },
+							source: 'core/post-data',
+							args: { key: 'link' },
 						},
 					},
 				},
 				id: 123,
+				kind: 'post-type',
 			};
 
 			const { result } = renderHook( () =>
@@ -72,7 +73,31 @@ describe( 'useEntityBinding', () => {
 			expect( result.current.hasUrlBinding ).toBe( true );
 		} );
 
-		it( 'should return false when source is not core/entity', () => {
+		it( 'should return true when core/term-data binding exists with id for taxonomy', () => {
+			const attributes = {
+				metadata: {
+					bindings: {
+						url: {
+							source: 'core/term-data',
+							args: { key: 'link' },
+						},
+					},
+				},
+				id: 123,
+				kind: 'taxonomy',
+			};
+
+			const { result } = renderHook( () =>
+				useEntityBinding( {
+					clientId: 'test-client-id',
+					attributes,
+				} )
+			);
+
+			expect( result.current.hasUrlBinding ).toBe( true );
+		} );
+
+		it( 'should return false when source is not core/post-data or core/term-data', () => {
 			const attributes = {
 				metadata: {
 					bindings: {
@@ -83,6 +108,7 @@ describe( 'useEntityBinding', () => {
 					},
 				},
 				id: 123,
+				kind: 'post-type',
 			};
 
 			const { result } = renderHook( () =>
@@ -95,17 +121,18 @@ describe( 'useEntityBinding', () => {
 			expect( result.current.hasUrlBinding ).toBe( false );
 		} );
 
-		it( 'should return false when core/entity binding exists but no id', () => {
+		it( 'should return false when core/post-data binding exists but no id', () => {
 			const attributes = {
 				metadata: {
 					bindings: {
 						url: {
-							source: 'core/entity',
-							args: { key: 'url' },
+							source: 'core/post-data',
+							args: { key: 'link' },
 						},
 					},
 				},
 				id: null,
+				kind: 'post-type',
 			};
 
 			const { result } = renderHook( () =>
@@ -147,12 +174,13 @@ describe( 'useEntityBinding', () => {
 			metadata: {
 				bindings: {
 					url: {
-						source: 'core/entity',
-						args: { key: 'url' },
+						source: 'core/post-data',
+						args: { key: 'link' },
 					},
 				},
 			},
 			id: 123,
+			kind: 'post-type',
 		};
 
 		const { result } = renderHook( () =>
@@ -218,10 +246,11 @@ describe( 'useEntityBinding', () => {
 		expect( mockUpdateBlockBindings ).not.toHaveBeenCalled();
 	} );
 
-	it( 'should create binding when createBinding is called', () => {
+	it( 'should create core/post-data binding when createBinding is called for post-type', () => {
 		const attributes = {
 			metadata: {},
 			id: null,
+			kind: 'post-type',
 		};
 
 		const { result } = renderHook( () =>
@@ -237,9 +266,37 @@ describe( 'useEntityBinding', () => {
 
 		expect( mockUpdateBlockBindings ).toHaveBeenCalledWith( {
 			url: {
-				source: 'core/entity',
+				source: 'core/post-data',
 				args: {
-					key: 'url',
+					key: 'link',
+				},
+			},
+		} );
+	} );
+
+	it( 'should create core/term-data binding when createBinding is called for taxonomy', () => {
+		const attributes = {
+			metadata: {},
+			id: null,
+			kind: 'taxonomy',
+		};
+
+		const { result } = renderHook( () =>
+			useEntityBinding( {
+				clientId: 'test-client-id',
+				attributes,
+			} )
+		);
+
+		act( () => {
+			result.current.createBinding();
+		} );
+
+		expect( mockUpdateBlockBindings ).toHaveBeenCalledWith( {
+			url: {
+				source: 'core/term-data',
+				args: {
+					key: 'link',
 				},
 			},
 		} );
