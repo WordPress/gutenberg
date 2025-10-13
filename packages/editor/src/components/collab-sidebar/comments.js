@@ -198,9 +198,11 @@ export function Comments( {
 
 	return (
 		<VStack spacing="3">
-			<Text as="p" variant="muted">
-				{ __( 'Only logged in users can see Notes' ) }
-			</Text>
+			{ ! isFloating &&
+				<Text as="p" variant="muted">
+					{ __( 'Only logged in users can see Notes' ) }
+				</Text>
+			}
 			{ threads.map( ( thread ) => (
 				<Thread
 					key={ thread.id }
