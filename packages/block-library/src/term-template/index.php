@@ -39,21 +39,25 @@ function render_block_core_term_template( $attributes, $content, $block ) {
 
 	// We set parent only when inheriting from the taxonomy archive context or not
 	// showing nested terms, otherwise nested terms are not displayed.
+	$parent = $query['parent'] ?? false;
 	if (
-		isset( $query['inherit'] )
-		&& $query['inherit']
-		&& (
+		'inherit' === $parent
+	) {
+		if ( isset( $query_block_context['termId'] ) ) {
+			// Get the current term ID from context.
+			$query_args['parent'] = $query_block_context['termId'];
+		} elseif (
 			is_tax( $query_args['taxonomy'] )
 			// is_tax() does not detect built-in category or tag archives, only custom taxonomies.
 			|| ( 'category' === $query_args['taxonomy'] && is_category() )
 			|| ( 'post_tag' === $query_args['taxonomy'] && is_tag() )
-		)
-	) {
-		// Get the current term ID from the queried object.
-		$current_term_id      = get_queried_object_id();
-		$query_args['parent'] = $current_term_id;
-	} elseif ( empty( $query['hierarchical'] ) ) {
-		$query_args['parent'] = 0;
+		) {
+			// Get the current term ID from the queried object.
+			$current_term_id      = get_queried_object_id();
+			$query_args['parent'] = $current_term_id;
+		}
+	} elseif ( false !== $parent || empty( $query['showNested'] ) ) {
+		$query_args['parent'] = $parent ? $parent : 0;
 	}
 
 	$terms_query = new WP_Term_Query( $query_args );

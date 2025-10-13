@@ -79,10 +79,11 @@ export default function TermTemplateEdit( {
 			order,
 			orderBy,
 			hideEmpty,
-			hierarchical = false,
-			parent = 0,
+			showNested = false,
+			parent = false,
 			perPage = 10,
 		} = {},
+		termId,
 	},
 	__unstableLayoutClassNames,
 } ) {
@@ -99,9 +100,16 @@ export default function TermTemplateEdit( {
 		per_page: 100,
 	};
 
-	// Nested terms are returned by default from REST API as long as parent is not set.
-	// If we want to show nested terms, we must not set parent at all.
-	if ( parent || ! hierarchical ) {
+	if ( parent === 'inherit' ) {
+		if ( termId ) {
+			queryArgs.parent = termId;
+		} else {
+			// If there is no termId in context, we can't inherit, so we fall back to 0.
+			queryArgs.parent = 0;
+		}
+	} else if ( parent !== false || ! showNested ) {
+		// Nested terms are returned by default from REST API as long as parent is not set.
+		// If we want to show nested terms, we must not set parent at all.
 		queryArgs.parent = parent || 0;
 	}
 

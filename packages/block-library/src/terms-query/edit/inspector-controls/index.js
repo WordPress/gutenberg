@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -24,9 +24,10 @@ import AdvancedControls from './advanced-controls';
 
 export default function TermsQueryInspectorControls( {
 	attributes,
-	setQuery,
 	setAttributes,
 	clientId,
+	context,
+	setQuery,
 } ) {
 	const { termQuery, tagName: TagName } = attributes;
 	const {
@@ -34,10 +35,11 @@ export default function TermsQueryInspectorControls( {
 		orderBy,
 		order,
 		hideEmpty,
-		inherit,
-		hierarchical,
+		parent = false,
+		showNested,
 		perPage,
 	} = termQuery;
+	const { termId } = context;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const { templateSlug } = useSelect( ( select ) => {
@@ -64,17 +66,21 @@ export default function TermsQueryInspectorControls( {
 
 	// Only display the inherit control if the taxonomy is hierarchical and matches the current template.
 	const displayInheritControl =
-		isTaxonomyHierarchical && isTaxonomyMatchingTemplate;
+		isTaxonomyHierarchical && ( isTaxonomyMatchingTemplate || termId );
 
-	// Only display the hierarchical control if the taxonomy is hierarchical and not inheriting.
-	const displayHierarchicalControl =
-		isTaxonomyHierarchical && ! termQuery.inherit;
+	// Only display the show nested control if the taxonomy is hierarchical and not inheriting.
+	const displayShowNestedControl =
+		isTaxonomyHierarchical && termQuery.parent === false;
 
 	// Labels shared between ToolsPanelItem and its child control.
 	const taxonomyControlLabel = __( 'Taxonomy' );
 	const orderByControlLabel = __( 'Order by' );
 	const emptyTermsControlLabel = __( 'Show empty terms' );
-	const inheritControlLabel = __( 'Inherit parent term from archive' );
+	const inheritControlLabel = sprintf(
+		/* translators: %s: either "parent block" or "archive" */
+		__( 'Inherit parent term from %s' ),
+		termId ? __( 'parent block' ) : __( 'archive' )
+	);
 	const nestedTermsControlLabel = __( 'Show nested terms' );
 	const maxTermsControlLabel = __( 'Max terms' );
 
@@ -90,7 +96,7 @@ export default function TermsQueryInspectorControls( {
 								order: 'asc',
 								orderBy: 'name',
 								hideEmpty: true,
-								hierarchical: false,
+								showNested: false,
 								parent: false,
 								perPage: 10,
 							},
@@ -149,32 +155,32 @@ export default function TermsQueryInspectorControls( {
 					</ToolsPanelItem>
 					{ displayInheritControl && (
 						<ToolsPanelItem
-							hasValue={ () => inherit !== false }
+							hasValue={ () => parent !== false }
 							label={ inheritControlLabel }
-							onDeselect={ () => setQuery( { inherit: false } ) }
+							onDeselect={ () => setQuery( { parent: false } ) }
 							isShownByDefault
 						>
 							<InheritControl
 								label={ inheritControlLabel }
-								value={ inherit }
+								value={ parent === 'inherit' }
 								onChange={ setQuery }
 							/>
 						</ToolsPanelItem>
 					) }
-					{ displayHierarchicalControl && (
+					{ displayShowNestedControl && (
 						<ToolsPanelItem
-							hasValue={ () => hierarchical !== false }
+							hasValue={ () => showNested !== false }
 							label={ nestedTermsControlLabel }
 							onDeselect={ () =>
-								setQuery( { hierarchical: false } )
+								setQuery( { showNested: false } )
 							}
 							isShownByDefault
 						>
 							<NestedTermsControl
 								label={ nestedTermsControlLabel }
-								value={ hierarchical }
+								value={ showNested }
 								onChange={ ( value ) =>
-									setQuery( { hierarchical: value } )
+									setQuery( { showNested: value } )
 								}
 							/>
 						</ToolsPanelItem>
