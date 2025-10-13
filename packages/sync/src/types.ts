@@ -75,7 +75,6 @@ export interface SyncManager {
 		objectType: ObjectType,
 		objectId: ObjectID,
 		changes: Partial< ObjectData >,
-		record: ObjectData,
 		origin: string
 	) => void;
 }

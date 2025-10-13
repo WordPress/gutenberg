@@ -417,7 +417,6 @@ export const editEntityRecord =
 					objectType,
 					objectId,
 					edit.edits,
-					record, // persisted record
 					LOCAL_EDITOR_ORIGIN
 				);
 			}

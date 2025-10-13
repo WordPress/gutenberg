@@ -155,14 +155,12 @@ export function createSyncManager(): SyncManager {
 	 * @param {ObjectType}            objectType Object type.
 	 * @param {ObjectID}              objectId   Object ID.
 	 * @param {Partial< ObjectData >} changes    Updates to make.
-	 * @param {ObjectData}            record     Current entity record.
 	 * @param {string}                origin     The source of change.
 	 */
 	function updateCRDTDoc(
 		objectType: ObjectType,
 		objectId: ObjectID,
 		changes: Partial< ObjectData >,
-		record: ObjectData,
 		origin: string
 	): void {
 		const entityId = getEntityId( objectType, objectId );
