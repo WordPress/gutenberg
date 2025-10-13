@@ -66,6 +66,10 @@ export function useUploadMediaFromBlobURL( args = {} ) {
 		const { url, allowedTypes, onChange, onError } = latestArgsRef.current;
 		const { mediaUpload } = getSettings();
 
+		if ( ! mediaUpload ) {
+			return;
+		}
+
 		hasUploadStartedRef.current = true;
 
 		mediaUpload( {

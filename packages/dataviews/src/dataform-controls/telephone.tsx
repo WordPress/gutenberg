@@ -1,6 +1,10 @@
 /**
  * WordPress dependencies
  */
+import {
+	Icon,
+	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
+} from '@wordpress/components';
 import { mobile } from '@wordpress/icons';
 
 /**
@@ -23,7 +27,11 @@ export default function Telephone< Item >( {
 				onChange,
 				hideLabelFromVision,
 				type: 'tel',
-				icon: mobile,
+				prefix: (
+					<InputControlPrefixWrapper variant="icon">
+						<Icon icon={ mobile } />
+					</InputControlPrefixWrapper>
+				),
 			} }
 		/>
 	);

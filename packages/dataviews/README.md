@@ -989,24 +989,119 @@ Example:
 }
 ```
 
-### `getValue`
+### `getValue` and `setValue`
 
-React component that returns the value of a field. This value is used to sort or filter the fields.
+These functions control how field values are read from and written to your data structure.
 
--   Type: React component.
+Both functions are optional and automatically generated from the field's `id` when not provided. The `id` is treated as a dot-notation path (e.g., `"user.profile.name"` accesses `item.user.profile.name`).
+
+#### `getValue`
+
+Function that extracts the field value from an item. This value is used to sort, filter, and display the field.
+
+-   Type: `function`.
 -   Optional.
--   Defaults to `item[ id ]`.
--   Props:
-    -   `item` value to be processed.
--   Returns a value that represents the field.
+-   Args:
+    -   `item`: the data item to be processed.
+-   Returns the field's value.
 
-Example:
+#### `setValue`
+
+Function that creates a partial item object with updated field values. This is used by DataForm for editing operations and determines the structure of data passed to the `onChange` callback.
+
+-   Type: `function`.
+-   Optional.
+-   Args:
+    -   `item`: the current item being edited.
+    -   `value`: the new value to be set for the field.
+-   Returns a partial item object with the changes to be applied.
+
+#### Simple field access
+
+For basic field access, you only need to specify the field `id`. Both `getValue` and `setValue` are automatically generated:
 
 ```js
+// Data structure
+const item = {
+	title: 'Hello World',
+	author: 'John Doe'
+};
+
+// Field definition
 {
-	getValue: ( { item } ) => {
-		/* The field's value.  */
-	};
+	id: 'title',
+	label: 'Title'
+	// getValue: automatically becomes ( { item } ) => item.title
+	// setValue: automatically becomes ( { value } ) => ( { title: value } )
+}
+```
+
+#### Nested data access
+
+Use dot notation in the field `id` to access nested properties:
+
+```js
+// Data structure
+const item = {
+	user: {
+		profile: {
+			name: 'John Doe',
+			email: 'john@example.com'
+		}
+	}
+};
+
+// Field definition - using dot notation (automatic)
+{
+	id: 'user.profile.name',
+	label: 'User Name'
+	// getValue: automatically becomes ( { item } ) => item.user.profile.name
+	// setValue: automatically becomes ( { value } ) => ( { user: { profile: { name: value } } } )
+}
+
+// Alternative - using simple ID with custom functions
+{
+	id: 'userName',
+	label: 'User Name',
+	getValue: ( { item } ) => item.user.profile.name,
+	setValue: ( { value } ) => ( {
+		user: {
+			profile: { name: value }
+		}
+	} )
+}
+```
+
+#### Custom data transformation
+
+Provide custom `getValue` and `setValue` functions when you need to transform data between the storage format and display format:
+
+```js
+// Data structure
+const item = {
+	user: {
+		preferences: {
+			notifications: true
+		}
+	}
+};
+
+// Field definition - transform boolean to string options
+{
+	id: 'notifications',
+	label: 'Notifications',
+	Edit: 'radio',
+	elements: [
+		{ label: 'Enabled', value: 'enabled' },
+		{ label: 'Disabled', value: 'disabled' }
+	],
+	getValue: ( { item } ) =>
+		item.user.preferences.notifications === true ? 'enabled' : 'disabled',
+	setValue: ( { value } ) => ( {
+		user: {
+			preferences: { notifications: value === 'enabled' }
+		}
+	} )
 }
 ```
 

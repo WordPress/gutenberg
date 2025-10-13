@@ -1,12 +1,12 @@
 /**
+ * External dependencies
+ */
+import deepMerge from 'deepmerge';
+
+/**
  * WordPress dependencies
  */
-import {
-	Icon,
-	privateApis,
-	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
-	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
-} from '@wordpress/components';
+import { privateApis } from '@wordpress/components';
 import { useCallback, useState } from '@wordpress/element';
 
 /**
@@ -24,11 +24,11 @@ export type DataFormValidatedTextControlProps< Item > =
 		 */
 		type?: 'text' | 'email' | 'tel' | 'url' | 'password';
 		/**
-		 * Optional icon to display as prefix.
+		 * Optional prefix element to display before the input.
 		 */
-		icon?: React.ComponentType | React.ReactElement;
+		prefix?: React.ReactElement;
 		/**
-		 * Optional icon to display as suffix.
+		 * Optional suffix element to display after the input.
 		 */
 		suffix?: React.ReactElement;
 	};
@@ -39,11 +39,12 @@ export default function ValidatedText< Item >( {
 	onChange,
 	hideLabelFromVision,
 	type,
-	icon,
+	prefix,
 	suffix,
 }: DataFormValidatedTextControlProps< Item > ) {
-	const { id, label, placeholder, description } = field;
-	const value = field.getValue( { item: data } );
+	const { label, placeholder, description, getValue, setValue, isValid } =
+		field;
+	const value = getValue( { item: data } );
 	const [ customValidity, setCustomValidity ] =
 		useState<
 			React.ComponentProps<
@@ -53,34 +54,45 @@ export default function ValidatedText< Item >( {
 
 	const onChangeControl = useCallback(
 		( newValue: string ) =>
-			onChange( {
-				[ id ]: newValue,
-			} ),
-		[ id, onChange ]
+			onChange(
+				setValue( {
+					item: data,
+					value: newValue,
+				} )
+			),
+		[ data, setValue, onChange ]
+	);
+
+	const onValidateControl = useCallback(
+		( newValue: any ) => {
+			const message = isValid?.custom?.(
+				deepMerge(
+					data,
+					setValue( {
+						item: data,
+						value: newValue,
+					} ) as Partial< Item >
+				),
+				field
+			);
+
+			if ( message ) {
+				setCustomValidity( {
+					type: 'invalid',
+					message,
+				} );
+				return;
+			}
+
+			setCustomValidity( undefined );
+		},
+		[ data, field, isValid, setValue ]
 	);
 
 	return (
 		<ValidatedInputControl
-			required={ !! field.isValid?.required }
-			onValidate={ ( newValue: any ) => {
-				const message = field.isValid?.custom?.(
-					{
-						...data,
-						[ id ]: newValue,
-					},
-					field
-				);
-
-				if ( message ) {
-					setCustomValidity( {
-						type: 'invalid',
-						message,
-					} );
-					return;
-				}
-
-				setCustomValidity( undefined );
-			} }
+			required={ !! isValid?.required }
+			onValidate={ onValidateControl }
 			customValidity={ customValidity }
 			label={ label }
 			placeholder={ placeholder }
@@ -89,20 +101,8 @@ export default function ValidatedText< Item >( {
 			onChange={ onChangeControl }
 			hideLabelFromVision={ hideLabelFromVision }
 			type={ type }
-			prefix={
-				icon ? (
-					<InputControlPrefixWrapper variant="icon">
-						<Icon icon={ icon } />
-					</InputControlPrefixWrapper>
-				) : undefined
-			}
-			suffix={
-				suffix ? (
-					<InputControlSuffixWrapper variant="control">
-						{ suffix }
-					</InputControlSuffixWrapper>
-				) : undefined
-			}
+			prefix={ prefix }
+			suffix={ suffix }
 			__next40pxDefaultSize
 		/>
 	);
