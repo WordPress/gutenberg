@@ -114,7 +114,7 @@ export function Comments( {
 	// Auto-select the related comment thread when a block is selected.
 	useEffect( () => {
 		setSelectedThread( blockCommentId ?? undefined );
-	}, [ blockCommentId, setSelectedThread ] );
+	}, [ blockCommentId ] );
 
 	const setBlockRef = useCallback( ( id, blockRef ) => {
 		setBlockRefs( ( prev ) => ( { ...prev, [ id ]: blockRef } ) );
