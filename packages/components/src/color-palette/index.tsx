@@ -193,7 +193,10 @@ function UnforwardedColorPalette(
 	} = props;
 	const [ normalizedColorValue, setNormalizedColorValue ] = useState( value );
 
-	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
+	const clearColor = useCallback(
+		() => clearable && onChange( undefined ),
+		[ clearable, onChange ]
+	);
 
 	const customColorPaletteCallbackRef = useCallback(
 		( node: HTMLElement | null ) => {
