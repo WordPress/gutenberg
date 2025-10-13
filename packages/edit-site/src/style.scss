@@ -1,5 +1,5 @@
-@import "../../admin-ui/src/style.scss";
-@import "../../dataviews/src/style.scss";
+@import "@wordpress/admin-ui/build-style/style.css";
+@import "@wordpress/dataviews/build-style/style.css";
 @import "../../fields/src/style.scss";
 @import "./components/add-new-template/style.scss";
 @import "./components/block-editor/style.scss";

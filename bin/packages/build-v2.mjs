@@ -24,6 +24,7 @@ import babel from 'esbuild-plugin-babel';
  * Internal dependencies
  */
 import { V2_PACKAGES } from './v2-packages.js';
+import { groupByDepth } from './dependency-graph.js';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
 
@@ -804,6 +805,7 @@ async function compileStyles( packageName ) {
 				},
 				plugins: [
 					sassPlugin( {
+						embedded: true,
 						loadPaths: [
 							'node_modules',
 							path.join( PACKAGES_DIR, 'base-styles' ),
@@ -907,14 +909,23 @@ async function buildAll() {
 
 	const startTime = Date.now();
 
-	// Phase 1: Transpile all packages in parallel
+	// Group packages by dependency depth
+	const levels = groupByDepth( V2_PACKAGES );
+
+	// Phase 1: Transpile packages level by level (respecting dependencies)
 	console.log( '📝 Phase 1: Transpiling packages...\n' );
-	await Promise.all(
-		V2_PACKAGES.map( async ( packageName ) => {
-			const buildTime = await transpilePackage( packageName );
-			console.log( `✔ Transpiled ${ packageName } (${ buildTime }ms)` );
-		} )
-	);
+
+	for ( let i = 0; i < levels.length; i++ ) {
+		const level = levels[ i ];
+		await Promise.all(
+			level.map( async ( packageName ) => {
+				const buildTime = await transpilePackage( packageName );
+				console.log(
+					`   ✔ Transpiled ${ packageName } (${ buildTime }ms)`
+				);
+			} )
+		);
+	}
 
 	// Phase 2: Bundle packages with wpScript in parallel
 	console.log( '\n📦 Phase 2: Bundling packages...\n' );
