@@ -21,24 +21,7 @@ import {
 } from '@wordpress/block-editor';
 import { useEntityRecords } from '@wordpress/core-data';
 
-const TEMPLATE = [
-	[
-		'core/paragraph',
-		{
-			metadata: {
-				name: __( 'Term Name' ),
-				bindings: {
-					content: {
-						source: 'core/term-data',
-						args: {
-							key: 'name',
-						},
-					},
-				},
-			},
-		},
-	],
-];
+const TEMPLATE = [ [ 'core/term-name' ] ];
 
 function TermTemplateInnerBlocks( { classList } ) {
 	const innerBlocksProps = useInnerBlocksProps(
