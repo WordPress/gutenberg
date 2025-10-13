@@ -558,7 +558,7 @@ test.describe( 'List View', () => {
 			} )
 			.click();
 
-		// Expand group block, then move to quote block, and copy.
+		// Expand group block, then move to code block, and copy.
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'ArrowDown' );
