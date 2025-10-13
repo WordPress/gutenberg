@@ -67,9 +67,7 @@ export default function Select< Item >( {
 		[ data, field, setValue ]
 	);
 
-	const { elements, isResolving } = useFieldElements(
-		field.elements
-	);
+	const { elements, isResolving } = useFieldElements( field.elements );
 
 	return (
 		<ValidatedSelectControl
