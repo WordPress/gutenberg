@@ -31,7 +31,8 @@
 	"main": "lib/index.js",
 	"dependencies": {
 		"@wordpress/base-styles": "file:../base-styles",
-		"autoprefixer": "^10.4.20"
+		"autoprefixer": "^10.4.20",
+		"postcss-import": "^16.1.1"
 	},
 	"peerDependencies": {
 		"postcss": "^8.0.0"
