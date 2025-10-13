@@ -371,4 +371,116 @@ describe( 'converting menu items to blocks', () => {
 		const { innerBlocks: actual } = menuItemsToBlocks( [] );
 		expect( actual ).toEqual( [] );
 	} );
+
+	it( 'adds entity bindings for non-custom menu items', () => {
+		const { innerBlocks: actual } = menuItemsToBlocks( [
+			{
+				id: 1,
+				title: {
+					raw: 'Page Item',
+					rendered: 'Page Item',
+				},
+				url: 'http://localhost:8889/page-item/',
+				attr_title: '',
+				description: '',
+				type: 'post_type',
+				type_label: 'Page',
+				object: 'page',
+				object_id: 123,
+				parent: 0,
+				menu_order: 1,
+				target: '',
+				classes: [ '' ],
+				xfn: [ '' ],
+			},
+			{
+				id: 2,
+				title: {
+					raw: 'Category Item',
+					rendered: 'Category Item',
+				},
+				url: 'http://localhost:8889/category/category-item/',
+				attr_title: '',
+				description: '',
+				type: 'taxonomy',
+				type_label: 'Category',
+				object: 'category',
+				object_id: 456,
+				parent: 0,
+				menu_order: 2,
+				target: '',
+				classes: [ '' ],
+				xfn: [ '' ],
+			},
+			{
+				id: 3,
+				title: {
+					raw: 'Custom Item',
+					rendered: 'Custom Item',
+				},
+				url: 'http://localhost:8889/custom-link/',
+				attr_title: '',
+				description: '',
+				type: 'custom',
+				type_label: 'Custom Link',
+				object: 'custom',
+				parent: 0,
+				menu_order: 3,
+				target: '',
+				classes: [ '' ],
+				xfn: [ '' ],
+			},
+		] );
+
+		expect( actual ).toEqual( [
+			expect.objectContaining( {
+				name: 'core/navigation-link',
+				attributes: expect.objectContaining( {
+					label: 'Page Item',
+					id: 123,
+					metadata: {
+						bindings: {
+							url: {
+								source: 'core/entity',
+								args: {
+									key: 'url',
+								},
+							},
+						},
+					},
+				} ),
+				innerBlocks: [],
+			} ),
+			expect.objectContaining( {
+				name: 'core/navigation-link',
+				attributes: expect.objectContaining( {
+					label: 'Category Item',
+					id: 456,
+					metadata: {
+						bindings: {
+							url: {
+								source: 'core/entity',
+								args: {
+									key: 'url',
+								},
+							},
+						},
+					},
+				} ),
+				innerBlocks: [],
+			} ),
+			expect.objectContaining( {
+				name: 'core/navigation-link',
+				attributes: expect.objectContaining( {
+					label: 'Custom Item',
+					// Custom items should NOT have id, metadata, or bindings
+				} ),
+				innerBlocks: [],
+			} ),
+		] );
+
+		// Verify custom item does NOT have bindings
+		expect( actual[ 2 ].attributes ).not.toHaveProperty( 'id' );
+		expect( actual[ 2 ].attributes ).not.toHaveProperty( 'metadata' );
+	} );
 } );

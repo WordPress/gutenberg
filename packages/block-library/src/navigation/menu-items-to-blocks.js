@@ -5,6 +5,26 @@ import { createBlock, parse } from '@wordpress/blocks';
 import { applyFilters } from '@wordpress/hooks';
 
 /**
+ * Builds entity binding configuration for navigation link URLs.
+ * This function generates the structure used to bind navigation link URLs to their entity sources.
+ *
+ * Using a function instead of a constant allows for future enhancements where the binding
+ * might need dynamic data (e.g., entity ID, context-specific arguments).
+ *
+ * @return {Object} Entity binding configuration object
+ */
+function buildNavigationLinkEntityBinding() {
+	return {
+		url: {
+			source: 'core/entity',
+			args: {
+				key: 'url',
+			},
+		},
+	};
+}
+
+/**
  * Convert a flat menu item structure to a nested blocks structure.
  *
  * @param {Object[]} menuItems An array of menu items.
@@ -167,6 +187,9 @@ function menuItemToBlockAttributes(
 		...( object_id &&
 			'custom' !== object && {
 				id: object_id,
+				metadata: {
+					bindings: buildNavigationLinkEntityBinding(),
+				},
 			} ),
 		/* eslint-enable camelcase */
 		...( description?.length && {
