@@ -70,18 +70,24 @@ export function Comments( {
 	const [ boardOffsets, setBoardOffsets ] = useState( {} );
 	const [ blockRefs, setBlockRefs ] = useState( {} );
 
-	const { blockCommentId, selectedBlockClientId, blockIds } = useSelect( ( select ) => {
-		const { getBlockAttributes, getSelectedBlockClientId, getBlockOrder } =
-			select( blockEditorStore );
-		const clientId = getSelectedBlockClientId();
-		return {
-			blockCommentId: clientId
-				? getBlockAttributes( clientId )?.metadata?.commentId
-				: null,
-			selectedBlockClientId: clientId,
-			blockIds: getBlockOrder(),
-		};
-	}, [] );
+	const { blockCommentId, selectedBlockClientId, blockIds } = useSelect(
+		( select ) => {
+			const {
+				getBlockAttributes,
+				getSelectedBlockClientId,
+				getBlockOrder,
+			} = select( blockEditorStore );
+			const clientId = getSelectedBlockClientId();
+			return {
+				blockCommentId: clientId
+					? getBlockAttributes( clientId )?.metadata?.commentId
+					: null,
+				selectedBlockClientId: clientId,
+				blockIds: getBlockOrder(),
+			};
+		},
+		[]
+	);
 
 	const relatedBlockElement = useBlockElement( selectedBlockClientId );
 
@@ -194,11 +200,11 @@ export function Comments( {
 
 	return (
 		<VStack spacing="3">
-			{ ! isFloating &&
+			{ ! isFloating && (
 				<Text as="p" variant="muted">
 					{ __( 'Only logged in users can see Notes' ) }
 				</Text>
-			}
+			) }
 			{ threads.map( ( thread ) => (
 				<Thread
 					key={ thread.id }
