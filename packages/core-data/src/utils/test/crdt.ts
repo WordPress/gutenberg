@@ -141,20 +141,27 @@ describe( 'crdt', () => {
 	} );
 
 	describe( 'applyPostChangesToCRDTDoc', () => {
-		const mockPostType = {
-			supports: {
-				title: true,
-				editor: true,
-				excerpt: true,
-			},
-		} as unknown as Type;
+		const mockPostType = {} as Type;
+
+		const syncedProperties = new Set( [
+			'title',
+			'excerpt',
+			'blocks',
+			'status',
+			'slug',
+		] );
 
 		it( 'applies simple property changes', () => {
 			const changes = {
 				title: 'New Title',
 			} as PostChanges;
 
-			applyPostChangesToCRDTDoc( doc, changes, mockPostType );
+			applyPostChangesToCRDTDoc(
+				doc,
+				changes,
+				mockPostType,
+				syncedProperties
+			);
 
 			expect( map.get( 'title' ) ).toBe( 'New Title' );
 		} );
@@ -165,7 +172,12 @@ describe( 'crdt', () => {
 				unsyncedProperty: 'value',
 			} as unknown as PostChanges;
 
-			applyPostChangesToCRDTDoc( doc, changes, mockPostType );
+			applyPostChangesToCRDTDoc(
+				doc,
+				changes,
+				mockPostType,
+				syncedProperties
+			);
 
 			expect( map.has( 'unsyncedProperty' ) ).toBe( false );
 			expect( map.get( 'title' ) ).toBe( 'New Title' );
@@ -176,7 +188,12 @@ describe( 'crdt', () => {
 				title: () => 'function value',
 			} as unknown as PostChanges;
 
-			applyPostChangesToCRDTDoc( doc, changes, mockPostType );
+			applyPostChangesToCRDTDoc(
+				doc,
+				changes,
+				mockPostType,
+				syncedProperties
+			);
 
 			expect( map.has( 'title' ) ).toBe( false );
 		} );
@@ -186,7 +203,12 @@ describe( 'crdt', () => {
 				title: { raw: 'Raw Title', rendered: 'Rendered Title' },
 			};
 
-			applyPostChangesToCRDTDoc( doc, changes, mockPostType );
+			applyPostChangesToCRDTDoc(
+				doc,
+				changes,
+				mockPostType,
+				syncedProperties
+			);
 
 			expect( map.get( 'title' ) ).toBe( 'Raw Title' );
 		} );
@@ -196,7 +218,12 @@ describe( 'crdt', () => {
 				title: 'Auto Draft',
 			} as PostChanges;
 
-			applyPostChangesToCRDTDoc( doc, changes, mockPostType );
+			applyPostChangesToCRDTDoc(
+				doc,
+				changes,
+				mockPostType,
+				syncedProperties
+			);
 
 			expect( map.get( 'title' ) ).toBe( '' );
 		} );
@@ -210,7 +237,12 @@ describe( 'crdt', () => {
 				},
 			};
 
-			applyPostChangesToCRDTDoc( doc, changes, mockPostType );
+			applyPostChangesToCRDTDoc(
+				doc,
+				changes,
+				mockPostType,
+				syncedProperties
+			);
 
 			expect( map.get( 'excerpt' ) ).toBe( 'Raw excerpt' );
 		} );
@@ -220,7 +252,12 @@ describe( 'crdt', () => {
 				slug: '',
 			};
 
-			applyPostChangesToCRDTDoc( doc, changes, mockPostType );
+			applyPostChangesToCRDTDoc(
+				doc,
+				changes,
+				mockPostType,
+				syncedProperties
+			);
 
 			expect( map.has( 'slug' ) ).toBe( false );
 		} );
@@ -230,7 +267,12 @@ describe( 'crdt', () => {
 				slug: 'my-post-slug',
 			};
 
-			applyPostChangesToCRDTDoc( doc, changes, mockPostType );
+			applyPostChangesToCRDTDoc(
+				doc,
+				changes,
+				mockPostType,
+				syncedProperties
+			);
 
 			expect( map.get( 'slug' ) ).toBe( 'my-post-slug' );
 		} );
@@ -248,7 +290,12 @@ describe( 'crdt', () => {
 				],
 			};
 
-			applyPostChangesToCRDTDoc( doc, changes, mockPostType );
+			applyPostChangesToCRDTDoc(
+				doc,
+				changes,
+				mockPostType,
+				syncedProperties
+			);
 
 			expect( ( map.get( 'blocks' ) as YBlocks ).toJSON() ).toEqual(
 				changes.blocks
@@ -260,7 +307,12 @@ describe( 'crdt', () => {
 				blocks: [],
 			};
 
-			applyPostChangesToCRDTDoc( doc, changes, mockPostType );
+			applyPostChangesToCRDTDoc(
+				doc,
+				changes,
+				mockPostType,
+				syncedProperties
+			);
 
 			const blocks = map.get( 'blocks' );
 			expect( blocks ).toBeInstanceOf( Y.Array );
@@ -275,6 +327,14 @@ describe( 'crdt', () => {
 				editor: true,
 			},
 		} as unknown as Type;
+
+		const syncedProperties = new Set( [
+			'title',
+			'status',
+			'date',
+			'blocks',
+			'meta',
+		] );
 
 		beforeEach( () => {
 			map.set( 'title', 'CRDT Title' );
@@ -291,7 +351,8 @@ describe( 'crdt', () => {
 			const changes = getPostChangesFromCRDTDoc(
 				doc,
 				record,
-				mockPostType
+				mockPostType,
+				syncedProperties
 			);
 
 			expect( changes.title ).toBe( 'CRDT Title' );
@@ -305,7 +366,8 @@ describe( 'crdt', () => {
 			const changes = getPostChangesFromCRDTDoc(
 				doc,
 				record,
-				mockPostType
+				mockPostType,
+				syncedProperties
 			);
 
 			expect( changes ).not.toHaveProperty( 'unsyncedProp' );
@@ -321,7 +383,8 @@ describe( 'crdt', () => {
 			const changes = getPostChangesFromCRDTDoc(
 				doc,
 				record,
-				mockPostType
+				mockPostType,
+				syncedProperties
 			);
 
 			expect( changes ).not.toHaveProperty( 'status' );
@@ -340,7 +403,8 @@ describe( 'crdt', () => {
 			const changes = getPostChangesFromCRDTDoc(
 				doc,
 				record,
-				mockPostType
+				mockPostType,
+				syncedProperties
 			);
 
 			expect( changes ).not.toHaveProperty( 'date' );
@@ -356,7 +420,8 @@ describe( 'crdt', () => {
 			const changes = getPostChangesFromCRDTDoc(
 				doc,
 				record,
-				mockPostType
+				mockPostType,
+				syncedProperties
 			);
 
 			expect( changes ).toHaveProperty( 'blocks' );

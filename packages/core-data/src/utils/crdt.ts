@@ -72,18 +72,19 @@ export function defaultApplyChangesToCRDTDoc(
  * Given a set of local changes to a post record, apply those changes to the
  * local Y.Doc.
  *
- * @param {CRDTDoc}     ydoc
- * @param {PostChanges} changes
- * @param {Type}        postType
+ * @param {CRDTDoc}       ydoc
+ * @param {PostChanges}   changes
+ * @param {Type}          postType
+ * @param {Set< string >} syncedProperties
  * @return {void}
  */
 export function applyPostChangesToCRDTDoc(
 	ydoc: CRDTDoc,
 	changes: PostChanges,
-	postType: Type
+	postType: Type,
+	syncedProperties: Set< string >
 ): void {
 	const ymap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
-	const syncedProperties = getSyncedPropertiesForPostType( postType );
 
 	Object.entries( changes ).forEach( ( [ key, newValue ] ) => {
 		if ( ! syncedProperties.has( key ) ) {
@@ -179,18 +180,19 @@ export function defaultGetChangesFromCRDTDoc( crdtDoc: CRDTDoc ): ObjectData {
  * against the local record and determine if there are changes (edits) we want
  * to dispatch.
  *
- * @param {CRDTDoc} ydoc
- * @param {Post}    record
- * @param {Type}    postType
+ * @param {CRDTDoc}       ydoc
+ * @param {Post}          record
+ * @param {Type}          postType
+ * @param {Set< string >} syncedProperties
  * @return {Partial<PostChanges>} The changes that should be applied to the local record.
  */
 export function getPostChangesFromCRDTDoc(
 	ydoc: CRDTDoc,
 	record: Post,
-	postType: Type
+	postType: Type,
+	syncedProperties: Set< string >
 ): PostChanges {
 	const ymap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
-	const syncedProperties = getSyncedPropertiesForPostType( postType );
 
 	return Object.fromEntries(
 		Object.entries( ymap.toJSON() ).filter( ( [ key, newValue ] ) => {
