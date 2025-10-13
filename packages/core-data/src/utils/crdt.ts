@@ -11,15 +11,22 @@ import { type CRDTDoc, type ObjectData, Y } from '@wordpress/sync';
 /**
  * Internal dependencies
  */
-import { mergeCrdtBlocks, type Block, type YBlocks } from './crdt-blocks';
+import {
+	mergeCrdtBlocks,
+	type Block,
+	type YBlock,
+	type YBlocks,
+} from './crdt-blocks';
 import { type Post } from '../entity-types/post';
 import { type Type } from '../entity-types';
 import { CRDT_RECORD_MAP_KEY } from '../sync';
 import type { WPBlockSelection, WPSelection } from '../types';
 
-type PostChanges = Partial< Post > & {
+export type PostChanges = Partial< Post > & {
 	blocks?: Block[];
+	excerpt?: Post[ 'excerpt' ] | string;
 	selection?: WPSelection;
+	title?: Post[ 'title' ] | string;
 };
 
 // Hold a reference to the last known selection to help compute Y.Text deltas.
@@ -100,7 +107,7 @@ export function applyPostChangesToCRDTDoc(
 
 				// Initialize.
 				if ( ! ( currentBlocks instanceof Y.Array ) ) {
-					currentBlocks = new Y.Array();
+					currentBlocks = new Y.Array< YBlock >();
 					setValue( currentBlocks );
 				}
 

@@ -1,125 +1,12 @@
 /**
+ * WordPress dependencies
+ */
+import { CRDT_RECORD_MAP_KEY, Y } from '@wordpress/sync';
+
+/**
  * External dependencies
  */
 import { describe, expect, it, jest, beforeEach } from '@jest/globals';
-
-/**
- * Mock @wordpress/blocks
- */
-jest.mock( '@wordpress/blocks', () => ( {
-	parse: jest.fn( ( content: string ) => {
-		if ( ! content ) {
-			return [];
-		}
-		return [
-			{
-				name: 'core/paragraph',
-				attributes: { content },
-				innerBlocks: [],
-			},
-		];
-	} ),
-} ) );
-
-/**
- * Mock @wordpress/hooks
- */
-jest.mock( '@wordpress/hooks', () => ( {
-	applyFilters: jest.fn( ( _filterName: string, value: any ) => value ),
-} ) );
-
-/**
- * Mock crdt-blocks module
- */
-jest.mock( '../crdt-blocks', () => ( {
-	mergeCrdtBlocks: jest.fn(),
-} ) );
-
-/**
- * Mock lib0/function
- */
-jest.mock( 'lib0/function', () => ( {
-	callAll: jest.fn( ( ...args: any[] ) => {
-		args.forEach( ( fn: any ) => typeof fn === 'function' && fn() );
-	} ),
-	equalityDeep: jest.fn( ( a: any, b: any ) => {
-		return JSON.stringify( a ) === JSON.stringify( b );
-	} ),
-} ) );
-
-/**
- * Mock @wordpress/sync - Yjs implementation
- */
-jest.mock( '@wordpress/sync', () => {
-	class MockYMap {
-		private data: Map< string, any > = new Map();
-
-		constructor( entries?: Array< [ string, any ] > ) {
-			if ( entries ) {
-				entries.forEach( ( [ key, value ] ) =>
-					this.data.set( key, value )
-				);
-			}
-		}
-
-		get( key: string ): any {
-			return this.data.get( key );
-		}
-
-		set( key: string, value: any ): void {
-			this.data.set( key, value );
-		}
-
-		delete( key: string ): void {
-			this.data.delete( key );
-		}
-
-		has( key: string ): boolean {
-			return this.data.has( key );
-		}
-
-		forEach( callback: ( value: any, key: string ) => void ): void {
-			this.data.forEach( callback );
-		}
-
-		toJSON(): any {
-			const result: any = {};
-			this.data.forEach( ( value, key ) => {
-				if ( value && typeof value.toJSON === 'function' ) {
-					result[ key ] = value.toJSON();
-				} else {
-					result[ key ] = value;
-				}
-			} );
-			return result;
-		}
-	}
-
-	class MockYArray {
-		private data: any[] = [];
-
-		get length(): number {
-			return this.data.length;
-		}
-
-		toJSON(): any[] {
-			return this.data.map( ( item ) => {
-				if ( item && typeof item.toJSON === 'function' ) {
-					return item.toJSON();
-				}
-				return item;
-			} );
-		}
-	}
-
-	return {
-		Y: {
-			Map: MockYMap,
-			Array: MockYArray,
-		},
-		createSyncManager: jest.fn(),
-	};
-} );
 
 /**
  * Internal dependencies
@@ -128,86 +15,23 @@ import {
 	applyPostChangesToCRDTDoc,
 	getPostChangesFromCRDTDoc,
 	getSyncedPropertiesForPostType,
+	type PostChanges,
 } from '../crdt';
-
-/**
- * Mock Y.Map implementation for local use
- */
-class MockYMap {
-	private data: Map< string, any > = new Map();
-
-	constructor( entries?: Array< [ string, any ] > ) {
-		if ( entries ) {
-			entries.forEach( ( [ key, value ] ) =>
-				this.data.set( key, value )
-			);
-		}
-	}
-
-	get( key: string ): any {
-		return this.data.get( key );
-	}
-
-	set( key: string, value: any ): void {
-		this.data.set( key, value );
-	}
-
-	delete( key: string ): void {
-		this.data.delete( key );
-	}
-
-	has( key: string ): boolean {
-		return this.data.has( key );
-	}
-
-	forEach( callback: ( value: any, key: string ) => void ): void {
-		this.data.forEach( callback );
-	}
-
-	toJSON(): any {
-		const result: any = {};
-		this.data.forEach( ( value, key ) => {
-			if ( value && typeof value.toJSON === 'function' ) {
-				result[ key ] = value.toJSON();
-			} else {
-				result[ key ] = value;
-			}
-		} );
-		return result;
-	}
-}
-
-/**
- * Mock Y.Array implementation for local use
- */
-class MockYArray {
-	private data: any[] = [];
-
-	get length(): number {
-		return this.data.length;
-	}
-
-	toJSON(): any[] {
-		return this.data.map( ( item ) => {
-			if ( item && typeof item.toJSON === 'function' ) {
-				return item.toJSON();
-			}
-			return item;
-		} );
-	}
-}
-
-const mockYDoc = {
-	getMap: jest.fn( () => new MockYMap() ),
-};
+import type { YBlock, YBlocks } from '../crdt-blocks';
+import type { Post, Type } from '../../entity-types';
 
 describe( 'crdt', () => {
-	let mockYMap: MockYMap;
+	let doc: Y.Doc;
+	let map: Y.Map< string | object | YBlocks >;
 
 	beforeEach( () => {
+		doc = new Y.Doc();
+		map = doc.getMap( CRDT_RECORD_MAP_KEY );
 		jest.clearAllMocks();
-		mockYMap = new MockYMap();
-		mockYDoc.getMap.mockReturnValue( mockYMap );
+	} );
+
+	afterEach( () => {
+		doc.destroy();
 	} );
 
 	describe( 'getSyncedPropertiesForPostType', () => {
@@ -215,11 +39,9 @@ describe( 'crdt', () => {
 			const postType = {
 				slug: 'post',
 				supports: {},
-			};
+			} as Type;
 
-			const syncedProps = getSyncedPropertiesForPostType(
-				postType as any
-			);
+			const syncedProps = getSyncedPropertiesForPostType( postType );
 
 			expect( syncedProps.has( 'date' ) ).toBe( true );
 			expect( syncedProps.has( 'status' ) ).toBe( true );
@@ -233,11 +55,9 @@ describe( 'crdt', () => {
 			const postType = {
 				slug: 'post',
 				supports: { title: true },
-			};
+			} as unknown as Type;
 
-			const syncedProps = getSyncedPropertiesForPostType(
-				postType as any
-			);
+			const syncedProps = getSyncedPropertiesForPostType( postType );
 
 			expect( syncedProps.has( 'title' ) ).toBe( true );
 		} );
@@ -246,11 +66,9 @@ describe( 'crdt', () => {
 			const postType = {
 				slug: 'post',
 				supports: { editor: true },
-			};
+			} as unknown as Type;
 
-			const syncedProps = getSyncedPropertiesForPostType(
-				postType as any
-			);
+			const syncedProps = getSyncedPropertiesForPostType( postType );
 
 			expect( syncedProps.has( 'blocks' ) ).toBe( true );
 		} );
@@ -259,11 +77,9 @@ describe( 'crdt', () => {
 			const postType = {
 				slug: 'post',
 				supports: { excerpt: true },
-			};
+			} as unknown as Type;
 
-			const syncedProps = getSyncedPropertiesForPostType(
-				postType as any
-			);
+			const syncedProps = getSyncedPropertiesForPostType( postType );
 
 			expect( syncedProps.has( 'excerpt' ) ).toBe( true );
 		} );
@@ -272,11 +88,9 @@ describe( 'crdt', () => {
 			const postType = {
 				slug: 'post',
 				supports: { author: true },
-			};
+			} as unknown as Type;
 
-			const syncedProps = getSyncedPropertiesForPostType(
-				postType as any
-			);
+			const syncedProps = getSyncedPropertiesForPostType( postType );
 
 			expect( syncedProps.has( 'author' ) ).toBe( true );
 		} );
@@ -285,11 +99,9 @@ describe( 'crdt', () => {
 			const postType = {
 				slug: 'post',
 				supports: { comments: true },
-			};
+			} as unknown as Type;
 
-			const syncedProps = getSyncedPropertiesForPostType(
-				postType as any
-			);
+			const syncedProps = getSyncedPropertiesForPostType( postType );
 
 			expect( syncedProps.has( 'comment_status' ) ).toBe( true );
 		} );
@@ -298,11 +110,9 @@ describe( 'crdt', () => {
 			const postType = {
 				slug: 'post',
 				supports: { thumbnail: true },
-			};
+			} as unknown as Type;
 
-			const syncedProps = getSyncedPropertiesForPostType(
-				postType as any
-			);
+			const syncedProps = getSyncedPropertiesForPostType( postType );
 
 			expect( syncedProps.has( 'featured_media' ) ).toBe( true );
 		} );
@@ -311,11 +121,9 @@ describe( 'crdt', () => {
 			const postType = {
 				slug: 'post',
 				supports: { 'post-formats': true },
-			};
+			} as unknown as Type;
 
-			const syncedProps = getSyncedPropertiesForPostType(
-				postType as any
-			);
+			const syncedProps = getSyncedPropertiesForPostType( postType );
 
 			expect( syncedProps.has( 'format' ) ).toBe( true );
 		} );
@@ -324,26 +132,16 @@ describe( 'crdt', () => {
 			const postType = {
 				slug: 'post',
 				supports: { trackbacks: true },
-			};
+			} as unknown as Type;
 
-			const syncedProps = getSyncedPropertiesForPostType(
-				postType as any
-			);
+			const syncedProps = getSyncedPropertiesForPostType( postType );
 
 			expect( syncedProps.has( 'ping_status' ) ).toBe( true );
 		} );
 	} );
 
 	describe( 'applyPostChangesToCRDTDoc', () => {
-		const mockPostType = {
-			slug: 'post',
-			supports: {
-				title: true,
-				editor: true,
-				excerpt: true,
-				'custom-fields': true,
-			},
-		};
+		const mockPostType = {} as Type;
 
 		const syncedProperties = new Set( [
 			'title',
@@ -355,47 +153,49 @@ describe( 'crdt', () => {
 
 		it( 'applies simple property changes', () => {
 			const changes = {
-				title: 'New Title' as any,
-			};
+				title: 'New Title',
+			} as PostChanges;
 
 			applyPostChangesToCRDTDoc(
-				mockYDoc as any,
+				doc,
 				changes,
-				mockPostType as any,
+				mockPostType,
 				syncedProperties
 			);
 
-			expect( mockYMap.get( 'title' ) ).toBe( 'New Title' );
+			expect( map.get( 'title' ) ).toBe( 'New Title' );
 		} );
 
 		it( 'does not sync properties not in syncedProperties', () => {
 			const changes = {
+				title: 'New Title',
 				unsyncedProperty: 'value',
-			} as any;
+			} as unknown as PostChanges;
 
 			applyPostChangesToCRDTDoc(
-				mockYDoc as any,
+				doc,
 				changes,
-				mockPostType as any,
+				mockPostType,
 				syncedProperties
 			);
 
-			expect( mockYMap.has( 'unsyncedProperty' ) ).toBe( false );
+			expect( map.has( 'unsyncedProperty' ) ).toBe( false );
+			expect( map.get( 'title' ) ).toBe( 'New Title' );
 		} );
 
 		it( 'does not sync function values', () => {
 			const changes = {
 				title: () => 'function value',
-			};
+			} as unknown as PostChanges;
 
 			applyPostChangesToCRDTDoc(
-				mockYDoc as any,
-				changes as any,
-				mockPostType as any,
+				doc,
+				changes,
+				mockPostType,
 				syncedProperties
 			);
 
-			expect( mockYMap.has( 'title' ) ).toBe( false );
+			expect( map.has( 'title' ) ).toBe( false );
 		} );
 
 		it( 'handles title with RenderedText format', () => {
@@ -404,46 +204,47 @@ describe( 'crdt', () => {
 			};
 
 			applyPostChangesToCRDTDoc(
-				mockYDoc as any,
+				doc,
 				changes,
-				mockPostType as any,
+				mockPostType,
 				syncedProperties
 			);
 
-			expect( mockYMap.get( 'title' ) ).toBe( 'Raw Title' );
+			expect( map.get( 'title' ) ).toBe( 'Raw Title' );
 		} );
 
 		it( 'skips "Auto Draft" template title when no current value exists', () => {
 			const changes = {
-				title: 'Auto Draft' as any,
-			};
+				title: 'Auto Draft',
+			} as PostChanges;
 
 			applyPostChangesToCRDTDoc(
-				mockYDoc as any,
+				doc,
 				changes,
-				mockPostType as any,
+				mockPostType,
 				syncedProperties
 			);
 
-			expect( mockYMap.get( 'title' ) ).toBe( '' );
+			expect( map.get( 'title' ) ).toBe( '' );
 		} );
 
 		it( 'handles excerpt with RenderedText format', () => {
 			const changes = {
 				excerpt: {
+					protected: false,
 					raw: 'Raw excerpt',
 					rendered: 'Rendered excerpt',
-				} as any,
+				},
 			};
 
 			applyPostChangesToCRDTDoc(
-				mockYDoc as any,
+				doc,
 				changes,
-				mockPostType as any,
+				mockPostType,
 				syncedProperties
 			);
 
-			expect( mockYMap.get( 'excerpt' ) ).toBe( 'Raw excerpt' );
+			expect( map.get( 'excerpt' ) ).toBe( 'Raw excerpt' );
 		} );
 
 		it( 'does not sync empty slug', () => {
@@ -452,13 +253,13 @@ describe( 'crdt', () => {
 			};
 
 			applyPostChangesToCRDTDoc(
-				mockYDoc as any,
+				doc,
 				changes,
-				mockPostType as any,
+				mockPostType,
 				syncedProperties
 			);
 
-			expect( mockYMap.has( 'slug' ) ).toBe( false );
+			expect( map.has( 'slug' ) ).toBe( false );
 		} );
 
 		it( 'syncs non-empty slug', () => {
@@ -467,21 +268,17 @@ describe( 'crdt', () => {
 			};
 
 			applyPostChangesToCRDTDoc(
-				mockYDoc as any,
+				doc,
 				changes,
-				mockPostType as any,
+				mockPostType,
 				syncedProperties
 			);
 
-			expect( mockYMap.get( 'slug' ) ).toBe( 'my-post-slug' );
+			expect( map.get( 'slug' ) ).toBe( 'my-post-slug' );
 		} );
 
-		it( 'calls mergeCrdtBlocks for blocks changes', () => {
-			const { mergeCrdtBlocks: mockMergeCrdtBlocks } = jest.requireMock(
-				'../crdt-blocks'
-			) as { mergeCrdtBlocks: jest.Mock };
-
-			mockYMap.set( 'blocks', new MockYArray() );
+		it( 'merges blocks changes', () => {
+			map.set( 'blocks', new Y.Array< YBlock >() );
 
 			const changes = {
 				blocks: [
@@ -494,13 +291,15 @@ describe( 'crdt', () => {
 			};
 
 			applyPostChangesToCRDTDoc(
-				mockYDoc as any,
+				doc,
 				changes,
-				mockPostType as any,
+				mockPostType,
 				syncedProperties
 			);
 
-			expect( mockMergeCrdtBlocks ).toHaveBeenCalled();
+			expect( ( map.get( 'blocks' ) as YBlocks ).toJSON() ).toEqual(
+				changes.blocks
+			);
 		} );
 
 		it( 'initializes blocks as Y.Array when not present', () => {
@@ -509,14 +308,14 @@ describe( 'crdt', () => {
 			};
 
 			applyPostChangesToCRDTDoc(
-				mockYDoc as any,
+				doc,
 				changes,
-				mockPostType as any,
+				mockPostType,
 				syncedProperties
 			);
 
-			const blocks = mockYMap.get( 'blocks' );
-			expect( blocks.constructor.name ).toBe( 'MockYArray' );
+			const blocks = map.get( 'blocks' );
+			expect( blocks ).toBeInstanceOf( Y.Array );
 		} );
 	} );
 
@@ -527,7 +326,7 @@ describe( 'crdt', () => {
 				title: true,
 				editor: true,
 			},
-		};
+		} as unknown as Type;
 
 		const syncedProperties = new Set( [
 			'title',
@@ -538,21 +337,21 @@ describe( 'crdt', () => {
 		] );
 
 		beforeEach( () => {
-			mockYMap.set( 'title', 'CRDT Title' );
-			mockYMap.set( 'status', 'draft' );
-			mockYMap.set( 'date', '2025-01-01' );
+			map.set( 'title', 'CRDT Title' );
+			map.set( 'status', 'draft' );
+			map.set( 'date', '2025-01-01' );
 		} );
 
 		it( 'returns changes when values differ from record', () => {
 			const record = {
 				title: 'Old Title',
 				status: 'draft',
-			};
+			} as unknown as Post;
 
 			const changes = getPostChangesFromCRDTDoc(
-				mockYDoc as any,
-				record as any,
-				mockPostType as any,
+				doc,
+				record,
+				mockPostType,
 				syncedProperties
 			);
 
@@ -560,14 +359,14 @@ describe( 'crdt', () => {
 		} );
 
 		it( 'filters out properties not in syncedProperties', () => {
-			mockYMap.set( 'unsyncedProp', 'value' );
+			map.set( 'unsyncedProp', 'value' );
 
-			const record = {};
+			const record = {} as Post;
 
 			const changes = getPostChangesFromCRDTDoc(
-				mockYDoc as any,
-				record as any,
-				mockPostType as any,
+				doc,
+				record,
+				mockPostType,
 				syncedProperties
 			);
 
@@ -575,16 +374,16 @@ describe( 'crdt', () => {
 		} );
 
 		it( 'does not sync auto-draft status', () => {
-			mockYMap.set( 'status', 'auto-draft' );
+			map.set( 'status', 'auto-draft' );
 
 			const record = {
 				status: 'draft',
-			};
+			} as unknown as Post;
 
 			const changes = getPostChangesFromCRDTDoc(
-				mockYDoc as any,
-				record as any,
-				mockPostType as any,
+				doc,
+				record,
+				mockPostType,
 				syncedProperties
 			);
 
@@ -592,19 +391,19 @@ describe( 'crdt', () => {
 		} );
 
 		it( 'does not sync empty date for floating dates', () => {
-			mockYMap.set( 'status', 'draft' );
-			mockYMap.set( 'date', '' );
+			map.set( 'status', 'draft' );
+			map.set( 'date', '' );
 
 			const record = {
 				status: 'draft',
 				date: null,
 				modified: '2025-01-01',
-			};
+			} as unknown as Post;
 
 			const changes = getPostChangesFromCRDTDoc(
-				mockYDoc as any,
-				record as any,
-				mockPostType as any,
+				doc,
+				record,
+				mockPostType,
 				syncedProperties
 			);
 
@@ -612,50 +411,20 @@ describe( 'crdt', () => {
 		} );
 
 		it( 'includes blocks in changes', () => {
-			mockYMap.set( 'blocks', [] );
+			map.set( 'blocks', new Y.Array< YBlock >() );
 
 			const record = {
 				blocks: [],
-			};
+			} as unknown as Post;
 
 			const changes = getPostChangesFromCRDTDoc(
-				mockYDoc as any,
-				record as any,
-				mockPostType as any,
+				doc,
+				record,
+				mockPostType,
 				syncedProperties
 			);
 
 			expect( changes ).toHaveProperty( 'blocks' );
-		} );
-
-		it( 'includes meta changes from CRDT including private fields in merge', () => {
-			mockYMap.set( 'meta', {
-				_private: 'new-hidden',
-				public: 'new-visible',
-			} );
-
-			const record = {
-				meta: {
-					_private: 'old-hidden',
-					public: 'old-visible',
-				},
-			};
-
-			const changes = getPostChangesFromCRDTDoc(
-				mockYDoc as any,
-				record as any,
-				mockPostType as any,
-				syncedProperties
-			);
-
-			// The function filters _private from allowedMeta (since it starts with _),
-			// but then merges { ...currentValue, ...allowedMeta }
-			// However the result shows _private from CRDT is included
-			// This happens because the entire meta object from CRDT is in newValue
-			expect( changes.meta ).toEqual( {
-				_private: 'new-hidden', // From CRDT
-				public: 'new-visible', // From CRDT
-			} );
 		} );
 	} );
 } );
