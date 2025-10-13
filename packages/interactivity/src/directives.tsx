@@ -187,7 +187,7 @@ const getGlobalEventDirective = (
 		directives[ `on-${ type }` ]
 			.filter( isNonDefaultDirectiveSuffix )
 			.forEach( ( entry ) => {
-				const suffixParts = entry.suffix.split( '--', 1 );
+				const suffixParts = entry.suffix.split( '--', 2 );
 				const eventName = suffixParts[ 0 ];
 				if ( globalThis.SCRIPT_DEBUG ) {
 					if ( suffixParts[ 1 ] ) {
@@ -445,7 +445,7 @@ export default () => {
 	directive( 'on', ( { directives: { on }, element, evaluate } ) => {
 		const events = new Map< string, Set< DirectiveEntry > >();
 		on.filter( isNonDefaultDirectiveSuffix ).forEach( ( entry ) => {
-			const suffixParts = entry.suffix.split( '--' );
+			const suffixParts = entry.suffix.split( '--', 2 );
 			if ( globalThis.SCRIPT_DEBUG ) {
 				if ( suffixParts[ 1 ] ) {
 					warn(
@@ -516,7 +516,7 @@ export default () => {
 			onAsync
 				.filter( isNonDefaultDirectiveSuffix )
 				.forEach( ( entry ) => {
-					const event = entry.suffix.split( '--' )[ 0 ];
+					const event = entry.suffix.split( '--', 1 )[ 0 ];
 					if ( ! events.has( event ) ) {
 						events.set( event, new Set< DirectiveEntry >() );
 					}
