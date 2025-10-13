@@ -36,6 +36,20 @@ const { Menu } = unlock( componentsPrivateApis );
 
 const EMPTY_OBJECT = {};
 
+/**
+ * Get the normalized attribute type for block bindings.
+ * Converts 'rich-text' to 'string' since rich-text is stored as string.
+ *
+ * @param {string} blockName The block name.
+ * @param {string} attribute The attribute name.
+ * @return {string} The normalized attribute type.
+ */
+const getAttributeType = ( blockName, attribute ) => {
+	const _attributeType =
+		getBlockType( blockName ).attributes?.[ attribute ]?.type;
+	return _attributeType === 'rich-text' ? 'string' : _attributeType;
+};
+
 const useToolsPanelDropdownMenuProps = () => {
 	const isMobile = useViewportMatch( 'medium', '<' );
 	return ! isMobile
@@ -63,11 +77,8 @@ function BlockBindingsPanelMenuContent( {
 		( _select ) => {
 			const { name: blockName } =
 				_select( blockEditorStore ).getBlock( clientId );
-			const _attributeType =
-				getBlockType( blockName ).attributes?.[ attribute ]?.type;
 			return {
-				attributeType:
-					_attributeType === 'rich-text' ? 'string' : _attributeType,
+				attributeType: getAttributeType( blockName, attribute ),
 				select: _select,
 			};
 		},
@@ -206,7 +217,7 @@ function BlockBindingsPanelMenuContent( {
 	);
 }
 
-function BlockBindingsAttribute( { attribute, binding, sources } ) {
+function BlockBindingsAttribute( { attribute, binding, sources, blockName } ) {
 	const { source: sourceName, args } = binding || {};
 	const source = sources?.[ sourceName ];
 
@@ -215,7 +226,18 @@ function BlockBindingsAttribute( { attribute, binding, sources } ) {
 	const isNotBound = binding === undefined;
 
 	if ( isNotBound ) {
-		displayText = __( 'Not connected' );
+		// Check if there are any compatible sources for this attribute type
+		const attributeType = getAttributeType( blockName, attribute );
+
+		const hasCompatibleSources = Object.values( sources ).some( ( src ) =>
+			src.data?.some( ( item ) => item?.type === attributeType )
+		);
+
+		if ( ! hasCompatibleSources ) {
+			displayText = __( 'No sources available' );
+		} else {
+			displayText = __( 'Not connected' );
+		}
 		isValid = true;
 	} else if ( ! source ) {
 		// If there's a binding but the source is not found, it's invalid.
@@ -246,7 +268,12 @@ function BlockBindingsAttribute( { attribute, binding, sources } ) {
 	);
 }
 
-function ReadOnlyBlockBindingsPanelItem( { attribute, binding, sources } ) {
+function ReadOnlyBlockBindingsPanelItem( {
+	attribute,
+	binding,
+	sources,
+	blockName,
+} ) {
 	return (
 		<ToolsPanelItem hasValue={ () => !! binding } label={ attribute }>
 			<Item>
@@ -254,6 +281,7 @@ function ReadOnlyBlockBindingsPanelItem( { attribute, binding, sources } ) {
 					attribute={ attribute }
 					binding={ binding }
 					sources={ sources }
+					blockName={ blockName }
 				/>
 			</Item>
 		</ToolsPanelItem>
@@ -265,6 +293,7 @@ function EditableBlockBindingsPanelItem( {
 	binding,
 	sources,
 	setModalState,
+	blockName,
 } ) {
 	const { updateBlockBindings } = useBlockBindingsUtils();
 	const isMobile = useViewportMatch( 'medium', '<' );
@@ -289,6 +318,7 @@ function EditableBlockBindingsPanelItem( {
 						attribute={ attribute }
 						binding={ binding }
 						sources={ sources }
+						blockName={ blockName }
 					/>
 				</Menu.TriggerButton>
 				<Menu.Popover gutter={ isMobile ? 8 : 36 }>
@@ -329,72 +359,32 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 			}
 
 			const registeredSources = getBlockBindingsSources();
-			const { bindings } = metadata || {};
-			const usedSources = new Set(
-				Object.values( bindings || {} ).map(
-					( binding ) => binding?.source
-				)
-			);
 			Object.entries( registeredSources ).forEach(
 				( [
 					sourceName,
 					{ editorUI, getFieldsList, usesContext, label, getValues },
 				] ) => {
-					if ( editorUI ) {
-						// Populate context.
-						const context = {};
-						if ( usesContext?.length ) {
-							for ( const key of usesContext ) {
-								context[ key ] = blockContext[ key ];
-							}
+					// Populate context.
+					const context = {};
+					if ( usesContext?.length ) {
+						for ( const key of usesContext ) {
+							context[ key ] = blockContext[ key ];
 						}
+					}
 
+					if ( editorUI ) {
 						const editorUIResult = editorUI( {
 							select,
 							context,
 						} );
-						const hasCompatibleData = _bindableAttributes.some(
-							( attribute ) => {
-								const _attributeType =
-									getBlockType( blockName ).attributes?.[
-										attribute
-									]?.type;
-								const attributeType =
-									_attributeType === 'rich-text'
-										? 'string'
-										: _attributeType;
 
-								return editorUIResult.data?.some(
-									( item ) => item?.type === attributeType
-								);
-							}
-						);
-
-						if ( hasCompatibleData ) {
-							_sources[ sourceName ] = {
-								...editorUIResult,
-								label,
-								getValues,
-							};
-						} else if ( usedSources.has( sourceName ) ) {
-							// If there's no compatible data but the source is already used in a binding,
-							// still add it with empty data so it can be displayed in read-only mode.
-							_sources[ sourceName ] = {
-								...editorUIResult,
-								data: [],
-								label,
-								getValues,
-							};
-						}
+						_sources[ sourceName ] = {
+							...editorUIResult,
+							label,
+							getValues,
+						};
 					} else if ( getFieldsList ) {
 						// Backward compatibility: Convert getFieldsList to editorUI format
-						const context = {};
-						if ( usesContext?.length ) {
-							for ( const key of usesContext ) {
-								context[ key ] = blockContext[ key ];
-							}
-						}
-
 						const fieldsListResult = getFieldsList( {
 							select,
 							context,
@@ -410,42 +400,14 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 								} )
 							);
 
-							const hasCompatibleData = _bindableAttributes.some(
-								( attribute ) => {
-									const _attributeType =
-										getBlockType( blockName ).attributes?.[
-											attribute
-										]?.type;
-									const attributeType =
-										_attributeType === 'rich-text'
-											? 'string'
-											: _attributeType;
-
-									return data.some(
-										( item ) => item?.type === attributeType
-									);
-								}
-							);
-
-							if ( hasCompatibleData ) {
-								_sources[ sourceName ] = {
-									mode: 'dropdown', // Default mode for backward compatibility
-									data,
-									label,
-									getValues,
-								};
-							} else if ( usedSources.has( sourceName ) ) {
-								// If there's no compatible data but the source is already used in a binding,
-								// still add it with empty data so it can be displayed in read-only mode.
-								_sources[ sourceName ] = {
-									mode: 'dropdown', // Default mode for backward compatibility
-									data: [],
-									label,
-									getValues,
-								};
-							}
+							_sources[ sourceName ] = {
+								mode: 'dropdown', // Default mode for backward compatibility
+								data,
+								label,
+								getValues,
+							};
 						}
-					} else if ( usedSources.has( sourceName ) ) {
+					} else {
 						/*
 						 * Include sources without editorUI if they are already used in a binding.
 						 * This allows them to be displayed in read-only mode.
@@ -507,12 +469,30 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 					{ bindableAttributes.map( ( attribute ) => {
 						const binding = bindings?.[ attribute ];
 
-						return readOnly ? (
+						// Check if this specific attribute has compatible data from any source
+						const attributeType = getAttributeType(
+							blockName,
+							attribute
+						);
+
+						const hasCompatibleDataForAttribute = Object.values(
+							sources
+						).some( ( source ) =>
+							source.data?.some(
+								( item ) => item?.type === attributeType
+							)
+						);
+
+						const isAttributeReadOnly =
+							readOnly || ! hasCompatibleDataForAttribute;
+
+						return isAttributeReadOnly ? (
 							<ReadOnlyBlockBindingsPanelItem
 								key={ attribute }
 								attribute={ attribute }
 								binding={ binding }
 								sources={ sources }
+								blockName={ blockName }
 							/>
 						) : (
 							<EditableBlockBindingsPanelItem
@@ -521,6 +501,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 								binding={ binding }
 								sources={ sources }
 								setModalState={ setModalState }
+								blockName={ blockName }
 							/>
 						);
 					} ) }
