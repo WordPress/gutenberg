@@ -7,7 +7,6 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { InspectorControls } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -27,6 +26,7 @@ export default function TermsQueryInspectorControls( {
 	setQuery,
 	setAttributes,
 	clientId,
+	templateSlug,
 } ) {
 	const { termQuery, tagName: TagName } = attributes;
 	const {
@@ -40,27 +40,16 @@ export default function TermsQueryInspectorControls( {
 	} = termQuery;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	const { templateSlug } = useSelect( ( select ) => {
-		// @wordpress/block-library should not depend on @wordpress/editor.
-		// Blocks can be loaded into a *non-post* block editor, so to avoid
-		// declaring @wordpress/editor as a dependency, we must access its
-		// store by string.
-		// The solution here is to split WP specific blocks from generic blocks.
-		// eslint-disable-next-line @wordpress/data-no-store-string-literals
-		const { getEditedPostSlug } = select( 'core/editor' );
-		return {
-			templateSlug: getEditedPostSlug(),
-		};
-	}, [] );
-
 	const taxonomies = usePublicTaxonomies();
 
 	const isTaxonomyHierarchical = taxonomies.find(
 		( _taxonomy ) => _taxonomy.slug === taxonomy
 	)?.hierarchical;
 
-	const isTaxonomyMatchingTemplate =
-		typeof templateSlug === 'string' && templateSlug.includes( taxonomy );
+	const isTaxonomyMatchingTemplate = templateSlug?.startsWith(
+		// `Tags` are a special case in WP template hierarchy.
+		taxonomy === 'post_tag' ? 'tag' : taxonomy
+	);
 
 	// Only display the inherit control if the taxonomy is hierarchical and matches the current template.
 	const displayInheritControl =
@@ -82,7 +71,7 @@ export default function TermsQueryInspectorControls( {
 		<>
 			<InspectorControls>
 				<ToolsPanel
-					label={ __( 'Terms Query Settings' ) }
+					label={ __( 'Settings' ) }
 					resetAll={ () => {
 						setAttributes( {
 							termQuery: {

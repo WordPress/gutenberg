@@ -27,6 +27,7 @@
 			"default": "div"
 		}
 	},
+	"usesContext": [ "templateSlug" ],
 	"providesContext": {
 		"termQuery": "termQuery"
 	},
