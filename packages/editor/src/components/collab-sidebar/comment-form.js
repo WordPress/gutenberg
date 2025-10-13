@@ -46,7 +46,7 @@ function CommentForm( {
 		thread?.content?.raw ?? ''
 	);
 
-	// As the user types, the textarea may grow or shrink so we regularly trigger a comment reflow
+	// Regularly trigger a reflow as the user types since the textarea may grow or shrink.
 	const debouncedCommentUpdated = useDebounce( reflowComments, 100 );
 
 	const updateComment = ( value ) => {
