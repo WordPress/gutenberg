@@ -1,3 +1,7 @@
+.dataforms-layouts-card__field-header-label {
+	@include heading-large();
+}
+
 .dataforms-layouts-card__field {
 	width: 100%;
 }

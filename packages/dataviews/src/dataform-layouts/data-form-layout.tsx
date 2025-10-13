@@ -14,7 +14,9 @@ import { isCombinedField } from './is-combined-field';
 import normalizeFormFields, { normalizeLayout } from './normalize-form-fields';
 
 const DEFAULT_WRAPPER = ( { children }: { children: React.ReactNode } ) => (
-	<VStack spacing={ 4 }>{ children }</VStack>
+	<VStack className="dataforms-layouts__wrapper" spacing={ 4 }>
+		{ children }
+	</VStack>
 );
 
 export function DataFormLayout< Item >( {
