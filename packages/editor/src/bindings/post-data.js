@@ -125,7 +125,17 @@ export default {
 		}
 		return newValues;
 	},
-	setValues( { dispatch, context, bindings } ) {
+	setValues( { dispatch, context, bindings, clientId, select } ) {
+		const { getBlockName } = select( blockEditorStore );
+		// if nav block then return false (read only
+		const blockName = getBlockName?.( clientId );
+
+		if (
+			blockName === 'core/navigation-link' ||
+			blockName === 'core/navigation-submenu'
+		) {
+			return false;
+		}
 		const newData = {};
 		Object.values( bindings ).forEach( ( { args, newValue } ) => {
 			newData[ args.key ] = newValue;
@@ -138,7 +148,18 @@ export default {
 			newData
 		);
 	},
-	canUserEditValue( { select, context, args } ) {
+	canUserEditValue( { select, context, args, clientId } ) {
+		const { getBlockName } = select( blockEditorStore );
+		// if nav block then return false (read only
+		const blockName = getBlockName?.( clientId );
+
+		if (
+			blockName === 'core/navigation-link' ||
+			blockName === 'core/navigation-submenu'
+		) {
+			return false;
+		}
+
 		// Lock editing in query loop.
 		if ( context?.query || context?.queryId ) {
 			return false;
