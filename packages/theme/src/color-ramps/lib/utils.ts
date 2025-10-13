@@ -12,9 +12,9 @@ import {
 	UNIVERSAL_CONTRAST_TOPUP,
 	WHITE_TEXT_CONTRAST_MARGIN,
 	ACCENT_SCALE_BASE_LIGHTNESS_THRESHOLDS,
-} from './constants.ts';
-import type { Ramp, RampStepConfig, RampDirection } from './types.ts';
-import { getCachedContrast } from './cache-utils.ts';
+} from './constants';
+import type { Ramp, RampStepConfig, RampDirection } from './types';
+import { getCachedContrast } from './cache-utils';
 
 /**
  * Make sure that a color is valid in the p3 gamut, and converts it to oklch.

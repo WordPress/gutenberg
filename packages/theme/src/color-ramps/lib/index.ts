@@ -6,14 +6,14 @@ import Color from 'colorjs.io';
 /**
  * Internal dependencies
  */
-import { getCachedContrast, getColorString } from './cache-utils.ts';
-import { findColorMeetingRequirements } from './find-color-with-constraints.ts';
+import { getCachedContrast, getColorString } from './cache-utils';
+import { findColorMeetingRequirements } from './find-color-with-constraints';
 import {
 	clampToGamut,
 	sortByDependency,
 	computeBetterFgColorDirection,
 	adjustContrastTarget,
-} from './utils.ts';
+} from './utils';
 
 import type {
 	FollowDirection,
@@ -22,7 +22,7 @@ import type {
 	RampConfig,
 	RampResult,
 } from './types';
-import { LIGHTNESS_EPSILON, MAX_BISECTION_ITERATIONS } from './constants.ts';
+import { LIGHTNESS_EPSILON, MAX_BISECTION_ITERATIONS } from './constants';
 
 /**
  * Calculate a complete color ramp based on the provided configuration.

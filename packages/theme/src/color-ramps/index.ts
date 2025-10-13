@@ -6,17 +6,17 @@ import Color from 'colorjs.io';
 /**
  * Internal dependencies
  */
-import { buildRamp } from './lib/index.ts';
-import { clampAccentScaleReferenceLightness } from './lib/utils.ts';
-import { BG_RAMP_CONFIG, ACCENT_RAMP_CONFIG } from './lib/ramp-configs.ts';
+import { buildRamp } from './lib/index';
+import { clampAccentScaleReferenceLightness } from './lib/utils';
+import { BG_RAMP_CONFIG, ACCENT_RAMP_CONFIG } from './lib/ramp-configs';
 import type {
 	RampResult as InternalRampResult,
 	RampDirection,
 	Ramp,
-} from './lib/types.ts';
-import { getCachedContrast } from './lib/cache-utils.ts';
-import { CONTRAST_COMBINATIONS } from './lib/constants.ts';
-export { DEFAULT_SEED_COLORS } from './lib/constants.ts';
+} from './lib/types';
+import { getCachedContrast } from './lib/cache-utils';
+import { CONTRAST_COMBINATIONS } from './lib/constants';
+export { DEFAULT_SEED_COLORS } from './lib/constants';
 
 /**
  * Creates a background ramp.

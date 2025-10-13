@@ -8,7 +8,7 @@ import Color from 'colorjs.io';
 /**
  * Internal dependencies
  */
-import { FORMAT_JSON_ID } from './lib.ts';
+import { FORMAT_JSON_ID } from './lib';
 
 function titleCase( str: string ) {
 	return str[ 0 ].toUpperCase() + str.slice( 1 );

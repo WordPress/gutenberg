@@ -6,7 +6,7 @@ import Color from 'colorjs.io';
 /**
  * Internal dependencies
  */
-import type { Ramp } from './types.ts';
+import type { Ramp } from './types';
 
 export const WHITE = new Color( '#fff' ).to( 'oklch' );
 export const BLACK = new Color( '#000' ).to( 'oklch' );

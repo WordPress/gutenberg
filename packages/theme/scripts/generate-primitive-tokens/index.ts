@@ -13,7 +13,7 @@ import {
 	DEFAULT_SEED_COLORS,
 	buildBgRamp,
 	buildAccentRamp,
-} from '../../src/color-ramps/index.ts';
+} from '../../src/color-ramps/index';
 
 const __filename = fileURLToPath( import.meta.url );
 const __dirname = path.dirname( __filename );

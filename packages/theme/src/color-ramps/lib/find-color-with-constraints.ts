@@ -6,15 +6,15 @@ import Color from 'colorjs.io';
 /**
  * Internal dependencies
  */
-import { clampToGamut } from './utils.ts';
+import { clampToGamut } from './utils';
 import {
 	WHITE,
 	BLACK,
 	LIGHTNESS_EPSILON,
 	MAX_BISECTION_ITERATIONS,
-} from './constants.ts';
-import { getCachedContrast } from './cache-utils.ts';
-import { type TaperChromaOptions, taperChroma } from './taper-chroma.ts';
+} from './constants';
+import { getCachedContrast } from './cache-utils';
+import { type TaperChromaOptions, taperChroma } from './taper-chroma';
 
 /**
  * Solve for L such that:
