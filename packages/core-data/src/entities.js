@@ -265,14 +265,13 @@ export const prePersistPostType = ( persistedRecord, edits ) => {
  */
 async function loadPostTypeEntities() {
 	const postTypes = await apiFetch( {
-		path: '/wp/v2/types?context=edit',
+		path: '/wp/v2/types?context=view',
 	} );
 	return Object.entries( postTypes ?? {} ).map( ( [ name, postType ] ) => {
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
 			name
 		);
 		const namespace = postType?.rest_namespace ?? 'wp/v2';
-		const syncedProperties = getSyncedPropertiesForPostType( postType );
 
 		/**
 		 * @type {import('@wordpress/sync').SyncConfig}
@@ -284,14 +283,15 @@ async function loadPostTypeEntities() {
 			 *
 			 * @param {import('@wordpress/sync').CRDTDoc}               crdtDoc
 			 * @param {Partial< import('@wordpress/sync').ObjectData >} changes
+			 * @param {Set< string >}                                   availableProperties
 			 * @return {void}
 			 */
-			applyChangesToCRDTDoc: ( crdtDoc, changes ) =>
+			applyChangesToCRDTDoc: ( crdtDoc, changes, availableProperties ) =>
 				applyPostChangesToCRDTDoc(
 					crdtDoc,
 					changes,
 					postType,
-					syncedProperties
+					getSyncedPropertiesForPostType( availableProperties )
 				),
 
 			/**
@@ -300,14 +300,15 @@ async function loadPostTypeEntities() {
 			 *
 			 * @param {import('@wordpress/sync').CRDTDoc}    crdtDoc
 			 * @param {import('@wordpress/sync').ObjectData} record
+			 * @param {Set< string >}                        availableProperties
 			 * @return {Partial< import('@wordpress/sync').ObjectData >} Changes to record
 			 */
-			getChangesFromCRDTDoc: ( crdtDoc, record ) =>
+			getChangesFromCRDTDoc: ( crdtDoc, record, availableProperties ) =>
 				getPostChangesFromCRDTDoc(
 					crdtDoc,
 					record,
 					postType,
-					syncedProperties
+					getSyncedPropertiesForPostType( availableProperties )
 				),
 
 			/**

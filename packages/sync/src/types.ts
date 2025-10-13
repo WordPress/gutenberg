@@ -50,9 +50,14 @@ export interface RecordHandlers {
 export interface SyncConfig {
 	applyChangesToCRDTDoc: (
 		ydoc: Y.Doc,
-		changes: Partial< ObjectData >
+		changes: Partial< ObjectData >,
+		availableProperties: Set< string >
 	) => void;
-	getChangesFromCRDTDoc: ( ydoc: Y.Doc, record: ObjectData ) => ObjectData;
+	getChangesFromCRDTDoc: (
+		ydoc: Y.Doc,
+		record: ObjectData,
+		availableProperties: Set< string >
+	) => ObjectData;
 	supports?: Record< string, true >;
 }
 

@@ -35,108 +35,12 @@ describe( 'crdt', () => {
 	} );
 
 	describe( 'getSyncedPropertiesForPostType', () => {
-		it( 'includes base properties by default', () => {
-			const postType = {
-				slug: 'post',
-				supports: {},
-			} as Type;
+		it( 'removes properties that are not allowed', () => {
+			const syncedProps = getSyncedPropertiesForPostType(
+				new Set( [ 'foo', 'bar', 'date', 'title' ] )
+			);
 
-			const syncedProps = getSyncedPropertiesForPostType( postType );
-
-			expect( syncedProps.has( 'date' ) ).toBe( true );
-			expect( syncedProps.has( 'status' ) ).toBe( true );
-			expect( syncedProps.has( 'tags' ) ).toBe( true );
-			expect( syncedProps.has( 'template' ) ).toBe( true );
-			expect( syncedProps.has( 'slug' ) ).toBe( true );
-			expect( syncedProps.has( 'sticky' ) ).toBe( true );
-		} );
-
-		it( 'adds title when supported', () => {
-			const postType = {
-				slug: 'post',
-				supports: { title: true },
-			} as unknown as Type;
-
-			const syncedProps = getSyncedPropertiesForPostType( postType );
-
-			expect( syncedProps.has( 'title' ) ).toBe( true );
-		} );
-
-		it( 'adds blocks (editor) when supported', () => {
-			const postType = {
-				slug: 'post',
-				supports: { editor: true },
-			} as unknown as Type;
-
-			const syncedProps = getSyncedPropertiesForPostType( postType );
-
-			expect( syncedProps.has( 'blocks' ) ).toBe( true );
-		} );
-
-		it( 'adds excerpt when supported', () => {
-			const postType = {
-				slug: 'post',
-				supports: { excerpt: true },
-			} as unknown as Type;
-
-			const syncedProps = getSyncedPropertiesForPostType( postType );
-
-			expect( syncedProps.has( 'excerpt' ) ).toBe( true );
-		} );
-
-		it( 'adds author when supported', () => {
-			const postType = {
-				slug: 'post',
-				supports: { author: true },
-			} as unknown as Type;
-
-			const syncedProps = getSyncedPropertiesForPostType( postType );
-
-			expect( syncedProps.has( 'author' ) ).toBe( true );
-		} );
-
-		it( 'adds comment_status when comments is supported', () => {
-			const postType = {
-				slug: 'post',
-				supports: { comments: true },
-			} as unknown as Type;
-
-			const syncedProps = getSyncedPropertiesForPostType( postType );
-
-			expect( syncedProps.has( 'comment_status' ) ).toBe( true );
-		} );
-
-		it( 'adds featured_media when thumbnail is supported', () => {
-			const postType = {
-				slug: 'post',
-				supports: { thumbnail: true },
-			} as unknown as Type;
-
-			const syncedProps = getSyncedPropertiesForPostType( postType );
-
-			expect( syncedProps.has( 'featured_media' ) ).toBe( true );
-		} );
-
-		it( 'adds format when post-formats is supported', () => {
-			const postType = {
-				slug: 'post',
-				supports: { 'post-formats': true },
-			} as unknown as Type;
-
-			const syncedProps = getSyncedPropertiesForPostType( postType );
-
-			expect( syncedProps.has( 'format' ) ).toBe( true );
-		} );
-
-		it( 'adds ping_status when trackbacks is supported', () => {
-			const postType = {
-				slug: 'post',
-				supports: { trackbacks: true },
-			} as unknown as Type;
-
-			const syncedProps = getSyncedPropertiesForPostType( postType );
-
-			expect( syncedProps.has( 'ping_status' ) ).toBe( true );
+			expect( Array.from( syncedProps ) ).toEqual( [ 'date', 'title' ] );
 		} );
 	} );
 

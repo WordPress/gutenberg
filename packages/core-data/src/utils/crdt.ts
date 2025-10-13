@@ -296,58 +296,35 @@ function mergeValue< ValueType = any >(
 }
 
 /**
- * Given a post type definition, return the set of properties that should be
- * synced for that post type.
+ * Given a set of available properties, return the set of properties that should
+ * be synced.
  *
- * @param {Type} postType The post type definition.
- * @return {Set<string>} The set of properties that should be synced.
+ * @param {Set< string >} availableProperties The available properties for an entity.
+ * @return {Set< string> } The set of properties that should be synced.
  */
 export function getSyncedPropertiesForPostType(
-	postType: Type
+	availableProperties: Set< string >
 ): Set< string > {
-	const syncedProperties = new Set< string >( [
+	const allowedProperties = new Set< string >( [
+		'author',
+		'blocks',
+		'comment_status',
 		'date',
+		'excerpt',
+		'featured_media',
+		'format',
+		'ping_status',
+		'slug',
 		'status',
+		'sticky',
 		'tags',
 		'template',
-		'slug',
-		'sticky',
+		'title',
 	] );
 
-	Object.entries( postType.supports || {} ).forEach(
-		( [ feature, isSupported ] ) => {
-			if ( ! isSupported ) {
-				return;
-			}
-
-			switch ( feature ) {
-				case 'author':
-					syncedProperties.add( 'author' );
-					break;
-				case 'comments':
-					syncedProperties.add( 'comment_status' );
-					break;
-				case 'editor':
-					syncedProperties.add( 'blocks' );
-					break;
-				case 'excerpt':
-					syncedProperties.add( 'excerpt' );
-					break;
-				case 'post-formats':
-					syncedProperties.add( 'format' );
-					break;
-				case 'thumbnail':
-					syncedProperties.add( 'featured_media' );
-					break;
-				case 'trackbacks':
-					syncedProperties.add( 'ping_status' );
-					break;
-				case 'title':
-					syncedProperties.add( 'title' );
-					break;
-			}
-		}
+	return new Set(
+		[ ...availableProperties ].filter( ( prop ) =>
+			allowedProperties.has( prop )
+		)
 	);
-
-	return syncedProperties;
 }
