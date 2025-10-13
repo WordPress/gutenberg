@@ -151,7 +151,7 @@ function Spacing() {
 						);
 						updatedSize = { ...updatedSize, size: clampValue };
 					} else if ( key === 'fluid' && value === false ) {
-						// When disabling fluid, convert to preferred value
+						// When disabling fluid, convert to min value
 						updatedSize = {
 							...updatedSize,
 							size: clampValues.min,
