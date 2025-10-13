@@ -94,6 +94,7 @@ const V2_PACKAGES = [
 	'style-engine',
 	'stylelint-config',
 	'sync',
+	'theme',
 	'token-list',
 	'undo-manager',
 	'upload-media',
