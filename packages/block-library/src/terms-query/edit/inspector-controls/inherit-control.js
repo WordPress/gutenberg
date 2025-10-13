@@ -8,13 +8,7 @@ export default function InheritControl( { value, onChange, ...props } ) {
 		<ToggleControl
 			__nextHasNoMarginBottom
 			checked={ value }
-			onChange={ ( inherit ) =>
-				onChange( {
-					parent: inherit ? 'inherit' : false,
-					// When enabling inherit, showNested is not supported.
-					...( inherit ? { showNested: false } : {} ),
-				} )
-			}
+			onChange={ onChange }
 			{ ...props }
 		/>
 	);

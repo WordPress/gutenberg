@@ -34,11 +34,11 @@ export default function TermsQueryInspectorControls( {
 		orderBy,
 		order,
 		hideEmpty,
-		parent = false,
 		showNested,
 		perPage,
+		inherit,
 	} = termQuery;
-	const { termId, templateSlug } = context;
+	const { postId, templateSlug } = context;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const taxonomies = usePublicTaxonomies();
@@ -52,22 +52,24 @@ export default function TermsQueryInspectorControls( {
 		taxonomy === 'post_tag' ? 'tag' : taxonomy
 	);
 
-	// Only display the inherit control if the taxonomy is hierarchical and matches the current template.
+	// Only display the inherit control if the taxonomy is hierarchical and matches the current template or a post is available.
 	const displayInheritControl =
-		isTaxonomyHierarchical && ( isTaxonomyMatchingTemplate || termId );
+		isTaxonomyHierarchical && ( isTaxonomyMatchingTemplate || postId );
 
 	// Only display the show nested control if the taxonomy is hierarchical and not inheriting.
 	const displayShowNestedControl =
 		isTaxonomyHierarchical && termQuery.parent === false;
+
+	const inheritingFromPost = inherit && postId;
 
 	// Labels shared between ToolsPanelItem and its child control.
 	const taxonomyControlLabel = __( 'Taxonomy' );
 	const orderByControlLabel = __( 'Order by' );
 	const emptyTermsControlLabel = __( 'Show empty terms' );
 	const inheritControlLabel = sprintf(
-		/* translators: %s: either "parent block" or "archive" */
+		/* translators: %s: either "post" or "archive" */
 		__( 'Inherit parent term from %s' ),
-		termId ? __( 'parent block' ) : __( 'archive' )
+		postId ? __( 'post' ) : __( 'archive' )
 	);
 	const nestedTermsControlLabel = __( 'Show nested terms' );
 	const maxTermsControlLabel = __( 'Max terms' );
@@ -139,19 +141,32 @@ export default function TermsQueryInspectorControls( {
 							onChange={ ( value ) =>
 								setQuery( { hideEmpty: value } )
 							}
+							disabled={ inheritingFromPost }
 						/>
 					</ToolsPanelItem>
 					{ displayInheritControl && (
 						<ToolsPanelItem
-							hasValue={ () => parent !== false }
+							hasValue={ () => inherit !== false }
 							label={ inheritControlLabel }
-							onDeselect={ () => setQuery( { parent: false } ) }
+							onDeselect={ () => setQuery( { inherit: false } ) }
 							isShownByDefault
 						>
 							<InheritControl
 								label={ inheritControlLabel }
-								value={ parent === 'inherit' }
-								onChange={ setQuery }
+								value={ inherit }
+								onChange={ ( value ) => {
+									setQuery( {
+										inherit: value,
+										// When enabling inherit, showNested is not supported for posts.
+										...( value
+											? { showNested: ! postId }
+											: {} ),
+										// If inheriting from a post, hideEmpty is irrelevant but UI should reflect that no empty terms should be shown.
+										...( value && postId
+											? { hideEmpty: true }
+											: {} ),
+									} );
+								} }
 							/>
 						</ToolsPanelItem>
 					) }
