@@ -8,7 +8,6 @@ import deepMerge from 'deepmerge';
  */
 import { privateApis } from '@wordpress/components';
 import { useCallback, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -67,25 +66,7 @@ export default function Select< Item >( {
 		[ data, field, setValue ]
 	);
 
-	const fieldElements = field?.elements ?? [];
-	const hasEmptyValue = fieldElements.some(
-		( { value: elementValue } ) => elementValue === ''
-	);
-
-	const elements =
-		hasEmptyValue || isMultiple
-			? fieldElements
-			: [
-					/*
-					 * Value can be undefined when:
-					 *
-					 * - the field is not required
-					 * - in bulk editing
-					 *
-					 */
-					{ label: __( 'Select item' ), value: '' },
-					...fieldElements,
-			  ];
+	const elements = field?.elements ?? [];
 
 	return (
 		<ValidatedSelectControl

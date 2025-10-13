@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/dom",
-	"version": "4.31.0",
+	"version": "4.32.0",
 	"description": "DOM utilities module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -25,12 +25,19 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.js",
+			"require": "./build/index.js"
+		},
+		"./package.json": "./package.json"
+	},
 	"react-native": "src/index",
 	"wpScript": true,
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "7.25.7",
 		"@wordpress/deprecated": "file:../deprecated"
 	},
 	"publishConfig": {

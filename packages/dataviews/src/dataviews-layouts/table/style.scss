@@ -140,6 +140,10 @@
 
 		tr {
 			border: 0;
+			// Header select all checkbox should always be visible.
+			.components-checkbox-control__input.components-checkbox-control__input {
+				opacity: 1;
+			}
 		}
 		th {
 			background-color: $white;

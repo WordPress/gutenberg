@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/z-index" as *;
+
 .block-editor-skip-to-selected-block {
 	position: absolute;
 	top: -9999em;

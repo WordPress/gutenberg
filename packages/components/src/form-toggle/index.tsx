@@ -27,6 +27,7 @@ function UnforwardedFormToggle(
 		id,
 		disabled,
 		onChange = noop,
+		onClick,
 		...additionalProps
 	} = props;
 	const wrapperClasses = clsx( 'components-form-toggle', className, {
@@ -43,6 +44,12 @@ function UnforwardedFormToggle(
 				checked={ checked }
 				onChange={ onChange }
 				disabled={ disabled }
+				onClick={ ( event ) => {
+					// Compat code for Safari to ensure that the toggle is focused when clicked.
+					event.currentTarget.focus();
+
+					onClick?.( event );
+				} }
 				{ ...additionalProps }
 				ref={ ref }
 			/>

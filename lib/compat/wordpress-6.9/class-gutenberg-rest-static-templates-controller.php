@@ -78,47 +78,8 @@ class Gutenberg_REST_Static_Templates_Controller extends WP_REST_Templates_Contr
 		if ( isset( $request['post_type'] ) ) {
 			$query['post_type'] = $request['post_type'];
 		}
-		$template_files = _get_block_templates_files( 'wp_template', $query );
-		$query_result   = array();
-		foreach ( $template_files as $template_file ) {
-			$query_result[] = _build_block_template_result_from_file( $template_file, 'wp_template' );
-		}
-
-		// Add templates registered in the template registry. Filtering out the ones which have a theme file.
-		$registered_templates          = WP_Block_Templates_Registry::get_instance()->get_by_query( $query );
-		$matching_registered_templates = array_filter(
-			$registered_templates,
-			function ( $registered_template ) use ( $template_files ) {
-				foreach ( $template_files as $template_file ) {
-					if ( $template_file['slug'] === $registered_template->slug ) {
-						return false;
-					}
-				}
-				return true;
-			}
-		);
-
-		$query_result = array_merge( $query_result, $matching_registered_templates );
-
-		/**
-		 * Filters the array of queried block templates array after they've been fetched.
-		 *
-		 * @since 5.9.0
-		 *
-		 * @param WP_Block_Template[] $query_result Array of found block templates.
-		 * @param array               $query {
-		 *     Arguments to retrieve templates. All arguments are optional.
-		 *
-		 *     @type string[] $slug__in  List of slugs to include.
-		 *     @type int      $wp_id     Post ID of customized template.
-		 *     @type string   $area      A 'wp_template_part_area' taxonomy value to filter by (for 'wp_template_part' template type only).
-		 *     @type string   $post_type Post type to get the templates for.
-		 * }
-		 * @param string              $template_type wp_template or wp_template_part.
-		 */
-		$query_result = apply_filters( 'get_block_templates', $query_result, $query, 'wp_template' );
-
-		$templates = array();
+		$query_result = gutenberg_get_registered_block_templates( $query );
+		$templates    = array();
 		foreach ( $query_result as $template ) {
 			$item               = $this->prepare_item_for_response( $template, $request );
 			$item->data['type'] = 'wp_registered_template';

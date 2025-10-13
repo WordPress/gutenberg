@@ -36,6 +36,7 @@ const stories = [
 	'../packages/icons/src/**/stories/*.story.@(js|tsx|mdx)',
 	'../packages/edit-site/src/**/stories/*.story.@(js|tsx|mdx)',
 	'../packages/dataviews/src/**/stories/*.story.@(js|tsx|mdx)',
+	'../packages/fields/src/**/stories/*.story.@(js|tsx|mdx)',
 ].filter( Boolean );
 
 module.exports = {
@@ -74,6 +75,10 @@ module.exports = {
 				...config.module,
 				rules: [
 					...config.module.rules,
+					{
+						test: /\.md$/,
+						type: 'asset/source',
+					},
 					{
 						test: /\/stories\/.+\.story\.(j|t)sx?$/,
 						use: [

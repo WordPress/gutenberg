@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/style-engine",
-	"version": "2.31.0",
+	"version": "2.32.0",
 	"description": "A suite of parsers and compilers for WordPress styles.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -26,12 +26,19 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.js",
+			"require": "./build/index.js"
+		},
+		"./package.json": "./package.json"
+	},
 	"react-native": "src/index",
 	"wpScript": true,
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "7.25.7",
 		"change-case": "^4.1.2"
 	},
 	"publishConfig": {

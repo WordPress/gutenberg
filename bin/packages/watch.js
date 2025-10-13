@@ -64,7 +64,8 @@ function isSourceFile( filename ) {
 		.replace( /\\/g, '/' );
 
 	return (
-		/\/src\/.+\.(js|json|scss|ts|tsx)$/.test( relativePath ) &&
+		// Include .svg for automatic generation of icons in packages/icons
+		/\/src\/.+\.(js|json|scss|ts|tsx|svg)$/.test( relativePath ) &&
 		! [
 			/\/(benchmark|__mocks__|__tests__|test|storybook|stories|e2e-test-utils-playwright)\/.+/,
 			/.\.(spec|test)\.js$/,
@@ -102,6 +103,18 @@ function isWatchableFile( filename, skip ) {
 	// and passes the directories to this filter callback instead.
 
 	if ( isDirectory( filename ) ) {
+		// Exclude build output directories and dependencies to reduce file descriptor usage
+		const basename = path.basename( filename );
+		if (
+			basename === 'node_modules' ||
+			basename === 'build' ||
+			basename === 'build-module' ||
+			basename === 'build-style' ||
+			basename === 'build-types' ||
+			basename === '.git'
+		) {
+			return skip;
+		}
 		return true;
 	}
 

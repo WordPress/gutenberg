@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useEntityProp, store as coreStore } from '@wordpress/core-data';
+import { store as coreStore } from '@wordpress/core-data';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import {
 	dateI18n,
@@ -32,7 +32,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __, _x, sprintf } from '@wordpress/i18n';
-import { edit } from '@wordpress/icons';
+import { pencil } from '@wordpress/icons';
 import { DOWN } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 
@@ -81,22 +81,22 @@ export default function PostDateEdit( {
 
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const dateSettings = getDateSettings();
-	const [ siteFormat = dateSettings.formats.date ] = useEntityProp(
-		'root',
-		'site',
-		'date_format'
-	);
-	const [ siteTimeFormat = dateSettings.formats.time ] = useEntityProp(
-		'root',
-		'site',
-		'time_format'
-	);
 
-	const postType = useSelect(
-		( select ) =>
-			postTypeSlug
-				? select( coreStore ).getPostType( postTypeSlug )
-				: null,
+	const {
+		postType,
+		siteFormat = dateSettings.formats.date,
+		siteTimeFormat = dateSettings.formats.time,
+	} = useSelect(
+		( select ) => {
+			const { getPostType, getEntityRecord } = select( coreStore );
+			const siteSettings = getEntityRecord( 'root', 'site' );
+
+			return {
+				siteFormat: siteSettings?.date_format,
+				siteTimeFormat: siteSettings?.time_format,
+				postType: postTypeSlug ? getPostType( postTypeSlug ) : null,
+			};
+		},
 		[ postTypeSlug ]
 	);
 
@@ -174,7 +174,7 @@ export default function PostDateEdit( {
 										return (
 											<ToolbarButton
 												aria-expanded={ isOpen }
-												icon={ edit }
+												icon={ pencil }
 												title={ __( 'Change Date' ) }
 												onClick={ onToggle }
 												onKeyDown={ openOnArrowDown }

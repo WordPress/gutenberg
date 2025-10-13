@@ -15,6 +15,7 @@ import apiFetch from '@wordpress/api-fetch';
  */
 import { STORE_NAME } from './name';
 import { additionalEntityConfigLoaders, DEFAULT_ENTITY_KEY } from './entities';
+import { syncManager } from './sync';
 import {
 	forwardResolver,
 	getNormalizedCommaSeparable,
@@ -23,7 +24,6 @@ import {
 	ALLOWED_RESOURCE_ACTIONS,
 	RECEIVE_INTERMEDIATE_RESULTS,
 } from './utils';
-import { getSyncProvider } from './sync';
 import { fetchBlockPatterns } from './fetch';
 
 /**
@@ -93,122 +93,131 @@ export const getEntityRecord =
 		);
 
 		try {
-			// Entity supports configs,
-			// use the sync algorithm instead of the old fetch behavior.
+			if ( query !== undefined && query._fields ) {
+				// If requesting specific fields, items and query association to said
+				// records are stored by ID reference. Thus, fields must always include
+				// the ID.
+				query = {
+					...query,
+					_fields: [
+						...new Set( [
+							...( getNormalizedCommaSeparable( query._fields ) ||
+								[] ),
+							entityConfig.key || DEFAULT_ENTITY_KEY,
+						] ),
+					].join(),
+				};
+			}
+
+			if ( query !== undefined && query._fields ) {
+				// The resolution cache won't consider query as reusable based on the
+				// fields, so it's tested here, prior to initiating the REST request,
+				// and without causing `getEntityRecord` resolution to occur.
+				const hasRecord = select.hasEntityRecord(
+					kind,
+					name,
+					key,
+					query
+				);
+				if ( hasRecord ) {
+					return;
+				}
+			}
+
+			const path = addQueryArgs(
+				entityConfig.baseURL + ( key ? '/' + key : '' ),
+				{
+					...entityConfig.baseURLParams,
+					...query,
+				}
+			);
+			const response = await apiFetch( { path, parse: false } );
+			const record = await response.json();
+			const permissions = getUserPermissionsFromAllowHeader(
+				response.headers?.get( 'allow' )
+			);
+
+			const canUserResolutionsArgs = [];
+			const receiveUserPermissionArgs = {};
+			for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
+				receiveUserPermissionArgs[
+					getUserPermissionCacheKey( action, {
+						kind,
+						name,
+						id: key,
+					} )
+				] = permissions[ action ];
+
+				canUserResolutionsArgs.push( [
+					action,
+					{ kind, name, id: key },
+				] );
+			}
+
+			// Entity supports syncing.
 			if (
 				window.__experimentalEnableSync &&
 				entityConfig.syncConfig &&
 				! query
 			) {
 				if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-					const objectId = entityConfig.getSyncObjectId( key );
+					const objectType = `${ kind }/${ name }`;
+					const objectId = key;
 
-					// Loads the persisted document.
-					await getSyncProvider().bootstrap(
-						entityConfig.syncObjectType,
+					// Use the new transient "read/write" config to compute transients for
+					// the sync manager. Otherwise these transients are not available
+					// if / until the record is edited. Use a copy of the record so that
+					// it does not change the behavior outside this experimental flag.
+					const recordWithTransients = { ...record };
+					Object.entries( entityConfig.transientEdits ?? {} )
+						.filter(
+							( [ propName, transientConfig ] ) =>
+								undefined ===
+									recordWithTransients[ propName ] &&
+								transientConfig &&
+								'object' === typeof transientConfig &&
+								'read' in transientConfig &&
+								'function' === typeof transientConfig.read
+						)
+						.forEach( ( [ propName, transientConfig ] ) => {
+							recordWithTransients[ propName ] =
+								transientConfig.read( recordWithTransients );
+						} );
+
+					// Load the entity record for syncing.
+					await syncManager.load(
+						entityConfig.syncConfig,
+						objectType,
 						objectId,
-						( record ) => {
-							dispatch.receiveEntityRecords(
-								kind,
-								name,
-								record,
-								query
-							);
+						recordWithTransients,
+						{
+							// Handle edits sourced from the sync manager.
+							editRecord: ( edits ) => {
+								if ( ! Object.keys( edits ).length ) {
+									return;
+								}
+
+								dispatch( {
+									type: 'EDIT_ENTITY_RECORD',
+									kind,
+									name,
+									recordId: key,
+									edits,
+									meta: {
+										undo: undefined,
+									},
+								} );
+							},
 						}
 					);
-
-					// Bootstraps the edited document as well (and load from peers).
-					await getSyncProvider().bootstrap(
-						entityConfig.syncObjectType + '--edit',
-						objectId,
-						( record ) => {
-							dispatch( {
-								type: 'EDIT_ENTITY_RECORD',
-								kind,
-								name,
-								recordId: key,
-								edits: record,
-								meta: {
-									undo: undefined,
-								},
-							} );
-						}
-					);
 				}
-			} else {
-				if ( query !== undefined && query._fields ) {
-					// If requesting specific fields, items and query association to said
-					// records are stored by ID reference. Thus, fields must always include
-					// the ID.
-					query = {
-						...query,
-						_fields: [
-							...new Set( [
-								...( getNormalizedCommaSeparable(
-									query._fields
-								) || [] ),
-								entityConfig.key || DEFAULT_ENTITY_KEY,
-							] ),
-						].join(),
-					};
-				}
-
-				if ( query !== undefined && query._fields ) {
-					// The resolution cache won't consider query as reusable based on the
-					// fields, so it's tested here, prior to initiating the REST request,
-					// and without causing `getEntityRecord` resolution to occur.
-					const hasRecord = select.hasEntityRecord(
-						kind,
-						name,
-						key,
-						query
-					);
-					if ( hasRecord ) {
-						return;
-					}
-				}
-
-				const path = addQueryArgs(
-					entityConfig.baseURL + ( key ? '/' + key : '' ),
-					{
-						...entityConfig.baseURLParams,
-						...query,
-					}
-				);
-				const response = await apiFetch( { path, parse: false } );
-				const record = await response.json();
-				const permissions = getUserPermissionsFromAllowHeader(
-					response.headers?.get( 'allow' )
-				);
-
-				const canUserResolutionsArgs = [];
-				const receiveUserPermissionArgs = {};
-				for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
-					receiveUserPermissionArgs[
-						getUserPermissionCacheKey( action, {
-							kind,
-							name,
-							id: key,
-						} )
-					] = permissions[ action ];
-
-					canUserResolutionsArgs.push( [
-						action,
-						{ kind, name, id: key },
-					] );
-				}
-
-				registry.batch( () => {
-					dispatch.receiveEntityRecords( kind, name, record, query );
-					dispatch.receiveUserPermissions(
-						receiveUserPermissionArgs
-					);
-					dispatch.finishResolutions(
-						'canUser',
-						canUserResolutionsArgs
-					);
-				} );
 			}
+
+			registry.batch( () => {
+				dispatch.receiveEntityRecords( kind, name, record, query );
+				dispatch.receiveUserPermissions( receiveUserPermissionArgs );
+				dispatch.finishResolutions( 'canUser', canUserResolutionsArgs );
+			} );
 		} finally {
 			dispatch.__unstableReleaseStoreLock( lock );
 		}

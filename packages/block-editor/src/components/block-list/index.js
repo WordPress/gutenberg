@@ -47,12 +47,16 @@ const pendingBlockVisibilityUpdatesPerRegistry = new WeakMap();
 function Root( { className, ...settings } ) {
 	const { isOutlineMode, isFocusMode, temporarilyEditingAsBlocks } =
 		useSelect( ( select ) => {
-			const { getSettings, getTemporarilyEditingAsBlocks, isTyping } =
-				unlock( select( blockEditorStore ) );
+			const {
+				getSettings,
+				getTemporarilyEditingAsBlocks,
+				isTyping,
+				hasBlockSpotlight,
+			} = unlock( select( blockEditorStore ) );
 			const { outlineMode, focusMode } = getSettings();
 			return {
 				isOutlineMode: outlineMode && ! isTyping(),
-				isFocusMode: focusMode,
+				isFocusMode: focusMode || hasBlockSpotlight(),
 				temporarilyEditingAsBlocks: getTemporarilyEditingAsBlocks(),
 			};
 		}, [] );
