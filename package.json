@@ -103,6 +103,7 @@
 		"deep-freeze": "0.0.1",
 		"equivalent-key-map": "0.2.2",
 		"esbuild": "0.25.10",
+		"esbuild-plugin-babel": "0.2.3",
 		"esbuild-sass-plugin": "3.3.1",
 		"escape-html": "1.0.3",
 		"eslint-import-resolver-node": "0.3.4",

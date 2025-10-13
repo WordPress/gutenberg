@@ -104,6 +104,17 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_Test_REST_TestCase {
 		$this->assertErrorResponse( 'rest_comment_not_supported_post_type', $response, 403 );
 	}
 
+	public function test_create_block_comment_require_login() {
+		wp_set_current_user( 0 );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->set_param( 'post', self::$post_id );
+		$request->set_param( 'type', 'block_comment' );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_comment_login_required', $response, 401 );
+	}
+
 	public function test_cannot_create_block_comment_without_post_type_support() {
 		register_post_type(
 			'no-block-comments',
@@ -124,7 +135,7 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_Test_REST_TestCase {
 			'author_url'   => 'https://en.wikipedia.org/wiki/Herman_Melville',
 			'content'      => 'Call me Ishmael.',
 			'author'       => self::$user_ids['administrator'],
-			'comment_type' => 'block_comment',
+			'type'         => 'block_comment',
 		);
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
@@ -148,7 +159,7 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_Test_REST_TestCase {
 			'author_url'   => 'https://en.wikipedia.org/wiki/Herman_Melville',
 			'content'      => 'Call me Ishmael.',
 			'author'       => self::$user_ids['editor'],
-			'comment_type' => 'block_comment',
+			'type'         => 'block_comment',
 		);
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
@@ -159,6 +170,78 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_Test_REST_TestCase {
 		$data        = $response->get_data();
 		$new_comment = get_comment( $data['id'] );
 		$this->assertSame( 'Call me Ishmael.', $new_comment->comment_content );
+		$this->assertSame( 'block_comment', $new_comment->comment_type );
+	}
+
+	public function test_create_block_comment_status() {
+		wp_set_current_user( self::$user_ids['author'] );
+		$post_id = $this->factory->post->create( array( 'post_author' => self::$user_ids['author'] ) );
+
+		$params = array(
+			'post'         => $post_id,
+			'author_name'  => 'Ishmael',
+			'author_email' => 'herman-melville@earthlink.net',
+			'author_url'   => 'https://en.wikipedia.org/wiki/Herman_Melville',
+			'content'      => 'Comic Book Guy',
+			'author'       => self::$user_ids['author'],
+			'type'         => 'block_comment',
+			'status'       => 'hold',
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+
+		$response    = rest_get_server()->dispatch( $request );
+		$data        = $response->get_data();
+		$new_comment = get_comment( $data['id'] );
+
+		$this->assertSame( '0', $new_comment->comment_approved );
+		$this->assertSame( 'block_comment', $new_comment->comment_type );
+	}
+
+	public function test_cannot_create_with_non_valid_comment_type() {
+		wp_set_current_user( self::$user_ids['administrator'] );
+
+		$params = array(
+			'author_name'  => 'Ishmael',
+			'author_email' => 'herman-melville@earthlink.net',
+			'author_url'   => 'https://en.wikipedia.org/wiki/Herman_Melville',
+			'content'      => 'Comic Book Guy',
+			'author'       => self::$user_ids['administrator'],
+			'type'         => 'review',
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
+	}
+
+	public function test_create_assigns_default_type() {
+		wp_set_current_user( self::$user_ids['editor'] );
+		$post_id = $this->factory->post->create();
+
+		$params = array(
+			'post'         => $post_id,
+			'author_name'  => 'Ishmael',
+			'author_email' => 'herman-melville@earthlink.net',
+			'author_url'   => 'https://en.wikipedia.org/wiki/Herman_Melville',
+			'content'      => 'Comic Book Guy',
+			'author'       => self::$user_ids['editor'],
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+
+		$response    = rest_get_server()->dispatch( $request );
+		$data        = $response->get_data();
+		$new_comment = get_comment( $data['id'] );
+
+		$this->assertSame( 'comment', $new_comment->comment_type );
 	}
 
 	/**

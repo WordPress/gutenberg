@@ -148,7 +148,8 @@
 }
 
 // Visually hidden until focused (skip link pattern)
-.editor-collab-sidebar-panel__skip-link {
+.editor-collab-sidebar-panel__skip-to-comment,
+.editor-collab-sidebar-panel__skip-to-block {
 	position: absolute;
 	top: -9999px;
 	right: -9999px;
@@ -158,12 +159,18 @@
 	z-index: -1;
 
 	&:focus {
-		top: $grid-unit-10;
-		right: $grid-unit-10;
 		overflow: visible;
 		clip-path: none;
 		z-index: 1;
+		right: $grid-unit-10;
 	}
+}
+.editor-collab-sidebar-panel__skip-to-comment:focus {
+	top: $grid-unit-10;
+}
+.editor-collab-sidebar-panel__skip-to-block:focus {
+	top: auto;
+	bottom: $grid-unit-10;
 }
 
 // Comment avatar indicators.

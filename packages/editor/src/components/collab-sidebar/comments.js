@@ -81,7 +81,8 @@ export function Comments( {
 			selectedBlockClientId: clientId,
 		};
 	}, [] );
-	const { selectBlock } = useDispatch( blockEditorStore );
+
+	const relatedBlockElement = useBlockElement( selectedBlockClientId );
 
 	const blockIds = useSelect( ( select ) => {
 		const { getBlockOrder } = select( blockEditorStore );
@@ -106,7 +107,7 @@ export function Comments( {
 			setSelectedThread( null );
 			setShowCommentBoard( false );
 			// Focus the parent block instead of just scrolling into view.
-			selectBlock( selectedBlockClientId );
+			relatedBlockElement?.focus();
 		}
 	};
 
@@ -195,26 +196,35 @@ export function Comments( {
 		);
 	}
 
-	return threads.map( ( thread ) => (
-		<Thread
-			key={ thread.id }
-			thread={ thread }
-			onAddReply={ onAddReply }
-			onCommentDelete={ handleDelete }
-			onEditComment={ onEditComment }
-			isSelected={ selectedThread === thread.id }
-			setSelectedThread={ setSelectedThread }
-			setShowCommentBoard={ setShowCommentBoard }
-			commentSidebarRef={ commentSidebarRef }
-			reflowComments={ reflowComments }
-			isFloating={ isFloating }
-			calculatedOffset={ boardOffsets ? boardOffsets[ thread.id ] : 0 }
-			setHeights={ setHeights }
-			setBlockRef={ setBlockRef }
-			selectedThread={ selectedThread }
-			commentLastUpdated={ commentLastUpdated }
-		/>
-	) );
+	return (
+		<VStack spacing="3">
+			<Text as="p" variant="muted">
+				{ __( 'Only logged in users can see Notes' ) }
+			</Text>
+			{ threads.map( ( thread ) => (
+				<Thread
+					key={ thread.id }
+					thread={ thread }
+					onAddReply={ onAddReply }
+					onCommentDelete={ handleDelete }
+					onEditComment={ onEditComment }
+					isSelected={ selectedThread === thread.id }
+					setSelectedThread={ setSelectedThread }
+					setShowCommentBoard={ setShowCommentBoard }
+					commentSidebarRef={ commentSidebarRef }
+					reflowComments={ reflowComments }
+					isFloating={ isFloating }
+					calculatedOffset={
+						boardOffsets ? boardOffsets[ thread.id ] : 0
+					}
+					setHeights={ setHeights }
+					setBlockRef={ setBlockRef }
+					selectedThread={ selectedThread }
+					commentLastUpdated={ commentLastUpdated }
+				/>
+			) ) }
+		</VStack>
+	);
 }
 
 function Thread( {
@@ -336,7 +346,7 @@ function Thread( {
 			style={ isFloating ? { top: y } : undefined }
 		>
 			<Button
-				className="editor-collab-sidebar-panel__skip-link"
+				className="editor-collab-sidebar-panel__skip-to-comment"
 				variant="secondary"
 				size="compact"
 				onClick={ () => {
@@ -347,7 +357,7 @@ function Thread( {
 					);
 				} }
 			>
-				{ __( 'Add New Comment' ) }
+				{ __( 'Add new comment' ) }
 			</Button>
 			{ ! relatedBlockElement && (
 				<Text as="p" weight={ 500 } variant="muted">
@@ -472,6 +482,17 @@ function Thread( {
 					</VStack>
 				</VStack>
 			) }
+			<Button
+				className="editor-collab-sidebar-panel__skip-to-block"
+				variant="secondary"
+				size="compact"
+				onClick={ ( event ) => {
+					event.stopPropagation();
+					relatedBlockElement?.focus();
+				} }
+			>
+				{ __( 'Back to block' ) }
+			</Button>
 		</VStack>
 	);
 }

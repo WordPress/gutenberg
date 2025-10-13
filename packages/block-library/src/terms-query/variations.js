@@ -16,40 +16,6 @@ export const titleExcerpt = (
 	</SVG>
 );
 
-const termName = [
-	'core/paragraph',
-	{
-		metadata: {
-			name: __( 'Term Name' ),
-			bindings: {
-				content: {
-					source: 'core/term-data',
-					args: {
-						key: 'name',
-					},
-				},
-			},
-		},
-	},
-];
-const termCount = [
-	'core/paragraph',
-	{
-		placeholder: __( '(count)' ),
-		metadata: {
-			name: __( 'Term Count' ),
-			bindings: {
-				content: {
-					source: 'core/term-data',
-					args: {
-						key: 'count',
-					},
-				},
-			},
-		},
-	},
-];
-
 const variations = [
 	{
 		name: 'title',
@@ -58,7 +24,7 @@ const variations = [
 		attributes: {},
 		icon: titleDate,
 		scope: [ 'block' ],
-		innerBlocks: [ [ 'core/term-template', {}, [ termName ] ] ],
+		innerBlocks: [ [ 'core/term-template', {}, [ [ 'core/term-name' ] ] ] ],
 	},
 	{
 		name: 'title-count',
@@ -77,7 +43,7 @@ const variations = [
 					[
 						'core/group',
 						{ layout: { type: 'flex', flexWrap: 'nowrap' } },
-						[ termName, termCount ],
+						[ [ 'core/term-name' ], [ 'core/term-count' ] ],
 					],
 				],
 			],

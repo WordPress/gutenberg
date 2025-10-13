@@ -32,7 +32,8 @@
 		},
 		"./README.md": "./README.md",
 		"./CONTRIBUTING.md": "./CONTRIBUTING.md",
-		"./package.json": "./package.json"
+		"./package.json": "./package.json",
+		"./build-style/": "./build-style/"
 	},
 	"react-native": "src/index",
 	"wpScript": true,

@@ -1,3 +1,8 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
 // This remove the margins set here: https://github.com/WordPress/gutenberg/blob/17e5c2d870d84fb6de48dcd5bc3c38cd0c0fb0d0/packages/block-library/src/editor.scss#L56
 // It removes the margins around blocks when a BlockPreview is rendered in the block style selector
 .block-editor-block-styles .block-editor-block-list__block {
