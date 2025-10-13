@@ -43,9 +43,6 @@ export const IntersectionObserver = createContext();
 IntersectionObserver.displayName = 'IntersectionObserverContext';
 
 const pendingBlockVisibilityUpdatesPerRegistry = new WeakMap();
-const blockVisibilityDebounceOptions = {
-	trailing: true,
-};
 
 function Root( { className, ...settings } ) {
 	const { isOutlineMode, isFocusMode, temporarilyEditingAsBlocks } =
@@ -77,7 +74,9 @@ function Root( { className, ...settings } ) {
 			setBlockVisibility( updates );
 		}, [ registry ] ),
 		300,
-		blockVisibilityDebounceOptions
+		{
+			trailing: true,
+		}
 	);
 	const intersectionObserver = useMemo( () => {
 		const { IntersectionObserver: Observer } = window;
