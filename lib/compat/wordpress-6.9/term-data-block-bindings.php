@@ -74,7 +74,8 @@ function gutenberg_block_bindings_term_data_get_value( array $source_args, $bloc
 
 		case 'link':
 			// Only taxonomy entities are supported by Term Data.
-			return esc_url( get_term_link( $term ) );
+			$term_link = get_term_link( $term );
+			return is_wp_error( $term_link ) ? null : esc_url( $term_link );
 
 		case 'slug':
 			return esc_html( $term->slug );

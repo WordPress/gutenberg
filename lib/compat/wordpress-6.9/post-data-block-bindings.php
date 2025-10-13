@@ -68,7 +68,7 @@ function gutenberg_block_bindings_post_data_get_value( array $source_args, $bloc
 
 	if ( 'link' === $source_args['key'] ) {
 		$permalink = get_permalink( $post_id );
-		return is_wp_error( $permalink ) ? null : esc_url( $permalink );
+		return false === $permalink ? null : esc_url( $permalink );
 	}
 }
 
