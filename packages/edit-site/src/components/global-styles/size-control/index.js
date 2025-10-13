@@ -25,21 +25,47 @@ function SizeControl( {
 	...props
 } ) {
 	const { baseControlProps } = useBaseControlProps( props );
-	const { value, onChange, fallbackValue, disabled, label } = props;
+	const { value, onChange, fallbackValue, disabled, label, max } = props;
 
 	const units = useCustomUnits( {
 		availableUnits: DEFAULT_UNITS,
 	} );
 
+	const maxRelativeValue = 10;
+	const maxNonRelativeValue = 100;
+
+	// Helper function to check if a unit is relative
+	const isUnitRelative = ( unit ) =>
+		!! unit && [ 'em', 'rem', 'vw', 'vh' ].includes( unit );
+
 	const [ valueQuantity, valueUnit = 'px' ] =
 		parseQuantityAndUnitFromRawValue( value, units );
 
-	const isValueUnitRelative =
-		!! valueUnit && [ 'em', 'rem', 'vw', 'vh' ].includes( valueUnit );
+	const isValueUnitRelative = isUnitRelative( valueUnit );
+
+	// Determine the max value for the range control
+	const getMaxValue = () => {
+		// For relative units, always use 10
+		if ( isValueUnitRelative ) {
+			return maxRelativeValue;
+		}
+		// For non-relative units, use custom max from props or default 500
+		return max !== undefined ? max : maxNonRelativeValue;
+	};
 
 	// Receives the new value from the UnitControl component as a string containing the value and unit.
 	const handleUnitControlChange = ( newValue ) => {
-		onChange( newValue );
+		const [ newQuantity, newUnit = 'px' ] =
+			parseQuantityAndUnitFromRawValue( newValue, units );
+
+		const isNewUnitRelative = isUnitRelative( newUnit );
+
+		// If switching to a relative unit and the value exceeds the max, clamp it
+		if ( isNewUnitRelative && newQuantity > maxRelativeValue ) {
+			onChange( maxRelativeValue + newUnit );
+		} else {
+			onChange( newValue );
+		}
 	};
 
 	// Receives the new value from the RangeControl component as a number.
@@ -75,7 +101,7 @@ function SizeControl( {
 							withInputField={ false }
 							onChange={ handleRangeControlChange }
 							min={ 0 }
-							max={ isValueUnitRelative ? 10 : 100 }
+							max={ getMaxValue() }
 							step={ isValueUnitRelative ? 0.1 : 1 }
 							disabled={ disabled }
 						/>

@@ -35,6 +35,8 @@ import ScreenTypography from './screen-typography';
 import ScreenTypographyElement from './screen-typography-element';
 import FontSize from './font-sizes/font-size';
 import FontSizes from './font-sizes/font-sizes';
+import Spacing from './spacing/spacing';
+import Spacings from './spacing/spacings';
 import ScreenColors from './screen-colors';
 import ScreenColorPalette from './screen-color-palette';
 import ScreenBackground from './screen-background';
@@ -401,6 +403,14 @@ function GlobalStylesUI( { path, onPathChange } ) {
 
 			<GlobalStylesNavigationScreen path="/layout">
 				<ScreenLayout />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path="/layout/spacing">
+				<Spacings />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path="/layout/spacing/:origin/:slug">
+				<Spacing />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path="/css">

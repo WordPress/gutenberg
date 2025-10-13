@@ -228,6 +228,36 @@
 	}
 }
 
+// Spacing preview styles
+.edit-site-spacing-preview {
+	padding: $grid-unit-40;
+	min-height: 100px;
+	margin-bottom: $grid-unit-20;
+	background: $gray-100;
+	border-radius: $radius-small;
+	text-align: center;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+	overflow: hidden;
+}
+
+.edit-site-spacing-preview__box {
+	background-color: var(--wp-admin-theme-color);
+	border-radius: $radius-small;
+	min-width: $grid-unit-05;
+	min-height: $grid-unit-05;
+}
+
+.edit-site-spacing-preview__value {
+	position: absolute;
+	bottom: $grid-unit-10;
+	right: $grid-unit-15;
+	font-size: $font-size-small;
+	color: $gray-700;
+}
+
 .edit-site-global-styles-sidebar__navigator-provider {
 	height: 100%;
 }
