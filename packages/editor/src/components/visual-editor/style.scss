@@ -7,18 +7,11 @@
 	// like the "focused entities".
 	background-color: var(--wp-editor-canvas-background);
 
-	&::before {
-		content: "";
-		position: absolute;
-		inset: 0;
-		background-color: $white;
-	}
-
 	// This overrides the iframe background since it's applied again here
 	// It also prevents some style glitches if `editor-visual-editor`
 	// like when hovering the preview in the site editor.
 	iframe[name="editor-canvas"] {
-		background-color: transparent;
+		background-color: $white;
 	}
 
 	// Centralize the editor horizontally (flex-direction is column).
