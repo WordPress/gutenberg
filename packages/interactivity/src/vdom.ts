@@ -198,6 +198,23 @@ export function toVdom( root: Node ): ComponentChild {
 				} );
 				return obj;
 			}, {} );
+
+			// Sort directive arrays to ensure stable ordering across browsers.
+			// Put nulls first, then sort by suffix and finally by uniqueIds.
+			for ( const prefix in props.__directives ) {
+				props.__directives[ prefix ].sort(
+					( a: DirectiveEntry, b: DirectiveEntry ) => {
+						const aSuffix = a.suffix ?? '';
+						const bSuffix = b.suffix ?? '';
+						if ( aSuffix !== bSuffix ) {
+							return aSuffix < bSuffix ? -1 : 1;
+						}
+						const aId = a.uniqueId ?? '';
+						const bId = b.uniqueId ?? '';
+						return +( aId > bId ) - +( aId < bId );
+					}
+				);
+			}
 		}
 
 		if ( localName === 'template' ) {
