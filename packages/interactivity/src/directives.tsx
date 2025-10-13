@@ -269,7 +269,7 @@ export const routerRegions = new Map<
 >();
 
 export default () => {
-	// data-wp-context
+	// data-wp-context---[unique-id]
 	directive(
 		'context',
 		( {
@@ -354,7 +354,7 @@ export default () => {
 		{ priority: 5 }
 	);
 
-	// data-wp-watch--[name]
+	// data-wp-watch---[unique-id]
 	directive( 'watch', ( { directives: { watch }, evaluate } ) => {
 		watch.forEach( ( entry ) => {
 			if ( globalThis.SCRIPT_DEBUG ) {
@@ -395,7 +395,7 @@ export default () => {
 		} );
 	} );
 
-	// data-wp-init--[name]
+	// data-wp-init---[unique-id]
 	directive( 'init', ( { directives: { init }, evaluate } ) => {
 		init.forEach( ( entry ) => {
 			if ( globalThis.SCRIPT_DEBUG ) {
@@ -437,7 +437,7 @@ export default () => {
 		} );
 	} );
 
-	// data-wp-on--[event]
+	// data-wp-on--[event]---[unique-id]
 	directive( 'on', ( { directives: { on }, element, evaluate } ) => {
 		const events = new Map< string, Set< DirectiveEntry > >();
 		on.filter( isNonDefaultDirectiveSuffix ).forEach( ( entry ) => {
@@ -499,7 +499,7 @@ export default () => {
 		} );
 	} );
 
-	// data-wp-on-async--[event]
+	// data-wp-on-async--[event] (deprecated)
 	directive(
 		'on-async',
 		( { directives: { 'on-async': onAsync }, element, evaluate } ) => {
@@ -535,14 +535,14 @@ export default () => {
 		}
 	);
 
-	// data-wp-on-window--[event]
+	// data-wp-on-window--[event]---[unique-id]
 	directive( 'on-window', getGlobalEventDirective( 'window' ) );
-	// data-wp-on-document--[event]
+	// data-wp-on-document--[event]---[unique-id]
 	directive( 'on-document', getGlobalEventDirective( 'document' ) );
 
-	// data-wp-on-async-window--[event]
+	// data-wp-on-async-window--[event] (deprecated)
 	directive( 'on-async-window', getGlobalAsyncEventDirective( 'window' ) );
-	// data-wp-on-async-document--[event]
+	// data-wp-on-async-document--[event] (deprecated)
 	directive(
 		'on-async-document',
 		getGlobalAsyncEventDirective( 'document' )
@@ -725,7 +725,7 @@ export default () => {
 		} );
 	} );
 
-	// data-wp-ignore
+	// data-wp-ignore (deprecated)
 	directive(
 		'ignore',
 		( {
@@ -736,10 +736,11 @@ export default () => {
 		}: {
 			element: any;
 		} ) => {
-			// Shown deprecation warning
-			warn(
-				'The data-wp-ignore directive is deprecated and will be removed in version 7.0.'
-			);
+			if ( globalThis.SCRIPT_DEBUG ) {
+				warn(
+					'The data-wp-ignore directive is deprecated and will be removed in version 7.0.'
+				);
+			}
 
 			// Preserve the initial inner HTML
 			const cached = useMemo( () => innerHTML, [] );
@@ -782,7 +783,7 @@ export default () => {
 		} );
 	} );
 
-	// data-wp-run
+	// data-wp-run---[unique-id]
 	directive( 'run', ( { directives: { run }, evaluate } ) => {
 		run.forEach( ( entry ) => {
 			if ( globalThis.SCRIPT_DEBUG ) {
@@ -822,17 +823,20 @@ export default () => {
 			const [ entry ] = each;
 			const { namespace, suffix, uniqueId } = entry;
 
-			if ( globalThis.SCRIPT_DEBUG ) {
-				if ( each.length > 1 ) {
+			if ( each.length > 1 ) {
+				if ( globalThis.SCRIPT_DEBUG ) {
 					warn(
 						'The usage of multiple data-wp-each directives on the same element is not supported. Please pick only one.'
 					);
-					return;
 				}
-				if ( uniqueId ) {
+				return;
+			}
+
+			if ( uniqueId ) {
+				if ( globalThis.SCRIPT_DEBUG ) {
 					warnUniqueIdNotSupported( 'each', uniqueId );
-					return;
 				}
+				return;
 			}
 
 			let iterable = evaluate( entry );
@@ -886,13 +890,31 @@ export default () => {
 		{ priority: 20 }
 	);
 
+	// data-wp-each-child (internal use only)
 	directive( 'each-child', () => null, { priority: 1 } );
 
+	// data-wp-router-region
 	directive(
 		'router-region',
 		( { directives: { 'router-region': routerRegion } } ) => {
 			const entry = routerRegion.find( isDefaultDirectiveSuffix );
 			if ( ! entry ) {
+				return;
+			}
+
+			if ( entry.suffix ) {
+				if ( globalThis.SCRIPT_DEBUG ) {
+					warn(
+						`Suffixes for the data-wp-router-region directive are not supported. Ignoring the directive with suffix "${ entry.suffix }".`
+					);
+				}
+				return;
+			}
+
+			if ( entry.uniqueId ) {
+				if ( globalThis.SCRIPT_DEBUG ) {
+					warnUniqueIdNotSupported( 'router-region', entry.uniqueId );
+				}
 				return;
 			}
 
