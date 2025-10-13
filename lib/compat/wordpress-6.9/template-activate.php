@@ -694,8 +694,9 @@ function gutenberg_get_block_templates( $output, $query = array(), $template_typ
 		//////////////////////////////
 		// START CORE MODIFICATIONS //
 		//////////////////////////////
-		if ( $template->is_custom ) {
+		if ( $template->is_custom || isset( $query['wp_id'] ) ) {
 			// Custom templates don't need to be activated, leave them be.
+			// Also don't filter out templates when querying by wp_id.
 			$query_result[] = $template;
 		} elseif ( isset( $active_templates[ $template->slug ] ) && $active_templates[ $template->slug ] === $post->ID ) {
 			// Only include active templates.
