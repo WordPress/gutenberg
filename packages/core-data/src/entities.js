@@ -18,7 +18,6 @@ import {
 	defaultApplyChangesToCRDTDoc,
 	defaultGetChangesFromCRDTDoc,
 	getPostChangesFromCRDTDoc,
-	getSyncedPropertiesForPostType,
 } from './utils/crdt';
 
 export const DEFAULT_ENTITY_KEY = 'id';
@@ -265,14 +264,13 @@ export const prePersistPostType = ( persistedRecord, edits ) => {
  */
 async function loadPostTypeEntities() {
 	const postTypes = await apiFetch( {
-		path: '/wp/v2/types?context=edit',
+		path: '/wp/v2/types?context=view',
 	} );
 	return Object.entries( postTypes ?? {} ).map( ( [ name, postType ] ) => {
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
 			name
 		);
 		const namespace = postType?.rest_namespace ?? 'wp/v2';
-		const syncedProperties = getSyncedPropertiesForPostType( postType );
 
 		/**
 		 * @type {import('@wordpress/sync').SyncConfig}
@@ -284,15 +282,11 @@ async function loadPostTypeEntities() {
 			 *
 			 * @param {import('@wordpress/sync').CRDTDoc}               crdtDoc
 			 * @param {Partial< import('@wordpress/sync').ObjectData >} changes
+			 * @param {import('./entity-types').Type | null}            typeRecord
 			 * @return {void}
 			 */
-			applyChangesToCRDTDoc: ( crdtDoc, changes ) =>
-				applyPostChangesToCRDTDoc(
-					crdtDoc,
-					changes,
-					postType,
-					syncedProperties
-				),
+			applyChangesToCRDTDoc: ( crdtDoc, changes, typeRecord ) =>
+				applyPostChangesToCRDTDoc( crdtDoc, changes, typeRecord ),
 
 			/**
 			 * Extract changes from a CRDT document that can be used to update the
@@ -300,15 +294,11 @@ async function loadPostTypeEntities() {
 			 *
 			 * @param {import('@wordpress/sync').CRDTDoc}    crdtDoc
 			 * @param {import('@wordpress/sync').ObjectData} record
+			 * @param {import('./entity-types').Type | null} typeRecord
 			 * @return {Partial< import('@wordpress/sync').ObjectData >} Changes to record
 			 */
-			getChangesFromCRDTDoc: ( crdtDoc, record ) =>
-				getPostChangesFromCRDTDoc(
-					crdtDoc,
-					record,
-					postType,
-					syncedProperties
-				),
+			getChangesFromCRDTDoc: ( crdtDoc, record, typeRecord ) =>
+				getPostChangesFromCRDTDoc( crdtDoc, record, typeRecord ),
 
 			/**
 			 * Sync features supported by the entity.

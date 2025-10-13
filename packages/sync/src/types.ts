@@ -50,9 +50,14 @@ export interface RecordHandlers {
 export interface SyncConfig {
 	applyChangesToCRDTDoc: (
 		ydoc: Y.Doc,
-		changes: Partial< ObjectData >
+		changes: Partial< ObjectData >,
+		typeRecord: ObjectData | null
 	) => void;
-	getChangesFromCRDTDoc: ( ydoc: Y.Doc, record: ObjectData ) => ObjectData;
+	getChangesFromCRDTDoc: (
+		ydoc: Y.Doc,
+		record: ObjectData,
+		typeRecord: ObjectData | null
+	) => ObjectData;
 	supports?: Record< string, true >;
 }
 
@@ -62,6 +67,7 @@ export interface SyncManager {
 		objectType: ObjectType,
 		objectId: ObjectID,
 		record: ObjectData,
+		typeRecord: ObjectData | null,
 		handlers: RecordHandlers
 	) => Promise< void >;
 	unload: ( objectType: ObjectType, objectId: ObjectID ) => void;

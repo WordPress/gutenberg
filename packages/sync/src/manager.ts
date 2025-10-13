@@ -29,6 +29,7 @@ interface EntityState {
 	objectId: ObjectID;
 	objectType: ObjectType;
 	syncConfig: SyncConfig;
+	typeRecord: ObjectData | null;
 	unload: () => void;
 	ydoc: CRDTDoc;
 }
@@ -44,17 +45,19 @@ export function createSyncManager(): SyncManager {
 	/**
 	 * Load an entity for syncing and manage its lifecycle.
 	 *
-	 * @param {SyncConfig}     syncConfig Sync configuration for the object type.
-	 * @param {ObjectType}     objectType Object type.
-	 * @param {ObjectID}       objectId   Object ID.
-	 * @param {ObjectData}     record     Entity record representing this object type.
-	 * @param {RecordHandlers} handlers   Handlers for updating and fetching the record.
+	 * @param {SyncConfig}      syncConfig Sync configuration for the object type.
+	 * @param {ObjectType}      objectType Object type.
+	 * @param {ObjectID}        objectId   Object ID.
+	 * @param {ObjectData}      record     Entity record representing this object.
+	 * @param {ObjectData|null} typeRecord Entity record representing the object's type, if available.
+	 * @param {RecordHandlers}  handlers   Handlers for updating and fetching the record.
 	 */
 	async function loadEntity(
 		syncConfig: SyncConfig,
 		objectType: ObjectType,
 		objectId: ObjectID,
 		record: ObjectData,
+		typeRecord: ObjectData | null,
 		handlers: RecordHandlers
 	): Promise< void > {
 		const providerCreators: ProviderCreator[] = getProviderCreators();
@@ -101,6 +104,7 @@ export function createSyncManager(): SyncManager {
 			objectId,
 			objectType,
 			syncConfig,
+			typeRecord,
 			unload,
 			ydoc,
 		};
@@ -118,7 +122,7 @@ export function createSyncManager(): SyncManager {
 		recordMap.observeDeep( onRecordUpdate );
 
 		ydoc.transact( () => {
-			syncConfig.applyChangesToCRDTDoc( ydoc, record );
+			syncConfig.applyChangesToCRDTDoc( ydoc, record, typeRecord );
 		}, LOCAL_SYNC_MANAGER_ORIGIN );
 	}
 
@@ -163,11 +167,15 @@ export function createSyncManager(): SyncManager {
 	): void {
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
-		const syncConfig = entityState?.syncConfig;
-		const ydoc = entityState?.ydoc;
 
-		ydoc?.transact( () => {
-			syncConfig?.applyChangesToCRDTDoc( ydoc, changes );
+		if ( ! entityState ) {
+			return;
+		}
+
+		const { syncConfig, typeRecord, ydoc } = entityState;
+
+		ydoc.transact( () => {
+			syncConfig.applyChangesToCRDTDoc( ydoc, changes, typeRecord );
 		}, origin );
 	}
 
@@ -189,13 +197,14 @@ export function createSyncManager(): SyncManager {
 			return;
 		}
 
-		const { handlers, syncConfig, ydoc } = entityState;
+		const { handlers, syncConfig, typeRecord, ydoc } = entityState;
 
 		// Determine which synced properties have actually changed by comparing
 		// them against the current entity record.
 		const changes = syncConfig.getChangesFromCRDTDoc(
 			ydoc,
-			await handlers.getEditedRecord()
+			await handlers.getEditedRecord(),
+			typeRecord
 		);
 
 		// This is a good spot to debug to see which changes are being synced. Note

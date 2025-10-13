@@ -184,12 +184,25 @@ export const getEntityRecord =
 								transientConfig.read( recordWithTransients );
 						} );
 
+					// Load the record for the entity's type, if available.
+					const recordLinks = record._links ?? record[ 0 ]?._links;
+					const typeLinkUrl = recordLinks?.about?.[ 0 ]?.href;
+					const typeRecord = typeLinkUrl
+						? await apiFetch( {
+								parse: true,
+								url: addQueryArgs( typeLinkUrl, {
+									context: 'edit',
+								} ),
+						  } )
+						: null;
+
 					// Load the entity record for syncing.
 					await syncManager.load(
 						entityConfig.syncConfig,
 						objectType,
 						objectId,
 						recordWithTransients,
+						typeRecord,
 						{
 							// Handle edits sourced from the sync manager.
 							editRecord: ( edits ) => {
