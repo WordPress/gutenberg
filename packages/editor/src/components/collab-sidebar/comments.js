@@ -236,7 +236,7 @@ function Thread( {
 			aria-expanded={ isSelected }
 		>
 			<Button
-				className="editor-collab-sidebar-panel__skip-link"
+				className="editor-collab-sidebar-panel__skip-to-comment"
 				variant="secondary"
 				size="compact"
 				onClick={ () => {
@@ -248,17 +248,6 @@ function Thread( {
 				} }
 			>
 				{ __( 'Add new comment' ) }
-			</Button>
-			<Button
-				className="editor-collab-sidebar-panel__skip-link"
-				variant="secondary"
-				size="compact"
-				onClick={ ( event ) => {
-					event.stopPropagation();
-					blockRef.current?.focus();
-				} }
-			>
-				{ __( 'Back to block' ) }
 			</Button>
 			{ ! relatedBlockElement && (
 				<Text as="p" weight={ 500 } variant="muted">
@@ -379,6 +368,17 @@ function Thread( {
 					</VStack>
 				</VStack>
 			) }
+			<Button
+				className="editor-collab-sidebar-panel__skip-to-block"
+				variant="secondary"
+				size="compact"
+				onClick={ ( event ) => {
+					event.stopPropagation();
+					blockRef.current?.focus();
+				} }
+			>
+				{ __( 'Back to block' ) }
+			</Button>
 		</VStack>
 	);
 }
