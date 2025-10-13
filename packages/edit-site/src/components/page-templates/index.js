@@ -338,7 +338,7 @@ export default function PageTemplates() {
 				size="small"
 			>
 				{ __(
-					'Do you want to duplicate this bundled template and edit it? Changes will not be live until you activate the new template.'
+					'Do you want to duplicate and edit this bundled template? Changes will not be live until you activate the new template.'
 				) }
 			</ConfirmDialog>
 		</Page>
