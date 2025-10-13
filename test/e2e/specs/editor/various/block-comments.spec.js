@@ -479,11 +479,13 @@ test.describe( 'Block Comments', () => {
 				.getByRole( 'listitem', {
 					name: 'Comment: Test comment',
 				} );
+			const replyButton = thread.getByRole( 'button', {
+				name: 'Reply',
+			} );
 			const backToBlockButton = thread.getByRole( 'button', {
 				name: 'Back to block',
 			} );
-			await thread.focus();
-			await page.keyboard.press( 'Tab' );
+			await replyButton.focus();
 			await page.keyboard.press( 'Tab' );
 
 			await expect( backToBlockButton ).toBeFocused();

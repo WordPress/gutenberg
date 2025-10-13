@@ -69,8 +69,8 @@ export function Comments( {
 			selectedBlockClientId: clientId,
 		};
 	}, [] );
-	const { selectBlock } = useDispatch( blockEditorStore );
 	const [ selectedThread = blockCommentId, setSelectedThread ] = useState();
+	const relatedBlockElement = useBlockElement( selectedBlockClientId );
 
 	const handleDelete = async ( comment ) => {
 		const currentIndex = threads.findIndex( ( t ) => t.id === comment.id );
@@ -90,7 +90,7 @@ export function Comments( {
 			setSelectedThread( null );
 			setShowCommentBoard( false );
 			// Focus the parent block instead of just scrolling into view.
-			selectBlock( selectedBlockClientId );
+			relatedBlockElement?.focus();
 		}
 	};
 
