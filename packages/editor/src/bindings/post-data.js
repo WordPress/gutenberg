@@ -5,6 +5,12 @@ import { __ } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
+// Navigation block types that use special handling for backwards compatibility
+const NAVIGATION_BLOCK_TYPES = [
+	'core/navigation-link',
+	'core/navigation-submenu',
+];
+
 /**
  * Gets a list of post data fields with their values and labels
  * to be consumed in the needed callbacks.
@@ -57,9 +63,7 @@ function getPostDataFields( select, context, clientId ) {
 	 * be maintained to support blocks created in WordPress 6.9 and earlier.
 	 */
 	const blockName = getBlockName?.( clientId );
-	const isNavigationBlock =
-		blockName === 'core/navigation-link' ||
-		blockName === 'core/navigation-submenu';
+	const isNavigationBlock = NAVIGATION_BLOCK_TYPES.includes( blockName );
 
 	let postId, postType;
 
@@ -130,10 +134,7 @@ export default {
 		// if nav block then return false (read only
 		const blockName = getBlockName?.( clientId );
 
-		if (
-			blockName === 'core/navigation-link' ||
-			blockName === 'core/navigation-submenu'
-		) {
+		if ( NAVIGATION_BLOCK_TYPES.includes( blockName ) ) {
 			return false;
 		}
 		const newData = {};
@@ -153,10 +154,7 @@ export default {
 		// if nav block then return false (read only
 		const blockName = getBlockName?.( clientId );
 
-		if (
-			blockName === 'core/navigation-link' ||
-			blockName === 'core/navigation-submenu'
-		) {
+		if ( NAVIGATION_BLOCK_TYPES.includes( blockName ) ) {
 			return false;
 		}
 
@@ -197,6 +195,10 @@ export default {
 	editorUI( { select, context } ) {
 		const selectedBlock = select( blockEditorStore ).getSelectedBlock();
 		if ( selectedBlock?.name !== 'core/post-date' ) {
+			return {};
+		}
+		// Exit early for navigation blocks (read-only)
+		if ( NAVIGATION_BLOCK_TYPES.includes( selectedBlock?.name ) ) {
 			return {};
 		}
 		const postDataFields = Object.entries(

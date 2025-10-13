@@ -5,6 +5,12 @@ import { __ } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
+// Navigation block types that use special handling for backwards compatibility
+const NAVIGATION_BLOCK_TYPES = [
+	'core/navigation-link',
+	'core/navigation-submenu',
+];
+
 /**
  * Creates the data fields object with the given term data values and ID value.
  *
@@ -104,9 +110,7 @@ function getTermDataFields( select, context, clientId ) {
 	 * be maintained to support blocks created in WordPress 6.9 and earlier.
 	 */
 	const blockName = getBlockName?.( clientId );
-	const isNavigationBlock =
-		blockName === 'core/navigation-link' ||
-		blockName === 'core/navigation-submenu';
+	const isNavigationBlock = NAVIGATION_BLOCK_TYPES.includes( blockName );
 
 	let termId, taxonomy;
 
@@ -198,6 +202,11 @@ export default {
 		return getTermDataFields( select, context );
 	},
 	editorUI( { select, context } ) {
+		const selectedBlock = select( blockEditorStore ).getSelectedBlock();
+		// Exit early for navigation blocks (read-only)
+		if ( NAVIGATION_BLOCK_TYPES.includes( selectedBlock?.name ) ) {
+			return {};
+		}
 		const termDataFields = Object.entries(
 			getTermDataFields( select, context ) || {}
 		).map( ( [ key, field ] ) => ( {
