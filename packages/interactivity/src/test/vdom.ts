@@ -1177,5 +1177,23 @@ describe( 'toVdom', () => {
 				)
 			);
 		} );
+
+		it( 'should sort directives by suffix and uniqueId for stable ordering', () => {
+			const element = createElementFromHTML(
+				`<div data-wp-test---z data-wp-test---a data-wp-test--b---z data-wp-test--b---a data-wp-test--a data-wp-test></div>`
+			);
+			const vnode = toVdom( element ) as any;
+			const directives = vnode.props.__directives.test;
+			expect(
+				directives.map( ( d: any ) => [ d.suffix, d.uniqueId ] )
+			).toEqual( [
+				[ null, null ],
+				[ null, 'a' ],
+				[ null, 'z' ],
+				[ 'a', null ],
+				[ 'b', 'a' ],
+				[ 'b', 'z' ],
+			] );
+		} );
 	} );
 } );
