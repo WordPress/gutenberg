@@ -544,7 +544,7 @@ test.describe( 'List View', () => {
 		await editor.insertBlock( { name: 'core/file' } );
 		await editor.insertBlock( {
 			name: 'core/group',
-			innerBlocks: [ { name: 'core/paragraph' }, { name: 'core/quote' } ],
+			innerBlocks: [ { name: 'core/paragraph' }, { name: 'core/code' } ],
 		} );
 
 		// Open List View.
@@ -559,6 +559,7 @@ test.describe( 'List View', () => {
 			.click();
 
 		// Expand group block, then move to quote block, and copy.
+		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'ArrowDown' );
 		await pageUtils.pressKeys( 'primary+c' );
@@ -577,15 +578,15 @@ test.describe( 'List View', () => {
 				{ name: 'core/file', selected: false, focused: false },
 				{
 					name: 'core/group',
-					selected: false,
+					selected: true,
 					innerBlocks: [
 						{
-							name: 'core/quote',
-							selected: true,
-							focused: false,
+							name: 'core/code',
+							selected: false,
+							focused: true,
 						},
 						{
-							name: 'core/quote',
+							name: 'core/code',
 							selected: false,
 							focused: false,
 						},
@@ -685,7 +686,7 @@ test.describe( 'List View', () => {
 		await editor.insertBlock( { name: 'core/file' } );
 		await editor.insertBlock( {
 			name: 'core/group',
-			innerBlocks: [ { name: 'core/quote' }, { name: 'core/quote' } ],
+			innerBlocks: [ { name: 'core/code' }, { name: 'core/code' } ],
 		} );
 
 		// Open List View.
@@ -709,7 +710,7 @@ test.describe( 'List View', () => {
 			)
 			.toMatchObject( [
 				{ name: 'core/heading', selected: false, focused: false },
-				{ name: 'core/file', selected: true, focused: false },
+				{ name: 'core/file', selected: true, focused: true },
 			] );
 
 		await pageUtils.pressKeys( 'primary+v' );
@@ -724,15 +725,15 @@ test.describe( 'List View', () => {
 				{
 					name: 'core/group',
 					selected: true,
-					focused: false,
+					focused: true,
 					innerBlocks: [
 						{
-							name: 'core/quote',
+							name: 'core/code',
 							selected: false,
 							focused: false,
 						},
 						{
-							name: 'core/quote',
+							name: 'core/code',
 							selected: false,
 							focused: false,
 						},
