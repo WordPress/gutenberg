@@ -173,7 +173,8 @@ export default {
 
 		return true;
 	},
-	getFieldsList( { select, context, clientId } ) {
+	getFieldsList( { select, context } ) {
+		const clientId = select( blockEditorStore ).getSelectedBlockClientId();
 		// Deprecated, will be removed after 6.9.
 		return getPostDataFields( select, context, clientId );
 	},
