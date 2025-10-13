@@ -18,19 +18,19 @@ export const titleExcerpt = (
 
 const variations = [
 	{
-		name: 'title',
-		title: __( 'Title' ),
-		description: __( "Display the terms' titles." ),
+		name: 'name',
+		title: __( 'Name' ),
+		description: __( "Display the terms' names." ),
 		attributes: {},
 		icon: titleDate,
 		scope: [ 'block' ],
 		innerBlocks: [ [ 'core/term-template', {}, [ [ 'core/term-name' ] ] ] ],
 	},
 	{
-		name: 'title-count',
-		title: __( 'Title & Count' ),
+		name: 'name-count',
+		title: __( 'Name & Count' ),
 		description: __(
-			"Display the terms' titles and number of posts assigned to each term."
+			"Display the terms' names and number of posts assigned to each term."
 		),
 		attributes: {},
 		icon: titleExcerpt,
