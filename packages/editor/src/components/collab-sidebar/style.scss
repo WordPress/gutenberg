@@ -15,6 +15,15 @@
 	height: 100%;
 }
 
+.editor-collab-sidebar-panel__privacy-info {
+	text-wrap: pretty;
+
+	.components-icon {
+		color: $gray-600;
+		flex-shrink: 0;
+	}
+}
+
 .editor-collab-sidebar-panel__thread {
 	position: relative;
 	padding: $grid-unit-20;
