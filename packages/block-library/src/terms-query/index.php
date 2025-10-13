@@ -10,21 +10,13 @@
  *
  * @since 6.9.0
  *
- * @param array    $attributes Block attributes.
- * @param string   $content    Block default content.
+ * @param array  $attributes Block attributes.
+ * @param string $content    Block default content.
  *
  * @return string Returns the output of the query, structured using the layout defined by the block's inner blocks.
  */
 function render_block_core_terms_query( $attributes, $content ) {
-	$tag_name           = ! empty( $attributes['tagName'] ) ? $attributes['tagName'] : 'div';
-	$wrapper_attributes = get_block_wrapper_attributes();
-
-	return sprintf(
-		'<%1$s %2$s>%3$s</%1$s>',
-		$tag_name,
-		$wrapper_attributes,
-		$content
-	);
+	return $content;
 }
 
 
