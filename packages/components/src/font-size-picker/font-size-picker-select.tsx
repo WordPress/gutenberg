@@ -20,28 +20,9 @@ import { generateFontSizeHint } from './utils';
 
 // Custom styled component to force line break between name and hint while keeping checkmark on the right
 const StyledCustomSelectControl = styled( CustomSelectControl )`
-	.components-custom-select-control__item {
-		display: flex;
-		align-items: flex-start;
-		justify-content: space-between;
-	}
-
 	.components-custom-select-control__item
 		.components-custom-select-control__item-hint {
-		display: block;
-		margin-top: 2px;
-		margin-left: 0;
-		font-size: 12px;
-		line-height: 1.2;
 		width: 100%;
-	}
-
-	.components-custom-select-control__item
-		.components-custom-select-control__item-hint::before {
-		content: '';
-		display: block;
-		height: 0;
-		margin-top: -2px;
 	}
 `;
 
