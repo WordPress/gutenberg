@@ -251,7 +251,6 @@ test.describe( 'data-wp-context', () => {
 	test( 'should preserve values when navigating back or forward', async ( {
 		page,
 	} ) => {
-		await page.pause();
 		const element = page.getByTestId( 'navigation text' );
 		const navCount = page.getByTestId( 'navigation count' );
 		await expect( navCount ).toHaveText( '0' );
