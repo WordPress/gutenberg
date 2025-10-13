@@ -81,7 +81,6 @@ export default function CollabSidebar() {
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const isLargeViewport = useViewportMatch( 'medium' );
-
 	const commentSidebarRef = useRef( null );
 
 	const { postId } = useSelect( ( select ) => {
@@ -187,6 +186,9 @@ export default function CollabSidebar() {
 						commentSidebarRef={ commentSidebarRef }
 						reflowComments={ reflowComments }
 						commentLastUpdated={ commentLastUpdated }
+						styles={ {
+							backgroundColor,
+						} }
 						isFloating
 					/>
 				</PluginSidebar>
