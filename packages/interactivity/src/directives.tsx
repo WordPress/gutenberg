@@ -41,27 +41,30 @@ const warnUniqueIdWithTwoHyphens = (
 	uniqueId?: string
 ) => {
 	if ( globalThis.SCRIPT_DEBUG ) {
-		return `The usage of data-wp-${ prefix }--${ suffix }${
-			uniqueId ? `--${ uniqueId }` : ''
-		} (two hyphens for unique ID) is deprecated and will stop working in WordPress 7.0. Please use data-wp-${ prefix }${
-			uniqueId ? `--${ suffix }---${ uniqueId }` : `---${ suffix }`
-		} (three hyphens for unique ID) from now on.`;
+		warn(
+			`The usage of data-wp-${ prefix }--${ suffix }${
+				uniqueId ? `--${ uniqueId }` : ''
+			} (two hyphens for unique ID) is deprecated and will stop working in WordPress 7.0. Please use data-wp-${ prefix }${
+				uniqueId ? `--${ suffix }---${ uniqueId }` : `---${ suffix }`
+			} (three hyphens for unique ID) from now on.`
+		);
 	}
-	return '';
 };
 
 const warnUniqueIdNotSupported = ( prefix: string, uniqueId: string ) => {
 	if ( globalThis.SCRIPT_DEBUG ) {
-		return `Unique IDs are not supported for the data-wp-${ prefix } directive. Ignoring the directive with unique ID "${ uniqueId }".`;
+		warn(
+			`Unique IDs are not supported for the data-wp-${ prefix } directive. Ignoring the directive with unique ID "${ uniqueId }".`
+		);
 	}
-	return '';
 };
 
 const warnWithSyncEvent = ( wrongPrefix: string, rightPrefix: string ) => {
 	if ( globalThis.SCRIPT_DEBUG ) {
-		return `The usage of data-wp-${ wrongPrefix } is deprecated and will stop working in WordPress 7.0. Please, use data-wp-${ rightPrefix } with the withSyncEvent() helper from now on.`;
+		warn(
+			`The usage of data-wp-${ wrongPrefix } is deprecated and will stop working in WordPress 7.0. Please, use data-wp-${ rightPrefix } with the withSyncEvent() helper from now on.`
+		);
 	}
-	return '';
 };
 
 /**
@@ -191,12 +194,10 @@ const getGlobalEventDirective = (
 				const eventName = suffixParts[ 0 ];
 				if ( globalThis.SCRIPT_DEBUG ) {
 					if ( suffixParts[ 1 ] ) {
-						warn(
-							warnUniqueIdWithTwoHyphens(
-								`on-${ type }`,
-								suffixParts[ 0 ],
-								suffixParts[ 1 ]
-							)
+						warnUniqueIdWithTwoHyphens(
+							`on-${ type }`,
+							suffixParts[ 0 ],
+							suffixParts[ 1 ]
 						);
 					}
 				}
@@ -232,12 +233,7 @@ const getGlobalAsyncEventDirective = (
 			.filter( isNonDefaultDirectiveSuffix )
 			.forEach( ( entry ) => {
 				if ( globalThis.SCRIPT_DEBUG ) {
-					warn(
-						warnWithSyncEvent(
-							`on-async-${ type }`,
-							`on-${ type }`
-						)
-					);
+					warnWithSyncEvent( `on-async-${ type }`, `on-${ type }` );
 				}
 				const eventName = entry.suffix.split( '--', 1 )[ 0 ];
 				useInit( () => {
@@ -448,12 +444,10 @@ export default () => {
 			const suffixParts = entry.suffix.split( '--', 2 );
 			if ( globalThis.SCRIPT_DEBUG ) {
 				if ( suffixParts[ 1 ] ) {
-					warn(
-						warnUniqueIdWithTwoHyphens(
-							'on',
-							suffixParts[ 0 ],
-							suffixParts[ 1 ]
-						)
+					warnUniqueIdWithTwoHyphens(
+						'on',
+						suffixParts[ 0 ],
+						suffixParts[ 1 ]
 					);
 				}
 			}
