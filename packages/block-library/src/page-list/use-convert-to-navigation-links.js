@@ -6,6 +6,11 @@ import { useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
+ * Internal dependencies
+ */
+import { buildNavigationLinkEntityBinding } from '../navigation-link/shared';
+
+/**
  * Converts an array of pages into a nested array of navigation link blocks.
  *
  * @param {Array} pages An array of pages.
@@ -26,6 +31,9 @@ function createNavigationLinks( pages = [] ) {
 				url,
 				type,
 				kind: 'post-type',
+				metadata: {
+					bindings: buildNavigationLinkEntityBinding(),
+				},
 			},
 			innerBlocks
 		);

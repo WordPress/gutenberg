@@ -10,7 +10,10 @@ import { renderHook, act } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import { useEntityBinding } from '../use-entity-binding';
+import {
+	useEntityBinding,
+	buildNavigationLinkEntityBinding,
+} from '../use-entity-binding';
 
 // Mock the entire @wordpress/block-editor module
 jest.mock( '@wordpress/block-editor', () => ( {
@@ -266,7 +269,15 @@ describe( 'useEntityBinding', () => {
 			result.current.createBinding();
 		} );
 
-		expect( mockUpdateBlockBindings ).toHaveBeenCalledWith( {
+		expect( mockUpdateBlockBindings ).toHaveBeenCalledWith(
+			buildNavigationLinkEntityBinding()
+		);
+	} );
+} );
+
+describe( 'buildNavigationLinkEntityBinding', () => {
+	it( 'should build the correct binding structure', () => {
+		expect( buildNavigationLinkEntityBinding() ).toEqual( {
 			url: {
 				source: 'core/post-data',
 				args: {

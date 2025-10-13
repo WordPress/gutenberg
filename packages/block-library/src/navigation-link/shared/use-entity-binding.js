@@ -5,6 +5,26 @@ import { useCallback } from '@wordpress/element';
 import { useBlockBindingsUtils } from '@wordpress/block-editor';
 
 /**
+ * Builds entity binding configuration for navigation link URLs.
+ * This function generates the structure used to bind navigation link URLs to their entity sources.
+ *
+ * Using a function instead of a constant allows for future enhancements where the binding
+ * might need dynamic data (e.g., entity ID, context-specific arguments).
+ *
+ * @return {Object} Entity binding configuration object
+ */
+export function buildNavigationLinkEntityBinding() {
+	return {
+		url: {
+			source,
+			args: {
+				key: 'link',
+			},
+		},
+	};
+}
+
+/**
  * Shared hook for entity binding functionality in Navigation blocks.
  *
  * This hook provides common entity binding logic that can be used by both
@@ -47,14 +67,7 @@ export function useEntityBinding( { clientId, attributes } ) {
 			const source =
 				kindToUse === 'taxonomy' ? 'core/term-data' : 'core/post-data';
 
-			updateBlockBindings( {
-				url: {
-					source,
-					args: {
-						key: 'link',
-					},
-				},
-			} );
+			updateBlockBindings( buildNavigationLinkEntityBinding() );
 		},
 		[ updateBlockBindings, kind, id ]
 	);
