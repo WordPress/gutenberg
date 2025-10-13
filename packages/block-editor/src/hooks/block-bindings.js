@@ -84,6 +84,11 @@ function BlockBindingsPanelMenuContent( {
 				const noItemsAvailable =
 					! sourceDataItems || sourceDataItems.length === 0;
 
+				// Skip sources with no compatible items for this attribute
+				if ( noItemsAvailable ) {
+					return null;
+				}
+
 				if ( source.mode === 'dropdown' ) {
 					return (
 						<Menu
@@ -92,16 +97,11 @@ function BlockBindingsPanelMenuContent( {
 								isMobile ? 'bottom-start' : 'left-start'
 							}
 						>
-							{ noItemsAvailable ? (
-								<Menu.Item disabled>{ source.label }</Menu.Item>
-							) : (
-								<Menu.SubmenuTriggerItem>
-									<Menu.ItemLabel>
-										{ source.label }
-									</Menu.ItemLabel>
-								</Menu.SubmenuTriggerItem>
-							) }
-
+							<Menu.SubmenuTriggerItem>
+								<Menu.ItemLabel>
+									{ source.label }
+								</Menu.ItemLabel>
+							</Menu.SubmenuTriggerItem>
 							{ ! noItemsAvailable && (
 								<Menu.Popover gutter={ 8 }>
 									<Menu.Group>
@@ -206,39 +206,54 @@ function BlockBindingsPanelMenuContent( {
 	);
 }
 
-function BlockBindingsAttribute( { attribute, binding, source } ) {
+function BlockBindingsAttribute( { attribute, binding, sources } ) {
 	const { source: sourceName, args } = binding || {};
-	const isSourceInvalid = ! sourceName;
+	const source = sources?.[ sourceName ];
+
+	let displayText;
+	let isValid = true;
+	const isNotBound = binding === undefined;
+
+	if ( isNotBound ) {
+		displayText = __( 'Not connected' );
+		isValid = true;
+	} else if ( ! source ) {
+		// If there's a binding but the source is not found, it's invalid.
+		isValid = false;
+		displayText = __( 'Source not registered' );
+		if ( Object.keys( sources ).length === 0 ) {
+			displayText = __( 'No sources available' );
+		}
+	} else {
+		displayText =
+			source.data?.find( ( item ) => fastDeepEqual( item.args, args ) )
+				?.label ||
+			source.label ||
+			sourceName;
+	}
+
 	return (
 		<VStack className="block-editor-bindings__item" spacing={ 0 }>
 			<Text truncate>{ attribute }</Text>
-			{ !! binding && (
-				<Text
-					truncate
-					variant={ ! isSourceInvalid && 'muted' }
-					isDestructive={ isSourceInvalid }
-				>
-					{ isSourceInvalid
-						? __( 'Invalid source' )
-						: source?.data?.find( ( item ) =>
-								fastDeepEqual( item.args, args )
-						  )?.label ||
-						  source?.label ||
-						  sourceName }
-				</Text>
-			) }
+			<Text
+				truncate
+				variant={ isValid ? 'muted' : undefined }
+				isDestructive={ ! isValid }
+			>
+				{ displayText }
+			</Text>
 		</VStack>
 	);
 }
 
-function ReadOnlyBlockBindingsPanelItem( { attribute, binding, source } ) {
+function ReadOnlyBlockBindingsPanelItem( { attribute, binding, sources } ) {
 	return (
 		<ToolsPanelItem hasValue={ () => !! binding } label={ attribute }>
 			<Item>
 				<BlockBindingsAttribute
 					attribute={ attribute }
 					binding={ binding }
-					source={ source }
+					sources={ sources }
 				/>
 			</Item>
 		</ToolsPanelItem>
@@ -273,7 +288,7 @@ function EditableBlockBindingsPanelItem( {
 					<BlockBindingsAttribute
 						attribute={ attribute }
 						binding={ binding }
-						source={ sources?.[ binding?.source ] }
+						sources={ sources }
 					/>
 				</Menu.TriggerButton>
 				<Menu.Popover gutter={ isMobile ? 8 : 36 }>
@@ -314,6 +329,12 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 			}
 
 			const registeredSources = getBlockBindingsSources();
+			const { bindings } = metadata || {};
+			const usedSources = new Set(
+				Object.values( bindings || {} ).map(
+					( binding ) => binding?.source
+				)
+			);
 			Object.entries( registeredSources ).forEach(
 				( [
 					sourceName,
@@ -352,6 +373,15 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 						if ( hasCompatibleData ) {
 							_sources[ sourceName ] = {
 								...editorUIResult,
+								label,
+								getValues,
+							};
+						} else if ( usedSources.has( sourceName ) ) {
+							// If there's no compatible data but the source is already used in a binding,
+							// still add it with empty data so it can be displayed in read-only mode.
+							_sources[ sourceName ] = {
+								...editorUIResult,
+								data: [],
 								label,
 								getValues,
 							};
@@ -404,12 +434,21 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 									label,
 									getValues,
 								};
+							} else if ( usedSources.has( sourceName ) ) {
+								// If there's no compatible data but the source is already used in a binding,
+								// still add it with empty data so it can be displayed in read-only mode.
+								_sources[ sourceName ] = {
+									mode: 'dropdown', // Default mode for backward compatibility
+									data: [],
+									label,
+									getValues,
+								};
 							}
 						}
-					} else {
+					} else if ( usedSources.has( sourceName ) ) {
 						/*
-						 * Include sources without editorUI if they are introduced
-						 * by other means (e.g. code editor).
+						 * Include sources without editorUI if they are already used in a binding.
+						 * This allows them to be displayed in read-only mode.
 						 */
 						_sources[ sourceName ] = {
 							data: [],
@@ -431,9 +470,8 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 				bindableAttributes: _bindableAttributes,
 			};
 		},
-		[ blockContext, blockName ]
-	);
-	// Return early if there are no bindable attributes.
+		[ blockContext, blockName, metadata ]
+	); // Return early if there are no bindable attributes.
 	if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
 		return null;
 	}
@@ -450,6 +488,10 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 
 	const RenderModalContent =
 		sources[ modalState?.sourceKey ]?.renderModalContent;
+
+	if ( bindings === undefined && ! hasCompatibleData ) {
+		return null;
+	}
 
 	return (
 		<InspectorControls group="bindings">
@@ -470,7 +512,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 								key={ attribute }
 								attribute={ attribute }
 								binding={ binding }
-								source={ sources?.[ binding?.source ] }
+								sources={ sources }
 							/>
 						) : (
 							<EditableBlockBindingsPanelItem
