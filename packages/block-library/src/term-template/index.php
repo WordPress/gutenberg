@@ -30,11 +30,11 @@ function render_block_core_term_template( $attributes, $content, $block ) {
 	$query = $query_block_context['termQuery'];
 
 	$query_args = array(
-		'taxonomy'   => $query['taxonomy'] ?? 'category',
-		'number'     => $query['perPage'] ?? 10,
-		'order'      => $query['order'] ?? 'asc',
-		'orderby'    => $query['orderBy'] ?? 'name',
-		'hide_empty' => $query['hideEmpty'] ?? true,
+		'taxonomy'   => $query['taxonomy'],
+		'number'     => $query['perPage'],
+		'order'      => $query['order'],
+		'orderby'    => $query['orderBy'],
+		'hide_empty' => $query['hideEmpty'],
 	);
 
 	// We set parent only when inheriting from the taxonomy archive context or not

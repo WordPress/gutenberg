@@ -81,7 +81,7 @@ export default function TermTemplateEdit( {
 			hideEmpty,
 			showNested = false,
 			parent = 0,
-			perPage = 10,
+			perPage,
 		} = {},
 	},
 	__unstableLayoutClassNames,
@@ -93,10 +93,7 @@ export default function TermTemplateEdit( {
 		hide_empty: hideEmpty,
 		order,
 		orderby: orderBy,
-		// To preview the data the closest to the frontend, we fetch the largest number of terms
-		// and limit them during rendering. This allows us to avoid re-fetching data when max
-		// terms changes.
-		per_page: 100,
+		per_page: perPage,
 	};
 
 	// Nested terms are returned by default from REST API as long as parent is not set.
@@ -105,19 +102,11 @@ export default function TermTemplateEdit( {
 		queryArgs.parent = parent || 0;
 	}
 
-	const { records: terms, isResolving } = useEntityRecords(
+	const { records: terms } = useEntityRecords(
 		'taxonomy',
 		taxonomy,
 		queryArgs
 	);
-
-	const filteredTerms = useMemo( () => {
-		if ( ! terms ) {
-			return [];
-		}
-		// Limit to the number of terms defined by perPage.
-		return perPage === 0 ? terms : terms.slice( 0, perPage );
-	}, [ terms, perPage ] );
 
 	const blocks = useSelect(
 		( select ) => select( blockEditorStore ).getBlocks( clientId ),
@@ -128,16 +117,16 @@ export default function TermTemplateEdit( {
 	} );
 	const blockContexts = useMemo(
 		() =>
-			filteredTerms?.map( ( term ) => ( {
+			terms?.map( ( term ) => ( {
 				taxonomy,
 				termId: term.id,
 				classList: `term-${ term.id }`,
 				termData: term,
 			} ) ),
-		[ filteredTerms, taxonomy ]
+		[ terms, taxonomy ]
 	);
 
-	if ( isResolving ) {
+	if ( ! terms ) {
 		return (
 			<ul { ...blockProps }>
 				<li className="wp-block-term term-loading">
@@ -147,7 +136,7 @@ export default function TermTemplateEdit( {
 		);
 	}
 
-	if ( ! filteredTerms?.length ) {
+	if ( ! terms.length ) {
 		return <p { ...blockProps }> { __( 'No terms found.' ) }</p>;
 	}
 
