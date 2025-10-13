@@ -2,12 +2,6 @@
 
 ## Unreleased
 
-### New Features
-
--   Add new `MediaUploadModal` component as an alternative to the `MediaUpload` class component. The new component uses Modal and DataViewsPicker for an updated look.
-
-## 5.33.0 (2025-10-17)
-
 ## 5.32.0 (2025-10-01)
 
 ## 5.31.0 (2025-09-17)

@@ -4,8 +4,7 @@
 import { Button, __experimentalGrid as Grid } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useCallback, useRef, useState } from '@wordpress/element';
-// @ts-ignore
-import { MediaUploadModal } from '@wordpress/media-utils';
+import { privateApis as mediaUtilsPrivateApis } from '@wordpress/media-utils';
 import { lineSolid } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import type { DataFormControlProps } from '@wordpress/dataviews';
@@ -15,6 +14,9 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import type { BasePostWithEmbeddedFeaturedMedia } from '../../types';
+import { unlock } from '../../lock-unlock';
+
+const { MediaUploadModal } = unlock( mediaUtilsPrivateApis );
 
 export const FeaturedImageEdit = ( {
 	data,
