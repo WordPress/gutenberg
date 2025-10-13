@@ -54,23 +54,36 @@ export default function TermsQueryInspectorControls( {
 		// Extract taxonomy type from template context.
 		// Pattern 1: Taxonomy only (no specific term).
 		// e.g., "category", "tag", or "taxonomy-genre".
+		let isBuiltInTaxonomy = false;
 		if ( taxonomyMatches[ 1 ] ) {
-			_taxonomyFromTemplate =
-				taxonomyMatches[ 2 ] || // Custom taxonomy name (e.g., "genre" from "taxonomy-genre").
-				taxonomyMatches[ 1 ]; // Built-in taxonomy ("category" or "tag").
+			// Custom taxonomy from "taxonomy-X" pattern.
+			if ( taxonomyMatches[ 2 ] ) {
+				_taxonomyFromTemplate = taxonomyMatches[ 2 ];
+			}
+			// Built-in taxonomy ("category" or "tag").
+			else {
+				_taxonomyFromTemplate = taxonomyMatches[ 1 ];
+				isBuiltInTaxonomy = true;
+			}
 		}
 		// Pattern 2: Taxonomy with specific term.
 		// e.g., "category-news", "tag-javascript", or "taxonomy-genre-fiction".
 		else if ( taxonomyMatches[ 3 ] ) {
-			_taxonomyFromTemplate =
-				taxonomyMatches[ 6 ] || // Custom taxonomy name (e.g., "genre" from "taxonomy-genre-fiction").
-				taxonomyMatches[ 4 ]; // Built-in taxonomy type ("category" or "tag" from full match).
+			// Custom taxonomy from "taxonomy-X-term" pattern.
+			if ( taxonomyMatches[ 6 ] ) {
+				_taxonomyFromTemplate = taxonomyMatches[ 6 ];
+			}
+			// Built-in taxonomy type ("category" or "tag" from full match).
+			else {
+				_taxonomyFromTemplate = taxonomyMatches[ 4 ];
+				isBuiltInTaxonomy = true;
+			}
 		}
-		_taxonomyFromTemplate =
-			// `Tags` are a special case in WP template hierarchy.
-			_taxonomyFromTemplate === 'tag'
-				? 'post_tag'
-				: _taxonomyFromTemplate;
+		// `Tags` are a special case in WP template hierarchy.
+		// Only normalize built-in tags, not custom taxonomies with slug "tag".
+		if ( isBuiltInTaxonomy && _taxonomyFromTemplate === 'tag' ) {
+			_taxonomyFromTemplate = 'post_tag';
+		}
 	}
 	const isTaxonomyMatchingTemplate = taxonomy === _taxonomyFromTemplate;
 
