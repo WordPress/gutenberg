@@ -37,9 +37,25 @@ function getPostDataFields( select, context, clientId ) {
 
 	let entityDataValues, dataFields;
 
-	// Hardcoded exception for navigation blocks (temporary for WP 6.9)
-	// TODO: Replace with proper binding configuration API in WP 7.0
-	// See https://github.com/WordPress/gutenberg/pull/71002
+	/*
+	 * BACKWARDS COMPATIBILITY: Hardcoded exception for navigation blocks
+	 *
+	 * This conditional MUST be maintained indefinitely for backwards compatibility.
+	 *
+	 * REASON: Once WordPress 6.9 ships, navigation blocks will be created with
+	 * binding shapes that rely on this hardcoded exception. WordPress backwards
+	 * compatibility requirements mandate that these existing block structures
+	 * continue to be supported forever.
+	 *
+	 * MIGRATION PATH: During the WordPress 7.0 development cycle, a
+	 * binding configuration API will be designed that allows blocks to declare
+	 * their data source preferences. Navigation blocks can then be migrated to
+	 * use this new API, but this legacy exception must remain as a fallback to
+	 * ensure existing blocks continue to function.
+	 *
+	 * DO NOT REMOVE: This conditional is permanent technical debt that must
+	 * be maintained to support blocks created in WordPress 6.9 and earlier.
+	 */
 	const blockName = getBlockName?.( clientId );
 	const isNavigationBlock =
 		blockName === 'core/navigation-link' ||
