@@ -108,7 +108,6 @@ export function Comments( {
 				justify="flex-start"
 				spacing="2"
 			>
-				<Text>{ __( 'Only logged in users can see Notes' ) }</Text>
 				{
 					// translators: message displayed when there are no comments available
 					__( 'No comments available' )
@@ -119,7 +118,9 @@ export function Comments( {
 
 	return (
 		<VStack spacing="3">
-			<Text>{ __( 'Only logged in users can see Notes' ) }</Text>
+			<Text as="p" variant="muted">
+				{ __( 'Only logged in users can see Notes' ) }
+			</Text>
 			{ threads.map( ( thread ) => (
 				<Thread
 					key={ thread.id }
