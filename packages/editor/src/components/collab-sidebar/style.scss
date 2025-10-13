@@ -237,3 +237,23 @@
 	font-weight: 600;
 	flex-shrink: 0;
 }
+
+// Floating container for Google Docs-like alignment
+.editor-collab-sidebar-panel__floating-container {
+	position: relative;
+	width: 100%;
+	overflow: visible;
+}
+
+// .editor-collab-sidebar-panel__thread {
+// 	transition: top 200ms ease, transform 150ms ease, box-shadow 150ms ease;
+// }
+
+// .editor-collab-sidebar-panel__thread.is-selected {
+// 	border-color: var(--wp-admin-theme-color);
+// }
+
+.editor-collab-sidebar-panel__thread[style] {
+	/* ensure absolute items don't collapse layout */
+	will-change: top;
+}
