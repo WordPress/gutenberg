@@ -188,7 +188,7 @@ export function Comments( {
 				alignment="left"
 				className="editor-collab-sidebar-panel__thread"
 				justify="flex-start"
-				spacing="2"
+				spacing="3"
 			>
 				{
 					// translators: message displayed when there are no comments available
@@ -318,7 +318,7 @@ function Thread( {
 				'is-floating': isFloating,
 			} ) }
 			id={ `comment-thread-${ thread.id }` }
-			spacing={ isFloating ? '0' : '2' }
+			spacing="3"
 			onClick={ handleCommentSelect }
 			onMouseEnter={ onMouseEnter }
 			onMouseLeave={ onMouseLeave }
@@ -387,21 +387,15 @@ function Thread( {
 			/>
 			{ isSelected &&
 				replies.map( ( reply ) => (
-					<VStack
+					<CommentBoard
 						key={ reply.id }
-						className="editor-collab-sidebar-panel__child-thread"
-						id={ reply.id }
-						spacing="2"
-					>
-						<CommentBoard
-							thread={ reply }
-							parent={ thread }
-							isExpanded={ isSelected }
-							onEdit={ onEditComment }
-							onDelete={ onCommentDelete }
-							reflowComments={ reflowComments }
-						/>
-					</VStack>
+						thread={ reply }
+						parent={ thread }
+						isExpanded={ isSelected }
+						onEdit={ onEditComment }
+						onDelete={ onCommentDelete }
+						reflowComments={ reflowComments }
+					/>
 				) ) }
 			{ ! isSelected && restReplies.length > 0 && (
 				<HStack className="editor-collab-sidebar-panel__more-reply-separator">
@@ -440,10 +434,7 @@ function Thread( {
 				/>
 			) }
 			{ isSelected && (
-				<VStack
-					className="editor-collab-sidebar-panel__child-thread"
-					spacing="2"
-				>
+				<VStack spacing="2">
 					<HStack alignment="left" spacing="3" justify="flex-start">
 						<CommentAuthorInfo />
 					</HStack>
@@ -558,7 +549,7 @@ const CommentBoard = ( {
 			: [];
 
 	return (
-		<>
+		<VStack spacing="2" id={ thread.id }>
 			<HStack alignment="left" spacing="3" justify="flex-start">
 				<CommentAuthorInfo
 					avatar={ thread?.author_avatar_urls?.[ 48 ] }
@@ -659,6 +650,6 @@ const CommentBoard = ( {
 					{ __( 'Are you sure you want to delete this comment?' ) }
 				</ConfirmDialog>
 			) }
-		</>
+		</VStack>
 	);
 };

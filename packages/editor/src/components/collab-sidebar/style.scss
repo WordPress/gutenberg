@@ -37,16 +37,11 @@
 	}
 
 	&.is-floating {
-		padding: 16px;
-		border: none;
+		left: $grid-unit-20;
+		right: $grid-unit-20;
 		position: absolute;
-		width: 250px;
-		margin-top: 16px;
+		margin-top: $grid-unit-20;
 	}
-}
-
-.editor-collab-sidebar-panel__child-thread {
-	margin-top: 15px;
 }
 
 .editor-collab-sidebar-panel__user-name {
@@ -78,29 +73,6 @@
 	border-width: var(--wp-admin-border-width-focus);
 	border-style: solid;
 	padding: var(--wp-admin-border-width-focus);
-}
-
-.editor-collab-sidebar-panel__thread-overlay {
-	background-color: rgba(0, 0, 0, 0.7);
-	width: 100%;
-	height: 100%;
-	text-align: center;
-	position: absolute;
-	top: 0;
-	left: 0;
-	z-index: 1;
-	padding: 15px;
-	border-radius: $radius-large;
-	color: $white;
-
-	p {
-		margin-bottom: 15px;
-	}
-
-	button {
-		padding: 4px 10px;
-		color: $white;
-	}
 }
 
 .editor-collab-sidebar-panel__comment-status {
