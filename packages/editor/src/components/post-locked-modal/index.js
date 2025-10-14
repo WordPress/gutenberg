@@ -57,7 +57,7 @@ function PostLockedModal() {
 			activePostLock: getActivePostLock(),
 			postType: getPostType( getEditedPostAttribute( 'type' ) ),
 			previewLink: getEditedPostPreviewLink(),
-			supportsSync: getEntityConfig( 'postType', entityName )?.syncConfig?.enabled,
+			supportsSync: Boolean( getEntityConfig( 'postType', entityName )?.syncConfig ),
 		};
 	}, [] );
 
