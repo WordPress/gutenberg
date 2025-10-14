@@ -6,6 +6,8 @@ import fastDeepEqual from 'fast-deep-equal/es6';
 /**
  * WordPress dependencies
  */
+// @ts-expect-error No exported types.
+import { __unstableSerializeAndClean } from '@wordpress/blocks';
 import { type CRDTDoc, type ObjectData, Y } from '@wordpress/sync';
 
 /**
@@ -19,7 +21,7 @@ import {
 } from './crdt-blocks';
 import { type Post } from '../entity-types/post';
 import { type Type } from '../entity-types';
-import { CRDT_RECORD_MAP_KEY } from '../sync';
+import { CRDT_DOC_META_PERSISTENCE_KEY, CRDT_RECORD_MAP_KEY } from '../sync';
 import type { WPBlockSelection, WPSelection } from '../types';
 
 export type PostChanges = Partial< Post > & {
@@ -218,6 +220,35 @@ export function getPostChangesFromCRDTDoc(
 
 			switch ( key ) {
 				case 'blocks': {
+					// When we are passed a persisted CRDT document, make a special
+					// comparison of the content and blocks.
+					//
+					// When other fields (besides `blocks`) are mutated outside the block
+					// editor, the change is caught by an equality check (see other cases
+					// in this `switch` statement). As a transient property, `blocks`
+					// cannot be directly mutated outside the block editor -- only
+					// `content` can.
+					//
+					// Therefore, for this special comparison, we serialize the `blocks`
+					// from the persisted CRDT document and compare that to the content
+					// from the persisted record. If they differ, we know that the content
+					// in the database has changed, and therefore the blocks have changed.
+					//
+					// We cannot directly compare the `blocks` from the CRDT document to
+					// the `blocks` derived from the `content` in the persisted record,
+					// because the latter will have different client IDs.
+					if (
+						ydoc.meta?.get( CRDT_DOC_META_PERSISTENCE_KEY ) &&
+						editedRecord.content
+					) {
+						const blocks = ymap.get( 'blocks' ) as YBlocks;
+						return (
+							__unstableSerializeAndClean(
+								blocks.toJSON()
+							).trim() !== editedRecord.content.raw.trim()
+						);
+					}
+
 					// The consumers of blocks have memoization that renders optimization
 					// here unnecessary.
 					return true;
