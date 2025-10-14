@@ -9,7 +9,7 @@ import {
 	Popover,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { useMemo, useRef } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 
 /**
  * External dependencies
@@ -18,7 +18,7 @@ import temml from 'temml';
 
 export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 	const { latex } = attributes;
-	const blockRef = useRef();
+	const [ blockRef, setBlockRef ] = useState();
 
 	const { mathML, error } = useMemo( () => {
 		try {
@@ -36,14 +36,19 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 	return (
 		<>
 			<div
-				{ ...useBlockProps( { ref: blockRef } ) }
-				dangerouslySetInnerHTML={ { __html: mathML } }
-			></div>
+				{ ...useBlockProps( {
+					ref: setBlockRef,
+					position: 'relative',
+				} ) }
+				{ ...( mathML
+					? { dangerouslySetInnerHTML: { __html: mathML } }
+					: { children: '\u200B' } ) }
+			/>
 			{ isSelected && (
 				<Popover
 					placement="bottom"
 					offset={ 8 }
-					anchor={ blockRef.current }
+					anchor={ blockRef }
 					focusOnMount="firstContentElement"
 				>
 					<div style={ { padding: '16px', minWidth: '300px' } }>
