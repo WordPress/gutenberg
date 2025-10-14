@@ -130,5 +130,6 @@ function gutenberg_allow_duplicate_note_resolution( $dupe_id, $commentdata ) {
 	if ( isset( $commentdata['meta']['_wp_note_status'] ) && in_array( $commentdata['meta']['_wp_note_status'], array( 'resolved', 'reopen' ), true ) ) {
 		return false;
 	}
+	return $dupe_id;
 }
 add_filter( 'duplicate_comment_id', 'gutenberg_allow_duplicate_note_resolution', 10, 2 );

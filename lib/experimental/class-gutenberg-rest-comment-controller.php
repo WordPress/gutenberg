@@ -550,11 +550,12 @@ class Gutenberg_REST_Comment_Controller extends WP_REST_Comments_Controller {
 			return true;
 		}
 
-		// Allow empty block comments with resolution metadata [backport].
+		// Allow empty block comments only when resolution metadata is valid [backport].
 		if (
 			isset( $check['comment_type'] ) &&
 			'note' === $check['comment_type'] &&
-			isset( $check['meta']['_wp_note_status'] )
+			isset( $check['meta']['_wp_note_status'] ) &&
+			in_array( $check['meta']['_wp_note_status'], array( 'resolved', 'reopen' ), true )
 		) {
 			return true;
 		}

@@ -245,6 +245,139 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * Test that empty block comments with resolution metadata are allowed.
+	 *
+	 * @param string $status The status of the block comment.
+	 *
+	 * @dataProvider data_note_status_provider
+	 */
+	public function test_create_empty_block_comment_with_resolution_meta( $status ) {
+		wp_set_current_user( self::$user_ids['editor'] );
+		$post_id = $this->factory->post->create();
+		$params  = array(
+			'post'         => $post_id,
+			'author_name'  => 'Editor',
+			'author_email' => 'editor@example.com',
+			'author_url'   => 'https://example.com',
+			'author'       => self::$user_ids['editor'],
+			'type'         => 'note',
+			'content'      => '',
+			'meta'         => array(
+				'_wp_note_status' => $status,
+			),
+		);
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 201, $response->get_status() );
+	}
+
+	/**
+	 * Test that empty block comments without resolution metadata are not allowed.
+	 */
+	public function test_cannot_create_empty_block_comment_without_resolution_meta() {
+		wp_set_current_user( self::$user_ids['editor'] );
+		$post_id = $this->factory->post->create();
+		$params  = array(
+			'post'         => $post_id,
+			'author_name'  => 'Editor',
+			'author_email' => 'editor@example.com',
+			'author_url'   => 'https://example.com',
+			'author'       => self::$user_ids['editor'],
+			'type'         => 'note',
+			'content'      => '',
+		);
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'rest_comment_content_invalid', $response, 400 );
+	}
+
+	/**
+	 * Test that empty block comments with invalid resolution metadata are not allowed.
+	 */
+	public function test_cannot_create_empty_block_comment_with_invalid_resolution_meta() {
+		wp_set_current_user( self::$user_ids['editor'] );
+		$post_id = $this->factory->post->create();
+		$params  = array(
+			'post'         => $post_id,
+			'author_name'  => 'Editor',
+			'author_email' => 'editor@example.com',
+			'author_url'   => 'https://example.com',
+			'author'       => self::$user_ids['editor'],
+			'type'         => 'note',
+			'content'      => '',
+			'meta'         => array(
+				'_wp_note_status' => 'invalid',
+			),
+		);
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'rest_comment_content_invalid', $response, 400 );
+	}
+
+	/**
+	 * Test that duplicate block comments with resolution metadata are allowed.
+	 */
+	public function test_create_duplicate_block_comment_with_resolution_metadata() {
+		wp_set_current_user( self::$user_ids['editor'] );
+		$post_id = $this->factory->post->create();
+
+		for ( $i = 0; $i < 2; $i++ ) {
+			$params  = array(
+				'post'         => $post_id,
+				'author_name'  => 'Editor',
+				'author_email' => 'editor@example.com',
+				'author_url'   => 'https://example.com',
+				'author'       => self::$user_ids['editor'],
+				'type'         => 'note',
+				'content'      => 'Doplicated comment',
+				'meta'         => array(
+					'_wp_note_status' => 'resolved',
+				),
+			);
+			$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+			$request->add_header( 'Content-Type', 'application/json' );
+			$request->set_body( wp_json_encode( $params ) );
+			$response = rest_get_server()->dispatch( $request );
+			$this->assertSame( 201, $response->get_status() );
+		}
+	}
+
+	/**
+	 * Test that duplicate block comments without resolution metadata are not allowed.
+	 */
+	public function test_cannot_create_duplicate_block_comment_without_resolution_meta() {
+		wp_set_current_user( self::$user_ids['editor'] );
+		$post_id = $this->factory->post->create();
+		$params  = array(
+			'post'         => $post_id,
+			'author_name'  => 'Editor',
+			'author_email' => 'editor@example.com',
+			'author_url'   => 'https://example.com',
+			'author'       => self::$user_ids['editor'],
+			'type'         => 'note',
+			'content'      => 'Doplicated comment',
+		);
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 201, $response->get_status() );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'comment_duplicate', $response, 409 );
+	}
+
+	/**
 	 * Test that for each user role, the permissions are correct when accessing comments.
 	 *
 	 * @param string $role The user role to test.
@@ -355,6 +488,13 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_Test_REST_TestCase {
 			'Subscriber cannot see block comments'         => array( 'subscriber', 'author', false ),
 			'Author can see block comments on own post'    => array( 'author', 'author', true ),
 			'Contributor can see block comments on own post' => array( 'contributor', 'contributor', true ),
+		);
+	}
+
+	public function data_note_status_provider() {
+		return array(
+			'resolved' => array( 'resolved' ),
+			'reopen'   => array( 'reopen' ),
 		);
 	}
 }
