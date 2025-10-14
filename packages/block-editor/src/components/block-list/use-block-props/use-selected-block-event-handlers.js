@@ -186,8 +186,8 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				const originClientY = event.clientY;
 
 				// We can't use position fixed because it will behave different
-				// if the html element is is scaled or transformed (position
-				// will no longer be relative to the viewport). The downside of
+				// if the html element is scaled or transformed (position will
+				// no longer be relative to the viewport). The downside of
 				// relative is that we have to listen to scroll events. On the
 				// upside we don't have to clone to keep a space. Absolute
 				// positioning might be weird because it will be based on the
@@ -203,7 +203,6 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				const dragScale = rect.height > 200 ? 200 / rect.height : 1;
 
 				node.style.zIndex = '1000';
-				node.style.transformOrigin = '0 0';
 				node.style.transformOrigin = `${ originX * inverted }px ${
 					originY * inverted
 				}px`;
@@ -240,6 +239,8 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				function end() {
 					ownerDocument.removeEventListener( 'dragover', over );
 					ownerDocument.removeEventListener( 'dragend', end );
+					ownerDocument.removeEventListener( 'drop', end );
+					ownerDocument.removeEventListener( 'scroll', over );
 					for ( const [ property, value ] of Object.entries(
 						originalNodeProperties
 					) ) {
