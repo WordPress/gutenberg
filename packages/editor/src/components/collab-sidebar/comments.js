@@ -190,7 +190,7 @@ export function Comments( {
 				justify="flex-start"
 				spacing="2"
 			>
-				{ __( 'No notes available' ) }
+				{ __( 'No notes available.' ) }
 			</VStack>
 		);
 	}
