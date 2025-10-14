@@ -130,32 +130,50 @@ export function Comments( {
 		 */
 		const calculateAllOffsets = () => {
 			const offsets = {};
-			let previousThreadData = null;
 
 			if ( ! isFloating ) {
 				return;
 			}
 
-			// Go through the comment threads from top to bottom.
-			threads.forEach( ( thread ) => {
-				if ( ! blockRefs[ thread.id ] ) {
-					return;
-				}
-				// The thread's starting top position is determined by its
-				// associated block's position.
-				const blockElement = blockRefs[ thread.id ];
-				const blockRect = blockElement?.getBoundingClientRect();
-				const threadTop = blockRect?.top || 0;
+			// Find the index of the selected thread.
+			const selectedThreadIndex = threads.findIndex(
+				( t ) => t.id === selectedThread
+			);
 
-				// Heights are tracked by the comment threads themselves.
-				const threadHeight = heights[ thread.id ] || 0;
+			const breakIndex =
+				selectedThreadIndex === -1 ? 0 : selectedThreadIndex;
 
-				// By default, remove the top margin by shifting the block up
-				// so it more precisely aligns with the block.
-				let additionalOffset = -16;
+			// If there is a selected thread, push threads above up and threads below down.
+			const selectedThreadData = threads[ breakIndex ];
+			if ( blockRefs[ selectedThreadData.id ] ) {
+				let blockElement = blockRefs[ selectedThreadData.id ];
+				let blockRect = blockElement?.getBoundingClientRect();
+				const selectedThreadTop = blockRect?.top || 0;
+				const selectedThreadHeight =
+					heights[ selectedThreadData.id ] || 0;
 
-				// The first block never needs to be adjusted.
-				if ( previousThreadData ) {
+				offsets[ selectedThreadData.id ] = -16;
+
+				let previousThreadData = {
+					threadTop: selectedThreadTop - 16,
+					threadHeight: selectedThreadHeight,
+				};
+
+				// Process threads after the selected thread, offsetting any overlapping
+				// threads downward.
+				for ( let i = breakIndex + 1; i < threads.length; i++ ) {
+					const thread = threads[ i ];
+					if ( ! blockRefs[ thread.id ] ) {
+						continue;
+					}
+
+					blockElement = blockRefs[ thread.id ];
+					blockRect = blockElement?.getBoundingClientRect();
+					const threadTop = blockRect?.top || 0;
+					const threadHeight = heights[ thread.id ] || 0;
+
+					let additionalOffset = -16;
+
 					// Check if the thread overlaps with the previous one.
 					const previousBottom =
 						previousThreadData.threadTop +
@@ -164,22 +182,64 @@ export function Comments( {
 						// Shift down by the difference plus a margin to avoid overlap.
 						additionalOffset = previousBottom - threadTop + 20;
 					}
+
+					offsets[ thread.id ] = additionalOffset;
+
+					// Update for next iteration.
+					previousThreadData = {
+						threadTop: threadTop + additionalOffset,
+						threadHeight,
+					};
 				}
 
-				// Store the current thread's position and height for the next iteration.
-				previousThreadData = {
-					threadTop: threadTop + additionalOffset,
-					threadHeight,
+				// Process threads before the selected thread, offsetting any overlapping
+				// threads upward.
+				let nextThreadData = {
+					threadTop: selectedThreadTop - 16,
+					threadHeight: selectedThreadHeight,
 				};
 
-				offsets[ thread.id ] = additionalOffset;
-			} );
+				for ( let i = selectedThreadIndex - 1; i >= 0; i-- ) {
+					const thread = threads[ i ];
+					if ( ! blockRefs[ thread.id ] ) {
+						continue;
+					}
+
+					blockElement = blockRefs[ thread.id ];
+					blockRect = blockElement?.getBoundingClientRect();
+					const threadTop = blockRect?.top || 0;
+					const threadHeight = heights[ thread.id ] || 0;
+
+					let additionalOffset = -16;
+
+					// Calculate the bottom position of this thread with default offset.
+					const threadBottom = threadTop + threadHeight;
+
+					// Check if this thread's bottom would overlap with the next thread's top.
+					if ( threadBottom > nextThreadData.threadTop ) {
+						// Shift up by the difference plus a margin to avoid overlap.
+						additionalOffset =
+							nextThreadData.threadTop -
+							threadTop -
+							threadHeight -
+							20;
+					}
+
+					offsets[ thread.id ] = additionalOffset;
+
+					// Update for next iteration (going upward).
+					nextThreadData = {
+						threadTop: threadTop + additionalOffset,
+						threadHeight,
+					};
+				}
+			}
 
 			return offsets;
 		};
 		const newOffsets = calculateAllOffsets();
 		setBoardOffsets( newOffsets );
-	}, [ heights, blockIds, blockRefs, isFloating, threads ] );
+	}, [ heights, blockIds, blockRefs, isFloating, threads, selectedThread ] );
 
 	const hasThreads = Array.isArray( threads ) && threads.length > 0;
 	if ( ! hasThreads ) {
