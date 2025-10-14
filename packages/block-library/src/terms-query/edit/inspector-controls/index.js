@@ -142,6 +142,13 @@ export default function TermsQueryInspectorControls( {
 								setQuery( { hideEmpty: value } )
 							}
 							disabled={ inheritingFromPost }
+							help={
+								inheritingFromPost
+									? __(
+											'When inheriting terms from a post, empty terms are not shown.'
+									  )
+									: undefined
+							}
 						/>
 					</ToolsPanelItem>
 					{ displayInheritControl && (
