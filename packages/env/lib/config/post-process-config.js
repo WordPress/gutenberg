@@ -193,7 +193,7 @@ async function enableHttps( config ) {
 			''
 		);
 		const httpsUrl = ( url ) => url.replace( /^http:\/\//i, 'https://' );
-		const domainName = config.config.WP_HOME.replace( /^https?:\/\//i, '' );
+		const domainName = new URL(config.config.WP_HOME).hostname;
 
 		// change the siteurl and home to https
 		config.config.WP_SITEURL = httpsUrl( config.config.WP_SITEURL );
