@@ -754,7 +754,9 @@ test.describe( 'Navigation block', () => {
 		let testPage1, testPage2, testPage3;
 
 		test.beforeAll( async ( { requestUtils } ) => {
-			// Activate the pretty permalinks plugin
+			// Activate the pretty permalinks plugin.
+			// This is required to verify that modifying the page slug will dynamically update
+			// the URL in the editor and frontend.
 			await requestUtils.activatePlugin(
 				'gutenberg-test-pretty-permalinks'
 			);
