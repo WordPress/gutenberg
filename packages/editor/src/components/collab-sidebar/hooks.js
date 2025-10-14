@@ -34,6 +34,7 @@ import { store as interfaceStore } from '@wordpress/interface';
 import { store as editorStore } from '../../store';
 import { collabSidebarName } from './constants';
 import { unlock } from '../../lock-unlock';
+import { noop } from './utils';
 
 const { useBlockElementRef } = unlock( blockEditorPrivateApis );
 
@@ -155,7 +156,7 @@ export function useBlockComments( postId ) {
 	};
 }
 
-export function useBlockCommentsActions( reflowComments ) {
+export function useBlockCommentsActions( reflowComments = noop ) {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
 	const { getCurrentPostId } = useSelect( editorStore );

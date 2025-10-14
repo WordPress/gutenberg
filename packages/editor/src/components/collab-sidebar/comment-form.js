@@ -20,27 +20,15 @@ import { useInstanceId, useDebounce } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { sanitizeCommentString } from './utils';
+import { sanitizeCommentString, noop } from './utils';
 
-/**
- * EditComment component.
- *
- * @param {Object}   props                  - The component props.
- * @param {Function} props.onSubmit         - The function to call when updating the comment.
- * @param {Function} props.onCancel         - The function to call when canceling the comment update.
- * @param {Object}   props.thread           - The comment thread object.
- * @param {string}   props.submitButtonText - The text to display on the submit button.
- * @param {string?}  props.labelText        - The label text for the comment input.
- * @param {Function} props.reflowComments   - The function to call when the comment is updated.
- * @return {React.ReactNode} The CommentForm component.
- */
 function CommentForm( {
 	onSubmit,
 	onCancel,
 	thread,
 	submitButtonText,
 	labelText,
-	reflowComments,
+	reflowComments = noop,
 } ) {
 	const [ inputComment, setInputComment ] = useState(
 		thread?.content?.raw ?? ''
