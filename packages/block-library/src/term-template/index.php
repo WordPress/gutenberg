@@ -30,29 +30,34 @@ function render_block_core_term_template( $attributes, $content, $block ) {
 	$query = $query_block_context['termQuery'];
 
 	$query_args = array(
-		'taxonomy'   => $query['taxonomy'],
 		'number'     => $query['perPage'],
 		'order'      => $query['order'],
 		'orderby'    => $query['orderBy'],
 		'hide_empty' => $query['hideEmpty'],
 	);
 
-	// We set parent only when inheriting from the taxonomy archive context or not
-	// showing nested terms, otherwise nested terms are not displayed.
-	if (
-		isset( $query['inherit'] )
+	$inherit_query = isset( $query['inherit'] )
 		&& $query['inherit']
-		&& (
-			is_tax( $query_args['taxonomy'] )
-			// is_tax() does not detect built-in category or tag archives, only custom taxonomies.
-			|| ( 'category' === $query_args['taxonomy'] && is_category() )
-			|| ( 'post_tag' === $query_args['taxonomy'] && is_tag() )
-		)
-	) {
-		// Get the current term ID from the queried object.
-		$current_term_id      = get_queried_object_id();
-		$query_args['parent'] = $current_term_id;
-	} elseif ( empty( $query['showNested'] ) ) {
+		&& ( is_tax() || is_category() || is_tag() );
+
+	if ( $inherit_query ) {
+		// Get the current term and taxonomy from the queried object.
+		$queried_object = get_queried_object();
+
+		// For hierarchical taxonomies, show direct children of the current term.
+		// For non-hierarchical taxonomies, show all terms (don't set parent).
+		if ( is_taxonomy_hierarchical( $queried_object->taxonomy ) ) {
+			$query_args['parent'] = $queried_object->term_id;
+		}
+		$query_args['taxonomy'] = $queried_object->taxonomy;
+	} else {
+		// If not inheriting set `taxonomy` from the block attribute.
+		$query_args['taxonomy'] = $query['taxonomy'];
+	}
+
+	// Set `parent` if we are not inheriting from the taxonomy archive context and not
+	// showing nested terms, otherwise nested terms are not displayed.
+	if ( ! $inherit_query && empty( $query['showNested'] ) ) {
 		$query_args['parent'] = 0;
 	}
 

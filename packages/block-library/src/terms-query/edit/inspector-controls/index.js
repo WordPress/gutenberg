@@ -46,24 +46,26 @@ export default function TermsQueryInspectorControls( {
 		( _taxonomy ) => _taxonomy.slug === taxonomy
 	)?.hierarchical;
 
-	const isTaxonomyMatchingTemplate = templateSlug?.startsWith(
-		// `Tags` are a special case in WP template hierarchy.
-		taxonomy === 'post_tag' ? 'tag' : taxonomy
-	);
-
-	// Only display the inherit control if the taxonomy is hierarchical and matches the current template.
+	// Display the inherit control when we're in a taxonomy-related
+	// template (category, tag, or custom taxonomy).
 	const displayInheritControl =
-		isTaxonomyHierarchical && isTaxonomyMatchingTemplate;
+		templateSlug?.startsWith( 'taxonomy' ) ||
+		templateSlug?.startsWith( 'category' ) ||
+		templateSlug?.startsWith( 'tag' ) ||
+		templateSlug === 'archive';
 
 	// Only display the showNested control if the taxonomy is hierarchical and not inheriting.
 	const displayShowNestedControl =
 		isTaxonomyHierarchical && ! termQuery.inherit;
 
+	// Only display the taxonomy control when not inheriting (custom query type).
+	const displayTaxonomyControl = ! termQuery.inherit;
+
 	// Labels shared between ToolsPanelItem and its child control.
+	const queryTypeControlLabel = __( 'Query type' );
 	const taxonomyControlLabel = __( 'Taxonomy' );
 	const orderByControlLabel = __( 'Order by' );
 	const emptyTermsControlLabel = __( 'Show empty terms' );
-	const inheritControlLabel = __( 'Inherit parent term from archive' );
 	const nestedTermsControlLabel = __( 'Show nested terms' );
 	const maxTermsControlLabel = __( 'Max terms' );
 
@@ -80,6 +82,7 @@ export default function TermsQueryInspectorControls( {
 								orderBy: 'name',
 								hideEmpty: true,
 								showNested: false,
+								inherit: false,
 								parent: false,
 								perPage: 10,
 							},
@@ -87,22 +90,38 @@ export default function TermsQueryInspectorControls( {
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
 				>
-					<ToolsPanelItem
-						hasValue={ () => taxonomy !== 'category' }
-						label={ taxonomyControlLabel }
-						onDeselect={ () => {
-							setQuery( { taxonomy: 'category' } );
-						} }
-						isShownByDefault
-					>
-						<TaxonomyControl
+					{ displayInheritControl && (
+						<ToolsPanelItem
+							hasValue={ () => inherit !== false }
+							label={ queryTypeControlLabel }
+							onDeselect={ () => setQuery( { inherit: false } ) }
+							isShownByDefault
+						>
+							<InheritControl
+								label={ queryTypeControlLabel }
+								value={ inherit }
+								onChange={ setQuery }
+							/>
+						</ToolsPanelItem>
+					) }
+					{ displayTaxonomyControl && (
+						<ToolsPanelItem
+							hasValue={ () => taxonomy !== 'category' }
 							label={ taxonomyControlLabel }
-							value={ taxonomy }
-							onChange={ ( value ) =>
-								setQuery( { taxonomy: value } )
-							}
-						/>
-					</ToolsPanelItem>
+							onDeselect={ () => {
+								setQuery( { taxonomy: 'category' } );
+							} }
+							isShownByDefault
+						>
+							<TaxonomyControl
+								label={ taxonomyControlLabel }
+								value={ taxonomy }
+								onChange={ ( value ) =>
+									setQuery( { taxonomy: value } )
+								}
+							/>
+						</ToolsPanelItem>
+					) }
 					<ToolsPanelItem
 						hasValue={ () => orderBy !== 'name' || order !== 'asc' }
 						label={ orderByControlLabel }
@@ -136,20 +155,6 @@ export default function TermsQueryInspectorControls( {
 							}
 						/>
 					</ToolsPanelItem>
-					{ displayInheritControl && (
-						<ToolsPanelItem
-							hasValue={ () => inherit !== false }
-							label={ inheritControlLabel }
-							onDeselect={ () => setQuery( { inherit: false } ) }
-							isShownByDefault
-						>
-							<InheritControl
-								label={ inheritControlLabel }
-								value={ inherit }
-								onChange={ setQuery }
-							/>
-						</ToolsPanelItem>
-					) }
 					{ displayShowNestedControl && (
 						<ToolsPanelItem
 							hasValue={ () => showNested !== false }
