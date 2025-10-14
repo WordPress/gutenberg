@@ -67,7 +67,6 @@ export function AddComment( {
 			<CommentForm
 				onSubmit={ async ( inputComment ) => {
 					const { id } = await onSubmit( { content: inputComment } );
-					setShowCommentBoard( false );
 					focusCommentThread( id, commentSidebarRef.current );
 				} }
 				onCancel={ () => {

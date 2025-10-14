@@ -52,15 +52,14 @@ function CollabSidebarContent( {
 				// Keeps the ref fresh when switching between floating and pinned sidebar.
 				commentSidebarRef.current = node;
 			} }
+			justify="flex-start"
 		>
-			{ ! isFloating && (
 				<AddComment
 					onSubmit={ onCreate }
 					showCommentBoard={ showCommentBoard }
 					setShowCommentBoard={ setShowCommentBoard }
 					commentSidebarRef={ commentSidebarRef }
 				/>
-			) }
 			<Comments
 				threads={ comments }
 				onEditComment={ onEdit }
@@ -129,15 +128,11 @@ export default function CollabSidebar() {
 	}
 
 	async function openTheSidebar() {
-		enableComplementaryArea( 'core', collabHistorySidebarName );
+		enableComplementaryArea( 'core', collabSidebarName );
 		const activeArea = await getActiveComplementaryArea( 'core' );
 
 		// Move focus to the target element after the sidebar has opened.
-		if (
-			[ collabHistorySidebarName, collabSidebarName ].includes(
-				activeArea
-			)
-		) {
+		if ( [ collabSidebarName, collabSidebarName ].includes( activeArea ) ) {
 			setShowCommentBoard( ! blockCommentId );
 			focusCommentThread(
 				blockCommentId,
@@ -173,7 +168,7 @@ export default function CollabSidebar() {
 					commentLastUpdated={ commentLastUpdated }
 				/>
 			</PluginSidebar>
-			{ isLargeViewport && unresolvedSortedThreads.length > 0 && (
+			{ isLargeViewport && (
 				<PluginSidebar
 					isPinnable={ false }
 					header={ false }
