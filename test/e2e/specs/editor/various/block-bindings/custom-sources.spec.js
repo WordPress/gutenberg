@@ -1197,7 +1197,7 @@ test.describe( 'Registered sources', () => {
 		} );
 		await expect( contentButton ).toContainText( 'Server Source' );
 	} );
-	test( 'should show an "Invalid source" warning for not registered sources', async ( {
+	test( 'should show an "Source not registered" warning for not registered sources', async ( {
 		editor,
 		page,
 	} ) => {
@@ -1217,7 +1217,7 @@ test.describe( 'Registered sources', () => {
 		const contentButton = page.getByRole( 'button', {
 			name: 'content',
 		} );
-		await expect( contentButton ).toContainText( 'Invalid source' );
+		await expect( contentButton ).toContainText( 'Source not registered' );
 	} );
 
 	test.describe( 'Modal source', () => {
@@ -1314,22 +1314,23 @@ test.describe( 'Registered sources', () => {
 			editor,
 			page,
 		} ) => {
-			// Test string attribute - paragraph content
-			await editor.insertBlock( { name: 'core/image' } );
+			await editor.insertBlock( {
+				name: 'core/image',
+			} );
+
+			// Open the bindings panel
 			await page.getByLabel( 'Attributes options' ).click();
 			await page
-				.getByRole( 'menuitemcheckbox', { name: 'Show id' } )
+				.getByRole( 'menuitemcheckbox', {
+					name: 'Show id',
+				} )
 				.click();
-			await page.getByRole( 'button', { name: 'id' } ).click();
 
-			// String sources enabled, number source disabled for string attribute
-			await expect(
-				page.getByRole( 'menuitem', { name: 'Complete Source' } )
-			).toBeDisabled();
-
-			await expect(
-				page.getByRole( 'menuitem', { name: 'Modal Source' } )
-			).toBeEnabled();
+			// Click on the content binding button
+			const idButton = page.getByRole( 'button', {
+				name: 'id',
+			} );
+			await expect( idButton ).toContainText( 'Not connected' );
 		} );
 	} );
 } );

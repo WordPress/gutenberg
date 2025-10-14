@@ -166,7 +166,7 @@ function gutenberg_test_block_bindings_registration() {
 	);
 	register_meta(
 		'post',
-		'number',
+		'number_custom_field',
 		array(
 			'label'        => 'Number custom field',
 			'type'         => 'number',
