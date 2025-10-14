@@ -753,6 +753,13 @@ test.describe( 'Navigation block', () => {
 		// eslint-disable-next-line no-unused-vars
 		let testPage1, testPage2, testPage3;
 
+		test.beforeAll( async ( { requestUtils } ) => {
+			// Activate the pretty permalinks plugin
+			await requestUtils.activatePlugin(
+				'gutenberg-test-pretty-permalinks'
+			);
+		} );
+
 		test.beforeEach( async ( { requestUtils } ) => {
 			testPage1 = await requestUtils.createPage( {
 				title: 'Test Page 1',
@@ -772,6 +779,13 @@ test.describe( 'Navigation block', () => {
 
 		test.afterEach( async ( { requestUtils } ) => {
 			await requestUtils.deleteAllPages();
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			// Deactivate the pretty permalinks plugin
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-pretty-permalinks'
+			);
 		} );
 
 		test( 'can bind to a page', async ( {
