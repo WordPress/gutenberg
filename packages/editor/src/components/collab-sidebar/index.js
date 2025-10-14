@@ -54,12 +54,12 @@ function CollabSidebarContent( {
 			} }
 			justify="flex-start"
 		>
-				<AddComment
-					onSubmit={ onCreate }
-					showCommentBoard={ showCommentBoard }
-					setShowCommentBoard={ setShowCommentBoard }
-					commentSidebarRef={ commentSidebarRef }
-				/>
+			<AddComment
+				onSubmit={ onCreate }
+				showCommentBoard={ showCommentBoard }
+				setShowCommentBoard={ setShowCommentBoard }
+				commentSidebarRef={ commentSidebarRef }
+			/>
 			<Comments
 				threads={ comments }
 				onEditComment={ onEdit }
