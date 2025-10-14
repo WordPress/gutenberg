@@ -43,8 +43,8 @@ function gutenberg_register_block_comment_metadata() {
 					'enum' => array( 'resolved', 'reopen' ),
 				),
 			),
-			'auth_callback' => function () {
-				return current_user_can( 'edit_posts' );
+			'auth_callback' => function ( $allowed, $meta_key, $object_id ) {
+				return current_user_can( 'edit_comment', $object_id );
 			},
 		)
 	);
