@@ -560,7 +560,7 @@ const CommentBoard = ( {
 			: [];
 
 	return (
-		<VStack spacing="2" id={ thread.id }>
+		<VStack spacing="2">
 			<HStack alignment="left" spacing="3" justify="flex-start">
 				<CommentAuthorInfo
 					avatar={ thread?.author_avatar_urls?.[ 48 ] }
