@@ -38,11 +38,11 @@ export default function EnhancedPaginationModal( {
 
 	const notice =
 		__(
-			'If you still want to prevent full page reloads, remove that block, then disable "Reload full page" again in the Query Block settings.'
+			'Currently, avoiding full page reloads is not possible when non-interactive or non-client Navigation compatible blocks from plugins are present inside the Query block.'
 		) +
 		' ' +
 		__(
-			'Currently, avoiding full page reloads is not possible when non-interactive or non-client Navigation compatible blocks from plugins are present inside the Query block.'
+			'If you still want to prevent full page reloads, remove that block, then disable "Reload full page" again in the Query Block settings.'
 		);
 
 	return (
