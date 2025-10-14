@@ -756,34 +756,17 @@ test.describe( 'Navigation block', () => {
 		// Use a fixture to manage pretty permalinks with automatic cleanup.
 		// This is more reliable than beforeAll/afterAll because Playwright's fixture
 		// system ensures teardown runs even if tests crash or are interrupted.
-		test.use( {
-			prettyPermalinks: async ( { requestUtils }, use ) => {
-				// Setup: Enable pretty permalinks
-				await requestUtils.activatePlugin(
-					'gutenberg-test-pretty-permalinks'
-				);
+		test.beforeAll( async ( { requestUtils } ) => {
+			// Setup: Enable pretty permalinks
+			await requestUtils.activatePlugin(
+				'gutenberg-test-pretty-permalinks'
+			);
 
-				// Force re-discovery of REST API root URL after enabling pretty permalinks.
-				// When permalinks change from plain to pretty, the REST API URL changes
-				// from /?rest_route=/ to /wp-json/. We need to refresh the cached URL
-				// to prevent 404 errors.
-				await requestUtils.setupRest();
-
-				// Provide the fixture value to tests
-				await use( true );
-
-				// Teardown: Disable pretty permalinks
-				// This runs automatically after all tests, even if they fail or crash
-				await requestUtils.deactivatePlugin(
-					'gutenberg-test-pretty-permalinks'
-				);
-
-				// Force re-discovery of REST API root URL after disabling pretty permalinks.
-				// When permalinks change from pretty to plain, the REST API URL changes
-				// from /wp-json/ back to /?rest_route=/. We need to refresh the cached URL
-				// to prevent 404 errors.
-				await requestUtils.setupRest();
-			},
+			// Force re-discovery of REST API root URL after enabling pretty permalinks.
+			// When permalinks change from plain to pretty, the REST API URL changes
+			// from /?rest_route=/ to /wp-json/. We need to refresh the cached URL
+			// to prevent 404 errors.
+			await requestUtils.setupRest();
 		} );
 
 		test.beforeEach( async ( { requestUtils } ) => {
@@ -805,6 +788,20 @@ test.describe( 'Navigation block', () => {
 
 		test.afterEach( async ( { requestUtils } ) => {
 			await requestUtils.deleteAllPages();
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			// Teardown: Disable pretty permalinks
+			// This runs automatically after all tests, even if they fail or crash
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-pretty-permalinks'
+			);
+
+			// Force re-discovery of REST API root URL after disabling pretty permalinks.
+			// When permalinks change from pretty to plain, the REST API URL changes
+			// from /wp-json/ back to /?rest_route=/. We need to refresh the cached URL
+			// to prevent 404 errors.
+			await requestUtils.setupRest();
 		} );
 
 		test( 'can bind to a page', async ( {
@@ -909,14 +906,17 @@ test.describe( 'Navigation block', () => {
 			} );
 
 			await test.step( 'Update page slug and verify frontend reflects change', async () => {
+				const updatedPageSlug = 'page-1-changed';
 				// Update the page slug via REST API
 				updatedPage = await requestUtils.rest( {
 					method: 'PUT',
 					path: `/wp/v2/pages/${ testPage1.id }`,
 					data: {
-						slug: 'page-1-changed',
+						slug: updatedPageSlug,
 					},
 				} );
+
+				expect( updatedPage.link ).toContain( `/${ updatedPageSlug }` );
 
 				// Check that the frontend immediately shows the updated URL
 				await page.goto( `/?p=${ postId }` );
@@ -928,6 +928,15 @@ test.describe( 'Navigation block', () => {
 					'href',
 					updatedPage.link
 				);
+
+				// Verify the link goes to the correct page
+				await updatedFrontendLink.click();
+				await expect( page ).toHaveURL( updatedPage.link );
+
+				// Verify the page content is correct
+				await expect(
+					page.getByRole( 'heading', { name: 'Test Page 1' } )
+				).toBeVisible();
 			} );
 
 			await test.step( 'Verify editor sidebar reflects updated page URL', async () => {

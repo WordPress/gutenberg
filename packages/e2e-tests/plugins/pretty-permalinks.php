@@ -22,6 +22,7 @@ function gutenberg_e2e_setup_pretty_permalinks() {
 
 	// Only set if not already set to avoid unnecessary writes
 	if ( $current_structure !== '/%postname%/' ) {
+		update_option( 'permalink_structure', '/%postname%/' );
 		global $wp_rewrite;
 		$wp_rewrite->set_permalink_structure( '/%postname%/' );
 		$wp_rewrite->flush_rules( true ); // Hard flush to create .htaccess
@@ -34,6 +35,7 @@ add_action( 'init', 'gutenberg_e2e_setup_pretty_permalinks', 1 );
  * Deactivation hooks do work via REST API.
  */
 function gutenberg_e2e_restore_plain_permalinks() {
+	update_option( 'permalink_structure', '' );
 	global $wp_rewrite;
 	$wp_rewrite->set_permalink_structure( '' );
 	$wp_rewrite->flush_rules( true ); // Hard flush to update .htaccess
