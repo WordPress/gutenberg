@@ -80,7 +80,7 @@ export default function TermTemplateEdit( {
 			orderBy,
 			hideEmpty,
 			showNested = false,
-			perPage = 10,
+			perPage,
 			inherit = false,
 		} = {},
 		postId,
