@@ -428,7 +428,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 	if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
 		return null;
 	}
-	// Filter bindings to only show bindable attributes.
+
 	const { bindings } = metadata || {};
 
 	// Check if all sources have empty data arrays
