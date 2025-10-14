@@ -131,7 +131,7 @@ export function pasteHandler( {
 	const isPlainText = plainText && ( ! HTML || isPlain( HTML ) );
 
 	if ( isPlainText && isLatexMathMode( plainText ) ) {
-		return createBlock( 'core/math', { latex: plainText } );
+		return [ createBlock( 'core/math', { latex: plainText } ) ];
 	}
 
 	// Parse Markdown (and encoded HTML) if it's considered plain text.
