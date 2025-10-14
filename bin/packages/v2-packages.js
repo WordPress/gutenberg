@@ -7,6 +7,7 @@
  */
 const V2_PACKAGES = [
 	'a11y',
+	'admin-ui',
 	'annotations',
 	'api-fetch',
 	'autop',
@@ -29,6 +30,7 @@ const V2_PACKAGES = [
 	'data',
 	'data-controls',
 	'date',
+	'dataviews',
 	'dependency-extraction-webpack-plugin',
 	'deprecated',
 	'docgen',
