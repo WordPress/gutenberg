@@ -322,8 +322,8 @@ describe( 'getEntityRecords', () => {
 			baseURLParams: { context: 'edit' },
 		},
 		{
-			name: 'media',
-			kind: 'root',
+			name: 'attachment',
+			kind: 'postType',
 			supportsPagination: true,
 		},
 	];
@@ -544,7 +544,7 @@ describe( 'getEntityRecords', () => {
 			} );
 		} );
 
-		await getEntityRecords( 'root', 'media', {
+		await getEntityRecords( 'postType', 'attachment', {
 			per_page: -1,
 			[ RECEIVE_INTERMEDIATE_RESULTS ]: true,
 		} )( { dispatch, registry, resolveSelect } );
