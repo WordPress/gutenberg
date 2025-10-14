@@ -340,7 +340,7 @@ export const getEntityRecords =
 			let { baseURL } = entityConfig;
 			// `combinedTemplates` means that we fetch templates from the "old"
 			// /templates endpoint, which combines active user templates with
-			// the registered templates rewrites IDs in the form of
+			// the registered templates and rewrites IDs in the form of
 			// `theme-slug/template-slug`. When turned off, we only fetch
 			// database templates (posts). To fetch registered templates without
 			// edits applied, use the `wp_registered_template` entity.
