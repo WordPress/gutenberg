@@ -10,6 +10,7 @@ import {
 	CRDT_RECORD_MAP_KEY as RECORD_KEY,
 	LOCAL_SYNC_MANAGER_ORIGIN,
 } from './config';
+import { createPersistedCRDTDoc, getPersistedCrdtDoc } from './persistence';
 import { getProviderCreators } from './providers';
 import type {
 	CRDTDoc,
@@ -117,9 +118,22 @@ export function createSyncManager(): SyncManager {
 		// Attach observers.
 		recordMap.observeDeep( onRecordUpdate );
 
-		ydoc.transact( () => {
-			syncConfig.applyChangesToCRDTDoc( ydoc, record );
-		}, LOCAL_SYNC_MANAGER_ORIGIN );
+		// Get persisted CRDT document, if it exists.
+		const isValid = applyPersistedCrdtDoc( objectType, objectId, record );
+
+		// If there is no persisted document or if it has been invalidated by out-of-
+		// band updates, apply changes from the current entity record to the CRDT
+		// document. This ensures that the CRDT document reflects the latest state of
+		// the entity record.
+		if ( ! isValid ) {
+			ydoc.transact( () => {
+				syncConfig.applyChangesToCRDTDoc( ydoc, record );
+			}, LOCAL_SYNC_MANAGER_ORIGIN );
+
+			const meta = createEntityMeta( objectType, objectId );
+			handlers.editRecord( { meta } );
+			handlers.saveRecord();
+		}
 	}
 
 	/**
@@ -143,6 +157,61 @@ export function createSyncManager(): SyncManager {
 		objectId: ObjectID
 	): EntityID {
 		return `${ objectType }_${ objectId }`;
+	}
+
+	/**
+	 * Apply a persisted CRDT document to the current document, if it exists.
+	 * Return true if the document exists and is valid, otherwise false. Returning
+	 * a boolean allows us to destroy the temporary document and prevent it from
+	 * leaking out.
+	 *
+	 * @param {ObjectType} objectType Object type.
+	 * @param {ObjectID}   objectId   Object ID.
+	 * @param {ObjectData} record     Entity record representing this object type.
+	 * @return {boolean} True if a valid persisted document was applied, false
+	 *                   otherwise.
+	 */
+	function applyPersistedCrdtDoc(
+		objectType: ObjectType,
+		objectId: ObjectID,
+		record: ObjectData
+	): Boolean {
+		const entityId = getEntityId( objectType, objectId );
+		const entityState = entityStates.get( entityId );
+
+		if ( ! entityState ) {
+			return false;
+		}
+
+		const { syncConfig, ydoc } = entityState;
+
+		// Get the persisted CRDT document, if it exists.
+		const tempDoc = getPersistedCrdtDoc( record );
+
+		// Apply the persisted document to the current document as a singular update.
+		if ( tempDoc ) {
+			const update = Y.encodeStateAsUpdateV2( tempDoc );
+			tempDoc.destroy();
+
+			ydoc.transact( () => {
+				Y.applyUpdateV2( ydoc, update );
+			}, LOCAL_SYNC_MANAGER_ORIGIN );
+
+			// Check if the persisted doc has been invalidated by out-of-band updates
+			// (e.g., a WP CLI command or direct database update). If it has, return
+			// false so that we will apply changes from the current record and update
+			// the persisted CRDT document. This prevents a newly joining peer (or
+			// refreshing user) from re-initializing the CRDT document (the
+			// "initialization problem").
+			const changes = syncConfig.getChangesFromCRDTDoc( tempDoc, record );
+
+			if ( Object.keys( changes ).length > 0 ) {
+				return false;
+			}
+		}
+
+		// The persisted document exists and was valid.
+		return true;
 	}
 
 	/**
@@ -207,7 +276,28 @@ export function createSyncManager(): SyncManager {
 		handlers.editRecord( changes );
 	}
 
+	/**
+	 * Create object meta to persist the CRDT document in the entity record.
+	 *
+	 * @param {ObjectType} objectType Object type.
+	 * @param {ObjectID}   objectId   Object ID.
+	 */
+	function createEntityMeta(
+		objectType: ObjectType,
+		objectId: ObjectID
+	): Record< string, string > {
+		const entityId = getEntityId( objectType, objectId );
+		const entityState = entityStates.get( entityId );
+
+		if ( ! entityState?.syncConfig.supports?.crdtPersistence ) {
+			return {};
+		}
+
+		return createPersistedCRDTDoc( entityState.ydoc );
+	}
+
 	return {
+		createMeta: createEntityMeta,
 		load: loadEntity,
 		unload: unloadEntity,
 		update: updateCRDTDoc,
