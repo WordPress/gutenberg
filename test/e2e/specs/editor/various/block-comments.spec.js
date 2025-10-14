@@ -22,7 +22,7 @@ test.describe( 'Block Comments', () => {
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await Promise.all( [
-			requestUtils.deleteAllComments( 'block_comment' ),
+			requestUtils.deleteAllComments( 'note' ),
 			requestUtils.setGutenbergExperiments( [] ),
 		] );
 	} );

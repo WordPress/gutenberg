@@ -529,10 +529,10 @@ const CommentBoard = ( {
 
 	// Check if this is a resolution comment by checking metadata.
 	const isResolutionComment =
-		thread.type === 'block_comment' &&
+		thread.type === 'note' &&
 		thread.meta &&
-		( thread.meta._wp_block_comment_status === 'resolved' ||
-			thread.meta._wp_block_comment_status === 'reopen' );
+		( thread.meta._wp_note_status === 'resolved' ||
+			thread.meta._wp_note_status === 'reopen' );
 
 	const actions = [
 		{
@@ -668,8 +668,7 @@ const CommentBoard = ( {
 					{ isResolutionComment
 						? ( () => {
 								const actionText =
-									thread.meta._wp_block_comment_status ===
-									'resolved'
+									thread.meta._wp_note_status === 'resolved'
 										? __( 'Marked as resolved' )
 										: __( 'Reopened' );
 								const content = thread?.content?.raw;

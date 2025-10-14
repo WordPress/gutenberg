@@ -46,7 +46,7 @@ export function useBlockComments( postId ) {
 
 	const queryArgs = {
 		post: postId,
-		type: 'block_comment',
+		type: 'note',
 		status: 'all',
 		per_page: 100,
 	};
@@ -183,7 +183,7 @@ export function useBlockCommentsActions( reflowComments ) {
 					post: getCurrentPostId(),
 					content,
 					status: 'hold',
-					type: 'block_comment',
+					type: 'note',
 					parent: parent || 0,
 				},
 				{ throwOnError: true }
@@ -247,11 +247,11 @@ export function useBlockCommentsActions( reflowComments ) {
 				const newCommentData = {
 					post: getCurrentPostId(),
 					content: content || '', // Empty content for resolve, content for reopen.
-					type: 'block_comment',
+					type: 'note',
 					status,
 					parent: id,
 					meta: {
-						_wp_block_comment_status:
+						_wp_note_status:
 							status === 'approved' ? 'resolved' : 'reopen',
 					},
 				};
