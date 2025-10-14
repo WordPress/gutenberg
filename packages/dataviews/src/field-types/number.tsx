@@ -37,6 +37,7 @@ function isEmpty( value: unknown ): value is '' | undefined | null {
 export default {
 	sort,
 	isValid: {
+		elements: true,
 		custom: ( item: any, field: NormalizedField< any > ) => {
 			const value = field.getValue( { item } );
 

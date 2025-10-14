@@ -10,6 +10,7 @@ function sort() {
 export default {
 	sort,
 	isValid: {
+		elements: true,
 		custom: () => null,
 	},
 	Edit: null,

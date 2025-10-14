@@ -97,6 +97,7 @@ export default function getFieldTypeDefinition< Item >(
 				: b.localeCompare( a );
 		},
 		isValid: {
+			elements: true,
 			custom: () => null,
 		},
 		Edit: null,

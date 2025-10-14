@@ -34,6 +34,7 @@ function sort( a: any, b: any, direction: SortDirection ) {
 export default {
 	sort,
 	isValid: {
+		elements: true,
 		custom: ( item: any, field: NormalizedField< any > ) => {
 			const value = field.getValue( { item } );
 			if (

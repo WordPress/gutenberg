@@ -28,6 +28,7 @@ function sort( a: any, b: any, direction: SortDirection ) {
 export default {
 	sort,
 	isValid: {
+		elements: true,
 		custom: () => null,
 	},
 	Edit: 'datetime',

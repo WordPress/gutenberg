@@ -28,6 +28,7 @@ function sort( valueA: any, valueB: any, direction: SortDirection ) {
 export default {
 	sort,
 	isValid: {
+		elements: true,
 		custom: () => null,
 	},
 	Edit: 'telephone',

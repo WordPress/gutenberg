@@ -38,6 +38,7 @@ export default {
 	sort,
 	Edit: 'date',
 	isValid: {
+		elements: true,
 		custom: () => null,
 	},
 	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
