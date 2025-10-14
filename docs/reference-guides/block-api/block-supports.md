@@ -61,7 +61,7 @@ supports: {
 -   Type: `boolean`
 -   Default value: `false`
 
-Enables PHP-only blocks to automatically appear in the block editor without requiring JavaScript registration. When set to `true`, blocks registered on the server with a `render_callback` will automatically be registered in the editor and use `ServerSideRender`. These blocks default to block API version 3 and are automatically upgraded if they're using an older version.
+Enables [PHP-only blocks](/docs/getting-started/fundamentals/registration-of-a-block.md#php-only-blocks-with-auto-registration) to automatically appear in the block editor without requiring JavaScript registration. When set to `true`, blocks registered on the server with a `render_callback` will automatically be registered in the editor and use `ServerSideRender`. These blocks default to block API version 3 and are automatically upgraded if they're using an older version.
 
 ```php
 register_block_type( 'my-plugin/server-block', array(
