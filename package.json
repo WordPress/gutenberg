@@ -92,6 +92,7 @@
 		"caniuse-lite": "1.0.30001731",
 		"chalk": "4.1.1",
 		"change-case": "4.1.2",
+		"chokidar": "^4.0.0",
 		"client-zip": "^2.4.5",
 		"commander": "9.2.0",
 		"concurrently": "3.5.0",

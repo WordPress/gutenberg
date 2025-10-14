@@ -24,19 +24,38 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.js",
+			"require": "./build/index.js"
+		},
+		"./package.json": "./package.json"
+	},
 	"react-native": "src/index",
 	"wpScript": true,
 	"types": "build-types",
 	"sideEffects": [
 		"build-style/**",
 		"src/**/*.scss",
-		"{src,build,build-module}/{index.js,store/index.js,hooks/**,bindings/**}"
+		"src/index.js",
+		"src/store/index.js",
+		"src/hooks/**",
+		"src/bindings/**",
+		"build/index.js",
+		"build/store/index.js",
+		"build/hooks/**",
+		"build/bindings/**",
+		"build-module/index.js",
+		"build-module/store/index.js",
+		"build-module/hooks/**",
+		"build-module/bindings/**"
 	],
 	"dependencies": {
-		"@babel/runtime": "7.25.7",
 		"@floating-ui/react-dom": "2.0.8",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
+		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/blob": "file:../blob",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/blocks": "file:../blocks",

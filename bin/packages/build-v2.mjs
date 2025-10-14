@@ -9,7 +9,7 @@ import { fileURLToPath } from 'url';
 import { parseArgs } from 'node:util';
 import esbuild from 'esbuild';
 import glob from 'fast-glob';
-import watch from 'node-watch';
+import chokidar from 'chokidar';
 // See https://github.com/WordPress/gutenberg/issues/72136
 // eslint-disable-next-line import/no-unresolved
 import browserslistToEsbuild from 'browserslist-to-esbuild';
@@ -36,6 +36,7 @@ const IGNORE_PATTERNS = [
 	'**/benchmark/**',
 	'**/{__mocks__,__tests__,test}/**',
 	'**/{storybook,stories}/**',
+	'**/*.native.*',
 ];
 const TEST_FILE_PATTERNS = [
 	/\/(benchmark|__mocks__|__tests__|test|storybook|stories)\/.+/,
@@ -983,47 +984,65 @@ async function watchMode() {
 		rebuildTimeoutId = null;
 	}
 
-	watch(
-		PACKAGES_DIR,
-		{
-			recursive: true,
-			delay: 500,
-			filter( filename ) {
-				// Exclude build output directories and dependencies to reduce file descriptor usage
-				const basename = path.basename( filename );
-				if (
-					basename === 'node_modules' ||
-					basename === 'build' ||
-					basename === 'build-module' ||
-					basename === 'build-style' ||
-					basename === 'build-types' ||
-					basename === '.git'
-				) {
-					return false;
-				}
-				return true;
-			},
-		},
-		( event, filename ) => {
-			if ( ! isV2SourceFile( filename ) ) {
-				return;
-			}
-
-			const packageName = getPackageName( filename );
-			if ( ! packageName ) {
-				return;
-			}
-
-			packagesToRebuild.add( packageName );
-
-			// Only schedule a rebuild if one isn't already scheduled
-			if ( rebuildTimeoutId ) {
-				return;
-			}
-
-			rebuildTimeoutId = setTimeout( processRebuilds, 100 );
-		}
+	// Watch only V2 package source directories (not all 89 packages)
+	const watchPaths = V2_PACKAGES.map( ( packageName ) =>
+		path.join( PACKAGES_DIR, packageName, 'src' )
 	);
+
+	const watcher = chokidar.watch( watchPaths, {
+		ignored: [
+			// Exclude test files and other non-source files
+			'**/{__mocks__,__tests__,test,storybook,stories}/**',
+			'**/*.{spec,test}.{js,ts,tsx}',
+			'**/*.native.*',
+		],
+		persistent: true,
+		ignoreInitial: true,
+		// Reduce file descriptor usage on macOS
+		useFsEvents: true,
+		depth: 10,
+		awaitWriteFinish: {
+			stabilityThreshold: 100,
+			pollInterval: 50,
+		},
+	} );
+
+	watcher.on( 'error', ( error ) => {
+		if ( error.code === 'EMFILE' ) {
+			console.error(
+				'\n❌ Too many open files. Try increasing the limit:\n' +
+					'   Run: ulimit -n 10240\n' +
+					'   Or add to ~/.zshrc: ulimit -n 10240\n'
+			);
+			process.exit( 1 );
+		}
+		console.error( '❌ Watcher error:', error );
+	} );
+
+	// Handle file changes, additions, and deletions
+	const handleFileChange = ( filename ) => {
+		if ( ! isV2SourceFile( filename ) ) {
+			return;
+		}
+
+		const packageName = getPackageName( filename );
+		if ( ! packageName ) {
+			return;
+		}
+
+		packagesToRebuild.add( packageName );
+
+		// Only schedule a rebuild if one isn't already scheduled
+		if ( rebuildTimeoutId ) {
+			return;
+		}
+
+		rebuildTimeoutId = setTimeout( processRebuilds, 100 );
+	};
+
+	watcher.on( 'change', handleFileChange );
+	watcher.on( 'add', handleFileChange );
+	watcher.on( 'unlink', handleFileChange );
 }
 
 /**
