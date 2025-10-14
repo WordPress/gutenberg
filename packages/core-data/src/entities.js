@@ -13,6 +13,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import { getSyncManager } from './sync';
 import {
 	applyPostChangesToCRDTDoc,
 	defaultApplyChangesToCRDTDoc,
@@ -236,16 +237,23 @@ export const additionalEntityConfigLoaders = [
 ];
 
 /**
- * Returns a function to be used to retrieve extra edits to apply before persisting a post type.
+ * Apply extra edits before persisting a post type.
  *
- * @param {Object} persistedRecord Already persisted Post
- * @param {Object} edits           Edits.
+ * @param {Object}  persistedRecord Already persisted Post
+ * @param {Object}  edits           Edits.
+ * @param {string}  name            Post type name.
+ * @param {boolean} isTemplate      Whether the post type is a template.
  * @return {Object} Updated edits.
  */
-export const prePersistPostType = ( persistedRecord, edits ) => {
+export const prePersistPostType = (
+	persistedRecord,
+	edits,
+	name,
+	isTemplate
+) => {
 	const newEdits = {};
 
-	if ( persistedRecord?.status === 'auto-draft' ) {
+	if ( ! isTemplate && persistedRecord?.status === 'auto-draft' ) {
 		// Saving an auto-draft should create a draft by default.
 		if ( ! edits.status && ! newEdits.status ) {
 			newEdits.status = 'draft';
@@ -259,6 +267,19 @@ export const prePersistPostType = ( persistedRecord, edits ) => {
 				persistedRecord?.title === 'Auto Draft' )
 		) {
 			newEdits.title = '';
+		}
+	}
+
+	// Add meta for persisted CRDT document.
+	if ( persistedRecord && window.__experimentalEnableSync ) {
+		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+			const objectType = `postType/${ name }`;
+			const objectId = persistedRecord.id;
+			const meta = getSyncManager()?.createMeta( objectType, objectId );
+			newEdits.meta = {
+				...edits.meta,
+				...meta,
+			};
 		}
 	}
 
@@ -298,7 +319,8 @@ async function loadPostTypeEntities() {
 				( isTemplate
 					? capitalCase( record.slug ?? '' )
 					: String( record.id ) ),
-			__unstablePrePersist: isTemplate ? undefined : prePersistPostType,
+			__unstablePrePersist: ( persistedRecord, edits ) =>
+				prePersistPostType( persistedRecord, edits, name, isTemplate ),
 			__unstable_rest_base: postType.rest_base,
 			supportsPagination: true,
 			getRevisionsUrl: ( parentId, revisionId ) =>
@@ -347,7 +369,9 @@ async function loadPostTypeEntities() {
 					 *
 					 * @type {Record< string, boolean >}
 					 */
-					supports: {},
+					supports: {
+						crdtPersistence: true,
+					},
 				};
 			}
 		}
