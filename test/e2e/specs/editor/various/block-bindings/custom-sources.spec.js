@@ -1310,27 +1310,31 @@ test.describe( 'Registered sources', () => {
 	} );
 
 	test.describe( 'Source compatibility filtering', () => {
-		test( 'should show compatible sources enabled and incompatible sources disabled', async ( {
+		test( 'should show only compatible sources.', async ( {
 			editor,
 			page,
 		} ) => {
-			await editor.insertBlock( {
-				name: 'core/image',
-			} );
-
-			// Open the bindings panel
+			await editor.insertBlock( { name: 'core/image' } );
 			await page.getByLabel( 'Attributes options' ).click();
 			await page
-				.getByRole( 'menuitemcheckbox', {
-					name: 'Show id',
-				} )
+				.getByRole( 'menuitemcheckbox', { name: 'Show id' } )
 				.click();
+			await page.getByRole( 'button', { name: 'id' } ).click();
 
-			// Click on the content binding button
-			const idButton = page.getByRole( 'button', {
-				name: 'id',
+			const idMenuItem = page.getByRole( 'menuitem', {
+				name: 'Complete Source',
 			} );
-			await expect( idButton ).toContainText( 'Not connected' );
+			await expect( idMenuItem ).toBeEnabled();
+			await idMenuItem.click();
+			const numberField = page.getByRole( 'menuitemcheckbox', {
+				name: 'Number Custom Field Label',
+			} );
+			await expect( numberField ).toBeEnabled();
+			await expect(
+				page.getByRole( 'menuitemcheckbox', {
+					name: 'Text Field Label',
+				} )
+			).toBeHidden();
 		} );
 	} );
 } );
