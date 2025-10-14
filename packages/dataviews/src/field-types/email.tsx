@@ -49,13 +49,6 @@ export default {
 				return __( 'Value must be a valid email address.' );
 			}
 
-			if ( field.elements ) {
-				const validValues = field.elements.map( ( f ) => f.value );
-				if ( ! validValues.includes( value ) ) {
-					return __( 'Value must be one of the elements.' );
-				}
-			}
-
 			return null;
 		},
 	},
