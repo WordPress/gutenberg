@@ -146,6 +146,7 @@
 		"postcss": "8.4.38",
 		"postcss-loader": "6.2.1",
 		"postcss-local-keyframes": "^0.0.2",
+		"postcss-modules": "6.0.1",
 		"prettier": "npm:wp-prettier@3.0.3",
 		"progress": "2.0.3",
 		"puppeteer-core": "23.10.1",
