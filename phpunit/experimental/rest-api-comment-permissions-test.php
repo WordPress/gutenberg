@@ -324,7 +324,7 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_Test_REST_TestCase {
 	/**
 	 * Test that duplicate block comments with resolution metadata are allowed.
 	 */
-	public function test_create_duplicate_block_comment_with_resolution_metadata() {
+	public function test_create_duplicate_block_comment() {
 		wp_set_current_user( self::$user_ids['editor'] );
 		$post_id = $this->factory->post->create();
 
@@ -337,9 +337,6 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_Test_REST_TestCase {
 				'author'       => self::$user_ids['editor'],
 				'type'         => 'note',
 				'content'      => 'Doplicated comment',
-				'meta'         => array(
-					'_wp_note_status' => 'resolved',
-				),
 			);
 			$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
 			$request->add_header( 'Content-Type', 'application/json' );
@@ -347,34 +344,6 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_Test_REST_TestCase {
 			$response = rest_get_server()->dispatch( $request );
 			$this->assertSame( 201, $response->get_status() );
 		}
-	}
-
-	/**
-	 * Test that duplicate block comments without resolution metadata are not allowed.
-	 */
-	public function test_cannot_create_duplicate_block_comment_without_resolution_meta() {
-		wp_set_current_user( self::$user_ids['editor'] );
-		$post_id = $this->factory->post->create();
-		$params  = array(
-			'post'         => $post_id,
-			'author_name'  => 'Editor',
-			'author_email' => 'editor@example.com',
-			'author_url'   => 'https://example.com',
-			'author'       => self::$user_ids['editor'],
-			'type'         => 'note',
-			'content'      => 'Doplicated comment',
-		);
-		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
-		$request->add_header( 'Content-Type', 'application/json' );
-		$request->set_body( wp_json_encode( $params ) );
-		$response = rest_get_server()->dispatch( $request );
-		$this->assertSame( 201, $response->get_status() );
-
-		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
-		$request->add_header( 'Content-Type', 'application/json' );
-		$request->set_body( wp_json_encode( $params ) );
-		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'comment_duplicate', $response, 409 );
 	}
 
 	/**
