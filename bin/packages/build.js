@@ -108,11 +108,12 @@ function getV1Packages() {
  * Main build function.
  */
 async function main() {
-	let filesToBuild = files;
+	// Collect files to build
+	let filesToBuild;
 
-	// If no specific files provided, collect all files to build
-	if ( filesToBuild.length === 0 ) {
-		const allFiles = await glob(
+	if ( files.length === 0 ) {
+		// Build all files
+		filesToBuild = await glob(
 			[
 				`${ PACKAGES_DIR }/*/src/**/*.{js,ts,tsx}`,
 				`${ PACKAGES_DIR }/*/src/*.scss`,
@@ -132,45 +133,46 @@ async function main() {
 				onlyFiles: true,
 			}
 		);
-
-		// Apply transforms
-		const transformedFiles = new Set();
-		for ( const file of allFiles ) {
-			// Style entry transform
-			if ( path.extname( file ) === '.scss' ) {
-				const packageName = getPackageName( file );
-				const entries = await glob(
-					path
-						.resolve( PACKAGES_DIR, packageName, 'src/*.scss' )
-						.replace( /\\/g, '/' )
-				);
-
-				// Account for the specific case where block styles in
-				// block-library package also need rebuilding.
-				if (
-					packageName === 'block-library' &&
-					[ 'style.scss', 'editor.scss', 'theme.scss' ].includes(
-						path.basename( file )
-					)
-				) {
-					entries.push( file );
-				}
-
-				entries.forEach( ( entry ) => transformedFiles.add( entry ) );
-
-				// Find other stylesheets that need to be rebuilt because
-				// they import the styles that are being transformed.
-				const styleEntries = findStyleEntriesThatImportFile( file );
-				styleEntries.forEach( ( entry ) =>
-					transformedFiles.add( entry )
-				);
-			} else {
-				transformedFiles.add( file );
-			}
-		}
-
-		filesToBuild = Array.from( transformedFiles );
+	} else {
+		// Watch mode - specific files provided
+		filesToBuild = files;
 	}
+
+	// Apply style entry transform to all files
+	const transformedFiles = new Set();
+	for ( const file of filesToBuild ) {
+		// Style entry transform
+		if ( path.extname( file ) === '.scss' ) {
+			const packageName = getPackageName( file );
+			const entries = await glob(
+				path
+					.resolve( PACKAGES_DIR, packageName, 'src/*.scss' )
+					.replace( /\\/g, '/' )
+			);
+
+			// Account for the specific case where block styles in
+			// block-library package also need rebuilding.
+			if (
+				packageName === 'block-library' &&
+				[ 'style.scss', 'editor.scss', 'theme.scss' ].includes(
+					path.basename( file )
+				)
+			) {
+				entries.push( file );
+			}
+
+			entries.forEach( ( entry ) => transformedFiles.add( entry ) );
+
+			// Find other stylesheets that need to be rebuilt because
+			// they import the styles that are being transformed.
+			const styleEntries = findStyleEntriesThatImportFile( file );
+			styleEntries.forEach( ( entry ) => transformedFiles.add( entry ) );
+		} else {
+			transformedFiles.add( file );
+		}
+	}
+
+	filesToBuild = Array.from( transformedFiles );
 
 	// Group files by their package's dependency level
 	const v1Packages = getV1Packages();
