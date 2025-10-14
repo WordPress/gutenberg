@@ -1227,8 +1227,8 @@ Example:
 
 Object that contains the validation rules for the field. If a rule is not met, the control will be marked as invalid and a message will be displayed.
 
--   `required`: boolean indicating whether the field is required or not.
--   `elements`: boolean restricting selection to the provided list of elements only. Used with the `array` field type.
+-   `required`: boolean indicating whether the field is required or not. Disabled by default.
+-   `elements`: boolean restricting selection to the provided list of elements only. Enabled by default. The `array` Edit control uses it to restrict the input values as well.
 -   `custom`: a function that validates a field's value. If the value is invalid, the function should return a string explaining why the value is invalid. Otherwise, the function must return null.
 
 Example:
