@@ -13,6 +13,7 @@
 		{ "path": "../deprecated" },
 		{ "path": "../element" },
 		{ "path": "../html-entities" },
+		{ "path": "../hooks" },
 		{ "path": "../i18n" },
 		{ "path": "../is-shallow-equal" },
 		{ "path": "../private-apis" },
