@@ -93,35 +93,26 @@ function EditorUI( { attribute, binding, source, sourceKey, context } ) {
 		return null;
 	}
 
-	const data = {
-		date: {
+	const data = [
+		{
 			label: __( 'Post Date' ),
 			value: date,
+			args: { key: 'date' },
 			type: 'string',
 		},
-		modified: {
+		{
 			label: __( 'Post Modified Date' ),
 			value: modified,
+			args: { key: 'modified' },
 			type: 'string',
 		},
-	};
-
-	const dataArray = Object.entries( data ).map(
-		( [ key, field ] ) => ( {
-			label: field.label,
-			args: {
-				key,
-			},
-			value: field.value, // Or compute via getValues()?
-			type: field.type,
-		} )
-	);
+	];
 
 	return (
 		<BlockBindingsDropdown
 			attribute={ attribute }
 			binding={ binding }
-			data={ dataArray }
+			data={ data }
 			source={ source }
 			sourceKey={ sourceKey }
 		/>
