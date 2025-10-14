@@ -46,46 +46,21 @@ export default function TermsQueryInspectorControls( {
 		( _taxonomy ) => _taxonomy.slug === taxonomy
 	)?.hierarchical;
 
-	const taxonomyMatches = templateSlug?.match(
-		/^(category|tag|taxonomy-([^-]+))$|^(((category|tag)|taxonomy-([^-]+))-(.+))$/
-	);
-	let _taxonomyFromTemplate;
-	if ( taxonomyMatches ) {
-		// Extract taxonomy type from template context.
-		// Pattern 1: Taxonomy only (no specific term).
-		// e.g., "category", "tag", or "taxonomy-genre".
-		let isBuiltInTaxonomy = false;
-		if ( taxonomyMatches[ 1 ] ) {
-			// Custom taxonomy from "taxonomy-X" pattern.
-			if ( taxonomyMatches[ 2 ] ) {
-				_taxonomyFromTemplate = taxonomyMatches[ 2 ];
-			}
-			// Built-in taxonomy ("category" or "tag").
-			else {
-				_taxonomyFromTemplate = taxonomyMatches[ 1 ];
-				isBuiltInTaxonomy = true;
-			}
-		}
-		// Pattern 2: Taxonomy with specific term.
-		// e.g., "category-news", "tag-javascript", or "taxonomy-genre-fiction".
-		else if ( taxonomyMatches[ 3 ] ) {
-			// Custom taxonomy from "taxonomy-X-term" pattern.
-			if ( taxonomyMatches[ 6 ] ) {
-				_taxonomyFromTemplate = taxonomyMatches[ 6 ];
-			}
-			// Built-in taxonomy type ("category" or "tag" from full match).
-			else {
-				_taxonomyFromTemplate = taxonomyMatches[ 4 ];
-				isBuiltInTaxonomy = true;
-			}
-		}
-		// `Tags` are a special case in WP template hierarchy.
-		// Only normalize built-in tags, not custom taxonomies with slug "tag".
-		if ( isBuiltInTaxonomy && _taxonomyFromTemplate === 'tag' ) {
-			_taxonomyFromTemplate = 'post_tag';
-		}
+	// Check if the current taxonomy matches the template slug.
+	// WordPress template hierarchy uses different patterns for taxonomies:
+	// - Built-in category: "category" or "category-{term}"
+	// - Built-in tags: "tag" or "tag-{term}" (taxonomy slug is "post_tag")
+	// - Custom taxonomies: "taxonomy-{slug}" or "taxonomy-{slug}-{term}"
+	let taxonomyPrefix;
+	if ( taxonomy === 'post_tag' ) {
+		taxonomyPrefix = 'tag';
+	} else if ( taxonomy === 'category' ) {
+		taxonomyPrefix = 'category';
+	} else {
+		taxonomyPrefix = `taxonomy-${ taxonomy }`;
 	}
-	const isTaxonomyMatchingTemplate = taxonomy === _taxonomyFromTemplate;
+	const isTaxonomyMatchingTemplate =
+		templateSlug?.startsWith( taxonomyPrefix );
 
 	// Only display the inherit control if the taxonomy is hierarchical and matches the current template.
 	const displayInheritControl =
