@@ -18,6 +18,7 @@ const V2_PACKAGES = [
 	'blob',
 	'block-directory',
 	'block-editor',
+	'block-library',
 	'block-serialization-default-parser',
 	'block-serialization-spec-parser',
 	'blocks',

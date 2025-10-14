@@ -24,6 +24,16 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"exports": {
+		".": {
+			"import": "./build-module/index.js",
+			"require": "./build/index.js"
+		},
+		"./babel-plugin": "./babel-plugin.js",
+		"./build-module/*": "./build-module/*",
+		"./build-style/*": "./build-style/*",
+		"./package.json": "./package.json"
+	},
 	"react-native": "src/index",
 	"wpScript": true,
 	"wpScriptModuleExports": {
@@ -35,16 +45,22 @@
 		"./query/view": "./build-module/query/view.js",
 		"./search/view": "./build-module/search/view.js"
 	},
+	"wpStyleEntryPoints": [
+		"src/*.scss",
+		"src/*/style.scss",
+		"src/*/editor.scss",
+		"src/*/theme.scss"
+	],
 	"sideEffects": [
 		"build-style/**",
 		"src/**/*.scss",
 		"{src,build,build-module}/*/init.js"
 	],
 	"dependencies": {
-		"@babel/runtime": "7.25.7",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/autop": "file:../autop",
+		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/blob": "file:../blob",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/blocks": "file:../blocks",
