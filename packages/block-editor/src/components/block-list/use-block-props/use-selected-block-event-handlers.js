@@ -12,6 +12,10 @@ import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
+function isColorTransparent( color ) {
+	return ! color || color === 'transparent' || color === 'rgba(0, 0, 0, 0)';
+}
+
 /**
  * Adds block behaviour:
  *   - Removes the block on BACKSPACE.
@@ -131,31 +135,15 @@ export function useEventHandlers( { clientId, isSelected } ) {
 
 				let _scale = 1;
 
-				let parentElement = node;
-
-				while ( ( parentElement = parentElement.parentElement ) ) {
-					const { scale } =
-						defaultView.getComputedStyle( parentElement );
-					if ( scale && scale !== 'none' ) {
-						_scale = parseFloat( scale );
-						break;
-					}
-				}
-
-				let bgColor = 'transparent';
-
-				parentElement = node;
-
-				while ( ( parentElement = parentElement.parentElement ) ) {
-					const { backgroundColor } =
-						defaultView.getComputedStyle( parentElement );
-					if (
-						backgroundColor &&
-						backgroundColor !== 'transparent' &&
-						backgroundColor !== 'rgba(0, 0, 0, 0)'
-					) {
-						bgColor = backgroundColor;
-						break;
+				{
+					let parentElement = node;
+					while ( ( parentElement = parentElement.parentElement ) ) {
+						const { scale } =
+							defaultView.getComputedStyle( parentElement );
+						if ( scale && scale !== 'none' ) {
+							_scale = parseFloat( scale );
+							break;
+						}
 					}
 				}
 
@@ -209,7 +197,27 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				node.style.transition = 'transform 0.2s ease-out';
 				node.style.transform = `scale(${ dragScale })`;
 				node.style.opacity = '0.9';
-				node.style.backgroundColor = bgColor;
+
+				// If the block has no background color, use the parent's
+				// background color.
+				if (
+					isColorTransparent(
+						defaultView.getComputedStyle( node ).backgroundColor
+					)
+				) {
+					let bgColor = 'transparent';
+					let parentElement = node;
+					while ( ( parentElement = parentElement.parentElement ) ) {
+						const { backgroundColor } =
+							defaultView.getComputedStyle( parentElement );
+						if ( ! isColorTransparent( backgroundColor ) ) {
+							bgColor = backgroundColor;
+							break;
+						}
+					}
+
+					node.style.backgroundColor = bgColor;
+				}
 
 				let hasStarted = false;
 
