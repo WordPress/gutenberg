@@ -70,24 +70,17 @@ export function Comments( {
 	const [ boardOffsets, setBoardOffsets ] = useState( {} );
 	const [ blockRefs, setBlockRefs ] = useState( {} );
 
-	const { blockCommentId, selectedBlockClientId, blockIds } = useSelect(
-		( select ) => {
-			const {
-				getBlockAttributes,
-				getSelectedBlockClientId,
-				getBlockOrder,
-			} = select( blockEditorStore );
-			const clientId = getSelectedBlockClientId();
-			return {
-				blockCommentId: clientId
-					? getBlockAttributes( clientId )?.metadata?.commentId
-					: null,
-				selectedBlockClientId: clientId,
-				blockIds: getBlockOrder(),
-			};
-		},
-		[]
-	);
+	const { blockCommentId, selectedBlockClientId } = useSelect( ( select ) => {
+		const { getBlockAttributes, getSelectedBlockClientId } =
+			select( blockEditorStore );
+		const clientId = getSelectedBlockClientId();
+		return {
+			blockCommentId: clientId
+				? getBlockAttributes( clientId )?.metadata?.commentId
+				: null,
+			selectedBlockClientId: clientId,
+		};
+	}, [] );
 
 	const relatedBlockElement = useBlockElement( selectedBlockClientId );
 
@@ -146,15 +139,17 @@ export function Comments( {
 			// If there is a selected thread, push threads above up and threads below down.
 			const selectedThreadData = threads[ breakIndex ];
 
-			if ( ! selectedThreadData || ! blockRefs[ selectedThreadData.id ] ) {
+			if (
+				! selectedThreadData ||
+				! blockRefs[ selectedThreadData.id ]
+			) {
 				return;
 			}
 
 			let blockElement = blockRefs[ selectedThreadData.id ];
 			let blockRect = blockElement?.getBoundingClientRect();
 			const selectedThreadTop = blockRect?.top || 0;
-			const selectedThreadHeight =
-				heights[ selectedThreadData.id ] || 0;
+			const selectedThreadHeight = heights[ selectedThreadData.id ] || 0;
 
 			offsets[ selectedThreadData.id ] = -16;
 
@@ -241,7 +236,7 @@ export function Comments( {
 		};
 		const newOffsets = calculateAllOffsets();
 		setBoardOffsets( newOffsets );
-	}, [ heights, blockIds, blockRefs, isFloating, threads, selectedThread ] );
+	}, [ heights, blockRefs, isFloating, threads, selectedThread ] );
 
 	const hasThreads = Array.isArray( threads ) && threads.length > 0;
 	if ( ! hasThreads ) {
