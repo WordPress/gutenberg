@@ -305,7 +305,7 @@ test.describe( 'Router styles', () => {
 		const linkPattern = '**/router-styles-red/style-from-link.css*';
 		await page.route( linkPattern, async ( route ) => {
 			await route.abort( 'failed' );
-			await page.unroute( linkPattern );
+			await page.unrouteAll( { behavior: 'ignoreErrors' } );
 		} );
 
 		// Navigate to the page with the Red block
