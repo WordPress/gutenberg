@@ -44,15 +44,6 @@ export default {
 				return __( 'Value must be a number.' );
 			}
 
-			if ( field?.elements ) {
-				const isMember = field.elements.some(
-					( element ) => element.value === Number( value )
-				);
-				if ( ! isMember ) {
-					return __( 'Value must be one of the elements.' );
-				}
-			}
-
 			return null;
 		},
 	},
