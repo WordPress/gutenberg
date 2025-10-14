@@ -14,7 +14,7 @@ function gutenberg_block_comment_add_post_type_support() {
 		}
 
 		$supports        = get_all_post_type_supports( $post_type );
-		$editor_supports = array( 'block-comments' => true );
+		$editor_supports = array( 'notes' => true );
 
 		// `add_post_type_support()` doesn't merge support sub-properties, so we explicitly merge it here.
 		if ( is_array( $supports['editor'] ) && isset( $supports['editor'][0] ) && is_array( $supports['editor'][0] ) ) {

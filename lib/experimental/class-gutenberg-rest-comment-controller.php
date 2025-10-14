@@ -18,7 +18,7 @@ class Gutenberg_REST_Comment_Controller extends WP_REST_Comments_Controller {
 				$post = get_post( $post_id );
 
 				// Note: This is only relevant change for the backport.
-				if ( $post && $is_note && ! $this->check_post_type_supports_block_comments( $post->post_type ) ) {
+				if ( $post && $is_note && ! $this->check_post_type_supports_notes( $post->post_type ) ) {
 					return new WP_Error(
 						'rest_comment_not_supported_post_type',
 						__( 'Sorry, this post type does not support block comments.', 'gutenberg' ),
@@ -226,7 +226,7 @@ class Gutenberg_REST_Comment_Controller extends WP_REST_Comments_Controller {
 		}
 
 		// Note: This is only relevant change for the backport.
-		if ( $is_note && ! $this->check_post_type_supports_block_comments( $post->post_type ) ) {
+		if ( $is_note && ! $this->check_post_type_supports_notes( $post->post_type ) ) {
 			return new WP_Error(
 				'rest_comment_not_supported_post_type',
 				__( 'Sorry, this post type does not support block comments.', 'gutenberg' ),
@@ -487,7 +487,7 @@ class Gutenberg_REST_Comment_Controller extends WP_REST_Comments_Controller {
 	 * @param string $post_type Post type name.
 	 * @return bool True if post type supports block comments, false otherwise.
 	 */
-	private function check_post_type_supports_block_comments( $post_type ) {
+	private function check_post_type_supports_notes( $post_type ) {
 		$supports = get_all_post_type_supports( $post_type );
 		if ( ! isset( $supports['editor'] ) ) {
 			return false;
@@ -496,7 +496,7 @@ class Gutenberg_REST_Comment_Controller extends WP_REST_Comments_Controller {
 			return false;
 		}
 		foreach ( $supports['editor'] as $item ) {
-			if ( is_array( $item ) && isset( $item['block-comments'] ) && true === $item['block-comments'] ) {
+			if ( is_array( $item ) && isset( $item['notes'] ) && true === $item['notes'] ) {
 				return true;
 			}
 		}

@@ -198,7 +198,7 @@ function Header( {
 				) }
 
 				{ isBlockCommentExperimentEnabled && (
-					<PostTypeSupportCheck supportKeys="editor.block-comments">
+					<PostTypeSupportCheck supportKeys="editor.notes">
 						<CollabSidebar />
 					</PostTypeSupportCheck>
 				) }
