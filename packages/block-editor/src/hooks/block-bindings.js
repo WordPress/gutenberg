@@ -113,89 +113,76 @@ function BlockBindingsPanelMenuContent( {
 									{ source.label }
 								</Menu.ItemLabel>
 							</Menu.SubmenuTriggerItem>
-							{ ! noItemsAvailable && (
-								<Menu.Popover gutter={ 8 }>
-									<Menu.Group>
-										{ sourceDataItems.map( ( item ) => {
-											const itemBindings = {
-												source: sourceKey,
-												args: item?.args || {
-													key: item.key,
-												},
-											};
-											const values = source.getValues( {
-												select,
-												context: blockContext,
-												bindings: {
-													[ attribute ]: itemBindings,
-												},
-											} );
-											return (
-												<Menu.CheckboxItem
-													key={
-														sourceKey +
-															JSON.stringify(
-																item.args
-															) || item.key
-													}
-													onChange={ () => {
-														const isCurrentlySelected =
-															fastDeepEqual(
-																binding?.args,
-																item.args
-															) ??
-															// Deprecate key dependency in 7.0.
-															item.key ===
-																binding?.args
-																	?.key;
-
-														if (
-															isCurrentlySelected
-														) {
-															// Unset if the same item is selected again.
-															updateBlockBindings(
-																{
-																	[ attribute ]:
-																		undefined,
-																}
-															);
-														} else {
-															updateBlockBindings(
-																{
-																	[ attribute ]:
-																		itemBindings,
-																}
-															);
-														}
-													} }
-													name={
-														attribute + '-binding'
-													}
-													value={
-														values[ attribute ]
-													}
-													checked={
+							<Menu.Popover gutter={ 8 }>
+								<Menu.Group>
+									{ sourceDataItems.map( ( item ) => {
+										const itemBindings = {
+											source: sourceKey,
+											args: item?.args || {
+												key: item.key,
+											},
+										};
+										const values = source.getValues( {
+											select,
+											context: blockContext,
+											bindings: {
+												[ attribute ]: itemBindings,
+											},
+										} );
+										return (
+											<Menu.CheckboxItem
+												key={
+													sourceKey +
+														JSON.stringify(
+															item.args
+														) || item.key
+												}
+												onChange={ () => {
+													const isCurrentlySelected =
 														fastDeepEqual(
 															binding?.args,
 															item.args
 														) ??
 														// Deprecate key dependency in 7.0.
 														item.key ===
-															binding?.args?.key
+															binding?.args?.key;
+
+													if ( isCurrentlySelected ) {
+														// Unset if the same item is selected again.
+														updateBlockBindings( {
+															[ attribute ]:
+																undefined,
+														} );
+													} else {
+														updateBlockBindings( {
+															[ attribute ]:
+																itemBindings,
+														} );
 													}
-												>
-													<Menu.ItemLabel>
-														{ item?.label }
-													</Menu.ItemLabel>
-													<Menu.ItemHelpText>
-														{ values[ attribute ] }
-													</Menu.ItemHelpText>
-												</Menu.CheckboxItem>
-											);
-										} ) }
-									</Menu.Group>
-								</Menu.Popover>
-							) }
+												} }
+												name={ attribute + '-binding' }
+												value={ values[ attribute ] }
+												checked={
+													fastDeepEqual(
+														binding?.args,
+														item.args
+													) ??
+													// Deprecate key dependency in 7.0.
+													item.key ===
+														binding?.args?.key
+												}
+											>
+												<Menu.ItemLabel>
+													{ item?.label }
+												</Menu.ItemLabel>
+												<Menu.ItemHelpText>
+													{ values[ attribute ] }
+												</Menu.ItemHelpText>
+											</Menu.CheckboxItem>
+										);
+									} ) }
+								</Menu.Group>
+							</Menu.Popover>
 						</Menu>
 					);
 				}
