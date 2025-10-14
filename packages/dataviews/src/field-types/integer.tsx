@@ -43,13 +43,6 @@ export default {
 				return __( 'Value must be an integer.' );
 			}
 
-			if ( field?.elements ) {
-				const validValues = field.elements.map( ( f ) => f.value );
-				if ( ! validValues.includes( Number( value ) ) ) {
-					return __( 'Value must be one of the elements.' );
-				}
-			}
-
 			return null;
 		},
 	},
