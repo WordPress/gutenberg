@@ -15,8 +15,8 @@ import {
 	useEffect,
 	useMemo,
 	useRef,
-	useState,
 	useCallback,
+	useReducer,
 } from '@wordpress/element';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
@@ -34,19 +34,19 @@ import { store as interfaceStore } from '@wordpress/interface';
 import { store as editorStore } from '../../store';
 import { collabSidebarName } from './constants';
 import { unlock } from '../../lock-unlock';
+import { noop } from './utils';
 
 const { useBlockElementRef } = unlock( blockEditorPrivateApis );
 
 export function useBlockComments( postId ) {
-	const [ commentLastUpdated, setCommentLastUpdated ] = useState( null );
-
-	const reflowComments = () => {
-		setCommentLastUpdated( Date.now() );
-	};
+	const [ commentLastUpdated, reflowComments ] = useReducer(
+		() => Date.now(),
+		0
+	);
 
 	const queryArgs = {
 		post: postId,
-		type: 'block_comment',
+		type: 'note',
 		status: 'all',
 		per_page: 100,
 	};
@@ -155,7 +155,7 @@ export function useBlockComments( postId ) {
 	};
 }
 
-export function useBlockCommentsActions( reflowComments ) {
+export function useBlockCommentsActions( reflowComments = noop ) {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
 	const { getCurrentPostId } = useSelect( editorStore );
@@ -183,7 +183,7 @@ export function useBlockCommentsActions( reflowComments ) {
 					post: getCurrentPostId(),
 					content,
 					status: 'hold',
-					type: 'block_comment',
+					type: 'note',
 					parent: parent || 0,
 				},
 				{ throwOnError: true }
@@ -247,11 +247,11 @@ export function useBlockCommentsActions( reflowComments ) {
 				const newCommentData = {
 					post: getCurrentPostId(),
 					content: content || '', // Empty content for resolve, content for reopen.
-					type: 'block_comment',
+					type: 'note',
 					status,
 					parent: id,
 					meta: {
-						_wp_block_comment_status:
+						_wp_note_status:
 							status === 'approved' ? 'resolved' : 'reopen',
 					},
 				};
