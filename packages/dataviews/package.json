@@ -28,11 +28,11 @@
 		".": {
 			"types": "./build-types/index.d.ts",
 			"import": "./build-module/index.js",
-			"default": "./build/index.js"
+			"require": "./build/index.js"
 		},
 		"./wp": {
 			"types": "./build-types/index.d.ts",
-			"default": "./build-wp/index.js"
+			"require": "./build-wp/index.js"
 		},
 		"./package.json": {
 			"default": "./package.json"

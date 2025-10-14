@@ -28,7 +28,7 @@
 		".": {
 			"types": "./build-types/index.d.ts",
 			"import": "./build-module/index.js",
-			"default": "./build/index.js"
+			"require": "./build/index.js"
 		},
 		"./README.md": "./README.md",
 		"./CONTRIBUTING.md": "./CONTRIBUTING.md",

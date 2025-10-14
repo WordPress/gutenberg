@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .wp-block-widget-group {
 	&.has-child-selected::after {
 		border-radius: $radius-small;
