@@ -68,37 +68,22 @@ function getPostDataFields( select, context ) {
 
 function EditorUI( { attribute, binding, source, sourceKey, context } ) {
 	// FIXME: Pass blockName as prop instead?
-	// FIXME: Compute context here? Might be needed to avoid the `useSelect` warning.
 
 	const { postId, postType } = context;
-	const { data, selectedBlock } = useSelect(
+	const { date, modified, selectedBlock } = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord } = select( coreDataStore );
 
-			let dataFields;
-			if ( postType && postId ) {
-				const entityDataValues = getEditedEntityRecord(
-					'postType',
-					postType,
-					postId
-				);
-				dataFields = {
-					date: {
-						label: __( 'Post Date' ),
-						value: entityDataValues?.date,
-						type: 'string',
-					},
-					modified: {
-						label: __( 'Post Modified Date' ),
-						value: entityDataValues?.modified,
-						type: 'string',
-					},
-				};
-			}
+			const entityDataValues = getEditedEntityRecord(
+				'postType',
+				postType,
+				postId
+			);
 
 			return {
 				selectedBlock: select( blockEditorStore ).getSelectedBlock(),
-				data: dataFields,
+				date: entityDataValues?.date,
+				modified: entityDataValues?.modified,
 			};
 		},
 		[ postId, postType ]
@@ -108,7 +93,20 @@ function EditorUI( { attribute, binding, source, sourceKey, context } ) {
 		return null;
 	}
 
-	const dataArray = Object.entries( data || {} ).map(
+	const data = {
+		date: {
+			label: __( 'Post Date' ),
+			value: date,
+			type: 'string',
+		},
+		modified: {
+			label: __( 'Post Modified Date' ),
+			value: modified,
+			type: 'string',
+		},
+	};
+
+	const dataArray = Object.entries( data ).map(
 		( [ key, field ] ) => ( {
 			label: field.label,
 			args: {
