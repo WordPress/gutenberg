@@ -44,6 +44,68 @@ test.describe( 'Registered sources', () => {
 		await requestUtils.deactivatePlugin( 'gutenberg-test-block-bindings' );
 	} );
 
+	test.describe( 'Default WP installation', () => {
+		test.beforeEach( async ( { admin, requestUtils } ) => {
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-block-bindings'
+			);
+			await admin.createNewPost( { title: 'Test bindings' } );
+		} );
+
+		test.afterEach( async ( { requestUtils } ) => {
+			await requestUtils.activatePlugin(
+				'gutenberg-test-block-bindings'
+			);
+		} );
+
+		test( 'It should not show the attributes panel if there are no sources registered.', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+			} );
+			await expect(
+				page.getByLabel( 'Attributes options' )
+			).toBeHidden();
+		} );
+		test( 'It should show the attributes panel, no sources registered, readOnlyAttributes.', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/image',
+				attributes: {
+					metadata: {
+						bindings: {
+							alt: {
+								source: 'testing/server-only-source',
+							},
+						},
+					},
+				},
+			} );
+			await page.getByLabel( 'Attributes options' ).click();
+			await page
+				.getByRole( 'menuitemcheckbox', { name: 'Show id' } )
+				.click();
+			const idAttribute = page.getByRole( 'button', {
+				name: 'id',
+			} );
+			await expect( idAttribute ).toBeVisible();
+			await expect( idAttribute ).toBeDisabled();
+			await expect( idAttribute ).toContainText( 'No sources available' );
+			const altAttribute = page.getByRole( 'button', {
+				name: 'alt',
+			} );
+			await expect( altAttribute ).toBeVisible();
+			await expect( altAttribute ).toBeDisabled();
+			await expect( altAttribute ).toContainText(
+				'Source not registered'
+			);
+		} );
+	} );
+
 	test.describe( 'getValues', () => {
 		test( 'should show the returned value in paragraph content', async ( {
 			editor,

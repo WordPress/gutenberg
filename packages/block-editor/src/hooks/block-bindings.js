@@ -274,16 +274,20 @@ function ReadOnlyBlockBindingsPanelItem( {
 	sources,
 	blockName,
 } ) {
+	const isMobile = useViewportMatch( 'medium', '<' );
+
 	return (
 		<ToolsPanelItem hasValue={ () => !! binding } label={ attribute }>
-			<Item>
-				<BlockBindingsAttribute
-					attribute={ attribute }
-					binding={ binding }
-					sources={ sources }
-					blockName={ blockName }
-				/>
-			</Item>
+			<Menu placement={ isMobile ? 'bottom-start' : 'left-start' }>
+				<Menu.TriggerButton render={ <Item /> } disabled>
+					<BlockBindingsAttribute
+						attribute={ attribute }
+						binding={ binding }
+						sources={ sources }
+						blockName={ blockName }
+					/>
+				</Menu.TriggerButton>
+			</Menu>
 		</ToolsPanelItem>
 	);
 }
