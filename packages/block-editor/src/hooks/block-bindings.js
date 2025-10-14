@@ -423,7 +423,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 				bindableAttributes: _bindableAttributes,
 			};
 		},
-		[ blockContext, blockName, metadata ]
+		[ blockContext, blockName ]
 	); // Return early if there are no bindable attributes.
 	if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
 		return null;
