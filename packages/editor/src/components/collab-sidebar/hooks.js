@@ -15,8 +15,8 @@ import {
 	useEffect,
 	useMemo,
 	useRef,
-	useState,
 	useCallback,
+	useReducer,
 } from '@wordpress/element';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
@@ -39,11 +39,10 @@ import { noop } from './utils';
 const { useBlockElementRef } = unlock( blockEditorPrivateApis );
 
 export function useBlockComments( postId ) {
-	const [ commentLastUpdated, setCommentLastUpdated ] = useState( null );
-
-	const reflowComments = () => {
-		setCommentLastUpdated( Date.now() );
-	};
+	const [ commentLastUpdated, reflowComments ] = useReducer(
+		() => Date.now(),
+		0
+	);
 
 	const queryArgs = {
 		post: postId,
