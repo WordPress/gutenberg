@@ -64,7 +64,7 @@ function CommentForm( {
 			spacing="4"
 		>
 			<VisuallyHidden as="label" htmlFor={ inputId }>
-				{ labelText ?? __( 'Comment' ) }
+				{ labelText ?? __( 'Note' ) }
 			</VisuallyHidden>
 			<TextareaAutosize
 				id={ inputId }

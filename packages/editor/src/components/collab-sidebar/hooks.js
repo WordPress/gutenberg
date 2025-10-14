@@ -205,7 +205,7 @@ export function useBlockCommentsActions( reflowComments ) {
 				'snackbar',
 				parent
 					? __( 'Reply added successfully.' )
-					: __( 'Comment added successfully.' ),
+					: __( 'Note added successfully.' ),
 				{
 					type: 'snackbar',
 					isDismissible: true,
@@ -222,13 +222,13 @@ export function useBlockCommentsActions( reflowComments ) {
 	const onEdit = async ( { id, content, status } ) => {
 		const messageType = status ? status : 'updated';
 		const messages = {
-			approved: __( 'Comment marked as resolved.' ),
-			hold: __( 'Comment reopened.' ),
-			updated: __( 'Comment updated.' ),
+			approved: __( 'Note marked as resolved.' ),
+			hold: __( 'Note reopened.' ),
+			updated: __( 'Note updated.' ),
 		};
 
 		try {
-			// For resolution or reopen actions, create a new comment with metadata.
+			// For resolution or reopen actions, create a new note with metadata.
 			if ( status === 'approved' || status === 'hold' ) {
 				// First, update the thread status.
 				await saveEntityRecord(
@@ -273,7 +273,7 @@ export function useBlockCommentsActions( reflowComments ) {
 
 			createNotice(
 				'snackbar',
-				messages[ messageType ] ?? __( 'Comment updated.' ),
+				messages[ messageType ] ?? __( 'Note updated.' ),
 				{
 					type: 'snackbar',
 					isDismissible: true,
@@ -309,7 +309,7 @@ export function useBlockCommentsActions( reflowComments ) {
 				} );
 			}
 
-			createNotice( 'snackbar', __( 'Comment deleted successfully.' ), {
+			createNotice( 'snackbar', __( 'Note deleted successfully.' ), {
 				type: 'snackbar',
 				isDismissible: true,
 			} );

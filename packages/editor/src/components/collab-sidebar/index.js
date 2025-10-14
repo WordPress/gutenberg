@@ -156,10 +156,9 @@ export default function CollabSidebar() {
 			<AddCommentMenuItem onClick={ openTheSidebar } />
 			<PluginSidebar
 				identifier={ collabHistorySidebarName }
-				// translators: Comments sidebar title
-				title={ __( 'Comments' ) }
+				title={ __( 'Notes' ) }
 				icon={ commentIcon }
-				closeLabel={ __( 'Close Comments' ) }
+				closeLabel={ __( 'Close Notes' ) }
 			>
 				<CollabSidebarContent
 					comments={ resultComments }

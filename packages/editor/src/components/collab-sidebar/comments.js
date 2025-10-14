@@ -190,10 +190,7 @@ export function Comments( {
 				justify="flex-start"
 				spacing="2"
 			>
-				{
-					// translators: message displayed when there are no comments available
-					__( 'No comments available' )
-				}
+				{ __( 'No notes available' ) }
 			</VStack>
 		);
 	}
@@ -299,13 +296,13 @@ function Thread( {
 	);
 	const ariaLabel = relatedBlockElement
 		? sprintf(
-				// translators: %s: comment excerpt
-				__( 'Comment: %s' ),
+				// translators: %s: note excerpt
+				__( 'Note: %s' ),
 				commentExcerpt
 		  )
 		: sprintf(
-				// translators: %s: comment excerpt
-				__( 'Original block deleted. Comment: %s' ),
+				// translators: %s: note excerpt
+				__( 'Original block deleted. Note: %s' ),
 				commentExcerpt
 		  );
 
@@ -361,7 +358,7 @@ function Thread( {
 					);
 				} }
 			>
-				{ __( 'Add new comment' ) }
+				{ __( 'Add new note' ) }
 			</Button>
 			{ ! relatedBlockElement && (
 				<Text as="p" weight={ 500 } variant="muted">
@@ -466,7 +463,8 @@ function Thread( {
 								}
 							} }
 							onCancel={ ( event ) => {
-								event.stopPropagation(); // Prevent the parent onClick from being triggered
+								// Prevent the parent onClick from being triggered.
+								event.stopPropagation();
 								unselectThread();
 								focusCommentThread(
 									thread.id,
@@ -480,8 +478,8 @@ function Thread( {
 							}
 							rows={ 'approved' === thread.status ? 2 : 4 }
 							labelText={ sprintf(
-								// translators: %1$s: comment identifier, %2$s: author name
-								__( 'Reply to Comment %1$s by %2$s' ),
+								// translators: %1$s: note identifier, %2$s: author name
+								__( 'Reply to Note %1$s by %2$s' ),
 								thread.id,
 								thread?.author_name || 'Unknown'
 							) }
@@ -537,7 +535,7 @@ const CommentBoard = ( {
 	const actions = [
 		{
 			id: 'edit',
-			title: _x( 'Edit', 'Edit comment' ),
+			title: __( 'Edit' ),
 			isEligible: ( { status } ) => status !== 'approved',
 			onClick: () => {
 				setActionState( 'edit' );
@@ -545,7 +543,7 @@ const CommentBoard = ( {
 		},
 		{
 			id: 'reopen',
-			title: _x( 'Reopen', 'Reopen comment' ),
+			title: _x( 'Reopen', 'Reopen note' ),
 			isEligible: ( { status } ) => status === 'approved',
 			onClick: () => {
 				onEdit( { id: thread.id, status: 'hold' } );
@@ -553,7 +551,7 @@ const CommentBoard = ( {
 		},
 		{
 			id: 'delete',
-			title: _x( 'Delete', 'Delete comment' ),
+			title: __( 'Delete' ),
 			isEligible: () => true,
 			onClick: () => {
 				setActionState( 'delete' );
@@ -590,7 +588,7 @@ const CommentBoard = ( {
 								<Button
 									label={ _x(
 										'Resolve',
-										'Mark comment as resolved'
+										'Mark note as resolved'
 									) }
 									size="small"
 									icon={ published }
@@ -648,8 +646,8 @@ const CommentBoard = ( {
 					thread={ thread }
 					submitButtonText={ _x( 'Update', 'verb' ) }
 					labelText={ sprintf(
-						// translators: %1$s: comment identifier, %2$s: author name.
-						__( 'Edit Comment %1$s by %2$s' ),
+						// translators: %1$s: note identifier, %2$s: author name.
+						__( 'Edit note %1$s by %2$s' ),
 						thread.id,
 						thread?.author_name || 'Unknown'
 					) }
@@ -680,7 +678,7 @@ const CommentBoard = ( {
 									content.trim() !== ''
 								) {
 									return sprintf(
-										// translators: %1$s: action label ("Marked as resolved" or "Reopened"); %2$s: comment text.
+										// translators: %1$s: action label ("Marked as resolved" or "Reopened"); %2$s: note text.
 										__( '%1$s: %2$s' ),
 										actionText,
 										content
@@ -699,7 +697,7 @@ const CommentBoard = ( {
 					onCancel={ handleCancel }
 					confirmButtonText={ __( 'Delete' ) }
 				>
-					{ __( 'Are you sure you want to delete this comment?' ) }
+					{ __( 'Are you sure you want to delete this note?' ) }
 				</ConfirmDialog>
 			) }
 		</>

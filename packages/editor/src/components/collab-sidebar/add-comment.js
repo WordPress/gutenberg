@@ -73,8 +73,8 @@ export function AddComment( {
 					setShowCommentBoard( false );
 					blockElement?.focus();
 				} }
-				submitButtonText={ _x( 'Comment', 'Add comment button' ) }
-				labelText={ __( 'New Comment' ) }
+				submitButtonText={ _x( 'Note', 'Add note button' ) }
+				labelText={ __( 'New Note' ) }
 			/>
 		</VStack>
 	);
