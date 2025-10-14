@@ -2,10 +2,12 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+
 import {
-	BlockPreview,
-	privateApis as blockEditorPrivateApis,
 	// @ts-ignore
+	BlockPreview,
+	// @ts-ignore
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import type { BasePost } from '@wordpress/fields';
 import { useSelect } from '@wordpress/data';
