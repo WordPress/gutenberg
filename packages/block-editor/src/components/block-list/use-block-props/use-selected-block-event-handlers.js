@@ -163,6 +163,22 @@ export function useEventHandlers( { clientId, isSelected } ) {
 
 				node.after( clone );
 
+				const originalNodeProperties = {};
+				for ( const property of [
+					'transform',
+					'transformOrigin',
+					'transition',
+					'zIndex',
+					'position',
+					'top',
+					'left',
+					'pointerEvents',
+					'opacity',
+					'backgroundColor',
+				] ) {
+					originalNodeProperties[ property ] = node.style[ property ];
+				}
+
 				// Get scroll position.
 				const originScrollTop = defaultView.scrollY;
 				const originScrollLeft = defaultView.scrollX;
@@ -179,7 +195,6 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				node.style.position = 'relative';
 				node.style.top = `${ 0 }px`;
 				node.style.left = `${ 0 }px`;
-				// node.style.width = `${ rect.width * inverted }px`;
 
 				const originX = event.clientX - rect.left;
 				const originY = event.clientY - rect.top;
@@ -194,7 +209,6 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				}px`;
 				node.style.transition = 'transform 0.2s ease-out';
 				node.style.transform = `scale(${ dragScale })`;
-				// node.style.margin = '0';
 				node.style.opacity = '0.9';
 				node.style.backgroundColor = bgColor;
 
@@ -226,18 +240,11 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				function end() {
 					ownerDocument.removeEventListener( 'dragover', over );
 					ownerDocument.removeEventListener( 'dragend', end );
-					node.style.transform = '';
-					node.style.transformOrigin = '';
-					node.style.transition = '';
-					node.style.zIndex = '';
-					node.style.position = '';
-					node.style.top = '';
-					node.style.left = '';
-					// node.style.width = '';
-					node.style.pointerEvents = '';
-					// node.style.margin = '';
-					node.style.opacity = '';
-					node.style.backgroundColor = '';
+					for ( const [ property, value ] of Object.entries(
+						originalNodeProperties
+					) ) {
+						node.style[ property ] = value;
+					}
 					clone.remove();
 					node.id = id;
 					dragElement.remove();
