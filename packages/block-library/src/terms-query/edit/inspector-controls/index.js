@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -70,11 +70,9 @@ export default function TermsQueryInspectorControls( {
 	const taxonomyControlLabel = __( 'Taxonomy' );
 	const orderByControlLabel = __( 'Order by' );
 	const emptyTermsControlLabel = __( 'Show empty terms' );
-	const inheritControlLabel = sprintf(
-		/* translators: %s: either "post" or "archive" */
-		__( 'Inherit parent term from %s' ),
-		isSinglePostContext ? __( 'post' ) : __( 'archive' )
-	);
+	const inheritControlLabel = isSinglePostContext
+		? __( 'Inherit terms from post' )
+		: __( 'Inherit parent term from archive' );
 	const nestedTermsControlLabel = __( 'Show nested terms' );
 	const maxTermsControlLabel = __( 'Max terms' );
 
