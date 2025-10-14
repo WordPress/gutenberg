@@ -34,6 +34,7 @@ function PostLockedModal() {
 		activePostLock,
 		postType,
 		previewLink,
+		supportsSync,
 	} = useSelect( ( select ) => {
 		const {
 			isPostLocked,
@@ -45,7 +46,8 @@ function PostLockedModal() {
 			getEditedPostPreviewLink,
 			getEditorSettings,
 		} = select( editorStore );
-		const { getPostType } = select( coreStore );
+		const { getPostType, getEntityConfig } = select( coreStore );
+		const entityName = getEditedPostAttribute( 'type' );
 		return {
 			isLocked: isPostLocked(),
 			isTakeover: isPostLockTakeover(),
@@ -55,6 +57,7 @@ function PostLockedModal() {
 			activePostLock: getActivePostLock(),
 			postType: getPostType( getEditedPostAttribute( 'type' ) ),
 			previewLink: getEditedPostPreviewLink(),
+			supportsSync: getEntityConfig( 'postType', entityName )?.syncConfig?.enabled,
 		};
 	}, [] );
 
@@ -146,6 +149,13 @@ function PostLockedModal() {
 
 	if ( ! isLocked ) {
 		return null;
+	}
+
+	// Avoid sending the modal if sync is supported, but retain functionality around locks etc.
+	if ( window.__experimentalEnableSync && supportsSync ) {
+		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+			return null;
+		}
 	}
 
 	const userDisplayName = user.name;
