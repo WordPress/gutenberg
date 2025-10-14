@@ -70,7 +70,7 @@ function CommentAuthorInfo( { avatar, name, date, userId } ) {
 	return (
 		<>
 			<img
-				src={ avatar ?? currentUserAvatar }
+				src={ avatar || currentUserAvatar }
 				className="editor-collab-sidebar-panel__user-avatar"
 				// translators: alt text for user avatar image
 				alt={ __( 'User avatar' ) }

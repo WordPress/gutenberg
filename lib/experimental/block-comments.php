@@ -27,6 +27,31 @@ function gutenberg_block_comment_add_post_type_support() {
 add_action( 'init', 'gutenberg_block_comment_add_post_type_support' );
 
 /**
+ * Register comment metadata for block comment status.
+ */
+function gutenberg_register_block_comment_metadata() {
+	register_meta(
+		'comment',
+		'_wp_block_comment_status',
+		array(
+			'type'          => 'string',
+			'description'   => __( 'Block comment resolution status', 'gutenberg' ),
+			'single'        => true,
+			'show_in_rest'  => array(
+				'schema' => array(
+					'type' => 'string',
+					'enum' => array( 'resolved', 'reopen' ),
+				),
+			),
+			'auth_callback' => function () {
+				return current_user_can( 'edit_posts' );
+			},
+		)
+	);
+}
+add_action( 'init', 'gutenberg_register_block_comment_metadata' );
+
+/**
  * Updates the comment type for avatars in the WordPress REST API.
  *
  * This function adds the 'block_comment' type to the list of comment types
@@ -90,3 +115,21 @@ function gutenberg_filter_comment_count_query_exclude_block_comments( $query ) {
 	return $query;
 }
 add_filter( 'query', 'gutenberg_filter_comment_count_query_exclude_block_comments' );
+
+/**
+ * Allows duplicate block comment resolution messages.
+ *
+ * @since 6.9.0
+ *
+ * @param int $dupe_id The duplicate comment ID.
+ * @param array $commentdata The comment data.
+ *
+ * @return bool True if the comment can be duplicated, false otherwise.
+ */
+function gutenberg_allow_duplicate_block_comment_resolution( $dupe_id, $commentdata ) {
+	if ( isset( $commentdata['meta']['_wp_block_comment_status'] ) && in_array( $commentdata['meta']['_wp_block_comment_status'], array( 'resolved', 'reopen' ), true ) ) {
+		return false;
+	}
+}
+
+add_filter( 'duplicate_comment_id', 'gutenberg_allow_duplicate_block_comment_resolution', 10, 2 );

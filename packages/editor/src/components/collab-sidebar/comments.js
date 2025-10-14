@@ -287,11 +287,11 @@ function Thread( {
 		toggleBlockSpotlight( thread.blockClientId, false );
 	};
 
-	const replies = thread?.reply;
-	const lastReply = !! replies.length
-		? replies[ replies.length - 1 ]
-		: undefined;
-	const restReplies = !! replies.length ? replies.slice( 0, -1 ) : [];
+	const allReplies = thread?.reply || [];
+
+	const lastReply =
+		allReplies.length > 0 ? allReplies[ allReplies.length - 1 ] : undefined;
+	const restReplies = allReplies.length > 0 ? allReplies.slice( 0, -1 ) : [];
 
 	const commentExcerpt = getCommentExcerpt(
 		stripHTML( thread.content.rendered ),
@@ -386,7 +386,7 @@ function Thread( {
 				reflowComments={ reflowComments }
 			/>
 			{ isSelected &&
-				replies.map( ( reply ) => (
+				allReplies.map( ( reply ) => (
 					<CommentBoard
 						key={ reply.id }
 						thread={ reply }
@@ -442,15 +442,19 @@ function Thread( {
 						<CommentForm
 							onSubmit={ ( inputComment ) => {
 								if ( 'approved' === thread.status ) {
+									// For reopening, include the content in the reopen action.
 									onEditComment( {
 										id: thread.id,
 										status: 'hold',
+										content: inputComment,
+									} );
+								} else {
+									// For regular replies, add as separate comment.
+									onAddReply( {
+										content: inputComment,
+										parent: thread.id,
 									} );
 								}
-								onAddReply( {
-									content: inputComment,
-									parent: thread.id,
-								} );
 							} }
 							onCancel={ ( event ) => {
 								event.stopPropagation(); // Prevent the parent onClick from being triggered
@@ -513,6 +517,13 @@ const CommentBoard = ( {
 		setActionState( false );
 		setShowConfirmDialog( false );
 	};
+
+	// Check if this is a resolution comment by checking metadata.
+	const isResolutionComment =
+		thread.type === 'block_comment' &&
+		thread.meta &&
+		( thread.meta._wp_block_comment_status === 'resolved' ||
+			thread.meta._wp_block_comment_status === 'reopen' );
 
 	const actions = [
 		{
@@ -636,8 +647,40 @@ const CommentBoard = ( {
 					reflowComments={ reflowComments }
 				/>
 			) : (
-				<RawHTML className="editor-collab-sidebar-panel__user-comment">
-					{ thread?.content?.rendered }
+				<RawHTML
+					className={ clsx(
+						'editor-collab-sidebar-panel__user-comment',
+						{
+							'editor-collab-sidebar-panel__resolution-text':
+								isResolutionComment,
+						}
+					) }
+				>
+					{ isResolutionComment
+						? ( () => {
+								const actionText =
+									thread.meta._wp_block_comment_status ===
+									'resolved'
+										? __( 'Marked as resolved' )
+										: __( 'Reopened' );
+								const content = thread?.content?.raw;
+
+								if (
+									content &&
+									typeof content === 'string' &&
+									content.trim() !== ''
+								) {
+									return sprintf(
+										// translators: %1$s: action label ("Marked as resolved" or "Reopened"); %2$s: comment text.
+										__( '%1$s: %2$s' ),
+										actionText,
+										content
+									);
+								}
+								// If no content, just show the action.
+								return actionText;
+						  } )()
+						: thread?.content?.rendered }
 				</RawHTML>
 			) }
 			{ 'delete' === actionState && (
@@ -653,3 +696,5 @@ const CommentBoard = ( {
 		</VStack>
 	);
 };
+
+export default Comments;

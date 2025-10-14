@@ -16,6 +16,13 @@ export const titleExcerpt = (
 	</SVG>
 );
 
+const termName = [
+	'core/term-name',
+	{
+		isLink: true,
+	},
+];
+
 const variations = [
 	{
 		name: 'name',
@@ -24,7 +31,7 @@ const variations = [
 		attributes: {},
 		icon: titleDate,
 		scope: [ 'block' ],
-		innerBlocks: [ [ 'core/term-template', {}, [ [ 'core/term-name' ] ] ] ],
+		innerBlocks: [ [ 'core/term-template', {}, [ termName ] ] ],
 	},
 	{
 		name: 'name-count',
@@ -43,7 +50,7 @@ const variations = [
 					[
 						'core/group',
 						{ layout: { type: 'flex', flexWrap: 'nowrap' } },
-						[ [ 'core/term-name' ], [ 'core/term-count' ] ],
+						[ termName, [ 'core/term-count' ] ],
 					],
 				],
 			],

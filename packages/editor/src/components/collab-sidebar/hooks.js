@@ -228,16 +228,49 @@ export function useBlockCommentsActions( reflowComments ) {
 		};
 
 		try {
-			await saveEntityRecord(
-				'root',
-				'comment',
-				{
+			// For resolution or reopen actions, create a new comment with metadata.
+			if ( status === 'approved' || status === 'hold' ) {
+				// First, update the thread status.
+				await saveEntityRecord(
+					'root',
+					'comment',
+					{
+						id,
+						status,
+					},
+					{
+						throwOnError: true,
+					}
+				);
+
+				// Then create a new comment with the metadata.
+				const newCommentData = {
+					post: getCurrentPostId(),
+					content: content || '', // Empty content for resolve, content for reopen.
+					type: 'block_comment',
+					status,
+					parent: id,
+					meta: {
+						_wp_block_comment_status:
+							status === 'approved' ? 'resolved' : 'reopen',
+					},
+				};
+
+				await saveEntityRecord( 'root', 'comment', newCommentData, {
+					throwOnError: true,
+				} );
+			} else {
+				const updateData = {
 					id,
 					content,
 					status,
-				},
-				{ throwOnError: true }
-			);
+				};
+
+				await saveEntityRecord( 'root', 'comment', updateData, {
+					throwOnError: true,
+				} );
+			}
+
 			createNotice(
 				'snackbar',
 				messages[ messageType ] ?? __( 'Comment updated.' ),

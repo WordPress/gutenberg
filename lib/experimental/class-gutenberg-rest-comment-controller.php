@@ -303,6 +303,11 @@ class Gutenberg_REST_Comment_Controller extends WP_REST_Comments_Controller {
 			$prepared_comment['comment_content'] = '';
 		}
 
+		// Include block comment metadata into check_is_comment_content_allowed [backport].
+		if ( isset( $request['meta']['_wp_block_comment_status'] ) ) {
+			$prepared_comment['meta']['_wp_block_comment_status'] = $request['meta']['_wp_block_comment_status'];
+		}
+
 		if ( ! $this->check_is_comment_content_allowed( $prepared_comment ) ) {
 			return new WP_Error(
 				'rest_comment_content_invalid',
@@ -515,6 +520,50 @@ class Gutenberg_REST_Comment_Controller extends WP_REST_Comments_Controller {
 		);
 
 		return $schema;
+	}
+
+	/**
+	 * If empty comments are not allowed, checks if the provided comment content is not empty.
+	 *
+	 * @since 6.9.0
+	 *
+	 * @param array $prepared_comment The prepared comment data.
+	 * @return bool True if the content is allowed, false otherwise.
+	 */
+	protected function check_is_comment_content_allowed( $prepared_comment ) {
+		$check = wp_parse_args(
+			$prepared_comment,
+			array(
+				'comment_post_ID'      => 0,
+				'comment_author'       => null,
+				'comment_author_email' => null,
+				'comment_author_url'   => null,
+				'comment_parent'       => 0,
+				'user_id'              => 0,
+			)
+		);
+
+		/** This filter is documented in wp-includes/comment.php */
+		$allow_empty = apply_filters( 'allow_empty_comment', false, $check );
+
+		if ( $allow_empty ) {
+			return true;
+		}
+
+		// Allow empty block comments with resolution metadata [backport].
+		if (
+			isset( $check['comment_type'] ) &&
+			'block_comment' === $check['comment_type'] &&
+			isset( $check['meta']['_wp_block_comment_status'] )
+		) {
+			return true;
+		}
+
+		/*
+		 * Do not allow a comment to be created with missing or empty
+		 * comment_content. See wp_handle_comment_submission().
+		 */
+		return '' !== $check['comment_content'];
 	}
 }
 
