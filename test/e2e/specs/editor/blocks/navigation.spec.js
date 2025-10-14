@@ -931,7 +931,7 @@ test.describe( 'Navigation block', () => {
 
 				await expect( navLinkBlock ).toBeVisible( {
 					// Wait for the Navigation Link block to be available
-					timeout: 10000,
+					timeout: 1000,
 				} );
 				await editor.selectBlocks( navLinkBlock );
 
