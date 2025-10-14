@@ -40,7 +40,6 @@ class Test_Script_Dependencies extends WP_UnitTestCase {
 			'wp-block-library',
 			'wp-edit-site',
 			'wp-editor',
-			'wp-widgets',
 		);
 
 		$this->assertEqualSets( $expected, $dependents );
