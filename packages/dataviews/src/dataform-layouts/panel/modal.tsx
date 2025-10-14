@@ -29,6 +29,7 @@ import { DEFAULT_LAYOUT } from '../normalize-form';
 import SummaryButton from './summary-button';
 import useFormValidity from '../../hooks/use-form-validity';
 import DataFormContext from '../../components/dataform-context';
+import useFocusOnFormInput from './use-focus-on-form-input';
 
 function ModalContent< Item >( {
 	data,
@@ -75,6 +76,8 @@ function ModalContent< Item >( {
 		setChanges( ( prev ) => deepMerge( prev, newValue ) );
 	};
 
+	const focusOnMountRef = useFocusOnFormInput();
+
 	return (
 		<Modal
 			className="dataforms-layouts-panel__modal"
@@ -83,6 +86,7 @@ function ModalContent< Item >( {
 			title={ fieldLabel }
 			size="medium"
 		>
+			<div ref={ focusOnMountRef }>
 			<DataFormLayout
 				data={ modalData }
 				form={ form }
@@ -100,6 +104,7 @@ function ModalContent< Item >( {
 					/>
 				) }
 			</DataFormLayout>
+			</div>
 			<HStack
 				className="dataforms-layouts-panel__modal-footer"
 				spacing={ 3 }
