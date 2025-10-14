@@ -753,13 +753,37 @@ test.describe( 'Navigation block', () => {
 		// eslint-disable-next-line no-unused-vars
 		let testPage1, testPage2, testPage3;
 
-		test.beforeAll( async ( { requestUtils } ) => {
-			// Activate the pretty permalinks plugin.
-			// This is required to verify that modifying the page slug will dynamically update
-			// the URL in the editor and frontend.
-			await requestUtils.activatePlugin(
-				'gutenberg-test-pretty-permalinks'
-			);
+		// Use a fixture to manage pretty permalinks with automatic cleanup.
+		// This is more reliable than beforeAll/afterAll because Playwright's fixture
+		// system ensures teardown runs even if tests crash or are interrupted.
+		test.use( {
+			prettyPermalinks: async ( { requestUtils }, use ) => {
+				// Setup: Enable pretty permalinks
+				await requestUtils.activatePlugin(
+					'gutenberg-test-pretty-permalinks'
+				);
+
+				// Force re-discovery of REST API root URL after enabling pretty permalinks.
+				// When permalinks change from plain to pretty, the REST API URL changes
+				// from /?rest_route=/ to /wp-json/. We need to refresh the cached URL
+				// to prevent 404 errors.
+				await requestUtils.setupRest();
+
+				// Provide the fixture value to tests
+				await use( true );
+
+				// Teardown: Disable pretty permalinks
+				// This runs automatically after all tests, even if they fail or crash
+				await requestUtils.deactivatePlugin(
+					'gutenberg-test-pretty-permalinks'
+				);
+
+				// Force re-discovery of REST API root URL after disabling pretty permalinks.
+				// When permalinks change from pretty to plain, the REST API URL changes
+				// from /wp-json/ back to /?rest_route=/. We need to refresh the cached URL
+				// to prevent 404 errors.
+				await requestUtils.setupRest();
+			},
 		} );
 
 		test.beforeEach( async ( { requestUtils } ) => {
@@ -781,13 +805,6 @@ test.describe( 'Navigation block', () => {
 
 		test.afterEach( async ( { requestUtils } ) => {
 			await requestUtils.deleteAllPages();
-		} );
-
-		test.afterAll( async ( { requestUtils } ) => {
-			// Deactivate the pretty permalinks plugin
-			await requestUtils.deactivatePlugin(
-				'gutenberg-test-pretty-permalinks'
-			);
 		} );
 
 		test( 'can bind to a page', async ( {

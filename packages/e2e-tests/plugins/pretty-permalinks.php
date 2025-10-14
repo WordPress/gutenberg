@@ -16,13 +16,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Enable pretty permalinks for E2E tests
  */
 function gutenberg_e2e_enable_pretty_permalinks() {
-	// Enable pretty permalinks
-	update_option( 'permalink_structure', '/%postname%/' );
-
-	// Flush rewrite rules
+	// Flush rewrite rules with hard flush to create .htaccess
 	global $wp_rewrite;
 	$wp_rewrite->set_permalink_structure( '/%postname%/' );
-	$wp_rewrite->flush_rules();
+	$wp_rewrite->flush_rules( true );
 }
 register_activation_hook( __FILE__, 'gutenberg_e2e_enable_pretty_permalinks' );
 
@@ -30,12 +27,9 @@ register_activation_hook( __FILE__, 'gutenberg_e2e_enable_pretty_permalinks' );
  * Disable pretty permalinks (reset to default)
  */
 function gutenberg_e2e_disable_pretty_permalinks() {
-	// Disable pretty permalinks (set to default/empty)
-	update_option( 'permalink_structure', '' );
-
-	// Flush rewrite rules
+	// Flush rewrite rules with hard flush to update .htaccess
 	global $wp_rewrite;
 	$wp_rewrite->set_permalink_structure( '' );
-	$wp_rewrite->flush_rules();
+	$wp_rewrite->flush_rules( true );
 }
 register_deactivation_hook( __FILE__, 'gutenberg_e2e_disable_pretty_permalinks' );
