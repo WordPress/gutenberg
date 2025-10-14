@@ -63,7 +63,7 @@ test.describe( 'Template Activate', () => {
 		await activateButton.click();
 
 		await page.waitForSelector(
-			'.dataviews-view-grid__field-value .is-success'
+			'.dataviews-view-grid__field-value .is-success:has-text("Active")'
 		);
 
 		await page

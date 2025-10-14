@@ -378,5 +378,8 @@ class BlockTemplateRegistrationUtils {
 		await expect
 			.poll( async () => await searchResults.count() )
 			.toBeLessThanOrEqual( initialSearchResultsCount );
+		await expect
+			.poll( async () => this.page.url() )
+			.toContain( `search=${ encodeURIComponent( searchTerm ) }` );
 	}
 }
