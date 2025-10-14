@@ -228,7 +228,8 @@ getEntityRecord.shouldInvalidate = ( action, kind, name ) => {
 		name === 'site' &&
 		( ( action.type === 'RECEIVE_ITEMS' &&
 			// Making sure persistedEdits is set seems to be the only way of
-			// knowing whether it's an update or fetch.
+			// knowing whether it's an update or fetch. Only an update would
+			// have persistedEdits.
 			action.persistedEdits &&
 			action.persistedEdits.status !== 'auto-draft' ) ||
 			action.type === 'REMOVE_ITEMS' ) &&
@@ -337,6 +338,12 @@ export const getEntityRecords =
 			}
 
 			let { baseURL } = entityConfig;
+			// `combinedTemplates` means that we fetch templates from the "old"
+			// /templates endpoint, which combines active user templates with
+			// the registered templates rewrites IDs in the form of
+			// `theme-slug/template-slug`. When turned off, we only fetch
+			// database templates (posts). To fetch registered templates without
+			// edits applied, use the `wp_registered_template` entity.
 			const { combinedTemplates = true } = query;
 
 			if (
