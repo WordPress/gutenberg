@@ -211,6 +211,20 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	&[data-clear="true"] {
 		float: none;
 	}
+
+	&:not([draggable="true"]),
+	&:not([data-draggable="true"]) {
+		cursor: default;
+	}
+
+	&[draggable="true"],
+	&[data-draggable="true"] {
+		cursor: grab;
+	}
+
+	[contenteditable] {
+		cursor: text;
+	}
 }
 
 .is-outline-mode .block-editor-block-list__block:not(.remove-outline) {
