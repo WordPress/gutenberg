@@ -39,10 +39,8 @@ import {
 	getContentLockingParent,
 	getTemporarilyEditingAsBlocks,
 	getTemporarilyEditingFocusModeToRevert,
-	getSectionRootClientId,
 	isSectionBlock,
 	getParentSectionBlock,
-	isZoomOut,
 	isContainerInsertableToInContentOnlyMode,
 } from './private-selectors';
 
@@ -3004,22 +3002,6 @@ export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 	// If the block editing is locked, the block overlay is always active.
 	if ( ! canEditBlock( state, clientId ) ) {
 		return true;
-	}
-
-	// In zoom-out mode, the block overlay is always active for section level blocks.
-	if ( isZoomOut( state ) ) {
-		const sectionRootClientId = getSectionRootClientId( state );
-		if ( sectionRootClientId ) {
-			const sectionClientIds = getBlockOrder(
-				state,
-				sectionRootClientId
-			);
-			if ( sectionClientIds?.includes( clientId ) ) {
-				return true;
-			}
-		} else if ( clientId && ! getBlockRootClientId( state, clientId ) ) {
-			return true;
-		}
 	}
 
 	// In navigation mode, the block overlay is active when the block is not
