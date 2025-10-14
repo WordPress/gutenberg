@@ -393,17 +393,17 @@ export default function NavigationLinkEdit( {
 		onKeyDown,
 	} );
 
-	const innerBlocksProps = useInnerBlocksProps(
-		{
-			...blockProps,
-			className: 'remove-outline', // Remove the outline from the inner blocks container.
-		},
-		{
-			defaultBlock: DEFAULT_BLOCK,
-			directInsert: true,
-			renderAppender: false,
-		}
-	);
+	// const innerBlocksProps = useInnerBlocksProps(
+	// 	{
+	// 		...blockProps,
+	// 		className: 'remove-outline', // Remove the outline from the inner blocks container.
+	// 	},
+	// 	{
+	// 		defaultBlock: DEFAULT_BLOCK,
+	// 		directInsert: true,
+	// 		renderAppender: false,
+	// 	}
+	// );
 
 	if ( ! url || isInvalid || isDraft ) {
 		blockProps.onClick = () => {
@@ -561,7 +561,6 @@ export default function NavigationLinkEdit( {
 						/>
 					) }
 				</a>
-				<div { ...innerBlocksProps } />
 			</div>
 		</>
 	);
