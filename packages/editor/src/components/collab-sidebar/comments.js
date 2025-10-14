@@ -145,96 +145,98 @@ export function Comments( {
 
 			// If there is a selected thread, push threads above up and threads below down.
 			const selectedThreadData = threads[ breakIndex ];
-			if ( blockRefs[ selectedThreadData.id ] ) {
-				let blockElement = blockRefs[ selectedThreadData.id ];
-				let blockRect = blockElement?.getBoundingClientRect();
-				const selectedThreadTop = blockRect?.top || 0;
-				const selectedThreadHeight =
-					heights[ selectedThreadData.id ] || 0;
 
-				offsets[ selectedThreadData.id ] = -16;
-
-				let previousThreadData = {
-					threadTop: selectedThreadTop - 16,
-					threadHeight: selectedThreadHeight,
-				};
-
-				// Process threads after the selected thread, offsetting any overlapping
-				// threads downward.
-				for ( let i = breakIndex + 1; i < threads.length; i++ ) {
-					const thread = threads[ i ];
-					if ( ! blockRefs[ thread.id ] ) {
-						continue;
-					}
-
-					blockElement = blockRefs[ thread.id ];
-					blockRect = blockElement?.getBoundingClientRect();
-					const threadTop = blockRect?.top || 0;
-					const threadHeight = heights[ thread.id ] || 0;
-
-					let additionalOffset = -16;
-
-					// Check if the thread overlaps with the previous one.
-					const previousBottom =
-						previousThreadData.threadTop +
-						previousThreadData.threadHeight;
-					if ( threadTop < previousBottom ) {
-						// Shift down by the difference plus a margin to avoid overlap.
-						additionalOffset = previousBottom - threadTop + 20;
-					}
-
-					offsets[ thread.id ] = additionalOffset;
-
-					// Update for next iteration.
-					previousThreadData = {
-						threadTop: threadTop + additionalOffset,
-						threadHeight,
-					};
-				}
-
-				// Process threads before the selected thread, offsetting any overlapping
-				// threads upward.
-				let nextThreadData = {
-					threadTop: selectedThreadTop - 16,
-					threadHeight: selectedThreadHeight,
-				};
-
-				for ( let i = selectedThreadIndex - 1; i >= 0; i-- ) {
-					const thread = threads[ i ];
-					if ( ! blockRefs[ thread.id ] ) {
-						continue;
-					}
-
-					blockElement = blockRefs[ thread.id ];
-					blockRect = blockElement?.getBoundingClientRect();
-					const threadTop = blockRect?.top || 0;
-					const threadHeight = heights[ thread.id ] || 0;
-
-					let additionalOffset = -16;
-
-					// Calculate the bottom position of this thread with default offset.
-					const threadBottom = threadTop + threadHeight;
-
-					// Check if this thread's bottom would overlap with the next thread's top.
-					if ( threadBottom > nextThreadData.threadTop ) {
-						// Shift up by the difference plus a margin to avoid overlap.
-						additionalOffset =
-							nextThreadData.threadTop -
-							threadTop -
-							threadHeight -
-							20;
-					}
-
-					offsets[ thread.id ] = additionalOffset;
-
-					// Update for next iteration (going upward).
-					nextThreadData = {
-						threadTop: threadTop + additionalOffset,
-						threadHeight,
-					};
-				}
+			if ( ! selectedThreadData || ! blockRefs[ selectedThreadData.id ] ) {
+				return;
 			}
 
+			let blockElement = blockRefs[ selectedThreadData.id ];
+			let blockRect = blockElement?.getBoundingClientRect();
+			const selectedThreadTop = blockRect?.top || 0;
+			const selectedThreadHeight =
+				heights[ selectedThreadData.id ] || 0;
+
+			offsets[ selectedThreadData.id ] = -16;
+
+			let previousThreadData = {
+				threadTop: selectedThreadTop - 16,
+				threadHeight: selectedThreadHeight,
+			};
+
+			// Process threads after the selected thread, offsetting any overlapping
+			// threads downward.
+			for ( let i = breakIndex + 1; i < threads.length; i++ ) {
+				const thread = threads[ i ];
+				if ( ! blockRefs[ thread.id ] ) {
+					continue;
+				}
+
+				blockElement = blockRefs[ thread.id ];
+				blockRect = blockElement?.getBoundingClientRect();
+				const threadTop = blockRect?.top || 0;
+				const threadHeight = heights[ thread.id ] || 0;
+
+				let additionalOffset = -16;
+
+				// Check if the thread overlaps with the previous one.
+				const previousBottom =
+					previousThreadData.threadTop +
+					previousThreadData.threadHeight;
+				if ( threadTop < previousBottom ) {
+					// Shift down by the difference plus a margin to avoid overlap.
+					additionalOffset = previousBottom - threadTop + 20;
+				}
+
+				offsets[ thread.id ] = additionalOffset;
+
+				// Update for next iteration.
+				previousThreadData = {
+					threadTop: threadTop + additionalOffset,
+					threadHeight,
+				};
+			}
+
+			// Process threads before the selected thread, offsetting any overlapping
+			// threads upward.
+			let nextThreadData = {
+				threadTop: selectedThreadTop - 16,
+				threadHeight: selectedThreadHeight,
+			};
+
+			for ( let i = selectedThreadIndex - 1; i >= 0; i-- ) {
+				const thread = threads[ i ];
+				if ( ! blockRefs[ thread.id ] ) {
+					continue;
+				}
+
+				blockElement = blockRefs[ thread.id ];
+				blockRect = blockElement?.getBoundingClientRect();
+				const threadTop = blockRect?.top || 0;
+				const threadHeight = heights[ thread.id ] || 0;
+
+				let additionalOffset = -16;
+
+				// Calculate the bottom position of this thread with default offset.
+				const threadBottom = threadTop + threadHeight;
+
+				// Check if this thread's bottom would overlap with the next thread's top.
+				if ( threadBottom > nextThreadData.threadTop ) {
+					// Shift up by the difference plus a margin to avoid overlap.
+					additionalOffset =
+						nextThreadData.threadTop -
+						threadTop -
+						threadHeight -
+						20;
+				}
+
+				offsets[ thread.id ] = additionalOffset;
+
+				// Update for next iteration (going upward).
+				nextThreadData = {
+					threadTop: threadTop + additionalOffset,
+					threadHeight,
+				};
+			}
 			return offsets;
 		};
 		const newOffsets = calculateAllOffsets();
