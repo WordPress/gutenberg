@@ -8,8 +8,8 @@ import { RichTextToolbarButton } from '@wordpress/block-editor';
 import {
 	Popover,
 	TextControl,
-	Notice,
 	__experimentalVStack as VStack,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { math as icon } from '@wordpress/icons';
 
@@ -17,6 +17,13 @@ import { math as icon } from '@wordpress/icons';
  * External dependencies
  */
 import temml from 'temml';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../lock-unlock';
+
+const { Badge } = unlock( componentsPrivateApis );
 
 const name = 'core/math';
 const title = __( 'Math' );
@@ -71,26 +78,34 @@ function InlineUI( { value, onChange, activeAttributes, contentRef } ) {
 
 	return (
 		<Popover
-			placement="bottom"
+			placement="bottom-start"
 			offset={ 8 }
 			focusOnMount="firstContentElement"
 			anchor={ popoverAnchor }
 			className="block-editor-format-toolbar__math-popover"
 		>
-			<div style={ { minWidth: '300px', padding: '16px' } }>
-				<VStack spacing={ 3 }>
+			<div style={ { minWidth: '300px', padding: '4px' } }>
+				<VStack spacing={ 1 }>
 					<TextControl
 						__nextHasNoMarginBottom
 						__next40pxDefaultSize
+						hideLabelFromVision
 						label={ __( 'LaTeX math syntax' ) }
 						value={ latex }
 						onChange={ handleLatexChange }
 						placeholder={ __( 'e.g., x^2, \\frac{a}{b}' ) }
+						autoComplete="off"
 					/>
 					{ error && (
-						<Notice status="error" isDismissible={ false }>
-							{ error }
-						</Notice>
+						<>
+							<Badge
+								intent="error"
+								className="wp-block-math__error"
+							>
+								{ error }
+							</Badge>
+							<style children=".wp-block-math__error .components-badge__content{white-space:normal}" />
+						</>
 					) }
 				</VStack>
 			</div>

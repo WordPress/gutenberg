@@ -4,17 +4,23 @@
 import { __ } from '@wordpress/i18n';
 import { useBlockProps } from '@wordpress/block-editor';
 import {
-	TextControl,
-	Notice,
+	TextareaControl,
 	Popover,
 	__experimentalVStack as VStack,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useMemo, useState } from '@wordpress/element';
-
 /**
  * External dependencies
  */
 import temml from 'temml';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../lock-unlock';
+
+const { Badge } = unlock( componentsPrivateApis );
 
 export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 	const { latex } = attributes;
@@ -46,17 +52,18 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 			/>
 			{ isSelected && (
 				<Popover
-					placement="bottom"
+					placement="bottom-start"
 					offset={ 8 }
 					anchor={ blockRef }
 					focusOnMount="firstContentElement"
 				>
-					<div style={ { padding: '16px', minWidth: '300px' } }>
-						<VStack spacing={ 3 }>
-							<TextControl
+					<div style={ { padding: '4px', minWidth: '300px' } }>
+						<VStack spacing={ 1 }>
+							<TextareaControl
 								__nextHasNoMarginBottom
 								__next40pxDefaultSize
 								label={ __( 'LaTeX math syntax' ) }
+								hideLabelFromVision
 								value={ latex }
 								onChange={ ( newLatex ) => {
 									setAttributes( { latex: newLatex } );
@@ -64,9 +71,15 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 								placeholder={ __( 'e.g., x^2, \\frac{a}{b}' ) }
 							/>
 							{ error && (
-								<Notice status="error" isDismissible={ false }>
-									{ error }
-								</Notice>
+								<>
+									<Badge
+										intent="error"
+										className="wp-block-math__error"
+									>
+										{ error }
+									</Badge>
+									<style children=".wp-block-math__error .components-badge__content{white-space:normal}" />
+								</>
 							) }
 						</VStack>
 					</div>
