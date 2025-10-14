@@ -25,7 +25,6 @@ import type {
 import { createYjsDoc } from './utils';
 
 interface EntityState {
-	availableProperties: Set< string >;
 	handlers: RecordHandlers;
 	objectId: ObjectID;
 	objectType: ObjectType;
@@ -98,7 +97,6 @@ export function createSyncManager(): SyncManager {
 		};
 
 		const entityState: EntityState = {
-			availableProperties: new Set( Object.keys( record ) ),
 			handlers,
 			objectId,
 			objectType,
@@ -120,11 +118,7 @@ export function createSyncManager(): SyncManager {
 		recordMap.observeDeep( onRecordUpdate );
 
 		ydoc.transact( () => {
-			syncConfig.applyChangesToCRDTDoc(
-				ydoc,
-				record,
-				entityState.availableProperties
-			);
+			syncConfig.applyChangesToCRDTDoc( ydoc, record );
 		}, LOCAL_SYNC_MANAGER_ORIGIN );
 	}
 
@@ -172,14 +166,10 @@ export function createSyncManager(): SyncManager {
 			return;
 		}
 
-		const { availableProperties, syncConfig, ydoc } = entityState;
+		const { syncConfig, ydoc } = entityState;
 
 		ydoc.transact( () => {
-			syncConfig.applyChangesToCRDTDoc(
-				ydoc,
-				changes,
-				availableProperties
-			);
+			syncConfig.applyChangesToCRDTDoc( ydoc, changes );
 		}, origin );
 	}
 
@@ -201,14 +191,13 @@ export function createSyncManager(): SyncManager {
 			return;
 		}
 
-		const { availableProperties, handlers, syncConfig, ydoc } = entityState;
+		const { handlers, syncConfig, ydoc } = entityState;
 
 		// Determine which synced properties have actually changed by comparing
-		// them against the current entity record.
+		// them against the current edited entity record.
 		const changes = syncConfig.getChangesFromCRDTDoc(
 			ydoc,
-			await handlers.getEditedRecord(),
-			availableProperties
+			await handlers.getEditedRecord()
 		);
 
 		// This is a good spot to debug to see which changes are being synced. Note

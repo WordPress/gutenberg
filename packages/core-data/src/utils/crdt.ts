@@ -32,6 +32,24 @@ export type PostChanges = Partial< Post > & {
 // Hold a reference to the last known selection to help compute Y.Text deltas.
 let lastSelection: WPBlockSelection | null = null;
 
+// Properties that are allowed to be synced for a post.
+const allowedPostProperties = new Set< string >( [
+	'author',
+	'blocks',
+	'comment_status',
+	'date',
+	'excerpt',
+	'featured_media',
+	'format',
+	'ping_status',
+	'slug',
+	'status',
+	'sticky',
+	'tags',
+	'template',
+	'title',
+] );
+
 /**
  * Given a set of local changes to a generic entity record, apply those changes
  * to the local Y.Doc.
@@ -72,22 +90,20 @@ export function defaultApplyChangesToCRDTDoc(
  * Given a set of local changes to a post record, apply those changes to the
  * local Y.Doc.
  *
- * @param {CRDTDoc}       ydoc
- * @param {PostChanges}   changes
- * @param {Type}          postType
- * @param {Set< string >} syncedProperties
+ * @param {CRDTDoc}     ydoc
+ * @param {PostChanges} changes
+ * @param {Type}        postType
  * @return {void}
  */
 export function applyPostChangesToCRDTDoc(
 	ydoc: CRDTDoc,
 	changes: PostChanges,
-	postType: Type,
-	syncedProperties: Set< string >
+	postType: Type // eslint-disable-line @typescript-eslint/no-unused-vars
 ): void {
 	const ymap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
 
 	Object.entries( changes ).forEach( ( [ key, newValue ] ) => {
-		if ( ! syncedProperties.has( key ) ) {
+		if ( ! allowedPostProperties.has( key ) ) {
 			return;
 		}
 
@@ -180,27 +196,25 @@ export function defaultGetChangesFromCRDTDoc( crdtDoc: CRDTDoc ): ObjectData {
  * against the local record and determine if there are changes (edits) we want
  * to dispatch.
  *
- * @param {CRDTDoc}       ydoc
- * @param {Post}          record
- * @param {Type}          postType
- * @param {Set< string >} syncedProperties
+ * @param {CRDTDoc} ydoc
+ * @param {Post}    editedRecord
+ * @param {Type}    postType
  * @return {Partial<PostChanges>} The changes that should be applied to the local record.
  */
 export function getPostChangesFromCRDTDoc(
 	ydoc: CRDTDoc,
-	record: Post,
-	postType: Type,
-	syncedProperties: Set< string >
+	editedRecord: Post,
+	postType: Type // eslint-disable-line @typescript-eslint/no-unused-vars
 ): PostChanges {
 	const ymap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
 
 	return Object.fromEntries(
 		Object.entries( ymap.toJSON() ).filter( ( [ key, newValue ] ) => {
-			if ( ! syncedProperties.has( key ) ) {
+			if ( ! allowedPostProperties.has( key ) ) {
 				return false;
 			}
 
-			const currentValue = record[ key ];
+			const currentValue = editedRecord[ key ];
 
 			switch ( key ) {
 				case 'blocks': {
@@ -217,7 +231,7 @@ export function getPostChangesFromCRDTDoc(
 							ymap.get( 'status' ) as string
 						) &&
 						( null === currentValue ||
-							record.modified === currentValue );
+							editedRecord.modified === currentValue );
 
 					if ( ! newValue && currentDateIsFloating ) {
 						return false;
@@ -293,38 +307,4 @@ function mergeValue< ValueType = any >(
 	if ( haveValuesChanged< ValueType >( currentValue, newValue ) ) {
 		setValue( newValue );
 	}
-}
-
-/**
- * Given a set of available properties, return the set of properties that should
- * be synced.
- *
- * @param {Set< string >} availableProperties The available properties for an entity.
- * @return {Set< string> } The set of properties that should be synced.
- */
-export function getSyncedPropertiesForPostType(
-	availableProperties: Set< string >
-): Set< string > {
-	const allowedProperties = new Set< string >( [
-		'author',
-		'blocks',
-		'comment_status',
-		'date',
-		'excerpt',
-		'featured_media',
-		'format',
-		'ping_status',
-		'slug',
-		'status',
-		'sticky',
-		'tags',
-		'template',
-		'title',
-	] );
-
-	return new Set(
-		[ ...availableProperties ].filter( ( prop ) =>
-			allowedProperties.has( prop )
-		)
-	);
 }

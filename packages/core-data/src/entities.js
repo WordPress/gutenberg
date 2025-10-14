@@ -18,7 +18,6 @@ import {
 	defaultApplyChangesToCRDTDoc,
 	defaultGetChangesFromCRDTDoc,
 	getPostChangesFromCRDTDoc,
-	getSyncedPropertiesForPostType,
 } from './utils/crdt';
 
 export const DEFAULT_ENTITY_KEY = 'id';
@@ -283,33 +282,21 @@ async function loadPostTypeEntities() {
 			 *
 			 * @param {import('@wordpress/sync').CRDTDoc}               crdtDoc
 			 * @param {Partial< import('@wordpress/sync').ObjectData >} changes
-			 * @param {Set< string >}                                   availableProperties
 			 * @return {void}
 			 */
-			applyChangesToCRDTDoc: ( crdtDoc, changes, availableProperties ) =>
-				applyPostChangesToCRDTDoc(
-					crdtDoc,
-					changes,
-					postType,
-					getSyncedPropertiesForPostType( availableProperties )
-				),
+			applyChangesToCRDTDoc: ( crdtDoc, changes ) =>
+				applyPostChangesToCRDTDoc( crdtDoc, changes, postType ),
 
 			/**
 			 * Extract changes from a CRDT document that can be used to update the
 			 * local editor state.
 			 *
 			 * @param {import('@wordpress/sync').CRDTDoc}    crdtDoc
-			 * @param {import('@wordpress/sync').ObjectData} record
-			 * @param {Set< string >}                        availableProperties
+			 * @param {import('@wordpress/sync').ObjectData} editedRecord
 			 * @return {Partial< import('@wordpress/sync').ObjectData >} Changes to record
 			 */
-			getChangesFromCRDTDoc: ( crdtDoc, record, availableProperties ) =>
-				getPostChangesFromCRDTDoc(
-					crdtDoc,
-					record,
-					postType,
-					getSyncedPropertiesForPostType( availableProperties )
-				),
+			getChangesFromCRDTDoc: ( crdtDoc, editedRecord ) =>
+				getPostChangesFromCRDTDoc( crdtDoc, editedRecord, postType ),
 
 			/**
 			 * Sync features supported by the entity.
