@@ -95,7 +95,6 @@ function BlockBindingsPanelMenuContent( {
 				const noItemsAvailable =
 					! sourceDataItems || sourceDataItems.length === 0;
 
-				// Skip sources with no compatible items for this attribute
 				if ( noItemsAvailable ) {
 					return null;
 				}
@@ -213,7 +212,7 @@ function BlockBindingsAttribute( { attribute, binding, sources, blockName } ) {
 	const isNotBound = binding === undefined;
 
 	if ( isNotBound ) {
-		// Check if there are any compatible sources for this attribute type
+		// Check if there are any compatible sources for this attribute type.
 		const attributeType = getAttributeType( blockName, attribute );
 
 		const hasCompatibleSources = Object.values( sources ).some( ( src ) =>
@@ -375,14 +374,13 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 							getValues,
 						};
 					} else if ( getFieldsList ) {
-						// Backward compatibility: Convert getFieldsList to editorUI format
+						// Backward compatibility: Convert getFieldsList to editorUI format.
 						const fieldsListResult = getFieldsList( {
 							select,
 							context,
 						} );
 
 						if ( fieldsListResult ) {
-							// Convert getFieldsList format to editorUI format
 							const data = Object.entries( fieldsListResult ).map(
 								( [ key, field ] ) => ( {
 									label: field.label || key,
@@ -392,7 +390,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 							);
 
 							_sources[ sourceName ] = {
-								mode: 'dropdown', // Default mode for backward compatibility
+								mode: 'dropdown', // Default mode for backward compatibility.
 								data,
 								label,
 								getValues,
@@ -424,14 +422,15 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 			};
 		},
 		[ blockContext, blockName ]
-	); // Return early if there are no bindable attributes.
+	);
+	// Return early if there are no bindable attributes.
 	if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
 		return null;
 	}
 
 	const { bindings } = metadata || {};
 
-	// Check if all sources have empty data arrays
+	// Check if all sources have empty data arrays.
 	const hasCompatibleData = Object.values( sources ).some(
 		( source ) => source.data && source.data.length > 0
 	);
@@ -460,7 +459,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 					{ bindableAttributes.map( ( attribute ) => {
 						const binding = bindings?.[ attribute ];
 
-						// Check if this specific attribute has compatible data from any source
+						// Check if this specific attribute has compatible data from any source.
 						const attributeType = getAttributeType(
 							blockName,
 							attribute
