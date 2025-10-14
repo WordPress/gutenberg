@@ -37,7 +37,6 @@ class Test_Script_Dependencies extends WP_UnitTestCase {
 		// If the list update is intentional, please add a comment explaining why.
 		$expected = array(
 			'react',
-			'wp-block-library',
 			'wp-edit-site',
 		);
 
