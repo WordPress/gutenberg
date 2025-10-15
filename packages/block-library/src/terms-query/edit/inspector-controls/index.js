@@ -49,10 +49,10 @@ export default function TermsQueryInspectorControls( {
 	// Display the inherit control when we're in a taxonomy-related
 	// template (category, tag, or custom taxonomy).
 	const displayInheritControl =
-		templateSlug?.startsWith( 'taxonomy' ) ||
-		templateSlug?.startsWith( 'category' ) ||
-		templateSlug?.startsWith( 'tag' ) ||
-		templateSlug === 'archive';
+		[ 'taxonomy', 'category', 'tag', 'archive' ].includes( templateSlug ) ||
+		templateSlug?.startsWith( 'taxonomy-' ) ||
+		templateSlug?.startsWith( 'category-' ) ||
+		templateSlug?.startsWith( 'tag-' );
 
 	// Only display the showNested control if the taxonomy is hierarchical and not inheriting.
 	const displayShowNestedControl =
