@@ -33,12 +33,12 @@ const { state } = store( 'test/get-server-state', {
 		updateState() {
 			const { prop, newProp, nested } = getServerState();
 			state.prop = prop;
-			state.nested.prop = nested.prop;
+			state.nested.prop = nested?.prop;
 			if ( newProp ) {
 				state.newProp = newProp;
 			}
 			if ( nested.newProp ) {
-				state.nested.newProp = nested.newProp;
+				state.nested.newProp = nested?.newProp;
 			}
 		},
 		updateNonChanging() {

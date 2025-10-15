@@ -57,6 +57,9 @@ export const getServerState: ( (
 	namespace?: string
 ) => {
 	const ns = namespace || getNamespace();
+	if ( ! serverStates.has( ns ) ) {
+		serverStates.set( ns, deepReadOnly( {} ) );
+	}
 	// Accesses the navigation signal to make this reactive. It assigns it to an
 	// arbitrary property (`subscribe`) to prevent the JavaScript minifier from
 	// removing this line.
@@ -281,11 +284,15 @@ export const populateServerData = ( data?: {
 	state?: Record< string, unknown >;
 	config?: Record< string, unknown >;
 } ) => {
+	// Resets all the previous server states and configs.
+	serverStates.clear();
+	storeConfigs.clear();
+
 	if ( isPlainObject( data?.state ) ) {
 		Object.entries( data!.state ).forEach( ( [ namespace, state ] ) => {
 			const st = store< any >( namespace, {}, { lock: universalUnlock } );
 			deepMerge( st.state, state, false );
-			serverStates.set( namespace, deepReadOnly( state || {} ) );
+			serverStates.set( namespace, deepReadOnly( state! ) );
 		} );
 	}
 	if ( isPlainObject( data?.config ) ) {
