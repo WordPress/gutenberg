@@ -726,14 +726,32 @@ Parameters:
 -   `fields`: the fields config, as described in the "fields" property of DataViews.
 -   `form`: the form config, as described in the "form" property of DataViews.
 
-Returns an array containing the errors. Each error is an object with the following properties:
+Returns an object containing the errors. Each property is a field ID, containing a description of each error type. For example:
 
--   `id`: string. The field that has the error.
--   `required`: `invalid` when the field's value is required but empty.
--   `elements`: `invalid` when the field's value doesn't match any of the field elements.
--   `custom`: object with the following properties:
-    -   `type`: `validating` | `invalid` | `valid`. `validating` means the field is being validated, `invalid` means the value doesn't match the custom validation, and `valid` means the value passes the custom validation.
-    -   `message`: The message to be displayed in the UI control.
+```js
+{
+	fieldId: {
+		required: {
+			type: 'invalid',
+			message: 'Required.'
+		},
+		elements: {
+			type: 'invalid',
+			message: 'Value must be one of the elements.'
+		},
+		custom: {
+			type: 'invalid',
+			message: 'Custom message'
+		}
+	}
+}
+```
+
+The type of each error can be:
+
+- `invalid`: when it's invalid
+- `valid`: when the value became valid after being invalid
+- `validating`: when the value is being validated
 
 
 ## Actions API
