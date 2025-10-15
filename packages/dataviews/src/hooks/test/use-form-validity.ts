@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { renderHook } from '@testing-library/react';
+import { renderHook, waitFor } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -62,6 +62,51 @@ describe( 'useFormValidity', () => {
 		const REQUIRED_MESSAGE = {
 			required: { type: 'invalid' },
 		};
+
+		it( 'is valid when validity object only contains type:valid messages', async () => {
+			const item = { id: 1, title: 'Valid Title', status: 'published' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'title',
+					type: 'text',
+					isValid: {
+						custom: async () =>
+							await new Promise( ( resolve ) =>
+								setTimeout( resolve, 5 )
+							).then( () => null ),
+					},
+				},
+				{
+					id: 'status',
+					type: 'text',
+					isValid: {
+						custom: async () =>
+							await new Promise( ( resolve ) =>
+								setTimeout( resolve, 5 )
+							).then( () => null ),
+					},
+				},
+			];
+			const form = { fields: [ 'title', 'status' ] };
+			const { result } = renderHook( () =>
+				useFormValidity( item, fields, form )
+			);
+
+			await waitFor( () => {
+				expect( result.current ).toEqual( {
+					validity: {
+						title: {
+							custom: { type: 'valid', message: 'Valid' },
+						},
+						status: {
+							custom: { type: 'valid', message: 'Valid' },
+						},
+					},
+					isValid: true,
+				} );
+			} );
+		} );
+
 		it( 'array is invalid when required but empty', () => {
 			const item = { id: 1, tags: [] };
 			const fields: Field< {} >[] = [
