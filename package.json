@@ -135,6 +135,7 @@
 		"mkdirp": "3.0.1",
 		"mock-match-media": "0.4.2",
 		"moment-timezone-data-webpack-plugin": "1.5.1",
+		"monocart-reporter": "2.9.17",
 		"nock": "12.0.3",
 		"node-fetch": "2.7.0",
 		"node-watch": "0.7.0",

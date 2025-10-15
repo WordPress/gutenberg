@@ -14,7 +14,16 @@ const config = defineConfig( {
 	...baseConfig,
 	reporter: process.env.CI
 		? [ [ 'github' ], [ './config/flaky-tests-reporter.ts' ] ]
-		: 'list',
+		: [
+				[ 'list' ],
+				[
+					'monocart-reporter',
+					{
+						name: 'Gutenberg E2E Tests',
+						outputFile: './artifacts/monocart-report/index.html',
+					},
+				],
+		  ],
 	workers: 1,
 	globalSetup: fileURLToPath(
 		new URL( './config/global-setup.ts', 'file:' + __filename ).href
