@@ -2,9 +2,6 @@
  * WordPress dependencies
  */
 import { useContext, useMemo } from '@wordpress/element';
-import {
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -64,22 +61,17 @@ export default function FormDetailsField< Item >( {
 	}
 
 	return (
-		<VStack
-			className="dataforms-layouts-details__field"
-			spacing={ 0 }
-		>
-			<details className="dataforms-layouts-details__details">
-				<summary className="dataforms-layouts-details__summary">
-					{ summaryContent }
-				</summary>
-				<div className="dataforms-layouts-details__content">
-					<DataFormLayout
-						data={ data }
-						form={ form }
-						onChange={ onChange }
-					/>
-				</div>
-			</details>
-		</VStack>
+		<details className="dataforms-layouts-details__details">
+			<summary className="dataforms-layouts-details__summary">
+				{ summaryContent }
+			</summary>
+			<div className="dataforms-layouts-details__content">
+				<DataFormLayout
+					data={ data }
+					form={ form }
+					onChange={ onChange }
+				/>
+			</div>
+		</details>
 	);
 }
