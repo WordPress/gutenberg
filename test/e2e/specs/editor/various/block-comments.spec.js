@@ -36,7 +36,7 @@ test.describe( 'Block Comments', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Testing block comments' },
 		} );
-		await editor.clickBlockOptionsMenuItem( 'Note' );
+		await editor.clickBlockOptionsMenuItem( 'Add note' );
 		await page
 			.getByRole( 'textbox', {
 				name: 'New Note',
@@ -45,7 +45,7 @@ test.describe( 'Block Comments', () => {
 			.fill( 'A test comment' );
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Note', exact: true } )
+			.getByRole( 'button', { name: 'Add note', exact: true } )
 			.click();
 		const thread = page
 			.getByRole( 'region', { name: 'Editor settings' } )
@@ -642,7 +642,7 @@ class BlockCommentUtils {
 					name: type,
 					attributes,
 				} );
-				await this.#editor.clickBlockOptionsMenuItem( 'Note' );
+				await this.#editor.clickBlockOptionsMenuItem( 'Add note' );
 				await this.#page
 					.getByRole( 'textbox', {
 						name: 'New Note',
@@ -651,7 +651,7 @@ class BlockCommentUtils {
 					.fill( comment );
 				await this.#page
 					.getByRole( 'region', { name: 'Editor settings' } )
-					.getByRole( 'button', { name: 'Note', exact: true } )
+					.getByRole( 'button', { name: 'Add note', exact: true } )
 					.click();
 				await this.#page
 					.getByRole( 'button', { name: 'Dismiss this notice' } )
