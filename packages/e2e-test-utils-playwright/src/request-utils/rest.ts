@@ -126,6 +126,25 @@ async function rest< RestResponse = any >(
 		} );
 		const json: RestResponse = await response.json();
 
+		// Get response text to see what we're actually getting
+		const responseText = await response.text();
+
+		// Only log when we get HTML instead of JSON (the actual problem)
+		if ( responseText.includes( '<!DOCTYPE' ) ) {
+			console.log( 'REST API ERROR: Got HTML instead of JSON' );
+			console.log( 'URL:', url );
+			console.log( 'Status:', response.status() );
+			console.log( 'Response (first 300 chars):', responseText.substring( 0, 300 ) );
+		}
+
+		// Try to parse as JSON, but handle the case where it's HTML
+		let json: RestResponse;
+		try {
+			json = JSON.parse( responseText );
+		} catch ( parseError ) {
+			throw new Error( `REST API returned HTML instead of JSON. URL: ${url}, Status: ${response.status()}, Response: ${responseText.substring( 0, 500 ) }` );
+		}
+
 		if ( ! response.ok() ) {
 			throw json;
 		}
