@@ -98,7 +98,13 @@ export function Comments( {
 
 		await onCommentDelete( comment );
 
-		// Focus logic after deletion completes.
+		if ( comment.parent !== 0 ) {
+			// Move focus to the parent thread when a reply was deleted.
+			setSelectedThread( comment.parent );
+			focusCommentThread( comment.parent, commentSidebarRef.current );
+			return;
+		}
+
 		if ( nextThread ) {
 			setSelectedThread( nextThread.id );
 			focusCommentThread( nextThread.id, commentSidebarRef.current );
@@ -108,7 +114,7 @@ export function Comments( {
 		} else {
 			setSelectedThread( null );
 			setShowCommentBoard( false );
-			// Focus the parent block instead of just scrolling into view.
+			// Move focus to the related block.
 			relatedBlockElement?.focus();
 		}
 	};
