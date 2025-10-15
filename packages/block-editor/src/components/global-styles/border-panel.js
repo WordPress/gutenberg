@@ -39,6 +39,10 @@ export function useHasBorderPanelControls( settings ) {
 	return controls;
 }
 
+function useCustomSolids( settings ) {
+	return settings?.color?.custom;
+}
+
 function useHasBorderColorControl( settings ) {
 	return settings?.border?.color;
 }
@@ -104,6 +108,7 @@ export default function BorderPanel( {
 	defaultControls = DEFAULT_CONTROLS,
 } ) {
 	const colors = useColorsPerOrigin( settings );
+	const areCustomSolidsEnabled = useCustomSolids( settings );
 	const decodeValue = useCallback(
 		( rawValue ) => getValueFromVariable( { settings }, '', rawValue ),
 		[ settings ]
@@ -265,6 +270,7 @@ export default function BorderPanel( {
 				>
 					<BorderBoxControl
 						colors={ colors }
+						disableCustomColors={ ! areCustomSolidsEnabled }
 						enableAlpha
 						enableStyle={ showBorderStyle }
 						onChange={ onBorderChange }
