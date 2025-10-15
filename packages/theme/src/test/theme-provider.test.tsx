@@ -4,6 +4,11 @@
 import { render } from '@testing-library/react';
 
 /**
+ * WordPress dependencies
+ */
+import * as React from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import { ThemeProvider } from '../theme-provider';
