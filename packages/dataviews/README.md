@@ -716,7 +716,7 @@ Returns an object containing:
     -   `totalItems`: total number of items for the current view config.
     -   `totalPages`: total number of pages for the current view config.
 
-### `useIsFormValid`
+### `useFormValidity`
 
 Hook to determine if a form is valid.
 

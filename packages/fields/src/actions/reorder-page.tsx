@@ -6,7 +6,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useState } from '@wordpress/element';
-import { DataForm, useIsFormValid } from '@wordpress/dataviews';
+import { DataForm, useFormValidity } from '@wordpress/dataviews';
 import {
 	Button,
 	__experimentalHStack as HStack,
@@ -37,7 +37,7 @@ function ReorderModal( {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
-	const validity = useIsFormValid( item, fields, formOrderAction );
+	const validity = useFormValidity( item, fields, formOrderAction );
 
 	async function onOrder( event: React.FormEvent ) {
 		event.preventDefault();

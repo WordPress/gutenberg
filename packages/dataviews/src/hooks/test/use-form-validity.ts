@@ -6,10 +6,10 @@ import { renderHook } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import { useIsFormValid } from '../';
+import { useFormValidity } from '..';
 import type { Field } from '../../types';
 
-describe( 'useIsFormValid', () => {
+describe( 'useFormValidity', () => {
 	it( 'operates on form fields and ignores the rest', () => {
 		const item = { id: 1, valid_order: 2, invalid_order: 'd' };
 		const fields: Field< {} >[] = [
@@ -24,7 +24,7 @@ describe( 'useIsFormValid', () => {
 		];
 		const form = { fields: [ 'valid_order' ] };
 		const { result } = renderHook( () =>
-			useIsFormValid( item, fields, form )
+			useFormValidity( item, fields, form )
 		);
 		expect( result.current ).toEqual( undefined );
 	} );
@@ -47,7 +47,7 @@ describe( 'useIsFormValid', () => {
 		];
 		const form = { fields: [ 'order' ] };
 		const { result } = renderHook( () =>
-			useIsFormValid( item, fields, form )
+			useFormValidity( item, fields, form )
 		);
 		expect( result.current ).toEqual( undefined );
 	} );
@@ -69,7 +69,7 @@ describe( 'useIsFormValid', () => {
 			];
 			const form = { fields: [ 'tags' ] };
 			const { result } = renderHook( () =>
-				useIsFormValid( item, fields, form )
+				useFormValidity( item, fields, form )
 			);
 			expect( result.current?.tags ).toEqual( REQUIRED_MESSAGE );
 		} );
@@ -87,7 +87,7 @@ describe( 'useIsFormValid', () => {
 			];
 			const form = { fields: [ 'tags' ] };
 			const { result } = renderHook( () =>
-				useIsFormValid( item, fields, form )
+				useFormValidity( item, fields, form )
 			);
 			expect( result.current?.tags ).toEqual( REQUIRED_MESSAGE );
 		} );
@@ -105,7 +105,7 @@ describe( 'useIsFormValid', () => {
 			];
 			const form = { fields: [ 'tags' ] };
 			const { result } = renderHook( () =>
-				useIsFormValid( item, fields, form )
+				useFormValidity( item, fields, form )
 			);
 			expect( result.current ).toEqual( undefined );
 		} );
@@ -131,7 +131,7 @@ describe( 'useIsFormValid', () => {
 			];
 			const form = { fields: [ 'author' ] };
 			const { result } = renderHook( () =>
-				useIsFormValid( item, fields, form )
+				useFormValidity( item, fields, form )
 			);
 			expect( result.current?.author ).toEqual( ELEMENTS_MESSAGE );
 		} );
@@ -153,7 +153,7 @@ describe( 'useIsFormValid', () => {
 			];
 			const form = { fields: [ 'status' ] };
 			const { result } = renderHook( () =>
-				useIsFormValid( item, fields, form )
+				useFormValidity( item, fields, form )
 			);
 			expect( result.current ).toEqual( undefined );
 		} );
@@ -175,7 +175,7 @@ describe( 'useIsFormValid', () => {
 			];
 			const form = { fields: [ 'status' ] };
 			const { result } = renderHook( () =>
-				useIsFormValid( item, fields, form )
+				useFormValidity( item, fields, form )
 			);
 			expect( result.current?.status ).toEqual( ELEMENTS_MESSAGE );
 		} );
@@ -198,7 +198,7 @@ describe( 'useIsFormValid', () => {
 			];
 			const form = { fields: [ 'priority' ] };
 			const { result } = renderHook( () =>
-				useIsFormValid( item, fields, form )
+				useFormValidity( item, fields, form )
 			);
 			expect( result.current ).toEqual( undefined );
 		} );
@@ -221,7 +221,7 @@ describe( 'useIsFormValid', () => {
 			];
 			const form = { fields: [ 'priority' ] };
 			const { result } = renderHook( () =>
-				useIsFormValid( item, fields, form )
+				useFormValidity( item, fields, form )
 			);
 			expect( result.current?.priority ).toEqual( ELEMENTS_MESSAGE );
 		} );
@@ -240,7 +240,7 @@ describe( 'useIsFormValid', () => {
 			];
 			const form = { fields: [ 'price' ] };
 			const { result } = renderHook( () =>
-				useIsFormValid( item, fields, form )
+				useFormValidity( item, fields, form )
 			);
 			expect( result.current?.price ).toEqual( ELEMENTS_MESSAGE );
 		} );
@@ -260,7 +260,7 @@ describe( 'useIsFormValid', () => {
 			];
 			const form = { fields: [ 'tags' ] };
 			const { result } = renderHook( () =>
-				useIsFormValid( item, fields, form )
+				useFormValidity( item, fields, form )
 			);
 			expect( result.current ).toEqual( undefined );
 		} );
@@ -280,7 +280,7 @@ describe( 'useIsFormValid', () => {
 			];
 			const form = { fields: [ 'tags' ] };
 			const { result } = renderHook( () =>
-				useIsFormValid( item, fields, form )
+				useFormValidity( item, fields, form )
 			);
 			expect( result.current?.tags ).toEqual( ELEMENTS_MESSAGE );
 		} );
@@ -302,7 +302,7 @@ describe( 'useIsFormValid', () => {
 			];
 			const form = { fields: [ 'tags' ] };
 			const { result } = renderHook( () =>
-				useIsFormValid( item, fields, form )
+				useFormValidity( item, fields, form )
 			);
 			expect( result.current?.tags ).toEqual( ELEMENTS_MESSAGE );
 		} );
@@ -319,7 +319,7 @@ describe( 'useIsFormValid', () => {
 			];
 			const form = { fields: [ 'order' ] };
 			const { result } = renderHook( () =>
-				useIsFormValid( item, fields, form )
+				useFormValidity( item, fields, form )
 			);
 			expect( result.current ).toEqual( undefined );
 		} );
@@ -334,7 +334,7 @@ describe( 'useIsFormValid', () => {
 			];
 			const form = { fields: [ 'order' ] };
 			const { result } = renderHook( () =>
-				useIsFormValid( item, fields, form )
+				useFormValidity( item, fields, form )
 			);
 			expect( result.current?.order ).toEqual( {
 				custom: {
@@ -354,7 +354,7 @@ describe( 'useIsFormValid', () => {
 			];
 			const form = { fields: [ 'price' ] };
 			const { result } = renderHook( () =>
-				useIsFormValid( item, fields, form )
+				useFormValidity( item, fields, form )
 			);
 			expect( result.current ).toEqual( undefined );
 		} );
@@ -369,7 +369,7 @@ describe( 'useIsFormValid', () => {
 			];
 			const form = { fields: [ 'price' ] };
 			const { result } = renderHook( () =>
-				useIsFormValid( item, fields, form )
+				useFormValidity( item, fields, form )
 			);
 			expect( result.current?.price ).toEqual( {
 				custom: {

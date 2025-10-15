@@ -54,7 +54,7 @@ function isInvalidForRequired( fieldType: string | undefined, value: any ) {
  *
  * @return Record of field IDs to error messages (undefined means no error).
  */
-export function useIsFormValid< Item >(
+export function useFormValidity< Item >(
 	item: Item,
 	fields: Field< Item >[],
 	form: Form
@@ -290,4 +290,4 @@ export function useIsFormValid< Item >(
 	return formValidity;
 }
 
-export default useIsFormValid;
+export default useFormValidity;

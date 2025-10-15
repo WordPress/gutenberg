@@ -17,7 +17,7 @@ import {
  * Internal dependencies
  */
 import DataForm from '../components/dataform';
-import useIsFormValid from '../hooks/use-is-form-valid';
+import useFormValidity from '../hooks/use-form-validity';
 
 import type {
 	Field,
@@ -1012,7 +1012,7 @@ const ValidationComponent = ( {
 		],
 	};
 
-	const validity = useIsFormValid( post, _fields, form );
+	const validity = useFormValidity( post, _fields, form );
 
 	return (
 		<form>
