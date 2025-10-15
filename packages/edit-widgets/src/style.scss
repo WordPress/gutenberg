@@ -1,16 +1,19 @@
-@import "@wordpress/interface/build-style/style.css";
-
-@import "./blocks/widget-area/editor.scss";
-@import "./components/error-boundary/style.scss";
-@import "./components/header/style.scss";
-@import "./components/keyboard-shortcut-help-modal/style.scss";
-@import "./components/sidebar/style.scss";
-@import "./components/notices/style.scss";
-@import "./components/layout/style.scss";
-@import "./components/more-menu/style.scss";
-@import "./components/welcome-guide/style.scss";
-@import "./components/widget-areas-block-editor-content/style.scss";
-@import "./components/secondary-sidebar/style.scss";
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/default-custom-properties";
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/interface/build-style/style.css" as interface;
+@use "./blocks/widget-area/editor.scss" as *;
+@use "./components/error-boundary/style.scss" as *;
+@use "./components/header/style.scss" as *;
+@use "./components/keyboard-shortcut-help-modal/style.scss" as *;
+@use "./components/sidebar/style.scss" as *;
+@use "./components/notices/style.scss" as *;
+@use "./components/layout/style.scss" as *;
+@use "./components/more-menu/style.scss" as *;
+@use "./components/welcome-guide/style.scss" as *;
+@use "./components/widget-areas-block-editor-content/style.scss" as *;
+@use "./components/secondary-sidebar/style.scss" as *;
 
 body.js.appearance_page_gutenberg-widgets,
 body.js.widgets-php {
