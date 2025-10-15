@@ -25,17 +25,24 @@ export type DateRelative = {
 	unit?: string;
 };
 
+type VALID_OPERATORS = 'inThePast' | 'over';
+
 interface RelativeDateControlProps {
 	id: string;
 	value: DateRelative;
 	onChange: ( args: DateRelative ) => void;
 	label: string;
 	hideLabelFromVision?: boolean;
-	options: { value: string; label: string }[];
 	className?: string;
+	operator: VALID_OPERATORS;
 }
 
-export const TIME_UNITS_OPTIONS = {
+interface TimeUnitOption {
+	value: string;
+	label: string;
+}
+
+const TIME_UNITS_OPTIONS: Record< VALID_OPERATORS, TimeUnitOption[] > = {
 	[ OPERATOR_IN_THE_PAST ]: [
 		{ value: 'days', label: __( 'Days' ) },
 		{ value: 'weeks', label: __( 'Weeks' ) },
@@ -56,9 +63,10 @@ export default function RelativeDateControl( {
 	onChange,
 	label,
 	hideLabelFromVision,
-	options,
+	operator,
 	className,
 }: RelativeDateControlProps ) {
+	const options: TimeUnitOption[] = TIME_UNITS_OPTIONS[ operator ];
 	const { value: relValue = '', unit = options[ 0 ].value } = value;
 
 	const onChangeValue = useCallback(

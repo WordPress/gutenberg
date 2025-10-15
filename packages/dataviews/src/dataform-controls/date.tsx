@@ -40,7 +40,6 @@ import deepMerge from 'deepmerge';
  * Internal dependencies
  */
 import RelativeDateControl, {
-	TIME_UNITS_OPTIONS,
 	type DateRelative,
 } from './relative-date-control';
 import {
@@ -662,7 +661,7 @@ export default function DateControl< Item >( {
 				onChange={ onChangeRelativeDateControl }
 				label={ label }
 				hideLabelFromVision={ hideLabelFromVision }
-				options={ TIME_UNITS_OPTIONS[ operator ] }
+				operator={ operator }
 			/>
 		);
 	}
