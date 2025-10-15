@@ -25,26 +25,49 @@ export function useEntityBinding( { clientId, attributes } ) {
 	const hasCorrectBinding =
 		hasUrlBinding && metadata?.bindings?.url?.source === expectedSource;
 
-	const clearBinding = useCallback( () => {
-		// Only clear if there's actually a valid binding to clear
-		if ( hasCorrectBinding ) {
-			// Remove the URL binding by setting it to undefined
-			updateBlockBindings( { url: undefined } );
-		}
-	}, [ hasCorrectBinding, updateBlockBindings ] );
+	const clearBinding = useCallback(
+		( freshAttributes ) => {
+			// Use fresh attributes if provided, otherwise fall back to closure attributes
+			const kindToUse = freshAttributes?.kind ?? kind;
+			const expectedSourceForClear =
+				kindToUse === 'post-type' ? 'core/post-data' : 'core/term-data';
+			const hasCorrectBindingForClear =
+				hasUrlBinding &&
+				metadata?.bindings?.url?.source === expectedSourceForClear;
 
-	const createBinding = useCallback( () => {
-		const source =
-			kind === 'post-type' ? 'core/post-data' : 'core/term-data';
-		updateBlockBindings( {
-			url: {
-				source,
-				args: {
-					key: 'link',
+			if ( hasCorrectBindingForClear ) {
+				updateBlockBindings( { url: undefined } );
+			}
+		},
+		[ hasUrlBinding, metadata, updateBlockBindings, kind ]
+	);
+
+	const createBinding = useCallback(
+		( freshAttributes ) => {
+			// Use fresh attributes if provided, otherwise fall back to closure attributes
+			const kindToUse = freshAttributes?.kind ?? kind;
+
+			// Avoid creating binding if no kind is provided
+			if ( ! kindToUse ) {
+				return;
+			}
+
+			// Default to post-type in case there is a need to support dynamic kinds
+			// in the future.
+			const source =
+				kindToUse === 'taxonomy' ? 'core/term-data' : 'core/post-data';
+
+			updateBlockBindings( {
+				url: {
+					source,
+					args: {
+						key: 'link',
+					},
 				},
-			},
-		} );
-	}, [ updateBlockBindings, kind ] );
+			} );
+		},
+		[ updateBlockBindings, kind ]
+	);
 
 	return {
 		hasUrlBinding: hasCorrectBinding,
