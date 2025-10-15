@@ -116,9 +116,11 @@ export default {
 	},
 	setValues( { dispatch, context, bindings, clientId, select } ) {
 		const { getBlockName } = select( blockEditorStore );
-		// if nav block then return false (read only
+
 		const blockName = getBlockName?.( clientId );
 
+		// Navigaton block types are read-only.
+		// See https://github.com/WordPress/gutenberg/pull/72165.
 		if ( NAVIGATION_BLOCK_TYPES.includes( blockName ) ) {
 			return false;
 		}
