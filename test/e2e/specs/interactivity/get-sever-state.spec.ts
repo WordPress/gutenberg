@@ -67,19 +67,24 @@ test.describe( 'getServerState()', () => {
 		const prop = page.getByTestId( 'prop' );
 		const nestedProp = page.getByTestId( 'nested.prop' );
 
+		await expect( page ).toHaveTitle( /main/ );
 		await expect( prop ).toHaveText( 'main' );
 		await expect( nestedProp ).toHaveText( 'main' );
 
 		await page.getByTestId( 'link 1' ).click();
+		await expect( page ).toHaveTitle( /link 1/ );
 
 		await expect( prop ).toHaveText( 'link 1' );
 		await expect( nestedProp ).toHaveText( 'link 1' );
 
 		await page.goBack();
+		await expect( page ).toHaveTitle( /main/ );
+
 		await expect( prop ).toHaveText( 'main' );
 		await expect( nestedProp ).toHaveText( 'main' );
 
 		await page.getByTestId( 'link 2' ).click();
+		await expect( page ).toHaveTitle( /link 2/ );
 
 		await expect( prop ).toHaveText( 'link 2' );
 		await expect( nestedProp ).toHaveText( 'link 2' );
@@ -91,19 +96,24 @@ test.describe( 'getServerState()', () => {
 		const newProp = page.getByTestId( 'newProp' );
 		const nestedNewProp = page.getByTestId( 'nested.newProp' );
 
+		await expect( page ).toHaveTitle( /main/ );
 		await expect( newProp ).toBeEmpty();
 		await expect( nestedNewProp ).toBeEmpty();
 
 		await page.getByTestId( 'link 1' ).click();
+		await expect( page ).toHaveTitle( /link 1/ );
 
 		await expect( newProp ).toHaveText( 'link 1' );
 		await expect( nestedNewProp ).toHaveText( 'link 1' );
 
 		await page.goBack();
+		await expect( page ).toHaveTitle( /main/ );
+
 		await expect( newProp ).toHaveText( 'link 1' );
 		await expect( nestedNewProp ).toHaveText( 'link 1' );
 
 		await page.getByTestId( 'link 2' ).click();
+		await expect( page ).toHaveTitle( /link 2/ );
 
 		await expect( newProp ).toHaveText( 'link 2' );
 		await expect( nestedNewProp ).toHaveText( 'link 2' );
