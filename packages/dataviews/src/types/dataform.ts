@@ -133,7 +133,7 @@ export interface DataFormProps< Item > {
 	validity?: FormValidity;
 }
 
-export type FormValidity = FieldValidity[] | undefined;
+export type FormValidity = Record< string, FieldValidity > | undefined;
 
 export interface FieldLayoutProps< Item > {
 	data: Item;

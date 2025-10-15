@@ -96,18 +96,16 @@ export function useIsFormValid< Item >(
 				field.isValid.required &&
 				isInvalidForRequired( field.type, value )
 			) {
-				setFormValidity( ( prev ) => [
-					...( prev
-						? prev.filter(
-								( fieldValidation ) =>
-									fieldValidation.id !== field.id
-						  )
-						: [] ),
-					{
-						id: field.id,
-						required: 'invalid',
+				setFormValidity( ( prev ) => ( {
+					...prev,
+					[ field.id ]: {
+						...prev?.[ field.id ],
+						required: {
+							type: 'invalid',
+							message: 'Required',
+						},
 					},
-				] );
+				} ) );
 				return;
 			}
 
@@ -126,33 +124,30 @@ export function useIsFormValid< Item >(
 						if ( allAreValid ) {
 							return;
 						}
-						setFormValidity( ( prev ) => [
-							...( prev
-								? prev.filter(
-										( fieldValidation ) =>
-											fieldValidation.id !== field.id
-								  )
-								: [] ),
-							{
-								id: field.id,
-								elements: 'invalid',
+						setFormValidity( ( prev ) => ( {
+							...prev,
+							[ field.id ]: {
+								...prev?.[ field.id ],
+								elements: {
+									type: 'invalid',
+									message:
+										'Value must be one of the elements.',
+								},
 							},
-						] );
+						} ) );
 						return;
 					}
 
-					setFormValidity( ( prev ) => [
-						...( prev
-							? prev.filter(
-									( fieldValidation ) =>
-										fieldValidation.id !== field.id
-							  )
-							: [] ),
-						{
-							id: field.id,
-							elements: 'invalid',
+					setFormValidity( ( prev ) => ( {
+						...prev,
+						[ field.id ]: {
+							...prev?.[ field.id ],
+							elements: {
+								type: 'invalid',
+								message: 'Value must be one of the elements.',
+							},
 						},
-					] );
+					} ) );
 					return;
 				}
 
@@ -162,18 +157,16 @@ export function useIsFormValid< Item >(
 					return;
 				}
 
-				setFormValidity( ( prev ) => [
-					...( prev
-						? prev.filter(
-								( fieldValidation ) =>
-									fieldValidation.id !== field.id
-						  )
-						: [] ),
-					{
-						id: field.id,
-						elements: 'invalid',
+				setFormValidity( ( prev ) => ( {
+					...prev,
+					[ field.id ]: {
+						...prev?.[ field.id ],
+						elements: {
+							type: 'invalid',
+							message: 'Value must be one of the elements.',
+						},
 					},
-				] );
+				} ) );
 				return;
 			}
 
@@ -196,79 +189,57 @@ export function useIsFormValid< Item >(
 					return;
 				}
 
-				setFormValidity( ( prev ) => [
-					...( prev
-						? prev.filter(
-								( fieldValidation ) =>
-									fieldValidation.id !== field.id
-						  )
-						: [] ),
-					{
-						id: field.id,
+				setFormValidity( ( prev ) => ( {
+					...prev,
+					[ field.id ]: {
+						...prev?.[ field.id ],
 						custom: {
 							type: 'validating',
 							message: 'Validating...',
 						},
 					},
-				] );
+				} ) );
 
 				if ( customAsyncError instanceof Promise ) {
 					customAsyncError
 						.then( ( result ) => {
 							if ( result === null ) {
-								setFormValidity( ( prev ) => [
-									...( prev
-										? prev.filter(
-												( fieldValidation ) =>
-													fieldValidation.id !==
-													field.id
-										  )
-										: [] ),
-									{
-										id: field.id,
+								setFormValidity( ( prev ) => ( {
+									...prev,
+									[ field.id ]: {
+										...prev?.[ field.id ],
 										custom: {
 											type: 'valid',
 											message: 'Valid',
 										},
 									},
-								] );
+								} ) );
 							}
 
 							if ( typeof result === 'string' ) {
-								setFormValidity( ( prev ) => [
-									...( prev
-										? prev.filter(
-												( fieldValidation ) =>
-													fieldValidation.id !==
-													field.id
-										  )
-										: [] ),
-									{
-										id: field.id,
+								setFormValidity( ( prev ) => ( {
+									...prev,
+									[ field.id ]: {
+										...prev?.[ field.id ],
 										custom: {
 											type: 'invalid',
 											message: result,
 										},
 									},
-								] );
+								} ) );
 							}
 						} )
 						.catch( ( error ) => {
-							setFormValidity( ( prev ) => [
-								...( prev
-									? prev.filter(
-											( fieldValidation ) =>
-												fieldValidation.id !== field.id
-									  )
-									: [] ),
-								{
-									id: field.id,
+							setFormValidity( ( prev ) => ( {
+								...prev,
+								[ field.id ]: {
+									...prev?.[ field.id ],
 									custom: {
 										type: 'invalid',
 										message: error.message,
 									},
 								},
-							] );
+							} ) );
 						} );
 				}
 
@@ -282,35 +253,33 @@ export function useIsFormValid< Item >(
 			) {
 				const customError = field.isValid.custom( item, field );
 				if ( typeof customError === 'string' ) {
-					setFormValidity( ( prev ) => [
-						...( prev
-							? prev.filter( ( error ) => error.id !== field.id )
-							: [] ),
-						{
-							id: field.id,
+					setFormValidity( ( prev ) => ( {
+						...prev,
+						[ field.id ]: {
+							...prev?.[ field.id ],
 							custom: {
 								type: 'invalid',
 								message: customError,
 							},
 						},
-					] );
+					} ) );
 					return;
 				}
 			}
 
 			// No errors for this field, remove from errors object
 			setFormValidity( ( prev ) => {
-				const errors = [
-					...( prev ? prev : [] ).filter(
-						( error ) => error.id !== field.id
-					),
-				];
+				if ( ! prev || ! prev[ field.id ] ) {
+					return prev;
+				}
 
-				if ( errors.length === 0 ) {
+				const { [ field.id ]: removed, ...rest } = prev;
+
+				if ( Object.keys( rest ).length === 0 ) {
 					return undefined;
 				}
 
-				return errors;
+				return rest;
 			} );
 		} );
 	}, [ item, fields, form ] );

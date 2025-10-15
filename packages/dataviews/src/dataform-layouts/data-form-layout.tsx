@@ -90,25 +90,20 @@ export function DataFormLayout< Item >( {
 						( props ) => (
 							<FieldLayout
 								{ ...props }
-								validity={ validity?.find(
-									( item ) => item.id === formField.id
-								) }
+								validity={ validity?.[ formField.id ] }
 							/>
 						),
 						formField
 					);
 				}
 
-				const fieldValidity = validity?.find(
-					( item ) => item.id === formField.id
-				);
 				return (
 					<FieldLayout
 						key={ formField.id }
 						data={ data }
 						field={ formField }
 						onChange={ onChange }
-						validity={ fieldValidity }
+						validity={ validity?.[ formField.id ] }
 					/>
 				);
 			} ) }

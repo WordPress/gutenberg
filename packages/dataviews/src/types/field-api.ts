@@ -326,19 +326,18 @@ export type NormalizedField< Item > = Omit< Field< Item >, 'Edit' > & {
 export type Fields< Item > = Field< Item >[];
 
 export type FieldValidity = {
-	id: string;
-	required?: 'invalid';
-	elements?: 'invalid';
-	custom?:
-		| {
-				type: 'invalid';
-				message: string;
-		  }
-		| {
-				type: 'validating';
-				message: 'Validating...';
-		  }
-		| { type: 'valid'; message: 'Valid' };
+	required?: {
+		type: 'valid' | 'invalid' | 'validating';
+		message?: string;
+	};
+	elements?: {
+		type: 'valid' | 'invalid' | 'validating';
+		message?: string;
+	};
+	custom?: {
+		type: 'valid' | 'invalid' | 'validating';
+		message: string;
+	};
 };
 
 export type DataFormControlProps< Item > = {
