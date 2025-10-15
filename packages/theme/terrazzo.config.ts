@@ -7,9 +7,9 @@ import { makeCSSVar } from '@terrazzo/token-tools/css';
 /**
  * Internal dependencies
  */
-import pluginFigmaDsTokenManager from './scripts/terrazzo-plugin-figma-ds-token-manager/index';
-import pluginKnownWpdsCssVariables from './scripts/terrazzo-plugin-known-wpds-css-variables/index';
-import pluginDsTokenDocs from './scripts/terrazzo-plugin-ds-tokens-docs/index';
+import pluginFigmaDsTokenManager from './bin/terrazzo-plugin-figma-ds-token-manager/index';
+import pluginKnownWpdsCssVariables from './bin/terrazzo-plugin-known-wpds-css-variables/index';
+import pluginDsTokenDocs from './bin/terrazzo-plugin-ds-tokens-docs/index';
 
 export default defineConfig( {
 	tokens: [

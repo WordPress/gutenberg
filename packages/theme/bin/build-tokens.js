@@ -15,7 +15,7 @@ const path = require( 'path' );
  */
 
 const TEMP_FILES = [
-	'scripts/generate-primitive-tokens/index.mjs',
+	'bin/generate-primitive-tokens/index.mjs',
 	'terrazzo.config.mjs',
 ];
 
@@ -43,7 +43,7 @@ try {
 	// Step 1: Compile the primitive token generator
 	console.log( '🔨 Compiling primitive token generator...' );
 	execSync(
-		'npx esbuild scripts/generate-primitive-tokens/index.ts --bundle --platform=node --format=esm --packages=external --outfile=scripts/generate-primitive-tokens/index.mjs',
+		'npx esbuild bin/generate-primitive-tokens/index.ts --bundle --platform=node --format=esm --packages=external --outfile=bin/generate-primitive-tokens/index.mjs',
 		{
 			stdio: 'inherit',
 			cwd: process.cwd(),
@@ -52,7 +52,7 @@ try {
 
 	// Step 2: Run the primitive token generator
 	console.log( '🎨 Generating primitive tokens...' );
-	execSync( 'node scripts/generate-primitive-tokens/index.mjs', {
+	execSync( 'node bin/generate-primitive-tokens/index.mjs', {
 		stdio: 'inherit',
 		cwd: process.cwd(),
 	} );

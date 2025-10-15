@@ -14,7 +14,7 @@ const developmentFiles = [
 	'**/@(__mocks__|__tests__|test)/**/*.[tj]s?(x)',
 	'**/@(storybook|stories)/**/*.[tj]s?(x)',
 	'packages/babel-preset-default/bin/**/*.js',
-	'packages/theme/scripts/**/*.[tj]s?(x)',
+	'packages/theme/bin/**/*.[tj]s?(x)',
 	'packages/theme/terrazzo.config.ts',
 ];
 
@@ -437,7 +437,6 @@ module.exports = {
 				'bin/**/*.mjs',
 				'packages/env/**',
 				'packages/theme/bin/**/*.[tj]s?(x)',
-				'packages/theme/scripts/**/*.[tj]s?(x)',
 			],
 			rules: {
 				'no-console': 'off',

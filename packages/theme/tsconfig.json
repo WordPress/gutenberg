@@ -8,5 +8,11 @@
 		"types": [ "jest", "@testing-library/jest-dom" ]
 	},
 	"references": [ { "path": "../element" }, { "path": "../private-apis" } ],
-	"include": [ "src", "types", "scripts", "build/js", "terrazzo.config.ts" ]
+	"include": [
+		"src",
+		"types",
+		"bin/**/*.ts",
+		"build/js",
+		"terrazzo.config.ts"
+	]
 }
