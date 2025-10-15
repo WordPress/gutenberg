@@ -23,11 +23,7 @@
 			// text-overflow: ellipsis only works on block containers, not flex containers.
 			&:first-child {
 				display: block;
-				flex-grow: 0;
 				overflow: hidden;
-				text-decoration: none;
-				text-overflow: ellipsis;
-				white-space: nowrap;
 			}
 
 			&--clickable {
