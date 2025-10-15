@@ -162,6 +162,18 @@ export default {
 		return false;
 	},
 	canUserEditValue( { select, context, args } ) {
+		const { getBlockName, getSelectedBlockClientId } =
+			select( blockEditorStore );
+
+		const clientId = getSelectedBlockClientId();
+		const blockName = getBlockName?.( clientId );
+
+		// Navigaton block types are read-only.
+		// See https://github.com/WordPress/gutenberg/pull/72165.
+		if ( NAVIGATION_BLOCK_TYPES.includes( blockName ) ) {
+			return false;
+		}
+
 		// Terms are typically read-only when displayed.
 		if ( context?.termQuery ) {
 			return false;
