@@ -332,7 +332,7 @@ export type FieldValidity = {
 	};
 	elements?: {
 		type: 'valid' | 'invalid' | 'validating';
-		message?: string;
+		message: string;
 	};
 	custom?: {
 		type: 'valid' | 'invalid' | 'validating';

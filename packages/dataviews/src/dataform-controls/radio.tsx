@@ -9,6 +9,7 @@ import { useCallback } from '@wordpress/element';
  */
 import type { DataFormControlProps } from '../types';
 import { unlock } from '../lock-unlock';
+import getCustomValidity from './utils/get-custom-validity';
 
 const { ValidatedRadioControl } = unlock( privateApis );
 
@@ -19,7 +20,7 @@ export default function Radio< Item >( {
 	hideLabelFromVision,
 	validity,
 }: DataFormControlProps< Item > ) {
-	const { label, description, elements, getValue, setValue } = field;
+	const { label, description, elements, getValue, setValue, isValid } = field;
 	const value = getValue( { item: data } );
 
 	const onChangeControl = useCallback(
@@ -31,10 +32,8 @@ export default function Radio< Item >( {
 	if ( elements ) {
 		return (
 			<ValidatedRadioControl
-				required={ !! field.isValid?.required }
-				customValidity={
-					validity?.custom ? validity.custom : undefined
-				}
+				required={ !! isValid?.required }
+				customValidity={ getCustomValidity( isValid, validity ) }
 				label={ label }
 				help={ description }
 				onChange={ onChangeControl }

@@ -16,6 +16,7 @@ import { __ } from '@wordpress/i18n';
 import { OPERATOR_BETWEEN } from '../../constants';
 import type { DataFormControlProps } from '../../types';
 import { unlock } from '../../lock-unlock';
+import getCustomValidity from './get-custom-validity';
 
 const { ValidatedNumberControl } = unlock( privateApis );
 
@@ -101,7 +102,7 @@ export default function ValidatedNumber< Item >( {
 	validity,
 }: DataFormValidatedNumberControlProps< Item > ) {
 	const step = Math.pow( 10, Math.abs( decimals ) * -1 );
-	const { label, description, getValue, setValue } = field;
+	const { label, description, getValue, setValue, isValid } = field;
 	const value = getValue( { item: data } ) ?? '';
 
 	const onChangeControl = useCallback(
@@ -156,8 +157,8 @@ export default function ValidatedNumber< Item >( {
 
 	return (
 		<ValidatedNumberControl
-			required={ !! field.isValid?.required }
-			customValidity={ validity?.custom ? validity.custom : undefined }
+			required={ !! isValid?.required }
+			customValidity={ getCustomValidity( isValid, validity ) }
 			label={ label }
 			help={ description }
 			value={ value }

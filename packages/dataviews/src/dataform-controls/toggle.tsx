@@ -9,6 +9,7 @@ import { useCallback } from '@wordpress/element';
  */
 import type { DataFormControlProps } from '../types';
 import { unlock } from '../lock-unlock';
+import getCustomValidity from './utils/get-custom-validity';
 
 const { ValidatedToggleControl } = unlock( privateApis );
 
@@ -19,7 +20,7 @@ export default function Toggle< Item >( {
 	hideLabelFromVision,
 	validity,
 }: DataFormControlProps< Item > ) {
-	const { label, description, getValue, setValue } = field;
+	const { label, description, getValue, setValue, isValid } = field;
 
 	const onChangeControl = useCallback( () => {
 		onChange(
@@ -29,8 +30,8 @@ export default function Toggle< Item >( {
 
 	return (
 		<ValidatedToggleControl
-			required={ !! field.isValid.required }
-			customValidity={ validity?.custom ? validity.custom : undefined }
+			required={ !! isValid.required }
+			customValidity={ getCustomValidity( isValid, validity ) }
 			hidden={ hideLabelFromVision }
 			__nextHasNoMarginBottom
 			label={ label }

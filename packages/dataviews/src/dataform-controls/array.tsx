@@ -9,6 +9,7 @@ import { useCallback, useMemo } from '@wordpress/element';
  */
 import type { DataFormControlProps } from '../types';
 import { unlock } from '../lock-unlock';
+import getCustomValidity from './utils/get-custom-validity';
 
 const { ValidatedFormTokenField } = unlock( privateApis );
 
@@ -19,7 +20,7 @@ export default function ArrayControl< Item >( {
 	hideLabelFromVision,
 	validity,
 }: DataFormControlProps< Item > ) {
-	const { label, placeholder, elements, getValue, setValue } = field;
+	const { label, placeholder, elements, getValue, setValue, isValid } = field;
 	const value = getValue( { item: data } );
 
 	// Convert stored values to element objects for the token field
@@ -53,8 +54,8 @@ export default function ArrayControl< Item >( {
 
 	return (
 		<ValidatedFormTokenField
-			required={ !! field.isValid?.required }
-			customValidity={ validity?.custom ? validity.custom : undefined }
+			required={ !! isValid?.required }
+			customValidity={ getCustomValidity( isValid, validity ) }
 			label={ hideLabelFromVision ? undefined : label }
 			value={ arrayValueAsElements }
 			onChange={ onChangeControl }

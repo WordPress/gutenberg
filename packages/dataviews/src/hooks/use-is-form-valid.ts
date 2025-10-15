@@ -102,7 +102,6 @@ export function useIsFormValid< Item >(
 						...prev?.[ field.id ],
 						required: {
 							type: 'invalid',
-							message: 'Required',
 						},
 					},
 				} ) );

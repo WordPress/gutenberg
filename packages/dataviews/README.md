@@ -733,11 +733,11 @@ Returns an object containing the errors. Each property is a field ID, containing
 	fieldId: {
 		required: {
 			type: 'invalid',
-			message: 'Required.'
+			message: 'Required.' // Optional
 		},
 		elements: {
 			type: 'invalid',
-			message: 'Value must be one of the elements.'
+			message: 'Value must be one of the elements.' // Optional
 		},
 		custom: {
 			type: 'invalid',
@@ -753,6 +753,7 @@ The type of each error can be:
 - `valid`: when the value became valid after being invalid
 - `validating`: when the value is being validated
 
+The message will be displayed in the UI controls. The message for the `required` and `elements` rules is optional, and the built-in message will be used if not provided.
 
 ## Actions API
 

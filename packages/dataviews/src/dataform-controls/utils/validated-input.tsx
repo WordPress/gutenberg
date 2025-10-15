@@ -9,6 +9,7 @@ import { useCallback } from '@wordpress/element';
  */
 import type { DataFormControlProps } from '../../types';
 import { unlock } from '../../lock-unlock';
+import getCustomValidity from './get-custom-validity';
 
 const { ValidatedInputControl } = unlock( privateApis );
 
@@ -56,7 +57,7 @@ export default function ValidatedText< Item >( {
 	return (
 		<ValidatedInputControl
 			required={ !! isValid?.required }
-			customValidity={ validity?.custom ? validity.custom : undefined }
+			customValidity={ getCustomValidity( isValid, validity ) }
 			label={ label }
 			placeholder={ placeholder }
 			value={ value ?? '' }

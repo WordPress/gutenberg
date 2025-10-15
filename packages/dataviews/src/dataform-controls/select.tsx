@@ -9,6 +9,7 @@ import { useCallback } from '@wordpress/element';
  */
 import type { DataFormControlProps } from '../types';
 import { unlock } from '../lock-unlock';
+import getCustomValidity from './utils/get-custom-validity';
 
 const { ValidatedSelectControl } = unlock( privateApis );
 
@@ -19,7 +20,7 @@ export default function Select< Item >( {
 	hideLabelFromVision,
 	validity,
 }: DataFormControlProps< Item > ) {
-	const { type, label, description, getValue, setValue } = field;
+	const { type, label, description, getValue, setValue, isValid } = field;
 
 	const isMultiple = type === 'array';
 	const value = getValue( { item: data } ) ?? ( isMultiple ? [] : '' );
@@ -35,7 +36,7 @@ export default function Select< Item >( {
 	return (
 		<ValidatedSelectControl
 			required={ !! field.isValid?.required }
-			customValidity={ validity?.custom ? validity.custom : undefined }
+			customValidity={ getCustomValidity( isValid, validity ) }
 			label={ label }
 			value={ value }
 			help={ description }

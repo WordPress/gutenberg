@@ -9,6 +9,7 @@ import { useCallback } from '@wordpress/element';
  */
 import type { DataFormControlProps } from '../types';
 import { unlock } from '../lock-unlock';
+import getCustomValidity from './utils/get-custom-validity';
 
 const { ValidatedCheckboxControl } = unlock( privateApis );
 
@@ -19,7 +20,7 @@ export default function Checkbox< Item >( {
 	hideLabelFromVision,
 	validity,
 }: DataFormControlProps< Item > ) {
-	const { getValue, setValue, label, description } = field;
+	const { getValue, setValue, label, description, isValid } = field;
 
 	const onChangeControl = useCallback( () => {
 		onChange(
@@ -30,7 +31,7 @@ export default function Checkbox< Item >( {
 	return (
 		<ValidatedCheckboxControl
 			required={ !! field.isValid?.required }
-			customValidity={ validity?.custom ? validity.custom : undefined }
+			customValidity={ getCustomValidity( isValid, validity ) }
 			hidden={ hideLabelFromVision }
 			label={ label }
 			help={ description }

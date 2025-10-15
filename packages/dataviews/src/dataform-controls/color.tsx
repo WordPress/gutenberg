@@ -18,6 +18,7 @@ import { useCallback } from '@wordpress/element';
  */
 import type { DataFormControlProps } from '../types';
 import { unlock } from '../lock-unlock';
+import getCustomValidity from './utils/get-custom-validity';
 
 const { ValidatedInputControl, Picker } = unlock( privateApis );
 
@@ -76,7 +77,7 @@ export default function Color< Item >( {
 	hideLabelFromVision,
 	validity,
 }: DataFormControlProps< Item > ) {
-	const { label, placeholder, description, setValue } = field;
+	const { label, placeholder, description, setValue, isValid } = field;
 	const value = field.getValue( { item: data } ) || '';
 
 	const handleColorChange = useCallback(
@@ -96,7 +97,7 @@ export default function Color< Item >( {
 	return (
 		<ValidatedInputControl
 			required={ !! field.isValid?.required }
-			customValidity={ validity?.custom ? validity.custom : undefined }
+			customValidity={ getCustomValidity( isValid, validity ) }
 			label={ label }
 			placeholder={ placeholder }
 			value={ value }

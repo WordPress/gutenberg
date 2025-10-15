@@ -9,6 +9,7 @@ import { useCallback } from '@wordpress/element';
  */
 import type { DataFormControlProps } from '../types';
 import { unlock } from '../lock-unlock';
+import getCustomValidity from './utils/get-custom-validity';
 
 const { ValidatedTextareaControl } = unlock( privateApis );
 
@@ -21,7 +22,7 @@ export default function Textarea< Item >( {
 	validity,
 }: DataFormControlProps< Item > ) {
 	const { rows = 4 } = config || {};
-	const { label, placeholder, description, setValue } = field;
+	const { label, placeholder, description, setValue, isValid } = field;
 	const value = field.getValue( { item: data } );
 
 	const onChangeControl = useCallback(
@@ -32,8 +33,8 @@ export default function Textarea< Item >( {
 
 	return (
 		<ValidatedTextareaControl
-			required={ !! field.isValid?.required }
-			customValidity={ validity?.custom ? validity.custom : undefined }
+			required={ !! isValid?.required }
+			customValidity={ getCustomValidity( isValid, validity ) }
 			label={ label }
 			placeholder={ placeholder }
 			value={ value ?? '' }
