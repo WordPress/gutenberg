@@ -54,7 +54,7 @@ describe( 'useIsFormValid', () => {
 
 	describe( 'isValid.required', () => {
 		const REQUIRED_MESSAGE = {
-			required: { type: 'invalid', message: 'Required' },
+			required: { type: 'invalid' },
 		};
 		it( 'array is invalid when required but empty', () => {
 			const item = { id: 1, tags: [] };
