@@ -41,13 +41,14 @@ function PostLockedModal() {
 			isPostLockTakeover,
 			getPostLockUser,
 			getCurrentPostId,
+			getCurrentPostType,
 			getActivePostLock,
 			getEditedPostAttribute,
 			getEditedPostPreviewLink,
 			getEditorSettings,
 		} = select( editorStore );
 		const { getPostType, getEntityConfig } = select( coreStore );
-		const entityName = getEditedPostAttribute( 'type' );
+		const currentPostType = getCurrentPostType();
 		return {
 			isLocked: isPostLocked(),
 			isTakeover: isPostLockTakeover(),
@@ -57,7 +58,7 @@ function PostLockedModal() {
 			activePostLock: getActivePostLock(),
 			postType: getPostType( getEditedPostAttribute( 'type' ) ),
 			previewLink: getEditedPostPreviewLink(),
-			supportsSync: getEntityConfig( 'postType', entityName )?.syncConfig?.enabled,
+			supportsSync: getEntityConfig( 'postType', currentPostType )?.syncConfig?.enabled,
 		};
 	}, [] );
 
