@@ -93,16 +93,6 @@ export function receiveEntityRecords(
 	edits,
 	meta
 ) {
-	// If we receive an auto-draft template, pretend it's already published.
-	if ( kind === 'postType' && name === 'wp_template' ) {
-		records = ( Array.isArray( records ) ? records : [ records ] ).map(
-			( record ) =>
-				record.status === 'auto-draft'
-					? { ...record, status: 'publish' }
-					: record
-		);
-	}
-
 	// Auto drafts should not have titles, but some plugins rely on them so we can't filter this
 	// on the server.
 	if ( kind === 'postType' ) {
