@@ -142,7 +142,7 @@ async function rest< RestResponse = any >(
 		try {
 			json = JSON.parse( responseText );
 		} catch ( parseError ) {
-			throw new Error( `REST API returned HTML instead of JSON. URL: ${url}, Status: ${response.status()}, Response: ${responseText.substring( 0, 500 ) }` );
+			throw new Error( `REST API returned HTML instead of JSON - URL: ${url}, Status: ${response.status()}, Response: ${responseText.substring( 0, 500 ) }` );
 		}
 
 		if ( ! response.ok() ) {
