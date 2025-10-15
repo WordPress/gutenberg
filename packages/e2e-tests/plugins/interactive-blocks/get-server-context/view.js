@@ -58,5 +58,19 @@ store( 'test/get-server-context', {
 			const { nonChanging } = getServerContext();
 			ctx.nonChanging = nonChanging;
 		},
+		updateOnlyInMain() {
+			// This property only exists in the main page, so we need to clear
+			// it when navigating to a page that doesn't have it.
+			const ctx = getContext();
+			const { onlyInMain } = getServerContext();
+			ctx.onlyInMain = onlyInMain;
+		},
+		updateOnlyInModified() {
+			// This property only exists in the modified page, so we need to clear
+			// it when navigating to a page that doesn't have it.
+			const ctx = getContext();
+			const { onlyInModified } = getServerContext();
+			ctx.onlyInModified = onlyInModified;
+		},
 	},
 } );

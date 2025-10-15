@@ -44,6 +44,7 @@ test.describe( 'getServerContext()', () => {
 				prop: 'child',
 			},
 			nonChanging: 'modified from server',
+			onlyInMain: 'only in main',
 		};
 
 		const childModified = {
@@ -52,6 +53,7 @@ test.describe( 'getServerContext()', () => {
 				prop: 'childModified',
 			},
 			nonChanging: 'modified from server',
+			onlyInModified: 'only in modified',
 		};
 
 		const childNewProps = {
@@ -194,5 +196,33 @@ test.describe( 'getServerContext()', () => {
 
 		// The prop is overwritten on navigation.
 		await expect( nonChanging ).toHaveText( 'modified from server' );
+	} );
+
+	test( 'should handle props only existing in some pages', async ( {
+		page,
+	} ) => {
+		const onlyInMain = page.getByTestId( 'onlyInMain' );
+		const onlyInModified = page.getByTestId( 'onlyInModified' );
+
+		await expect( onlyInMain ).toHaveText( 'only in main' );
+		await expect( onlyInModified ).toBeEmpty();
+
+		await page.getByTestId( 'modified' ).click();
+		await expect( page ).toHaveTitle( /modified/ );
+
+		await expect( onlyInMain ).toBeEmpty();
+		await expect( onlyInModified ).toHaveText( 'only in modified' );
+
+		await page.goBack();
+		await expect( page ).toHaveTitle( /main/ );
+
+		await expect( onlyInMain ).toHaveText( 'only in main' );
+		await expect( onlyInModified ).toBeEmpty();
+
+		await page.getByTestId( 'newProps' ).click();
+		await expect( page ).toHaveTitle( /new props/ );
+
+		await expect( onlyInMain ).toBeEmpty();
+		await expect( onlyInModified ).toBeEmpty();
 	} );
 } );

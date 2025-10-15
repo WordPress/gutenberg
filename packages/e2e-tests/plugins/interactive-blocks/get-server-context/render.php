@@ -31,6 +31,8 @@ $child_ctx  = $attributes['childContext'];
 	<div
 		data-wp-watch---server-context-child="callbacks.updateServerContextChild"
 		data-wp-watch---non-changing="callbacks.updateNonChanging"
+		data-wp-watch---only-in-main="callbacks.updateOnlyInMain"
+		data-wp-watch---only-in-modified="callbacks.updateOnlyInModified"
 		<?php echo wp_interactivity_data_wp_context( $child_ctx ); ?>
 	>
 		<div data-testid="prop" data-wp-text="context.prop"></div>
@@ -40,6 +42,8 @@ $child_ctx  = $attributes['childContext'];
 		<div data-testid="inherited.prop" data-wp-text="context.inherited.prop"></div>
 		<div data-testid="inherited.newProp" data-wp-text="context.inherited.newProp"></div>
 		<div data-testid="nonChanging" data-wp-text="context.nonChanging"></div>
+		<div data-testid="onlyInMain" data-wp-text="context.onlyInMain"></div>
+		<div data-testid="onlyInModified" data-wp-text="context.onlyInModified"></div>
 
 		<button
 			data-testid="tryToModifyServerContext"
