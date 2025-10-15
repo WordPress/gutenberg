@@ -25,6 +25,9 @@ const { state } = store( 'test/get-server-state', {
 				getContext().result = 'not modified ✅';
 			}
 		},
+		updateNonChanging() {
+			state.nonChanging = 'modified from client';
+		},
 	},
 	callbacks: {
 		updateState() {
@@ -33,6 +36,13 @@ const { state } = store( 'test/get-server-state', {
 			state.newProp = newProp;
 			state.nested.prop = nested.prop;
 			state.nested.newProp = nested.newProp;
+		},
+		updateNonChanging() {
+			// This property never changes in the server, but it changes in the
+			// client so every time there's a navigation, we need to overwrite
+			// it.
+			const { nonChanging } = getServerState();
+			state.nonChanging = nonChanging;
 		},
 	},
 } );

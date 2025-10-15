@@ -16,6 +16,7 @@ test.describe( 'getServerState()', () => {
 						prop: 'link 1',
 						newProp: 'link 1',
 					},
+					nonChanging: 'modified from server',
 				},
 			},
 		} );
@@ -29,6 +30,7 @@ test.describe( 'getServerState()', () => {
 						prop: 'link 2',
 						newProp: 'link 2',
 					},
+					nonChanging: 'modified from server',
 				},
 			},
 		} );
@@ -42,6 +44,7 @@ test.describe( 'getServerState()', () => {
 					nested: {
 						prop: 'main',
 					},
+					nonChanging: 'modified from server',
 				},
 			},
 		} );
@@ -115,5 +118,35 @@ test.describe( 'getServerState()', () => {
 
 		await expect( prop ).toHaveText( 'main' );
 		await expect( button ).toHaveText( 'not modified ✅' );
+	} );
+
+	test( 'should overwrite non-changing props on navigation', async ( {
+		page,
+	} ) => {
+		const nonChanging = page.getByTestId( 'nonChanging' );
+		const button = page.getByTestId( 'updateNonChanging' );
+
+		await expect( page ).toHaveTitle( /main/ );
+		await expect( nonChanging ).toHaveText( 'modified from server' );
+
+		await button.click();
+
+		await expect( nonChanging ).toHaveText( 'modified from client' );
+
+		await page.getByTestId( 'link 1' ).click();
+		await expect( page ).toHaveTitle( /link 1/ );
+
+		// The prop is overwritten on navigation.
+		await expect( nonChanging ).toHaveText( 'modified from server' );
+
+		await button.click();
+
+		await expect( nonChanging ).toHaveText( 'modified from client' );
+
+		await page.goBack();
+		await expect( page ).toHaveTitle( /main/ );
+
+		// The prop is overwritten on navigation.
+		await expect( nonChanging ).toHaveText( 'modified from server' );
 	} );
 } );

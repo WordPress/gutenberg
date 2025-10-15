@@ -14,12 +14,14 @@ if ( isset( $attributes['state'] ) ) {
 
 <div
 	data-wp-interactive="test/get-server-state"
-	data-wp-watch="callbacks.updateState"
+	data-wp-watch---update-state="callbacks.updateState"
+	data-wp-watch---non-changing="callbacks.updateNonChanging"
 >
 	<div data-testid="prop" data-wp-text="state.prop"></div>
 	<div data-testid="nested.prop" data-wp-text="state.nested.prop"></div>
 	<div data-testid="newProp" data-wp-text="state.newProp"></div>
 	<div data-testid="nested.newProp" data-wp-text="state.nested.newProp"></div>
+	<div data-testid="nonChanging" data-wp-text="state.nonChanging"></div>
 
 	<button
 		data-testid="tryToModifyServerState"
@@ -30,6 +32,12 @@ if ( isset( $attributes['state'] ) ) {
 		modify
 	</button>
 
+	<button
+		data-testid="updateNonChanging"
+		data-wp-on--click="actions.updateNonChanging"
+	>
+		update non-changing prop
+	</button>
 
 	<nav>
 		<?php
