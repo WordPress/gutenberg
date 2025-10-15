@@ -44,5 +44,17 @@ const { state } = store( 'test/get-server-state', {
 			const { nonChanging } = getServerState();
 			state.nonChanging = nonChanging;
 		},
+		updateOnlyInMain() {
+			// This property only exists in the main link, so we need to clear
+			// it when navigating to a page that doesn't have it.
+			const { onlyInMain } = getServerState();
+			state.onlyInMain = onlyInMain;
+		},
+		updateOnlyInLink1() {
+			// This property only exists in link 1, so we need to clear it when
+			// navigating to a page that doesn't have it.
+			const { onlyInLink1 } = getServerState();
+			state.onlyInLink1 = onlyInLink1;
+		},
 	},
 } );

@@ -17,6 +17,7 @@ test.describe( 'getServerState()', () => {
 						newProp: 'link 1',
 					},
 					nonChanging: 'modified from server',
+					onlyInLink1: 'only in link 1',
 				},
 			},
 		} );
@@ -45,6 +46,7 @@ test.describe( 'getServerState()', () => {
 						prop: 'main',
 					},
 					nonChanging: 'modified from server',
+					onlyInMain: 'only in main',
 				},
 			},
 		} );
@@ -148,5 +150,33 @@ test.describe( 'getServerState()', () => {
 
 		// The prop is overwritten on navigation.
 		await expect( nonChanging ).toHaveText( 'modified from server' );
+	} );
+
+	test( 'should handle props only existing in some pages', async ( {
+		page,
+	} ) => {
+		const onlyInMain = page.getByTestId( 'onlyInMain' );
+		const onlyInLink1 = page.getByTestId( 'onlyInLink1' );
+
+		await expect( onlyInMain ).toHaveText( 'only in main' );
+		await expect( onlyInLink1 ).toBeEmpty();
+
+		await page.getByTestId( 'link 1' ).click();
+		await expect( page ).toHaveTitle( /link 1/ );
+
+		await expect( onlyInMain ).toBeEmpty();
+		await expect( onlyInLink1 ).toHaveText( 'only in link 1' );
+
+		await page.goBack();
+		await expect( page ).toHaveTitle( /main/ );
+
+		await expect( onlyInMain ).toHaveText( 'only in main' );
+		await expect( onlyInLink1 ).toBeEmpty();
+
+		await page.getByTestId( 'link 2' ).click();
+		await expect( page ).toHaveTitle( /link 2/ );
+
+		await expect( onlyInMain ).toBeEmpty();
+		await expect( onlyInLink1 ).toBeEmpty();
 	} );
 } );
