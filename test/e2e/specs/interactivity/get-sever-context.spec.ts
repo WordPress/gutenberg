@@ -43,6 +43,7 @@ test.describe( 'getServerContext()', () => {
 			nested: {
 				prop: 'child',
 			},
+			nonChanging: 'modified from server',
 		};
 
 		const childModified = {
@@ -50,6 +51,7 @@ test.describe( 'getServerContext()', () => {
 			nested: {
 				prop: 'childModified',
 			},
+			nonChanging: 'modified from server',
 		};
 
 		const childNewProps = {
@@ -59,6 +61,7 @@ test.describe( 'getServerContext()', () => {
 				prop: 'child',
 				newProp: 'child',
 			},
+			nonChanging: 'modified from server',
 		};
 
 		await utils.activatePlugins();
@@ -162,5 +165,34 @@ test.describe( 'getServerContext()', () => {
 
 		await expect( prop ).toHaveText( 'child' );
 		await expect( button ).toHaveText( 'not modified ✅' );
+	} );
+
+	test( 'should overwrite non-changing props on navigation', async ( {
+		page,
+	} ) => {
+		const nonChanging = page.getByTestId( 'nonChanging' );
+		const button = page.getByTestId( 'updateNonChanging' );
+
+		await expect( nonChanging ).toHaveText( 'modified from server' );
+
+		await button.click();
+
+		await expect( nonChanging ).toHaveText( 'modified from client' );
+
+		await page.getByTestId( 'modified' ).click();
+		await expect( page ).toHaveTitle( /modified/ );
+
+		// The prop is overwritten on navigation.
+		await expect( nonChanging ).toHaveText( 'modified from server' );
+
+		await button.click();
+
+		await expect( nonChanging ).toHaveText( 'modified from client' );
+
+		await page.goBack();
+		await expect( page ).toHaveTitle( /main/ );
+
+		// The prop is overwritten on navigation.
+		await expect( nonChanging ).toHaveText( 'modified from server' );
 	} );
 } );

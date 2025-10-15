@@ -25,6 +25,9 @@ store( 'test/get-server-context', {
 				getContext().result = 'not modified ✅';
 			}
 		},
+		updateNonChanging() {
+			getContext().nonChanging = 'modified from client';
+		},
 	},
 	callbacks: {
 		updateServerContextParent() {
@@ -46,6 +49,14 @@ store( 'test/get-server-context', {
 			ctx.nested.newProp = nested.newProp;
 			ctx.inherited.prop = inherited.prop;
 			ctx.inherited.newProp = inherited.newProp;
+		},
+		updateNonChanging() {
+			// This property never changes in the server, but it changes in the
+			// client so every time there's a navigation, we need to overwrite
+			// it.
+			const ctx = getContext();
+			const { nonChanging } = getServerContext();
+			ctx.nonChanging = nonChanging;
 		},
 	},
 } );

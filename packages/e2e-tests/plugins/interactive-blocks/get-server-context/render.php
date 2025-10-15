@@ -29,7 +29,8 @@ $child_ctx  = $attributes['childContext'];
 	<?php echo wp_interactivity_data_wp_context( $parent_ctx ); ?>
 >
 	<div
-		data-wp-watch="callbacks.updateServerContextChild"
+		data-wp-watch---server-context-child="callbacks.updateServerContextChild"
+		data-wp-watch---non-changing="callbacks.updateNonChanging"
 		<?php echo wp_interactivity_data_wp_context( $child_ctx ); ?>
 	>
 		<div data-testid="prop" data-wp-text="context.prop"></div>
@@ -38,6 +39,7 @@ $child_ctx  = $attributes['childContext'];
 		<div data-testid="nested.newProp" data-wp-text="context.nested.newProp"></div>
 		<div data-testid="inherited.prop" data-wp-text="context.inherited.prop"></div>
 		<div data-testid="inherited.newProp" data-wp-text="context.inherited.newProp"></div>
+		<div data-testid="nonChanging" data-wp-text="context.nonChanging"></div>
 
 		<button
 			data-testid="tryToModifyServerContext"
@@ -46,6 +48,13 @@ $child_ctx  = $attributes['childContext'];
 			data-wp-text="context.result">
 		>
 			modify
+		</button>
+
+		<button
+			data-testid="updateNonChanging"
+			data-wp-on--click="actions.updateNonChanging"
+		>
+			update non-changing prop
 		</button>
 	</div>
 </div>
