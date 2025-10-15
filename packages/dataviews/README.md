@@ -716,17 +716,6 @@ Returns an object containing:
     -   `totalItems`: total number of items for the current view config.
     -   `totalPages`: total number of pages for the current view config.
 
-### `isItemValid`
-
-Utility is used to determine whether or not the given item's value is valid according to the current fields and form configuration.
-
-Parameters:
-
--   `item`: the item, as described in the "data" property of DataForm.
--   `fields`: the fields config, as described in the "fields" property of DataForm.
--   `form`: the form config, as described in the "form" property of DataForm.
-
-Returns a boolean indicating if the item is valid (true) or not (false).
 
 ## Actions API
 
