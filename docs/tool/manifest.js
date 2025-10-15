@@ -19,7 +19,6 @@ const componentPaths = glob( 'packages/components/src/*/**/README.md', {
 		'packages/components/src/tabs/README.md',
 		'packages/components/src/custom-select-control-v2/README.md',
 		'packages/components/src/badge/README.md',
-		'packages/theme/README.md',
 	],
 } );
 const packagePaths = glob( 'packages/*/package.json' )
