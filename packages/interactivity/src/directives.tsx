@@ -23,7 +23,6 @@ import {
 	warn,
 	splitTask,
 	isPlainObject,
-	deepReadOnly,
 } from './utils';
 import {
 	directive,
@@ -278,10 +277,7 @@ export default () => {
 			props: { children },
 			context: inheritedContext,
 		} ) => {
-			const entries = context
-				.filter( isDefaultDirectiveSuffix )
-				// Reverses entries to make the ones with unique IDs override the default one.
-				.reverse();
+			const entries = context.filter( isDefaultDirectiveSuffix );
 
 			// Doesn't do anything if there are no default entries.
 			if ( ! entries.length ) {
@@ -297,7 +293,7 @@ export default () => {
 			const { client: inheritedClient, server: inheritedServer } =
 				useContext( inheritedContext );
 			const client = useRef( {} );
-			const server = {};
+			const server = useRef( {} );
 			const result = {
 				client: { ...inheritedClient },
 				server: { ...inheritedServer },
@@ -306,33 +302,37 @@ export default () => {
 
 			entries.forEach( ( { value, namespace, uniqueId } ) => {
 				// Checks that the value is a JSON object. Sends a console warning if not.
-				if ( ! isPlainObject( value ) ) {
-					if ( globalThis.SCRIPT_DEBUG ) {
+				if ( globalThis.SCRIPT_DEBUG ) {
+					if ( ! isPlainObject( value ) ) {
 						warn(
 							`The value of data-wp-context${
 								uniqueId ? `---${ uniqueId }` : ''
 							} on the ${ namespace } namespace must be a valid stringified JSON object.`
 						);
 					}
-					return;
 				}
 
-				// If the namespace doesn't exist yet, initalizes an empty
-				// proxified state for that namespace's client context.
+				// If the namespace doesn't exist yet, initalizes empty
+				// proxified states for that namespace.
 				if ( ! client.current[ namespace ] ) {
 					client.current[ namespace ] = proxifyState( namespace, {} );
+					server.current[ namespace ] = proxifyState(
+						namespace,
+						{},
+						{ readOnly: true }
+					);
 				}
 
-				// Merges the new client value with whatever was there before.
+				// Merges the new value with whatever was there before.
 				deepMerge(
 					client.current[ namespace ],
-					deepClone( value ),
+					deepClone( value ) as object,
 					false
 				);
-
-				// Sets the server context for that namespace to a deep
-				// read-only.
-				server[ namespace ] = deepReadOnly( value );
+				deepMerge(
+					server.current[ namespace ],
+					deepClone( value ) as object
+				);
 
 				// Registers the namespace.
 				namespaces.add( namespace );
@@ -344,7 +344,7 @@ export default () => {
 					inheritedClient[ namespace ]
 				);
 				result.server[ namespace ] = proxifyContext(
-					server[ namespace ],
+					server.current[ namespace ],
 					inheritedServer[ namespace ]
 				);
 			} );
