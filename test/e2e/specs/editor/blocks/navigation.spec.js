@@ -753,23 +753,31 @@ test.describe( 'Navigation block', () => {
 		// eslint-disable-next-line no-unused-vars
 		let testPage1, testPage2, testPage3;
 
-		// Use a fixture to manage pretty permalinks with automatic cleanup.
-		// This is more reliable than beforeAll/afterAll because Playwright's fixture
-		// system ensures teardown runs even if tests crash or are interrupted.
-		test.beforeAll( async ( { requestUtils } ) => {
-			// Setup: Enable pretty permalinks
-			await requestUtils.activatePlugin(
-				'gutenberg-test-pretty-permalinks'
-			);
+		test.beforeEach( async ( { admin, page, requestUtils } ) => {
+			// Enable pretty permalinks by navigating to Settings > Permalinks
+			await admin.visitAdminPage( 'options-permalink.php' );
+
+			// Select the Post name permalink structure (/%postname%/)
+			await page.click( '#permalink-input-post-name' );
+
+			// Click Save Changes
+			await page.click( '#submit' );
+
+			// Wait for settings to be saved
+			await page.waitForSelector( '.notice-success' );
 
 			// Force re-discovery of REST API root URL after enabling pretty permalinks.
 			// When permalinks change from plain to pretty, the REST API URL changes
 			// from /?rest_route=/ to /wp-json/. We need to refresh the cached URL
 			// to prevent 404 errors.
 			await requestUtils.setupRest();
-		} );
 
-		test.beforeEach( async ( { requestUtils } ) => {
+			console.log(
+				'Pretty permalinks enabled. REST API root URL:',
+				requestUtils.storageState?.rootURL
+			);
+
+			// Create test pages
 			testPage1 = await requestUtils.createPage( {
 				title: 'Test Page 1',
 				status: 'publish',
@@ -784,18 +792,27 @@ test.describe( 'Navigation block', () => {
 				title: 'Test Page 3',
 				status: 'publish',
 			} );
+
+			console.log( 'TEST PAGES CREATED: ' );
+			console.log( testPage1.link );
+			console.log( testPage2.link );
+			console.log( testPage3.link );
 		} );
 
-		test.afterEach( async ( { requestUtils } ) => {
+		test.afterEach( async ( { admin, page, requestUtils } ) => {
 			await requestUtils.deleteAllPages();
-		} );
 
-		test.afterAll( async ( { requestUtils } ) => {
-			// Teardown: Disable pretty permalinks
-			// This runs automatically after all tests, even if they fail or crash
-			await requestUtils.deactivatePlugin(
-				'gutenberg-test-pretty-permalinks'
-			);
+			// Restore plain permalinks
+			await admin.visitAdminPage( 'options-permalink.php' );
+
+			// Select Plain permalinks
+			await page.click( '#permalink-input-plain' );
+
+			// Click Save Changes
+			await page.click( '#submit' );
+
+			// Wait for settings to be saved
+			await page.waitForSelector( '.notice-success' );
 
 			// Force re-discovery of REST API root URL after disabling pretty permalinks.
 			// When permalinks change from pretty to plain, the REST API URL changes
@@ -915,6 +932,8 @@ test.describe( 'Navigation block', () => {
 						slug: updatedPageSlug,
 					},
 				} );
+
+				console.log( `PAGE SLUG UPDATED: ${ updatedPage.slug }` );
 
 				expect( updatedPage.link ).toContain( `/${ updatedPageSlug }` );
 
