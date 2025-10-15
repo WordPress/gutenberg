@@ -228,7 +228,12 @@ function ValidatedDateControl< Item >( {
 					<p
 						className={ clsx(
 							'components-validated-control__indicator',
-							'is-invalid'
+							customValidity.type === 'invalid'
+								? 'is-invalid'
+								: undefined,
+							customValidity.type === 'valid'
+								? 'is-valid'
+								: undefined
 						) }
 					>
 						<Icon
