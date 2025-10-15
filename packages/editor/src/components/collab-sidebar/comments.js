@@ -183,7 +183,7 @@ export function Comments( {
 				const previousBottom =
 					previousThreadData.threadTop +
 					previousThreadData.threadHeight;
-				if ( threadTop < previousBottom ) {
+				if ( threadTop < previousBottom + 16 ) {
 					// Shift down by the difference plus a margin to avoid overlap.
 					additionalOffset = previousBottom - threadTop + 20;
 				}
