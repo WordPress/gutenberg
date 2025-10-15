@@ -15,7 +15,7 @@ import {
 } from './registry';
 import { PropSignal } from './signals';
 import { setNamespace, resetNamespace } from '../namespaces';
-import { isPlainObject } from '../utils';
+import { isPlainObject, warn } from '../utils';
 
 /**
  * Set of built-in symbols.
@@ -154,6 +154,9 @@ const stateHandlers: ProxyHandler< object > = {
 		receiver: object
 	): boolean {
 		if ( readOnlyProxies.has( receiver ) ) {
+			if ( globalThis.SCRIPT_DEBUG ) {
+				warn( 'Cannot modify read-only object' );
+			}
 			return false;
 		}
 		setNamespace( getNamespaceFromProxy( receiver ) );
@@ -170,6 +173,9 @@ const stateHandlers: ProxyHandler< object > = {
 		desc: PropertyDescriptor
 	): boolean {
 		if ( readOnlyProxies.has( getProxyFromObject( target )! ) ) {
+			if ( globalThis.SCRIPT_DEBUG ) {
+				warn( 'Cannot define property on read-only object' );
+			}
 			return false;
 		}
 
@@ -212,6 +218,9 @@ const stateHandlers: ProxyHandler< object > = {
 
 	deleteProperty( target: object, key: string ): boolean {
 		if ( readOnlyProxies.has( getProxyFromObject( target )! ) ) {
+			if ( globalThis.SCRIPT_DEBUG ) {
+				warn( 'Cannot delete property from read-only object' );
+			}
 			return false;
 		}
 

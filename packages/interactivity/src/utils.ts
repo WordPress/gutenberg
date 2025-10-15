@@ -410,3 +410,56 @@ export function withSyncEvent( callback: Function ): SyncAwareFunction {
 	syncAware.sync = true;
 	return syncAware;
 }
+
+/**
+ * Proxy handler that prevents any modifications to the target object.
+ */
+const deepReadOnlyHandlers: ProxyHandler< object > = {
+	get( target, prop ) {
+		const value = target[ prop ];
+		if ( value && typeof value === 'object' ) {
+			return deepReadOnly( value );
+		}
+		return value;
+	},
+	set() {
+		if ( globalThis.SCRIPT_DEBUG ) {
+			warn( 'Cannot modify read-only object' );
+		}
+		return false;
+	},
+	deleteProperty() {
+		if ( globalThis.SCRIPT_DEBUG ) {
+			warn( 'Cannot delete property from read-only object' );
+		}
+		return false;
+	},
+	defineProperty() {
+		if ( globalThis.SCRIPT_DEBUG ) {
+			warn( 'Cannot define property on read-only object' );
+		}
+		return false;
+	},
+};
+
+/**
+ * Creates a deeply read-only proxy of an object.
+ *
+ * This function recursively wraps an object and all its nested objects in
+ * proxies that prevent any modifications. All mutation operations (`set`,
+ * `deleteProperty`, and `defineProperty`) will silently fail in production and
+ * throw an error in development.
+ *
+ * The wrapping is lazy: nested objects are only wrapped when accessed, making
+ * this efficient for large or deeply nested structures.
+ *
+ * @param obj The object to make read-only.
+ * @return A read-only proxy of the object.
+ */
+export function deepReadOnly(
+	obj: object
+): Readonly< Record< string, unknown > > {
+	return new Proxy( obj, deepReadOnlyHandlers ) as Readonly<
+		Record< string, unknown >
+	>;
+}

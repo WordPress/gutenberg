@@ -2,11 +2,13 @@
  * Internal dependencies
  */
 import { proxifyState, proxifyStore, deepMerge } from './proxies';
+import { getNamespace } from './namespaces';
+import { isPlainObject, deepReadOnly } from './utils';
+
 /**
  * External dependencies
  */
-import { getNamespace } from './namespaces';
-import { isPlainObject } from './utils';
+import { signal, type Signal } from '@preact/signals';
 
 export const stores = new Map();
 const rawStores = new Map();
@@ -24,7 +26,34 @@ export const getConfig = ( namespace?: string ) =>
 	storeConfigs.get( namespace || getNamespace() ) || {};
 
 /**
- * Gets the part of the state defined and updated from the server.
+ * Initializes, updates or gets the server state for the given namespace.
+ *
+ * @param namespace Store's namespace.
+ * @param state     Initial or new state to set.
+ * @return The server state object, its signal, and the current signal value.
+ */
+const serverState = (
+	namespace: string,
+	state?: object
+): {
+	state: Readonly< Record< string, unknown > >;
+	signal: Signal< number >;
+	value: number;
+} => {
+	if ( ! serverStates.has( namespace ) ) {
+		serverStates.set( namespace, {
+			state: deepReadOnly( state || {} ),
+			signal: signal( 0 ),
+			value: 0,
+		} );
+	} else if ( state ) {
+		serverStates.get( namespace ).state = deepReadOnly( state );
+	}
+	return serverStates.get( namespace );
+};
+
+/**
+ * Gets the state defined and updated from the server.
  *
  * The object returned is read-only, and includes the state defined in PHP with
  * `wp_interactivity_state()`. When using `actions.navigate()`, this object is
@@ -50,10 +79,11 @@ export const getConfig = ( namespace?: string ) =>
  */
 export const getServerState = ( namespace?: string ) => {
 	const ns = namespace || getNamespace();
-	if ( ! serverStates.has( ns ) ) {
-		serverStates.set( ns, proxifyState( ns, {}, { readOnly: true } ) );
-	}
-	return serverStates.get( ns );
+	const server = serverState( ns );
+	// Accesses the signal to make this reactive. It assigns it to `value` to
+	// prevent the JavaScript minifier from removing this line.
+	server.value = server.signal.value;
+	return server.state;
 };
 
 interface StoreOptions {
@@ -274,15 +304,16 @@ export const populateServerData = ( data?: {
 	config?: Record< string, unknown >;
 } ) => {
 	if ( isPlainObject( data?.state ) ) {
-		Object.entries( data!.state ).forEach( ( [ namespace, state ] ) => {
-			const st = store< any >( namespace, {}, { lock: universalUnlock } );
+		Object.entries( data!.state ).forEach( ( [ ns, state ] ) => {
+			const st = store< any >( ns, {}, { lock: universalUnlock } );
 			deepMerge( st.state, state, false );
-			deepMerge( getServerState( namespace ), state );
+			const { signal: serverSignal } = serverState( ns, state || {} );
+			serverSignal.value += 1; // Triggers invalidations.
 		} );
 	}
 	if ( isPlainObject( data?.config ) ) {
-		Object.entries( data!.config ).forEach( ( [ namespace, config ] ) => {
-			storeConfigs.set( namespace, config );
+		Object.entries( data!.config ).forEach( ( [ ns, config ] ) => {
+			storeConfigs.set( ns, config );
 		} );
 	}
 };
