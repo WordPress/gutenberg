@@ -59,6 +59,7 @@ export default function SearchEdit( {
 	toggleSelection,
 	isSelected,
 	clientId,
+	context,
 } ) {
 	const {
 		label,
@@ -73,6 +74,13 @@ export default function SearchEdit( {
 		isSearchFieldHidden,
 		style,
 	} = attributes;
+
+	// Check if the block is inside a Query block with enhanced pagination enabled
+	// and if the `__experimentalEnableSearchQueryBlock` flag is enabled.
+	const hasInstantSearch = !! (
+		context?.enhancedPagination &&
+		window?.__experimentalEnableSearchQueryBlock
+	);
 
 	const wasJustInsertedIntoNavigationBlock = useSelect(
 		( select ) => {
@@ -377,54 +385,60 @@ export default function SearchEdit( {
 							}
 						/>
 					</ToolsPanelItem>
-					<ToolsPanelItem
-						hasValue={ () => buttonPosition !== 'button-outside' }
-						label={ __( 'Button position' ) }
-						onDeselect={ () => {
-							setAttributes( {
-								buttonPosition: 'button-outside',
-								isSearchFieldHidden: false,
-							} );
-						} }
-						isShownByDefault
-					>
-						<SelectControl
-							value={ buttonPosition }
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
-							label={ __( 'Button position' ) }
-							onChange={ ( value ) => {
-								setAttributes( {
-									buttonPosition: value,
-									isSearchFieldHidden:
-										value === 'button-only',
-								} );
-							} }
-							options={ buttonPositionControls }
-						/>
-					</ToolsPanelItem>
-					{ buttonPosition !== 'no-button' && (
-						<ToolsPanelItem
-							hasValue={ () => !! buttonUseIcon }
-							label={ __( 'Use button with icon' ) }
-							onDeselect={ () => {
-								setAttributes( {
-									buttonUseIcon: false,
-								} );
-							} }
-							isShownByDefault
-						>
-							<ToggleControl
-								__nextHasNoMarginBottom
-								checked={ buttonUseIcon }
-								label={ __( 'Use button with icon' ) }
-								onChange={ ( value ) =>
-									setAttributes( {
-										buttonUseIcon: value,
-									} )
+					{ ! hasInstantSearch && (
+						<>
+							<ToolsPanelItem
+								hasValue={ () =>
+									buttonPosition !== 'button-outside'
 								}
-							/>
-						</ToolsPanelItem>
+								label={ __( 'Button position' ) }
+								onDeselect={ () => {
+									setAttributes( {
+										buttonPosition: 'button-outside',
+										isSearchFieldHidden: false,
+									} );
+								} }
+								isShownByDefault
+							>
+								<SelectControl
+									value={ buttonPosition }
+									__next40pxDefaultSize
+									__nextHasNoMarginBottom
+									label={ __( 'Button position' ) }
+									onChange={ ( value ) => {
+										setAttributes( {
+											buttonPosition: value,
+											isSearchFieldHidden:
+												value === 'button-only',
+										} );
+									} }
+									options={ buttonPositionControls }
+								/>
+							</ToolsPanelItem>
+							{ buttonPosition !== 'no-button' && (
+								<ToolsPanelItem
+									hasValue={ () => !! buttonUseIcon }
+									label={ __( 'Use button with icon' ) }
+									onDeselect={ () => {
+										setAttributes( {
+											buttonUseIcon: false,
+										} );
+									} }
+									isShownByDefault
+								>
+									<ToggleControl
+										__nextHasNoMarginBottom
+										checked={ buttonUseIcon }
+										label={ __( 'Use button with icon' ) }
+										onChange={ ( value ) =>
+											setAttributes( {
+												buttonUseIcon: value,
+											} )
+										}
+									/>
+								</ToolsPanelItem>
+							) }
+						</>
 					) }
 					<ToolsPanelItem
 						hasValue={ () => !! width }
@@ -641,16 +655,22 @@ export default function SearchEdit( {
 				} }
 				showHandle={ isSelected }
 			>
-				{ ( isButtonPositionInside ||
-					isButtonPositionOutside ||
-					hasOnlyButton ) && (
+				{ hasInstantSearch ? (
+					renderTextField()
+				) : (
 					<>
-						{ renderTextField() }
-						{ renderButton() }
+						{ ( isButtonPositionInside ||
+							isButtonPositionOutside ||
+							hasOnlyButton ) && (
+							<>
+								{ renderTextField() }
+								{ renderButton() }
+							</>
+						) }
+
+						{ hasNoButton && renderTextField() }
 					</>
 				) }
-
-				{ hasNoButton && renderTextField() }
 			</ResizableBox>
 		</div>
 	);

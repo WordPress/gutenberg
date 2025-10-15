@@ -51,7 +51,12 @@ export default function useBlockDisplayTitle( {
 			}
 
 			const attributes = getBlockAttributes( clientId );
-			const label = getBlockLabel( blockType, attributes, context );
+			const label = getBlockLabel(
+				blockType,
+				attributes,
+				context,
+				clientId
+			);
 			// If the label is defined we prioritize it over a possible block variation title match.
 			if ( label !== blockType.title ) {
 				return label;

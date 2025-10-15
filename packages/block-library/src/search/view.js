@@ -8,6 +8,9 @@ import {
 	withSyncEvent,
 } from '@wordpress/interactivity';
 
+/** @type {( () => void ) | null} */
+let supersedePreviousSearch = null;
+
 const { actions } = store(
 	'core/search',
 	{
@@ -70,6 +73,62 @@ const { actions } = store(
 				) {
 					actions.closeSearchInput();
 				}
+			},
+			*updateSearch( e ) {
+				const { value } = e.target;
+
+				const ctx = getContext();
+
+				// Don't navigate if the search didn't really change.
+				if ( value === ctx.search ) {
+					return;
+				}
+
+				ctx.search = value;
+
+				// Debounce the search by 300ms to prevent multiple navigations.
+				supersedePreviousSearch?.();
+
+				const promise = new Promise( ( resolve, reject ) => {
+					const timeout = setTimeout( resolve, 300 );
+					supersedePreviousSearch = () => {
+						clearTimeout( timeout );
+						reject( new Error( 'Search superseded' ) );
+					};
+				} );
+
+				try {
+					yield promise;
+				} catch ( error ) {
+					// Search was superseded by a newer search, exit early
+					return;
+				}
+
+				const url = new URL( window.location.href );
+
+				if ( value ) {
+					// Set the instant-search parameter using the query ID and search value
+					const queryId = ctx.queryId;
+					url.searchParams.set(
+						`instant-search-${ queryId }`,
+						value
+					);
+
+					// Make sure we reset the pagination.
+					url.searchParams.set( `query-${ queryId }-page`, '1' );
+				} else {
+					// Reset specific search for non-inherited queries
+					url.searchParams.delete(
+						`instant-search-${ ctx.queryId }`
+					);
+					url.searchParams.delete( `query-${ ctx.queryId }-page` );
+				}
+
+				const { actions: routerActions } = yield import(
+					'@wordpress/interactivity-router'
+				);
+
+				routerActions.navigate( url.href );
 			},
 		},
 	},

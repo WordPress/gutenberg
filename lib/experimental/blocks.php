@@ -136,3 +136,36 @@ add_filter(
 	'script_module_data_@wordpress/block-library/form/view',
 	'gutenberg_block_core_form_view_script_module'
 );
+
+/**
+ * Passes the search query param to Query Loop blocks, if the instant search experiment is enabled.
+ *
+ * @param array     $query The query variables.
+ * @param WP_Block  $block Block instance.
+ * @return array Modified query variables.
+ */
+function gutenberg_block_core_query_add_url_filtering( $query, $block ) {
+	// Check if the instant search gutenberg experiment is enabled
+	$gutenberg_experiments  = get_option( 'gutenberg-experiments' );
+	$instant_search_enabled = $gutenberg_experiments && array_key_exists( 'gutenberg-search-query-block', $gutenberg_experiments );
+	if ( ! $instant_search_enabled ) {
+		return $query;
+	}
+
+	// Make sure block has a queryId
+	if ( empty( $block->context['queryId'] ) ) {
+		return $query;
+	}
+
+	// Get the search key from the URL
+	$search_key = 'instant-search-' . $block->context['queryId'];
+	if ( ! isset( $_GET[ $search_key ] ) ) {
+		return $query;
+	}
+
+	// Add the search parameter to the query
+	$query['s'] = sanitize_text_field( $_GET[ $search_key ] );
+
+	return $query;
+}
+add_filter( 'query_loop_block_query_vars', 'gutenberg_block_core_query_add_url_filtering', 10, 2 );

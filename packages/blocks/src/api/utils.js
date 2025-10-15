@@ -174,13 +174,19 @@ export function normalizeBlockType( blockTypeOrName ) {
  * @param {Object} blockType  The block type.
  * @param {Object} attributes The values of the block's attributes.
  * @param {Object} context    The intended use for the label.
+ * @param {string} clientId   The block's client ID.
  *
  * @return {string} The block label.
  */
-export function getBlockLabel( blockType, attributes, context = 'visual' ) {
+export function getBlockLabel(
+	blockType,
+	attributes,
+	context = 'visual',
+	clientId
+) {
 	const { __experimentalLabel: getLabel, title } = blockType;
 
-	const label = getLabel && getLabel( attributes, { context } );
+	const label = getLabel && getLabel( attributes, { context, clientId } );
 
 	if ( ! label ) {
 		return title;
