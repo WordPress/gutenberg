@@ -1,15 +1,16 @@
 <?php
+
 /**
  * Load API functions, register scripts and actions, etc.
  *
  * @package gutenberg
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-	die( 'Silence is golden.' );
+if (! defined('ABSPATH')) {
+	die('Silence is golden.');
 }
 
-define( 'IS_GUTENBERG_PLUGIN', true );
+define('IS_GUTENBERG_PLUGIN', true);
 
 require_once __DIR__ . '/init.php';
 require_once __DIR__ . '/upgrade.php';
@@ -23,15 +24,16 @@ require_once __DIR__ . '/upgrade.php';
  *
  * @return bool True when the experiment is enabled.
  */
-function gutenberg_is_experiment_enabled( $name ) {
-	$experiments = get_option( 'gutenberg-experiments' );
-	return ! empty( $experiments[ $name ] );
+function gutenberg_is_experiment_enabled($name)
+{
+	$experiments = get_option('gutenberg-experiments');
+	return ! empty($experiments[$name]);
 }
 
 // These files only need to be loaded if within a rest server instance.
 // which this class will exist if that is the case.
-if ( class_exists( 'WP_REST_Controller' ) ) {
-	if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
+if (class_exists('WP_REST_Controller')) {
+	if (! class_exists('WP_REST_Block_Editor_Settings_Controller')) {
 		require_once __DIR__ . '/experimental/class-wp-rest-block-editor-settings-controller.php';
 	}
 
@@ -60,7 +62,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 }
 
 // Experimental signaling server.
-if ( ! class_exists( 'Gutenberg_HTTP_Singling_Server' ) ) {
+if (! class_exists('Gutenberg_HTTP_Singling_Server')) {
 	require_once __DIR__ . '/experimental/sync/class-gutenberg-http-signaling-server.php';
 }
 
@@ -84,6 +86,7 @@ require __DIR__ . '/compat/wordpress-6.8/site-preview.php';
 require __DIR__ . '/compat/wordpress-6.9/customizer-preview-custom-css.php';
 require __DIR__ . '/compat/wordpress-6.9/command-palette.php';
 require __DIR__ . '/compat/wordpress-6.9/preload.php';
+require __DIR__ . '/compat/wordpress-6.9/site-editor-redirect.php';
 
 // WordPress 7.0 compat.
 require __DIR__ . '/compat/wordpress-7.0/php-only-blocks.php';
@@ -97,7 +100,7 @@ require __DIR__ . '/experimental/synchronization.php';
 require __DIR__ . '/experimental/script-modules.php';
 require __DIR__ . '/experimental/posts/load.php';
 
-if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
+if (gutenberg_is_experiment_enabled('gutenberg-no-tinymce')) {
 	require __DIR__ . '/experimental/disable-tinymce.php';
 }
 
@@ -133,7 +136,7 @@ require __DIR__ . '/interactivity-api.php';
 require __DIR__ . '/block-template-utils.php';
 
 // Copied package PHP files.
-if ( is_dir( __DIR__ . '/../build/style-engine' ) ) {
+if (is_dir(__DIR__ . '/../build/style-engine')) {
 	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-css-declarations-gutenberg.php';
 	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-css-rule-gutenberg.php';
 	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-css-rules-store-gutenberg.php';
@@ -160,12 +163,12 @@ require __DIR__ . '/block-supports/aria-label.php';
 require __DIR__ . '/block-supports/block-visibility.php';
 
 // Client-side media processing.
-if ( gutenberg_is_experiment_enabled( 'gutenberg-media-processing' ) ) {
+if (gutenberg_is_experiment_enabled('gutenberg-media-processing')) {
 	require_once __DIR__ . '/experimental/media/load.php';
 }
 
 // Interactivity API full-page client-side navigation.
-if ( gutenberg_is_experiment_enabled( 'gutenberg-full-page-client-side-navigation' ) ) {
+if (gutenberg_is_experiment_enabled('gutenberg-full-page-client-side-navigation')) {
 	require __DIR__ . '/experimental/interactivity-api/class-gutenberg-interactivity-api-full-page-navigation.php';
 	Gutenberg_Interactivity_API_Full_Page_Navigation::instance();
 }
