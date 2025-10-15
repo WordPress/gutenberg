@@ -21,9 +21,7 @@ import { getDate, getSettings } from '@wordpress/date';
  */
 import type { DataFormControlProps } from '../types';
 import { OPERATOR_IN_THE_PAST, OPERATOR_OVER } from '../constants';
-import RelativeDateControl, {
-	type DateRelative,
-} from './relative-date-control';
+import RelativeDateControl from './relative-date-control';
 import { unlock } from '../lock-unlock';
 
 const { DateCalendar, ValidatedInputControl } = unlock( componentsPrivateApis );
@@ -253,21 +251,13 @@ export default function DateTime< Item >( {
 	hideLabelFromVision,
 	operator,
 }: DataFormControlProps< Item > ) {
-	const { setValue } = field;
-
-	const onChangeRelativeDateControl = useCallback(
-		( newValue: DateRelative ) =>
-			onChange( setValue( { item: data, value: newValue } ) ),
-		[ data, onChange, setValue ]
-	);
-
 	if ( operator === OPERATOR_IN_THE_PAST || operator === OPERATOR_OVER ) {
 		return (
 			<RelativeDateControl
 				className="dataviews-controls__datetime"
 				data={ data }
 				field={ field }
-				onChange={ onChangeRelativeDateControl }
+				onChange={ onChange }
 				hideLabelFromVision={ hideLabelFromVision }
 				operator={ operator }
 			/>

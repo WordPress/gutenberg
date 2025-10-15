@@ -19,23 +19,9 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { OPERATOR_IN_THE_PAST, OPERATOR_OVER } from '../constants';
-import type { NormalizedField } from '../types';
-
-export type DateRelative = {
-	value?: string | number;
-	unit?: string;
-};
+import type { DataFormControlProps } from '../types';
 
 type VALID_OPERATORS = 'inThePast' | 'over';
-
-interface RelativeDateControlProps< Item > {
-	className?: string;
-	data: Item;
-	field: NormalizedField< Item >;
-	onChange: ( args: DateRelative ) => void;
-	hideLabelFromVision?: boolean;
-	operator: VALID_OPERATORS;
-}
 
 interface TimeUnitOption {
 	value: string;
@@ -64,24 +50,39 @@ export default function RelativeDateControl< Item >( {
 	onChange,
 	hideLabelFromVision,
 	operator,
-}: RelativeDateControlProps< Item > ) {
-	const options: TimeUnitOption[] = TIME_UNITS_OPTIONS[ operator ];
+}: DataFormControlProps< Item > & {
+	className: string;
+} ) {
+	const options: TimeUnitOption[] =
+		TIME_UNITS_OPTIONS[
+			operator === OPERATOR_IN_THE_PAST ? 'inThePast' : 'over'
+		];
 
-	const { id, label, getValue } = field;
+	const { id, label, getValue, setValue } = field;
 	const fieldValue = getValue( { item: data } );
 	const { value: relValue = '', unit = options[ 0 ].value } =
 		fieldValue && typeof fieldValue === 'object' ? fieldValue : {};
 
 	const onChangeValue = useCallback(
 		( newValue: string | undefined ) =>
-			onChange( { value: Number( newValue ), unit } ),
-		[ onChange, unit ]
+			onChange(
+				setValue( {
+					item: data,
+					value: { value: Number( newValue ), unit },
+				} )
+			),
+		[ onChange, setValue, data, unit ]
 	);
 
 	const onChangeUnit = useCallback(
 		( newUnit: string | undefined ) =>
-			onChange( { value: relValue, unit: newUnit } ),
-		[ onChange, relValue ]
+			onChange(
+				setValue( {
+					item: data,
+					value: { value: relValue, unit: newUnit },
+				} )
+			),
+		[ onChange, setValue, data, relValue ]
 	);
 
 	return (
