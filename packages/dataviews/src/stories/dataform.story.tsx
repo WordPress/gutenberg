@@ -1909,6 +1909,13 @@ const LayoutDetailsComponent = () => {
 				children: [ 'tags', 'description' ],
 				layout: { type: 'details' },
 			},
+			{
+				id: 'scheduling',
+				children: [ 'date', 'birthdate' ],
+				layout: {
+					type: 'details',
+				},
+			},
 		],
 	};
 
