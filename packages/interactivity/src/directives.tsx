@@ -928,7 +928,20 @@ export default () => {
 	);
 
 	// data-wp-each-child (internal use only)
-	directive( 'each-child', () => null, { priority: 1 } );
+	directive(
+		'each-child',
+		( { directives: { 'each-child': eachChild }, element, evaluate } ) => {
+			const entry = eachChild.find( isDefaultDirectiveSuffix );
+
+			if ( ! entry ) {
+				return;
+			}
+
+			const iterable = evaluate( entry );
+			return iterable === PENDING_GETTER ? element : null;
+		},
+		{ priority: 1 }
+	);
 
 	// data-wp-router-region
 	directive(
