@@ -53,6 +53,7 @@ test.describe( 'Router styles', () => {
 
 	test.beforeEach( async ( { page, interactivityUtils: utils } ) => {
 		await page.goto( utils.getLink( 'none' ) );
+		await expect( page.getByTestId( 'hydrated' ) ).toBeVisible();
 	} );
 
 	test.afterAll( async ( { interactivityUtils: utils } ) => {
