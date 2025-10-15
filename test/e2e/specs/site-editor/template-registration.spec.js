@@ -53,7 +53,7 @@ test.describe( 'Block template registration', () => {
 
 		// Verify the template contents are rendered in the editor.
 		await page.getByText( 'Plugin Template' ).click();
-		await page.getByRole( 'button', { name: 'Duplicate & Edit' } ).click();
+		await page.getByRole( 'button', { name: 'Duplicate' } ).click();
 		await expect(
 			editor.canvas.getByText( 'This is a plugin-registered template.' )
 		).toBeVisible();
@@ -85,7 +85,7 @@ test.describe( 'Block template registration', () => {
 		} );
 		const resetNotice = page
 			.getByLabel( 'Dismiss this notice' )
-			.getByText( `"Plugin Template" moved to the trash.` );
+			.getByText( `"Plugin Template (Copy)" moved to the trash.` );
 		const savedButton = page.getByRole( 'button', {
 			name: 'Saved',
 		} );
@@ -195,7 +195,7 @@ test.describe( 'Block template registration', () => {
 			'Plugin Template'
 		);
 		await page.getByText( 'Plugin Template' ).click();
-		await page.getByRole( 'button', { name: 'Duplicate & Edit' } ).click();
+		await page.getByRole( 'button', { name: 'Duplicate' } ).click();
 		await expect(
 			editor.canvas.getByText( 'This is a plugin-registered template.' )
 		).toBeVisible();
@@ -219,7 +219,7 @@ test.describe( 'Block template registration', () => {
 		} );
 		const deletedNotice = page
 			.getByLabel( 'Dismiss this notice' )
-			.getByText( `"Plugin Template" moved to the trash.` );
+			.getByText( `"Plugin Template (Copy)" moved to the trash.` );
 		const savedButton = page.getByRole( 'button', {
 			name: 'Saved',
 		} );

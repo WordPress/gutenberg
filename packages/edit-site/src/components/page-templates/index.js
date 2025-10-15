@@ -16,10 +16,7 @@ import { addQueryArgs } from '@wordpress/url';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEvent } from '@wordpress/compose';
 import { useView } from '@wordpress/views';
-import {
-	Button,
-	__experimentalConfirmDialog as ConfirmDialog,
-} from '@wordpress/components';
+import { Button, Modal } from '@wordpress/components';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -281,6 +278,10 @@ export default function PageTemplates() {
 		updateView( newView );
 	} );
 
+	const duplicateAction = actions.find(
+		( action ) => action.id === 'duplicate-post'
+	);
+
 	return (
 		<Page
 			className="edit-site-page-templates"
@@ -315,7 +316,7 @@ export default function PageTemplates() {
 				isItemClickable={ () => true }
 				onClickItem={ ( item ) => {
 					if ( item.type === 'wp_registered_template' ) {
-						setSelectedRegisteredTemplate( item.id );
+						setSelectedRegisteredTemplate( item );
 					} else {
 						history.navigate(
 							`/${ item.type }/${ item.id }?canvas=edit`
@@ -325,22 +326,23 @@ export default function PageTemplates() {
 				selection={ selection }
 				defaultLayouts={ defaultLayouts }
 			/>
-			<ConfirmDialog
-				isOpen={ !! selectedRegisteredTemplate }
-				onConfirm={ () => {
-					setSelectedRegisteredTemplate( false );
-					history.navigate(
-						`/wp_registered_template/${ selectedRegisteredTemplate }?canvas=edit`
-					);
-				} }
-				onCancel={ () => setSelectedRegisteredTemplate() }
-				confirmButtonText={ __( 'Duplicate & Edit' ) }
-				size="small"
-			>
-				{ __(
-					'Do you want to duplicate and edit this bundled template? Changes will not be live until you activate the new template.'
-				) }
-			</ConfirmDialog>
+			{ selectedRegisteredTemplate && duplicateAction && (
+				<Modal
+					title={ __( 'Duplicate' ) }
+					onRequestClose={ () => setSelectedRegisteredTemplate() }
+					size="small"
+				>
+					<duplicateAction.RenderModal
+						items={ [ selectedRegisteredTemplate ] }
+						closeModal={ () => setSelectedRegisteredTemplate() }
+						onActionPerformed={ ( [ item ] ) => {
+							history.navigate(
+								`/${ item.type }/${ item.id }?canvas=edit`
+							);
+						} }
+					/>
+				</Modal>
+			) }
 		</Page>
 	);
 }
