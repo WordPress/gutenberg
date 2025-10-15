@@ -19,6 +19,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { OPERATOR_IN_THE_PAST, OPERATOR_OVER } from '../constants';
+import type { NormalizedField } from '../types';
 
 export type DateRelative = {
 	value?: string | number;
@@ -27,13 +28,12 @@ export type DateRelative = {
 
 type VALID_OPERATORS = 'inThePast' | 'over';
 
-interface RelativeDateControlProps {
-	id: string;
-	value: DateRelative;
-	onChange: ( args: DateRelative ) => void;
-	label: string;
-	hideLabelFromVision?: boolean;
+interface RelativeDateControlProps< Item > {
 	className?: string;
+	data: Item;
+	field: NormalizedField< Item >;
+	onChange: ( args: DateRelative ) => void;
+	hideLabelFromVision?: boolean;
 	operator: VALID_OPERATORS;
 }
 
@@ -57,17 +57,20 @@ const TIME_UNITS_OPTIONS: Record< VALID_OPERATORS, TimeUnitOption[] > = {
 	],
 };
 
-export default function RelativeDateControl( {
-	id,
-	value,
+export default function RelativeDateControl< Item >( {
+	className,
+	data,
+	field,
 	onChange,
-	label,
 	hideLabelFromVision,
 	operator,
-	className,
-}: RelativeDateControlProps ) {
+}: RelativeDateControlProps< Item > ) {
 	const options: TimeUnitOption[] = TIME_UNITS_OPTIONS[ operator ];
-	const { value: relValue = '', unit = options[ 0 ].value } = value;
+
+	const { id, label, getValue } = field;
+	const fieldValue = getValue( { item: data } );
+	const { value: relValue = '', unit = options[ 0 ].value } =
+		fieldValue && typeof fieldValue === 'object' ? fieldValue : {};
 
 	const onChangeValue = useCallback(
 		( newValue: string | undefined ) =>

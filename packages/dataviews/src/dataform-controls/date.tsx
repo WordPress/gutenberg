@@ -642,8 +642,7 @@ export default function DateControl< Item >( {
 	hideLabelFromVision,
 	operator,
 }: DataFormControlProps< Item > ) {
-	const { id, label, getValue, setValue } = field;
-	const value = getValue( { item: data } );
+	const { setValue } = field;
 
 	const onChangeRelativeDateControl = useCallback(
 		( newValue: DateRelative ) => {
@@ -656,10 +655,9 @@ export default function DateControl< Item >( {
 		return (
 			<RelativeDateControl
 				className="dataviews-controls__date"
-				id={ id }
-				value={ value && typeof value === 'object' ? value : {} }
+				data={ data }
+				field={ field }
 				onChange={ onChangeRelativeDateControl }
-				label={ label }
 				hideLabelFromVision={ hideLabelFromVision }
 				operator={ operator }
 			/>
