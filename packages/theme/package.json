@@ -41,6 +41,7 @@
 	"sideEffects": false,
 	"dependencies": {
 		"@wordpress/element": "file:../element",
+		"@wordpress/private-apis": "file:../private-apis",
 		"colorjs.io": "^0.5.2"
 	},
 	"peerDependencies": {

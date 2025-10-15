@@ -6,7 +6,7 @@ import { render } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import { ThemeProvider } from '../index';
+import { ThemeProvider } from '../theme-provider';
 
 const NestingDebug = ( { bg = '', primary = '' } ) => (
 	<div
