@@ -93,7 +93,7 @@ export function createSyncManager(): SyncManager {
 				return;
 			}
 
-			updateEntityRecord( objectType, objectId );
+			void updateEntityRecord( objectType, objectId );
 		};
 
 		const entityState: EntityState = {
@@ -161,11 +161,15 @@ export function createSyncManager(): SyncManager {
 	): void {
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
-		const syncConfig = entityState?.syncConfig;
-		const ydoc = entityState?.ydoc;
 
-		ydoc?.transact( () => {
-			syncConfig?.applyChangesToCRDTDoc( ydoc, changes );
+		if ( ! entityState ) {
+			return;
+		}
+
+		const { syncConfig, ydoc } = entityState;
+
+		ydoc.transact( () => {
+			syncConfig.applyChangesToCRDTDoc( ydoc, changes );
 		}, origin );
 	}
 
@@ -176,10 +180,10 @@ export function createSyncManager(): SyncManager {
 	 * @param {ObjectType} objectType Object type of record to update.
 	 * @param {ObjectID}   objectId   Object ID of record to update.
 	 */
-	function updateEntityRecord(
+	async function updateEntityRecord(
 		objectType: ObjectType,
 		objectId: ObjectID
-	): void {
+	): Promise< void > {
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
 
@@ -190,8 +194,11 @@ export function createSyncManager(): SyncManager {
 		const { handlers, syncConfig, ydoc } = entityState;
 
 		// Determine which synced properties have actually changed by comparing
-		// them against the current entity record.
-		const changes = syncConfig.getChangesFromCRDTDoc( ydoc );
+		// them against the current edited entity record.
+		const changes = syncConfig.getChangesFromCRDTDoc(
+			ydoc,
+			await handlers.getEditedRecord()
+		);
 
 		// This is a good spot to debug to see which changes are being synced. Note
 		// that `blocks` will always appear in the changes, but will only result

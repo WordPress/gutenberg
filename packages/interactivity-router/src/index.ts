@@ -15,7 +15,6 @@ import {
 } from './assets/script-modules';
 
 const {
-	directivePrefix,
 	getRegionRootFragment,
 	initialVdom,
 	toVdom,
@@ -29,8 +28,8 @@ const {
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
 );
 
-const regionAttr = `data-${ directivePrefix }-router-region`;
-const interactiveAttr = `data-${ directivePrefix }-interactive`;
+const regionAttr = `data-wp-router-region`;
+const interactiveAttr = `data-wp-interactive`;
 const regionsSelector = `[${ interactiveAttr }][${ regionAttr }], [${ interactiveAttr }] [${ interactiveAttr }][${ regionAttr }]`;
 
 export interface NavigateOptions {

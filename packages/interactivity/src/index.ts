@@ -9,7 +9,6 @@ import { batch } from '@preact/signals';
  */
 import registerDirectives, { routerRegions } from './directives';
 import { init, getRegionRootFragment, initialVdom } from './init';
-import { directivePrefix } from './constants';
 import { toVdom } from './vdom';
 import { directive } from './hooks';
 import { getNamespace } from './namespaces';
@@ -44,7 +43,6 @@ const requiredConsent =
 export const privateApis = ( lock ): any => {
 	if ( lock === requiredConsent ) {
 		return {
-			directivePrefix,
 			getRegionRootFragment,
 			initialVdom,
 			toVdom,

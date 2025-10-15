@@ -34,33 +34,45 @@ function CollabSidebarContent( {
 	styles,
 	comments,
 	commentSidebarRef,
+	reflowComments,
+	commentLastUpdated,
+	isFloating = false,
 } ) {
-	const { onCreate, onEdit, onDelete } = useBlockCommentsActions();
+	const { onCreate, onEdit, onDelete } =
+		useBlockCommentsActions( reflowComments );
 
 	return (
-		<div
+		<VStack
 			className="editor-collab-sidebar-panel"
 			style={ styles }
-			ref={ commentSidebarRef }
+			role="list"
+			spacing="3"
+			ref={ ( node ) => {
+				// Keeps the ref fresh when switching between floating and pinned sidebar.
+				commentSidebarRef.current = node;
+			} }
 		>
-			<VStack role="list" spacing="3">
+			{ ! isFloating && (
 				<AddComment
 					onSubmit={ onCreate }
 					showCommentBoard={ showCommentBoard }
 					setShowCommentBoard={ setShowCommentBoard }
 					commentSidebarRef={ commentSidebarRef }
 				/>
-				<Comments
-					threads={ comments }
-					onEditComment={ onEdit }
-					onAddReply={ onCreate }
-					onCommentDelete={ onDelete }
-					showCommentBoard={ showCommentBoard }
-					setShowCommentBoard={ setShowCommentBoard }
-					commentSidebarRef={ commentSidebarRef }
-				/>
-			</VStack>
-		</div>
+			) }
+			<Comments
+				threads={ comments }
+				onEditComment={ onEdit }
+				onAddReply={ onCreate }
+				onCommentDelete={ onDelete }
+				showCommentBoard={ showCommentBoard }
+				setShowCommentBoard={ setShowCommentBoard }
+				commentSidebarRef={ commentSidebarRef }
+				reflowComments={ reflowComments }
+				commentLastUpdated={ commentLastUpdated }
+				isFloating={ isFloating }
+			/>
+		</VStack>
 	);
 }
 
@@ -84,15 +96,19 @@ export default function CollabSidebar() {
 	const blockCommentId = useSelect( ( select ) => {
 		const { getBlockAttributes, getSelectedBlockClientId } =
 			select( blockEditorStore );
-		const _clientId = getSelectedBlockClientId();
-
-		return _clientId
-			? getBlockAttributes( _clientId )?.metadata?.commentId
+		const clientId = getSelectedBlockClientId();
+		return clientId
+			? getBlockAttributes( clientId )?.metadata?.commentId
 			: null;
 	}, [] );
 
-	const { resultComments, unresolvedSortedThreads, totalPages } =
-		useBlockComments( postId );
+	const {
+		resultComments,
+		unresolvedSortedThreads,
+		totalPages,
+		reflowComments,
+		commentLastUpdated,
+	} = useBlockComments( postId );
 	useEnableFloatingSidebar( resultComments.length > 0 );
 
 	const hasMoreComments = totalPages && totalPages > 1;
@@ -143,16 +159,17 @@ export default function CollabSidebar() {
 			<AddCommentMenuItem onClick={ openTheSidebar } />
 			<PluginSidebar
 				identifier={ collabHistorySidebarName }
-				// translators: Comments sidebar title
-				title={ __( 'Comments' ) }
+				title={ __( 'Notes' ) }
 				icon={ commentIcon }
-				closeLabel={ __( 'Close Comments' ) }
+				closeLabel={ __( 'Close Notes' ) }
 			>
 				<CollabSidebarContent
 					comments={ resultComments }
 					showCommentBoard={ showCommentBoard }
 					setShowCommentBoard={ setShowCommentBoard }
 					commentSidebarRef={ commentSidebarRef }
+					reflowComments={ reflowComments }
+					commentLastUpdated={ commentLastUpdated }
 				/>
 			</PluginSidebar>
 			{ isLargeViewport && unresolvedSortedThreads.length > 0 && (
@@ -162,15 +179,19 @@ export default function CollabSidebar() {
 					identifier={ collabSidebarName }
 					className="editor-collab-sidebar"
 					headerClassName="editor-collab-sidebar__header"
+					backgroundColor={ backgroundColor }
 				>
 					<CollabSidebarContent
 						comments={ unresolvedSortedThreads }
 						showCommentBoard={ showCommentBoard }
 						setShowCommentBoard={ setShowCommentBoard }
 						commentSidebarRef={ commentSidebarRef }
+						reflowComments={ reflowComments }
+						commentLastUpdated={ commentLastUpdated }
 						styles={ {
 							backgroundColor,
 						} }
+						isFloating
 					/>
 				</PluginSidebar>
 			) }

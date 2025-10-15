@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 body.js.is-fullscreen-mode {
 
 	@include break-medium {

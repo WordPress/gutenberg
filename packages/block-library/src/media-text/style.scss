@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/breakpoints" as *;
+
 .wp-block-media-text {
 	// This block's direction should not be manipulated by rtl, as the mediaPosition control does.
 	/*!rtl:begin:ignore*/

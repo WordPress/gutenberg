@@ -14,7 +14,7 @@ function gutenberg_block_comment_add_post_type_support() {
 		}
 
 		$supports        = get_all_post_type_supports( $post_type );
-		$editor_supports = array( 'block-comments' => true );
+		$editor_supports = array( 'notes' => true );
 
 		// `add_post_type_support()` doesn't merge support sub-properties, so we explicitly merge it here.
 		if ( is_array( $supports['editor'] ) && isset( $supports['editor'][0] ) && is_array( $supports['editor'][0] ) ) {
@@ -27,9 +27,34 @@ function gutenberg_block_comment_add_post_type_support() {
 add_action( 'init', 'gutenberg_block_comment_add_post_type_support' );
 
 /**
+ * Register comment metadata for block comment status.
+ */
+function gutenberg_register_block_comment_metadata() {
+	register_meta(
+		'comment',
+		'_wp_note_status',
+		array(
+			'type'          => 'string',
+			'description'   => __( 'Note resolution status', 'gutenberg' ),
+			'single'        => true,
+			'show_in_rest'  => array(
+				'schema' => array(
+					'type' => 'string',
+					'enum' => array( 'resolved', 'reopen' ),
+				),
+			),
+			'auth_callback' => function ( $allowed, $meta_key, $object_id ) {
+				return current_user_can( 'edit_comment', $object_id );
+			},
+		)
+	);
+}
+add_action( 'init', 'gutenberg_register_block_comment_metadata' );
+
+/**
  * Updates the comment type for avatars in the WordPress REST API.
  *
- * This function adds the 'block_comment' type to the list of comment types
+ * This function adds the 'note' type to the list of comment types
  * for which avatars should be retrieved in the WordPress REST API.
  *
  * @param array $comment_type The array of comment types.
@@ -37,7 +62,7 @@ add_action( 'init', 'gutenberg_block_comment_add_post_type_support' );
  */
 if ( ! function_exists( 'update_get_avatar_comment_type' ) ) {
 	function update_get_avatar_comment_type( $comment_type ) {
-		$comment_type[] = 'block_comment';
+		$comment_type[] = 'note';
 		return $comment_type;
 	}
 	add_filter( 'get_avatar_comment_types', 'update_get_avatar_comment_type' );
@@ -46,7 +71,7 @@ if ( ! function_exists( 'update_get_avatar_comment_type' ) ) {
 /**
  * Excludes block comments from the admin comments query.
  *
- * This function modifies the comments query to exclude comments of type 'block_comment'
+ * This function modifies the comments query to exclude comments of type 'note'
  * when the query is for comments in the WordPress admin.
  *
  * @global wpdb $wpdb WordPress database abstraction object.
@@ -63,7 +88,7 @@ if ( ! function_exists( 'exclude_block_comments_from_admin' ) ) {
 			$query->set( 'type', '' );
 
 			global $wpdb;
-			$clauses['where'] .= " AND {$wpdb->comments}.comment_type != 'block_comment'";
+			$clauses['where'] .= " AND {$wpdb->comments}.comment_type != 'note'";
 		}
 
 		return $clauses;
@@ -83,10 +108,28 @@ if ( ! function_exists( 'exclude_block_comments_from_admin' ) ) {
 function gutenberg_filter_comment_count_query_exclude_block_comments( $query ) {
 	// Adjust the query if it is a comment count query.
 	if ( str_starts_with( $query, 'SELECT comment_post_ID, COUNT(comment_ID) as num_comments FROM' ) && str_contains( $query, 'comment_approved' ) ) {
-		if ( ! str_contains( $query, "comment_type != 'block_comment'" ) ) {
-			$query = str_replace( 'comment_approved', "comment_type != 'block_comment' AND comment_approved", $query );
+		if ( ! str_contains( $query, "comment_type != 'note'" ) ) {
+			$query = str_replace( 'comment_approved', "comment_type != 'note' AND comment_approved", $query );
 		}
 	}
 	return $query;
 }
 add_filter( 'query', 'gutenberg_filter_comment_count_query_exclude_block_comments' );
+
+/**
+ * Allows duplicate block comment.
+ *
+ * @since 6.9.0
+ *
+ * @param int $dupe_id The duplicate comment ID.
+ * @param array $commentdata The comment data.
+ *
+ * @return int ID of the comment identified as a duplicate.
+ */
+function gutenberg_allow_duplicate_note_resolution( $dupe_id, $commentdata ) {
+	if ( isset( $commentdata['comment_type'] ) && 'note' === $commentdata['comment_type'] ) {
+		return false;
+	}
+	return $dupe_id;
+}
+add_filter( 'duplicate_comment_id', 'gutenberg_allow_duplicate_note_resolution', 10, 2 );

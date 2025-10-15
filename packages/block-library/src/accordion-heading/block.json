@@ -57,7 +57,8 @@
 			}
 		},
 		"shadow": true,
-		"blockVisibility": false
+		"blockVisibility": false,
+		"lock": false
 	},
 	"selectors": {
 		"typography": {

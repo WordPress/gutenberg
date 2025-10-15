@@ -359,7 +359,7 @@ async function runPerformanceTests( branches, options ) {
 		//     5.7   -> 5.7   (unchanged)
 		//     5.7.0 -> 5.7   (changed)
 		//     5.7.2 -> 5.7.2 (unchanged)
-		const zipVersion = options.wpVersion.replace( /^(\d+\.\d+).0/, '$1' );
+		const zipVersion = options.wpVersion.replace( /^(\d+\.\d+)\.0$/, '$1' );
 		wpZipUrl = `https://wordpress.org/wordpress-${ zipVersion }.zip`;
 	}
 

@@ -34,11 +34,8 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$separator        = isset( $attributes['separator'] ) ? $attributes['separator'] : '/';
-	$show_home_link   = isset( $attributes['showHomeLink'] ) ? $attributes['showHomeLink'] : true;
 	$breadcrumb_items = array();
-
-	if ( $show_home_link ) {
+	if ( $attributes['showHomeLink'] ) {
 		$breadcrumb_items[] = sprintf(
 			'<a href="%s">%s</a>',
 			esc_url( home_url() ),
@@ -58,10 +55,10 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 	}
 
 	// Add current post title (not linked).
-	$breadcrumb_items[] = sprintf( '<span>%s</span>', get_the_title( $post ) );
+	$breadcrumb_items[] = sprintf( '<span aria-current="page">%s</span>', get_the_title( $post ) );
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
-			'style'      => '--separator: "' . addcslashes( $separator, '\\"' ) . '";',
+			'style'      => '--separator: "' . addcslashes( $attributes['separator'], '\\"' ) . '";',
 			'aria-label' => __( 'Breadcrumbs' ),
 		)
 	);

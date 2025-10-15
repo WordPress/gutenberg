@@ -31,6 +31,12 @@
 		"replace-polyfills.js"
 	],
 	"main": "index.js",
+	"exports": {
+		".": {
+			"default": "./index.js"
+		},
+		"./package.json": "./package.json"
+	},
 	"dependencies": {
 		"@babel/core": "7.25.7",
 		"@babel/plugin-syntax-import-attributes": "7.26.0",
@@ -38,7 +44,6 @@
 		"@babel/plugin-transform-runtime": "7.25.7",
 		"@babel/preset-env": "7.25.7",
 		"@babel/preset-typescript": "7.25.7",
-		"@babel/runtime": "7.25.7",
 		"@wordpress/browserslist-config": "file:../browserslist-config",
 		"@wordpress/warning": "file:../warning",
 		"browserslist": "^4.21.10",

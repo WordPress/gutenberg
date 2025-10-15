@@ -18,7 +18,7 @@
 				"orderBy": "name",
 				"hideEmpty": true,
 				"parent": false,
-				"hierarchical": false,
+				"showNested": false,
 				"inherit": false
 			}
 		},
@@ -27,6 +27,7 @@
 			"default": "div"
 		}
 	},
+	"usesContext": [ "templateSlug" ],
 	"providesContext": {
 		"termQuery": "termQuery"
 	},
