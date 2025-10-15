@@ -709,11 +709,6 @@ export const saveEntityRecord =
 							),
 						};
 					}
-					// Unless there is no persisted record, set the status to
-					// publish.
-					if ( name === 'wp_template' && persistedRecord ) {
-						edits.status = 'publish';
-					}
 					updatedRecord = await __unstableFetch( {
 						path,
 						method: recordId ? 'PUT' : 'POST',
