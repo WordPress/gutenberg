@@ -53,6 +53,7 @@ test.describe( 'Block template registration', () => {
 
 		// Verify the template contents are rendered in the editor.
 		await page.getByText( 'Plugin Template' ).click();
+		await page.getByRole( 'button', { name: 'Duplicate & Edit' } ).click();
 		await expect(
 			editor.canvas.getByText( 'This is a plugin-registered template.' )
 		).toBeVisible();
@@ -194,6 +195,7 @@ test.describe( 'Block template registration', () => {
 			'Plugin Template'
 		);
 		await page.getByText( 'Plugin Template' ).click();
+		await page.getByRole( 'button', { name: 'Duplicate & Edit' } ).click();
 		await expect(
 			editor.canvas.getByText( 'This is a plugin-registered template.' )
 		).toBeVisible();

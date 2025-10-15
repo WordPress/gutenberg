@@ -22,6 +22,7 @@ test.describe( 'Site editor browser history', () => {
 		await page
 			.locator( '.fields-field__title', { hasText: 'Index' } )
 			.click();
+		await page.getByRole( 'button', { name: 'Duplicate & Edit' } ).click();
 		await expect( page ).toHaveURL(
 			'/wp-admin/site-editor.php?p=%2Fwp_registered_template%2Femptytheme%2F%2Findex&canvas=edit'
 		);
