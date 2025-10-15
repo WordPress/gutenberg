@@ -18,6 +18,7 @@ import {
 	ToolbarItem,
 	DropdownMenu,
 	Popover,
+	CheckboxControl,
 } from '@wordpress/components';
 import {
 	useMergeRefs,
@@ -289,6 +290,7 @@ export default function Image( {
 	const [ resizeDelta, setResizeDelta ] = useState( null );
 	const [ pixelSize, setPixelSize ] = useState( {} );
 	const [ offsetTop, setOffsetTop ] = useState( 0 );
+	const [ isDecorativeImage, setIsDecorativeImage ] = useState( false );
 	const setResizeObserved = useResizeObserver( ( [ entry ] ) => {
 		if ( ! resizeDelta ) {
 			const [ box ] = entry.borderBoxSize;
@@ -425,6 +427,11 @@ export default function Image( {
 
 	function onSetHref( props ) {
 		setAttributes( props );
+	}
+
+	function onSetDecorativeImage( props ) {
+		setIsDecorativeImage(props)
+		alt && updateAlt('')
 	}
 
 	function onSetLightbox( enable ) {
@@ -829,12 +836,17 @@ export default function Image( {
 											</ExternalLink>
 											<br />
 											{ __(
-												'Leave empty if decorative.'
+												'Leave empty and check below if decorative.'
 											) }
 										</>
 									)
 								}
 								__nextHasNoMarginBottom
+							/>
+							<CheckboxControl
+								label= { __('This is a decorative image.') }
+								checked={ isDecorativeImage }
+								onChange={ onSetDecorativeImage }
 							/>
 						</ToolsPanelItem>
 					) }
@@ -936,6 +948,7 @@ export default function Image( {
 						objectFit: scale,
 						...borderProps.style,
 						...shadowProps.style,
+						border: !isDecorativeImage && !alt && '5px solid red',
 					} }
 				/>
 				{ temporaryURL && <Spinner /> }
