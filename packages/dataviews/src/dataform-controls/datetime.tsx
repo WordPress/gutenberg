@@ -21,7 +21,7 @@ import { getDate, getSettings } from '@wordpress/date';
  */
 import type { DataFormControlProps } from '../types';
 import { OPERATOR_IN_THE_PAST, OPERATOR_OVER } from '../constants';
-import RelativeDateControl from './relative-date-control';
+import RelativeDateControl from './utils/relative-date-control';
 import { unlock } from '../lock-unlock';
 
 const { DateCalendar, ValidatedInputControl } = unlock( componentsPrivateApis );

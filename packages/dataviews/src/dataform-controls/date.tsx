@@ -39,7 +39,7 @@ import deepMerge from 'deepmerge';
 /**
  * Internal dependencies
  */
-import RelativeDateControl from './relative-date-control';
+import RelativeDateControl from './utils/relative-date-control';
 import {
 	OPERATOR_IN_THE_PAST,
 	OPERATOR_OVER,

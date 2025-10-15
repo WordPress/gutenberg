@@ -18,8 +18,8 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { OPERATOR_IN_THE_PAST, OPERATOR_OVER } from '../constants';
-import type { DataFormControlProps } from '../types';
+import { OPERATOR_IN_THE_PAST, OPERATOR_OVER } from '../../constants';
+import type { DataFormControlProps } from '../../types';
 
 type VALID_OPERATORS = 'inThePast' | 'over';
 
