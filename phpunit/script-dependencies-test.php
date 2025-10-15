@@ -36,8 +36,7 @@ class Test_Script_Dependencies extends WP_UnitTestCase {
 		// This list should get smaller over time as we remove `wp-polyfill` dependencies.
 		// If the list update is intentional, please add a comment explaining why.
 		$expected = array(
-			'react',
-			'wp-edit-site',
+			'react'
 		);
 
 		$this->assertEqualSets( $expected, $dependents );
