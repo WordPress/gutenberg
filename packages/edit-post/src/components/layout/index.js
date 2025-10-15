@@ -55,6 +55,7 @@ import {
 	useRefEffect,
 	useViewportMatch,
 } from '@wordpress/compose';
+import { focus } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -258,6 +259,45 @@ function MetaBoxesMain( { isLegacy } ) {
 		}
 	}, [ isShort ] );
 
+	const focusOnExpandRef = useRef( false );
+	const updateLinerTabbabilityRef = useRef();
+	// Makes the pane’s content wrapper tabbable or not per its overflow and
+	// moves focus to either the scrollable liner or its first tabbable element
+	// when expanded if queued by the toggle button. The focus management is
+	// only helpful because the toggle doesn't directly precede the content in
+	// the DOM and should likely be removed if the following issue is resolved:
+	// https://github.com/WordPress/gutenberg/issues/66436
+	const linerTabbableEffect = useRefEffect( ( node ) => {
+		updateLinerTabbabilityRef.current = () => {
+			const hasOverflow = node.scrollHeight > node.clientHeight;
+			if ( hasOverflow ) {
+				node.tabIndex = 0;
+			} else {
+				node.removeAttribute( 'tabindex' );
+			}
+			return hasOverflow;
+		};
+		const markupSpy = new window.MutationObserver( () => {
+			if ( ! node.hasAttribute( 'hidden' ) ) {
+				const hasOverflow = updateLinerTabbabilityRef.current();
+				if ( focusOnExpandRef.current ) {
+					focusOnExpandRef.current = false;
+					( hasOverflow
+						? node
+						: focus.tabbable.findNext( node )
+					)?.focus();
+				}
+			}
+		} );
+		markupSpy.observe( node, {
+			subtree: true,
+			childList: true,
+			// The class attribute catches when individual meta boxes are toggled.
+			attributeFilter: [ 'hidden', 'class' ],
+		} );
+		return () => markupSpy.disconnect();
+	}, [] );
+
 	if ( ! hasAnyVisible ) {
 		return;
 	}
@@ -267,6 +307,7 @@ function MetaBoxesMain( { isLegacy } ) {
 			// The class name 'edit-post-layout__metaboxes' is retained because some plugins use it.
 			className="edit-post-layout__metaboxes edit-post-meta-boxes-main__liner"
 			hidden={ ! isLegacy && ! isOpen }
+			ref={ ! isLegacy && linerTabbableEffect }
 		>
 			<MetaBoxes location="normal" />
 			<MetaBoxes location="advanced" />
@@ -306,11 +347,15 @@ function MetaBoxesMain( { isLegacy } ) {
 			aria-expanded={ isOpen }
 			onClick={ ( { detail } ) => {
 				const { isToggleInferred } = resizeDataRef.current;
-				if ( isShort || ! detail || isToggleInferred ) {
+				const isKeyboard = ! detail;
+				if ( isShort || isKeyboard || isToggleInferred ) {
 					persistIsOpen();
 					const usedOpenHeight = isShort ? 'auto' : openHeight;
 					const usedHeight = isOpen ? min : usedOpenHeight;
 					applyHeight( usedHeight, false, true );
+					if ( ! isOpen && isKeyboard ) {
+						focusOnExpandRef.current = true;
+					}
 				}
 			} }
 			// Prevents resizing in short viewports.
@@ -404,6 +449,7 @@ function MetaBoxesMain( { isLegacy } ) {
 				if ( nextIsOpen ) {
 					applyHeight( height, true );
 				}
+				updateLinerTabbabilityRef.current();
 			}
 		},
 	} );

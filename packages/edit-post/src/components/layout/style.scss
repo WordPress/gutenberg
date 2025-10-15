@@ -1,4 +1,9 @@
 .edit-post-meta-boxes-main {
+	--wp-edit-post-meta-boxes-main-presenter-height: #{$button-size-compact};
+	// Enlarge the toggle/resizable hit area on touch devices.
+	@media (pointer: coarse) {
+		--wp-edit-post-meta-boxes-main-presenter-height: #{$button-size};
+	}
 	filter: drop-shadow(0 -1px rgba($color: #000, $alpha: 0.133)); // 0.133 = $gray-200 but with alpha.
 	// Windows High Contrast mode will show this outline, but not the shadow.
 	outline: 1px solid transparent;
@@ -6,7 +11,7 @@
 	display: flex;
 	flex-direction: column;
 	overflow: hidden;
-	padding-block-start: $button-size-compact;
+	padding-block-start: var(--wp-edit-post-meta-boxes-main-presenter-height);
 }
 
 .edit-post-meta-boxes-main__presenter {
@@ -19,7 +24,7 @@
 	// and this has to appear in front of it or else click events will be blocked on touch devices.
 	z-index: 10000;
 	inset: 0 0 auto;
-	height: $button-size-compact;
+	height: var(--wp-edit-post-meta-boxes-main-presenter-height);
 
 	// Style reset for both toggle and separator buttons.
 	> button {
@@ -83,16 +88,6 @@
 	}
 }
 
-// Enlarge the toggle/resizable hit area on touch devices.
-@media (pointer: coarse) {
-	.edit-post-meta-boxes-main {
-		padding-block-start: $button-size;
-	}
-	.edit-post-meta-boxes-main__presenter {
-		height: $button-size;
-	}
-}
-
 .edit-post-meta-boxes-main__liner {
 	// Enable scrolling only for the split view.
 	.edit-post-meta-boxes-main & {
@@ -100,6 +95,17 @@
 	}
 	// Keep the contents behind the resize handle.
 	isolation: isolate;
+
+	&:focus-visible::after {
+		content: "";
+		position: absolute;
+		inset: calc(1px + var(--wp-edit-post-meta-boxes-main-presenter-height)) 0 0;
+		pointer-events: none;
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		// Windows High Contrast mode will show this outline, but not the box-shadow.
+		outline: 2px solid transparent;
+		outline-offset: -2px;
+	}
 
 	// While resizing override hidden attribute in case starting from closed state.
 	.is-resizing.edit-post-meta-boxes-main & {
