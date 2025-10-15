@@ -45,9 +45,8 @@ function gutenberg_maintain_templates_routes() {
 				// templates controller, so we need to check if the id is an
 				// integer to make sure it's the proper post type endpoint.
 				if ( ! is_int( $post_arr['id'] ) ) {
-					// See _build_block_template_result_from_file, registered
-					// templates always set the theme to the active theme.
-					return get_stylesheet();
+					$template = get_block_template( $post_arr['id'], 'wp_template' );
+					return $template ? $template->theme : null;
 				}
 				$terms = get_the_terms( $post_arr['id'], 'wp_theme' );
 				if ( is_wp_error( $terms ) || empty( $terms ) ) {
