@@ -16,13 +16,21 @@ wp_interactivity_state(
 wp_interactivity_state(
 	'test/deferred-store/derived-state',
 	array(
-		'value'   => function () {
+		'value'                   => function () {
 			$context = wp_interactivity_get_context( 'test/deferred-store/derived-state' );
 			return 'bind-' . $context['counter'];
 		},
-		'below10' => function () {
+		'below10'                 => function () {
 			$context = wp_interactivity_get_context( 'test/deferred-store/derived-state' );
 			return $context['counter'] < 10;
+		},
+		'redOrGreen'              => function () {
+			$context = wp_interactivity_get_context( 'test/deferred-store/derived-state' );
+			return $context['isReady'] ? 'rgb(0, 255, 0)' : 'rgb(255, 0, 0)';
+		},
+		'derivedText'             => function () {
+			$context = wp_interactivity_get_context( 'test/deferred-store/derived-state' );
+			return $context['isReady'] ? 'client-updated text' : 'server-rendered text';
 		},
 		'radiotelephonicAlphabet' => function () {
 			$context = wp_interactivity_get_context( 'test/deferred-store/derived-state' );
@@ -52,6 +60,8 @@ add_filter(
 			'test/deferred-store/derived-state' => array(
 				'state.value',
 				'state.below10',
+				'state.redOrGreen',
+				'state.derivedText',
 				'state.radiotelephonicAlphabet',
 			),
 		);
@@ -106,6 +116,23 @@ add_filter(
 		data-testid="derived-class-element"
 	>NaN</output>
 	<button data-wp-on--click="actions.increment" data-testid="derived-class-increment">+</button>
+</div>
+
+<div data-wp-interactive="test/deferred-store/derived-state" data-wp-context='{"isReady": false}'>
+	<output
+		style="color:red;"
+		data-wp-style--color="state.redOrGreen"
+		data-testid="derived-style-element"
+	>Style</output>
+	<button data-wp-on--click="actions.setReady" data-testid="derived-style-ready">Set ready</button>
+</div>
+
+<div data-wp-interactive="test/deferred-store/derived-state" data-wp-context='{"isReady": false}'>
+	<output
+		data-wp-text="state.derivedText"
+		data-testid="derived-text-element"
+	>server-rendered text</output>
+	<button data-wp-on--click="actions.setReady" data-testid="derived-text-update">Update</button>
 </div>
 
 <div data-wp-interactive="test/deferred-store/derived-state" data-wp-context='{"list": ["a", "b", "c"]}'>

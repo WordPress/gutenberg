@@ -52,7 +52,7 @@ test.describe( 'deferred store', () => {
 		await expect( stateDouble ).toHaveText( '6' );
 	} );
 
-	test( 'Ensure bind keeps the value of a derived state props from deferred store', async ( {
+	test( 'Ensure wp-bind keeps the value of a derived state props from deferred store', async ( {
 		page,
 	} ) => {
 		const load = page.getByTestId( 'derived-state-load' );
@@ -86,7 +86,7 @@ test.describe( 'deferred store', () => {
 		await expect( value2 ).toHaveValue( 'bind-43' );
 	} );
 
-	test( 'Ensure class keeps the value of a derived state props from deferred store', async ( {
+	test( 'Ensure wp-class keeps the value of a derived state props from deferred store', async ( {
 		page,
 	} ) => {
 		const load = page.getByTestId( 'derived-state-load' );
@@ -113,6 +113,64 @@ test.describe( 'deferred store', () => {
 		await increment.click();
 		await expect( loaded ).toBeVisible();
 		await expect( element ).not.toHaveClass( 'below-10' );
+	} );
+
+	test( 'Ensure wp-style keeps the value of a derived state props from deferred store', async ( {
+		page,
+	} ) => {
+		const load = page.getByTestId( 'derived-state-load' );
+		const loaded = page.getByTestId( 'derived-state-loaded' );
+		const hydrated = page.getByTestId( 'derived-state-hydrated' );
+		const setReady = page.getByTestId( 'derived-style-ready' );
+		const element = page.getByTestId( 'derived-style-element' );
+
+		await expect( hydrated ).toBeVisible();
+		await expect( loaded ).toBeHidden();
+		await expect( element ).toHaveCSS( 'color', 'rgb(255, 0, 0)' );
+
+		// The `setReady` button doesn't work yet; nothing changes.
+		await setReady.click();
+		await expect( loaded ).toBeHidden();
+		await expect( element ).toHaveCSS( 'color', 'rgb(255, 0, 0)' );
+
+		// The element color is maintained according to the computed getter.
+		await load.click();
+		await expect( loaded ).toBeVisible();
+		await expect( element ).toHaveCSS( 'color', 'rgb(255, 0, 0)' );
+
+		// The button works, and the color updated.
+		await setReady.click();
+		await expect( loaded ).toBeVisible();
+		await expect( element ).toHaveCSS( 'color', 'rgb(0, 255, 0)' );
+	} );
+
+	test( 'Ensure wp-text keeps the value of a derived state props from deferred store', async ( {
+		page,
+	} ) => {
+		const load = page.getByTestId( 'derived-state-load' );
+		const loaded = page.getByTestId( 'derived-state-loaded' );
+		const hydrated = page.getByTestId( 'derived-state-hydrated' );
+		const update = page.getByTestId( 'derived-text-update' );
+		const element = page.getByTestId( 'derived-text-element' );
+
+		await expect( hydrated ).toBeVisible();
+		await expect( loaded ).toBeHidden();
+		await expect( element ).toHaveText( 'server-rendered text' );
+
+		// The `update` button doesn't work yet; nothing changes.
+		await update.click();
+		await expect( loaded ).toBeHidden();
+		await expect( element ).toHaveText( 'server-rendered text' );
+
+		// The element text is maintained according to the computed getter.
+		await load.click();
+		await expect( loaded ).toBeVisible();
+		await expect( element ).toHaveText( 'server-rendered text' );
+
+		// The button works, and the text updated.
+		await update.click();
+		await expect( loaded ).toBeVisible();
+		await expect( element ).toHaveText( 'client-updated text' );
 	} );
 
 	test( 'Ensure wp-each keeps server-rendered children until the list is ready', async ( {

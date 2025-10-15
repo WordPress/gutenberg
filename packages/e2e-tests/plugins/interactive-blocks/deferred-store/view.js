@@ -57,6 +57,16 @@ const { state } = store( 'test/deferred-store/derived-state', {
 						const { counter } = getContext();
 						return counter < 10;
 					},
+					get redOrGreen() {
+						const { isReady } = getContext();
+						return isReady ? 'rgb(0, 255, 0)' : 'rgb(255, 0, 0)';
+					},
+					get derivedText() {
+						const { isReady } = getContext();
+						return isReady
+							? 'client-updated text'
+							: 'server-rendered text';
+					},
 					get radiotelephonicAlphabet() {
 						const { list } = getContext();
 						const dictionary = {
@@ -71,6 +81,9 @@ const { state } = store( 'test/deferred-store/derived-state', {
 				actions: {
 					increment() {
 						getContext().counter += 1;
+					},
+					setReady() {
+						getContext().isReady = true;
 					},
 					addItem() {
 						const { list } = getContext();
