@@ -613,8 +613,7 @@ function BlockListBlockProvider( props ) {
 			} = getSettings();
 
 			const bindableAttributes =
-				__experimentalBlockBindingsSupportedAttributes?.[ blockName ] ||
-				[];
+				__experimentalBlockBindingsSupportedAttributes?.[ blockName ];
 
 			const hasLightBlockWrapper = blockType?.apiVersion > 1;
 			const previewContext = {
