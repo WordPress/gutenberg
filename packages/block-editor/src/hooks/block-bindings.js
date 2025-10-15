@@ -71,17 +71,7 @@ function BlockBindingsPanelMenuContent( { attribute, binding } ) {
 	const sources = getBlockBindingsSources();
 	const isMobile = useViewportMatch( 'medium', '<' );
 	const blockContext = useContext( BlockContext );
-	const { attributeType, select } = useSelect(
-		( _select ) => {
-			const { name: blockName } =
-				_select( blockEditorStore ).getBlock( clientId );
-			return {
-				attributeType: getAttributeType( blockName, attribute ),
-				select: _select,
-			};
-		},
-		[ clientId, attribute ]
-	);
+
 	return (
 		<Menu placement={ isMobile ? 'bottom-start' : 'left-start' }>
 			{ Object.entries( sources ).map( ( [ sourceKey, source ] ) => {
@@ -129,38 +119,37 @@ function BlockBindingsPanelMenuContent( { attribute, binding } ) {
 	);
 }
 
-function BlockBindingsAttribute( { attribute, binding, sources, blockName } ) {
-	// const source = getBlockBindingsSource( sourceName );
-	// const isSourceInvalid = ! source;
-
+function BlockBindingsAttribute( { attribute, binding } ) {
 	const { source: sourceName, args } = binding || {};
-	const source = sources?.[ sourceName ];
+	const source = getBlockBindingsSource( sourceName );
 
 	let displayText;
 	let isValid = true;
 	const isNotBound = binding === undefined;
 
 	if ( isNotBound ) {
+		// FIXME: Re-enable
 		// Check if there are any compatible sources for this attribute type.
-		const attributeType = getAttributeType( blockName, attribute );
+		// const attributeType = getAttributeType( blockName, attribute );
 
-		const hasCompatibleSources = Object.values( sources ).some( ( src ) =>
-			src.data?.some( ( item ) => item?.type === attributeType )
-		);
+		// const hasCompatibleSources = Object.values( sources ).some( ( src ) =>
+		// 	src.data?.some( ( item ) => item?.type === attributeType )
+		// );
 
-		if ( ! hasCompatibleSources ) {
-			displayText = __( 'No sources available' );
-		} else {
-			displayText = __( 'Not connected' );
-		}
+		// if ( ! hasCompatibleSources ) {
+		// 	displayText = __( 'No sources available' );
+		// } else {
+		// 	displayText = __( 'Not connected' );
+		// }
 		isValid = true;
 	} else if ( ! source ) {
 		// If there's a binding but the source is not found, it's invalid.
 		isValid = false;
 		displayText = __( 'Source not registered' );
-		if ( Object.keys( sources ).length === 0 ) {
-			displayText = __( 'No sources available' );
-		}
+		// FIXME: Re-enable
+		// if ( Object.keys( sources ).length === 0 ) {
+		// 	displayText = __( 'No sources available' );
+		// }
 	} else {
 		displayText =
 			source.data?.find( ( item ) => fastDeepEqual( item.args, args ) )
@@ -183,12 +172,7 @@ function BlockBindingsAttribute( { attribute, binding, sources, blockName } ) {
 	);
 }
 
-function ReadOnlyBlockBindingsPanelItem( {
-	attribute,
-	binding,
-	sources,
-	blockName,
-} ) {
+function ReadOnlyBlockBindingsPanelItem( { attribute, binding } ) {
 	const isMobile = useViewportMatch( 'medium', '<' );
 
 	return (
@@ -198,8 +182,6 @@ function ReadOnlyBlockBindingsPanelItem( {
 					<BlockBindingsAttribute
 						attribute={ attribute }
 						binding={ binding }
-						sources={ sources }
-						blockName={ blockName }
 					/>
 				</Menu.TriggerButton>
 			</Menu>
@@ -211,7 +193,6 @@ function EditableBlockBindingsPanelItem( {
 	attribute,
 	binding,
 	setModalState,
-	blockName,
 } ) {
 	const { updateBlockBindings } = useBlockBindingsUtils();
 	const isMobile = useViewportMatch( 'medium', '<' );
@@ -235,8 +216,6 @@ function EditableBlockBindingsPanelItem( {
 					<BlockBindingsAttribute
 						attribute={ attribute }
 						binding={ binding }
-						sources={ sources }
-						blockName={ blockName }
 					/>
 				</Menu.TriggerButton>
 				<Menu.Popover gutter={ isMobile ? 8 : 36 }>
@@ -279,7 +258,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 
 	// Use useSelect to ensure sources are updated whenever there are updates in block context
 	// or when underlying data changes.
-	const { canUpdateBlockBindings } = useSelect(
+	const { canUpdateBlockBindings, sources } = useSelect(
 		( select ) => {
 			const _sources = {};
 			Object.entries( registeredSources ).forEach(
@@ -347,9 +326,10 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 				canUpdateBlockBindings:
 					select( blockEditorStore ).getSettings()
 						.canUpdateBlockBindings,
+				sources: _sources || EMPTY_OBJECT,
 			};
 		},
-		[ blockContext, blockName, registeredSources, bindableAttributes ]
+		[ blockContext, registeredSources ]
 	);
 
 	// Return early if there are no bindable attributes.
@@ -411,8 +391,6 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 								key={ attribute }
 								attribute={ attribute }
 								binding={ binding }
-								sources={ sources }
-								blockName={ blockName }
 							/>
 						) : (
 							<EditableBlockBindingsPanelItem
@@ -420,7 +398,6 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 								attribute={ attribute }
 								binding={ binding }
 								setModalState={ setModalState }
-								blockName={ blockName }
 							/>
 						);
 					} ) }
