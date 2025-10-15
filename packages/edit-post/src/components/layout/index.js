@@ -519,17 +519,6 @@ function Layout( {
 
 	useMetaBoxInitialization( hasActiveMetaboxes && hasResolvedMode );
 
-	const editableResolvedTemplateId = useSelect(
-		( select ) => {
-			if ( typeof templateId !== 'string' ) {
-				return templateId;
-			}
-			return unlock( select( coreStore ) ).getTemplateAutoDraftId(
-				templateId
-			);
-		},
-		[ templateId ]
-	);
 	const [ paddingAppenderRef, paddingStyle ] = usePaddingAppender(
 		enablePaddingAppender
 	);
@@ -653,7 +642,7 @@ function Layout( {
 						initialEdits={ initialEdits }
 						postType={ currentPostType }
 						postId={ currentPostId }
-						templateId={ editableResolvedTemplateId }
+						templateId={ templateId }
 						className={ className }
 						styles={ styles }
 						forceIsDirty={ hasActiveMetaboxes }

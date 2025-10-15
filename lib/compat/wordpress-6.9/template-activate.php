@@ -9,7 +9,7 @@ add_filter( 'register_post_type_args', 'gutenberg_modify_wp_template_post_type_a
 function gutenberg_modify_wp_template_post_type_args( $args, $post_type ) {
 	if ( 'wp_template' === $post_type ) {
 		$args['rest_base']                       = 'wp_template';
-		$args['rest_controller_class']           = 'Gutenberg_REST_Templates_Controller';
+		$args['rest_controller_class']           = 'WP_REST_Posts_Controller';
 		$args['autosave_rest_controller_class']  = null;
 		$args['revisions_rest_controller_class'] = null;
 		$args['supports']                        = array_merge( $args['supports'], array( 'custom-fields' ) );
