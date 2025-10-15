@@ -35,11 +35,15 @@ test.describe( 'getServerState()', () => {
 				},
 			},
 		} );
+		const link3 = await utils.addPostWithBlock( 'test/get-server-state', {
+			alias: 'getServerState() - link 3',
+			attributes: {},
+		} );
 		await utils.addPostWithBlock( 'test/get-server-state', {
 			alias: 'getServerState() - main',
 			attributes: {
 				title: 'Main',
-				links: [ link1, link2 ],
+				links: [ link1, link2, link3 ],
 				state: {
 					prop: 'main',
 					nested: {
@@ -188,5 +192,22 @@ test.describe( 'getServerState()', () => {
 
 		await expect( onlyInMain ).toBeEmpty();
 		await expect( onlyInLink1 ).toBeEmpty();
+	} );
+
+	test( 'should reset server state when navigating to a page without state', async ( {
+		page,
+	} ) => {
+		const prop = page.getByTestId( 'prop' );
+		const nestedProp = page.getByTestId( 'nested.prop' );
+
+		await expect( page ).toHaveTitle( /main/ );
+		await expect( prop ).toHaveText( 'main' );
+		await expect( nestedProp ).toHaveText( 'main' );
+
+		await page.getByTestId( 'link 3' ).click();
+		await expect( page ).toHaveTitle( /link 3/ );
+
+		await expect( prop ).toBeEmpty();
+		await expect( nestedProp ).toBeEmpty();
 	} );
 } );
