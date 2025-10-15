@@ -511,6 +511,11 @@ test.describe( 'Block Comments', () => {
 			await blockCommentUtils.addBlockWithComment( {
 				type: 'core/paragraph',
 				attributes: { content: 'Testing block comments' },
+				comment: 'Test note',
+			} );
+			await blockCommentUtils.addBlockWithComment( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing block comments' },
 				comment: 'Test comment',
 			} );
 			const commentForm = page.getByRole( 'textbox', {
