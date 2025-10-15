@@ -14,6 +14,7 @@ import { directive } from './hooks';
 import { getNamespace } from './namespaces';
 import { parseServerData, populateServerData } from './store';
 import { proxifyState } from './proxies';
+import { deepReadOnly } from './utils';
 
 export {
 	store,
@@ -33,6 +34,7 @@ export {
 	useMemo,
 	splitTask,
 	withSyncEvent,
+	deepReadOnly,
 } from './utils';
 
 export { useState, useRef } from 'preact/hooks';
@@ -56,6 +58,7 @@ export const privateApis = ( lock ): any => {
 			populateServerData,
 			batch,
 			routerRegions,
+			deepReadOnly,
 		};
 	}
 
