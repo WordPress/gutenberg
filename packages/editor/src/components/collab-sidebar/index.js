@@ -48,11 +48,11 @@ function CollabSidebarContent( {
 			style={ styles }
 			role="list"
 			spacing="3"
+			justify="flex-start"
 			ref={ ( node ) => {
 				// Keeps the ref fresh when switching between floating and pinned sidebar.
 				commentSidebarRef.current = node;
 			} }
-			justify="flex-start"
 		>
 			<AddComment
 				onSubmit={ onCreate }
