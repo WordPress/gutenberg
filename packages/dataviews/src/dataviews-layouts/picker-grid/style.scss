@@ -16,16 +16,9 @@
 
 		.dataviews-view-picker-grid__title-field {
 			min-height: $grid-unit-30; // Preserve layout when there is no ellipsis button
-			display: flex;
 			align-items: center;
-
-			// Ensure the title field content doesn't overflow its container.
-			// text-overflow: ellipsis only works on block containers, not flex containers.
-			&:first-child {
-				display: block;
-				overflow: hidden;
-				align-content: center;
-			}
+			overflow: hidden;
+			align-content: center;
 
 			&--clickable {
 				width: fit-content;
