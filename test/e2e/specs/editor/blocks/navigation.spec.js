@@ -755,6 +755,9 @@ test.describe( 'Navigation block', () => {
 
 		test.beforeEach( async ( { admin, page, requestUtils } ) => {
 			// Enable pretty permalinks by navigating to Settings > Permalinks
+			// TODO: Encapsulate permalink setup in an admin.setPermalinks( '/%postname%/' ) style util
+			// We need to run this in beforeEach instead of beforeAll since we don't have page context
+			// in beforeAll
 			await admin.visitAdminPage( 'options-permalink.php' );
 
 			// Select the Post name permalink structure (/%postname%/)
@@ -772,11 +775,6 @@ test.describe( 'Navigation block', () => {
 			// to prevent 404 errors.
 			await requestUtils.setupRest();
 
-			console.log(
-				'Pretty permalinks enabled. REST API root URL:',
-				requestUtils.storageState?.rootURL
-			);
-
 			// Create test pages
 			testPage1 = await requestUtils.createPage( {
 				title: 'Test Page 1',
@@ -792,17 +790,15 @@ test.describe( 'Navigation block', () => {
 				title: 'Test Page 3',
 				status: 'publish',
 			} );
-
-			console.log( 'TEST PAGES CREATED: ' );
-			console.log( testPage1.link );
-			console.log( testPage2.link );
-			console.log( testPage3.link );
 		} );
 
 		test.afterEach( async ( { admin, page, requestUtils } ) => {
 			await requestUtils.deleteAllPages();
 
 			// Restore plain permalinks
+			// TODO: Encapsulate permalink teardown in an admin.setPermalinks( '' ) style util
+			// We need to run this in afterEach instead of afterAll since we don't have page context
+			// in afterAll
 			await admin.visitAdminPage( 'options-permalink.php' );
 
 			// Select Plain permalinks
@@ -932,8 +928,6 @@ test.describe( 'Navigation block', () => {
 						slug: updatedPageSlug,
 					},
 				} );
-
-				console.log( `PAGE SLUG UPDATED: ${ updatedPage.slug }` );
 
 				expect( updatedPage.link ).toContain( `/${ updatedPageSlug }` );
 
