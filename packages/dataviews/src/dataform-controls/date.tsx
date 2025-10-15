@@ -39,10 +39,7 @@ import deepMerge from 'deepmerge';
 /**
  * Internal dependencies
  */
-import RelativeDateControl, {
-	TIME_UNITS_OPTIONS,
-	type DateRelative,
-} from './relative-date-control';
+import RelativeDateControl from './utils/relative-date-control';
 import {
 	OPERATOR_IN_THE_PAST,
 	OPERATOR_OVER,
@@ -643,26 +640,15 @@ export default function DateControl< Item >( {
 	hideLabelFromVision,
 	operator,
 }: DataFormControlProps< Item > ) {
-	const { id, label, getValue, setValue } = field;
-	const value = getValue( { item: data } );
-
-	const onChangeRelativeDateControl = useCallback(
-		( newValue: DateRelative ) => {
-			onChange( setValue( { item: data, value: newValue } ) );
-		},
-		[ data, onChange, setValue ]
-	);
-
 	if ( operator === OPERATOR_IN_THE_PAST || operator === OPERATOR_OVER ) {
 		return (
 			<RelativeDateControl
 				className="dataviews-controls__date"
-				id={ id }
-				value={ value && typeof value === 'object' ? value : {} }
-				onChange={ onChangeRelativeDateControl }
-				label={ label }
+				data={ data }
+				field={ field }
+				onChange={ onChange }
 				hideLabelFromVision={ hideLabelFromVision }
-				options={ TIME_UNITS_OPTIONS[ operator ] }
+				operator={ operator }
 			/>
 		);
 	}

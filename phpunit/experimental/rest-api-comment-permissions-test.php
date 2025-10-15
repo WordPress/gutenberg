@@ -202,8 +202,10 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_Test_REST_TestCase {
 
 	public function test_cannot_create_with_non_valid_comment_type() {
 		wp_set_current_user( self::$user_ids['administrator'] );
+		$post_id = $this->factory->post->create();
 
 		$params = array(
+			'post'         => $post_id,
 			'author_name'  => 'Ishmael',
 			'author_email' => 'herman-melville@earthlink.net',
 			'author_url'   => 'https://en.wikipedia.org/wiki/Herman_Melville',
@@ -217,7 +219,7 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_Test_REST_TestCase {
 		$request->set_body( wp_json_encode( $params ) );
 		$response = rest_get_server()->dispatch( $request );
 
-		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
+		$this->assertErrorResponse( 'rest_invalid_comment_type', $response, 400 );
 	}
 
 	public function test_create_assigns_default_type() {

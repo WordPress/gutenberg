@@ -3,8 +3,7 @@
 // This creates a "slot" where the block you're dragging appeared.
 // We use !important as one of the rules are meant to be overridden.
 .block-editor-block-list__layout .is-dragging {
-	opacity: 0.1 !important;
-	border-radius: $radius-small !important;
+	opacity: 0.1;
 
 	iframe {
 		pointer-events: none;

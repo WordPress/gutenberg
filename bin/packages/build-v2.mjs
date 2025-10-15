@@ -559,9 +559,10 @@ async function bundlePackage( packageName ) {
 					? 'index'
 					: exportName.replace( /^\.\//, '' );
 			const entryPoint = path.join( packageDir, exportPath );
+			const baseFileName = path.basename( fileName );
 
 			const modulePlugins = [
-				wordpressExternalsPlugin( `${ fileName }.min`, 'esm' ),
+				wordpressExternalsPlugin( `${ baseFileName }.min`, 'esm' ),
 			];
 
 			builds.push(
@@ -770,7 +771,9 @@ async function transpilePackage( packageName ) {
 
 /**
  * Compile styles for a single package.
- * Discovers and compiles all .scss at the root of the src/ directory (matching v1 behavior),
+ *
+ * Discovers and compiles SCSS entry points based on package configuration
+ * (supporting wpStyleEntryPoints in package.json for custom entry point patterns),
  * and all .module.css files in src/ directory.
  *
  * @param {string} packageName Package name.
@@ -778,11 +781,22 @@ async function transpilePackage( packageName ) {
  */
 async function compileStyles( packageName ) {
 	const packageDir = path.join( PACKAGES_DIR, packageName );
+	const packageJsonPath = path.join( packageDir, 'package.json' );
+	const packageJson = JSON.parse( await readFile( packageJsonPath, 'utf8' ) );
 
-	// Find SCSS entry points at src/ root (match v1 behavior) and CSS modules anywhere in src/
+	// Get SCSS entry point patterns from package.json, default to root-level only
+	const scssEntryPointPatterns = packageJson.wpStyleEntryPoints || [
+		'src/*.scss',
+	];
+
+	// Find all matching SCSS files
 	const scssEntries = await glob(
-		normalizePath( path.join( packageDir, 'src/*.scss' ) )
+		scssEntryPointPatterns.map( ( pattern ) =>
+			normalizePath( path.join( packageDir, pattern ) )
+		)
 	);
+
+	// Get CSS modules from anywhere in src/
 	const cssModuleEntries = await glob(
 		normalizePath( path.join( packageDir, 'src/**/*.module.css' ) ),
 		{ ignore: IGNORE_PATTERNS }
@@ -794,12 +808,11 @@ async function compileStyles( packageName ) {
 
 	const startTime = Date.now();
 	const buildStyleDir = path.join( packageDir, 'build-style' );
-	await mkdir( buildStyleDir, { recursive: true } );
+	const srcDir = path.join( packageDir, 'src' );
 
 	// Process .module.css files and generate JS modules
 	await Promise.all(
 		cssModuleEntries.map( async ( styleEntryPath ) => {
-			const srcDir = path.join( packageDir, 'src' );
 			const buildDir = path.join( packageDir, 'build' );
 			const buildModuleDir = path.join( packageDir, 'build-module' );
 
@@ -848,12 +861,24 @@ async function compileStyles( packageName ) {
 	// Process SCSS files
 	await Promise.all(
 		scssEntries.map( async ( styleEntryPath ) => {
+			// Calculate relative path from src/ to preserve directory structure
+			const relativePath = path.relative( srcDir, styleEntryPath );
+			const relativeDir = path.dirname( relativePath );
 			const entryName = path.basename( styleEntryPath, '.scss' );
+
+			// Determine output directory (preserve subdirectory structure)
+			const outputDir =
+				relativeDir === '.'
+					? buildStyleDir
+					: path.join( buildStyleDir, relativeDir );
+
+			// Ensure output directory exists
+			await mkdir( outputDir, { recursive: true } );
 
 			// Build with Sass plugin
 			await esbuild.build( {
 				entryPoints: [ styleEntryPath ],
-				outdir: buildStyleDir,
+				outdir: outputDir,
 				bundle: true,
 				write: false,
 				loader: {
@@ -881,14 +906,14 @@ async function compileStyles( packageName ) {
 							await Promise.all( [
 								writeFile(
 									path.join(
-										buildStyleDir,
+										outputDir,
 										`${ entryName }.css`
 									),
 									ltrResult.css
 								),
 								writeFile(
 									path.join(
-										buildStyleDir,
+										outputDir,
 										`${ entryName }-rtl.css`
 									),
 									rtlResult.css

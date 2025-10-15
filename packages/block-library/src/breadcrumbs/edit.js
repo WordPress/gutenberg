@@ -69,7 +69,7 @@ export default function BreadcrumbEdit( {
 						</li>
 					) ) }
 					<li>
-						<span>{ __( 'Current' ) }</span>
+						<span aria-current="page">{ __( 'Current' ) }</span>
 					</li>
 				</ol>
 			</nav>
@@ -126,6 +126,13 @@ export default function BreadcrumbEdit( {
 							onChange={ ( value ) =>
 								setAttributes( { separator: value } )
 							}
+							onBlur={ () => {
+								if ( ! separator ) {
+									setAttributes( {
+										separator: separatorDefaultValue,
+									} );
+								}
+							} }
 						/>
 					</ToolsPanelItem>
 				</ToolsPanel>

@@ -10,21 +10,12 @@ test.use( {
 } );
 
 test.describe( 'Block Comments', () => {
-	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.setGutenbergExperiments( [
-			'gutenberg-block-comment',
-		] );
-	} );
-
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
-		await Promise.all( [
-			requestUtils.deleteAllComments( 'note' ),
-			requestUtils.setGutenbergExperiments( [] ),
-		] );
+		await requestUtils.deleteAllComments( 'note' );
 	} );
 
 	test( 'can pin and unpin comments sidebar', async ( {
@@ -508,6 +499,11 @@ test.describe( 'Block Comments', () => {
 			page,
 			blockCommentUtils,
 		} ) => {
+			await blockCommentUtils.addBlockWithComment( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing block comments' },
+				comment: 'Test note',
+			} );
 			await blockCommentUtils.addBlockWithComment( {
 				type: 'core/paragraph',
 				attributes: { content: 'Testing block comments' },
