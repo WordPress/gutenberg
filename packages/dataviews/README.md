@@ -716,6 +716,25 @@ Returns an object containing:
     -   `totalItems`: total number of items for the current view config.
     -   `totalPages`: total number of pages for the current view config.
 
+### `useIsFormValid`
+
+Hook to determine if a form is valid.
+
+Parameters:
+
+-   `item`: the item being edited.
+-   `fields`: the fields config, as described in the "fields" property of DataViews.
+-   `form`: the form config, as described in the "form" property of DataViews.
+
+Returns an array containing the errors. Each error is an object with the following properties:
+
+-   `id`: string. The field that has the error.
+-   `required`: `invalid` when the field's value is required but empty.
+-   `elements`: `invalid` when the field's value doesn't match any of the field elements.
+-   `custom`: object with the following properties:
+    -   `type`: `validating` | `invalid` | `valid`. `validating` means the field is being validated, `invalid` means the value doesn't match the custom validation, and `valid` means the value passes the custom validation.
+    -   `message`: The message to be displayed in the UI control.
+
 
 ## Actions API
 
