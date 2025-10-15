@@ -35,12 +35,18 @@ async function ensureSvgFilesTracked() {
 	try {
 		// Avoid invoking `ls-files` with a wildcard (`*.svg`) due to the
 		// variability of wildcard behaviour across shells.
-		const { stdout } = await execFileAsync( 'git', [
-			'ls-files',
-			'-o',
-			'--full-name',
-			ICON_LIBRARY_DIR,
-		] );
+		const { stdout } = await execFileAsync(
+			'git',
+			[ 'ls-files', '-o', '--full-name', ICON_LIBRARY_DIR ],
+			{
+				// Unset GIT_WORK_TREE to avoid path resolution issues
+				// in commit hook environments (e.g. GUI git clients)
+				env: {
+					...process.env,
+					GIT_WORK_TREE: undefined,
+				},
+			}
+		);
 
 		// Filtering with `grep` in a single `exec` call was tempting, but this
 		// manual filtering avoids any shell escaping weirdness.
@@ -66,7 +72,12 @@ async function ensureSvgFilesTracked() {
 }
 
 async function cleanup() {
-	await execFileAsync( 'git', [ 'clean', '-Xfq', ICON_LIBRARY_DIR ] );
+	await execFileAsync( 'git', [ 'clean', '-Xfq', ICON_LIBRARY_DIR ], {
+		env: {
+			...process.env,
+			GIT_WORK_TREE: undefined,
+		},
+	} );
 }
 
 // Generate src/library/*.tsx based on the available SVG files.
