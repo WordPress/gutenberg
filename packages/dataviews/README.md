@@ -726,7 +726,10 @@ Parameters:
 -   `fields`: the fields config, as described in the "fields" property of DataViews.
 -   `form`: the form config, as described in the "form" property of DataViews.
 
-Returns an object containing the errors. Each property is a field ID, containing a description of each error type. For example:
+Returns an object containing:
+
+-   `isValid`: a boolean indicating if the form is valid.
+-   `validity`: an object containing the errors. Each property is a field ID, containing a description of each error type. For example:
 
 ```js
 {
@@ -740,8 +743,8 @@ Returns an object containing the errors. Each property is a field ID, containing
 			message: 'Value must be one of the elements.' // Optional
 		},
 		custom: {
-			type: 'invalid',
-			message: 'Custom message'
+			type: 'validating',
+			message: 'Validating...'
 		}
 	}
 }

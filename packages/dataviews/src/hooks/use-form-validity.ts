@@ -58,7 +58,7 @@ export function useFormValidity< Item >(
 	item: Item,
 	fields: Field< Item >[],
 	form: Form
-): FormValidity {
+): { validity: FormValidity; isValid: boolean } {
 	const [ formValidity, setFormValidity ] = useState< FormValidity >();
 
 	const previousValidatedValuesRef = useRef< Record< string, any > >( {} );
@@ -287,7 +287,16 @@ export function useFormValidity< Item >(
 		validate();
 	}, [ validate ] );
 
-	return formValidity;
+	return {
+		validity: formValidity,
+		isValid:
+			! formValidity ||
+			Object.values( formValidity ).every( ( fieldValidation ) =>
+				Object.values( fieldValidation ).every(
+					( validation ) => validation.type === 'valid'
+				)
+			),
+	};
 }
 
 export default useFormValidity;

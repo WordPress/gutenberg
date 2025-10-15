@@ -37,12 +37,16 @@ function ReorderModal( {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
-	const validity = useFormValidity( item, fields, formOrderAction );
+	const { validity, isValid } = useFormValidity(
+		item,
+		fields,
+		formOrderAction
+	);
 
 	async function onOrder( event: React.FormEvent ) {
 		event.preventDefault();
 
-		if ( !! validity ) {
+		if ( ! isValid ) {
 			return;
 		}
 
@@ -83,6 +87,7 @@ function ReorderModal( {
 					data={ item }
 					fields={ fields }
 					form={ formOrderAction }
+					validity={ validity }
 					onChange={ ( changes ) => {
 						return setItem( {
 							...item,
@@ -105,7 +110,7 @@ function ReorderModal( {
 						variant="primary"
 						type="submit"
 						accessibleWhenDisabled
-						disabled={ !! validity }
+						disabled={ ! isValid }
 					>
 						{ __( 'Save' ) }
 					</Button>

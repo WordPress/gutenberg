@@ -23,10 +23,13 @@ describe( 'useFormValidity', () => {
 			},
 		];
 		const form = { fields: [ 'valid_order' ] };
-		const { result } = renderHook( () =>
-			useFormValidity( item, fields, form )
-		);
-		expect( result.current ).toEqual( undefined );
+		const {
+			result: {
+				current: { validity, isValid },
+			},
+		} = renderHook( () => useFormValidity( item, fields, form ) );
+		expect( validity ).toEqual( undefined );
+		expect( isValid ).toBe( true );
 	} );
 
 	it( 'fields can override the defaults', () => {
@@ -46,10 +49,13 @@ describe( 'useFormValidity', () => {
 			},
 		];
 		const form = { fields: [ 'order' ] };
-		const { result } = renderHook( () =>
-			useFormValidity( item, fields, form )
-		);
-		expect( result.current ).toEqual( undefined );
+		const {
+			result: {
+				current: { validity, isValid },
+			},
+		} = renderHook( () => useFormValidity( item, fields, form ) );
+		expect( validity ).toEqual( undefined );
+		expect( isValid ).toBe( true );
 	} );
 
 	describe( 'isValid.required', () => {
@@ -68,10 +74,13 @@ describe( 'useFormValidity', () => {
 				},
 			];
 			const form = { fields: [ 'tags' ] };
-			const { result } = renderHook( () =>
-				useFormValidity( item, fields, form )
-			);
-			expect( result.current?.tags ).toEqual( REQUIRED_MESSAGE );
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity?.tags ).toEqual( REQUIRED_MESSAGE );
+			expect( isValid ).toBe( false );
 		} );
 
 		it( 'array is invalid when required but not an array', () => {
@@ -86,10 +95,13 @@ describe( 'useFormValidity', () => {
 				},
 			];
 			const form = { fields: [ 'tags' ] };
-			const { result } = renderHook( () =>
-				useFormValidity( item, fields, form )
-			);
-			expect( result.current?.tags ).toEqual( REQUIRED_MESSAGE );
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity?.tags ).toEqual( REQUIRED_MESSAGE );
+			expect( isValid ).toBe( false );
 		} );
 
 		it( 'array is valid when required and has values', () => {
@@ -104,10 +116,13 @@ describe( 'useFormValidity', () => {
 				},
 			];
 			const form = { fields: [ 'tags' ] };
-			const { result } = renderHook( () =>
-				useFormValidity( item, fields, form )
-			);
-			expect( result.current ).toEqual( undefined );
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
 		} );
 	} );
 
@@ -130,10 +145,13 @@ describe( 'useFormValidity', () => {
 				},
 			];
 			const form = { fields: [ 'author' ] };
-			const { result } = renderHook( () =>
-				useFormValidity( item, fields, form )
-			);
-			expect( result.current?.author ).toEqual( ELEMENTS_MESSAGE );
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity?.author ).toEqual( ELEMENTS_MESSAGE );
+			expect( isValid ).toBe( false );
 		} );
 
 		it( 'text is valid when value is one of the elements', () => {
@@ -152,10 +170,13 @@ describe( 'useFormValidity', () => {
 				},
 			];
 			const form = { fields: [ 'status' ] };
-			const { result } = renderHook( () =>
-				useFormValidity( item, fields, form )
-			);
-			expect( result.current ).toEqual( undefined );
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
 		} );
 
 		it( 'text is invalid when value is not one of the elements', () => {
@@ -174,10 +195,13 @@ describe( 'useFormValidity', () => {
 				},
 			];
 			const form = { fields: [ 'status' ] };
-			const { result } = renderHook( () =>
-				useFormValidity( item, fields, form )
-			);
-			expect( result.current?.status ).toEqual( ELEMENTS_MESSAGE );
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity?.status ).toEqual( ELEMENTS_MESSAGE );
+			expect( isValid ).toBe( false );
 		} );
 
 		it( 'integer is valid when value is one of the elements', () => {
@@ -197,10 +221,13 @@ describe( 'useFormValidity', () => {
 				},
 			];
 			const form = { fields: [ 'priority' ] };
-			const { result } = renderHook( () =>
-				useFormValidity( item, fields, form )
-			);
-			expect( result.current ).toEqual( undefined );
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
 		} );
 
 		it( 'integer is invalid when value is not one of the elements', () => {
@@ -220,10 +247,13 @@ describe( 'useFormValidity', () => {
 				},
 			];
 			const form = { fields: [ 'priority' ] };
-			const { result } = renderHook( () =>
-				useFormValidity( item, fields, form )
-			);
-			expect( result.current?.priority ).toEqual( ELEMENTS_MESSAGE );
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity?.priority ).toEqual( ELEMENTS_MESSAGE );
+			expect( isValid ).toBe( false );
 		} );
 
 		it( 'number is invalid if value is not one of the elements', () => {
@@ -239,10 +269,13 @@ describe( 'useFormValidity', () => {
 				},
 			];
 			const form = { fields: [ 'price' ] };
-			const { result } = renderHook( () =>
-				useFormValidity( item, fields, form )
-			);
-			expect( result.current?.price ).toEqual( ELEMENTS_MESSAGE );
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity?.price ).toEqual( ELEMENTS_MESSAGE );
+			expect( isValid ).toBe( false );
 		} );
 
 		it( 'array is valid if all items are part of the elements', () => {
@@ -259,10 +292,13 @@ describe( 'useFormValidity', () => {
 				},
 			];
 			const form = { fields: [ 'tags' ] };
-			const { result } = renderHook( () =>
-				useFormValidity( item, fields, form )
-			);
-			expect( result.current ).toEqual( undefined );
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
 		} );
 
 		it( 'array is invalid when not all items are part of the elements', () => {
@@ -279,10 +315,13 @@ describe( 'useFormValidity', () => {
 				},
 			];
 			const form = { fields: [ 'tags' ] };
-			const { result } = renderHook( () =>
-				useFormValidity( item, fields, form )
-			);
-			expect( result.current?.tags ).toEqual( ELEMENTS_MESSAGE );
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity?.tags ).toEqual( ELEMENTS_MESSAGE );
+			expect( isValid ).toBe( false );
 		} );
 
 		it( 'array is invalid when value is not an array', () => {
@@ -301,10 +340,13 @@ describe( 'useFormValidity', () => {
 				},
 			];
 			const form = { fields: [ 'tags' ] };
-			const { result } = renderHook( () =>
-				useFormValidity( item, fields, form )
-			);
-			expect( result.current?.tags ).toEqual( ELEMENTS_MESSAGE );
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity?.tags ).toEqual( ELEMENTS_MESSAGE );
+			expect( isValid ).toBe( false );
 		} );
 	} );
 
@@ -318,10 +360,13 @@ describe( 'useFormValidity', () => {
 				},
 			];
 			const form = { fields: [ 'order' ] };
-			const { result } = renderHook( () =>
-				useFormValidity( item, fields, form )
-			);
-			expect( result.current ).toEqual( undefined );
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
 		} );
 
 		it( 'integer is invalid if value is not integer when not empty', () => {
@@ -333,15 +378,18 @@ describe( 'useFormValidity', () => {
 				},
 			];
 			const form = { fields: [ 'order' ] };
-			const { result } = renderHook( () =>
-				useFormValidity( item, fields, form )
-			);
-			expect( result.current?.order ).toEqual( {
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity?.order ).toEqual( {
 				custom: {
 					type: 'invalid',
 					message: 'Value must be an integer.',
 				},
 			} );
+			expect( isValid ).toBe( false );
 		} );
 
 		it( 'number is valid if value is finite', () => {
@@ -353,10 +401,13 @@ describe( 'useFormValidity', () => {
 				},
 			];
 			const form = { fields: [ 'price' ] };
-			const { result } = renderHook( () =>
-				useFormValidity( item, fields, form )
-			);
-			expect( result.current ).toEqual( undefined );
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
 		} );
 
 		it( 'number is invalid if value is not finite when not empty', () => {
@@ -368,15 +419,18 @@ describe( 'useFormValidity', () => {
 				},
 			];
 			const form = { fields: [ 'price' ] };
-			const { result } = renderHook( () =>
-				useFormValidity( item, fields, form )
-			);
-			expect( result.current?.price ).toEqual( {
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity?.price ).toEqual( {
 				custom: {
 					type: 'invalid',
 					message: 'Value must be a number.',
 				},
 			} );
+			expect( isValid ).toBe( false );
 		} );
 	} );
 } );

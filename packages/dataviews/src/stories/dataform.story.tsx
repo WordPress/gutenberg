@@ -1012,7 +1012,7 @@ const ValidationComponent = ( {
 		],
 	};
 
-	const validity = useFormValidity( post, _fields, form );
+	const { validity, isValid } = useFormValidity( post, _fields, form );
 
 	return (
 		<form>
@@ -1032,7 +1032,7 @@ const ValidationComponent = ( {
 				<Button
 					__next40pxDefaultSize
 					accessibleWhenDisabled
-					disabled={ !! validity }
+					disabled={ ! isValid }
 					variant="primary"
 				>
 					Submit
