@@ -201,7 +201,6 @@ export function Comments( {
 			// threads upward.
 			let nextThreadData = {
 				threadTop: selectedThreadTop - 16,
-				threadHeight: selectedThreadHeight,
 			};
 
 			for ( let i = selectedThreadIndex - 1; i >= 0; i-- ) {
@@ -235,7 +234,6 @@ export function Comments( {
 				// Update for next iteration (going upward).
 				nextThreadData = {
 					threadTop: threadTop + additionalOffset,
-					threadHeight,
 				};
 			}
 			return offsets;
