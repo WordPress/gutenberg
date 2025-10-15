@@ -548,4 +548,9 @@ test.describe( 'data-wp-each', () => {
 			}
 		} );
 	}
+
+	test( 'does not support multiple directives', async ( { page } ) => {
+		const element = page.getByTestId( 'each-with-multiple-directives' );
+		await expect( element ).not.toContainText( 'array' );
+	} );
 } );

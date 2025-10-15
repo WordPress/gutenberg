@@ -47,7 +47,10 @@ function CollabSidebarContent( {
 			style={ styles }
 			role="list"
 			spacing="3"
-			ref={ commentSidebarRef }
+			ref={ ( node ) => {
+				// Keeps the ref fresh when switching between floating and pinned sidebar.
+				commentSidebarRef.current = node;
+			} }
 		>
 			{ ! isFloating && (
 				<AddComment
