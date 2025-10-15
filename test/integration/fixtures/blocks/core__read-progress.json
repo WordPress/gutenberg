@@ -1,0 +1,14 @@
+[
+	{
+		"name": "core/read-progress",
+		"isValid": true,
+		"attributes": {
+			"backgroundColor": "#f0f0f0",
+			"progressColor": "#1E1E1E",
+			"height": 15,
+			"position": "top",
+			"isInverted": false
+		},
+		"innerBlocks": []
+	}
+]

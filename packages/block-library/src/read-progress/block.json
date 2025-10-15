@@ -1,0 +1,36 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "core/read-progress",
+	"category": "theme",
+	"title": "Reading Progress Bar",
+	"description": "Displays a reading progress bar. Useful for tracking the read progress.",
+	"textdomain": "default",
+	"attributes": {
+		"backgroundColor": {
+			"type": "string",
+			"default": "#f0f0f0"
+		},
+		"progressColor": {
+			"type": "string",
+			"default": "#1E1E1E"
+		},
+		"height": {
+			"type": "number",
+			"default": 15
+		},
+		"position": {
+			"type": "string",
+			"default": "top"
+		},
+		"isInverted": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"supports": {
+		"html": false,
+		"interactivity": true
+	},
+	"style": "wp-block-read-progress"
+}

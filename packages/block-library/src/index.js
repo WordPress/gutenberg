@@ -114,6 +114,7 @@ import * as queryTotal from './query-total';
 import * as quote from './quote';
 import * as reusableBlock from './block';
 import * as readMore from './read-more';
+import * as readProgress from './read-progress';
 import * as rss from './rss';
 import * as search from './search';
 import * as separator from './separator';
@@ -235,6 +236,7 @@ const getAllBlocks = () => {
 		queryNoResults,
 		queryTotal,
 		readMore,
+		readProgress,
 		comments,
 		commentAuthorName,
 		commentContent,

@@ -853,6 +853,15 @@ Displays the link of a post, page, or any other content-type. ([Source](https://
 -	**Supports:** color (background, gradients, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** content, linkTarget
 
+## Reading Progress Bar
+
+Displays a reading progress bar. Useful for tracking the read progress. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/read-progress))
+
+-	**Name:** core/read-progress
+-	**Category:** theme
+-	**Supports:** interactivity, ~~html~~
+-	**Attributes:** backgroundColor, height, isInverted, position, progressColor
+
 ## RSS
 
 Display entries from any RSS or Atom feed. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/rss))

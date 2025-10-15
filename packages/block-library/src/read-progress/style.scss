@@ -1,0 +1,50 @@
+.wp-block-read-progress {
+	&__container {
+		width: 100%;
+	}
+
+	&__selector {
+		background-color: $gray-200;
+		text-align: center;
+	}
+
+	&__read-bar {
+		width: 100%;
+		position: fixed;
+		left: 0;
+		top: 0;
+		z-index: 1000;
+
+		.admin-bar & {
+			top: 32px;
+
+			@media screen and ( max-width: 779px ) {
+				top: 46px;
+			}
+
+			@media screen and ( max-width: 594px ) {
+				top: 0;
+			}
+		}
+	}
+
+	&__progress-style {
+		position: fixed;
+		left: 0;
+		top: 0;
+		width: 100%;
+		z-index: 1000;
+
+		.admin-bar & {
+			top: 32px;
+
+			@media screen and ( max-width: 779px ) {
+				top: 46px;
+			}
+
+			@media screen and ( max-width: 594px ) {
+				top: 0;
+			}
+		}
+	}
+}
