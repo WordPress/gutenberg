@@ -131,7 +131,7 @@ export function Comments( {
 			const offsets = {};
 
 			if ( ! isFloating ) {
-				return;
+				return offsets;
 			}
 
 			// Find the index of the selected thread.
@@ -149,7 +149,7 @@ export function Comments( {
 				! selectedThreadData ||
 				! blockRefs[ selectedThreadData.id ]
 			) {
-				return;
+				return offsets;
 			}
 
 			let blockElement = blockRefs[ selectedThreadData.id ];
@@ -241,7 +241,9 @@ export function Comments( {
 			return offsets;
 		};
 		const newOffsets = calculateAllOffsets();
-		setBoardOffsets( newOffsets );
+		if ( Object.keys( newOffsets ).length > 0 ) {
+			setBoardOffsets( newOffsets );
+		}
 	}, [ heights, blockRefs, isFloating, threads, selectedThread ] );
 
 	const hasThreads = Array.isArray( threads ) && threads.length > 0;
@@ -278,9 +280,7 @@ export function Comments( {
 					commentSidebarRef={ commentSidebarRef }
 					reflowComments={ reflowComments }
 					isFloating={ isFloating }
-					calculatedOffset={
-						boardOffsets ? boardOffsets[ thread.id ] : 0
-					}
+					calculatedOffset={ boardOffsets[ thread.id ] ?? 0 }
 					setHeights={ setHeights }
 					setBlockRef={ setBlockRef }
 					selectedThread={ selectedThread }
