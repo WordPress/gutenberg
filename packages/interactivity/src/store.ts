@@ -8,13 +8,14 @@ import { isPlainObject, deepReadOnly } from './utils';
 /**
  * External dependencies
  */
-import { signal, type Signal } from '@preact/signals';
+import { signal } from '@preact/signals';
 
 export const stores = new Map();
 const rawStores = new Map();
 const storeLocks = new Map();
 const storeConfigs = new Map();
 const serverStates = new Map();
+const navigationSignal = signal( 0 );
 
 /**
  * Gets the defined config for the store with the passed namespace.
@@ -24,33 +25,6 @@ const serverStates = new Map();
  */
 export const getConfig = ( namespace?: string ) =>
 	storeConfigs.get( namespace || getNamespace() ) || {};
-
-/**
- * Initializes, updates or gets the server state for the given namespace.
- *
- * @param namespace Store's namespace.
- * @param state     Initial or new state to set.
- * @return The server state object, its signal, and the current signal value.
- */
-const serverState = (
-	namespace: string,
-	state?: object
-): {
-	state: Readonly< Record< string, unknown > >;
-	signal: Signal< number >;
-	value: number;
-} => {
-	if ( ! serverStates.has( namespace ) ) {
-		serverStates.set( namespace, {
-			state: deepReadOnly( state || {} ),
-			signal: signal( 0 ),
-			value: 0,
-		} );
-	} else if ( state ) {
-		serverStates.get( namespace ).state = deepReadOnly( state );
-	}
-	return serverStates.get( namespace );
-};
 
 /**
  * Gets the state defined and updated from the server.
@@ -77,13 +51,17 @@ const serverState = (
  * @param namespace Store's namespace from which to retrieve the server state.
  * @return The server state for the given namespace.
  */
-export const getServerState = ( namespace?: string ) => {
+export const getServerState: ( (
+	namespace?: string
+) => Readonly< Record< string, unknown > > ) & { subscribe?: number } = (
+	namespace?: string
+) => {
 	const ns = namespace || getNamespace();
-	const server = serverState( ns );
-	// Accesses the signal to make this reactive. It assigns it to `value` to
-	// prevent the JavaScript minifier from removing this line.
-	server.value = server.signal.value;
-	return server.state;
+	// Accesses the navigation signal to make this reactive. It assigns it to an
+	// arbitrary property (`subscribe`) to prevent the JavaScript minifier from
+	// removing this line.
+	getServerState.subscribe = navigationSignal.value;
+	return serverStates.get( ns );
 };
 
 interface StoreOptions {
@@ -304,18 +282,18 @@ export const populateServerData = ( data?: {
 	config?: Record< string, unknown >;
 } ) => {
 	if ( isPlainObject( data?.state ) ) {
-		Object.entries( data!.state ).forEach( ( [ ns, state ] ) => {
-			const st = store< any >( ns, {}, { lock: universalUnlock } );
+		Object.entries( data!.state ).forEach( ( [ namespace, state ] ) => {
+			const st = store< any >( namespace, {}, { lock: universalUnlock } );
 			deepMerge( st.state, state, false );
-			const { signal: serverSignal } = serverState( ns, state || {} );
-			serverSignal.value += 1; // Triggers invalidations.
+			serverStates.set( namespace, deepReadOnly( state || {} ) );
 		} );
 	}
 	if ( isPlainObject( data?.config ) ) {
-		Object.entries( data!.config ).forEach( ( [ ns, config ] ) => {
-			storeConfigs.set( ns, config );
+		Object.entries( data!.config ).forEach( ( [ namespace, config ] ) => {
+			storeConfigs.set( namespace, config );
 		} );
 	}
+	navigationSignal.value += 1; // Triggers invalidations.
 };
 
 // Parse and populate the initial state and config.
