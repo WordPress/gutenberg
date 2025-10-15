@@ -113,6 +113,9 @@ add_filter(
 		<template data-wp-each="state.radiotelephonicAlphabet">
 			<li data-wp-text="context.item"></li>
 		</template>
+		<li data-wp-each-child="test/deferred-store/derived-state::state.radiotelephonicAlphabet" data-wp-text="context.item">alpha</li>
+		<li data-wp-each-child="test/deferred-store/derived-state::state.radiotelephonicAlphabet" data-wp-text="context.item">bravo</li>
+		<li data-wp-each-child="test/deferred-store/derived-state::state.radiotelephonicAlphabet" data-wp-text="context.item">charlie</li>
 	</ol>
 	<button data-wp-on--click="actions.addItem" data-testid="derived-each-additem">+</button>
 </div>

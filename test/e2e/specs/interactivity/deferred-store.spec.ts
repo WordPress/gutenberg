@@ -114,4 +114,39 @@ test.describe( 'deferred store', () => {
 		await expect( loaded ).toBeVisible();
 		await expect( element ).not.toHaveClass( 'below-10' );
 	} );
+
+	test( 'Ensure wp-each keeps server-rendered children until the list is ready', async ( {
+		page,
+	} ) => {
+		const load = page.getByTestId( 'derived-state-load' );
+		const loaded = page.getByTestId( 'derived-state-loaded' );
+		const hydrated = page.getByTestId( 'derived-state-hydrated' );
+		const addItem = page.getByTestId( 'derived-each-additem' );
+		const element = page.getByTestId( 'derived-each-list' );
+		const items = element.getByRole( 'listitem' );
+
+		await expect( hydrated ).toBeVisible();
+		await expect( loaded ).toBeHidden();
+		await expect( items ).toHaveText( [ 'alpha', 'bravo', 'charlie' ] );
+
+		// The `addItem` button doesn't work yet; nothing changes.
+		await addItem.click();
+		await expect( loaded ).toBeHidden();
+		await expect( items ).toHaveText( [ 'alpha', 'bravo', 'charlie' ] );
+
+		// The list items are recreated according to the computed getter.
+		await load.click();
+		await expect( loaded ).toBeVisible();
+		await expect( items ).toHaveText( [ 'alpha', 'bravo', 'charlie' ] );
+
+		// The button works, and a new item is added.
+		await addItem.click();
+		await expect( loaded ).toBeVisible();
+		await expect( items ).toHaveText( [
+			'alpha',
+			'bravo',
+			'charlie',
+			'delta',
+		] );
+	} );
 } );
