@@ -7,193 +7,393 @@ import { renderHook } from '@testing-library/react';
  * Internal dependencies
  */
 import { useIsFormValid } from '../';
-import type { Field, Form } from '../../types';
+import type { Field } from '../../types';
 
 describe( 'useIsFormValid', () => {
-	const mockItem = {
-		id: 1,
-		name: 'Test Item',
-		description: '',
-		isActive: false,
-		count: 5,
-		email: 'test@example.com',
-	};
+	it( 'operates on form fields and ignores the rest', () => {
+		const item = { id: 1, valid_order: 2, invalid_order: 'd' };
+		const fields: Field< {} >[] = [
+			{
+				id: 'valid_order',
+				type: 'integer',
+			},
+			{
+				id: 'invalid_order',
+				type: 'integer',
+			},
+		];
+		const form = { fields: [ 'valid_order' ] };
+		const { result } = renderHook( () =>
+			useIsFormValid( item, fields, form )
+		);
+		expect( result.current?.[ 0 ] ).toEqual( undefined );
+	} );
 
-	const mockFields: Field< typeof mockItem >[] = [
-		{
-			id: 'name',
-			type: 'text',
-			label: 'Name',
-			isValid: { required: true },
-			getValue: ( { item } ) => item.name,
-		},
-		{
-			id: 'description',
-			type: 'text',
-			label: 'Description',
-			getValue: ( { item } ) => item.description,
-			isValid: {},
-		},
-		{
-			id: 'isActive',
-			type: 'boolean',
-			label: 'Active',
-			getValue: ( { item } ) => item.isActive,
-			isValid: { required: true },
-		},
-		{
-			id: 'count',
-			type: 'integer',
-			label: 'Count',
-			getValue: ( { item } ) => item.count,
-			isValid: {
-				required: true,
-				custom: ( item, field ) => {
-					const value = field.getValue( { item } );
-					return value < 10 ? null : 'Count must be less than 10';
+	it( 'fields can override the defaults', () => {
+		const item = { id: 1, order: 'd' };
+		const fields: Field< {} >[] = [
+			{
+				id: 'order',
+				type: 'integer',
+				elements: [
+					{ value: 'a', label: 'A' },
+					{ value: 'b', label: 'B' },
+				],
+				isValid: {
+					elements: false,
+					custom: () => null, // Overrides the validation provided for integer types.
 				},
 			},
-		},
-		{
-			id: 'email',
-			type: 'email',
-			label: 'Email',
-			getValue: ( { item } ) => item.email,
-			isValid: {
-				required: true,
-				custom: ( item, field ) => {
-					const value = field.getValue( { item } );
-					return value.includes( '@' )
-						? null
-						: 'Invalid email format';
+		];
+		const form = { fields: [ 'order' ] };
+		const { result } = renderHook( () =>
+			useIsFormValid( item, fields, form )
+		);
+		expect( result.current?.[ 0 ] ).toEqual( undefined );
+	} );
+
+	describe( 'isValid.required', () => {
+		it( 'array is invalid when required but empty', () => {
+			const item = { id: 1, tags: [] };
+			const fields: Field< {} >[] = [
+				{
+					id: 'tags',
+					type: 'array',
+					isValid: {
+						required: true,
+					},
 				},
-			},
-		},
-	];
+			];
+			const form = { fields: [ 'tags' ] };
+			const { result } = renderHook( () =>
+				useIsFormValid( item, fields, form )
+			);
+			expect( result.current?.[ 0 ] ).toEqual( {
+				id: 'tags',
+				required: 'invalid',
+			} );
+		} );
 
-	const mockForm: Form = {
-		fields: [ 'name', 'description', 'isActive', 'count', 'email' ],
-	};
+		it( 'array is invalid when required but not an array', () => {
+			const item = { id: 1, tags: null };
+			const fields: Field< {} >[] = [
+				{
+					id: 'tags',
+					type: 'array',
+					isValid: {
+						required: true,
+					},
+				},
+			];
+			const form = { fields: [ 'tags' ] };
+			const { result } = renderHook( () =>
+				useIsFormValid( item, fields, form )
+			);
+			expect( result.current?.[ 0 ] ).toEqual( {
+				id: 'tags',
+				required: 'invalid',
+			} );
+		} );
 
-	it( 'should return error messages for invalid fields', () => {
-		const { result } = renderHook( () =>
-			useIsFormValid( mockItem, mockFields, mockForm )
-		);
-
-		expect( result.current?.[ 0 ] ).toEqual( {
-			id: 'isActive',
-			required: 'invalid',
+		it( 'array is valid when required and has values', () => {
+			const item = { id: 1, tags: [ 'tag1', 'tag2' ] };
+			const fields: Field< {} >[] = [
+				{
+					id: 'tags',
+					type: 'array',
+					isValid: {
+						required: true,
+					},
+				},
+			];
+			const form = { fields: [ 'tags' ] };
+			const { result } = renderHook( () =>
+				useIsFormValid( item, fields, form )
+			);
+			expect( result.current?.[ 0 ] ).toEqual( undefined );
 		} );
 	} );
 
-	it( 'should handle required text fields', () => {
-		const item = { ...mockItem, name: '' };
-		const { result } = renderHook( () =>
-			useIsFormValid( item, mockFields, mockForm )
-		);
+	describe( 'isValid.elements', () => {
+		it( 'untyped is invalid if value is not one of the elements', () => {
+			const item = { id: 1, author: 'not-in-elements' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'author',
+					elements: [
+						{ value: 'jane', label: 'Jane' },
+						{ value: 'john', label: 'John' },
+					],
+				},
+			];
+			const form = { fields: [ 'author' ] };
+			const { result } = renderHook( () =>
+				useIsFormValid( item, fields, form )
+			);
+			expect( result.current?.[ 0 ] ).toEqual( {
+				id: 'author',
+				elements: 'invalid',
+			} );
+		} );
 
-		expect( result.current?.[ 0 ] ).toEqual( {
-			id: 'name',
-			required: 'invalid',
+		it( 'text is valid when value is one of the elements', () => {
+			const item = { id: 1, status: 'published' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'status',
+					type: 'text',
+					elements: [
+						{ value: 'draft', label: 'Draft' },
+						{ value: 'published', label: 'Published' },
+					],
+					isValid: {
+						elements: true,
+					},
+				},
+			];
+			const form = { fields: [ 'status' ] };
+			const { result } = renderHook( () =>
+				useIsFormValid( item, fields, form )
+			);
+			expect( result.current?.[ 0 ] ).toEqual( undefined );
+		} );
+
+		it( 'text is invalid when value is not one of the elements', () => {
+			const item = { id: 1, status: 'invalid-status' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'status',
+					type: 'text',
+					elements: [
+						{ value: 'draft', label: 'Draft' },
+						{ value: 'published', label: 'Published' },
+					],
+					isValid: {
+						elements: true,
+					},
+				},
+			];
+			const form = { fields: [ 'status' ] };
+			const { result } = renderHook( () =>
+				useIsFormValid( item, fields, form )
+			);
+			expect( result.current?.[ 0 ] ).toEqual( {
+				id: 'status',
+				elements: 'invalid',
+			} );
+		} );
+
+		it( 'integer is valid when value is one of the elements', () => {
+			const item = { id: 1, priority: 2 };
+			const fields: Field< {} >[] = [
+				{
+					id: 'priority',
+					type: 'integer',
+					elements: [
+						{ value: 1, label: 'Low' },
+						{ value: 2, label: 'Medium' },
+						{ value: 3, label: 'High' },
+					],
+					isValid: {
+						elements: true,
+					},
+				},
+			];
+			const form = { fields: [ 'priority' ] };
+			const { result } = renderHook( () =>
+				useIsFormValid( item, fields, form )
+			);
+			expect( result.current?.[ 0 ] ).toEqual( undefined );
+		} );
+
+		it( 'integer is invalid when value is not one of the elements', () => {
+			const item = { id: 1, priority: 5 };
+			const fields: Field< {} >[] = [
+				{
+					id: 'priority',
+					type: 'integer',
+					elements: [
+						{ value: 1, label: 'Low' },
+						{ value: 2, label: 'Medium' },
+						{ value: 3, label: 'High' },
+					],
+					isValid: {
+						elements: true,
+					},
+				},
+			];
+			const form = { fields: [ 'priority' ] };
+			const { result } = renderHook( () =>
+				useIsFormValid( item, fields, form )
+			);
+			expect( result.current?.[ 0 ] ).toEqual( {
+				id: 'priority',
+				elements: 'invalid',
+			} );
+		} );
+
+		it( 'number is invalid if value is not one of the elements', () => {
+			const item = { id: 1, price: 4.5 };
+			const fields: Field< {} >[] = [
+				{
+					id: 'price',
+					type: 'number',
+					elements: [
+						{ value: 1.5, label: 'Bronze' },
+						{ value: 2.5, label: 'Silver' },
+					],
+				},
+			];
+			const form = { fields: [ 'price' ] };
+			const { result } = renderHook( () =>
+				useIsFormValid( item, fields, form )
+			);
+			expect( result.current?.[ 0 ] ).toEqual( {
+				id: 'price',
+				elements: 'invalid',
+			} );
+		} );
+
+		it( 'array is valid if all items are part of the elements', () => {
+			const item = { id: 1, tags: [ 'red', 'blue' ] };
+			const fields: Field< {} >[] = [
+				{
+					id: 'tags',
+					type: 'array',
+					elements: [
+						{ value: 'red', label: 'Red' },
+						{ value: 'blue', label: 'Blue' },
+						{ value: 'green', label: 'Green' },
+					],
+				},
+			];
+			const form = { fields: [ 'tags' ] };
+			const { result } = renderHook( () =>
+				useIsFormValid( item, fields, form )
+			);
+			expect( result.current?.[ 0 ] ).toEqual( undefined );
+		} );
+
+		it( 'array is invalid when not all items are part of the elements', () => {
+			const item = { id: 1, tags: [ 'red', 'yellow' ] };
+			const fields: Field< {} >[] = [
+				{
+					id: 'tags',
+					type: 'array',
+					elements: [
+						{ value: 'red', label: 'Red' },
+						{ value: 'blue', label: 'Blue' },
+						{ value: 'green', label: 'Green' },
+					],
+				},
+			];
+			const form = { fields: [ 'tags' ] };
+			const { result } = renderHook( () =>
+				useIsFormValid( item, fields, form )
+			);
+			expect( result.current?.[ 0 ] ).toEqual( {
+				id: 'tags',
+				elements: 'invalid',
+			} );
+		} );
+
+		it( 'array is invalid when value is not an array', () => {
+			const item = { id: 1, tags: 'not-an-array' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'tags',
+					type: 'array',
+					elements: [
+						{ value: 'red', label: 'Red' },
+						{ value: 'blue', label: 'Blue' },
+					],
+					isValid: {
+						custom: () => null, // Disable to make sure the only validation triggered is elements
+					},
+				},
+			];
+			const form = { fields: [ 'tags' ] };
+			const { result } = renderHook( () =>
+				useIsFormValid( item, fields, form )
+			);
+			expect( result.current?.[ 0 ] ).toEqual( {
+				id: 'tags',
+				elements: 'invalid',
+			} );
 		} );
 	} );
 
-	it( 'should handle required email fields', () => {
-		const item = { ...mockItem, email: '' };
-		const { result } = renderHook( () =>
-			useIsFormValid( item, mockFields, mockForm )
-		);
-
-		expect( result.current?.[ 1 ] ).toEqual( {
-			id: 'email',
-			required: 'invalid',
+	describe( 'isValid.custom', () => {
+		it( 'integer is valid if value is integer', () => {
+			const item = { id: 1, order: 2, title: 'hi' };
+			const fields: Field< {} >[] = [
+				{
+					type: 'integer',
+					id: 'order',
+				},
+			];
+			const form = { fields: [ 'order' ] };
+			const { result } = renderHook( () =>
+				useIsFormValid( item, fields, form )
+			);
+			expect( result.current?.[ 0 ] ).toEqual( undefined );
 		} );
-	} );
 
-	it( 'should handle custom validation', () => {
-		const item = { ...mockItem, count: 15 };
-		const { result } = renderHook( () =>
-			useIsFormValid( item, mockFields, mockForm )
-		);
-
-		expect( result.current?.[ 1 ] ).toEqual( {
-			id: 'count',
-			custom: {
-				type: 'invalid',
-				message: 'Count must be less than 10',
-			},
+		it( 'integer is invalid if value is not integer when not empty', () => {
+			const item = { id: 1, order: 'd' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'order',
+					type: 'integer',
+				},
+			];
+			const form = { fields: [ 'order' ] };
+			const { result } = renderHook( () =>
+				useIsFormValid( item, fields, form )
+			);
+			expect( result.current?.[ 0 ] ).toEqual( {
+				id: 'order',
+				custom: {
+					type: 'invalid',
+					message: 'Value must be an integer.',
+				},
+			} );
 		} );
-	} );
 
-	it( 'should handle custom validation for email format', () => {
-		const item = { ...mockItem, email: 'invalid-email' };
-		const { result } = renderHook( () =>
-			useIsFormValid( item, mockFields, mockForm )
-		);
-
-		expect( result.current?.[ 1 ] ).toEqual( {
-			id: 'email',
-			custom: {
-				type: 'invalid',
-				message: 'Invalid email format',
-			},
+		it( 'number is valid if value is finite', () => {
+			const item = { id: 1, price: 2.5 };
+			const fields: Field< {} >[] = [
+				{
+					id: 'price',
+					type: 'number',
+				},
+			];
+			const form = { fields: [ 'price' ] };
+			const { result } = renderHook( () =>
+				useIsFormValid( item, fields, form )
+			);
+			expect( result.current?.[ 0 ] ).toEqual( undefined );
 		} );
-	} );
 
-	it( 'should handle form fields as objects', () => {
-		const formWithObjects: Form = {
-			fields: [
-				{ id: 'name' },
-				{ id: 'description' },
-				{ id: 'isActive' },
-				{ id: 'count' },
-				{ id: 'email' },
-			],
-		};
-
-		const { result } = renderHook( () =>
-			useIsFormValid( mockItem, mockFields, formWithObjects )
-		);
-
-		expect( result.current ).not.toBeUndefined();
-		expect( result.current?.[ 0 ] ).toEqual( {
-			id: 'isActive',
-			required: 'invalid',
+		it( 'number is invalid if value is not finite when not empty', () => {
+			const item = { id: 1, price: Number.NaN };
+			const fields: Field< {} >[] = [
+				{
+					id: 'price',
+					type: 'number',
+				},
+			];
+			const form = { fields: [ 'price' ] };
+			const { result } = renderHook( () =>
+				useIsFormValid( item, fields, form )
+			);
+			expect( result.current?.[ 0 ] ).toEqual( {
+				id: 'price',
+				custom: {
+					type: 'invalid',
+					message: 'Value must be a number.',
+				},
+			} );
 		} );
-	} );
-
-	it( 'should handle empty form fields', () => {
-		const formWithEmptyFields: Form = {
-			fields: [],
-		};
-
-		const { result } = renderHook( () =>
-			useIsFormValid( mockItem, mockFields, formWithEmptyFields )
-		);
-
-		expect( result.current ).toBeUndefined();
-	} );
-
-	it( 'should return undefined when all fields are valid', () => {
-		const validItem = {
-			...mockItem,
-			isActive: true,
-		};
-
-		const { result } = renderHook( () =>
-			useIsFormValid( validItem, mockFields, mockForm )
-		);
-
-		expect( result.current ).toBeUndefined();
-	} );
-
-	it( 'should handle undefined form fields', () => {
-		const formWithUndefinedFields: Form = {};
-
-		const { result } = renderHook( () =>
-			useIsFormValid( mockItem, mockFields, formWithUndefinedFields )
-		);
-
-		expect( result.current ).toBeUndefined();
 	} );
 } );
