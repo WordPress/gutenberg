@@ -197,9 +197,7 @@ function GridItem< Item >( {
 						className="dataviews-view-grid__title-field dataviews-title-field"
 						{ ...titleA11yProps }
 					>
-						<span className="dataviews-view-grid__title-field-content">
-							{ renderedTitleField }
-						</span>
+						<span>{ renderedTitleField }</span>
 					</ItemClickWrapper>
 					{ !! actions?.length && (
 						<ItemActions

@@ -141,7 +141,7 @@ function GridItem< Item >( {
 					className="dataviews-view-picker-grid__title-actions"
 				>
 					<div className="dataviews-view-picker-grid__title-field dataviews-title-field">
-						{ renderedTitleField }
+						<span>{ renderedTitleField }</span>
 					</div>
 				</HStack>
 			) }

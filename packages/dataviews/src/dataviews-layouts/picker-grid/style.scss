@@ -19,6 +19,14 @@
 			display: flex;
 			align-items: center;
 
+			// Ensure the title field content doesn't overflow its container.
+			// text-overflow: ellipsis only works on block containers, not flex containers.
+			&:first-child {
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
 			&--clickable {
 				width: fit-content;
 			}
