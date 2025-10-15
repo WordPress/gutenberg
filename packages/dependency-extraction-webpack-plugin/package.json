@@ -28,6 +28,11 @@
 		"build-types"
 	],
 	"main": "lib/index.js",
+	"exports": {
+		".": "./lib/index.js",
+		"./lib/util": "./lib/util.js",
+		"./package.json": "./package.json"
+	},
 	"types": "lib/types.d.ts",
 	"dependencies": {
 		"json2php": "^0.0.7"

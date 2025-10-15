@@ -2747,6 +2747,70 @@ describe( 'Entity handling', () => {
 		} );
 	} );
 
+	it( 'should allow unlinking and entering a custom URL', async () => {
+		const user = userEvent.setup();
+
+		const entityLink = {
+			id: 123,
+			url: 'https://example.com/page',
+			title: 'Test Page',
+			type: 'page',
+			kind: 'post-type',
+		};
+
+		const onChange = jest.fn();
+
+		render(
+			<LinkControl
+				value={ entityLink }
+				handleEntities
+				forceIsEditingLink
+				onChange={ onChange }
+			/>
+		);
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+
+		// Initially should be disabled because it's an entity
+		expect( searchInput ).toBeDisabled();
+
+		// Click the unsync button
+		const unlinkButton = screen.getByRole( 'button', {
+			name: 'Unsync and edit',
+		} );
+		await user.click( unlinkButton );
+
+		// Input should now be enabled and value should be cleared
+		expect( searchInput ).toBeEnabled();
+		expect( searchInput ).toHaveValue( '' );
+
+		// Type a custom URL (not selecting from suggestions)
+		const customUrl = 'www.wordpress.org';
+		await user.type( searchInput, customUrl );
+
+		// Wait for the URL suggestion to appear
+		await screen.findByRole( 'listbox' );
+
+		// Click the Apply button to submit
+		const applyButton = screen.getByRole( 'button', {
+			name: 'Apply',
+		} );
+		await user.click( applyButton );
+
+		// Verify that onChange was called with the entity link severed
+		// id, kind, and type should be undefined to indicate it's no longer an entity
+		expect( onChange ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				url: customUrl,
+				id: undefined,
+				kind: undefined,
+				type: undefined,
+			} )
+		);
+	} );
+
 	describe( 'Accessibility association for entity links', () => {
 		it( 'should associate unlink button with help text via aria-describedby', () => {
 			const entityLink = {

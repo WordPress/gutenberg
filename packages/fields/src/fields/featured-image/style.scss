@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .fields-controls__featured-image-placeholder {
 	border-radius: $radius-small;
 	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);

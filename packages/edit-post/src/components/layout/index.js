@@ -266,7 +266,7 @@ function MetaBoxesMain( { isLegacy } ) {
 		<div
 			// The class name 'edit-post-layout__metaboxes' is retained because some plugins use it.
 			className="edit-post-layout__metaboxes edit-post-meta-boxes-main__liner"
-			hidden={ ! isOpen }
+			hidden={ ! isLegacy && ! isOpen }
 		>
 			<MetaBoxes location="normal" />
 			<MetaBoxes location="advanced" />

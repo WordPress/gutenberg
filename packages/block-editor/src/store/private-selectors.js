@@ -141,13 +141,11 @@ function getEnabledClientIdsTreeUnmemoized( state, rootClientId ) {
  *
  * @return {Object[]} Tree of block objects with only clientID and innerBlocks set.
  */
-export const getEnabledClientIdsTree = createRegistrySelector( ( select ) =>
+export const getEnabledClientIdsTree = createRegistrySelector( () =>
 	createSelector( getEnabledClientIdsTreeUnmemoized, ( state ) => [
 		state.blocks.order,
 		state.derivedBlockEditingModes,
-		state.derivedNavModeBlockEditingModes,
 		state.blockEditingModes,
-		select( STORE_NAME ).__unstableGetEditorMode( state ),
 	] )
 );
 

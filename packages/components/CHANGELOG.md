@@ -2,13 +2,12 @@
 
 ## Unreleased
 
-## 30.6.0-next.0 (2025-10-10)
-
 ### Enhancements
 
 -   `SearchControl`: Move search icon to prefix position ([#71984](https://github.com/WordPress/gutenberg/pull/71984)).
 -   `SearchControl`: Flip search icon depending on placement ([#72070](https://github.com/WordPress/gutenberg/pull/72070)).
 -   `SearchControl`: Normalize styles ([#72072](https://github.com/WordPress/gutenberg/pull/72072)).
+-   `Badge`: Avoid propagating text-decoration styles from ancestors into the component ([#72097](https://github.com/WordPress/gutenberg/pull/72097), [#72302](https://github.com/WordPress/gutenberg/pull/72302)).
 -   `CheckboxControl`, `RadioControl`, `ToggleControl` (`FormToggle`): Ensure elements are focused when clicked in Safari ([#72115](https://github.com/WordPress/gutenberg/pull/72115)).
 
 ### Bug Fixes
@@ -18,6 +17,7 @@
 ### Internal
 
 -   Replace usage of extinct icons `edit` and `warning` with `pencil` and `cautionFilled`, respectively ([#72105](https://github.com/WordPress/gutenberg/pull/72105)).
+-   Move the package to v2 build pipeline. Rewrite styles to be dart-sass compatible ([#72242](https://github.com/WordPress/gutenberg/pull/72242)).
 
 ## 30.5.0 (2025-10-01)
 

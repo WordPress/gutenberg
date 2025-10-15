@@ -9,15 +9,22 @@ import { fileURLToPath } from 'url';
 import { parseArgs } from 'node:util';
 import esbuild from 'esbuild';
 import glob from 'fast-glob';
-import watch from 'node-watch';
+import chokidar from 'chokidar';
 // See https://github.com/WordPress/gutenberg/issues/72136
 // eslint-disable-next-line import/no-unresolved
 import browserslistToEsbuild from 'browserslist-to-esbuild';
+import { sassPlugin } from 'esbuild-sass-plugin';
+import postcss from 'postcss';
+import autoprefixer from 'autoprefixer';
+import rtlcss from 'rtlcss';
+import cssnano from 'cssnano';
+import babel from 'esbuild-plugin-babel';
 
 /**
  * Internal dependencies
  */
 import { V2_PACKAGES } from './v2-packages.js';
+import { groupByDepth } from './dependency-graph.js';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
 
@@ -29,6 +36,7 @@ const IGNORE_PATTERNS = [
 	'**/benchmark/**',
 	'**/{__mocks__,__tests__,test}/**',
 	'**/{storybook,stories}/**',
+	'**/*.native.*',
 ];
 const TEST_FILE_PATTERNS = [
 	/\/(benchmark|__mocks__|__tests__|test|storybook|stories)\/.+/,
@@ -47,6 +55,21 @@ const define = {
 		process.env.NODE_ENV === 'development'
 	),
 };
+
+/**
+ * Create emotion babel plugin for esbuild.
+ * This plugin enables emotion's babel transformations for proper CSS-in-JS handling.
+ *
+ * @return {Object} esbuild plugin.
+ */
+function emotionBabelPlugin() {
+	return babel( {
+		filter: /\.[jt]sx?$/,
+		config: {
+			plugins: [ '@emotion/babel-plugin' ],
+		},
+	} );
+}
 
 /**
  * Normalize path separators for cross-platform compatibility.
@@ -399,10 +422,56 @@ function wordpressExternalsPlugin(
 					outputDir,
 					`${ assetName }.asset.php`
 				);
+
+				await mkdir( path.dirname( assetFilePath ), {
+					recursive: true,
+				} );
 				await writeFile( assetFilePath, assetContent );
 			} );
 		},
 	};
+}
+
+/**
+ * Resolve the entry point for bundling from package.json exports field.
+ * Falls back to build-module/index.js if no exports field is found.
+ *
+ * @param {string} packageDir  Package directory path.
+ * @param {Object} packageJson Package.json object.
+ * @return {string} Resolved entry point path.
+ */
+function resolveEntryPoint( packageDir, packageJson ) {
+	// If package has exports field, use it
+	if ( packageJson.exports ) {
+		const rootExport = packageJson.exports[ '.' ];
+		if ( rootExport ) {
+			// If it's an object with conditions, prefer 'import' over 'default'
+			if ( typeof rootExport === 'object' ) {
+				const entryFile =
+					rootExport.import ||
+					rootExport.default ||
+					rootExport.require;
+				if ( entryFile ) {
+					return path.join( packageDir, entryFile );
+				}
+			}
+			// If it's a string, use it directly
+			if ( typeof rootExport === 'string' ) {
+				return path.join( packageDir, rootExport );
+			}
+		}
+	}
+
+	// Fallback: try module field, then main field, then build-module/index.js
+	if ( packageJson.module ) {
+		return path.join( packageDir, packageJson.module );
+	}
+	if ( packageJson.main ) {
+		return path.join( packageDir, packageJson.main );
+	}
+
+	// Ultimate fallback
+	return path.join( packageDir, 'build-module', 'index.js' );
 }
 
 /**
@@ -420,7 +489,7 @@ async function bundlePackage( packageName ) {
 
 	// Bundle wpScript (IIFE format for global wp.* namespace)
 	if ( packageJson.wpScript ) {
-		const entryPoint = path.join( packageDir, 'build-module', 'index.js' );
+		const entryPoint = resolveEntryPoint( packageDir, packageJson );
 		const outputDir = path.join( PACKAGES_DIR, '..', 'build', packageName );
 		const target = browserslistToEsbuild();
 		const globalName = `wp.${ kebabToCamelCase( packageName ) }`;
@@ -442,26 +511,25 @@ async function bundlePackage( packageName ) {
 			};
 		}
 
+		const bundlePlugins = [
+			momentTimezoneAliasPlugin(),
+			wordpressExternalsPlugin( 'index.min', 'iife' ),
+		];
+
 		builds.push(
 			esbuild.build( {
 				...baseConfig,
 				outfile: path.join( outputDir, 'index.min.js' ),
 				minify: true,
 				define,
-				plugins: [
-					momentTimezoneAliasPlugin(),
-					wordpressExternalsPlugin( 'index.min', 'iife' ),
-				],
+				plugins: bundlePlugins,
 			} ),
 			esbuild.build( {
 				...baseConfig,
 				outfile: path.join( outputDir, 'index.js' ),
 				minify: false,
 				define,
-				plugins: [
-					momentTimezoneAliasPlugin(),
-					wordpressExternalsPlugin( 'index.min', 'iife' ),
-				],
+				plugins: bundlePlugins,
 			} )
 		);
 	}
@@ -491,6 +559,10 @@ async function bundlePackage( packageName ) {
 					: exportName.replace( /^\.\//, '' );
 			const entryPoint = path.join( packageDir, exportPath );
 
+			const modulePlugins = [
+				wordpressExternalsPlugin( `${ fileName }.min`, 'esm' ),
+			];
+
 			builds.push(
 				esbuild.build( {
 					entryPoints: [ entryPoint ],
@@ -505,11 +577,67 @@ async function bundlePackage( packageName ) {
 					platform: 'browser',
 					minify: true,
 					define,
-					plugins: [
-						wordpressExternalsPlugin( `${ fileName }.min`, 'esm' ),
-					],
+					plugins: modulePlugins,
 				} )
 			);
+		}
+	}
+
+	// Process CSS files from build-style to build directory (for wpScript packages)
+	if ( packageJson.wpScript ) {
+		const buildStyleDir = path.join( packageDir, 'build-style' );
+		const outputDir = path.join( PACKAGES_DIR, '..', 'build', packageName );
+		const isProduction = process.env.NODE_ENV === 'production';
+
+		try {
+			// Find CSS files in build-style directory
+			const cssFiles = await glob(
+				normalizePath( path.join( buildStyleDir, '*.css' ) )
+			);
+
+			if ( cssFiles.length > 0 ) {
+				// Ensure output directory exists
+				await mkdir( outputDir, { recursive: true } );
+
+				// Process each CSS file
+				for ( const cssFile of cssFiles ) {
+					const filename = path.basename( cssFile );
+					const destPath = path.join( outputDir, filename );
+
+					if ( isProduction ) {
+						// In production, minify CSS with cssnano
+						builds.push(
+							( async () => {
+								const cssContent = await readFile(
+									cssFile,
+									'utf8'
+								);
+								const result = await postcss( [
+									cssnano( {
+										preset: [
+											'default',
+											{
+												discardComments: {
+													removeAll: true,
+												},
+											},
+										],
+									} ),
+								] ).process( cssContent, {
+									from: cssFile,
+									to: destPath,
+								} );
+								await writeFile( destPath, result.css );
+							} )()
+						);
+					} else {
+						// In development, just copy the file
+						builds.push( copyFile( cssFile, destPath ) );
+					}
+				}
+			}
+		} catch ( error ) {
+			// build-style doesn't exist or is empty - that's fine, not all packages have styles
 		}
 	}
 
@@ -559,6 +687,11 @@ async function transpilePackage( packageName ) {
 
 	const builds = [];
 
+	// Check if this is the components package that needs emotion babel plugin
+	// Ideally we should remove this exception and move away from emotion.
+	const needsEmotionPlugin = packageName === 'components';
+	const plugins = needsEmotionPlugin ? [ emotionBabelPlugin() ] : [];
+
 	// Build CJS and copy JSON files to build directory
 	if ( packageJson.main ) {
 		builds.push(
@@ -576,6 +709,7 @@ async function transpilePackage( packageName ) {
 				loader: {
 					'.js': 'jsx',
 				},
+				plugins,
 			} )
 		);
 
@@ -609,6 +743,7 @@ async function transpilePackage( packageName ) {
 				loader: {
 					'.js': 'jsx',
 				},
+				plugins,
 			} )
 		);
 
@@ -625,7 +760,93 @@ async function transpilePackage( packageName ) {
 		}
 	}
 
+	await compileStyles( packageName );
+
 	await Promise.all( builds );
+
+	return Date.now() - startTime;
+}
+
+/**
+ * Compile styles for a single package.
+ * Discovers and compiles all .scss entry points in src/ directory (matching v1 behavior).
+ *
+ * @param {string} packageName Package name.
+ * @return {Promise<number|null>} Build time in milliseconds, or null if no styles.
+ */
+async function compileStyles( packageName ) {
+	const packageDir = path.join( PACKAGES_DIR, packageName );
+
+	// Find all .scss entry points in src/ root (match v1 behavior)
+	const styleEntries = await glob(
+		normalizePath( path.join( packageDir, 'src/*.scss' ) )
+	);
+
+	if ( styleEntries.length === 0 ) {
+		return null;
+	}
+
+	const startTime = Date.now();
+	const buildStyleDir = path.join( packageDir, 'build-style' );
+	await mkdir( buildStyleDir, { recursive: true } );
+
+	// Compile each style entry point
+	await Promise.all(
+		styleEntries.map( async ( styleEntryPath ) => {
+			const entryName = path.basename( styleEntryPath, '.scss' );
+
+			// Build with Sass plugin
+			await esbuild.build( {
+				entryPoints: [ styleEntryPath ],
+				outdir: buildStyleDir,
+				bundle: true,
+				write: false,
+				loader: {
+					'.scss': 'css',
+				},
+				plugins: [
+					sassPlugin( {
+						embedded: true,
+						loadPaths: [
+							'node_modules',
+							path.join( PACKAGES_DIR, 'base-styles' ),
+						],
+						async transform( source ) {
+							// Process with autoprefixer for LTR version
+							const ltrResult = await postcss( [
+								autoprefixer( { grid: true } ),
+							] ).process( source, { from: undefined } );
+
+							// Process with rtlcss for RTL version
+							const rtlResult = await postcss( [
+								rtlcss(),
+							] ).process( ltrResult.css, { from: undefined } );
+
+							// Write both versions
+							await Promise.all( [
+								writeFile(
+									path.join(
+										buildStyleDir,
+										`${ entryName }.css`
+									),
+									ltrResult.css
+								),
+								writeFile(
+									path.join(
+										buildStyleDir,
+										`${ entryName }-rtl.css`
+									),
+									rtlResult.css
+								),
+							] );
+
+							return '';
+						},
+					} ),
+				],
+			} );
+		} )
+	);
 
 	return Date.now() - startTime;
 }
@@ -641,7 +862,7 @@ function isV2SourceFile( filename ) {
 		path.relative( process.cwd(), filename )
 	);
 
-	if ( ! /\/src\/.+\.(js|ts|tsx)$/.test( relativePath ) ) {
+	if ( ! /\/src\/.+\.(js|ts|tsx|scss)$/.test( relativePath ) ) {
 		return false;
 	}
 
@@ -689,14 +910,23 @@ async function buildAll() {
 
 	const startTime = Date.now();
 
-	// Phase 1: Transpile all packages in parallel
+	// Group packages by dependency depth
+	const levels = groupByDepth( V2_PACKAGES );
+
+	// Phase 1: Transpile packages level by level (respecting dependencies)
 	console.log( '📝 Phase 1: Transpiling packages...\n' );
-	await Promise.all(
-		V2_PACKAGES.map( async ( packageName ) => {
-			const buildTime = await transpilePackage( packageName );
-			console.log( `✔ Transpiled ${ packageName } (${ buildTime }ms)` );
-		} )
-	);
+
+	for ( let i = 0; i < levels.length; i++ ) {
+		const level = levels[ i ];
+		await Promise.all(
+			level.map( async ( packageName ) => {
+				const buildTime = await transpilePackage( packageName );
+				console.log(
+					`   ✔ Transpiled ${ packageName } (${ buildTime }ms)`
+				);
+			} )
+		);
+	}
 
 	// Phase 2: Bundle packages with wpScript in parallel
 	console.log( '\n📦 Phase 2: Bundling packages...\n' );
@@ -754,29 +984,65 @@ async function watchMode() {
 		rebuildTimeoutId = null;
 	}
 
-	watch(
-		PACKAGES_DIR,
-		{ recursive: true, delay: 500 },
-		( event, filename ) => {
-			if ( ! isV2SourceFile( filename ) ) {
-				return;
-			}
-
-			const packageName = getPackageName( filename );
-			if ( ! packageName ) {
-				return;
-			}
-
-			packagesToRebuild.add( packageName );
-
-			// Only schedule a rebuild if one isn't already scheduled
-			if ( rebuildTimeoutId ) {
-				return;
-			}
-
-			rebuildTimeoutId = setTimeout( processRebuilds, 100 );
-		}
+	// Watch only V2 package source directories (not all 89 packages)
+	const watchPaths = V2_PACKAGES.map( ( packageName ) =>
+		path.join( PACKAGES_DIR, packageName, 'src' )
 	);
+
+	const watcher = chokidar.watch( watchPaths, {
+		ignored: [
+			// Exclude test files and other non-source files
+			'**/{__mocks__,__tests__,test,storybook,stories}/**',
+			'**/*.{spec,test}.{js,ts,tsx}',
+			'**/*.native.*',
+		],
+		persistent: true,
+		ignoreInitial: true,
+		// Reduce file descriptor usage on macOS
+		useFsEvents: true,
+		depth: 10,
+		awaitWriteFinish: {
+			stabilityThreshold: 100,
+			pollInterval: 50,
+		},
+	} );
+
+	watcher.on( 'error', ( error ) => {
+		if ( error.code === 'EMFILE' ) {
+			console.error(
+				'\n❌ Too many open files. Try increasing the limit:\n' +
+					'   Run: ulimit -n 10240\n' +
+					'   Or add to ~/.zshrc: ulimit -n 10240\n'
+			);
+			process.exit( 1 );
+		}
+		console.error( '❌ Watcher error:', error );
+	} );
+
+	// Handle file changes, additions, and deletions
+	const handleFileChange = ( filename ) => {
+		if ( ! isV2SourceFile( filename ) ) {
+			return;
+		}
+
+		const packageName = getPackageName( filename );
+		if ( ! packageName ) {
+			return;
+		}
+
+		packagesToRebuild.add( packageName );
+
+		// Only schedule a rebuild if one isn't already scheduled
+		if ( rebuildTimeoutId ) {
+			return;
+		}
+
+		rebuildTimeoutId = setTimeout( processRebuilds, 100 );
+	};
+
+	watcher.on( 'change', handleFileChange );
+	watcher.on( 'add', handleFileChange );
+	watcher.on( 'unlink', handleFileChange );
 }
 
 /**

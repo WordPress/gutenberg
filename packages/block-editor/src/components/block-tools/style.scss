@@ -1,7 +1,10 @@
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
 /**
  * Insertion Point.
  */
-
 .block-editor-block-list__insertion-point {
 	position: absolute;
 	top: 0;

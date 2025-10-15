@@ -27,6 +27,10 @@
 		"index.js"
 	],
 	"main": "index.js",
+	"exports": {
+		".": "./index.js",
+		"./package.json": "./package.json"
+	},
 	"peerDependencies": {
 		"npm-package-json-lint": ">=6.0.0"
 	},

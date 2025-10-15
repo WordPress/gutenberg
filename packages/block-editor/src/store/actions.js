@@ -1666,19 +1666,6 @@ export const __unstableMarkAutomaticChange =
 	};
 
 /**
- * Action that enables or disables the navigation mode.
- *
- * @param {boolean} isNavigationMode Enable/Disable navigation mode.
- */
-export const setNavigationMode =
-	( isNavigationMode = true ) =>
-	( { dispatch } ) => {
-		dispatch.__unstableSetEditorMode(
-			isNavigationMode ? 'navigation' : 'edit'
-		);
-	};
-
-/**
  * Action that sets the editor mode
  *
  * @param {string} mode Editor mode

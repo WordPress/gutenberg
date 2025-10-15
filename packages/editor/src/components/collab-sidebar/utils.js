@@ -14,6 +14,11 @@ export function sanitizeCommentString( str ) {
 }
 
 /**
+ * A no-operation function that does nothing.
+ */
+export function noop() {}
+
+/**
  * These colors are picked from the WordPress.org design library.
  * @see https://www.figma.com/design/HOJTpCFfa3tR0EccUlu0CM/WordPress.org-Design-Library?node-id=1-2193&t=M6WdRvTpt0mh8n6T-1
  */
