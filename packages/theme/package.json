@@ -52,6 +52,6 @@
 		"access": "public"
 	},
 	"scripts": {
-		"build:tokens": "node bin/build-tokens.js && prettier --write tokens/color.json prebuild/* docs/*"
+		"build": "rimraf prebuild docs && node bin/build-tokens.js && prettier --write tokens/color.json prebuild/* docs/*"
 	}
 }
