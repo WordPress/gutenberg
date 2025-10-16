@@ -26,9 +26,10 @@ export function useEntityBinding( { clientId, attributes } ) {
 		hasUrlBinding && metadata?.bindings?.url?.source === expectedSource;
 
 	const clearBinding = useCallback(
-		( freshAttributes ) => {
-			// Use fresh attributes if provided, otherwise fall back to closure attributes
-			const kindToUse = freshAttributes?.kind ?? kind;
+		( updatedAttributes ) => {
+			// Use updated attributes if provided, otherwise fall back to closure attributes
+			// updatedAttributes needed to access the most up-to-date data when called synchronously
+			const kindToUse = updatedAttributes?.kind ?? kind;
 			const expectedSourceForClear =
 				kindToUse === 'post-type' ? 'core/post-data' : 'core/term-data';
 			const hasCorrectBindingForClear =
@@ -39,13 +40,14 @@ export function useEntityBinding( { clientId, attributes } ) {
 				updateBlockBindings( { url: undefined } );
 			}
 		},
-		[ hasUrlBinding, metadata, updateBlockBindings, kind ]
+		[ hasUrlBinding, metadata, updateBlockBindings, kind, id ]
 	);
 
 	const createBinding = useCallback(
-		( freshAttributes ) => {
-			// Use fresh attributes if provided, otherwise fall back to closure attributes
-			const kindToUse = freshAttributes?.kind ?? kind;
+		( updatedAttributes ) => {
+			// Use updated attributes if provided, otherwise fall back to closure attributes
+			// updatedAttributes needed to access the most up-to-date data when called synchronously
+			const kindToUse = updatedAttributes?.kind ?? kind;
 
 			// Avoid creating binding if no kind is provided
 			if ( ! kindToUse ) {
@@ -66,7 +68,7 @@ export function useEntityBinding( { clientId, attributes } ) {
 				},
 			} );
 		},
-		[ updateBlockBindings, kind ]
+		[ updateBlockBindings, kind, id ]
 	);
 
 	return {

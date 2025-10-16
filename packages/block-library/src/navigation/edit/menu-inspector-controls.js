@@ -111,19 +111,20 @@ function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
 			} }
 			onChange={ ( updatedValue ) => {
 				// updateAttributes determines the final state and returns metadata
-				const { isEntityLink } = updateAttributes(
-					updatedValue,
-					setInsertedBlockAttributes( insertedBlock?.clientId ),
-					insertedBlock?.attributes
-				);
+				const { isEntityLink, attributes: updatedAttributes } =
+					updateAttributes(
+						updatedValue,
+						setInsertedBlockAttributes( insertedBlock?.clientId ),
+						insertedBlock?.attributes
+					);
 
 				// Handle URL binding based on the final computed state
 				// Only create bindings for entity links (posts, pages, taxonomies)
 				// Never create bindings for custom links (manual URLs)
 				if ( isEntityLink ) {
-					createBinding();
+					createBinding( updatedAttributes );
 				} else {
-					clearBinding();
+					clearBinding( updatedAttributes );
 				}
 
 				setInsertedBlock( null );

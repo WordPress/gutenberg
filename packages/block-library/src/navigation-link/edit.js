@@ -545,7 +545,7 @@ export default function NavigationLinkEdit( {
 							onChange={ ( updatedValue ) => {
 								const {
 									isEntityLink,
-									attributes: freshAttributes,
+									attributes: updatedAttributes,
 								} = updateAttributes(
 									updatedValue,
 									setAttributes,
@@ -556,9 +556,9 @@ export default function NavigationLinkEdit( {
 								// Only create bindings for entity links (posts, pages, taxonomies)
 								// Never create bindings for custom links (manual URLs)
 								if ( isEntityLink ) {
-									createBinding( freshAttributes );
+									createBinding( updatedAttributes );
 								} else {
-									clearBinding( freshAttributes );
+									clearBinding( updatedAttributes );
 								}
 							} }
 						/>
