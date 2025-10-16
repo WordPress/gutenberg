@@ -19,11 +19,11 @@ function gutenberg_kses_allow_mathml( $allowedtags ) {
 	// https://www.w3.org/TR/mathml-core/#global-attributes
 	// Except common attributes added by _wp_add_global_attributes.
 	$global_attributes = array(
-		'displaystyle'    => true,
-		'scriptlevel'     => true,
-		'mathbackground'  => true,
-		'mathcolor'       => true,
-		'mathsize'        => true,
+		'displaystyle'   => true,
+		'scriptlevel'    => true,
+		'mathbackground' => true,
+		'mathcolor'      => true,
+		'mathsize'       => true,
 	);
 
 	// https://www.w3.org/TR/mathml-core/#the-top-level-math-element
@@ -49,17 +49,17 @@ function gutenberg_kses_allow_mathml( $allowedtags ) {
 	$allowedtags['mo'] = array_merge(
 		$global_attributes,
 		array(
-			'form'           => true,
-			'fence'          => true,
-			'separator'      => true,
-			'lspace'         => true,
-			'rspace'         => true,
-			'stretchy'       => true,
-			'symmetric'      => true,
-			'maxsize'        => true,
-			'minsize'        => true,
-			'largeop'        => true,
-			'movablelimits'  => true,
+			'form'          => true,
+			'fence'         => true,
+			'separator'     => true,
+			'lspace'        => true,
+			'rspace'        => true,
+			'stretchy'      => true,
+			'symmetric'     => true,
+			'maxsize'       => true,
+			'minsize'       => true,
+			'largeop'       => true,
+			'movablelimits' => true,
 		)
 	);
 	// https://www.w3.org/TR/mathml-core/#space-mspace
@@ -72,11 +72,11 @@ function gutenberg_kses_allow_mathml( $allowedtags ) {
 		)
 	);
 	// https://www.w3.org/TR/mathml-core/#string-literal-ms
-	$allowedtags['ms']    = $global_attributes;
+	$allowedtags['ms'] = $global_attributes;
 
 	// https://www.w3.org/TR/mathml-core/#general-layout-schemata
 	// https://www.w3.org/TR/mathml-core/#horizontally-group-sub-expressions-mrow
-	$allowedtags['mrow']    = $global_attributes;
+	$allowedtags['mrow'] = $global_attributes;
 	// https://www.w3.org/TR/mathml-core/#fractions-mfrac
 	$allowedtags['mfrac'] = array_merge(
 		$global_attributes,
@@ -88,9 +88,9 @@ function gutenberg_kses_allow_mathml( $allowedtags ) {
 	$allowedtags['msqrt'] = $global_attributes;
 	$allowedtags['mroot'] = $global_attributes;
 	// https://www.w3.org/TR/mathml-core/#style-change-mstyle
-	$allowedtags['mstyle']  = $global_attributes;
+	$allowedtags['mstyle'] = $global_attributes;
 	// https://www.w3.org/TR/mathml-core/#error-message-merror
-	$allowedtags['merror']  = $global_attributes;
+	$allowedtags['merror'] = $global_attributes;
 	// https://www.w3.org/TR/mathml-core/#adjust-space-around-content-mpadded
 	$allowedtags['mpadded'] = array_merge(
 		$global_attributes,
@@ -111,12 +111,12 @@ function gutenberg_kses_allow_mathml( $allowedtags ) {
 	$allowedtags['msup']    = $global_attributes;
 	$allowedtags['msubsup'] = $global_attributes;
 	// https://www.w3.org/TR/mathml-core/#underscripts-and-overscripts-munder-mover-munderover
-	$overunder_attributes = array(
+	$overunder_attributes      = array(
 		'accentunder' => true,
 		'accent'      => true,
 	);
-	$allowedtags['munder'] = array_merge( $global_attributes, $overunder_attributes );
-	$allowedtags['mover'] = array_merge( $global_attributes, $overunder_attributes );
+	$allowedtags['munder']     = array_merge( $global_attributes, $overunder_attributes );
+	$allowedtags['mover']      = array_merge( $global_attributes, $overunder_attributes );
 	$allowedtags['munderover'] = array_merge( $global_attributes, $overunder_attributes );
 	// https://www.w3.org/TR/mathml-core/#prescripts-and-tensor-indices-mmultiscripts
 	$allowedtags['mmultiscripts'] = $global_attributes;
@@ -165,11 +165,11 @@ function gutenberg_kses_allow_mathml( $allowedtags ) {
 	);
 
 	// https://www.w3.org/TR/mathml-core/#semantics-and-presentation
-	$allowedtags['semantics'] = $global_attributes;
-	$annotation_attributes = array(
+	$allowedtags['semantics']      = $global_attributes;
+	$annotation_attributes         = array(
 		'encoding' => true,
-	);	
-	$allowedtags['annotation'] = array_merge( $global_attributes, $annotation_attributes );
+	);
+	$allowedtags['annotation']     = array_merge( $global_attributes, $annotation_attributes );
 	$allowedtags['annotation-xml'] = array_merge( $global_attributes, $annotation_attributes );
 
 	// Non-standard but widely supported, used by temml/katex.
