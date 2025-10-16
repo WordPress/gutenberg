@@ -781,7 +781,6 @@ const ValidationComponent = ( {
 			isValid: {
 				required,
 				custom: maybeCustomRule( customTextRule ),
-				elements: false, // TODO: expose this via storybook
 			},
 		},
 		{
@@ -795,7 +794,6 @@ const ValidationComponent = ( {
 			isValid: {
 				required,
 				custom: maybeCustomRule( customSelectRule ),
-				elements: false, // TODO: expose this via storybook
 			},
 		},
 		{
@@ -810,7 +808,6 @@ const ValidationComponent = ( {
 			isValid: {
 				required,
 				custom: maybeCustomRule( customTextRadioRule ),
-				elements: false, // TODO: expose this via storybook
 			},
 		},
 		{
@@ -821,7 +818,6 @@ const ValidationComponent = ( {
 			isValid: {
 				required,
 				custom: maybeCustomRule( customTextareaRule ),
-				elements: false, // TODO: expose this via storybook
 			},
 		},
 		{
@@ -831,7 +827,6 @@ const ValidationComponent = ( {
 			isValid: {
 				required,
 				custom: maybeCustomRule( customEmailRule ),
-				elements: false, // TODO: expose this via storybook
 			},
 		},
 		{
@@ -841,7 +836,6 @@ const ValidationComponent = ( {
 			isValid: {
 				required,
 				custom: maybeCustomRule( customTelephoneRule ),
-				elements: false, // TODO: expose this via storybook
 			},
 		},
 		{
@@ -851,7 +845,6 @@ const ValidationComponent = ( {
 			isValid: {
 				required,
 				custom: maybeCustomRule( customUrlRule ),
-				elements: false, // TODO: expose this via storybook
 			},
 		},
 		{
@@ -861,7 +854,6 @@ const ValidationComponent = ( {
 			isValid: {
 				required,
 				custom: maybeCustomRule( customColorRule ),
-				elements: false, // TODO: expose this via storybook
 			},
 		},
 		{
@@ -871,7 +863,6 @@ const ValidationComponent = ( {
 			isValid: {
 				required,
 				custom: maybeCustomRule( customIntegerRule ),
-				elements: false, // TODO: expose this via storybook
 			},
 		},
 		{
@@ -881,7 +872,6 @@ const ValidationComponent = ( {
 			isValid: {
 				required,
 				custom: maybeCustomRule( customNumberRule ),
-				elements: false, // TODO: expose this via storybook
 			},
 		},
 		{
@@ -891,7 +881,6 @@ const ValidationComponent = ( {
 			isValid: {
 				required,
 				custom: maybeCustomRule( customBooleanRule ),
-				elements: false, // TODO: expose this via storybook
 			},
 		},
 		{
@@ -900,7 +889,6 @@ const ValidationComponent = ( {
 			label: 'Categories',
 			isValid: {
 				required,
-				elements: false, // TODO: expose this via storybook
 			},
 			elements: [
 				{ value: 'astronomy', label: 'Astronomy' },
@@ -936,7 +924,6 @@ const ValidationComponent = ( {
 			Edit: CustomEditControl,
 			isValid: {
 				required,
-				elements: false, // TODO: expose this via storybook
 			},
 		},
 		{
@@ -946,7 +933,6 @@ const ValidationComponent = ( {
 			isValid: {
 				required,
 				custom: maybeCustomRule( customPasswordRule ),
-				elements: false, // TODO: expose this via storybook
 			},
 		},
 		{
@@ -957,7 +943,6 @@ const ValidationComponent = ( {
 			isValid: {
 				required,
 				custom: maybeCustomRule( customToggleRule ),
-				elements: false, // TODO: expose this via storybook
 			},
 		},
 		{
@@ -973,7 +958,6 @@ const ValidationComponent = ( {
 			isValid: {
 				required,
 				custom: maybeCustomRule( customToggleGroupRule ),
-				elements: false, // TODO: expose this via storybook
 			},
 		},
 		{
@@ -983,7 +967,6 @@ const ValidationComponent = ( {
 			isValid: {
 				required,
 				custom: maybeCustomRule( customDateRule ),
-				elements: false, // TODO: expose this via storybook
 			},
 		},
 		{
@@ -994,7 +977,6 @@ const ValidationComponent = ( {
 			isValid: {
 				required,
 				custom: maybeCustomRule( customDateRangeRule ),
-				elements: false, // TODO: expose this via storybook
 			},
 		},
 		{
@@ -1004,7 +986,6 @@ const ValidationComponent = ( {
 			isValid: {
 				required,
 				custom: maybeCustomRule( customDateTimeRule ),
-				elements: false, // TODO: expose this via storybook
 			},
 		},
 	];
