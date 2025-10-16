@@ -22,6 +22,7 @@ import type {
 	SyncConfig,
 	SyncManager,
 } from './types';
+import { createUndoManager } from './undo-manager';
 import { createYjsDoc } from './utils';
 
 interface EntityState {
@@ -40,6 +41,7 @@ interface EntityState {
  */
 export function createSyncManager(): SyncManager {
 	const entityStates: Map< EntityID, EntityState > = new Map();
+	const undoManager = createUndoManager();
 
 	/**
 	 * Load an entity for syncing and manage its lifecycle.
@@ -95,6 +97,10 @@ export function createSyncManager(): SyncManager {
 
 			void updateEntityRecord( objectType, objectId );
 		};
+
+		if ( syncConfig.supports?.undo ) {
+			undoManager.addToScope( recordMap );
+		}
 
 		const entityState: EntityState = {
 			handlers,
@@ -209,6 +215,7 @@ export function createSyncManager(): SyncManager {
 
 	return {
 		load: loadEntity,
+		undoManager,
 		unload: unloadEntity,
 		update: updateCRDTDoc,
 	};
