@@ -18,6 +18,7 @@
 			min-height: $grid-unit-30; // Preserve layout when there is no ellipsis button
 			overflow: hidden;
 			align-content: center;
+			text-align: start;
 
 			&--clickable {
 				width: fit-content;
