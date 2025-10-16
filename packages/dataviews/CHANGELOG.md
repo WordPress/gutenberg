@@ -17,6 +17,7 @@
 - DataForm control for `datetime` supports `required` and `custom` validation. [#72060](https://github.com/WordPress/gutenberg/pull/72060).
 - Standardise DataForm typography. [#72284](https://github.com/WordPress/gutenberg/pull/72284).
 - Dataviews: Add support for dynamic modal headers. [#72384](https://github.com/WordPress/gutenberg/pull/72384)
+- Field API: support async loading elements. [#72254](https://github.com/WordPress/gutenberg/pull/72254)
 
 ### Breaking changes
 
