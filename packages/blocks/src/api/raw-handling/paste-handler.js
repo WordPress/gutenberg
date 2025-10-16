@@ -32,6 +32,7 @@ import brRemover from './br-remover';
 import { deepFilterHTML, isPlain, getBlockContentSchema } from './utils';
 import emptyParagraphRemover from './empty-paragraph-remover';
 import slackParagraphCorrector from './slack-paragraph-corrector';
+import googleDocsPasteConverter from './google-docs-paste-convertor';
 
 const log = ( ...args ) => window?.console?.log?.( ...args );
 
@@ -119,6 +120,8 @@ export function pasteHandler( {
 	if ( String.prototype.normalize ) {
 		HTML = HTML.normalize();
 	}
+
+	HTML = googleDocsPasteConverter( HTML, plainText );
 
 	// Must be run before checking if it's inline content.
 	HTML = deepFilterHTML( HTML, [ slackParagraphCorrector ] );
