@@ -978,6 +978,15 @@ async function buildAll() {
  * This allows continuous development even when code is temporarily invalid.
  */
 async function watchMode() {
+	// Add global unhandled rejection handler for this process
+	process.on( 'unhandledRejection', ( reason, promise ) => {
+		console.error(
+			'❌ Unhandled promise rejection in watch mode:',
+			reason
+		);
+		// Don't exit - just log the error
+	} );
+
 	const packagesToRebuild = new Set();
 	const rebuilding = new Set();
 	let rebuildTimeoutId = null;
@@ -1000,20 +1009,28 @@ async function watchMode() {
 				console.log( `✅ ${ packageName } (${ buildTime }ms)` );
 			} catch ( error ) {
 				// Format esbuild errors nicely
-				if ( error.errors && error.errors.length > 0 ) {
-					console.log( `\n❌ ${ packageName } - Build failed:\n` );
-					error.errors.forEach( ( err ) => {
-						const location = err.location
-							? `${ err.location.file }:${ err.location.line }:${ err.location.column }`
-							: '';
+				try {
+					if ( error.errors && error.errors.length > 0 ) {
+						console.log( `\n❌ ${ packageName } - Build failed:\n` );
+						error.errors.forEach( ( err ) => {
+							const location = err.location
+								? `${ err.location.file }:${ err.location.line }:${ err.location.column }`
+								: '';
+							console.log(
+								`   ${ location } - ${ err.text }`
+							);
+						} );
+						console.log( '' );
+					} else {
 						console.log(
-							`   ${ location } - ${ err.text }`
+							`❌ ${ packageName } - Error: ${ error.message }`
 						);
-					} );
-					console.log( '' );
-				} else {
-					console.log(
-						`❌ ${ packageName } - Error: ${ error.message }`
+					}
+				} catch ( formatError ) {
+					// If error formatting fails, log the raw error
+					console.error(
+						`❌ ${ packageName } - Build failed:`,
+						error
 					);
 				}
 			} finally {
@@ -1062,29 +1079,33 @@ async function watchMode() {
 
 	// Handle file changes, additions, and deletions
 	const handleFileChange = ( filename ) => {
-		if ( ! isV2SourceFile( filename ) ) {
-			return;
+		try {
+			if ( ! isV2SourceFile( filename ) ) {
+				return;
+			}
+
+			const packageName = getPackageName( filename );
+			if ( ! packageName ) {
+				return;
+			}
+
+			packagesToRebuild.add( packageName );
+
+			// Only schedule a rebuild if one isn't already scheduled
+			if ( rebuildTimeoutId ) {
+				return;
+			}
+
+			// Schedule rebuild with error handling to prevent process exit.
+			// The .catch() ensures unhandled promise rejections don't crash the watcher.
+			rebuildTimeoutId = setTimeout( () => {
+				processRebuilds().catch( ( error ) => {
+					console.error( '❌ Rebuild failed:', error.message );
+				} );
+			}, 100 );
+		} catch ( error ) {
+			console.error( '❌ File change handler error:', error.message );
 		}
-
-		const packageName = getPackageName( filename );
-		if ( ! packageName ) {
-			return;
-		}
-
-		packagesToRebuild.add( packageName );
-
-		// Only schedule a rebuild if one isn't already scheduled
-		if ( rebuildTimeoutId ) {
-			return;
-		}
-
-		// Schedule rebuild with error handling to prevent process exit.
-		// The .catch() ensures unhandled promise rejections don't crash the watcher.
-		rebuildTimeoutId = setTimeout( () => {
-			processRebuilds().catch( ( error ) => {
-				console.error( '❌ Rebuild failed:', error.message );
-			} );
-		}, 100 );
 	};
 
 	watcher.on( 'change', handleFileChange );
