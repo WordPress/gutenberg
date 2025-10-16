@@ -277,7 +277,10 @@ export default () => {
 			props: { children },
 			context: inheritedContext,
 		} ) => {
-			const entries = context.filter( isDefaultDirectiveSuffix );
+			const entries = context
+				.filter( isDefaultDirectiveSuffix )
+				// Reverses entries to make the ones with unique IDs override the default one.
+				.reverse();
 
 			// Doesn't do anything if there are no default entries.
 			if ( ! entries.length ) {
@@ -300,49 +303,43 @@ export default () => {
 			};
 			const namespaces = new Set< string >();
 
-			// Reverse entries to ensure that the ones with unique IDs have priority.
-			[ ...entries ]
-				.reverse()
-				.forEach( ( { value, namespace, uniqueId } ) => {
-					// Checks that the value is a JSON object. Sends a console warning if not.
-					if ( globalThis.SCRIPT_DEBUG ) {
-						if ( ! isPlainObject( value ) ) {
-							warn(
-								`The value of data-wp-context${
-									uniqueId ? `---${ uniqueId }` : ''
-								} on the ${ namespace } namespace must be a valid stringified JSON object.`
-							);
-						}
-					}
-
-					// If the namespace doesn't exist yet, initalizes empty
-					// proxified states for that namespace.
-					if ( ! client.current[ namespace ] ) {
-						client.current[ namespace ] = proxifyState(
-							namespace,
-							{}
-						);
-						server.current[ namespace ] = proxifyState(
-							namespace,
-							{},
-							{ readOnly: true }
+			entries.forEach( ( { value, namespace, uniqueId } ) => {
+				// Checks that the value is a JSON object. Sends a console warning if not.
+				if ( globalThis.SCRIPT_DEBUG ) {
+					if ( ! isPlainObject( value ) ) {
+						warn(
+							`The value of data-wp-context${
+								uniqueId ? `---${ uniqueId }` : ''
+							} on the ${ namespace } namespace must be a valid stringified JSON object.`
 						);
 					}
+				}
 
-					// Merges the new value with whatever was there before.
-					deepMerge(
-						client.current[ namespace ],
-						deepClone( value ) as object,
-						false
+				// If the namespace doesn't exist yet, initalizes empty
+				// proxified states for that namespace.
+				if ( ! client.current[ namespace ] ) {
+					client.current[ namespace ] = proxifyState( namespace, {} );
+					server.current[ namespace ] = proxifyState(
+						namespace,
+						{},
+						{ readOnly: true }
 					);
-					deepMerge(
-						server.current[ namespace ],
-						deepClone( value ) as object
-					);
+				}
 
-					// Registers the namespace.
-					namespaces.add( namespace );
-				} );
+				// Merges the new value with whatever was there before.
+				deepMerge(
+					client.current[ namespace ],
+					deepClone( value ) as object,
+					false
+				);
+				deepMerge(
+					server.current[ namespace ],
+					deepClone( value ) as object
+				);
+
+				// Registers the namespace.
+				namespaces.add( namespace );
+			} );
 
 			namespaces.forEach( ( namespace ) => {
 				result.client[ namespace ] = proxifyContext(
