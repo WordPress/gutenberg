@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.33.0-next.0 (2025-10-16)
+
 ### Enhancements
 
 -   Add official support for unique IDs. ([#72161](https://github.com/WordPress/gutenberg/pull/72161))
