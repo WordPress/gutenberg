@@ -3,20 +3,14 @@
  */
 import { proxifyState, proxifyStore, deepMerge } from './proxies';
 import { getNamespace } from './namespaces';
-import { isPlainObject, deepReadOnly } from './utils';
+import { isPlainObject, deepReadOnly, navigationSignal } from './utils';
 import type { DeepReadonly } from './utils';
-
-/**
- * External dependencies
- */
-import { signal } from '@preact/signals';
 
 export const stores = new Map();
 const rawStores = new Map();
 const storeLocks = new Map();
 const storeConfigs = new Map();
 const serverStates = new Map();
-const navigationSignal = signal( 0 );
 
 /**
  * Gets the defined config for the store with the passed namespace.
@@ -38,7 +32,7 @@ export const getConfig = ( namespace?: string ) =>
  *
  * @example
  * ```js
- *  const { state } = store('myStore', {
+ *  const { state } = store( 'myPlugin', {
  *    callbacks: {
  *      updateServerState() {
  *        const serverState = getServerState();
@@ -46,10 +40,11 @@ export const getConfig = ( namespace?: string ) =>
  *        state.overridableProp = serverState.overridableProp;
  *      },
  *    },
- *  });
+ *  } );
  * ```
  *
- * @param namespace Store's namespace from which to retrieve the server state.
+ * @param namespace Store namespace. By default, it inherits the namespace of
+ *                  the store where it is defined.
  * @return The server state for the given namespace.
  */
 export const getServerState: ( < T extends object >(

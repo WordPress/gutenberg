@@ -9,7 +9,7 @@ import {
 	type EffectCallback,
 	type Inputs,
 } from 'preact/hooks';
-import { effect } from '@preact/signals';
+import { effect, signal } from '@preact/signals';
 
 /**
  * Internal dependencies
@@ -483,3 +483,5 @@ export function deepReadOnly< T extends object >(
 
 	return readOnlyMap.get( obj ) as T;
 }
+
+export const navigationSignal = signal( 0 );
