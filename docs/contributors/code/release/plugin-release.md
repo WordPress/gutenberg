@@ -19,6 +19,7 @@
 
 -   Announce in [#core-editor](https://wordpress.slack.com/messages/C02QB2JS7) Slack channel
 -   Go to GitHub Actions → [Build Plugin Zip workflow](https://github.com/WordPress/gutenberg/actions/workflows/build-plugin-zip.yml)
+-   Keep the `Use workflow from` option set to `trunk` (default)
 -   Type `rc` for release candidate OR `stable` for final release
 -   Click `Run workflow`
 -   When the release draft is generated in [GitHub Releases](https://github.com/WordPress/gutenberg/releases), publish it for the workflow to continue
