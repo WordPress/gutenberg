@@ -32,6 +32,7 @@ import brRemover from './br-remover';
 import { deepFilterHTML, isPlain, getBlockContentSchema } from './utils';
 import emptyParagraphRemover from './empty-paragraph-remover';
 import slackParagraphCorrector from './slack-paragraph-corrector';
+import { rawHandler } from '.';
 
 const log = ( ...args ) => window?.console?.log?.( ...args );
 
@@ -100,11 +101,21 @@ export function pasteHandler( {
 		const content = HTML ? HTML : plainText;
 
 		if ( content.indexOf( '<!-- wp:' ) !== -1 ) {
-			const parseResult = parse( content );
+			let parseResult = parse( markdownConverter( content ) );
 			const isSingleFreeFormBlock =
 				parseResult.length === 1 &&
 				parseResult[ 0 ].name === 'core/freeform';
 			if ( ! isSingleFreeFormBlock ) {
+				// Convert classic content to blocks.
+				parseResult = parseResult.flatMap( ( block ) => {
+					if ( 'core/freeform' === block.name ) {
+						const newBlock = rawHandler( {
+							HTML: block.originalContent,
+						} );
+						return newBlock;
+					}
+					return block;
+				} );
 				return parseResult;
 			}
 		}
