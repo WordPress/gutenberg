@@ -17,40 +17,32 @@ const FontSizePickerToggleGroup = ( props: FontSizePickerToggleGroupProps ) => {
 	const {
 		fontSizes,
 		value,
-		selectedSlug,
+		valueMode = 'literal',
 		__next40pxDefaultSize,
 		size,
 		onChange,
 	} = props;
 
-	// Find the current value by slug if selectedSlug is provided, otherwise use the size value
+	// Find the current value based on valueMode
 	const currentValue = ( () => {
 		if ( ! value ) {
 			return undefined;
 		}
 
-		// If selectedSlug is provided, use it to find the exact font size
-		if ( selectedSlug ) {
-			const fontSizeBySlug = fontSizes.find(
-				( fontSize ) => fontSize.slug === selectedSlug
-			);
-			if ( fontSizeBySlug ) {
-				return fontSizeBySlug.slug;
-			}
+		// If valueMode is 'slug', the value is already the slug
+		if ( valueMode === 'slug' ) {
+			return String( value );
 		}
 
-		// Fallback to finding by size value - this is the current behavior
+		// If valueMode is 'literal', find the font size by size value
 		// If multiple font sizes have the same size value, we can't distinguish them
-		// without the selectedSlug, so we return undefined to avoid incorrect selection
-
-		// Check if there are multiple font sizes with the same size value
+		// without additional information, so we return undefined to avoid incorrect selection
 		const matchingFontSizes = fontSizes.filter(
 			( fontSize ) => fontSize.size === value
 		);
 
-		// If there are multiple matches and no selectedSlug, return undefined
-		// to avoid selecting the wrong font size
-		if ( matchingFontSizes.length > 1 && ! selectedSlug ) {
+		// If there are multiple matches, return undefined to avoid selecting the wrong font size
+		if ( matchingFontSizes.length > 1 ) {
 			return undefined;
 		}
 
@@ -74,14 +66,14 @@ const FontSizePickerToggleGroup = ( props: FontSizePickerToggleGroupProps ) => {
 				if ( newSlug === undefined ) {
 					onChange( undefined );
 				} else {
-					// Find the font size by slug and pass both the size value and the slug
+					// Find the font size by slug
 					const selectedFontSize = fontSizes.find(
 						( fontSize ) => fontSize.slug === String( newSlug )
 					);
 					if ( selectedFontSize ) {
 						onChange(
 							selectedFontSize.size as number | string,
-							String( newSlug )
+							selectedFontSize
 						);
 					}
 				}

@@ -46,7 +46,7 @@ const UnforwardedFontSizePicker = (
 		size = 'default',
 		units: unitsProp = DEFAULT_UNITS,
 		value,
-		selectedSlug,
+		valueMode = 'literal',
 		withSlider = false,
 		withReset = true,
 	} = props;
@@ -65,17 +65,12 @@ const UnforwardedFontSizePicker = (
 			return undefined;
 		}
 
-		// If selectedSlug is provided, use it to find the exact font size
-		if ( selectedSlug ) {
-			const fontSizeBySlug = fontSizes.find(
-				( fontSize ) => fontSize.slug === selectedSlug
-			);
-			if ( fontSizeBySlug ) {
-				return fontSizeBySlug;
-			}
+		// If valueMode is 'slug', find by slug
+		if ( valueMode === 'slug' ) {
+			return fontSizes.find( ( fontSize ) => fontSize.slug === value );
 		}
 
-		// Fallback to finding by size value - this is the current behavior
+		// If valueMode is 'literal', find by size value
 		return fontSizes.find( ( fontSize ) => fontSize.size === value );
 	} )();
 	const isCustomValue = !! value && ! selectedFontSize;
@@ -155,29 +150,16 @@ const UnforwardedFontSizePicker = (
 						__next40pxDefaultSize={ __next40pxDefaultSize }
 						fontSizes={ fontSizes }
 						value={ value }
-						selectedSlug={ selectedSlug }
+						valueMode={ valueMode }
 						disableCustomFontSizes={ disableCustomFontSizes }
 						size={ size }
-						onChange={ ( newValue, newSelectedSlug ) => {
+						onChange={ ( newValue, selectedItem ) => {
 							if ( newValue === undefined ) {
 								onChange?.( undefined );
 							} else {
-								// Find the font size that matches the new value
-								// Use the selectedSlug if provided to get the exact font size
-								const matchingFontSize = newSelectedSlug
-									? fontSizes.find(
-											( fontSize ) =>
-												fontSize.slug ===
-												newSelectedSlug
-									  )
-									: fontSizes.find(
-											( fontSize ) =>
-												fontSize.size === newValue
-									  );
-
 								onChange?.(
 									hasUnits ? newValue : Number( newValue ),
-									matchingFontSize
+									selectedItem
 								);
 							}
 						} }
@@ -188,29 +170,16 @@ const UnforwardedFontSizePicker = (
 					<FontSizePickerToggleGroup
 						fontSizes={ fontSizes }
 						value={ value }
-						selectedSlug={ selectedSlug }
+						valueMode={ valueMode }
 						__next40pxDefaultSize={ __next40pxDefaultSize }
 						size={ size }
-						onChange={ ( newValue, newSelectedSlug ) => {
+						onChange={ ( newValue, selectedItem ) => {
 							if ( newValue === undefined ) {
 								onChange?.( undefined );
 							} else {
-								// Find the font size that matches the new value
-								// Use the selectedSlug if provided to get the exact font size
-								const matchingFontSize = newSelectedSlug
-									? fontSizes.find(
-											( fontSize ) =>
-												fontSize.slug ===
-												newSelectedSlug
-									  )
-									: fontSizes.find(
-											( fontSize ) =>
-												fontSize.size === newValue
-									  );
-
 								onChange?.(
 									hasUnits ? newValue : Number( newValue ),
-									matchingFontSize
+									selectedItem
 								);
 							}
 						} }

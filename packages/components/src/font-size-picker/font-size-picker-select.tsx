@@ -25,7 +25,7 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 		fontSizes,
 		value,
 		size,
-		selectedSlug,
+		valueMode = 'literal',
 		onChange,
 	} = props;
 
@@ -47,17 +47,17 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 			return DEFAULT_OPTION;
 		}
 
-		// If selectedSlug is provided, use it to find the exact option
-		if ( selectedSlug ) {
+		// If valueMode is 'slug', find by slug
+		if ( valueMode === 'slug' ) {
 			const optionBySlug = options.find(
-				( option ) => option.key === selectedSlug
+				( option ) => option.key === value
 			);
 			if ( optionBySlug ) {
 				return optionBySlug;
 			}
 		}
 
-		// Fallback to finding by value (size) - this is the current behavior
+		// If valueMode is 'literal', find by value (size)
 		return (
 			options.find( ( option ) => option.value === value ) ??
 			DEFAULT_OPTION
@@ -84,7 +84,16 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 			}: {
 				selectedItem: FontSizePickerSelectOption;
 			} ) => {
-				onChange( selectedItem.value, selectedItem.key );
+				// Find the corresponding FontSize object
+				const matchingFontSize =
+					selectedItem.key === 'default'
+						? undefined
+						: fontSizes.find(
+								( fontSize ) =>
+									fontSize.slug === selectedItem.key
+						  );
+
+				onChange( selectedItem.value, matchingFontSize );
 			} }
 			size={ size }
 		/>

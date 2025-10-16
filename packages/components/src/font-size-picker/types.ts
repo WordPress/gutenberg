@@ -41,11 +41,13 @@ export type FontSizePickerProps = {
 	 */
 	value?: number | string;
 	/**
-	 * The slug of the currently selected font size. This is used to distinguish between
-	 * multiple font sizes that have the same size value. If not provided, the component
-	 * will use the first font size that matches the value.
+	 * Determines how the `value` prop should be interpreted.
+	 * - `'literal'`: The `value` prop contains the actual font size value (number or string)
+	 * - `'slug'`: The `value` prop contains the slug of the selected font size
+	 *
+	 * @default 'literal'
 	 */
-	selectedSlug?: string;
+	valueMode?: 'literal' | 'slug';
 	/**
 	 * If `true`, a slider will be displayed alongside the input field when a
 	 * custom font size is active. Has no effect when `disableCustomFontSizes`
@@ -119,7 +121,7 @@ export type FontSize = {
 
 export type FontSizePickerSelectProps = Pick<
 	FontSizePickerProps,
-	'value' | 'size' | 'selectedSlug'
+	'value' | 'size' | 'valueMode'
 > & {
 	fontSizes: NonNullable< FontSizePickerProps[ 'fontSizes' ] >;
 	disableCustomFontSizes: NonNullable<
@@ -127,7 +129,7 @@ export type FontSizePickerSelectProps = Pick<
 	>;
 	onChange: (
 		value: number | string | undefined,
-		selectedSlug?: string
+		selectedItem?: FontSize
 	) => void;
 	onSelectCustom: () => void;
 	__next40pxDefaultSize: boolean;
@@ -142,11 +144,11 @@ export type FontSizePickerSelectOption = {
 
 export type FontSizePickerToggleGroupProps = Pick<
 	FontSizePickerProps,
-	'value' | 'size' | '__next40pxDefaultSize' | 'selectedSlug'
+	'value' | 'size' | '__next40pxDefaultSize' | 'valueMode'
 > & {
 	fontSizes: NonNullable< FontSizePickerProps[ 'fontSizes' ] >;
 	onChange: (
 		value: number | string | undefined,
-		selectedSlug?: string
+		selectedItem?: FontSize
 	) => void;
 };
