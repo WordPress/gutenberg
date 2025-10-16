@@ -115,10 +115,13 @@ export async function loadFontFaceInBrowser( fontFace, source, addTo = 'all' ) {
 	}
 
 	if ( addTo === 'iframe' || addTo === 'all' ) {
-		const iframeDocument = document.querySelector(
+		const iframeElement = document.querySelector(
 			'iframe[name="editor-canvas"]'
-		).contentDocument;
-		iframeDocument.fonts.add( loadedFace );
+		);
+		// Only try to add to iframe if it exists (visual mode)
+		if ( iframeElement?.contentDocument ) {
+			iframeElement.contentDocument.fonts.add( loadedFace );
+		}
 	}
 }
 
@@ -149,11 +152,52 @@ export function unloadFontFaceInBrowser( fontFace, removeFrom = 'all' ) {
 	}
 
 	if ( removeFrom === 'iframe' || removeFrom === 'all' ) {
-		const iframeDocument = document.querySelector(
+		const iframeElement = document.querySelector(
 			'iframe[name="editor-canvas"]'
-		).contentDocument;
-		unloadFontFace( iframeDocument.fonts );
+		);
+		// Only try to remove from iframe if it exists (visual mode)
+		if ( iframeElement?.contentDocument ) {
+			unloadFontFace( iframeElement.contentDocument.fonts );
+		}
 	}
+}
+
+/*
+ * Copies all font faces from the root document to the iframe document.
+ * This is useful when switching from code editor to visual editor
+ * and fonts were uploaded while in code editor mode.
+ */
+export function copyFontsFromDocumentToIframe() {
+	const iframeElement = document.querySelector(
+		'iframe[name="editor-canvas"]'
+	);
+
+	// If there's no iframe (e.g., still in code editor mode), return early
+	if ( ! iframeElement?.contentDocument ) {
+		return;
+	}
+
+	const iframeDocument = iframeElement.contentDocument;
+
+	// Copy all fonts from the root document to the iframe
+	document.fonts.forEach( ( fontFace ) => {
+		// Check if the font is already in the iframe to avoid duplicates
+		let fontExists = false;
+		iframeDocument.fonts.forEach( ( iframeFontFace ) => {
+			if (
+				iframeFontFace.family === fontFace.family &&
+				iframeFontFace.weight === fontFace.weight &&
+				iframeFontFace.style === fontFace.style
+			) {
+				fontExists = true;
+			}
+		} );
+
+		// Only add if it doesn't already exist
+		if ( ! fontExists ) {
+			iframeDocument.fonts.add( fontFace );
+		}
+	} );
 }
 
 /**

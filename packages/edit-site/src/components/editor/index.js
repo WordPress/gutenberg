@@ -55,6 +55,7 @@ import {
 	useSyncDeprecatedEntityIntoState,
 } from './use-resolve-edited-entity';
 import SitePreview from './site-preview';
+import { useFontSynchronization } from '../../hooks/use-font-synchronization';
 
 const { Editor, BackButton } = unlock( editorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
@@ -132,6 +133,9 @@ export default function EditSiteEditor( {
 	// deprecated sync state with url
 	useSyncDeprecatedEntityIntoState( entity );
 	const { postType, postId, context } = entity;
+
+	// Handle font synchronization when switching from code to visual editor
+	useFontSynchronization();
 	const {
 		isBlockBasedTheme,
 		editorCanvasView,
