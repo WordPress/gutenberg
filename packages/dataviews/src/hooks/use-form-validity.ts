@@ -51,13 +51,19 @@ function isFormValid( formValidity: FormValidity | undefined ): boolean {
 	}
 
 	return Object.values( formValidity ).every( ( fieldValidation ) => {
-		return Object.entries( fieldValidation ).every( ( [ key, validation ] ) => {
-			if ( key === 'children' && validation && typeof validation === 'object' ) {
-				// Recursively check children validations
-				return isFormValid( validation as FormValidity );
+		return Object.entries( fieldValidation ).every(
+			( [ key, validation ] ) => {
+				if (
+					key === 'children' &&
+					validation &&
+					typeof validation === 'object'
+				) {
+					// Recursively check children validations
+					return isFormValid( validation as FormValidity );
+				}
+				return validation.type === 'valid';
 			}
-			return validation.type === 'valid';
-		} );
+		);
 	} );
 }
 
@@ -82,7 +88,9 @@ function updateFieldValidity(
 				children: {
 					...prev?.[ parentFieldId ]?.children,
 					[ fieldId ]: {
-						...( prev?.[ parentFieldId ]?.children as any )?.[ fieldId ],
+						...( prev?.[ parentFieldId ]?.children as any )?.[
+							fieldId
+						],
 						...validationUpdate,
 					},
 				},
@@ -136,7 +144,8 @@ export function useFormValidity< Item >(
 				const combinedField = formField as CombinedFormField;
 				if ( combinedField.children ) {
 					combinedField.children.forEach( ( child ) => {
-						const childId = typeof child === 'string' ? child : child.id;
+						const childId =
+							typeof child === 'string' ? child : child.id;
 						fieldIdsToValidate.add( childId );
 						fieldParentMap.set( childId, combinedField.id );
 					} );
@@ -197,7 +206,8 @@ export function useFormValidity< Item >(
 							{
 								elements: {
 									type: 'invalid',
-									message: 'Value must be one of the elements.',
+									message:
+										'Value must be one of the elements.',
 								},
 							},
 							parentFieldId
@@ -357,15 +367,21 @@ export function useFormValidity< Item >(
 						return prev;
 					}
 
-					const { [ field.id ]: removed, ...restChildren } = parentField.children as any;
+					const { [ field.id ]: removed, ...restChildren } =
+						parentField.children as any;
 
 					// If no more children, remove the children property
 					if ( Object.keys( restChildren ).length === 0 ) {
 						const { children, ...restParent } = parentField;
 						if ( Object.keys( restParent ).length === 0 ) {
 							// Remove parent field entirely if no other validations
-							const { [ parentFieldId ]: removedParent, ...restFields } = prev;
-							return Object.keys( restFields ).length === 0 ? undefined : restFields;
+							const {
+								[ parentFieldId ]: removedParent,
+								...restFields
+							} = prev;
+							return Object.keys( restFields ).length === 0
+								? undefined
+								: restFields;
 						}
 						return {
 							...prev,
