@@ -199,7 +199,7 @@ describe( 'useEntityBinding', () => {
 		} );
 	} );
 
-	it( 'should NOT clear binding when clearBinding is called and no binding exists', () => {
+	it( 'should always attempt to clear binding when clearBinding is called, even when no binding exists', () => {
 		const attributes = {
 			metadata: {},
 			id: null,
@@ -216,10 +216,12 @@ describe( 'useEntityBinding', () => {
 			result.current.clearBinding();
 		} );
 
-		expect( mockUpdateBlockBindings ).not.toHaveBeenCalled();
+		expect( mockUpdateBlockBindings ).toHaveBeenCalledWith( {
+			url: undefined,
+		} );
 	} );
 
-	it( 'should NOT clear binding when binding metadata exists but source is null', () => {
+	it( 'should always attempt to clear binding when clearBinding is called, even when binding source is null', () => {
 		const attributes = {
 			metadata: {
 				bindings: {
@@ -243,7 +245,9 @@ describe( 'useEntityBinding', () => {
 			result.current.clearBinding();
 		} );
 
-		expect( mockUpdateBlockBindings ).not.toHaveBeenCalled();
+		expect( mockUpdateBlockBindings ).toHaveBeenCalledWith( {
+			url: undefined,
+		} );
 	} );
 
 	it( 'should create core/post-data binding when createBinding is called for post-type', () => {
