@@ -10,52 +10,112 @@ import { useFormValidity } from '..';
 import type { Field } from '../../types';
 
 describe( 'useFormValidity', () => {
-	it( 'operates on form fields and ignores the rest', () => {
-		const item = { id: 1, valid_order: 2, invalid_order: 'd' };
-		const fields: Field< {} >[] = [
-			{
-				id: 'valid_order',
-				type: 'integer',
-			},
-			{
-				id: 'invalid_order',
-				type: 'integer',
-			},
-		];
-		const form = { fields: [ 'valid_order' ] };
-		const {
-			result: {
-				current: { validity, isValid },
-			},
-		} = renderHook( () => useFormValidity( item, fields, form ) );
-		expect( validity ).toEqual( undefined );
-		expect( isValid ).toBe( true );
-	} );
-
-	it( 'fields can override the defaults', () => {
-		const item = { id: 1, order: 'd' };
-		const fields: Field< {} >[] = [
-			{
-				id: 'order',
-				type: 'integer',
-				elements: [
-					{ value: 'a', label: 'A' },
-					{ value: 'b', label: 'B' },
-				],
-				isValid: {
-					elements: false,
-					custom: () => null, // Overrides the validation provided for integer types.
+	describe( 'fields', () => {
+		it( 'can override the defaults', () => {
+			const item = { id: 1, order: 'd' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'order',
+					type: 'integer',
+					elements: [
+						{ value: 'a', label: 'A' },
+						{ value: 'b', label: 'B' },
+					],
+					isValid: {
+						elements: false,
+						custom: () => null, // Overrides the validation provided for integer types.
+					},
 				},
-			},
-		];
-		const form = { fields: [ 'order' ] };
-		const {
-			result: {
-				current: { validity, isValid },
-			},
-		} = renderHook( () => useFormValidity( item, fields, form ) );
-		expect( validity ).toEqual( undefined );
-		expect( isValid ).toBe( true );
+			];
+			const form = { fields: [ 'order' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'not in the form are ignored', () => {
+			const item = { id: 1, valid_order: 2, invalid_order: 'd' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'valid_order',
+					type: 'integer',
+				},
+				{
+					id: 'invalid_order',
+					type: 'integer',
+				},
+			];
+			const form = { fields: [ 'valid_order' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'with children are checked for validity', () => {
+			const item = { id: 1, order: undefined };
+			const fields: Field< {} >[] = [
+				{
+					id: 'order',
+					type: 'integer',
+					isValid: {
+						required: true,
+					},
+				},
+			];
+			const form = {
+				fields: [ { id: 'combinedField', children: [ 'order' ] } ],
+			};
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( {
+				combinedField: {
+					children: {
+						order: {
+							required: { type: 'invalid' },
+						},
+					},
+				},
+			} );
+			expect( isValid ).toBe( false );
+		} );
+
+		it( 'without children but defined as objects are checked for validity', () => {
+			const item = { id: 1, order: undefined };
+			const fields: Field< {} >[] = [
+				{
+					id: 'order',
+					type: 'integer',
+					isValid: {
+						required: true,
+					},
+				},
+			];
+			const form = {
+				fields: [ { id: 'order' } ],
+			};
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( {
+				order: {
+					required: { type: 'invalid' },
+				},
+			} );
+			expect( isValid ).toBe( false );
+		} );
 	} );
 
 	describe( 'isValid.required', () => {

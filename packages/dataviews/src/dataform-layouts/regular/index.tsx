@@ -68,6 +68,7 @@ export default function FormRegularField< Item >( {
 					data={ data }
 					form={ form }
 					onChange={ onChange }
+					validity={ validity?.children }
 				/>
 			</>
 		);

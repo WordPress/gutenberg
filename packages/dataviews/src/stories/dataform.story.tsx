@@ -1012,7 +1012,8 @@ const ValidationComponent = ( {
 	const form = {
 		layout: { type },
 		fields: [
-			'text',
+			// Use field object for testing purposes.
+			{ id: 'text' },
 			'select',
 			'textWithRadio',
 			'textarea',
@@ -1029,9 +1030,12 @@ const ValidationComponent = ( {
 			'toggleGroup',
 			'password',
 			'customEdit',
-			'date',
-			'dateRange',
-			'datetime',
+			// Use field object with children for testing purposes.
+			{
+				id: 'dates',
+				label: 'Dates',
+				children: [ 'date', 'dateRange', 'datetime' ],
+			},
 		],
 	};
 
@@ -1809,7 +1813,7 @@ export const Validation = {
 		type: {
 			control: { type: 'select' },
 			description: 'Chooses the validation type.',
-			options: [ 'regular', 'panel' ],
+			options: [ 'regular', 'panel', 'card', 'row' ],
 		},
 		custom: {
 			control: { type: 'select' },

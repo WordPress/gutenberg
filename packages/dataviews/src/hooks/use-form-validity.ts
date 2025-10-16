@@ -12,7 +12,7 @@ import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import normalizeFields from '../utils/normalize-fields';
-import type { Field, Form, FormValidity } from '../types';
+import type { Field, Form, FormValidity, CombinedFormField } from '../types';
 
 const isEmptyNullOrUndefined = ( value: any ) =>
 	[ undefined, '', null ].includes( value );
@@ -45,6 +45,60 @@ function isInvalidForRequired( fieldType: string | undefined, value: any ) {
 	return false;
 }
 
+function isFormValid( formValidity: FormValidity | undefined ): boolean {
+	if ( ! formValidity ) {
+		return true;
+	}
+
+	return Object.values( formValidity ).every( ( fieldValidation ) => {
+		return Object.entries( fieldValidation ).every( ( [ key, validation ] ) => {
+			if ( key === 'children' && validation && typeof validation === 'object' ) {
+				// Recursively check children validations
+				return isFormValid( validation as FormValidity );
+			}
+			return validation.type === 'valid';
+		} );
+	} );
+}
+
+type ValidationUpdate = {
+	required?: { type: 'valid' | 'invalid' | 'validating'; message?: string };
+	elements?: { type: 'valid' | 'invalid' | 'validating'; message: string };
+	custom?: { type: 'valid' | 'invalid' | 'validating'; message: string };
+};
+
+function updateFieldValidity(
+	setFormValidity: React.Dispatch< React.SetStateAction< FormValidity > >,
+	fieldId: string,
+	validationUpdate: ValidationUpdate,
+	parentFieldId?: string
+) {
+	if ( parentFieldId ) {
+		// This field is a child of a combined field
+		setFormValidity( ( prev ) => ( {
+			...prev,
+			[ parentFieldId ]: {
+				...prev?.[ parentFieldId ],
+				children: {
+					...prev?.[ parentFieldId ]?.children,
+					[ fieldId ]: {
+						...( prev?.[ parentFieldId ]?.children as any )?.[ fieldId ],
+						...validationUpdate,
+					},
+				},
+			},
+		} ) );
+	} else {
+		setFormValidity( ( prev ) => ( {
+			...prev,
+			[ fieldId ]: {
+				...prev?.[ fieldId ],
+				...validationUpdate,
+			},
+		} ) );
+	}
+}
+
 /**
  * Hook that validates a form item and returns an object with error messages for each field.
  *
@@ -60,7 +114,6 @@ export function useFormValidity< Item >(
 	form: Form
 ): { validity: FormValidity; isValid: boolean } {
 	const [ formValidity, setFormValidity ] = useState< FormValidity >();
-
 	const previousValidatedValuesRef = useRef< Record< string, any > >( {} );
 
 	const validate = useCallback( () => {
@@ -69,16 +122,32 @@ export function useFormValidity< Item >(
 			return;
 		}
 
-		const normalizedFields = normalizeFields(
-			fields.filter( ( field ) => {
-				return form?.fields?.some( ( formField ) => {
-					if ( typeof formField === 'string' ) {
-						return formField === field.id;
-					}
+		// Build a map of field ID -> parent field ID for combined fields with children
+		const fieldParentMap = new Map< string, string >();
 
-					return formField.id === field.id;
-				} );
-			} )
+		// Collect all field IDs that should be validated (including children)
+		const fieldIdsToValidate = new Set< string >();
+
+		form.fields.forEach( ( formField ) => {
+			if ( typeof formField === 'string' ) {
+				fieldIdsToValidate.add( formField );
+			} else {
+				// Check if this is a CombinedFormField with children
+				const combinedField = formField as CombinedFormField;
+				if ( combinedField.children ) {
+					combinedField.children.forEach( ( child ) => {
+						const childId = typeof child === 'string' ? child : child.id;
+						fieldIdsToValidate.add( childId );
+						fieldParentMap.set( childId, combinedField.id );
+					} );
+				} else {
+					fieldIdsToValidate.add( formField.id );
+				}
+			}
+		} );
+
+		const normalizedFields = normalizeFields(
+			fields.filter( ( field ) => fieldIdsToValidate.has( field.id ) )
 		);
 
 		normalizedFields.forEach( ( field ) => {
@@ -96,15 +165,13 @@ export function useFormValidity< Item >(
 				field.isValid.required &&
 				isInvalidForRequired( field.type, value )
 			) {
-				setFormValidity( ( prev ) => ( {
-					...prev,
-					[ field.id ]: {
-						...prev?.[ field.id ],
-						required: {
-							type: 'invalid',
-						},
-					},
-				} ) );
+				const parentFieldId = fieldParentMap.get( field.id );
+				updateFieldValidity(
+					setFormValidity,
+					field.id,
+					{ required: { type: 'invalid' } },
+					parentFieldId
+				);
 				return;
 			}
 
@@ -113,6 +180,7 @@ export function useFormValidity< Item >(
 				const validValues = field.elements.map(
 					( element ) => element.value
 				);
+				const parentFieldId = fieldParentMap.get( field.id );
 
 				if ( field.type === 'array' ) {
 					// Arrays (all values must be valid):
@@ -123,30 +191,31 @@ export function useFormValidity< Item >(
 						if ( allAreValid ) {
 							return;
 						}
-						setFormValidity( ( prev ) => ( {
-							...prev,
-							[ field.id ]: {
-								...prev?.[ field.id ],
+						updateFieldValidity(
+							setFormValidity,
+							field.id,
+							{
 								elements: {
 									type: 'invalid',
-									message:
-										'Value must be one of the elements.',
+									message: 'Value must be one of the elements.',
 								},
 							},
-						} ) );
+							parentFieldId
+						);
 						return;
 					}
 
-					setFormValidity( ( prev ) => ( {
-						...prev,
-						[ field.id ]: {
-							...prev?.[ field.id ],
+					updateFieldValidity(
+						setFormValidity,
+						field.id,
+						{
 							elements: {
 								type: 'invalid',
 								message: 'Value must be one of the elements.',
 							},
 						},
-					} ) );
+						parentFieldId
+					);
 					return;
 				}
 
@@ -156,16 +225,17 @@ export function useFormValidity< Item >(
 					return;
 				}
 
-				setFormValidity( ( prev ) => ( {
-					...prev,
-					[ field.id ]: {
-						...prev?.[ field.id ],
+				updateFieldValidity(
+					setFormValidity,
+					field.id,
+					{
 						elements: {
 							type: 'invalid',
 							message: 'Value must be one of the elements.',
 						},
 					},
-				} ) );
+					parentFieldId
+				);
 				return;
 			}
 
@@ -174,6 +244,7 @@ export function useFormValidity< Item >(
 				typeof field.isValid.custom === 'function' &&
 				field.isValid.custom.constructor.name === 'AsyncFunction'
 			) {
+				const parentFieldId = fieldParentMap.get( field.id );
 				const customAsyncError = field.isValid.custom(
 					deepMerge(
 						item,
@@ -188,57 +259,61 @@ export function useFormValidity< Item >(
 					return;
 				}
 
-				setFormValidity( ( prev ) => ( {
-					...prev,
-					[ field.id ]: {
-						...prev?.[ field.id ],
+				updateFieldValidity(
+					setFormValidity,
+					field.id,
+					{
 						custom: {
 							type: 'validating',
 							message: 'Validating...',
 						},
 					},
-				} ) );
+					parentFieldId
+				);
 
 				if ( customAsyncError instanceof Promise ) {
 					customAsyncError
 						.then( ( result ) => {
 							if ( result === null ) {
-								setFormValidity( ( prev ) => ( {
-									...prev,
-									[ field.id ]: {
-										...prev?.[ field.id ],
+								updateFieldValidity(
+									setFormValidity,
+									field.id,
+									{
 										custom: {
 											type: 'valid',
 											message: 'Valid',
 										},
 									},
-								} ) );
+									parentFieldId
+								);
 							}
 
 							if ( typeof result === 'string' ) {
-								setFormValidity( ( prev ) => ( {
-									...prev,
-									[ field.id ]: {
-										...prev?.[ field.id ],
+								updateFieldValidity(
+									setFormValidity,
+									field.id,
+									{
 										custom: {
 											type: 'invalid',
 											message: result,
 										},
 									},
-								} ) );
+									parentFieldId
+								);
 							}
 						} )
 						.catch( ( error ) => {
-							setFormValidity( ( prev ) => ( {
-								...prev,
-								[ field.id ]: {
-									...prev?.[ field.id ],
+							updateFieldValidity(
+								setFormValidity,
+								field.id,
+								{
 									custom: {
 										type: 'invalid',
 										message: error.message,
 									},
 								},
-							} ) );
+								parentFieldId
+							);
 						} );
 				}
 
@@ -250,25 +325,65 @@ export function useFormValidity< Item >(
 				typeof field.isValid.custom === 'function' &&
 				! ( field.isValid.custom.constructor.name === 'AsyncFunction' )
 			) {
+				const parentFieldId = fieldParentMap.get( field.id );
 				const customError = field.isValid.custom( item, field );
 				if ( typeof customError === 'string' ) {
-					setFormValidity( ( prev ) => ( {
-						...prev,
-						[ field.id ]: {
-							...prev?.[ field.id ],
+					updateFieldValidity(
+						setFormValidity,
+						field.id,
+						{
 							custom: {
 								type: 'invalid',
 								message: customError,
 							},
 						},
-					} ) );
+						parentFieldId
+					);
 					return;
 				}
 			}
 
 			// No errors for this field, remove from errors object
+			const parentFieldId = fieldParentMap.get( field.id );
 			setFormValidity( ( prev ) => {
-				if ( ! prev || ! prev[ field.id ] ) {
+				if ( ! prev ) {
+					return prev;
+				}
+
+				if ( parentFieldId ) {
+					// This field is a child - remove it from parent's children
+					const parentField = prev[ parentFieldId ];
+					if ( ! parentField?.children ) {
+						return prev;
+					}
+
+					const { [ field.id ]: removed, ...restChildren } = parentField.children as any;
+
+					// If no more children, remove the children property
+					if ( Object.keys( restChildren ).length === 0 ) {
+						const { children, ...restParent } = parentField;
+						if ( Object.keys( restParent ).length === 0 ) {
+							// Remove parent field entirely if no other validations
+							const { [ parentFieldId ]: removedParent, ...restFields } = prev;
+							return Object.keys( restFields ).length === 0 ? undefined : restFields;
+						}
+						return {
+							...prev,
+							[ parentFieldId ]: restParent,
+						};
+					}
+
+					return {
+						...prev,
+						[ parentFieldId ]: {
+							...parentField,
+							children: restChildren,
+						},
+					};
+				}
+
+				// Regular field - remove from top level
+				if ( ! prev[ field.id ] ) {
 					return prev;
 				}
 
@@ -289,13 +404,7 @@ export function useFormValidity< Item >(
 
 	return {
 		validity: formValidity,
-		isValid:
-			! formValidity ||
-			Object.values( formValidity ).every( ( fieldValidation ) =>
-				Object.values( fieldValidation ).every(
-					( validation ) => validation.type === 'valid'
-				)
-			),
+		isValid: isFormValid( formValidity ),
 	};
 }
 

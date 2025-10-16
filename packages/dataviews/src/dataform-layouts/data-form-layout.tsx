@@ -7,7 +7,13 @@ import { useContext, useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { Form, SimpleFormField, FormField, FieldValidity } from '../types';
+import type {
+	FieldValidity,
+	Form,
+	FormField,
+	FormValidity,
+	SimpleFormField,
+} from '../types';
 import { getFormFieldLayout } from './index';
 import DataFormContext from '../components/dataform-context';
 import { isCombinedField } from './is-combined-field';
@@ -23,12 +29,14 @@ export function DataFormLayout< Item >( {
 	data,
 	form,
 	onChange,
+	validity,
 	children,
 	as,
 }: {
 	data: Item;
 	form: Form;
 	onChange: ( value: any ) => void;
+	validity?: FormValidity;
 	children?: (
 		FieldLayout: ( props: {
 			data: Item;
@@ -37,12 +45,12 @@ export function DataFormLayout< Item >( {
 			hideLabelFromVision?: boolean;
 			validity?: FieldValidity;
 		} ) => React.JSX.Element | null,
-		field: FormField
+		childField: FormField,
+		childFieldValidity?: FieldValidity
 	) => React.JSX.Element;
 	as?: React.ComponentType< { children: React.ReactNode } >;
 } ) {
-	const { fields: fieldDefinitions, validity } =
-		useContext( DataFormContext );
+	const { fields: fieldDefinitions } = useContext( DataFormContext );
 
 	function getFieldDefinition( field: SimpleFormField | string ) {
 		const fieldId = typeof field === 'string' ? field : field.id;
@@ -86,7 +94,11 @@ export function DataFormLayout< Item >( {
 				}
 
 				if ( children ) {
-					return children( FieldLayout, formField );
+					return children(
+						FieldLayout,
+						formField,
+						validity?.[ formField.id ]
+					);
 				}
 
 				return (

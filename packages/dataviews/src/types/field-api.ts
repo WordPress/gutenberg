@@ -338,6 +338,7 @@ export type FieldValidity = {
 		type: 'valid' | 'invalid' | 'validating';
 		message: string;
 	};
+	children?: Record< string, FieldValidity >;
 };
 
 export type DataFormControlProps< Item > = {

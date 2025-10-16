@@ -135,24 +135,23 @@ export default function FormPanelField< Item >( {
 	const renderedControl =
 		layout.openAs === 'modal' ? (
 			<PanelModal
-				field={ field }
-				fieldDefinition={ fieldDefinition }
-				summaryFields={ summaryFields }
 				data={ data }
+				field={ field }
 				onChange={ onChange }
 				labelPosition={ labelPosition }
-				validity={ validity }
+				summaryFields={ summaryFields }
+				fieldDefinition={ fieldDefinition }
 			/>
 		) : (
 			<PanelDropdown
-				field={ field }
-				popoverAnchor={ popoverAnchor }
-				fieldDefinition={ fieldDefinition }
-				summaryFields={ summaryFields }
 				data={ data }
+				field={ field }
 				onChange={ onChange }
-				labelPosition={ labelPosition }
 				validity={ validity }
+				labelPosition={ labelPosition }
+				summaryFields={ summaryFields }
+				fieldDefinition={ fieldDefinition }
+				popoverAnchor={ popoverAnchor }
 			/>
 		);
 

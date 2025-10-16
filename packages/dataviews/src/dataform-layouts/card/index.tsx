@@ -192,6 +192,7 @@ export default function FormCardField< Item >( {
 							data={ data }
 							form={ form }
 							onChange={ onChange }
+							validity={ validity?.children }
 						/>
 					</CardBody>
 				) }

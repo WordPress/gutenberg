@@ -28,8 +28,13 @@ export default function DataForm< Item >( {
 	}
 
 	return (
-		<DataFormProvider fields={ normalizedFields } validity={ validity }>
-			<DataFormLayout data={ data } form={ form } onChange={ onChange } />
+		<DataFormProvider fields={ normalizedFields }>
+			<DataFormLayout
+				data={ data }
+				form={ form }
+				onChange={ onChange }
+				validity={ validity }
+			/>
 		</DataFormProvider>
 	);
 }
