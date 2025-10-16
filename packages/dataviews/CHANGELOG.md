@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## 10.0.0-next.0 (2025-10-16)
-
 ### Bug Fixes
 
 - DataViewsPicker: ensure title overflows correctly in Grid view. ([#72339](https://github.com/WordPress/gutenberg/pull/72339))
