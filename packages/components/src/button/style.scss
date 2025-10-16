@@ -19,8 +19,8 @@
 	border: 0;
 	cursor: pointer;
 	-webkit-appearance: none;
+	appearance: none;
 	background: none;
-
 	@media not (prefers-reduced-motion) {
 		transition: box-shadow 0.1s linear;
 	}
@@ -366,6 +366,7 @@
 
 		&:disabled,
 		&[aria-disabled="true"] {
+			cursor: default;
 			color: $gray-600;
 
 			&:not(.is-primary):not(.is-secondary):not(.is-tertiary) {
