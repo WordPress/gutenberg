@@ -8,7 +8,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useCallback, useMemo, useEffect } from '@wordpress/element';
+import { useCallback, useMemo, useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -263,21 +263,46 @@ export default function TypographyPanel( {
 	}, [ setFontAppearance ] );
 
 	// Check if previous font style and weight values are available in the new font family.
+	const previousFontFamilyRef = useRef();
+
 	useEffect( () => {
-		if ( nearestFontStyle && nearestFontWeight ) {
+		const currentFontFamily = value?.typography?.fontFamily;
+		const previousFontFamily = previousFontFamilyRef.current;
+
+		const fontFamilyChanged = previousFontFamily !== currentFontFamily;
+
+		const userHasExplicitAppearance =
+			undefined !== value?.typography?.fontStyle ||
+			undefined !== value?.typography?.fontWeight;
+
+		if (
+			fontFamilyChanged &&
+			! userHasExplicitAppearance &&
+			nearestFontStyle &&
+			nearestFontWeight
+		) {
 			setFontAppearance( {
 				fontStyle: nearestFontStyle,
 				fontWeight: nearestFontWeight,
 			} );
-		} else {
+		} else if (
+			fontFamilyChanged &&
+			( ! nearestFontStyle || ! nearestFontWeight )
+		) {
 			// Reset font appearance if there are no available styles or weights.
 			resetFontAppearance();
 		}
+
+		// Track the current font family for next render
+		previousFontFamilyRef.current = currentFontFamily;
 	}, [
+		value?.typography?.fontFamily,
+		value?.typography?.fontStyle,
+		value?.typography?.fontWeight,
 		nearestFontStyle,
 		nearestFontWeight,
-		resetFontAppearance,
 		setFontAppearance,
+		resetFontAppearance,
 	] );
 
 	// Line Height
