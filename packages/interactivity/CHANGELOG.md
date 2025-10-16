@@ -8,7 +8,7 @@
 
 ### Bug Fixes
 
--   Handle client-server state synchronization scenarios for `getServerContext` and `getServerState`. ([#???](https://github.com/WordPress/gutenberg/pull/???))
+-   Handle client-server state synchronization scenarios for `getServerContext` and `getServerState`. ([#72381](https://github.com/WordPress/gutenberg/pull/72381))
 
 ## 6.32.0 (2025-10-01)
 
