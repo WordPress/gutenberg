@@ -216,6 +216,45 @@ describe( 'BorderBoxControl', () => {
 				} )
 			).not.toBeInTheDocument();
 		} );
+
+		it( 'should disable the custom color picker when disableCustomColors is true', async () => {
+			const user = userEvent.setup();
+
+			// disableCustomColors = true → custom picker should NOT appear
+			render( <BorderBoxControl { ...props } disableCustomColors /> );
+
+			const colorButton = screen.getByLabelText( toggleLabelRegex );
+			await user.click( colorButton );
+
+			// Wait to make sure the dropdown opens
+			await waitFor( () =>
+				expect(
+					screen.queryByRole( 'button', {
+						name: 'Custom color picker',
+					} )
+				).not.toBeInTheDocument()
+			);
+		} );
+
+		it( 'should show the custom color picker when disableCustomColors is false', async () => {
+			const user = userEvent.setup();
+
+			// disableCustomColors = false → custom picker SHOULD appear
+			render(
+				<BorderBoxControl { ...props } disableCustomColors={ false } />
+			);
+
+			const colorButton = screen.getByLabelText( toggleLabelRegex );
+			await user.click( colorButton );
+
+			await waitFor( () =>
+				expect(
+					screen.getByRole( 'button', {
+						name: 'Custom color picker',
+					} )
+				).toBeVisible()
+			);
+		} );
 	} );
 
 	describe( 'Split view rendering', () => {
