@@ -1106,11 +1106,19 @@ async function main() {
 		},
 	} );
 
-	await buildAll();
-
+	// In watch mode, allow initial build to fail and continue to watch
 	if ( values.watch ) {
+		try {
+			await buildAll();
+		} catch ( error ) {
+			console.error( '\n❌ Initial build failed:', error.message );
+			console.error( '   Continuing to watch mode...\n' );
+		}
 		console.log( '\n👀 Watching for changes...\n' );
 		await watchMode();
+	} else {
+		// In non-watch mode, let build errors propagate
+		await buildAll();
 	}
 }
 
