@@ -1,7 +1,12 @@
 /**
  * Internal dependencies
  */
-import { store, type AsyncAction, type TypeYield } from '../store';
+import {
+	store,
+	getServerState,
+	type AsyncAction,
+	type TypeYield,
+} from '../store';
 
 describe( 'Interactivity API', () => {
 	describe( 'store', () => {
@@ -368,6 +373,34 @@ describe( 'Interactivity API', () => {
 					( await actions.asyncAction() ) satisfies number;
 				};
 			} );
+		} );
+	} );
+
+	describe( 'getServerState', () => {
+		describe( 'should return a read-only generic object when no type is passed', () => {
+			const state = getServerState();
+			// @ts-expect-error
+			state.nonModifiable = 'error';
+			// @ts-expect-error
+			state.nonExistent satisfies any;
+		} );
+
+		describe( 'should accept a type parameter to define the returned object type, but convert it to read-only', () => {
+			interface State {
+				foo: string;
+				bar: {
+					baz: number;
+				};
+			}
+			const state = getServerState< State >();
+			// @ts-expect-error
+			state.nonExistent = 'error';
+			// @ts-expect-error
+			state.foo = 'error';
+			// @ts-expect-error
+			state.bar.baz = 1;
+			state.foo satisfies string;
+			state.bar.baz satisfies number;
 		} );
 	} );
 } );

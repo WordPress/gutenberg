@@ -4,6 +4,7 @@
 import { proxifyState, proxifyStore, deepMerge } from './proxies';
 import { getNamespace } from './namespaces';
 import { isPlainObject, deepReadOnly } from './utils';
+import type { DeepReadonly } from './utils';
 
 /**
  * External dependencies
@@ -51,11 +52,11 @@ export const getConfig = ( namespace?: string ) =>
  * @param namespace Store's namespace from which to retrieve the server state.
  * @return The server state for the given namespace.
  */
-export const getServerState: ( (
+export const getServerState: ( < T extends object >(
 	namespace?: string
-) => Readonly< Record< string, unknown > > ) & { subscribe?: number } = (
+) => DeepReadonly< T > ) & { subscribe?: number } = < T extends object >(
 	namespace?: string
-) => {
+): DeepReadonly< T > => {
 	const ns = namespace || getNamespace();
 	if ( ! serverStates.has( ns ) ) {
 		serverStates.set( ns, deepReadOnly( {} ) );
@@ -64,7 +65,7 @@ export const getServerState: ( (
 	// arbitrary property (`subscribe`) to prevent the JavaScript minifier from
 	// removing this line.
 	getServerState.subscribe = navigationSignal.value;
-	return serverStates.get( ns );
+	return serverStates.get( ns ) as DeepReadonly< T >;
 };
 
 interface StoreOptions {

@@ -411,6 +411,12 @@ export function withSyncEvent( callback: Function ): SyncAwareFunction {
 	return syncAware;
 }
 
+export type DeepReadonly< T > = T extends ( ...args: any[] ) => any
+	? T
+	: T extends object
+	? { readonly [ K in keyof T ]: DeepReadonly< T[ K ] > }
+	: T;
+
 // WeakMap cache to reuse proxies for the same read-only objects.
 const readOnlyMap = new WeakMap< object, object >();
 
