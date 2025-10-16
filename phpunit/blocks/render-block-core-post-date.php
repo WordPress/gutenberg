@@ -70,7 +70,7 @@ class Test_Render_Block_Core_Post_Date extends WP_UnitTestCase {
 				'bindings' => array(
 					'datetime' => array(
 						'source' => 'core/post-data',
-						'args'   => array( 'key' => $field ),
+						'args'   => array( 'field' => $field ),
 					),
 				),
 			),
@@ -138,7 +138,7 @@ class Test_Render_Block_Core_Post_Date extends WP_UnitTestCase {
 				'bindings' => array(
 					'datetime' => array(
 						'source' => 'core/post-data',
-						'args'   => array( 'key' => 'modified' ),
+						'args'   => array( 'field' => 'modified' ),
 					),
 				),
 			),
