@@ -20,13 +20,15 @@ import DataForm from '../components/dataform';
 import useFormValidity from '../hooks/use-form-validity';
 
 import type {
-	Field,
-	Form,
-	DataFormControlProps,
-	Layout,
-	RegularLayout,
-	PanelLayout,
 	CardLayout,
+	DataFormControlProps,
+	Field,
+	FieldValidity,
+	Form,
+	Layout,
+	PanelLayout,
+	RegularLayout,
+	Rules,
 } from '../types';
 import { unlock } from '../lock-unlock';
 import DateControl from '../dataform-controls/date';
@@ -481,6 +483,26 @@ const LayoutPanelComponent = ( {
 	);
 };
 
+function getCustomValidity< Item >(
+	isValid: Rules< Item >,
+	validity: FieldValidity | undefined
+) {
+	let customValidity;
+	if ( isValid?.required && validity?.required ) {
+		// If the consumer provides a message for required,
+		// use it instead of the native built-in message.
+		customValidity = validity?.required?.message
+			? validity.required
+			: undefined;
+	} else if ( isValid?.elements && validity?.elements ) {
+		customValidity = validity.elements;
+	} else if ( validity?.custom ) {
+		customValidity = validity.custom;
+	}
+
+	return customValidity;
+}
+
 function CustomEditControl< Item >( {
 	data,
 	field,
@@ -488,7 +510,8 @@ function CustomEditControl< Item >( {
 	hideLabelFromVision,
 	validity,
 }: DataFormControlProps< Item > ) {
-	const { label, placeholder, description, getValue, setValue } = field;
+	const { label, placeholder, description, getValue, setValue, isValid } =
+		field;
 	const value = getValue( { item: data } );
 
 	const onChangeControl = useCallback(
@@ -499,8 +522,8 @@ function CustomEditControl< Item >( {
 
 	return (
 		<ValidatedTextControl
-			required={ !! field.isValid?.required }
-			customValidity={ validity?.custom ? validity.custom : undefined }
+			required={ !! isValid?.required }
+			customValidity={ getCustomValidity( isValid, validity ) }
 			label={ label }
 			placeholder={ placeholder }
 			value={ value ?? '' }
