@@ -18,6 +18,8 @@ import { Menu } from '..';
 import Icon from '../../icon';
 import Button from '../../button';
 import Modal from '../../modal';
+import Popover from '../../popover';
+import Dropdown from '../../dropdown';
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
 import { ContextSystemProvider } from '../../context';
 import type { Props } from '../types';
@@ -680,6 +682,181 @@ export const InsideModal: StoryObj< typeof Menu > = {
 					</Modal>
 				) }
 			</>
+		);
+	},
+
+	args: {
+		...Default.args,
+	},
+
+	parameters: {
+		docs: {
+			source: { type: 'code' },
+		},
+	},
+};
+
+export const InsidePopover: StoryObj< typeof Menu > = {
+	render: function InsidePopover( props: Props ) {
+		const [ isPopoverOpen, setPopoverOpen ] = useState( false );
+		const [ anchorElement, setAnchorElement ] =
+			useState< HTMLButtonElement | null >( null );
+
+		return (
+			<>
+				<Button
+					ref={ setAnchorElement }
+					onClick={ () => setPopoverOpen( ! isPopoverOpen ) }
+					__next40pxDefaultSize
+					variant="secondary"
+				>
+					Toggle Popover
+				</Button>
+				{ isPopoverOpen && (
+					<Popover
+						anchor={ anchorElement }
+						onClose={ () => setPopoverOpen( false ) }
+						placement="bottom-start"
+					>
+						<div style={ { padding: '16px' } }>
+							<p style={ { margin: '0 0 16px 0' } }>
+								Menu inside Popover:
+							</p>
+							<Menu { ...props }>
+								<Menu.TriggerButton
+									render={
+										<Button
+											__next40pxDefaultSize
+											variant="secondary"
+										/>
+									}
+								>
+									Open menu
+								</Menu.TriggerButton>
+								<Menu.Popover>
+									<Menu.Item>
+										<Menu.ItemLabel>
+											Level 1 item
+										</Menu.ItemLabel>
+									</Menu.Item>
+									<Menu.Item>
+										<Menu.ItemLabel>
+											Level 1 item with help text
+										</Menu.ItemLabel>
+										<Menu.ItemHelpText>
+											Some helpful description
+										</Menu.ItemHelpText>
+									</Menu.Item>
+									<Menu.Separator />
+									<Menu>
+										<Menu.SubmenuTriggerItem>
+											<Menu.ItemLabel>
+												Submenu trigger
+											</Menu.ItemLabel>
+										</Menu.SubmenuTriggerItem>
+										<Menu.Popover>
+											<Menu.Item>
+												<Menu.ItemLabel>
+													Level 2 item
+												</Menu.ItemLabel>
+											</Menu.Item>
+											<Menu.Item>
+												<Menu.ItemLabel>
+													Another level 2 item
+												</Menu.ItemLabel>
+											</Menu.Item>
+										</Menu.Popover>
+									</Menu>
+								</Menu.Popover>
+							</Menu>
+						</div>
+					</Popover>
+				) }
+			</>
+		);
+	},
+
+	args: {
+		...Default.args,
+	},
+
+	parameters: {
+		docs: {
+			source: { type: 'code' },
+		},
+	},
+};
+
+export const InsideDropdown: StoryObj< typeof Menu > = {
+	render: function InsideDropdown( props: Props ) {
+		return (
+			<Dropdown
+				popoverProps={ { placement: 'bottom-start' } }
+				renderToggle={ ( { isOpen, onToggle } ) => (
+					<Button
+						__next40pxDefaultSize
+						variant="secondary"
+						onClick={ onToggle }
+						aria-expanded={ isOpen }
+					>
+						Open Dropdown
+					</Button>
+				) }
+				renderContent={ () => (
+					<div style={ { padding: '16px', minWidth: '200px' } }>
+						<p style={ { margin: '0 0 16px 0' } }>
+							Menu inside Dropdown:
+						</p>
+						<Menu { ...props }>
+							<Menu.TriggerButton
+								render={
+									<Button
+										__next40pxDefaultSize
+										variant="secondary"
+									/>
+								}
+							>
+								Open menu
+							</Menu.TriggerButton>
+							<Menu.Popover>
+								<Menu.Item>
+									<Menu.ItemLabel>
+										Level 1 item
+									</Menu.ItemLabel>
+								</Menu.Item>
+								<Menu.Item>
+									<Menu.ItemLabel>
+										Level 1 item with help text
+									</Menu.ItemLabel>
+									<Menu.ItemHelpText>
+										Some helpful description
+									</Menu.ItemHelpText>
+								</Menu.Item>
+								<Menu.Separator />
+								<Menu>
+									<Menu.SubmenuTriggerItem>
+										<Menu.ItemLabel>
+											Submenu trigger
+										</Menu.ItemLabel>
+									</Menu.SubmenuTriggerItem>
+									<Menu.Popover>
+										<Menu.Item>
+											<Menu.ItemLabel>
+												Level 2 item
+											</Menu.ItemLabel>
+										</Menu.Item>
+										<Menu.Item>
+											<Menu.ItemLabel>
+												Another level 2 item
+											</Menu.ItemLabel>
+										</Menu.Item>
+									</Menu.Popover>
+								</Menu>
+							</Menu.Popover>
+						</Menu>
+					</div>
+				) }
+			/>
 		);
 	},
 
