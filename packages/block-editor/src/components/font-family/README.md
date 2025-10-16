@@ -76,6 +76,22 @@ The current font family value.
 
 The rest of the props are passed down to the underlying `<SelectControl />` instance.
 
+### label
+
+The label displayed above the control.
+
+- Type: `String`
+- Required: No
+- Default: 'Font'
+
+### help
+
+Help text displayed below the control, providing guidance or context.
+Accepts either a string or a function. If a function is provided, it receives the current value as an argument.
+
+- Type: `String|Element|Function`
+- Required: No
+
 #### `__next40pxDefaultSize`
 
 - Type: `boolean`

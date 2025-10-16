@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { CustomSelectControl } from '@wordpress/components';
+import { BaseControl, CustomSelectControl } from '@wordpress/components';
 import deprecated from '@wordpress/deprecated';
 import { __ } from '@wordpress/i18n';
 
@@ -24,6 +24,8 @@ export default function FontFamilyControl( {
 	onChange,
 	fontFamilies,
 	className,
+	label = __( 'Font' ),
+	help,
 	...props
 } ) {
 	const [ blockLevelFontFamilies ] = useSettings( 'typography.fontFamilies' );
@@ -74,18 +76,38 @@ export default function FontFamilyControl( {
 
 	const selectedValue =
 		options.find( ( option ) => option.key === value ) ?? '';
+
+	let helpLabel;
+	if ( help ) {
+		if ( typeof help === 'function' ) {
+			if ( value !== undefined ) {
+				helpLabel = help( value );
+			}
+		} else {
+			helpLabel = help;
+		}
+	}
+
 	return (
-		<CustomSelectControl
-			__next40pxDefaultSize={ __next40pxDefaultSize }
-			__shouldNotWarnDeprecated36pxSize
-			label={ __( 'Font' ) }
-			value={ selectedValue }
-			onChange={ ( { selectedItem } ) => onChange( selectedItem.key ) }
-			options={ options }
-			className={ clsx( 'block-editor-font-family-control', className, {
-				'is-next-has-no-margin-bottom': __nextHasNoMarginBottom,
-			} ) }
-			{ ...props }
-		/>
+		<BaseControl __nextHasNoMarginBottom help={ helpLabel }>
+			<CustomSelectControl
+				__next40pxDefaultSize={ __next40pxDefaultSize }
+				__shouldNotWarnDeprecated36pxSize
+				value={ selectedValue }
+				onChange={ ( { selectedItem } ) =>
+					onChange( selectedItem.key )
+				}
+				label={ label }
+				options={ options }
+				className={ clsx(
+					'block-editor-font-family-control',
+					className,
+					{
+						'is-next-has-no-margin-bottom': __nextHasNoMarginBottom,
+					}
+				) }
+				{ ...props }
+			/>
+		</BaseControl>
 	);
 }
