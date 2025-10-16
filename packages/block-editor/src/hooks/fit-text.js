@@ -62,14 +62,17 @@ function useFitText( { fitText, name, clientId } ) {
 	const hasFitTextSupport = hasBlockSupport( name, FIT_TEXT_SUPPORT_KEY );
 	const blockElement = useBlockElement( clientId );
 
-	// Monitor block attribute changes
+	// Monitor block attribute changes and selection state
 	// Any attribute may change the available space.
-	const blockAttributes = useSelect(
+	const { blockAttributes, isSelected } = useSelect(
 		( select ) => {
 			if ( ! clientId ) {
-				return;
+				return { blockAttributes: undefined, isSelected: false };
 			}
-			return select( blockEditorStore ).getBlockAttributes( clientId );
+			return {
+				blockAttributes: select( blockEditorStore ).getBlockAttributes( clientId ),
+				isSelected: select( blockEditorStore ).isBlockSelected( clientId ),
+			};
 		},
 		[ clientId ]
 	);
@@ -94,8 +97,11 @@ function useFitText( { fitText, name, clientId } ) {
 			styleElement.textContent = css;
 		};
 
-		optimizeFitText( blockElement, blockSelector, applyStylesFn );
-	}, [ blockElement, clientId, hasFitTextSupport, fitText ] );
+		// Limit font size to 200px when block is selected
+		const maxSize = isSelected ? 200 : 600;
+
+		optimizeFitText( blockElement, blockSelector, applyStylesFn, maxSize );
+	}, [ blockElement, clientId, hasFitTextSupport, fitText, isSelected ] );
 
 	useEffect( () => {
 		if (
@@ -138,14 +144,14 @@ function useFitText( { fitText, name, clientId } ) {
 	// Trigger fit text recalculation when content changes
 	useEffect( () => {
 		if ( fitText && blockElement && hasFitTextSupport ) {
-			// Small delay to ensure DOM has updated after content changes
-			const timer = setTimeout( () => {
+			// Wait for next frame to ensure DOM has updated after content changes
+			const frameId = requestAnimationFrame( () => {
 				if ( blockElement ) {
 					applyFitText();
 				}
-			}, 1000 );
+			} );
 
-			return () => clearTimeout( timer );
+			return () => cancelAnimationFrame( frameId );
 		}
 	}, [
 		blockAttributes,
