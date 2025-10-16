@@ -27,6 +27,7 @@ import type {
 	SyncManager,
 } from './types';
 import { createUndoManager } from './undo-manager';
+<<<<<<< HEAD
 import { createYjsDoc, markEntityAsSaved } from './utils';
 import { Awareness } from 'y-protocols/awareness';
 
@@ -36,6 +37,9 @@ interface CollectionState {
 	unload: () => void;
 	ydoc: CRDTDoc;
 }
+=======
+import { createYjsDoc } from './utils';
+>>>>>>> c96fc7a961 (Real-time collaboration: [pr-72407] Add UndoManager support for collaborative editing)
 
 interface EntityState {
 	handlers: RecordHandlers;
@@ -429,7 +433,10 @@ export function createSyncManager(): SyncManager {
 	return {
 		createMeta: createEntityMeta,
 		load: loadEntity,
+<<<<<<< HEAD
 		loadCollection,
+=======
+>>>>>>> c96fc7a961 (Real-time collaboration: [pr-72407] Add UndoManager support for collaborative editing)
 		undoManager,
 		unload: unloadEntity,
 		update: updateCRDTDoc,
