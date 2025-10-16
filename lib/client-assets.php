@@ -617,26 +617,12 @@ add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
  * @since 19.3.0
  */
 function gutenberg_default_script_modules() {
-	$all_assets = array();
-
-	/*
-	 * Load combined assets.php for webpack-built script modules.
-	 * Expects multidimensional array like:
-	 *
-	 *     'interactivity/index.min.js' => array('dependencies' => array(…), 'version' => '…'),
-	 *     'interactivity/debug.min.js' => array('dependencies' => array(…), 'version' => '…'),
-	 *     'interactivity-router/index.min.js' => …
-	 */
-	$combined_assets_file = gutenberg_dir_path() . '/build-module/assets.php';
-	if ( file_exists( $combined_assets_file ) ) {
-		$all_assets = include $combined_assets_file;
-	}
-
 	/*
 	 * Load individual asset files for esbuild-built packages.
 	 * Follows the same pattern as regular scripts in gutenberg_register_packages_scripts().
 	 * Uses RecursiveDirectoryIterator to find all *.min.js files at any nesting depth.
 	 */
+	$all_assets       = array();
 	$build_module_dir = gutenberg_dir_path() . 'build-module';
 	if ( is_dir( $build_module_dir ) ) {
 		$iterator = new RecursiveIteratorIterator(
