@@ -11,6 +11,7 @@
 - Normalize search field styles ([#72072](https://github.com/WordPress/gutenberg/pull/72072)).
 - DataForm control for `date` supports `required` and `custom` validation [#72048](https://github.com/WordPress/gutenberg/pull/72048).
 - DataForm control for `datetime` supports `required` and `custom` validation. [#72060](https://github.com/WordPress/gutenberg/pull/72060).
+- Dataviews: Add support for dynamic modal headers. ([#72383](https://github.com/WordPress/gutenberg/pull/72384))
 
 ### Breaking changes
 
