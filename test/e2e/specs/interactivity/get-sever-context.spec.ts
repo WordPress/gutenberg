@@ -81,10 +81,14 @@ test.describe( 'getServerContext()', () => {
 				childContext: childNewProps,
 			},
 		} );
+		const link3 = await utils.addPostWithBlock( 'test/get-server-context', {
+			alias: 'getServerContext() - no context',
+			attributes: {},
+		} );
 		await utils.addPostWithBlock( 'test/get-server-context', {
 			alias: 'getServerContext() - main',
 			attributes: {
-				links: { modified: link1, newProps: link2 },
+				links: { modified: link1, newProps: link2, noContext: link3 },
 				parentContext: parent,
 				childContext: child,
 			},
@@ -105,17 +109,20 @@ test.describe( 'getServerContext()', () => {
 		const nestedProp = page.getByTestId( 'nested.prop' );
 		const inheritedProp = page.getByTestId( 'inherited.prop' );
 
+		await expect( page ).toHaveTitle( /main/ );
 		await expect( prop ).toHaveText( 'child' );
 		await expect( nestedProp ).toHaveText( 'child' );
 		await expect( inheritedProp ).toHaveText( 'parent' );
 
 		await page.getByTestId( 'modified' ).click();
+		await expect( page ).toHaveTitle( /modified/ );
 
 		await expect( prop ).toHaveText( 'childModified' );
 		await expect( nestedProp ).toHaveText( 'childModified' );
 		await expect( inheritedProp ).toHaveText( 'parentModified' );
 
 		await page.goBack();
+		await expect( page ).toHaveTitle( /main/ );
 
 		await expect( prop ).toHaveText( 'child' );
 		await expect( nestedProp ).toHaveText( 'child' );
@@ -127,11 +134,13 @@ test.describe( 'getServerContext()', () => {
 		const nestedNewProp = page.getByTestId( 'nested.newProp' );
 		const inheritedNewProp = page.getByTestId( 'inherited.newProp' );
 
+		await expect( page ).toHaveTitle( /main/ );
 		await expect( newProp ).toBeEmpty();
 		await expect( nestedNewProp ).toBeEmpty();
 		await expect( inheritedNewProp ).toBeEmpty();
 
 		await page.getByTestId( 'newProps' ).click();
+		await expect( page ).toHaveTitle( /new props/ );
 
 		await expect( newProp ).toHaveText( 'child' );
 		await expect( nestedNewProp ).toHaveText( 'child' );
@@ -143,13 +152,17 @@ test.describe( 'getServerContext()', () => {
 		const nestedNewProp = page.getByTestId( 'nested.newProp' );
 		const inheritedNewProp = page.getByTestId( 'inherited.newProp' );
 
+		await expect( page ).toHaveTitle( /main/ );
+
 		await page.getByTestId( 'newProps' ).click();
+		await expect( page ).toHaveTitle( /new props/ );
 
 		await expect( newProp ).toHaveText( 'child' );
 		await expect( nestedNewProp ).toHaveText( 'child' );
 		await expect( inheritedNewProp ).toHaveText( 'parent' );
 
 		await page.goBack();
+		await expect( page ).toHaveTitle( /main/ );
 
 		await expect( newProp ).toHaveText( 'child' );
 		await expect( nestedNewProp ).toHaveText( 'child' );
@@ -175,10 +188,10 @@ test.describe( 'getServerContext()', () => {
 		const nonChanging = page.getByTestId( 'nonChanging' );
 		const button = page.getByTestId( 'updateNonChanging' );
 
+		await expect( page ).toHaveTitle( /main/ );
 		await expect( nonChanging ).toHaveText( 'modified from server' );
 
 		await button.click();
-
 		await expect( nonChanging ).toHaveText( 'modified from client' );
 
 		await page.getByTestId( 'modified' ).click();
@@ -188,7 +201,6 @@ test.describe( 'getServerContext()', () => {
 		await expect( nonChanging ).toHaveText( 'modified from server' );
 
 		await button.click();
-
 		await expect( nonChanging ).toHaveText( 'modified from client' );
 
 		await page.goBack();
@@ -204,6 +216,7 @@ test.describe( 'getServerContext()', () => {
 		const onlyInMain = page.getByTestId( 'onlyInMain' );
 		const onlyInModified = page.getByTestId( 'onlyInModified' );
 
+		await expect( page ).toHaveTitle( /main/ );
 		await expect( onlyInMain ).toHaveText( 'only in main' );
 		await expect( onlyInModified ).toBeEmpty();
 
@@ -224,5 +237,22 @@ test.describe( 'getServerContext()', () => {
 
 		await expect( onlyInMain ).toBeEmpty();
 		await expect( onlyInModified ).toBeEmpty();
+	} );
+
+	test( 'should reset server context when navigating to a page without context', async ( {
+		page,
+	} ) => {
+		const prop = page.getByTestId( 'prop' );
+		const nestedProp = page.getByTestId( 'nested.prop' );
+
+		await expect( page ).toHaveTitle( /main/ );
+		await expect( prop ).toHaveText( 'child' );
+		await expect( nestedProp ).toHaveText( 'child' );
+
+		await page.getByTestId( 'noContext' ).click();
+		await expect( page ).toHaveTitle( /no context/ );
+
+		await expect( prop ).toBeEmpty();
+		await expect( nestedProp ).toBeEmpty();
 	} );
 } );
