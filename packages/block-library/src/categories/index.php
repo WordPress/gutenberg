@@ -112,7 +112,7 @@ function build_dropdown_script_block_core_categories( $dropdown_id ) {
 				location.href = url.href;
 			}
 		} );
-	})( <?php echo wp_json_encode( $exports, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ); ?> );
+	} )( <?php echo wp_json_encode( $exports, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ); ?> );
 	</script>
 	<?php
 	return wp_get_inline_script_tag(
