@@ -316,17 +316,42 @@ function useBlockProps( { name, className, clientId } ) {
 		clientId
 	);
 
+	const descendantBlockNames = useSelect(
+		( select ) => {
+			// Avoid a subscription if there is no variation.
+			if ( ! variation ) {
+				return;
+			}
+			const { getClientIdsOfDescendants, getBlockName } =
+				select( blockEditorStore );
+			// Could be moved to a private memoized selector, but this also
+			// makes sure the reference is stable.
+			return JSON.stringify( [
+				...new Set(
+					[ clientId, ...getClientIdsOfDescendants( clientId ) ].map(
+						( id ) => getBlockName( id )
+					)
+				),
+			] );
+		},
+		[ clientId, variation ]
+	);
+
 	const variationStyles = useMemo( () => {
 		if ( ! variation ) {
 			return;
 		}
 
 		const variationConfig = { settings, styles };
+		const names = JSON.parse( descendantBlockNames );
 		const blockSelectors = getBlockSelectors(
-			getBlockTypes(),
+			getBlockTypes().filter( ( blockType ) =>
+				names.includes( blockType.name )
+			),
 			getBlockStyles,
 			clientId
 		);
+
 		const hasBlockGapSupport = false;
 		const hasFallbackGapSupport = true;
 		const disableLayoutStyles = true;
@@ -349,7 +374,14 @@ function useBlockProps( { name, className, clientId } ) {
 				variationStyles: true,
 			}
 		);
-	}, [ variation, settings, styles, getBlockStyles, clientId ] );
+	}, [
+		variation,
+		settings,
+		styles,
+		getBlockStyles,
+		clientId,
+		descendantBlockNames,
+	] );
 
 	usePrivateStyleOverride( {
 		id: `variation-${ clientId }`,
