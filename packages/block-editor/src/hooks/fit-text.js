@@ -194,7 +194,7 @@ export function FitTextControl( {
 						fitText
 							? __( 'Text will resize to fit its container.' )
 							: __(
-									'Font size setting is overriden when enabled'
+									'Resize text to fit its container. When enabled, font size settings are ignored.'
 							  )
 					}
 				/>
