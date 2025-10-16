@@ -972,6 +972,10 @@ async function buildAll() {
 
 /**
  * Watch mode for development.
+ * 
+ * Watches source files and rebuilds packages on changes. Errors during rebuild
+ * (such as syntax errors) are caught and logged, but don't cause the watcher to exit.
+ * This allows continuous development even when code is temporarily invalid.
  */
 async function watchMode() {
 	const packagesToRebuild = new Set();
@@ -1074,6 +1078,8 @@ async function watchMode() {
 			return;
 		}
 
+		// Schedule rebuild with error handling to prevent process exit.
+		// The .catch() ensures unhandled promise rejections don't crash the watcher.
 		rebuildTimeoutId = setTimeout( () => {
 			processRebuilds().catch( ( error ) => {
 				console.error( '❌ Rebuild failed:', error.message );
