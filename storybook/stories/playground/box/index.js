@@ -10,9 +10,27 @@ import {
 } from '@wordpress/block-editor';
 
 /**
+ * External dependencies
+ */
+import componentsStyles from '!!raw-loader!@wordpress/components/build-style/style.css';
+import blockEditorContentStyles from '!!raw-loader!@wordpress/block-editor/build-style/content.css';
+import blocksStyles from '!!raw-loader!@wordpress/block-library/build-style/style.css';
+import blocksEditorStyles from '!!raw-loader!@wordpress/block-library/build-style/editor.css';
+
+/**
  * Internal dependencies
  */
 import { editorStyles } from '../editor-styles';
+
+//Base styles for the content within the block canvas iframe.
+const contentStyles = [
+	{ css: componentsStyles },
+	{ css: blockEditorContentStyles },
+	{ css: blocksStyles },
+	{ css: blocksEditorStyles },
+	...editorStyles,
+];
+
 import './style.css';
 
 export default function EditorBox() {
@@ -37,7 +55,7 @@ export default function EditorBox() {
 				} }
 			>
 				<BlockToolbar hideDragHandle />
-				<BlockCanvas height="500px" styles={ editorStyles } />
+				<BlockCanvas height="500px" styles={ contentStyles } />
 			</BlockEditorProvider>
 		</div>
 	);
