@@ -2,6 +2,7 @@
  * External dependencies
  */
 import * as Y from 'yjs';
+import { Awareness } from 'y-protocols/awareness';
 import * as fun from 'lib0/function';
 import {
 	describe,
@@ -136,7 +137,28 @@ describe( 'SyncManager', () => {
 			expect( mockProviderCreator ).toHaveBeenCalledWith(
 				'post',
 				'123',
-				expect.any( Y.Doc )
+				expect.any( Y.Doc ),
+				undefined
+			);
+		} );
+
+		it( 'creates providers with awareness when supported', async () => {
+			const manager = createSyncManager();
+
+			await manager.load(
+				{ ...mockSyncConfig, supports: { awareness: true } },
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+
+			expect( mockProviderCreator ).toHaveBeenCalledTimes( 1 );
+			expect( mockProviderCreator ).toHaveBeenCalledWith(
+				'post',
+				'123',
+				expect.any( Y.Doc ),
+				expect.any( Awareness )
 			);
 		} );
 

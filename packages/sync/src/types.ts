@@ -7,6 +7,7 @@ import type { UndoManager as WPUndoManager } from '@wordpress/undo-manager';
  * External dependencies
  */
 import type * as Y from 'yjs';
+import type { Awareness } from 'y-protocols/awareness';
 
 /**
  * Internal dependencies
@@ -55,7 +56,8 @@ export interface ProviderCreatorResult {
 export type ProviderCreator = (
 	objectType: ObjectType,
 	objectId: ObjectID,
-	ydoc: Y.Doc
+	ydoc: Y.Doc,
+	awareness?: Awareness
 ) => Promise< ProviderCreatorResult >;
 
 export interface RecordHandlers {
