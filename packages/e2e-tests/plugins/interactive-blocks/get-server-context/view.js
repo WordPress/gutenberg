@@ -34,21 +34,33 @@ store( 'test/get-server-context', {
 			const ctx = getContext();
 			const { prop, newProp, nested, inherited } = getServerContext();
 			ctx.prop = prop;
-			ctx.newProp = newProp;
+			if ( newProp ) {
+				ctx.newProp = newProp;
+			}
 			ctx.nested.prop = nested.prop;
-			ctx.nested.newProp = nested.newProp;
+			if ( nested?.newProp ) {
+				ctx.nested.newProp = nested.newProp;
+			}
 			ctx.inherited.prop = inherited.prop;
-			ctx.inherited.newProp = inherited.newProp;
+			if ( inherited?.newProp ) {
+				ctx.inherited.newProp = inherited.newProp;
+			}
 		},
 		updateServerContextChild() {
 			const ctx = getContext();
 			const { prop, newProp, nested, inherited } = getServerContext();
 			ctx.prop = prop;
-			ctx.newProp = newProp;
+			if ( newProp ) {
+				ctx.newProp = newProp;
+			}
 			ctx.nested.prop = nested.prop;
-			ctx.nested.newProp = nested.newProp;
+			if ( nested?.newProp ) {
+				ctx.nested.newProp = nested.newProp;
+			}
 			ctx.inherited.prop = inherited.prop;
-			ctx.inherited.newProp = inherited.newProp;
+			if ( inherited?.newProp ) {
+				ctx.inherited.newProp = inherited.newProp;
+			}
 		},
 		updateNonChanging() {
 			// This property never changes in the server, but it changes in the

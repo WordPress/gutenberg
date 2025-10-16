@@ -7,7 +7,8 @@ import type { h as createElement, RefObject } from 'preact';
  * Internal dependencies
  */
 import { getNamespace } from './namespaces';
-import { deepReadOnly } from './utils';
+import { deepReadOnly, navigationSignal } from './utils';
+import type { DeepReadonly } from './utils';
 import type { Evaluate } from './hooks';
 
 export interface Scope {
@@ -31,6 +32,12 @@ export const resetScope = () => {
 	scopeStack.pop();
 };
 
+const throwNotInScope = ( method: string ) => {
+	throw Error(
+		`Cannot call \`${ method }()\` when there is no scope. If you are using an async function, please consider using a generator instead. If you are using some sort of async callbacks, like \`setTimeout\`, please wrap the callback with \`withScope(callback)\`.`
+	);
+};
+
 /**
  * Retrieves the context inherited by the element evaluating a function from the
  * store. The returned value depends on the element and the namespace where the
@@ -44,9 +51,7 @@ export const getContext = < T extends object >( namespace?: string ): T => {
 	const scope = getScope();
 	if ( globalThis.SCRIPT_DEBUG ) {
 		if ( ! scope ) {
-			throw Error(
-				'Cannot call `getContext()` when there is no scope. If you are using an async function, please consider using a generator instead. If you are using some sort of async callbacks, like `setTimeout`, please wrap the callback with `withScope(callback)`.'
-			);
+			throwNotInScope( 'getContext' );
 		}
 	}
 	return scope.context[ namespace || getNamespace() ];
@@ -64,9 +69,7 @@ export const getElement = () => {
 	let deepReadOnlyOptions = {};
 	if ( globalThis.SCRIPT_DEBUG ) {
 		if ( ! scope ) {
-			throw Error(
-				'Cannot call `getElement()` when there is no scope. If you are using an async function, please consider using a generator instead. If you are using some sort of async callbacks, like `setTimeout`, please wrap the callback with `withScope(callback)`.'
-			);
+			throwNotInScope( 'getElement' );
 		}
 		deepReadOnlyOptions = {
 			errorMessage:
@@ -81,19 +84,18 @@ export const getElement = () => {
 };
 
 /**
- * Retrieves the part of the inherited context defined and updated from the
- * server.
+ * Gets the context defined and updated from the server.
  *
  * The object returned is read-only, and includes the context defined in PHP
- * with `wp_interactivity_data_wp_context()`, including the corresponding
- * inherited properties. When `actions.navigate()` is called, this object is
- * updated to reflect the changes in the new visited page, without affecting the
- * context returned by `getContext()`. Directives can subscribe to those changes
- * to update the context if needed.
+ * with `data-wp-context` directives, including the corresponding inherited
+ * properties. When `actions.navigate()` is called, this object is updated to
+ * reflect the changes in the new visited page, without affecting the context
+ * returned by `getContext()`. Directives can subscribe to those changes to
+ * update the context if needed.
  *
  * @example
  * ```js
- *  store('...', {
+ *  store( 'myPlugin', {
  *    callbacks: {
  *      updateServerContext() {
  *        const context = getContext();
@@ -102,23 +104,29 @@ export const getElement = () => {
  *        context.overridableProp = serverContext.overridableProp;
  *      },
  *    },
- *  });
+ *  } );
  * ```
  *
- * @param namespace Store namespace. By default, the namespace where the calling
- *                  function exists is used.
- * @return The server context content.
+ * @param namespace Store namespace. By default, it inherits the namespace of
+ *                  the store where it is defined.
+ * @return The server context content for the given namespace.
  */
-export const getServerContext = < T extends object >(
+export const getServerContext: ( < T extends object >(
 	namespace?: string
-): T => {
+) => DeepReadonly< T > ) & { subscribe?: number } = < T extends object >(
+	namespace?: string
+): DeepReadonly< T > => {
 	const scope = getScope();
+
 	if ( globalThis.SCRIPT_DEBUG ) {
 		if ( ! scope ) {
-			throw Error(
-				'Cannot call `getServerContext()` when there is no scope. If you are using an async function, please consider using a generator instead. If you are using some sort of async callbacks, like `setTimeout`, please wrap the callback with `withScope(callback)`.'
-			);
+			throwNotInScope( 'getServerContext' );
 		}
 	}
+
+	// Accesses the signal to make this reactive. It assigns it to `subscribe`
+	// to prevent the JavaScript minifier from removing this line.
+	getServerContext.subscribe = navigationSignal.value;
+
 	return scope.serverContext[ namespace || getNamespace() ];
 };

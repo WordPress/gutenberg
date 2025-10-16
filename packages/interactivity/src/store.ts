@@ -60,7 +60,7 @@ export const getServerState: ( < T extends object >(
 	// arbitrary property (`subscribe`) to prevent the JavaScript minifier from
 	// removing this line.
 	getServerState.subscribe = navigationSignal.value;
-	return serverStates.get( ns ) as DeepReadonly< T >;
+	return serverStates.get( ns );
 };
 
 interface StoreOptions {
