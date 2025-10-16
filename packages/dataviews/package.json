@@ -32,7 +32,7 @@
 		},
 		"./wp": {
 			"types": "./build-types/index.d.ts",
-			"require": "./build-wp/index.js"
+			"default": "./build-wp/index.js"
 		},
 		"./package.json": {
 			"default": "./package.json"
