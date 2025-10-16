@@ -995,9 +995,23 @@ async function watchMode() {
 				const buildTime = Date.now() - startTime;
 				console.log( `✅ ${ packageName } (${ buildTime }ms)` );
 			} catch ( error ) {
-				console.log(
-					`❌ ${ packageName } - Error: ${ error.message }`
-				);
+				// Format esbuild errors nicely
+				if ( error.errors && error.errors.length > 0 ) {
+					console.log( `\n❌ ${ packageName } - Build failed:\n` );
+					error.errors.forEach( ( err ) => {
+						const location = err.location
+							? `${ err.location.file }:${ err.location.line }:${ err.location.column }`
+							: '';
+						console.log(
+							`   ${ location } - ${ err.text }`
+						);
+					} );
+					console.log( '' );
+				} else {
+					console.log(
+						`❌ ${ packageName } - Error: ${ error.message }`
+					);
+				}
 			} finally {
 				rebuilding.delete( packageName );
 			}
@@ -1060,7 +1074,11 @@ async function watchMode() {
 			return;
 		}
 
-		rebuildTimeoutId = setTimeout( processRebuilds, 100 );
+		rebuildTimeoutId = setTimeout( () => {
+			processRebuilds().catch( ( error ) => {
+				console.error( '❌ Rebuild failed:', error.message );
+			} );
+		}, 100 );
 	};
 
 	watcher.on( 'change', handleFileChange );
