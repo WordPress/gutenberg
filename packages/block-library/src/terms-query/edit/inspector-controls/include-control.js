@@ -6,6 +6,7 @@ import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useState, useEffect, useMemo } from '@wordpress/element';
 import { useDebounce } from '@wordpress/compose';
+import { decodeEntities } from '@wordpress/html-entities';
 
 const EMPTY_ARRAY = [];
 const BASE_QUERY = {
@@ -85,7 +86,7 @@ export default function IncludeControl( {
 			if ( entity ) {
 				accumulator.push( {
 					id,
-					value: entity.name,
+					value: decodeEntities( entity.name ),
 				} );
 			}
 			return accumulator;
@@ -100,8 +101,9 @@ export default function IncludeControl( {
 		const names = [];
 		const mapByName = {};
 		searchResults.forEach( ( result ) => {
-			names.push( result.name );
-			mapByName[ result.name ] = result;
+			const decodedName = decodeEntities( result.name );
+			names.push( decodedName );
+			mapByName[ decodedName ] = result;
 		} );
 		return { names, mapByName };
 	}, [ searchResults ] );
