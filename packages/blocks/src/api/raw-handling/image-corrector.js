@@ -14,6 +14,10 @@ export default function imageCorrector( node ) {
 
 	// This piece cannot be tested outside a browser env.
 	if ( node.src.indexOf( 'data:' ) === 0 ) {
+		if ( node.src.indexOf( 'data:image/svg+xml' ) === 0 ) {
+			return;
+		}
+
 		const [ properties, data ] = node.src.split( ',' );
 		const [ type ] = properties.slice( 5 ).split( ';' );
 
