@@ -111,11 +111,15 @@ export const getElement = () => {
  *                  the store where it is defined.
  * @return The server context content for the given namespace.
  */
-export const getServerContext: ( < T extends object >(
+export function getServerContext(
 	namespace?: string
-) => DeepReadonly< T > ) & { subscribe?: number } = < T extends object >(
+): DeepReadonly< Record< string, unknown > >;
+export function getServerContext< T extends object >(
 	namespace?: string
-): DeepReadonly< T > => {
+): DeepReadonly< T >;
+export function getServerContext< T extends object >(
+	namespace?: string
+): DeepReadonly< T > {
 	const scope = getScope();
 
 	if ( globalThis.SCRIPT_DEBUG ) {
@@ -129,4 +133,5 @@ export const getServerContext: ( < T extends object >(
 	getServerContext.subscribe = navigationSignal.value;
 
 	return scope.serverContext[ namespace || getNamespace() ];
-};
+}
+getServerContext.subscribe = 0;

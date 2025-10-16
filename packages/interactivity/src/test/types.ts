@@ -414,7 +414,6 @@ describe( 'Interactivity API types', () => {
 				const context = getServerContext();
 				// @ts-expect-error
 				context.nonModifiable = 'error';
-				// @ts-expect-error
 				context.nonExistent satisfies any;
 			};
 		} );
