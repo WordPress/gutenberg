@@ -28,14 +28,22 @@ $child_ctx  = $attributes['childContext'] ?? false;
 	data-wp-interactive="test/get-server-context"
 	data-wp-router-region="server-context"
 	data-wp-watch="callbacks.updateServerContextParent"
-	<?php if ( $parent_ctx ) { echo wp_interactivity_data_wp_context( $parent_ctx ); } ?>
+	<?php
+	if ( $parent_ctx ) {
+		echo wp_interactivity_data_wp_context( $parent_ctx );
+	}
+	?>
 >
 	<div
 		data-wp-watch---child="callbacks.updateServerContextChild"
 		data-wp-watch---non-changing="callbacks.updateNonChanging"
 		data-wp-watch---only-in-main="callbacks.updateOnlyInMain"
 		data-wp-watch---only-in-modified="callbacks.updateOnlyInModified"
-		<?php if ( $child_ctx ) { echo wp_interactivity_data_wp_context( $child_ctx ); } ?>
+		<?php
+		if ( $child_ctx ) {
+			echo wp_interactivity_data_wp_context( $child_ctx );
+		}
+		?>
 	>
 		<div data-testid="prop" data-wp-text="context.prop"></div>
 		<div data-testid="nested.prop" data-wp-text="context.nested.prop"></div>
