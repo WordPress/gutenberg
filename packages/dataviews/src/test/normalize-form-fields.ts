@@ -28,11 +28,19 @@ describe( 'normalizeFormFields', () => {
 			expect( result ).toEqual( [
 				{
 					id: 'field1',
-					layout: { type: 'regular', labelPosition: 'top' },
+					layout: {
+						type: 'regular',
+						labelPosition: 'top',
+						spacing: 4,
+					},
 				},
 				{
 					id: 'field2',
-					layout: { type: 'regular', labelPosition: 'top' },
+					layout: {
+						type: 'regular',
+						labelPosition: 'top',
+						spacing: 4,
+					},
 				},
 			] );
 		} );
@@ -51,12 +59,20 @@ describe( 'normalizeFormFields', () => {
 			expect( result ).toEqual( [
 				{
 					id: 'field1',
-					layout: { type: 'regular', labelPosition: 'top' },
+					layout: {
+						type: 'regular',
+						labelPosition: 'top',
+						spacing: 4,
+					},
 				},
 				{
 					id: 'field2',
 					label: 'Field 2',
-					layout: { type: 'regular', labelPosition: 'top' },
+					layout: {
+						type: 'regular',
+						labelPosition: 'top',
+						spacing: 4,
+					},
 				},
 			] );
 		} );
@@ -72,7 +88,11 @@ describe( 'normalizeFormFields', () => {
 			expect( result ).toEqual( [
 				{
 					id: 'field1',
-					layout: { type: 'regular', labelPosition: 'top' },
+					layout: {
+						type: 'regular',
+						labelPosition: 'top',
+						spacing: 4,
+					},
 				},
 			] );
 		} );
@@ -86,7 +106,11 @@ describe( 'normalizeFormFields', () => {
 			expect( result ).toEqual( [
 				{
 					id: 'field1',
-					layout: { type: 'regular', labelPosition: 'side' },
+					layout: {
+						type: 'regular',
+						labelPosition: 'side',
+						spacing: 4,
+					},
 				},
 			] );
 		} );
@@ -143,6 +167,7 @@ describe( 'normalizeFormFields', () => {
 						withHeader: true,
 						isOpened: true,
 						summary: [],
+						spacing: 6,
 					},
 				},
 			] );
@@ -169,6 +194,7 @@ describe( 'normalizeFormFields', () => {
 						withHeader: false,
 						isOpened: true,
 						summary: [],
+						spacing: 6,
 					},
 				},
 			] );
@@ -193,6 +219,7 @@ describe( 'normalizeFormFields', () => {
 						withHeader: true,
 						isOpened: false,
 						summary: [ { id: 'field1', visibility: 'always' } ],
+						spacing: 6,
 					},
 				},
 			] );
@@ -223,6 +250,7 @@ describe( 'normalizeFormFields', () => {
 							{ id: 'field2', visibility: 'when-collapsed' },
 							{ id: 'field1', visibility: 'always' },
 						],
+						spacing: 6,
 					},
 				},
 			] );
@@ -245,7 +273,11 @@ describe( 'normalizeFormFields', () => {
 			expect( result ).toEqual( [
 				{
 					id: 'field1',
-					layout: { type: 'regular', labelPosition: 'top' },
+					layout: {
+						type: 'regular',
+						labelPosition: 'top',
+						spacing: 4,
+					},
 				},
 				{
 					id: 'field2',
@@ -279,6 +311,7 @@ describe( 'normalizeFormFields', () => {
 						withHeader: false,
 						isOpened: true,
 						summary: [],
+						spacing: 6,
 					},
 				},
 				{
@@ -288,6 +321,7 @@ describe( 'normalizeFormFields', () => {
 						withHeader: true,
 						isOpened: false,
 						summary: [],
+						spacing: 6,
 					},
 				},
 			] );
