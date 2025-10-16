@@ -4,27 +4,14 @@
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
- * External dependencies
- */
-import styled from '@emotion/styled';
-
-/**
  * Internal dependencies
  */
-import CustomSelectControl from '../custom-select-control';
 import type {
 	FontSizePickerSelectProps,
 	FontSizePickerSelectOption,
 } from './types';
 import { generateFontSizeHint } from './utils';
-
-// Custom styled component to force line break between name and hint while keeping checkmark on the right
-const StyledCustomSelectControl = styled( CustomSelectControl )`
-	.components-custom-select-control__item
-		.components-custom-select-control__item-hint {
-		width: 100%;
-	}
-`;
+import { StyledCustomSelectControl } from './styles';
 
 const DEFAULT_OPTION: FontSizePickerSelectOption = {
 	key: 'default',
