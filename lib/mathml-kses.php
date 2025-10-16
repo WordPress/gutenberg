@@ -24,6 +24,13 @@ function gutenberg_kses_allow_mathml( $allowedtags ) {
 		'mathbackground' => true,
 		'mathcolor'      => true,
 		'mathsize'       => true,
+		// Common attributes also defined by _wp_add_global_attributes.
+		// We do not want to add all those global attributes though.
+		'class'            => true,
+		'data-*'           => true,
+		'dir'              => true,
+		'id'               => true,
+		'style'            => true,
 	);
 
 	// https://www.w3.org/TR/mathml-core/#the-top-level-math-element
@@ -165,12 +172,13 @@ function gutenberg_kses_allow_mathml( $allowedtags ) {
 	);
 
 	// https://www.w3.org/TR/mathml-core/#semantics-and-presentation
-	$allowedtags['semantics']      = $global_attributes;
-	$annotation_attributes         = array(
-		'encoding' => true,
+	$allowedtags['semantics']  = $global_attributes;
+	$allowedtags['annotation'] = array_merge(
+		$global_attributes,
+		array(
+			'encoding' => true,
+		)
 	);
-	$allowedtags['annotation']     = array_merge( $global_attributes, $annotation_attributes );
-	$allowedtags['annotation-xml'] = array_merge( $global_attributes, $annotation_attributes );
 
 	// Non-standard but widely supported, used by temml/katex.
 	$allowedtags['menclose'] = array_merge(
