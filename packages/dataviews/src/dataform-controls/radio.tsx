@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { privateApis, Spinner } from '@wordpress/components';
-import { useCallback, useState } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -21,7 +21,7 @@ export default function Radio< Item >( {
 	hideLabelFromVision,
 	validity,
 }: DataFormControlProps< Item > ) {
-	const { label, description, elements, getValue, setValue, isValid } = field;
+	const { label, description, getValue, setValue, isValid } = field;
 	const { elements, isLoading } = useElements(
 		field.elements,
 		field.getElements

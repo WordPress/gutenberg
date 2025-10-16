@@ -2,8 +2,7 @@
  * WordPress dependencies
  */
 import { privateApis, Spinner } from '@wordpress/components';
-import { useCallback, useMemo, useState } from '@wordpress/element';
-import { _n, sprintf } from '@wordpress/i18n';
+import { useCallback, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -22,7 +21,7 @@ export default function ArrayControl< Item >( {
 	hideLabelFromVision,
 	validity,
 }: DataFormControlProps< Item > ) {
-	const { label, placeholder, elements, getValue, setValue, isValid } = field;
+	const { label, placeholder, getValue, setValue, isValid } = field;
 	const value = getValue( { item: data } );
 
 	const { elements, isLoading } = useElements(
