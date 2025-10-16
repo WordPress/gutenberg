@@ -327,7 +327,7 @@ export default () => {
 				deepMerge(
 					client.current[ namespace ],
 					deepClone( value ) as object,
-					false
+					true
 				);
 				deepMerge(
 					server.current[ namespace ],
