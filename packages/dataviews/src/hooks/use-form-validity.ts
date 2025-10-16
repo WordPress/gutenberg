@@ -7,6 +7,7 @@ import deepMerge from 'deepmerge';
  * WordPress dependencies
  */
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -123,6 +124,10 @@ export function useFormValidity< Item >(
 ): { validity: FormValidity; isValid: boolean } {
 	const [ formValidity, setFormValidity ] = useState< FormValidity >();
 	const previousValidatedValuesRef = useRef< Record< string, any > >( {} );
+	// customValidationCounterRef is used to track the validation promises triggered
+	// by executing isValid.custom. When the promise resolves,
+	// it will update the form validity state ONLY if its counter matches the current one.
+	const customValidationCounterRef = useRef< Record< string, number > >( {} );
 
 	const validate = useCallback( () => {
 		if ( typeof form.fields === 'undefined' ) {
@@ -169,12 +174,13 @@ export function useFormValidity< Item >(
 			}
 			previousValidatedValuesRef.current[ field.id ] = value;
 
+			const parentFieldId = fieldParentMap.get( field.id );
+
 			// Check isValid.required
 			if (
 				field.isValid.required &&
 				isInvalidForRequired( field.type, value )
 			) {
-				const parentFieldId = fieldParentMap.get( field.id );
 				updateFieldValidity(
 					setFormValidity,
 					field.id,
@@ -189,7 +195,6 @@ export function useFormValidity< Item >(
 				const validValues = field.elements.map(
 					( element ) => element.value
 				);
-				const parentFieldId = fieldParentMap.get( field.id );
 
 				if ( field.type === 'array' ) {
 					// Arrays (all values must be valid):
@@ -249,13 +254,10 @@ export function useFormValidity< Item >(
 				return;
 			}
 
-			// Check isValid.custom (async)
-			if (
-				typeof field.isValid.custom === 'function' &&
-				field.isValid.custom.constructor.name === 'AsyncFunction'
-			) {
-				const parentFieldId = fieldParentMap.get( field.id );
-				const customAsyncError = field.isValid.custom(
+			// Check isValid.custom
+			let customError;
+			try {
+				customError = field.isValid?.custom?.(
 					deepMerge(
 						item,
 						field.setValue( {
@@ -265,9 +267,51 @@ export function useFormValidity< Item >(
 					),
 					field
 				);
-				if ( customAsyncError === null ) {
-					return;
+			} catch ( error: any ) {
+				let errorMessage;
+				if ( error instanceof Error ) {
+					errorMessage = error.message;
+				} else {
+					errorMessage =
+						String( error ) ||
+						__( 'Unknown error when running custom validation.' );
 				}
+
+				updateFieldValidity(
+					setFormValidity,
+					field.id,
+					{
+						custom: {
+							type: 'invalid',
+							message: errorMessage,
+						},
+					},
+					parentFieldId
+				);
+			}
+
+			// — isValid.custom (sync version)
+			if ( typeof customError === 'string' ) {
+				updateFieldValidity(
+					setFormValidity,
+					field.id,
+					{
+						custom: {
+							type: 'invalid',
+							message: customError,
+						},
+					},
+					parentFieldId
+				);
+				return;
+			}
+
+			// — isValid.custom (async version)
+			if ( customError instanceof Promise ) {
+				// Increment token for this field to track the latest validation
+				const currentToken =
+					( customValidationCounterRef.current[ field.id ] || 0 ) + 1;
+				customValidationCounterRef.current[ field.id ] = currentToken;
 
 				updateFieldValidity(
 					setFormValidity,
@@ -281,80 +325,68 @@ export function useFormValidity< Item >(
 					parentFieldId
 				);
 
-				if ( customAsyncError instanceof Promise ) {
-					customAsyncError
-						.then( ( result ) => {
-							if ( result === null ) {
-								updateFieldValidity(
-									setFormValidity,
-									field.id,
-									{
-										custom: {
-											type: 'valid',
-											message: 'Valid',
-										},
-									},
-									parentFieldId
-								);
-							}
+				customError
+					.then( ( result ) => {
+						// Only update if this is still the latest validation
+						if (
+							customValidationCounterRef.current[ field.id ] !==
+							currentToken
+						) {
+							return;
+						}
 
-							if ( typeof result === 'string' ) {
-								updateFieldValidity(
-									setFormValidity,
-									field.id,
-									{
-										custom: {
-											type: 'invalid',
-											message: result,
-										},
+						if ( result === null ) {
+							updateFieldValidity(
+								setFormValidity,
+								field.id,
+								{
+									custom: {
+										type: 'valid',
+										message: 'Valid',
 									},
-									parentFieldId
-								);
-							}
-						} )
-						.catch( ( error ) => {
+								},
+								parentFieldId
+							);
+						} else if ( typeof result === 'string' ) {
 							updateFieldValidity(
 								setFormValidity,
 								field.id,
 								{
 									custom: {
 										type: 'invalid',
-										message: error.message,
+										message: result,
 									},
 								},
 								parentFieldId
 							);
-						} );
-				}
+						}
+					} )
+					.catch( ( error ) => {
+						// Only update if this is still the latest validation
+						if (
+							customValidationCounterRef.current[ field.id ] !==
+							currentToken
+						) {
+							return;
+						}
+
+						updateFieldValidity(
+							setFormValidity,
+							field.id,
+							{
+								custom: {
+									type: 'invalid',
+									message: error.message,
+								},
+							},
+							parentFieldId
+						);
+					} );
 
 				return;
 			}
 
-			// Check isValid.custom (sync)
-			if (
-				typeof field.isValid.custom === 'function' &&
-				! ( field.isValid.custom.constructor.name === 'AsyncFunction' )
-			) {
-				const parentFieldId = fieldParentMap.get( field.id );
-				const customError = field.isValid.custom( item, field );
-				if ( typeof customError === 'string' ) {
-					updateFieldValidity(
-						setFormValidity,
-						field.id,
-						{
-							custom: {
-								type: 'invalid',
-								message: customError,
-							},
-						},
-						parentFieldId
-					);
-					return;
-				}
-			}
-
 			// No errors for this field, remove from errors object
-			const parentFieldId = fieldParentMap.get( field.id );
 			setFormValidity( ( prev ) => {
 				if ( ! prev ) {
 					return prev;
