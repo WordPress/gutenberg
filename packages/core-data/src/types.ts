@@ -1,3 +1,9 @@
+declare global {
+	interface Window {
+		__experimentalEnableSync?: boolean;
+	}
+}
+
 export interface AnyFunction {
 	( ...args: any[] ): any;
 }
