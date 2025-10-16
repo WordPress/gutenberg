@@ -49,7 +49,7 @@ export default defineConfig( {
 		pluginKnownWpdsCssVariables( {
 			exports: [
 				{ filename: 'js/design-tokens.js', modes: false },
-				{ filename: '../src/design-tokens.ts', modes: true },
+				{ filename: 'js/design-tokens.ts', modes: true },
 			],
 		} ),
 		pluginDsTokenDocs( {
