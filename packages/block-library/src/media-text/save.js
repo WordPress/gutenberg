@@ -33,6 +33,7 @@ export default function save( { attributes } ) {
 		href,
 		linkTarget,
 		rel,
+		useFeaturedImage,
 	} = attributes;
 	const mediaSizeSlug = attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
 	const newRel = ! rel ? undefined : rel;
@@ -46,14 +47,15 @@ export default function save( { attributes } ) {
 		? imageFillStyles( mediaUrl, focalPoint )
 		: {};
 
-	let image = mediaUrl ? (
-		<img
-			src={ mediaUrl }
-			alt={ mediaAlt }
-			className={ imageClasses || null }
-			style={ positionStyles }
-		/>
-	) : null;
+	let image =
+		! useFeaturedImage && mediaUrl ? (
+			<img
+				src={ mediaUrl }
+				alt={ mediaAlt }
+				className={ imageClasses || null }
+				style={ positionStyles }
+			/>
+		) : null;
 
 	if ( href ) {
 		image = (

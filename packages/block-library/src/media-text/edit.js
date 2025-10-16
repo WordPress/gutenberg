@@ -63,7 +63,7 @@ function getImageSourceUrlBySizeSlug( image, slug ) {
 }
 
 function attributesFromMedia( {
-	attributes: { linkDestination, href },
+	attributes: { linkDestination, href, mediaSizeSlug },
 	setAttributes,
 } ) {
 	return ( media ) => {
@@ -102,11 +102,10 @@ function attributesFromMedia( {
 		}
 
 		if ( mediaType === 'image' ) {
-			// Try the "large" size URL, falling back to the "full" size URL below.
+			// Get the URL for the selected image size, falling back to the full size.
 			src =
-				media.sizes?.large?.url ||
-				// eslint-disable-next-line camelcase
-				media.media_details?.sizes?.large?.source_url;
+				media.sizes?.[ mediaSizeSlug ]?.url ||
+				media?.media_details?.sizes?.[ mediaSizeSlug ]?.source_url;
 		}
 
 		let newHref = href;
@@ -126,6 +125,8 @@ function attributesFromMedia( {
 			mediaId: media.id,
 			mediaType,
 			mediaUrl: src || media.url,
+			// Reset to default size if the selected size is not available in media.
+			mediaSizeSlug: src ? mediaSizeSlug : DEFAULT_MEDIA_SIZE_SLUG,
 			mediaLink: media.link || undefined,
 			href: newHref,
 			focalPoint: undefined,
@@ -179,8 +180,8 @@ function MediaTextEdit( {
 		mediaPosition,
 		mediaType,
 		mediaUrl,
-		mediaWidth,
 		mediaSizeSlug,
+		mediaWidth,
 		rel,
 		verticalAlignment,
 		allowedBlocks,
@@ -233,13 +234,27 @@ function MediaTextEdit( {
 	);
 
 	const featuredImageURL = useFeaturedImage
-		? featuredImageMedia?.source_url
+		? featuredImageMedia?.media_details?.sizes?.[ mediaSizeSlug ]
+				?.source_url ?? featuredImageMedia?.source_url
 		: '';
+
+	const featuredMediaSizeSlug =
+		useFeaturedImage &&
+		featuredImageMedia?.media_details?.sizes?.[ mediaSizeSlug ]?.source_url
+			? mediaSizeSlug
+			: DEFAULT_MEDIA_SIZE_SLUG;
+
 	const featuredImageAlt = useFeaturedImage
 		? featuredImageMedia?.alt_text
 		: '';
 
 	const toggleUseFeaturedImage = () => {
+		const updateMediaSize =
+			! useFeaturedImage &&
+			featuredImageMedia?.media_details?.sizes?.[ mediaSizeSlug ]
+				? mediaSizeSlug
+				: DEFAULT_MEDIA_SIZE_SLUG;
+
 		setAttributes( {
 			imageFill: false,
 			mediaType: 'image',
@@ -252,6 +267,7 @@ function MediaTextEdit( {
 			linkClass: undefined,
 			rel: undefined,
 			href: undefined,
+			mediaSizeSlug: updateMediaSize,
 			useFeaturedImage: ! useFeaturedImage,
 		} );
 	};
@@ -265,7 +281,10 @@ function MediaTextEdit( {
 
 	const [ temporaryMediaWidth, setTemporaryMediaWidth ] = useState( null );
 
-	const onSelectMedia = attributesFromMedia( { attributes, setAttributes } );
+	const onSelectMedia = attributesFromMedia( {
+		attributes: { ...attributes, mediaSizeSlug },
+		setAttributes,
+	} );
 
 	const onSetHref = ( props ) => {
 		setAttributes( props );
@@ -303,8 +322,14 @@ function MediaTextEdit( {
 	const onVerticalAlignmentChange = ( alignment ) => {
 		setAttributes( { verticalAlignment: alignment } );
 	};
+
+	const currentImageMedia = useFeaturedImage ? featuredImageMedia : image;
+
 	const updateImage = ( newMediaSizeSlug ) => {
-		const newUrl = getImageSourceUrlBySizeSlug( image, newMediaSizeSlug );
+		const newUrl = getImageSourceUrlBySizeSlug(
+			currentImageMedia,
+			newMediaSizeSlug
+		);
 
 		if ( ! newUrl ) {
 			return null;
@@ -447,10 +472,12 @@ function MediaTextEdit( {
 					/>
 				</ToolsPanelItem>
 			) }
-			{ mediaType === 'image' && ! useFeaturedImage && (
+			{ mediaType === 'image' && (
 				<MediaTextResolutionTool
-					image={ image }
-					value={ mediaSizeSlug }
+					image={ useFeaturedImage ? featuredImageMedia : image }
+					value={
+						useFeaturedImage ? featuredMediaSizeSlug : mediaSizeSlug
+					}
 					onChange={ updateImage }
 				/>
 			) }
