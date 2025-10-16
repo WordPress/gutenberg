@@ -87,7 +87,7 @@ function gutenberg_block_bindings_term_data_get_value( array $source_args, $bloc
 			return esc_html( (string) $term->parent );
 
 		case 'count':
-			return esc_html( (string) '(' . $term->count . ')' );
+			return esc_html( (string) $term->count );
 
 		default:
 			return null;
