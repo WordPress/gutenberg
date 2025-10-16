@@ -61,7 +61,7 @@ function findOptimalFontSize(
  * @param {HTMLElement} textElement     The text element (paragraph, heading, etc.)
  * @param {string}      elementSelector CSS selector for the text element
  * @param {Function}    applyStylesFn   Function to apply CSS styles (pass empty string to clear)
- * @param {number}      maxSize         Maximum font size in pixels (default: 600)
+ * @param {number}      maxSize         Maximum font size in pixels.
  */
 export function optimizeFitText(
 	textElement,
