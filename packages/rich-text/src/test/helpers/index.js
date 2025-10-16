@@ -607,6 +607,65 @@ export const spec = [
 			text: '\ufffc',
 		},
 	},
+	{
+		description:
+			'should unwrap element with data-rich-text-bogus attribute',
+		html: '<span data-rich-text-bogus="true">test</span>',
+		createRange: ( element ) => ( {
+			startOffset: 0,
+			startContainer: element,
+			endOffset: 1,
+			endContainer: element,
+		} ),
+		startPath: [ 0, 0 ],
+		endPath: [ 0, 4 ],
+		record: {
+			start: 0,
+			end: 4,
+			formats: [ , , , , ],
+			replacements: [ , , , , ],
+			text: 'test',
+		},
+	},
+	{
+		description:
+			'should unwrap data-rich-text-bogus element but preserve child formatting',
+		html: '<span data-rich-text-bogus="true">hello <em>world</em></span>',
+		createRange: ( element ) => ( {
+			startOffset: 0,
+			startContainer: element,
+			endOffset: 1,
+			endContainer: element,
+		} ),
+		startPath: [ 0, 0 ],
+		endPath: [ 1, 0, 5 ],
+		record: {
+			start: 0,
+			end: 11,
+			formats: [ , , , , , , [ em ], [ em ], [ em ], [ em ], [ em ] ],
+			replacements: [ , , , , , , , , , , , ],
+			text: 'hello world',
+		},
+	},
+	{
+		description: 'should unwrap nested data-rich-text-bogus elements',
+		html: '<span data-rich-text-bogus="true"><strong>te</strong><span data-rich-text-bogus="true">st</span></span>',
+		createRange: ( element ) => ( {
+			startOffset: 0,
+			startContainer: element,
+			endOffset: 1,
+			endContainer: element,
+		} ),
+		startPath: [ 0, 0, 0 ],
+		endPath: [ 1, 2 ],
+		record: {
+			start: 0,
+			end: 4,
+			formats: [ [ strong ], [ strong ], , , ],
+			replacements: [ , , , , ],
+			text: 'test',
+		},
+	},
 ];
 
 export const specWithRegistration = [
