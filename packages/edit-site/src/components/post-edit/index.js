@@ -19,8 +19,6 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import usePatternSettings from '../page-patterns/use-pattern-settings';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 const { usePostFields, PostCardPanel } = unlock( editorPrivateApis );
 
@@ -31,6 +29,35 @@ const fieldsWithBulkEditSupport = [
 	'author',
 	'discussion',
 ];
+
+/**
+ * Returns an array of templates for the given post type, as an array of
+ * options suitable for use in a `SelectControl`.
+ *
+ * @param {string} postType The post type to retrieve templates for.
+ *
+ * @return {Array<Object>} An array of objects with `value` and `label`
+ *                         properties, representing the available templates.
+ */
+function useTemplates( postType ) {
+	return useSelect(
+		( select ) => {
+			const templates = select( coreDataStore ).getEntityRecords(
+				'postType',
+				'wp_template',
+				{ per_page: -1 }
+			);
+
+			return (
+				templates?.map( ( template ) => ( {
+					value: template.id,
+					label: template.title?.rendered || template.slug,
+				} ) ) || []
+			);
+		},
+		[ postType ]
+	);
+}
 
 function PostEditForm( { postType, postId } ) {
 	const ids = useMemo( () => postId.split( ',' ), [ postId ] );
@@ -57,6 +84,10 @@ function PostEditForm( { postType, postId } ) {
 	const [ multiEdits, setMultiEdits ] = useState( {} );
 	const { editEntityRecord } = useDispatch( coreDataStore );
 	const { fields: _fields } = usePostFields( { postType } );
+
+	// Fetch templates using the custom hook
+	const templates = useTemplates( postType );
+
 	const fields = useMemo(
 		() =>
 			_fields?.map( ( field ) => {
@@ -73,6 +104,7 @@ function PostEditForm( { postType, postId } ) {
 		[ _fields ]
 	);
 
+	// Define form structure
 	const form = useMemo(
 		() => ( {
 			layout: {
@@ -117,8 +149,11 @@ function PostEditForm( { postType, postId } ) {
 		} ),
 		[ ids ]
 	);
+
+	// Handle changes to the form
 	const onChange = ( edits ) => {
 		for ( const id of ids ) {
+			// Reset date if changing from future status
 			if (
 				edits.status &&
 				edits.status !== 'future' &&
@@ -127,6 +162,8 @@ function PostEditForm( { postType, postId } ) {
 			) {
 				edits.date = null;
 			}
+
+			// Clear password for private posts
 			if (
 				edits.status &&
 				edits.status === 'private' &&
@@ -134,7 +171,11 @@ function PostEditForm( { postType, postId } ) {
 			) {
 				edits.password = '';
 			}
+
+			// Edit the entity record
 			editEntityRecord( 'postType', postType, id, edits );
+
+			// Track multi-edit changes
 			if ( ids.length > 1 ) {
 				setMultiEdits( ( prev ) => ( {
 					...prev,
@@ -143,35 +184,26 @@ function PostEditForm( { postType, postId } ) {
 			}
 		}
 	};
+
+	// Reset multi-edits when ids change
 	useEffect( () => {
 		setMultiEdits( {} );
 	}, [ ids ] );
 
-	const { ExperimentalBlockEditorProvider } = unlock(
-		blockEditorPrivateApis
-	);
-	const settings = usePatternSettings();
-
-	/**
-	 * The template field depends on the block editor settings.
-	 * This is a workaround to ensure that the block editor settings are available.
-	 * For more information, see: https://github.com/WordPress/gutenberg/issues/67521
-	 */
+	// Prepare fields with template dependency
 	const fieldsWithDependency = useMemo( () => {
 		return fields.map( ( field ) => {
 			if ( field.id === 'template' ) {
 				return {
 					...field,
 					Edit: ( data ) => (
-						<ExperimentalBlockEditorProvider settings={ settings }>
-							<field.Edit { ...data } />
-						</ExperimentalBlockEditorProvider>
+						<field.Edit { ...data } templates={ templates } />
 					),
 				};
 			}
 			return field;
 		} );
-	}, [ fields, settings ] );
+	}, [ fields, templates ] );
 
 	return (
 		<VStack spacing={ 4 }>
