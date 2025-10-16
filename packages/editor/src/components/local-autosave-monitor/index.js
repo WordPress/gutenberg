@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef } from '@wordpress/element';
 import { ifCondition, usePrevious } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { store as coreStore } from '@wordpress/core-data';
 import { parse } from '@wordpress/blocks';
 import { store as noticesStore } from '@wordpress/notices';
 
@@ -53,12 +54,13 @@ const hasSessionStorageSupport = () => {
  * restore a local autosave, if one exists.
  */
 function useAutosaveNotice() {
-	const { postId, isEditedPostNew, hasRemoteAutosave } = useSelect(
+	const { postId, isEditedPostNew, hasRemoteAutosave, postType } = useSelect(
 		( select ) => ( {
 			postId: select( editorStore ).getCurrentPostId(),
 			isEditedPostNew: select( editorStore ).isEditedPostNew(),
 			hasRemoteAutosave:
 				!! select( editorStore ).getEditorSettings().autosave,
+			postType: select( editorStore ).getCurrentPostType(),
 		} ),
 		[]
 	);
@@ -67,10 +69,22 @@ function useAutosaveNotice() {
 	const { createWarningNotice, removeNotice } = useDispatch( noticesStore );
 	const { editPost, resetEditorBlocks } = useDispatch( editorStore );
 
+	const { getEntityConfig } = useSelect( coreStore );
+	const supportsSync = Boolean(
+		getEntityConfig( 'postType', postType )?.syncConfig
+	);
+
 	useEffect( () => {
 		let localAutosave = localAutosaveGet( postId, isEditedPostNew );
 		if ( ! localAutosave ) {
 			return;
+		}
+
+		// If the post type supports sync, don't auto save.
+		if ( supportsSync ) {
+			if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+				return;
+			}
 		}
 
 		try {

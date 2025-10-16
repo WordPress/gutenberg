@@ -286,12 +286,23 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			setRenderingMode,
 		} = unlock( useDispatch( editorStore ) );
 		const { createWarningNotice } = useDispatch( noticesStore );
+		const { getEntityConfig } = useSelect( coreStore );
+		const supportsSync = Boolean(
+			getEntityConfig( 'postType', post.type )?.syncConfig
+		);
 
 		// Ideally this should be synced on each change and not just something you do once.
 		useLayoutEffect( () => {
 			// Assume that we don't need to initialize in the case of an error recovery.
 			if ( recovery ) {
 				return;
+			}
+
+			// If the post type supports sync, don't auto save.
+			if ( supportsSync ) {
+				if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+					return;
+				}
 			}
 
 			updatePostLock( settings.postLock );
