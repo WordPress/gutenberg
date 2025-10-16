@@ -239,6 +239,7 @@ function Iframe( {
 		iframeDocument,
 	} );
 
+	// useDisabled adds the `inert` HTML attribute to all the childe nodes.
 	const disabledRef = useDisabled( { isDisabled: ! readonly } );
 	const bodyRef = useMergeRefs( [
 		useBubbleEvents( iframeDocument ),

@@ -98,6 +98,8 @@ $z-layers: (
 	// the multi-entity saving sidebar.
 	".edit-site-editor__toggle-save-panel": 100000,
 
+	".edit-site-editor__edit-mode-toggle": 1,
+
 	// Show sidebar in greater than small viewports above editor related elements
 	// but below #adminmenuback { z-index: 100 }
 	".interface-interface-skeleton__sidebar {greater than small}": 90,

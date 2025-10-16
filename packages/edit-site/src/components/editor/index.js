@@ -162,6 +162,7 @@ export default function EditSiteEditor( {
 	const hasDefaultEditorCanvasView = ! useHasEditorCanvasContainer();
 	const iframeProps = useEditorIframeProps();
 	const isEditMode = canvas === 'edit';
+	const isViewMode = canvas === 'view';
 	const loadingProgressId = useInstanceId(
 		CanvasLoader,
 		'edit-site-editor__loading-progress'
@@ -174,15 +175,14 @@ export default function EditSiteEditor( {
 			{
 				// Forming a "block formatting context" to prevent margin collapsing.
 				// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
-				css:
-					canvas === 'view'
-						? `body{min-height: 100vh; ${
-								currentPostIsTrashed ? '' : 'cursor: pointer;'
-						  }}`
-						: undefined,
+				css: isViewMode
+					? `body{min-height: 100vh; ${
+							currentPostIsTrashed ? '' : 'cursor: pointer;'
+					  }}`
+					: undefined,
 			},
 		],
-		[ settings.styles, canvas, currentPostIsTrashed ]
+		[ settings.styles, isViewMode, currentPostIsTrashed ]
 	);
 	const { resetZoomLevel } = unlock( useDispatch( blockEditorStore ) );
 	const { createSuccessNotice } = useDispatch( noticesStore );
@@ -249,6 +249,11 @@ export default function EditSiteEditor( {
 		duration: disableMotion ? 0 : 0.2,
 	};
 
+	// We use the onClick on both the button (for keyboard) and on the iframe.
+	// The button uses `pointer-events: none` to allow to click the iframe behind it
+	// and preserve the scrolling behavior.
+	const { onClick } = iframeProps;
+
 	return ! isBlockBasedTheme && isHomeRoute ? (
 		<SitePreview />
 	) : (
@@ -265,99 +270,122 @@ export default function EditSiteEditor( {
 				/>
 			) }
 			{ isReady && (
-				<Editor
-					postType={ postWithTemplate ? context.postType : postType }
-					postId={ postWithTemplate ? context.postId : postId }
-					templateId={ postWithTemplate ? postId : undefined }
-					settings={ settings }
-					className="edit-site-editor__editor-interface"
-					styles={ styles }
-					customSaveButton={
-						_isPreviewingTheme && <SaveButton size="compact" />
-					}
-					customSavePanel={ _isPreviewingTheme && <SavePanel /> }
-					forceDisableBlockTools={ ! hasDefaultEditorCanvasView }
-					title={ title }
-					iframeProps={ iframeProps }
-					onActionPerformed={ onActionPerformed }
-					extraSidebarPanels={
-						! postWithTemplate && (
-							<PluginTemplateSettingPanel.Slot />
-						)
-					}
-				>
-					{ isEditMode && (
-						<BackButton>
-							{ ( { length } ) =>
-								length <= 1 && (
-									<motion.div
-										className="edit-site-editor__view-mode-toggle"
-										transition={ transition }
-										animate="edit"
-										initial="edit"
-										whileHover="hover"
-										whileTap="tap"
-									>
-										<Button
-											__next40pxDefaultSize
-											label={ __( 'Open Navigation' ) }
-											showTooltip
-											tooltipPosition="middle right"
-											onClick={ () => {
-												resetZoomLevel();
+				<>
+					{ isViewMode && (
+						<button
+							onClick={ onClick }
+							aria-disabled={ currentPostIsTrashed }
+							type="button"
+							className="edit-site-editor__edit-mode-toggle"
+							aria-label={ __( 'Edit' ) }
+						/>
+					) }
+					<Editor
+						postType={
+							postWithTemplate ? context.postType : postType
+						}
+						postId={ postWithTemplate ? context.postId : postId }
+						templateId={ postWithTemplate ? postId : undefined }
+						settings={ settings }
+						className="edit-site-editor__editor-interface"
+						styles={ styles }
+						customSaveButton={
+							_isPreviewingTheme && <SaveButton size="compact" />
+						}
+						customSavePanel={ _isPreviewingTheme && <SavePanel /> }
+						forceDisableBlockTools={ ! hasDefaultEditorCanvasView }
+						title={ title }
+						iframeProps={ iframeProps }
+						onActionPerformed={ onActionPerformed }
+						extraSidebarPanels={
+							! postWithTemplate && (
+								<PluginTemplateSettingPanel.Slot />
+							)
+						}
+					>
+						{ isEditMode && (
+							<BackButton>
+								{ ( { length } ) =>
+									length <= 1 && (
+										<motion.div
+											className="edit-site-editor__view-mode-toggle"
+											transition={ transition }
+											animate="edit"
+											initial="edit"
+											whileHover="hover"
+											whileTap="tap"
+											// All elements with tap listeners or whileTap receive tabindex="0".
+											// https://motion.dev/docs/react-upgrade-guide#9-0
+											tabIndex="-1"
+										>
+											<Button
+												__next40pxDefaultSize
+												label={ __(
+													'Open Navigation'
+												) }
+												showTooltip
+												tooltipPosition="middle right"
+												onClick={ () => {
+													resetZoomLevel();
 
-												// TODO: this is a temporary solution to navigate to the posts list if we are
-												// come here through `posts list` and are in focus mode editing a template, template part etc..
-												if (
-													isPostsList &&
-													location.query?.focusMode
-												) {
-													history.navigate( '/', {
-														transition:
-															'canvas-mode-view-transition',
-													} );
-												} else {
-													history.navigate(
-														getNavigationPath(
-															location,
-															postWithTemplate
-																? context.postType
-																: postType
-														),
-														{
+													// TODO: this is a temporary solution to navigate to the posts list if we are
+													// come here through `posts list` and are in focus mode editing a template, template part etc..
+													if (
+														isPostsList &&
+														location.query
+															?.focusMode
+													) {
+														history.navigate( '/', {
 															transition:
 																'canvas-mode-view-transition',
-														}
-													);
-												}
-											} }
-										>
-											<motion.div
-												variants={ siteIconVariants }
+														} );
+													} else {
+														history.navigate(
+															getNavigationPath(
+																location,
+																postWithTemplate
+																	? context.postType
+																	: postType
+															),
+															{
+																transition:
+																	'canvas-mode-view-transition',
+															}
+														);
+													}
+												} }
 											>
-												<SiteIcon className="edit-site-editor__view-mode-toggle-icon" />
-											</motion.div>
-										</Button>
-										<motion.div
-											className={ clsx(
-												'edit-site-editor__back-icon',
-												{
-													'has-site-icon':
-														hasSiteIcon,
+												<motion.div
+													variants={
+														siteIconVariants
+													}
+												>
+													<SiteIcon className="edit-site-editor__view-mode-toggle-icon" />
+												</motion.div>
+											</Button>
+											<motion.div
+												className={ clsx(
+													'edit-site-editor__back-icon',
+													{
+														'has-site-icon':
+															hasSiteIcon,
+													}
+												) }
+												variants={
+													toggleHomeIconVariants
 												}
-											) }
-											variants={ toggleHomeIconVariants }
-										>
-											<Icon icon={ arrowUpLeft } />
+											>
+												<Icon icon={ arrowUpLeft } />
+											</motion.div>
 										</motion.div>
-									</motion.div>
-								)
-							}
-						</BackButton>
-					) }
-					<SiteEditorMoreMenu />
-					{ isBlockBasedTheme && <GlobalStylesSidebar /> }
-				</Editor>
+									)
+								}
+							</BackButton>
+						) }
+						<SiteEditorMoreMenu />
+						{ isBlockBasedTheme && <GlobalStylesSidebar /> }
+					</Editor>
+				</>
 			) }
 		</>
 	);

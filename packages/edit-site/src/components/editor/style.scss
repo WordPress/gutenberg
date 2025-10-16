@@ -84,3 +84,20 @@
 		backdrop-filter: saturate(180%) blur(15px);
 	}
 }
+
+.edit-site-editor__edit-mode-toggle {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+	border: 0;
+	padding: 0;
+	background: rgba(255, 0, 0, 0.3);
+	z-index: z-index(".edit-site-editor__edit-mode-toggle");
+	pointer-events: none;
+
+	&:not([aria-disabled="true"]) {
+		cursor: pointer;
+	}
+}
