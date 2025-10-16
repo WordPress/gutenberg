@@ -25,6 +25,7 @@ import type {
 } from './types';
 import { createUndoManager } from './undo-manager';
 import { createYjsDoc } from './utils';
+import { Awareness } from 'y-protocols/awareness';
 
 interface EntityState {
 	handlers: RecordHandlers;
@@ -115,7 +116,7 @@ export function createSyncManager(): SyncManager {
 		// Create providers for the given entity and its Yjs document.
 		const providerResults = await Promise.all(
 			providerCreators.map( ( create ) =>
-				create( objectType, objectId, ydoc )
+				create( objectType, objectId, ydoc, new Awareness( ydoc ) )
 			)
 		);
 
