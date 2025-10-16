@@ -21,10 +21,9 @@ const variations = [
 		},
 		scope: [ 'block', 'inserter', 'transform' ],
 		isActive: ( blockAttributes ) => {
-			const fieldValue = globalThis.IS_GUTENBERG_PLUGIN
-				? blockAttributes?.metadata?.bindings?.datetime?.args?.field ||
-				  blockAttributes?.metadata?.bindings?.datetime?.args?.key
-				: blockAttributes?.metadata?.bindings?.datetime?.args?.field;
+			const fieldValue =
+				blockAttributes?.metadata?.bindings?.datetime?.args?.field ||
+				blockAttributes?.metadata?.bindings?.datetime?.args?.key;
 			return (
 				blockAttributes?.metadata?.bindings?.datetime?.source ===
 					'core/post-data' && fieldValue === 'date'
@@ -49,10 +48,9 @@ const variations = [
 		},
 		scope: [ 'block', 'inserter', 'transform' ],
 		isActive: ( blockAttributes ) => {
-			const fieldValue = globalThis.IS_GUTENBERG_PLUGIN
-				? blockAttributes?.metadata?.bindings?.datetime?.args?.field ||
-				  blockAttributes?.metadata?.bindings?.datetime?.args?.key
-				: blockAttributes?.metadata?.bindings?.datetime?.args?.field;
+			const fieldValue =
+				blockAttributes?.metadata?.bindings?.datetime?.args?.field ||
+				blockAttributes?.metadata?.bindings?.datetime?.args?.key;
 			return (
 				blockAttributes?.metadata?.bindings?.datetime?.source ===
 					'core/post-data' && fieldValue === 'modified'

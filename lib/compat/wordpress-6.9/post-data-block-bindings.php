@@ -19,14 +19,14 @@
  * @return mixed The value computed for the source.
  */
 function gutenberg_block_bindings_post_data_get_value( array $source_args, $block_instance ) {
-	$field = isset( $source_args['field'] ) ? $source_args['field'] : null;
-
-	// Backward compatibility for when the source argument was called `key` in Gutenberg plugin.
-	if ( empty( $field ) && defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
-		$field = $source_args['key'];
-		if ( empty( $field ) ) {
+	if ( empty( $source_args['field'] ) ) {
+		// Backward compatibility for when the source argument was called `key` in Gutenberg plugin.
+		if ( empty( $source_args['key'] ) ) {
 			return null;
 		}
+		$field = $source_args['key'];
+	} else {
+		$field = $source_args['field'];
 	}
 
 	/*
