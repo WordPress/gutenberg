@@ -107,7 +107,7 @@ function useFitText( { fitText, name, clientId } ) {
 		// Avoid very jarring resizes when a user is actively editing the
 		// block. Placing a ceiling on how much the block can grow curbs the
 		// effect of the first few keypresses.
-		const maxSize = isSelectedRef.current ? 200 : 600;
+		const maxSize = isSelectedRef.current ? 200 : undefined;
 
 		optimizeFitText( blockElement, blockSelector, applyStylesFn, maxSize );
 	}, [ blockElement, clientId, hasFitTextSupport, fitText, isSelectedRef ] );
