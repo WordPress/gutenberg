@@ -3,7 +3,7 @@
  */
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
-import { useEffect, useCallback } from '@wordpress/element';
+import { useEffect, useCallback, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
@@ -70,12 +70,19 @@ function useFitText( { fitText, name, clientId } ) {
 				return { blockAttributes: undefined, isSelected: false };
 			}
 			return {
-				blockAttributes: select( blockEditorStore ).getBlockAttributes( clientId ),
-				isSelected: select( blockEditorStore ).isBlockSelected( clientId ),
+				blockAttributes:
+					select( blockEditorStore ).getBlockAttributes( clientId ),
+				isSelected:
+					select( blockEditorStore ).isBlockSelected( clientId ),
 			};
 		},
 		[ clientId ]
 	);
+
+	const isSelectedRef = useRef();
+	useEffect( () => {
+		isSelectedRef.current = isSelected;
+	}, [ isSelected ] );
 
 	const applyFitText = useCallback( () => {
 		if ( ! blockElement || ! hasFitTextSupport || ! fitText ) {
@@ -97,11 +104,13 @@ function useFitText( { fitText, name, clientId } ) {
 			styleElement.textContent = css;
 		};
 
-		// Limit font size to 200px when block is selected
-		const maxSize = isSelected ? 200 : 600;
+		// Avoid very jarring resizes when a user is actively editing the
+		// block. Placing a ceiling on how much the block can grow curbs the
+		// effect of the first few keypresses.
+		const maxSize = isSelectedRef.current ? 200 : 600;
 
 		optimizeFitText( blockElement, blockSelector, applyStylesFn, maxSize );
-	}, [ blockElement, clientId, hasFitTextSupport, fitText, isSelected ] );
+	}, [ blockElement, clientId, hasFitTextSupport, fitText, isSelectedRef ] );
 
 	useEffect( () => {
 		if (
@@ -145,16 +154,17 @@ function useFitText( { fitText, name, clientId } ) {
 	useEffect( () => {
 		if ( fitText && blockElement && hasFitTextSupport ) {
 			// Wait for next frame to ensure DOM has updated after content changes
-			const frameId = requestAnimationFrame( () => {
+			const frameId = window.requestAnimationFrame( () => {
 				if ( blockElement ) {
 					applyFitText();
 				}
 			} );
 
-			return () => cancelAnimationFrame( frameId );
+			return () => window.cancelAnimationFrame( frameId );
 		}
 	}, [
 		blockAttributes,
+		isSelected,
 		fitText,
 		applyFitText,
 		blockElement,
