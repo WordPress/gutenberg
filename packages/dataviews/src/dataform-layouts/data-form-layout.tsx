@@ -86,15 +86,7 @@ export function DataFormLayout< Item >( {
 				}
 
 				if ( children ) {
-					return children(
-						( props ) => (
-							<FieldLayout
-								{ ...props }
-								validity={ validity?.[ formField.id ] }
-							/>
-						),
-						formField
-					);
+					return children( FieldLayout, formField );
 				}
 
 				return (
