@@ -21,7 +21,16 @@ describe( 'buildRamps', () => {
 		const allBgColors = lStops
 			.map( ( l ) =>
 				sStops.map( ( s ) =>
-					hstops.map( ( h ) => `hsl(${ h }deg ${ s }% ${ l }%)` )
+					hstops.map( ( h ) => {
+						// Adjust hsl(180deg 40% 50%) to avoid floating-point precision
+						// differences. This specific combination produces RGB (76.5, ...)
+						// which rounds differently between Node.js v22 and v24.
+						// May be removed once all versions on CI have the same floating-point behavior.
+						const lightness =
+							h === 180 && s === 40 && l === 50 ? 50.01 : l;
+
+						return `hsl(${ h }deg ${ s }% ${ lightness }%)`;
+					} )
 				)
 			)
 			.flat( 2 );

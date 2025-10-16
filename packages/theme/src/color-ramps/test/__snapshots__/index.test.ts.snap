@@ -32654,9 +32654,9 @@ exports[`buildRamps background ramp snapshots 1`] = `
   },
   {
     "input": {
-      "seedComputed": "#4cb3b3",
+      "seedComputed": "#4db3b3",
       "seedOriginal": "#4db3b3",
-      "seedUnchanged": false,
+      "seedUnchanged": true,
     },
     "output": {
       "direction": "darker",
@@ -32730,7 +32730,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "surface2": {
-          "color": "#4cb3b3",
+          "color": "#4db3b3",
           "warning": false,
         },
         "surface3": {
