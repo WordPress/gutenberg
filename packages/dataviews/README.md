@@ -875,8 +875,9 @@ Controls visibility of the modal's header when using `RenderModal`.
 
 The header text to show in the modal.
 
--   Type: `string`
+-   Type: `string | (items: Item[]) => string`
 -   Optional
+-   If a function is provided, it receives the selected items as an argument and should return the header text
 
 ### `modalSize`
 
@@ -1489,11 +1490,10 @@ For example:
 
 #### Panel
 
-- `type`: `panel`. Required.
-- `labelPosition`: one of `side`, `top`, or `none`. Optional. `top` by default.
-- `summary`: Summary field configuration. Optional. Specifies which field(s) to display in the panel header. Can be:
-   	- A string (single field ID)
-    - An array of strings (multiple field IDs)
+-   `type`: `panel`. Required.
+-   `labelPosition`: one of `side`, `top`, or `none`. Optional. `top` by default.
+-   `summary`: Summary field configuration. Optional. Specifies which field(s) to display in the panel header. Can be: - A string (single field ID)
+    -   An array of strings (multiple field IDs)
 
 When no summary fields are explicitly configured, the panel automatically determines which fields to display using this priority:
 
@@ -1503,6 +1503,7 @@ When no summary fields are explicitly configured, the panel automatically determ
 4. If no field definition is found, return empty summary fields
 
 For example:
+
 ```js
 {
 	id: 'field_id',
