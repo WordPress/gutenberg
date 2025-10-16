@@ -133,8 +133,7 @@ jobs:
               uses: ./.github/setup-node
 
             - name: Npm build
-              # TODO: We don't have to build the entire project, just the action itself.
-              run: npm run build:packages
+              run: npm run build
 
             - name: Report flaky tests
               uses: ./packages/report-flaky-tests

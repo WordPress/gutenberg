@@ -80,8 +80,8 @@ export default function TermTemplateEdit( {
 			orderBy,
 			hideEmpty,
 			showNested = false,
-			parent = 0,
 			perPage,
+			include,
 		} = {},
 	},
 	__unstableLayoutClassNames,
@@ -98,8 +98,15 @@ export default function TermTemplateEdit( {
 
 	// Nested terms are returned by default from REST API as long as parent is not set.
 	// If we want to show nested terms, we must not set parent at all.
-	if ( parent || ! showNested ) {
-		queryArgs.parent = parent || 0;
+	if ( ! showNested && ! include?.length ) {
+		queryArgs.parent = 0;
+	}
+
+	if ( include?.length ) {
+		queryArgs.include = include;
+		// If we are using `include` update the `order` and `orderby` arguments to preserve the order.
+		queryArgs.orderby = 'include';
+		queryArgs.order = 'asc';
 	}
 
 	const { records: terms } = useEntityRecords(

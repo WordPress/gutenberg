@@ -2,7 +2,6 @@
  * External dependencies
  */
 const { join } = require( 'path' );
-const { readdirSync } = require( 'node:fs' );
 
 /**
  * WordPress dependencies
@@ -13,65 +12,15 @@ const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extrac
  * Internal dependencies
  */
 const { baseConfig, plugins } = require( './shared' );
-const { V2_PACKAGES } = require( '../../bin/packages/v2-packages' );
 
-const WORDPRESS_NAMESPACE = '@wordpress/';
-
-const packageDirs = readdirSync(
-	new URL( '../packages', `file://${ __dirname }` ),
-	{
-		withFileTypes: true,
-	}
-).flatMap( ( dirent ) => ( dirent.isDirectory() ? [ dirent.name ] : [] ) );
-
-/** @type {Map<string, string>} */
+/**
+ * All packages are now built by esbuild (bin/packages/build.mjs).
+ * Webpack is only used for file copying operations in other configs.
+ * This config generates an empty webpack build.
+ *
+ * @type {Map<string, string>}
+ */
 const gutenbergScriptModules = new Map();
-for ( const packageDir of packageDirs ) {
-	// Skip v2 packages - they're built with build-v2.mjs
-	if ( V2_PACKAGES.includes( packageDir ) ) {
-		continue;
-	}
-
-	const packageJson = require( `@wordpress/${ packageDir }/package.json` );
-
-	if ( ! Object.hasOwn( packageJson, 'wpScriptModuleExports' ) ) {
-		continue;
-	}
-
-	const moduleName = packageJson.name.substring( WORDPRESS_NAMESPACE.length );
-	let { wpScriptModuleExports } = packageJson;
-
-	// Special handling for { "wpScriptModuleExports": "./build-module/index.js" }.
-	if ( typeof wpScriptModuleExports === 'string' ) {
-		wpScriptModuleExports = { '.': wpScriptModuleExports };
-	}
-
-	if ( Object.getPrototypeOf( wpScriptModuleExports ) !== Object.prototype ) {
-		throw new Error( 'wpScriptModuleExports must be an object' );
-	}
-
-	for ( const [ exportName, exportPath ] of Object.entries(
-		wpScriptModuleExports
-	) ) {
-		if ( typeof exportPath !== 'string' ) {
-			throw new Error( 'wpScriptModuleExports paths must be strings' );
-		}
-
-		if ( ! exportPath.startsWith( './' ) ) {
-			throw new Error(
-				'wpScriptModuleExports paths must start with "./"'
-			);
-		}
-
-		const name =
-			exportName === '.' ? 'index' : exportName.replace( /^\.\/?/, '' );
-
-		gutenbergScriptModules.set(
-			`${ moduleName }/${ name }`,
-			require.resolve( `@wordpress/${ packageDir }/${ exportPath }` )
-		);
-	}
-}
 
 module.exports = {
 	...baseConfig,

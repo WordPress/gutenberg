@@ -311,6 +311,21 @@ export const data: SpaceObject[] = [
 		datetime: '2020-03-01T10:15:20Z',
 		email: 'uranus@example.com',
 	},
+	{
+		id: 19,
+		name: {
+			title: 'Thessalonikopolymnianebuchodonossarinacharybdis',
+			description: 'Takes longer to say than to orbit.',
+		},
+		image: 'https://live.staticflickr.com/1357/935805705_119635028c_b.jpg',
+		type: 'Rogue planet',
+		isPlanet: true,
+		categories: [ 'Planet', 'Rogue planet' ],
+		satellites: 0,
+		date: '2020-03-01',
+		datetime: '2020-03-01T10:15:20Z',
+		email: 'thessalonikopolymnianebuchodonossarinacharybdis@example.com',
+	},
 ];
 
 export const themeData: Theme[] = [
@@ -753,15 +768,20 @@ export const actions: Action< SpaceObject >[] = [
 		label: 'Delete item',
 		isPrimary: true,
 		icon: trash,
-		hideModalHeader: true,
+		modalHeader: ( items ) =>
+			items.length > 1
+				? `Delete ${ items.length } items`
+				: `Delete ${ items[ 0 ].name.title }`,
 		modalFocusOnMount: 'firstContentElement',
 		supportsBulk: true,
 		RenderModal: ( { items, closeModal } ) => {
+			const label =
+				items.length > 1
+					? `Are you sure you want to delete ${ items.length } items?`
+					: `Are you sure you want to delete "${ items[ 0 ].name.title }"?`;
 			return (
 				<VStack spacing="5">
-					<Text>
-						{ `Are you sure you want to delete "${ items[ 0 ].name.title }"?` }
-					</Text>
+					<Text>{ label }</Text>
 					<HStack justify="right">
 						<Button
 							__next40pxDefaultSize

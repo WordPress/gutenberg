@@ -21,20 +21,11 @@ export function getTransformedMetadata(
 		return;
 	}
 	const { supports } = getBlockType( newBlockName );
-	// Fixed until an opt-in mechanism is implemented.
-	const BLOCK_BINDINGS_SUPPORTED_BLOCKS = [
-		'core/paragraph',
-		'core/heading',
-		'core/image',
-		'core/button',
-	];
+
 	// The metadata properties that should be preserved after the transform.
 	const transformSupportedProps = [ 'commentId' ];
-	// If it support bindings, and there is a transform bindings callback, add the `id` and `bindings` properties.
-	if (
-		BLOCK_BINDINGS_SUPPORTED_BLOCKS.includes( newBlockName ) &&
-		bindingsCallback
-	) {
+	// If there is a transform bindings callback, add the `id` and `bindings` properties.
+	if ( bindingsCallback ) {
 		transformSupportedProps.push( 'id', 'bindings' );
 	}
 	// If it support block naming (true by default), add the `name` property.
