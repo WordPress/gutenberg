@@ -163,7 +163,6 @@ const getAllBlocks = () => {
 		accordionPanel,
 		archives,
 		audio,
-		breadcrumbs,
 		button,
 		buttons,
 		calendar,
@@ -259,6 +258,10 @@ const getAllBlocks = () => {
 		queryTitle,
 		postAuthorBiography,
 	];
+
+	if ( window?.__experimentalEnableBlockExperiments ) {
+		blocks.push( breadcrumbs );
+	}
 
 	if ( window?.__experimentalEnableFormBlocks ) {
 		blocks.push( form );
