@@ -52,6 +52,6 @@
 		"access": "public"
 	},
 	"scripts": {
-		"build:tokens": "node bin/build-tokens.js && prettier --write tokens/color.json prebuilt/css/design-tokens.css prebuilt/js/design-tokens.js src/design-tokens.ts docs/*"
+		"build:tokens": "node bin/build-tokens.js && prettier --write tokens/color.json prebuilt/* src/design-tokens.ts docs/*"
 	}
 }
