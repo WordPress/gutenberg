@@ -16,6 +16,8 @@ import { useInstanceId } from '@wordpress/compose';
 import { safeDecodeURI } from '@wordpress/url';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { linkOff as unlinkIcon } from '@wordpress/icons';
+import { useDispatch } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -79,12 +81,19 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 		attributes,
 	} );
 
-	const editBoundLink = () => {
-		// Clear url and id to allow picking a new entity (keep type and kind)
-		setAttributes( { url: undefined, id: undefined } );
+	// Get direct store dispatch to bypass setBoundAttributes wrapper
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
-		// Remove the binding
+	const editBoundLink = () => {
+		// Clear the binding first
 		clearBinding();
+
+		// Use direct store dispatch to bypass block bindings safeguards
+		// which prevent updates to bound attributes when calling setAttributes.
+		// setAttributes is actually setBoundAttributes, a wrapper function that
+		// processes attributes through the binding system.
+		// See: packages/block-editor/src/components/block-edit/edit.js
+		updateBlockAttributes( clientId, { url: '', id: undefined } );
 	};
 
 	return (
