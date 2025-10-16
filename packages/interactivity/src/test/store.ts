@@ -379,57 +379,69 @@ describe( 'Interactivity API', () => {
 
 	describe( 'getServerState', () => {
 		describe( 'should return a read-only generic object when no type is passed', () => {
-			const state = getServerState();
-			// @ts-expect-error
-			state.nonModifiable = 'error';
-			// @ts-expect-error
-			state.nonExistent satisfies any;
+			// eslint-disable-next-line no-unused-expressions
+			() => {
+				const state = getServerState();
+				// @ts-expect-error
+				state.nonModifiable = 'error';
+				// @ts-expect-error
+				state.nonExistent satisfies any;
+			};
 		} );
 
 		describe( 'should accept a type parameter to define the returned object type, but convert it to read-only', () => {
-			interface State {
-				foo: string;
-				bar: {
-					baz: number;
-				};
-			}
-			const state = getServerState< State >();
-			// @ts-expect-error
-			state.nonExistent = 'error';
-			// @ts-expect-error
-			state.foo = 'error';
-			// @ts-expect-error
-			state.bar.baz = 1;
-			state.foo satisfies string;
-			state.bar.baz satisfies number;
+			// eslint-disable-next-line no-unused-expressions
+			() => {
+				interface State {
+					foo: string;
+					bar: {
+						baz: number;
+					};
+				}
+				const state = getServerState< State >();
+				// @ts-expect-error
+				state.nonExistent = 'error';
+				// @ts-expect-error
+				state.foo = 'error';
+				// @ts-expect-error
+				state.bar.baz = 1;
+				state.foo satisfies string;
+				state.bar.baz satisfies number;
+			};
 		} );
 	} );
 
 	describe( 'getServerContext', () => {
 		describe( 'should return a read-only generic object when no type is passed', () => {
-			const context = getServerContext();
-			// @ts-expect-error
-			context.nonModifiable = 'error';
-			// @ts-expect-error
-			context.nonExistent satisfies any;
+			// eslint-disable-next-line no-unused-expressions
+			() => {
+				const context = getServerContext();
+				// @ts-expect-error
+				context.nonModifiable = 'error';
+				// @ts-expect-error
+				context.nonExistent satisfies any;
+			};
 		} );
 
 		describe( 'should accept a type parameter to define the returned object type, but convert it to read-only', () => {
-			interface Context {
-				foo: string;
-				bar: {
-					baz: number;
-				};
-			}
-			const context = getServerContext< Context >();
-			// @ts-expect-error
-			context.nonExistent = 'error';
-			// @ts-expect-error
-			context.foo = 'error';
-			// @ts-expect-error
-			context.bar.baz = 1;
-			context.foo satisfies string;
-			context.bar.baz satisfies number;
+			// eslint-disable-next-line no-unused-expressions
+			() => {
+				interface Context {
+					foo: string;
+					bar: {
+						baz: number;
+					};
+				}
+				const context = getServerContext< Context >();
+				// @ts-expect-error
+				context.nonExistent = 'error';
+				// @ts-expect-error
+				context.foo = 'error';
+				// @ts-expect-error
+				context.bar.baz = 1;
+				context.foo satisfies string;
+				context.bar.baz satisfies number;
+			};
 		} );
 	} );
 } );
