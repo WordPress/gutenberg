@@ -25,23 +25,9 @@ export function useEntityBinding( { clientId, attributes } ) {
 	const hasCorrectBinding =
 		hasUrlBinding && metadata?.bindings?.url?.source === expectedSource;
 
-	const clearBinding = useCallback(
-		( updatedAttributes ) => {
-			// Use updated attributes if provided, otherwise fall back to closure attributes
-			// updatedAttributes needed to access the most up-to-date data when called synchronously
-			const kindToUse = updatedAttributes?.kind ?? kind;
-			const expectedSourceForClear =
-				kindToUse === 'post-type' ? 'core/post-data' : 'core/term-data';
-			const hasCorrectBindingForClear =
-				hasUrlBinding &&
-				metadata?.bindings?.url?.source === expectedSourceForClear;
-
-			if ( hasCorrectBindingForClear ) {
-				updateBlockBindings( { url: undefined } );
-			}
-		},
-		[ hasUrlBinding, metadata, updateBlockBindings, kind, id ]
-	);
+	const clearBinding = useCallback( () => {
+		updateBlockBindings( { url: undefined } );
+	}, [ updateBlockBindings ] );
 
 	const createBinding = useCallback(
 		( updatedAttributes ) => {

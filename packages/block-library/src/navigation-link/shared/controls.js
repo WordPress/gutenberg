@@ -80,11 +80,11 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 	} );
 
 	const editBoundLink = () => {
-		// Remove the binding
-		clearBinding();
-
 		// Clear url and id to allow picking a new entity (keep type and kind)
 		setAttributes( { url: undefined, id: undefined } );
+
+		// Remove the binding
+		clearBinding();
 	};
 
 	return (
