@@ -155,7 +155,7 @@ export function createSyncManager(): SyncManager {
 		// Create providers for the given entity and its Yjs document.
 		const providerResults = await Promise.all(
 			providerCreators.map( ( create ) =>
-				create( objectType, objectId, ydoc )
+				create( objectType, objectId, ydoc, new Awareness( ydoc ) )
 			)
 		);
 

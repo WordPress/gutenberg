@@ -2,6 +2,7 @@
  * External dependencies
  */
 import * as Y from 'yjs';
+import { Awareness } from 'y-protocols/awareness';
 import * as fun from 'lib0/function';
 import {
 	describe,
@@ -149,7 +150,8 @@ describe( 'SyncManager', () => {
 			expect( mockProviderCreator ).toHaveBeenCalledWith(
 				'post',
 				'123',
-				expect.any( Y.Doc )
+				expect.any( Y.Doc ),
+				expect.any( Awareness )
 			);
 		} );
 
