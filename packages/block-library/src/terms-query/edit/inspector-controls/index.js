@@ -47,7 +47,7 @@ export default function TermsQueryInspectorControls( {
 	const isTaxonomyHierarchical = taxonomies.find(
 		( _taxonomy ) => _taxonomy.slug === taxonomy
 	)?.hierarchical;
-
+	const inheritQuery = !! inherit;
 	// Display the inherit control when we're in a taxonomy-related
 	// template (category, tag, or custom taxonomy).
 	const displayInheritControl =
@@ -56,10 +56,7 @@ export default function TermsQueryInspectorControls( {
 		templateSlug?.startsWith( 'category-' ) ||
 		templateSlug?.startsWith( 'tag-' );
 	// Only display the showNested control if the taxonomy is hierarchical and not inheriting.
-	const displayShowNestedControl =
-		isTaxonomyHierarchical && ! termQuery.inherit;
-	// Only display the taxonomy control when not inheriting (custom query type).
-	const displayTaxonomyControl = ! termQuery.inherit;
+	const displayShowNestedControl = isTaxonomyHierarchical && ! inheritQuery;
 	const hasIncludeFilter = !! include?.length;
 
 	// Labels shared between ToolsPanelItem and its child control.
@@ -69,7 +66,7 @@ export default function TermsQueryInspectorControls( {
 	const emptyTermsControlLabel = __( 'Show empty terms' );
 	const nestedTermsControlLabel = __( 'Show nested terms' );
 	const maxTermsControlLabel = __( 'Max terms' );
-	const includeControlLabel = __( 'Include terms' );
+	const includeControlLabel = __( 'Selected terms' );
 
 	return (
 		<>
@@ -106,7 +103,7 @@ export default function TermsQueryInspectorControls( {
 							/>
 						</ToolsPanelItem>
 					) }
-					{ displayTaxonomyControl && (
+					{ ! inheritQuery && (
 						<ToolsPanelItem
 							hasValue={ () => taxonomy !== 'category' }
 							label={ taxonomyControlLabel }
@@ -152,27 +149,29 @@ export default function TermsQueryInspectorControls( {
 							}
 						/>
 					</ToolsPanelItem>
-					<ToolsPanelItem
-						hasValue={ () => !! include?.length }
-						label={ includeControlLabel }
-						onDeselect={ () =>
-							setQuery( {
-								include: [],
-								orderBy: 'name',
-								order: 'asc',
-							} )
-						}
-						isShownByDefault
-					>
-						<IncludeControl
+					{ ! inheritQuery && (
+						<ToolsPanelItem
+							hasValue={ () => !! include?.length }
 							label={ includeControlLabel }
-							taxonomy={ taxonomy }
-							value={ include }
-							onChange={ ( value ) =>
-								setQuery( { include: value } )
+							onDeselect={ () =>
+								setQuery( {
+									include: [],
+									orderBy: 'name',
+									order: 'asc',
+								} )
 							}
-						/>
-					</ToolsPanelItem>
+							isShownByDefault
+						>
+							<IncludeControl
+								label={ includeControlLabel }
+								taxonomy={ taxonomy }
+								value={ include }
+								onChange={ ( value ) =>
+									setQuery( { include: value } )
+								}
+							/>
+						</ToolsPanelItem>
+					) }
 					<ToolsPanelItem
 						hasValue={ () => hideEmpty !== true }
 						label={ emptyTermsControlLabel }
