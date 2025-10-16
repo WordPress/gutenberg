@@ -1,0 +1,10 @@
+[
+	{
+		"name": "core/math",
+		"isValid": true,
+		"attributes": {
+			"latex": "x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}"
+		},
+		"innerBlocks": []
+	}
+]
