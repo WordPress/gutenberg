@@ -12,7 +12,7 @@
 function gutenberg_reregister_core_block_types() {
 	// Blocks directory may not exist if working from a fresh clone.
 	$blocks_dirs = array(
-		__DIR__ . '/../build/block-library/blocks/' => array(
+		__DIR__ . '/../build/block-library/'       => array(
 			'block_folders' => array(
 				'accordion-heading',
 				'accordion-panel',
@@ -132,13 +132,13 @@ function gutenberg_reregister_core_block_types() {
 				'video.php'                        => 'core/video',
 			),
 		),
-		__DIR__ . '/../build/edit-widgets/blocks/'  => array(
+		__DIR__ . '/../build/edit-widgets/blocks/' => array(
 			'block_folders' => array(
 				'widget-area',
 			),
 			'block_names'   => array(),
 		),
-		__DIR__ . '/../build/widgets/blocks/'       => array(
+		__DIR__ . '/../build/widgets/blocks/'      => array(
 			'block_folders' => array(
 				'legacy-widget',
 				'widget-group',
@@ -261,7 +261,7 @@ function gutenberg_register_core_block_assets( $block_name ) {
 	// else (for development or test) default to use the current time.
 	$default_version = defined( 'GUTENBERG_VERSION' ) && ! SCRIPT_DEBUG ? GUTENBERG_VERSION : time();
 
-	$style_path      = "build/block-library/blocks/$block_name/";
+	$style_path      = "build/block-library/$block_name/";
 	$stylesheet_url  = gutenberg_url( $style_path . 'style.css' );
 	$stylesheet_path = gutenberg_dir_path() . $style_path . ( is_rtl() ? 'style-rtl.css' : 'style.css' );
 
@@ -289,8 +289,8 @@ function gutenberg_register_core_block_assets( $block_name ) {
 
 		// Get the path to the block's stylesheet.
 		$theme_style_path = is_rtl()
-			? "build/block-library/blocks/$block_name/theme-rtl.css"
-			: "build/block-library/blocks/$block_name/theme.css";
+			? "build/block-library/$block_name/theme-rtl.css"
+			: "build/block-library/$block_name/theme.css";
 
 		// If the file exists, enqueue it.
 		if ( file_exists( gutenberg_dir_path() . $theme_style_path ) ) {
@@ -305,7 +305,7 @@ function gutenberg_register_core_block_assets( $block_name ) {
 		}
 	}
 
-	$editor_style_path = "build/block-library/blocks/$block_name/style-editor.css";
+	$editor_style_path = "build/block-library/$block_name/style-editor.css";
 	if ( file_exists( gutenberg_dir_path() . $editor_style_path ) ) {
 		wp_deregister_style( "wp-block-{$block_name}-editor" );
 		wp_register_style(

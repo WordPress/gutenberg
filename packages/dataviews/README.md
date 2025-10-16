@@ -875,8 +875,9 @@ Controls visibility of the modal's header when using `RenderModal`.
 
 The header text to show in the modal.
 
--   Type: `string`
+-   Type: `string | (items: Item[]) => string`
 -   Optional
+-   If a function is provided, it receives the selected items as an argument and should return the header text
 
 ### `modalSize`
 

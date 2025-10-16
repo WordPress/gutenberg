@@ -768,15 +768,20 @@ export const actions: Action< SpaceObject >[] = [
 		label: 'Delete item',
 		isPrimary: true,
 		icon: trash,
-		hideModalHeader: true,
+		modalHeader: ( items ) =>
+			items.length > 1
+				? `Delete ${ items.length } items`
+				: `Delete ${ items[ 0 ].name.title }`,
 		modalFocusOnMount: 'firstContentElement',
 		supportsBulk: true,
 		RenderModal: ( { items, closeModal } ) => {
+			const label =
+				items.length > 1
+					? `Are you sure you want to delete ${ items.length } items?`
+					: `Are you sure you want to delete "${ items[ 0 ].name.title }"?`;
 			return (
 				<VStack spacing="5">
-					<Text>
-						{ `Are you sure you want to delete "${ items[ 0 ].name.title }"?` }
-					</Text>
+					<Text>{ label }</Text>
 					<HStack justify="right">
 						<Button
 							__next40pxDefaultSize

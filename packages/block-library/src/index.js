@@ -254,14 +254,11 @@ const getAllBlocks = () => {
 		termCount,
 		termDescription,
 		termName,
+		termsQuery,
+		termTemplate,
 		queryTitle,
 		postAuthorBiography,
 	];
-
-	if ( window?.__experimentalEnableBlockExperiments ) {
-		blocks.push( termsQuery );
-		blocks.push( termTemplate );
-	}
 
 	if ( window?.__experimentalEnableFormBlocks ) {
 		blocks.push( form );
