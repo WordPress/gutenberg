@@ -19,7 +19,7 @@ export default defineConfig( {
 		'./tokens/spacing.json',
 		'./tokens/typography.json',
 	],
-	outDir: './build',
+	outDir: './prebuilt',
 
 	plugins: [
 		pluginCSS( {

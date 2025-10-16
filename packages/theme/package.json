@@ -30,8 +30,8 @@
 			"import": "./build-module/index.js",
 			"default": "./build/index.js"
 		},
-		"./design-tokens.css": "./build/css/design-tokens.css",
-		"./design-tokens.js": "./build/js/design-tokens.js",
+		"./design-tokens.css": "./prebuilt/css/design-tokens.css",
+		"./design-tokens.js": "./prebuilt/js/design-tokens.js",
 		"./package.json": "./package.json",
 		"./build-style/": "./build-style/"
 	},
@@ -52,6 +52,6 @@
 		"access": "public"
 	},
 	"scripts": {
-		"build:tokens": "node bin/build-tokens.js && prettier --write tokens/color.json build/css/design-tokens.css build/js/design-tokens.js src/design-tokens.ts docs/*"
+		"build:tokens": "node bin/build-tokens.js && prettier --write tokens/color.json prebuilt/css/design-tokens.css prebuilt/js/design-tokens.js src/design-tokens.ts docs/*"
 	}
 }
