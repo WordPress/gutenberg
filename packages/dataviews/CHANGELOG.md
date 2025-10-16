@@ -2,7 +2,9 @@
 
 ## Unreleased
 
-## 10.0.0-next.0 (2025-10-15)
+### Bug Fixes
+
+- DataViewsPicker: ensure title overflows correctly in Grid view. ([#72339](https://github.com/WordPress/gutenberg/pull/72339))
 
 ### Enhancements
 
@@ -13,6 +15,7 @@
 - Normalize search field styles ([#72072](https://github.com/WordPress/gutenberg/pull/72072)).
 - DataForm control for `date` supports `required` and `custom` validation [#72048](https://github.com/WordPress/gutenberg/pull/72048).
 - DataForm control for `datetime` supports `required` and `custom` validation. [#72060](https://github.com/WordPress/gutenberg/pull/72060).
+- Standardise DataForm typography. [#72284](https://github.com/WordPress/gutenberg/pull/72284).
 
 ### Breaking changes
 
@@ -31,6 +34,7 @@
 - Reorganizes normalize-form-fields and renames `dataforms-layouts/` to `dataform-layout/` to follow the naming schema of any other folder in the package. [#72056](https://github.com/WordPress/gutenberg/pull/72056)
 - Moves `utils.ts` to `field-types/utils/render-from-elements.ts`, so it's collocated where it is used. [#72058](https://github.com/WordPress/gutenberg/pull/72058)
 - Centralize all top-level utilities in a `utils/` folder, sets a name that reflects on the function name, and uses the default exports. [#72063](https://github.com/WordPress/gutenberg/pull/72063)
+- DataForm: refactor RelativeDateControl to use DataFormControl props. [#72361](https://github.com/WordPress/gutenberg/pull/72361)
 
 ## 9.1.0 (2025-10-01)
 

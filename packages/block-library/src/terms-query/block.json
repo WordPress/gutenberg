@@ -16,8 +16,8 @@
 				"taxonomy": "category",
 				"order": "asc",
 				"orderBy": "name",
+				"include": [],
 				"hideEmpty": true,
-				"parent": false,
 				"showNested": false,
 				"inherit": false
 			}
