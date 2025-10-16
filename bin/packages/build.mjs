@@ -4,6 +4,7 @@
  * External dependencies
  */
 import { readFile, writeFile, copyFile, mkdir } from 'fs/promises';
+import { readdirSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { parseArgs } from 'node:util';
@@ -23,7 +24,6 @@ import babel from 'esbuild-plugin-babel';
 /**
  * Internal dependencies
  */
-import { V2_PACKAGES } from './v2-packages.js';
 import { groupByDepth } from './dependency-graph.js';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
@@ -42,6 +42,19 @@ const TEST_FILE_PATTERNS = [
 	/\/(benchmark|__mocks__|__tests__|test|storybook|stories)\/.+/,
 	/\.(spec|test)\.(js|ts|tsx)$/,
 ];
+
+/**
+ * Get all package names from the packages directory.
+ *
+ * @return {string[]} Array of package names.
+ */
+function getAllPackages() {
+	return readdirSync( PACKAGES_DIR, { withFileTypes: true } )
+		.filter( ( dirent ) => dirent.isDirectory() )
+		.map( ( dirent ) => dirent.name );
+}
+
+const PACKAGES = getAllPackages();
 
 // Define global variables for feature flagging, matching webpack's DefinePlugin behavior
 const define = {
@@ -591,24 +604,25 @@ async function bundlePackage( packageName ) {
 		const isProduction = process.env.NODE_ENV === 'production';
 
 		try {
-			// Find CSS files in build-style directory
+			// Find CSS files in build-style directory (including subdirectories)
 			const cssFiles = await glob(
-				normalizePath( path.join( buildStyleDir, '*.css' ) )
+				normalizePath( path.join( buildStyleDir, '**/*.css' ) )
 			);
 
 			if ( cssFiles.length > 0 ) {
-				// Ensure output directory exists
-				await mkdir( outputDir, { recursive: true } );
-
 				// Process each CSS file
 				for ( const cssFile of cssFiles ) {
-					const filename = path.basename( cssFile );
-					const destPath = path.join( outputDir, filename );
+					// Calculate relative path from build-style to preserve directory structure
+					const relativePath = path.relative( buildStyleDir, cssFile );
+					const destPath = path.join( outputDir, relativePath );
+					const destDir = path.dirname( destPath );
 
 					if ( isProduction ) {
 						// In production, minify CSS with cssnano
 						builds.push(
 							( async () => {
+								// Ensure destination directory exists
+								await mkdir( destDir, { recursive: true } );
 								const cssContent = await readFile(
 									cssFile,
 									'utf8'
@@ -633,7 +647,11 @@ async function bundlePackage( packageName ) {
 						);
 					} else {
 						// In development, just copy the file
-						builds.push( copyFile( cssFile, destPath ) );
+						builds.push(
+							mkdir( destDir, { recursive: true } ).then( () =>
+								copyFile( cssFile, destPath )
+							)
+						);
 					}
 				}
 			}
@@ -875,12 +893,12 @@ async function compileStyles( packageName ) {
 }
 
 /**
- * Determine if a file is a source file in a v2 package.
+ * Determine if a file is a source file in a package.
  *
  * @param {string} filename File path.
- * @return {boolean} True if the file is a v2 source file.
+ * @return {boolean} True if the file is a package source file.
  */
-function isV2SourceFile( filename ) {
+function isPackageSourceFile( filename ) {
 	const relativePath = normalizePath(
 		path.relative( process.cwd(), filename )
 	);
@@ -894,8 +912,8 @@ function isV2SourceFile( filename ) {
 		return false;
 	}
 
-	// Check if it's in a v2 package
-	return V2_PACKAGES.some( ( packageName ) => {
+	// Check if it's in a package
+	return PACKAGES.some( ( packageName ) => {
 		const packagePath = normalizePath(
 			path.join( 'packages', packageName )
 		);
@@ -914,7 +932,7 @@ function getPackageName( filename ) {
 		path.relative( process.cwd(), filename )
 	);
 
-	for ( const packageName of V2_PACKAGES ) {
+	for ( const packageName of PACKAGES ) {
 		const packagePath = normalizePath(
 			path.join( 'packages', packageName )
 		);
@@ -929,12 +947,12 @@ function getPackageName( filename ) {
  * Main build function.
  */
 async function buildAll() {
-	console.log( '🔨 Building v2 packages...\n' );
+	console.log( '🔨 Building packages...\n' );
 
 	const startTime = Date.now();
 
 	// Group packages by dependency depth
-	const levels = groupByDepth( V2_PACKAGES );
+	const levels = groupByDepth( PACKAGES );
 
 	// Phase 1: Transpile packages level by level (respecting dependencies)
 	console.log( '📝 Phase 1: Transpiling packages...\n' );
@@ -954,7 +972,7 @@ async function buildAll() {
 	// Phase 2: Bundle packages with wpScript in parallel
 	console.log( '\n📦 Phase 2: Bundling packages...\n' );
 	await Promise.all(
-		V2_PACKAGES.map( async ( packageName ) => {
+		PACKAGES.map( async ( packageName ) => {
 			const startBundleTime = Date.now();
 			const isBundled = await bundlePackage( packageName );
 			const buildTime = Date.now() - startBundleTime;
@@ -966,7 +984,7 @@ async function buildAll() {
 
 	const totalTime = Date.now() - startTime;
 	console.log(
-		`\n🎉 All v2 packages built successfully! (${ totalTime }ms total)`
+		`\n🎉 All packages built successfully! (${ totalTime }ms total)`
 	);
 }
 
@@ -1007,8 +1025,8 @@ async function watchMode() {
 		rebuildTimeoutId = null;
 	}
 
-	// Watch only V2 package source directories (not all 89 packages)
-	const watchPaths = V2_PACKAGES.map( ( packageName ) =>
+	// Watch package source directories
+	const watchPaths = PACKAGES.map( ( packageName ) =>
 		path.join( PACKAGES_DIR, packageName, 'src' )
 	);
 
@@ -1044,7 +1062,7 @@ async function watchMode() {
 
 	// Handle file changes, additions, and deletions
 	const handleFileChange = ( filename ) => {
-		if ( ! isV2SourceFile( filename ) ) {
+		if ( ! isPackageSourceFile( filename ) ) {
 			return;
 		}
 

@@ -4,7 +4,6 @@
 const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 const { DefinePlugin } = require( 'webpack' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
-const postcss = require( 'postcss' );
 
 /**
  * WordPress dependencies
@@ -77,29 +76,7 @@ const plugins = [
 	mode === 'production' && new ReadableJsAssetsWebpackPlugin(),
 ];
 
-const stylesTransform = ( content ) => {
-	return postcss( [
-		require( 'cssnano' )( {
-			preset: [
-				'default',
-				{
-					discardComments: {
-						removeAll: true,
-					},
-					normalizeWhitespace: mode === 'production',
-				},
-			],
-		} ),
-	] )
-		.process( content, {
-			from: 'src/app.css',
-			to: 'dest/app.css',
-		} )
-		.then( ( result ) => result.css );
-};
-
 module.exports = {
 	baseConfig,
 	plugins,
-	stylesTransform,
 };

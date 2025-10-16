@@ -620,7 +620,7 @@ function gutenberg_default_script_modules() {
 	$all_assets = array();
 
 	/*
-	 * Load combined assets.php for v1 packages (webpack build).
+	 * Load combined assets.php for webpack-built script modules.
 	 * Expects multidimensional array like:
 	 *
 	 *     'interactivity/index.min.js' => array('dependencies' => array(…), 'version' => '…'),
@@ -633,7 +633,7 @@ function gutenberg_default_script_modules() {
 	}
 
 	/*
-	 * Load individual asset files for v2 packages (esbuild build).
+	 * Load individual asset files for esbuild-built packages.
 	 * Follows the same pattern as regular scripts in gutenberg_register_packages_scripts().
 	 * Uses RecursiveDirectoryIterator to find all *.min.js files at any nesting depth.
 	 */

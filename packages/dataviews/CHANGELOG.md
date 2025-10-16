@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## 10.0.0-next.0 (2025-10-16)
-
 ### Bug Fixes
 
 - DataViewsPicker: ensure title overflows correctly in Grid view. ([#72339](https://github.com/WordPress/gutenberg/pull/72339))
@@ -18,6 +16,7 @@
 - DataForm control for `date` supports `required` and `custom` validation [#72048](https://github.com/WordPress/gutenberg/pull/72048).
 - DataForm control for `datetime` supports `required` and `custom` validation. [#72060](https://github.com/WordPress/gutenberg/pull/72060).
 - Standardise DataForm typography. [#72284](https://github.com/WordPress/gutenberg/pull/72284).
+- Dataviews: Add support for dynamic modal headers. [#72384](https://github.com/WordPress/gutenberg/pull/72384)
 
 ### Breaking changes
 
