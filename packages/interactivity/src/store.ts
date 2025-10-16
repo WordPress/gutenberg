@@ -47,11 +47,15 @@ export const getConfig = ( namespace?: string ) =>
  *                  the store where it is defined.
  * @return The server state for the given namespace.
  */
-export const getServerState: ( < T extends object >(
+export function getServerState(
 	namespace?: string
-) => DeepReadonly< T > ) & { subscribe?: number } = < T extends object >(
+): DeepReadonly< Record< string, unknown > >;
+export function getServerState< T extends object >(
 	namespace?: string
-): DeepReadonly< T > => {
+): DeepReadonly< T >;
+export function getServerState< T extends object >(
+	namespace?: string
+): DeepReadonly< T > {
 	const ns = namespace || getNamespace();
 	if ( ! serverStates.has( ns ) ) {
 		serverStates.set( ns, deepReadOnly( {} ) );
@@ -60,8 +64,9 @@ export const getServerState: ( < T extends object >(
 	// arbitrary property (`subscribe`) to prevent the JavaScript minifier from
 	// removing this line.
 	getServerState.subscribe = navigationSignal.value;
-	return serverStates.get( ns );
-};
+	return serverStates.get( ns ) as DeepReadonly< T >;
+}
+getServerState.subscribe = 0;
 
 interface StoreOptions {
 	/**

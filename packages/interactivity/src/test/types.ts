@@ -381,7 +381,6 @@ describe( 'Interactivity API types', () => {
 				const state = getServerState();
 				// @ts-expect-error
 				state.nonModifiable = 'error';
-				// @ts-expect-error
 				state.nonExistent satisfies any;
 			};
 		} );
