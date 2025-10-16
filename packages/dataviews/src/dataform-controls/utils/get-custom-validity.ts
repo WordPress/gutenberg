@@ -8,7 +8,7 @@ export default function getCustomValidity< Item >(
 	validity: FieldValidity | undefined
 ) {
 	let customValidity;
-	if ( isValid?.required ) {
+	if ( isValid?.required && validity?.required ) {
 		// If the consumer provides a message for required,
 		// use it instead of the native built-in message.
 		customValidity = validity?.required?.message
