@@ -35,10 +35,14 @@ function ElementItem( { parentMenu, element, label } ) {
 	const [ fallbackBackgroundColor ] = useGlobalStyle( 'color.background' );
 	const [ gradientValue ] = useGlobalStyle( prefix + 'color.gradient' );
 	const [ color ] = useGlobalStyle( prefix + 'color.text' );
+	const displayFontName =
+		fontFamily?.split( ',' )[ 0 ]?.replace( /['"]/g, '' ).trim() ??
+		__( 'Default' );
 
 	return (
 		<NavigationButtonAsItem path={ parentMenu + '/typography/' + element }>
-			<HStack justify="flex-start">
+			<HStack justify="space-between">
+				<FlexItem>{ label }</FlexItem>
 				<FlexItem
 					className="edit-site-global-styles-screen-typography__indicator"
 					style={ {
@@ -50,13 +54,22 @@ function ElementItem( { parentMenu, element, label } ) {
 						color,
 						fontStyle,
 						fontWeight,
+						fontSize: '0.875rem',
+						padding: '0.25rem 0.5rem',
+						borderRadius: '0.25rem',
+						display: 'inline-block',
+						whiteSpace: 'nowrap',
+						overflow: 'visible',
+						textOverflow: 'initial',
+						minWidth: '120px',
+						maxWidth: '100%',
 						...extraStyles,
 					} }
+					title={ displayFontName }
 					aria-hidden="true"
 				>
-					{ __( 'Aa' ) }
+					{ displayFontName }
 				</FlexItem>
-				<FlexItem>{ label }</FlexItem>
 			</HStack>
 		</NavigationButtonAsItem>
 	);
