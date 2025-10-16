@@ -606,15 +606,7 @@ function BlockListBlockProvider( props ) {
 			const attributes = getBlockAttributes( clientId );
 			const { name: blockName, isValid } = blockWithoutAttributes;
 			const blockType = getBlockType( blockName );
-			const {
-				supportsLayout,
-				isPreviewMode,
-				__experimentalBlockBindingsSupportedAttributes,
-			} = getSettings();
-
-			const bindableAttributes =
-				__experimentalBlockBindingsSupportedAttributes?.[ blockName ];
-
+			const { supportsLayout, isPreviewMode } = getSettings();
 			const hasLightBlockWrapper = blockType?.apiVersion > 1;
 			const previewContext = {
 				isPreviewMode,
@@ -718,7 +710,6 @@ function BlockListBlockProvider( props ) {
 					? blocksWithSameName[ 0 ]
 					: false,
 				isBlockHidden: _isBlockHidden( clientId ),
-				bindableAttributes,
 			};
 		},
 		[ clientId, rootClientId ]
@@ -762,7 +753,6 @@ function BlockListBlockProvider( props ) {
 		defaultClassName,
 		originalBlockClientId,
 		isBlockHidden,
-		bindableAttributes,
 	} = selectedProps;
 
 	// Users of the editor.BlockListBlock filter used to be able to
@@ -812,7 +802,6 @@ function BlockListBlockProvider( props ) {
 		themeSupportsLayout,
 		canMove,
 		isBlockHidden,
-		bindableAttributes,
 	};
 
 	if (
