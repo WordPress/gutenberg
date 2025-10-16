@@ -40,8 +40,8 @@ class Block_Fixture_Test extends WP_UnitTestCase {
 		// KSES replaces \u005c with \\ in block comment delimiters.
 		$block = preg_replace_callback(
 			'/<!-- wp:([^ ]+) ({.*?}) -->/',
-			function ($matches) {
-				$json = str_replace('\\u005c', '\\\\', $matches[2]);
+			function ( $matches ) {
+				$json = str_replace( '\\u005c', '\\\\', $matches[2] );
 				return "<!-- wp:{$matches[1]} {$json} -->";
 			},
 			$block
