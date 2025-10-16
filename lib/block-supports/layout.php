@@ -1159,15 +1159,14 @@ function gutenberg_restore_image_outer_container( $block_content, $block ) {
 
 	$wrapper_classnames = array( 'wp-block-image' );
 
-	// If the block has a classNames attribute these classnames need to be removed from the content and added back
+	// If the block has a classNames attribute these classnames need to be added back
 	// to the new wrapper div also.
 	if ( ! empty( $block['attrs']['className'] ) ) {
 		$wrapper_classnames = array_merge( $wrapper_classnames, explode( ' ', $block['attrs']['className'] ) );
 	}
-	$content_classnames          = explode( ' ', $matches[2] );
-	$filtered_content_classnames = array_diff( $content_classnames, $wrapper_classnames );
 
-	return '<div class="' . implode( ' ', $wrapper_classnames ) . '">' . $matches[1] . implode( ' ', $filtered_content_classnames ) . $matches[3] . '</div>';
+	// Wrap the existing content with the new wrapper div.
+	return '<div class="' . implode( ' ', $wrapper_classnames ) . '">' . $block_content . '</div>';
 }
 
 if ( function_exists( 'wp_restore_image_outer_container' ) ) {
