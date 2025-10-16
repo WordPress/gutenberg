@@ -604,24 +604,25 @@ async function bundlePackage( packageName ) {
 		const isProduction = process.env.NODE_ENV === 'production';
 
 		try {
-			// Find CSS files in build-style directory
+			// Find CSS files in build-style directory (including subdirectories)
 			const cssFiles = await glob(
-				normalizePath( path.join( buildStyleDir, '*.css' ) )
+				normalizePath( path.join( buildStyleDir, '**/*.css' ) )
 			);
 
 			if ( cssFiles.length > 0 ) {
-				// Ensure output directory exists
-				await mkdir( outputDir, { recursive: true } );
-
 				// Process each CSS file
 				for ( const cssFile of cssFiles ) {
-					const filename = path.basename( cssFile );
-					const destPath = path.join( outputDir, filename );
+					// Calculate relative path from build-style to preserve directory structure
+					const relativePath = path.relative( buildStyleDir, cssFile );
+					const destPath = path.join( outputDir, relativePath );
+					const destDir = path.dirname( destPath );
 
 					if ( isProduction ) {
 						// In production, minify CSS with cssnano
 						builds.push(
 							( async () => {
+								// Ensure destination directory exists
+								await mkdir( destDir, { recursive: true } );
 								const cssContent = await readFile(
 									cssFile,
 									'utf8'
@@ -646,7 +647,11 @@ async function bundlePackage( packageName ) {
 						);
 					} else {
 						// In development, just copy the file
-						builds.push( copyFile( cssFile, destPath ) );
+						builds.push(
+							mkdir( destDir, { recursive: true } ).then( () =>
+								copyFile( cssFile, destPath )
+							)
+						);
 					}
 				}
 			}

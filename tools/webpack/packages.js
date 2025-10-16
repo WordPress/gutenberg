@@ -16,7 +16,7 @@ const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extrac
 /**
  * Internal dependencies
  */
-const { baseConfig, plugins, stylesTransform } = require( './shared' );
+const { baseConfig, plugins } = require( './shared' );
 
 const WORDPRESS_NAMESPACE = '@wordpress/';
 
@@ -137,21 +137,12 @@ module.exports = {
 		...plugins,
 		new DependencyExtractionWebpackPlugin( { injectPolyfill: false } ),
 		new CopyWebpackPlugin( {
-			patterns: gutenbergScripts
-				.map( ( packageName ) => ( {
-					from: '*.css',
-					context: `./packages/${ packageName }/build-style`,
-					to: `./build/${ packageName }`,
-					transform: stylesTransform,
-					noErrorOnMissing: true,
+			patterns: bundledPackagesPhpConfig.concat(
+				Object.entries( copiedVendors ).map( ( [ to, from ] ) => ( {
+					from: `node_modules/${ from }`,
+					to: `build/vendors/${ to }`,
 				} ) )
-				.concat( bundledPackagesPhpConfig )
-				.concat(
-					Object.entries( copiedVendors ).map( ( [ to, from ] ) => ( {
-						from: `node_modules/${ from }`,
-						to: `build/vendors/${ to }`,
-					} ) )
-				),
+			),
 		} ),
 		new MomentTimezoneDataPlugin( {
 			startYear: 2000,
