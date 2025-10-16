@@ -128,7 +128,25 @@ const UnconnectedDropdown = (
 				<Popover
 					position={ position }
 					onClose={ close }
-					onFocusOutside={ closeIfFocusOutside }
+					onFocusOutside={ ( event ) => {
+						// Check if this blur event is actually relevant to this dropdown
+						const blurTarget = event?.target as Element;
+						const container = containerRef.current;
+
+						// Check if blur is from this dropdown's container or its popover content
+						// Popover content might be in a portal, so we also check for the dropdown's
+						// content class name on the blur target or its ancestors
+						const isBlurFromThisDropdown =
+							container?.contains( blurTarget ) ||
+							blurTarget?.closest(
+								`.components-dropdown__content`
+							);
+
+						// Only proceed with closing if the blur is actually from this dropdown
+						if ( isBlurFromThisDropdown ) {
+							closeIfFocusOutside();
+						}
+					} }
 					expandOnMobile={ expandOnMobile }
 					headerTitle={ headerTitle }
 					focusOnMount={ focusOnMount }
