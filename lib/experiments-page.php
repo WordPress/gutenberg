@@ -153,7 +153,7 @@ function gutenberg_initialize_experiments_settings() {
 
 	add_settings_field(
 		'gutenberg-dataviews-media-modal',
-		__( 'Data Views: powered media modal', 'gutenberg' ),
+		__( 'Data Views: new media modal', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
