@@ -37,6 +37,15 @@ class Block_Fixture_Test extends WP_UnitTestCase {
 
 		// KSES adds a space at the end of self-closing tags, add it to the original to match.
 		$block = preg_replace( '|([^ ])/>|', '$1 />', $block );
+		// KSES replaces \u005c with \\ in block comment delimiters.
+		$block = preg_replace_callback(
+			'/<!-- wp:([^ ]+) ({.*?}) -->/',
+			function ($matches) {
+				$json = str_replace('\\u005c', '\\\\', $matches[2]);
+				return "<!-- wp:{$matches[1]} {$json} -->";
+			},
+			$block
+		);
 
 		// KSES removes the last semi-colon from style attributes, remove it from the original to match.
 		$block = preg_replace( '/style="([^"]*);"/', 'style="$1"', $block );
