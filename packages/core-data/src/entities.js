@@ -326,6 +326,7 @@ async function loadPostTypeEntities() {
 			 */
 			supports: {
 				crdtPersistence: true,
+				undo: true,
 			},
 		};
 
