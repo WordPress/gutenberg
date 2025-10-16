@@ -107,7 +107,9 @@ export default {
 		const newValues = {};
 		for ( const [ attributeName, source ] of Object.entries( bindings ) ) {
 			// Use the value, the field label, or the field key.
-			const fieldKey = source.args.key;
+			const fieldKey = globalThis.IS_GUTENBERG_PLUGIN
+				? source.args.field || source.args.key
+				: source.args.field;
 			const { value: fieldValue, label: fieldLabel } =
 				dataFields?.[ fieldKey ] || {};
 			newValues[ attributeName ] = fieldValue ?? fieldLabel ?? fieldKey;
@@ -126,7 +128,7 @@ export default {
 		}
 		const newData = {};
 		Object.values( bindings ).forEach( ( { args, newValue } ) => {
-			newData[ args.key ] = newValue;
+			newData[ args.field ] = newValue;
 		} );
 
 		dispatch( coreDataStore ).editEntityRecord(
@@ -159,7 +161,7 @@ export default {
 		}
 
 		const fieldValue = getPostDataFields( select, context, undefined )?.[
-			args.key
+			args.field
 		]?.value;
 		// Empty string or `false` could be a valid value, so we need to check if the field value is undefined.
 		if ( fieldValue === undefined ) {
@@ -197,7 +199,7 @@ export default {
 		).map( ( [ key, field ] ) => ( {
 			label: field.label,
 			args: {
-				key,
+				field: key,
 			},
 			type: field.type,
 		} ) );

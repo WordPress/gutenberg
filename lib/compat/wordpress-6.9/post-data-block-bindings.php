@@ -14,13 +14,19 @@
  * @access private
  *
  * @param array    $source_args    Array containing source arguments used to look up the override value.
- *                                 Example: array( "key" => "foo" ).
+ *                                 Example: array( "field" => "foo" ).
  * @param WP_Block $block_instance The block instance.
  * @return mixed The value computed for the source.
  */
 function gutenberg_block_bindings_post_data_get_value( array $source_args, $block_instance ) {
-	if ( empty( $source_args['key'] ) ) {
-		return null;
+	$field = isset( $source_args['field'] ) ? $source_args['field'] : null;
+
+	// Backward compatibility for when the source argument was called `key` in Gutenberg plugin.
+	if ( empty( $field ) && defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+		$field = $source_args['key'];
+		if ( empty( $field ) ) {
+			return null;
+		}
 	}
 
 	/*
@@ -53,11 +59,11 @@ function gutenberg_block_bindings_post_data_get_value( array $source_args, $bloc
 		return null;
 	}
 
-	if ( 'date' === $source_args['key'] ) {
+	if ( 'date' === $field ) {
 		return esc_attr( get_the_date( 'c', $post_id ) );
 	}
 
-	if ( 'modified' === $source_args['key'] ) {
+	if ( 'modified' === $field ) {
 		// Only return the modified date if it is later than the publishing date.
 		if ( get_the_modified_date( 'U', $post_id ) > get_the_date( 'U', $post_id ) ) {
 			return esc_attr( get_the_modified_date( 'c', $post_id ) );
