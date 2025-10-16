@@ -17,6 +17,7 @@ import {
 	InspectorControls,
 	RichText,
 	useBlockProps,
+	useBlockEditingMode,
 	store as blockEditorStore,
 	getColorClassName,
 } from '@wordpress/block-editor';
@@ -129,7 +130,16 @@ export default function NavigationSubmenuEdit( {
 } ) {
 	const { label, url, description } = attributes;
 
-	const { showSubmenuIcon, maxNestingLevel, openSubmenusOnClick } = context;
+	const {
+		showSubmenuIcon,
+		maxNestingLevel,
+		openSubmenusOnClick: contextOpenSubmenusOnClick,
+	} = context;
+	const blockEditingMode = useBlockEditingMode();
+
+	// Force click-only behavior in contentOnly mode to prevent hover dropdowns
+	const openSubmenusOnClick =
+		blockEditingMode !== 'default' ? true : contextOpenSubmenusOnClick;
 
 	// URL binding logic
 	const { clearBinding, createBinding } = useEntityBinding( {

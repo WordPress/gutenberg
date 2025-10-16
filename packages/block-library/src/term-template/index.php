@@ -17,43 +17,47 @@
  * @return string Returns the output of the term template.
  */
 function render_block_core_term_template( $attributes, $content, $block ) {
-	if ( ! isset( $block->context ) || ! isset( $attributes ) ) {
+	if ( ! isset( $block->context ) || empty( $block->context['termQuery'] ) ) {
 		return '';
 	}
 
-	$query_block_context = $block->context;
-
-	if ( empty( $query_block_context['termQuery'] ) ) {
-		return '';
-	}
-
-	$query = $query_block_context['termQuery'];
+	$query = $block->context['termQuery'];
 
 	$query_args = array(
-		'taxonomy'   => $query['taxonomy'] ?? 'category',
-		'number'     => $query['perPage'] ?? 10,
-		'order'      => $query['order'] ?? 'asc',
-		'orderby'    => $query['orderBy'] ?? 'name',
-		'hide_empty' => $query['hideEmpty'] ?? true,
+		'number'     => $query['perPage'],
+		'order'      => $query['order'],
+		'orderby'    => $query['orderBy'],
+		'hide_empty' => $query['hideEmpty'],
 	);
 
-	// We set parent only when inheriting from the taxonomy archive context or not
-	// showing nested terms, otherwise nested terms are not displayed.
-	if (
-		isset( $query['inherit'] )
+	$inherit_query = isset( $query['inherit'] )
 		&& $query['inherit']
-		&& (
-			is_tax( $query_args['taxonomy'] )
-			// is_tax() does not detect built-in category or tag archives, only custom taxonomies.
-			|| ( 'category' === $query_args['taxonomy'] && is_category() )
-			|| ( 'post_tag' === $query_args['taxonomy'] && is_tag() )
-		)
-	) {
-		// Get the current term ID from the queried object.
-		$current_term_id      = get_queried_object_id();
-		$query_args['parent'] = $current_term_id;
-	} elseif ( empty( $query['hierarchical'] ) ) {
-		$query_args['parent'] = 0;
+		&& ( is_tax() || is_category() || is_tag() );
+
+	if ( $inherit_query ) {
+		// Get the current term and taxonomy from the queried object.
+		$queried_object = get_queried_object();
+
+		// For hierarchical taxonomies, show direct children of the current term.
+		// For non-hierarchical taxonomies, show all terms (don't set parent).
+		if ( is_taxonomy_hierarchical( $queried_object->taxonomy ) ) {
+			$query_args['parent'] = $queried_object->term_id;
+		}
+		$query_args['taxonomy'] = $queried_object->taxonomy;
+	} else {
+		// If not inheriting set `taxonomy` from the block attribute.
+		$query_args['taxonomy'] = $query['taxonomy'];
+
+		// If we are including specific terms we ignore `showNested` argument.
+		if ( ! empty( $query['include'] ) ) {
+			$query_args['include'] = array_unique( array_map( 'intval', $query['include'] ) );
+			$query_args['orderby'] = 'include';
+			$query_args['order']   = 'asc';
+		} elseif ( empty( $query['showNested'] ) ) {
+			// We set parent only when inheriting from the taxonomy archive context or not
+			// showing nested terms, otherwise nested terms are not displayed.
+			$query_args['parent'] = 0;
+		}
 	}
 
 	$terms_query = new WP_Term_Query( $query_args );

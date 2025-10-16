@@ -28,7 +28,7 @@
 		".": {
 			"types": "./build-types/index.d.ts",
 			"import": "./build-module/index.js",
-			"default": "./build/index.js"
+			"require": "./build/index.js"
 		},
 		"./wp": {
 			"types": "./build-types/index.d.ts",
@@ -40,12 +40,10 @@
 		"./build-style/": "./build-style/"
 	},
 	"react-native": "src/index",
-	"wpScript": true,
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
 		"@ariakit/react": "^0.4.15",
-		"@babel/runtime": "7.25.7",
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",

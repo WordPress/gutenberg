@@ -24,11 +24,14 @@
 		"npm": ">=8.19.2"
 	},
 	"main": "lib/index.js",
+	"exports": {
+		".": "./lib/index.js",
+		"./package.json": "./package.json"
+	},
 	"types": "build-types",
 	"dependencies": {
 		"@actions/core": "1.9.1",
 		"@actions/github": "^5.0.0",
-		"@babel/runtime": "7.25.7",
 		"@octokit/request-error": "^2.1.0",
 		"@octokit/webhooks": "^9.26.3"
 	},

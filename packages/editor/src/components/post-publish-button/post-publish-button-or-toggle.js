@@ -35,7 +35,7 @@ export default function PostPublishButtonOrToggle( {
 			hasPublishAction:
 				!! select( editorStore ).getCurrentPost()?._links?.[
 					'wp:action-publish'
-				] ?? false,
+				],
 			isBeingScheduled:
 				select( editorStore ).isEditedPostBeingScheduled(),
 			isPending: select( editorStore ).isCurrentPostPending(),

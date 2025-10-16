@@ -1,5 +1,42 @@
 == Changelog ==
 
+= 21.8.2 =
+
+## Changelog
+
+### Bug Fixes
+
+- Ensure meta boxes are not hidden when legacy. ([72220](https://github.com/WordPress/gutenberg/pull/72220))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@stokesman 
+
+
+= 21.8.1 =
+
+
+## Changelog
+
+### Bug Fixes
+
+- Template activation: Improve back compat. ([72223](https://github.com/WordPress/gutenberg/pull/72223))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@ellatrix
+
+
 = 21.8.0 =
 
 ## Changelog

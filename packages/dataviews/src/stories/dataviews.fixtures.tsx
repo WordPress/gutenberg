@@ -311,6 +311,21 @@ export const data: SpaceObject[] = [
 		datetime: '2020-03-01T10:15:20Z',
 		email: 'uranus@example.com',
 	},
+	{
+		id: 19,
+		name: {
+			title: 'Thessalonikopolymnianebuchodonossarinacharybdis',
+			description: 'Takes longer to say than to orbit.',
+		},
+		image: 'https://live.staticflickr.com/1357/935805705_119635028c_b.jpg',
+		type: 'Rogue planet',
+		isPlanet: true,
+		categories: [ 'Planet', 'Rogue planet' ],
+		satellites: 0,
+		date: '2020-03-01',
+		datetime: '2020-03-01T10:15:20Z',
+		email: 'thessalonikopolymnianebuchodonossarinacharybdis@example.com',
+	},
 ];
 
 export const themeData: Theme[] = [

@@ -10,21 +10,12 @@ test.use( {
 } );
 
 test.describe( 'Block Comments', () => {
-	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.setGutenbergExperiments( [
-			'gutenberg-block-comment',
-		] );
-	} );
-
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
-		await Promise.all( [
-			requestUtils.deleteAllComments( 'block_comment' ),
-			requestUtils.setGutenbergExperiments( [] ),
-		] );
+		await requestUtils.deleteAllComments( 'note' );
 	} );
 
 	test( 'can pin and unpin comments sidebar', async ( {
@@ -45,21 +36,21 @@ test.describe( 'Block Comments', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Testing block comments' },
 		} );
-		await editor.clickBlockOptionsMenuItem( 'Comment' );
+		await editor.clickBlockOptionsMenuItem( 'Note' );
 		await page
 			.getByRole( 'textbox', {
-				name: 'New Comment',
+				name: 'New Note',
 				exact: true,
 			} )
 			.fill( 'A test comment' );
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Comment', exact: true } )
+			.getByRole( 'button', { name: 'Note', exact: true } )
 			.click();
 		const thread = page
 			.getByRole( 'region', { name: 'Editor settings' } )
 			.getByRole( 'listitem', {
-				name: 'Comment: A test comment',
+				name: 'Note: A test comment',
 			} );
 
 		await expect( thread ).toBeVisible();
@@ -102,7 +93,7 @@ test.describe( 'Block Comments', () => {
 		} );
 		await blockCommentUtils.clickBlockCommentActionMenuItem( 'Edit' );
 		await page
-			.getByRole( 'textbox', { name: 'Comment' } )
+			.getByRole( 'textbox', { name: 'Note' } )
 			.first()
 			.fill( 'Test comment after edit.' );
 		await page
@@ -116,7 +107,7 @@ test.describe( 'Block Comments', () => {
 		await expect(
 			page
 				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Comment updated.' } )
+				.filter( { hasText: 'Note updated.' } )
 		).toBeVisible();
 	} );
 
@@ -141,7 +132,7 @@ test.describe( 'Block Comments', () => {
 		await expect(
 			page
 				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Comment deleted successfully.' } )
+				.filter( { hasText: 'Note deleted successfully.' } )
 		).toBeVisible();
 	} );
 
@@ -158,7 +149,7 @@ test.describe( 'Block Comments', () => {
 		const thread = page
 			.getByRole( 'region', { name: 'Editor settings' } )
 			.getByRole( 'listitem', {
-				name: 'Comment: Test comment to resolve.',
+				name: 'Note: Test comment to resolve.',
 			} );
 		await thread.click();
 		await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
@@ -168,7 +159,7 @@ test.describe( 'Block Comments', () => {
 		await expect(
 			page
 				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Comment marked as resolved.' } )
+				.filter( { hasText: 'Note marked as resolved.' } )
 		).toBeVisible();
 		await expect( thread ).toBeFocused();
 		await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
@@ -181,7 +172,7 @@ test.describe( 'Block Comments', () => {
 		await expect(
 			page
 				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Comment reopened.' } )
+				.filter( { hasText: 'Note reopened.' } )
 		).toBeVisible();
 	} );
 
@@ -200,7 +191,7 @@ test.describe( 'Block Comments', () => {
 		await expect(
 			page
 				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Comment marked as resolved.' } )
+				.filter( { hasText: 'Note marked as resolved.' } )
 		).toBeVisible();
 
 		await page.locator( '.editor-collab-sidebar-panel__thread' ).click();
@@ -216,7 +207,7 @@ test.describe( 'Block Comments', () => {
 		await expect(
 			page
 				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Comment reopened.' } )
+				.filter( { hasText: 'Note reopened.' } )
 		).toBeVisible();
 	} );
 
@@ -292,7 +283,7 @@ test.describe( 'Block Comments', () => {
 					name: 'Editor settings',
 				} )
 				.getByRole( 'listitem', {
-					name: 'Comment: Test comment',
+					name: 'Note: Test comment',
 				} );
 
 			// Expand the comment with Enter key.
@@ -326,7 +317,7 @@ test.describe( 'Block Comments', () => {
 					name: 'Editor settings',
 				} )
 				.getByRole( 'listitem', {
-					name: 'Comment: Test comment escape',
+					name: 'Note: Test comment escape',
 				} );
 
 			await thread.click();
@@ -352,7 +343,7 @@ test.describe( 'Block Comments', () => {
 					name: 'Editor settings',
 				} )
 				.getByRole( 'listitem', {
-					name: 'Comment: Test comment',
+					name: 'Note: Test comment',
 				} );
 
 			await thread.click();
@@ -379,9 +370,7 @@ test.describe( 'Block Comments', () => {
 				.getByRole( 'listitem' );
 
 			await thread.focus();
-			await expect( thread ).toHaveAccessibleName(
-				'Comment: Test comment'
-			);
+			await expect( thread ).toHaveAccessibleName( 'Note: Test comment' );
 		} );
 
 		test( 'should expand and focus the thread after clicking the "x more replies" button', async ( {
@@ -421,7 +410,7 @@ test.describe( 'Block Comments', () => {
 					name: 'Editor settings',
 				} )
 				.getByRole( 'listitem', {
-					name: 'Comment: Test comment',
+					name: 'Note: Test comment',
 				} );
 
 			await thread
@@ -429,6 +418,188 @@ test.describe( 'Block Comments', () => {
 				.click();
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
 			await expect( thread ).toBeFocused();
+		} );
+
+		test( 'should focus appropriate element when comment is deleted', async ( {
+			page,
+			editor,
+			blockCommentUtils,
+		} ) => {
+			await blockCommentUtils.addBlockWithComment( {
+				type: 'core/paragraph',
+				attributes: { content: 'First block content' },
+				comment: 'First block comment',
+			} );
+			await blockCommentUtils.addBlockWithComment( {
+				type: 'core/paragraph',
+				attributes: { content: 'Second block content' },
+				comment: 'Second block comment',
+			} );
+			await blockCommentUtils.addBlockWithComment( {
+				type: 'core/paragraph',
+				attributes: { content: 'Third block content' },
+				comment: 'Third block comment',
+			} );
+			const firstThread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'listitem', {
+					name: 'Note: First block comment',
+				} );
+			const secondThread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'listitem', {
+					name: 'Note: Second block comment',
+				} );
+			const thirdThread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'listitem', {
+					name: 'Note: Third block comment',
+				} );
+
+			await firstThread.click();
+			await blockCommentUtils.clickBlockCommentActionMenuItem( 'Delete' );
+			await page
+				.getByRole( 'dialog' )
+				.getByRole( 'button', { name: 'Delete' } )
+				.click();
+			await expect(
+				secondThread,
+				'focus should move to the next comment if there is one'
+			).toBeFocused();
+
+			await thirdThread.click();
+			await blockCommentUtils.clickBlockCommentActionMenuItem( 'Delete' );
+			await page
+				.getByRole( 'dialog' )
+				.getByRole( 'button', { name: 'Delete' } )
+				.click();
+			await expect(
+				secondThread,
+				"focus should move to the previous comment if there isn't a next one"
+			).toBeFocused();
+
+			await secondThread.click();
+			await blockCommentUtils.clickBlockCommentActionMenuItem( 'Delete' );
+			await page
+				.getByRole( 'dialog' )
+				.getByRole( 'button', { name: 'Delete' } )
+				.click();
+			const secondBlock = editor.canvas
+				.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} )
+				.nth( 1 );
+			await expect(
+				secondBlock,
+				"focus should move to the block if there isn't a next or previous comment"
+			).toBeFocused();
+		} );
+
+		test( 'should focus comment thread when reply is deleted', async ( {
+			page,
+			blockCommentUtils,
+		} ) => {
+			await blockCommentUtils.addBlockWithComment( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing block comments' },
+				comment: 'Test note',
+			} );
+			await blockCommentUtils.addBlockWithComment( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing block comments' },
+				comment: 'Test comment',
+			} );
+			const commentForm = page.getByRole( 'textbox', {
+				name: 'Reply to',
+			} );
+			await commentForm.fill( 'Test reply' );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Reply', exact: true } )
+				.click();
+			await blockCommentUtils.clickBlockCommentActionMenuItem(
+				'Delete',
+				1
+			);
+			await page
+				.getByRole( 'dialog' )
+				.getByRole( 'button', { name: 'Delete' } )
+				.click();
+			const thread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'listitem', {
+					name: 'Note: Test comment',
+				} );
+
+			await expect( thread ).toBeFocused();
+		} );
+
+		test( 'should focus comment form after clicking "Add new comment" skip link button', async ( {
+			page,
+			blockCommentUtils,
+		} ) => {
+			await blockCommentUtils.addBlockWithComment( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing block comments' },
+				comment: 'Test comment',
+			} );
+			const thread = page
+				.getByRole( 'region', {
+					name: 'Editor settings',
+				} )
+				.getByRole( 'listitem', {
+					name: 'Note: Test comment',
+				} );
+			const addNewCommentButton = thread.getByRole( 'button', {
+				name: 'Add new note',
+			} );
+			await thread.focus();
+			await page.keyboard.press( 'Tab' );
+
+			await expect( addNewCommentButton ).toBeFocused();
+
+			await page.keyboard.press( 'Enter' );
+
+			await expect(
+				page.getByRole( 'textbox', { name: 'Reply to' } )
+			).toBeFocused();
+		} );
+
+		test( 'should focus block after clicking "Back to block" skip link button', async ( {
+			editor,
+			page,
+			blockCommentUtils,
+		} ) => {
+			await blockCommentUtils.addBlockWithComment( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing block comments' },
+				comment: 'Test comment',
+			} );
+			const thread = page
+				.getByRole( 'region', {
+					name: 'Editor settings',
+				} )
+				.getByRole( 'listitem', {
+					name: 'Note: Test comment',
+				} );
+			const replyButton = thread.getByRole( 'button', {
+				name: 'Reply',
+			} );
+			const backToBlockButton = thread.getByRole( 'button', {
+				name: 'Back to block',
+			} );
+			await replyButton.focus();
+			await page.keyboard.press( 'Tab' );
+
+			await expect( backToBlockButton ).toBeFocused();
+
+			await page.keyboard.press( 'Enter' );
+
+			await expect(
+				editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} )
+			).toBeFocused();
 		} );
 	} );
 } );
@@ -447,7 +618,7 @@ class BlockCommentUtils {
 	async openBlockCommentSidebar() {
 		const toggleButton = this.#page
 			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'Comments', exact: true } );
+			.getByRole( 'button', { name: 'Notes', exact: true } );
 
 		const isClosed =
 			( await toggleButton.getAttribute( 'aria-expanded' ) ) === 'false';
@@ -456,7 +627,7 @@ class BlockCommentUtils {
 			await toggleButton.click();
 			await this.#page
 				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'button', { name: 'Close Comments' } )
+				.getByRole( 'button', { name: 'Close Notes' } )
 				.waitFor();
 		}
 
@@ -471,30 +642,31 @@ class BlockCommentUtils {
 					name: type,
 					attributes,
 				} );
-				await this.#editor.clickBlockOptionsMenuItem( 'Comment' );
+				await this.#editor.clickBlockOptionsMenuItem( 'Note' );
 				await this.#page
 					.getByRole( 'textbox', {
-						name: 'New Comment',
+						name: 'New Note',
 						exact: true,
 					} )
 					.fill( comment );
 				await this.#page
 					.getByRole( 'region', { name: 'Editor settings' } )
-					.getByRole( 'button', { name: 'Comment', exact: true } )
+					.getByRole( 'button', { name: 'Note', exact: true } )
 					.click();
 				await this.#page
 					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Comment added successfully.' } )
+					.filter( { hasText: 'Note added successfully.' } )
 					.click();
 			},
 			{ box: true }
 		);
 	}
 
-	async clickBlockCommentActionMenuItem( actionName ) {
+	async clickBlockCommentActionMenuItem( actionName, index = 0 ) {
 		await this.#page
 			.getByRole( 'region', { name: 'Editor settings' } )
 			.getByRole( 'button', { name: 'Actions' } )
+			.nth( index )
 			.click();
 		await this.#page.getByRole( 'menuitem', { name: actionName } ).click();
 	}

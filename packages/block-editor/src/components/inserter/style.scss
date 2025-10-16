@@ -1,3 +1,9 @@
+@use "@wordpress/base-styles/breakpoints" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
 $block-inserter-preview-height: 350px;
 $block-quick-inserter-width: 350px;
 $block-inserter-tabs-height: 44px;

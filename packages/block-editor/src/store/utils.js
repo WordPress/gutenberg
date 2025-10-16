@@ -132,15 +132,13 @@ export const getAllPatternsDependants = ( select ) => ( state ) => {
 	];
 };
 
-export const getInsertBlockTypeDependants =
-	( select ) => ( state, rootClientId ) => {
-		return [
-			state.blockListSettings[ rootClientId ],
-			state.blocks.byClientId.get( rootClientId ),
-			state.settings.allowedBlockTypes,
-			state.settings.templateLock,
-			getBlockEditingMode( state, rootClientId ),
-			select( STORE_NAME ).__unstableGetEditorMode( state ),
-			getSectionRootClientId( state ),
-		];
-	};
+export const getInsertBlockTypeDependants = () => ( state, rootClientId ) => {
+	return [
+		state.blockListSettings[ rootClientId ],
+		state.blocks.byClientId.get( rootClientId ),
+		state.settings.allowedBlockTypes,
+		state.settings.templateLock,
+		getBlockEditingMode( state, rootClientId ),
+		getSectionRootClientId( state ),
+	];
+};
