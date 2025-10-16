@@ -6,6 +6,10 @@
 
 -   Add official support for unique IDs. ([#72161](https://github.com/WordPress/gutenberg/pull/72161))
 
+### Bug Fixes
+
+-   Handle client-server state synchronization scenarios for `getServerContext` and `getServerState`. ([#???](https://github.com/WordPress/gutenberg/pull/???))
+
 ## 6.32.0 (2025-10-01)
 
 -   Update router regions inside elements with `data-wp-interactive`. ([#71635](https://github.com/WordPress/gutenberg/pull/71635))
