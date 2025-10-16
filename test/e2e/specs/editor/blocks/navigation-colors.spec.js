@@ -144,9 +144,7 @@ test.describe( 'Navigation colors', () => {
 		await editor.openDocumentSettingsSidebar();
 		await page.getByRole( 'tab', { name: 'Styles' } ).click();
 		await page.getByRole( 'button', { name: 'Color options' } ).click();
-		await page
-			.getByRole( 'menuitemcheckbox', { name: 'Show Link' } )
-			.click();
+		await page.getByRole( 'menuitemcheckbox', { name: 'Link' } ).click();
 		await page.getByRole( 'tab', { name: 'Styles' } ).click();
 		await page.getByRole( 'button', { name: 'Link', exact: true } ).click();
 		// rga(207, 46 ,46) is the color of the "vivid red" color preset.

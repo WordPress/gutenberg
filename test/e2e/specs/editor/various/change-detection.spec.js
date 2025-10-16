@@ -455,7 +455,7 @@ test.describe( 'Change detection', () => {
 			.click();
 		await page
 			.getByRole( 'menu', { name: 'Typography options' } )
-			.getByRole( 'menuitemcheckbox', { name: 'Show drop cap' } )
+			.getByRole( 'menuitemcheckbox', { name: 'drop cap' } )
 			.click();
 
 		await page

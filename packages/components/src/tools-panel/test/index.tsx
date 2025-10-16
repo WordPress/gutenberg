@@ -802,7 +802,7 @@ describe( 'ToolsPanel', () => {
 
 			const altItem = screen.getByText( 'Nested Control 2' );
 			const altMenuItem = screen.getByRole( 'menuitemcheckbox', {
-				name: 'Show Nested Control 2',
+				name: 'Nested Control 2',
 				checked: false,
 			} );
 
@@ -840,7 +840,7 @@ describe( 'ToolsPanel', () => {
 
 			const altItem = screen.getByText( 'Nested Control 2' );
 			const altMenuItem = screen.getByRole( 'menuitemcheckbox', {
-				name: 'Show Nested Control 2',
+				name: 'Nested Control 2',
 				checked: false,
 			} );
 
@@ -1090,12 +1090,12 @@ describe( 'ToolsPanel', () => {
 			// and appear in the panel menu.
 			expect(
 				screen.getByRole( 'menuitemcheckbox', {
-					name: 'Show Alt',
+					name: 'Alt',
 				} )
 			).toBeInTheDocument();
 			expect(
 				screen.queryByRole( 'menuitemcheckbox', {
-					name: 'Hide and reset Example',
+					name: 'Example',
 				} )
 			).not.toBeInTheDocument();
 
@@ -1104,12 +1104,12 @@ describe( 'ToolsPanel', () => {
 			rerender( <TestSlotFillPanel panelId="9999" /> );
 			expect(
 				screen.queryByRole( 'menuitemcheckbox', {
-					name: 'Show Alt',
+					name: 'Alt',
 				} )
 			).not.toBeInTheDocument();
 			expect(
 				screen.getByRole( 'menuitemcheckbox', {
-					name: 'Hide and reset Example',
+					name: 'Example',
 				} )
 			).toBeInTheDocument();
 		} );

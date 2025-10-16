@@ -156,7 +156,7 @@ test.describe( 'Post Meta source', () => {
 				await page.getByLabel( 'Attributes options' ).click();
 				await page
 					.getByRole( 'menuitemcheckbox', {
-						name: 'Show content',
+						name: 'content',
 					} )
 					.click();
 				const contentBinding = page.getByRole( 'button', {
@@ -192,7 +192,7 @@ test.describe( 'Post Meta source', () => {
 				await page.getByLabel( 'Attributes options' ).click();
 				await page
 					.getByRole( 'menuitemcheckbox', {
-						name: 'Show content',
+						name: 'content',
 					} )
 					.click();
 				const contentBinding = page.getByRole( 'button', {
@@ -223,7 +223,7 @@ test.describe( 'Post Meta source', () => {
 				await page.getByLabel( 'Attributes options' ).click();
 				await page
 					.getByRole( 'menuitemcheckbox', {
-						name: 'Show content',
+						name: 'content',
 					} )
 					.click();
 				await page
@@ -598,7 +598,7 @@ test.describe( 'Post Meta source', () => {
 			await page.getByLabel( 'Attributes options' ).click();
 			await page
 				.getByRole( 'menuitemcheckbox', {
-					name: 'Show content',
+					name: 'content',
 				} )
 				.click();
 			await page
@@ -626,7 +626,7 @@ test.describe( 'Post Meta source', () => {
 			await page.getByLabel( 'Attributes options' ).click();
 			await page
 				.getByRole( 'menuitemcheckbox', {
-					name: 'Show content',
+					name: 'content',
 				} )
 				.click();
 			await page

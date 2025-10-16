@@ -553,7 +553,7 @@ test.describe( 'Widgets Customizer', () => {
 
 		// Change `drop cap` (Any change made in this section is sufficient; not required to be `drop cap`).
 		await page.click( 'role=button[name="Typography options"i]' );
-		await page.click( 'role=menuitemcheckbox[name="Show Drop cap"i]' );
+		await page.click( 'role=menuitemcheckbox[name="Drop cap"i]' );
 
 		await page.click( 'role=checkbox[name="Drop cap"i]' );
 

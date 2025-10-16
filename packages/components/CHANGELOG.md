@@ -222,6 +222,7 @@
 ### Bug Fixes
 
 -   `Button`: Remove fixed width from small and compact buttons with icons ([#69378](https://github.com/WordPress/gutenberg/pull/69378)).
+-   `ToolsPanel`: Updated the ARIA labels to match the visible text to improve accessibilty ([#68592](https://github.com/WordPress/gutenberg/pull/68592)).
 
 ## 29.5.0 (2025-02-28)
 
