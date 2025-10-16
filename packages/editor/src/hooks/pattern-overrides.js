@@ -4,7 +4,10 @@
 import { addFilter } from '@wordpress/hooks';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { useBlockEditingMode } from '@wordpress/block-editor';
+import {
+	store as blockEditorStore,
+	useBlockEditingMode,
+} from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { getBlockBindingsSource } from '@wordpress/blocks';
 
@@ -20,7 +23,6 @@ const {
 	PatternOverridesControls,
 	ResetOverridesControl,
 	PATTERN_TYPES,
-	PARTIAL_SYNCING_SUPPORTED_BLOCKS,
 	PATTERN_SYNC_TYPES,
 } = unlock( patternsPrivateApis );
 
@@ -35,8 +37,14 @@ const {
  */
 const withPatternOverrideControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const isSupportedBlock =
-			!! PARTIAL_SYNCING_SUPPORTED_BLOCKS[ props.name ];
+		const isSupportedBlock = useSelect(
+			( select ) => {
+				const { __experimentalBlockBindingsSupportedAttributes } =
+					select( blockEditorStore ).getSettings();
+				return !! __experimentalBlockBindingsSupportedAttributes?.[ props.name ];
+			},
+			[ props.name ]
+		);
 
 		return (
 			<>
