@@ -11,6 +11,11 @@
 		"latex": {
 			"type": "string",
 			"role": "content"
+		},
+		"mathML": {
+			"type": "string",
+			"source": "html",
+			"selector": "math"
 		}
 	}
 }

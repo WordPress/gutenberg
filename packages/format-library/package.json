@@ -43,10 +43,10 @@
 		"@wordpress/html-entities": "file:../html-entities",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
+		"@wordpress/latex-to-mathml": "file:../latex-to-mathml",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/rich-text": "file:../rich-text",
-		"@wordpress/url": "file:../url",
-		"temml": "^0.10.33"
+		"@wordpress/url": "file:../url"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",

@@ -9,11 +9,7 @@ import {
 	__experimentalVStack as VStack,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { useMemo, useState } from '@wordpress/element';
-/**
- * External dependencies
- */
-import temml from 'temml';
+import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -25,30 +21,36 @@ const { Badge } = unlock( componentsPrivateApis );
 export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 	const { latex } = attributes;
 	const [ blockRef, setBlockRef ] = useState();
+	const [ error, setError ] = useState( null );
+	const [ latexToMathML, setLatexToMathML ] = useState();
 
-	const { mathML, error } = useMemo( () => {
-		try {
-			const result = temml.renderToString( latex, {
-				displayMode: true,
-				annotate: true,
-				throwOnError: true,
-			} );
-			return { mathML: result, error: null };
-		} catch ( err ) {
-			return { mathML: latex, error: err.message };
-		}
-	}, [ latex ] );
+	useEffect( () => {
+		import( '@wordpress/latex-to-mathml' ).then( ( module ) => {
+			setLatexToMathML( () => module.default );
+		} );
+	}, [] );
+
+	const blockProps = useBlockProps( {
+		ref: setBlockRef,
+		position: 'relative',
+	} );
 
 	return (
 		<>
 			<div
-				{ ...useBlockProps( {
-					ref: setBlockRef,
-					position: 'relative',
-				} ) }
-				{ ...( mathML
-					? { dangerouslySetInnerHTML: { __html: mathML } }
-					: { children: '\u200B' } ) }
+				{ ...blockProps }
+				{ ...( attributes.mathML
+					? {
+							dangerouslySetInnerHTML: {
+								__html:
+									// It seems React doesn't currently support
+									// rendering <math> elements directly.
+									'<math display="block">' +
+									attributes.mathML +
+									'</math>',
+							},
+					  }
+					: { children: attributes.latex || '\u200B' } ) }
 			/>
 			{ isSelected && (
 				<Popover
@@ -67,6 +69,18 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 								value={ latex }
 								onChange={ ( newLatex ) => {
 									setAttributes( { latex: newLatex } );
+									if ( ! latexToMathML ) {
+										return;
+									}
+									let mathML = '';
+									try {
+										mathML = latexToMathML( newLatex, {
+											displayMode: true,
+										} );
+									} catch ( err ) {
+										setError( err.message );
+									}
+									setAttributes( { mathML } );
 								} }
 								placeholder={ __( 'e.g., x^2, \\frac{a}{b}' ) }
 							/>

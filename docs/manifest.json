@@ -1794,6 +1794,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/latex-to-mathml",
+		"slug": "packages-latex-to-mathml",
+		"markdown_source": "../packages/latex-to-mathml/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/lazy-import",
 		"slug": "packages-lazy-import",
 		"markdown_source": "../packages/lazy-import/README.md",

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { insertObject, useAnchor } from '@wordpress/rich-text';
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import {
@@ -14,11 +14,6 @@ import {
 import { math as icon } from '@wordpress/icons';
 
 /**
- * External dependencies
- */
-import temml from 'temml';
-
-/**
  * Internal dependencies
  */
 import { unlock } from '../lock-unlock';
@@ -28,7 +23,13 @@ const { Badge } = unlock( componentsPrivateApis );
 const name = 'core/math';
 const title = __( 'Math' );
 
-function InlineUI( { value, onChange, activeAttributes, contentRef } ) {
+function InlineUI( {
+	value,
+	onChange,
+	activeAttributes,
+	contentRef,
+	latexToMathML,
+} ) {
 	const [ latex, setLatex ] = useState(
 		activeAttributes?.[ 'data-latex' ] || ''
 	);
@@ -41,25 +42,17 @@ function InlineUI( { value, onChange, activeAttributes, contentRef } ) {
 
 	// Update the math object in real-time as the user types
 	const handleLatexChange = ( newLatex ) => {
-		let result;
+		let mathML;
 
 		setLatex( newLatex );
 
 		try {
-			result = temml.renderToString( newLatex, {
-				displayMode: false,
-				annotate: true,
-				throwOnError: true,
-			} );
+			mathML = latexToMathML( newLatex, { displayMode: false } );
 			setError( null );
 		} catch ( err ) {
 			setError( err.message );
 			return;
 		}
-
-		const doc = document.implementation.createHTMLDocument( '' );
-		doc.body.innerHTML = result;
-		const mathML = doc.body.querySelector( 'math' ).innerHTML;
 
 		const newReplacements = value.replacements.slice();
 		newReplacements[ value.start ] = {
@@ -121,6 +114,13 @@ function Edit( {
 	activeObjectAttributes,
 	contentRef,
 } ) {
+	const [ latexToMathML, setLatexToMathML ] = useState();
+
+	useEffect( () => {
+		import( '@wordpress/latex-to-mathml' ).then( ( module ) => {
+			setLatexToMathML( () => module.default );
+		} );
+	}, [] );
 	return (
 		<>
 			<RichTextToolbarButton
@@ -146,6 +146,7 @@ function Edit( {
 					onChange={ onChange }
 					activeAttributes={ activeObjectAttributes }
 					contentRef={ contentRef }
+					latexToMathML={ latexToMathML }
 				/>
 			) }
 		</>
