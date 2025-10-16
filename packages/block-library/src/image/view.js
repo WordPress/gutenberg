@@ -43,6 +43,7 @@ const { state, actions, callbacks } = store(
 			},
 			get enlargedSrc() {
 				return (
+					state.currentImage.currentSrc ||
 					state.currentImage.uploadedSrc ||
 					'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='
 				);
