@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+import { getServerContext } from '../scopes';
 import {
 	store,
 	getServerState,
@@ -401,6 +402,34 @@ describe( 'Interactivity API', () => {
 			state.bar.baz = 1;
 			state.foo satisfies string;
 			state.bar.baz satisfies number;
+		} );
+	} );
+
+	describe( 'getServerContext', () => {
+		describe( 'should return a read-only generic object when no type is passed', () => {
+			const context = getServerContext();
+			// @ts-expect-error
+			context.nonModifiable = 'error';
+			// @ts-expect-error
+			context.nonExistent satisfies any;
+		} );
+
+		describe( 'should accept a type parameter to define the returned object type, but convert it to read-only', () => {
+			interface Context {
+				foo: string;
+				bar: {
+					baz: number;
+				};
+			}
+			const context = getServerContext< Context >();
+			// @ts-expect-error
+			context.nonExistent = 'error';
+			// @ts-expect-error
+			context.foo = 'error';
+			// @ts-expect-error
+			context.bar.baz = 1;
+			context.foo satisfies string;
+			context.bar.baz satisfies number;
 		} );
 	} );
 } );
