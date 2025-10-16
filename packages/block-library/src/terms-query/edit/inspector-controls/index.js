@@ -23,10 +23,10 @@ import AdvancedControls from './advanced-controls';
 
 export default function TermsQueryInspectorControls( {
 	attributes,
-	setQuery,
 	setAttributes,
 	clientId,
-	templateSlug,
+	context,
+	setQuery,
 } ) {
 	const { termQuery, tagName: TagName } = attributes;
 	const {
@@ -34,10 +34,11 @@ export default function TermsQueryInspectorControls( {
 		orderBy,
 		order,
 		hideEmpty,
-		inherit,
 		showNested,
 		perPage,
+		inherit,
 	} = termQuery;
+	const { postId, templateSlug } = context;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const taxonomies = usePublicTaxonomies();
@@ -51,19 +52,27 @@ export default function TermsQueryInspectorControls( {
 		taxonomy === 'post_tag' ? 'tag' : taxonomy
 	);
 
-	// Only display the inherit control if the taxonomy is hierarchical and matches the current template.
-	const displayInheritControl =
-		isTaxonomyHierarchical && isTaxonomyMatchingTemplate;
+	const isSinglePostContext =
+		!! postId || templateSlug?.startsWith( 'single' );
 
-	// Only display the showNested control if the taxonomy is hierarchical and not inheriting.
+	// Only display the inherit control if the taxonomy is hierarchical and matches the current template or a post is available.
+	const displayInheritControl =
+		( isTaxonomyHierarchical && isTaxonomyMatchingTemplate ) ||
+		isSinglePostContext;
+
+	// Only display the show nested control if the taxonomy is hierarchical and not inheriting.
 	const displayShowNestedControl =
-		isTaxonomyHierarchical && ! termQuery.inherit;
+		isTaxonomyHierarchical && termQuery.parent === false;
+
+	const inheritingFromPost = inherit && isSinglePostContext;
 
 	// Labels shared between ToolsPanelItem and its child control.
 	const taxonomyControlLabel = __( 'Taxonomy' );
 	const orderByControlLabel = __( 'Order by' );
 	const emptyTermsControlLabel = __( 'Show empty terms' );
-	const inheritControlLabel = __( 'Inherit parent term from archive' );
+	const inheritControlLabel = isSinglePostContext
+		? __( 'Inherit terms from post' )
+		: __( 'Inherit parent term from archive' );
 	const nestedTermsControlLabel = __( 'Show nested terms' );
 	const maxTermsControlLabel = __( 'Max terms' );
 
@@ -134,6 +143,14 @@ export default function TermsQueryInspectorControls( {
 							onChange={ ( value ) =>
 								setQuery( { hideEmpty: value } )
 							}
+							disabled={ inheritingFromPost }
+							help={
+								inheritingFromPost
+									? __(
+											'When inheriting terms from a post, empty terms are not shown.'
+									  )
+									: undefined
+							}
 						/>
 					</ToolsPanelItem>
 					{ displayInheritControl && (
@@ -146,7 +163,22 @@ export default function TermsQueryInspectorControls( {
 							<InheritControl
 								label={ inheritControlLabel }
 								value={ inherit }
-								onChange={ setQuery }
+								onChange={ ( value ) => {
+									setQuery( {
+										inherit: value,
+										// When enabling inherit, showNested is not supported for posts.
+										...( value
+											? {
+													showNested:
+														! isSinglePostContext,
+											  }
+											: {} ),
+										// If inheriting from a post, hideEmpty is irrelevant but UI should reflect that no empty terms should be shown.
+										...( value && isSinglePostContext
+											? { hideEmpty: true }
+											: {} ),
+									} );
+								} }
 							/>
 						</ToolsPanelItem>
 					) }

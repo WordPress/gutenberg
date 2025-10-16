@@ -80,9 +80,10 @@ export default function TermTemplateEdit( {
 			orderBy,
 			hideEmpty,
 			showNested = false,
-			parent = 0,
 			perPage,
+			inherit = false,
 		} = {},
+		postId,
 	},
 	__unstableLayoutClassNames,
 } ) {
@@ -96,10 +97,16 @@ export default function TermTemplateEdit( {
 		per_page: perPage,
 	};
 
+	if ( inherit ) {
+		if ( postId ) {
+			queryArgs.post = postId;
+		}
+	}
+
 	// Nested terms are returned by default from REST API as long as parent is not set.
 	// If we want to show nested terms, we must not set parent at all.
-	if ( parent || ! showNested ) {
-		queryArgs.parent = parent || 0;
+	if ( ! showNested && ! inherit ) {
+		queryArgs.parent = 0;
 	}
 
 	const { records: terms } = useEntityRecords(

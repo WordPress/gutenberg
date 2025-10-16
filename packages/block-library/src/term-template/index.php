@@ -42,17 +42,21 @@ function render_block_core_term_template( $attributes, $content, $block ) {
 	if (
 		isset( $query['inherit'] )
 		&& $query['inherit']
-		&& (
+	) {
+		// Check for post context to get terms attached to that post.
+		if ( isset( $block->context['postId'] ) ) {
+			$query_args['object_ids'] = $block->context['postId'];
+		} elseif (
 			is_tax( $query_args['taxonomy'] )
 			// is_tax() does not detect built-in category or tag archives, only custom taxonomies.
 			|| ( 'category' === $query_args['taxonomy'] && is_category() )
 			|| ( 'post_tag' === $query_args['taxonomy'] && is_tag() )
-		)
-	) {
-		// Get the current term ID from the queried object.
-		$current_term_id      = get_queried_object_id();
-		$query_args['parent'] = $current_term_id;
-	} elseif ( empty( $query['showNested'] ) ) {
+		) {
+			// Get the current term ID from the queried object.
+			$current_term_id      = get_queried_object_id();
+			$query_args['parent'] = $current_term_id;
+		}
+	} elseif ( empty( $query['showNested'] ) && empty( $query['include'] ) ) {
 		$query_args['parent'] = 0;
 	}
 
