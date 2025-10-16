@@ -285,6 +285,11 @@ export const STYLE_BOOK_IFRAME_STYLES = `
 		color: color-mix( in srgb, currentColor 60%, transparent );
 	}
 
+	.edit-site-style-book__example-subtitle {
+		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+		font-size: 9px;
+	}
+
 	.edit-site-style-book__subcategory-title {
 		font-size: 16px;
 		margin-bottom: 40px;
