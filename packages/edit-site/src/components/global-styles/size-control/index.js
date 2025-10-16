@@ -60,6 +60,7 @@ function SizeControl( {
 						onChange={ handleUnitControlChange }
 						units={ units }
 						min={ 0 }
+						step={ isValueUnitRelative ? 0.001 : 1 }
 						disabled={ disabled }
 					/>
 				</FlexItem>
@@ -76,7 +77,7 @@ function SizeControl( {
 							onChange={ handleRangeControlChange }
 							min={ 0 }
 							max={ isValueUnitRelative ? 10 : 100 }
-							step={ isValueUnitRelative ? 0.1 : 1 }
+							step={ isValueUnitRelative ? 0.001 : 1 }
 							disabled={ disabled }
 						/>
 					</Spacer>
