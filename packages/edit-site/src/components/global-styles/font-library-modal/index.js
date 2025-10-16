@@ -59,6 +59,10 @@ function FontLibraryModal( {
 		tabs.push( ...tabsFromCollections( collections || [] ) );
 	}
 
+	const sortedTabs = [ ...tabs ].sort( ( a, b ) =>
+		a.title.localeCompare( b.title )
+	);
+
 	return (
 		<Modal
 			title={ __( 'Fonts' ) }
@@ -69,14 +73,14 @@ function FontLibraryModal( {
 			<Tabs defaultTabId={ defaultTabId }>
 				<div className="font-library-modal__tablist-container">
 					<Tabs.TabList>
-						{ tabs.map( ( { id, title } ) => (
+						{ sortedTabs.map( ( { id, title } ) => (
 							<Tabs.Tab key={ id } tabId={ id }>
 								{ title }
 							</Tabs.Tab>
 						) ) }
 					</Tabs.TabList>
 				</div>
-				{ tabs.map( ( { id } ) => {
+				{ sortedTabs.map( ( { id } ) => {
 					let contents;
 					switch ( id ) {
 						case 'upload-fonts':
