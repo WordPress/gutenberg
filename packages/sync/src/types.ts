@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import type { UndoManager as WPUndoManager } from '@wordpress/undo-manager';
+
+/**
  * External dependencies
  */
 import type * as Y from 'yjs';
@@ -83,6 +88,7 @@ export interface SyncManager {
 		record: ObjectData,
 		handlers: RecordHandlers
 	) => Promise< void >;
+	undoManager: SyncUndoManager;
 	unload: ( objectType: ObjectType, objectId: ObjectID ) => void;
 	update: (
 		objectType: ObjectType,
@@ -90,4 +96,8 @@ export interface SyncManager {
 		changes: Partial< ObjectData >,
 		origin: string
 	) => void;
+}
+
+export interface SyncUndoManager extends WPUndoManager< ObjectData > {
+	addToScope: ( ymap: Y.Map< any > ) => void;
 }
