@@ -1,0 +1,54 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "core/revision",
+	"title": "Revision",
+	"category": "theme",
+	"description": "Display the revision history",
+	"textdomain": "default",
+	"usesContext": [ "postId", "postType" ],
+	"attributes": {
+		"showTotalCount": {
+			"type": "boolean",
+			"default": true
+		},
+		"showRevisionHistory": {
+			"type": "boolean",
+			"default": true
+		},
+		"revisionLimit": {
+			"type": "integer",
+			"default": 10
+		}
+	},
+	"icon": "backup",
+	"supports": {
+		"align": [ "wide", "full" ],
+		"html": false,
+		"spacing": {
+			"margin": true,
+			"padding": true
+		},
+		"color": {
+			"gradients": true,
+			"text": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		}
+	}
+}
