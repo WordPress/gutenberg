@@ -51,6 +51,29 @@
 		"src/*/editor.scss",
 		"src/*/theme.scss"
 	],
+	"wpCopyFiles": {
+		"files": [
+			"src/**/*.php",
+			"src/*/block.json"
+		],
+		"transforms": {
+			"php": {
+				"functionPrefix": "gutenberg_",
+				"classSuffix": "_Gutenberg",
+				"prefixFunctions": [
+					"wp_apply_colors_support",
+					"wp_enqueue_block_support_styles",
+					"wp_get_typography_font_size_value",
+					"wp_style_engine_get_styles",
+					"wp_get_global_settings"
+				],
+				"suffixClasses": [
+					"WP_Navigation_Block_Renderer"
+				],
+				"addActionPriority": 20
+			}
+		}
+	},
 	"sideEffects": [
 		"build-style/**",
 		"src/**/*.scss",

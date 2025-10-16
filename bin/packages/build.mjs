@@ -94,6 +94,52 @@ function normalizePath( p ) {
 	return p.replace( /\\/g, '/' );
 }
 
+function transformPhpContent( content, transforms ) {
+	const {
+		functionPrefix = '',
+		classSuffix = '',
+		prefixFunctions = [],
+		suffixClasses = [],
+		addActionPriority,
+	} = transforms;
+
+	content = content.toString();
+
+	if ( prefixFunctions.length ) {
+		content = content.replace(
+			new RegExp( prefixFunctions.join( '|' ), 'g' ),
+			( match ) => `${ functionPrefix }${ match.replace( /^wp_/, '' ) }`
+		);
+	}
+
+	if ( suffixClasses.length ) {
+		content = content.replace(
+			new RegExp( suffixClasses.join( '|' ), 'g' ),
+			( match ) => `${ match }${ classSuffix }`
+		);
+	}
+
+	if ( functionPrefix ) {
+		content = Array.from(
+			content.matchAll( /^\s*function ([^\(]+)/gm )
+		).reduce( ( result, [ , functionName ] ) => {
+			return result.replace(
+				new RegExp( functionName + '(?![a-zA-Z0-9_])', 'g' ),
+				( match ) => functionPrefix + match.replace( /^wp_/, '' )
+			);
+		}, content );
+	}
+
+	if ( addActionPriority ) {
+		content = content.replace(
+			/(add_action\(\s*'init',\s*'gutenberg_register_block_[^']+'(?!,))/,
+			`$1, ${ addActionPriority }`
+		);
+	}
+
+	return content;
+}
+
 /**
  * Convert kebab-case to camelCase.
  *
@@ -597,66 +643,102 @@ async function bundlePackage( packageName ) {
 		}
 	}
 
-	// Process CSS files from build-style to build directory (for wpScript packages)
 	if ( packageJson.wpScript ) {
 		const buildStyleDir = path.join( packageDir, 'build-style' );
 		const outputDir = path.join( PACKAGES_DIR, '..', 'build', packageName );
 		const isProduction = process.env.NODE_ENV === 'production';
 
-		try {
-			// Find CSS files in build-style directory (including subdirectories)
-			const cssFiles = await glob(
-				normalizePath( path.join( buildStyleDir, '**/*.css' ) )
+		const cssFiles = await glob(
+			normalizePath( path.join( buildStyleDir, '**/*.css' ) )
+		);
+
+		for ( const cssFile of cssFiles ) {
+			const relativePath = path.relative( buildStyleDir, cssFile );
+			const destPath = path.join( outputDir, relativePath );
+			const destDir = path.dirname( destPath );
+
+			if ( isProduction ) {
+				builds.push(
+					( async () => {
+						await mkdir( destDir, { recursive: true } );
+						const content = await readFile( cssFile, 'utf8' );
+						const result = await postcss( [
+							cssnano( {
+								preset: [
+									'default',
+									{
+										discardComments: {
+											removeAll: true,
+										},
+									},
+								],
+							} ),
+						] ).process( content, {
+							from: cssFile,
+							to: destPath,
+						} );
+						await writeFile( destPath, result.css );
+					} )()
+				);
+			} else {
+				builds.push(
+					mkdir( destDir, { recursive: true } ).then( () =>
+						copyFile( cssFile, destPath )
+					)
+				);
+			}
+		}
+	}
+
+	if ( packageJson.wpCopyFiles ) {
+		const { files, transforms = {} } = packageJson.wpCopyFiles;
+		const sourceDir = path.join( packageDir, 'src' );
+		const outputDir = path.join( PACKAGES_DIR, '..', 'build', packageName );
+
+		for ( const filePattern of files ) {
+			const matchedFiles = await glob(
+				normalizePath( path.join( packageDir, filePattern ) )
 			);
 
-			if ( cssFiles.length > 0 ) {
-				// Process each CSS file
-				for ( const cssFile of cssFiles ) {
-					// Calculate relative path from build-style to preserve directory structure
-					const relativePath = path.relative( buildStyleDir, cssFile );
-					const destPath = path.join( outputDir, relativePath );
-					const destDir = path.dirname( destPath );
+			for ( const sourceFile of matchedFiles ) {
+				const relativePath = path.relative( sourceDir, sourceFile );
+				const destPath = path.join( outputDir, relativePath );
+				const destDir = path.dirname( destPath );
 
-					if ( isProduction ) {
-						// In production, minify CSS with cssnano
-						builds.push(
-							( async () => {
-								// Ensure destination directory exists
-								await mkdir( destDir, { recursive: true } );
-								const cssContent = await readFile(
-									cssFile,
-									'utf8'
+				if ( sourceFile.endsWith( '.php' ) && transforms.php ) {
+					builds.push(
+						( async () => {
+							await mkdir( destDir, { recursive: true } );
+							const content = await readFile(
+								sourceFile,
+								'utf8'
+							);
+							const transformed = transformPhpContent(
+								content,
+								transforms.php
+							);
+
+							let finalPath = destPath;
+							if ( transforms.php.filenameSuffix ) {
+								const ext = path.extname( destPath );
+								const base = path.basename( destPath, ext );
+								finalPath = path.join(
+									destDir,
+									`${ base }${ transforms.php.filenameSuffix }${ ext }`
 								);
-								const result = await postcss( [
-									cssnano( {
-										preset: [
-											'default',
-											{
-												discardComments: {
-													removeAll: true,
-												},
-											},
-										],
-									} ),
-								] ).process( cssContent, {
-									from: cssFile,
-									to: destPath,
-								} );
-								await writeFile( destPath, result.css );
-							} )()
-						);
-					} else {
-						// In development, just copy the file
-						builds.push(
-							mkdir( destDir, { recursive: true } ).then( () =>
-								copyFile( cssFile, destPath )
-							)
-						);
-					}
+							}
+
+							await writeFile( finalPath, transformed );
+						} )()
+					);
+				} else {
+					builds.push(
+						mkdir( destDir, { recursive: true } ).then( () =>
+							copyFile( sourceFile, destPath )
+						)
+					);
 				}
 			}
-		} catch ( error ) {
-			// build-style doesn't exist or is empty - that's fine, not all packages have styles
 		}
 	}
 
@@ -903,7 +985,7 @@ function isPackageSourceFile( filename ) {
 		path.relative( process.cwd(), filename )
 	);
 
-	if ( ! /\/src\/.+\.(js|ts|tsx|scss)$/.test( relativePath ) ) {
+	if ( ! /\/src\/.+/.test( relativePath ) ) {
 		return false;
 	}
 
