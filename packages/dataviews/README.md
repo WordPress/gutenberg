@@ -697,6 +697,54 @@ return (
 );
 ```
 
+### validity
+
+Object that determines the validation status of each field. There's a `useFormValidity` hook that can be used to create the validity object — see the utility below. This section documents the `validity` object in case you want to create it via other means.
+
+The top-level props of the `validity` object are the field IDs. Fields declare their validity status for each of the validation rules supported: `required`, `elements`, `custom`. If a rule is valid, it should not be present in the object; if a field is valid for all the rules, it should not be present in the object either.
+
+For example:
+
+```json
+{
+  "title": {
+    "required": {
+      "type": "invalid"
+    }
+  },
+  "author": {
+    "elements": {
+      "type": "invalid",
+      "message": "Value must be one of the elements."
+    }
+  },
+  "publisher": {
+    "custom": {
+      "type": "validating",
+      "message": "Validating..."
+    }
+  },
+  "isbn": {
+    "custom": {
+      "type": "valid",
+      "message": "Valid."
+    }
+  }
+}
+```
+
+Each rule, can have a `type` and a `message`.
+
+The `message` is the text to be displayed in the UI controls. The message for the `required` rule is optional, and the built-in browser message will be used if not provided.
+
+The `type` can be:
+
+- `validating`: when the value is being validated (e.g., custom async rule)
+- `invalid`: when the value is invalid according to the rule
+- `valid`: when the value _became_ valid after having been invalid (e.g., custom async rule)
+
+Note the `valid` status. This is useful for displaying a "Valid." message when the field transitions from invalid to valid.  The `useFormValidity` hook implements this only for the custom async validation.
+
 ## Utilities
 
 ### `filterSortAndPaginate`
@@ -718,7 +766,7 @@ Returns an object containing:
 
 ### `useFormValidity`
 
-Hook to determine if a form is valid.
+Hook to determine the form validation status.
 
 Parameters:
 
@@ -729,7 +777,7 @@ Parameters:
 Returns an object containing:
 
 -   `isValid`: a boolean indicating if the form is valid.
--   `validity`: an object containing the errors. Each property is a field ID, containing a description of each error type. For example:
+-   `validity`: an object containing the errors. Each property is a field ID, containing a description of each error type. See `validity` prop for more info. For example:
 
 ```js
 {
@@ -749,14 +797,6 @@ Returns an object containing:
 	}
 }
 ```
-
-The type of each error can be:
-
-- `invalid`: when it's invalid
-- `valid`: when the value became valid after being invalid
-- `validating`: when the value is being validated
-
-The message will be displayed in the UI controls. The message for the `required` and `elements` rules is optional, and the built-in message will be used if not provided.
 
 ## Actions API
 
