@@ -4,3 +4,9 @@
 .dataviews-action-modal {
 	z-index: z-index(".dataviews-action-modal");
 }
+
+.dataviews-item-actions {
+	.components-button.is-link {
+		white-space: nowrap;
+	}
+}
