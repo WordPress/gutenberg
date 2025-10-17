@@ -18,6 +18,18 @@ add_action(
 			foreach ( $block_json_files as $block_json_file ) {
 				register_block_type( $block_json_file );
 			}
+
+			// Manually register script modules for navigation tests.
+			$test_router_script_modules = array(
+				'test-router-script-modules-alpha-view-script-module',
+				'test-router-script-modules-bravo-view-script-module',
+				'test-router-script-modules-charlie-view-script-module',
+				'test-router-script-modules-wrapper-view-script-module',
+			);
+
+			foreach ( $test_router_script_modules as $module_id ) {
+				gutenberg_register_interactive_script_module_id( $module_id );
+			}
 		}
 
 		/*

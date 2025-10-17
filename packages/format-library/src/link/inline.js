@@ -29,12 +29,28 @@ import { useDispatch, useSelect } from '@wordpress/data';
  */
 import { createLinkFormat, isValidHref, getFormatBoundary } from './utils';
 import { link as settings } from './index';
+import CSSClassesSettingComponent from './css-classes-setting';
+
+// CSSClassesSettingComponent moved to its own file and imported above.
 
 const LINK_SETTINGS = [
 	...LinkControl.DEFAULT_LINK_SETTINGS,
 	{
 		id: 'nofollow',
 		title: __( 'Mark as nofollow' ),
+	},
+	{
+		id: 'cssClasses',
+		title: __( 'Additional CSS class(es)' ),
+		render: ( setting, value, onChange ) => {
+			return (
+				<CSSClassesSettingComponent
+					setting={ setting }
+					value={ value }
+					onChange={ onChange }
+				/>
+			);
+		},
 	},
 ];
 
@@ -78,8 +94,10 @@ function InlineLinkUI( {
 			opensInNewTab: activeAttributes.target === '_blank',
 			nofollow: activeAttributes.rel?.includes( 'nofollow' ),
 			title: richTextText,
+			cssClasses: activeAttributes.class,
 		} ),
 		[
+			activeAttributes.class,
 			activeAttributes.id,
 			activeAttributes.rel,
 			activeAttributes.target,
@@ -116,6 +134,7 @@ function InlineLinkUI( {
 					: undefined,
 			opensInNewWindow: nextValue.opensInNewTab,
 			nofollow: nextValue.nofollow,
+			cssClasses: nextValue.cssClasses,
 		} );
 
 		const newText = nextValue.title || newUrl;

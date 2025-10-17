@@ -13,10 +13,9 @@ This page lists the blocks included in the block-library package.
 Displays a group of accordion headings and associated expandable content. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion))
 
 -	**Name:** core/accordion
--	**Experimental:** true
 -	**Category:** design
 -	**Allowed Blocks:** core/accordion-item
--	**Supports:** align (full, wide), background (backgroundImage, backgroundSize), color (background, gradients, text), interactivity, layout, shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), anchor, ariaLabel, background (backgroundImage, backgroundSize), color (background, gradients, text), contentRole, interactivity, layout, shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** autoclose, headingLevel, iconPosition, levelOptions, showIcon
 
 ## Accordion Heading
@@ -24,10 +23,9 @@ Displays a group of accordion headings and associated expandable content. ([Sour
 Displays an accordion heading. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion-heading))
 
 -	**Name:** core/accordion-heading
--	**Experimental:** true
 -	**Category:** design
 -	**Parent:** core/accordion-item
--	**Supports:** anchor, color (background, gradients, text), interactivity, shadow, spacing (padding), typography (fontSize), ~~align~~, ~~blockVisibility~~
+-	**Supports:** anchor, color (background, gradients, text), interactivity, shadow, spacing (padding), typography (fontSize), ~~align~~, ~~blockVisibility~~, ~~lock~~
 -	**Attributes:** iconPosition, level, openByDefault, showIcon, title
 
 ## Accordion Item
@@ -35,11 +33,10 @@ Displays an accordion heading. ([Source](https://github.com/WordPress/gutenberg/
 Displays a section of content in an accordion, including a heading and expandable content. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion-item))
 
 -	**Name:** core/accordion-item
--	**Experimental:** true
 -	**Category:** design
 -	**Parent:** core/accordion
 -	**Allowed Blocks:** core/accordion-heading, core/accordion-panel
--	**Supports:** color (background, gradients, text), interactivity, layout, shadow, spacing (blockGap, margin), typography (fontSize, lineHeight)
+-	**Supports:** color (background, gradients, text), contentRole, interactivity, layout (~~allowEditing~~), shadow, spacing (blockGap, margin), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** openByDefault
 
 ## Accordion Panel
@@ -47,11 +44,10 @@ Displays a section of content in an accordion, including a heading and expandabl
 Displays an accordion panel. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion-panel))
 
 -	**Name:** core/accordion-panel
--	**Experimental:** true
 -	**Category:** design
 -	**Parent:** core/accordion-item
--	**Supports:** color (background, gradients, text), interactivity, layout, shadow, spacing (blockGap, padding), typography (fontSize, lineHeight), ~~blockVisibility~~
--	**Attributes:** allowedBlocks, isSelected, openByDefault, templateLock
+-	**Supports:** allowedBlocks, color (background, gradients, text), contentRole, interactivity, layout (~~allowEditing~~), shadow, spacing (blockGap, padding), typography (fontSize, lineHeight), ~~blockVisibility~~, ~~html~~, ~~lock~~
+-	**Attributes:** isSelected, openByDefault, templateLock
 
 ## Archives
 
@@ -86,8 +82,18 @@ Reuse this design across your site. ([Source](https://github.com/WordPress/guten
 
 -	**Name:** core/block
 -	**Category:** reusable
--	**Supports:** interactivity (clientNavigation), ~~blockVisibility~~, ~~customClassName~~, ~~html~~, ~~inserter~~, ~~renaming~~
+-	**Supports:** interactivity (clientNavigation), ~~customClassName~~, ~~html~~, ~~inserter~~, ~~renaming~~
 -	**Attributes:** content, ref
+
+## Breadcrumbs
+
+Display a breadcrumb trail for hierarchical post types or based on taxonomy terms. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/breadcrumbs))
+
+-	**Name:** core/breadcrumbs
+-	**Experimental:** true
+-	**Category:** theme
+-	**Supports:** color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Attributes:** separator, showHomeLink, type
 
 ## Button
 
@@ -142,8 +148,8 @@ A single column within a columns block. ([Source](https://github.com/WordPress/g
 -	**Name:** core/column
 -	**Category:** design
 -	**Parent:** core/columns
--	**Supports:** anchor, color (background, button, gradients, heading, link, text), interactivity (clientNavigation), layout, shadow, spacing (blockGap, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:** allowedBlocks, templateLock, verticalAlignment, width
+-	**Supports:** allowedBlocks, anchor, color (background, button, gradients, heading, link, text), interactivity (clientNavigation), layout, shadow, spacing (blockGap, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Attributes:** templateLock, verticalAlignment, width
 
 ## Columns
 
@@ -290,8 +296,8 @@ Add an image or video with a text overlay. ([Source](https://github.com/WordPres
 
 -	**Name:** core/cover
 -	**Category:** media
--	**Supports:** align, anchor, color (heading, text, ~~background~~, ~~enableContrastChecker~~), dimensions (aspectRatio), filter (duotone), interactivity (clientNavigation), layout (~~allowJustification~~), shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** allowedBlocks, alt, backgroundType, contentPosition, customGradient, customOverlayColor, dimRatio, focalPoint, gradient, hasParallax, id, isDark, isRepeated, isUserOverlayColor, minHeight, minHeightUnit, overlayColor, poster, sizeSlug, tagName, templateLock, url, useFeaturedImage
+-	**Supports:** align, allowedBlocks, anchor, color (heading, text, ~~background~~, ~~enableContrastChecker~~), dimensions (aspectRatio), filter (duotone), interactivity (clientNavigation), layout (~~allowJustification~~), shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Attributes:** alt, backgroundType, contentPosition, customGradient, customOverlayColor, dimRatio, focalPoint, gradient, hasParallax, id, isDark, isRepeated, isUserOverlayColor, minHeight, minHeightUnit, overlayColor, poster, sizeSlug, tagName, templateLock, url, useFeaturedImage
 
 ## Details
 
@@ -299,8 +305,8 @@ Hide and show additional content. ([Source](https://github.com/WordPress/gutenbe
 
 -	**Name:** core/details
 -	**Category:** text
--	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), layout (~~allowEditing~~), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** allowedBlocks, name, placeholder, showContent, summary
+-	**Supports:** align (full, wide), allowedBlocks, anchor, color (background, gradients, link, text), interactivity (clientNavigation), layout (~~allowEditing~~), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Attributes:** name, placeholder, showContent, summary
 
 ## Embed
 
@@ -387,7 +393,7 @@ Display multiple images in a rich gallery. ([Source](https://github.com/WordPres
 -	**Category:** media
 -	**Allowed Blocks:** core/image
 -	**Supports:** align, anchor, color (background, gradients, ~~text~~), interactivity (clientNavigation), layout (default, ~~allowEditing~~, ~~allowInheriting~~, ~~allowSwitching~~), spacing (blockGap, margin, padding), units (em, px, rem, vh, vw), ~~html~~
--	**Attributes:** allowResize, caption, columns, fixedHeight, ids, imageCrop, images, linkTarget, linkTo, randomOrder, shortCodeTransforms, sizeSlug
+-	**Attributes:** allowResize, aspectRatio, caption, columns, fixedHeight, ids, imageCrop, images, linkTarget, linkTo, randomOrder, shortCodeTransforms, sizeSlug
 
 ## Group
 
@@ -395,8 +401,8 @@ Gather blocks in a layout container. ([Source](https://github.com/WordPress/gute
 
 -	**Name:** core/group
 -	**Category:** design
--	**Supports:** align (full, wide), anchor, ariaLabel, background (backgroundImage, backgroundSize), color (background, button, gradients, heading, link, text), dimensions (minHeight), interactivity (clientNavigation), layout (allowSizingOnChildren), position (sticky), shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** allowedBlocks, tagName, templateLock
+-	**Supports:** align (full, wide), allowedBlocks, anchor, ariaLabel, background (backgroundImage, backgroundSize), color (background, button, gradients, heading, link, text), dimensions (minHeight), interactivity (clientNavigation), layout (allowSizingOnChildren), position (sticky), shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Attributes:** tagName, templateLock
 
 ## Heading
 
@@ -404,7 +410,7 @@ Introduce new sections and organize content to help visitors (and search engines
 
 -	**Name:** core/heading
 -	**Category:** text
--	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, className, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fontSize, lineHeight)
+-	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, className, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fitText, fontSize, lineHeight)
 -	**Attributes:** content, level, levelOptions, placeholder, textAlign
 
 ## Home Link
@@ -483,14 +489,22 @@ Show login & logout links. ([Source](https://github.com/WordPress/gutenberg/tree
 -	**Supports:** className, color (background, gradients, link, ~~text~~), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight)
 -	**Attributes:** displayLoginAsForm, redirectToCurrent
 
+## Math
+
+Display mathematical notation using LaTeX. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/math))
+
+-	**Name:** core/math
+-	**Category:** text
+-	**Attributes:** latex, mathML
+
 ## Media & Text
 
 Set media and words side-by-side for a richer layout. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/media-text))
 
 -	**Name:** core/media-text
 -	**Category:** media
--	**Supports:** align (full, wide), anchor, color (background, gradients, heading, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** align, allowedBlocks, focalPoint, href, imageFill, isStackedOnMobile, linkClass, linkDestination, linkTarget, mediaAlt, mediaId, mediaLink, mediaPosition, mediaSizeSlug, mediaType, mediaUrl, mediaWidth, rel, useFeaturedImage, verticalAlignment
+-	**Supports:** align (full, wide), allowedBlocks, anchor, color (background, gradients, heading, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Attributes:** align, focalPoint, href, imageFill, isStackedOnMobile, linkClass, linkDestination, linkTarget, mediaAlt, mediaId, mediaLink, mediaPosition, mediaSizeSlug, mediaType, mediaUrl, mediaWidth, rel, useFeaturedImage, verticalAlignment
 
 ## Unsupported
 
@@ -576,7 +590,7 @@ Start with the basic building block of all narrative. ([Source](https://github.c
 
 -	**Name:** core/paragraph
 -	**Category:** text
--	**Supports:** __unstablePasteTextInline, anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fontSize, lineHeight), ~~className~~
+-	**Supports:** __unstablePasteTextInline, anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fitText, fontSize, lineHeight), ~~className~~
 -	**Attributes:** align, content, direction, dropCap, placeholder
 
 ## Pattern Placeholder
@@ -659,7 +673,7 @@ Displays the contents of a post or page. ([Source](https://github.com/WordPress/
 
 -	**Name:** core/post-content
 -	**Category:** theme
--	**Supports:** align (full, wide), background (backgroundImage, backgroundSize), color (background, gradients, heading, link, text), dimensions (minHeight), layout, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), background (backgroundImage, backgroundSize), color (background, gradients, heading, link, text), dimensions (minHeight), interactivity (clientNavigation), layout, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** tagName
 
 ## Date
@@ -721,7 +735,6 @@ Post terms. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages
 Show minutes required to finish reading the post. Can also show a word count. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-time-to-read))
 
 -	**Name:** core/post-time-to-read
--	**Experimental:** true
 -	**Category:** theme
 -	**Supports:** color (background, gradients, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** averageReadingSpeed, displayAsRange, displayMode, textAlign
@@ -837,7 +850,7 @@ Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Ju
 
 -	**Name:** core/quote
 -	**Category:** text
--	**Supports:** align (full, left, right, wide), anchor, background (backgroundImage, backgroundSize), color (background, gradients, heading, link, text), dimensions (minHeight), interactivity (clientNavigation), layout (~~allowEditing~~), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, left, right, wide), allowedBlocks, anchor, background (backgroundImage, backgroundSize), color (background, gradients, heading, link, text), dimensions (minHeight), interactivity (clientNavigation), layout (~~allowEditing~~), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** citation, textAlign, value
 
 ## Read More
@@ -975,8 +988,17 @@ Edit the different global regions of your site, like the header, footer, sidebar
 
 -	**Name:** core/template-part
 -	**Category:** theme
--	**Supports:** align, interactivity (clientNavigation), ~~blockVisibility~~, ~~html~~, ~~renaming~~, ~~reusable~~
+-	**Supports:** align, interactivity (clientNavigation), ~~html~~, ~~renaming~~, ~~reusable~~
 -	**Attributes:** area, slug, tagName, theme
+
+## Term Count
+
+Displays the post count of a taxonomy term. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/term-count))
+
+-	**Name:** core/term-count
+-	**Category:** theme
+-	**Supports:** color (background, gradients, text), interactivity (clientNavigation), spacing (padding), typography (fontSize, lineHeight), ~~html~~
+-	**Attributes:** bracketType
 
 ## Term Description
 
@@ -987,27 +1009,32 @@ Display the description of categories, tags and custom taxonomies when viewing a
 -	**Supports:** align (full, wide), color (background, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** textAlign
 
+## Term Name
+
+Displays the name of a taxonomy term. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/term-name))
+
+-	**Name:** core/term-name
+-	**Category:** theme
+-	**Supports:** align (full, wide), color (background, gradients, link, text), interactivity (clientNavigation), spacing (padding), typography (fontSize, lineHeight), ~~html~~
+-	**Attributes:** isLink, level, textAlign
+
 ## Term Template
 
 Contains the block elements used to render a taxonomy term, like the name, description, and more. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/term-template))
 
 -	**Name:** core/term-template
--	**Experimental:** true
 -	**Category:** theme
 -	**Ancestor:** core/terms-query
--	**Supports:** align (full, wide), color (background, gradients, link, text), interactivity (clientNavigation), layout (allowEditing, allowSwitching, default), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:** namespace
+-	**Supports:** align (full, wide), color (background, gradients, link, text), interactivity (clientNavigation), layout, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 
 ## Terms Query
 
 An advanced block that allows displaying taxonomy terms based on different query parameters and visual configurations. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/terms-query))
 
 -	**Name:** core/terms-query
--	**Experimental:** true
 -	**Category:** theme
--	**Allowed Blocks:** core/term-template
--	**Supports:** align (full, wide), interactivity, ~~html~~
--	**Attributes:** namespace, tagName, termQuery, termQueryId, termsToShow
+-	**Supports:** align (full, wide), interactivity, layout, ~~html~~
+-	**Attributes:** tagName, termQuery
 
 ## Text Columns (deprecated)
 

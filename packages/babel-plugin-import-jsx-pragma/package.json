@@ -31,6 +31,10 @@
 		"index.js"
 	],
 	"main": "index.js",
+	"exports": {
+		".": "./index.js",
+		"./package.json": "./package.json"
+	},
 	"peerDependencies": {
 		"@babel/core": "^7.25.7"
 	},

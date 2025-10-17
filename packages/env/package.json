@@ -32,6 +32,11 @@
 		"lib"
 	],
 	"main": "lib/env.js",
+	"exports": {
+		".": "./lib/env.js",
+		"./lib/cli.js": "./lib/cli.js",
+		"./package.json": "./package.json"
+	},
 	"bin": {
 		"wp-env": "bin/wp-env"
 	},

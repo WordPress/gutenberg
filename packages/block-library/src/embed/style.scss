@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/breakpoints" as *;
+@use "@wordpress/base-styles/mixins" as *;
+
 // Apply max-width to floated items that have no intrinsic width
 .wp-block[data-align="left"] > [data-type="core/embed"],
 .wp-block[data-align="right"] > [data-type="core/embed"],

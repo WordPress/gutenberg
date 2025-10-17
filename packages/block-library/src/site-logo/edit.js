@@ -77,12 +77,7 @@ const SiteLogo = ( {
 
 	// Check if we're in contentOnly mode
 	const blockEditingMode = useBlockEditingMode();
-	const isNavigationMode = useSelect(
-		( select ) => select( blockEditorStore ).isNavigationMode(),
-		[]
-	);
 	const isContentOnlyMode = blockEditingMode === 'contentOnly';
-	const isContentOnlyWriteMode = isNavigationMode && isContentOnlyMode;
 
 	const { imageEditing, maxWidth, title } = useSelect( ( select ) => {
 		const settings = select( blockEditorStore ).getSettings();
@@ -217,7 +212,7 @@ const SiteLogo = ( {
 		logoId && naturalWidth && naturalHeight && imageEditing;
 
 	// Hide crop and dimensions editing in write mode
-	const shouldShowCropAndDimensions = ! isContentOnlyWriteMode;
+	const shouldShowCropAndDimensions = ! isContentOnlyMode;
 
 	let imgEdit;
 	if ( canEditImage && isEditingImage ) {

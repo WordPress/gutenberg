@@ -25,13 +25,22 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.js",
+			"default": "./build/index.js"
+		},
+		"./package.json": "./package.json"
+	},
 	"react-native": "src/index",
 	"wpScript": true,
 	"dependencies": {
-		"@babel/runtime": "7.25.7",
 		"@react-spring/web": "^9.4.5",
 		"@wordpress/a11y": "file:../a11y",
+		"@wordpress/admin-ui": "file:../admin-ui",
 		"@wordpress/api-fetch": "file:../api-fetch",
+		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/blob": "file:../blob",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/block-library": "file:../block-library",
@@ -67,6 +76,7 @@
 		"@wordpress/style-engine": "file:../style-engine",
 		"@wordpress/url": "file:../url",
 		"@wordpress/viewport": "file:../viewport",
+		"@wordpress/views": "file:../views",
 		"@wordpress/widgets": "file:../widgets",
 		"@wordpress/wordcount": "file:../wordcount",
 		"change-case": "^4.1.2",

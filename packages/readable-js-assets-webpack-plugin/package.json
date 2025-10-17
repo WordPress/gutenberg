@@ -28,6 +28,10 @@
 		"index.js"
 	],
 	"main": "index.js",
+	"exports": {
+		".": "./index.js",
+		"./package.json": "./package.json"
+	},
 	"peerDependencies": {
 		"webpack": "^4.8.3 || ^5.0.0"
 	},

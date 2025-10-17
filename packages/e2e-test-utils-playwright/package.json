@@ -29,6 +29,10 @@
 		"build-types"
 	],
 	"main": "./build/index.js",
+	"exports": {
+		".": "./build/index.js",
+		"./package.json": "./package.json"
+	},
 	"types": "./build-types",
 	"dependencies": {
 		"change-case": "^4.1.2",

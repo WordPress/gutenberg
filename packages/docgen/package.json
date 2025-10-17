@@ -27,6 +27,9 @@
 		"bin",
 		"lib"
 	],
+	"exports": {
+		"./package.json": "./package.json"
+	},
 	"bin": {
 		"docgen": "./bin/cli.js"
 	},

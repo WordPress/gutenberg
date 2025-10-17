@@ -27,6 +27,12 @@
 		"lib"
 	],
 	"main": "index.js",
+	"exports": {
+		".": {
+			"default": "./index.js"
+		},
+		"./package.json": "./package.json"
+	},
 	"bin": {
 		"wp-create-block": "./index.js"
 	},

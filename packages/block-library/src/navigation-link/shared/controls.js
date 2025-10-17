@@ -4,20 +4,58 @@
 import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalInputControl as InputControl,
+	Button,
 	CheckboxControl,
 	TextControl,
 	TextareaControl,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useRef } from '@wordpress/element';
+import { useInstanceId } from '@wordpress/compose';
 import { safeDecodeURI } from '@wordpress/url';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
+import { linkOff as unlinkIcon } from '@wordpress/icons';
+import { useDispatch } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
-import { updateAttributes } from '../update-attributes';
+import { updateAttributes } from './update-attributes';
+import { useEntityBinding } from './use-entity-binding';
+
+/**
+ * Get a human-readable entity type name.
+ *
+ * @param {string} type - The entity type
+ * @param {string} kind - The entity kind
+ * @return {string} Human-readable entity type name
+ */
+function getEntityTypeName( type, kind ) {
+	if ( kind === 'post-type' ) {
+		switch ( type ) {
+			case 'post':
+				return __( 'post' );
+			case 'page':
+				return __( 'page' );
+			default:
+				return type || __( 'post' );
+		}
+	}
+	if ( kind === 'taxonomy' ) {
+		switch ( type ) {
+			case 'category':
+				return __( 'category' );
+			case 'tag':
+				return __( 'tag' );
+			default:
+				return type || __( 'term' );
+		}
+	}
+	return type || __( 'item' );
+}
 
 /**
  * Shared Controls component for Navigation Link and Navigation Submenu blocks.
@@ -25,19 +63,38 @@ import { updateAttributes } from '../update-attributes';
  * This component provides the inspector controls (ToolsPanel) that are identical
  * between both navigation blocks.
  *
- * @param {Object}   props                     - Component props
- * @param {Object}   props.attributes          - Block attributes
- * @param {Function} props.setAttributes       - Function to update block attributes
- * @param {Function} props.setIsEditingControl - Function to set editing state (optional)
+ * @param {Object}   props               - Component props
+ * @param {Object}   props.attributes    - Block attributes
+ * @param {Function} props.setAttributes - Function to update block attributes
+ * @param {string}   props.clientId      - Block client ID
  */
-export function Controls( {
-	attributes,
-	setAttributes,
-	setIsEditingControl = () => {},
-} ) {
+export function Controls( { attributes, setAttributes, clientId } ) {
 	const { label, url, description, rel, opensInNewTab } = attributes;
 	const lastURLRef = useRef( url );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+	const inputId = useInstanceId( Controls, 'link-input' );
+	const helpTextId = `${ inputId }__help`;
+
+	// Use the entity binding hook internally
+	const { hasUrlBinding, clearBinding } = useEntityBinding( {
+		clientId,
+		attributes,
+	} );
+
+	// Get direct store dispatch to bypass setBoundAttributes wrapper
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+
+	const editBoundLink = () => {
+		// Clear the binding first
+		clearBinding();
+
+		// Use direct store dispatch to bypass block bindings safeguards
+		// which prevent updates to bound attributes when calling setAttributes.
+		// setAttributes is actually setBoundAttributes, a wrapper function that
+		// processes attributes through the binding system.
+		// See: packages/block-editor/src/components/block-edit/edit.js
+		updateBlockAttributes( clientId, { url: '', id: undefined } );
+	};
 
 	return (
 		<ToolsPanel
@@ -68,8 +125,6 @@ export function Controls( {
 						setAttributes( { label: labelValue } );
 					} }
 					autoComplete="off"
-					onFocus={ () => setIsEditingControl( true ) }
-					onBlur={ () => setIsEditingControl( false ) }
 				/>
 			</ToolsPanelItem>
 
@@ -79,31 +134,60 @@ export function Controls( {
 				onDeselect={ () => setAttributes( { url: '' } ) }
 				isShownByDefault
 			>
-				<TextControl
+				<InputControl
 					__nextHasNoMarginBottom
 					__next40pxDefaultSize
+					id={ inputId }
 					label={ __( 'Link' ) }
 					value={ url ? safeDecodeURI( url ) : '' }
 					onChange={ ( urlValue ) => {
+						if ( hasUrlBinding ) {
+							return; // Prevent editing when URL is bound
+						}
 						setAttributes( {
 							url: encodeURI( safeDecodeURI( urlValue ) ),
 						} );
 					} }
 					autoComplete="off"
 					type="url"
+					disabled={ hasUrlBinding }
 					onFocus={ () => {
+						if ( hasUrlBinding ) {
+							return;
+						}
 						lastURLRef.current = url;
-						setIsEditingControl( true );
 					} }
 					onBlur={ () => {
+						if ( hasUrlBinding ) {
+							return;
+						}
 						// Defer the updateAttributes call to ensure entity connection isn't severed by accident.
 						updateAttributes(
 							{ url: ! url ? lastURLRef.current : url },
 							setAttributes,
 							{ ...attributes, url: lastURLRef.current }
 						);
-						setIsEditingControl( false );
 					} }
+					help={
+						hasUrlBinding && (
+							<BindingHelpText
+								type={ attributes.type }
+								kind={ attributes.kind }
+							/>
+						)
+					}
+					suffix={
+						hasUrlBinding && (
+							<Button
+								icon={ unlinkIcon }
+								onClick={ editBoundLink }
+								aria-describedby={ helpTextId }
+								showTooltip
+								label={ __( 'Unsync and edit' ) }
+								__next40pxDefaultSize
+							/>
+						)
+					}
 				/>
 			</ToolsPanelItem>
 
@@ -163,5 +247,22 @@ export function Controls( {
 				/>
 			</ToolsPanelItem>
 		</ToolsPanel>
+	);
+}
+
+/**
+ * Component to display help text for bound URL attributes.
+ *
+ * @param {Object} props      - Component props
+ * @param {string} props.type - The entity type
+ * @param {string} props.kind - The entity kind
+ * @return {string} Help text for the bound URL
+ */
+function BindingHelpText( { type, kind } ) {
+	const entityType = getEntityTypeName( type, kind );
+	return sprintf(
+		/* translators: %s is the entity type (e.g., "page", "post", "category") */
+		__( 'Synced with the selected %s.' ),
+		entityType
 	);
 }

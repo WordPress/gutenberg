@@ -7,11 +7,30 @@ import { capitalCase, pascalCase } from 'change-case';
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
+import { __unstableSerializeAndClean, parse } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
-import { RichTextData } from '@wordpress/rich-text';
+
+/**
+ * Internal dependencies
+ */
+import {
+	applyPostChangesToCRDTDoc,
+	defaultApplyChangesToCRDTDoc,
+	defaultGetChangesFromCRDTDoc,
+	getPostChangesFromCRDTDoc,
+} from './utils/crdt';
 
 export const DEFAULT_ENTITY_KEY = 'id';
 const POST_RAW_ATTRIBUTES = [ 'title', 'excerpt', 'content' ];
+
+const blocksTransientEdits = {
+	blocks: {
+		read: ( record ) => parse( record.content?.raw ?? '' ),
+		write: ( record ) => ( {
+			content: __unstableSerializeAndClean( record.blocks ),
+		} ),
+	},
+};
 
 export const rootEntitiesConfig = [
 	{
@@ -40,24 +59,6 @@ export const rootEntitiesConfig = [
 		// The entity doesn't support selecting multiple records.
 		// The property is maintained for backward compatibility.
 		plural: '__unstableBases',
-		syncConfig: {
-			fetch: async () => {
-				return apiFetch( { path: '/' } );
-			},
-			applyChangesToDoc: ( doc, changes ) => {
-				const document = doc.getMap( 'document' );
-				Object.entries( changes ).forEach( ( [ key, value ] ) => {
-					if ( document.get( key ) !== value ) {
-						document.set( key, value );
-					}
-				} );
-			},
-			fromCRDTDoc: ( doc ) => {
-				return doc.getMap( 'document' ).toJSON();
-			},
-		},
-		syncObjectType: 'root/base',
-		getSyncObjectId: () => 'index',
 	},
 	{
 		label: __( 'Post Type' ),
@@ -67,26 +68,6 @@ export const rootEntitiesConfig = [
 		baseURL: '/wp/v2/types',
 		baseURLParams: { context: 'edit' },
 		plural: 'postTypes',
-		syncConfig: {
-			fetch: async ( id ) => {
-				return apiFetch( {
-					path: `/wp/v2/types/${ id }?context=edit`,
-				} );
-			},
-			applyChangesToDoc: ( doc, changes ) => {
-				const document = doc.getMap( 'document' );
-				Object.entries( changes ).forEach( ( [ key, value ] ) => {
-					if ( document.get( key ) !== value ) {
-						document.set( key, value );
-					}
-				} );
-			},
-			fromCRDTDoc: ( doc ) => {
-				return doc.getMap( 'document' ).toJSON();
-			},
-		},
-		syncObjectType: 'root/postType',
-		getSyncObjectId: ( id ) => id,
 	},
 	{
 		name: 'media',
@@ -276,29 +257,6 @@ export const prePersistPostType = ( persistedRecord, edits ) => {
 	return newEdits;
 };
 
-const serialisableBlocksCache = new WeakMap();
-
-function makeBlockAttributesSerializable( attributes ) {
-	const newAttributes = { ...attributes };
-	for ( const [ key, value ] of Object.entries( attributes ) ) {
-		if ( value instanceof RichTextData ) {
-			newAttributes[ key ] = value.valueOf();
-		}
-	}
-	return newAttributes;
-}
-
-function makeBlocksSerializable( blocks ) {
-	return blocks.map( ( block ) => {
-		const { innerBlocks, attributes, ...rest } = block;
-		return {
-			...rest,
-			attributes: makeBlockAttributesSerializable( attributes ),
-			innerBlocks: makeBlocksSerializable( innerBlocks ),
-		};
-	} );
-}
-
 /**
  * Returns the list of post type entities.
  *
@@ -313,6 +271,41 @@ async function loadPostTypeEntities() {
 			name
 		);
 		const namespace = postType?.rest_namespace ?? 'wp/v2';
+
+		/**
+		 * @type {import('@wordpress/sync').SyncConfig}
+		 */
+		const syncConfig = {
+			/**
+			 * Apply changes from the local editor to the local CRDT document so
+			 * that those changes can be synced to other peers (via the provider).
+			 *
+			 * @param {import('@wordpress/sync').CRDTDoc}               crdtDoc
+			 * @param {Partial< import('@wordpress/sync').ObjectData >} changes
+			 * @return {void}
+			 */
+			applyChangesToCRDTDoc: ( crdtDoc, changes ) =>
+				applyPostChangesToCRDTDoc( crdtDoc, changes, postType ),
+
+			/**
+			 * Extract changes from a CRDT document that can be used to update the
+			 * local editor state.
+			 *
+			 * @param {import('@wordpress/sync').CRDTDoc}    crdtDoc
+			 * @param {import('@wordpress/sync').ObjectData} editedRecord
+			 * @return {Partial< import('@wordpress/sync').ObjectData >} Changes to record
+			 */
+			getChangesFromCRDTDoc: ( crdtDoc, editedRecord ) =>
+				getPostChangesFromCRDTDoc( crdtDoc, editedRecord, postType ),
+
+			/**
+			 * Sync features supported by the entity.
+			 *
+			 * @type {Record< string, boolean >}
+			 */
+			supports: {},
+		};
+
 		return {
 			kind: 'postType',
 			baseURL: `/${ namespace }/${ postType.rest_base }`,
@@ -320,7 +313,7 @@ async function loadPostTypeEntities() {
 			name,
 			label: postType.name,
 			transientEdits: {
-				blocks: true,
+				...blocksTransientEdits,
 				selection: true,
 			},
 			mergedEdits: { meta: true },
@@ -333,40 +326,7 @@ async function loadPostTypeEntities() {
 					: String( record.id ) ),
 			__unstablePrePersist: isTemplate ? undefined : prePersistPostType,
 			__unstable_rest_base: postType.rest_base,
-			syncConfig: {
-				fetch: async ( id ) => {
-					return apiFetch( {
-						path: `/${ namespace }/${ postType.rest_base }/${ id }?context=edit`,
-					} );
-				},
-				applyChangesToDoc: ( doc, changes ) => {
-					const document = doc.getMap( 'document' );
-
-					Object.entries( changes ).forEach( ( [ key, value ] ) => {
-						if ( typeof value !== 'function' ) {
-							if ( key === 'blocks' ) {
-								if ( ! serialisableBlocksCache.has( value ) ) {
-									serialisableBlocksCache.set(
-										value,
-										makeBlocksSerializable( value )
-									);
-								}
-
-								value = serialisableBlocksCache.get( value );
-							}
-
-							if ( document.get( key ) !== value ) {
-								document.set( key, value );
-							}
-						}
-					} );
-				},
-				fromCRDTDoc: ( doc ) => {
-					return doc.getMap( 'document' ).toJSON();
-				},
-			},
-			syncObjectType: 'postType/' + postType.name,
-			getSyncObjectId: ( id ) => id,
+			syncConfig,
 			supportsPagination: true,
 			getRevisionsUrl: ( parentId, revisionId ) =>
 				`/${ namespace }/${
@@ -414,23 +374,9 @@ async function loadSiteEntity() {
 		kind: 'root',
 		baseURL: '/wp/v2/settings',
 		syncConfig: {
-			fetch: async () => {
-				return apiFetch( { path: '/wp/v2/settings' } );
-			},
-			applyChangesToDoc: ( doc, changes ) => {
-				const document = doc.getMap( 'document' );
-				Object.entries( changes ).forEach( ( [ key, value ] ) => {
-					if ( document.get( key ) !== value ) {
-						document.set( key, value );
-					}
-				} );
-			},
-			fromCRDTDoc: ( doc ) => {
-				return doc.getMap( 'document' ).toJSON();
-			},
+			applyChangesToCRDTDoc: defaultApplyChangesToCRDTDoc,
+			getChangesFromCRDTDoc: defaultGetChangesFromCRDTDoc,
 		},
-		syncObjectType: 'root/site',
-		getSyncObjectId: () => 'index',
 		meta: {},
 	};
 

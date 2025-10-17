@@ -1,18 +1,12 @@
 /**
- * WordPress dependencies
- */
-import { __ } from '@wordpress/i18n';
-
-/**
  * Internal dependencies
  */
 import type {
 	DataViewRenderFieldProps,
 	SortDirection,
-	NormalizedField,
 	FieldTypeDefinition,
 } from '../types';
-import { renderFromElements } from '../utils';
+import RenderFromElements from './utils/render-from-elements';
 import {
 	OPERATOR_ON,
 	OPERATOR_NOT_ON,
@@ -34,23 +28,16 @@ function sort( a: any, b: any, direction: SortDirection ) {
 export default {
 	sort,
 	isValid: {
-		custom: ( item: any, field: NormalizedField< any > ) => {
-			const value = field.getValue( { item } );
-			if ( field?.elements ) {
-				const validValues = field.elements.map( ( f ) => f.value );
-				if ( ! validValues.includes( value ) ) {
-					return __( 'Value must be one of the elements.' );
-				}
-			}
-
-			return null;
-		},
+		elements: true,
+		custom: () => null,
 	},
 	Edit: 'datetime',
 	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
-		return field.elements
-			? renderFromElements( { item, field } )
-			: field.getValue( { item } );
+		return field.hasElements ? (
+			<RenderFromElements item={ item } field={ field } />
+		) : (
+			field.getValue( { item } )
+		);
 	},
 	enableSorting: true,
 	filterBy: {

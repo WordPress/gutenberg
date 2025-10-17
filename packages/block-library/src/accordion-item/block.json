@@ -5,10 +5,10 @@
 	"title": "Accordion Item",
 	"category": "design",
 	"description": "Displays a section of content in an accordion, including a heading and expandable content.",
-	"__experimental": true,
 	"parent": [ "core/accordion" ],
 	"allowedBlocks": [ "core/accordion-heading", "core/accordion-panel" ],
 	"supports": {
+		"html": false,
 		"color": {
 			"background": true,
 			"gradients": true
@@ -31,7 +31,9 @@
 			}
 		},
 		"shadow": true,
-		"layout": true,
+		"layout": {
+			"allowEditing": false
+			},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
@@ -44,7 +46,8 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
-		}
+		},
+		"contentRole": true
 	},
 	"attributes": {
 		"openByDefault": {
