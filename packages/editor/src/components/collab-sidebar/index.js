@@ -99,7 +99,7 @@ export default function CollabSidebar() {
 			select( blockEditorStore );
 		const clientId = getSelectedBlockClientId();
 		return clientId
-			? getBlockAttributes( clientId )?.metadata?.commentId
+			? getBlockAttributes( clientId )?.metadata?.noteId
 			: null;
 	}, [] );
 

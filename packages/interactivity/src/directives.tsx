@@ -278,7 +278,10 @@ export default () => {
 			props: { children },
 			context: inheritedContext,
 		} ) => {
-			const entries = context.filter( isDefaultDirectiveSuffix );
+			const entries = context
+				.filter( isDefaultDirectiveSuffix )
+				// Reverses entries to make the ones with unique IDs override the default one.
+				.reverse();
 
 			// Doesn't do anything if there are no default entries.
 			if ( ! entries.length ) {

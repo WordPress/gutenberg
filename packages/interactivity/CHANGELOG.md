@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+-   Change ordering of multiple `data-wp-context` directives in iAPI processing. ([#72395](https://github.com/WordPress/gutenberg/pull/72395))
 -   Handle client-server state synchronization scenarios for `getServerContext` and `getServerState`. ([#72381](https://github.com/WordPress/gutenberg/pull/72381))
 
 ## 6.32.0 (2025-10-01)

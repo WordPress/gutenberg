@@ -23,7 +23,7 @@ export function getTransformedMetadata(
 	const { supports } = getBlockType( newBlockName );
 
 	// The metadata properties that should be preserved after the transform.
-	const transformSupportedProps = [ 'commentId' ];
+	const transformSupportedProps = [ 'noteId' ];
 	// If there is a transform bindings callback, add the `id` and `bindings` properties.
 	if ( bindingsCallback ) {
 		transformSupportedProps.push( 'id', 'bindings' );
