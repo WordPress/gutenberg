@@ -9,6 +9,7 @@
 -   `SearchControl`: Normalize styles ([#72072](https://github.com/WordPress/gutenberg/pull/72072)).
 -   `Badge`: Avoid propagating text-decoration styles from ancestors into the component ([#72097](https://github.com/WordPress/gutenberg/pull/72097), [#72302](https://github.com/WordPress/gutenberg/pull/72302)).
 -   `CheckboxControl`, `RadioControl`, `ToggleControl` (`FormToggle`): Ensure elements are focused when clicked in Safari ([#72115](https://github.com/WordPress/gutenberg/pull/72115)).
+-   `Button`: update font weight to `500` ([#70787](https://github.com/WordPress/gutenberg/pull/70787)).
 
 ### Bug Fixes
 
@@ -103,10 +104,6 @@
 ### Breaking Changes
 
 -   `Icon`: Pass `size` prop value as `width`/`height` attributes when `icon` is a component that doesn't exactly match `SVG` ([#70756](https://github.com/WordPress/gutenberg/pull/70756)).
-
-### Enhancements
-
--   `Button`: update font weight to `500` ([#70787](https://github.com/WordPress/gutenberg/pull/70787)).
 
 ### Internal
 
