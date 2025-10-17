@@ -124,7 +124,7 @@ function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
 				if ( isEntityLink ) {
 					createBinding( updatedAttributes );
 				} else {
-					clearBinding( updatedAttributes );
+					clearBinding();
 				}
 
 				setInsertedBlock( null );
