@@ -141,12 +141,13 @@ test.describe( 'Fit Text', () => {
 				},
 			} );
 
-			// Wait for fit text to apply
-			await page.waitForTimeout( 500 );
-
 			const headingBlock = editor.canvas.locator(
 				'[data-type="core/heading"]'
 			);
+
+			// Wait for fit text to apply
+			await headingBlock.waitFor( { state: 'attached' } );
+			await expect( headingBlock ).toHaveClass( /has-fit-text/ );
 
 			const initialFontSize = await headingBlock.evaluate( ( el ) => {
 				return window.getComputedStyle( el ).fontSize;
@@ -159,8 +160,8 @@ test.describe( 'Fit Text', () => {
 				' that is much longer and should have smaller font'
 			);
 
-			// Wait for resize to apply
-			await page.waitForTimeout( 500 );
+			// Wait for DOM to update and fit text to recalculate
+			await headingBlock.waitFor( { state: 'attached' } );
 
 			const newFontSize = await headingBlock.evaluate( ( el ) => {
 				return window.getComputedStyle( el ).fontSize;
@@ -193,11 +194,14 @@ test.describe( 'Fit Text', () => {
 				},
 			} );
 
-			// Wait for fit text to apply
-			await page.waitForTimeout( 500 );
-
 			const paragraphBlocks = editor.canvas.locator(
 				'[data-type="core/paragraph"]'
+			);
+
+			// Wait for fit text to apply
+			await paragraphBlocks.nth( 1 ).waitFor( { state: 'attached' } );
+			await expect( paragraphBlocks.nth( 1 ) ).toHaveClass(
+				/has-fit-text/
 			);
 
 			const normalFontSize = await paragraphBlocks
@@ -283,18 +287,19 @@ test.describe( 'Fit Text', () => {
 
 			const heading = page.locator( 'h2.has-fit-text' );
 
-			// Wait for fit text to initialize
-			await page.waitForTimeout( 500 );
+			// Wait for fit text to initialize (verify frontend script ran)
+			await heading.waitFor( { state: 'attached' } );
+			await expect( heading ).toHaveAttribute( 'data-fit-text-id', /.+/ );
 
 			await page.setViewportSize( { width: 1280, height: 720 } );
-			await page.waitForTimeout( 500 );
+			await heading.waitFor( { state: 'attached' } );
 
 			const initialFontSize = await heading.evaluate( ( el ) => {
 				return window.getComputedStyle( el ).fontSize;
 			} );
 
 			await page.setViewportSize( { width: 640, height: 720 } );
-			await page.waitForTimeout( 500 );
+			await heading.waitFor( { state: 'attached' } );
 
 			const newFontSize = await heading.evaluate( ( el ) => {
 				return window.getComputedStyle( el ).fontSize;
@@ -336,8 +341,14 @@ test.describe( 'Fit Text', () => {
 			await page.goto( postUrl );
 			await page.waitForLoadState( 'networkidle' );
 
-			// Wait for fit text to initialize
-			await page.waitForTimeout( 500 );
+			const fitTextParagraph = page.locator( 'p.has-fit-text' );
+
+			// Wait for fit text to initialize (verify frontend script ran)
+			await fitTextParagraph.waitFor( { state: 'visible' } );
+			await expect( fitTextParagraph ).toHaveAttribute(
+				'data-fit-text-id',
+				/.+/
+			);
 
 			const paragraphs = page.locator( 'p' );
 
@@ -347,7 +358,6 @@ test.describe( 'Fit Text', () => {
 					return window.getComputedStyle( el ).fontSize;
 				} );
 
-			const fitTextParagraph = page.locator( 'p.has-fit-text' );
 			const fitTextFontSize = await fitTextParagraph.evaluate( ( el ) => {
 				return window.getComputedStyle( el ).fontSize;
 			} );
