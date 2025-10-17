@@ -285,7 +285,7 @@ export const parseServerData = ( dom = document ) => {
 export const populateServerData = ( data?: {
 	state?: Record< string, unknown >;
 	config?: Record< string, unknown >;
-	derivedStatePropsAccessed?: Record< string, string[] >;
+	derivedStateClosures?: Record< string, string[] >;
 } ) => {
 	// Resets all the previous server states and configs.
 	serverStates.clear();
@@ -303,8 +303,8 @@ export const populateServerData = ( data?: {
 			storeConfigs.set( namespace, config );
 		} );
 	}
-	if ( isPlainObject( data?.derivedStatePropsAccessed ) ) {
-		Object.entries( data!.derivedStatePropsAccessed ).forEach(
+	if ( isPlainObject( data?.derivedStateClosures ) ) {
+		Object.entries( data!.derivedStateClosures ).forEach(
 			( [ namespace, paths ] ) => {
 				const st = store< any >(
 					namespace,

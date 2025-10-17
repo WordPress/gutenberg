@@ -56,7 +56,7 @@ add_filter(
 		if ( ! isset( $data ) ) {
 			$data = array();
 		}
-		$data['derivedStatePropsAccessed'] = array(
+		$data['derivedStateClosures'] = array(
 			'test/deferred-store/derived-state' => array(
 				'state.value',
 				'state.below10',
