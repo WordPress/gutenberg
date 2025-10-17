@@ -14,13 +14,20 @@ const toposort = require( 'toposort' );
 
 const PACKAGES_DIR = path.resolve( __dirname, '../../packages' );
 
+// Cache for package.json data
+const packageJsonCache = new Map();
+
 /**
- * Get WordPress package dependencies from a package.json file.
+ * Get package.json info for a WordPress package.
  *
- * @param {string} packageName The name of the package.
- * @return {string[]} Array of WordPress package names this package depends on.
+ * @param {string} packageName The package name.
+ * @return {Object|null} Package.json object or null if not found.
  */
-function getWordPressDependencies( packageName ) {
+function getPackageInfo( packageName ) {
+	if ( packageJsonCache.has( packageName ) ) {
+		return packageJsonCache.get( packageName );
+	}
+
 	const packageJsonPath = path.join(
 		PACKAGES_DIR,
 		packageName,
@@ -31,16 +38,47 @@ function getWordPressDependencies( packageName ) {
 		const packageJson = JSON.parse(
 			fs.readFileSync( packageJsonPath, 'utf8' )
 		);
-		const deps = packageJson.dependencies || {};
-
-		// Extract @wordpress/* package names (without @wordpress/ prefix)
-		return Object.keys( deps )
-			.filter( ( dep ) => dep.startsWith( '@wordpress/' ) )
-			.map( ( dep ) => dep.replace( '@wordpress/', '' ) );
+		packageJsonCache.set( packageName, packageJson );
+		return packageJson;
 	} catch ( error ) {
-		// If package.json doesn't exist or can't be read, return empty array
+		packageJsonCache.set( packageName, null );
+		return null;
+	}
+}
+
+/**
+ * Check if a package is a script or script module.
+ * A package is a script if it has wpScript or wpScriptModuleExports.
+ *
+ * @param {string} packageName The package name.
+ * @return {boolean} True if the package is a script or script module.
+ */
+function isScriptOrModule( packageName ) {
+	const packageJson = getPackageInfo( packageName );
+	if ( ! packageJson ) {
+		return false;
+	}
+	return !! ( packageJson.wpScript || packageJson.wpScriptModuleExports );
+}
+
+/**
+ * Get WordPress package dependencies from a package.json file.
+ *
+ * @param {string} packageName The name of the package.
+ * @return {string[]} Array of WordPress package names this package depends on.
+ */
+function getWordPressDependencies( packageName ) {
+	const packageJson = getPackageInfo( packageName );
+	if ( ! packageJson ) {
 		return [];
 	}
+
+	const deps = packageJson.dependencies || {};
+
+	// Extract @wordpress/* package names (without @wordpress/ prefix)
+	return Object.keys( deps )
+		.filter( ( dep ) => dep.startsWith( '@wordpress/' ) )
+		.map( ( dep ) => dep.replace( '@wordpress/', '' ) );
 }
 
 /**
@@ -172,9 +210,92 @@ function groupByDepth( packages ) {
 	return levels;
 }
 
+/**
+ * Get packages that depend on a given package (reverse dependencies).
+ *
+ * @param {string}   packageName The package to find dependents of.
+ * @param {string[]} allPackages Array of all package names to search.
+ * @return {string[]} Array of package names that depend on the given package.
+ */
+function getReverseDependencies( packageName, allPackages ) {
+	const dependents = [];
+
+	for ( const pkg of allPackages ) {
+		const deps = getWordPressDependencies( pkg );
+		if ( deps.includes( packageName ) ) {
+			dependents.push( pkg );
+		}
+	}
+
+	return dependents;
+}
+
+/**
+ * Find scripts/script-modules that need to be rebundled when a bundled package changes.
+ * Uses BFS to traverse reverse dependencies, stopping at script/module boundaries.
+ *
+ * When a bundled package (no wpScript/wpScriptModuleExports) changes, we need to
+ * rebundle any scripts/modules that depend on it through a chain of bundled packages.
+ * We stop at script/module boundaries because they handle their own bundling.
+ *
+ * Example:
+ * - A (bundled) changes
+ * - B (bundled) depends on A
+ * - C (script) depends on B
+ * - D (script) depends on C
+ * Result: Only C needs rebundling (D stops at C boundary)
+ *
+ * @param {string}   changedPackage The bundled package that changed.
+ * @param {string[]} allPackages    Array of all package names.
+ * @return {string[]} Array of script/module package names to rebundle.
+ */
+function findScriptsToRebundle( changedPackage, allPackages ) {
+	// If the changed package itself is a script/module, no need to find others
+	// (it will be rebuilt by the regular watch logic)
+	if ( isScriptOrModule( changedPackage ) ) {
+		return [];
+	}
+
+	const scriptsToRebundle = new Set();
+	const visited = new Set();
+	const queue = [ changedPackage ];
+
+	while ( queue.length > 0 ) {
+		const currentPackage = queue.shift();
+
+		if ( visited.has( currentPackage ) ) {
+			continue;
+		}
+		visited.add( currentPackage );
+
+		// Get all packages that depend on the current package
+		const dependents = getReverseDependencies(
+			currentPackage,
+			allPackages
+		);
+
+		for ( const dependent of dependents ) {
+			// If this dependent is a script/module, add it to the result
+			// but don't traverse further (stop at script boundaries)
+			if ( isScriptOrModule( dependent ) ) {
+				scriptsToRebundle.add( dependent );
+			} else if ( ! visited.has( dependent ) ) {
+				// If it's a bundled package, continue traversing
+				queue.push( dependent );
+			}
+		}
+	}
+
+	return Array.from( scriptsToRebundle );
+}
+
 module.exports = {
 	getWordPressDependencies,
 	buildDependencyGraph,
 	topologicalSort,
 	groupByDepth,
+	getPackageInfo,
+	isScriptOrModule,
+	getReverseDependencies,
+	findScriptsToRebundle,
 };
