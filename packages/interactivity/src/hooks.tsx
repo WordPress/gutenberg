@@ -258,9 +258,7 @@ export const getEvaluate: GetEvaluate =
 			}
 			// Reset scope before return and wrap the function so it will still run within the correct scope.
 			resetScope();
-			const wrappedFunction: SyncAwareFunction = (
-				...functionArgs: any[]
-			) => {
+			const wrappedFunction: Function = ( ...functionArgs: any[] ) => {
 				setScope( scope );
 				const functionResult = value( ...functionArgs );
 				resetScope();
@@ -268,7 +266,8 @@ export const getEvaluate: GetEvaluate =
 			};
 			// Preserve the sync property from the original function
 			if ( value.sync ) {
-				wrappedFunction.sync = true;
+				const syncAwareFunction = wrappedFunction as SyncAwareFunction;
+				syncAwareFunction.sync = true;
 			}
 			return wrappedFunction;
 		}
