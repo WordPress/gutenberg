@@ -77,7 +77,6 @@ function ButtonTrigger< Item >( {
 			accessibleWhenDisabled
 			size="compact"
 			onClick={ onClick }
-			variant="link"
 		>
 			{ label }
 		</Button>
@@ -186,7 +185,7 @@ export default function ItemActions< Item >( {
 
 	return (
 		<HStack
-			spacing={ 5 }
+			spacing={ 0 }
 			justify="flex-end"
 			className="dataviews-item-actions"
 			style={ {

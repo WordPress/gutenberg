@@ -5,20 +5,3 @@
 .dataviews-action-modal {
 	z-index: z-index(".dataviews-action-modal");
 }
-
-.dataviews-item-actions {
-	.components-button.is-link {
-		padding-left: $grid-unit-10;
-		padding-right: $grid-unit-10;
-		text-decoration: none;
-		font-weight: 600;
-		color: $gray-700;
-		white-space: nowrap;
-		&:hover:not(:disabled) {
-			color: var(--wp-admin-theme-color);
-		}
-		&:active:not(:disabled) {
-			color: $gray-900;
-		}
-	}
-}
