@@ -141,22 +141,14 @@ export function useBlockComments( postId ) {
 			);
 
 		// Append orphan notes (whose related block was deleted or missing).
-		const orphanUnresolvedComments = updatedResult.filter(
-			( thread ) =>
-				! mappedIds.has( String( thread.id ) ) &&
-				thread.status === 'hold'
-		);
-		const orphanResolvedComments = updatedResult.filter(
-			( thread ) =>
-				! mappedIds.has( String( thread.id ) ) &&
-				thread.status === 'approved'
+		const orphanComments = updatedResult.filter(
+			( thread ) => ! mappedIds.has( String( thread.id ) )
 		);
 
 		const allSortedComments = [
 			...unresolvedSortedComments,
 			...resolvedSortedComments,
-			...orphanUnresolvedComments,
-			...orphanResolvedComments,
+			...orphanComments,
 		];
 
 		return {
