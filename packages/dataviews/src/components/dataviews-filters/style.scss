@@ -44,7 +44,7 @@
 	padding: $grid-unit-10 $grid-unit-20;
 
 	&:has(+ .dataviews-filters__search-widget-listbox),
-	&:has(+ .dataviews-filters__search-widget-loading),
+	&:has(+ .dataviews-filters__search-widget-no-elements),
 	&:has(+ .dataviews-filters__user-input-widget) {
 		border-bottom: 1px solid $gray-200;
 	}
@@ -407,7 +407,7 @@
 	}
 }
 
-.dataviews-filters__search-widget-loading {
+.dataviews-filters__search-widget-no-elements {
 	display: flex;
 	align-items: center;
 	justify-content: center;

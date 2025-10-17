@@ -342,7 +342,7 @@ export default function SearchWidget( props: SearchWidgetProps ) {
 
 	if ( isLoading ) {
 		return (
-			<div className="dataviews-filters__search-widget-loading">
+			<div className="dataviews-filters__search-widget-no-elements">
 				<Spinner />
 			</div>
 		);
@@ -350,7 +350,7 @@ export default function SearchWidget( props: SearchWidgetProps ) {
 
 	if ( elements.length === 0 ) {
 		return (
-			<div className="dataviews-filters__search-widget-loading">
+			<div className="dataviews-filters__search-widget-no-elements">
 				{ __( 'No elements found' ) }
 			</div>
 		);
