@@ -31,7 +31,6 @@ export const useSetActiveTemplateAction = () => {
 					? __( 'Deactivate' )
 					: __( 'Activate' );
 			},
-			isPrimary: true,
 			icon: pencil,
 			isEligible( item ) {
 				return (
