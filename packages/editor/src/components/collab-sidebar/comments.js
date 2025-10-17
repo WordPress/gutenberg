@@ -247,24 +247,17 @@ export function Comments( {
 	const hasThreads = Array.isArray( threads ) && threads.length > 0;
 	if ( ! hasThreads ) {
 		return (
-			<VStack
-				alignment="left"
-				className="editor-collab-sidebar-panel__thread"
-				justify="flex-start"
-				spacing="3"
-			>
-				{ __( 'No notes available.' ) }
+			<VStack alignment="left" justify="flex-start" spacing="2">
+				<Text as="p">{ __( 'No notes available.' ) }</Text>
+				<Text as="p" variant="muted">
+					{ __( 'Only logged in users can see Notes.' ) }
+				</Text>
 			</VStack>
 		);
 	}
 
 	return (
 		<VStack spacing="3">
-			{ ! isFloating && (
-				<Text as="p" variant="muted">
-					{ __( 'Only logged in users can see Notes' ) }
-				</Text>
-			) }
 			{ threads.map( ( thread ) => (
 				<Thread
 					key={ thread.id }
