@@ -86,8 +86,7 @@ function CollabSidebarContent( {
 export default function CollabSidebar() {
 	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
-	const { enableComplementaryArea, disableComplementaryArea } =
-		useDispatch( interfaceStore );
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const commentSidebarRef = useRef( null );
 
@@ -132,28 +131,19 @@ export default function CollabSidebar() {
 		return null;
 	}
 
-	async function openTheSidebar( newNotesArea ) {
-		const currentActiveArea = await getActiveComplementaryArea( 'core' );
+	async function openTheSidebar() {
+		const prevArea = await getActiveComplementaryArea( 'core' );
+		const activeNotesArea = SIDEBARS.find( ( name ) => name === prevArea );
 
-		const activeNotesArea = SIDEBARS.find(
-			( name ) => name === currentActiveArea
-		);
-
+		// If the notes sidebar is not already active, enable the pinned sidebar.
 		if ( ! activeNotesArea ) {
-			// If the notes sidebar is not already active, enable the notes sidebar.
-			// Default to the floating notes sidebar.
-			enableComplementaryArea(
-				'core',
-				newNotesArea || collabSidebarName
-			);
-		} else if (
-			activeNotesArea &&
-			newNotesArea &&
-			activeNotesArea !== newNotesArea
-		) {
-			// If the current notes sidebar is not the one we want to open, disable it and enable the new one.
-			disableComplementaryArea( 'core', activeNotesArea );
-			enableComplementaryArea( 'core', newNotesArea );
+			enableComplementaryArea( 'core', collabSidebarName );
+		}
+
+		const currentArea = await getActiveComplementaryArea( 'core' );
+		// Bail out if the current active area is not one of note sidebars.
+		if ( ! SIDEBARS.includes( currentArea ) ) {
+			return;
 		}
 
 		setShowCommentBoard( ! blockCommentId );
@@ -171,10 +161,10 @@ export default function CollabSidebar() {
 				<CommentAvatarIndicator
 					thread={ currentThread }
 					hasMoreComments={ hasMoreComments }
-					onClick={ () => openTheSidebar() }
+					onClick={ openTheSidebar }
 				/>
 			) }
-			<AddCommentMenuItem onClick={ () => openTheSidebar() } />
+			<AddCommentMenuItem onClick={ openTheSidebar } />
 			<PluginSidebar
 				identifier={ collabHistorySidebarName }
 				title={ __( 'Notes' ) }
@@ -216,7 +206,9 @@ export default function CollabSidebar() {
 				) }
 			<PluginMoreMenuItem
 				icon={ commentIcon }
-				onClick={ () => openTheSidebar( collabHistorySidebarName ) }
+				onClick={ () =>
+					enableComplementaryArea( 'core', collabHistorySidebarName )
+				}
 			>
 				{ __( 'Notes' ) }
 			</PluginMoreMenuItem>
