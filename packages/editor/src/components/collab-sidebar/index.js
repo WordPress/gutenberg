@@ -48,12 +48,13 @@ function CollabSidebarContent( {
 			style={ styles }
 			role="list"
 			spacing="3"
+			justify="flex-start"
 			ref={ ( node ) => {
 				// Keeps the ref fresh when switching between floating and pinned sidebar.
 				commentSidebarRef.current = node;
 			} }
 		>
-			{ ! isFloating && (
+			{ ( ! isFloating || ( isFloating && showCommentBoard ) ) && (
 				<AddComment
 					onSubmit={ onCreate }
 					showCommentBoard={ showCommentBoard }
@@ -83,7 +84,8 @@ function CollabSidebarContent( {
 export default function CollabSidebar() {
 	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
-	const { enableComplementaryArea } = useDispatch( interfaceStore );
+	const { enableComplementaryArea, disableComplementaryArea } =
+		useDispatch( interfaceStore );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const commentSidebarRef = useRef( null );
 
@@ -129,23 +131,31 @@ export default function CollabSidebar() {
 	}
 
 	async function openTheSidebar() {
-		enableComplementaryArea( 'core', collabHistorySidebarName );
 		const activeArea = await getActiveComplementaryArea( 'core' );
 
-		// Move focus to the target element after the sidebar has opened.
-		if (
-			[ collabHistorySidebarName, collabSidebarName ].includes(
-				activeArea
-			)
-		) {
-			setShowCommentBoard( ! blockCommentId );
-			focusCommentThread(
-				blockCommentId,
-				commentSidebarRef.current,
-				// Focus a comment thread when there's a selected block with a comment.
-				! blockCommentId ? 'textarea' : undefined
-			);
+		// If adding a new comment, handle sidebar logic based on what's currently open.
+		if ( ! blockCommentId ) {
+			setShowCommentBoard( true );
+
+			// If Notes sidebar is already open, keep it open.
+			if ( activeArea === collabHistorySidebarName ) {
+				// Notes sidebar is open, keep it open and show floating form.
+				return;
+			}
+
+			// If any other sidebar is open (like Page sidebar), close it to make room for floating sidebar.
+			if ( activeArea && activeArea !== collabHistorySidebarName ) {
+				disableComplementaryArea( 'core' );
+				enableComplementaryArea( 'core', collabSidebarName );
+			}
+
+			return;
 		}
+
+		// Otherwise, open the sidebar as usual.
+		enableComplementaryArea( 'core', collabHistorySidebarName );
+		setShowCommentBoard( false );
+		focusCommentThread( blockCommentId, commentSidebarRef.current );
 	}
 
 	return (
@@ -173,29 +183,30 @@ export default function CollabSidebar() {
 					commentLastUpdated={ commentLastUpdated }
 				/>
 			</PluginSidebar>
-			{ isLargeViewport && unresolvedSortedThreads.length > 0 && (
-				<PluginSidebar
-					isPinnable={ false }
-					header={ false }
-					identifier={ collabSidebarName }
-					className="editor-collab-sidebar"
-					headerClassName="editor-collab-sidebar__header"
-					backgroundColor={ backgroundColor }
-				>
-					<CollabSidebarContent
-						comments={ unresolvedSortedThreads }
-						showCommentBoard={ showCommentBoard }
-						setShowCommentBoard={ setShowCommentBoard }
-						commentSidebarRef={ commentSidebarRef }
-						reflowComments={ reflowComments }
-						commentLastUpdated={ commentLastUpdated }
-						styles={ {
-							backgroundColor,
-						} }
-						isFloating
-					/>
-				</PluginSidebar>
-			) }
+			{ isLargeViewport &&
+				( unresolvedSortedThreads.length > 0 || showCommentBoard ) && (
+					<PluginSidebar
+						isPinnable={ false }
+						header={ false }
+						identifier={ collabSidebarName }
+						className="editor-collab-sidebar"
+						headerClassName="editor-collab-sidebar__header"
+						backgroundColor={ backgroundColor }
+					>
+						<CollabSidebarContent
+							comments={ unresolvedSortedThreads }
+							showCommentBoard={ showCommentBoard }
+							setShowCommentBoard={ setShowCommentBoard }
+							commentSidebarRef={ commentSidebarRef }
+							reflowComments={ reflowComments }
+							commentLastUpdated={ commentLastUpdated }
+							styles={ {
+								backgroundColor,
+							} }
+							isFloating
+						/>
+					</PluginSidebar>
+				) }
 			<PluginMoreMenuItem icon={ commentIcon } onClick={ openTheSidebar }>
 				{ __( 'Notes' ) }
 			</PluginMoreMenuItem>
