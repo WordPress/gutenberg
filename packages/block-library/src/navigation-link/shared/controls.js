@@ -99,10 +99,10 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 	};
 
 	useEffect( () => {
-		if ( shouldFocusURLInputRef.current ) {
+		if ( ! hasUrlBinding && shouldFocusURLInputRef.current ) {
 			urlInputRef.current?.focus();
-			shouldFocusURLInputRef.current = false;
 		}
+		shouldFocusURLInputRef.current = false;
 	}, [ hasUrlBinding ] );
 
 	return (
