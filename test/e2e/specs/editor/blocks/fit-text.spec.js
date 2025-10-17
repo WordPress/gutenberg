@@ -23,15 +23,6 @@ test.describe( 'Fit Text', () => {
 
 			await editor.openDocumentSettingsSidebar();
 
-			// Open typography panel
-			const typographyButton = page
-				.getByRole( 'region', {
-					name: 'Editor settings',
-				} )
-				.getByRole( 'button', { name: 'Typography', exact: true } );
-
-			await typographyButton.click();
-
 			const fitTextToggle = page.getByRole( 'checkbox', {
 				name: 'Fit text',
 			} );
@@ -71,15 +62,6 @@ test.describe( 'Fit Text', () => {
 
 			await editor.openDocumentSettingsSidebar();
 
-			// Open typography panel
-			const typographyButton = page
-				.getByRole( 'region', {
-					name: 'Editor settings',
-				} )
-				.getByRole( 'button', { name: 'Typography', exact: true } );
-
-			await typographyButton.click();
-
 			const fitTextToggle = page.getByRole( 'checkbox', {
 				name: 'Fit text',
 			} );
@@ -102,15 +84,6 @@ test.describe( 'Fit Text', () => {
 			} );
 
 			await editor.openDocumentSettingsSidebar();
-
-			// Open typography panel
-			const typographyButton = page
-				.getByRole( 'region', {
-					name: 'Editor settings',
-				} )
-				.getByRole( 'button', { name: 'Typography', exact: true } );
-
-			await typographyButton.click();
 
 			const fitTextToggle = page.getByRole( 'checkbox', {
 				name: 'Fit text',
@@ -148,12 +121,12 @@ test.describe( 'Fit Text', () => {
 				},
 			} );
 
-			const headingBlock = editor.canvas.getByRole( 'document', {
-				name: 'Block: Heading',
-			} );
-
 			// Wait for fit text to apply
 			await page.waitForTimeout( 500 );
+
+			const headingBlock = editor.canvas.locator(
+				'[data-type="core/heading"]'
+			);
 
 			const initialFontSize = await headingBlock.evaluate( ( el ) => {
 				return window.getComputedStyle( el ).fontSize;
@@ -203,18 +176,18 @@ test.describe( 'Fit Text', () => {
 			// Wait for fit text to apply
 			await page.waitForTimeout( 500 );
 
-			const paragraphBlocks = editor.canvas.getByRole( 'document', {
-				name: 'Block: Paragraph',
-			} );
+			const paragraphBlocks = editor.canvas.locator(
+				'[data-type="core/paragraph"]'
+			);
 
 			const normalFontSize = await paragraphBlocks
-				.first()
+				.nth( 0 )
 				.evaluate( ( el ) => {
 					return window.getComputedStyle( el ).fontSize;
 				} );
 
 			const fitTextFontSize = await paragraphBlocks
-				.last()
+				.nth( 1 )
 				.evaluate( ( el ) => {
 					return window.getComputedStyle( el ).fontSize;
 				} );
@@ -244,9 +217,7 @@ test.describe( 'Fit Text', () => {
 			await editor.publishPost();
 
 			const postUrl = await page.evaluate( () =>
-				window.wp.data
-					.select( 'core/editor' )
-					.getPermalink()
+				window.wp.data.select( 'core/editor' ).getPermalink()
 			);
 
 			await page.goto( postUrl );
@@ -258,10 +229,7 @@ test.describe( 'Fit Text', () => {
 			await expect( heading ).toHaveClass( /has-fit-text/ );
 
 			// Verify data attribute is set (added by frontend script)
-			await expect( heading ).toHaveAttribute(
-				'data-fit-text-id',
-				/.+/
-			);
+			await expect( heading ).toHaveAttribute( 'data-fit-text-id', /.+/ );
 
 			const fontSize = await heading.evaluate( ( el ) => {
 				return window.getComputedStyle( el ).fontSize;
@@ -287,9 +255,7 @@ test.describe( 'Fit Text', () => {
 			await editor.publishPost();
 
 			const postUrl = await page.evaluate( () =>
-				window.wp.data
-					.select( 'core/editor' )
-					.getPermalink()
+				window.wp.data.select( 'core/editor' ).getPermalink()
 			);
 
 			await page.goto( postUrl );
@@ -344,9 +310,7 @@ test.describe( 'Fit Text', () => {
 			await editor.publishPost();
 
 			const postUrl = await page.evaluate( () =>
-				window.wp.data
-					.select( 'core/editor' )
-					.getPermalink()
+				window.wp.data.select( 'core/editor' ).getPermalink()
 			);
 
 			await page.goto( postUrl );
@@ -357,9 +321,11 @@ test.describe( 'Fit Text', () => {
 
 			const paragraphs = page.locator( 'p' );
 
-			const normalFontSize = await paragraphs.first().evaluate( ( el ) => {
-				return window.getComputedStyle( el ).fontSize;
-			} );
+			const normalFontSize = await paragraphs
+				.first()
+				.evaluate( ( el ) => {
+					return window.getComputedStyle( el ).fontSize;
+				} );
 
 			const fitTextParagraph = page.locator( 'p.has-fit-text' );
 			const fitTextFontSize = await fitTextParagraph.evaluate( ( el ) => {
