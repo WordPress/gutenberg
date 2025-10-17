@@ -145,6 +145,10 @@ _Returns_
 
 -   `Element`: Block Breadcrumb.
 
+### BlockCanvasCover
+
+Undocumented declaration.
+
 ### BlockColorsStyleSelector
 
 Undocumented declaration.
