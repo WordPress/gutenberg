@@ -176,7 +176,6 @@ test.describe( 'Fit Text', () => {
 
 		test( 'should apply much larger font size with fit text compared to without fit text for a short text', async ( {
 			editor,
-			page,
 		} ) => {
 			// Insert two paragraphs with same content for comparison
 			await editor.insertBlock( {
@@ -245,7 +244,6 @@ test.describe( 'Fit Text', () => {
 			);
 
 			await page.goto( postUrl );
-			await page.waitForLoadState( 'networkidle' );
 
 			const heading = page.locator( 'h2.has-fit-text' );
 
@@ -283,7 +281,6 @@ test.describe( 'Fit Text', () => {
 			);
 
 			await page.goto( postUrl );
-			await page.waitForLoadState( 'networkidle' );
 
 			const heading = page.locator( 'h2.has-fit-text' );
 
@@ -298,12 +295,12 @@ test.describe( 'Fit Text', () => {
 				return window.getComputedStyle( el ).fontSize;
 			} );
 
+			await page.setViewportSize( { width: 440, height: 720 } );
+			await heading.waitFor( { state: 'attached' } );
+
 			// Wait for fit text to recalculate (temporary solution while implementation uses 1000ms setTimeout)
 			// eslint-disable-next-line playwright/no-wait-for-timeout, no-restricted-syntax
 			await page.waitForTimeout( 1100 );
-
-			await page.setViewportSize( { width: 640, height: 720 } );
-			await heading.waitFor( { state: 'attached' } );
 
 			const newFontSize = await heading.evaluate( ( el ) => {
 				return window.getComputedStyle( el ).fontSize;
@@ -343,7 +340,6 @@ test.describe( 'Fit Text', () => {
 			);
 
 			await page.goto( postUrl );
-			await page.waitForLoadState( 'networkidle' );
 
 			const fitTextParagraph = page.locator( 'p.has-fit-text' );
 
