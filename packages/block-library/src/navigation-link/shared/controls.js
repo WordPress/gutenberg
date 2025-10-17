@@ -192,8 +192,8 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 								icon={ unlinkIcon }
 								onClick={ () => {
 									unsyncBoundLink();
-									// focus management to send focus to the URL input
-									// on next render after disabled state is removed
+									// Focus management to send focus to the URL input
+									// on next render after disabled state is removed.
 									shouldFocusURLInputRef.current = true;
 								} }
 								aria-describedby={ helpTextId }
