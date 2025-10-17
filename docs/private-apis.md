@@ -225,7 +225,6 @@ Private exports:
 - `CreatePatternModalContents`
 - `DuplicatePatternModal`
 - `isOverridableBlock`
-- `hasOverridableBlocks`
 - `useDuplicatePatternProps`
 - `RenamePatternModal`
 - `PatternsMenuItems`
@@ -239,7 +238,6 @@ Private exports:
 - `PATTERN_USER_CATEGORY`
 - `EXCLUDED_PATTERN_SOURCES`
 - `PATTERN_SYNC_TYPES`
-- `PARTIAL_SYNCING_SUPPORTED_BLOCKS`
 
 ### `core/patterns` store
 
