@@ -157,12 +157,23 @@ export function Comments( {
 			const selectedThreadTop = blockRect?.top || 0;
 			const selectedThreadHeight = heights[ selectedThreadData.id ] || 0;
 
-			offsets[ selectedThreadData.id ] = -16;
+			// Ensure the selected thread is not overlapping the sidebar bottom border,
+			// otherwise the user may not be able to add a reply.
+			let threadBottom = selectedThreadTop + selectedThreadHeight;
+			const sidebarHeight =
+				commentSidebarRef.current?.getBoundingClientRect().height || 0;
+			if ( threadBottom > sidebarHeight ) {
+				const offset = sidebarHeight - threadBottom - 36;
+				offsets[ selectedThreadData.id ] = offset;
+			} else {
+				offsets[ selectedThreadData.id ] = -16;
+			}
 
-			let previousThreadData = {
-				threadTop: selectedThreadTop - 16,
+			const selectedThreadPreviousData = {
+				threadTop: selectedThreadTop + offsets[ selectedThreadData.id ],
 				threadHeight: selectedThreadHeight,
 			};
+			let previousThreadData = { ...selectedThreadPreviousData };
 
 			// Process threads after the selected thread, offsetting any overlapping
 			// threads downward.
@@ -199,9 +210,7 @@ export function Comments( {
 
 			// Process threads before the selected thread, offsetting any overlapping
 			// threads upward.
-			let nextThreadData = {
-				threadTop: selectedThreadTop - 16,
-			};
+			let nextThreadData = { ...selectedThreadPreviousData };
 
 			for ( let i = selectedThreadIndex - 1; i >= 0; i-- ) {
 				const thread = threads[ i ];
@@ -217,7 +226,7 @@ export function Comments( {
 				let additionalOffset = -16;
 
 				// Calculate the bottom position of this thread with default offset.
-				const threadBottom = threadTop + threadHeight;
+				threadBottom = threadTop + threadHeight;
 
 				// Check if this thread's bottom would overlap with the next thread's top.
 				if ( threadBottom > nextThreadData.threadTop ) {
