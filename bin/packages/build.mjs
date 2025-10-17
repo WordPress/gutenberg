@@ -613,7 +613,10 @@ async function bundlePackage( packageName ) {
 				// Process each CSS file
 				for ( const cssFile of cssFiles ) {
 					// Calculate relative path from build-style to preserve directory structure
-					const relativePath = path.relative( buildStyleDir, cssFile );
+					const relativePath = path.relative(
+						buildStyleDir,
+						cssFile
+					);
 					const destPath = path.join( outputDir, relativePath );
 					const destDir = path.dirname( destPath );
 
@@ -992,43 +995,9 @@ async function buildAll() {
  * Watch mode for development.
  */
 async function watchMode() {
-	process.on( 'unhandledRejection', ( reason ) => {
-		console.error( '❌ Unhandled promise rejection:', reason );
-	} );
-
-	const packagesToRebuild = new Set();
-	const rebuilding = new Set();
-	let rebuildTimeoutId = null;
-
-	async function processRebuilds() {
-		for ( const packageName of packagesToRebuild ) {
-			if ( rebuilding.has( packageName ) ) {
-				continue;
-			}
-
-			rebuilding.add( packageName );
-
-			try {
-				const startTime = Date.now();
-
-				await transpilePackage( packageName );
-				await bundlePackage( packageName );
-
-				const buildTime = Date.now() - startTime;
-				console.log( `✅ ${ packageName } (${ buildTime }ms)` );
-			} catch ( error ) {
-				console.log(
-					`❌ ${ packageName } - Error: ${ error.message }`
-				);
-			} finally {
-				rebuilding.delete( packageName );
-			}
-		}
-
-		packagesToRebuild.clear();
-		rebuildTimeoutId = null;
-	}
-
+	// Suppress unhandled promise rejections in watch mode
+	// Prevents the process from crashing on errors
+	process.on( 'unhandledRejection', () => {} );
 	// Watch package source directories
 	const watchPaths = PACKAGES.map( ( packageName ) =>
 		path.join( PACKAGES_DIR, packageName, 'src' )
@@ -1065,7 +1034,7 @@ async function watchMode() {
 	} );
 
 	// Handle file changes, additions, and deletions
-	const handleFileChange = ( filename ) => {
+	const handleFileChange = async ( filename ) => {
 		if ( ! isPackageSourceFile( filename ) ) {
 			return;
 		}
@@ -1075,18 +1044,17 @@ async function watchMode() {
 			return;
 		}
 
-		packagesToRebuild.add( packageName );
+		try {
+			const startTime = Date.now();
 
-		// Only schedule a rebuild if one isn't already scheduled
-		if ( rebuildTimeoutId ) {
-			return;
+			await transpilePackage( packageName );
+			await bundlePackage( packageName );
+
+			const buildTime = Date.now() - startTime;
+			console.log( `✅ ${ packageName } (${ buildTime }ms)` );
+		} catch ( error ) {
+			console.error( `❌ ${ packageName } - Rebuild failed.` );
 		}
-
-		rebuildTimeoutId = setTimeout( () => {
-			processRebuilds().catch( ( error ) => {
-				console.error( '❌ Rebuild failed:', error.message );
-			} );
-		}, 100 );
 	};
 
 	watcher.on( 'change', handleFileChange );
@@ -1108,17 +1076,10 @@ async function main() {
 		},
 	} );
 
+	await buildAll();
 	if ( values.watch ) {
-		try {
-			await buildAll();
-		} catch ( error ) {
-			console.error( '\n❌ Initial build failed:', error.message );
-			console.error( '   Continuing to watch mode...\n' );
-		}
 		console.log( '\n👀 Watching for changes...\n' );
 		await watchMode();
-	} else {
-		await buildAll();
 	}
 }
 
