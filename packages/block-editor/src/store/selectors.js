@@ -1917,6 +1917,19 @@ export function canMoveBlock( state, clientId ) {
 	if ( getTemplateLock( state, rootClientId ) === 'all' ) {
 		return false;
 	}
+
+	const blockEditingMode = getBlockEditingMode( state, clientId );
+	if (
+		blockEditingMode === 'contentOnly' &&
+		! isContainerInsertableToInWriteMode(
+			state,
+			getBlockName( state, clientId ),
+			rootClientId
+		)
+	) {
+		return false;
+	}
+
 	return getBlockEditingMode( state, rootClientId ) !== 'disabled';
 }
 
