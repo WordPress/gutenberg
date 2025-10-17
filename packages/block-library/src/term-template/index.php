@@ -85,27 +85,25 @@ function render_block_core_term_template( $attributes, $content, $block ) {
 			return $context;
 		};
 
-		$block_content = '';
-
 		// Use an early priority to so that other 'render_block_context' filters have access to the values.
 		add_filter( 'render_block_context', $filter_block_context, 1 );
 
 		// Render the inner blocks of the Term Template block with `dynamic` set to `false` to prevent calling
 		// `render_callback` and ensure that no wrapper markup is included.
-		$block_content .= ( new WP_Block( $block_instance ) )->render( array( 'dynamic' => false ) );
+		$block_content = ( new WP_Block( $block_instance ) )->render( array( 'dynamic' => false ) );
 
 		remove_filter( 'render_block_context', $filter_block_context, 1 );
 
 		// Wrap the render inner blocks in a `li` element with the appropriate term classes.
-		$term_classes = implode( ' ', array( 'wp-block-term', "term-{$term->term_id}", $term->taxonomy, "taxonomy-{$term->taxonomy}" ) );
+		$term_classes = "wp-block-term term-{$term->term_id} {$term->taxonomy} taxonomy-{$term->taxonomy}";
 
 		$content .= '<li class="' . esc_attr( $term_classes ) . '">' . $block_content . '</li>';
 	}
 
-	$classnames = 'wp-block-term-template';
+	$classnames = '';
 
 	if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
-		$classnames .= ' has-link-color';
+		$classnames .= 'has-link-color';
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => trim( $classnames ) ) );

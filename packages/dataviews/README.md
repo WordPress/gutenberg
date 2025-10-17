@@ -697,6 +697,54 @@ return (
 );
 ```
 
+### validity
+
+Object that determines the validation status of each field. There's a `useFormValidity` hook that can be used to create the validity object — see the utility below. This section documents the `validity` object in case you want to create it via other means.
+
+The top-level props of the `validity` object are the field IDs. Fields declare their validity status for each of the validation rules supported: `required`, `elements`, `custom`. If a rule is valid, it should not be present in the object; if a field is valid for all the rules, it should not be present in the object either.
+
+For example:
+
+```json
+{
+  "title": {
+    "required": {
+      "type": "invalid"
+    }
+  },
+  "author": {
+    "elements": {
+      "type": "invalid",
+      "message": "Value must be one of the elements."
+    }
+  },
+  "publisher": {
+    "custom": {
+      "type": "validating",
+      "message": "Validating..."
+    }
+  },
+  "isbn": {
+    "custom": {
+      "type": "valid",
+      "message": "Valid."
+    }
+  }
+}
+```
+
+Each rule, can have a `type` and a `message`.
+
+The `message` is the text to be displayed in the UI controls. The message for the `required` rule is optional, and the built-in browser message will be used if not provided.
+
+The `type` can be:
+
+- `validating`: when the value is being validated (e.g., custom async rule)
+- `invalid`: when the value is invalid according to the rule
+- `valid`: when the value _became_ valid after having been invalid (e.g., custom async rule)
+
+Note the `valid` status. This is useful for displaying a "Valid." message when the field transitions from invalid to valid.  The `useFormValidity` hook implements this only for the custom async validation.
+
 ## Utilities
 
 ### `filterSortAndPaginate`
@@ -716,17 +764,39 @@ Returns an object containing:
     -   `totalItems`: total number of items for the current view config.
     -   `totalPages`: total number of pages for the current view config.
 
-### `isItemValid`
+### `useFormValidity`
 
-Utility is used to determine whether or not the given item's value is valid according to the current fields and form configuration.
+Hook to determine the form validation status.
 
 Parameters:
 
--   `item`: the item, as described in the "data" property of DataForm.
--   `fields`: the fields config, as described in the "fields" property of DataForm.
--   `form`: the form config, as described in the "form" property of DataForm.
+-   `item`: the item being edited.
+-   `fields`: the fields config, as described in the "fields" property of DataViews.
+-   `form`: the form config, as described in the "form" property of DataViews.
 
-Returns a boolean indicating if the item is valid (true) or not (false).
+Returns an object containing:
+
+-   `isValid`: a boolean indicating if the form is valid.
+-   `validity`: an object containing the errors. Each property is a field ID, containing a description of each error type. See `validity` prop for more info. For example:
+
+```js
+{
+	fieldId: {
+		required: {
+			type: 'invalid',
+			message: 'Required.' // Optional
+		},
+		elements: {
+			type: 'invalid',
+			message: 'Value must be one of the elements.' // Optional
+		},
+		custom: {
+			type: 'validating',
+			message: 'Validating...'
+		}
+	}
+}
+```
 
 ## Actions API
 
@@ -875,8 +945,9 @@ Controls visibility of the modal's header when using `RenderModal`.
 
 The header text to show in the modal.
 
--   Type: `string`
+-   Type: `string | (items: Item[]) => string`
 -   Optional
+-   If a function is provided, it receives the selected items as an argument and should return the header text
 
 ### `modalSize`
 

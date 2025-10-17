@@ -332,7 +332,7 @@ export interface ActionModal< Item > extends ActionBase< Item > {
 	/**
 	 * The header of the modal.
 	 */
-	modalHeader?: string;
+	modalHeader?: string | ( ( items: Item[] ) => string );
 
 	/**
 	 * The size of the modal.

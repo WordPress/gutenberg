@@ -2,11 +2,9 @@
  * Internal dependencies
  */
 import { proxifyState, proxifyStore, deepMerge } from './proxies';
-/**
- * External dependencies
- */
 import { getNamespace } from './namespaces';
-import { isPlainObject } from './utils';
+import { isPlainObject, deepReadOnly, navigationSignal } from './utils';
+import type { DeepReadonly } from './utils';
 
 export const stores = new Map();
 const rawStores = new Map();
@@ -24,7 +22,7 @@ export const getConfig = ( namespace?: string ) =>
 	storeConfigs.get( namespace || getNamespace() ) || {};
 
 /**
- * Gets the part of the state defined and updated from the server.
+ * Gets the state defined and updated from the server.
  *
  * The object returned is read-only, and includes the state defined in PHP with
  * `wp_interactivity_state()`. When using `actions.navigate()`, this object is
@@ -34,7 +32,7 @@ export const getConfig = ( namespace?: string ) =>
  *
  * @example
  * ```js
- *  const { state } = store('myStore', {
+ *  const { state } = store( 'myPlugin', {
  *    callbacks: {
  *      updateServerState() {
  *        const serverState = getServerState();
@@ -42,19 +40,33 @@ export const getConfig = ( namespace?: string ) =>
  *        state.overridableProp = serverState.overridableProp;
  *      },
  *    },
- *  });
+ *  } );
  * ```
  *
- * @param namespace Store's namespace from which to retrieve the server state.
+ * @param namespace Store namespace. By default, it inherits the namespace of
+ *                  the store where it is defined.
  * @return The server state for the given namespace.
  */
-export const getServerState = ( namespace?: string ) => {
+export function getServerState(
+	namespace?: string
+): DeepReadonly< Record< string, unknown > >;
+export function getServerState< T extends object >(
+	namespace?: string
+): DeepReadonly< T >;
+export function getServerState< T extends object >(
+	namespace?: string
+): DeepReadonly< T > {
 	const ns = namespace || getNamespace();
 	if ( ! serverStates.has( ns ) ) {
-		serverStates.set( ns, proxifyState( ns, {}, { readOnly: true } ) );
+		serverStates.set( ns, deepReadOnly( {} ) );
 	}
-	return serverStates.get( ns );
-};
+	// Accesses the navigation signal to make this reactive. It assigns it to an
+	// arbitrary property (`subscribe`) to prevent the JavaScript minifier from
+	// removing this line.
+	getServerState.subscribe = navigationSignal.value;
+	return serverStates.get( ns ) as DeepReadonly< T >;
+}
+getServerState.subscribe = 0;
 
 interface StoreOptions {
 	/**
@@ -273,11 +285,15 @@ export const populateServerData = ( data?: {
 	state?: Record< string, unknown >;
 	config?: Record< string, unknown >;
 } ) => {
+	// Resets all the previous server states and configs.
+	serverStates.clear();
+	storeConfigs.clear();
+
 	if ( isPlainObject( data?.state ) ) {
 		Object.entries( data!.state ).forEach( ( [ namespace, state ] ) => {
 			const st = store< any >( namespace, {}, { lock: universalUnlock } );
 			deepMerge( st.state, state, false );
-			deepMerge( getServerState( namespace ), state );
+			serverStates.set( namespace, deepReadOnly( state! ) );
 		} );
 	}
 	if ( isPlainObject( data?.config ) ) {
@@ -285,6 +301,7 @@ export const populateServerData = ( data?: {
 			storeConfigs.set( namespace, config );
 		} );
 	}
+	navigationSignal.value += 1; // Triggers invalidations.
 };
 
 // Parse and populate the initial state and config.

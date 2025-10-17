@@ -16,6 +16,7 @@
 - DataForm control for `date` supports `required` and `custom` validation [#72048](https://github.com/WordPress/gutenberg/pull/72048).
 - DataForm control for `datetime` supports `required` and `custom` validation. [#72060](https://github.com/WordPress/gutenberg/pull/72060).
 - Standardise DataForm typography. [#72284](https://github.com/WordPress/gutenberg/pull/72284).
+- Dataviews: Add support for dynamic modal headers. [#72384](https://github.com/WordPress/gutenberg/pull/72384)
 
 ### Breaking changes
 
@@ -24,6 +25,7 @@
 - Remove `Data< Item >` type, as it is no longer used internally for a long time. [#72051](https://github.com/WordPress/gutenberg/pull/72051)
 - Remove `isDestructive` prop from actions API. Destructive actions should be communicated via flow (opens modal to confirm) and color should be used in the modal. [#72111](https://github.com/WordPress/gutenberg/pull/72111)
 - The `isValid.custom` default function that comes with the field type no longer checks for elements. This is now the `isValid.elements` responsibility and can be toggle on/off separately. [#72325](https://github.com/WordPress/gutenberg/pull/72325)
+- DataForm: make validation controlled by leveraging a `validity` prop. This also removes `isItemValid` and introduces `useFormValidity` hook to calculate the `validity` prop. [#71412](https://github.com/WordPress/gutenberg/pull/71412)
 
 ### Features
 

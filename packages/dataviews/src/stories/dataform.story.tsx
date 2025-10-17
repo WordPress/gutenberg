@@ -17,16 +17,18 @@ import {
  * Internal dependencies
  */
 import DataForm from '../components/dataform';
-import isItemValid from '../utils/is-item-valid';
+import useFormValidity from '../hooks/use-form-validity';
 
 import type {
-	Field,
-	Form,
-	DataFormControlProps,
-	Layout,
-	RegularLayout,
-	PanelLayout,
 	CardLayout,
+	DataFormControlProps,
+	Field,
+	FieldValidity,
+	Form,
+	Layout,
+	PanelLayout,
+	RegularLayout,
+	Rules,
 } from '../types';
 import { unlock } from '../lock-unlock';
 import DateControl from '../dataform-controls/date';
@@ -481,13 +483,35 @@ const LayoutPanelComponent = ( {
 	);
 };
 
+function getCustomValidity< Item >(
+	isValid: Rules< Item >,
+	validity: FieldValidity | undefined
+) {
+	let customValidity;
+	if ( isValid?.required && validity?.required ) {
+		// If the consumer provides a message for required,
+		// use it instead of the native built-in message.
+		customValidity = validity?.required?.message
+			? validity.required
+			: undefined;
+	} else if ( isValid?.elements && validity?.elements ) {
+		customValidity = validity.elements;
+	} else if ( validity?.custom ) {
+		customValidity = validity.custom;
+	}
+
+	return customValidity;
+}
+
 function CustomEditControl< Item >( {
 	data,
 	field,
 	onChange,
 	hideLabelFromVision,
+	validity,
 }: DataFormControlProps< Item > ) {
-	const { label, placeholder, description, getValue, setValue } = field;
+	const { label, placeholder, description, getValue, setValue, isValid } =
+		field;
 	const value = getValue( { item: data } );
 
 	const onChangeControl = useCallback(
@@ -498,7 +522,8 @@ function CustomEditControl< Item >( {
 
 	return (
 		<ValidatedTextControl
-			required={ !! field.isValid?.required }
+			required={ !! isValid?.required }
+			customValidity={ getCustomValidity( isValid, validity ) }
 			label={ label }
 			placeholder={ placeholder }
 			value={ value ?? '' }
@@ -517,7 +542,7 @@ const ValidationComponent = ( {
 	custom,
 }: {
 	required: boolean;
-	custom: boolean;
+	custom: 'sync' | 'async' | 'none';
 	type: 'regular' | 'panel';
 } ) => {
 	type ValidatedItem = {
@@ -569,6 +594,17 @@ const ValidationComponent = ( {
 		dateRange: undefined,
 		datetime: undefined,
 	} );
+
+	const makeAsync = ( rule: ( item: ValidatedItem ) => null | string ) => {
+		return async ( value: ValidatedItem ) => {
+			return await new Promise< string | null >( ( resolve ) => {
+				setTimeout( () => {
+					const validationResult = rule( value );
+					resolve( validationResult );
+				}, 2000 );
+			} );
+		};
+	};
 
 	const customTextRule = ( value: ValidatedItem ) => {
 		if ( ! /^[a-zA-Z ]+$/.test( value.text ) ) {
@@ -726,7 +762,15 @@ const ValidationComponent = ( {
 	const maybeCustomRule = (
 		rule: ( item: ValidatedItem ) => null | string
 	) => {
-		return custom ? rule : undefined;
+		if ( custom === 'sync' ) {
+			return rule;
+		}
+
+		if ( custom === 'async' ) {
+			return makeAsync( rule );
+		}
+
+		return undefined;
 	};
 
 	const _fields: Field< ValidatedItem >[] = [
@@ -949,7 +993,8 @@ const ValidationComponent = ( {
 	const form = {
 		layout: { type },
 		fields: [
-			'text',
+			// Use field object for testing purposes.
+			{ id: 'text' },
 			'select',
 			'textWithRadio',
 			'textarea',
@@ -966,13 +1011,16 @@ const ValidationComponent = ( {
 			'toggleGroup',
 			'password',
 			'customEdit',
-			'date',
-			'dateRange',
-			'datetime',
+			// Use field object with children for testing purposes.
+			{
+				id: 'dates',
+				label: 'Dates',
+				children: [ 'date', 'dateRange', 'datetime' ],
+			},
 		],
 	};
 
-	const canSave = isItemValid( post, _fields, form );
+	const { validity, isValid } = useFormValidity( post, _fields, form );
 
 	return (
 		<form>
@@ -981,6 +1029,7 @@ const ValidationComponent = ( {
 					data={ post }
 					fields={ _fields }
 					form={ form }
+					validity={ validity }
 					onChange={ ( edits ) =>
 						setPost( ( prev ) => ( {
 							...prev,
@@ -991,7 +1040,7 @@ const ValidationComponent = ( {
 				<Button
 					__next40pxDefaultSize
 					accessibleWhenDisabled
-					disabled={ ! canSave }
+					disabled={ ! isValid }
 					variant="primary"
 				>
 					Submit
@@ -1745,17 +1794,18 @@ export const Validation = {
 		type: {
 			control: { type: 'select' },
 			description: 'Chooses the validation type.',
-			options: [ 'regular', 'panel' ],
+			options: [ 'regular', 'panel', 'card', 'row' ],
 		},
 		custom: {
-			control: { type: 'boolean' },
+			control: { type: 'select' },
 			description: 'Whether or not the fields have custom validation.',
+			options: [ 'sync', 'async', 'none' ],
 		},
 	},
 	args: {
 		required: true,
 		type: 'regular',
-		custom: true,
+		custom: 'sync',
 	},
 };
 

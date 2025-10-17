@@ -24,6 +24,7 @@ const {
 	batch,
 	routerRegions,
 	cloneElement,
+	navigationSignal,
 } = privateApis(
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
 );
@@ -238,15 +239,19 @@ const renderPage = ( page: Page ) => {
 	const regionsToAttach = { ...page.regionsToAttach };
 
 	batch( () => {
-		// Update server data.
+		// Updates the server data.
 		populateServerData( page.initialData );
 
-		// Reset all router regions before setting the actual values.
+		// Triggers navigation invalidations (`getServerState` and
+		// `getServerContext`).
+		navigationSignal.value += 1;
+
+		// Resets all router regions before setting the actual values.
 		( routerRegions as Map< string, any > ).forEach( ( signal ) => {
 			signal.value = null;
 		} );
 
-		//Init regions with attachTo that don't exist yet.
+		// Inits regions with attachTo that don't exist yet.
 		const parentsToUpdate = new Set< Element >();
 		for ( const id in regionsToAttach ) {
 			const parent = document.querySelector( regionsToAttach[ id ] );
@@ -260,7 +265,7 @@ const renderPage = ( page: Page ) => {
 			}
 		}
 
-		//Update all existing regions.
+		// Updates all existing regions.
 		for ( const id in page.regions ) {
 			if ( routerRegions.has( id ) ) {
 				routerRegions.get( id ).value = cloneRouterRegionContent(
@@ -269,7 +274,7 @@ const renderPage = ( page: Page ) => {
 			}
 		}
 
-		// Render regions attached to the same parent in the same fragment.
+		// Renders regions attached to the same parent in the same fragment.
 		parentsToUpdate.forEach( ( parent ) => {
 			const ids = regionsToAttachByParent.get( parent );
 			const vdoms = ids.map( ( id ) => page.regions[ id ] );
@@ -279,8 +284,9 @@ const renderPage = ( page: Page ) => {
 					const elementType =
 						typeof type === 'function' ? props.type : type;
 
-					// Create an element with the obtained type where the region will be
-					// rendered. The type should match the one of the root vnode.
+					// Creates an element with the obtained type where the
+					// region will be rendered. The type should match the one of
+					// the root vnode.
 					const region = document.createElement( elementType );
 					parent.appendChild( region );
 					return region;
@@ -321,9 +327,10 @@ window.addEventListener( 'popstate', async () => {
 	const pagePath = getPagePath( window.location.href ); // Remove hash.
 	const page = pages.has( pagePath ) && ( await pages.get( pagePath ) );
 	if ( page ) {
-		renderPage( page );
-		// Update the URL in the state.
-		state.url = window.location.href;
+		batch( () => {
+			state.url = window.location.href;
+			renderPage( page );
+		} );
 	} else {
 		window.location.reload();
 	}
@@ -412,13 +419,13 @@ export const { state, actions } = store< Store >( 'core/router', {
 			navigatingTo = href;
 			actions.prefetch( pagePath, options );
 
-			// Create a promise that resolves when the specified timeout ends.
+			// Creates a promise that resolves when the specified timeout ends.
 			// The timeout value is 10 seconds by default.
 			const timeoutPromise = new Promise< void >( ( resolve ) =>
 				setTimeout( resolve, timeout )
 			);
 
-			// Don't update the navigation status immediately, wait 400 ms.
+			// Doesn't update the navigation status immediately, wait 400 ms.
 			const loadingTimeout = setTimeout( () => {
 				if ( navigatingTo !== href ) {
 					return;
@@ -438,7 +445,7 @@ export const { state, actions } = store< Store >( 'core/router', {
 				timeoutPromise,
 			] );
 
-			// Dismiss loading message if it hasn't been added yet.
+			// Dismisses loading message if it hasn't been added yet.
 			clearTimeout( loadingTimeout );
 
 			// Once the page is fetched, the destination URL could have changed
@@ -454,20 +461,25 @@ export const { state, actions } = store< Store >( 'core/router', {
 					?.clientNavigationDisabled
 			) {
 				yield importScriptModules( page.scriptModules );
-				renderPage( page );
+
+				batch( () => {
+					// Updates the URL in the state.
+					state.url = href;
+
+					// Updates the navigation status once the the new page rendering
+					// has been completed.
+					if ( loadingAnimation ) {
+						navigation.hasStarted = false;
+						navigation.hasFinished = true;
+					}
+
+					// Renders the new page.
+					renderPage( page );
+				} );
+
 				window.history[
 					options.replace ? 'replaceState' : 'pushState'
 				]( {}, '', href );
-
-				// Update the URL in the state.
-				state.url = href;
-
-				// Update the navigation status once the the new page rendering
-				// has been completed.
-				if ( loadingAnimation ) {
-					navigation.hasStarted = false;
-					navigation.hasFinished = true;
-				}
 
 				if ( screenReaderAnnouncement ) {
 					a11ySpeak( 'loaded' );

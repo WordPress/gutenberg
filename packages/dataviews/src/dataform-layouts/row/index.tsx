@@ -41,6 +41,7 @@ export default function FormRowField< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	validity,
 }: FieldLayoutProps< Item > ) {
 	const { fields } = useContext( DataFormContext );
 
@@ -69,19 +70,21 @@ export default function FormRowField< Item >( {
 						data={ data }
 						form={ form }
 						onChange={ onChange }
+						validity={ validity?.children }
 						as={ EMPTY_WRAPPER }
 					>
-						{ ( FieldLayout, nestedField ) => (
+						{ ( FieldLayout, childField, childFieldValidity ) => (
 							<div
-								key={ nestedField.id }
+								key={ childField.id }
 								className="dataforms-layouts-row__field-control"
-								style={ layout.styles[ nestedField.id ] }
+								style={ layout.styles[ childField.id ] }
 							>
 								<FieldLayout
 									data={ data }
-									field={ nestedField }
+									field={ childField }
 									onChange={ onChange }
 									hideLabelFromVision={ hideLabelFromVision }
+									validity={ childFieldValidity }
 								/>
 							</div>
 						) }
@@ -109,6 +112,7 @@ export default function FormRowField< Item >( {
 					data={ data }
 					field={ fieldDefinition }
 					onChange={ onChange }
+					validity={ validity }
 				/>
 			</div>
 		</>
