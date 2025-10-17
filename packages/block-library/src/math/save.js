@@ -18,7 +18,7 @@ export default function save( { attributes } ) {
 		<math
 			{ ...useBlockProps.save() }
 			display="block"
-			dangerouslySetInnerHTML={ { __html: mathML || latex } }
+			dangerouslySetInnerHTML={ { __html: mathML } }
 		/>
 	);
 }

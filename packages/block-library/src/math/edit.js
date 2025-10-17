@@ -55,22 +55,18 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 	} );
 
 	return (
-		<>
-			<div
-				{ ...blockProps }
-				{ ...( attributes.mathML
-					? {
-							dangerouslySetInnerHTML: {
-								__html:
-									// It seems React doesn't currently support
-									// rendering <math> elements directly.
-									'<math display="block">' +
-									attributes.mathML +
-									'</math>',
-							},
-					  }
-					: { children: attributes.latex || '\u200B' } ) }
-			/>
+		<div { ...blockProps }>
+			{ attributes.mathML ? (
+				<math
+					// We can't spread block props on the math element because
+					// it only supports a limited amount of global attributes.
+					// For example, draggable will have no effect.
+					display="block"
+					dangerouslySetInnerHTML={ { __html: attributes.mathML } }
+				/>
+			) : (
+				attributes.latex || '\u200B'
+			) }
 			{ isSelected && (
 				<Popover
 					placement="bottom-start"
@@ -122,6 +118,6 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 					</div>
 				</Popover>
 			) }
-		</>
+		</div>
 	);
 }
