@@ -43,7 +43,11 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 				} );
 			}
 		} );
-	}, [ initialLatex, setAttributes ] );
+	}, [
+		initialLatex,
+		setAttributes,
+		__unstableMarkNextChangeAsNotPersistent,
+	] );
 
 	const blockProps = useBlockProps( {
 		ref: setBlockRef,
@@ -83,8 +87,8 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 								hideLabelFromVision
 								value={ latex }
 								onChange={ ( newLatex ) => {
-									setAttributes( { latex: newLatex } );
 									if ( ! latexToMathML ) {
+										setAttributes( { latex: newLatex } );
 										return;
 									}
 									let mathML = '';
@@ -96,7 +100,10 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 									} catch ( err ) {
 										setError( err.message );
 									}
-									setAttributes( { mathML } );
+									setAttributes( {
+										mathML,
+										latex: newLatex,
+									} );
 								} }
 								placeholder={ __( 'e.g., x^2, \\frac{a}{b}' ) }
 							/>
