@@ -35,6 +35,14 @@ export default function ImageEditor( {
 				naturalHeight={ naturalHeight }
 				naturalWidth={ naturalWidth }
 			/>
+			<BlockControls>
+				<ToolbarGroup>
+					<ZoomDropdown />
+					<RotationButton />
+				</ToolbarGroup>
+			</BlockControls>
+
+
 			{/* <BlockControls>
 				<ToolbarGroup>
 					<ZoomDropdown />
