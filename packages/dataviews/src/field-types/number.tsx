@@ -51,11 +51,16 @@ export default {
 	},
 	Edit: 'number',
 	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
-		return field.hasElements ? (
-			<RenderFromElements item={ item } field={ field } />
-		) : (
-			Number( field.getValue( { item } ) ).toFixed( 2 )
-		);
+		if ( field.hasElements ) {
+			<RenderFromElements item={ item } field={ field } />;
+		}
+
+		const value = field.getValue( { item } );
+		if ( ! [ null, undefined ].includes( value ) ) {
+			return Number( value ).toFixed( 2 );
+		}
+
+		return null;
 	},
 	enableSorting: true,
 	filterBy: {
