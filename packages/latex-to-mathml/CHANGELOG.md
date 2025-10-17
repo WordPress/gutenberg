@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.1.0 (2025-10-17)
+
 ### New Features
 
 -   Initial release of the `@wordpress/latex-to-mathml` package.
