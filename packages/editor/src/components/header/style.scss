@@ -79,6 +79,7 @@
 }
 
 .editor-header__center {
+	gap: $grid-unit-10;
 	grid-column: 3 / 4;
 	display: flex;
 	justify-content: center;
