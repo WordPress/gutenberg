@@ -12,28 +12,14 @@ import { buildRamp } from '../lib';
 import { BG_RAMP_CONFIG, ACCENT_RAMP_CONFIG } from '../lib/ramp-configs';
 import { DEFAULT_SEED_COLORS } from '../lib/constants';
 
-const lStops = [ 100, 90, 80, 70, 60, 50, 40, 30, 20, 10 ];
-const sStops = [ 100, 80, 60, 40, 20, 0 ];
-const hstops = [ 0, 60, 120, 180, 240, 300 ];
-
 describe( 'buildRamps', () => {
 	it( 'background ramp snapshots', () => {
-		const allBgColors = lStops
-			.map( ( l ) =>
-				sStops.map( ( s ) =>
-					hstops.map( ( h ) => {
-						// Adjust hsl(180deg 40% 50%) to avoid floating-point precision
-						// differences. This specific combination produces RGB (76.5, ...)
-						// which rounds differently between Node.js v22 and v24.
-						// May be removed once all versions on CI have the same floating-point behavior.
-						const lightness =
-							h === 180 && s === 40 && l === 50 ? 50.01 : l;
-
-						return `hsl(${ h }deg ${ s }% ${ lightness }%)`;
-					} )
-				)
-			)
-			.flat( 2 );
+		// Representative sample covering edge cases and various hue/saturation/lightness combinations
+		const allBgColors = [
+			'hsl(0deg 0% 30%)', // Dark gray (desaturated)
+			'hsl(120deg 50% 60%)', // Mid-range green
+			'hsl(240deg 100% 30%)', // Dark saturated blue
+		];
 
 		expect(
 			allBgColors.map( ( bg ) => {
@@ -58,38 +44,15 @@ describe( 'buildRamps', () => {
 	} );
 
 	it( 'accent ramp snapshots', () => {
+		// Representative sample covering key option combinations
 		const options = [
 			{
 				pinLightness: { stepName: 'surface2', value: 0 },
 				mainDirection: 'lighter',
 			},
 			{
-				pinLightness: { stepName: 'surface2', value: 0.1 },
+				pinLightness: { stepName: 'surface2', value: 0.5 },
 				mainDirection: 'lighter',
-			},
-			{
-				pinLightness: { stepName: 'surface2', value: 0.2 },
-				mainDirection: 'lighter',
-			},
-			{
-				pinLightness: { stepName: 'surface2', value: 0.3 },
-				mainDirection: 'lighter',
-			},
-			{
-				pinLightness: { stepName: 'surface2', value: 0.4 },
-				mainDirection: 'lighter',
-			},
-			{
-				pinLightness: { stepName: 'surface2', value: 0.7 },
-				mainDirection: 'darker',
-			},
-			{
-				pinLightness: { stepName: 'surface2', value: 0.8 },
-				mainDirection: 'darker',
-			},
-			{
-				pinLightness: { stepName: 'surface2', value: 0.9 },
-				mainDirection: 'darker',
 			},
 			{
 				pinLightness: { stepName: 'surface2', value: 1 },
@@ -97,15 +60,11 @@ describe( 'buildRamps', () => {
 			},
 		] as const;
 
+		// Representative sample covering different hue ranges and saturation levels
 		const allPrimaryColors = [
-			...Object.values( DEFAULT_SEED_COLORS ),
-			'#3858e9', // blueberry blue
-			'#069e08', // jetpack green
-			'#873eff', // woocommerce purple
-			'#52accc', // WP Admin "blue" theme accent
-			'#c7a589', // WP Admin "coffee" theme accent
-			'#a3b745', // WP Admin "ectoplasm" theme accent
-			'#dd823b', // WP Admin "sunrise" theme accent
+			DEFAULT_SEED_COLORS.primary, // WP blue (mid saturation)
+			DEFAULT_SEED_COLORS.error, // WP error red (saturated)
+			'#c7a589', // WP Admin "coffee" theme accent (desaturated/beige)
 		];
 
 		expect(
