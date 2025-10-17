@@ -81,7 +81,7 @@ test.describe( 'Block Comments', () => {
 		await expect(
 			page
 				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Reply added successfully.' } )
+				.filter( { hasText: 'Reply added.' } )
 		).toBeVisible();
 	} );
 
@@ -132,7 +132,7 @@ test.describe( 'Block Comments', () => {
 		await expect(
 			page
 				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Note deleted successfully.' } )
+				.filter( { hasText: 'Note deleted.' } )
 		).toBeVisible();
 	} );
 
@@ -393,11 +393,11 @@ test.describe( 'Block Comments', () => {
 			await replyForm.fill( 'Second reply' );
 			await replyButton.click();
 
-			// Check that two replies were added successfully.
+			// Check that two replies were added.
 			await expect(
 				page
 					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Reply added successfully.' } )
+					.filter( { hasText: 'Reply added.' } )
 			).toHaveCount( 2 );
 
 			// Click on the title field to deselect the block and the comment.
@@ -655,7 +655,7 @@ class BlockCommentUtils {
 					.click();
 				await this.#page
 					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Note added successfully.' } )
+					.filter( { hasText: 'Note added.' } )
 					.click();
 			},
 			{ box: true }
