@@ -6,8 +6,11 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
-import { ImageCropper as ImageCropperComponent } from '@wordpress/image-cropper';
+import { useState, useCallback } from '@wordpress/element';
+import {
+	ImageCropper as ImageCropperComponent,
+	useImageCropper,
+} from '@wordpress/image-cropper';
 
 /**
  * WordPress dependencies
@@ -17,9 +20,14 @@ import { useResizeObserver } from '@wordpress/compose';
 
 /**
  * Internal dependencies
+ * @param root0
+ * @param root0.url
+ * @param root0.width
+ * @param root0.height
+ * @param root0.naturalHeight
+ * @param root0.naturalWidth
+ * @param root0.borderProps
  */
-;
-
 export default function ImageCropper( {
 	url,
 	width,
@@ -28,27 +36,43 @@ export default function ImageCropper( {
 	naturalWidth,
 	borderProps,
 } ) {
-	// const {
-	// 	isInProgress,
-	// 	editedUrl,
-	// 	position,
-	// 	zoom,
-	// 	aspect,
-	// 	setPosition,
-	// 	setCrop,
-	// 	setZoom,
-	// 	rotation,
-	// } = useImageEditingContext();
+	const { setResetState, cropperState } = useImageCropper();
 	const [ contentResizeListener, { width: clientWidth } ] =
 		useResizeObserver();
 
+		// This is clunky. I think we need a dedicated modal to reduce tool clutter and to be able to focus on the image.
+	let editedHeight = height || ( clientWidth * naturalHeight ) / naturalWidth;
 
-	// if ( rotation % 180 === 90 ) {
-	// 	editedHeight = ( clientWidth * naturalWidth ) / naturalHeight;
-	// }
+	if ( cropperState.rotation % 180 === 90 ) {
+		editedHeight = ( clientWidth * naturalWidth ) / naturalHeight;
+	}
 
-	const [ editedHeight, setEditedHeight ] = useState( height || ( clientWidth * naturalHeight ) / naturalWidth );
-	const [ editedWidth, setEditedWidth ] = useState( width || clientWidth );
+	const handleOnload = useCallback(
+		( loadedMediaSize ) => {
+			// setEditedHeight( loadedMediaSize.height );
+			// setEditedWidth( loadedMediaSize.width );
+			const newResetState = {
+				aspectRatio:
+					loadedMediaSize.naturalWidth /
+					loadedMediaSize.naturalHeight,
+				crop: {
+					x: 0,
+					y: 0,
+					width: loadedMediaSize.naturalWidth,
+					height: loadedMediaSize.naturalHeight,
+				},
+				zoom: 1,
+				rotation: 0,
+				flip: {
+					horizontal: false,
+					vertical: false,
+				},
+			};
+
+			setResetState( newResetState );
+		},
+		[ setResetState ]
+	);
 
 	if ( ! url ) {
 		return <Spinner />;
@@ -65,15 +89,12 @@ export default function ImageCropper( {
 			) }
 			style={ {
 				...borderProps?.style,
-				width: editedWidth,
+				width: width || clientWidth,
 				height: editedHeight,
 			} }
 		>
-			<ImageCropperComponent src={ url } onLoad={ ( mediaSize ) => {
-				setEditedHeight( mediaSize.height );
-				setEditedWidth( mediaSize.width );
-			} } />
-			{/* { isInProgress && <Spinner /> } */}
+			<ImageCropperComponent src={ url } onLoad={ handleOnload } />
+			{ /* { isInProgress && <Spinner /> } */ }
 		</div>
 	);
 
