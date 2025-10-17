@@ -280,17 +280,18 @@ const UnforwardedPopover = (
 						'contains' in referenceElement &&
 						referenceElement.contains( blurTarget ) ) ||
 					floatingElement?.contains( blurTarget );
-
 				// Only proceed if the blur is actually from this popover
 				if ( ! isBlurFromThisPopover ) {
 					return;
 				}
-
-				// Call onFocusOutside if defined
+				// Call onFocusOutside if defined or call onClose.
 				if ( onFocusOutside ) {
 					onFocusOutside( event );
+				} else if ( onClose ) {
+					onClose();
 				}
 			} else if ( onClose ) {
+				// onClose should be called for other event types if it exists.
 				onClose();
 			}
 		};
