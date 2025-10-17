@@ -11,10 +11,27 @@ import { useBlockBindingsUtils } from '@wordpress/block-editor';
  * Using a function instead of a constant allows for future enhancements where the binding
  * might need dynamic data (e.g., entity ID, context-specific arguments).
  *
- * @param {string} kind - The kind of entity ('post-type' or 'taxonomy')
+ * @param {('post-type'|'taxonomy')} kind - The kind of entity. Only 'post-type' and 'taxonomy' are supported.
  * @return {Object} Entity binding configuration object
+ * @throws {Error} If kind is not 'post-type' or 'taxonomy'
  */
 export function buildNavigationLinkEntityBinding( kind ) {
+	// Validate kind parameter exists
+	if ( kind === undefined ) {
+		throw new Error(
+			'buildNavigationLinkEntityBinding requires a kind parameter. ' +
+				'Only "post-type" and "taxonomy" are supported.'
+		);
+	}
+
+	// Validate kind parameter value
+	if ( kind !== 'post-type' && kind !== 'taxonomy' ) {
+		throw new Error(
+			`Invalid kind "${ kind }" provided to buildNavigationLinkEntityBinding. ` +
+				`Only 'post-type' and 'taxonomy' are supported.`
+		);
+	}
+
 	const source = kind === 'taxonomy' ? 'core/term-data' : 'core/post-data';
 
 	return {
@@ -65,9 +82,17 @@ export function useEntityBinding( { clientId, attributes } ) {
 				return;
 			}
 
-			updateBlockBindings(
-				buildNavigationLinkEntityBinding( kindToUse )
-			);
+			try {
+				const binding = buildNavigationLinkEntityBinding( kindToUse );
+				updateBlockBindings( binding );
+			} catch ( error ) {
+				// eslint-disable-next-line no-console
+				console.warn(
+					'Failed to create entity binding:',
+					error.message
+				);
+				// Don't create binding if validation fails
+			}
 		},
 		[ updateBlockBindings, kind, id ]
 	);

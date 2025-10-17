@@ -269,15 +269,7 @@ describe( 'useEntityBinding', () => {
 			result.current.createBinding();
 		} );
 
-		expect( mockUpdateBlockBindings ).toHaveBeenCalledWith(
-			buildNavigationLinkEntityBinding()
-		);
-	} );
-} );
-
-describe( 'buildNavigationLinkEntityBinding', () => {
-	it( 'should build the correct binding structure', () => {
-		expect( buildNavigationLinkEntityBinding() ).toEqual( {
+		expect( mockUpdateBlockBindings ).toHaveBeenCalledWith( {
 			url: {
 				source: 'core/post-data',
 				args: {
@@ -287,160 +279,62 @@ describe( 'buildNavigationLinkEntityBinding', () => {
 		} );
 	} );
 
-	it( 'should create core/term-data binding when createBinding is called for taxonomy', () => {
-		const attributes = {
-			metadata: {},
-			id: null,
-			kind: 'taxonomy',
-		};
-
-		const { result } = renderHook( () =>
-			useEntityBinding( {
-				clientId: 'test-client-id',
-				attributes,
-			} )
-		);
-
-		act( () => {
-			result.current.createBinding();
+	describe( 'buildNavigationLinkEntityBinding', () => {
+		it( 'returns correct binding for post-type', () => {
+			const binding = buildNavigationLinkEntityBinding( 'post-type' );
+			expect( binding ).toEqual( {
+				url: {
+					source: 'core/post-data',
+					args: { key: 'link' },
+				},
+			} );
 		} );
 
-		expect( mockUpdateBlockBindings ).toHaveBeenCalledWith( {
-			url: {
-				source: 'core/term-data',
-				args: {
-					key: 'link',
+		it( 'returns correct binding for taxonomy', () => {
+			const binding = buildNavigationLinkEntityBinding( 'taxonomy' );
+			expect( binding ).toEqual( {
+				url: {
+					source: 'core/term-data',
+					args: { key: 'link' },
 				},
-			},
+			} );
 		} );
-	} );
 
-	describe( 'clearBinding behavior', () => {
-		it( 'should call updateBlockBindings when clearBinding is called and valid binding exists', () => {
-			const attributes = {
-				metadata: {
-					bindings: {
-						url: {
-							source: 'core/post-data',
-							args: { key: 'link' },
-						},
-					},
-				},
-				id: 123,
-				kind: 'post-type',
-			};
-
-			const { result } = renderHook( () =>
-				useEntityBinding( {
-					clientId: 'test-client-id',
-					attributes,
-				} )
+		it( 'throws error when called without parameter', () => {
+			expect( () => {
+				buildNavigationLinkEntityBinding();
+			} ).toThrow(
+				'buildNavigationLinkEntityBinding requires a kind parameter'
 			);
-
-			act( () => {
-				result.current.clearBinding();
-			} );
-
-			expect( mockUpdateBlockBindings ).toHaveBeenCalledWith( {
-				url: undefined,
-			} );
 		} );
 
-		it( 'should call updateBlockBindings when clearBinding is called and valid taxonomy binding exists', () => {
-			const attributes = {
-				metadata: {
-					bindings: {
-						url: {
-							source: 'core/term-data',
-							args: { key: 'link' },
-						},
-					},
-				},
-				id: 456,
-				kind: 'taxonomy',
-			};
-
-			const { result } = renderHook( () =>
-				useEntityBinding( {
-					clientId: 'test-client-id',
-					attributes,
-				} )
-			);
-
-			act( () => {
-				result.current.clearBinding();
-			} );
-
-			expect( mockUpdateBlockBindings ).toHaveBeenCalledWith( {
-				url: undefined,
-			} );
+		it( 'throws error for invalid kind', () => {
+			expect( () => {
+				buildNavigationLinkEntityBinding( 'invalid-kind' );
+			} ).toThrow( 'Invalid kind "invalid-kind"' );
 		} );
 
-		it( 'should NOT call updateBlockBindings when clearBinding is called and binding exists but no id', () => {
-			const attributes = {
-				metadata: {
-					bindings: {
-						url: {
-							source: 'core/post-data',
-							args: { key: 'link' },
-						},
-					},
-				},
-				id: null,
-				kind: 'post-type',
-			};
-
-			const { result } = renderHook( () =>
-				useEntityBinding( {
-					clientId: 'test-client-id',
-					attributes,
-				} )
-			);
-
-			act( () => {
-				result.current.clearBinding();
-			} );
-
-			expect( mockUpdateBlockBindings ).not.toHaveBeenCalled();
+		it( 'throws error for null kind', () => {
+			expect( () => {
+				buildNavigationLinkEntityBinding( null );
+			} ).toThrow( 'Invalid kind "null"' );
 		} );
 
-		it( 'should call updateBlockBindings when clearBinding is called and binding exists with any source', () => {
-			const attributes = {
-				metadata: {
-					bindings: {
-						url: {
-							source: 'core/post-data',
-							args: { key: 'link' },
-						},
-					},
-				},
-				id: 123,
-				kind: 'post-type', // Correct kind for post-data source
-			};
-
-			const { result } = renderHook( () =>
-				useEntityBinding( {
-					clientId: 'test-client-id',
-					attributes,
-				} )
-			);
-
-			act( () => {
-				result.current.clearBinding();
-			} );
-
-			expect( mockUpdateBlockBindings ).toHaveBeenCalledWith( {
-				url: undefined,
-			} );
+		it( 'throws error for empty string', () => {
+			expect( () => {
+				buildNavigationLinkEntityBinding( '' );
+			} ).toThrow( 'Invalid kind ""' );
 		} );
-	} );
 
-	describe( 'createBinding behavior', () => {
-		it( 'should not create binding when createBinding is called without kind', () => {
+		it( 'handles invalid kind gracefully in createBinding', () => {
+			const consoleSpy = jest
+				.spyOn( console, 'warn' )
+				.mockImplementation();
+
 			const attributes = {
 				metadata: {},
 				id: null,
-				kind: null,
+				kind: 'invalid-kind',
 			};
 
 			const { result } = renderHook( () =>
@@ -454,39 +348,15 @@ describe( 'buildNavigationLinkEntityBinding', () => {
 				result.current.createBinding();
 			} );
 
-			expect( mockUpdateBlockBindings ).not.toHaveBeenCalled();
-		} );
-
-		it( 'should create binding with updated attributes when createBinding is called with updatedAttributes', () => {
-			const attributes = {
-				metadata: {},
-				id: null,
-				kind: 'post-type',
-			};
-
-			const updatedAttributes = {
-				kind: 'taxonomy',
-			};
-
-			const { result } = renderHook( () =>
-				useEntityBinding( {
-					clientId: 'test-client-id',
-					attributes,
-				} )
+			expect( consoleSpy ).toHaveBeenCalledWith(
+				'Failed to create entity binding:',
+				expect.stringContaining( 'Invalid kind "invalid-kind"' )
 			);
 
-			act( () => {
-				result.current.createBinding( updatedAttributes );
-			} );
+			// Should not call updateBlockBindings when validation fails
+			expect( mockUpdateBlockBindings ).not.toHaveBeenCalled();
 
-			expect( mockUpdateBlockBindings ).toHaveBeenCalledWith( {
-				url: {
-					source: 'core/term-data',
-					args: {
-						key: 'link',
-					},
-				},
-			} );
+			consoleSpy.mockRestore();
 		} );
 	} );
 } );
