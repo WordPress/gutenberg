@@ -14,7 +14,11 @@ import { store as interfaceStore } from '@wordpress/interface';
  * Internal dependencies
  */
 import PluginSidebar from '../plugin-sidebar';
-import { collabHistorySidebarName, collabSidebarName } from './constants';
+import {
+	collabHistorySidebarName,
+	collabSidebarName,
+	SIDEBARS,
+} from './constants';
 import { Comments } from './comments';
 import { AddComment } from './add-comment';
 import { store as editorStore } from '../../store';
@@ -54,14 +58,12 @@ function CollabSidebarContent( {
 				commentSidebarRef.current = node;
 			} }
 		>
-			{ ( ! isFloating || ( isFloating && showCommentBoard ) ) && (
-				<AddComment
-					onSubmit={ onCreate }
-					showCommentBoard={ showCommentBoard }
-					setShowCommentBoard={ setShowCommentBoard }
-					commentSidebarRef={ commentSidebarRef }
-				/>
-			) }
+			<AddComment
+				onSubmit={ onCreate }
+				showCommentBoard={ showCommentBoard }
+				setShowCommentBoard={ setShowCommentBoard }
+				commentSidebarRef={ commentSidebarRef }
+			/>
 			<Comments
 				threads={ comments }
 				onEditComment={ onEdit }
@@ -84,8 +86,7 @@ function CollabSidebarContent( {
 export default function CollabSidebar() {
 	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
-	const { enableComplementaryArea, disableComplementaryArea } =
-		useDispatch( interfaceStore );
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const commentSidebarRef = useRef( null );
 
@@ -131,31 +132,27 @@ export default function CollabSidebar() {
 	}
 
 	async function openTheSidebar() {
-		const activeArea = await getActiveComplementaryArea( 'core' );
+		const prevArea = await getActiveComplementaryArea( 'core' );
+		const activeNotesArea = SIDEBARS.find( ( name ) => name === prevArea );
 
-		// If adding a new comment, handle sidebar logic based on what's currently open.
-		if ( ! blockCommentId ) {
-			setShowCommentBoard( true );
+		// If the notes sidebar is not already active, enable floating sidebar.
+		if ( ! activeNotesArea ) {
+			enableComplementaryArea( 'core', collabSidebarName );
+		}
 
-			// If Notes sidebar is already open, keep it open.
-			if ( activeArea === collabHistorySidebarName ) {
-				// Notes sidebar is open, keep it open and show floating form.
-				return;
-			}
-
-			// If any other sidebar is open (like Page sidebar), close it to make room for floating sidebar.
-			if ( activeArea && activeArea !== collabHistorySidebarName ) {
-				disableComplementaryArea( 'core' );
-				enableComplementaryArea( 'core', collabSidebarName );
-			}
-
+		const currentArea = await getActiveComplementaryArea( 'core' );
+		// Bail out if the current active area is not one of note sidebars.
+		if ( ! SIDEBARS.includes( currentArea ) ) {
 			return;
 		}
 
-		// Otherwise, open the sidebar as usual.
-		enableComplementaryArea( 'core', collabHistorySidebarName );
-		setShowCommentBoard( false );
-		focusCommentThread( blockCommentId, commentSidebarRef.current );
+		setShowCommentBoard( ! blockCommentId );
+		focusCommentThread(
+			blockCommentId,
+			commentSidebarRef.current,
+			// Focus a comment thread when there's a selected block with a comment.
+			! blockCommentId ? 'textarea' : undefined
+		);
 	}
 
 	return (
