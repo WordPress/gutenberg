@@ -5,6 +5,7 @@
 		"checkJs": false,
 		"noImplicitAny": false
 	},
+	"include": [ "src", "typings" ],
 	"references": [
 		{ "path": "../api-fetch" },
 		{ "path": "../compose" },
