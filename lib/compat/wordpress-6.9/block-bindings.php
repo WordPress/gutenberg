@@ -123,10 +123,10 @@ function gutenberg_get_block_bindings_supported_attributes( $block_type ) {
 	 * for new block attributes.
 	 */
 	$block_bindings_supported_attributes_6_8 = array(
-		'core/paragraph'          => array( 'content' ),
-		'core/heading'            => array( 'content' ),
-		'core/image'              => array( 'id', 'url', 'title', 'alt' ),
-		'core/button'             => array( 'url', 'text', 'linkTarget', 'rel' ),
+		'core/paragraph' => array( 'content' ),
+		'core/heading'   => array( 'content' ),
+		'core/image'     => array( 'id', 'url', 'title', 'alt' ),
+		'core/button'    => array( 'url', 'text', 'linkTarget', 'rel' ),
 	);
 
 	$supported_block_attributes =
