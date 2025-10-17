@@ -99,6 +99,8 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 	};
 
 	useEffect( () => {
+		// Checking for ! hasUrlBinding is a defensive check, as we would
+		// only want to focus the input if the url is not bound to an entity.
 		if ( ! hasUrlBinding && shouldFocusURLInputRef.current ) {
 			urlInputRef.current?.focus();
 		}
