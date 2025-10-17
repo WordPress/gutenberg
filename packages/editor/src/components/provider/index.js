@@ -298,8 +298,8 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 				return;
 			}
 
-			// If the post type supports sync, don't auto save.
-			if ( supportsSync ) {
+			// If the post type supports sync, don't show auto save warning.
+			if ( window.__experimentalEnableSync && supportsSync ) {
 				if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 					return;
 				}

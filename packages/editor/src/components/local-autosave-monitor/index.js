@@ -81,7 +81,7 @@ function useAutosaveNotice() {
 		}
 
 		// If the post type supports sync, don't auto save.
-		if ( supportsSync ) {
+		if ( window.__experimentalEnableSync && supportsSync ) {
 			if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 				return;
 			}
