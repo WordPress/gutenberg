@@ -24,13 +24,7 @@ import { search, check } from '@wordpress/icons';
  * Internal dependencies
  */
 import { getCurrentValue } from './utils';
-import type {
-	Filter,
-	NormalizedFilter,
-	NormalizedField,
-	View,
-	Option,
-} from '../../types';
+import type { Filter, NormalizedFilter, View, Option } from '../../types';
 import useElements from '../../hooks/use-elements';
 
 interface SearchWidgetProps {
@@ -39,7 +33,6 @@ interface SearchWidgetProps {
 		elements: Option[];
 	};
 	onChangeView: ( view: View ) => void;
-	fields: NormalizedField< any >[];
 }
 
 function normalizeSearchInput( input = '' ) {

@@ -55,11 +55,11 @@ import {
 } from '../../constants';
 import type {
 	Filter,
+	NormalizedField,
 	NormalizedFilter,
 	Operator,
 	Option,
 	View,
-	NormalizedField,
 } from '../../types';
 import useElements from '../../hooks/use-elements';
 
@@ -607,7 +607,6 @@ export default function Filter( {
 									...commonProps.filter,
 									elements,
 								} }
-								fields={ fields }
 							/>
 						) : (
 							<InputWidget { ...commonProps } fields={ fields } />
