@@ -73,13 +73,14 @@ function ButtonTrigger< Item >( {
 		typeof action.label === 'string' ? action.label : action.label( items );
 	return (
 		<Button
-			label={ label }
-			icon={ action.icon }
 			disabled={ !! action.disabled }
 			accessibleWhenDisabled
 			size="compact"
 			onClick={ onClick }
-		/>
+			variant="link"
+		>
+			{ label }
+		</Button>
 	);
 }
 
@@ -164,7 +165,7 @@ export default function ItemActions< Item >( {
 			( action ) => ! action.isEligible || action.isEligible( item )
 		);
 		const _primaryActions = _eligibleActions.filter(
-			( action ) => action.isPrimary && !! action.icon
+			( action ) => action.isPrimary
 		);
 		return {
 			primaryActions: _primaryActions,
