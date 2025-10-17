@@ -31,7 +31,6 @@ export const useSetActiveTemplateAction = () => {
 					? __( 'Deactivate' )
 					: __( 'Activate' );
 			},
-			icon: pencil,
 			isEligible( item ) {
 				return (
 					! ( item.slug === 'index' && item.source === 'theme' ) &&
