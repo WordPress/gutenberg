@@ -134,7 +134,6 @@
 		"make-dir": "3.0.0",
 		"mkdirp": "3.0.1",
 		"mock-match-media": "0.4.2",
-		"moment-timezone-data-webpack-plugin": "1.5.1",
 		"nock": "12.0.3",
 		"node-fetch": "2.7.0",
 		"npm-run-all": "4.1.5",
@@ -183,8 +182,7 @@
 		"jsdom": "25.0.1"
 	},
 	"scripts": {
-		"build": "npm run --silent build:package-types && wp-scripts build && npm run build:packages",
-		"build:analyze-bundles": "npm run build -- --webpack-bundle-analyzer",
+		"build": "npm run --silent build:package-types && node ./bin/packages/build-vendors.mjs && npm run build:packages",
 		"build:package-types": "node ./bin/packages/validate-typescript-version.js && ( tsc --build || ( echo 'tsc failed. Try cleaning up first: `npm run clean:package-types`'; exit 1 ) ) && node ./bin/packages/check-build-type-declaration-files.js",
 		"build:profile-types": "rimraf ./ts-traces && npm run clean:package-types && node ./bin/packages/validate-typescript-version.js && ( tsc --build --extendedDiagnostics --generateTrace ./ts-traces || ( echo 'tsc failed.'; exit 1 ) ) && node ./bin/packages/check-build-type-declaration-files.js && npx --yes @typescript/analyze-trace ts-traces > ts-traces/analysis.txt && node -p \"'\\n\\nDone! Build traces saved to ts-traces/ directory.\\nTrace analysis saved to ts-traces/analysis.txt.'\"",
 		"prebuild": "npm run clean:packages && npm run --if-present --workspaces build",
@@ -195,7 +193,7 @@
 		"clean:packages": "rimraf --glob \"./packages/*/{build,build-module,build-wp,build-style}\"",
 		"component-usage-stats": "node ./node_modules/react-scanner/bin/react-scanner -c ./react-scanner.config.js",
 		"predev": "npm run clean:packages && npm run --if-present --workspaces build",
-		"dev": "npm run --silent build:package-types && wp-scripts build && npm run dev:packages",
+		"dev": "npm run --silent build:package-types && node ./bin/packages/build-vendors.mjs && npm run dev:packages",
 		"dev:packages": "cross-env NODE_ENV=development concurrently \"tsc --build --watch\" \"node ./bin/packages/build.mjs --watch\"",
 		"distclean": "git clean --force -d -X",
 		"docs:api-ref": "node ./bin/api-docs/update-api-docs.js",
