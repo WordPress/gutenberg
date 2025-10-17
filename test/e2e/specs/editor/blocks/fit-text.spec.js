@@ -23,6 +23,16 @@ test.describe( 'Fit Text', () => {
 
 			await editor.openDocumentSettingsSidebar();
 
+			// Enable Fit text control via Typography options menu
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Typography options' } )
+				.click();
+			await page
+				.getByRole( 'menu', { name: 'Typography options' } )
+				.getByRole( 'menuitemcheckbox', { name: 'Show Fit text' } )
+				.click();
+
 			const fitTextToggle = page.getByRole( 'checkbox', {
 				name: 'Fit text',
 			} );
@@ -40,9 +50,9 @@ test.describe( 'Fit Text', () => {
 				},
 			] );
 
-			const headingBlock = editor.canvas.getByRole( 'document', {
-				name: 'Block: Heading',
-			} );
+			const headingBlock = editor.canvas.locator(
+				'[data-type="core/heading"]'
+			);
 
 			await expect( headingBlock ).toHaveClass( /has-fit-text/ );
 		} );
@@ -85,6 +95,16 @@ test.describe( 'Fit Text', () => {
 
 			await editor.openDocumentSettingsSidebar();
 
+			// Enable Fit text control via Typography options menu
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Typography options' } )
+				.click();
+			await page
+				.getByRole( 'menu', { name: 'Typography options' } )
+				.getByRole( 'menuitemcheckbox', { name: 'Show Fit text' } )
+				.click();
+
 			const fitTextToggle = page.getByRole( 'checkbox', {
 				name: 'Fit text',
 			} );
@@ -101,9 +121,9 @@ test.describe( 'Fit Text', () => {
 				},
 			] );
 
-			const paragraphBlock = editor.canvas.getByRole( 'document', {
-				name: 'Block: Paragraph',
-			} );
+			const paragraphBlock = editor.canvas.locator(
+				'[data-type="core/paragraph"]'
+			);
 
 			await expect( paragraphBlock ).toHaveClass( /has-fit-text/ );
 		} );
