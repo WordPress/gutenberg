@@ -127,8 +127,8 @@ export function FontSizeEdit( props ) {
 	return (
 		<FontSizePicker
 			onChange={ onChange }
-			value={ fontSizeValue }
-			selectedSlug={ fontSize }
+			value={ fontSize || fontSizeValue }
+			valueMode={ fontSize ? 'slug' : 'literal' }
 			withReset={ false }
 			withSlider
 			size="__unstable-large"

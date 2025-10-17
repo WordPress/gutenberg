@@ -446,8 +446,8 @@ export default function TypographyPanel( {
 					panelId={ panelId }
 				>
 					<FontSizePicker
-						value={ fontSize }
-						selectedSlug={ currentFontSizeSlug }
+						value={ currentFontSizeSlug || fontSize }
+						valueMode={ currentFontSizeSlug ? 'slug' : 'literal' }
 						onChange={ setFontSize }
 						fontSizes={ mergedFontSizes }
 						disableCustomFontSizes={ disableCustomFontSizes }
