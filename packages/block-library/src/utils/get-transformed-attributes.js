@@ -34,8 +34,8 @@ export function getTransformedAttributes(
 	) {
 		transformedAttributes.allowedBlocks = attributes.allowedBlocks;
 	}
-	if ( hasBlockSupport( newBlockType, 'anchor' ) && attributes.id ) {
-		transformedAttributes.id = attributes.id;
+	if ( hasBlockSupport( newBlockType, 'anchor' ) && attributes.anchor ) {
+		transformedAttributes.anchor = attributes.anchor;
 	}
 	if (
 		hasBlockSupport( newBlockType, 'ariaLabel' ) &&
