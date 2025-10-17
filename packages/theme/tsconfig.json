@@ -2,17 +2,8 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"outDir": "./build",
-		"rootDir": ".",
 		"moduleResolution": "bundler",
 		"types": [ "jest", "@testing-library/jest-dom" ]
 	},
-	"references": [ { "path": "../element" }, { "path": "../private-apis" } ],
-	"include": [
-		"src",
-		"types",
-		"bin/**/*.ts",
-		"prebuild/js",
-		"terrazzo.config.ts"
-	]
+	"references": [ { "path": "../element" }, { "path": "../private-apis" } ]
 }

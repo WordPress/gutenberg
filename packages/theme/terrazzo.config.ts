@@ -19,7 +19,7 @@ export default defineConfig( {
 		'./tokens/spacing.json',
 		'./tokens/typography.json',
 	],
-	outDir: './prebuild',
+	outDir: './src/prebuild',
 
 	plugins: [
 		pluginCSS( {
@@ -49,11 +49,11 @@ export default defineConfig( {
 		pluginKnownWpdsCssVariables( {
 			exports: [
 				{ filename: 'js/design-tokens.js', modes: false },
-				{ filename: 'js/design-tokens.ts', modes: true },
+				{ filename: 'ts/design-tokens.ts', modes: true },
 			],
 		} ),
 		pluginDsTokenDocs( {
-			filename: '../docs/ds-tokens.md',
+			filename: '../../docs/ds-tokens.md',
 		} ),
 	],
 

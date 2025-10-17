@@ -13,7 +13,7 @@ import { useMemo, useContext } from '@wordpress/element';
  * Internal dependencies
  */
 import { ThemeContext } from './context';
-import semanticVariables from '../prebuild/js/design-tokens';
+import semanticVariables from './prebuild/ts/design-tokens';
 import {
 	buildBgRamp,
 	buildAccentRamp,
