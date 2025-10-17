@@ -51,7 +51,8 @@ export function normalizeLayout( layout?: Layout ): NormalizedLayout {
 		normalizedLayout = {
 			type: 'regular',
 			labelPosition: layout?.labelPosition ?? 'top',
-			spacing: ( layout as any )?.spacing ?? 4,
+			// Spacing is fixed for regular layout.
+			spacing: 4,
 		} satisfies NormalizedRegularLayout;
 	} else if ( layout?.type === 'panel' ) {
 		const summary = layout.summary ?? [];
@@ -74,7 +75,8 @@ export function normalizeLayout( layout?: Layout ): NormalizedLayout {
 				withHeader: false,
 				isOpened: true,
 				summary: [],
-				spacing: ( layout as any )?.spacing ?? 6,
+				// Spacing is fixed for card layout.
+				spacing: 6,
 			} satisfies NormalizedCardLayout;
 		} else {
 			const summary = layout.summary ?? [];
@@ -87,7 +89,8 @@ export function normalizeLayout( layout?: Layout ): NormalizedLayout {
 						? layout.isOpened
 						: true,
 				summary: normalizeCardSummaryField( summary ),
-				spacing: ( layout as any )?.spacing ?? 6,
+				// Spacing is fixed for card layout.
+				spacing: 6,
 			} satisfies NormalizedCardLayout;
 		}
 	} else if ( layout?.type === 'row' ) {

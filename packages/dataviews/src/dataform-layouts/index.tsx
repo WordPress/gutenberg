@@ -21,15 +21,11 @@ const FORM_FIELD_LAYOUTS = [
 		component: FormRegularField,
 		wrapper: ( {
 			children,
-			layout,
 		}: {
 			children: React.ReactNode;
 			layout: Layout;
 		} ) => (
-			<VStack
-				className="dataforms-layouts__wrapper"
-				spacing={ ( layout as any )?.spacing ?? 4 }
-			>
+			<VStack className="dataforms-layouts__wrapper" spacing={ 4 }>
 				{ children }
 			</VStack>
 		),
@@ -48,19 +44,14 @@ const FORM_FIELD_LAYOUTS = [
 		component: FormCardField,
 		wrapper: ( {
 			children,
-			layout,
 		}: {
 			children: React.ReactNode;
 			layout: Layout;
 		} ) => (
-<<<<<<< HEAD
 			<VStack
 				className="dataforms-layouts__wrapper"
 				spacing={ ( layout as any )?.spacing ?? 6 }
 			>
-=======
-			<VStack spacing={ ( layout as any ).spacing ?? 4 }>
->>>>>>> 5da5e9b1f9 (Make DataFormLayout spacing customisable)
 				{ children }
 			</VStack>
 		),
