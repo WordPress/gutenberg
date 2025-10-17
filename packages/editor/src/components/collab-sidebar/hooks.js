@@ -121,6 +121,11 @@ export function useBlockComments( postId ) {
 			updatedResult.map( ( thread ) => [ String( thread.id ), thread ] )
 		);
 
+		// Prepare sets to determine which threads are linked to existing blocks.
+		const mappedIds = new Set(
+			Object.values( blocksWithComments ).map( ( id ) => String( id ) )
+		);
+
 		// Get comments by block order, first unresolved, then resolved.
 		const unresolvedSortedComments = Object.values( blocksWithComments )
 			.map( ( commentId ) => threadIdMap.get( String( commentId ) ) )
@@ -135,10 +140,23 @@ export function useBlockComments( postId ) {
 					thread !== undefined && thread.status === 'approved'
 			);
 
-		// Combine unresolved comments in block order with resolved comments at the end.
+		// Append orphan notes (whose related block was deleted or missing).
+		const orphanUnresolvedComments = updatedResult.filter(
+			( thread ) =>
+				! mappedIds.has( String( thread.id ) ) &&
+				thread.status === 'hold'
+		);
+		const orphanResolvedComments = updatedResult.filter(
+			( thread ) =>
+				! mappedIds.has( String( thread.id ) ) &&
+				thread.status === 'approved'
+		);
+
 		const allSortedComments = [
 			...unresolvedSortedComments,
 			...resolvedSortedComments,
+			...orphanUnresolvedComments,
+			...orphanResolvedComments,
 		];
 
 		return {
