@@ -219,7 +219,7 @@ describe( 'useEntityBinding', () => {
 		expect( mockUpdateBlockBindings ).not.toHaveBeenCalled();
 	} );
 
-	it( 'should NOT call updateBlockBindings when clearBinding is called and binding source is null', () => {
+	it( 'should call updateBlockBindings when clearBinding is called and binding exists even with null source', () => {
 		const attributes = {
 			metadata: {
 				bindings: {
@@ -243,7 +243,9 @@ describe( 'useEntityBinding', () => {
 			result.current.clearBinding();
 		} );
 
-		expect( mockUpdateBlockBindings ).not.toHaveBeenCalled();
+		expect( mockUpdateBlockBindings ).toHaveBeenCalledWith( {
+			url: undefined,
+		} );
 	} );
 
 	it( 'should create core/post-data binding when createBinding is called for post-type', () => {

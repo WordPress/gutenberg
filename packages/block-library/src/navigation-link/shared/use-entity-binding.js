@@ -29,7 +29,7 @@ export function useEntityBinding( { clientId, attributes } ) {
 		if ( hasUrlBinding ) {
 			updateBlockBindings( { url: undefined } );
 		}
-	}, [ updateBlockBindings, hasUrlBinding ] );
+	}, [ updateBlockBindings, hasUrlBinding, metadata, id ] );
 
 	const createBinding = useCallback(
 		( updatedAttributes ) => {
