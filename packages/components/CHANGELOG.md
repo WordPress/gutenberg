@@ -10,7 +10,6 @@
 -   `Badge`: Avoid propagating text-decoration styles from ancestors into the component ([#72097](https://github.com/WordPress/gutenberg/pull/72097), [#72302](https://github.com/WordPress/gutenberg/pull/72302)).
 -   `CheckboxControl`, `RadioControl`, `ToggleControl` (`FormToggle`): Ensure elements are focused when clicked in Safari ([#72115](https://github.com/WordPress/gutenberg/pull/72115)).
 -   `Button`: Update font weight to `500` ([#70787](https://github.com/WordPress/gutenberg/pull/70787)).
--   `TabPanel`: Update font weight of tabs to `400` ([#70787](https://github.com/WordPress/gutenberg/pull/70787)).
 
 ### Bug Fixes
 
