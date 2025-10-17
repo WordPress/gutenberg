@@ -199,7 +199,7 @@ describe( 'useEntityBinding', () => {
 		} );
 	} );
 
-	it( 'should always attempt to clear binding when clearBinding is called, even when no binding exists', () => {
+	it( 'should NOT call updateBlockBindings when clearBinding is called and no binding exists', () => {
 		const attributes = {
 			metadata: {},
 			id: null,
@@ -216,12 +216,10 @@ describe( 'useEntityBinding', () => {
 			result.current.clearBinding();
 		} );
 
-		expect( mockUpdateBlockBindings ).toHaveBeenCalledWith( {
-			url: undefined,
-		} );
+		expect( mockUpdateBlockBindings ).not.toHaveBeenCalled();
 	} );
 
-	it( 'should always attempt to clear binding when clearBinding is called, even when binding source is null', () => {
+	it( 'should NOT call updateBlockBindings when clearBinding is called and binding source is null', () => {
 		const attributes = {
 			metadata: {
 				bindings: {
@@ -245,9 +243,7 @@ describe( 'useEntityBinding', () => {
 			result.current.clearBinding();
 		} );
 
-		expect( mockUpdateBlockBindings ).toHaveBeenCalledWith( {
-			url: undefined,
-		} );
+		expect( mockUpdateBlockBindings ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should create core/post-data binding when createBinding is called for post-type', () => {
@@ -303,6 +299,181 @@ describe( 'useEntityBinding', () => {
 					key: 'link',
 				},
 			},
+		} );
+	} );
+
+	describe( 'clearBinding behavior', () => {
+		it( 'should call updateBlockBindings when clearBinding is called and valid binding exists', () => {
+			const attributes = {
+				metadata: {
+					bindings: {
+						url: {
+							source: 'core/post-data',
+							args: { key: 'link' },
+						},
+					},
+				},
+				id: 123,
+				kind: 'post-type',
+			};
+
+			const { result } = renderHook( () =>
+				useEntityBinding( {
+					clientId: 'test-client-id',
+					attributes,
+				} )
+			);
+
+			act( () => {
+				result.current.clearBinding();
+			} );
+
+			expect( mockUpdateBlockBindings ).toHaveBeenCalledWith( {
+				url: undefined,
+			} );
+		} );
+
+		it( 'should call updateBlockBindings when clearBinding is called and valid taxonomy binding exists', () => {
+			const attributes = {
+				metadata: {
+					bindings: {
+						url: {
+							source: 'core/term-data',
+							args: { key: 'link' },
+						},
+					},
+				},
+				id: 456,
+				kind: 'taxonomy',
+			};
+
+			const { result } = renderHook( () =>
+				useEntityBinding( {
+					clientId: 'test-client-id',
+					attributes,
+				} )
+			);
+
+			act( () => {
+				result.current.clearBinding();
+			} );
+
+			expect( mockUpdateBlockBindings ).toHaveBeenCalledWith( {
+				url: undefined,
+			} );
+		} );
+
+		it( 'should NOT call updateBlockBindings when clearBinding is called and binding exists but no id', () => {
+			const attributes = {
+				metadata: {
+					bindings: {
+						url: {
+							source: 'core/post-data',
+							args: { key: 'link' },
+						},
+					},
+				},
+				id: null,
+				kind: 'post-type',
+			};
+
+			const { result } = renderHook( () =>
+				useEntityBinding( {
+					clientId: 'test-client-id',
+					attributes,
+				} )
+			);
+
+			act( () => {
+				result.current.clearBinding();
+			} );
+
+			expect( mockUpdateBlockBindings ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should call updateBlockBindings when clearBinding is called and binding exists with any source', () => {
+			const attributes = {
+				metadata: {
+					bindings: {
+						url: {
+							source: 'core/post-data',
+							args: { key: 'link' },
+						},
+					},
+				},
+				id: 123,
+				kind: 'post-type', // Correct kind for post-data source
+			};
+
+			const { result } = renderHook( () =>
+				useEntityBinding( {
+					clientId: 'test-client-id',
+					attributes,
+				} )
+			);
+
+			act( () => {
+				result.current.clearBinding();
+			} );
+
+			expect( mockUpdateBlockBindings ).toHaveBeenCalledWith( {
+				url: undefined,
+			} );
+		} );
+	} );
+
+	describe( 'createBinding behavior', () => {
+		it( 'should not create binding when createBinding is called without kind', () => {
+			const attributes = {
+				metadata: {},
+				id: null,
+				kind: null,
+			};
+
+			const { result } = renderHook( () =>
+				useEntityBinding( {
+					clientId: 'test-client-id',
+					attributes,
+				} )
+			);
+
+			act( () => {
+				result.current.createBinding();
+			} );
+
+			expect( mockUpdateBlockBindings ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should create binding with updated attributes when createBinding is called with updatedAttributes', () => {
+			const attributes = {
+				metadata: {},
+				id: null,
+				kind: 'post-type',
+			};
+
+			const updatedAttributes = {
+				kind: 'taxonomy',
+			};
+
+			const { result } = renderHook( () =>
+				useEntityBinding( {
+					clientId: 'test-client-id',
+					attributes,
+				} )
+			);
+
+			act( () => {
+				result.current.createBinding( updatedAttributes );
+			} );
+
+			expect( mockUpdateBlockBindings ).toHaveBeenCalledWith( {
+				url: {
+					source: 'core/term-data',
+					args: {
+						key: 'link',
+					},
+				},
+			} );
 		} );
 	} );
 } );

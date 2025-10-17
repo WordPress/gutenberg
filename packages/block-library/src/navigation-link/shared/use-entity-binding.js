@@ -26,8 +26,10 @@ export function useEntityBinding( { clientId, attributes } ) {
 		hasUrlBinding && metadata?.bindings?.url?.source === expectedSource;
 
 	const clearBinding = useCallback( () => {
-		updateBlockBindings( { url: undefined } );
-	}, [ updateBlockBindings ] );
+		if ( hasUrlBinding ) {
+			updateBlockBindings( { url: undefined } );
+		}
+	}, [ updateBlockBindings, hasUrlBinding ] );
 
 	const createBinding = useCallback(
 		( updatedAttributes ) => {
