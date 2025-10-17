@@ -11,6 +11,7 @@ import {
 	preloadScriptModules,
 	importScriptModules,
 	markScriptModuleAsResolved,
+	initializeInteractiveModuleAllowlist,
 	type ScriptModuleLoad,
 } from './assets/script-modules';
 
@@ -340,6 +341,27 @@ window.addEventListener( 'popstate', async () => {
 window.document
 	.querySelectorAll< HTMLScriptElement >( 'script[type=module][src]' )
 	.forEach( ( { src } ) => markScriptModuleAsResolved( src ) );
+
+// Initialize the interactive module allowlist from configuration
+const initializeAllowlist = () => {
+	try {
+		const allowlistElement = document.getElementById(
+			'wp-script-module-data-@wordpress/interactivity-router-allowlist'
+		);
+		if ( allowlistElement?.textContent ) {
+			const allowlistData = JSON.parse( allowlistElement.textContent );
+			if ( Array.isArray( allowlistData ) ) {
+				initializeInteractiveModuleAllowlist( allowlistData );
+			}
+		}
+	} catch ( error ) {
+		// If allowlist initialization fails, continue with default patterns
+		// Silent fallback to default behavior
+	}
+};
+
+initializeAllowlist();
+
 pages.set(
 	getPagePath( window.location.href ),
 	Promise.resolve(

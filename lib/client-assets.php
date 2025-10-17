@@ -695,6 +695,65 @@ function gutenberg_default_script_modules() {
 remove_action( 'wp_default_scripts', 'wp_default_script_modules' );
 add_action( 'wp_default_scripts', 'gutenberg_default_script_modules' );
 
+/**
+ * Provides the interactive module allowlist data to the frontend.
+ * This function identifies which script modules belong to interactive blocks
+ * and should be loaded during client-side navigation.
+ *
+ * @since 19.4.0
+ */
+function gutenberg_enqueue_interactive_module_allowlist() {
+	global $wp_script_modules;
+	
+	// Only add allowlist if we have script modules system
+	if ( ! $wp_script_modules ) {
+		return;
+	}
+
+	// Build allowlist of interactive block modules by checking registered modules
+	$interactive_modules = array();
+	
+	// Core WordPress modules that are always interactive-compatible
+	$always_allowed_modules = array(
+		'@wordpress/interactivity',
+		'@wordpress/interactivity-router',
+	);
+	
+	// Check all registered script modules
+	$registered_modules = $wp_script_modules->get_registered();
+	if ( is_array( $registered_modules ) ) {
+		foreach ( array_keys( $registered_modules ) as $module_id ) {
+			// Include core interactivity modules
+			if ( in_array( $module_id, $always_allowed_modules, true ) ) {
+				$interactive_modules[] = $module_id;
+				continue;
+			}
+			
+			// Include block-library view modules (they are typically interactive)
+			if ( strpos( $module_id, '@wordpress/block-library/' ) === 0 && strpos( $module_id, '/view' ) !== false ) {
+				$interactive_modules[] = $module_id;
+				continue;
+			}
+			
+			// Include modules that contain "interactive" in their name
+			if ( strpos( $module_id, 'interactive' ) !== false ) {
+				$interactive_modules[] = $module_id;
+				continue;
+			}
+		}
+	}
+	
+	// Allow plugins to modify the allowlist
+	$interactive_modules = apply_filters( 'gutenberg_interactive_module_allowlist', $interactive_modules );
+	
+	// Only output if we have modules to allowlist
+	if ( ! empty( $interactive_modules ) ) {
+		$allowlist_json = wp_json_encode( array_values( array_unique( $interactive_modules ) ) );
+		echo '<script type="application/json" id="wp-script-module-data-@wordpress/interactivity-router-allowlist">' . $allowlist_json . '</script>' . "\n";
+	}
+}
+add_action( 'wp_head', 'gutenberg_enqueue_interactive_module_allowlist' );
+
 /*
  * Always remove the Core action hook while gutenberg_enqueue_stored_styles() exists to avoid styles being printed twice.
  * This is also because gutenberg_enqueue_stored_styles uses the Style Engine's `gutenberg_*` functions and `_Gutenberg` classes,

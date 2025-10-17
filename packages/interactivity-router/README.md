@@ -148,6 +148,45 @@ prefetch( url: string, options: PrefetchOptions = {} )
     -   `force`: If `true`, forces fetching the URL again.
     -   `html`: HTML string to be used instead of fetching the requested URL.
 
+## Interactive Module Allowlist
+
+The Interactivity Router includes an allowlist mechanism to ensure that only JavaScript modules belonging to interactive blocks are loaded during client-side navigation. This prevents execution of potentially incompatible code and improves performance.
+
+### How it works
+
+By default, the router automatically identifies interactive block modules using these patterns:
+
+1. **Core WordPress modules**: `@wordpress/interactivity`, `@wordpress/interactivity-router` 
+2. **Block library view modules**: Any module with the pattern `@wordpress/block-library/*/view`
+3. **Interactive modules**: Any module containing "interactive" in the name
+
+### For Plugin Developers
+
+If you're creating custom interactive blocks, you can register your modules in the allowlist using the PHP filter:
+
+```php
+function my_plugin_register_interactive_modules( $allowlist ) {
+    $allowlist[] = '@my-plugin/interactive-block/view';
+    $allowlist[] = '@my-plugin/another-interactive-module';
+    return $allowlist;
+}
+add_filter( 'gutenberg_interactive_module_allowlist', 'my_plugin_register_interactive_modules' );
+```
+
+### Manual Configuration
+
+You can also manually configure the allowlist by providing a JSON script element in your page:
+
+```html
+<script type="application/json" id="wp-script-module-data-@wordpress/interactivity-router-allowlist">
+["@my-plugin/module-1", "@my-plugin/module-2"]
+</script>
+```
+
+### Debugging
+
+To see which modules are being loaded during navigation, you can check the browser console for any warnings about non-allowlisted modules being filtered out.
+
 ### State
 
 `state.url` is a reactive property synchronized with the current URL.
