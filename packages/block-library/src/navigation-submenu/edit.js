@@ -447,7 +447,7 @@ export default function NavigationSubmenuEdit( {
 								if ( isEntityLink ) {
 									createBinding( updatedAttributes );
 								} else {
-									clearBinding( updatedAttributes );
+									clearBinding();
 								}
 							} }
 						/>
