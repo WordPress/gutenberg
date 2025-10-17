@@ -3,12 +3,12 @@
  */
 import { createSlotFill } from '@wordpress/components';
 
-const { Fill, Slot } = createSlotFill( 'EditorsPresence' );
+const { Fill, Slot } = createSlotFill( 'EditorPresence' );
 
-export const EditorsPresenceFill = Fill;
+export const EditorPresenceFill = Fill;
 
-export function EditorsPresence( { children } ) {
+export function EditorPresence( { children } ) {
 	return <Fill>{ children }</Fill>;
 }
 
-EditorsPresence.Slot = Slot;
+EditorPresence.Slot = Slot;

@@ -353,6 +353,10 @@ _Returns_
 
 -   `React.ReactNode`: The rendered EditorNotices component.
 
+### EditorPresence
+
+Undocumented declaration.
+
 ### EditorProvider
 
 This component establishes a new post editing context, and serves as the entry point for a new post editor (or post with template editor).
@@ -392,10 +396,6 @@ Renders the editor snackbars component.
 _Returns_
 
 -   `React.ReactNode`: The rendered component.
-
-### EditorsPresence
-
-Undocumented declaration.
 
 ### EntitiesSavedStates
 
