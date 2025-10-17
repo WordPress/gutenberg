@@ -39,7 +39,7 @@ export default function isLatexMathMode( text ) {
 	//   since they're also found in normal text.
 	// * A command (e.g., \alpha)
 	const softClues = [
-		( t ) => t.includes( '^' ),
+		( t ) => t.includes( '^' ) && ! t.startsWith( '^' ),
 		( t ) =>
 			[ '=', '+', '-', '/', '*' ].some( ( operator ) =>
 				t.includes( operator )

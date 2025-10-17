@@ -19,8 +19,10 @@ export const settings = {
 	icon,
 	example: {
 		attributes: {
-			latex: '\\begin{bmatrix} a_{11} & a_{12} & \\cdots & a_{1n} \\\\ a_{21} & a_{22} & \\cdots & a_{2n} \\\\ \\vdots & \\vdots & \\ddots & \\vdots \\\\ a_{m1} & a_{m2} & \\cdots & a_{mn} \\end{bmatrix} \\begin{bmatrix} x_1 \\\\ x_2 \\\\ \\vdots \\\\ x_n \\end{bmatrix} = \\begin{bmatrix} b_1 \\\\ b_2 \\\\ \\vdots \\\\ b_m \\end{bmatrix}',
+			latex: 'x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}',
+			mathML: '<semantics><mrow><mi>x</mi><mo>=</mo><mfrac><mrow><mo lspace="0em" rspace="0em">−</mo><mi>b</mi><mo>±</mo><msqrt><mrow><msup><mi>b</mi><mn>2</mn></msup><mo>−</mo><mn>4</mn><mi>a</mi><mi>c</mi></mrow></msqrt></mrow><mrow><mn>2</mn><mi>a</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}</annotation></semantics>',
 		},
+		viewportWidth: 300,
 	},
 	edit,
 	save,

@@ -48,6 +48,10 @@ describe( 'isLatexMathMode', () => {
 			expect( isLatexMathMode( 'a + b' ) ).toBe( false );
 			expect( isLatexMathMode( '\\alpha' ) ).toBe( false );
 		} );
+
+		it( 'regex with start of string', () => {
+			expect( isLatexMathMode( '^[a+]' ) ).toBe( false );
+		} );
 	} );
 
 	describe( 'should handle edge cases with LaTeX commands', () => {

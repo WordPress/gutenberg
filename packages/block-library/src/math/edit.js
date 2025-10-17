@@ -77,6 +77,7 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 										mathML = latexToMathML( newLatex, {
 											displayMode: true,
 										} );
+										setError( null );
 									} catch ( err ) {
 										setError( err.message );
 									}
