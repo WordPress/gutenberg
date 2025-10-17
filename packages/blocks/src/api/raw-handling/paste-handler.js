@@ -32,6 +32,7 @@ import brRemover from './br-remover';
 import { deepFilterHTML, isPlain, getBlockContentSchema } from './utils';
 import emptyParagraphRemover from './empty-paragraph-remover';
 import slackParagraphCorrector from './slack-paragraph-corrector';
+import nestedListedConverter from './nested-list-converted';
 
 const log = ( ...args ) => window?.console?.log?.( ...args );
 
@@ -46,6 +47,7 @@ function filterInlineHTML( HTML ) {
 	HTML = deepFilterHTML( HTML, [
 		headRemover,
 		googleDocsUIDRemover,
+		nestedListedConverter,
 		msListIgnore,
 		phrasingContentReducer,
 		commentRemover,
@@ -188,6 +190,7 @@ export function pasteHandler( {
 			const filters = [
 				googleDocsUIDRemover,
 				msListConverter,
+				nestedListedConverter,
 				headRemover,
 				listReducer,
 				imageCorrector,
