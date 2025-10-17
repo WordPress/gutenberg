@@ -149,7 +149,7 @@ export default {
 		const newValues = {};
 		for ( const [ attributeName, source ] of Object.entries( bindings ) ) {
 			// Use the value, the field label, or the field key.
-			const fieldKey = source.args.key;
+			const fieldKey = source.args.field;
 			const { value: fieldValue, label: fieldLabel } =
 				dataFields?.[ fieldKey ] || {};
 			newValues[ attributeName ] = fieldValue ?? fieldLabel ?? fieldKey;
@@ -185,7 +185,7 @@ export default {
 		}
 
 		const fieldValue = getTermDataFields( select, context, undefined )?.[
-			args.key
+			args.field
 		]?.value;
 		// Empty string or `false` could be a valid value, so we need to check if the field value is undefined.
 		if ( fieldValue === undefined ) {
@@ -210,7 +210,7 @@ export default {
 			label: field.label,
 			type: field.type,
 			args: {
-				key,
+				field: key,
 			},
 		} ) );
 		/*
