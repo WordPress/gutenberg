@@ -60,7 +60,7 @@ const { state, actions } = store(
 			},
 		},
 		actions: {
-			openMenuOnHover() {
+			openMenuOnHover: withSyncEvent( () => {
 				const { type, overlayOpenedBy } = getContext();
 				if (
 					type === 'submenu' &&
@@ -70,8 +70,8 @@ const { state, actions } = store(
 				) {
 					actions.openMenu( 'hover' );
 				}
-			},
-			closeMenuOnHover() {
+			} ),
+			closeMenuOnHover: withSyncEvent( () => {
 				const { type, overlayOpenedBy } = getContext();
 				if (
 					type === 'submenu' &&
@@ -81,21 +81,21 @@ const { state, actions } = store(
 				) {
 					actions.closeMenu( 'hover' );
 				}
-			},
-			openMenuOnClick() {
+			} ),
+			openMenuOnClick: withSyncEvent( () => {
 				const ctx = getContext();
 				const { ref } = getElement();
 				ctx.previousFocus = ref;
 				actions.openMenu( 'click' );
-			},
-			closeMenuOnClick() {
+			} ),
+			closeMenuOnClick: withSyncEvent( () => {
 				actions.closeMenu( 'click' );
 				actions.closeMenu( 'focus' );
-			},
-			openMenuOnFocus() {
+			} ),
+			openMenuOnFocus: withSyncEvent( () => {
 				actions.openMenu( 'focus' );
-			},
-			toggleMenuOnClick() {
+			} ),
+			toggleMenuOnClick: withSyncEvent( () => {
 				const ctx = getContext();
 				const { ref } = getElement();
 				// Safari won't send focus to the clicked element, so we need to manually place it: https://bugs.webkit.org/show_bug.cgi?id=22261
@@ -110,7 +110,7 @@ const { state, actions } = store(
 					ctx.previousFocus = ref;
 					actions.openMenu( 'click' );
 				}
-			},
+			} ),
 			handleMenuKeydown: withSyncEvent( ( event ) => {
 				const { type, firstFocusableElement, lastFocusableElement } =
 					getContext();
@@ -144,7 +144,7 @@ const { state, actions } = store(
 					}
 				}
 			} ),
-			handleMenuFocusout( event ) {
+			handleMenuFocusout: withSyncEvent( ( event ) => {
 				const { modal, type } = getContext();
 				// If focus is outside modal, and in the document, close menu
 				// event.target === The element losing focus
@@ -162,7 +162,7 @@ const { state, actions } = store(
 					actions.closeMenu( 'click' );
 					actions.closeMenu( 'focus' );
 				}
-			},
+			} ),
 
 			openMenu( menuOpenedOn = 'click' ) {
 				const { type } = getContext();
