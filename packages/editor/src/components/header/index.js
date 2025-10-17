@@ -30,7 +30,7 @@ import {
 	NAVIGATION_POST_TYPE,
 } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
-import { EditorsPresence } from '../editors-presence';
+import { EditorsPresence } from '../editor-presence';
 
 const toolbarVariations = {
 	distractionFreeDisabled: { y: '-50px' },
