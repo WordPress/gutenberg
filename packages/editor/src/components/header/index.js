@@ -31,6 +31,7 @@ import {
 	NAVIGATION_POST_TYPE,
 } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
+import { Slot as EditorPresenceSlot } from '../editor-presence';
 
 const toolbarVariations = {
 	distractionFreeDisabled: { y: '-50px' },
@@ -159,6 +160,15 @@ function Header( {
 					variants={ toolbarVariations }
 					transition={ { type: 'tween' } }
 				>
+					<EditorPresenceSlot>
+						{ ( fills ) =>
+							fills?.length ? (
+								<div className="editor-header__editor-presence">
+									{ fills }
+								</div>
+							) : null
+						}
+					</EditorPresenceSlot>
 					<DocumentBar />
 				</motion.div>
 			) }
