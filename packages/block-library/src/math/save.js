@@ -10,10 +10,6 @@ export default function save( { attributes } ) {
 		return null;
 	}
 
-	if ( ! mathML ) {
-		return <div { ...useBlockProps.save() }>{ latex }</div>;
-	}
-
 	return (
 		<math
 			{ ...useBlockProps.save() }

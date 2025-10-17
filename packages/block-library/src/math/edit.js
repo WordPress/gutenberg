@@ -65,7 +65,7 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 					dangerouslySetInnerHTML={ { __html: attributes.mathML } }
 				/>
 			) : (
-				attributes.latex || '\u200B'
+				'\u200B'
 			) }
 			{ isSelected && (
 				<Popover
