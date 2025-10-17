@@ -7,9 +7,9 @@ import { convertToNavigationLinks } from '../use-convert-to-navigation-links';
 // Expected entity binding structure for navigation links
 const EXPECTED_ENTITY_BINDING = {
 	url: {
-		source: 'core/entity',
+		source: 'core/post-data',
 		args: {
-			key: 'url',
+			key: 'link',
 		},
 	},
 };
