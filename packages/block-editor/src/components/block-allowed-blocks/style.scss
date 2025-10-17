@@ -1,0 +1,27 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
+.block-editor-block-allowed-blocks-control:not(:only-child) {
+	margin-top: $grid-unit-20;
+}
+
+.block-editor-block-allowed-blocks-control__button {
+	width: 100%;
+	justify-content: center;
+}
+
+.block-editor-block-allowed-blocks-modal {
+	z-index: z-index(".block-editor-block-allowed-blocks-modal");
+}
+
+.block-editor-block-allowed-blocks-modal__actions {
+	background-color: $white;
+	border-top: $border-width solid $gray-300;
+	bottom: -1 * $grid-unit-40;
+	left: 0;
+	margin: 0 (-1 * $grid-unit-40) (-1 * $grid-unit-40);
+	padding: $grid-unit-20 $grid-unit-40;
+	position: sticky;
+	z-index: 1;
+}

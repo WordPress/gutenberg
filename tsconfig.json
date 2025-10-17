@@ -3,6 +3,7 @@
 	"references": [
 		{ "path": "bin" },
 		{ "path": "packages/a11y" },
+		{ "path": "packages/admin-ui" },
 		{ "path": "packages/api-fetch" },
 		{ "path": "packages/autop" },
 		{ "path": "packages/blob" },
@@ -37,6 +38,7 @@
 		{ "path": "packages/interactivity-router" },
 		{ "path": "packages/is-shallow-equal" },
 		{ "path": "packages/keycodes" },
+		{ "path": "packages/latex-to-mathml" },
 		{ "path": "packages/lazy-import" },
 		{ "path": "packages/media-utils" },
 		{ "path": "packages/notices" },
@@ -59,6 +61,7 @@
 		{ "path": "packages/undo-manager" },
 		{ "path": "packages/upload-media" },
 		{ "path": "packages/url" },
+		{ "path": "packages/views" },
 		{ "path": "packages/vips" },
 		{ "path": "packages/warning" },
 		{ "path": "packages/wordcount" },

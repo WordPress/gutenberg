@@ -14,13 +14,13 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import type { BasePost } from '../../types';
+import type { BasePostWithEmbeddedFeaturedMedia } from '../../types';
 
 export const FeaturedImageEdit = ( {
 	data,
 	field,
 	onChange,
-}: DataFormControlProps< BasePost > ) => {
+}: DataFormControlProps< BasePostWithEmbeddedFeaturedMedia > ) => {
 	const { id } = field;
 
 	const value = field.getValue( { item: data } );

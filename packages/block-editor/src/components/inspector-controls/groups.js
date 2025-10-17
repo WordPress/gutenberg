@@ -41,3 +41,8 @@ const groups = {
 };
 
 export default groups;
+
+// Private slot for allowed blocks control UI.
+export const PrivateInspectorControlsAllowedBlocks = createSlotFill(
+	Symbol( 'PrivateInspectorControlsAllowedBlocks' )
+);

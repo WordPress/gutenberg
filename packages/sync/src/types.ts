@@ -1,27 +1,77 @@
+/**
+ * External dependencies
+ */
+import type * as Y from 'yjs';
+
+/* globalThis */
+declare global {
+	interface Window {
+		__experimentalCollaborativeEditingSecret?: string;
+		wp?: {
+			ajax?: {
+				settings?: {
+					url?: string;
+				};
+			};
+		};
+	}
+}
+
+export type CRDTDoc = Y.Doc;
+export type EntityID = string;
 export type ObjectID = string;
 export type ObjectType = string;
-export type ObjectData = any;
-export type CRDTDoc = any;
 
-export type ObjectConfig = {
-	fetch: ( id: ObjectID ) => Promise< ObjectData >;
-	applyChangesToDoc: ( doc: CRDTDoc, data: any ) => void;
-	fromCRDTDoc: ( doc: CRDTDoc ) => any;
-};
+// An origin is a value passed by the transactor to identify the source of a
+// change. It can be any value, and is not used internally by Yjs. Origins are
+// preserved locally, while a remote change will have the provider instance as
+// its origin.
+export type Origin = any;
 
-export type ConnectDoc = (
-	id: ObjectID,
-	type: ObjectType,
-	doc: CRDTDoc
-) => Promise< () => void >;
+// Object data represents any entity record, post, term, user, site, etc. There
+// are not many expectations that can hold on its shape.
+export interface ObjectData extends Record< string, unknown > {}
 
-export type SyncProvider = {
-	register: ( type: ObjectType, config: ObjectConfig ) => void;
-	bootstrap: (
-		type: ObjectType,
-		id: ObjectID,
-		handleChanges: ( data: any ) => void
-	) => Promise< CRDTDoc >;
-	update: ( type: ObjectType, id: ObjectID, data: any ) => void;
-	discard: ( type: ObjectType, id: ObjectID ) => Promise< CRDTDoc >;
-};
+export interface ProviderCreatorResult {
+	destroy: () => void;
+}
+
+export type ProviderCreator = (
+	objectType: ObjectType,
+	objectId: ObjectID,
+	ydoc: Y.Doc
+) => Promise< ProviderCreatorResult >;
+
+export interface RecordHandlers {
+	editRecord: ( data: Partial< ObjectData > ) => void;
+	getEditedRecord: () => Promise< ObjectData >;
+}
+
+export interface SyncConfig {
+	applyChangesToCRDTDoc: (
+		ydoc: Y.Doc,
+		changes: Partial< ObjectData >
+	) => void;
+	getChangesFromCRDTDoc: (
+		ydoc: Y.Doc,
+		editedRecord: ObjectData
+	) => ObjectData;
+	supports?: Record< string, true >;
+}
+
+export interface SyncManager {
+	load: (
+		syncConfig: SyncConfig,
+		objectType: ObjectType,
+		objectId: ObjectID,
+		record: ObjectData,
+		handlers: RecordHandlers
+	) => Promise< void >;
+	unload: ( objectType: ObjectType, objectId: ObjectID ) => void;
+	update: (
+		objectType: ObjectType,
+		objectId: ObjectID,
+		changes: Partial< ObjectData >,
+		origin: string
+	) => void;
+}

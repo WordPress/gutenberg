@@ -33,9 +33,6 @@ import {
 } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
 
-const isBlockCommentExperimentEnabled =
-	window?.__experimentalEnableBlockComment;
-
 const toolbarVariations = {
 	distractionFreeDisabled: { y: '-50px' },
 	distractionFreeHover: { y: 0 },
@@ -197,11 +194,9 @@ function Header( {
 					/>
 				) }
 
-				{ isBlockCommentExperimentEnabled && (
-					<PostTypeSupportCheck supportKeys="editor.block-comments">
-						<CollabSidebar />
-					</PostTypeSupportCheck>
-				) }
+				<PostTypeSupportCheck supportKeys="editor.notes">
+					<CollabSidebar />
+				</PostTypeSupportCheck>
 
 				{ customSaveButton }
 				<MoreMenu />
