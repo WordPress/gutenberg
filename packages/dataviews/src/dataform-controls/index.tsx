@@ -29,6 +29,7 @@ import toggleGroup from './toggle-group';
 import array from './array';
 import color from './color';
 import password from './password';
+import hasElements from '../utils/has-elements';
 
 interface FormControls {
 	[ key: string ]: ComponentType< DataFormControlProps< any > >;
@@ -87,7 +88,7 @@ export function getControl< Item >(
 		return createConfiguredControl( field.Edit );
 	}
 
-	if ( field.elements && field.type !== 'array' ) {
+	if ( hasElements( field ) && field.type !== 'array' ) {
 		return getControlByType( 'select' );
 	}
 

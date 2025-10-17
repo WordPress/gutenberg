@@ -123,7 +123,7 @@ const EditWithGeneratedProps = ( props ) => {
 				const source = registeredSources[ sourceName ];
 				if (
 					! source ||
-					! bindableAttributes.includes( attributeName )
+					! bindableAttributes?.includes( attributeName )
 				) {
 					continue;
 				}
@@ -202,7 +202,7 @@ const EditWithGeneratedProps = ( props ) => {
 				) ) {
 					if (
 						! blockBindings[ attributeName ] ||
-						! bindableAttributes.includes( attributeName )
+						! bindableAttributes?.includes( attributeName )
 					) {
 						continue;
 					}

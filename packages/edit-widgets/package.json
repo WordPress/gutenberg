@@ -34,6 +34,11 @@
 	},
 	"react-native": "src/index",
 	"wpScript": true,
+	"wpCopyFiles": {
+		"files": [
+			"src/blocks/*/block.json"
+		]
+	},
 	"dependencies": {
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/base-styles": "file:../base-styles",

@@ -4,6 +4,16 @@
 
 import { convertToNavigationLinks } from '../use-convert-to-navigation-links';
 
+// Expected entity binding structure for navigation links
+const EXPECTED_ENTITY_BINDING = {
+	url: {
+		source: 'core/post-data',
+		args: {
+			key: 'link',
+		},
+	},
+};
+
 // Mock createBlock to avoid creating the blocks in test environment
 // as convertToNavigationLinks calls this method internally.
 jest.mock( '@wordpress/blocks', () => {
@@ -117,6 +127,9 @@ describe( 'page list convert to links', () => {
 						label: 'Sample Page',
 						type: 'page',
 						url: 'http://wordpress.local/sample-page/',
+						metadata: {
+							bindings: EXPECTED_ENTITY_BINDING,
+						},
 					},
 					innerBlocks: [],
 					name: 'core/navigation-link',
@@ -128,6 +141,9 @@ describe( 'page list convert to links', () => {
 						label: 'About',
 						type: 'page',
 						url: 'http://wordpress.local/about/',
+						metadata: {
+							bindings: EXPECTED_ENTITY_BINDING,
+						},
 					},
 					innerBlocks: [
 						{
@@ -137,6 +153,9 @@ describe( 'page list convert to links', () => {
 								label: 'About Sub 1',
 								type: 'page',
 								url: 'http://wordpress.local/about/about-sub-1/',
+								metadata: {
+									bindings: EXPECTED_ENTITY_BINDING,
+								},
 							},
 							innerBlocks: [],
 							name: 'core/navigation-link',
@@ -148,6 +167,9 @@ describe( 'page list convert to links', () => {
 								label: 'About Sub 2',
 								type: 'page',
 								url: 'http://wordpress.local/about/about-sub-2/',
+								metadata: {
+									bindings: EXPECTED_ENTITY_BINDING,
+								},
 							},
 							innerBlocks: [],
 							name: 'core/navigation-link',
@@ -162,6 +184,9 @@ describe( 'page list convert to links', () => {
 						label: 'Contact Page',
 						type: 'page',
 						url: 'http://wordpress.local/contact-page/',
+						metadata: {
+							bindings: EXPECTED_ENTITY_BINDING,
+						},
 					},
 					innerBlocks: [],
 					name: 'core/navigation-link',
@@ -173,6 +198,9 @@ describe( 'page list convert to links', () => {
 						label: 'Test',
 						type: 'page',
 						url: 'http://wordpress.local/test/',
+						metadata: {
+							bindings: EXPECTED_ENTITY_BINDING,
+						},
 					},
 					innerBlocks: [
 						{
@@ -182,6 +210,9 @@ describe( 'page list convert to links', () => {
 								label: 'Test Sub',
 								type: 'page',
 								url: 'http://wordpress.local/test/test-sub/',
+								metadata: {
+									bindings: EXPECTED_ENTITY_BINDING,
+								},
 							},
 							innerBlocks: [
 								{
@@ -191,6 +222,9 @@ describe( 'page list convert to links', () => {
 										label: 'Test Sub Sub',
 										type: 'page',
 										url: 'http://wordpress.local/test/test-sub/test-sub-sub/',
+										metadata: {
+											bindings: EXPECTED_ENTITY_BINDING,
+										},
 									},
 									innerBlocks: [],
 									name: 'core/navigation-link',
@@ -297,6 +331,9 @@ describe( 'page list convert to links', () => {
 						label: 'Sample Page',
 						type: 'page',
 						url: 'http://wordpress.local/sample-page/',
+						metadata: {
+							bindings: EXPECTED_ENTITY_BINDING,
+						},
 					},
 					innerBlocks: [],
 					name: 'core/navigation-link',
@@ -308,6 +345,9 @@ describe( 'page list convert to links', () => {
 						label: 'About',
 						type: 'page',
 						url: 'http://wordpress.local/about/',
+						metadata: {
+							bindings: EXPECTED_ENTITY_BINDING,
+						},
 					},
 					innerBlocks: [
 						{
@@ -317,6 +357,9 @@ describe( 'page list convert to links', () => {
 								label: 'About Sub 1',
 								type: 'page',
 								url: 'http://wordpress.local/about/about-sub-1/',
+								metadata: {
+									bindings: EXPECTED_ENTITY_BINDING,
+								},
 							},
 							innerBlocks: [],
 							name: 'core/navigation-link',
@@ -328,6 +371,9 @@ describe( 'page list convert to links', () => {
 								label: 'About Sub 2',
 								type: 'page',
 								url: 'http://wordpress.local/about/about-sub-2/',
+								metadata: {
+									bindings: EXPECTED_ENTITY_BINDING,
+								},
 							},
 							innerBlocks: [],
 							name: 'core/navigation-link',
@@ -342,6 +388,9 @@ describe( 'page list convert to links', () => {
 						label: 'Contact Page',
 						type: 'page',
 						url: 'http://wordpress.local/contact-page/',
+						metadata: {
+							bindings: EXPECTED_ENTITY_BINDING,
+						},
 					},
 					innerBlocks: [],
 					name: 'core/navigation-link',
@@ -353,6 +402,9 @@ describe( 'page list convert to links', () => {
 						label: 'Test',
 						type: 'page',
 						url: 'http://wordpress.local/test/',
+						metadata: {
+							bindings: EXPECTED_ENTITY_BINDING,
+						},
 					},
 					innerBlocks: [
 						{
@@ -362,6 +414,9 @@ describe( 'page list convert to links', () => {
 								label: 'Test Sub',
 								type: 'page',
 								url: 'http://wordpress.local/test/test-sub/',
+								metadata: {
+									bindings: EXPECTED_ENTITY_BINDING,
+								},
 							},
 							innerBlocks: [
 								{
@@ -371,6 +426,9 @@ describe( 'page list convert to links', () => {
 										label: 'Test Sub Sub',
 										type: 'page',
 										url: 'http://wordpress.local/test/test-sub/test-sub-sub/',
+										metadata: {
+											bindings: EXPECTED_ENTITY_BINDING,
+										},
 									},
 									innerBlocks: [],
 									name: 'core/navigation-link',
@@ -481,6 +539,9 @@ describe( 'page list convert to links', () => {
 						label: 'About Sub 1',
 						type: 'page',
 						url: 'http://wordpress.local/about/about-sub-1/',
+						metadata: {
+							bindings: EXPECTED_ENTITY_BINDING,
+						},
 					},
 					innerBlocks: [],
 					name: 'core/navigation-link',
@@ -492,6 +553,9 @@ describe( 'page list convert to links', () => {
 						label: 'About Sub 2',
 						type: 'page',
 						url: 'http://wordpress.local/about/about-sub-2/',
+						metadata: {
+							bindings: EXPECTED_ENTITY_BINDING,
+						},
 					},
 					innerBlocks: [],
 					name: 'core/navigation-link',
@@ -511,6 +575,9 @@ describe( 'page list convert to links', () => {
 						label: 'Test Sub Sub',
 						type: 'page',
 						url: 'http://wordpress.local/test/test-sub/test-sub-sub/',
+						metadata: {
+							bindings: EXPECTED_ENTITY_BINDING,
+						},
 					},
 					innerBlocks: [],
 					name: 'core/navigation-link',

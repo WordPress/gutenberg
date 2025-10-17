@@ -33,6 +33,7 @@
 	&.is-selected {
 		background-color: $white;
 		box-shadow: $elevation-medium;
+		z-index: 1;
 	}
 
 	&:focus {

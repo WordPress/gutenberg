@@ -432,7 +432,10 @@ export default function NavigationSubmenuEdit( {
 							} }
 							onChange={ ( updatedValue ) => {
 								// updateAttributes determines the final state and returns metadata
-								const { isEntityLink } = updateAttributes(
+								const {
+									isEntityLink,
+									attributes: updatedAttributes,
+								} = updateAttributes(
 									updatedValue,
 									setAttributes,
 									attributes
@@ -442,9 +445,9 @@ export default function NavigationSubmenuEdit( {
 								// Only create bindings for entity links (posts, pages, taxonomies)
 								// Never create bindings for custom links (manual URLs)
 								if ( isEntityLink ) {
-									createBinding();
+									createBinding( updatedAttributes );
 								} else {
-									clearBinding();
+									clearBinding( updatedAttributes );
 								}
 							} }
 						/>

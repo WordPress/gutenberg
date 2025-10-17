@@ -1,0 +1,49 @@
+{
+	"name": "@wordpress/latex-to-mathml",
+	"version": "1.0.0",
+	"description": "Convert LaTeX math syntax to MathML.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"latex",
+		"mathml",
+		"math"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/latex-to-mathml/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/latex-to-mathml"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.js",
+			"require": "./build/index.js"
+		},
+		"./package.json": "./package.json"
+	},
+	"wpScript": true,
+	"wpScriptModuleExports": {
+		".": "./build-module/index.js",
+		"./loader": "./build-module/loader.js"
+	},
+	"types": "build-types",
+	"dependencies": {
+		"temml": "^0.10.33"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

@@ -58,7 +58,17 @@ export interface NormalizedFilter {
 	/**
 	 * The list of options to pick from when using the field as a filter.
 	 */
-	elements: Option[];
+	elements?: Option[];
+
+	/**
+	 * Retrieval function to get the elements.
+	 */
+	getElements?: () => Promise< Option[] >;
+
+	/**
+	 * Whether the filter has elements.
+	 */
+	hasElements: boolean;
 
 	/**
 	 * Is a single selection filter.

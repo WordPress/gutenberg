@@ -543,7 +543,10 @@ export default function NavigationLinkEdit( {
 							anchor={ popoverAnchor }
 							onRemove={ removeLink }
 							onChange={ ( updatedValue ) => {
-								const { isEntityLink } = updateAttributes(
+								const {
+									isEntityLink,
+									attributes: updatedAttributes,
+								} = updateAttributes(
 									updatedValue,
 									setAttributes,
 									attributes
@@ -553,9 +556,9 @@ export default function NavigationLinkEdit( {
 								// Only create bindings for entity links (posts, pages, taxonomies)
 								// Never create bindings for custom links (manual URLs)
 								if ( isEntityLink ) {
-									createBinding();
+									createBinding( updatedAttributes );
 								} else {
-									clearBinding();
+									clearBinding( updatedAttributes );
 								}
 							} }
 						/>

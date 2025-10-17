@@ -14,7 +14,11 @@ import { store as interfaceStore } from '@wordpress/interface';
  * Internal dependencies
  */
 import PluginSidebar from '../plugin-sidebar';
-import { collabHistorySidebarName, collabSidebarName } from './constants';
+import {
+	collabHistorySidebarName,
+	collabSidebarName,
+	SIDEBARS,
+} from './constants';
 import { Comments } from './comments';
 import { AddComment } from './add-comment';
 import { store as editorStore } from '../../store';
@@ -27,6 +31,7 @@ import {
 	useEnableFloatingSidebar,
 } from './hooks';
 import { focusCommentThread } from './utils';
+import PluginMoreMenuItem from '../plugin-more-menu-item';
 
 function CollabSidebarContent( {
 	showCommentBoard,
@@ -47,19 +52,18 @@ function CollabSidebarContent( {
 			style={ styles }
 			role="list"
 			spacing="3"
+			justify="flex-start"
 			ref={ ( node ) => {
 				// Keeps the ref fresh when switching between floating and pinned sidebar.
 				commentSidebarRef.current = node;
 			} }
 		>
-			{ ! isFloating && (
-				<AddComment
-					onSubmit={ onCreate }
-					showCommentBoard={ showCommentBoard }
-					setShowCommentBoard={ setShowCommentBoard }
-					commentSidebarRef={ commentSidebarRef }
-				/>
-			) }
+			<AddComment
+				onSubmit={ onCreate }
+				showCommentBoard={ showCommentBoard }
+				setShowCommentBoard={ setShowCommentBoard }
+				commentSidebarRef={ commentSidebarRef }
+			/>
 			<Comments
 				threads={ comments }
 				onEditComment={ onEdit }
@@ -98,7 +102,7 @@ export default function CollabSidebar() {
 			select( blockEditorStore );
 		const clientId = getSelectedBlockClientId();
 		return clientId
-			? getBlockAttributes( clientId )?.metadata?.commentId
+			? getBlockAttributes( clientId )?.metadata?.noteId
 			: null;
 	}, [] );
 
@@ -128,23 +132,27 @@ export default function CollabSidebar() {
 	}
 
 	async function openTheSidebar() {
-		enableComplementaryArea( 'core', collabHistorySidebarName );
-		const activeArea = await getActiveComplementaryArea( 'core' );
+		const prevArea = await getActiveComplementaryArea( 'core' );
+		const activeNotesArea = SIDEBARS.find( ( name ) => name === prevArea );
 
-		// Move focus to the target element after the sidebar has opened.
-		if (
-			[ collabHistorySidebarName, collabSidebarName ].includes(
-				activeArea
-			)
-		) {
-			setShowCommentBoard( ! blockCommentId );
-			focusCommentThread(
-				blockCommentId,
-				commentSidebarRef.current,
-				// Focus a comment thread when there's a selected block with a comment.
-				! blockCommentId ? 'textarea' : undefined
-			);
+		// If the notes sidebar is not already active, enable the pinned sidebar.
+		if ( ! activeNotesArea ) {
+			enableComplementaryArea( 'core', collabSidebarName );
 		}
+
+		const currentArea = await getActiveComplementaryArea( 'core' );
+		// Bail out if the current active area is not one of note sidebars.
+		if ( ! SIDEBARS.includes( currentArea ) ) {
+			return;
+		}
+
+		setShowCommentBoard( ! blockCommentId );
+		focusCommentThread(
+			blockCommentId,
+			commentSidebarRef.current,
+			// Focus a comment thread when there's a selected block with a comment.
+			! blockCommentId ? 'textarea' : undefined
+		);
 	}
 
 	return (
@@ -172,29 +180,38 @@ export default function CollabSidebar() {
 					commentLastUpdated={ commentLastUpdated }
 				/>
 			</PluginSidebar>
-			{ isLargeViewport && unresolvedSortedThreads.length > 0 && (
-				<PluginSidebar
-					isPinnable={ false }
-					header={ false }
-					identifier={ collabSidebarName }
-					className="editor-collab-sidebar"
-					headerClassName="editor-collab-sidebar__header"
-					backgroundColor={ backgroundColor }
-				>
-					<CollabSidebarContent
-						comments={ unresolvedSortedThreads }
-						showCommentBoard={ showCommentBoard }
-						setShowCommentBoard={ setShowCommentBoard }
-						commentSidebarRef={ commentSidebarRef }
-						reflowComments={ reflowComments }
-						commentLastUpdated={ commentLastUpdated }
-						styles={ {
-							backgroundColor,
-						} }
-						isFloating
-					/>
-				</PluginSidebar>
-			) }
+			{ isLargeViewport &&
+				( unresolvedSortedThreads.length > 0 || showCommentBoard ) && (
+					<PluginSidebar
+						isPinnable={ false }
+						header={ false }
+						identifier={ collabSidebarName }
+						className="editor-collab-sidebar"
+						headerClassName="editor-collab-sidebar__header"
+						backgroundColor={ backgroundColor }
+					>
+						<CollabSidebarContent
+							comments={ unresolvedSortedThreads }
+							showCommentBoard={ showCommentBoard }
+							setShowCommentBoard={ setShowCommentBoard }
+							commentSidebarRef={ commentSidebarRef }
+							reflowComments={ reflowComments }
+							commentLastUpdated={ commentLastUpdated }
+							styles={ {
+								backgroundColor,
+							} }
+							isFloating
+						/>
+					</PluginSidebar>
+				) }
+			<PluginMoreMenuItem
+				icon={ commentIcon }
+				onClick={ () =>
+					enableComplementaryArea( 'core', collabHistorySidebarName )
+				}
+			>
+				{ __( 'Notes' ) }
+			</PluginMoreMenuItem>
 		</>
 	);
 }

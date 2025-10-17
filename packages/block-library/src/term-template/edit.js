@@ -93,7 +93,10 @@ export default function TermTemplateEdit( {
 		hide_empty: hideEmpty,
 		order,
 		orderby: orderBy,
-		per_page: perPage,
+		// There is a mismatch between `WP_Term_Query` and the REST API parameter default
+		// values to fetch all items. In `WP_Term_Query`, the default is `''|0` and in
+		// the REST API is `-1`.
+		per_page: perPage || -1,
 	};
 
 	// Nested terms are returned by default from REST API as long as parent is not set.

@@ -415,7 +415,7 @@ test.describe( 'data-wp-context', () => {
 
 		await expect( defaultNamespace ).toHaveAttribute(
 			'data-test-prop',
-			'default'
+			'id1'
 		);
 
 		for ( const attribute of [ 'parent', 'default', 'id1', 'other' ] ) {

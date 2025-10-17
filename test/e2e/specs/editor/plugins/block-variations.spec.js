@@ -77,12 +77,7 @@ test.describe( 'Block variations', () => {
 			page
 				.getByRole( 'listbox', { name: 'Blocks' } )
 				.getByRole( 'option' )
-		).toHaveText( [
-			'Paragraph',
-			'Stretchy Paragraph',
-			'Success Message',
-			'Warning Message',
-		] );
+		).toHaveText( [ 'Paragraph', 'Success Message', 'Warning Message' ] );
 	} );
 
 	test( 'Insert the Success Message block variation', async ( {
@@ -93,9 +88,7 @@ test.describe( 'Block variations', () => {
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/Heading' );
-		await page
-			.getByRole( 'option', { name: 'Heading', exact: true } )
-			.click();
+		await page.getByRole( 'option', { name: 'Heading' } ).click();
 		await page.keyboard.type( '/Success Message' );
 		await page.getByRole( 'option', { name: 'Success Message' } ).click();
 
@@ -174,9 +167,7 @@ test.describe( 'Block variations', () => {
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/Heading' );
-		await page
-			.getByRole( 'option', { name: 'Heading', exact: true } )
-			.click();
+		await page.getByRole( 'option', { name: 'Heading' } ).click();
 		await page.keyboard.type( '/Success Message' );
 		await page.getByRole( 'option', { name: 'Success Message' } ).click();
 
@@ -212,9 +203,7 @@ test.describe( 'Block variations', () => {
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/Heading' );
-		await page
-			.getByRole( 'option', { name: 'Heading', exact: true } )
-			.click();
+		await page.getByRole( 'option', { name: 'Heading' } ).click();
 		await page.keyboard.type( '/Warning Message' );
 		await page.getByRole( 'option', { name: 'Warning Message' } ).click();
 

@@ -3,6 +3,13 @@
  */
 import { __ } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+
+// Navigation block types that use special handling for backwards compatibility
+const NAVIGATION_BLOCK_TYPES = [
+	'core/navigation-link',
+	'core/navigation-submenu',
+];
 
 /**
  * Gets a list of post data fields with their values and labels
@@ -10,8 +17,9 @@ import { store as coreDataStore } from '@wordpress/core-data';
  * If the value is not available based on context, like in templates,
  * it falls back to the default value, label, or key.
  *
- * @param {Object} select  The select function from the data store.
- * @param {Object} context The context provided.
+ * @param {Object} select   The select function from the data store.
+ * @param {Object} context  The context provided.
+ * @param {string} clientId The block client ID used to read attributes.
  * @return {Object} List of post data fields with their value and label.
  *
  * @example
@@ -29,16 +37,38 @@ import { store as coreDataStore } from '@wordpress/core-data';
  * }
  * ```
  */
-function getPostDataFields( select, context ) {
+function getPostDataFields( select, context, clientId ) {
 	const { getEditedEntityRecord } = select( coreDataStore );
+	const { getBlockAttributes, getBlockName } = select( blockEditorStore );
 
 	let entityDataValues, dataFields;
-	// Try to get the current entity data values.
-	if ( context?.postType && context?.postId ) {
+
+	/*
+	 * BACKWARDS COMPATIBILITY: Hardcoded exception for navigation blocks.
+	 * Required for WordPress 6.9+ navigation blocks. DO NOT REMOVE.
+	 */
+	const blockName = getBlockName?.( clientId );
+	const isNavigationBlock = NAVIGATION_BLOCK_TYPES.includes( blockName );
+
+	let postId, postType;
+
+	if ( isNavigationBlock ) {
+		// Navigation blocks: read from block attributes
+		const blockAttributes = getBlockAttributes?.( clientId );
+		postId = blockAttributes?.id;
+		postType = blockAttributes?.type;
+	} else {
+		// All other blocks: use context
+		postId = context?.postId;
+		postType = context?.postType;
+	}
+
+	// Try to get the current entity data values using resolved identifiers.
+	if ( postType && postId ) {
 		entityDataValues = getEditedEntityRecord(
 			'postType',
-			context?.postType,
-			context?.postId
+			postType,
+			postId
 		);
 		dataFields = {
 			date: {
@@ -49,6 +79,11 @@ function getPostDataFields( select, context ) {
 			modified: {
 				label: __( 'Post Modified Date' ),
 				value: entityDataValues?.modified,
+				type: 'string',
+			},
+			link: {
+				label: __( 'Post Link' ),
+				value: entityDataValues?.link,
 				type: 'string',
 			},
 		};
@@ -66,8 +101,8 @@ function getPostDataFields( select, context ) {
  */
 export default {
 	name: 'core/post-data',
-	getValues( { select, context, bindings } ) {
-		const dataFields = getPostDataFields( select, context );
+	getValues( { select, context, bindings, clientId } ) {
+		const dataFields = getPostDataFields( select, context, clientId );
 
 		const newValues = {};
 		for ( const [ attributeName, source ] of Object.entries( bindings ) ) {
@@ -79,7 +114,16 @@ export default {
 		}
 		return newValues;
 	},
-	setValues( { dispatch, context, bindings } ) {
+	setValues( { dispatch, context, bindings, clientId, select } ) {
+		const { getBlockName } = select( blockEditorStore );
+
+		const blockName = getBlockName?.( clientId );
+
+		// Navigaton block types are read-only.
+		// See https://github.com/WordPress/gutenberg/pull/72165.
+		if ( NAVIGATION_BLOCK_TYPES.includes( blockName ) ) {
+			return false;
+		}
 		const newData = {};
 		Object.values( bindings ).forEach( ( { args, newValue } ) => {
 			newData[ args.key ] = newValue;
@@ -93,6 +137,17 @@ export default {
 		);
 	},
 	canUserEditValue( { select, context, args } ) {
+		const { getBlockName, getSelectedBlockClientId } =
+			select( blockEditorStore );
+		const clientId = getSelectedBlockClientId();
+		const blockName = getBlockName?.( clientId );
+
+		// Navigaton block types are read-only.
+		// See https://github.com/WordPress/gutenberg/pull/72165.
+		if ( NAVIGATION_BLOCK_TYPES.includes( blockName ) ) {
+			return false;
+		}
+
 		// Lock editing in query loop.
 		if ( context?.query || context?.queryId ) {
 			return false;
@@ -103,8 +158,9 @@ export default {
 			return false;
 		}
 
-		const fieldValue = getPostDataFields( select, context )?.[ args.key ]
-			?.value;
+		const fieldValue = getPostDataFields( select, context, undefined )?.[
+			args.key
+		]?.value;
 		// Empty string or `false` could be a valid value, so we need to check if the field value is undefined.
 		if ( fieldValue === undefined ) {
 			return false;
@@ -123,12 +179,17 @@ export default {
 		return true;
 	},
 	getFieldsList( { select, context } ) {
+		const clientId = select( blockEditorStore ).getSelectedBlockClientId();
 		// Deprecated, will be removed after 6.9.
-		return getPostDataFields( select, context );
+		return getPostDataFields( select, context, clientId );
 	},
 	editorUI( { select, context } ) {
-		const selectedBlock = select( 'core/block-editor' ).getSelectedBlock();
+		const selectedBlock = select( blockEditorStore ).getSelectedBlock();
 		if ( selectedBlock?.name !== 'core/post-date' ) {
+			return {};
+		}
+		// Exit early for navigation blocks (read-only)
+		if ( NAVIGATION_BLOCK_TYPES.includes( selectedBlock?.name ) ) {
 			return {};
 		}
 		const postDataFields = Object.entries(
