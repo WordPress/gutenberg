@@ -20,6 +20,7 @@
 - Standardise DataForm typography. [#72284](https://github.com/WordPress/gutenberg/pull/72284).
 - Dataviews: Add support for dynamic modal headers. [#72384](https://github.com/WordPress/gutenberg/pull/72384)
 - Field API: support async loading elements. [#72254](https://github.com/WordPress/gutenberg/pull/72254)
+- Dataviews: Use text based buttons for actions instead of text. [#72417](https://github.com/WordPress/gutenberg/pull/72417)
 
 ### Breaking changes
 
