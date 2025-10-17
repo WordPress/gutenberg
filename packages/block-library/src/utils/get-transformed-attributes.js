@@ -3,14 +3,6 @@
  */
 import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 
-// Fixed until an opt-in mechanism is implemented.
-const BLOCK_BINDINGS_SUPPORTED_BLOCKS = [
-	'core/paragraph',
-	'core/heading',
-	'core/image',
-	'core/button',
-];
-
 /**
  * Transform block support attributes and metadata during block transforms.
  *
@@ -60,12 +52,11 @@ export function getTransformedAttributes(
 
 	// Handle metadata transformation.
 	if ( attributes.metadata ) {
-		const transformedMetadata = [];
-		// If it support bindings, and there is a transform bindings callback, add the `id` and `bindings` properties.
-		if (
-			BLOCK_BINDINGS_SUPPORTED_BLOCKS.includes( newBlockName ) &&
-			bindingsCallback
-		) {
+		// The metadata properties that should be preserved after the transform.
+		const transformedMetadata = [ 'noteId' ];
+
+		// If there is a transform bindings callback, add the `id` and `bindings` properties.
+		if ( bindingsCallback ) {
 			transformedMetadata.push( 'id', 'bindings' );
 		}
 
@@ -75,11 +66,6 @@ export function getTransformedAttributes(
 		}
 		if ( hasBlockSupport( newBlockType, 'blockVisibility', true ) ) {
 			transformedMetadata.push( 'blockVisibility' );
-		}
-
-		// Experimental "Note" feature.
-		if ( window?.__experimentalEnableBlockComment ) {
-			transformedMetadata.push( 'commentId' );
 		}
 
 		// Only process metadata if there are supported properties.
