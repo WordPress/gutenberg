@@ -531,9 +531,9 @@ function Thread( {
 							rows={ 'approved' === thread.status ? 2 : 4 }
 							labelText={ sprintf(
 								// translators: %1$s: note identifier, %2$s: author name
-								__( 'Reply to Note %1$s by %2$s' ),
+								__( 'Reply to note %1$s by %2$s' ),
 								thread.id,
-								thread?.author_name || 'Unknown'
+								thread.author_name
 							) }
 							reflowComments={ reflowComments }
 						/>
@@ -701,7 +701,7 @@ const CommentBoard = ( {
 						// translators: %1$s: note identifier, %2$s: author name.
 						__( 'Edit note %1$s by %2$s' ),
 						thread.id,
-						thread?.author_name || 'Unknown'
+						thread.author_name
 					) }
 					reflowComments={ reflowComments }
 				/>

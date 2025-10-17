@@ -46,8 +46,6 @@ const proxyToProps: WeakMap<
 export const hasPropSignal = ( proxy: object, key: string ) =>
 	proxyToProps.has( proxy ) && proxyToProps.get( proxy )!.has( key );
 
-const readOnlyProxies = new WeakSet();
-
 /**
  * Returns the {@link PropSignal | `PropSignal`} instance associated with the
  * specified prop in the passed proxy.
@@ -79,11 +77,8 @@ const getPropSignal = (
 			if ( get ) {
 				prop.setGetter( get );
 			} else {
-				const readOnly = readOnlyProxies.has( proxy );
 				prop.setValue(
-					shouldProxy( value )
-						? proxifyState( ns, value, { readOnly } )
-						: value
+					shouldProxy( value ) ? proxifyState( ns, value ) : value
 				);
 			}
 		}
@@ -153,9 +148,6 @@ const stateHandlers: ProxyHandler< object > = {
 		value: unknown,
 		receiver: object
 	): boolean {
-		if ( readOnlyProxies.has( receiver ) ) {
-			return false;
-		}
 		setNamespace( getNamespaceFromProxy( receiver ) );
 		try {
 			return Reflect.set( target, key, value, receiver );
@@ -169,10 +161,6 @@ const stateHandlers: ProxyHandler< object > = {
 		key: string,
 		desc: PropertyDescriptor
 	): boolean {
-		if ( readOnlyProxies.has( getProxyFromObject( target )! ) ) {
-			return false;
-		}
-
 		const isNew = ! ( key in target );
 		const result = Reflect.defineProperty( target, key, desc );
 
@@ -211,10 +199,6 @@ const stateHandlers: ProxyHandler< object > = {
 	},
 
 	deleteProperty( target: object, key: string ): boolean {
-		if ( readOnlyProxies.has( getProxyFromObject( target )! ) ) {
-			return false;
-		}
-
 		const result = Reflect.deleteProperty( target, key );
 
 		if ( result ) {
@@ -246,10 +230,8 @@ const stateHandlers: ProxyHandler< object > = {
  * Returns the proxy associated with the given state object, creating it if it
  * does not exist.
  *
- * @param namespace        The namespace that will be associated to this proxy.
- * @param obj              The object to proxify.
- * @param options          Options.
- * @param options.readOnly Read-only.
+ * @param namespace The namespace that will be associated to this proxy.
+ * @param obj       The object to proxify.
  *
  * @throws Error if the object cannot be proxified. Use {@link shouldProxy} to
  *         check if a proxy can be created for a specific object.
@@ -258,14 +240,9 @@ const stateHandlers: ProxyHandler< object > = {
  */
 export const proxifyState = < T extends object >(
 	namespace: string,
-	obj: T,
-	options?: { readOnly?: boolean }
+	obj: T
 ): T => {
-	const proxy = createProxy( namespace, obj, stateHandlers ) as T;
-	if ( options?.readOnly ) {
-		readOnlyProxies.add( proxy );
-	}
-	return proxy;
+	return createProxy( namespace, obj, stateHandlers ) as T;
 };
 
 /**

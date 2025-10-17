@@ -20,6 +20,7 @@ import NestedTermsControl from './nested-terms-control';
 import InheritControl from './inherit-control';
 import MaxTermsControl from './max-terms-control';
 import AdvancedControls from './advanced-controls';
+import IncludeControl from './include-control';
 
 export default function TermsQueryInspectorControls( {
 	attributes,
@@ -37,6 +38,7 @@ export default function TermsQueryInspectorControls( {
 		inherit,
 		showNested,
 		perPage,
+		include,
 	} = termQuery;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
@@ -45,27 +47,26 @@ export default function TermsQueryInspectorControls( {
 	const isTaxonomyHierarchical = taxonomies.find(
 		( _taxonomy ) => _taxonomy.slug === taxonomy
 	)?.hierarchical;
-
-	const isTaxonomyMatchingTemplate = templateSlug?.startsWith(
-		// `Tags` are a special case in WP template hierarchy.
-		taxonomy === 'post_tag' ? 'tag' : taxonomy
-	);
-
-	// Only display the inherit control if the taxonomy is hierarchical and matches the current template.
+	const inheritQuery = !! inherit;
+	// Display the inherit control when we're in a taxonomy-related
+	// template (category, tag, or custom taxonomy).
 	const displayInheritControl =
-		isTaxonomyHierarchical && isTaxonomyMatchingTemplate;
-
+		[ 'taxonomy', 'category', 'tag', 'archive' ].includes( templateSlug ) ||
+		templateSlug?.startsWith( 'taxonomy-' ) ||
+		templateSlug?.startsWith( 'category-' ) ||
+		templateSlug?.startsWith( 'tag-' );
 	// Only display the showNested control if the taxonomy is hierarchical and not inheriting.
-	const displayShowNestedControl =
-		isTaxonomyHierarchical && ! termQuery.inherit;
+	const displayShowNestedControl = isTaxonomyHierarchical && ! inheritQuery;
+	const hasIncludeFilter = !! include?.length;
 
 	// Labels shared between ToolsPanelItem and its child control.
+	const queryTypeControlLabel = __( 'Query type' );
 	const taxonomyControlLabel = __( 'Taxonomy' );
 	const orderByControlLabel = __( 'Order by' );
 	const emptyTermsControlLabel = __( 'Show empty terms' );
-	const inheritControlLabel = __( 'Inherit parent term from archive' );
 	const nestedTermsControlLabel = __( 'Show nested terms' );
 	const maxTermsControlLabel = __( 'Max terms' );
+	const includeControlLabel = __( 'Selected terms' );
 
 	return (
 		<>
@@ -78,31 +79,49 @@ export default function TermsQueryInspectorControls( {
 								taxonomy: 'category',
 								order: 'asc',
 								orderBy: 'name',
+								include: [],
 								hideEmpty: true,
 								showNested: false,
-								parent: false,
+								inherit: false,
 								perPage: 10,
 							},
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
 				>
-					<ToolsPanelItem
-						hasValue={ () => taxonomy !== 'category' }
-						label={ taxonomyControlLabel }
-						onDeselect={ () => {
-							setQuery( { taxonomy: 'category' } );
-						} }
-						isShownByDefault
-					>
-						<TaxonomyControl
+					{ displayInheritControl && (
+						<ToolsPanelItem
+							hasValue={ () => inherit !== false }
+							label={ queryTypeControlLabel }
+							onDeselect={ () => setQuery( { inherit: false } ) }
+							isShownByDefault
+						>
+							<InheritControl
+								label={ queryTypeControlLabel }
+								value={ inherit }
+								onChange={ setQuery }
+							/>
+						</ToolsPanelItem>
+					) }
+					{ ! inheritQuery && (
+						<ToolsPanelItem
+							hasValue={ () => taxonomy !== 'category' }
 							label={ taxonomyControlLabel }
-							value={ taxonomy }
-							onChange={ ( value ) =>
-								setQuery( { taxonomy: value } )
-							}
-						/>
-					</ToolsPanelItem>
+							onDeselect={ () => {
+								setQuery( { taxonomy: 'category' } );
+							} }
+							isShownByDefault
+						>
+							<TaxonomyControl
+								label={ taxonomyControlLabel }
+								value={ taxonomy }
+								onChange={ ( value ) =>
+									// We also need to reset the include filter when changing taxonomy.
+									setQuery( { taxonomy: value, include: [] } )
+								}
+							/>
+						</ToolsPanelItem>
+					) }
 					<ToolsPanelItem
 						hasValue={ () => orderBy !== 'name' || order !== 'asc' }
 						label={ orderByControlLabel }
@@ -120,8 +139,39 @@ export default function TermsQueryInspectorControls( {
 									order: newOrder,
 								} );
 							} }
+							disabled={ hasIncludeFilter }
+							help={
+								hasIncludeFilter
+									? __(
+											'When specific terms are selected, the order is based on their selection order.'
+									  )
+									: undefined
+							}
 						/>
 					</ToolsPanelItem>
+					{ ! inheritQuery && (
+						<ToolsPanelItem
+							hasValue={ () => !! include?.length }
+							label={ includeControlLabel }
+							onDeselect={ () =>
+								setQuery( {
+									include: [],
+									orderBy: 'name',
+									order: 'asc',
+								} )
+							}
+							isShownByDefault
+						>
+							<IncludeControl
+								label={ includeControlLabel }
+								taxonomy={ taxonomy }
+								value={ include }
+								onChange={ ( value ) =>
+									setQuery( { include: value } )
+								}
+							/>
+						</ToolsPanelItem>
+					) }
 					<ToolsPanelItem
 						hasValue={ () => hideEmpty !== true }
 						label={ emptyTermsControlLabel }
@@ -136,20 +186,6 @@ export default function TermsQueryInspectorControls( {
 							}
 						/>
 					</ToolsPanelItem>
-					{ displayInheritControl && (
-						<ToolsPanelItem
-							hasValue={ () => inherit !== false }
-							label={ inheritControlLabel }
-							onDeselect={ () => setQuery( { inherit: false } ) }
-							isShownByDefault
-						>
-							<InheritControl
-								label={ inheritControlLabel }
-								value={ inherit }
-								onChange={ setQuery }
-							/>
-						</ToolsPanelItem>
-					) }
 					{ displayShowNestedControl && (
 						<ToolsPanelItem
 							hasValue={ () => showNested !== false }
@@ -164,6 +200,14 @@ export default function TermsQueryInspectorControls( {
 								value={ showNested }
 								onChange={ ( value ) =>
 									setQuery( { showNested: value } )
+								}
+								disabled={ hasIncludeFilter }
+								help={
+									hasIncludeFilter
+										? __(
+												'When specific terms are selected, only those are displayed.'
+										  )
+										: undefined
 								}
 							/>
 						</ToolsPanelItem>

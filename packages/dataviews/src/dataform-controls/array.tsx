@@ -1,20 +1,15 @@
 /**
- * External dependencies
- */
-import deepMerge from 'deepmerge';
-
-/**
  * WordPress dependencies
  */
 import { privateApis } from '@wordpress/components';
-import { useCallback, useMemo, useState } from '@wordpress/element';
-import { _n, sprintf } from '@wordpress/i18n';
+import { useCallback, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import type { DataFormControlProps } from '../types';
 import { unlock } from '../lock-unlock';
+import getCustomValidity from './utils/get-custom-validity';
 
 const { ValidatedFormTokenField } = unlock( privateApis );
 
@@ -23,17 +18,10 @@ export default function ArrayControl< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	validity,
 }: DataFormControlProps< Item > ) {
-	const { label, placeholder, elements, getValue, setValue } = field;
+	const { label, placeholder, elements, getValue, setValue, isValid } = field;
 	const value = getValue( { item: data } );
-
-	const [ customValidity, setCustomValidity ] = useState<
-		| {
-				type: 'validating' | 'valid' | 'invalid';
-				message: string;
-		  }
-		| undefined
-	>( undefined );
 
 	// Convert stored values to element objects for the token field
 	const arrayValueAsElements = useMemo(
@@ -47,69 +35,6 @@ export default function ArrayControl< Item >( {
 				  } )
 				: [],
 		[ value, elements ]
-	);
-
-	const validateTokens = useCallback(
-		( tokens: ( string | { value: string; label?: string } )[] ) => {
-			// Extract actual values from tokens for validation
-			const tokenValues = tokens.map( ( token ) => {
-				if ( typeof token === 'object' && 'value' in token ) {
-					return token.value;
-				}
-				return token;
-			} );
-
-			// First, check if elements validation is required and any tokens are invalid
-			if ( field.isValid?.elements && elements ) {
-				const invalidTokens = tokenValues.filter( ( tokenValue ) => {
-					return ! elements.some(
-						( element ) => element.value === tokenValue
-					);
-				} );
-
-				if ( invalidTokens.length > 0 ) {
-					setCustomValidity( {
-						type: 'invalid',
-						message: sprintf(
-							/* translators: %s: list of invalid tokens */
-							_n(
-								'Please select from the available options: %s is invalid.',
-								'Please select from the available options: %s are invalid.',
-								invalidTokens.length
-							),
-							invalidTokens.join( ', ' )
-						),
-					} );
-					return;
-				}
-			}
-
-			// Then check custom validation if provided.
-			if ( field.isValid?.custom ) {
-				const result = field.isValid?.custom?.(
-					deepMerge(
-						data,
-						setValue( {
-							item: data,
-							value: tokenValues,
-						} ) as Partial< Item >
-					),
-					field
-				);
-
-				if ( result ) {
-					setCustomValidity( {
-						type: 'invalid',
-						message: result,
-					} );
-					return;
-				}
-			}
-
-			// If no validation errors, clear custom validity
-			setCustomValidity( undefined );
-		},
-		[ elements, data, field, setValue ]
 	);
 
 	const onChangeControl = useCallback(
@@ -129,9 +54,8 @@ export default function ArrayControl< Item >( {
 
 	return (
 		<ValidatedFormTokenField
-			required={ !! field.isValid?.required }
-			onValidate={ validateTokens }
-			customValidity={ customValidity }
+			required={ !! isValid?.required }
+			customValidity={ getCustomValidity( isValid, validity ) }
 			label={ hideLabelFromVision ? undefined : label }
 			value={ arrayValueAsElements }
 			onChange={ onChangeControl }

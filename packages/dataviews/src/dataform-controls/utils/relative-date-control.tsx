@@ -18,24 +18,17 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { OPERATOR_IN_THE_PAST, OPERATOR_OVER } from '../constants';
+import { OPERATOR_IN_THE_PAST, OPERATOR_OVER } from '../../constants';
+import type { DataFormControlProps } from '../../types';
 
-export type DateRelative = {
-	value?: string | number;
-	unit?: string;
-};
+type VALID_OPERATORS = 'inThePast' | 'over';
 
-interface RelativeDateControlProps {
-	id: string;
-	value: DateRelative;
-	onChange: ( args: DateRelative ) => void;
+interface TimeUnitOption {
+	value: string;
 	label: string;
-	hideLabelFromVision?: boolean;
-	options: { value: string; label: string }[];
-	className?: string;
 }
 
-export const TIME_UNITS_OPTIONS = {
+const TIME_UNITS_OPTIONS: Record< VALID_OPERATORS, TimeUnitOption[] > = {
 	[ OPERATOR_IN_THE_PAST ]: [
 		{ value: 'days', label: __( 'Days' ) },
 		{ value: 'weeks', label: __( 'Weeks' ) },
@@ -50,27 +43,46 @@ export const TIME_UNITS_OPTIONS = {
 	],
 };
 
-export default function RelativeDateControl( {
-	id,
-	value,
-	onChange,
-	label,
-	hideLabelFromVision,
-	options,
+export default function RelativeDateControl< Item >( {
 	className,
-}: RelativeDateControlProps ) {
-	const { value: relValue = '', unit = options[ 0 ].value } = value;
+	data,
+	field,
+	onChange,
+	hideLabelFromVision,
+	operator,
+}: DataFormControlProps< Item > & {
+	className: string;
+} ) {
+	const options: TimeUnitOption[] =
+		TIME_UNITS_OPTIONS[
+			operator === OPERATOR_IN_THE_PAST ? 'inThePast' : 'over'
+		];
+
+	const { id, label, getValue, setValue } = field;
+	const fieldValue = getValue( { item: data } );
+	const { value: relValue = '', unit = options[ 0 ].value } =
+		fieldValue && typeof fieldValue === 'object' ? fieldValue : {};
 
 	const onChangeValue = useCallback(
 		( newValue: string | undefined ) =>
-			onChange( { value: Number( newValue ), unit } ),
-		[ onChange, unit ]
+			onChange(
+				setValue( {
+					item: data,
+					value: { value: Number( newValue ), unit },
+				} )
+			),
+		[ onChange, setValue, data, unit ]
 	);
 
 	const onChangeUnit = useCallback(
 		( newUnit: string | undefined ) =>
-			onChange( { value: relValue, unit: newUnit } ),
-		[ onChange, relValue ]
+			onChange(
+				setValue( {
+					item: data,
+					value: { value: relValue, unit: newUnit },
+				} )
+			),
+		[ onChange, setValue, data, relValue ]
 	);
 
 	return (

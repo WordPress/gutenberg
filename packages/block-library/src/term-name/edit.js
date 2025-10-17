@@ -19,6 +19,7 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -34,7 +35,9 @@ export default function TermNameEdit( {
 	const { textAlign, level = 0, isLink } = attributes;
 	const { term } = useTermName( termId, taxonomy );
 
-	const termName = term?.name || __( 'Term Name' );
+	const termName = term?.name
+		? decodeEntities( term.name )
+		: __( 'Term Name' );
 
 	const blockProps = useBlockProps( {
 		className: clsx( {

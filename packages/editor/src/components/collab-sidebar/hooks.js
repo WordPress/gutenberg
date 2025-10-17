@@ -36,7 +36,9 @@ import { collabSidebarName } from './constants';
 import { unlock } from '../../lock-unlock';
 import { noop } from './utils';
 
-const { useBlockElementRef } = unlock( blockEditorPrivateApis );
+const { useBlockElementRef, cleanEmptyObject } = unlock(
+	blockEditorPrivateApis
+);
 
 export function useBlockComments( postId ) {
 	const [ commentLastUpdated, reflowComments ] = useReducer(
@@ -203,9 +205,7 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 
 			createNotice(
 				'snackbar',
-				parent
-					? __( 'Reply added successfully.' )
-					: __( 'Note added successfully.' ),
+				parent ? __( 'Reply added.' ) : __( 'Note added.' ),
 				{
 					type: 'snackbar',
 					isDismissible: true,
@@ -302,14 +302,14 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 				const clientId = getSelectedBlockClientId();
 				const metadata = getBlockAttributes( clientId )?.metadata;
 				updateBlockAttributes( clientId, {
-					metadata: {
+					metadata: cleanEmptyObject( {
 						...metadata,
 						commentId: undefined,
-					},
+					} ),
 				} );
 			}
 
-			createNotice( 'snackbar', __( 'Note deleted successfully.' ), {
+			createNotice( 'snackbar', __( 'Note deleted.' ), {
 				type: 'snackbar',
 				isDismissible: true,
 			} );

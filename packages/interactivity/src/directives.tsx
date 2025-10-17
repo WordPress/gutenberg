@@ -23,6 +23,7 @@ import {
 	warn,
 	splitTask,
 	isPlainObject,
+	deepReadOnly,
 } from './utils';
 import {
 	directive,
@@ -293,7 +294,7 @@ export default () => {
 			const { client: inheritedClient, server: inheritedServer } =
 				useContext( inheritedContext );
 			const client = useRef( {} );
-			const server = useRef( {} );
+			const server = {};
 			const result = {
 				client: { ...inheritedClient },
 				server: { ...inheritedServer },
@@ -302,37 +303,33 @@ export default () => {
 
 			entries.forEach( ( { value, namespace, uniqueId } ) => {
 				// Checks that the value is a JSON object. Sends a console warning if not.
-				if ( globalThis.SCRIPT_DEBUG ) {
-					if ( ! isPlainObject( value ) ) {
+				if ( ! isPlainObject( value ) ) {
+					if ( globalThis.SCRIPT_DEBUG ) {
 						warn(
 							`The value of data-wp-context${
 								uniqueId ? `---${ uniqueId }` : ''
 							} on the ${ namespace } namespace must be a valid stringified JSON object.`
 						);
 					}
+					return;
 				}
 
-				// If the namespace doesn't exist yet, initalizes empty
-				// proxified states for that namespace.
+				// If the namespace doesn't exist yet, initalizes an empty
+				// proxified state for that namespace's client context.
 				if ( ! client.current[ namespace ] ) {
 					client.current[ namespace ] = proxifyState( namespace, {} );
-					server.current[ namespace ] = proxifyState(
-						namespace,
-						{},
-						{ readOnly: true }
-					);
 				}
 
-				// Merges the new value with whatever was there before.
+				// Merges the new client value with whatever was there before.
 				deepMerge(
 					client.current[ namespace ],
-					deepClone( value ) as object,
+					deepClone( value ),
 					false
 				);
-				deepMerge(
-					server.current[ namespace ],
-					deepClone( value ) as object
-				);
+
+				// Sets the server context for that namespace to a deep
+				// read-only.
+				server[ namespace ] = deepReadOnly( value );
 
 				// Registers the namespace.
 				namespaces.add( namespace );
@@ -344,7 +341,7 @@ export default () => {
 					inheritedClient[ namespace ]
 				);
 				result.server[ namespace ] = proxifyContext(
-					server.current[ namespace ],
+					server[ namespace ],
 					inheritedServer[ namespace ]
 				);
 			} );
