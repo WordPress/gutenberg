@@ -1866,21 +1866,22 @@ export function canRemoveBlock( state, clientId ) {
 		return false;
 	}
 
-	const blockEditingMode = getBlockEditingMode( state, rootClientId );
+	const blockEditingMode = getBlockEditingMode( state, clientId );
 
 	// Check if the parent container allows insertion/removal in write mode
 	if (
 		blockEditingMode === 'contentOnly' &&
 		! isContainerInsertableToInWriteMode(
 			state,
-			getBlockName( state, rootClientId ),
+			getBlockName( state, clientId ),
 			rootClientId
 		)
 	) {
 		return false;
 	}
 
-	return blockEditingMode !== 'disabled';
+	const rootBlockEditingMode = getBlockEditingMode( state, rootClientId );
+	return rootBlockEditingMode !== 'disabled';
 }
 
 /**
