@@ -73,7 +73,7 @@ function InlineUI( {
 		<Popover
 			placement="bottom-start"
 			offset={ 8 }
-			focusOnMount="firstContentElement"
+			focusOnMount={ false }
 			anchor={ popoverAnchor }
 			className="block-editor-format-toolbar__math-popover"
 		>
