@@ -45,6 +45,7 @@ function gutenberg_reregister_core_block_types() {
 				'text-columns',
 				'verse',
 				'embed',
+				'post-edit-link',
 			),
 			'block_names'   => array(
 				'accordion-item.php'               => 'core/accordion-item',
@@ -105,6 +106,7 @@ function gutenberg_reregister_core_block_types() {
 				'post-terms.php'                   => 'core/post-terms',
 				'post-time-to-read.php'            => 'core/post-time-to-read',
 				'post-title.php'                   => 'core/post-title',
+				'post-edit-link.php'               => 'core/post-edit-link',
 				'query.php'                        => 'core/query',
 				'post-template.php'                => 'core/post-template',
 				'query-no-results.php'             => 'core/query-no-results',

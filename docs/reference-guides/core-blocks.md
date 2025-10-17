@@ -677,6 +677,15 @@ Display the publish date for an entry such as a post or page. ([Source](https://
 -	**Supports:** color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** datetime, format, isLink, textAlign
 
+## post Edit Link
+
+Displays a link to edit the post in the WordPress Dashboard. This link is only visible to users with the edit post capability. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-edit-link))
+
+-	**Name:** core/post-edit-link
+-	**Category:** theme
+-	**Supports:** color (background, gradients, link, ~~text~~), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Attributes:** linkTarget, textAlign
+
 ## Excerpt
 
 Display the excerpt. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-excerpt))
