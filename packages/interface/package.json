@@ -30,7 +30,8 @@
 			"import": "./build-module/index.js",
 			"require": "./build/index.js"
 		},
-		"./package.json": "./package.json"
+		"./package.json": "./package.json",
+		"./build-style/": "./build-style/"
 	},
 	"react-native": "src/index",
 	"sideEffects": [
