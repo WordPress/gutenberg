@@ -1,8 +1,11 @@
-@import "@wordpress/admin-ui/build-style/style.css";
-@import "./components/back-button/style.scss";
-@import "./components/layout/style.scss";
-@import "./components/meta-boxes/meta-boxes-area/style.scss";
-@import "./components/welcome-guide/style.scss";
+@use "@wordpress/base-styles/default-custom-properties";
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/admin-ui/build-style/style.css" as *;
+@use "./components/back-button/style.scss" as *;
+@use "./components/layout/style.scss" as *;
+@use "./components/meta-boxes/meta-boxes-area/style.scss" as *;
+@use "./components/welcome-guide/style.scss" as *;
 
 body.js.block-editor-page {
 	@include wp-admin-reset( ".block-editor" );

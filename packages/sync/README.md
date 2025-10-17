@@ -26,6 +26,10 @@ The sync manager orchestrates the lifecycle of syncing entity records. It create
 
 Origin string for CRDT document changes originating from the local editor.
 
+### LOCAL_SYNC_MANAGER_ORIGIN
+
+Origin string for CRDT document changes originating from the sync manager.
+
 ### Y
 
 Exported copy of Yjs so that consumers of this package don't need to install it.

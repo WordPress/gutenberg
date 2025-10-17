@@ -18,12 +18,13 @@ import type { VNode, Context } from 'preact';
  * Internal dependencies
  */
 import { store, stores, universalUnlock } from './store';
-import { warn } from './utils';
+import { warn, type SyncAwareFunction } from './utils';
 import { getScope, setScope, resetScope, type Scope } from './scopes';
 export interface DirectiveEntry {
 	value: string | object;
 	namespace: string;
 	suffix: string | null;
+	uniqueId: string | null;
 }
 
 export interface NonDefaultSuffixDirectiveEntry extends DirectiveEntry {
@@ -257,12 +258,18 @@ export const getEvaluate: GetEvaluate =
 			}
 			// Reset scope before return and wrap the function so it will still run within the correct scope.
 			resetScope();
-			return ( ...functionArgs: any[] ) => {
+			const wrappedFunction: Function = ( ...functionArgs: any[] ) => {
 				setScope( scope );
 				const functionResult = value( ...functionArgs );
 				resetScope();
 				return functionResult;
 			};
+			// Preserve the sync property from the original function
+			if ( value.sync ) {
+				const syncAwareFunction = wrappedFunction as SyncAwareFunction;
+				syncAwareFunction.sync = true;
+			}
+			return wrappedFunction;
 		}
 		const result = value;
 		resetScope();

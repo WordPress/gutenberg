@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -10,7 +9,6 @@ import { __ } from '@wordpress/i18n';
 import type {
 	DataViewRenderFieldProps,
 	SortDirection,
-	NormalizedField,
 	FieldTypeDefinition,
 } from '../types';
 import renderFromElements from './utils/render-from-elements';
@@ -40,17 +38,8 @@ export default {
 	sort,
 	Edit: 'date',
 	isValid: {
-		custom: ( item: any, field: NormalizedField< any > ) => {
-			const value = field.getValue( { item } );
-			if ( field?.elements ) {
-				const validValues = field.elements.map( ( f ) => f.value );
-				if ( ! validValues.includes( value ) ) {
-					return __( 'Value must be one of the elements.' );
-				}
-			}
-
-			return null;
-		},
+		elements: true,
+		custom: () => null,
 	},
 	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
 		if ( field.elements ) {

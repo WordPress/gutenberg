@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+- DataViewsPicker: ensure title overflows correctly in Grid view. ([#72339](https://github.com/WordPress/gutenberg/pull/72339))
+
 ### Enhancements
 
 - Dataviews: Make header table view select all checkbox always visible. ([#72050](https://github.com/WordPress/gutenberg/pull/72050))
@@ -11,6 +15,8 @@
 - Normalize search field styles ([#72072](https://github.com/WordPress/gutenberg/pull/72072)).
 - DataForm control for `date` supports `required` and `custom` validation [#72048](https://github.com/WordPress/gutenberg/pull/72048).
 - DataForm control for `datetime` supports `required` and `custom` validation. [#72060](https://github.com/WordPress/gutenberg/pull/72060).
+- Standardise DataForm typography. [#72284](https://github.com/WordPress/gutenberg/pull/72284).
+- Dataviews: Add support for dynamic modal headers. [#72384](https://github.com/WordPress/gutenberg/pull/72384)
 
 ### Breaking changes
 
@@ -18,6 +24,8 @@
 - DataForm: Add summary field support for both card and panel layouts. The `summary` property has been moved from the field level to the layout level, and so fields using `summary` at the field level must now configure it within the `layout` object. Additionally, the first children will only be used as summary for the panel if 1) there is no `layout.summary` and 2) the form field ID doesn't match any existing field. See README for details. [#71576](https://github.com/WordPress/gutenberg/pull/71576)
 - Remove `Data< Item >` type, as it is no longer used internally for a long time. [#72051](https://github.com/WordPress/gutenberg/pull/72051)
 - Remove `isDestructive` prop from actions API. Destructive actions should be communicated via flow (opens modal to confirm) and color should be used in the modal. [#72111](https://github.com/WordPress/gutenberg/pull/72111)
+- The `isValid.custom` default function that comes with the field type no longer checks for elements. This is now the `isValid.elements` responsibility and can be toggle on/off separately. [#72325](https://github.com/WordPress/gutenberg/pull/72325)
+- DataForm: make validation controlled by leveraging a `validity` prop. This also removes `isItemValid` and introduces `useFormValidity` hook to calculate the `validity` prop. [#71412](https://github.com/WordPress/gutenberg/pull/71412)
 
 ### Features
 
@@ -28,6 +36,7 @@
 - Reorganizes normalize-form-fields and renames `dataforms-layouts/` to `dataform-layout/` to follow the naming schema of any other folder in the package. [#72056](https://github.com/WordPress/gutenberg/pull/72056)
 - Moves `utils.ts` to `field-types/utils/render-from-elements.ts`, so it's collocated where it is used. [#72058](https://github.com/WordPress/gutenberg/pull/72058)
 - Centralize all top-level utilities in a `utils/` folder, sets a name that reflects on the function name, and uses the default exports. [#72063](https://github.com/WordPress/gutenberg/pull/72063)
+- DataForm: refactor RelativeDateControl to use DataFormControl props. [#72361](https://github.com/WordPress/gutenberg/pull/72361)
 
 ## 9.1.0 (2025-10-01)
 

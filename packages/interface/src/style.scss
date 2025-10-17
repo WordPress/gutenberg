@@ -1,6 +1,6 @@
-@import "@wordpress/admin-ui/build-style/style.css";
-@import "./components/complementary-area-header/style.scss";
-@import "./components/complementary-area/style.scss";
-@import "./components/fullscreen-mode/style.scss";
-@import "./components/interface-skeleton/style.scss";
-@import "./components/pinned-items/style.scss";
+@use "@wordpress/admin-ui/build-style/style.css" as *;
+@use "./components/complementary-area-header/style.scss" as *;
+@use "./components/complementary-area/style.scss" as *;
+@use "./components/fullscreen-mode/style.scss" as *;
+@use "./components/interface-skeleton/style.scss" as *;
+@use "./components/pinned-items/style.scss" as *;

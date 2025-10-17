@@ -19,6 +19,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import { useBlockDisplayInformation } from '..';
 import isEmptyString from './is-empty-string';
+import { cleanEmptyObject } from '../../hooks/utils';
 
 export default function BlockRenameModal( { clientId, onClose } ) {
 	const [ editedBlockName, setEditedBlockName ] = useState();
@@ -75,10 +76,10 @@ export default function BlockRenameModal( { clientId, onClose } ) {
 		// Must be assertive to immediately announce change.
 		speak( message, 'assertive' );
 		updateBlockAttributes( [ clientId ], {
-			metadata: {
+			metadata: cleanEmptyObject( {
 				...metadata,
 				name: newName,
-			},
+			} ),
 		} );
 
 		// Immediate close avoids ability to hit save multiple times.

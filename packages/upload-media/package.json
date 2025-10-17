@@ -27,10 +27,10 @@
 		".": {
 			"types": "./build-types/index.d.ts",
 			"import": "./build-module/index.js",
-			"default": "./build/index.js"
-		}
+			"require": "./build/index.js"
+		},
+		"./package.json": "./package.json"
 	},
-	"wpScript": true,
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {

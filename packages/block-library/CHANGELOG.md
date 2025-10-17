@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Enable the Query Loop "Force Page Reload" setting to be false when the Post Content block is used. ([#72160](https://github.com/WordPress/gutenberg/pull/72160))
+
 ## 9.32.0 (2025-10-01)
 
 ## 9.31.0 (2025-09-17)

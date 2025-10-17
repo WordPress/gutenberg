@@ -29,6 +29,10 @@
 		"lib"
 	],
 	"main": "lib/index.js",
+	"exports": {
+		".": "./lib/index.js",
+		"./package.json": "./package.json"
+	},
 	"dependencies": {
 		"@wordpress/base-styles": "file:../base-styles",
 		"autoprefixer": "^10.4.20",

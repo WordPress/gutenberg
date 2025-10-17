@@ -104,9 +104,14 @@ export function ActionModal< Item >( {
 }: ActionModalProps< Item > ) {
 	const label =
 		typeof action.label === 'string' ? action.label : action.label( items );
+
+	const modalHeader =
+		typeof action.modalHeader === 'function'
+			? action.modalHeader( items )
+			: action.modalHeader;
 	return (
 		<Modal
-			title={ action.modalHeader || label }
+			title={ modalHeader || label }
 			__experimentalHideHeader={ !! action.hideModalHeader }
 			onRequestClose={ closeModal }
 			focusOnMount={ action.modalFocusOnMount ?? true }

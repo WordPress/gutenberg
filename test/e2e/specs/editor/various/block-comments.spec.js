@@ -10,21 +10,12 @@ test.use( {
 } );
 
 test.describe( 'Block Comments', () => {
-	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.setGutenbergExperiments( [
-			'gutenberg-block-comment',
-		] );
-	} );
-
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
-		await Promise.all( [
-			requestUtils.deleteAllComments( 'note' ),
-			requestUtils.setGutenbergExperiments( [] ),
-		] );
+		await requestUtils.deleteAllComments( 'note' );
 	} );
 
 	test( 'can pin and unpin comments sidebar', async ( {
@@ -45,7 +36,7 @@ test.describe( 'Block Comments', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Testing block comments' },
 		} );
-		await editor.clickBlockOptionsMenuItem( 'Note' );
+		await editor.clickBlockOptionsMenuItem( 'Add note' );
 		await page
 			.getByRole( 'textbox', {
 				name: 'New Note',
@@ -54,7 +45,7 @@ test.describe( 'Block Comments', () => {
 			.fill( 'A test comment' );
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Note', exact: true } )
+			.getByRole( 'button', { name: 'Add note', exact: true } )
 			.click();
 		const thread = page
 			.getByRole( 'region', { name: 'Editor settings' } )
@@ -90,7 +81,7 @@ test.describe( 'Block Comments', () => {
 		await expect(
 			page
 				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Reply added successfully.' } )
+				.filter( { hasText: 'Reply added.' } )
 		).toBeVisible();
 	} );
 
@@ -141,7 +132,7 @@ test.describe( 'Block Comments', () => {
 		await expect(
 			page
 				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Note deleted successfully.' } )
+				.filter( { hasText: 'Note deleted.' } )
 		).toBeVisible();
 	} );
 
@@ -402,11 +393,11 @@ test.describe( 'Block Comments', () => {
 			await replyForm.fill( 'Second reply' );
 			await replyButton.click();
 
-			// Check that two replies were added successfully.
+			// Check that two replies were added.
 			await expect(
 				page
 					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Reply added successfully.' } )
+					.filter( { hasText: 'Reply added.' } )
 			).toHaveCount( 2 );
 
 			// Click on the title field to deselect the block and the comment.
@@ -508,6 +499,11 @@ test.describe( 'Block Comments', () => {
 			page,
 			blockCommentUtils,
 		} ) => {
+			await blockCommentUtils.addBlockWithComment( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing block comments' },
+				comment: 'Test note',
+			} );
 			await blockCommentUtils.addBlockWithComment( {
 				type: 'core/paragraph',
 				attributes: { content: 'Testing block comments' },
@@ -646,7 +642,7 @@ class BlockCommentUtils {
 					name: type,
 					attributes,
 				} );
-				await this.#editor.clickBlockOptionsMenuItem( 'Note' );
+				await this.#editor.clickBlockOptionsMenuItem( 'Add note' );
 				await this.#page
 					.getByRole( 'textbox', {
 						name: 'New Note',
@@ -655,11 +651,11 @@ class BlockCommentUtils {
 					.fill( comment );
 				await this.#page
 					.getByRole( 'region', { name: 'Editor settings' } )
-					.getByRole( 'button', { name: 'Note', exact: true } )
+					.getByRole( 'button', { name: 'Add note', exact: true } )
 					.click();
 				await this.#page
 					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Note added successfully.' } )
+					.filter( { hasText: 'Note added.' } )
 					.click();
 			},
 			{ box: true }

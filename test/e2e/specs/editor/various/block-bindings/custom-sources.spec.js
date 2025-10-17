@@ -44,6 +44,68 @@ test.describe( 'Registered sources', () => {
 		await requestUtils.deactivatePlugin( 'gutenberg-test-block-bindings' );
 	} );
 
+	test.describe( 'Default WP installation', () => {
+		test.beforeEach( async ( { admin, requestUtils } ) => {
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-block-bindings'
+			);
+			await admin.createNewPost( { title: 'Test bindings' } );
+		} );
+
+		test.afterEach( async ( { requestUtils } ) => {
+			await requestUtils.activatePlugin(
+				'gutenberg-test-block-bindings'
+			);
+		} );
+
+		test( 'It should not show the attributes panel if there are no sources registered.', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+			} );
+			await expect(
+				page.getByLabel( 'Attributes options' )
+			).toBeHidden();
+		} );
+		test( 'It should show the attributes panel, no sources registered, readOnlyAttributes.', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/image',
+				attributes: {
+					metadata: {
+						bindings: {
+							alt: {
+								source: 'testing/server-only-source',
+							},
+						},
+					},
+				},
+			} );
+			await page.getByLabel( 'Attributes options' ).click();
+			await page
+				.getByRole( 'menuitemcheckbox', { name: 'Show id' } )
+				.click();
+			const idAttribute = page.getByRole( 'button', {
+				name: 'id',
+			} );
+			await expect( idAttribute ).toBeVisible();
+			await expect( idAttribute ).toBeDisabled();
+			await expect( idAttribute ).toContainText( 'No sources available' );
+			const altAttribute = page.getByRole( 'button', {
+				name: 'alt',
+			} );
+			await expect( altAttribute ).toBeVisible();
+			await expect( altAttribute ).toBeDisabled();
+			await expect( altAttribute ).toContainText(
+				'Source not registered'
+			);
+		} );
+	} );
+
 	test.describe( 'getValues', () => {
 		test( 'should show the returned value in paragraph content', async ( {
 			editor,
@@ -1197,7 +1259,7 @@ test.describe( 'Registered sources', () => {
 		} );
 		await expect( contentButton ).toContainText( 'Server Source' );
 	} );
-	test( 'should show an "Invalid source" warning for not registered sources', async ( {
+	test( 'should show an "Source not registered" warning for not registered sources', async ( {
 		editor,
 		page,
 	} ) => {
@@ -1217,7 +1279,7 @@ test.describe( 'Registered sources', () => {
 		const contentButton = page.getByRole( 'button', {
 			name: 'content',
 		} );
-		await expect( contentButton ).toContainText( 'Invalid source' );
+		await expect( contentButton ).toContainText( 'Source not registered' );
 	} );
 
 	test.describe( 'Modal source', () => {
@@ -1310,11 +1372,10 @@ test.describe( 'Registered sources', () => {
 	} );
 
 	test.describe( 'Source compatibility filtering', () => {
-		test( 'should show compatible sources enabled and incompatible sources disabled', async ( {
+		test( 'should show only compatible sources.', async ( {
 			editor,
 			page,
 		} ) => {
-			// Test string attribute - paragraph content
 			await editor.insertBlock( { name: 'core/image' } );
 			await page.getByLabel( 'Attributes options' ).click();
 			await page
@@ -1322,14 +1383,20 @@ test.describe( 'Registered sources', () => {
 				.click();
 			await page.getByRole( 'button', { name: 'id' } ).click();
 
-			// String sources enabled, number source disabled for string attribute
+			const idMenuItem = page.getByRole( 'menuitem', {
+				name: 'Complete Source',
+			} );
+			await expect( idMenuItem ).toBeEnabled();
+			await idMenuItem.click();
+			const numberField = page.getByRole( 'menuitemcheckbox', {
+				name: 'Number Custom Field Label',
+			} );
+			await expect( numberField ).toBeEnabled();
 			await expect(
-				page.getByRole( 'menuitem', { name: 'Complete Source' } )
-			).toBeDisabled();
-
-			await expect(
-				page.getByRole( 'menuitem', { name: 'Modal Source' } )
-			).toBeEnabled();
+				page.getByRole( 'menuitemcheckbox', {
+					name: 'Text Field Label',
+				} )
+			).toBeHidden();
 		} );
 	} );
 } );

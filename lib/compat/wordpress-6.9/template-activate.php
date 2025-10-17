@@ -45,7 +45,9 @@ function gutenberg_maintain_templates_routes() {
 				// templates controller, so we need to check if the id is an
 				// integer to make sure it's the proper post type endpoint.
 				if ( ! is_int( $post_arr['id'] ) ) {
-					return null;
+					// See _build_block_template_result_from_file, registered
+					// templates always set the theme to the active theme.
+					return get_stylesheet();
 				}
 				$terms = get_the_terms( $post_arr['id'], 'wp_theme' );
 				if ( is_wp_error( $terms ) || empty( $terms ) ) {
@@ -523,4 +525,271 @@ function gutenberg_migrate_existing_templates() {
 	}
 
 	update_option( 'active_templates', $active_templates );
+}
+
+add_action( 'save_post_wp_template', 'gutenberg_maybe_update_active_templates' );
+function gutenberg_maybe_update_active_templates( $post_id ) {
+	$post                   = get_post( $post_id );
+	$is_inactive_by_default = get_post_meta( $post_id, 'is_inactive_by_default', true );
+	if ( $is_inactive_by_default ) {
+		return;
+	}
+	$active_templates                     = get_option( 'active_templates', array() );
+	$active_templates[ $post->post_name ] = $post->ID;
+	update_option( 'active_templates', $active_templates );
+}
+
+add_action( 'pre_get_block_template', 'gutenberg_get_block_template', 10, 3 );
+
+///////////////////////////////////////////////////////////////////////
+// This function is a copy of core's, except for the marked section. //
+///////////////////////////////////////////////////////////////////////
+function gutenberg_get_block_template( $output, $id, $template_type ) {
+	if ( 'wp_template' !== $template_type ) {
+		return $output;
+	}
+	$parts = explode( '//', $id, 2 );
+	if ( count( $parts ) < 2 ) {
+		return null;
+	}
+	list( $theme, $slug ) = $parts;
+
+	//////////////////////////////
+	// START CORE MODIFICATIONS //
+	//////////////////////////////
+	$active_templates = get_option( 'active_templates', array() );
+
+	if ( ! empty( $active_templates[ $slug ] ) ) {
+		if ( is_int( $active_templates[ $slug ] ) ) {
+			$post = get_post( $active_templates[ $slug ] );
+			if ( $post && 'publish' === $post->post_status ) {
+				$template = _build_block_template_result_from_post( $post );
+
+				if ( ! is_wp_error( $template ) && $theme === $template->theme ) {
+					return $template;
+				}
+			}
+		} elseif ( false === $active_templates[ $slug ] ) {
+			return null;
+		}
+	}
+	////////////////////////////
+	// END CORE MODIFICATIONS //
+	////////////////////////////
+
+	$wp_query_args  = array(
+		'post_name__in'  => array( $slug ),
+		'post_type'      => $template_type,
+		'post_status'    => array( 'auto-draft', 'draft', 'publish', 'trash' ),
+		'posts_per_page' => 1,
+		'no_found_rows'  => true,
+		'tax_query'      => array(
+			array(
+				'taxonomy' => 'wp_theme',
+				'field'    => 'name',
+				'terms'    => $theme,
+			),
+		),
+	);
+	$template_query = new WP_Query( $wp_query_args );
+	$posts          = $template_query->posts;
+
+	if ( count( $posts ) > 0 ) {
+		$template = _build_block_template_result_from_post( $posts[0] );
+
+		//////////////////////////////
+		// START CORE MODIFICATIONS //
+		//////////////////////////////
+		// Custom templates don't need to be activated, so if it's a custom
+		// template, return it.
+		if ( ! is_wp_error( $template ) && $template->is_custom ) {
+			return $template;
+		}
+		////////////////////////////
+		// END CORE MODIFICATIONS //
+		////////////////////////////
+	}
+
+	$block_template = get_block_file_template( $id, $template_type );
+
+	/**
+	 * Filters the queried block template object after it's been fetched.
+	 *
+	 * @since 5.9.0
+	 *
+	 * @param WP_Block_Template|null $block_template The found block template, or null if there isn't one.
+	 * @param string                 $id             Template unique identifier (example: 'theme_slug//template_slug').
+	 * @param string                 $template_type  Template type. Either 'wp_template' or 'wp_template_part'.
+	 */
+	return apply_filters( 'get_block_template', $block_template, $id, $template_type );
+}
+
+add_action( 'pre_get_block_templates', 'gutenberg_get_block_templates', 10, 3 );
+
+///////////////////////////////////////////////////////////////////////
+// This function is a copy of core's, except for the marked section. //
+///////////////////////////////////////////////////////////////////////
+function gutenberg_get_block_templates( $output, $query = array(), $template_type = 'wp_template' ) {
+	if ( 'wp_template' !== $template_type ) {
+		return $output;
+	}
+
+	$post_type     = isset( $query['post_type'] ) ? $query['post_type'] : '';
+	$wp_query_args = array(
+		'post_status'         => array( 'auto-draft', 'draft', 'publish' ),
+		'post_type'           => $template_type,
+		'posts_per_page'      => -1,
+		'no_found_rows'       => true,
+		'lazy_load_term_meta' => false,
+		'tax_query'           => array(
+			array(
+				'taxonomy' => 'wp_theme',
+				'field'    => 'name',
+				'terms'    => get_stylesheet(),
+			),
+		),
+	);
+
+	if ( ! empty( $query['slug__in'] ) ) {
+		$wp_query_args['post_name__in']  = $query['slug__in'];
+		$wp_query_args['posts_per_page'] = count( array_unique( $query['slug__in'] ) );
+	}
+
+	// This is only needed for the regular templates/template parts post type listing and editor.
+	if ( isset( $query['wp_id'] ) ) {
+		$wp_query_args['p'] = $query['wp_id'];
+	} else {
+		$wp_query_args['post_status'] = 'publish';
+	}
+
+	//////////////////////////////
+	// START CORE MODIFICATIONS //
+	//////////////////////////////
+	$active_templates = get_option( 'active_templates', array() );
+	////////////////////////////
+	// END CORE MODIFICATIONS //
+	////////////////////////////
+
+	$template_query = new WP_Query( $wp_query_args );
+	$query_result   = array();
+	foreach ( $template_query->posts as $post ) {
+		$template = _build_block_template_result_from_post( $post );
+
+		if ( is_wp_error( $template ) ) {
+			continue;
+		}
+
+		if ( $post_type && ! $template->is_custom ) {
+			continue;
+		}
+
+		if (
+			$post_type &&
+			isset( $template->post_types ) &&
+			! in_array( $post_type, $template->post_types, true )
+		) {
+			continue;
+		}
+
+		//////////////////////////////
+		// START CORE MODIFICATIONS //
+		//////////////////////////////
+		if ( $template->is_custom || isset( $query['wp_id'] ) ) {
+			// Custom templates don't need to be activated, leave them be.
+			// Also don't filter out templates when querying by wp_id.
+			$query_result[] = $template;
+		} elseif ( isset( $active_templates[ $template->slug ] ) && $active_templates[ $template->slug ] === $post->ID ) {
+			// Only include active templates.
+			$query_result[] = $template;
+		}
+		////////////////////////////
+		// END CORE MODIFICATIONS //
+		////////////////////////////
+	}
+
+	if ( ! isset( $query['wp_id'] ) ) {
+		/*
+		 * If the query has found some user templates, those have priority
+		 * over the theme-provided ones, so we skip querying and building them.
+		 */
+		$query['slug__not_in'] = wp_list_pluck( $query_result, 'slug' );
+		/*
+		 * We need to unset the post_type query param because some templates
+		 * would be excluded otherwise, like `page.html` when looking for
+		 * `page` templates. We need all templates so we can exclude duplicates
+		 * from plugin-registered templates.
+		 * See: https://github.com/WordPress/gutenberg/issues/65584
+		 */
+		$template_files_query = $query;
+		unset( $template_files_query['post_type'] );
+		$template_files = _get_block_templates_files( $template_type, $template_files_query );
+		foreach ( $template_files as $template_file ) {
+			// If the query doesn't specify a post type, or it does and the template matches the post type, add it.
+			if (
+				! isset( $query['post_type'] ) ||
+				(
+					isset( $template_file['postTypes'] ) &&
+					in_array( $query['post_type'], $template_file['postTypes'], true )
+				)
+			) {
+				$query_result[] = _build_block_template_result_from_file( $template_file, $template_type );
+			} elseif ( ! isset( $template_file['postTypes'] ) ) {
+				// The custom templates with no associated post types are available for all post types as long
+				// as they are not default templates.
+				$candidate              = _build_block_template_result_from_file( $template_file, $template_type );
+				$default_template_types = get_default_block_template_types();
+				if ( ! isset( $default_template_types[ $candidate->slug ] ) ) {
+					$query_result[] = $candidate;
+				}
+			}
+		}
+
+		if ( 'wp_template' === $template_type ) {
+			// Add templates registered in the template registry. Filtering out the ones which have a theme file.
+			$registered_templates          = WP_Block_Templates_Registry::get_instance()->get_by_query( $query );
+			$matching_registered_templates = array_filter(
+				$registered_templates,
+				function ( $registered_template ) use ( $template_files ) {
+					foreach ( $template_files as $template_file ) {
+						if ( $template_file['slug'] === $registered_template->slug ) {
+							return false;
+						}
+					}
+					return true;
+				}
+			);
+
+			$matching_registered_templates = array_map(
+				function ( $template ) {
+					$template->content = apply_block_hooks_to_content(
+						$template->content,
+						$template,
+						'insert_hooked_blocks_and_set_ignored_hooked_blocks_metadata'
+					);
+					return $template;
+				},
+				$matching_registered_templates
+			);
+
+			$query_result = array_merge( $query_result, $matching_registered_templates );
+		}
+	}
+
+	/**
+	 * Filters the array of queried block templates array after they've been fetched.
+	 *
+	 * @since 5.9.0
+	 *
+	 * @param WP_Block_Template[] $query_result Array of found block templates.
+	 * @param array               $query {
+	 *     Arguments to retrieve templates. All arguments are optional.
+	 *
+	 *     @type string[] $slug__in  List of slugs to include.
+	 *     @type int      $wp_id     Post ID of customized template.
+	 *     @type string   $area      A 'wp_template_part_area' taxonomy value to filter by (for 'wp_template_part' template type only).
+	 *     @type string   $post_type Post type to get the templates for.
+	 * }
+	 * @param string              $template_type wp_template or wp_template_part.
+	 */
+	return apply_filters( 'get_block_templates', $query_result, $query, $template_type );
 }

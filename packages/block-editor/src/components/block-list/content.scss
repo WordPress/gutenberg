@@ -211,20 +211,24 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	&[data-clear="true"] {
 		float: none;
 	}
+
+	&:not([draggable="true"]),
+	&:not([data-draggable="true"]) {
+		cursor: default;
+	}
+
+	&[draggable="true"],
+	&[data-draggable="true"] {
+		cursor: grab;
+	}
+
+	&[contenteditable],
+	[contenteditable] {
+		cursor: text;
+	}
 }
 
 .is-outline-mode .block-editor-block-list__block:not(.remove-outline) {
-
-	&.is-selected,
-	&.is-hovered {
-		cursor: default;
-
-		&.rich-text,
-		.rich-text {
-			cursor: auto;
-		}
-	}
-
 	&.is-hovered:not(.is-selected),
 	&:not(.rich-text):not([contenteditable="true"]).is-selected {
 

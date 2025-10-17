@@ -1,14 +1,8 @@
 /**
- * WordPress dependencies
- */
-import { __ } from '@wordpress/i18n';
-
-/**
  * Internal dependencies
  */
 import type {
 	DataViewRenderFieldProps,
-	NormalizedField,
 	FieldType,
 	FieldTypeDefinition,
 	SortDirection,
@@ -103,19 +97,8 @@ export default function getFieldTypeDefinition< Item >(
 				: b.localeCompare( a );
 		},
 		isValid: {
-			custom: ( item: any, field: NormalizedField< any > ) => {
-				if ( field?.elements ) {
-					const value = field.getValue( { item } );
-					const validValues = field?.elements?.map(
-						( f ) => f.value
-					);
-					if ( ! validValues.includes( value ) ) {
-						return __( 'Value must be one of the elements.' );
-					}
-				}
-
-				return null;
-			},
+			elements: true,
+			custom: () => null,
 		},
 		Edit: null,
 		render: ( { item, field }: DataViewRenderFieldProps< Item > ) => {

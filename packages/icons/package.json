@@ -29,12 +29,11 @@
 		".": {
 			"types": "./build-types/index.d.ts",
 			"import": "./build-module/index.js",
-			"default": "./build/index.js"
+			"require": "./build/index.js"
 		},
 		"./package.json": "./package.json"
 	},
 	"react-native": "src/index",
-	"wpScript": true,
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
@@ -46,6 +45,7 @@
 	},
 	"scripts": {
 		"prelint": "npm run build",
+		"prepare": "npm run build",
 		"build": "node lib/generate-library"
 	}
 }

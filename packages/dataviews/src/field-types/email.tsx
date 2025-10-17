@@ -39,6 +39,7 @@ const emailRegex =
 export default {
 	sort,
 	isValid: {
+		elements: true,
 		custom: ( item: any, field: NormalizedField< any > ) => {
 			const value = field.getValue( { item } );
 
@@ -47,13 +48,6 @@ export default {
 				! emailRegex.test( value )
 			) {
 				return __( 'Value must be a valid email address.' );
-			}
-
-			if ( field.elements ) {
-				const validValues = field.elements.map( ( f ) => f.value );
-				if ( ! validValues.includes( value ) ) {
-					return __( 'Value must be one of the elements.' );
-				}
 			}
 
 			return null;

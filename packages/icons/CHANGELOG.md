@@ -5,6 +5,7 @@
 ### Breaking Changes
 
 - Remove `edit` and `warning` icons, which were aliases to `pencil` and `cautionFilled`, respectively. Switch to SVG icons as canonical source format, letting the system auto-generate the React elements and index. ([#71878](https://github.com/WordPress/gutenberg/pull/71878)).
+- Ensure both SVG and generated TSX code in `src/` are included in the published package. ([#72299](https://github.com/WordPress/gutenberg/pull/72299))
 
 ### Enhancements
 

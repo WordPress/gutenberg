@@ -36,7 +36,9 @@ import { collabSidebarName } from './constants';
 import { unlock } from '../../lock-unlock';
 import { noop } from './utils';
 
-const { useBlockElementRef } = unlock( blockEditorPrivateApis );
+const { useBlockElementRef, cleanEmptyObject } = unlock(
+	blockEditorPrivateApis
+);
 
 export function useBlockComments( postId ) {
 	const [ commentLastUpdated, reflowComments ] = useReducer(
@@ -69,8 +71,7 @@ export function useBlockComments( postId ) {
 	// Process comments to build the tree structure.
 	const { resultComments, unresolvedSortedThreads } = useMemo( () => {
 		const blocksWithComments = clientIds.reduce( ( results, clientId ) => {
-			const commentId =
-				getBlockAttributes( clientId )?.metadata?.commentId;
+			const commentId = getBlockAttributes( clientId )?.metadata?.noteId;
 			if ( commentId ) {
 				results[ clientId ] = commentId;
 			}
@@ -196,16 +197,14 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 				updateBlockAttributes( clientId, {
 					metadata: {
 						...metadata,
-						commentId: savedRecord.id,
+						noteId: savedRecord.id,
 					},
 				} );
 			}
 
 			createNotice(
 				'snackbar',
-				parent
-					? __( 'Reply added successfully.' )
-					: __( 'Note added successfully.' ),
+				parent ? __( 'Reply added.' ) : __( 'Note added.' ),
 				{
 					type: 'snackbar',
 					isDismissible: true,
@@ -302,14 +301,14 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 				const clientId = getSelectedBlockClientId();
 				const metadata = getBlockAttributes( clientId )?.metadata;
 				updateBlockAttributes( clientId, {
-					metadata: {
+					metadata: cleanEmptyObject( {
 						...metadata,
-						commentId: undefined,
-					},
+						noteId: undefined,
+					} ),
 				} );
 			}
 
-			createNotice( 'snackbar', __( 'Note deleted successfully.' ), {
+			createNotice( 'snackbar', __( 'Note deleted.' ), {
 				type: 'snackbar',
 				isDismissible: true,
 			} );
