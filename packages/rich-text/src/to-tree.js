@@ -264,6 +264,13 @@ export function toTree( {
 						type: 'span',
 						attributes: attrs,
 					} );
+					// Some browsers like Safari and Firefox have issues placing
+					// the caret after a non-editable element when it's at the
+					// end of the field, so help them a little by providing a
+					// text element. Similar to `insertPadding` above.
+					if ( isEditableTree && i + 1 === text.length ) {
+						append( getParent( pointer ), ZWNBSP );
+					}
 				}
 				pointer = append(
 					pointer,
