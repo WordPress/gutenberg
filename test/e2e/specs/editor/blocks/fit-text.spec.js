@@ -298,6 +298,10 @@ test.describe( 'Fit Text', () => {
 				return window.getComputedStyle( el ).fontSize;
 			} );
 
+			// Wait for fit text to recalculate (temporary solution while implementation uses 1000ms setTimeout)
+			// eslint-disable-next-line playwright/no-wait-for-timeout, no-restricted-syntax
+			await page.waitForTimeout( 1100 );
+
 			await page.setViewportSize( { width: 640, height: 720 } );
 			await heading.waitFor( { state: 'attached' } );
 
