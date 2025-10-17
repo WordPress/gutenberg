@@ -80,7 +80,7 @@ export function Comments( {
 			const clientId = getSelectedBlockClientId();
 			return {
 				blockCommentId: clientId
-					? getBlockAttributes( clientId )?.metadata?.commentId
+					? getBlockAttributes( clientId )?.metadata?.noteId
 					: null,
 				selectedBlockClientId: clientId,
 				blockIds: getBlockOrder(),

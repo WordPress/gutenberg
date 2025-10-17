@@ -71,8 +71,7 @@ export function useBlockComments( postId ) {
 	// Process comments to build the tree structure.
 	const { resultComments, unresolvedSortedThreads } = useMemo( () => {
 		const blocksWithComments = clientIds.reduce( ( results, clientId ) => {
-			const commentId =
-				getBlockAttributes( clientId )?.metadata?.commentId;
+			const commentId = getBlockAttributes( clientId )?.metadata?.noteId;
 			if ( commentId ) {
 				results[ clientId ] = commentId;
 			}
@@ -198,7 +197,7 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 				updateBlockAttributes( clientId, {
 					metadata: {
 						...metadata,
-						commentId: savedRecord.id,
+						noteId: savedRecord.id,
 					},
 				} );
 			}
@@ -304,7 +303,7 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 				updateBlockAttributes( clientId, {
 					metadata: cleanEmptyObject( {
 						...metadata,
-						commentId: undefined,
+						noteId: undefined,
 					} ),
 				} );
 			}
