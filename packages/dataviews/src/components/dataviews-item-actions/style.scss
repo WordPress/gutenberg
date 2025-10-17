@@ -8,6 +8,8 @@
 
 .dataviews-item-actions {
 	.components-button.is-link {
+		padding-left: $grid-unit-10;
+		padding-right: $grid-unit-10;
 		text-decoration: none;
 		font-weight: 600;
 		color: $gray-700;
