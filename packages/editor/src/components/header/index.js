@@ -145,6 +145,7 @@ function Header( {
 					variants={ toolbarVariations }
 					transition={ { type: 'tween' } }
 				>
+<<<<<<< HEAD
 					<EditorPresenceSlot>
 						{ ( fills ) =>
 							fills?.length ? (
@@ -154,6 +155,20 @@ function Header( {
 							) : null
 						}
 					</EditorPresenceSlot>
+=======
+					<EditorsPresence.Slot>
+						{ ( fills ) =>
+							fills.map( ( fill, i ) => (
+								<div
+									className="editor-header__editor-presence"
+									key={ i }
+								>
+									{ fill }
+								</div>
+							) )
+						}
+					</EditorsPresence.Slot>
+>>>>>>> b375e5b518 (Real-time collaboration: [no-pr] Add <EditorsPresence> SlotFill)
 					<DocumentBar title={ title } />
 				</motion.div>
 			) }
