@@ -14,6 +14,11 @@ export function sanitizeCommentString( str ) {
 }
 
 /**
+ * A no-operation function that does nothing.
+ */
+export function noop() {}
+
+/**
  * These colors are picked from the WordPress.org design library.
  * @see https://www.figma.com/design/HOJTpCFfa3tR0EccUlu0CM/WordPress.org-Design-Library?node-id=1-2193&t=M6WdRvTpt0mh8n6T-1
  */
@@ -98,27 +103,41 @@ export function getCommentExcerpt( text, excerptLength = 10 ) {
  * @param {string}       additionalSelector The additional selector to focus on.
  */
 export function focusCommentThread( commentId, container, additionalSelector ) {
-	const getFocusElement = () => {
-		const commentThread = container?.querySelector(
-			`[role=listitem][id="comment-thread-${ commentId }"]`
-		);
-		if ( additionalSelector ) {
-			return commentThread?.querySelector( additionalSelector );
-		}
-		return commentThread;
-	};
+	if ( ! container ) {
+		return;
+	}
 
-	let focusElement = getFocusElement();
-	if ( focusElement ) {
-		focusElement.focus();
-	} else {
-		// The element hasn't been painted yet. Defer focusing on the next frame.
-		window.requestAnimationFrame( () => {
-			focusElement = getFocusElement();
-			// Ignore if the element still doesn't exist.
-			if ( focusElement ) {
-				focusElement.focus();
+	// A thread without a commentId is a new comment thread.
+	const threadSelector = commentId
+		? `[role=listitem][id="comment-thread-${ commentId }"]`
+		: '[role=listitem]:not([id])';
+	const selector = additionalSelector
+		? `${ threadSelector } ${ additionalSelector }`
+		: threadSelector;
+
+	return new Promise( ( resolve ) => {
+		if ( container.querySelector( selector ) ) {
+			return resolve( container.querySelector( selector ) );
+		}
+
+		let timer = null;
+		// Wait for the element to be added to the DOM.
+		const observer = new window.MutationObserver( () => {
+			if ( container.querySelector( selector ) ) {
+				clearTimeout( timer );
+				observer.disconnect();
+				resolve( container.querySelector( selector ) );
 			}
 		} );
-	}
+		observer.observe( container, {
+			childList: true,
+			subtree: true,
+		} );
+
+		// Stop trying after 3 seconds.
+		timer = setTimeout( () => {
+			observer.disconnect();
+			resolve( null );
+		}, 3000 );
+	} ).then( ( element ) => element?.focus() );
 }

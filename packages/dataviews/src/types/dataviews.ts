@@ -287,11 +287,6 @@ interface ActionBase< Item > {
 	disabled?: boolean;
 
 	/**
-	 * Whether the action is destructive.
-	 */
-	isDestructive?: boolean;
-
-	/**
 	 * Whether the action is a primary action.
 	 */
 	isPrimary?: boolean;
@@ -337,7 +332,7 @@ export interface ActionModal< Item > extends ActionBase< Item > {
 	/**
 	 * The header of the modal.
 	 */
-	modalHeader?: string;
+	modalHeader?: string | ( ( items: Item[] ) => string );
 
 	/**
 	 * The size of the modal.

@@ -133,7 +133,13 @@ export default function GalleryEdit( props ) {
 		onFocus,
 	} = props;
 
-	const [ lightboxSetting ] = useSettings( 'blocks.core/image.lightbox' );
+	const [ lightboxSetting, defaultRatios, themeRatios, showDefaultRatios ] =
+		useSettings(
+			'blocks.core/image.lightbox',
+			'dimensions.aspectRatios.default',
+			'dimensions.aspectRatios.theme',
+			'dimensions.defaultAspectRatios'
+		);
 
 	const linkOptions = ! lightboxSetting?.allowEditing
 		? LINK_OPTIONS.filter(
@@ -149,6 +155,7 @@ export default function GalleryEdit( props ) {
 		linkTarget,
 		linkTo,
 		sizeSlug,
+		aspectRatio,
 	} = attributes;
 
 	const {
@@ -223,6 +230,26 @@ export default function GalleryEdit( props ) {
 		: images.filter( ( image ) => image.attributes.lightbox?.enabled )
 				.length > 0;
 
+	const themeOptions = themeRatios?.map( ( { name, ratio } ) => ( {
+		label: name,
+		value: ratio,
+	} ) );
+	const defaultOptions = defaultRatios?.map( ( { name, ratio } ) => ( {
+		label: name,
+		value: ratio,
+	} ) );
+	const aspectRatioOptions = [
+		{
+			label: _x(
+				'Original',
+				'Aspect ratio option for dimensions control'
+			),
+			value: 'auto',
+		},
+		...( showDefaultRatios ? defaultOptions || [] : [] ),
+		...( themeOptions || [] ),
+	];
+
 	useEffect( () => {
 		newImages?.forEach( ( newImage ) => {
 			// Update the images data without creating new undo levels.
@@ -290,6 +317,7 @@ export default function GalleryEdit( props ) {
 			sizeSlug,
 			caption: imageAttributes.caption || image.caption?.raw,
 			alt: imageAttributes.alt || image.alt_text,
+			aspectRatio: aspectRatio === 'auto' ? undefined : aspectRatio,
 		};
 	}
 
@@ -513,6 +541,39 @@ export default function GalleryEdit( props ) {
 		);
 	}
 
+	function setAspectRatio( value ) {
+		setAttributes( { aspectRatio: value } );
+
+		// Update all inner image blocks with the new aspect ratio
+		const changedAttributes = {};
+		const blocks = [];
+
+		getBlock( clientId ).innerBlocks.forEach( ( block ) => {
+			blocks.push( block.clientId );
+			changedAttributes[ block.clientId ] = {
+				aspectRatio: value === 'auto' ? undefined : value,
+			};
+		} );
+
+		updateBlockAttributes( blocks, changedAttributes, true );
+
+		const aspectRatioText = aspectRatioOptions.find(
+			( option ) => option.value === value
+		);
+
+		createSuccessNotice(
+			sprintf(
+				/* translators: %s: aspect ratio setting */
+				__( 'All gallery images updated to aspect ratio: %s' ),
+				aspectRatioText?.label || value
+			),
+			{
+				id: 'gallery-attributes-aspectRatio',
+				type: 'snackbar',
+			}
+		);
+	}
+
 	useEffect( () => {
 		// linkTo attribute must be saved so blocks don't break when changing image_default_link_type in options.php.
 		if ( ! linkTo ) {
@@ -611,6 +672,8 @@ export default function GalleryEdit( props ) {
 								imageCrop: true,
 								randomOrder: false,
 							} );
+
+							setAspectRatio( 'auto' );
 
 							if ( sizeSlug !== DEFAULT_MEDIA_SIZE_SLUG ) {
 								updateImagesSize( DEFAULT_MEDIA_SIZE_SLUG );
@@ -724,6 +787,28 @@ export default function GalleryEdit( props ) {
 								/>
 							</ToolsPanelItem>
 						) }
+						{ aspectRatioOptions.length > 1 && (
+							<ToolsPanelItem
+								hasValue={ () =>
+									!! aspectRatio && aspectRatio !== 'auto'
+								}
+								label={ __( 'Aspect ratio' ) }
+								onDeselect={ () => setAspectRatio( 'auto' ) }
+								isShownByDefault
+							>
+								<SelectControl
+									__next40pxDefaultSize
+									__nextHasNoMarginBottom
+									label={ __( 'Aspect ratio' ) }
+									help={ __(
+										'Set a consistent aspect ratio for all images in the gallery.'
+									) }
+									value={ aspectRatio }
+									options={ aspectRatioOptions }
+									onChange={ setAspectRatio }
+								/>
+							</ToolsPanelItem>
+						) }
 						<ToolsPanelItem
 							label={ __( 'Navigation button type' ) }
 							isShownByDefault
@@ -819,6 +904,20 @@ export default function GalleryEdit( props ) {
 								label={ __( 'Open images in new tab' ) }
 								checked={ linkTarget === '_blank' }
 								onChange={ toggleOpenInNewTab }
+							/>
+						) }
+						{ aspectRatioOptions.length > 1 && (
+							<SelectControl
+								__nextHasNoMarginBottom
+								label={ __( 'Aspect Ratio' ) }
+								help={ __(
+									'Set a consistent aspect ratio for all images in the gallery.'
+								) }
+								value={ aspectRatio }
+								options={ aspectRatioOptions }
+								onChange={ setAspectRatio }
+								hideCancelButton
+								size="__unstable-large"
 							/>
 						) }
 					</PanelBody>

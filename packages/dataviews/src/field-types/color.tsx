@@ -56,6 +56,7 @@ function sort( valueA: any, valueB: any, direction: SortDirection ) {
 export default {
 	sort,
 	isValid: {
+		elements: true,
 		custom: ( item: any, field: NormalizedField< any > ) => {
 			const value = field.getValue( { item } );
 
@@ -64,13 +65,6 @@ export default {
 				! colord( value ).isValid()
 			) {
 				return __( 'Value must be a valid color.' );
-			}
-
-			if ( field.elements ) {
-				const validValues = field.elements.map( ( f ) => f.value );
-				if ( ! validValues.includes( value ) ) {
-					return __( 'Value must be one of the elements.' );
-				}
 			}
 
 			return null;

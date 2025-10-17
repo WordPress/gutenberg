@@ -13,7 +13,7 @@ import userEvent from '@testing-library/user-event';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, createElement } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -2747,6 +2747,70 @@ describe( 'Entity handling', () => {
 		} );
 	} );
 
+	it( 'should allow unlinking and entering a custom URL', async () => {
+		const user = userEvent.setup();
+
+		const entityLink = {
+			id: 123,
+			url: 'https://example.com/page',
+			title: 'Test Page',
+			type: 'page',
+			kind: 'post-type',
+		};
+
+		const onChange = jest.fn();
+
+		render(
+			<LinkControl
+				value={ entityLink }
+				handleEntities
+				forceIsEditingLink
+				onChange={ onChange }
+			/>
+		);
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+
+		// Initially should be disabled because it's an entity
+		expect( searchInput ).toBeDisabled();
+
+		// Click the unsync button
+		const unlinkButton = screen.getByRole( 'button', {
+			name: 'Unsync and edit',
+		} );
+		await user.click( unlinkButton );
+
+		// Input should now be enabled and value should be cleared
+		expect( searchInput ).toBeEnabled();
+		expect( searchInput ).toHaveValue( '' );
+
+		// Type a custom URL (not selecting from suggestions)
+		const customUrl = 'www.wordpress.org';
+		await user.type( searchInput, customUrl );
+
+		// Wait for the URL suggestion to appear
+		await screen.findByRole( 'listbox' );
+
+		// Click the Apply button to submit
+		const applyButton = screen.getByRole( 'button', {
+			name: 'Apply',
+		} );
+		await user.click( applyButton );
+
+		// Verify that onChange was called with the entity link severed
+		// id, kind, and type should be undefined to indicate it's no longer an entity
+		expect( onChange ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				url: customUrl,
+				id: undefined,
+				kind: undefined,
+				type: undefined,
+			} )
+		);
+	} );
+
 	describe( 'Accessibility association for entity links', () => {
 		it( 'should associate unlink button with help text via aria-describedby', () => {
 			const entityLink = {
@@ -2837,6 +2901,194 @@ describe( 'Entity handling', () => {
 			expect(
 				screen.getAllByText( 'Synced with the selected page.' )
 			).toHaveLength( 2 );
+		} );
+	} );
+} );
+
+describe( 'Custom settings rendering', () => {
+	it( 'renders custom settings with valid render functions', async () => {
+		const user = userEvent.setup();
+		const mockRender = jest.fn(
+			// eslint-disable-next-line no-unused-vars
+			( setting, value, onChange ) =>
+				createElement(
+					'div',
+					{ 'data-testid': 'custom-setting' },
+					'Custom Setting Content'
+				)
+		);
+
+		const settings = [
+			{
+				id: 'customSetting',
+				title: 'Custom Setting',
+				render: mockRender,
+			},
+		];
+
+		const selectedLink = fauxEntitySuggestions[ 0 ];
+
+		render(
+			<LinkControl
+				value={ selectedLink }
+				settings={ settings }
+				forceIsEditingLink
+			/>
+		);
+
+		await toggleSettingsDrawer( user );
+
+		expect( mockRender ).toHaveBeenCalledWith(
+			settings[ 0 ],
+			selectedLink,
+			expect.any( Function )
+		);
+		expect( screen.getByTestId( 'custom-setting' ) ).toBeInTheDocument();
+		expect(
+			screen.getByText( 'Custom Setting Content' )
+		).toBeInTheDocument();
+	} );
+
+	it( 'renders only valid settings when mixed with invalid ones', async () => {
+		const user = userEvent.setup();
+		const validRender = jest.fn(
+			// eslint-disable-next-line no-unused-vars
+			( setting, value, onChange ) =>
+				createElement(
+					'div',
+					{ 'data-testid': 'valid-setting' },
+					'Valid Setting'
+				)
+		);
+
+		const settings = [
+			{
+				id: 'validSetting',
+				title: 'Valid Setting',
+				render: validRender,
+			},
+			{
+				id: 'invalidSetting',
+				title: 'Invalid Setting',
+				render: 'not a function',
+			},
+			{
+				id: 'anotherValidSetting',
+				title: 'Another Valid Setting',
+				render: validRender,
+			},
+		];
+
+		const selectedLink = fauxEntitySuggestions[ 0 ];
+
+		render(
+			<LinkControl
+				value={ selectedLink }
+				settings={ settings }
+				forceIsEditingLink
+			/>
+		);
+
+		await toggleSettingsDrawer( user );
+
+		// Should render only the valid settings
+		expect( screen.getAllByTestId( 'valid-setting' ) ).toHaveLength( 2 );
+		expect(
+			screen.queryByText( 'Invalid Setting' )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'renders CheckboxControl for settings without render property', async () => {
+		const user = userEvent.setup();
+
+		const settings = [
+			{
+				id: 'noRenderSetting',
+				title: 'No Render Setting',
+				// No render property
+			},
+		];
+
+		const selectedLink = fauxEntitySuggestions[ 0 ];
+
+		render(
+			<LinkControl
+				value={ selectedLink }
+				settings={ settings }
+				forceIsEditingLink
+			/>
+		);
+
+		await toggleSettingsDrawer( user );
+
+		// Should render CheckboxControl
+		expect(
+			screen.getByRole( 'checkbox', { name: 'No Render Setting' } )
+		).toBeInTheDocument();
+	} );
+
+	it( 'allows custom render functions to call onChange in LinkControl', async () => {
+		const user = userEvent.setup();
+		const mockOnChange = jest.fn();
+
+		const mockRender = jest.fn( ( setting, value, onChange ) => {
+			return createElement(
+				'button',
+				{
+					'data-testid': 'custom-toggle-button',
+					onClick: () =>
+						onChange( { [ setting.id ]: ! value[ setting.id ] } ),
+				},
+				'Toggle Custom Setting'
+			);
+		} );
+
+		const settings = [
+			{
+				id: 'customToggleSetting',
+				title: 'Custom Toggle Setting',
+				render: mockRender,
+			},
+		];
+
+		const selectedLink = {
+			...fauxEntitySuggestions[ 0 ],
+			customToggleSetting: false,
+		};
+
+		render(
+			<LinkControl
+				value={ selectedLink }
+				settings={ settings }
+				onChange={ mockOnChange }
+				forceIsEditingLink
+			/>
+		);
+
+		await toggleSettingsDrawer( user );
+
+		// Verify the custom render function was called
+		expect( mockRender ).toHaveBeenCalledWith(
+			settings[ 0 ],
+			selectedLink,
+			expect.any( Function )
+		);
+
+		// Click the custom button
+		const customButton = screen.getByTestId( 'custom-toggle-button' );
+		await user.click( customButton );
+
+		// Check that the Apply button is now enabled
+		const applyButton = screen.getByRole( 'button', { name: 'Apply' } );
+		expect( applyButton ).toBeEnabled();
+
+		// Click Apply to submit the changes
+		await user.click( applyButton );
+
+		// Verify onChange was called with the updated value
+		expect( mockOnChange ).toHaveBeenCalledWith( {
+			...selectedLink,
+			customToggleSetting: true,
 		} );
 	} );
 } );

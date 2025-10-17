@@ -44,10 +44,11 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-6.9/template-activate.php';
 	require __DIR__ . '/compat/wordpress-6.9/block-bindings.php';
 	require __DIR__ . '/compat/wordpress-6.9/post-data-block-bindings.php';
-	require __DIR__ . '/compat/wordpress-6.9/term-data-block-bindings.php';
 	require __DIR__ . '/compat/wordpress-6.9/entity-block-bindings.php';
 	require __DIR__ . '/compat/wordpress-6.9/rest-api.php';
 	require __DIR__ . '/compat/wordpress-6.9/class-gutenberg-hierarchical-sort.php';
+	require __DIR__ . '/compat/wordpress-6.9/block-comments.php';
+	require __DIR__ . '/compat/wordpress-6.9/class-gutenberg-rest-comment-controller.php';
 
 	// Plugin specific code.
 	require_once __DIR__ . '/class-wp-rest-global-styles-controller-gutenberg.php';
@@ -56,12 +57,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 
 	require_once __DIR__ . '/experimental/rest-api.php';
 	require_once __DIR__ . '/experimental/kses-allowed-html.php';
-
-	// Block Comments.
-	if ( gutenberg_is_experiment_enabled( 'gutenberg-block-comment' ) ) {
-		require __DIR__ . '/experimental/block-comments.php';
-		require __DIR__ . '/experimental/class-gutenberg-rest-comment-controller.php';
-	}
 }
 
 // Experimental signaling server.
@@ -89,7 +84,6 @@ require __DIR__ . '/compat/wordpress-6.8/site-preview.php';
 require __DIR__ . '/compat/wordpress-6.9/customizer-preview-custom-css.php';
 require __DIR__ . '/compat/wordpress-6.9/command-palette.php';
 require __DIR__ . '/compat/wordpress-6.9/preload.php';
-require __DIR__ . '/compat/wordpress-6.9/l10n.php';
 
 // WordPress 7.0 compat.
 require __DIR__ . '/compat/wordpress-7.0/php-only-blocks.php';
@@ -164,9 +158,6 @@ require __DIR__ . '/block-supports/background.php';
 require __DIR__ . '/block-supports/block-style-variations.php';
 require __DIR__ . '/block-supports/aria-label.php';
 require __DIR__ . '/block-supports/block-visibility.php';
-
-// Data views.
-require_once __DIR__ . '/experimental/data-views.php';
 
 // Client-side media processing.
 if ( gutenberg_is_experiment_enabled( 'gutenberg-media-processing' ) ) {

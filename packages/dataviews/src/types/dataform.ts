@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import type { Field } from './field-api';
+import type { Field, FieldValidity } from './field-api';
 
 /**
  * DataForm layouts.
@@ -130,11 +130,15 @@ export interface DataFormProps< Item > {
 	fields: Field< Item >[];
 	form: Form;
 	onChange: ( value: Record< string, any > ) => void;
+	validity?: FormValidity;
 }
+
+export type FormValidity = Record< string, FieldValidity > | undefined;
 
 export interface FieldLayoutProps< Item > {
 	data: Item;
 	field: FormField;
 	onChange: ( value: any ) => void;
 	hideLabelFromVision?: boolean;
+	validity?: FieldValidity;
 }

@@ -89,7 +89,6 @@ const actions: Action< Data >[] = [
 	{
 		id: 'delete',
 		label: 'Delete',
-		isDestructive: true,
 		supportsBulk: true,
 		RenderModal: () => <div>Modal Content</div>,
 	},

@@ -69,7 +69,7 @@ Export action as JSON for Pattern.
 
 ### featuredImageField
 
-Featured Image field for BasePost.
+Featured Image field for BasePostWithEmbeddedFeaturedMedia.
 
 ### orderField
 

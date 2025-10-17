@@ -4,7 +4,6 @@
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const MomentTimezoneDataPlugin = require( 'moment-timezone-data-webpack-plugin' );
 const { join } = require( 'path' );
-const { readdirSync } = require( 'node:fs' );
 
 /**
  * WordPress dependencies
@@ -17,34 +16,9 @@ const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extrac
 /**
  * Internal dependencies
  */
-const packageDirs = readdirSync(
-	new URL( '../packages', `file://${ __dirname }` ),
-	{
-		withFileTypes: true,
-	}
-).flatMap( ( dirent ) => ( dirent.isDirectory() ? [ dirent.name ] : [] ) );
-const { baseConfig, plugins, stylesTransform } = require( './shared' );
+const { baseConfig, plugins } = require( './shared' );
 
 const WORDPRESS_NAMESPACE = '@wordpress/';
-
-// Experimental or other packages that should be private are bundled when used.
-// That way, we can iterate on these package without making them part of the public API.
-// See: https://github.com/WordPress/gutenberg/pull/19809
-//
-// !!
-// This list must be kept in sync with the matching list in packages/dependency-extraction-webpack-plugin/lib/util.js
-// !!
-const BUNDLED_PACKAGES = [
-	'@wordpress/dataviews',
-	'@wordpress/dataviews/wp',
-	'@wordpress/icons',
-	'@wordpress/interface',
-	'@wordpress/sync',
-	'@wordpress/undo-manager',
-	'@wordpress/upload-media',
-	'@wordpress/fields',
-	'@wordpress/views',
-];
 
 // PHP files in packages that have to be copied during build.
 const bundledPackagesPhpConfig = [
@@ -91,34 +65,13 @@ const bundledPackagesPhpConfig = [
 	},
 } ) );
 
-/** @type {Array<string>} */
+/**
+ * All packages are now built by esbuild (bin/packages/build.mjs).
+ * Webpack is only used for file copying operations (PHP files, vendor bundles).
+ *
+ * @type {Array<string>}
+ */
 const gutenbergScripts = [];
-for ( const packageDir of packageDirs ) {
-	const packageJson = require(
-		`${ WORDPRESS_NAMESPACE }${ packageDir }/package.json`
-	);
-
-	if ( ! packageJson.wpScript ) {
-		continue;
-	}
-
-	if ( BUNDLED_PACKAGES.includes( packageJson.name ) ) {
-		continue;
-	}
-
-	gutenbergScripts.push( packageDir );
-}
-
-const exportDefaultPackages = [
-	'api-fetch',
-	'deprecated',
-	'dom-ready',
-	'redux-routine',
-	'token-list',
-	'server-side-render',
-	'shortcode',
-	'warning',
-];
 
 const copiedVendors = {
 	'react.js': 'react/umd/react.development.js',
@@ -131,19 +84,24 @@ module.exports = {
 	...baseConfig,
 	name: 'packages',
 	entry: Object.fromEntries(
-		gutenbergScripts.map( ( packageName ) => [
-			packageName,
-			{
-				import: `./packages/${ packageName }`,
-				library: {
-					name: [ 'wp', camelCaseDash( packageName ) ],
-					type: 'window',
-					export: exportDefaultPackages.includes( packageName )
-						? 'default'
-						: undefined,
+		gutenbergScripts.map( ( packageName ) => {
+			const packageJson = require(
+				`${ WORDPRESS_NAMESPACE }${ packageName }/package.json`
+			);
+			return [
+				packageName,
+				{
+					import: `./packages/${ packageName }`,
+					library: {
+						name: [ 'wp', camelCaseDash( packageName ) ],
+						type: 'window',
+						export: packageJson.wpScriptDefaultExport
+							? 'default'
+							: undefined,
+					},
 				},
-			},
-		] )
+			];
+		} )
 	),
 	output: {
 		devtoolNamespace: 'wp',
@@ -179,21 +137,12 @@ module.exports = {
 		...plugins,
 		new DependencyExtractionWebpackPlugin( { injectPolyfill: false } ),
 		new CopyWebpackPlugin( {
-			patterns: gutenbergScripts
-				.map( ( packageName ) => ( {
-					from: '*.css',
-					context: `./packages/${ packageName }/build-style`,
-					to: `./build/${ packageName }`,
-					transform: stylesTransform,
-					noErrorOnMissing: true,
+			patterns: bundledPackagesPhpConfig.concat(
+				Object.entries( copiedVendors ).map( ( [ to, from ] ) => ( {
+					from: `node_modules/${ from }`,
+					to: `build/vendors/${ to }`,
 				} ) )
-				.concat( bundledPackagesPhpConfig )
-				.concat(
-					Object.entries( copiedVendors ).map( ( [ to, from ] ) => ( {
-						from: `node_modules/${ from }`,
-						to: `build/vendors/${ to }`,
-					} ) )
-				),
+			),
 		} ),
 		new MomentTimezoneDataPlugin( {
 			startYear: 2000,

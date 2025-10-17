@@ -19,17 +19,47 @@ const FORM_FIELD_LAYOUTS = [
 	{
 		type: 'regular',
 		component: FormRegularField,
+		wrapper: ( {
+			children,
+			layout,
+		}: {
+			children: React.ReactNode;
+			layout: Layout;
+		} ) => (
+			<VStack
+				className="dataforms-layouts__wrapper"
+				spacing={ ( layout as any )?.spacing ?? 4 }
+			>
+				{ children }
+			</VStack>
+		),
 	},
 	{
 		type: 'panel',
 		component: FormPanelField,
 		wrapper: ( { children }: { children: React.ReactNode } ) => (
-			<VStack spacing={ 2 }>{ children }</VStack>
+			<VStack className="dataforms-layouts__wrapper" spacing={ 2 }>
+				{ children }
+			</VStack>
 		),
 	},
 	{
 		type: 'card',
 		component: FormCardField,
+		wrapper: ( {
+			children,
+			layout,
+		}: {
+			children: React.ReactNode;
+			layout: Layout;
+		} ) => (
+			<VStack
+				className="dataforms-layouts__wrapper"
+				spacing={ ( layout as any )?.spacing ?? 6 }
+			>
+				{ children }
+			</VStack>
+		),
 	},
 	{
 		type: 'row',
@@ -41,7 +71,7 @@ const FORM_FIELD_LAYOUTS = [
 			children: React.ReactNode;
 			layout: Layout;
 		} ) => (
-			<VStack spacing={ 4 }>
+			<VStack className="dataforms-layouts__wrapper" spacing={ 4 }>
 				<div className="dataforms-layouts-row__field">
 					<HStack
 						spacing={ 4 }

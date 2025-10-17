@@ -25,6 +25,10 @@
 		"npm": ">=8.19.2"
 	},
 	"main": "parser.js",
+	"exports": {
+		".": "./parser.js",
+		"./package.json": "./package.json"
+	},
 	"wpScript": true,
 	"sideEffects": false,
 	"dependencies": {

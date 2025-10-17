@@ -6,7 +6,11 @@ import { isTextField } from '@wordpress/dom';
 import { Popover } from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 import { useRef } from '@wordpress/element';
-import { switchToBlockType, store as blocksStore } from '@wordpress/blocks';
+import {
+	switchToBlockType,
+	store as blocksStore,
+	hasBlockSupport,
+} from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
 import { __, sprintf, _n } from '@wordpress/i18n';
 
@@ -24,6 +28,7 @@ import usePopoverScroll from '../block-popover/use-popover-scroll';
 import ZoomOutModeInserters from './zoom-out-mode-inserters';
 import { useShowBlockTools } from './use-show-block-tools';
 import { unlock } from '../../lock-unlock';
+import { cleanEmptyObject } from '../../hooks/utils';
 import usePasteStyles from '../use-paste-styles';
 
 function selector( select ) {
@@ -71,6 +76,7 @@ export default function BlockTools( {
 		getSelectedBlockClientIds,
 		getBlockRootClientId,
 		isGroupable,
+		getBlockName,
 	} = useSelect( blockEditorStore );
 	const { getGroupingBlockName } = useSelect( blocksStore );
 	const { showEmptyBlockSideInserter, showBlockToolbarPopover } =
@@ -87,6 +93,7 @@ export default function BlockTools( {
 		moveBlocksUp,
 		moveBlocksDown,
 		expandBlock,
+		updateBlockAttributes,
 	} = unlock( useDispatch( blockEditorStore ) );
 
 	function onKeyDown( event ) {
@@ -199,6 +206,44 @@ export default function BlockTools( {
 				);
 				replaceBlocks( clientIds, newBlocks );
 				speak( __( 'Selected blocks are grouped.' ) );
+			}
+		} else if (
+			isMatch( 'core/block-editor/toggle-block-visibility', event )
+		) {
+			const clientIds = getSelectedBlockClientIds();
+			if ( clientIds.length ) {
+				event.preventDefault();
+				const blocks = getBlocksByClientId( clientIds );
+				const canToggleBlockVisibility = blocks.every( ( block ) =>
+					hasBlockSupport(
+						getBlockName( block.clientId ),
+						'blockVisibility',
+						true
+					)
+				);
+				if ( ! canToggleBlockVisibility ) {
+					return;
+				}
+				const hasHiddenBlock = blocks.some(
+					( block ) =>
+						block.attributes.metadata?.blockVisibility === false
+				);
+				const attributesByClientId = Object.fromEntries(
+					blocks.map( ( { clientId: mapClientId, attributes } ) => [
+						mapClientId,
+						{
+							metadata: cleanEmptyObject( {
+								...attributes?.metadata,
+								blockVisibility: hasHiddenBlock
+									? undefined
+									: false,
+							} ),
+						},
+					] )
+				);
+				updateBlockAttributes( clientIds, attributesByClientId, {
+					uniqueByBlock: true,
+				} );
 			}
 		}
 	}

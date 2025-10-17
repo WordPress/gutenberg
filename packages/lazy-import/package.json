@@ -23,6 +23,10 @@
 		"npm": ">=8.19.2"
 	},
 	"main": "lib/index.js",
+	"exports": {
+		".": "./lib/index.js",
+		"./package.json": "./package.json"
+	},
 	"types": "build-types",
 	"dependencies": {
 		"execa": "^4.0.2",
