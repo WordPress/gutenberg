@@ -251,7 +251,14 @@ test.describe( 'Fit Text', () => {
 			await expect( heading ).toHaveClass( /has-fit-text/ );
 
 			// Verify data attribute is set (added by frontend script)
-			await expect( heading ).toHaveAttribute( 'data-fit-text-id', /.+/ );
+			const fitTextId = await heading.getAttribute( 'data-fit-text-id' );
+			expect( fitTextId ).toBeTruthy();
+
+			// Verify style element exists for this fit text instance
+			const styleElement = page.locator(
+				`style#fit-text-${ fitTextId }`
+			);
+			await expect( styleElement ).toBeAttached();
 
 			const fontSize = await heading.evaluate( ( el ) => {
 				return window.getComputedStyle( el ).fontSize;
@@ -286,21 +293,55 @@ test.describe( 'Fit Text', () => {
 
 			// Wait for fit text to initialize (verify frontend script ran)
 			await heading.waitFor( { state: 'attached' } );
-			await expect( heading ).toHaveAttribute( 'data-fit-text-id', /.+/ );
+			const fitTextId = await heading.getAttribute( 'data-fit-text-id' );
+			expect( fitTextId ).toBeTruthy();
 
-			await page.setViewportSize( { width: 1280, height: 720 } );
-			await heading.waitFor( { state: 'attached' } );
+			// Verify style element exists for this fit text instance
+			const styleElement = page.locator(
+				`style#fit-text-${ fitTextId }`
+			);
+			await styleElement.waitFor( { state: 'attached' } );
+
+			// Wait for fit text to calculate initially
+			await page.waitForFunction(
+				( styleId ) => {
+					const style = document.getElementById( styleId );
+					return style && style.textContent.trim().length > 0;
+				},
+				`fit-text-${ fitTextId }`,
+				{ timeout: 5000 }
+			);
 
 			const initialFontSize = await heading.evaluate( ( el ) => {
 				return window.getComputedStyle( el ).fontSize;
 			} );
 
-			await page.setViewportSize( { width: 440, height: 720 } );
-			await heading.waitFor( { state: 'attached' } );
+			// Capture style content before resize
+			const styleBeforeResize = await styleElement.textContent();
 
-			// Wait for fit text to recalculate (temporary solution while implementation uses 1000ms setTimeout)
-			// eslint-disable-next-line playwright/no-wait-for-timeout, no-restricted-syntax
-			await page.waitForTimeout( 1100 );
+			await page.setViewportSize( { width: 440, height: 720 } );
+
+			// Wait for fit text to recalculate (style content changes)
+			await page.waitForFunction(
+				( { styleId, previousContent } ) => {
+					const style = document.getElementById( styleId );
+					return (
+						style &&
+						style.textContent !== previousContent &&
+						style.textContent.trim().length > 0
+					);
+				},
+				{
+					styleId: `fit-text-${ fitTextId }`,
+					previousContent: styleBeforeResize,
+				},
+				{ timeout: 5000 }
+			);
+
+			// Verify the same element instance is maintained (ID unchanged)
+			const fitTextIdAfterResize =
+				await heading.getAttribute( 'data-fit-text-id' );
+			expect( fitTextIdAfterResize ).toBe( fitTextId );
 
 			const newFontSize = await heading.evaluate( ( el ) => {
 				return window.getComputedStyle( el ).fontSize;
@@ -345,10 +386,15 @@ test.describe( 'Fit Text', () => {
 
 			// Wait for fit text to initialize (verify frontend script ran)
 			await fitTextParagraph.waitFor( { state: 'visible' } );
-			await expect( fitTextParagraph ).toHaveAttribute(
-				'data-fit-text-id',
-				/.+/
+			const fitTextId =
+				await fitTextParagraph.getAttribute( 'data-fit-text-id' );
+			expect( fitTextId ).toBeTruthy();
+
+			// Verify style element exists for this fit text instance
+			const styleElement = page.locator(
+				`style#fit-text-${ fitTextId }`
 			);
+			await expect( styleElement ).toBeAttached();
 
 			const paragraphs = page.locator( 'p' );
 
