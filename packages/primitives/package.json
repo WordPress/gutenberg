@@ -28,7 +28,8 @@
 	"exports": {
 		".": {
 			"import": "./build-module/index.js",
-			"require": "./build/index.js"
+			"require": "./build/index.js",
+			"types": "./build-types/index.d.ts"
 		},
 		"./package.json": "./package.json"
 	},
