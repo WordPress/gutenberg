@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { privateApis, Spinner } from '@wordpress/components';
-import { useCallback, useState } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
