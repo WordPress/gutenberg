@@ -105,16 +105,9 @@ export type FontSize = {
 	 */
 	slug: string;
 	/**
-	 * The `fluid` property is an optional object specifying min and max values for
-	 * fluid font sizes.
-	 */
-	fluid?: {
-		min?: string | number;
-		max?: string | number;
-	};
-	/**
 	 * The `hint` property is an optional string that provides additional information
 	 * about the font size, such as fluid typography ranges or custom descriptions.
+	 * Consumers can use this to provide their own preferred hints.
 	 */
 	hint?: string;
 };
