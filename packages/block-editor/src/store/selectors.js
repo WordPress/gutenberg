@@ -43,7 +43,7 @@ import {
 	isSectionBlock,
 	getParentSectionBlock,
 	isZoomOut,
-	isContainerInsertableToInWriteMode,
+	isContainerInsertableToInContentOnlyMode,
 } from './private-selectors';
 
 const { isContentBlock } = unlock( blocksPrivateApis );
@@ -1707,10 +1707,14 @@ const canInsertBlockTypeUnmemoized = (
 		return false;
 	}
 
-	// In write mode, check if this container allows insertion.
+	// In content only mode, check if this container allows insertion.
 	if (
 		( isParentSectionBlock || blockEditingMode === 'contentOnly' ) &&
-		! isContainerInsertableToInWriteMode( state, blockName, rootClientId )
+		! isContainerInsertableToInContentOnlyMode(
+			state,
+			blockName,
+			rootClientId
+		)
 	) {
 		return false;
 	}
@@ -1868,10 +1872,10 @@ export function canRemoveBlock( state, clientId ) {
 
 	const blockEditingMode = getBlockEditingMode( state, clientId );
 
-	// Check if the parent container allows insertion/removal in write mode
+	// Check if the parent container allows insertion/removal in contentOnly mode
 	if (
 		blockEditingMode === 'contentOnly' &&
-		! isContainerInsertableToInWriteMode(
+		! isContainerInsertableToInContentOnlyMode(
 			state,
 			getBlockName( state, clientId ),
 			rootClientId
@@ -1921,7 +1925,7 @@ export function canMoveBlock( state, clientId ) {
 	const blockEditingMode = getBlockEditingMode( state, clientId );
 	if (
 		blockEditingMode === 'contentOnly' &&
-		! isContainerInsertableToInWriteMode(
+		! isContainerInsertableToInContentOnlyMode(
 			state,
 			getBlockName( state, clientId ),
 			rootClientId
