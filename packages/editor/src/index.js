@@ -13,3 +13,4 @@ export * from './dataviews/api';
  * Backward compatibility
  */
 export { transformStyles } from '@wordpress/block-editor';
+export { EditorsPresence } from './components/editors-presence';
