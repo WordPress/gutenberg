@@ -140,15 +140,15 @@ export function useBlockComments( postId ) {
 					thread !== undefined && thread.status === 'approved'
 			);
 
-		// Append orphan notes (whose related block was deleted or missing).
-		const orphanComments = updatedResult.filter(
+		// Append orphaned notes (whose related block was deleted or missing).
+		const orphanedComments = updatedResult.filter(
 			( thread ) => ! mappedIds.has( String( thread.id ) )
 		);
 
 		const allSortedComments = [
 			...unresolvedSortedComments,
 			...resolvedSortedComments,
-			...orphanComments,
+			...orphanedComments,
 		];
 
 		return {
