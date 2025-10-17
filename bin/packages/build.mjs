@@ -878,9 +878,9 @@ async function transpilePackage( packageName ) {
 		}
 	}
 
-	await compileStyles( packageName );
-
 	await Promise.all( builds );
+
+	await compileStyles( packageName );
 
 	return Date.now() - startTime;
 }
