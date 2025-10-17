@@ -1709,7 +1709,7 @@ const canInsertBlockTypeUnmemoized = (
 
 	// In write mode, check if this container allows insertion.
 	if (
-		blockEditingMode === 'contentOnly' &&
+		( isParentSectionBlock || blockEditingMode === 'contentOnly' ) &&
 		! isContainerInsertableToInWriteMode( state, blockName, rootClientId )
 	) {
 		return false;
