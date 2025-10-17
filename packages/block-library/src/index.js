@@ -163,7 +163,6 @@ const getAllBlocks = () => {
 		accordionPanel,
 		archives,
 		audio,
-		breadcrumbs,
 		button,
 		buttons,
 		calendar,
@@ -254,13 +253,14 @@ const getAllBlocks = () => {
 		termCount,
 		termDescription,
 		termName,
+		termsQuery,
+		termTemplate,
 		queryTitle,
 		postAuthorBiography,
 	];
 
 	if ( window?.__experimentalEnableBlockExperiments ) {
-		blocks.push( termsQuery );
-		blocks.push( termTemplate );
+		blocks.push( breadcrumbs );
 	}
 
 	if ( window?.__experimentalEnableFormBlocks ) {

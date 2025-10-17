@@ -28,7 +28,7 @@
 	"exports": {
 		".": {
 			"import": "./build-module/index.js",
-			"default": "./build/index.js"
+			"require": "./build/index.js"
 		},
 		"./package.json": "./package.json"
 	},

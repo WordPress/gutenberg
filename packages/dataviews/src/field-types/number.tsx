@@ -37,20 +37,12 @@ function isEmpty( value: unknown ): value is '' | undefined | null {
 export default {
 	sort,
 	isValid: {
+		elements: true,
 		custom: ( item: any, field: NormalizedField< any > ) => {
 			const value = field.getValue( { item } );
 
 			if ( ! isEmpty( value ) && ! Number.isFinite( value ) ) {
 				return __( 'Value must be a number.' );
-			}
-
-			if ( field?.elements ) {
-				const isMember = field.elements.some(
-					( element ) => element.value === Number( value )
-				);
-				if ( ! isMember ) {
-					return __( 'Value must be one of the elements.' );
-				}
 			}
 
 			return null;

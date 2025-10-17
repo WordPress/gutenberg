@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/colors" as *;
+
 .editor-autocompleters__user {
 	.editor-autocompleters__no-avatar::before {
 		/* stylelint-disable-next-line font-family-no-missing-generic-family-keyword -- dashicons don't need a generic family keyword. */

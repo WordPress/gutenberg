@@ -3,6 +3,7 @@
 	"apiVersion": 3,
 	"name": "core/breadcrumbs",
 	"title": "Breadcrumbs",
+	"__experimental": true,
 	"category": "theme",
 	"description": "Display a breadcrumb trail only for Pages, or for hierarchical post types. The block is useful to insert in the Pages template.",
 	"textdomain": "default",

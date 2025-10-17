@@ -24,6 +24,14 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.js",
+			"require": "./build/index.js"
+		},
+		"./package.json": "./package.json"
+	},
 	"types": "build-types",
 	"dependencies": {
 		"@wordpress/data": "file:../data",

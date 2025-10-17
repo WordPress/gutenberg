@@ -620,7 +620,7 @@ function gutenberg_default_script_modules() {
 	$all_assets = array();
 
 	/*
-	 * Load combined assets.php for v1 packages (webpack build).
+	 * Load combined assets.php for webpack-built script modules.
 	 * Expects multidimensional array like:
 	 *
 	 *     'interactivity/index.min.js' => array('dependencies' => array(…), 'version' => '…'),
@@ -633,19 +633,29 @@ function gutenberg_default_script_modules() {
 	}
 
 	/*
-	 * Load individual asset files for v2 packages (esbuild build).
+	 * Load individual asset files for esbuild-built packages.
 	 * Follows the same pattern as regular scripts in gutenberg_register_packages_scripts().
+	 * Uses RecursiveDirectoryIterator to find all *.min.js files at any nesting depth.
 	 */
-	foreach ( glob( gutenberg_dir_path() . 'build-module/*/*.min.js' ) as $path ) {
-		$asset_file = substr( $path, 0, -3 ) . '.asset.php';
-		if ( ! file_exists( $asset_file ) ) {
-			continue;
-		}
+	$build_module_dir = gutenberg_dir_path() . 'build-module';
+	if ( is_dir( $build_module_dir ) ) {
+		$iterator = new RecursiveIteratorIterator(
+			new RecursiveDirectoryIterator( $build_module_dir, RecursiveDirectoryIterator::SKIP_DOTS )
+		);
+		foreach ( $iterator as $file ) {
+			if ( $file->isFile() && preg_match( '/\.min\.js$/', $file->getFilename() ) ) {
+				$path       = $file->getPathname();
+				$asset_file = substr( $path, 0, -3 ) . '.asset.php';
+				if ( ! file_exists( $asset_file ) ) {
+					continue;
+				}
 
-		$asset                    = require $asset_file;
-		$file_name                = str_replace( gutenberg_dir_path() . 'build-module/', '', $path );
-		$asset['dependencies']    = $asset['module_dependencies'] ?? array();
-		$all_assets[ $file_name ] = $asset;
+				$asset                    = require $asset_file;
+				$file_name                = str_replace( gutenberg_dir_path() . 'build-module/', '', $path );
+				$asset['dependencies']    = $asset['module_dependencies'] ?? array();
+				$all_assets[ $file_name ] = $asset;
+			}
+		}
 	}
 
 	foreach ( $all_assets as $file_name => $script_module_data ) {

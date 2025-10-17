@@ -2,6 +2,7 @@
 @use "@wordpress/base-styles/breakpoints" as *;
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
 
 $dot-size: 8px; // Size of the indicator dot
 $dot-scale: 3;  // How much the pulse animation should scale up by in size

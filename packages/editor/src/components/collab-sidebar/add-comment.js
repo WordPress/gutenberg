@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import {
 	__experimentalHStack as HStack,
@@ -73,8 +73,8 @@ export function AddComment( {
 					setShowCommentBoard( false );
 					blockElement?.focus();
 				} }
-				submitButtonText={ _x( 'Comment', 'Add comment button' ) }
-				labelText={ __( 'New Comment' ) }
+				submitButtonText={ __( 'Add note' ) }
+				labelText={ __( 'New Note' ) }
 			/>
 		</VStack>
 	);

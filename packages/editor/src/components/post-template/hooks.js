@@ -73,7 +73,7 @@ function useTemplates( postType ) {
 					userTemplates: select( coreStore ).getEntityRecords(
 						'postType',
 						'wp_template',
-						{ per_page: -1 }
+						{ per_page: -1, combinedTemplates: false }
 					),
 				};
 			},

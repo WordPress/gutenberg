@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/variables" as *;
+
 .editor-editor-interface .entities-saved-states__panel-header {
 	height: $header-height + $border-width;
 }

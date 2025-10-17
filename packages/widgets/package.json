@@ -22,11 +22,18 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"exports": {
+		".": {
+			"import": "./build-module/index.js",
+			"require": "./build/index.js"
+		},
+		"./package.json": "./package.json"
+	},
 	"react-native": "src/index",
 	"wpScript": true,
 	"dependencies": {
-		"@babel/runtime": "7.25.7",
 		"@wordpress/api-fetch": "file:../api-fetch",
+		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/blocks": "file:../blocks",
 		"@wordpress/components": "file:../components",

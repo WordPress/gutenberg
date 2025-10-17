@@ -17,6 +17,10 @@ $badge-colors: (
 	padding: 2px $grid-unit-10;
 	min-height: $grid-unit-30;
 	border-radius: $radius-small;
+	line-height: 0;
+
+	// Prevents anchor text-decoration styles from being applied through a parent.
+	display: inline-block;
 
 	&:where(.is-default) {
 		background-color: $gray-100;

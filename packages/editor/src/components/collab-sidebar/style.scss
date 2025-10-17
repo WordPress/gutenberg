@@ -1,3 +1,7 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .interface-interface-skeleton__sidebar:has(.editor-collab-sidebar) {
 	box-shadow: none;
 
@@ -8,11 +12,13 @@
 
 .editor-collab-sidebar {
 	height: 100%;
+	overflow: hidden;
 }
 
 .editor-collab-sidebar-panel {
 	padding: $grid-unit-20;
 	height: 100%;
+	overflow: hidden;
 }
 
 .editor-collab-sidebar-panel__thread {
@@ -22,6 +28,7 @@
 	border: $border-width solid $gray-300;
 	background-color: $gray-100;
 	overflow: hidden;
+	width: auto;
 
 	&.is-selected {
 		background-color: $white;
@@ -32,10 +39,13 @@
 		outline: var(--wp-admin-border-width-focus) solid var(--wp-admin-theme-color);
 		outline-offset: calc((-1 * var(--wp-admin-border-width-focus)));
 	}
-}
 
-.editor-collab-sidebar-panel__child-thread {
-	margin-top: 15px;
+	&.is-floating {
+		left: $grid-unit-20;
+		right: $grid-unit-20;
+		position: absolute;
+		margin-top: $grid-unit-20;
+	}
 }
 
 .editor-collab-sidebar-panel__user-name {
@@ -67,29 +77,6 @@
 	border-width: var(--wp-admin-border-width-focus);
 	border-style: solid;
 	padding: var(--wp-admin-border-width-focus);
-}
-
-.editor-collab-sidebar-panel__thread-overlay {
-	background-color: rgba(0, 0, 0, 0.7);
-	width: 100%;
-	height: 100%;
-	text-align: center;
-	position: absolute;
-	top: 0;
-	left: 0;
-	z-index: 1;
-	padding: 15px;
-	border-radius: $radius-large;
-	color: $white;
-
-	p {
-		margin-bottom: 15px;
-	}
-
-	button {
-		padding: 4px 10px;
-		color: $white;
-	}
 }
 
 .editor-collab-sidebar-panel__comment-status {
@@ -126,6 +113,10 @@
 	font-weight: 500;
 }
 
+.editor-collab-sidebar-panel__resolution-text {
+	font-style: italic;
+}
+
 .editor-collab-sidebar-panel__comment-form textarea {
 	@include input-control;
 	// Vertical padding is to match the standard 40px control height when rows=1,
@@ -137,7 +128,8 @@
 }
 
 // Visually hidden until focused (skip link pattern)
-.editor-collab-sidebar-panel__skip-link {
+.editor-collab-sidebar-panel__skip-to-comment,
+.editor-collab-sidebar-panel__skip-to-block {
 	position: absolute;
 	top: -9999px;
 	right: -9999px;
@@ -147,12 +139,18 @@
 	z-index: -1;
 
 	&:focus {
-		top: $grid-unit-10;
-		right: $grid-unit-10;
 		overflow: visible;
 		clip-path: none;
 		z-index: 1;
+		right: $grid-unit-10;
 	}
+}
+.editor-collab-sidebar-panel__skip-to-comment:focus {
+	top: $grid-unit-10;
+}
+.editor-collab-sidebar-panel__skip-to-block:focus {
+	top: auto;
+	bottom: $grid-unit-10;
 }
 
 // Comment avatar indicators.

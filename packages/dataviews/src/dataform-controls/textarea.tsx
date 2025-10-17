@@ -1,19 +1,15 @@
 /**
- * External dependencies
- */
-import deepMerge from 'deepmerge';
-
-/**
  * WordPress dependencies
  */
 import { privateApis } from '@wordpress/components';
-import { useCallback, useState } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import type { DataFormControlProps } from '../types';
 import { unlock } from '../lock-unlock';
+import getCustomValidity from './utils/get-custom-validity';
 
 const { ValidatedTextareaControl } = unlock( privateApis );
 
@@ -23,16 +19,11 @@ export default function Textarea< Item >( {
 	onChange,
 	hideLabelFromVision,
 	config,
+	validity,
 }: DataFormControlProps< Item > ) {
 	const { rows = 4 } = config || {};
-	const { label, placeholder, description, setValue } = field;
+	const { label, placeholder, description, setValue, isValid } = field;
 	const value = field.getValue( { item: data } );
-	const [ customValidity, setCustomValidity ] =
-		useState<
-			React.ComponentProps<
-				typeof ValidatedTextareaControl
-			>[ 'customValidity' ]
-		>( undefined );
 
 	const onChangeControl = useCallback(
 		( newValue: string ) =>
@@ -40,37 +31,10 @@ export default function Textarea< Item >( {
 		[ data, onChange, setValue ]
 	);
 
-	const onValidateControl = useCallback(
-		( newValue: any ) => {
-			const message = field.isValid?.custom?.(
-				deepMerge(
-					data,
-					setValue( {
-						item: data,
-						value: newValue,
-					} ) as Partial< Item >
-				),
-				field
-			);
-
-			if ( message ) {
-				setCustomValidity( {
-					type: 'invalid',
-					message,
-				} );
-				return;
-			}
-
-			setCustomValidity( undefined );
-		},
-		[ data, field, setValue ]
-	);
-
 	return (
 		<ValidatedTextareaControl
-			required={ !! field.isValid?.required }
-			onValidate={ onValidateControl }
-			customValidity={ customValidity }
+			required={ !! isValid?.required }
+			customValidity={ getCustomValidity( isValid, validity ) }
 			label={ label }
 			placeholder={ placeholder }
 			value={ value ?? '' }

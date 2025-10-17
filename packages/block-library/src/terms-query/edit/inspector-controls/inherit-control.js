@@ -1,21 +1,40 @@
 /**
  * WordPress dependencies
  */
-import { ToggleControl } from '@wordpress/components';
+import {
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+} from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
-export default function InheritControl( { value, onChange, ...props } ) {
+export default function InheritControl( { value, onChange, label } ) {
 	return (
-		<ToggleControl
+		<ToggleGroupControl
+			__next40pxDefaultSize
 			__nextHasNoMarginBottom
-			checked={ value }
-			onChange={ ( inherit ) =>
+			label={ label }
+			isBlock
+			onChange={ ( newValue ) => {
 				onChange( {
-					inherit,
+					inherit: newValue === 'default',
 					// When enabling inherit, hierarchical is not supported.
-					...( inherit ? { hierarchical: false } : {} ),
-				} )
+					...( newValue === 'default' ? { showNested: false } : {} ),
+				} );
+			} }
+			help={
+				value
+					? __(
+							'Display terms based on the current taxonomy archive. For hierarchical taxonomies, shows direct children of the current term. For non-hierarchical taxonomies, shows all terms.'
+					  )
+					: __( 'Display terms based on specific criteria.' )
 			}
-			{ ...props }
-		/>
+			value={ value ? 'default' : 'custom' }
+		>
+			<ToggleGroupControlOption
+				value="default"
+				label={ __( 'Default' ) }
+			/>
+			<ToggleGroupControlOption value="custom" label={ __( 'Custom' ) } />
+		</ToggleGroupControl>
 	);
 }

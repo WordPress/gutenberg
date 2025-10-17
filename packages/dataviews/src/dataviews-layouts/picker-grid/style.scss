@@ -1,5 +1,8 @@
-
-@import "../utils/grid-items.scss";
+@use "sass:math";
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+@use "../utils/grid-items.scss" as *;
 
 .dataviews-view-picker-grid {
 	.dataviews-view-picker-grid__card {
@@ -13,8 +16,9 @@
 
 		.dataviews-view-picker-grid__title-field {
 			min-height: $grid-unit-30; // Preserve layout when there is no ellipsis button
-			display: flex;
-			align-items: center;
+			overflow: hidden;
+			align-content: center;
+			text-align: start;
 
 			&--clickable {
 				width: fit-content;

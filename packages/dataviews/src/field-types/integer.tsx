@@ -34,6 +34,7 @@ function sort( a: any, b: any, direction: SortDirection ) {
 export default {
 	sort,
 	isValid: {
+		elements: true,
 		custom: ( item: any, field: NormalizedField< any > ) => {
 			const value = field.getValue( { item } );
 			if (
@@ -41,13 +42,6 @@ export default {
 				! Number.isInteger( value )
 			) {
 				return __( 'Value must be an integer.' );
-			}
-
-			if ( field?.elements ) {
-				const validValues = field.elements.map( ( f ) => f.value );
-				if ( ! validValues.includes( Number( value ) ) ) {
-					return __( 'Value must be one of the elements.' );
-				}
 			}
 
 			return null;

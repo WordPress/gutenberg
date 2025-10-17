@@ -13,7 +13,7 @@ const PhpFilePathsPlugin = require( '@wordpress/scripts/plugins/php-file-paths-p
 /**
  * Internal dependencies
  */
-const { baseConfig, plugins, stylesTransform } = require( './shared' );
+const { baseConfig, plugins } = require( './shared' );
 
 /**
  * We need to automatically rename some functions when they are called inside block files,
@@ -57,35 +57,8 @@ module.exports = [
 			} ),
 			new CopyWebpackPlugin( {
 				patterns: [].concat(
-					[
-						'style',
-						'style-rtl',
-						'editor',
-						'editor-rtl',
-						'theme',
-						'theme-rtl',
-					].map( ( filename ) => ( {
-						from: `./packages/block-library/build-style/*/${ filename }.css`,
-						to( { absoluteFilename } ) {
-							const [ , dirname ] = absoluteFilename.match(
-								new RegExp(
-									`([\\w-]+)${ escapeRegExp(
-										sep
-									) }${ filename }\\.css$`
-								)
-							);
-
-							return join(
-								'build/block-library/blocks',
-								dirname,
-								filename + '.css'
-							);
-						},
-						transform: stylesTransform,
-					} ) ),
 					Object.entries( {
-						'./packages/block-library/src/':
-							'build/block-library/blocks/',
+						'./packages/block-library/src/': 'build/block-library/',
 						'./packages/edit-widgets/src/blocks/':
 							'build/edit-widgets/blocks/',
 						'./packages/widgets/src/blocks/':
