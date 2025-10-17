@@ -56,7 +56,6 @@ export default function ImageCropper( {
 				cropAreaClassName: 'image-cropper__crop-area',
 				mediaClassName: 'image-cropper__image',
 			} }
-			disableAutomaticStylesInjection
 			minZoom={ minZoom }
 			maxZoom={ maxZoom }
 			rotation={ rotation }

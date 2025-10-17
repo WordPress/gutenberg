@@ -2,13 +2,13 @@
  * WordPress dependencies
  */
 import { ToolbarGroup, ToolbarItem } from '@wordpress/components';
+import { ImageCropperProvider } from '@wordpress/image-cropper';
 
 /**
  * Internal dependencies
  */
 import AspectRatioDropdown from './aspect-ratio-dropdown';
 import BlockControls from '../block-controls';
-import ImageEditingProvider from './context';
 import Cropper from './cropper';
 import ZoomDropdown from './zoom-dropdown';
 import RotationButton from './rotation-button';
@@ -26,14 +26,7 @@ export default function ImageEditor( {
 	borderProps,
 } ) {
 	return (
-		<ImageEditingProvider
-			id={ id }
-			url={ url }
-			naturalWidth={ naturalWidth }
-			naturalHeight={ naturalHeight }
-			onSaveImage={ onSaveImage }
-			onFinishEditing={ onFinishEditing }
-		>
+		<ImageCropperProvider>
 			<Cropper
 				borderProps={ borderProps }
 				url={ url }
@@ -42,7 +35,7 @@ export default function ImageEditor( {
 				naturalHeight={ naturalHeight }
 				naturalWidth={ naturalWidth }
 			/>
-			<BlockControls>
+			{/* <BlockControls>
 				<ToolbarGroup>
 					<ZoomDropdown />
 					<ToolbarItem>
@@ -55,7 +48,7 @@ export default function ImageEditor( {
 				<ToolbarGroup>
 					<FormControls />
 				</ToolbarGroup>
-			</BlockControls>
-		</ImageEditingProvider>
+			</BlockControls> */}
+		</ImageCropperProvider>
 	);
 }
