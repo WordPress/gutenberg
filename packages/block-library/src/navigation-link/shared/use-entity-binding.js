@@ -38,7 +38,7 @@ export function buildNavigationLinkEntityBinding( kind ) {
 		url: {
 			source,
 			args: {
-				key: 'link',
+				field: 'link',
 			},
 		},
 	};
