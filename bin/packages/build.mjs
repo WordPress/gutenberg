@@ -708,7 +708,9 @@ async function bundlePackage( packageName ) {
 				if ( sourceFile.endsWith( '.php' ) && transforms.php ) {
 					builds.push(
 						( async () => {
-							await mkdir( destDir, { recursive: true } );
+							let finalPath = destPath;
+							let finalDir = destDir;
+
 							const content = await readFile(
 								sourceFile,
 								'utf8'
@@ -718,7 +720,6 @@ async function bundlePackage( packageName ) {
 								transforms.php
 							);
 
-							let finalPath = destPath;
 							if ( transforms.php.filenameSuffix ) {
 								const ext = path.extname( destPath );
 								const base = path.basename( destPath, ext );
@@ -728,6 +729,22 @@ async function bundlePackage( packageName ) {
 								);
 							}
 
+							// Check if we should flatten index.php files
+							if (
+								transforms.php.flattenIndexFiles &&
+								path.basename( sourceFile ) === 'index.php'
+							) {
+								// Flatten: button/index.php → button.php
+								const parentDir = path.dirname( finalPath );
+								const blockName = path.basename( parentDir );
+								finalPath = path.join(
+									path.dirname( parentDir ),
+									`${ blockName }.php`
+								);
+								finalDir = path.dirname( finalPath );
+							}
+
+							await mkdir( finalDir, { recursive: true } );
 							await writeFile( finalPath, transformed );
 						} )()
 					);

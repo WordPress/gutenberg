@@ -70,7 +70,8 @@
 				"suffixClasses": [
 					"WP_Navigation_Block_Renderer"
 				],
-				"addActionPriority": 20
+				"addActionPriority": 20,
+				"flattenIndexFiles": true
 			}
 		}
 	},
