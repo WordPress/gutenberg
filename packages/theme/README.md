@@ -9,21 +9,6 @@ A theming package that's part of the WordPress Design System. It has two parts:
 
 In the **[Design Tokens Reference](docs/ds-tokens.md)** document there is a complete reference of all available design tokens including colors, spacing, typography, and more.
 
-### Building Design Tokens
-
-To rebuild the design tokens from source:
-
-```bash
-npm run build:tokens
-```
-
-This command will:
-
-1. Generate primitive tokens
-2. Build CSS and JavaScript token files
-3. Update the design tokens documentation
-4. Format all generated files
-
 ## Theme Provider
 
 The `ThemeProvider` is a React component that should wrap your application to provide design tokens and theme context to the child UI components.
@@ -57,6 +42,21 @@ The provider can be used recursively to override or modify the theme for a speci
 ```
 
 The `ThemeProvider` redefines some of the design system tokens. Components consuming semantic design system tokens will automatically follow the chosen theme. Note that the tokens are defined and inherited using the CSS cascade, and therefore the DOM tree, not the React tree. This is very important when using React portals.
+
+### Building
+
+This package is built in two steps. When `npm run build` is run at the root of the repo, it will first run the "prebuild" step of this package, which is defined in the `build` script of this package's package.json.
+
+This step will:
+
+1. Generate primitive tokens.
+2. Build CSS and JavaScript token files.
+3. Update the design tokens documentation.
+4. Format all generated files.
+
+The files generated in this step will all be committed to the repo.
+
+After the prebuild step, the package will be built into its final form via the repo's standard package build script.
 
 ## Contributing to this package
 
