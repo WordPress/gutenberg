@@ -38,10 +38,6 @@ export default function Radio< Item >( {
 		return <Spinner />;
 	}
 
-	if ( elements.length === 0 ) {
-		return null;
-	}
-
 	return (
 		<ValidatedRadioControl
 			required={ !! field.isValid?.required }
