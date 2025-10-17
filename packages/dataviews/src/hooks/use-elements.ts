@@ -30,22 +30,33 @@ export default function useElements( {
 			return;
 		}
 
+		let cancelled = false;
 		setIsLoading( true );
 		getElements()
 			.then( ( fetchedElements ) => {
-				const dynamicElements =
-					Array.isArray( fetchedElements ) &&
-					fetchedElements.length > 0
-						? fetchedElements
-						: staticElements;
-				setRecords( dynamicElements );
+				if ( ! cancelled ) {
+					const dynamicElements =
+						Array.isArray( fetchedElements ) &&
+						fetchedElements.length > 0
+							? fetchedElements
+							: staticElements;
+					setRecords( dynamicElements );
+				}
 			} )
 			.catch( () => {
-				setRecords( staticElements );
+				if ( ! cancelled ) {
+					setRecords( staticElements );
+				}
 			} )
 			.finally( () => {
-				setIsLoading( false );
+				if ( ! cancelled ) {
+					setIsLoading( false );
+				}
 			} );
+
+		return () => {
+			cancelled = true;
+		};
 	}, [ getElements, staticElements ] );
 
 	return {
