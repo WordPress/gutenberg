@@ -5,6 +5,7 @@ import {
 	getBlockType,
 	serialize,
 	store as blocksStore,
+	hasBlockSupport,
 } from '@wordpress/blocks';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -89,6 +90,7 @@ export function BlockSettingsDropdown( {
 		openedBlockSettingsMenu,
 		isContentOnly,
 		isZoomOut,
+		canNote,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -108,6 +110,8 @@ export function BlockSettingsDropdown( {
 				getBlockRootClientId( firstBlockClientId );
 			const parentBlockName =
 				_firstParentClientId && getBlockName( _firstParentClientId );
+			const firstBlockName =
+				firstBlockClientId && getBlockName( firstBlockClientId );
 
 			return {
 				firstParentClientId: _firstParentClientId,
@@ -125,6 +129,7 @@ export function BlockSettingsDropdown( {
 				isContentOnly:
 					getBlockEditingMode( firstBlockClientId ) === 'contentOnly',
 				isZoomOut: _isZoomOut(),
+				canNote: hasBlockSupport( firstBlockName, 'note', true ),
 			};
 		},
 		[ firstBlockClientId ]
@@ -216,6 +221,8 @@ export function BlockSettingsDropdown( {
 
 	const shouldShowBlockParentMenuItem =
 		! parentBlockIsSelected && !! firstParentClientId;
+
+	const shouldShowNoteMenuItem = canNote && count === 1;
 
 	return (
 		<BlockActions
@@ -334,7 +341,7 @@ export function BlockSettingsDropdown( {
 											</MenuItem>
 										</>
 									) }
-									{ count === 1 && (
+									{ shouldShowNoteMenuItem && (
 										<CommentIconSlotFill.Slot
 											fillProps={ { onClose } }
 										/>

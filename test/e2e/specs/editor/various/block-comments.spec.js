@@ -602,6 +602,42 @@ test.describe( 'Block Comments', () => {
 				} )
 			).toBeFocused();
 		} );
+
+		test( 'does not allow comments of blocks that do not support the feature', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			await pageUtils.pressKeys( 'access+o' );
+
+			const listView = page.getByRole( 'treegrid', {
+				name: 'Block navigation structure',
+			} );
+
+			await editor.insertBlock( {
+				name: 'my-plugin/block-that-does-not-support-comments',
+			} );
+
+			// Select via keyboard.
+			await pageUtils.pressKeys( 'primary+a' );
+
+			const blockActionsTrigger = listView.getByRole( 'button', {
+				name: 'Options',
+			} );
+
+			await blockActionsTrigger.click();
+
+			const addNoteMenuItem = page
+				.getByRole( 'menu', {
+					name: 'Options',
+				} )
+				.getByRole( 'menuitem', {
+					name: 'Add note',
+				} );
+
+			// Expect the Add note menu item not to exist at all.
+			await expect( addNoteMenuItem ).toBeHidden();
+		} );
 	} );
 } );
 
