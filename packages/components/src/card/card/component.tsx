@@ -32,6 +32,10 @@ function UnconnectedCard(
 		isBorderless,
 		isRounded,
 		size,
+		paddingTop,
+		paddingRight,
+		paddingBottom,
+		paddingLeft,
 		...otherProps
 	} = useCard( props );
 	const elevationBorderRadius = isRounded ? CONFIG.radiusLarge : 0;
@@ -47,13 +51,24 @@ function UnconnectedCard(
 		const contextProps = {
 			size,
 			isBorderless,
+			paddingTop,
+			paddingRight,
+			paddingBottom,
+			paddingLeft,
 		};
 		return {
 			CardBody: contextProps,
 			CardHeader: contextProps,
 			CardFooter: contextProps,
 		};
-	}, [ isBorderless, size ] );
+	}, [
+		isBorderless,
+		size,
+		paddingTop,
+		paddingRight,
+		paddingBottom,
+		paddingLeft,
+	] );
 
 	return (
 		<ContextSystemProvider value={ contextProviderValue }>

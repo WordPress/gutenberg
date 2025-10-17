@@ -85,6 +85,215 @@ Snapshot Diff:
     </div>
 `;
 
+exports[`Card Card component Custom padding props should accept CSS values for custom padding 1`] = `
+Snapshot Diff:
+- First value
++ Second value
+
+@@ -1,8 +1,8 @@
+  <div>
+    <div
+-     class="components-card__body components-card-body css-11uvgr1-PolymorphicDiv-Body-borderRadius-customPaddingStyle e19lxcc00"
++     class="components-card__body components-card-body css-qts0p1-PolymorphicDiv-Body-borderRadius-customPaddingStyle e19lxcc00"
+      data-wp-c16t="true"
+      data-wp-component="CardBody"
+    >
+      Body
+    </div>
+`;
+
+exports[`Card Card component Custom padding props should apply custom padding to CardFooter 1`] = `
+Snapshot Diff:
+- First value
++ Second value
+
+@@ -1,8 +1,8 @@
+  <div>
+    <div
+-     class="components-flex components-card__footer components-card-footer css-19sc0cg-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-medium e19lxcc00"
++     class="components-flex components-card__footer components-card-footer css-16d1nua-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-customPaddingStyle e19lxcc00"
+      data-wp-c16t="true"
+      data-wp-component="CardFooter"
+    >
+      Footer
+    </div>
+`;
+
+exports[`Card Card component Custom padding props should apply custom padding to CardHeader 1`] = `
+Snapshot Diff:
+- First value
++ Second value
+
+@@ -1,8 +1,8 @@
+  <div>
+    <div
+-     class="components-flex components-card__header components-card-header css-1qwshfy-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-medium e19lxcc00"
++     class="components-flex components-card__header components-card-header css-es92xf-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-customPaddingStyle e19lxcc00"
+      data-wp-c16t="true"
+      data-wp-component="CardHeader"
+    >
+      Header
+    </div>
+`;
+
+exports[`Card Card component Custom padding props should apply custom paddingBottom to CardBody 1`] = `
+Snapshot Diff:
+- First value
++ Second value
+
+@@ -1,8 +1,8 @@
+  <div>
+    <div
+-     class="components-card__body components-card-body css-12jqy32-PolymorphicDiv-Body-borderRadius-medium e19lxcc00"
++     class="components-card__body components-card-body css-udgmzr-PolymorphicDiv-Body-borderRadius-customPaddingStyle e19lxcc00"
+      data-wp-c16t="true"
+      data-wp-component="CardBody"
+    >
+      Body
+    </div>
+`;
+
+exports[`Card Card component Custom padding props should apply custom paddingLeft to CardBody 1`] = `
+Snapshot Diff:
+- First value
++ Second value
+
+@@ -1,8 +1,8 @@
+  <div>
+    <div
+-     class="components-card__body components-card-body css-12jqy32-PolymorphicDiv-Body-borderRadius-medium e19lxcc00"
++     class="components-card__body components-card-body css-1e7bf4z-PolymorphicDiv-Body-borderRadius-customPaddingStyle e19lxcc00"
+      data-wp-c16t="true"
+      data-wp-component="CardBody"
+    >
+      Body
+    </div>
+`;
+
+exports[`Card Card component Custom padding props should apply custom paddingRight to CardBody 1`] = `
+Snapshot Diff:
+- First value
++ Second value
+
+@@ -1,8 +1,8 @@
+  <div>
+    <div
+-     class="components-card__body components-card-body css-12jqy32-PolymorphicDiv-Body-borderRadius-medium e19lxcc00"
++     class="components-card__body components-card-body css-auqczn-PolymorphicDiv-Body-borderRadius-customPaddingStyle e19lxcc00"
+      data-wp-c16t="true"
+      data-wp-component="CardBody"
+    >
+      Body
+    </div>
+`;
+
+exports[`Card Card component Custom padding props should apply custom paddingTop to CardBody 1`] = `
+Snapshot Diff:
+- First value
++ Second value
+
+@@ -1,8 +1,8 @@
+  <div>
+    <div
+-     class="components-card__body components-card-body css-12jqy32-PolymorphicDiv-Body-borderRadius-medium e19lxcc00"
++     class="components-card__body components-card-body css-gazzqp-PolymorphicDiv-Body-borderRadius-customPaddingStyle e19lxcc00"
+      data-wp-c16t="true"
+      data-wp-component="CardBody"
+    >
+      Body
+    </div>
+`;
+
+exports[`Card Card component Custom padding props should apply multiple custom padding values to CardBody 1`] = `
+Snapshot Diff:
+- First value
++ Second value
+
+@@ -1,8 +1,8 @@
+  <div>
+    <div
+-     class="components-card__body components-card-body css-12jqy32-PolymorphicDiv-Body-borderRadius-medium e19lxcc00"
++     class="components-card__body components-card-body css-1liiuul-PolymorphicDiv-Body-borderRadius-customPaddingStyle e19lxcc00"
+      data-wp-c16t="true"
+      data-wp-component="CardBody"
+    >
+      Body
+    </div>
+`;
+
+exports[`Card Card component Custom padding props should override Card context padding when specified directly on sub-component 1`] = `
+Snapshot Diff:
+- First value
++ Second value
+
+@@ -6,11 +6,11 @@
+    >
+      <div
+        class="css-76dw7d-PolymorphicDiv-Content e19lxcc00"
+      >
+        <div
+-         class="components-card__body components-card-body css-1xybdbz-PolymorphicDiv-Body-borderRadius-customPaddingStyle e19lxcc00"
++         class="components-card__body components-card-body css-gazzqp-PolymorphicDiv-Body-borderRadius-customPaddingStyle e19lxcc00"
+          data-wp-c16t="true"
+          data-wp-component="CardBody"
+        >
+          Body
+        </div>
+`;
+
+exports[`Card Card component Custom padding props should pass custom padding from Card context to its sub-components 1`] = `
+Snapshot Diff:
+- First value
++ Second value
+
+@@ -6,25 +6,25 @@
+    >
+      <div
+        class="css-76dw7d-PolymorphicDiv-Content e19lxcc00"
+      >
+        <div
+-         class="components-flex components-card__header components-card-header css-1qwshfy-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-medium e19lxcc00"
++         class="components-flex components-card__header components-card-header css-1f98b6k-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-customPaddingStyle e19lxcc00"
+          data-wp-c16t="true"
+          data-wp-component="CardHeader"
+        >
+          Header
+        </div>
+        <div
+-         class="components-card__body components-card-body css-12jqy32-PolymorphicDiv-Body-borderRadius-medium e19lxcc00"
++         class="components-card__body components-card-body css-hbuv40-PolymorphicDiv-Body-borderRadius-customPaddingStyle e19lxcc00"
+          data-wp-c16t="true"
+          data-wp-component="CardBody"
+        >
+          Body
+        </div>
+        <div
+-         class="components-flex components-card__footer components-card-footer css-19sc0cg-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-medium e19lxcc00"
++         class="components-flex components-card__footer components-card-footer css-17ja3jg-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-customPaddingStyle e19lxcc00"
+          data-wp-c16t="true"
+          data-wp-component="CardFooter"
+        >
+          Footer
+        </div>
+`;
+
+exports[`Card Card component Custom padding props should work with size prop and custom padding together 1`] = `
+Snapshot Diff:
+- First value
++ Second value
+
+@@ -1,8 +1,8 @@
+  <div>
+    <div
+-     class="components-card__body components-card-body css-e0vrqx-PolymorphicDiv-Body-borderRadius-large e19lxcc00"
++     class="components-card__body components-card-body css-al2ni7-PolymorphicDiv-Body-borderRadius-customPaddingStyle e19lxcc00"
+      data-wp-c16t="true"
+      data-wp-component="CardBody"
+    >
+      Body
+    </div>
+`;
+
 exports[`Card Card component should add different amounts of white space when using the size prop 1`] = `
 Snapshot Diff:
 - First value

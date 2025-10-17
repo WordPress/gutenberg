@@ -7,6 +7,7 @@ import type { CSSProperties } from 'react';
  * Internal dependencies
  */
 import type { SurfaceProps } from '../surface/types';
+import type { SpaceInput } from '../utils/space';
 
 type DeprecatedSizeOptions = 'extraSmall';
 export type SizeOptions = 'xSmall' | 'small' | 'medium' | 'large';
@@ -18,6 +19,26 @@ type SizeableProps = {
 	 * @default 'medium'
 	 */
 	size?: SizeOptions | DeprecatedSizeOptions;
+	/**
+	 * Padding for the top side. Overrides the value derived from `size`.
+	 * Accepts values from the spacing scale (e.g., 2, 4, 6) or CSS values (e.g., '10px', '1rem').
+	 */
+	paddingTop?: SpaceInput;
+	/**
+	 * Padding for the right side. Overrides the value derived from `size`.
+	 * Accepts values from the spacing scale (e.g., 2, 4, 6) or CSS values (e.g., '10px', '1rem').
+	 */
+	paddingRight?: SpaceInput;
+	/**
+	 * Padding for the bottom side. Overrides the value derived from `size`.
+	 * Accepts values from the spacing scale (e.g., 2, 4, 6) or CSS values (e.g., '10px', '1rem').
+	 */
+	paddingBottom?: SpaceInput;
+	/**
+	 * Padding for the left side. Overrides the value derived from `size`.
+	 * Accepts values from the spacing scale (e.g., 2, 4, 6) or CSS values (e.g., '10px', '1rem').
+	 */
+	paddingLeft?: SpaceInput;
 };
 
 export type Props = SurfaceProps &

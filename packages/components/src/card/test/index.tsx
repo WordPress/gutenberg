@@ -218,5 +218,157 @@ describe( 'Card', () => {
 				expect( container ).toMatchDiffSnapshot( containerScrollable );
 			} );
 		} );
+
+		describe( 'Custom padding props', () => {
+			it( 'should apply custom paddingTop to CardBody', () => {
+				const { container: withDefaultPadding } = render(
+					<CardBody>Body</CardBody>
+				);
+				const { container: withCustomPaddingTop } = render(
+					<CardBody paddingTop={ 8 }>Body</CardBody>
+				);
+				expect( withDefaultPadding ).toMatchDiffSnapshot(
+					withCustomPaddingTop
+				);
+			} );
+
+			it( 'should apply custom paddingRight to CardBody', () => {
+				const { container: withDefaultPadding } = render(
+					<CardBody>Body</CardBody>
+				);
+				const { container: withCustomPaddingRight } = render(
+					<CardBody paddingRight={ 8 }>Body</CardBody>
+				);
+				expect( withDefaultPadding ).toMatchDiffSnapshot(
+					withCustomPaddingRight
+				);
+			} );
+
+			it( 'should apply custom paddingBottom to CardBody', () => {
+				const { container: withDefaultPadding } = render(
+					<CardBody>Body</CardBody>
+				);
+				const { container: withCustomPaddingBottom } = render(
+					<CardBody paddingBottom={ 8 }>Body</CardBody>
+				);
+				expect( withDefaultPadding ).toMatchDiffSnapshot(
+					withCustomPaddingBottom
+				);
+			} );
+
+			it( 'should apply custom paddingLeft to CardBody', () => {
+				const { container: withDefaultPadding } = render(
+					<CardBody>Body</CardBody>
+				);
+				const { container: withCustomPaddingLeft } = render(
+					<CardBody paddingLeft={ 8 }>Body</CardBody>
+				);
+				expect( withDefaultPadding ).toMatchDiffSnapshot(
+					withCustomPaddingLeft
+				);
+			} );
+
+			it( 'should apply multiple custom padding values to CardBody', () => {
+				const { container: withDefaultPadding } = render(
+					<CardBody>Body</CardBody>
+				);
+				const { container: withMultipleCustomPaddings } = render(
+					<CardBody paddingTop={ 2 } paddingBottom={ 8 }>
+						Body
+					</CardBody>
+				);
+				expect( withDefaultPadding ).toMatchDiffSnapshot(
+					withMultipleCustomPaddings
+				);
+			} );
+
+			it( 'should apply custom padding to CardHeader', () => {
+				const { container: withDefaultPadding } = render(
+					<CardHeader>Header</CardHeader>
+				);
+				const { container: withCustomPadding } = render(
+					<CardHeader paddingTop={ 8 } paddingLeft={ 10 }>
+						Header
+					</CardHeader>
+				);
+				expect( withDefaultPadding ).toMatchDiffSnapshot(
+					withCustomPadding
+				);
+			} );
+
+			it( 'should apply custom padding to CardFooter', () => {
+				const { container: withDefaultPadding } = render(
+					<CardFooter>Footer</CardFooter>
+				);
+				const { container: withCustomPadding } = render(
+					<CardFooter paddingRight={ 12 } paddingBottom={ 4 }>
+						Footer
+					</CardFooter>
+				);
+				expect( withDefaultPadding ).toMatchDiffSnapshot(
+					withCustomPadding
+				);
+			} );
+
+			it( 'should pass custom padding from Card context to its sub-components', () => {
+				const { container: withoutCustomPadding } = render(
+					<Card>
+						<CardHeader>Header</CardHeader>
+						<CardBody>Body</CardBody>
+						<CardFooter>Footer</CardFooter>
+					</Card>
+				);
+				const { container: withCustomPadding } = render(
+					<Card paddingTop={ 2 } paddingLeft={ 10 }>
+						<CardHeader>Header</CardHeader>
+						<CardBody>Body</CardBody>
+						<CardFooter>Footer</CardFooter>
+					</Card>
+				);
+				expect( withoutCustomPadding ).toMatchDiffSnapshot(
+					withCustomPadding
+				);
+			} );
+
+			it( 'should override Card context padding when specified directly on sub-component', () => {
+				const { container: withContextPadding } = render(
+					<Card paddingTop={ 2 }>
+						<CardBody>Body</CardBody>
+					</Card>
+				);
+				const { container: withOverriddenPadding } = render(
+					<Card paddingTop={ 2 }>
+						<CardBody paddingTop={ 8 }>Body</CardBody>
+					</Card>
+				);
+				expect( withContextPadding ).toMatchDiffSnapshot(
+					withOverriddenPadding
+				);
+			} );
+
+			it( 'should work with size prop and custom padding together', () => {
+				const { container: withSizeOnly } = render(
+					<CardBody size="large">Body</CardBody>
+				);
+				const { container: withSizeAndCustomPadding } = render(
+					<CardBody size="large" paddingTop={ 2 }>
+						Body
+					</CardBody>
+				);
+				expect( withSizeOnly ).toMatchDiffSnapshot(
+					withSizeAndCustomPadding
+				);
+			} );
+
+			it( 'should accept CSS values for custom padding', () => {
+				const { container: withNumberValue } = render(
+					<CardBody paddingTop={ 4 }>Body</CardBody>
+				);
+				const { container: withCSSValue } = render(
+					<CardBody paddingTop="20px">Body</CardBody>
+				);
+				expect( withNumberValue ).toMatchDiffSnapshot( withCSSValue );
+			} );
+		} );
 	} );
 } );
