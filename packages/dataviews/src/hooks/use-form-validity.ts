@@ -79,10 +79,9 @@ function updateFieldValidity(
 	setFormValidity: React.Dispatch< React.SetStateAction< FormValidity > >,
 	parentFieldId: string | undefined,
 	fieldId: string,
-	validationUpdate: FieldValidity
+	newValidity: FieldValidity
 ) {
 	if ( parentFieldId ) {
-		// This field is a child of a combined field
 		setFormValidity( ( prev ) => ( {
 			...prev,
 			[ parentFieldId ]: {
@@ -90,10 +89,7 @@ function updateFieldValidity(
 				children: {
 					...prev?.[ parentFieldId ]?.children,
 					[ fieldId ]: {
-						...( prev?.[ parentFieldId ]?.children as any )?.[
-							fieldId
-						],
-						...validationUpdate,
+						...newValidity,
 					},
 				},
 			},
@@ -102,8 +98,7 @@ function updateFieldValidity(
 		setFormValidity( ( prev ) => ( {
 			...prev,
 			[ fieldId ]: {
-				...prev?.[ fieldId ],
-				...validationUpdate,
+				...newValidity,
 			},
 		} ) );
 	}
@@ -160,12 +155,15 @@ export function useFormValidity< Item >(
 	form: Form
 ): { validity: FormValidity; isValid: boolean } {
 	const [ formValidity, setFormValidity ] = useState< FormValidity >();
-	// customValidationCounterRef is used to track the validation promises triggered
-	// by executing isValid.custom. When the promise resolves,
+	const previousValidatedValuesRef = useRef< Record< string, any > >( {} );
+
+	// The following counters are used to track the validation promises triggered
+	// by executing isValid.custom and the elements validation. When the promise resolves,
 	// it will update the form validity state ONLY if its counter matches the current one.
 	const customValidationCounterRef = useRef< Record< string, number > >( {} );
-
-	const previousValidatedValuesRef = useRef< Record< string, any > >( {} );
+	const elementsValidationCounterRef = useRef< Record< string, number > >(
+		{}
+	);
 
 	const validate = useCallback( () => {
 		const { fields: fieldsToValidate, fieldToParent } = getFieldsToValidate(
@@ -266,7 +264,10 @@ export function useFormValidity< Item >(
 				field.hasElements &&
 				typeof field.getElements === 'function'
 			) {
-				const elements = field.getElements();
+				const currentToken =
+					( elementsValidationCounterRef.current[ field.id ] || 0 ) +
+					1;
+				elementsValidationCounterRef.current[ field.id ] = currentToken;
 				updateFieldValidity( setFormValidity, parentFieldId, field.id, {
 					elements: {
 						type: 'validating',
@@ -274,8 +275,16 @@ export function useFormValidity< Item >(
 					},
 				} );
 
-				elements
+				field
+					.getElements()
 					.then( ( result ) => {
+						if (
+							elementsValidationCounterRef.current[ field.id ] !==
+							currentToken
+						) {
+							return;
+						}
+
 						if ( ! Array.isArray( result ) ) {
 							updateFieldValidity(
 								setFormValidity,
@@ -292,7 +301,6 @@ export function useFormValidity< Item >(
 						}
 
 						const validValues = result.map( ( el ) => el.value );
-
 						if (
 							field.type !== 'array' &&
 							! validValues.includes( value )
@@ -329,6 +337,7 @@ export function useFormValidity< Item >(
 							);
 							return;
 						}
+
 						if (
 							field.type === 'array' &&
 							value.some(
@@ -350,6 +359,13 @@ export function useFormValidity< Item >(
 						}
 					} )
 					.catch( ( error ) => {
+						if (
+							elementsValidationCounterRef.current[ field.id ] !==
+							currentToken
+						) {
+							return;
+						}
+
 						updateFieldValidity(
 							setFormValidity,
 							parentFieldId,
@@ -362,7 +378,6 @@ export function useFormValidity< Item >(
 							}
 						);
 					} );
-				return;
 			}
 
 			// Check isValid.custom
@@ -423,7 +438,6 @@ export function useFormValidity< Item >(
 
 				customError
 					.then( ( result ) => {
-						// Only update if this is still the latest validation
 						if (
 							customValidationCounterRef.current[ field.id ] !==
 							currentToken
@@ -443,7 +457,10 @@ export function useFormValidity< Item >(
 									},
 								}
 							);
-						} else if ( typeof result === 'string' ) {
+							return;
+						}
+
+						if ( typeof result === 'string' ) {
 							updateFieldValidity(
 								setFormValidity,
 								parentFieldId,
@@ -458,7 +475,6 @@ export function useFormValidity< Item >(
 						}
 					} )
 					.catch( ( error ) => {
-						// Only update if this is still the latest validation
 						if (
 							customValidationCounterRef.current[ field.id ] !==
 							currentToken

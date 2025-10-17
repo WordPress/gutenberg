@@ -776,111 +776,102 @@ const ValidationComponent = ( {
 	};
 
 	// Cache for getElements functions - ensures promises are only created once
-	const getElementsCache = useMemo( () => {
-		const cache: Record< string, any > = {};
+	const getElements = useMemo( () => {
+		const promiseCache: Record< string, Promise< any > > = {};
 
-		if ( elements === 'async' ) {
-			// Create cached promise for 'select' field
-			let selectPromise: Promise< any > | null = null;
-			cache.select = () => {
-				if ( ! selectPromise ) {
-					selectPromise = new Promise( ( resolve ) =>
-						setTimeout(
-							() =>
-								resolve( [
-									{
-										value: 'option1',
-										label: 'Option 1',
-									},
-									{
-										value: 'option2',
-										label: 'Option 2',
-									},
-								] ),
-							3500
-						)
-					);
+		return ( fieldId: string ) => {
+			return () => {
+				if ( fieldId in promiseCache ) {
+					return promiseCache[ fieldId ];
 				}
-				return selectPromise;
-			};
 
-			// Create cached promise for 'textWithRadio' field
-			let textWithRadioPromise: Promise< any > | null = null;
-			cache.textWithRadio = () => {
-				if ( ! textWithRadioPromise ) {
-					textWithRadioPromise = new Promise( ( resolve ) =>
-						setTimeout(
-							() =>
-								resolve( [
-									{ value: 'item1', label: 'Item 1' },
-									{ value: 'item2', label: 'Item 2' },
-								] ),
-							3500
-						)
-					);
+				switch ( fieldId ) {
+					case 'select':
+						promiseCache[ fieldId ] = new Promise( ( resolve ) =>
+							setTimeout(
+								() =>
+									resolve( [
+										{
+											value: 'option1',
+											label: 'Option 1',
+										},
+										{
+											value: 'option2',
+											label: 'Option 2',
+										},
+									] ),
+								3500
+							)
+						);
+						break;
+
+					case 'textWithRadio':
+						promiseCache[ fieldId ] = new Promise( ( resolve ) =>
+							setTimeout(
+								() =>
+									resolve( [
+										{ value: 'item1', label: 'Item 1' },
+										{ value: 'item2', label: 'Item 2' },
+									] ),
+								3500
+							)
+						);
+						break;
+
+					case 'countries':
+						promiseCache[ fieldId ] = new Promise( ( resolve ) =>
+							setTimeout(
+								() =>
+									resolve( [
+										{
+											value: 'us',
+											label: 'United States',
+										},
+										{ value: 'ca', label: 'Canada' },
+										{
+											value: 'uk',
+											label: 'United Kingdom',
+										},
+										{ value: 'fr', label: 'France' },
+										{ value: 'de', label: 'Germany' },
+										{ value: 'jp', label: 'Japan' },
+										{ value: 'au', label: 'Australia' },
+									] ),
+								3500
+							)
+						);
+						break;
+
+					case 'toggleGroup':
+						promiseCache[ fieldId ] = new Promise( ( resolve ) =>
+							setTimeout(
+								() =>
+									resolve( [
+										{
+											value: 'option1',
+											label: 'Option 1',
+										},
+										{
+											value: 'option2',
+											label: 'Option 2',
+										},
+										{
+											value: 'option3',
+											label: 'Option 3',
+										},
+									] ),
+								3500
+							)
+						);
+						break;
+
+					default:
+						throw new Error( `Unknown field ID: ${ fieldId }` );
 				}
-				return textWithRadioPromise;
-			};
 
-			// Create cached promise for 'countries' field
-			let countriesPromise: Promise< any > | null = null;
-			cache.countries = () => {
-				if ( ! countriesPromise ) {
-					countriesPromise = new Promise( ( resolve ) =>
-						setTimeout(
-							() =>
-								resolve( [
-									{
-										value: 'us',
-										label: 'United States',
-									},
-									{ value: 'ca', label: 'Canada' },
-									{
-										value: 'uk',
-										label: 'United Kingdom',
-									},
-									{ value: 'fr', label: 'France' },
-									{ value: 'de', label: 'Germany' },
-									{ value: 'jp', label: 'Japan' },
-									{ value: 'au', label: 'Australia' },
-								] ),
-							3500
-						)
-					);
-				}
-				return countriesPromise;
+				return promiseCache[ fieldId ];
 			};
-
-			// Create cached promise for 'toggleGroup' field
-			let toggleGroupPromise: Promise< any > | null = null;
-			cache.toggleGroup = () => {
-				if ( ! toggleGroupPromise ) {
-					toggleGroupPromise = new Promise( ( resolve ) =>
-						setTimeout(
-							() =>
-								resolve( [
-									{
-										value: 'option1',
-										label: 'Option 1',
-									},
-									{
-										value: 'option2',
-										label: 'Option 2',
-									},
-									{
-										value: 'option3',
-										label: 'Option 3',
-									},
-								] ),
-							3500
-						)
-					);
-				}
-				return toggleGroupPromise;
-			};
-		}
-
-		return cache;
+		};
 	}, [ elements ] );
 
 	const _fields: Field< ValidatedItem >[] = [
@@ -899,13 +890,14 @@ const ValidationComponent = ( {
 			type: 'text',
 			label: 'Select',
 			elements:
-				elements === 'sync'
-					? [
+				elements === 'async'
+					? undefined
+					: [
 							{ value: 'option1', label: 'Option 1' },
 							{ value: 'option2', label: 'Option 2' },
-					  ]
-					: undefined,
-			getElements: getElementsCache.select,
+					  ],
+			getElements:
+				elements === 'async' ? getElements( 'select' ) : undefined,
 			isValid: {
 				required,
 				elements: elements !== 'none' ? true : false,
@@ -918,13 +910,16 @@ const ValidationComponent = ( {
 			Edit: 'radio',
 			label: 'Text with radio',
 			elements:
-				elements === 'sync'
-					? [
+				elements === 'async'
+					? undefined
+					: [
 							{ value: 'item1', label: 'Item 1' },
 							{ value: 'item2', label: 'Item 2' },
-					  ]
+					  ],
+			getElements:
+				elements === 'async'
+					? getElements( 'textWithRadio' )
 					: undefined,
-			getElements: getElementsCache.textWithRadio,
 			isValid: {
 				required,
 				elements: elements !== 'none' ? true : false,
@@ -1023,8 +1018,9 @@ const ValidationComponent = ( {
 				elements: elements !== 'none' ? true : false,
 			},
 			elements:
-				elements === 'sync'
-					? [
+				elements === 'async'
+					? undefined
+					: [
 							{ value: 'us', label: 'United States' },
 							{ value: 'ca', label: 'Canada' },
 							{ value: 'uk', label: 'United Kingdom' },
@@ -1032,9 +1028,9 @@ const ValidationComponent = ( {
 							{ value: 'de', label: 'Germany' },
 							{ value: 'jp', label: 'Japan' },
 							{ value: 'au', label: 'Australia' },
-					  ]
-					: undefined,
-			getElements: getElementsCache.countries,
+					  ],
+			getElements:
+				elements === 'async' ? getElements( 'countries' ) : undefined,
 		},
 		{
 			id: 'customEdit',
@@ -1072,14 +1068,15 @@ const ValidationComponent = ( {
 			label: 'Toggle Group',
 			Edit: 'toggleGroup',
 			elements:
-				elements === 'sync'
-					? [
+				elements === 'async'
+					? undefined
+					: [
 							{ value: 'option1', label: 'Option 1' },
 							{ value: 'option2', label: 'Option 2' },
 							{ value: 'option3', label: 'Option 3' },
-					  ]
-					: undefined,
-			getElements: getElementsCache.toggleGroup,
+					  ],
+			getElements:
+				elements === 'async' ? getElements( 'toggleGroup' ) : undefined,
 			isValid: {
 				required,
 				elements: elements !== 'none' ? true : false,
