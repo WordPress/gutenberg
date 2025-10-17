@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/project-management-automation",
-	"version": "2.28.0",
+	"version": "2.32.0",
 	"description": "GitHub Action that implements various automation to assist with managing the Gutenberg GitHub repository.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -24,11 +24,14 @@
 		"npm": ">=8.19.2"
 	},
 	"main": "lib/index.js",
+	"exports": {
+		".": "./lib/index.js",
+		"./package.json": "./package.json"
+	},
 	"types": "build-types",
 	"dependencies": {
 		"@actions/core": "1.9.1",
 		"@actions/github": "^5.0.0",
-		"@babel/runtime": "7.25.7",
 		"@octokit/request-error": "^2.1.0",
 		"@octokit/webhooks": "^9.26.3"
 	},

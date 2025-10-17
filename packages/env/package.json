@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/env",
-	"version": "10.28.0",
+	"version": "10.32.0",
 	"description": "A zero-config, self contained local WordPress environment for development and testing.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -32,6 +32,11 @@
 		"lib"
 	],
 	"main": "lib/env.js",
+	"exports": {
+		".": "./lib/env.js",
+		"./lib/cli.js": "./lib/cli.js",
+		"./package.json": "./package.json"
+	},
 	"bin": {
 		"wp-env": "bin/wp-env"
 	},

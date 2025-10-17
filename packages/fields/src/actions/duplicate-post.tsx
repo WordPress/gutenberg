@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { useDispatch } from '@wordpress/data';
-import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf, _x } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
@@ -56,10 +55,14 @@ const duplicatePost: Action< BasePost > = {
 				return;
 			}
 
+			const isTemplate =
+				item.type === 'wp_template' ||
+				item.type === 'wp_registered_template';
+
 			const newItemObject = {
-				status: 'draft',
+				status: isTemplate ? 'publish' : 'draft',
 				title: item.title,
-				slug: item.title || __( 'No title' ),
+				slug: isTemplate ? item.slug : item.title || __( 'No title' ),
 				comment_status: item.comment_status,
 				content:
 					typeof item.content === 'string'
@@ -98,7 +101,9 @@ const duplicatePost: Action< BasePost > = {
 			try {
 				const newItem = await saveEntityRecord(
 					'postType',
-					item.type,
+					item.type === 'wp_registered_template'
+						? 'wp_template'
+						: item.type,
 					newItemObject,
 					{ throwOnError: true }
 				);
@@ -107,7 +112,7 @@ const duplicatePost: Action< BasePost > = {
 					sprintf(
 						// translators: %s: Title of the created post, e.g: "Hello world".
 						__( '"%s" successfully created.' ),
-						decodeEntities( newItem.title?.rendered || item.title )
+						getItemTitle( newItem )
 					),
 					{
 						id: 'duplicate-post-action',

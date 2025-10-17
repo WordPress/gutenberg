@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/colors" as *;
+
 .wp-block[data-align="center"] > .wp-block-button {
 	text-align: center;
 	margin-left: auto;

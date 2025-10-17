@@ -318,7 +318,6 @@ const actions = [
 	{
 		id: 'delete',
 		label: 'Delete',
-		isDestructive: true,
 		supportsBulk: true,
 		RenderModal: ( { items, closeModal, onActionPerformed } ) => (
 			<div>
@@ -358,9 +357,9 @@ Whether the data is loading. `false` by default.
 
 #### `defaultLayouts`: `Record< string, view >`
 
-This property provides layout information about active view types. If empty, this enables all layout types (see "Layout Types") with empty layout data.
+This property limits the available layout and provides layout information about active view types. If empty, this enables all layout types (see "Layout Types") with empty layout data.
 
-For example, this is how you'd enable only the table view type:
+For example, this is how you'd enable only the table and grid layout type and set whether those layouts show media by default:
 
 ```js
 const defaultLayouts = {
@@ -373,7 +372,7 @@ const defaultLayouts = {
 };
 ```
 
-The `defaultLayouts` property should be an object that includes properties named `table`, `grid`, or `list`. These properties are applied to the view object each time the user switches to the corresponding layout.
+The `defaultLayouts` property should be an object that includes properties named `table`, `grid`, and/or `list`. These properties are applied to the view object each time the user switches to the corresponding layout.
 
 #### `selection`: `string[]`
 
@@ -381,11 +380,15 @@ The list of selected items' ids.
 
 If `selection` and `onChangeSelection` are provided, the `DataViews` component behaves like a controlled component. Otherwise, it behaves like an uncontrolled component.
 
+Note: `DataViews` still requires at least one bulk action to make items selectable.
+
 #### `onChangeSelection`: `function`
 
 Callback that signals the user selected one of more items. It receives the list of selected items' IDs as a parameter.
 
 If `selection` and `onChangeSelection` are provided, the `DataViews` component behaves like a controlled component. Otherwise, it behaves like an uncontrolled component.
+
+Note: `DataViews` still requires at least one bulk action to make items selectable.
 
 #### `isItemClickable`: `function`
 
@@ -416,13 +419,13 @@ The component receives the following props:
 
 React component to be rendered next to the view config button.
 
-#### `perPageSizes`: `number[]`
+#### `config`: { perPageSizes: number[] }
 
-A list of numbers used to control the available item counts per page. It's optional. Defaults to `[10, 20, 50, 100]`. The list needs to have a minimum of 2 items and a maximum of 6, otherwise the UI component won't be displayed.
+Optional. Pass an object with a list of `perPageSizes` to control the available item counts per page (defaults to `[10, 20, 50, 100]`). `perPageSizes` needs to have a minimum of 2 items and a maximum of 6, otherwise the UI component won't be displayed.
 
 #### `empty`: React node
 
-A message or element to be displayed instead of the dataview's default empty message.
+An element to display when the `data` prop is empty. Defaults to `<p>No results</p>`.
 
 ### Composition modes
 
@@ -448,6 +451,7 @@ The following components are available directly under `DataViews`:
 
 -   `DataViews.Search`
 -   `DataViews.FiltersToggle`
+-   `DataViews.FiltersToggled`
 -   `DataViews.Filters`
 -   `DataViews.Layout`
 -   `DataViews.LayoutSwitcher`
@@ -476,7 +480,7 @@ const CustomLayout = () => {
 			<h1>{ __( 'Free composition' ) }</h1>
 			<DataViews.Search />
 			<DataViews.FiltersToggle />
-			<DataViews.Filters />
+			<DataViews.FiltersToggled />
 			<DataViews.Layout />
 			<DataViews.Pagination />
 		</DataViews>
@@ -488,13 +492,85 @@ const CustomLayout = () => {
 
 ### Accessibility considerations
 
-All `DataViews` subcomponents are designed with accessibility in mind — including keyboard interactions, focus management, and semantic roles. Components like `Search`, `Pagination`, `FiltersToggle`, and `Filters` already handle these responsibilities internally and can be safely used in custom layouts.
+All `DataViews` subcomponents are designed with accessibility in mind — including keyboard interactions, focus management, and semantic roles. Components like `Search`, `Pagination`, `FiltersToggle`, and `FiltersToggled` already handle these responsibilities internally and can be safely used in custom layouts.
 
 When using free composition, developers are responsible for the outer structure of the layout.
 
 Developers don't need to worry about the internal accessibility logic for individual features. The core behaviors — like search semantics, filter toggles, or pagination focus — are encapsulated.
 
 `FiltersToggle` controls the visibility of the filters panel, and `Filters` renders the actual filters inside it. They work together and should always be used as a pair. While their internal behavior is accessible by default, how they’re positioned and grouped in custom layouts may affect the overall experience — especially for assistive technologies. Extra care is recommended.
+
+## `DataViewsPicker`
+
+<div class="callout callout-info">At <a href="https://wordpress.github.io/gutenberg/">WordPress Gutenberg's Storybook</a> there's an <a href="https://wordpress.github.io/gutenberg/?path=/docs/dataviews-dataviewspicker--docs">example implementation of the DataviewsPicker component</a>.</div>
+
+### Usage
+
+The `DataViewsPicker` component is very similar to the regular `DataViews` component, but is optimized for selection or picking of items.
+
+The component behaves differently to a regular `DataViews` component in the following ways:
+
+-   The items in the view are rendered using the `listbox` and `option` aria roles.
+-   Holding the `ctrl` or `cmd` key isn't required for multi-selection of items. The entire item can be clicked to select or deselect it.
+-   Individual items do not display any actions. All actions appear in the footer as text buttons.
+-   Selection is maintained across multiple pages when the component is paginated.
+
+There are also a few differences in the implementation:
+
+-   Currently only the `pickerGrid` layout is supported for `DataViewsPicker`. This layout is very similar to the regular `grid` layout.
+-   The picker component is used as a 'controlled' component, so `selection` and `onChangeSelection` should be provided as props. This is so that implementers can access the full range of selected items across pages.
+-   An optional `itemListLabel` prop can be supplied to the `DataViewsPicker` component. This is added as an `aria-label` to the `listbox` element, and should be supplied if there's no heading element associated with the `DataViewsPicker` UI.
+-   The `isItemClickable`, `renderItemLink` and `onClickItem` prop are unsupported for `DataViewsPicker`.
+-   To implement a multi-selection picker, ensure all actions are declared with `supportsBulk: true`. For single selection use `supportsBulk: false`. When a mixture of bulk and non-bulk actions are provided, the component falls back to single selection.
+-   Only the `callback` style of action is supported. `RenderModal` is unsupported.
+-   The `isEligible` callback for actions is unsupported.
+-   The `isPrimary` option for an action is used to render a `primary` variant of `Button` that can be used as a main call to action.
+
+Example:
+
+```jsx
+const Example = () => {
+	// When using DataViewsPicker, `selection` should be managed so that the component is 'controlled'.
+	const [ selection, setSelection ] = useState( [] );
+
+	// Both actions have `supportsBulk: true`, so the `DataViewsPicker` will allow multi-selection.
+	const actions = [
+		{
+			id: 'confirm',
+			label: 'Confirm',
+			isPrimary: true,
+			supportsBulk: true,
+			callback() {
+				window.alert( selection.join( ', ' ) );
+			},
+		},
+		{
+			id: 'cancel',
+			label: 'Cancel',
+			supportsBulk: true,
+			callback() {
+				setSelection( [] );
+			},
+		},
+	];
+
+	return (
+		<DataViewsPicker
+			actions={ actions }
+			data={ data }
+			fields={ fields }
+			view={ view }
+			onChangeView={ onChangeView }
+			defaultLayouts={ defaultLayouts }
+			paginationInfo={ paginationInfo }
+			selection={ selection }
+			onChangeSelection={ setSelection }
+		/>
+	);
+};
+```
+
+### Properties
 
 ## `DataForm`
 
@@ -557,15 +633,17 @@ const fields = [
 
 #### `form`: `Object[]`
 
--   `type`: either `regular` or `panel`.
--   `labelPosition`: either `side`, `top`, or `none`.
+-   `layout`: an object describing the layout used to render the top-level fields present in `fields`. See `layout` prop in "Form Field API".
 -   `fields`: a list of fields ids that should be rendered. Field ids can also be defined as an object and allow you to define a `layout`, `labelPosition` or `children` if displaying combined fields. See "Form Field API" for a description of every property.
 
 Example:
 
 ```js
 const form = {
-	type: 'panel',
+	layout: {
+		type: 'panel',
+		labelPosition: 'side',
+	},
 	fields: [
 		'title',
 		'data',
@@ -619,6 +697,54 @@ return (
 );
 ```
 
+### validity
+
+Object that determines the validation status of each field. There's a `useFormValidity` hook that can be used to create the validity object — see the utility below. This section documents the `validity` object in case you want to create it via other means.
+
+The top-level props of the `validity` object are the field IDs. Fields declare their validity status for each of the validation rules supported: `required`, `elements`, `custom`. If a rule is valid, it should not be present in the object; if a field is valid for all the rules, it should not be present in the object either.
+
+For example:
+
+```json
+{
+  "title": {
+    "required": {
+      "type": "invalid"
+    }
+  },
+  "author": {
+    "elements": {
+      "type": "invalid",
+      "message": "Value must be one of the elements."
+    }
+  },
+  "publisher": {
+    "custom": {
+      "type": "validating",
+      "message": "Validating..."
+    }
+  },
+  "isbn": {
+    "custom": {
+      "type": "valid",
+      "message": "Valid."
+    }
+  }
+}
+```
+
+Each rule, can have a `type` and a `message`.
+
+The `message` is the text to be displayed in the UI controls. The message for the `required` rule is optional, and the built-in browser message will be used if not provided.
+
+The `type` can be:
+
+- `validating`: when the value is being validated (e.g., custom async rule)
+- `invalid`: when the value is invalid according to the rule
+- `valid`: when the value _became_ valid after having been invalid (e.g., custom async rule)
+
+Note the `valid` status. This is useful for displaying a "Valid." message when the field transitions from invalid to valid.  The `useFormValidity` hook implements this only for the custom async validation.
+
 ## Utilities
 
 ### `filterSortAndPaginate`
@@ -638,17 +764,39 @@ Returns an object containing:
     -   `totalItems`: total number of items for the current view config.
     -   `totalPages`: total number of pages for the current view config.
 
-### `isItemValid`
+### `useFormValidity`
 
-Utility is used to determine whether or not the given item's value is valid according to the current fields and form configuration.
+Hook to determine the form validation status.
 
 Parameters:
 
--   `item`: the item, as described in the "data" property of DataForm.
--   `fields`: the fields config, as described in the "fields" property of DataForm.
--   `form`: the form config, as described in the "form" property of DataForm.
+-   `item`: the item being edited.
+-   `fields`: the fields config, as described in the "fields" property of DataViews.
+-   `form`: the form config, as described in the "form" property of DataViews.
 
-Returns a boolean indicating if the item is valid (true) or not (false).
+Returns an object containing:
+
+-   `isValid`: a boolean indicating if the form is valid.
+-   `validity`: an object containing the errors. Each property is a field ID, containing a description of each error type. See `validity` prop for more info. For example:
+
+```js
+{
+	fieldId: {
+		required: {
+			type: 'invalid',
+			message: 'Required.' // Optional
+		},
+		elements: {
+			type: 'invalid',
+			message: 'Value must be one of the elements.' // Optional
+		},
+		custom: {
+			type: 'validating',
+			message: 'Validating...'
+		}
+	}
+}
+```
 
 ## Actions API
 
@@ -709,13 +857,6 @@ Function that determines whether the action can be performed for a given record.
 	isEligible: ( item ) => item.status === 'published';
 }
 ```
-
-### `isDestructive`
-
-Whether the action can delete data, in which case the UI communicates it via a red color.
-
--   Type: `boolean`
--   Optional
 
 ### `supportsBulk`
 
@@ -804,8 +945,9 @@ Controls visibility of the modal's header when using `RenderModal`.
 
 The header text to show in the modal.
 
--   Type: `string`
+-   Type: `string | (items: Item[]) => string`
 -   Optional
+-   If a function is provided, it receives the selected items as an argument and should return the header text
 
 ### `modalSize`
 
@@ -860,7 +1002,7 @@ Example:
 
 ### `type`
 
-Field type. One of `text`, `integer`, `datetime`.
+Field type. One of `text`, `integer`, `number`, `datetime`, `date`, `media`, `boolean`, `email`, `password`, `telephone`, `color`, `url`, `array`.
 
 If a field declares a `type`, it gets default implementations for the `sort`, `isValid`, and `Edit` functions if no other values are specified.
 
@@ -911,24 +1053,119 @@ Example:
 }
 ```
 
-### `getValue`
+### `getValue` and `setValue`
 
-React component that returns the value of a field. This value is used to sort or filter the fields.
+These functions control how field values are read from and written to your data structure.
 
--   Type: React component.
+Both functions are optional and automatically generated from the field's `id` when not provided. The `id` is treated as a dot-notation path (e.g., `"user.profile.name"` accesses `item.user.profile.name`).
+
+#### `getValue`
+
+Function that extracts the field value from an item. This value is used to sort, filter, and display the field.
+
+-   Type: `function`.
 -   Optional.
--   Defaults to `item[ id ]`.
--   Props:
-    -   `item` value to be processed.
--   Returns a value that represents the field.
+-   Args:
+    -   `item`: the data item to be processed.
+-   Returns the field's value.
 
-Example:
+#### `setValue`
+
+Function that creates a partial item object with updated field values. This is used by DataForm for editing operations and determines the structure of data passed to the `onChange` callback.
+
+-   Type: `function`.
+-   Optional.
+-   Args:
+    -   `item`: the current item being edited.
+    -   `value`: the new value to be set for the field.
+-   Returns a partial item object with the changes to be applied.
+
+#### Simple field access
+
+For basic field access, you only need to specify the field `id`. Both `getValue` and `setValue` are automatically generated:
 
 ```js
+// Data structure
+const item = {
+	title: 'Hello World',
+	author: 'John Doe'
+};
+
+// Field definition
 {
-	getValue: ( { item } ) => {
-		/* The field's value.  */
-	};
+	id: 'title',
+	label: 'Title'
+	// getValue: automatically becomes ( { item } ) => item.title
+	// setValue: automatically becomes ( { value } ) => ( { title: value } )
+}
+```
+
+#### Nested data access
+
+Use dot notation in the field `id` to access nested properties:
+
+```js
+// Data structure
+const item = {
+	user: {
+		profile: {
+			name: 'John Doe',
+			email: 'john@example.com'
+		}
+	}
+};
+
+// Field definition - using dot notation (automatic)
+{
+	id: 'user.profile.name',
+	label: 'User Name'
+	// getValue: automatically becomes ( { item } ) => item.user.profile.name
+	// setValue: automatically becomes ( { value } ) => ( { user: { profile: { name: value } } } )
+}
+
+// Alternative - using simple ID with custom functions
+{
+	id: 'userName',
+	label: 'User Name',
+	getValue: ( { item } ) => item.user.profile.name,
+	setValue: ( { value } ) => ( {
+		user: {
+			profile: { name: value }
+		}
+	} )
+}
+```
+
+#### Custom data transformation
+
+Provide custom `getValue` and `setValue` functions when you need to transform data between the storage format and display format:
+
+```js
+// Data structure
+const item = {
+	user: {
+		preferences: {
+			notifications: true
+		}
+	}
+};
+
+// Field definition - transform boolean to string options
+{
+	id: 'notifications',
+	label: 'Notifications',
+	Edit: 'radio',
+	elements: [
+		{ label: 'Enabled', value: 'enabled' },
+		{ label: 'Disabled', value: 'disabled' }
+	],
+	getValue: ( { item } ) =>
+		item.user.preferences.notifications === true ? 'enabled' : 'disabled',
+	setValue: ( { value } ) => ( {
+		user: {
+			preferences: { notifications: value === 'enabled' }
+		}
+	} )
 }
 ```
 
@@ -958,7 +1195,7 @@ Example:
 
 React component that renders the control to edit the field.
 
--   Type: React component | `string`. If it's a string, it needs to be one of `text`, `integer`, `datetime`, `radio`, `select`.
+-   Type: React component | `string`. If it's a string, it needs to be one of `array`, `checkbox`, `color`, `datetime`, `date`, `email`, `telephone`, `url`, `integer`, `number`, `password`, `radio`, `select`, `text`, `toggle`, `textarea`, `toggleGroup`.
 -   Required by DataForm. Optional if the field provided a `type`.
 -   Props:
     -   `data`: the item to be processed
@@ -1061,8 +1298,9 @@ Example:
 
 Object that contains the validation rules for the field. If a rule is not met, the control will be marked as invalid and a message will be displayed.
 
-- `required`: boolean indicating whether the field is required or not.
-- `custom`: a function that validates a field's value. If the value is invalid, the function should return a string explaining why the value is invalid. Otherwise, the function must return null.
+-   `required`: boolean indicating whether the field is required or not. Disabled by default.
+-   `elements`: boolean restricting selection to the provided list of elements only. Enabled by default. The `array` Edit control uses it to restrict the input values as well.
+-   `custom`: a function that validates a field's value. If the value is invalid, the function should return a string explaining why the value is invalid. Otherwise, the function must return null.
 
 Example:
 
@@ -1105,9 +1343,9 @@ Fields that define their own Edit component have access to the validation rules 
 
 ```js
 {
-  Edit: ( { field }) => {
-	  return <input required={ !! field.isValid.required } />
-  }
+	Edit: ( { field } ) => {
+		return <input required={ !! field.isValid.required } />;
+	};
 }
 ```
 
@@ -1204,7 +1442,6 @@ Example:
 }
 ```
 
-By default, we add an empty value (label: "Select item"). The label can be overriden by providing an empty element (`{ value: '', label: 'Custom label for empty value'}`).
 
 ### `filterBy`
 
@@ -1234,8 +1471,8 @@ Operators:
 | `contains`           | Text           | `CONTAINS`. The item's field contains the given substring.                                           | Title contains: Mars                               |
 | `notContains`        | Text           | `NOT CONTAINS`. The item's field does not contain the given substring.                               | Description doesn't contain: photo                 |
 | `startsWith`         | Text           | `STARTS WITH`. The item's field starts with the given substring.                                     | Title starts with: Mar                             |
-| `on`                 | Date           | `ON`. The item's field is on a given date (date equality using proper date parsing).                | Date is on: 2024-01-01                             |
-| `notOn`              | Date           | `NOT ON`. The item's field is not on a given date (date inequality using proper date parsing).      | Date is not on: 2024-01-01                         |
+| `on`                 | Date           | `ON`. The item's field is on a given date (date equality using proper date parsing).                 | Date is on: 2024-01-01                             |
+| `notOn`              | Date           | `NOT ON`. The item's field is not on a given date (date inequality using proper date parsing).       | Date is not on: 2024-01-01                         |
 | `before`             | Date           | `BEFORE`. The item's field is before a given date.                                                   | Date is before 2024-01-01                          |
 | `after`              | Date           | `AFTER`. The item's field is after a given date.                                                     | Date is after 2024-01-01                           |
 | `beforeInc`          | Date           | `BEFORE (Inc)`. The item's field is before a given date, including the date.                         | Date is before 2024-01-01, including 2024-01-01    |
@@ -1301,31 +1538,95 @@ Example:
 
 ### `layout`
 
-The same as the `form.type`, either `regular` or `panel` only for the individual field. It defaults to `form.type`.
+Represents the type of layout used to render the field. It'll be one of Regular, Panel, Card, or Row. This prop is the same as the `form.layout` prop.
 
--   Type: `string`.
+#### Regular
 
-Example:
+-   `type`: `regular`. Required.
+-   `labelPosition`: one of `side`, `top`, or `none`. Optional. `top` by default.
+
+For example:
 
 ```js
 {
 	id: 'field_id',
-	layout: 'regular'
+	layout: {
+		type: 'regular',
+		labelPosition: 'side'
+	},
 }
 ```
 
-### `labelPosition`
+#### Panel
 
-The same as the `form.labelPosition`, either `side`, `top`, or `none` for the individual field. It defaults to `form.labelPosition`.
+- `type`: `panel`. Required.
+- `labelPosition`: one of `side`, `top`, or `none`. Optional. `top` by default.
+- `summary`: Summary field configuration. Optional. Specifies which field(s) to display in the panel header. Can be:
+   	- A string (single field ID)
+    - An array of strings (multiple field IDs)
 
--   Type: `string`.
+When no summary fields are explicitly configured, the panel automatically determines which fields to display using this priority:
 
-Example:
+1. Use `summary` fields if they exist
+2. Fall back to the field definition that matches the form field's id
+3. If the form field id doesn't exist, pick the first child field
+4. If no field definition is found, return empty summary fields
+
+For example:
+```js
+{
+	id: 'field_id',
+	layout: {
+		type: 'panel',
+		labelPosition: 'top'
+	},
+}
+```
+
+#### Card
+
+-   `type`: `card`. Required.
+-   `isOpened`: boolean. Optional. `true` by default.
+-   `withHeader`: boolean. Optional. `true` by default.
+-   `summary`: Summary field configuration. Optional. Specifies which field(s) to display in the card header. Can be:
+    -   A string (single field ID)
+    -   An array of strings (multiple field IDs)
+    -   An array of objects for per-field visibility control `[{ id: string, visibility: 'always' | 'when-collapsed' }]`
+
+Cards can be collapsed while visible, so you can control when summary fields appear:
+
+-   `'always'`: Show the field in both expanded and collapsed states.
+-   `'when-collapsed'`: Show the field only when the card is collapsed. This is the default.
+
+For example:
 
 ```js
 {
 	id: 'field_id',
-	labelPosition: 'none'
+	layout: {
+		type: 'card',
+		isOpened: false,
+		withHeader: true,
+	},
+}
+```
+
+#### Row
+
+-   `type`: `row`. Required.
+-   `alignment`: one of `start`, `center`, or `end`. Optional. `center` by default.
+
+The Row layout displays fields horizontally in a single row. It's particularly useful for grouping related fields that should be displayed side by side. This layout can be used both as a top-level form layout and for individual field groups.
+
+For example:
+
+```js
+{
+	id: 'field_id',
+	layout: {
+		type: 'row',
+		alignment: 'start'
+	},
 }
 ```
 
@@ -1356,7 +1657,9 @@ Example:
 ```js
 {
 	id: 'status',
-	layout: 'panel',
+	layout: {
+		type: 'panel',
+	},
 	label: 'Combined Field',
 	children: [ 'field1', 'field2' ],
 }

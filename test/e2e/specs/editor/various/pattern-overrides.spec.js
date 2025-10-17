@@ -12,6 +12,9 @@ test.describe( 'Pattern Overrides', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.activateTheme( 'emptytheme' ),
+			await requestUtils.activatePlugin(
+				'gutenberg-test-block-bindings'
+			),
 			requestUtils.deleteAllBlocks(),
 		] );
 	} );
@@ -24,6 +27,7 @@ test.describe( 'Pattern Overrides', () => {
 	test.afterAll( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.activateTheme( 'twentytwentyone' ),
+			requestUtils.deactivatePlugin( 'gutenberg-test-block-bindings' ),
 		] );
 	} );
 
@@ -39,7 +43,7 @@ test.describe( 'Pattern Overrides', () => {
 			await admin.visitSiteEditor( { postType: 'wp_block' } );
 
 			await page
-				.getByRole( 'region', { name: 'Patterns content' } )
+				.getByRole( 'region', { name: 'All patterns' } )
 				.getByRole( 'button', { name: 'add pattern' } )
 				.click();
 
@@ -152,6 +156,7 @@ test.describe( 'Pattern Overrides', () => {
 			} );
 			const paragraphs = patternBlocks.first().getByRole( 'document', {
 				name: 'Block: Paragraph',
+				includeHidden: true,
 			} );
 			// Ensure the first pattern is selected.
 			await patternBlocks.first().selectText();
@@ -220,12 +225,6 @@ test.describe( 'Pattern Overrides', () => {
 	} );
 
 	test.describe( 'block editing modes', () => {
-		test.beforeEach( async ( { page } ) => {
-			await page.addInitScript( () => {
-				window.__experimentalEditorWriteMode = true;
-			} );
-		} );
-
 		test( 'blocks with bindings in a synced pattern are editable, and all other blocks are disabled', async ( {
 			admin,
 			editor,
@@ -252,12 +251,11 @@ test.describe( 'Pattern Overrides', () => {
 
 			await admin.visitSiteEditor( {
 				postId: 'emptytheme//index',
-				postType: 'wp_template',
+				postType: 'wp_registered_template',
 				canvas: 'edit',
 			} );
 
 			await editor.setContent( '' );
-			await editor.switchEditorTool( 'Design' );
 
 			// Insert a `<main>` group block.
 			// In zoomed out and write mode it acts as the section root.
@@ -278,9 +276,11 @@ test.describe( 'Pattern Overrides', () => {
 			} );
 			const patternBlock = editor.canvas.getByRole( 'document', {
 				name: 'Block: Pattern',
+				includeHidden: true,
 			} );
 			const paragraphs = editor.canvas.getByRole( 'document', {
 				name: 'Block: Paragraph',
+				includeHidden: true,
 			} );
 			const blockWithOverrides = paragraphs.filter( {
 				hasText: 'Pattern Overrides',
@@ -315,7 +315,7 @@ test.describe( 'Pattern Overrides', () => {
 				);
 			} );
 
-			await test.step( 'Zoomed in / Design mode', async () => {
+			await test.step( 'Zoomed in', async () => {
 				await editor.selectBlocks( patternBlock );
 
 				// Once selected and in zoomed in/design mode the child blocks
@@ -335,63 +335,9 @@ test.describe( 'Pattern Overrides', () => {
 				);
 			} );
 
-			await test.step( 'Zoomed in / Write mode - pattern as a section', async () => {
-				await editor.switchEditorTool( 'Write' );
-
-				// The pattern block is still editable as a section.
-				await expect( patternBlock ).not.toHaveAttribute(
-					'inert',
-					'true'
-				);
-
-				// Ensure the pattern block is selected.
-				await editor.selectBlocks( patternBlock );
-
-				// Child blocks of the pattern with bindings are editable.
-				await expect( blockWithOverrides ).not.toHaveAttribute(
-					'inert',
-					'true'
-				);
-				await expect( blockWithBindings ).not.toHaveAttribute(
-					'inert',
-					'true'
-				);
-				await expect( blockWithoutOverridesOrBindings ).toHaveAttribute(
-					'inert',
-					'true'
-				);
-			} );
-
-			await test.step( 'Zoomed out / Write mode - pattern as a section', async () => {
+			await test.step( 'Zoomed out - pattern as a section', async () => {
 				await page.getByLabel( 'Zoom Out' ).click();
-				// In zoomed out only the pattern block is editable,
-				// as in this scenario it's a section.
-				await expect( patternBlock ).not.toHaveAttribute(
-					'inert',
-					'true'
-				);
 
-				// Ensure the pattern block is selected before checking the child blocks
-				// to ensure the click-through behavior isn't interfering.
-				await editor.selectBlocks( patternBlock );
-
-				// None of the child blocks are editable in zoomed out mode.
-				await expect( blockWithOverrides ).toHaveAttribute(
-					'inert',
-					'true'
-				);
-				await expect( blockWithBindings ).toHaveAttribute(
-					'inert',
-					'true'
-				);
-				await expect( blockWithoutOverridesOrBindings ).toHaveAttribute(
-					'inert',
-					'true'
-				);
-			} );
-
-			await test.step( 'Zoomed out / Design mode - pattern as a section', async () => {
-				await editor.switchEditorTool( 'Design' );
 				// In zoomed out only the pattern block is editable,
 				// as in this scenario it's a section.
 				await expect( patternBlock ).not.toHaveAttribute(
@@ -422,51 +368,8 @@ test.describe( 'Pattern Overrides', () => {
 			await editor.selectBlocks( patternBlock );
 			await editor.clickBlockOptionsMenuItem( 'Group' );
 
-			await test.step( 'Zoomed in / Write mode - pattern nested in a section', async () => {
-				await editor.switchEditorTool( 'Write' );
-				// The pattern block is not inert as it has editable content, but it shouldn't be selectable.
-				// TODO: find a way to test that the block is not selectable.
-				await expect( patternBlock ).not.toHaveAttribute(
-					'inert',
-					'true'
-				);
-				// Child blocks of the pattern are editable as normal.
-				await expect( blockWithOverrides ).not.toHaveAttribute(
-					'inert',
-					'true'
-				);
-				await expect( blockWithBindings ).not.toHaveAttribute(
-					'inert',
-					'true'
-				);
-				await expect( blockWithoutOverridesOrBindings ).toHaveAttribute(
-					'inert',
-					'true'
-				);
-			} );
-
-			await test.step( 'Zoomed out / Write mode - pattern nested in a section', async () => {
-				await page.getByLabel( 'Zoom Out' ).click();
+			await test.step( 'Zoomed out - pattern nested in a section', async () => {
 				// None of the pattern is editable in zoomed out when nested in a section.
-				await expect( patternBlock ).toHaveAttribute( 'inert', 'true' );
-				await expect( blockWithOverrides ).toHaveAttribute(
-					'inert',
-					'true'
-				);
-				await expect( blockWithBindings ).toHaveAttribute(
-					'inert',
-					'true'
-				);
-				await expect( blockWithoutOverridesOrBindings ).toHaveAttribute(
-					'inert',
-					'true'
-				);
-			} );
-
-			await test.step( 'Zoomed out / Design mode - pattern nested in a section', async () => {
-				await editor.switchEditorTool( 'Design' );
-				// None of the pattern is editable in zoomed out when nested in a section.
-				await expect( patternBlock ).toHaveAttribute( 'inert', 'true' );
 				await expect( blockWithOverrides ).toHaveAttribute(
 					'inert',
 					'true'
@@ -541,6 +444,7 @@ test.describe( 'Pattern Overrides', () => {
 			} );
 			const paragraphBlock = editor.canvas.getByRole( 'document', {
 				name: 'Block: Paragraph',
+				includeHidden: true,
 			} );
 			await expect( headingBlock ).toHaveText( 'Outer heading (edited)' );
 			await expect( headingBlock ).not.toHaveAttribute( 'inert', 'true' );
@@ -785,6 +689,96 @@ test.describe( 'Pattern Overrides', () => {
 		await expect( buttonLink ).toHaveAttribute( 'rel', /^\s*nofollow\s*$/ );
 	} );
 
+	test( 'should disable editing for pattern blocks without overrides enabled, even when mixed with bound attributes', async ( {
+		page,
+		admin,
+		requestUtils,
+		editor,
+	} ) => {
+		const { id } = await requestUtils.createBlock( {
+			title: 'Pattern',
+			content: `<!-- wp:paragraph {"metadata":{"name":"Post Meta Binding","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
+<p>Edit me</p>
+<!-- /wp:paragraph -->
+<!-- wp:buttons -->
+<div class="wp-block-buttons"><!-- wp:button {"metadata":{"name":"Read Only Button","bindings":{"url":{"source":"core/post-meta","args":{"key":"text_custom_field"}}}}} -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button">Read Only Button Text</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->`,
+			status: 'publish',
+		} );
+
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/block',
+			attributes: { ref: id },
+		} );
+
+		const patternBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Pattern',
+		} );
+
+		await expect( patternBlock.getByText( 'Edit me' ) ).toBeVisible();
+		await expect(
+			patternBlock.getByText( 'Read Only Button Text' )
+		).toBeVisible();
+
+		const editableParagraph = patternBlock
+			.getByRole( 'document', {
+				name: 'Block: Paragraph',
+				includeHidden: true,
+			} )
+			.filter( { hasText: 'Edit me' } );
+		const nonEditableButton = patternBlock
+			.getByRole( 'document', {
+				name: 'Block: Button',
+				exact: true,
+				includeHidden: true,
+			} )
+			.filter( { hasText: 'Read Only Button Text' } );
+
+		await editableParagraph.click();
+		await editableParagraph.focus();
+		await page.keyboard.type( ' - Edited' );
+		await expect( editableParagraph ).toHaveText( 'Edit me - Edited' );
+
+		// Button with only URL binding (no pattern overrides) should not have editable text.
+		await nonEditableButton.click();
+		const initialText = await nonEditableButton.textContent();
+		await page.keyboard.type( 'Edited' );
+		const finalText = await nonEditableButton.textContent();
+		expect( initialText ).toBe( finalText );
+
+		await nonEditableButton.click();
+		await editor.showBlockToolbar();
+
+		// Open the link control
+		const linkButton = page.getByRole( 'button', {
+			name: 'Link',
+			exact: true,
+		} );
+		await linkButton.click();
+
+		const urlInput = page.getByPlaceholder( 'Search or type URL' );
+		await urlInput.fill( '#test' );
+
+		// Save the link
+		const saveLinkButton = page.locator(
+			'.block-editor-link-control__search-submit'
+		);
+		await saveLinkButton.click();
+
+		// Publish the post
+		const postId = await editor.publishPost();
+
+		// Check on the frontend that the URL was updated
+		await page.goto( `/?p=${ postId }` );
+		const frontendButton = page.getByRole( 'link', {
+			name: 'Button Text',
+		} );
+		await expect( frontendButton ).toHaveAttribute( 'href', '#test' );
+	} );
+
 	test( 'resets overrides after clicking the reset button', async ( {
 		page,
 		admin,
@@ -821,6 +815,7 @@ test.describe( 'Pattern Overrides', () => {
 		} );
 		const headingBlock = patternBlock.getByRole( 'document', {
 			name: 'Block: Heading',
+			includeHidden: true,
 		} );
 		const paragraphBlock = patternBlock.getByRole( 'document', {
 			name: 'Block: Paragraph',
@@ -887,7 +882,7 @@ test.describe( 'Pattern Overrides', () => {
 		const paragraphName = 'Editable paragraph';
 		const { id } = await requestUtils.createBlock( {
 			title: 'Pattern',
-			content: `<!-- wp:paragraph {"metadata":{"name":"${ paragraphName }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
+			content: `<!-- wp:paragraph {"metadata":{"name":"${ paragraphName }","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
 <p>Paragraph</p>
 <!-- /wp:paragraph -->`,
 			status: 'publish',
@@ -905,6 +900,7 @@ test.describe( 'Pattern Overrides', () => {
 		} );
 		const paragraphBlock = patternBlock.getByRole( 'document', {
 			name: 'Block: Paragraph',
+			includeHidden: true,
 		} );
 		const resetButton = page
 			.getByRole( 'toolbar', { name: 'Block tools' } )
@@ -969,6 +965,7 @@ test.describe( 'Pattern Overrides', () => {
 
 		const imageBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Image',
+			includeHidden: true,
 		} );
 		await editor.selectBlocks( imageBlock );
 		await imageBlock
@@ -1200,13 +1197,13 @@ test.describe( 'Pattern Overrides', () => {
 		await test.step( 'create a pattern with synced blocks with the same name', async () => {
 			const { id } = await requestUtils.createBlock( {
 				title: 'Blocks with the same name',
-				content: `<!-- wp:heading {"metadata":{"name":"${ sharedName }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
+				content: `<!-- wp:heading {"metadata":{"name":"${ sharedName }","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
 			<h2>default name</h2>
 			<!-- /wp:heading -->
-			<!-- wp:paragraph {"metadata":{"name":"${ sharedName }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
+			<!-- wp:paragraph {"metadata":{"name":"${ sharedName }","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
 			<p>default content</p>
 			<!-- /wp:paragraph -->
-			<!-- wp:paragraph {"metadata":{"name":"${ sharedName }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
+			<!-- wp:paragraph {"metadata":{"name":"${ sharedName }","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
 			<p>default content</p>
 			<!-- /wp:paragraph -->`,
 				status: 'publish',
@@ -1327,86 +1324,5 @@ test.describe( 'Pattern Overrides', () => {
 		await expect(
 			editorSettings.getByRole( 'button', { name: 'Enable overrides' } )
 		).toBeHidden();
-	} );
-
-	// @see https://github.com/WordPress/gutenberg/pull/60694
-	test( 'handles back-compat from individual attributes to __default', async ( {
-		page,
-		admin,
-		requestUtils,
-		editor,
-	} ) => {
-		const imageName = 'Editable image';
-		const TEST_IMAGE_FILE_PATH = path.resolve(
-			__dirname,
-			'../../../assets/10x10_e2e_test_image_z9T8jK.png'
-		);
-		const { id } = await requestUtils.createBlock( {
-			title: 'Pattern',
-			content: `<!-- wp:image {"metadata":{"name":"${ imageName }","bindings":{"id":{"source":"core/pattern-overrides"},"url":{"source":"core/pattern-overrides"},"title":{"source":"core/pattern-overrides"},"alt":{"source":"core/pattern-overrides"}}}} -->
-<figure class="wp-block-image"><img alt=""/></figure>
-<!-- /wp:image -->`,
-			status: 'publish',
-		} );
-
-		await admin.createNewPost();
-
-		await editor.insertBlock( {
-			name: 'core/block',
-			attributes: { ref: id },
-		} );
-
-		const blocks = await editor.getBlocks( { full: true } );
-		expect( blocks ).toMatchObject( [
-			{
-				name: 'core/block',
-				attributes: { ref: id },
-			},
-		] );
-		expect(
-			await editor.getBlocks( { clientId: blocks[ 0 ].clientId } )
-		).toMatchObject( [
-			{
-				name: 'core/image',
-				attributes: {
-					metadata: {
-						name: imageName,
-						bindings: {
-							__default: {
-								source: 'core/pattern-overrides',
-							},
-						},
-					},
-				},
-			},
-		] );
-
-		const imageBlock = editor.canvas.getByRole( 'document', {
-			name: 'Block: Image',
-		} );
-		await editor.selectBlocks( imageBlock );
-		await imageBlock
-			.getByTestId( 'form-file-upload-input' )
-			.setInputFiles( TEST_IMAGE_FILE_PATH );
-		await expect( imageBlock.getByRole( 'img' ) ).toHaveCount( 1 );
-		await expect( imageBlock.getByRole( 'img' ) ).toHaveAttribute(
-			'src',
-			/\/wp-content\/uploads\//
-		);
-		await editor.showBlockToolbar();
-		await editor.clickBlockToolbarButton( 'More' );
-		await page
-			.getByRole( 'menuitem', { name: 'Alternative text' } )
-			.click();
-		await page
-			.getByRole( 'textbox', { name: 'alternative text' } )
-			.fill( 'Test Image' );
-
-		const postId = await editor.publishPost();
-
-		await page.goto( `/?p=${ postId }` );
-		await expect(
-			page.getByRole( 'img', { name: 'Test Image' } )
-		).toHaveAttribute( 'src', /\/wp-content\/uploads\// );
 	} );
 } );

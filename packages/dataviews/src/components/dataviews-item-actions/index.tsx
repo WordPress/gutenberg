@@ -77,7 +77,6 @@ function ButtonTrigger< Item >( {
 			icon={ action.icon }
 			disabled={ !! action.disabled }
 			accessibleWhenDisabled
-			isDestructive={ action.isDestructive }
 			size="compact"
 			onClick={ onClick }
 		/>
@@ -105,9 +104,14 @@ export function ActionModal< Item >( {
 }: ActionModalProps< Item > ) {
 	const label =
 		typeof action.label === 'string' ? action.label : action.label( items );
+
+	const modalHeader =
+		typeof action.modalHeader === 'function'
+			? action.modalHeader( items )
+			: action.modalHeader;
 	return (
 		<Modal
-			title={ action.modalHeader || label }
+			title={ modalHeader || label }
 			__experimentalHideHeader={ !! action.hideModalHeader }
 			onRequestClose={ closeModal }
 			focusOnMount={ action.modalFocusOnMount ?? true }
@@ -179,17 +183,6 @@ export default function ItemActions< Item >( {
 		);
 	}
 
-	// If all actions are primary, there is no need to render the dropdown.
-	if ( primaryActions.length === eligibleActions.length ) {
-		return (
-			<PrimaryActions
-				item={ item }
-				actions={ primaryActions }
-				registry={ registry }
-			/>
-		);
-	}
-
 	return (
 		<HStack
 			spacing={ 1 }
@@ -205,11 +198,13 @@ export default function ItemActions< Item >( {
 				actions={ primaryActions }
 				registry={ registry }
 			/>
-			<CompactItemActions
-				item={ item }
-				actions={ eligibleActions }
-				registry={ registry }
-			/>
+			{ primaryActions.length < eligibleActions.length && (
+				<CompactItemActions
+					item={ item }
+					actions={ eligibleActions }
+					registry={ registry }
+				/>
+			) }
 		</HStack>
 	);
 }

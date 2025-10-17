@@ -2,7 +2,7 @@ import { ArgTypes, Meta, Stories } from '@storybook/blocks';
 import * as OverviewStories from './overview.story';
 import { ValidatedInputControl } from '..';
 
-<Meta of={ OverviewStories } title="Components (Private)/Validated Form Controls/Overview" />
+<Meta of={ OverviewStories } title="Components/Selection & Input/Validated Form Controls/Overview" />
 
 # Validated Form Controls
 
@@ -16,7 +16,7 @@ We are still gathering feedback and iterating. Please get in touch with `@WordPr
 
 Component APIs are the same as the underlying WordPress components, with the addition of some optional props:
 
-<ArgTypes of={ ValidatedInputControl } include={ [ 'required', 'markWhenOptional', 'customValidator' ] } />
+<ArgTypes of={ ValidatedInputControl } include={ [ 'required', 'markWhenOptional', 'onValidate', 'customValidity' ] } />
 
 ## Implementation
 

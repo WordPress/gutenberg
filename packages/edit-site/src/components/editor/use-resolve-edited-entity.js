@@ -25,13 +25,12 @@ const postTypesWithoutParentTemplate = [
 	TEMPLATE_PART_POST_TYPE,
 	NAVIGATION_POST_TYPE,
 	PATTERN_TYPES.user,
+	'wp_registered_template',
 ];
 
 const authorizedPostTypes = [ 'page', 'post' ];
 
-export function useResolveEditedEntity() {
-	const { name, params = {}, query } = useLocation();
-	const { postId = query?.postId } = params; // Fallback to query param for postId for list view routes.
+function getPostType( name ) {
 	let postType;
 	if ( name === 'navigation-item' ) {
 		postType = NAVIGATION_POST_TYPE;
@@ -39,18 +38,45 @@ export function useResolveEditedEntity() {
 		postType = PATTERN_TYPES.user;
 	} else if ( name === 'template-part-item' ) {
 		postType = TEMPLATE_PART_POST_TYPE;
-	} else if ( name === 'template-item' || name === 'templates' ) {
+	} else if ( name === 'templates' ) {
 		postType = TEMPLATE_POST_TYPE;
+	} else if ( name === 'template-item' ) {
+		postType = TEMPLATE_POST_TYPE;
+	} else if ( name === 'static-template-item' ) {
+		postType = 'wp_registered_template';
 	} else if ( name === 'page-item' || name === 'pages' ) {
 		postType = 'page';
 	} else if ( name === 'post-item' || name === 'posts' ) {
 		postType = 'post';
 	}
 
+	return postType;
+}
+
+export function useResolveEditedEntity() {
+	const { name, params = {}, query } = useLocation();
+	const { postId: _postId = query?.postId } = params; // Fallback to query param for postId for list view routes.
+	const _postType = getPostType( name, _postId ) ?? query?.postType;
+
 	const homePage = useSelect( ( select ) => {
 		const { getHomePage } = unlock( select( coreDataStore ) );
 		return getHomePage();
 	}, [] );
+
+	const [ postType, postId ] = useSelect(
+		( select ) => {
+			if ( _postType !== 'wp_registered_template' ) {
+				return [ _postType, _postId ];
+			}
+			return [
+				TEMPLATE_POST_TYPE,
+				unlock( select( coreDataStore ) ).getTemplateAutoDraftId(
+					_postId
+				),
+			];
+		},
+		[ _postType, _postId ]
+	);
 
 	/**
 	 * This is a hook that recreates the logic to resolve a template for a given WordPress postID postTypeId
@@ -141,7 +167,14 @@ export function useSyncDeprecatedEntityIntoState( {
 
 	useEffect( () => {
 		if ( isReady ) {
-			setEditedEntity( postType, postId, context );
+			// setEditedEntity expects a string (because the postId used to be
+			// the template slug, even for edited templates). Now the postId can
+			// be a number (either because it's an auto-draft or edited
+			// template). Passing a number could break plugins doing things like
+			// `id.includes`. It would be way more complex to keep passing the
+			// template slug, while also being incorrect, so the easiest
+			// solution is to cast the postId to a string.
+			setEditedEntity( postType, String( postId ), context );
 		}
 	}, [ isReady, postType, postId, context, setEditedEntity ] );
 }

@@ -6,10 +6,8 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { Card, CardBody } from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { store as editorStore } from '@wordpress/editor';
-import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -27,11 +25,7 @@ function ScreenStyleVariations() {
 	const isPreviewMode = useSelect( ( select ) => {
 		return select( blockEditorStore ).getSettings().isPreviewMode;
 	}, [] );
-	const { setDeviceType } = useDispatch( editorStore );
 	useZoomOut( ! isPreviewMode );
-	useEffect( () => {
-		setDeviceType( 'desktop' );
-	}, [ setDeviceType ] );
 
 	return (
 		<>

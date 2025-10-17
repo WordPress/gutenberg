@@ -618,15 +618,33 @@ add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
  */
 function gutenberg_default_script_modules() {
 	/*
-	 * Expects multidimensional array like:
-	 *
-	 *     'interactivity/index.min.js' => array('dependencies' => array(…), 'version' => '…'),
-	 *     'interactivity/debug.min.js' => array('dependencies' => array(…), 'version' => '…'),
-	 *     'interactivity-router/index.min.js' => …
+	 * Load individual asset files for esbuild-built packages.
+	 * Follows the same pattern as regular scripts in gutenberg_register_packages_scripts().
+	 * Uses RecursiveDirectoryIterator to find all *.min.js files at any nesting depth.
 	 */
-	$assets = include gutenberg_dir_path() . '/build-module/assets.php';
+	$all_assets       = array();
+	$build_module_dir = gutenberg_dir_path() . 'build-module';
+	if ( is_dir( $build_module_dir ) ) {
+		$iterator = new RecursiveIteratorIterator(
+			new RecursiveDirectoryIterator( $build_module_dir, RecursiveDirectoryIterator::SKIP_DOTS )
+		);
+		foreach ( $iterator as $file ) {
+			if ( $file->isFile() && preg_match( '/\.min\.js$/', $file->getFilename() ) ) {
+				$path       = $file->getPathname();
+				$asset_file = substr( $path, 0, -3 ) . '.asset.php';
+				if ( ! file_exists( $asset_file ) ) {
+					continue;
+				}
 
-	foreach ( $assets as $file_name => $script_module_data ) {
+				$asset                    = require $asset_file;
+				$file_name                = str_replace( gutenberg_dir_path() . 'build-module/', '', $path );
+				$asset['dependencies']    = $asset['module_dependencies'] ?? array();
+				$all_assets[ $file_name ] = $asset;
+			}
+		}
+	}
+
+	foreach ( $all_assets as $file_name => $script_module_data ) {
 		/*
 		 * Build the WordPress Script Module ID from the file name.
 		 * Prepend `@wordpress/` and remove extensions and `/index` if present:
@@ -653,8 +671,25 @@ function gutenberg_default_script_modules() {
 				break;
 		}
 
+		/*
+		 * All script modules in Gutenberg are (currently) related to the Interactivity API which prioritizes server-side rendering.
+		 * Therefore, the modules should be fetched with a low priority to avoid network contention with any LCP element resource.
+		 * For allowing a block to opt-in to another fetchpriority, see <https://github.com/WordPress/gutenberg/issues/71366>.
+		 *
+		 * Also, the @wordpress/a11y script module is intended to be used as a dynamic import dependency, in which case
+		 * the fetchpriority is irrelevant. See <https://make.wordpress.org/core/2024/10/14/updates-to-script-modules-in-6-7/>.
+		 * However, in case it is added as a static import dependency, the fetchpriority is explicitly set to be 'low'
+		 * since the module should not be involved in the critical rendering path, and if it is, its fetchpriority will
+		 * be bumped to match the fetchpriority of the dependent script.
+		 */
+		$args = array(
+			'fetchpriority' => 'low',
+		);
+
+		gutenberg_register_interactive_script_module_id( $script_module_id );
+
 		$path = gutenberg_url( "build-module/{$file_name}" );
-		wp_register_script_module( $script_module_id, $path, $script_module_data['dependencies'], $script_module_data['version'] );
+		wp_register_script_module( $script_module_id, $path, $script_module_data['dependencies'], $script_module_data['version'], $args ); // The $args parameter is new as of WP 6.9 per <https://core.trac.wordpress.org/ticket/61734>.
 	}
 }
 remove_action( 'wp_default_scripts', 'wp_default_script_modules' );
@@ -671,3 +706,56 @@ remove_action( 'wp_footer', 'wp_enqueue_stored_styles', 1 );
 // Enqueue stored styles.
 add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_stored_styles' );
 add_action( 'wp_footer', 'gutenberg_enqueue_stored_styles', 1 );
+
+/**
+ * Access the shared static variable for interactive script modules.
+ *
+ * @param string|null $script_module_id The script module ID to register, or null to get the list.
+ * @return array Associative array of script module ID => true.
+ */
+function gutenberg_interactive_script_modules_registry( $script_module_id = null ) {
+	static $interactive_script_modules = array();
+
+	if ( null !== $script_module_id ) {
+		$interactive_script_modules[ $script_module_id ] = true;
+	}
+
+	return $interactive_script_modules;
+}
+
+/**
+ * Register a script module ID for interactive blocks.
+ *
+ * @param string $script_module_id The script module ID.
+ */
+function gutenberg_register_interactive_script_module_id( $script_module_id ) {
+	gutenberg_interactive_script_modules_registry( $script_module_id );
+}
+
+/**
+ * Get the list of interactive script module IDs.
+ *
+ * @return array Associative array of script module ID => true.
+ */
+function gutenberg_get_interactive_script_module_ids() {
+	return gutenberg_interactive_script_modules_registry();
+}
+
+/**
+ * Adds `data-wp-router-options` attribute to script modules registered as interactive.
+ *
+ * @param array  $args The script module attributes.
+ * @param string $id   The script module ID.
+ * @return array Filtered script module attributes.
+ */
+function gutenberg_script_module_add_router_options_attributes( $args, $id ) {
+	// Check if this script module ID is registered as interactive.
+	$interactive_modules = gutenberg_get_interactive_script_module_ids();
+
+	if ( isset( $interactive_modules[ $id ] ) ) {
+		$args['data-wp-router-options'] = '{ "loadOnClientNavigation": true }';
+	}
+		return $args;
+}
+
+add_filter( 'wp_script_module_attributes', 'gutenberg_script_module_add_router_options_attributes', 10, 2 );

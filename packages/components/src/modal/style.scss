@@ -1,3 +1,10 @@
+@use "@wordpress/base-styles/animations" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+@use "../utils/theme-variables" as *;
+
 // The scrim behind the modal window.
 .components-modal__screen-overlay {
 	position: fixed;
@@ -31,10 +38,18 @@
 	overflow: hidden;
 	// Have the content element fill the vertical space yet not overflow.
 	display: flex;
+	color: $gray-900;
 	// Animate the modal frame/contents appearing on the page.
 	animation-name: components-modal__appear-animation;
 	animation-fill-mode: forwards;
 	animation-timing-function: cubic-bezier(0.29, 0, 0, 1);
+
+	// Ensure all headings use the proper editor text color, overriding wp-admin common.css
+	h1,
+	h2,
+	h3 {
+		color: $gray-900;
+	}
 
 	@media not (prefers-reduced-motion) {
 		animation-duration: var(--modal-frame-animation-duration);
@@ -159,7 +174,7 @@
 	flex-grow: 1;
 	display: flex;
 	flex-direction: row;
-	justify-content: left;
+	justify-content: flex-start;
 }
 
 .components-modal__header-icon-container {

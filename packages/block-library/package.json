@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-library",
-	"version": "9.28.0",
+	"version": "9.32.0",
 	"description": "Block library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -24,9 +24,20 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"exports": {
+		".": {
+			"import": "./build-module/index.js",
+			"require": "./build/index.js"
+		},
+		"./babel-plugin": "./babel-plugin.js",
+		"./build-module/*": "./build-module/*",
+		"./build-style/*": "./build-style/*",
+		"./package.json": "./package.json"
+	},
 	"react-native": "src/index",
 	"wpScript": true,
 	"wpScriptModuleExports": {
+		"./accordion/view": "./build-module/accordion/view.js",
 		"./file/view": "./build-module/file/view.js",
 		"./form/view": "./build-module/form/view.js",
 		"./image/view": "./build-module/image/view.js",
@@ -34,16 +45,46 @@
 		"./query/view": "./build-module/query/view.js",
 		"./search/view": "./build-module/search/view.js"
 	},
+	"wpStyleEntryPoints": [
+		"src/*.scss",
+		"src/*/style.scss",
+		"src/*/editor.scss",
+		"src/*/theme.scss"
+	],
+	"wpCopyFiles": {
+		"files": [
+			"src/**/*.php",
+			"src/*/block.json"
+		],
+		"transforms": {
+			"php": {
+				"functionPrefix": "gutenberg_",
+				"classSuffix": "_Gutenberg",
+				"prefixFunctions": [
+					"wp_apply_colors_support",
+					"wp_enqueue_block_support_styles",
+					"wp_get_typography_font_size_value",
+					"wp_style_engine_get_styles",
+					"wp_get_global_settings"
+				],
+				"suffixClasses": [
+					"WP_Navigation_Block_Renderer"
+				],
+				"addActionPriority": 20,
+				"flattenIndexFiles": true
+			}
+		}
+	},
 	"sideEffects": [
 		"build-style/**",
 		"src/**/*.scss",
 		"{src,build,build-module}/*/init.js"
 	],
 	"dependencies": {
-		"@babel/runtime": "7.25.7",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/autop": "file:../autop",
+		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/blob": "file:../blob",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/blocks": "file:../blocks",

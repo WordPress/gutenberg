@@ -15,7 +15,8 @@ import { ValidatedComboboxControl } from '../combobox-control';
 import { formDecorator } from './story-utils';
 
 const meta: Meta< typeof ValidatedComboboxControl > = {
-	title: 'Components (Experimental)/Validated Form Controls/ValidatedComboboxControl',
+	title: 'Components/Selection & Input/Validated Form Controls/ValidatedComboboxControl',
+	id: 'components-validatedcomboboxcontrol',
 	component: ValidatedComboboxControl,
 	tags: [ 'status-private' ],
 	decorators: formDecorator,
@@ -34,6 +35,12 @@ export const Default: StoryObj< typeof ValidatedComboboxControl > = {
 					typeof ValidatedComboboxControl
 				>[ 'value' ]
 			>();
+		const [ customValidity, setCustomValidity ] =
+			useState<
+				React.ComponentProps<
+					typeof ValidatedComboboxControl
+				>[ 'customValidity' ]
+			>( undefined );
 
 		return (
 			<ValidatedComboboxControl
@@ -43,6 +50,17 @@ export const Default: StoryObj< typeof ValidatedComboboxControl > = {
 					setValue( newValue );
 					onChange?.( newValue );
 				} }
+				onValidate={ ( v ) => {
+					if ( v === 'a' ) {
+						setCustomValidity( {
+							type: 'invalid',
+							message: 'Option A is not allowed.',
+						} );
+					} else {
+						setCustomValidity( undefined );
+					}
+				} }
+				customValidity={ customValidity }
 			/>
 		);
 	},
@@ -55,10 +73,4 @@ Default.args = {
 		{ value: 'a', label: 'Option A (not allowed)' },
 		{ value: 'b', label: 'Option B' },
 	],
-	customValidator: ( value ) => {
-		if ( value === 'a' ) {
-			return 'Option A is not allowed.';
-		}
-		return undefined;
-	},
 };

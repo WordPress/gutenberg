@@ -1,42 +1,42 @@
 /**
  * WordPress dependencies
  */
-import { _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
+import { focusCommentThread } from './utils';
 
-/**
- * Renders the UI for adding a comment in the Gutenberg editor's collaboration sidebar.
- *
- * @param {Object}   props                     - The component props.
- * @param {Function} props.onSubmit            - A callback function to be called when the user submits a comment.
- * @param {boolean}  props.showCommentBoard    - The function to edit the comment.
- * @param {Function} props.setShowCommentBoard - The function to delete the comment.
- * @return {React.ReactNode} The rendered comment input UI.
- */
+const { useBlockElement } = unlock( blockEditorPrivateApis );
+
 export function AddComment( {
 	onSubmit,
 	showCommentBoard,
 	setShowCommentBoard,
+	commentSidebarRef,
 } ) {
 	const { clientId, blockCommentId } = useSelect( ( select ) => {
 		const { getSelectedBlock } = select( blockEditorStore );
 		const selectedBlock = getSelectedBlock();
 		return {
 			clientId: selectedBlock?.clientId,
-			blockCommentId: selectedBlock?.attributes?.blockCommentId,
+			blockCommentId: selectedBlock?.attributes?.metadata?.noteId,
 		};
-	} );
+	}, [] );
+	const blockElement = useBlockElement( clientId );
 
 	if ( ! showCommentBoard || ! clientId || undefined !== blockCommentId ) {
 		return null;
@@ -44,20 +44,26 @@ export function AddComment( {
 
 	return (
 		<VStack
+			className="editor-collab-sidebar-panel__thread is-selected"
 			spacing="3"
-			className="editor-collab-sidebar-panel__thread editor-collab-sidebar-panel__active-thread editor-collab-sidebar-panel__focus-thread"
+			tabIndex={ 0 }
+			role="listitem"
 		>
 			<HStack alignment="left" spacing="3">
 				<CommentAuthorInfo />
 			</HStack>
 			<CommentForm
-				onSubmit={ ( inputComment ) => {
-					onSubmit( inputComment );
+				onSubmit={ async ( inputComment ) => {
+					const { id } = await onSubmit( { content: inputComment } );
+					focusCommentThread( id, commentSidebarRef.current );
+					setShowCommentBoard( false );
 				} }
 				onCancel={ () => {
 					setShowCommentBoard( false );
+					blockElement?.focus();
 				} }
-				submitButtonText={ _x( 'Comment', 'Add comment button' ) }
+				submitButtonText={ __( 'Add note' ) }
+				labelText={ __( 'New Note' ) }
 			/>
 		</VStack>
 	);

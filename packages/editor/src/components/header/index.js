@@ -24,6 +24,7 @@ import PostSavedState from '../post-saved-state';
 import PostViewLink from '../post-view-link';
 import PreviewDropdown from '../preview-dropdown';
 import ZoomOutToggle from '../zoom-out-toggle';
+import PostTypeSupportCheck from '../post-type-support-check';
 import { store as editorStore } from '../../store';
 import {
 	TEMPLATE_PART_POST_TYPE,
@@ -31,9 +32,6 @@ import {
 	NAVIGATION_POST_TYPE,
 } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
-
-const isBlockCommentExperimentEnabled =
-	window?.__experimentalEnableBlockComment;
 
 const toolbarVariations = {
 	distractionFreeDisabled: { y: '-50px' },
@@ -196,9 +194,9 @@ function Header( {
 					/>
 				) }
 
-				{ isBlockCommentExperimentEnabled ? (
+				<PostTypeSupportCheck supportKeys="editor.notes">
 					<CollabSidebar />
-				) : undefined }
+				</PostTypeSupportCheck>
 
 				{ customSaveButton }
 				<MoreMenu />

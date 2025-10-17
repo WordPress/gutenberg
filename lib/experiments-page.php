@@ -104,18 +104,6 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-block-comment',
-		__( 'Collaboration: add block level comments', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enables multi-user block level commenting.', 'gutenberg' ),
-			'id'    => 'gutenberg-block-comment',
-		)
-	);
-
-	add_settings_field(
 		'gutenberg-sync-collaboration',
 		__( 'Collaboration: add real time editing', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
@@ -136,18 +124,6 @@ function gutenberg_initialize_experiments_settings() {
 		array(
 			'label' => __( 'Enables the Global Styles color randomizer in the Site Editor; a utility that lets you mix the current color palette pseudo-randomly.', 'gutenberg' ),
 			'id'    => 'gutenberg-color-randomizer',
-		)
-	);
-
-	add_settings_field(
-		'gutenberg-custom-dataviews',
-		__( 'Data Views: add Custom Views', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enables the ability to add, edit, and save custom views when in the Site Editor.', 'gutenberg' ),
-			'id'    => 'gutenberg-custom-dataviews',
 		)
 	);
 
@@ -176,18 +152,6 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-editor-write-mode',
-		__( 'Simplified site editing', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enables Write mode in the Site Editor for a simplified editing experience.', 'gutenberg' ),
-			'id'    => 'gutenberg-editor-write-mode',
-		)
-	);
-
-	add_settings_field(
 		'gutenberg-full-page-client-side-navigation',
 		__( 'Interactivity API: Full-page client-side navigation', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
@@ -196,6 +160,18 @@ function gutenberg_initialize_experiments_settings() {
 		array(
 			'label' => __( 'Enables full-page client-side navigation, powered by the Interactivity API.', 'gutenberg' ),
 			'id'    => 'gutenberg-full-page-client-side-navigation',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-content-only-pattern-insertion',
+		__( 'contentOnly: Make patterns contentOnly by default upon insertion', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'When patterns are inserted, default to a simplified content only mode for editing pattern content.', 'gutenberg' ),
+			'id'    => 'gutenberg-content-only-pattern-insertion',
 		)
 	);
 

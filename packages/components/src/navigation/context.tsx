@@ -34,4 +34,7 @@ export const NavigationContext = createContext< NavigationContextType >( {
 		isMenuEmpty: defaultIsEmpty,
 	},
 } );
+
+NavigationContext.displayName = 'NavigationContext';
+
 export const useNavigationContext = () => useContext( NavigationContext );

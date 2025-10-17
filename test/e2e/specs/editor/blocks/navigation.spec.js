@@ -4,36 +4,8 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Navigation block', () => {
-	test.beforeEach( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllMenus();
-	} );
-
-	test.beforeAll( async ( { requestUtils } ) => {
-		// We need pages to be published so the Link Control can return pages
-		await requestUtils.createPage( {
-			title: 'Cat',
-			status: 'publish',
-		} );
-		await requestUtils.createPage( {
-			title: 'Dog',
-			status: 'publish',
-		} );
-		await requestUtils.createPage( {
-			title: 'Walrus',
-			status: 'publish',
-		} );
-	} );
-
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMenus();
-	} );
-
-	test.afterEach( async ( { requestUtils } ) => {
-		await Promise.all( [
-			requestUtils.deleteAllPosts(),
-			requestUtils.deleteAllPages(),
-			requestUtils.deleteAllMenus(),
-		] );
 	} );
 
 	test.use( {
@@ -43,6 +15,14 @@ test.describe( 'Navigation block', () => {
 	} );
 
 	test.describe( 'As a user I want the navigation block to fallback to the best possible default', () => {
+		test.afterEach( async ( { requestUtils } ) => {
+			await Promise.all( [
+				requestUtils.deleteAllPosts(),
+				requestUtils.deleteAllPages(),
+				requestUtils.deleteAllMenus(),
+			] );
+		} );
+
 		test( 'default to a list of pages if there are no menus', async ( {
 			admin,
 			editor,
@@ -316,6 +296,22 @@ test.describe( 'Navigation block', () => {
 	} );
 
 	test.describe( 'Focus management', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			// We need pages to be published so the Link Control can return pages
+			await requestUtils.createPage( {
+				title: 'Cat',
+				status: 'publish',
+			} );
+			await requestUtils.createPage( {
+				title: 'Dog',
+				status: 'publish',
+			} );
+			await requestUtils.createPage( {
+				title: 'Walrus',
+				status: 'publish',
+			} );
+		} );
+
 		test.beforeEach(
 			async ( { admin, editor, requestUtils, navigation } ) => {
 				await admin.createNewPost();
@@ -333,76 +329,68 @@ test.describe( 'Navigation block', () => {
 			}
 		);
 
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllMenus();
+		} );
+
 		test( 'Focus management when using the navigation link appender', async ( {
 			pageUtils,
 			navigation,
-		} ) => {
-			const navBlock = navigation.getNavBlock();
-
-			/**
-			 * Test: We don't lose focus when using the navigation link appender
-			 */
-			await pageUtils.pressKeys( 'ArrowDown' );
-			await navigation.useBlockInserter();
-			await navigation.addLinkClose();
-
-			/**
-			 * TODO: This is not desired behavior. Ideally the
-			 * Appender should be focused again since it opened
-			 * the link control.
-			 * IMPORTANT: This check is not to enforce this behavior,
-			 * but to make sure focus is kept nearby until we are able
-			 * to send focus to the appender.
-			 */
-			await expect( navBlock ).toBeFocused();
-		} );
-
-		// eslint-disable-next-line playwright/expect-expect
-		test( 'Focus management when creating navigation links', async ( {
 			page,
-			pageUtils,
-			navigation,
 		} ) => {
-			/**
-			 * Test: Creating a link sends focus to the newly created navigation link item
-			 */
-			await pageUtils.pressKeys( 'ArrowDown' );
-			await navigation.useBlockInserter();
-			await navigation.addPage( 'Cat' );
+			const navBlockInserter = navigation.getNavBlockInserter();
 
-			/**
-			 * Test: We can open and close the preview with the keyboard and escape
-			 *       buttons from a top-level nav item using both the shortcut and toolbar
-			 */
-			await navigation.useLinkShortcut();
-			await navigation.previewIsOpenAndCloses();
-			await navigation.checkLabelFocus( 'Cat' );
+			await test.step( 'with no links, focus returns to the top level navigation link appender if we close the Link UI without creating a link', async () => {
+				await pageUtils.pressKeys( 'ArrowDown' );
+				await navigation.useBlockInserter();
+				await navigation.addLinkClose();
 
-			await navigation.canUseToolbarLink();
+				await expect( navBlockInserter ).toBeVisible();
+				await expect( navBlockInserter ).toBeFocused();
+			} );
 
-			/**
-			 * Test: Creating a link from a url-string (https://www.example.com) returns
-			 *       focus to the newly created link with the text selected
-			 */
-			await page.keyboard.press( 'Escape' );
+			await test.step( 'creating a link sends focus to the newly created navigation link item', async () => {
+				await pageUtils.pressKeys( 'ArrowDown' );
+				await navigation.useBlockInserter();
+				await navigation.addPage( 'Cat' );
+			} );
+
+			await test.step( 'can use the shortcut to open the preview with the keyboard and escape keypress sends focus back to the navigation link block', async () => {
+				await navigation.useLinkShortcut();
+				await navigation.previewIsOpenAndCloses();
+				await navigation.checkLabelFocus( 'Cat' );
+			} );
+
+			await test.step( 'can use the toolbar link to open the preview and escape keypress sends focus back to the toolbar link button', async () => {
+				await navigation.canUseToolbarLink();
+
+				await page.keyboard.press( 'Escape' );
+			} );
+
 			await pageUtils.pressKeys( 'ArrowDown' );
 			await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
 
-			await navigation.useBlockInserter();
-			await navigation.addCustomURL( 'https://example.com' );
-			await navigation.expectToHaveTextSelected( 'example.com' );
+			await test.step( 'focus returns to the navigation link appender if we close the Link UI without creating a link', async () => {
+				await navigation.useBlockInserter();
+				await navigation.addLinkClose();
+				await expect( navBlockInserter ).toBeVisible();
+				await expect( navBlockInserter ).toBeFocused();
+			} );
 
-			/**
-			 * Test: We can open and close the preview with the keyboard and escape
-			 *       buttons from a top-level nav link with a url-like label using
-			 *       both the shortcut and toolbar
-			 */
-			await pageUtils.pressKeys( 'ArrowLeft' );
-			await navigation.useLinkShortcut();
-			await navigation.previewIsOpenAndCloses();
-			await navigation.checkLabelFocus( 'example.com' );
+			await test.step( 'creating a link from a url-string (https://www.example.com) returns focus to the newly created link with the text selected', async () => {
+				await navigation.useBlockInserter();
+				await navigation.addCustomURL( 'https://example.com' );
+				await navigation.expectToHaveTextSelected( 'example.com' );
+			} );
 
-			await navigation.canUseToolbarLink();
+			await test.step( 'we can open and close the preview with the keyboard and escape buttons from a top-level nav link with a url-like label using both the shortcut and toolbar', async () => {
+				await pageUtils.pressKeys( 'ArrowLeft' );
+				await navigation.useLinkShortcut();
+				await navigation.previewIsOpenAndCloses();
+				await navigation.checkLabelFocus( 'example.com' );
+
+				await navigation.canUseToolbarLink();
+			} );
 		} );
 
 		test( 'Can add submenu item using the keyboard', async ( {
@@ -411,61 +399,71 @@ test.describe( 'Navigation block', () => {
 			navigation,
 			page,
 		} ) => {
-			await pageUtils.pressKeys( 'ArrowDown' );
-			await navigation.useBlockInserter();
-			await navigation.addPage( 'Cat' );
+			await test.step( 'create a top level navigation link', async () => {
+				await pageUtils.pressKeys( 'ArrowDown' );
+				await navigation.useBlockInserter();
+				await navigation.addPage( 'Cat' );
+			} );
 
-			/**
-			 * Test: Can add submenu item using the keyboard
-			 */
-			navigation.useToolbarButton( 'Add submenu' );
+			await test.step( 'can add submenu item using the keyboard', async () => {
+				navigation.useToolbarButton( 'Add submenu' );
 
-			// Expect the submenu Add link to be present
-			await expect(
-				editor.canvas.locator( 'a' ).filter( { hasText: 'Add link' } )
-			).toBeVisible();
+				// Expect the submenu Add link to be present
+				await expect(
+					editor.canvas
+						.locator( 'a' )
+						.filter( { hasText: 'Add link' } )
+				).toBeVisible();
 
-			await pageUtils.pressKeys( 'ArrowDown' );
-			// There is a bug that won't allow us to press Enter to add the link: https://github.com/WordPress/gutenberg/issues/60051
-			// TODO: Use Enter after that bug is resolved
-			await navigation.useLinkShortcut();
+				await pageUtils.pressKeys( 'ArrowDown' );
+				// There is a bug that won't allow us to press Enter to add the link: https://github.com/WordPress/gutenberg/issues/60051
+				// TODO: Use Enter after that bug is resolved
+				await navigation.useLinkShortcut();
 
-			await navigation.addPage( 'Dog' );
+				await navigation.addPage( 'Dog' );
+			} );
 
-			/**
-			 * Test: We can open and close the preview with the keyboard and escape
-			 *       buttons from a submenu nav item using both the shortcut and toolbar
-			 */
-			await navigation.useLinkShortcut();
-			await navigation.previewIsOpenAndCloses();
-			await navigation.checkLabelFocus( 'Dog' );
+			await test.step( 'can use the shortcut to open the preview with the keyboard and escape keypress sends focus back to the navigation link block in the submenu', async () => {
+				await navigation.useLinkShortcut();
+				await navigation.previewIsOpenAndCloses();
+				await navigation.checkLabelFocus( 'Dog' );
+			} );
 
-			await navigation.canUseToolbarLink();
+			await test.step( 'can use the toolbar link to open the preview and escape keypress sends focus back to the toolbar link button', async () => {
+				await navigation.canUseToolbarLink();
 
-			// Return to nav label from toolbar
-			await page.keyboard.press( 'Escape' );
+				// Return to nav label from toolbar
+				await page.keyboard.press( 'Escape' );
 
-			// We should be at the first position on the label
-			await navigation.checkLabelFocus( 'Dog' );
+				// We should be at the first position on the label
+				await navigation.checkLabelFocus( 'Dog' );
+			} );
 
-			/**
-			 * Test: We don't lose focus when closing the submenu appender
-			 */
+			await test.step( 'focus returns to the submenu appender when exiting the submenu link creation without creating a link', async () => {
+				// Move focus to the submenu navigation appender
+				await page.keyboard.press( 'End' );
+				await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
 
-			// Move focus to the submenu navigation appender
-			await page.keyboard.press( 'End' );
-			await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
-			await navigation.useBlockInserter();
-			await navigation.addLinkClose();
-			/**
-			 * TODO: This is not desired behavior. Ideally the
-			 * Appender should be focused again since it opened
-			 * the link control.
-			 * IMPORTANT: This check is not to enforce this behavior,
-			 * but to make sure focus is kept nearby until we are able
-			 * to send focus to the appender. It is falling back to the previous sibling.
-			 */
-			await navigation.checkLabelFocus( 'Dog' );
+				await pageUtils.pressKeys( 'ArrowDown' );
+
+				// Use the submenu block inserter
+				const navBlock = navigation.getNavBlock();
+				const submenuBlock = navBlock.getByRole( 'document', {
+					name: 'Block: Submenu',
+				} );
+
+				const submenuBlockInserter =
+					submenuBlock.getByLabel( 'Add block' );
+				await expect( submenuBlockInserter ).toBeVisible();
+				await expect( submenuBlockInserter ).toBeFocused();
+
+				await page.keyboard.press( 'Enter' );
+
+				await navigation.addLinkClose();
+
+				await expect( submenuBlockInserter ).toBeVisible();
+				await expect( submenuBlockInserter ).toBeFocused();
+			} );
 		} );
 
 		test( 'Can add submenu item(custom-link) using the keyboard', async ( {
@@ -598,6 +596,93 @@ test.describe( 'Navigation block', () => {
 			await pageUtils.pressKeys( 'ArrowDown' );
 			await expect( navigation.getNavBlockInserter() ).toBeFocused();
 		} );
+
+		test( 'should preserve focus in sidebar text input when typing (@firefox)', async ( {
+			page,
+			editor,
+			requestUtils,
+			pageUtils,
+		} ) => {
+			// Create a navigation menu with one link
+			const createdMenu = await requestUtils.createNavigationMenu( {
+				title: 'Test Menu',
+				content: `<!-- wp:navigation-link {"label":"Home","url":"https://example.com"} /-->`,
+			} );
+
+			// Insert the navigation block
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: {
+					ref: createdMenu?.id,
+				},
+			} );
+
+			// Click on the navigation link label in the canvas to edit it
+			const linkLabel = editor.canvas.getByRole( 'textbox', {
+				name: 'Navigation link text',
+			} );
+			await linkLabel.click();
+			await pageUtils.pressKeys( 'primary+a' );
+			await page.keyboard.type( 'Updated Home' );
+
+			// Open the document settings sidebar
+			await editor.openDocumentSettingsSidebar();
+
+			// Tab to the sidebar settings panel
+			// First tab should go to the settings sidebar
+			await page.keyboard.press( 'Tab' );
+
+			// Find the text input in the sidebar
+			const textInput = page.getByRole( 'textbox', {
+				name: 'Text',
+			} );
+
+			// Tab until we reach the Text field in the sidebar
+			// This may take multiple tabs depending on other controls
+			for ( let i = 0; i < 10; i++ ) {
+				const focusedElement = await page.evaluate( () => {
+					const el = document.activeElement;
+					return {
+						tagName: el?.tagName,
+						label:
+							el?.getAttribute( 'aria-label' ) ||
+							el?.labels?.[ 0 ]?.textContent,
+						id: el?.id,
+					};
+				} );
+
+				if (
+					focusedElement.label?.includes( 'Text' ) &&
+					focusedElement.tagName === 'INPUT'
+				) {
+					break;
+				}
+
+				await page.keyboard.press( 'Tab' );
+			}
+
+			await expect( textInput ).toBeFocused();
+			await pageUtils.pressKeys( 'ArrowRight' );
+			// Type in the sidebar text input
+			await page.keyboard.type( ' Extra' );
+
+			// Verify the text was actually typed (change happened)
+			await expect( textInput ).toHaveValue( 'Updated Home Extra' );
+
+			// Tab again to move to the next field
+			await page.keyboard.press( 'Tab' );
+
+			// Check that focus is still within the document sidebar
+			const focusIsInSidebar = await page.evaluate( () => {
+				const activeEl = document.activeElement;
+				const sidebar = document.querySelector(
+					'.interface-interface-skeleton__sidebar'
+				);
+				return sidebar?.contains( activeEl );
+			} );
+
+			expect( focusIsInSidebar ).toBe( true );
+		} );
 	} );
 
 	test( 'Adding new links to a navigation block with existing inner blocks triggers creation of a single Navigation Menu', async ( {
@@ -663,6 +748,483 @@ test.describe( 'Navigation block', () => {
 			} )
 		).toHaveLength( 1 );
 	} );
+
+	test.describe( 'Navigation Link Entity bindings', () => {
+		// eslint-disable-next-line no-unused-vars
+		let testPage1, testPage2, testPage3;
+
+		test.beforeEach( async ( { admin, page, requestUtils } ) => {
+			// Enable pretty permalinks by navigating to Settings > Permalinks
+			// TODO: Encapsulate permalink setup in an admin.setPermalinks( '/%postname%/' ) style util
+			// We need to run this in beforeEach instead of beforeAll since we don't have page context
+			// in beforeAll
+			await admin.visitAdminPage( 'options-permalink.php' );
+
+			// Select the Post name permalink structure (/%postname%/)
+			await page.click( '#permalink-input-post-name' );
+
+			// Click Save Changes
+			await page.click( '#submit' );
+
+			// Wait for settings to be saved
+			await page.waitForSelector( '.notice-success' );
+
+			// Force re-discovery of REST API root URL after enabling pretty permalinks.
+			// When permalinks change from plain to pretty, the REST API URL changes
+			// from /?rest_route=/ to /wp-json/. We need to refresh the cached URL
+			// to prevent 404 errors.
+			await requestUtils.setupRest();
+
+			// Create test pages
+			testPage1 = await requestUtils.createPage( {
+				title: 'Test Page 1',
+				status: 'publish',
+			} );
+
+			testPage2 = await requestUtils.createPage( {
+				title: 'Test Page 2',
+				status: 'publish',
+			} );
+
+			testPage3 = await requestUtils.createPage( {
+				title: 'Test Page 3',
+				status: 'publish',
+			} );
+		} );
+
+		test.afterEach( async ( { admin, page, requestUtils } ) => {
+			await requestUtils.deleteAllPages();
+
+			// Restore plain permalinks
+			// TODO: Encapsulate permalink teardown in an admin.setPermalinks( '' ) style util
+			// We need to run this in afterEach instead of afterAll since we don't have page context
+			// in afterAll
+			await admin.visitAdminPage( 'options-permalink.php' );
+
+			// Select Plain permalinks
+			await page.click( '#permalink-input-plain' );
+
+			// Click Save Changes
+			await page.click( '#submit' );
+
+			// Wait for settings to be saved
+			await page.waitForSelector( '.notice-success' );
+
+			// Force re-discovery of REST API root URL after disabling pretty permalinks.
+			// When permalinks change from pretty to plain, the REST API URL changes
+			// from /wp-json/ back to /?rest_route=/. We need to refresh the cached URL
+			// to prevent 404 errors.
+			await requestUtils.setupRest();
+		} );
+
+		test( 'can bind to a page', async ( {
+			editor,
+			page,
+			admin,
+			navigation,
+			requestUtils,
+			pageUtils,
+		} ) => {
+			let postId, updatedPage;
+
+			await test.step( 'Setup - Create menu and navigation block with bound page link', async () => {
+				await admin.createNewPost();
+
+				// create an empty menu for use - avoids Page List block
+				const menu = await requestUtils.createNavigationMenu( {
+					title: 'Test Menu',
+					content: '',
+				} );
+
+				await editor.insertBlock( {
+					name: 'core/navigation',
+					attributes: {
+						ref: menu.id,
+					},
+				} );
+
+				// Insert a link to a Page
+				await expect( navigation.getNavBlockInserter() ).toBeVisible();
+				await pageUtils.pressKeys( 'ArrowDown' );
+				await navigation.useBlockInserter();
+				await navigation.addPage( 'Test Page 1' );
+			} );
+
+			await test.step( 'Verify bound link displays correctly in Link UI popover', async () => {
+				// Open Link UI via keyboard shortcut
+				await pageUtils.pressKeys( 'primary+k' );
+
+				const linkPopover = navigation.getLinkPopover();
+				await expect( linkPopover ).toBeVisible();
+
+				// Click Edit button to see form fields
+				await linkPopover
+					.getByRole( 'button', { name: 'Edit' } )
+					.click();
+
+				// Check Link field is disabled with correct URL
+				const linkInput = linkPopover.getByRole( 'combobox', {
+					name: 'Link',
+				} );
+				await expect( linkInput ).toBeDisabled();
+				await expect( linkInput ).toHaveValue( testPage1.link );
+
+				// Check help text
+				await expect(
+					linkPopover.getByText( 'Synced with the selected page.' )
+				).toBeVisible();
+
+				// Close Link UI
+				await page.keyboard.press( 'Escape' );
+				await expect( linkPopover ).toBeHidden();
+			} );
+
+			await test.step( 'Verify bound link displays correctly in sidebar', async () => {
+				// Check the Inspector controls for the Nav Link block
+				// to verify the Link field is:
+				// - disabled
+				// - has the correct URL matching the page URL
+				// - has the correct help text (description)
+				await editor.openDocumentSettingsSidebar();
+				const settingsControls = page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'tabpanel', { name: 'Settings' } );
+
+				await expect( settingsControls ).toBeVisible();
+
+				const linkInput = settingsControls.getByRole( 'textbox', {
+					name: 'Link',
+					description: 'Synced with the selected page',
+				} );
+
+				await expect( linkInput ).toBeDisabled();
+				await expect( linkInput ).toHaveValue( testPage1.link );
+			} );
+
+			await test.step( 'Verify bound link works correctly on frontend', async () => {
+				// Save the Post and check frontend
+				postId = await editor.publishPost();
+
+				// Navigate to the frontend post page
+				await page.goto( `/?p=${ postId }` );
+
+				// Verify the navigation link on the frontend has the correct URL
+				const frontendLink = page.getByRole( 'link', {
+					name: 'Test Page 1',
+				} );
+				await expect( frontendLink ).toHaveAttribute(
+					'href',
+					testPage1.link
+				);
+			} );
+
+			await test.step( 'Update page slug and verify frontend reflects change', async () => {
+				const updatedPageSlug = 'page-1-changed';
+				// Update the page slug via REST API
+				updatedPage = await requestUtils.rest( {
+					method: 'PUT',
+					path: `/wp/v2/pages/${ testPage1.id }`,
+					data: {
+						slug: updatedPageSlug,
+					},
+				} );
+
+				expect( updatedPage.link ).toContain( `/${ updatedPageSlug }` );
+
+				// Check that the frontend immediately shows the updated URL
+				await page.goto( `/?p=${ postId }` );
+
+				const updatedFrontendLink = page.getByRole( 'link', {
+					name: 'Test Page 1',
+				} );
+				await expect( updatedFrontendLink ).toHaveAttribute(
+					'href',
+					updatedPage.link
+				);
+
+				// Verify the link goes to the correct page
+				await updatedFrontendLink.click();
+				await expect( page ).toHaveURL( updatedPage.link );
+
+				// Verify the page content is correct
+				await expect(
+					page.getByRole( 'heading', { name: 'Test Page 1' } )
+				).toBeVisible();
+			} );
+
+			await test.step( 'Verify editor sidebar reflects updated page URL', async () => {
+				// Now check that the editor also shows the updated URL
+				await admin.editPost( postId );
+
+				// Wait for and select the Navigation block first
+				const navBlock = navigation.getNavBlock();
+				await expect( navBlock ).toBeVisible();
+				await editor.selectBlocks( navBlock );
+
+				// Then select the Navigation Link block
+				const navLinkBlock = navBlock
+					.getByRole( 'document', {
+						name: 'Block: Page Link',
+					} )
+					.first(); // there is a draggable ghost block so we need to select the actual block!
+
+				await expect( navLinkBlock ).toBeVisible( {
+					// Wait for the Navigation Link block to be available
+					timeout: 1000,
+				} );
+				await editor.selectBlocks( navLinkBlock );
+
+				// Check that the link input now shows the updated URL
+				await editor.openDocumentSettingsSidebar();
+				const updatedLinkInput = page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'tabpanel', { name: 'Settings' } )
+					.getByRole( 'textbox', {
+						name: 'Link',
+						description: 'Synced with the selected page',
+					} );
+
+				await expect( updatedLinkInput ).toHaveValue(
+					updatedPage.link
+				);
+			} );
+
+			await test.step( 'Verify Link UI popover also reflects updated page URL', async () => {
+				// Open Link UI via keyboard shortcut
+				await pageUtils.pressKeys( 'primary+k' );
+
+				const linkPopover = navigation.getLinkPopover();
+				await expect( linkPopover ).toBeVisible();
+
+				// Click Edit button to see form fields
+				await linkPopover
+					.getByRole( 'button', { name: 'Edit' } )
+					.click();
+
+				// Check Link field shows updated URL
+				const linkInput = linkPopover.getByRole( 'combobox', {
+					name: 'Link',
+				} );
+				await expect( linkInput ).toBeDisabled();
+				await expect( linkInput ).toHaveValue( updatedPage.link );
+
+				// Close Link UI
+				await page.keyboard.press( 'Escape' );
+				await expect( linkPopover ).toBeHidden();
+			} );
+
+			await test.step( 'Verify unsync button works in Link UI popover', async () => {
+				// Open Link UI via keyboard shortcut
+				await pageUtils.pressKeys( 'primary+k' );
+
+				const linkPopover = navigation.getLinkPopover();
+				await expect( linkPopover ).toBeVisible();
+
+				// Click Edit button
+				await linkPopover
+					.getByRole( 'button', { name: 'Edit' } )
+					.click();
+
+				const linkInput = linkPopover.getByRole( 'combobox', {
+					name: 'Link',
+				} );
+
+				// Find and click unsync button
+				const unsyncButton = linkPopover.getByRole( 'button', {
+					name: 'Unsync and edit',
+				} );
+				await unsyncButton.click();
+
+				// Verify Link field becomes enabled
+				await expect( linkInput ).toBeEnabled();
+
+				// Cancel to preserve bound state for sidebar tests
+				await linkPopover
+					.getByRole( 'button', { name: 'Cancel' } )
+					.click();
+
+				// Pressing Escape closes the popover
+				await page.keyboard.press( 'Escape' );
+				await expect( linkPopover ).toBeHidden();
+			} );
+
+			await test.step( 'Verify unsync button works in sidebar', async () => {
+				// Get the sidebar controls
+				const settingsControls = page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'tabpanel', { name: 'Settings' } );
+
+				const linkInput = settingsControls.getByRole( 'textbox', {
+					name: 'Link',
+					description: 'Synced with the selected page',
+				} );
+
+				// Find the button using its name and aria-describedby ID
+				// The button has aria-describedby pointing to the help text element
+				const helpTextId =
+					await linkInput.getAttribute( 'aria-describedby' );
+				const unlinkButton = settingsControls.getByRole( 'button', {
+					name: 'Unsync and edit',
+					description: helpTextId,
+				} );
+				await unlinkButton.click();
+				await expect( linkInput ).toBeEnabled();
+				await expect( linkInput ).toHaveValue( '' );
+			} );
+		} );
+
+		test( 'existing links with id but no binding remain editable', async ( {
+			editor,
+			page,
+			admin,
+			navigation,
+			requestUtils,
+		} ) => {
+			await admin.createNewPost();
+
+			// Create a menu with an existing link that has id but no binding
+			// This simulates existing sites before the binding feature
+			const menu = await requestUtils.createNavigationMenu( {
+				title: 'Test Menu',
+				content: `<!-- wp:navigation-link {"label":"Support","type":"page","id":${ testPage1.id },"url":"${ testPage1.link }","kind":"post-type"} /-->`,
+			} );
+
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: {
+					ref: menu.id,
+				},
+			} );
+
+			// Select the Navigation Link block
+			const navBlock = navigation.getNavBlock();
+			await editor.selectBlocks( navBlock );
+
+			const navLinkBlock = navBlock
+				.getByRole( 'document', {
+					name: 'Block: Page Link',
+				} )
+				.first();
+
+			await editor.selectBlocks( navLinkBlock );
+
+			// Check the Inspector controls for the Nav Link block
+			// to verify the Link field is enabled (not locked in entity mode)
+			await editor.openDocumentSettingsSidebar();
+			const settingsControls = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'tabpanel', { name: 'Settings' } );
+
+			await expect( settingsControls ).toBeVisible();
+
+			const linkInput = settingsControls.getByRole( 'textbox', {
+				name: 'Link',
+			} );
+
+			// For existing links with id but no binding, the input should be enabled
+			await expect( linkInput ).toBeEnabled();
+			await expect( linkInput ).toHaveValue( testPage1.link );
+		} );
+
+		test( 'Page List converts to Navigation Links with entity bindings', async ( {
+			editor,
+			page,
+			admin,
+			requestUtils,
+		} ) => {
+			// Step 1: Create menu with Page List block
+			const menu = await requestUtils.createNavigationMenu( {
+				title: 'Test Menu with Page List',
+				content: '<!-- wp:page-list /-->',
+			} );
+
+			// Step 2: Insert Navigation block
+			await admin.createNewPost();
+
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: {
+					ref: menu.id,
+				},
+			} );
+
+			// Step 3: Verify Page List is present
+			const pageListBlock = editor.canvas.getByRole( 'document', {
+				name: 'Block: Page List',
+			} );
+			await expect( pageListBlock ).toBeVisible();
+
+			// Verify pages are shown in the list
+			const pageItems = pageListBlock.locator( 'li' );
+
+			// Wait for Page List to load pages
+			await pageItems.first().waitFor( { state: 'visible' } );
+			const itemCount = await pageItems.count();
+			expect( itemCount ).toBeGreaterThan( 0 );
+
+			// Step 4: Convert Page List using Edit button
+			// Select the Page List block
+			await editor.selectBlocks( pageListBlock );
+
+			// Try using the toolbar Edit button instead
+			const editButton = page
+				.getByRole( 'button', { name: 'Edit' } )
+				.first();
+			await expect( editButton ).toBeVisible();
+
+			await editButton.click();
+
+			// Wait for modal and approve conversion
+			await expect(
+				page.getByRole( 'dialog', { name: 'Edit Page List' } )
+			).toBeVisible();
+
+			await page.getByRole( 'button', { name: 'Edit' } ).last().click();
+
+			// Wait for conversion - check that Page List is gone
+			await expect( pageListBlock ).toBeHidden();
+
+			// Step 5: Verify conversion to entity links
+
+			// Get Navigation block
+			const navBlock = editor.canvas.getByRole( 'document', {
+				name: 'Block: Navigation',
+			} );
+
+			// Should have Navigation Link blocks
+			const navLinkBlocks = navBlock.getByRole( 'document', {
+				name: 'Block: Page Link',
+			} );
+
+			const linkCount = await navLinkBlocks.count();
+			expect( linkCount ).toBeGreaterThan( 0 );
+
+			// Select first link and verify binding
+			const navLinkBlock = navLinkBlocks.first();
+			await editor.selectBlocks( navLinkBlock );
+
+			// Open sidebar to check Link field
+			await editor.openDocumentSettingsSidebar();
+			const settingsControls = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'tabpanel', { name: 'Settings' } );
+
+			await expect( settingsControls ).toBeVisible();
+
+			// Verify Link field is disabled (indicating binding is active)
+			const linkInput = settingsControls.getByRole( 'textbox', {
+				name: 'Link',
+				description: 'Synced with the selected page',
+			} );
+
+			await expect( linkInput ).toBeDisabled();
+
+			// Verify help text is present
+			await expect(
+				settingsControls.getByText( 'Synced with the selected page.' )
+			).toBeVisible();
+		} );
+	} );
 } );
 
 class Navigation {
@@ -686,7 +1248,7 @@ class Navigation {
 	}
 
 	getNavBlockInserter() {
-		return this.getNavBlock().getByLabel( 'Add block' );
+		return this.getNavBlock().getByLabel( 'Add block' ).first();
 	}
 
 	getLinkControlSearch() {
@@ -750,6 +1312,13 @@ class Navigation {
 		await expect( linkControlSearch ).toBeFocused();
 
 		await this.page.keyboard.type( label, { delay: 50 } );
+
+		// Wait for the search results to be visible
+		await expect(
+			this.page.getByRole( 'listbox', {
+				name: 'Search results',
+			} )
+		).toBeVisible();
 
 		await this.pageUtils.pressKeys( 'ArrowDown' );
 
@@ -831,16 +1400,26 @@ class Navigation {
 	async previewIsOpenAndCloses() {
 		const linkPopover = this.getLinkPopover();
 		await expect( linkPopover ).toBeVisible();
-		// Expect focus to be within the link control. We could be more exact here, but it would be more brittle that way. We really care if focus is within it or not.
-		expect(
-			await this.page.evaluate( () => {
-				const { activeElement } =
-					document.activeElement?.contentDocument ?? document;
-				return !! activeElement.closest(
-					'.components-popover__content .block-editor-link-control'
-				);
-			} )
-		).toBe( true );
+
+		// Wait for focus to be within the link control
+		// We could be more exact here, but it would be more brittle that way. We really care if focus is within it or not.
+		await expect
+			.poll(
+				async () => {
+					return await this.page.evaluate( () => {
+						const { activeElement } =
+							document.activeElement?.contentDocument ?? document;
+						return !! activeElement.closest(
+							'.components-popover__content .block-editor-link-control'
+						);
+					} );
+				},
+				{
+					message: 'Focus should be within the link control',
+					timeout: 500,
+				}
+			)
+			.toBe( true );
 
 		await this.page.keyboard.press( 'Escape' );
 

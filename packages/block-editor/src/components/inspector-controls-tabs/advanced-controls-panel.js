@@ -14,12 +14,17 @@ import {
 	default as InspectorControls,
 	InspectorAdvancedControls,
 } from '../inspector-controls';
+import { PrivateInspectorControlsAllowedBlocks } from '../inspector-controls/groups';
 
 const AdvancedControls = () => {
 	const fills = useSlotFills( InspectorAdvancedControls.slotName );
+	const privateFills = useSlotFills(
+		PrivateInspectorControlsAllowedBlocks.name
+	);
 	const hasFills = Boolean( fills && fills.length );
+	const hasPrivateFills = Boolean( privateFills && privateFills.length );
 
-	if ( ! hasFills ) {
+	if ( ! hasFills && ! hasPrivateFills ) {
 		return null;
 	}
 
@@ -30,6 +35,7 @@ const AdvancedControls = () => {
 			initialOpen={ false }
 		>
 			<InspectorControls.Slot group="advanced" />
+			<PrivateInspectorControlsAllowedBlocks.Slot />
 		</PanelBody>
 	);
 };

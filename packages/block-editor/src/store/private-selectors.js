@@ -2,6 +2,10 @@
  * WordPress dependencies
  */
 import { createSelector, createRegistrySelector } from '@wordpress/data';
+import {
+	hasBlockSupport,
+	privateApis as blocksPrivateApis,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -15,16 +19,16 @@ import {
 	getBlockName,
 	getTemplateLock,
 	getClientIdsWithDescendants,
-	isNavigationMode,
 	getBlockRootClientId,
+	getBlockAttributes,
 } from './selectors';
 import {
 	checkAllowListRecursive,
 	getAllPatternsDependants,
 	getInsertBlockTypeDependants,
 	getGrammar,
+	mapUserPattern,
 } from './utils';
-import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-tab/utils';
 import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
 import {
@@ -32,6 +36,8 @@ import {
 	reusableBlocksSelectKey,
 	sectionRootClientIdKey,
 } from './private-keys';
+
+const { isContentBlock } = unlock( blocksPrivateApis );
 
 export { getBlockSettings } from './get-block-settings';
 
@@ -81,6 +87,32 @@ export const isBlockSubtreeDisabled = ( state, clientId ) => {
 	return getBlockOrder( state, clientId ).every( isChildSubtreeDisabled );
 };
 
+/**
+ * Determines if a container (clientId) allows insertion of blocks, considering contentOnly mode restrictions.
+ *
+ * @param {Object} state        Editor state.
+ * @param {string} blockName    The block name to insert.
+ * @param {string} rootClientId The client ID of the root container block.
+ * @return {boolean} Whether the container allows insertion.
+ */
+export function isContainerInsertableToInWriteMode(
+	state,
+	blockName,
+	rootClientId
+) {
+	const isBlockContentBlock = isContentBlock( blockName );
+	const rootBlockName = getBlockName( state, rootClientId );
+	const isContainerContentBlock = isContentBlock( rootBlockName );
+	const isRootBlockMain = getSectionRootClientId( state ) === rootClientId;
+
+	// In write mode, containers shouldn't be inserted into unless:
+	// 1. they are a section root;
+	// 2. they are a content block and the block to be inserted is also content.
+	return (
+		isRootBlockMain || ( isContainerContentBlock && isBlockContentBlock )
+	);
+}
+
 function getEnabledClientIdsTreeUnmemoized( state, rootClientId ) {
 	const blockOrder = getBlockOrder( state, rootClientId );
 	const result = [];
@@ -109,15 +141,11 @@ function getEnabledClientIdsTreeUnmemoized( state, rootClientId ) {
  *
  * @return {Object[]} Tree of block objects with only clientID and innerBlocks set.
  */
-export const getEnabledClientIdsTree = createRegistrySelector( ( select ) =>
+export const getEnabledClientIdsTree = createRegistrySelector( () =>
 	createSelector( getEnabledClientIdsTreeUnmemoized, ( state ) => [
 		state.blocks.order,
 		state.derivedBlockEditingModes,
-		state.derivedNavModeBlockEditingModes,
 		state.blockEditingModes,
-		state.settings.templateLock,
-		state.blockListSettings,
-		select( STORE_NAME ).__unstableGetEditorMode( state ),
 	] )
 );
 
@@ -321,26 +349,6 @@ export const hasAllowedPatterns = createRegistrySelector( ( select ) =>
 	)
 );
 
-function mapUserPattern(
-	userPattern,
-	__experimentalUserPatternCategories = []
-) {
-	return {
-		name: `core/block/${ userPattern.id }`,
-		id: userPattern.id,
-		type: INSERTER_PATTERN_TYPES.user,
-		title: userPattern.title.raw,
-		categories: userPattern.wp_pattern_category?.map( ( catId ) => {
-			const category = __experimentalUserPatternCategories.find(
-				( { id } ) => id === catId
-			);
-			return category ? category.slug : catId;
-		} ),
-		content: userPattern.content.raw,
-		syncStatus: userPattern.wp_pattern_sync_status,
-	};
-}
-
 export const getPatternBySlug = createRegistrySelector( ( select ) =>
 	createSelector(
 		( state, patternName ) => {
@@ -510,15 +518,15 @@ export function isSectionBlock( state, clientId ) {
 		return true;
 	}
 
-	// Template parts become sections in navigation mode.
-	const _isNavigationMode = isNavigationMode( state );
-	if ( _isNavigationMode && blockName === 'core/template-part' ) {
+	const attributes = getBlockAttributes( state, clientId );
+	const isTemplatePart = blockName === 'core/template-part';
+	if (
+		( attributes?.metadata?.patternName || isTemplatePart ) &&
+		!! window?.__experimentalContentOnlyPatternInsertion
+	) {
 		return true;
 	}
-
-	const sectionRootClientId = getSectionRootClientId( state );
-	const sectionClientIds = getBlockOrder( state, sectionRootClientId );
-	return _isNavigationMode && sectionClientIds.includes( clientId );
+	return false;
 }
 
 /**
@@ -667,4 +675,32 @@ export function getClosestAllowedInsertionPointForPattern(
  */
 export function getInsertionPoint( state ) {
 	return state.insertionPoint;
+}
+
+/**
+ * Returns true if the block is hidden, or false otherwise.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Client ID of the block.
+ *
+ * @return {boolean} Whether the block is hidden.
+ */
+export const isBlockHidden = ( state, clientId ) => {
+	const blockName = getBlockName( state, clientId );
+	if ( ! hasBlockSupport( state, blockName, 'blockVisibility', true ) ) {
+		return false;
+	}
+	const attributes = state.blocks.attributes.get( clientId );
+	return attributes?.metadata?.blockVisibility === false;
+};
+
+/**
+ * Returns true if the current spotlighted block matches the block clientId.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the block is currently spotlighted.
+ */
+export function hasBlockSpotlight( state ) {
+	return !! state.hasBlockSpotlight;
 }

@@ -11,7 +11,7 @@ import { HStack } from '../..';
 
 const meta: Meta< typeof HStack > = {
 	component: HStack,
-	title: 'Components (Experimental)/HStack',
+	title: 'Components/HStack',
 };
 export default meta;
 
