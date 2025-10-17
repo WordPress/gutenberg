@@ -40,7 +40,9 @@ const withPatternOverrideControls = createHigherOrderComponent(
 			( select ) => {
 				const { __experimentalBlockBindingsSupportedAttributes } =
 					select( blockEditorStore ).getSettings();
-				return !! __experimentalBlockBindingsSupportedAttributes?.[ props.name ];
+				return !! __experimentalBlockBindingsSupportedAttributes?.[
+					props.name
+				];
 			},
 			[ props.name ]
 		);
