@@ -8,10 +8,10 @@ export default function RenderFromElements< Item >( {
 	item,
 	field,
 }: DataViewRenderFieldProps< Item > ) {
-	const { elements, isLoading } = useElements(
-		field.elements,
-		field.getElements
-	);
+	const { elements, isLoading } = useElements( {
+		elements: field.elements,
+		getElements: field.getElements,
+	} );
 
 	const value = field.getValue( { item } );
 	if ( isLoading ) {

@@ -481,7 +481,10 @@ export default function Filter( {
 
 	let activeElements: Option[] = [];
 
-	const { elements } = useElements( filter.elements, filter.getElements );
+	const { elements } = useElements( {
+		elements: filter.elements,
+		getElements: filter.getElements,
+	} );
 
 	if ( elements.length > 0 ) {
 		activeElements = elements.filter( ( element ) => {

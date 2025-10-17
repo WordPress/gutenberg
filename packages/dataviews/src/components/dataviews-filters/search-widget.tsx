@@ -335,10 +335,10 @@ function ComboboxList( { view, filter, onChangeView }: SearchWidgetProps ) {
 }
 
 export default function SearchWidget( props: SearchWidgetProps ) {
-	const { elements, isLoading } = useElements(
-		props.filter.elements,
-		props.filter.getElements
-	);
+	const { elements, isLoading } = useElements( {
+		elements: props.filter.elements,
+		getElements: props.filter.getElements,
+	} );
 
 	if ( isLoading ) {
 		return (

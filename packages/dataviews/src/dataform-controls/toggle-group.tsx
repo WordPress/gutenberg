@@ -34,10 +34,10 @@ export default function ToggleGroup< Item >( {
 		[ data, onChange, setValue ]
 	);
 
-	const { elements, isLoading } = useElements(
-		field.elements,
-		field.getElements
-	);
+	const { elements, isLoading } = useElements( {
+		elements: field.elements,
+		getElements: field.getElements,
+	} );
 
 	if ( isLoading ) {
 		return <Spinner />;

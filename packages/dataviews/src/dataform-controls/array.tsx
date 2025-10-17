@@ -24,10 +24,10 @@ export default function ArrayControl< Item >( {
 	const { label, placeholder, getValue, setValue, isValid } = field;
 	const value = getValue( { item: data } );
 
-	const { elements, isLoading } = useElements(
-		field.elements,
-		field.getElements
-	);
+	const { elements, isLoading } = useElements( {
+		elements: field.elements,
+		getElements: field.getElements,
+	} );
 
 	// Convert stored values to element objects for the token field
 	const arrayValueAsElements = useMemo(

@@ -22,10 +22,10 @@ export default function Radio< Item >( {
 	validity,
 }: DataFormControlProps< Item > ) {
 	const { label, description, getValue, setValue, isValid } = field;
-	const { elements, isLoading } = useElements(
-		field.elements,
-		field.getElements
-	);
+	const { elements, isLoading } = useElements( {
+		elements: field.elements,
+		getElements: field.getElements,
+	} );
 	const value = getValue( { item: data } );
 
 	const onChangeControl = useCallback(

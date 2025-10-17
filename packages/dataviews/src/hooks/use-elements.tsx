@@ -10,10 +10,13 @@ import type { Option } from '../types';
 
 const EMPTY_ARRAY: Option[] = [];
 
-export default function useElements(
-	elements?: Option[],
-	getElements?: () => Promise< Option[] >
-) {
+export default function useElements( {
+	elements,
+	getElements,
+}: {
+	elements?: Option[];
+	getElements?: () => Promise< Option[] >;
+} ) {
 	const staticElements =
 		Array.isArray( elements ) && elements.length > 0
 			? elements
