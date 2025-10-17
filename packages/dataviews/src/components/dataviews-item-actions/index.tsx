@@ -186,7 +186,7 @@ export default function ItemActions< Item >( {
 
 	return (
 		<HStack
-			spacing={ 1 }
+			spacing={ 5 }
 			justify="flex-end"
 			className="dataviews-item-actions"
 			style={ {
