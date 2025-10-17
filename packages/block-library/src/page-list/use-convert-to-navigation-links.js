@@ -18,6 +18,7 @@ import { buildNavigationLinkEntityBinding } from '../navigation-link/shared';
  * @return {Array} A nested array of navigation link blocks.
  */
 function createNavigationLinks( pages = [] ) {
+	const POST_TYPE_KIND = 'post-type';
 	const linkMap = {};
 	const navigationLinks = [];
 	pages.forEach( ( { id, title, link: url, type, parent } ) => {
@@ -30,9 +31,10 @@ function createNavigationLinks( pages = [] ) {
 				label: title.rendered,
 				url,
 				type,
-				kind: 'post-type',
+				kind: POST_TYPE_KIND,
 				metadata: {
-					bindings: buildNavigationLinkEntityBinding(),
+					bindings:
+						buildNavigationLinkEntityBinding( POST_TYPE_KIND ),
 				},
 			},
 			innerBlocks

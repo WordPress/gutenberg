@@ -1125,6 +1125,105 @@ test.describe( 'Navigation block', () => {
 			await expect( linkInput ).toBeEnabled();
 			await expect( linkInput ).toHaveValue( testPage1.link );
 		} );
+
+		test( 'Page List converts to Navigation Links with entity bindings', async ( {
+			editor,
+			page,
+			admin,
+			requestUtils,
+		} ) => {
+			// Step 1: Create menu with Page List block
+			const menu = await requestUtils.createNavigationMenu( {
+				title: 'Test Menu with Page List',
+				content: '<!-- wp:page-list /-->',
+			} );
+
+			// Step 2: Insert Navigation block
+			await admin.createNewPost();
+
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: {
+					ref: menu.id,
+				},
+			} );
+
+			// Step 3: Verify Page List is present
+			const pageListBlock = editor.canvas.getByRole( 'document', {
+				name: 'Block: Page List',
+			} );
+			await expect( pageListBlock ).toBeVisible();
+
+			// Verify pages are shown in the list
+			const pageItems = pageListBlock.locator( 'li' );
+
+			// Wait for Page List to load pages
+			await pageItems.first().waitFor( { state: 'visible' } );
+			const itemCount = await pageItems.count();
+			expect( itemCount ).toBeGreaterThan( 0 );
+
+			// Step 4: Convert Page List using Edit button
+			// Select the Page List block
+			await editor.selectBlocks( pageListBlock );
+
+			// Try using the toolbar Edit button instead
+			const editButton = page
+				.getByRole( 'button', { name: 'Edit' } )
+				.first();
+			await expect( editButton ).toBeVisible();
+
+			await editButton.click();
+
+			// Wait for modal and approve conversion
+			await expect(
+				page.getByRole( 'dialog', { name: 'Edit Page List' } )
+			).toBeVisible();
+
+			await page.getByRole( 'button', { name: 'Edit' } ).last().click();
+
+			// Wait for conversion - check that Page List is gone
+			await expect( pageListBlock ).toBeHidden();
+
+			// Step 5: Verify conversion to entity links
+
+			// Get Navigation block
+			const navBlock = editor.canvas.getByRole( 'document', {
+				name: 'Block: Navigation',
+			} );
+
+			// Should have Navigation Link blocks
+			const navLinkBlocks = navBlock.getByRole( 'document', {
+				name: 'Block: Page Link',
+			} );
+
+			const linkCount = await navLinkBlocks.count();
+			expect( linkCount ).toBeGreaterThan( 0 );
+
+			// Select first link and verify binding
+			const navLinkBlock = navLinkBlocks.first();
+			await editor.selectBlocks( navLinkBlock );
+
+			// Open sidebar to check Link field
+			await editor.openDocumentSettingsSidebar();
+			const settingsControls = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'tabpanel', { name: 'Settings' } );
+
+			await expect( settingsControls ).toBeVisible();
+
+			// Verify Link field is disabled (indicating binding is active)
+			const linkInput = settingsControls.getByRole( 'textbox', {
+				name: 'Link',
+				description: 'Synced with the selected page',
+			} );
+
+			await expect( linkInput ).toBeDisabled();
+
+			// Verify help text is present
+			await expect(
+				settingsControls.getByText( 'Synced with the selected page.' )
+			).toBeVisible();
+		} );
 	} );
 } );
 

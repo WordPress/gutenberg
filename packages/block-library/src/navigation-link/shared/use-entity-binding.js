@@ -11,9 +11,12 @@ import { useBlockBindingsUtils } from '@wordpress/block-editor';
  * Using a function instead of a constant allows for future enhancements where the binding
  * might need dynamic data (e.g., entity ID, context-specific arguments).
  *
+ * @param {string} kind - The kind of entity ('post-type' or 'taxonomy')
  * @return {Object} Entity binding configuration object
  */
-export function buildNavigationLinkEntityBinding() {
+export function buildNavigationLinkEntityBinding( kind ) {
+	const source = kind === 'taxonomy' ? 'core/term-data' : 'core/post-data';
+
 	return {
 		url: {
 			source,
@@ -62,12 +65,9 @@ export function useEntityBinding( { clientId, attributes } ) {
 				return;
 			}
 
-			// Default to post-type in case there is a need to support dynamic kinds
-			// in the future.
-			const source =
-				kindToUse === 'taxonomy' ? 'core/term-data' : 'core/post-data';
-
-			updateBlockBindings( buildNavigationLinkEntityBinding() );
+			updateBlockBindings(
+				buildNavigationLinkEntityBinding( kindToUse )
+			);
 		},
 		[ updateBlockBindings, kind, id ]
 	);
