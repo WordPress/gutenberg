@@ -2,14 +2,18 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useBlockProps } from '@wordpress/block-editor';
+import {
+	useBlockProps,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import {
 	TextareaControl,
 	Popover,
 	__experimentalVStack as VStack,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useRef } from '@wordpress/element';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -23,12 +27,23 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 	const [ blockRef, setBlockRef ] = useState();
 	const [ error, setError ] = useState( null );
 	const [ latexToMathML, setLatexToMathML ] = useState();
+	const initialLatex = useRef( attributes.latex );
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 
 	useEffect( () => {
 		import( '@wordpress/latex-to-mathml' ).then( ( module ) => {
 			setLatexToMathML( () => module.default );
+			if ( initialLatex.current ) {
+				__unstableMarkNextChangeAsNotPersistent();
+				setAttributes( {
+					mathML: module.default( initialLatex.current, {
+						displayMode: true,
+					} ),
+				} );
+			}
 		} );
-	}, [] );
+	}, [ initialLatex, setAttributes ] );
 
 	const blockProps = useBlockProps( {
 		ref: setBlockRef,
