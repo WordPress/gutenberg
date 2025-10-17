@@ -49,9 +49,11 @@ export default {
 	},
 	Edit: 'integer',
 	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
-		return field.hasElements
-			? RenderFromElements( { item, field } )
-			: field.getValue( { item } );
+		return field.hasElements ? (
+			<RenderFromElements item={ item } field={ field } />
+		) : (
+			field.getValue( { item } )
+		);
 	},
 	enableSorting: true,
 	filterBy: {

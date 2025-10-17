@@ -52,7 +52,7 @@ export default {
 	Edit: 'checkbox',
 	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
 		if ( field.hasElements ) {
-			return RenderFromElements( { item, field } );
+			return <RenderFromElements item={ item } field={ field } />;
 		}
 
 		if ( field.getValue( { item } ) === true ) {

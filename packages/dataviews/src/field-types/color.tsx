@@ -73,7 +73,7 @@ export default {
 	Edit: 'color',
 	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
 		if ( field.hasElements ) {
-			return RenderFromElements( { item, field } );
+			return <RenderFromElements item={ item } field={ field } />;
 		}
 
 		const value = field.getValue( { item } );

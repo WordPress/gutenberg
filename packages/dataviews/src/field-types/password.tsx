@@ -22,9 +22,11 @@ export default {
 	},
 	Edit: 'password',
 	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
-		return field.hasElements
-			? RenderFromElements( { item, field } )
-			: '••••••••';
+		return field.hasElements ? (
+			<RenderFromElements item={ item } field={ field } />
+		) : (
+			'••••••••'
+		);
 	},
 	enableSorting: false,
 	filterBy: false,
