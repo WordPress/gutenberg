@@ -20,25 +20,37 @@ import { store as editorStore } from '../../store';
 import PostPanelRow from '../post-panel-row';
 
 export default function PostsPerPage() {
-	const { isTemplate, postSlug, templateId, globalPostsPerPage } = useSelect( ( select ) => {
-		const { getEditedPostAttribute, getCurrentPostType } =
-			select( editorStore );
-		const { getEntityRecords, getEditedEntityRecord, canUser } = select( coreStore );
-		const siteSettings = canUser( 'read', {
-			kind: 'root',
-			name: 'site',
-		} )
-			? getEditedEntityRecord( 'root', 'site' )
-			: undefined;
-		const slug = getEditedPostAttribute( 'slug' );
-		return {
-			isTemplate: getCurrentPostType() === TEMPLATE_POST_TYPE,
-			postSlug: slug,
-			templateId: getEntityRecords( 'postType', TEMPLATE_POST_TYPE)?.find( record => record.slug === slug )?.id,
-			globalPostsPerPage: siteSettings?.posts_per_page || 1,
-		};
-	}, [] );
-	const [ postsPerPage, setPostsPerPage ] = useEntityProp( 'postType', TEMPLATE_POST_TYPE, 'posts_per_page', templateId );
+	const { isTemplate, postSlug, templateId, globalPostsPerPage } = useSelect(
+		( select ) => {
+			const { getEditedPostAttribute, getCurrentPostType } =
+				select( editorStore );
+			const { getEntityRecords, getEditedEntityRecord, canUser } =
+				select( coreStore );
+			const siteSettings = canUser( 'read', {
+				kind: 'root',
+				name: 'site',
+			} )
+				? getEditedEntityRecord( 'root', 'site' )
+				: undefined;
+			const slug = getEditedPostAttribute( 'slug' );
+			return {
+				isTemplate: getCurrentPostType() === TEMPLATE_POST_TYPE,
+				postSlug: slug,
+				templateId: getEntityRecords(
+					'postType',
+					TEMPLATE_POST_TYPE
+				)?.find( ( record ) => record.slug === slug )?.id,
+				globalPostsPerPage: siteSettings?.posts_per_page || 1,
+			};
+		},
+		[]
+	);
+	const [ postsPerPage, setPostsPerPage ] = useEntityProp(
+		'postType',
+		TEMPLATE_POST_TYPE,
+		'posts_per_page',
+		templateId
+	);
 
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
@@ -56,16 +68,30 @@ export default function PostsPerPage() {
 		[ popoverAnchor ]
 	);
 
-	if ( ! isTemplate || ! [ 'home', 'index', 'author', 'category', 'tag', 'taxonomy', 'date', 'search', 'archive' ]
-		.some( slug => postSlug === slug || postSlug?.startsWith(slug + '-') ) ) {
+	if (
+		! isTemplate ||
+		! [
+			'home',
+			'index',
+			'author',
+			'category',
+			'tag',
+			'taxonomy',
+			'date',
+			'search',
+			'archive',
+		].some(
+			( slug ) => postSlug === slug || postSlug?.startsWith( slug + '-' )
+		)
+	) {
 		return null;
 	}
 
 	const handleSetPostsPerPage = ( newPostsPerPage ) => {
 		if ( newPostsPerPage ) {
-			newPostsPerPage = Number( newPostsPerPage )
+			newPostsPerPage = Number( newPostsPerPage );
 		}
-		setPostsPerPage(newPostsPerPage);
+		setPostsPerPage( newPostsPerPage );
 	};
 	return (
 		<PostPanelRow label={ __( 'Posts per page' ) } ref={ setPopoverAnchor }>
@@ -81,7 +107,7 @@ export default function PostsPerPage() {
 						aria-label={ __( 'Change posts per page' ) }
 						onClick={ onToggle }
 					>
-						{ postsPerPage || `Default ${globalPostsPerPage}` }
+						{ postsPerPage || `Default ${ globalPostsPerPage }` }
 					</Button>
 				) }
 				renderContent={ ( { onClose } ) => (
@@ -91,7 +117,7 @@ export default function PostsPerPage() {
 							onClose={ onClose }
 						/>
 						<NumberControl
-							placeholder={ `Default ${globalPostsPerPage}` }
+							placeholder={ `Default ${ globalPostsPerPage }` }
 							value={ postsPerPage }
 							size="__unstable-large"
 							spinControls="custom"
