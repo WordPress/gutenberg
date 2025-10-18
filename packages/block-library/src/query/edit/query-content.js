@@ -55,8 +55,12 @@ export default function QueryContent( {
 	} );
 	const { postsPerPage } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		const { getEntityRecord, getEntityRecordEdits, canUser } =
-			select( coreStore );
+		const {
+			getEntityRecord,
+			getEntityRecords,
+			getEntityRecordEdits,
+			canUser,
+		} = select( coreStore );
 		const settingPerPage = canUser( 'read', {
 			kind: 'root',
 			name: 'site',
@@ -70,8 +74,19 @@ export default function QueryContent( {
 		const editedSettingPerPage = +getEntityRecordEdits( 'root', 'site' )
 			?.posts_per_page;
 
+		const template = getEntityRecords( 'postType', 'wp_template' )?.find(
+			( record ) => record.slug === templateSlug
+		);
+		const templatePostsPerPage = template?.posts_per_page;
+		const editedTemplatePostsPerPage = getEntityRecordEdits(
+			'postType',
+			'wp_template',
+			template?.id
+		)?.posts_per_page;
 		return {
 			postsPerPage:
+				editedTemplatePostsPerPage ||
+				templatePostsPerPage ||
 				editedSettingPerPage ||
 				settingPerPage ||
 				DEFAULTS_POSTS_PER_PAGE,
