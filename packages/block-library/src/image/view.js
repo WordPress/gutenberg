@@ -88,7 +88,7 @@ const { state, actions, callbacks } = store(
 			},
 		},
 		actions: {
-			showLightbox: withSyncEvent( () => {
+			showLightbox() {
 				const { imageId } = getContext();
 
 				// Bails out if the image has not loaded yet.
@@ -107,8 +107,8 @@ const { state, actions, callbacks } = store(
 
 				// Computes the styles of the overlay for the animation.
 				callbacks.setOverlayStyles();
-			} ),
-			hideLightbox: withSyncEvent( () => {
+			},
+			hideLightbox() {
 				if ( state.overlayEnabled ) {
 					state.overlayEnabled = false;
 
@@ -129,7 +129,7 @@ const { state, actions, callbacks } = store(
 						state.currentImageId = null;
 					}, 450 );
 				}
-			} ),
+			},
 			handleKeydown: withSyncEvent( ( event ) => {
 				if ( state.overlayEnabled ) {
 					// Focuses the close button when the user presses the tab key.
@@ -155,16 +155,16 @@ const { state, actions, callbacks } = store(
 					event.preventDefault();
 				}
 			} ),
-			handleTouchStart: withSyncEvent( () => {
+			handleTouchStart() {
 				isTouching = true;
-			} ),
-			handleTouchEnd: withSyncEvent( () => {
+			},
+			handleTouchEnd() {
 				// Waits a few milliseconds before resetting to ensure that pinch to
 				// zoom works consistently on mobile devices when the lightbox is open.
 				lastTouchTime = Date.now();
 				isTouching = false;
-			} ),
-			handleScroll: withSyncEvent( () => {
+			},
+			handleScroll() {
 				// Prevents scrolling behaviors that trigger content shift while the
 				// lightbox is open. It would be better to accomplish through CSS alone,
 				// but using overflow: hidden is currently the only way to do so and
@@ -186,10 +186,10 @@ const { state, actions, callbacks } = store(
 						);
 					}
 				}
-			} ),
+			},
 		},
 		callbacks: {
-			setOverlayStyles: withSyncEvent( () => {
+			setOverlayStyles() {
 				if ( ! state.overlayEnabled ) {
 					return;
 				}
@@ -354,8 +354,8 @@ const { state, actions, callbacks } = store(
 						window.innerWidth - document.documentElement.clientWidth
 					}px;
 				`;
-			} ),
-			setButtonStyles: withSyncEvent( () => {
+			},
+			setButtonStyles() {
 				const { imageId } = getContext();
 				const { ref } = getElement();
 
@@ -438,19 +438,19 @@ const { state, actions, callbacks } = store(
 
 				state.metadata[ imageId ].imageButtonTop = imageButtonTop;
 				state.metadata[ imageId ].imageButtonRight = imageButtonRight;
-			} ),
-			setOverlayFocus: withSyncEvent( () => {
+			},
+			setOverlayFocus() {
 				if ( state.overlayEnabled ) {
 					// Moves the focus to the dialog when it opens.
 					const { ref } = getElement();
 					ref.focus();
 				}
-			} ),
-			initTriggerButton: withSyncEvent( () => {
+			},
+			initTriggerButton() {
 				const { imageId } = getContext();
 				const { ref } = getElement();
 				state.metadata[ imageId ].buttonRef = ref;
-			} ),
+			},
 		},
 	},
 	{ lock: true }

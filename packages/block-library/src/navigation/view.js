@@ -60,7 +60,7 @@ const { state, actions } = store(
 			},
 		},
 		actions: {
-			openMenuOnHover: withSyncEvent( () => {
+			openMenuOnHover() {
 				const { type, overlayOpenedBy } = getContext();
 				if (
 					type === 'submenu' &&
@@ -70,8 +70,8 @@ const { state, actions } = store(
 				) {
 					actions.openMenu( 'hover' );
 				}
-			} ),
-			closeMenuOnHover: withSyncEvent( () => {
+			},
+			closeMenuOnHover() {
 				const { type, overlayOpenedBy } = getContext();
 				if (
 					type === 'submenu' &&
@@ -81,21 +81,21 @@ const { state, actions } = store(
 				) {
 					actions.closeMenu( 'hover' );
 				}
-			} ),
-			openMenuOnClick: withSyncEvent( () => {
+			},
+			openMenuOnClick() {
 				const ctx = getContext();
 				const { ref } = getElement();
 				ctx.previousFocus = ref;
 				actions.openMenu( 'click' );
-			} ),
-			closeMenuOnClick: withSyncEvent( () => {
+			},
+			closeMenuOnClick() {
 				actions.closeMenu( 'click' );
 				actions.closeMenu( 'focus' );
-			} ),
-			openMenuOnFocus: withSyncEvent( () => {
+			},
+			openMenuOnFocus() {
 				actions.openMenu( 'focus' );
-			} ),
-			toggleMenuOnClick: withSyncEvent( () => {
+			},
+			toggleMenuOnClick() {
 				const ctx = getContext();
 				const { ref } = getElement();
 				// Safari won't send focus to the clicked element, so we need to manually place it: https://bugs.webkit.org/show_bug.cgi?id=22261
@@ -110,7 +110,7 @@ const { state, actions } = store(
 					ctx.previousFocus = ref;
 					actions.openMenu( 'click' );
 				}
-			} ),
+			},
 			handleMenuKeydown: withSyncEvent( ( event ) => {
 				const { type, firstFocusableElement, lastFocusableElement } =
 					getContext();
