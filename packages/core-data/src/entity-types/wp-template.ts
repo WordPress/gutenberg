@@ -93,6 +93,10 @@ declare module './base-entity-records' {
 			 * The date the template was last modified, in the site's timezone.
 			 */
 			modified: ContextualField< string, 'view' | 'edit', C >;
+			/**
+			 * Blog pages show at most.
+			 */
+			posts_per_page: number;
 		}
 	}
 }
