@@ -38,7 +38,7 @@ const transforms = {
 					{},
 					// Loop the selected buttons.
 					buttons.map( ( attributes ) => {
-						const { content } = attributes;
+						const { content, metadata } = attributes;
 						const element = createElement( document, content );
 						// Remove any HTML tags.
 						const text = element.innerText || '';
@@ -54,6 +54,7 @@ const transforms = {
 									text: contentBinding,
 								} )
 							),
+							metadata,
 							text,
 							url,
 						} );
