@@ -56,7 +56,8 @@ export default function PostsPerPage() {
 		[ popoverAnchor ]
 	);
 
-	if ( ! isTemplate || ! [ 'home', 'index' ].includes( postSlug ) ) {
+	if ( ! isTemplate || ! [ 'home', 'index', 'author', 'category', 'tag', 'taxonomy', 'date', 'search', 'archive' ]
+		.some( slug => postSlug === slug || postSlug?.startsWith(slug + '-') ) ) {
 		return null;
 	}
 
