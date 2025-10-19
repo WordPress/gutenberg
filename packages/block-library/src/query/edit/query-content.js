@@ -14,6 +14,7 @@ import {
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -55,18 +56,15 @@ export default function QueryContent( {
 	} );
 	const { postsPerPage } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		const {
-			getEntityRecord,
-			getEntityRecords,
-			getEntityRecordEdits,
-			canUser,
-		} = select( coreStore );
+		const { getEntityRecord, getEntityRecordEdits, canUser } =
+			select( coreStore );
 		const settingPerPage = canUser( 'read', {
 			kind: 'root',
 			name: 'site',
 		} )
 			? +getEntityRecord( 'root', 'site' )?.posts_per_page
 			: +getSettings().postsPerPage;
+		const { getCurrentPostId } = select( editorStore );
 
 		// Gets changes made via the template area posts per page setting. These won't be saved
 		// until the page is saved, but we should reflect this setting within the query loops
@@ -74,19 +72,23 @@ export default function QueryContent( {
 		const editedSettingPerPage = +getEntityRecordEdits( 'root', 'site' )
 			?.posts_per_page;
 
-		const template = getEntityRecords( 'postType', 'wp_template' )?.find(
-			( record ) => record.slug === templateSlug
-		);
-		const templatePostsPerPage = template?.posts_per_page;
-		const editedTemplatePostsPerPage = getEntityRecordEdits(
+		const templateId = getCurrentPostId();
+		const templatePerPage = getEntityRecord(
 			'postType',
 			'wp_template',
-			template?.id
+			templateId,
+			{ combinedTemplates: false }
 		)?.posts_per_page;
+		const editedTemplatePerPage = getEntityRecordEdits(
+			'postType',
+			'wp_template',
+			templateId
+		)?.posts_per_page;
+
 		return {
 			postsPerPage:
-				editedTemplatePostsPerPage ||
-				templatePostsPerPage ||
+				editedTemplatePerPage ||
+				templatePerPage ||
 				editedSettingPerPage ||
 				settingPerPage ||
 				DEFAULTS_POSTS_PER_PAGE,

@@ -2,8 +2,8 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
-import { store as coreStore, useEntityProp } from '@wordpress/core-data';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import {
 	Button,
 	Dropdown,
@@ -20,37 +20,51 @@ import { store as editorStore } from '../../store';
 import PostPanelRow from '../post-panel-row';
 
 export default function PostsPerPage() {
-	const { isTemplate, postSlug, templateId, globalPostsPerPage } = useSelect(
-		( select ) => {
-			const { getEditedPostAttribute, getCurrentPostType } =
-				select( editorStore );
-			const { getEntityRecords, getEditedEntityRecord, canUser } =
-				select( coreStore );
-			const siteSettings = canUser( 'read', {
-				kind: 'root',
-				name: 'site',
-			} )
-				? getEditedEntityRecord( 'root', 'site' )
-				: undefined;
-			const slug = getEditedPostAttribute( 'slug' );
-			return {
-				isTemplate: getCurrentPostType() === TEMPLATE_POST_TYPE,
-				postSlug: slug,
-				templateId: getEntityRecords(
-					'postType',
-					TEMPLATE_POST_TYPE
-				)?.find( ( record ) => record.slug === slug )?.id,
-				globalPostsPerPage: siteSettings?.posts_per_page || 1,
-			};
-		},
-		[]
-	);
-	const [ postsPerPage, setPostsPerPage ] = useEntityProp(
-		'postType',
-		TEMPLATE_POST_TYPE,
-		'posts_per_page',
-		templateId
-	);
+	const { editEntityRecord } = useDispatch( coreStore );
+	const {
+		isTemplate,
+		postSlug,
+		templateId,
+		postsPerPage,
+		globalPostsPerPage,
+	} = useSelect( ( select ) => {
+		const { getEditedPostAttribute, getCurrentPostId, getCurrentPostType } =
+			select( editorStore );
+		const {
+			getEntityRecord,
+			getEntityRecordEdits,
+			getEditedEntityRecord,
+			canUser,
+		} = select( coreStore );
+		const siteSettings = canUser( 'read', {
+			kind: 'root',
+			name: 'site',
+		} )
+			? getEditedEntityRecord( 'root', 'site' )
+			: undefined;
+		const slug = getEditedPostAttribute( 'slug' );
+
+		const id = getCurrentPostId();
+		const perPage = getEntityRecord(
+			'postType',
+			TEMPLATE_POST_TYPE,
+			id,
+			{ combinedTemplates: false }
+		)?.posts_per_page;
+		const editedPerPage = getEntityRecordEdits(
+			'postType',
+			TEMPLATE_POST_TYPE,
+			id
+		)?.posts_per_page;
+
+		return {
+			isTemplate: getCurrentPostType() === TEMPLATE_POST_TYPE,
+			postSlug: slug,
+			templateId: id,
+			postsPerPage: editedPerPage || perPage,
+			globalPostsPerPage: siteSettings?.posts_per_page || 1,
+		};
+	}, [] );
 
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
@@ -91,7 +105,9 @@ export default function PostsPerPage() {
 		if ( newPostsPerPage ) {
 			newPostsPerPage = Number( newPostsPerPage );
 		}
-		setPostsPerPage( newPostsPerPage );
+		editEntityRecord( 'postType', TEMPLATE_POST_TYPE, templateId, {
+			posts_per_page: newPostsPerPage,
+		} );
 	};
 	return (
 		<PostPanelRow label={ __( 'Posts per page' ) } ref={ setPopoverAnchor }>
