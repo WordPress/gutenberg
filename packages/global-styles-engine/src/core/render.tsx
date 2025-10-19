@@ -2,16 +2,12 @@
  * WordPress dependencies
  */
 import {
-	// @ts-ignore - WordPress blocks module doesn't have proper types
 	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
-	// @ts-ignore - WordPress blocks module doesn't have proper types
 	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
-	// @ts-ignore - WordPress blocks module doesn't have proper types
 	getBlockSupport,
-	// @ts-ignore - WordPress blocks module doesn't have proper types
 	getBlockTypes,
-	// @ts-ignore - WordPress blocks module doesn't have proper types
 	store as blocksStore,
+	// @ts-expect-error - @wordpress/blocks module doesn't have TypeScript declarations
 } from '@wordpress/blocks';
 import { getCSSRules, getCSSValueFromRawStyle } from '@wordpress/style-engine';
 import { select } from '@wordpress/data';
