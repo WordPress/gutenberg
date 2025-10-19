@@ -2,12 +2,16 @@
  * WordPress dependencies
  */
 import {
-	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
-	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
-	getBlockSupport,
-	getBlockTypes,
-	store as blocksStore,
 	// @ts-ignore - WordPress blocks module doesn't have proper types
+	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
+	// @ts-ignore - WordPress blocks module doesn't have proper types
+	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
+	// @ts-ignore - WordPress blocks module doesn't have proper types
+	getBlockSupport,
+	// @ts-ignore - WordPress blocks module doesn't have proper types
+	getBlockTypes,
+	// @ts-ignore - WordPress blocks module doesn't have proper types
+	store as blocksStore,
 } from '@wordpress/blocks';
 import { getCSSRules, getCSSValueFromRawStyle } from '@wordpress/style-engine';
 import { select } from '@wordpress/data';
@@ -1638,8 +1642,7 @@ export function generateGlobalStyles(
 	const blocks = blockTypes.length > 0 ? blockTypes : getBlockTypes();
 
 	const blockGap = getSetting( config, 'spacing.blockGap' );
-	const hasBlockGapSupport =
-		hasBlockGapSupportOption ?? ( blockGap !== null );
+	const hasBlockGapSupport = hasBlockGapSupportOption ?? blockGap !== null;
 	const hasFallbackGapSupport =
 		hasFallbackGapSupportOption ?? ! hasBlockGapSupport;
 
