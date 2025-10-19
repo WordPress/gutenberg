@@ -854,9 +854,6 @@ export const getNodesWithStyles = (
 										variationName
 								  ]
 								: undefined;
-						if ( ! variationSelector ) {
-							return;
-						}
 
 						// Process the variation's inner element styles.
 						// This comes before the inner block styles so the

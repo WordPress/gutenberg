@@ -159,7 +159,7 @@ export const STYLE_PATH_TO_CSS_VAR_INFIX: Record< string, string > = {
  *
  * @return Scoped selector.
  */
-export function scopeSelector( scope: string, selector: string ) {
+export function scopeSelector( scope: string | undefined, selector: string ) {
 	if ( ! scope || ! selector ) {
 		return selector;
 	}
@@ -200,7 +200,7 @@ export function scopeSelector( scope: string, selector: string ) {
  * @return Scoped collection of feature selectors.
  */
 export function scopeFeatureSelectors(
-	scope: string,
+	scope: string | undefined,
 	selectors: string | Record< string, string | Record< string, string > >
 ) {
 	if ( ! scope || ! selectors ) {
