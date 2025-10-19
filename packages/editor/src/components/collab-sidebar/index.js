@@ -20,7 +20,6 @@ import {
 	SIDEBARS,
 } from './constants';
 import { Comments } from './comments';
-import { AddComment } from './add-comment';
 import { store as editorStore } from '../../store';
 import AddCommentMenuItem from './comment-menu-item';
 import CommentAvatarIndicator from './comment-indicator-toolbar';
@@ -58,12 +57,6 @@ function CollabSidebarContent( {
 				commentSidebarRef.current = node;
 			} }
 		>
-			<AddComment
-				onSubmit={ onCreate }
-				showCommentBoard={ showCommentBoard }
-				setShowCommentBoard={ setShowCommentBoard }
-				commentSidebarRef={ commentSidebarRef }
-			/>
 			<Comments
 				threads={ comments }
 				onEditComment={ onEdit }

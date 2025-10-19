@@ -35,6 +35,7 @@ import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
 import { getCommentExcerpt, focusCommentThread } from './utils';
 import { useFloatingThread } from './hooks';
+import { AddComment } from './add-comment';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 const { Menu } = unlock( componentsPrivateApis );
@@ -47,6 +48,7 @@ const { Menu } = unlock( componentsPrivateApis );
  * @param {Function} props.onEditComment       - The function to handle comment editing.
  * @param {Function} props.onAddReply          - The function to add a reply to a comment.
  * @param {Function} props.onCommentDelete     - The function to delete a comment.
+ * @param {boolean}  props.showCommentBoard    - Whether to show the comment board.
  * @param {Function} props.setShowCommentBoard - The function to set the comment board visibility.
  * @param {Ref}      props.commentSidebarRef   - The ref to the comment sidebar.
  * @param {Function} props.reflowComments      - The function to call indicating a comment is updated.
@@ -59,6 +61,7 @@ export function Comments( {
 	onEditComment,
 	onAddReply,
 	onCommentDelete,
+	showCommentBoard,
 	setShowCommentBoard,
 	commentSidebarRef,
 	reflowComments,
@@ -252,12 +255,36 @@ export function Comments( {
 				<Text as="p" variant="muted">
 					{ __( 'Only logged in users can see Notes.' ) }
 				</Text>
+				<AddComment
+					onSubmit={ onAddReply }
+					showCommentBoard={ showCommentBoard }
+					setShowCommentBoard={ setShowCommentBoard }
+					commentSidebarRef={ commentSidebarRef }
+					thread={ { blockId: selectedBlockClientId } }
+					calculatedOffset={ 0 }
+					setHeights={ setHeights }
+					setBlockRef={ setBlockRef }
+					selectedThread={ selectedThread }
+					commentLastUpdated={ commentLastUpdated }
+				/>
 			</VStack>
 		);
 	}
 
 	return (
 		<VStack spacing="3">
+			<AddComment
+				onSubmit={ onAddReply }
+				showCommentBoard={ showCommentBoard }
+				setShowCommentBoard={ setShowCommentBoard }
+				commentSidebarRef={ commentSidebarRef }
+				thread={ { blockId: selectedBlockClientId } }
+				calculatedOffset={ 0 }
+				setHeights={ setHeights }
+				setBlockRef={ setBlockRef }
+				selectedThread={ selectedThread }
+				commentLastUpdated={ commentLastUpdated }
+			/>
 			{ threads.map( ( thread ) => (
 				<Thread
 					key={ thread.id }

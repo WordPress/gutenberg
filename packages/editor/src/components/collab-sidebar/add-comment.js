@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -19,6 +24,7 @@ import { unlock } from '../../lock-unlock';
 import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
 import { focusCommentThread } from './utils';
+import { useFloatingThread } from './hooks';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
@@ -27,6 +33,13 @@ export function AddComment( {
 	showCommentBoard,
 	setShowCommentBoard,
 	commentSidebarRef,
+	isFloating,
+	thread,
+	calculatedOffset,
+	setHeights,
+	setBlockRef,
+	selectedThread,
+	commentLastUpdated,
 } ) {
 	const { clientId, blockCommentId } = useSelect( ( select ) => {
 		const { getSelectedBlock } = select( blockEditorStore );
@@ -37,17 +50,29 @@ export function AddComment( {
 		};
 	}, [] );
 	const blockElement = useBlockElement( clientId );
-
+	const { y, refs } = useFloatingThread( {
+		thread,
+		calculatedOffset,
+		setHeights,
+		setBlockRef,
+		selectedThread,
+		commentLastUpdated,
+	} );
 	if ( ! showCommentBoard || ! clientId || undefined !== blockCommentId ) {
 		return null;
 	}
 
 	return (
 		<VStack
-			className="editor-collab-sidebar-panel__thread is-selected"
+			className={ clsx( 'editor-collab-sidebar-panel__thread', {
+				'is-selected': true,
+				'is-floating': isFloating,
+			} ) }
 			spacing="3"
 			tabIndex={ 0 }
 			role="listitem"
+			ref={ isFloating ? refs.setFloating : undefined }
+			style={ isFloating ? { top: y } : undefined }
 		>
 			<HStack alignment="left" spacing="3">
 				<CommentAuthorInfo />
