@@ -4,15 +4,12 @@
 import { getBlockTypes, store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { useContext, useMemo } from '@wordpress/element';
+import { toStyles, getBlockSelectors } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
  */
-import {
-	GlobalStylesContext,
-	toStyles,
-	getBlockSelectors,
-} from '../components/global-styles';
+import { GlobalStylesContext } from '../components/global-styles';
 import { usePrivateStyleOverride } from './utils';
 import { getValueFromObjectPath } from '../utils/object';
 import { store as blockEditorStore } from '../store';

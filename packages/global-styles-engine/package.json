@@ -1,0 +1,49 @@
+{
+	"name": "@wordpress/global-styles-engine",
+	"version": "1.0.0",
+	"description": "Pure CSS generation engine for WordPress global styles.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"global styles"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/patterns/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/global-styles-engine"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.js",
+			"require": "./build/index.js"
+		},
+		"./package.json": "./package.json"
+	},
+	"types": "build-types/index.d.ts",
+	"sideEffects": false,
+	"dependencies": {
+		"@wordpress/blocks": "file:../blocks",
+		"@wordpress/data": "file:../data",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/style-engine": "file:../style-engine",
+		"colord": "^2.9.2",
+		"deepmerge": "^4.3.0",
+		"is-plain-object": "^5.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}
