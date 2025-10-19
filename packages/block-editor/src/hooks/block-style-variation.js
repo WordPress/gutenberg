@@ -124,7 +124,6 @@ export function __unstableBlockStyleVariationOverridesWithConfig( { config } ) {
 					};
 					const blockSelectors = getBlockSelectors(
 						getBlockTypes(),
-						getBlockStyles,
 						override.clientId
 					);
 					const hasBlockGapSupport = false;
@@ -319,11 +318,7 @@ function useBlockProps( { name, className, clientId } ) {
 		}
 
 		const variationConfig = { settings, styles };
-		const blockSelectors = getBlockSelectors(
-			getBlockTypes(),
-			getBlockStyles,
-			clientId
-		);
+		const blockSelectors = getBlockSelectors( getBlockTypes(), clientId );
 		const hasBlockGapSupport = false;
 		const hasFallbackGapSupport = true;
 		const disableLayoutStyles = true;
@@ -346,7 +341,7 @@ function useBlockProps( { name, className, clientId } ) {
 				variationStyles: true,
 			}
 		);
-	}, [ variation, settings, styles, getBlockStyles, clientId ] );
+	}, [ variation, settings, styles, clientId ] );
 
 	usePrivateStyleOverride( {
 		id: `variation-${ clientId }`,
