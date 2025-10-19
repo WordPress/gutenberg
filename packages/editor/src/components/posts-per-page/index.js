@@ -45,12 +45,9 @@ export default function PostsPerPage() {
 		const slug = getEditedPostAttribute( 'slug' );
 
 		const id = getCurrentPostId();
-		const perPage = getEntityRecord(
-			'postType',
-			TEMPLATE_POST_TYPE,
-			id,
-			{ combinedTemplates: false }
-		)?.posts_per_page;
+		const perPage = getEntityRecord( 'postType', TEMPLATE_POST_TYPE, id, {
+			combinedTemplates: false,
+		} )?.posts_per_page;
 		const editedPerPage = getEntityRecordEdits(
 			'postType',
 			TEMPLATE_POST_TYPE,
