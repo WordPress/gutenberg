@@ -17,25 +17,14 @@
  * @return string Returns the post breadcrumb for hierarchical post types.
  */
 function render_block_core_breadcrumbs( $attributes, $content, $block ) {
-	// Exclude breadcrumbs from special contexts like archives, search, 404, etc.
+	// Exclude breadcrumbs from special contexts like search, 404, etc.
 	// until they are explicitly supported.
-	if ( is_archive() || is_search() || is_404() || is_home() || is_front_page() ) {
-		return '';
-	}
-	if ( ! isset( $block->context['postId'] ) || ! isset( $block->context['postType'] ) ) {
+	if ( is_search() || is_404() || is_home() || is_front_page() ) {
 		return '';
 	}
 
-	$post_id   = $block->context['postId'];
-	$post_type = $block->context['postType'];
-
-	$post = get_post( $post_id );
-	if ( ! $post ) {
-		return '';
-	}
-
-	$type             = $attributes['type'];
 	$breadcrumb_items = array();
+
 	if ( $attributes['showHomeLink'] ) {
 		$breadcrumb_items[] = sprintf(
 			'<a href="%s">%s</a>',
@@ -43,16 +32,41 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 			esc_html__( 'Home' )
 		);
 	}
-	$supported_types = array( 'postWithAncestors', 'postWithTerms' );
-	// If `type` is not set to a specific breadcrumb type, determine it based on the block's default heuristics.
-	$breadcrumbs_type = in_array( $type, $supported_types, true ) ? $type : block_core_breadcrumbs_get_breadcrumbs_type( $post_type );
-	if ( 'postWithAncestors' === $breadcrumbs_type ) {
-		$breadcrumb_items = array_merge( $breadcrumb_items, block_core_breadcrumbs_get_hierarchical_post_type_breadcrumbs( $post_id ) );
+
+	// Handle archive pages (taxonomy, post type, date, author archives).
+	if ( is_archive() ) {
+		$archive_breadcrumbs = block_core_breadcrumbs_get_archive_breadcrumbs();
+		if ( ! empty( $archive_breadcrumbs ) ) {
+			$breadcrumb_items = array_merge( $breadcrumb_items, $archive_breadcrumbs );
+		}
 	} else {
-		$breadcrumb_items = array_merge( $breadcrumb_items, block_core_breadcrumbs_get_terms_breadcrumbs( $post_id, $post_type ) );
+		// Handle single post/page breadcrumbs.
+		if ( ! isset( $block->context['postId'] ) || ! isset( $block->context['postType'] ) ) {
+			return '';
+		}
+
+		$post_id   = $block->context['postId'];
+		$post_type = $block->context['postType'];
+
+		$post = get_post( $post_id );
+		if ( ! $post ) {
+			return '';
+		}
+
+		$breadcrumbs_type = block_core_breadcrumbs_get_breadcrumbs_type( $post_type, $attributes );
+		if ( 'postWithAncestors' === $breadcrumbs_type ) {
+			$breadcrumb_items = array_merge( $breadcrumb_items, block_core_breadcrumbs_get_hierarchical_post_type_breadcrumbs( $post_id ) );
+		} else {
+			$breadcrumb_items = array_merge( $breadcrumb_items, block_core_breadcrumbs_get_terms_breadcrumbs( $post_id, $post_type ) );
+		}
+		// Add current post title (not linked).
+		$breadcrumb_items[] = sprintf( '<span aria-current="page">%s</span>', get_the_title( $post ) );
 	}
-	// Add current post title (not linked).
-	$breadcrumb_items[] = sprintf( '<span aria-current="page">%s</span>', get_the_title( $post ) );
+
+	if ( empty( $breadcrumb_items ) ) {
+		return '';
+	}
+
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
 			'style'      => '--separator: "' . addcslashes( $attributes['separator'], '\\"' ) . '";',
@@ -86,8 +100,22 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
  *
  * @return string The breadcrumb type.
  */
-function block_core_breadcrumbs_get_breadcrumbs_type( $post_type ) {
-	return is_post_type_hierarchical( $post_type ) ? 'postWithAncestors' : 'postWithTerms';
+function block_core_breadcrumbs_get_breadcrumbs_type( $post_type, $attributes ) {
+	// Breadcrumbs type for posts can be either 'postWithAncestors' or 'postWithTerms'.
+	// If the post type is not hierarchical, default to 'postWithTerms'.
+	if ( ! is_post_type_hierarchical( $post_type ) ) {
+		return 'postWithTerms';
+	}
+
+	// Hierarchical post type without taxonomies can only use ancestors.
+	if ( empty( get_object_taxonomies( $post_type, 'objects' ) ) ) {
+		return 'postWithAncestors';
+	}
+
+	// For hierarchical post types with taxonomies, use the attribute if valid.
+	$supported_types = array( 'postWithAncestors', 'postWithTerms' );
+	$type            = $attributes['postBreadcrumbsType'];
+	return in_array( $type, $supported_types, true ) ? $type : 'postWithAncestors';
 }
 
 /**
@@ -114,6 +142,125 @@ function block_core_breadcrumbs_get_hierarchical_post_type_breadcrumbs( $post_id
 	return $breadcrumb_items;
 }
 
+
+/**
+ * Generates breadcrumb items for archive pages.
+ *
+ * Handles taxonomy archives, post type archives, date archives, and author archives.
+ * For hierarchical taxonomies, includes ancestor terms in the breadcrumb trail.
+ *
+ * @since 6.9.0
+ *
+ * @return array Array of breadcrumb HTML items.
+ */
+function block_core_breadcrumbs_get_archive_breadcrumbs() {
+	$breadcrumb_items = array();
+
+	// Date archive (check first since it doesn't have a queried object).
+	if ( is_date() ) {
+		$year  = get_query_var( 'year' );
+		$month = get_query_var( 'monthnum' );
+		$day   = get_query_var( 'day' );
+
+		if ( $year ) {
+			if ( $month ) {
+				// Year is linked if we have month.
+				$breadcrumb_items[] = sprintf(
+					'<a href="%s">%s</a>',
+					esc_url( get_year_link( $year ) ),
+					esc_html( $year )
+				);
+
+				if ( $day ) {
+					// Month is linked if we have day.
+					$breadcrumb_items[] = sprintf(
+						'<a href="%s">%s</a>',
+						esc_url( get_month_link( $year, $month ) ),
+						esc_html( date_i18n( 'F', mktime( 0, 0, 0, $month, 1 ) ) )
+					);
+					// Current day.
+					$breadcrumb_items[] = sprintf(
+						'<span aria-current="page">%s</span>',
+						esc_html( $day )
+					);
+				} else {
+					// Current month.
+					$breadcrumb_items[] = sprintf(
+						'<span aria-current="page">%s</span>',
+						esc_html( date_i18n( 'F', mktime( 0, 0, 0, $month, 1 ) ) )
+					);
+				}
+			} else {
+				// Current year only.
+				$breadcrumb_items[] = sprintf(
+					'<span aria-current="page">%s</span>',
+					esc_html( $year )
+				);
+			}
+		}
+
+		return $breadcrumb_items;
+	}
+
+	// For other archive types, we need a queried object.
+	$queried_object = get_queried_object();
+
+	if ( ! $queried_object ) {
+		return array();
+	}
+
+	// Taxonomy archive (category, tag, custom taxonomy).
+	if ( $queried_object instanceof WP_Term ) {
+		$term     = $queried_object;
+		$taxonomy = $term->taxonomy;
+
+		// Add hierarchical term ancestors if applicable.
+		if ( is_taxonomy_hierarchical( $taxonomy ) ) {
+			$term_ancestors = get_ancestors( $term->term_id, $taxonomy, 'taxonomy' );
+			$term_ancestors = array_reverse( $term_ancestors );
+			foreach ( $term_ancestors as $ancestor_id ) {
+				$ancestor_term = get_term( $ancestor_id, $taxonomy );
+				if ( $ancestor_term && ! is_wp_error( $ancestor_term ) ) {
+					$breadcrumb_items[] = sprintf(
+						'<a href="%s">%s</a>',
+						esc_url( get_term_link( $ancestor_term ) ),
+						esc_html( $ancestor_term->name )
+					);
+				}
+			}
+		}
+
+		// Add current term.
+		$breadcrumb_items[] = sprintf(
+			'<span aria-current="page">%s</span>',
+			esc_html( $term->name )
+		);
+	} elseif ( is_post_type_archive() ) {
+		// Post type archive.
+		$post_type = get_query_var( 'post_type' );
+		if ( is_array( $post_type ) ) {
+			$post_type = reset( $post_type );
+		}
+		$post_type_object = get_post_type_object( $post_type );
+		if ( $post_type_object ) {
+			$breadcrumb_items[] = sprintf(
+				'<span aria-current="page">%s</span>',
+				esc_html( $post_type_object->labels->name )
+			);
+		}
+	} elseif ( is_author() ) {
+		// Author archive.
+		$author = $queried_object;
+		if ( $author instanceof WP_User ) {
+			$breadcrumb_items[] = sprintf(
+				'<span aria-current="page">%s</span>',
+				esc_html( $author->display_name )
+			);
+		}
+	}
+
+	return $breadcrumb_items;
+}
 
 /**
  * Generates breadcrumb items from taxonomy terms.
