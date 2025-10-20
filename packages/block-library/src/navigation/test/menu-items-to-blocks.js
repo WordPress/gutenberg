@@ -441,9 +441,9 @@ describe( 'converting menu items to blocks', () => {
 					metadata: {
 						bindings: {
 							url: {
-								source: 'core/entity',
+								source: 'core/post-data',
 								args: {
-									key: 'url',
+									field: 'link',
 								},
 							},
 						},
@@ -459,9 +459,9 @@ describe( 'converting menu items to blocks', () => {
 					metadata: {
 						bindings: {
 							url: {
-								source: 'core/entity',
+								source: 'core/term-data',
 								args: {
-									key: 'url',
+									field: 'link',
 								},
 							},
 						},
