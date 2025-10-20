@@ -312,30 +312,37 @@ function build_variation_for_navigation_link( $entity, $kind ) {
 	$title       = '';
 	$description = '';
 
-	// Check for generic fallback labels that WordPress auto-generates
-	$is_generic_post_link = false;
-	$is_generic_category_link = false;
-	$is_generic_tag_link = false;
+	// Get the default labels for this entity type to check if current labels are generic
+	$default_labels = null;
+	if ( $entity instanceof WP_Post_Type ) {
+		$default_labels = WP_Post_Type::get_default_labels();
+	} elseif ( $entity instanceof WP_Taxonomy ) {
+		$default_labels = WP_Taxonomy::get_default_labels();
+	}
 
-	if ( property_exists( $entity->labels, 'item_link' ) ) {
+	// Check if the current labels are the default generic ones
+	$is_default_title = false;
+	$is_default_description = false;
+
+	if ( $default_labels && property_exists( $entity->labels, 'item_link' ) ) {
 		$title = $entity->labels->item_link;
-		// Check if this is a generic fallback label
-		$is_generic_post_link = ( $title === __( 'Post Link' ) || $title === 'Post Link' );
-		$is_generic_category_link = ( $title === __( 'Category Link' ) || $title === 'Category Link' );
-		$is_generic_tag_link = ( $title === __( 'Tag Link' ) || $title === 'Tag Link' );
+		// Check if this matches the default labels (array contains both post/page or tag/category variants)
+		$is_default_title = in_array( $title, $default_labels['item_link'], true );
 	}
-	if ( property_exists( $entity->labels, 'item_link_description' ) ) {
+
+	if ( $default_labels && property_exists( $entity->labels, 'item_link_description' ) ) {
 		$description = $entity->labels->item_link_description;
+		// Check if this matches the default labels
+		$is_default_description = in_array( $description, $default_labels['item_link_description'], true );
 	}
 
-
-	// Use custom labels for custom post types/taxonomies that have generic fallback labels
-	// This improves inserter UX by ensuring each variation has a readable, specific label.
-	if ( $is_generic_post_link || $is_generic_category_link || $is_generic_tag_link || '' === $title ) {
+	// Generate custom labels if we have default generic ones or no labels at all
+	if ( $is_default_title || '' === $title ) {
 		$singular = isset( $entity->labels->singular_name ) ? $entity->labels->singular_name : ucfirst( $entity->name );
 		$title    = sprintf( /* translators: %s: Singular label of the entity. */ __( '%s Link' ), $singular );
 	}
-	if ( $is_generic_post_link || $is_generic_category_link || $is_generic_tag_link || '' === $description ) {
+
+	if ( $is_default_description || '' === $description ) {
 		$singular     = isset( $entity->labels->singular_name ) ? $entity->labels->singular_name : ucfirst( $entity->name );
 		$description = sprintf( /* translators: %s: Singular label of the entity. */ __( 'A link to a %s' ), strtolower( $singular ) );
 	}
