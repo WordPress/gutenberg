@@ -5,24 +5,9 @@ import { createBlock, parse } from '@wordpress/blocks';
 import { applyFilters } from '@wordpress/hooks';
 
 /**
- * Builds entity binding configuration for navigation link URLs.
- * This function generates the structure used to bind navigation link URLs to their entity sources.
- *
- * Using a function instead of a constant allows for future enhancements where the binding
- * might need dynamic data (e.g., entity ID, context-specific arguments).
- *
- * @return {Object} Entity binding configuration object
+ * Internal dependencies
  */
-function buildNavigationLinkEntityBinding() {
-	return {
-		url: {
-			source: 'core/entity',
-			args: {
-				key: 'url',
-			},
-		},
-	};
-}
+import { buildNavigationLinkEntityBinding } from '../navigation-link/shared/use-entity-binding';
 
 /**
  * Convert a flat menu item structure to a nested blocks structure.
@@ -165,12 +150,14 @@ function menuItemToBlockAttributes(
 		object = 'tag';
 	}
 
+	const inferredKind = menuItemTypeField?.replace( '_', '-' ) || 'custom';
+
 	return {
 		label: menuItemTitleField?.rendered || '',
 		...( object?.length && {
 			type: object,
 		} ),
-		kind: menuItemTypeField?.replace( '_', '-' ) || 'custom',
+		kind: inferredKind,
 		url: url || '',
 		...( xfn?.length &&
 			xfn.join( ' ' ).trim() && {
@@ -185,10 +172,10 @@ function menuItemToBlockAttributes(
 			title: attr_title,
 		} ),
 		...( object_id &&
-			'custom' !== object && {
+			( inferredKind === 'post-type' || inferredKind === 'taxonomy' ) && {
 				id: object_id,
 				metadata: {
-					bindings: buildNavigationLinkEntityBinding(),
+					bindings: buildNavigationLinkEntityBinding( inferredKind ),
 				},
 			} ),
 		/* eslint-enable camelcase */
