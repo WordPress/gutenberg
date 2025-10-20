@@ -892,7 +892,7 @@ async function compileStyles( packageName ) {
 	const srcDir = path.join( packageDir, 'src' );
 
 	// Process .module.css files and generate JS modules
-	await Promise.all(
+	const cssResults = await Promise.all(
 		cssModuleEntries.map( async ( styleEntryPath ) => {
 			const buildDir = path.join( packageDir, 'build' );
 			const buildModuleDir = path.join( packageDir, 'build-module' );
@@ -936,8 +936,18 @@ async function compileStyles( packageName ) {
 					`export default ${ jsExport };\n`
 				),
 			] );
+
+			// Return the processed CSS for combining
+			return result.css;
 		} )
 	);
+
+	// Generate combined stylesheet from all CSS modules
+	if ( cssResults.length > 0 ) {
+		const combinedCss = cssResults.join( '\n' );
+		await mkdir( buildStyleDir, { recursive: true } );
+		await writeFile( path.join( buildStyleDir, 'style.css' ), combinedCss );
+	}
 
 	// Process SCSS files
 	await Promise.all(
