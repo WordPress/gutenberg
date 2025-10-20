@@ -254,18 +254,24 @@ test.describe( 'Fit Text', () => {
 			const fitTextId = await heading.getAttribute( 'data-fit-text-id' );
 			expect( fitTextId ).toBeTruthy();
 
-			// Verify style element exists for this fit text instance
+			// Verify style element exists for this fit text instance.
 			const styleElement = page.locator(
 				`style#fit-text-${ fitTextId }`
 			);
 			await expect( styleElement ).toBeAttached();
 
-			const fontSize = await heading.evaluate( ( el ) => {
+			const computedFontSize = await heading.evaluate( ( el ) => {
 				return window.getComputedStyle( el ).fontSize;
 			} );
 
-			expect( fontSize ).toBeTruthy();
-			expect( parseFloat( fontSize ) ).toBeGreaterThan( 0 );
+			const styleContent = await styleElement.textContent();
+			const fontSizeMatch = styleContent.match(
+				/font-size:\s*(\d+(?:\.\d+)?)px/
+			);
+			expect( fontSizeMatch ).toBeTruthy();
+			const expectedFontSize = parseFloat( fontSizeMatch[ 1 ] );
+
+			expect( parseFloat( computedFontSize ) ).toBe( expectedFontSize );
 		} );
 
 		test( 'should resize text on window resize on the frontend', async ( {
