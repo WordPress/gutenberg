@@ -157,7 +157,6 @@ jobs:
                   name: build-assets
                   path: |
                       ./build/
-                      ./build-module/
 
     test-php:
         name: PHP ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }}${{ matrix.wordpress != '' && format( ' (WP {0}) ', matrix.wordpress ) || '' }} on Linux
