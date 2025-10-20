@@ -308,16 +308,6 @@ test.describe( 'Fit Text', () => {
 			);
 			await styleElement.waitFor( { state: 'attached' } );
 
-			// Wait for fit text to calculate initially
-			await page.waitForFunction(
-				( styleId ) => {
-					const style = document.getElementById( styleId );
-					return style && style.textContent.trim().length > 0;
-				},
-				`fit-text-${ fitTextId }`,
-				{ timeout: 5000 }
-			);
-
 			const initialFontSize = await heading.evaluate( ( el ) => {
 				return window.getComputedStyle( el ).fontSize;
 			} );
