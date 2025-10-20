@@ -32,7 +32,6 @@ import useCommands from '../commands';
 import BlockRemovalWarnings from '../block-removal-warnings';
 import StartPageOptions from '../start-page-options';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
-import ContentOnlySettingsMenu from '../block-settings-menu/content-only-settings-menu';
 import StartTemplateOptions from '../start-template-options';
 import EditorKeyboardShortcuts from '../global-keyboard-shortcuts';
 import PatternRenameModal from '../pattern-rename-modal';
@@ -373,7 +372,6 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 								<>
 									<PatternsMenuItems />
 									<TemplatePartMenuItems />
-									<ContentOnlySettingsMenu />
 									{ mode === 'template-locked' && (
 										<DisableNonPageContentBlocks />
 									) }
