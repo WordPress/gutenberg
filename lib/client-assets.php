@@ -628,8 +628,10 @@ function gutenberg_default_script_modules() {
 	/*
 	 * Load individual asset files for esbuild-built packages.
 	 * Follows the same pattern as regular scripts in gutenberg_register_packages_scripts().
-	 * Uses RecursiveDirectoryIterator to find all *.min.js files at any nesting depth.
+	 * Uses RecursiveDirectoryIterator to find all *.js files at any nesting depth.
+	 * Only processes files matching the SCRIPT_DEBUG setting (either .js or .min.js).
 	 */
+	$extension        = SCRIPT_DEBUG ? '.js' : '.min.js';
 	$all_assets       = array();
 	$build_module_dir = gutenberg_dir_path() . 'build/modules';
 	if ( is_dir( $build_module_dir ) ) {
@@ -637,9 +639,13 @@ function gutenberg_default_script_modules() {
 			new RecursiveDirectoryIterator( $build_module_dir, RecursiveDirectoryIterator::SKIP_DOTS )
 		);
 		foreach ( $iterator as $file ) {
-			if ( $file->isFile() && preg_match( '/\.min\.js$/', $file->getFilename() ) ) {
-				$path       = $file->getPathname();
-				$asset_file = substr( $path, 0, -3 ) . '.asset.php';
+			if ( $file->isFile() && preg_match( '/\.(min\.)?js$/', $file->getFilename() ) ) {
+				$path = $file->getPathname();
+				if ( ! str_ends_with( $path, $extension ) ) {
+					continue;
+				}
+
+				$asset_file = substr( $path, 0, -strlen( $extension ) ) . '.min.asset.php';
 				if ( ! file_exists( $asset_file ) ) {
 					continue;
 				}
@@ -656,28 +662,10 @@ function gutenberg_default_script_modules() {
 		/*
 		 * Build the WordPress Script Module ID from the file name.
 		 * Prepend `@wordpress/` and remove extensions and `/index` if present:
-		 *   - interactivity/index.min.js  => @wordpress/interactivity
-		 *   - interactivity/debug.min.js  => @wordpress/interactivity/debug
-		 *   - block-library/query/view.js => @wordpress/block-library/query/view
+		 *   - interactivity/index.min.js or interactivity/index.js => @wordpress/interactivity
+		 *   - block-library/query/view.min.js or block-library/query/view.js => @wordpress/block-library/query/view
 		 */
-		$script_module_id = '@wordpress/' . preg_replace( '~(?:/index)?\.min\.js$~D', '', $file_name, 1 );
-		switch ( $script_module_id ) {
-			/*
-			 * Interactivity exposes two entrypoints, "/index" and "/debug".
-			 * "/debug" should replace "/index" in development.
-			 */
-			case '@wordpress/interactivity/debug':
-				if ( ! SCRIPT_DEBUG ) {
-					continue 2;
-				}
-				$script_module_id = '@wordpress/interactivity';
-				break;
-			case '@wordpress/interactivity':
-				if ( SCRIPT_DEBUG ) {
-					continue 2;
-				}
-				break;
-		}
+		$script_module_id = '@wordpress/' . preg_replace( '~(?:/index)?\.(min\.)?js$~D', '', $file_name, 1 );
 
 		/*
 		 * All script modules in Gutenberg are (currently) related to the Interactivity API which prioritizes server-side rendering.
