@@ -48,10 +48,7 @@ const FORM_FIELD_LAYOUTS = [
 			children: React.ReactNode;
 			layout: Layout;
 		} ) => (
-			<VStack
-				className="dataforms-layouts__wrapper"
-				spacing={ ( layout as any )?.spacing ?? 6 }
-			>
+			<VStack className="dataforms-layouts__wrapper" spacing={ 6 }>
 				{ children }
 			</VStack>
 		),
