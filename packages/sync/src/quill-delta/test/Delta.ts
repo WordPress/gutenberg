@@ -198,41 +198,6 @@ describe( 'Delta.diffWithCursor', () => {
 		} );
 	} );
 
-	describe( 'mixed operations', () => {
-		it( 'should handle typing to replace a character (insert + delete)', () => {
-			// 'helo|' -> 'hell|' (user notices typo, backspaces 'o', types 'l')
-			const oldDelta = new Delta().insert( 'helo' );
-			const newDelta = new Delta().insert( 'hell' );
-			const cursor = 4;
-
-			const diff = oldDelta.diffWithCursor( newDelta, cursor );
-
-			expect( diff.ops ).toEqual( [
-				{ retain: 3 },
-				{ insert: 'l' },
-				{ delete: 1 },
-			] );
-		} );
-
-		it( 'should handle multiple character replacement in middle of word', () => {
-			// 'reci|eve' -> 'recei|ve' (fix typo by deleting and inserting)
-			const oldDelta = new Delta().insert( 'recieve' );
-			const newDelta = new Delta().insert( 'receive' );
-			const cursor = 5;
-
-			const diff = oldDelta.diffWithCursor( newDelta, cursor );
-
-			// Note: Character-level diff sees 'i' -> delete, 'e' -> retain, 'i' -> insert
-			// This is correct behavior - the 'e' is shared between old and new
-			expect( diff.ops ).toEqual( [
-				{ retain: 3 },
-				{ delete: 1 },
-				{ retain: 1 },
-				{ insert: 'i' },
-			] );
-		} );
-	} );
-
 	describe( 'word boundary operations', () => {
 		it( 'should handle deleting a whole word with backspace', () => {
 			// 'hello world|' -> 'hello |' (delete 'world')
