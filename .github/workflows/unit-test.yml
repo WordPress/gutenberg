@@ -172,14 +172,16 @@ jobs:
             matrix:
                 php: ${{ github.event_name == 'pull_request' && fromJSON('["8.3"]') || fromJSON('["7.2", "7.3", "7.4", "8.0", "8.1", "8.2", "8.3"]') }}
                 multisite: ${{ github.event_name == 'pull_request' && fromJSON('[false]') || fromJSON('[false, true]') }}
-                wordpress: [''] # Latest WordPress version.
-                include:
-                    # Test with the previous WP version.
-                    - php: '7.2'
+                wordpress: ${{ github.event_name == 'pull_request' && fromJSON('[""]') || fromJSON('["", "previous major version"]') }}
+                exclude:
+                    # On trunk/releases: Only test previous WP version with specific PHP versions.
+                    - php: '7.3'
                       wordpress: 'previous major version'
-                    - php: '7.4'
+                    - php: '8.0'
                       wordpress: 'previous major version'
-                    - php: '8.3'
+                    - php: '8.1'
+                      wordpress: 'previous major version'
+                    - php: '8.2'
                       wordpress: 'previous major version'
 
         env:
