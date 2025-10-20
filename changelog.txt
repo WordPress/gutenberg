@@ -1,5 +1,30 @@
 == Changelog ==
 
+= 21.9.0-rc.2 =
+
+
+## Changelog
+
+### Bug Fixes
+
+- Prevent registering private APIs twice. ([72493](https://github.com/WordPress/gutenberg/pull/72493))
+
+#### Collaboration
+- Notes: Don't render 'no results' message for floating sidebar. ([72484](https://github.com/WordPress/gutenberg/pull/72484))
+
+#### Block bindings
+- Post Date: Add block deprecation to change source arg to field. ([72483](https://github.com/WordPress/gutenberg/pull/72483))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@Mamaduka @oandregal @ockham
+
+
 = 21.9.0-rc.1 =
 
 
