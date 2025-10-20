@@ -1326,8 +1326,14 @@ export function processCSSNesting( css, blockSelector ) {
 
 	// Split CSS nested rules.
 	const parts = css.split( '&' );
+	let unprocessedNestedSelectors = [];
 	parts.forEach( ( part ) => {
 		if ( ! part || part.trim() === '' ) {
+			return;
+		}
+
+		if ( part.trim().endsWith( ',' ) ) {
+			unprocessedNestedSelectors.push( part.trimEnd().slice( 0, -1 ) );
 			return;
 		}
 
@@ -1342,33 +1348,51 @@ export function processCSSNesting( css, blockSelector ) {
 				return;
 			}
 
-			const [ nestedSelector, cssValue ] = splitPart;
+			const [ unprocessedNestedSelector, cssValue ] = splitPart;
+			const nestedSelectors = [
+				...unprocessedNestedSelectors,
+				unprocessedNestedSelector,
+			];
 
-			// Handle pseudo elements such as ::before, ::after, etc. Regex will also
-			// capture any leading combinator such as >, +, or ~, as well as spaces.
-			// This allows pseudo elements as descendants e.g. `.parent ::before`.
-			const matches = nestedSelector.match( /([>+~\s]*::[a-zA-Z-]+)/ );
-			const pseudoPart = matches ? matches[ 1 ] : '';
-			const withoutPseudoElement = matches
-				? nestedSelector.replace( pseudoPart, '' ).trim()
-				: nestedSelector.trim();
+			const finalSelectors = [];
+			nestedSelectors.forEach( ( nestedSelector ) => {
+				// Handle pseudo elements such as ::before, ::after, etc. Regex will also
+				// capture any leading combinator such as >, +, or ~, as well as spaces.
+				// This allows pseudo elements as descendants e.g. `.parent ::before`.
+				const matches = nestedSelector.match(
+					/([>+~\s]*::[a-zA-Z-]+)/
+				);
+				const pseudoPart = matches ? matches[ 1 ] : '';
+				const withoutPseudoElement = matches
+					? nestedSelector.replace( pseudoPart, '' ).trim()
+					: nestedSelector.trim();
 
-			let combinedSelector;
-			if ( withoutPseudoElement === '' ) {
-				// Only contained a pseudo element to use the block selector to form
-				// the final `:root :where()` selector.
-				combinedSelector = blockSelector;
-			} else {
-				// If the nested selector is a descendant of the block scope it with the
-				// block selector. Otherwise append it to the block selector.
-				combinedSelector = nestedSelector.startsWith( ' ' )
-					? scopeSelector( blockSelector, withoutPseudoElement )
-					: appendToSelector( blockSelector, withoutPseudoElement );
-			}
+				let combinedSelector;
+				if ( withoutPseudoElement === '' ) {
+					// Only contained a pseudo element to use the block selector to form
+					// the final `:root :where()` selector.
+					combinedSelector = blockSelector;
+				} else {
+					// If the nested selector is a descendant of the block scope it with the
+					// block selector. Otherwise append it to the block selector.
+					combinedSelector = nestedSelector.startsWith( ' ' )
+						? scopeSelector( blockSelector, withoutPseudoElement )
+						: appendToSelector(
+								blockSelector,
+								withoutPseudoElement
+						  );
+				}
+				finalSelectors.push(
+					`:root :where(${ combinedSelector })${ pseudoPart }`
+				);
+			} );
 
 			// Build final rule, re-adding any pseudo element outside the `:where()`
 			// to maintain valid CSS selector.
-			processedCSS += `:root :where(${ combinedSelector })${ pseudoPart }{${ cssValue.trim() }}`;
+			processedCSS += `${ finalSelectors.join(
+				','
+			) }{${ cssValue.trim() }}`;
+			unprocessedNestedSelectors = [];
 		}
 	} );
 	return processedCSS;

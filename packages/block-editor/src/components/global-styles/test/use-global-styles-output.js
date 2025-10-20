@@ -1127,5 +1127,12 @@ describe( 'global styles renderer', () => {
 				':root :where(.foo, .bar){color: red; margin: auto;}:root :where(.foo.one, .bar.one){color: blue;}:root :where(.foo .two, .bar .two){color: green;}:root :where(.foo, .bar)::before{color: yellow;}:root :where(.foo, .bar) ::before{color: purple;}:root :where(.foo.three, .bar.three)::before{color: orange;}:root :where(.foo .four, .bar .four)::before{color: skyblue;}:root :where(.foo, .bar) > ::before{color: darkseagreen;}'
 			);
 		} );
+		it( 'should return processed CSS with multiple nesetd selectors', () => {
+			expect(
+				processCSSNesting( '&.one, & .two {color: red;}', '.foo' )
+			).toEqual(
+				':root :where(.foo.one),:root :where(.foo .two){color: red;}'
+			);
+		} );
 	} );
 } );

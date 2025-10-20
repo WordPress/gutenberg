@@ -5510,6 +5510,13 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 				'expected' => ':root :where(.foo, .bar){color: red; margin: auto;}:root :where(.foo.one, .bar.one){color: blue;}:root :where(.foo .two, .bar .two){color: green;}:root :where(.foo, .bar)::before{color: yellow;}:root :where(.foo, .bar) ::before{color: purple;}:root :where(.foo.three, .bar.three)::before{color: orange;}:root :where(.foo .four, .bar .four)::before{color: skyblue;}',
 			),
+			'with nested selector list'    => array(
+				'input'    => array(
+					'selector' => '.foo',
+					'css'      => '&.one, & .two {color: red;}',
+				),
+				'expected' => ':root :where(.foo.one),:root :where(.foo .two){color: red;}',
+			),
 		);
 	}
 
