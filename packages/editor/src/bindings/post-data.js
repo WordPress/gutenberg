@@ -107,9 +107,7 @@ export default {
 		const newValues = {};
 		for ( const [ attributeName, source ] of Object.entries( bindings ) ) {
 			// Use the value, the field label, or the field key.
-			const fieldKey = globalThis.IS_GUTENBERG_PLUGIN
-				? source.args.field || source.args.key
-				: source.args.field;
+			const fieldKey = source.args.field;
 			const { value: fieldValue, label: fieldLabel } =
 				dataFields?.[ fieldKey ] || {};
 			newValues[ attributeName ] = fieldValue ?? fieldLabel ?? fieldKey;
