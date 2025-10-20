@@ -79,6 +79,13 @@ const UnforwardedFontSizePicker = (
 	const [ userRequestedCustom, setUserRequestedCustom ] =
 		useState( isCustomValue );
 
+	// Resolve the literal value to use in custom controls when operating in slug mode.
+	// When `valueMode` is 'slug', the `value` prop contains the slug of the
+	// selected preset. In that case, the custom input should reflect the preset's
+	// actual size value so it pre-populates correctly after clicking "Set custom size".
+	const resolvedValueForControls =
+		valueMode === 'slug' ? selectedFontSize?.size : value;
+
 	let currentPickerType;
 	if ( ! disableCustomFontSizes && userRequestedCustom ) {
 		// While showing the custom value picker, switch back to predef only if
@@ -99,10 +106,11 @@ const UnforwardedFontSizePicker = (
 	// operates in a legacy "unitless" mode where UnitControl can only be used
 	// to select px values and onChange() is always called with number values.
 	const hasUnits =
-		typeof value === 'string' || typeof fontSizes[ 0 ]?.size === 'string';
+		typeof resolvedValueForControls === 'string' ||
+		typeof fontSizes[ 0 ]?.size === 'string';
 
 	const [ valueQuantity, valueUnit ] = parseQuantityAndUnitFromRawValue(
-		value,
+		resolvedValueForControls,
 		units
 	);
 	const isValueUnitRelative =
@@ -194,11 +202,21 @@ const UnforwardedFontSizePicker = (
 								label={ __( 'Font size' ) }
 								labelPosition="top"
 								hideLabelFromVision
-								value={ value }
+								value={
+									hasUnits
+										? `${ valueQuantity ?? '' }${
+												valueUnit ?? ''
+										  }`
+										: resolvedValueForControls
+								}
 								onChange={ ( newValue ) => {
 									setUserRequestedCustom( true );
 
-									if ( newValue === undefined ) {
+									// Treat clearing the input (empty string) as a reset
+									if (
+										newValue === undefined ||
+										newValue === ''
+									) {
 										onChange?.( undefined );
 									} else {
 										onChange?.(
