@@ -61,8 +61,7 @@ function PatternOverridesControls( {
 	}
 
 	const hasUnsupportedImageAttributes =
-		blockName === 'core/image' &&
-		( !! attributes.caption?.length || !! attributes.href?.length );
+		blockName === 'core/image' && !! attributes.href?.length;
 
 	const helpText =
 		! hasOverrides && hasUnsupportedImageAttributes
