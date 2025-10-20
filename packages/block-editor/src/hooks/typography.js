@@ -116,11 +116,13 @@ function TypographyInspectorControl( { children, resetAllFilter } ) {
 
 export function TypographyPanel( { clientId, name, setAttributes, settings } ) {
 	function selector( select ) {
-		const { style, fontFamily, fontSize } =
+		const { style, fontFamily, fontSize, fitText } =
 			select( blockEditorStore ).getBlockAttributes( clientId ) || {};
-		return { style, fontFamily, fontSize };
+		return { style, fontFamily, fontSize, fitText };
 	}
-	const { style, fontFamily, fontSize } = useSelect( selector, [ clientId ] );
+	const { style, fontFamily, fontSize, fitText } = useSelect( selector, [
+		clientId,
+	] );
 	const isEnabled = useHasTypographyPanel( settings );
 	const value = useMemo(
 		() => attributesToStyle( { style, fontFamily, fontSize } ),
@@ -148,6 +150,7 @@ export function TypographyPanel( { clientId, name, setAttributes, settings } ) {
 			value={ value }
 			onChange={ onChange }
 			defaultControls={ defaultControls }
+			fitText={ fitText }
 		/>
 	);
 }
