@@ -16,6 +16,7 @@ import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -25,7 +26,6 @@ import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
 import { focusCommentThread } from './utils';
 import { useFloatingThread } from './hooks';
-import { useEffect } from 'react';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
@@ -54,7 +54,7 @@ export function AddComment( {
 	}, [] );
 
 	const blockElement = useBlockElement( clientId );
-	console.log( 'blockElement:', blockElement );
+
 	const { y, refs } = useFloatingThread( {
 		thread,
 		calculatedOffset,
@@ -74,10 +74,6 @@ export function AddComment( {
 	if ( ! showCommentBoard || ! clientId || undefined !== blockCommentId ) {
 		return null;
 	}
-
-
-
-	console.log( { isFloating, thread, refs } );
 
 	return (
 		<VStack
