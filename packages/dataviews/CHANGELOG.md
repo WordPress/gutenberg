@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Consistently use font-weight 499 instead of 500 ([#72473](https://github.com/WordPress/gutenberg/pull/72473)).
+
 ## 10.0.0 (2025-10-17)
 
 ### Bug Fixes
