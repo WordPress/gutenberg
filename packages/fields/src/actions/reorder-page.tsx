@@ -32,6 +32,14 @@ interface Action< Item > {
 	RenderModal: ( props: RenderModalProps< Item > ) => JSX.Element;
 }
 
+function isItemValid( item: BasePost ): boolean {
+	return (
+		typeof item.menu_order === 'number' &&
+		Number.isInteger( item.menu_order ) &&
+		item.menu_order > 0
+	);
+}
+
 function ReorderModal( {
 	items,
 	closeModal,
@@ -43,8 +51,14 @@ function ReorderModal( {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
+	const isValid = isItemValid( item );
+
 	async function onOrder( event: React.FormEvent ) {
 		event.preventDefault();
+
+		if ( ! isValid ) {
+			return;
+		}
 
 		try {
 			await editEntityRecord( 'postType', item.type, item.id, {
@@ -83,11 +97,18 @@ function ReorderModal( {
 					__next40pxDefaultSize
 					label={ __( 'Order' ) }
 					type="number"
-					value={ String( item.menu_order ?? 0 ) }
+					value={
+						typeof item.menu_order === 'number' &&
+						Number.isInteger( item.menu_order )
+							? String( item.menu_order )
+							: ''
+					}
 					onChange={ ( value ) => {
 						setItem( {
 							...item,
-							menu_order: value ? parseInt( value, 10 ) : 0,
+							menu_order: [ undefined, '' ].includes( value )
+								? undefined
+								: parseInt( value as string, 10 ),
 						} );
 					} }
 				/>
@@ -105,6 +126,8 @@ function ReorderModal( {
 						__next40pxDefaultSize
 						variant="primary"
 						type="submit"
+						accessibleWhenDisabled
+						disabled={ ! isValid }
 					>
 						{ __( 'Save' ) }
 					</Button>
