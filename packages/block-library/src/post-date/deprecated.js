@@ -8,6 +8,104 @@ import clsx from 'clsx';
  */
 import migrateFontFamily from '../utils/migrate-font-family';
 
+const v3 = {
+	attributes: {
+		datetime: {
+			type: 'string',
+			role: 'content',
+		},
+		textAlign: {
+			type: 'string',
+		},
+		format: {
+			type: 'string',
+		},
+		isLink: {
+			type: 'boolean',
+			default: false,
+			role: 'content',
+		},
+	},
+	supports: {
+		html: false,
+		color: {
+			gradients: true,
+			link: true,
+			__experimentalDefaultControls: {
+				background: true,
+				text: true,
+				link: true,
+			},
+		},
+		spacing: {
+			margin: true,
+			padding: true,
+		},
+		typography: {
+			fontSize: true,
+			lineHeight: true,
+			__experimentalFontFamily: true,
+			__experimentalFontWeight: true,
+			__experimentalFontStyle: true,
+			__experimentalTextTransform: true,
+			__experimentalTextDecoration: true,
+			__experimentalLetterSpacing: true,
+			__experimentalDefaultControls: {
+				fontSize: true,
+			},
+		},
+		interactivity: {
+			clientNavigation: true,
+		},
+		__experimentalBorder: {
+			radius: true,
+			color: true,
+			width: true,
+			style: true,
+			__experimentalDefaultControls: {
+				radius: true,
+				color: true,
+				width: true,
+				style: true,
+			},
+		},
+	},
+	save() {
+		return null;
+	},
+	migrate( {
+		metadata: {
+			bindings: {
+				datetime: {
+					source,
+					args: { key, ...otherArgs },
+				},
+				...otherBindings
+			},
+			...otherMetadata
+		},
+		...otherAttributes
+	} ) {
+		// Change the block bindings source argument name from "key" to "field".
+		return {
+			metadata: {
+				bindings: {
+					datetime: {
+						source,
+						args: { field: key, ...otherArgs },
+					},
+					...otherBindings,
+				},
+				...otherMetadata,
+			},
+			...otherAttributes,
+		};
+	},
+	isEligible( attributes ) {
+		return !! attributes?.metadata?.bindings?.datetime?.args?.key;
+	},
+};
+
 const v2 = {
 	attributes: {
 		textAlign: {
@@ -152,4 +250,4 @@ const v1 = {
  *
  * See block-deprecation.md
  */
-export default [ v2, v1 ];
+export default [ v3, v2, v1 ];
