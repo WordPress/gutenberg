@@ -38,6 +38,12 @@ export type CustomSelectProps< T extends CustomSelectOption > = {
 	 */
 	className?: string;
 	/**
+	 * If true, the control will be disabled and the user will not be able to interact with it.
+	 *
+	 * @default false
+	 */
+	disabled?: boolean;
+	/**
 	 * Hide the label visually, while keeping available to assistive technology.
 	 */
 	hideLabelFromVision?: boolean;

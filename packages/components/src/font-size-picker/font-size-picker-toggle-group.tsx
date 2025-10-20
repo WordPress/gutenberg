@@ -14,7 +14,14 @@ import { T_SHIRT_ABBREVIATIONS, T_SHIRT_NAMES } from './constants';
 import type { FontSizePickerToggleGroupProps } from './types';
 
 const FontSizePickerToggleGroup = ( props: FontSizePickerToggleGroupProps ) => {
-	const { fontSizes, value, __next40pxDefaultSize, size, onChange } = props;
+	const {
+		fontSizes,
+		value,
+		__next40pxDefaultSize,
+		size,
+		disabled,
+		onChange,
+	} = props;
 	return (
 		<ToggleGroupControl
 			__nextHasNoMarginBottom
@@ -26,6 +33,7 @@ const FontSizePickerToggleGroup = ( props: FontSizePickerToggleGroupProps ) => {
 			onChange={ onChange }
 			isBlock
 			size={ size }
+			disabled={ disabled }
 		>
 			{ fontSizes.map( ( fontSize, index ) => (
 				<ToggleGroupControlOption
@@ -34,6 +42,7 @@ const FontSizePickerToggleGroup = ( props: FontSizePickerToggleGroupProps ) => {
 					label={ T_SHIRT_ABBREVIATIONS[ index ] }
 					aria-label={ fontSize.name || T_SHIRT_NAMES[ index ] }
 					showTooltip
+					disabled={ disabled }
 				/>
 			) ) }
 		</ToggleGroupControl>

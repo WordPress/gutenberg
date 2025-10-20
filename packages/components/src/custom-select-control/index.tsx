@@ -59,6 +59,7 @@ function CustomSelectControl< T extends CustomSelectOption >(
 		__next40pxDefaultSize = false,
 		__shouldNotWarnDeprecated36pxSize,
 		describedBy,
+		disabled = false,
 		options,
 		onChange,
 		size = 'default',
@@ -188,6 +189,7 @@ function CustomSelectControl< T extends CustomSelectOption >(
 		<>
 			<_CustomSelect
 				aria-describedby={ descriptionId }
+				disabled={ disabled }
 				renderSelectedValue={
 					showSelectedHint ? renderSelectedValueHint : undefined
 				}

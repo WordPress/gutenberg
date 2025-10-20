@@ -93,6 +93,7 @@ function _CustomSelect(
 ) {
 	const {
 		children,
+		disabled = false,
 		hideLabelFromVision = false,
 		label,
 		size,
@@ -135,11 +136,13 @@ function _CustomSelect(
 				__next40pxDefaultSize
 				size={ size }
 				suffix={ <SelectControlChevronDown /> }
+				disabled={ disabled }
 			>
 				<CustomSelectButton
 					{ ...restProps }
 					size={ size }
 					store={ store }
+					disabled={ disabled }
 					// Match legacy behavior (move selection rather than open the popover)
 					showOnKeyDown={ ! isLegacy }
 				/>

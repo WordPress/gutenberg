@@ -97,7 +97,7 @@ const UnforwardedFontSizePicker = (
 	);
 	const isValueUnitRelative =
 		!! valueUnit && [ 'em', 'rem', 'vw', 'vh' ].includes( valueUnit );
-	const isDisabled = value === undefined;
+	const isDisabled = disabled || value === undefined;
 
 	maybeWarnDeprecated36pxSize( {
 		componentName: 'FontSizePicker',
@@ -131,6 +131,7 @@ const UnforwardedFontSizePicker = (
 							}
 							isPressed={ currentPickerType === 'custom' }
 							size="small"
+							disabled={ disabled }
 						/>
 					) }
 				</Header>
@@ -143,6 +144,7 @@ const UnforwardedFontSizePicker = (
 						value={ value }
 						disableCustomFontSizes={ disableCustomFontSizes }
 						size={ size }
+						disabled={ disabled }
 						onChange={ ( newValue ) => {
 							if ( newValue === undefined ) {
 								onChange?.( undefined );
@@ -165,6 +167,7 @@ const UnforwardedFontSizePicker = (
 						value={ value }
 						__next40pxDefaultSize={ __next40pxDefaultSize }
 						size={ size }
+						disabled={ disabled }
 						onChange={ ( newValue ) => {
 							if ( newValue === undefined ) {
 								onChange?.( undefined );
@@ -190,6 +193,7 @@ const UnforwardedFontSizePicker = (
 								labelPosition="top"
 								hideLabelFromVision
 								value={ value }
+								disabled={ disabled }
 								onChange={ ( newValue ) => {
 									setUserRequestedCustom( true );
 
@@ -223,6 +227,7 @@ const UnforwardedFontSizePicker = (
 										value={ valueQuantity }
 										initialPosition={ fallbackFontSize }
 										withInputField={ false }
+										disabled={ disabled }
 										onChange={ ( newValue ) => {
 											setUserRequestedCustom( true );
 

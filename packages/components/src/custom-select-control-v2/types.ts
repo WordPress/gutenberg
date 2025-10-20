@@ -68,6 +68,12 @@ export type _CustomSelectProps = CustomSelectButtonProps & {
 	 */
 	children: React.ReactNode;
 	/**
+	 * If true, the control will be disabled and the user will not be able to interact with it.
+	 *
+	 * @default false
+	 */
+	disabled?: boolean;
+	/**
 	 * Used to visually hide the label. It will always be visible to screen readers.
 	 *
 	 * @default false

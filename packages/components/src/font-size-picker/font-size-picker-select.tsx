@@ -20,7 +20,14 @@ const DEFAULT_OPTION: FontSizePickerSelectOption = {
 };
 
 const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
-	const { __next40pxDefaultSize, fontSizes, value, size, onChange } = props;
+	const {
+		__next40pxDefaultSize,
+		fontSizes,
+		value,
+		size,
+		disabled,
+		onChange,
+	} = props;
 
 	const options: FontSizePickerSelectOption[] = [
 		DEFAULT_OPTION,
@@ -56,6 +63,7 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 			options={ options }
 			value={ selectedOption }
 			showSelectedHint
+			disabled={ disabled }
 			onChange={ ( {
 				selectedItem,
 			}: {
