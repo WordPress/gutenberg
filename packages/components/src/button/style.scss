@@ -390,6 +390,7 @@
 	svg {
 		fill: currentColor;
 		outline: none;
+		flex-shrink: 0;
 
 		// Optimize for high contrast modes.
 		// See also https://blogs.windows.com/msedgedev/2020/09/17/styling-for-windows-high-contrast-with-new-standards-for-forced-colors/.
