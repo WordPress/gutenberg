@@ -7,6 +7,13 @@ export type FontSizePickerProps = {
 	 */
 	disableCustomFontSizes?: boolean;
 	/**
+	 * If `true`, the font size picker will be disabled and the user will not
+	 * be able to change the font size.
+	 *
+	 * @default false
+	 */
+	disabled?: boolean;
+	/**
 	 * If no value exists, this prop defines the starting position for the font
 	 * size picker slider. Only relevant if `withSlider` is `true`.
 	 */
@@ -100,7 +107,7 @@ export type FontSize = {
 
 export type FontSizePickerSelectProps = Pick<
 	FontSizePickerProps,
-	'value' | 'size'
+	'value' | 'size' | 'disabled'
 > & {
 	fontSizes: NonNullable< FontSizePickerProps[ 'fontSizes' ] >;
 	disableCustomFontSizes: NonNullable<
@@ -120,7 +127,7 @@ export type FontSizePickerSelectOption = {
 
 export type FontSizePickerToggleGroupProps = Pick<
 	FontSizePickerProps,
-	'value' | 'size' | '__next40pxDefaultSize'
+	'value' | 'size' | '__next40pxDefaultSize' | 'disabled'
 > & {
 	fontSizes: NonNullable< FontSizePickerProps[ 'fontSizes' ] >;
 	onChange: NonNullable< FontSizePickerProps[ 'onChange' ] >;

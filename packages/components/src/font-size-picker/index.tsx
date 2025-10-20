@@ -42,6 +42,7 @@ const UnforwardedFontSizePicker = (
 		fallbackFontSize,
 		fontSizes = [],
 		disableCustomFontSizes = false,
+		disabled = false,
 		onChange,
 		size = 'default',
 		units: unitsProp = DEFAULT_UNITS,
@@ -110,6 +111,7 @@ const UnforwardedFontSizePicker = (
 			className="components-font-size-picker"
 			// This Container component renders a fieldset element that needs to be labeled.
 			aria-labelledby={ labelId }
+			disabled={ disabled }
 		>
 			<Spacer>
 				<Header className="components-font-size-picker__header">

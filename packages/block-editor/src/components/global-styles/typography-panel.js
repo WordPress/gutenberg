@@ -424,7 +424,7 @@ export default function TypographyPanel( {
 					/>
 				</ToolsPanelItem>
 			) }
-			{ hasFontSizeEnabled && ! fitText && (
+			{ hasFontSizeEnabled && (
 				<ToolsPanelItem
 					label={ __( 'Size' ) }
 					hasValue={ hasFontSize }
@@ -440,6 +440,7 @@ export default function TypographyPanel( {
 						withReset={ false }
 						withSlider
 						size="__unstable-large"
+						disabled={ fitText }
 					/>
 				</ToolsPanelItem>
 			) }
