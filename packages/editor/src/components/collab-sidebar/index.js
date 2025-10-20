@@ -54,8 +54,11 @@ function CollabSidebarContent( {
 			spacing="3"
 			justify="flex-start"
 			ref={ ( node ) => {
-				// Keeps the ref fresh when switching between floating and pinned sidebar.
-				commentSidebarRef.current = node;
+				// Sometimes previous sidebar unmounts after the new one mounts.
+				// This ensures we always have the latest reference.
+				if ( node ) {
+					commentSidebarRef.current = node;
+				}
 			} }
 		>
 			<AddComment
