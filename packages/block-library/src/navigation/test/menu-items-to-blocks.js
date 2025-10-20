@@ -483,4 +483,36 @@ describe( 'converting menu items to blocks', () => {
 		expect( actual[ 2 ].attributes ).not.toHaveProperty( 'id' );
 		expect( actual[ 2 ].attributes ).not.toHaveProperty( 'metadata' );
 	} );
+
+	it( 'does not add bindings for invalid kinds even when object_id is present', () => {
+		const { innerBlocks: actual } = menuItemsToBlocks( [
+			{
+				id: 10,
+				title: {
+					raw: 'Invalid Kind Item',
+					rendered: 'Invalid Kind Item',
+				},
+				url: 'http://localhost:8889/invalid-kind-item/',
+				attr_title: '',
+				description: '',
+				type: 'invalid', // becomes inferred kind 'invalid'
+				type_label: 'Invalid',
+				object: 'page',
+				object_id: 999,
+				parent: 0,
+				menu_order: 1,
+				target: '',
+				classes: [ '' ],
+				xfn: [ '' ],
+			},
+		] );
+
+		expect( actual ).toHaveLength( 1 );
+		expect( actual[ 0 ].name ).toBe( 'core/navigation-link' );
+		// Should not set id or metadata when kind is not supported
+		expect( actual[ 0 ].attributes ).not.toHaveProperty( 'id' );
+		expect( actual[ 0 ].attributes ).not.toHaveProperty( 'metadata' );
+		// Label should still be set correctly
+		expect( actual[ 0 ].attributes.label ).toBe( 'Invalid Kind Item' );
+	} );
 } );
