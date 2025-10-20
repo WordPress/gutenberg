@@ -104,11 +104,10 @@ function ReorderModal( {
 							: ''
 					}
 					onChange={ ( value ) => {
+						const parsed = parseInt( value as string, 10 ); // absorbs '' and undefined
 						setItem( {
 							...item,
-							menu_order: [ undefined, '' ].includes( value )
-								? undefined
-								: parseInt( value as string, 10 ),
+							menu_order: isNaN( parsed ) ? undefined : parsed,
 						} );
 					} }
 				/>
