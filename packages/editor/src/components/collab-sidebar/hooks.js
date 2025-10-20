@@ -336,6 +336,9 @@ export function useEnableFloatingSidebar( enabled = false ) {
 	const registry = useRegistry();
 	useEffect( () => {
 		if ( ! enabled ) {
+			registry
+				.dispatch( interfaceStore )
+				.disableComplementaryArea( 'core', collabSidebarName );
 			return;
 		}
 
