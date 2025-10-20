@@ -260,12 +260,15 @@ export function Comments( {
 					showCommentBoard={ showCommentBoard }
 					setShowCommentBoard={ setShowCommentBoard }
 					commentSidebarRef={ commentSidebarRef }
-					thread={ { blockId: selectedBlockClientId } }
+					thread={ { blockClientId: blockCommentId } }
+					isFloating={ isFloating }
 					calculatedOffset={ 0 }
 					setHeights={ setHeights }
 					setBlockRef={ setBlockRef }
 					selectedThread={ selectedThread }
+					setSelectedThread={ setSelectedThread }
 					commentLastUpdated={ commentLastUpdated }
+					reflowComments={ reflowComments }
 				/>
 			</VStack>
 		);
@@ -278,12 +281,15 @@ export function Comments( {
 				showCommentBoard={ showCommentBoard }
 				setShowCommentBoard={ setShowCommentBoard }
 				commentSidebarRef={ commentSidebarRef }
-				thread={ { blockId: selectedBlockClientId } }
+				isFloating={ isFloating }
+				thread={ { blockClientId: selectedBlockClientId } }
 				calculatedOffset={ 0 }
 				setHeights={ setHeights }
 				setBlockRef={ setBlockRef }
 				selectedThread={ selectedThread }
+				setSelectedThread={ setSelectedThread }
 				commentLastUpdated={ commentLastUpdated }
+				reflowComments={ reflowComments }
 			/>
 			{ threads.map( ( thread ) => (
 				<Thread

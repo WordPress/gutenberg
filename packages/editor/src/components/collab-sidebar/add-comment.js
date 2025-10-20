@@ -25,6 +25,7 @@ import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
 import { focusCommentThread } from './utils';
 import { useFloatingThread } from './hooks';
+import { useEffect } from 'react';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
@@ -39,17 +40,21 @@ export function AddComment( {
 	setHeights,
 	setBlockRef,
 	selectedThread,
+	setSelectedThread,
 	commentLastUpdated,
+	reflowComments,
 } ) {
 	const { clientId, blockCommentId } = useSelect( ( select ) => {
 		const { getSelectedBlock } = select( blockEditorStore );
-		const selectedBlock = getSelectedBlock();
+		const selected = getSelectedBlock();
 		return {
-			clientId: selectedBlock?.clientId,
-			blockCommentId: selectedBlock?.attributes?.metadata?.noteId,
+			clientId: selected?.clientId,
+			blockCommentId: selected?.attributes?.metadata?.noteId,
 		};
 	}, [] );
+
 	const blockElement = useBlockElement( clientId );
+	console.log( 'blockElement:', blockElement );
 	const { y, refs } = useFloatingThread( {
 		thread,
 		calculatedOffset,
@@ -58,9 +63,21 @@ export function AddComment( {
 		selectedThread,
 		commentLastUpdated,
 	} );
+
+	// Reflow comments when rendered.
+	useEffect( () => {
+		setSelectedThread( thread );
+		reflowComments();
+
+	}, [] );
+
 	if ( ! showCommentBoard || ! clientId || undefined !== blockCommentId ) {
 		return null;
 	}
+
+
+
+	console.log( { isFloating, thread, refs } );
 
 	return (
 		<VStack

@@ -364,6 +364,8 @@ export function useFloatingThread( {
 	const blockRef = useRef();
 	useBlockElementRef( thread.blockClientId, blockRef );
 
+	//console.log( 'useFloatingThread', { blockRef } );
+
 	const updateHeight = useCallback(
 		( id, newHeight ) => {
 			setHeights( ( prev ) => {
@@ -376,6 +378,7 @@ export function useFloatingThread( {
 		[ setHeights ]
 	);
 
+	//console.log( { calculatedOffset } );
 	// Use floating-ui to track the block element's position with the calculated offset.
 	const { y, refs } = useFloating( {
 		placement: 'right-start',
@@ -390,6 +393,7 @@ export function useFloatingThread( {
 	// Store the block reference for each thread.
 	useEffect( () => {
 		if ( blockRef.current ) {
+			//console.log( 'setReference', { blockRef } );
 			refs.setReference( blockRef.current );
 		}
 	}, [ blockRef, refs ] );
@@ -397,6 +401,7 @@ export function useFloatingThread( {
 	// Track thread heights.
 	useEffect( () => {
 		if ( refs.floating?.current ) {
+			//console.log( 'setBlockRef', { thread, blockRef } );
 			setBlockRef( thread.id, blockRef.current );
 		}
 	}, [ thread.id, refs.floating, setBlockRef ] );
@@ -405,6 +410,7 @@ export function useFloatingThread( {
 	useEffect( () => {
 		if ( refs.floating?.current ) {
 			const newHeight = refs.floating.current.scrollHeight;
+			console.log( 'update height', { thread, newHeight } );
 			updateHeight( thread.id, newHeight );
 		}
 	}, [
