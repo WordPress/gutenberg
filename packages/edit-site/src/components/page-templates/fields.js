@@ -155,6 +155,11 @@ export const activeField = {
 	id: 'active',
 	getValue: ( { item } ) => item._isActive,
 	render: function Render( { item } ) {
+		if ( item.is_custom ) {
+			// translators: Refers to a type of template: custom template
+			return <Badge intent="info">{ __( 'Custom' ) }</Badge>;
+		}
+
 		const isActive = item._isActive;
 		return (
 			<Badge intent={ isActive ? 'success' : 'default' }>
@@ -192,7 +197,7 @@ export const slugField = {
 		);
 		return (
 			defaultTemplateType?.title ||
-			// translators: %s is the slug of a custom template.
+			// translators: Refers to a type of template: custom template
 			__( 'Custom' )
 		);
 	},
