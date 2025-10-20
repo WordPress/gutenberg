@@ -1438,10 +1438,28 @@ Example:
 		{ value: '2', label: 'Product B' },
 		{ value: '3', label: 'Product C' },
 		{ value: '4', label: 'Product D' },
-	];
+	]
 }
 ```
 
+### `getElements`
+
+Async function that fetches elements only when they are needed, enabling lazy loading. It returns a promise that resolves to an array of elements.
+
+Note this function may be called many times in the lifetime of the DataViews/DataForm component. For example, if elements are used in the `render` method of a field, it'll trigger as many times as records displayed in the page. It's the consumer responsibility to cache the results to avoid unnecessary costly operations (network requests, etc.).
+
+```js
+{
+	getElements: () => {
+		return Promise.resolve( [
+			{ value: '1', label: 'Product A' },
+			{ value: '2', label: 'Product B' },
+			{ value: '3', label: 'Product C' },
+			{ value: '4', label: 'Product D' },
+		] );
+	}
+}
+```
 
 ### `filterBy`
 

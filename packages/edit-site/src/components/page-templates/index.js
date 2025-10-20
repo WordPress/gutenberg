@@ -2,7 +2,8 @@
  * WordPress dependencies
  */
 import { Page } from '@wordpress/admin-ui';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
+import { decodeEntities } from '@wordpress/html-entities';
 import { useState, useMemo, useCallback } from '@wordpress/element';
 import {
 	privateApis as corePrivateApis,
@@ -12,10 +13,11 @@ import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { addQueryArgs } from '@wordpress/url';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useEvent } from '@wordpress/compose';
 import { useView } from '@wordpress/views';
-import { Button } from '@wordpress/components';
+import { Button, Modal } from '@wordpress/components';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -45,6 +47,8 @@ export default function PageTemplates() {
 	const { path, query } = useLocation();
 	const { activeView = 'active', postId } = query;
 	const [ selection, setSelection ] = useState( [ postId ] );
+	const [ selectedRegisteredTemplate, setSelectedRegisteredTemplate ] =
+		useState( false );
 	const defaultView = useMemo( () => {
 		return getDefaultView( activeView );
 	}, [ activeView ] );
@@ -207,15 +211,54 @@ export default function PageTemplates() {
 			elements,
 		} );
 		return _fields;
-	}, [ users, activeView ] );
+	}, [ users, activeView, themeField ] );
 
 	const { data, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( records, view, fields );
 	}, [ records, view, fields ] );
 
+	const { createSuccessNotice } = useDispatch( noticesStore );
+	const onActionPerformed = useCallback(
+		( actionId, items ) => {
+			switch ( actionId ) {
+				case 'duplicate-post':
+					{
+						const newItem = items[ 0 ];
+						const _title =
+							typeof newItem.title === 'string'
+								? newItem.title
+								: newItem.title?.rendered;
+						createSuccessNotice(
+							sprintf(
+								// translators: %s: Title of the created post or template, e.g: "Hello world".
+								__( '"%s" successfully created.' ),
+								decodeEntities( _title ) || __( '(no title)' )
+							),
+							{
+								type: 'snackbar',
+								id: 'duplicate-post-action',
+								actions: [
+									{
+										label: __( 'Edit' ),
+										onClick: () => {
+											history.navigate(
+												`/${ newItem.type }/${ newItem.id }?canvas=edit`
+											);
+										},
+									},
+								],
+							}
+						);
+					}
+					break;
+			}
+		},
+		[ history, createSuccessNotice ]
+	);
 	const postTypeActions = usePostActions( {
 		postType: TEMPLATE_POST_TYPE,
 		context: 'list',
+		onActionPerformed,
 	} );
 	const editAction = useEditPostAction();
 	const setActiveTemplateAction = useSetActiveTemplateAction();
@@ -234,6 +277,10 @@ export default function PageTemplates() {
 		}
 		updateView( newView );
 	} );
+
+	const duplicateAction = actions.find(
+		( action ) => action.id === 'duplicate-post'
+	);
 
 	return (
 		<Page
@@ -268,13 +315,34 @@ export default function PageTemplates() {
 				onChangeSelection={ onChangeSelection }
 				isItemClickable={ () => true }
 				onClickItem={ ( item ) => {
-					history.navigate(
-						`/${ item.type }/${ item.id }?canvas=edit`
-					);
+					if ( item.type === 'wp_registered_template' ) {
+						setSelectedRegisteredTemplate( item );
+					} else {
+						history.navigate(
+							`/${ item.type }/${ item.id }?canvas=edit`
+						);
+					}
 				} }
 				selection={ selection }
 				defaultLayouts={ defaultLayouts }
 			/>
+			{ selectedRegisteredTemplate && duplicateAction && (
+				<Modal
+					title={ __( 'Duplicate' ) }
+					onRequestClose={ () => setSelectedRegisteredTemplate() }
+					size="small"
+				>
+					<duplicateAction.RenderModal
+						items={ [ selectedRegisteredTemplate ] }
+						closeModal={ () => setSelectedRegisteredTemplate() }
+						onActionPerformed={ ( [ item ] ) => {
+							history.navigate(
+								`/${ item.type }/${ item.id }?canvas=edit`
+							);
+						} }
+					/>
+				</Modal>
+			) }
 		</Page>
 	);
 }

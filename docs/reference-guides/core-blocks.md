@@ -489,6 +489,14 @@ Show login & logout links. ([Source](https://github.com/WordPress/gutenberg/tree
 -	**Supports:** className, color (background, gradients, link, ~~text~~), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight)
 -	**Attributes:** displayLoginAsForm, redirectToCurrent
 
+## Math
+
+Display mathematical notation using LaTeX. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/math))
+
+-	**Name:** core/math
+-	**Category:** text
+-	**Attributes:** latex, mathML
+
 ## Media & Text
 
 Set media and words side-by-side for a richer layout. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/media-text))

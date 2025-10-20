@@ -58,7 +58,7 @@ describe( 'useEntityBinding', () => {
 					bindings: {
 						url: {
 							source: 'core/post-data',
-							args: { key: 'link' },
+							args: { field: 'link' },
 						},
 					},
 				},
@@ -82,7 +82,7 @@ describe( 'useEntityBinding', () => {
 					bindings: {
 						url: {
 							source: 'core/term-data',
-							args: { key: 'link' },
+							args: { field: 'link' },
 						},
 					},
 				},
@@ -106,7 +106,7 @@ describe( 'useEntityBinding', () => {
 					bindings: {
 						url: {
 							source: 'some-other-source',
-							args: { key: 'url' },
+							args: { field: 'url' },
 						},
 					},
 				},
@@ -130,7 +130,7 @@ describe( 'useEntityBinding', () => {
 					bindings: {
 						url: {
 							source: 'core/post-data',
-							args: { key: 'link' },
+							args: { field: 'link' },
 						},
 					},
 				},
@@ -178,7 +178,7 @@ describe( 'useEntityBinding', () => {
 				bindings: {
 					url: {
 						source: 'core/post-data',
-						args: { key: 'link' },
+						args: { field: 'link' },
 					},
 				},
 			},
@@ -273,7 +273,7 @@ describe( 'useEntityBinding', () => {
 			url: {
 				source: 'core/post-data',
 				args: {
-					key: 'link',
+					field: 'link',
 				},
 			},
 		} );
@@ -285,7 +285,7 @@ describe( 'useEntityBinding', () => {
 			expect( binding ).toEqual( {
 				url: {
 					source: 'core/post-data',
-					args: { key: 'link' },
+					args: { field: 'link' },
 				},
 			} );
 		} );
@@ -295,7 +295,7 @@ describe( 'useEntityBinding', () => {
 			expect( binding ).toEqual( {
 				url: {
 					source: 'core/term-data',
-					args: { key: 'link' },
+					args: { field: 'link' },
 				},
 			} );
 		} );

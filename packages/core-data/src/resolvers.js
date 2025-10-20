@@ -248,30 +248,6 @@ getEntityRecord.shouldInvalidate = ( action, kind, name ) => {
 	);
 };
 
-export const getTemplateAutoDraftId =
-	( staticTemplateId ) =>
-	async ( { resolveSelect, dispatch } ) => {
-		const record = await resolveSelect.getEntityRecord(
-			'postType',
-			'wp_registered_template',
-			staticTemplateId
-		);
-		const autoDraft = await dispatch.saveEntityRecord(
-			'postType',
-			'wp_template',
-			{
-				...record,
-				id: undefined,
-				type: 'wp_template',
-				status: 'auto-draft',
-			}
-		);
-		await dispatch.receiveTemplateAutoDraftId(
-			staticTemplateId,
-			autoDraft.id
-		);
-	};
-
 /**
  * Requests an entity's record from the REST API.
  */

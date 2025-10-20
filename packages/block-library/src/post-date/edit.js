@@ -48,7 +48,8 @@ export default function PostDateEdit( {
 } ) {
 	const displayType =
 		metadata?.bindings?.datetime?.source === 'core/post-data' &&
-		metadata?.bindings?.datetime?.args?.key;
+		( metadata?.bindings?.datetime?.args?.field ||
+			metadata?.bindings?.datetime?.args?.key );
 
 	const blockProps = useBlockProps( {
 		className: clsx( {

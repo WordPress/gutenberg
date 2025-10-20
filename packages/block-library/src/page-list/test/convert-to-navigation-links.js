@@ -9,7 +9,7 @@ const EXPECTED_ENTITY_BINDING = {
 	url: {
 		source: 'core/post-data',
 		args: {
-			key: 'link',
+			field: 'link',
 		},
 	},
 };

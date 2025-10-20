@@ -538,10 +538,12 @@ function CustomEditControl< Item >( {
 
 const ValidationComponent = ( {
 	required,
+	elements,
 	type,
 	custom,
 }: {
 	required: boolean;
+	elements: 'sync' | 'async' | 'none';
 	custom: 'sync' | 'async' | 'none';
 	type: 'regular' | 'panel';
 } ) => {
@@ -773,6 +775,105 @@ const ValidationComponent = ( {
 		return undefined;
 	};
 
+	// Cache for getElements functions - ensures promises are only created once
+	const getElements = useMemo( () => {
+		const promiseCache: Record< string, Promise< any > > = {};
+
+		return ( fieldId: string ) => {
+			return () => {
+				if ( fieldId in promiseCache ) {
+					return promiseCache[ fieldId ];
+				}
+
+				switch ( fieldId ) {
+					case 'select':
+						promiseCache[ fieldId ] = new Promise( ( resolve ) =>
+							setTimeout(
+								() =>
+									resolve( [
+										{
+											value: 'option1',
+											label: 'Option 1',
+										},
+										{
+											value: 'option2',
+											label: 'Option 2',
+										},
+									] ),
+								3500
+							)
+						);
+						break;
+
+					case 'textWithRadio':
+						promiseCache[ fieldId ] = new Promise( ( resolve ) =>
+							setTimeout(
+								() =>
+									resolve( [
+										{ value: 'item1', label: 'Item 1' },
+										{ value: 'item2', label: 'Item 2' },
+									] ),
+								3500
+							)
+						);
+						break;
+
+					case 'countries':
+						promiseCache[ fieldId ] = new Promise( ( resolve ) =>
+							setTimeout(
+								() =>
+									resolve( [
+										{
+											value: 'us',
+											label: 'United States',
+										},
+										{ value: 'ca', label: 'Canada' },
+										{
+											value: 'uk',
+											label: 'United Kingdom',
+										},
+										{ value: 'fr', label: 'France' },
+										{ value: 'de', label: 'Germany' },
+										{ value: 'jp', label: 'Japan' },
+										{ value: 'au', label: 'Australia' },
+									] ),
+								3500
+							)
+						);
+						break;
+
+					case 'toggleGroup':
+						promiseCache[ fieldId ] = new Promise( ( resolve ) =>
+							setTimeout(
+								() =>
+									resolve( [
+										{
+											value: 'option1',
+											label: 'Option 1',
+										},
+										{
+											value: 'option2',
+											label: 'Option 2',
+										},
+										{
+											value: 'option3',
+											label: 'Option 3',
+										},
+									] ),
+								3500
+							)
+						);
+						break;
+
+					default:
+						throw new Error( `Unknown field ID: ${ fieldId }` );
+				}
+
+				return promiseCache[ fieldId ];
+			};
+		};
+	}, [ elements ] );
+
 	const _fields: Field< ValidatedItem >[] = [
 		{
 			id: 'text',
@@ -780,6 +881,7 @@ const ValidationComponent = ( {
 			label: 'Text',
 			isValid: {
 				required,
+				elements: elements !== 'none' ? true : false,
 				custom: maybeCustomRule( customTextRule ),
 			},
 		},
@@ -787,12 +889,18 @@ const ValidationComponent = ( {
 			id: 'select',
 			type: 'text',
 			label: 'Select',
-			elements: [
-				{ value: 'option1', label: 'Option 1' },
-				{ value: 'option2', label: 'Option 2' },
-			],
+			elements:
+				elements === 'async'
+					? undefined
+					: [
+							{ value: 'option1', label: 'Option 1' },
+							{ value: 'option2', label: 'Option 2' },
+					  ],
+			getElements:
+				elements === 'async' ? getElements( 'select' ) : undefined,
 			isValid: {
 				required,
+				elements: elements !== 'none' ? true : false,
 				custom: maybeCustomRule( customSelectRule ),
 			},
 		},
@@ -801,12 +909,20 @@ const ValidationComponent = ( {
 			type: 'text',
 			Edit: 'radio',
 			label: 'Text with radio',
-			elements: [
-				{ value: 'item1', label: 'Item 1' },
-				{ value: 'item2', label: 'Item 2' },
-			],
+			elements:
+				elements === 'async'
+					? undefined
+					: [
+							{ value: 'item1', label: 'Item 1' },
+							{ value: 'item2', label: 'Item 2' },
+					  ],
+			getElements:
+				elements === 'async'
+					? getElements( 'textWithRadio' )
+					: undefined,
 			isValid: {
 				required,
+				elements: elements !== 'none' ? true : false,
 				custom: maybeCustomRule( customTextRadioRule ),
 			},
 		},
@@ -817,6 +933,7 @@ const ValidationComponent = ( {
 			label: 'Textarea',
 			isValid: {
 				required,
+				elements: elements !== 'none' ? true : false,
 				custom: maybeCustomRule( customTextareaRule ),
 			},
 		},
@@ -826,6 +943,7 @@ const ValidationComponent = ( {
 			label: 'e-mail',
 			isValid: {
 				required,
+				elements: elements !== 'none' ? true : false,
 				custom: maybeCustomRule( customEmailRule ),
 			},
 		},
@@ -835,6 +953,7 @@ const ValidationComponent = ( {
 			label: 'telephone',
 			isValid: {
 				required,
+				elements: elements !== 'none' ? true : false,
 				custom: maybeCustomRule( customTelephoneRule ),
 			},
 		},
@@ -844,6 +963,7 @@ const ValidationComponent = ( {
 			label: 'URL',
 			isValid: {
 				required,
+				elements: elements !== 'none' ? true : false,
 				custom: maybeCustomRule( customUrlRule ),
 			},
 		},
@@ -853,6 +973,7 @@ const ValidationComponent = ( {
 			label: 'Color',
 			isValid: {
 				required,
+				elements: elements !== 'none' ? true : false,
 				custom: maybeCustomRule( customColorRule ),
 			},
 		},
@@ -862,6 +983,7 @@ const ValidationComponent = ( {
 			label: 'Integer',
 			isValid: {
 				required,
+				elements: elements !== 'none' ? true : false,
 				custom: maybeCustomRule( customIntegerRule ),
 			},
 		},
@@ -871,6 +993,7 @@ const ValidationComponent = ( {
 			label: 'Number',
 			isValid: {
 				required,
+				elements: elements !== 'none' ? true : false,
 				custom: maybeCustomRule( customNumberRule ),
 			},
 		},
@@ -880,23 +1003,9 @@ const ValidationComponent = ( {
 			label: 'Boolean',
 			isValid: {
 				required,
+				elements: elements !== 'none' ? true : false,
 				custom: maybeCustomRule( customBooleanRule ),
 			},
-		},
-		{
-			id: 'categories',
-			type: 'array' as const,
-			label: 'Categories',
-			isValid: {
-				required,
-			},
-			elements: [
-				{ value: 'astronomy', label: 'Astronomy' },
-				{ value: 'book-review', label: 'Book review' },
-				{ value: 'event', label: 'Event' },
-				{ value: 'photography', label: 'Photography' },
-				{ value: 'travel', label: 'Travel' },
-			],
 		},
 		{
 			id: 'countries',
@@ -906,17 +1015,22 @@ const ValidationComponent = ( {
 			description: 'Countries you have visited',
 			isValid: {
 				required,
-				elements: true,
+				elements: elements !== 'none' ? true : false,
 			},
-			elements: [
-				{ value: 'us', label: 'United States' },
-				{ value: 'ca', label: 'Canada' },
-				{ value: 'uk', label: 'United Kingdom' },
-				{ value: 'fr', label: 'France' },
-				{ value: 'de', label: 'Germany' },
-				{ value: 'jp', label: 'Japan' },
-				{ value: 'au', label: 'Australia' },
-			],
+			elements:
+				elements === 'async'
+					? undefined
+					: [
+							{ value: 'us', label: 'United States' },
+							{ value: 'ca', label: 'Canada' },
+							{ value: 'uk', label: 'United Kingdom' },
+							{ value: 'fr', label: 'France' },
+							{ value: 'de', label: 'Germany' },
+							{ value: 'jp', label: 'Japan' },
+							{ value: 'au', label: 'Australia' },
+					  ],
+			getElements:
+				elements === 'async' ? getElements( 'countries' ) : undefined,
 		},
 		{
 			id: 'customEdit',
@@ -924,6 +1038,7 @@ const ValidationComponent = ( {
 			Edit: CustomEditControl,
 			isValid: {
 				required,
+				elements: elements !== 'none' ? true : false,
 			},
 		},
 		{
@@ -932,6 +1047,7 @@ const ValidationComponent = ( {
 			label: 'Password',
 			isValid: {
 				required,
+				elements: elements !== 'none' ? true : false,
 				custom: maybeCustomRule( customPasswordRule ),
 			},
 		},
@@ -942,6 +1058,7 @@ const ValidationComponent = ( {
 			Edit: 'toggle',
 			isValid: {
 				required,
+				elements: elements !== 'none' ? true : false,
 				custom: maybeCustomRule( customToggleRule ),
 			},
 		},
@@ -950,13 +1067,19 @@ const ValidationComponent = ( {
 			type: 'text',
 			label: 'Toggle Group',
 			Edit: 'toggleGroup',
-			elements: [
-				{ value: 'option1', label: 'Option 1' },
-				{ value: 'option2', label: 'Option 2' },
-				{ value: 'option3', label: 'Option 3' },
-			],
+			elements:
+				elements === 'async'
+					? undefined
+					: [
+							{ value: 'option1', label: 'Option 1' },
+							{ value: 'option2', label: 'Option 2' },
+							{ value: 'option3', label: 'Option 3' },
+					  ],
+			getElements:
+				elements === 'async' ? getElements( 'toggleGroup' ) : undefined,
 			isValid: {
 				required,
+				elements: elements !== 'none' ? true : false,
 				custom: maybeCustomRule( customToggleGroupRule ),
 			},
 		},
@@ -966,6 +1089,7 @@ const ValidationComponent = ( {
 			label: 'Date',
 			isValid: {
 				required,
+				elements: elements !== 'none' ? true : false,
 				custom: maybeCustomRule( customDateRule ),
 			},
 		},
@@ -976,6 +1100,7 @@ const ValidationComponent = ( {
 			Edit: DateRangeEdit,
 			isValid: {
 				required,
+				elements: elements !== 'none' ? true : false,
 				custom: maybeCustomRule( customDateRangeRule ),
 			},
 		},
@@ -985,6 +1110,7 @@ const ValidationComponent = ( {
 			label: 'Date Time',
 			isValid: {
 				required,
+				elements: elements !== 'none' ? true : false,
 				custom: maybeCustomRule( customDateTimeRule ),
 			},
 		},
@@ -1789,23 +1915,31 @@ export const Validation = {
 	argTypes: {
 		required: {
 			control: { type: 'boolean' },
-			description: 'Whether or not the fields are required.',
+			description:
+				'Whether or not the required validation rule is active.',
 		},
-		type: {
+		elements: {
 			control: { type: 'select' },
-			description: 'Chooses the validation type.',
-			options: [ 'regular', 'panel', 'card', 'row' ],
+			description:
+				'Whether or not the elements validation rule is active.',
+			options: [ 'sync', 'async', 'none' ],
 		},
 		custom: {
 			control: { type: 'select' },
-			description: 'Whether or not the fields have custom validation.',
+			description: 'Whether or not the custom validation rule is active.',
 			options: [ 'sync', 'async', 'none' ],
+		},
+		type: {
+			control: { type: 'select' },
+			description: 'Chooses the layout type.',
+			options: [ 'regular', 'panel', 'card', 'row' ],
 		},
 	},
 	args: {
 		required: true,
-		type: 'regular',
+		elements: 'sync',
 		custom: 'sync',
+		type: 'regular',
 	},
 };
 
