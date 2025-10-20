@@ -1069,7 +1069,7 @@ test.describe( 'Navigation block', () => {
 				} );
 				await unlinkButton.click();
 				await expect( linkInput ).toBeEnabled();
-				await expect( linkInput ).toHaveValue( '' );
+				await expect( linkInput ).toHaveValue( updatedPage.link );
 				await expect( linkInput ).toBeFocused();
 			} );
 		} );
