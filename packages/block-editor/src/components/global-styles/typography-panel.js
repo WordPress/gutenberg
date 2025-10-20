@@ -216,13 +216,23 @@ export default function TypographyPanel( {
 	// Extract the slug from the CSS custom property if it exists
 	const currentFontSizeSlug = ( () => {
 		const rawValue = inheritedValue?.typography?.fontSize;
-		if (
-			rawValue &&
-			typeof rawValue === 'string' &&
-			rawValue.startsWith( 'var:preset|font-size|' )
-		) {
+		if ( ! rawValue || typeof rawValue !== 'string' ) {
+			return undefined;
+		}
+
+		// Block supports use `var:preset` format.
+		if ( rawValue.startsWith( 'var:preset|font-size|' ) ) {
 			return rawValue.replace( 'var:preset|font-size|', '' );
 		}
+
+		// Global styles data uses `var(--wp--preset)` format.
+		const cssVarMatch = rawValue.match(
+			/^var\(--wp--preset--font-size--([^)]+)\)$/
+		);
+		if ( cssVarMatch ) {
+			return cssVarMatch[ 1 ];
+		}
+
 		return undefined;
 	} )();
 
