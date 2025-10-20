@@ -186,14 +186,15 @@ function gutenberg_register_packages_scripts( $scripts ) {
 	// When in production, use the plugin's version as the default asset version;
 	// else (for development or test) default to use the current time.
 	$default_version = defined( 'GUTENBERG_VERSION' ) && ! SCRIPT_DEBUG ? GUTENBERG_VERSION : time();
+	$file_extension  = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.js' : '.min.js';
 
-	foreach ( glob( gutenberg_dir_path() . 'build/*/index.min.js' ) as $path ) {
+	foreach ( glob( gutenberg_dir_path() . 'build/*/index' . $file_extension ) as $path ) {
 		// Prefix `wp-` to package directory to get script handle.
 		// For example, `…/build/a11y/index.min.js` becomes `wp-a11y`.
 		$handle = 'wp-' . basename( dirname( $path ) );
 
 		// Replace extension with `.asset.php` to find the generated dependencies file.
-		$asset_file   = substr( $path, 0, -( strlen( '.js' ) ) ) . '.asset.php';
+		$asset_file   = substr( $path, 0, -( strlen( $file_extension ) ) ) . '.min.asset.php';
 		$asset        = file_exists( $asset_file )
 			? require $asset_file
 			: null;
