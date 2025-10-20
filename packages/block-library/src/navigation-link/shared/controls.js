@@ -104,7 +104,7 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 		// processes attributes through the binding system.
 		// See: packages/block-editor/src/components/block-edit/edit.js
 		updateBlockAttributes( clientId, {
-			url: lastURLRef.current,
+			url: lastURLRef.current, // set the lastURLRef as the new editable value so we avoid bugs from empty link states
 			id: undefined,
 		} );
 	};
@@ -173,9 +173,9 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 							return;
 						}
 
-						// Don't update the actual url attribute yet, defer to onBlur so we
-						// don't end up with the canvas thinking the url is empty, which causes
-						// the label to be replaced by the placeholder text.
+						// Defer updating the url attribute until onBlur to prevent the canvas from
+						// treating a temporary empty value as a committed value, which replaces the
+						// label with placeholder text.
 						setInputValue( newValue );
 					} }
 					onFocus={ () => {
