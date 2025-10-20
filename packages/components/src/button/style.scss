@@ -15,13 +15,17 @@
 	text-decoration: none;
 	font-family: inherit;
 	font-size: $default-font-size;
+	// Use 499 instead of `$font-weight-medium` (ie 500) as it seems to force
+	// browsers to pick 400 (instead if 600 or 700) when the font family in use
+	// doesn't include the 500 weight.
+	font-weight: 499;
 	margin: 0;
 	border: 0;
 	cursor: pointer;
 	-webkit-appearance: none;
 	background: none;
 
-	@media not (prefers-reduced-motion) {
+	@media not ( prefers-reduced-motion ) {
 		transition: box-shadow 0.1s linear;
 	}
 
@@ -251,6 +255,7 @@
 		background: none;
 		outline: none;
 		text-align: left;
+		font-weight: $font-weight-regular;
 		color: $components-color-accent;
 		text-decoration: underline;
 

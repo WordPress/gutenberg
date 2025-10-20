@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/admin-ui",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"description": "Generic components to be used in the Admin UI.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -30,7 +30,8 @@
 			"import": "./build-module/index.js",
 			"require": "./build/index.js"
 		},
-		"./package.json": "./package.json"
+		"./package.json": "./package.json",
+		"./build-style/": "./build-style/"
 	},
 	"react-native": "src/index",
 	"types": "build-types",

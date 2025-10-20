@@ -4,6 +4,12 @@
 
 ### Enhancements
 
+-   `Button`: Update font weight to `500` ([#70787](https://github.com/WordPress/gutenberg/pull/70787)).
+
+## 30.6.0 (2025-10-17)
+
+### Enhancements
+
 -   `SearchControl`: Move search icon to prefix position ([#71984](https://github.com/WordPress/gutenberg/pull/71984)).
 -   `SearchControl`: Flip search icon depending on placement ([#72070](https://github.com/WordPress/gutenberg/pull/72070)).
 -   `SearchControl`: Normalize styles ([#72072](https://github.com/WordPress/gutenberg/pull/72072)).
