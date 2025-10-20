@@ -33,7 +33,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                node: ['20', '22', '24']
+                node: ${{ github.event_name == 'pull_request' && fromJSON('["20"]') || fromJSON('["20", "22", "24"]') }}
                 shard: ['1/4', '2/4', '3/4', '4/4']
 
         steps:
@@ -78,7 +78,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                node: ['20', '22', '24']
+                node: ${{ github.event_name == 'pull_request' && fromJSON('["20"]') || fromJSON('["20", "22", "24"]') }}
 
         steps:
             - name: Checkout repository
@@ -170,15 +170,8 @@ jobs:
         strategy:
             fail-fast: true
             matrix:
-                php:
-                    - '7.2'
-                    - '7.3'
-                    - '7.4'
-                    - '8.0'
-                    - '8.1'
-                    - '8.2'
-                    - '8.3'
-                multisite: [false, true]
+                php: ${{ github.event_name == 'pull_request' && fromJSON('["8.3"]') || fromJSON('["7.2", "7.3", "7.4", "8.0", "8.1", "8.2", "8.3"]') }}
+                multisite: ${{ github.event_name == 'pull_request' && fromJSON('[false]') || fromJSON('[false, true]') }}
                 wordpress: [''] # Latest WordPress version.
                 include:
                     # Test with the previous WP version.
