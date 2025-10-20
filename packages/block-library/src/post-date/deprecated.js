@@ -86,6 +86,7 @@ const v3 = {
 		},
 		...otherAttributes
 	} ) {
+		// Change the block bindings source argument name from "key" to "field".
 		return {
 			metadata: {
 				bindings: {
