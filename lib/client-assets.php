@@ -193,7 +193,14 @@ function gutenberg_register_packages_scripts( $scripts ) {
 		// For example, `…/build/a11y/index.min.js` becomes `wp-a11y`.
 		$handle = 'wp-' . basename( dirname( $path ) );
 
-		// Replace extension with `.asset.php` to find the generated dependencies file.
+		/**
+		 * Find the asset file for each package script by
+		 * replacing the JS file extension '.js' or '.min.js' with '.min.asset.php'.
+		 *
+		 * Example:
+		 * - '.../build/block-library/index.min.js' => '.../build/block-library/index.min.asset.php'
+		 * - '.../build/block-library/index.js'     => '.../build/block-library/index.min.asset.php'
+		 */
 		$asset_file   = substr( $path, 0, -( strlen( $file_extension ) ) ) . '.min.asset.php';
 		$asset        = file_exists( $asset_file )
 			? require $asset_file
