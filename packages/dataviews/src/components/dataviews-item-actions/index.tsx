@@ -73,13 +73,13 @@ function ButtonTrigger< Item >( {
 		typeof action.label === 'string' ? action.label : action.label( items );
 	return (
 		<Button
-			label={ label }
-			icon={ action.icon }
 			disabled={ !! action.disabled }
 			accessibleWhenDisabled
 			size="compact"
 			onClick={ onClick }
-		/>
+		>
+			{ label }
+		</Button>
 	);
 }
 
@@ -164,7 +164,7 @@ export default function ItemActions< Item >( {
 			( action ) => ! action.isEligible || action.isEligible( item )
 		);
 		const _primaryActions = _eligibleActions.filter(
-			( action ) => action.isPrimary && !! action.icon
+			( action ) => action.isPrimary
 		);
 		return {
 			primaryActions: _primaryActions,
@@ -185,7 +185,7 @@ export default function ItemActions< Item >( {
 
 	return (
 		<HStack
-			spacing={ 1 }
+			spacing={ 0 }
 			justify="flex-end"
 			className="dataviews-item-actions"
 			style={ {
