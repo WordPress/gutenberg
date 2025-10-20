@@ -6,6 +6,7 @@
  * External dependencies
  */
 import { render, screen, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
@@ -95,16 +96,16 @@ describe( 'Controls', () => {
 		expect( urlInput.value ).toBe( 'https://example.com/test page' );
 	} );
 
-	it( 'calls updateAttributes with new URL on blur', () => {
+	it( 'calls updateAttributes with new URL on blur', async () => {
+		const user = userEvent.setup();
 		render( <Controls { ...defaultProps } /> );
 
 		const urlInput = screen.getByLabelText( 'Link' );
 
-		fireEvent.focus( urlInput );
-		fireEvent.change( urlInput, {
-			target: { value: 'https://example.com/test page' },
-		} );
-		fireEvent.blur( urlInput );
+		await user.click( urlInput );
+		await user.clear( urlInput );
+		await user.type( urlInput, 'https://example.com/test page' );
+		await user.tab();
 
 		expect( mockUpdateAttributes ).toHaveBeenCalledWith(
 			{ url: 'https://example.com/test page' },
