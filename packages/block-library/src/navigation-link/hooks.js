@@ -45,6 +45,7 @@ export function enhanceNavigationLinkVariations( settings, name ) {
 				} ),
 			};
 		} );
+
 		return {
 			...settings,
 			variations,

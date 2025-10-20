@@ -312,11 +312,32 @@ function build_variation_for_navigation_link( $entity, $kind ) {
 	$title       = '';
 	$description = '';
 
+	// Check for generic fallback labels that WordPress auto-generates
+	$is_generic_post_link = false;
+	$is_generic_category_link = false;
+	$is_generic_tag_link = false;
+
 	if ( property_exists( $entity->labels, 'item_link' ) ) {
 		$title = $entity->labels->item_link;
+		// Check if this is a generic fallback label
+		$is_generic_post_link = ( $title === __( 'Post Link' ) || $title === 'Post Link' );
+		$is_generic_category_link = ( $title === __( 'Category Link' ) || $title === 'Category Link' );
+		$is_generic_tag_link = ( $title === __( 'Tag Link' ) || $title === 'Tag Link' );
 	}
 	if ( property_exists( $entity->labels, 'item_link_description' ) ) {
 		$description = $entity->labels->item_link_description;
+	}
+
+
+	// Use custom labels for custom post types/taxonomies that have generic fallback labels
+	// This improves inserter UX by ensuring each variation has a readable, specific label.
+	if ( $is_generic_post_link || $is_generic_category_link || $is_generic_tag_link || '' === $title ) {
+		$singular = isset( $entity->labels->singular_name ) ? $entity->labels->singular_name : ucfirst( $entity->name );
+		$title    = sprintf( /* translators: %s: Singular label of the entity. */ __( '%s Link' ), $singular );
+	}
+	if ( $is_generic_post_link || $is_generic_category_link || $is_generic_tag_link || '' === $description ) {
+		$singular     = isset( $entity->labels->singular_name ) ? $entity->labels->singular_name : ucfirst( $entity->name );
+		$description = sprintf( /* translators: %s: Singular label of the entity. */ __( 'A link to a %s' ), strtolower( $singular ) );
 	}
 
 	$variation = array(
@@ -375,7 +396,9 @@ function block_core_navigation_link_filter_variations( $variations, $block_type 
 	}
 
 	$generated_variations = block_core_navigation_link_build_variations();
-	return array_merge( $variations, $generated_variations );
+	// Merge with existing variations - put our generated variations first
+	// so they override any generic labels from existing variations
+	return array_merge( $generated_variations, $variations );
 }
 
 /**
@@ -388,6 +411,7 @@ function block_core_navigation_link_filter_variations( $variations, $block_type 
 function block_core_navigation_link_build_variations() {
 	$post_types = get_post_types( array( 'show_in_nav_menus' => true ), 'objects' );
 	$taxonomies = get_taxonomies( array( 'show_in_nav_menus' => true ), 'objects' );
+
 
 	/*
 	 * Use two separate arrays as a way to order the variations in the UI.
@@ -419,7 +443,10 @@ function block_core_navigation_link_build_variations() {
 		}
 	}
 
-	return array_merge( $built_ins, $variations );
+	$all_variations = array_merge( $built_ins, $variations );
+
+
+	return $all_variations;
 }
 
 /**
