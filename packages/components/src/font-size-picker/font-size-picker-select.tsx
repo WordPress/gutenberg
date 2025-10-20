@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -42,7 +43,7 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 		} ),
 	];
 
-	const selectedOption = ( () => {
+	const selectedOption = useMemo( () => {
 		if ( value === undefined ) {
 			return DEFAULT_OPTION;
 		}
@@ -62,7 +63,7 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 			options.find( ( option ) => option.value === value ) ??
 			DEFAULT_OPTION
 		);
-	} )();
+	}, [ value, valueMode, options ] );
 
 	return (
 		<StyledCustomSelectControl
