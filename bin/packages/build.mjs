@@ -676,7 +676,13 @@ async function bundlePackage( packageName ) {
 	if ( packageJson.wpCopyFiles ) {
 		const { files, transforms = {} } = packageJson.wpCopyFiles;
 		const sourceDir = path.join( packageDir, 'src' );
-		const outputDir = path.join( PACKAGES_DIR, '..', 'build', packageName );
+		const outputDir = path.join(
+			PACKAGES_DIR,
+			'..',
+			'build',
+			'scripts',
+			packageName
+		);
 
 		for ( const filePattern of files ) {
 			const matchedFiles = await glob(

@@ -12,9 +12,9 @@
 function gutenberg_reregister_core_block_types() {
 	// Blocks directory may not exist if working from a fresh clone.
 	$blocks_dirs = array(
-		__DIR__ . '/../build/styles/block-library/',
-		__DIR__ . '/../build/styles/edit-widgets/blocks/',
-		__DIR__ . '/../build/styles/widgets/blocks/',
+		__DIR__ . '/../build/scripts/block-library/',
+		__DIR__ . '/../build/scripts/edit-widgets/blocks/',
+		__DIR__ . '/../build/scripts/widgets/blocks/',
 	);
 
 	foreach ( $blocks_dirs as $blocks_dir ) {
