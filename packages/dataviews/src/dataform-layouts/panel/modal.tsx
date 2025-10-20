@@ -18,10 +18,15 @@ import { useContext, useState, useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { Field, Form, FormField, NormalizedField } from '../../types';
+import type {
+	Field,
+	NormalizedForm,
+	NormalizedFormField,
+	NormalizedField,
+} from '../../types';
 import { DataFormLayout } from '../data-form-layout';
 import { isCombinedField } from '../is-combined-field';
-import { DEFAULT_LAYOUT } from '../normalize-form-fields';
+import { DEFAULT_LAYOUT } from '../normalize-form';
 import SummaryButton from './summary-button';
 import useFormValidity from '../../hooks/use-form-validity';
 import DataFormContext from '../../components/dataform-context';
@@ -34,7 +39,7 @@ function ModalContent< Item >( {
 	onClose,
 }: {
 	data: Item;
-	field: FormField;
+	field: NormalizedFormField;
 	onChange: ( data: Partial< Item > ) => void;
 	onClose: () => void;
 	fieldLabel: string;
@@ -45,13 +50,13 @@ function ModalContent< Item >( {
 		return deepMerge( data, changes );
 	}, [ data, changes ] );
 
-	const form: Form = useMemo(
-		(): Form => ( {
+	const form: NormalizedForm = useMemo(
+		() => ( {
 			layout: DEFAULT_LAYOUT,
 			fields: isCombinedField( field )
 				? field.children
 				: // If not explicit children return the field id itself.
-				  [ { id: field.id } ],
+				  [ { id: field.id, layout: DEFAULT_LAYOUT } ],
 		} ),
 		[ field ]
 	);
@@ -91,9 +96,7 @@ function ModalContent< Item >( {
 						data={ modalData }
 						field={ childField }
 						onChange={ handleOnChange }
-						hideLabelFromVision={
-							( form?.fields ?? [] ).length < 2
-						}
+						hideLabelFromVision={ form.fields.length < 2 }
 						validity={ childFieldValidity }
 					/>
 				) }
@@ -131,7 +134,7 @@ function PanelModal< Item >( {
 	fieldDefinition,
 }: {
 	data: Item;
-	field: FormField;
+	field: NormalizedFormField;
 	onChange: ( value: any ) => void;
 	labelPosition: 'side' | 'top' | 'none';
 	summaryFields: NormalizedField< Item >[];

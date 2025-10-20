@@ -16,16 +16,15 @@ import { chevronDown, chevronUp } from '@wordpress/icons';
 import { getFormFieldLayout } from '..';
 import DataFormContext from '../../components/dataform-context';
 import type {
-	NormalizedCardLayout,
-	CardLayout,
 	FieldLayoutProps,
-	Form,
-	Layout,
+	NormalizedCardLayout,
 	NormalizedField,
+	NormalizedForm,
+	NormalizedLayout,
 } from '../../types';
 import { DataFormLayout } from '../data-form-layout';
 import { isCombinedField } from '../is-combined-field';
-import { DEFAULT_LAYOUT, normalizeLayout } from '../normalize-form-fields';
+import { DEFAULT_LAYOUT } from '../normalize-form';
 import { getSummaryFields } from '../get-summary-fields';
 
 const NonCollapsibleCardHeader = ( {
@@ -162,15 +161,11 @@ export default function FormCardField< Item >( {
 	validity,
 }: FieldLayoutProps< Item > ) {
 	const { fields } = useContext( DataFormContext );
+	const layout = field.layout as NormalizedCardLayout;
 
-	const layout: NormalizedCardLayout = normalizeLayout( {
-		...field.layout,
-		type: 'card',
-	} as CardLayout ) as NormalizedCardLayout;
-
-	const form: Form = useMemo(
-		(): Form => ( {
-			layout: DEFAULT_LAYOUT as Layout,
+	const form: NormalizedForm = useMemo(
+		() => ( {
+			layout: DEFAULT_LAYOUT as NormalizedLayout,
 			fields: isCombinedField( field ) ? field.children : [],
 		} ),
 		[ field ]

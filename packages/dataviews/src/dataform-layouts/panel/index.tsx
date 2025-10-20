@@ -17,49 +17,41 @@ import { useState, useContext } from '@wordpress/element';
  */
 import type {
 	FieldLayoutProps,
-	FormField,
 	NormalizedField,
+	NormalizedFormField,
 	NormalizedPanelLayout,
-	PanelLayout,
-	SimpleFormField,
 } from '../../types';
 import DataFormContext from '../../components/dataform-context';
 import { isCombinedField } from '../is-combined-field';
-import { normalizeLayout } from '../normalize-form-fields';
 import PanelDropdown from './dropdown';
 import PanelModal from './modal';
 import { getSummaryFields } from '../get-summary-fields';
 
 const getFieldDefinition = < Item, >(
-	field: FormField,
+	formField: NormalizedFormField,
 	fields: NormalizedField< Item >[]
 ) => {
-	const fieldDefinition = fields.find( ( _field ) => _field.id === field.id );
+	const field = fields.find( ( _field ) => _field.id === formField.id );
 
-	if ( ! fieldDefinition ) {
-		return fields.find( ( _field ) => {
-			if ( isCombinedField( field ) ) {
-				const simpleChildren = field.children.filter(
-					( child ): child is string | SimpleFormField =>
-						typeof child === 'string' || ! isCombinedField( child )
-				);
+	if ( field ) {
+		return field;
+	}
 
-				if ( simpleChildren.length === 0 ) {
-					return false;
-				}
+	return fields.find( ( _field ) => {
+		if ( isCombinedField( formField ) ) {
+			const simpleChildren = formField.children.filter(
+				( child ) => ! isCombinedField( child )
+			);
 
-				const firstChildFieldId =
-					typeof simpleChildren[ 0 ] === 'string'
-						? simpleChildren[ 0 ]
-						: simpleChildren[ 0 ].id;
-
-				return _field.id === firstChildFieldId;
+			if ( simpleChildren.length === 0 ) {
+				return false;
 			}
 
-			return _field.id === field.id;
-		} );
-	}
-	return fieldDefinition;
+			return _field.id === simpleChildren[ 0 ].id;
+		}
+
+		return _field.id === formField.id;
+	} );
 };
 
 /**
@@ -78,7 +70,7 @@ const getFieldDefinition = < Item, >(
  */
 const getFieldDefinitionAndSummaryFields = < Item, >(
 	layout: NormalizedPanelLayout,
-	field: FormField,
+	field: NormalizedFormField,
 	fields: NormalizedField< Item >[]
 ) => {
 	const summaryFields = getSummaryFields( layout.summary, fields );
@@ -104,11 +96,7 @@ export default function FormPanelField< Item >( {
 	validity,
 }: FieldLayoutProps< Item > ) {
 	const { fields } = useContext( DataFormContext );
-
-	const layout: NormalizedPanelLayout = normalizeLayout( {
-		...field.layout,
-		type: 'panel',
-	} as PanelLayout ) as NormalizedPanelLayout;
+	const layout = field.layout as NormalizedPanelLayout;
 
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.

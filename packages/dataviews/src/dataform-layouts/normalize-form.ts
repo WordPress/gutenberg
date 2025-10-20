@@ -4,6 +4,8 @@
 import type {
 	Form,
 	Layout,
+	NormalizedForm,
+	NormalizedFormField,
 	NormalizedLayout,
 	NormalizedRegularLayout,
 	NormalizedPanelLayout,
@@ -11,12 +13,10 @@ import type {
 	NormalizedRowLayout,
 	NormalizedCardSummaryField,
 	CardSummaryField,
+	CombinedFormField,
+	NormalizedSimpleFormField,
+	NormalizedCombinedFormField,
 } from '../types';
-
-interface NormalizedFormField {
-	id: string;
-	layout: Layout;
-}
 
 export const DEFAULT_LAYOUT: NormalizedLayout = {
 	type: 'regular',
@@ -43,7 +43,7 @@ const normalizeCardSummaryField = (
  * @param layout The layout object to normalize.
  * @return The normalized layout object.
  */
-export function normalizeLayout( layout?: Layout ): NormalizedLayout {
+function normalizeLayout( layout?: Layout ): NormalizedLayout {
 	let normalizedLayout = DEFAULT_LAYOUT;
 
 	if ( layout?.type === 'regular' ) {
@@ -102,25 +102,52 @@ export function normalizeLayout( layout?: Layout ): NormalizedLayout {
 	return normalizedLayout;
 }
 
-export default function normalizeFormFields(
-	form: Form
-): NormalizedFormField[] {
-	const formLayout = normalizeLayout( form?.layout );
+function normalizeForm( form: Form ): NormalizedForm {
+	const normalizedFormLayout = normalizeLayout( form?.layout );
 
-	return ( form.fields ?? [] ).map( ( field ) => {
-		if ( typeof field === 'string' ) {
+	const normalizedFields: NormalizedFormField[] = ( form.fields ?? [] ).map(
+		( field ) => {
+			if ( typeof field === 'string' ) {
+				return {
+					id: field,
+					layout: normalizedFormLayout,
+				} satisfies NormalizedSimpleFormField;
+			}
+
+			const fieldLayout = field.layout
+				? normalizeLayout( field.layout )
+				: normalizedFormLayout;
+
+			if (
+				! ( 'children' in field ) ||
+				! Array.isArray( field.children )
+			) {
+				return {
+					id: field.id,
+					layout: fieldLayout,
+					...( !! field.label && { label: field.label } ),
+				} satisfies NormalizedSimpleFormField;
+			}
+
 			return {
-				id: field,
-				layout: formLayout,
-			};
+				id: field.id,
+				layout: fieldLayout,
+				...( !! field.label && { label: field.label } ),
+				...( !! field.description && {
+					description: field.description,
+				} ),
+				children: normalizeForm( {
+					fields: ( field as CombinedFormField ).children,
+					layout: fieldLayout,
+				} ).fields,
+			} satisfies NormalizedCombinedFormField;
 		}
+	);
 
-		const fieldLayout = field.layout
-			? normalizeLayout( field.layout )
-			: formLayout;
-		return {
-			...field,
-			layout: fieldLayout,
-		};
-	} );
+	return {
+		layout: normalizedFormLayout,
+		fields: normalizedFields,
+	};
 }
+
+export default normalizeForm;

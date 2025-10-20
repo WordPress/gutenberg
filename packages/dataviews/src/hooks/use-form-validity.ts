@@ -13,7 +13,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import normalizeFields from '../utils/normalize-fields';
-import normalizeFormFields from '../dataform-layouts/normalize-form-fields';
+import normalizeForm from '../dataform-layouts/normalize-form';
 import type {
 	CombinedFormField,
 	Field,
@@ -111,14 +111,14 @@ function getFieldsToValidate< Item >(
 	fields: NormalizedField< Item >[];
 	fieldToParent: Map< string, string >;
 } {
-	const formFields = normalizeFormFields( form );
-	if ( formFields.length === 0 ) {
+	const normalizedForm = normalizeForm( form );
+	if ( normalizedForm.fields.length === 0 ) {
 		return { fields: [], fieldToParent: new Map() };
 	}
 
 	const fieldToParent = new Map< string, string >();
 	const fieldIdsToValidate: string[] = [];
-	formFields.forEach( ( formField ) => {
+	normalizedForm.fields.forEach( ( formField ) => {
 		if ( !! ( formField as CombinedFormField ).children ) {
 			( formField as CombinedFormField ).children.forEach( ( child ) => {
 				const childId = typeof child === 'string' ? child : child.id;
