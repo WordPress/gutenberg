@@ -245,7 +245,7 @@ export function Comments( {
 	}, [ heights, blockRefs, isFloating, threads, selectedThread ] );
 
 	const hasThreads = Array.isArray( threads ) && threads.length > 0;
-	if ( ! hasThreads ) {
+	if ( ! hasThreads && ! isFloating ) {
 		return (
 			<VStack alignment="left" justify="flex-start" spacing="2">
 				<Text as="p">{ __( 'No notes available.' ) }</Text>
