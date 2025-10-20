@@ -1030,6 +1030,7 @@ _Parameters_
 -   _name_ `string`: The entity name.
 -   _prop_ `string`: The property name.
 -   _\_id_ `[number|string]`: An entity ID to use instead of the context-provided one.
+-   _context_ `[string]`: The context to use when accessing the entity.
 
 _Returns_
 

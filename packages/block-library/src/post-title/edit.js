@@ -62,13 +62,21 @@ export default function PostTitleEdit( {
 		},
 		[ isDescendentOfQueryLoop, postType, postId ]
 	);
+	const context = userCanEdit ? 'edit' : 'view';
 	const [ rawTitle = '', setTitle, fullTitle ] = useEntityProp(
 		'postType',
 		postType,
 		'title',
-		postId
+		postId,
+		context
 	);
-	const [ link ] = useEntityProp( 'postType', postType, 'link', postId );
+	const [ link ] = useEntityProp(
+		'postType',
+		postType,
+		'link',
+		postId,
+		context
+	);
 	const onSplitAtEnd = () => {
 		insertBlocksAfter( createBlock( getDefaultBlockName() ) );
 	};
