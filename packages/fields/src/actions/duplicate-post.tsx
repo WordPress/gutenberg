@@ -164,7 +164,7 @@ const duplicatePost: Action< BasePost > = {
 						onChange={ ( value ) =>
 							setItem( ( prev ) => ( {
 								...prev,
-								title: value || '',
+								title: value || __( 'No title' ),
 							} ) )
 						}
 					/>
