@@ -357,6 +357,10 @@ _Returns_
 
 Undocumented declaration.
 
+### EditorPresence
+
+Undocumented declaration.
+
 ### EditorProvider
 
 This component establishes a new post editing context, and serves as the entry point for a new post editor (or post with template editor).
