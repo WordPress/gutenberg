@@ -155,7 +155,7 @@ const UnforwardedFontSizePicker = (
 						size={ size }
 						onChange={ ( newValue, selectedItem ) => {
 							if ( newValue === undefined ) {
-								onChange?.( undefined );
+								onChange?.( undefined, selectedItem );
 							} else {
 								onChange?.(
 									hasUnits ? newValue : Number( newValue ),
@@ -175,7 +175,7 @@ const UnforwardedFontSizePicker = (
 						size={ size }
 						onChange={ ( newValue, selectedItem ) => {
 							if ( newValue === undefined ) {
-								onChange?.( undefined );
+								onChange?.( undefined, selectedItem );
 							} else {
 								onChange?.(
 									hasUnits ? newValue : Number( newValue ),
