@@ -102,7 +102,7 @@ const v3 = {
 		};
 	},
 	isEligible( attributes ) {
-		return attributes?.metadata?.bindings?.datetime?.args?.key;
+		return !! attributes?.metadata?.bindings?.datetime?.args?.key;
 	},
 };
 
