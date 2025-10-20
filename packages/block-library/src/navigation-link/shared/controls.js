@@ -11,7 +11,7 @@ import {
 	TextareaControl,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useRef } from '@wordpress/element';
+import { useRef, useEffect } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import { safeDecodeURI } from '@wordpress/url';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
@@ -72,6 +72,8 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 	const { label, url, description, rel, opensInNewTab } = attributes;
 	const lastURLRef = useRef( url );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+	const urlInputRef = useRef();
+	const shouldFocusURLInputRef = useRef( false );
 	const inputId = useInstanceId( Controls, 'link-input' );
 	const helpTextId = `${ inputId }__help`;
 
@@ -84,7 +86,7 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 	// Get direct store dispatch to bypass setBoundAttributes wrapper
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
-	const editBoundLink = () => {
+	const unsyncBoundLink = () => {
 		// Clear the binding first
 		clearBinding();
 
@@ -95,6 +97,13 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 		// See: packages/block-editor/src/components/block-edit/edit.js
 		updateBlockAttributes( clientId, { url: '', id: undefined } );
 	};
+
+	useEffect( () => {
+		if ( ! hasUrlBinding && shouldFocusURLInputRef.current ) {
+			urlInputRef.current?.focus();
+		}
+		shouldFocusURLInputRef.current = false;
+	}, [ hasUrlBinding ] );
 
 	return (
 		<ToolsPanel
@@ -135,6 +144,7 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 				isShownByDefault
 			>
 				<InputControl
+					ref={ urlInputRef }
 					__nextHasNoMarginBottom
 					__next40pxDefaultSize
 					id={ inputId }
@@ -180,7 +190,12 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 						hasUrlBinding && (
 							<Button
 								icon={ unlinkIcon }
-								onClick={ editBoundLink }
+								onClick={ () => {
+									unsyncBoundLink();
+									// Focus management to send focus to the URL input
+									// on next render after disabled state is removed.
+									shouldFocusURLInputRef.current = true;
+								} }
 								aria-describedby={ helpTextId }
 								showTooltip
 								label={ __( 'Unsync and edit' ) }
