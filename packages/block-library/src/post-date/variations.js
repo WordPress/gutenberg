@@ -20,15 +20,11 @@ const variations = [
 			},
 		},
 		scope: [ 'block', 'inserter', 'transform' ],
-		isActive: ( blockAttributes ) => {
-			const fieldValue =
-				blockAttributes?.metadata?.bindings?.datetime?.args?.field ||
-				blockAttributes?.metadata?.bindings?.datetime?.args?.key;
-			return (
-				blockAttributes?.metadata?.bindings?.datetime?.source ===
-					'core/post-data' && fieldValue === 'date'
-			);
-		},
+		isActive: ( blockAttributes ) =>
+			blockAttributes?.metadata?.bindings?.datetime?.source ===
+				'core/post-data' &&
+			blockAttributes?.metadata?.bindings?.datetime?.args?.field ===
+				'date',
 		icon: postDate,
 	},
 	{
@@ -47,15 +43,11 @@ const variations = [
 			className: 'wp-block-post-date__modified-date',
 		},
 		scope: [ 'block', 'inserter', 'transform' ],
-		isActive: ( blockAttributes ) => {
-			const fieldValue =
-				blockAttributes?.metadata?.bindings?.datetime?.args?.field ||
-				blockAttributes?.metadata?.bindings?.datetime?.args?.key;
-			return (
-				blockAttributes?.metadata?.bindings?.datetime?.source ===
-					'core/post-data' && fieldValue === 'modified'
-			);
-		},
+		isActive: ( blockAttributes ) =>
+			blockAttributes?.metadata?.bindings?.datetime?.source ===
+				'core/post-data' &&
+			blockAttributes?.metadata?.bindings?.datetime?.args?.field ===
+				'modified',
 		icon: postDate,
 	},
 ];
