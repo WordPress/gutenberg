@@ -83,6 +83,7 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 	// Sync local state when url prop changes (e.g., from undo/redo or external updates)
 	useEffect( () => {
 		setInputValue( url );
+		lastURLRef.current = url;
 	}, [ url ] );
 
 	// Use the entity binding hook internally
