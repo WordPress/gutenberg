@@ -357,9 +357,9 @@ _Returns_
 
 Renders the SlotFill for editor presence.
 
-_Returns_
+_Type_
 
--   `ReactNode`: The rendered component.
+-   `ReactNode`
 
 ### EditorProvider
 
