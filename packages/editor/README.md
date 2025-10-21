@@ -355,11 +355,11 @@ _Returns_
 
 ### EditorPresence
 
-Undocumented declaration.
+Renders the SlotFill for editor presence.
 
-### EditorPresence
+_Returns_
 
-Undocumented declaration.
+-   `ReactNode`: The rendered component.
 
 ### EditorProvider
 
