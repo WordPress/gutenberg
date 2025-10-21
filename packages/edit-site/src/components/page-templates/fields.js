@@ -155,7 +155,7 @@ export const activeField = {
 	id: 'active',
 	getValue: ( { item } ) => item._isActive,
 	render: function Render( { item } ) {
-		if ( item.is_custom ) {
+		if ( item._isCustom ) {
 			return (
 				<Badge
 					intent="info"
