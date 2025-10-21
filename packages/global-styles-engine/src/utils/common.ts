@@ -524,6 +524,20 @@ function getValueFromCustomVariable(
 	return getValueFromVariable( features, blockName, result as string );
 }
 
+/**
+ * Attempts to fetch the value of a theme.json CSS variable.
+ *
+ * This function resolves CSS variable references in two formats:
+ * - User format: `var:preset|color|red` or `var:custom|spacing|small`
+ * - Theme format: `var(--wp--preset--color--red)` or `var(--wp--custom--spacing--small)`
+ *
+ * It also handles ref-style variables in the format `{ ref: "path.to.value" }`.
+ *
+ * @param features  GlobalStylesContext config (user, base, or merged). Represents the theme.json tree.
+ * @param blockName The name of a block as represented in the styles property. E.g., 'root' for root-level, and 'core/block-name' for blocks.
+ * @param variable  An incoming style value. A CSS var value is expected, but it could be any value.
+ * @return The value of the CSS var, if found. If not found, returns the original variable argument.
+ */
 export function getValueFromVariable(
 	features: GlobalStylesConfig,
 	blockName?: string,

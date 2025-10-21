@@ -5,13 +5,31 @@ import type {
 	TypographyPreset,
 	GlobalStylesSettings,
 	FluidTypographySettings,
+	TypographySettings,
 } from '../types';
 import {
 	getTypographyValueAndUnit,
 	getComputedFluidTypographyValue,
 } from './fluid';
 
-function isFluidTypographyEnabled( typographySettings?: { fluid?: any } ) {
+/**
+ * Checks if fluid typography is enabled in the given typography settings.
+ *
+ * Fluid typography is considered enabled if the fluid setting is explicitly set to true,
+ * or if it's an object with properties (which would contain fluid typography configuration
+ * like minViewportWidth, maxViewportWidth, etc.).
+ *
+ * @param typographySettings       Typography settings object that may contain fluid typography configuration.
+ * @param typographySettings.fluid Fluid typography configuration. Can be:
+ *                                 - `true` to enable with default settings
+ *                                 - An object with fluid settings (minViewportWidth, maxViewportWidth, etc.)
+ *                                 - `false` or `undefined` to disable
+ *
+ * @return True if fluid typography is enabled, false otherwise.
+ */
+function isFluidTypographyEnabled(
+	typographySettings?: TypographySettings | TypographyPreset
+) {
 	const fluidSettings = typographySettings?.fluid;
 	return (
 		true === fluidSettings ||
