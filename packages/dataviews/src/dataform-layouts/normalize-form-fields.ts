@@ -72,6 +72,7 @@ export function normalizeLayout( layout?: Layout ): NormalizedLayout {
 				withHeader: false,
 				isOpened: true,
 				summary: [],
+				isCollapsible: false,
 			} satisfies NormalizedCardLayout;
 		} else {
 			const summary = layout.summary ?? [];
@@ -84,6 +85,7 @@ export function normalizeLayout( layout?: Layout ): NormalizedLayout {
 						? layout.isOpened
 						: true,
 				summary: normalizeCardSummaryField( summary ),
+				isCollapsible: layout.isCollapsible ?? false,
 			} satisfies NormalizedCardLayout;
 		}
 	} else if ( layout?.type === 'row' ) {
