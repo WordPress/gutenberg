@@ -72,14 +72,18 @@ export default function PageTemplates() {
 		},
 	} );
 
-	const { activeTemplatesOption, activeTheme } = useSelect( ( select ) => {
-		const { getEntityRecord, getCurrentTheme } = select( coreStore );
-		return {
-			activeTemplatesOption: getEntityRecord( 'root', 'site' )
-				?.active_templates,
-			activeTheme: getCurrentTheme(),
-		};
-	} );
+	const { activeTemplatesOption, activeTheme, defaultTemplateTypes } =
+		useSelect( ( select ) => {
+			const { getEntityRecord, getCurrentTheme } = select( coreStore );
+			return {
+				activeTemplatesOption: getEntityRecord( 'root', 'site' )
+					?.active_templates,
+				activeTheme: getCurrentTheme(),
+				defaultTemplateTypes:
+					select( coreStore ).getCurrentTheme()
+						?.default_template_types,
+			};
+		} );
 	// Todo: this will have to be better so that we're not fetching all the
 	// records all the time. Active templates query will need to move server
 	// side.
@@ -150,8 +154,14 @@ export default function PageTemplates() {
 			_isActive: activeTemplates.find(
 				( template ) => template.id === record.id
 			),
+			_isCustom:
+				record.is_custom ||
+				( ! record.meta?.is_wp_suggestion &&
+					! defaultTemplateTypes.find(
+						( type ) => type.slug === record.slug
+					) ),
 		} ) );
-	}, [ _records, activeTemplates ] );
+	}, [ _records, activeTemplates, defaultTemplateTypes ] );
 
 	const users = useSelect(
 		( select ) => {

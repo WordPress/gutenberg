@@ -134,13 +134,13 @@ require __DIR__ . '/interactivity-api.php';
 require __DIR__ . '/block-template-utils.php';
 
 // Copied package PHP files.
-if ( is_dir( __DIR__ . '/../build/style-engine' ) ) {
-	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-css-declarations-gutenberg.php';
-	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-css-rule-gutenberg.php';
-	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-css-rules-store-gutenberg.php';
-	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-processor-gutenberg.php';
-	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-gutenberg.php';
-	require_once __DIR__ . '/../build/style-engine/style-engine-gutenberg.php';
+if ( is_dir( __DIR__ . '/../build/scripts/style-engine' ) ) {
+	require_once __DIR__ . '/../build/scripts/style-engine/class-wp-style-engine-css-declarations-gutenberg.php';
+	require_once __DIR__ . '/../build/scripts/style-engine/class-wp-style-engine-css-rule-gutenberg.php';
+	require_once __DIR__ . '/../build/scripts/style-engine/class-wp-style-engine-css-rules-store-gutenberg.php';
+	require_once __DIR__ . '/../build/scripts/style-engine/class-wp-style-engine-processor-gutenberg.php';
+	require_once __DIR__ . '/../build/scripts/style-engine/class-wp-style-engine-gutenberg.php';
+	require_once __DIR__ . '/../build/scripts/style-engine/style-engine-gutenberg.php';
 }
 
 // Block supports overrides.

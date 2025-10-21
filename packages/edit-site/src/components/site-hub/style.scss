@@ -29,7 +29,7 @@
 	display: block;
 	flex-grow: 1;
 	font-size: 15px;
-	font-weight: 500;
+	font-weight: $font-weight-medium;
 	overflow: hidden;
 	// Add space for the ↗ to render.
 	padding-right: $grid-unit-20;

@@ -27,7 +27,7 @@ $footer-height: 70px;
 
 	.font-library-modal__subtitle {
 		text-transform: uppercase;
-		font-weight: 500;
+		font-weight: $font-weight-medium;
 		font-size: 11px;
 	}
 
@@ -68,13 +68,13 @@ $footer-height: 70px;
 
 .font-library-modal__page-selection {
 	font-size: 11px;
-	font-weight: 500;
+	font-weight: $font-weight-medium;
 	text-transform: uppercase;
 
 	@include break-small() {
 		.components-select-control__input {
 			font-size: 11px !important;
-			font-weight: 500;
+			font-weight: $font-weight-medium;
 		}
 	}
 }

@@ -157,7 +157,7 @@
 			padding-left: $grid-unit-15;
 			font-size: 11px;
 			text-transform: uppercase;
-			font-weight: 500;
+			font-weight: $font-weight-medium;
 
 			&:has(.dataviews-view-table-header-button):not(:first-child) {
 				padding-left: $grid-unit-05;
@@ -190,7 +190,7 @@
 		padding: $grid-unit-05 $grid-unit-10;
 		font-size: 11px;
 		text-transform: uppercase;
-		font-weight: 500;
+		font-weight: $font-weight-medium;
 
 		&:not(:hover) {
 			color: $gray-900;
