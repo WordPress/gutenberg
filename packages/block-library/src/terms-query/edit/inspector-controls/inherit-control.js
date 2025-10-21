@@ -22,7 +22,7 @@ export default function InheritControl( { value, onChange, label } ) {
 			help={
 				value
 					? __(
-							'Display terms based on the current taxonomy archive. For hierarchical taxonomies, you can choose to show nested terms or only direct children.'
+							'Display terms based on the current taxonomy archive. For hierarchical taxonomies, choose between showing nested terms or only direct children.'
 					  )
 					: __( 'Display terms based on specific criteria.' )
 			}
