@@ -5,6 +5,7 @@
 ### Enhancements
 
 - Dataviews: Use text based buttons for actions instead of text. [#72417](https://github.com/WordPress/gutenberg/pull/72417)
+- DataForm: Add support for non collapsible cards. [#72540](https://github.com/WordPress/gutenberg/pull/72540)
 
 ## 10.0.0 (2025-10-17)
 
