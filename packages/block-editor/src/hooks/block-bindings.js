@@ -473,11 +473,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 
 						const hasCompatibleDataForAttribute = Object.values(
 							sources
-						).some( ( source ) => {
-							return source.data?.some(
-								( item ) => item?.type === attributeType
-							);
-						} );
+						).some( ( item ) => item?.type === attributeType );
 
 						const isAttributeReadOnly =
 							readOnly || ! hasCompatibleDataForAttribute;
