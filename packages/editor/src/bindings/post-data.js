@@ -74,20 +74,17 @@ function getPostDataFields( select, context, clientId ) {
 			date: {
 				label: __( 'Post Date' ),
 				value: entityDataValues?.date,
-				type: 'string',
-				attributes: [ 'datetime' ],
+				type: 'datetime',
 			},
 			modified: {
 				label: __( 'Post Modified Date' ),
 				value: entityDataValues?.modified,
-				type: 'string',
-				attributes: [ 'datetime' ],
+				type: 'datetime',
 			},
 			link: {
 				label: __( 'Post Link' ),
 				value: entityDataValues?.link,
 				type: 'string',
-				attributes: [ 'url', 'content' ],
 			},
 		};
 	}
@@ -203,7 +200,6 @@ export default {
 				field: key,
 			},
 			type: field.type,
-			attributes: field.attributes,
 		} ) );
 		/*
 		 * We need to define the data as [{ label: string, value: any, type: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#type-validation }]

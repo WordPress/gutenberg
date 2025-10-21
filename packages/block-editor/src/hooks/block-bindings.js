@@ -45,6 +45,10 @@ const EMPTY_OBJECT = {};
  * @return {string} The normalized attribute type.
  */
 const getAttributeType = ( blockName, attribute ) => {
+	// Temporary workaround for datetime attribute.
+	if ( attribute === 'datetime' ) {
+		return 'datetime';
+	}
 	const _attributeType =
 		getBlockType( blockName ).attributes?.[ attribute ]?.type;
 	return _attributeType === 'rich-text' ? 'string' : _attributeType;
