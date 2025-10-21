@@ -1237,7 +1237,7 @@ test.describe( 'Links', () => {
 			.getByRole( 'region', {
 				name: 'Editor content',
 			} )
-			.getByRole( 'button', { name: 'Save' } )
+			.getByRole( 'button', { name: 'Apply' } )
 			.click();
 
 		// Reactive the link again
