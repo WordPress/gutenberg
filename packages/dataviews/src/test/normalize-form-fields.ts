@@ -143,6 +143,7 @@ describe( 'normalizeFormFields', () => {
 						withHeader: true,
 						isOpened: true,
 						summary: [],
+						isCollapsible: true,
 					},
 				},
 			] );
@@ -169,6 +170,7 @@ describe( 'normalizeFormFields', () => {
 						withHeader: false,
 						isOpened: true,
 						summary: [],
+						isCollapsible: false,
 					},
 				},
 			] );
@@ -193,6 +195,7 @@ describe( 'normalizeFormFields', () => {
 						withHeader: true,
 						isOpened: false,
 						summary: [ { id: 'field1', visibility: 'always' } ],
+						isCollapsible: true,
 					},
 				},
 			] );
@@ -208,6 +211,7 @@ describe( 'normalizeFormFields', () => {
 						'field2',
 						{ id: 'field1', visibility: 'always' },
 					],
+					isCollapsible: true,
 				},
 				fields: [ 'field1' ],
 			};
@@ -223,6 +227,7 @@ describe( 'normalizeFormFields', () => {
 							{ id: 'field2', visibility: 'when-collapsed' },
 							{ id: 'field1', visibility: 'always' },
 						],
+						isCollapsible: true,
 					},
 				},
 			] );
@@ -279,6 +284,7 @@ describe( 'normalizeFormFields', () => {
 						withHeader: false,
 						isOpened: true,
 						summary: [],
+						isCollapsible: false,
 					},
 				},
 				{
@@ -288,6 +294,7 @@ describe( 'normalizeFormFields', () => {
 						withHeader: true,
 						isOpened: false,
 						summary: [],
+						isCollapsible: true,
 					},
 				},
 			] );
