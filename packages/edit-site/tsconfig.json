@@ -21,6 +21,7 @@
 		{ "path": "../element" },
 		{ "path": "../escape-html" },
 		{ "path": "../fields" },
+		{ "path": "../global-styles-engine" },
 		{ "path": "../hooks" },
 		{ "path": "../html-entities" },
 		{ "path": "../i18n" },

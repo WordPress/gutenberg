@@ -20,11 +20,11 @@ import { useContext, useMemo } from '@wordpress/element';
 
 import { unlock } from '../../lock-unlock';
 import EditorCanvasContainer from '../editor-canvas-container';
+import { useGlobalStylesOutputWithConfig } from '../../hooks/use-global-styles-output';
 
 const {
 	ExperimentalBlockEditorProvider,
 	GlobalStylesContext,
-	useGlobalStylesOutputWithConfig,
 	__unstableBlockStyleVariationOverridesWithConfig,
 } = unlock( blockEditorPrivateApis );
 const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );

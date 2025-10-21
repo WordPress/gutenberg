@@ -56,13 +56,10 @@ import {
 	STYLE_BOOK_COLOR_GROUPS,
 	STYLE_BOOK_PREVIEW_CATEGORIES,
 } from '../style-book/constants';
+import { useGlobalStylesOutputWithConfig } from '../../hooks/use-global-styles-output';
 
-const {
-	ExperimentalBlockEditorProvider,
-	useGlobalStyle,
-	GlobalStylesContext,
-	useGlobalStylesOutputWithConfig,
-} = unlock( blockEditorPrivateApis );
+const { ExperimentalBlockEditorProvider, useGlobalStyle, GlobalStylesContext } =
+	unlock( blockEditorPrivateApis );
 const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
 
 const { Tabs } = unlock( componentsPrivateApis );

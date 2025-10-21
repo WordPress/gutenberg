@@ -51,6 +51,7 @@ export default Object.assign( {}, CONTROL_PROPS, {
 	fontSizeXSmall: 'calc(0.75 * 13px)',
 	fontLineHeightBase: '1.4',
 	fontWeight: 'normal',
+	fontWeightMedium: '499', // ensures fallback to 400 (instead of 600)
 	fontWeightHeading: '600',
 	gridBase: '4px',
 	cardPaddingXSmall: `${ space( 2 ) }`,

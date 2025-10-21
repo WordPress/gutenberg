@@ -1716,6 +1716,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/global-styles-engine",
+		"slug": "packages-global-styles-engine",
+		"markdown_source": "../packages/global-styles-engine/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/hooks",
 		"slug": "packages-hooks",
 		"markdown_source": "../packages/hooks/README.md",
