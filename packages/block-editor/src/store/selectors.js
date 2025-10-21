@@ -1682,15 +1682,7 @@ const canInsertBlockTypeUnmemoized = (
 		blockType = getBlockType( blockName );
 	}
 
-	const isLocked = !! getTemplateLock( state, rootClientId );
-	if ( isLocked ) {
-		return false;
-	}
-	const isContentRoleBlock = isContentBlock( blockName );
-	const isParentSectionBlock = !! isSectionBlock( state, rootClientId );
-	// It shouldn't be possible to insert inside a section block unless in
-	// some cases when the block is a content block.
-	if ( isParentSectionBlock && ! isContentRoleBlock ) {
+	if ( getTemplateLock( state, rootClientId ) ) {
 		return false;
 	}
 
@@ -1704,6 +1696,21 @@ const canInsertBlockTypeUnmemoized = (
 	// The parent block doesn't have settings indicating it doesn't support
 	// inner blocks, return false.
 	if ( rootClientId && parentBlockListSettings === undefined ) {
+		return false;
+	}
+
+	// It shouldn't be possible to insert inside a section block unless in
+	// some cases when the block is a content block.
+	const isContentRoleBlock = isContentBlock( blockName );
+	const isParentSectionBlock = !! isSectionBlock( state, rootClientId );
+	const isBlockWithinSection = !! getParentSectionBlock(
+		state,
+		rootClientId
+	);
+	if (
+		( isParentSectionBlock || isBlockWithinSection ) &&
+		! isContentRoleBlock
+	) {
 		return false;
 	}
 
@@ -1862,6 +1869,8 @@ export function canRemoveBlock( state, clientId ) {
 		return false;
 	}
 
+	// It shouldn't be possible to move in a section block unless in
+	// some cases when the block is a content block.
 	const isBlockWithinSection = !! getParentSectionBlock( state, clientId );
 	const isContentRoleBlock = isContentBlock(
 		getBlockName( state, clientId )
@@ -1870,11 +1879,11 @@ export function canRemoveBlock( state, clientId ) {
 		return false;
 	}
 
-	const blockEditingMode = getBlockEditingMode( state, clientId );
-
+	const isParentSectionBlock = !! isSectionBlock( state, rootClientId );
+	const rootBlockEditingMode = getBlockEditingMode( state, rootClientId );
 	// Check if the parent container allows insertion/removal in contentOnly mode
 	if (
-		blockEditingMode === 'contentOnly' &&
+		( isParentSectionBlock || rootBlockEditingMode === 'contentOnly' ) &&
 		! isContainerInsertableToInContentOnlyMode(
 			state,
 			getBlockName( state, clientId ),
@@ -1884,7 +1893,6 @@ export function canRemoveBlock( state, clientId ) {
 		return false;
 	}
 
-	const rootBlockEditingMode = getBlockEditingMode( state, rootClientId );
 	return rootBlockEditingMode !== 'disabled';
 }
 
@@ -1918,14 +1926,24 @@ export function canMoveBlock( state, clientId ) {
 	}
 
 	const rootClientId = getBlockRootClientId( state, clientId );
-	const templateLock = getTemplateLock( state, rootClientId );
-	if ( templateLock === 'all' || templateLock === 'contentOnly' ) {
+	if ( getTemplateLock( state, rootClientId ) ) {
 		return false;
 	}
 
-	const blockEditingMode = getBlockEditingMode( state, clientId );
+	const isBlockWithinSection = !! getParentSectionBlock( state, clientId );
+	const isContentRoleBlock = isContentBlock(
+		getBlockName( state, clientId )
+	);
+	if ( isBlockWithinSection && ! isContentRoleBlock ) {
+		return false;
+	}
+
+	// If the parent is a section or is `contentOnly`, then check is the inner block
+	// should be allowed to move.
+	const isParentSectionBlock = !! isSectionBlock( state, rootClientId );
+	const rootBlockEditingMode = getBlockEditingMode( state, rootClientId );
 	if (
-		blockEditingMode === 'contentOnly' &&
+		( isParentSectionBlock || rootBlockEditingMode === 'contentOnly' ) &&
 		! isContainerInsertableToInContentOnlyMode(
 			state,
 			getBlockName( state, clientId ),
