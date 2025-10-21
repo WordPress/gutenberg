@@ -221,6 +221,90 @@ test.describe( 'Fit Text', () => {
 			// Fit text should scale up significantly for short content
 			expect( fitTextSize ).toBeGreaterThan( normalSize * 2 );
 		} );
+
+		test( 'should disable fit text when a font size is selected', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/heading',
+				attributes: {
+					content: 'Test Heading',
+					level: 2,
+					fitText: true,
+				},
+			} );
+
+			await editor.openDocumentSettingsSidebar();
+
+			// Set a custom font size
+			await page.click(
+				'role=region[name="Editor settings"i] >> role=button[name="Set custom size"i]'
+			);
+			await page.click( 'role=spinbutton[name="Font size"i]' );
+			await page.keyboard.type( '24' );
+
+			// fitText should be disabled
+			await expect
+				.poll( async () => {
+					const blocks = await editor.getBlocks();
+					return blocks[ 0 ].attributes.fitText;
+				} )
+				.toBeUndefined();
+
+			// Font size should be set
+			const blocks = await editor.getBlocks();
+			expect(
+				blocks[ 0 ].attributes.style?.typography?.fontSize
+			).toBeTruthy();
+		} );
+
+		test( 'should clear font size when fit text is enabled', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/heading',
+				attributes: {
+					content: 'Test Heading',
+					level: 2,
+					fontSize: 'large',
+				},
+			} );
+
+			await editor.openDocumentSettingsSidebar();
+
+			// Enable Fit text control via Typography options menu
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Typography options' } )
+				.click();
+			await page
+				.getByRole( 'menu', { name: 'Typography options' } )
+				.getByRole( 'menuitemcheckbox', { name: 'Show Fit text' } )
+				.click();
+
+			const fitTextToggle = page.getByRole( 'checkbox', {
+				name: 'Fit text',
+			} );
+
+			await fitTextToggle.click();
+
+			// fontSize should be cleared
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/heading',
+					attributes: expect.objectContaining( {
+						content: 'Test Heading',
+						level: 2,
+						fitText: true,
+					} ),
+				},
+			] );
+
+			const blocks = await editor.getBlocks();
+			expect( blocks[ 0 ].attributes.fontSize ).toBeUndefined();
+		} );
 	} );
 
 	test.describe( 'Frontend functionality', () => {
