@@ -9,6 +9,7 @@ import deepMerge from 'deepmerge';
 import { useCallback, useMemo, useState } from '@wordpress/element';
 import {
 	Button,
+	Notice,
 	__experimentalVStack as VStack,
 	privateApis,
 } from '@wordpress/components';
@@ -1355,6 +1356,21 @@ const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 				return <Badge>{ item.plan }</Badge>;
 			},
 		},
+		{
+			id: 'important-note',
+			label: 'Important notice regarding your account',
+			type: 'text',
+			readOnly: true,
+			render: () => {
+				return (
+					<Notice status="warning" isDismissible={ false }>
+						This card can not be collapsed and is used to display
+						important messages or when it is the only card in the
+						page.
+					</Notice>
+				);
+			},
+		},
 	];
 
 	const [ customer, setCustomer ] = useState< Customer >( {
@@ -1440,6 +1456,15 @@ const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 						type: 'card',
 						withHeader: false,
 					},
+				},
+				{
+					id: 'important-information',
+					label: 'Important information',
+					layout: {
+						type: 'card',
+						isCollapsible: false,
+					},
+					children: [ 'important-note' ],
 				},
 				{
 					id: 'taxConfiguration',
