@@ -142,7 +142,11 @@ export const registerPostTypeSchema =
 
 		// @ts-ignore
 		if ( ! globalThis.IS_GUTENBERG_PLUGIN ) {
-			if ( postType === 'page' ) {
+			if (
+				! [ 'wp_template', 'wp_block', 'wp_template_part' ].includes(
+					postType
+				)
+			) {
 				canDuplicate = undefined;
 			}
 		}
