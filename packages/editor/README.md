@@ -353,14 +353,6 @@ _Returns_
 
 -   `React.ReactNode`: The rendered EditorNotices component.
 
-### EditorPresence
-
-Renders the SlotFill for editor presence.
-
-_Type_
-
--   `ReactNode`
-
 ### EditorProvider
 
 This component establishes a new post editing context, and serves as the entry point for a new post editor (or post with template editor).
