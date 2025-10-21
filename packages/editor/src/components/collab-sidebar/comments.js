@@ -535,17 +535,19 @@ function Thread( {
 					</VStack>
 				</VStack>
 			) }
-			<Button
-				className="editor-collab-sidebar-panel__skip-to-block"
-				variant="secondary"
-				size="compact"
-				onClick={ ( event ) => {
-					event.stopPropagation();
-					relatedBlockElement?.focus();
-				} }
-			>
-				{ __( 'Back to block' ) }
-			</Button>
+			{ !! thread.blockClientId && (
+				<Button
+					className="editor-collab-sidebar-panel__skip-to-block"
+					variant="secondary"
+					size="compact"
+					onClick={ ( event ) => {
+						event.stopPropagation();
+						relatedBlockElement?.focus();
+					} }
+				>
+					{ __( 'Back to block' ) }
+				</Button>
+			) }
 		</VStack>
 	);
 }
