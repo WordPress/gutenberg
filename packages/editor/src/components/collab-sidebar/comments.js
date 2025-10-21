@@ -327,7 +327,7 @@ function Thread( {
 	const handleCommentSelect = () => {
 		setShowCommentBoard( false );
 		setSelectedThread( thread.id );
-		if ( relatedBlockElement ) {
+		if ( !! thread.blockClientId ) {
 			// Pass `null` as the second parameter to prevent focusing the block.
 			selectBlock( thread.blockClientId, null );
 			toggleBlockSpotlight( thread.blockClientId, true );
@@ -350,7 +350,7 @@ function Thread( {
 		stripHTML( thread.content.rendered ),
 		10
 	);
-	const ariaLabel = relatedBlockElement
+	const ariaLabel = !! thread.blockClientId
 		? sprintf(
 				// translators: %s: note excerpt
 				__( 'Note: %s' ),
@@ -416,7 +416,7 @@ function Thread( {
 			>
 				{ __( 'Add new note' ) }
 			</Button>
-			{ ! relatedBlockElement && (
+			{ ! thread.blockClientId && (
 				<Text as="p" weight={ 500 } variant="muted">
 					{ __( 'Original block deleted.' ) }
 				</Text>
