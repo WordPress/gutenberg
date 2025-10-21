@@ -347,7 +347,8 @@ export function useEnableFloatingSidebar( enabled = false ) {
 				.select( interfaceStore )
 				.getActiveComplementaryArea( 'core' );
 
-			if ( ! activeSidebar ) {
+			// Return `null` to indicate the user hid the complementary area.
+			if ( activeSidebar === null ) {
 				registry
 					.dispatch( interfaceStore )
 					.enableComplementaryArea( 'core', collabSidebarName );
