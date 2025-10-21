@@ -12,9 +12,7 @@ const { Fill, Slot } = createSlotFill( 'EditorPresence' );
 
 /**
  * Renders the SlotFill for editor presence.
- *
- * @return {ReactNode} The rendered component.
  */
-export const EditorPresence = Fill;
+export const EditorPresence: ReactNode = Fill;
 
 export { Slot };
