@@ -256,8 +256,15 @@ export function Comments( {
 		);
 	}
 
+	const style = isFloating
+		? {
+				container: 'thread stack / size',
+				height: '100%',
+		  }
+		: undefined;
+
 	return (
-		<VStack spacing="3">
+		<VStack style={ style } spacing="3">
 			{ threads.map( ( thread ) => (
 				<Thread
 					key={ thread.id }
@@ -398,7 +405,7 @@ function Thread( {
 			aria-label={ ariaLabel }
 			aria-expanded={ isSelected }
 			ref={ isFloating ? refs.setFloating : undefined }
-			style={ isFloating ? { top: y } : undefined }
+			style={ isFloating ? { '--floating-top': `${ y }px` } : undefined }
 		>
 			<Button
 				className="editor-collab-sidebar-panel__skip-to-comment"

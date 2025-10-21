@@ -42,10 +42,21 @@
 	}
 
 	&.is-floating {
+		translate: 0 var(--floating-top);
+		top: 0;
 		left: $grid-unit-20;
 		right: $grid-unit-20;
 		position: absolute;
 		margin-top: $grid-unit-20;
+		max-height: calc(100cqb - var(--floating-top));
+		overflow: auto;
+		justify-content: initial;
+
+		> * {
+			// Prevents shrinking children flex items. E.g. VStack components which have
+			// min-height: 0px causing them to overlap sibliings.
+			flex-shrink: 0;
+		}
 	}
 }
 
@@ -132,26 +143,24 @@
 .editor-collab-sidebar-panel__skip-to-comment,
 .editor-collab-sidebar-panel__skip-to-block {
 	position: absolute;
-	top: -9999px;
-	right: -9999px;
 	overflow: hidden;
 	clip-path: inset(50%);
 	background: $white !important;
 	z-index: -1;
 
 	&:focus {
+		position: sticky;
 		overflow: visible;
 		clip-path: none;
 		z-index: 1;
-		right: $grid-unit-10;
+		align-self: end;
 	}
 }
 .editor-collab-sidebar-panel__skip-to-comment:focus {
-	top: $grid-unit-10;
+	top: 0;
 }
 .editor-collab-sidebar-panel__skip-to-block:focus {
-	top: auto;
-	bottom: $grid-unit-10;
+	bottom: 0;
 }
 
 // Comment avatar indicators.
