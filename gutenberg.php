@@ -5,7 +5,7 @@
  * Description: Printing since 1440. This is the development plugin for the block editor, site editor, and other future WordPress core functionality.
  * Requires at least: 6.7
  * Requires PHP: 7.2
- * Version: 21.9.0-rc.1
+ * Version: 21.9.0-rc.2
  * Author: Gutenberg Team
  * Text Domain: gutenberg
  *
@@ -55,7 +55,7 @@ function gutenberg_build_files_notice() {
  */
 function gutenberg_pre_init() {
 	global $wp_version;
-	if ( defined( 'GUTENBERG_DEVELOPMENT_MODE' ) && GUTENBERG_DEVELOPMENT_MODE && ! file_exists( __DIR__ . '/build/blocks' ) ) {
+	if ( defined( 'GUTENBERG_DEVELOPMENT_MODE' ) && GUTENBERG_DEVELOPMENT_MODE && ! file_exists( __DIR__ . '/build/scripts/blocks' ) ) {
 		add_action( 'admin_notices', 'gutenberg_build_files_notice' );
 		return;
 	}

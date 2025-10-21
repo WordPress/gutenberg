@@ -6,25 +6,32 @@ import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf, _x } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useState } from '@wordpress/element';
-import { DataForm } from '@wordpress/dataviews';
 import {
 	Button,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
+	__experimentalInputControl as InputControl,
 } from '@wordpress/components';
-import type { Action } from '@wordpress/dataviews';
 
 /**
  * Internal dependencies
  */
-import { titleField } from '../fields';
 import type { BasePost, CoreDataError } from '../types';
 import { getItemTitle } from './utils';
 
-const fields = [ titleField ];
-const formDuplicateAction = {
-	fields: [ 'title' ],
-};
+interface RenderModalProps< Item > {
+	items: Item[];
+	closeModal?: () => void;
+	onActionPerformed?: ( items: Item[] ) => void;
+}
+
+interface Action< Item > {
+	id: string;
+	label: string;
+	isEligible?: ( item: Item ) => boolean;
+	modalFocusOnMount?: string;
+	RenderModal: ( props: RenderModalProps< Item > ) => JSX.Element;
+}
 
 const duplicatePost: Action< BasePost > = {
 	id: 'duplicate-post',
@@ -149,14 +156,15 @@ const duplicatePost: Action< BasePost > = {
 							) }
 						</div>
 					) }
-					<DataForm
-						data={ item }
-						fields={ fields }
-						form={ formDuplicateAction }
-						onChange={ ( changes ) =>
+					<InputControl
+						__next40pxDefaultSize
+						label={ __( 'Title' ) }
+						placeholder={ __( 'No title' ) }
+						value={ getItemTitle( item ) }
+						onChange={ ( value ) =>
 							setItem( ( prev ) => ( {
 								...prev,
-								...changes,
+								title: value || __( 'No title' ),
 							} ) )
 						}
 					/>

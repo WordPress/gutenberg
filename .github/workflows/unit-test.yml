@@ -157,7 +157,6 @@ jobs:
                   name: build-assets
                   path: |
                       ./build/
-                      ./build-module/
 
     test-php:
         name: PHP ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }}${{ matrix.wordpress != '' && format( ' (WP {0}) ', matrix.wordpress ) || '' }} on Linux
@@ -234,6 +233,7 @@ jobs:
               uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
               with:
                   name: build-assets
+                  path: build
 
             - name: Docker debug information
               run: |
