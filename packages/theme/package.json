@@ -30,8 +30,8 @@
 			"import": "./build-module/index.js",
 			"default": "./build/index.js"
 		},
-		"./design-tokens.css": "./src/prebuild/css/design-tokens.css",
-		"./design-tokens.js": "./src/prebuild/js/design-tokens.js",
+		"./design-tokens.css": "./src/prebuilt/css/design-tokens.css",
+		"./design-tokens.js": "./src/prebuilt/js/design-tokens.js",
 		"./package.json": "./package.json",
 		"./build-style/": "./build-style/"
 	},
@@ -52,6 +52,6 @@
 		"access": "public"
 	},
 	"scripts": {
-		"build": "rimraf src/prebuild docs && node bin/build-tokens.js && prettier --write tokens/color.json src/prebuild/* docs/*"
+		"build": "rimraf src/prebuilt docs && node bin/build-tokens.js && prettier --write tokens/color.json src/prebuilt/* docs/*"
 	}
 }
