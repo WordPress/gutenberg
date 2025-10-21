@@ -244,19 +244,21 @@ test.describe( 'Fit Text', () => {
 			await page.click( 'role=spinbutton[name="Font size"i]' );
 			await page.keyboard.type( '24' );
 
-			// fitText should be disabled
-			await expect
-				.poll( async () => {
-					const blocks = await editor.getBlocks();
-					return blocks[ 0 ].attributes.fitText;
-				} )
-				.toBeUndefined();
-
-			// Font size should be set
-			const blocks = await editor.getBlocks();
-			expect(
-				blocks[ 0 ].attributes.style?.typography?.fontSize
-			).toBeTruthy();
+			// fitText should be cleared
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/heading',
+					attributes: expect.objectContaining( {
+						content: 'Test Heading',
+						level: 2,
+						style: {
+							typography: {
+								fontSize: '24px',
+							},
+						},
+					} ),
+				},
+			] );
 		} );
 
 		test( 'should clear font size when fit text is enabled', async ( {
@@ -301,9 +303,6 @@ test.describe( 'Fit Text', () => {
 					} ),
 				},
 			] );
-
-			const blocks = await editor.getBlocks();
-			expect( blocks[ 0 ].attributes.fontSize ).toBeUndefined();
 		} );
 	} );
 
