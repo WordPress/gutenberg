@@ -45,6 +45,10 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'kind', $variation['attributes'], 'Attributes should have kind key' );
 	}
 
+	// ============================================================================
+	// UNIT TESTS - Mock objects for controlled testing
+	// ============================================================================
+
 	/**
 	 * Test that a custom post type variation has correct title and description format.
 	 */
@@ -332,5 +336,161 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'product', $variation['name'], 'Name should match entity name' );
 		$this->assertEquals( 'product', $variation['attributes']['type'], 'Type should match entity name' );
 		$this->assertEquals( 'post-type', $variation['attributes']['kind'], 'Kind should be preserved' );
+	}
+
+	// ============================================================================
+	// INTEGRATION TESTS - Real WordPress objects with registration
+	// ============================================================================
+
+	/**
+	 * Integration test: Custom post type with custom labels.
+	 */
+	public function test_integration_custom_post_type_with_custom_labels() {
+		// Register a custom post type with custom labels
+		$post_type = register_post_type(
+			'test_product',
+			array(
+				'labels'            => array(
+					'singular_name'        => 'Product',
+					'item_link'            => 'Custom Product Link',
+					'item_link_description' => 'Custom product description',
+				),
+				'public'            => true,
+				'show_in_nav_menus' => true,
+			)
+		);
+
+		$this->assertNotNull( $post_type, 'Custom post type should be registered' );
+
+		$variation = gutenberg_build_variation_for_navigation_link( $post_type, 'post-type' );
+
+		// Verify custom post type works correctly with custom labels
+		$this->assertEquals( 'test_product', $variation['name'], 'Name should match registered post type name' );
+		$this->assertEquals( 'test_product', $variation['attributes']['type'], 'Type should match registered post type name' );
+		$this->assertEquals( 'post-type', $variation['attributes']['kind'], 'Kind should be "post-type"' );
+		$this->assertEquals( 'Custom Product Link', $variation['title'], 'Title should use custom item_link label' );
+		$this->assertEquals( 'Custom product description', $variation['description'], 'Description should use custom item_link_description' );
+
+		// Clean up
+		unregister_post_type( 'test_product' );
+	}
+
+	/**
+	 * Integration test: Custom post type without custom labels (smoke test).
+	 */
+	public function test_integration_custom_post_type_without_custom_labels() {
+		// Register a custom post type WITHOUT custom item_link labels
+		$post_type = register_post_type(
+			'test_product',
+			array(
+				'labels'            => array(
+					'singular_name' => 'Product',
+					// No item_link or item_link_description
+				),
+				'public'            => true,
+				'show_in_nav_menus' => true,
+			)
+		);
+
+		$this->assertNotNull( $post_type, 'Custom post type should be registered' );
+
+		$variation = gutenberg_build_variation_for_navigation_link( $post_type, 'post-type' );
+
+		// Verify custom post type works correctly with generated labels
+		$this->assertEquals( 'test_product', $variation['name'], 'Name should match registered post type name' );
+		$this->assertEquals( 'test_product', $variation['attributes']['type'], 'Type should match registered post type name' );
+		$this->assertEquals( 'post-type', $variation['attributes']['kind'], 'Kind should be "post-type"' );
+		$this->assertEquals( 'Product Link', $variation['title'], 'Title should be generated from singular_name' );
+		$this->assertEquals( 'A link to a product', $variation['description'], 'Description should be generated from singular_name' );
+
+		// Clean up
+		unregister_post_type( 'test_product' );
+	}
+
+	/**
+	 * Integration test: Custom taxonomy with custom labels.
+	 */
+	public function test_integration_custom_taxonomy_with_custom_labels() {
+		// First register a post type for the taxonomy
+		$post_type = register_post_type(
+			'test_product',
+			array(
+				'public'            => true,
+				'show_in_nav_menus' => true,
+			)
+		);
+
+		// Register a custom taxonomy with custom labels
+		$taxonomy = register_taxonomy(
+			'test_product_category',
+			'test_product',
+			array(
+				'labels'            => array(
+					'singular_name'        => 'Product Category',
+					'item_link'            => 'Custom Category Link',
+					'item_link_description' => 'Custom category description',
+				),
+				'public'            => true,
+				'show_in_nav_menus' => true,
+			)
+		);
+
+		$this->assertNotNull( $taxonomy, 'Custom taxonomy should be registered' );
+
+		$variation = gutenberg_build_variation_for_navigation_link( $taxonomy, 'taxonomy' );
+
+		// Verify custom taxonomy works correctly with custom labels
+		$this->assertEquals( 'test_product_category', $variation['name'], 'Name should match registered taxonomy name' );
+		$this->assertEquals( 'test_product_category', $variation['attributes']['type'], 'Type should match registered taxonomy name' );
+		$this->assertEquals( 'taxonomy', $variation['attributes']['kind'], 'Kind should be "taxonomy"' );
+		$this->assertEquals( 'Custom Category Link', $variation['title'], 'Title should use custom item_link label' );
+		$this->assertEquals( 'Custom category description', $variation['description'], 'Description should use custom item_link_description' );
+
+		// Clean up
+		unregister_taxonomy( 'test_product_category' );
+		unregister_post_type( 'test_product' );
+	}
+
+	/**
+	 * Integration test: Custom taxonomy without custom labels (smoke test).
+	 */
+	public function test_integration_custom_taxonomy_without_custom_labels() {
+		// First register a post type for the taxonomy
+		$post_type = register_post_type(
+			'test_product',
+			array(
+				'public'            => true,
+				'show_in_nav_menus' => true,
+			)
+		);
+
+		// Register a custom taxonomy WITHOUT custom item_link labels
+		$taxonomy = register_taxonomy(
+			'test_product_category',
+			'test_product',
+			array(
+				'labels'            => array(
+					'singular_name' => 'Product Category',
+					// No item_link or item_link_description
+				),
+				'public'            => true,
+				'show_in_nav_menus' => true,
+			)
+		);
+
+		$this->assertNotNull( $taxonomy, 'Custom taxonomy should be registered' );
+
+		$variation = gutenberg_build_variation_for_navigation_link( $taxonomy, 'taxonomy' );
+
+		// Verify custom taxonomy works correctly with generated labels
+		$this->assertEquals( 'test_product_category', $variation['name'], 'Name should match registered taxonomy name' );
+		$this->assertEquals( 'test_product_category', $variation['attributes']['type'], 'Type should match registered taxonomy name' );
+		$this->assertEquals( 'taxonomy', $variation['attributes']['kind'], 'Kind should be "taxonomy"' );
+		$this->assertEquals( 'Product Category Link', $variation['title'], 'Title should be generated from singular_name' );
+		$this->assertEquals( 'A link to a product category', $variation['description'], 'Description should be generated from singular_name' );
+
+		// Clean up
+		unregister_taxonomy( 'test_product_category' );
+		unregister_post_type( 'test_product' );
 	}
 }
