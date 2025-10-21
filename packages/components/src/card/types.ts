@@ -9,8 +9,16 @@ import type { CSSProperties } from 'react';
 import type { SurfaceProps } from '../surface/types';
 
 type DeprecatedSizeOptions = 'extraSmall';
-export type SizeOptions = 'xSmall' | 'small' | 'medium' | 'large';
+export type SizeToken = 'xSmall' | 'small' | 'medium' | 'large';
 
+export type SizeOptions =
+	| SizeToken
+	| {
+			top?: SizeToken;
+			right?: SizeToken;
+			bottom?: SizeToken;
+			left?: SizeToken;
+	  };
 type SizeableProps = {
 	/**
 	 * Determines the amount of padding within the component.
@@ -72,7 +80,7 @@ export type BodyProps = BaseSubComponentProps & {
 	 * @default false
 	 */
 	isScrollable?: boolean;
-};
+} & SizeableProps;
 
 export type MediaProps = {
 	/**
@@ -90,7 +98,7 @@ type MarginalSubComponentProps = BaseSubComponentProps & {
 	isBorderless?: boolean;
 };
 
-export type HeaderProps = MarginalSubComponentProps;
+export type HeaderProps = MarginalSubComponentProps & SizeableProps;
 
 export type FooterProps = MarginalSubComponentProps & {
 	justify?: CSSProperties[ 'justifyContent' ];
