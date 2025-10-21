@@ -312,42 +312,44 @@ function build_variation_for_navigation_link( $entity, $kind ) {
 	$title       = '';
 	$description = '';
 
-	// Hard-coded default labels to avoid WordPress core dependencies in tests
-	$default_post_type_labels = array(
-		'item_link'            => array( 'Post Link', 'Page Link' ),
-		'item_link_description' => array( 'A link to a post.', 'A link to a page.' ),
-	);
-	$default_taxonomy_labels  = array(
-		'item_link'            => array( 'Tag Link', 'Category Link' ),
-		'item_link_description' => array( 'A link to a tag.', 'A link to a category.' ),
-	);
+	// Get default labels based on entity type
+	$default_labels = null;
+	if ( $entity instanceof WP_Post_Type ) {
+		$default_labels = WP_Post_Type::get_default_labels();
+	} elseif ( $entity instanceof WP_Taxonomy ) {
+		$default_labels = WP_Taxonomy::get_default_labels();
+	}
 
-	// Check if the current labels are the default generic ones
-	$is_default_title       = false;
-	$is_default_description = false;
-
+	// Get title and check if it's default
+	$title = '';
+	$is_default_title = false;
 	if ( property_exists( $entity->labels, 'item_link' ) ) {
 		$title = $entity->labels->item_link;
-		// Check if this matches the default labels
-		$default_labels   = $entity instanceof WP_Post_Type ? $default_post_type_labels : $default_taxonomy_labels;
-		$is_default_title = in_array( $title, $default_labels['item_link'], true );
+		if ( $default_labels && isset( $default_labels['item_link'] ) ) {
+			$is_default_title = in_array( $title, $default_labels['item_link'], true );
+		}
 	}
 
+	// Get description and check if it's default
+	$description = '';
+	$is_default_description = false;
 	if ( property_exists( $entity->labels, 'item_link_description' ) ) {
 		$description = $entity->labels->item_link_description;
-		// Check if this matches the default labels
-		$default_labels           = $entity instanceof WP_Post_Type ? $default_post_type_labels : $default_taxonomy_labels;
-		$is_default_description   = in_array( $description, $default_labels['item_link_description'], true );
+		if ( $default_labels && isset( $default_labels['item_link_description'] ) ) {
+			$is_default_description = in_array( $description, $default_labels['item_link_description'], true );
+		}
 	}
 
-	// Generate custom labels if we have default generic ones or no labels at all
+	// Calculate singular name once (used for both title and description)
+	$singular = isset( $entity->labels->singular_name ) ? $entity->labels->singular_name : ucfirst( $entity->name );
+
+	// Set default title if needed
 	if ( $is_default_title || '' === $title ) {
-		$singular = isset( $entity->labels->singular_name ) ? $entity->labels->singular_name : ucfirst( $entity->name );
-		$title    = sprintf( /* translators: %s: Singular label of the entity. */ __( '%s Link' ), $singular );
+		$title = sprintf( /* translators: %s: Singular label of the entity. */ __( '%s Link' ), $singular );
 	}
 
+	// Set default description if needed
 	if ( $is_default_description || '' === $description ) {
-		$singular     = isset( $entity->labels->singular_name ) ? $entity->labels->singular_name : ucfirst( $entity->name );
 		$description = sprintf( /* translators: %s: Singular label of the entity. */ __( 'A link to a %s' ), strtolower( $singular ) );
 	}
 
