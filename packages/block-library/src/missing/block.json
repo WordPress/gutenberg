@@ -19,7 +19,6 @@
 		}
 	},
 	"supports": {
-		"note": false,
 		"className": false,
 		"customClassName": false,
 		"inserter": false,

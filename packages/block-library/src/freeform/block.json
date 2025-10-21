@@ -13,7 +13,6 @@
 		}
 	},
 	"supports": {
-		"note": false,
 		"className": false,
 		"customClassName": false,
 		"reusable": false
