@@ -54,8 +54,11 @@ function CollabSidebarContent( {
 			spacing="3"
 			justify="flex-start"
 			ref={ ( node ) => {
-				// Keeps the ref fresh when switching between floating and pinned sidebar.
-				commentSidebarRef.current = node;
+				// Sometimes previous sidebar unmounts after the new one mounts.
+				// This ensures we always have the latest reference.
+				if ( node ) {
+					commentSidebarRef.current = node;
+				}
 			} }
 		>
 			<AddComment
@@ -113,7 +116,9 @@ export default function CollabSidebar() {
 		reflowComments,
 		commentLastUpdated,
 	} = useBlockComments( postId );
-	useEnableFloatingSidebar( resultComments.length > 0 );
+	useEnableFloatingSidebar(
+		unresolvedSortedThreads.length > 0 || showCommentBoard
+	);
 
 	const hasMoreComments = totalPages && totalPages > 1;
 
@@ -135,7 +140,7 @@ export default function CollabSidebar() {
 		const prevArea = await getActiveComplementaryArea( 'core' );
 		const activeNotesArea = SIDEBARS.find( ( name ) => name === prevArea );
 
-		// If the notes sidebar is not already active, enable the pinned sidebar.
+		// If the notes sidebar is not already active, enable the floating sidebar.
 		if ( ! activeNotesArea ) {
 			enableComplementaryArea( 'core', collabSidebarName );
 		}
@@ -180,30 +185,29 @@ export default function CollabSidebar() {
 					commentLastUpdated={ commentLastUpdated }
 				/>
 			</PluginSidebar>
-			{ isLargeViewport &&
-				( unresolvedSortedThreads.length > 0 || showCommentBoard ) && (
-					<PluginSidebar
-						isPinnable={ false }
-						header={ false }
-						identifier={ collabSidebarName }
-						className="editor-collab-sidebar"
-						headerClassName="editor-collab-sidebar__header"
-						backgroundColor={ backgroundColor }
-					>
-						<CollabSidebarContent
-							comments={ unresolvedSortedThreads }
-							showCommentBoard={ showCommentBoard }
-							setShowCommentBoard={ setShowCommentBoard }
-							commentSidebarRef={ commentSidebarRef }
-							reflowComments={ reflowComments }
-							commentLastUpdated={ commentLastUpdated }
-							styles={ {
-								backgroundColor,
-							} }
-							isFloating
-						/>
-					</PluginSidebar>
-				) }
+			{ isLargeViewport && (
+				<PluginSidebar
+					isPinnable={ false }
+					header={ false }
+					identifier={ collabSidebarName }
+					className="editor-collab-sidebar"
+					headerClassName="editor-collab-sidebar__header"
+					backgroundColor={ backgroundColor }
+				>
+					<CollabSidebarContent
+						comments={ unresolvedSortedThreads }
+						showCommentBoard={ showCommentBoard }
+						setShowCommentBoard={ setShowCommentBoard }
+						commentSidebarRef={ commentSidebarRef }
+						reflowComments={ reflowComments }
+						commentLastUpdated={ commentLastUpdated }
+						styles={ {
+							backgroundColor,
+						} }
+						isFloating
+					/>
+				</PluginSidebar>
+			) }
 			<PluginMoreMenuItem
 				icon={ commentIcon }
 				onClick={ () =>
