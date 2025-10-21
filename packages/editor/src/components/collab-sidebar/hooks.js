@@ -336,24 +336,27 @@ export function useEnableFloatingSidebar( enabled = false ) {
 	const registry = useRegistry();
 	useEffect( () => {
 		if ( ! enabled ) {
-			registry
-				.dispatch( interfaceStore )
-				.disableComplementaryArea( 'core', collabSidebarName );
 			return;
 		}
 
-		return registry.subscribe( () => {
-			const activeSidebar = registry
-				.select( interfaceStore )
-				.getActiveComplementaryArea( 'core' );
+		const { getActiveComplementaryArea } =
+			registry.select( interfaceStore );
+		const { disableComplementaryArea, enableComplementaryArea } =
+			registry.dispatch( interfaceStore );
 
+		const unsubscribe = registry.subscribe( () => {
 			// Return `null` to indicate the user hid the complementary area.
-			if ( activeSidebar === null ) {
-				registry
-					.dispatch( interfaceStore )
-					.enableComplementaryArea( 'core', collabSidebarName );
+			if ( getActiveComplementaryArea( 'core' ) === null ) {
+				enableComplementaryArea( 'core', collabSidebarName );
 			}
 		} );
+
+		return () => {
+			unsubscribe();
+			if ( getActiveComplementaryArea( 'core' ) === collabSidebarName ) {
+				disableComplementaryArea( 'core', collabSidebarName );
+			}
+		};
 	}, [ enabled, registry ] );
 }
 
