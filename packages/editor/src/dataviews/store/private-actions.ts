@@ -141,7 +141,7 @@ export const registerPostTypeSchema =
 			duplicatePost;
 
 		// @ts-ignore
-		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+		if ( ! globalThis.IS_GUTENBERG_PLUGIN ) {
 			if ( postType === 'page' ) {
 				canDuplicate = undefined;
 			}
