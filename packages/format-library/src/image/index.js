@@ -72,7 +72,6 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 
 	return (
 		<Popover
-			placement="bottom"
 			focusOnMount={ false }
 			anchor={ popoverAnchor }
 			className="block-editor-format-toolbar__image-popover"
