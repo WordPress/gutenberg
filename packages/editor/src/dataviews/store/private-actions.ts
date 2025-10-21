@@ -141,7 +141,7 @@ export const registerPostTypeSchema =
 			duplicatePost;
 
 		// @ts-ignore
-		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+		if ( ! globalThis.IS_GUTENBERG_PLUGIN ) {
 			// Outside Gutenberg, disable duplication except for wp_template.
 			if ( 'wp_template' !== postTypeConfig.slug ) {
 				canDuplicate = undefined;
