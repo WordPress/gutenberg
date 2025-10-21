@@ -17,7 +17,7 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 	 * Test that the function exists.
 	 */
 	public function test_function_exists() {
-		$this->assertTrue( function_exists( 'build_variation_for_navigation_link' ), 'Function build_variation_for_navigation_link should exist' );
+		$this->assertTrue( function_exists( 'gutenberg_build_variation_for_navigation_link' ), 'Function gutenberg_build_variation_for_navigation_link should exist' );
 	}
 
 	/**
@@ -28,7 +28,7 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 		$post_type = get_post_type_object( 'post' );
 		$this->assertNotNull( $post_type, 'Post type object should exist' );
 
-		$variation = build_variation_for_navigation_link( $post_type, 'post-type' );
+		$variation = gutenberg_build_variation_for_navigation_link( $post_type, 'post-type' );
 
 		// Verify it returns an array
 		$this->assertIsArray( $variation, 'Function should return an array' );
@@ -53,7 +53,7 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 		$taxonomy = get_taxonomy( 'category' );
 		$this->assertNotNull( $taxonomy, 'Taxonomy object should exist' );
 
-		$variation = build_variation_for_navigation_link( $taxonomy, 'taxonomy' );
+		$variation = gutenberg_build_variation_for_navigation_link( $taxonomy, 'taxonomy' );
 
 		// Verify it returns an array
 		$this->assertIsArray( $variation, 'Function should return an array' );
