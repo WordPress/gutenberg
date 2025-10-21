@@ -71,9 +71,15 @@ function DimensionsInspectorControl( { children, resetAllFilter } ) {
 export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 	const isEnabled = useHasDimensionsPanel( settings );
 	const value = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getBlockAttributes( clientId )?.style,
-		[ clientId ]
+		( select ) => {
+			// Early return to avoid subscription when disabled
+			if ( ! isEnabled ) {
+				return undefined;
+			}
+			return select( blockEditorStore ).getBlockAttributes( clientId )
+				?.style;
+		},
+		[ clientId, isEnabled ]
 	);
 	const [ visualizedProperty, setVisualizedProperty ] = useVisualizer();
 	const onChange = ( newStyle ) => {
