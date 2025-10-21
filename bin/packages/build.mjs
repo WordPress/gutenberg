@@ -66,7 +66,7 @@ const baseDefine = {
 };
 const getDefine = ( scriptDebug ) => ( {
 	...baseDefine,
-	'globalThis.SCRIPT_DEBUG': JSON.stringify( ! scriptDebug ),
+	'globalThis.SCRIPT_DEBUG': JSON.stringify( scriptDebug ),
 } );
 
 /**
@@ -560,14 +560,14 @@ async function bundlePackage( packageName ) {
 				...baseConfig,
 				outfile: path.join( outputDir, 'index.min.js' ),
 				minify: true,
-				define: getDefine( true ),
+				define: getDefine( false ),
 				plugins: bundlePlugins,
 			} ),
 			esbuild.build( {
 				...baseConfig,
 				outfile: path.join( outputDir, 'index.js' ),
 				minify: false,
-				define: getDefine( false ),
+				define: getDefine( true ),
 				plugins: bundlePlugins,
 			} )
 		);
@@ -612,7 +612,7 @@ async function bundlePackage( packageName ) {
 					target,
 					platform: 'browser',
 					minify: true,
-					define: getDefine( true ),
+					define: getDefine( false ),
 					plugins: modulePlugins,
 				} ),
 				esbuild.build( {
@@ -627,7 +627,7 @@ async function bundlePackage( packageName ) {
 					target,
 					platform: 'browser',
 					minify: false,
-					define: getDefine( false ),
+					define: getDefine( true ),
 					plugins: modulePlugins,
 				} )
 			);
