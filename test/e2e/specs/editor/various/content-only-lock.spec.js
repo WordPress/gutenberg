@@ -101,6 +101,7 @@ test.describe( 'Content-only lock', () => {
 			<!-- /wp:heading -->` );
 
 		await pageUtils.pressKeys( 'secondary+M' );
+		await editor.openDocumentSettingsSidebar();
 		// Select the content locked block.
 		await editor.canvas
 			.locator( 'role=document[name="Block: Group"i]' )
