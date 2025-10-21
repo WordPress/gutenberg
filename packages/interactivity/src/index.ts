@@ -1,3 +1,7 @@
+if ( globalThis.SCRIPT_DEBUG ) {
+	await import( 'preact/debug' );
+}
+
 /**
  * External dependencies
  */
@@ -37,10 +41,6 @@ export {
 } from './utils';
 
 export { useState, useRef } from 'preact/hooks';
-
-if ( globalThis.SCRIPT_DEBUG ) {
-	import( 'preact/debug' );
-}
 
 const requiredConsent =
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.';
