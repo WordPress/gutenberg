@@ -102,4 +102,4 @@ export type HeaderProps = MarginalSubComponentProps & SizeableProps;
 
 export type FooterProps = MarginalSubComponentProps & {
 	justify?: CSSProperties[ 'justifyContent' ];
-};
+} & SizeableProps;
