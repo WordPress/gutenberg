@@ -18,6 +18,9 @@
 		"node": ">=20.10.0",
 		"npm": ">=10.2.3"
 	},
+	"wpPlugin": {
+		"prefix": "gutenberg"
+	},
 	"config": {
 		"IS_GUTENBERG_PLUGIN": true
 	},

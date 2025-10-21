@@ -624,74 +624,24 @@ add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
  *
  * @since 19.3.0
  */
-function gutenberg_default_script_modules() {
-	/*
-	 * Load individual asset files for esbuild-built packages.
-	 * Follows the same pattern as regular scripts in gutenberg_register_packages_scripts().
-	 * Uses RecursiveDirectoryIterator to find all *.js files at any nesting depth.
-	 * Only processes files matching the SCRIPT_DEBUG setting (either .js or .min.js).
-	 */
-	$extension        = SCRIPT_DEBUG ? '.js' : '.min.js';
-	$all_assets       = array();
-	$build_module_dir = gutenberg_dir_path() . 'build/modules';
-	if ( is_dir( $build_module_dir ) ) {
-		$iterator = new RecursiveIteratorIterator(
-			new RecursiveDirectoryIterator( $build_module_dir, RecursiveDirectoryIterator::SKIP_DOTS )
-		);
-		foreach ( $iterator as $file ) {
-			if ( $file->isFile() && preg_match( '/\.(min\.)?js$/', $file->getFilename() ) ) {
-				$path = $file->getPathname();
-				if ( ! str_ends_with( $path, $extension ) ) {
-					continue;
-				}
-
-				$asset_file = substr( $path, 0, -strlen( $extension ) ) . '.min.asset.php';
-				if ( ! file_exists( $asset_file ) ) {
-					continue;
-				}
-
-				$asset                    = require $asset_file;
-				$file_name                = str_replace( gutenberg_dir_path() . 'build/modules/', '', $path );
-				$asset['dependencies']    = $asset['module_dependencies'] ?? array();
-				$all_assets[ $file_name ] = $asset;
-			}
-		}
+function gutenberg_define_interactivity_modules_support() {
+	// Load the auto-generated module registry.
+	$modules_registry_file = gutenberg_dir_path() . 'build/modules/index.php';
+	if ( ! file_exists( $modules_registry_file ) ) {
+		return;
 	}
 
-	foreach ( $all_assets as $file_name => $script_module_data ) {
-		/*
-		 * Build the WordPress Script Module ID from the file name.
-		 * Prepend `@wordpress/` and remove extensions and `/index` if present:
-		 *   - interactivity/index.min.js or interactivity/index.js => @wordpress/interactivity
-		 *   - block-library/query/view.min.js or block-library/query/view.js => @wordpress/block-library/query/view
-		 */
-		$script_module_id = '@wordpress/' . preg_replace( '~(?:/index)?\.(min\.)?js$~D', '', $file_name, 1 );
+	$modules = require $modules_registry_file;
 
-		/*
-		 * All script modules in Gutenberg are (currently) related to the Interactivity API which prioritizes server-side rendering.
-		 * Therefore, the modules should be fetched with a low priority to avoid network contention with any LCP element resource.
-		 * For allowing a block to opt-in to another fetchpriority, see <https://github.com/WordPress/gutenberg/issues/71366>.
-		 *
-		 * Also, the @wordpress/a11y script module is intended to be used as a dynamic import dependency, in which case
-		 * the fetchpriority is irrelevant. See <https://make.wordpress.org/core/2024/10/14/updates-to-script-modules-in-6-7/>.
-		 * However, in case it is added as a static import dependency, the fetchpriority is explicitly set to be 'low'
-		 * since the module should not be involved in the critical rendering path, and if it is, its fetchpriority will
-		 * be bumped to match the fetchpriority of the dependent script.
-		 */
-		$args = array(
-			'fetchpriority' => 'low',
-		);
-
-		if ( str_starts_with( $script_module_id, '@wordpress/block-library' ) && method_exists( 'WP_Interactivity_API', 'add_client_navigation_support_to_script_module' ) ) {
-			wp_interactivity()->add_client_navigation_support_to_script_module( $script_module_id );
+	// Add client navigation support to block library modules.
+	foreach ( $modules as $module ) {
+		if ( str_starts_with( $module['id'], '@wordpress/block-library' ) && method_exists( 'WP_Interactivity_API', 'add_client_navigation_support_to_script_module' ) ) {
+			wp_interactivity()->add_client_navigation_support_to_script_module( $module['id'] );
 		}
-
-		$path = gutenberg_url( "build/modules/{$file_name}" );
-		wp_register_script_module( $script_module_id, $path, $script_module_data['dependencies'], $script_module_data['version'], $args ); // The $args parameter is new as of WP 6.9 per <https://core.trac.wordpress.org/ticket/61734>.
 	}
 }
-remove_action( 'wp_default_scripts', 'wp_default_script_modules' );
-add_action( 'wp_default_scripts', 'gutenberg_default_script_modules' );
+remove_action( 'wp_default_scripts', 'wp_define_interactivity_modules_support' );
+add_action( 'wp_default_scripts', 'gutenberg_define_interactivity_modules_support' );
 
 /**
  * Always remove the Core action hook while gutenberg_enqueue_stored_styles() exists to avoid styles being printed twice.
