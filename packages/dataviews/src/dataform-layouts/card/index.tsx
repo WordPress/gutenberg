@@ -23,7 +23,13 @@ import { isCombinedField } from '../is-combined-field';
 import { DEFAULT_LAYOUT, normalizeLayout } from '../normalize-form-fields';
 import { getSummaryFields } from '../get-summary-fields';
 
-export function useCollapsibleCard( initialIsOpen: boolean = true ) {
+export function useCollapsibleCard( {
+	initialIsOpen,
+	headerBorder,
+}: {
+	initialIsOpen: boolean;
+	headerBorder: boolean;
+} ) {
 	const [ isOpen, setIsOpen ] = useState( initialIsOpen );
 
 	const toggle = useCallback( () => {
@@ -39,12 +45,28 @@ export function useCollapsibleCard( initialIsOpen: boolean = true ) {
 			[ key: string ]: any;
 		} ) => (
 			<CardHeader
+				size={
+					isOpen
+						? {
+								top: 'medium',
+								right: 'medium',
+								bottom: 'xSmall',
+								left: 'medium',
+						  }
+						: {
+								top: 'medium',
+								right: 'medium',
+								bottom: 'medium',
+								left: 'medium',
+						  }
+				}
 				{ ...props }
 				onClick={ toggle }
 				style={ {
 					cursor: 'pointer',
 					...props.style,
 				} }
+				isBorderless={ ! headerBorder }
 			>
 				<div
 					style={ {
@@ -65,7 +87,7 @@ export function useCollapsibleCard( initialIsOpen: boolean = true ) {
 				/>
 			</CardHeader>
 		),
-		[ toggle, isOpen ]
+		[ toggle, headerBorder, isOpen ]
 	);
 
 	return { isOpen, CollapsibleCardHeader };
@@ -144,9 +166,10 @@ export default function FormCardField< Item >( {
 		[ field ]
 	);
 
-	const { isOpen, CollapsibleCardHeader } = useCollapsibleCard(
-		layout.isOpened
-	);
+	const { isOpen, CollapsibleCardHeader } = useCollapsibleCard( {
+		initialIsOpen: layout.isOpened,
+		headerBorder: layout.withHeader ? layout.headerBorder : false,
+	} );
 
 	const summaryFields = getSummaryFields< Item >( layout.summary, fields );
 
@@ -157,7 +180,15 @@ export default function FormCardField< Item >( {
 	if ( isCombinedField( field ) ) {
 		const withHeader = !! field.label && layout.withHeader;
 		return (
-			<Card className="dataforms-layouts-card__field">
+			<Card
+				className="dataforms-layouts-card__field"
+				size={ {
+					top: 'medium',
+					right: 'medium',
+					bottom: 'medium',
+					left: 'medium',
+				} }
+			>
 				{ withHeader && (
 					<CollapsibleCardHeader className="dataforms-layouts-card__field-header">
 						<span className="dataforms-layouts-card__field-header-label">
@@ -182,7 +213,15 @@ export default function FormCardField< Item >( {
 				{ ( isOpen || ! withHeader ) && (
 					// If it doesn't have a header, keep it open.
 					// Otherwise, the card will not be visible.
-					<CardBody className="dataforms-layouts-card__field-control">
+					<CardBody
+						size={ {
+							top: ! withHeader ? 'medium' : undefined,
+							right: 'medium',
+							bottom: 'medium',
+							left: 'medium',
+						} }
+						className="dataforms-layouts-card__field-control"
+					>
 						{ field.description && (
 							<div className="dataforms-layouts-card__field-description">
 								{ field.description }
@@ -236,7 +275,15 @@ export default function FormCardField< Item >( {
 			{ ( isOpen || ! withHeader ) && (
 				// If it doesn't have a header, keep it open.
 				// Otherwise, the card will not be visible.
-				<CardBody className="dataforms-layouts-card__field-control">
+				<CardBody
+					size={ {
+						top: ! withHeader ? 'medium' : undefined,
+						right: 'medium',
+						bottom: 'medium',
+						left: 'medium',
+					} }
+					className="dataforms-layouts-card__field-control"
+				>
 					<RegularLayout
 						data={ data }
 						field={ field }

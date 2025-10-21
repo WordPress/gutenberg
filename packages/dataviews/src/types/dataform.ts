@@ -60,6 +60,7 @@ export type CardLayout =
 	| {
 			type: 'card';
 			withHeader?: true | undefined;
+			headerBorder?: boolean;
 			isOpened?: boolean;
 			summary?: CardSummaryField;
 	  };
@@ -76,6 +77,7 @@ export type NormalizedCardLayout =
 	| {
 			type: 'card';
 			withHeader: true;
+			headerBorder: boolean;
 			isOpened: boolean;
 			summary: NormalizedCardSummaryField;
 	  };

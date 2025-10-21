@@ -79,6 +79,7 @@ export function normalizeLayout( layout?: Layout ): NormalizedLayout {
 			normalizedLayout = {
 				type: 'card',
 				withHeader: true,
+				headerBorder: layout.headerBorder ?? false,
 				isOpened:
 					typeof layout.isOpened === 'boolean'
 						? layout.isOpened
