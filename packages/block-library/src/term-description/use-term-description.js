@@ -6,7 +6,7 @@ import { useEntityProp } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import { useTermData } from '../utils/use-context-data';
+import { useTermContext } from '../utils/use-context-data';
 
 /**
  * Hook to fetch term description based on context or fallback to template parsing.
@@ -25,7 +25,7 @@ export function useTermDescription( termId, taxonomy ) {
 		termId
 	);
 
-	const { hasContext, term } = useTermData( termId, taxonomy );
+	const { hasContext, term } = useTermContext( termId, taxonomy );
 
 	return {
 		hasContext,

@@ -128,20 +128,24 @@ export function parseTemplateSlug( templateSlug ) {
 }
 
 /**
- * Hook to get term data based on context or template fallback.
+ * Hook to get term context including term data and archive labels.
  *
- * @param {string|number} termId   The term ID from context
- * @param {string}        taxonomy The taxonomy name from context
- * @return {Object} Object containing term data and context information
+ * @param {string|number} [termId]   The term ID from context (optional)
+ * @param {string}        [taxonomy] The taxonomy name from context (optional)
+ * @return {Object} Object containing term data, archive labels, and context information
  */
-export function useTermData( termId, taxonomy ) {
+export function useTermContext( termId = null, taxonomy = null ) {
 	const templateSlug = useTemplateSlug();
-	const { taxonomy: fallbackTaxonomy, termSlug } =
-		parseTemplateSlug( templateSlug );
+	const {
+		taxonomy: fallbackTaxonomy,
+		termSlug,
+		isAuthor,
+		authorSlug,
+	} = parseTemplateSlug( templateSlug );
 
 	const hasContext = Boolean( termId && taxonomy );
 
-	// Get term from context
+	// Get term from context.
 	const contextBasedTerm = useSelect(
 		( select ) => {
 			if ( ! hasContext ) {
@@ -156,7 +160,7 @@ export function useTermData( termId, taxonomy ) {
 		[ hasContext, taxonomy, termId ]
 	);
 
-	// Fallback: Get term from template
+	// Fallback: Get term from template.
 	const templateBasedTerm = useSelect(
 		( select ) => {
 			if ( hasContext || ! fallbackTaxonomy || ! termSlug ) {
@@ -178,42 +182,25 @@ export function useTermData( termId, taxonomy ) {
 		[ hasContext, fallbackTaxonomy, termSlug ]
 	);
 
-	return {
-		hasContext,
-		term: hasContext ? contextBasedTerm : templateBasedTerm,
-	};
-}
-
-/**
- * Hook to get archive label data based on template context.
- *
- * @return {Object} Object containing archive type and name labels
- */
-export function useArchiveData() {
-	const templateSlug = useTemplateSlug();
-	const { taxonomy, termSlug, isAuthor, authorSlug } =
-		parseTemplateSlug( templateSlug );
-
-	return useSelect(
+	// Get archive labels.
+	const archiveLabels = useSelect(
 		( select ) => {
-			const { getEntityRecords, getTaxonomy, getAuthors } =
-				select( coreStore );
+			const { getTaxonomy, getAuthors } = select( coreStore );
 			let archiveTypeLabel;
 			let archiveNameLabel;
 
-			if ( taxonomy ) {
+			const currentTaxonomy = hasContext ? taxonomy : fallbackTaxonomy;
+
+			if ( currentTaxonomy ) {
 				archiveTypeLabel =
-					getTaxonomy( taxonomy )?.labels?.singular_name;
+					getTaxonomy( currentTaxonomy )?.labels?.singular_name;
 			}
 
-			if ( termSlug ) {
-				const records = getEntityRecords( 'taxonomy', taxonomy, {
-					slug: termSlug,
-					per_page: 1,
-				} );
-				if ( records?.[ 0 ] ) {
-					archiveNameLabel = records[ 0 ].name;
-				}
+			const currentTerm = hasContext
+				? contextBasedTerm
+				: templateBasedTerm;
+			if ( currentTerm ) {
+				archiveNameLabel = currentTerm.name;
 			}
 
 			if ( isAuthor ) {
@@ -231,6 +218,20 @@ export function useArchiveData() {
 				archiveNameLabel,
 			};
 		},
-		[ taxonomy, termSlug, isAuthor, authorSlug ]
+		[
+			hasContext,
+			taxonomy,
+			fallbackTaxonomy,
+			contextBasedTerm,
+			templateBasedTerm,
+			isAuthor,
+			authorSlug,
+		]
 	);
+
+	return {
+		hasContext,
+		term: hasContext ? contextBasedTerm : templateBasedTerm,
+		...archiveLabels,
+	};
 }

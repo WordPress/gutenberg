@@ -25,7 +25,7 @@ import { decodeEntities } from '@wordpress/html-entities';
  * Internal dependencies
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
-import { useTermData } from '../utils/use-context-data';
+import { useTermContext } from '../utils/use-context-data';
 
 export default function TermNameEdit( {
 	attributes,
@@ -33,7 +33,7 @@ export default function TermNameEdit( {
 	context: { termId, taxonomy },
 } ) {
 	const { textAlign, level = 0, isLink } = attributes;
-	const { term } = useTermData( termId, taxonomy );
+	const { term } = useTermContext( termId, taxonomy );
 
 	const termName = term?.name
 		? decodeEntities( term.name )
