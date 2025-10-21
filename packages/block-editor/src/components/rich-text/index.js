@@ -171,11 +171,15 @@ export function RichTextWrapper(
 
 	const { disableBoundBlock, bindingsPlaceholder, bindingsLabel } = useSelect(
 		( select ) => {
+			// Early return BEFORE accessing store to avoid subscription for blocks without bindings
+			if ( ! blockBindings?.[ identifier ] ) {
+				return {};
+			}
+
 			const { __experimentalBlockBindingsSupportedAttributes } =
 				select( blockEditorStore ).getSettings();
 
 			if (
-				! blockBindings?.[ identifier ] ||
 				! (
 					blockName in __experimentalBlockBindingsSupportedAttributes
 				)
