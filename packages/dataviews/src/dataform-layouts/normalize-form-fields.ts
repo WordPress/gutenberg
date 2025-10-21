@@ -85,7 +85,10 @@ export function normalizeLayout( layout?: Layout ): NormalizedLayout {
 						? layout.isOpened
 						: true,
 				summary: normalizeCardSummaryField( summary ),
-				isCollapsible: layout.isCollapsible ?? false,
+				isCollapsible:
+					layout.isCollapsible === undefined
+						? true
+						: layout.isCollapsible,
 			} satisfies NormalizedCardLayout;
 		}
 	} else if ( layout?.type === 'row' ) {
