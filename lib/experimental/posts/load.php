@@ -51,7 +51,7 @@ function gutenberg_posts_dashboard() {
 	do_action( 'enqueue_block_editor_assets' );
 	wp_register_style(
 		'wp-gutenberg-posts-dashboard',
-		gutenberg_url( 'build/edit-site/posts.css' ),
+		gutenberg_url( 'build/styles/edit-site/posts.css' ),
 		array( 'wp-components', 'wp-commands', 'wp-edit-site' )
 	);
 	wp_enqueue_style( 'wp-gutenberg-posts-dashboard' );

@@ -12,9 +12,9 @@
 function gutenberg_reregister_core_block_types() {
 	// Blocks directory may not exist if working from a fresh clone.
 	$blocks_dirs = array(
-		__DIR__ . '/../build/block-library/',
-		__DIR__ . '/../build/edit-widgets/blocks/',
-		__DIR__ . '/../build/widgets/blocks/',
+		__DIR__ . '/../build/scripts/block-library/',
+		__DIR__ . '/../build/scripts/edit-widgets/blocks/',
+		__DIR__ . '/../build/scripts/widgets/blocks/',
 	);
 
 	foreach ( $blocks_dirs as $blocks_dir ) {
@@ -124,7 +124,7 @@ function gutenberg_register_core_block_assets( $block_name ) {
 	// else (for development or test) default to use the current time.
 	$default_version = defined( 'GUTENBERG_VERSION' ) && ! SCRIPT_DEBUG ? GUTENBERG_VERSION : time();
 
-	$style_path      = "build/block-library/$block_name/";
+	$style_path      = "build/styles/block-library/$block_name/";
 	$stylesheet_url  = gutenberg_url( $style_path . 'style.css' );
 	$stylesheet_path = gutenberg_dir_path() . $style_path . ( is_rtl() ? 'style-rtl.css' : 'style.css' );
 
@@ -152,8 +152,8 @@ function gutenberg_register_core_block_assets( $block_name ) {
 
 		// Get the path to the block's stylesheet.
 		$theme_style_path = is_rtl()
-			? "build/block-library/$block_name/theme-rtl.css"
-			: "build/block-library/$block_name/theme.css";
+			? "build/styles/block-library/$block_name/theme-rtl.css"
+			: "build/styles/block-library/$block_name/theme.css";
 
 		// If the file exists, enqueue it.
 		if ( file_exists( gutenberg_dir_path() . $theme_style_path ) ) {
@@ -168,7 +168,7 @@ function gutenberg_register_core_block_assets( $block_name ) {
 		}
 	}
 
-	$editor_style_path = "build/block-library/$block_name/style-editor.css";
+	$editor_style_path = "build/styles/block-library/$block_name/style-editor.css";
 	if ( file_exists( gutenberg_dir_path() . $editor_style_path ) ) {
 		wp_deregister_style( "wp-block-{$block_name}-editor" );
 		wp_register_style(
