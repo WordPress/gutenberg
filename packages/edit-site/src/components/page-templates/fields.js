@@ -11,7 +11,7 @@ import {
 	__experimentalHStack as HStack,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useState, useMemo } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { parse } from '@wordpress/blocks';
@@ -155,6 +155,19 @@ export const activeField = {
 	id: 'active',
 	getValue: ( { item } ) => item._isActive,
 	render: function Render( { item } ) {
+		if ( item._isCustom ) {
+			return (
+				<Badge
+					intent="info"
+					title={ __(
+						'Custom templates cannot be active nor inactive.'
+					) }
+				>
+					{ __( 'N/A' ) }
+				</Badge>
+			);
+		}
+
 		const isActive = item._isActive;
 		return (
 			<Badge intent={ isActive ? 'success' : 'default' }>
@@ -190,10 +203,6 @@ export const slugField = {
 		const defaultTemplateType = defaultTemplateTypes.find(
 			( type ) => type.slug === item.slug
 		);
-		return (
-			defaultTemplateType?.title ||
-			// translators: %s is the slug of a custom template.
-			__( 'Custom' )
-		);
+		return defaultTemplateType?.title || _x( 'Custom', 'template type' );
 	},
 };

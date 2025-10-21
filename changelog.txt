@@ -1,5 +1,40 @@
 == Changelog ==
 
+= 21.9.0-rc.3 =
+
+
+## Changelog
+
+### Enhancements
+
+#### Interactivity API
+- Reuse `wp_script_attributes` filter for adding `data-wp-router-options` attribute to script module. ([72449](https://github.com/WordPress/gutenberg/pull/72449))
+
+
+### Bug Fixes
+
+- Template activation: Duplicate action should be available outside GB. ([72513](https://github.com/WordPress/gutenberg/pull/72513))
+- Template activation: Improve UX for custom templates. ([72499](https://github.com/WordPress/gutenberg/pull/72499))
+
+#### Block bindings
+- Post Date block: In deprecation, add check if source is `core/post-data`. ([72518](https://github.com/WordPress/gutenberg/pull/72518))
+
+
+### Tools
+
+#### Build Tooling
+- Optimize CI: Limit the number of job variations (PHP and JS matrix) in PRs. ([72506](https://github.com/WordPress/gutenberg/pull/72506))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@ellatrix @mcsf @ockham @westonruter @youknowriad
+
+
 = 21.9.0-rc.2 =
 
 

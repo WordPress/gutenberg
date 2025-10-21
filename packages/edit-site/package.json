@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-site",
-	"version": "6.33.1",
+	"version": "6.33.2",
 	"description": "Edit Site Page module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -58,6 +58,7 @@
 		"@wordpress/element": "file:../element",
 		"@wordpress/escape-html": "file:../escape-html",
 		"@wordpress/fields": "file:../fields",
+		"@wordpress/global-styles-engine": "file:../global-styles-engine",
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/html-entities": "file:../html-entities",
 		"@wordpress/i18n": "file:../i18n",

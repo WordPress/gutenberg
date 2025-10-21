@@ -33,8 +33,15 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
+                event: ['${{ github.event_name }}']
                 node: ['20', '22', '24']
                 shard: ['1/4', '2/4', '3/4', '4/4']
+                exclude:
+                    # On PRs: Only test Node 20
+                    - event: 'pull_request'
+                      node: '22'
+                    - event: 'pull_request'
+                      node: '24'
 
         steps:
             - name: Checkout repository
@@ -78,7 +85,14 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
+                event: ['${{ github.event_name }}']
                 node: ['20', '22', '24']
+                exclude:
+                    # On PRs: Only test Node 20
+                    - event: 'pull_request'
+                      node: '22'
+                    - event: 'pull_request'
+                      node: '24'
 
         steps:
             - name: Checkout repository
@@ -169,23 +183,36 @@ jobs:
         strategy:
             fail-fast: true
             matrix:
-                php:
-                    - '7.2'
-                    - '7.3'
-                    - '7.4'
-                    - '8.0'
-                    - '8.1'
-                    - '8.2'
-                    - '8.3'
+                event: ['${{ github.event_name }}']
+                php: ['7.2', '7.3', '7.4', '8.0', '8.1', '8.2', '8.3']
                 multisite: [false, true]
-                wordpress: [''] # Latest WordPress version.
-                include:
-                    # Test with the previous WP version.
-                    - php: '7.2'
+                wordpress: ['', 'previous major version']
+                exclude:
+                    # On PRs: Only test PHP 8.3, single-site, latest WP
+                    - event: 'pull_request'
+                      php: '7.2'
+                    - event: 'pull_request'
+                      php: '7.3'
+                    - event: 'pull_request'
+                      php: '7.4'
+                    - event: 'pull_request'
+                      php: '8.0'
+                    - event: 'pull_request'
+                      php: '8.1'
+                    - event: 'pull_request'
+                      php: '8.2'
+                    - event: 'pull_request'
+                      multisite: true
+                    - event: 'pull_request'
                       wordpress: 'previous major version'
-                    - php: '7.4'
+                    # On trunk/releases: Only test previous WP version with specific PHP versions
+                    - php: '7.3'
                       wordpress: 'previous major version'
-                    - php: '8.3'
+                    - php: '8.0'
+                      wordpress: 'previous major version'
+                    - php: '8.1'
+                      wordpress: 'previous major version'
+                    - php: '8.2'
                       wordpress: 'previous major version'
 
         env:

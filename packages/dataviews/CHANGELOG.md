@@ -2,8 +2,11 @@
 
 ## Unreleased
 
+## 10.1.0 (2025-10-21)
+
 ### Enhancements
 
+- Consistently use font-weight 499 instead of 500 ([#72473](https://github.com/WordPress/gutenberg/pull/72473)).
 - Dataviews: Use text based buttons for actions instead of text. [#72417](https://github.com/WordPress/gutenberg/pull/72417)
 
 ## 10.0.0 (2025-10-17)

@@ -10,80 +10,20 @@ import { useContext, useCallback, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 import { _x } from '@wordpress/i18n';
+import {
+	getSetting,
+	getStyle,
+	getPresetVariableFromValue,
+} from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
  */
-import { getValueFromVariable, getPresetVariableFromValue } from './utils';
-import { getValueFromObjectPath, setImmutably } from '../../utils/object';
+import { setImmutably } from '../../utils/object';
 import { GlobalStylesContext } from './context';
 import { unlock } from '../../lock-unlock';
 
 const EMPTY_CONFIG = { settings: {}, styles: {} };
-
-const VALID_SETTINGS = [
-	'appearanceTools',
-	'useRootPaddingAwareAlignments',
-	'background.backgroundImage',
-	'background.backgroundRepeat',
-	'background.backgroundSize',
-	'background.backgroundPosition',
-	'border.color',
-	'border.radius',
-	'border.style',
-	'border.width',
-	'border.radiusSizes',
-	'shadow.presets',
-	'shadow.defaultPresets',
-	'color.background',
-	'color.button',
-	'color.caption',
-	'color.custom',
-	'color.customDuotone',
-	'color.customGradient',
-	'color.defaultDuotone',
-	'color.defaultGradients',
-	'color.defaultPalette',
-	'color.duotone',
-	'color.gradients',
-	'color.heading',
-	'color.link',
-	'color.palette',
-	'color.text',
-	'custom',
-	'dimensions.aspectRatio',
-	'dimensions.minHeight',
-	'layout.contentSize',
-	'layout.definitions',
-	'layout.wideSize',
-	'lightbox.enabled',
-	'lightbox.allowEditing',
-	'position.fixed',
-	'position.sticky',
-	'spacing.customSpacingSize',
-	'spacing.defaultSpacingSizes',
-	'spacing.spacingSizes',
-	'spacing.spacingScale',
-	'spacing.blockGap',
-	'spacing.margin',
-	'spacing.padding',
-	'spacing.units',
-	'typography.fluid',
-	'typography.customFontSize',
-	'typography.defaultFontSizes',
-	'typography.dropCap',
-	'typography.fontFamilies',
-	'typography.fontSizes',
-	'typography.fontStyle',
-	'typography.fontWeight',
-	'typography.letterSpacing',
-	'typography.lineHeight',
-	'typography.textAlign',
-	'typography.textColumns',
-	'typography.textDecoration',
-	'typography.textTransform',
-	'typography.writingMode',
-];
 
 export const useGlobalStylesReset = () => {
 	const { user, setUserConfig } = useContext( GlobalStylesContext );
@@ -103,7 +43,6 @@ export function useGlobalSetting( propertyPath, blockName, source = 'all' ) {
 	const appendedBlockPath = blockName ? '.blocks.' + blockName : '';
 	const appendedPropertyPath = propertyPath ? '.' + propertyPath : '';
 	const contextualPath = `settings${ appendedBlockPath }${ appendedPropertyPath }`;
-	const globalPath = `settings${ appendedPropertyPath }`;
 	const sourceKey = source === 'all' ? 'merged' : source;
 
 	const settingValue = useMemo( () => {
@@ -112,34 +51,9 @@ export function useGlobalSetting( propertyPath, blockName, source = 'all' ) {
 			throw 'Unsupported source';
 		}
 
-		if ( propertyPath ) {
-			return (
-				getValueFromObjectPath( configToUse, contextualPath ) ??
-				getValueFromObjectPath( configToUse, globalPath )
-			);
-		}
-
-		let result = {};
-		VALID_SETTINGS.forEach( ( setting ) => {
-			const value =
-				getValueFromObjectPath(
-					configToUse,
-					`settings${ appendedBlockPath }.${ setting }`
-				) ??
-				getValueFromObjectPath( configToUse, `settings.${ setting }` );
-			if ( value !== undefined ) {
-				result = setImmutably( result, setting.split( '.' ), value );
-			}
-		} );
-		return result;
-	}, [
-		configs,
-		sourceKey,
-		propertyPath,
-		contextualPath,
-		globalPath,
-		appendedBlockPath,
-	] );
+		// Use engine's getSetting instead of duplicating logic
+		return getSetting( configToUse, propertyPath, blockName );
+	}, [ configs, sourceKey, propertyPath, blockName ] );
 
 	const setSetting = ( newValue ) => {
 		setUserConfig( ( currentConfig ) =>
@@ -183,25 +97,32 @@ export function useGlobalStyle(
 		);
 	};
 
-	let rawResult, result;
+	let result;
+	// Use engine's getStyle instead of duplicating logic
 	switch ( source ) {
 		case 'all':
-			rawResult = getValueFromObjectPath( mergedConfig, finalPath );
-			result = shouldDecodeEncode
-				? getValueFromVariable( mergedConfig, blockName, rawResult )
-				: rawResult;
+			result = getStyle(
+				mergedConfig,
+				path,
+				blockName,
+				shouldDecodeEncode
+			);
 			break;
 		case 'user':
-			rawResult = getValueFromObjectPath( userConfig, finalPath );
-			result = shouldDecodeEncode
-				? getValueFromVariable( mergedConfig, blockName, rawResult )
-				: rawResult;
+			result = getStyle(
+				userConfig,
+				path,
+				blockName,
+				shouldDecodeEncode
+			);
 			break;
 		case 'base':
-			rawResult = getValueFromObjectPath( baseConfig, finalPath );
-			result = shouldDecodeEncode
-				? getValueFromVariable( baseConfig, blockName, rawResult )
-				: rawResult;
+			result = getStyle(
+				baseConfig,
+				path,
+				blockName,
+				shouldDecodeEncode
+			);
 			break;
 		default:
 			throw 'Unsupported source';

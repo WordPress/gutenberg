@@ -19,10 +19,8 @@ import {
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	privateApis as blockEditorPrivateApis,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { getLayoutStyles } from '@wordpress/global-styles-engine';
 import { PluginArea } from '@wordpress/plugins';
 import { __, sprintf } from '@wordpress/i18n';
 import {
@@ -75,7 +73,6 @@ import { useShouldIframe } from './use-should-iframe';
 import useNavigateToEntityRecord from '../../hooks/use-navigate-to-entity-record';
 import { useMetaBoxInitialization } from '../meta-boxes/use-meta-box-initialization';
 
-const { getLayoutStyles } = unlock( blockEditorPrivateApis );
 const { useCommandContext } = unlock( commandsPrivateApis );
 const { Editor, FullscreenMode } = unlock( editorPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );

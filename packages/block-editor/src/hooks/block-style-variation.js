@@ -4,15 +4,12 @@
 import { getBlockTypes, store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { useContext, useMemo } from '@wordpress/element';
+import { toStyles, getBlockSelectors } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
  */
-import {
-	GlobalStylesContext,
-	toStyles,
-	getBlockSelectors,
-} from '../components/global-styles';
+import { GlobalStylesContext } from '../components/global-styles';
 import { usePrivateStyleOverride } from './utils';
 import { getValueFromObjectPath } from '../utils/object';
 import { store as blockEditorStore } from '../store';
@@ -127,7 +124,6 @@ export function __unstableBlockStyleVariationOverridesWithConfig( { config } ) {
 					};
 					const blockSelectors = getBlockSelectors(
 						getBlockTypes(),
-						getBlockStyles,
 						override.clientId
 					);
 					const hasBlockGapSupport = false;
@@ -322,11 +318,7 @@ function useBlockProps( { name, className, clientId } ) {
 		}
 
 		const variationConfig = { settings, styles };
-		const blockSelectors = getBlockSelectors(
-			getBlockTypes(),
-			getBlockStyles,
-			clientId
-		);
+		const blockSelectors = getBlockSelectors( getBlockTypes(), clientId );
 		const hasBlockGapSupport = false;
 		const hasFallbackGapSupport = true;
 		const disableLayoutStyles = true;
@@ -349,7 +341,7 @@ function useBlockProps( { name, className, clientId } ) {
 				variationStyles: true,
 			}
 		);
-	}, [ variation, settings, styles, getBlockStyles, clientId ] );
+	}, [ variation, settings, styles, clientId ] );
 
 	usePrivateStyleOverride( {
 		id: `variation-${ clientId }`,

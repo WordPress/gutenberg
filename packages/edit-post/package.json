@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-post",
-	"version": "8.33.1",
+	"version": "8.33.2",
 	"description": "Edit Post module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -51,6 +51,7 @@
 		"@wordpress/dom": "file:../dom",
 		"@wordpress/editor": "file:../editor",
 		"@wordpress/element": "file:../element",
+		"@wordpress/global-styles-engine": "file:../global-styles-engine",
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/html-entities": "file:../html-entities",
 		"@wordpress/i18n": "file:../i18n",

@@ -7,11 +7,10 @@ import {
 	getBlockSupport,
 	getBlockTypes,
 	store as blocksStore,
+	// @ts-expect-error - @wordpress/blocks module doesn't have TypeScript declarations
 } from '@wordpress/blocks';
-import { useSelect } from '@wordpress/data';
-import { useContext, useMemo } from '@wordpress/element';
 import { getCSSRules, getCSSValueFromRawStyle } from '@wordpress/style-engine';
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
+import { select } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -25,18 +24,125 @@ import {
 	appendToSelector,
 	getBlockStyleVariationSelector,
 	getResolvedValue,
-} from './utils';
-import { getBlockCSSSelector } from './get-block-css-selector';
-import { getTypographyFontSizeValue } from './typography-utils';
-import { GlobalStylesContext } from './context';
-import { useGlobalSetting } from './hooks';
-import { getDuotoneFilter } from '../duotone/utils';
-import { getGapCSSValue } from '../../hooks/gap';
-import { setBackgroundStyleDefaults } from '../../hooks/background';
-import { store as blockEditorStore } from '../../store';
-import { LAYOUT_DEFINITIONS } from '../../layouts/definitions';
-import { getValueFromObjectPath, setImmutably } from '../../utils/object';
-import { unlock } from '../../lock-unlock';
+} from '../utils/common';
+import { getBlockSelector } from './selectors';
+import { getTypographyFontSizeValue } from '../utils/typography';
+import { getDuotoneFilter } from '../utils/duotone';
+import { kebabCase } from '../utils/string';
+import { getGapCSSValue } from '../utils/gap';
+import { setBackgroundStyleDefaults } from '../utils/background';
+import { LAYOUT_DEFINITIONS } from '../utils/layout';
+import { getValueFromObjectPath, setImmutably } from '../utils/object';
+import { getSetting } from '../settings/get-setting';
+import type {
+	BlockStyleVariation,
+	BlockType,
+	GlobalStylesConfig,
+	GlobalStylesSettings,
+	GlobalStylesStyles,
+} from '../types';
+
+// =============================================================================
+// LOCAL TYPE DEFINITIONS
+// =============================================================================
+
+/**
+ * Preset metadata for CSS variable generation
+ */
+interface PresetMetadata {
+	path: string[];
+	valueKey?: string;
+	valueFunc?: ( preset: any, settings: any ) => string | number | null;
+	cssVarInfix: string;
+	classes?: Array< {
+		classSuffix: string;
+		propertyName: string;
+	} >;
+}
+
+/**
+ * Preset collection by origin
+ */
+interface PresetsByOrigin {
+	[ origin: string ]: any[];
+}
+
+/**
+ * CSS class configuration
+ */
+interface CSSClassConfig {
+	classSuffix: string;
+	propertyName: string;
+}
+
+/**
+ * Style property configuration from WordPress
+ */
+interface StylePropertyConfig {
+	value: string[];
+	properties?: Record< string, string >;
+	useEngine?: boolean;
+	rootOnly?: boolean;
+}
+
+/**
+ * Layout definition structure
+ */
+interface LayoutDefinition {
+	className: string;
+	name: string;
+	displayMode?: string;
+	spacingStyles?: Array< {
+		selector?: string;
+		rules?: Record< string, any >;
+	} >;
+	baseStyles?: Array< {
+		selector?: string;
+		rules?: Record< string, any >;
+	} >;
+}
+
+/**
+ * CSS rule from style engine
+ */
+interface CSSRule {
+	key: string;
+	value: any;
+}
+
+/**
+ * Block variation in theme.json (different from BlockStyleVariation)
+ */
+interface BlockVariation {
+	css?: string;
+	elements?: Record< string, any >;
+	blocks?: Record< string, any >;
+	[ key: string ]: any; // For additional style properties
+}
+
+/**
+ * Block node in theme.json
+ */
+interface BlockNode {
+	variations?: Record< string, BlockVariation >;
+	elements?: Record< string, any >;
+	[ key: string ]: any; // For additional style properties
+}
+
+export type BlockSelectors = Record<
+	string,
+	{
+		duotoneSelector?: string;
+		selector: string;
+		fallbackGapValue?: string;
+		hasLayoutSupport?: boolean;
+		featureSelectors?:
+			| string
+			| Record< string, string | Record< string, string > >;
+		name?: string;
+		styleVariationSelectors?: Record< string, string >;
+	}
+>;
 
 // Elements that rely on class names in their selectors.
 const ELEMENT_CLASS_NAMES = {
@@ -52,27 +158,31 @@ const BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS = {
 	spacing: 'spacing',
 	typography: 'typography',
 };
-const { kebabCase } = unlock( componentsPrivateApis );
 
 /**
  * Transform given preset tree into a set of style declarations.
  *
- * @param {Object} blockPresets
- * @param {Object} mergedSettings Merged theme.json settings.
- *
- * @return {Array<Object>} An array of style declarations.
+ * @param blockPresets   Block presets object
+ * @param mergedSettings Merged theme.json settings
+ * @return An array of style declarations
  */
-function getPresetsDeclarations( blockPresets = {}, mergedSettings ) {
+function getPresetsDeclarations(
+	blockPresets: Record< string, any > = {},
+	mergedSettings: GlobalStylesSettings
+): string[] {
 	return PRESET_METADATA.reduce(
-		( declarations, { path, valueKey, valueFunc, cssVarInfix } ) => {
+		(
+			declarations: string[],
+			{ path, valueKey, valueFunc, cssVarInfix }: PresetMetadata
+		) => {
 			const presetByOrigin = getValueFromObjectPath(
 				blockPresets,
 				path,
 				[]
-			);
+			) as PresetsByOrigin;
 			[ 'default', 'theme', 'custom' ].forEach( ( origin ) => {
 				if ( presetByOrigin[ origin ] ) {
-					presetByOrigin[ origin ].forEach( ( value ) => {
+					presetByOrigin[ origin ].forEach( ( value: any ) => {
 						if ( valueKey && ! valueFunc ) {
 							declarations.push(
 								`--wp--preset--${ cssVarInfix }--${ kebabCase(
@@ -95,20 +205,26 @@ function getPresetsDeclarations( blockPresets = {}, mergedSettings ) {
 
 			return declarations;
 		},
-		[]
+		[] as string[]
 	);
 }
 
 /**
  * Transform given preset tree into a set of preset class declarations.
  *
- * @param {?string} blockSelector
- * @param {Object}  blockPresets
- * @return {string} CSS declarations for the preset classes.
+ * @param blockSelector Block selector string
+ * @param blockPresets  Block presets object
+ * @return CSS declarations for the preset classes
  */
-function getPresetsClasses( blockSelector = '*', blockPresets = {} ) {
+function getPresetsClasses(
+	blockSelector: string = '*',
+	blockPresets: Record< string, any > = {}
+): string {
 	return PRESET_METADATA.reduce(
-		( declarations, { path, cssVarInfix, classes } ) => {
+		(
+			declarations: string,
+			{ path, cssVarInfix, classes }: PresetMetadata
+		) => {
 			if ( ! classes ) {
 				return declarations;
 			}
@@ -117,27 +233,34 @@ function getPresetsClasses( blockSelector = '*', blockPresets = {} ) {
 				blockPresets,
 				path,
 				[]
-			);
+			) as PresetsByOrigin;
 			[ 'default', 'theme', 'custom' ].forEach( ( origin ) => {
 				if ( presetByOrigin[ origin ] ) {
-					presetByOrigin[ origin ].forEach( ( { slug } ) => {
-						classes.forEach( ( { classSuffix, propertyName } ) => {
-							const classSelectorToUse = `.has-${ kebabCase(
-								slug
-							) }-${ classSuffix }`;
-							const selectorToUse = blockSelector
-								.split( ',' ) // Selector can be "h1, h2, h3"
-								.map(
-									( selector ) =>
-										`${ selector }${ classSelectorToUse }`
-								)
-								.join( ',' );
-							const value = `var(--wp--preset--${ cssVarInfix }--${ kebabCase(
-								slug
-							) })`;
-							declarations += `${ selectorToUse }{${ propertyName }: ${ value } !important;}`;
-						} );
-					} );
+					presetByOrigin[ origin ].forEach(
+						( { slug }: { slug: string } ) => {
+							classes!.forEach(
+								( {
+									classSuffix,
+									propertyName,
+								}: CSSClassConfig ) => {
+									const classSelectorToUse = `.has-${ kebabCase(
+										slug
+									) }-${ classSuffix }`;
+									const selectorToUse = blockSelector
+										.split( ',' ) // Selector can be "h1, h2, h3"
+										.map(
+											( selector ) =>
+												`${ selector }${ classSelectorToUse }`
+										)
+										.join( ',' );
+									const value = `var(--wp--preset--${ cssVarInfix }--${ kebabCase(
+										slug
+									) })`;
+									declarations += `${ selectorToUse }{${ propertyName }: ${ value } !important;}`;
+								}
+							);
+						}
+					);
 				}
 			} );
 			return declarations;
@@ -146,20 +269,22 @@ function getPresetsClasses( blockSelector = '*', blockPresets = {} ) {
 	);
 }
 
-function getPresetsSvgFilters( blockPresets = {} ) {
+function getPresetsSvgFilters(
+	blockPresets: Record< string, any > = {}
+): string[] {
 	return PRESET_METADATA.filter(
 		// Duotone are the only type of filters for now.
-		( metadata ) => metadata.path.at( -1 ) === 'duotone'
-	).flatMap( ( metadata ) => {
+		( metadata: PresetMetadata ) => metadata.path.at( -1 ) === 'duotone'
+	).flatMap( ( metadata: PresetMetadata ) => {
 		const presetByOrigin = getValueFromObjectPath(
 			blockPresets,
 			metadata.path,
 			{}
-		);
+		) as PresetsByOrigin;
 		return [ 'default', 'theme' ]
 			.filter( ( origin ) => presetByOrigin[ origin ] )
 			.flatMap( ( origin ) =>
-				presetByOrigin[ origin ].map( ( preset ) =>
+				presetByOrigin[ origin ].map( ( preset: any ) =>
 					getDuotoneFilter(
 						`wp-duotone-${ preset.slug }`,
 						preset.colors
@@ -170,8 +295,12 @@ function getPresetsSvgFilters( blockPresets = {} ) {
 	} );
 }
 
-function flattenTree( input = {}, prefix, token ) {
-	let result = [];
+function flattenTree(
+	input: any = {},
+	prefix: string,
+	token: string
+): string[] {
+	let result: string[] = [];
 	Object.keys( input ).forEach( ( key ) => {
 		const newKey = prefix + kebabCase( key.replace( '/', '-' ) );
 		const newLeaf = input[ key ];
@@ -189,17 +318,16 @@ function flattenTree( input = {}, prefix, token ) {
 /**
  * Gets variation selector string from feature selector.
  *
- * @param {string} featureSelector        The feature selector.
- *
- * @param {string} styleVariationSelector The style variation selector.
- * @return {string} Combined selector string.
+ * @param featureSelector        The feature selector
+ * @param styleVariationSelector The style variation selector
+ * @return Combined selector string
  */
 function concatFeatureVariationSelectorString(
-	featureSelector,
-	styleVariationSelector
-) {
+	featureSelector: string,
+	styleVariationSelector: string
+): string {
 	const featureSelectors = featureSelector.split( ',' );
-	const combinedSelectors = [];
+	const combinedSelectors: string[] = [];
 	featureSelectors.forEach( ( selector ) => {
 		combinedSelectors.push(
 			`${ styleVariationSelector.trim() }${ selector.trim() }`
@@ -214,13 +342,15 @@ function concatFeatureVariationSelectorString(
  *
  * NOTE: The passed `styles` object will be mutated by this function.
  *
- * @param {Object} selectors Custom selectors object for a block.
- * @param {Object} styles    A block's styles object.
- *
- * @return {Object} Style declarations.
+ * @param selectors Custom selectors object for a block
+ * @param styles    A block's styles object
+ * @return Style declarations
  */
-const getFeatureDeclarations = ( selectors, styles ) => {
-	const declarations = {};
+const getFeatureDeclarations = (
+	selectors: Record< string, any >,
+	styles: Record< string, any >
+): Record< string, string[] > => {
+	const declarations: Record< string, string[] > = {};
 
 	Object.entries( selectors ).forEach( ( [ feature, selector ] ) => {
 		// We're only processing features/subfeatures that have styles.
@@ -231,8 +361,12 @@ const getFeatureDeclarations = ( selectors, styles ) => {
 		const isShorthand = typeof selector === 'string';
 
 		// If we have a selector object instead of shorthand process it.
-		if ( ! isShorthand ) {
-			Object.entries( selector ).forEach(
+		if (
+			! isShorthand &&
+			typeof selector === 'object' &&
+			selector !== null
+		) {
+			Object.entries( selector as Record< string, string > ).forEach(
 				( [ subfeature, subfeatureSelector ] ) => {
 					// Don't process root feature selector yet or any
 					// subfeature that doesn't have a style.
@@ -269,8 +403,15 @@ const getFeatureDeclarations = ( selectors, styles ) => {
 
 		// Now subfeatures have been processed and removed, we can
 		// process root, or shorthand, feature selectors.
-		if ( isShorthand || selector.root ) {
-			const featureSelector = isShorthand ? selector : selector.root;
+		if (
+			isShorthand ||
+			( typeof selector === 'object' &&
+				selector !== null &&
+				'root' in selector )
+		) {
+			const featureSelector = isShorthand
+				? ( selector as string )
+				: ( selector as any ).root;
 
 			// Create temporary style object and build declarations for feature.
 			const featureStyles = { [ feature ]: styles[ feature ] };
@@ -294,29 +435,30 @@ const getFeatureDeclarations = ( selectors, styles ) => {
 /**
  * Transform given style tree into a set of style declarations.
  *
- * @param {Object}  blockStyles         Block styles.
- *
- * @param {string}  selector            The selector these declarations should attach to.
- *
- * @param {boolean} useRootPaddingAlign Whether to use CSS custom properties in root selector.
- *
- * @param {Object}  tree                A theme.json tree containing layout definitions.
- *
- * @param {boolean} disableRootPadding  Whether to force disable the root padding styles.
- * @return {Array} An array of style declarations.
+ * @param blockStyles         Block styles
+ * @param selector            The selector these declarations should attach to
+ * @param useRootPaddingAlign Whether to use CSS custom properties in root selector
+ * @param tree                A theme.json tree containing layout definitions
+ * @param disableRootPadding  Whether to force disable the root padding styles
+ * @return An array of style declarations
  */
 export function getStylesDeclarations(
-	blockStyles = {},
-	selector = '',
-	useRootPaddingAlign,
-	tree = {},
-	disableRootPadding = false
-) {
+	blockStyles: any = {},
+	selector: string = '',
+	useRootPaddingAlign?: boolean,
+	tree: any = {},
+	disableRootPadding: boolean = false
+): string[] {
 	const isRoot = ROOT_BLOCK_SELECTOR === selector;
-	const output = Object.entries( STYLE_PROPERTY ).reduce(
+	const output = Object.entries(
+		STYLE_PROPERTY as Record< string, StylePropertyConfig >
+	).reduce(
 		(
-			declarations,
-			[ key, { value, properties, useEngine, rootOnly } ]
+			declarations: string[],
+			[ key, { value, properties, useEngine, rootOnly } ]: [
+				string,
+				StylePropertyConfig,
+			]
 		) => {
 			if ( rootOnly && ! isRoot ) {
 				return declarations;
@@ -376,7 +518,7 @@ export function getStylesDeclarations(
 
 			return declarations;
 		},
-		[]
+		[] as string[]
 	);
 
 	/*
@@ -415,7 +557,7 @@ export function getStylesDeclarations(
 	}
 
 	const extraRules = getCSSRules( blockStyles );
-	extraRules.forEach( ( rule ) => {
+	extraRules.forEach( ( rule: CSSRule ) => {
 		// Don't output padding properties if padding variables are set or if we're not editing a full template.
 		if (
 			isRoot &&
@@ -428,7 +570,7 @@ export function getStylesDeclarations(
 			? rule.key
 			: kebabCase( rule.key );
 
-		let ruleValue = getResolvedValue( rule.value, tree, null );
+		let ruleValue = getResolvedValue( rule.value, tree );
 
 		// Calculate fluid typography rules where available.
 		if ( cssProperty === 'font-size' ) {
@@ -440,7 +582,7 @@ export function getStylesDeclarations(
 			 * and therefore the original $value will be returned.
 			 */
 			ruleValue = getTypographyFontSizeValue(
-				{ size: ruleValue },
+				{ name: '', slug: '', size: ruleValue as string },
 				tree?.settings
 			);
 		}
@@ -461,14 +603,15 @@ export function getStylesDeclarations(
  * Get generated CSS for layout styles by looking up layout definitions provided
  * in theme.json, and outputting common layout styles, and specific blockGap values.
  *
- * @param {Object}  props
- * @param {Object}  props.layoutDefinitions     Layout definitions, keyed by layout type.
- * @param {Object}  props.style                 A style object containing spacing values.
- * @param {string}  props.selector              Selector used to group together layout styling rules.
- * @param {boolean} props.hasBlockGapSupport    Whether or not the theme opts-in to blockGap support.
- * @param {boolean} props.hasFallbackGapSupport Whether or not the theme allows fallback gap styles.
- * @param {?string} props.fallbackGapValue      An optional fallback gap value if no real gap value is available.
- * @return {string} Generated CSS rules for the layout styles.
+ * @param props                       Layout styles configuration
+ * @param props.layoutDefinitions     Layout definitions from theme.json
+ * @param props.style                 Style object for the block
+ * @param props.selector              Selector to apply the styles to
+ * @param props.hasBlockGapSupport    Whether the block supports block gap styles
+ * @param props.hasFallbackGapSupport Whether the block supports fallback gap styles
+ * @param props.fallbackGapValue      Fallback gap value to use if block gap support is
+ *
+ * @return Generated CSS rules for the layout styles
  */
 export function getLayoutStyles( {
 	layoutDefinitions = LAYOUT_DEFINITIONS,
@@ -477,7 +620,14 @@ export function getLayoutStyles( {
 	hasBlockGapSupport,
 	hasFallbackGapSupport,
 	fallbackGapValue,
-} ) {
+}: {
+	layoutDefinitions?: Record< string, LayoutDefinition >;
+	style?: GlobalStylesStyles;
+	selector?: string;
+	hasBlockGapSupport?: boolean;
+	hasFallbackGapSupport?: boolean;
+	fallbackGapValue?: string;
+} ): string {
 	let ruleset = '';
 	let gapValue = hasBlockGapSupport
 		? getGapCSSValue( style?.spacing?.blockGap )
@@ -506,8 +656,8 @@ export function getLayoutStyles( {
 				}
 
 				if ( spacingStyles?.length ) {
-					spacingStyles.forEach( ( spacingStyle ) => {
-						const declarations = [];
+					spacingStyles.forEach( ( spacingStyle: any ) => {
+						const declarations: string[] = [];
 
 						if ( spacingStyle.rules ) {
 							Object.entries( spacingStyle.rules ).forEach(
@@ -562,7 +712,7 @@ export function getLayoutStyles( {
 	if ( selector === ROOT_BLOCK_SELECTOR && layoutDefinitions ) {
 		const validDisplayModes = [ 'block', 'flex', 'grid' ];
 		Object.values( layoutDefinitions ).forEach(
-			( { className, displayMode, baseStyles } ) => {
+			( { className, displayMode, baseStyles }: LayoutDefinition ) => {
 				if (
 					displayMode &&
 					validDisplayModes.includes( displayMode )
@@ -571,8 +721,8 @@ export function getLayoutStyles( {
 				}
 
 				if ( baseStyles?.length ) {
-					baseStyles.forEach( ( baseStyle ) => {
-						const declarations = [];
+					baseStyles.forEach( ( baseStyle: any ) => {
+						const declarations: string[] = [];
 
 						if ( baseStyle.rules ) {
 							Object.entries( baseStyle.rules ).forEach(
@@ -613,7 +763,7 @@ const STYLE_KEYS = [
 	'background',
 ];
 
-function pickStyleKeys( treeToPickFrom ) {
+function pickStyleKeys( treeToPickFrom: any ): any {
 	if ( ! treeToPickFrom ) {
 		return {};
 	}
@@ -629,8 +779,22 @@ function pickStyleKeys( treeToPickFrom ) {
 	return Object.fromEntries( clonedEntries );
 }
 
-export const getNodesWithStyles = ( tree, blockSelectors ) => {
-	const nodes = [];
+export const getNodesWithStyles = (
+	tree: GlobalStylesConfig,
+	blockSelectors: string | BlockSelectors
+): any[] => {
+	const nodes: {
+		styles: Partial< Omit< GlobalStylesStyles, 'elements' | 'blocks' > >;
+		selector: string;
+		skipSelectorWrapper?: boolean;
+		duotoneSelector?: string;
+		featureSelectors?:
+			| string
+			| Record< string, string | Record< string, string > >;
+		fallbackGapValue?: string;
+		hasLayoutSupport?: boolean;
+		styleVariationSelectors?: Record< string, string >;
+	}[] = [];
 
 	if ( ! tree?.styles ) {
 		return nodes;
@@ -651,11 +815,13 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 	Object.entries( ELEMENTS ).forEach( ( [ name, selector ] ) => {
 		if ( tree.styles?.elements?.[ name ] ) {
 			nodes.push( {
-				styles: tree.styles?.elements?.[ name ],
-				selector,
+				styles: tree.styles?.elements?.[ name ] ?? {},
+				selector: selector as string,
 				// Top level elements that don't use a class name should not receive the
 				// `:root :where()` wrapper to maintain backwards compatibility.
-				skipSelectorWrapper: ! ELEMENT_CLASS_NAMES[ name ],
+				skipSelectorWrapper: ! (
+					ELEMENT_CLASS_NAMES as Record< string, string >
+				 )[ name ],
 			} );
 		}
 	} );
@@ -664,60 +830,78 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 	Object.entries( tree.styles?.blocks ?? {} ).forEach(
 		( [ blockName, node ] ) => {
 			const blockStyles = pickStyleKeys( node );
+			const typedNode = node as BlockNode;
 
-			if ( node?.variations ) {
-				const variations = {};
-				Object.entries( node.variations ).forEach(
+			if ( typedNode?.variations ) {
+				const variations: Record< string, any > = {};
+				Object.entries( typedNode.variations ).forEach(
 					( [ variationName, variation ] ) => {
+						const typedVariation = variation as BlockVariation;
 						variations[ variationName ] =
-							pickStyleKeys( variation );
-						if ( variation?.css ) {
-							variations[ variationName ].css = variation.css;
+							pickStyleKeys( typedVariation );
+						if ( typedVariation?.css ) {
+							variations[ variationName ].css =
+								typedVariation.css;
 						}
 						const variationSelector =
-							blockSelectors[ blockName ]
-								?.styleVariationSelectors?.[ variationName ];
+							typeof blockSelectors !== 'string'
+								? blockSelectors[ blockName ]
+										?.styleVariationSelectors?.[
+										variationName
+								  ]
+								: undefined;
 
 						// Process the variation's inner element styles.
 						// This comes before the inner block styles so the
 						// element styles within the block type styles take
 						// precedence over these.
-						Object.entries( variation?.elements ?? {} ).forEach(
-							( [ element, elementStyles ] ) => {
-								if ( elementStyles && ELEMENTS[ element ] ) {
-									nodes.push( {
-										styles: elementStyles,
-										selector: scopeSelector(
-											variationSelector,
-											ELEMENTS[ element ]
-										),
-									} );
-								}
+						Object.entries(
+							typedVariation?.elements ?? {}
+						).forEach( ( [ element, elementStyles ] ) => {
+							if ( elementStyles && ELEMENTS[ element ] ) {
+								nodes.push( {
+									styles: elementStyles,
+									selector: scopeSelector(
+										variationSelector,
+										ELEMENTS[ element ]
+									),
+								} );
 							}
-						);
+						} );
 
 						// Process the variations inner block type styles.
-						Object.entries( variation?.blocks ?? {} ).forEach(
+						Object.entries( typedVariation?.blocks ?? {} ).forEach(
 							( [
 								variationBlockName,
 								variationBlockStyles,
 							] ) => {
-								const variationBlockSelector = scopeSelector(
-									variationSelector,
-									blockSelectors[ variationBlockName ]
-										?.selector
-								);
-								const variationDuotoneSelector = scopeSelector(
-									variationSelector,
-									blockSelectors[ variationBlockName ]
-										?.duotoneSelector
-								);
+								const variationBlockSelector =
+									typeof blockSelectors !== 'string'
+										? scopeSelector(
+												variationSelector,
+												blockSelectors[
+													variationBlockName
+												]?.selector
+										  )
+										: undefined;
+								const variationDuotoneSelector =
+									typeof blockSelectors !== 'string'
+										? scopeSelector(
+												variationSelector,
+												blockSelectors[
+													variationBlockName
+												]?.duotoneSelector as string
+										  )
+										: undefined;
 								const variationFeatureSelectors =
-									scopeFeatureSelectors(
-										variationSelector,
-										blockSelectors[ variationBlockName ]
-											?.featureSelectors
-									);
+									typeof blockSelectors !== 'string'
+										? scopeFeatureSelectors(
+												variationSelector,
+												blockSelectors[
+													variationBlockName
+												]?.featureSelectors ?? {}
+										  )
+										: undefined;
 
 								const variationBlockStyleNodes =
 									pickStyleKeys( variationBlockStyles );
@@ -725,6 +909,13 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 								if ( variationBlockStyles?.css ) {
 									variationBlockStyleNodes.css =
 										variationBlockStyles.css;
+								}
+
+								if (
+									! variationBlockSelector ||
+									typeof blockSelectors === 'string'
+								) {
+									return;
 								}
 
 								nodes.push( {
@@ -772,7 +963,10 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 				blockStyles.variations = variations;
 			}
 
-			if ( blockSelectors?.[ blockName ]?.selector ) {
+			if (
+				typeof blockSelectors !== 'string' &&
+				blockSelectors?.[ blockName ]?.selector
+			) {
 				nodes.push( {
 					duotoneSelector:
 						blockSelectors[ blockName ].duotoneSelector,
@@ -789,9 +983,10 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 				} );
 			}
 
-			Object.entries( node?.elements ?? {} ).forEach(
+			Object.entries( typedNode?.elements ?? {} ).forEach(
 				( [ elementName, value ] ) => {
 					if (
+						typeof blockSelectors !== 'string' &&
 						value &&
 						blockSelectors?.[ blockName ] &&
 						ELEMENTS[ elementName ]
@@ -800,11 +995,11 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 							styles: value,
 							selector: blockSelectors[ blockName ]?.selector
 								.split( ',' )
-								.map( ( sel ) => {
+								.map( ( sel: string ) => {
 									const elementSelectors =
 										ELEMENTS[ elementName ].split( ',' );
 									return elementSelectors.map(
-										( elementSelector ) =>
+										( elementSelector: string ) =>
 											sel + ' ' + elementSelector
 									);
 								} )
@@ -819,14 +1014,26 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 	return nodes;
 };
 
-export const getNodesWithSettings = ( tree, blockSelectors ) => {
-	const nodes = [];
+export const getNodesWithSettings = (
+	tree: GlobalStylesConfig,
+	blockSelectors: string | BlockSelectors
+): any[] => {
+	const nodes: {
+		presets: Record< string, any >;
+		custom?: Record< string, any >;
+		selector?: string;
+		duotoneSelector?: string;
+		fallbackGapValue?: string;
+		hasLayoutSupport?: boolean;
+		featureSelectors?: Record< string, string >;
+		styleVariationSelectors?: Record< string, string >;
+	}[] = [];
 
 	if ( ! tree?.settings ) {
 		return nodes;
 	}
 
-	const pickPresets = ( treeToPickFrom ) => {
+	const pickPresets = ( treeToPickFrom: any ): any => {
 		let presets = {};
 		PRESET_METADATA.forEach( ( { path } ) => {
 			const value = getValueFromObjectPath( treeToPickFrom, path, false );
@@ -851,8 +1058,14 @@ export const getNodesWithSettings = ( tree, blockSelectors ) => {
 	// Blocks.
 	Object.entries( tree.settings?.blocks ?? {} ).forEach(
 		( [ blockName, node ] ) => {
-			const blockPresets = pickPresets( node );
 			const blockCustom = node.custom;
+			if (
+				typeof blockSelectors === 'string' ||
+				! blockSelectors[ blockName ]
+			) {
+				return;
+			}
+			const blockPresets = pickPresets( node );
 			if ( Object.keys( blockPresets ).length > 0 || blockCustom ) {
 				nodes.push( {
 					presets: blockPresets,
@@ -866,11 +1079,16 @@ export const getNodesWithSettings = ( tree, blockSelectors ) => {
 	return nodes;
 };
 
-export const toCustomProperties = ( tree, blockSelectors ) => {
+export const generateCustomProperties = (
+	tree: GlobalStylesConfig,
+	blockSelectors: BlockSelectors
+): string => {
 	const settings = getNodesWithSettings( tree, blockSelectors );
 	let ruleset = '';
 	settings.forEach( ( { presets, custom, selector } ) => {
-		const declarations = getPresetsDeclarations( presets, tree?.settings );
+		const declarations = tree?.settings
+			? getPresetsDeclarations( presets, tree?.settings )
+			: [];
 		const customProps = flattenTree( custom, '--wp--custom--', '--' );
 		if ( customProps.length > 0 ) {
 			declarations.push( ...customProps );
@@ -884,15 +1102,15 @@ export const toCustomProperties = ( tree, blockSelectors ) => {
 	return ruleset;
 };
 
-export const toStyles = (
-	tree,
-	blockSelectors,
-	hasBlockGapSupport,
-	hasFallbackGapSupport,
-	disableLayoutStyles = false,
-	disableRootPadding = false,
-	styleOptions = undefined
-) => {
+export const transformToStyles = (
+	tree: GlobalStylesConfig,
+	blockSelectors: string | BlockSelectors,
+	hasBlockGapSupport?: boolean,
+	hasFallbackGapSupport?: boolean,
+	disableLayoutStyles: boolean = false,
+	disableRootPadding: boolean = false,
+	styleOptions: Record< string, boolean > = {}
+): string => {
 	// These allow opting out of certain sets of styles.
 	const options = {
 		blockGap: true,
@@ -984,7 +1202,7 @@ export const toStyles = (
 
 				// Process duotone styles.
 				if ( duotoneSelector ) {
-					const duotoneStyles = {};
+					const duotoneStyles: any = {};
 					if ( styles?.filter ) {
 						duotoneStyles.filter = styles.filter;
 						delete styles.filter;
@@ -1052,12 +1270,15 @@ export const toStyles = (
 									Object.entries(
 										featureDeclarations
 									).forEach(
-										( [ baseSelector, declarations ] ) => {
+										( [ baseSelector, declarations ]: [
+											string,
+											string[],
+										] ) => {
 											if ( declarations.length ) {
 												const cssSelector =
 													concatFeatureVariationSelectorString(
 														baseSelector,
-														styleVariationSelector
+														styleVariationSelector as string
 													);
 												const rules =
 													declarations.join( ';' );
@@ -1071,7 +1292,7 @@ export const toStyles = (
 								const styleVariationDeclarations =
 									getStylesDeclarations(
 										styleVariations,
-										styleVariationSelector,
+										styleVariationSelector as string,
 										useRootPaddingAlign,
 										tree
 									);
@@ -1115,7 +1336,7 @@ export const toStyles = (
 							// the proper rules to target the elements.
 							const _selector = selector
 								.split( ',' )
-								.map( ( sel ) => sel + pseudoKey )
+								.map( ( sel: string ) => sel + pseudoKey )
 								.join( ',' );
 
 							// As pseudo classes such as :hover, :focus etc. have class-level
@@ -1182,14 +1403,17 @@ export const toStyles = (
 	return ruleset;
 };
 
-export function toSvgFilters( tree, blockSelectors ) {
+export function generateSvgFilters(
+	tree: GlobalStylesConfig,
+	blockSelectors: BlockSelectors
+): string[] {
 	const nodesWithSettings = getNodesWithSettings( tree, blockSelectors );
 	return nodesWithSettings.flatMap( ( { presets } ) => {
 		return getPresetsSvgFilters( presets );
 	} );
 }
 
-const getSelectorsConfig = ( blockType, rootSelector ) => {
+const getSelectorsConfig = ( blockType: BlockType, rootSelector: string ) => {
 	if (
 		blockType?.selectors &&
 		Object.keys( blockType.selectors ).length > 0
@@ -1197,13 +1421,12 @@ const getSelectorsConfig = ( blockType, rootSelector ) => {
 		return blockType.selectors;
 	}
 
-	const config = { root: rootSelector };
+	const config: Record< string, string > = {
+		root: rootSelector,
+	};
 	Object.entries( BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS ).forEach(
 		( [ featureKey, featureName ] ) => {
-			const featureSelector = getBlockCSSSelector(
-				blockType,
-				featureKey
-			);
+			const featureSelector = getBlockSelector( blockType, featureKey );
 
 			if ( featureSelector ) {
 				config[ featureName ] = featureSelector;
@@ -1215,40 +1438,43 @@ const getSelectorsConfig = ( blockType, rootSelector ) => {
 };
 
 export const getBlockSelectors = (
-	blockTypes,
-	getBlockStyles,
-	variationInstanceId
+	blockTypes: BlockType[],
+	variationInstanceId?: string
 ) => {
-	const result = {};
+	const { getBlockStyles } = select( blocksStore );
+	const result: BlockSelectors = {};
 	blockTypes.forEach( ( blockType ) => {
 		const name = blockType.name;
-		const selector = getBlockCSSSelector( blockType );
-		let duotoneSelector = getBlockCSSSelector(
-			blockType,
-			'filter.duotone'
-		);
+		const selector = getBlockSelector( blockType );
 
+		if ( ! selector ) {
+			return; // Skip blocks without valid selectors
+		}
+		let duotoneSelector = getBlockSelector( blockType, 'filter.duotone' );
 		// Keep backwards compatibility for support.color.__experimentalDuotone.
 		if ( ! duotoneSelector ) {
-			const rootSelector = getBlockCSSSelector( blockType );
+			const rootSelector = getBlockSelector( blockType );
 			const duotoneSupport = getBlockSupport(
 				blockType,
 				'color.__experimentalDuotone',
 				false
 			);
 			duotoneSelector =
-				duotoneSupport && scopeSelector( rootSelector, duotoneSupport );
+				duotoneSupport &&
+				rootSelector &&
+				scopeSelector( rootSelector, duotoneSupport );
 		}
 
 		const hasLayoutSupport =
 			!! blockType?.supports?.layout ||
 			!! blockType?.supports?.__experimentalLayout;
 		const fallbackGapValue =
+			// @ts-expect-error
 			blockType?.supports?.spacing?.blockGap?.__experimentalDefault;
 
 		const blockStyleVariations = getBlockStyles( name );
-		const styleVariationSelectors = {};
-		blockStyleVariations?.forEach( ( variation ) => {
+		const styleVariationSelectors: Record< string, string > = {};
+		blockStyleVariations?.forEach( ( variation: BlockStyleVariation ) => {
 			const variationSuffix = variationInstanceId
 				? `-${ variationInstanceId }`
 				: '';
@@ -1265,7 +1491,7 @@ export const getBlockSelectors = (
 		const featureSelectors = getSelectorsConfig( blockType, selector );
 
 		result[ name ] = {
-			duotoneSelector,
+			duotoneSelector: duotoneSelector ?? undefined,
 			fallbackGapValue,
 			featureSelectors: Object.keys( featureSelectors ).length
 				? featureSelectors
@@ -1286,28 +1512,31 @@ export const getBlockSelectors = (
  * If there is a separator block whose color is defined in theme.json via background,
  * update the separator color to the same value by using border color.
  *
- * @param {Object} config Theme.json configuration file object.
- * @return {Object} configTheme.json configuration file object updated.
+ * @param config Theme.json configuration file object
+ * @return Theme.json configuration file object updated
  */
-function updateConfigWithSeparator( config ) {
+function updateConfigWithSeparator(
+	config: GlobalStylesConfig
+): GlobalStylesConfig {
+	const blocks = config.styles?.blocks;
+	const separatorBlock = blocks?.[ 'core/separator' ];
 	const needsSeparatorStyleUpdate =
-		config.styles?.blocks?.[ 'core/separator' ] &&
-		config.styles?.blocks?.[ 'core/separator' ].color?.background &&
-		! config.styles?.blocks?.[ 'core/separator' ].color?.text &&
-		! config.styles?.blocks?.[ 'core/separator' ].border?.color;
+		separatorBlock &&
+		separatorBlock.color?.background &&
+		! separatorBlock.color?.text &&
+		! separatorBlock.border?.color;
 	if ( needsSeparatorStyleUpdate ) {
 		return {
 			...config,
 			styles: {
 				...config.styles,
 				blocks: {
-					...config.styles.blocks,
+					...blocks,
 					'core/separator': {
-						...config.styles.blocks[ 'core/separator' ],
+						...separatorBlock,
 						color: {
-							...config.styles.blocks[ 'core/separator' ].color,
-							text: config.styles?.blocks[ 'core/separator' ]
-								.color.background,
+							...separatorBlock.color,
+							text: separatorBlock.color?.background,
 						},
 					},
 				},
@@ -1317,7 +1546,7 @@ function updateConfigWithSeparator( config ) {
 	return config;
 }
 
-export function processCSSNesting( css, blockSelector ) {
+export function processCSSNesting( css: string, blockSelector: string ) {
 	let processedCSS = '';
 
 	if ( ! css || css.trim() === '' ) {
@@ -1326,7 +1555,7 @@ export function processCSSNesting( css, blockSelector ) {
 
 	// Split CSS nested rules.
 	const parts = css.split( '&' );
-	parts.forEach( ( part ) => {
+	parts.forEach( ( part: string ) => {
 		if ( ! part || part.trim() === '' ) {
 			return;
 		}
@@ -1374,114 +1603,94 @@ export function processCSSNesting( css, blockSelector ) {
 	return processedCSS;
 }
 
-/**
- * Returns the global styles output using a global styles configuration.
- * If wishing to generate global styles and settings based on the
- * global styles config loaded in the editor context, use `useGlobalStylesOutput()`.
- * The use case for a custom config is to generate bespoke styles
- * and settings for previews, or other out-of-editor experiences.
- *
- * @param {Object}  mergedConfig       Global styles configuration.
- * @param {boolean} disableRootPadding Disable root padding styles.
- *
- * @return {Array} Array of stylesheets and settings.
- */
-export function useGlobalStylesOutputWithConfig(
-	mergedConfig = {},
-	disableRootPadding
-) {
-	const [ blockGap ] = useGlobalSetting( 'spacing.blockGap' );
-	const hasBlockGapSupport = blockGap !== null;
-	const hasFallbackGapSupport = ! hasBlockGapSupport; // This setting isn't useful yet: it exists as a placeholder for a future explicit fallback styles support.
-	const disableLayoutStyles = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return !! getSettings().disableLayoutStyles;
-	} );
-
-	const { getBlockStyles } = useSelect( blocksStore );
-
-	return useMemo( () => {
-		if ( ! mergedConfig?.styles || ! mergedConfig?.settings ) {
-			return [];
-		}
-		const updatedConfig = updateConfigWithSeparator( mergedConfig );
-
-		const blockSelectors = getBlockSelectors(
-			getBlockTypes(),
-			getBlockStyles
-		);
-
-		const customProperties = toCustomProperties(
-			updatedConfig,
-			blockSelectors
-		);
-
-		const globalStyles = toStyles(
-			updatedConfig,
-			blockSelectors,
-			hasBlockGapSupport,
-			hasFallbackGapSupport,
-			disableLayoutStyles,
-			disableRootPadding
-		);
-		const svgs = toSvgFilters( updatedConfig, blockSelectors );
-
-		const styles = [
-			{
-				css: customProperties,
-				isGlobalStyles: true,
-			},
-			{
-				css: globalStyles,
-				isGlobalStyles: true,
-			},
-			// Load custom CSS in own stylesheet so that any invalid CSS entered in the input won't break all the global styles in the editor.
-			{
-				css: updatedConfig.styles.css ?? '',
-				isGlobalStyles: true,
-			},
-			{
-				assets: svgs,
-				__unstableType: 'svg',
-				isGlobalStyles: true,
-			},
-		];
-
-		// Loop through the blocks to check if there are custom CSS values.
-		// If there are, get the block selector and push the selector together with
-		// the CSS value to the 'stylesheets' array.
-		getBlockTypes().forEach( ( blockType ) => {
-			if ( updatedConfig.styles.blocks[ blockType.name ]?.css ) {
-				const selector = blockSelectors[ blockType.name ].selector;
-				styles.push( {
-					css: processCSSNesting(
-						updatedConfig.styles.blocks[ blockType.name ]?.css,
-						selector
-					),
-					isGlobalStyles: true,
-				} );
-			}
-		} );
-
-		return [ styles, updatedConfig.settings ];
-	}, [
-		hasBlockGapSupport,
-		hasFallbackGapSupport,
-		mergedConfig,
-		disableLayoutStyles,
-		disableRootPadding,
-		getBlockStyles,
-	] );
+export interface GlobalStylesRenderOptions {
+	hasBlockGapSupport?: boolean;
+	hasFallbackGapSupport?: boolean;
+	disableLayoutStyles?: boolean;
+	disableRootPadding?: boolean;
+	getBlockStyles?: ( blockName: string ) => any[];
 }
 
 /**
  * Returns the global styles output based on the current state of global styles config loaded in the editor context.
  *
- * @param {boolean} disableRootPadding Disable root padding styles.
- *
- * @return {Array} Array of stylesheets and settings.
+ * @param config     Global styles configuration
+ * @param blockTypes Array of block types from WordPress blocks store
+ * @param options    Options for rendering global styles
+ * @return Array of stylesheets and settings
  */
-export function useGlobalStylesOutput( disableRootPadding = false ) {
-	const { merged: mergedConfig } = useContext( GlobalStylesContext );
-	return useGlobalStylesOutputWithConfig( mergedConfig, disableRootPadding );
+export function generateGlobalStyles(
+	config: GlobalStylesConfig | undefined = {},
+	blockTypes: any[] = [],
+	options: GlobalStylesRenderOptions = {}
+): [ any[], any ] {
+	const {
+		hasBlockGapSupport: hasBlockGapSupportOption,
+		hasFallbackGapSupport: hasFallbackGapSupportOption,
+		disableLayoutStyles = false,
+		disableRootPadding = false,
+	} = options;
+
+	// Use provided block types or fall back to getBlockTypes()
+	const blocks = blockTypes.length > 0 ? blockTypes : getBlockTypes();
+
+	const blockGap = getSetting( config, 'spacing.blockGap' );
+	const hasBlockGapSupport = hasBlockGapSupportOption ?? blockGap !== null;
+	const hasFallbackGapSupport =
+		hasFallbackGapSupportOption ?? ! hasBlockGapSupport;
+
+	if ( ! config?.styles || ! config?.settings ) {
+		return [ [], {} ];
+	}
+	const updatedConfig = updateConfigWithSeparator( config );
+	const blockSelectors = getBlockSelectors( blocks );
+	const customProperties = generateCustomProperties(
+		updatedConfig,
+		blockSelectors
+	);
+	const globalStyles = transformToStyles(
+		updatedConfig,
+		blockSelectors,
+		hasBlockGapSupport,
+		hasFallbackGapSupport,
+		disableLayoutStyles,
+		disableRootPadding
+	);
+	const svgs = generateSvgFilters( updatedConfig, blockSelectors );
+	const styles = [
+		{
+			css: customProperties,
+			isGlobalStyles: true,
+		},
+		{
+			css: globalStyles,
+			isGlobalStyles: true,
+		},
+		// Load custom CSS in own stylesheet so that any invalid CSS entered in the input won't break all the global styles in the editor.
+		{
+			css: updatedConfig?.styles?.css ?? '',
+			isGlobalStyles: true,
+		},
+		{
+			assets: svgs,
+			__unstableType: 'svg',
+			isGlobalStyles: true,
+		},
+	];
+
+	// Loop through the blocks to check if there are custom CSS values.
+	// If there are, get the block selector and push the selector together with
+	// the CSS value to the 'stylesheets' array.
+	blocks.forEach( ( blockType: BlockType ) => {
+		const blockStyles = updatedConfig?.styles?.blocks?.[ blockType.name ];
+		if ( blockStyles?.css ) {
+			const selector = blockSelectors[ blockType.name ].selector;
+			styles.push( {
+				css: processCSSNesting( blockStyles.css, selector ),
+				isGlobalStyles: true,
+			} );
+		}
+	} );
+
+	return [ styles, updatedConfig.settings ];
 }

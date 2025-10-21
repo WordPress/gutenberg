@@ -93,6 +93,6 @@ function gutenberg_enqueue_command_palette_assets() {
 }
 
 if ( has_filter( 'admin_enqueue_scripts', 'wp_enqueue_command_palette_assets' ) ) {
-	remove_filter( 'admin_enqueue_scripts', 'wp_enqueue_command_palette_assets', 9 );
+	remove_filter( 'admin_enqueue_scripts', 'wp_enqueue_command_palette_assets' );
 }
 add_filter( 'admin_enqueue_scripts', 'gutenberg_enqueue_command_palette_assets', 9 );
