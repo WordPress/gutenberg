@@ -102,7 +102,11 @@ const v3 = {
 		};
 	},
 	isEligible( attributes ) {
-		return !! attributes?.metadata?.bindings?.datetime?.args?.key;
+		return (
+			attributes?.metadata?.bindings?.datetime?.source ===
+				'core/post-data' &&
+			!! attributes?.metadata?.bindings?.datetime?.args?.key
+		);
 	},
 };
 
