@@ -9,7 +9,7 @@
 					"datetime": {
 						"source": "core/post-data",
 						"args": {
-							"key": "date"
+							"field": "date"
 						}
 					}
 				}

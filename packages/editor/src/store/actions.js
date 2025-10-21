@@ -356,15 +356,10 @@ async function templateActivationNotice( { select, registry } ) {
 					onClick: async () => {
 						await registry
 							.dispatch( noticesStore )
-							.removeNotice( 'template-activate-notice' );
-						await registry
-							.dispatch( noticesStore )
 							.createNotice(
 								'info',
 								__( 'Activating template…' ),
-								{
-									id: 'template-activating-notice',
-								}
+								{ id: 'template-activate-notice' }
 							);
 						try {
 							const currentSite = await registry
@@ -385,20 +380,16 @@ async function templateActivationNotice( { select, registry } ) {
 								);
 							await registry
 								.dispatch( noticesStore )
-								.removeNotice( 'template-activating-notice' );
-							await registry
-								.dispatch( noticesStore )
 								.createSuccessNotice(
-									__( 'Template activated.' )
+									__( 'Template activated.' ),
+									{ id: 'template-activate-notice' }
 								);
 						} catch ( error ) {
 							await registry
 								.dispatch( noticesStore )
-								.removeNotice( 'template-activating-notice' );
-							await registry
-								.dispatch( noticesStore )
 								.createErrorNotice(
-									__( 'Template activation failed.' )
+									__( 'Template activation failed.' ),
+									{ id: 'template-activate-notice' }
 								);
 							// Rethrow for debugging.
 							throw error;

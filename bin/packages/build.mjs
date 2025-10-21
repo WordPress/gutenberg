@@ -524,7 +524,13 @@ async function bundlePackage( packageName ) {
 
 	if ( packageJson.wpScript ) {
 		const entryPoint = resolveEntryPoint( packageDir, packageJson );
-		const outputDir = path.join( PACKAGES_DIR, '..', 'build', packageName );
+		const outputDir = path.join(
+			PACKAGES_DIR,
+			'..',
+			'build',
+			'scripts',
+			packageName
+		);
 		const target = browserslistToEsbuild();
 		const globalName = `wp.${ kebabToCamelCase( packageName ) }`;
 
@@ -573,7 +579,8 @@ async function bundlePackage( packageName ) {
 		const rootBuildModuleDir = path.join(
 			PACKAGES_DIR,
 			'..',
-			'build-module',
+			'build',
+			'modules',
 			packageName
 		);
 
@@ -616,7 +623,13 @@ async function bundlePackage( packageName ) {
 
 	if ( packageJson.wpScript ) {
 		const buildStyleDir = path.join( packageDir, 'build-style' );
-		const outputDir = path.join( PACKAGES_DIR, '..', 'build', packageName );
+		const outputDir = path.join(
+			PACKAGES_DIR,
+			'..',
+			'build',
+			'styles',
+			packageName
+		);
 		const isProduction = process.env.NODE_ENV === 'production';
 
 		const cssFiles = await glob(
@@ -664,7 +677,13 @@ async function bundlePackage( packageName ) {
 	if ( packageJson.wpCopyFiles ) {
 		const { files, transforms = {} } = packageJson.wpCopyFiles;
 		const sourceDir = path.join( packageDir, 'src' );
-		const outputDir = path.join( PACKAGES_DIR, '..', 'build', packageName );
+		const outputDir = path.join(
+			PACKAGES_DIR,
+			'..',
+			'build',
+			'scripts',
+			packageName
+		);
 
 		for ( const filePattern of files ) {
 			const matchedFiles = await glob(
@@ -1096,7 +1115,7 @@ async function buildAll() {
 			const isBundled = await bundlePackage( packageName );
 			const buildTime = Date.now() - startBundleTime;
 			if ( isBundled ) {
-				console.log( `✔ Bundled ${ packageName } (${ buildTime }ms)` );
+				console.log( `   ✔ Bundled ${ packageName } (${ buildTime }ms)` );
 			}
 		} )
 	);

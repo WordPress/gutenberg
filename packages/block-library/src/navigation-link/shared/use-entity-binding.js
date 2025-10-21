@@ -38,7 +38,7 @@ export function buildNavigationLinkEntityBinding( kind ) {
 		url: {
 			source,
 			args: {
-				key: 'link',
+				field: 'link',
 			},
 		},
 	};
@@ -69,7 +69,7 @@ export function useEntityBinding( { clientId, attributes } ) {
 		if ( hasUrlBinding ) {
 			updateBlockBindings( { url: undefined } );
 		}
-	}, [ updateBlockBindings, hasUrlBinding, metadata, id ] );
+	}, [ updateBlockBindings, hasUrlBinding ] );
 
 	const createBinding = useCallback(
 		( updatedAttributes ) => {

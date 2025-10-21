@@ -4,6 +4,18 @@
 
 ### Enhancements
 
+-   `Button`: Update font weight to `500` ([#70787](https://github.com/WordPress/gutenberg/pull/70787)).
+-   `TabPanel`: Update tab font weight ([#72455](https://github.com/WordPress/gutenberg/pull/72455)).
+-   Consistently use font-weight 499 instead of 500 ([#72473](https://github.com/WordPress/gutenberg/pull/72473)).
+
+### Bug Fixes
+
+-   `Button`: Ensure that icons don't shrink ([#72474](https://github.com/WordPress/gutenberg/pull/72474)).
+
+## 30.6.0 (2025-10-17)
+
+### Enhancements
+
 -   `SearchControl`: Move search icon to prefix position ([#71984](https://github.com/WordPress/gutenberg/pull/71984)).
 -   `SearchControl`: Flip search icon depending on placement ([#72070](https://github.com/WordPress/gutenberg/pull/72070)).
 -   `SearchControl`: Normalize styles ([#72072](https://github.com/WordPress/gutenberg/pull/72072)).

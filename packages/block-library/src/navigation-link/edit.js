@@ -558,7 +558,7 @@ export default function NavigationLinkEdit( {
 								if ( isEntityLink ) {
 									createBinding( updatedAttributes );
 								} else {
-									clearBinding( updatedAttributes );
+									clearBinding();
 								}
 							} }
 						/>
