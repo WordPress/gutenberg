@@ -88,9 +88,16 @@ function BlockBindingsPanelMenuContent( {
 		<Menu placement={ isMobile ? 'bottom-start' : 'left-start' }>
 			{ Object.entries( sources ).map( ( [ sourceKey, source ] ) => {
 				// Only show sources that have compatible data for this specific attribute.
-				const sourceDataItems = source.data?.filter(
-					( item ) => item?.type === attributeType
-				);
+				const sourceDataItems = source.data?.filter( ( item ) => {
+					if ( item.attributes === undefined ) {
+						return item?.type === attributeType;
+					}
+
+					return (
+						item?.type === attributeType &&
+						item?.attributes.includes( attribute )
+					);
+				} );
 
 				const noItemsAvailable =
 					! sourceDataItems || sourceDataItems.length === 0;
@@ -210,7 +217,6 @@ function BlockBindingsAttribute( { attribute, binding, sources, blockName } ) {
 	let displayText;
 	let isValid = true;
 	const isNotBound = binding === undefined;
-
 	if ( isNotBound ) {
 		// Check if there are any compatible sources for this attribute type.
 		const attributeType = getAttributeType( blockName, attribute );
@@ -467,11 +473,11 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 
 						const hasCompatibleDataForAttribute = Object.values(
 							sources
-						).some( ( source ) =>
-							source.data?.some(
+						).some( ( source ) => {
+							return source.data?.some(
 								( item ) => item?.type === attributeType
-							)
-						);
+							);
+						} );
 
 						const isAttributeReadOnly =
 							readOnly || ! hasCompatibleDataForAttribute;
