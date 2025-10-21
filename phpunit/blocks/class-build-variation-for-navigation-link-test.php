@@ -54,9 +54,9 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 	 */
 	public function test_custom_post_type_variation_format() {
 		// Create a mock custom post type object
-		$post_type = new stdClass();
-		$post_type->name = 'product';
-		$post_type->labels = new stdClass();
+		$post_type                        = new stdClass();
+		$post_type->name                  = 'product';
+		$post_type->labels                = new stdClass();
 		$post_type->labels->singular_name = 'Product';
 
 		$variation = gutenberg_build_variation_for_navigation_link( $post_type, 'post-type' );
@@ -73,11 +73,11 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 	 */
 	public function test_custom_post_type_with_custom_item_link_label() {
 		// Create a mock custom post type object with custom item_link
-		$post_type = new stdClass();
-		$post_type->name = 'product';
-		$post_type->labels = new stdClass();
+		$post_type                        = new stdClass();
+		$post_type->name                  = 'product';
+		$post_type->labels                = new stdClass();
 		$post_type->labels->singular_name = 'Product';
-		$post_type->labels->item_link = 'Custom Product Link';
+		$post_type->labels->item_link     = 'Custom Product Link';
 
 		$variation = gutenberg_build_variation_for_navigation_link( $post_type, 'post-type' );
 
@@ -90,10 +90,10 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 	 */
 	public function test_custom_post_type_with_custom_item_link_description() {
 		// Create a mock custom post type object with custom item_link_description
-		$post_type = new stdClass();
-		$post_type->name = 'product';
-		$post_type->labels = new stdClass();
-		$post_type->labels->singular_name = 'Product';
+		$post_type                                = new stdClass();
+		$post_type->name                          = 'product';
+		$post_type->labels                        = new stdClass();
+		$post_type->labels->singular_name         = 'Product';
 		$post_type->labels->item_link_description = 'Custom product description';
 
 		$variation = gutenberg_build_variation_for_navigation_link( $post_type, 'post-type' );
@@ -107,11 +107,11 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 	 */
 	public function test_custom_post_type_with_both_custom_labels() {
 		// Create a mock custom post type object with both custom labels
-		$post_type = new stdClass();
-		$post_type->name = 'product';
-		$post_type->labels = new stdClass();
-		$post_type->labels->singular_name = 'Product';
-		$post_type->labels->item_link = 'Custom Product Link';
+		$post_type                                = new stdClass();
+		$post_type->name                          = 'product';
+		$post_type->labels                        = new stdClass();
+		$post_type->labels->singular_name         = 'Product';
+		$post_type->labels->item_link             = 'Custom Product Link';
 		$post_type->labels->item_link_description = 'Custom product description';
 
 		$variation = gutenberg_build_variation_for_navigation_link( $post_type, 'post-type' );
@@ -126,9 +126,9 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 	 */
 	public function test_missing_item_link_generates_from_singular_name() {
 		// Create a mock custom post type object without item_link
-		$post_type = new stdClass();
-		$post_type->name = 'product';
-		$post_type->labels = new stdClass();
+		$post_type                        = new stdClass();
+		$post_type->name                  = 'product';
+		$post_type->labels                = new stdClass();
 		$post_type->labels->singular_name = 'Product';
 		// No item_link property
 
@@ -143,9 +143,9 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 	 */
 	public function test_missing_item_link_description_generates_from_singular_name() {
 		// Create a mock custom post type object without item_link_description
-		$post_type = new stdClass();
-		$post_type->name = 'product';
-		$post_type->labels = new stdClass();
+		$post_type                        = new stdClass();
+		$post_type->name                  = 'product';
+		$post_type->labels                = new stdClass();
 		$post_type->labels->singular_name = 'Product';
 		// No item_link_description property
 
@@ -160,8 +160,8 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 	 */
 	public function test_missing_singular_name_falls_back_to_ucfirst_name() {
 		// Create a mock custom post type object without singular_name
-		$post_type = new stdClass();
-		$post_type->name = 'product';
+		$post_type         = new stdClass();
+		$post_type->name   = 'product';
 		$post_type->labels = new stdClass();
 		// No singular_name property
 
@@ -177,11 +177,11 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 	 */
 	public function test_taxonomy_with_custom_labels() {
 		// Create a mock taxonomy object with custom labels
-		$taxonomy = new stdClass();
-		$taxonomy->name = 'product_category';
-		$taxonomy->labels = new stdClass();
-		$taxonomy->labels->singular_name = 'Product Category';
-		$taxonomy->labels->item_link = 'Custom Category Link';
+		$taxonomy                                = new stdClass();
+		$taxonomy->name                          = 'product_category';
+		$taxonomy->labels                        = new stdClass();
+		$taxonomy->labels->singular_name         = 'Product Category';
+		$taxonomy->labels->item_link             = 'Custom Category Link';
 		$taxonomy->labels->item_link_description = 'Custom category description';
 
 		$variation = gutenberg_build_variation_for_navigation_link( $taxonomy, 'taxonomy' );
@@ -196,9 +196,9 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 	 */
 	public function test_taxonomy_with_generated_labels() {
 		// Create a mock taxonomy object without custom labels
-		$taxonomy = new stdClass();
-		$taxonomy->name = 'product_category';
-		$taxonomy->labels = new stdClass();
+		$taxonomy                        = new stdClass();
+		$taxonomy->name                  = 'product_category';
+		$taxonomy->labels                = new stdClass();
 		$taxonomy->labels->singular_name = 'Product Category';
 		// No custom item_link or item_link_description
 
@@ -214,9 +214,9 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 	 */
 	public function test_post_tag_override() {
 		// Create a mock post_tag taxonomy object
-		$taxonomy = new stdClass();
-		$taxonomy->name = 'post_tag';
-		$taxonomy->labels = new stdClass();
+		$taxonomy                        = new stdClass();
+		$taxonomy->name                  = 'post_tag';
+		$taxonomy->labels                = new stdClass();
 		$taxonomy->labels->singular_name = 'Tag';
 
 		$variation = gutenberg_build_variation_for_navigation_link( $taxonomy, 'taxonomy' );
@@ -232,9 +232,9 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 	 */
 	public function test_post_format_override() {
 		// Create a mock post_format taxonomy object
-		$taxonomy = new stdClass();
-		$taxonomy->name = 'post_format';
-		$taxonomy->labels = new stdClass();
+		$taxonomy                        = new stdClass();
+		$taxonomy->name                  = 'post_format';
+		$taxonomy->labels                = new stdClass();
 		$taxonomy->labels->singular_name = 'Post Format';
 
 		$variation = gutenberg_build_variation_for_navigation_link( $taxonomy, 'taxonomy' );
@@ -251,9 +251,9 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 	 */
 	public function test_attributes_with_post_type_kind() {
 		// Create a mock post type object
-		$post_type = new stdClass();
-		$post_type->name = 'product';
-		$post_type->labels = new stdClass();
+		$post_type                        = new stdClass();
+		$post_type->name                  = 'product';
+		$post_type->labels                = new stdClass();
 		$post_type->labels->singular_name = 'Product';
 
 		$variation = gutenberg_build_variation_for_navigation_link( $post_type, 'post-type' );
@@ -269,9 +269,9 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 	 */
 	public function test_attributes_with_taxonomy_kind() {
 		// Create a mock taxonomy object
-		$taxonomy = new stdClass();
-		$taxonomy->name = 'product_category';
-		$taxonomy->labels = new stdClass();
+		$taxonomy                        = new stdClass();
+		$taxonomy->name                  = 'product_category';
+		$taxonomy->labels                = new stdClass();
 		$taxonomy->labels->singular_name = 'Product Category';
 
 		$variation = gutenberg_build_variation_for_navigation_link( $taxonomy, 'taxonomy' );
@@ -287,11 +287,11 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 	 */
 	public function test_empty_string_labels_trigger_generation() {
 		// Create a mock post type object with empty string labels
-		$post_type = new stdClass();
-		$post_type->name = 'product';
-		$post_type->labels = new stdClass();
-		$post_type->labels->singular_name = 'Product';
-		$post_type->labels->item_link = ''; // Empty string
+		$post_type                                = new stdClass();
+		$post_type->name                          = 'product';
+		$post_type->labels                        = new stdClass();
+		$post_type->labels->singular_name         = 'Product';
+		$post_type->labels->item_link             = ''; // Empty string
 		$post_type->labels->item_link_description = ''; // Empty string
 
 		$variation = gutenberg_build_variation_for_navigation_link( $post_type, 'post-type' );
@@ -306,9 +306,9 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 	 */
 	public function test_case_sensitivity() {
 		// Create a mock post type object with mixed case singular_name
-		$post_type = new stdClass();
-		$post_type->name = 'product';
-		$post_type->labels = new stdClass();
+		$post_type                        = new stdClass();
+		$post_type->name                  = 'product';
+		$post_type->labels                = new stdClass();
 		$post_type->labels->singular_name = 'Product'; // Mixed case
 
 		$variation = gutenberg_build_variation_for_navigation_link( $post_type, 'post-type' );
@@ -323,8 +323,8 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 	 */
 	public function test_entity_with_minimal_properties() {
 		// Create a mock entity with only name property and empty labels
-		$entity = new stdClass();
-		$entity->name = 'product';
+		$entity         = new stdClass();
+		$entity->name   = 'product';
 		$entity->labels = new stdClass();
 		// No singular_name property
 
@@ -351,8 +351,8 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 			'test_product',
 			array(
 				'labels'            => array(
-					'singular_name'        => 'Product',
-					'item_link'            => 'Custom Product Link',
+					'singular_name'         => 'Product',
+					'item_link'             => 'Custom Product Link',
 					'item_link_description' => 'Custom product description',
 				),
 				'public'            => true,
@@ -412,7 +412,7 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 	 */
 	public function test_integration_custom_taxonomy_with_custom_labels() {
 		// First register a post type for the taxonomy
-		$post_type = register_post_type(
+		register_post_type(
 			'test_product',
 			array(
 				'public'            => true,
@@ -426,8 +426,8 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 			'test_product',
 			array(
 				'labels'            => array(
-					'singular_name'        => 'Product Category',
-					'item_link'            => 'Custom Category Link',
+					'singular_name'         => 'Product Category',
+					'item_link'             => 'Custom Category Link',
 					'item_link_description' => 'Custom category description',
 				),
 				'public'            => true,
@@ -456,7 +456,7 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 	 */
 	public function test_integration_custom_taxonomy_without_custom_labels() {
 		// First register a post type for the taxonomy
-		$post_type = register_post_type(
+		register_post_type(
 			'test_product',
 			array(
 				'public'            => true,

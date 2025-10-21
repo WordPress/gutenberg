@@ -321,7 +321,7 @@ function build_variation_for_navigation_link( $entity, $kind ) {
 	}
 
 	// Get title and check if it's default
-	$title = '';
+	$title            = '';
 	$is_default_title = false;
 	if ( property_exists( $entity->labels, 'item_link' ) ) {
 		$title = $entity->labels->item_link;
@@ -331,7 +331,7 @@ function build_variation_for_navigation_link( $entity, $kind ) {
 	}
 
 	// Get description and check if it's default
-	$description = '';
+	$description            = '';
 	$is_default_description = false;
 	if ( property_exists( $entity->labels, 'item_link_description' ) ) {
 		$description = $entity->labels->item_link_description;
@@ -425,7 +425,6 @@ function block_core_navigation_link_build_variations() {
 	$post_types = get_post_types( array( 'show_in_nav_menus' => true ), 'objects' );
 	$taxonomies = get_taxonomies( array( 'show_in_nav_menus' => true ), 'objects' );
 
-
 	/*
 	 * Use two separate arrays as a way to order the variations in the UI.
 	 * Known variations (like Post Link and Page Link) are added to the
@@ -457,7 +456,6 @@ function block_core_navigation_link_build_variations() {
 	}
 
 	$all_variations = array_merge( $built_ins, $variations );
-
 
 	return $all_variations;
 }
