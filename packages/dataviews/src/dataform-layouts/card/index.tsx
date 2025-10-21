@@ -122,6 +122,26 @@ function isSummaryFieldVisible< Item >(
 	return true;
 }
 
+const NonCollapsibleCardHeader = ( {
+	children,
+	...props
+}: {
+	children: React.ReactNode;
+} ) => (
+	<CardHeader { ...props }>
+		<div
+			style={ {
+				height: '40px', // This is to match the chevron's __next40pxDefaultSize
+				width: '100%',
+				display: 'flex',
+				alignItems: 'center',
+			} }
+		>
+			{ children }
+		</div>
+	</CardHeader>
+);
+
 export default function FormCardField< Item >( {
 	data,
 	field,
@@ -154,12 +174,19 @@ export default function FormCardField< Item >( {
 		isSummaryFieldVisible( summaryField, layout.summary, isOpen )
 	);
 
+	const shouldUseCollapsible = layout.isCollapsible;
+	const effectiveIsOpen = shouldUseCollapsible ? isOpen : true;
+
 	if ( isCombinedField( field ) ) {
 		const withHeader = !! field.label && layout.withHeader;
+		const CardHeaderComponent = shouldUseCollapsible
+			? CollapsibleCardHeader
+			: NonCollapsibleCardHeader;
+
 		return (
 			<Card className="dataforms-layouts-card__field">
 				{ withHeader && (
-					<CollapsibleCardHeader className="dataforms-layouts-card__field-header">
+					<CardHeaderComponent className="dataforms-layouts-card__field-header">
 						<span className="dataforms-layouts-card__field-header-label">
 							{ field.label }
 						</span>
@@ -177,9 +204,9 @@ export default function FormCardField< Item >( {
 									) }
 								</div>
 							) }
-					</CollapsibleCardHeader>
+					</CardHeaderComponent>
 				) }
-				{ ( isOpen || ! withHeader ) && (
+				{ ( effectiveIsOpen || ! withHeader ) && (
 					// If it doesn't have a header, keep it open.
 					// Otherwise, the card will not be visible.
 					<CardBody className="dataforms-layouts-card__field-control">
@@ -213,10 +240,14 @@ export default function FormCardField< Item >( {
 		return null;
 	}
 	const withHeader = !! fieldDefinition.label && layout.withHeader;
+	const CardHeaderComponent = shouldUseCollapsible
+		? CollapsibleCardHeader
+		: NonCollapsibleCardHeader;
+
 	return (
 		<Card className="dataforms-layouts-card__field">
 			{ withHeader && (
-				<CollapsibleCardHeader className="dataforms-layouts-card__field-header">
+				<CardHeaderComponent className="dataforms-layouts-card__field-header">
 					<span className="dataforms-layouts-card__field-header-label">
 						{ fieldDefinition.label }
 					</span>
@@ -231,9 +262,9 @@ export default function FormCardField< Item >( {
 							) ) }
 						</div>
 					) }
-				</CollapsibleCardHeader>
+				</CardHeaderComponent>
 			) }
-			{ ( isOpen || ! withHeader ) && (
+			{ ( effectiveIsOpen || ! withHeader ) && (
 				// If it doesn't have a header, keep it open.
 				// Otherwise, the card will not be visible.
 				<CardBody className="dataforms-layouts-card__field-control">
