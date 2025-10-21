@@ -28,6 +28,8 @@ import {
 	__experimentalHasSplitBorders as hasSplitBorders,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
 import {
 	alignLeft,
@@ -100,7 +102,7 @@ function TableEdit( {
 	insertBlocksAfter,
 	isSelected: isSingleSelected,
 } ) {
-	const { hasFixedLayout, head, foot } = attributes;
+	const { hasFixedLayout, head, foot, caption, captionSide } = attributes;
 	const [ initialRowCount, setInitialRowCount ] = useState( 2 );
 	const [ initialColumnCount, setInitialColumnCount ] = useState( 2 );
 	const [ selectedCell, setSelectedCell ] = useState();
@@ -113,6 +115,8 @@ function TableEdit( {
 	const [ hasTableCreated, setHasTableCreated ] = useState( false );
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
+	const hasCaption = ! RichText.isEmpty( caption );
 
 	/**
 	 * Updates the initial column count used for table creation.
@@ -330,6 +334,15 @@ function TableEdit( {
 	}
 
 	/**
+	 * Changes the caption side position.
+	 *
+	 * @param {string} value The new caption side value.
+	 */
+	function onChangeCaptionSide( value ) {
+		setAttributes( { captionSide: value } );
+	}
+
+	/**
 	 * Deletes the currently selected column.
 	 */
 	function onDeleteColumn() {
@@ -455,8 +468,18 @@ function TableEdit( {
 
 	const isEmpty = ! sections.length;
 
+	// Add caption position class to figure
+	const blockPropsClassName = clsx( {
+		'has-caption-top': hasCaption && captionSide === 'top',
+	} );
+
 	return (
-		<figure { ...useBlockProps( { ref: tableRef } ) }>
+		<figure
+			{ ...useBlockProps( {
+				ref: tableRef,
+				className: blockPropsClassName,
+			} ) }
+		>
 			{ ! isEmpty && blockEditingMode === 'default' && (
 				<>
 					<BlockControls group="block">
@@ -537,6 +560,37 @@ function TableEdit( {
 									onChange={ onToggleFooterSection }
 								/>
 							</ToolsPanelItem>
+
+							{ hasCaption && (
+								<ToolsPanelItem
+									hasValue={ () => captionSide !== 'bottom' }
+									label={ __( 'Caption position' ) }
+									onDeselect={ () =>
+										setAttributes( {
+											captionSide: 'bottom',
+										} )
+									}
+									isShownByDefault
+								>
+									<ToggleGroupControl
+										__next40pxDefaultSize
+										__nextHasNoMarginBottom
+										label={ __( 'Caption position' ) }
+										value={ captionSide || 'bottom' }
+										onChange={ onChangeCaptionSide }
+										isBlock
+									>
+										<ToggleGroupControlOption
+											value="top"
+											label={ __( 'Top' ) }
+										/>
+										<ToggleGroupControlOption
+											value="bottom"
+											label={ __( 'Bottom' ) }
+										/>
+									</ToggleGroupControl>
+								</ToolsPanelItem>
+							) }
 						</>
 					) }
 				</ToolsPanel>
@@ -558,10 +612,24 @@ function TableEdit( {
 					) }
 					style={ { ...colorProps.style, ...borderProps.style } }
 				>
+					{ ! isEmpty && (
+						<Caption
+							attributes={ attributes }
+							setAttributes={ setAttributes }
+							isSelected={ isSingleSelected }
+							insertBlocksAfter={ insertBlocksAfter }
+							label={ __( 'Table caption text' ) }
+							tagName="caption"
+							showToolbarButton={
+								isSingleSelected &&
+								blockEditingMode === 'default'
+							}
+						/>
+					) }
 					{ renderedSections }
 				</table>
 			) }
-			{ isEmpty ? (
+			{ isEmpty && (
 				<Placeholder
 					label={ __( 'Table' ) }
 					icon={ <BlockIcon icon={ icon } showColors /> }
@@ -600,17 +668,6 @@ function TableEdit( {
 						</Button>
 					</form>
 				</Placeholder>
-			) : (
-				<Caption
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-					isSelected={ isSingleSelected }
-					insertBlocksAfter={ insertBlocksAfter }
-					label={ __( 'Table caption text' ) }
-					showToolbarButton={
-						isSingleSelected && blockEditingMode === 'default'
-					}
-				/>
 			) }
 		</figure>
 	);

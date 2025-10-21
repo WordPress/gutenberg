@@ -14,8 +14,13 @@
 		"caption": {
 			"type": "rich-text",
 			"source": "rich-text",
-			"selector": "figcaption",
+			"selector": "caption",
 			"role": "content"
+		},
+		"captionSide": {
+			"type": "string",
+			"default": "bottom",
+			"enum": [ "bottom", "top" ]
 		},
 		"head": {
 			"type": "array",
