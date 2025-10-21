@@ -31,7 +31,6 @@ describe( 'normalizeFormFields', () => {
 					layout: {
 						type: 'regular',
 						labelPosition: 'top',
-						spacing: 4,
 					},
 				},
 				{
@@ -39,7 +38,6 @@ describe( 'normalizeFormFields', () => {
 					layout: {
 						type: 'regular',
 						labelPosition: 'top',
-						spacing: 4,
 					},
 				},
 			] );
@@ -62,7 +60,6 @@ describe( 'normalizeFormFields', () => {
 					layout: {
 						type: 'regular',
 						labelPosition: 'top',
-						spacing: 4,
 					},
 				},
 				{
@@ -71,7 +68,6 @@ describe( 'normalizeFormFields', () => {
 					layout: {
 						type: 'regular',
 						labelPosition: 'top',
-						spacing: 4,
 					},
 				},
 			] );
@@ -91,7 +87,6 @@ describe( 'normalizeFormFields', () => {
 					layout: {
 						type: 'regular',
 						labelPosition: 'top',
-						spacing: 4,
 					},
 				},
 			] );
@@ -109,7 +104,6 @@ describe( 'normalizeFormFields', () => {
 					layout: {
 						type: 'regular',
 						labelPosition: 'side',
-						spacing: 4,
 					},
 				},
 			] );
@@ -167,7 +161,6 @@ describe( 'normalizeFormFields', () => {
 						withHeader: true,
 						isOpened: true,
 						summary: [],
-						spacing: 6,
 					},
 				},
 			] );
@@ -194,7 +187,6 @@ describe( 'normalizeFormFields', () => {
 						withHeader: false,
 						isOpened: true,
 						summary: [],
-						spacing: 6,
 					},
 				},
 			] );
@@ -219,7 +211,6 @@ describe( 'normalizeFormFields', () => {
 						withHeader: true,
 						isOpened: false,
 						summary: [ { id: 'field1', visibility: 'always' } ],
-						spacing: 6,
 					},
 				},
 			] );
@@ -250,7 +241,6 @@ describe( 'normalizeFormFields', () => {
 							{ id: 'field2', visibility: 'when-collapsed' },
 							{ id: 'field1', visibility: 'always' },
 						],
-						spacing: 6,
 					},
 				},
 			] );
@@ -276,7 +266,6 @@ describe( 'normalizeFormFields', () => {
 					layout: {
 						type: 'regular',
 						labelPosition: 'top',
-						spacing: 4,
 					},
 				},
 				{
@@ -311,7 +300,6 @@ describe( 'normalizeFormFields', () => {
 						withHeader: false,
 						isOpened: true,
 						summary: [],
-						spacing: 6,
 					},
 				},
 				{
@@ -321,7 +309,6 @@ describe( 'normalizeFormFields', () => {
 						withHeader: true,
 						isOpened: false,
 						summary: [],
-						spacing: 6,
 					},
 				},
 			] );

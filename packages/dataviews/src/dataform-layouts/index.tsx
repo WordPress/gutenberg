@@ -19,12 +19,7 @@ const FORM_FIELD_LAYOUTS = [
 	{
 		type: 'regular',
 		component: FormRegularField,
-		wrapper: ( {
-			children,
-		}: {
-			children: React.ReactNode;
-			layout: Layout;
-		} ) => (
+		wrapper: ( { children }: { children: React.ReactNode } ) => (
 			<VStack className="dataforms-layouts__wrapper" spacing={ 4 }>
 				{ children }
 			</VStack>
@@ -42,12 +37,7 @@ const FORM_FIELD_LAYOUTS = [
 	{
 		type: 'card',
 		component: FormCardField,
-		wrapper: ( {
-			children,
-		}: {
-			children: React.ReactNode;
-			layout: Layout;
-		} ) => (
+		wrapper: ( { children }: { children: React.ReactNode } ) => (
 			<VStack className="dataforms-layouts__wrapper" spacing={ 6 }>
 				{ children }
 			</VStack>

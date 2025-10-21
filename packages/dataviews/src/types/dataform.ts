@@ -19,7 +19,6 @@ export type RegularLayout = {
 export type NormalizedRegularLayout = {
 	type: 'regular';
 	labelPosition: LabelPosition;
-	spacing: number;
 };
 
 export type PanelLayout = {
@@ -73,14 +72,12 @@ export type NormalizedCardLayout =
 			isOpened: true;
 			// Summary is an empty array
 			summary: [];
-			spacing: number;
 	  }
 	| {
 			type: 'card';
 			withHeader: true;
 			isOpened: boolean;
 			summary: NormalizedCardSummaryField;
-			spacing: number;
 	  };
 
 export type RowLayout = {

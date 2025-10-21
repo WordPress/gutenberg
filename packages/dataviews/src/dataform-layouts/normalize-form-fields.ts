@@ -21,7 +21,6 @@ interface NormalizedFormField {
 export const DEFAULT_LAYOUT: NormalizedLayout = {
 	type: 'regular',
 	labelPosition: 'top',
-	spacing: 4,
 } as NormalizedRegularLayout;
 
 const normalizeCardSummaryField = (
@@ -51,8 +50,6 @@ export function normalizeLayout( layout?: Layout ): NormalizedLayout {
 		normalizedLayout = {
 			type: 'regular',
 			labelPosition: layout?.labelPosition ?? 'top',
-			// Spacing is fixed for regular layout.
-			spacing: 4,
 		} satisfies NormalizedRegularLayout;
 	} else if ( layout?.type === 'panel' ) {
 		const summary = layout.summary ?? [];
@@ -75,8 +72,6 @@ export function normalizeLayout( layout?: Layout ): NormalizedLayout {
 				withHeader: false,
 				isOpened: true,
 				summary: [],
-				// Spacing is fixed for card layout.
-				spacing: 6,
 			} satisfies NormalizedCardLayout;
 		} else {
 			const summary = layout.summary ?? [];
@@ -89,8 +84,6 @@ export function normalizeLayout( layout?: Layout ): NormalizedLayout {
 						? layout.isOpened
 						: true,
 				summary: normalizeCardSummaryField( summary ),
-				// Spacing is fixed for card layout.
-				spacing: 6,
 			} satisfies NormalizedCardLayout;
 		}
 	} else if ( layout?.type === 'row' ) {
