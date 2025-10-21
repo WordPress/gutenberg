@@ -18,6 +18,7 @@ export default function Url< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	validity,
 }: DataFormControlProps< Item > ) {
 	return (
 		<ValidatedText
@@ -26,6 +27,7 @@ export default function Url< Item >( {
 				field,
 				onChange,
 				hideLabelFromVision,
+				validity,
 				type: 'url',
 				prefix: (
 					<InputControlPrefixWrapper variant="icon">

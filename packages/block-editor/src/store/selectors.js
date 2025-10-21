@@ -17,7 +17,6 @@ import { symbol } from '@wordpress/icons';
 import { create, remove, toHTMLString } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
 import { createSelector, createRegistrySelector } from '@wordpress/data';
-import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -2796,36 +2795,6 @@ export function __experimentalGetLastBlockAttributeChanges( state ) {
 }
 
 /**
- * Returns whether the navigation mode is enabled.
- *
- * @param {Object} state Editor state.
- *
- * @return {boolean} Is navigation mode enabled.
- */
-export function isNavigationMode( state ) {
-	return __unstableGetEditorMode( state ) === 'navigation';
-}
-
-/**
- * Returns the current editor mode.
- *
- * @param {Object} state Editor state.
- *
- * @return {string} the editor mode.
- */
-export const __unstableGetEditorMode = createRegistrySelector(
-	( select ) => ( state ) => {
-		if ( ! window?.__experimentalEditorWriteMode ) {
-			return 'edit';
-		}
-		return (
-			state.settings.editorTool ??
-			select( preferencesStore ).get( 'core', 'editorTool' )
-		);
-	}
-);
-
-/**
  * Returns whether block moving mode is enabled.
  *
  * @deprecated
@@ -3086,20 +3055,11 @@ export function getBlockEditingMode( state, clientId = '' ) {
 		clientId = '';
 	}
 
-	const isNavMode = isNavigationMode( state );
-
-	// If the editor is currently not in navigation mode, check if the clientId
-	// has an editing mode set in the regular derived map.
+	// Check if the clientId has an editing mode set in the regular derived map.
 	// There may be an editing mode set here for synced patterns or in zoomed out
 	// mode.
-	if ( ! isNavMode && state.derivedBlockEditingModes?.has( clientId ) ) {
+	if ( state.derivedBlockEditingModes?.has( clientId ) ) {
 		return state.derivedBlockEditingModes.get( clientId );
-	}
-
-	// If the editor *is* in navigation mode, the block editing mode states
-	// are stored in the derivedNavModeBlockEditingModes map.
-	if ( isNavMode && state.derivedNavModeBlockEditingModes?.has( clientId ) ) {
-		return state.derivedNavModeBlockEditingModes.get( clientId );
 	}
 
 	// In normal mode, consider that an explicitly set editing mode takes over.

@@ -26,7 +26,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
 
 .emotion-6 {
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 499;
   line-height: 1.4;
   text-transform: uppercase;
   display: block;
@@ -391,7 +391,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
 
 .emotion-6 {
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 499;
   line-height: 1.4;
   text-transform: uppercase;
   display: block;
@@ -660,7 +660,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
 
 .emotion-6 {
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 499;
   line-height: 1.4;
   text-transform: uppercase;
   display: block;
@@ -1019,7 +1019,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
 
 .emotion-6 {
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 499;
   line-height: 1.4;
   text-transform: uppercase;
   display: block;

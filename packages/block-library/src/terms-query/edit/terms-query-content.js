@@ -15,7 +15,7 @@ export default function TermsQueryContent( {
 	attributes,
 	setAttributes,
 	clientId,
-	name,
+	context,
 } ) {
 	const { tagName: TagName } = attributes;
 	const blockProps = useBlockProps();
@@ -32,11 +32,11 @@ export default function TermsQueryContent( {
 	return (
 		<>
 			<TermsQueryInspectorControls
-				name={ name }
 				attributes={ attributes }
 				setQuery={ setQuery }
 				setAttributes={ setAttributes }
 				clientId={ clientId }
+				templateSlug={ context?.templateSlug }
 			/>
 			<TagName { ...innerBlocksProps } />
 		</>

@@ -1,14 +1,8 @@
 /**
- * WordPress dependencies
- */
-import { __ } from '@wordpress/i18n';
-
-/**
  * Internal dependencies
  */
 import type {
 	DataViewRenderFieldProps,
-	NormalizedField,
 	FieldType,
 	FieldTypeDefinition,
 	SortDirection,
@@ -26,7 +20,7 @@ import { default as password } from './password';
 import { default as telephone } from './telephone';
 import { default as color } from './color';
 import { default as url } from './url';
-import renderFromElements from './utils/render-from-elements';
+import RenderFromElements from './utils/render-from-elements';
 import { ALL_OPERATORS, OPERATOR_IS, OPERATOR_IS_NOT } from '../constants';
 
 /**
@@ -103,25 +97,16 @@ export default function getFieldTypeDefinition< Item >(
 				: b.localeCompare( a );
 		},
 		isValid: {
-			custom: ( item: any, field: NormalizedField< any > ) => {
-				if ( field?.elements ) {
-					const value = field.getValue( { item } );
-					const validValues = field?.elements?.map(
-						( f ) => f.value
-					);
-					if ( ! validValues.includes( value ) ) {
-						return __( 'Value must be one of the elements.' );
-					}
-				}
-
-				return null;
-			},
+			elements: true,
+			custom: () => null,
 		},
 		Edit: null,
 		render: ( { item, field }: DataViewRenderFieldProps< Item > ) => {
-			return field.elements
-				? renderFromElements( { item, field } )
-				: field.getValue( { item } );
+			return field.hasElements ? (
+				<RenderFromElements item={ item } field={ field } />
+			) : (
+				field.getValue( { item } )
+			);
 		},
 		enableSorting: true,
 		filterBy: {

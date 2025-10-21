@@ -17,7 +17,7 @@ import type {
 	NormalizedField,
 	FieldTypeDefinition,
 } from '../types';
-import renderFromElements from './utils/render-from-elements';
+import RenderFromElements from './utils/render-from-elements';
 import {
 	OPERATOR_IS,
 	OPERATOR_IS_ANY,
@@ -56,6 +56,7 @@ function sort( valueA: any, valueB: any, direction: SortDirection ) {
 export default {
 	sort,
 	isValid: {
+		elements: true,
 		custom: ( item: any, field: NormalizedField< any > ) => {
 			const value = field.getValue( { item } );
 
@@ -66,20 +67,13 @@ export default {
 				return __( 'Value must be a valid color.' );
 			}
 
-			if ( field.elements ) {
-				const validValues = field.elements.map( ( f ) => f.value );
-				if ( ! validValues.includes( value ) ) {
-					return __( 'Value must be one of the elements.' );
-				}
-			}
-
 			return null;
 		},
 	},
 	Edit: 'color',
 	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
-		if ( field.elements ) {
-			return renderFromElements( { item, field } );
+		if ( field.hasElements ) {
+			return <RenderFromElements item={ item } field={ field } />;
 		}
 
 		const value = field.getValue( { item } );

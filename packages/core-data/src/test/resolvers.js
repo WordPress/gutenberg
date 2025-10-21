@@ -6,13 +6,11 @@ import triggerFetch from '@wordpress/api-fetch';
 /**
  * Internal dependencies
  */
-import { syncManager } from '../sync';
+import { getSyncManager } from '../sync';
 
 jest.mock( '@wordpress/api-fetch' );
 jest.mock( '../sync', () => ( {
-	syncManager: {
-		load: jest.fn(),
-	},
+	getSyncManager: jest.fn(),
 } ) );
 
 /**
@@ -42,6 +40,8 @@ describe( 'getEntityRecord', () => {
 	const resolveSelect = { getEntitiesConfig: jest.fn( () => ENTITIES ) };
 
 	let dispatch;
+	let syncManager;
+
 	beforeEach( async () => {
 		dispatch = Object.assign( jest.fn(), {
 			receiveEntityRecords: jest.fn(),
@@ -51,7 +51,11 @@ describe( 'getEntityRecord', () => {
 			finishResolutions: jest.fn(),
 		} );
 		triggerFetch.mockReset();
-		syncManager.load.mockClear();
+
+		syncManager = {
+			load: jest.fn(),
+		};
+		getSyncManager.mockImplementation( () => syncManager );
 	} );
 
 	afterEach( () => {
@@ -168,7 +172,10 @@ describe( 'getEntityRecord', () => {
 			'postType/post',
 			1,
 			POST_RECORD,
-			{ editRecord: expect.any( Function ) }
+			{
+				editRecord: expect.any( Function ),
+				getEditedRecord: expect.any( Function ),
+			}
 		);
 	} );
 
@@ -218,7 +225,10 @@ describe( 'getEntityRecord', () => {
 			'postType/post',
 			1,
 			{ ...POST_RECORD, foo: 'bar' },
-			{ editRecord: expect.any( Function ) }
+			{
+				editRecord: expect.any( Function ),
+				getEditedRecord: expect.any( Function ),
+			}
 		);
 	} );
 
