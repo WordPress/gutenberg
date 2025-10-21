@@ -141,12 +141,9 @@ export const registerPostTypeSchema =
 			duplicatePost;
 
 		// @ts-ignore
-		if ( ! globalThis.IS_GUTENBERG_PLUGIN ) {
-			if (
-				! [ 'wp_template', 'wp_block', 'wp_template_part' ].includes(
-					postType
-				)
-			) {
+		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+			// Outside Gutenberg, disable duplication except for wp_template.
+			if ( 'wp_template' !== postTypeConfig.slug ) {
 				canDuplicate = undefined;
 			}
 		}
