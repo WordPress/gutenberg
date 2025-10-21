@@ -24,7 +24,7 @@
 
 ### Bug Fixes
 
--   `Dropdown`: Fix `onFocusOutside` passed to `Popover` to only close the dropdown if the blur event targets the specific dropdown instance ([#72376](https://github.com/WordPress/gutenberg/pull/72376)).
+-   `Popover`: Fix `onDialogClose` logic to only close the popover if the blur event targets the specific popover instance ([#72376](https://github.com/WordPress/gutenberg/pull/72376)).
 -   `ValidatedCheckboxControl`, `ValidatedRadioControl`, `ValidatedToggleControl`: Fix issue where validation may not be triggered in Safari when elements are toggled by clicking ([#72115](https://github.com/WordPress/gutenberg/pull/72115)).
 
 ### Internal
