@@ -262,14 +262,27 @@ function ColorInspectorControl( { children, resetAllFilter } ) {
 
 export function ColorEdit( { clientId, name, setAttributes, settings } ) {
 	const isEnabled = useHasColorPanel( settings );
-	function selector( select ) {
-		const { style, textColor, backgroundColor, gradient } =
-			select( blockEditorStore ).getBlockAttributes( clientId ) || {};
-		return { style, textColor, backgroundColor, gradient };
-	}
+
 	const { style, textColor, backgroundColor, gradient } = useSelect(
-		selector,
-		[ clientId ]
+		( select ) => {
+			// Early return to avoid subscription when disabled
+			if ( ! isEnabled ) {
+				return {};
+			}
+			const {
+				style: _style,
+				textColor: _textColor,
+				backgroundColor: _backgroundColor,
+				gradient: _gradient,
+			} = select( blockEditorStore ).getBlockAttributes( clientId ) || {};
+			return {
+				style: _style,
+				textColor: _textColor,
+				backgroundColor: _backgroundColor,
+				gradient: _gradient,
+			};
+		},
+		[ clientId, isEnabled ]
 	);
 	const value = useMemo( () => {
 		return attributesToStyle( {
