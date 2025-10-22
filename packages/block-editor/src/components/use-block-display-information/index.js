@@ -9,11 +9,13 @@ import {
 	__experimentalGetBlockLabel as getBlockLabel,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
+import { useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { PrivateBlockContext } from '../block-list/private-block-context';
 
 /** @typedef {import('@wordpress/blocks').WPIcon} WPIcon */
 
@@ -66,21 +68,36 @@ function getPositionTypeLabel( attributes ) {
  */
 
 export default function useBlockDisplayInformation( clientId ) {
+	// Try to get from context to avoid subscription when available
+	const privateContext = useContext( PrivateBlockContext );
+	const contextClientId = privateContext?.clientId;
+	const contextName = privateContext?.name;
+	const contextAttributes = privateContext?.attributes;
+
 	return useSelect(
 		( select ) => {
 			if ( ! clientId ) {
 				return null;
 			}
-			const { getBlockName, getBlockAttributes } =
-				select( blockEditorStore );
+
+			// Use context if available, otherwise get both from store in one call
+			let blockName, attributes;
+			if ( contextClientId === clientId ) {
+				blockName = contextName;
+				attributes = contextAttributes;
+			} else {
+				const { getBlockName, getBlockAttributes } =
+					select( blockEditorStore );
+				blockName = getBlockName( clientId );
+				attributes = getBlockAttributes( clientId );
+			}
+
 			const { getBlockType, getActiveBlockVariation } =
 				select( blocksStore );
-			const blockName = getBlockName( clientId );
 			const blockType = getBlockType( blockName );
 			if ( ! blockType ) {
 				return null;
 			}
-			const attributes = getBlockAttributes( clientId );
 			const match = getActiveBlockVariation( blockName, attributes );
 			const isSynced =
 				isReusableBlock( blockType ) || isTemplatePart( blockType );
@@ -114,6 +131,6 @@ export default function useBlockDisplayInformation( clientId ) {
 				name: attributes?.metadata?.name,
 			};
 		},
-		[ clientId ]
+		[ clientId, contextClientId, contextName, contextAttributes ]
 	);
 }

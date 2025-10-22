@@ -6,11 +6,13 @@ import {
 	__experimentalGetBlockLabel as getBlockLabel,
 	store as blocksStore,
 } from '@wordpress/blocks';
+import { useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { PrivateBlockContext } from '../block-list/private-block-context';
 
 /**
  * Returns the block's configured title as a string, or empty if the title
@@ -33,24 +35,38 @@ export default function useBlockDisplayTitle( {
 	maximumLength,
 	context,
 } ) {
+	// Try to get from context to avoid subscription when available
+	const privateContext = useContext( PrivateBlockContext );
+	const contextClientId = privateContext?.clientId;
+	const contextName = privateContext?.name;
+	const contextAttributes = privateContext?.attributes;
+
 	const blockTitle = useSelect(
 		( select ) => {
 			if ( ! clientId ) {
 				return null;
 			}
 
-			const { getBlockName, getBlockAttributes } =
-				select( blockEditorStore );
+			// Use context if available, otherwise get both from store in one call
+			let blockName, attributes;
+			if ( contextClientId === clientId ) {
+				blockName = contextName;
+				attributes = contextAttributes;
+			} else {
+				const { getBlockName, getBlockAttributes } =
+					select( blockEditorStore );
+				blockName = getBlockName( clientId );
+				attributes = getBlockAttributes( clientId );
+			}
+
 			const { getBlockType, getActiveBlockVariation } =
 				select( blocksStore );
 
-			const blockName = getBlockName( clientId );
 			const blockType = getBlockType( blockName );
 			if ( ! blockType ) {
 				return null;
 			}
 
-			const attributes = getBlockAttributes( clientId );
 			const label = getBlockLabel( blockType, attributes, context );
 			// If the label is defined we prioritize it over a possible block variation title match.
 			if ( label !== blockType.title ) {
@@ -61,7 +77,7 @@ export default function useBlockDisplayTitle( {
 			// Label will fallback to the title if no label is defined for the current label context.
 			return match?.title || blockType.title;
 		},
-		[ clientId, context ]
+		[ clientId, context, contextClientId, contextName, contextAttributes ]
 	);
 
 	if ( ! blockTitle ) {

@@ -813,6 +813,7 @@ function BlockListBlockProvider( props ) {
 		canMove,
 		isBlockHidden,
 		bindableAttributes,
+		attributes,
 	};
 
 	if (
