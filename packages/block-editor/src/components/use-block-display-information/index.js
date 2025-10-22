@@ -9,11 +9,13 @@ import {
 	__experimentalGetBlockLabel as getBlockLabel,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
+import { useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { PrivateBlockContext } from '../block-list/private-block-context';
 
 /** @typedef {import('@wordpress/blocks').WPIcon} WPIcon */
 
@@ -66,21 +68,38 @@ function getPositionTypeLabel( attributes ) {
  */
 
 export default function useBlockDisplayInformation( clientId ) {
+	// Try to get blockType from context to avoid subscription when available
+	const privateContext = useContext( PrivateBlockContext );
+	const contextClientId = privateContext?.clientId;
+	const contextBlockType = privateContext?.blockType;
+
+	const shouldUseContext = contextClientId === clientId;
+
 	return useSelect(
 		( select ) => {
 			if ( ! clientId ) {
 				return null;
 			}
-			const { getBlockName, getBlockAttributes } =
-				select( blockEditorStore );
-			const { getBlockType, getActiveBlockVariation } =
-				select( blocksStore );
-			const blockName = getBlockName( clientId );
-			const blockType = getBlockType( blockName );
+
+			// Use context blockType if querying the current block
+			let blockName, blockType;
+			if ( shouldUseContext ) {
+				blockName = privateContext?.name;
+				blockType = contextBlockType;
+			} else {
+				const { getBlockName } = select( blockEditorStore );
+				const { getBlockType } = select( blocksStore );
+				blockName = getBlockName( clientId );
+				blockType = getBlockType( blockName );
+			}
+
 			if ( ! blockType ) {
 				return null;
 			}
+
+			const { getBlockAttributes } = select( blockEditorStore );
 			const attributes = getBlockAttributes( clientId );
+			const { getActiveBlockVariation } = select( blocksStore );
 			const match = getActiveBlockVariation( blockName, attributes );
 			const isSynced =
 				isReusableBlock( blockType ) || isTemplatePart( blockType );
@@ -114,6 +133,6 @@ export default function useBlockDisplayInformation( clientId ) {
 				name: attributes?.metadata?.name,
 			};
 		},
-		[ clientId ]
+		[ clientId, shouldUseContext ]
 	);
 }

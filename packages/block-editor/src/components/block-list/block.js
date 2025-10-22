@@ -633,6 +633,7 @@ function BlockListBlockProvider( props ) {
 					: undefined,
 				blockTitle: blockType?.title,
 				isBlockHidden: attributes?.metadata?.blockVisibility === false,
+				blockType,
 			};
 
 			// When in preview mode, we can avoid a lot of selection and
@@ -693,6 +694,7 @@ function BlockListBlockProvider( props ) {
 					) && hasSelectedInnerBlock( clientId ),
 				blockApiVersion: blockType?.apiVersion || 1,
 				blockTitle: match?.title || blockType?.title,
+				blockType,
 				isSubtreeDisabled:
 					blockEditingMode === 'disabled' &&
 					isBlockSubtreeDisabled( clientId ),
@@ -741,6 +743,7 @@ function BlockListBlockProvider( props ) {
 		themeSupportsLayout,
 		isTemporarilyEditingAsBlocks,
 		blockEditingMode,
+		blockType,
 		mayDisplayControls,
 		mayDisplayParentControls,
 		index,
@@ -790,6 +793,7 @@ function BlockListBlockProvider( props ) {
 		name,
 		blockApiVersion,
 		blockTitle,
+		blockType,
 		isSelected,
 		isSubtreeDisabled,
 		hasOverlay,

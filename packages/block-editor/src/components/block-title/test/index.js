@@ -59,6 +59,7 @@ describe( 'BlockTitle', () => {
 		useSelect.mockImplementation( ( mapSelect ) =>
 			mapSelect( () => ( {
 				getBlockName: () => 'name-not-exists',
+				getBlockAttributes: () => null,
 				getBlockType: () => null,
 			} ) )
 		);

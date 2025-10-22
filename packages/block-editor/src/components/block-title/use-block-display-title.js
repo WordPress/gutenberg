@@ -6,11 +6,13 @@ import {
 	__experimentalGetBlockLabel as getBlockLabel,
 	store as blocksStore,
 } from '@wordpress/blocks';
+import { useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { PrivateBlockContext } from '../block-list/private-block-context';
 
 /**
  * Returns the block's configured title as a string, or empty if the title
@@ -33,23 +35,36 @@ export default function useBlockDisplayTitle( {
 	maximumLength,
 	context,
 } ) {
+	// Try to get blockType from context to avoid subscription when available
+	const privateContext = useContext( PrivateBlockContext );
+	const contextClientId = privateContext?.clientId;
+	const contextBlockType = privateContext?.blockType;
+
+	const shouldUseContext = contextClientId === clientId;
+
 	const blockTitle = useSelect(
 		( select ) => {
 			if ( ! clientId ) {
 				return null;
 			}
 
-			const { getBlockName, getBlockAttributes } =
-				select( blockEditorStore );
-			const { getBlockType, getActiveBlockVariation } =
-				select( blocksStore );
+			// Use context blockType if querying the current block
+			let blockName, blockType;
+			if ( shouldUseContext ) {
+				blockName = privateContext?.name;
+				blockType = contextBlockType;
+			} else {
+				const { getBlockName } = select( blockEditorStore );
+				const { getBlockType } = select( blocksStore );
+				blockName = getBlockName( clientId );
+				blockType = getBlockType( blockName );
+			}
 
-			const blockName = getBlockName( clientId );
-			const blockType = getBlockType( blockName );
 			if ( ! blockType ) {
 				return null;
 			}
 
+			const { getBlockAttributes } = select( blockEditorStore );
 			const attributes = getBlockAttributes( clientId );
 			const label = getBlockLabel( blockType, attributes, context );
 			// If the label is defined we prioritize it over a possible block variation title match.
@@ -57,11 +72,12 @@ export default function useBlockDisplayTitle( {
 				return label;
 			}
 
+			const { getActiveBlockVariation } = select( blocksStore );
 			const match = getActiveBlockVariation( blockName, attributes );
 			// Label will fallback to the title if no label is defined for the current label context.
 			return match?.title || blockType.title;
 		},
-		[ clientId, context ]
+		[ clientId, context, shouldUseContext ]
 	);
 
 	if ( ! blockTitle ) {
