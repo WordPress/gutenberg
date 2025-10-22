@@ -19,13 +19,11 @@ import {
 	store as blockEditorStore,
 	getColorClassName,
 	useInnerBlocksProps,
-	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
 import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
-import { store as coreStore } from '@wordpress/core-data';
 import { useMergeRefs, usePrevious } from '@wordpress/compose';
 
 /**
@@ -33,6 +31,7 @@ import { useMergeRefs, usePrevious } from '@wordpress/compose';
  */
 import { getColors } from '../navigation/edit/utils';
 import { Controls, LinkUI, updateAttributes, useEntityBinding } from './shared';
+import { useIsInvalidLink } from './use-is-invalid-link';
 
 const DEFAULT_BLOCK = { name: 'core/navigation-link' };
 const NESTING_BLOCK_NAMES = [
@@ -89,46 +88,6 @@ const useIsDraggingWithin = ( elementRef ) => {
 	}, [ elementRef ] );
 
 	return isDraggingWithin;
-};
-
-const useIsInvalidLink = ( kind, type, id, enabled ) => {
-	const isPostType =
-		kind === 'post-type' || type === 'post' || type === 'page';
-	const hasId = Number.isInteger( id );
-	const blockEditingMode = useBlockEditingMode();
-
-	const postStatus = useSelect(
-		( select ) => {
-			if ( ! isPostType ) {
-				return null;
-			}
-
-			// Fetching the posts status is an "expensive" operation. Especially for sites with large navigations.
-			// When the block is rendered in a template or other disabled contexts we can skip this check in order
-			// to avoid all these additional requests that don't really add any value in that mode.
-			if ( blockEditingMode === 'disabled' || ! enabled ) {
-				return null;
-			}
-
-			const { getEntityRecord } = select( coreStore );
-			return getEntityRecord( 'postType', type, id )?.status;
-		},
-		[ isPostType, blockEditingMode, enabled, type, id ]
-	);
-
-	// Check Navigation Link validity if:
-	// 1. Link is 'post-type'.
-	// 2. It has an id.
-	// 3. It's neither null, nor undefined, as valid items might be either of those while loading.
-	// If those conditions are met, check if
-	// 1. The post status is published.
-	// 2. The Navigation Link item has no label.
-	// If either of those is true, invalidate.
-	const isInvalid =
-		isPostType && hasId && postStatus && 'trash' === postStatus;
-	const isDraft = 'draft' === postStatus;
-
-	return [ isInvalid, isDraft ];
 };
 
 function getMissingText( type ) {
