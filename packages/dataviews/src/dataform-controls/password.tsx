@@ -42,8 +42,7 @@ export default function Password< Item >( {
 							icon={ isVisible ? unseen : seen }
 							onClick={ toggleVisibility }
 							size="small"
-							variant="tertiary"
-							aria-label={
+							label={
 								isVisible
 									? __( 'Hide password' )
 									: __( 'Show password' )
