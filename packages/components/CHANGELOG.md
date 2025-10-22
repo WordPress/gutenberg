@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 30.7.0-next.0 (2025-10-22)
+
 ### Enhancements
 
 -   `Button`: Update font weight to `500` ([#70787](https://github.com/WordPress/gutenberg/pull/70787)).
