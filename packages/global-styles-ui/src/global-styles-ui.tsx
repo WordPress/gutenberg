@@ -274,7 +274,7 @@ function PathSynchronizer( {
 			}
 			// If child path changed, notify parent via onPathChange
 			else if ( childPath !== previousChildPath && onPathChange ) {
-				onPathChange( childPath );
+				onPathChange( childPath ?? '/' );
 			}
 		}
 	}, [
