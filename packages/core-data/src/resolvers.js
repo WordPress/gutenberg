@@ -15,7 +15,7 @@ import apiFetch from '@wordpress/api-fetch';
  */
 import { STORE_NAME } from './name';
 import { additionalEntityConfigLoaders, DEFAULT_ENTITY_KEY } from './entities';
-import { syncManager } from './sync';
+import { getSyncManager } from './sync';
 import {
 	forwardResolver,
 	getNormalizedCommaSeparable,
@@ -185,7 +185,7 @@ export const getEntityRecord =
 						} );
 
 					// Load the entity record for syncing.
-					await syncManager.load(
+					await getSyncManager()?.load(
 						entityConfig.syncConfig,
 						objectType,
 						objectId,

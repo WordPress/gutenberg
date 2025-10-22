@@ -19,7 +19,7 @@ import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
 import { STORE_NAME } from './name';
-import { LOCAL_EDITOR_ORIGIN, syncManager } from './sync';
+import { LOCAL_EDITOR_ORIGIN, getSyncManager } from './sync';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 
 /**
@@ -415,7 +415,7 @@ export const editEntityRecord =
 				const objectType = `${ kind }/${ name }`;
 				const objectId = recordId;
 
-				syncManager.update(
+				getSyncManager()?.update(
 					objectType,
 					objectId,
 					edit.edits,

@@ -1,25 +1,26 @@
 /**
  * Internal dependencies
  */
-import { scopeSelector } from './utils';
-import { getValueFromObjectPath } from '../../utils/object';
+import type { BlockType } from '../types';
+import { scopeSelector } from '../utils/common';
+import { getValueFromObjectPath } from '../utils/object';
 
 /**
  * Determine the CSS selector for the block type and target provided, returning
  * it if available.
  *
- * @param {import('@wordpress/blocks').Block} blockType        The block's type.
- * @param {string|string[]}                   target           The desired selector's target e.g. `root`, delimited string, or array path.
- * @param {Object}                            options          Options object.
- * @param {boolean}                           options.fallback Whether or not to fallback to broader selector.
+ * @param blockType        The block's type.
+ * @param target           The desired selector's target e.g. `root`, delimited string, or array path.
+ * @param options          Options object.
+ * @param options.fallback Whether or not to fallback to broader selector.
  *
- * @return {?string} The CSS selector or `null` if no selector available.
+ * @return The CSS selector or `null` if no selector available.
  */
-export function getBlockCSSSelector(
-	blockType,
-	target = 'root',
-	options = {}
-) {
+export function getBlockSelector(
+	blockType: BlockType,
+	target: string = 'root',
+	options: { fallback?: boolean } = {}
+): string | null {
 	if ( ! target ) {
 		return null;
 	}
@@ -34,11 +35,11 @@ export function getBlockCSSSelector(
 
 	// Calculated before returning as it can be used as a fallback for feature
 	// selectors later on.
-	let rootSelector = null;
+	let rootSelector: string | null = null;
 
 	if ( hasSelectors && selectors.root ) {
 		// Use the selectors API if available.
-		rootSelector = selectors?.root;
+		rootSelector = selectors?.root as string;
 	} else if ( supports?.__experimentalSelector ) {
 		// Use the old experimental selector supports property if set.
 		rootSelector = supports.__experimentalSelector;
@@ -65,19 +66,25 @@ export function getBlockCSSSelector(
 		if ( hasSelectors ) {
 			// Get selector from either `feature.root` or shorthand path.
 			const featureSelector =
-				getValueFromObjectPath( selectors, `${ path }.root`, null ) ||
-				getValueFromObjectPath( selectors, path, null );
+				( getValueFromObjectPath(
+					selectors,
+					`${ path }.root`,
+					null
+				) as string ) ||
+				( getValueFromObjectPath( selectors, path, null ) as string );
 
 			// Return feature selector if found or any available fallback.
 			return featureSelector || fallbackSelector;
 		}
 
 		// Try getting old experimental supports selector value.
-		const featureSelector = getValueFromObjectPath(
-			supports,
-			`${ path }.__experimentalSelector`,
-			null
-		);
+		const featureSelector = supports
+			? ( getValueFromObjectPath(
+					supports,
+					`${ path }.__experimentalSelector`,
+					null
+			  ) as string | undefined )
+			: undefined;
 
 		// If nothing to work with, provide fallback selector if available.
 		if ( ! featureSelector ) {
@@ -99,14 +106,14 @@ export function getBlockCSSSelector(
 
 	// Only return if we have a subfeature selector.
 	if ( subfeatureSelector ) {
-		return subfeatureSelector;
+		return subfeatureSelector as string;
 	}
 
 	// To this point we don't have a subfeature selector. If a fallback has been
 	// requested, remove subfeature from target path and return results of a
 	// call for the parent feature's selector.
 	if ( fallback ) {
-		return getBlockCSSSelector( blockType, pathArray[ 0 ], options );
+		return getBlockSelector( blockType, pathArray[ 0 ], options );
 	}
 
 	// We tried.

@@ -21,11 +21,11 @@
 
 .edit-site-global-styles-sidebar .components-navigation__menu-title-heading {
 	font-size: $default-font-size * 1.2;
-	font-weight: 500;
+	font-weight: $font-weight-medium;
 }
 
 .edit-site-global-styles-sidebar .components-navigation__item > button span {
-	font-weight: 500;
+	font-weight: $font-weight-medium;
 }
 
 .edit-site-global-styles-sidebar .block-editor-panel-color-gradient-settings {

@@ -17,11 +17,12 @@ import {
 } from '@wordpress/components';
 import { Icon, alignNone, stretchWide } from '@wordpress/icons';
 import { useCallback, useState, Platform } from '@wordpress/element';
+import { getValueFromVariable } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
  */
-import { getValueFromVariable, useToolsPanelDropdownMenuProps } from './utils';
+import { useToolsPanelDropdownMenuProps } from './utils';
 import SpacingSizesControl from '../spacing-sizes-control';
 import HeightControl from '../height-control';
 import ChildLayoutControl from '../child-layout-control';

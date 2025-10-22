@@ -4,6 +4,7 @@
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
 import TokenList from '@wordpress/token-list';
+import { getTypographyFontSizeValue } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
@@ -21,7 +22,6 @@ import {
 	shouldSkipSerialization,
 } from './utils';
 import { useSettings } from '../components/use-settings';
-import { getTypographyFontSizeValue } from '../components/global-styles/typography-utils';
 
 export const FONT_SIZE_SUPPORT_KEY = 'typography.fontSize';
 

@@ -6,6 +6,7 @@
  * External dependencies
  */
 import { render, screen, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
@@ -95,18 +96,22 @@ describe( 'Controls', () => {
 		expect( urlInput.value ).toBe( 'https://example.com/test page' );
 	} );
 
-	it( 'encodes URL values when changed', () => {
+	it( 'calls updateAttributes with new URL on blur', async () => {
+		const user = userEvent.setup();
 		render( <Controls { ...defaultProps } /> );
 
 		const urlInput = screen.getByLabelText( 'Link' );
 
-		fireEvent.change( urlInput, {
-			target: { value: 'https://example.com/test page' },
-		} );
+		await user.click( urlInput );
+		await user.clear( urlInput );
+		await user.type( urlInput, 'https://example.com/test page' );
+		await user.tab();
 
-		expect( defaultProps.setAttributes ).toHaveBeenCalledWith( {
-			url: 'https://example.com/test%20page',
-		} );
+		expect( mockUpdateAttributes ).toHaveBeenCalledWith(
+			{ url: 'https://example.com/test page' },
+			defaultProps.setAttributes,
+			{ ...defaultProps.attributes, url: 'https://example.com' }
+		);
 	} );
 
 	it( 'calls updateAttributes on URL blur', () => {
@@ -143,11 +148,11 @@ describe( 'Controls', () => {
 			target: { value: 'https://new.com' },
 		} );
 
-		// Blur should call updateAttributes with the current URL (since url exists)
+		// Blur should call updateAttributes with the new URL value from the input
 		fireEvent.blur( urlInput );
 
 		expect( mockUpdateAttributes ).toHaveBeenCalledWith(
-			{ url: 'https://different.com' }, // Current URL from attributes (not input value)
+			{ url: 'https://new.com' }, // New URL from input value
 			defaultProps.setAttributes,
 			{
 				...propsWithDifferentUrl.attributes,
