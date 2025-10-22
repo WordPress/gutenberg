@@ -38,6 +38,7 @@ import {
 	TEMPLATE_POST_TYPE,
 } from '../../store/constants';
 import { useZoomOutModeExit } from './use-zoom-out-mode-exit';
+import { usePaddingAppender } from './use-padding-appender';
 
 const {
 	LayoutStyle,
@@ -350,6 +351,10 @@ function VisualEditor( {
 		return canvasMinHeight + scrollTop;
 	}, [ canvasMinHeight ] );
 
+	const [ paddingAppenderRef, paddingStyle ] = usePaddingAppender(
+		! isPreview && renderingMode === 'post-only' && ! isDesignPostType
+	);
+
 	const iframeStyles = useMemo( () => {
 		return [
 			...( styles ?? [] ),
@@ -366,6 +371,7 @@ function VisualEditor( {
 					// which isn't a requirement in auto resize mode.
 					enableResizing ? 'min-height:0!important;' : ''
 				}}
+				${ paddingStyle ? paddingStyle : '' }
 				${
 					enableResizing
 						? `.block-editor-iframe__html{background:var(--wp-editor-canvas-background);display:flex;align-items:center;justify-content:center;min-height:100vh;}.block-editor-iframe__body{width:100%;}`
@@ -375,7 +381,7 @@ function VisualEditor( {
 				// color to the iframe HTML element to match the background color of the editor canvas.
 			},
 		];
-	}, [ styles, enableResizing, calculatedMinHeight ] );
+	}, [ styles, enableResizing, calculatedMinHeight, paddingStyle ] );
 
 	const typewriterRef = useTypewriter();
 	contentRef = useMergeRefs( [
@@ -389,6 +395,7 @@ function VisualEditor( {
 			isEnabled: renderingMode === 'template-locked',
 		} ),
 		useZoomOutModeExit(),
+		paddingAppenderRef,
 	] );
 
 	return (

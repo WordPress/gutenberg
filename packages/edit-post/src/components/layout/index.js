@@ -68,7 +68,6 @@ import WelcomeGuide from '../welcome-guide';
 import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import useEditPostCommands from '../../commands/use-commands';
-import { usePaddingAppender } from './use-padding-appender';
 import { useShouldIframe } from './use-should-iframe';
 import useNavigateToEntityRecord from '../../hooks/use-navigate-to-entity-record';
 import { useMetaBoxInitialization } from '../meta-boxes/use-meta-box-initialization';
@@ -441,7 +440,6 @@ function Layout( {
 		showMetaBoxes,
 		isWelcomeGuideVisible,
 		templateId,
-		enablePaddingAppender,
 		isDevicePreview,
 	} = useSelect(
 		( select ) => {
@@ -461,13 +459,8 @@ function Layout( {
 			const { getBlockSelectionStart, isZoomOut } = unlock(
 				select( blockEditorStore )
 			);
-			const {
-				getEditorMode,
-				getRenderingMode,
-				getDefaultRenderingMode,
-				getDeviceType,
-			} = unlock( select( editorStore ) );
-			const isRenderingPostOnly = getRenderingMode() === 'post-only';
+			const { getEditorMode, getDefaultRenderingMode, getDeviceType } =
+				unlock( select( editorStore ) );
 			const isNotDesignPostType =
 				! DESIGN_POST_TYPES.includes( currentPostType );
 			const isDirectlyEditingPattern =
@@ -498,8 +491,6 @@ function Layout( {
 					! isEditingTemplate
 						? _templateId
 						: null,
-				enablePaddingAppender:
-					! isZoomOut() && isRenderingPostOnly && isNotDesignPostType,
 				isDevicePreview: getDeviceType() !== 'Desktop',
 			};
 		},
@@ -514,16 +505,12 @@ function Layout( {
 
 	useMetaBoxInitialization( hasActiveMetaboxes && hasResolvedMode );
 
-	const [ paddingAppenderRef, paddingStyle ] = usePaddingAppender(
-		enablePaddingAppender
-	);
-
 	// Set the right context for the command palette
 	const commandContext = hasBlockSelected
 		? 'block-selection-edit'
 		: 'entity-edit';
 	useCommandContext( commandContext );
-	const styles = useEditorStyles( settings, paddingStyle );
+	const styles = useEditorStyles( settings );
 	const editorSettings = useMemo(
 		() => ( {
 			...settings,
@@ -646,7 +633,6 @@ function Layout( {
 						templateId={ templateId }
 						className={ className }
 						forceIsDirty={ hasActiveMetaboxes }
-						contentRef={ paddingAppenderRef }
 						disableIframe={ ! shouldIframe }
 						// We should auto-focus the canvas (title) on load.
 						// eslint-disable-next-line jsx-a11y/no-autofocus
