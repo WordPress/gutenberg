@@ -96,7 +96,15 @@ export function GlobalStylesEditorCanvasContainerLink( {
 			editorCanvasContainerView &&
 			editorCanvasContainerView.startsWith( 'global-styles-revisions' )
 		) {
-			setEditorCanvasContainerView( undefined );
+			// If stylebook was open with revisions, keep it open
+			if (
+				editorCanvasContainerView ===
+				'global-styles-revisions:style-book'
+			) {
+				setEditorCanvasContainerView( 'style-book' );
+			} else {
+				setEditorCanvasContainerView( undefined );
+			}
 		}
 	}, [
 		path,

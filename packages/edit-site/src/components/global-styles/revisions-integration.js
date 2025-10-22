@@ -57,9 +57,7 @@ export function GlobalStylesRevisions( { path } ) {
 	// Only render when on the revisions path and the appropriate canvas view is active
 	const shouldRender =
 		path?.startsWith( '/revisions' ) &&
-		( editorCanvasContainerView === 'global-styles-revisions' ||
-			editorCanvasContainerView ===
-				'global-styles-revisions:style-book' );
+		editorCanvasContainerView === 'global-styles-revisions';
 
 	if ( ! shouldRender || isLoading ) {
 		return null;

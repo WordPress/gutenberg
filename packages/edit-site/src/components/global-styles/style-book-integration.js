@@ -26,7 +26,10 @@ export function GlobalStylesStyleBook( { path, onPathChange } ) {
 		[]
 	);
 
-	if ( editorCanvasContainerView !== 'style-book' ) {
+	if (
+		editorCanvasContainerView !== 'style-book' &&
+		editorCanvasContainerView !== 'global-styles-revisions:style-book'
+	) {
 		return null;
 	}
 
