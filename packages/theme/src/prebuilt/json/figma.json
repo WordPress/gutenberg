@@ -1,0 +1,1317 @@
+{
+	"Border/radius-x-small": {
+		"value": {
+			".": "1px"
+		},
+		"description": "Extra small radius"
+	},
+	"Border/radius-small": {
+		"value": {
+			".": "2px"
+		},
+		"description": "Small radius"
+	},
+	"Border/radius-medium": {
+		"value": {
+			".": "4px"
+		},
+		"description": "Medium radius"
+	},
+	"Border/radius-large": {
+		"value": {
+			".": "8px"
+		},
+		"description": "Large radius"
+	},
+	"Border/width-focus": {
+		"value": {
+			".": "2px",
+			"high-dpi": "1.5px"
+		},
+		"description": "Border width for focus ring"
+	},
+	"Color/_Primitives/Primary/bgFill1": {
+		"value": {
+			".": "#3858e9"
+		}
+	},
+	"Color/_Primitives/Primary/fgFill": {
+		"value": {
+			".": "#eff0f2"
+		}
+	},
+	"Color/_Primitives/Primary/bgFill2": {
+		"value": {
+			".": "#2c47d7"
+		}
+	},
+	"Color/_Primitives/Primary/surface2": {
+		"value": {
+			".": "#f6f8fc"
+		}
+	},
+	"Color/_Primitives/Primary/surface6": {
+		"value": {
+			".": "#c4d0ee"
+		}
+	},
+	"Color/_Primitives/Primary/surface5": {
+		"value": {
+			".": "#d7dff3"
+		}
+	},
+	"Color/_Primitives/Primary/surface4": {
+		"value": {
+			".": "#e5eaf7"
+		}
+	},
+	"Color/_Primitives/Primary/surface3": {
+		"value": {
+			".": "#fff"
+		}
+	},
+	"Color/_Primitives/Primary/fgSurface4": {
+		"value": {
+			".": "#080071"
+		}
+	},
+	"Color/_Primitives/Primary/fgSurface3": {
+		"value": {
+			".": "#3858e9"
+		}
+	},
+	"Color/_Primitives/Primary/fgSurface2": {
+		"value": {
+			".": "#577fff"
+		}
+	},
+	"Color/_Primitives/Primary/fgSurface1": {
+		"value": {
+			".": "#81a6ff"
+		}
+	},
+	"Color/_Primitives/Primary/stroke3": {
+		"value": {
+			".": "#3858e9"
+		}
+	},
+	"Color/_Primitives/Primary/stroke4": {
+		"value": {
+			".": "#2236c7"
+		}
+	},
+	"Color/_Primitives/Primary/stroke2": {
+		"value": {
+			".": "#7085c0"
+		}
+	},
+	"Color/_Primitives/Primary/stroke1": {
+		"value": {
+			".": "#93a4d0"
+		}
+	},
+	"Color/_Primitives/Primary/bgFillDark": {
+		"value": {
+			".": "#1b1e26"
+		}
+	},
+	"Color/_Primitives/Primary/fgFillDark": {
+		"value": {
+			".": "#eff0f2"
+		}
+	},
+	"Color/_Primitives/Primary/bgFillInverted2": {
+		"value": {
+			".": "#1b1e26"
+		}
+	},
+	"Color/_Primitives/Primary/bgFillInverted1": {
+		"value": {
+			".": "#1401a5"
+		}
+	},
+	"Color/_Primitives/Primary/fgFillInverted": {
+		"value": {
+			".": "#eff0f2"
+		}
+	},
+	"Color/_Primitives/Primary/surface1": {
+		"value": {
+			".": "#ecf0f9"
+		}
+	},
+	"Color/_Primitives/Info/bgFill1": {
+		"value": {
+			".": "#0090ff"
+		}
+	},
+	"Color/_Primitives/Info/fgFill": {
+		"value": {
+			".": "#1b1e23"
+		}
+	},
+	"Color/_Primitives/Info/bgFill2": {
+		"value": {
+			".": "#007eec"
+		}
+	},
+	"Color/_Primitives/Info/surface2": {
+		"value": {
+			".": "#f5f9fd"
+		}
+	},
+	"Color/_Primitives/Info/surface6": {
+		"value": {
+			".": "#b9d3f0"
+		}
+	},
+	"Color/_Primitives/Info/surface5": {
+		"value": {
+			".": "#d0e1f5"
+		}
+	},
+	"Color/_Primitives/Info/surface4": {
+		"value": {
+			".": "#e0ecf8"
+		}
+	},
+	"Color/_Primitives/Info/surface3": {
+		"value": {
+			".": "#fff"
+		}
+	},
+	"Color/_Primitives/Info/fgSurface4": {
+		"value": {
+			".": "#001758"
+		}
+	},
+	"Color/_Primitives/Info/fgSurface3": {
+		"value": {
+			".": "#006cd8"
+		}
+	},
+	"Color/_Primitives/Info/fgSurface2": {
+		"value": {
+			".": "#008bf9"
+		}
+	},
+	"Color/_Primitives/Info/fgSurface1": {
+		"value": {
+			".": "#4dafff"
+		}
+	},
+	"Color/_Primitives/Info/stroke3": {
+		"value": {
+			".": "#006cd8"
+		}
+	},
+	"Color/_Primitives/Info/stroke4": {
+		"value": {
+			".": "#004bb5"
+		}
+	},
+	"Color/_Primitives/Info/stroke2": {
+		"value": {
+			".": "#5c90c9"
+		}
+	},
+	"Color/_Primitives/Info/stroke1": {
+		"value": {
+			".": "#8baed6"
+		}
+	},
+	"Color/_Primitives/Info/bgFillDark": {
+		"value": {
+			".": "#1b1e23"
+		}
+	},
+	"Color/_Primitives/Info/fgFillDark": {
+		"value": {
+			".": "#eff0f2"
+		}
+	},
+	"Color/_Primitives/Info/bgFillInverted2": {
+		"value": {
+			".": "#1b1e23"
+		}
+	},
+	"Color/_Primitives/Info/bgFillInverted1": {
+		"value": {
+			".": "#00297b"
+		}
+	},
+	"Color/_Primitives/Info/fgFillInverted": {
+		"value": {
+			".": "#eff0f2"
+		}
+	},
+	"Color/_Primitives/Info/surface1": {
+		"value": {
+			".": "#e9f1fa"
+		}
+	},
+	"Color/_Primitives/Success/bgFill1": {
+		"value": {
+			".": "#4ab866"
+		}
+	},
+	"Color/_Primitives/Success/fgFill": {
+		"value": {
+			".": "#1b1f1c"
+		}
+	},
+	"Color/_Primitives/Success/bgFill2": {
+		"value": {
+			".": "#34a554"
+		}
+	},
+	"Color/_Primitives/Success/surface2": {
+		"value": {
+			".": "#f0fcf2"
+		}
+	},
+	"Color/_Primitives/Success/surface6": {
+		"value": {
+			".": "#7be792"
+		}
+	},
+	"Color/_Primitives/Success/surface5": {
+		"value": {
+			".": "#abf0b7"
+		}
+	},
+	"Color/_Primitives/Success/surface4": {
+		"value": {
+			".": "#cdf5d2"
+		}
+	},
+	"Color/_Primitives/Success/surface3": {
+		"value": {
+			".": "#fff"
+		}
+	},
+	"Color/_Primitives/Success/fgSurface4": {
+		"value": {
+			".": "#002b00"
+		}
+	},
+	"Color/_Primitives/Success/fgSurface3": {
+		"value": {
+			".": "#008030"
+		}
+	},
+	"Color/_Primitives/Success/fgSurface2": {
+		"value": {
+			".": "#2a9e4d"
+		}
+	},
+	"Color/_Primitives/Success/fgSurface1": {
+		"value": {
+			".": "#52bf6d"
+		}
+	},
+	"Color/_Primitives/Success/stroke3": {
+		"value": {
+			".": "#008030"
+		}
+	},
+	"Color/_Primitives/Success/stroke4": {
+		"value": {
+			".": "#006013"
+		}
+	},
+	"Color/_Primitives/Success/stroke2": {
+		"value": {
+			".": "#629a6c"
+		}
+	},
+	"Color/_Primitives/Success/stroke1": {
+		"value": {
+			".": "#78bb84"
+		}
+	},
+	"Color/_Primitives/Success/bgFillDark": {
+		"value": {
+			".": "#1b1f1c"
+		}
+	},
+	"Color/_Primitives/Success/fgFillDark": {
+		"value": {
+			".": "#edf2ed"
+		}
+	},
+	"Color/_Primitives/Success/bgFillInverted2": {
+		"value": {
+			".": "#1b1f1c"
+		}
+	},
+	"Color/_Primitives/Success/bgFillInverted1": {
+		"value": {
+			".": "#003b00"
+		}
+	},
+	"Color/_Primitives/Success/fgFillInverted": {
+		"value": {
+			".": "#edf2ed"
+		}
+	},
+	"Color/_Primitives/Success/surface1": {
+		"value": {
+			".": "#ddf8e1"
+		}
+	},
+	"Color/_Primitives/Warning/bgFill1": {
+		"value": {
+			".": "#f0b849"
+		}
+	},
+	"Color/_Primitives/Warning/fgFill": {
+		"value": {
+			".": "#1f1e1b"
+		}
+	},
+	"Color/_Primitives/Warning/bgFill2": {
+		"value": {
+			".": "#dba32f"
+		}
+	},
+	"Color/_Primitives/Warning/surface2": {
+		"value": {
+			".": "#fdf7ee"
+		}
+	},
+	"Color/_Primitives/Warning/surface6": {
+		"value": {
+			".": "#f0cb89"
+		}
+	},
+	"Color/_Primitives/Warning/surface5": {
+		"value": {
+			".": "#f5dcb2"
+		}
+	},
+	"Color/_Primitives/Warning/surface4": {
+		"value": {
+			".": "#f8e8cd"
+		}
+	},
+	"Color/_Primitives/Warning/surface3": {
+		"value": {
+			".": "#fff"
+		}
+	},
+	"Color/_Primitives/Warning/fgSurface4": {
+		"value": {
+			".": "#2f1800"
+		}
+	},
+	"Color/_Primitives/Warning/fgSurface3": {
+		"value": {
+			".": "#966200"
+		}
+	},
+	"Color/_Primitives/Warning/fgSurface2": {
+		"value": {
+			".": "#b58000"
+		}
+	},
+	"Color/_Primitives/Warning/fgSurface1": {
+		"value": {
+			".": "#d7a02b"
+		}
+	},
+	"Color/_Primitives/Warning/stroke3": {
+		"value": {
+			".": "#966200"
+		}
+	},
+	"Color/_Primitives/Warning/stroke4": {
+		"value": {
+			".": "#724700"
+		}
+	},
+	"Color/_Primitives/Warning/stroke2": {
+		"value": {
+			".": "#a18a61"
+		}
+	},
+	"Color/_Primitives/Warning/stroke1": {
+		"value": {
+			".": "#c3a777"
+		}
+	},
+	"Color/_Primitives/Warning/bgFillDark": {
+		"value": {
+			".": "#1f1e1b"
+		}
+	},
+	"Color/_Primitives/Warning/fgFillDark": {
+		"value": {
+			".": "#f3f0e9"
+		}
+	},
+	"Color/_Primitives/Warning/bgFillInverted2": {
+		"value": {
+			".": "#1f1e1b"
+		}
+	},
+	"Color/_Primitives/Warning/bgFillInverted1": {
+		"value": {
+			".": "#472900"
+		}
+	},
+	"Color/_Primitives/Warning/fgFillInverted": {
+		"value": {
+			".": "#f3f0e9"
+		}
+	},
+	"Color/_Primitives/Warning/surface1": {
+		"value": {
+			".": "#faefdc"
+		}
+	},
+	"Color/_Primitives/Error/bgFill1": {
+		"value": {
+			".": "#cc1818"
+		}
+	},
+	"Color/_Primitives/Error/fgFill": {
+		"value": {
+			".": "#f2efef"
+		}
+	},
+	"Color/_Primitives/Error/bgFill2": {
+		"value": {
+			".": "#b90000"
+		}
+	},
+	"Color/_Primitives/Error/surface2": {
+		"value": {
+			".": "#fdf6f5"
+		}
+	},
+	"Color/_Primitives/Error/surface6": {
+		"value": {
+			".": "#f5c5bd"
+		}
+	},
+	"Color/_Primitives/Error/surface5": {
+		"value": {
+			".": "#f8d8d3"
+		}
+	},
+	"Color/_Primitives/Error/surface4": {
+		"value": {
+			".": "#fae5e2"
+		}
+	},
+	"Color/_Primitives/Error/surface3": {
+		"value": {
+			".": "#fff"
+		}
+	},
+	"Color/_Primitives/Error/fgSurface4": {
+		"value": {
+			".": "#4a0000"
+		}
+	},
+	"Color/_Primitives/Error/fgSurface3": {
+		"value": {
+			".": "#cc1818"
+		}
+	},
+	"Color/_Primitives/Error/fgSurface2": {
+		"value": {
+			".": "#f64b40"
+		}
+	},
+	"Color/_Primitives/Error/fgSurface1": {
+		"value": {
+			".": "#ff8070"
+		}
+	},
+	"Color/_Primitives/Error/stroke3": {
+		"value": {
+			".": "#cc1818"
+		}
+	},
+	"Color/_Primitives/Error/stroke4": {
+		"value": {
+			".": "#a30000"
+		}
+	},
+	"Color/_Primitives/Error/stroke2": {
+		"value": {
+			".": "#cd695d"
+		}
+	},
+	"Color/_Primitives/Error/stroke1": {
+		"value": {
+			".": "#dc9085"
+		}
+	},
+	"Color/_Primitives/Error/bgFillDark": {
+		"value": {
+			".": "#231c1b"
+		}
+	},
+	"Color/_Primitives/Error/fgFillDark": {
+		"value": {
+			".": "#f2efef"
+		}
+	},
+	"Color/_Primitives/Error/bgFillInverted2": {
+		"value": {
+			".": "#231c1b"
+		}
+	},
+	"Color/_Primitives/Error/bgFillInverted1": {
+		"value": {
+			".": "#6d0000"
+		}
+	},
+	"Color/_Primitives/Error/fgFillInverted": {
+		"value": {
+			".": "#f2efef"
+		}
+	},
+	"Color/_Primitives/Error/surface1": {
+		"value": {
+			".": "#fcedea"
+		}
+	},
+	"Color/_Primitives/Bg/surface2": {
+		"value": {
+			".": "#f8f8f8"
+		}
+	},
+	"Color/_Primitives/Bg/bgFill1": {
+		"value": {
+			".": "#555"
+		}
+	},
+	"Color/_Primitives/Bg/fgFill": {
+		"value": {
+			".": "#f0f0f0"
+		}
+	},
+	"Color/_Primitives/Bg/bgFill2": {
+		"value": {
+			".": "#474747"
+		}
+	},
+	"Color/_Primitives/Bg/surface6": {
+		"value": {
+			".": "#d0d0d0"
+		}
+	},
+	"Color/_Primitives/Bg/surface5": {
+		"value": {
+			".": "#dfdfdf"
+		}
+	},
+	"Color/_Primitives/Bg/surface4": {
+		"value": {
+			".": "#eaeaea"
+		}
+	},
+	"Color/_Primitives/Bg/surface3": {
+		"value": {
+			".": "#fff"
+		}
+	},
+	"Color/_Primitives/Bg/fgSurface4": {
+		"value": {
+			".": "#1e1e1e"
+		}
+	},
+	"Color/_Primitives/Bg/fgSurface3": {
+		"value": {
+			".": "#6c6c6c"
+		}
+	},
+	"Color/_Primitives/Bg/fgSurface2": {
+		"value": {
+			".": "#898989"
+		}
+	},
+	"Color/_Primitives/Bg/fgSurface1": {
+		"value": {
+			".": "#a9a9a9"
+		}
+	},
+	"Color/_Primitives/Bg/stroke3": {
+		"value": {
+			".": "#898989"
+		}
+	},
+	"Color/_Primitives/Bg/stroke4": {
+		"value": {
+			".": "#6a6a6a"
+		}
+	},
+	"Color/_Primitives/Bg/stroke2": {
+		"value": {
+			".": "#aeaeae"
+		}
+	},
+	"Color/_Primitives/Bg/stroke1": {
+		"value": {
+			".": "#d0d0d0"
+		}
+	},
+	"Color/_Primitives/Bg/bgFillDark": {
+		"value": {
+			".": "#1e1e1e"
+		}
+	},
+	"Color/_Primitives/Bg/fgFillDark": {
+		"value": {
+			".": "#f0f0f0"
+		}
+	},
+	"Color/_Primitives/Bg/bgFillInverted2": {
+		"value": {
+			".": "#1e1e1e"
+		}
+	},
+	"Color/_Primitives/Bg/bgFillInverted1": {
+		"value": {
+			".": "#2f2f2f"
+		}
+	},
+	"Color/_Primitives/Bg/fgFillInverted": {
+		"value": {
+			".": "#f0f0f0"
+		}
+	},
+	"Color/_Primitives/Bg/surface1": {
+		"value": {
+			".": "#efefef"
+		}
+	},
+	"Color/Semantic/Background/Neutral/bgSur-neutral": {
+		"value": {
+			".": "{Color/_Primitives/Bg/surface2}"
+		},
+		"description": "Background color for surfaces with normal emphasis."
+	},
+	"Color/Semantic/Background/Neutral/bgSur-neutral-strong": {
+		"value": {
+			".": "{Color/_Primitives/Bg/surface3}"
+		},
+		"description": "Background color for surfaces with strong emphasis."
+	},
+	"Color/Semantic/Background/Neutral/bgSur-neutral-weak": {
+		"value": {
+			".": "{Color/_Primitives/Bg/surface1}"
+		},
+		"description": "Background color for surfaces with weak emphasis."
+	},
+	"Color/Semantic/Background/Brand/bgSur-brand": {
+		"value": {
+			".": "{Color/_Primitives/Primary/surface1}"
+		},
+		"description": "Background color for surfaces with brand tone and normal emphasis."
+	},
+	"Color/Semantic/Background/Success/bgSur-success": {
+		"value": {
+			".": "{Color/_Primitives/Success/surface4}"
+		},
+		"description": "Background color for surfaces with success tone and normal emphasis."
+	},
+	"Color/Semantic/Background/Success/bgSur-success-weak": {
+		"value": {
+			".": "{Color/_Primitives/Success/surface2}"
+		},
+		"description": "Background color for surfaces with success tone and weak emphasis."
+	},
+	"Color/Semantic/Background/Info/bgSur-info": {
+		"value": {
+			".": "{Color/_Primitives/Info/surface4}"
+		},
+		"description": "Background color for surfaces with info tone and normal emphasis."
+	},
+	"Color/Semantic/Background/Info/bgSur-info-weak": {
+		"value": {
+			".": "{Color/_Primitives/Info/surface2}"
+		},
+		"description": "Background color for surfaces with info tone and weak emphasis."
+	},
+	"Color/Semantic/Background/Warning/bgSur-warning": {
+		"value": {
+			".": "{Color/_Primitives/Warning/surface4}"
+		},
+		"description": "Background color for surfaces with warning tone and normal emphasis."
+	},
+	"Color/Semantic/Background/Warning/bgSur-warning-weak": {
+		"value": {
+			".": "{Color/_Primitives/Warning/surface2}"
+		},
+		"description": "Background color for surfaces with warning tone and weak emphasis."
+	},
+	"Color/Semantic/Background/Error/bgSur-error": {
+		"value": {
+			".": "{Color/_Primitives/Error/surface4}"
+		},
+		"description": "Background color for surfaces with error tone and normal emphasis."
+	},
+	"Color/Semantic/Background/Error/bgSur-error-weak": {
+		"value": {
+			".": "{Color/_Primitives/Error/surface2}"
+		},
+		"description": "Background color for surfaces with error tone and weak emphasis."
+	},
+	"Color/Semantic/Background/Neutral/bgInt-neutral": {
+		"value": {
+			".": "#0000"
+		},
+		"description": "Background color for interactive elements with neutral tone and normal emphasis."
+	},
+	"Color/Semantic/Background/Neutral/bgInt-neutral-active": {
+		"value": {
+			".": "{Color/_Primitives/Bg/surface4}"
+		},
+		"description": "Background color for interactive elements with neutral tone and normal emphasis that are hovered, focused, or active."
+	},
+	"Color/Semantic/Background/Neutral/bgInt-neutral-disabled": {
+		"value": {
+			".": "{Color/_Primitives/Bg/surface5}"
+		},
+		"description": "Background color for interactive elements with neutral tone and normal emphasis, in their disabled state."
+	},
+	"Color/Semantic/Background/Neutral/bgInt-neutral-strong": {
+		"value": {
+			".": "{Color/_Primitives/Bg/bgFillInverted1}"
+		},
+		"description": "Background color for interactive elements with neutral tone and strong emphasis."
+	},
+	"Color/Semantic/Background/Neutral/bgInt-neutral-strong-active": {
+		"value": {
+			".": "{Color/_Primitives/Bg/bgFillInverted2}"
+		},
+		"description": "Background color for interactive elements with neutral tone and strong emphasis that are hovered, focused, or active."
+	},
+	"Color/Semantic/Background/Neutral/bgInt-neutral-strong-disabled": {
+		"value": {
+			".": "{Color/_Primitives/Bg/surface6}"
+		},
+		"description": "Background color for interactive elements with neutral tone and strong emphasis, in their disabled state."
+	},
+	"Color/Semantic/Background/Neutral/bgInt-neutral-weak": {
+		"value": {
+			".": "#0000"
+		},
+		"description": "Background color for interactive elements with neutral tone and weak emphasis."
+	},
+	"Color/Semantic/Background/Neutral/bgInt-neutral-weak-active": {
+		"value": {
+			".": "{Color/_Primitives/Bg/surface4}"
+		},
+		"description": "Background color for interactive elements with neutral tone and weak emphasis that are hovered, focused, or active."
+	},
+	"Color/Semantic/Background/Neutral/bgInt-neutral-weak-disabled": {
+		"value": {
+			".": "{Color/_Primitives/Bg/surface5}"
+		},
+		"description": "Background color for interactive elements with neutral tone and weak emphasis, in their disabled state."
+	},
+	"Color/Semantic/Background/Brand/bgInt-brand": {
+		"value": {
+			".": "#0000"
+		},
+		"description": "Background color for interactive elements with brand tone and normal emphasis."
+	},
+	"Color/Semantic/Background/Brand/bgInt-brand-active": {
+		"value": {
+			".": "{Color/_Primitives/Primary/surface2}"
+		},
+		"description": "Background color for interactive elements with brand tone and normal emphasis that are hovered, focused, or active."
+	},
+	"Color/Semantic/Background/Brand/bgInt-brand-disabled": {
+		"value": {
+			".": "{Color/_Primitives/Bg/surface5}"
+		},
+		"description": "Background color for interactive elements with brand tone and normal emphasis, in their disabled state."
+	},
+	"Color/Semantic/Background/Brand/bgInt-brand-strong": {
+		"value": {
+			".": "{Color/_Primitives/Primary/bgFill1}"
+		},
+		"description": "Background color for interactive elements with brand tone and strong emphasis."
+	},
+	"Color/Semantic/Background/Brand/bgInt-brand-strong-active": {
+		"value": {
+			".": "{Color/_Primitives/Primary/bgFill2}"
+		},
+		"description": "Background color for interactive elements with brand tone and strong emphasis that are hovered, focused, or active."
+	},
+	"Color/Semantic/Background/Brand/bgInt-brand-strong-disabled": {
+		"value": {
+			".": "{Color/_Primitives/Bg/surface6}"
+		},
+		"description": "Background color for interactive elements with brand tone and strong emphasis, in their disabled state."
+	},
+	"Color/Semantic/Background/Brand/bgInt-brand-weak": {
+		"value": {
+			".": "#0000"
+		},
+		"description": "Background color for interactive elements with brand tone and weak emphasis."
+	},
+	"Color/Semantic/Background/Brand/bgInt-brand-weak-active": {
+		"value": {
+			".": "{Color/_Primitives/Primary/surface4}"
+		},
+		"description": "Background color for interactive elements with brand tone and weak emphasis that are hovered, focused, or active."
+	},
+	"Color/Semantic/Background/Brand/bgInt-brand-weak-disabled": {
+		"value": {
+			".": "{Color/_Primitives/Bg/surface5}"
+		},
+		"description": "Background color for interactive elements with brand tone and weak emphasis, in their disabled state."
+	},
+	"Color/Semantic/Background/Neutral/bgTra-neutral-weak": {
+		"value": {
+			".": "{Color/_Primitives/Bg/stroke1}"
+		},
+		"description": "Background color for tracks with a neutral tone and weak emphasis (eg. scrollbar track)."
+	},
+	"Color/Semantic/Background/Neutral/bgTra-neutral": {
+		"value": {
+			".": "{Color/_Primitives/Bg/stroke2}"
+		},
+		"description": "Background color for tracks with a neutral tone and normal emphasis (eg. slider or progressbar track)."
+	},
+	"Color/Semantic/Background/Neutral/bgThu-neutral-weak": {
+		"value": {
+			".": "{Color/_Primitives/Bg/stroke3}"
+		},
+		"description": "Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb)."
+	},
+	"Color/Semantic/Background/Neutral/bgThu-neutral-weak-active": {
+		"value": {
+			".": "{Color/_Primitives/Bg/stroke4}"
+		},
+		"description": "Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb) that are hovered, focused, or active."
+	},
+	"Color/Semantic/Background/Brand/bgThu-brand": {
+		"value": {
+			".": "{Color/_Primitives/Primary/stroke3}"
+		},
+		"description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track)."
+	},
+	"Color/Semantic/Background/Brand/bgThu-brand-active": {
+		"value": {
+			".": "{Color/_Primitives/Primary/stroke3}"
+		},
+		"description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track) that are hovered, focused, or active."
+	},
+	"Color/Semantic/Background/Brand/bgThu-brand-disabled": {
+		"value": {
+			".": "{Color/_Primitives/Bg/stroke2}"
+		},
+		"description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track), in their disabled state."
+	},
+	"Color/Semantic/Foreground/Neutral/fgCon-neutral": {
+		"value": {
+			".": "{Color/_Primitives/Bg/fgSurface4}"
+		},
+		"description": "Foreground color for content like text with normal emphasis."
+	},
+	"Color/Semantic/Foreground/Neutral/fgCon-neutral-weak": {
+		"value": {
+			".": "{Color/_Primitives/Bg/fgSurface3}"
+		},
+		"description": "Foreground color for content like text with weak emphasis."
+	},
+	"Color/Semantic/Foreground/Neutral/fgInt-neutral": {
+		"value": {
+			".": "{Color/_Primitives/Bg/fgSurface4}"
+		},
+		"description": "Foreground color for interactive elements with neutral tone and normal emphasis."
+	},
+	"Color/Semantic/Foreground/Neutral/fgInt-neutral-active": {
+		"value": {
+			".": "{Color/_Primitives/Bg/fgSurface4}"
+		},
+		"description": "Foreground color for interactive elements with neutral tone and normal emphasis that are hovered, focused, or active."
+	},
+	"Color/Semantic/Foreground/Neutral/fgInt-neutral-disabled": {
+		"value": {
+			".": "{Color/_Primitives/Bg/fgSurface2}"
+		},
+		"description": "Foreground color for interactive elements with neutral tone and normal emphasis, in their disabled state."
+	},
+	"Color/Semantic/Foreground/Neutral/fgInt-neutral-strong": {
+		"value": {
+			".": "{Color/_Primitives/Bg/fgFillInverted}"
+		},
+		"description": "Foreground color for interactive elements with neutral tone and strong emphasis."
+	},
+	"Color/Semantic/Foreground/Neutral/fgInt-neutral-strong-active": {
+		"value": {
+			".": "{Color/_Primitives/Bg/fgFillInverted}"
+		},
+		"description": "Foreground color for interactive elements with neutral tone and strong emphasis that are hovered, focused, or active."
+	},
+	"Color/Semantic/Foreground/Neutral/fgInt-neutral-strong-disabled": {
+		"value": {
+			".": "{Color/_Primitives/Bg/fgSurface3}"
+		},
+		"description": "Foreground color for interactive elements with neutral tone and strong emphasis, in their disabled state."
+	},
+	"Color/Semantic/Foreground/Neutral/fgInt-neutral-weak": {
+		"value": {
+			".": "{Color/_Primitives/Bg/fgSurface3}"
+		},
+		"description": "Foreground color for interactive elements with neutral tone and weak emphasis."
+	},
+	"Color/Semantic/Foreground/Neutral/fgInt-neutral-weak-disabled": {
+		"value": {
+			".": "{Color/_Primitives/Bg/fgSurface2}"
+		},
+		"description": "Foreground color for interactive elements with neutral tone and weak emphasis, in their disabled state."
+	},
+	"Color/Semantic/Foreground/Brand/fgInt-brand": {
+		"value": {
+			".": "{Color/_Primitives/Primary/fgSurface3}"
+		},
+		"description": "Foreground color for interactive elements with brand tone and normal emphasis."
+	},
+	"Color/Semantic/Foreground/Brand/fgInt-brand-active": {
+		"value": {
+			".": "{Color/_Primitives/Primary/fgSurface3}"
+		},
+		"description": "Foreground color for interactive elements with brand tone and normal emphasis that are hovered, focused, or active."
+	},
+	"Color/Semantic/Foreground/Brand/fgInt-brand-disabled": {
+		"value": {
+			".": "{Color/_Primitives/Bg/fgSurface2}"
+		},
+		"description": "Foreground color for interactive elements with brand tone and normal emphasis, in their disabled state."
+	},
+	"Color/Semantic/Foreground/Brand/fgInt-brand-strong": {
+		"value": {
+			".": "{Color/_Primitives/Primary/fgFill}"
+		},
+		"description": "Foreground color for interactive elements with brand tone and strong emphasis."
+	},
+	"Color/Semantic/Foreground/Brand/fgInt-brand-strong-active": {
+		"value": {
+			".": "{Color/_Primitives/Primary/fgFill}"
+		},
+		"description": "Foreground color for interactive elements with brand tone and strong emphasis that are hovered, focused, or active."
+	},
+	"Color/Semantic/Foreground/Brand/fgInt-brand-strong-disabled": {
+		"value": {
+			".": "{Color/_Primitives/Bg/fgSurface3}"
+		},
+		"description": "Foreground color for interactive elements with brand tone and strong emphasis, in their disabled state."
+	},
+	"Color/Semantic/Stroke/Neutral/strokeSur-neutral": {
+		"value": {
+			".": "{Color/_Primitives/Bg/stroke2}"
+		},
+		"description": "Decorative stroke color used to define neutrally-toned surface boundaries with normal emphasis."
+	},
+	"Color/Semantic/Stroke/Neutral/strokeSur-neutral-weak": {
+		"value": {
+			".": "{Color/_Primitives/Bg/stroke1}"
+		},
+		"description": "Decorative stroke color used to define neutrally-toned surface boundaries with weak emphasis."
+	},
+	"Color/Semantic/Stroke/Neutral/strokeSur-neutral-strong": {
+		"value": {
+			".": "{Color/_Primitives/Bg/stroke3}"
+		},
+		"description": "Decorative stroke color used to define neutrally-toned surface boundaries with strong emphasis."
+	},
+	"Color/Semantic/Stroke/Brand/strokeSur-brand": {
+		"value": {
+			".": "{Color/_Primitives/Primary/stroke1}"
+		},
+		"description": "Decorative stroke color used to define brand-toned surface boundaries with normal emphasis."
+	},
+	"Color/Semantic/Stroke/Brand/strokeSur-brand-strong": {
+		"value": {
+			".": "{Color/_Primitives/Primary/stroke3}"
+		},
+		"description": "Decorative stroke color used to define neutrally-toned surface boundaries with strong emphasis."
+	},
+	"Color/Semantic/Stroke/Success/strokeSur-success": {
+		"value": {
+			".": "{Color/_Primitives/Success/stroke1}"
+		},
+		"description": "Decorative stroke color used to define success-toned surface boundaries with normal emphasis."
+	},
+	"Color/Semantic/Stroke/Success/strokeSur-success-strong": {
+		"value": {
+			".": "{Color/_Primitives/Success/stroke3}"
+		},
+		"description": "Decorative stroke color used to define success-toned surface boundaries with strong emphasis."
+	},
+	"Color/Semantic/Stroke/Info/strokeSur-info": {
+		"value": {
+			".": "{Color/_Primitives/Info/stroke1}"
+		},
+		"description": "Decorative stroke color used to define info-toned surface boundaries with normal emphasis."
+	},
+	"Color/Semantic/Stroke/Info/strokeSur-info-strong": {
+		"value": {
+			".": "{Color/_Primitives/Info/stroke3}"
+		},
+		"description": "Decorative stroke color used to define info-toned surface boundaries with strong emphasis."
+	},
+	"Color/Semantic/Stroke/Warning/strokeSur-warning": {
+		"value": {
+			".": "{Color/_Primitives/Warning/stroke1}"
+		},
+		"description": "Decorative stroke color used to define warning-toned surface boundaries with normal emphasis."
+	},
+	"Color/Semantic/Stroke/Warning/strokeSur-warning-strong": {
+		"value": {
+			".": "{Color/_Primitives/Warning/stroke3}"
+		},
+		"description": "Decorative stroke color used to define warning-toned surface boundaries with strong emphasis."
+	},
+	"Color/Semantic/Stroke/Error/strokeSur-error": {
+		"value": {
+			".": "{Color/_Primitives/Error/stroke1}"
+		},
+		"description": "Decorative stroke color used to define error-toned surface boundaries with normal emphasis."
+	},
+	"Color/Semantic/Stroke/Error/strokeSur-error-strong": {
+		"value": {
+			".": "{Color/_Primitives/Error/stroke3}"
+		},
+		"description": "Decorative stroke color used to define error-toned surface boundaries with strong emphasis."
+	},
+	"Color/Semantic/Stroke/Neutral/strokeInt-neutral": {
+		"value": {
+			".": "{Color/_Primitives/Bg/stroke3}"
+		},
+		"description": "Accessible stroke color used for interactive neutrally-toned elements with normal emphasis."
+	},
+	"Color/Semantic/Stroke/Neutral/strokeInt-neutral-active": {
+		"value": {
+			".": "{Color/_Primitives/Bg/stroke4}"
+		},
+		"description": "Accessible stroke color used for interactive neutrally-toned elements with normal emphasis that are hovered, focused, or active."
+	},
+	"Color/Semantic/Stroke/Neutral/strokeInt-neutral-disabled": {
+		"value": {
+			".": "{Color/_Primitives/Bg/stroke2}"
+		},
+		"description": "Accessible stroke color used for interactive neutrally-toned elements with normal emphasis, in their disabled state."
+	},
+	"Color/Semantic/Stroke/Neutral/strokeInt-neutral-strong": {
+		"value": {
+			".": "{Color/_Primitives/Bg/stroke4}"
+		},
+		"description": "Accessible stroke color used for interactive neutrally-toned elements with strong emphasis."
+	},
+	"Color/Semantic/Stroke/Brand/strokeInt-brand": {
+		"value": {
+			".": "{Color/_Primitives/Primary/stroke3}"
+		},
+		"description": "Accessible stroke color used for interactive brand-toned elements with normal emphasis."
+	},
+	"Color/Semantic/Stroke/Brand/strokeInt-brand-active": {
+		"value": {
+			".": "{Color/_Primitives/Primary/stroke4}"
+		},
+		"description": "Accessible stroke color used for interactive brand-toned elements with normal emphasis that are hovered, focused, or active."
+	},
+	"Color/Semantic/Stroke/Brand/strokeInt-brand-disabled": {
+		"value": {
+			".": "{Color/_Primitives/Bg/stroke2}"
+		},
+		"description": "Accessible stroke color used for interactive brand-toned elements with normal emphasis, in their disabled state."
+	},
+	"Color/Semantic/Stroke/Error/strokeInt-error-strong": {
+		"value": {
+			".": "{Color/_Primitives/Error/stroke3}"
+		},
+		"description": "Accessible stroke color used for interactive error-toned elements with strong emphasis."
+	},
+	"Color/Semantic/Stroke/Brand/strokeFoc-brand": {
+		"value": {
+			".": "{Color/_Primitives/Primary/stroke3}"
+		},
+		"description": "Accessible stroke color applied to focus rings."
+	},
+	"Elevation/x-small": {
+		"value": {
+			".": "0 1px 1px 0 color(srgb 0 0 0 / 0.03), 0 1px 2px 0 color(srgb 0 0 0 / 0.02), 0 3px 3px 0 color(srgb 0 0 0 / 0.02), 0 4px 4px 0 color(srgb 0 0 0 / 0.01)"
+		},
+		"description": "For sections and containers that group related content and controls, which may overlap other content. Example: Preview Frame."
+	},
+	"Elevation/small": {
+		"value": {
+			".": "0 1px 2px 0 color(srgb 0 0 0 / 0.05), 0 2px 3px 0 color(srgb 0 0 0 / 0.04), 0 6px 6px 0 color(srgb 0 0 0 / 0.03), 0 8px 8px 0 color(srgb 0 0 0 / 0.02)"
+		},
+		"description": "For components that provide contextual feedback without being intrusive. Generally non-interruptive. Example: Tooltips, Snackbar."
+	},
+	"Elevation/medium": {
+		"value": {
+			".": "0 2px 3px 0 color(srgb 0 0 0 / 0.05), 0 4px 5px 0 color(srgb 0 0 0 / 0.04), 0 12px 12px 0 color(srgb 0 0 0 / 0.03), 0 16px 16px 0 color(srgb 0 0 0 / 0.02)"
+		},
+		"description": "For components that offer additional actions. Example: Menus, Command Palette"
+	},
+	"Elevation/large": {
+		"value": {
+			".": "0 5px 15px 0 color(srgb 0 0 0 / 0.08), 0 15px 27px 0 color(srgb 0 0 0 / 0.07), 0 30px 36px 0 color(srgb 0 0 0 / 0.04), 0 50px 43px 0 color(srgb 0 0 0 / 0.02)"
+		},
+		"description": "For components that confirm decisions or handle necessary interruptions. Example: Modals."
+	},
+	"Spacing/05": {
+		"value": {
+			".": "4px"
+		},
+		"description": "Extra small spacing"
+	},
+	"Spacing/10": {
+		"value": {
+			".": "8px"
+		},
+		"description": "Small spacing"
+	},
+	"Spacing/15": {
+		"value": {
+			".": "12px"
+		},
+		"description": "Medium spacing"
+	},
+	"Spacing/20": {
+		"value": {
+			".": "16px"
+		},
+		"description": "Large spacing"
+	},
+	"Spacing/30": {
+		"value": {
+			".": "24px"
+		},
+		"description": "Extra large spacing"
+	},
+	"Spacing/40": {
+		"value": {
+			".": "32px"
+		},
+		"description": "2X large spacing"
+	},
+	"Spacing/50": {
+		"value": {
+			".": "40px"
+		},
+		"description": "3X large spacing"
+	},
+	"Spacing/60": {
+		"value": {
+			".": "48px"
+		},
+		"description": "4X large spacing"
+	},
+	"Spacing/70": {
+		"value": {
+			".": "56px"
+		},
+		"description": "5X large spacing"
+	},
+	"Spacing/80": {
+		"value": {
+			".": "64px"
+		},
+		"description": "6X large spacing"
+	},
+	"Font/family-heading": {
+		"value": {
+			".": "-apple-system, system-ui, \"Segoe UI\", \"Roboto\", \"Oxygen-Sans\", \"Ubuntu\", \"Cantarell\", \"Helvetica Neue\", sans-serif"
+		},
+		"description": "Headings font family"
+	},
+	"Font/family-body": {
+		"value": {
+			".": "-apple-system, system-ui, \"Segoe UI\", \"Roboto\", \"Oxygen-Sans\", \"Ubuntu\", \"Cantarell\", \"Helvetica Neue\", sans-serif"
+		},
+		"description": "Body font family"
+	},
+	"Font/family-mono": {
+		"value": {
+			".": "\"Menlo\", \"Consolas\", monaco, monospace"
+		},
+		"description": "Monospace font family"
+	},
+	"Font/size-x-small": {
+		"value": {
+			".": "11px"
+		},
+		"description": "Extra small font size"
+	},
+	"Font/size-small": {
+		"value": {
+			".": "12px"
+		},
+		"description": "Small font size"
+	},
+	"Font/size-medium": {
+		"value": {
+			".": "13px"
+		},
+		"description": "Medium font size"
+	},
+	"Font/size-large": {
+		"value": {
+			".": "15px"
+		},
+		"description": "Large font size"
+	},
+	"Font/size-x-large": {
+		"value": {
+			".": "20px"
+		},
+		"description": "Extra large font size"
+	},
+	"Font/size-2x-large": {
+		"value": {
+			".": "32px"
+		},
+		"description": "2X large font size"
+	},
+	"Font/lineHeight-x-small": {
+		"value": {
+			".": "16px"
+		},
+		"description": "Extra small line height"
+	},
+	"Font/lineHeight-small": {
+		"value": {
+			".": "20px"
+		},
+		"description": "Small line height"
+	},
+	"Font/lineHeight-medium": {
+		"value": {
+			".": "24px"
+		},
+		"description": "Medium line height"
+	},
+	"Font/lineHeight-large": {
+		"value": {
+			".": "28px"
+		},
+		"description": "Large line height"
+	},
+	"Font/lineHeight-x-large": {
+		"value": {
+			".": "32px"
+		},
+		"description": "Extra large line height"
+	},
+	"Font/lineHeight-2x-large": {
+		"value": {
+			".": "40px"
+		},
+		"description": "2X large line height"
+	}
+}
