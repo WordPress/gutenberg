@@ -78,6 +78,7 @@ const transforms = {
 								const colspan = normalizeRowColSpan(
 									col.getAttribute( 'colspan' )
 								);
+								const scope = col.getAttribute( 'scope' );
 
 								const { textAlign } = col.style || {};
 
@@ -95,6 +96,7 @@ const transforms = {
 									content: col.innerHTML,
 									rowspan,
 									colspan,
+									scope,
 									align,
 								} );
 
