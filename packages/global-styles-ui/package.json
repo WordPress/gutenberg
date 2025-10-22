@@ -35,7 +35,6 @@
 		"./build-style/": "./build-style/"
 	},
 	"react-native": "src/index",
-	"wpScript": true,
 	"dependencies": {
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
