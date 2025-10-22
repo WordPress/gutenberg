@@ -114,18 +114,46 @@ function ListViewBranch( props ) {
 		[ parentId ]
 	);
 
-	const shouldHideChildren = useSelect(
+	const { shouldHideChildren, patternsWithSelectedChildren } = useSelect(
 		( select ) => {
-			if ( ! parentId ) {
-				return false;
-			}
-			const { getBlockAttributes } = select( blockEditorStore );
-			const parentAttributes = getBlockAttributes( parentId );
+			const { getBlockAttributes, getClientIdsOfDescendants } =
+				select( blockEditorStore );
 
-			// Hide children if parent is a pattern (has patternName metadata)
-			return !! parentAttributes?.metadata?.patternName;
+			// Check if parent should hide children
+			let hideChildren = false;
+			if ( parentId ) {
+				const parentAttributes = getBlockAttributes( parentId );
+				hideChildren = !! parentAttributes?.metadata?.patternName;
+			}
+
+			// Find patterns in this branch that have selected descendants
+			const patternsWithSelected = new Set();
+			blocks.forEach( ( block ) => {
+				if ( ! block?.clientId ) {
+					return;
+				}
+				const blockAttributes = getBlockAttributes( block.clientId );
+				const isPattern = !! blockAttributes?.metadata?.patternName;
+
+				if ( isPattern ) {
+					const descendants = getClientIdsOfDescendants(
+						block.clientId
+					);
+					const hasSelectedDescendant = selectedClientIds.some(
+						( selectedId ) => descendants.includes( selectedId )
+					);
+					if ( hasSelectedDescendant ) {
+						patternsWithSelected.add( block.clientId );
+					}
+				}
+			} );
+
+			return {
+				shouldHideChildren: hideChildren,
+				patternsWithSelectedChildren: patternsWithSelected,
+			};
 		},
-		[ parentId ]
+		[ parentId, blocks, selectedClientIds ]
 	);
 
 	const {
@@ -207,8 +235,18 @@ function ListViewBranch( props ) {
 					clientId,
 					selectedClientIds
 				);
+
+				// Check if this pattern block has a selected child
+				const isPatternWithSelectedChild =
+					patternsWithSelectedChildren.has( clientId );
+
+				// Treat pattern blocks with selected children as fully selected
+				const isSelectedOrPatternWithChild =
+					isSelected || isPatternWithSelectedChild;
+
 				const isSelectedBranch =
-					isBranchSelected || ( isSelected && hasNestedBlocks );
+					isBranchSelected ||
+					( isSelectedOrPatternWithChild && hasNestedBlocks );
 
 				// To avoid performance issues, we only render blocks that are in view,
 				// or blocks that are selected or dragged. If a block is selected,
@@ -222,15 +260,19 @@ function ListViewBranch( props ) {
 					isDragged ||
 					blockInView ||
 					( isSelected && clientId === selectedClientIds[ 0 ] ) ||
+					isPatternWithSelectedChild ||
 					index === 0 ||
 					index === blockCount - 1;
 				return (
-					<AsyncModeProvider key={ clientId } value={ ! isSelected }>
+					<AsyncModeProvider
+						key={ clientId }
+						value={ ! isSelectedOrPatternWithChild }
+					>
 						{ showBlock && (
 							<ListViewBlock
 								block={ block }
 								selectBlock={ selectBlock }
-								isSelected={ isSelected }
+								isSelected={ isSelectedOrPatternWithChild }
 								isBranchSelected={ isSelectedBranch }
 								isDragged={ isDragged }
 								level={ level }
