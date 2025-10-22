@@ -24,7 +24,7 @@ import {
 import { __, _x } from '@wordpress/i18n';
 import { useCallback, useMemo, useRef } from '@wordpress/element';
 import { reset as resetIcon } from '@wordpress/icons';
-import { getValueFromVariable } from '@wordpress/global-styles-engine';
+import { getValueFromVariable } from '@wordpress/style-engine';
 
 /**
  * Internal dependencies

@@ -14,7 +14,6 @@
 		{ "path": "../dom" },
 		{ "path": "../element" },
 		{ "path": "../escape-html" },
-		{ "path": "../global-styles-engine" },
 		{ "path": "../priority-queue" },
 		{ "path": "../private-apis" },
 		{ "path": "../hooks" },

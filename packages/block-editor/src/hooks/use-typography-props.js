@@ -7,7 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
-import { getTypographyFontSizeValue } from '@wordpress/global-styles-engine';
+import { getTypographyFontSizeValue } from '@wordpress/style-engine';
 
 /**
  * Internal dependencies

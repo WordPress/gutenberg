@@ -4,7 +4,7 @@
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
 import TokenList from '@wordpress/token-list';
-import { getTypographyFontSizeValue } from '@wordpress/global-styles-engine';
+import { getTypographyFontSizeValue } from '@wordpress/style-engine';
 
 /**
  * Internal dependencies

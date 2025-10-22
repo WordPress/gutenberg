@@ -1,11 +1,7 @@
 /**
- * WordPress dependencies
- */
-import { getCSSValueFromRawStyle } from '@wordpress/style-engine';
-
-/**
  * Internal dependencies
  */
+import { getCSSValueFromRawStyle } from '../style-definitions/utils';
 import type {
 	GlobalStylesSettings,
 	ThemeFileLink,

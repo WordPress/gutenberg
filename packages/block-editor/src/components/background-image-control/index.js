@@ -33,7 +33,7 @@ import { useRef, useState, useEffect, useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { focus } from '@wordpress/dom';
 import { isBlobURL } from '@wordpress/blob';
-import { getResolvedValue } from '@wordpress/global-styles-engine';
+import { getResolvedValue } from '@wordpress/style-engine';
 
 /**
  * Internal dependencies

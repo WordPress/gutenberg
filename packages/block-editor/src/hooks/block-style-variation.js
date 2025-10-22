@@ -4,7 +4,7 @@
 import { getBlockTypes, store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { useContext, useMemo } from '@wordpress/element';
-import { toStyles, getBlockSelectors } from '@wordpress/global-styles-engine';
+import { toStyles, getBlockSelectors } from '@wordpress/style-engine';
 
 /**
  * Internal dependencies

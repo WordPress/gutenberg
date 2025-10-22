@@ -9,7 +9,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useCallback, useMemo, useEffect } from '@wordpress/element';
-import { getValueFromVariable } from '@wordpress/global-styles-engine';
+import { getValueFromVariable } from '@wordpress/style-engine';
 
 /**
  * Internal dependencies

@@ -20,7 +20,7 @@ import {
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { getLayoutStyles } from '@wordpress/global-styles-engine';
+import { getLayoutStyles } from '@wordpress/style-engine';
 import { PluginArea } from '@wordpress/plugins';
 import { __, sprintf } from '@wordpress/i18n';
 import {

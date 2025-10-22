@@ -4,7 +4,7 @@
 import { getBlockTypes, store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { useContext, useMemo } from '@wordpress/element';
-import { generateGlobalStyles } from '@wordpress/global-styles-engine';
+import { generateGlobalStyles } from '@wordpress/style-engine';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**

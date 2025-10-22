@@ -9,7 +9,6 @@ import {
 	store as blocksStore,
 	// @ts-expect-error - @wordpress/blocks module doesn't have TypeScript declarations
 } from '@wordpress/blocks';
-import { getCSSRules, getCSSValueFromRawStyle } from '@wordpress/style-engine';
 import { select } from '@wordpress/data';
 
 /**
@@ -25,6 +24,8 @@ import {
 	getBlockStyleVariationSelector,
 	getResolvedValue,
 } from '../utils/common';
+import { getCSSRules } from '../css-utils';
+import { getCSSValueFromRawStyle } from '../style-definitions/utils';
 import { getBlockSelector } from './selectors';
 import { getTypographyFontSizeValue } from '../utils/typography';
 import { getDuotoneFilter } from '../utils/duotone';

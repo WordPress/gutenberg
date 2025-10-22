@@ -17,7 +17,7 @@ import {
 } from '@wordpress/components';
 import { Icon, alignNone, stretchWide } from '@wordpress/icons';
 import { useCallback, useState, Platform } from '@wordpress/element';
-import { getValueFromVariable } from '@wordpress/global-styles-engine';
+import { getValueFromVariable } from '@wordpress/style-engine';
 
 /**
  * Internal dependencies

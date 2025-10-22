@@ -14,7 +14,7 @@ import {
 	getSetting,
 	getStyle,
 	getPresetVariableFromValue,
-} from '@wordpress/global-styles-engine';
+} from '@wordpress/style-engine';
 
 /**
  * Internal dependencies

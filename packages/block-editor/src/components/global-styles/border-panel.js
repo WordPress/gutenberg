@@ -11,7 +11,7 @@ import {
 } from '@wordpress/components';
 import { useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { getValueFromVariable } from '@wordpress/global-styles-engine';
+import { getValueFromVariable } from '@wordpress/style-engine';
 
 /**
  * Internal dependencies

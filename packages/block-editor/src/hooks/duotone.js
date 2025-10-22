@@ -15,7 +15,7 @@ import {
 import { useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { useMemo, useEffect } from '@wordpress/element';
-import { getBlockSelector } from '@wordpress/global-styles-engine';
+import { getBlockSelector } from '@wordpress/style-engine';
 
 /**
  * Internal dependencies
