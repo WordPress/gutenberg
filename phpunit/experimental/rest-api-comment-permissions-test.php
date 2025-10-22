@@ -1,74 +1,71 @@
 <?php
 /**
- * Unit tests covering WP_Test_REST_Comments_Controller_Gutenberg functionality.
+ * REST API test for block_comment permissions.
+ *
+ * Test that permissions are adjusted successfully for block comments.
+ * The block comments feature should be available for any user who can edit the post.
  *
  * @package Gutenberg
+ * @group block-comments
  */
-class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_Controller_Testcase {
-	protected static $admin_id;
-	protected static $editor_id;
-	protected static $contributor_id;
-	protected static $subscriber_id;
-	protected static $author_id;
-	protected static $user_ids = array();
-	protected static $post_id;
-	protected static $num_notes = 10;
+class WP_Test_REST_Block_Comment_Permissions extends WP_Test_REST_TestCase {
 
-	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
-		self::$admin_id       = $factory->user->create(
-			array(
-				'role' => 'administrator',
-			)
-		);
-		self::$editor_id      = $factory->user->create(
-			array(
-				'role' => 'editor',
-			)
-		);
-		self::$contributor_id = $factory->user->create(
-			array(
-				'role' => 'contributor',
-			)
-		);
-		self::$subscriber_id  = $factory->user->create(
-			array(
-				'role' => 'subscriber',
-			)
-		);
-		self::$author_id      = $factory->user->create(
-			array(
-				'role' => 'author',
-			)
-		);
+	/**
+	 * @var int The number of comments to create for testing.
+	 */
+	protected static $num_comments = 10;
+
+	/**
+	 * User IDs for various roles.
+	 *
+	 * @var array<string, int> Associative array mapping role names to user IDs.
+	 */
+	protected static $user_ids = array();
+
+	/**
+	 * Test post to add comments to.
+	 *
+	 * @var int The post ID.
+	 */
+	protected static $post_id;
+
+	/**
+	 * Setup helper, create test users of admin, editor, author, contributor, and subscriber roles.
+	 */
+	public function set_up() {
+		parent::set_up();
+
+		$roles = array( 'administrator', 'editor', 'author', 'contributor', 'subscriber' );
+		foreach ( $roles as $role ) {
+			self::$user_ids[ $role ] = $this->factory->user->create( array( 'role' => $role ) );
+		}
 	}
 
-	public static function wpTearDownAfterClass() {
-		self::delete_user( self::$admin_id );
-		self::delete_user( self::$editor_id );
-		self::delete_user( self::$contributor_id );
-		self::delete_user( self::$subscriber_id );
-		self::delete_user( self::$author_id );
+	public function tear_down() {
+		foreach ( self::$user_ids as $user_id ) {
+			wp_delete_user( $user_id );
+		}
+		parent::tear_down();
 	}
 
 	/**
-	 * Create a test post with note.
+	 * Create a test post with standard comments and block comments.
 	 *
-	 * @param int $user_id Post author's user ID.
-	 * @return int Post ID.
+	 * @return string $role The role of the user creating the post.
 	 */
-	protected function create_test_post_with_note( $role ) {
+	public function create_test_post_with_block_comment( $role ) {
 		$user_id = self::$user_ids[ $role ];
-		$post_id = self::factory()->post->create(
+		$post_id = $this->factory->post->create(
 			array(
-				'post_title'   => 'Test Post for Notes',
-				'post_content' => 'This is a test post to check note permissions.',
+				'post_title'   => 'Test Post for Block Comments',
+				'post_content' => 'This is a test post to check block comment permissions.',
 				'post_status'  => 'contributor' === $role ? 'draft' : 'publish',
 				'post_author'  => $user_id,
 			)
 		);
 
-		for ( $i = 0; $i < self::$num_notes; $i++ ) {
-			self::factory()->comment->create(
+		for ( $i = 0; $i < self::$num_comments; $i++ ) {
+			$this->factory->comment->create(
 				array(
 					'comment_post_ID'  => $post_id,
 					'comment_type'     => 'note',
@@ -80,11 +77,11 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_Controller
 		return $post_id;
 	}
 
-	public function test_cannot_read_note_without_post_type_support() {
+	public function test_cannot_read_comments_without_post_type_support() {
 		register_post_type(
-			'no-notes',
+			'no-block-comments',
 			array(
-				'label'        => 'No Notes',
+				'label'        => 'No Block Comments',
 				'supports'     => array( 'title', 'editor', 'author', 'comments' ),
 				'show_in_rest' => true,
 				'public'       => true,
@@ -95,9 +92,9 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_Controller
 		// See: https://github.com/WordPress/wordpress-develop/blob/8c2ec298ad82d32f6bd66fae5ec567d287bd6bbf/tests/phpunit/tests/rest-api/rest-comments-controller.php#L3461-L3470.
 		// create_initial_rest_routes();
 
-		wp_set_current_user( self::$admin_id );
+		wp_set_current_user( self::$user_ids['administrator'] );
 
-		$post_id = self::factory()->post->create( array( 'post_type' => 'no-notes' ) );
+		$post_id = self::factory()->post->create( array( 'post_type' => 'no-block-comments' ) );
 		$request = new WP_REST_Request( 'GET', '/wp/v2/comments' );
 		$request->set_param( 'post', $post_id );
 		$request->set_param( 'type', 'note' );
@@ -105,42 +102,39 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_Controller
 
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertErrorResponse( 'rest_comment_not_supported_post_type', $response, 403 );
-
-		_unregister_post_type( 'no-notes' );
 	}
 
-	public function test_create_note_require_login() {
+	public function test_create_block_comment_require_login() {
 		wp_set_current_user( 0 );
 
-		$post_id = self::factory()->post->create();
 		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
-		$request->set_param( 'post', $post_id );
+		$request->set_param( 'post', self::$post_id );
 		$request->set_param( 'type', 'note' );
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertErrorResponse( 'rest_comment_login_required', $response, 401 );
 	}
 
-	public function test_cannot_create_note_without_post_type_support() {
+	public function test_cannot_create_block_comment_without_post_type_support() {
 		register_post_type(
-			'no-note',
+			'no-block-comments',
 			array(
-				'label'        => 'No Notes',
+				'label'        => 'No Block Comments',
 				'supports'     => array( 'title', 'editor', 'author', 'comments' ),
 				'show_in_rest' => true,
 				'public'       => true,
 			)
 		);
 
-		wp_set_current_user( self::$admin_id );
-		$post_id = self::factory()->post->create( array( 'post_type' => 'no-note' ) );
+		wp_set_current_user( self::$user_ids['administrator'] );
+		$post_id = self::factory()->post->create( array( 'post_type' => 'no-block-comments' ) );
 		$params  = array(
 			'post'         => $post_id,
 			'author_name'  => 'Ishmael',
 			'author_email' => 'herman-melville@earthlink.net',
 			'author_url'   => 'https://en.wikipedia.org/wiki/Herman_Melville',
 			'content'      => 'Call me Ishmael.',
-			'author'       => self::$admin_id,
+			'author'       => self::$user_ids['administrator'],
 			'type'         => 'note',
 		);
 
@@ -149,13 +143,11 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_Controller
 		$request->set_body( wp_json_encode( $params ) );
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertErrorResponse( 'rest_comment_not_supported_post_type', $response, 403 );
-
-		_unregister_post_type( 'no-note' );
 	}
 
-	public function test_create_note_draft_post() {
-		wp_set_current_user( self::$editor_id );
-		$draft_id = self::factory()->post->create(
+	public function test_create_block_comment_draft_post() {
+		wp_set_current_user( self::$user_ids['editor'] );
+		$draft_id = $this->factory->post->create(
 			array(
 				'post_status' => 'draft',
 			)
@@ -166,7 +158,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_Controller
 			'author_email' => 'herman-melville@earthlink.net',
 			'author_url'   => 'https://en.wikipedia.org/wiki/Herman_Melville',
 			'content'      => 'Call me Ishmael.',
-			'author'       => self::$editor_id,
+			'author'       => self::$user_ids['editor'],
 			'type'         => 'note',
 		);
 
@@ -181,9 +173,9 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_Controller
 		$this->assertSame( 'note', $new_comment->comment_type );
 	}
 
-	public function test_create_note_status() {
-		wp_set_current_user( self::$author_id );
-		$post_id = self::factory()->post->create( array( 'post_author' => self::$author_id ) );
+	public function test_create_block_comment_status() {
+		wp_set_current_user( self::$user_ids['author'] );
+		$post_id = $this->factory->post->create( array( 'post_author' => self::$user_ids['author'] ) );
 
 		$params = array(
 			'post'         => $post_id,
@@ -191,7 +183,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_Controller
 			'author_email' => 'herman-melville@earthlink.net',
 			'author_url'   => 'https://en.wikipedia.org/wiki/Herman_Melville',
 			'content'      => 'Comic Book Guy',
-			'author'       => self::$author_id,
+			'author'       => self::$user_ids['author'],
 			'type'         => 'note',
 			'status'       => 'hold',
 		);
@@ -209,8 +201,8 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_Controller
 	}
 
 	public function test_cannot_create_with_non_valid_comment_type() {
-		wp_set_current_user( self::$admin_id );
-		$post_id = self::factory()->post->create();
+		wp_set_current_user( self::$user_ids['administrator'] );
+		$post_id = $this->factory->post->create();
 
 		$params = array(
 			'post'         => $post_id,
@@ -218,7 +210,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_Controller
 			'author_email' => 'herman-melville@earthlink.net',
 			'author_url'   => 'https://en.wikipedia.org/wiki/Herman_Melville',
 			'content'      => 'Comic Book Guy',
-			'author'       => self::$admin_id,
+			'author'       => self::$user_ids['administrator'],
 			'type'         => 'review',
 		);
 
@@ -231,8 +223,8 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_Controller
 	}
 
 	public function test_create_assigns_default_type() {
-		wp_set_current_user( self::$editor_id );
-		$post_id = self::factory()->post->create();
+		wp_set_current_user( self::$user_ids['editor'] );
+		$post_id = $this->factory->post->create();
 
 		$params = array(
 			'post'         => $post_id,
@@ -240,7 +232,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_Controller
 			'author_email' => 'herman-melville@earthlink.net',
 			'author_url'   => 'https://en.wikipedia.org/wiki/Herman_Melville',
 			'content'      => 'Comic Book Guy',
-			'author'       => self::$editor_id,
+			'author'       => self::$user_ids['editor'],
 		);
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
@@ -255,17 +247,21 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_Controller
 	}
 
 	/**
+	 * Test that empty block comments with resolution metadata are allowed.
+	 *
+	 * @param string $status The status of the block comment.
+	 *
 	 * @dataProvider data_note_status_provider
 	 */
-	public function test_create_empty_note_with_resolution_meta( $status ) {
-		wp_set_current_user( self::$editor_id );
-		$post_id = self::factory()->post->create();
+	public function test_create_empty_block_comment_with_resolution_meta( $status ) {
+		wp_set_current_user( self::$user_ids['editor'] );
+		$post_id = $this->factory->post->create();
 		$params  = array(
 			'post'         => $post_id,
 			'author_name'  => 'Editor',
 			'author_email' => 'editor@example.com',
 			'author_url'   => 'https://example.com',
-			'author'       => self::$editor_id,
+			'author'       => self::$user_ids['editor'],
 			'type'         => 'note',
 			'content'      => '',
 			'meta'         => array(
@@ -280,15 +276,18 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_Controller
 		$this->assertSame( 201, $response->get_status() );
 	}
 
-	public function test_cannot_create_empty_note_without_resolution_meta() {
-		wp_set_current_user( self::$editor_id );
-		$post_id = self::factory()->post->create();
+	/**
+	 * Test that empty block comments without resolution metadata are not allowed.
+	 */
+	public function test_cannot_create_empty_block_comment_without_resolution_meta() {
+		wp_set_current_user( self::$user_ids['editor'] );
+		$post_id = $this->factory->post->create();
 		$params  = array(
 			'post'         => $post_id,
 			'author_name'  => 'Editor',
 			'author_email' => 'editor@example.com',
 			'author_url'   => 'https://example.com',
-			'author'       => self::$editor_id,
+			'author'       => self::$user_ids['editor'],
 			'type'         => 'note',
 			'content'      => '',
 		);
@@ -299,15 +298,18 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_Controller
 		$this->assertErrorResponse( 'rest_comment_content_invalid', $response, 400 );
 	}
 
-	public function test_cannot_create_empty_note_with_invalid_resolution_meta() {
-		wp_set_current_user( self::$editor_id );
-		$post_id = self::factory()->post->create();
+	/**
+	 * Test that empty block comments with invalid resolution metadata are not allowed.
+	 */
+	public function test_cannot_create_empty_block_comment_with_invalid_resolution_meta() {
+		wp_set_current_user( self::$user_ids['editor'] );
+		$post_id = $this->factory->post->create();
 		$params  = array(
 			'post'         => $post_id,
 			'author_name'  => 'Editor',
 			'author_email' => 'editor@example.com',
 			'author_url'   => 'https://example.com',
-			'author'       => self::$editor_id,
+			'author'       => self::$user_ids['editor'],
 			'type'         => 'note',
 			'content'      => '',
 			'meta'         => array(
@@ -321,9 +323,12 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_Controller
 		$this->assertErrorResponse( 'rest_comment_content_invalid', $response, 400 );
 	}
 
-	public function test_create_duplicate_note() {
-		wp_set_current_user( self::$editor_id );
-		$post_id = self::factory()->post->create();
+	/**
+	 * Test that duplicate block comments with resolution metadata are allowed.
+	 */
+	public function test_create_duplicate_block_comment() {
+		wp_set_current_user( self::$user_ids['editor'] );
+		$post_id = $this->factory->post->create();
 
 		for ( $i = 0; $i < 2; $i++ ) {
 			$params  = array(
@@ -331,7 +336,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_Controller
 				'author_name'  => 'Editor',
 				'author_email' => 'editor@example.com',
 				'author_url'   => 'https://example.com',
-				'author'       => self::$editor_id,
+				'author'       => self::$user_ids['editor'],
 				'type'         => 'note',
 				'content'      => 'Doplicated comment',
 			);
@@ -344,11 +349,17 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_Controller
 	}
 
 	/**
-	 * @dataProvider data_note_get_items_permissions_data_provider
+	 * Test that for each user role, the permissions are correct when accessing comments.
+	 *
+	 * @param string $role The user role to test.
+	 * @param string $post_author_role The role of the post author.
+	 * @param bool $can_read The expected permission result.
+	 *
+	 * @dataProvider data_block_comment_get_items_permissions_data_provider
 	 */
-	public function test_note_get_items_permissions_edit_context( $role, $post_author_role, $can_read ) {
+	public function test_block_comment_get_items_permissions_edit_context( $role, $post_author_role, $can_read ) {
 		wp_set_current_user( self::$user_ids[ $role ] );
-		$post_id = $this->create_test_post_with_note( $post_author_role );
+		$post_id = $this->create_test_post_with_block_comment( $post_author_role );
 
 		$request = new WP_REST_Request( 'GET', '/wp/v2/comments' );
 		$request->set_param( 'post', $post_id );
@@ -360,7 +371,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_Controller
 
 		if ( $can_read ) {
 			$comments = $response->get_data();
-			$this->assertEquals( self::$num_notes, count( $comments ) );
+			$this->assertEquals( self::$num_comments, count( $comments ) );
 
 		} else {
 			$this->assertErrorResponse( 'rest_forbidden_context', $response, 403 );
@@ -369,11 +380,15 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_Controller
 		wp_delete_post( $post_id, true );
 	}
 
-	public function test_note_get_items_permissions_mixed_post_authors() {
-		$author_post_id = $this->create_test_post_with_note( 'author' );
-		$editor_post_id = $this->create_test_post_with_note( 'editor' );
+	/**
+	 * Verify that when querying block comments for multiple posts, if the user does not have
+	 * permission to read comments on all of the posts, a 403 is returned.
+	 */
+	public function test_block_comment_get_items_permissions_mixed_post_authors() {
+		$author_post_id = $this->create_test_post_with_block_comment( 'author' );
+		$editor_post_id = $this->create_test_post_with_block_comment( 'editor' );
 
-		wp_set_current_user( self::$author_id );
+		wp_set_current_user( self::$user_ids['author'] );
 
 		$request = new WP_REST_Request( 'GET', '/wp/v2/comments' );
 		$request->set_param( 'post', array( $author_post_id, $editor_post_id ) );
@@ -390,12 +405,18 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_Controller
 	}
 
 	/**
-	 * @dataProvider data_note_get_items_permissions_data_provider
+	 * Test that for each user role, the permissions are correct when accessing a comment.
+	 *
+	 * @param string $role The user role to test.
+	 * @param string $post_author_role The role of the post author.
+	 * @param bool $can_read The expected permission result.
+	 *
+	 * @dataProvider data_block_comment_get_items_permissions_data_provider
 	 */
-	public function test_note_get_item_permissions_edit_context( $role, $post_author_role, $can_read ) {
+	public function test_block_comment_get_item_permissions_edit_context( $role, $post_author_role, $can_read ) {
 		wp_set_current_user( self::$user_ids[ $role ] );
 
-		$post_id = self::factory()->post->create(
+		$post_id = $this->factory->post->create(
 			array(
 				'post_title'   => 'Test Post for Block Comments',
 				'post_content' => 'This is a test post to check block comment permissions.',
@@ -404,7 +425,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_Controller
 			)
 		);
 
-		$comment_id = self::factory()->comment->create(
+		$comment_id = $this->factory->comment->create(
 			array(
 				'comment_post_ID'  => $post_id,
 				'comment_type'     => 'note',
@@ -429,15 +450,15 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_Controller
 		wp_delete_post( $post_id, true );
 	}
 
-	public function data_note_get_items_permissions_data_provider() {
+	public function data_block_comment_get_items_permissions_data_provider() {
 		return array(
-			'Administrator can see note on other posts'  => array( 'administrator', 'author', true ),
-			'Editor can see note on other posts'         => array( 'editor', 'contributor', true ),
-			'Author cannot see note on other posts'      => array( 'author', 'editor', false ),
-			'Contributor cannot see note on other posts' => array( 'contributor', 'author', false ),
-			'Subscriber cannot see note'                 => array( 'subscriber', 'author', false ),
-			'Author can see note on own post'            => array( 'author', 'author', true ),
-			'Contributor can see note on own post'       => array( 'contributor', 'contributor', true ),
+			'Administrator can see block comments on other posts' => array( 'administrator', 'author', true ),
+			'Editor can see block comments on other posts' => array( 'editor', 'contributor', true ),
+			'Author cannot see block comments on other posts' => array( 'author', 'editor', false ),
+			'Contributor cannot see block comments on other posts' => array( 'contributor', 'author', false ),
+			'Subscriber cannot see block comments'         => array( 'subscriber', 'author', false ),
+			'Author can see block comments on own post'    => array( 'author', 'author', true ),
+			'Contributor can see block comments on own post' => array( 'contributor', 'contributor', true ),
 		);
 	}
 

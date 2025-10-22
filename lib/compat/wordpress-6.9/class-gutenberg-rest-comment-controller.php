@@ -3,15 +3,15 @@
  * A custom REST server for Gutenberg.
  *
  * @package gutenberg
- * @since   6.9.0
+ * @since   6.8.0
  */
 
 // Create a new class that extends WP_REST_Comments_Controller
-class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller {
+class Gutenberg_REST_Comment_Controller extends WP_REST_Comments_Controller {
 
 	public function get_items_permissions_check( $request ) {
-		$is_note         = 'note' === $request['type'];
-		$is_edit_context = 'edit' === $request['context'];
+		$is_note         = ! empty( $request['type'] ) && 'note' === $request['type'];
+		$is_edit_context = ! empty( $request['context'] ) && 'edit' === $request['context'];
 
 		if ( ! empty( $request['post'] ) ) {
 			foreach ( (array) $request['post'] as $post_id ) {
@@ -305,7 +305,7 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 			return $prepared_comment;
 		}
 
-		$prepared_comment['comment_type'] = $request['type'];
+		$prepared_comment['comment_type'] = empty( $request['type'] ) ? 'comment' : $request['type'];
 
 		if ( ! isset( $prepared_comment['comment_content'] ) ) {
 			$prepared_comment['comment_content'] = '';
@@ -504,11 +504,11 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 			return false;
 		}
 		foreach ( $supports['editor'] as $item ) {
-			if ( ! empty( $item['notes'] ) ) {
+			if ( is_array( $item ) && isset( $item['notes'] ) && true === $item['notes'] ) {
 				return true;
 			}
 		}
-		return false;
+		return true;
 	}
 
 	/**
@@ -577,7 +577,7 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 add_action(
 	'rest_api_init',
 	function () {
-		$controller = new Gutenberg_REST_Comment_Controller_6_9();
+		$controller = new Gutenberg_REST_Comment_Controller();
 		$controller->register_routes();
 	}
 );
