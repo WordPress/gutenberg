@@ -298,7 +298,8 @@ export function mergeCrdtBlocks(
 
 							if (
 								isRichText &&
-								'string' === typeof attributeValue
+								'string' === typeof attributeValue &&
+								currentAttributes.has( attributeName )
 							) {
 								// Rich text values are stored as persistent Y.Text instances.
 								// Update the value with a delta in place.
