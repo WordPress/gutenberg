@@ -82,7 +82,7 @@ jobs:
               with:
                   token: ${{ secrets.GUTENBERG_TOKEN }}
                   fetch-depth: 0
-                  persist-credentials: false
+                  persist-credentials: true
 
             - name: Set up Git
               if: env.cherry_pick == 'true'
