@@ -4,7 +4,7 @@
 	"name": "core/accordion-heading",
 	"title": "Accordion Heading",
 	"category": "design",
-	"description": "Displays an accordion heading.",
+	"description": "Displays a clickable heading that toggles the content panel open and closed.",
 	"parent": [ "core/accordion-item" ],
 	"usesContext": [
 		"core/accordion-icon-position",

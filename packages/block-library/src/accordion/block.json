@@ -4,7 +4,7 @@
 	"name": "core/accordion",
 	"title": "Accordion",
 	"category": "design",
-	"description": "Displays a group of accordion headings and associated expandable content.",
+	"description": "Displays a group of collapsible headings and associated expandable content.",
 	"example": {},
 	"supports": {
 		"anchor": true,

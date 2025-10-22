@@ -4,7 +4,7 @@
 	"name": "core/accordion-panel",
 	"title": "Accordion Panel",
 	"category": "design",
-	"description": "Displays an accordion panel.",
+	"description": "Displays an expandable panel that collapses when the heading is clicked.",
 	"parent": [ "core/accordion-item" ],
 	"supports": {
 		"html": false,
