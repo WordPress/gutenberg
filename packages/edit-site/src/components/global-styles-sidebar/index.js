@@ -11,7 +11,7 @@ import {
 	store as editorStore,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
-import { useViewportMatch } from '@wordpress/compose';
+import { useViewportMatch, usePrevious } from '@wordpress/compose';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
@@ -37,6 +37,7 @@ export default function GlobalStylesSidebar() {
 		hasRevisions,
 		isRevisionsOpened,
 		isRevisionsStyleBookOpened,
+		activeComplementaryArea,
 	} = useSelect(
 		( select ) => {
 			const { getActiveComplementaryArea } = select( interfaceStore );
@@ -75,6 +76,10 @@ export default function GlobalStylesSidebar() {
 					canvasContainerView,
 				isRevisionsOpened:
 					'global-styles-revisions' === canvasContainerView,
+				activeComplementaryArea:
+					select( interfaceStore ).getActiveComplementaryArea(
+						'core'
+					),
 			};
 		},
 		[ canvas ]
@@ -84,6 +89,17 @@ export default function GlobalStylesSidebar() {
 	);
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const [ globalStylesPath, setGlobalStylesPath ] = useState( '/' );
+	const previousActiveArea = usePrevious( activeComplementaryArea );
+
+	// Reset path when sidebar opens
+	useEffect( () => {
+		if (
+			activeComplementaryArea === 'edit-site/global-styles' &&
+			previousActiveArea !== 'edit-site/global-styles'
+		) {
+			setGlobalStylesPath( '/' );
+		}
+	}, [ activeComplementaryArea, previousActiveArea, setGlobalStylesPath ] );
 
 	useEffect( () => {
 		if ( shouldClearCanvasContainerView ) {
