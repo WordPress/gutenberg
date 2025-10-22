@@ -260,7 +260,7 @@ function PrimaryActions< Item >( {
 	registry,
 }: PrimaryActionsProps< Item > ) {
 	const [ activeModalAction, setActiveModalAction ] = useState( null as any );
-	const isMobileViewport = useViewportMatch( 'small', '<' );
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
 
 	if ( isMobileViewport ) {
 		return null;
