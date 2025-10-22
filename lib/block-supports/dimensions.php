@@ -44,27 +44,32 @@ function gutenberg_register_dimensions_support( $block_type ) {
  * @return array Block dimensions CSS classes and inline styles.
  */
 function gutenberg_apply_dimensions_support( $block_type, $block_attributes ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-	if ( wp_should_skip_block_supports_serialization( $block_type, 'dimensions' ) ) {
-		return array();
-	}
-
 	$attributes = array();
 
-	// Width support to be added in near future.
+	if ( wp_should_skip_block_supports_serialization( $block_type, 'dimensions' ) ) {
+		return $attributes;
+	}
 
-	$has_min_height_support = block_has_support( $block_type, array( 'dimensions', 'minHeight' ), false );
-	$block_styles           = isset( $block_attributes['style'] ) ? $block_attributes['style'] : null;
+	$block_styles = $block_attributes['style'] ?? null;
 
 	if ( ! $block_styles ) {
 		return $attributes;
 	}
 
-	$skip_min_height                      = wp_should_skip_block_supports_serialization( $block_type, 'dimensions', 'minHeight' );
-	$dimensions_block_styles              = array();
-	$dimensions_block_styles['minHeight'] = null;
-	if ( $has_min_height_support && ! $skip_min_height ) {
-		$dimensions_block_styles['minHeight'] = $block_styles['dimensions']['minHeight'] ?? null;
+	$dimensions_block_styles = array();
+	$supported_features      = array( 'minHeight', 'width' );
+
+	foreach ( $supported_features as $feature ) {
+		$has_support        = block_has_support( $block_type, array( 'dimensions', $feature ), false );
+		$skip_serialization = wp_should_skip_block_supports_serialization( $block_type, 'dimensions', $feature );
+
+		$dimensions_block_styles[ $feature ] = null;
+
+		if ( $has_support && ! $skip_serialization ) {
+			$dimensions_block_styles[ $feature ] = $block_styles['dimensions'][ $feature ] ?? null;
+		}
 	}
+
 	$styles = gutenberg_style_engine_get_styles( array( 'dimensions' => $dimensions_block_styles ) );
 
 	if ( ! empty( $styles['css'] ) ) {
@@ -84,13 +89,13 @@ function gutenberg_apply_dimensions_support( $block_type, $block_attributes ) { 
  * @return string                Filtered block content.
  */
 function gutenberg_render_dimensions_support( $block_content, $block ) {
-	$block_type             = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-	$block_attributes       = ( isset( $block['attrs'] ) && is_array( $block['attrs'] ) ) ? $block['attrs'] : array();
-	$has_dimensions_support = block_has_support( $block_type, 'dimensions', false );
+	$block_type               = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+	$block_attributes         = ( isset( $block['attrs'] ) && is_array( $block['attrs'] ) ) ? $block['attrs'] : array();
+	$has_aspect_ratio_support = block_has_support( $block_type, array( 'dimensions', 'aspectRatio' ), false );
 
 	if (
-		! $has_dimensions_support ||
-		wp_should_skip_block_supports_serialization( $block_type, 'dimensions' )
+		! $has_aspect_ratio_support ||
+		wp_should_skip_block_supports_serialization( $block_type, 'dimensions', 'aspectRatio' )
 	) {
 		return $block_content;
 	}
@@ -109,9 +114,6 @@ function gutenberg_render_dimensions_support( $block_content, $block ) {
 	) {
 		$dimensions_block_styles['aspectRatio'] = 'unset';
 	}
-
-	// Add width value.
-	$dimensions_block_styles['width'] = $block_attributes['style']['dimensions']['width'] ?? null;
 
 	$styles = gutenberg_style_engine_get_styles( array( 'dimensions' => $dimensions_block_styles ) );
 

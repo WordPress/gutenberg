@@ -215,9 +215,6 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 						'default' => 'width',
 					),
 					'path'          => array( 'dimensions', 'width' ),
-					'css_vars'      => array(
-						'spacing' => '--wp--preset--spacing--$slug',
-					),
 				),
 			),
 			'spacing'    => array(
