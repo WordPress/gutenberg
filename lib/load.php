@@ -83,7 +83,7 @@ require __DIR__ . '/compat/wordpress-6.8/site-preview.php';
 require __DIR__ . '/compat/wordpress-6.9/customizer-preview-custom-css.php';
 require __DIR__ . '/compat/wordpress-6.9/command-palette.php';
 require __DIR__ . '/compat/wordpress-6.9/preload.php';
-require __DIR__ . '/compat/wordpress-6.9/script-modules.php';
+require __DIR__ . '/compat/wordpress-6.9/client-assets.php';
 
 // WordPress 7.0 compat.
 require __DIR__ . '/compat/wordpress-7.0/php-only-blocks.php';

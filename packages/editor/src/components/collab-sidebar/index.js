@@ -117,7 +117,8 @@ export default function CollabSidebar() {
 		commentLastUpdated,
 	} = useBlockComments( postId );
 	useEnableFloatingSidebar(
-		unresolvedSortedThreads.length > 0 || showCommentBoard
+		isLargeViewport &&
+			( unresolvedSortedThreads.length > 0 || showCommentBoard )
 	);
 
 	const hasMoreComments = totalPages && totalPages > 1;
@@ -142,7 +143,10 @@ export default function CollabSidebar() {
 
 		// If the notes sidebar is not already active, enable the floating sidebar.
 		if ( ! activeNotesArea ) {
-			enableComplementaryArea( 'core', collabSidebarName );
+			enableComplementaryArea(
+				'core',
+				isLargeViewport ? collabSidebarName : collabHistorySidebarName
+			);
 		}
 
 		const currentArea = await getActiveComplementaryArea( 'core' );
