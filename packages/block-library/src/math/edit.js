@@ -82,6 +82,7 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 								label={ __( 'LaTeX math syntax' ) }
 								hideLabelFromVision
 								value={ latex }
+								style={ { fontFamily: 'monospace' } }
 								onChange={ ( newLatex ) => {
 									if ( ! latexToMathML ) {
 										setAttributes( { latex: newLatex } );
