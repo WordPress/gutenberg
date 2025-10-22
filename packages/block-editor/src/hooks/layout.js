@@ -74,13 +74,17 @@ export function useLayoutClasses( blockAttributes = {}, blockName = '' ) {
 
 	const hasGlobalPadding = useSelect(
 		( select ) => {
-			return (
-				( usedLayout?.inherit ||
-					usedLayout?.contentSize ||
-					usedLayout?.type === 'constrained' ) &&
-				select( blockEditorStore ).getSettings().__experimentalFeatures
-					?.useRootPaddingAwareAlignments
-			);
+			// Early return to avoid subscription when layout doesn't use global padding
+			if (
+				! usedLayout?.inherit &&
+				! usedLayout?.contentSize &&
+				usedLayout?.type !== 'constrained'
+			) {
+				return false;
+			}
+
+			return select( blockEditorStore ).getSettings()
+				.__experimentalFeatures?.useRootPaddingAwareAlignments;
 		},
 		[ usedLayout?.contentSize, usedLayout?.inherit, usedLayout?.type ]
 	);
