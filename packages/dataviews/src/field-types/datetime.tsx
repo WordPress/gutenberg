@@ -6,7 +6,7 @@ import type {
 	SortDirection,
 	FieldTypeDefinition,
 } from '../types';
-import renderFromElements from './utils/render-from-elements';
+import RenderFromElements from './utils/render-from-elements';
 import {
 	OPERATOR_ON,
 	OPERATOR_NOT_ON,
@@ -33,9 +33,11 @@ export default {
 	},
 	Edit: 'datetime',
 	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
-		return field.elements
-			? renderFromElements( { item, field } )
-			: field.getValue( { item } );
+		return field.hasElements ? (
+			<RenderFromElements item={ item } field={ field } />
+		) : (
+			field.getValue( { item } )
+		);
 	},
 	enableSorting: true,
 	filterBy: {

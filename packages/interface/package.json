@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/interface",
-	"version": "9.17.0",
+	"version": "9.18.0",
 	"description": "Interface module for WordPress. The package contains shared functionality across the modern JavaScript-based WordPress screens.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -30,7 +30,8 @@
 			"import": "./build-module/index.js",
 			"require": "./build/index.js"
 		},
-		"./package.json": "./package.json"
+		"./package.json": "./package.json",
+		"./build-style/": "./build-style/"
 	},
 	"react-native": "src/index",
 	"sideEffects": [

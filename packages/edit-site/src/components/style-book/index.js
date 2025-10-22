@@ -56,13 +56,10 @@ import {
 	STYLE_BOOK_COLOR_GROUPS,
 	STYLE_BOOK_PREVIEW_CATEGORIES,
 } from '../style-book/constants';
+import { useGlobalStylesOutputWithConfig } from '../../hooks/use-global-styles-output';
 
-const {
-	ExperimentalBlockEditorProvider,
-	useGlobalStyle,
-	GlobalStylesContext,
-	useGlobalStylesOutputWithConfig,
-} = unlock( blockEditorPrivateApis );
+const { ExperimentalBlockEditorProvider, useGlobalStyle, GlobalStylesContext } =
+	unlock( blockEditorPrivateApis );
 const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
 
 const { Tabs } = unlock( componentsPrivateApis );
@@ -227,19 +224,29 @@ function applyBlockVariationsToExamples( examples, variation ) {
 	if ( ! variation ) {
 		return examples;
 	}
-
-	return examples.map( ( example ) => ( {
-		...example,
-		variation,
-		blocks: {
-			...example.blocks,
-			attributes: {
-				...example.blocks.attributes,
-				style: undefined,
-				className: getVariationClassName( variation ),
-			},
-		},
-	} ) );
+	return examples.map( ( example ) => {
+		return {
+			...example,
+			variation,
+			blocks: Array.isArray( example.blocks )
+				? example.blocks.map( ( block ) => ( {
+						...block,
+						attributes: {
+							...block.attributes,
+							style: undefined,
+							className: getVariationClassName( variation ),
+						},
+				  } ) )
+				: {
+						...example.blocks,
+						attributes: {
+							...example.blocks.attributes,
+							style: undefined,
+							className: getVariationClassName( variation ),
+						},
+				  },
+		};
+	} );
 }
 
 function StyleBook( {

@@ -9,7 +9,7 @@ import {
 	type EffectCallback,
 	type Inputs,
 } from 'preact/hooks';
-import { effect } from '@preact/signals';
+import { effect, signal } from '@preact/signals';
 
 /**
  * Internal dependencies
@@ -30,7 +30,7 @@ declare global {
 	}
 }
 
-interface SyncAwareFunction extends Function {
+export interface SyncAwareFunction extends Function {
 	sync?: boolean;
 }
 
@@ -410,3 +410,78 @@ export function withSyncEvent( callback: Function ): SyncAwareFunction {
 	syncAware.sync = true;
 	return syncAware;
 }
+
+export type DeepReadonly< T > = T extends ( ...args: any[] ) => any
+	? T
+	: T extends object
+	? { readonly [ K in keyof T ]: DeepReadonly< T[ K ] > }
+	: T;
+
+// WeakMap cache to reuse proxies for the same read-only objects.
+const readOnlyMap = new WeakMap< object, object >();
+
+/**
+ * Creates a proxy handler that prevents any modifications to the target object.
+ *
+ * @param errorMessage Custom error message to display when modification is attempted.
+ * @return Proxy handler for read-only behavior.
+ */
+const createDeepReadOnlyHandlers = (
+	errorMessage: string
+): ProxyHandler< object > => {
+	const handleError = () => {
+		if ( globalThis.SCRIPT_DEBUG ) {
+			warn( errorMessage );
+		}
+		return false;
+	};
+
+	return {
+		get( target, prop ) {
+			const value = target[ prop ];
+			if ( value && typeof value === 'object' ) {
+				return deepReadOnly( value, { errorMessage } );
+			}
+			return value;
+		},
+		set: handleError,
+		deleteProperty: handleError,
+		defineProperty: handleError,
+	};
+};
+
+/**
+ * Creates a deeply read-only proxy of an object.
+ *
+ * This function recursively wraps an object and all its nested objects in
+ * proxies that prevent any modifications. All mutation operations (`set`,
+ * `deleteProperty`, and `defineProperty`) will silently fail in production and
+ * emit warnings in development (when `globalThis.SCRIPT_DEBUG` is true).
+ *
+ * The wrapping is lazy: nested objects are only wrapped when accessed, making
+ * this efficient for large or deeply nested structures.
+ *
+ * Proxies are cached using a WeakMap, so calling this function multiple times
+ * with the same object will return the same proxy instance.
+ *
+ * @param obj                  The object to make read-only.
+ * @param options              Optional configuration.
+ * @param options.errorMessage Custom error message to display when modification is attempted.
+ * @return A read-only proxy of the object.
+ */
+export function deepReadOnly< T extends object >(
+	obj: T,
+	options?: { errorMessage?: string }
+): T {
+	const errorMessage =
+		options?.errorMessage ?? 'Cannot modify read-only object';
+
+	if ( ! readOnlyMap.has( obj ) ) {
+		const handlers = createDeepReadOnlyHandlers( errorMessage );
+		readOnlyMap.set( obj, new Proxy( obj, handlers ) );
+	}
+
+	return readOnlyMap.get( obj ) as T;
+}
+
+export const navigationSignal = signal( 0 );

@@ -169,13 +169,12 @@ function ActionTrigger< Item >( {
 		<Button
 			disabled={ isBusy }
 			accessibleWhenDisabled
-			label={ label }
-			icon={ action.icon }
 			size="compact"
 			onClick={ onClick }
 			isBusy={ isBusy }
-			tooltipPosition="top"
-		/>
+		>
+			{ label }
+		</Button>
 	);
 }
 
@@ -335,7 +334,6 @@ function FooterContent< Item >( {
 			actions.filter( ( action ) => {
 				return (
 					action.supportsBulk &&
-					action.icon &&
 					selectedItems.some(
 						( item ) =>
 							! action.isEligible || action.isEligible( item )

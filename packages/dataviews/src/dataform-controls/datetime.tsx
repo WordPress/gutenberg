@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import deepMerge from 'deepmerge';
-import { format, isValid } from 'date-fns';
+import { format, isValid as isValidDate } from 'date-fns';
 
 /**
  * WordPress dependencies
@@ -21,10 +20,8 @@ import { getDate, getSettings } from '@wordpress/date';
  */
 import type { DataFormControlProps } from '../types';
 import { OPERATOR_IN_THE_PAST, OPERATOR_OVER } from '../constants';
-import RelativeDateControl, {
-	TIME_UNITS_OPTIONS,
-	type DateRelative,
-} from './relative-date-control';
+import RelativeDateControl from './utils/relative-date-control';
+import getCustomValidity from './utils/get-custom-validity';
 import { unlock } from '../lock-unlock';
 
 const { DateCalendar, ValidatedInputControl } = unlock( componentsPrivateApis );
@@ -34,7 +31,7 @@ const parseDateTime = ( dateTimeString?: string ): Date | null => {
 		return null;
 	}
 	const parsed = getDate( dateTimeString );
-	return parsed && isValid( parsed ) ? parsed : null;
+	return parsed && isValidDate( parsed ) ? parsed : null;
 };
 
 const formatDateTime = ( date?: Date | string ): string => {
@@ -53,8 +50,9 @@ function CalendarDateTimeControl< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	validity,
 }: DataFormControlProps< Item > ) {
-	const { id, label, description, setValue, getValue } = field;
+	const { id, label, description, setValue, getValue, isValid } = field;
 	const fieldValue = getValue( { item: data } );
 	const value = typeof fieldValue === 'string' ? fieldValue : undefined;
 
@@ -62,13 +60,6 @@ function CalendarDateTimeControl< Item >( {
 		const parsedDate = parseDateTime( value );
 		return parsedDate || new Date(); // Default to current month
 	} );
-
-	const [ customValidity, setCustomValidity ] =
-		useState<
-			React.ComponentProps<
-				typeof ValidatedInputControl
-			>[ 'customValidity' ]
-		>( undefined );
 
 	const inputControlRef = useRef< HTMLInputElement >( null );
 	const validationTimeoutRef = useRef< ReturnType< typeof setTimeout > >();
@@ -88,32 +79,6 @@ function CalendarDateTimeControl< Item >( {
 			}
 		};
 	}, [] );
-
-	const onValidateControl = useCallback(
-		( newValue: any ) => {
-			const message = field.isValid?.custom?.(
-				deepMerge(
-					data,
-					setValue( {
-						item: data,
-						value: newValue,
-					} ) as Partial< Item >
-				),
-				field
-			);
-
-			if ( message ) {
-				setCustomValidity( {
-					type: 'invalid',
-					message,
-				} );
-				return;
-			}
-
-			setCustomValidity( undefined );
-		},
-		[ data, field, setValue ]
-	);
 
 	const onSelectDate = useCallback(
 		( newDate: Date | undefined | null ) => {
@@ -136,7 +101,6 @@ function CalendarDateTimeControl< Item >( {
 
 				dateTimeValue = finalDateTime.toISOString();
 				onChangeCallback( dateTimeValue );
-				onValidateControl( dateTimeValue );
 
 				// Clear any existing timeout
 				if ( validationTimeoutRef.current ) {
@@ -144,7 +108,6 @@ function CalendarDateTimeControl< Item >( {
 				}
 			} else {
 				onChangeCallback( undefined );
-				onValidateControl( undefined );
 			}
 			// Save the currently focused element
 			previousFocusRef.current =
@@ -158,7 +121,6 @@ function CalendarDateTimeControl< Item >( {
 					inputControlRef.current.focus();
 					inputControlRef.current.blur();
 					onChangeCallback( dateTimeValue );
-					onValidateControl( dateTimeValue );
 
 					// Restore focus to the previously focused element
 					if (
@@ -170,7 +132,7 @@ function CalendarDateTimeControl< Item >( {
 				}
 			}, 0 );
 		},
-		[ onChangeCallback, value, onValidateControl ]
+		[ onChangeCallback, value ]
 	);
 
 	const handleManualDateTimeChange = useCallback(
@@ -198,7 +160,7 @@ function CalendarDateTimeControl< Item >( {
 	} = getSettings();
 
 	const displayLabel =
-		field.isValid?.required && ! hideLabelFromVision
+		isValid?.required && ! hideLabelFromVision
 			? `${ label } (${ __( 'Required' ) })`
 			: label;
 
@@ -227,9 +189,8 @@ function CalendarDateTimeControl< Item >( {
 				<ValidatedInputControl
 					ref={ inputControlRef }
 					__next40pxDefaultSize
-					required={ !! field.isValid?.required }
-					onValidate={ onValidateControl }
-					customValidity={ customValidity }
+					required={ !! isValid?.required }
+					customValidity={ getCustomValidity( isValid, validity ) }
 					type="datetime-local"
 					label={ __( 'Date time' ) }
 					hideLabelFromVision
@@ -253,26 +214,17 @@ export default function DateTime< Item >( {
 	onChange,
 	hideLabelFromVision,
 	operator,
+	validity,
 }: DataFormControlProps< Item > ) {
-	const { id, label, getValue, setValue } = field;
-	const value = getValue( { item: data } );
-
-	const onChangeRelativeDateControl = useCallback(
-		( newValue: DateRelative ) =>
-			onChange( setValue( { item: data, value: newValue } ) ),
-		[ data, onChange, setValue ]
-	);
-
 	if ( operator === OPERATOR_IN_THE_PAST || operator === OPERATOR_OVER ) {
 		return (
 			<RelativeDateControl
 				className="dataviews-controls__datetime"
-				id={ id }
-				value={ value && typeof value === 'object' ? value : {} }
-				onChange={ onChangeRelativeDateControl }
-				label={ label }
+				data={ data }
+				field={ field }
+				onChange={ onChange }
 				hideLabelFromVision={ hideLabelFromVision }
-				options={ TIME_UNITS_OPTIONS[ operator ] }
+				operator={ operator }
 			/>
 		);
 	}
@@ -283,6 +235,7 @@ export default function DateTime< Item >( {
 			field={ field }
 			onChange={ onChange }
 			hideLabelFromVision={ hideLabelFromVision }
+			validity={ validity }
 		/>
 	);
 }

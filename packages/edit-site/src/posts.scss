@@ -1,14 +1,17 @@
-@import "@wordpress/admin-ui/build-style/style.css";
-@import "@wordpress/dataviews/build-style/style.css";
-@import "./components/layout/style.scss";
-@import "./components/save-hub/style.scss";
-@import "./components/save-panel/style.scss";
-@import "./components/sidebar/style.scss";
-@import "./components/site-hub/style.scss";
-@import "./components/site-icon/style.scss";
-@import "./components/editor-canvas-container/style.scss";
-@import "./components/post-list/style.scss";
-@import "./components/resizable-frame/style.scss";
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/default-custom-properties";
+
+@use "@wordpress/admin-ui/build-style/style.css" as admin-ui;
+@use "@wordpress/dataviews/build-style/style.css" as dataviews;
+@use "./components/layout/style.scss" as *;
+@use "./components/save-hub/style.scss" as *;
+@use "./components/save-panel/style.scss" as *;
+@use "./components/sidebar/style.scss" as *;
+@use "./components/site-hub/style.scss" as *;
+@use "./components/site-icon/style.scss" as *;
+@use "./components/editor-canvas-container/style.scss" as *;
+@use "./components/post-list/style.scss" as *;
+@use "./components/resizable-frame/style.scss" as *;
 
 @include wordpress-admin-schemes();
 

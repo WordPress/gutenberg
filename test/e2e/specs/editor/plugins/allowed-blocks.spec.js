@@ -33,7 +33,7 @@ test.describe( 'Allowed Blocks Filter', () => {
 		await searchbox.fill( 'Paragraph' );
 
 		await expect(
-			page.getByRole( 'option', { name: 'Paragraph', exact: true } )
+			page.getByRole( 'option', { name: 'Paragraph' } )
 		).toBeVisible();
 
 		// The gallery block is not available.

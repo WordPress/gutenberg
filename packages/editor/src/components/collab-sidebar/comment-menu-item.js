@@ -26,7 +26,7 @@ const AddCommentMenuItem = ( { onClick } ) => {
 					} }
 					aria-haspopup="dialog"
 				>
-					{ __( 'Note' ) }
+					{ __( 'Add note' ) }
 				</MenuItem>
 			) }
 		</CommentIconSlotFill.Fill>

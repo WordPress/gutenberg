@@ -36,7 +36,9 @@ import { collabSidebarName } from './constants';
 import { unlock } from '../../lock-unlock';
 import { noop } from './utils';
 
-const { useBlockElementRef } = unlock( blockEditorPrivateApis );
+const { useBlockElementRef, cleanEmptyObject } = unlock(
+	blockEditorPrivateApis
+);
 
 export function useBlockComments( postId ) {
 	const [ commentLastUpdated, reflowComments ] = useReducer(
@@ -69,8 +71,7 @@ export function useBlockComments( postId ) {
 	// Process comments to build the tree structure.
 	const { resultComments, unresolvedSortedThreads } = useMemo( () => {
 		const blocksWithComments = clientIds.reduce( ( results, clientId ) => {
-			const commentId =
-				getBlockAttributes( clientId )?.metadata?.commentId;
+			const commentId = getBlockAttributes( clientId )?.metadata?.noteId;
 			if ( commentId ) {
 				results[ clientId ] = commentId;
 			}
@@ -120,6 +121,11 @@ export function useBlockComments( postId ) {
 			updatedResult.map( ( thread ) => [ String( thread.id ), thread ] )
 		);
 
+		// Prepare sets to determine which threads are linked to existing blocks.
+		const mappedIds = new Set(
+			Object.values( blocksWithComments ).map( ( id ) => String( id ) )
+		);
+
 		// Get comments by block order, first unresolved, then resolved.
 		const unresolvedSortedComments = Object.values( blocksWithComments )
 			.map( ( commentId ) => threadIdMap.get( String( commentId ) ) )
@@ -134,10 +140,15 @@ export function useBlockComments( postId ) {
 					thread !== undefined && thread.status === 'approved'
 			);
 
-		// Combine unresolved comments in block order with resolved comments at the end.
+		// Append orphaned notes (whose related block was deleted or missing).
+		const orphanedComments = updatedResult.filter(
+			( thread ) => ! mappedIds.has( String( thread.id ) )
+		);
+
 		const allSortedComments = [
 			...unresolvedSortedComments,
 			...resolvedSortedComments,
+			...orphanedComments,
 		];
 
 		return {
@@ -196,16 +207,14 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 				updateBlockAttributes( clientId, {
 					metadata: {
 						...metadata,
-						commentId: savedRecord.id,
+						noteId: savedRecord.id,
 					},
 				} );
 			}
 
 			createNotice(
 				'snackbar',
-				parent
-					? __( 'Reply added successfully.' )
-					: __( 'Note added successfully.' ),
+				parent ? __( 'Reply added.' ) : __( 'Note added.' ),
 				{
 					type: 'snackbar',
 					isDismissible: true,
@@ -302,14 +311,14 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 				const clientId = getSelectedBlockClientId();
 				const metadata = getBlockAttributes( clientId )?.metadata;
 				updateBlockAttributes( clientId, {
-					metadata: {
+					metadata: cleanEmptyObject( {
 						...metadata,
-						commentId: undefined,
-					},
+						noteId: undefined,
+					} ),
 				} );
 			}
 
-			createNotice( 'snackbar', __( 'Note deleted successfully.' ), {
+			createNotice( 'snackbar', __( 'Note deleted.' ), {
 				type: 'snackbar',
 				isDismissible: true,
 			} );
@@ -330,17 +339,24 @@ export function useEnableFloatingSidebar( enabled = false ) {
 			return;
 		}
 
-		return registry.subscribe( () => {
-			const activeSidebar = registry
-				.select( interfaceStore )
-				.getActiveComplementaryArea( 'core' );
+		const { getActiveComplementaryArea } =
+			registry.select( interfaceStore );
+		const { disableComplementaryArea, enableComplementaryArea } =
+			registry.dispatch( interfaceStore );
 
-			if ( ! activeSidebar ) {
-				registry
-					.dispatch( interfaceStore )
-					.enableComplementaryArea( 'core', collabSidebarName );
+		const unsubscribe = registry.subscribe( () => {
+			// Return `null` to indicate the user hid the complementary area.
+			if ( getActiveComplementaryArea( 'core' ) === null ) {
+				enableComplementaryArea( 'core', collabSidebarName );
 			}
 		} );
+
+		return () => {
+			unsubscribe();
+			if ( getActiveComplementaryArea( 'core' ) === collabSidebarName ) {
+				disableComplementaryArea( 'core', collabSidebarName );
+			}
+		};
 	}, [ enabled, registry ] );
 }
 

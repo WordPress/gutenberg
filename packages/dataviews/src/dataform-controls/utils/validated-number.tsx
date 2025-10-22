@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import deepMerge from 'deepmerge';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -12,7 +7,7 @@ import {
 	__experimentalNumberControl as NumberControl,
 	privateApis,
 } from '@wordpress/components';
-import { useCallback, useState } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -21,6 +16,7 @@ import { __ } from '@wordpress/i18n';
 import { OPERATOR_BETWEEN } from '../../constants';
 import type { DataFormControlProps } from '../../types';
 import { unlock } from '../../lock-unlock';
+import getCustomValidity from './get-custom-validity';
 
 const { ValidatedNumberControl } = unlock( privateApis );
 
@@ -103,16 +99,11 @@ export default function ValidatedNumber< Item >( {
 	hideLabelFromVision,
 	operator,
 	decimals,
+	validity,
 }: DataFormValidatedNumberControlProps< Item > ) {
 	const step = Math.pow( 10, Math.abs( decimals ) * -1 );
-	const { label, description, getValue, setValue } = field;
+	const { label, description, getValue, setValue, isValid } = field;
 	const value = getValue( { item: data } ) ?? '';
-	const [ customValidity, setCustomValidity ] =
-		useState<
-			React.ComponentProps<
-				typeof ValidatedNumberControl
-			>[ 'customValidity' ]
-		>( undefined );
 
 	const onChangeControl = useCallback(
 		( newValue: string | undefined ) => {
@@ -143,34 +134,6 @@ export default function ValidatedNumber< Item >( {
 		[ data, onChange, setValue ]
 	);
 
-	const onValidateControl = useCallback(
-		( newValue: any ) => {
-			const message = field.isValid?.custom?.(
-				deepMerge(
-					data,
-					setValue( {
-						item: data,
-						value: [ undefined, '', null ].includes( newValue )
-							? undefined
-							: Number( newValue ),
-					} ) as Partial< Item >
-				),
-				field
-			);
-
-			if ( message ) {
-				setCustomValidity( {
-					type: 'invalid',
-					message,
-				} );
-				return;
-			}
-
-			setCustomValidity( undefined );
-		},
-		[ data, field, setValue ]
-	);
-
 	if ( operator === OPERATOR_BETWEEN ) {
 		let valueBetween: NumberBetween = [ '', '' ];
 		if (
@@ -194,9 +157,8 @@ export default function ValidatedNumber< Item >( {
 
 	return (
 		<ValidatedNumberControl
-			required={ !! field.isValid?.required }
-			onValidate={ onValidateControl }
-			customValidity={ customValidity }
+			required={ !! isValid?.required }
+			customValidity={ getCustomValidity( isValid, validity ) }
 			label={ label }
 			help={ description }
 			value={ value }
