@@ -4,11 +4,6 @@
 import clsx from 'clsx';
 
 /**
- * Internal dependencies
- */
-import { useCurrentTerm } from './use-current-term';
-
-/**
  * WordPress dependencies
  */
 import { ToolbarGroup } from '@wordpress/components';
@@ -87,16 +82,12 @@ export default function TermTemplateEdit( {
 			showNested = false,
 			perPage,
 			include,
-			inherit = false,
 		} = {},
 	},
 	__unstableLayoutClassNames,
 } ) {
 	const { type: layoutType, columnCount = 3 } = layout || {};
 	const [ activeBlockContextId, setActiveBlockContextId ] = useState();
-
-	// Extract current term from template slug when inheriting.
-	const currentTerm = useCurrentTerm( inherit );
 
 	const queryArgs = {
 		hide_empty: hideEmpty,
@@ -108,24 +99,9 @@ export default function TermTemplateEdit( {
 		per_page: perPage || -1,
 	};
 
-	// Handle inherit logic.
-	if ( inherit && currentTerm ) {
-		// When inheriting, use the current term's taxonomy.
-		queryArgs.taxonomy = currentTerm.taxonomy;
-
-		// For hierarchical taxonomies, show children of the current term.
-		// If showNested is true, use child_of to include nested terms.
-		// Otherwise, use parent to show only direct children.
-		if ( showNested ) {
-			// For nested terms, we need to fetch all terms and filter client-side
-			// since the REST API doesn't support child_of like WP_Term_Query does.
-			// Don't set parent - we'll filter the results after fetching.
-		} else {
-			queryArgs.parent = currentTerm.id;
-		}
-	} else if ( ! showNested && ! include?.length ) {
-		// Nested terms are returned by default from REST API as long as parent is not set.
-		// Set parent to 0 to show only top-level terms.
+	// Nested terms are returned by default from REST API as long as parent is not set.
+	// If we want to show nested terms, we must not set parent at all.
+	if ( ! showNested && ! include?.length ) {
 		queryArgs.parent = 0;
 	}
 
@@ -136,45 +112,11 @@ export default function TermTemplateEdit( {
 		queryArgs.order = 'asc';
 	}
 
-	// Use the taxonomy from queryArgs if it was set (for inherit), otherwise use the context taxonomy.
-	const currentTaxonomy = queryArgs.taxonomy || taxonomy;
-
-	const { records: allTerms } = useEntityRecords(
+	const { records: terms } = useEntityRecords(
 		'taxonomy',
-		currentTaxonomy,
+		taxonomy,
 		queryArgs
 	);
-
-	// Filter terms for nested functionality.
-	const terms = useMemo( () => {
-		if ( ! allTerms || ! inherit || ! currentTerm ) {
-			return allTerms;
-		}
-
-		if ( showNested ) {
-			// For nested terms, filter to show all descendants of the current term.
-			const isDescendant = ( term ) => {
-				// Check if this term is a descendant of the current term.
-				const findParent = ( termId ) => {
-					const foundTerm = allTerms.find( ( t ) => t.id === termId );
-					return foundTerm ? foundTerm.parent : 0;
-				};
-
-				let currentParent = term.parent;
-				while ( currentParent !== 0 ) {
-					if ( currentParent === currentTerm.id ) {
-						return true;
-					}
-					currentParent = findParent( currentParent );
-				}
-				return false;
-			};
-
-			return allTerms.filter( isDescendant );
-		}
-
-		return allTerms;
-	}, [ allTerms, inherit, currentTerm, showNested ] );
 
 	const blocks = useSelect(
 		( select ) => select( blockEditorStore ).getBlocks( clientId ),
@@ -186,12 +128,12 @@ export default function TermTemplateEdit( {
 	const blockContexts = useMemo(
 		() =>
 			terms?.map( ( term ) => ( {
-				taxonomy: currentTaxonomy,
+				taxonomy,
 				termId: term.id,
 				classList: `term-${ term.id }`,
 				termData: term,
 			} ) ),
-		[ terms, currentTaxonomy ]
+		[ terms, taxonomy ]
 	);
 
 	if ( ! terms ) {
