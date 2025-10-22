@@ -799,11 +799,11 @@ async function generateModuleRegistrationPhp( modules ) {
 	// Read templates
 	const templatesDir = path.join( __dirname, 'templates' );
 	const registryTemplate = await readFile(
-		path.join( templatesDir, 'module-registry.php' ),
+		path.join( templatesDir, 'module-registry.php.template' ),
 		'utf8'
 	);
 	const registrationTemplate = await readFile(
-		path.join( templatesDir, 'module-registration.php' ),
+		path.join( templatesDir, 'module-registration.php.template' ),
 		'utf8'
 	);
 
