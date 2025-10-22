@@ -3,10 +3,16 @@
 	"apiVersion": 3,
 	"name": "core/breadcrumbs",
 	"title": "Breadcrumbs",
+	"__experimental": true,
 	"category": "theme",
-	"description": "Display a breadcrumb trail only for Pages, or for hierarchical post types. The block is useful to insert in the Pages template.",
+	"description": "Display a breadcrumb trail for hierarchical post types or based on taxonomy terms.",
 	"textdomain": "default",
 	"attributes": {
+		"type": {
+			"type": "string",
+			"default": "auto",
+			"enum": [ "auto", "postWithTerms", "postWithAncestors" ]
+		},
 		"separator": {
 			"type": "string",
 			"default": "/"
@@ -16,7 +22,7 @@
 			"default": true
 		}
 	},
-	"usesContext": [ "postId", "postType" ],
+	"usesContext": [ "postId", "postType", "templateSlug" ],
 	"supports": {
 		"html": false,
 		"spacing": {

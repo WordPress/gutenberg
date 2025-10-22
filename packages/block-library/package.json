@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-library",
-	"version": "9.33.1-next.b8c8708f3.0",
+	"version": "9.33.1",
 	"description": "Block library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -51,6 +51,30 @@
 		"src/*/editor.scss",
 		"src/*/theme.scss"
 	],
+	"wpCopyFiles": {
+		"files": [
+			"src/**/*.php",
+			"src/*/block.json"
+		],
+		"transforms": {
+			"php": {
+				"functionPrefix": "gutenberg_",
+				"classSuffix": "_Gutenberg",
+				"prefixFunctions": [
+					"wp_apply_colors_support",
+					"wp_enqueue_block_support_styles",
+					"wp_get_typography_font_size_value",
+					"wp_style_engine_get_styles",
+					"wp_get_global_settings"
+				],
+				"suffixClasses": [
+					"WP_Navigation_Block_Renderer"
+				],
+				"addActionPriority": 20,
+				"flattenIndexFiles": true
+			}
+		}
+	},
 	"sideEffects": [
 		"build-style/**",
 		"src/**/*.scss",
@@ -81,6 +105,7 @@
 		"@wordpress/interactivity-router": "file:../interactivity-router",
 		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
 		"@wordpress/keycodes": "file:../keycodes",
+		"@wordpress/latex-to-mathml": "file:../latex-to-mathml",
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/patterns": "file:../patterns",
 		"@wordpress/primitives": "file:../primitives",

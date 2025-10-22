@@ -64,6 +64,39 @@ test.describe( 'calling saveEntityRecord with a theme template ID', () => {
 		} );
 	} );
 
+	test( 'should work as expected for different theme by calling the API directly', async ( {
+		admin,
+		page,
+	} ) => {
+		await admin.visitSiteEditor();
+		const template = await page.evaluate( async () => {
+			return await window.wp.apiFetch( {
+				path: '/wp/v2/templates',
+				method: 'POST',
+				data: {
+					slug: 'test',
+					title: 'for different theme',
+					content: 'test',
+					theme: 'twentytwentyone',
+				},
+			} );
+		} );
+		expect( template.content.raw ).toEqual( 'test' );
+		expect( template.theme ).toEqual( 'twentytwentyone' );
+		await admin.visitSiteEditor( {
+			postType: 'wp_template',
+			activeView: 'user',
+		} );
+		await expect(
+			page.getByRole( 'button', { name: 'for different theme' } ).first()
+		).toBeVisible();
+		await page.evaluate( async ( _id ) => {
+			return await window.wp.data
+				.dispatch( 'core' )
+				.deleteEntityRecord( 'postType', 'wp_template', _id );
+		}, template.wp_id );
+	} );
+
 	test( 'getEntityRecord should work as expected', async ( {
 		admin,
 		page,

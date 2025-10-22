@@ -512,7 +512,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			.click();
 		await page
 			.getByRole( 'listbox', { name: 'Text' } )
-			.getByRole( 'option', { name: 'Heading', exact: true } )
+			.getByRole( 'option', { name: 'Heading' } )
 			.hover();
 
 		await expect( insertingBlocksUtils.indicator ).toBeVisible();
@@ -553,7 +553,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		await page.getByRole( 'button', { name: 'Browse All' } ).click();
 		await page
 			.getByRole( 'listbox', { name: 'Text' } )
-			.getByRole( 'option', { name: 'Paragraph', exact: true } )
+			.getByRole( 'option', { name: 'Paragraph' } )
 			.click();
 		await editor.canvas
 			.getByRole( 'document', { name: 'Empty block' } )
@@ -655,7 +655,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			.click();
 		await page
 			.getByRole( 'listbox', { name: 'Text' } )
-			.getByRole( 'option', { name: 'Paragraph', exact: true } )
+			.getByRole( 'option', { name: 'Paragraph' } )
 			.hover();
 
 		await expect(

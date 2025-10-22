@@ -3,15 +3,12 @@
  */
 import { useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
-import { unlock } from '../../lock-unlock';
-
-const { useGlobalStylesOutput } = unlock( blockEditorPrivateApis );
+import { useGlobalStylesOutput } from '../../hooks/use-global-styles-output';
 
 function useGlobalStylesRenderer( disableRootPadding ) {
 	const [ styles, settings ] = useGlobalStylesOutput( disableRootPadding );

@@ -3,7 +3,7 @@
  */
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
-import { useEffect, useCallback } from '@wordpress/element';
+import { useEffect, useCallback, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
@@ -62,17 +62,27 @@ function useFitText( { fitText, name, clientId } ) {
 	const hasFitTextSupport = hasBlockSupport( name, FIT_TEXT_SUPPORT_KEY );
 	const blockElement = useBlockElement( clientId );
 
-	// Monitor block attribute changes
+	// Monitor block attribute changes and selection state
 	// Any attribute may change the available space.
-	const blockAttributes = useSelect(
+	const { blockAttributes, isSelected } = useSelect(
 		( select ) => {
 			if ( ! clientId ) {
-				return;
+				return { blockAttributes: undefined, isSelected: false };
 			}
-			return select( blockEditorStore ).getBlockAttributes( clientId );
+			return {
+				blockAttributes:
+					select( blockEditorStore ).getBlockAttributes( clientId ),
+				isSelected:
+					select( blockEditorStore ).isBlockSelected( clientId ),
+			};
 		},
 		[ clientId ]
 	);
+
+	const isSelectedRef = useRef();
+	useEffect( () => {
+		isSelectedRef.current = isSelected;
+	}, [ isSelected ] );
 
 	const applyFitText = useCallback( () => {
 		if ( ! blockElement || ! hasFitTextSupport || ! fitText ) {
@@ -94,8 +104,13 @@ function useFitText( { fitText, name, clientId } ) {
 			styleElement.textContent = css;
 		};
 
-		optimizeFitText( blockElement, blockSelector, applyStylesFn );
-	}, [ blockElement, clientId, hasFitTextSupport, fitText ] );
+		// Avoid very jarring resizes when a user is actively editing the
+		// block. Placing a ceiling on how much the block can grow curbs the
+		// effect of the first few keypresses.
+		const maxSize = isSelectedRef.current ? 200 : undefined;
+
+		optimizeFitText( blockElement, blockSelector, applyStylesFn, maxSize );
+	}, [ blockElement, clientId, hasFitTextSupport, fitText, isSelectedRef ] );
 
 	useEffect( () => {
 		if (
@@ -138,17 +153,18 @@ function useFitText( { fitText, name, clientId } ) {
 	// Trigger fit text recalculation when content changes
 	useEffect( () => {
 		if ( fitText && blockElement && hasFitTextSupport ) {
-			// Small delay to ensure DOM has updated after content changes
-			const timer = setTimeout( () => {
+			// Wait for next frame to ensure DOM has updated after content changes
+			const frameId = window.requestAnimationFrame( () => {
 				if ( blockElement ) {
 					applyFitText();
 				}
-			}, 1000 );
+			} );
 
-			return () => clearTimeout( timer );
+			return () => window.cancelAnimationFrame( frameId );
 		}
 	}, [
 		blockAttributes,
+		isSelected,
 		fitText,
 		applyFitText,
 		blockElement,

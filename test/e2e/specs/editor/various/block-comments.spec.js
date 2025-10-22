@@ -10,8 +10,9 @@ test.use( {
 } );
 
 test.describe( 'Block Comments', () => {
-	test.beforeEach( async ( { admin } ) => {
+	test.beforeEach( async ( { admin, blockCommentUtils } ) => {
 		await admin.createNewPost();
+		await blockCommentUtils.openBlockCommentSidebar();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -31,12 +32,36 @@ test.describe( 'Block Comments', () => {
 		await expect( topBarButton ).toBeVisible();
 	} );
 
+	test( 'should move focus to add a new note form', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Testing block comments' },
+		} );
+		const form = page.getByRole( 'textbox', {
+			name: 'New Note',
+			exact: true,
+		} );
+
+		await editor.clickBlockOptionsMenuItem( 'Add note' );
+		await expect( form ).toBeFocused();
+		// Close the pinned notes sidebar.
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Notes', exact: true } )
+			.click();
+		await editor.clickBlockOptionsMenuItem( 'Add note' );
+		await expect( form ).toBeFocused();
+	} );
+
 	test( 'can add a comment to a block', async ( { editor, page } ) => {
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'Testing block comments' },
 		} );
-		await editor.clickBlockOptionsMenuItem( 'Note' );
+		await editor.clickBlockOptionsMenuItem( 'Add note' );
 		await page
 			.getByRole( 'textbox', {
 				name: 'New Note',
@@ -45,7 +70,7 @@ test.describe( 'Block Comments', () => {
 			.fill( 'A test comment' );
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Note', exact: true } )
+			.getByRole( 'button', { name: 'Add note', exact: true } )
 			.click();
 		const thread = page
 			.getByRole( 'region', { name: 'Editor settings' } )
@@ -81,7 +106,7 @@ test.describe( 'Block Comments', () => {
 		await expect(
 			page
 				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Reply added successfully.' } )
+				.filter( { hasText: 'Reply added.' } )
 		).toBeVisible();
 	} );
 
@@ -132,7 +157,7 @@ test.describe( 'Block Comments', () => {
 		await expect(
 			page
 				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Note deleted successfully.' } )
+				.filter( { hasText: 'Note deleted.' } )
 		).toBeVisible();
 	} );
 
@@ -393,11 +418,11 @@ test.describe( 'Block Comments', () => {
 			await replyForm.fill( 'Second reply' );
 			await replyButton.click();
 
-			// Check that two replies were added successfully.
+			// Check that two replies were added.
 			await expect(
 				page
 					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Reply added successfully.' } )
+					.filter( { hasText: 'Reply added.' } )
 			).toHaveCount( 2 );
 
 			// Click on the title field to deselect the block and the comment.
@@ -642,7 +667,7 @@ class BlockCommentUtils {
 					name: type,
 					attributes,
 				} );
-				await this.#editor.clickBlockOptionsMenuItem( 'Note' );
+				await this.#editor.clickBlockOptionsMenuItem( 'Add note' );
 				await this.#page
 					.getByRole( 'textbox', {
 						name: 'New Note',
@@ -651,11 +676,11 @@ class BlockCommentUtils {
 					.fill( comment );
 				await this.#page
 					.getByRole( 'region', { name: 'Editor settings' } )
-					.getByRole( 'button', { name: 'Note', exact: true } )
+					.getByRole( 'button', { name: 'Add note', exact: true } )
 					.click();
 				await this.#page
 					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Note added successfully.' } )
+					.filter( { hasText: 'Note added.' } )
 					.click();
 			},
 			{ box: true }

@@ -7,5 +7,8 @@
 
 export { Controls } from './controls';
 export { updateAttributes } from './update-attributes';
-export { useEntityBinding } from './use-entity-binding';
+export {
+	useEntityBinding,
+	buildNavigationLinkEntityBinding,
+} from './use-entity-binding';
 export { LinkUI } from '../link-ui';

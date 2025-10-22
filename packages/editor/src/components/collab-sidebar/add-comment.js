@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import {
 	__experimentalHStack as HStack,
@@ -11,7 +11,6 @@ import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -29,28 +28,17 @@ export function AddComment( {
 	setShowCommentBoard,
 	commentSidebarRef,
 } ) {
-	const { clientId, blockCommentId, isEmptyDefaultBlock } = useSelect(
-		( select ) => {
-			const { getSelectedBlock } = select( blockEditorStore );
-			const selectedBlock = getSelectedBlock();
-			return {
-				clientId: selectedBlock?.clientId,
-				blockCommentId: selectedBlock?.attributes?.metadata?.commentId,
-				isEmptyDefaultBlock: selectedBlock
-					? isUnmodifiedDefaultBlock( selectedBlock )
-					: false,
-			};
-		},
-		[]
-	);
+	const { clientId, blockCommentId } = useSelect( ( select ) => {
+		const { getSelectedBlock } = select( blockEditorStore );
+		const selectedBlock = getSelectedBlock();
+		return {
+			clientId: selectedBlock?.clientId,
+			blockCommentId: selectedBlock?.attributes?.metadata?.noteId,
+		};
+	}, [] );
 	const blockElement = useBlockElement( clientId );
 
-	if (
-		! showCommentBoard ||
-		! clientId ||
-		undefined !== blockCommentId ||
-		isEmptyDefaultBlock
-	) {
+	if ( ! showCommentBoard || ! clientId || undefined !== blockCommentId ) {
 		return null;
 	}
 
@@ -68,12 +56,13 @@ export function AddComment( {
 				onSubmit={ async ( inputComment ) => {
 					const { id } = await onSubmit( { content: inputComment } );
 					focusCommentThread( id, commentSidebarRef.current );
+					setShowCommentBoard( false );
 				} }
 				onCancel={ () => {
 					setShowCommentBoard( false );
 					blockElement?.focus();
 				} }
-				submitButtonText={ _x( 'Note', 'Add note button' ) }
+				submitButtonText={ __( 'Add note' ) }
 				labelText={ __( 'New Note' ) }
 			/>
 		</VStack>

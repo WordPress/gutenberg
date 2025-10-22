@@ -41,7 +41,7 @@ test.describe( 'Post Data source', () => {
 							content: {
 								source: 'core/post-data',
 								args: {
-									key: 'modified',
+									field: 'modified',
 								},
 							},
 						},
@@ -71,7 +71,7 @@ test.describe( 'Post Data source', () => {
 						bindings: {
 							datetime: {
 								source: 'core/post-data',
-								args: { key: 'date' },
+								args: { field: 'date' },
 							},
 						},
 					},

@@ -6,6 +6,7 @@
 .components-menu-item__button,
 .components-menu-item__button.components-button {
 	width: 100%;
+	font-weight: $font-weight-regular;
 
 	&[role="menuitemradio"],
 	&[role="menuitemcheckbox"] {

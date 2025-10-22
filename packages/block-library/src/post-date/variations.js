@@ -14,7 +14,7 @@ const variations = [
 				bindings: {
 					datetime: {
 						source: 'core/post-data',
-						args: { key: 'date' },
+						args: { field: 'date' },
 					},
 				},
 			},
@@ -23,7 +23,8 @@ const variations = [
 		isActive: ( blockAttributes ) =>
 			blockAttributes?.metadata?.bindings?.datetime?.source ===
 				'core/post-data' &&
-			blockAttributes?.metadata?.bindings?.datetime?.args?.key === 'date',
+			blockAttributes?.metadata?.bindings?.datetime?.args?.field ===
+				'date',
 		icon: postDate,
 	},
 	{
@@ -35,7 +36,7 @@ const variations = [
 				bindings: {
 					datetime: {
 						source: 'core/post-data',
-						args: { key: 'modified' },
+						args: { field: 'modified' },
 					},
 				},
 			},
@@ -45,7 +46,7 @@ const variations = [
 		isActive: ( blockAttributes ) =>
 			blockAttributes?.metadata?.bindings?.datetime?.source ===
 				'core/post-data' &&
-			blockAttributes?.metadata?.bindings?.datetime?.args?.key ===
+			blockAttributes?.metadata?.bindings?.datetime?.args?.field ===
 				'modified',
 		icon: postDate,
 	},

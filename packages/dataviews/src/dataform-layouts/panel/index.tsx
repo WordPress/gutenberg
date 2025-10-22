@@ -101,6 +101,7 @@ export default function FormPanelField< Item >( {
 	data,
 	field,
 	onChange,
+	validity,
 }: FieldLayoutProps< Item > ) {
 	const { fields } = useContext( DataFormContext );
 
@@ -134,22 +135,23 @@ export default function FormPanelField< Item >( {
 	const renderedControl =
 		layout.openAs === 'modal' ? (
 			<PanelModal
-				field={ field }
-				fieldDefinition={ fieldDefinition }
-				summaryFields={ summaryFields }
 				data={ data }
+				field={ field }
 				onChange={ onChange }
 				labelPosition={ labelPosition }
+				summaryFields={ summaryFields }
+				fieldDefinition={ fieldDefinition }
 			/>
 		) : (
 			<PanelDropdown
-				field={ field }
-				popoverAnchor={ popoverAnchor }
-				fieldDefinition={ fieldDefinition }
-				summaryFields={ summaryFields }
 				data={ data }
+				field={ field }
 				onChange={ onChange }
+				validity={ validity }
 				labelPosition={ labelPosition }
+				summaryFields={ summaryFields }
+				fieldDefinition={ fieldDefinition }
+				popoverAnchor={ popoverAnchor }
 			/>
 		);
 

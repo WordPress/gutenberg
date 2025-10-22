@@ -72,6 +72,7 @@ import * as image from './image';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
 import * as list from './list';
+import * as math from './math';
 import * as listItem from './list-item';
 import * as logInOut from './loginout';
 import * as mediaText from './media-text';
@@ -163,7 +164,6 @@ const getAllBlocks = () => {
 		accordionPanel,
 		archives,
 		audio,
-		breadcrumbs,
 		button,
 		buttons,
 		calendar,
@@ -178,6 +178,7 @@ const getAllBlocks = () => {
 		file,
 		group,
 		html,
+		math,
 		latestComments,
 		latestPosts,
 		mediaText,
@@ -259,6 +260,10 @@ const getAllBlocks = () => {
 		queryTitle,
 		postAuthorBiography,
 	];
+
+	if ( window?.__experimentalEnableBlockExperiments ) {
+		blocks.push( breadcrumbs );
+	}
 
 	if ( window?.__experimentalEnableFormBlocks ) {
 		blocks.push( form );
