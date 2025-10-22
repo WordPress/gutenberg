@@ -15,6 +15,7 @@ import {
 	__EXPERIMENTAL_STYLE_PROPERTY,
 	getBlockType,
 	hasBlockSupport,
+	store as blocksStore,
 } from '@wordpress/blocks';
 import { useMemo, useCallback } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -24,7 +25,6 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import { useSupportedStyles } from '@wordpress/global-styles-ui';
 import { unlock } from '../../lock-unlock';
 import setNestedValue from '../../utils/set-nested-value';
 import { useGlobalStyles } from '../../components/global-styles';
@@ -165,7 +165,16 @@ function getFallbackBorderStyleChange( side, border, globalBorderStyle ) {
 }
 
 function useChangesToPush( name, attributes, userConfig ) {
-	const supports = useSupportedStyles( name );
+	const supports = useSelect(
+		( select ) => {
+			return {
+				supportedPanels: unlock(
+					select( blocksStore )
+				).getSupportedStyles( name ),
+			};
+		},
+		[ name ]
+	);
 	const blockUserConfig = userConfig?.styles?.blocks?.[ name ];
 
 	return useMemo( () => {
