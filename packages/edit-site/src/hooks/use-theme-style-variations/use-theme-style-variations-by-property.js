@@ -5,8 +5,8 @@ import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
+import { mergeGlobalStyles } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
@@ -16,7 +16,6 @@ import { useGlobalStyles } from '../../components/global-styles';
 
 const EMPTY_ARRAY = [];
 const { areGlobalStyleConfigsEqual } = unlock( blockEditorPrivateApis );
-const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
 
 /**
  * Removes all instances of properties from an object.
@@ -104,7 +103,7 @@ export function useCurrentMergeThemeStyleVariationsWithUserConfig(
 				return isVariationWithProperties( variation, properties );
 			} )
 			.map( ( variation ) => {
-				return mergeBaseAndUserConfigs(
+				return mergeGlobalStyles(
 					userVariationWithoutProperties,
 					variation
 				);

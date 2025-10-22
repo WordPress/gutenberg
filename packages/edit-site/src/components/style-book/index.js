@@ -22,8 +22,8 @@ import {
 	__unstableIframe as Iframe,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 } from '@wordpress/block-editor';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useSelect, dispatch } from '@wordpress/data';
+import { mergeGlobalStyles } from '@wordpress/global-styles-engine';
 import {
 	useMemo,
 	useState,
@@ -58,8 +58,6 @@ import { useGlobalStylesOutputWithConfig } from '../../hooks/use-global-styles-o
 import { useStyle, useGlobalStyles } from '../global-styles';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
-const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
-
 const { Tabs } = unlock( componentsPrivateApis );
 
 function isObjectEmpty( object ) {
@@ -279,7 +277,7 @@ function StyleBook( {
 
 	const mergedConfig = useMemo( () => {
 		if ( ! isObjectEmpty( userConfig ) && ! isObjectEmpty( baseConfig ) ) {
-			return mergeBaseAndUserConfigs( baseConfig, userConfig );
+			return mergeGlobalStyles( baseConfig, userConfig );
 		}
 		return {};
 	}, [ baseConfig, userConfig ] );
@@ -525,7 +523,7 @@ export const StyleBookPreview = ( { userConfig = {}, isStatic = false } ) => {
 
 	const mergedConfig = useMemo( () => {
 		if ( ! isObjectEmpty( userConfig ) && ! isObjectEmpty( baseConfig ) ) {
-			return mergeBaseAndUserConfigs( baseConfig, userConfig );
+			return mergeGlobalStyles( baseConfig, userConfig );
 		}
 		return {};
 	}, [ baseConfig, userConfig ] );

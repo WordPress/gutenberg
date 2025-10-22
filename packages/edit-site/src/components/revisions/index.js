@@ -10,9 +10,9 @@ import {
 	__unstableEditorStyles as EditorStyles,
 	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
+import { mergeGlobalStyles } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
@@ -27,7 +27,6 @@ const {
 	ExperimentalBlockEditorProvider,
 	__unstableBlockStyleVariationOverridesWithConfig,
 } = unlock( blockEditorPrivateApis );
-const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
 
 function isObjectEmpty( object ) {
 	return ! object || Object.keys( object ).length === 0;
@@ -38,7 +37,7 @@ function Revisions( { userConfig, blocks } ) {
 
 	const mergedConfig = useMemo( () => {
 		if ( ! isObjectEmpty( userConfig ) && ! isObjectEmpty( baseConfig ) ) {
-			return mergeBaseAndUserConfigs( baseConfig, userConfig );
+			return mergeGlobalStyles( baseConfig, userConfig );
 		}
 		return {};
 	}, [ baseConfig, userConfig ] );
