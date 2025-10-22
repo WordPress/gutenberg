@@ -6,7 +6,13 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useState, RawHTML, useEffect, useCallback, useMemo } from '@wordpress/element';
+import {
+	useState,
+	RawHTML,
+	useEffect,
+	useCallback,
+	useMemo,
+} from '@wordpress/element';
 import {
 	__experimentalText as Text,
 	__experimentalHStack as HStack,
@@ -57,7 +63,7 @@ const { Menu } = unlock( componentsPrivateApis );
  * @return {React.ReactNode} The rendered Comments component.
  */
 export function Comments( {
-	threads: commentThreads,
+	threads: noteThreads,
 	onEditComment,
 	onAddReply,
 	onCommentDelete,
@@ -90,34 +96,37 @@ export function Comments( {
 	const relatedBlockElement = useBlockElement( selectedBlockClientId );
 
 	const threads = useMemo( () => {
-		const t = [ ...commentThreads ];
-		// In floating mode, when the comment board is shown, add a new comment entry to the threads.
-		if ( isFloating && showCommentBoard ) {
-			// Insert the new comment entry at the correct location for its blockId.
-			const newCommentThread = {
-				id: 'new-comment-thread',
+		const t = [ ...noteThreads ];
+		// In floating mode, when the note board is shown, add a new
+		// note entry to the threads - as long as the selected block doesn't
+		// have an existing note attached.
+		if ( isFloating && showCommentBoard && undefined === blockCommentId ) {
+			// Insert the new note entry at the correct location for its blockId.
+			const newNoteThread = {
+				id: 'new-note-thread',
 				blockClientId: selectedBlockClientId,
 				content: { rendered: '' },
 			};
-			// Find the comment blocks spot in orderedBlockIds.
+			// Find the note blocks spot in orderedBlockIds.
 			const insertIndex = orderedBlockIds.findIndex(
 				( id ) => id === selectedBlockClientId
 			);
 			if ( insertIndex !== -1 ) {
-				t.splice( insertIndex, 0, newCommentThread );
+				t.splice( insertIndex, 0, newNoteThread );
 			} else {
 				// If block not found, append to the end.
-				t.push( newCommentThread );
+				t.push( newNoteThread );
 			}
 		} else {
-			// Otherwise, remove any previously added new comment entry.
-			return t.filter( ( thread ) => thread.id !== 'new-comment-thread' );
+			// Otherwise, remove any previously added new note entry.
+			return t.filter( ( thread ) => thread.id !== 'new-note-thread' );
 		}
 		return t;
 	}, [
-		commentThreads,
+		noteThreads,
 		isFloating,
 		showCommentBoard,
+		blockCommentId,
 		selectedBlockClientId,
 		orderedBlockIds,
 	] );
@@ -302,21 +311,23 @@ export function Comments( {
 
 	return (
 		<VStack spacing="3">
-			{ ! isFloating && showCommentBoard && (
-				<VStack
-					className="editor-collab-sidebar-panel__thread is-selected"
-					spacing="3"
-					tabIndex={ 0 }
-					role="listitem"
-				>
-					<AddComment
-						onSubmit={ onAddReply }
-						showCommentBoard={ showCommentBoard }
-						setShowCommentBoard={ setShowCommentBoard }
-						commentSidebarRef={ commentSidebarRef }
-					/>
-				</VStack>
-			) }
+			{ ! isFloating &&
+				showCommentBoard &&
+				undefined === blockCommentId && (
+					<VStack
+						className="editor-collab-sidebar-panel__thread is-selected"
+						spacing="3"
+						tabIndex={ 0 }
+						role="listitem"
+					>
+						<AddComment
+							onSubmit={ onAddReply }
+							showCommentBoard={ showCommentBoard }
+							setShowCommentBoard={ setShowCommentBoard }
+							commentSidebarRef={ commentSidebarRef }
+						/>
+					</VStack>
+				) }
 			{ threads.map( ( thread ) => (
 				<Thread
 					key={ thread.id }
@@ -368,6 +379,7 @@ function Thread( {
 		toggleBlockHighlight,
 		50
 	);
+
 	const { y, refs } = useFloatingThread( {
 		thread,
 		calculatedOffset,
@@ -421,7 +433,8 @@ function Thread( {
 				__( 'Original block deleted. Note: %s' ),
 				commentExcerpt
 		  );
-	if ( 'new-comment-thread' === thread.id ) {
+
+	if ( 'new-note-thread' === thread.id && showCommentBoard && isFloating ) {
 		return (
 			// Disable reason: role="listitem" does in fact support aria-expanded.
 			// eslint-disable-next-line jsx-a11y/role-supports-aria-props
