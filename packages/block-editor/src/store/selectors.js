@@ -1926,7 +1926,8 @@ export function canMoveBlock( state, clientId ) {
 	}
 
 	const rootClientId = getBlockRootClientId( state, clientId );
-	if ( getTemplateLock( state, rootClientId ) ) {
+	const templateLock = getTemplateLock( state, rootClientId );
+	if ( templateLock === 'all' || templateLock === 'contentOnly' ) {
 		return false;
 	}
 
