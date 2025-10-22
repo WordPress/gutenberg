@@ -1,7 +1,7 @@
 export type SectionProps = {
-	description: React.ReactNode;
-	title: React.ReactNode;
-	children: React.ReactNode;
+	description?: React.ReactNode;
+	title?: React.ReactNode;
+	children?: React.ReactNode;
 };
 
 const Section = ( { description, title, children }: SectionProps ) => (
