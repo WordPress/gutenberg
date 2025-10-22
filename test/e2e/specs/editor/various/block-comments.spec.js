@@ -32,6 +32,30 @@ test.describe( 'Block Comments', () => {
 		await expect( topBarButton ).toBeVisible();
 	} );
 
+	test( 'should move focus to add a new note form', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Testing block comments' },
+		} );
+		const form = page.getByRole( 'textbox', {
+			name: 'New Note',
+			exact: true,
+		} );
+
+		await editor.clickBlockOptionsMenuItem( 'Add note' );
+		await expect( form ).toBeFocused();
+		// Close the pinned notes sidebar.
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Notes', exact: true } )
+			.click();
+		await editor.clickBlockOptionsMenuItem( 'Add note' );
+		await expect( form ).toBeFocused();
+	} );
+
 	test( 'can add a comment to a block', async ( { editor, page } ) => {
 		await editor.insertBlock( {
 			name: 'core/paragraph',

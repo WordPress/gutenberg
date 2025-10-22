@@ -339,17 +339,24 @@ export function useEnableFloatingSidebar( enabled = false ) {
 			return;
 		}
 
-		return registry.subscribe( () => {
-			const activeSidebar = registry
-				.select( interfaceStore )
-				.getActiveComplementaryArea( 'core' );
+		const { getActiveComplementaryArea } =
+			registry.select( interfaceStore );
+		const { disableComplementaryArea, enableComplementaryArea } =
+			registry.dispatch( interfaceStore );
 
-			if ( ! activeSidebar ) {
-				registry
-					.dispatch( interfaceStore )
-					.enableComplementaryArea( 'core', collabSidebarName );
+		const unsubscribe = registry.subscribe( () => {
+			// Return `null` to indicate the user hid the complementary area.
+			if ( getActiveComplementaryArea( 'core' ) === null ) {
+				enableComplementaryArea( 'core', collabSidebarName );
 			}
 		} );
+
+		return () => {
+			unsubscribe();
+			if ( getActiveComplementaryArea( 'core' ) === collabSidebarName ) {
+				disableComplementaryArea( 'core', collabSidebarName );
+			}
+		};
 	}, [ enabled, registry ] );
 }
 
