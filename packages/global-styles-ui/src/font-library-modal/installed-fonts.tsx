@@ -177,7 +177,7 @@ function InstalledFonts() {
 	useEffect( () => {
 		handleSetLibraryFontSelected( libraryFontSelected );
 		refreshLibrary();
-	}, [ handleSetLibraryFontSelected, libraryFontSelected, refreshLibrary ] );
+	}, [] );
 
 	// Get activated fonts count.
 	const activeFontsCount = libraryFontSelected
