@@ -12,7 +12,7 @@ import {
 } from '@wordpress/block-editor';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
-import { useContext, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -21,10 +21,10 @@ import { useContext, useMemo } from '@wordpress/element';
 import { unlock } from '../../lock-unlock';
 import EditorCanvasContainer from '../editor-canvas-container';
 import { useGlobalStylesOutputWithConfig } from '../../hooks/use-global-styles-output';
+import { useGlobalStyles } from '../global-styles';
 
 const {
 	ExperimentalBlockEditorProvider,
-	GlobalStylesContext,
 	__unstableBlockStyleVariationOverridesWithConfig,
 } = unlock( blockEditorPrivateApis );
 const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
@@ -34,7 +34,7 @@ function isObjectEmpty( object ) {
 }
 
 function Revisions( { userConfig, blocks } ) {
-	const { base: baseConfig } = useContext( GlobalStylesContext );
+	const { base: baseConfig } = useGlobalStyles();
 
 	const mergedConfig = useMemo( () => {
 		if ( ! isObjectEmpty( userConfig ) && ! isObjectEmpty( baseConfig ) ) {

@@ -17,9 +17,7 @@ import { useMemo, useCallback } from '@wordpress/element';
  */
 import { unlock } from '../../lock-unlock';
 
-const { GlobalStylesContext, cleanEmptyObject } = unlock(
-	blockEditorPrivateApis
-);
+const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
 export function mergeBaseAndUserConfigs( base, user ) {
 	return deepmerge( base, user, {
@@ -233,17 +231,4 @@ export function useGlobalStylesContext() {
 	] );
 
 	return context;
-}
-
-export function GlobalStylesProvider( { children } ) {
-	const context = useGlobalStylesContext();
-	if ( ! context.isReady ) {
-		return null;
-	}
-
-	return (
-		<GlobalStylesContext.Provider value={ context }>
-			{ children }
-		</GlobalStylesContext.Provider>
-	);
 }

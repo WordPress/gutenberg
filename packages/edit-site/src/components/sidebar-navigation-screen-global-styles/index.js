@@ -15,7 +15,7 @@ import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import SidebarNavigationItem from '../sidebar-navigation-item';
-import useGlobalStylesRevisions from '../global-styles/screen-revisions/use-global-styles-revisions';
+import { useGlobalStylesRevisions } from '@wordpress/global-styles-ui';
 import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';
 import { MainSidebarNavigationContent } from '../sidebar-navigation-screen-main';
 

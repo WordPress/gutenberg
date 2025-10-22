@@ -3,7 +3,7 @@
  */
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { useContext, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
@@ -12,11 +12,10 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
+import { useGlobalStyles } from '../../components/global-styles';
 
 const EMPTY_ARRAY = [];
-const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
-	blockEditorPrivateApis
-);
+const { areGlobalStyleConfigsEqual } = unlock( blockEditorPrivateApis );
 const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
 
 /**
@@ -86,7 +85,7 @@ export function useCurrentMergeThemeStyleVariationsWithUserConfig(
 			variationsFromTheme: _variationsFromTheme || EMPTY_ARRAY,
 		};
 	}, [] );
-	const { user: userVariation } = useContext( GlobalStylesContext );
+	const { user: userVariation } = useGlobalStyles();
 
 	const propertiesAsString = properties.toString();
 

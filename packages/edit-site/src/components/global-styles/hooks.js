@@ -1,111 +1,216 @@
 /**
- * External dependencies
- */
-import { colord, extend } from 'colord';
-import a11yPlugin from 'colord/plugins/a11y';
-
-/**
  * WordPress dependencies
  */
-import { store as blocksStore } from '@wordpress/blocks';
+import { useMemo, useCallback } from '@wordpress/element';
+import {
+	mergeGlobalStyles,
+	getStyle,
+	getSetting,
+} from '@wordpress/global-styles-engine';
+import { store as coreStore } from '@wordpress/core-data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import { useSelect } from '@wordpress/data';
 
-const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorPrivateApis );
+const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
-// Enable colord's a11y plugin.
-extend( [ a11yPlugin ] );
+/**
+ * Hook to fetch and manage user global styles config
+ */
+function useGlobalStylesUserConfig() {
+	const { globalStylesId, isReady, settings, styles, _links } = useSelect(
+		( select ) => {
+			const {
+				getEntityRecord,
+				getEditedEntityRecord,
+				hasFinishedResolution,
+				canUser,
+			} = select( coreStore );
+			const _globalStylesId =
+				select( coreStore ).__experimentalGetCurrentGlobalStylesId();
 
-export function useColorRandomizer( name ) {
-	const [ themeColors, setThemeColors ] = useGlobalSetting(
-		'color.palette.theme',
-		name
-	);
+			let record;
 
-	function randomizeColors() {
-		/* eslint-disable no-restricted-syntax */
-		const randomRotationValue = Math.floor( Math.random() * 225 );
-		/* eslint-enable no-restricted-syntax */
+			const userCanEditGlobalStyles = _globalStylesId
+				? canUser( 'update', {
+						kind: 'root',
+						name: 'globalStyles',
+						id: _globalStylesId,
+				  } )
+				: null;
 
-		const newColors = themeColors.map( ( colorObject ) => {
-			const { color } = colorObject;
-			const newColor = colord( color )
-				.rotate( randomRotationValue )
-				.toHex();
+			if (
+				_globalStylesId &&
+				typeof userCanEditGlobalStyles === 'boolean'
+			) {
+				if ( userCanEditGlobalStyles ) {
+					record = getEditedEntityRecord(
+						'root',
+						'globalStyles',
+						_globalStylesId
+					);
+				} else {
+					record = getEntityRecord(
+						'root',
+						'globalStyles',
+						_globalStylesId,
+						{ context: 'view' }
+					);
+				}
+			}
+
+			let hasResolved = false;
+			if (
+				hasFinishedResolution(
+					'__experimentalGetCurrentGlobalStylesId'
+				)
+			) {
+				if ( _globalStylesId ) {
+					hasResolved = userCanEditGlobalStyles
+						? hasFinishedResolution( 'getEditedEntityRecord', [
+								'root',
+								'globalStyles',
+								_globalStylesId,
+						  ] )
+						: hasFinishedResolution( 'getEntityRecord', [
+								'root',
+								'globalStyles',
+								_globalStylesId,
+								{ context: 'view' },
+						  ] );
+				} else {
+					hasResolved = true;
+				}
+			}
 
 			return {
-				...colorObject,
-				color: newColor,
+				globalStylesId: _globalStylesId,
+				isReady: hasResolved,
+				settings: record?.settings,
+				styles: record?.styles,
+				_links: record?._links,
 			};
-		} );
+		},
+		[]
+	);
 
-		setThemeColors( newColors );
-	}
+	const { getEditedEntityRecord } = useSelect( coreStore );
+	const { editEntityRecord } = useDispatch( coreStore );
 
-	return window.__experimentalEnableColorRandomizer
-		? [ randomizeColors ]
-		: [];
+	const config = useMemo( () => {
+		return {
+			settings: settings ?? {},
+			styles: styles ?? {},
+			_links: _links ?? {},
+		};
+	}, [ settings, styles, _links ] );
+
+	const setConfig = useCallback(
+		( callbackOrObject, options = {} ) => {
+			const record = getEditedEntityRecord(
+				'root',
+				'globalStyles',
+				globalStylesId
+			);
+
+			const currentConfig = {
+				styles: record?.styles ?? {},
+				settings: record?.settings ?? {},
+				_links: record?._links ?? {},
+			};
+
+			const updatedConfig =
+				typeof callbackOrObject === 'function'
+					? callbackOrObject( currentConfig )
+					: callbackOrObject;
+
+			editEntityRecord(
+				'root',
+				'globalStyles',
+				globalStylesId,
+				{
+					styles: cleanEmptyObject( updatedConfig.styles ) || {},
+					settings: cleanEmptyObject( updatedConfig.settings ) || {},
+					_links: cleanEmptyObject( updatedConfig._links ) || {},
+				},
+				options
+			);
+		},
+		[ globalStylesId, editEntityRecord, getEditedEntityRecord ]
+	);
+
+	return [ isReady, config, setConfig ];
 }
 
-export function useStylesPreviewColors() {
-	const [ textColor = 'black' ] = useGlobalStyle( 'color.text' );
-	const [ backgroundColor = 'white' ] = useGlobalStyle( 'color.background' );
-	const [ headingColor = textColor ] = useGlobalStyle(
-		'elements.h1.color.text'
+/**
+ * Hook to fetch base/theme global styles config
+ */
+function useGlobalStylesBaseConfig() {
+	const baseConfig = useSelect(
+		( select ) =>
+			select( coreStore ).__experimentalGetCurrentThemeBaseGlobalStyles(),
+		[]
 	);
-	const [ linkColor = headingColor ] = useGlobalStyle(
-		'elements.link.color.text'
-	);
+	return [ !! baseConfig, baseConfig ];
+}
 
-	const [ buttonBackgroundColor = linkColor ] = useGlobalStyle(
-		'elements.button.color.background'
-	);
-	const [ coreColors ] = useGlobalSetting( 'color.palette.core' );
-	const [ themeColors ] = useGlobalSetting( 'color.palette.theme' );
-	const [ customColors ] = useGlobalSetting( 'color.palette.custom' );
+/**
+ * Hook to get merged global styles configuration
+ *
+ * @return {Object} Object containing merged, base, user configs and setUser function
+ *                  { merged, base, user, setUser }
+ */
+export function useGlobalStyles() {
+	const [ isUserConfigReady, userConfig, setUserConfig ] =
+		useGlobalStylesUserConfig();
+	const [ isBaseConfigReady, baseConfig ] = useGlobalStylesBaseConfig();
 
-	const paletteColors = ( themeColors ?? [] )
-		.concat( customColors ?? [] )
-		.concat( coreColors ?? [] );
-
-	const textColorObject = paletteColors.filter(
-		( { color } ) => color === textColor
-	);
-	const buttonBackgroundColorObject = paletteColors.filter(
-		( { color } ) => color === buttonBackgroundColor
-	);
-
-	const highlightedColors = textColorObject
-		.concat( buttonBackgroundColorObject )
-		.concat( paletteColors )
-		.filter(
-			// we exclude these background color because it is already visible in the preview.
-			( { color } ) => color !== backgroundColor
-		)
-		.slice( 0, 2 );
+	const merged = useMemo( () => {
+		if ( ! isUserConfigReady || ! isBaseConfigReady ) {
+			return {};
+		}
+		return mergeGlobalStyles( baseConfig || {}, userConfig );
+	}, [ isUserConfigReady, isBaseConfigReady, baseConfig, userConfig ] );
 
 	return {
-		paletteColors,
-		highlightedColors,
+		merged,
+		base: baseConfig || {},
+		user: userConfig,
+		setUser: setUserConfig,
+		isReady: isUserConfigReady && isBaseConfigReady,
 	};
 }
 
-export function useSupportedStyles( name, element ) {
-	const { supportedPanels } = useSelect(
-		( select ) => {
-			return {
-				supportedPanels: unlock(
-					select( blocksStore )
-				).getSupportedStyles( name, element ),
-			};
-		},
-		[ name, element ]
+/**
+ * Hook to get a style value from global styles
+ *
+ * @param {string} path      Style path (e.g., 'color.background')
+ * @param {string} blockName Optional block name
+ * @return {*} Style value
+ */
+export function useStyle( path, blockName ) {
+	const { merged } = useGlobalStyles();
+	return useMemo(
+		() => getStyle( merged, path, blockName ),
+		[ merged, path, blockName ]
 	);
+}
 
-	return supportedPanels;
+/**
+ * Hook to get a setting value from global styles
+ *
+ * @param {string} path      Setting path (e.g., 'spacing.blockGap')
+ * @param {string} blockName Optional block name
+ * @return {*} Setting value
+ */
+export function useSetting( path, blockName ) {
+	const { merged } = useGlobalStyles();
+	return useMemo(
+		() => getSetting( merged, path, blockName ),
+		[ merged, path, blockName ]
+	);
 }
