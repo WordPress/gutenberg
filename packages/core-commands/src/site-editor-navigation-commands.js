@@ -101,6 +101,10 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 		);
 
 		const commands = useMemo( () => {
+			if ( window.location.pathname.startsWith( '/wp-admin/network/' ) ) {
+				return [];
+			}
+
 			return ( records ?? [] ).map( ( record ) => {
 				const command = {
 					name: postType + '-' + record.id,
@@ -200,6 +204,10 @@ const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 		}, [ records, search ] );
 
 		const commands = useMemo( () => {
+			if ( window.location.pathname.startsWith( '/wp-admin/network/' ) ) {
+				return [];
+			}
+
 			if (
 				! canCreateTemplate ||
 				( ! isBlockBasedTheme && ! templateType === 'wp_template_part' )
@@ -297,6 +305,10 @@ const getSiteEditorBasicNavigationCommands = () =>
 				};
 			}, [] );
 		const commands = useMemo( () => {
+			if ( window.location.pathname.startsWith( '/wp-admin/network/' ) ) {
+				return [];
+			}
+
 			const result = [];
 
 			if ( canCreateTemplate && isBlockBasedTheme ) {
@@ -422,6 +434,10 @@ const getGlobalStylesOpenCssCommands = () =>
 		}, [] );
 
 		const commands = useMemo( () => {
+			if ( window.location.pathname.includes( '/wp-admin/network/' ) ) {
+				return [];
+			}
+
 			if ( ! canEditCSS ) {
 				return [];
 			}
