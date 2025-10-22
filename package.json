@@ -62,6 +62,7 @@
 		"@testing-library/react": "14.3.0",
 		"@testing-library/react-native": "12.4.3",
 		"@testing-library/user-event": "14.4.3",
+		"@types/diff": "7.0.2",
 		"@types/eslint": "8.56.9",
 		"@types/estree": "1.0.5",
 		"@types/istanbul-lib-report": "3.0.0",
