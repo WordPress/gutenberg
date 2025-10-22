@@ -167,11 +167,7 @@ function getFallbackBorderStyleChange( side, border, globalBorderStyle ) {
 function useChangesToPush( name, attributes, userConfig ) {
 	const supports = useSelect(
 		( select ) => {
-			return {
-				supportedPanels: unlock(
-					select( blocksStore )
-				).getSupportedStyles( name ),
-			};
+			return unlock( select( blocksStore ) ).getSupportedStyles( name );
 		},
 		[ name ]
 	);

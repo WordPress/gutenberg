@@ -4,6 +4,7 @@
 import { useSelect } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { usePrevious } from '@wordpress/compose';
 
 /**
  * Auto-navigate to block styles when a block is selected in the canvas.
@@ -28,9 +29,14 @@ export function GlobalStylesBlockLink( { path, onPathChange } ) {
 
 	// const blockHasGlobalStyles = useBlockHasGlobalStyles( selectedBlockName );
 	const blockHasGlobalStyles = true;
+	const previousBlockClientId = usePrevious( selectedBlockClientId );
 
 	// When we're in the `Blocks` screen enable deep linking to the selected block.
 	useEffect( () => {
+		// Only navigate when block selection changes, not when path changes
+		if ( selectedBlockClientId === previousBlockClientId ) {
+			return;
+		}
 		if ( ! selectedBlockClientId || ! blockHasGlobalStyles ) {
 			return;
 		}
@@ -48,6 +54,7 @@ export function GlobalStylesBlockLink( { path, onPathChange } ) {
 		}
 	}, [
 		selectedBlockClientId,
+		previousBlockClientId,
 		selectedBlockName,
 		blockHasGlobalStyles,
 		path,
