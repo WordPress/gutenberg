@@ -73,18 +73,19 @@ export function Comments( {
 	const [ boardOffsets, setBoardOffsets ] = useState( {} );
 	const [ blockRefs, setBlockRefs ] = useState( {} );
 
-	const { blockCommentId, selectedBlockClientId } = useSelect( ( select ) => {
-		const { getBlockAttributes, getSelectedBlockClientId } =
-			select( blockEditorStore );
-		const clientId = getSelectedBlockClientId();
-		return {
-			blockCommentId: clientId
-				? getBlockAttributes( clientId )?.metadata?.noteId
-				: null,
-			selectedBlockClientId: clientId,
-		};
-	}, [] );
-
+	const { blockCommentId, selectedBlockClientId, orderedBlockIds } =
+		useSelect( ( select ) => {
+			const { getBlockAttributes, getSelectedBlockClientId } =
+				select( blockEditorStore );
+			const clientId = getSelectedBlockClientId();
+			return {
+				blockCommentId: clientId
+					? getBlockAttributes( clientId )?.metadata?.noteId
+					: null,
+				selectedBlockClientId: clientId,
+				orderedBlockIds: select( blockEditorStore ).getBlockOrder(),
+			};
+		}, [] );
 
 	const relatedBlockElement = useBlockElement( selectedBlockClientId );
 
@@ -92,10 +93,25 @@ export function Comments( {
 		const t = [ ...commentThreads ];
 		// In floating mode, when the comment board is shown, add a new comment entry to the threads.
 		if ( isFloating && showCommentBoard ) {
-			t.push( {
+			// Insert the new comment entry at the correct location for its blockId.
+			const newCommentThread = {
 				id: 'new-comment-thread',
 				blockClientId: selectedBlockClientId,
-			} );
+				content: { rendered: '' },
+			};
+			// Find the comment blocks spot in orderedBlockIds.
+			const insertIndex = orderedBlockIds.findIndex(
+				( id ) => id === selectedBlockClientId
+			);
+			if ( insertIndex !== -1 ) {
+				t.splice( insertIndex, 0, newCommentThread );
+			} else {
+				// If block not found, append to the end.
+				t.push( newCommentThread );
+			}
+		} else {
+			// Otherwise, remove any previously added new comment entry.
+			return t.filter( ( thread ) => thread.id !== 'new-comment-thread' );
 		}
 		return t;
 	}, [
@@ -103,6 +119,7 @@ export function Comments( {
 		isFloating,
 		showCommentBoard,
 		selectedBlockClientId,
+		orderedBlockIds,
 	] );
 
 	const handleDelete = async ( comment ) => {
@@ -285,7 +302,7 @@ export function Comments( {
 
 	return (
 		<VStack spacing="3">
-			{ ! isFloating && (
+			{ ! isFloating && showCommentBoard && (
 				<VStack
 					className="editor-collab-sidebar-panel__thread is-selected"
 					spacing="3"
