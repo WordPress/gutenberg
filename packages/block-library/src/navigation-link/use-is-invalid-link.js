@@ -22,13 +22,21 @@ export const useIsInvalidLink = ( kind, type, id, enabled ) => {
 
 	const entityData = useSelect(
 		( select ) => {
+			// Early exit if validation is disabled
+			// Fetching entity records is an "expensive" operation. Especially for sites with large navigations.
+			// When the block is rendered in a template or other disabled contexts we can skip this check in order
+			// to avoid all these additional requests that don't really add any value in that mode.
+			if ( ! enabled ) {
+				return null;
+			}
+
 			// Early exit if no valid ID
 			if ( ! hasId ) {
 				return null;
 			}
 
-			// Early exit if validation is disabled or block editing mode is disabled
-			if ( ! enabled || blockEditingMode === 'disabled' ) {
+			// Early exit if block editing mode is disabled
+			if ( blockEditingMode === 'disabled' ) {
 				return null;
 			}
 
