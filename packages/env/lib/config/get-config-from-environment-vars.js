@@ -70,7 +70,10 @@ module.exports = function getConfigFromEnvironmentVars( cacheDirectoryPath ) {
 	}
 
 	if ( process.env.WP_ENV_MULTISITE ) {
-		environmentConfig.multisite = !! process.env.WP_ENV_MULTISITE;
+		const rawValue = process.env.WP_ENV_MULTISITE.trim().toLowerCase();
+		if ( rawValue === '1' || rawValue === 'true' ) {
+			environmentConfig.multisite = true;
+		}
 	}
 
 	return environmentConfig;
