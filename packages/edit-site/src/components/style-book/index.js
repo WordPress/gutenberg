@@ -224,19 +224,29 @@ function applyBlockVariationsToExamples( examples, variation ) {
 	if ( ! variation ) {
 		return examples;
 	}
-
-	return examples.map( ( example ) => ( {
-		...example,
-		variation,
-		blocks: {
-			...example.blocks,
-			attributes: {
-				...example.blocks.attributes,
-				style: undefined,
-				className: getVariationClassName( variation ),
-			},
-		},
-	} ) );
+	return examples.map( ( example ) => {
+		return {
+			...example,
+			variation,
+			blocks: Array.isArray( example.blocks )
+				? example.blocks.map( ( block ) => ( {
+						...block,
+						attributes: {
+							...block.attributes,
+							style: undefined,
+							className: getVariationClassName( variation ),
+						},
+				  } ) )
+				: {
+						...example.blocks,
+						attributes: {
+							...example.blocks.attributes,
+							style: undefined,
+							className: getVariationClassName( variation ),
+						},
+				  },
+		};
+	} );
 }
 
 function StyleBook( {
