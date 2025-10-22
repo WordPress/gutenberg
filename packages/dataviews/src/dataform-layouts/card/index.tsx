@@ -45,21 +45,7 @@ export function useCollapsibleCard( {
 			[ key: string ]: any;
 		} ) => (
 			<CardHeader
-				size={
-					isOpen
-						? {
-								top: 'medium',
-								right: 'medium',
-								bottom: 'xSmall',
-								left: 'medium',
-						  }
-						: {
-								top: 'medium',
-								right: 'medium',
-								bottom: 'medium',
-								left: 'medium',
-						  }
-				}
+				size="medium"
 				{ ...props }
 				onClick={ toggle }
 				style={ {
@@ -180,15 +166,7 @@ export default function FormCardField< Item >( {
 	if ( isCombinedField( field ) ) {
 		const withHeader = !! field.label && layout.withHeader;
 		return (
-			<Card
-				className="dataforms-layouts-card__field"
-				size={ {
-					top: 'medium',
-					right: 'medium',
-					bottom: 'medium',
-					left: 'medium',
-				} }
-			>
+			<Card className="dataforms-layouts-card__field" size="medium">
 				{ withHeader && (
 					<CollapsibleCardHeader className="dataforms-layouts-card__field-header">
 						<span className="dataforms-layouts-card__field-header-label">
