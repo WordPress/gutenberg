@@ -95,10 +95,10 @@ export const useIsInvalidLink = ( kind, type, id, enabled ) => {
 	}
 
 	// For post types, check status. The post might technically exist
-	// but the link is invalid if it's in the trash.
+	// but the link is invalid if it's in the trash or if the entity doesn't exist.
 	if ( isPostType ) {
 		const status = entityData?.status;
-		const isInvalid = status === 'trash';
+		const isInvalid = ! entityData || status === 'trash';
 		const isDraft = status === 'draft';
 		return [ isInvalid, isDraft ];
 	}

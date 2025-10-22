@@ -282,7 +282,7 @@ describe( 'useIsInvalidLink', () => {
 			expect( result.current ).toEqual( [ true, false ] );
 		} );
 
-		it( 'should not mark non-existent post-type as invalid (only trashed posts are invalid)', () => {
+		it( 'should mark non-existent post-type as invalid (deleted posts are invalid)', () => {
 			mockUseSelect.mockImplementation( () => ( {
 				entityData: null, // Post doesn't exist
 				hasResolved: true, // Resolution completed
@@ -292,8 +292,8 @@ describe( 'useIsInvalidLink', () => {
 				useIsInvalidLink( 'post-type', 'post', 999, true )
 			);
 
-			// Non-existent posts are not marked as invalid (only trashed posts are)
-			expect( result.current ).toEqual( [ false, false ] );
+			// Non-existent posts are marked as invalid (deleted posts are invalid)
+			expect( result.current ).toEqual( [ true, false ] );
 		} );
 
 		it( 'should mark as invalid only after taxonomy resolution completes', () => {
