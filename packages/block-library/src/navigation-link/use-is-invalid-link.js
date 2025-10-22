@@ -20,42 +20,56 @@ export const useIsInvalidLink = ( kind, type, id, enabled ) => {
 	const hasId = Number.isInteger( id );
 	const blockEditingMode = useBlockEditingMode();
 
-	const entityData = useSelect(
+	const { entityData, hasResolved } = useSelect(
 		( select ) => {
 			// Early exit if validation is disabled
 			// Fetching entity records is an "expensive" operation. Especially for sites with large navigations.
 			// When the block is rendered in a template or other disabled contexts we can skip this check in order
 			// to avoid all these additional requests that don't really add any value in that mode.
 			if ( ! enabled ) {
-				return null;
+				return { entityData: null, hasResolved: true };
 			}
 
 			// Early exit if no valid ID
 			if ( ! hasId ) {
-				return null;
+				return { entityData: null, hasResolved: true };
 			}
 
 			// Early exit if block editing mode is disabled
 			if ( blockEditingMode === 'disabled' ) {
-				return null;
+				return { entityData: null, hasResolved: true };
 			}
 
 			// Early exit for non-entity links (custom, post-type-archive, etc.)
 			if ( ! isPostType && ! isTaxonomy ) {
-				return null;
+				return { entityData: null, hasResolved: true };
 			}
 
-			const { getEntityRecord } = select( coreStore );
+			const { getEntityRecord, hasFinishedResolution } =
+				select( coreStore );
+
+			let _entityData = null;
+			let _hasResolved = true;
 
 			if ( isPostType ) {
-				return getEntityRecord( 'postType', type, id );
+				_entityData = getEntityRecord( 'postType', type, id );
+				_hasResolved = hasFinishedResolution( 'getEntityRecord', [
+					'postType',
+					type,
+					id,
+				] );
 			}
 
 			if ( isTaxonomy ) {
-				return getEntityRecord( 'taxonomy', type, id );
+				_entityData = getEntityRecord( 'taxonomy', type, id );
+				_hasResolved = hasFinishedResolution( 'getEntityRecord', [
+					'taxonomy',
+					type,
+					id,
+				] );
 			}
 
-			return null;
+			return { entityData: _entityData, hasResolved: _hasResolved };
 		},
 		[ isPostType, isTaxonomy, type, id, hasId, enabled, blockEditingMode ]
 	);
@@ -72,6 +86,11 @@ export const useIsInvalidLink = ( kind, type, id, enabled ) => {
 
 	// Early exit for non-entity links (custom, post-type-archive, etc.)
 	if ( ! isPostType && ! isTaxonomy ) {
+		return [ false, false ];
+	}
+
+	// If still loading, don't mark as invalid to avoid false negatives
+	if ( ! hasResolved ) {
 		return [ false, false ];
 	}
 
