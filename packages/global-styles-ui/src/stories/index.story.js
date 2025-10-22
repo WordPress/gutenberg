@@ -1,22 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
-import { useMemo, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { default as GlobalStylesUIComponent } from '../ui';
-import { unlock } from '../../../lock-unlock';
+import { GlobalStylesUI as GlobalStylesUIComponent } from '../global-styles-ui';
 
-const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
-const { GlobalStylesContext, ExperimentalBlockEditorProvider } = unlock(
-	blockEditorPrivateApis
-);
-
-export default { title: 'EditSite/GlobalStylesUI' };
+export default { title: 'GlobalStylesUI/GlobalStylesUI' };
 
 const BASE_SETTINGS = {
 	settings: {
@@ -400,28 +392,19 @@ export const GlobalStylesUI = () => {
 		settings: {},
 		styles: {},
 	} );
-	const context = useMemo( () => {
-		return {
-			isReady: true,
-			user: userGlobalStyles,
-			base: BASE_SETTINGS,
-			merged: mergeBaseAndUserConfigs( BASE_SETTINGS, userGlobalStyles ),
-			setUserConfig: setUserStyles,
-		};
-	}, [ userGlobalStyles, setUserStyles ] );
 	const wrapperStyle = {
 		width: 280,
 	};
 	return (
-		<ExperimentalBlockEditorProvider>
-			<GlobalStylesContext.Provider value={ context }>
-				<div style={ wrapperStyle }>
-					<GlobalStylesUIComponent
-						isStyleBookOpened={ false }
-						onCloseStyleBook={ () => {} }
-					/>
-				</div>
-			</GlobalStylesContext.Provider>
-		</ExperimentalBlockEditorProvider>
+		<div style={ wrapperStyle }>
+			<GlobalStylesUIComponent
+				value={ userGlobalStyles }
+				baseValue={ BASE_SETTINGS }
+				onChange={ setUserStyles }
+				fontLibraryEnabled
+				serverCSS={ [] }
+				serverSettings={ {} }
+			/>
+		</div>
 	);
 };
