@@ -25,11 +25,8 @@ import { IconWithCurrentColor } from './icon-with-current-color';
 import { NavigationButtonAsItem } from './navigation-button';
 import RootMenu from './root-menu';
 import PreviewStyles from './preview-styles';
-import { useStyle } from './hooks';
 
 function ScreenRoot() {
-	const [ customCSS ] = useStyle< string >( 'css' );
-
 	const { hasVariations, canEditCSS } = useSelect( ( select ) => {
 		const {
 			__experimentalGetCurrentThemeGlobalStylesVariations,
@@ -111,7 +108,7 @@ function ScreenRoot() {
 				</ItemGroup>
 			</CardBody>
 
-			{ canEditCSS && !! customCSS && (
+			{ canEditCSS && (
 				<>
 					<CardDivider />
 					<CardBody>

@@ -49,6 +49,7 @@ import { useSetting } from '../hooks';
 export const FontLibraryContext = createContext< FontLibraryState >(
 	{} as FontLibraryState
 );
+FontLibraryContext.displayName = 'FontLibraryContext';
 
 function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
