@@ -31,7 +31,7 @@ function ConfirmResetShadowDialog( {
 	return (
 		<ConfirmDialog
 			isOpen={ isOpen }
-			cancelButtonText={ __( 'Cancel') }
+			cancelButtonText={ __( 'Cancel' ) }
 			confirmButtonText={ confirmButtonText }
 			onCancel={ handleCancel }
 			onConfirm={ handleConfirm }

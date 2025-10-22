@@ -52,31 +52,31 @@ function RootMenu() {
 						icon={ typography }
 						path="/typography"
 					>
-						{ __( 'Typography') }
+						{ __( 'Typography' ) }
 					</NavigationButtonAsItem>
 				) }
 				{ hasColorPanel && (
 					<NavigationButtonAsItem icon={ color } path="/colors">
-						{ __( 'Colors') }
+						{ __( 'Colors' ) }
 					</NavigationButtonAsItem>
 				) }
 				{ hasBackgroundPanel && (
 					<NavigationButtonAsItem
 						icon={ background }
 						path="/background"
-						aria-label={ __( 'Background styles') }
+						aria-label={ __( 'Background styles' ) }
 					>
-						{ __( 'Background') }
+						{ __( 'Background' ) }
 					</NavigationButtonAsItem>
 				) }
 				{ hasShadowPanel && (
 					<NavigationButtonAsItem icon={ shadowIcon } path="/shadows">
-						{ __( 'Shadows') }
+						{ __( 'Shadows' ) }
 					</NavigationButtonAsItem>
 				) }
 				{ hasLayoutPanel && (
 					<NavigationButtonAsItem icon={ layout } path="/layout">
-						{ __( 'Layout') }
+						{ __( 'Layout' ) }
 					</NavigationButtonAsItem>
 				) }
 			</ItemGroup>

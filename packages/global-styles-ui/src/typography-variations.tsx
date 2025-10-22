@@ -31,6 +31,5 @@ export interface TypographyVariationsProps {
  * />
  * ```
  */
-export const TypographyVariations: React.ComponentType<
-	TypographyVariationsProps
-> = withGlobalStylesProvider( TypographyVariationsInternal );
+export const TypographyVariations: React.ComponentType< TypographyVariationsProps > =
+	withGlobalStylesProvider( TypographyVariationsInternal );

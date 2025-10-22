@@ -25,7 +25,7 @@ function ScreenLayout() {
 
 	return (
 		<>
-			<ScreenHeader title={ __( 'Layout') } />
+			<ScreenHeader title={ __( 'Layout' ) } />
 			{ hasDimensionsPanel && <DimensionsPanel /> }
 		</>
 	);

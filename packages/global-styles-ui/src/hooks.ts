@@ -139,7 +139,7 @@ function hasThemeVariation( {
 	styles,
 }: StyleVariation ): boolean {
 	return (
-		title === __( 'Default') ||
+		title === __( 'Default' ) ||
 		Object.keys( settings || {} ).length > 0 ||
 		Object.keys( styles || {} ).length > 0
 	);
@@ -174,7 +174,7 @@ export function useCurrentMergeThemeStyleVariationsWithUserConfig(
 			clonedUserVariation,
 			properties
 		);
-		userVariationWithoutProperties.title = __( 'Default');
+		userVariationWithoutProperties.title = __( 'Default' );
 
 		const variationsWithPropertiesAndBase = (
 			variationsFromTheme as StyleVariation[]

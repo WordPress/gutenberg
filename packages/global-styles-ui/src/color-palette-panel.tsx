@@ -58,10 +58,7 @@ export default function ColorPalettePanel( { name }: ColorPalettePanelProps ) {
 	const [ randomizeThemeColors ] = useColorRandomizer( name );
 
 	return (
-		<VStack
-			className="global-styles-ui-color-palette-panel"
-			spacing={ 8 }
-		>
+		<VStack className="global-styles-ui-color-palette-panel" spacing={ 8 }>
 			<VStack spacing={ 4 }>
 				{ !! themeColors && !! themeColors.length && (
 					<PaletteEdit
@@ -69,7 +66,7 @@ export default function ColorPalettePanel( { name }: ColorPalettePanelProps ) {
 						canOnlyChangeValues
 						colors={ themeColors }
 						onChange={ setThemeColors }
-						paletteLabel={ __( 'Theme') }
+						paletteLabel={ __( 'Theme' ) }
 						paletteLabelHeadingLevel={ 3 }
 						popoverProps={ popoverProps }
 					/>
@@ -83,7 +80,7 @@ export default function ColorPalettePanel( { name }: ColorPalettePanelProps ) {
 							icon={ shuffle }
 							onClick={ randomizeThemeColors }
 						>
-							{ __( 'Randomize colors') }
+							{ __( 'Randomize colors' ) }
 						</Button>
 					) }
 			</VStack>
@@ -95,7 +92,7 @@ export default function ColorPalettePanel( { name }: ColorPalettePanelProps ) {
 						canOnlyChangeValues
 						colors={ defaultColors }
 						onChange={ setDefaultColors }
-						paletteLabel={ __( 'Default') }
+						paletteLabel={ __( 'Default' ) }
 						paletteLabelHeadingLevel={ 3 }
 						popoverProps={ popoverProps }
 					/>
@@ -103,12 +100,12 @@ export default function ColorPalettePanel( { name }: ColorPalettePanelProps ) {
 			<PaletteEdit
 				colors={ customColors }
 				onChange={ setCustomColors }
-				paletteLabel={ __( 'Custom') }
+				paletteLabel={ __( 'Custom' ) }
 				paletteLabelHeadingLevel={ 3 }
 				slugPrefix="custom-"
 				popoverProps={ popoverProps }
 			/>
-			<ColorVariations title={ __( 'Palettes') } />
+			<ColorVariations title={ __( 'Palettes' ) } />
 		</VStack>
 	);
 }

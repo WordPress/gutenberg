@@ -475,10 +475,7 @@ function ShadowPopover( { shadowObj, onChange }: ShadowPopoverProps ) {
 	};
 
 	return (
-		<VStack
-			spacing={ 4 }
-			className="global-styles-ui__shadow-editor-panel"
-		>
+		<VStack spacing={ 4 } className="global-styles-ui__shadow-editor-panel">
 			<ColorPalette
 				clearable={ false }
 				enableAlpha={ enableAlpha }

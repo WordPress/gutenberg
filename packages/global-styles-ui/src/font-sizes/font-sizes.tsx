@@ -57,9 +57,11 @@ function FontSizeGroup( {
 	const resetDialogText =
 		origin === 'custom'
 			? __(
-					'Are you sure you want to remove all custom font size presets?')
+					'Are you sure you want to remove all custom font size presets?'
+			  )
 			: __(
-					'Are you sure you want to reset all font size presets to their default values?');
+					'Are you sure you want to reset all font size presets to their default values?'
+			  );
 
 	return (
 		<>
@@ -67,9 +69,7 @@ function FontSizeGroup( {
 				<ConfirmResetFontSizesDialog
 					text={ resetDialogText }
 					confirmButtonText={
-						origin === 'custom'
-							? __( 'Remove')
-							: __( 'Reset')
+						origin === 'custom' ? __( 'Remove' ) : __( 'Reset' )
 					}
 					isOpen={ isResetDialogOpen }
 					toggleOpen={ toggleResetDialog }
@@ -82,7 +82,7 @@ function FontSizeGroup( {
 					<FlexItem className="global-styles-ui__typography-panel__options-container">
 						{ origin === 'custom' && (
 							<Button
-								label={ __( 'Add font size') }
+								label={ __( 'Add font size' ) }
 								icon={ plus }
 								size="small"
 								onClick={ handleAddFontSize }
@@ -96,7 +96,8 @@ function FontSizeGroup( {
 											size="small"
 											icon={ moreVertical }
 											label={ __(
-												'Font size presets options') }
+												'Font size presets options'
+											) }
 										/>
 									}
 								/>
@@ -105,9 +106,11 @@ function FontSizeGroup( {
 										<Menu.ItemLabel>
 											{ origin === 'custom'
 												? __(
-														'Remove font size presets')
+														'Remove font size presets'
+												  )
 												: __(
-														'Reset font size presets') }
+														'Reset font size presets'
+												  ) }
 										</Menu.ItemLabel>
 									</Menu.Item>
 								</Menu.Popover>
@@ -176,7 +179,7 @@ function FontSizes() {
 		const index = getNewIndexFromPresets( customFontSizes, 'custom-' );
 		const newFontSize = {
 			/* translators: %d: font size index */
-			name: sprintf( __( 'New Font Size %d'), index ),
+			name: sprintf( __( 'New Font Size %d' ), index ),
 			size: '16px',
 			slug: `custom-${ index }`,
 		};
@@ -191,9 +194,10 @@ function FontSizes() {
 	return (
 		<VStack spacing={ 2 }>
 			<ScreenHeader
-				title={ __( 'Font size presets') }
+				title={ __( 'Font size presets' ) }
 				description={ __(
-					'Create and edit the presets used for font sizes across the site.') }
+					'Create and edit the presets used for font sizes across the site.'
+				) }
 			/>
 
 			<View>
@@ -201,7 +205,7 @@ function FontSizes() {
 					<VStack spacing={ 8 }>
 						{ !! themeFontSizes?.length && (
 							<FontSizeGroup
-								label={ __( 'Theme') }
+								label={ __( 'Theme' ) }
 								origin="theme"
 								sizes={ themeFontSizes }
 								handleAddFontSize={ handleAddFontSize }
@@ -222,7 +226,7 @@ function FontSizes() {
 						{ defaultFontSizesEnabled &&
 							!! defaultFontSizes?.length && (
 								<FontSizeGroup
-									label={ __( 'Default') }
+									label={ __( 'Default' ) }
 									origin="default"
 									sizes={ defaultFontSizes }
 									handleAddFontSize={ handleAddFontSize }
@@ -241,7 +245,7 @@ function FontSizes() {
 							) }
 
 						<FontSizeGroup
-							label={ __( 'Custom') }
+							label={ __( 'Custom' ) }
 							origin="custom"
 							sizes={ customFontSizes }
 							handleAddFontSize={ handleAddFontSize }

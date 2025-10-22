@@ -68,12 +68,10 @@ function FontFamiliesInner() {
 
 			<VStack spacing={ 2 }>
 				<HStack justify="space-between">
-					<Subtitle level={ 3 }>
-						{ __( 'Fonts') }
-					</Subtitle>
+					<Subtitle level={ 3 }>{ __( 'Fonts' ) }</Subtitle>
 					<Button
 						onClick={ () => setModalTabOpen?.( 'installed-fonts' ) }
-						label={ __( 'Manage fonts') }
+						label={ __( 'Manage fonts' ) }
 						icon={ settings }
 						size="small"
 					/>
@@ -94,8 +92,8 @@ function FontFamiliesInner() {
 					<>
 						<Text as="p">
 							{ hasInstalledFonts
-								? __( 'No fonts activated.')
-								: __( 'No fonts installed.') }
+								? __( 'No fonts activated.' )
+								: __( 'No fonts installed.' ) }
 						</Text>
 						<Button
 							className="global-styles-ui-font-families__manage-fonts"
@@ -110,8 +108,8 @@ function FontFamiliesInner() {
 							} }
 						>
 							{ hasInstalledFonts
-								? __( 'Manage fonts')
-								: __( 'Add fonts') }
+								? __( 'Manage fonts' )
+								: __( 'Add fonts' ) }
 						</Button>
 					</>
 				) }

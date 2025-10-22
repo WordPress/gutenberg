@@ -127,16 +127,14 @@ function InstalledFonts() {
 			await saveFontFamilies( fontFamilies );
 			setNotice( {
 				type: 'success',
-				message: __(
-					'Font family updated successfully.'),
+				message: __( 'Font family updated successfully.' ),
 			} );
 		} catch ( error ) {
 			setNotice( {
 				type: 'error',
 				message: sprintf(
 					/* translators: %s: error message */
-					__(
-						'There was an error updating the font family. %s'),
+					__( 'There was an error updating the font family. %s' ),
 					( error as Error ).message
 				),
 			} );
@@ -170,7 +168,7 @@ function InstalledFonts() {
 		).length;
 		return sprintf(
 			/* translators: 1: Active font variants, 2: Total font variants. */
-			__( '%1$d/%2$d variants active'),
+			__( '%1$d/%2$d variants active' ),
 			variantsActive,
 			variantsInstalled
 		);
@@ -262,8 +260,7 @@ function InstalledFonts() {
 								) }
 								{ ! hasFonts && (
 									<Text as="p">
-										{ __(
-											'No fonts installed.') }
+										{ __( 'No fonts installed.' ) }
 									</Text>
 								) }
 								{ baseThemeFonts.length > 0 && (
@@ -271,9 +268,7 @@ function InstalledFonts() {
 										<h2 className="font-library-modal__fonts-title">
 											{
 												/* translators: Heading for a list of fonts provided by the theme. */
-												_x(
-													'Theme',
-													'font source')
+												_x( 'Theme', 'font source' )
 											}
 										</h2>
 										{ /*
@@ -314,9 +309,7 @@ function InstalledFonts() {
 										<h2 className="font-library-modal__fonts-title">
 											{
 												/* translators: Heading for a list of fonts installed by the user. */
-												_x(
-													'Custom',
-													'font source')
+												_x( 'Custom', 'font source' )
 											}
 										</h2>
 										{ /*
@@ -381,7 +374,7 @@ function InstalledFonts() {
 										);
 										setNotice( null );
 									} }
-									label={ __( 'Back') }
+									label={ __( 'Back' ) }
 								/>
 								<Heading
 									level={ 2 }
@@ -406,13 +399,14 @@ function InstalledFonts() {
 							<Spacer margin={ 4 } />
 							<Text>
 								{ __(
-									'Choose font variants. Keep in mind that too many variants could make your site slower.') }
+									'Choose font variants. Keep in mind that too many variants could make your site slower.'
+								) }
 							</Text>
 							<Spacer margin={ 4 } />
 							<VStack spacing={ 0 }>
 								<CheckboxControl
 									className="font-library-modal__select-all"
-									label={ __( 'Select all') }
+									label={ __( 'Select all' ) }
 									checked={ isSelectAllChecked }
 									onChange={ toggleSelectAll }
 									indeterminate={ isIndeterminate }
@@ -461,7 +455,7 @@ function InstalledFonts() {
 								variant="tertiary"
 								onClick={ handleUninstallClick }
 							>
-								{ __( 'Delete') }
+								{ __( 'Delete' ) }
 							</Button>
 						) }
 						<Button
@@ -471,7 +465,7 @@ function InstalledFonts() {
 							disabled={ ! fontFamiliesHasChanges }
 							accessibleWhenDisabled
 						>
-							{ __( 'Update') }
+							{ __( 'Update' ) }
 						</Button>
 					</HStack>
 				</>
@@ -513,15 +507,14 @@ function ConfirmDeleteDialog( {
 			handleSetLibraryFontSelected( undefined );
 			setNotice( {
 				type: 'success',
-				message: __(
-					'Font family uninstalled successfully.'),
+				message: __( 'Font family uninstalled successfully.' ),
 			} );
 		} catch ( error ) {
 			setNotice( {
 				type: 'error',
 				message:
-					__(
-						'There was an error uninstalling the font family.') + ( error as Error ).message,
+					__( 'There was an error uninstalling the font family.' ) +
+					( error as Error ).message,
 			} );
 		}
 	};
@@ -533,8 +526,8 @@ function ConfirmDeleteDialog( {
 	return (
 		<ConfirmDialog
 			isOpen={ isOpen }
-			cancelButtonText={ __( 'Cancel') }
-			confirmButtonText={ __( 'Delete') }
+			cancelButtonText={ __( 'Cancel' ) }
+			confirmButtonText={ __( 'Delete' ) }
 			onCancel={ handleCancelUninstall }
 			onConfirm={ handleConfirmUninstall }
 			size="medium"
@@ -543,7 +536,8 @@ function ConfirmDeleteDialog( {
 				sprintf(
 					/* translators: %s: Name of the font. */
 					__(
-						'Are you sure you want to delete "%s" font and all its variants and assets?'),
+						'Are you sure you want to delete "%s" font and all its variants and assets?'
+					),
 					font.name
 				) }
 		</ConfirmDialog>

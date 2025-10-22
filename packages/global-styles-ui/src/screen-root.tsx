@@ -71,7 +71,7 @@ function ScreenRoot() {
 							<NavigationButtonAsItem path="/variations">
 								<HStack justify="space-between">
 									<FlexItem>
-										{ __( 'Browse styles') }
+										{ __( 'Browse styles' ) }
 									</FlexItem>
 									<IconWithCurrentColor
 										icon={
@@ -96,14 +96,13 @@ function ScreenRoot() {
 					marginBottom={ 4 }
 				>
 					{ __(
-						'Customize the appearance of specific blocks for the whole site.') }
+						'Customize the appearance of specific blocks for the whole site.'
+					) }
 				</Spacer>
 				<ItemGroup>
 					<NavigationButtonAsItem path="/blocks">
 						<HStack justify="space-between">
-							<FlexItem>
-								{ __( 'Blocks') }
-							</FlexItem>
+							<FlexItem>{ __( 'Blocks' ) }</FlexItem>
 							<IconWithCurrentColor
 								icon={ isRTL() ? chevronLeft : chevronRight }
 							/>
@@ -123,13 +122,14 @@ function ScreenRoot() {
 							marginBottom={ 4 }
 						>
 							{ __(
-								'Add your own CSS to customize the appearance and layout of your site.') }
+								'Add your own CSS to customize the appearance and layout of your site.'
+							) }
 						</Spacer>
 						<ItemGroup>
 							<NavigationButtonAsItem path="/css">
 								<HStack justify="space-between">
 									<FlexItem>
-										{ __( 'Additional CSS') }
+										{ __( 'Additional CSS' ) }
 									</FlexItem>
 									<IconWithCurrentColor
 										icon={

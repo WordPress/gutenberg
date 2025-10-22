@@ -14,9 +14,10 @@ function ScreenStyleVariations() {
 	return (
 		<>
 			<ScreenHeader
-				title={ __( 'Browse styles') }
+				title={ __( 'Browse styles' ) }
 				description={ __(
-					'Choose a variation to change the look of the site.') }
+					'Choose a variation to change the look of the site.'
+				) }
 			/>
 
 			<Card

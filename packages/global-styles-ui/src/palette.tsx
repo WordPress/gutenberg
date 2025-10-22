@@ -64,7 +64,7 @@ function Palette( { name }: PaletteProps ) {
 
 	return (
 		<VStack spacing={ 3 }>
-			<Subtitle level={ 3 }>{ __( 'Palette') }</Subtitle>
+			<Subtitle level={ 3 }>{ __( 'Palette' ) }</Subtitle>
 			<ItemGroup isBordered isSeparated>
 				<NavigationButtonAsItem path={ screenPath }>
 					<HStack direction="row">
@@ -84,13 +84,11 @@ function Palette( { name }: PaletteProps ) {
 										) ) }
 								</ZStack>
 								<FlexItem isBlock>
-									{ __( 'Edit palette') }
+									{ __( 'Edit palette' ) }
 								</FlexItem>
 							</>
 						) : (
-							<FlexItem>
-								{ __( 'Add colors') }
-							</FlexItem>
+							<FlexItem>{ __( 'Add colors' ) }</FlexItem>
 						) }
 						<Icon icon={ isRTL() ? chevronLeft : chevronRight } />
 					</HStack>

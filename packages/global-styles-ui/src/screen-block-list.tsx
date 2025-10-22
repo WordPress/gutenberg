@@ -139,7 +139,7 @@ function BlockList( { filterValue }: BlockListProps ) {
 		const count = blockTypesListRef.current?.childElementCount || 0;
 		const resultsFoundMessage = sprintf(
 			/* translators: %d: number of results. */
-			_n( '%d result found.', '%d results found.', count),
+			_n( '%d result found.', '%d results found.', count ),
 			count
 		);
 		debouncedSpeak( resultsFoundMessage, 'polite' );
@@ -154,7 +154,7 @@ function BlockList( { filterValue }: BlockListProps ) {
 		>
 			{ filteredBlockTypes.length === 0 ? (
 				<Text align="center" as="p">
-					{ __( 'No blocks found.') }
+					{ __( 'No blocks found.' ) }
 				</Text>
 			) : (
 				filteredBlockTypes.map( ( block ) => (
@@ -177,17 +177,18 @@ function ScreenBlockList() {
 	return (
 		<>
 			<ScreenHeader
-				title={ __( 'Blocks') }
+				title={ __( 'Blocks' ) }
 				description={ __(
-					'Customize the appearance of specific blocks and for the whole site.') }
+					'Customize the appearance of specific blocks and for the whole site.'
+				) }
 			/>
 			<SearchControl
 				__nextHasNoMarginBottom
 				className="global-styles-ui-block-types-search"
 				onChange={ setFilterValue }
 				value={ filterValue }
-				label={ __( 'Search') }
-				placeholder={ __( 'Search') }
+				label={ __( 'Search' ) }
+				placeholder={ __( 'Search' ) }
 			/>
 			<MemoizedBlockList filterValue={ deferredFilterValue } />
 		</>

@@ -44,9 +44,10 @@ function ScreenColors() {
 	return (
 		<>
 			<ScreenHeader
-				title={ __( 'Colors') }
+				title={ __( 'Colors' ) }
 				description={ __(
-					'Palette colors and the application of those colors on site elements.') }
+					'Palette colors and the application of those colors on site elements.'
+				) }
 			/>
 			<div className="global-styles-ui-screen">
 				<VStack spacing={ 7 }>

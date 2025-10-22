@@ -31,7 +31,7 @@ export function ScreenHeader( {
 						<Navigator.BackButton
 							icon={ isRTL() ? chevronRight : chevronLeft }
 							size="small"
-							label={ __( 'Back') }
+							label={ __( 'Back' ) }
 							onClick={ onBack }
 						/>
 						<Spacer>

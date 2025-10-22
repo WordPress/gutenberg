@@ -40,10 +40,7 @@ function FontFamilyItem( { font }: FontFamilyItemProps ) {
 				<FlexItem className="global-styles-ui-screen-typography__font-variants-count">
 					{ sprintf(
 						/* translators: %d: Number of font variants. */
-						_n(
-							'%d variant',
-							'%d variants',
-							variantsCount),
+						_n( '%d variant', '%d variants', variantsCount ),
 						variantsCount
 					) }
 				</FlexItem>
