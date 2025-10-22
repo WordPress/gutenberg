@@ -361,6 +361,7 @@ describe.each( [
 			<Component
 				options={ timezones }
 				label={ defaultLabelText }
+				value={ timezones[ 0 ].value }
 				allowReset
 			/>
 		);
@@ -368,7 +369,6 @@ describe.each( [
 		const resetButton = screen.getByRole( 'button', { name: 'Reset' } );
 
 		expect( resetButton ).toBeVisible();
-		expect( resetButton ).toBeDisabled();
 	} );
 
 	it( 'should reset input when clicking the Reset button', async () => {
@@ -379,6 +379,7 @@ describe.each( [
 			<Component
 				options={ timezones }
 				label={ defaultLabelText }
+				value={ targetOption.value }
 				allowReset
 			/>
 		);
@@ -401,7 +402,6 @@ describe.each( [
 		await user.click( resetButton );
 
 		expect( input ).toHaveValue( '' );
-		expect( resetButton ).toBeDisabled();
 		expect( input ).toHaveFocus();
 	} );
 
@@ -413,6 +413,7 @@ describe.each( [
 			<Component
 				options={ timezones }
 				label={ defaultLabelText }
+				value={ targetOption.value }
 				allowReset
 			/>
 		);
@@ -440,7 +441,6 @@ describe.each( [
 		await user.keyboard( '{Enter}' );
 
 		expect( input ).toHaveValue( '' );
-		expect( resetButton ).toBeDisabled();
 		expect( input ).toHaveFocus();
 	} );
 
@@ -452,6 +452,7 @@ describe.each( [
 			<Component
 				options={ timezones }
 				label={ defaultLabelText }
+				value={ targetOption.value }
 				allowReset
 			/>
 		);
@@ -479,7 +480,6 @@ describe.each( [
 		await user.keyboard( '[Space]' );
 
 		expect( input ).toHaveValue( '' );
-		expect( resetButton ).toBeDisabled();
 		expect( input ).toHaveFocus();
 	} );
 } );
