@@ -55,28 +55,35 @@ function ListViewBlockSelectButton(
 		context: 'list-view',
 	} );
 	const { isLocked } = useBlockLock( clientId );
-	const { canToggleBlockVisibility, isBlockHidden, isContentOnly } =
-		useSelect(
-			( select ) => {
-				const { getBlockName } = select( blockEditorStore );
-				const { isBlockHidden: _isBlockHidden } = unlock(
-					select( blockEditorStore )
-				);
-				return {
-					canToggleBlockVisibility: hasBlockSupport(
-						getBlockName( clientId ),
-						'blockVisibility',
-						true
-					),
-					isBlockHidden: _isBlockHidden( clientId ),
-					isContentOnly:
-						select( blockEditorStore ).getBlockEditingMode(
-							clientId
-						) === 'contentOnly',
-				};
-			},
-			[ clientId ]
-		);
+	const {
+		canToggleBlockVisibility,
+		isBlockHidden,
+		isContentOnly,
+		isPattern,
+	} = useSelect(
+		( select ) => {
+			const { getBlockName, getBlockAttributes } =
+				select( blockEditorStore );
+			const { isBlockHidden: _isBlockHidden } = unlock(
+				select( blockEditorStore )
+			);
+			const blockAttributes = getBlockAttributes( clientId );
+			return {
+				canToggleBlockVisibility: hasBlockSupport(
+					getBlockName( clientId ),
+					'blockVisibility',
+					true
+				),
+				isBlockHidden: _isBlockHidden( clientId ),
+				isContentOnly:
+					select( blockEditorStore ).getBlockEditingMode(
+						clientId
+					) === 'contentOnly',
+				isPattern: !! blockAttributes?.metadata?.patternName,
+			};
+		},
+		[ clientId ]
+	);
 	const shouldShowLockIcon = isLocked && ! isContentOnly;
 	const shouldShowBlockVisibilityIcon =
 		canToggleBlockVisibility && isBlockHidden;
@@ -121,7 +128,9 @@ function ListViewBlockSelectButton(
 			aria-describedby={ ariaDescribedBy }
 			aria-expanded={ isExpanded }
 		>
-			<ListViewExpander onClick={ onToggleExpanded } />
+			<ListViewExpander
+				onClick={ isPattern ? undefined : onToggleExpanded }
+			/>
 			<BlockIcon
 				icon={ blockInformation?.icon }
 				showColors

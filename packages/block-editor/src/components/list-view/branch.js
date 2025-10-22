@@ -114,6 +114,20 @@ function ListViewBranch( props ) {
 		[ parentId ]
 	);
 
+	const shouldHideChildren = useSelect(
+		( select ) => {
+			if ( ! parentId ) {
+				return false;
+			}
+			const { getBlockAttributes } = select( blockEditorStore );
+			const parentAttributes = getBlockAttributes( parentId );
+
+			// Hide children if parent is a pattern (has patternName metadata)
+			return !! parentAttributes?.metadata?.patternName;
+		},
+		[ parentId ]
+	);
+
 	const {
 		blockDropPosition,
 		blockDropTargetIndex,
@@ -126,6 +140,12 @@ function ListViewBranch( props ) {
 	const nextPositionRef = useRef();
 
 	if ( ! canParentExpand ) {
+		return null;
+	}
+
+	// Hide this entire branch if the parent is a pattern block.
+	// This prevents pattern internals from appearing in the list view.
+	if ( shouldHideChildren ) {
 		return null;
 	}
 
