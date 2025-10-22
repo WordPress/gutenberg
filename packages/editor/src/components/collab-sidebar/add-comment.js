@@ -43,12 +43,7 @@ export function AddComment( {
 	}
 
 	return (
-		<VStack
-			className="editor-collab-sidebar-panel__thread is-selected"
-			spacing="3"
-			tabIndex={ 0 }
-			role="listitem"
-		>
+		<VStack spacing="3" tabIndex={ 0 } role="listitem">
 			<HStack alignment="left" spacing="3">
 				<CommentAuthorInfo />
 			</HStack>

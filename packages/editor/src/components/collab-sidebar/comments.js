@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useState, RawHTML, useEffect, useCallback } from '@wordpress/element';
+import { useState, RawHTML, useEffect, useCallback, useMemo } from '@wordpress/element';
 import {
 	__experimentalText as Text,
 	__experimentalHStack as HStack,
@@ -57,7 +57,7 @@ const { Menu } = unlock( componentsPrivateApis );
  * @return {React.ReactNode} The rendered Comments component.
  */
 export function Comments( {
-	threads,
+	threads: commentThreads,
 	onEditComment,
 	onAddReply,
 	onCommentDelete,
@@ -85,7 +85,25 @@ export function Comments( {
 		};
 	}, [] );
 
+
 	const relatedBlockElement = useBlockElement( selectedBlockClientId );
+
+	const threads = useMemo( () => {
+		const t = [ ...commentThreads ];
+		// In floating mode, when the comment board is shown, add a new comment entry to the threads.
+		if ( isFloating && showCommentBoard ) {
+			t.push( {
+				id: 'new-comment-thread',
+				blockClientId: selectedBlockClientId,
+			} );
+		}
+		return t;
+	}, [
+		commentThreads,
+		isFloating,
+		showCommentBoard,
+		selectedBlockClientId,
+	] );
 
 	const handleDelete = async ( comment ) => {
 		const currentIndex = threads.findIndex( ( t ) => t.id === comment.id );
@@ -260,15 +278,6 @@ export function Comments( {
 					showCommentBoard={ showCommentBoard }
 					setShowCommentBoard={ setShowCommentBoard }
 					commentSidebarRef={ commentSidebarRef }
-					thread={ { blockClientId: blockCommentId } }
-					isFloating={ isFloating }
-					calculatedOffset={ 0 }
-					setHeights={ setHeights }
-					setBlockRef={ setBlockRef }
-					selectedThread={ selectedThread }
-					setSelectedThread={ setSelectedThread }
-					commentLastUpdated={ commentLastUpdated }
-					reflowComments={ reflowComments }
 				/>
 			</VStack>
 		);
@@ -276,21 +285,21 @@ export function Comments( {
 
 	return (
 		<VStack spacing="3">
-			<AddComment
-				onSubmit={ onAddReply }
-				showCommentBoard={ showCommentBoard }
-				setShowCommentBoard={ setShowCommentBoard }
-				commentSidebarRef={ commentSidebarRef }
-				isFloating={ isFloating }
-				thread={ { blockClientId: selectedBlockClientId } }
-				calculatedOffset={ 0 }
-				setHeights={ setHeights }
-				setBlockRef={ setBlockRef }
-				selectedThread={ selectedThread }
-				setSelectedThread={ setSelectedThread }
-				commentLastUpdated={ commentLastUpdated }
-				reflowComments={ reflowComments }
-			/>
+			{ ! isFloating && (
+				<VStack
+					className="editor-collab-sidebar-panel__thread is-selected"
+					spacing="3"
+					tabIndex={ 0 }
+					role="listitem"
+				>
+					<AddComment
+						onSubmit={ onAddReply }
+						showCommentBoard={ showCommentBoard }
+						setShowCommentBoard={ setShowCommentBoard }
+						commentSidebarRef={ commentSidebarRef }
+					/>
+				</VStack>
+			) }
 			{ threads.map( ( thread ) => (
 				<Thread
 					key={ thread.id }
@@ -309,6 +318,7 @@ export function Comments( {
 					setBlockRef={ setBlockRef }
 					selectedThread={ selectedThread }
 					commentLastUpdated={ commentLastUpdated }
+					showCommentBoard={ showCommentBoard }
 				/>
 			) ) }
 		</VStack>
@@ -331,6 +341,7 @@ function Thread( {
 	setSelectedThread,
 	selectedThread,
 	commentLastUpdated,
+	showCommentBoard,
 } ) {
 	const { toggleBlockHighlight, selectBlock, toggleBlockSpotlight } = unlock(
 		useDispatch( blockEditorStore )
@@ -372,7 +383,6 @@ function Thread( {
 		setShowCommentBoard( false );
 		toggleBlockSpotlight( thread.blockClientId, false );
 	};
-
 	const allReplies = thread?.reply || [];
 
 	const lastReply =
@@ -380,7 +390,7 @@ function Thread( {
 	const restReplies = allReplies.length > 0 ? allReplies.slice( 0, -1 ) : [];
 
 	const commentExcerpt = getCommentExcerpt(
-		stripHTML( thread.content.rendered ),
+		stripHTML( thread.content?.rendered ),
 		10
 	);
 	const ariaLabel = !! thread.blockClientId
@@ -394,6 +404,30 @@ function Thread( {
 				__( 'Original block deleted. Note: %s' ),
 				commentExcerpt
 		  );
+	if ( 'new-comment-thread' === thread.id ) {
+		return (
+			// Disable reason: role="listitem" does in fact support aria-expanded.
+			// eslint-disable-next-line jsx-a11y/role-supports-aria-props
+			<VStack
+				className="editor-collab-sidebar-panel__thread is-selected is-floating"
+				id={ `comment-thread-${ thread.id }` }
+				spacing="3"
+				tabIndex={ 0 }
+				role="listitem"
+				aria-label={ ariaLabel }
+				aria-expanded={ isSelected }
+				ref={ isFloating ? refs.setFloating : undefined }
+				style={ isFloating ? { top: y } : undefined }
+			>
+				<AddComment
+					onSubmit={ onAddReply }
+					showCommentBoard={ showCommentBoard }
+					setShowCommentBoard={ setShowCommentBoard }
+					commentSidebarRef={ commentSidebarRef }
+				/>
+			</VStack>
+		);
+	}
 
 	return (
 		// Disable reason: role="listitem" does in fact support aria-expanded.
