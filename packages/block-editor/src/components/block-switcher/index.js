@@ -29,7 +29,6 @@ import BlockTransformationsMenu from './block-transformations-menu';
 import { useBlockVariationTransforms } from './block-variation-transformations';
 import BlockStylesMenu from './block-styles-menu';
 import PatternTransformationsMenu from './pattern-transformations-menu';
-import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import { unlock } from '../../lock-unlock';
 
 function BlockSwitcherDropdownMenuContents( {
@@ -200,6 +199,7 @@ export const BlockSwitcher = ( { clientIds } ) => {
 		isTemplate,
 		isDisabled,
 		isSectionInSelection,
+		blockTitle,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -223,6 +223,7 @@ export const BlockSwitcher = ( { clientIds } ) => {
 
 			let _icon;
 			let _hasTemplateLock;
+			let _blockTitle;
 			if ( _isSingleBlockSelected ) {
 				const match = getActiveBlockVariation(
 					firstBlockName,
@@ -232,6 +233,15 @@ export const BlockSwitcher = ( { clientIds } ) => {
 				_icon = match?.icon || blockType.icon;
 				_hasTemplateLock =
 					getTemplateLock( clientIds[ 0 ] ) === 'contentOnly';
+
+				// For BlockSwitcher, we only show the block type or variation name
+				// We don't need custom labels (metadata.name) - those are only for list view
+				_blockTitle = match?.title || blockType.title;
+
+				// Truncate if needed (max 35 chars)
+				if ( _blockTitle && _blockTitle.length > 35 ) {
+					_blockTitle = _blockTitle.slice( 0, 34 ) + '…';
+				}
 			} else {
 				const isSelectionOfSameType =
 					new Set( _blocks.map( ( { name } ) => name ) ).size === 1;
@@ -241,6 +251,7 @@ export const BlockSwitcher = ( { clientIds } ) => {
 				// When selection consists of blocks of multiple types, display an
 				// appropriate icon to communicate the non-uniformity.
 				_icon = isSelectionOfSameType ? blockType.icon : copy;
+				_blockTitle = null; // Not used for multiple blocks
 			}
 
 			const _isSectionInSelection = clientIds.some( ( id ) =>
@@ -260,14 +271,11 @@ export const BlockSwitcher = ( { clientIds } ) => {
 				hasContentOnlyLocking: _hasTemplateLock,
 				isDisabled: editingMode !== 'default',
 				isSectionInSelection: _isSectionInSelection,
+				blockTitle: _blockTitle,
 			};
 		},
 		[ clientIds ]
 	);
-	const blockTitle = useBlockDisplayTitle( {
-		clientId: clientIds?.[ 0 ],
-		maximumLength: 35,
-	} );
 	const showIconLabels = useSelect(
 		( select ) =>
 			select( preferencesStore ).get( 'core', 'showIconLabels' ),
