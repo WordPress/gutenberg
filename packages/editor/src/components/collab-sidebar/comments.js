@@ -97,9 +97,11 @@ export function Comments( {
 
 	const threads = useMemo( () => {
 		const t = [ ...noteThreads ];
-		// In floating mode, when the note board is shown, add a new
-		// note entry to the threads - as long as the selected block doesn't
-		// have an existing note attached.
+		// In floating mode, when the note board is shown, and as long
+		// as the selected block doesn't have an existing note attached -
+		// add a "new note" entry to the threads. This special thread type
+		// gets sorted and floated like regular threads, but shows an AddComment
+		// component instead of a regular comment thread.
 		if ( isFloating && showCommentBoard && undefined === blockCommentId ) {
 			// Insert the new note entry at the correct location for its blockId.
 			const newNoteThread = {
@@ -107,7 +109,7 @@ export function Comments( {
 				blockClientId: selectedBlockClientId,
 				content: { rendered: '' },
 			};
-			// Find the note blocks spot in orderedBlockIds.
+			// Find the note block's spot in orderedBlockIds.
 			const insertIndex = orderedBlockIds.findIndex(
 				( id ) => id === selectedBlockClientId
 			);
@@ -117,9 +119,6 @@ export function Comments( {
 				// If block not found, append to the end.
 				t.push( newNoteThread );
 			}
-		} else {
-			// Otherwise, remove any previously added new note entry.
-			return t.filter( ( thread ) => thread.id !== 'new-note-thread' );
 		}
 		return t;
 	}, [
