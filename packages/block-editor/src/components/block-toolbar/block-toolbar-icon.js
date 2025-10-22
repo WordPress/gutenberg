@@ -4,7 +4,7 @@
 import { ToolbarButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { copy } from '@wordpress/icons';
+import { copy, symbol } from '@wordpress/icons';
 import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 import { store as preferencesStore } from '@wordpress/preferences';
 
@@ -90,11 +90,15 @@ function getBlockIcon( { select, clientIds } ) {
 	const blockType = getBlockType( blockName );
 
 	if ( _isSingleBlock ) {
-		const match = getActiveBlockVariation(
-			blockName,
-			getBlockAttributes( firstClientId )
-		);
-		return match?.icon || blockType?.icon;
+		const blockAttributes = getBlockAttributes( firstClientId );
+		// Check if this is a pattern block
+		if ( blockAttributes?.metadata?.patternName ) {
+			return symbol;
+		} else {
+			const match = getActiveBlockVariation( blockName, blockAttributes );
+			// Take into account active block variations.
+			return match?.icon || blockType?.icon;
+		}
 	}
 
 	const blockNames = clientIds.map( ( id ) => getBlockName( id ) );
