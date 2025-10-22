@@ -12,7 +12,13 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
-import { Icon, lockSmall as lock, pinSmall, unseen } from '@wordpress/icons';
+import {
+	Icon,
+	lockSmall as lock,
+	pinSmall,
+	unseen,
+	symbol,
+} from '@wordpress/icons';
 import { SPACE, ENTER } from '@wordpress/keycodes';
 import { useSelect } from '@wordpress/data';
 import { hasBlockSupport } from '@wordpress/blocks';
@@ -132,7 +138,7 @@ function ListViewBlockSelectButton(
 				onClick={ isPattern ? undefined : onToggleExpanded }
 			/>
 			<BlockIcon
-				icon={ blockInformation?.icon }
+				icon={ isPattern ? symbol : blockInformation?.icon }
 				showColors
 				context="list-view"
 			/>
