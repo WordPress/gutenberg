@@ -209,11 +209,13 @@ function momentTimezoneAliasPlugin() {
  *
  * @param {string} assetName   Optional. The name of the asset file to generate (without .asset.php extension). Defaults to 'index.min'.
  * @param {string} buildFormat Optional. The build format: 'iife' for scripts or 'esm' for script modules. Defaults to 'iife'.
+ * @param {Object} packageJSON Optional. The package.json manifest object.
  * @return {Object} esbuild plugin.
  */
 function wordpressExternalsPlugin(
 	assetName = 'index.min',
-	buildFormat = 'iife'
+	buildFormat = 'iife',
+	packageJSON = null
 ) {
 	return {
 		name: 'wordpress-externals',
@@ -400,13 +402,15 @@ function wordpressExternalsPlugin(
 
 			build.onLoad(
 				{ filter: /.*/, namespace: 'wordpress-external' },
-				( args ) => {
-					const wpGlobal = kebabToCamelCase(
-						args.path.replace( '@wordpress/', '' )
-					);
+				async ( args ) => {
+					const packageName = args.path.replace( '@wordpress/', '' );
+					const { version } = await getPackageInfo( packageName );
+					const versionedHandle = `${ args.path }@${
+						version.split( '.' )[ 0 ]
+					}`;
 
 					return {
-						contents: `module.exports = window.wp.${ wpGlobal };`,
+						contents: `module.exports = window.wp[ '${ versionedHandle }' ];`,
 						loader: 'js',
 					};
 				}
@@ -417,10 +421,27 @@ function wordpressExternalsPlugin(
 					return;
 				}
 
-				const dependenciesString = Array.from( dependencies )
-					.sort()
-					.map( ( dep ) => `'${ dep }'` )
-					.join( ', ' );
+				const dependenciesString = (
+					await Promise.all(
+						Array.from( dependencies )
+							.sort()
+							.map( async ( dep ) => {
+								if ( dep.startsWith( 'wp-' ) ) {
+									const packageName = dep.replace(
+										/^wp-/,
+										''
+									);
+									const { version } =
+										await getPackageInfo( packageName );
+									return `'${ dep }@${
+										version.split( '.' )[ 0 ]
+									}'`;
+								}
+
+								return `'${ dep }'`;
+							} )
+					)
+				).join( ', ' );
 
 				// Format module dependencies as array of arrays with 'id' and 'import' keys
 				const moduleDependenciesArray = Array.from(
@@ -437,7 +458,7 @@ function wordpressExternalsPlugin(
 						? moduleDependenciesArray.join( ', ' )
 						: '';
 
-				const version = Date.now();
+				const version = packageJSON.version.split( '.' )[ 0 ];
 
 				const parts = [
 					`'dependencies' => array(${ dependenciesString })`,
@@ -533,6 +554,9 @@ async function bundlePackage( packageName ) {
 		);
 		const target = browserslistToEsbuild();
 		const globalName = `wp.${ kebabToCamelCase( packageName ) }`;
+		const versionedName = `${ packageJson.name }@${
+			packageJson.version.split( '.' )[ 0 ]
+		}`;
 
 		const baseConfig = {
 			entryPoints: [ entryPoint ],
@@ -542,18 +566,19 @@ async function bundlePackage( packageName ) {
 			target,
 			platform: 'browser',
 			globalName,
+			footer: { js: '' },
 		};
 
 		// For packages with default exports, add a footer to properly expose the default
 		if ( packageJson.wpScriptDefaultExport ) {
-			baseConfig.footer = {
-				js: `if (typeof ${ globalName } === 'object' && ${ globalName }.default) { ${ globalName } = ${ globalName }.default; }`,
-			};
+			baseConfig.footer.js += `if (typeof ${ globalName } === 'object' && ${ globalName }.default) { ${ globalName } = ${ globalName }.default; }`;
 		}
+
+		baseConfig.footer.js += `window.wp[ '${ versionedName }' ] = ${ globalName };`;
 
 		const bundlePlugins = [
 			momentTimezoneAliasPlugin(),
-			wordpressExternalsPlugin( 'index.min', 'iife' ),
+			wordpressExternalsPlugin( 'index.min', 'iife', packageJson ),
 		];
 
 		builds.push(
@@ -597,7 +622,11 @@ async function bundlePackage( packageName ) {
 			const entryPoint = path.join( packageDir, exportPath );
 			const baseFileName = path.basename( fileName );
 			const modulePlugins = [
-				wordpressExternalsPlugin( `${ baseFileName }.min`, 'esm' ),
+				wordpressExternalsPlugin(
+					`${ baseFileName }.min`,
+					'esm',
+					packageJson
+				),
 			];
 
 			builds.push(
