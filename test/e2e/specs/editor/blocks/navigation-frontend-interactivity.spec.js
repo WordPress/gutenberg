@@ -21,7 +21,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 		await requestUtils.deleteAllMenus();
 	} );
 
-	test.describe( 'Overlay menu', () => {
+	test.describe( 'Overlay menu (@firefox, @webkit)', () => {
 		test.beforeEach( async ( { admin, editor, requestUtils } ) => {
 			await admin.visitSiteEditor( {
 				postId: 'emptytheme//header',
@@ -65,67 +65,22 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			// Test: overlay menu focuses on first element after opening
 			await expect( overlayMenuFirstElement ).toBeFocused();
 
-			// Test: overlay menu traps focus
-			await pageUtils.pressKeys( 'Tab', { times: 2, delay: 50 } );
-			await expect( closeMenuButton ).toBeFocused();
-			await pageUtils.pressKeys( 'Shift+Tab', { times: 2, delay: 50 } );
-			await expect( overlayMenuFirstElement ).toBeFocused();
-
 			// Test: overlay menu closes on click on close menu button
 			await closeMenuButton.click();
 			await expect( overlayMenuFirstElement ).toBeHidden();
 
 			// Test: overlay menu closes on ESC key
-			await openMenuButton.click();
-			await expect( overlayMenuFirstElement ).toBeVisible();
-			await pageUtils.pressKeys( 'Escape' );
-			await expect( overlayMenuFirstElement ).toBeHidden();
-			await expect( openMenuButton ).toBeFocused();
-		} );
-
-		/**
-		 * These are already tested within the Overlay Interactions test above, but Safari is flakey on the Tab
-		 * keypresses (passes 50 - 70% of the time). Tab keypresses are testing fine manually in Safari, but not
-		 * in the test. Once we figure out why the Tab keypresses are flakey in the test, we can
-		 * remove this test and only rely on the Overlay Interactions test above and add a (@firefox, @webkit)
-		 * directive to the describe() statement. https://github.com/WordPress/gutenberg/pull/55198
-		 */
-		test( 'Overlay menu interactions in Safari (@webkit)', async ( {
-			page,
-			pageUtils,
-		} ) => {
-			await page.goto( '/' );
-			const overlayMenuFirstElement = page.getByRole( 'link', {
-				name: 'Item 1',
-			} );
-			const openMenuButton = page.getByRole( 'button', {
-				name: 'Open menu',
-			} );
-
-			const closeMenuButton = page.getByRole( 'button', {
-				name: 'Close menu',
-			} );
-
-			// Test: overlay menu opens on click on open menu button
-			await expect( overlayMenuFirstElement ).toBeHidden();
-			await openMenuButton.click();
-			await expect( overlayMenuFirstElement ).toBeVisible();
-
-			// Test: overlay menu focuses on first element after opening
-			await expect( overlayMenuFirstElement ).toBeFocused();
-
-			// Test: overlay menu traps focus
-			await pageUtils.pressKeys( 'Tab', { times: 2, delay: 50 } );
-			await expect( closeMenuButton ).toBeFocused();
-			await pageUtils.pressKeys( 'Shift+Tab', { times: 2, delay: 50 } );
-			await expect( overlayMenuFirstElement ).toBeFocused();
-
-			// Test: overlay menu closes on click on close menu button
-			await closeMenuButton.click();
-			await expect( overlayMenuFirstElement ).toBeHidden();
-
-			// Test: overlay menu closes on ESC key
-			await openMenuButton.click();
+			// In webkit clicking a button doesn’t focus it. Tabbing to the button and opening it
+			// with a Space key press ensures that even in webkit it is focused before the dialog
+			// opens and thereby gets focused after the dialog closes.
+			while (
+				! ( await openMenuButton.evaluate( ( button ) =>
+					button.matches( ':focus' )
+				) )
+			) {
+				await pageUtils.pressKeys( 'Tab' );
+			}
+			await pageUtils.pressKeys( 'Space' );
 			await expect( overlayMenuFirstElement ).toBeVisible();
 			await pageUtils.pressKeys( 'Escape' );
 			await expect( overlayMenuFirstElement ).toBeHidden();
@@ -159,7 +114,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			} );
 			await editor.insertBlock( {
 				name: 'core/navigation',
-				attributes: { overlayMenu: 'off', openSubmenusOnClick: true },
+				attributes: { overlayMenu: 'never', openSubmenusOnClick: true },
 			} );
 			await editor.saveSiteEditorEntities( {
 				isOnlyCurrentEntityDirty: true,
@@ -386,7 +341,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			} );
 			await editor.insertBlock( {
 				name: 'core/navigation',
-				attributes: { overlayMenu: 'off' },
+				attributes: { overlayMenu: 'never' },
 			} );
 			await editor.saveSiteEditorEntities( {
 				isOnlyCurrentEntityDirty: true,
@@ -478,7 +433,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			} );
 			await editor.insertBlock( {
 				name: 'core/navigation',
-				attributes: { overlayMenu: 'off', openSubmenusOnClick: true },
+				attributes: { overlayMenu: 'never', openSubmenusOnClick: true },
 			} );
 			await editor.saveSiteEditorEntities( {
 				isOnlyCurrentEntityDirty: true,

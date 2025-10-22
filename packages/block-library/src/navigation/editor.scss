@@ -448,6 +448,10 @@ $color-control-label-height: 20px;
 // When not fullscreen.
 .wp-block-navigation__responsive-container.is-menu-open {
 	position: fixed;
+	// This z-index was applied in style.scss but is ineffectual for a modal dialog.
+	// In the editor, if the canvas is not iframed then this element is not modal and
+	// this is applicable.
+	z-index: 10000;
 	top: $admin-bar-height-big + $header-height + $block-toolbar-height + $border-width;
 
 	@include break-medium() {

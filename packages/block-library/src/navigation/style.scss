@@ -479,12 +479,14 @@ button.wp-block-navigation-item__content {
 	}
 }
 .wp-block-navigation__responsive-container {
-	display: none;
-	position: fixed;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
+	color: inherit;
+	background-color: inherit;
+	width: auto;
+	height: auto;
+	max-width: 100%;
+	max-height: 100%;
+	box-sizing: border-box;
+	border: 0;
 
 	// Low specificity so that themes can override.
 	& :where(.wp-block-navigation-item a) {
@@ -499,9 +501,9 @@ button.wp-block-navigation-item__content {
 		align-items: var(--navigation-layout-align, initial);
 	}
 
-	// If the responsive wrapper is present but overlay is not open,
-	// overlay styles shouldn't apply.
-	&:not(.is-menu-open.is-menu-open) {
+	// If the responsive wrapper is present but overlay is not open, overlay colors
+	// shouldn't apply and !important is to override color classes or inline styles.
+	&:not(.is-menu-open, [open]) { /* todo: replace [open] with :open when browser support is widely available. */
 		color: inherit !important;
 		background-color: inherit !important;
 	}
@@ -511,10 +513,9 @@ button.wp-block-navigation-item__content {
 	// Inherit as much as we can regarding colors, fonts, sizes,
 	// but otherwise provide a baseline.
 	// In a future version, we can explore more customizability.
-	&.is-menu-open {
-		display: flex; // Needs to be set to override "none".
+	&:is(.is-menu-open, [open]) { /* todo: replace [open] with :open when browser support is widely available. */
+		display: flex;
 		flex-direction: column;
-		background-color: inherit;
 
 		// Animation.
 		@media not (prefers-reduced-motion) {
@@ -530,9 +531,6 @@ button.wp-block-navigation-item__content {
 
 		// Allow modal to scroll.
 		overflow: auto;
-
-		// Give it a z-index just higher than the adminbar.
-		z-index: 100000;
 
 		.wp-block-navigation__responsive-container-content {
 			// Add padding above to accommodate close button.
@@ -625,7 +623,7 @@ button.wp-block-navigation-item__content {
 
 	@include break-small() {
 		&:not(.hidden-by-default) {
-			&:not(.is-menu-open) {
+			&:not(.is-menu-open, [open]) { /* todo: replace [open] with :open when browser support is widely available. */
 				display: block;
 				width: 100%;
 				position: relative;
@@ -638,7 +636,7 @@ button.wp-block-navigation-item__content {
 			}
 		}
 
-		&.is-menu-open {
+		&:is(.is-menu-open, [open]) { /* todo: replace [open] with :open when browser support is widely available. */
 			// Override breakpoint-inherited submenu rules.
 			.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container {
 				left: 0;
@@ -649,12 +647,12 @@ button.wp-block-navigation-item__content {
 
 // Default menu background and font color.
 .wp-block-navigation:not(.has-background)
-.wp-block-navigation__responsive-container.is-menu-open {
+.wp-block-navigation__responsive-container:is(.is-menu-open, [open]) { /* todo: replace [open] with :open when browser support is widely available. */
 	background-color: #fff;
 }
 
 .wp-block-navigation:not(.has-text-color)
-.wp-block-navigation__responsive-container.is-menu-open {
+.wp-block-navigation__responsive-container:is(.is-menu-open, [open]) { /* todo: replace [open] with :open when browser support is widely available. */
 	color: #000;
 }
 
@@ -725,7 +723,7 @@ button.wp-block-navigation-item__content {
 .wp-block-navigation__responsive-close {
 	width: 100%;
 
-	.has-modal-open & {
+	:is(.is-menu-open, [open]) > & { /* todo: replace [open] with :open when browser support is widely available. */
 		// Try to inherit wide-width when defined, so the X can align to a top-right aligned menu.
 		max-width: var(--wp--style--global--wide-size, 100%);
 		margin-left: auto;
@@ -741,9 +739,8 @@ button.wp-block-navigation-item__content {
 	}
 }
 
-.is-menu-open .wp-block-navigation__responsive-close,
-.is-menu-open .wp-block-navigation__responsive-dialog,
-.is-menu-open .wp-block-navigation__responsive-container-content {
+.wp-block-navigation__responsive-container:is(.is-menu-open, [open]) /* todo: replace [open] with :open when browser support is widely available. */
+:is(.wp-block-navigation__responsive-close, .wp-block-navigation__responsive-dialog, .wp-block-navigation__responsive-container-content) {
 	box-sizing: border-box;
 }
 
@@ -751,18 +748,8 @@ button.wp-block-navigation-item__content {
 	position: relative;
 }
 
-// Adjust open dialog top margin when admin-bar is visible.
-// Needs to be scoped to .is-menu-open, or it will shift the position of any other navigations that may be present.
-.has-modal-open .admin-bar .is-menu-open .wp-block-navigation__responsive-dialog {
-	margin-top: $admin-bar-height-big;
-
-	// Handle smaller admin-bar.
-	@include break-medium() {
-		margin-top: $admin-bar-height;
-	}
-}
-
 // Prevent scrolling of the parent content when the modal is open.
-html.has-modal-open {
+html.has-modal-open,
+html:has(.wp-block-navigation__responsive-container[open]) { /* todo: replace [open] with :open when browser support is widely available. */
 	overflow: hidden;
 }

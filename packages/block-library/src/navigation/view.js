@@ -18,6 +18,11 @@ const focusableSelectors = [
 	'[tabindex]:not([tabindex^="-"])',
 ];
 
+const openedByNone = { click: false, focus: false, hover: false };
+
+const lacksCommandSupport =
+	! window.HTMLButtonElement.prototype.hasOwnProperty( 'command' );
+
 // This is a fix for Safari in iOS/iPadOS. Without it, Safari doesn't focus out
 // when the user taps in the body. It can be removed once we add an overlay to
 // capture the clicks, instead of relying on the focusout event.
@@ -27,70 +32,21 @@ const { state, actions } = store(
 	'core/navigation',
 	{
 		state: {
-			get roleAttribute() {
-				const ctx = getContext();
-				return ctx.type === 'overlay' && state.isMenuOpen
-					? 'dialog'
-					: null;
-			},
-			get ariaModal() {
-				const ctx = getContext();
-				return ctx.type === 'overlay' && state.isMenuOpen
-					? 'true'
-					: null;
-			},
-			get ariaLabel() {
-				const ctx = getContext();
-				return ctx.type === 'overlay' && state.isMenuOpen
-					? ctx.ariaLabel
-					: null;
-			},
 			get isMenuOpen() {
+				const { submenuOpenedBy = {} } = getContext();
 				// The menu is opened if either `click`, `hover` or `focus` is true.
-				return (
-					Object.values( state.menuOpenedBy ).filter( Boolean )
-						.length > 0
-				);
-			},
-			get menuOpenedBy() {
-				const ctx = getContext();
-				return ctx.type === 'overlay'
-					? ctx.overlayOpenedBy
-					: ctx.submenuOpenedBy;
+				return Object.values( submenuOpenedBy ).some( Boolean );
 			},
 		},
 		actions: {
 			openMenuOnHover() {
-				const { type, overlayOpenedBy } = getContext();
-				if (
-					type === 'submenu' &&
-					// Only open on hover if the overlay is closed.
-					Object.values( overlayOpenedBy || {} ).filter( Boolean )
-						.length === 0
-				) {
-					actions.openMenu( 'hover' );
-				}
+				actions.openMenu( 'hover' );
 			},
 			closeMenuOnHover() {
-				const { type, overlayOpenedBy } = getContext();
-				if (
-					type === 'submenu' &&
-					// Only close on hover if the overlay is closed.
-					Object.values( overlayOpenedBy || {} ).filter( Boolean )
-						.length === 0
-				) {
-					actions.closeMenu( 'hover' );
+				// Closes only if not opened by click.
+				if ( getContext().submenuOpenedBy.click === false ) {
+					actions.closeMenu();
 				}
-			},
-			openMenuOnClick() {
-				const ctx = getContext();
-				const { ref } = getElement();
-				ctx.previousFocus = ref;
-				actions.openMenu( 'click' );
-			},
-			closeMenuOnClick() {
-				actions.closeMenu( 'click' );
-				actions.closeMenu( 'focus' );
 			},
 			openMenuOnFocus() {
 				actions.openMenu( 'focus' );
@@ -102,51 +58,25 @@ const { state, actions } = store(
 				if ( window.document.activeElement !== ref ) {
 					ref.focus();
 				}
-				const { menuOpenedBy } = state;
-				if ( menuOpenedBy.click || menuOpenedBy.focus ) {
-					actions.closeMenu( 'click' );
-					actions.closeMenu( 'focus' );
+				const { click, focus } = ctx.submenuOpenedBy;
+				if ( click || focus ) {
+					actions.closeMenu();
 				} else {
 					ctx.previousFocus = ref;
 					actions.openMenu( 'click' );
 				}
 			},
 			handleMenuKeydown: withSyncEvent( ( event ) => {
-				const { type, firstFocusableElement, lastFocusableElement } =
-					getContext();
-				if ( state.menuOpenedBy.click ) {
-					// If Escape close the menu.
-					if ( event.key === 'Escape' ) {
-						event.stopPropagation(); // Keeps ancestor menus open.
-						actions.closeMenu( 'click' );
-						actions.closeMenu( 'focus' );
-						return;
-					}
-
-					// Trap focus if it is an overlay (main menu).
-					if ( type === 'overlay' && event.key === 'Tab' ) {
-						// If shift + tab it change the direction.
-						if (
-							event.shiftKey &&
-							window.document.activeElement ===
-								firstFocusableElement
-						) {
-							event.preventDefault();
-							lastFocusableElement.focus();
-						} else if (
-							! event.shiftKey &&
-							window.document.activeElement ===
-								lastFocusableElement
-						) {
-							event.preventDefault();
-							firstFocusableElement.focus();
-						}
-					}
+				const { key } = event;
+				if ( getContext().submenuOpenedBy.click && key === 'Escape' ) {
+					event.stopPropagation(); // Keeps ancestor menus open.
+					actions.closeMenu();
 				}
 			} ),
 			handleMenuFocusout( event ) {
-				const { modal, type } = getContext();
-				// If focus is outside modal, and in the document, close menu
+				const { menu } = getContext();
+				const { activeElement } = window.document;
+				// If focus is outside menu, and in the document, close menu
 				// event.target === The element losing focus
 				// event.relatedTarget === The element receiving focus (if any)
 				// When focusout is outside the document,
@@ -154,64 +84,66 @@ const { state, actions } = store(
 
 				// The event.relatedTarget is null when something outside the navigation menu is clicked. This is only necessary for Safari.
 				if (
-					event.relatedTarget === null ||
-					( ! modal?.contains( event.relatedTarget ) &&
-						event.target !== window.document.activeElement &&
-						type === 'submenu' )
+					menu &&
+					( event.relatedTarget === null ||
+						( ! menu.contains( event.relatedTarget ) &&
+							event.target !== activeElement ) )
 				) {
-					actions.closeMenu( 'click' );
-					actions.closeMenu( 'focus' );
+					actions.closeMenu();
 				}
 			},
-
 			openMenu( menuOpenedOn = 'click' ) {
-				const { type } = getContext();
-				state.menuOpenedBy[ menuOpenedOn ] = true;
-				if ( type === 'overlay' ) {
-					// Add a `has-modal-open` class to the <html> root.
-					document.documentElement.classList.add( 'has-modal-open' );
-				}
-			},
-
-			closeMenu( menuClosedOn = 'click' ) {
 				const ctx = getContext();
-				state.menuOpenedBy[ menuClosedOn ] = false;
-				// Check if the menu is still open or not.
-				if ( ! state.isMenuOpen ) {
-					if (
-						ctx.modal?.contains( window.document.activeElement )
-					) {
-						ctx.previousFocus?.focus();
-					}
-					ctx.modal = null;
-					ctx.previousFocus = null;
-					if ( ctx.type === 'overlay' ) {
-						document.documentElement.classList.remove(
-							'has-modal-open'
-						);
-					}
+				ctx.submenuOpenedBy[ menuOpenedOn ] = true;
+				ctx.menu = getElement().ref.closest( 'li' );
+			},
+			closeMenu() {
+				const ctx = getContext();
+				Object.assign( ctx.submenuOpenedBy, openedByNone );
+				if ( ctx.menu.contains( window.document.activeElement ) ) {
+					ctx.previousFocus?.focus();
 				}
+				ctx.menu = null;
+				ctx.previousFocus = null;
 			},
 		},
 		callbacks: {
-			initMenu() {
-				const ctx = getContext();
-				const { ref } = getElement();
-				if ( state.isMenuOpen ) {
-					const focusableElements =
-						ref.querySelectorAll( focusableSelectors );
-					ctx.modal = ref;
-					ctx.firstFocusableElement = focusableElements[ 0 ];
-					ctx.lastFocusableElement =
-						focusableElements[ focusableElements.length - 1 ];
+			mountDialogInvoker() {
+				if ( lacksCommandSupport ) {
+					const { ref } = getElement();
+					const dialog = document.getElementById(
+						ref.getAttribute( 'commandfor' )
+					);
+					ref.addEventListener( 'click', () =>
+						dialog[ dialog.open ? 'close' : 'showModal' ]()
+					);
 				}
 			},
+			mountDialog() {
+				const dialog = getElement().ref;
+				const { ariaLabel } = getContext();
+				const openAttributeSpy = new window.MutationObserver( () => {
+					const { open, classList } = dialog;
+					const method = open ? 'add' : 'remove';
+					// Toggles `has-modal-open` class on the <html> root.
+					document.documentElement.classList[ method ](
+						'has-modal-open'
+					);
+					classList[ method ]( 'has-modal-open', 'is-menu-open' );
+					// TODO: Without JS the label won’t be applied. This is not new but was a non-issue when
+					// the dialog could only be opened with JS.
+					dialog.ariaLabel = open ? ariaLabel : null;
+				} );
+				openAttributeSpy.observe( dialog, {
+					attributeFilter: [ 'open' ],
+					attributes: true,
+				} );
+				return () => openAttributeSpy.disconnect();
+			},
 			focusFirstElement() {
-				const { ref } = getElement();
 				if ( state.isMenuOpen ) {
-					const focusableElements =
-						ref.querySelectorAll( focusableSelectors );
-					focusableElements?.[ 0 ]?.focus();
+					const { ref } = getElement();
+					ref.querySelectorAll( focusableSelectors )?.[ 0 ]?.focus();
 				}
 			},
 		},

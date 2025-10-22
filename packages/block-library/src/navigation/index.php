@@ -491,30 +491,19 @@ class WP_Navigation_Block_Renderer {
 		$toggle_aria_label_close     = $should_display_icon_label ? 'aria-label="' . __( 'Close menu' ) . '"' : ''; // Close button label.
 
 		// Add Interactivity API directives to the markup if needed.
-		$open_button_directives          = '';
-		$responsive_container_directives = '';
-		$responsive_dialog_directives    = '';
-		$close_button_directives         = '';
+		$open_button_directives                  = '';
+		$responsive_container_directives         = '';
+		$close_button_directives                 = '';
+		$responsive_container_content_directives = '';
 		if ( $is_interactive ) {
 			$open_button_directives                  = '
-				data-wp-on-async--click="actions.openMenuOnClick"
-				data-wp-on--keydown="actions.handleMenuKeydown"
+				data-wp-init="callbacks.mountDialogInvoker"
 			';
 			$responsive_container_directives         = '
-				data-wp-class--has-modal-open="state.isMenuOpen"
-				data-wp-class--is-menu-open="state.isMenuOpen"
-				data-wp-watch="callbacks.initMenu"
-				data-wp-on--keydown="actions.handleMenuKeydown"
-				data-wp-on-async--focusout="actions.handleMenuFocusout"
-				tabindex="-1"
-			';
-			$responsive_dialog_directives            = '
-				data-wp-bind--aria-modal="state.ariaModal"
-				data-wp-bind--aria-label="state.ariaLabel"
-				data-wp-bind--role="state.roleAttribute"
+				data-wp-init="callbacks.mountDialog"
 			';
 			$close_button_directives                 = '
-				data-wp-on-async--click="actions.closeMenuOnClick"
+				data-wp-init="callbacks.mountDialogInvoker"
 			';
 			$responsive_container_content_directives = '
 				data-wp-watch="callbacks.focusFirstElement"
@@ -523,18 +512,28 @@ class WP_Navigation_Block_Renderer {
 
 		$overlay_inline_styles = esc_attr( safecss_filter_attr( $colors['overlay_inline_styles'] ) );
 
+		// Set the autofocus attribute on the first link.
+		$tag_processor = new WP_HTML_Tag_Processor( $inner_blocks_html );
+		while ( $tag_processor->next_tag( array( 'tag_name' => 'A' ) ) ) {
+			if ( is_string( $tag_processor->get_attribute( 'href' ) ) ) {
+				$tag_processor->set_attribute( 'autofocus', true );
+				$inner_blocks_html = $tag_processor->get_updated_html();
+				break;
+			}
+		}
+
 		return sprintf(
-			'<button aria-haspopup="dialog" %3$s class="%6$s" %10$s>%8$s</button>
-				<div class="%5$s" %7$s id="%1$s" %11$s>
+			'<button aria-haspopup="dialog" %3$s class="%6$s" %10$s commandfor="%1$s" command="show-modal">%8$s</button>
+				<dialog class="%5$s" %7$s id="%1$s" %11$s>
 					<div class="wp-block-navigation__responsive-close" tabindex="-1">
-						<div class="wp-block-navigation__responsive-dialog" %12$s>
-							<button %4$s class="wp-block-navigation__responsive-container-close" %13$s>%9$s</button>
-							<div class="wp-block-navigation__responsive-container-content" %14$s id="%1$s-content">
+						<div class="wp-block-navigation__responsive-dialog">
+							<button %4$s class="wp-block-navigation__responsive-container-close" %12$s commandfor="%1$s" command="close">%9$s</button>
+							<div class="wp-block-navigation__responsive-container-content" %13$s id="%1$s-content">
 								%2$s
 							</div>
 						</div>
 					</div>
-				</div>',
+				</dialog>',
 			esc_attr( $modal_unique_id ),
 			$inner_blocks_html,
 			$toggle_aria_label_open,
@@ -546,7 +545,6 @@ class WP_Navigation_Block_Renderer {
 			$toggle_close_button_content,
 			$open_button_directives,
 			$responsive_container_directives,
-			$responsive_dialog_directives,
 			$close_button_directives,
 			$responsive_container_content_directives
 		);
@@ -598,16 +596,7 @@ class WP_Navigation_Block_Renderer {
 		}
 		// When adding to this array be mindful of security concerns.
 		$nav_element_context    = wp_interactivity_data_wp_context(
-			array(
-				'overlayOpenedBy' => array(
-					'click' => false,
-					'hover' => false,
-					'focus' => false,
-				),
-				'type'            => 'overlay',
-				'roleAttribute'   => '',
-				'ariaLabel'       => __( 'Menu' ),
-			)
+			array( 'ariaLabel' => __( 'Menu' ) )
 		);
 		$nav_element_directives = '
 		 data-wp-interactive="core/navigation" '
@@ -818,8 +807,7 @@ function block_core_navigation_add_directives_to_submenu( $tags, $block_attribut
 	) ) {
 		// Add directives to the parent `<li>`.
 		$tags->set_attribute( 'data-wp-interactive', 'core/navigation' );
-		$tags->set_attribute( 'data-wp-context', '{ "submenuOpenedBy": { "click": false, "hover": false, "focus": false }, "type": "submenu", "modal": null, "previousFocus": null }' );
-		$tags->set_attribute( 'data-wp-watch', 'callbacks.initMenu' );
+		$tags->set_attribute( 'data-wp-context', '{ "submenuOpenedBy": { "click": false, "hover": false, "focus": false }, "menu": null, "previousFocus": null }' );
 		$tags->set_attribute( 'data-wp-on--focusout', 'actions.handleMenuFocusout' );
 		$tags->set_attribute( 'data-wp-on--keydown', 'actions.handleMenuKeydown' );
 

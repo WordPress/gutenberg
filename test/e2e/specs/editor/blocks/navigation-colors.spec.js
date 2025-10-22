@@ -271,6 +271,63 @@ test.describe( 'Navigation colors', () => {
 		await colorControl.testFrontendColors( expectedNavigationColors );
 	} );
 
+	test( 'The submenu/overlay colors do not apply to all navigation links unless the overlay is open', async ( {
+		page,
+		editor,
+		colorControl,
+	} ) => {
+		await editor.openDocumentSettingsSidebar();
+
+		// In the inspector sidebar, we change the nav block colors.
+		await page.getByRole( 'tab', { name: 'Styles' } ).click();
+		// Open the overly text color picker.
+		await page
+			.getByRole( 'button', {
+				name: 'Submenu & overlay text',
+				exact: true,
+			} )
+			.click();
+		// 142, 209, 252 is the color of the "Pale cyan blue" color preset.
+		const paleCyan = 'rgb(142, 209, 252)';
+		await page
+			.getByRole( 'option', { name: 'Pale cyan blue' } )
+			.click( { force: true } );
+		// Open the submenu and overlay background color picker.
+		await page
+			.getByRole( 'button', { name: 'Submenu & overlay background' } )
+			.click();
+		// 155, 81, 224 is the color of the "Vivid purple" color preset.
+		const vividPurple = 'rgb(155, 81, 224)';
+		await page
+			.getByRole( 'option', { name: 'Vivid purple' } )
+			.click( { force: true } );
+
+		// Close the sidebar so our selectors don't accidentally select the sidebar links instead of the editor canvas.
+		await page
+			.getByRole( 'button', { name: 'Close Settings' } )
+			.click( { force: true } );
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Navigation' } )
+			.click();
+
+		// The navigation text and background should be the defaults; the submenu/overlay text and background should be as picked.
+		const expectedNavigationColors = {
+			textColor: colorControl.black,
+			backgroundColor: colorControl.transparent,
+			submenuTextColor: paleCyan,
+			submenuBackgroundColor: vividPurple,
+		};
+
+		await colorControl.testEditorColors( expectedNavigationColors );
+
+		// Check the colors of the links on the frontend.
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		await colorControl.testFrontendColors( expectedNavigationColors );
+	} );
+
 	test( 'As a user I expect my navigation to use the colors I selected for it', async ( {
 		editor,
 		page,
@@ -379,6 +436,9 @@ class ColorControl {
 			'background-color',
 			backgroundColor
 		);
+		// Overlay element background.
+		const dialog = navigationWrapper.getByRole( 'dialog' );
+		await expect( dialog ).toHaveCSS( 'background-color', backgroundColor );
 
 		await customLink.click();
 
@@ -417,17 +477,13 @@ class ColorControl {
 		// state on the links once the overlay opens.
 		await this.page.mouse.move( 1000, 1000 );
 
-		const overlay = this.editor.canvas
-			.locator( '.wp-block-navigation__responsive-container' )
-			.filter( { hasText: 'Submenu Link' } );
-
 		// All of the mobile menu navigation links should be the same color as the submenuTextColor.
 		await expect( customLink ).toHaveCSS( 'color', submenuTextColor );
 		await expect( submenuLink ).toHaveCSS( 'color', submenuTextColor );
 		await expect( pageLink ).toHaveCSS( 'color', submenuTextColor );
 
 		// The mobile menu background should be the same color as the submenu background.
-		await expect( overlay ).toHaveCSS(
+		await expect( dialog ).toHaveCSS(
 			'background-color',
 			submenuBackgroundColor
 		);
@@ -454,14 +510,17 @@ class ColorControl {
 		await expect( customLink ).toHaveCSS( 'color', textColor );
 		await expect( pageLink ).toHaveCSS( 'color', textColor );
 
+		const navigationWrapper = this.page.getByRole( 'navigation', {
+			name: 'Colored menu',
+		} );
 		// Navigation background.
-		const menuWrapperFront = this.page
-			.getByRole( 'navigation', { name: 'Colored menu' } )
-			.getByRole( 'list' );
-		await expect( menuWrapperFront ).toHaveCSS(
+		await expect( navigationWrapper.getByRole( 'list' ) ).toHaveCSS(
 			'background-color',
 			backgroundColor
 		);
+		// Overlay element background.
+		const dialog = navigationWrapper.getByRole( 'dialog' );
+		await expect( dialog ).toHaveCSS( 'background-color', backgroundColor );
 
 		await customLink.hover();
 
@@ -491,12 +550,8 @@ class ColorControl {
 		await expect( submenuLink ).toHaveCSS( 'color', submenuTextColor );
 		await expect( pageLink ).toHaveCSS( 'color', submenuTextColor );
 
-		const overlayFront = this.page
-			.locator( '.wp-block-navigation__responsive-container' )
-			.filter( { hasText: 'Submenu Link' } );
-
 		// The mobile menu background should be the same color as the submenu background.
-		await expect( overlayFront ).toHaveCSS(
+		await expect( dialog ).toHaveCSS(
 			'background-color',
 			submenuBackgroundColor
 		);
