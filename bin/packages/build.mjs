@@ -16,6 +16,7 @@ import chokidar from 'chokidar';
 import browserslistToEsbuild from 'browserslist-to-esbuild';
 import { sassPlugin } from 'esbuild-sass-plugin';
 import postcss from 'postcss';
+import postcssModulesPlugin from 'postcss-modules';
 import autoprefixer from 'autoprefixer';
 import rtlcss from 'rtlcss';
 import cssnano from 'cssnano';
@@ -870,8 +871,10 @@ async function transpilePackage( packageName ) {
 
 /**
  * Compile styles for a single package.
- * Discovers and compiles SCSS entry points based on package configuration.
- * Supports wpStyleEntryPoints in package.json for custom entry point patterns.
+ *
+ * Discovers and compiles SCSS entry points based on package configuration
+ * (supporting wpStyleEntryPoints in package.json for custom entry point patterns),
+ * and all .module.css files in src/ directory.
  *
  * @param {string} packageName Package name.
  * @return {Promise<number|null>} Build time in milliseconds, or null if no styles.
@@ -881,18 +884,25 @@ async function compileStyles( packageName ) {
 	const packageJsonPath = path.join( packageDir, 'package.json' );
 	const packageJson = JSON.parse( await readFile( packageJsonPath, 'utf8' ) );
 
-	// Get entry point patterns from package.json, default to root-level only
-	const entryPointPatterns = packageJson.wpStyleEntryPoints || [
+	// Get SCSS entry point patterns from package.json, default to root-level only
+	const scssEntryPointPatterns = packageJson.wpStyleEntryPoints || [
 		'src/*.scss',
 	];
 
-	const styleEntries = await glob(
-		entryPointPatterns.map( ( pattern ) =>
+	// Find all matching SCSS files
+	const scssEntries = await glob(
+		scssEntryPointPatterns.map( ( pattern ) =>
 			normalizePath( path.join( packageDir, pattern ) )
 		)
 	);
 
-	if ( styleEntries.length === 0 ) {
+	// Get CSS modules from anywhere in src/
+	const cssModuleEntries = await glob(
+		normalizePath( path.join( packageDir, 'src/**/*.module.css' ) ),
+		{ ignore: IGNORE_PATTERNS }
+	);
+
+	if ( scssEntries.length === 0 && cssModuleEntries.length === 0 ) {
 		return null;
 	}
 
@@ -900,8 +910,67 @@ async function compileStyles( packageName ) {
 	const buildStyleDir = path.join( packageDir, 'build-style' );
 	const srcDir = path.join( packageDir, 'src' );
 
+	// Process .module.css files and generate JS modules
+	const cssResults = await Promise.all(
+		cssModuleEntries.map( async ( styleEntryPath ) => {
+			const buildDir = path.join( packageDir, 'build' );
+			const buildModuleDir = path.join( packageDir, 'build-module' );
+
+			const cssContent = await readFile( styleEntryPath, 'utf8' );
+			const relativePath = path.relative( srcDir, styleEntryPath );
+
+			let mappings = {};
+			const result = await postcss( [
+				postcssModulesPlugin( {
+					getJSON: ( _, json ) => ( mappings = json ),
+				} ),
+			] ).process( cssContent, { from: styleEntryPath } );
+
+			// Write processed CSS to build-style (preserving directory structure)
+			const cssOutPath = path.join(
+				buildStyleDir,
+				relativePath.replace( '.module.css', '.css' )
+			);
+			await mkdir( path.dirname( cssOutPath ), { recursive: true } );
+			await writeFile( cssOutPath, result.css );
+
+			// Generate JS modules with class name mappings (preserving directory structure)
+			const jsExport = JSON.stringify( mappings );
+			const jsPath = `${ relativePath }.js`;
+			await Promise.all( [
+				mkdir( path.dirname( path.join( buildDir, jsPath ) ), {
+					recursive: true,
+				} ),
+				mkdir( path.dirname( path.join( buildModuleDir, jsPath ) ), {
+					recursive: true,
+				} ),
+			] );
+			await Promise.all( [
+				writeFile(
+					path.join( buildDir, jsPath ),
+					`"use strict";\nmodule.exports = ${ jsExport };\n`
+				),
+				writeFile(
+					path.join( buildModuleDir, jsPath ),
+					`export default ${ jsExport };\n`
+				),
+			] );
+
+			// Return the processed CSS for combining
+			return result.css;
+		} )
+	);
+
+	// Generate combined stylesheet from all CSS modules
+	if ( cssResults.length > 0 ) {
+		const combinedCss = cssResults.join( '\n' );
+		await mkdir( buildStyleDir, { recursive: true } );
+		await writeFile( path.join( buildStyleDir, 'style.css' ), combinedCss );
+	}
+
+	// Process SCSS files
 	await Promise.all(
-		styleEntries.map( async ( styleEntryPath ) => {
+		scssEntries.map( async ( styleEntryPath ) => {
 			// Calculate relative path from src/ to preserve directory structure
 			const relativePath = path.relative( srcDir, styleEntryPath );
 			const relativeDir = path.dirname( relativePath );

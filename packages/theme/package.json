@@ -1,0 +1,57 @@
+{
+	"name": "@wordpress/theme",
+	"version": "0.0.1",
+	"description": "Theme and context provider for the WordPress Design System.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"components"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/theme/README.md",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/theme"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.js",
+			"default": "./build/index.js"
+		},
+		"./design-tokens.css": "./src/prebuilt/css/design-tokens.css",
+		"./design-tokens.js": "./src/prebuilt/js/design-tokens.js",
+		"./package.json": "./package.json",
+		"./build-style/": "./build-style/"
+	},
+	"react-native": "src/index",
+	"wpScript": true,
+	"types": "build-types",
+	"sideEffects": false,
+	"dependencies": {
+		"@wordpress/element": "file:../element",
+		"@wordpress/private-apis": "file:../private-apis",
+		"colorjs.io": "^0.5.2"
+	},
+	"peerDependencies": {
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"build": "rimraf src/prebuilt docs && node bin/build-tokens.js && prettier --write tokens/color.json src/prebuilt/* docs/*"
+	}
+}

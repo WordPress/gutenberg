@@ -694,7 +694,9 @@ function gutenberg_default_script_modules() {
 			'fetchpriority' => 'low',
 		);
 
-		gutenberg_register_interactive_script_module_id( $script_module_id );
+		if ( str_starts_with( $script_module_id, '@wordpress/block-library' ) && method_exists( 'WP_Interactivity_API', 'add_client_navigation_support_to_script_module' ) ) {
+			wp_interactivity()->add_client_navigation_support_to_script_module( $script_module_id );
+		}
 
 		$path = gutenberg_url( "build/modules/{$file_name}" );
 		wp_register_script_module( $script_module_id, $path, $script_module_data['dependencies'], $script_module_data['version'], $args ); // The $args parameter is new as of WP 6.9 per <https://core.trac.wordpress.org/ticket/61734>.
@@ -703,7 +705,7 @@ function gutenberg_default_script_modules() {
 remove_action( 'wp_default_scripts', 'wp_default_script_modules' );
 add_action( 'wp_default_scripts', 'gutenberg_default_script_modules' );
 
-/*
+/**
  * Always remove the Core action hook while gutenberg_enqueue_stored_styles() exists to avoid styles being printed twice.
  * This is also because gutenberg_enqueue_stored_styles uses the Style Engine's `gutenberg_*` functions and `_Gutenberg` classes,
  * which are in continuous development and generally ahead of Core.
@@ -714,59 +716,6 @@ remove_action( 'wp_footer', 'wp_enqueue_stored_styles', 1 );
 // Enqueue stored styles.
 add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_stored_styles' );
 add_action( 'wp_footer', 'gutenberg_enqueue_stored_styles', 1 );
-
-/**
- * Access the shared static variable for interactive script modules.
- *
- * @param string|null $script_module_id The script module ID to register, or null to get the list.
- * @return array Associative array of script module ID => true.
- */
-function gutenberg_interactive_script_modules_registry( $script_module_id = null ) {
-	static $interactive_script_modules = array();
-
-	if ( null !== $script_module_id ) {
-		$interactive_script_modules[ $script_module_id ] = true;
-	}
-
-	return $interactive_script_modules;
-}
-
-/**
- * Register a script module ID for interactive blocks.
- *
- * @param string $script_module_id The script module ID.
- */
-function gutenberg_register_interactive_script_module_id( $script_module_id ) {
-	gutenberg_interactive_script_modules_registry( $script_module_id );
-}
-
-/**
- * Get the list of interactive script module IDs.
- *
- * @return array Associative array of script module ID => true.
- */
-function gutenberg_get_interactive_script_module_ids() {
-	return gutenberg_interactive_script_modules_registry();
-}
-
-/**
- * Adds `data-wp-router-options` attribute to script modules registered as interactive.
- *
- * @param array  $args The script module attributes.
- * @param string $id   The script module ID.
- * @return array Filtered script module attributes.
- */
-function gutenberg_script_module_add_router_options_attributes( $args, $id ) {
-	// Check if this script module ID is registered as interactive.
-	$interactive_modules = gutenberg_get_interactive_script_module_ids();
-
-	if ( isset( $interactive_modules[ $id ] ) ) {
-		$args['data-wp-router-options'] = '{ "loadOnClientNavigation": true }';
-	}
-		return $args;
-}
-
-add_filter( 'wp_script_module_attributes', 'gutenberg_script_module_add_router_options_attributes', 10, 2 );
 
 add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_latex_to_mathml_loader' );
 function gutenberg_enqueue_latex_to_mathml_loader() {

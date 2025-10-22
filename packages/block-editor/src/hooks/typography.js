@@ -116,11 +116,13 @@ function TypographyInspectorControl( { children, resetAllFilter } ) {
 
 export function TypographyPanel( { clientId, name, setAttributes, settings } ) {
 	function selector( select ) {
-		const { style, fontFamily, fontSize } =
+		const { style, fontFamily, fontSize, fitText } =
 			select( blockEditorStore ).getBlockAttributes( clientId ) || {};
-		return { style, fontFamily, fontSize };
+		return { style, fontFamily, fontSize, fitText };
 	}
-	const { style, fontFamily, fontSize } = useSelect( selector, [ clientId ] );
+	const { style, fontFamily, fontSize, fitText } = useSelect( selector, [
+		clientId,
+	] );
 	const isEnabled = useHasTypographyPanel( settings );
 	const value = useMemo(
 		() => attributesToStyle( { style, fontFamily, fontSize } ),
@@ -128,7 +130,16 @@ export function TypographyPanel( { clientId, name, setAttributes, settings } ) {
 	);
 
 	const onChange = ( newStyle ) => {
-		setAttributes( styleToAttributes( newStyle ) );
+		const newAttributes = styleToAttributes( newStyle );
+
+		// If setting a font size and fitText is currently enabled, disable it
+		const hasFontSize =
+			newAttributes.fontSize || newAttributes.style?.typography?.fontSize;
+		if ( hasFontSize && fitText ) {
+			newAttributes.fitText = undefined;
+		}
+
+		setAttributes( newAttributes );
 	};
 
 	if ( ! isEnabled ) {
