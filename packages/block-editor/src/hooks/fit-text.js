@@ -3,7 +3,7 @@
  */
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
-import { useEffect, useCallback, useRef } from '@wordpress/element';
+import { useEffect, useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
@@ -62,27 +62,17 @@ function useFitText( { fitText, name, clientId } ) {
 	const hasFitTextSupport = hasBlockSupport( name, FIT_TEXT_SUPPORT_KEY );
 	const blockElement = useBlockElement( clientId );
 
-	// Monitor block attribute changes and selection state
+	// Monitor block attribute changes
 	// Any attribute may change the available space.
-	const { blockAttributes, isSelected } = useSelect(
+	const blockAttributes = useSelect(
 		( select ) => {
 			if ( ! clientId ) {
-				return { blockAttributes: undefined, isSelected: false };
+				return;
 			}
-			return {
-				blockAttributes:
-					select( blockEditorStore ).getBlockAttributes( clientId ),
-				isSelected:
-					select( blockEditorStore ).isBlockSelected( clientId ),
-			};
+			return select( blockEditorStore ).getBlockAttributes( clientId );
 		},
 		[ clientId ]
 	);
-
-	const isSelectedRef = useRef();
-	useEffect( () => {
-		isSelectedRef.current = isSelected;
-	}, [ isSelected ] );
 
 	const applyFitText = useCallback( () => {
 		if ( ! blockElement || ! hasFitTextSupport || ! fitText ) {
@@ -104,13 +94,8 @@ function useFitText( { fitText, name, clientId } ) {
 			styleElement.textContent = css;
 		};
 
-		// Avoid very jarring resizes when a user is actively editing the
-		// block. Placing a ceiling on how much the block can grow curbs the
-		// effect of the first few keypresses.
-		const maxSize = isSelectedRef.current ? 200 : undefined;
-
-		optimizeFitText( blockElement, blockSelector, applyStylesFn, maxSize );
-	}, [ blockElement, clientId, hasFitTextSupport, fitText, isSelectedRef ] );
+		optimizeFitText( blockElement, blockSelector, applyStylesFn );
+	}, [ blockElement, clientId, hasFitTextSupport, fitText ] );
 
 	useEffect( () => {
 		if (
@@ -164,7 +149,6 @@ function useFitText( { fitText, name, clientId } ) {
 		}
 	}, [
 		blockAttributes,
-		isSelected,
 		fitText,
 		applyFitText,
 		blockElement,
