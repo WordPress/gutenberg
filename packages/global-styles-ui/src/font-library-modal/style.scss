@@ -27,7 +27,7 @@ $footer-height: 70px;
 
 	.font-library-modal__subtitle {
 		text-transform: uppercase;
-		font-weight: $font-weight-medium;
+		font-weight: variables.$font-weight-medium;
 		font-size: 11px;
 	}
 
@@ -74,13 +74,13 @@ $footer-height: 70px;
 
 .font-library-modal__page-selection {
 	font-size: 11px;
-	font-weight: $font-weight-medium;
+	font-weight: variables.$font-weight-medium;
 	text-transform: uppercase;
 
 	@include mixins.break-small() {
 		.font-library-modal__page-selection-trigger {
 			font-size: 11px !important;
-			font-weight: $font-weight-medium;
+			font-weight: variables.$font-weight-medium;
 		}
 	}
 }
