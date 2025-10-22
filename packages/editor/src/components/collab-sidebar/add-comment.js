@@ -18,7 +18,7 @@ import {
 import { unlock } from '../../lock-unlock';
 import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
-import { focusCommentThread } from './utils';
+import { focusCommentThread, noop } from './utils';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
@@ -27,6 +27,7 @@ export function AddComment( {
 	showCommentBoard,
 	setShowCommentBoard,
 	commentSidebarRef,
+	reflowComments = noop,
 } ) {
 	const { clientId, blockCommentId } = useSelect( ( select ) => {
 		const { getSelectedBlock } = select( blockEditorStore );
@@ -57,6 +58,7 @@ export function AddComment( {
 					setShowCommentBoard( false );
 					blockElement?.focus();
 				} }
+				reflowComments={ reflowComments }
 				submitButtonText={ __( 'Add note' ) }
 				labelText={ __( 'New Note' ) }
 			/>

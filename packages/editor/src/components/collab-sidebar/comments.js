@@ -453,6 +453,7 @@ function Thread( {
 					showCommentBoard={ showCommentBoard }
 					setShowCommentBoard={ setShowCommentBoard }
 					commentSidebarRef={ commentSidebarRef }
+					reflowComments={ reflowComments }
 				/>
 			</VStack>
 		);
