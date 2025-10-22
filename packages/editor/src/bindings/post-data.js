@@ -9,6 +9,12 @@ import {
 import { store as coreDataStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
+// Navigation block types that use special handling for backwards compatibility
+const NAVIGATION_BLOCK_TYPES = [
+	'core/navigation-link',
+	'core/navigation-submenu',
+];
+
 /**
  * Gets a list of post data fields with their values and labels
  * to be consumed in the needed callbacks.
