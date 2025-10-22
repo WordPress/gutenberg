@@ -8,8 +8,6 @@ import {
 	privateApis as mediaUtilsPrivateApis,
 	MediaUpload,
 } from '@wordpress/media-utils';
-// @ts-ignore
-import { MediaUploadCheck } from '@wordpress/block-editor';
 import { lineSolid } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import type { DataFormControlProps } from '@wordpress/dataviews';
@@ -91,83 +89,81 @@ export const FeaturedImageEdit = ( {
 	return (
 		<fieldset className="fields-controls__featured-image">
 			<div className="fields-controls__featured-image-container">
-				<MediaUploadCheck>
-					<ConditionalMediaUpload
-						onSelect={ ( selectedMedia: any ) => {
-							onChangeControl( selectedMedia.id );
-						} }
-						allowedTypes={ [ 'image' ] }
-						value={ value }
-						title={ __( 'Select Featured Image' ) }
-						render={ ( { open }: any ) => (
-							<div
-								ref={ ref }
-								role="button"
-								tabIndex={ -1 }
-								onClick={ open }
-								onKeyDown={ ( event ) => {
-									if (
-										event.key === 'Enter' ||
-										event.key === ' '
-									) {
-										event.preventDefault();
-										open();
-									}
-								} }
+				<ConditionalMediaUpload
+					onSelect={ ( selectedMedia: any ) => {
+						onChangeControl( selectedMedia.id );
+					} }
+					allowedTypes={ [ 'image' ] }
+					value={ value }
+					title={ __( 'Select Featured Image' ) }
+					render={ ( { open }: any ) => (
+						<div
+							ref={ ref }
+							role="button"
+							tabIndex={ -1 }
+							onClick={ open }
+							onKeyDown={ ( event ) => {
+								if (
+									event.key === 'Enter' ||
+									event.key === ' '
+								) {
+									event.preventDefault();
+									open();
+								}
+							} }
+						>
+							<Grid
+								rowGap={ 0 }
+								columnGap={ 8 }
+								templateColumns="24px 1fr 24px"
 							>
-								<Grid
-									rowGap={ 0 }
-									columnGap={ 8 }
-									templateColumns="24px 1fr 24px"
-								>
-									{ url && (
-										<>
-											<img
-												className="fields-controls__featured-image-image"
-												alt=""
-												width={ 24 }
-												height={ 24 }
-												src={ url }
-											/>
-											<span className="fields-controls__featured-image-title">
-												{ title }
-											</span>
-										</>
-									) }
-									{ ! url && (
-										<>
-											<span
-												className="fields-controls__featured-image-placeholder"
-												style={ {
-													width: '24px',
-													height: '24px',
-												} }
-											/>
-											<span className="fields-controls__featured-image-title">
-												{ __( 'Choose an image…' ) }
-											</span>
-										</>
-									) }
-									{ url && (
-										<>
-											<Button
-												size="small"
-												className="fields-controls__featured-image-remove-button"
-												icon={ lineSolid }
-												onClick={ (
-													event: React.MouseEvent< HTMLButtonElement >
-												) => {
-													event.stopPropagation();
-													onChangeControl( 0 );
-												} }
-											/>
-										</>
-									) }
-								</Grid>
-							</div>
-						) }
-					/>
-				</MediaUploadCheck>
+								{ url && (
+									<>
+										<img
+											className="fields-controls__featured-image-image"
+											alt=""
+											width={ 24 }
+											height={ 24 }
+											src={ url }
+										/>
+										<span className="fields-controls__featured-image-title">
+											{ title }
+										</span>
+									</>
+								) }
+								{ ! url && (
+									<>
+										<span
+											className="fields-controls__featured-image-placeholder"
+											style={ {
+												width: '24px',
+												height: '24px',
+											} }
+										/>
+										<span className="fields-controls__featured-image-title">
+											{ __( 'Choose an image…' ) }
+										</span>
+									</>
+								) }
+								{ url && (
+									<>
+										<Button
+											size="small"
+											className="fields-controls__featured-image-remove-button"
+											icon={ lineSolid }
+											onClick={ (
+												event: React.MouseEvent< HTMLButtonElement >
+											) => {
+												event.stopPropagation();
+												onChangeControl( 0 );
+											} }
+										/>
+									</>
+								) }
+							</Grid>
+						</div>
+					) }
+				/>
 			</div>
 		</fieldset>
 	);
