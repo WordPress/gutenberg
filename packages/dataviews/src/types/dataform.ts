@@ -56,7 +56,7 @@ export type CardLayout =
 			// isOpened cannot be false if withHeader is false as well.
 			// Otherwise, the card would not be visible.
 			isOpened?: true;
-			// isCollapsible cannot be false if withHeader is false as well.
+			// isCollapsible cannot be true if withHeader is false as well.
 			isCollapsible?: false;
 	  }
 	| {
