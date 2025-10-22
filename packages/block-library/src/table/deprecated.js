@@ -256,9 +256,25 @@ const v5 = {
 		);
 	},
 	migrate( attributes ) {
+		// Add scope="col" to header cells that don't have it
+		const migratedHead = attributes.head?.map( ( row ) => ( {
+			...row,
+			cells: row.cells.map( ( cell ) => {
+				// Add scope="col" to th elements in header section if not present
+				if ( cell.tag === 'th' && ! cell.scope ) {
+					return {
+						...cell,
+						scope: 'col',
+					};
+				}
+				return cell;
+			} ),
+		} ) );
+
 		return {
 			...attributes,
 			captionSide: 'bottom',
+			head: migratedHead || attributes.head,
 		};
 	},
 };
