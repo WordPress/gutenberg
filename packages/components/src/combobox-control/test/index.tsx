@@ -371,6 +371,35 @@ describe.each( [
 		expect( resetButton ).toBeVisible();
 	} );
 
+	it( 'should not render Reset button when no value is set', () => {
+		render(
+			<Component
+				options={ timezones }
+				label={ defaultLabelText }
+				allowReset
+			/>
+		);
+
+		const resetButton = screen.queryByRole( 'button', { name: 'Reset' } );
+
+		expect( resetButton ).not.toBeInTheDocument();
+	} );
+
+	it( 'should not render Reset button when allowReset is false', () => {
+		render(
+			<Component
+				options={ timezones }
+				label={ defaultLabelText }
+				value={ timezones[ 0 ].value }
+				allowReset={ false }
+			/>
+		);
+
+		const resetButton = screen.queryByRole( 'button', { name: 'Reset' } );
+
+		expect( resetButton ).not.toBeInTheDocument();
+	} );
+
 	it( 'should reset input when clicking the Reset button', async () => {
 		const user = await userEvent.setup();
 		const targetOption = timezones[ 13 ];
