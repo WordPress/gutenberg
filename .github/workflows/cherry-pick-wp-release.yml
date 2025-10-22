@@ -26,7 +26,7 @@ jobs:
         permissions:
             contents: write
             issues: write
-            pull-requests: read
+            pull-requests: write
         # When in the context of a PR, ensure the PR is merged.
         if: github.event.pull_request == null || github.event.pull_request.merged == true
         steps:
