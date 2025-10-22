@@ -75,7 +75,8 @@ export const useIsInvalidLink = ( kind, type, id, enabled ) => {
 		return [ false, false ];
 	}
 
-	// For post types, check status
+	// For post types, check status. The post might technically exist
+	// but the link is invalid if it's in the trash.
 	if ( isPostType ) {
 		const status = entityData?.status;
 		const isInvalid = status === 'trash';
@@ -83,7 +84,7 @@ export const useIsInvalidLink = ( kind, type, id, enabled ) => {
 		return [ isInvalid, isDraft ];
 	}
 
-	// For taxonomies, check if entity exists
+	// For taxonomies, check if entity exists as there is no status.
 	if ( isTaxonomy ) {
 		const isInvalid = ! entityData; // null/undefined means invalid
 		const isDraft = false; // taxonomies don't have draft status
