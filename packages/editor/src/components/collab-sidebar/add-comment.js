@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -16,7 +11,6 @@ import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -25,7 +19,6 @@ import { unlock } from '../../lock-unlock';
 import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
 import { focusCommentThread } from './utils';
-import { useFloatingThread } from './hooks';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
@@ -34,42 +27,16 @@ export function AddComment( {
 	showCommentBoard,
 	setShowCommentBoard,
 	commentSidebarRef,
-	isFloating,
-	thread,
-	calculatedOffset,
-	setHeights,
-	setBlockRef,
-	selectedThread,
-	setSelectedThread,
-	commentLastUpdated,
-	reflowComments,
 } ) {
 	const { clientId, blockCommentId } = useSelect( ( select ) => {
 		const { getSelectedBlock } = select( blockEditorStore );
-		const selected = getSelectedBlock();
+		const selectedBlock = getSelectedBlock();
 		return {
-			clientId: selected?.clientId,
-			blockCommentId: selected?.attributes?.metadata?.noteId,
+			clientId: selectedBlock?.clientId,
+			blockCommentId: selectedBlock?.attributes?.metadata?.noteId,
 		};
 	}, [] );
-
 	const blockElement = useBlockElement( clientId );
-
-	const { y, refs } = useFloatingThread( {
-		thread,
-		calculatedOffset,
-		setHeights,
-		setBlockRef,
-		selectedThread,
-		commentLastUpdated,
-	} );
-
-	// Reflow comments when rendered.
-	useEffect( () => {
-		setSelectedThread( thread );
-		reflowComments();
-
-	}, [] );
 
 	if ( ! showCommentBoard || ! clientId || undefined !== blockCommentId ) {
 		return null;
@@ -77,15 +44,10 @@ export function AddComment( {
 
 	return (
 		<VStack
-			className={ clsx( 'editor-collab-sidebar-panel__thread', {
-				'is-selected': true,
-				'is-floating': isFloating,
-			} ) }
+			className="editor-collab-sidebar-panel__thread is-selected"
 			spacing="3"
 			tabIndex={ 0 }
 			role="listitem"
-			ref={ isFloating ? refs.setFloating : undefined }
-			style={ isFloating ? { top: y } : undefined }
 		>
 			<HStack alignment="left" spacing="3">
 				<CommentAuthorInfo />
