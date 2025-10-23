@@ -85,23 +85,23 @@ export default function PostDateEdit( {
 		postType,
 		siteFormat = dateSettings.formats.date,
 		siteTimeFormat = dateSettings.formats.time,
-		activeBlockVariationName,
 	} = useSelect(
 		( select ) => {
 			const { getPostType, getEntityRecord } = select( coreStore );
 			const siteSettings = getEntityRecord( 'root', 'site' );
-			const { getActiveBlockVariation } = select( blocksStore );
 			return {
 				siteFormat: siteSettings?.date_format,
 				siteTimeFormat: siteSettings?.time_format,
 				postType: postTypeSlug ? getPostType( postTypeSlug ) : null,
-				activeBlockVariationName: getActiveBlockVariation(
-					name,
-					attributes
-				)?.name,
 			};
 		},
-		[ postTypeSlug, name, attributes ]
+		[ postTypeSlug ]
+	);
+	const activeBlockVariationName = useSelect(
+		( select ) =>
+			select( blocksStore ).getActiveBlockVariation( name, attributes )
+				?.name,
+		[ name, attributes ]
 	);
 
 	const blockEditingMode = useBlockEditingMode();
