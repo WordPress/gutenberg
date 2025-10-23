@@ -6,7 +6,6 @@ import { useSelect } from '@wordpress/data';
 
 /**
  * Hook to get the current template slug from the editor context.
- * This avoids the @wordpress/editor dependency by accessing the store by string.
  *
  * @return {string|null} The current template slug or null if not available.
  */
@@ -48,6 +47,7 @@ export function parseTemplateSlug( templateSlug ) {
 	}
 
 	// Check for author patterns
+	// e.g. author, author-john-doe
 	const authorMatches = templateSlug.match( /^(author)$|^author-(.+)$/ );
 	if ( authorMatches ) {
 		return {
@@ -58,7 +58,58 @@ export function parseTemplateSlug( templateSlug ) {
 		};
 	}
 
-	// Check for simple taxonomy patterns, e.g. category, tag
+	// Check for taxonomy patterns
+	// e.g. taxonomy-product-category, taxonomy-product-category-electronics
+	if ( templateSlug.startsWith( 'taxonomy-' ) ) {
+		const taxonomyPart = templateSlug.substring( 9 );
+
+		// Find dash positions
+		const dashIndices = [];
+		for ( let i = 0; i < taxonomyPart.length; i++ ) {
+			if ( taxonomyPart[ i ] === '-' ) {
+				dashIndices.push( i );
+			}
+		}
+
+		if ( dashIndices.length > 0 ) {
+			// If there's only one dash, treat it as taxonomy.
+			// If there are multiple dashes, use the last one as the split point.
+			if ( dashIndices.length === 1 ) {
+				// Single dash
+				// e.g. taxonomy-product-category -> taxonomy: "product-category", term: null
+				return {
+					taxonomy: taxonomyPart,
+					termSlug: null,
+					isAuthor: false,
+					authorSlug: null,
+				};
+			}
+
+			// Multiple dashes
+			// e.g. taxonomy-product-category-electronics -> taxonomy: "product-category", term: "electronics"
+			const lastDashIndex = dashIndices[ dashIndices.length - 1 ];
+			const taxonomy = taxonomyPart.substring( 0, lastDashIndex );
+			const termSlug = taxonomyPart.substring( lastDashIndex + 1 );
+
+			return {
+				taxonomy,
+				termSlug,
+				isAuthor: false,
+				authorSlug: null,
+			};
+		}
+
+		// No dashes, so the entire part is the taxonomy
+		return {
+			taxonomy: taxonomyPart,
+			termSlug: null,
+			isAuthor: false,
+			authorSlug: null,
+		};
+	}
+
+	// Check for built-in taxonomy patterns
+	// e.g. category, tag
 	if ( templateSlug === 'category' ) {
 		return {
 			taxonomy: 'category',
@@ -76,7 +127,8 @@ export function parseTemplateSlug( templateSlug ) {
 		};
 	}
 
-	// Check for specific term patterns, e.g. category-news, tag-featured
+	// Check for specific term patterns for built-in taxonomies
+	// e.g. category-news, tag-featured
 	if ( templateSlug.startsWith( 'category-' ) ) {
 		return {
 			taxonomy: 'category',
@@ -94,37 +146,37 @@ export function parseTemplateSlug( templateSlug ) {
 		};
 	}
 
-	// Check for taxonomy patterns
-	// e.g. taxonomy-product-category, taxonomy-product-category-electronics
-	if ( templateSlug.startsWith( 'taxonomy-' ) ) {
-		const taxonomyPart = templateSlug.substring( 9 );
-		const dashCount = ( taxonomyPart.match( /-/g ) || [] ).length;
-		if ( dashCount >= 2 ) {
-			const lastDashIndex = taxonomyPart.lastIndexOf( '-' );
-			const taxonomy = taxonomyPart.substring( 0, lastDashIndex );
-			const termSlug = taxonomyPart.substring( lastDashIndex + 1 );
-
-			return {
-				taxonomy,
-				termSlug,
-				isAuthor: false,
-				authorSlug: null,
-			};
-		}
-		return {
-			taxonomy: taxonomyPart,
-			termSlug: null,
-			isAuthor: false,
-			authorSlug: null,
-		};
-	}
-
 	return {
 		taxonomy: null,
 		termSlug: null,
 		isAuthor: false,
 		authorSlug: null,
 	};
+}
+
+/**
+ * Template slug parser that validates taxonomies exist.
+ *
+ * @param {string}   templateSlug The template slug to parse.
+ * @param {Function} getTaxonomy  Function to get taxonomy record.
+ * @return {Object} Object containing taxonomy, termSlug, isAuthor, and authorSlug.
+ */
+export function parseTemplateSlugWithValidation( templateSlug, getTaxonomy ) {
+	const basicParse = parseTemplateSlug( templateSlug );
+
+	if ( basicParse.taxonomy && ! basicParse.isAuthor ) {
+		const taxonomyRecord = getTaxonomy( basicParse.taxonomy );
+		if ( ! taxonomyRecord ) {
+			return {
+				taxonomy: null,
+				termSlug: null,
+				isAuthor: false,
+				authorSlug: null,
+			};
+		}
+	}
+
+	return basicParse;
 }
 
 /**
@@ -136,12 +188,19 @@ export function parseTemplateSlug( templateSlug ) {
  */
 export function useTermContext( termId = null, taxonomy = null ) {
 	const templateSlug = useTemplateSlug();
+
 	const {
 		taxonomy: fallbackTaxonomy,
 		termSlug,
 		isAuthor,
 		authorSlug,
-	} = parseTemplateSlug( templateSlug );
+	} = useSelect(
+		( select ) => {
+			const { getTaxonomy } = select( coreStore );
+			return parseTemplateSlugWithValidation( templateSlug, getTaxonomy );
+		},
+		[ templateSlug ]
+	);
 
 	const hasContext = Boolean( termId && taxonomy );
 
@@ -167,7 +226,12 @@ export function useTermContext( termId = null, taxonomy = null ) {
 				return null;
 			}
 
-			const { getEntityRecords } = select( coreStore );
+			const { getEntityRecords, getTaxonomy } = select( coreStore );
+			const taxonomyRecord = getTaxonomy( fallbackTaxonomy );
+			if ( ! taxonomyRecord ) {
+				return null;
+			}
+
 			const termRecords = getEntityRecords(
 				'taxonomy',
 				fallbackTaxonomy,
