@@ -97,6 +97,7 @@ export function Comments( {
 
 	const threads = useMemo( () => {
 		const t = [ ...noteThreads ];
+		const orderedThreads = [];
 		// In floating mode, when the note board is shown, and as long
 		// as the selected block doesn't have an existing note attached -
 		// add a "new note" entry to the threads. This special thread type
@@ -109,16 +110,21 @@ export function Comments( {
 				blockClientId: selectedBlockClientId,
 				content: { rendered: '' },
 			};
-			// Find the note block's spot in orderedBlockIds.
-			const insertIndex = orderedBlockIds.findIndex(
-				( id ) => id === selectedBlockClientId
-			);
-			if ( insertIndex !== -1 ) {
-				t.splice( insertIndex, 0, newNoteThread );
-			} else {
-				// If block not found, append to the end.
-				t.push( newNoteThread );
-			}
+			// Insert the new comment block at the right order within the threads.
+			orderedBlockIds.forEach( ( blockId ) => {
+				if ( blockId === selectedBlockClientId ) {
+					orderedThreads.push( newNoteThread );
+				} else {
+					const threadForBlock = t.find(
+						( thread ) => thread.blockClientId === blockId
+					);
+					if ( threadForBlock ) {
+						orderedThreads.push( threadForBlock );
+					}
+				}
+			} );
+			setSelectedThread( 'new-note-thread' );
+			return orderedThreads;
 		}
 		return t;
 	}, [
