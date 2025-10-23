@@ -66,12 +66,12 @@ function useFitText( { fitText, name, clientId } ) {
 	// Any attribute may change the available space.
 	const blockAttributes = useSelect(
 		( select ) => {
-			if ( ! clientId ) {
+			if ( ! clientId || ! hasFitTextSupport || ! fitText ) {
 				return;
 			}
 			return select( blockEditorStore ).getBlockAttributes( clientId );
 		},
-		[ clientId ]
+		[ clientId, hasFitTextSupport, fitText ]
 	);
 
 	const applyFitText = useCallback( () => {
