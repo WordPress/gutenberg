@@ -35,7 +35,6 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import { pencil } from '@wordpress/icons';
 import { DOWN } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -43,12 +42,14 @@ import { store as blocksStore } from '@wordpress/blocks';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 export default function PostDateEdit( {
-	attributes,
+	attributes: { datetime, textAlign, format, isLink, metadata },
 	context: { postType: postTypeSlug, queryId },
 	setAttributes,
-	name,
 } ) {
-	const { datetime, textAlign, format, isLink } = attributes;
+	const displayType =
+		metadata?.bindings?.datetime?.source === 'core/post-data' &&
+		metadata?.bindings?.datetime?.args?.field;
+
 	const blockProps = useBlockProps( {
 		className: clsx( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
@@ -89,6 +90,7 @@ export default function PostDateEdit( {
 		( select ) => {
 			const { getPostType, getEntityRecord } = select( coreStore );
 			const siteSettings = getEntityRecord( 'root', 'site' );
+
 			return {
 				siteFormat: siteSettings?.date_format,
 				siteTimeFormat: siteSettings?.time_format,
@@ -96,12 +98,6 @@ export default function PostDateEdit( {
 			};
 		},
 		[ postTypeSlug ]
-	);
-	const activeBlockVariationName = useSelect(
-		( select ) =>
-			select( blocksStore ).getActiveBlockVariation( name, attributes )
-				?.name,
-		[ name, attributes ]
 	);
 
 	const blockEditingMode = useBlockEditingMode();
@@ -124,6 +120,7 @@ export default function PostDateEdit( {
 			</a>
 		);
 	}
+
 	return (
 		<>
 			{ ( blockEditingMode === 'default' ||
@@ -136,17 +133,15 @@ export default function PostDateEdit( {
 						} }
 					/>
 
-					{ activeBlockVariationName !== 'post-date-modified' &&
-						( ! isDescendentOfQueryLoop ||
-							! activeBlockVariationName ) && (
+					{ displayType !== 'modified' &&
+						! isDescendentOfQueryLoop && (
 							<ToolbarGroup>
 								<Dropdown
 									popoverProps={ popoverProps }
 									renderContent={ ( { onClose } ) => (
 										<PublishDateTimePicker
 											title={
-												activeBlockVariationName ===
-												'post-date'
+												displayType === 'date'
 													? __( 'Publish Date' )
 													: __( 'Date' )
 											}
