@@ -1,4 +1,8 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -28,6 +32,11 @@ export function AddComment( {
 	setShowCommentBoard,
 	commentSidebarRef,
 	reflowComments = noop,
+	isFloating = false,
+	thread = {},
+	y,
+	refs,
+	ariaLabel,
 } ) {
 	const { clientId, blockCommentId } = useSelect( ( select ) => {
 		const { getSelectedBlock } = select( blockEditorStore );
@@ -44,7 +53,24 @@ export function AddComment( {
 	}
 
 	return (
-		<VStack spacing="3" tabIndex={ 0 } role="listitem">
+		// Disable reason: role="listitem" does in fact support aria-expanded.
+		// eslint-disable-next-line jsx-a11y/role-supports-aria-props
+		<VStack
+			className={ clsx(
+				'editor-collab-sidebar-panel__thread is-selected',
+				{
+					'is-floating': isFloating,
+				}
+			) }
+			id={ `comment-thread-${ thread.id }` }
+			spacing="3"
+			tabIndex={ 0 }
+			role="listitem"
+			aria-label={ ariaLabel }
+			aria-expanded
+			ref={ isFloating ? refs.setFloating : undefined }
+			style={ isFloating ? { top: y } : undefined }
+		>
 			<HStack alignment="left" spacing="3">
 				<CommentAuthorInfo />
 			</HStack>

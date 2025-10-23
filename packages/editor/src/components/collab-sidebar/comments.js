@@ -39,7 +39,7 @@ import {
 import { unlock } from '../../lock-unlock';
 import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
-import { getCommentExcerpt, focusCommentThread } from './utils';
+import { focusCommentThread, getCommentExcerpt } from './utils';
 import { useFloatingThread } from './hooks';
 import { AddComment } from './add-comment';
 
@@ -139,9 +139,16 @@ export function Comments( {
 	// Reselect the new note thread when block selection changes.
 	useEffect( () => {
 		if ( isFloating && showCommentBoard && undefined === blockCommentId ) {
-			reflowComments();
+			const timeoutId = setTimeout( reflowComments, 300 );
+			return () => clearTimeout( timeoutId );
 		}
-	}, [selectedBlockClientId, reflowComments, isFloating, showCommentBoard, blockCommentId] );
+	}, [
+		selectedBlockClientId,
+		reflowComments,
+		isFloating,
+		showCommentBoard,
+		blockCommentId,
+	] );
 
 	const handleDelete = async ( comment ) => {
 		const currentIndex = threads.findIndex( ( t ) => t.id === comment.id );
@@ -307,16 +314,17 @@ export function Comments( {
 	if ( ! hasThreads && ! isFloating ) {
 		return (
 			<VStack alignment="left" justify="flex-start" spacing="2">
-				<Text as="p">{ __( 'No notes available.' ) }</Text>
-				<Text as="p" variant="muted">
-					{ __( 'Only logged in users can see Notes.' ) }
-				</Text>
 				<AddComment
 					onSubmit={ onAddReply }
 					showCommentBoard={ showCommentBoard }
 					setShowCommentBoard={ setShowCommentBoard }
 					commentSidebarRef={ commentSidebarRef }
+					thread={ { id: 0 } }
 				/>
+				<Text as="p">{ __( 'No notes available.' ) }</Text>
+				<Text as="p" variant="muted">
+					{ __( 'Only logged in users can see Notes.' ) }
+				</Text>
 			</VStack>
 		);
 	}
@@ -326,19 +334,13 @@ export function Comments( {
 			{ ! isFloating &&
 				showCommentBoard &&
 				undefined === blockCommentId && (
-					<VStack
-						className="editor-collab-sidebar-panel__thread is-selected"
-						spacing="3"
-						tabIndex={ 0 }
-						role="listitem"
-					>
-						<AddComment
-							onSubmit={ onAddReply }
-							showCommentBoard={ showCommentBoard }
-							setShowCommentBoard={ setShowCommentBoard }
-							commentSidebarRef={ commentSidebarRef }
-						/>
-					</VStack>
+					<AddComment
+						onSubmit={ onAddReply }
+						showCommentBoard={ showCommentBoard }
+						setShowCommentBoard={ setShowCommentBoard }
+						commentSidebarRef={ commentSidebarRef }
+						thread={ { id: 0 } }
+					/>
 				) }
 			{ threads.map( ( thread ) => (
 				<Thread
@@ -429,7 +431,6 @@ function Thread( {
 	const lastReply =
 		allReplies.length > 0 ? allReplies[ allReplies.length - 1 ] : undefined;
 	const restReplies = allReplies.length > 0 ? allReplies.slice( 0, -1 ) : [];
-
 	const commentExcerpt = getCommentExcerpt(
 		stripHTML( thread.content?.rendered ),
 		10
@@ -445,30 +446,20 @@ function Thread( {
 				__( 'Original block deleted. Note: %s' ),
 				commentExcerpt
 		  );
-
 	if ( 'new-note-thread' === thread.id && showCommentBoard && isFloating ) {
 		return (
-			// Disable reason: role="listitem" does in fact support aria-expanded.
-			// eslint-disable-next-line jsx-a11y/role-supports-aria-props
-			<VStack
-				className="editor-collab-sidebar-panel__thread is-selected is-floating"
-				id={ `comment-thread-${ thread.id }` }
-				spacing="3"
-				tabIndex={ 0 }
-				role="listitem"
-				aria-label={ ariaLabel }
-				aria-expanded={ isSelected }
-				ref={ isFloating ? refs.setFloating : undefined }
-				style={ isFloating ? { top: y } : undefined }
-			>
-				<AddComment
-					onSubmit={ onAddReply }
-					showCommentBoard={ showCommentBoard }
-					setShowCommentBoard={ setShowCommentBoard }
-					commentSidebarRef={ commentSidebarRef }
-					reflowComments={ reflowComments }
-				/>
-			</VStack>
+			<AddComment
+				onSubmit={ onAddReply }
+				showCommentBoard={ showCommentBoard }
+				setShowCommentBoard={ setShowCommentBoard }
+				commentSidebarRef={ commentSidebarRef }
+				reflowComments={ reflowComments }
+				isFloating={ isFloating }
+				thread={ thread }
+				y={ y }
+				refs={ refs }
+				ariaLabel={ ariaLabel }
+			/>
 		);
 	}
 
