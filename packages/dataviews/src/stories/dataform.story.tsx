@@ -9,7 +9,6 @@ import deepMerge from 'deepmerge';
 import { useCallback, useMemo, useState } from '@wordpress/element';
 import {
 	Button,
-	Notice,
 	__experimentalVStack as VStack,
 	privateApis,
 } from '@wordpress/components';
@@ -1253,7 +1252,13 @@ const VisibilityComponent = () => {
 	);
 };
 
-const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
+const LayoutCardComponent = ( {
+	withHeader,
+	isCollapsible,
+}: {
+	withHeader: boolean;
+	isCollapsible: boolean;
+} ) => {
 	type Customer = {
 		name: string;
 		email: string;
@@ -1356,21 +1361,6 @@ const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 				return <Badge>{ item.plan }</Badge>;
 			},
 		},
-		{
-			id: 'important-note',
-			label: 'Important notice regarding your account',
-			type: 'text',
-			readOnly: true,
-			render: () => {
-				return (
-					<Notice status="warning" isDismissible={ false }>
-						This card can not be collapsed and is used to display
-						important messages or when it is the only card in the
-						page.
-					</Notice>
-				);
-			},
-		},
 	];
 
 	const [ customer, setCustomer ] = useState< Customer >( {
@@ -1399,7 +1389,11 @@ const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 			fields: [
 				{
 					id: 'customerCard',
-					layout: { type: 'card', summary: 'plan-summary' },
+					layout: {
+						type: 'card',
+						summary: 'plan-summary',
+						isCollapsible,
+					},
 					label: 'Customer',
 					description:
 						'Enter your contact details, plan type, and addresses to complete your customer information.',
@@ -1458,27 +1452,19 @@ const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 					},
 				},
 				{
-					id: 'important-information',
-					label: 'Important information',
-					layout: {
-						type: 'card',
-						isCollapsible: false,
-					},
-					children: [ 'important-note' ],
-				},
-				{
 					id: 'taxConfiguration',
 					label: 'Taxes',
 					layout: {
 						type: 'card',
 						isOpened: false,
 						summary: [ { id: 'dueDate', visibility: 'always' } ],
+						isCollapsible,
 					},
 					children: [ 'vat', 'commission' ],
 				},
 			],
 		} ),
-		[ withHeader ]
+		[ withHeader, isCollapsible ]
 	);
 
 	return (
@@ -1884,9 +1870,14 @@ export const LayoutCard = {
 			control: { type: 'boolean' },
 			description: 'Whether the card has a header.',
 		},
+		isCollapsible: {
+			control: { type: 'boolean' },
+			description: 'Whether the card can be collapsed/expanded.',
+		},
 	},
 	args: {
 		withHeader: true,
+		isCollapsible: true,
 	},
 };
 
