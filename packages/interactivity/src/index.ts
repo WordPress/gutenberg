@@ -1,3 +1,7 @@
+if ( globalThis.SCRIPT_DEBUG ) {
+	await import( 'preact/debug' );
+}
+
 /**
  * External dependencies
  */

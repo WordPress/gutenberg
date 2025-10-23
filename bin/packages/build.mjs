@@ -57,18 +57,18 @@ function getAllPackages() {
 
 const PACKAGES = getAllPackages();
 
-// Define global variables for feature flagging, matching webpack's DefinePlugin behavior
-const define = {
+const baseDefine = {
 	'globalThis.IS_GUTENBERG_PLUGIN': JSON.stringify(
 		Boolean( process.env.npm_package_config_IS_GUTENBERG_PLUGIN )
 	),
 	'globalThis.IS_WORDPRESS_CORE': JSON.stringify(
 		Boolean( process.env.npm_package_config_IS_WORDPRESS_CORE )
 	),
-	'globalThis.SCRIPT_DEBUG': JSON.stringify(
-		process.env.NODE_ENV === 'development'
-	),
 };
+const getDefine = ( scriptDebug ) => ( {
+	...baseDefine,
+	'globalThis.SCRIPT_DEBUG': JSON.stringify( scriptDebug ),
+} );
 
 /**
  * Create emotion babel plugin for esbuild.
@@ -561,14 +561,14 @@ async function bundlePackage( packageName ) {
 				...baseConfig,
 				outfile: path.join( outputDir, 'index.min.js' ),
 				minify: true,
-				define,
+				define: getDefine( false ),
 				plugins: bundlePlugins,
 			} ),
 			esbuild.build( {
 				...baseConfig,
 				outfile: path.join( outputDir, 'index.js' ),
 				minify: false,
-				define,
+				define: getDefine( true ),
 				plugins: bundlePlugins,
 			} )
 		);
@@ -596,7 +596,6 @@ async function bundlePackage( packageName ) {
 					: exportName.replace( /^\.\//, '' );
 			const entryPoint = path.join( packageDir, exportPath );
 			const baseFileName = path.basename( fileName );
-
 			const modulePlugins = [
 				wordpressExternalsPlugin( `${ baseFileName }.min`, 'esm' ),
 			];
@@ -614,7 +613,22 @@ async function bundlePackage( packageName ) {
 					target,
 					platform: 'browser',
 					minify: true,
-					define,
+					define: getDefine( false ),
+					plugins: modulePlugins,
+				} ),
+				esbuild.build( {
+					entryPoints: [ entryPoint ],
+					outfile: path.join(
+						rootBuildModuleDir,
+						`${ fileName }.js`
+					),
+					bundle: true,
+					sourcemap: true,
+					format: 'esm',
+					target,
+					platform: 'browser',
+					minify: false,
+					define: getDefine( true ),
 					plugins: modulePlugins,
 				} )
 			);
@@ -1115,7 +1129,9 @@ async function buildAll() {
 			const isBundled = await bundlePackage( packageName );
 			const buildTime = Date.now() - startBundleTime;
 			if ( isBundled ) {
-				console.log( `   ✔ Bundled ${ packageName } (${ buildTime }ms)` );
+				console.log(
+					`   ✔ Bundled ${ packageName } (${ buildTime }ms)`
+				);
 			}
 		} )
 	);

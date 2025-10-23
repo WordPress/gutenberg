@@ -22,21 +22,16 @@
 		"node": ">=18.12.0",
 		"npm": ">=8.19.2"
 	},
-	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
-			"import": "./build-module/index.js",
-			"require": "./build/index.js"
+			"import": "./build-module/index.js"
 		},
 		"./package.json": "./package.json"
 	},
 	"react-native": "src/index",
-	"wpScriptModuleExports": {
-		".": "./build-module/index.js",
-		"./debug": "./build-module/debug.js"
-	},
+	"wpScriptModuleExports": "./build-module/index.js",
 	"types": "build-types",
 	"dependencies": {
 		"@preact/signals": "^1.3.0",
