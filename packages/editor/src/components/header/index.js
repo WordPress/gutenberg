@@ -12,7 +12,6 @@ import { PinnedItems } from '@wordpress/interface';
 /**
  * Internal dependencies
  */
-import CollabSidebar from '../collab-sidebar';
 import BackButton, { useHasBackButton } from './back-button';
 import CollapsibleBlockToolbar from '../collapsible-block-toolbar';
 import DocumentBar from '../document-bar';
@@ -24,7 +23,6 @@ import PostSavedState from '../post-saved-state';
 import PostViewLink from '../post-view-link';
 import PreviewDropdown from '../preview-dropdown';
 import ZoomOutToggle from '../zoom-out-toggle';
-import PostTypeSupportCheck from '../post-type-support-check';
 import { store as editorStore } from '../../store';
 import {
 	TEMPLATE_PART_POST_TYPE,
@@ -193,11 +191,6 @@ function Header( {
 						}
 					/>
 				) }
-
-				<PostTypeSupportCheck supportKeys="editor.notes">
-					<CollabSidebar />
-				</PostTypeSupportCheck>
-
 				{ customSaveButton }
 				<MoreMenu />
 			</motion.div>
