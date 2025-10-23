@@ -260,6 +260,7 @@ export function Comments( {
 		? {
 				container: 'thread stack / size',
 				height: '100%',
+				flexShrink: 0,
 		  }
 		: undefined;
 

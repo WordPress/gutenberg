@@ -29,6 +29,7 @@
 	background-color: $gray-100;
 	overflow: hidden;
 	width: auto;
+	flex-shrink: 0;
 
 	&.is-selected {
 		background-color: $white;
