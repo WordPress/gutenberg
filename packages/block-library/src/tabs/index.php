@@ -200,7 +200,7 @@ function block_core_tabs_render_block_callback( array $attributes, string $conte
 			return wp_sprintf(
 				'<a id="tab__%1$s" class="tabs__tab-label" href="#%1$s" role="tab" aria-controls="%1$s" data-wp-on--click="actions.handleTabClick" data-wp-on--keydown="actions.handleTabKeyDown" data-wp-bind--aria-selected="state.isActiveTab" data-wp-bind--tabindex="state.tabIndexAttribute">%2$s</a>',
 				$tab['id'],
-				html_entity_decode( $tab['label'] ),
+				html_entity_decode( $tab['label'] )
 			);
 		},
 		$tabs_list
