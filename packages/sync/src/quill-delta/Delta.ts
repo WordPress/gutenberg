@@ -63,7 +63,7 @@ class Delta {
 		embedType: string,
 		handler: EmbedHandler< T >
 	): void {
-		this.handlers[ embedType ] = handler;
+		this.handlers[ embedType ] = handler as EmbedHandler< unknown >;
 	}
 
 	static unregisterEmbed( embedType: string ): void {
@@ -620,7 +620,7 @@ class Delta {
 			const diff = diffs[ i ];
 
 			const segmentStart = lastDiffPosition;
-			const segmentEnd = lastDiffPosition + diff.count;
+			const segmentEnd = lastDiffPosition + ( diff.count ?? 0 );
 			const isCursorInSegment =
 				cursorAfterChange > segmentStart &&
 				cursorAfterChange <= segmentEnd;
@@ -671,7 +671,7 @@ class Delta {
 					// Remove the previous unchanged segment from adjustedDiffs
 					adjustedDiffs.pop();
 					adjustedDiffs.push( ...movedSegments );
-					lastDiffPosition += diff.count;
+					lastDiffPosition += diff.count ?? 0;
 					continue;
 				}
 			}
@@ -679,7 +679,7 @@ class Delta {
 			// Path 3: Do nothing - add diff as-is
 			adjustedDiffs.push( diff );
 			if ( ! diff.added ) {
-				lastDiffPosition += diff.count;
+				lastDiffPosition += diff.count ?? 0;
 			}
 		}
 
@@ -785,7 +785,7 @@ class Delta {
 			return null;
 		}
 
-		const prevSegmentStart = lastDiffPosition - prevDiff.count;
+		const prevSegmentStart = lastDiffPosition - ( prevDiff.count ?? 0 );
 		const prevSegmentEnd = lastDiffPosition;
 
 		// Check if cursor is within or at the end of the previous unchanged segment
@@ -814,7 +814,7 @@ class Delta {
 		const atAndAfterCursor = prevDiff.value.substring( deleteOffset );
 
 		// The deletion should consume characters starting at cursor
-		const deletionLength = diff.count;
+		const deletionLength = diff.count ?? 0;
 		const afterDeletion = atAndAfterCursor.substring( deletionLength );
 
 		const result: Change[] = [];
@@ -884,7 +884,7 @@ class Delta {
 	): Delta {
 		const retDelta = new Delta();
 		changes.forEach( ( component: Change ) => {
-			let length = component.count;
+			let length = component.count ?? 0;
 			while ( length > 0 ) {
 				let opLength = 0;
 				if ( component.added ) {
