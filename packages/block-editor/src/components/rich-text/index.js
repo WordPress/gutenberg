@@ -41,6 +41,7 @@ import { getAllowedFormats } from './utils';
 import { Content, valueToHTMLString } from './content';
 import { withDeprecations } from './with-deprecations';
 import BlockContext from '../block-context';
+import { PrivateBlockContext } from '../block-list/private-block-context';
 
 export const keyboardShortcutContext = createContext();
 keyboardShortcutContext.displayName = 'keyboardShortcutContext';
@@ -124,9 +125,10 @@ export function RichTextWrapper(
 	const instanceId = useInstanceId( RichTextWrapper );
 	const anchorRef = useRef();
 	const context = useBlockEditContext();
-	const { clientId, isSelected: isBlockSelected, name: blockName } = context;
+	const { clientId, isSelected: isBlockSelected } = context;
 	const blockBindings = context[ blockBindingsKey ];
 	const blockContext = useContext( BlockContext );
+	const { bindableAttributes } = useContext( PrivateBlockContext );
 	const registry = useRegistry();
 	const selector = ( select ) => {
 		// Avoid subscribing to the block editor store if the block is not
@@ -171,15 +173,7 @@ export function RichTextWrapper(
 
 	const { disableBoundBlock, bindingsPlaceholder, bindingsLabel } = useSelect(
 		( select ) => {
-			const { __experimentalBlockBindingsSupportedAttributes } =
-				select( blockEditorStore ).getSettings();
-
-			if (
-				! blockBindings?.[ identifier ] ||
-				! (
-					blockName in __experimentalBlockBindingsSupportedAttributes
-				)
-			) {
+			if ( ! blockBindings?.[ identifier ] || ! bindableAttributes ) {
 				return {};
 			}
 
@@ -252,7 +246,7 @@ export function RichTextWrapper(
 		[
 			blockBindings,
 			identifier,
-			blockName,
+			bindableAttributes,
 			adjustedValue,
 			clientId,
 			blockContext,

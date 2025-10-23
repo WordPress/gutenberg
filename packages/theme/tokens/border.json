@@ -1,0 +1,34 @@
+{
+	"border": {
+		"$type": "dimension",
+		"radius": {
+			"x-small": {
+				"$value": { "value": 1, "unit": "px" },
+				"$description": "Extra small radius"
+			},
+			"small": {
+				"$value": { "value": 2, "unit": "px" },
+				"$description": "Small radius"
+			},
+			"medium": {
+				"$value": { "value": 4, "unit": "px" },
+				"$description": "Medium radius"
+			},
+			"large": {
+				"$value": { "value": 8, "unit": "px" },
+				"$description": "Large radius"
+			}
+		},
+		"width": {
+			"focus": {
+				"$value": { "value": 2, "unit": "px" },
+				"$description": "Border width for focus ring",
+				"$extensions": {
+					"mode": {
+						"high-dpi": { "value": 1.5, "unit": "px" }
+					}
+				}
+			}
+		}
+	}
+}

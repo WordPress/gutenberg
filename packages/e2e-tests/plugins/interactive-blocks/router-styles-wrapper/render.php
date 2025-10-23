@@ -68,7 +68,7 @@ $wrapper_attributes = get_block_wrapper_attributes();
 			<a
 				data-testid="link <?php echo $label; ?>"
 				data-wp-on--click="actions.navigate"
-				data-wp-on-async--mouseenter="actions.prefetch"
+				data-wp-on--mouseenter="actions.prefetch"
 				href="<?php echo $link; ?>"
 			>
 				<?php echo $label; ?>
@@ -111,10 +111,10 @@ $wrapper_attributes = get_block_wrapper_attributes();
 
 	<!-- Text hidden when media=print applies. -->
 	<div class="hide-on-print" data-testid="hide-on-print">This should be visible when media is not "print".</div>
-	
+
 	<!-- Element for testing noscript styles being ignored -->
 	<div data-testid="noscript-style-test" class="noscript-style-test">This should not be affected by styles in noscript tags</div>
-	
+
 	<!-- Noscript styles that should be ignored -->
 	<noscript>
 		<style>

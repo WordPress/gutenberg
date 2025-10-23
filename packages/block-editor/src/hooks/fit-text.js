@@ -180,12 +180,16 @@ function useFitText( { fitText, name, clientId } ) {
  * @param {Function} props.setAttributes Function to set block attributes.
  * @param {string}   props.name          Block name.
  * @param {boolean}  props.fitText       Whether fit text is enabled.
+ * @param {string}   props.fontSize      Font size slug.
+ * @param {Object}   props.style         Block style object.
  */
 export function FitTextControl( {
 	clientId,
 	fitText = false,
 	setAttributes,
 	name,
+	fontSize,
+	style,
 } ) {
 	if ( ! hasBlockSupport( name, FIT_TEXT_SUPPORT_KEY ) ) {
 		return null;
@@ -203,9 +207,28 @@ export function FitTextControl( {
 					__nextHasNoMarginBottom
 					label={ __( 'Fit text' ) }
 					checked={ fitText }
-					onChange={ () =>
-						setAttributes( { fitText: ! fitText || undefined } )
-					}
+					onChange={ () => {
+						const newFitText = ! fitText || undefined;
+						const updates = { fitText: newFitText };
+
+						// When enabling fit text, clear font size if it has a value
+						if ( newFitText ) {
+							if ( fontSize ) {
+								updates.fontSize = undefined;
+							}
+							if ( style?.typography?.fontSize ) {
+								updates.style = {
+									...style,
+									typography: {
+										...style?.typography,
+										fontSize: undefined,
+									},
+								};
+							}
+						}
+
+						setAttributes( updates );
+					} }
 					help={
 						fitText
 							? __( 'Text will resize to fit its container.' )
@@ -278,7 +301,7 @@ const hasFitTextSupport = ( blockNameOrType ) => {
 export default {
 	useBlockProps,
 	addSaveProps,
-	attributeKeys: [ 'fitText' ],
+	attributeKeys: [ 'fitText', 'fontSize', 'style' ],
 	hasSupport: hasFitTextSupport,
 	edit: FitTextControl,
 };
