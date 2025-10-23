@@ -3,7 +3,11 @@
  */
 import { useState, useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
+import {
+	privateApis as coreDataPrivateApis,
+	store as coreStore,
+} from '@wordpress/core-data';
+import { resolveSelect } from '@wordpress/data';
 import { Modal } from '@wordpress/components';
 
 /**
@@ -238,26 +242,41 @@ export function MediaUploadModal( {
 				label: multiple ? __( 'Select' ) : __( 'Select' ),
 				isPrimary: true,
 				supportsBulk: multiple,
-				callback: ( items: Attachment[] ) => {
-					if ( multiple ) {
-						onSelect( items );
-					} else {
-						onSelect( items[ 0 ] );
+				async callback() {
+					if ( selection.length === 0 ) {
+						return;
 					}
-					onClose?.();
+
+					const selectedPostsQuery = {
+						include: selection,
+						per_page: -1,
+					};
+
+					const selectedPosts = await resolveSelect(
+						coreStore
+					).getEntityRecords(
+						'postType',
+						'attachment',
+						selectedPostsQuery
+					);
+
+					// Transform the selected posts to the expected Attachment format
+					const transformedPosts =
+						selectedPosts?.map( transformAttachment );
+
+					const selectedItems = multiple
+						? transformedPosts
+						: transformedPosts?.[ 0 ];
+
+					onSelect( selectedItems );
 				},
 			},
 		],
-		[ multiple, onSelect, onClose ]
+		[ multiple, onSelect, selection ]
 	);
-
-	const handleSelectionChange = useCallback( ( newSelection: string[] ) => {
-		setSelection( newSelection );
-	}, [] );
 
 	const handleModalClose = useCallback( () => {
 		onClose?.();
-		setSelection( [] );
 	}, [ onClose ] );
 
 	const paginationInfo = useMemo(
@@ -294,7 +313,7 @@ export function MediaUploadModal( {
 				onChangeView={ setView }
 				actions={ actions }
 				selection={ selection }
-				onChangeSelection={ handleSelectionChange }
+				onChangeSelection={ setSelection }
 				isLoading={ isLoading }
 				paginationInfo={ paginationInfo }
 				defaultLayouts={ defaultLayouts }
