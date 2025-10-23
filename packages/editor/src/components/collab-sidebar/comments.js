@@ -393,7 +393,6 @@ function Thread( {
 		toggleBlockHighlight,
 		50
 	);
-
 	const { y, refs } = useFloatingThread( {
 		thread,
 		calculatedOffset,
@@ -426,11 +425,13 @@ function Thread( {
 		setShowCommentBoard( false );
 		toggleBlockSpotlight( thread.blockClientId, false );
 	};
+
 	const allReplies = thread?.reply || [];
 
 	const lastReply =
 		allReplies.length > 0 ? allReplies[ allReplies.length - 1 ] : undefined;
 	const restReplies = allReplies.length > 0 ? allReplies.slice( 0, -1 ) : [];
+
 	const commentExcerpt = getCommentExcerpt(
 		stripHTML( thread.content?.rendered ),
 		10
