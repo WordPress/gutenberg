@@ -46,9 +46,6 @@ const READONLY_BLOCKS = [ 'core/post-date' ];
  * @return {string} The normalized attribute type.
  */
 const getAttributeType = ( blockName, attribute ) => {
-	if ( READONLY_BLOCKS.includes( blockName ) ) {
-		return '';
-	}
 	const _attributeType =
 		getBlockType( blockName ).attributes?.[ attribute ]?.type;
 	return _attributeType === 'rich-text' ? 'string' : _attributeType;
@@ -440,7 +437,10 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 	);
 
 	// Lock the UI when the user can't update bindings or there are no fields to connect to.
-	const readOnly = ! canUpdateBlockBindings || ! hasCompatibleData;
+	const readOnly =
+		! canUpdateBlockBindings ||
+		! hasCompatibleData ||
+		READONLY_BLOCKS.includes( blockName );
 
 	const RenderModalContent =
 		sources[ modalState?.sourceKey ]?.renderModalContent;

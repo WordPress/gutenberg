@@ -77,15 +77,14 @@ test.describe( 'Post Data source', () => {
 					},
 				},
 			} );
-			await page
+			const postDataItem = await page
 				.getByRole( 'button', {
 					name: 'datetime',
 				} )
 				.click();
-			const postDataMenuItem = page.getByRole( 'menuitem', {
-				name: 'Post Data',
-			} );
-			await expect( postDataMenuItem ).toBeVisible();
+			await expect( postDataItem ).toBeVisible();
+			await expect( postDataItem ).toHaveText( 'Post Date' );
+			await expect( postDataItem ).toBeDisabled();
 		} );
 	} );
 } );
