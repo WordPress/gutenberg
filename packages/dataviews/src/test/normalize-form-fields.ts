@@ -142,6 +142,7 @@ describe( 'normalizeFormFields', () => {
 						type: 'card',
 						withHeader: true,
 						isOpened: true,
+						withHeaderBorder: false,
 						summary: [],
 					},
 				},
@@ -220,6 +221,7 @@ describe( 'normalizeFormFields', () => {
 					layout: {
 						type: 'card',
 						withHeader: true,
+						withHeaderBorder: false,
 						isOpened: false,
 						summary: [
 							{ id: 'field2', visibility: 'when-collapsed' },
