@@ -91,8 +91,8 @@ export function GlobalStylesEditorCanvasContainerLink( {
 		}
 		// If user navigated away from revisions screen, clear the canvas view
 		else if (
-			previousPath === '/revisions' &&
-			path !== '/revisions' &&
+			previousPath?.startsWith( '/revisions' ) &&
+			! path?.startsWith( '/revisions' ) &&
 			editorCanvasContainerView &&
 			editorCanvasContainerView.startsWith( 'global-styles-revisions' )
 		) {
