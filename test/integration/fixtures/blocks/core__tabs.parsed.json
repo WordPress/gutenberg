@@ -1,0 +1,50 @@
+[
+	{
+		"blockName": "core/tabs",
+		"attrs": {},
+		"innerBlocks": [
+			{
+				"blockName": "core/tab",
+				"attrs": {
+					"label": "Tab 1"
+				},
+				"innerBlocks": [
+					{
+						"blockName": "core/paragraph",
+						"attrs": {
+							"placeholder": "Type / to add a block to tab"
+						},
+						"innerBlocks": [],
+						"innerHTML": "\n\t<p></p>\n\t",
+						"innerContent": [ "\n\t<p></p>\n\t" ]
+					}
+				],
+				"innerHTML": "\n\t<section id=\"tab-1\" class=\"wp-block-tab\"></section>\n\t",
+				"innerContent": [
+					"\n\t<section id=\"tab-1\" class=\"wp-block-tab\">",
+					null,
+					"</section>\n\t"
+				]
+			},
+			{
+				"blockName": "core/tab",
+				"attrs": {
+					"label": "Tab 2"
+				},
+				"innerBlocks": [],
+				"innerHTML": "\n\t<section id=\"tab-2\" class=\"wp-block-tab\"></section>\n\t",
+				"innerContent": [
+					"\n\t<section id=\"tab-2\" class=\"wp-block-tab\"></section>\n\t"
+				]
+			}
+		],
+		"innerHTML": "\n<div class=\"wp-block-tabs\"><h3 class=\"tabs__title\">Tab Contents</h3><ul class=\"tabs__list\"></ul>\n\n\t</div>\n\t",
+		"innerContent": [
+			"\n<div class=\"wp-block-tabs\"><h3 class=\"tabs__title\">Tab Contents</h3><ul class=\"tabs__list\"></ul>",
+			null,
+			"\n\n\t",
+			null,
+			"</div>\n\t"
+		]
+	}
+]

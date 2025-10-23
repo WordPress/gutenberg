@@ -1,0 +1,25 @@
+[
+	{
+		"blockName": "core/tab",
+		"attrs": {
+			"label": "Tab 1"
+		},
+		"innerBlocks": [
+			{
+				"blockName": "core/paragraph",
+				"attrs": {
+					"placeholder": "Type / to add a block to tab"
+				},
+				"innerBlocks": [],
+				"innerHTML": "\n\t<p>Tab 1 content</p>\n",
+				"innerContent": [ "\n\t<p>Tab 1 content</p>\n" ]
+			}
+		],
+		"innerHTML": "\n<section class=\"wp-block-tab\" id=\"tab-1\"></section>\n",
+		"innerContent": [
+			"\n<section class=\"wp-block-tab\" id=\"tab-1\">",
+			null,
+			"</section>\n"
+		]
+	}
+]

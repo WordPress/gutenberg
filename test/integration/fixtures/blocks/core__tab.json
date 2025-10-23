@@ -1,0 +1,22 @@
+[
+	{
+		"name": "core/tab",
+		"isValid": true,
+		"attributes": {
+			"label": "Tab 1",
+			"anchor": "tab-1"
+		},
+		"innerBlocks": [
+			{
+				"name": "core/paragraph",
+				"isValid": true,
+				"attributes": {
+					"content": "Tab 1 content",
+					"dropCap": false,
+					"placeholder": "Type / to add a block to tab"
+				},
+				"innerBlocks": []
+			}
+		]
+	}
+]
