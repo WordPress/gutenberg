@@ -35,6 +35,9 @@
 	},
 	"react-native": "src/index",
 	"wpScript": true,
+	"wpScriptExtraDependencies": [
+		"wp-dom-ready"
+	],
 	"dependencies": {
 		"@react-spring/web": "^9.4.5",
 		"@wordpress/a11y": "file:../a11y",
