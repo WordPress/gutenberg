@@ -212,6 +212,19 @@ export function Draggable( {
 		// Update cursor to 'grabbing', document wide.
 		ownerDocument.body.classList.add( bodyClass );
 
+		// Apply the cursor style to any editor iframes that might be present.
+		const editorIframes = ownerDocument.querySelectorAll(
+			'iframe[name="editor-canvas"]'
+		);
+		editorIframes.forEach( ( iframe ) => {
+			const iframeDocument =
+				( iframe as HTMLIFrameElement ).contentDocument ||
+				( iframe as HTMLIFrameElement ).contentWindow?.document;
+			if ( iframeDocument ) {
+				iframeDocument.body.classList.add( bodyClass );
+			}
+		} );
+
 		if ( onDragStart ) {
 			onDragStart( event );
 		}
@@ -228,6 +241,16 @@ export function Draggable( {
 
 			// Reset cursor.
 			ownerDocument.body.classList.remove( bodyClass );
+
+			// Remove the cursor style from any editor iframes.
+			editorIframes.forEach( ( iframe ) => {
+				const iframeDocument =
+					( iframe as HTMLIFrameElement ).contentDocument ||
+					( iframe as HTMLIFrameElement ).contentWindow?.document;
+				if ( iframeDocument ) {
+					iframeDocument.body.classList.remove( bodyClass );
+				}
+			} );
 
 			ownerDocument.removeEventListener( 'dragover', throttledDragOver );
 		};
