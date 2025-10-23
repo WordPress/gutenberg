@@ -34,11 +34,18 @@ export const useSetActiveTemplateAction = () => {
 			isPrimary: true,
 			icon: pencil,
 			isEligible( item ) {
-				return (
-					! item._isCustom &&
-					! ( item.slug === 'index' && item.source === 'theme' ) &&
-					item.theme === activeTheme.stylesheet
-				);
+				if ( item.theme !== activeTheme.stylesheet ) {
+					return false;
+				}
+
+				// If it's not a created template but a registered template
+				// (which means the source property is set), only allow
+				// activating (so when it's inactive).
+				if ( item.source ) {
+					return item._isActive === false;
+				}
+
+				return ! item._isCustom;
 			},
 			async callback( items ) {
 				const deactivate = items.some( ( item ) => item._isActive );
@@ -49,11 +56,7 @@ export const useSetActiveTemplateAction = () => {
 				};
 				for ( const item of items ) {
 					if ( deactivate ) {
-						if ( item.source === 'theme' ) {
-							activeTemplates[ item.slug ] = false;
-						} else {
-							delete activeTemplates[ item.slug ];
-						}
+						delete activeTemplates[ item.slug ];
 					} else {
 						activeTemplates[ item.slug ] = item.id;
 					}
