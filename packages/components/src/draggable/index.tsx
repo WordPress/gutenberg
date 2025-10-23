@@ -18,6 +18,38 @@ const dragImageClass = 'components-draggable__invisible-drag-image';
 const cloneWrapperClass = 'components-draggable__clone';
 const clonePadding = 0;
 const bodyClass = 'is-dragging-components-draggable';
+const editorIframeSelector = 'iframe[name="editor-canvas"]';
+
+/**
+ * Applies or removes a class from the body of all editor iframes in the document.
+ *
+ * @param ownerDocument The document to search for iframes.
+ * @param className     The class name to add or remove.
+ * @param action        Either 'add' or 'remove'.
+ */
+function updateEditorIframeBodyClass(
+	ownerDocument: Document,
+	className: string,
+	action: 'add' | 'remove'
+) {
+	const editorIframes =
+		ownerDocument.querySelectorAll< HTMLIFrameElement >(
+			editorIframeSelector
+		);
+
+	editorIframes.forEach( ( iframe ) => {
+		try {
+			const iframeDocument =
+				iframe.contentDocument || iframe.contentWindow?.document;
+			if ( iframeDocument?.body ) {
+				iframeDocument.body.classList[ action ]( className );
+			}
+		} catch ( error ) {
+			// Iframe access may fail due to cross-origin restrictions.
+			// We can safely ignore these errors as they're expected in some scenarios.
+		}
+	} );
+}
 
 /**
  * `Draggable` is a Component that provides a way to set up a cross-browser
@@ -218,17 +250,7 @@ export function Draggable( {
 		ownerDocument.body.classList.add( bodyClass );
 
 		// Apply the cursor style to any editor iframes that might be present.
-		const editorIframes = ownerDocument.querySelectorAll(
-			'iframe[name="editor-canvas"]'
-		);
-		editorIframes.forEach( ( iframe ) => {
-			const iframeDocument =
-				( iframe as HTMLIFrameElement ).contentDocument ||
-				( iframe as HTMLIFrameElement ).contentWindow?.document;
-			if ( iframeDocument ) {
-				iframeDocument.body.classList.add( bodyClass );
-			}
-		} );
+		updateEditorIframeBodyClass( ownerDocument, bodyClass, 'add' );
 
 		if ( onDragStart ) {
 			onDragStart( event );
@@ -248,14 +270,7 @@ export function Draggable( {
 			ownerDocument.body.classList.remove( bodyClass );
 
 			// Remove the cursor style from any editor iframes.
-			editorIframes.forEach( ( iframe ) => {
-				const iframeDocument =
-					( iframe as HTMLIFrameElement ).contentDocument ||
-					( iframe as HTMLIFrameElement ).contentWindow?.document;
-				if ( iframeDocument ) {
-					iframeDocument.body.classList.remove( bodyClass );
-				}
-			} );
+			updateEditorIframeBodyClass( ownerDocument, bodyClass, 'remove' );
 
 			ownerDocument.removeEventListener( 'dragover', throttledDragOver );
 		};
