@@ -116,7 +116,7 @@ function block_core_tab_render( array $attributes, string $content, \WP_Block $b
  *
  * @hook init
  *
- * @since 6.8.0
+ * @since 6.9.0
  */
 function register_block_core_tab() {
 	register_block_type_from_metadata(

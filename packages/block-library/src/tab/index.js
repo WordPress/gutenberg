@@ -1,8 +1,4 @@
 /**
- * WordPress dependencies
- */
-
-/**
  * Internal dependencies
  */
 import initBlock from '../utils/init-block';

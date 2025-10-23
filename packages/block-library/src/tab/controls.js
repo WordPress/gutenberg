@@ -48,7 +48,7 @@ export default function Controls( {
 						__nextHasNoMarginBottom
 					/>
 					<ToggleControl
-						label={ __( 'Is Default Tab' ) }
+						label={ __( 'Default Tab' ) }
 						checked={ isDefaultTab }
 						onChange={ ( value ) => {
 							updateBlockAttributes( tabsClientId, {
