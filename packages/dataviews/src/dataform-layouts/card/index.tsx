@@ -134,6 +134,7 @@ const NonCollapsibleCardHeader = ( {
 				height: '40px', // This is to match the chevron's __next40pxDefaultSize
 				width: '100%',
 				display: 'flex',
+				justifyContent: 'space-between',
 				alignItems: 'center',
 			} }
 		>
