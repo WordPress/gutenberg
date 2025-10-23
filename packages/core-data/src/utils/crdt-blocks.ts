@@ -183,8 +183,8 @@ function createNewYBlock( block: Block ): YBlock {
  * @param cursorPosition The position of the cursor after the change occurs.
  */
 export function mergeCrdtBlocks(
-	yblocks: Y.Array< YBlock >, // yblocks represent the blocks in the local Y.Doc
-	incomingBlocks: Block[], // incomingBlocks represent JSON blocks being synced, either from a peer or from the local editor
+	yblocks: YBlocks,
+	incomingBlocks: Block[],
 	cursorPosition: number | null
 ): void {
 	// Ensure we are working with serializable block data.
