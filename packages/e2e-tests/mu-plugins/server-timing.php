@@ -12,6 +12,19 @@
  * is loaded.
  */
 
+// Temporarily disable the template enhancement output buffer to help isolate whether it is the cause for a performance degradation noted in <https://github.com/WordPress/gutenberg/pull/72340#issuecomment-3428729158>.
+add_action(
+	'after_setup_theme',
+	static function () {
+		if ( wp_is_block_theme() ) {
+			return;
+		}
+		add_filter( 'should_load_block_assets_on_demand', '__return_false' );
+		add_filter( 'should_load_separate_core_block_assets', '__return_false' );
+		add_filter( 'wp_should_output_buffer_template_for_enhancement', '__return_false' );
+	}
+);
+
 add_filter(
 	'template_include',
 	static function ( $template ) {
