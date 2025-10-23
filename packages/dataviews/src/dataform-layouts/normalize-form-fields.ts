@@ -21,7 +21,7 @@ interface NormalizedFormField {
 export const DEFAULT_LAYOUT: NormalizedLayout = {
 	type: 'regular',
 	labelPosition: 'top',
-};
+} as NormalizedRegularLayout;
 
 const normalizeCardSummaryField = (
 	sum: CardSummaryField

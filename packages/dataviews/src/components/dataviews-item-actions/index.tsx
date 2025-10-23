@@ -16,6 +16,7 @@ import { __ } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import { moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -259,6 +260,12 @@ function PrimaryActions< Item >( {
 	registry,
 }: PrimaryActionsProps< Item > ) {
 	const [ activeModalAction, setActiveModalAction ] = useState( null as any );
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
+
+	if ( isMobileViewport ) {
+		return null;
+	}
+
 	if ( ! Array.isArray( actions ) || actions.length === 0 ) {
 		return null;
 	}

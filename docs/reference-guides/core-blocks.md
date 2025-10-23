@@ -678,7 +678,7 @@ Displays the contents of a post or page. ([Source](https://github.com/WordPress/
 
 ## Date
 
-Display the publish date for an entry such as a post or page. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-date))
+Display a custom date. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-date))
 
 -	**Name:** core/post-date
 -	**Category:** theme

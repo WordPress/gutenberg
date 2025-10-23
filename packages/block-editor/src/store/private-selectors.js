@@ -95,7 +95,7 @@ export const isBlockSubtreeDisabled = ( state, clientId ) => {
  * @param {string} rootClientId The client ID of the root container block.
  * @return {boolean} Whether the container allows insertion.
  */
-export function isContainerInsertableToInWriteMode(
+export function isContainerInsertableToInContentOnlyMode(
 	state,
 	blockName,
 	rootClientId
@@ -105,7 +105,7 @@ export function isContainerInsertableToInWriteMode(
 	const isContainerContentBlock = isContentBlock( rootBlockName );
 	const isRootBlockMain = getSectionRootClientId( state ) === rootClientId;
 
-	// In write mode, containers shouldn't be inserted into unless:
+	// In contentOnly mode, containers shouldn't be inserted into unless:
 	// 1. they are a section root;
 	// 2. they are a content block and the block to be inserted is also content.
 	return (
