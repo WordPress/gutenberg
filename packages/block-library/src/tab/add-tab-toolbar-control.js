@@ -24,7 +24,6 @@ export default function AddTabToolbarControl( { attributes, tabsClientId } ) {
 
 	const addTab = () => {
 		const newTabBlock = createBlock( 'core/tab', {
-			label: __( 'New Tab' ),
 			className,
 			fontFamily,
 			fontSize,

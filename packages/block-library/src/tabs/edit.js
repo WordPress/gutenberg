@@ -20,10 +20,7 @@ import { TabFill } from '../tab/slotfill';
 import StyleEngine from './style-engine';
 import Controls from './controls';
 
-const TABS_TEMPLATE = [
-	[ 'core/tab', { label: 'Tab 1', anchor: 'tab-1' } ],
-	[ 'core/tab', { label: 'Tab 2', anchor: 'tab-2' } ],
-];
+const TABS_TEMPLATE = [ [ 'core/tab', {} ] ];
 
 const DEFAULT_BLOCK = {
 	name: 'core/tab',

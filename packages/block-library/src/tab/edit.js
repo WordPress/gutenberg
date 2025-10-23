@@ -16,7 +16,13 @@ import {
 	RichText,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useMemo, useRef, useEffect } from '@wordpress/element';
+import {
+	useMemo,
+	useRef,
+	useEffect,
+	useCallback,
+	useState,
+} from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 /**
  * Internal dependencies
@@ -46,27 +52,44 @@ export default function Edit( {
 	const { selectBlock } = useDispatch( blockEditorStore );
 
 	const innerBlocksRef = useRef( null );
-	const labelRef = useRef();
 	const focusRef = useRef();
+	const [ isInitialMount, setIsInitialMount ] = useState( true );
+	const labelElementRef = useRef( null );
 
 	const { anchor, label } = attributes;
 
-	// Focus the label RichText component when no label exists
-	// and when the block is mounted.
+	// Callback ref that stores the element and focuses on initial mount.
+	const labelRef = useCallback(
+		( node ) => {
+			labelElementRef.current = node;
+			if ( node && isInitialMount ) {
+				// Focus immediately when ref is set on initial mount.
+				const animationId = requestAnimationFrame( () => {
+					if ( node ) {
+						node.focus();
+					}
+				} );
+				focusRef.current = animationId;
+				setIsInitialMount( false );
+			}
+		},
+		[ isInitialMount ]
+	);
+
+	// Focus the label RichText component when no label exists (after initial mount).
 	useEffect( () => {
-		if ( ! label && labelRef.current ) {
+		if ( ! label && ! isInitialMount && labelElementRef.current ) {
 			const animationId = requestAnimationFrame( () => {
-				if ( labelRef.current ) {
-					labelRef.current.focus();
+				if ( labelElementRef.current ) {
+					labelElementRef.current.focus();
 				}
 			} );
-
 			focusRef.current = animationId;
 			return () => cancelAnimationFrame( focusRef.current );
 		}
-	}, [ label ] );
+	}, [ label, isInitialMount ] );
 
-	// Clean up animation frames on unmount
+	// Clean up animation frames on unmount.
 	useEffect( () => {
 		return () => {
 			if ( focusRef.current ) {
@@ -122,6 +145,16 @@ export default function Edit( {
 		},
 		[ clientId ]
 	);
+
+	// Auto-label the first tab when it has no label
+	// useEffect( () => {
+	// 	if ( ! label && blockIndex === 0 ) {
+	// 		setAttributes( {
+	// 			label: 'Tab 1',
+	// 			anchor: 'tab-1',
+	// 		} );
+	// 	}
+	// }, [ label, blockIndex, setAttributes ] );
 
 	/**
 	 * This hook determines if the current tab is selected. This is true if it is the active tab, or if it is selected directly.
@@ -218,7 +251,7 @@ export default function Edit( {
 								selectBlock( clientId );
 								focusRef.current = requestAnimationFrame(
 									() => {
-										labelRef.current.focus();
+										labelElementRef.current?.focus();
 									}
 								);
 							}
@@ -232,7 +265,9 @@ export default function Edit( {
 								'core/italic',
 								'core/strikethrough',
 							] }
-							placeholder={ __( 'Add tab label…' ) }
+							placeholder={
+								__( 'Tab' ) + ` ${ blockIndex + 1 }…`
+							}
 							value={ decodeEntities( label ) }
 							onChange={ ( value ) =>
 								setAttributes( {
