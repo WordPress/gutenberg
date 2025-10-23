@@ -516,6 +516,7 @@ function resolveEntryPoint( packageDir, packageJson ) {
  * @return {Promise<boolean>} True if the package was bundled, false otherwise.
  */
 async function bundlePackage( packageName ) {
+	const builtModules = [];
 	const packageDir = path.join( PACKAGES_DIR, packageName );
 	const packageJsonPath = path.join( packageDir, 'package.json' );
 	const packageJson = JSON.parse( await readFile( packageJsonPath, 'utf8' ) );
@@ -632,6 +633,17 @@ async function bundlePackage( packageName ) {
 					plugins: modulePlugins,
 				} )
 			);
+
+			const scriptModuleId =
+				exportName === '.'
+					? `@wordpress/${ packageName }`
+					: `@wordpress/${ packageName }/${ fileName }`;
+
+			builtModules.push( {
+				id: scriptModuleId,
+				path: `${ packageName }/${ fileName }`,
+				asset: `${ packageName }/${ fileName }.min.asset.php`,
+			} );
 		}
 	}
 
@@ -769,7 +781,70 @@ async function bundlePackage( packageName ) {
 
 	await Promise.all( builds );
 
-	return true;
+	return { modules: builtModules };
+}
+
+/**
+ * Generate PHP files for script module registration.
+ *
+ * @param {Array} modules Array of module info objects.
+ */
+async function generateModuleRegistrationPhp( modules ) {
+	const ROOT_DIR = path.join( PACKAGES_DIR, '..' );
+	const rootPackageJson = JSON.parse(
+		await readFile( path.join( ROOT_DIR, 'package.json' ), 'utf8' )
+	);
+	const prefix = rootPackageJson.wpPlugin?.prefix || 'gutenberg';
+
+	// Read templates
+	const templatesDir = path.join( __dirname, 'templates' );
+	const registryTemplate = await readFile(
+		path.join( templatesDir, 'module-registry.php.template' ),
+		'utf8'
+	);
+	const registrationTemplate = await readFile(
+		path.join( templatesDir, 'module-registration.php.template' ),
+		'utf8'
+	);
+
+	// Generate modules array for registry
+	const modulesArray = modules
+		.map(
+			( module ) =>
+				`\tarray(\n` +
+				`\t\t'id' => '${ module.id }',\n` +
+				`\t\t'path' => '${ module.path }',\n` +
+				`\t\t'asset' => '${ module.asset }',\n` +
+				`\t),`
+		)
+		.join( '\n' );
+
+	// Generate module registry file (data only)
+	const registryContent = registryTemplate
+		.replace( /\{\{PREFIX\}\}/g, prefix )
+		.replace( '{{MODULES}}', modulesArray );
+
+	// Generate registration file (logic only)
+	const registrationContent = registrationTemplate.replace(
+		/\{\{PREFIX\}\}/g,
+		prefix
+	);
+
+	// Write files
+	const buildDir = path.join( ROOT_DIR, 'build' );
+	const modulesDir = path.join( buildDir, 'modules' );
+
+	await mkdir( modulesDir, { recursive: true } );
+	await writeFile(
+		path.join( modulesDir, 'index.php' ),
+		registryContent,
+		'utf8'
+	);
+	await writeFile(
+		path.join( buildDir, 'index.php' ),
+		registrationContent,
+		'utf8'
+	);
 }
 
 /**
@@ -1123,18 +1198,28 @@ async function buildAll() {
 	}
 
 	console.log( '\n📦 Phase 2: Bundling packages...\n' );
+	const modules = [];
 	await Promise.all(
 		PACKAGES.map( async ( packageName ) => {
 			const startBundleTime = Date.now();
-			const isBundled = await bundlePackage( packageName );
+			const ret = await bundlePackage( packageName );
 			const buildTime = Date.now() - startBundleTime;
-			if ( isBundled ) {
+			if ( ret ) {
 				console.log(
 					`   ✔ Bundled ${ packageName } (${ buildTime }ms)`
 				);
+
+				if ( ret.modules ) {
+					modules.push( ...ret.modules );
+				}
 			}
 		} )
 	);
+
+	console.log( '\n📄 Generating PHP registration...\n' );
+	await generateModuleRegistrationPhp( modules );
+	console.log( '   ✔ Generated build/index.php' );
+	console.log( '   ✔ Generated build/modules/index.php' );
 
 	const totalTime = Date.now() - startTime;
 	console.log(
