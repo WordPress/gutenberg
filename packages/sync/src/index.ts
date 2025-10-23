@@ -11,6 +11,11 @@
  */
 export * as Y from 'yjs';
 
+/**
+ * Deltas are used to calculate incremental Y.Text updates.
+ */
+export { default as Delta } from './quill-delta/Delta';
+
 export {
 	CRDT_DOC_META_PERSISTENCE_KEY,
 	CRDT_RECORD_MAP_KEY,
@@ -18,5 +23,4 @@ export {
 	LOCAL_SYNC_MANAGER_ORIGIN,
 } from './config';
 export { createSyncManager } from './manager';
-export { default as Delta } from './quill-delta/Delta';
 export type * from './types';

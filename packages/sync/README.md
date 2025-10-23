@@ -28,7 +28,7 @@ The sync manager orchestrates the lifecycle of syncing entity records. It create
 
 ### Delta
 
-Undocumented declaration.
+Deltas are used to calculate incremental Y.Text updates.
 
 ### LOCAL_EDITOR_ORIGIN
 
