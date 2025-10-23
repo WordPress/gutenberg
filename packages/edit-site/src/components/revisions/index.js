@@ -10,9 +10,9 @@ import {
 	__unstableEditorStyles as EditorStyles,
 	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
-import { useContext, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
+import { mergeGlobalStyles } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
@@ -21,24 +21,23 @@ import { useContext, useMemo } from '@wordpress/element';
 import { unlock } from '../../lock-unlock';
 import EditorCanvasContainer from '../editor-canvas-container';
 import { useGlobalStylesOutputWithConfig } from '../../hooks/use-global-styles-output';
+import { useGlobalStyles } from '../global-styles';
 
 const {
 	ExperimentalBlockEditorProvider,
-	GlobalStylesContext,
 	__unstableBlockStyleVariationOverridesWithConfig,
 } = unlock( blockEditorPrivateApis );
-const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
 
 function isObjectEmpty( object ) {
 	return ! object || Object.keys( object ).length === 0;
 }
 
 function Revisions( { userConfig, blocks } ) {
-	const { base: baseConfig } = useContext( GlobalStylesContext );
+	const { base: baseConfig } = useGlobalStyles();
 
 	const mergedConfig = useMemo( () => {
 		if ( ! isObjectEmpty( userConfig ) && ! isObjectEmpty( baseConfig ) ) {
-			return mergeBaseAndUserConfigs( baseConfig, userConfig );
+			return mergeGlobalStyles( baseConfig, userConfig );
 		}
 		return {};
 	}, [ baseConfig, userConfig ] );

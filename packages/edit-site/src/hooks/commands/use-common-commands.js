@@ -6,7 +6,6 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { __, isRTL } from '@wordpress/i18n';
 import { rotateLeft, rotateRight, help, backup } from '@wordpress/icons';
 import { useCommandLoader } from '@wordpress/commands';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as coreStore } from '@wordpress/core-data';
@@ -16,8 +15,8 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
+import { useGlobalStyles } from '../../components/global-styles/hooks';
 
-const { useGlobalStylesReset } = unlock( blockEditorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 
 const getGlobalStylesToggleWelcomeGuideCommands = () =>
@@ -69,7 +68,14 @@ const getGlobalStylesToggleWelcomeGuideCommands = () =>
 
 const getGlobalStylesResetCommands = () =>
 	function useGlobalStylesResetCommands() {
-		const [ canReset, onReset ] = useGlobalStylesReset();
+		const { user, setUser } = useGlobalStyles();
+
+		// Check if there are user customizations that can be reset
+		const canReset =
+			!! user &&
+			( Object.keys( user?.styles ?? {} ).length > 0 ||
+				Object.keys( user?.settings ?? {} ).length > 0 );
+
 		const commands = useMemo( () => {
 			if ( ! canReset ) {
 				return [];
@@ -82,11 +88,11 @@ const getGlobalStylesResetCommands = () =>
 					icon: isRTL() ? rotateRight : rotateLeft,
 					callback: ( { close } ) => {
 						close();
-						onReset();
+						setUser( { styles: {}, settings: {} } );
 					},
 				},
 			];
-		}, [ canReset, onReset ] );
+		}, [ canReset, setUser ] );
 
 		return {
 			isLoading: false,
