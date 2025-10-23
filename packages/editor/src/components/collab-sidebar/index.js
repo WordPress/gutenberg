@@ -31,7 +31,6 @@ import {
 	useEnableFloatingSidebar,
 } from './hooks';
 import { focusCommentThread } from './utils';
-import PluginMoreMenuItem from '../plugin-more-menu-item';
 import PostTypeSupportCheck from '../post-type-support-check';
 
 function NotesSidebarContent( {
@@ -162,6 +161,7 @@ function NotesSidebar( { postId } ) {
 			<AddCommentMenuItem onClick={ openTheSidebar } />
 			<PluginSidebar
 				identifier={ collabHistorySidebarName }
+				name={ collabHistorySidebarName }
 				title={ __( 'Notes' ) }
 				icon={ commentIcon }
 				closeLabel={ __( 'Close Notes' ) }
@@ -198,14 +198,6 @@ function NotesSidebar( { postId } ) {
 					/>
 				</PluginSidebar>
 			) }
-			<PluginMoreMenuItem
-				icon={ commentIcon }
-				onClick={ () =>
-					enableComplementaryArea( 'core', collabHistorySidebarName )
-				}
-			>
-				{ __( 'Notes' ) }
-			</PluginMoreMenuItem>
 		</>
 	);
 }
