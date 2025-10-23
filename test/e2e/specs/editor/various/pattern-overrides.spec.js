@@ -294,49 +294,7 @@ test.describe( 'Pattern Overrides', () => {
 		// Select the pattern to make blocks accessible.
 		await editor.selectBlocks( patternBlock );
 
-		await test.step( 'Blocks cannot be duplicated', async () => {
-			// Test block with overrides.
-			await editor.selectBlocks( blockWithOverrides );
-			await editor.showBlockToolbar();
-
-			await expect(
-				page
-					.getByRole( 'toolbar', { name: 'Block tools' } )
-					.getByRole( 'button', { name: 'Options' } )
-			).toBeHidden();
-
-			// Test block without overrides.
-			await editor.selectBlocks( blockWithoutOverrides );
-			await editor.showBlockToolbar();
-
-			await expect(
-				page
-					.getByRole( 'toolbar', { name: 'Block tools' } )
-					.getByRole( 'button', { name: 'Options' } )
-			).toBeHidden();
-
-			// Test first button.
-			await editor.selectBlocks( firstButton );
-			await editor.showBlockToolbar();
-
-			await expect(
-				page
-					.getByRole( 'toolbar', { name: 'Block tools' } )
-					.getByRole( 'button', { name: 'Options' } )
-			).toBeHidden();
-
-			// Test second button.
-			await editor.selectBlocks( secondButton );
-			await editor.showBlockToolbar();
-
-			await expect(
-				page
-					.getByRole( 'toolbar', { name: 'Block tools' } )
-					.getByRole( 'button', { name: 'Options' } )
-			).toBeHidden();
-		} );
-
-		await test.step( 'Blocks cannot be inserted before/after', async () => {
+		await test.step( 'Blocks cannot be inserted before/after or duplicated', async () => {
 			// Test block with overrides.
 			await editor.selectBlocks( blockWithOverrides );
 			await editor.showBlockToolbar();

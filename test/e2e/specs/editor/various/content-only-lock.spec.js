@@ -180,39 +180,7 @@ test.describe( 'Content-only lock', () => {
 
 		// Select the content-locked group block.
 		await editor.selectBlocks( groupBlock );
-		await test.step( 'Blocks cannot be duplicated', async () => {
-			// Test paragraph.
-			await editor.selectBlocks( paragraph );
-			await editor.showBlockToolbar();
-
-			await expect(
-				page
-					.getByRole( 'toolbar', { name: 'Block tools' } )
-					.getByRole( 'button', { name: 'Options' } )
-			).toBeHidden();
-
-			// Test first list item.
-			await editor.selectBlocks( firstListItem );
-			await editor.showBlockToolbar();
-
-			await expect(
-				page
-					.getByRole( 'toolbar', { name: 'Block tools' } )
-					.getByRole( 'button', { name: 'Options' } )
-			).toBeHidden();
-
-			// Test second list item.
-			await editor.selectBlocks( secondListItem );
-			await editor.showBlockToolbar();
-
-			await expect(
-				page
-					.getByRole( 'toolbar', { name: 'Block tools' } )
-					.getByRole( 'button', { name: 'Options' } )
-			).toBeHidden();
-		} );
-
-		await test.step( 'Blocks cannot be inserted before/after', async () => {
+		await test.step( 'Blocks cannot be inserted before/after or duplicated', async () => {
 			// Test paragraph.
 			await editor.selectBlocks( paragraph );
 			await editor.showBlockToolbar();
