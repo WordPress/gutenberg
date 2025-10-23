@@ -4,7 +4,7 @@
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 
 /**
- * Calculates which block tools should be showing based on the current editor state.
+ * Determines which block tools should be showing based on the current editor state.
  * This is a pure function that can be called from within a selector.
  *
  * @param {Object}  options                        Calculation options.
@@ -17,7 +17,7 @@ import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
  *
  * @return {Object} Object of which block tools will be shown.
  */
-export function calculateShowBlockTools( {
+export function shouldShowBlockTools( {
 	block,
 	blockMode,
 	isBlockInterfaceHidden,

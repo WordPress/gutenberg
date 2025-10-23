@@ -26,7 +26,7 @@ import BlockToolbarPopover from './block-toolbar-popover';
 import { store as blockEditorStore } from '../../store';
 import usePopoverScroll from '../block-popover/use-popover-scroll';
 import ZoomOutModeInserters from './zoom-out-mode-inserters';
-import { useShowBlockTools } from './use-show-block-tools';
+import { shouldShowBlockTools } from './should-show-block-tools';
 import { unlock } from '../../lock-unlock';
 import { cleanEmptyObject } from '../../hooks/utils';
 import usePasteStyles from '../use-paste-styles';
@@ -44,19 +44,36 @@ function selector( select ) {
 		getBlockRootClientId,
 		isGroupable,
 		getBlockName,
+		getBlock,
+		getBlockMode,
+		isBlockInterfaceHidden,
 	} = unlock( select( blockEditorStore ) );
 
 	const { getGroupingBlockName } = select( blocksStore );
 
 	const clientId =
 		getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
+	const _isTyping = isTyping();
+	const _hasFixedToolbar = getSettings().hasFixedToolbar;
+
+	const { showEmptyBlockSideInserter, showBlockToolbarPopover } =
+		shouldShowBlockTools( {
+			block: getBlock( clientId ),
+			blockMode: clientId ? getBlockMode( clientId ) : null,
+			isBlockInterfaceHidden: isBlockInterfaceHidden(),
+			clientId,
+			isTyping: _isTyping,
+			hasFixedToolbar: _hasFixedToolbar,
+		} );
 
 	return {
 		clientId,
-		hasFixedToolbar: getSettings().hasFixedToolbar,
-		isTyping: isTyping(),
+		hasFixedToolbar: _hasFixedToolbar,
+		isTyping: _isTyping,
 		isZoomOutMode: isZoomOut(),
 		isDragging: isDragging(),
+		showEmptyBlockSideInserter,
+		showBlockToolbarPopover,
 		getBlocksByClientId,
 		getSelectedBlockClientIds,
 		getBlockRootClientId,
@@ -92,11 +109,11 @@ export default function BlockTools( {
 		isGroupable,
 		getBlockName,
 		getGroupingBlockName,
+		showEmptyBlockSideInserter,
+		showBlockToolbarPopover,
 	} = useSelect( selector, [] );
 
 	const isMatch = useShortcutEventMatch();
-	const { showEmptyBlockSideInserter, showBlockToolbarPopover } =
-		useShowBlockTools();
 	const pasteStyles = usePasteStyles();
 
 	const {
