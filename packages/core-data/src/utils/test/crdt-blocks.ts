@@ -9,6 +9,14 @@ import { Y } from '@wordpress/sync';
 import { describe, expect, it, jest, beforeEach } from '@jest/globals';
 
 /**
+ * Mock uuid module
+ */
+jest.mock( 'uuid', () => ( {
+	// eslint-disable-next-line no-restricted-syntax
+	v4: jest.fn( () => 'mocked-uuid-' + Math.random() ),
+} ) );
+
+/**
  * Internal dependencies
  */
 import {
