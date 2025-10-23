@@ -146,16 +146,6 @@ export default function Edit( {
 		[ clientId ]
 	);
 
-	// Auto-label the first tab when it has no label
-	// useEffect( () => {
-	// 	if ( ! label && blockIndex === 0 ) {
-	// 		setAttributes( {
-	// 			label: 'Tab 1',
-	// 			anchor: 'tab-1',
-	// 		} );
-	// 	}
-	// }, [ label, blockIndex, setAttributes ] );
-
 	/**
 	 * This hook determines if the current tab is selected. This is true if it is the active tab, or if it is selected directly.
 	 */
@@ -239,7 +229,7 @@ export default function Edit( {
 						style={ {
 							...tabItemColorProps.style,
 						} }
-						tabIndex={ 0 }
+						tabIndex={ -1 }
 						onClick={ ( event ) => {
 							event.preventDefault();
 							selectBlock( clientId );
