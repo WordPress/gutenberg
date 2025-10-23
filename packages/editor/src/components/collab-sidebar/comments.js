@@ -136,6 +136,13 @@ export function Comments( {
 		orderedBlockIds,
 	] );
 
+	// Reselect the new note thread when block selection changes.
+	useEffect( () => {
+		if ( isFloating && showCommentBoard && undefined === blockCommentId ) {
+			reflowComments();
+		}
+	}, [selectedBlockClientId, reflowComments, isFloating, showCommentBoard, blockCommentId] );
+
 	const handleDelete = async ( comment ) => {
 		const currentIndex = threads.findIndex( ( t ) => t.id === comment.id );
 		const nextThread = threads[ currentIndex + 1 ];
