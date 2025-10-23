@@ -45,6 +45,7 @@ function InbetweenInsertionPointPopover( {
 		isInserterShown,
 		isDistractionFree,
 		isZoomOutMode,
+		getBlockEditingMode,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockOrder,
@@ -55,6 +56,7 @@ function InbetweenInsertionPointPopover( {
 			getNextBlockClientId,
 			getSettings,
 			isZoomOut,
+			getBlockEditingMode: _getBlockEditingMode,
 		} = unlock( select( blockEditorStore ) );
 		const insertionPoint = getBlockInsertionPoint();
 		const order = getBlockOrder( insertionPoint.rootClientId );
@@ -86,9 +88,9 @@ function InbetweenInsertionPointPopover( {
 			isDistractionFree: settings.isDistractionFree,
 			isInserterShown: insertionPoint?.__unstableWithInserter,
 			isZoomOutMode: isZoomOut(),
+			getBlockEditingMode: _getBlockEditingMode,
 		};
 	}, [] );
-	const { getBlockEditingMode } = useSelect( blockEditorStore );
 
 	const disableMotion = useReducedMotion();
 
