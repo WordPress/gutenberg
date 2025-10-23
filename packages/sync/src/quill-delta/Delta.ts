@@ -83,7 +83,11 @@ class Delta {
 		// Assume we are given a well formed ops
 		if ( Array.isArray( ops ) ) {
 			this.ops = ops;
-		} else if ( ops != null && Array.isArray( ops.ops ) ) {
+		} else if (
+			ops !== null &&
+			ops !== undefined &&
+			Array.isArray( ops.ops )
+		) {
 			this.ops = ops.ops;
 		} else {
 			this.ops = [];
@@ -100,7 +104,8 @@ class Delta {
 		}
 		newOp.insert = arg;
 		if (
-			attributes != null &&
+			attributes !== null &&
+			attributes !== undefined &&
 			typeof attributes === 'object' &&
 			Object.keys( attributes ).length > 0
 		) {
@@ -125,7 +130,8 @@ class Delta {
 		}
 		const newOp: Op = { retain: length };
 		if (
-			attributes != null &&
+			attributes !== null &&
+			attributes !== undefined &&
 			typeof attributes === 'object' &&
 			Object.keys( attributes ).length > 0
 		) {
@@ -150,7 +156,11 @@ class Delta {
 			}
 			// Since it does not matter if we insert before or after deleting at the same index,
 			// always prefer to insert first
-			if ( typeof lastOp.delete === 'number' && newOp.insert != null ) {
+			if (
+				typeof lastOp.delete === 'number' &&
+				newOp.insert !== null &&
+				newOp.insert !== undefined
+			) {
 				index -= 1;
 				lastOp = this.ops[ index - 1 ];
 				if ( typeof lastOp !== 'object' ) {
@@ -273,9 +283,11 @@ class Delta {
 		const ops = [];
 		const firstOther = otherIter.peek();
 		if (
-			firstOther != null &&
+			firstOther !== null &&
+			firstOther !== undefined &&
 			typeof firstOther.retain === 'number' &&
-			firstOther.attributes == null
+			( firstOther.attributes === null ||
+				firstOther.attributes === undefined )
 		) {
 			let firstLeft = firstOther.retain;
 			while (
@@ -310,14 +322,20 @@ class Delta {
 								? length
 								: otherOp.retain;
 					} else if ( typeof otherOp.retain === 'number' ) {
-						if ( thisOp.retain == null ) {
+						if (
+							thisOp.retain === null ||
+							thisOp.retain === undefined
+						) {
 							newOp.insert = thisOp.insert;
 						} else {
 							newOp.retain = thisOp.retain;
 						}
 					} else {
 						const action =
-							thisOp.retain == null ? 'insert' : 'retain';
+							thisOp.retain === null ||
+							thisOp.retain === undefined
+								? 'insert'
+								: 'retain';
 						const [ embedType, thisData, otherData ] =
 							getEmbedTypeAndData(
 								thisOp[ action ],
@@ -441,7 +459,7 @@ class Delta {
 				inverted.delete( Op.length( op ) );
 			} else if (
 				typeof op.retain === 'number' &&
-				op.attributes == null
+				( op.attributes === null || op.attributes === undefined )
 			) {
 				inverted.retain( op.retain );
 				return baseIndex + op.retain;
@@ -837,7 +855,7 @@ class Delta {
 		return [ this, other ].map( ( delta ) => {
 			return delta
 				.map( ( op ) => {
-					if ( op.insert != null ) {
+					if ( op.insert !== null || op.insert !== undefined ) {
 						return typeof op.insert === 'string'
 							? op.insert
 							: NULL_CHARACTER;
