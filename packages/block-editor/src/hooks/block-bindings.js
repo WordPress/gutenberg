@@ -325,6 +325,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 							context[ key ] = blockContext[ key ];
 						}
 					}
+<<<<<<< HEAD
 					if ( getFieldsList ) {
 						const fieldsListResult = getFieldsList( {
 							select,
@@ -335,6 +336,57 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 							label,
 							getValues,
 						};
+=======
+
+					if ( editorUI ) {
+						try {
+							const editorUIResult = editorUI( {
+								select,
+								context,
+							} );
+
+							_sources[ sourceName ] = {
+								...editorUIResult,
+								label,
+								getValues,
+							};
+						} catch ( error ) {
+							warning(
+								`Error in editorUI for source "${ sourceName }":`,
+								error
+							);
+						}
+					} else if ( getFieldsList ) {
+						// Backward compatibility: Convert getFieldsList to editorUI format.
+						try {
+							const fieldsListResult = getFieldsList( {
+								select,
+								context,
+							} );
+
+							if ( fieldsListResult ) {
+								const data = Object.entries(
+									fieldsListResult
+								).map( ( [ key, field ] ) => ( {
+									label: field.label || key,
+									type: field.type || 'string',
+									args: { key },
+								} ) );
+
+								_sources[ sourceName ] = {
+									mode: 'dropdown', // Default mode for backward compatibility.
+									data,
+									label,
+									getValues,
+								};
+							}
+						} catch ( error ) {
+							warning(
+								`Error in getFieldsList for source "${ sourceName }":`,
+								error
+							);
+						}
+>>>>>>> 14361bb819 (Add warning)
 					} else {
 						/*
 						 * Include sources without getFieldsList if they are already used in a binding.
