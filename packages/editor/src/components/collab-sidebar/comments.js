@@ -136,11 +136,10 @@ export function Comments( {
 		orderedBlockIds,
 	] );
 
-	// Reselect the new note thread when block selection changes.
+	// Reflow comments when block selection changes.
 	useEffect( () => {
 		if ( isFloating && showCommentBoard && undefined === blockCommentId ) {
-			const timeoutId = setTimeout( reflowComments, 300 );
-			return () => clearTimeout( timeoutId );
+			reflowComments();
 		}
 	}, [
 		selectedBlockClientId,
