@@ -94,7 +94,7 @@ test.describe( 'Block template registration', () => {
 		);
 		const searchResults = page.getByLabel( 'Actions' );
 		await searchResults.first().click();
-		await page.getByRole( 'menuitem', { name: 'Move to trash' } ).click();
+		await page.getByRole( 'menuitem', { name: 'Trash' } ).click();
 		await page.getByRole( 'button', { name: 'Trash' } ).click();
 
 		await expect( resetNotice ).toBeVisible();
@@ -228,7 +228,7 @@ test.describe( 'Block template registration', () => {
 		);
 		const searchResults = page.getByLabel( 'Actions' );
 		await searchResults.first().click();
-		await page.getByRole( 'menuitem', { name: 'Move to trash' } ).click();
+		await page.getByRole( 'menuitem', { name: 'Trash' } ).click();
 		await page.getByRole( 'button', { name: 'Trash' } ).click();
 
 		await expect( deletedNotice ).toBeVisible();
@@ -350,7 +350,7 @@ test.describe( 'Block template registration', () => {
 			.click();
 		const actions = page.getByLabel( 'Actions' );
 		await actions.first().click();
-		await page.getByRole( 'menuitem', { name: 'Move to trash' } ).click();
+		await page.getByRole( 'menuitem', { name: 'Trash' } ).click();
 		await page.getByRole( 'button', { name: 'Trash' } ).click();
 
 		await expect( resetNotice ).toBeVisible();
