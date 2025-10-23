@@ -9,14 +9,12 @@ import clsx from 'clsx';
 import {
 	useBlockProps,
 	useInnerBlocksProps,
-	InnerBlocks,
 	withColors,
 } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import { TabFill } from '../tab/slotfill';
 import StyleEngine from './style-engine';
 import Controls from './controls';
 
@@ -68,18 +66,13 @@ function Edit( {
 		clientId,
 		orientation,
 		template: TABS_TEMPLATE,
-		renderAppender: false, // We handle this via a slotfill.
+		renderAppender: false, // Appender is rendered by individual tab blocks.
 	} );
 
 	return (
 		<>
 			<div { ...innerBlockProps }>
 				{ innerBlockProps.children }
-				<TabFill tabsClientId={ clientId }>
-					<div className="wp-block-tabs__tab-item__inserter">
-						<InnerBlocks.ButtonBlockAppender />
-					</div>
-				</TabFill>
 				<StyleEngine attributes={ attributes } clientId={ clientId } />
 				<Controls
 					{ ...{

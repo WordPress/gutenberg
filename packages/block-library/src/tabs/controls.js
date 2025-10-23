@@ -11,6 +11,11 @@ import {
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 } from '@wordpress/block-editor';
 
+/**
+ * Internal dependencies
+ */
+import AddTabToolbarControl from '../tab/add-tab-toolbar-control';
+
 function ContrastCheckerMatrix( { attributes } ) {
 	const {
 		className,
@@ -134,6 +139,10 @@ export default function Controls( {
 
 	return (
 		<>
+			<AddTabToolbarControl
+				tabsClientId={ clientId }
+				attributes={ attributes }
+			/>
 			<InspectorControls>
 				<PanelBody title={ __( 'Tabs Settings' ) }>
 					<ToggleControl

@@ -13,7 +13,6 @@ import {
 	getTypographyClassesAndStyles as useTypographyProps,
 	__experimentalUseColorProps as useColorProps,
 	store as blockEditorStore,
-	RichText,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
@@ -23,13 +22,12 @@ import {
 	useCallback,
 	useState,
 } from '@wordpress/element';
-import { decodeEntities } from '@wordpress/html-entities';
 /**
  * Internal dependencies
  */
-import { TabFill, TabsListSlot } from './slotfill';
 import Controls from './controls';
 import slugFromLabel from './slug-from-label';
+import TabsList from './tabs-list';
 
 const TEMPLATE = [
 	[
@@ -107,6 +105,7 @@ export default function Edit( {
 		forceDisplay,
 		isTabsClientSelected,
 		isDefaultTab,
+		siblingTabs,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -115,6 +114,7 @@ export default function Edit( {
 				isBlockSelected,
 				hasSelectedInnerBlock,
 				getBlockAttributes,
+				getBlocks,
 			} = select( blockEditorStore );
 
 			// Get data from core/tabs.
@@ -132,6 +132,9 @@ export default function Edit( {
 				true
 			);
 
+			// Get all sibling tabs from parent.
+			const _siblingTabs = getBlocks( rootClientId );
+
 			return {
 				blockIndex: _blockIndex,
 				hasInnerBlocksSelected: _hasInnerBlocksSelected,
@@ -141,6 +144,7 @@ export default function Edit( {
 				isTabsClientSelected: _isTabsClientSelected,
 				isDefaultTab: _isDefaultTab,
 				tabsAttributes: rootAttributes,
+				siblingTabs: _siblingTabs,
 			};
 		},
 		[ clientId ]
@@ -216,61 +220,25 @@ export default function Edit( {
 					blockIndex={ blockIndex }
 					isDefaultTab={ isDefaultTab }
 				/>
-				<TabFill tabsClientId={ tabsClientId }>
-					<button
-						aria-controls={ tabPanelId }
-						aria-selected={ isSelectedTab }
-						id={ tabLabelId }
-						role="tab"
-						className={ clsx(
-							'tabs__tab-label',
-							tabItemColorProps.className
-						) }
-						style={ {
-							...tabItemColorProps.style,
-						} }
-						tabIndex={ -1 }
-						onClick={ ( event ) => {
-							event.preventDefault();
-							selectBlock( clientId );
-						} }
-						onKeyDown={ ( event ) => {
-							// If shift is also pressed, do not select the block.
-							if ( event.key === 'Enter' && ! event.shiftKey ) {
-								event.preventDefault();
-								selectBlock( clientId );
-								focusRef.current = requestAnimationFrame(
-									() => {
-										labelElementRef.current?.focus();
-									}
-								);
-							}
-						} }
-					>
-						<RichText
-							ref={ labelRef }
-							tagName="span"
-							allowedFormats={ [
-								'core/bold',
-								'core/italic',
-								'core/strikethrough',
-							] }
-							placeholder={
-								__( 'Tab' ) + ` ${ blockIndex + 1 }…`
-							}
-							value={ decodeEntities( label ) }
-							onChange={ ( value ) =>
+				{ isSelectedTab && (
+					<>
+						<TabsList
+							siblingTabs={ siblingTabs }
+							currentClientId={ clientId }
+							currentBlockIndex={ blockIndex }
+							currentLabel={ label }
+							tabItemColorProps={ tabItemColorProps }
+							onSelectTab={ selectBlock }
+							onLabelChange={ ( value ) =>
 								setAttributes( {
 									label: value,
 									anchor: slugFromLabel( value, blockIndex ),
 								} )
 							}
+							labelRef={ labelRef }
+							focusRef={ focusRef }
+							labelElementRef={ labelElementRef }
 						/>
-					</button>
-				</TabFill>
-				{ isSelectedTab && (
-					<>
-						<TabsListSlot tabsClientId={ tabsClientId } />
 						<section { ...innerBlocksProps } />
 					</>
 				) }
