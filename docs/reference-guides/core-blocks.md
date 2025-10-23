@@ -10,7 +10,7 @@ This page lists the blocks included in the block-library package.
 
 ## Accordion
 
-Displays a group of collapsible headings and associated expandable content. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion))
+Displays a foldable layout that groups content in collapsible sections. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion))
 
 -	**Name:** core/accordion
 -	**Category:** design
@@ -20,7 +20,7 @@ Displays a group of collapsible headings and associated expandable content. ([So
 
 ## Accordion Heading
 
-Displays a clickable heading that toggles the content panel open and closed. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion-heading))
+Toggles the accordion panel. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion-heading))
 
 -	**Name:** core/accordion-heading
 -	**Category:** design
@@ -30,7 +30,7 @@ Displays a clickable heading that toggles the content panel open and closed. ([S
 
 ## Accordion Item
 
-Displays a section of content containing a heading and expandable content panel. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion-item))
+Wraps the heading and panel in one unit. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion-item))
 
 -	**Name:** core/accordion-item
 -	**Category:** design
@@ -41,7 +41,7 @@ Displays a section of content containing a heading and expandable content panel.
 
 ## Accordion Panel
 
-Displays an expandable panel that collapses when the heading is clicked. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion-panel))
+Contains the hidden or revealed content beneath the heading. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion-panel))
 
 -	**Name:** core/accordion-panel
 -	**Category:** design

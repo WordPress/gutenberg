@@ -4,7 +4,7 @@
 	"name": "core/accordion-panel",
 	"title": "Accordion Panel",
 	"category": "design",
-	"description": "Displays an expandable panel that collapses when the heading is clicked.",
+	"description": "Contains the hidden or revealed content beneath the heading.",
 	"parent": [ "core/accordion-item" ],
 	"supports": {
 		"html": false,
