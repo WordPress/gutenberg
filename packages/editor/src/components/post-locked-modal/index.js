@@ -32,9 +32,9 @@ function PostLockedModal() {
 		postId,
 		postLockUtils,
 		activePostLock,
+		postSupportsSync,
 		postType,
 		previewLink,
-		supportsSync,
 	} = useSelect( ( select ) => {
 		const {
 			isPostLocked,
@@ -48,7 +48,6 @@ function PostLockedModal() {
 			getEditorSettings,
 		} = select( editorStore );
 		const { getPostType, getEntityConfig } = select( coreStore );
-		const currentPostType = getCurrentPostType();
 		return {
 			isLocked: isPostLocked(),
 			isTakeover: isPostLockTakeover(),
@@ -56,13 +55,19 @@ function PostLockedModal() {
 			postId: getCurrentPostId(),
 			postLockUtils: getEditorSettings().postLockUtils,
 			activePostLock: getActivePostLock(),
+			postSupportsSync: Boolean(
+				getEntityConfig( 'postType', getCurrentPostType() )?.syncConfig
+			),
 			postType: getPostType( getEditedPostAttribute( 'type' ) ),
 			previewLink: getEditedPostPreviewLink(),
-			supportsSync: Boolean(
-				getEntityConfig( 'postType', currentPostType )?.syncConfig
-			),
 		};
 	}, [] );
+
+	let syncEnabled = false;
+	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+		syncEnabled =
+			postSupportsSync && Boolean( window.__experimentalEnableSync );
+	}
 
 	useEffect( () => {
 		/**
@@ -96,6 +101,12 @@ function PostLockedModal() {
 
 			const received = data[ 'wp-refresh-post-lock' ];
 			if ( received.lock_error ) {
+				// If both the current user and the lock owner can collaboratively
+				// edit, do not enforce the takeover.
+				if ( syncEnabled && received.lock_error.syncEnabled ) {
+					return;
+				}
+
 				// Auto save and display the takeover modal.
 				autosave();
 				updatePostLock( {
@@ -154,11 +165,10 @@ function PostLockedModal() {
 		return null;
 	}
 
-	// Avoid sending the modal if sync is supported, but retain functionality around locks etc.
-	if ( window.__experimentalEnableSync && supportsSync ) {
-		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-			return null;
-		}
+	// If both the current user and the lock owner can collaboratively edit, do not
+	// show the modal.
+	if ( syncEnabled && user.syncEnabled ) {
+		return null;
 	}
 
 	const userDisplayName = user.name;
