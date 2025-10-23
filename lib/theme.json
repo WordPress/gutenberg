@@ -357,6 +357,17 @@
 					}
 				}
 			},
+			"core/navigation": {
+				"elements": {
+					"link": {
+						":hover": {
+							"typography": {
+								"textDecoration": "underline"
+							}
+						}
+					}
+				}
+			},
 			"core/site-logo": {
 				"variations": {
 					"rounded": {
