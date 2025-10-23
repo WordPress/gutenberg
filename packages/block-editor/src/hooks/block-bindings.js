@@ -35,7 +35,7 @@ import { store as blockEditorStore } from '../store';
 const { Menu } = unlock( componentsPrivateApis );
 
 const EMPTY_OBJECT = {};
-const READ_ONLY_BLOCKS = [ 'core/post-date' ];
+const READONLY_BLOCKS = [ 'core/post-date' ];
 
 /**
  * Get the normalized attribute type for block bindings.
@@ -46,7 +46,7 @@ const READ_ONLY_BLOCKS = [ 'core/post-date' ];
  * @return {string} The normalized attribute type.
  */
 const getAttributeType = ( blockName, attribute ) => {
-	if ( READ_ONLY_BLOCKS.includes( blockName ) ) {
+	if ( READONLY_BLOCKS.includes( blockName ) ) {
 		return '';
 	}
 	const _attributeType =
