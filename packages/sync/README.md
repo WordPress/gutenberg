@@ -26,6 +26,10 @@ Root-level key for the CRDT document that holds the entity record data.
 
 The sync manager orchestrates the lifecycle of syncing entity records. It creates Yjs documents, connects to providers, creates awareness instances, and coordinates with the `core-data` store.
 
+### Delta
+
+Deltas are used to calculate incremental Y.Text updates.
+
 ### LOCAL_EDITOR_ORIGIN
 
 Origin string for CRDT document changes originating from the local editor.
