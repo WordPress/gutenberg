@@ -22,11 +22,7 @@ function generateCSSRule( elementSelector, fontSize ) {
  * @param {Function}    applyStylesFn   Function to apply test styles
  * @return {number} Optimal font size
  */
-function findOptimalFontSize(
-	textElement,
-	elementSelector,
-	applyStylesFn
-) {
+function findOptimalFontSize( textElement, elementSelector, applyStylesFn ) {
 	const alreadyHasScrollableHeight =
 		textElement.scrollHeight > textElement.clientHeight;
 	let minSize = 5;
@@ -61,11 +57,7 @@ function findOptimalFontSize(
  * @param {string}      elementSelector CSS selector for the text element
  * @param {Function}    applyStylesFn   Function to apply CSS styles (pass empty string to clear)
  */
-export function optimizeFitText(
-	textElement,
-	elementSelector,
-	applyStylesFn
-) {
+export function optimizeFitText( textElement, elementSelector, applyStylesFn ) {
 	if ( ! textElement ) {
 		return;
 	}
