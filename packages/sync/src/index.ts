@@ -18,10 +18,5 @@ export {
 	LOCAL_SYNC_MANAGER_ORIGIN,
 } from './config';
 export { createSyncManager } from './manager';
-export {
-	default as Delta,
-	Op,
-	OpIterator,
-	AttributeMap,
-} from './quill-delta/Delta';
+export { default as Delta } from './quill-delta/Delta';
 export type * from './types';
