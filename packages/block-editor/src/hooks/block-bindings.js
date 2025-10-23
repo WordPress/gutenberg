@@ -20,6 +20,7 @@ import {
 import { useSelect } from '@wordpress/data';
 import { useContext } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
+import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
