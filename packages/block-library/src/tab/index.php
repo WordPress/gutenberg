@@ -59,11 +59,10 @@ function block_core_tab_get_typography_styles( array $attributes ): string {
  *
  * @param array     $attributes Block attributes.
  * @param string    $content    Block content.
- * @param \WP_Block $block The block.
  *
  * @return string Updated HTML.
  */
-function block_core_tab_render( array $attributes, string $content, \WP_Block $block ): string {
+function block_core_tab_render( array $attributes, string $content ): string {
 	$tag_processor = new WP_HTML_Tag_Processor( $content );
 	$tag_processor->next_tag( array( 'class_name' => 'wp-block-tab' ) );
 	$tab_id = (string) $tag_processor->get_attribute( 'id' );
