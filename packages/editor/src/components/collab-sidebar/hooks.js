@@ -399,7 +399,7 @@ export function useFloatingThread( {
 		if ( blockRef.current ) {
 			refs.setReference( blockRef.current );
 		}
-	}, [ blockRef, refs ] );
+	}, [ blockRef, refs, commentLastUpdated ] );
 
 	// Track thread heights.
 	useEffect( () => {
