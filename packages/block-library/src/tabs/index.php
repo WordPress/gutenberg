@@ -155,7 +155,7 @@ function block_core_tabs_render_block_callback( array $attributes, string $conte
 	 * client side state management per core/tabs instance, like context.
 	 */
 	wp_interactivity_state(
-		'core/tabs',
+		'core/tabs/private',
 		array(
 			$tabs_id => $tabs_list,
 		)
@@ -166,7 +166,7 @@ function block_core_tabs_render_block_callback( array $attributes, string $conte
 	$tag_processor = new WP_HTML_Tag_Processor( $content );
 	$tag_processor->next_tag( array( 'class_name' => 'wp-block-tabs' ) );
 	$tag_processor->add_class( $is_vertical ? 'is-vertical' : 'is-horizontal' );
-	$tag_processor->set_attribute( 'data-wp-interactive', 'core/tabs' );
+	$tag_processor->set_attribute( 'data-wp-interactive', 'core/tabs/private' );
 	$tag_processor->set_attribute(
 		'data-wp-context',
 		wp_json_encode(

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { ToggleControl, PanelBody } from '@wordpress/components';
+import { ToggleControl, PanelBody, TextControl } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import {
 	ContrastChecker,
@@ -123,6 +123,9 @@ export default function Controls( {
 		customTabActiveTextColor,
 		customTabHoverTextColor,
 		orientation,
+		metadata = {
+			name: '',
+		},
 	} = attributes;
 	/**
 	 * Get the color settings for the block.
@@ -145,6 +148,21 @@ export default function Controls( {
 							} )
 						}
 						__nextHasNoMarginBottom
+					/>
+					<TextControl
+						label={ __( 'Tabs Title' ) }
+						help={ __(
+							'The tabs title is used by screen readers to describe the purpose and content of the tabs.'
+						) }
+						value={ metadata.name }
+						placeholder={ __( 'Tab Contents' ) }
+						onChange={ ( value ) => {
+							setAttributes( {
+								metadata: { ...metadata, name: value },
+							} );
+						} }
+						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 					/>
 				</PanelBody>
 			</InspectorControls>
@@ -224,6 +242,7 @@ export default function Controls( {
 					panelId={ clientId }
 					disableCustomColors={ false }
 					__experimentalIsRenderedInSidebar
+					__next40pxDefaultSize
 					{ ...colorSettings }
 				/>
 				<ContrastCheckerMatrix attributes={ attributes } />
