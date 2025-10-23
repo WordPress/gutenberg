@@ -82,6 +82,11 @@ export function Draggable( {
 		event.preventDefault();
 		cleanupRef.current();
 
+		// Blur the drag handle to clear the :active state.
+		if ( event.target instanceof HTMLElement ) {
+			event.target.blur();
+		}
+
 		if ( onDragEnd ) {
 			onDragEnd( event );
 		}

@@ -36,6 +36,10 @@
 		cursor: grab;
 	}
 
+	&.is-draggable .block-editor-list-view-block-contents:active {
+		cursor: grabbing;
+	}
+
 	.block-editor-list-view-block-select-button {
 		// When a row is expanded, retain the dark color.
 		&[aria-expanded="true"] {
