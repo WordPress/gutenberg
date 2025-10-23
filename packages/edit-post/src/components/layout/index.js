@@ -676,7 +676,9 @@ function Layout( {
 						<EditPostKeyboardShortcuts />
 						<EditorKeyboardShortcutsRegister />
 						<BlockKeyboardShortcuts />
-						<InitPatternModal />
+						{ currentPostType === 'wp_block' && (
+							<InitPatternModal />
+						) }
 						<PluginArea onError={ onPluginAreaError } />
 						<PostEditorMoreMenu />
 						{ backButton }
