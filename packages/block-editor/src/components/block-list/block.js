@@ -633,6 +633,7 @@ function BlockListBlockProvider( props ) {
 					: undefined,
 				blockTitle: blockType?.title,
 				isBlockHidden: attributes?.metadata?.blockVisibility === false,
+				bindableAttributes,
 			};
 
 			// When in preview mode, we can avoid a lot of selection and
@@ -718,7 +719,6 @@ function BlockListBlockProvider( props ) {
 					? blocksWithSameName[ 0 ]
 					: false,
 				isBlockHidden: _isBlockHidden( clientId ),
-				bindableAttributes,
 			};
 		},
 		[ clientId, rootClientId ]
