@@ -31,7 +31,10 @@ namespace AttributeMap {
 		if ( ! keepNull ) {
 			attributes = Object.keys( attributes ).reduce< AttributeMap >(
 				( copy, key ) => {
-					if ( attributes[ key ] != null ) {
+					if (
+						attributes[ key ] !== null ||
+						attributes[ key ] !== undefined
+					) {
 						copy[ key ] = attributes[ key ];
 					}
 					return copy;
