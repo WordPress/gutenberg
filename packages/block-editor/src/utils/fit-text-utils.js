@@ -20,18 +20,13 @@ function generateCSSRule( elementSelector, fontSize ) {
  * @param {HTMLElement} textElement     The text element
  * @param {string}      elementSelector CSS selector for the text element
  * @param {Function}    applyStylesFn   Function to apply test styles
- * @param {number}      maxSize         Maximum font size in pixels (default: 600)
  * @return {number} Optimal font size
  */
-function findOptimalFontSize(
-	textElement,
-	elementSelector,
-	applyStylesFn,
-	maxSize = 600
-) {
+function findOptimalFontSize( textElement, elementSelector, applyStylesFn ) {
 	const alreadyHasScrollableHeight =
 		textElement.scrollHeight > textElement.clientHeight;
 	let minSize = 5;
+	let maxSize = 600;
 	let bestSize = minSize;
 
 	while ( minSize <= maxSize ) {
@@ -61,14 +56,8 @@ function findOptimalFontSize(
  * @param {HTMLElement} textElement     The text element (paragraph, heading, etc.)
  * @param {string}      elementSelector CSS selector for the text element
  * @param {Function}    applyStylesFn   Function to apply CSS styles (pass empty string to clear)
- * @param {number}      maxSize         Maximum font size in pixels.
  */
-export function optimizeFitText(
-	textElement,
-	elementSelector,
-	applyStylesFn,
-	maxSize
-) {
+export function optimizeFitText( textElement, elementSelector, applyStylesFn ) {
 	if ( ! textElement ) {
 		return;
 	}
@@ -78,8 +67,7 @@ export function optimizeFitText(
 	const optimalSize = findOptimalFontSize(
 		textElement,
 		elementSelector,
-		applyStylesFn,
-		maxSize
+		applyStylesFn
 	);
 
 	const cssRule = generateCSSRule( elementSelector, optimalSize );

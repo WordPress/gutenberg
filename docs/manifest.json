@@ -1722,6 +1722,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/global-styles-ui",
+		"slug": "packages-global-styles-ui",
+		"markdown_source": "../packages/global-styles-ui/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/hooks",
 		"slug": "packages-hooks",
 		"markdown_source": "../packages/hooks/README.md",
@@ -1983,6 +1989,12 @@
 		"title": "@wordpress/sync",
 		"slug": "packages-sync",
 		"markdown_source": "../packages/sync/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/theme",
+		"slug": "packages-theme",
+		"markdown_source": "../packages/theme/README.md",
 		"parent": "packages"
 	},
 	{

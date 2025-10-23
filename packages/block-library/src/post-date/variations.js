@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { postDate } from '@wordpress/icons';
 
 const variations = [
 	{
@@ -19,13 +18,12 @@ const variations = [
 				},
 			},
 		},
-		scope: [ 'block', 'inserter', 'transform' ],
+		scope: [ 'inserter', 'transform' ],
 		isActive: ( blockAttributes ) =>
 			blockAttributes?.metadata?.bindings?.datetime?.source ===
 				'core/post-data' &&
 			blockAttributes?.metadata?.bindings?.datetime?.args?.field ===
 				'date',
-		icon: postDate,
 	},
 	{
 		name: 'post-date-modified',
@@ -42,13 +40,12 @@ const variations = [
 			},
 			className: 'wp-block-post-date__modified-date',
 		},
-		scope: [ 'block', 'inserter', 'transform' ],
+		scope: [ 'inserter', 'transform' ],
 		isActive: ( blockAttributes ) =>
 			blockAttributes?.metadata?.bindings?.datetime?.source ===
 				'core/post-data' &&
 			blockAttributes?.metadata?.bindings?.datetime?.args?.field ===
 				'modified',
-		icon: postDate,
 	},
 ];
 

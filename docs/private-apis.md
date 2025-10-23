@@ -277,8 +277,6 @@ Private exports:
 - `EntitiesSavedStatesExtensible`
 - `Editor`
 - `EditorContentSlotFill`
-- `GlobalStylesProvider`
-- `mergeBaseAndUserConfigs`
 - `PluginPostExcerpt`
 - `PostCardPanel`
 - `PreferencesModal`

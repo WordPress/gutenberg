@@ -47,7 +47,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-6.9/rest-api.php';
 	require __DIR__ . '/compat/wordpress-6.9/class-gutenberg-hierarchical-sort.php';
 	require __DIR__ . '/compat/wordpress-6.9/block-comments.php';
-	require __DIR__ . '/compat/wordpress-6.9/class-gutenberg-rest-comment-controller.php';
+	require __DIR__ . '/compat/wordpress-6.9/class-gutenberg-rest-comment-controller-6-9.php';
 
 	// Plugin specific code.
 	require_once __DIR__ . '/class-wp-rest-global-styles-controller-gutenberg.php';
@@ -83,7 +83,7 @@ require __DIR__ . '/compat/wordpress-6.8/site-preview.php';
 require __DIR__ . '/compat/wordpress-6.9/customizer-preview-custom-css.php';
 require __DIR__ . '/compat/wordpress-6.9/command-palette.php';
 require __DIR__ . '/compat/wordpress-6.9/preload.php';
-require __DIR__ . '/compat/wordpress-6.9/script-modules.php';
+require __DIR__ . '/compat/wordpress-6.9/client-assets.php';
 
 // WordPress 7.0 compat.
 require __DIR__ . '/compat/wordpress-7.0/php-only-blocks.php';
@@ -169,4 +169,10 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-media-processing' ) ) {
 if ( gutenberg_is_experiment_enabled( 'gutenberg-full-page-client-side-navigation' ) ) {
 	require __DIR__ . '/experimental/interactivity-api/class-gutenberg-interactivity-api-full-page-navigation.php';
 	Gutenberg_Interactivity_API_Full_Page_Navigation::instance();
+}
+
+// Load auto-generated build registration.
+$build_registration = gutenberg_dir_path() . 'build/index.php';
+if ( file_exists( $build_registration ) ) {
+	require_once $build_registration;
 }
