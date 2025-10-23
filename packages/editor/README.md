@@ -393,10 +393,6 @@ _Returns_
 
 -   `React.ReactNode`: The rendered component.
 
-### EditorsPresence
-
-Undocumented declaration.
-
 ### EntitiesSavedStates
 
 Renders the component for managing saved states of entities.
