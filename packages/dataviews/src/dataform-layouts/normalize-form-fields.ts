@@ -70,6 +70,7 @@ export function normalizeLayout( layout?: Layout ): NormalizedLayout {
 			normalizedLayout = {
 				type: 'card',
 				withHeader: false,
+				withHeaderBorder: false,
 				isOpened: true,
 				summary: [],
 			} satisfies NormalizedCardLayout;
@@ -79,7 +80,7 @@ export function normalizeLayout( layout?: Layout ): NormalizedLayout {
 			normalizedLayout = {
 				type: 'card',
 				withHeader: true,
-				headerBorder: layout.headerBorder ?? false,
+				withHeaderBorder: layout.withHeaderBorder ?? false,
 				isOpened:
 					typeof layout.isOpened === 'boolean'
 						? layout.isOpened

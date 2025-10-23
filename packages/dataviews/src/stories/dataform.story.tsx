@@ -340,11 +340,13 @@ const getLayoutFromStoryArgs = ( {
 	labelPosition,
 	openAs,
 	withHeader,
+	withHeaderBorder,
 }: {
 	type: 'default' | 'regular' | 'panel' | 'card' | 'row';
 	labelPosition?: 'default' | 'top' | 'side' | 'none';
 	openAs?: 'default' | 'dropdown' | 'modal';
 	withHeader?: boolean;
+	withHeaderBorder?: boolean;
 } ): Layout | undefined => {
 	let layout: Layout | undefined;
 
@@ -375,6 +377,7 @@ const getLayoutFromStoryArgs = ( {
 			// @ts-ignore We want to demo the effects of configuring withHeader.
 			cardLayout.withHeader = withHeader;
 		}
+		cardLayout.withHeaderBorder = withHeaderBorder ?? false;
 		layout = cardLayout;
 	}
 
@@ -1252,7 +1255,13 @@ const VisibilityComponent = () => {
 	);
 };
 
-const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
+const LayoutCardComponent = ( {
+	withHeader,
+	withHeaderBorder,
+}: {
+	withHeader: boolean;
+	withHeaderBorder: boolean;
+} ) => {
 	type Customer = {
 		name: string;
 		email: string;
@@ -1376,14 +1385,14 @@ const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 
 	const form: Form = useMemo(
 		() => ( {
-			layout: getLayoutFromStoryArgs( {
-				type: 'card',
-				withHeader,
-			} ),
 			fields: [
 				{
 					id: 'customerCard',
-					layout: { type: 'card', summary: 'plan-summary' },
+					layout: getLayoutFromStoryArgs( {
+						type: 'card',
+						withHeader,
+						withHeaderBorder,
+					} ),
 					label: 'Customer',
 					description:
 						'Enter your contact details, plan type, and addresses to complete your customer information.',
@@ -1453,7 +1462,7 @@ const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 				},
 			],
 		} ),
-		[ withHeader ]
+		[ withHeader, withHeaderBorder ]
 	);
 
 	return (
@@ -1855,14 +1864,10 @@ export default meta;
 export const LayoutCard = {
 	render: LayoutCardComponent,
 	argTypes: {
-		withHeader: {
-			control: { type: 'boolean' },
-			description: 'Whether the card has a header.',
-		},
+		withHeader: { control: { type: 'boolean' } },
+		withHeaderBorder: { control: { type: 'boolean' } },
 	},
-	args: {
-		withHeader: true,
-	},
+	args: { withHeader: true, withHeaderBorder: false },
 };
 
 export const LayoutPanel = {

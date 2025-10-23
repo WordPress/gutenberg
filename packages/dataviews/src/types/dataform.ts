@@ -60,7 +60,7 @@ export type CardLayout =
 	| {
 			type: 'card';
 			withHeader?: true | undefined;
-			headerBorder?: boolean;
+			withHeaderBorder?: boolean;
 			isOpened?: boolean;
 			summary?: CardSummaryField;
 	  };
@@ -68,6 +68,7 @@ export type NormalizedCardLayout =
 	| {
 			type: 'card';
 			withHeader: false;
+			withHeaderBorder: false;
 			// isOpened cannot be false if withHeader is false as well.
 			// Otherwise, the card would not be visible.
 			isOpened: true;
@@ -77,7 +78,7 @@ export type NormalizedCardLayout =
 	| {
 			type: 'card';
 			withHeader: true;
-			headerBorder: boolean;
+			withHeaderBorder: boolean;
 			isOpened: boolean;
 			summary: NormalizedCardSummaryField;
 	  };

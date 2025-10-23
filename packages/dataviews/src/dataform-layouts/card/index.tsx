@@ -25,10 +25,10 @@ import { getSummaryFields } from '../get-summary-fields';
 
 export function useCollapsibleCard( {
 	initialIsOpen,
-	headerBorder,
+	withHeaderBorder,
 }: {
 	initialIsOpen: boolean;
-	headerBorder: boolean;
+	withHeaderBorder: boolean;
 } ) {
 	const [ isOpen, setIsOpen ] = useState( initialIsOpen );
 
@@ -45,14 +45,13 @@ export function useCollapsibleCard( {
 			[ key: string ]: any;
 		} ) => (
 			<CardHeader
-				size="medium"
 				{ ...props }
 				onClick={ toggle }
 				style={ {
 					cursor: 'pointer',
 					...props.style,
 				} }
-				isBorderless={ ! headerBorder }
+				isBorderless={ ! withHeaderBorder }
 			>
 				<div
 					style={ {
@@ -73,7 +72,7 @@ export function useCollapsibleCard( {
 				/>
 			</CardHeader>
 		),
-		[ toggle, headerBorder, isOpen ]
+		[ toggle, withHeaderBorder, isOpen ]
 	);
 
 	return { isOpen, CollapsibleCardHeader };
@@ -152,9 +151,29 @@ export default function FormCardField< Item >( {
 		[ field ]
 	);
 
+	const sizeCard =
+		! layout.withHeaderBorder && layout.withHeader
+			? {
+					top: 'medium' as const,
+					right: 'medium' as const,
+					bottom: 'medium' as const,
+					left: 'medium' as const,
+			  }
+			: undefined;
+
+	const sizeCardBody =
+		! layout.withHeaderBorder && layout.withHeader
+			? {
+					top: undefined,
+					right: 'medium' as const,
+					bottom: 'medium' as const,
+					left: 'medium' as const,
+			  }
+			: undefined;
+
 	const { isOpen, CollapsibleCardHeader } = useCollapsibleCard( {
 		initialIsOpen: layout.isOpened,
-		headerBorder: layout.withHeader ? layout.headerBorder : false,
+		withHeaderBorder: layout.withHeaderBorder,
 	} );
 
 	const summaryFields = getSummaryFields< Item >( layout.summary, fields );
@@ -166,7 +185,7 @@ export default function FormCardField< Item >( {
 	if ( isCombinedField( field ) ) {
 		const withHeader = !! field.label && layout.withHeader;
 		return (
-			<Card className="dataforms-layouts-card__field" size="medium">
+			<Card className="dataforms-layouts-card__field" size={ sizeCard }>
 				{ withHeader && (
 					<CollapsibleCardHeader className="dataforms-layouts-card__field-header">
 						<span className="dataforms-layouts-card__field-header-label">
@@ -192,12 +211,7 @@ export default function FormCardField< Item >( {
 					// If it doesn't have a header, keep it open.
 					// Otherwise, the card will not be visible.
 					<CardBody
-						size={ {
-							top: ! withHeader ? 'medium' : undefined,
-							right: 'medium',
-							bottom: 'medium',
-							left: 'medium',
-						} }
+						size={ sizeCardBody }
 						className="dataforms-layouts-card__field-control"
 					>
 						{ field.description && (
@@ -254,12 +268,7 @@ export default function FormCardField< Item >( {
 				// If it doesn't have a header, keep it open.
 				// Otherwise, the card will not be visible.
 				<CardBody
-					size={ {
-						top: ! withHeader ? 'medium' : undefined,
-						right: 'medium',
-						bottom: 'medium',
-						left: 'medium',
-					} }
+					size={ sizeCardBody }
 					className="dataforms-layouts-card__field-control"
 				>
 					<RegularLayout
