@@ -102,7 +102,7 @@ const getGlobalStylesResetCommands = () =>
 
 const getGlobalStylesOpenRevisionsCommands = () =>
 	function useGlobalStylesOpenRevisionsCommands() {
-		const { openGeneralSidebar, setEditorCanvasContainerView } = unlock(
+		const { openGeneralSidebar, setStylesPath } = unlock(
 			useDispatch( editSiteStore )
 		);
 		const { params } = useLocation();
@@ -137,16 +137,14 @@ const getGlobalStylesOpenRevisionsCommands = () =>
 							} );
 						}
 						openGeneralSidebar( 'edit-site/global-styles' );
-						setEditorCanvasContainerView(
-							'global-styles-revisions'
-						);
+						setStylesPath( '/revisions' );
 					},
 				},
 			];
 		}, [
 			history,
 			openGeneralSidebar,
-			setEditorCanvasContainerView,
+			setStylesPath,
 			hasRevisions,
 			canvas,
 		] );

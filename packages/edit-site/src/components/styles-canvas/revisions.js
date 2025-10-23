@@ -9,29 +9,22 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../lock-unlock';
-import { store as editSiteStore } from '../../store';
 import Revisions from '../revisions';
-import { useGlobalStyles } from './hooks';
+import { useGlobalStyles } from '../global-styles/hooks';
 
 /**
- * Revisions integration - renders conditionally when revisions view is active.
+ * Revisions content component for global styles.
  * Coordinates with ScreenRevisions through the path parameter to display
  * the currently selected revision.
  *
  * @param {Object} props      Component props.
  * @param {string} props.path Current path in global styles.
- * @return {JSX.Element|null} The Revisions component or null.
+ * @return {JSX.Element|null} The Revisions component or null if loading.
  */
-export function GlobalStylesRevisions( { path } ) {
-	const { editorCanvasContainerView, blocks } = useSelect( ( select ) => {
-		return {
-			// This is not ideal: it's like a loop (reading from block-editor to render it).
-			blocks: select( blockEditorStore ).getBlocks(),
-			editorCanvasContainerView: unlock(
-				select( editSiteStore )
-			).getEditorCanvasContainerView(),
-		};
+export function StylesCanvasRevisions( { path } ) {
+	const blocks = useSelect( ( select ) => {
+		// This is not ideal: it's like a loop (reading from block-editor to render it).
+		return select( blockEditorStore ).getBlocks();
 	}, [] );
 	const { user: userConfig } = useGlobalStyles();
 
@@ -54,12 +47,7 @@ export function GlobalStylesRevisions( { path } ) {
 		);
 	}, [ revisionId, revisions ] );
 
-	// Only render when on the revisions path and the appropriate canvas view is active
-	const shouldRender =
-		path?.startsWith( '/revisions' ) &&
-		editorCanvasContainerView === 'global-styles-revisions';
-
-	if ( ! shouldRender || isLoading ) {
+	if ( isLoading ) {
 		return null;
 	}
 
