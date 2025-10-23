@@ -8,7 +8,7 @@ import {
 	store as coreStore,
 } from '@wordpress/core-data';
 import { resolveSelect } from '@wordpress/data';
-import { Modal } from '@wordpress/components';
+import { Modal, DropZone } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -17,6 +17,7 @@ import { DataViewsPicker } from '@wordpress/dataviews';
 import type { View, Field, ActionButton } from '@wordpress/dataviews';
 import type { Attachment } from '../../utils/types';
 import { transformAttachment } from '../../utils/transform-attachment';
+import { uploadMedia } from '../../utils/upload-media';
 import { unlock } from '../../lock-unlock';
 
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
@@ -53,6 +54,18 @@ interface MediaUploadModalProps {
 	 * Function called when the modal is closed without selection.
 	 */
 	onClose?: () => void;
+
+	/**
+	 * Function to handle media uploads.
+	 * If not provided, drag and drop will be disabled.
+	 */
+	onUpload?: ( args: {
+		allowedTypes?: string[];
+		filesList: File[];
+		onFileChange?: ( attachments: Partial< Attachment >[] ) => void;
+		onError?: ( error: Error ) => void;
+		multiple?: boolean;
+	} ) => void;
 
 	/**
 	 * Title for the modal.
@@ -100,6 +113,7 @@ interface MediaUploadModalProps {
  * @param props.value         Currently selected media item(s)
  * @param props.onSelect      Function called when media is selected
  * @param props.onClose       Function called when modal is closed
+ * @param props.onUpload      Function to handle media uploads
  * @param props.title         Title for the modal
  * @param props.isOpen        Whether the modal is open
  * @param props.isDismissible Whether modal can be dismissed
@@ -114,6 +128,7 @@ export function MediaUploadModal( {
 	value,
 	onSelect,
 	onClose,
+	onUpload,
 	title = __( 'Select Media' ),
 	isOpen,
 	isDismissible = true,
@@ -298,6 +313,9 @@ export function MediaUploadModal( {
 		return null;
 	}
 
+	// Use onUpload if provided, otherwise fall back to uploadMedia
+	const handleUpload = onUpload || uploadMedia;
+
 	return (
 		<Modal
 			title={ title }
@@ -306,6 +324,33 @@ export function MediaUploadModal( {
 			className={ modalClass }
 			size="fill"
 		>
+			<DropZone
+				onFilesDrop={ ( files ) => {
+					let filteredFiles = files;
+					// Filter files by allowed types if specified
+					if ( allowedTypes && ! allowedTypes.includes( '*' ) ) {
+						filteredFiles = files.filter( ( file ) =>
+							allowedTypes.some( ( allowedType ) => {
+								// Check if the file type matches the allowed MIME type
+								return (
+									file.type === allowedType ||
+									file.type.startsWith(
+										allowedType.replace( '*', '' )
+									)
+								);
+							} )
+						);
+					}
+					if ( filteredFiles.length > 0 ) {
+						handleUpload( {
+							allowedTypes,
+							filesList: filteredFiles,
+							multiple,
+						} );
+					}
+				} }
+				label={ __( 'Drop files to upload' ) }
+			/>
 			<DataViewsPicker
 				data={ mediaItems }
 				fields={ fields }

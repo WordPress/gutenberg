@@ -45,6 +45,8 @@ let uniqueId = 0;
  */
 function ConditionalMediaUpload( { render, ...props } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	const { getSettings } = useSelect( blockEditorStore );
+
 	if ( window.__experimentalDataViewsMediaModal ) {
 		return (
 			<>
@@ -60,6 +62,7 @@ function ConditionalMediaUpload( { render, ...props } ) {
 						setIsModalOpen( false );
 						props.onSelect?.( media );
 					} }
+					onUpload={ getSettings().mediaUpload }
 				/>
 			</>
 		);

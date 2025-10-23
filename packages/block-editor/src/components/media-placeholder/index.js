@@ -43,6 +43,10 @@ const noop = () => {};
  */
 function ConditionalMediaUpload( { render, ...props } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	const mediaUpload = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return getSettings().mediaUpload;
+	}, [] );
 
 	if ( window.__experimentalDataViewsMediaModal ) {
 		return (
@@ -59,6 +63,7 @@ function ConditionalMediaUpload( { render, ...props } ) {
 						setIsModalOpen( false );
 						props.onSelect?.( media );
 					} }
+					onUpload={ mediaUpload }
 				/>
 			</>
 		);

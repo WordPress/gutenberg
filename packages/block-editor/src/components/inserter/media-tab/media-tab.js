@@ -5,6 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import { Button } from '@wordpress/components';
 import { useCallback, useMemo, useState } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -18,6 +19,7 @@ import { getBlockAndPreviewFromMedia } from './utils';
 import MobileTabNavigation from '../mobile-tab-navigation';
 import CategoryTabs from '../category-tabs';
 import InserterNoResults from '../no-results';
+import { store as blockEditorStore } from '../../../store';
 
 const ALLOWED_MEDIA_TYPES = [ 'image', 'video', 'audio' ];
 
@@ -31,6 +33,10 @@ const ALLOWED_MEDIA_TYPES = [ 'image', 'video', 'audio' ];
  */
 function ConditionalMediaUpload( { render, ...props } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	const mediaUpload = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return getSettings().mediaUpload;
+	}, [] );
 
 	if ( window.__experimentalDataViewsMediaModal ) {
 		return (
@@ -47,6 +53,7 @@ function ConditionalMediaUpload( { render, ...props } ) {
 						setIsModalOpen( false );
 						props.onSelect?.( media );
 					} }
+					onUpload={ mediaUpload }
 				/>
 			</>
 		);
