@@ -15,7 +15,7 @@ import { Modal, DropZone } from '@wordpress/components';
  */
 import { DataViewsPicker } from '@wordpress/dataviews';
 import type { View, Field, ActionButton } from '@wordpress/dataviews';
-import type { Attachment } from '../../utils/types';
+import type { Attachment, RestAttachment } from '../../utils/types';
 import { transformAttachment } from '../../utils/transform-attachment';
 import { uploadMedia } from '../../utils/upload-media';
 import { unlock } from '../../lock-unlock';
@@ -207,23 +207,16 @@ export function MediaUploadModal( {
 		totalPages,
 	} = useEntityRecordsWithPermissions( 'postType', 'attachment', queryArgs );
 
-	// Transform the records to the expected format
-	const mediaItems = useMemo( () => {
-		return ( mediaRecords || [] ).map( ( item: any ) =>
-			transformAttachment( item )
-		);
-	}, [ mediaRecords ] );
-
-	const fields: Field< Attachment >[] = useMemo(
+	const fields: Field< RestAttachment >[] = useMemo(
 		() => [
 			{
 				id: 'url',
 				type: 'media' as const,
 				label: __( 'Media' ),
-				render: ( { item }: { item: Attachment } ) => (
+				render: ( { item }: { item: RestAttachment } ) => (
 					<img
-						src={ item.url }
-						alt={ item.alt }
+						src={ item.source_url }
+						alt={ item.alt_text }
 						style={ {
 							width: '100%',
 							height: '100%',
@@ -237,20 +230,23 @@ export function MediaUploadModal( {
 				id: 'title',
 				type: 'text' as const,
 				label: __( 'Title' ),
-				getValue: ( { item }: { item: Attachment } ) =>
-					item.title || __( '(no title)' ),
+				getValue: ( { item }: { item: RestAttachment } ) => {
+					const titleValue = item.title.raw || item.title.rendered;
+					return titleValue || __( '(no title)' );
+				},
 			},
 			{
 				id: 'alt',
 				type: 'text' as const,
 				label: __( 'Alt text' ),
-				getValue: ( { item }: { item: Attachment } ) => item.alt,
+				getValue: ( { item }: { item: RestAttachment } ) =>
+					item.alt_text,
 			},
 		],
 		[]
 	);
 
-	const actions: ActionButton< Attachment >[] = useMemo(
+	const actions: ActionButton< RestAttachment >[] = useMemo(
 		() => [
 			{
 				id: 'select',
@@ -352,7 +348,7 @@ export function MediaUploadModal( {
 				label={ __( 'Drop files to upload' ) }
 			/>
 			<DataViewsPicker
-				data={ mediaItems }
+				data={ mediaRecords || [] }
 				fields={ fields }
 				view={ view }
 				onChangeView={ setView }
@@ -362,7 +358,7 @@ export function MediaUploadModal( {
 				isLoading={ isLoading }
 				paginationInfo={ paginationInfo }
 				defaultLayouts={ defaultLayouts }
-				getItemId={ ( item: Attachment ) => String( item.id ) }
+				getItemId={ ( item: RestAttachment ) => String( item.id ) }
 				search={ search }
 				searchLabel={ searchLabel }
 				itemListLabel={ __( 'Media items' ) }
