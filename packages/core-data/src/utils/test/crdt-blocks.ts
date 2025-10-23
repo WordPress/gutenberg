@@ -371,5 +371,44 @@ describe( 'crdt-blocks', () => {
 			 ).get( 'content' ) as Y.Text;
 			expect( content.toString() ).toBe( 'Updated Middle' );
 		} );
+
+		it( 'adds new rich-text attribute to existing block without that attribute', () => {
+			// Start with a block that has NO content attribute
+			const initialBlocks: Block[] = [
+				{
+					name: 'core/paragraph',
+					attributes: { level: 1 },
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, initialBlocks, null );
+
+			// Now add the content attribute (rich-text)
+			const updatedBlocks: Block[] = [
+				{
+					name: 'core/paragraph',
+					attributes: {
+						level: 1,
+						content: 'New content added',
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, updatedBlocks, null );
+
+			expect( yblocks.length ).toBe( 1 );
+			const block = yblocks.get( 0 );
+			const attributes = block.get( 'attributes' ) as YBlockAttributes;
+
+			// The content attribute should now exist
+			expect( attributes.has( 'content' ) ).toBe( true );
+			const content = attributes.get( 'content' ) as Y.Text;
+			expect( content.toString() ).toBe( 'New content added' );
+
+			// The level attribute should still exist
+			expect( attributes.get( 'level' ) ).toBe( 1 );
+		} );
 	} );
 } );
