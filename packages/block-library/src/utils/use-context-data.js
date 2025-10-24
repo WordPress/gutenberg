@@ -162,6 +162,63 @@ export function parseTemplateSlug( templateSlug ) {
  * @return {Object} Object containing taxonomy, termSlug, isAuthor, and authorSlug.
  */
 export function parseTemplateSlugWithValidation( templateSlug, getTaxonomy ) {
+	if ( templateSlug.startsWith( 'taxonomy-' ) ) {
+		const taxonomyPart = templateSlug.substring( 9 );
+		const dashIndices = [];
+
+		// Find all dash positions
+		for ( let i = 0; i < taxonomyPart.length; i++ ) {
+			if ( taxonomyPart[ i ] === '-' ) {
+				dashIndices.push( i );
+			}
+		}
+
+		// If we have dashes, try different split points to find a valid taxonomy
+		if ( dashIndices.length > 0 ) {
+			for ( let i = 0; i < dashIndices.length; i++ ) {
+				const splitIndex = dashIndices[ i ];
+				const potentialTaxonomy = taxonomyPart.substring(
+					0,
+					splitIndex
+				);
+				const potentialTermSlug = taxonomyPart.substring(
+					splitIndex + 1
+				);
+
+				// Check if this taxonomy exists
+				const taxonomyRecord = getTaxonomy( potentialTaxonomy );
+				if ( taxonomyRecord ) {
+					return {
+						taxonomy: potentialTaxonomy,
+						termSlug: potentialTermSlug,
+						isAuthor: false,
+						authorSlug: null,
+					};
+				}
+			}
+		}
+
+		// If no valid split found, try the entire string as taxonomy
+		const taxonomyRecord = getTaxonomy( taxonomyPart );
+		if ( taxonomyRecord ) {
+			return {
+				taxonomy: taxonomyPart,
+				termSlug: null,
+				isAuthor: false,
+				authorSlug: null,
+			};
+		}
+
+		// No valid taxonomy found
+		return {
+			taxonomy: null,
+			termSlug: null,
+			isAuthor: false,
+			authorSlug: null,
+		};
+	}
+
+	// For non-taxonomy prefixed slugs, use the basic parsing
 	const basicParse = parseTemplateSlug( templateSlug );
 
 	if ( basicParse.taxonomy && ! basicParse.isAuthor ) {

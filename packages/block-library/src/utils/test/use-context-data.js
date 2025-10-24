@@ -144,7 +144,12 @@ describe( 'parseTemplateSlugWithValidation', () => {
 	} );
 
 	it( 'should return basic parse result when taxonomy exists', () => {
-		mockGetTaxonomy.mockReturnValue( { name: 'Product Category' } );
+		mockGetTaxonomy.mockImplementation( ( taxonomy ) => {
+			if ( taxonomy === 'product-category' ) {
+				return { name: 'Product Category' };
+			}
+			return null;
+		} );
 
 		const result = parseTemplateSlugWithValidation(
 			'taxonomy-product-category',
@@ -270,6 +275,93 @@ describe( 'parseTemplateSlugWithValidation', () => {
 		expect( result ).toEqual( {
 			taxonomy: '-product-category-',
 			termSlug: '',
+			isAuthor: false,
+			authorSlug: null,
+		} );
+	} );
+} );
+
+describe( 'parseTemplateSlugWithValidation - complex taxonomy scenarios', () => {
+	const mockGetTaxonomy = jest.fn();
+
+	beforeEach( () => {
+		mockGetTaxonomy.mockClear();
+	} );
+
+	it( 'should handle coffee_type taxonomy with complex term', () => {
+		mockGetTaxonomy.mockImplementation( ( taxonomy ) => {
+			if ( taxonomy === 'coffee_type' ) {
+				return { name: 'Coffee Type' };
+			}
+			return null;
+		} );
+
+		const result = parseTemplateSlugWithValidation(
+			'taxonomy-coffee_type-flat-white',
+			mockGetTaxonomy
+		);
+
+		expect( result ).toEqual( {
+			taxonomy: 'coffee_type',
+			termSlug: 'flat-white',
+			isAuthor: false,
+			authorSlug: null,
+		} );
+	} );
+
+	it( 'should handle product-category taxonomy with complex term', () => {
+		mockGetTaxonomy.mockImplementation( ( taxonomy ) => {
+			if ( taxonomy === 'product-category' ) {
+				return { name: 'Product Category' };
+			}
+			return null;
+		} );
+
+		const result = parseTemplateSlugWithValidation(
+			'taxonomy-product-category-electronics-gadgets',
+			mockGetTaxonomy
+		);
+
+		expect( result ).toEqual( {
+			taxonomy: 'product-category',
+			termSlug: 'electronics-gadgets',
+			isAuthor: false,
+			authorSlug: null,
+		} );
+	} );
+
+	it( 'should fallback to entire string if no valid split found', () => {
+		mockGetTaxonomy.mockImplementation( ( taxonomy ) => {
+			if ( taxonomy === 'coffee_type-flat-white' ) {
+				return { name: 'Coffee Type Flat White' };
+			}
+			return null;
+		} );
+
+		const result = parseTemplateSlugWithValidation(
+			'taxonomy-coffee_type-flat-white',
+			mockGetTaxonomy
+		);
+
+		expect( result ).toEqual( {
+			taxonomy: 'coffee_type-flat-white',
+			termSlug: null,
+			isAuthor: false,
+			authorSlug: null,
+		} );
+	} );
+
+	it( 'should return null if no valid taxonomy found', () => {
+		mockGetTaxonomy.mockReturnValue( null );
+
+		const result = parseTemplateSlugWithValidation(
+			'taxonomy-nonexistent-taxonomy',
+			mockGetTaxonomy
+		);
+
+		expect( result ).toEqual( {
+			taxonomy: null,
+			termSlug: null,
 			isAuthor: false,
 			authorSlug: null,
 		} );
