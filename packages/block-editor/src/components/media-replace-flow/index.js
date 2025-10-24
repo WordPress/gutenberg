@@ -12,6 +12,7 @@ import {
 	ToolbarButton,
 } from '@wordpress/components';
 import { useSelect, withDispatch } from '@wordpress/data';
+import { useState } from '@wordpress/element';
 import { DOWN } from '@wordpress/keycodes';
 import {
 	postFeaturedImage,
@@ -26,12 +27,49 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import MediaUpload from '../media-upload';
+import MediaUploadModal from '../media-upload-modal';
 import MediaUploadCheck from '../media-upload/check';
 import LinkControl from '../link-control';
 import { store as blockEditorStore } from '../../store';
 
 const noop = () => {};
 let uniqueId = 0;
+
+/**
+ * Conditional Media component that uses MediaUploadModal when experiment is enabled,
+ * otherwise falls back to MediaUpload.
+ *
+ * @param {Object}   root0        Component props.
+ * @param {Function} root0.render Render prop function that receives { open } object.
+ * @return {JSX.Element} The component.
+ */
+function ConditionalMediaUpload( { render, ...props } ) {
+	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	const { getSettings } = useSelect( blockEditorStore );
+
+	if ( window.__experimentalDataViewsMediaModal ) {
+		return (
+			<>
+				{ render && render( { open: () => setIsModalOpen( true ) } ) }
+				<MediaUploadModal
+					{ ...props }
+					isOpen={ isModalOpen }
+					onClose={ () => {
+						setIsModalOpen( false );
+						props.onClose?.();
+					} }
+					onSelect={ ( media ) => {
+						setIsModalOpen( false );
+						props.onSelect?.( media );
+					} }
+					onUpload={ getSettings().mediaUpload }
+				/>
+			</>
+		);
+	}
+
+	return <MediaUpload { ...props } render={ render } />;
+}
 
 const MediaReplaceFlow = ( {
 	mediaURL,
@@ -157,7 +195,7 @@ const MediaReplaceFlow = ( {
 				<>
 					<NavigableMenu className="block-editor-media-replace-flow__media-upload-menu">
 						<MediaUploadCheck>
-							<MediaUpload
+							<ConditionalMediaUpload
 								gallery={ gallery }
 								addToGallery={ addToGallery }
 								multiple={ multiple }
