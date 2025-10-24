@@ -46,22 +46,6 @@ import { AddComment } from './add-comment';
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 const { Menu } = unlock( componentsPrivateApis );
 
-/**
- * Renders the Comments component.
- *
- * @param {Object}   props                     - The component props.
- * @param {Array}    props.threads             - The array of comment threads.
- * @param {Function} props.onEditComment       - The function to handle comment editing.
- * @param {Function} props.onAddReply          - The function to add a reply to a comment.
- * @param {Function} props.onCommentDelete     - The function to delete a comment.
- * @param {boolean}  props.showCommentBoard    - Whether to show the comment board.
- * @param {Function} props.setShowCommentBoard - The function to set the comment board visibility.
- * @param {Ref}      props.commentSidebarRef   - The ref to the comment sidebar.
- * @param {Function} props.reflowComments      - The function to call indicating a comment is updated.
- * @param {boolean}  props.isFloating          - Whether the comment thread is floating.
- * @param {number}   props.commentLastUpdated  - Timestamp of the last comment update.
- * @return {React.ReactNode} The rendered Comments component.
- */
 export function Comments( {
 	threads: noteThreads,
 	onEditComment,
@@ -318,7 +302,6 @@ export function Comments( {
 					showCommentBoard={ showCommentBoard }
 					setShowCommentBoard={ setShowCommentBoard }
 					commentSidebarRef={ commentSidebarRef }
-					thread={ { id: 0 } }
 				/>
 				<Text as="p">{ __( 'No notes available.' ) }</Text>
 				<Text as="p" variant="muted">
@@ -338,7 +321,6 @@ export function Comments( {
 						showCommentBoard={ showCommentBoard }
 						setShowCommentBoard={ setShowCommentBoard }
 						commentSidebarRef={ commentSidebarRef }
-						thread={ { id: 0 } }
 					/>
 				) }
 			{ threads.map( ( thread ) => (
@@ -446,6 +428,7 @@ function Thread( {
 				__( 'Original block deleted. Note: %s' ),
 				commentExcerpt
 		  );
+
 	if ( 'new-note-thread' === thread.id && showCommentBoard && isFloating ) {
 		return (
 			<AddComment
@@ -455,10 +438,8 @@ function Thread( {
 				commentSidebarRef={ commentSidebarRef }
 				reflowComments={ reflowComments }
 				isFloating={ isFloating }
-				thread={ thread }
 				y={ y }
 				refs={ refs }
-				ariaLabel={ ariaLabel }
 			/>
 		);
 	}

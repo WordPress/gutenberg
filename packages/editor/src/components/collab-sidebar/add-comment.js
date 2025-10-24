@@ -33,10 +33,8 @@ export function AddComment( {
 	commentSidebarRef,
 	reflowComments = noop,
 	isFloating = false,
-	thread = {},
 	y,
 	refs,
-	ariaLabel,
 } ) {
 	const { clientId, blockCommentId } = useSelect( ( select ) => {
 		const { getSelectedBlock } = select( blockEditorStore );
@@ -62,12 +60,9 @@ export function AddComment( {
 					'is-floating': isFloating,
 				}
 			) }
-			id={ `comment-thread-${ thread.id }` }
 			spacing="3"
 			tabIndex={ 0 }
 			role="listitem"
-			aria-label={ ariaLabel }
-			aria-expanded
 			ref={ isFloating ? refs.setFloating : undefined }
 			style={ isFloating ? { top: y } : undefined }
 		>
