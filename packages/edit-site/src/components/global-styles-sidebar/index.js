@@ -5,7 +5,7 @@ import { FlexItem, Flex, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { styles, seen, backup } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	store as editorStore,
@@ -31,20 +31,18 @@ export default function GlobalStylesSidebar() {
 	const { query } = useLocation();
 	const { canvas = 'view', name } = query;
 	const {
-		shouldClearCanvasContainerView,
-		isStyleBookOpened,
+		shouldResetNavigation,
+		stylesPath,
+		showStylebook,
 		showListViewByDefault,
 		hasRevisions,
-		isRevisionsOpened,
-		isRevisionsStyleBookOpened,
 		activeComplementaryArea,
 	} = useSelect(
 		( select ) => {
 			const { getActiveComplementaryArea } = select( interfaceStore );
-			const { getEditorCanvasContainerView } = unlock(
+			const { getStylesPath, getShowStylebook } = unlock(
 				select( editSiteStore )
 			);
-			const canvasContainerView = getEditorCanvasContainerView();
 			const _isVisualEditorMode =
 				'visual' === select( editorStore ).getEditorMode();
 			const _isEditCanvasMode = 'edit' === canvas;
@@ -61,8 +59,9 @@ export default function GlobalStylesSidebar() {
 				: undefined;
 
 			return {
-				isStyleBookOpened: 'style-book' === canvasContainerView,
-				shouldClearCanvasContainerView:
+				stylesPath: getStylesPath(),
+				showStylebook: getShowStylebook(),
+				shouldResetNavigation:
 					'edit-site/global-styles' !==
 						getActiveComplementaryArea( 'core' ) ||
 					! _isVisualEditorMode ||
@@ -71,11 +70,6 @@ export default function GlobalStylesSidebar() {
 				hasRevisions:
 					!! globalStyles?._links?.[ 'version-history' ]?.[ 0 ]
 						?.count,
-				isRevisionsStyleBookOpened:
-					'global-styles-revisions:style-book' ===
-					canvasContainerView,
-				isRevisionsOpened:
-					'global-styles-revisions' === canvasContainerView,
 				activeComplementaryArea:
 					select( interfaceStore ).getActiveComplementaryArea(
 						'core'
@@ -84,65 +78,50 @@ export default function GlobalStylesSidebar() {
 		},
 		[ canvas ]
 	);
-	const { setEditorCanvasContainerView } = unlock(
+	const { setStylesPath, setShowStylebook, resetStylesNavigation } = unlock(
 		useDispatch( editSiteStore )
 	);
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const [ globalStylesPath, setGlobalStylesPath ] = useState( '/' );
+
+	// Derive state from path and showStylebook
+	const isRevisionsOpened =
+		stylesPath.startsWith( '/revisions' ) && ! showStylebook;
+	const isRevisionsStyleBookOpened =
+		stylesPath.startsWith( '/revisions' ) && showStylebook;
+
 	const previousActiveArea = usePrevious( activeComplementaryArea );
 
-	// Reset path when sidebar opens
+	// Reset navigation when sidebar opens
 	useEffect( () => {
 		if (
 			activeComplementaryArea === 'edit-site/global-styles' &&
 			previousActiveArea !== 'edit-site/global-styles'
 		) {
-			setGlobalStylesPath( '/' );
+			resetStylesNavigation();
 		}
-	}, [ activeComplementaryArea, previousActiveArea, setGlobalStylesPath ] );
+	}, [ activeComplementaryArea, previousActiveArea, resetStylesNavigation ] );
 
 	useEffect( () => {
-		if ( shouldClearCanvasContainerView ) {
-			setEditorCanvasContainerView( undefined );
+		if ( shouldResetNavigation ) {
+			resetStylesNavigation();
 		}
-	}, [ shouldClearCanvasContainerView, setEditorCanvasContainerView ] );
+	}, [ shouldResetNavigation, resetStylesNavigation ] );
 
 	const { setIsListViewOpened } = useDispatch( editorStore );
 
 	const toggleRevisions = () => {
 		setIsListViewOpened( false );
-		if ( isRevisionsStyleBookOpened ) {
-			setEditorCanvasContainerView( 'style-book' );
-			return;
-		}
-		if ( isRevisionsOpened ) {
-			setEditorCanvasContainerView( undefined );
-			return;
-		}
-
-		if ( isStyleBookOpened ) {
-			setEditorCanvasContainerView(
-				'global-styles-revisions:style-book'
-			);
+		if ( isRevisionsOpened || isRevisionsStyleBookOpened ) {
+			// Close revisions, go back to root
+			setStylesPath( '/' );
 		} else {
-			setEditorCanvasContainerView( 'global-styles-revisions' );
+			// Open revisions
+			setStylesPath( '/revisions' );
 		}
 	};
 	const toggleStyleBook = () => {
-		if ( isRevisionsOpened ) {
-			setEditorCanvasContainerView(
-				'global-styles-revisions:style-book'
-			);
-			return;
-		}
-		if ( isRevisionsStyleBookOpened ) {
-			setEditorCanvasContainerView( 'global-styles-revisions' );
-			return;
-		}
-		setIsListViewOpened( isStyleBookOpened && showListViewByDefault );
-		setEditorCanvasContainerView(
-			isStyleBookOpened ? undefined : 'style-book'
-		);
+		setIsListViewOpened( showStylebook && showListViewByDefault );
+		setShowStylebook( ! showStylebook );
 	};
 
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
@@ -187,12 +166,9 @@ export default function GlobalStylesSidebar() {
 								<Button
 									icon={ seen }
 									label={ __( 'Style Book' ) }
-									isPressed={
-										isStyleBookOpened ||
-										isRevisionsStyleBookOpened
-									}
+									isPressed={ showStylebook }
 									accessibleWhenDisabled
-									disabled={ shouldClearCanvasContainerView }
+									disabled={ shouldResetNavigation }
 									onClick={ toggleStyleBook }
 									size="compact"
 								/>
@@ -218,8 +194,8 @@ export default function GlobalStylesSidebar() {
 			}
 		>
 			<GlobalStylesUI
-				path={ globalStylesPath }
-				onPathChange={ setGlobalStylesPath }
+				path={ stylesPath }
+				onPathChange={ setStylesPath }
 			/>
 		</DefaultSidebar>
 	);

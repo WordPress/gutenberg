@@ -45,11 +45,9 @@ export function GlobalStylesActionMenu() {
 			canEditCSS: !! globalStyles?._links?.[ 'wp:action-edit-css' ],
 		};
 	}, [] );
-	const { setEditorCanvasContainerView } = unlock(
-		useDispatch( editSiteStore )
-	);
+	const { setStylesPath } = unlock( useDispatch( editSiteStore ) );
 	const loadCustomCSS = () => {
-		setEditorCanvasContainerView( 'global-styles-css' );
+		setStylesPath( '/css' );
 	};
 
 	return (
