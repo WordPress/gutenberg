@@ -89,10 +89,17 @@ export function LinkUIPageCreator( {
 				};
 
 				// Show success notice
-				createSuccessNotice( __( 'Page created successfully.' ), {
-					type: 'snackbar',
-					id: 'page-created-success',
-				} );
+				createSuccessNotice(
+					sprintf(
+						__( '%s page created successfully.' ),
+						decodeEntities( savedRecord.title.rendered )
+					),
+					{
+						type: 'snackbar',
+						id: 'page-created-success',
+					}
+				);
+
 
 				onPageCreated( pageLink );
 			}
