@@ -30,9 +30,41 @@ function gutenberg_maintain_templates_routes() {
 	// This should later be changed in core so we don't need initialize
 	// WP_REST_Templates_Controller with a post type.
 	global $wp_post_types;
+	// Register the old templates endpoints. The WP_REST_Templates_Controller
+	// and sub-controllers used linked to the wp_template post type, but are no
+	// longer. They still require a post type object when contructing the class.
+	// To maintain backward and changes to these controller classes, we make use
+	// that the wp_template post type has the right information it needs.
 	$wp_post_types['wp_template']->rest_base = 'templates';
-	$controller                              = new Gutenberg_REST_Old_Templates_Controller( 'wp_template' );
+	// Store the classes so they can be restored.
+	$original_rest_controller_class           = $wp_post_types['wp_template']->rest_controller_class;
+	$original_autosave_rest_controller_class  = $wp_post_types['wp_template']->autosave_rest_controller_class;
+	$original_revisions_rest_controller_class = $wp_post_types['wp_template']->revisions_rest_controller_class;
+	// Temporarily set the old classes.
+	$wp_post_types['wp_template']->rest_controller_class           = 'WP_REST_Templates_Controller';
+	$wp_post_types['wp_template']->autosave_rest_controller_class  = 'WP_REST_Template_Autosaves_Controller';
+	$wp_post_types['wp_template']->revisions_rest_controller_class = 'WP_REST_Template_Revisions_Controller';
+	// Initialize the controllers. The order is important: the autosave
+	// controller needs both the templates and revisions controllers.
+	$controller                                    = new Gutenberg_REST_Old_Templates_Controller( 'wp_template' );
+	$wp_post_types['wp_template']->rest_controller = $controller;
+	$revisions_controller                          = new WP_REST_Template_Revisions_Controller( 'wp_template' );
+	$wp_post_types['wp_template']->revisions_rest_controller = $revisions_controller;
+	$autosaves_controller                                    = new WP_REST_Template_Autosaves_Controller( 'wp_template' );
+	// Unset the controller cache, it will be re-initialized when
+	// get_rest_controller is called.
+	$wp_post_types['wp_template']->rest_controller           = null;
+	$wp_post_types['wp_template']->revisions_rest_controller = null;
+	// Restore the original classes.
+	$wp_post_types['wp_template']->rest_controller_class           = $original_rest_controller_class;
+	$wp_post_types['wp_template']->autosave_rest_controller_class  = $original_autosave_rest_controller_class;
+	$wp_post_types['wp_template']->revisions_rest_controller_class = $original_revisions_rest_controller_class;
+	// Restore the original base.
 	$wp_post_types['wp_template']->rest_base = 'wp_template';
+
+	// Register the old routes.
+	$autosaves_controller->register_routes();
+	$revisions_controller->register_routes();
 	$controller->register_routes();
 
 	// Add the same field as wp_registered_template.
