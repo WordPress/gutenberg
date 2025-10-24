@@ -4,6 +4,12 @@
 
 ### Enhancements
 
+- DataForm: update spacing for regular and card layouts. [#72249](https://github.com/WordPress/gutenberg/pull/72249).
+
+## 10.1.0 (2025-10-21)
+
+### Enhancements
+
 - Dataviews: Use text based buttons for actions instead of text. [#72417](https://github.com/WordPress/gutenberg/pull/72417)
 
 ## 10.0.0 (2025-10-17)
