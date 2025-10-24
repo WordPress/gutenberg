@@ -77,18 +77,6 @@ export default function StylesCanvas() {
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
 	const sectionFocusReturnRef = useFocusReturn();
 
-	function onCloseCanvas() {
-		setIsListViewOpened( showListViewByDefault );
-		resetStylesNavigation();
-	}
-
-	function closeOnEscape( event ) {
-		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
-			event.preventDefault();
-			onCloseCanvas();
-		}
-	}
-
 	// Determine what content to render
 	let content = null;
 
@@ -109,11 +97,22 @@ export default function StylesCanvas() {
 		);
 	}
 
-	const title = getStylesCanvasTitle( stylesPath, showStylebook );
-
 	if ( ! content ) {
 		return null;
 	}
+
+	const title = getStylesCanvasTitle( stylesPath, showStylebook );
+	const onCloseCanvas = () => {
+		setIsListViewOpened( showListViewByDefault );
+		resetStylesNavigation();
+	};
+
+	const closeOnEscape = ( event ) => {
+		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
+			event.preventDefault();
+			onCloseCanvas();
+		}
+	};
 
 	return (
 		<EditorContentSlotFill.Fill>
