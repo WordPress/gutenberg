@@ -517,8 +517,10 @@ test.describe( 'Pattern Overrides', () => {
 			await test.step( 'Zoomed out - pattern as a section', async () => {
 				await page.getByLabel( 'Zoom Out' ).click();
 
-				// In zoomed out only the pattern block is editable,
-				// as in this scenario it's a section.
+				// Zoom level is now decoupled from editing modes, so the inert
+				// state should be the same as when zoomed in.
+				// The child blocks with overrides/bindings are editable,
+				// and blocks without are inert.
 				await expect( patternBlock ).not.toHaveAttribute(
 					'inert',
 					'true'
@@ -528,11 +530,11 @@ test.describe( 'Pattern Overrides', () => {
 				// to ensure the click-through behavior isn't interfering.
 				await editor.selectBlocks( patternBlock );
 
-				await expect( blockWithOverrides ).toHaveAttribute(
+				await expect( blockWithOverrides ).not.toHaveAttribute(
 					'inert',
 					'true'
 				);
-				await expect( blockWithBindings ).toHaveAttribute(
+				await expect( blockWithBindings ).not.toHaveAttribute(
 					'inert',
 					'true'
 				);
@@ -548,7 +550,9 @@ test.describe( 'Pattern Overrides', () => {
 			await editor.clickBlockOptionsMenuItem( 'Group' );
 
 			await test.step( 'Zoomed out - pattern nested in a section', async () => {
-				// None of the pattern is editable in zoomed out when nested in a section.
+				// With zoom decoupled from editing modes, the inert state depends on
+				// whether the blocks are synced patterns (not editable from instance).
+				// Since this pattern is a synced pattern, all blocks are inert.
 				await expect( blockWithOverrides ).toHaveAttribute(
 					'inert',
 					'true'

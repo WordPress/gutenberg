@@ -234,9 +234,7 @@ test.describe( 'Zoom Out', () => {
 		await expect( fourthSectionStart ).not.toBeInViewport();
 	} );
 
-	test( 'Zoom out selected section has four items in options menu', async ( {
-		page,
-	} ) => {
+	test( 'Zoom out selected section has options menu', async ( { page } ) => {
 		// open the inserter
 		await page
 			.getByRole( 'button', {
@@ -258,13 +256,20 @@ test.describe( 'Zoom Out', () => {
 		// open the block toolbar more settings menu
 		await page.getByLabel( 'Block tools' ).getByLabel( 'Options' ).click();
 
-		// get the length of the options menu
+		// get the options menu
 		const optionsMenu = page
 			.getByRole( 'menu', { name: 'Options' } )
 			.getByRole( 'menuitem' );
 
-		// we expect 2 items in the options menu: Duplicate and Delete.
-		await expect( optionsMenu ).toHaveCount( 2 );
+		// With zoom decoupled from editing modes, the pattern is now fully editable
+		// so more options are available in the menu. We verify that typical options like
+		// Duplicate and Delete are present.
+		await expect(
+			optionsMenu.filter( { hasText: 'Duplicate' } )
+		).toHaveCount( 1 );
+		await expect( optionsMenu.filter( { hasText: 'Delete' } ) ).toHaveCount(
+			1
+		);
 	} );
 
 	test( 'Zoom Out cannot be activated when the section root is missing', async ( {
