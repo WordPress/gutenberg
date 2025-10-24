@@ -51,13 +51,22 @@ function CoverContainer( {
 	additionalStyles = {},
 	children,
 } ) {
-	const [ width, setWidth ] = useState( selectedElement.offsetWidth );
-	const [ height, setHeight ] = useState( selectedElement.offsetHeight );
+	const [ width, setWidth ] = useState( () => {
+		const rect = selectedElement.getBoundingClientRect();
+		return rect.width;
+	} );
+	const [ height, setHeight ] = useState( () => {
+		const rect = selectedElement.getBoundingClientRect();
+		return rect.height;
+	} );
 
 	useEffect( () => {
 		const observer = new window.ResizeObserver( () => {
-			setWidth( selectedElement.offsetWidth );
-			setHeight( selectedElement.offsetHeight );
+			// Use getBoundingClientRect to get correct sizes when the
+			// editor is zoomed in or out, accounting for any scaling.
+			const rect = selectedElement.getBoundingClientRect();
+			setWidth( rect.width );
+			setHeight( rect.height );
 		} );
 		observer.observe( selectedElement, { box: 'border-box' } );
 		return () => observer.disconnect();
