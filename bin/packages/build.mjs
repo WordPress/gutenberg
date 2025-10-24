@@ -91,7 +91,9 @@ async function getPackageInfo( packageName ) {
 			packageJson = (
 				await import( packageJsonPath, { with: { type: 'json' } } )
 			).default;
-		} catch {}
+		} catch {
+			packageJson = null;
+		}
 
 		packageJsonCache.set( packageName, packageJson );
 	}
