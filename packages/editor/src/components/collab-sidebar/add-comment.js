@@ -48,7 +48,7 @@ export function AddComment( {
 			spacing="3"
 			tabIndex={ 0 }
 			role="treeitem"
-			aria-label={ __( 'New Note' ) }
+			aria-label={ __( 'New note' ) }
 		>
 			<HStack alignment="left" spacing="3">
 				<CommentAuthorInfo />
@@ -64,7 +64,7 @@ export function AddComment( {
 					blockElement?.focus();
 				} }
 				submitButtonText={ __( 'Add note' ) }
-				labelText={ __( 'New Note' ) }
+				labelText={ __( 'New note' ) }
 			/>
 		</VStack>
 	);
