@@ -16,8 +16,9 @@
 		"noEmit": true,
 		"outDir": ".cache"
 	},
-	"include": [ "." ],
 	"exclude": [
+		// Do not add to this list! The reason these are excluded is because
+		// they have existing issues which need to be resolved. Fix them up!
 		"plugin/commands/test/changelog.js",
 		"plugin/commands/test/common.js",
 		"api-docs/are-api-docs-unstaged.js",
