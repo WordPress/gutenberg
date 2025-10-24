@@ -22,7 +22,6 @@ import { useServerSideRender } from '@wordpress/server-side-render';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const separatorDefaultValue = '/';
-const prefersTaxonomyDefaultValue = false;
 
 export default function BreadcrumbEdit( {
 	attributes,
@@ -141,11 +140,10 @@ export default function BreadcrumbEdit( {
 		}
 		if ( templateSlug && ! postId ) {
 			placeholderItems.push( __( 'Page' ) );
+		} else if ( _showTerms ) {
+			placeholderItems.push( __( 'Category' ) );
 		} else {
-			placeholderItems.push(
-				_showTerms ? __( 'Category' ) : __( 'Ancestor' ),
-				__( 'Parent' )
-			);
+			placeholderItems.push( __( 'Ancestor' ), __( 'Parent' ) );
 		}
 		placeholder = (
 			<nav
@@ -178,7 +176,6 @@ export default function BreadcrumbEdit( {
 						setAttributes( {
 							separator: separatorDefaultValue,
 							showHomeLink: true,
-							prefersTaxonomy: prefersTaxonomyDefaultValue,
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
