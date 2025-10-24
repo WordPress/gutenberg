@@ -83,12 +83,14 @@ function NotesSidebarContent( {
 	);
 }
 
-function NotesSidebar( { postId } ) {
+function NotesSidebar( { postId, mode } ) {
 	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const commentSidebarRef = useRef( null );
+
+	const showFloatingSidebar = isLargeViewport && mode === 'post-only';
 
 	const blockCommentId = useSelect( ( select ) => {
 		const { getBlockAttributes, getSelectedBlockClientId } =
@@ -107,7 +109,7 @@ function NotesSidebar( { postId } ) {
 		commentLastUpdated,
 	} = useBlockComments( postId );
 	useEnableFloatingSidebar(
-		isLargeViewport &&
+		showFloatingSidebar &&
 			( unresolvedSortedThreads.length > 0 || showCommentBoard )
 	);
 
@@ -130,7 +132,9 @@ function NotesSidebar( { postId } ) {
 		if ( ! activeNotesArea ) {
 			enableComplementaryArea(
 				'core',
-				isLargeViewport ? collabSidebarName : collabHistorySidebarName
+				showFloatingSidebar
+					? collabSidebarName
+					: collabHistorySidebarName
 			);
 		}
 
@@ -175,7 +179,7 @@ function NotesSidebar( { postId } ) {
 					commentLastUpdated={ commentLastUpdated }
 				/>
 			</PluginSidebar>
-			{ isLargeViewport && (
+			{ showFloatingSidebar && (
 				<PluginSidebar
 					isPinnable={ false }
 					header={ false }
@@ -203,9 +207,12 @@ function NotesSidebar( { postId } ) {
 }
 
 export default function NotesSidebarContainer() {
-	const postId = useSelect( ( select ) => {
-		const { getCurrentPostId } = select( editorStore );
-		return getCurrentPostId();
+	const { postId, mode } = useSelect( ( select ) => {
+		const { getCurrentPostId, getRenderingMode } = select( editorStore );
+		return {
+			postId: getCurrentPostId(),
+			mode: getRenderingMode(),
+		};
 	}, [] );
 
 	if ( ! postId || typeof postId !== 'number' ) {
@@ -214,7 +221,7 @@ export default function NotesSidebarContainer() {
 
 	return (
 		<PostTypeSupportCheck supportKeys="editor.notes">
-			<NotesSidebar postId={ postId } />
+			<NotesSidebar postId={ postId } mode={ mode } />
 		</PostTypeSupportCheck>
 	);
 }
