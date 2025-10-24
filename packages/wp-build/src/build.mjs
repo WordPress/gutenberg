@@ -13,9 +13,8 @@ import chokidar from 'chokidar';
 // See https://github.com/WordPress/gutenberg/issues/72136
 // eslint-disable-next-line import/no-unresolved
 import browserslistToEsbuild from 'browserslist-to-esbuild';
-import { sassPlugin } from 'esbuild-sass-plugin';
+import { sassPlugin, postcssModules } from 'esbuild-sass-plugin';
 import postcss from 'postcss';
-import postcssModulesPlugin from 'postcss-modules';
 import autoprefixer from 'autoprefixer';
 import rtlcss from 'rtlcss';
 import cssnano from 'cssnano';
@@ -38,6 +37,7 @@ const PACKAGES_DIR = path.join( ROOT_DIR, 'packages' );
 const BUILD_DIR = path.join( ROOT_DIR, 'build' );
 
 const SOURCE_EXTENSIONS = '{js,ts,tsx}';
+const ASSET_EXTENSIONS = '{json,module.css}';
 const IGNORE_PATTERNS = [
 	'**/benchmark/**',
 	'**/{__mocks__,__tests__,test}/**',
@@ -309,6 +309,12 @@ async function bundlePackage( packageName ) {
 				'iife',
 				packageJson.wpScriptExtraDependencies || []
 			),
+			sassPlugin( {
+				embedded: true,
+				filter: /\.module\.css$/,
+				transform: postcssModules( {} ),
+				type: 'style',
+			} ),
 		];
 
 		builds.push(
@@ -789,8 +795,10 @@ async function transpilePackage( packageName ) {
 		}
 	);
 
-	const jsonFiles = await glob(
-		normalizePath( path.join( packageDir, 'src/**/*.json' ) ),
+	const assetFiles = await glob(
+		normalizePath(
+			path.join( packageDir, `src/**/*.${ ASSET_EXTENSIONS }` )
+		),
 		{
 			ignore: IGNORE_PATTERNS,
 		}
@@ -828,13 +836,13 @@ async function transpilePackage( packageName ) {
 			} )
 		);
 
-		for ( const jsonFile of jsonFiles ) {
-			const relativePath = path.relative( srcDir, jsonFile );
+		for ( const assetFile of assetFiles ) {
+			const relativePath = path.relative( srcDir, assetFile );
 			const destPath = path.join( buildDir, relativePath );
 			const destDir = path.dirname( destPath );
 			builds.push(
 				mkdir( destDir, { recursive: true } ).then( () =>
-					copyFile( jsonFile, destPath )
+					copyFile( assetFile, destPath )
 				)
 			);
 		}
@@ -860,7 +868,7 @@ async function transpilePackage( packageName ) {
 			} )
 		);
 
-		for ( const jsonFile of jsonFiles ) {
+		for ( const jsonFile of assetFiles ) {
 			const relativePath = path.relative( srcDir, jsonFile );
 			const destPath = path.join( buildModuleDir, relativePath );
 			const destDir = path.dirname( destPath );
@@ -882,9 +890,9 @@ async function transpilePackage( packageName ) {
 /**
  * Compile styles for a single package.
  *
- * Discovers and compiles SCSS entry points based on package configuration
- * (supporting wpStyleEntryPoints in package.json for custom entry point patterns),
- * and all .module.css files in src/ directory.
+ * Discovers and compiles SCSS entry points based on package configuration,
+ * supporting wpStyleEntryPoints in package.json for custom entry point
+ * patterns.
  *
  * @param {string} packageName Package name.
  * @return {Promise<number|null>} Build time in milliseconds, or null if no styles.
@@ -907,77 +915,13 @@ async function compileStyles( packageName ) {
 		)
 	);
 
-	// Get CSS modules from anywhere in src/
-	const cssModuleEntries = await glob(
-		normalizePath( path.join( packageDir, 'src/**/*.module.css' ) ),
-		{ ignore: IGNORE_PATTERNS }
-	);
-
-	if ( scssEntries.length === 0 && cssModuleEntries.length === 0 ) {
+	if ( scssEntries.length === 0 ) {
 		return null;
 	}
 
 	const startTime = Date.now();
 	const buildStyleDir = path.join( packageDir, 'build-style' );
 	const srcDir = path.join( packageDir, 'src' );
-
-	// Process .module.css files and generate JS modules
-	const cssResults = await Promise.all(
-		cssModuleEntries.map( async ( styleEntryPath ) => {
-			const buildDir = path.join( packageDir, 'build' );
-			const buildModuleDir = path.join( packageDir, 'build-module' );
-
-			const cssContent = await readFile( styleEntryPath, 'utf8' );
-			const relativePath = path.relative( srcDir, styleEntryPath );
-
-			let mappings = {};
-			const result = await postcss( [
-				postcssModulesPlugin( {
-					getJSON: ( _, json ) => ( mappings = json ),
-				} ),
-			] ).process( cssContent, { from: styleEntryPath } );
-
-			// Write processed CSS to build-style (preserving directory structure)
-			const cssOutPath = path.join(
-				buildStyleDir,
-				relativePath.replace( '.module.css', '.css' )
-			);
-			await mkdir( path.dirname( cssOutPath ), { recursive: true } );
-			await writeFile( cssOutPath, result.css );
-
-			// Generate JS modules with class name mappings (preserving directory structure)
-			const jsExport = JSON.stringify( mappings );
-			const jsPath = `${ relativePath }.js`;
-			await Promise.all( [
-				mkdir( path.dirname( path.join( buildDir, jsPath ) ), {
-					recursive: true,
-				} ),
-				mkdir( path.dirname( path.join( buildModuleDir, jsPath ) ), {
-					recursive: true,
-				} ),
-			] );
-			await Promise.all( [
-				writeFile(
-					path.join( buildDir, jsPath ),
-					`"use strict";\nmodule.exports = ${ jsExport };\n`
-				),
-				writeFile(
-					path.join( buildModuleDir, jsPath ),
-					`export default ${ jsExport };\n`
-				),
-			] );
-
-			// Return the processed CSS for combining
-			return result.css;
-		} )
-	);
-
-	// Generate combined stylesheet from all CSS modules
-	if ( cssResults.length > 0 ) {
-		const combinedCss = cssResults.join( '\n' );
-		await mkdir( buildStyleDir, { recursive: true } );
-		await writeFile( path.join( buildStyleDir, 'style.css' ), combinedCss );
-	}
 
 	// Process SCSS files
 	await Promise.all(
