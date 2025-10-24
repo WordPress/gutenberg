@@ -4,11 +4,6 @@
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
 
-/**
- * Internal dependencies
- */
-import { cleanEmptyObject } from './utils';
-
 const META_ATTRIBUTE_NAME = 'metadata';
 
 /**
@@ -104,13 +99,13 @@ export function addTransforms( result, source, index, results ) {
 	if ( Object.keys( preservedMetadata ).length > 0 ) {
 		return {
 			...result,
-			attributes: cleanEmptyObject( {
+			attributes: {
 				...result.attributes,
 				metadata: {
 					...result.attributes.metadata,
 					...preservedMetadata,
 				},
-			} ),
+			},
 		};
 	}
 	return result;
