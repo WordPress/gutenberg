@@ -6,8 +6,7 @@ import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import {
 	ToggleControl,
 	TextControl,
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	CheckboxControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	Spinner,
@@ -240,44 +239,24 @@ export default function BreadcrumbEdit( {
 							} }
 						/>
 					</ToolsPanelItem>
-					<ToolsPanelItem
-						label={ __( 'Post breadcrumbs type' ) }
-						hasValue={ () =>
-							postBreadcrumbsType !==
-							postBreadcrumbsTypeDefaultValue
-						}
-						onDeselect={ () =>
-							setAttributes( {
-								postBreadcrumbsType:
-									postBreadcrumbsTypeDefaultValue,
-							} )
-						}
-						isShownByDefault
-					>
-						<ToggleGroupControl
-							__nextHasNoMarginBottom
-							__next40pxDefaultSize
-							isBlock
-							label={ __( 'Type' ) }
-							value={ postBreadcrumbsType }
-							onChange={ ( value ) =>
-								setAttributes( { postBreadcrumbsType: value } )
-							}
-							help={ __(
-								'For hierarchical post types with taxonomies, the breadcrumbs trail can consist of either the post ancestors or its assigned terms.'
-							) }
-						>
-							<ToggleGroupControlOption
-								value="postWithAncestors"
-								label={ __( 'With ancestors' ) }
-							/>
-							<ToggleGroupControlOption
-								value="postWithTerms"
-								label={ __( 'With terms' ) }
-							/>
-						</ToggleGroupControl>
-					</ToolsPanelItem>
 				</ToolsPanel>
+			</InspectorControls>
+			<InspectorControls group="advanced">
+				<CheckboxControl
+					__nextHasNoMarginBottom
+					label={ __( 'Prefer taxonomy terms' ) }
+					checked={ postBreadcrumbsType === 'postWithTerms' }
+					onChange={ ( value ) =>
+						setAttributes( {
+							postBreadcrumbsType: value
+								? 'postWithTerms'
+								: 'postWithAncestors',
+						} )
+					}
+					help={ __(
+						'The exact type of breadcrumbs shown will vary automatically depending on the page in which this block is displayed. In the specific case of a hierarchical post type with taxonomies, the breadcrumbs can either reflect its post hierarchy (default) or the hierarchy of its assigned taxonomy terms.'
+					) }
+				/>
 			</InspectorControls>
 			<div { ...blockProps }>
 				{ showPlaceholder ? (
