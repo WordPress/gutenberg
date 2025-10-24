@@ -44,7 +44,7 @@ function wp_latest_comments_draft_or_post_title( $post = 0 ) {
  */
 function render_block_core_latest_comments( $attributes ) {
 	// Handle backward compatibility: check for old displayExcerpt attribute
-	if ( ! isset( $attributes['displayContent'] ) && isset( $attributes['displayExcerpt'] ) ) {
+	if ( isset( $attributes['displayExcerpt'] ) ) {
 		$display_content = $attributes['displayExcerpt'] ? 'excerpt' : 'none';
 	} else {
 		$display_content = isset( $attributes['displayContent'] ) ? $attributes['displayContent'] : 'excerpt';

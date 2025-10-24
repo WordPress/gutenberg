@@ -25,7 +25,7 @@
 		"displayContent": {
 			"type": "string",
 			"default": "excerpt",
-			"enum": ["none", "excerpt", "full"]
+			"enum": [ "none", "excerpt", "full" ]
 		}
 	},
 	"supports": {

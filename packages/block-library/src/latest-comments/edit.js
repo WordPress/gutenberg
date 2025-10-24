@@ -32,12 +32,8 @@ const MIN_COMMENTS = 1;
 const MAX_COMMENTS = 100;
 
 export default function LatestComments( { attributes, setAttributes } ) {
-	// Handle backward compatibility in the editor
-	const displayContent =
-		attributes.displayContent ||
-		( attributes.displayExcerpt === false ? 'none' : 'excerpt' );
-
-	const { commentsToShow, displayAvatar, displayDate } = attributes;
+	
+	const { commentsToShow, displayAvatar, displayDate, displayContent } = attributes;
 
 	const serverSideAttributes = {
 		...attributes,
@@ -112,6 +108,7 @@ export default function LatestComments( { attributes, setAttributes } ) {
 					>
 						<SelectControl
 							__nextHasNoMarginBottom
+							__next40pxDefaultSize
 							label={ __( 'Display content' ) }
 							value={ displayContent }
 							options={ [
