@@ -11,10 +11,7 @@ import { uploadMedia } from '@wordpress/media-utils';
 /**
  * Internal dependencies
  */
-import { GlobalStylesStyleBook } from './style-book-integration';
-import { GlobalStylesRevisions } from './revisions-integration';
 import { GlobalStylesBlockLink } from './block-link';
-import { GlobalStylesEditorCanvasContainerLink } from './canvas-link';
 import { useGlobalStyles } from './hooks';
 
 /**
@@ -117,16 +114,7 @@ export default function GlobalStylesUIWrapper( { path, onPathChange } ) {
 				serverCSS={ serverCSS }
 				serverSettings={ serverSettings }
 			/>
-			<GlobalStylesStyleBook
-				path={ path }
-				onPathChange={ onPathChange }
-			/>
-			<GlobalStylesRevisions path={ path } />
 			<GlobalStylesBlockLink
-				path={ path }
-				onPathChange={ onPathChange }
-			/>
-			<GlobalStylesEditorCanvasContainerLink
 				path={ path }
 				onPathChange={ onPathChange }
 			/>

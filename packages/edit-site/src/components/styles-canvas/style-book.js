@@ -1,40 +1,28 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../lock-unlock';
-import { store as editSiteStore } from '../../store';
 import StyleBook from '../style-book';
 import { STYLE_BOOK_COLOR_GROUPS } from '../style-book/constants';
 
 /**
- * Style Book integration - renders conditionally when style book is active.
+ * Style Book content component for global styles.
+ * Provides the business logic for StyleBook behavior in the global styles context.
  *
- * @param {Object}   props              Component props.
- * @param {string}   props.path         Current path in the style book.
- * @param {Function} props.onPathChange Callback when the path changes.
- * @return {JSX.Element|null} The Style Book component or null.
+ * @param {Object}                       props              Component props.
+ * @param {string}                       props.path         Current path in global styles.
+ * @param {Function}                     props.onPathChange Callback when the path changes.
+ * @param {import('react').ForwardedRef} ref                Ref to the Style Book component.
+ * @return {JSX.Element} The Style Book component.
  */
-export function GlobalStylesStyleBook( { path, onPathChange } ) {
-	const editorCanvasContainerView = useSelect(
-		( select ) =>
-			unlock( select( editSiteStore ) ).getEditorCanvasContainerView(),
-		[]
-	);
-
-	if (
-		editorCanvasContainerView !== 'style-book' &&
-		editorCanvasContainerView !== 'global-styles-revisions:style-book'
-	) {
-		return null;
-	}
-
+function StylesCanvasStyleBook( { path, onPathChange }, ref ) {
 	return (
 		<StyleBook
+			ref={ ref }
 			isSelected={ ( blockName ) =>
 				// Match '/blocks/core%2Fbutton' and
 				// '/blocks/core%2Fbutton/typography', but not
@@ -66,3 +54,4 @@ export function GlobalStylesStyleBook( { path, onPathChange } ) {
 		/>
 	);
 }
+export default forwardRef( StylesCanvasStyleBook );

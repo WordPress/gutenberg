@@ -151,11 +151,11 @@ export default function PageTemplates() {
 	const records = useMemo( () => {
 		return _records.map( ( record ) => ( {
 			...record,
-			_isActive: activeTemplates.find(
+			_isActive: !! activeTemplates.find(
 				( template ) => template.id === record.id
 			),
 			_isCustom:
-				record.is_custom ||
+				record.is_custom ??
 				( ! record.meta?.is_wp_suggestion &&
 					! defaultTemplateTypes.find(
 						( type ) => type.slug === record.slug

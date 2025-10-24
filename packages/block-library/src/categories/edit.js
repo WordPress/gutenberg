@@ -189,12 +189,16 @@ export default function CategoriesEdit( {
 			? 'ul'
 			: 'div';
 
-	const classes = clsx( className, {
-		'wp-block-categories-list':
-			!! categories?.length && ! displayAsDropdown && ! isResolving,
-		'wp-block-categories-dropdown':
-			!! categories?.length && displayAsDropdown && ! isResolving,
-	} );
+	const classes = clsx(
+		className,
+		`wp-block-categories-taxonomy-${ taxonomySlug }`,
+		{
+			'wp-block-categories-list':
+				!! categories?.length && ! displayAsDropdown && ! isResolving,
+			'wp-block-categories-dropdown':
+				!! categories?.length && displayAsDropdown && ! isResolving,
+		}
+	);
 
 	const blockProps = useBlockProps( {
 		className: classes,
