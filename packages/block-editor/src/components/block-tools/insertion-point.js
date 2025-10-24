@@ -168,7 +168,6 @@ function InbetweenInsertionPointPopover( {
 	// Other operations such as "group" are when the editor tries to create a row
 	// block by grouping the block being dragged with the block it's being dropped
 	// onto.
-	// @ZOOMOUTMODE
 	if ( isZoomOutMode && operation !== 'insert' ) {
 		return null;
 	}
