@@ -64,7 +64,12 @@ export function AddComment( {
 			tabIndex={ 0 }
 			role="listitem"
 			ref={ isFloating ? refs.setFloating : undefined }
-			style={ isFloating ? { top: y } : undefined }
+			style={
+				isFloating
+					? // Delay showing the floating note box until a Y position is known to prevent blink.
+					  { top: y, opacity: ! y ? 0 : undefined }
+					: undefined
+			}
 			onBlur={ ( event ) => {
 				if ( event.currentTarget.contains( event.relatedTarget ) ) {
 					return;
