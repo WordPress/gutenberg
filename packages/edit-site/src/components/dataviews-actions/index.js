@@ -38,10 +38,9 @@ export const useSetActiveTemplateAction = () => {
 					return false;
 				}
 
-				// If it's not a created template but a registered template
-				// (which means the source property is set), only allow
-				// activating (so when it's inactive).
-				if ( item.source ) {
+				// If it's not a created template but a registered template,
+				// only allow activating (so when it's inactive).
+				if ( typeof item.id !== 'number' ) {
 					return item._isActive === false;
 				}
 
