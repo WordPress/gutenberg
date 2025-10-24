@@ -22,7 +22,7 @@ import apiFetch from '@wordpress/api-fetch';
 /**
  * Internal dependencies
  */
-import { getItemTitle, isTemplateOrTemplatePart } from './utils';
+import { getItemTitle } from './utils';
 import type { CoreDataError, Template, TemplatePart } from '../types';
 
 const isTemplateRevertable = (
@@ -180,10 +180,9 @@ const resetPostAction: Action< Template | TemplatePart > = {
 	label: __( 'Reset' ),
 	isEligible: ( item ) => {
 		return (
-			isTemplateOrTemplatePart( item ) &&
+			item.type === 'wp_template_part' &&
 			item?.source === 'custom' &&
-			( Boolean( item.type === 'wp_template' && item?.plugin ) ||
-				item?.has_theme_file )
+			item?.has_theme_file
 		);
 	},
 	icon: backup,
