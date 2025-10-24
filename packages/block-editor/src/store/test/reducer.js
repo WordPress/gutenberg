@@ -3830,7 +3830,7 @@ describe( 'state', () => {
 				expect( derivedBlockEditingModes ).toEqual( new Map() );
 			} );
 
-			it( 'returns the expected block editing modes for synced patterns when switching to zoomed out mode', () => {
+			it( 'does not change block editing modes when switching to zoomed out mode', () => {
 				const { derivedBlockEditingModes } = dispatchActions(
 					[
 						{
@@ -3842,18 +3842,15 @@ describe( 'state', () => {
 					initialState
 				);
 
+				// Zoom level is decoupled from editing modes, so switching to
+				// zoomed out mode should not affect the derived editing modes.
+				// The modes should remain based on synced patterns and template locking.
 				expect( derivedBlockEditingModes ).toEqual(
 					new Map(
 						Object.entries( {
-							'': 'contentOnly', // Section root.
-							'group-1': 'contentOnly', // Section.
-							'paragraph-1': 'disabled',
-							'group-2': 'disabled',
-							'paragraph-2': 'disabled',
-							'root-pattern': 'contentOnly', // Pattern and section.
 							'pattern-paragraph': 'disabled',
 							'pattern-group': 'disabled',
-							'pattern-paragraph-with-overrides': 'disabled',
+							'pattern-paragraph-with-overrides': 'contentOnly',
 							'nested-pattern': 'disabled',
 							'nested-paragraph': 'disabled',
 							'nested-group': 'disabled',
@@ -4022,17 +4019,11 @@ describe( 'state', () => {
 				);
 			} );
 
-			it( 'returns the expected block editing modes', () => {
+			it( 'returns empty block editing modes since zoom does not affect editing modes', () => {
+				// Zoom level is decoupled from editing modes, so even when
+				// zoomed out with sections, no derived editing modes should be set.
 				expect( initialState.derivedBlockEditingModes ).toEqual(
-					new Map(
-						Object.entries( {
-							'': 'contentOnly', // Section root.
-							'group-1': 'contentOnly', // Section block.
-							'paragraph-1': 'disabled',
-							'group-2': 'disabled',
-							'paragraph-2': 'disabled',
-						} )
-					)
+					new Map()
 				);
 			} );
 
@@ -4048,15 +4039,7 @@ describe( 'state', () => {
 					initialState
 				);
 
-				expect( derivedBlockEditingModes ).toEqual(
-					new Map(
-						Object.entries( {
-							'': 'contentOnly',
-							'group-1': 'contentOnly',
-							'paragraph-1': 'disabled',
-						} )
-					)
-				);
+				expect( derivedBlockEditingModes ).toEqual( new Map() );
 			} );
 
 			it( 'updates block editing modes when new blocks are inserted', () => {
@@ -4092,20 +4075,7 @@ describe( 'state', () => {
 					initialState
 				);
 
-				expect( derivedBlockEditingModes ).toEqual(
-					new Map(
-						Object.entries( {
-							'': 'contentOnly', // Section root.
-							'group-1': 'contentOnly', // Section block.
-							'paragraph-1': 'disabled',
-							'group-2': 'disabled',
-							'paragraph-2': 'disabled',
-							'group-3': 'contentOnly', // New section block.
-							'paragraph-3': 'disabled',
-							'group-4': 'disabled',
-						} )
-					)
-				);
+				expect( derivedBlockEditingModes ).toEqual( new Map() );
 			} );
 
 			it( 'updates block editing modes when blocks are moved to a new position', () => {
@@ -4121,17 +4091,9 @@ describe( 'state', () => {
 					testReducer,
 					initialState
 				);
-				expect( derivedBlockEditingModes ).toEqual(
-					new Map(
-						Object.entries( {
-							'': 'contentOnly', // Section root.
-							'group-1': 'contentOnly', // Section block.
-							'paragraph-1': 'disabled',
-							'group-2': 'contentOnly', // New section block.
-							'paragraph-2': 'disabled',
-						} )
-					)
-				);
+				// Zoom level is decoupled from editing modes, so moving blocks
+				// should not create derived editing modes when zoom is set.
+				expect( derivedBlockEditingModes ).toEqual( new Map() );
 			} );
 
 			it( 'handles changes to the section root', () => {
@@ -4148,17 +4110,9 @@ describe( 'state', () => {
 					initialState
 				);
 
-				expect( derivedBlockEditingModes ).toEqual(
-					new Map(
-						Object.entries( {
-							'': 'disabled',
-							'group-1': 'contentOnly', // New section root.
-							'paragraph-1': 'contentOnly', // Section block.
-							'group-2': 'contentOnly', // Section block.
-							'paragraph-2': 'disabled',
-						} )
-					)
-				);
+				// Zoom level is decoupled from editing modes, so changing the
+				// section root should not affect derived editing modes when in zoom mode.
+				expect( derivedBlockEditingModes ).toEqual( new Map() );
 			} );
 		} );
 
