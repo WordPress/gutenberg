@@ -22,23 +22,14 @@ import { useServerSideRender } from '@wordpress/server-side-render';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const separatorDefaultValue = '/';
-const postBreadcrumbsTypeDefaultValue = 'postWithAncestors';
-
-const BREADCRUMB_TYPES = {
-	postWithAncestors: {
-		placeholderItems: [ __( 'Ancestor' ), __( 'Parent' ) ],
-	},
-	postWithTerms: {
-		placeholderItems: [ __( 'Category' ) ],
-	},
-};
+const prefersTaxonomyDefaultValue = false;
 
 export default function BreadcrumbEdit( {
 	attributes,
 	setAttributes,
 	context: { postId, postType, templateSlug },
 } ) {
-	const { separator, showHomeLink, postBreadcrumbsType } = attributes;
+	const { separator, showHomeLink, prefersTaxonomy } = attributes;
 	const {
 		post,
 		isPostTypeHierarchical,
@@ -121,18 +112,15 @@ export default function BreadcrumbEdit( {
 	}
 
 	// Determine breadcrumb type for accurate previews (matching PHP logic).
-	let breadcrumbsType;
+	let _showTerms;
 	if ( ! isPostTypeHierarchical ) {
-		breadcrumbsType = 'postWithTerms';
+		_showTerms = true;
 	} else if ( ! postTypeHasTaxonomies ) {
 		// Hierarchical post type without taxonomies can only use ancestors.
-		breadcrumbsType = 'postWithAncestors';
+		_showTerms = false;
 	} else {
-		// For hierarchical post types with taxonomies, use the attribute if valid.
-		const supportedTypes = [ 'postWithAncestors', 'postWithTerms' ];
-		breadcrumbsType = supportedTypes.includes( postBreadcrumbsType )
-			? postBreadcrumbsType
-			: 'postWithAncestors';
+		// For hierarchical post types with taxonomies, use the attribute.
+		_showTerms = prefersTaxonomy;
 	}
 	let placeholder = null;
 	// This is fragile because this block is server side rendered and we'll have to
@@ -144,17 +132,21 @@ export default function BreadcrumbEdit( {
 		// This is needed because when we are showing the template in post editor we
 		// want to show the real breadcrumbs if we have the post type.
 		( templateSlug && ! postType ) ||
-		( breadcrumbsType === 'postWithAncestors' &&
-			! isPostTypeHierarchical ) ||
-		( breadcrumbsType === 'postWithTerms' && ! hasTermsAssigned );
+		( ! _showTerms && ! isPostTypeHierarchical ) ||
+		( _showTerms && ! hasTermsAssigned );
 	if ( showPlaceholder ) {
-		const placeholderItems = [
-			showHomeLink && __( 'Home' ),
-			// For now if we are adding this in a template show a generic placeholder.
-			...( templateSlug && ! postId
-				? [ __( 'Page' ) ]
-				: BREADCRUMB_TYPES[ breadcrumbsType ]?.placeholderItems || [] ),
-		].filter( Boolean );
+		const placeholderItems = [];
+		if ( showHomeLink ) {
+			placeholderItems.push( __( 'Home' ) );
+		}
+		if ( templateSlug && ! postId ) {
+			placeholderItems.push( __( 'Page' ) );
+		} else {
+			placeholderItems.push(
+				_showTerms ? __( 'Category' ) : __( 'Ancestor' ),
+				__( 'Parent' )
+			);
+		}
 		placeholder = (
 			<nav
 				style={ {
@@ -186,8 +178,7 @@ export default function BreadcrumbEdit( {
 						setAttributes( {
 							separator: separatorDefaultValue,
 							showHomeLink: true,
-							postBreadcrumbsType:
-								postBreadcrumbsTypeDefaultValue,
+							prefersTaxonomy: prefersTaxonomyDefaultValue,
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
@@ -245,13 +236,9 @@ export default function BreadcrumbEdit( {
 				<CheckboxControl
 					__nextHasNoMarginBottom
 					label={ __( 'Prefer taxonomy terms' ) }
-					checked={ postBreadcrumbsType === 'postWithTerms' }
+					checked={ prefersTaxonomy }
 					onChange={ ( value ) =>
-						setAttributes( {
-							postBreadcrumbsType: value
-								? 'postWithTerms'
-								: 'postWithAncestors',
-						} )
+						setAttributes( { prefersTaxonomy: value } )
 					}
 					help={ __(
 						'The exact type of breadcrumbs shown will vary automatically depending on the page in which this block is displayed. In the specific case of a hierarchical post type with taxonomies, the breadcrumbs can either reflect its post hierarchy (default) or the hierarchy of its assigned taxonomy terms.'

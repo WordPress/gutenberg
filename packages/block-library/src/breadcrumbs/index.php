@@ -53,8 +53,19 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 			return '';
 		}
 
-		$breadcrumbs_type = block_core_breadcrumbs_get_breadcrumbs_type( $post_type, $attributes );
-		if ( 'postWithAncestors' === $breadcrumbs_type ) {
+		// Determine breadcrumb type for accurate rendering (matching JavaScript logic).
+		$show_terms = false;
+		if ( ! is_post_type_hierarchical( $post_type ) ) {
+			$show_terms = true;
+		} elseif ( empty( get_object_taxonomies( $post_type, 'objects' ) ) ) {
+			// Hierarchical post type without taxonomies can only use ancestors.
+			$show_terms = false;
+		} else {
+			// For hierarchical post types with taxonomies, use the attribute.
+			$show_terms = $attributes['prefersTaxonomy'];
+		}
+
+		if ( ! $show_terms ) {
 			$breadcrumb_items = array_merge( $breadcrumb_items, block_core_breadcrumbs_get_hierarchical_post_type_breadcrumbs( $post_id ) );
 		} else {
 			$breadcrumb_items = array_merge( $breadcrumb_items, block_core_breadcrumbs_get_terms_breadcrumbs( $post_id, $post_type ) );
@@ -92,33 +103,6 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 }
 
 /**
- * Determines the breadcrumb type based on the block's default heuristics.
- *
- * @since 6.9.0
- *
- * @param string $post_type The post type name.
- *
- * @return string The breadcrumb type.
- */
-function block_core_breadcrumbs_get_breadcrumbs_type( $post_type, $attributes ) {
-	// Breadcrumbs type for posts can be either 'postWithAncestors' or 'postWithTerms'.
-	// If the post type is not hierarchical, default to 'postWithTerms'.
-	if ( ! is_post_type_hierarchical( $post_type ) ) {
-		return 'postWithTerms';
-	}
-
-	// Hierarchical post type without taxonomies can only use ancestors.
-	if ( empty( get_object_taxonomies( $post_type, 'objects' ) ) ) {
-		return 'postWithAncestors';
-	}
-
-	// For hierarchical post types with taxonomies, use the attribute if valid.
-	$supported_types = array( 'postWithAncestors', 'postWithTerms' );
-	$type            = $attributes['postBreadcrumbsType'];
-	return in_array( $type, $supported_types, true ) ? $type : 'postWithAncestors';
-}
-
-/**
  * Generates breadcrumb items from hierarchical post type ancestors.
  *
  * @since 6.9.0
@@ -142,6 +126,39 @@ function block_core_breadcrumbs_get_hierarchical_post_type_breadcrumbs( $post_id
 	return $breadcrumb_items;
 }
 
+/**
+ * Generates breadcrumb items for hierarchical term ancestors.
+ *
+ * For hierarchical taxonomies, retrieves and formats ancestor terms as breadcrumb links.
+ *
+ * @since 6.9.0
+ *
+ * @param int    $term_id  The term ID.
+ * @param string $taxonomy The taxonomy name.
+ *
+ * @return array Array of breadcrumb HTML items for ancestors.
+ */
+function block_core_breadcrumbs_get_term_ancestors_items( $term_id, $taxonomy ) {
+	$breadcrumb_items = array();
+
+	// Check if taxonomy is hierarchical and add ancestor term links.
+	if ( is_taxonomy_hierarchical( $taxonomy ) ) {
+		$term_ancestors = get_ancestors( $term_id, $taxonomy, 'taxonomy' );
+		$term_ancestors = array_reverse( $term_ancestors );
+		foreach ( $term_ancestors as $ancestor_id ) {
+			$ancestor_term = get_term( $ancestor_id, $taxonomy );
+			if ( $ancestor_term && ! is_wp_error( $ancestor_term ) ) {
+				$breadcrumb_items[] = sprintf(
+					'<a href="%s">%s</a>',
+					esc_url( get_term_link( $ancestor_term ) ),
+					esc_html( $ancestor_term->name )
+				);
+			}
+		}
+	}
+
+	return $breadcrumb_items;
+}
 
 /**
  * Generates breadcrumb items for archive pages.
@@ -176,7 +193,7 @@ function block_core_breadcrumbs_get_archive_breadcrumbs() {
 					$breadcrumb_items[] = sprintf(
 						'<a href="%s">%s</a>',
 						esc_url( get_month_link( $year, $month ) ),
-						esc_html( date_i18n( 'F', mktime( 0, 0, 0, $month, 1 ) ) )
+						esc_html( date_i18n( 'F', mktime( 0, 0, 0, $month, 1, $year ) ) )
 					);
 					// Current day.
 					$breadcrumb_items[] = sprintf(
@@ -187,7 +204,7 @@ function block_core_breadcrumbs_get_archive_breadcrumbs() {
 					// Current month.
 					$breadcrumb_items[] = sprintf(
 						'<span aria-current="page">%s</span>',
-						esc_html( date_i18n( 'F', mktime( 0, 0, 0, $month, 1 ) ) )
+						esc_html( date_i18n( 'F', mktime( 0, 0, 0, $month, 1, $year ) ) )
 					);
 				}
 			} else {
@@ -215,20 +232,10 @@ function block_core_breadcrumbs_get_archive_breadcrumbs() {
 		$taxonomy = $term->taxonomy;
 
 		// Add hierarchical term ancestors if applicable.
-		if ( is_taxonomy_hierarchical( $taxonomy ) ) {
-			$term_ancestors = get_ancestors( $term->term_id, $taxonomy, 'taxonomy' );
-			$term_ancestors = array_reverse( $term_ancestors );
-			foreach ( $term_ancestors as $ancestor_id ) {
-				$ancestor_term = get_term( $ancestor_id, $taxonomy );
-				if ( $ancestor_term && ! is_wp_error( $ancestor_term ) ) {
-					$breadcrumb_items[] = sprintf(
-						'<a href="%s">%s</a>',
-						esc_url( get_term_link( $ancestor_term ) ),
-						esc_html( $ancestor_term->name )
-					);
-				}
-			}
-		}
+		$breadcrumb_items = array_merge(
+			$breadcrumb_items,
+			block_core_breadcrumbs_get_term_ancestors_items( $term->term_id, $taxonomy )
+		);
 
 		// Add current term.
 		$breadcrumb_items[] = sprintf(
@@ -251,12 +258,10 @@ function block_core_breadcrumbs_get_archive_breadcrumbs() {
 	} elseif ( is_author() ) {
 		// Author archive.
 		$author = $queried_object;
-		if ( $author instanceof WP_User ) {
-			$breadcrumb_items[] = sprintf(
-				'<span aria-current="page">%s</span>',
-				esc_html( $author->display_name )
-			);
-		}
+		$breadcrumb_items[] = sprintf(
+			'<span aria-current="page">%s</span>',
+			esc_html( $author->display_name )
+		);
 	}
 
 	return $breadcrumb_items;
@@ -305,21 +310,11 @@ function block_core_breadcrumbs_get_terms_breadcrumbs( $post_id, $post_type ) {
 	if ( ! empty( $terms ) ) {
 		// Use the first term (if multiple are assigned).
 		$term = reset( $terms );
-		// Check if taxonomy is hierarchical also add ancestor term links
-		if ( is_taxonomy_hierarchical( $taxonomy_name ) ) {
-			$term_ancestors = get_ancestors( $term->term_id, $taxonomy_name, 'taxonomy' );
-			$term_ancestors = array_reverse( $term_ancestors );
-			foreach ( $term_ancestors as $ancestor_id ) {
-				$ancestor_term = get_term( $ancestor_id, $taxonomy_name );
-				if ( $ancestor_term && ! is_wp_error( $ancestor_term ) ) {
-					$breadcrumb_items[] = sprintf(
-						'<a href="%s">%s</a>',
-						esc_url( get_term_link( $ancestor_term ) ),
-						esc_html( $ancestor_term->name )
-					);
-				}
-			}
-		}
+		// Add hierarchical term ancestors if applicable.
+		$breadcrumb_items = array_merge(
+			$breadcrumb_items,
+			block_core_breadcrumbs_get_term_ancestors_items( $term->term_id, $taxonomy_name )
+		);
 		$breadcrumb_items[] = sprintf(
 			'<a href="%s">%s</a>',
 			esc_url( get_term_link( $term ) ),
