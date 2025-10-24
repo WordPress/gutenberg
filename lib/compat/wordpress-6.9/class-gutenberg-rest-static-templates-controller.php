@@ -86,8 +86,8 @@ class Gutenberg_REST_Static_Templates_Controller extends WP_REST_Templates_Contr
 		$query_result = gutenberg_get_registered_block_templates( $query );
 		$templates    = array();
 		foreach ( $query_result as $template ) {
-			$item               = $this->prepare_item_for_response( $template, $request );
-			$templates[]        = $this->prepare_response_for_collection( $item );
+			$item        = $this->prepare_item_for_response( $template, $request );
+			$templates[] = $this->prepare_response_for_collection( $item );
 		}
 
 		return rest_ensure_response( $templates );
