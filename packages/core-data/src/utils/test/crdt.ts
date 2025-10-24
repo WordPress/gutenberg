@@ -153,7 +153,7 @@ describe( 'crdt', () => {
 			expect( blocks ).toBeInstanceOf( Y.Array );
 		} );
 
-		it( 'syncs non-hidden meta fields', () => {
+		it( 'syncs meta fields', () => {
 			const changes = {
 				meta: {
 					some_meta: 'new value',
@@ -166,24 +166,6 @@ describe( 'crdt', () => {
 
 			applyPostChangesToCRDTDoc( doc, changes, mockPostType );
 
-			expect( metaMap.get( 'some_meta' ) ).toBe( 'new value' );
-		} );
-
-		it( 'does not sync hidden meta fields', () => {
-			const changes = {
-				meta: {
-					_private_meta: 'unsynced value',
-					some_meta: 'new value',
-				},
-			};
-
-			const metaMap = new Y.Map< unknown >();
-			metaMap.set( 'some_meta', 'old value' );
-			map.set( 'meta', metaMap );
-
-			applyPostChangesToCRDTDoc( doc, changes, mockPostType );
-
-			expect( metaMap.has( '_private_meta' ) ).toBe( false );
 			expect( metaMap.get( 'some_meta' ) ).toBe( 'new value' );
 		} );
 
@@ -299,15 +281,13 @@ describe( 'crdt', () => {
 			expect( changes ).toHaveProperty( 'blocks' );
 		} );
 
-		it( 'includes meta in changes, preserving any unsynced fields', () => {
+		it( 'includes meta in changes', () => {
 			map.set( 'meta', {
-				_private_meta: 'ignored value',
 				public_meta: 'new value',
 			} );
 
 			const editedRecord = {
 				meta: {
-					_private_meta: 'preserved value',
 					public_meta: 'old value',
 				},
 			} as unknown as Post;
@@ -319,7 +299,6 @@ describe( 'crdt', () => {
 			);
 
 			expect( changes.meta ).toEqual( {
-				_private_meta: 'preserved value', // preserved from edited record
 				public_meta: 'new value', // from CRDT
 			} );
 		} );

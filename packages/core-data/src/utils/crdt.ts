@@ -23,7 +23,6 @@ import { type Post } from '../entity-types/post';
 import { type Type } from '../entity-types';
 import { CRDT_DOC_META_PERSISTENCE_KEY, CRDT_RECORD_MAP_KEY } from '../sync';
 import type { WPBlockSelection, WPSelection } from '../types';
-import { shouldSyncMetaForPostType } from './crdt-meta';
 
 export type PostChanges = Partial< Post > & {
 	blocks?: Block[];
@@ -53,6 +52,9 @@ const allowedPostProperties = new Set< string >( [
 	'template',
 	'title',
 ] );
+
+// Post meta keys that should *not* be synced.
+const disallowedPostMetaKeys = new Set< string >( [] );
 
 /**
  * Given a set of local changes to a generic entity record, apply those changes
@@ -96,13 +98,13 @@ export function defaultApplyChangesToCRDTDoc(
  *
  * @param {CRDTDoc}     ydoc
  * @param {PostChanges} changes
- * @param {Type}        postType
+ * @param {Type}        _postType
  * @return {void}
  */
 export function applyPostChangesToCRDTDoc(
 	ydoc: CRDTDoc,
 	changes: PostChanges,
-	postType: Type
+	_postType: Type // eslint-disable-line @typescript-eslint/no-unused-vars
 ): void {
 	const ymap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
 
@@ -164,9 +166,7 @@ export function applyPostChangesToCRDTDoc(
 				// should be synced.
 				Object.entries( newValue ?? {} ).forEach(
 					( [ metaKey, metaValue ] ) => {
-						if (
-							! shouldSyncMetaForPostType( metaKey, postType )
-						) {
+						if ( disallowedPostMetaKeys.has( metaKey ) ) {
 							return;
 						}
 
@@ -234,13 +234,13 @@ export function defaultGetChangesFromCRDTDoc( crdtDoc: CRDTDoc ): ObjectData {
  *
  * @param {CRDTDoc} ydoc
  * @param {Post}    editedRecord
- * @param {Type}    postType
+ * @param {Type}    _postType
  * @return {Partial<PostChanges>} The changes that should be applied to the local record.
  */
 export function getPostChangesFromCRDTDoc(
 	ydoc: CRDTDoc,
 	editedRecord: Post,
-	postType: Type
+	_postType: Type // eslint-disable-line @typescript-eslint/no-unused-vars
 ): PostChanges {
 	const ymap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
 
@@ -311,7 +311,7 @@ export function getPostChangesFromCRDTDoc(
 					allowedMetaChanges = Object.fromEntries(
 						Object.entries( newValue ?? {} ).filter(
 							( [ metaKey ] ) =>
-								shouldSyncMetaForPostType( metaKey, postType )
+								! disallowedPostMetaKeys.has( metaKey )
 						)
 					);
 
