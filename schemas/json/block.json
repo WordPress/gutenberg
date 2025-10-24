@@ -144,6 +144,18 @@
 								}
 							]
 						},
+						"bindings": {
+							"type": "object",
+							"description": "Defines if the attribute can be bound.",
+							"properties": {
+								"ui": {
+									"description": "Defines the bindings UI state for the attribute.",
+									"type": "string",
+									"enum": [ "readOnly", "hidden", "active" ],
+									"default": "hidden"
+								}
+							}
+						},
 						"enum": {
 							"description": "An attribute can be defined as one of a fixed set of values. This is specified by an enum, which contains an array of allowed values:",
 							"type": "array",

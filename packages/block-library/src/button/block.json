@@ -26,7 +26,10 @@
 			"source": "attribute",
 			"selector": "a",
 			"attribute": "href",
-			"role": "content"
+			"role": "content",
+			"bindings": {
+				"ui": "active"
+			}
 		},
 		"title": {
 			"type": "string",
@@ -39,21 +42,30 @@
 			"type": "rich-text",
 			"source": "rich-text",
 			"selector": "a,button",
-			"role": "content"
+			"role": "content",
+			"bindings": {
+				"ui": "active"
+			}
 		},
 		"linkTarget": {
 			"type": "string",
 			"source": "attribute",
 			"selector": "a",
 			"attribute": "target",
-			"role": "content"
+			"role": "content",
+			"bindings": {
+				"ui": "active"
+			}
 		},
 		"rel": {
 			"type": "string",
 			"source": "attribute",
 			"selector": "a",
 			"attribute": "rel",
-			"role": "content"
+			"role": "content",
+			"bindings": {
+				"ui": "active"
+			}
 		},
 		"placeholder": {
 			"type": "string"

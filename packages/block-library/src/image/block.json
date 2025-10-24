@@ -25,7 +25,10 @@
 			"source": "attribute",
 			"selector": "img",
 			"attribute": "src",
-			"role": "content"
+			"role": "content",
+			"bindings": {
+				"ui": "active"
+			}
 		},
 		"alt": {
 			"type": "string",
@@ -33,7 +36,10 @@
 			"selector": "img",
 			"attribute": "alt",
 			"default": "",
-			"role": "content"
+			"role": "content",
+			"bindings": {
+				"ui": "active"
+			}
 		},
 		"caption": {
 			"type": "rich-text",
@@ -52,7 +58,10 @@
 			"source": "attribute",
 			"selector": "img",
 			"attribute": "title",
-			"role": "content"
+			"role": "content",
+			"bindings": {
+				"ui": "active"
+			}
 		},
 		"href": {
 			"type": "string",
@@ -75,7 +84,10 @@
 		},
 		"id": {
 			"type": "number",
-			"role": "content"
+			"role": "content",
+			"bindings": {
+				"ui": "active"
+			}
 		},
 		"width": {
 			"type": "string"

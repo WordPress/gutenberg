@@ -342,9 +342,20 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 		( select ) => {
 			const { __experimentalBlockBindingsSupportedAttributes } =
 				select( blockEditorStore ).getSettings();
-			const _bindableAttributes =
+			const supportedAttributes =
 				__experimentalBlockBindingsSupportedAttributes?.[ blockName ];
-			if ( ! _bindableAttributes || _bindableAttributes.length === 0 ) {
+			if ( ! supportedAttributes || supportedAttributes.length === 0 ) {
+				return EMPTY_OBJECT;
+			}
+
+			// Filter to only include attributes that have a source (UI compatible).
+			const blockAttributes = getBlockType( blockName ).attributes;
+			const _bindableAttributes = supportedAttributes.filter(
+				( attribute ) =>
+					blockAttributes[ attribute ]?.bindings?.ui === 'active'
+			);
+
+			if ( _bindableAttributes.length === 0 ) {
 				return EMPTY_OBJECT;
 			}
 
