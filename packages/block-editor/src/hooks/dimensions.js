@@ -159,6 +159,7 @@ export function hasDimensionsSupport( blockName, feature = 'any' ) {
 	if ( feature === 'any' ) {
 		return !! (
 			support?.aspectRatio ||
+			!! support?.height ||
 			!! support?.minHeight ||
 			!! support?.width
 		);
@@ -169,7 +170,7 @@ export function hasDimensionsSupport( blockName, feature = 'any' ) {
 
 export default {
 	useBlockProps,
-	attributeKeys: [ 'minHeight', 'width', 'style' ],
+	attributeKeys: [ 'height', 'minHeight', 'width', 'style' ],
 	hasSupport( name ) {
 		return hasDimensionsSupport( name );
 	},

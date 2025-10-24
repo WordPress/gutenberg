@@ -36,7 +36,9 @@ class WP_Block_Supports_Dimensions_Test extends WP_UnitTestCase {
 				),
 				'supports'    => array(
 					'dimensions' => array(
+						'height'    => true,
 						'minHeight' => true,
+						'width'     => true,
 					),
 				),
 			)
@@ -46,14 +48,16 @@ class WP_Block_Supports_Dimensions_Test extends WP_UnitTestCase {
 		$block_attrs = array(
 			'style' => array(
 				'dimensions' => array(
+					'height'    => '80vh',
 					'minHeight' => '50vh',
+					'width'     => '1000px',
 				),
 			),
 		);
 
 		$actual   = gutenberg_apply_dimensions_support( $block_type, $block_attrs );
 		$expected = array(
-			'style' => 'min-height:50vh;',
+			'style' => 'height:80vh;min-height:50vh;width:1000px;',
 		);
 
 		$this->assertSame( $expected, $actual );
@@ -72,7 +76,9 @@ class WP_Block_Supports_Dimensions_Test extends WP_UnitTestCase {
 				),
 				'supports'    => array(
 					'dimensions' => array(
+						'height'                          => true,
 						'minHeight'                       => true,
+						'width'                           => true,
 						'__experimentalSkipSerialization' => true,
 					),
 				),
@@ -83,7 +89,9 @@ class WP_Block_Supports_Dimensions_Test extends WP_UnitTestCase {
 		$block_attrs = array(
 			'style' => array(
 				'dimensions' => array(
+					'height'    => '70vh',
 					'minHeight' => '50vh',
+					'width'     => '999px',
 				),
 			),
 		);
