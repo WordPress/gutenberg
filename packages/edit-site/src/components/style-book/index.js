@@ -22,13 +22,12 @@ import {
 	__unstableIframe as Iframe,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 } from '@wordpress/block-editor';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useSelect, dispatch } from '@wordpress/data';
+import { mergeGlobalStyles } from '@wordpress/global-styles-engine';
 import {
 	useMemo,
 	useState,
 	memo,
-	useContext,
 	useRef,
 	useLayoutEffect,
 	useEffect,
@@ -51,17 +50,14 @@ import { getExamples } from './examples';
 import { store as siteEditorStore } from '../../store';
 import { useSection } from '../sidebar-global-styles-wrapper';
 import { GlobalStylesRenderer } from '../global-styles-renderer';
-import { getVariationClassName } from '../global-styles/utils';
 import {
 	STYLE_BOOK_COLOR_GROUPS,
 	STYLE_BOOK_PREVIEW_CATEGORIES,
 } from '../style-book/constants';
 import { useGlobalStylesOutputWithConfig } from '../../hooks/use-global-styles-output';
+import { useStyle, useGlobalStyles } from '../global-styles';
 
-const { ExperimentalBlockEditorProvider, useGlobalStyle, GlobalStylesContext } =
-	unlock( blockEditorPrivateApis );
-const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
-
+const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { Tabs } = unlock( componentsPrivateApis );
 
 function isObjectEmpty( object ) {
@@ -234,7 +230,7 @@ function applyBlockVariationsToExamples( examples, variation ) {
 						attributes: {
 							...block.attributes,
 							style: undefined,
-							className: getVariationClassName( variation ),
+							className: `is-style-${ variation }`,
 						},
 				  } ) )
 				: {
@@ -242,7 +238,7 @@ function applyBlockVariationsToExamples( examples, variation ) {
 						attributes: {
 							...example.blocks.attributes,
 							style: undefined,
-							className: getVariationClassName( variation ),
+							className: `is-style-${ variation }`,
 						},
 				  },
 		};
@@ -260,8 +256,8 @@ function StyleBook( {
 	userConfig = {},
 	path = '',
 } ) {
-	const [ textColor ] = useGlobalStyle( 'color.text' );
-	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
+	const textColor = useStyle( 'color.text' );
+	const backgroundColor = useStyle( 'color.background' );
 	const colors = useMultiOriginPalettes();
 	const examples = useMemo( () => getExamples( colors ), [ colors ] );
 	const tabs = useMemo(
@@ -276,12 +272,12 @@ function StyleBook( {
 
 	const examplesForSinglePageUse = getExamplesForSinglePageUse( examples );
 
-	const { base: baseConfig } = useContext( GlobalStylesContext );
+	const { base: baseConfig } = useGlobalStyles();
 	const goTo = getStyleBookNavigationFromPath( path );
 
 	const mergedConfig = useMemo( () => {
 		if ( ! isObjectEmpty( userConfig ) && ! isObjectEmpty( baseConfig ) ) {
-			return mergeBaseAndUserConfigs( baseConfig, userConfig );
+			return mergeGlobalStyles( baseConfig, userConfig );
 		}
 		return {};
 	}, [ baseConfig, userConfig ] );
@@ -522,12 +518,12 @@ export const StyleBookPreview = ( { userConfig = {}, isStatic = false } ) => {
 		filteredExamples,
 	] );
 
-	const { base: baseConfig } = useContext( GlobalStylesContext );
+	const { base: baseConfig } = useGlobalStyles();
 	const goTo = getStyleBookNavigationFromPath( section );
 
 	const mergedConfig = useMemo( () => {
 		if ( ! isObjectEmpty( userConfig ) && ! isObjectEmpty( baseConfig ) ) {
-			return mergeBaseAndUserConfigs( baseConfig, userConfig );
+			return mergeGlobalStyles( baseConfig, userConfig );
 		}
 		return {};
 	}, [ baseConfig, userConfig ] );

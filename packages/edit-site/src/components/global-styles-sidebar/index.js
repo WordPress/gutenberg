@@ -5,21 +5,21 @@ import { FlexItem, Flex, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { styles, seen, backup } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	store as editorStore,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
-import { useViewportMatch } from '@wordpress/compose';
+import { useViewportMatch, usePrevious } from '@wordpress/compose';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
-import { GlobalStylesUI } from '../global-styles';
+import GlobalStylesUI from '../global-styles';
+import { GlobalStylesActionMenu } from '../global-styles/menu';
 import { store as editSiteStore } from '../../store';
-import { GlobalStylesMenuSlot } from '../global-styles/ui';
 import { unlock } from '../../lock-unlock';
 import { store as coreStore } from '@wordpress/core-data';
 import DefaultSidebar from './default-sidebar';
@@ -37,6 +37,7 @@ export default function GlobalStylesSidebar() {
 		hasRevisions,
 		isRevisionsOpened,
 		isRevisionsStyleBookOpened,
+		activeComplementaryArea,
 	} = useSelect(
 		( select ) => {
 			const { getActiveComplementaryArea } = select( interfaceStore );
@@ -75,6 +76,10 @@ export default function GlobalStylesSidebar() {
 					canvasContainerView,
 				isRevisionsOpened:
 					'global-styles-revisions' === canvasContainerView,
+				activeComplementaryArea:
+					select( interfaceStore ).getActiveComplementaryArea(
+						'core'
+					),
 			};
 		},
 		[ canvas ]
@@ -83,6 +88,18 @@ export default function GlobalStylesSidebar() {
 		useDispatch( editSiteStore )
 	);
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const [ globalStylesPath, setGlobalStylesPath ] = useState( '/' );
+	const previousActiveArea = usePrevious( activeComplementaryArea );
+
+	// Reset path when sidebar opens
+	useEffect( () => {
+		if (
+			activeComplementaryArea === 'edit-site/global-styles' &&
+			previousActiveArea !== 'edit-site/global-styles'
+		) {
+			setGlobalStylesPath( '/' );
+		}
+	}, [ activeComplementaryArea, previousActiveArea, setGlobalStylesPath ] );
 
 	useEffect( () => {
 		if ( shouldClearCanvasContainerView ) {
@@ -195,12 +212,15 @@ export default function GlobalStylesSidebar() {
 								size="compact"
 							/>
 						</FlexItem>
-						<GlobalStylesMenuSlot />
+						<GlobalStylesActionMenu />
 					</Flex>
 				</Flex>
 			}
 		>
-			<GlobalStylesUI />
+			<GlobalStylesUI
+				path={ globalStylesPath }
+				onPathChange={ setGlobalStylesPath }
+			/>
 		</DefaultSidebar>
 	);
 }

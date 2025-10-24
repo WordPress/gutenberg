@@ -25,14 +25,18 @@ import {
 	MediaUpload,
 	MediaUploadCheck,
 	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import PostFeaturedImageCheck from './check';
 import { store as editorStore } from '../../store';
+
+const { MediaUploadModal } = unlock( blockEditorPrivateApis );
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
@@ -47,6 +51,45 @@ const instructions = (
 		) }
 	</p>
 );
+
+/**
+ * Conditional Media component that uses MediaUploadModal when experiment is enabled,
+ * otherwise falls back to MediaUpload.
+ *
+ * @param {Object}   root0        Component props.
+ * @param {Function} root0.render Render prop function that receives { open } object.
+ * @return {JSX.Element} The component.
+ */
+function ConditionalMediaUpload( { render, ...props } ) {
+	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	const mediaUpload = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return getSettings().mediaUpload;
+	}, [] );
+
+	if ( window.__experimentalDataViewsMediaModal ) {
+		return (
+			<>
+				{ render && render( { open: () => setIsModalOpen( true ) } ) }
+				<MediaUploadModal
+					{ ...props }
+					isOpen={ isModalOpen }
+					onClose={ () => {
+						setIsModalOpen( false );
+						props.onClose?.();
+					} }
+					onSelect={ ( media ) => {
+						setIsModalOpen( false );
+						props.onSelect?.( media );
+					} }
+					onUpload={ mediaUpload }
+				/>
+			</>
+		);
+	}
+
+	return <MediaUpload { ...props } render={ render } />;
+}
 
 function getMediaDetails( media, postId ) {
 	if ( ! media ) {
@@ -181,7 +224,7 @@ function PostFeaturedImage( {
 					</div>
 				) }
 				<MediaUploadCheck fallback={ instructions }>
-					<MediaUpload
+					<ConditionalMediaUpload
 						title={
 							postType?.labels?.featured_image ||
 							DEFAULT_FEATURE_IMAGE_LABEL

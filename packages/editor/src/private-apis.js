@@ -20,10 +20,6 @@ import ToolsMoreMenuGroup from './components/more-menu/tools-more-menu-group';
 import ViewMoreMenuGroup from './components/more-menu/view-more-menu-group';
 import ResizableEditor from './components/resizable-editor';
 import {
-	mergeBaseAndUserConfigs,
-	GlobalStylesProvider,
-} from './components/global-styles-provider';
-import {
 	CreateTemplatePartModal,
 	patternTitleField,
 	templateTitleField,
@@ -42,8 +38,6 @@ lock( privateApis, {
 	EntitiesSavedStatesExtensible,
 	Editor,
 	EditorContentSlotFill,
-	GlobalStylesProvider,
-	mergeBaseAndUserConfigs,
 	PluginPostExcerpt,
 	PostCardPanel,
 	PreferencesModal,

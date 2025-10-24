@@ -28,11 +28,17 @@ describe( 'normalizeFormFields', () => {
 			expect( result ).toEqual( [
 				{
 					id: 'field1',
-					layout: { type: 'regular', labelPosition: 'top' },
+					layout: {
+						type: 'regular',
+						labelPosition: 'top',
+					},
 				},
 				{
 					id: 'field2',
-					layout: { type: 'regular', labelPosition: 'top' },
+					layout: {
+						type: 'regular',
+						labelPosition: 'top',
+					},
 				},
 			] );
 		} );
@@ -51,12 +57,18 @@ describe( 'normalizeFormFields', () => {
 			expect( result ).toEqual( [
 				{
 					id: 'field1',
-					layout: { type: 'regular', labelPosition: 'top' },
+					layout: {
+						type: 'regular',
+						labelPosition: 'top',
+					},
 				},
 				{
 					id: 'field2',
 					label: 'Field 2',
-					layout: { type: 'regular', labelPosition: 'top' },
+					layout: {
+						type: 'regular',
+						labelPosition: 'top',
+					},
 				},
 			] );
 		} );
@@ -72,7 +84,10 @@ describe( 'normalizeFormFields', () => {
 			expect( result ).toEqual( [
 				{
 					id: 'field1',
-					layout: { type: 'regular', labelPosition: 'top' },
+					layout: {
+						type: 'regular',
+						labelPosition: 'top',
+					},
 				},
 			] );
 		} );
@@ -86,7 +101,10 @@ describe( 'normalizeFormFields', () => {
 			expect( result ).toEqual( [
 				{
 					id: 'field1',
-					layout: { type: 'regular', labelPosition: 'side' },
+					layout: {
+						type: 'regular',
+						labelPosition: 'side',
+					},
 				},
 			] );
 		} );
@@ -245,7 +263,10 @@ describe( 'normalizeFormFields', () => {
 			expect( result ).toEqual( [
 				{
 					id: 'field1',
-					layout: { type: 'regular', labelPosition: 'top' },
+					layout: {
+						type: 'regular',
+						labelPosition: 'top',
+					},
 				},
 				{
 					id: 'field2',
