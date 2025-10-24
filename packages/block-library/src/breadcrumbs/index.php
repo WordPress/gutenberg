@@ -257,7 +257,7 @@ function block_core_breadcrumbs_get_archive_breadcrumbs() {
 		}
 	} elseif ( is_author() ) {
 		// Author archive.
-		$author = $queried_object;
+		$author             = $queried_object;
 		$breadcrumb_items[] = sprintf(
 			'<span aria-current="page">%s</span>',
 			esc_html( $author->display_name )
@@ -311,7 +311,7 @@ function block_core_breadcrumbs_get_terms_breadcrumbs( $post_id, $post_type ) {
 		// Use the first term (if multiple are assigned).
 		$term = reset( $terms );
 		// Add hierarchical term ancestors if applicable.
-		$breadcrumb_items = array_merge(
+		$breadcrumb_items   = array_merge(
 			$breadcrumb_items,
 			block_core_breadcrumbs_get_term_ancestors_items( $term->term_id, $taxonomy_name )
 		);
