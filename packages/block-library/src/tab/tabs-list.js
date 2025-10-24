@@ -9,11 +9,31 @@ import clsx from 'clsx';
 import { __, sprintf } from '@wordpress/i18n';
 import { RichText } from '@wordpress/block-editor';
 import { decodeEntities } from '@wordpress/html-entities';
+import { RawHTML } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import slugFromLabel from './slug-from-label';
+
+function StaticLabel( { label, index } ) {
+	if ( label ) {
+		return (
+			<span>
+				<RawHTML>{ decodeEntities( label ) }</RawHTML>
+			</span>
+		);
+	}
+	return (
+		<span>
+			{ sprintf(
+				/* translators: %d is the tab index + 1 */
+				__( 'Tab %d' ),
+				index + 1
+			) }
+		</span>
+	);
+}
 
 export default function TabsList( {
 	siblingTabs,
@@ -89,14 +109,9 @@ export default function TabsList( {
 								onChange={ onLabelChange }
 							/>
 						) : (
-							<RichText.Content
-								value={ decodeEntities( siblingLabel ) }
-								tagName="span"
-								placeholder={ sprintf(
-									/* translators: %d is the tab index + 1 */
-									__( 'Tab %d…' ),
-									index + 1
-								) }
+							<StaticLabel
+								label={ siblingLabel }
+								index={ index }
 							/>
 						) }
 					</button>
