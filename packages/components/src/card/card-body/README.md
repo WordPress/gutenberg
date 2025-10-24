@@ -32,10 +32,21 @@ Renders with a light gray background color.
 -   Required: No
 -   Default: `false`
 
-### `size`: `string`
+### `size`: `string | object`
 
-Determines the amount of padding within the component.
+Determines the amount of padding within the component. Can be specified either as a single size token or as an object for directional control.
 
 - Required: No
 - Default: `medium`
-- Allowed values: `xSmall`, `small`, `medium`, `large`
+- Allowed values:
+-   Single size token: `xSmall`, `small`, `medium`, `large`
+-   Directional object:
+
+    ```ts
+    {
+      top?: 'xSmall' | 'small' | 'medium' | 'large';
+      right?: 'xSmall' | 'small' | 'medium' | 'large';
+      bottom?: 'xSmall' | 'small' | 'medium' | 'large';
+      left?: 'xSmall' | 'small' | 'medium' | 'large';
+    }
+    ```

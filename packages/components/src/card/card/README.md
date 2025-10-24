@@ -56,13 +56,24 @@ Renders with rounded corners.
 - Required: No
 - Default: `true`
 
-### `size`: `string`
+### `size`: `string | object`
 
-Determines the amount of padding within the component.
+Determines the amount of padding within the component. Can be specified either as a single size token or as an object for directional control.
 
 - Required: No
 - Default: `medium`
-- Allowed values: `xSmall`, `small`, `medium`, `large`
+- Allowed values:
+   	- Single size token: `xSmall`, `small`, `medium`, `large`
+   	- Directional object:
+
+    ```ts
+    {
+      top?: 'xSmall' | 'small' | 'medium' | 'large';
+      right?: 'xSmall' | 'small' | 'medium' | 'large';
+      bottom?: 'xSmall' | 'small' | 'medium' | 'large';
+      left?: 'xSmall' | 'small' | 'medium' | 'large';
+    }
+    ```
 
 ### Inherited props
 
@@ -100,6 +111,36 @@ const Example = () => (
 			<img src="..." />
 		</CardMedia>
 		<CardFooter>...</CardFooter>
+	</Card>
+);
+```
+
+### Directional Padding Example
+
+The `size` prop supports directional padding control, allowing you to set different padding values for each side:
+
+```jsx
+import { Card, CardBody } from '@wordpress/components';
+
+const Example = () => (
+	<Card
+		size={ {
+			top: 'large',
+			right: 'medium',
+			bottom: 'small',
+			left: 'medium',
+		} }
+	>
+		<CardBody
+			size={ {
+				top: 'small',
+				right: 'large',
+				bottom: 'small',
+				left: 'large',
+			} }
+		>
+			Content with custom padding per side
+		</CardBody>
 	</Card>
 );
 ```
