@@ -31,10 +31,11 @@ function gutenberg_maintain_templates_routes() {
 	// WP_REST_Templates_Controller with a post type.
 	global $wp_post_types;
 	// Register the old templates endpoints. The WP_REST_Templates_Controller
-	// and sub-controllers used linked to the wp_template post type, but are no
-	// longer. They still require a post type object when contructing the class.
-	// To maintain backward and changes to these controller classes, we make use
-	// that the wp_template post type has the right information it needs.
+	// and sub-controllers used to be linked to the wp_template post type, but
+	// are no longer. They still require a post type object when contructing the
+	// class. To maintain backward and changes to these controller classes, we
+	// make use that the wp_template post type has the right information it
+	// needs.
 	$wp_post_types['wp_template']->rest_base = 'templates';
 	// Store the classes so they can be restored.
 	$original_rest_controller_class           = $wp_post_types['wp_template']->rest_controller_class;
