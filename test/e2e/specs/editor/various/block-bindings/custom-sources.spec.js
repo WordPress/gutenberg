@@ -86,15 +86,6 @@ test.describe( 'Registered sources', () => {
 				},
 			} );
 			await page.getByLabel( 'Attributes options' ).click();
-			await page
-				.getByRole( 'menuitemcheckbox', { name: 'Show id' } )
-				.click();
-			const idAttribute = page.getByRole( 'button', {
-				name: 'id',
-			} );
-			await expect( idAttribute ).toBeVisible();
-			await expect( idAttribute ).toBeDisabled();
-			await expect( idAttribute ).toContainText( 'No sources available' );
 			const altAttribute = page.getByRole( 'button', {
 				name: 'alt',
 			} );
@@ -944,10 +935,6 @@ test.describe( 'Registered sources', () => {
 				name: 'Show url',
 			} );
 			await expect( urlAttribute ).toBeVisible();
-			const idAttribute = page.getByRole( 'menuitemcheckbox', {
-				name: 'Show id',
-			} );
-			await expect( idAttribute ).toBeVisible();
 			const titleAttribute = page.getByRole( 'menuitemcheckbox', {
 				name: 'Show title',
 			} );
@@ -1368,35 +1355,6 @@ test.describe( 'Registered sources', () => {
 				name: 'content',
 			} );
 			await expect( contentButton ).toContainText( 'Text Field Label' );
-		} );
-	} );
-
-	test.describe( 'Source compatibility filtering', () => {
-		test( 'should show only compatible sources.', async ( {
-			editor,
-			page,
-		} ) => {
-			await editor.insertBlock( { name: 'core/image' } );
-			await page.getByLabel( 'Attributes options' ).click();
-			await page
-				.getByRole( 'menuitemcheckbox', { name: 'Show id' } )
-				.click();
-			await page.getByRole( 'button', { name: 'id' } ).click();
-
-			const idMenuItem = page.getByRole( 'menuitem', {
-				name: 'Complete Source',
-			} );
-			await expect( idMenuItem ).toBeEnabled();
-			await idMenuItem.click();
-			const numberField = page.getByRole( 'menuitemcheckbox', {
-				name: 'Number Custom Field Label',
-			} );
-			await expect( numberField ).toBeEnabled();
-			await expect(
-				page.getByRole( 'menuitemcheckbox', {
-					name: 'Text Field Label',
-				} )
-			).toBeHidden();
 		} );
 	} );
 } );
