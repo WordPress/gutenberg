@@ -65,6 +65,12 @@ export function AddComment( {
 			role="listitem"
 			ref={ isFloating ? refs.setFloating : undefined }
 			style={ isFloating ? { top: y } : undefined }
+			onBlur={ ( event ) => {
+				if ( event.currentTarget.contains( event.relatedTarget ) ) {
+					return;
+				}
+				setShowCommentBoard( false );
+			} }
 		>
 			<HStack alignment="left" spacing="3">
 				<CommentAuthorInfo />

@@ -107,7 +107,6 @@ export function Comments( {
 					}
 				}
 			} );
-			setSelectedThread( 'new-note-thread' );
 			return orderedThreads;
 		}
 		return t;
@@ -118,19 +117,6 @@ export function Comments( {
 		blockCommentId,
 		selectedBlockClientId,
 		orderedBlockIds,
-	] );
-
-	// Reflow comments when block selection changes.
-	useEffect( () => {
-		if ( isFloating && showCommentBoard && undefined === blockCommentId ) {
-			reflowComments();
-		}
-	}, [
-		selectedBlockClientId,
-		reflowComments,
-		isFloating,
-		showCommentBoard,
-		blockCommentId,
 	] );
 
 	const handleDelete = async ( comment ) => {
