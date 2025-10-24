@@ -150,6 +150,7 @@ export const authorField = {
 export const activeField = {
 	label: __( 'Status' ),
 	id: 'active',
+	type: 'boolean',
 	getValue: ( { item } ) => item._isActive,
 	render: function Render( { item } ) {
 		if ( item._isCustom ) {
