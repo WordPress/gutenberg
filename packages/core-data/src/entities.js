@@ -207,8 +207,6 @@ export const rootEntitiesConfig = [
 		name: 'registeredTemplate',
 		kind: 'root',
 		baseURL: '/wp/v2/wp_registered_template',
-		baseURLParams: { context: 'edit' },
-		plural: 'registeredTemplates',
 		key: 'id',
 	},
 ];
