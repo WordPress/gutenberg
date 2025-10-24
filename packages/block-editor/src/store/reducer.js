@@ -2277,14 +2277,8 @@ function hasBindings( block ) {
  * @return {Map} A Map containing the derived block editing modes, keyed by block client ID.
  */
 function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
-	const isZoomedOut =
-		state?.zoomLevel < 100 || state?.zoomLevel === 'auto-scaled';
 	const derivedBlockEditingModes = new Map();
 
-	// When there are sections, the majority of blocks are disabled,
-	// so the default block editing mode is set to disabled.
-	const sectionRootClientId = state.settings?.[ sectionRootClientIdKey ];
-	const sectionClientIds = state.blocks.order.get( sectionRootClientId );
 	const hasDisabledBlocks = Array.from( state.blockEditingModes ).some(
 		( [ , mode ] ) => mode === 'disabled'
 	);
