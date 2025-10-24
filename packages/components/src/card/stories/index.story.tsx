@@ -95,7 +95,7 @@ export const FullBleedContent: StoryObj< typeof Card > = {
 /**
  * The Card component supports three approaches to padding:
  * 1. Default padding (medium) - no size prop needed
- * 2. Token-based padding - using size tokens: xSmall (8px), small (16px), medium (24px), large (32px)
+ * 2. Token-based padding - using size tokens: xSmall, small, medium, large
  * 3. Directional padding - customize each side independently
  *
  * Each component (Card, CardHeader, CardBody) can have its own padding configuration.
@@ -120,7 +120,6 @@ export const PaddingVariations: StoryObj< typeof Card > = {
 			<div>
 				<Card
 					size={ {
-						// 32px top, 24px sides, 16px bottom
 						top: 'large',
 						right: 'medium',
 						bottom: 'small',
@@ -129,7 +128,6 @@ export const PaddingVariations: StoryObj< typeof Card > = {
 				>
 					<CardHeader
 						size={ {
-							// 16px top/bottom, 32px sides
 							top: 'small',
 							right: 'large',
 							bottom: 'small',
@@ -143,7 +141,6 @@ export const PaddingVariations: StoryObj< typeof Card > = {
 					</CardHeader>
 					<CardBody
 						size={ {
-							// 24px vertical, 8px horizontal
 							top: 'medium',
 							right: 'xSmall',
 							bottom: 'medium',
