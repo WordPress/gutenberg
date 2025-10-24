@@ -93,9 +93,7 @@ export default function PageTemplates() {
 			combinedTemplates: false,
 		} );
 	const { records: staticRecords, isResolving: isLoadingStaticData } =
-		useEntityRecordsWithPermissions( 'postType', 'wp_registered_template', {
-			per_page: -1,
-		} );
+		useEntityRecordsWithPermissions( 'root', 'registeredTemplate' );
 
 	const activeTemplates = useMemo( () => {
 		const _active = [ ...staticRecords ].filter(
@@ -325,7 +323,7 @@ export default function PageTemplates() {
 				onChangeSelection={ onChangeSelection }
 				isItemClickable={ () => true }
 				onClickItem={ ( item ) => {
-					if ( item.type === 'wp_registered_template' ) {
+					if ( typeof item.id === 'string' ) {
 						setSelectedRegisteredTemplate( item );
 					} else {
 						history.navigate(

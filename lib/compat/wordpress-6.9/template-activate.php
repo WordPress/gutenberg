@@ -35,6 +35,9 @@ function gutenberg_maintain_templates_routes() {
 	$wp_post_types['wp_template']->rest_base = 'wp_template';
 	$controller->register_routes();
 
+	$registered_template_controller = new Gutenberg_REST_Static_Templates_Controller();
+	$registered_template_controller->register_routes();
+
 	// Add the same field as wp_registered_template.
 	register_rest_field(
 		'wp_template',
@@ -79,12 +82,6 @@ add_action( 'init', 'gutenberg_setup_static_template' );
  * @global array $wp_post_types List of post types.
  */
 function gutenberg_setup_static_template() {
-	global $wp_post_types;
-	$wp_post_types['wp_registered_template']                        = clone $wp_post_types['wp_template'];
-	$wp_post_types['wp_registered_template']->name                  = 'wp_registered_template';
-	$wp_post_types['wp_registered_template']->rest_base             = 'wp_registered_template';
-	$wp_post_types['wp_registered_template']->rest_controller_class = 'Gutenberg_REST_Static_Templates_Controller';
-
 	register_setting(
 		'reading',
 		'active_templates',
