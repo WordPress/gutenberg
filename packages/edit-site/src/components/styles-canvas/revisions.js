@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
+import { useMemo, forwardRef } from '@wordpress/element';
 import { useGlobalStylesRevisions } from '@wordpress/global-styles-ui';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
@@ -17,11 +17,12 @@ import { useGlobalStyles } from '../global-styles/hooks';
  * Coordinates with ScreenRevisions through the path parameter to display
  * the currently selected revision.
  *
- * @param {Object} props      Component props.
- * @param {string} props.path Current path in global styles.
+ * @param {Object}                       props      Component props.
+ * @param {string}                       props.path Current path in global styles.
+ * @param {import('react').ForwardedRef} ref        Ref to the Revisions component.
  * @return {JSX.Element|null} The Revisions component or null if loading.
  */
-export function StylesCanvasRevisions( { path } ) {
+function StylesCanvasRevisions( { path }, ref ) {
 	const blocks = useSelect( ( select ) => {
 		// This is not ideal: it's like a loop (reading from block-editor to render it).
 		return select( blockEditorStore ).getBlocks();
@@ -54,5 +55,8 @@ export function StylesCanvasRevisions( { path } ) {
 	// Use the selected revision's config if available, otherwise use current user config
 	const displayConfig = selectedRevision || userConfig;
 
-	return <Revisions userConfig={ displayConfig } blocks={ blocks } />;
+	return (
+		<Revisions ref={ ref } userConfig={ displayConfig } blocks={ blocks } />
+	);
 }
+export default forwardRef( StylesCanvasRevisions );

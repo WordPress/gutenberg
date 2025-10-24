@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { cloneElement } from '@wordpress/element';
 import {
 	Button,
 	__experimentalUseSlotFills as useSlotFills,
@@ -22,8 +21,8 @@ import {
  */
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
-import { StylesCanvasStyleBook } from './style-book';
-import { StylesCanvasRevisions } from './revisions';
+import StylesCanvasStyleBook from './style-book';
+import StylesCanvasRevisions from './revisions';
 
 const { EditorContentSlotFill, ResizableEditor } = unlock( editorPrivateApis );
 
@@ -98,10 +97,16 @@ export default function StylesCanvas() {
 			<StylesCanvasStyleBook
 				path={ stylesPath }
 				onPathChange={ setStylesPath }
+				ref={ sectionFocusReturnRef }
 			/>
 		);
 	} else if ( stylesPath?.startsWith( '/revisions' ) ) {
-		content = <StylesCanvasRevisions path={ stylesPath } />;
+		content = (
+			<StylesCanvasRevisions
+				path={ stylesPath }
+				ref={ sectionFocusReturnRef }
+			/>
+		);
 	}
 
 	const title = getStylesCanvasTitle( stylesPath, showStylebook );
@@ -109,11 +114,6 @@ export default function StylesCanvas() {
 	if ( ! content ) {
 		return null;
 	}
-
-	// Clone content with ref to allow proper height inheritance
-	const contentWithRef = cloneElement( content, {
-		ref: sectionFocusReturnRef,
-	} );
 
 	return (
 		<EditorContentSlotFill.Fill>
@@ -133,7 +133,7 @@ export default function StylesCanvas() {
 							label={ __( 'Close' ) }
 							onClick={ onCloseCanvas }
 						/>
-						{ contentWithRef }
+						{ content }
 					</section>
 				</ResizableEditor>
 			</div>

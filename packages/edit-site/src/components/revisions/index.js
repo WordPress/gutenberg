@@ -10,7 +10,7 @@ import {
 	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
+import { useMemo, forwardRef } from '@wordpress/element';
 import { mergeGlobalStyles } from '@wordpress/global-styles-engine';
 
 /**
@@ -30,7 +30,7 @@ function isObjectEmpty( object ) {
 	return ! object || Object.keys( object ).length === 0;
 }
 
-function Revisions( { userConfig, blocks } ) {
+function Revisions( { userConfig, blocks }, ref ) {
 	const { base: baseConfig } = useGlobalStyles();
 
 	const mergedConfig = useMemo( () => {
@@ -66,6 +66,7 @@ function Revisions( { userConfig, blocks } ) {
 
 	return (
 		<Iframe
+			ref={ ref }
 			className="edit-site-revisions__iframe"
 			name="revisions"
 			tabIndex={ 0 }
@@ -97,4 +98,4 @@ function Revisions( { userConfig, blocks } ) {
 	);
 }
 
-export default Revisions;
+export default forwardRef( Revisions );

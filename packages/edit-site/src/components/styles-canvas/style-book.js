@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { forwardRef } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import StyleBook from '../style-book';
@@ -8,14 +13,16 @@ import { STYLE_BOOK_COLOR_GROUPS } from '../style-book/constants';
  * Style Book content component for global styles.
  * Provides the business logic for StyleBook behavior in the global styles context.
  *
- * @param {Object}   props              Component props.
- * @param {string}   props.path         Current path in global styles.
- * @param {Function} props.onPathChange Callback when the path changes.
+ * @param {Object}                       props              Component props.
+ * @param {string}                       props.path         Current path in global styles.
+ * @param {Function}                     props.onPathChange Callback when the path changes.
+ * @param {import('react').ForwardedRef} ref                Ref to the Style Book component.
  * @return {JSX.Element} The Style Book component.
  */
-export function StylesCanvasStyleBook( { path, onPathChange } ) {
+function StylesCanvasStyleBook( { path, onPathChange }, ref ) {
 	return (
 		<StyleBook
+			ref={ ref }
 			isSelected={ ( blockName ) =>
 				// Match '/blocks/core%2Fbutton' and
 				// '/blocks/core%2Fbutton/typography', but not
@@ -47,3 +54,4 @@ export function StylesCanvasStyleBook( { path, onPathChange } ) {
 		/>
 	);
 }
+export default forwardRef( StylesCanvasStyleBook );

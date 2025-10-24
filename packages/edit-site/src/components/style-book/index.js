@@ -31,6 +31,7 @@ import {
 	useRef,
 	useLayoutEffect,
 	useEffect,
+	forwardRef,
 } from '@wordpress/element';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 import { uploadMedia } from '@wordpress/media-utils';
@@ -244,14 +245,17 @@ function applyBlockVariationsToExamples( examples, variation ) {
 	} );
 }
 
-function StyleBook( {
-	isSelected,
-	onClick,
-	onSelect,
-	showTabs = true,
-	userConfig = {},
-	path = '',
-} ) {
+function StyleBook(
+	{
+		isSelected,
+		onClick,
+		onSelect,
+		showTabs = true,
+		userConfig = {},
+		path = '',
+	},
+	ref
+) {
 	const textColor = useStyle( 'color.text' );
 	const backgroundColor = useStyle( 'color.background' );
 	const colors = useMultiOriginPalettes();
@@ -300,6 +304,7 @@ function StyleBook( {
 
 	return (
 		<div
+			ref={ ref }
 			className={ clsx( 'edit-site-style-book', {
 				'is-button': !! onClick,
 			} ) }
@@ -780,4 +785,4 @@ const Example = ( { id, title, blocks, isSelected, onClick, content } ) => {
 	);
 };
 
-export default StyleBook;
+export default forwardRef( StyleBook );
