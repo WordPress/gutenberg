@@ -51,7 +51,7 @@ function NotesSidebarContent( {
 		<VStack
 			className="editor-collab-sidebar-panel"
 			style={ styles }
-			role="list"
+			role="tree"
 			spacing="3"
 			justify="flex-start"
 			ref={ ( node ) => {

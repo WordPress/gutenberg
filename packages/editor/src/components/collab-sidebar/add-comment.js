@@ -47,7 +47,8 @@ export function AddComment( {
 			className="editor-collab-sidebar-panel__thread is-selected"
 			spacing="3"
 			tabIndex={ 0 }
-			role="listitem"
+			role="treeitem"
+			aria-label={ __( 'New Note' ) }
 		>
 			<HStack alignment="left" spacing="3">
 				<CommentAuthorInfo />
