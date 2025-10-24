@@ -80,7 +80,7 @@ export type BodyProps = BaseSubComponentProps & {
 	 * @default false
 	 */
 	isScrollable?: boolean;
-} & SizeableProps;
+};
 
 export type MediaProps = {
 	/**
@@ -98,8 +98,8 @@ type MarginalSubComponentProps = BaseSubComponentProps & {
 	isBorderless?: boolean;
 };
 
-export type HeaderProps = MarginalSubComponentProps & SizeableProps;
+export type HeaderProps = MarginalSubComponentProps;
 
 export type FooterProps = MarginalSubComponentProps & {
 	justify?: CSSProperties[ 'justifyContent' ];
-} & SizeableProps;
+};
