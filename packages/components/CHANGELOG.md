@@ -12,6 +12,7 @@
 
 -   `Button`: Ensure that icons don't shrink ([#72474](https://github.com/WordPress/gutenberg/pull/72474)).
 -   `Popover`: Fix `onDialogClose` logic to only close the popover if the blur event targets the specific popover instance ([#72376](https://github.com/WordPress/gutenberg/pull/72376)).
+-   `Badge`: Add max-width for text truncation ([#72653](https://github.com/WordPress/gutenberg/pull/72653)).
 
 ## 30.6.0 (2025-10-17)
 
