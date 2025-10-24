@@ -7,8 +7,34 @@ import { css, type SerializedStyles } from '@emotion/react';
  * Internal dependencies
  */
 import type { Props, SizeToken } from './types';
-import { cardPaddings } from './styles';
 import { space } from '../utils/space';
+
+const CONFIG = {
+	cardPaddingXSmall: `${ space( 2 ) }`,
+	cardPaddingSmall: `${ space( 4 ) }`,
+	cardPaddingMedium: `${ space( 4 ) } ${ space( 6 ) }`,
+	cardPaddingLarge: `${ space( 6 ) } ${ space( 8 ) }`,
+};
+
+const xSmallCardPadding = css`
+	padding: ${ CONFIG.cardPaddingXSmall };
+`;
+
+export const cardPaddings = {
+	large: css`
+		padding: ${ CONFIG.cardPaddingLarge };
+	`,
+	medium: css`
+		padding: ${ CONFIG.cardPaddingMedium };
+	`,
+	small: css`
+		padding: ${ CONFIG.cardPaddingSmall };
+	`,
+	xSmall: xSmallCardPadding,
+	// The `extraSmall` size is not officially documented, but the following styles
+	// are kept for legacy reasons to support older values of the `size` prop.
+	extraSmall: xSmallCardPadding,
+};
 
 const getSinglePaddingValue = ( size?: SizeToken ): string | undefined => {
 	switch ( size ) {
