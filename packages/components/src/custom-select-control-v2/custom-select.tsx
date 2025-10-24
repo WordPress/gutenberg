@@ -12,7 +12,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { VisuallyHidden } from '..';
+import { VisuallyHidden } from '../visually-hidden';
 import * as Styled from './styles';
 import type {
 	CustomSelectContext as CustomSelectContextType,

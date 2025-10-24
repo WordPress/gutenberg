@@ -224,6 +224,185 @@ test.describe( 'Pattern Overrides', () => {
 		} );
 	} );
 
+	test( 'blocks within a synced pattern cannot be duplicated, inserted before/after, or moved', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const content = `
+		<!-- wp:paragraph {"metadata":{"name":"Pattern Overrides","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
+		<p>Block with pattern overrides</p>
+		<!-- /wp:paragraph -->
+		<!-- wp:paragraph {"metadata":{"name":"No Overrides"}} -->
+		<p>Block without overrides</p>
+		<!-- /wp:paragraph -->
+		<!-- wp:buttons -->
+		<div class="wp-block-buttons"><!-- wp:button {"metadata":{"name":"First Button","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
+		<div class="wp-block-button"><a class="wp-block-button__link wp-element-button">First button</a></div>
+		<!-- /wp:button -->
+
+		<!-- wp:button {"metadata":{"name":"Second Button","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
+		<div class="wp-block-button"><a class="wp-block-button__link wp-element-button">Second button</a></div>
+		<!-- /wp:button --></div>
+		<!-- /wp:buttons -->
+		`;
+
+		const { id } = await requestUtils.createBlock( {
+			title: 'Test Pattern',
+			content,
+			status: 'publish',
+		} );
+
+		await admin.createNewPost();
+
+		await editor.insertBlock( {
+			name: 'core/block',
+			attributes: { ref: id },
+		} );
+
+		const patternBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Pattern',
+		} );
+		const blockWithOverrides = editor.canvas
+			.getByRole( 'document', {
+				name: 'Block: Paragraph',
+				includeHidden: true,
+			} )
+			.filter( { hasText: 'Block with pattern overrides' } );
+		const blockWithoutOverrides = editor.canvas
+			.getByRole( 'document', {
+				name: 'Block: Paragraph',
+				includeHidden: true,
+			} )
+			.filter( { hasText: 'Block without overrides' } );
+		const firstButton = editor.canvas
+			.getByRole( 'document', {
+				name: 'Block: Button',
+				exact: true,
+				includeHidden: true,
+			} )
+			.filter( { hasText: 'First button' } );
+		const secondButton = editor.canvas
+			.getByRole( 'document', {
+				name: 'Block: Button',
+				exact: true,
+				includeHidden: true,
+			} )
+			.filter( { hasText: 'Second button' } );
+
+		// Select the pattern to make blocks accessible.
+		await editor.selectBlocks( patternBlock );
+
+		await test.step( 'Blocks cannot be inserted before/after or duplicated', async () => {
+			// Test block with overrides.
+			await editor.selectBlocks( blockWithOverrides );
+			await editor.showBlockToolbar();
+
+			await expect(
+				page
+					.getByRole( 'toolbar', { name: 'Block tools' } )
+					.getByRole( 'button', { name: 'Options' } )
+			).toBeHidden();
+
+			// Test block without overrides.
+			await editor.selectBlocks( blockWithoutOverrides );
+			await editor.showBlockToolbar();
+
+			await expect(
+				page
+					.getByRole( 'toolbar', { name: 'Block tools' } )
+					.getByRole( 'button', { name: 'Options' } )
+			).toBeHidden();
+
+			// Test first button.
+			await editor.selectBlocks( firstButton );
+			await editor.showBlockToolbar();
+
+			await expect(
+				page
+					.getByRole( 'toolbar', { name: 'Block tools' } )
+					.getByRole( 'button', { name: 'Options' } )
+			).toBeHidden();
+
+			// Test second button.
+			await editor.selectBlocks( secondButton );
+			await editor.showBlockToolbar();
+
+			await expect(
+				page
+					.getByRole( 'toolbar', { name: 'Block tools' } )
+					.getByRole( 'button', { name: 'Options' } )
+			).toBeHidden();
+		} );
+
+		await test.step( 'Blocks cannot be moved', async () => {
+			// Test block with overrides.
+			await editor.selectBlocks( blockWithOverrides );
+			await editor.showBlockToolbar();
+
+			await expect(
+				page
+					.getByRole( 'toolbar', { name: 'Block tools' } )
+					.getByRole( 'button', { name: 'Move up' } )
+			).toBeHidden();
+
+			await expect(
+				page
+					.getByRole( 'toolbar', { name: 'Block tools' } )
+					.getByRole( 'button', { name: 'Move down' } )
+			).toBeHidden();
+
+			// Test block without overrides.
+			await editor.selectBlocks( blockWithoutOverrides );
+			await editor.showBlockToolbar();
+
+			await expect(
+				page
+					.getByRole( 'toolbar', { name: 'Block tools' } )
+					.getByRole( 'button', { name: 'Move up' } )
+			).toBeHidden();
+
+			await expect(
+				page
+					.getByRole( 'toolbar', { name: 'Block tools' } )
+					.getByRole( 'button', { name: 'Move down' } )
+			).toBeHidden();
+
+			// Test first button.
+			await editor.selectBlocks( firstButton );
+			await editor.showBlockToolbar();
+
+			await expect(
+				page
+					.getByRole( 'toolbar', { name: 'Block tools' } )
+					.getByRole( 'button', { name: 'Move up' } )
+			).toBeHidden();
+
+			await expect(
+				page
+					.getByRole( 'toolbar', { name: 'Block tools' } )
+					.getByRole( 'button', { name: 'Move down' } )
+			).toBeHidden();
+
+			// Test second button.
+			await editor.selectBlocks( secondButton );
+			await editor.showBlockToolbar();
+
+			await expect(
+				page
+					.getByRole( 'toolbar', { name: 'Block tools' } )
+					.getByRole( 'button', { name: 'Move up' } )
+			).toBeHidden();
+
+			await expect(
+				page
+					.getByRole( 'toolbar', { name: 'Block tools' } )
+					.getByRole( 'button', { name: 'Move down' } )
+			).toBeHidden();
+		} );
+	} );
+
 	test.describe( 'block editing modes', () => {
 		test( 'blocks with bindings in a synced pattern are editable, and all other blocks are disabled', async ( {
 			admin,

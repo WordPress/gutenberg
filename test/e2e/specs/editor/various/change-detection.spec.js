@@ -414,7 +414,7 @@ test.describe( 'Change detection', () => {
 			.click();
 		await page
 			.getByRole( 'menu' )
-			.getByRole( 'menuitem', { name: 'Move to trash' } )
+			.getByRole( 'menuitem', { name: 'Trash' } )
 			.click();
 		await page
 			.getByRole( 'dialog' )

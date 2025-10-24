@@ -15,6 +15,7 @@ import {
 import { useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { useMemo, useEffect } from '@wordpress/element';
+import { getBlockSelector } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
@@ -30,7 +31,6 @@ import {
 	getDuotoneStylesheet,
 	getDuotoneUnsetStylesheet,
 } from '../components/duotone/utils';
-import { getBlockCSSSelector } from '../components/global-styles/get-block-css-selector';
 import { scopeSelector } from '../components/global-styles/utils';
 import {
 	cleanEmptyObject,
@@ -354,14 +354,14 @@ function useBlockProps( { clientId, name, style } ) {
 				false
 			);
 			if ( experimentalDuotone ) {
-				const rootSelector = getBlockCSSSelector( blockType );
+				const rootSelector = getBlockSelector( blockType );
 				return typeof experimentalDuotone === 'string'
 					? scopeSelector( rootSelector, experimentalDuotone )
 					: rootSelector;
 			}
 
 			// Regular filter.duotone support uses filter.duotone selectors with fallbacks.
-			return getBlockCSSSelector( blockType, 'filter.duotone', {
+			return getBlockSelector( blockType, 'filter.duotone', {
 				fallback: true,
 			} );
 		}

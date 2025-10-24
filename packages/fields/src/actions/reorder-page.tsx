@@ -6,24 +6,39 @@ import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useState } from '@wordpress/element';
-import { DataForm, useFormValidity } from '@wordpress/dataviews';
 import {
 	Button,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
+	__experimentalInputControl as InputControl,
 } from '@wordpress/components';
-import type { Action, RenderModalProps } from '@wordpress/dataviews';
 
 /**
  * Internal dependencies
  */
 import type { CoreDataError, BasePost } from '../types';
-import { orderField } from '../fields';
 
-const fields = [ orderField ];
-const formOrderAction = {
-	fields: [ 'menu_order' ],
-};
+interface RenderModalProps< Item > {
+	items: Item[];
+	closeModal?: () => void;
+	onActionPerformed?: ( items: Item[] ) => void;
+}
+
+interface Action< Item > {
+	id: string;
+	label: string;
+	isEligible?: ( item: Item ) => boolean;
+	modalFocusOnMount?: string;
+	RenderModal: ( props: RenderModalProps< Item > ) => JSX.Element;
+}
+
+function isItemValid( item: BasePost ): boolean {
+	return (
+		typeof item.menu_order === 'number' &&
+		Number.isInteger( item.menu_order ) &&
+		item.menu_order > 0
+	);
+}
 
 function ReorderModal( {
 	items,
@@ -31,17 +46,12 @@ function ReorderModal( {
 	onActionPerformed,
 }: RenderModalProps< BasePost > ) {
 	const [ item, setItem ] = useState( items[ 0 ] );
-	const orderInput = item.menu_order;
 	const { editEntityRecord, saveEditedEntityRecord } =
 		useDispatch( coreStore );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
-	const { validity, isValid } = useFormValidity(
-		item,
-		fields,
-		formOrderAction
-	);
+	const isValid = isItemValid( item );
 
 	async function onOrder( event: React.FormEvent ) {
 		event.preventDefault();
@@ -52,7 +62,7 @@ function ReorderModal( {
 
 		try {
 			await editEntityRecord( 'postType', item.type, item.id, {
-				menu_order: orderInput,
+				menu_order: item.menu_order,
 			} );
 			closeModal?.();
 			// Persist edited entity.
@@ -83,15 +93,21 @@ function ReorderModal( {
 						'Determines the order of pages. Pages with the same order value are sorted alphabetically. Negative order values are supported.'
 					) }
 				</div>
-				<DataForm
-					data={ item }
-					fields={ fields }
-					form={ formOrderAction }
-					validity={ validity }
-					onChange={ ( changes ) => {
-						return setItem( {
+				<InputControl
+					__next40pxDefaultSize
+					label={ __( 'Order' ) }
+					type="number"
+					value={
+						typeof item.menu_order === 'number' &&
+						Number.isInteger( item.menu_order )
+							? String( item.menu_order )
+							: ''
+					}
+					onChange={ ( value ) => {
+						const parsed = parseInt( value as string, 10 ); // absorbs '' and undefined
+						setItem( {
 							...item,
-							...changes,
+							menu_order: isNaN( parsed ) ? undefined : parsed,
 						} );
 					} }
 				/>

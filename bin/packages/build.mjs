@@ -16,6 +16,7 @@ import chokidar from 'chokidar';
 import browserslistToEsbuild from 'browserslist-to-esbuild';
 import { sassPlugin } from 'esbuild-sass-plugin';
 import postcss from 'postcss';
+import postcssModulesPlugin from 'postcss-modules';
 import autoprefixer from 'autoprefixer';
 import rtlcss from 'rtlcss';
 import cssnano from 'cssnano';
@@ -56,18 +57,18 @@ function getAllPackages() {
 
 const PACKAGES = getAllPackages();
 
-// Define global variables for feature flagging, matching webpack's DefinePlugin behavior
-const define = {
+const baseDefine = {
 	'globalThis.IS_GUTENBERG_PLUGIN': JSON.stringify(
 		Boolean( process.env.npm_package_config_IS_GUTENBERG_PLUGIN )
 	),
 	'globalThis.IS_WORDPRESS_CORE': JSON.stringify(
 		Boolean( process.env.npm_package_config_IS_WORDPRESS_CORE )
 	),
-	'globalThis.SCRIPT_DEBUG': JSON.stringify(
-		process.env.NODE_ENV === 'development'
-	),
 };
+const getDefine = ( scriptDebug ) => ( {
+	...baseDefine,
+	'globalThis.SCRIPT_DEBUG': JSON.stringify( scriptDebug ),
+} );
 
 /**
  * Create emotion babel plugin for esbuild.
@@ -515,6 +516,7 @@ function resolveEntryPoint( packageDir, packageJson ) {
  * @return {Promise<boolean>} True if the package was bundled, false otherwise.
  */
 async function bundlePackage( packageName ) {
+	const builtModules = [];
 	const packageDir = path.join( PACKAGES_DIR, packageName );
 	const packageJsonPath = path.join( packageDir, 'package.json' );
 	const packageJson = JSON.parse( await readFile( packageJsonPath, 'utf8' ) );
@@ -523,7 +525,13 @@ async function bundlePackage( packageName ) {
 
 	if ( packageJson.wpScript ) {
 		const entryPoint = resolveEntryPoint( packageDir, packageJson );
-		const outputDir = path.join( PACKAGES_DIR, '..', 'build', packageName );
+		const outputDir = path.join(
+			PACKAGES_DIR,
+			'..',
+			'build',
+			'scripts',
+			packageName
+		);
 		const target = browserslistToEsbuild();
 		const globalName = `wp.${ kebabToCamelCase( packageName ) }`;
 
@@ -554,14 +562,14 @@ async function bundlePackage( packageName ) {
 				...baseConfig,
 				outfile: path.join( outputDir, 'index.min.js' ),
 				minify: true,
-				define,
+				define: getDefine( false ),
 				plugins: bundlePlugins,
 			} ),
 			esbuild.build( {
 				...baseConfig,
 				outfile: path.join( outputDir, 'index.js' ),
 				minify: false,
-				define,
+				define: getDefine( true ),
 				plugins: bundlePlugins,
 			} )
 		);
@@ -572,7 +580,8 @@ async function bundlePackage( packageName ) {
 		const rootBuildModuleDir = path.join(
 			PACKAGES_DIR,
 			'..',
-			'build-module',
+			'build',
+			'modules',
 			packageName
 		);
 
@@ -588,7 +597,6 @@ async function bundlePackage( packageName ) {
 					: exportName.replace( /^\.\//, '' );
 			const entryPoint = path.join( packageDir, exportPath );
 			const baseFileName = path.basename( fileName );
-
 			const modulePlugins = [
 				wordpressExternalsPlugin( `${ baseFileName }.min`, 'esm' ),
 			];
@@ -606,16 +614,48 @@ async function bundlePackage( packageName ) {
 					target,
 					platform: 'browser',
 					minify: true,
-					define,
+					define: getDefine( false ),
+					plugins: modulePlugins,
+				} ),
+				esbuild.build( {
+					entryPoints: [ entryPoint ],
+					outfile: path.join(
+						rootBuildModuleDir,
+						`${ fileName }.js`
+					),
+					bundle: true,
+					sourcemap: true,
+					format: 'esm',
+					target,
+					platform: 'browser',
+					minify: false,
+					define: getDefine( true ),
 					plugins: modulePlugins,
 				} )
 			);
+
+			const scriptModuleId =
+				exportName === '.'
+					? `@wordpress/${ packageName }`
+					: `@wordpress/${ packageName }/${ fileName }`;
+
+			builtModules.push( {
+				id: scriptModuleId,
+				path: `${ packageName }/${ fileName }`,
+				asset: `${ packageName }/${ fileName }.min.asset.php`,
+			} );
 		}
 	}
 
 	if ( packageJson.wpScript ) {
 		const buildStyleDir = path.join( packageDir, 'build-style' );
-		const outputDir = path.join( PACKAGES_DIR, '..', 'build', packageName );
+		const outputDir = path.join(
+			PACKAGES_DIR,
+			'..',
+			'build',
+			'styles',
+			packageName
+		);
 		const isProduction = process.env.NODE_ENV === 'production';
 
 		const cssFiles = await glob(
@@ -663,7 +703,13 @@ async function bundlePackage( packageName ) {
 	if ( packageJson.wpCopyFiles ) {
 		const { files, transforms = {} } = packageJson.wpCopyFiles;
 		const sourceDir = path.join( packageDir, 'src' );
-		const outputDir = path.join( PACKAGES_DIR, '..', 'build', packageName );
+		const outputDir = path.join(
+			PACKAGES_DIR,
+			'..',
+			'build',
+			'scripts',
+			packageName
+		);
 
 		for ( const filePattern of files ) {
 			const matchedFiles = await glob(
@@ -735,7 +781,70 @@ async function bundlePackage( packageName ) {
 
 	await Promise.all( builds );
 
-	return true;
+	return { modules: builtModules };
+}
+
+/**
+ * Generate PHP files for script module registration.
+ *
+ * @param {Array} modules Array of module info objects.
+ */
+async function generateModuleRegistrationPhp( modules ) {
+	const ROOT_DIR = path.join( PACKAGES_DIR, '..' );
+	const rootPackageJson = JSON.parse(
+		await readFile( path.join( ROOT_DIR, 'package.json' ), 'utf8' )
+	);
+	const prefix = rootPackageJson.wpPlugin?.prefix || 'gutenberg';
+
+	// Read templates
+	const templatesDir = path.join( __dirname, 'templates' );
+	const registryTemplate = await readFile(
+		path.join( templatesDir, 'module-registry.php.template' ),
+		'utf8'
+	);
+	const registrationTemplate = await readFile(
+		path.join( templatesDir, 'module-registration.php.template' ),
+		'utf8'
+	);
+
+	// Generate modules array for registry
+	const modulesArray = modules
+		.map(
+			( module ) =>
+				`\tarray(\n` +
+				`\t\t'id' => '${ module.id }',\n` +
+				`\t\t'path' => '${ module.path }',\n` +
+				`\t\t'asset' => '${ module.asset }',\n` +
+				`\t),`
+		)
+		.join( '\n' );
+
+	// Generate module registry file (data only)
+	const registryContent = registryTemplate
+		.replace( /\{\{PREFIX\}\}/g, prefix )
+		.replace( '{{MODULES}}', modulesArray );
+
+	// Generate registration file (logic only)
+	const registrationContent = registrationTemplate.replace(
+		/\{\{PREFIX\}\}/g,
+		prefix
+	);
+
+	// Write files
+	const buildDir = path.join( ROOT_DIR, 'build' );
+	const modulesDir = path.join( buildDir, 'modules' );
+
+	await mkdir( modulesDir, { recursive: true } );
+	await writeFile(
+		path.join( modulesDir, 'index.php' ),
+		registryContent,
+		'utf8'
+	);
+	await writeFile(
+		path.join( buildDir, 'index.php' ),
+		registrationContent,
+		'utf8'
+	);
 }
 
 /**
@@ -851,8 +960,10 @@ async function transpilePackage( packageName ) {
 
 /**
  * Compile styles for a single package.
- * Discovers and compiles SCSS entry points based on package configuration.
- * Supports wpStyleEntryPoints in package.json for custom entry point patterns.
+ *
+ * Discovers and compiles SCSS entry points based on package configuration
+ * (supporting wpStyleEntryPoints in package.json for custom entry point patterns),
+ * and all .module.css files in src/ directory.
  *
  * @param {string} packageName Package name.
  * @return {Promise<number|null>} Build time in milliseconds, or null if no styles.
@@ -862,18 +973,25 @@ async function compileStyles( packageName ) {
 	const packageJsonPath = path.join( packageDir, 'package.json' );
 	const packageJson = JSON.parse( await readFile( packageJsonPath, 'utf8' ) );
 
-	// Get entry point patterns from package.json, default to root-level only
-	const entryPointPatterns = packageJson.wpStyleEntryPoints || [
+	// Get SCSS entry point patterns from package.json, default to root-level only
+	const scssEntryPointPatterns = packageJson.wpStyleEntryPoints || [
 		'src/*.scss',
 	];
 
-	const styleEntries = await glob(
-		entryPointPatterns.map( ( pattern ) =>
+	// Find all matching SCSS files
+	const scssEntries = await glob(
+		scssEntryPointPatterns.map( ( pattern ) =>
 			normalizePath( path.join( packageDir, pattern ) )
 		)
 	);
 
-	if ( styleEntries.length === 0 ) {
+	// Get CSS modules from anywhere in src/
+	const cssModuleEntries = await glob(
+		normalizePath( path.join( packageDir, 'src/**/*.module.css' ) ),
+		{ ignore: IGNORE_PATTERNS }
+	);
+
+	if ( scssEntries.length === 0 && cssModuleEntries.length === 0 ) {
 		return null;
 	}
 
@@ -881,8 +999,67 @@ async function compileStyles( packageName ) {
 	const buildStyleDir = path.join( packageDir, 'build-style' );
 	const srcDir = path.join( packageDir, 'src' );
 
+	// Process .module.css files and generate JS modules
+	const cssResults = await Promise.all(
+		cssModuleEntries.map( async ( styleEntryPath ) => {
+			const buildDir = path.join( packageDir, 'build' );
+			const buildModuleDir = path.join( packageDir, 'build-module' );
+
+			const cssContent = await readFile( styleEntryPath, 'utf8' );
+			const relativePath = path.relative( srcDir, styleEntryPath );
+
+			let mappings = {};
+			const result = await postcss( [
+				postcssModulesPlugin( {
+					getJSON: ( _, json ) => ( mappings = json ),
+				} ),
+			] ).process( cssContent, { from: styleEntryPath } );
+
+			// Write processed CSS to build-style (preserving directory structure)
+			const cssOutPath = path.join(
+				buildStyleDir,
+				relativePath.replace( '.module.css', '.css' )
+			);
+			await mkdir( path.dirname( cssOutPath ), { recursive: true } );
+			await writeFile( cssOutPath, result.css );
+
+			// Generate JS modules with class name mappings (preserving directory structure)
+			const jsExport = JSON.stringify( mappings );
+			const jsPath = `${ relativePath }.js`;
+			await Promise.all( [
+				mkdir( path.dirname( path.join( buildDir, jsPath ) ), {
+					recursive: true,
+				} ),
+				mkdir( path.dirname( path.join( buildModuleDir, jsPath ) ), {
+					recursive: true,
+				} ),
+			] );
+			await Promise.all( [
+				writeFile(
+					path.join( buildDir, jsPath ),
+					`"use strict";\nmodule.exports = ${ jsExport };\n`
+				),
+				writeFile(
+					path.join( buildModuleDir, jsPath ),
+					`export default ${ jsExport };\n`
+				),
+			] );
+
+			// Return the processed CSS for combining
+			return result.css;
+		} )
+	);
+
+	// Generate combined stylesheet from all CSS modules
+	if ( cssResults.length > 0 ) {
+		const combinedCss = cssResults.join( '\n' );
+		await mkdir( buildStyleDir, { recursive: true } );
+		await writeFile( path.join( buildStyleDir, 'style.css' ), combinedCss );
+	}
+
+	// Process SCSS files
 	await Promise.all(
-		styleEntries.map( async ( styleEntryPath ) => {
+		scssEntries.map( async ( styleEntryPath ) => {
 			// Calculate relative path from src/ to preserve directory structure
 			const relativePath = path.relative( srcDir, styleEntryPath );
 			const relativeDir = path.dirname( relativePath );
@@ -1021,16 +1198,28 @@ async function buildAll() {
 	}
 
 	console.log( '\n📦 Phase 2: Bundling packages...\n' );
+	const modules = [];
 	await Promise.all(
 		PACKAGES.map( async ( packageName ) => {
 			const startBundleTime = Date.now();
-			const isBundled = await bundlePackage( packageName );
+			const ret = await bundlePackage( packageName );
 			const buildTime = Date.now() - startBundleTime;
-			if ( isBundled ) {
-				console.log( `✔ Bundled ${ packageName } (${ buildTime }ms)` );
+			if ( ret ) {
+				console.log(
+					`   ✔ Bundled ${ packageName } (${ buildTime }ms)`
+				);
+
+				if ( ret.modules ) {
+					modules.push( ...ret.modules );
+				}
 			}
 		} )
 	);
+
+	console.log( '\n📄 Generating PHP registration...\n' );
+	await generateModuleRegistrationPhp( modules );
+	console.log( '   ✔ Generated build/index.php' );
+	console.log( '   ✔ Generated build/modules/index.php' );
 
 	const totalTime = Date.now() - startTime;
 	console.log(

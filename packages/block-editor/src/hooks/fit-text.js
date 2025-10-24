@@ -3,7 +3,7 @@
  */
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
-import { useEffect, useCallback, useRef } from '@wordpress/element';
+import { useEffect, useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
@@ -62,27 +62,17 @@ function useFitText( { fitText, name, clientId } ) {
 	const hasFitTextSupport = hasBlockSupport( name, FIT_TEXT_SUPPORT_KEY );
 	const blockElement = useBlockElement( clientId );
 
-	// Monitor block attribute changes and selection state
+	// Monitor block attribute changes
 	// Any attribute may change the available space.
-	const { blockAttributes, isSelected } = useSelect(
+	const blockAttributes = useSelect(
 		( select ) => {
-			if ( ! clientId ) {
-				return { blockAttributes: undefined, isSelected: false };
+			if ( ! clientId || ! hasFitTextSupport || ! fitText ) {
+				return;
 			}
-			return {
-				blockAttributes:
-					select( blockEditorStore ).getBlockAttributes( clientId ),
-				isSelected:
-					select( blockEditorStore ).isBlockSelected( clientId ),
-			};
+			return select( blockEditorStore ).getBlockAttributes( clientId );
 		},
-		[ clientId ]
+		[ clientId, hasFitTextSupport, fitText ]
 	);
-
-	const isSelectedRef = useRef();
-	useEffect( () => {
-		isSelectedRef.current = isSelected;
-	}, [ isSelected ] );
 
 	const applyFitText = useCallback( () => {
 		if ( ! blockElement || ! hasFitTextSupport || ! fitText ) {
@@ -104,13 +94,8 @@ function useFitText( { fitText, name, clientId } ) {
 			styleElement.textContent = css;
 		};
 
-		// Avoid very jarring resizes when a user is actively editing the
-		// block. Placing a ceiling on how much the block can grow curbs the
-		// effect of the first few keypresses.
-		const maxSize = isSelectedRef.current ? 200 : undefined;
-
-		optimizeFitText( blockElement, blockSelector, applyStylesFn, maxSize );
-	}, [ blockElement, clientId, hasFitTextSupport, fitText, isSelectedRef ] );
+		optimizeFitText( blockElement, blockSelector, applyStylesFn );
+	}, [ blockElement, clientId, hasFitTextSupport, fitText ] );
 
 	useEffect( () => {
 		if (
@@ -164,7 +149,6 @@ function useFitText( { fitText, name, clientId } ) {
 		}
 	}, [
 		blockAttributes,
-		isSelected,
 		fitText,
 		applyFitText,
 		blockElement,
@@ -180,12 +164,16 @@ function useFitText( { fitText, name, clientId } ) {
  * @param {Function} props.setAttributes Function to set block attributes.
  * @param {string}   props.name          Block name.
  * @param {boolean}  props.fitText       Whether fit text is enabled.
+ * @param {string}   props.fontSize      Font size slug.
+ * @param {Object}   props.style         Block style object.
  */
 export function FitTextControl( {
 	clientId,
 	fitText = false,
 	setAttributes,
 	name,
+	fontSize,
+	style,
 } ) {
 	if ( ! hasBlockSupport( name, FIT_TEXT_SUPPORT_KEY ) ) {
 		return null;
@@ -203,13 +191,34 @@ export function FitTextControl( {
 					__nextHasNoMarginBottom
 					label={ __( 'Fit text' ) }
 					checked={ fitText }
-					onChange={ () =>
-						setAttributes( { fitText: ! fitText || undefined } )
-					}
+					onChange={ () => {
+						const newFitText = ! fitText || undefined;
+						const updates = { fitText: newFitText };
+
+						// When enabling fit text, clear font size if it has a value
+						if ( newFitText ) {
+							if ( fontSize ) {
+								updates.fontSize = undefined;
+							}
+							if ( style?.typography?.fontSize ) {
+								updates.style = {
+									...style,
+									typography: {
+										...style?.typography,
+										fontSize: undefined,
+									},
+								};
+							}
+						}
+
+						setAttributes( updates );
+					} }
 					help={
 						fitText
 							? __( 'Text will resize to fit its container.' )
-							: __( 'Resize text to fit its container.' )
+							: __(
+									'The text will resize to fit its container, resetting other font size settings.'
+							  )
 					}
 				/>
 			</ToolsPanelItem>
@@ -278,7 +287,7 @@ const hasFitTextSupport = ( blockNameOrType ) => {
 export default {
 	useBlockProps,
 	addSaveProps,
-	attributeKeys: [ 'fitText' ],
+	attributeKeys: [ 'fitText', 'fontSize', 'style' ],
 	hasSupport: hasFitTextSupport,
 	edit: FitTextControl,
 };

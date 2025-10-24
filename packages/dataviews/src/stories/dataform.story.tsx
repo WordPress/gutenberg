@@ -1799,6 +1799,7 @@ const LayoutMixedComponent = () => {
 	} );
 
 	const form: Form = {
+		layout: { type: 'card' },
 		fields: [
 			{
 				id: 'title-and-status',

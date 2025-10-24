@@ -15,13 +15,14 @@
 	text-decoration: none;
 	font-family: inherit;
 	font-size: $default-font-size;
+	font-weight: $font-weight-medium;
 	margin: 0;
 	border: 0;
 	cursor: pointer;
 	-webkit-appearance: none;
 	background: none;
 
-	@media not (prefers-reduced-motion) {
+	@media not ( prefers-reduced-motion ) {
 		transition: box-shadow 0.1s linear;
 	}
 
@@ -251,6 +252,7 @@
 		background: none;
 		outline: none;
 		text-align: left;
+		font-weight: $font-weight-regular;
 		color: $components-color-accent;
 		text-decoration: underline;
 
@@ -385,6 +387,7 @@
 	svg {
 		fill: currentColor;
 		outline: none;
+		flex-shrink: 0;
 
 		// Optimize for high contrast modes.
 		// See also https://blogs.windows.com/msedgedev/2020/09/17/styling-for-windows-high-contrast-with-new-standards-for-forced-colors/.
