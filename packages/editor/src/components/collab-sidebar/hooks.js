@@ -412,7 +412,6 @@ export function useFloatingThread( {
 	useEffect( () => {
 		if ( refs.floating?.current ) {
 			const newHeight = refs.floating.current.scrollHeight;
-
 			updateHeight( thread.id, newHeight );
 		}
 	}, [
