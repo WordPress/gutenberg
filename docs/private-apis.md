@@ -276,7 +276,6 @@ Private exports:
 - `BackButton`
 - `EntitiesSavedStatesExtensible`
 - `Editor`
-- `EditorContentSlotFill`
 - `PluginPostExcerpt`
 - `PostCardPanel`
 - `PreferencesModal`

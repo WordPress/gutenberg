@@ -526,3 +526,40 @@ export const setDefaultRenderingMode =
 			.dispatch( preferencesStore )
 			.set( 'core', 'renderingModes', newModes );
 	};
+
+/**
+ * Set the current global styles navigation path.
+ *
+ * @param {string} path The navigation path.
+ * @return {Object} Action object.
+ */
+export function setStylesPath( path ) {
+	return {
+		type: 'SET_STYLES_PATH',
+		path,
+	};
+}
+
+/**
+ * Set whether the stylebook is visible.
+ *
+ * @param {boolean} show Whether to show the stylebook.
+ * @return {Object} Action object.
+ */
+export function setShowStylebook( show ) {
+	return {
+		type: 'SET_SHOW_STYLEBOOK',
+		show,
+	};
+}
+
+/**
+ * Reset the global styles navigation to initial state.
+ *
+ * @return {Object} Action object.
+ */
+export function resetStylesNavigation() {
+	return {
+		type: 'RESET_STYLES_NAVIGATION',
+	};
+}

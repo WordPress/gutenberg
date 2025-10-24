@@ -9,15 +9,16 @@ import { useCommandLoader } from '@wordpress/commands';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as coreStore } from '@wordpress/core-data';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
-import { useGlobalStyles } from '../../components/global-styles/hooks';
 
 const { useHistory, useLocation } = unlock( routerPrivateApis );
+const { useGlobalStyles } = unlock( editorPrivateApis );
 
 const getGlobalStylesToggleWelcomeGuideCommands = () =>
 	function useGlobalStylesToggleWelcomeGuideCommands() {
