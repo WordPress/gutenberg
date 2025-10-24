@@ -101,7 +101,6 @@ export function LinkUIPageCreator( {
 					}
 				);
 
-
 				onPageCreated( pageLink );
 			}
 		} catch ( error ) {
