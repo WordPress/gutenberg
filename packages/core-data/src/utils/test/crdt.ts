@@ -169,6 +169,25 @@ describe( 'crdt', () => {
 			expect( metaMap.get( 'some_meta' ) ).toBe( 'new value' );
 		} );
 
+		it( 'syncs non-single meta fields', () => {
+			const changes = {
+				meta: {
+					some_meta: [ 'value', 'value 2' ],
+				},
+			};
+
+			const metaMap = new Y.Map< unknown >();
+			metaMap.set( 'some_meta', 'old value' );
+			map.set( 'meta', metaMap );
+
+			applyPostChangesToCRDTDoc( doc, changes, mockPostType );
+
+			expect( metaMap.get( 'some_meta' ) ).toStrictEqual( [
+				'value',
+				'value 2',
+			] );
+		} );
+
 		it( 'initializes meta as Y.Map when not present', () => {
 			const changes = {
 				meta: {
@@ -300,6 +319,28 @@ describe( 'crdt', () => {
 
 			expect( changes.meta ).toEqual( {
 				public_meta: 'new value', // from CRDT
+			} );
+		} );
+
+		it( 'includes non-single meta in changes', () => {
+			map.set( 'meta', {
+				public_meta: [ 'value', 'value 2' ],
+			} );
+
+			const editedRecord = {
+				meta: {
+					public_meta: 'value',
+				},
+			} as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				mockPostType
+			);
+
+			expect( changes.meta ).toEqual( {
+				public_meta: [ 'value', 'value 2' ], // from CRDT
 			} );
 		} );
 	} );
