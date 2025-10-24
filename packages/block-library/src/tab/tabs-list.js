@@ -89,14 +89,15 @@ export default function TabsList( {
 								onChange={ onLabelChange }
 							/>
 						) : (
-							<span>
-								{ decodeEntities( siblingLabel ) ||
-									sprintf(
-										/* translators: %d is the tab index + 1 */
-										__( 'Tab %d' ),
-										index + 1
-									) }
-							</span>
+							<RichText.Content
+								value={ decodeEntities( siblingLabel ) }
+								tagName="span"
+								placeholder={ sprintf(
+									/* translators: %d is the tab index + 1 */
+									__( 'Tab %d…' ),
+									index + 1
+								) }
+							/>
 						) }
 					</button>
 				);
