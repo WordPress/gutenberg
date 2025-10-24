@@ -91,6 +91,7 @@ export function LinkUIPageCreator( {
 				// Show success notice
 				createSuccessNotice(
 					sprintf(
+					// translators: %s: the name of the new page being created.
 						__( '%s page created successfully.' ),
 						decodeEntities( savedRecord.title.rendered )
 					),
