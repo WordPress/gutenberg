@@ -70,5 +70,9 @@
 		{ "path": "packages/jest-console" },
 		{ "path": "test/performance" }
 	],
-	"files": []
+	"compilerOptions": {
+		"rootDir": ".",
+		"noEmit": true
+	},
+	"include": [ "bin" ]
 }
