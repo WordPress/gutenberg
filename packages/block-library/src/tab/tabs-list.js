@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { RichText } from '@wordpress/block-editor';
 import { decodeEntities } from '@wordpress/html-entities';
 
@@ -79,21 +79,23 @@ export default function TabsList( {
 							<RichText
 								ref={ labelRef }
 								tagName="span"
-								allowedFormats={ [
-									'core/bold',
-									'core/italic',
-									'core/strikethrough',
-								] }
-								placeholder={
-									__( 'Tab' ) + ` ${ currentBlockIndex + 1 }…`
-								}
+								withoutInteractiveFormatting
+								placeholder={ sprintf(
+									/* translators: %d is the tab index + 1 */
+									__( 'Tab %d…' ),
+									currentBlockIndex + 1
+								) }
 								value={ decodeEntities( currentLabel ) }
 								onChange={ onLabelChange }
 							/>
 						) : (
 							<span>
 								{ decodeEntities( siblingLabel ) ||
-									__( 'Tab' ) + ` ${ index + 1 }` }
+									sprintf(
+										/* translators: %d is the tab index + 1 */
+										__( 'Tab %d' ),
+										index + 1
+									) }
 							</span>
 						) }
 					</button>
