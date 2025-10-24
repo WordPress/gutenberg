@@ -151,7 +151,7 @@
 								"ui": {
 									"description": "Defines the bindings UI state for the attribute.",
 									"type": "string",
-									"enum": [ "readOnly", "hidden", "active" ],
+									"enum": [ "hidden", "active" ],
 									"default": "hidden"
 								}
 							}
