@@ -57,18 +57,18 @@ function getAllPackages() {
 
 const PACKAGES = getAllPackages();
 
-// Define global variables for feature flagging, matching webpack's DefinePlugin behavior
-const define = {
+const baseDefine = {
 	'globalThis.IS_GUTENBERG_PLUGIN': JSON.stringify(
 		Boolean( process.env.npm_package_config_IS_GUTENBERG_PLUGIN )
 	),
 	'globalThis.IS_WORDPRESS_CORE': JSON.stringify(
 		Boolean( process.env.npm_package_config_IS_WORDPRESS_CORE )
 	),
-	'globalThis.SCRIPT_DEBUG': JSON.stringify(
-		process.env.NODE_ENV === 'development'
-	),
 };
+const getDefine = ( scriptDebug ) => ( {
+	...baseDefine,
+	'globalThis.SCRIPT_DEBUG': JSON.stringify( scriptDebug ),
+} );
 
 /**
  * Create emotion babel plugin for esbuild.
@@ -207,13 +207,15 @@ function momentTimezoneAliasPlugin() {
  * WordPress externals and asset plugin.
  * Inspired by wp-build's wordpressExternalsAndAssetPlugin.
  *
- * @param {string} assetName   Optional. The name of the asset file to generate (without .asset.php extension). Defaults to 'index.min'.
- * @param {string} buildFormat Optional. The build format: 'iife' for scripts or 'esm' for script modules. Defaults to 'iife'.
+ * @param {string}   assetName         Optional. The name of the asset file to generate (without .asset.php extension). Defaults to 'index.min'.
+ * @param {string}   buildFormat       Optional. The build format: 'iife' for scripts or 'esm' for script modules. Defaults to 'iife'.
+ * @param {string[]} extraDependencies Optional. Additional dependencies to include in the asset file. Defaults to empty array.
  * @return {Object} esbuild plugin.
  */
 function wordpressExternalsPlugin(
 	assetName = 'index.min',
-	buildFormat = 'iife'
+	buildFormat = 'iife',
+	extraDependencies = []
 ) {
 	return {
 		name: 'wordpress-externals',
@@ -417,7 +419,13 @@ function wordpressExternalsPlugin(
 					return;
 				}
 
-				const dependenciesString = Array.from( dependencies )
+				// Merge discovered dependencies with extra dependencies
+				const allDependencies = new Set( [
+					...dependencies,
+					...extraDependencies,
+				] );
+
+				const dependenciesString = Array.from( allDependencies )
 					.sort()
 					.map( ( dep ) => `'${ dep }'` )
 					.join( ', ' );
@@ -516,6 +524,8 @@ function resolveEntryPoint( packageDir, packageJson ) {
  * @return {Promise<boolean>} True if the package was bundled, false otherwise.
  */
 async function bundlePackage( packageName ) {
+	const builtModules = [];
+	const builtScripts = [];
 	const packageDir = path.join( PACKAGES_DIR, packageName );
 	const packageJsonPath = path.join( packageDir, 'package.json' );
 	const packageJson = JSON.parse( await readFile( packageJsonPath, 'utf8' ) );
@@ -553,7 +563,11 @@ async function bundlePackage( packageName ) {
 
 		const bundlePlugins = [
 			momentTimezoneAliasPlugin(),
-			wordpressExternalsPlugin( 'index.min', 'iife' ),
+			wordpressExternalsPlugin(
+				'index.min',
+				'iife',
+				packageJson.wpScriptExtraDependencies || []
+			),
 		];
 
 		builds.push(
@@ -561,17 +575,23 @@ async function bundlePackage( packageName ) {
 				...baseConfig,
 				outfile: path.join( outputDir, 'index.min.js' ),
 				minify: true,
-				define,
+				define: getDefine( false ),
 				plugins: bundlePlugins,
 			} ),
 			esbuild.build( {
 				...baseConfig,
 				outfile: path.join( outputDir, 'index.js' ),
 				minify: false,
-				define,
+				define: getDefine( true ),
 				plugins: bundlePlugins,
 			} )
 		);
+
+		builtScripts.push( {
+			handle: `wp-${ packageName }`,
+			path: `${ packageName }/index`,
+			asset: `${ packageName }/index.min.asset.php`,
+		} );
 	}
 
 	if ( packageJson.wpScriptModuleExports ) {
@@ -596,7 +616,6 @@ async function bundlePackage( packageName ) {
 					: exportName.replace( /^\.\//, '' );
 			const entryPoint = path.join( packageDir, exportPath );
 			const baseFileName = path.basename( fileName );
-
 			const modulePlugins = [
 				wordpressExternalsPlugin( `${ baseFileName }.min`, 'esm' ),
 			];
@@ -614,10 +633,36 @@ async function bundlePackage( packageName ) {
 					target,
 					platform: 'browser',
 					minify: true,
-					define,
+					define: getDefine( false ),
+					plugins: modulePlugins,
+				} ),
+				esbuild.build( {
+					entryPoints: [ entryPoint ],
+					outfile: path.join(
+						rootBuildModuleDir,
+						`${ fileName }.js`
+					),
+					bundle: true,
+					sourcemap: true,
+					format: 'esm',
+					target,
+					platform: 'browser',
+					minify: false,
+					define: getDefine( true ),
 					plugins: modulePlugins,
 				} )
 			);
+
+			const scriptModuleId =
+				exportName === '.'
+					? `@wordpress/${ packageName }`
+					: `@wordpress/${ packageName }/${ fileName }`;
+
+			builtModules.push( {
+				id: scriptModuleId,
+				path: `${ packageName }/${ fileName }`,
+				asset: `${ packageName }/${ fileName }.min.asset.php`,
+			} );
 		}
 	}
 
@@ -755,7 +800,158 @@ async function bundlePackage( packageName ) {
 
 	await Promise.all( builds );
 
-	return true;
+	return { modules: builtModules, scripts: builtScripts };
+}
+
+/**
+ * Generate PHP files for script module registration.
+ *
+ * @param {Array} modules Array of module info objects.
+ */
+async function generateModuleRegistrationPhp( modules ) {
+	const ROOT_DIR = path.join( PACKAGES_DIR, '..' );
+	const rootPackageJson = JSON.parse(
+		await readFile( path.join( ROOT_DIR, 'package.json' ), 'utf8' )
+	);
+	const prefix = rootPackageJson.wpPlugin?.prefix || 'gutenberg';
+
+	// Read templates
+	const templatesDir = path.join( __dirname, 'templates' );
+	const registryTemplate = await readFile(
+		path.join( templatesDir, 'module-registry.php.template' ),
+		'utf8'
+	);
+	const registrationTemplate = await readFile(
+		path.join( templatesDir, 'module-registration.php.template' ),
+		'utf8'
+	);
+
+	// Generate modules array for registry
+	const modulesArray = modules
+		.map(
+			( module ) =>
+				`\tarray(\n` +
+				`\t\t'id' => '${ module.id }',\n` +
+				`\t\t'path' => '${ module.path }',\n` +
+				`\t\t'asset' => '${ module.asset }',\n` +
+				`\t),`
+		)
+		.join( '\n' );
+
+	// Generate module registry file (data only)
+	const registryContent = registryTemplate
+		.replace( /\{\{PREFIX\}\}/g, prefix )
+		.replace( '{{MODULES}}', modulesArray );
+
+	// Generate registration file (logic only)
+	const registrationContent = registrationTemplate.replace(
+		/\{\{PREFIX\}\}/g,
+		prefix
+	);
+
+	// Write files
+	const buildDir = path.join( ROOT_DIR, 'build' );
+	const modulesDir = path.join( buildDir, 'modules' );
+
+	await mkdir( modulesDir, { recursive: true } );
+	await writeFile(
+		path.join( modulesDir, 'index.php' ),
+		registryContent,
+		'utf8'
+	);
+	await writeFile(
+		path.join( buildDir, 'modules.php' ),
+		registrationContent,
+		'utf8'
+	);
+}
+
+/**
+ * Generate PHP files for script registration.
+ *
+ * @param {Array} scripts Array of script info objects.
+ */
+async function generateScriptRegistrationPhp( scripts ) {
+	const ROOT_DIR = path.join( PACKAGES_DIR, '..' );
+	const rootPackageJson = JSON.parse(
+		await readFile( path.join( ROOT_DIR, 'package.json' ), 'utf8' )
+	);
+	const prefix = rootPackageJson.wpPlugin?.prefix || 'gutenberg';
+
+	// Read templates
+	const templatesDir = path.join( __dirname, 'templates' );
+	const registryTemplate = await readFile(
+		path.join( templatesDir, 'script-registry.php.template' ),
+		'utf8'
+	);
+	const registrationTemplate = await readFile(
+		path.join( templatesDir, 'script-registration.php.template' ),
+		'utf8'
+	);
+
+	// Generate scripts array for registry
+	const scriptsArray = scripts
+		.map(
+			( script ) =>
+				`\tarray(\n` +
+				`\t\t'handle' => '${ script.handle }',\n` +
+				`\t\t'path' => '${ script.path }',\n` +
+				`\t\t'asset' => '${ script.asset }',\n` +
+				`\t),`
+		)
+		.join( '\n' );
+
+	// Generate script registry file (data only)
+	const registryContent = registryTemplate
+		.replace( /\{\{PREFIX\}\}/g, prefix )
+		.replace( '{{SCRIPTS}}', scriptsArray );
+
+	// Generate registration file (logic only)
+	const registrationContent = registrationTemplate.replace(
+		/\{\{PREFIX\}\}/g,
+		prefix
+	);
+
+	// Write files
+	const buildDir = path.join( ROOT_DIR, 'build' );
+	const scriptsDir = path.join( buildDir, 'scripts' );
+
+	await mkdir( scriptsDir, { recursive: true } );
+	await writeFile(
+		path.join( scriptsDir, 'index.php' ),
+		registryContent,
+		'utf8'
+	);
+	await writeFile(
+		path.join( buildDir, 'scripts.php' ),
+		registrationContent,
+		'utf8'
+	);
+}
+
+/**
+ * Generate main index.php that loads both modules and scripts.
+ */
+async function generateMainIndexPhp() {
+	const ROOT_DIR = path.join( PACKAGES_DIR, '..' );
+	const rootPackageJson = JSON.parse(
+		await readFile( path.join( ROOT_DIR, 'package.json' ), 'utf8' )
+	);
+	const prefix = rootPackageJson.wpPlugin?.prefix || 'gutenberg';
+
+	// Read template
+	const templatesDir = path.join( __dirname, 'templates' );
+	const indexTemplate = await readFile(
+		path.join( templatesDir, 'index.php.template' ),
+		'utf8'
+	);
+
+	// Generate main index file
+	const indexContent = indexTemplate.replace( /\{\{PREFIX\}\}/g, prefix );
+
+	// Write file
+	const buildDir = path.join( ROOT_DIR, 'build' );
+	await writeFile( path.join( buildDir, 'index.php' ), indexContent, 'utf8' );
 }
 
 /**
@@ -1109,16 +1305,39 @@ async function buildAll() {
 	}
 
 	console.log( '\n📦 Phase 2: Bundling packages...\n' );
+	const modules = [];
+	const scripts = [];
 	await Promise.all(
 		PACKAGES.map( async ( packageName ) => {
 			const startBundleTime = Date.now();
-			const isBundled = await bundlePackage( packageName );
+			const ret = await bundlePackage( packageName );
 			const buildTime = Date.now() - startBundleTime;
-			if ( isBundled ) {
-				console.log( `   ✔ Bundled ${ packageName } (${ buildTime }ms)` );
+			if ( ret ) {
+				console.log(
+					`   ✔ Bundled ${ packageName } (${ buildTime }ms)`
+				);
+
+				if ( ret.modules ) {
+					modules.push( ...ret.modules );
+				}
+				if ( ret.scripts ) {
+					scripts.push( ...ret.scripts );
+				}
 			}
 		} )
 	);
+
+	console.log( '\n📄 Generating PHP registration files...\n' );
+	await Promise.all( [
+		generateMainIndexPhp(),
+		generateModuleRegistrationPhp( modules ),
+		generateScriptRegistrationPhp( scripts ),
+	] );
+	console.log( '   ✔ Generated build/modules.php' );
+	console.log( '   ✔ Generated build/modules/index.php' );
+	console.log( '   ✔ Generated build/scripts.php' );
+	console.log( '   ✔ Generated build/scripts/index.php' );
+	console.log( '   ✔ Generated build/index.php' );
 
 	const totalTime = Date.now() - startTime;
 	console.log(

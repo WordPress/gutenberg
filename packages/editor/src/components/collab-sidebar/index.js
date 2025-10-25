@@ -31,9 +31,9 @@ import {
 	useEnableFloatingSidebar,
 } from './hooks';
 import { focusCommentThread } from './utils';
-import PluginMoreMenuItem from '../plugin-more-menu-item';
+import PostTypeSupportCheck from '../post-type-support-check';
 
-function CollabSidebarContent( {
+function NotesSidebarContent( {
 	showCommentBoard,
 	setShowCommentBoard,
 	styles,
@@ -83,22 +83,14 @@ function CollabSidebarContent( {
 	);
 }
 
-/**
- * Renders the Collab sidebar.
- */
-export default function CollabSidebar() {
+function NotesSidebar( { postId, mode } ) {
 	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const commentSidebarRef = useRef( null );
 
-	const { postId } = useSelect( ( select ) => {
-		const { getCurrentPostId } = select( editorStore );
-		return {
-			postId: getCurrentPostId(),
-		};
-	}, [] );
+	const showFloatingSidebar = isLargeViewport && mode === 'post-only';
 
 	const blockCommentId = useSelect( ( select ) => {
 		const { getBlockAttributes, getSelectedBlockClientId } =
@@ -117,7 +109,7 @@ export default function CollabSidebar() {
 		commentLastUpdated,
 	} = useBlockComments( postId );
 	useEnableFloatingSidebar(
-		isLargeViewport &&
+		showFloatingSidebar &&
 			( unresolvedSortedThreads.length > 0 || showCommentBoard )
 	);
 
@@ -132,11 +124,6 @@ export default function CollabSidebar() {
 		? resultComments.find( ( thread ) => thread.id === blockCommentId )
 		: null;
 
-	// If postId is not a valid number, do not render the comment sidebar.
-	if ( ! ( !! postId && typeof postId === 'number' ) ) {
-		return null;
-	}
-
 	async function openTheSidebar() {
 		const prevArea = await getActiveComplementaryArea( 'core' );
 		const activeNotesArea = SIDEBARS.find( ( name ) => name === prevArea );
@@ -145,7 +132,9 @@ export default function CollabSidebar() {
 		if ( ! activeNotesArea ) {
 			enableComplementaryArea(
 				'core',
-				isLargeViewport ? collabSidebarName : collabHistorySidebarName
+				showFloatingSidebar
+					? collabSidebarName
+					: collabHistorySidebarName
 			);
 		}
 
@@ -176,11 +165,12 @@ export default function CollabSidebar() {
 			<AddCommentMenuItem onClick={ openTheSidebar } />
 			<PluginSidebar
 				identifier={ collabHistorySidebarName }
+				name={ collabHistorySidebarName }
 				title={ __( 'Notes' ) }
 				icon={ commentIcon }
 				closeLabel={ __( 'Close Notes' ) }
 			>
-				<CollabSidebarContent
+				<NotesSidebarContent
 					comments={ resultComments }
 					showCommentBoard={ showCommentBoard }
 					setShowCommentBoard={ setShowCommentBoard }
@@ -189,7 +179,7 @@ export default function CollabSidebar() {
 					commentLastUpdated={ commentLastUpdated }
 				/>
 			</PluginSidebar>
-			{ isLargeViewport && (
+			{ showFloatingSidebar && (
 				<PluginSidebar
 					isPinnable={ false }
 					header={ false }
@@ -198,7 +188,7 @@ export default function CollabSidebar() {
 					headerClassName="editor-collab-sidebar__header"
 					backgroundColor={ backgroundColor }
 				>
-					<CollabSidebarContent
+					<NotesSidebarContent
 						comments={ unresolvedSortedThreads }
 						showCommentBoard={ showCommentBoard }
 						setShowCommentBoard={ setShowCommentBoard }
@@ -212,14 +202,26 @@ export default function CollabSidebar() {
 					/>
 				</PluginSidebar>
 			) }
-			<PluginMoreMenuItem
-				icon={ commentIcon }
-				onClick={ () =>
-					enableComplementaryArea( 'core', collabHistorySidebarName )
-				}
-			>
-				{ __( 'Notes' ) }
-			</PluginMoreMenuItem>
 		</>
+	);
+}
+
+export default function NotesSidebarContainer() {
+	const { postId, mode } = useSelect( ( select ) => {
+		const { getCurrentPostId, getRenderingMode } = select( editorStore );
+		return {
+			postId: getCurrentPostId(),
+			mode: getRenderingMode(),
+		};
+	}, [] );
+
+	if ( ! postId || typeof postId !== 'number' ) {
+		return null;
+	}
+
+	return (
+		<PostTypeSupportCheck supportKeys="editor.notes">
+			<NotesSidebar postId={ postId } mode={ mode } />
+		</PostTypeSupportCheck>
 	);
 }

@@ -170,3 +170,9 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-full-page-client-side-navigatio
 	require __DIR__ . '/experimental/interactivity-api/class-gutenberg-interactivity-api-full-page-navigation.php';
 	Gutenberg_Interactivity_API_Full_Page_Navigation::instance();
 }
+
+// Load auto-generated build registration.
+$build_registration = gutenberg_dir_path() . 'build/index.php';
+if ( file_exists( $build_registration ) ) {
+	require_once $build_registration;
+}

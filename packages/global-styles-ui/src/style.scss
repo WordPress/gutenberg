@@ -1,0 +1,287 @@
+@use "@wordpress/base-styles/variables";
+@use "@wordpress/base-styles/colors";
+@use "@wordpress/base-styles/mixins";
+@use "./font-library-modal/style.scss" as *;
+@use "./pagination/style.scss" as *;
+@use "./screen-revisions/style.scss" as *;
+@use "./size-control/style.scss" as *;
+@use "./variations/style.scss" as *;
+
+
+.global-styles-ui-preview {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	line-height: 1;
+	cursor: pointer;
+}
+
+.global-styles-ui-preview__wrapper {
+	max-width: 100%;
+	display: block;
+	width: 100%;
+}
+
+.global-styles-ui-typography-preview {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 100px;
+	margin-bottom: 20px;
+	background: #f0f0f0;
+	border-radius: 2px;
+	overflow: hidden;
+}
+
+.global-styles-ui-font-size__item {
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	line-break: anywhere;
+}
+
+.global-styles-ui-font-size__item-value {
+	color: #757575;
+}
+
+.global-styles-ui-screen {
+	margin: 12px 16px 16px;
+}
+
+.global-styles-ui-screen-typography__indicator {
+	height: 24px;
+	width: 24px;
+	font-size: 14px;
+	display: flex !important;
+	align-items: center;
+	justify-content: center;
+	border-radius: 2px;
+}
+
+.global-styles-ui-block-types-search {
+	margin-bottom: 10px;
+	padding: 0 20px;
+}
+
+.global-styles-ui-screen-typography__font-variants-count {
+	color: colors.$gray-700;
+}
+
+.global-styles-ui-font-families__manage-fonts {
+	justify-content: center;
+}
+
+.global-styles-ui-screen .color-block-support-panel {
+	padding-left: 0;
+	padding-right: 0;
+	padding-top: 0;
+	border-top: none;
+	row-gap: calc(4px * 3);
+}
+
+.global-styles-ui-header__description {
+	padding: 0 16px;
+}
+
+.global-styles-ui-header {
+	// Need to override the too specific bottom margin for complementary areas.
+	margin-bottom: 0 !important;
+}
+
+.global-styles-ui-subtitle {
+	// Need to override the too specific styles for complementary areas.
+	margin-bottom: 0 !important;
+	text-transform: uppercase;
+	font-weight: variables.$font-weight-medium !important;
+	font-size: 11px !important;
+}
+
+.global-styles-ui-section-title {
+	color: colors.$gray-800;
+	font-weight: 600;
+	line-height: 1.2;
+	padding: 16px 16px 0;
+	margin: 0;
+}
+
+.global-styles-ui-icon-with-current-color {
+	fill: currentColor;
+}
+
+.global-styles-ui__color-indicator-wrapper {
+	// Match the height of the rest of the icons (24px).
+	height: variables.$grid-unit * 3;
+	flex-shrink: 0;
+}
+
+.global-styles-ui__shadows-panel__options-container,
+.global-styles-ui__typography-panel__options-container {
+	height: variables.$grid-unit * 3;
+}
+
+.global-styles-ui__block-preview-panel {
+	position: relative;
+	width: 100%;
+	border: #ddd 1px solid;
+	border-radius: 2px;
+	overflow: hidden;
+}
+
+.global-styles-ui__shadow-preview-panel {
+	height: 144px;
+	border: #ddd 1px solid;
+	border-radius: 2px;
+	overflow: auto;
+	background-image:
+		repeating-linear-gradient(45deg, #f5f5f5 25%, #0000 0, #0000 75%, #f5f5f5 0, #f5f5f5),
+		repeating-linear-gradient(45deg, #f5f5f5 25%, #0000 0, #0000 75%, #f5f5f5 0, #f5f5f5);
+	background-position:
+		0 0,
+		8px 8px;
+	background-size: 16px 16px;
+
+	.global-styles-ui__shadow-preview-block {
+		border: #ddd 1px solid;
+		border-radius: 2px;
+		background-color: #fff;
+		width: 60%;
+		height: 60px;
+	}
+}
+
+.global-styles-ui__shadow-editor__dropdown-content {
+	width: 280px;
+}
+
+.global-styles-ui__shadow-editor-panel {
+	// because tooltip of the range control is too close to the edge and creates overflow
+	margin-bottom: 4px;
+}
+
+.global-styles-ui__shadow-editor__dropdown {
+	width: 100%;
+	position: relative;
+}
+
+.global-styles-ui__shadow-editor__dropdown-toggle {
+	width: 100%;
+	height: auto;
+	padding-top: 8px;
+	padding-bottom: 8px;
+	text-align: left;
+	border-radius: inherit;
+
+	&.is-open {
+		background: colors.$gray-100;
+		color: var(--wp-admin-theme-color);
+	}
+}
+
+.global-styles-ui__shadow-editor__remove-button {
+	position: absolute;
+	right: 8px;
+	top: 8px;
+	opacity: 0;
+
+	&.global-styles-ui__shadow-editor__remove-button {
+		border: none;
+	}
+
+	.global-styles-ui__shadow-editor__dropdown-toggle:hover + &,
+	&:focus,
+	&:hover {
+		opacity: 1;
+	}
+
+	@media ( hover: none ) {
+		// Show reset button on devices that do not support hover.
+		opacity: 1;
+	}
+}
+
+.global-styles-ui-screen-css {
+	flex: 1 1 auto;
+	display: flex;
+	flex-direction: column;
+	margin: 16px;
+
+	.components-v-stack {
+		flex: 1 1 auto;
+
+		.block-editor-global-styles-advanced-panel__custom-css-input {
+			flex: 1 1 auto;
+			display: flex;
+			flex-direction: column;
+
+			.components-base-control__field {
+				flex: 1 1 auto;
+				display: flex;
+				flex-direction: column;
+
+				.components-textarea-control__input {
+					flex: 1 1 auto;
+					// CSS input is always LTR regardless of language.
+
+					/*rtl:ignore*/
+					direction: ltr;
+				}
+			}
+		}
+	}
+}
+
+.global-styles-ui-screen-css-help-link {
+	display: inline-block;
+	margin-top: 8px;
+}
+
+.global-styles-ui-screen-variations {
+	margin-top: 16px;
+	border-top: 1px solid #ddd;
+
+	> * {
+		margin: 24px 16px;
+	}
+}
+
+.global-styles-ui-sidebar__navigator-provider {
+	height: 100%;
+}
+
+.global-styles-ui-sidebar__navigator-screen {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+.global-styles-ui-sidebar__navigator-screen .single-column {
+	grid-column: span 1;
+}
+
+.global-styles-ui-screen-root.global-styles-ui-screen-root,
+.global-styles-ui-screen-style-variations.global-styles-ui-screen-style-variations {
+	background: unset;
+	color: inherit;
+}
+
+.global-styles-ui-sidebar__panel .block-editor-block-icon svg {
+	fill: currentColor;
+}
+
+.global-styles-ui-screen-root__active-style-tile {
+	// Todo: revisit use of Card component and/or remove override
+	// The &#{&} is a workaround for the specificity of the Card component.
+	&#{&},
+	&#{&} .global-styles-ui-screen-root__active-style-tile-preview {
+		border-radius: 2px;
+	}
+}
+
+.global-styles-ui-color-palette-panel,
+.global-styles-ui-gradient-palette-panel {
+	padding: variables.$grid-unit-20;
+}
+
+.components-navigator-screen {
+	padding: variables.$grid-unit-15;
+}

@@ -1,9 +1,4 @@
-export {
-	useGlobalStylesReset,
-	useGlobalSetting,
-	useGlobalStyle,
-	useSettingsForBlockElement,
-} from './hooks';
+export { useSettingsForBlockElement } from './hooks';
 export { GlobalStylesContext } from './context';
 export {
 	default as TypographyPanel,
