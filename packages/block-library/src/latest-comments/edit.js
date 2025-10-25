@@ -100,7 +100,7 @@ export default function LatestComments( { attributes, setAttributes } ) {
 
 					<ToolsPanelItem
 						hasValue={ () => displayContent !== 'excerpt' }
-						label={ __( 'Display Content' ) }
+						label={ __( 'Display content' ) }
 						onDeselect={ () =>
 							setAttributes( { displayContent: 'excerpt' } )
 						}
