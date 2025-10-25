@@ -122,8 +122,8 @@ function render_block_core_latest_comments( $attributes ) {
 			if ( 'full' === $display_content ) {
 				$list_items_markup .= '<div class="wp-block-latest-comments__comment-excerpt">' . wpautop( get_comment_text( $comment ) ) . '</div>';
 			} elseif ( 'excerpt' === $display_content ) {
-$list_items_markup .= '<div class="wp-block-latest-comments__comment-excerpt">' . wpautop( get_comment_excerpt( $comment ) ) . '</div>';
-}
+				$list_items_markup .= '<div class="wp-block-latest-comments__comment-excerpt">' . wpautop( get_comment_excerpt( $comment ) ) . '</div>';
+			}
 			$list_items_markup .= '</article></li>';
 		}
 	}
