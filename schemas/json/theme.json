@@ -860,9 +860,6 @@
 			"description": "Settings defined on a per-block basis.",
 			"type": "object",
 			"properties": {
-				"core/archives": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
-				},
 				"core/accordion": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
@@ -873,6 +870,9 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/accordion-panel": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/archives": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/audio": {
@@ -980,9 +980,6 @@
 				"core/image": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
-				"core/math": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
-				},
 				"core/latest-comments": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
@@ -996,6 +993,9 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/loginout": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/math": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/media-text": {
@@ -1058,9 +1058,6 @@
 				"core/post-excerpt": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
-				"core/post-time-to-read": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
-				},
 				"core/post-featured-image": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
@@ -1071,6 +1068,9 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/post-terms": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/post-time-to-read": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/post-title": {
@@ -1880,9 +1880,6 @@
 			"description": "Styles defined on a per-block basis using the block's selector.",
 			"type": "object",
 			"properties": {
-				"core/archives": {
-					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-				},
 				"core/accordion": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
@@ -1893,6 +1890,9 @@
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/accordion-panel": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/archives": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/audio": {
@@ -2000,9 +2000,6 @@
 				"core/image": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
-				"core/math": {
-					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-				},
 				"core/latest-comments": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
@@ -2016,6 +2013,9 @@
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/loginout": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/math": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/media-text": {
@@ -2078,9 +2078,6 @@
 				"core/post-excerpt": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
-				"core/post-time-to-read": {
-					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-				},
 				"core/post-featured-image": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
@@ -2091,6 +2088,9 @@
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/post-terms": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/post-time-to-read": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/post-title": {
@@ -2324,6 +2324,18 @@
 		"stylesVariationBlocksPropertiesComplete": {
 			"type": "object",
 			"properties": {
+				"core/accordion": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
+				"core/accordion-heading": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
+				"core/accordion-item": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
+				"core/accordion-panel": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
 				"core/archives": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
@@ -2447,6 +2459,9 @@
 				"core/loginout": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
+				"core/math": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
 				"core/media-text": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
@@ -2517,6 +2532,9 @@
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
 				"core/post-terms": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
+				"core/post-time-to-read": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
 				"core/post-title": {
@@ -2598,6 +2616,18 @@
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
 				"core/term-description": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
+				"core/term-count": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
+				"core/term-name": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
+				"core/term-template": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
+				"core/terms-query": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
 				"core/text-columns": {
