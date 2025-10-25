@@ -393,7 +393,6 @@ describe.each( [
 			<Component
 				options={ timezones }
 				label={ defaultLabelText }
-				value={ targetOption.value }
 				allowReset
 			/>
 		);
