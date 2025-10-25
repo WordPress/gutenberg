@@ -365,7 +365,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
 							/>
 						</FlexBlock>
 						{ isLoading && <Spinner /> }
-						{ allowReset && Boolean( value ) && (
+						{ allowReset && Boolean( value ) && ! isExpanded && (
 							<Button
 								size="small"
 								icon={ closeSmall }
