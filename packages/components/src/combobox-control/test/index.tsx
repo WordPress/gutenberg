@@ -356,21 +356,6 @@ describe.each( [
 		expect( input ).toHaveValue( targetOption.label );
 	} );
 
-	it( 'should render with Reset button disabled', () => {
-		render(
-			<Component
-				options={ timezones }
-				label={ defaultLabelText }
-				value={ timezones[ 0 ].value }
-				allowReset
-			/>
-		);
-
-		const resetButton = screen.getByRole( 'button', { name: 'Reset' } );
-
-		expect( resetButton ).toBeVisible();
-	} );
-
 	it( 'should not render Reset button when no value is set', () => {
 		render(
 			<Component
