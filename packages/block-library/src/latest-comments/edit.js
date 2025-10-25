@@ -109,7 +109,7 @@ export default function LatestComments( { attributes, setAttributes } ) {
 						<SelectControl
 							__nextHasNoMarginBottom
 							__next40pxDefaultSize
-							label={ __( 'Display Content' ) }
+							label={ __( 'Display content' ) }
 							value={ displayContent }
 							options={ [
 								{ label: __( 'No content' ), value: 'none' },
