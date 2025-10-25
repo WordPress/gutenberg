@@ -77,6 +77,7 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 					<div style={ { padding: '4px', minWidth: '300px' } }>
 						<VStack spacing={ 1 }>
 							<TextareaControl
+								style={ { direction: 'ltr' } }
 								__nextHasNoMarginBottom
 								__next40pxDefaultSize
 								label={ __( 'LaTeX math syntax' ) }
