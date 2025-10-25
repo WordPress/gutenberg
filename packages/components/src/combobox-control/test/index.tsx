@@ -375,7 +375,6 @@ describe.each( [
 			<Component
 				options={ timezones }
 				label={ defaultLabelText }
-				value={ timezones[ 0 ].value }
 				allowReset={ false }
 			/>
 		);
@@ -427,7 +426,6 @@ describe.each( [
 			<Component
 				options={ timezones }
 				label={ defaultLabelText }
-				value={ targetOption.value }
 				allowReset
 			/>
 		);
@@ -454,6 +452,7 @@ describe.each( [
 		// Pressing Enter/Return resets the input.
 		await user.keyboard( '{Enter}' );
 
+		expect( resetButton ).not.toBeInTheDocument();
 		expect( input ).toHaveValue( '' );
 		expect( input ).toHaveFocus();
 	} );
@@ -466,7 +465,6 @@ describe.each( [
 			<Component
 				options={ timezones }
 				label={ defaultLabelText }
-				value={ targetOption.value }
 				allowReset
 			/>
 		);
@@ -493,6 +491,7 @@ describe.each( [
 		// Pressing Spacebar resets the input.
 		await user.keyboard( '[Space]' );
 
+		expect( resetButton ).not.toBeInTheDocument();
 		expect( input ).toHaveValue( '' );
 		expect( input ).toHaveFocus();
 	} );
