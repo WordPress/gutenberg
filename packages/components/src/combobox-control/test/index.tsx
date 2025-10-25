@@ -414,6 +414,7 @@ describe.each( [
 
 		await user.click( resetButton );
 
+		expect( resetButton ).not.toBeInTheDocument();
 		expect( input ).toHaveValue( '' );
 		expect( input ).toHaveFocus();
 	} );
