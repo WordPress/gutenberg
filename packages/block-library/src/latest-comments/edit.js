@@ -112,14 +112,15 @@ export default function LatestComments( { attributes, setAttributes } ) {
 							label={ __( 'Display Content' ) }
 							value={ displayContent }
 							options={ [
-                                { label: __( 'No content' ), value: 'none' },
-                                { label: __( 'Excerpt' ), value: 'excerpt' },
-                                { label: __( 'Full content' ), value: 'full' },
-                            ] }
-							onChange={ ( value ) => 
-								setAttributes({
-									displayContent:value
-								})}
+								{ label: __( 'No content' ), value: 'none' },
+								{ label: __( 'Excerpt' ), value: 'excerpt' },
+								{ label: __( 'Full content' ), value: 'full' },
+							] }
+							onChange={ ( value ) =>
+								setAttributes( {
+									displayContent: value,
+								} )
+							}
 						/>
 					</ToolsPanelItem>
 
