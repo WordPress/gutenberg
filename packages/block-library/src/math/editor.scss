@@ -2,4 +2,6 @@
 
 .wp-block-math__textarea-control textarea {
 	font-family: $font-family-mono;
+	/*rtl:ignore*/
+	direction: ltr;
 }
