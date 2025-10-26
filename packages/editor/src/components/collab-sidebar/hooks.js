@@ -50,7 +50,7 @@ export function useBlockComments( postId ) {
 		post: postId,
 		type: 'note',
 		status: 'all',
-		per_page: 100,
+		per_page: -1,
 	};
 
 	const { records: threads, totalPages } = useEntityRecords(
