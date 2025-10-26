@@ -32,6 +32,7 @@ import brRemover from './br-remover';
 import { deepFilterHTML, isPlain, getBlockContentSchema } from './utils';
 import emptyParagraphRemover from './empty-paragraph-remover';
 import slackParagraphCorrector from './slack-paragraph-corrector';
+import grokConverter from './grok-converter';
 
 const log = ( ...args ) => window?.console?.log?.( ...args );
 
@@ -187,6 +188,7 @@ export function pasteHandler( {
 
 			const filters = [
 				googleDocsUIDRemover,
+				grokConverter,
 				msListConverter,
 				headRemover,
 				listReducer,
