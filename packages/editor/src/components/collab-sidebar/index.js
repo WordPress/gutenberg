@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __experimentalVStack as VStack } from '@wordpress/components';
-import { useState, useRef } from '@wordpress/element';
+import { useState, useRef, useEffect } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { comment as commentIcon } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -85,6 +85,7 @@ function NotesSidebarContent( {
 
 function NotesSidebar( { postId, mode } ) {
 	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
+	const [ isInitialLoad, setIsInitialLoad ] = useState( true );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -107,11 +108,23 @@ function NotesSidebar( { postId, mode } ) {
 		totalPages,
 		reflowComments,
 		commentLastUpdated,
-	} = useBlockComments( postId );
+	} = useBlockComments( postId, isInitialLoad );
 	useEnableFloatingSidebar(
 		showFloatingSidebar &&
 			( unresolvedSortedThreads.length > 0 || showCommentBoard )
 	);
+
+	// Set initial load state to false once the initial threads load.
+	useEffect( () => {
+		if ( isInitialLoad && resultComments.length > 0 ) {
+			// setTimeout to ensure UI updates after initial load.
+			const timeoutId = setTimeout( () => {
+				setIsInitialLoad( false );
+				reflowComments();
+			}, 1000 );
+			return () => clearTimeout( timeoutId );
+		}
+	}, [ isInitialLoad, resultComments.length, reflowComments ] );
 
 	const hasMoreComments = totalPages && totalPages > 1;
 

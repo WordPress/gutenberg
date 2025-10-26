@@ -40,7 +40,7 @@ const { useBlockElementRef, cleanEmptyObject } = unlock(
 	blockEditorPrivateApis
 );
 
-export function useBlockComments( postId ) {
+export function useBlockComments( postId, isInitialLoad = false ) {
 	const [ commentLastUpdated, reflowComments ] = useReducer(
 		() => Date.now(),
 		0
@@ -52,6 +52,10 @@ export function useBlockComments( postId ) {
 		status: 'all',
 		per_page: -1,
 	};
+
+	if ( isInitialLoad ) {
+		queryArgs.parent = 0;
+	}
 
 	const { records: threads, totalPages } = useEntityRecords(
 		'root',
