@@ -1151,10 +1151,10 @@
 				"core/template-part": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
-				"core/term-description": {
+				"core/term-count": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
-				"core/term-count": {
+				"core/term-description": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/term-name": {
@@ -2171,10 +2171,10 @@
 				"core/template-part": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
-				"core/term-description": {
+				"core/term-count": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
-				"core/term-count": {
+				"core/term-description": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/term-name": {
@@ -2615,10 +2615,10 @@
 				"core/template-part": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
-				"core/term-description": {
+				"core/term-count": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
-				"core/term-count": {
+				"core/term-description": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
 				"core/term-name": {
