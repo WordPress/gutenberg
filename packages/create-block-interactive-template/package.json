@@ -24,6 +24,7 @@
 		"npm": ">=8.19.2"
 	},
 	"exports": {
+		".": "./index.js",
 		"./package.json": "./package.json"
 	},
 	"publishConfig": {
