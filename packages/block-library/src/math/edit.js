@@ -82,6 +82,7 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 								label={ __( 'LaTeX math syntax' ) }
 								hideLabelFromVision
 								value={ latex }
+								className="wp-block-math__textarea-control"
 								onChange={ ( newLatex ) => {
 									if ( ! latexToMathML ) {
 										setAttributes( { latex: newLatex } );

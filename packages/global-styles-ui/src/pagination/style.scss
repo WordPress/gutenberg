@@ -1,0 +1,7 @@
+@use "@wordpress/base-styles/variables";
+
+.global-styles-ui-pagination .components-button.is-tertiary {
+	width: variables.$button-size-compact;
+	height: variables.$button-size-compact;
+	justify-content: center;
+}
