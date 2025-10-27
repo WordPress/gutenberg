@@ -12,8 +12,6 @@ import {
 	useContext,
 	useSyncExternalStore,
 	useMemo,
-	useState,
-	useEffect,
 } from '@wordpress/element';
 import {
 	addQueryArgs,
@@ -21,7 +19,7 @@ import {
 	getPath,
 	buildQueryString,
 } from '@wordpress/url';
-import { useEvent, usePrevious } from '@wordpress/compose';
+import { useEvent } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -165,66 +163,50 @@ export default function useMatch(
 	matcher: RouteRecognizer,
 	pathArg: string,
 	matchResolverArgs: Record< string, any >
-): Match | undefined {
+): Match {
 	const { query: rawQuery = {} } = location;
-	const [ resolvedMatch, setMatch ] = useState< Match | undefined >();
 
-	useEffect( () => {
+	return useMemo( () => {
 		const { [ pathArg ]: path = '/', ...query } = rawQuery;
-		const ret = matcher.recognize( path )?.[ 0 ];
-		async function resolveMatch( result: any ) {
-			const matchedRoute = result.handler as Route;
-			const resolveFunctions = async (
-				record: Record< string, any > = {}
-			) => {
-				const entries = await Promise.all(
-					Object.entries( record ).map( async ( [ key, value ] ) => {
-						if ( typeof value === 'function' ) {
-							return [
-								key,
-								await value( {
-									query,
-									params: result.params,
-									...matchResolverArgs,
-								} ),
-							];
-						}
-						return [ key, value ];
-					} )
-				);
-				return Object.fromEntries( entries );
-			};
-			const [ resolvedAreas, resolvedWidths ] = await Promise.all( [
-				resolveFunctions( matchedRoute.areas ),
-				resolveFunctions( matchedRoute.widths ),
-			] );
-			setMatch( {
-				name: matchedRoute.name,
-				areas: resolvedAreas,
-				widths: resolvedWidths,
-				params: result.params,
-				query,
-				path: addQueryArgs( path, query ),
-			} );
-		}
-
-		if ( ! ret ) {
-			setMatch( {
+		const result = matcher.recognize( path )?.[ 0 ];
+		if ( ! result ) {
+			return {
 				name: '404',
 				path: addQueryArgs( path, query ),
 				areas: {},
 				widths: {},
 				query,
 				params: {},
-			} );
-		} else {
-			resolveMatch( ret );
+			};
 		}
 
-		return () => setMatch( undefined );
+		const matchedRoute = result.handler as Route;
+		const resolveFunctions = ( record: Record< string, any > = {} ) => {
+			return Object.fromEntries(
+				Object.entries( record ).map( ( [ key, value ] ) => {
+					if ( typeof value === 'function' ) {
+						return [
+							key,
+							value( {
+								query,
+								params: result.params,
+								...matchResolverArgs,
+							} ),
+						];
+					}
+					return [ key, value ];
+				} )
+			);
+		};
+		return {
+			name: matchedRoute.name,
+			areas: resolveFunctions( matchedRoute.areas ),
+			widths: resolveFunctions( matchedRoute.widths ),
+			params: result.params,
+			query,
+			path: addQueryArgs( path, query ),
+		};
 	}, [ matcher, rawQuery, pathArg, matchResolverArgs ] );
-
-	return resolvedMatch;
 }
 
 export function RouterProvider( {
@@ -255,20 +237,14 @@ export function RouterProvider( {
 		return ret;
 	}, [ routes ] );
 	const match = useMatch( location, matcher, pathArg, matchResolverArgs );
-	const previousMatch = usePrevious( match );
 	const config = useMemo(
 		() => ( { beforeNavigate, pathArg } ),
 		[ beforeNavigate, pathArg ]
 	);
-	const renderedMatch = match || previousMatch;
-
-	if ( ! renderedMatch ) {
-		return null;
-	}
 
 	return (
 		<ConfigContext.Provider value={ config }>
-			<RoutesContext.Provider value={ renderedMatch }>
+			<RoutesContext.Provider value={ match }>
 				{ children }
 			</RoutesContext.Provider>
 		</ConfigContext.Provider>

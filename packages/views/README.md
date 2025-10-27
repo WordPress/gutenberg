@@ -23,13 +23,13 @@ npm install @wordpress/views --save
 
 ### loadView
 
-Async function for loading view state in route loaders with optional URL parameters.
+Function for loading view state in route loaders with optional URL parameters.
 
 _Usage_
 
 ```typescript
 // In route loader
-const view = await loadView( {
+const view = loadView( {
 	kind: 'taxonomy',
 	name: 'category',
 	slug: 'all',
@@ -49,7 +49,7 @@ _Parameters_
 
 _Returns_
 
--   Promise resolving to the loaded view object.
+-   The loaded view object.
 
 ### useView
 

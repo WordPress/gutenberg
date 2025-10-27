@@ -12,9 +12,9 @@ import SidebarNavigationScreenUnsupported from '../sidebar-navigation-screen-uns
 import PageTemplates from '../page-templates';
 import { getDefaultView } from '../page-templates/view-utils';
 
-async function isTemplateListView( query ) {
+function isTemplateListView( query ) {
 	const { activeView = 'active' } = query;
-	const view = await loadView( {
+	const view = loadView( {
 		kind: 'postType',
 		name: 'wp_template',
 		slug: activeView,
@@ -39,12 +39,12 @@ export const templatesRoute = {
 			const isBlockTheme = siteData.currentTheme?.is_block_theme;
 			return isBlockTheme ? <PageTemplates /> : undefined;
 		},
-		async preview( { query, siteData } ) {
+		preview( { query, siteData } ) {
 			const isBlockTheme = siteData.currentTheme?.is_block_theme;
 			if ( ! isBlockTheme ) {
 				return undefined;
 			}
-			const isListView = await isTemplateListView( query );
+			const isListView = isTemplateListView( query );
 			return isListView ? <Editor /> : undefined;
 		},
 		mobile( { siteData } ) {
@@ -57,8 +57,8 @@ export const templatesRoute = {
 		},
 	},
 	widths: {
-		async content( { query } ) {
-			const isListView = await isTemplateListView( query );
+		content( { query } ) {
+			const isListView = isTemplateListView( query );
 			return isListView ? 380 : undefined;
 		},
 	},

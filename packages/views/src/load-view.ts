@@ -13,13 +13,13 @@ import { generatePreferenceKey } from './preference-keys';
 import type { ViewConfig } from './types';
 
 /**
- * Async function for loading view state in route loaders with optional URL parameters.
+ * Function for loading view state in route loaders with optional URL parameters.
  *
  * @example
  *
  * ```typescript
  * // In route loader
- * const view = await loadView( {
+ * const view = loadView( {
  * 	kind: 'taxonomy',
  * 	name: 'category',
  * 	slug: 'all',
@@ -35,9 +35,9 @@ import type { ViewConfig } from './types';
  * @param config.defaultView Default view configuration.
  * @param config.queryParams Object with `page` and/or `search` from URL.
  *
- * @return Promise resolving to the loaded view object.
+ * @return The loaded view object.
  */
-export async function loadView( config: ViewConfig ) {
+export function loadView( config: ViewConfig ) {
 	const { kind, name, slug, defaultView, queryParams } = config;
 	const preferenceKey = generatePreferenceKey( kind, name, slug );
 	const persistedView: View | undefined = select( preferencesStore ).get(
