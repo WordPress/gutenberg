@@ -527,6 +527,7 @@ function resolveEntryPoint( packageDir, packageJson ) {
 async function bundlePackage( packageName ) {
 	const builtModules = [];
 	const builtScripts = [];
+	const builtStyles = [];
 	const packageDir = path.join( PACKAGES_DIR, packageName );
 	const packageJsonPath = path.join( packageDir, 'package.json' );
 	const packageJson = JSON.parse( await readFile( packageJsonPath, 'utf8' ) );
@@ -718,6 +719,53 @@ async function bundlePackage( packageName ) {
 				);
 			}
 		}
+
+		// Collect style information for auto-registration (after styles are copied)
+		// Only register the main style.css file - complex cases handled manually in lib/client-assets.php
+		const mainStylePath = path.join( outputDir, 'style.css' );
+		const mainStyleFiles = await glob( normalizePath( mainStylePath ) );
+
+		if ( mainStyleFiles.length > 0 ) {
+			// Read script asset file to get dependencies
+			const scriptAssetPath = path.join(
+				PACKAGES_DIR,
+				'..',
+				'build',
+				'scripts',
+				packageName,
+				'index.min.asset.php'
+			);
+
+			try {
+				const assetContent = await readFile( scriptAssetPath, 'utf8' );
+				const depsMatch = assetContent.match(
+					/'dependencies' => array\((.*?)\)/s
+				);
+
+				let scriptDependencies = [];
+				if ( depsMatch ) {
+					const depsString = depsMatch[ 1 ];
+					scriptDependencies =
+						depsString
+							.match( /'([^']+)'/g )
+							?.map( ( d ) => d.replace( /'/g, '' ) ) || [];
+				}
+
+				// Infer style dependencies from script dependencies
+				const styleDeps = await inferStyleDependencies(
+					packageName,
+					scriptDependencies
+				);
+
+				builtStyles.push( {
+					handle: `wp-${ packageName }`,
+					path: `${ packageName }/style`,
+					dependencies: styleDeps,
+				} );
+			} catch ( error ) {
+				// Asset file doesn't exist or can't be read - skip style registration
+			}
+		}
 	}
 
 	if ( packageJson.wpCopyFiles ) {
@@ -801,7 +849,77 @@ async function bundlePackage( packageName ) {
 
 	await Promise.all( builds );
 
-	return { modules: builtModules, scripts: builtScripts };
+	return {
+		modules: builtModules,
+		scripts: builtScripts,
+		styles: builtStyles,
+	};
+}
+
+/**
+ * Infer style dependencies from script dependencies.
+ * Only includes dependencies that:
+ * 1. Are @wordpress packages (start with 'wp-')
+ * 2. Have wpScript: true in their package.json
+ * 3. Actually have a built style.css file
+ *
+ * @param {string}   packageName        The package name.
+ * @param {string[]} scriptDependencies Array of script handles from asset file.
+ * @return {Promise<string[]>} Array of style handles to depend on.
+ */
+async function inferStyleDependencies( packageName, scriptDependencies ) {
+	if ( ! scriptDependencies || scriptDependencies.length === 0 ) {
+		return [];
+	}
+
+	const ROOT_DIR = path.join( PACKAGES_DIR, '..' );
+	const BUILD_DIR = path.join( ROOT_DIR, 'build' );
+	const styleDeps = [];
+
+	for ( const scriptHandle of scriptDependencies ) {
+		// Skip non-package dependencies (like 'react', 'lodash', etc.)
+		if ( ! scriptHandle.startsWith( 'wp-' ) ) {
+			continue;
+		}
+
+		// Convert handle to package name: 'wp-components' → 'components'
+		const depPackageName = scriptHandle.replace( 'wp-', '' );
+
+		// Read the dependency's package.json
+		const depPackageJsonPath = path.join(
+			PACKAGES_DIR,
+			depPackageName,
+			'package.json'
+		);
+
+		try {
+			const depPackageJson = JSON.parse(
+				await readFile( depPackageJsonPath, 'utf8' )
+			);
+
+			// ONLY include if it has wpScript: true (which means it builds styles)
+			if ( depPackageJson.wpScript === true ) {
+				// Double-check the style file actually exists
+				const styleFile = path.join(
+					BUILD_DIR,
+					'styles',
+					depPackageName,
+					'style.css'
+				);
+				try {
+					await readFile( styleFile );
+					styleDeps.push( scriptHandle );
+				} catch {
+					// Style file doesn't exist, skip it
+				}
+			}
+		} catch {
+			// Package not found or can't read package.json - skip it
+			continue;
+		}
+	}
+
+	return styleDeps;
 }
 
 /**
@@ -943,7 +1061,6 @@ async function generateVersionPhp() {
 	);
 	const prefix = rootPackageJson.wpPlugin?.prefix || 'gutenberg';
 	const version = rootPackageJson.version;
-
 	// Generate version constant name: 'gutenberg' → 'GUTENBERG_VERSION'
 	const versionConstant =
 		prefix.toUpperCase().replace( /-/g, '_' ) + '_VERSION';
@@ -967,6 +1084,71 @@ async function generateVersionPhp() {
 	await writeFile(
 		path.join( buildDir, 'version.php' ),
 		versionContent,
+		'utf8'
+	);
+}
+
+/**
+ * Generate PHP files for style registration.
+ *
+ * @param {Array} styles Array of style info objects.
+ */
+async function generateStyleRegistrationPhp( styles ) {
+	const ROOT_DIR = path.join( PACKAGES_DIR, '..' );
+	const rootPackageJson = JSON.parse(
+		await readFile( path.join( ROOT_DIR, 'package.json' ), 'utf8' )
+	);
+	const prefix = rootPackageJson.wpPlugin?.prefix || 'gutenberg';
+
+	// Read templates
+	const templatesDir = path.join( __dirname, 'templates' );
+	const registryTemplate = await readFile(
+		path.join( templatesDir, 'style-registry.php.template' ),
+		'utf8'
+	);
+	const registrationTemplate = await readFile(
+		path.join( templatesDir, 'style-registration.php.template' ),
+		'utf8'
+	);
+
+	// Generate styles array for registry
+	const stylesArray = styles
+		.map(
+			( style ) =>
+				`\tarray(\n` +
+				`\t\t'handle' => '${ style.handle }',\n` +
+				`\t\t'path' => '${ style.path }',\n` +
+				`\t\t'dependencies' => array(${ style.dependencies
+					.map( ( dep ) => `'${ dep }'` )
+					.join( ', ' ) }),\n` +
+				`\t),`
+		)
+		.join( '\n' );
+
+	// Generate style registry file (data only)
+	const registryContent = registryTemplate
+		.replace( /\{\{PREFIX\}\}/g, prefix )
+		.replace( '{{STYLES}}', stylesArray );
+
+	// Generate registration file (logic only)
+	const registrationContent = registrationTemplate.replace(
+		/\{\{PREFIX\}\}/g,
+		prefix
+	);
+
+	// Write files
+	const buildDir = path.join( ROOT_DIR, 'build' );
+	const stylesDir = path.join( buildDir, 'styles' );
+
+	await mkdir( stylesDir, { recursive: true } );
+	await writeFile(
+		path.join( stylesDir, 'index.php' ),
+		registryContent,
+		'utf8'
+	);
+	await writeFile(
+		path.join( buildDir, 'styles.php' ),
+		registrationContent,
 		'utf8'
 	);
 }
@@ -1349,6 +1531,7 @@ async function buildAll() {
 	console.log( '\n📦 Phase 2: Bundling packages...\n' );
 	const modules = [];
 	const scripts = [];
+	const styles = [];
 	await Promise.all(
 		PACKAGES.map( async ( packageName ) => {
 			const startBundleTime = Date.now();
@@ -1365,6 +1548,9 @@ async function buildAll() {
 				if ( ret.scripts ) {
 					scripts.push( ...ret.scripts );
 				}
+				if ( ret.styles ) {
+					styles.push( ...ret.styles );
+				}
 			}
 		} )
 	);
@@ -1374,12 +1560,15 @@ async function buildAll() {
 		generateMainIndexPhp(),
 		generateModuleRegistrationPhp( modules ),
 		generateScriptRegistrationPhp( scripts ),
+		generateStyleRegistrationPhp( styles ),
 		generateVersionPhp(),
 	] );
 	console.log( '   ✔ Generated build/modules.php' );
 	console.log( '   ✔ Generated build/modules/index.php' );
 	console.log( '   ✔ Generated build/scripts.php' );
 	console.log( '   ✔ Generated build/scripts/index.php' );
+	console.log( '   ✔ Generated build/styles.php' );
+	console.log( '   ✔ Generated build/styles/index.php' );
 	console.log( '   ✔ Generated build/version.php' );
 	console.log( '   ✔ Generated build/index.php' );
 

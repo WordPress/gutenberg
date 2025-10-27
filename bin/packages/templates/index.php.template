@@ -23,3 +23,9 @@ $scripts_file = __DIR__ . '/scripts.php';
 if ( file_exists( $scripts_file ) ) {
 	require_once $scripts_file;
 }
+
+// Load style registration.
+$styles_file = __DIR__ . '/styles.php';
+if ( file_exists( $styles_file ) ) {
+	require_once $styles_file;
+}
