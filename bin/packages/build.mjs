@@ -877,6 +877,9 @@ async function generateScriptRegistrationPhp( scripts ) {
 		await readFile( path.join( ROOT_DIR, 'package.json' ), 'utf8' )
 	);
 	const prefix = rootPackageJson.wpPlugin?.prefix || 'gutenberg';
+	const version = rootPackageJson.version;
+	const versionConstant =
+		prefix.toUpperCase().replace( /-/g, '_' ) + '_VERSION';
 
 	// Read templates
 	const templatesDir = path.join( __dirname, 'templates' );
@@ -907,10 +910,10 @@ async function generateScriptRegistrationPhp( scripts ) {
 		.replace( '{{SCRIPTS}}', scriptsArray );
 
 	// Generate registration file (logic only)
-	const registrationContent = registrationTemplate.replace(
-		/\{\{PREFIX\}\}/g,
-		prefix
-	);
+	const registrationContent = registrationTemplate
+		.replace( /\{\{PREFIX\}\}/g, prefix )
+		.replace( /\{\{VERSION\}\}/g, version )
+		.replace( /\{\{VERSION_CONSTANT\}\}/g, versionConstant );
 
 	// Write files
 	const buildDir = path.join( ROOT_DIR, 'build' );
@@ -925,6 +928,44 @@ async function generateScriptRegistrationPhp( scripts ) {
 	await writeFile(
 		path.join( buildDir, 'scripts.php' ),
 		registrationContent,
+		'utf8'
+	);
+}
+
+/**
+ * Generate PHP file for version constant.
+ */
+async function generateVersionPhp() {
+	const ROOT_DIR = path.join( PACKAGES_DIR, '..' );
+	const rootPackageJson = JSON.parse(
+		await readFile( path.join( ROOT_DIR, 'package.json' ), 'utf8' )
+	);
+	const prefix = rootPackageJson.wpPlugin?.prefix || 'gutenberg';
+	const version = rootPackageJson.version;
+
+	// Generate version constant name: 'gutenberg' → 'GUTENBERG_VERSION'
+	const versionConstant =
+		prefix.toUpperCase().replace( /-/g, '_' ) + '_VERSION';
+
+	// Read template
+	const templatesDir = path.join( __dirname, 'templates' );
+	const versionTemplate = await readFile(
+		path.join( templatesDir, 'version.php.template' ),
+		'utf8'
+	);
+
+	// Generate version file
+	const versionContent = versionTemplate
+		.replace( /\{\{PREFIX\}\}/g, prefix )
+		.replace( /\{\{VERSION_CONSTANT\}\}/g, versionConstant )
+		.replace( /\{\{VERSION\}\}/g, version );
+
+	// Write file
+	const buildDir = path.join( ROOT_DIR, 'build' );
+	await mkdir( buildDir, { recursive: true } );
+	await writeFile(
+		path.join( buildDir, 'version.php' ),
+		versionContent,
 		'utf8'
 	);
 }
@@ -1332,11 +1373,13 @@ async function buildAll() {
 		generateMainIndexPhp(),
 		generateModuleRegistrationPhp( modules ),
 		generateScriptRegistrationPhp( scripts ),
+		generateVersionPhp(),
 	] );
 	console.log( '   ✔ Generated build/modules.php' );
 	console.log( '   ✔ Generated build/modules/index.php' );
 	console.log( '   ✔ Generated build/scripts.php' );
 	console.log( '   ✔ Generated build/scripts/index.php' );
+	console.log( '   ✔ Generated build/version.php' );
 	console.log( '   ✔ Generated build/index.php' );
 
 	const totalTime = Date.now() - startTime;

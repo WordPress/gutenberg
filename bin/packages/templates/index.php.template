@@ -6,6 +6,12 @@
  * @package {{PREFIX}}
  */
 
+// Load version constant.
+$version_file = __DIR__ . '/version.php';
+if ( file_exists( $version_file ) ) {
+	require_once $version_file;
+}
+
 // Load script module registration.
 $modules_file = __DIR__ . '/modules.php';
 if ( file_exists( $modules_file ) ) {

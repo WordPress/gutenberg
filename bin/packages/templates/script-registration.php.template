@@ -53,7 +53,7 @@ if ( ! function_exists( '{{PREFIX}}_register_package_scripts' ) ) {
 	 * Register all package scripts.
 	 */
 	function {{PREFIX}}_register_package_scripts( $scripts ) {
-		$default_version = defined( 'GUTENBERG_VERSION' ) && ! SCRIPT_DEBUG ? GUTENBERG_VERSION : time();
+		$default_version = defined( '{{VERSION_CONSTANT}}' ) && ! SCRIPT_DEBUG ? {{VERSION_CONSTANT}} : time();
 		$extension       = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.js' : '.min.js';
 
 		$scripts_dir  = __DIR__ . '/scripts';
