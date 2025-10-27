@@ -294,16 +294,17 @@ export function mergeCrdtBlocks(
 							if (
 								isRichText &&
 								'string' === typeof attributeValue &&
-								currentAttributes.has( attributeName )
+								currentAttributes.has( attributeName ) &&
+								currentAttributes.get(
+									attributeName
+								) instanceof Y.Text
 							) {
 								// Rich text values are stored as persistent Y.Text instances.
 								// Update the value with a delta in place.
-								const blockYText = currentAttributes.get(
-									attributeName
-								) as Y.Text;
-
 								mergeRichTextUpdate(
-									blockYText,
+									currentAttributes.get(
+										attributeName
+									) as Y.Text,
 									attributeValue,
 									cursorPosition
 								);
