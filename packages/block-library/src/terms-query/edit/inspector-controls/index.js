@@ -2,6 +2,9 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
+import { useEffect } from '@wordpress/element';
+import { store as coreStore } from '@wordpress/core-data';
 import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -13,6 +16,7 @@ import { InspectorControls } from '@wordpress/block-editor';
  */
 import { useToolsPanelDropdownMenuProps } from '../../../utils/hooks';
 import { usePublicTaxonomies } from '../../utils';
+import { parseTemplateSlugWithValidation } from '../../../utils/use-context-data';
 import TaxonomyControl from './taxonomy-control';
 import OrderControl from './order-control';
 import EmptyTermsControl from './empty-terms-control';
@@ -44,13 +48,41 @@ export default function TermsQueryInspectorControls( {
 
 	const taxonomies = usePublicTaxonomies();
 
+	const templateContext = useSelect(
+		( select ) => {
+			if ( ! templateSlug ) {
+				return null;
+			}
+			const { getTaxonomy } = select( coreStore );
+			return parseTemplateSlugWithValidation( templateSlug, getTaxonomy );
+		},
+		[ templateSlug ]
+	);
+
 	const isTaxonomyHierarchical = taxonomies.find(
 		( _taxonomy ) => _taxonomy.slug === taxonomy
 	)?.hierarchical;
 	const inheritQuery = !! inherit;
-	// Display the inherit control when we're in a taxonomy-related
-	// template (category, tag, or custom taxonomy).
+
+	// Auto-set inherit mode and taxonomy when we have a valid template context taxonomy.
+	useEffect( () => {
+		if ( templateContext?.taxonomy && ! inherit ) {
+			setQuery( {
+				inherit: true,
+				taxonomy: templateContext.taxonomy,
+			} );
+		}
+	}, [
+		templateContext?.taxonomy,
+		inherit,
+		setQuery,
+		templateContext,
+		templateSlug,
+	] );
+
+	// Display the inherit control when in a taxonomy template.
 	const displayInheritControl =
+		templateContext?.taxonomy ||
 		[ 'taxonomy', 'category', 'tag', 'archive' ].includes( templateSlug ) ||
 		templateSlug?.startsWith( 'taxonomy-' ) ||
 		templateSlug?.startsWith( 'category-' ) ||
@@ -100,15 +132,22 @@ export default function TermsQueryInspectorControls( {
 								label={ queryTypeControlLabel }
 								value={ inherit }
 								onChange={ setQuery }
+								templateContext={ templateContext }
 							/>
 						</ToolsPanelItem>
 					) }
 					{ ! inheritQuery && (
 						<ToolsPanelItem
-							hasValue={ () => taxonomy !== 'category' }
+							hasValue={ () =>
+								taxonomy !==
+								( templateContext?.taxonomy || 'category' )
+							}
 							label={ taxonomyControlLabel }
 							onDeselect={ () => {
-								setQuery( { taxonomy: 'category' } );
+								setQuery( {
+									taxonomy:
+										templateContext?.taxonomy || 'category',
+								} );
 							} }
 							isShownByDefault
 						>
