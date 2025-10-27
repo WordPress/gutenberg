@@ -38,9 +38,8 @@ const { useEntityRecordsWithPermissions } = unlock( corePrivateApis );
 function useAllDefaultTemplateTypes() {
 	const defaultTemplateTypes = useDefaultTemplateTypes();
 	const { records: staticRecords } = useEntityRecordsWithPermissions(
-		'postType',
-		'wp_registered_template',
-		{ per_page: -1 }
+		'root',
+		'registeredTemplate'
 	);
 	return [
 		...defaultTemplateTypes,
