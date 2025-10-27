@@ -21,7 +21,11 @@ import {
 } from './crdt-blocks';
 import { type Post } from '../entity-types/post';
 import { type Type } from '../entity-types';
-import { CRDT_DOC_META_PERSISTENCE_KEY, CRDT_RECORD_MAP_KEY } from '../sync';
+import {
+	CRDT_DOC_META_PERSISTENCE_KEY,
+	CRDT_RECORD_MAP_KEY,
+	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
+} from '../sync';
 import type { WPBlockSelection, WPSelection } from '../types';
 
 export type PostChanges = Partial< Post > & {
@@ -44,12 +48,18 @@ const allowedPostProperties = new Set< string >( [
 	'featured_media',
 	'format',
 	'ping_status',
+	'meta',
 	'slug',
 	'status',
 	'sticky',
 	'tags',
 	'template',
 	'title',
+] );
+
+// Post meta keys that should *not* be synced.
+const disallowedPostMetaKeys = new Set< string >( [
+	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 ] );
 
 /**
@@ -94,13 +104,13 @@ export function defaultApplyChangesToCRDTDoc(
  *
  * @param {CRDTDoc}     ydoc
  * @param {PostChanges} changes
- * @param {Type}        postType
+ * @param {Type}        _postType
  * @return {void}
  */
 export function applyPostChangesToCRDTDoc(
 	ydoc: CRDTDoc,
 	changes: PostChanges,
-	postType: Type // eslint-disable-line @typescript-eslint/no-unused-vars
+	_postType: Type // eslint-disable-line @typescript-eslint/no-unused-vars
 ): void {
 	const ymap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
 
@@ -145,6 +155,36 @@ export function applyPostChangesToCRDTDoc(
 				const rawNewValue = getRawValue( newValue );
 
 				mergeValue( currentValue, rawNewValue, setValue );
+				break;
+			}
+
+			// "Meta" is overloaded term; here, it refers to post meta.
+			case 'meta': {
+				let metaMap = ymap.get( 'meta' ) as Y.Map< unknown >;
+
+				// Initialize.
+				if ( ! ( metaMap instanceof Y.Map ) ) {
+					metaMap = new Y.Map();
+					setValue( metaMap );
+				}
+
+				// Iterate over each meta property in the new value and merge it if it
+				// should be synced.
+				Object.entries( newValue ?? {} ).forEach(
+					( [ metaKey, metaValue ] ) => {
+						if ( disallowedPostMetaKeys.has( metaKey ) ) {
+							return;
+						}
+
+						mergeValue(
+							metaMap.get( metaKey ), // current value in CRDT
+							metaValue, // new value from changes
+							( updatedMetaValue: unknown ): void => {
+								metaMap.set( metaKey, updatedMetaValue );
+							}
+						);
+					}
+				);
 				break;
 			}
 
@@ -200,17 +240,19 @@ export function defaultGetChangesFromCRDTDoc( crdtDoc: CRDTDoc ): ObjectData {
  *
  * @param {CRDTDoc} ydoc
  * @param {Post}    editedRecord
- * @param {Type}    postType
+ * @param {Type}    _postType
  * @return {Partial<PostChanges>} The changes that should be applied to the local record.
  */
 export function getPostChangesFromCRDTDoc(
 	ydoc: CRDTDoc,
 	editedRecord: Post,
-	postType: Type // eslint-disable-line @typescript-eslint/no-unused-vars
+	_postType: Type // eslint-disable-line @typescript-eslint/no-unused-vars
 ): PostChanges {
 	const ymap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
 
-	return Object.fromEntries(
+	let allowedMetaChanges: Post[ 'meta' ] = {};
+
+	const changes = Object.fromEntries(
 		Object.entries( ymap.toJSON() ).filter( ( [ key, newValue ] ) => {
 			if ( ! allowedPostProperties.has( key ) ) {
 				return false;
@@ -271,6 +313,24 @@ export function getPostChangesFromCRDTDoc(
 					return haveValuesChanged( currentValue, newValue );
 				}
 
+				case 'meta': {
+					allowedMetaChanges = Object.fromEntries(
+						Object.entries( newValue ?? {} ).filter(
+							( [ metaKey ] ) =>
+								! disallowedPostMetaKeys.has( metaKey )
+						)
+					);
+
+					// Merge the allowed meta changes with the current meta values since
+					// not all meta properties are synced.
+					const mergedValue = {
+						...( currentValue as PostChanges[ 'meta' ] ),
+						...allowedMetaChanges,
+					};
+
+					return haveValuesChanged( currentValue, mergedValue );
+				}
+
 				case 'status': {
 					// Do not sync an invalid status.
 					if ( 'auto-draft' === newValue ) {
@@ -296,6 +356,17 @@ export function getPostChangesFromCRDTDoc(
 			}
 		} )
 	);
+
+	// Meta changes must be merged with the edited record since not all meta
+	// properties are synced.
+	if ( 'object' === typeof changes.meta ) {
+		changes.meta = {
+			...editedRecord.meta,
+			...allowedMetaChanges,
+		};
+	}
+
+	return changes;
 }
 
 /**
