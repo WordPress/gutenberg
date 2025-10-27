@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import { proxifyState, proxifyStore, deepMerge } from './proxies';
+import { PENDING_GETTER } from './proxies/state';
 import { getNamespace } from './namespaces';
 import { isPlainObject, deepReadOnly, navigationSignal } from './utils';
 import type { DeepReadonly } from './utils';
@@ -284,6 +285,7 @@ export const parseServerData = ( dom = document ) => {
 export const populateServerData = ( data?: {
 	state?: Record< string, unknown >;
 	config?: Record< string, unknown >;
+	derivedStateClosures?: Record< string, string[] >;
 } ) => {
 	// Resets all the previous server states and configs.
 	serverStates.clear();
@@ -300,6 +302,28 @@ export const populateServerData = ( data?: {
 		Object.entries( data!.config ).forEach( ( [ namespace, config ] ) => {
 			storeConfigs.set( namespace, config );
 		} );
+	}
+	if ( isPlainObject( data?.derivedStateClosures ) ) {
+		Object.entries( data!.derivedStateClosures ).forEach(
+			( [ namespace, paths ] ) => {
+				const st = store< any >(
+					namespace,
+					{},
+					{ lock: universalUnlock }
+				);
+				paths.forEach( ( path ) => {
+					const pathParts = path.split( '.' );
+					const prop = pathParts.splice( -1, 1 )[ 0 ];
+					const parent = pathParts.reduce(
+						( prev, key ) => prev[ key ],
+						st
+					);
+					if ( isPlainObject( parent[ prop ] ) ) {
+						parent[ prop ] = PENDING_GETTER;
+					}
+				} );
+			}
+		);
 	}
 	navigationSignal.value += 1; // Triggers invalidations.
 };

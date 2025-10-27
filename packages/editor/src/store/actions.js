@@ -334,12 +334,19 @@ async function templateActivationNotice( { select, registry } ) {
 		return;
 	}
 
+	const currentTheme = await registry
+		.resolveSelect( coreStore )
+		.getCurrentTheme();
+	const templateType = currentTheme?.default_template_types.find(
+		( type ) => type.slug === slug
+	);
+
 	await registry.dispatch( noticesStore ).createNotice(
 		'info',
 		sprintf(
-			// translators: %s: template slug
-			__( 'This is a "%s" template. Do you want to activate it?' ),
-			slug
+			// translators: %s: The name (or slug) of the type of template.
+			__( 'Do you want to activate this "%s" template?' ),
+			templateType?.title ?? slug
 		),
 		{
 			id: 'template-activate-notice',
@@ -349,15 +356,10 @@ async function templateActivationNotice( { select, registry } ) {
 					onClick: async () => {
 						await registry
 							.dispatch( noticesStore )
-							.removeNotice( 'template-activate-notice' );
-						await registry
-							.dispatch( noticesStore )
 							.createNotice(
 								'info',
 								__( 'Activating template…' ),
-								{
-									id: 'template-activating-notice',
-								}
+								{ id: 'template-activate-notice' }
 							);
 						try {
 							const currentSite = await registry
@@ -378,20 +380,16 @@ async function templateActivationNotice( { select, registry } ) {
 								);
 							await registry
 								.dispatch( noticesStore )
-								.removeNotice( 'template-activating-notice' );
-							await registry
-								.dispatch( noticesStore )
 								.createSuccessNotice(
-									__( 'Template activated.' )
+									__( 'Template activated.' ),
+									{ id: 'template-activate-notice' }
 								);
 						} catch ( error ) {
 							await registry
 								.dispatch( noticesStore )
-								.removeNotice( 'template-activating-notice' );
-							await registry
-								.dispatch( noticesStore )
 								.createErrorNotice(
-									__( 'Template activation failed.' )
+									__( 'Template activation failed.' ),
+									{ id: 'template-activate-notice' }
 								);
 							// Rethrow for debugging.
 							throw error;
@@ -736,7 +734,10 @@ export function updateEditorSettings( settings ) {
 export const setRenderingMode =
 	( mode ) =>
 	( { dispatch, registry, select } ) => {
-		if ( select.__unstableIsEditorReady() ) {
+		if (
+			select.__unstableIsEditorReady() &&
+			! select.getEditorSettings().isPreviewMode
+		) {
 			// We clear the block selection but we also need to clear the selection from the core store.
 			registry.dispatch( blockEditorStore ).clearSelectedBlock();
 			dispatch.editPost( { selection: undefined }, { undoIgnore: true } );

@@ -20,6 +20,7 @@ import type { VNode, Context } from 'preact';
 import { store, stores, universalUnlock } from './store';
 import { warn, type SyncAwareFunction } from './utils';
 import { getScope, setScope, resetScope, type Scope } from './scopes';
+import { PENDING_GETTER } from './proxies/state';
 export interface DirectiveEntry {
 	value: string | object;
 	namespace: string;
@@ -223,10 +224,15 @@ const resolve = ( path: string, namespace: string ) => {
 		...resolvedStore,
 		context: getScope().context[ namespace ],
 	};
+
 	try {
-		// TODO: Support lazy/dynamically initialized stores
-		return path.split( '.' ).reduce( ( acc, key ) => acc[ key ], current );
-	} catch ( e ) {}
+		const pathParts = path.split( '.' );
+		return pathParts.reduce( ( acc, key ) => acc[ key ], current );
+	} catch ( e ) {
+		if ( e === PENDING_GETTER ) {
+			return PENDING_GETTER;
+		}
+	}
 };
 
 // Generate the evaluate function.
@@ -273,7 +279,9 @@ export const getEvaluate: GetEvaluate =
 		}
 		const result = value;
 		resetScope();
-		return hasNegationOperator ? ! result : result;
+		return hasNegationOperator && value !== PENDING_GETTER
+			? ! result
+			: result;
 	};
 
 // Separate directives by priority. The resulting array contains objects

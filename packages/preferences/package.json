@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/preferences",
-	"version": "4.32.0",
+	"version": "4.33.0",
 	"description": "Utilities for managing WordPress preferences.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -36,6 +36,9 @@
 	},
 	"react-native": "src/index",
 	"wpScript": true,
+	"wpScriptExtraDependencies": [
+		"wp-preferences-persistence"
+	],
 	"sideEffects": false,
 	"dependencies": {
 		"@wordpress/a11y": "file:../a11y",

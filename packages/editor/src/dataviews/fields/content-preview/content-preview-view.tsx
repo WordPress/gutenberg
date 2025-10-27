@@ -3,7 +3,9 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
+	// @ts-ignore
 	BlockPreview,
+	// @ts-ignore
 	privateApis as blockEditorPrivateApis,
 	// @ts-ignore
 } from '@wordpress/block-editor';

@@ -245,26 +245,19 @@ export function Comments( {
 	}, [ heights, blockRefs, isFloating, threads, selectedThread ] );
 
 	const hasThreads = Array.isArray( threads ) && threads.length > 0;
-	if ( ! hasThreads ) {
+	if ( ! hasThreads && ! isFloating ) {
 		return (
-			<VStack
-				alignment="left"
-				className="editor-collab-sidebar-panel__thread"
-				justify="flex-start"
-				spacing="3"
-			>
-				{ __( 'No notes available.' ) }
+			<VStack alignment="left" justify="flex-start" spacing="2">
+				<Text as="p">{ __( 'No notes available.' ) }</Text>
+				<Text as="p" variant="muted">
+					{ __( 'Only logged in users can see Notes.' ) }
+				</Text>
 			</VStack>
 		);
 	}
 
 	return (
 		<VStack spacing="3">
-			{ ! isFloating && (
-				<Text as="p" variant="muted">
-					{ __( 'Only logged in users can see Notes' ) }
-				</Text>
-			) }
 			{ threads.map( ( thread ) => (
 				<Thread
 					key={ thread.id }
@@ -334,9 +327,11 @@ function Thread( {
 	const handleCommentSelect = () => {
 		setShowCommentBoard( false );
 		setSelectedThread( thread.id );
-		// pass `null` as the second parameter to prevent focusing the block.
-		selectBlock( thread.blockClientId, null );
-		toggleBlockSpotlight( thread.blockClientId, true );
+		if ( !! thread.blockClientId ) {
+			// Pass `null` as the second parameter to prevent focusing the block.
+			selectBlock( thread.blockClientId, null );
+			toggleBlockSpotlight( thread.blockClientId, true );
+		}
 	};
 
 	const unselectThread = () => {
@@ -355,7 +350,7 @@ function Thread( {
 		stripHTML( thread.content.rendered ),
 		10
 	);
-	const ariaLabel = relatedBlockElement
+	const ariaLabel = !! thread.blockClientId
 		? sprintf(
 				// translators: %s: note excerpt
 				__( 'Note: %s' ),
@@ -383,6 +378,9 @@ function Thread( {
 			onFocus={ onMouseEnter }
 			onBlur={ onMouseLeave }
 			onKeyDown={ ( event ) => {
+				if ( event.defaultPrevented ) {
+					return;
+				}
 				// Expand or Collapse thread.
 				if (
 					event.key === 'Enter' &&
@@ -421,7 +419,7 @@ function Thread( {
 			>
 				{ __( 'Add new note' ) }
 			</Button>
-			{ ! relatedBlockElement && (
+			{ ! thread.blockClientId && (
 				<Text as="p" weight={ 500 } variant="muted">
 					{ __( 'Original block deleted.' ) }
 				</Text>
@@ -540,17 +538,19 @@ function Thread( {
 					</VStack>
 				</VStack>
 			) }
-			<Button
-				className="editor-collab-sidebar-panel__skip-to-block"
-				variant="secondary"
-				size="compact"
-				onClick={ ( event ) => {
-					event.stopPropagation();
-					relatedBlockElement?.focus();
-				} }
-			>
-				{ __( 'Back to block' ) }
-			</Button>
+			{ !! thread.blockClientId && (
+				<Button
+					className="editor-collab-sidebar-panel__skip-to-block"
+					variant="secondary"
+					size="compact"
+					onClick={ ( event ) => {
+						event.stopPropagation();
+						relatedBlockElement?.focus();
+					} }
+				>
+					{ __( 'Back to block' ) }
+				</Button>
+			) }
 		</VStack>
 	);
 }

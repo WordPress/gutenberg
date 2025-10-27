@@ -10,7 +10,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import { useHasEditorCanvasContainer } from '../../components/editor-canvas-container';
+import { useHasEditorCanvasContainer } from '../../components/styles-canvas';
 
 const { useCommandContext } = unlock( commandsPrivateApis );
 const { useLocation } = unlock( routerPrivateApis );

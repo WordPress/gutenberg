@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-widgets",
-	"version": "6.32.0",
+	"version": "6.33.1",
 	"description": "Widgets Page module for WordPress..",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -34,6 +34,11 @@
 	},
 	"react-native": "src/index",
 	"wpScript": true,
+	"wpCopyFiles": {
+		"files": [
+			"src/blocks/*/block.json"
+		]
+	},
 	"dependencies": {
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/base-styles": "file:../base-styles",

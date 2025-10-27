@@ -12,7 +12,7 @@ import type {
 	FieldTypeDefinition,
 	NormalizedField,
 } from '../types';
-import renderFromElements from './utils/render-from-elements';
+import RenderFromElements from './utils/render-from-elements';
 import { OPERATOR_IS, OPERATOR_IS_NOT } from '../constants';
 
 function sort( a: any, b: any, direction: SortDirection ) {
@@ -51,8 +51,8 @@ export default {
 	},
 	Edit: 'checkbox',
 	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
-		if ( field.elements ) {
-			return renderFromElements( { item, field } );
+		if ( field.hasElements ) {
+			return <RenderFromElements item={ item } field={ field } />;
 		}
 
 		if ( field.getValue( { item } ) === true ) {

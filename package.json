@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "21.8.2",
+	"version": "21.9.0",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -17,6 +17,9 @@
 	"engines": {
 		"node": ">=20.10.0",
 		"npm": ">=10.2.3"
+	},
+	"wpPlugin": {
+		"prefix": "gutenberg"
 	},
 	"config": {
 		"IS_GUTENBERG_PLUGIN": true
@@ -58,6 +61,9 @@
 		"@storybook/test": "8.4.7",
 		"@storybook/theming": "8.4.7",
 		"@storybook/types": "8.4.7",
+		"@terrazzo/cli": "^0.10.2",
+		"@terrazzo/plugin-css": "^0.10.2",
+		"@terrazzo/token-tools": "^0.10.2",
 		"@testing-library/jest-dom": "5.16.5",
 		"@testing-library/react": "14.3.0",
 		"@testing-library/react-native": "12.4.3",
@@ -134,7 +140,6 @@
 		"make-dir": "3.0.0",
 		"mkdirp": "3.0.1",
 		"mock-match-media": "0.4.2",
-		"moment-timezone-data-webpack-plugin": "1.5.1",
 		"nock": "12.0.3",
 		"node-fetch": "2.7.0",
 		"npm-run-all": "4.1.5",
@@ -142,6 +147,7 @@
 		"postcss": "8.4.38",
 		"postcss-loader": "6.2.1",
 		"postcss-local-keyframes": "^0.0.2",
+		"postcss-modules": "6.0.1",
 		"prettier": "npm:wp-prettier@3.0.3",
 		"progress": "2.0.3",
 		"puppeteer-core": "23.10.1",
@@ -175,6 +181,7 @@
 		"toposort": "2.0.2",
 		"typescript": "5.7.2",
 		"uuid": "9.0.1",
+		"wait-on": "8.0.1",
 		"webdriverio": "8.16.20",
 		"webpack": "5.97.0",
 		"webpack-bundle-analyzer": "4.9.1"
@@ -183,20 +190,13 @@
 		"jsdom": "25.0.1"
 	},
 	"scripts": {
-		"build": "npm run --silent build:package-types && wp-scripts build && npm run build:packages",
-		"build:analyze-bundles": "npm run build -- --webpack-bundle-analyzer",
-		"build:package-types": "node ./bin/packages/validate-typescript-version.js && ( tsc --build || ( echo 'tsc failed. Try cleaning up first: `npm run clean:package-types`'; exit 1 ) ) && node ./bin/packages/check-build-type-declaration-files.js",
+		"build": "node ./bin/build.mjs",
 		"build:profile-types": "rimraf ./ts-traces && npm run clean:package-types && node ./bin/packages/validate-typescript-version.js && ( tsc --build --extendedDiagnostics --generateTrace ./ts-traces || ( echo 'tsc failed.'; exit 1 ) ) && node ./bin/packages/check-build-type-declaration-files.js && npx --yes @typescript/analyze-trace ts-traces > ts-traces/analysis.txt && node -p \"'\\n\\nDone! Build traces saved to ts-traces/ directory.\\nTrace analysis saved to ts-traces/analysis.txt.'\"",
-		"prebuild": "npm run clean:packages && npm run --if-present --workspaces build",
-		"build:packages": "cross-env NODE_ENV=production node ./bin/packages/build.mjs",
-		"postbuild:packages": " npm run --if-present --workspaces build:wp",
 		"build:plugin-zip": "bash ./bin/build-plugin-zip.sh",
 		"clean:package-types": "tsc --build --clean && rimraf --glob \"./packages/*/build-types\"",
 		"clean:packages": "rimraf --glob \"./packages/*/{build,build-module,build-wp,build-style}\"",
 		"component-usage-stats": "node ./node_modules/react-scanner/bin/react-scanner -c ./react-scanner.config.js",
-		"predev": "npm run clean:packages && npm run --if-present --workspaces build",
-		"dev": "npm run --silent build:package-types && wp-scripts build && npm run dev:packages",
-		"dev:packages": "cross-env NODE_ENV=development concurrently \"tsc --build --watch\" \"node ./bin/packages/build.mjs --watch\"",
+		"dev": "node ./bin/dev.mjs",
 		"distclean": "git clean --force -d -X",
 		"docs:api-ref": "node ./bin/api-docs/update-api-docs.js",
 		"docs:blocks": "node ./bin/api-docs/gen-block-lib-list.js",
@@ -237,9 +237,8 @@
 		"start": "npm run dev",
 		"prestorybook:build": "npm run build",
 		"storybook:build": "storybook build -c ./storybook -o ./storybook/build",
-		"prestorybook:dev": "npm run build",
-		"storybook:dev": "concurrently \"npm run dev:packages\" \"storybook dev -c ./storybook -p 50240\"",
-		"storybook:e2e:dev": "concurrently \"npm run dev:packages\" \"storybook dev -c test/storybook-playwright/storybook -p 50241\"",
+		"storybook:dev": "concurrently \"npm run dev\" \"wait-on .dev-ready && storybook dev -c ./storybook -p 50240\"",
+		"storybook:e2e:dev": "concurrently \"npm run dev\" \"wait-on .dev-ready && storybook dev -c test/storybook-playwright/storybook -p 50241\"",
 		"test": "npm-run-all lint test:unit",
 		"test:create-block": "bash ./bin/test-create-block.sh",
 		"test:e2e": "wp-scripts test-playwright --config test/e2e/playwright.config.ts",

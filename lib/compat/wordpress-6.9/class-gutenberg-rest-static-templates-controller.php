@@ -1,6 +1,11 @@
 <?php
 
 class Gutenberg_REST_Static_Templates_Controller extends WP_REST_Templates_Controller {
+	public function __construct() {
+		$this->rest_base = 'wp_registered_template';
+		$this->namespace = 'wp/v2';
+	}
+
 	public function register_routes() {
 		// Lists all templates.
 		register_rest_route(
@@ -81,9 +86,8 @@ class Gutenberg_REST_Static_Templates_Controller extends WP_REST_Templates_Contr
 		$query_result = gutenberg_get_registered_block_templates( $query );
 		$templates    = array();
 		foreach ( $query_result as $template ) {
-			$item               = $this->prepare_item_for_response( $template, $request );
-			$item->data['type'] = 'wp_registered_template';
-			$templates[]        = $this->prepare_response_for_collection( $item );
+			$item        = $this->prepare_item_for_response( $template, $request );
+			$templates[] = $this->prepare_response_for_collection( $item );
 		}
 
 		return rest_ensure_response( $templates );
@@ -97,8 +101,6 @@ class Gutenberg_REST_Static_Templates_Controller extends WP_REST_Templates_Contr
 		}
 
 		$item = $this->prepare_item_for_response( $template, $request );
-		// adjust the template type here instead
-		$item->data['type'] = 'wp_registered_template';
 		return rest_ensure_response( $item );
 	}
 }

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { privateApis } from '@wordpress/components';
+import { privateApis, Spinner } from '@wordpress/components';
 import { useCallback, useMemo } from '@wordpress/element';
 
 /**
@@ -10,6 +10,7 @@ import { useCallback, useMemo } from '@wordpress/element';
 import type { DataFormControlProps } from '../types';
 import { unlock } from '../lock-unlock';
 import getCustomValidity from './utils/get-custom-validity';
+import useElements from '../hooks/use-elements';
 
 const { ValidatedFormTokenField } = unlock( privateApis );
 
@@ -20,8 +21,13 @@ export default function ArrayControl< Item >( {
 	hideLabelFromVision,
 	validity,
 }: DataFormControlProps< Item > ) {
-	const { label, placeholder, elements, getValue, setValue, isValid } = field;
+	const { label, placeholder, getValue, setValue, isValid } = field;
 	const value = getValue( { item: data } );
+
+	const { elements, isLoading } = useElements( {
+		elements: field.elements,
+		getElements: field.getElements,
+	} );
 
 	// Convert stored values to element objects for the token field
 	const arrayValueAsElements = useMemo(
@@ -51,6 +57,10 @@ export default function ArrayControl< Item >( {
 		},
 		[ onChange, setValue, data ]
 	);
+
+	if ( isLoading ) {
+		return <Spinner />;
+	}
 
 	return (
 		<ValidatedFormTokenField

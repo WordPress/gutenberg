@@ -35,6 +35,7 @@ import {
 } from './hooks';
 import { getScope } from './scopes';
 import { proxifyState, proxifyContext, deepMerge } from './proxies';
+import { PENDING_GETTER } from './proxies/state';
 
 const warnUniqueIdWithTwoHyphens = (
 	prefix: string,
@@ -218,6 +219,98 @@ const getGlobalEventDirective = (
 				} );
 			} );
 	};
+};
+
+/**
+ * Obtains the given item key based on the passed `eachKey` entry. Used by the
+ * `wp-each` directive.
+ *
+ * The item key is computed using `getEvaluate` with a mocked scope simulating
+ * the specific context that inner directives will inherit, i.e., including the
+ * item under the corresponding item prop.
+ *
+ * @param inheritedValue Inherited context value.
+ * @param namespace      Namespace for the `wp-each` directive.
+ * @param item           Item from the list of items pointed by `wp-each`.
+ * @param itemProp       Prop in which the item is accessible from the context.
+ * @param eachKey        Directive entry pointing to the item's key.
+ * @return The evaluated key for the passed item.
+ */
+const evaluateItemKey = (
+	inheritedValue: any,
+	namespace: string,
+	item: unknown,
+	itemProp: string,
+	eachKey?: DirectiveEntry
+) => {
+	// Construct a client context with the item. Note that accessing the item
+	// prop is not reactive, as this simulated context is not proxified.
+	const clientContextWithItem = {
+		...inheritedValue.client,
+		[ namespace ]: {
+			...inheritedValue.client[ namespace ],
+			[ itemProp ]: item,
+		},
+	};
+
+	// Scope must contain the client and the server contexts.
+	const scope = {
+		...getScope(),
+		context: clientContextWithItem,
+		serverContext: inheritedValue.server,
+	};
+
+	// If passed, evaluate `eachKey` entry with the simulated scope. Return
+	// `item` otherwhise.
+	return eachKey ? getEvaluate( { scope } )( eachKey ) : item;
+};
+
+/**
+ * Generates an `Iterable` from the passed items that returns, for each item, a
+ * tuple with the item, its context and its evaluated key. Used by the `wp-each`
+ * directive.
+ *
+ * @param inheritedValue Inherited context value.
+ * @param namespace      Namespace for the `wp-each` directive.
+ * @param items          List of items pointed by `wp-each`.
+ * @param itemProp       Prop in which items are accessible from the context.
+ * @param eachKey        Directive entry pointing to the item's key.
+ * @return Generator that yields items along with their context and key.
+ */
+const useItemContexts = function* (
+	inheritedValue: any,
+	namespace: string,
+	items: Iterable< unknown >,
+	itemProp: string,
+	eachKey?: DirectiveEntry
+): Generator< [ item: unknown, context: any, key: any ] > {
+	const { current: itemContexts } = useRef< Map< any, any > >( new Map() );
+
+	for ( const item of items ) {
+		const key = evaluateItemKey(
+			inheritedValue,
+			namespace,
+			item,
+			itemProp,
+			eachKey
+		);
+
+		if ( ! itemContexts.has( key ) ) {
+			itemContexts.set(
+				key,
+				proxifyContext(
+					proxifyState( namespace, {
+						// Inits the item prop in the context to shadow it in case
+						// it was inherited from the parent context. The actual
+						// value is set in the `wp-each` directive later on.
+						[ itemProp ]: undefined,
+					} ),
+					inheritedValue.client[ namespace ]
+				)
+			);
+		}
+		yield [ item, itemContexts.get( key ), key ];
+	}
 };
 
 /**
@@ -559,6 +652,9 @@ export default () => {
 						? `${ entry.suffix }---${ entry.uniqueId }`
 						: entry.suffix;
 					let result = evaluate( entry );
+					if ( result === PENDING_GETTER ) {
+						return;
+					}
 					if ( typeof result === 'function' ) {
 						result = result();
 					}
@@ -608,6 +704,9 @@ export default () => {
 			}
 			const styleProp = entry.suffix;
 			let result = evaluate( entry );
+			if ( result === PENDING_GETTER ) {
+				return;
+			}
 			if ( typeof result === 'function' ) {
 				result = result();
 			}
@@ -651,6 +750,9 @@ export default () => {
 			}
 			const attribute = entry.suffix;
 			let result = evaluate( entry );
+			if ( result === PENDING_GETTER ) {
+				return;
+			}
 			if ( typeof result === 'function' ) {
 				result = result();
 			}
@@ -772,6 +874,9 @@ export default () => {
 			}
 			try {
 				let result = evaluate( entry );
+				if ( result === PENDING_GETTER ) {
+					return;
+				}
 				if ( typeof result === 'function' ) {
 					result = result();
 				}
@@ -840,6 +945,9 @@ export default () => {
 			}
 
 			let iterable = evaluate( entry );
+			if ( iterable === PENDING_GETTER ) {
+				return;
+			}
 			if ( typeof iterable === 'function' ) {
 				iterable = iterable();
 			}
@@ -852,14 +960,15 @@ export default () => {
 
 			const result: VNode< any >[] = [];
 
-			for ( const item of iterable ) {
-				// Shadows a previous item with the same key.
-				const itemContext = proxifyContext(
-					proxifyState( namespace, {
-						[ itemProp ]: item,
-					} ),
-					inheritedValue.client[ namespace ]
-				);
+			const itemContexts = useItemContexts(
+				inheritedValue,
+				namespace,
+				iterable,
+				itemProp,
+				eachKey?.[ 0 ]
+			);
+
+			for ( const [ item, itemContext, key ] of itemContexts ) {
 				const mergedContext = {
 					client: {
 						...inheritedValue.client,
@@ -868,14 +977,8 @@ export default () => {
 					server: { ...inheritedValue.server },
 				};
 
-				const scope = {
-					...getScope(),
-					context: mergedContext.client,
-					serverContext: mergedContext.server,
-				};
-				const key = eachKey
-					? getEvaluate( { scope } )( eachKey[ 0 ] )
-					: item;
+				// Sets the item after proxifying the context.
+				mergedContext.client[ namespace ][ itemProp ] = item;
 
 				result.push(
 					createElement(
@@ -891,7 +994,20 @@ export default () => {
 	);
 
 	// data-wp-each-child (internal use only)
-	directive( 'each-child', () => null, { priority: 1 } );
+	directive(
+		'each-child',
+		( { directives: { 'each-child': eachChild }, element, evaluate } ) => {
+			const entry = eachChild.find( isDefaultDirectiveSuffix );
+
+			if ( ! entry ) {
+				return;
+			}
+
+			const iterable = evaluate( entry );
+			return iterable === PENDING_GETTER ? element : null;
+		},
+		{ priority: 1 }
+	);
 
 	// data-wp-router-region
 	directive(

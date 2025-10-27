@@ -13,8 +13,15 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import normalizeFields from '../utils/normalize-fields';
-import type { Field, Form, FormValidity, CombinedFormField } from '../types';
-
+import normalizeFormFields from '../dataform-layouts/normalize-form-fields';
+import type {
+	CombinedFormField,
+	Field,
+	FieldValidity,
+	Form,
+	FormValidity,
+	NormalizedField,
+} from '../types';
 const isEmptyNullOrUndefined = ( value: any ) =>
 	[ undefined, '', null ].includes( value );
 
@@ -68,20 +75,13 @@ function isFormValid( formValidity: FormValidity | undefined ): boolean {
 	} );
 }
 
-type ValidationUpdate = {
-	required?: { type: 'valid' | 'invalid' | 'validating'; message?: string };
-	elements?: { type: 'valid' | 'invalid' | 'validating'; message: string };
-	custom?: { type: 'valid' | 'invalid' | 'validating'; message: string };
-};
-
 function updateFieldValidity(
 	setFormValidity: React.Dispatch< React.SetStateAction< FormValidity > >,
+	parentFieldId: string | undefined,
 	fieldId: string,
-	validationUpdate: ValidationUpdate,
-	parentFieldId?: string
+	newValidity: FieldValidity
 ) {
 	if ( parentFieldId ) {
-		// This field is a child of a combined field
 		setFormValidity( ( prev ) => ( {
 			...prev,
 			[ parentFieldId ]: {
@@ -89,10 +89,7 @@ function updateFieldValidity(
 				children: {
 					...prev?.[ parentFieldId ]?.children,
 					[ fieldId ]: {
-						...( prev?.[ parentFieldId ]?.children as any )?.[
-							fieldId
-						],
-						...validationUpdate,
+						...newValidity,
 					},
 				},
 			},
@@ -101,11 +98,46 @@ function updateFieldValidity(
 		setFormValidity( ( prev ) => ( {
 			...prev,
 			[ fieldId ]: {
-				...prev?.[ fieldId ],
-				...validationUpdate,
+				...newValidity,
 			},
 		} ) );
 	}
+}
+
+function getFieldsToValidate< Item >(
+	fields: Field< Item >[],
+	form: Form
+): {
+	fields: NormalizedField< Item >[];
+	fieldToParent: Map< string, string >;
+} {
+	const formFields = normalizeFormFields( form );
+	if ( formFields.length === 0 ) {
+		return { fields: [], fieldToParent: new Map() };
+	}
+
+	const fieldToParent = new Map< string, string >();
+	const fieldIdsToValidate: string[] = [];
+	formFields.forEach( ( formField ) => {
+		if ( !! ( formField as CombinedFormField ).children ) {
+			( formField as CombinedFormField ).children.forEach( ( child ) => {
+				const childId = typeof child === 'string' ? child : child.id;
+				fieldIdsToValidate.push( childId );
+				fieldToParent.set( childId, formField.id );
+			} );
+		} else {
+			fieldIdsToValidate.push( formField.id );
+		}
+	} );
+
+	return {
+		fields: normalizeFields(
+			fields.filter( ( field ) =>
+				fieldIdsToValidate.includes( field.id )
+			)
+		),
+		fieldToParent,
+	};
 }
 
 /**
@@ -124,47 +156,26 @@ export function useFormValidity< Item >(
 ): { validity: FormValidity; isValid: boolean } {
 	const [ formValidity, setFormValidity ] = useState< FormValidity >();
 	const previousValidatedValuesRef = useRef< Record< string, any > >( {} );
-	// customValidationCounterRef is used to track the validation promises triggered
-	// by executing isValid.custom. When the promise resolves,
+
+	// The following counters are used to track the validation promises triggered
+	// by executing isValid.custom and the elements validation. When the promise resolves,
 	// it will update the form validity state ONLY if its counter matches the current one.
 	const customValidationCounterRef = useRef< Record< string, number > >( {} );
+	const elementsValidationCounterRef = useRef< Record< string, number > >(
+		{}
+	);
 
 	const validate = useCallback( () => {
-		if ( typeof form.fields === 'undefined' ) {
+		const { fields: fieldsToValidate, fieldToParent } = getFieldsToValidate(
+			fields,
+			form
+		);
+		if ( fieldsToValidate.length === 0 ) {
 			setFormValidity( undefined );
 			return;
 		}
 
-		// Build a map of field ID -> parent field ID for combined fields with children
-		const fieldParentMap = new Map< string, string >();
-
-		// Collect all field IDs that should be validated (including children)
-		const fieldIdsToValidate = new Set< string >();
-
-		form.fields.forEach( ( formField ) => {
-			if ( typeof formField === 'string' ) {
-				fieldIdsToValidate.add( formField );
-			} else {
-				// Check if this is a CombinedFormField with children
-				const combinedField = formField as CombinedFormField;
-				if ( combinedField.children ) {
-					combinedField.children.forEach( ( child ) => {
-						const childId =
-							typeof child === 'string' ? child : child.id;
-						fieldIdsToValidate.add( childId );
-						fieldParentMap.set( childId, combinedField.id );
-					} );
-				} else {
-					fieldIdsToValidate.add( formField.id );
-				}
-			}
-		} );
-
-		const normalizedFields = normalizeFields(
-			fields.filter( ( field ) => fieldIdsToValidate.has( field.id ) )
-		);
-
-		normalizedFields.forEach( ( field ) => {
+		fieldsToValidate.forEach( ( field ) => {
 			const value = field.getValue( { item } );
 			if (
 				previousValidatedValuesRef.current.hasOwnProperty( field.id ) &&
@@ -174,84 +185,199 @@ export function useFormValidity< Item >(
 			}
 			previousValidatedValuesRef.current[ field.id ] = value;
 
-			const parentFieldId = fieldParentMap.get( field.id );
+			const parentFieldId = fieldToParent.get( field.id );
 
-			// Check isValid.required
+			// isValid.required
 			if (
 				field.isValid.required &&
 				isInvalidForRequired( field.type, value )
 			) {
-				updateFieldValidity(
-					setFormValidity,
-					field.id,
-					{ required: { type: 'invalid' } },
-					parentFieldId
-				);
+				updateFieldValidity( setFormValidity, parentFieldId, field.id, {
+					required: { type: 'invalid' },
+				} );
 				return;
 			}
 
-			// Check isValid.elements
-			if ( field.isValid.elements && field.elements ) {
-				const validValues = field.elements.map(
-					( element ) => element.value
-				);
+			// isValid.elements (static elements)
+			if (
+				field.isValid.elements &&
+				field.hasElements &&
+				! field.getElements &&
+				Array.isArray( field.elements )
+			) {
+				const validValues = field.elements.map( ( el ) => el.value );
 
-				if ( field.type === 'array' ) {
-					// Arrays (all values must be valid):
-					if ( Array.isArray( value ) ) {
-						const allAreValid = value.every( ( arrayItem ) =>
-							validValues.includes( arrayItem )
-						);
-						if ( allAreValid ) {
-							return;
-						}
-						updateFieldValidity(
-							setFormValidity,
-							field.id,
-							{
-								elements: {
-									type: 'invalid',
-									message:
-										'Value must be one of the elements.',
-								},
-							},
-							parentFieldId
-						);
-						return;
-					}
-
+				if (
+					field.type !== 'array' &&
+					! validValues.includes( value )
+				) {
 					updateFieldValidity(
 						setFormValidity,
+						parentFieldId,
 						field.id,
 						{
 							elements: {
 								type: 'invalid',
 								message: 'Value must be one of the elements.',
 							},
-						},
-						parentFieldId
+						}
 					);
 					return;
 				}
 
-				// Single-value fields:
-				const isValid = validValues.includes( value );
-				if ( isValid ) {
+				if ( field.type === 'array' && ! Array.isArray( value ) ) {
+					updateFieldValidity(
+						setFormValidity,
+						parentFieldId,
+						field.id,
+						{
+							elements: {
+								type: 'invalid',
+								message: 'Value must be an array.',
+							},
+						}
+					);
 					return;
 				}
+				if (
+					field.type === 'array' &&
+					value.some( ( v: any ) => ! validValues.includes( v ) )
+				) {
+					updateFieldValidity(
+						setFormValidity,
+						parentFieldId,
+						field.id,
+						{
+							elements: {
+								type: 'invalid',
+								message: 'Value must be one of the elements.',
+							},
+						}
+					);
+					return;
+				}
+			}
 
-				updateFieldValidity(
-					setFormValidity,
-					field.id,
-					{
-						elements: {
-							type: 'invalid',
-							message: 'Value must be one of the elements.',
-						},
+			// isValid.elements (get them via getElements first)
+			if (
+				field.isValid.elements &&
+				field.hasElements &&
+				typeof field.getElements === 'function'
+			) {
+				const currentToken =
+					( elementsValidationCounterRef.current[ field.id ] || 0 ) +
+					1;
+				elementsValidationCounterRef.current[ field.id ] = currentToken;
+				updateFieldValidity( setFormValidity, parentFieldId, field.id, {
+					elements: {
+						type: 'validating',
+						message: 'Validating...',
 					},
-					parentFieldId
-				);
-				return;
+				} );
+
+				field
+					.getElements()
+					.then( ( result ) => {
+						if (
+							elementsValidationCounterRef.current[ field.id ] !==
+							currentToken
+						) {
+							return;
+						}
+
+						if ( ! Array.isArray( result ) ) {
+							updateFieldValidity(
+								setFormValidity,
+								parentFieldId,
+								field.id,
+								{
+									elements: {
+										type: 'invalid',
+										message: 'Could not validate elements.',
+									},
+								}
+							);
+							return;
+						}
+
+						const validValues = result.map( ( el ) => el.value );
+						if (
+							field.type !== 'array' &&
+							! validValues.includes( value )
+						) {
+							updateFieldValidity(
+								setFormValidity,
+								parentFieldId,
+								field.id,
+								{
+									elements: {
+										type: 'invalid',
+										message:
+											'Value must be one of the elements.',
+									},
+								}
+							);
+							return;
+						}
+
+						if (
+							field.type === 'array' &&
+							! Array.isArray( value )
+						) {
+							updateFieldValidity(
+								setFormValidity,
+								parentFieldId,
+								field.id,
+								{
+									elements: {
+										type: 'invalid',
+										message: 'Value must be an array.',
+									},
+								}
+							);
+							return;
+						}
+
+						if (
+							field.type === 'array' &&
+							value.some(
+								( v: any ) => ! validValues.includes( v )
+							)
+						) {
+							updateFieldValidity(
+								setFormValidity,
+								parentFieldId,
+								field.id,
+								{
+									elements: {
+										type: 'invalid',
+										message:
+											'Value must be one of the elements.',
+									},
+								}
+							);
+						}
+					} )
+					.catch( ( error ) => {
+						if (
+							elementsValidationCounterRef.current[ field.id ] !==
+							currentToken
+						) {
+							return;
+						}
+
+						updateFieldValidity(
+							setFormValidity,
+							parentFieldId,
+							field.id,
+							{
+								elements: {
+									type: 'invalid',
+									message: error.message,
+								},
+							}
+						);
+					} );
 			}
 
 			// Check isValid.custom
@@ -277,32 +403,22 @@ export function useFormValidity< Item >(
 						__( 'Unknown error when running custom validation.' );
 				}
 
-				updateFieldValidity(
-					setFormValidity,
-					field.id,
-					{
-						custom: {
-							type: 'invalid',
-							message: errorMessage,
-						},
+				updateFieldValidity( setFormValidity, parentFieldId, field.id, {
+					custom: {
+						type: 'invalid',
+						message: errorMessage,
 					},
-					parentFieldId
-				);
+				} );
 			}
 
 			// — isValid.custom (sync version)
 			if ( typeof customError === 'string' ) {
-				updateFieldValidity(
-					setFormValidity,
-					field.id,
-					{
-						custom: {
-							type: 'invalid',
-							message: customError,
-						},
+				updateFieldValidity( setFormValidity, parentFieldId, field.id, {
+					custom: {
+						type: 'invalid',
+						message: customError,
 					},
-					parentFieldId
-				);
+				} );
 				return;
 			}
 
@@ -313,21 +429,15 @@ export function useFormValidity< Item >(
 					( customValidationCounterRef.current[ field.id ] || 0 ) + 1;
 				customValidationCounterRef.current[ field.id ] = currentToken;
 
-				updateFieldValidity(
-					setFormValidity,
-					field.id,
-					{
-						custom: {
-							type: 'validating',
-							message: 'Validating...',
-						},
+				updateFieldValidity( setFormValidity, parentFieldId, field.id, {
+					custom: {
+						type: 'validating',
+						message: 'Validating...',
 					},
-					parentFieldId
-				);
+				} );
 
 				customError
 					.then( ( result ) => {
-						// Only update if this is still the latest validation
 						if (
 							customValidationCounterRef.current[ field.id ] !==
 							currentToken
@@ -338,31 +448,33 @@ export function useFormValidity< Item >(
 						if ( result === null ) {
 							updateFieldValidity(
 								setFormValidity,
+								parentFieldId,
 								field.id,
 								{
 									custom: {
 										type: 'valid',
 										message: 'Valid',
 									},
-								},
-								parentFieldId
+								}
 							);
-						} else if ( typeof result === 'string' ) {
+							return;
+						}
+
+						if ( typeof result === 'string' ) {
 							updateFieldValidity(
 								setFormValidity,
+								parentFieldId,
 								field.id,
 								{
 									custom: {
 										type: 'invalid',
 										message: result,
 									},
-								},
-								parentFieldId
+								}
 							);
 						}
 					} )
 					.catch( ( error ) => {
-						// Only update if this is still the latest validation
 						if (
 							customValidationCounterRef.current[ field.id ] !==
 							currentToken
@@ -372,14 +484,14 @@ export function useFormValidity< Item >(
 
 						updateFieldValidity(
 							setFormValidity,
+							parentFieldId,
 							field.id,
 							{
 								custom: {
 									type: 'invalid',
 									message: error.message,
 								},
-							},
-							parentFieldId
+							}
 						);
 					} );
 

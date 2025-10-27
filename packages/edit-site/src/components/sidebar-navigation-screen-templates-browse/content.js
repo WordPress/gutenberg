@@ -38,13 +38,7 @@ export default function DataviewsTemplatesSidebarContent() {
 	const {
 		query: { activeView = 'active' },
 	} = useLocation();
-	const { records } = useEntityRecords(
-		'postType',
-		'wp_registered_template',
-		{
-			per_page: -1,
-		}
-	);
+	const { records } = useEntityRecords( 'root', 'registeredTemplate' );
 	const firstItemPerAuthorText = useMemo( () => {
 		const firstItemPerAuthor = records?.reduce( ( acc, template ) => {
 			const author = template.author_text;
@@ -73,7 +67,13 @@ export default function DataviewsTemplatesSidebarContent() {
 				icon={ layout }
 				aria-current={ activeView === 'user' }
 			>
-				{ __( 'Custom templates' ) }
+				{
+					// Let's avoid calling them "custom templates" to avoid
+					// confusion. "Created" is closest to meaning database
+					// templates, created by users.
+					// https://developer.wordpress.org/themes/classic-themes/templates/page-template-files/#creating-custom-page-templates-for-global-use
+					__( 'Created templates' )
+				}
 			</SidebarNavigationItem>
 			{ firstItemPerAuthorText.map( ( template ) => {
 				return (

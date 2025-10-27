@@ -19,7 +19,7 @@ import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
 import { STORE_NAME } from './name';
-import { LOCAL_EDITOR_ORIGIN, syncManager } from './sync';
+import { LOCAL_EDITOR_ORIGIN, getSyncManager } from './sync';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 
 /**
@@ -93,16 +93,6 @@ export function receiveEntityRecords(
 	edits,
 	meta
 ) {
-	// If we receive an auto-draft template, pretend it's already published.
-	if ( kind === 'postType' && name === 'wp_template' ) {
-		records = ( Array.isArray( records ) ? records : [ records ] ).map(
-			( record ) =>
-				record.status === 'auto-draft'
-					? { ...record, status: 'publish' }
-					: record
-		);
-	}
-
 	// Auto drafts should not have titles, but some plugins rely on them so we can't filter this
 	// on the server.
 	if ( kind === 'postType' ) {
@@ -425,7 +415,7 @@ export const editEntityRecord =
 				const objectType = `${ kind }/${ name }`;
 				const objectId = recordId;
 
-				syncManager.update(
+				getSyncManager()?.update(
 					objectType,
 					objectId,
 					edit.edits,
@@ -708,11 +698,6 @@ export const saveEntityRecord =
 								edits
 							),
 						};
-					}
-					// Unless there is no persisted record, set the status to
-					// publish.
-					if ( name === 'wp_template' && persistedRecord ) {
-						edits.status = 'publish';
 					}
 					updatedRecord = await __unstableFetch( {
 						path,

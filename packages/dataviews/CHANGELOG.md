@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### Enhancements
+
+- DataForm: update spacing for regular and card layouts. [#72249](https://github.com/WordPress/gutenberg/pull/72249).
+- DataForm: Fix password field suffix alignment. [#72524](https://github.com/WordPress/gutenberg/pull/72524).
+
+## 10.1.0 (2025-10-21)
+
+### Enhancements
+
+- Consistently use font-weight 499 instead of 500 ([#72473](https://github.com/WordPress/gutenberg/pull/72473)).
+- Dataviews: Use text based buttons for actions instead of text. [#72417](https://github.com/WordPress/gutenberg/pull/72417)
+
+## 10.0.0 (2025-10-17)
+
 ### Bug Fixes
 
 - DataViewsPicker: ensure title overflows correctly in Grid view. ([#72339](https://github.com/WordPress/gutenberg/pull/72339))
@@ -17,6 +31,7 @@
 - DataForm control for `datetime` supports `required` and `custom` validation. [#72060](https://github.com/WordPress/gutenberg/pull/72060).
 - Standardise DataForm typography. [#72284](https://github.com/WordPress/gutenberg/pull/72284).
 - Dataviews: Add support for dynamic modal headers. [#72384](https://github.com/WordPress/gutenberg/pull/72384)
+- Field API: support async loading elements. [#72254](https://github.com/WordPress/gutenberg/pull/72254)
 
 ### Breaking changes
 

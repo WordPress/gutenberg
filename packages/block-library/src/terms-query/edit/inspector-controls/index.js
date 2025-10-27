@@ -55,8 +55,8 @@ export default function TermsQueryInspectorControls( {
 		templateSlug?.startsWith( 'taxonomy-' ) ||
 		templateSlug?.startsWith( 'category-' ) ||
 		templateSlug?.startsWith( 'tag-' );
-	// Only display the showNested control if the taxonomy is hierarchical and not inheriting.
-	const displayShowNestedControl = isTaxonomyHierarchical && ! inheritQuery;
+	// Display the showNested control if the taxonomy is hierarchical.
+	const displayShowNestedControl = isTaxonomyHierarchical;
 	const hasIncludeFilter = !! include?.length;
 
 	// Labels shared between ToolsPanelItem and its child control.

@@ -450,7 +450,12 @@ describe( 'useFormValidity', () => {
 					current: { validity, isValid },
 				},
 			} = renderHook( () => useFormValidity( item, fields, form ) );
-			expect( validity?.tags ).toEqual( ELEMENTS_MESSAGE );
+			expect( validity?.tags ).toEqual( {
+				elements: {
+					type: 'invalid',
+					message: 'Value must be an array.',
+				},
+			} );
 			expect( isValid ).toBe( false );
 		} );
 	} );

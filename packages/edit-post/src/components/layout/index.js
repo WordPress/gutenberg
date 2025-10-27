@@ -19,10 +19,8 @@ import {
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	privateApis as blockEditorPrivateApis,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { getLayoutStyles } from '@wordpress/global-styles-engine';
 import { PluginArea } from '@wordpress/plugins';
 import { __, sprintf } from '@wordpress/i18n';
 import {
@@ -75,7 +73,6 @@ import { useShouldIframe } from './use-should-iframe';
 import useNavigateToEntityRecord from '../../hooks/use-navigate-to-entity-record';
 import { useMetaBoxInitialization } from '../meta-boxes/use-meta-box-initialization';
 
-const { getLayoutStyles } = unlock( blockEditorPrivateApis );
 const { useCommandContext } = unlock( commandsPrivateApis );
 const { Editor, FullscreenMode } = unlock( editorPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
@@ -84,7 +81,6 @@ const DESIGN_POST_TYPES = [
 	'wp_template_part',
 	'wp_block',
 	'wp_navigation',
-	'wp_registered_template',
 ];
 
 function useEditorStyles( ...additionalStyles ) {
@@ -519,17 +515,6 @@ function Layout( {
 
 	useMetaBoxInitialization( hasActiveMetaboxes && hasResolvedMode );
 
-	const editableResolvedTemplateId = useSelect(
-		( select ) => {
-			if ( typeof templateId !== 'string' ) {
-				return templateId;
-			}
-			return unlock( select( coreStore ) ).getTemplateAutoDraftId(
-				templateId
-			);
-		},
-		[ templateId ]
-	);
 	const [ paddingAppenderRef, paddingStyle ] = usePaddingAppender(
 		enablePaddingAppender
 	);
@@ -653,7 +638,7 @@ function Layout( {
 						initialEdits={ initialEdits }
 						postType={ currentPostType }
 						postId={ currentPostId }
-						templateId={ editableResolvedTemplateId }
+						templateId={ templateId }
 						className={ className }
 						styles={ styles }
 						forceIsDirty={ hasActiveMetaboxes }

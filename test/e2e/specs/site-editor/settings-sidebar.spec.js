@@ -15,7 +15,7 @@ test.describe( 'Settings sidebar', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//index',
-			postType: 'wp_registered_template',
+			postType: 'wp_template',
 			canvas: 'edit',
 		} );
 	} );
@@ -63,7 +63,7 @@ test.describe( 'Settings sidebar', () => {
 
 			await admin.visitSiteEditor( {
 				postId: 'emptytheme//singular',
-				postType: 'wp_registered_template',
+				postType: 'wp_template',
 				canvas: 'edit',
 			} );
 
