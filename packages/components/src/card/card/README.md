@@ -58,20 +58,20 @@ Renders with rounded corners.
 
 ### `size`: `string | object`
 
-Determines the amount of padding within the component. Can be specified either as a single size token or as an object for directional control.
+Determines the amount of padding within the component. Can be specified either as a single size token or as an object.
 
 - Required: No
 - Default: `medium`
 - Allowed values:
    	- Single size token: `xSmall`, `small`, `medium`, `large`
-   	- Directional object:
+   	- Object:
 
     ```ts
     {
-      top?: 'xSmall' | 'small' | 'medium' | 'large';
-      right?: 'xSmall' | 'small' | 'medium' | 'large';
-      bottom?: 'xSmall' | 'small' | 'medium' | 'large';
-      left?: 'xSmall' | 'small' | 'medium' | 'large';
+      blockStart?: 'xSmall' | 'small' | 'medium' | 'large';
+      blockEnd?: 'xSmall' | 'small' | 'medium' | 'large';
+      inlineStart?: 'xSmall' | 'small' | 'medium' | 'large';
+      inlineEnd?: 'xSmall' | 'small' | 'medium' | 'large';
     }
     ```
 
@@ -115,9 +115,14 @@ const Example = () => (
 );
 ```
 
-### Directional Padding Example
+### Logical Padding Properties
 
-The `size` prop supports directional padding control, allowing you to set different padding values for each side:
+The `size` prop supports logical properties that adapt to different writing directions:
+
+- `blockStart` - Maps to `top` in horizontal writing modes
+- `blockEnd` - Maps to `bottom` in horizontal writing modes
+- `inlineStart` - Maps to `left` in horizontal writing modes
+- `inlineEnd` - Maps to `right` in horizontal writing modes
 
 ```jsx
 import { Card, CardBody } from '@wordpress/components';
@@ -125,21 +130,20 @@ import { Card, CardBody } from '@wordpress/components';
 const Example = () => (
 	<Card
 		size={ {
-			top: 'large',
-			right: 'medium',
-			bottom: 'small',
-			left: 'medium',
+			blockStart: 'large',
+			blockEnd: 'small',
+			inlineStart: 'medium',
+			inlineEnd: 'medium',
 		} }
 	>
 		<CardBody
 			size={ {
-				top: 'small',
-				right: 'large',
-				bottom: 'small',
-				left: 'large',
+				blockStart: 'small',
+				inlineStart: 'large',
+				inlineEnd: 'large',
 			} }
 		>
-			Content with custom padding per side
+			Content with logical padding properties
 		</CardBody>
 	</Card>
 );

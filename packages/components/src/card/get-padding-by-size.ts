@@ -59,11 +59,16 @@ export const getPaddingBySize = ( size: Props[ 'size' ] ): SerializedStyles => {
 
 	// Handle object-based sizes
 	if ( size && typeof size === 'object' ) {
+		const top = size.blockStart;
+		const bottom = size.blockEnd;
+		const left = size.inlineStart;
+		const right = size.inlineEnd;
+
 		return css`
-			padding: ${ getSinglePaddingValue( size.top ) }
-				${ getSinglePaddingValue( size.right ) }
-				${ getSinglePaddingValue( size.bottom ) }
-				${ getSinglePaddingValue( size.left ) };
+			padding: ${ getSinglePaddingValue( top ) }
+				${ getSinglePaddingValue( right ) }
+				${ getSinglePaddingValue( bottom ) }
+				${ getSinglePaddingValue( left ) };
 		`;
 	}
 
