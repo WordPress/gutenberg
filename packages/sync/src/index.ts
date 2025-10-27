@@ -16,6 +16,7 @@ export {
 	CRDT_RECORD_MAP_KEY,
 	LOCAL_EDITOR_ORIGIN,
 	LOCAL_SYNC_MANAGER_ORIGIN,
+	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 } from './config';
 export { createSyncManager } from './manager';
 export type * from './types';
