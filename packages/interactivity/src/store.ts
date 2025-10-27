@@ -328,11 +328,7 @@ export const populateServerData = ( data?: {
 					// The derived state prop is considered a pending getter
 					// only if its value is a plain object, which is how
 					// closures are serialized from PHP.
-					if (
-						desc &&
-						'value' in desc &&
-						isPlainObject( desc.value )
-					) {
+					if ( isPlainObject( desc?.value ) ) {
 						parent[ prop ] = PENDING_GETTER;
 					}
 				} );
