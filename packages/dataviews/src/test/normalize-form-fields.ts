@@ -142,7 +142,6 @@ describe( 'normalizeFormFields', () => {
 						type: 'card',
 						withHeader: true,
 						isOpened: true,
-						withHeaderBorder: false,
 						summary: [],
 					},
 				},
@@ -169,7 +168,6 @@ describe( 'normalizeFormFields', () => {
 						type: 'card',
 						withHeader: false,
 						isOpened: true,
-						withHeaderBorder: false,
 						summary: [],
 					},
 				},
@@ -193,7 +191,6 @@ describe( 'normalizeFormFields', () => {
 					layout: {
 						type: 'card',
 						withHeader: true,
-						withHeaderBorder: false,
 						isOpened: false,
 						summary: [ { id: 'field1', visibility: 'always' } ],
 					},
@@ -221,7 +218,6 @@ describe( 'normalizeFormFields', () => {
 					layout: {
 						type: 'card',
 						withHeader: true,
-						withHeaderBorder: false,
 						isOpened: false,
 						summary: [
 							{ id: 'field2', visibility: 'when-collapsed' },
@@ -283,7 +279,6 @@ describe( 'normalizeFormFields', () => {
 						withHeader: false,
 						isOpened: true,
 						summary: [],
-						withHeaderBorder: false,
 					},
 				},
 				{
@@ -293,7 +288,6 @@ describe( 'normalizeFormFields', () => {
 						withHeader: true,
 						isOpened: false,
 						summary: [],
-						withHeaderBorder: false,
 					},
 				},
 			] );

@@ -340,13 +340,11 @@ const getLayoutFromStoryArgs = ( {
 	labelPosition,
 	openAs,
 	withHeader,
-	withHeaderBorder,
 }: {
 	type: 'default' | 'regular' | 'panel' | 'card' | 'row';
 	labelPosition?: 'default' | 'top' | 'side' | 'none';
 	openAs?: 'default' | 'dropdown' | 'modal';
 	withHeader?: boolean;
-	withHeaderBorder?: boolean;
 } ): Layout | undefined => {
 	let layout: Layout | undefined;
 
@@ -377,7 +375,6 @@ const getLayoutFromStoryArgs = ( {
 			// @ts-ignore We want to demo the effects of configuring withHeader.
 			cardLayout.withHeader = withHeader;
 		}
-		cardLayout.withHeaderBorder = withHeaderBorder ?? false;
 		layout = cardLayout;
 	}
 
@@ -1255,13 +1252,7 @@ const VisibilityComponent = () => {
 	);
 };
 
-const LayoutCardComponent = ( {
-	withHeader,
-	withHeaderBorder,
-}: {
-	withHeader: boolean;
-	withHeaderBorder: boolean;
-} ) => {
+const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 	type Customer = {
 		name: string;
 		email: string;
@@ -1391,7 +1382,6 @@ const LayoutCardComponent = ( {
 					layout: getLayoutFromStoryArgs( {
 						type: 'card',
 						withHeader,
-						withHeaderBorder,
 					} ),
 					label: 'Customer',
 					description:
@@ -1462,7 +1452,7 @@ const LayoutCardComponent = ( {
 				},
 			],
 		} ),
-		[ withHeader, withHeaderBorder ]
+		[ withHeader ]
 	);
 
 	return (
@@ -1865,9 +1855,8 @@ export const LayoutCard = {
 	render: LayoutCardComponent,
 	argTypes: {
 		withHeader: { control: { type: 'boolean' } },
-		withHeaderBorder: { control: { type: 'boolean' } },
 	},
-	args: { withHeader: true, withHeaderBorder: false },
+	args: { withHeader: true },
 };
 
 export const LayoutPanel = {

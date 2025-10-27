@@ -25,10 +25,8 @@ import { getSummaryFields } from '../get-summary-fields';
 
 export function useCollapsibleCard( {
 	initialIsOpen,
-	withHeaderBorder,
 }: {
 	initialIsOpen: boolean;
-	withHeaderBorder: boolean;
 } ) {
 	const [ isOpen, setIsOpen ] = useState( initialIsOpen );
 
@@ -51,7 +49,7 @@ export function useCollapsibleCard( {
 					cursor: 'pointer',
 					...props.style,
 				} }
-				isBorderless={ ! withHeaderBorder }
+				isBorderless
 			>
 				<div
 					style={ {
@@ -72,7 +70,7 @@ export function useCollapsibleCard( {
 				/>
 			</CardHeader>
 		),
-		[ toggle, withHeaderBorder, isOpen ]
+		[ toggle, isOpen ]
 	);
 
 	return { isOpen, CollapsibleCardHeader };
@@ -151,29 +149,17 @@ export default function FormCardField< Item >( {
 		[ field ]
 	);
 
-	const sizeCard =
-		! layout.withHeaderBorder && layout.withHeader
-			? {
-					top: 'medium' as const,
-					right: 'medium' as const,
-					bottom: 'medium' as const,
-					left: 'medium' as const,
-			  }
-			: undefined;
-
-	const sizeCardBody =
-		! layout.withHeaderBorder && layout.withHeader
-			? {
-					top: undefined,
-					right: 'medium' as const,
-					bottom: 'medium' as const,
-					left: 'medium' as const,
-			  }
-			: undefined;
+	const sizeCard = layout.withHeader
+		? {
+				top: 'medium' as const,
+				right: 'medium' as const,
+				bottom: 'medium' as const,
+				left: 'medium' as const,
+		  }
+		: undefined;
 
 	const { isOpen, CollapsibleCardHeader } = useCollapsibleCard( {
 		initialIsOpen: layout.isOpened,
-		withHeaderBorder: layout.withHeaderBorder,
 	} );
 
 	const summaryFields = getSummaryFields< Item >( layout.summary, fields );
@@ -184,6 +170,16 @@ export default function FormCardField< Item >( {
 
 	if ( isCombinedField( field ) ) {
 		const withHeader = !! field.label && layout.withHeader;
+
+		const sizeCardBody = withHeader
+			? {
+					top: undefined,
+					right: 'medium' as const,
+					bottom: 'medium' as const,
+					left: 'medium' as const,
+			  }
+			: undefined;
+
 		return (
 			<Card className="dataforms-layouts-card__field" size={ sizeCard }>
 				{ withHeader && (
@@ -244,6 +240,15 @@ export default function FormCardField< Item >( {
 		return null;
 	}
 	const withHeader = !! fieldDefinition.label && layout.withHeader;
+
+	const sizeCardBody = withHeader
+		? {
+				top: undefined,
+				right: 'medium' as const,
+				bottom: 'medium' as const,
+				left: 'medium' as const,
+		  }
+		: undefined;
 	return (
 		<Card className="dataforms-layouts-card__field">
 			{ withHeader && (
