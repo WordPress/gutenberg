@@ -25,6 +25,8 @@ test.describe( 'Pages View Persistence', () => {
 	test.beforeEach( async ( { admin, page } ) => {
 		await admin.visitSiteEditor();
 		await page.getByRole( 'button', { name: 'Pages' } ).click();
+		// Wait for the page list to be fully rendered
+		await page.getByRole( 'region', { name: 'Pages' } ).waitFor();
 
 		const resetButton = page.getByRole( 'button', { name: 'Reset view' } );
 		if ( await resetButton.isVisible() ) {

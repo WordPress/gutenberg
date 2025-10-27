@@ -417,6 +417,8 @@ test.describe( 'Site Editor Performance', () => {
 
 			await admin.visitSiteEditor();
 			await page.getByRole( 'button', { name: 'Pages' } ).click();
+			// Wait for the page list to be fully rendered
+			await page.getByRole( 'region', { name: 'Pages' } ).waitFor();
 
 			// Check if we're dealing with the old URL structure.
 			const path = new URL( page.url() ).searchParams.get( 'path' );

@@ -5,6 +5,8 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 async function draftNewPage( page ) {
 	await page.getByRole( 'button', { name: 'Pages' } ).click();
+	// Wait for the page list to be fully rendered
+	await page.getByRole( 'region', { name: 'Pages' } ).waitFor();
 	await page.getByRole( 'button', { name: 'Add page' } ).click();
 	await page
 		.locator( 'role=dialog[name="Draft new: page"i]' )

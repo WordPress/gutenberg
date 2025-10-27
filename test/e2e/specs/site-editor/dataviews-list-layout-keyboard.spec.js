@@ -29,6 +29,8 @@ test.describe( 'Dataviews List Layout', () => {
 		// Go to the pages page, as it has the list layout enabled by default.
 		await admin.visitSiteEditor();
 		await page.getByRole( 'button', { name: 'Pages' } ).click();
+		// Wait for the page list to be fully rendered
+		await page.getByRole( 'region', { name: 'Pages' } ).waitFor();
 	} );
 
 	test( 'Items list is reachable via TAB', async ( { page } ) => {

@@ -23,6 +23,8 @@ test.describe( 'Homepage Settings via Editor', () => {
 	test.beforeEach( async ( { admin, page } ) => {
 		await admin.visitSiteEditor();
 		await page.getByRole( 'button', { name: 'Pages' } ).click();
+		// Wait for the page list to be fully rendered
+		await page.getByRole( 'region', { name: 'Pages' } ).waitFor();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
