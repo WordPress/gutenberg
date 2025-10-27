@@ -9,26 +9,6 @@
  */
 
 /**
- * Internal dependencies
- */
-import type * as api from './api';
-import type { store } from './store';
-
-/**
- * TypeScript declaration for the global wp object
- */
-declare global {
-	interface Window {
-		wp: {
-			abilities?: typeof api & {
-				store: typeof store;
-			};
-			[ key: string ]: any;
-		};
-	}
-}
-
-/**
  * Public API functions
  */
 export {
