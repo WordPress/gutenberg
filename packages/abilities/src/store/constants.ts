@@ -1,7 +1,7 @@
 /**
  * Store constants
  */
-export const STORE_NAME = 'abilities-api/abilities';
+export const STORE_NAME = 'core/abilities';
 export const ENTITY_KIND = 'root';
 export const ENTITY_NAME = 'abilities';
 export const ENTITY_NAME_CATEGORIES = 'ability-categories';

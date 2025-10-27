@@ -435,9 +435,7 @@ describe( 'Store Actions', () => {
 			await action( { select: mockSelect, dispatch: mockDispatch } );
 
 			// resolveSelect should have been called to load categories
-			expect( resolveSelect ).toHaveBeenCalledWith(
-				'abilities-api/abilities'
-			);
+			expect( resolveSelect ).toHaveBeenCalledWith( 'core/abilities' );
 			expect( mockDispatch ).toHaveBeenCalledWith( {
 				type: REGISTER_ABILITY,
 				ability,
@@ -515,9 +513,7 @@ describe( 'Store Actions', () => {
 			await action( { select: mockSelect, dispatch: mockDispatch } );
 
 			// Should have called resolveSelect to load categories
-			expect( resolveSelect ).toHaveBeenCalledWith(
-				'abilities-api/abilities'
-			);
+			expect( resolveSelect ).toHaveBeenCalledWith( 'core/abilities' );
 			// Should have successfully registered
 			expect( mockDispatch ).toHaveBeenCalledWith( {
 				type: REGISTER_ABILITY,
