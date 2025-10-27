@@ -29,7 +29,7 @@ test.describe( 'Post Data source', () => {
 	} );
 	test.describe( 'Post Data bindings UI.', () => {
 		// Update this test if we land the format attribute.
-		test( 'should include post data fields in UI to connect attributes on blocks', async ( {
+		test( 'should not include post data fields in UI to connect attributes on non date blocks', async ( {
 			editor,
 			page,
 		} ) => {
@@ -57,7 +57,7 @@ test.describe( 'Post Data source', () => {
 			const postDataMenuItem = page.getByRole( 'menuitem', {
 				name: 'Post Data',
 			} );
-			await expect( postDataMenuItem ).toBeVisible();
+			await expect( postDataMenuItem ).toBeHidden();
 			// Check the fields registered by other sources are there.
 		} );
 

@@ -182,6 +182,14 @@ export default {
 		return true;
 	},
 	getFieldsList( { select, context } ) {
+		const selectedBlock = select( blockEditorStore ).getSelectedBlock();
+		if ( selectedBlock?.name !== 'core/post-date' ) {
+			return [];
+		}
+		// Exit early for navigation blocks (read-only)
+		if ( NAVIGATION_BLOCK_TYPES.includes( selectedBlock?.name ) ) {
+			return [];
+		}
 		const clientId = select( blockEditorStore ).getSelectedBlockClientId();
 		const postDataFields = getPostDataFields( select, context, clientId );
 		if ( ! postDataFields ) {
