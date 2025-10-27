@@ -21,7 +21,11 @@ import {
 } from './crdt-blocks';
 import { type Post } from '../entity-types/post';
 import { type Type } from '../entity-types';
-import { CRDT_DOC_META_PERSISTENCE_KEY, CRDT_RECORD_MAP_KEY } from '../sync';
+import {
+	CRDT_DOC_META_PERSISTENCE_KEY,
+	CRDT_RECORD_MAP_KEY,
+	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
+} from '../sync';
 import type { WPBlockSelection, WPSelection } from '../types';
 
 export type PostChanges = Partial< Post > & {
@@ -54,7 +58,9 @@ const allowedPostProperties = new Set< string >( [
 ] );
 
 // Post meta keys that should *not* be synced.
-const disallowedPostMetaKeys = new Set< string >( [] );
+const disallowedPostMetaKeys = new Set< string >( [
+	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
+] );
 
 /**
  * Given a set of local changes to a generic entity record, apply those changes

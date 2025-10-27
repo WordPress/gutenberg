@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { CRDT_RECORD_MAP_KEY, Y } from '@wordpress/sync';
+import {
+	CRDT_RECORD_MAP_KEY,
+	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
+	Y,
+} from '@wordpress/sync';
 
 /**
  * External dependencies
@@ -342,6 +346,32 @@ describe( 'crdt', () => {
 			expect( changes.meta ).toEqual( {
 				public_meta: [ 'value', 'value 2' ], // from CRDT
 			} );
+		} );
+
+		it( 'excludes disallowed meta keys in changes', () => {
+			map.set( 'meta', {
+				public_meta: 'new value',
+				[ WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: 'exclude me',
+			} );
+
+			const editedRecord = {
+				meta: {
+					public_meta: 'old value',
+				},
+			} as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				mockPostType
+			);
+
+			expect( changes.meta ).toEqual( {
+				public_meta: 'new value', // from CRDT
+			} );
+			expect( changes.meta ).not.toHaveProperty(
+				WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE
+			);
 		} );
 	} );
 } );
