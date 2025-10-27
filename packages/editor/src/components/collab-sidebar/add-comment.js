@@ -59,6 +59,8 @@ export function AddComment( {
 				}
 			) }
 			spacing="3"
+			tabIndex={ 0 }
+			aria-label={ __( 'New note' ) }
 			role="listitem"
 			ref={ isFloating ? refs.setFloating : undefined }
 			style={
@@ -89,7 +91,7 @@ export function AddComment( {
 				} }
 				reflowComments={ reflowComments }
 				submitButtonText={ __( 'Add note' ) }
-				labelText={ __( 'New Note' ) }
+				labelText={ __( 'New note' ) }
 			/>
 		</VStack>
 	);
