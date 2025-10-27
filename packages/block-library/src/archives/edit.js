@@ -4,7 +4,6 @@
 import {
 	ToggleControl,
 	SelectControl,
-	Disabled,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -126,13 +125,11 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 				</ToolsPanel>
 			</InspectorControls>
 			<div { ...useBlockProps() }>
-				<Disabled>
-					<ServerSideRender
-						block="core/archives"
-						skipBlockSupportAttributes
-						attributes={ attributes }
-					/>
-				</Disabled>
+				<ServerSideRender
+					block="core/archives"
+					skipBlockSupportAttributes
+					attributes={ attributes }
+				/>
 			</div>
 		</>
 	);

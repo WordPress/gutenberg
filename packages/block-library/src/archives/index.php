@@ -66,8 +66,18 @@ function render_block_core_archives( $attributes ) {
 		$show_label = empty( $attributes['showLabel'] ) ? ' screen-reader-text' : '';
 
 		$block_content = '<label for="' . $dropdown_id . '" class="wp-block-archives__label' . $show_label . '">' . esc_html( $title ) . '</label>
-		<select id="' . $dropdown_id . '" name="archive-dropdown" onchange="document.location.href=this.options[this.selectedIndex].value;">
+		<select id="' . $dropdown_id . '" name="archive-dropdown">
 		<option value="">' . esc_html( $label ) . '</option>' . $archives . '</select>';
+
+		if ( ! is_admin() ) {
+			// Inject the dropdown script immediately after the select dropdown.
+			$block_content = preg_replace(
+				'#(?<=</select>)#',
+				block_core_archives_build_dropdown_script( $dropdown_id ),
+				$block_content,
+				1
+			);
+		}
 
 		return sprintf(
 			'<div %1$s>%2$s</div>',
@@ -104,6 +114,36 @@ function render_block_core_archives( $attributes ) {
 		$wrapper_attributes,
 		$archives
 	);
+}
+
+/**
+ * Generates the inline script for an archives dropdown field.
+ *
+ * @since 6.9.0
+ *
+ * @param string $dropdown_id ID of the dropdown field.
+ *
+ * @return string Returns the dropdown onChange redirection script.
+ */
+function block_core_archives_build_dropdown_script( $dropdown_id ) {
+	ob_start();
+	?>
+	<script>
+	( function() {
+		var dropdown = document.getElementById( '<?php echo esc_js( $dropdown_id ); ?>' );
+		if ( ! dropdown ) {
+			return;
+		}
+		function onArchiveChange() {
+			if ( dropdown.options[ dropdown.selectedIndex ].value !== '' ) {
+				location.href = dropdown.options[ dropdown.selectedIndex ].value;
+			}
+		}
+		dropdown.onchange = onArchiveChange;
+	})();
+	</script>
+	<?php
+	return wp_get_inline_script_tag( str_replace( array( '<script>', '</script>' ), '', ob_get_clean() ) );
 }
 
 /**
