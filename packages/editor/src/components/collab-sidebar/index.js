@@ -86,6 +86,10 @@ function NotesSidebarContent( {
 function NotesSidebar( { postId, mode } ) {
 	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
 	const [ isInitialLoad, setIsInitialLoad ] = useState( true );
+	const [ cachedComments, setCachedComments ] = useState( [] );
+	const [ cachedUnresolvedThreads, setCachedUnresolvedThreads ] = useState(
+		[]
+	);
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -108,23 +112,39 @@ function NotesSidebar( { postId, mode } ) {
 		totalPages,
 		reflowComments,
 		commentLastUpdated,
+		hasResolved,
+		isResolving,
 	} = useBlockComments( postId, isInitialLoad );
+
+	// Cache comments between initial load (parent comments only) and full load (all comments).
+	useEffect( () => {
+		if ( resultComments.length > 0 ) {
+			setCachedComments( resultComments );
+			reflowComments();
+		}
+		if ( unresolvedSortedThreads.length > 0 ) {
+			setCachedUnresolvedThreads( unresolvedSortedThreads );
+			reflowComments();
+		}
+	}, [ reflowComments, resultComments, unresolvedSortedThreads ] );
+
 	useEnableFloatingSidebar(
 		showFloatingSidebar &&
-			( unresolvedSortedThreads.length > 0 || showCommentBoard )
+			( cachedUnresolvedThreads.length > 0 || showCommentBoard )
 	);
 
-	// Set initial load state to false once the initial threads load.
+	// Transition from initial load (parent comments only) to full load (all comments with replies)
+	// once the parent comments query has completed and rendered.
 	useEffect( () => {
-		if ( isInitialLoad && resultComments.length > 0 ) {
-			// setTimeout to ensure UI updates after initial load.
+		if ( isInitialLoad && hasResolved && ! isResolving ) {
+			// Use a timeout to ensure the browser has painted the parent comments.
 			const timeoutId = setTimeout( () => {
 				setIsInitialLoad( false );
 				reflowComments();
 			}, 1000 );
 			return () => clearTimeout( timeoutId );
 		}
-	}, [ isInitialLoad, resultComments.length, reflowComments ] );
+	}, [ isInitialLoad, hasResolved, isResolving, reflowComments ] );
 
 	const hasMoreComments = totalPages && totalPages > 1;
 
@@ -134,7 +154,7 @@ function NotesSidebar( { postId, mode } ) {
 
 	// Find the current thread for the selected block.
 	const currentThread = blockCommentId
-		? resultComments.find( ( thread ) => thread.id === blockCommentId )
+		? cachedComments.find( ( thread ) => thread.id === blockCommentId )
 		: null;
 
 	async function openTheSidebar() {
@@ -184,7 +204,7 @@ function NotesSidebar( { postId, mode } ) {
 				closeLabel={ __( 'Close Notes' ) }
 			>
 				<NotesSidebarContent
-					comments={ resultComments }
+					comments={ cachedComments }
 					showCommentBoard={ showCommentBoard }
 					setShowCommentBoard={ setShowCommentBoard }
 					commentSidebarRef={ commentSidebarRef }
@@ -202,7 +222,7 @@ function NotesSidebar( { postId, mode } ) {
 					backgroundColor={ backgroundColor }
 				>
 					<NotesSidebarContent
-						comments={ unresolvedSortedThreads }
+						comments={ cachedUnresolvedThreads }
 						showCommentBoard={ showCommentBoard }
 						setShowCommentBoard={ setShowCommentBoard }
 						commentSidebarRef={ commentSidebarRef }

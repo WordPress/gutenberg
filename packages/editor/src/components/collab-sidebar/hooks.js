@@ -57,12 +57,14 @@ export function useBlockComments( postId, isInitialLoad = false ) {
 		queryArgs.parent = 0;
 	}
 
-	const { records: threads, totalPages } = useEntityRecords(
-		'root',
-		'comment',
-		queryArgs,
-		{ enabled: !! postId && typeof postId === 'number' }
-	);
+	const {
+		records: threads,
+		totalPages,
+		hasResolved,
+		isResolving,
+	} = useEntityRecords( 'root', 'comment', queryArgs, {
+		enabled: !! postId && typeof postId === 'number',
+	} );
 
 	const { getBlockAttributes } = useSelect( blockEditorStore );
 	const { clientIds } = useSelect( ( select ) => {
@@ -167,6 +169,8 @@ export function useBlockComments( postId, isInitialLoad = false ) {
 		totalPages,
 		reflowComments,
 		commentLastUpdated,
+		hasResolved,
+		isResolving,
 	};
 }
 
