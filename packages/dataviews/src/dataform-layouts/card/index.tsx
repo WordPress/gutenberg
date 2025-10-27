@@ -151,10 +151,10 @@ export default function FormCardField< Item >( {
 
 	const sizeCard = layout.withHeader
 		? {
-				top: 'medium' as const,
-				right: 'medium' as const,
-				bottom: 'medium' as const,
-				left: 'medium' as const,
+				blockStart: 'medium' as const,
+				blockEnd: 'medium' as const,
+				inlineStart: 'medium' as const,
+				inlineEnd: 'medium' as const,
 		  }
 		: undefined;
 
@@ -173,10 +173,10 @@ export default function FormCardField< Item >( {
 
 		const sizeCardBody = withHeader
 			? {
-					top: undefined,
-					right: 'medium' as const,
-					bottom: 'medium' as const,
-					left: 'medium' as const,
+					blockStart: undefined,
+					blockEnd: 'medium' as const,
+					inlineStart: 'medium' as const,
+					inlineEnd: 'medium' as const,
 			  }
 			: undefined;
 
@@ -243,10 +243,10 @@ export default function FormCardField< Item >( {
 
 	const sizeCardBody = withHeader
 		? {
-				top: undefined,
-				right: 'medium' as const,
-				bottom: 'medium' as const,
-				left: 'medium' as const,
+				blockStart: undefined,
+				blockEnd: 'medium' as const,
+				inlineStart: 'medium' as const,
+				inlineEnd: 'medium' as const,
 		  }
 		: undefined;
 	return (
