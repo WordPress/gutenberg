@@ -7,8 +7,16 @@
  *
  * @see https://developer.wordpress.org/rest-api/extending-the-rest-api/schema/#json-schema-basics
  */
+
+/**
+ * External dependencies
+ */
 import Ajv from 'ajv-draft-04';
 import addFormats from 'ajv-formats';
+
+/**
+ * Internal dependencies
+ */
 import type { ValidationError } from './types';
 
 const ajv = new Ajv( {
