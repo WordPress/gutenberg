@@ -1,7 +1,7 @@
 {
 	"name": "@wordpress/abilities",
 	"version": "0.1.0",
-	"description": "JavaScript client for WordPress Abilities API",
+	"description": "JavaScript client for WordPress Abilities API.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
@@ -23,11 +23,6 @@
 		"node": ">=18.12.0",
 		"npm": ">=8.19.2"
 	},
-	"main": "build/index.js",
-	"module": "build-module/index.js",
-	"react-native": "src/index",
-	"wpScript": true,
-	"types": "build-types",
 	"files": [
 		"build",
 		"build-module",
@@ -35,6 +30,11 @@
 		"src",
 		"*.md"
 	],
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
+	"wpScript": true,
+	"types": "build-types",
 	"dependencies": {
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/core-data": "file:../core-data",

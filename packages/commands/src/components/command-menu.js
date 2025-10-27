@@ -26,8 +26,7 @@ import {
 	useShortcut,
 } from '@wordpress/keyboard-shortcuts';
 import { Icon, search as inputIcon } from '@wordpress/icons';
-import { executeAbility } from '@wordpress/abilities';
-console.log( executeAbility );
+
 /**
  * Internal dependencies
  */

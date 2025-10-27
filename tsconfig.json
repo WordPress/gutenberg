@@ -3,6 +3,7 @@
 	"references": [
 		{ "path": "bin" },
 		{ "path": "packages/a11y" },
+		{ "path": "packages/abilities" },
 		{ "path": "packages/admin-ui" },
 		{ "path": "packages/api-fetch" },
 		{ "path": "packages/asset-loader" },

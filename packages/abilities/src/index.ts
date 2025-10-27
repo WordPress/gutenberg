@@ -8,8 +8,11 @@
  * @package
  */
 
-import * as api from './api';
-import { store } from './store';
+/**
+ * Internal dependencies
+ */
+import type * as api from './api';
+import type { store } from './store';
 
 /**
  * TypeScript declaration for the global wp object
@@ -40,25 +43,25 @@ export {
 	unregisterAbilityCategory,
 } from './api';
 
-// /**
-//  * The store can be used directly with @wordpress/data via selectors
-//  * in React components with useSelect.
-//  *
-//  * @example
-//  * ```js
-//  * import { useSelect } from '@wordpress/data';
-//  * import { store as abilitiesStore } from '@wordpress/abilities';
-//  *
-//  * function MyComponent() {
-//  *   const abilities = useSelect(
-//  *     (select) => select(abilitiesStore).getAbilities(),
-//  *     []
-//  *   );
-//  *   // Use abilities...
-//  * }
-//  * ```
-//  */
-// // export { store } from './store';
+/**
+ * The store can be used directly with @wordpress/data via selectors
+ * in React components with useSelect.
+ *
+ * @example
+ * ```js
+ * import { useSelect } from '@wordpress/data';
+ * import { store as abilitiesStore } from '@wordpress/abilities';
+ *
+ * function MyComponent() {
+ *   const abilities = useSelect(
+ *     (select) => select(abilitiesStore).getAbilities(),
+ *     []
+ *   );
+ *   // Use abilities...
+ * }
+ * ```
+ */
+export { store } from './store';
 
 /**
  * Type definitions

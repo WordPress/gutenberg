@@ -44,7 +44,6 @@
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
 		"@wordpress/private-apis": "file:../private-apis",
-		"@wordpress/abilities": "file:../abilities",
 		"clsx": "^2.1.1",
 		"cmdk": "^1.0.0"
 	},
