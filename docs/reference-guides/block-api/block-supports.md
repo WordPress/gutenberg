@@ -608,6 +608,22 @@ When the block declares support for `color.text`, the attributes definition is e
     }
     ```
 
+### contentRole
+
+_**Note:** Since WordPress 6.9._
+
+-   Type: `boolean`
+-   Default value: `false`
+
+This value signals that a block contains user-editable content. When set to true, the block is considered a content block. Content blocks remain editable even when their parent container has content-only locking applied.
+
+```js
+supports: {
+	// Declare support for content role.
+	contentRole: true
+}
+```
+
 ## customClassName
 
 -   Type: `boolean`
