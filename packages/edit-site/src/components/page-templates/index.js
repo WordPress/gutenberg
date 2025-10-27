@@ -96,9 +96,7 @@ export default function PageTemplates() {
 		useEntityRecordsWithPermissions( 'root', 'registeredTemplate' );
 
 	const activeTemplates = useMemo( () => {
-		const _active = [ ...staticRecords ].filter(
-			( record ) => ! record.is_custom
-		);
+		const _active = [ ...staticRecords ];
 		if ( activeTemplatesOption ) {
 			for ( const activeSlug in activeTemplatesOption ) {
 				const activeId = activeTemplatesOption[ activeSlug ];
