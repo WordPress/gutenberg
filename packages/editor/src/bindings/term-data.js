@@ -24,36 +24,43 @@ function createDataFields( termDataValues, idValue ) {
 			label: __( 'Term ID' ),
 			value: idValue,
 			type: 'string',
+			args: { field: 'id' },
 		},
 		name: {
 			label: __( 'Name' ),
 			value: termDataValues?.name,
 			type: 'string',
+			args: { field: 'name' },
 		},
 		slug: {
 			label: __( 'Slug' ),
 			value: termDataValues?.slug,
 			type: 'string',
+			args: { field: 'slug' },
 		},
 		link: {
 			label: __( 'Link' ),
 			value: termDataValues?.link,
 			type: 'string',
+			args: { field: 'link' },
 		},
 		description: {
 			label: __( 'Description' ),
 			value: termDataValues?.description,
 			type: 'string',
+			args: { field: 'description' },
 		},
 		parent: {
 			label: __( 'Parent ID' ),
 			value: termDataValues?.parent,
 			type: 'string',
+			args: { field: 'parent' },
 		},
 		count: {
 			label: __( 'Count' ),
 			value: `(${ termDataValues?.count ?? 0 })`,
 			type: 'string',
+			args: { field: 'count' },
 		},
 	};
 }
@@ -195,30 +202,15 @@ export default {
 		return false;
 	},
 	getFieldsList( { select, context } ) {
-		// Deprecated, will be removed after 6.9.
-		return getTermDataFields( select, context );
-	},
-	editorUI( { select, context } ) {
-		const selectedBlock = select( blockEditorStore ).getSelectedBlock();
-		// Exit early for navigation blocks (read-only)
-		if ( NAVIGATION_BLOCK_TYPES.includes( selectedBlock?.name ) ) {
-			return {};
+		const clientId = select( blockEditorStore ).getSelectedBlockClientId();
+		const termDataFields = getTermDataFields( select, context, clientId );
+		if ( ! termDataFields ) {
+			return [];
 		}
-		const termDataFields = Object.entries(
-			getTermDataFields( select, context ) || {}
-		).map( ( [ key, field ] ) => ( {
-			label: field.label,
-			type: field.type,
-			args: {
-				field: key,
-			},
+		return Object.entries( termDataFields ).map( ( [ key, field ] ) => ( {
+			label: field.label || key,
+			type: field.type || 'string',
+			args: field.args || { field: key },
 		} ) );
-		/*
-		 * We need to define the data as [{ label: string, value: any, type: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#type-validation }]
-		 */
-		return {
-			mode: 'dropdown',
-			data: termDataFields,
-		};
 	},
 };

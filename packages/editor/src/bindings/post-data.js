@@ -75,16 +75,19 @@ function getPostDataFields( select, context, clientId ) {
 				label: __( 'Post Date' ),
 				value: entityDataValues?.date,
 				type: 'string',
+				args: { field: 'date' },
 			},
 			modified: {
 				label: __( 'Post Modified Date' ),
 				value: entityDataValues?.modified,
 				type: 'string',
+				args: { field: 'modified' },
 			},
 			link: {
 				label: __( 'Post Link' ),
 				value: entityDataValues?.link,
 				type: 'string',
+				args: { field: 'link' },
 			},
 		};
 	}
@@ -180,33 +183,14 @@ export default {
 	},
 	getFieldsList( { select, context } ) {
 		const clientId = select( blockEditorStore ).getSelectedBlockClientId();
-		// Deprecated, will be removed after 6.9.
-		return getPostDataFields( select, context, clientId );
-	},
-	editorUI( { select, context } ) {
-		const selectedBlock = select( blockEditorStore ).getSelectedBlock();
-		if ( selectedBlock?.name !== 'core/post-date' ) {
-			return {};
+		const postDataFields = getPostDataFields( select, context, clientId );
+		if ( ! postDataFields ) {
+			return [];
 		}
-		// Exit early for navigation blocks (read-only)
-		if ( NAVIGATION_BLOCK_TYPES.includes( selectedBlock?.name ) ) {
-			return {};
-		}
-		const postDataFields = Object.entries(
-			getPostDataFields( select, context ) || {}
-		).map( ( [ key, field ] ) => ( {
-			label: field.label,
-			args: {
-				field: key,
-			},
-			type: field.type,
+		return Object.entries( postDataFields ).map( ( [ key, field ] ) => ( {
+			label: field.label || key,
+			type: field.type || 'string',
+			args: field.args || { field: key },
 		} ) );
-		/*
-		 * We need to define the data as [{ label: string, value: any, type: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#type-validation }]
-		 */
-		return {
-			mode: 'dropdown',
-			data: postDataFields,
-		};
 	},
 };

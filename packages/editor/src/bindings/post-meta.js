@@ -61,6 +61,7 @@ function getPostMetaFields( select, context ) {
 					// When using the default, an empty string IS NOT a valid value.
 					( props.default || undefined ),
 				type: props.type,
+				args: { key },
 			};
 		}
 	} );
@@ -142,25 +143,14 @@ export default {
 		return true;
 	},
 	getFieldsList( { select, context } ) {
-		// Deprecated, will be removed after 6.9.
-		return getPostMetaFields( select, context );
-	},
-	editorUI( { select, context } ) {
-		const metaFields = Object.entries(
-			getPostMetaFields( select, context ) || {}
-		).map( ( [ key, field ] ) => ( {
-			label: field.label,
-			args: {
-				key,
-			},
-			type: field.type,
+		const metaFields = getPostMetaFields( select, context );
+		if ( ! metaFields ) {
+			return [];
+		}
+		return Object.entries( metaFields ).map( ( [ key, field ] ) => ( {
+			label: field.label || key,
+			type: field.type || 'string',
+			args: field.args || { key },
 		} ) );
-		/*
-		 * We need to define the data as [{ label: string, value: any, type: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#type-validation }]
-		 */
-		return {
-			mode: 'dropdown',
-			data: metaFields,
-		};
 	},
 };

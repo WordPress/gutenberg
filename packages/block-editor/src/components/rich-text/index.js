@@ -208,12 +208,12 @@ export function RichTextWrapper(
 			const { getBlockAttributes } = select( blockEditorStore );
 			const blockAttributes = getBlockAttributes( clientId );
 			let clientSideFieldLabel = null;
-			if ( blockBindingsSource?.editorUI ) {
-				const editorUIResult = blockBindingsSource.editorUI( {
+			if ( blockBindingsSource?.getFieldsList ) {
+				const fieldsItems = blockBindingsSource.getFieldsList( {
 					select,
 					context: blockBindingsContext,
 				} );
-				clientSideFieldLabel = editorUIResult.data?.find( ( item ) =>
+				clientSideFieldLabel = fieldsItems?.find( ( item ) =>
 					fastDeepEqual( item.args, relatedBinding?.args )
 				)?.label;
 			}

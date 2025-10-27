@@ -28,7 +28,8 @@ test.describe( 'Post Data source', () => {
 		await requestUtils.deactivatePlugin( 'gutenberg-test-block-bindings' );
 	} );
 	test.describe( 'Post Data bindings UI.', () => {
-		test( 'should not include post data fields in UI to connect attributes on non date blocks', async ( {
+		// Update this test if we land the format attribute.
+		test( 'should include post data fields in UI to connect attributes on blocks', async ( {
 			editor,
 			page,
 		} ) => {
@@ -56,7 +57,7 @@ test.describe( 'Post Data source', () => {
 			const postDataMenuItem = page.getByRole( 'menuitem', {
 				name: 'Post Data',
 			} );
-			await expect( postDataMenuItem ).toBeHidden();
+			await expect( postDataMenuItem ).toBeVisible();
 			// Check the fields registered by other sources are there.
 		} );
 
