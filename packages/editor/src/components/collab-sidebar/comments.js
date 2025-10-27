@@ -282,7 +282,7 @@ export function Comments( {
 	const hasThreads = Array.isArray( threads ) && threads.length > 0;
 	if ( ! hasThreads && ! isFloating ) {
 		return (
-			<VStack alignment="left" justify="flex-start" spacing="2">
+			<>
 				<AddComment
 					onSubmit={ onAddReply }
 					showCommentBoard={ showCommentBoard }
@@ -293,12 +293,12 @@ export function Comments( {
 				<Text as="p" variant="muted">
 					{ __( 'Only logged in users can see Notes.' ) }
 				</Text>
-			</VStack>
+			</>
 		);
 	}
 
 	return (
-		<VStack spacing="3">
+		<>
 			{ ! isFloating &&
 				showCommentBoard &&
 				undefined === blockCommentId && (
@@ -330,7 +330,7 @@ export function Comments( {
 					showCommentBoard={ showCommentBoard }
 				/>
 			) ) }
-		</VStack>
+		</>
 	);
 }
 
