@@ -8,7 +8,7 @@ require_once __DIR__ . '/class-gutenberg-rest-old-templates-controller.php';
 add_filter( 'register_post_type_args', 'gutenberg_modify_wp_template_post_type_args', 10, 2 );
 function gutenberg_modify_wp_template_post_type_args( $args, $post_type ) {
 	if ( 'wp_template' === $post_type ) {
-		$args['rest_base']                       = 'wp_template';
+		$args['rest_base']                       = 'created-templates';
 		$args['rest_controller_class']           = 'WP_REST_Posts_Controller';
 		$args['autosave_rest_controller_class']  = null;
 		$args['revisions_rest_controller_class'] = null;
@@ -61,7 +61,7 @@ function gutenberg_maintain_templates_routes() {
 	$wp_post_types['wp_template']->autosave_rest_controller_class  = $original_autosave_rest_controller_class;
 	$wp_post_types['wp_template']->revisions_rest_controller_class = $original_revisions_rest_controller_class;
 	// Restore the original base.
-	$wp_post_types['wp_template']->rest_base = 'wp_template';
+	$wp_post_types['wp_template']->rest_base = 'created-templates';
 
 	// Register the old routes.
 	$autosaves_controller->register_routes();
