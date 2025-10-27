@@ -128,8 +128,9 @@ function NotesSidebar( { postId, mode } ) {
 		const prevArea = await getActiveComplementaryArea( 'core' );
 		const activeNotesArea = SIDEBARS.find( ( name ) => name === prevArea );
 
-		// If the notes sidebar is not already active, enable the floating sidebar.
-		if ( ! activeNotesArea ) {
+		if ( currentThread?.status === 'approved' ) {
+			enableComplementaryArea( 'core', collabHistorySidebarName );
+		} else if ( ! activeNotesArea ) {
 			enableComplementaryArea(
 				'core',
 				showFloatingSidebar
