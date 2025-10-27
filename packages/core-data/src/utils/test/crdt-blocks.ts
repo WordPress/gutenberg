@@ -17,6 +17,18 @@ jest.mock( 'uuid', () => ( {
 } ) );
 
 /**
+ * Mock @wordpress/blocks module
+ */
+jest.mock( '@wordpress/blocks', () => ( {
+	getBlockTypes: jest.fn( () => [
+		{
+			name: 'core/paragraph',
+			attributes: { content: { type: 'rich-text' } },
+		},
+	] ),
+} ) );
+
+/**
  * Internal dependencies
  */
 import {
@@ -269,7 +281,48 @@ describe( 'crdt-blocks', () => {
 			const contentAttr = (
 				block.get( 'attributes' ) as YBlockAttributes
 			 ).get( 'content' ) as Y.Text;
+			expect( contentAttr ).toBeInstanceOf( Y.Text );
 			expect( contentAttr.toString() ).toBe( 'Rich text content' );
+		} );
+
+		it( 'creates Y.Text for rich-text attributes even when the block name changes', () => {
+			const blocks: Block[] = [
+				{
+					name: 'core/freeform',
+					attributes: { content: 'Freeform text' },
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, blocks, null );
+
+			const block = yblocks.get( 0 );
+			const contentAttr = (
+				block.get( 'attributes' ) as YBlockAttributes
+			 ).get( 'content' );
+			expect( block.get( 'name' ) ).toBe( 'core/freeform' );
+			expect( typeof contentAttr ).toBe( 'string' );
+			expect( contentAttr ).toBe( 'Freeform text' );
+
+			const updatedBlocks: Block[] = [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Updated text' },
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, updatedBlocks, null );
+
+			expect( yblocks.length ).toBe( 1 );
+
+			const updatedBlock = yblocks.get( 0 );
+			const updatedContentAttr = (
+				updatedBlock.get( 'attributes' ) as YBlockAttributes
+			 ).get( 'content' ) as Y.Text;
+			expect( updatedBlock.get( 'name' ) ).toBe( 'core/paragraph' );
+			expect( updatedContentAttr ).toBeInstanceOf( Y.Text );
+			expect( updatedContentAttr.toString() ).toBe( 'Updated text' );
 		} );
 
 		it( 'removes duplicate clientIds', () => {
