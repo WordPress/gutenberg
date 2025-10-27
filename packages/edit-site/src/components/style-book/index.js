@@ -22,16 +22,16 @@ import {
 	__unstableIframe as Iframe,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 } from '@wordpress/block-editor';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useSelect, dispatch } from '@wordpress/data';
+import { mergeGlobalStyles } from '@wordpress/global-styles-engine';
 import {
 	useMemo,
 	useState,
 	memo,
-	useContext,
 	useRef,
 	useLayoutEffect,
 	useEffect,
+	forwardRef,
 } from '@wordpress/element';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 import { uploadMedia } from '@wordpress/media-utils';
@@ -41,7 +41,6 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import EditorCanvasContainer from '../editor-canvas-container';
 import { STYLE_BOOK_IFRAME_STYLES } from './constants';
 import {
 	getExamplesByCategory,
@@ -51,17 +50,14 @@ import { getExamples } from './examples';
 import { store as siteEditorStore } from '../../store';
 import { useSection } from '../sidebar-global-styles-wrapper';
 import { GlobalStylesRenderer } from '../global-styles-renderer';
-import { getVariationClassName } from '../global-styles/utils';
 import {
 	STYLE_BOOK_COLOR_GROUPS,
 	STYLE_BOOK_PREVIEW_CATEGORIES,
 } from '../style-book/constants';
 import { useGlobalStylesOutputWithConfig } from '../../hooks/use-global-styles-output';
+import { useStyle, useGlobalStyles } from '../global-styles';
 
-const { ExperimentalBlockEditorProvider, useGlobalStyle, GlobalStylesContext } =
-	unlock( blockEditorPrivateApis );
-const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
-
+const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { Tabs } = unlock( componentsPrivateApis );
 
 function isObjectEmpty( object ) {
@@ -234,7 +230,7 @@ function applyBlockVariationsToExamples( examples, variation ) {
 						attributes: {
 							...block.attributes,
 							style: undefined,
-							className: getVariationClassName( variation ),
+							className: `is-style-${ variation }`,
 						},
 				  } ) )
 				: {
@@ -242,26 +238,26 @@ function applyBlockVariationsToExamples( examples, variation ) {
 						attributes: {
 							...example.blocks.attributes,
 							style: undefined,
-							className: getVariationClassName( variation ),
+							className: `is-style-${ variation }`,
 						},
 				  },
 		};
 	} );
 }
 
-function StyleBook( {
-	enableResizing = true,
-	isSelected,
-	onClick,
-	onSelect,
-	showCloseButton = true,
-	onClose,
-	showTabs = true,
-	userConfig = {},
-	path = '',
-} ) {
-	const [ textColor ] = useGlobalStyle( 'color.text' );
-	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
+function StyleBook(
+	{
+		isSelected,
+		onClick,
+		onSelect,
+		showTabs = true,
+		userConfig = {},
+		path = '',
+	},
+	ref
+) {
+	const textColor = useStyle( 'color.text' );
+	const backgroundColor = useStyle( 'color.background' );
 	const colors = useMultiOriginPalettes();
 	const examples = useMemo( () => getExamples( colors ), [ colors ] );
 	const tabs = useMemo(
@@ -276,12 +272,12 @@ function StyleBook( {
 
 	const examplesForSinglePageUse = getExamplesForSinglePageUse( examples );
 
-	const { base: baseConfig } = useContext( GlobalStylesContext );
+	const { base: baseConfig } = useGlobalStyles();
 	const goTo = getStyleBookNavigationFromPath( path );
 
 	const mergedConfig = useMemo( () => {
 		if ( ! isObjectEmpty( userConfig ) && ! isObjectEmpty( baseConfig ) ) {
-			return mergeBaseAndUserConfigs( baseConfig, userConfig );
+			return mergeGlobalStyles( baseConfig, userConfig );
 		}
 		return {};
 	}, [ baseConfig, userConfig ] );
@@ -307,79 +303,70 @@ function StyleBook( {
 	);
 
 	return (
-		<EditorCanvasContainer
-			onClose={ onClose }
-			enableResizing={ enableResizing }
-			closeButtonLabel={ showCloseButton ? __( 'Close' ) : null }
+		<div
+			ref={ ref }
+			className={ clsx( 'edit-site-style-book', {
+				'is-button': !! onClick,
+			} ) }
+			style={ {
+				color: textColor,
+				background: backgroundColor,
+			} }
 		>
-			<div
-				className={ clsx( 'edit-site-style-book', {
-					'is-button': !! onClick,
-				} ) }
-				style={ {
-					color: textColor,
-					background: backgroundColor,
-				} }
-			>
-				{ showTabs ? (
-					<Tabs>
-						<div className="edit-site-style-book__tablist-container">
-							<Tabs.TabList>
-								{ tabs.map( ( tab ) => (
-									<Tabs.Tab
-										tabId={ tab.slug }
-										key={ tab.slug }
-									>
-										{ tab.title }
-									</Tabs.Tab>
-								) ) }
-							</Tabs.TabList>
-						</div>
-						{ tabs.map( ( tab ) => {
-							const categoryDefinition = tab.slug
-								? getTopLevelStyleBookCategories().find(
-										( _category ) =>
-											_category.slug === tab.slug
-								  )
-								: null;
-							const filteredExamples = categoryDefinition
-								? getExamplesByCategory(
-										categoryDefinition,
-										examples
-								  )
-								: { examples };
-							return (
-								<Tabs.TabPanel
-									key={ tab.slug }
-									tabId={ tab.slug }
-									focusable={ false }
-									className="edit-site-style-book__tabpanel"
-								>
-									<StyleBookBody
-										category={ tab.slug }
-										examples={ filteredExamples }
-										isSelected={ isSelected }
-										onSelect={ onSelect }
-										settings={ settings }
-										title={ tab.title }
-										goTo={ goTo }
-									/>
-								</Tabs.TabPanel>
-							);
-						} ) }
-					</Tabs>
-				) : (
-					<StyleBookBody
-						examples={ { examples: examplesForSinglePageUse } }
-						isSelected={ isSelected }
-						onClick={ onClick }
-						onSelect={ onSelect }
-						settings={ settings }
-						goTo={ goTo }
-					/>
-				) }
-			</div>
-		</EditorCanvasContainer>
+			{ showTabs ? (
+				<Tabs>
+					<div className="edit-site-style-book__tablist-container">
+						<Tabs.TabList>
+							{ tabs.map( ( tab ) => (
+								<Tabs.Tab tabId={ tab.slug } key={ tab.slug }>
+									{ tab.title }
+								</Tabs.Tab>
+							) ) }
+						</Tabs.TabList>
+					</div>
+					{ tabs.map( ( tab ) => {
+						const categoryDefinition = tab.slug
+							? getTopLevelStyleBookCategories().find(
+									( _category ) => _category.slug === tab.slug
+							  )
+							: null;
+						const filteredExamples = categoryDefinition
+							? getExamplesByCategory(
+									categoryDefinition,
+									examples
+							  )
+							: { examples };
+						return (
+							<Tabs.TabPanel
+								key={ tab.slug }
+								tabId={ tab.slug }
+								focusable={ false }
+								className="edit-site-style-book__tabpanel"
+							>
+								<StyleBookBody
+									category={ tab.slug }
+									examples={ filteredExamples }
+									isSelected={ isSelected }
+									onSelect={ onSelect }
+									settings={ settings }
+									title={ tab.title }
+									goTo={ goTo }
+								/>
+							</Tabs.TabPanel>
+						);
+					} ) }
+				</Tabs>
+			) : (
+				<StyleBookBody
+					examples={ { examples: examplesForSinglePageUse } }
+					isSelected={ isSelected }
+					onClick={ onClick }
+					onSelect={ onSelect }
+					settings={ settings }
+					goTo={ goTo }
+				/>
+			) }
+		</div>
 	);
 }
 
@@ -522,12 +509,12 @@ export const StyleBookPreview = ( { userConfig = {}, isStatic = false } ) => {
 		filteredExamples,
 	] );
 
-	const { base: baseConfig } = useContext( GlobalStylesContext );
+	const { base: baseConfig } = useGlobalStyles();
 	const goTo = getStyleBookNavigationFromPath( section );
 
 	const mergedConfig = useMemo( () => {
 		if ( ! isObjectEmpty( userConfig ) && ! isObjectEmpty( baseConfig ) ) {
-			return mergeBaseAndUserConfigs( baseConfig, userConfig );
+			return mergeGlobalStyles( baseConfig, userConfig );
 		}
 		return {};
 	}, [ baseConfig, userConfig ] );
@@ -798,4 +785,4 @@ const Example = ( { id, title, blocks, isSelected, onClick, content } ) => {
 	);
 };
 
-export default StyleBook;
+export default forwardRef( StyleBook );

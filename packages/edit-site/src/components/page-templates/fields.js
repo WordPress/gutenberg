@@ -15,10 +15,7 @@ import { __, _x } from '@wordpress/i18n';
 import { useState, useMemo } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { parse } from '@wordpress/blocks';
-import {
-	BlockPreview,
-	privateApis as blockEditorPrivateApis,
-} from '@wordpress/block-editor';
+import { BlockPreview } from '@wordpress/block-editor';
 import { EditorProvider } from '@wordpress/editor';
 import {
 	privateApis as corePrivateApis,
@@ -33,17 +30,16 @@ import { useAddedBy } from './hooks';
 import { useDefaultTemplateTypes } from '../add-new-template/utils';
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 import { unlock } from '../../lock-unlock';
+import { useStyle } from '../global-styles';
 
-const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 const { Badge } = unlock( componentsPrivateApis );
 const { useEntityRecordsWithPermissions } = unlock( corePrivateApis );
 
 function useAllDefaultTemplateTypes() {
 	const defaultTemplateTypes = useDefaultTemplateTypes();
 	const { records: staticRecords } = useEntityRecordsWithPermissions(
-		'postType',
-		'wp_registered_template',
-		{ per_page: -1 }
+		'root',
+		'registeredTemplate'
 	);
 	return [
 		...defaultTemplateTypes,
@@ -61,7 +57,7 @@ function useAllDefaultTemplateTypes() {
 
 function PreviewField( { item } ) {
 	const settings = usePatternSettings();
-	const [ backgroundColor = 'white' ] = useGlobalStyle( 'color.background' );
+	const backgroundColor = useStyle( 'color.background' ) ?? 'white';
 	const blocks = useMemo( () => {
 		return parse( item.content.raw );
 	}, [ item.content.raw ] );
@@ -153,6 +149,7 @@ export const authorField = {
 export const activeField = {
 	label: __( 'Status' ),
 	id: 'active',
+	type: 'boolean',
 	getValue: ( { item } ) => item._isActive,
 	render: function Render( { item } ) {
 		if ( item._isCustom ) {

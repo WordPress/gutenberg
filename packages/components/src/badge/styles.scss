@@ -18,6 +18,7 @@ $badge-colors: (
 	min-height: $grid-unit-30;
 	border-radius: $radius-small;
 	line-height: 0;
+	max-width: 100%;
 
 	// Prevents anchor text-decoration styles from being applied through a parent.
 	display: inline-block;

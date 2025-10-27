@@ -15,8 +15,9 @@ import {
 	__EXPERIMENTAL_STYLE_PROPERTY,
 	getBlockType,
 	hasBlockSupport,
+	store as blocksStore,
 } from '@wordpress/blocks';
-import { useContext, useMemo, useCallback } from '@wordpress/element';
+import { useMemo, useCallback } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
@@ -24,13 +25,11 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import { useSupportedStyles } from '../../components/global-styles/hooks';
 import { unlock } from '../../lock-unlock';
 import setNestedValue from '../../utils/set-nested-value';
+import { useGlobalStyles } from '../../components/global-styles';
 
-const { cleanEmptyObject, GlobalStylesContext } = unlock(
-	blockEditorPrivateApis
-);
+const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
 // Block Gap is a special case and isn't defined within the blocks
 // style properties config. We'll add it here to allow it to be pushed
@@ -166,7 +165,12 @@ function getFallbackBorderStyleChange( side, border, globalBorderStyle ) {
 }
 
 function useChangesToPush( name, attributes, userConfig ) {
-	const supports = useSupportedStyles( name );
+	const supports = useSelect(
+		( select ) => {
+			return unlock( select( blocksStore ) ).getSupportedStyles( name );
+		},
+		[ name ]
+	);
 	const blockUserConfig = userConfig?.styles?.blocks?.[ name ];
 
 	return useMemo( () => {
@@ -241,8 +245,7 @@ function PushChangesToGlobalStylesControl( {
 	attributes,
 	setAttributes,
 } ) {
-	const { user: userConfig, setUserConfig } =
-		useContext( GlobalStylesContext );
+	const { user: userConfig, setUser: setUserConfig } = useGlobalStyles();
 
 	const changes = useChangesToPush( name, attributes, userConfig );
 
