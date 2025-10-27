@@ -408,14 +408,21 @@ export function mergeCrdtBlocks(
  * @return True if the block should be synced, false otherwise.
  */
 function shouldBlockBeSynced( block: Block ): boolean {
-	// Verify that the gallery block is ready to be synced.
-	// This means that, all images have had their blobs converted to full URLs.
-	// Checking for only the blobs ensures that blocks that have just been inserted work as well.
-	if ( 'core/gallery' === block.name ) {
-		return ! block.innerBlocks.some(
-			( innerBlock ) =>
-				innerBlock.attributes && innerBlock.attributes.blob
-		);
+	switch ( block.name ) {
+		case 'core/freeform': {
+			// A freeform block without a content attribute will trigger an open modal
+			// in all peers, which we want to prevent.
+			return 'string' === typeof block.attributes.content;
+		}
+
+		case 'core/gallery': {
+			// Verify that all images have had their blobs converted to full URLs so
+			// that other peers can render them correctly.
+			return ! block.innerBlocks.some(
+				( innerBlock ) =>
+					innerBlock.attributes && innerBlock.attributes.blob
+			);
+		}
 	}
 
 	// Allow all other blocks to be synced.
