@@ -216,6 +216,57 @@ describe( 'crdt-blocks', () => {
 			expect( block.get( 'name' ) ).toBe( 'core/gallery' );
 		} );
 
+		it( 'skips freeform blocks without a content attribute', () => {
+			const blocks: Block[] = [
+				{
+					name: 'core/freeform',
+					attributes: {},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, blocks, null );
+
+			// Freeform block should not be synced because it has no content attribute.
+			expect( yblocks.length ).toBe( 0 );
+		} );
+
+		it( 'syncs freeform blocks with defined content attribute', () => {
+			const blocks: Block[] = [
+				{
+					name: 'core/freeform',
+					attributes: {
+						content: 'Some freeform content',
+					},
+					innerBlocks: [],
+				},
+				{
+					name: 'core/freeform',
+					attributes: {
+						content: '',
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, blocks, null );
+
+			expect( yblocks.length ).toBe( 2 );
+			expect( yblocks.get( 0 ).get( 'name' ) ).toBe( 'core/freeform' );
+			expect(
+				(
+					yblocks.get( 0 ).get( 'attributes' ) as YBlockAttributes
+				 ).get( 'content' )
+			).toBe( 'Some freeform content' );
+
+			expect( yblocks.get( 1 ).get( 'name' ) ).toBe( 'core/freeform' );
+			expect(
+				(
+					yblocks.get( 1 ).get( 'attributes' ) as YBlockAttributes
+				 ).get( 'content' )
+			).toBe( '' );
+		} );
+
 		it( 'handles block reordering', () => {
 			const initialBlocks: Block[] = [
 				{
