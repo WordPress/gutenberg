@@ -24,4 +24,3 @@ export {
 	default as BackgroundPanel,
 	useHasBackgroundPanel,
 } from './background-panel';
-export { areGlobalStyleConfigsEqual } from './utils';
