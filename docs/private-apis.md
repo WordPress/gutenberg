@@ -81,7 +81,6 @@ Private exports:
 - `areGlobalStyleConfigsEqual`
 - `getBlockCSSSelector`
 - `getBlockSelectors`
-- `getGlobalStylesChanges`
 - `getLayoutStyles`
 - `toStyles`
 - `useGlobalSetting`
@@ -276,7 +275,6 @@ Private exports:
 - `BackButton`
 - `EntitiesSavedStatesExtensible`
 - `Editor`
-- `EditorContentSlotFill`
 - `PluginPostExcerpt`
 - `PostCardPanel`
 - `PreferencesModal`

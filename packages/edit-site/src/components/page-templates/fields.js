@@ -16,7 +16,10 @@ import { useState, useMemo } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { parse } from '@wordpress/blocks';
 import { BlockPreview } from '@wordpress/block-editor';
-import { EditorProvider } from '@wordpress/editor';
+import {
+	EditorProvider,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 import {
 	privateApis as corePrivateApis,
 	store as coreStore,
@@ -30,17 +33,16 @@ import { useAddedBy } from './hooks';
 import { useDefaultTemplateTypes } from '../add-new-template/utils';
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 import { unlock } from '../../lock-unlock';
-import { useStyle } from '../global-styles';
 
 const { Badge } = unlock( componentsPrivateApis );
 const { useEntityRecordsWithPermissions } = unlock( corePrivateApis );
+const { useStyle } = unlock( editorPrivateApis );
 
 function useAllDefaultTemplateTypes() {
 	const defaultTemplateTypes = useDefaultTemplateTypes();
 	const { records: staticRecords } = useEntityRecordsWithPermissions(
-		'postType',
-		'wp_registered_template',
-		{ per_page: -1 }
+		'root',
+		'registeredTemplate'
 	);
 	return [
 		...defaultTemplateTypes,

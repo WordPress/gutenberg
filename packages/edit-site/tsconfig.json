@@ -42,16 +42,5 @@
 		{ "path": "../views" },
 		{ "path": "../wordcount" }
 	],
-	// NOTE: This package is being progressively typed. You are encouraged to
-	// expand this array with files which can be type-checked. At some point in
-	// the future, this can be simplified to an `includes` of `src/**/*`.
-	"files": [
-		"src/components/style-book/categories.ts",
-		"src/components/style-book/constants.ts",
-		"src/components/style-book/types.ts",
-		"src/components/style-book/color-examples.tsx",
-		"src/components/style-book/duotone-examples.tsx",
-		"src/components/style-book/examples.tsx"
-	],
 	"include": []
 }

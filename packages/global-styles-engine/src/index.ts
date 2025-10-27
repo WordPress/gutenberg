@@ -5,8 +5,9 @@ export { getStyle } from './settings/get-style';
 export { setStyle } from './settings/set-style';
 export { default as getPalettes } from './settings/get-palette';
 
-// Merge utility
+// Utilities.
 export { mergeGlobalStyles } from './core/merge';
+export { default as getGlobalStylesChanges } from './utils/get-global-styles-changes';
 
 // Core rendering
 export { generateGlobalStyles } from './core/render';

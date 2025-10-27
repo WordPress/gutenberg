@@ -329,7 +329,7 @@ export const getEntityRecords =
 			// the registered templates and rewrites IDs in the form of
 			// `theme-slug/template-slug`. When turned off, we only fetch
 			// database templates (posts). To fetch registered templates without
-			// edits applied, use the `wp_registered_template` entity.
+			// edits applied, use the `registeredTemplate` entity.
 			const { combinedTemplates = true } = query;
 
 			if (
@@ -899,10 +899,6 @@ export const getDefaultTemplateId =
 		// Endpoint may return an empty object if no template is found.
 		if ( id ) {
 			template.id = id;
-			template.type =
-				typeof id === 'string'
-					? 'wp_registered_template'
-					: 'wp_template';
 			registry.batch( () => {
 				dispatch.receiveDefaultTemplateId( query, id );
 				dispatch.receiveEntityRecords( 'postType', template.type, [

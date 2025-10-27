@@ -25,6 +25,7 @@ import {
 	EditorSnackbars,
 	UnsavedChangesWarning,
 	ErrorBoundary,
+	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { PluginArea } from '@wordpress/plugins';
@@ -44,9 +45,9 @@ import useMovingAnimation from './animation';
 import { SidebarContent, SidebarNavigationProvider } from '../sidebar';
 import SaveHub from '../save-hub';
 import SavePanel from '../save-panel';
-import { useStyle } from '../global-styles';
 
 const { useLocation } = unlock( routerPrivateApis );
+const { useStyle } = unlock( editorPrivateApis );
 
 const ANIMATION_DURATION = 0.3;
 
