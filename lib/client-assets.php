@@ -140,7 +140,7 @@ function gutenberg_register_packages_styles( $styles ) {
 	$styles->query( 'wp-edit-post', 'registered' )->deps[] = 'wp-edit-blocks';
 
 	// wp-edit-site: add core WP styles and custom handles
-	$edit_site_style = $styles->query( 'wp-edit-site', 'registered' );
+	$edit_site_style         = $styles->query( 'wp-edit-site', 'registered' );
 	$edit_site_style->deps[] = 'common';
 	$edit_site_style->deps[] = 'forms';
 	$edit_site_style->deps[] = 'wp-block-library-editor';

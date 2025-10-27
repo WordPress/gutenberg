@@ -688,6 +688,46 @@ async function bundlePackage( packageName ) {
 			const destPath = path.join( outputDir, relativePath );
 			const destDir = path.dirname( destPath );
 
+			// Collect style metadata for auto-registration (main style.css only)
+			// Complex cases with multiple files handled manually in lib/client-assets.php
+			if ( relativePath === 'style.css' ) {
+				// Read script asset file to get dependencies
+				const scriptAssetPath = path.join(
+					PACKAGES_DIR,
+					'..',
+					'build',
+					'scripts',
+					packageName,
+					'index.min.asset.php'
+				);
+
+				const assetContent = await readFile( scriptAssetPath, 'utf8' );
+				const depsMatch = assetContent.match(
+					/'dependencies' => array\((.*?)\)/s
+				);
+
+				let scriptDependencies = [];
+				if ( depsMatch ) {
+					const depsString = depsMatch[ 1 ];
+					scriptDependencies =
+						depsString
+							.match( /'([^']+)'/g )
+							?.map( ( d ) => d.replace( /'/g, '' ) ) || [];
+				}
+
+				// Infer style dependencies from script dependencies
+				const styleDeps = await inferStyleDependencies(
+					packageName,
+					scriptDependencies
+				);
+
+				builtStyles.push( {
+					handle: `wp-${ packageName }`,
+					path: `${ packageName }/style`,
+					dependencies: styleDeps,
+				} );
+			}
+
 			if ( isProduction ) {
 				builds.push(
 					( async () => {
@@ -717,53 +757,6 @@ async function bundlePackage( packageName ) {
 						copyFile( cssFile, destPath )
 					)
 				);
-			}
-		}
-
-		// Collect style information for auto-registration (after styles are copied)
-		// Only register the main style.css file - complex cases handled manually in lib/client-assets.php
-		const mainStylePath = path.join( outputDir, 'style.css' );
-		const mainStyleFiles = await glob( normalizePath( mainStylePath ) );
-
-		if ( mainStyleFiles.length > 0 ) {
-			// Read script asset file to get dependencies
-			const scriptAssetPath = path.join(
-				PACKAGES_DIR,
-				'..',
-				'build',
-				'scripts',
-				packageName,
-				'index.min.asset.php'
-			);
-
-			try {
-				const assetContent = await readFile( scriptAssetPath, 'utf8' );
-				const depsMatch = assetContent.match(
-					/'dependencies' => array\((.*?)\)/s
-				);
-
-				let scriptDependencies = [];
-				if ( depsMatch ) {
-					const depsString = depsMatch[ 1 ];
-					scriptDependencies =
-						depsString
-							.match( /'([^']+)'/g )
-							?.map( ( d ) => d.replace( /'/g, '' ) ) || [];
-				}
-
-				// Infer style dependencies from script dependencies
-				const styleDeps = await inferStyleDependencies(
-					packageName,
-					scriptDependencies
-				);
-
-				builtStyles.push( {
-					handle: `wp-${ packageName }`,
-					path: `${ packageName }/style`,
-					dependencies: styleDeps,
-				} );
-			} catch ( error ) {
-				// Asset file doesn't exist or can't be read - skip style registration
 			}
 		}
 	}
