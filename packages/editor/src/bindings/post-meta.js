@@ -61,7 +61,6 @@ function getPostMetaFields( select, context ) {
 					// When using the default, an empty string IS NOT a valid value.
 					( props.default || undefined ),
 				type: props.type,
-				args: { key },
 			};
 		}
 	} );
