@@ -70,6 +70,37 @@ const getDefine = ( scriptDebug ) => ( {
 	'globalThis.SCRIPT_DEBUG': JSON.stringify( scriptDebug ),
 } );
 
+const packageJsonCache = new Map();
+
+/**
+ * Get package.json info for a WordPress package.
+ *
+ * @param {string} packageName The package name (without @wordpress/ prefix).
+ * @return {Promise<Object|null>} Package.json object or null if not found.
+ */
+async function getPackageInfo( packageName ) {
+	let packageJson = packageJsonCache.get( packageName );
+	if ( packageJson === undefined ) {
+		const packageJsonPath = path.join(
+			PACKAGES_DIR,
+			packageName,
+			'package.json'
+		);
+
+		try {
+			packageJson = (
+				await import( packageJsonPath, { with: { type: 'json' } } )
+			).default;
+		} catch {
+			packageJson = null;
+		}
+
+		packageJsonCache.set( packageName, packageJson );
+	}
+
+	return packageJson;
+}
+
 /**
  * Create emotion babel plugin for esbuild.
  * This plugin enables emotion's babel transformations for proper CSS-in-JS handling.
@@ -222,36 +253,6 @@ function wordpressExternalsPlugin(
 		setup( build ) {
 			const dependencies = new Set();
 			const moduleDependencies = new Map();
-			const packageJsonCache = new Map();
-
-			/**
-			 * Get package.json info for a WordPress package.
-			 *
-			 * @param {string} packageName The package name (without @wordpress/ prefix).
-			 * @return {Promise<Object|null>} Package.json object or null if not found.
-			 */
-			async function getPackageInfo( packageName ) {
-				if ( packageJsonCache.has( packageName ) ) {
-					return packageJsonCache.get( packageName );
-				}
-
-				const packageJsonPath = path.join(
-					PACKAGES_DIR,
-					packageName,
-					'package.json'
-				);
-
-				try {
-					const packageJson = JSON.parse(
-						await readFile( packageJsonPath, 'utf8' )
-					);
-					packageJsonCache.set( packageName, packageJson );
-					return packageJson;
-				} catch ( error ) {
-					packageJsonCache.set( packageName, null );
-					return null;
-				}
-			}
 
 			/**
 			 * Check if a package import is a script module.

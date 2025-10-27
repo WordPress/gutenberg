@@ -36,6 +36,7 @@ export const rootEntitiesConfig = [
 	{
 		label: __( 'Base' ),
 		kind: 'root',
+		key: false,
 		name: '__unstableBase',
 		baseURL: '/',
 		baseURLParams: {
@@ -201,6 +202,13 @@ export const rootEntitiesConfig = [
 		baseURLParams: { context: 'edit' },
 		plural: 'statuses',
 		key: 'slug',
+	},
+	{
+		label: __( 'Registered Templates' ),
+		name: 'registeredTemplate',
+		kind: 'root',
+		baseURL: '/wp/v2/wp_registered_template',
+		key: 'id',
 	},
 ];
 
@@ -381,6 +389,7 @@ async function loadSiteEntity() {
 		label: __( 'Site' ),
 		name: 'site',
 		kind: 'root',
+		key: false,
 		baseURL: '/wp/v2/settings',
 		meta: {},
 	};

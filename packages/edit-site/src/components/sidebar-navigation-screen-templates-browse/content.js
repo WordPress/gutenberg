@@ -38,13 +38,7 @@ export default function DataviewsTemplatesSidebarContent() {
 	const {
 		query: { activeView = 'active' },
 	} = useLocation();
-	const { records } = useEntityRecords(
-		'postType',
-		'wp_registered_template',
-		{
-			per_page: -1,
-		}
-	);
+	const { records } = useEntityRecords( 'root', 'registeredTemplate' );
 	const firstItemPerAuthorText = useMemo( () => {
 		const firstItemPerAuthor = records?.reduce( ( acc, template ) => {
 			const author = template.author_text;

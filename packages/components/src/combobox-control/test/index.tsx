@@ -356,7 +356,7 @@ describe.each( [
 		expect( input ).toHaveValue( targetOption.label );
 	} );
 
-	it( 'should render with Reset button disabled', () => {
+	it( 'should not render Reset button when no value is set', () => {
 		render(
 			<Component
 				options={ timezones }
@@ -365,10 +365,23 @@ describe.each( [
 			/>
 		);
 
-		const resetButton = screen.getByRole( 'button', { name: 'Reset' } );
+		const resetButton = screen.queryByRole( 'button', { name: 'Reset' } );
 
-		expect( resetButton ).toBeVisible();
-		expect( resetButton ).toBeDisabled();
+		expect( resetButton ).not.toBeInTheDocument();
+	} );
+
+	it( 'should not render Reset button when allowReset is false', () => {
+		render(
+			<Component
+				options={ timezones }
+				label={ defaultLabelText }
+				allowReset={ false }
+			/>
+		);
+
+		const resetButton = screen.queryByRole( 'button', { name: 'Reset' } );
+
+		expect( resetButton ).not.toBeInTheDocument();
 	} );
 
 	it( 'should reset input when clicking the Reset button', async () => {
@@ -400,8 +413,8 @@ describe.each( [
 
 		await user.click( resetButton );
 
+		expect( resetButton ).not.toBeInTheDocument();
 		expect( input ).toHaveValue( '' );
-		expect( resetButton ).toBeDisabled();
 		expect( input ).toHaveFocus();
 	} );
 
@@ -439,8 +452,8 @@ describe.each( [
 		// Pressing Enter/Return resets the input.
 		await user.keyboard( '{Enter}' );
 
+		expect( resetButton ).not.toBeInTheDocument();
 		expect( input ).toHaveValue( '' );
-		expect( resetButton ).toBeDisabled();
 		expect( input ).toHaveFocus();
 	} );
 
@@ -478,8 +491,8 @@ describe.each( [
 		// Pressing Spacebar resets the input.
 		await user.keyboard( '[Space]' );
 
+		expect( resetButton ).not.toBeInTheDocument();
 		expect( input ).toHaveValue( '' );
-		expect( resetButton ).toBeDisabled();
 		expect( input ).toHaveFocus();
 	} );
 } );
