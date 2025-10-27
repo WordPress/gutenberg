@@ -45,16 +45,11 @@ test.describe( 'Registered sources', () => {
 	} );
 
 	test.describe( 'Default WP installation', () => {
-		test.beforeEach( async ( { admin, requestUtils, page } ) => {
+		test.beforeEach( async ( { admin, requestUtils } ) => {
 			await requestUtils.deactivatePlugin(
 				'gutenberg-test-block-bindings'
 			);
 			await admin.createNewPost( { title: 'Test bindings' } );
-			await page.evaluate( () =>
-				window.wp.blocks.unregisterBlockBindingsSource(
-					'core/post-data'
-				)
-			);
 		} );
 
 		test.afterEach( async ( { requestUtils } ) => {
