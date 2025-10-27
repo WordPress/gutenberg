@@ -47,6 +47,7 @@ const transforms = {
 						const url = link?.getAttribute( 'href' );
 						// Create singular button in the buttons block.
 						return createBlock( 'core/button', {
+							...attributes,
 							...getTransformedAttributes(
 								attributes,
 								'core/button',

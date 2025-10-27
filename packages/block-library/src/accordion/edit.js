@@ -102,22 +102,22 @@ export default function Edit( {
 	return (
 		<>
 			{ isSingleSelected && ! isContentOnlyMode && (
-				<BlockControls>
-					<ToolbarGroup>
-						<HeadingLevelDropdown
-							value={ headingLevel }
-							options={ levelOptions }
-							onChange={ updateHeadingLevel }
-						/>
-					</ToolbarGroup>
-				</BlockControls>
-			) }
-			{ isSingleSelected && (
-				<BlockControls group="other">
-					<ToolbarButton onClick={ addAccordionItemBlock }>
-						{ __( 'Add' ) }
-					</ToolbarButton>
-				</BlockControls>
+				<>
+					<BlockControls>
+						<ToolbarGroup>
+							<HeadingLevelDropdown
+								value={ headingLevel }
+								options={ levelOptions }
+								onChange={ updateHeadingLevel }
+							/>
+						</ToolbarGroup>
+					</BlockControls>
+					<BlockControls group="other">
+						<ToolbarButton onClick={ addAccordionItemBlock }>
+							{ __( 'Add' ) }
+						</ToolbarButton>
+					</BlockControls>
+				</>
 			) }
 			<InspectorControls key="setting">
 				<ToolsPanel

@@ -35,68 +35,6 @@ function gutenberg_url( $path ) {
 }
 
 /**
- * Registers a script according to `wp_register_script`. Honors this request by
- * reassigning internal dependency properties of any script handle already
- * registered by that name. It does not deregister the original script, to
- * avoid losing inline scripts which may have been attached.
- *
- * @since 4.1.0
- *
- * @param WP_Scripts       $scripts   WP_Scripts instance.
- * @param string           $handle    Name of the script. Should be unique.
- * @param string           $src       Full URL of the script, or path of the script relative to the WordPress root directory.
- * @param array            $deps      Optional. An array of registered script handles this script depends on. Default empty array.
- * @param string|bool|null $ver       Optional. String specifying script version number, if it has one, which is added to the URL
- *                                    as a query string for cache busting purposes. If version is set to false, a version
- *                                    number is automatically added equal to current installed WordPress version.
- *                                    If set to null, no version is added.
- * @param bool             $in_footer Optional. Whether to enqueue the script before </body> instead of in the <head>.
- *                                    Default 'false'.
- */
-function gutenberg_override_script( $scripts, $handle, $src, $deps = array(), $ver = false, $in_footer = false ) {
-	/*
-	 * Force `wp-i18n` script to be registered in the <head> as a
-	 * temporary workaround for https://meta.trac.wordpress.org/ticket/6195.
-	 */
-	$in_footer = 'wp-i18n' === $handle ? false : $in_footer;
-
-	$script = $scripts->query( $handle, 'registered' );
-	if ( $script ) {
-		/*
-		 * In many ways, this is a reimplementation of `wp_register_script` but
-		 * bypassing consideration of whether a script by the given handle had
-		 * already been registered.
-		 */
-
-		// See: `_WP_Dependency::__construct` .
-		$script->src  = $src;
-		$script->deps = $deps;
-		$script->ver  = $ver;
-		$script->args = $in_footer ? 1 : null;
-	} else {
-		$scripts->add( $handle, $src, $deps, $ver, ( $in_footer ? 1 : null ) );
-	}
-
-	if ( in_array( 'wp-i18n', $deps, true ) ) {
-		$scripts->set_translations( $handle );
-	}
-
-	/*
-	 * Wp-editor module is exposed as window.wp.editor.
-	 * Problem: there is quite some code expecting window.wp.oldEditor object available under window.wp.editor.
-	 * Solution: fuse the two objects together to maintain backward compatibility.
-	 * For more context, see https://github.com/WordPress/gutenberg/issues/33203
-	 */
-	if ( 'wp-editor' === $handle ) {
-		$scripts->add_inline_script(
-			'wp-editor',
-			'Object.assign( window.wp.editor, window.wp.oldEditor );',
-			'after'
-		);
-	}
-}
-
-/**
  * Filters the default translation file load behavior to load the Gutenberg
  * plugin translation file, if available.
  *
@@ -175,77 +113,27 @@ function gutenberg_override_style( $styles, $handle, $src, $deps = array(), $ver
 }
 
 /**
- * Registers all the WordPress packages scripts that are in the standardized
- * `build/scripts/` location.
+ * Handle special case dependencies for wp-block-library that depend on runtime conditions.
  *
- * @since 4.5.0
+ * This adds the 'editor' dependency conditionally based on experiments and classic block requirements.
+ * All other script registrations are handled by the auto-generated build/scripts.php file.
  *
  * @param WP_Scripts $scripts WP_Scripts instance.
  */
-function gutenberg_register_packages_scripts( $scripts ) {
-	// When in production, use the plugin's version as the default asset version;
-	// else (for development or test) default to use the current time.
-	$default_version = defined( 'GUTENBERG_VERSION' ) && ! SCRIPT_DEBUG ? GUTENBERG_VERSION : time();
-	$file_extension  = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.js' : '.min.js';
-
-	foreach ( glob( gutenberg_dir_path() . 'build/scripts/*/index' . $file_extension ) as $path ) {
-		// Prefix `wp-` to package directory to get script handle.
-		// For example, `…/build/scripts/a11y/index.min.js` becomes `wp-a11y`.
-		$handle = 'wp-' . basename( dirname( $path ) );
-
-		/**
-		 * Find the asset file for each package script by
-		 * replacing the JS file extension '.js' or '.min.js' with '.min.asset.php'.
-		 *
-		 * Example:
-		 * - '.../build/block-library/index.min.js' => '.../build/block-library/index.min.asset.php'
-		 * - '.../build/block-library/index.js'     => '.../build/block-library/index.min.asset.php'
-		 */
-		$asset_file   = substr( $path, 0, -( strlen( $file_extension ) ) ) . '.min.asset.php';
-		$asset        = file_exists( $asset_file )
-			? require $asset_file
-			: null;
-		$dependencies = isset( $asset['dependencies'] ) ? $asset['dependencies'] : array();
-		$version      = isset( $asset['version'] ) ? $asset['version'] : $default_version;
-
-		// Add dependencies that cannot be detected and generated by build tools.
-		switch ( $handle ) {
-			case 'wp-block-library':
-				if (
-					! gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ||
-					! empty( $_GET['requiresTinymce'] ) ||
-					gutenberg_post_being_edited_requires_classic_block()
-				) {
-					array_push( $dependencies, 'editor' );
-				}
-				break;
-
-			case 'wp-edit-post':
-				array_push( $dependencies, 'media-models', 'media-views', 'postbox' );
-				break;
-
-			case 'wp-edit-site':
-				array_push( $dependencies, 'wp-dom-ready' );
-				break;
-			case 'wp-preferences':
-				array_push( $dependencies, 'wp-preferences-persistence' );
-				break;
+function gutenberg_register_block_library_script_special_case( $scripts ) {
+	$handle = 'wp-block-library';
+	$script = $scripts->query( $handle, 'registered' );
+	if (
+		! gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ||
+		! empty( $_GET['requiresTinymce'] ) ||
+		gutenberg_post_being_edited_requires_classic_block()
+	) {
+		if ( ! in_array( 'editor', $script->deps, true ) ) {
+			$script->deps[] = 'editor';
 		}
-
-		// Get the path from Gutenberg directory as expected by `gutenberg_url`.
-		$gutenberg_path = substr( $path, strlen( gutenberg_dir_path() ) );
-
-		gutenberg_override_script(
-			$scripts,
-			$handle,
-			gutenberg_url( $gutenberg_path ),
-			$dependencies,
-			$version,
-			true
-		);
 	}
 }
-add_action( 'wp_default_scripts', 'gutenberg_register_packages_scripts' );
+add_action( 'wp_default_scripts', 'gutenberg_register_block_library_script_special_case', 11 );
 
 /**
  * Registers all the WordPress packages styles that are in the standardized
@@ -624,76 +512,24 @@ add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
  *
  * @since 19.3.0
  */
-function gutenberg_default_script_modules() {
-	/*
-	 * Load individual asset files for esbuild-built packages.
-	 * Follows the same pattern as regular scripts in gutenberg_register_packages_scripts().
-	 * Uses RecursiveDirectoryIterator to find all *.js files at any nesting depth.
-	 * Only processes files matching the SCRIPT_DEBUG setting (either .js or .min.js).
-	 */
-	$extension        = SCRIPT_DEBUG ? '.js' : '.min.js';
-	$all_assets       = array();
-	$build_module_dir = gutenberg_dir_path() . 'build/modules';
-	if ( is_dir( $build_module_dir ) ) {
-		$iterator = new RecursiveIteratorIterator(
-			new RecursiveDirectoryIterator( $build_module_dir, RecursiveDirectoryIterator::SKIP_DOTS )
-		);
-		foreach ( $iterator as $file ) {
-			if ( $file->isFile() && preg_match( '/\.(min\.)?js$/', $file->getFilename() ) ) {
-				$path = $file->getPathname();
-				if ( ! str_ends_with( $path, $extension ) ) {
-					continue;
-				}
-
-				$asset_file = substr( $path, 0, -strlen( $extension ) ) . '.min.asset.php';
-				if ( ! file_exists( $asset_file ) ) {
-					continue;
-				}
-
-				$asset                    = require $asset_file;
-				$file_name                = str_replace( gutenberg_dir_path() . 'build/modules/', '', $path );
-				$asset['dependencies']    = $asset['module_dependencies'] ?? array();
-				$all_assets[ $file_name ] = $asset;
-			}
-		}
+function gutenberg_define_interactivity_modules_support() {
+	// Load the auto-generated module registry.
+	$modules_registry_file = gutenberg_dir_path() . 'build/modules/index.php';
+	if ( ! file_exists( $modules_registry_file ) ) {
+		return;
 	}
 
-	foreach ( $all_assets as $file_name => $script_module_data ) {
-		/*
-		 * Build the WordPress Script Module ID from the file name.
-		 * Prepend `@wordpress/` and remove extensions and `/index` if present:
-		 *   - interactivity/index.min.js or interactivity/index.js => @wordpress/interactivity
-		 *   - block-library/query/view.min.js or block-library/query/view.js => @wordpress/block-library/query/view
-		 */
-		$script_module_id = '@wordpress/' . preg_replace( '~(?:/index)?\.(min\.)?js$~D', '', $file_name, 1 );
+	$modules = require $modules_registry_file;
 
-		/*
-		 * All script modules in Gutenberg are (currently) related to the Interactivity API which prioritizes server-side rendering.
-		 * Therefore, the modules should be fetched with a low priority and printed in the footer to avoid network contention with
-		 * any LCP element resource. For allowing a block to opt-in to another fetchpriority,
-		 * see <https://github.com/WordPress/gutenberg/issues/71366>.
-		 *
-		 * Also, the @wordpress/a11y script module is intended to be used as a dynamic import dependency, in which case
-		 * the fetchpriority is irrelevant. See <https://make.wordpress.org/core/2024/10/14/updates-to-script-modules-in-6-7/>.
-		 * However, in case it is added as a static import dependency, the fetchpriority is explicitly set to be 'low'
-		 * since the module should not be involved in the critical rendering path, and if it is, its fetchpriority will
-		 * be bumped to match the fetchpriority of the dependent script.
-		 */
-		$args = array(
-			'fetchpriority' => 'low',
-			'in_footer'     => true,
-		);
-
-		if ( str_starts_with( $script_module_id, '@wordpress/block-library' ) && method_exists( 'WP_Interactivity_API', 'add_client_navigation_support_to_script_module' ) ) {
-			wp_interactivity()->add_client_navigation_support_to_script_module( $script_module_id );
+	// Add client navigation support to block library modules.
+	foreach ( $modules as $module ) {
+		if ( str_starts_with( $module['id'], '@wordpress/block-library' ) && method_exists( 'WP_Interactivity_API', 'add_client_navigation_support_to_script_module' ) ) {
+			wp_interactivity()->add_client_navigation_support_to_script_module( $module['id'] );
 		}
-
-		$path = gutenberg_url( "build/modules/{$file_name}" );
-		wp_register_script_module( $script_module_id, $path, $script_module_data['dependencies'], $script_module_data['version'], $args ); // The $args parameter is new as of WP 6.9 per <https://core.trac.wordpress.org/ticket/61734>.
 	}
 }
-remove_action( 'wp_default_scripts', 'wp_default_script_modules' );
-add_action( 'wp_default_scripts', 'gutenberg_default_script_modules' );
+remove_action( 'wp_default_scripts', 'wp_define_interactivity_modules_support' );
+add_action( 'wp_default_scripts', 'gutenberg_define_interactivity_modules_support' );
 
 /**
  * Always remove the Core action hook while gutenberg_enqueue_stored_styles() exists to avoid styles being printed twice.

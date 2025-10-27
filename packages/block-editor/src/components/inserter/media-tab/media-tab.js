@@ -4,7 +4,8 @@
 import { __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import { Button } from '@wordpress/components';
-import { useCallback, useMemo } from '@wordpress/element';
+import { useCallback, useMemo, useState } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -12,13 +13,54 @@ import { useCallback, useMemo } from '@wordpress/element';
 import { MediaCategoryPanel } from './media-panel';
 import MediaUploadCheck from '../../media-upload/check';
 import MediaUpload from '../../media-upload';
+import MediaUploadModal from '../../media-upload-modal';
 import { useMediaCategories } from './hooks';
 import { getBlockAndPreviewFromMedia } from './utils';
 import MobileTabNavigation from '../mobile-tab-navigation';
 import CategoryTabs from '../category-tabs';
 import InserterNoResults from '../no-results';
+import { store as blockEditorStore } from '../../../store';
 
 const ALLOWED_MEDIA_TYPES = [ 'image', 'video', 'audio' ];
+
+/**
+ * Conditional Media component that uses MediaUploadModal when experiment is enabled,
+ * otherwise falls back to MediaUpload.
+ *
+ * @param {Object}   root0        Component props.
+ * @param {Function} root0.render Render prop function that receives { open } object.
+ * @return {JSX.Element} The component.
+ */
+function ConditionalMediaUpload( { render, ...props } ) {
+	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	const mediaUpload = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return getSettings().mediaUpload;
+	}, [] );
+
+	if ( window.__experimentalDataViewsMediaModal ) {
+		return (
+			<>
+				{ render && render( { open: () => setIsModalOpen( true ) } ) }
+				<MediaUploadModal
+					{ ...props }
+					isOpen={ isModalOpen }
+					onClose={ () => {
+						setIsModalOpen( false );
+						props.onClose?.();
+					} }
+					onSelect={ ( media ) => {
+						setIsModalOpen( false );
+						props.onSelect?.( media );
+					} }
+					onUpload={ mediaUpload }
+				/>
+			</>
+		);
+	}
+
+	return <MediaUpload { ...props } render={ render } />;
+}
 
 function MediaTab( {
 	rootClientId,
@@ -65,7 +107,7 @@ function MediaTab( {
 						{ children }
 					</CategoryTabs>
 					<MediaUploadCheck>
-						<MediaUpload
+						<ConditionalMediaUpload
 							multiple={ false }
 							onSelect={ onSelectMedia }
 							allowedTypes={ ALLOWED_MEDIA_TYPES }

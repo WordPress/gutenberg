@@ -93,9 +93,7 @@ export default function PageTemplates() {
 			combinedTemplates: false,
 		} );
 	const { records: staticRecords, isResolving: isLoadingStaticData } =
-		useEntityRecordsWithPermissions( 'postType', 'wp_registered_template', {
-			per_page: -1,
-		} );
+		useEntityRecordsWithPermissions( 'root', 'registeredTemplate' );
 
 	const activeTemplates = useMemo( () => {
 		const _active = [ ...staticRecords ].filter(
@@ -104,30 +102,20 @@ export default function PageTemplates() {
 		if ( activeTemplatesOption ) {
 			for ( const activeSlug in activeTemplatesOption ) {
 				const activeId = activeTemplatesOption[ activeSlug ];
-				if ( activeId === false ) {
-					// Remove the template from the array.
+				// Replace the template in the array.
+				const template = userRecords.find(
+					( userRecord ) =>
+						userRecord.id === activeId &&
+						userRecord.theme === activeTheme.stylesheet
+				);
+				if ( template ) {
 					const index = _active.findIndex(
-						( template ) => template.slug === activeSlug
+						( { slug } ) => slug === template.slug
 					);
 					if ( index !== -1 ) {
-						_active.splice( index, 1 );
-					}
-				} else {
-					// Replace the template in the array.
-					const template = userRecords.find(
-						( userRecord ) =>
-							userRecord.id === activeId &&
-							userRecord.theme === activeTheme.stylesheet
-					);
-					if ( template ) {
-						const index = _active.findIndex(
-							( { slug } ) => slug === template.slug
-						);
-						if ( index !== -1 ) {
-							_active[ index ] = template;
-						} else {
-							_active.push( template );
-						}
+						_active[ index ] = template;
+					} else {
+						_active.push( template );
 					}
 				}
 			}
@@ -151,11 +139,15 @@ export default function PageTemplates() {
 	const records = useMemo( () => {
 		return _records.map( ( record ) => ( {
 			...record,
-			_isActive: activeTemplates.find(
+			_isActive: !! activeTemplates.find(
 				( template ) => template.id === record.id
 			),
 			_isCustom:
-				record.is_custom ||
+				// For registered templates, the is_custom field is defined.
+				record.is_custom ??
+				// For user templates it's custom if the is_wp_suggestion meta
+				// field is not set and the slug is not found in the default
+				// template types.
 				( ! record.meta?.is_wp_suggestion &&
 					! defaultTemplateTypes.find(
 						( type ) => type.slug === record.slug
@@ -325,7 +317,7 @@ export default function PageTemplates() {
 				onChangeSelection={ onChangeSelection }
 				isItemClickable={ () => true }
 				onClickItem={ ( item ) => {
-					if ( item.type === 'wp_registered_template' ) {
+					if ( typeof item.id === 'string' ) {
 						setSelectedRegisteredTemplate( item );
 					} else {
 						history.navigate(

@@ -31,7 +31,6 @@ import {
 	useEnableFloatingSidebar,
 } from './hooks';
 import { focusCommentThread } from './utils';
-import PluginMoreMenuItem from '../plugin-more-menu-item';
 import PostTypeSupportCheck from '../post-type-support-check';
 
 function NotesSidebarContent( {
@@ -84,12 +83,14 @@ function NotesSidebarContent( {
 	);
 }
 
-function NotesSidebar( { postId } ) {
+function NotesSidebar( { postId, mode } ) {
 	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const commentSidebarRef = useRef( null );
+
+	const showFloatingSidebar = isLargeViewport && mode === 'post-only';
 
 	const blockCommentId = useSelect( ( select ) => {
 		const { getBlockAttributes, getSelectedBlockClientId } =
@@ -108,7 +109,7 @@ function NotesSidebar( { postId } ) {
 		commentLastUpdated,
 	} = useBlockComments( postId );
 	useEnableFloatingSidebar(
-		isLargeViewport &&
+		showFloatingSidebar &&
 			( unresolvedSortedThreads.length > 0 || showCommentBoard )
 	);
 
@@ -127,11 +128,14 @@ function NotesSidebar( { postId } ) {
 		const prevArea = await getActiveComplementaryArea( 'core' );
 		const activeNotesArea = SIDEBARS.find( ( name ) => name === prevArea );
 
-		// If the notes sidebar is not already active, enable the floating sidebar.
-		if ( ! activeNotesArea ) {
+		if ( currentThread?.status === 'approved' ) {
+			enableComplementaryArea( 'core', collabHistorySidebarName );
+		} else if ( ! activeNotesArea ) {
 			enableComplementaryArea(
 				'core',
-				isLargeViewport ? collabSidebarName : collabHistorySidebarName
+				showFloatingSidebar
+					? collabSidebarName
+					: collabHistorySidebarName
 			);
 		}
 
@@ -162,6 +166,7 @@ function NotesSidebar( { postId } ) {
 			<AddCommentMenuItem onClick={ openTheSidebar } />
 			<PluginSidebar
 				identifier={ collabHistorySidebarName }
+				name={ collabHistorySidebarName }
 				title={ __( 'Notes' ) }
 				icon={ commentIcon }
 				closeLabel={ __( 'Close Notes' ) }
@@ -198,22 +203,17 @@ function NotesSidebar( { postId } ) {
 					/>
 				</PluginSidebar>
 			) }
-			<PluginMoreMenuItem
-				icon={ commentIcon }
-				onClick={ () =>
-					enableComplementaryArea( 'core', collabHistorySidebarName )
-				}
-			>
-				{ __( 'Notes' ) }
-			</PluginMoreMenuItem>
 		</>
 	);
 }
 
 export default function NotesSidebarContainer() {
-	const postId = useSelect( ( select ) => {
-		const { getCurrentPostId } = select( editorStore );
-		return getCurrentPostId();
+	const { postId, mode } = useSelect( ( select ) => {
+		const { getCurrentPostId, getRenderingMode } = select( editorStore );
+		return {
+			postId: getCurrentPostId(),
+			mode: getRenderingMode(),
+		};
 	}, [] );
 
 	if ( ! postId || typeof postId !== 'number' ) {
@@ -222,7 +222,7 @@ export default function NotesSidebarContainer() {
 
 	return (
 		<PostTypeSupportCheck supportKeys="editor.notes">
-			<NotesSidebar postId={ postId } />
+			<NotesSidebar postId={ postId } mode={ mode } />
 		</PostTypeSupportCheck>
 	);
 }

@@ -378,6 +378,9 @@ function Thread( {
 			onFocus={ onMouseEnter }
 			onBlur={ onMouseLeave }
 			onKeyDown={ ( event ) => {
+				if ( event.defaultPrevented ) {
+					return;
+				}
 				// Expand or Collapse thread.
 				if (
 					event.key === 'Enter' &&

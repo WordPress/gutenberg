@@ -34,6 +34,11 @@
 	},
 	"react-native": "src/index",
 	"wpScript": true,
+	"wpScriptExtraDependencies": [
+		"media-models",
+		"media-views",
+		"postbox"
+	],
 	"dependencies": {
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/admin-ui": "file:../admin-ui",

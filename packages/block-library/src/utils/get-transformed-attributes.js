@@ -27,7 +27,8 @@ export function getTransformedAttributes(
 
 	const transformedAttributes = {};
 
-	// Handle attributes derived from block support.
+	// Handle attributes derived from block support. The custom class name
+	// attribute is handled in the `core/customClassName/addTransforms` hook.
 	if (
 		hasBlockSupport( newBlockType, 'allowedBlocks' ) &&
 		attributes.allowedBlocks
@@ -43,29 +44,17 @@ export function getTransformedAttributes(
 	) {
 		transformedAttributes.ariaLabel = attributes.ariaLabel;
 	}
-	if (
-		hasBlockSupport( newBlockType, 'className' ) &&
-		attributes.className
-	) {
-		transformedAttributes.className = attributes.className;
-	}
 
 	// Handle metadata transformation.
 	if ( attributes.metadata ) {
 		// The metadata properties that should be preserved after the transform.
-		const transformedMetadata = [ 'noteId' ];
+		// The noteId, name, and blockVisibility properties are separately handled
+		// in the `core/metadata/addTransforms` hook.
+		const transformedMetadata = [];
 
 		// If there is a transform bindings callback, add the `id` and `bindings` properties.
 		if ( bindingsCallback ) {
 			transformedMetadata.push( 'id', 'bindings' );
-		}
-
-		// Handle metadata properties derived from block support.
-		if ( hasBlockSupport( newBlockType, 'renaming', true ) ) {
-			transformedMetadata.push( 'name' );
-		}
-		if ( hasBlockSupport( newBlockType, 'blockVisibility', true ) ) {
-			transformedMetadata.push( 'blockVisibility' );
 		}
 
 		// Only process metadata if there are supported properties.
