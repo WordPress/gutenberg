@@ -251,6 +251,7 @@ export default function PageTemplates() {
 							typeof newItem.title === 'string'
 								? newItem.title
 								: newItem.title?.rendered;
+						history.navigate( `/template?activeView=user` );
 						createSuccessNotice(
 							sprintf(
 								// translators: %s: Title of the created post or template, e.g: "Hello world".
