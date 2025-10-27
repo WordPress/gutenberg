@@ -9,7 +9,10 @@ import { useCommandLoader } from '@wordpress/commands';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as coreStore } from '@wordpress/core-data';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -103,9 +106,8 @@ const getGlobalStylesResetCommands = () =>
 
 const getGlobalStylesOpenRevisionsCommands = () =>
 	function useGlobalStylesOpenRevisionsCommands() {
-		const { openGeneralSidebar, setStylesPath } = unlock(
-			useDispatch( editSiteStore )
-		);
+		const { openGeneralSidebar } = unlock( useDispatch( editSiteStore ) );
+		const { setStylesPath } = unlock( useDispatch( editorStore ) );
 		const { params } = useLocation();
 		const { canvas = 'view' } = params;
 		const history = useHistory();

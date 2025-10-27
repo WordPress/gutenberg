@@ -71,7 +71,10 @@ function StylesCanvasRevisions( { path }, ref ) {
 
 	// Merge the display config with the base config
 	const mergedConfig = useMemo( () => {
-		if ( ! isObjectEmpty( displayConfig ) && ! isObjectEmpty( baseConfig ) ) {
+		if (
+			! isObjectEmpty( displayConfig ) &&
+			! isObjectEmpty( baseConfig )
+		) {
 			return mergeGlobalStyles( baseConfig, displayConfig );
 		}
 		return {};
