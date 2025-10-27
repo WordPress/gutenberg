@@ -95,8 +95,8 @@ export const FullBleedContent: StoryObj< typeof Card > = {
 /**
  * The Card component supports three approaches to padding:
  * 1. Default padding (medium) - no size prop needed
- * 2. Token-based padding - using size tokens: xSmall (8px), small (16px), medium (24px), large (32px)
- * 3. Directional padding - customize each side independently
+ * 2. Token-based padding - using size tokens: xSmall, small, medium, large
+ * 3. Logical padding - customize each direction using logical properties
  *
  * Each component (Card, CardHeader, CardBody) can have its own padding configuration.
  */
@@ -120,39 +120,36 @@ export const PaddingVariations: StoryObj< typeof Card > = {
 			<div>
 				<Card
 					size={ {
-						// 32px top, 24px sides, 16px bottom
-						top: 'large',
-						right: 'medium',
-						bottom: 'small',
-						left: 'medium',
+						blockStart: 'large',
+						blockEnd: 'small',
+						inlineStart: 'medium',
+						inlineEnd: 'medium',
 					} }
 				>
 					<CardHeader
 						size={ {
-							// 16px top/bottom, 32px sides
-							top: 'small',
-							right: 'large',
-							bottom: 'small',
-							left: 'large',
+							blockStart: 'small',
+							blockEnd: 'small',
+							inlineStart: 'xSmall',
+							inlineEnd: 'large',
 						} }
 					>
 						<Text>
-							Header with custom padding per side (small top,
-							large sides, small bottom)
+							Header with logical padding (large blockStart, small
+							blockEnd, xSmall inlineStart, large inlineEnd)
 						</Text>
 					</CardHeader>
 					<CardBody
 						size={ {
-							// 24px vertical, 8px horizontal
-							top: 'medium',
-							right: 'xSmall',
-							bottom: 'medium',
-							left: 'large',
+							blockStart: 'medium',
+							blockEnd: 'xSmall',
+							inlineStart: 'large',
+							inlineEnd: 'xSmall',
 						} }
 					>
 						<Text>
-							Body with custom padding per side (medium top,
-							xSmall right, medium bottom, large left)
+							Body with logical padding (medium blockStart, xSmall
+							blockEnd, large inlineStart, xSmall inlineEnd)
 						</Text>
 					</CardBody>
 				</Card>

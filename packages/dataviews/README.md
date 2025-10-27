@@ -818,7 +818,7 @@ The user facing description of the action.
 
 ```js
 {
-	label: Move to Trash
+	label: Trash
 }
 ```
 

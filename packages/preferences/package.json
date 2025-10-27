@@ -36,6 +36,9 @@
 	},
 	"react-native": "src/index",
 	"wpScript": true,
+	"wpScriptExtraDependencies": [
+		"wp-preferences-persistence"
+	],
 	"sideEffects": false,
 	"dependencies": {
 		"@wordpress/a11y": "file:../a11y",
