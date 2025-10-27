@@ -188,9 +188,9 @@ export default {
 			return [];
 		}
 		return Object.entries( postDataFields ).map( ( [ key, field ] ) => ( {
-			label: field.label || key,
-			type: field.type || 'string',
-			args: field.args || { field: key },
+			label: field.label,
+			type: field.type,
+			args: { field: key },
 		} ) );
 	},
 };

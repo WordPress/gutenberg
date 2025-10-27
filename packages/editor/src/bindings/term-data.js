@@ -24,43 +24,36 @@ function createDataFields( termDataValues, idValue ) {
 			label: __( 'Term ID' ),
 			value: idValue,
 			type: 'string',
-			args: { field: 'id' },
 		},
 		name: {
 			label: __( 'Name' ),
 			value: termDataValues?.name,
 			type: 'string',
-			args: { field: 'name' },
 		},
 		slug: {
 			label: __( 'Slug' ),
 			value: termDataValues?.slug,
 			type: 'string',
-			args: { field: 'slug' },
 		},
 		link: {
 			label: __( 'Link' ),
 			value: termDataValues?.link,
 			type: 'string',
-			args: { field: 'link' },
 		},
 		description: {
 			label: __( 'Description' ),
 			value: termDataValues?.description,
 			type: 'string',
-			args: { field: 'description' },
 		},
 		parent: {
 			label: __( 'Parent ID' ),
 			value: termDataValues?.parent,
 			type: 'string',
-			args: { field: 'parent' },
 		},
 		count: {
 			label: __( 'Count' ),
 			value: `(${ termDataValues?.count ?? 0 })`,
 			type: 'string',
-			args: { field: 'count' },
 		},
 	};
 }
@@ -208,9 +201,9 @@ export default {
 			return [];
 		}
 		return Object.entries( termDataFields ).map( ( [ key, field ] ) => ( {
-			label: field.label || key,
-			type: field.type || 'string',
-			args: field.args || { field: key },
+			label: field.label,
+			type: field.type,
+			args: { field: key },
 		} ) );
 	},
 };

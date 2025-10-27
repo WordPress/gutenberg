@@ -148,9 +148,9 @@ export default {
 			return [];
 		}
 		return Object.entries( metaFields ).map( ( [ key, field ] ) => ( {
-			label: field.label || key,
-			type: field.type || 'string',
-			args: field.args || { key },
+			label: field.label,
+			type: field.type,
+			args: { key },
 		} ) );
 	},
 };
