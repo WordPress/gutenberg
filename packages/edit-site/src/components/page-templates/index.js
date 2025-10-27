@@ -121,37 +121,55 @@ export default function PageTemplates() {
 		return _active;
 	}, [ userRecords, staticRecords, activeTemplatesOption, activeTheme ] );
 
-	let _records;
 	let isLoadingData;
 	if ( activeView === 'active' ) {
-		_records = activeTemplates;
 		isLoadingData = isLoadingUserRecords || isLoadingStaticData;
 	} else if ( activeView === 'user' ) {
-		_records = userRecords;
 		isLoadingData = isLoadingUserRecords;
 	} else {
-		_records = staticRecords;
 		isLoadingData = isLoadingStaticData;
 	}
 
 	const records = useMemo( () => {
-		return _records.map( ( record ) => ( {
-			...record,
-			_isActive: !! activeTemplates.find(
-				( template ) => template.id === record.id
-			),
-			_isCustom:
-				// For registered templates, the is_custom field is defined.
+		function isCustom( record ) {
+			// For registered templates, the is_custom field is defined.
+			return (
 				record.is_custom ??
 				// For user templates it's custom if the is_wp_suggestion meta
 				// field is not set and the slug is not found in the default
 				// template types.
 				( ! record.meta?.is_wp_suggestion &&
-					! defaultTemplateTypes.find(
+					! defaultTemplateTypes.some(
 						( type ) => type.slug === record.slug
-					) ),
+					) )
+			);
+		}
+
+		let _records;
+		if ( activeView === 'active' ) {
+			// Don't show active custom templates in the active view.
+			_records = activeTemplates.filter(
+				( record ) => ! isCustom( record )
+			);
+		} else if ( activeView === 'user' ) {
+			_records = userRecords;
+		} else {
+			_records = staticRecords;
+		}
+		return _records.map( ( record ) => ( {
+			...record,
+			_isActive: activeTemplates.some(
+				( template ) => template.id === record.id
+			),
+			_isCustom: isCustom( record ),
 		} ) );
-	}, [ _records, activeTemplates, defaultTemplateTypes ] );
+	}, [
+		activeTemplates,
+		defaultTemplateTypes,
+		userRecords,
+		staticRecords,
+		activeView,
+	] );
 
 	const users = useSelect(
 		( select ) => {
