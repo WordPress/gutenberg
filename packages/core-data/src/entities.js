@@ -36,6 +36,7 @@ export const rootEntitiesConfig = [
 	{
 		label: __( 'Base' ),
 		kind: 'root',
+		key: false,
 		name: '__unstableBase',
 		baseURL: '/',
 		baseURLParams: {
@@ -202,6 +203,13 @@ export const rootEntitiesConfig = [
 		plural: 'statuses',
 		key: 'slug',
 	},
+	{
+		label: __( 'Registered Templates' ),
+		name: 'registeredTemplate',
+		kind: 'root',
+		baseURL: '/wp/v2/wp_registered_template',
+		key: 'id',
+	},
 ];
 
 export const deprecatedEntities = {
@@ -272,41 +280,7 @@ async function loadPostTypeEntities() {
 		);
 		const namespace = postType?.rest_namespace ?? 'wp/v2';
 
-		/**
-		 * @type {import('@wordpress/sync').SyncConfig}
-		 */
-		const syncConfig = {
-			/**
-			 * Apply changes from the local editor to the local CRDT document so
-			 * that those changes can be synced to other peers (via the provider).
-			 *
-			 * @param {import('@wordpress/sync').CRDTDoc}               crdtDoc
-			 * @param {Partial< import('@wordpress/sync').ObjectData >} changes
-			 * @return {void}
-			 */
-			applyChangesToCRDTDoc: ( crdtDoc, changes ) =>
-				applyPostChangesToCRDTDoc( crdtDoc, changes, postType ),
-
-			/**
-			 * Extract changes from a CRDT document that can be used to update the
-			 * local editor state.
-			 *
-			 * @param {import('@wordpress/sync').CRDTDoc}    crdtDoc
-			 * @param {import('@wordpress/sync').ObjectData} editedRecord
-			 * @return {Partial< import('@wordpress/sync').ObjectData >} Changes to record
-			 */
-			getChangesFromCRDTDoc: ( crdtDoc, editedRecord ) =>
-				getPostChangesFromCRDTDoc( crdtDoc, editedRecord, postType ),
-
-			/**
-			 * Sync features supported by the entity.
-			 *
-			 * @type {Record< string, boolean >}
-			 */
-			supports: {},
-		};
-
-		return {
+		const entity = {
 			kind: 'postType',
 			baseURL: `/${ namespace }/${ postType.rest_base }`,
 			baseURLParams: { context: 'edit' },
@@ -326,7 +300,6 @@ async function loadPostTypeEntities() {
 					: String( record.id ) ),
 			__unstablePrePersist: isTemplate ? undefined : prePersistPostType,
 			__unstable_rest_base: postType.rest_base,
-			syncConfig,
 			supportsPagination: true,
 			getRevisionsUrl: ( parentId, revisionId ) =>
 				`/${ namespace }/${
@@ -336,6 +309,50 @@ async function loadPostTypeEntities() {
 				}`,
 			revisionKey: DEFAULT_ENTITY_KEY,
 		};
+
+		if ( window.__experimentalEnableSync ) {
+			if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+				/**
+				 * @type {import('@wordpress/sync').SyncConfig}
+				 */
+				entity.syncConfig = {
+					/**
+					 * Apply changes from the local editor to the local CRDT document so
+					 * that those changes can be synced to other peers (via the provider).
+					 *
+					 * @param {import('@wordpress/sync').CRDTDoc}               crdtDoc
+					 * @param {Partial< import('@wordpress/sync').ObjectData >} changes
+					 * @return {void}
+					 */
+					applyChangesToCRDTDoc: ( crdtDoc, changes ) =>
+						applyPostChangesToCRDTDoc( crdtDoc, changes, postType ),
+
+					/**
+					 * Extract changes from a CRDT document that can be used to update the
+					 * local editor state.
+					 *
+					 * @param {import('@wordpress/sync').CRDTDoc}    crdtDoc
+					 * @param {import('@wordpress/sync').ObjectData} editedRecord
+					 * @return {Partial< import('@wordpress/sync').ObjectData >} Changes to record
+					 */
+					getChangesFromCRDTDoc: ( crdtDoc, editedRecord ) =>
+						getPostChangesFromCRDTDoc(
+							crdtDoc,
+							editedRecord,
+							postType
+						),
+
+					/**
+					 * Sync features supported by the entity.
+					 *
+					 * @type {Record< string, boolean >}
+					 */
+					supports: {},
+				};
+			}
+		}
+
+		return entity;
 	} );
 }
 
@@ -372,13 +389,22 @@ async function loadSiteEntity() {
 		label: __( 'Site' ),
 		name: 'site',
 		kind: 'root',
+		key: false,
 		baseURL: '/wp/v2/settings',
-		syncConfig: {
-			applyChangesToCRDTDoc: defaultApplyChangesToCRDTDoc,
-			getChangesFromCRDTDoc: defaultGetChangesFromCRDTDoc,
-		},
 		meta: {},
 	};
+
+	if ( window.__experimentalEnableSync ) {
+		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+			/**
+			 * @type {import('@wordpress/sync').SyncConfig}
+			 */
+			entity.syncConfig = {
+				applyChangesToCRDTDoc: defaultApplyChangesToCRDTDoc,
+				getChangesFromCRDTDoc: defaultGetChangesFromCRDTDoc,
+			};
+		}
+	}
 
 	const site = await apiFetch( {
 		path: entity.baseURL,

@@ -12,7 +12,6 @@ import { PinnedItems } from '@wordpress/interface';
 /**
  * Internal dependencies
  */
-import CollabSidebar from '../collab-sidebar';
 import BackButton, { useHasBackButton } from './back-button';
 import CollapsibleBlockToolbar from '../collapsible-block-toolbar';
 import DocumentBar from '../document-bar';
@@ -24,7 +23,6 @@ import PostSavedState from '../post-saved-state';
 import PostViewLink from '../post-view-link';
 import PreviewDropdown from '../preview-dropdown';
 import ZoomOutToggle from '../zoom-out-toggle';
-import PostTypeSupportCheck from '../post-type-support-check';
 import { store as editorStore } from '../../store';
 import {
 	TEMPLATE_PART_POST_TYPE,
@@ -52,9 +50,7 @@ const backButtonVariations = {
 function Header( {
 	customSaveButton,
 	forceIsDirty,
-	forceDisableBlockTools,
 	setEntitiesSavedStatesCallback,
-	title,
 } ) {
 	const isWideViewport = useViewportMatch( 'large' );
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -67,6 +63,7 @@ function Header( {
 		hasFixedToolbar,
 		hasBlockSelection,
 		hasSectionRootClientId,
+		isStylesCanvasActive,
 	} = useSelect( ( select ) => {
 		const { get: getPreference } = select( preferencesStore );
 		const {
@@ -74,6 +71,9 @@ function Header( {
 			getCurrentPostType,
 			isPublishSidebarOpened: _isPublishSidebarOpened,
 		} = select( editorStore );
+		const { getStylesPath, getShowStylebook } = unlock(
+			select( editorStore )
+		);
 		const { getBlockSelectionStart, getSectionRootClientId } = unlock(
 			select( blockEditorStore )
 		);
@@ -86,6 +86,9 @@ function Header( {
 			hasFixedToolbar: getPreference( 'core', 'fixedToolbar' ),
 			hasBlockSelection: !! getBlockSelectionStart(),
 			hasSectionRootClientId: !! getSectionRootClientId(),
+			isStylesCanvasActive:
+				!! getStylesPath()?.startsWith( '/revisions' ) ||
+				getShowStylebook(),
 		};
 	}, [] );
 
@@ -98,7 +101,7 @@ function Header( {
 			NAVIGATION_POST_TYPE,
 			TEMPLATE_PART_POST_TYPE,
 			PATTERN_POST_TYPE,
-		].includes( postType ) || forceDisableBlockTools;
+		].includes( postType ) || isStylesCanvasActive;
 
 	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
 		useState( true );
@@ -131,7 +134,7 @@ function Header( {
 				transition={ { type: 'tween' } }
 			>
 				<DocumentTools
-					disableBlockTools={ forceDisableBlockTools || isTextEditor }
+					disableBlockTools={ isStylesCanvasActive || isTextEditor }
 				/>
 				{ hasFixedToolbar && isLargeViewport && (
 					<CollapsibleBlockToolbar
@@ -146,7 +149,7 @@ function Header( {
 					variants={ toolbarVariations }
 					transition={ { type: 'tween' } }
 				>
-					<DocumentBar title={ title } />
+					<DocumentBar />
 				</motion.div>
 			) }
 			<motion.div
@@ -178,7 +181,7 @@ function Header( {
 				/>
 
 				{ isWideViewport && canBeZoomedOut && (
-					<ZoomOutToggle disabled={ forceDisableBlockTools } />
+					<ZoomOutToggle disabled={ isStylesCanvasActive } />
 				) }
 
 				{ ( isWideViewport || ! showIconLabels ) && (
@@ -193,11 +196,6 @@ function Header( {
 						}
 					/>
 				) }
-
-				<PostTypeSupportCheck supportKeys="editor.notes">
-					<CollabSidebar />
-				</PostTypeSupportCheck>
-
 				{ customSaveButton }
 				<MoreMenu />
 			</motion.div>

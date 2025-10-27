@@ -16,16 +16,37 @@
 		"noEmit": true,
 		"outDir": ".cache"
 	},
-	"include": [],
-	"files": [
-		"./api-docs/update-api-docs.js",
-		"./plugin/config.js",
-		"./plugin/commands/changelog.js",
-		"./plugin/commands/performance.js",
-		"./plugin/lib/milestone.js",
-		"./plugin/lib/version.js",
-		"./plugin/lib/logger.js",
-		"./plugin/lib/utils.js",
-		"./validate-package-lock.js"
+	"include": [ "." ],
+	"exclude": [
+		// Do not add to this list! The reason these are excluded is because
+		// they have existing issues which need to be resolved. Fix them up!
+		"plugin/commands/test/changelog.js",
+		"plugin/commands/test/common.js",
+		"api-docs/are-api-docs-unstaged.js",
+		"api-docs/gen-block-lib-list.js",
+		"api-docs/gen-components-docs/get-subcomponent-descriptions.mjs",
+		"api-docs/gen-components-docs/get-tags-from-storybook.mjs",
+		"api-docs/gen-components-docs/index.mjs",
+		"api-docs/gen-components-docs/markdown/index.mjs",
+		"api-docs/gen-components-docs/markdown/props.mjs",
+		"api-docs/gen-theme-reference.mjs",
+		"build.mjs",
+		"check-licenses.mjs",
+		"check-local-changes.js",
+		"cherry-pick.mjs",
+		"commander.js",
+		"dev.mjs",
+		"generate-php-sync-issue.mjs",
+		"log-performance-results.js",
+		"packages/build-vendors.mjs",
+		"packages/build.mjs",
+		"packages/check-build-type-declaration-files.js",
+		"packages/dependency-graph.js",
+		"packages/lint-staged-typecheck.js",
+		"plugin/cli.js",
+		"plugin/commands/common.js",
+		"plugin/commands/packages.js",
+		"plugin/lib/test/version.js",
+		"validate-tsconfig.mjs"
 	]
 }

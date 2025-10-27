@@ -133,13 +133,22 @@ test.describe( 'Style Revisions', () => {
 		).toBeVisible();
 	} );
 
-	test( 'should access from the site editor sidebar', async ( { page } ) => {
+	test( 'should access from the site editor sidebar', async ( {
+		editor,
+		page,
+	} ) => {
 		const navigationContainer = page.getByRole( 'region', {
 			name: 'Navigation',
 		} );
+
 		await navigationContainer
 			.getByRole( 'button', { name: 'Styles' } )
 			.click();
+
+		// wait for the editor canvas to be ready (to contain a block)
+		await expect(
+			editor.canvas.locator( '.wp-block' ).nth( 0 )
+		).toBeVisible();
 
 		await navigationContainer
 			.getByRole( 'button', { name: 'Revisions' } )

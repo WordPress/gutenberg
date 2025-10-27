@@ -268,9 +268,30 @@ const UnforwardedPopover = (
 		onDialogClose = ( type: string | undefined, event: SyntheticEvent ) => {
 			// Ideally the popover should have just a single onClose prop and
 			// not three props that potentially do the same thing.
-			if ( type === 'focus-outside' && onFocusOutside ) {
-				onFocusOutside( event );
+			if ( type === 'focus-outside' ) {
+				// Check if this blur event is actually relevant to this popover
+				const blurTarget = event?.target as Element;
+				const referenceElement = refs.reference.current;
+				const floatingElement = refs.floating.current;
+
+				// Check if blur is from this popover's reference element or its floating content
+				const isBlurFromThisPopover =
+					( referenceElement &&
+						'contains' in referenceElement &&
+						referenceElement.contains( blurTarget ) ) ||
+					floatingElement?.contains( blurTarget );
+				// Only proceed if the blur is actually from this popover
+				if ( ! isBlurFromThisPopover ) {
+					return;
+				}
+				// Call onFocusOutside if defined or call onClose.
+				if ( onFocusOutside ) {
+					onFocusOutside( event );
+				} else if ( onClose ) {
+					onClose();
+				}
 			} else if ( onClose ) {
+				// onClose should be called for other event types if it exists.
 				onClose();
 			}
 		};

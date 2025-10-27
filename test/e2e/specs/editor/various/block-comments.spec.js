@@ -20,6 +20,7 @@ test.describe( 'Block Comments', () => {
 	} );
 
 	test( 'can pin and unpin comments sidebar', async ( {
+		editor,
 		page,
 		blockCommentUtils,
 	} ) => {
@@ -28,8 +29,42 @@ test.describe( 'Block Comments', () => {
 			.getByRole( 'button', { name: 'Unpin from toolbar' } )
 			.click();
 		await expect( topBarButton ).toBeHidden();
+
+		await editor.openDocumentSettingsSidebar();
+		await page
+			.getByRole( 'region', {
+				name: 'Editor top bar',
+			} )
+			.getByRole( 'button', { name: 'Options' } )
+			.click();
+		await page.getByRole( 'menuitemcheckbox', { name: 'Notes' } ).click();
 		await page.getByRole( 'button', { name: 'Pin to toolbar' } ).click();
+
 		await expect( topBarButton ).toBeVisible();
+	} );
+
+	test( 'should move focus to add a new note form', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Testing block comments' },
+		} );
+		const form = page.getByRole( 'textbox', {
+			name: 'New Note',
+			exact: true,
+		} );
+
+		await editor.clickBlockOptionsMenuItem( 'Add note' );
+		await expect( form ).toBeFocused();
+		// Close the pinned notes sidebar.
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Notes', exact: true } )
+			.click();
+		await editor.clickBlockOptionsMenuItem( 'Add note' );
+		await expect( form ).toBeFocused();
 	} );
 
 	test( 'can add a comment to a block', async ( { editor, page } ) => {

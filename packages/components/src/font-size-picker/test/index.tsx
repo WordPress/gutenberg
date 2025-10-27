@@ -145,7 +145,7 @@ describe( 'FontSizePicker', () => {
 			{
 				option: 'Default',
 				value: '8px',
-				expectedArguments: [ undefined ],
+				expectedArguments: [ undefined, undefined ],
 			},
 			{
 				option: 'Tiny 8px',
@@ -249,7 +249,7 @@ describe( 'FontSizePicker', () => {
 			{
 				option: 'Default',
 				value: '8px',
-				expectedArguments: [ undefined ],
+				expectedArguments: [ undefined, undefined ],
 			},
 			{
 				option: 'Tiny 8px',
@@ -358,6 +358,98 @@ describe( 'FontSizePicker', () => {
 
 		commonToggleGroupTests( fontSizes );
 		commonTests( fontSizes );
+
+		describe( 'valueMode prop for toggle group', () => {
+			it( 'should find font size by size value when valueMode is literal', async () => {
+				await render(
+					<FontSizePicker
+						fontSizes={ fontSizes }
+						value="16px"
+						valueMode="literal"
+					/>
+				);
+				// Should select the medium option (16px)
+				expect(
+					screen.getByRole( 'radio', { checked: true } )
+				).toHaveAccessibleName( 'Medium' );
+			} );
+
+			it( 'should find font size by slug when valueMode is slug', async () => {
+				await render(
+					<FontSizePicker
+						fontSizes={ fontSizes }
+						value="medium"
+						valueMode="slug"
+					/>
+				);
+				// Should select the medium option
+				expect(
+					screen.getByRole( 'radio', { checked: true } )
+				).toHaveAccessibleName( 'Medium' );
+			} );
+
+			it( 'should handle multiple font sizes with same value in literal mode', async () => {
+				const fontSizesWithDuplicates = [
+					{
+						slug: 'small-1',
+						name: 'Small 1',
+						size: '12px',
+					},
+					{
+						slug: 'small-2',
+						name: 'Small 2',
+						size: '12px',
+					},
+					{
+						slug: 'medium',
+						name: 'Medium',
+						size: '16px',
+					},
+				];
+				await render(
+					<FontSizePicker
+						fontSizes={ fontSizesWithDuplicates }
+						value="12px"
+						valueMode="literal"
+					/>
+				);
+				// Should have no selection when there are multiple matches
+				expect(
+					screen.queryByRole( 'radio', { checked: true } )
+				).not.toBeInTheDocument();
+			} );
+
+			it( 'should handle multiple font sizes with same value in slug mode', async () => {
+				const fontSizesWithDuplicates = [
+					{
+						slug: 'small-1',
+						name: 'Small 1',
+						size: '12px',
+					},
+					{
+						slug: 'small-2',
+						name: 'Small 2',
+						size: '12px',
+					},
+					{
+						slug: 'medium',
+						name: 'Medium',
+						size: '16px',
+					},
+				];
+				await render(
+					<FontSizePicker
+						fontSizes={ fontSizesWithDuplicates }
+						value="small-1"
+						valueMode="slug"
+					/>
+				);
+				// Should select the specific font size by slug
+				expect(
+					screen.getByRole( 'radio', { checked: true } )
+				).toHaveAccessibleName( 'Small 1' );
+			} );
+		} );
 	} );
 
 	describe( 'with ≤ 5 heterogeneous font sizes', () => {
@@ -430,6 +522,64 @@ describe( 'FontSizePicker', () => {
 
 		commonToggleGroupTests( fontSizes );
 		commonTests( fontSizes );
+
+		describe( 'valueMode prop for heterogeneous toggle group', () => {
+			it( 'should find font size by size value when valueMode is literal', async () => {
+				await render(
+					<FontSizePicker
+						fontSizes={ fontSizes }
+						value="1em"
+						valueMode="literal"
+					/>
+				);
+				// Should select the medium option (1em)
+				expect(
+					screen.getByRole( 'radio', { checked: true } )
+				).toHaveAccessibleName( 'Medium' );
+			} );
+
+			it( 'should find font size by slug when valueMode is slug', async () => {
+				await render(
+					<FontSizePicker
+						fontSizes={ fontSizes }
+						value="medium"
+						valueMode="slug"
+					/>
+				);
+				// Should select the medium option
+				expect(
+					screen.getByRole( 'radio', { checked: true } )
+				).toHaveAccessibleName( 'Medium' );
+			} );
+
+			it( 'should handle complex font size values in literal mode', async () => {
+				await render(
+					<FontSizePicker
+						fontSizes={ fontSizes }
+						value="clamp(1.75rem, 3vw, 2.25rem)"
+						valueMode="literal"
+					/>
+				);
+				// Should select the extra large option
+				expect(
+					screen.getByRole( 'radio', { checked: true } )
+				).toHaveAccessibleName( 'Extra Large' );
+			} );
+
+			it( 'should handle complex font size values in slug mode', async () => {
+				await render(
+					<FontSizePicker
+						fontSizes={ fontSizes }
+						value="x-large"
+						valueMode="slug"
+					/>
+				);
+				// Should select the extra large option
+				expect(
+					screen.getByRole( 'radio', { checked: true } )
+				).toHaveAccessibleName( 'Extra Large' );
+			} );
+		} );
 	} );
 
 	function commonToggleGroupTests( fontSizes: FontSize[] ) {
@@ -653,4 +803,312 @@ describe( 'FontSizePicker', () => {
 			expect( units[ 2 ] ).toHaveAccessibleName( 'ex' );
 		} );
 	}
+
+	describe( 'valueMode prop', () => {
+		// Use 6 font sizes to trigger select control (> 5)
+		const fontSizes = [
+			{
+				slug: 'small',
+				name: 'Small',
+				size: '12px',
+			},
+			{
+				slug: 'medium',
+				name: 'Medium',
+				size: '16px',
+			},
+			{
+				slug: 'large',
+				name: 'Large',
+				size: '20px',
+			},
+			{
+				slug: 'x-large',
+				name: 'Extra Large',
+				size: '24px',
+			},
+			{
+				slug: 'xx-large',
+				name: 'XX Large',
+				size: '28px',
+			},
+			{
+				slug: 'huge',
+				name: 'Huge',
+				size: '32px',
+			},
+		];
+
+		describe( 'valueMode="literal" (default)', () => {
+			it( 'should find font size by size value when valueMode is literal', async () => {
+				await render(
+					<FontSizePicker
+						fontSizes={ fontSizes }
+						value="16px"
+						valueMode="literal"
+					/>
+				);
+				// Should select the medium option (16px)
+				expect(
+					screen.getByRole( 'combobox', { name: 'Font size' } )
+				).toHaveTextContent( 'Medium' );
+			} );
+
+			it( 'should call onChange with size value and FontSize object when valueMode is literal', async () => {
+				const user = userEvent.setup();
+				const onChange = jest.fn();
+				await render(
+					<FontSizePicker
+						fontSizes={ fontSizes }
+						onChange={ onChange }
+						valueMode="literal"
+					/>
+				);
+				await user.click(
+					screen.getByRole( 'combobox', { name: 'Font size' } )
+				);
+				await user.click(
+					screen.getByRole( 'option', { name: 'Medium 16px' } )
+				);
+				expect( onChange ).toHaveBeenCalledWith(
+					'16px',
+					fontSizes[ 1 ]
+				);
+			} );
+		} );
+
+		describe( 'valueMode="slug"', () => {
+			it( 'should find font size by slug when valueMode is slug', async () => {
+				await render(
+					<FontSizePicker
+						fontSizes={ fontSizes }
+						value="medium"
+						valueMode="slug"
+					/>
+				);
+				// Should select the medium option
+				expect(
+					screen.getByRole( 'combobox', { name: 'Font size' } )
+				).toHaveTextContent( 'Medium' );
+			} );
+
+			it( 'should call onChange with size value and FontSize object when valueMode is slug', async () => {
+				const user = userEvent.setup();
+				const onChange = jest.fn();
+				await render(
+					<FontSizePicker
+						fontSizes={ fontSizes }
+						onChange={ onChange }
+						valueMode="slug"
+					/>
+				);
+				await user.click(
+					screen.getByRole( 'combobox', { name: 'Font size' } )
+				);
+				await user.click(
+					screen.getByRole( 'option', { name: 'Large 20px' } )
+				);
+				expect( onChange ).toHaveBeenCalledWith(
+					'20px',
+					fontSizes[ 2 ]
+				);
+			} );
+
+			it( 'should handle undefined value when valueMode is slug', async () => {
+				await render(
+					<FontSizePicker
+						fontSizes={ fontSizes }
+						value={ undefined }
+						valueMode="slug"
+					/>
+				);
+				// Should show default option
+				expect(
+					screen.getByRole( 'combobox', { name: 'Font size' } )
+				).toHaveTextContent( 'Default' );
+			} );
+
+			it( 'should handle empty string value when valueMode is slug', async () => {
+				await render(
+					<FontSizePicker
+						fontSizes={ fontSizes }
+						value=""
+						valueMode="slug"
+					/>
+				);
+				// Should show default option
+				expect(
+					screen.getByRole( 'combobox', { name: 'Font size' } )
+				).toHaveTextContent( 'Default' );
+			} );
+		} );
+
+		describe( 'edge cases with valueMode', () => {
+			// Use 6 font sizes to trigger select control (> 5)
+			const fontSizesWithDuplicates = [
+				{
+					slug: 'small-1',
+					name: 'Small 1',
+					size: '12px',
+				},
+				{
+					slug: 'small-2',
+					name: 'Small 2',
+					size: '12px',
+				},
+				{
+					slug: 'medium',
+					name: 'Medium',
+					size: '16px',
+				},
+				{
+					slug: 'large',
+					name: 'Large',
+					size: '20px',
+				},
+				{
+					slug: 'x-large',
+					name: 'Extra Large',
+					size: '24px',
+				},
+				{
+					slug: 'huge',
+					name: 'Huge',
+					size: '28px',
+				},
+			];
+
+			it( 'should handle multiple font sizes with same value in literal mode', async () => {
+				await render(
+					<FontSizePicker
+						fontSizes={ fontSizesWithDuplicates }
+						value="12px"
+						valueMode="literal"
+					/>
+				);
+				// Should show the first matching font size when there are multiple matches
+				expect(
+					screen.getByRole( 'combobox', { name: 'Font size' } )
+				).toHaveTextContent( 'Small 1' );
+			} );
+
+			it( 'should handle multiple font sizes with same value in slug mode', async () => {
+				await render(
+					<FontSizePicker
+						fontSizes={ fontSizesWithDuplicates }
+						value="small-1"
+						valueMode="slug"
+					/>
+				);
+				// Should select the specific font size by slug
+				expect(
+					screen.getByRole( 'combobox', { name: 'Font size' } )
+				).toHaveTextContent( 'Small 1' );
+			} );
+		} );
+	} );
+
+	describe( 'onChange callback signature', () => {
+		// Use 6 font sizes to trigger select control (> 5)
+		const fontSizes = [
+			{
+				slug: 'small',
+				name: 'Small',
+				size: '12px',
+			},
+			{
+				slug: 'medium',
+				name: 'Medium',
+				size: '16px',
+			},
+			{
+				slug: 'large',
+				name: 'Large',
+				size: '20px',
+			},
+			{
+				slug: 'x-large',
+				name: 'Extra Large',
+				size: '24px',
+			},
+			{
+				slug: 'xx-large',
+				name: 'XX Large',
+				size: '28px',
+			},
+			{
+				slug: 'huge',
+				name: 'Huge',
+				size: '32px',
+			},
+		];
+
+		it( 'should call onChange with FontSize object as second parameter for select control', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
+			await render(
+				<FontSizePicker fontSizes={ fontSizes } onChange={ onChange } />
+			);
+			await user.click(
+				screen.getByRole( 'combobox', { name: 'Font size' } )
+			);
+			await user.click(
+				screen.getByRole( 'option', { name: 'Small 12px' } )
+			);
+			expect( onChange ).toHaveBeenCalledWith( '12px', fontSizes[ 0 ] );
+		} );
+
+		it( 'should call onChange with undefined as second parameter for default option', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
+			await render(
+				<FontSizePicker
+					fontSizes={ fontSizes }
+					value="16px" // Start with a selected value
+					onChange={ onChange }
+				/>
+			);
+			await user.click(
+				screen.getByRole( 'combobox', { name: 'Font size' } )
+			);
+			await user.click(
+				screen.getByRole( 'option', { name: 'Default' } )
+			);
+			expect( onChange ).toHaveBeenCalledWith( undefined, undefined );
+		} );
+
+		it( 'should call onChange with FontSize object as second parameter for toggle group control', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
+			// Use fewer font sizes to trigger toggle group (≤ 5)
+			const toggleGroupFontSizes = [
+				{
+					slug: 'small',
+					name: 'Small',
+					size: '12px',
+				},
+				{
+					slug: 'medium',
+					name: 'Medium',
+					size: '16px',
+				},
+				{
+					slug: 'large',
+					name: 'Large',
+					size: '20px',
+				},
+			];
+			await render(
+				<FontSizePicker
+					fontSizes={ toggleGroupFontSizes }
+					onChange={ onChange }
+				/>
+			);
+			await user.click( screen.getByRole( 'radio', { name: 'Small' } ) );
+			expect( onChange ).toHaveBeenCalledWith(
+				'12px',
+				toggleGroupFontSizes[ 0 ]
+			);
+		} );
+	} );
 } );

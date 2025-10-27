@@ -31,9 +31,9 @@ import {
 	useEnableFloatingSidebar,
 } from './hooks';
 import { focusCommentThread } from './utils';
-import PluginMoreMenuItem from '../plugin-more-menu-item';
+import PostTypeSupportCheck from '../post-type-support-check';
 
-function CollabSidebarContent( {
+function NotesSidebarContent( {
 	showCommentBoard,
 	setShowCommentBoard,
 	styles,
@@ -54,8 +54,11 @@ function CollabSidebarContent( {
 			spacing="3"
 			justify="flex-start"
 			ref={ ( node ) => {
-				// Keeps the ref fresh when switching between floating and pinned sidebar.
-				commentSidebarRef.current = node;
+				// Sometimes previous sidebar unmounts after the new one mounts.
+				// This ensures we always have the latest reference.
+				if ( node ) {
+					commentSidebarRef.current = node;
+				}
 			} }
 		>
 			<AddComment
@@ -80,22 +83,14 @@ function CollabSidebarContent( {
 	);
 }
 
-/**
- * Renders the Collab sidebar.
- */
-export default function CollabSidebar() {
+function NotesSidebar( { postId, mode } ) {
 	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const commentSidebarRef = useRef( null );
 
-	const { postId } = useSelect( ( select ) => {
-		const { getCurrentPostId } = select( editorStore );
-		return {
-			postId: getCurrentPostId(),
-		};
-	}, [] );
+	const showFloatingSidebar = isLargeViewport && mode === 'post-only';
 
 	const blockCommentId = useSelect( ( select ) => {
 		const { getBlockAttributes, getSelectedBlockClientId } =
@@ -113,7 +108,10 @@ export default function CollabSidebar() {
 		reflowComments,
 		commentLastUpdated,
 	} = useBlockComments( postId );
-	useEnableFloatingSidebar( resultComments.length > 0 );
+	useEnableFloatingSidebar(
+		showFloatingSidebar &&
+			( unresolvedSortedThreads.length > 0 || showCommentBoard )
+	);
 
 	const hasMoreComments = totalPages && totalPages > 1;
 
@@ -126,18 +124,19 @@ export default function CollabSidebar() {
 		? resultComments.find( ( thread ) => thread.id === blockCommentId )
 		: null;
 
-	// If postId is not a valid number, do not render the comment sidebar.
-	if ( ! ( !! postId && typeof postId === 'number' ) ) {
-		return null;
-	}
-
 	async function openTheSidebar() {
 		const prevArea = await getActiveComplementaryArea( 'core' );
 		const activeNotesArea = SIDEBARS.find( ( name ) => name === prevArea );
 
-		// If the notes sidebar is not already active, enable the pinned sidebar.
-		if ( ! activeNotesArea ) {
-			enableComplementaryArea( 'core', collabSidebarName );
+		if ( currentThread?.status === 'approved' ) {
+			enableComplementaryArea( 'core', collabHistorySidebarName );
+		} else if ( ! activeNotesArea ) {
+			enableComplementaryArea(
+				'core',
+				showFloatingSidebar
+					? collabSidebarName
+					: collabHistorySidebarName
+			);
 		}
 
 		const currentArea = await getActiveComplementaryArea( 'core' );
@@ -167,11 +166,12 @@ export default function CollabSidebar() {
 			<AddCommentMenuItem onClick={ openTheSidebar } />
 			<PluginSidebar
 				identifier={ collabHistorySidebarName }
+				name={ collabHistorySidebarName }
 				title={ __( 'Notes' ) }
 				icon={ commentIcon }
 				closeLabel={ __( 'Close Notes' ) }
 			>
-				<CollabSidebarContent
+				<NotesSidebarContent
 					comments={ resultComments }
 					showCommentBoard={ showCommentBoard }
 					setShowCommentBoard={ setShowCommentBoard }
@@ -180,38 +180,49 @@ export default function CollabSidebar() {
 					commentLastUpdated={ commentLastUpdated }
 				/>
 			</PluginSidebar>
-			{ isLargeViewport &&
-				( unresolvedSortedThreads.length > 0 || showCommentBoard ) && (
-					<PluginSidebar
-						isPinnable={ false }
-						header={ false }
-						identifier={ collabSidebarName }
-						className="editor-collab-sidebar"
-						headerClassName="editor-collab-sidebar__header"
-						backgroundColor={ backgroundColor }
-					>
-						<CollabSidebarContent
-							comments={ unresolvedSortedThreads }
-							showCommentBoard={ showCommentBoard }
-							setShowCommentBoard={ setShowCommentBoard }
-							commentSidebarRef={ commentSidebarRef }
-							reflowComments={ reflowComments }
-							commentLastUpdated={ commentLastUpdated }
-							styles={ {
-								backgroundColor,
-							} }
-							isFloating
-						/>
-					</PluginSidebar>
-				) }
-			<PluginMoreMenuItem
-				icon={ commentIcon }
-				onClick={ () =>
-					enableComplementaryArea( 'core', collabHistorySidebarName )
-				}
-			>
-				{ __( 'Notes' ) }
-			</PluginMoreMenuItem>
+			{ isLargeViewport && (
+				<PluginSidebar
+					isPinnable={ false }
+					header={ false }
+					identifier={ collabSidebarName }
+					className="editor-collab-sidebar"
+					headerClassName="editor-collab-sidebar__header"
+					backgroundColor={ backgroundColor }
+				>
+					<NotesSidebarContent
+						comments={ unresolvedSortedThreads }
+						showCommentBoard={ showCommentBoard }
+						setShowCommentBoard={ setShowCommentBoard }
+						commentSidebarRef={ commentSidebarRef }
+						reflowComments={ reflowComments }
+						commentLastUpdated={ commentLastUpdated }
+						styles={ {
+							backgroundColor,
+						} }
+						isFloating
+					/>
+				</PluginSidebar>
+			) }
 		</>
+	);
+}
+
+export default function NotesSidebarContainer() {
+	const { postId, mode } = useSelect( ( select ) => {
+		const { getCurrentPostId, getRenderingMode } = select( editorStore );
+		return {
+			postId: getCurrentPostId(),
+			mode: getRenderingMode(),
+		};
+	}, [] );
+
+	if ( ! postId || typeof postId !== 'number' ) {
+		return null;
+	}
+
+	return (
+		<PostTypeSupportCheck supportKeys="editor.notes">
+			<NotesSidebar postId={ postId } mode={ mode } />
+		</PostTypeSupportCheck>
 	);
 }
