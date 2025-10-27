@@ -7,7 +7,7 @@
  * @phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
  */
 
-if ( $attributes['disableNavigation'] ) {
+if ( isset( $attributes['disableNavigation'] ) && $attributes['disableNavigation'] ) {
 	wp_interactivity_config(
 		'core/router',
 		array( 'clientNavigationDisabled' => true )
