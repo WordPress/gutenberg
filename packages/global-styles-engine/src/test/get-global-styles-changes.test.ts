@@ -3,7 +3,7 @@
  */
 import getGlobalStylesChanges, {
 	getGlobalStylesChangelist,
-} from '../get-global-styles-changes';
+} from '../utils/get-global-styles-changes';
 
 /**
  * WordPress dependencies

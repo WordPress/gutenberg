@@ -7,11 +7,20 @@ import memoize from 'memize';
  * WordPress dependencies
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
+// @ts-expect-error blocks package not typed yet.
 import { getBlockTypes } from '@wordpress/blocks';
 
-const globalStylesChangesCache = new Map();
-const EMPTY_ARRAY = [];
-const translationMap = {
+type TranslationMap = Record< string, string >;
+type BlockNamesMap = Record< string, string >;
+type ChangeEntry = [ string, string ];
+
+interface GetGlobalStylesChangesOptions {
+	maxResults?: number;
+}
+
+const globalStylesChangesCache = new Map< string, ChangeEntry[] >();
+const EMPTY_ARRAY: string[] = [];
+const translationMap: TranslationMap = {
 	caption: __( 'Caption' ),
 	link: __( 'Link' ),
 	button: __( 'Button' ),
@@ -31,20 +40,34 @@ const translationMap = {
 	'styles.background': __( 'Background' ),
 	'styles.typography': __( 'Typography' ),
 };
-const getBlockNames = memoize( () =>
-	getBlockTypes().reduce( ( accumulator, { name, title } ) => {
-		accumulator[ name ] = title;
-		return accumulator;
-	}, {} )
+const getBlockNames = memoize(
+	(): BlockNamesMap =>
+		getBlockTypes().reduce< BlockNamesMap >(
+			(
+				accumulator: BlockNamesMap,
+				{
+					name,
+					title,
+				}: {
+					name: string;
+					title: string;
+				}
+			) => {
+				accumulator[ name ] = title;
+				return accumulator;
+			},
+			{}
+		)
 );
-const isObject = ( obj ) => obj !== null && typeof obj === 'object';
+const isObject = ( obj: any ): obj is Record< string, any > =>
+	obj !== null && typeof obj === 'object';
 
 /**
  * Get the translation for a given global styles key.
- * @param {string} key A key representing a path to a global style property or setting.
- * @return {string|undefined}                A translated key or undefined if no translation exists.
+ * @param key A key representing a path to a global style property or setting.
+ * @return A translated key or undefined if no translation exists.
  */
-function getTranslation( key ) {
+function getTranslation( key: string ): string | undefined {
 	if ( translationMap[ key ] ) {
 		return translationMap[ key ];
 	}
@@ -65,12 +88,16 @@ function getTranslation( key ) {
 
 /**
  * A deep comparison of two objects, optimized for comparing global styles.
- * @param {Object} changedObject  The changed object to compare.
- * @param {Object} originalObject The original object to compare against.
- * @param {string} parentPath     A key/value pair object of block names and their rendered titles.
- * @return {string[]}             An array of paths whose values have changed.
+ * @param changedObject  The changed object to compare.
+ * @param originalObject The original object to compare against.
+ * @param parentPath     A key/value pair object of block names and their rendered titles.
+ * @return An array of paths whose values have changed.
  */
-function deepCompare( changedObject, originalObject, parentPath = '' ) {
+function deepCompare(
+	changedObject: any,
+	originalObject: any,
+	parentPath: string = ''
+): string | string[] | undefined {
 	// We have two non-object values to compare.
 	if ( ! isObject( changedObject ) && ! isObject( originalObject ) ) {
 		/*
@@ -91,7 +118,7 @@ function deepCompare( changedObject, originalObject, parentPath = '' ) {
 		...Object.keys( originalObject ),
 	] );
 
-	let diffs = [];
+	let diffs: string[] = [];
 	for ( const key of allKeys ) {
 		const path = parentPath ? parentPath + '.' + key : key;
 		const changedPath = deepCompare(
@@ -110,15 +137,18 @@ function deepCompare( changedObject, originalObject, parentPath = '' ) {
  * Returns an array of translated summarized global styles changes.
  * Results are cached using a Map() key of `JSON.stringify( { next, previous } )`.
  *
- * @param {Object} next     The changed object to compare.
- * @param {Object} previous The original object to compare against.
- * @return {Array[]}        A 2-dimensional array of tuples: [ "group", "translated change" ].
+ * @param next     The changed object to compare.
+ * @param previous The original object to compare against.
+ * @return A 2-dimensional array of tuples: [ "group", "translated change" ].
  */
-export function getGlobalStylesChangelist( next, previous ) {
+export function getGlobalStylesChangelist(
+	next: any,
+	previous: any
+): ChangeEntry[] {
 	const cacheKey = JSON.stringify( { next, previous } );
 
 	if ( globalStylesChangesCache.has( cacheKey ) ) {
-		return globalStylesChangesCache.get( cacheKey );
+		return globalStylesChangesCache.get( cacheKey )!;
 	}
 
 	/*
@@ -151,18 +181,25 @@ export function getGlobalStylesChangelist( next, previous ) {
 		}
 	);
 
-	if ( ! changedValueTree.length ) {
-		globalStylesChangesCache.set( cacheKey, EMPTY_ARRAY );
-		return EMPTY_ARRAY;
+	if (
+		! changedValueTree ||
+		( Array.isArray( changedValueTree ) && ! changedValueTree.length )
+	) {
+		globalStylesChangesCache.set( cacheKey, [] );
+		return [];
 	}
 
+	const changedValueArray = Array.isArray( changedValueTree )
+		? changedValueTree
+		: [ changedValueTree ];
+
 	// Remove duplicate results.
-	const result = [ ...new Set( changedValueTree ) ]
+	const result = [ ...new Set( changedValueArray ) ]
 		/*
 		 * Translate the keys.
 		 * Remove empty translations.
 		 */
-		.reduce( ( acc, curr ) => {
+		.reduce< ChangeEntry[] >( ( acc, curr ) => {
 			const translation = getTranslation( curr );
 			if ( translation ) {
 				acc.push( [ curr.split( '.' )[ 0 ], translation ] );
@@ -179,12 +216,16 @@ export function getGlobalStylesChangelist( next, previous ) {
  * From a getGlobalStylesChangelist() result, returns an array of translated global styles changes, grouped by type.
  * The types are 'blocks', 'elements', 'settings', and 'styles'.
  *
- * @param {Object}              next     The changed object to compare.
- * @param {Object}              previous The original object to compare against.
- * @param {{maxResults:number}} options  Options. maxResults: results to return before truncating.
- * @return {string[]}                    An array of translated changes.
+ * @param next     The changed object to compare.
+ * @param previous The original object to compare against.
+ * @param options  Options. maxResults: results to return before truncating.
+ * @return An array of translated changes.
  */
-export default function getGlobalStylesChanges( next, previous, options = {} ) {
+export default function getGlobalStylesChanges(
+	next: any,
+	previous: any,
+	options: GetGlobalStylesChangesOptions = {}
+): string[] {
 	let changeList = getGlobalStylesChangelist( next, previous );
 	const changesLength = changeList.length;
 	const { maxResults } = options;
@@ -195,7 +236,7 @@ export default function getGlobalStylesChanges( next, previous, options = {} ) {
 			changeList = changeList.slice( 0, maxResults );
 		}
 		return Object.entries(
-			changeList.reduce( ( acc, curr ) => {
+			changeList.reduce< Record< string, string[] > >( ( acc, curr ) => {
 				const group = acc[ curr[ 0 ] ] || [];
 				if ( ! group.includes( curr[ 1 ] ) ) {
 					acc[ curr[ 0 ] ] = [ ...group, curr[ 1 ] ];

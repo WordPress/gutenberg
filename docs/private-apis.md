@@ -81,7 +81,6 @@ Private exports:
 - `areGlobalStyleConfigsEqual`
 - `getBlockCSSSelector`
 - `getBlockSelectors`
-- `getGlobalStylesChanges`
 - `getLayoutStyles`
 - `toStyles`
 - `useGlobalSetting`

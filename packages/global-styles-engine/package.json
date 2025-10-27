@@ -41,7 +41,8 @@
 		"@wordpress/style-engine": "file:../style-engine",
 		"colord": "^2.9.2",
 		"deepmerge": "^4.3.0",
-		"is-plain-object": "^5.0.0"
+		"is-plain-object": "^5.0.0",
+		"memize": "^2.1.0"
 	},
 	"publishConfig": {
 		"access": "public"

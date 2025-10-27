@@ -25,4 +25,3 @@ export {
 	useHasBackgroundPanel,
 } from './background-panel';
 export { areGlobalStyleConfigsEqual } from './utils';
-export { default as getGlobalStylesChanges } from './get-global-styles-changes';
