@@ -133,3 +133,33 @@ function gutenberg_allow_duplicate_note_resolution( $dupe_id, $commentdata ) {
 	return $dupe_id;
 }
 add_filter( 'duplicate_comment_id', 'gutenberg_allow_duplicate_note_resolution', 10, 2 );
+
+/**
+ * Add total note count to block editor settings.
+ *
+ * Add the note count to the editor settings.
+ *
+ * @param array $settings Block editor settings.
+ * @return array Modified settings with note count.
+ */
+function gutenberg_add_note_count_to_editor_settings( $settings ) {
+	global $post;
+
+	if ( ! $post || ! is_numeric( $post->ID ) ) {
+		return $settings;
+	}
+
+	global $wpdb;
+	$total_notes = (int) $wpdb->get_var(
+		$wpdb->prepare(
+			"SELECT COUNT(*) FROM {$wpdb->comments}
+			 WHERE comment_post_ID = %d AND comment_type = 'note'",
+			$post->ID
+		)
+	);
+
+	$settings['totalNotes'] = $total_notes;
+
+	return $settings;
+}
+add_filter( 'block_editor_settings_all', 'gutenberg_add_note_count_to_editor_settings', 100 );

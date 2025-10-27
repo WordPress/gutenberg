@@ -84,8 +84,19 @@ function NotesSidebarContent( {
 }
 
 function NotesSidebar( { postId, mode } ) {
+	// Get total note count from editor settings to determine if staggered loading is needed.
+	const totalNotes = useSelect( ( select ) => {
+		const { getEditorSettings } = select( editorStore );
+		return getEditorSettings().totalNotes || 0;
+	}, [] );
+
+	// Only use staggered loading if there are 100 or more notes.
+	const shouldUseStaggeredLoad = totalNotes >= 100;
+
 	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
-	const [ isInitialLoad, setIsInitialLoad ] = useState( true );
+	const [ isInitialLoad, setIsInitialLoad ] = useState(
+		shouldUseStaggeredLoad
+	);
 	const [ cachedComments, setCachedComments ] = useState( [] );
 	const [ cachedUnresolvedThreads, setCachedUnresolvedThreads ] = useState(
 		[]
@@ -135,8 +146,14 @@ function NotesSidebar( { postId, mode } ) {
 
 	// Transition from initial load (parent comments only) to full load (all comments with replies)
 	// once the parent comments query has completed and rendered.
+	// Only runs if staggered loading is enabled (100+ notes).
 	useEffect( () => {
-		if ( isInitialLoad && hasResolved && ! isResolving ) {
+		if (
+			shouldUseStaggeredLoad &&
+			isInitialLoad &&
+			hasResolved &&
+			! isResolving
+		) {
 			// Use a timeout to ensure the browser has painted the parent comments.
 			const timeoutId = setTimeout( () => {
 				setIsInitialLoad( false );
@@ -144,7 +161,13 @@ function NotesSidebar( { postId, mode } ) {
 			}, 1000 );
 			return () => clearTimeout( timeoutId );
 		}
-	}, [ isInitialLoad, hasResolved, isResolving, reflowComments ] );
+	}, [
+		shouldUseStaggeredLoad,
+		isInitialLoad,
+		hasResolved,
+		isResolving,
+		reflowComments,
+	] );
 
 	const hasMoreComments = totalPages && totalPages > 1;
 
