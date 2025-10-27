@@ -51,8 +51,6 @@ export function AddComment( {
 	}
 
 	return (
-		// Disable reason: role="listitem" does in fact support aria-expanded.
-		// eslint-disable-next-line jsx-a11y/role-supports-aria-props
 		<VStack
 			className={ clsx(
 				'editor-collab-sidebar-panel__thread is-selected',
@@ -61,7 +59,6 @@ export function AddComment( {
 				}
 			) }
 			spacing="3"
-			tabIndex={ 0 }
 			role="listitem"
 			ref={ isFloating ? refs.setFloating : undefined }
 			style={
