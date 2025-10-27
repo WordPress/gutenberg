@@ -33,7 +33,6 @@ const icons = {
 	post,
 	page,
 	wp_template: layout,
-	wp_registered_template: layout,
 	wp_template_part: symbolFilled,
 };
 
@@ -102,6 +101,10 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 		);
 
 		const commands = useMemo( () => {
+			if ( window.location.pathname.startsWith( '/wp-admin/network/' ) ) {
+				return [];
+			}
+
 			return ( records ?? [] ).map( ( record ) => {
 				const command = {
 					name: postType + '-' + record.id,
@@ -171,7 +174,7 @@ const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 				return {
 					isBlockBasedTheme:
 						select( coreStore ).getCurrentTheme()?.is_block_theme,
-					canCreateTemplate: select( coreStore ).canUser( 'read', {
+					canCreateTemplate: select( coreStore ).canUser( 'create', {
 						kind: 'postType',
 						name: templateType,
 					} ),
@@ -201,6 +204,10 @@ const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 		}, [ records, search ] );
 
 		const commands = useMemo( () => {
+			if ( window.location.pathname.startsWith( '/wp-admin/network/' ) ) {
+				return [];
+			}
+
 			if (
 				! canCreateTemplate ||
 				( ! isBlockBasedTheme && ! templateType === 'wp_template_part' )
@@ -298,6 +305,10 @@ const getSiteEditorBasicNavigationCommands = () =>
 				};
 			}, [] );
 		const commands = useMemo( () => {
+			if ( window.location.pathname.startsWith( '/wp-admin/network/' ) ) {
+				return [];
+			}
+
 			const result = [];
 
 			if ( canCreateTemplate && isBlockBasedTheme ) {
@@ -423,6 +434,10 @@ const getGlobalStylesOpenCssCommands = () =>
 		}, [] );
 
 		const commands = useMemo( () => {
+			if ( window.location.pathname.includes( '/wp-admin/network/' ) ) {
+				return [];
+			}
+
 			if ( ! canEditCSS ) {
 				return [];
 			}
@@ -469,10 +484,6 @@ export function useSiteEditorNavigationCommands() {
 	useCommandLoader( {
 		name: 'core/edit-site/navigate-templates',
 		hook: getNavigationCommandLoaderPerTemplate( 'wp_template' ),
-	} );
-	useCommandLoader( {
-		name: 'core/edit-site/navigate-templates',
-		hook: getNavigationCommandLoaderPerTemplate( 'wp_registered_template' ),
 	} );
 	useCommandLoader( {
 		name: 'core/edit-site/navigate-template-parts',

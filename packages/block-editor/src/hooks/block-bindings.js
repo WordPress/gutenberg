@@ -509,7 +509,10 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 				</Text>
 			</ToolsPanel>
 			{ RenderModalContent && (
-				<Modal onRequestClose={ handleCloseModal }>
+				<Modal
+					onRequestClose={ handleCloseModal }
+					title={ sources[ modalState.sourceKey ]?.label }
+				>
 					<RenderModalContent
 						attribute={ modalState.attribute }
 						closeModal={ handleCloseModal }

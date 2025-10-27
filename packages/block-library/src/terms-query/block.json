@@ -1,7 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"__experimental": true,
 	"name": "core/terms-query",
 	"title": "Terms Query",
 	"category": "theme",
@@ -16,8 +15,8 @@
 				"taxonomy": "category",
 				"order": "asc",
 				"orderBy": "name",
+				"include": [],
 				"hideEmpty": true,
-				"parent": false,
 				"showNested": false,
 				"inherit": false
 			}

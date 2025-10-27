@@ -80,8 +80,8 @@ export default function TermTemplateEdit( {
 			orderBy,
 			hideEmpty,
 			showNested = false,
-			parent = 0,
 			perPage,
+			include,
 		} = {},
 	},
 	__unstableLayoutClassNames,
@@ -93,13 +93,23 @@ export default function TermTemplateEdit( {
 		hide_empty: hideEmpty,
 		order,
 		orderby: orderBy,
-		per_page: perPage,
+		// There is a mismatch between `WP_Term_Query` and the REST API parameter default
+		// values to fetch all items. In `WP_Term_Query`, the default is `''|0` and in
+		// the REST API is `-1`.
+		per_page: perPage || -1,
 	};
 
 	// Nested terms are returned by default from REST API as long as parent is not set.
 	// If we want to show nested terms, we must not set parent at all.
-	if ( parent || ! showNested ) {
-		queryArgs.parent = parent || 0;
+	if ( ! showNested && ! include?.length ) {
+		queryArgs.parent = 0;
+	}
+
+	if ( include?.length ) {
+		queryArgs.include = include;
+		// If we are using `include` update the `order` and `orderby` arguments to preserve the order.
+		queryArgs.orderby = 'include';
+		queryArgs.order = 'asc';
 	}
 
 	const { records: terms } = useEntityRecords(

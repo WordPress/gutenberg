@@ -37,10 +37,10 @@ import { useSpecificEditorSettings } from '../block-editor/use-site-editor-setti
 import PluginTemplateSettingPanel from '../plugin-template-setting-panel';
 import GlobalStylesSidebar from '../global-styles-sidebar';
 import { isPreviewingTheme } from '../../utils/is-previewing-theme';
-import {
+import StylesCanvas, {
 	getEditorCanvasContainerTitle,
 	useHasEditorCanvasContainer,
-} from '../editor-canvas-container';
+} from '../styles-canvas';
 import SaveButton from '../save-button';
 import SavePanel from '../save-panel';
 import SiteEditorMoreMenu from '../more-menu';
@@ -134,11 +134,12 @@ export default function EditSiteEditor( {
 	const { postType, postId, context } = entity;
 	const {
 		isBlockBasedTheme,
-		editorCanvasView,
+		stylesPath,
+		showStylebook,
 		currentPostIsTrashed,
 		hasSiteIcon,
 	} = useSelect( ( select ) => {
-		const { getEditorCanvasContainerView } = unlock(
+		const { getStylesPath, getShowStylebook } = unlock(
 			select( editSiteStore )
 		);
 		const { getCurrentTheme, getEntityRecord } = select( coreDataStore );
@@ -146,7 +147,8 @@ export default function EditSiteEditor( {
 
 		return {
 			isBlockBasedTheme: getCurrentTheme()?.is_block_theme,
-			editorCanvasView: getEditorCanvasContainerView(),
+			stylesPath: getStylesPath(),
+			showStylebook: getShowStylebook(),
 			currentPostIsTrashed:
 				select( editorStore ).getCurrentPostAttribute( 'status' ) ===
 				'trash',
@@ -242,7 +244,7 @@ export default function EditSiteEditor( {
 	);
 
 	// Replace the title and icon displayed in the DocumentBar when there's an overlay visible.
-	const title = getEditorCanvasContainerTitle( editorCanvasView );
+	const title = getEditorCanvasContainerTitle( stylesPath, showStylebook );
 
 	const isReady = ! isLoading;
 	const transition = {
@@ -256,6 +258,7 @@ export default function EditSiteEditor( {
 			<GlobalStylesRenderer
 				disableRootPadding={ postType !== TEMPLATE_POST_TYPE }
 			/>
+			<StylesCanvas />
 			<EditorKeyboardShortcutsRegister />
 			{ isEditMode && <BlockKeyboardShortcuts /> }
 			{ ! isReady ? <CanvasLoader id={ loadingProgressId } /> : null }

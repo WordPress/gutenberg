@@ -66,12 +66,12 @@ function useFitText( { fitText, name, clientId } ) {
 	// Any attribute may change the available space.
 	const blockAttributes = useSelect(
 		( select ) => {
-			if ( ! clientId ) {
+			if ( ! clientId || ! hasFitTextSupport || ! fitText ) {
 				return;
 			}
 			return select( blockEditorStore ).getBlockAttributes( clientId );
 		},
-		[ clientId ]
+		[ clientId, hasFitTextSupport, fitText ]
 	);
 
 	const applyFitText = useCallback( () => {
@@ -138,14 +138,14 @@ function useFitText( { fitText, name, clientId } ) {
 	// Trigger fit text recalculation when content changes
 	useEffect( () => {
 		if ( fitText && blockElement && hasFitTextSupport ) {
-			// Small delay to ensure DOM has updated after content changes
-			const timer = setTimeout( () => {
+			// Wait for next frame to ensure DOM has updated after content changes
+			const frameId = window.requestAnimationFrame( () => {
 				if ( blockElement ) {
 					applyFitText();
 				}
-			}, 1000 );
+			} );
 
-			return () => clearTimeout( timer );
+			return () => window.cancelAnimationFrame( frameId );
 		}
 	}, [
 		blockAttributes,
@@ -164,12 +164,16 @@ function useFitText( { fitText, name, clientId } ) {
  * @param {Function} props.setAttributes Function to set block attributes.
  * @param {string}   props.name          Block name.
  * @param {boolean}  props.fitText       Whether fit text is enabled.
+ * @param {string}   props.fontSize      Font size slug.
+ * @param {Object}   props.style         Block style object.
  */
 export function FitTextControl( {
 	clientId,
 	fitText = false,
 	setAttributes,
 	name,
+	fontSize,
+	style,
 } ) {
 	if ( ! hasBlockSupport( name, FIT_TEXT_SUPPORT_KEY ) ) {
 		return null;
@@ -187,13 +191,34 @@ export function FitTextControl( {
 					__nextHasNoMarginBottom
 					label={ __( 'Fit text' ) }
 					checked={ fitText }
-					onChange={ () =>
-						setAttributes( { fitText: ! fitText || undefined } )
-					}
+					onChange={ () => {
+						const newFitText = ! fitText || undefined;
+						const updates = { fitText: newFitText };
+
+						// When enabling fit text, clear font size if it has a value
+						if ( newFitText ) {
+							if ( fontSize ) {
+								updates.fontSize = undefined;
+							}
+							if ( style?.typography?.fontSize ) {
+								updates.style = {
+									...style,
+									typography: {
+										...style?.typography,
+										fontSize: undefined,
+									},
+								};
+							}
+						}
+
+						setAttributes( updates );
+					} }
 					help={
 						fitText
 							? __( 'Text will resize to fit its container.' )
-							: __( 'Resize text to fit its container.' )
+							: __(
+									'The text will resize to fit its container, resetting other font size settings.'
+							  )
 					}
 				/>
 			</ToolsPanelItem>
@@ -262,7 +287,7 @@ const hasFitTextSupport = ( blockNameOrType ) => {
 export default {
 	useBlockProps,
 	addSaveProps,
-	attributeKeys: [ 'fitText' ],
+	attributeKeys: [ 'fitText', 'fontSize', 'style' ],
 	hasSupport: hasFitTextSupport,
 	edit: FitTextControl,
 };

@@ -56,7 +56,7 @@ function PostEditForm( { postType, postId } ) {
 	);
 	const [ multiEdits, setMultiEdits ] = useState( {} );
 	const { editEntityRecord } = useDispatch( coreDataStore );
-	const { fields: _fields } = usePostFields( { postType } );
+	const _fields = usePostFields( { postType } );
 	const fields = useMemo(
 		() =>
 			_fields?.map( ( field ) => {

@@ -19,6 +19,7 @@
 		{ "path": "../dom" },
 		{ "path": "../element" },
 		{ "path": "../fields" },
+		{ "path": "../global-styles-engine" },
 		{ "path": "../hooks" },
 		{ "path": "../html-entities" },
 		{ "path": "../i18n" },

@@ -1,3 +1,7 @@
+if ( globalThis.SCRIPT_DEBUG ) {
+	await import( 'preact/debug' );
+}
+
 /**
  * External dependencies
  */
@@ -14,6 +18,7 @@ import { directive } from './hooks';
 import { getNamespace } from './namespaces';
 import { parseServerData, populateServerData } from './store';
 import { proxifyState } from './proxies';
+import { deepReadOnly, navigationSignal } from './utils';
 
 export {
 	store,
@@ -40,7 +45,9 @@ export { useState, useRef } from 'preact/hooks';
 const requiredConsent =
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.';
 
-export const privateApis = ( lock ): any => {
+export const privateApis = (
+	lock: 'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
+): any => {
 	if ( lock === requiredConsent ) {
 		return {
 			getRegionRootFragment,
@@ -56,6 +63,8 @@ export const privateApis = ( lock ): any => {
 			populateServerData,
 			batch,
 			routerRegions,
+			deepReadOnly,
+			navigationSignal,
 		};
 	}
 

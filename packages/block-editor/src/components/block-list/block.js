@@ -606,7 +606,15 @@ function BlockListBlockProvider( props ) {
 			const attributes = getBlockAttributes( clientId );
 			const { name: blockName, isValid } = blockWithoutAttributes;
 			const blockType = getBlockType( blockName );
-			const { supportsLayout, isPreviewMode } = getSettings();
+			const {
+				supportsLayout,
+				isPreviewMode,
+				__experimentalBlockBindingsSupportedAttributes,
+			} = getSettings();
+
+			const bindableAttributes =
+				__experimentalBlockBindingsSupportedAttributes?.[ blockName ];
+
 			const hasLightBlockWrapper = blockType?.apiVersion > 1;
 			const previewContext = {
 				isPreviewMode,
@@ -625,6 +633,7 @@ function BlockListBlockProvider( props ) {
 					: undefined,
 				blockTitle: blockType?.title,
 				isBlockHidden: attributes?.metadata?.blockVisibility === false,
+				bindableAttributes,
 			};
 
 			// When in preview mode, we can avoid a lot of selection and
@@ -753,6 +762,7 @@ function BlockListBlockProvider( props ) {
 		defaultClassName,
 		originalBlockClientId,
 		isBlockHidden,
+		bindableAttributes,
 	} = selectedProps;
 
 	// Users of the editor.BlockListBlock filter used to be able to
@@ -802,6 +812,7 @@ function BlockListBlockProvider( props ) {
 		themeSupportsLayout,
 		canMove,
 		isBlockHidden,
+		bindableAttributes,
 	};
 
 	if (

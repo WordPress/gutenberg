@@ -571,7 +571,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		// Get the assertive live region screen reader announcement.
 		await expect(
 			page.getByText(
-				'4 results found, use up and down arrow keys to navigate.'
+				'3 results found, use up and down arrow keys to navigate.'
 			)
 		).toBeVisible();
 	} );

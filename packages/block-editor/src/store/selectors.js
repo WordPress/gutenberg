@@ -43,7 +43,7 @@ import {
 	isSectionBlock,
 	getParentSectionBlock,
 	isZoomOut,
-	isContainerInsertableToInWriteMode,
+	isContainerInsertableToInContentOnlyMode,
 } from './private-selectors';
 
 const { isContentBlock } = unlock( blocksPrivateApis );
@@ -1682,15 +1682,7 @@ const canInsertBlockTypeUnmemoized = (
 		blockType = getBlockType( blockName );
 	}
 
-	const isLocked = !! getTemplateLock( state, rootClientId );
-	if ( isLocked ) {
-		return false;
-	}
-	const isContentRoleBlock = isContentBlock( blockName );
-	const isParentSectionBlock = !! isSectionBlock( state, rootClientId );
-	// It shouldn't be possible to insert inside a section block unless in
-	// some cases when the block is a content block.
-	if ( isParentSectionBlock && ! isContentRoleBlock ) {
+	if ( getTemplateLock( state, rootClientId ) ) {
 		return false;
 	}
 
@@ -1707,10 +1699,29 @@ const canInsertBlockTypeUnmemoized = (
 		return false;
 	}
 
-	// In write mode, check if this container allows insertion.
+	// It shouldn't be possible to insert inside a section block unless in
+	// some cases when the block is a content block.
+	const isContentRoleBlock = isContentBlock( blockName );
+	const isParentSectionBlock = !! isSectionBlock( state, rootClientId );
+	const isBlockWithinSection = !! getParentSectionBlock(
+		state,
+		rootClientId
+	);
 	if (
-		blockEditingMode === 'contentOnly' &&
-		! isContainerInsertableToInWriteMode( state, blockName, rootClientId )
+		( isParentSectionBlock || isBlockWithinSection ) &&
+		! isContentRoleBlock
+	) {
+		return false;
+	}
+
+	// In content only mode, check if this container allows insertion.
+	if (
+		( isParentSectionBlock || blockEditingMode === 'contentOnly' ) &&
+		! isContainerInsertableToInContentOnlyMode(
+			state,
+			blockName,
+			rootClientId
+		)
 	) {
 		return false;
 	}
@@ -1858,6 +1869,8 @@ export function canRemoveBlock( state, clientId ) {
 		return false;
 	}
 
+	// It shouldn't be possible to move in a section block unless in
+	// some cases when the block is a content block.
 	const isBlockWithinSection = !! getParentSectionBlock( state, clientId );
 	const isContentRoleBlock = isContentBlock(
 		getBlockName( state, clientId )
@@ -1866,21 +1879,21 @@ export function canRemoveBlock( state, clientId ) {
 		return false;
 	}
 
-	const blockEditingMode = getBlockEditingMode( state, rootClientId );
-
-	// Check if the parent container allows insertion/removal in write mode
+	const isParentSectionBlock = !! isSectionBlock( state, rootClientId );
+	const rootBlockEditingMode = getBlockEditingMode( state, rootClientId );
+	// Check if the parent container allows insertion/removal in contentOnly mode
 	if (
-		blockEditingMode === 'contentOnly' &&
-		! isContainerInsertableToInWriteMode(
+		( isParentSectionBlock || rootBlockEditingMode === 'contentOnly' ) &&
+		! isContainerInsertableToInContentOnlyMode(
 			state,
-			getBlockName( state, rootClientId ),
+			getBlockName( state, clientId ),
 			rootClientId
 		)
 	) {
 		return false;
 	}
 
-	return blockEditingMode !== 'disabled';
+	return rootBlockEditingMode !== 'disabled';
 }
 
 /**
@@ -1913,9 +1926,34 @@ export function canMoveBlock( state, clientId ) {
 	}
 
 	const rootClientId = getBlockRootClientId( state, clientId );
-	if ( getTemplateLock( state, rootClientId ) === 'all' ) {
+	const templateLock = getTemplateLock( state, rootClientId );
+	if ( templateLock === 'all' || templateLock === 'contentOnly' ) {
 		return false;
 	}
+
+	const isBlockWithinSection = !! getParentSectionBlock( state, clientId );
+	const isContentRoleBlock = isContentBlock(
+		getBlockName( state, clientId )
+	);
+	if ( isBlockWithinSection && ! isContentRoleBlock ) {
+		return false;
+	}
+
+	// If the parent is a section or is `contentOnly`, then check is the inner block
+	// should be allowed to move.
+	const isParentSectionBlock = !! isSectionBlock( state, rootClientId );
+	const rootBlockEditingMode = getBlockEditingMode( state, rootClientId );
+	if (
+		( isParentSectionBlock || rootBlockEditingMode === 'contentOnly' ) &&
+		! isContainerInsertableToInContentOnlyMode(
+			state,
+			getBlockName( state, clientId ),
+			rootClientId
+		)
+	) {
+		return false;
+	}
+
 	return getBlockEditingMode( state, rootClientId ) !== 'disabled';
 }
 

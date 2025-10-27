@@ -2,13 +2,13 @@
 @use "@wordpress/base-styles/variables" as *;
 
 .edit-site-styles {
-	.edit-site-global-styles-screen-root {
+	.global-styles-ui-screen-root {
 		box-shadow: none;
 		& > div > hr {
 			display: none;
 		}
 	}
-	.edit-site-global-styles-sidebar__navigator-provider {
+	.global-styles-ui-sidebar__navigator-provider {
 		.components-tools-panel {
 			border-top: none;
 		}
@@ -16,7 +16,7 @@
 		padding-left: 0;
 		padding-right: 0;
 
-		.edit-site-global-styles-sidebar__navigator-screen {
+		.global-styles-ui-sidebar__navigator-screen {
 			padding-top: $grid-unit-15;
 			padding-left: $grid-unit-15;
 			padding-right: $grid-unit-15;

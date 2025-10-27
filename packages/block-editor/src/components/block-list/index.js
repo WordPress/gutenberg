@@ -184,7 +184,7 @@ function Items( {
 				getTemplateLock,
 				getBlockEditingMode,
 				isSectionBlock,
-				isContainerInsertableToInWriteMode,
+				isContainerInsertableToInContentOnlyMode,
 				getBlockName,
 				isZoomOut: _isZoomOut,
 				canInsertBlockType,
@@ -223,7 +223,7 @@ function Items( {
 				isZoomOut: _isZoomOut(),
 				shouldRenderAppender:
 					( ! isSectionBlock( rootClientId ) ||
-						isContainerInsertableToInWriteMode(
+						isContainerInsertableToInContentOnlyMode(
 							getBlockName( selectedBlockClientId ),
 							rootClientId
 						) ) &&

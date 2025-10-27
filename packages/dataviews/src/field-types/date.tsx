@@ -11,7 +11,7 @@ import type {
 	SortDirection,
 	FieldTypeDefinition,
 } from '../types';
-import renderFromElements from './utils/render-from-elements';
+import RenderFromElements from './utils/render-from-elements';
 import {
 	OPERATOR_ON,
 	OPERATOR_NOT_ON,
@@ -42,8 +42,8 @@ export default {
 		custom: () => null,
 	},
 	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
-		if ( field.elements ) {
-			return renderFromElements( { item, field } );
+		if ( field.hasElements ) {
+			return <RenderFromElements item={ item } field={ field } />;
 		}
 
 		const value = field.getValue( { item } );

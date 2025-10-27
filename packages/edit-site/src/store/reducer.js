@@ -65,17 +65,34 @@ export function saveViewPanel( state = false, action ) {
 }
 
 /**
- * Reducer used to track the site editor canvas container view.
- * Default is `undefined`, denoting the default, visual block editor.
- * This could be, for example, `'style-book'` (the style book).
+ * Reducer used to track the global styles navigation state.
+ * Controls the current path within global styles UI and whether stylebook is visible.
  *
- * @param {string|undefined} state  Current state.
- * @param {Object}           action Dispatched action.
+ * @param {Object}  state               Current state.
+ * @param {string}  state.path          Current navigation path (e.g., '/', '/revisions', '/css').
+ * @param {boolean} state.showStylebook Whether the stylebook preview is visible.
+ * @param {Object}  action              Dispatched action.
  */
-function editorCanvasContainerView( state = undefined, action ) {
+function stylesNavigation(
+	state = { path: '/', showStylebook: false },
+	action
+) {
 	switch ( action.type ) {
-		case 'SET_EDITOR_CANVAS_CONTAINER_VIEW':
-			return action.view;
+		case 'SET_STYLES_PATH':
+			return {
+				...state,
+				path: action.path,
+			};
+		case 'SET_SHOW_STYLEBOOK':
+			return {
+				...state,
+				showStylebook: action.showStylebook,
+			};
+		case 'RESET_STYLES_NAVIGATION':
+			return {
+				path: '/',
+				showStylebook: false,
+			};
 	}
 
 	return state;
@@ -96,6 +113,6 @@ export default combineReducers( {
 	settings,
 	editedPost,
 	saveViewPanel,
-	editorCanvasContainerView,
+	stylesNavigation,
 	routes,
 } );
