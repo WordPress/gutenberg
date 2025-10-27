@@ -27,8 +27,8 @@ if ( isset( $attributes['derivedStateClosure'] ) && $attributes['derivedStateClo
 		array(
 			'derivedStateClosure' => function () {
 				$context = wp_interactivity_get_context();
-				return $context['value'] . "FromClosure";
-			}
+				return $context['value'] . 'FromClosure';
+			},
 		)
 	);
 
