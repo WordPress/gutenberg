@@ -203,6 +203,14 @@ export const getEntityRecord =
 									name,
 									key
 								),
+							// Save the current entity record's unsaved edits.
+							saveRecord: () => {
+								dispatch.saveEditedEntityRecord(
+									kind,
+									name,
+									key
+								);
+							},
 						}
 					);
 				}
