@@ -9,7 +9,11 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
+import {
+	InspectorControls,
+	useBlockProps,
+	RichText,
+} from '@wordpress/block-editor';
 import ServerSideRender from '@wordpress/server-side-render';
 
 /**
@@ -18,9 +22,14 @@ import ServerSideRender from '@wordpress/server-side-render';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 export default function ArchivesEdit( { attributes, setAttributes } ) {
-	const { showLabel, showPostCounts, displayAsDropdown, type } = attributes;
+	const { showLabel, label, showPostCounts, displayAsDropdown, type } =
+		attributes;
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
+	// Clone the attributes to avoid mutating the original object and add the `isEditor` property.
+	const propsAttributes = structuredClone( attributes );
+	propsAttributes.isEditor = true;
 
 	return (
 		<>
@@ -126,11 +135,24 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 				</ToolsPanel>
 			</InspectorControls>
 			<div { ...useBlockProps() }>
+				{ displayAsDropdown && showLabel && (
+					<RichText
+						tagName="label"
+						value={ label }
+						className="wp-block-archives__label"
+						// htmlFor={ instanceId }
+						onChange={ ( value ) =>
+							setAttributes( { label: value } )
+						}
+						placeholder={ __( 'Archives' ) }
+						aria-label={ __( 'Archives label' ) }
+					/>
+				) }
 				<Disabled>
 					<ServerSideRender
 						block="core/archives"
 						skipBlockSupportAttributes
-						attributes={ attributes }
+						attributes={ propsAttributes }
 					/>
 				</Disabled>
 			</div>

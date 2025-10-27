@@ -15,6 +15,14 @@
 			"type": "boolean",
 			"default": true
 		},
+		"label": {
+			"type": "string",
+			"default": ""
+		},
+		"isEditor": {
+			"type": "boolean",
+			"default": false
+		},
 		"showPostCounts": {
 			"type": "boolean",
 			"default": false
