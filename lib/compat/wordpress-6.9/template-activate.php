@@ -21,7 +21,8 @@ function gutenberg_modify_wp_template_post_type_args( $args, $post_type ) {
 //    need to deprecate /templates eventually, but we'll still want to be able
 //    to lookup the active template for a specific slug, and probably get a list
 //    of all _active_ templates. For that we can keep /lookup.
-add_action( 'rest_api_init', 'gutenberg_maintain_templates_routes' );
+// Priority 100, after `create_initial_rest_routes`.
+add_action( 'rest_api_init', 'gutenberg_maintain_templates_routes', 100 );
 
 /**
  * @global array $wp_post_types List of post types.
