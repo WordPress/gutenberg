@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { CRDT_RECORD_MAP_KEY, Y } from '@wordpress/sync';
+import {
+	CRDT_RECORD_MAP_KEY,
+	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
+	Y,
+} from '@wordpress/sync';
 
 /**
  * External dependencies
@@ -152,6 +156,55 @@ describe( 'crdt', () => {
 			const blocks = map.get( 'blocks' );
 			expect( blocks ).toBeInstanceOf( Y.Array );
 		} );
+
+		it( 'syncs meta fields', () => {
+			const changes = {
+				meta: {
+					some_meta: 'new value',
+				},
+			};
+
+			const metaMap = new Y.Map< unknown >();
+			metaMap.set( 'some_meta', 'old value' );
+			map.set( 'meta', metaMap );
+
+			applyPostChangesToCRDTDoc( doc, changes, mockPostType );
+
+			expect( metaMap.get( 'some_meta' ) ).toBe( 'new value' );
+		} );
+
+		it( 'syncs non-single meta fields', () => {
+			const changes = {
+				meta: {
+					some_meta: [ 'value', 'value 2' ],
+				},
+			};
+
+			const metaMap = new Y.Map< unknown >();
+			metaMap.set( 'some_meta', 'old value' );
+			map.set( 'meta', metaMap );
+
+			applyPostChangesToCRDTDoc( doc, changes, mockPostType );
+
+			expect( metaMap.get( 'some_meta' ) ).toStrictEqual( [
+				'value',
+				'value 2',
+			] );
+		} );
+
+		it( 'initializes meta as Y.Map when not present', () => {
+			const changes = {
+				meta: {
+					custom_field: 'value',
+				},
+			};
+
+			applyPostChangesToCRDTDoc( doc, changes, mockPostType );
+
+			const metaMap = map.get( 'meta' ) as Y.Map< unknown >;
+			expect( metaMap ).toBeInstanceOf( Y.Map );
+			expect( metaMap.get( 'custom_field' ) ).toBe( 'value' );
+		} );
 	} );
 
 	describe( 'getPostChangesFromCRDTDoc', () => {
@@ -249,6 +302,76 @@ describe( 'crdt', () => {
 			);
 
 			expect( changes ).toHaveProperty( 'blocks' );
+		} );
+
+		it( 'includes meta in changes', () => {
+			map.set( 'meta', {
+				public_meta: 'new value',
+			} );
+
+			const editedRecord = {
+				meta: {
+					public_meta: 'old value',
+				},
+			} as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				mockPostType
+			);
+
+			expect( changes.meta ).toEqual( {
+				public_meta: 'new value', // from CRDT
+			} );
+		} );
+
+		it( 'includes non-single meta in changes', () => {
+			map.set( 'meta', {
+				public_meta: [ 'value', 'value 2' ],
+			} );
+
+			const editedRecord = {
+				meta: {
+					public_meta: 'value',
+				},
+			} as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				mockPostType
+			);
+
+			expect( changes.meta ).toEqual( {
+				public_meta: [ 'value', 'value 2' ], // from CRDT
+			} );
+		} );
+
+		it( 'excludes disallowed meta keys in changes', () => {
+			map.set( 'meta', {
+				public_meta: 'new value',
+				[ WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: 'exclude me',
+			} );
+
+			const editedRecord = {
+				meta: {
+					public_meta: 'old value',
+				},
+			} as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				mockPostType
+			);
+
+			expect( changes.meta ).toEqual( {
+				public_meta: 'new value', // from CRDT
+			} );
+			expect( changes.meta ).not.toHaveProperty(
+				WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE
+			);
 		} );
 	} );
 } );
