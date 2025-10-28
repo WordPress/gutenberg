@@ -98,7 +98,7 @@ export interface SyncManager {
 		changes: Partial< ObjectData >,
 		origin: string
 	) => void;
-	updateLastPersistedDate: (
+	markPersisted: (
 		objectType: ObjectType,
 		objectId: ObjectID,
 		origin: string

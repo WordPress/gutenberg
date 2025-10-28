@@ -281,7 +281,8 @@ export const prePersistPostType = (
 				...meta,
 			};
 
-			getSyncManager()?.updateLastPersistedDate(
+			// Mark the doc as having been persisted.
+			getSyncManager()?.markPersisted(
 				objectType,
 				objectId,
 				LOCAL_EDITOR_ORIGIN

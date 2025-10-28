@@ -19,6 +19,9 @@ import {
 import { createSyncManager } from '../manager';
 import {
 	CRDT_RECORD_MAP_KEY,
+	CRDT_STATE_MAP_KEY,
+	CRDT_STATE_PERSISTED_AT_KEY,
+	CRDT_STATE_PERSISTED_BY_KEY,
 	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 } from '../config';
 import { createPersistedCRDTDoc } from '../persistence';
@@ -712,6 +715,141 @@ describe( 'SyncManager', () => {
 
 			// Should not trigger record update for local sync manager origin
 			expect( mockHandlers.editRecord ).not.toHaveBeenCalled();
+		} );
+	} );
+
+	describe( 'markPersisted', () => {
+		it( 'updates the state map with timestamp and client ID', async () => {
+			// Capture the Y.Doc from provider creator.
+			let capturedDoc: Y.Doc | null = null;
+			mockProviderCreator.mockImplementation(
+				async (
+					_objectType: string,
+					_objectId: string,
+					ydoc: Y.Doc
+				) => {
+					capturedDoc = ydoc;
+					return mockProviderResult;
+				}
+			);
+
+			const manager = createSyncManager();
+
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+
+			expect( capturedDoc ).not.toBeNull();
+			const ydoc = capturedDoc as unknown as Y.Doc;
+			const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
+
+			const beforeTime = Date.now();
+			manager.markPersisted( 'post', '123', 'test-origin' );
+			const afterTime = Date.now();
+
+			const persistedAt = stateMap.get(
+				CRDT_STATE_PERSISTED_AT_KEY
+			) as number;
+			const persistedBy = stateMap.get(
+				CRDT_STATE_PERSISTED_BY_KEY
+			) as number;
+
+			expect( persistedAt ).toBeGreaterThanOrEqual( beforeTime );
+			expect( persistedAt ).toBeLessThanOrEqual( afterTime );
+			expect( persistedBy ).toBe( ydoc.clientID );
+		} );
+
+		it( 'does not throw when entity is not loaded', () => {
+			const manager = createSyncManager();
+
+			expect( () => {
+				manager.markPersisted( 'post', '999', 'test-origin' );
+			} ).not.toThrow();
+		} );
+
+		it( 'applies changes with specified origin', async () => {
+			// Capture the Y.Doc from provider creator.
+			let capturedDoc: Y.Doc | null = null;
+			mockProviderCreator.mockImplementation(
+				async (
+					_objectType: string,
+					_objectId: string,
+					ydoc: Y.Doc
+				) => {
+					capturedDoc = ydoc;
+					return mockProviderResult;
+				}
+			);
+
+			const manager = createSyncManager();
+
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+
+			expect( capturedDoc ).not.toBeNull();
+			const ydoc = capturedDoc as unknown as Y.Doc;
+
+			let capturedOrigin: string | undefined;
+			ydoc.on( 'afterTransaction', ( transaction: Y.Transaction ) => {
+				capturedOrigin = transaction.origin as string | undefined;
+			} );
+
+			const customOrigin = 'custom-persist-origin';
+			manager.markPersisted( 'post', '123', customOrigin );
+
+			expect( capturedOrigin ).toBe( customOrigin );
+		} );
+
+		it( 'updates timestamp each time markPersisted is called', async () => {
+			// Capture the Y.Doc from provider creator.
+			let capturedDoc: Y.Doc | null = null;
+			mockProviderCreator.mockImplementation(
+				async (
+					_objectType: string,
+					_objectId: string,
+					ydoc: Y.Doc
+				) => {
+					capturedDoc = ydoc;
+					return mockProviderResult;
+				}
+			);
+
+			const manager = createSyncManager();
+
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+
+			expect( capturedDoc ).not.toBeNull();
+			const ydoc = capturedDoc as unknown as Y.Doc;
+			const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
+
+			manager.markPersisted( 'post', '123', 'test-origin' );
+			const firstTimestamp = stateMap.get(
+				CRDT_STATE_PERSISTED_AT_KEY
+			) as number;
+
+			await new Promise( ( resolve ) => setTimeout( resolve, 10 ) );
+
+			manager.markPersisted( 'post', '123', 'test-origin' );
+			const secondTimestamp = stateMap.get(
+				CRDT_STATE_PERSISTED_AT_KEY
+			) as number;
+
+			expect( secondTimestamp ).toBeGreaterThan( firstTimestamp );
 		} );
 	} );
 } );

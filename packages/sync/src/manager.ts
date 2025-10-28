@@ -308,8 +308,10 @@ export function createSyncManager(): SyncManager {
 	}
 
 	/**
-	 * Update the last persisted timestamp in the CRDT document state map. This is
-	 * used by peers as a signal that they need to refetch the persisted entity.
+	 * Update the last persisted timestamp in the CRDT document state map.
+	 *
+	 * This can be used to send notifications to other peers about when the document
+	 * was last updated.
 	 *
 	 * @param {ObjectType} objectType Object type.
 	 * @param {ObjectID}   objectId   Object ID.
@@ -348,6 +350,6 @@ export function createSyncManager(): SyncManager {
 		undoManager,
 		unload: unloadEntity,
 		update: updateCRDTDoc,
-		updateLastPersistedDate,
+		markPersisted: updateLastPersistedDate,
 	};
 }
