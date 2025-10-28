@@ -308,16 +308,16 @@ export function createSyncManager(): SyncManager {
 	}
 
 	/**
-	 * Update the last persisted timestamp in the CRDT document state map.
+	 * Update the last persisted timestamp, and the user who last persisted the document in the CRDT document state map.
 	 *
 	 * This can be used to send notifications to other peers about when the document
-	 * was last updated.
+	 * was last updated, and by whom.
 	 *
 	 * @param {ObjectType} objectType Object type.
 	 * @param {ObjectID}   objectId   Object ID.
 	 * @param {string}     origin     The source of change.
 	 */
-	function updateLastPersistedDate(
+	function recordPersistence(
 		objectType: ObjectType,
 		objectId: ObjectID,
 		origin: string
@@ -350,6 +350,6 @@ export function createSyncManager(): SyncManager {
 		undoManager,
 		unload: unloadEntity,
 		update: updateCRDTDoc,
-		markPersisted: updateLastPersistedDate,
+		markPersisted: recordPersistence,
 	};
 }
