@@ -53,8 +53,6 @@ export function deserializeCrdtDoc(
 		// Overwrite the client ID (which is from a previous session) with a random
 		// client ID. Deserialized documents should not be used directly. Instead,
 		// their state should be applied to another in-use document.
-		//
-		// eslint-disable-next-line no-restricted-syntax
 		ydoc.clientID = Math.floor( Math.random() * 1000000000 );
 
 		return ydoc;
