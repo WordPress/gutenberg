@@ -175,7 +175,7 @@ export function parseTemplateSlugWithValidation( templateSlug, getTaxonomy ) {
 		const taxonomyPart = templateSlug.substring( 9 );
 		const dashIndices = [];
 
-		// Find all dash positions
+		// Find all dash positions.
 		for ( let i = 0; i < taxonomyPart.length; i++ ) {
 			if ( taxonomyPart[ i ] === '-' ) {
 				dashIndices.push( i );
@@ -207,7 +207,7 @@ export function parseTemplateSlugWithValidation( templateSlug, getTaxonomy ) {
 			}
 		}
 
-		// If no valid split found, try the entire string as taxonomy
+		// If no valid split found, try the entire string as taxonomy.
 		const taxonomyRecord = getTaxonomy( taxonomyPart );
 		if ( taxonomyRecord ) {
 			return {
@@ -218,7 +218,7 @@ export function parseTemplateSlugWithValidation( templateSlug, getTaxonomy ) {
 			};
 		}
 
-		// No valid taxonomy found
+		// No valid taxonomy found.
 		return {
 			taxonomy: null,
 			termSlug: null,
