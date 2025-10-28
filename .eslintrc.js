@@ -92,8 +92,7 @@ const restrictedSyntax = [
 	},
 	{
 		selector: 'JSXAttribute[name.name="id"][value.type="Literal"]',
-		message:
-			'Do not use string literals for IDs; use React useId hook instead.',
+		message: 'Do not use string literals for IDs; use useId hook instead.',
 	},
 	{
 		selector:
