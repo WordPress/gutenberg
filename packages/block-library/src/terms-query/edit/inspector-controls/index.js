@@ -65,7 +65,8 @@ export default function TermsQueryInspectorControls( {
 	)?.hierarchical;
 	const inheritQuery = !! inherit;
 
-	// Display the inherit control when in a taxonomy template.
+	// Display the inherit control when we're in a taxonomy-related
+	// template (category, tag, or custom taxonomy).
 	const displayInheritControl =
 		templateContext?.taxonomy ||
 		[ 'taxonomy', 'category', 'tag', 'archive' ].includes( templateSlug ) ||
