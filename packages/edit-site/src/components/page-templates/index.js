@@ -93,7 +93,12 @@ export default function PageTemplates() {
 			combinedTemplates: false,
 		} );
 	const { records: staticRecords, isResolving: isLoadingStaticData } =
-		useEntityRecordsWithPermissions( 'root', 'registeredTemplate' );
+		useEntityRecordsWithPermissions( 'root', 'registeredTemplate', {
+			// This should not be needed, the endpoint returns all registered
+			// templates, but it's not possible right now to turn off pagination
+			// for entity configs.
+			per_page: -1,
+		} );
 
 	const activeTemplates = useMemo( () => {
 		const _active = [ ...staticRecords ];
