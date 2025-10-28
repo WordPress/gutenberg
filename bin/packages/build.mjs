@@ -936,9 +936,9 @@ async function generateScriptRegistrationPhp( scripts ) {
  * Generate PHP file for version constant.
  */
 async function generateVersionPhp() {
-	const ROOT_DIR = path.join( PACKAGES_DIR, '..' );
+	const rootDir = path.join( PACKAGES_DIR, '..' );
 	const rootPackageJson = JSON.parse(
-		await readFile( path.join( ROOT_DIR, 'package.json' ), 'utf8' )
+		await readFile( path.join( rootDir, 'package.json' ), 'utf8' )
 	);
 	const prefix = rootPackageJson.wpPlugin?.prefix || 'gutenberg';
 	const version = rootPackageJson.version;
@@ -961,7 +961,7 @@ async function generateVersionPhp() {
 		.replace( /\{\{VERSION\}\}/g, version );
 
 	// Write file
-	const buildDir = path.join( ROOT_DIR, 'build' );
+	const buildDir = path.join( rootDir, 'build' );
 	await mkdir( buildDir, { recursive: true } );
 	await writeFile(
 		path.join( buildDir, 'version.php' ),
