@@ -66,6 +66,11 @@ const CONFIG = [
 		ltr: [ componentsLtr, dataviewsLtr, fieldsLtr ],
 		rtl: [ componentsRtl, dataviewsRtl, fieldsRtl ],
 	},
+
+	// These components exclusively use logical properties, so the same
+	// stylesheet is used regardless of text direction.
+	//
+	// See: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_logical_properties_and_values
 	{
 		componentIdMatcher: /^theme-/,
 		ltr: [ theme ],
