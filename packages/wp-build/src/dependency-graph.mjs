@@ -1,3 +1,6 @@
+// console should be allowed in a build tool.
+/* eslint-disable no-console */
+
 /**
  * Dependency graph utilities for WordPress packages.
  *
@@ -14,7 +17,7 @@ import toposort from 'toposort';
 /**
  * Internal dependencies
  */
-import { getPackageInfo } from './lib/package-utils.mjs';
+import { getPackageInfo } from './package-utils.mjs';
 
 /**
  * Check if a package is a script or script module.
@@ -270,3 +273,4 @@ export {
 	getReverseDependencies,
 	findScriptsToRebundle,
 };
+/* eslint-enable no-console */
