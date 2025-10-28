@@ -61,6 +61,11 @@ function getAllPackages() {
 }
 
 const PACKAGES = getAllPackages();
+const ROOT_PACKAGE_JSON = getPackageInfoFromFile( path.join( ROOT_DIR, 'package.json' ) );
+const WP_PLUGIN_CONFIG = ROOT_PACKAGE_JSON.wpPlugin || {};
+const SCRIPT_GLOBAL = WP_PLUGIN_CONFIG.scriptGlobal;
+const PACKAGE_NAMESPACE = WP_PLUGIN_CONFIG.packageNamespace;
+
 
 const baseDefine = {
 	'globalThis.IS_GUTENBERG_PLUGIN': JSON.stringify(
@@ -76,9 +81,12 @@ const getDefine = ( scriptDebug ) => ( {
 } );
 
 /**
- * Initialize WordPress externals plugin.
+ * Initialize WordPress externals plugin with custom namespace configuration.
  */
-const wordpressExternalsPlugin = createWordpressExternalsPlugin();
+const wordpressExternalsPlugin = createWordpressExternalsPlugin(
+	PACKAGE_NAMESPACE,
+	SCRIPT_GLOBAL
+);
 
 /**
  * Create emotion babel plugin for esbuild.
@@ -263,7 +271,15 @@ async function bundlePackage( packageName ) {
 		const entryPoint = resolveEntryPoint( packageDir, packageJson );
 		const outputDir = path.join( BUILD_DIR, 'scripts', packageName );
 		const target = browserslistToEsbuild();
-		const globalName = `wp.${ camelCase( packageName ) }`;
+
+		// Check if package matches the namespace and should expose a global
+		const packageFullName = packageJson.name;
+		const matchesNamespace = packageFullName.startsWith( `@${ PACKAGE_NAMESPACE }/` );
+		const shouldExposeGlobal = matchesNamespace && SCRIPT_GLOBAL !== false;
+
+		const globalName = shouldExposeGlobal
+			? `${ SCRIPT_GLOBAL }.${ camelCase( packageName ) }`
+			: undefined;
 
 		const baseConfig = {
 			entryPoints: [ entryPoint ],
@@ -276,7 +292,7 @@ async function bundlePackage( packageName ) {
 		};
 
 		// For packages with default exports, add a footer to properly expose the default
-		if ( packageJson.wpScriptDefaultExport ) {
+		if ( packageJson.wpScriptDefaultExport && globalName ) {
 			baseConfig.footer = {
 				js: `if (typeof ${ globalName } === 'object' && ${ globalName }.default) { ${ globalName } = ${ globalName }.default; }`,
 			};

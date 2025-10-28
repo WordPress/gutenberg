@@ -126,6 +126,76 @@ Files to copy with optional PHP transformations:
 }
 ```
 
+## Root Configuration
+
+Configure your root `package.json` with a `wpPlugin` object to control global namespace and externalization behavior:
+
+### `wpPlugin.scriptGlobal`
+
+The global variable name for your packages (e.g., `"wp"`, `"myPlugin"`). Set to `false` to disable global exposure:
+
+```json
+{
+	"wpPlugin": {
+		"scriptGlobal": "myPlugin"
+	}
+}
+```
+
+### `wpPlugin.packageNamespace`
+
+The package scope to match for global exposure (without `@` prefix). Only packages matching `@{packageNamespace}/*` will expose globals:
+
+```json
+{
+	"wpPlugin": {
+		"scriptGlobal": "myPlugin",
+		"packageNamespace": "my-plugin"
+	}
+}
+```
+
+### Example: WordPress Core (Gutenberg)
+
+```json
+{
+	"wpPlugin": {
+		"scriptGlobal": "wp",
+		"packageNamespace": "wordpress"
+	}
+}
+```
+
+This configuration:
+- Packages like `@wordpress/data` expose `window.wp.data`
+- Packages like `@wordpress/block-editor` expose `window.wp.blockEditor`
+- All packages can consume `@wordpress/*` as externals
+
+### Example: Third-Party Plugin
+
+```json
+{
+	"wpPlugin": {
+		"scriptGlobal": "acme",
+		"packageNamespace": "acme"
+	}
+}
+```
+
+This configuration:
+- Packages like `@acme/editor` expose `window.acme.editor`
+- Packages like `@acme/data` expose `window.acme.data`
+- All packages can still consume `@wordpress/*` → `window.wp.*`
+- All packages can still consume vendors (react, lodash) → `window.React`, `window.lodash`
+
+### Behavior
+
+- **Packages with `wpScript: true` matching the namespace**: Bundled with global exposure
+- **Packages with `wpScript: true` not matching the namespace**: Bundled without global exposure
+- **Dependencies**: `@wordpress/*` packages are always externalized to `wp.*` globals
+- **Vendors**: React, lodash, jQuery, moment are always externalized to their standard globals
+- **Asset files**: `.asset.php` files are always generated for WordPress dependency management
+
 ## Output Structure
 
 The built tool generates several files in the `build/` directory, but the primary output is the PHP registration file.

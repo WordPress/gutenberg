@@ -15,9 +15,11 @@ import { getPackageInfo } from './package-utils.mjs';
  * This plugin handles WordPress package externals and vendor libraries,
  * treating them as external dependencies available via global variables.
  *
+ * @param {string} packageNamespace Custom package namespace (e.g., 'wordpress', 'my-plugin').
+ * @param {string|false} scriptGlobal Global variable name (e.g., 'wp', 'myPlugin') or false to disable globals.
  * @return {Function} Function that creates the esbuild plugin instance.
  */
-export function createWordpressExternalsPlugin() {
+export function createWordpressExternalsPlugin( packageNamespace, scriptGlobal ) {
 	/**
 	 * WordPress externals plugin for esbuild.
 	 *
@@ -97,6 +99,26 @@ export function createWordpressExternalsPlugin() {
 					jquery: { global: 'jQuery', handle: 'jquery' },
 				};
 
+				// Build list of package namespace configurations
+				const packageExternals = [
+					{
+						namespace: 'wordpress',
+						pattern: /^@wordpress\//,
+						globalName: 'wp',
+						handlePrefix: 'wp',
+					},
+				];
+
+				// Add custom namespace if different from wordpress and scriptGlobal is not false
+				if ( packageNamespace && packageNamespace !== 'wordpress' && scriptGlobal !== false ) {
+					packageExternals.push( {
+						namespace: packageNamespace,
+						pattern: new RegExp( `^@${ packageNamespace }/` ),
+						globalName: scriptGlobal,
+						handlePrefix: packageNamespace,
+					} );
+				}
+
 				for ( const [ packageName, config ] of Object.entries(
 					vendorExternals
 				) ) {
@@ -117,71 +139,75 @@ export function createWordpressExternalsPlugin() {
 					);
 				}
 
-				build.onResolve(
-					{ filter: /^@wordpress\// },
-					/** @param {import('esbuild').OnResolveArgs} args */
-					( args ) => {
-						// Extract package name and subpath from import
-						// e.g., '@wordpress/blocks/sub/path' → packageName='@wordpress/blocks', subpath='sub/path'
-						const parts = args.path.split( '/' );
-						let packageName = args.path;
-						let subpath = null;
-						if ( parts.length > 2 ) {
-							packageName = parts.slice( 0, 2 ).join( '/' );
-							subpath = parts.slice( 2 ).join( '/' );
-						}
-						const shortName = parts[ 1 ]; // 'blocks' from '@wordpress/blocks'
-						const wpHandle = `wp-${ shortName }`;
+				// Handle package namespace externals (wordpress and custom)
+				for ( const externalConfig of packageExternals ) {
+					build.onResolve(
+						{ filter: externalConfig.pattern },
+						/** @param {import('esbuild').OnResolveArgs} args */
+						( args ) => {
+							// Extract package name and subpath from import
+							// e.g., '@wordpress/blocks/sub/path' → packageName='@wordpress/blocks', subpath='sub/path'
+							const parts = args.path.split( '/' );
+							let packageName = args.path;
+							let subpath = null;
+							if ( parts.length > 2 ) {
+								packageName = parts.slice( 0, 2 ).join( '/' );
+								subpath = parts.slice( 2 ).join( '/' );
+							}
+							const shortName = parts[ 1 ];
+							const handle = `${ externalConfig.handlePrefix }-${ shortName }`;
 
-						const packageJson = getPackageInfo( packageName );
+							const packageJson = getPackageInfo( packageName );
 
-						if ( ! packageJson ) {
-							return undefined;
-						}
-
-						let isScriptModule = isScriptModuleImport(
-							packageJson,
-							subpath
-						);
-						let isScript = !! packageJson.wpScript;
-						if ( isScriptModule && isScript ) {
-							// If the package is both a script and a script module, rely on the format being built
-							isScript = buildFormat === 'iife';
-							isScriptModule = buildFormat === 'esm';
-						}
-
-						const kind =
-							args.kind === 'dynamic-import'
-								? 'dynamic'
-								: 'static';
-
-						if ( isScriptModule ) {
-							if ( kind === 'static' ) {
-								moduleDependencies.set( args.path, 'static' );
-							} else if (
-								! moduleDependencies.has( args.path )
-							) {
-								moduleDependencies.set( args.path, 'dynamic' );
+							if ( ! packageJson ) {
+								return undefined;
 							}
 
-							return {
-								path: args.path,
-								external: true,
-							};
+							let isScriptModule = isScriptModuleImport(
+								packageJson,
+								subpath
+							);
+							let isScript = !! packageJson.wpScript;
+							if ( isScriptModule && isScript ) {
+								// If the package is both a script and a script module, rely on the format being built
+								isScript = buildFormat === 'iife';
+								isScriptModule = buildFormat === 'esm';
+							}
+
+							const kind =
+								args.kind === 'dynamic-import'
+									? 'dynamic'
+									: 'static';
+
+							if ( isScriptModule ) {
+								if ( kind === 'static' ) {
+									moduleDependencies.set( args.path, 'static' );
+								} else if (
+									! moduleDependencies.has( args.path )
+								) {
+									moduleDependencies.set( args.path, 'dynamic' );
+								}
+
+								return {
+									path: args.path,
+									external: true,
+								};
+							}
+
+							if ( isScript ) {
+								dependencies.add( handle );
+
+								return {
+									path: args.path,
+									namespace: 'package-external',
+									pluginData: { globalName: externalConfig.globalName },
+								};
+							}
+
+							return undefined;
 						}
-
-						if ( isScript ) {
-							dependencies.add( wpHandle );
-
-							return {
-								path: args.path,
-								namespace: 'wordpress-external',
-							};
-						}
-
-						return undefined;
-					}
-				);
+					);
+				}
 
 				build.onLoad(
 					{ filter: /.*/, namespace: 'vendor-external' },
@@ -197,15 +223,17 @@ export function createWordpressExternalsPlugin() {
 				);
 
 				build.onLoad(
-					{ filter: /.*/, namespace: 'wordpress-external' },
+					{ filter: /.*/, namespace: 'package-external' },
 					/** @param {import('esbuild').OnLoadArgs} args */
 					( args ) => {
-						const wpGlobal = camelCase(
-							args.path.replace( '@wordpress/', '' )
-						);
+						const globalName = args.pluginData.globalName;
+						// Extract package name after '@namespace/' prefix
+						// e.g., '@wordpress/blocks' or '@my-plugin/data'
+						const packagePath = args.path.split( '/' ).slice( 1 ).join( '/' );
+						const camelCasedName = camelCase( packagePath );
 
 						return {
-							contents: `module.exports = window.wp.${ wpGlobal };`,
+							contents: `module.exports = window.${ globalName }.${ camelCasedName };`,
 							loader: 'js',
 						};
 					}
