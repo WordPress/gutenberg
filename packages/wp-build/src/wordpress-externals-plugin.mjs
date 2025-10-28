@@ -3,11 +3,12 @@
  */
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
+import { camelCase } from 'change-case';
 
 /**
  * Internal dependencies
  */
-import { getPackageInfo, kebabToCamelCase } from './package-utils.mjs';
+import { getPackageInfo } from './package-utils.mjs';
 
 /**
  * Create WordPress externals plugin for esbuild.
@@ -206,7 +207,7 @@ export function createWordpressExternalsPlugin() {
 					{ filter: /.*/, namespace: 'wordpress-external' },
 					/** @param {import('esbuild').OnLoadArgs} args */
 					( args ) => {
-						const wpGlobal = kebabToCamelCase(
+						const wpGlobal = camelCase(
 							args.path.replace( '@wordpress/', '' )
 						);
 

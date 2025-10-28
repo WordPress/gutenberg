@@ -23,6 +23,7 @@ import autoprefixer from 'autoprefixer';
 import rtlcss from 'rtlcss';
 import cssnano from 'cssnano';
 import babel from 'esbuild-plugin-babel';
+import { camelCase } from 'change-case';
 
 /**
  * Internal dependencies
@@ -35,7 +36,6 @@ import {
 import {
 	getPackageInfo,
 	getPackageInfoFromFile,
-	kebabToCamelCase,
 } from './package-utils.mjs';
 import { createWordpressExternalsPlugin } from './wordpress-externals-plugin.mjs';
 
@@ -269,7 +269,7 @@ async function bundlePackage( packageName ) {
 		const entryPoint = resolveEntryPoint( packageDir, packageJson );
 		const outputDir = path.join( BUILD_DIR, 'scripts', packageName );
 		const target = browserslistToEsbuild();
-		const globalName = `wp.${ kebabToCamelCase( packageName ) }`;
+		const globalName = `wp.${ camelCase( packageName ) }`;
 
 		const baseConfig = {
 			entryPoints: [ entryPoint ],

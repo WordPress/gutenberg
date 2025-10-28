@@ -69,13 +69,3 @@ export function getPackageInfoFromFile( packageJsonPath ) {
 	packagePathCache.set( packageJsonPath, packageJson );
 	return packageJson;
 }
-
-/**
- * Convert kebab-case string to camelCase.
- *
- * @param {string} str String in kebab-case format.
- * @return {string} String in camelCase format.
- */
-export function kebabToCamelCase( str ) {
-	return str.replace( /-([a-z])/g, ( _, letter ) => letter.toUpperCase() );
-}
