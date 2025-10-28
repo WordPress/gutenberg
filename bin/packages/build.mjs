@@ -668,6 +668,7 @@ async function bundlePackage( packageName ) {
 		}
 	}
 
+	let hasMainStyle = false;
 	if ( packageJson.wpScript ) {
 		const buildStyleDir = path.join( packageDir, 'build-style' );
 		const outputDir = path.join(
@@ -688,44 +689,9 @@ async function bundlePackage( packageName ) {
 			const destPath = path.join( outputDir, relativePath );
 			const destDir = path.dirname( destPath );
 
-			// Collect style metadata for auto-registration (main style.css only)
-			// Complex cases with multiple files handled manually in lib/client-assets.php
+			// Track if this package has a main style.css for auto-registration
 			if ( relativePath === 'style.css' ) {
-				// Read script asset file to get dependencies
-				const scriptAssetPath = path.join(
-					PACKAGES_DIR,
-					'..',
-					'build',
-					'scripts',
-					packageName,
-					'index.min.asset.php'
-				);
-
-				const assetContent = await readFile( scriptAssetPath, 'utf8' );
-				const depsMatch = assetContent.match(
-					/'dependencies' => array\((.*?)\)/s
-				);
-
-				let scriptDependencies = [];
-				if ( depsMatch ) {
-					const depsString = depsMatch[ 1 ];
-					scriptDependencies =
-						depsString
-							.match( /'([^']+)'/g )
-							?.map( ( d ) => d.replace( /'/g, '' ) ) || [];
-				}
-
-				// Infer style dependencies from script dependencies
-				const styleDeps = await inferStyleDependencies(
-					packageName,
-					scriptDependencies
-				);
-
-				builtStyles.push( {
-					handle: `wp-${ packageName }`,
-					path: `${ packageName }/style`,
-					dependencies: styleDeps,
-				} );
+				hasMainStyle = true;
 			}
 
 			if ( isProduction ) {
@@ -841,6 +807,46 @@ async function bundlePackage( packageName ) {
 	}
 
 	await Promise.all( builds );
+
+	// Collect style metadata after builds complete (so asset files exist)
+	// Only register the main style.css file - complex cases handled manually in lib/client-assets.php
+	if ( hasMainStyle ) {
+		// Read script asset file to get dependencies
+		const scriptAssetPath = path.join(
+			PACKAGES_DIR,
+			'..',
+			'build',
+			'scripts',
+			packageName,
+			'index.min.asset.php'
+		);
+
+		const assetContent = await readFile( scriptAssetPath, 'utf8' );
+		const depsMatch = assetContent.match(
+			/'dependencies' => array\((.*?)\)/s
+		);
+
+		let scriptDependencies = [];
+		if ( depsMatch ) {
+			const depsString = depsMatch[ 1 ];
+			scriptDependencies =
+				depsString
+					.match( /'([^']+)'/g )
+					?.map( ( d ) => d.replace( /'/g, '' ) ) || [];
+		}
+
+		// Infer style dependencies from script dependencies
+		const styleDeps = await inferStyleDependencies(
+			packageName,
+			scriptDependencies
+		);
+
+		builtStyles.push( {
+			handle: `wp-${ packageName }`,
+			path: `${ packageName }/style`,
+			dependencies: styleDeps,
+		} );
+	}
 
 	return {
 		modules: builtModules,
