@@ -30,7 +30,7 @@ test.describe( 'Site editor browser history', () => {
 		// Navigate back to the template list
 		await page.goBack();
 		await expect( page ).toHaveURL(
-			'/wp-admin/site-editor.php?p=%2Ftemplate'
+			'/wp-admin/site-editor.php?p=%2Ftemplate&activeView=user'
 		);
 
 		// Navigate back to the dashboard

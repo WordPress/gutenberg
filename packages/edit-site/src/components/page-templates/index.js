@@ -359,11 +359,6 @@ export default function PageTemplates() {
 					<duplicateAction.RenderModal
 						items={ [ selectedRegisteredTemplate ] }
 						closeModal={ () => setSelectedRegisteredTemplate() }
-						onActionPerformed={ ( [ item ] ) => {
-							history.navigate(
-								`/${ item.type }/${ item.id }?canvas=edit`
-							);
-						} }
 					/>
 				</Modal>
 			) }
