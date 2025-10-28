@@ -1060,7 +1060,6 @@ async function generateVersionPhp() {
 	);
 	const prefix = rootPackageJson.wpPlugin?.prefix || 'gutenberg';
 	const version = rootPackageJson.version;
-	// Generate version constant name: 'gutenberg' → 'GUTENBERG_VERSION'
 	const versionConstant =
 		prefix.toUpperCase().replace( /-/g, '_' ) + '_VERSION';
 
@@ -1098,6 +1097,8 @@ async function generateStyleRegistrationPhp( styles ) {
 		await readFile( path.join( ROOT_DIR, 'package.json' ), 'utf8' )
 	);
 	const prefix = rootPackageJson.wpPlugin?.prefix || 'gutenberg';
+	const versionConstant =
+		prefix.toUpperCase().replace( /-/g, '_' ) + '_VERSION';
 
 	// Read templates
 	const templatesDir = path.join( __dirname, 'templates' );
@@ -1130,10 +1131,9 @@ async function generateStyleRegistrationPhp( styles ) {
 		.replace( '{{STYLES}}', stylesArray );
 
 	// Generate registration file (logic only)
-	const registrationContent = registrationTemplate.replace(
-		/\{\{PREFIX\}\}/g,
-		prefix
-	);
+	const registrationContent = registrationTemplate
+		.replace( /\{\{PREFIX\}\}/g, prefix )
+		.replace( /\{\{VERSION_CONSTANT\}\}/g, versionConstant );
 
 	// Write files
 	const buildDir = path.join( ROOT_DIR, 'build' );
