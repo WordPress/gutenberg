@@ -69,11 +69,10 @@ function Header( {
 		const {
 			getEditorMode,
 			getCurrentPostType,
+			getStylesPath,
+			getShowStylebook,
 			isPublishSidebarOpened: _isPublishSidebarOpened,
-		} = select( editorStore );
-		const { getStylesPath, getShowStylebook } = unlock(
-			select( editorStore )
-		);
+		} = unlock( select( editorStore ) );
 		const { getBlockSelectionStart, getSectionRootClientId } = unlock(
 			select( blockEditorStore )
 		);

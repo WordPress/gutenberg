@@ -83,64 +83,52 @@ const DESIGN_POST_TYPES = [
 	'wp_navigation',
 ];
 
-function useEditorStyles( settings, ...additionalStyles ) {
-	const { hasThemeStyleSupport } = useSelect( ( select ) => {
-		return {
-			hasThemeStyleSupport:
-				select( editPostStore ).isFeatureActive( 'themeStyles' ),
-		};
-	}, [] );
+function getEditorStyles(
+	settings,
+	hasThemeStyleSupport,
+	...additionalStyles
+) {
+	const addedStyles = additionalStyles.filter( Boolean ).join( '\n' );
 
-	const addedStyles = additionalStyles.join( '\n' );
+	const presetStyles =
+		settings.styles?.filter(
+			( style ) =>
+				style.__unstableType && style.__unstableType !== 'theme'
+		) ?? [];
 
-	// Compute the default styles.
-	return useMemo( () => {
-		const presetStyles =
-			settings.styles?.filter(
-				( style ) =>
-					style.__unstableType && style.__unstableType !== 'theme'
-			) ?? [];
+	const defaultEditorStyles = [
+		...( settings?.defaultEditorStyles ?? [] ),
+		...presetStyles,
+	];
 
-		const defaultEditorStyles = [
-			...( settings?.defaultEditorStyles ?? [] ),
-			...presetStyles,
-		];
+	// Has theme styles if the theme supports them and if some styles were not preset styles (in which case they're theme styles).
+	const hasThemeStyles =
+		hasThemeStyleSupport &&
+		presetStyles.length !== ( settings.styles?.length ?? 0 );
 
-		// Has theme styles if the theme supports them and if some styles were not preset styles (in which case they're theme styles).
-		const hasThemeStyles =
-			hasThemeStyleSupport &&
-			presetStyles.length !== ( settings.styles?.length ?? 0 );
+	// If theme styles are not present or displayed, ensure that
+	// base layout styles are still present in the editor.
+	if ( ! settings.disableLayoutStyles && ! hasThemeStyles ) {
+		defaultEditorStyles.push( {
+			css: getLayoutStyles( {
+				style: {},
+				selector: 'body',
+				hasBlockGapSupport: false,
+				hasFallbackGapSupport: true,
+				fallbackGapValue: '0.5em',
+			} ),
+		} );
+	}
 
-		// If theme styles are not present or displayed, ensure that
-		// base layout styles are still present in the editor.
-		if ( ! settings.disableLayoutStyles && ! hasThemeStyles ) {
-			defaultEditorStyles.push( {
-				css: getLayoutStyles( {
-					style: {},
-					selector: 'body',
-					hasBlockGapSupport: false,
-					hasFallbackGapSupport: true,
-					fallbackGapValue: '0.5em',
-				} ),
-			} );
-		}
+	const baseStyles = hasThemeStyles
+		? settings.styles ?? []
+		: defaultEditorStyles;
 
-		const baseStyles = hasThemeStyles
-			? settings.styles ?? []
-			: defaultEditorStyles;
+	if ( addedStyles ) {
+		return [ ...baseStyles, { css: addedStyles } ];
+	}
 
-		if ( addedStyles ) {
-			return [ ...baseStyles, { css: addedStyles } ];
-		}
-
-		return baseStyles;
-	}, [
-		settings.defaultEditorStyles,
-		settings.disableLayoutStyles,
-		settings.styles,
-		hasThemeStyleSupport,
-		addedStyles,
-	] );
+	return baseStyles;
 }
 
 /**
@@ -436,6 +424,7 @@ function Layout( {
 		hasResolvedMode,
 		hasActiveMetaboxes,
 		hasBlockSelected,
+		hasThemeStyleSupport,
 		showIconLabels,
 		isDistractionFree,
 		showMetaBoxes,
@@ -485,6 +474,7 @@ function Layout( {
 						? !! _templateId
 						: defaultMode !== undefined,
 				hasBlockSelected: !! getBlockSelectionStart(),
+				hasThemeStyleSupport: isFeatureActive( 'themeStyles' ),
 				showIconLabels: get( 'core', 'showIconLabels' ),
 				isDistractionFree: get( 'core', 'distractionFree' ),
 				showMetaBoxes:
@@ -523,18 +513,22 @@ function Layout( {
 		? 'block-selection-edit'
 		: 'entity-edit';
 	useCommandContext( commandContext );
-	const styles = useEditorStyles( settings, paddingStyle );
 	const editorSettings = useMemo(
 		() => ( {
 			...settings,
-			styles,
+			styles: getEditorStyles(
+				settings,
+				hasThemeStyleSupport,
+				paddingStyle
+			),
 			onNavigateToEntityRecord,
 			onNavigateToPreviousEntityRecord,
 			defaultRenderingMode: 'post-only',
 		} ),
 		[
 			settings,
-			styles,
+			hasThemeStyleSupport,
+			paddingStyle,
 			onNavigateToEntityRecord,
 			onNavigateToPreviousEntityRecord,
 		]

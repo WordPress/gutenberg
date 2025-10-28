@@ -65,14 +65,20 @@ export default function EditorInterface( {
 		showStylebook,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
-		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
-		const { getStylesPath, getShowStylebook } = unlock(
-			select( editorStore )
-		);
+		const editorStoreSelectors = select( editorStore );
+		const {
+			getEditorSettings,
+			getPostTypeLabel,
+			getEditorMode,
+			getStylesPath,
+			getShowStylebook,
+			isInserterOpened: getIsInserterOpened,
+			isListViewOpened: getIsListViewOpened,
+		} = unlock( editorStoreSelectors );
 		const editorSettings = getEditorSettings();
 		const postTypeLabel = getPostTypeLabel();
 
-		let _mode = select( editorStore ).getEditorMode();
+		let _mode = getEditorMode();
 		if ( ! editorSettings.richEditingEnabled && _mode === 'visual' ) {
 			_mode = 'text';
 		}
@@ -82,8 +88,8 @@ export default function EditorInterface( {
 
 		return {
 			mode: _mode,
-			isInserterOpened: select( editorStore ).isInserterOpened(),
-			isListViewOpened: select( editorStore ).isListViewOpened(),
+			isInserterOpened: getIsInserterOpened(),
+			isListViewOpened: getIsListViewOpened(),
 			isDistractionFree: get( 'core', 'distractionFree' ),
 			isPreviewMode: editorSettings.isPreviewMode,
 			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
