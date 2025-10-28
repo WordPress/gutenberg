@@ -11,7 +11,6 @@
 /**
  * External dependencies
  */
-// @ts-expect-error: No types available
 import toposort from 'toposort';
 
 /**
