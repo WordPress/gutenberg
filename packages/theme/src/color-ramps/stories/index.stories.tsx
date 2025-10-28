@@ -1,14 +1,14 @@
 /**
+ * External dependencies
+ */
+import type { Meta, StoryObj } from '@storybook/react';
+
+/**
  * Internal dependencies
  */
 import { RampTable } from './ramp-table';
 import { buildBgRamp, buildAccentRamp, checkAccessibleCombinations } from '..';
 import { DEFAULT_SEED_COLORS } from '../lib/constants';
-
-/**
- * External dependencies
- */
-import type { Meta, StoryObj } from '@storybook/react';
 
 const ColorGen = ( props: {
 	background: string;
