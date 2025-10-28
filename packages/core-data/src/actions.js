@@ -712,6 +712,17 @@ export const saveEntityRecord =
 						true,
 						edits
 					);
+					// if ( window.__experimentalEnableSync && entityConfig.syncConfig ) {
+					// 	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+					// 		const objectType = `${ kind }/${ name }`;
+					// 		const objectId = recordId;
+					// 		getSyncManager()?.updateLastPersistedDate(
+					// 			objectType,
+					// 			objectId,
+					// 			LOCAL_EDITOR_ORIGIN
+					// 		);
+					// 	}
+					// }
 				}
 			} catch ( _error ) {
 				hasError = true;

@@ -98,6 +98,11 @@ export interface SyncManager {
 		changes: Partial< ObjectData >,
 		origin: string
 	) => void;
+	updateLastPersistedDate: (
+		objectType: ObjectType,
+		objectId: ObjectID,
+		origin: string
+	) => void;
 }
 
 export interface SyncUndoManager extends WPUndoManager< ObjectData > {

@@ -9,6 +9,10 @@ import * as Y from 'yjs';
 import {
 	CRDT_RECORD_MAP_KEY as RECORD_KEY,
 	LOCAL_SYNC_MANAGER_ORIGIN,
+	CRDT_STATE_MAP_KEY as STATE_KEY,
+	CRDT_STATE_PERSISTED_AT_KEY as PERSISTED_AT_KEY,
+	CRDT_STATE_RESTORED_AT_KEY as RESTORED_AT_KEY,
+	CRDT_STATE_RESTORED_BY_KEY as RESTORED_BY_KEY,
 } from './config';
 import { createPersistedCRDTDoc, getPersistedCrdtDoc } from './persistence';
 import { getProviderCreators } from './providers';
@@ -75,6 +79,7 @@ export function createSyncManager(): SyncManager {
 
 		const ydoc = createYjsDoc( { objectType } );
 		const recordMap = ydoc.getMap( RECORD_KEY );
+		const stateMap = ydoc.getMap( STATE_KEY );
 
 		// Clean up providers and in-memory state when the entity is unloaded.
 		const unload = (): void => {
@@ -139,6 +144,8 @@ export function createSyncManager(): SyncManager {
 		if ( isInvalid ) {
 			ydoc.transact( () => {
 				syncConfig.applyChangesToCRDTDoc( ydoc, record );
+				stateMap.set( RESTORED_AT_KEY, Date.now() );
+				stateMap.set( RESTORED_BY_KEY, ydoc.clientID );
 			}, LOCAL_SYNC_MANAGER_ORIGIN );
 
 			const meta = createEntityMeta( objectType, objectId );
@@ -305,11 +312,46 @@ export function createSyncManager(): SyncManager {
 		return createPersistedCRDTDoc( entityState.ydoc );
 	}
 
+	/**
+	 * Update the last persisted timestamp in the CRDT document state map. This is
+	 * used by peers as a signal that they need to refetch the persisted entity.
+	 *
+	 * @param {ObjectType} objectType Object type.
+	 * @param {ObjectID}   objectId   Object ID.
+	 * @param {string}     origin     The source of change.
+	 */
+	function updateLastPersistedDate(
+		objectType: ObjectType,
+		objectId: ObjectID,
+		origin: string
+	): void {
+		const entityId = getEntityId( objectType, objectId );
+		const entityState = entityStates.get( entityId );
+
+		if ( ! entityState ) {
+			return;
+		}
+
+		const { ydoc } = entityState;
+
+		const lastPersistedAt = Date.now();
+
+		Y.transact(
+			ydoc,
+			() => {
+				const stateMap = ydoc.getMap( 'state' );
+				stateMap.set( PERSISTED_AT_KEY, lastPersistedAt );
+			},
+			origin
+		);
+	}
+
 	return {
 		createMeta: createEntityMeta,
 		load: loadEntity,
 		undoManager,
 		unload: unloadEntity,
 		update: updateCRDTDoc,
+		updateLastPersistedDate,
 	};
 }

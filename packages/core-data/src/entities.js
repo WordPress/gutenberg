@@ -13,7 +13,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { getSyncManager } from './sync';
+import { LOCAL_EDITOR_ORIGIN, getSyncManager } from './sync';
 import {
 	applyPostChangesToCRDTDoc,
 	defaultApplyChangesToCRDTDoc,
@@ -280,6 +280,12 @@ export const prePersistPostType = (
 				...edits.meta,
 				...meta,
 			};
+
+			getSyncManager()?.updateLastPersistedDate(
+				objectType,
+				objectId,
+				LOCAL_EDITOR_ORIGIN
+			);
 		}
 	}
 
