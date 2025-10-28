@@ -146,13 +146,6 @@ function NotesSidebar( { postId, mode } ) {
 
 	return (
 		<>
-			{ blockCommentId && (
-				<CommentAvatarIndicator
-					thread={ currentThread }
-					onClick={ openTheSidebar }
-				/>
-			) }
-			<AddCommentMenuItem onClick={ openTheSidebar } />
 			<PluginSidebar
 				identifier={ collabHistorySidebarName }
 				name={ collabHistorySidebarName }
@@ -197,21 +190,5 @@ function NotesSidebar( { postId, mode } ) {
 }
 
 export default function NotesSidebarContainer() {
-	const { postId, mode } = useSelect( ( select ) => {
-		const { getCurrentPostId, getRenderingMode } = select( editorStore );
-		return {
-			postId: getCurrentPostId(),
-			mode: getRenderingMode(),
-		};
-	}, [] );
-
-	if ( ! postId || typeof postId !== 'number' ) {
-		return null;
-	}
-
-	return (
-		<PostTypeSupportCheck supportKeys="editor.notes">
-			<NotesSidebar postId={ postId } mode={ mode } />
-		</PostTypeSupportCheck>
-	);
+	return null;
 }
