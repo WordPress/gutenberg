@@ -50,7 +50,7 @@ const NonCollapsibleCardHeader = ( {
 );
 
 export function useCardHeader( layout: NormalizedCardLayout ) {
-	const { isOpened, isCollapsible } = layout;
+	const { isOpened = true, isCollapsible } = layout;
 	const [ isOpen, setIsOpen ] = useState( isOpened );
 
 	const toggle = useCallback( () => {
