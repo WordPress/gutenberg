@@ -15,6 +15,7 @@ import dataviewsLtr from '../package-styles/dataviews-ltr.lazy.scss';
 import dataviewsRtl from '../package-styles/dataviews-rtl.lazy.scss';
 import fieldsLtr from '../package-styles/fields-ltr.lazy.scss';
 import fieldsRtl from '../package-styles/fields-rtl.lazy.scss';
+import theme from '../package-styles/theme.lazy.scss';
 
 /**
  * Stylesheets to lazy load when the story's context.componentId matches the
@@ -64,6 +65,11 @@ const CONFIG = [
 		componentIdMatcher: /^fields-/,
 		ltr: [ componentsLtr, dataviewsLtr, fieldsLtr ],
 		rtl: [ componentsRtl, dataviewsRtl, fieldsRtl ],
+	},
+	{
+		componentIdMatcher: /^theme-/,
+		ltr: [ theme ],
+		rtl: [ theme ],
 	},
 ];
 
