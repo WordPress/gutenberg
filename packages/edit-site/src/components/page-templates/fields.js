@@ -157,7 +157,7 @@ export const activeField = {
 	render: function Render( { item } ) {
 		const activeLabel = item._isCustom
 			? __( 'Active when used' )
-			: __( 'Inactive' );
+			: __( 'Active' );
 		const activeIntent = item._isCustom ? 'info' : 'success';
 		const isActive = item._isActive;
 		return (
