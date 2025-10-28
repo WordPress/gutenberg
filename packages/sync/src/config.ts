@@ -27,8 +27,6 @@ export const CRDT_STATE_MAP_KEY = 'state';
 export const CRDT_STATE_VERSION_KEY = 'version';
 export const CRDT_STATE_PERSISTED_AT_KEY = 'persistedAt';
 export const CRDT_STATE_PERSISTED_BY_KEY = 'persistedBy';
-export const CRDT_STATE_RESTORED_AT_KEY = 'restoredAt';
-export const CRDT_STATE_RESTORED_BY_KEY = 'restoredBy';
 
 /**
  * Origin string for CRDT document changes originating from the local editor.
