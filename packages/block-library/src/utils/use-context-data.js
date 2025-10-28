@@ -353,6 +353,7 @@ export function useTermContext( termId = null, taxonomy = null ) {
 	return {
 		hasContext,
 		term: hasContext ? contextBasedTerm : templateBasedTerm,
+		taxonomy: hasContext ? taxonomy : fallbackTaxonomy,
 		...archiveLabels,
 	};
 }

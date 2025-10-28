@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import {
 	__experimentalToolsPanel as ToolsPanel,
@@ -45,6 +45,7 @@ export default function TermsQueryInspectorControls( {
 		include,
 	} = termQuery;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+	const [ hasAutoSetInherit, setHasAutoSetInherit ] = useState( false );
 
 	const taxonomies = usePublicTaxonomies();
 
@@ -64,22 +65,6 @@ export default function TermsQueryInspectorControls( {
 	)?.hierarchical;
 	const inheritQuery = !! inherit;
 
-	// Auto-set inherit mode and taxonomy when we have a valid template context taxonomy.
-	useEffect( () => {
-		if ( templateContext?.taxonomy && ! inherit ) {
-			setQuery( {
-				inherit: true,
-				taxonomy: templateContext.taxonomy,
-			} );
-		}
-	}, [
-		templateContext?.taxonomy,
-		inherit,
-		setQuery,
-		templateContext,
-		templateSlug,
-	] );
-
 	// Display the inherit control when in a taxonomy template.
 	const displayInheritControl =
 		templateContext?.taxonomy ||
@@ -87,6 +72,29 @@ export default function TermsQueryInspectorControls( {
 		templateSlug?.startsWith( 'taxonomy-' ) ||
 		templateSlug?.startsWith( 'category-' ) ||
 		templateSlug?.startsWith( 'tag-' );
+
+	// Auto-set inherit mode and taxonomy when we have a valid template context taxonomy.
+	useEffect( () => {
+		if (
+			templateContext?.taxonomy &&
+			! inherit &&
+			displayInheritControl &&
+			! hasAutoSetInherit
+		) {
+			setHasAutoSetInherit( true );
+			setQuery( {
+				inherit: true,
+				taxonomy: templateContext.taxonomy,
+			} );
+		}
+	}, [
+		templateContext?.taxonomy,
+		displayInheritControl,
+		inherit,
+		hasAutoSetInherit,
+		setQuery,
+	] );
+
 	// Display the showNested control if the taxonomy is hierarchical.
 	const displayShowNestedControl = isTaxonomyHierarchical;
 	const hasIncludeFilter = !! include?.length;

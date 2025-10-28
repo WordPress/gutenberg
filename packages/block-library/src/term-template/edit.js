@@ -21,6 +21,11 @@ import {
 } from '@wordpress/block-editor';
 import { useEntityRecords } from '@wordpress/core-data';
 
+/**
+ * Internal dependencies
+ */
+import { useTermContext } from '../utils/use-context-data';
+
 const TEMPLATE = [ [ 'core/term-name' ] ];
 
 function TermTemplateInnerBlocks( { classList } ) {
@@ -82,12 +87,17 @@ export default function TermTemplateEdit( {
 			showNested = false,
 			perPage,
 			include,
+			inherit = false,
 		} = {},
 	},
 	__unstableLayoutClassNames,
 } ) {
 	const { type: layoutType, columnCount = 3 } = layout || {};
 	const [ activeBlockContextId, setActiveBlockContextId ] = useState();
+
+	// Get current term context for inherit mode.
+	const termContext = useTermContext();
+	const { term: currentTerm, taxonomy: contextTaxonomy } = termContext;
 
 	const queryArgs = {
 		hide_empty: hideEmpty,
@@ -99,17 +109,32 @@ export default function TermTemplateEdit( {
 		per_page: perPage || -1,
 	};
 
-	// Nested terms are returned by default from REST API as long as parent is not set.
-	// If we want to show nested terms, we must not set parent at all.
-	if ( ! showNested && ! include?.length ) {
-		queryArgs.parent = 0;
-	}
+	const inheritQuery = Boolean( inherit && currentTerm && contextTaxonomy );
 
-	if ( include?.length ) {
-		queryArgs.include = include;
-		// If we are using `include` update the `order` and `orderby` arguments to preserve the order.
-		queryArgs.orderby = 'include';
-		queryArgs.order = 'asc';
+	if ( inheritQuery ) {
+		queryArgs.taxonomy = contextTaxonomy;
+
+		// For hierarchical taxonomies, show the current term and its children.
+		if (
+			currentTerm.taxonomy &&
+			currentTerm.taxonomy === contextTaxonomy
+		) {
+			queryArgs.include = [ currentTerm.id ];
+		}
+	} else {
+		queryArgs.taxonomy = taxonomy;
+
+		// If we are including specific terms we ignore `showNested` argument.
+		if ( include?.length ) {
+			queryArgs.include = include;
+			// If we are using `include` update the `order` and `orderby` arguments to preserve the order.
+			queryArgs.orderby = 'include';
+			queryArgs.order = 'asc';
+		} else if ( ! showNested ) {
+			// Nested terms are returned by default from REST API as long as parent is not set.
+			// If we want to show nested terms, we must not set parent at all.
+			queryArgs.parent = 0;
+		}
 	}
 
 	const { records: terms } = useEntityRecords(
