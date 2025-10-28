@@ -7,11 +7,6 @@ import { useMemo } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
@@ -51,8 +46,6 @@ const CommentAvatarIndicator = ( { onClick, thread, hasMoreComments } ) => {
 
 		return Array.from( participantsMap.values() );
 	}, [ thread ] );
-
-	const hasUnresolved = thread?.status !== 'approved';
 
 	// Check if this specific thread has more participants due to pagination.
 	// If we have pagination AND this thread + its replies equals or exceeds the API limit,
@@ -95,9 +88,7 @@ const CommentAvatarIndicator = ( { onClick, thread, hasMoreComments } ) => {
 	return (
 		<CommentIconToolbarSlotFill.Fill>
 			<ToolbarButton
-				className={ clsx( 'comment-avatar-indicator', {
-					'has-unresolved': hasUnresolved,
-				} ) }
+				className="comment-avatar-indicator"
 				label={ __( 'View notes' ) }
 				onClick={ onClick }
 				showTooltip
