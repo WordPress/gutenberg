@@ -60,5 +60,5 @@ export async function generatePhpFromTemplate(
 
 	// Write output file
 	await mkdir( path.dirname( outputPath ), { recursive: true } );
-	await writeFile( outputPath, content, 'utf8' );
+	await writeFile( outputPath, content );
 }
