@@ -163,21 +163,6 @@ describe( 'parseTemplateSlugWithValidation', () => {
 		} );
 	} );
 
-	it( 'should return null values when taxonomy does not exist', () => {
-		mockGetTaxonomy.mockReturnValue( null );
-
-		const result = parseTemplateSlugWithValidation(
-			'taxonomy-nonexistent-taxonomy',
-			mockGetTaxonomy
-		);
-		expect( result ).toEqual( {
-			taxonomy: null,
-			termSlug: null,
-			isAuthor: false,
-			authorSlug: null,
-		} );
-	} );
-
 	it( 'should handle author patterns without validation', () => {
 		mockGetTaxonomy.mockReturnValue( null );
 
@@ -208,108 +193,7 @@ describe( 'parseTemplateSlugWithValidation', () => {
 		} );
 	} );
 
-	it( 'should handle custom taxonomy with slug "tag"', () => {
-		const result = parseTemplateSlug( 'taxonomy-tag' );
-		expect( result ).toEqual( {
-			taxonomy: 'tag',
-			termSlug: null,
-			isAuthor: false,
-			authorSlug: null,
-		} );
-	} );
-
-	it( 'should handle custom taxonomy with slug "category"', () => {
-		const result = parseTemplateSlug( 'taxonomy-category' );
-		expect( result ).toEqual( {
-			taxonomy: 'category',
-			termSlug: null,
-			isAuthor: false,
-			authorSlug: null,
-		} );
-	} );
-
-	it( 'should handle custom taxonomy with hyphens in both taxonomy and term', () => {
-		const result = parseTemplateSlug(
-			'taxonomy-product-category-electronics-gadgets'
-		);
-		expect( result ).toEqual( {
-			taxonomy: 'product-category-electronics',
-			termSlug: 'gadgets',
-			isAuthor: false,
-			authorSlug: null,
-		} );
-	} );
-
-	it( 'should handle single-character taxonomy names', () => {
-		const result = parseTemplateSlug( 'taxonomy-x' );
-		expect( result ).toEqual( {
-			taxonomy: 'x',
-			termSlug: null,
-			isAuthor: false,
-			authorSlug: null,
-		} );
-	} );
-
-	it( 'should handle single-character term slugs', () => {
-		const result = parseTemplateSlug( 'taxonomy-product-category-x' );
-		expect( result ).toEqual( {
-			taxonomy: 'product-category',
-			termSlug: 'x',
-			isAuthor: false,
-			authorSlug: null,
-		} );
-	} );
-
-	it( 'should handle edge case with multiple consecutive dashes', () => {
-		const result = parseTemplateSlug( 'taxonomy-product--category' );
-		expect( result ).toEqual( {
-			taxonomy: 'product-',
-			termSlug: 'category',
-			isAuthor: false,
-			authorSlug: null,
-		} );
-	} );
-
-	it( 'should handle edge case with leading/trailing dashes', () => {
-		const result = parseTemplateSlug( 'taxonomy--product-category--' );
-		expect( result ).toEqual( {
-			taxonomy: '-product-category-',
-			termSlug: '',
-			isAuthor: false,
-			authorSlug: null,
-		} );
-	} );
-} );
-
-describe( 'parseTemplateSlugWithValidation - complex taxonomy scenarios', () => {
-	const mockGetTaxonomy = jest.fn();
-
-	beforeEach( () => {
-		mockGetTaxonomy.mockClear();
-	} );
-
-	it( 'should handle coffee_type taxonomy with complex term', () => {
-		mockGetTaxonomy.mockImplementation( ( taxonomy ) => {
-			if ( taxonomy === 'coffee_type' ) {
-				return { name: 'Coffee Type' };
-			}
-			return null;
-		} );
-
-		const result = parseTemplateSlugWithValidation(
-			'taxonomy-coffee_type-flat-white',
-			mockGetTaxonomy
-		);
-
-		expect( result ).toEqual( {
-			taxonomy: 'coffee_type',
-			termSlug: 'flat-white',
-			isAuthor: false,
-			authorSlug: null,
-		} );
-	} );
-
-	it( 'should handle product-category taxonomy with complex term', () => {
+	it( 'should handle custom taxonomy with validation', () => {
 		mockGetTaxonomy.mockImplementation( ( taxonomy ) => {
 			if ( taxonomy === 'product-category' ) {
 				return { name: 'Product Category' };
@@ -321,10 +205,24 @@ describe( 'parseTemplateSlugWithValidation - complex taxonomy scenarios', () => 
 			'taxonomy-product-category-electronics-gadgets',
 			mockGetTaxonomy
 		);
-
 		expect( result ).toEqual( {
 			taxonomy: 'product-category',
 			termSlug: 'electronics-gadgets',
+			isAuthor: false,
+			authorSlug: null,
+		} );
+	} );
+
+	it( 'should return null values when taxonomy does not exist', () => {
+		mockGetTaxonomy.mockReturnValue( null );
+
+		const result = parseTemplateSlugWithValidation(
+			'taxonomy-nonexistent-taxonomy',
+			mockGetTaxonomy
+		);
+		expect( result ).toEqual( {
+			taxonomy: null,
+			termSlug: null,
 			isAuthor: false,
 			authorSlug: null,
 		} );
@@ -345,22 +243,6 @@ describe( 'parseTemplateSlugWithValidation - complex taxonomy scenarios', () => 
 
 		expect( result ).toEqual( {
 			taxonomy: 'coffee_type-flat-white',
-			termSlug: null,
-			isAuthor: false,
-			authorSlug: null,
-		} );
-	} );
-
-	it( 'should return null if no valid taxonomy found', () => {
-		mockGetTaxonomy.mockReturnValue( null );
-
-		const result = parseTemplateSlugWithValidation(
-			'taxonomy-nonexistent-taxonomy',
-			mockGetTaxonomy
-		);
-
-		expect( result ).toEqual( {
-			taxonomy: null,
 			termSlug: null,
 			isAuthor: false,
 			authorSlug: null,
