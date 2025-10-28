@@ -1,8 +1,5 @@
 #!/usr/bin/env node
 
-// console should be allowed in a build tool.
-/* eslint-disable no-console */
-
 /**
  * External dependencies
  */
@@ -1326,4 +1323,3 @@ main().catch( ( error ) => {
 	console.error( '❌ Build failed:', error );
 	process.exit( 1 );
 } );
-/* eslint-enable no-console */

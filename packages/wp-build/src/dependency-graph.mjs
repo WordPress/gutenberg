@@ -1,6 +1,3 @@
-// console should be allowed in a build tool.
-/* eslint-disable no-console */
-
 /**
  * Dependency graph utilities for WordPress packages.
  *
@@ -272,4 +269,3 @@ export {
 	getReverseDependencies,
 	findScriptsToRebundle,
 };
-/* eslint-enable no-console */
