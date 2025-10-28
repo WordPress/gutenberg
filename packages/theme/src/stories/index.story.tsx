@@ -17,7 +17,7 @@ import {
 /**
  * Internal dependencies
  */
-import { ThemeProvider } from './theme-provider';
+import { ThemeProvider } from '../theme-provider';
 
 const meta: Meta< typeof ThemeProvider > = {
 	title: 'Design System/Theme Provider',
