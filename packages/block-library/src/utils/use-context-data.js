@@ -162,6 +162,15 @@ export function parseTemplateSlug( templateSlug ) {
  * @return {Object} Object containing taxonomy, termSlug, isAuthor, and authorSlug.
  */
 export function parseTemplateSlugWithValidation( templateSlug, getTaxonomy ) {
+	if ( ! templateSlug ) {
+		return {
+			taxonomy: null,
+			termSlug: null,
+			isAuthor: false,
+			authorSlug: null,
+		};
+	}
+
 	if ( templateSlug.startsWith( 'taxonomy-' ) ) {
 		const taxonomyPart = templateSlug.substring( 9 );
 		const dashIndices = [];
