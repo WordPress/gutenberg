@@ -18,7 +18,7 @@ const zip = new AdmZip();
 const zipRootFolderArg = getArgFromCLI( '--root-folder' );
 const noRootFolderArg = getArgFromCLI( '--no-root-folder' );
 let zipRootFolder = `${ name }/`;
-let files = [];
+let files;
 
 if ( hasPackageProp( 'files' ) ) {
 	stdout.write(

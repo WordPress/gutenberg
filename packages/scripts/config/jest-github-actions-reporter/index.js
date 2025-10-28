@@ -14,7 +14,7 @@
 
 const newLine = /\n/g;
 const encodedNewLine = '%0A';
-const lineAndColumnInStackTrace = /^.*?:([0-9]+):([0-9]+).*$/;
+const lineAndColumnInStackTrace = /^.*?:(\d+):(\d+).*$/;
 
 class GithubActionsReporter {
 	async onRunComplete( _contexts, _aggregatedResults ) {

@@ -66,6 +66,7 @@ async function readConfig() {
 	return merge( {}, defaultConfig, localConfig );
 }
 
+// TODO: puppeteer now supports FireFox, this needs updating: https://hacks.mozilla.org/2024/08/puppeteer-support-for-firefox/
 function getPuppeteer( { browser } ) {
 	switch ( browser.toLowerCase() ) {
 		case 'chromium':
