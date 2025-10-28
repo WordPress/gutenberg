@@ -36,7 +36,7 @@ export default {
 		return field.hasElements ? (
 			<RenderFromElements item={ item } field={ field } />
 		) : (
-			field.getValue( { item } )
+			new Date( field.getValue( { item } ) ).toLocaleString()
 		);
 	},
 	enableSorting: true,
