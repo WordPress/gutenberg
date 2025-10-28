@@ -17,6 +17,7 @@
 -   `Tabs`: Replace `rem` with `px` in tablist overflow fade ([#72669](https://github.com/WordPress/gutenberg/pull/72669)).
 -   `Modal`: Replace `rem` in heading text with a standard `px` value ([#72669](https://github.com/WordPress/gutenberg/pull/72669)).
 -   Validated form controls: Replace `rem` with `px` in error message ([#72669](https://github.com/WordPress/gutenberg/pull/72669)).
+-   `FocalPointPicker`: Fix label markup ([#70835](https://github.com/WordPress/gutenberg/pull/70835)).
 
 ## 30.6.0 (2025-10-17)
 

@@ -13,6 +13,7 @@ import {
 	__experimentalUseDragging as useDragging,
 	useIsomorphicLayoutEffect,
 } from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -108,6 +109,14 @@ export function FocalPointPicker( {
 }: WordPressComponentProps< FocalPointPickerProps, 'div', false > ) {
 	const [ point, setPoint ] = useState( valueProp );
 	const [ showGridOverlay, setShowGridOverlay ] = useState( false );
+
+	if ( ! __nextHasNoMarginBottom ) {
+		deprecated( 'Bottom margin styles for wp.components.FocalPointPicker', {
+			since: '6.7',
+			version: '7.0',
+			hint: 'Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version.',
+		} );
+	}
 
 	const { startDrag, endDrag, isDragging } = useDragging( {
 		onDragStart: ( event ) => {
