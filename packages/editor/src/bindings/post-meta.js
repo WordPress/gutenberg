@@ -77,10 +77,6 @@ function getValue( { select, context, args } ) {
 export default {
 	name: 'core/post-meta',
 	getValues( { select, context, bindings } ) {
-		if ( ! context?.postType || ! context?.postId ) {
-			return {};
-		}
-
 		const newValues = {};
 		for ( const [ attributeName, binding ] of Object.entries( bindings ) ) {
 			newValues[ attributeName ] = getValue( {
