@@ -33,10 +33,7 @@ import {
 	generatePhpFromTemplate,
 	getPhpReplacements,
 } from './php-generator.mjs';
-import {
-	getPackageInfo,
-	getPackageInfoFromFile,
-} from './package-utils.mjs';
+import { getPackageInfo, getPackageInfoFromFile } from './package-utils.mjs';
 import { createWordpressExternalsPlugin } from './wordpress-externals-plugin.mjs';
 
 const ROOT_DIR = process.cwd();
@@ -623,11 +620,10 @@ async function inferStyleDependencies( scriptDependencies ) {
 /**
  * Generate PHP files for script module registration.
  *
- * @param {Array} modules Array of module info objects.
+ * @param {Array}                  modules      Array of module info objects.
+ * @param {Record<string, string>} replacements PHP template replacements.
  */
-async function generateModuleRegistrationPhp( modules ) {
-	const replacements = await getPhpReplacements( ROOT_DIR );
-
+async function generateModuleRegistrationPhp( modules, replacements ) {
 	// Generate modules array for registry
 	const modulesArray = modules
 		.map(
@@ -657,11 +653,10 @@ async function generateModuleRegistrationPhp( modules ) {
 /**
  * Generate PHP files for script registration.
  *
- * @param {Array} scripts Array of script info objects.
+ * @param {Array}                  scripts      Array of script info objects.
+ * @param {Record<string, string>} replacements PHP template replacements.
  */
-async function generateScriptRegistrationPhp( scripts ) {
-	const replacements = await getPhpReplacements( ROOT_DIR );
-
+async function generateScriptRegistrationPhp( scripts, replacements ) {
 	// Generate scripts array for registry
 	const scriptsArray = scripts
 		.map(
@@ -690,10 +685,10 @@ async function generateScriptRegistrationPhp( scripts ) {
 
 /**
  * Generate PHP file for version constant.
+ *
+ * @param {Record<string, string>} replacements PHP template replacements.
  */
-async function generateVersionPhp() {
-	const replacements = await getPhpReplacements( ROOT_DIR );
-
+async function generateVersionPhp( replacements ) {
 	await generatePhpFromTemplate(
 		'version.php.template',
 		path.join( BUILD_DIR, 'version.php' ),
@@ -704,11 +699,10 @@ async function generateVersionPhp() {
 /**
  * Generate PHP files for style registration.
  *
- * @param {Array} styles Array of style info objects.
+ * @param {Array}                  styles       Array of style info objects.
+ * @param {Record<string, string>} replacements PHP template replacements.
  */
-async function generateStyleRegistrationPhp( styles ) {
-	const replacements = await getPhpReplacements( ROOT_DIR );
-
+async function generateStyleRegistrationPhp( styles, replacements ) {
 	// Generate styles array for registry
 	const stylesArray = styles
 		.map(
@@ -739,10 +733,10 @@ async function generateStyleRegistrationPhp( styles ) {
 
 /**
  * Generate main index.php that loads both modules and scripts.
+ *
+ * @param {Record<string, string>} replacements PHP template replacements.
  */
-async function generateMainIndexPhp() {
-	const replacements = await getPhpReplacements( ROOT_DIR );
-
+async function generateMainIndexPhp( replacements ) {
 	await generatePhpFromTemplate(
 		'index.php.template',
 		path.join( BUILD_DIR, 'index.php' ),
@@ -1149,12 +1143,13 @@ async function buildAll() {
 	);
 
 	console.log( '\n📄 Generating PHP registration files...\n' );
+	const phpReplacements = await getPhpReplacements( ROOT_DIR );
 	await Promise.all( [
-		generateMainIndexPhp(),
-		generateModuleRegistrationPhp( modules ),
-		generateScriptRegistrationPhp( scripts ),
-		generateStyleRegistrationPhp( styles ),
-		generateVersionPhp(),
+		generateMainIndexPhp( phpReplacements ),
+		generateModuleRegistrationPhp( modules, phpReplacements ),
+		generateScriptRegistrationPhp( scripts, phpReplacements ),
+		generateStyleRegistrationPhp( styles, phpReplacements ),
+		generateVersionPhp( phpReplacements ),
 	] );
 	console.log( '   ✔ Generated build/modules.php' );
 	console.log( '   ✔ Generated build/modules/index.php' );
