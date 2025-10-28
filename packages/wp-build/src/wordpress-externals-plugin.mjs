@@ -124,14 +124,12 @@ export function createWordpressExternalsPlugin() {
 						// Extract package name and subpath from import
 						// e.g., '@wordpress/blocks/sub/path' → packageName='@wordpress/blocks', subpath='sub/path'
 						const parts = args.path.split( '/' );
-						const packageName =
-							parts.length >= 2
-								? `${ parts[ 0 ] }/${ parts[ 1 ] }`
-								: args.path;
-						const subpath =
-							parts.length > 2
-								? parts.slice( 2 ).join( '/' )
-								: null;
+						let packageName = args.path;
+						let subpath = null;
+						if ( parts.length > 2 ) {
+							packageName = parts.slice( 0, 2 ).join( '/' );
+							subpath = parts.slice( 2 ).join( '/' );
+						}
 						const shortName = parts[ 1 ]; // 'blocks' from '@wordpress/blocks'
 						const wpHandle = `wp-${ shortName }`;
 
