@@ -9,6 +9,7 @@ import { fileURLToPath } from 'url';
  * Cache is keyed by the full package name from package.json's name field.
  */
 const packageJsonCache = new Map();
+const packagePathCache = new Map();
 
 /**
  * @typedef  {Object} PackageJson
@@ -46,19 +47,11 @@ export function getPackageInfo( fullPackageName ) {
 		return packageJsonCache.get( fullPackageName );
 	}
 
-	try {
-		const resolved = import.meta.resolve(
-			`${ fullPackageName }/package.json`
-		);
-		const packageJson = JSON.parse(
-			readFileSync( fileURLToPath( resolved ), 'utf8' )
-		);
-		packageJsonCache.set( packageJson.name, packageJson );
-		return packageJson;
-	} catch ( error ) {
-		packageJsonCache.set( fullPackageName, null );
-		return null;
-	}
+	const resolved = import.meta.resolve( `${ fullPackageName }/package.json` );
+	const result = getPackageInfoFromFile( fileURLToPath( resolved ) );
+	packageJsonCache.set( fullPackageName, result );
+
+	return result;
 }
 
 /**
@@ -69,16 +62,12 @@ export function getPackageInfo( fullPackageName ) {
  * @return {PackageJson|null} Package.json object or null if not found.
  */
 export function getPackageInfoFromFile( packageJsonPath ) {
-	try {
-		const packageJson = JSON.parse(
-			readFileSync( packageJsonPath, 'utf8' )
-		);
-		// Cache by the actual name from package.json
-		packageJsonCache.set( packageJson.name, packageJson );
-		return packageJson;
-	} catch ( error ) {
-		return null;
+	if ( packagePathCache.has( packageJsonPath ) ) {
+		return packagePathCache.get( packageJsonPath );
 	}
+	const packageJson = JSON.parse( readFileSync( packageJsonPath, 'utf8' ) );
+	packagePathCache.set( packageJsonPath, packageJson );
+	return packageJson;
 }
 
 /**
