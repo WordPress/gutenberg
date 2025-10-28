@@ -5,6 +5,11 @@ import { readFile, writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+/**
+ * Internal dependencies
+ */
+import { getPackageInfoFromFile } from './package-utils.mjs';
+
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
 
 /**
@@ -14,9 +19,14 @@ const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
  * @return {Promise<Record<string, string>>} Replacements object with {{PREFIX}}, {{VERSION}}, {{VERSION_CONSTANT}}.
  */
 export async function getPhpReplacements( rootDir ) {
-	const rootPackageJson = JSON.parse(
-		await readFile( path.join( rootDir, 'package.json' ), 'utf8' )
+	const rootPackageJson = getPackageInfoFromFile(
+		path.join( rootDir, 'package.json' )
 	);
+	if ( ! rootPackageJson ) {
+		throw new Error( 'Could not read root package.json' );
+	}
+
+	// @ts-expect-error specific override to package.json
 	const prefix = rootPackageJson.wpPlugin?.prefix || 'gutenberg';
 	const version = rootPackageJson.version;
 	const versionConstant =
@@ -53,9 +63,7 @@ export async function generatePhpFromTemplate(
 	// Apply all replacements
 	let content = template;
 	for ( const [ placeholder, value ] of Object.entries( replacements ) ) {
-		// Use regex to replace all occurrences (like /{{PREFIX}}/g)
-		const regex = new RegExp( placeholder.replace( /[{}]/g, '\\$&' ), 'g' );
-		content = content.replace( regex, value );
+		content = content.replaceAll( placeholder, value );
 	}
 
 	// Write output file
