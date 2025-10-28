@@ -494,10 +494,21 @@ export default function Filter( {
 			return filterInView?.value?.includes( element.value );
 		} );
 	} else if ( filterInView?.value !== undefined ) {
+		const field = fields.find( ( f ) => f.id === filter.field );
+		let label = filterInView.value;
+
+		if ( field?.type === 'datetime' && typeof label === 'string' ) {
+			try {
+				label = new Date( label ).toLocaleString();
+			} catch ( e ) {
+				label = filterInView.value;
+			}
+		}
+
 		activeElements = [
 			{
 				value: filterInView.value,
-				label: filterInView.value,
+				label,
 			},
 		];
 	}
