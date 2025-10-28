@@ -1,5 +1,5 @@
 .heroLogo {
-	padding-bottom: 3rem;
+	padding-block-end: 3rem;
 }
 
 .heroTitle {
@@ -20,7 +20,7 @@
 	display: flex;
 	flex-direction: column;
 	gap: 1rem;
-	max-width: 800px;
+	max-inline-size: 800px;
 	padding: 5rem 0;
 }
 

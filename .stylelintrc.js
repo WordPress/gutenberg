@@ -1,6 +1,7 @@
 /** @type {import('stylelint').Config} */
 module.exports = {
 	extends: '@wordpress/stylelint-config/scss-stylistic',
+	plugins: [ 'stylelint-plugin-logical-css' ],
 	rules: {
 		'at-rule-empty-line-before': null,
 		'at-rule-no-unknown': null,
@@ -48,5 +49,13 @@ module.exports = {
 		'scss/at-if-closing-brace-space-after': null,
 		'no-invalid-position-at-import-rule': null,
 	},
+	overrides: [
+		{
+			files: [ '**/*.module.css' ],
+			rules: {
+				'plugin/use-logical-properties-and-values': true,
+			},
+		},
+	],
 	reportDescriptionlessDisables: true,
 };
