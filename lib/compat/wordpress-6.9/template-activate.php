@@ -8,7 +8,7 @@ require_once __DIR__ . '/class-gutenberg-rest-old-templates-controller.php';
 add_filter( 'register_post_type_args', 'gutenberg_modify_wp_template_post_type_args', 10, 2 );
 function gutenberg_modify_wp_template_post_type_args( $args, $post_type ) {
 	if ( 'wp_template' === $post_type ) {
-		$args['rest_base']                       = 'wp_template';
+		$args['rest_base']                       = 'created-templates';
 		$args['rest_controller_class']           = 'WP_REST_Posts_Controller';
 		$args['autosave_rest_controller_class']  = null;
 		$args['revisions_rest_controller_class'] = null;
@@ -21,7 +21,8 @@ function gutenberg_modify_wp_template_post_type_args( $args, $post_type ) {
 //    need to deprecate /templates eventually, but we'll still want to be able
 //    to lookup the active template for a specific slug, and probably get a list
 //    of all _active_ templates. For that we can keep /lookup.
-add_action( 'rest_api_init', 'gutenberg_maintain_templates_routes' );
+// Priority 100, after `create_initial_rest_routes`.
+add_action( 'rest_api_init', 'gutenberg_maintain_templates_routes', 100 );
 
 /**
  * @global array $wp_post_types List of post types.
@@ -61,7 +62,7 @@ function gutenberg_maintain_templates_routes() {
 	$wp_post_types['wp_template']->autosave_rest_controller_class  = $original_autosave_rest_controller_class;
 	$wp_post_types['wp_template']->revisions_rest_controller_class = $original_revisions_rest_controller_class;
 	// Restore the original base.
-	$wp_post_types['wp_template']->rest_base = 'wp_template';
+	$wp_post_types['wp_template']->rest_base = 'created-templates';
 
 	// Register the old routes.
 	$autosaves_controller->register_routes();
@@ -259,16 +260,6 @@ function gutenberg_resolve_block_template( $template_type, $template_hierarchy, 
 	$object            = get_queried_object();
 	$specific_template = $object ? get_page_template_slug( $object ) : null;
 	$active_templates  = (array) get_option( 'active_templates', array() );
-
-	// Remove templates slugs that are deactivated, except if it's the specific
-	// template or index.
-	$slugs = array_filter(
-		$slugs,
-		function ( $slug ) use ( $specific_template, $active_templates ) {
-			$should_ignore = $slug === $specific_template || 'index' === $slug;
-			return $should_ignore || ( ! isset( $active_templates[ $slug ] ) || false !== $active_templates[ $slug ] );
-		}
-	);
 
 	// We expect one template for each slug. Use the active template if it is
 	// set and exists. Otherwise use the static template.
@@ -598,8 +589,6 @@ function gutenberg_get_block_template( $output, $id, $template_type ) {
 					return $template;
 				}
 			}
-		} elseif ( false === $active_templates[ $slug ] ) {
-			return null;
 		}
 	}
 	////////////////////////////

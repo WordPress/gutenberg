@@ -8,8 +8,6 @@
 @use "./components/add-new-template/style.scss" as *;
 @use "./components/block-editor/style.scss" as *;
 @use "./components/canvas-loader/style.scss" as *;
-@use "./components/global-styles/style.scss" as *;
-@use "./components/global-styles-sidebar/style.scss" as *;
 @use "./components/page-patterns/style.scss" as *;
 @use "./components/page-templates/style.scss" as *;
 @use "./components/editor/style.scss" as *;
@@ -30,14 +28,11 @@
 @use "./components/sidebar-dataviews/style.scss" as *;
 @use "./components/site-hub/style.scss" as *;
 @use "./components/site-icon/style.scss" as *;
-@use "./components/style-book/style.scss" as *;
-@use "./components/styles-canvas/style.scss" as *;
 @use "./components/post-edit/style.scss" as *;
 @use "./components/post-list/style.scss" as *;
 @use "./components/resizable-frame/style.scss" as *;
-@use "./hooks/push-changes-to-global-styles/style.scss" as *;
 @use "./components/pagination/style.scss" as *;
-@use "./components/sidebar-global-styles-wrapper/style.scss" as *;
+@use "./components/sidebar-global-styles/style.scss" as *;
 
 /* stylelint-disable -- Disable reason: View Transitions not supported properly by stylelint. */
 ::view-transition-image-pair(root) {

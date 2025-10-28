@@ -5,6 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { store as editorStore } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -40,7 +41,7 @@ export default function SidebarNavigationScreenGlobalStyles() {
 		revisionsCount,
 	} = useGlobalStylesRevisions();
 	const { openGeneralSidebar } = useDispatch( editSiteStore );
-	const { setStylesPath } = unlock( useDispatch( editSiteStore ) );
+	const { setStylesPath } = unlock( useDispatch( editorStore ) );
 	const { set: setPreference } = useDispatch( preferencesStore );
 
 	const openGlobalStyles = useCallback( async () => {

@@ -6,18 +6,15 @@ import { Button, Composite } from '@wordpress/components';
 import { dateI18n, getDate, humanTimeDiff, getSettings } from '@wordpress/date';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-// @ts-expect-error: Not typed yet.
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { getGlobalStylesChanges } from '@wordpress/global-styles-engine';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../lock-unlock';
 import type { Revision } from './types';
 
 const DAY_IN_MILLISECONDS = 60 * 60 * 1000 * 24;
-const { getGlobalStylesChanges } = unlock( blockEditorPrivateApis );
 
 interface ChangesSummaryProps {
 	revision: Revision;

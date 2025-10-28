@@ -6,6 +6,12 @@
  * @package {{PREFIX}}
  */
 
+// Load version constant.
+$version_file = __DIR__ . '/version.php';
+if ( file_exists( $version_file ) ) {
+	require_once $version_file;
+}
+
 // Load script module registration.
 $modules_file = __DIR__ . '/modules.php';
 if ( file_exists( $modules_file ) ) {
@@ -16,4 +22,10 @@ if ( file_exists( $modules_file ) ) {
 $scripts_file = __DIR__ . '/scripts.php';
 if ( file_exists( $scripts_file ) ) {
 	require_once $scripts_file;
+}
+
+// Load style registration.
+$styles_file = __DIR__ . '/styles.php';
+if ( file_exists( $styles_file ) ) {
+	require_once $styles_file;
 }

@@ -8,11 +8,14 @@ import {
 	ColorVariations,
 	TypographyVariations,
 } from '@wordpress/global-styles-ui';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import { useGlobalStyles } from '../global-styles';
+import { unlock } from '../../lock-unlock';
+
+const { useGlobalStyles } = unlock( editorPrivateApis );
 
 export default function SidebarNavigationScreenGlobalStylesContent() {
 	const gap = 3;

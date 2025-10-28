@@ -6,7 +6,6 @@
 import { readFile, writeFile, copyFile, mkdir } from 'fs/promises';
 import { readdirSync } from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import { parseArgs } from 'node:util';
 import esbuild from 'esbuild';
 import glob from 'fast-glob';
@@ -25,13 +24,22 @@ import babel from 'esbuild-plugin-babel';
 /**
  * Internal dependencies
  */
-import { groupByDepth, findScriptsToRebundle } from './dependency-graph.js';
+import { groupByDepth, findScriptsToRebundle } from './dependency-graph.mjs';
+import {
+	generatePhpFromTemplate,
+	getPhpReplacements,
+} from './lib/php-generator.mjs';
+import {
+	getPackageInfo,
+	getPackageInfoFromFile,
+	kebabToCamelCase,
+} from './lib/package-utils.mjs';
+import { createWordpressExternalsPlugin } from './lib/wordpress-externals-plugin.mjs';
 
-const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
+const ROOT_DIR = process.cwd();
+const PACKAGES_DIR = path.join( ROOT_DIR, 'packages' );
+const BUILD_DIR = path.join( ROOT_DIR, 'build' );
 
-const PACKAGES_DIR = path
-	.resolve( __dirname, '../../packages' )
-	.replace( /\\/g, '/' );
 const SOURCE_EXTENSIONS = '{js,ts,tsx}';
 const IGNORE_PATTERNS = [
 	'**/benchmark/**',
@@ -69,6 +77,11 @@ const getDefine = ( scriptDebug ) => ( {
 	...baseDefine,
 	'globalThis.SCRIPT_DEBUG': JSON.stringify( scriptDebug ),
 } );
+
+/**
+ * Initialize WordPress externals plugin.
+ */
+const wordpressExternalsPlugin = createWordpressExternalsPlugin();
 
 /**
  * Create emotion babel plugin for esbuild.
@@ -142,16 +155,6 @@ function transformPhpContent( content, transforms ) {
 }
 
 /**
- * Convert kebab-case to camelCase.
- *
- * @param {string} str String to convert.
- * @return {string} Converted string.
- */
-function kebabToCamelCase( str ) {
-	return str.replace( /-([a-z])/g, ( _, letter ) => letter.toUpperCase() );
-}
-
-/**
  * Plugin to handle moment-timezone aliases.
  * Redirects moment-timezone imports to use pre-built bundles with limited data.
  *
@@ -198,281 +201,6 @@ function momentTimezoneAliasPlugin() {
 				) {
 					return { path: preBuiltBundlePath };
 				}
-			} );
-		},
-	};
-}
-
-/**
- * WordPress externals and asset plugin.
- * Inspired by wp-build's wordpressExternalsAndAssetPlugin.
- *
- * @param {string}   assetName         Optional. The name of the asset file to generate (without .asset.php extension). Defaults to 'index.min'.
- * @param {string}   buildFormat       Optional. The build format: 'iife' for scripts or 'esm' for script modules. Defaults to 'iife'.
- * @param {string[]} extraDependencies Optional. Additional dependencies to include in the asset file. Defaults to empty array.
- * @return {Object} esbuild plugin.
- */
-function wordpressExternalsPlugin(
-	assetName = 'index.min',
-	buildFormat = 'iife',
-	extraDependencies = []
-) {
-	return {
-		name: 'wordpress-externals',
-		setup( build ) {
-			const dependencies = new Set();
-			const moduleDependencies = new Map();
-			const packageJsonCache = new Map();
-
-			/**
-			 * Get package.json info for a WordPress package.
-			 *
-			 * @param {string} packageName The package name (without @wordpress/ prefix).
-			 * @return {Promise<Object|null>} Package.json object or null if not found.
-			 */
-			async function getPackageInfo( packageName ) {
-				if ( packageJsonCache.has( packageName ) ) {
-					return packageJsonCache.get( packageName );
-				}
-
-				const packageJsonPath = path.join(
-					PACKAGES_DIR,
-					packageName,
-					'package.json'
-				);
-
-				try {
-					const packageJson = JSON.parse(
-						await readFile( packageJsonPath, 'utf8' )
-					);
-					packageJsonCache.set( packageName, packageJson );
-					return packageJson;
-				} catch ( error ) {
-					packageJsonCache.set( packageName, null );
-					return null;
-				}
-			}
-
-			/**
-			 * Check if a package import is a script module.
-			 * A package is considered a script module if it has wpScriptModuleExports
-			 * and the specific import path (root or subpath) is declared in wpScriptModuleExports.
-			 *
-			 * @param {Object}      packageJson Package.json object.
-			 * @param {string|null} subpath     Subpath after package name, or null for root import.
-			 * @return {boolean} True if the import is a script module.
-			 */
-			function isScriptModuleImport( packageJson, subpath ) {
-				const { wpScriptModuleExports } = packageJson;
-
-				if ( ! wpScriptModuleExports ) {
-					return false;
-				}
-
-				// Root import: @wordpress/package-name
-				if ( ! subpath ) {
-					if ( typeof wpScriptModuleExports === 'string' ) {
-						return true;
-					}
-					if (
-						typeof wpScriptModuleExports === 'object' &&
-						wpScriptModuleExports[ '.' ]
-					) {
-						return true;
-					}
-					return false;
-				}
-
-				// Subpath import: @wordpress/package-name/subpath
-				if (
-					typeof wpScriptModuleExports === 'object' &&
-					wpScriptModuleExports[ `./${ subpath }` ]
-				) {
-					return true;
-				}
-
-				return false;
-			}
-
-			// Map of vendor packages to their global variables and handles
-			const vendorExternals = {
-				react: { global: 'React', handle: 'react' },
-				'react-dom': { global: 'ReactDOM', handle: 'react-dom' },
-				'react/jsx-runtime': {
-					global: 'ReactJSXRuntime',
-					handle: 'react-jsx-runtime',
-				},
-				'react/jsx-dev-runtime': {
-					global: 'ReactJSXRuntime',
-					handle: 'react-jsx-runtime',
-				},
-				moment: { global: 'moment', handle: 'moment' },
-				lodash: { global: 'lodash', handle: 'lodash' },
-				'lodash-es': { global: 'lodash', handle: 'lodash' },
-				jquery: { global: 'jQuery', handle: 'jquery' },
-			};
-
-			for ( const [ packageName, config ] of Object.entries(
-				vendorExternals
-			) ) {
-				build.onResolve(
-					{
-						filter: new RegExp(
-							`^${ packageName.replace(
-								/[.*+?^${}()|[\]\\]/g,
-								'\\$&'
-							) }$`
-						),
-					},
-					( args ) => {
-						dependencies.add( config.handle );
-
-						return {
-							path: args.path,
-							namespace: 'vendor-external',
-							pluginData: { global: config.global },
-						};
-					}
-				);
-			}
-
-			build.onResolve( { filter: /^@wordpress\// }, async ( args ) => {
-				const fullPath = args.path.replace( '@wordpress/', '' );
-				const [ packageName, ...subpathParts ] = fullPath.split( '/' );
-				const subpath =
-					subpathParts.length > 0 ? subpathParts.join( '/' ) : null;
-				const wpHandle = `wp-${ packageName }`;
-
-				const packageJson = await getPackageInfo( packageName );
-
-				if ( ! packageJson ) {
-					return undefined;
-				}
-
-				let isScriptModule = isScriptModuleImport(
-					packageJson,
-					subpath
-				);
-				let isScript = packageJson.wpScript;
-				if ( isScriptModule && isScript ) {
-					// If the package is both a script and a script module, rely on the format being built
-					isScript = buildFormat === 'iife';
-					isScriptModule = buildFormat === 'esm';
-				}
-
-				const kind =
-					args.kind === 'dynamic-import' ? 'dynamic' : 'static';
-
-				if ( isScriptModule ) {
-					if ( kind === 'static' ) {
-						moduleDependencies.set( args.path, 'static' );
-					} else if ( ! moduleDependencies.has( args.path ) ) {
-						moduleDependencies.set( args.path, 'dynamic' );
-					}
-
-					return {
-						path: args.path,
-						external: true,
-					};
-				}
-
-				if ( isScript ) {
-					dependencies.add( wpHandle );
-
-					return {
-						path: args.path,
-						namespace: 'wordpress-external',
-					};
-				}
-
-				return undefined;
-			} );
-
-			build.onLoad(
-				{ filter: /.*/, namespace: 'vendor-external' },
-				( args ) => {
-					const global = args.pluginData.global;
-
-					return {
-						contents: `module.exports = window.${ global };`,
-						loader: 'js',
-					};
-				}
-			);
-
-			build.onLoad(
-				{ filter: /.*/, namespace: 'wordpress-external' },
-				( args ) => {
-					const wpGlobal = kebabToCamelCase(
-						args.path.replace( '@wordpress/', '' )
-					);
-
-					return {
-						contents: `module.exports = window.wp.${ wpGlobal };`,
-						loader: 'js',
-					};
-				}
-			);
-
-			build.onEnd( async ( result ) => {
-				if ( result.errors.length > 0 ) {
-					return;
-				}
-
-				// Merge discovered dependencies with extra dependencies
-				const allDependencies = new Set( [
-					...dependencies,
-					...extraDependencies,
-				] );
-
-				const dependenciesString = Array.from( allDependencies )
-					.sort()
-					.map( ( dep ) => `'${ dep }'` )
-					.join( ', ' );
-
-				// Format module dependencies as array of arrays with 'id' and 'import' keys
-				const moduleDependenciesArray = Array.from(
-					moduleDependencies.entries()
-				)
-					.sort( ( [ a ], [ b ] ) => a.localeCompare( b ) )
-					.map(
-						( [ dep, kind ] ) =>
-							`array('id' => '${ dep }', 'import' => '${ kind }')`
-					);
-
-				const moduleDependenciesString =
-					moduleDependenciesArray.length > 0
-						? moduleDependenciesArray.join( ', ' )
-						: '';
-
-				const version = Date.now();
-
-				const parts = [
-					`'dependencies' => array(${ dependenciesString })`,
-				];
-				if ( moduleDependenciesString ) {
-					parts.push(
-						`'module_dependencies' => array(${ moduleDependenciesString })`
-					);
-				}
-				parts.push( `'version' => '${ version }'` );
-				const assetContent = `<?php return array(${ parts.join(
-					', '
-				) });`;
-
-				const outputDir =
-					build.initialOptions.outdir ||
-					path.dirname( build.initialOptions.outfile || 'build' );
-
-				const assetFilePath = path.join(
-					outputDir,
-					`${ assetName }.asset.php`
-				);
-
-				await mkdir( path.dirname( assetFilePath ), {
-					recursive: true,
-				} );
-				await writeFile( assetFilePath, assetContent );
 			} );
 		},
 	};
@@ -526,21 +254,17 @@ function resolveEntryPoint( packageDir, packageJson ) {
 async function bundlePackage( packageName ) {
 	const builtModules = [];
 	const builtScripts = [];
+	const builtStyles = [];
 	const packageDir = path.join( PACKAGES_DIR, packageName );
-	const packageJsonPath = path.join( packageDir, 'package.json' );
-	const packageJson = JSON.parse( await readFile( packageJsonPath, 'utf8' ) );
+	const packageJson = getPackageInfoFromFile(
+		path.join( PACKAGES_DIR, packageName, 'package.json' )
+	);
 
 	const builds = [];
 
 	if ( packageJson.wpScript ) {
 		const entryPoint = resolveEntryPoint( packageDir, packageJson );
-		const outputDir = path.join(
-			PACKAGES_DIR,
-			'..',
-			'build',
-			'scripts',
-			packageName
-		);
+		const outputDir = path.join( BUILD_DIR, 'scripts', packageName );
 		const target = browserslistToEsbuild();
 		const globalName = `wp.${ kebabToCamelCase( packageName ) }`;
 
@@ -597,9 +321,7 @@ async function bundlePackage( packageName ) {
 	if ( packageJson.wpScriptModuleExports ) {
 		const target = browserslistToEsbuild();
 		const rootBuildModuleDir = path.join(
-			PACKAGES_DIR,
-			'..',
-			'build',
+			BUILD_DIR,
 			'modules',
 			packageName
 		);
@@ -666,15 +388,10 @@ async function bundlePackage( packageName ) {
 		}
 	}
 
+	let hasMainStyle = false;
 	if ( packageJson.wpScript ) {
 		const buildStyleDir = path.join( packageDir, 'build-style' );
-		const outputDir = path.join(
-			PACKAGES_DIR,
-			'..',
-			'build',
-			'styles',
-			packageName
-		);
+		const outputDir = path.join( BUILD_DIR, 'styles', packageName );
 		const isProduction = process.env.NODE_ENV === 'production';
 
 		const cssFiles = await glob(
@@ -685,6 +402,11 @@ async function bundlePackage( packageName ) {
 			const relativePath = path.relative( buildStyleDir, cssFile );
 			const destPath = path.join( outputDir, relativePath );
 			const destDir = path.dirname( destPath );
+
+			// Track if this package has a main style.css for auto-registration
+			if ( relativePath === 'style.css' ) {
+				hasMainStyle = true;
+			}
 
 			if ( isProduction ) {
 				builds.push(
@@ -722,13 +444,7 @@ async function bundlePackage( packageName ) {
 	if ( packageJson.wpCopyFiles ) {
 		const { files, transforms = {} } = packageJson.wpCopyFiles;
 		const sourceDir = path.join( packageDir, 'src' );
-		const outputDir = path.join(
-			PACKAGES_DIR,
-			'..',
-			'build',
-			'scripts',
-			packageName
-		);
+		const outputDir = path.join( BUILD_DIR, 'scripts', packageName );
 
 		for ( const filePattern of files ) {
 			const matchedFiles = await glob(
@@ -800,7 +516,105 @@ async function bundlePackage( packageName ) {
 
 	await Promise.all( builds );
 
-	return { modules: builtModules, scripts: builtScripts };
+	// Collect style metadata after builds complete (so asset files exist)
+	// Only register the main style.css file - complex cases handled manually in lib/client-assets.php
+	if ( hasMainStyle ) {
+		// Read script asset file to get dependencies
+		const scriptAssetPath = path.join(
+			BUILD_DIR,
+			'scripts',
+			packageName,
+			'index.min.asset.php'
+		);
+
+		const assetContent = await readFile( scriptAssetPath, 'utf8' );
+		const depsMatch = assetContent.match(
+			/'dependencies' => array\((.*?)\)/s
+		);
+
+		let scriptDependencies = [];
+		if ( depsMatch ) {
+			const depsString = depsMatch[ 1 ];
+			scriptDependencies =
+				depsString
+					.match( /'([^']+)'/g )
+					?.map( ( d ) => d.replace( /'/g, '' ) ) || [];
+		}
+
+		const styleDeps = await inferStyleDependencies( scriptDependencies );
+
+		builtStyles.push( {
+			handle: `wp-${ packageName }`,
+			path: `${ packageName }/style`,
+			dependencies: styleDeps,
+		} );
+	}
+
+	return {
+		modules: builtModules,
+		scripts: builtScripts,
+		styles: builtStyles,
+	};
+}
+
+/**
+ * Infer style dependencies from script dependencies.
+ * Only includes dependencies that:
+ * 1. Are @wordpress packages (start with 'wp-')
+ * 2. Have wpScript: true in their package.json
+ * 3. Actually have a built style.css file
+ *
+ * @param {string[]} scriptDependencies Array of script handles from asset file.
+ * @return {Promise<string[]>} Array of style handles to depend on.
+ */
+async function inferStyleDependencies( scriptDependencies ) {
+	if ( ! scriptDependencies || scriptDependencies.length === 0 ) {
+		return [];
+	}
+
+	const styleDeps = [];
+
+	for ( const scriptHandle of scriptDependencies ) {
+		// Skip non-package dependencies (like 'react', 'lodash', etc.)
+		if ( ! scriptHandle.startsWith( 'wp-' ) ) {
+			continue;
+		}
+
+		// Convert handle to package name: 'wp-components' → 'components'
+		const shortName = scriptHandle.replace( 'wp-', '' );
+		const depPackageName = `@wordpress/${ shortName }`;
+
+		// Read the dependency's package.json
+		try {
+			const depPackageJson = getPackageInfo( depPackageName );
+
+			if ( ! depPackageJson ) {
+				continue;
+			}
+
+			// ONLY include if it has wpScript: true (which means it builds styles)
+			if ( depPackageJson.wpScript === true ) {
+				// Double-check the style file actually exists
+				const styleFile = path.join(
+					BUILD_DIR,
+					'styles',
+					shortName,
+					'style.css'
+				);
+				try {
+					await readFile( styleFile );
+					styleDeps.push( scriptHandle );
+				} catch {
+					// Style file doesn't exist, skip it
+				}
+			}
+		} catch {
+			// Package not found or can't read package.json - skip it
+			continue;
+		}
+	}
+
+	return styleDeps;
 }
 
 /**
@@ -809,22 +623,7 @@ async function bundlePackage( packageName ) {
  * @param {Array} modules Array of module info objects.
  */
 async function generateModuleRegistrationPhp( modules ) {
-	const ROOT_DIR = path.join( PACKAGES_DIR, '..' );
-	const rootPackageJson = JSON.parse(
-		await readFile( path.join( ROOT_DIR, 'package.json' ), 'utf8' )
-	);
-	const prefix = rootPackageJson.wpPlugin?.prefix || 'gutenberg';
-
-	// Read templates
-	const templatesDir = path.join( __dirname, 'templates' );
-	const registryTemplate = await readFile(
-		path.join( templatesDir, 'module-registry.php.template' ),
-		'utf8'
-	);
-	const registrationTemplate = await readFile(
-		path.join( templatesDir, 'module-registration.php.template' ),
-		'utf8'
-	);
+	const replacements = await getPhpReplacements( ROOT_DIR );
 
 	// Generate modules array for registry
 	const modulesArray = modules
@@ -838,32 +637,18 @@ async function generateModuleRegistrationPhp( modules ) {
 		)
 		.join( '\n' );
 
-	// Generate module registry file (data only)
-	const registryContent = registryTemplate
-		.replace( /\{\{PREFIX\}\}/g, prefix )
-		.replace( '{{MODULES}}', modulesArray );
-
-	// Generate registration file (logic only)
-	const registrationContent = registrationTemplate.replace(
-		/\{\{PREFIX\}\}/g,
-		prefix
-	);
-
-	// Write files
-	const buildDir = path.join( ROOT_DIR, 'build' );
-	const modulesDir = path.join( buildDir, 'modules' );
-
-	await mkdir( modulesDir, { recursive: true } );
-	await writeFile(
-		path.join( modulesDir, 'index.php' ),
-		registryContent,
-		'utf8'
-	);
-	await writeFile(
-		path.join( buildDir, 'modules.php' ),
-		registrationContent,
-		'utf8'
-	);
+	await Promise.all( [
+		generatePhpFromTemplate(
+			'module-registry.php.template',
+			path.join( BUILD_DIR, 'modules', 'index.php' ),
+			{ ...replacements, '{{MODULES}}': modulesArray }
+		),
+		generatePhpFromTemplate(
+			'module-registration.php.template',
+			path.join( BUILD_DIR, 'modules.php' ),
+			replacements
+		),
+	] );
 }
 
 /**
@@ -872,22 +657,7 @@ async function generateModuleRegistrationPhp( modules ) {
  * @param {Array} scripts Array of script info objects.
  */
 async function generateScriptRegistrationPhp( scripts ) {
-	const ROOT_DIR = path.join( PACKAGES_DIR, '..' );
-	const rootPackageJson = JSON.parse(
-		await readFile( path.join( ROOT_DIR, 'package.json' ), 'utf8' )
-	);
-	const prefix = rootPackageJson.wpPlugin?.prefix || 'gutenberg';
-
-	// Read templates
-	const templatesDir = path.join( __dirname, 'templates' );
-	const registryTemplate = await readFile(
-		path.join( templatesDir, 'script-registry.php.template' ),
-		'utf8'
-	);
-	const registrationTemplate = await readFile(
-		path.join( templatesDir, 'script-registration.php.template' ),
-		'utf8'
-	);
+	const replacements = await getPhpReplacements( ROOT_DIR );
 
 	// Generate scripts array for registry
 	const scriptsArray = scripts
@@ -901,57 +671,80 @@ async function generateScriptRegistrationPhp( scripts ) {
 		)
 		.join( '\n' );
 
-	// Generate script registry file (data only)
-	const registryContent = registryTemplate
-		.replace( /\{\{PREFIX\}\}/g, prefix )
-		.replace( '{{SCRIPTS}}', scriptsArray );
+	await Promise.all( [
+		generatePhpFromTemplate(
+			'script-registry.php.template',
+			path.join( BUILD_DIR, 'scripts', 'index.php' ),
+			{ ...replacements, '{{SCRIPTS}}': scriptsArray }
+		),
+		generatePhpFromTemplate(
+			'script-registration.php.template',
+			path.join( BUILD_DIR, 'scripts.php' ),
+			replacements
+		),
+	] );
+}
 
-	// Generate registration file (logic only)
-	const registrationContent = registrationTemplate.replace(
-		/\{\{PREFIX\}\}/g,
-		prefix
-	);
+/**
+ * Generate PHP file for version constant.
+ */
+async function generateVersionPhp() {
+	const replacements = await getPhpReplacements( ROOT_DIR );
 
-	// Write files
-	const buildDir = path.join( ROOT_DIR, 'build' );
-	const scriptsDir = path.join( buildDir, 'scripts' );
+	await generatePhpFromTemplate(
+		'version.php.template',
+		path.join( BUILD_DIR, 'version.php' ),
+		replacements
+	);
+}
 
-	await mkdir( scriptsDir, { recursive: true } );
-	await writeFile(
-		path.join( scriptsDir, 'index.php' ),
-		registryContent,
-		'utf8'
-	);
-	await writeFile(
-		path.join( buildDir, 'scripts.php' ),
-		registrationContent,
-		'utf8'
-	);
+/**
+ * Generate PHP files for style registration.
+ *
+ * @param {Array} styles Array of style info objects.
+ */
+async function generateStyleRegistrationPhp( styles ) {
+	const replacements = await getPhpReplacements( ROOT_DIR );
+
+	// Generate styles array for registry
+	const stylesArray = styles
+		.map(
+			( style ) =>
+				`\tarray(\n` +
+				`\t\t'handle' => '${ style.handle }',\n` +
+				`\t\t'path' => '${ style.path }',\n` +
+				`\t\t'dependencies' => array(${ style.dependencies
+					.map( ( dep ) => `'${ dep }'` )
+					.join( ', ' ) }),\n` +
+				`\t),`
+		)
+		.join( '\n' );
+
+	await Promise.all( [
+		generatePhpFromTemplate(
+			'style-registry.php.template',
+			path.join( BUILD_DIR, 'styles', 'index.php' ),
+			{ ...replacements, '{{STYLES}}': stylesArray }
+		),
+		generatePhpFromTemplate(
+			'style-registration.php.template',
+			path.join( BUILD_DIR, 'styles.php' ),
+			replacements
+		),
+	] );
 }
 
 /**
  * Generate main index.php that loads both modules and scripts.
  */
 async function generateMainIndexPhp() {
-	const ROOT_DIR = path.join( PACKAGES_DIR, '..' );
-	const rootPackageJson = JSON.parse(
-		await readFile( path.join( ROOT_DIR, 'package.json' ), 'utf8' )
+	const replacements = await getPhpReplacements( ROOT_DIR );
+
+	await generatePhpFromTemplate(
+		'index.php.template',
+		path.join( BUILD_DIR, 'index.php' ),
+		replacements
 	);
-	const prefix = rootPackageJson.wpPlugin?.prefix || 'gutenberg';
-
-	// Read template
-	const templatesDir = path.join( __dirname, 'templates' );
-	const indexTemplate = await readFile(
-		path.join( templatesDir, 'index.php.template' ),
-		'utf8'
-	);
-
-	// Generate main index file
-	const indexContent = indexTemplate.replace( /\{\{PREFIX\}\}/g, prefix );
-
-	// Write file
-	const buildDir = path.join( ROOT_DIR, 'build' );
-	await writeFile( path.join( buildDir, 'index.php' ), indexContent, 'utf8' );
 }
 
 /**
@@ -963,8 +756,15 @@ async function generateMainIndexPhp() {
 async function transpilePackage( packageName ) {
 	const startTime = Date.now();
 	const packageDir = path.join( PACKAGES_DIR, packageName );
-	const packageJsonPath = path.join( packageDir, 'package.json' );
-	const packageJson = JSON.parse( await readFile( packageJsonPath, 'utf8' ) );
+	const packageJson = getPackageInfoFromFile(
+		path.join( PACKAGES_DIR, packageName, 'package.json' )
+	);
+
+	if ( ! packageJson ) {
+		throw new Error(
+			`Could not find package.json for package: ${ packageName }`
+		);
+	}
 
 	const srcFiles = await glob(
 		normalizePath(
@@ -1077,8 +877,9 @@ async function transpilePackage( packageName ) {
  */
 async function compileStyles( packageName ) {
 	const packageDir = path.join( PACKAGES_DIR, packageName );
-	const packageJsonPath = path.join( packageDir, 'package.json' );
-	const packageJson = JSON.parse( await readFile( packageJsonPath, 'utf8' ) );
+	const packageJson = getPackageInfoFromFile(
+		path.join( PACKAGES_DIR, packageName, 'package.json' )
+	);
 
 	// Get SCSS entry point patterns from package.json, default to root-level only
 	const scssEntryPointPatterns = packageJson.wpStyleEntryPoints || [
@@ -1289,13 +1090,26 @@ async function buildAll() {
 	console.log( '🔨 Building packages...\n' );
 
 	const startTime = Date.now();
-	const levels = groupByDepth( PACKAGES );
+
+	// Build maps: short name ↔ full name from package.json
+	const shortToFull = new Map();
+	const fullToShort = new Map();
+	for ( const pkg of PACKAGES ) {
+		const packageJson = getPackageInfoFromFile(
+			path.join( PACKAGES_DIR, pkg, 'package.json' )
+		);
+		shortToFull.set( pkg, packageJson.name );
+		fullToShort.set( packageJson.name, pkg );
+	}
+
+	const levels = groupByDepth( Array.from( shortToFull.values() ) );
 
 	console.log( '📝 Phase 1: Transpiling packages...\n' );
 
 	for ( const level of levels ) {
 		await Promise.all(
-			level.map( async ( packageName ) => {
+			level.map( async ( fullName ) => {
+				const packageName = fullToShort.get( fullName );
 				const buildTime = await transpilePackage( packageName );
 				console.log(
 					`   ✔ Transpiled ${ packageName } (${ buildTime }ms)`
@@ -1307,6 +1121,7 @@ async function buildAll() {
 	console.log( '\n📦 Phase 2: Bundling packages...\n' );
 	const modules = [];
 	const scripts = [];
+	const styles = [];
 	await Promise.all(
 		PACKAGES.map( async ( packageName ) => {
 			const startBundleTime = Date.now();
@@ -1323,6 +1138,9 @@ async function buildAll() {
 				if ( ret.scripts ) {
 					scripts.push( ...ret.scripts );
 				}
+				if ( ret.styles ) {
+					styles.push( ...ret.styles );
+				}
 			}
 		} )
 	);
@@ -1332,11 +1150,16 @@ async function buildAll() {
 		generateMainIndexPhp(),
 		generateModuleRegistrationPhp( modules ),
 		generateScriptRegistrationPhp( scripts ),
+		generateStyleRegistrationPhp( styles ),
+		generateVersionPhp(),
 	] );
 	console.log( '   ✔ Generated build/modules.php' );
 	console.log( '   ✔ Generated build/modules/index.php' );
 	console.log( '   ✔ Generated build/scripts.php' );
 	console.log( '   ✔ Generated build/scripts/index.php' );
+	console.log( '   ✔ Generated build/styles.php' );
+	console.log( '   ✔ Generated build/styles/index.php' );
+	console.log( '   ✔ Generated build/version.php' );
 	console.log( '   ✔ Generated build/index.php' );
 
 	const totalTime = Date.now() - startTime;
@@ -1352,10 +1175,22 @@ async function watchMode() {
 	let isRebuilding = false;
 	const needsRebuild = new Set();
 
+	// Build maps: short name ↔ full name from package.json (once)
+	const shortToFull = new Map();
+	const fullToShort = new Map();
+	for ( const pkg of PACKAGES ) {
+		const packageJson = getPackageInfoFromFile(
+			path.join( PACKAGES_DIR, pkg, 'package.json' )
+		);
+		shortToFull.set( pkg, packageJson.name );
+		fullToShort.set( packageJson.name, pkg );
+	}
+	const allFullNames = Array.from( shortToFull.values() );
+
 	/**
 	 * Rebuild a package and any affected scripts/modules.
 	 *
-	 * @param {string} packageName Package to rebuild.
+	 * @param {string} packageName Package to rebuild (short name).
 	 */
 	async function rebuildPackage( packageName ) {
 		try {
@@ -1367,12 +1202,14 @@ async function watchMode() {
 			const buildTime = Date.now() - startTime;
 			console.log( `✅ ${ packageName } (${ buildTime }ms)` );
 
+			const fullName = shortToFull.get( packageName );
 			const affectedScripts = findScriptsToRebundle(
-				packageName,
-				PACKAGES
+				fullName,
+				allFullNames
 			);
 
-			for ( const script of affectedScripts ) {
+			for ( const fullScript of affectedScripts ) {
+				const script = fullToShort.get( fullScript );
 				try {
 					const rebundleStartTime = Date.now();
 					await bundlePackage( script );

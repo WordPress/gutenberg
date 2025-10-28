@@ -7,14 +7,15 @@ import {
 } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import { useStyle } from '../global-styles/hooks';
 
 const { Theme } = unlock( componentsPrivateApis );
+const { useStyle } = unlock( editorPrivateApis );
 
 export default function CanvasLoader( { id } ) {
 	const textColor = useStyle( 'color.text' );

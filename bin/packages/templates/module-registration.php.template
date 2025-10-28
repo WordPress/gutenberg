@@ -31,7 +31,10 @@ if ( ! function_exists( '{{PREFIX}}_register_script_modules' ) ) {
 				$base_url . $module['path'] . $extension,
 				$asset['module_dependencies'] ?? array(),
 				$asset['version'] ?? false,
-				array( 'fetchpriority' => 'low' )
+				array(
+					'fetchpriority' => 'low',
+					'in_footer'     => true,
+				)
 			);
 		}
 	}

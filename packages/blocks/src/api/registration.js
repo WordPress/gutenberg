@@ -124,28 +124,6 @@ import { unlock } from '../lock-unlock';
  */
 
 /**
- * An object describing data for a field in block bindings EditorUI.
- *
- * @typedef {Object} WPBlockBindingsEditorUIDataItem
- *
- * @property {string} key     The unique identifier for the field.
- * @property {string} [label] Human-readable label for the field.
- * @property {string} [type]  The data type of the field (e.g., 'string', 'number').
- * @property {Object} [args]  Source-specific arguments used to retrieve the value from the source.
- */
-
-/**
- * An object describing the EditorUI configuration for block bindings.
- *
- * @typedef {Object} WPBlockBindingsEditorUI
- *
- * @property {string}   mode                 The UI mode - either 'dropdown' or 'modal'.
- * @property {Array}    [data]               Array of field data items.
- * @property {Function} [renderModalContent] Required for modal mode. Function that renders the modal content.
- *                                           Receives an object with the `attribute` that is being changed, and a `closeModal` function to close the modal.
- */
-
-/**
  * An object describing a Block Bindings source.
  *
  * @typedef {Object} WPBlockBindingsSource
@@ -156,7 +134,7 @@ import { unlock } from '../lock-unlock';
  * @property {Function} [getValues]        Optional function to get the values from the source.
  * @property {Function} [setValues]        Optional function to update multiple values connected to the source.
  * @property {Function} [canUserEditValue] Optional function to determine if the user can edit the value.
- * @property {Function} [editorUI]         Optional function that returns WPBlockBindingsEditorUI configuration.
+ * @property {Function} [getFieldsList]    Optional function that returns fields list that will be shown in the UI.
  */
 
 function isObject( object ) {
@@ -831,7 +809,6 @@ export const registerBlockBindingsSource = ( source ) => {
 		setValues,
 		canUserEditValue,
 		getFieldsList,
-		editorUI,
 	} = source;
 
 	const existingSource = unlock(
@@ -929,109 +906,6 @@ export const registerBlockBindingsSource = ( source ) => {
 		// eslint-disable-next-line no-console
 		warning( 'Block bindings source getFieldsList must be a function.' );
 		return;
-	}
-
-	if ( editorUI ) {
-		if ( typeof editorUI === 'function' ) {
-			// If it's a function, we can't validate the returned object at registration time
-			// since it may depend on runtime context, so we just validate it's a function
-			return unlock( dispatch( blocksStore ) ).addBlockBindingsSource(
-				source
-			);
-		}
-		if ( typeof editorUI !== 'object' || Array.isArray( editorUI ) ) {
-			warning( 'EditorUI must be an object or a function' );
-			return;
-		}
-		const { mode, data } = editorUI;
-
-		if ( mode && ! [ 'dropdown', 'modal' ].includes( mode ) ) {
-			warning( 'EditorUI mode must be either "dropdown" or "modal"' );
-			return;
-		}
-
-		if ( mode === 'dropdown' ) {
-			if ( ! data || ! Array.isArray( data ) ) {
-				warning(
-					'EditorUI data must be an array of field objects for dropdown mode'
-				);
-				return;
-			}
-
-			for ( const field of data ) {
-				if ( ! field || typeof field !== 'object' ) {
-					warning( 'Each field must be an object' );
-					return;
-				}
-
-				if ( ! field.label || ! field.args ) {
-					warning(
-						'Each field must have "label" and "args" properties'
-					);
-					return;
-				}
-
-				if ( typeof field.label !== 'string' ) {
-					warning( 'Field "label" property must be a string' );
-					return;
-				}
-
-				// Validate type field if provided (follows WordPress block attributes type validation).
-				if ( field.type ) {
-					const validTypes = [
-						'null',
-						'boolean',
-						'object',
-						'array',
-						'string',
-						'integer',
-						'number',
-					];
-					if ( ! validTypes.includes( field.type ) ) {
-						warning(
-							'Field "type" must be one of: ' +
-								validTypes.join( ', ' )
-						);
-						return;
-					}
-
-					if ( field.format ) {
-						if ( field.type !== 'string' ) {
-							warning(
-								'Field "format" can only be used with string type'
-							);
-							return;
-						}
-
-						const validFormats = [
-							'date-time',
-							'uri',
-							'email',
-							'ip',
-							'uuid',
-							'hex-color',
-						];
-						if ( ! validFormats.includes( field.format ) ) {
-							warning(
-								'Field "format" must be one of: ' +
-									validFormats.join( ', ' )
-							);
-							return;
-						}
-					}
-				}
-			}
-		} else if ( mode === 'modal' ) {
-			if ( ! editorUI.renderModalContent ) {
-				warning( 'Modal mode requires renderModalContent function' );
-				return;
-			}
-
-			if ( typeof editorUI.renderModalContent !== 'function' ) {
-				warning( 'renderModalContent must be a function' );
-				return;
-			}
-		}
 	}
 
 	return unlock( dispatch( blocksStore ) ).addBlockBindingsSource( source );

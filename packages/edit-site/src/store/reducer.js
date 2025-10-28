@@ -64,40 +64,6 @@ export function saveViewPanel( state = false, action ) {
 	return state;
 }
 
-/**
- * Reducer used to track the global styles navigation state.
- * Controls the current path within global styles UI and whether stylebook is visible.
- *
- * @param {Object}  state               Current state.
- * @param {string}  state.path          Current navigation path (e.g., '/', '/revisions', '/css').
- * @param {boolean} state.showStylebook Whether the stylebook preview is visible.
- * @param {Object}  action              Dispatched action.
- */
-function stylesNavigation(
-	state = { path: '/', showStylebook: false },
-	action
-) {
-	switch ( action.type ) {
-		case 'SET_STYLES_PATH':
-			return {
-				...state,
-				path: action.path,
-			};
-		case 'SET_SHOW_STYLEBOOK':
-			return {
-				...state,
-				showStylebook: action.showStylebook,
-			};
-		case 'RESET_STYLES_NAVIGATION':
-			return {
-				path: '/',
-				showStylebook: false,
-			};
-	}
-
-	return state;
-}
-
 function routes( state = [], action ) {
 	switch ( action.type ) {
 		case 'REGISTER_ROUTE':
@@ -113,6 +79,5 @@ export default combineReducers( {
 	settings,
 	editedPost,
 	saveViewPanel,
-	stylesNavigation,
 	routes,
 } );

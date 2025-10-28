@@ -20,6 +20,7 @@
 		{ "path": "../element" },
 		{ "path": "../fields" },
 		{ "path": "../global-styles-engine" },
+		{ "path": "../global-styles-ui" },
 		{ "path": "../hooks" },
 		{ "path": "../html-entities" },
 		{ "path": "../i18n" },

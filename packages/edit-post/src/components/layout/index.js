@@ -83,12 +83,11 @@ const DESIGN_POST_TYPES = [
 	'wp_navigation',
 ];
 
-function useEditorStyles( ...additionalStyles ) {
-	const { hasThemeStyleSupport, editorSettings } = useSelect( ( select ) => {
+function useEditorStyles( settings, ...additionalStyles ) {
+	const { hasThemeStyleSupport } = useSelect( ( select ) => {
 		return {
 			hasThemeStyleSupport:
 				select( editPostStore ).isFeatureActive( 'themeStyles' ),
-			editorSettings: select( editorStore ).getEditorSettings(),
 		};
 	}, [] );
 
@@ -97,24 +96,24 @@ function useEditorStyles( ...additionalStyles ) {
 	// Compute the default styles.
 	return useMemo( () => {
 		const presetStyles =
-			editorSettings.styles?.filter(
+			settings.styles?.filter(
 				( style ) =>
 					style.__unstableType && style.__unstableType !== 'theme'
 			) ?? [];
 
 		const defaultEditorStyles = [
-			...( editorSettings?.defaultEditorStyles ?? [] ),
+			...( settings?.defaultEditorStyles ?? [] ),
 			...presetStyles,
 		];
 
 		// Has theme styles if the theme supports them and if some styles were not preset styles (in which case they're theme styles).
 		const hasThemeStyles =
 			hasThemeStyleSupport &&
-			presetStyles.length !== ( editorSettings.styles?.length ?? 0 );
+			presetStyles.length !== ( settings.styles?.length ?? 0 );
 
 		// If theme styles are not present or displayed, ensure that
 		// base layout styles are still present in the editor.
-		if ( ! editorSettings.disableLayoutStyles && ! hasThemeStyles ) {
+		if ( ! settings.disableLayoutStyles && ! hasThemeStyles ) {
 			defaultEditorStyles.push( {
 				css: getLayoutStyles( {
 					style: {},
@@ -127,7 +126,7 @@ function useEditorStyles( ...additionalStyles ) {
 		}
 
 		const baseStyles = hasThemeStyles
-			? editorSettings.styles ?? []
+			? settings.styles ?? []
 			: defaultEditorStyles;
 
 		if ( addedStyles ) {
@@ -136,9 +135,9 @@ function useEditorStyles( ...additionalStyles ) {
 
 		return baseStyles;
 	}, [
-		editorSettings.defaultEditorStyles,
-		editorSettings.disableLayoutStyles,
-		editorSettings.styles,
+		settings.defaultEditorStyles,
+		settings.disableLayoutStyles,
+		settings.styles,
 		hasThemeStyleSupport,
 		addedStyles,
 	] );
@@ -524,16 +523,22 @@ function Layout( {
 		? 'block-selection-edit'
 		: 'entity-edit';
 	useCommandContext( commandContext );
+	const styles = useEditorStyles( settings, paddingStyle );
 	const editorSettings = useMemo(
 		() => ( {
 			...settings,
+			styles,
 			onNavigateToEntityRecord,
 			onNavigateToPreviousEntityRecord,
 			defaultRenderingMode: 'post-only',
 		} ),
-		[ settings, onNavigateToEntityRecord, onNavigateToPreviousEntityRecord ]
+		[
+			settings,
+			styles,
+			onNavigateToEntityRecord,
+			onNavigateToPreviousEntityRecord,
+		]
 	);
-	const styles = useEditorStyles( paddingStyle );
 
 	// We need to add the show-icon-labels class to the body element so it is applied to modals.
 	if ( showIconLabels ) {
@@ -640,7 +645,6 @@ function Layout( {
 						postId={ currentPostId }
 						templateId={ templateId }
 						className={ className }
-						styles={ styles }
 						forceIsDirty={ hasActiveMetaboxes }
 						contentRef={ paddingAppenderRef }
 						disableIframe={ ! shouldIframe }
