@@ -816,7 +816,9 @@ const CommentBoard = ( {
 					onCancel={ handleCancel }
 					confirmButtonText={ __( 'Delete' ) }
 				>
-					{ __( 'Are you sure you want to delete this note?' ) }
+					{ __(
+						"Are you sure you want to delete this note? This will also delete all of this note's replies."
+					) }
 				</ConfirmDialog>
 			) }
 		</VStack>
