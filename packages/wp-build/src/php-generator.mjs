@@ -11,7 +11,7 @@ const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
  * Get PHP replacements from root package.json.
  *
  * @param {string} rootDir Root directory path.
- * @return {Promise<Object>} Replacements object with {{PREFIX}}, {{VERSION}}, {{VERSION_CONSTANT}}.
+ * @return {Promise<Record<string, string>>} Replacements object with {{PREFIX}}, {{VERSION}}, {{VERSION_CONSTANT}}.
  */
 export async function getPhpReplacements( rootDir ) {
 	const rootPackageJson = JSON.parse(
@@ -32,9 +32,9 @@ export async function getPhpReplacements( rootDir ) {
 /**
  * Generate a PHP file from a template with replacements.
  *
- * @param {string} templateName Template file name.
- * @param {string} outputPath   Full output path.
- * @param {Object} replacements Replacements object (e.g. {'{{PREFIX}}': 'gutenberg'}).
+ * @param {string}                 templateName Template file name.
+ * @param {string}                 outputPath   Full output path.
+ * @param {Record<string, string>} replacements Replacements object (e.g. {'{{PREFIX}}': 'gutenberg'}).
  */
 export async function generatePhpFromTemplate(
 	templateName,
