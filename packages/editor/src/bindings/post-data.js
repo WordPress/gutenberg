@@ -68,16 +68,16 @@ export default {
 		);
 
 		const newValues = {};
-		for ( const [ attributeName, source ] of Object.entries( bindings ) ) {
-			if ( ! allowedFields.includes( source.args.field ) ) {
+		for ( const [ attributeName, binding ] of Object.entries( bindings ) ) {
+			if ( ! allowedFields.includes( binding.args.field ) ) {
 				newValues[ attributeName ] = {};
 				continue;
 			}
 
 			newValues[ attributeName ] =
-				entityDataValues?.[ source.args.field ] ??
+				entityDataValues?.[ binding.args.field ] ??
 				postDataFields.find(
-					( field ) => field.args.field === source.args.field
+					( field ) => field.args.field === binding.args.field
 				).label;
 		}
 		return newValues;
