@@ -8,49 +8,19 @@
 /**
  * External dependencies
  */
-const fs = require( 'fs' );
-const path = require( 'path' );
-const toposort = require( 'toposort' );
-
-const PACKAGES_DIR = path.resolve( __dirname, '../../packages' );
-
-// Cache for package.json data
-const packageJsonCache = new Map();
+// @ts-expect-error: No types available
+import toposort from 'toposort';
 
 /**
- * Get package.json info for a WordPress package.
- *
- * @param {string} packageName The package name.
- * @return {Object|null} Package.json object or null if not found.
+ * Internal dependencies
  */
-function getPackageInfo( packageName ) {
-	if ( packageJsonCache.has( packageName ) ) {
-		return packageJsonCache.get( packageName );
-	}
-
-	const packageJsonPath = path.join(
-		PACKAGES_DIR,
-		packageName,
-		'package.json'
-	);
-
-	try {
-		const packageJson = JSON.parse(
-			fs.readFileSync( packageJsonPath, 'utf8' )
-		);
-		packageJsonCache.set( packageName, packageJson );
-		return packageJson;
-	} catch ( error ) {
-		packageJsonCache.set( packageName, null );
-		return null;
-	}
-}
+import { getPackageInfo } from './lib/package-utils.mjs';
 
 /**
  * Check if a package is a script or script module.
  * A package is a script if it has wpScript or wpScriptModuleExports.
  *
- * @param {string} packageName The package name.
+ * @param {string} packageName The full package name (e.g., '@wordpress/blocks').
  * @return {boolean} True if the package is a script or script module.
  */
 function isScriptOrModule( packageName ) {
@@ -64,7 +34,7 @@ function isScriptOrModule( packageName ) {
 /**
  * Get WordPress package dependencies from a package.json file.
  *
- * @param {string} packageName The name of the package.
+ * @param {string} packageName The full package name (e.g., '@wordpress/blocks').
  * @return {string[]} Array of WordPress package names this package depends on.
  */
 function getWordPressDependencies( packageName ) {
@@ -75,19 +45,20 @@ function getWordPressDependencies( packageName ) {
 
 	const deps = packageJson.dependencies || {};
 
-	// Extract @wordpress/* package names (without @wordpress/ prefix)
-	return Object.keys( deps )
-		.filter( ( dep ) => dep.startsWith( '@wordpress/' ) )
-		.map( ( dep ) => dep.replace( '@wordpress/', '' ) );
+	// Extract @wordpress/* package names (keep full names)
+	return Object.keys( deps ).filter( ( dep ) =>
+		dep.startsWith( '@wordpress/' )
+	);
 }
 
 /**
  * Build a dependency graph for the given packages.
  *
- * @param {string[]} packages Array of package names to analyze.
+ * @param {string[]} packages Array of full package names to analyze.
  * @return {Array<[string, string]>} Array of [dependent, dependency] edges.
  */
 function buildDependencyGraph( packages ) {
+	/** @type {Array<[string, string]>} */
 	const edges = [];
 	const packagesSet = new Set( packages );
 
@@ -114,7 +85,7 @@ function buildDependencyGraph( packages ) {
 /**
  * Sort packages in topological order based on their dependencies.
  *
- * @param {string[]} packages Array of package names to sort.
+ * @param {string[]} packages Array of full package names to sort.
  * @return {string[]} Sorted array where dependencies come before dependents.
  */
 function topologicalSort( packages ) {
@@ -122,6 +93,7 @@ function topologicalSort( packages ) {
 
 	try {
 		// toposort returns dependencies first, then dependents
+		/** @type {Array<string>} */
 		const sorted = toposort( edges );
 
 		// Filter to only include packages in our input list
@@ -129,7 +101,7 @@ function topologicalSort( packages ) {
 		const packagesSet = new Set( packages );
 		return sorted.filter( ( pkg ) => packagesSet.has( pkg ) );
 	} catch ( error ) {
-		if ( error.message.includes( 'cyclic' ) ) {
+		if ( error instanceof Error && error.message.includes( 'cyclic' ) ) {
 			console.error(
 				'❌ Cyclic dependency detected in packages:',
 				error.message
@@ -146,7 +118,7 @@ function topologicalSort( packages ) {
  * Group packages by dependency depth level.
  * Packages at the same depth level can be built in parallel.
  *
- * @param {string[]} packages Array of package names to group.
+ * @param {string[]} packages Array of full package names to group.
  * @return {string[][]} Array of arrays, where each inner array is a depth level.
  */
 function groupByDepth( packages ) {
@@ -213,8 +185,8 @@ function groupByDepth( packages ) {
 /**
  * Get packages that depend on a given package (reverse dependencies).
  *
- * @param {string}   packageName The package to find dependents of.
- * @param {string[]} allPackages Array of all package names to search.
+ * @param {string}   packageName The full package name to find dependents of.
+ * @param {string[]} allPackages Array of all full package names to search.
  * @return {string[]} Array of package names that depend on the given package.
  */
 function getReverseDependencies( packageName, allPackages ) {
@@ -245,8 +217,8 @@ function getReverseDependencies( packageName, allPackages ) {
  * - D (script) depends on C
  * Result: Only C needs rebundling (D stops at C boundary)
  *
- * @param {string}   changedPackage The bundled package that changed.
- * @param {string[]} allPackages    Array of all package names.
+ * @param {string}   changedPackage The full package name that changed.
+ * @param {string[]} allPackages    Array of all full package names.
  * @return {string[]} Array of script/module package names to rebundle.
  */
 function findScriptsToRebundle( changedPackage, allPackages ) {
@@ -263,7 +235,7 @@ function findScriptsToRebundle( changedPackage, allPackages ) {
 	while ( queue.length > 0 ) {
 		const currentPackage = queue.shift();
 
-		if ( visited.has( currentPackage ) ) {
+		if ( ! currentPackage || visited.has( currentPackage ) ) {
 			continue;
 		}
 		visited.add( currentPackage );
@@ -289,12 +261,11 @@ function findScriptsToRebundle( changedPackage, allPackages ) {
 	return Array.from( scriptsToRebundle );
 }
 
-module.exports = {
+export {
 	getWordPressDependencies,
 	buildDependencyGraph,
 	topologicalSort,
 	groupByDepth,
-	getPackageInfo,
 	isScriptOrModule,
 	getReverseDependencies,
 	findScriptsToRebundle,

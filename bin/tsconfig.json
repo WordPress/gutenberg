@@ -2,7 +2,8 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../tsconfig.base.json",
 	"compilerOptions": {
-		"module": "commonjs",
+		"module": "node16",
+		"moduleResolution": "node16",
 		"esModuleInterop": true,
 		"target": "ES6",
 		"lib": [ "ES6", "ES2020.string" ],
@@ -41,7 +42,6 @@
 		"packages/build-vendors.mjs",
 		"packages/build.mjs",
 		"packages/check-build-type-declaration-files.js",
-		"packages/dependency-graph.js",
 		"packages/lint-staged-typecheck.js",
 		"plugin/cli.js",
 		"plugin/commands/common.js",
