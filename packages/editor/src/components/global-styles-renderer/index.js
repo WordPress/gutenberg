@@ -12,24 +12,28 @@ import { useGlobalStylesOutput } from '../../hooks/use-global-styles-output';
 
 function useGlobalStylesRenderer( disableRootPadding ) {
 	const [ styles, settings ] = useGlobalStylesOutput( disableRootPadding );
-	const { getEditorSettings } = useSelect( editorStore );
-	const { updateEditorSettings } = useDispatch( editorStore );
+	const { getEditorStyles } = useSelect( editorStore );
+	const { setEditorStyles, updateEditorSettings } =
+		useDispatch( editorStore );
 
 	useEffect( () => {
 		if ( ! styles || ! settings ) {
 			return;
 		}
 
-		const currentStoreSettings = getEditorSettings();
-		const nonGlobalStyles = Object.values(
-			currentStoreSettings.styles ?? []
-		).filter( ( style ) => ! style.isGlobalStyles );
-		updateEditorSettings( {
-			...currentStoreSettings,
-			styles: [ ...nonGlobalStyles, ...styles ],
-			__experimentalFeatures: settings,
-		} );
-	}, [ styles, settings, updateEditorSettings, getEditorSettings ] );
+		const currentStyles = getEditorStyles();
+		const nonGlobalStyles = Object.values( currentStyles ?? [] ).filter(
+			( style ) => ! style.isGlobalStyles
+		);
+		setEditorStyles( [ ...nonGlobalStyles, ...styles ] );
+		updateEditorSettings( { __experimentalFeatures: settings } );
+	}, [
+		styles,
+		settings,
+		setEditorStyles,
+		updateEditorSettings,
+		getEditorStyles,
+	] );
 }
 
 export function GlobalStylesRenderer( { disableRootPadding } ) {

@@ -445,6 +445,18 @@ _Returns_
 
 -   `Object`: The editor settings object.
 
+### getEditorStyles
+
+Returns the editor styles.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `Array`: Editor styles.
+
 ### getFirstMultiSelectedBlockClientId
 
 _Related_
@@ -1490,6 +1502,18 @@ _Parameters_
 
 -   _postType_ `string`: Post Type.
 -   _postId_ `string`: Post ID.
+
+_Returns_
+
+-   `Object`: Action object.
+
+### setEditorStyles
+
+Returns an action object used to update the editor styles.
+
+_Parameters_
+
+-   _styles_ `Array`: Editor styles.
 
 _Returns_
 

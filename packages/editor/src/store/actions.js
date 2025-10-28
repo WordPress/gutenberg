@@ -724,6 +724,20 @@ export function updateEditorSettings( settings ) {
 }
 
 /**
+ * Returns an action object used to update the editor styles.
+ *
+ * @param {Array} styles Editor styles.
+ *
+ * @return {Object} Action object.
+ */
+export function setEditorStyles( styles ) {
+	return {
+		type: 'SET_EDITOR_STYLES',
+		styles,
+	};
+}
+
+/**
  * Returns an action used to set the rendering mode of the post editor. We support multiple rendering modes:
  *
  * -   `post-only`: This mode extracts the post blocks from the template and renders only those. The idea is to allow the user to edit the post/page in isolation without the wrapping template.

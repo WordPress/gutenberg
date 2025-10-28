@@ -120,6 +120,7 @@ function VisualEditor( {
 			getCurrentPostType,
 			getCurrentTemplateId,
 			getEditorSettings,
+			getEditorStyles,
 			getRenderingMode,
 			getDeviceType,
 		} = select( editorStore );
@@ -162,7 +163,7 @@ function VisualEditor( {
 			isFocusedEntity: !! editorSettings.onNavigateToPreviousEntityRecord,
 			postType: postTypeSlug,
 			isPreview: editorSettings.isPreviewMode,
-			styles: editorSettings.styles,
+			styles: getEditorStyles(),
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );

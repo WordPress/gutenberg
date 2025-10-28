@@ -1330,6 +1330,17 @@ export function getEditorSettings( state ) {
 }
 
 /**
+ * Returns the editor styles.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Array} Editor styles.
+ */
+export function getEditorStyles( state ) {
+	return state.editorStyles;
+}
+
+/**
  * Returns the post editor's rendering mode.
  *
  * @param {Object} state Editor state.

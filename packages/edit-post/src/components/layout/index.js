@@ -513,25 +513,26 @@ function Layout( {
 		? 'block-selection-edit'
 		: 'entity-edit';
 	useCommandContext( commandContext );
+
+	const styles = useMemo(
+		() => getEditorStyles( settings, hasThemeStyleSupport, paddingStyle ),
+		[ settings, hasThemeStyleSupport, paddingStyle ]
+	);
+
+	const { setEditorStyles } = useDispatch( editorStore );
+
+	useEffect( () => {
+		setEditorStyles( styles );
+	}, [ styles, setEditorStyles ] );
+
 	const editorSettings = useMemo(
 		() => ( {
 			...settings,
-			styles: getEditorStyles(
-				settings,
-				hasThemeStyleSupport,
-				paddingStyle
-			),
 			onNavigateToEntityRecord,
 			onNavigateToPreviousEntityRecord,
 			defaultRenderingMode: 'post-only',
 		} ),
-		[
-			settings,
-			hasThemeStyleSupport,
-			paddingStyle,
-			onNavigateToEntityRecord,
-			onNavigateToPreviousEntityRecord,
-		]
+		[ settings, onNavigateToEntityRecord, onNavigateToPreviousEntityRecord ]
 	);
 
 	// We need to add the show-icon-labels class to the body element so it is applied to modals.

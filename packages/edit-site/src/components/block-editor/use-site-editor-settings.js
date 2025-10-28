@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useMemo, useEffect } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { usePrevious } from '@wordpress/compose';
 import { store as editorStore } from '@wordpress/editor';
@@ -53,24 +53,34 @@ export function useSpecificEditorSettings() {
 
 	const onNavigateToPreviousEntityRecord =
 		useNavigateToPreviousEntityRecord();
+
+	const { setEditorStyles } = useDispatch( editorStore );
+
+	// Compute styles separately and set them in the editor store
+	const styles = useMemo( () => {
+		return [
+			...( settings.styles || [] ),
+			{
+				// Forming a "block formatting context" to prevent margin collapsing.
+				// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
+				css:
+					canvas === 'view'
+						? `body{min-height: 100vh; ${
+								currentPostIsTrashed ? '' : 'cursor: pointer;'
+						  }}`
+						: undefined,
+			},
+		];
+	}, [ settings.styles, canvas, currentPostIsTrashed ] );
+
+	useEffect( () => {
+		setEditorStyles( styles );
+	}, [ styles, setEditorStyles ] );
+
+	// Editor settings without styles (styles are managed separately)
 	const defaultEditorSettings = useMemo( () => {
 		return {
 			...settings,
-			styles: [
-				...settings.styles,
-				{
-					// Forming a "block formatting context" to prevent margin collapsing.
-					// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
-					css:
-						canvas === 'view'
-							? `body{min-height: 100vh; ${
-									currentPostIsTrashed
-										? ''
-										: 'cursor: pointer;'
-							  }}`
-							: undefined,
-				},
-			],
 			richEditingEnabled: true,
 			supportsTemplateMode: true,
 			focusMode: canvas !== 'view',
@@ -81,7 +91,6 @@ export function useSpecificEditorSettings() {
 	}, [
 		settings,
 		canvas,
-		currentPostIsTrashed,
 		onNavigateToEntityRecord,
 		onNavigateToPreviousEntityRecord,
 	] );

@@ -267,6 +267,23 @@ export function editorSettings( state = EDITOR_SETTINGS_DEFAULTS, action ) {
 	return state;
 }
 
+/**
+ * Reducer returning the editor styles.
+ *
+ * @param {Array}  state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Array} Updated state.
+ */
+export function editorStyles( state = [], action ) {
+	switch ( action.type ) {
+		case 'SET_EDITOR_STYLES':
+			return action.styles;
+	}
+
+	return state;
+}
+
 export function renderingMode( state = 'post-only', action ) {
 	switch ( action.type ) {
 		case 'SET_RENDERING_MODE':
@@ -428,6 +445,7 @@ export default combineReducers( {
 	template,
 	postSavingLock,
 	editorSettings,
+	editorStyles,
 	postAutosavingLock,
 	renderingMode,
 	deviceType,
