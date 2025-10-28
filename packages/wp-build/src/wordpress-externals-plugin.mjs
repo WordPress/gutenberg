@@ -102,12 +102,7 @@ export function createWordpressExternalsPlugin() {
 				) ) {
 					build.onResolve(
 						{
-							filter: new RegExp(
-								`^${ packageName.replace(
-									/[.*+?^${}()|[\]\\]/g,
-									'\\$&'
-								) }$`
-							),
+							filter: new RegExp( `^${ packageName }$` ),
 						},
 						/** @param {import('esbuild').OnResolveArgs} args */
 						( args ) => {
