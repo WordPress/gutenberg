@@ -53,7 +53,7 @@ export function useBlockComments( postId ) {
 		per_page: -1,
 	};
 
-	const { records: threads, totalPages } = useEntityRecords(
+	const { records: threads } = useEntityRecords(
 		'root',
 		'comment',
 		queryArgs,
@@ -160,7 +160,6 @@ export function useBlockComments( postId ) {
 	return {
 		resultComments,
 		unresolvedSortedThreads,
-		totalPages,
 		reflowComments,
 		commentLastUpdated,
 	};

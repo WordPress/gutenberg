@@ -14,7 +14,7 @@ import { getAvatarBorderColor } from './utils';
 
 const { CommentIconToolbarSlotFill } = unlock( blockEditorPrivateApis );
 
-const CommentAvatarIndicator = ( { onClick, thread, hasMoreComments } ) => {
+const CommentAvatarIndicator = ( { onClick, thread } ) => {
 	const threadParticipants = useMemo( () => {
 		if ( ! thread ) {
 			return [];
@@ -29,15 +29,13 @@ const CommentAvatarIndicator = ( { onClick, thread, hasMoreComments } ) => {
 		allComments.forEach( ( comment ) => {
 			// Track thread participants (original commenter + repliers).
 			if ( comment.author_name && comment.author_avatar_urls ) {
-				const authorKey = `${ comment.author }-${ comment.author_name }`;
-				if ( ! participantsMap.has( authorKey ) ) {
-					participantsMap.set( authorKey, {
+				if ( ! participantsMap.has( comment.author ) ) {
+					participantsMap.set( comment.author, {
 						name: comment.author_name,
 						avatar:
 							comment.author_avatar_urls?.[ '48' ] ||
 							comment.author_avatar_urls?.[ '96' ],
 						id: comment.author,
-						isOriginalCommenter: comment.id === thread.id,
 						date: comment.date,
 					} );
 				}
@@ -47,12 +45,6 @@ const CommentAvatarIndicator = ( { onClick, thread, hasMoreComments } ) => {
 		return Array.from( participantsMap.values() );
 	}, [ thread ] );
 
-	// Check if this specific thread has more participants due to pagination.
-	// If we have pagination AND this thread + its replies equals or exceeds the API limit,
-	// then this thread likely has more participants that weren't loaded.
-	const threadHasMoreParticipants =
-		hasMoreComments && thread?.reply && 1 + thread.reply.length >= 100;
-
 	if ( ! threadParticipants.length ) {
 		return null;
 	}
@@ -61,6 +53,7 @@ const CommentAvatarIndicator = ( { onClick, thread, hasMoreComments } ) => {
 	const maxAvatars = 3;
 	const visibleParticipants = threadParticipants.slice( 0, maxAvatars );
 	const overflowCount = Math.max( 0, threadParticipants.length - maxAvatars );
+	const threadHasMoreParticipants = threadParticipants.length > 100;
 
 	// If we hit the comment limit, show "100+" instead of exact overflow count.
 	const overflowText =
@@ -96,7 +89,7 @@ const CommentAvatarIndicator = ( { onClick, thread, hasMoreComments } ) => {
 				<div className="comment-avatar-stack">
 					{ visibleParticipants.map( ( participant, index ) => (
 						<img
-							key={ participant.name + index }
+							key={ participant.id }
 							src={ participant.avatar }
 							alt={ participant.name }
 							className="comment-avatar"

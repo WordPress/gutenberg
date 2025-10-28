@@ -97,7 +97,6 @@ function NotesSidebar( { postId, mode } ) {
 	const {
 		resultComments,
 		unresolvedSortedThreads,
-		totalPages,
 		reflowComments,
 		commentLastUpdated,
 	} = useBlockComments( postId );
@@ -105,8 +104,6 @@ function NotesSidebar( { postId, mode } ) {
 		showFloatingSidebar &&
 			( unresolvedSortedThreads.length > 0 || showCommentBoard )
 	);
-
-	const hasMoreComments = totalPages && totalPages > 1;
 
 	// Get the global styles to set the background color of the sidebar.
 	const { merged: GlobalStyles } = useGlobalStylesContext();
@@ -152,7 +149,6 @@ function NotesSidebar( { postId, mode } ) {
 			{ blockCommentId && (
 				<CommentAvatarIndicator
 					thread={ currentThread }
-					hasMoreComments={ hasMoreComments }
 					onClick={ openTheSidebar }
 				/>
 			) }
