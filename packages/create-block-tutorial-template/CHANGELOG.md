@@ -1,6 +1,7 @@
 <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
+-   Add `main` property to `package.json` to address install errors ([#72746](https://github.com/WordPress/gutenberg/pull/72746))
 
 ## 4.33.0 (2025-10-17)
 
