@@ -4,7 +4,7 @@
  *
  * @package Gutenberg
  */
-class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_Controller_Testcase {
+class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	protected static $admin_id;
 	protected static $editor_id;
 	protected static $contributor_id;
@@ -39,6 +39,14 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_Controller
 			array(
 				'role' => 'author',
 			)
+		);
+
+		self::$user_ids = array(
+			'administrator' => self::$admin_id,
+			'editor'        => self::$editor_id,
+			'contributor'   => self::$contributor_id,
+			'subscriber'    => self::$subscriber_id,
+			'author'        => self::$author_id,
 		);
 	}
 
