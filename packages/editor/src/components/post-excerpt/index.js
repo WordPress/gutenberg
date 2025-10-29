@@ -33,10 +33,7 @@ export default function PostExcerpt( {
 			const postType = getCurrentPostType();
 			// This special case is unfortunate, but the REST API of wp_template and wp_template_part
 			// support the excerpt field through the "description" field rather than "excerpt".
-			const _usedAttribute = [
-				'wp_template',
-				'wp_template_part',
-			].includes( postType )
+			const _usedAttribute = [ 'wp_template_part' ].includes( postType )
 				? 'description'
 				: 'excerpt';
 			return {

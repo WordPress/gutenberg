@@ -21,7 +21,6 @@ import { decodeEntities } from '@wordpress/html-entities';
 import PostExcerptForm from './index';
 import PostExcerptCheck from './check';
 import PluginPostExcerpt from './plugin';
-import { TEMPLATE_ORIGINS } from '../../store/constants';
 import { store as editorStore } from '../../store';
 import { getTemplateInfo } from '../../utils/get-template-info';
 
@@ -111,6 +110,7 @@ function PrivateExcerpt() {
 				getEditedPostAttribute,
 				isEditorPanelEnabled,
 			} = select( editorStore );
+			const postId = getCurrentPostId();
 			const postType = getCurrentPostType();
 			const isTemplateOrTemplatePart = [
 				'wp_template',
@@ -121,9 +121,11 @@ function PrivateExcerpt() {
 			// handle proper labeling and some flows where we should always render them as text.
 			const _shouldBeUsedAsDescription =
 				isTemplateOrTemplatePart || isPattern;
-			const _usedAttribute = isTemplateOrTemplatePart
-				? 'description'
-				: 'excerpt';
+			const _usedAttribute =
+				postType === 'wp_template_part' ||
+				( postType === 'wp_template' && typeof postId === 'string' )
+					? 'description'
+					: 'excerpt';
 			const _excerpt = getEditedPostAttribute( _usedAttribute );
 			// We need to fetch the entity in this case to check if we'll allow editing.
 			const template =
@@ -131,7 +133,7 @@ function PrivateExcerpt() {
 				select( coreStore ).getEntityRecord(
 					'postType',
 					postType,
-					getCurrentPostId()
+					postId
 				);
 			const fallback =
 				! _excerpt && isTemplateOrTemplatePart
@@ -157,10 +159,8 @@ function PrivateExcerpt() {
 					_shouldRender &&
 					( ! _shouldBeUsedAsDescription ||
 						isPattern ||
-						( template &&
-							template.source === TEMPLATE_ORIGINS.custom &&
-							! template.has_theme_file &&
-							template.is_custom ) ),
+						( postType === 'wp_template' &&
+							typeof postId !== 'string' ) ),
 			};
 		}, [] );
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
