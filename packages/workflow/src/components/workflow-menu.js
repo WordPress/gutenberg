@@ -24,15 +24,14 @@ import { executeAbility, store as abilitiesStore } from '@wordpress/abilities';
 
 const inputLabel = __( 'Run abilities and workflows' );
 
-function WorkflowInput( { isOpen, search, setSearch } ) {
+function WorkflowInput( { isOpen, search, setSearch, abilities } ) {
 	const workflowMenuInput = useRef();
 	const _value = useCommandState( ( state ) => state.value );
 	const selectedItemId = useMemo( () => {
-		const item = document.querySelector(
-			`[cmdk-item=""][data-value="${ _value }"]`
-		);
-		return item?.getAttribute( 'id' );
-	}, [ _value ] );
+		// Find the ability whose label matches the selected value
+		const ability = abilities.find( ( a ) => a.label === _value );
+		return ability?.name;
+	}, [ _value, abilities ] );
 	useEffect( () => {
 		// Focus the workflow palette input when mounting the modal.
 		if ( isOpen ) {
@@ -239,6 +238,7 @@ export function WorkflowMenu() {
 								search={ search }
 								setSearch={ setSearch }
 								isOpen={ isOpen }
+								abilities={ abilities }
 							/>
 						</div>
 						<Command.List label={ __( 'Workflow suggestions' ) }>
