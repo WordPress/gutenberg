@@ -483,8 +483,7 @@ function gutenberg_locate_block_template( $template, $type, array $templates ) {
 // `inject_ignored_hooked_blocks_metadata_attributes`.
 add_action( 'rest_pre_insert_wp_template', 'gutenberg_set_active_template_theme', 9, 2 );
 function gutenberg_set_active_template_theme( $changes, $request ) {
-	$template = $request['id'] ? get_block_template( $request['id'], 'wp_template' ) : null;
-	if ( $template ) {
+	if ( str_starts_with( $request->get_route(), '/wp/v2/templates' ) ) {
 		return $changes;
 	}
 	$changes->tax_input = array(
