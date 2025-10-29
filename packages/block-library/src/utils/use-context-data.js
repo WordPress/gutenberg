@@ -4,6 +4,13 @@
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
+const DEFAULT_CONTEXT = {
+	taxonomy: null,
+	termSlug: null,
+	isAuthor: false,
+	authorSlug: null,
+};
+
 /**
  * Hook to get the current template slug from the editor context.
  *
@@ -38,12 +45,7 @@ export function useTemplateSlug() {
  */
 export function parseTemplateSlug( templateSlug ) {
 	if ( ! templateSlug ) {
-		return {
-			taxonomy: null,
-			termSlug: null,
-			isAuthor: false,
-			authorSlug: null,
-		};
+		return DEFAULT_CONTEXT;
 	}
 
 	// Check for author patterns
@@ -146,12 +148,7 @@ export function parseTemplateSlug( templateSlug ) {
 		};
 	}
 
-	return {
-		taxonomy: null,
-		termSlug: null,
-		isAuthor: false,
-		authorSlug: null,
-	};
+	return DEFAULT_CONTEXT;
 }
 
 /**
@@ -163,12 +160,7 @@ export function parseTemplateSlug( templateSlug ) {
  */
 export function parseTemplateSlugWithValidation( templateSlug, getTaxonomy ) {
 	if ( ! templateSlug ) {
-		return {
-			taxonomy: null,
-			termSlug: null,
-			isAuthor: false,
-			authorSlug: null,
-		};
+		return DEFAULT_CONTEXT;
 	}
 
 	if ( templateSlug.startsWith( 'taxonomy-' ) ) {
@@ -219,12 +211,7 @@ export function parseTemplateSlugWithValidation( templateSlug, getTaxonomy ) {
 		}
 
 		// No valid taxonomy found.
-		return {
-			taxonomy: null,
-			termSlug: null,
-			isAuthor: false,
-			authorSlug: null,
-		};
+		return DEFAULT_CONTEXT;
 	}
 
 	// For non-taxonomy prefixed slugs, use the basic parsing
@@ -233,12 +220,7 @@ export function parseTemplateSlugWithValidation( templateSlug, getTaxonomy ) {
 	if ( basicParse.taxonomy && ! basicParse.isAuthor ) {
 		const taxonomyRecord = getTaxonomy( basicParse.taxonomy );
 		if ( ! taxonomyRecord ) {
-			return {
-				taxonomy: null,
-				termSlug: null,
-				isAuthor: false,
-				authorSlug: null,
-			};
+			return DEFAULT_CONTEXT;
 		}
 	}
 
