@@ -273,9 +273,17 @@ async function executeServerAbility(
 	ability: Ability,
 	input: AbilityInput
 ): Promise< AbilityOutput > {
-	const method = !! ability.meta?.annotations?.readonly ? 'GET' : 'POST';
+	let method = 'POST';
+	if ( !! ability.meta?.annotations?.readonly ) {
+		method = 'GET';
+	} else if (
+		!! ability.meta?.annotations?.destructive &&
+		!! ability.meta?.annotations?.idempotent
+	) {
+		method = 'DELETE';
+	}
 
-	let path = `/wp/v2/abilities/${ ability.name }/run`;
+	let path = `/wp-abilities/v1/abilities/${ ability.name }/run`;
 	const options: {
 		method: string;
 		data?: { input: AbilityInput };
@@ -283,8 +291,8 @@ async function executeServerAbility(
 		method,
 	};
 
-	if ( method === 'GET' && input !== null ) {
-		// For GET requests, pass the input directly
+	if ( [ 'GET', 'DELETE' ].includes( method ) && input !== null ) {
+		// For GET and DELETE requests, pass the input directly.
 		path = addQueryArgs( path, { input } );
 	} else if ( method === 'POST' && input !== null ) {
 		options.data = { input };

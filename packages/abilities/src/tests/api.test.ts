@@ -228,7 +228,7 @@ describe( 'API functions', () => {
 				'test/server-ability'
 			);
 			expect( apiFetch ).toHaveBeenCalledWith( {
-				path: '/wp/v2/abilities/test/server-ability/run',
+				path: '/wp-abilities/v1/abilities/test/server-ability/run',
 				method: 'POST',
 				data: { input },
 			} );
@@ -337,7 +337,7 @@ describe( 'API functions', () => {
 			const result = await executeAbility( 'test/read-only', input );
 
 			expect( apiFetch ).toHaveBeenCalledWith( {
-				path: '/wp/v2/abilities/test/read-only/run?input%5Bid%5D=123&input%5Bformat%5D=json',
+				path: '/wp-abilities/v1/abilities/test/read-only/run?input%5Bid%5D=123&input%5Bformat%5D=json',
 				method: 'GET',
 			} );
 			expect( result ).toEqual( mockResponse );
@@ -369,8 +369,50 @@ describe( 'API functions', () => {
 			const result = await executeAbility( 'test/read-only', {} );
 
 			expect( apiFetch ).toHaveBeenCalledWith( {
-				path: '/wp/v2/abilities/test/read-only/run?',
+				path: '/wp-abilities/v1/abilities/test/read-only/run?',
 				method: 'GET',
+			} );
+			expect( result ).toEqual( mockResponse );
+		} );
+
+		it( 'should execute a destructive idempotent ability via DELETE', async () => {
+			const mockAbility: Ability = {
+				name: 'test/destructive',
+				label: 'Destructive Ability',
+				description: 'Test destructive idempotent ability.',
+				category: 'test-category',
+				input_schema: {
+					type: 'object',
+					properties: {
+						id: { type: 'string' },
+						format: { type: 'string' },
+					},
+				},
+				output_schema: { type: 'string' },
+				meta: {
+					annotations: {
+						destructive: true,
+						idempotent: true,
+					},
+				},
+			};
+
+			const mockGetAbility = jest.fn().mockResolvedValue( mockAbility );
+			( resolveSelect as jest.Mock ).mockReturnValue( {
+				getAbility: mockGetAbility,
+			} );
+
+			const mockResponse = 'Item deleted successfully.';
+			( apiFetch as unknown as jest.Mock ).mockResolvedValue(
+				mockResponse
+			);
+
+			const input = { id: '123', format: 'json' };
+			const result = await executeAbility( 'test/destructive', input );
+
+			expect( apiFetch ).toHaveBeenCalledWith( {
+				path: '/wp-abilities/v1/abilities/test/destructive/run?input%5Bid%5D=123&input%5Bformat%5D=json',
+				method: 'DELETE',
 			} );
 			expect( result ).toEqual( mockResponse );
 		} );
@@ -469,7 +511,7 @@ describe( 'API functions', () => {
 			} );
 
 			expect( apiFetch ).toHaveBeenCalledWith( {
-				path: '/wp/v2/abilities/test/ability/run',
+				path: '/wp-abilities/v1/abilities/test/ability/run',
 				method: 'POST',
 				data: { input: { data: 'test' } },
 			} );

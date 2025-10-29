@@ -67,8 +67,10 @@ describe( 'Store Reducer', () => {
 						label: 'Test Ability',
 						description: 'Test ability with links',
 						_links: {
-							self: { href: '/wp/v2/abilities/test/ability' },
-							collection: { href: '/wp/v2/abilities' },
+							self: {
+								href: '/wp-abilities/v1/abilities/test/ability',
+							},
+							collection: { href: '/wp-abilities/v1/abilities' },
 						},
 					},
 				];
@@ -444,10 +446,10 @@ describe( 'Store Reducer', () => {
 						description: 'Test category with links',
 						_links: {
 							self: {
-								href: '/wp/v2/abilities/categories/data-retrieval',
+								href: '/wp-abilities/v1/categories/data-retrieval',
 							},
 							collection: {
-								href: '/wp/v2/abilities/categories',
+								href: '/wp-abilities/v1/categories',
 							},
 						},
 					},
