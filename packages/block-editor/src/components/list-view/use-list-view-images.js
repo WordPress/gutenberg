@@ -3,86 +3,73 @@
  */
 import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
+import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { getMediaRoleAttributes } = unlock( blocksPrivateApis );
 
 // Maximum number of images to display in a list view row.
 const MAX_IMAGES = 3;
-const IMAGE_GETTERS = {
-	'core/image': ( { clientId, attributes } ) => {
-		if ( attributes.url ) {
-			return {
-				url: attributes.url,
-				alt: attributes.alt || '',
-				clientId,
-			};
-		}
-	},
-	'core/cover': ( { clientId, attributes } ) => {
-		if ( attributes.backgroundType === 'image' && attributes.url ) {
-			return {
-				url: attributes.url,
-				alt: attributes.alt || '',
-				clientId,
-			};
-		}
-	},
-	'core/media-text': ( { clientId, attributes } ) => {
-		if ( attributes.mediaType === 'image' && attributes.mediaUrl ) {
-			return {
-				url: attributes.mediaUrl,
-				alt: attributes.mediaAlt || '',
-				clientId,
-			};
-		}
-	},
-	'core/gallery': ( { innerBlocks } ) => {
-		const images = [];
-		const getValues = !! innerBlocks?.length
-			? IMAGE_GETTERS[ innerBlocks[ 0 ].name ]
-			: undefined;
-		if ( ! getValues ) {
-			return images;
-		}
-
-		for ( const innerBlock of innerBlocks ) {
-			const img = getValues( innerBlock );
-			if ( img ) {
-				images.push( img );
-			}
-			if ( images.length >= MAX_IMAGES ) {
-				return images;
-			}
-		}
-
-		return images;
-	},
-};
 
 function getImagesFromBlock( block, isExpanded ) {
-	const getImages = IMAGE_GETTERS[ block.name ];
-	const images = !! getImages ? getImages( block ) : undefined;
-
-	if ( ! images ) {
+	// Don't show images for expanded blocks (inner blocks shown separately).
+	if ( isExpanded && block.innerBlocks?.length ) {
 		return [];
 	}
-
-	if ( ! Array.isArray( images ) ) {
-		return [ images ];
+	const images = [];
+	// First, try to get an image from the block itself.
+	const blockImage = getImageFromMediaBlock( block );
+	if ( blockImage ) {
+		images.push( blockImage );
 	}
+	// Recursively check direct inner blocks.
+	// TODO: this is intentional for the first draft as we might not even want to
+	// support this for every block with child blocks. This covers the `gallery` block
+	// but also adds the `image` info for other blocks, like a `Group` with an Image block.
+	if ( block.innerBlocks?.length ) {
+		for ( const innerBlock of block.innerBlocks ) {
+			const innerImage = getImageFromMediaBlock( innerBlock );
+			if ( innerImage ) {
+				images.push( innerImage );
+			}
+			if ( images.length >= MAX_IMAGES ) {
+				break;
+			}
+		}
+	}
+	return images;
+}
 
-	return isExpanded ? [] : images;
+function getImageFromMediaBlock( block ) {
+	const mediaAttributes = getMediaRoleAttributes(
+		block.name,
+		block.attributes
+	);
+	// Only show images in list view and only when there are media attributes and a url.
+	if (
+		! mediaAttributes ||
+		mediaAttributes.type !== 'image' ||
+		! mediaAttributes.url
+	) {
+		return null;
+	}
+	return {
+		url: mediaAttributes.url,
+		alt: mediaAttributes.alt || '',
+		clientId: block.clientId,
+	};
 }
 
 /**
  * Get a block's preview images for display within a list view row.
  *
- * TODO: Currently only supports images from the core/image and core/gallery
- * blocks. This should be expanded to support other blocks that have images,
- * potentially via an API that blocks can opt into / provide their own logic.
+ * Uses the `mediaRoles` block config to generically extract media information
+ * from any block that defines media roles.
  *
  * @param {Object}  props            Hook properties.
  * @param {string}  props.clientId   The block's clientId.
@@ -90,10 +77,8 @@ function getImagesFromBlock( block, isExpanded ) {
  * @return {Array} Images.
  */
 export default function useListViewImages( { clientId, isExpanded } ) {
-	const { block } = useSelect(
-		( select ) => {
-			return { block: select( blockEditorStore ).getBlock( clientId ) };
-		},
+	const block = useSelect(
+		( select ) => select( blockEditorStore ).getBlock( clientId ),
 		[ clientId ]
 	);
 	const images = useMemo( () => {

@@ -186,6 +186,7 @@ function getBlockSettingsFromMetadata( { textdomain, ...metadata } ) {
 		'variations',
 		'blockHooks',
 		'allowedBlocks',
+		'mediaRoles',
 	];
 
 	const settings = Object.fromEntries(

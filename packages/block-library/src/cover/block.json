@@ -148,6 +148,12 @@
 		},
 		"allowedBlocks": true
 	},
+	"mediaRoles": {
+		"id": "id",
+		"url": "url",
+		"alt": "alt",
+		"type": { "attribute": "backgroundType" }
+	},
 	"selectors": {
 		"filter": {
 			"duotone": ".wp-block-cover > .wp-block-cover__image-background, .wp-block-cover > .wp-block-cover__video-background"

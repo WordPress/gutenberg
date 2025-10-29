@@ -97,6 +97,11 @@
 			"clientNavigation": true
 		}
 	},
+	"mediaRoles": {
+		"id": "id",
+		"url": "src",
+		"type": { "value": "video" }
+	},
 	"editorStyle": "wp-block-video-editor",
 	"style": "wp-block-video"
 }

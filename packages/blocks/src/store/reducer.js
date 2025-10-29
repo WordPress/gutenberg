@@ -66,31 +66,18 @@ function bootstrappedBlockTypes( state = {}, action ) {
 			// Don't overwrite if already set. It covers the case when metadata
 			// was initialized from the server.
 			if ( serverDefinition ) {
-				// The `blockHooks` prop is not yet included in the server provided
+				// The `mediaRoles` prop is not yet included in the server provided
 				// definitions and needs to be polyfilled. This can be removed when the
-				// minimum supported WordPress is >= 6.4.
+				// minimum supported WordPress is >= 7.0.
+				// This change should be handled in `get_block_editor_server_block_settings` in core.
 				if (
-					serverDefinition.blockHooks === undefined &&
-					blockType.blockHooks
+					serverDefinition.mediaRoles === undefined &&
+					blockType.mediaRoles
 				) {
 					newDefinition = {
 						...serverDefinition,
 						...newDefinition,
-						blockHooks: blockType.blockHooks,
-					};
-				}
-
-				// The `allowedBlocks` prop is not yet included in the server provided
-				// definitions and needs to be polyfilled. This can be removed when the
-				// minimum supported WordPress is >= 6.5.
-				if (
-					serverDefinition.allowedBlocks === undefined &&
-					blockType.allowedBlocks
-				) {
-					newDefinition = {
-						...serverDefinition,
-						...newDefinition,
-						allowedBlocks: blockType.allowedBlocks,
+						mediaRoles: blockType.mediaRoles,
 					};
 				}
 			} else {

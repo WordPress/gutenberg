@@ -1003,6 +1003,46 @@
 		"render": {
 			"description": "Template file loaded on the server when rendering a block.",
 			"type": "string"
+		},
+		"mediaRoles": {
+			"description": "Maps semantic media role names to block attributes. Allows generic media handling across blocks with different attribute naming conventions. Supported roles: id (media ID), url (media source URL), alt (alternative text), type (media type: image/video/audio).",
+			"type": "object",
+			"properties": {
+				"id": {
+					"description": "Maps to the attribute containing the media attachment ID.",
+					"type": "string"
+				},
+				"url": {
+					"description": "Maps to the attribute containing the media source URL.",
+					"type": "string"
+				},
+				"alt": {
+					"description": "Maps to the attribute containing alternative text for the media.",
+					"type": "string"
+				},
+				"type": {
+					"description": "Maps to the media type (image, video, or audio). Can be a static value or reference an attribute.",
+					"oneOf": [
+						{ "type": "string" },
+						{
+							"type": "object",
+							"properties": {
+								"value": {
+									"description": "Static media type value",
+									"type": "string",
+									"enum": ["image", "video", "audio"]
+								},
+								"attribute": {
+									"description": "Dynamic attribute reference containing media type",
+									"type": "string"
+								}
+							},
+							"additionalProperties": false
+						}
+					]
+				}
+			},
+			"additionalProperties": false
 		}
 	},
 	"required": [ "apiVersion", "name", "title" ],
