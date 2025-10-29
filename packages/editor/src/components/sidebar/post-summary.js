@@ -78,7 +78,7 @@ export default function PostSummary( { onActionPerformed } ) {
 										<PostStatusPanel />
 										<PostSchedulePanel />
 										<PostURLPanel />
-										{ /* <PostAuthorPanel /> */ }
+										<PostAuthorPanel />
 										<PostTemplatePanel />
 										<TemplateTypePanel />
 										<PostDiscussionPanel />
