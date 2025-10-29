@@ -177,7 +177,6 @@ function CommandInput( { isOpen, search, setSearch } ) {
 			onValueChange={ setSearch }
 			placeholder={ inputLabel }
 			aria-activedescendant={ selectedItemId }
-			icon={ search }
 		/>
 	);
 }

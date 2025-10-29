@@ -46,7 +46,6 @@ function WorkflowInput( { isOpen, search, setSearch } ) {
 			onValueChange={ setSearch }
 			placeholder={ inputLabel }
 			aria-activedescendant={ selectedItemId }
-			icon={ search }
 		/>
 	);
 }
