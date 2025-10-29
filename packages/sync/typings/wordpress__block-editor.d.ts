@@ -1,10 +1,8 @@
-import type { StoreDescriptor } from '@wordpress/data/build-types/types';
 import type { WPBlockSelection, WPSelection } from '@wordpress/editor';
+import type { AnyConfig, StoreDescriptor } from '@wordpress/data/build-types/types';
 
 declare module '@wordpress/block-editor' {
-	const store: {
-		name: string | StoreDescriptor< any >;
-	};
+	export const store: StoreDescriptor< AnyConfig >;
 
 	interface BlockEditorStoreSelectors {
 		getSelectionStart: () => WPBlockSelection;
