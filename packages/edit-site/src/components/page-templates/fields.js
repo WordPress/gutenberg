@@ -189,7 +189,7 @@ export const useThemeField = () => {
 };
 
 export const slugField = {
-	label: __( 'Template Type' ),
+	label: __( 'Type' ),
 	id: 'slug',
 	getValue: ( { item } ) => item.slug,
 	render: function Render( { item } ) {
