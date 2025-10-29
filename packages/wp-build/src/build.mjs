@@ -969,9 +969,6 @@ async function compileStyles( packageName ) {
 					{ '{{MAPPINGS}}': mappingsOutput }
 				),
 			] );
-
-			// Return the processed CSS for combining
-			return result.css;
 		} )
 	);
 
