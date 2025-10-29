@@ -22,6 +22,7 @@ import PostSchedulePanel from '../post-schedule/panel';
 import PostStatusPanel from '../post-status';
 import PostSyncStatus from '../post-sync-status';
 import PostTemplatePanel from '../post-template/panel';
+import TemplateTypePanel from '../template-type-panel';
 import PostURLPanel from '../post-url/panel';
 import BlogTitle from '../blog-title';
 import PostsPerPage from '../posts-per-page';
@@ -77,8 +78,9 @@ export default function PostSummary( { onActionPerformed } ) {
 										<PostStatusPanel />
 										<PostSchedulePanel />
 										<PostURLPanel />
-										<PostAuthorPanel />
+										{ /* <PostAuthorPanel /> */ }
 										<PostTemplatePanel />
+										<TemplateTypePanel />
 										<PostDiscussionPanel />
 										<PrivatePostLastRevision />
 										<PageAttributesPanel />
