@@ -7,6 +7,7 @@ const { state } = store( 'test/router-styles', {
 	state: {
 		clientSideNavigation: false,
 		prefetching: false,
+		hydrated: false,
 	},
 	actions: {
 		*navigate( e ) {
@@ -26,6 +27,11 @@ const { state } = store( 'test/router-styles', {
 			);
 			yield actions.prefetch( ref.href );
 			state.prefetching = false;
+		},
+	},
+	callbacks: {
+		setHydrated() {
+			state.hydrated = true;
 		},
 	},
 } );
