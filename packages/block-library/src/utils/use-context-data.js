@@ -12,6 +12,22 @@ const DEFAULT_CONTEXT = {
 };
 
 /**
+ * Creates a context object for taxonomy cases.
+ *
+ * @param {string}      taxonomy The taxonomy name.
+ * @param {string|null} termSlug The term slug (optional).
+ * @return {Object} Context object with taxonomy and optional term set.
+ */
+function createContext( taxonomy, termSlug = null ) {
+	return {
+		taxonomy,
+		termSlug,
+		isAuthor: false,
+		authorSlug: null,
+	};
+}
+
+/**
  * Hook to get the current template slug from the editor context.
  *
  * @return {string|null} The current template slug or null if not available.
@@ -79,12 +95,7 @@ export function parseTemplateSlug( templateSlug ) {
 			if ( dashIndices.length === 1 ) {
 				// Single dash
 				// e.g. taxonomy-product-category -> taxonomy: "product-category", term: null
-				return {
-					taxonomy: taxonomyPart,
-					termSlug: null,
-					isAuthor: false,
-					authorSlug: null,
-				};
+				return createContext( taxonomyPart );
 			}
 
 			// Multiple dashes
@@ -93,59 +104,29 @@ export function parseTemplateSlug( templateSlug ) {
 			const taxonomy = taxonomyPart.substring( 0, lastDashIndex );
 			const termSlug = taxonomyPart.substring( lastDashIndex + 1 );
 
-			return {
-				taxonomy,
-				termSlug,
-				isAuthor: false,
-				authorSlug: null,
-			};
+			return createContext( taxonomy, termSlug );
 		}
 
 		// No dashes, so the entire part is the taxonomy
-		return {
-			taxonomy: taxonomyPart,
-			termSlug: null,
-			isAuthor: false,
-			authorSlug: null,
-		};
+		return createContext( taxonomyPart );
 	}
 
 	// Check for built-in taxonomy patterns
 	// e.g. category, tag
 	if ( templateSlug === 'category' ) {
-		return {
-			taxonomy: 'category',
-			termSlug: null,
-			isAuthor: false,
-			authorSlug: null,
-		};
+		return createContext( 'category' );
 	}
 	if ( templateSlug === 'tag' ) {
-		return {
-			taxonomy: 'post_tag',
-			termSlug: null,
-			isAuthor: false,
-			authorSlug: null,
-		};
+		return createContext( 'post_tag' );
 	}
 
 	// Check for specific term patterns for built-in taxonomies
 	// e.g. category-news, tag-featured
 	if ( templateSlug.startsWith( 'category-' ) ) {
-		return {
-			taxonomy: 'category',
-			termSlug: templateSlug.substring( 9 ),
-			isAuthor: false,
-			authorSlug: null,
-		};
+		return createContext( 'category', templateSlug.substring( 9 ) );
 	}
 	if ( templateSlug.startsWith( 'tag-' ) ) {
-		return {
-			taxonomy: 'post_tag',
-			termSlug: templateSlug.substring( 4 ),
-			isAuthor: false,
-			authorSlug: null,
-		};
+		return createContext( 'post_tag', templateSlug.substring( 4 ) );
 	}
 
 	return DEFAULT_CONTEXT;
@@ -189,12 +170,10 @@ export function parseTemplateSlugWithValidation( templateSlug, getTaxonomy ) {
 				// Check if this taxonomy exists
 				const taxonomyRecord = getTaxonomy( potentialTaxonomy );
 				if ( taxonomyRecord ) {
-					return {
-						taxonomy: potentialTaxonomy,
-						termSlug: potentialTermSlug,
-						isAuthor: false,
-						authorSlug: null,
-					};
+					return createContext(
+						potentialTaxonomy,
+						potentialTermSlug
+					);
 				}
 			}
 		}
@@ -202,12 +181,7 @@ export function parseTemplateSlugWithValidation( templateSlug, getTaxonomy ) {
 		// If no valid split found, try the entire string as taxonomy.
 		const taxonomyRecord = getTaxonomy( taxonomyPart );
 		if ( taxonomyRecord ) {
-			return {
-				taxonomy: taxonomyPart,
-				termSlug: null,
-				isAuthor: false,
-				authorSlug: null,
-			};
+			return createContext( taxonomyPart );
 		}
 
 		// No valid taxonomy found.
