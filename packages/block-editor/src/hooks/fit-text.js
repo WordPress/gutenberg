@@ -3,7 +3,7 @@
  */
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
-import { useEffect, useCallback } from '@wordpress/element';
+import { useEffect, useCallback, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
@@ -61,6 +61,7 @@ function addAttributes( settings ) {
 function useFitText( { fitText, name, clientId } ) {
 	const hasFitTextSupport = hasBlockSupport( name, FIT_TEXT_SUPPORT_KEY );
 	const blockElement = useBlockElement( clientId );
+	const isInitialApplication = useRef( true );
 
 	// Monitor block attribute changes
 	// Any attribute may change the available space.
@@ -94,7 +95,31 @@ function useFitText( { fitText, name, clientId } ) {
 			styleElement.textContent = css;
 		};
 
-		optimizeFitText( blockElement, blockSelector, applyStylesFn );
+		// Capture element reference and initial state flag
+		const element = blockElement;
+		const shouldHideOnCalculation = isInitialApplication.current;
+
+		// Only hide/show on initial application to prevent flash on every keystroke
+		if ( shouldHideOnCalculation ) {
+			// Hide element during calculation to prevent flash
+			// eslint-disable-next-line react-compiler/react-compiler
+			element.style.opacity = '0';
+
+			// Wait for browser to render the hidden state
+			window.requestAnimationFrame( () => {
+				// Now do the calculation while hidden
+				optimizeFitText( element, blockSelector, applyStylesFn );
+
+				// Wait 100ms for browser to fully render the new font size
+				setTimeout( () => {
+					// Finally, show the element with the correct size
+					element.style.removeProperty( 'opacity' );
+				}, 10 );
+			} );
+		} else {
+			// Subsequent calls: apply directly without hiding
+			optimizeFitText( element, blockSelector, applyStylesFn );
+		}
 	}, [ blockElement, clientId, hasFitTextSupport, fitText ] );
 
 	useEffect( () => {
@@ -107,8 +132,14 @@ function useFitText( { fitText, name, clientId } ) {
 			return;
 		}
 
+		// Reset flag when fit text is enabled
+		isInitialApplication.current = true;
+
 		// Apply initially
 		applyFitText();
+
+		// Mark as no longer initial after first application
+		isInitialApplication.current = false;
 
 		// Store current element value for cleanup
 		const currentElement = blockElement;
