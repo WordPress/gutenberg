@@ -258,7 +258,7 @@ function gutenberg_resolve_block_template( $template_type, $template_hierarchy, 
 	//////////////////////////////
 
 	$object_id         = get_queried_object_id();
-	$specific_template = $object_id && get_post( $object_id ) ? get_page_template_slug( $object_id ) : null;
+	$specific_template = $object_id ? get_page_template_slug( $object_id ) : null;
 	$active_templates  = (array) get_option( 'active_templates', array() );
 
 	// We expect one template for each slug. Use the active template if it is
