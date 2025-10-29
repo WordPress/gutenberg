@@ -1,6 +1,7 @@
 {
 	"name": "@wordpress/workflow",
 	"version": "0.1.0",
+	"private": true,
 	"description": "Workflow palette for running abilities in WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
