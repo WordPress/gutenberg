@@ -1156,7 +1156,7 @@ async function buildAll() {
 	);
 
 	console.log( '\n📄 Generating PHP registration files...\n' );
-	const phpReplacements = await getPhpReplacements( ROOT_DIR );
+	const phpReplacements = await getReplacements( ROOT_DIR );
 	await Promise.all( [
 		generateMainIndexPhp( phpReplacements ),
 		generateModuleRegistrationPhp( modules, phpReplacements ),
