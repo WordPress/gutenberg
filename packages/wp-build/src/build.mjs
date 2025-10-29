@@ -950,7 +950,7 @@ async function compileStyles( packageName ) {
 		style.styleSheet.cssText = ${ JSON.stringify( result.css ) };
 		document.body.appendChild( style );
 		delete this[ ${ JSON.stringify( key ) } ];
-		return ${ JSON.stringify( value ) };
+		return ( this[ ${ JSON.stringify( key ) } ] = ${ JSON.stringify( value ) } );
 	}`
 				)
 				.join( ',\n' );
