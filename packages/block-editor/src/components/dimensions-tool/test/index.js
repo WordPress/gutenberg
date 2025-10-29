@@ -599,7 +599,7 @@ describe( 'DimensionsTool', () => {
 			expect( aspectRatioSelect ).toHaveValue( 'custom' );
 
 			await user.clear( widthInput, '' );
-			expect( aspectRatioSelect ).toHaveValue( '16/9' );
+			expect( aspectRatioSelect ).toHaveValue( 'auto' );
 
 			expect( onChange.mock.calls ).toStrictEqual( [
 				[ { aspectRatio: '16/9', scale: 'cover', width: '8px' } ],
