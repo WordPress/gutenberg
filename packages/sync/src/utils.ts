@@ -10,6 +10,7 @@ import * as buffer from 'lib0/buffer';
 import {
 	CRDT_DOC_META_PERSISTENCE_KEY,
 	CRDT_DOC_VERSION,
+	CRDT_RECORD_MAP_KEY,
 	CRDT_STATE_MAP_KEY,
 	CRDT_STATE_VERSION_KEY,
 } from './config';
@@ -61,4 +62,58 @@ export function deserializeCrdtDoc(
 	} catch ( e ) {
 		return null;
 	}
+}
+
+// Convenience types to manage block values with a clientId, attributes, and innerBlocks.
+type BlockClientId = string;
+type BlockAttributes = Y.Map< Y.Text >;
+type BlockInnerBlocks = Y.Array< SelectableBlock >;
+export type SelectableBlock = Y.Map<
+	BlockClientId | BlockAttributes | BlockInnerBlocks
+>;
+
+export function findBlockByClientIdInDoc(
+	blockId: string,
+	ydoc: Y.Doc
+): SelectableBlock | null {
+	// console.log( '--- findBlockByClientIdInDoc():', { blockId, ydoc } );
+	const ymap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
+	// console.log( 'ymap:', ymap );
+	const blocks = ymap.get( 'blocks' );
+	// console.log( 'blocks:', blocks );
+
+	if ( ! ( blocks instanceof Y.Array ) ) {
+		return null;
+	}
+
+	return findBlockByClientIdInBlocks(
+		blockId,
+		blocks as Y.Array< SelectableBlock >
+	);
+}
+
+function findBlockByClientIdInBlocks(
+	blockId: string,
+	blocks: Y.Array< SelectableBlock >
+): SelectableBlock | null {
+	for ( const block of blocks ) {
+		if ( block.get( 'clientId' ) === blockId ) {
+			return block;
+		}
+
+		const innerBlocks = block.get( 'innerBlocks' ) as BlockInnerBlocks;
+
+		if ( innerBlocks.length > 0 ) {
+			const innerBlock = findBlockByClientIdInBlocks(
+				blockId,
+				block.get( 'innerBlocks' ) as Y.Array< SelectableBlock >
+			);
+
+			if ( innerBlock ) {
+				return innerBlock;
+			}
+		}
+	}
+
+	return null;
 }

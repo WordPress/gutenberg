@@ -8,8 +8,8 @@ import * as Y from 'yjs';
  */
 import type { HistoryRecord } from '@wordpress/undo-manager';
 import { select, subscribe, dispatch } from '@wordpress/data';
-// @ts-expect-error
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import type { WPBlockSelection, WPSelection } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -17,6 +17,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { LOCAL_EDITOR_ORIGIN } from './config';
 import { YMultiDocUndoManager } from './y-utilities/y-multidoc-undomanager';
 import type { ObjectData, SyncUndoManager } from './types';
+import { findBlockByClientIdInDoc } from './utils';
 
 interface StackItemEvent {
 	stackItem: { meta: Map< any, any > };
@@ -24,18 +25,6 @@ interface StackItemEvent {
 	type: 'undo' | 'redo';
 	changedParentTypes: Map< Y.AbstractType< any >, Y.YEvent< any >[] >;
 	ydoc: Y.Doc;
-}
-
-// Can these be direct imports?
-interface WPBlockSelection {
-	clientId: string;
-	attributeKey: string;
-	offset: number;
-}
-
-interface WPSelection {
-	selectionEnd: WPBlockSelection;
-	selectionStart: WPBlockSelection;
 }
 
 /**
@@ -48,8 +37,8 @@ export function createUndoManager(): SyncUndoManager {
 	const selectionTracker = new SelectionTracker();
 
 	const yUndoManager = new YMultiDocUndoManager( [], {
-		// Throttle undo/redo captures. (default: 500ms)
-		captureTimeout: 1000,
+		// Throttle undo/redo captures.
+		captureTimeout: 500,
 		// Ensure that we only scope the undo/redo to the current editor.
 		// The yjs document's clientID is added once it's available.
 		trackedOrigins: new Set( [ LOCAL_EDITOR_ORIGIN ] ),
@@ -62,46 +51,53 @@ export function createUndoManager(): SyncUndoManager {
 		if ( lastSelection === null ) {
 			// If we don't have a selection, then don't save anything extra
 			// to the stack.
+			console.log( 'No lastSelection, doing nothing' );
+			return;
+		} else if ( event.type === 'redo' ) {
+			// Don't modify anything when restoring a redo.
+			console.log( 'Skipping redo update' );
 			return;
 		}
 
-		for ( const yType of event.changedParentTypes.keys() ) {
-			if ( yType instanceof Y.Text ) {
-				const yText = yType as Y.Text;
+		const clientId = lastSelection.selectionStart.clientId;
+		const block = findBlockByClientIdInDoc( clientId, event.ydoc );
+		const attributeKey = lastSelection.selectionStart.attributeKey;
+		const changedYText = block?.get( attributeKey );
 
-				// Find the attribute key for the Y.Text node in the parent Y.Map.
-				let attributeKey = null;
-				if ( yText.parent instanceof Y.Map ) {
-					for ( const [ key, value ] of yText.parent ) {
-						if ( value === yText ) {
-							attributeKey = key;
-							break;
-						}
-					}
-				}
+		if ( ! ( changedYText instanceof Y.Text ) ) {
+			// Could not find the relevant YText in the document, skip bundling position
+			console.log( 'Could not find relavant YText, doing nothing' );
+			return;
+		}
 
-				const offset = lastSelection.selectionStart.offset;
-				const clientId = lastSelection.selectionStart.clientId;
+		if ( attributeKey && clientId ) {
+			const offset = lastSelection.selectionStart.offset;
+			const relativePosition = Y.createRelativePositionFromTypeIndex(
+				changedYText,
+				offset
+			);
 
-				if ( attributeKey && offset && clientId ) {
-					const relativePosition =
-						Y.createRelativePositionFromTypeIndex( yType, offset );
+			console.log( 'Setting position meta with:', {
+				attributeKey,
+				relativePosition,
+				clientId,
+			} );
 
-					event.stackItem.meta.set( 'position', {
-						attributeKey,
-						relativePosition,
-						clientId,
-					} );
-
-					// There ever only seems to be a single Y.Text update per event.
-					// If we found one, assume it was correct.
-					break;
-				}
-			}
+			event.stackItem.meta.set( 'position', {
+				attributeKey,
+				relativePosition,
+				clientId,
+			} );
+		} else {
+			console.log( 'Could not set position meta:', {
+				attributeKey,
+				clientId,
+			} );
 		}
 	}
 
-	function restoreSelection( event: StackItemEvent ): void {
+	function restorePosition( event: StackItemEvent ): void {
+		console.log( '--- restorePosition()' );
 		const { relativePosition, clientId, attributeKey } =
 			event.stackItem.meta.get( 'position' ) ?? {};
 
@@ -111,6 +107,8 @@ export function createUndoManager(): SyncUndoManager {
 					relativePosition,
 					event.ydoc
 				);
+
+			console.log( 'Got absolutePosition:', absolutePosition );
 
 			if ( absolutePosition ) {
 				const { selectionChange } = dispatch( blockEditorStore ) as {
@@ -122,6 +120,12 @@ export function createUndoManager(): SyncUndoManager {
 					) => void;
 				};
 
+				console.log( 'Restoring selection:', {
+					clientId,
+					attributeKey,
+					index: absolutePosition.index,
+				} );
+
 				selectionChange(
 					clientId,
 					attributeKey,
@@ -129,6 +133,12 @@ export function createUndoManager(): SyncUndoManager {
 					absolutePosition.index
 				);
 			}
+		} else {
+			console.log( 'Could not restore position:', {
+				relativePosition,
+				clientId,
+				attributeKey,
+			} );
 		}
 	}
 
@@ -141,7 +151,7 @@ export function createUndoManager(): SyncUndoManager {
 	} );
 
 	yUndoManager.on( 'stack-item-popped', ( event: StackItemEvent ) => {
-		restoreSelection( event );
+		restorePosition( event );
 	} );
 
 	return {
@@ -157,6 +167,11 @@ export function createUndoManager(): SyncUndoManager {
 			_record?: HistoryRecord< ObjectData >,
 			_isStaged = false // eslint-disable-line @typescript-eslint/no-unused-vars
 		): void {
+			console.log( '--- addRecord():', {
+				_record,
+				_isStaged,
+				lastSelection: selectionTracker.getLastSelection(),
+			} );
 			// This is a no-op for Yjs since it automatically tracks changes.
 			// If needed, we could implement custom logic to handle specific records.
 		},
@@ -226,12 +241,13 @@ export function createUndoManager(): SyncUndoManager {
 /**
  * When a change is made to the document, we don't know the starting
  * position of the user before the change. That's because the 'stack-item-added'
- * event and addRecord() method are called after the selection has updated.
+ * event and addRecord() method are called after the selection has updated to
+ * the new cursor position after the change has occurred.
  *
  * We need the position of the cursor before the change in order to restore the
  * selection position with an undo. To do so, keep the current and prior
- * selection position. When it changes, update the last selection position and
- * use this value to store the prior cursor position.
+ * selection position. Each time position changes, update the last selection
+ * position and use this value to store on the undo stack.
  */
 class SelectionTracker {
 	private lastSelection: WPSelection | null = null;

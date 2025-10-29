@@ -4,5 +4,10 @@
 	"compilerOptions": {
 		"types": [ "node" ]
 	},
-	"references": [ { "path": "../hooks" }, { "path": "../url" } ]
+	"include": [ "src", "typings" ],
+	"references": [
+		{ "path": "../block-editor" },
+		{ "path": "../hooks" },
+		{ "path": "../url" }
+	]
 }
