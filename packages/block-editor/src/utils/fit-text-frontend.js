@@ -55,9 +55,14 @@ function getElementIdentifier( element ) {
  * @param {HTMLElement} element Element with fit text enabled.
  */
 function initializeFitText( element ) {
-	// Skip if already initialized (element already has an ID)
-	if ( element.dataset.fitTextId ) {
+	// Check if already initialized by looking for active observer
+	if ( element.dataset.fitTextId && resizeObservers.has( element.dataset.fitTextId ) ) {
 		return;
+	}
+
+	// If has ID but no observer, clear stale ID
+	if ( element.dataset.fitTextId ) {
+		delete element.dataset.fitTextId;
 	}
 
 	const elementId = getElementIdentifier( element );
@@ -120,30 +125,13 @@ window.addEventListener( 'load', initializeAllFitText );
 // Watch for dynamically added/removed fit-text elements (e.g., from Interactivity API navigation)
 if ( window.MutationObserver ) {
 	const observer = new window.MutationObserver( ( mutations ) => {
-		// Collect all added element references in this batch to detect moves vs removals
-		const addedElements = new Set();
 		for ( const mutation of mutations ) {
-			if ( mutation.addedNodes.length > 0 ) {
-				for ( const node of mutation.addedNodes ) {
-					if ( node.nodeType === 1 ) {
-						addedElements.add( node );
-					}
-				}
-			}
-		}
-
-		for ( const mutation of mutations ) {
-			// Handle removed nodes first (cleanup)
+			// Handle removed nodes (cleanup)
 			if ( mutation.removedNodes.length > 0 ) {
 				for ( const node of mutation.removedNodes ) {
 					// Skip non-element nodes
 					if ( node.nodeType !== 1 ) {
 						continue;
-					}
-
-					// IMPORTANT: Only cleanup if element is NOT being re-added (i.e., truly removed)
-					if ( addedElements.has( node ) ) {
-						continue; // Element is being moved, not removed
 					}
 
 					// Check if removed node itself is a fit-text element
@@ -157,10 +145,7 @@ if ( window.MutationObserver ) {
 					);
 					if ( removedFitTextElements?.length > 0 ) {
 						removedFitTextElements.forEach( ( el ) => {
-							// Only cleanup if not being re-added
-							if ( ! addedElements.has( el ) ) {
-								cleanupFitText( el.dataset.fitTextId );
-							}
+							cleanupFitText( el.dataset.fitTextId );
 						} );
 					}
 				}
@@ -176,38 +161,13 @@ if ( window.MutationObserver ) {
 
 					// Check if the node itself is a fit-text element
 					if ( node.classList?.contains( 'has-fit-text' ) ) {
-						// If already initialized and observer exists, skip
-						if (
-							node.dataset.fitTextId &&
-							resizeObservers.has( node.dataset.fitTextId )
-						) {
-							continue;
-						}
-						// Has ID but no observer (was cleaned up or moved), clear ID to reinit
-						if ( node.dataset.fitTextId ) {
-							delete node.dataset.fitTextId;
-						}
 						initializeFitText( node );
 					}
 
 					// Check for fit-text elements within the added node
-					const fitTextElements =
-						node.querySelectorAll?.( '.has-fit-text' );
+					const fitTextElements = node.querySelectorAll?.( '.has-fit-text' );
 					if ( fitTextElements?.length > 0 ) {
-						fitTextElements.forEach( ( el ) => {
-							// If already initialized and observer exists, skip
-							if (
-								el.dataset.fitTextId &&
-								resizeObservers.has( el.dataset.fitTextId )
-							) {
-								return;
-							}
-							// Has ID but no observer, clear ID to reinit
-							if ( el.dataset.fitTextId ) {
-								delete el.dataset.fitTextId;
-							}
-							initializeFitText( el );
-						} );
+						fitTextElements.forEach( initializeFitText );
 					}
 				}
 			}
