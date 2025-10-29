@@ -563,22 +563,37 @@ export const InfiniteScroll = () => {
 	);
 };
 
-export const Timeline = () => {
+const TimelineComponent = ( {
+	showMedia = 'true',
+}: {
+	showMedia: 'true' | 'false';
+} ) => {
 	const [ view, setView ] = useState< View >( {
 		type: LAYOUT_TIMELINE,
 		search: '',
 		page: 1,
 		perPage: 20,
 		filters: [],
-		fields: [ 'satellites' ],
+		fields: [ 'categories', 'datetime' ],
 		titleField: 'title',
 		descriptionField: 'description',
 		groupByField: 'date',
 		mediaField: 'image',
+		showMedia: showMedia === 'true',
 		layout: {
 			eventField: 'date',
+			dateFormat: 'M j, Y',
 		},
 	} );
+	useEffect( () => {
+		const setShowMedia = showMedia === 'true';
+		if ( setShowMedia !== view.showMedia ) {
+			setView( {
+				...view,
+				showMedia: setShowMedia,
+			} );
+		}
+	}, [ view, showMedia ] );
 	const { data: shownData, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( data, view, fields );
 	}, [ view ] );
@@ -596,4 +611,19 @@ export const Timeline = () => {
 			} }
 		/>
 	);
+};
+
+export const Timeline = {
+	render: TimelineComponent,
+	args: {
+		showMedia: 'true',
+	},
+	argTypes: {
+		showMedia: {
+			control: 'select',
+			options: [ 'true', 'false' ],
+			defaultValue: 'true',
+			description: 'Whether the media is shown in the timeline',
+		},
+	},
 };

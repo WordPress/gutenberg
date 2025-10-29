@@ -14,7 +14,7 @@ div.dataviews-view-timeline {
 
 		.dataviews-view-timeline__item-wrapper {
 			position: relative;
-			padding: $grid-unit-10 $grid-unit-30;
+			padding: 0 $grid-unit-30;
 			box-sizing: border-box;
 		}
 
@@ -53,6 +53,15 @@ div.dataviews-view-timeline {
 				flex-basis: min-content;
 				width: auto;
 				overflow: unset;
+			}
+		}
+
+		&.is-selected.is-selected {
+			border-top: 1px solid rgba(var(--wp-admin-theme-color--rgb), 0.12);
+
+			& + div[role="row"],
+			& + div[role="article"] {
+				border-top: 1px solid rgba(var(--wp-admin-theme-color--rgb), 0.12);
 			}
 		}
 
@@ -125,35 +134,8 @@ div.dataviews-view-timeline {
 		}
 	}
 
-	.dataviews-view-timeline__media-wrapper {
-		width: $grid-unit-30;
-		height: $grid-unit-30;
-		overflow: hidden;
-		position: relative;
-		flex-shrink: 0;
-		background-color: $white;
-		border-radius: $radius-round;
-		outline: $grid-unit-05 solid $white;
-
-		img {
-			width: 100%;
-			height: 100%;
-			object-fit: cover;
-		}
-
-		&::after {
-			content: "";
-			position: absolute;
-			top: 0;
-			left: 0;
-			width: 100%;
-			height: 100%;
-			box-shadow: inset 0 0 0 $border-width rgba(0, 0, 0, 0.1);
-			border-radius: $radius-round;
-		}
-	}
-
 	.dataviews-view-timeline__field-wrapper {
+		padding: $grid-unit-10 0;
 		min-height: $grid-unit-05 * 13;
 		flex-grow: 1;
 	}
@@ -197,14 +179,48 @@ div.dataviews-view-timeline {
 	padding: 0 $grid-unit-30;
 }
 
-.dataviews-view-timeline__group-items {
+.dataviews-view-timeline__event-type-wrapper {
+	align-self: stretch;
+	min-width: $grid-unit-30;
+}
+
+.dataviews-view-timeline__event-type-icon {
+	width: $grid-unit-30;
+	height: $grid-unit-30;
+	overflow: hidden;
 	position: relative;
-	&::before {
+	flex-shrink: 0;
+	background-color: $white;
+	border-radius: $radius-round;
+
+	img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	svg {
+		width: $grid-unit-30;
+		height: $grid-unit-30;
+		border-radius: $radius-round;
+		box-shadow: inset 0 0 0 $border-width $gray-100;
+	}
+}
+
+.dataviews-view-timeline__spacer {
+	position: relative;
+	flex: 1 0 auto;
+	&::after {
 		content: "";
 		position: absolute;
-		margin-left: calc($grid-unit-30 + $grid-unit-15);
-		background-color: $gray-100;
+		top: 0;
+		left: 50%;
 		width: 1px;
 		height: 100%;
+		background-color: $gray-100;
+	}
+	&:first-child {
+		height: $grid-unit-10;
+		flex: 0 0 auto;
 	}
 }
