@@ -13,7 +13,7 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import { useAddedBy } from '../page-templates/hooks';
-import { addTemplate, published } from '@wordpress/icons';
+import { commentAuthorAvatar, published } from '@wordpress/icons';
 import { unlock } from '../../lock-unlock';
 
 const { useLocation } = unlock( routerPrivateApis );
@@ -69,7 +69,7 @@ export default function DataviewsTemplatesSidebarContent() {
 			</SidebarNavigationItem>
 			<SidebarNavigationItem
 				to={ addQueryArgs( '/template', { activeView: 'user' } ) }
-				icon={ addTemplate }
+				icon={ commentAuthorAvatar }
 				aria-current={ activeView === 'user' }
 			>
 				{
