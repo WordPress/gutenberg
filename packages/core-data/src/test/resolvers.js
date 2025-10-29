@@ -549,19 +549,33 @@ describe( 'getEntityRecords', () => {
 			[ RECEIVE_INTERMEDIATE_RESULTS ]: true,
 		} )( { dispatch, registry, resolveSelect } );
 
-		const calls = dispatch.receiveEntityRecords.mock.calls;
-
 		// 3 calls for intermediate results (one per page), plus 1 final call with complete records
-		expect( calls.length ).toBe( 4 );
+		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledTimes( 4 );
 
-		calls.forEach( ( call ) => {
+		// Check that all calls include pagination metadata
+		dispatch.receiveEntityRecords.mock.calls.forEach( ( call ) => {
 			// 7th parameter is the pagination metadata
-			expect( call[ 6 ] ).toEqual( { totalItems: 5, totalPages: 1 } );
+			expect( call[ 6 ] ).toEqual(
+				expect.objectContaining( { totalItems: 5, totalPages: 1 } )
+			);
 		} );
 
 		// Should process all the data from the 3 mock pages (2+2+1=5 records total)
-		const finalCall = calls[ calls.length - 1 ];
-		expect( finalCall[ 2 ] ).toHaveLength( 5 );
+		expect( dispatch.receiveEntityRecords ).toHaveBeenLastCalledWith(
+			'postType',
+			'attachment',
+			expect.arrayContaining( [
+				expect.objectContaining( { id: 1 } ),
+				expect.objectContaining( { id: 2 } ),
+				expect.objectContaining( { id: 3 } ),
+				expect.objectContaining( { id: 4 } ),
+				expect.objectContaining( { id: 5 } ),
+			] ),
+			{ per_page: -1, [ RECEIVE_INTERMEDIATE_RESULTS ]: true },
+			false,
+			undefined,
+			expect.objectContaining( { totalItems: 5, totalPages: 1 } )
+		);
 	} );
 } );
 
