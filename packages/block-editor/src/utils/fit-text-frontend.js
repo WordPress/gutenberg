@@ -89,26 +89,46 @@ function initializeAllFitText() {
 // Initialize on page load
 window.addEventListener( 'load', initializeAllFitText );
 
-// Re-initialize after Interactivity API navigation
-// The Interactivity API router uses history.pushState/replaceState for navigation,
-// so we wrap these methods to detect when navigation occurs.
-const originalPushState = window.history.pushState;
-const originalReplaceState = window.history.replaceState;
+// Watch for dynamically added fit-text elements (e.g., from Interactivity API navigation)
+if ( window.MutationObserver ) {
+	const observer = new window.MutationObserver( ( mutations ) => {
+		// Only process mutations that added nodes
+		for ( const mutation of mutations ) {
+			if ( mutation.addedNodes.length === 0 ) {
+				continue;
+			}
 
-window.history.pushState = function ( ...args ) {
-	const result = originalPushState.apply( this, args );
-	// Small delay to ensure router has finished rendering
-	setTimeout( initializeAllFitText, 100 );
-	return result;
-};
+			// Check each added node
+			for ( const node of mutation.addedNodes ) {
+				// Skip non-element nodes
+				if ( node.nodeType !== 1 ) {
+					continue;
+				}
 
-window.history.replaceState = function ( ...args ) {
-	const result = originalReplaceState.apply( this, args );
-	setTimeout( initializeAllFitText, 100 );
-	return result;
-};
+				// Check if the node itself is a fit-text element
+				if (
+					node.classList?.contains( 'has-fit-text' ) &&
+					! node.dataset.fitTextId
+				) {
+					initializeFitText( node );
+				}
 
-// Handle back/forward navigation
-window.addEventListener( 'popstate', () => {
-	setTimeout( initializeAllFitText, 100 );
-} );
+				// Check for fit-text elements within the added node
+				const fitTextElements = node.querySelectorAll?.(
+					'.has-fit-text:not([data-fit-text-id])'
+				);
+				if ( fitTextElements?.length > 0 ) {
+					fitTextElements.forEach( initializeFitText );
+				}
+			}
+		}
+	} );
+
+	// Start observing after page load
+	window.addEventListener( 'load', () => {
+		observer.observe( document.body, {
+			childList: true,
+			subtree: true,
+		} );
+	} );
+}
