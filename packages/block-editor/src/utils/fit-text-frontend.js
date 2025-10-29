@@ -89,41 +89,26 @@ function initializeAllFitText() {
 // Initialize on page load
 window.addEventListener( 'load', initializeAllFitText );
 
-// Re-initialize after Interactivity API router navigation
-// The router uses popstate for back/forward and renders new content into router regions
+// Re-initialize after Interactivity API navigation
+// The Interactivity API router uses history.pushState/replaceState for navigation,
+// so we wrap these methods to detect when navigation occurs.
+const originalPushState = window.history.pushState;
+const originalReplaceState = window.history.replaceState;
+
+window.history.pushState = function ( ...args ) {
+	const result = originalPushState.apply( this, args );
+	// Small delay to ensure router has finished rendering
+	setTimeout( initializeAllFitText, 100 );
+	return result;
+};
+
+window.history.replaceState = function ( ...args ) {
+	const result = originalReplaceState.apply( this, args );
+	setTimeout( initializeAllFitText, 100 );
+	return result;
+};
+
+// Handle back/forward navigation
 window.addEventListener( 'popstate', () => {
-	// Small delay to let the router finish rendering
 	setTimeout( initializeAllFitText, 100 );
 } );
-
-// Watch for DOM changes in router regions to catch client-side navigation
-if ( window.MutationObserver ) {
-	const observer = new window.MutationObserver( ( mutations ) => {
-		// Check if any mutations affected elements with router region attributes
-		const hasRouterChanges = mutations.some( ( mutation ) => {
-			// Check if mutation is in a router region
-			if ( mutation.target.nodeType === 1 ) {
-				const target = mutation.target;
-				return (
-					target.hasAttribute( 'data-wp-router-region' ) ||
-					target.closest( '[data-wp-router-region]' )
-				);
-			}
-			return false;
-		} );
-
-		if ( hasRouterChanges ) {
-			// Debounce re-initialization
-			clearTimeout( observer.timer );
-			observer.timer = setTimeout( initializeAllFitText, 100 );
-		}
-	} );
-
-	// Start observing after page load
-	window.addEventListener( 'load', () => {
-		observer.observe( document.body, {
-			childList: true,
-			subtree: true,
-		} );
-	} );
-}
