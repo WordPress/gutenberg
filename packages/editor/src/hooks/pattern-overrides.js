@@ -43,9 +43,11 @@ const withPatternOverrideControls = createHigherOrderComponent(
 			<>
 				<BlockEdit key="edit" { ...props } />
 				{ props.isSelected && isSupportedBlock && (
-					<ControlsWithStoreSubscription { ...props } />
+					<>
+						<ControlsWithStoreSubscription { ...props } />
+						<PatternOverridesBlockControls />
+					</>
 				) }
-				{ isSupportedBlock && <PatternOverridesBlockControls /> }
 			</>
 		);
 	},
