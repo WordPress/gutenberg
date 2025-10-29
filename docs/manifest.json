@@ -2085,11 +2085,6 @@
 		"title": "@wordpress/wp-build",
 		"slug": "packages-wp-build",
 		"markdown_source": "../packages/wp-build/README.md",
-	},
-	{
-		"title": "@wordpress/workflow",
-		"slug": "packages-workflow",
-		"markdown_source": "../packages/workflow/README.md",
 		"parent": "packages"
 	},
 	{
