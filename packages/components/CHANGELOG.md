@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 30.7.0 (2025-10-29)
+
 ### Bug Fixes
 
 -   `CardHeader`: Fix missing Flex props ([#71915](https://github.com/WordPress/gutenberg/pull/71915)).

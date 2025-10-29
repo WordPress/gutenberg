@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.2.0 (2025-10-29)
+
 ### New Features
 
 - Initial release of `@wordpress/build` package
