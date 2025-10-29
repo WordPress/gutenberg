@@ -1119,9 +1119,6 @@ async function buildAll() {
 	for ( const level of levels ) {
 		await Promise.all(
 			level.map( async ( fullName ) => {
-				if ( fullName !== '@wordpress/theme' ) {
-					return;
-				}
 				const packageName = fullToShort.get( fullName );
 				const buildTime = await transpilePackage( packageName );
 				console.log(
