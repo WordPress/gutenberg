@@ -13,8 +13,9 @@ import chokidar from 'chokidar';
 // See https://github.com/WordPress/gutenberg/issues/72136
 // eslint-disable-next-line import/no-unresolved
 import browserslistToEsbuild from 'browserslist-to-esbuild';
-import { sassPlugin, postcssModules } from 'esbuild-sass-plugin';
+import { sassPlugin } from 'esbuild-sass-plugin';
 import postcss from 'postcss';
+import postcssModulesPlugin from 'postcss-modules';
 import autoprefixer from 'autoprefixer';
 import rtlcss from 'rtlcss';
 import cssnano from 'cssnano';
@@ -26,9 +27,9 @@ import { camelCase } from 'change-case';
  */
 import { groupByDepth, findScriptsToRebundle } from './dependency-graph.mjs';
 import {
-	generatePhpFromTemplate,
-	getPhpReplacements,
-} from './php-generator.mjs';
+	generateFromTemplate,
+	getReplacements,
+} from './template-generator.mjs';
 import { getPackageInfo, getPackageInfoFromFile } from './package-utils.mjs';
 import { createWordpressExternalsPlugin } from './wordpress-externals-plugin.mjs';
 
@@ -37,7 +38,6 @@ const PACKAGES_DIR = path.join( ROOT_DIR, 'packages' );
 const BUILD_DIR = path.join( ROOT_DIR, 'build' );
 
 const SOURCE_EXTENSIONS = '{js,ts,tsx}';
-const ASSET_EXTENSIONS = '{json,module.css}';
 const IGNORE_PATTERNS = [
 	'**/benchmark/**',
 	'**/{__mocks__,__tests__,test}/**',
@@ -61,13 +61,14 @@ function getAllPackages() {
 }
 
 const PACKAGES = getAllPackages();
-const ROOT_PACKAGE_JSON = getPackageInfoFromFile( path.join( ROOT_DIR, 'package.json' ) );
+const ROOT_PACKAGE_JSON = getPackageInfoFromFile(
+	path.join( ROOT_DIR, 'package.json' )
+);
 const WP_PLUGIN_CONFIG = ROOT_PACKAGE_JSON.wpPlugin || {};
 const SCRIPT_GLOBAL = WP_PLUGIN_CONFIG.scriptGlobal;
 const PACKAGE_NAMESPACE = WP_PLUGIN_CONFIG.packageNamespace;
 const HANDLE_PREFIX = WP_PLUGIN_CONFIG.handlePrefix || PACKAGE_NAMESPACE;
 const EXTERNAL_NAMESPACES = WP_PLUGIN_CONFIG.externalNamespaces || {};
-
 
 const baseDefine = {
 	'globalThis.IS_GUTENBERG_PLUGIN': JSON.stringify(
@@ -278,7 +279,9 @@ async function bundlePackage( packageName ) {
 
 		// Check if package matches the namespace and should expose a global
 		const packageFullName = packageJson.name;
-		const matchesNamespace = packageFullName.startsWith( `@${ PACKAGE_NAMESPACE }/` );
+		const matchesNamespace = packageFullName.startsWith(
+			`@${ PACKAGE_NAMESPACE }/`
+		);
 		const shouldExposeGlobal = matchesNamespace && SCRIPT_GLOBAL !== false;
 
 		const globalName = shouldExposeGlobal
@@ -309,12 +312,6 @@ async function bundlePackage( packageName ) {
 				'iife',
 				packageJson.wpScriptExtraDependencies || []
 			),
-			sassPlugin( {
-				embedded: true,
-				filter: /\.module\.css$/,
-				transform: postcssModules( {} ),
-				type: 'style',
-			} ),
 		];
 
 		builds.push(
@@ -660,12 +657,12 @@ async function generateModuleRegistrationPhp( modules, replacements ) {
 		.join( '\n' );
 
 	await Promise.all( [
-		generatePhpFromTemplate(
+		generateFromTemplate(
 			'module-registry.php.template',
 			path.join( BUILD_DIR, 'modules', 'index.php' ),
 			{ ...replacements, '{{MODULES}}': modulesArray }
 		),
-		generatePhpFromTemplate(
+		generateFromTemplate(
 			'module-registration.php.template',
 			path.join( BUILD_DIR, 'modules.php' ),
 			replacements
@@ -693,12 +690,12 @@ async function generateScriptRegistrationPhp( scripts, replacements ) {
 		.join( '\n' );
 
 	await Promise.all( [
-		generatePhpFromTemplate(
+		generateFromTemplate(
 			'script-registry.php.template',
 			path.join( BUILD_DIR, 'scripts', 'index.php' ),
 			{ ...replacements, '{{SCRIPTS}}': scriptsArray }
 		),
-		generatePhpFromTemplate(
+		generateFromTemplate(
 			'script-registration.php.template',
 			path.join( BUILD_DIR, 'scripts.php' ),
 			replacements
@@ -712,7 +709,7 @@ async function generateScriptRegistrationPhp( scripts, replacements ) {
  * @param {Record<string, string>} replacements PHP template replacements.
  */
 async function generateVersionPhp( replacements ) {
-	await generatePhpFromTemplate(
+	await generateFromTemplate(
 		'version.php.template',
 		path.join( BUILD_DIR, 'version.php' ),
 		replacements
@@ -741,12 +738,12 @@ async function generateStyleRegistrationPhp( styles, replacements ) {
 		.join( '\n' );
 
 	await Promise.all( [
-		generatePhpFromTemplate(
+		generateFromTemplate(
 			'style-registry.php.template',
 			path.join( BUILD_DIR, 'styles', 'index.php' ),
 			{ ...replacements, '{{STYLES}}': stylesArray }
 		),
-		generatePhpFromTemplate(
+		generateFromTemplate(
 			'style-registration.php.template',
 			path.join( BUILD_DIR, 'styles.php' ),
 			replacements
@@ -760,7 +757,7 @@ async function generateStyleRegistrationPhp( styles, replacements ) {
  * @param {Record<string, string>} replacements PHP template replacements.
  */
 async function generateMainIndexPhp( replacements ) {
-	await generatePhpFromTemplate(
+	await generateFromTemplate(
 		'index.php.template',
 		path.join( BUILD_DIR, 'index.php' ),
 		replacements
@@ -795,10 +792,8 @@ async function transpilePackage( packageName ) {
 		}
 	);
 
-	const assetFiles = await glob(
-		normalizePath(
-			path.join( packageDir, `src/**/*.${ ASSET_EXTENSIONS }` )
-		),
+	const jsonFiles = await glob(
+		normalizePath( path.join( packageDir, 'src/**/*.json' ) ),
 		{
 			ignore: IGNORE_PATTERNS,
 		}
@@ -836,13 +831,13 @@ async function transpilePackage( packageName ) {
 			} )
 		);
 
-		for ( const assetFile of assetFiles ) {
-			const relativePath = path.relative( srcDir, assetFile );
+		for ( const jsonFile of jsonFiles ) {
+			const relativePath = path.relative( srcDir, jsonFile );
 			const destPath = path.join( buildDir, relativePath );
 			const destDir = path.dirname( destPath );
 			builds.push(
 				mkdir( destDir, { recursive: true } ).then( () =>
-					copyFile( assetFile, destPath )
+					copyFile( jsonFile, destPath )
 				)
 			);
 		}
@@ -868,7 +863,7 @@ async function transpilePackage( packageName ) {
 			} )
 		);
 
-		for ( const jsonFile of assetFiles ) {
+		for ( const jsonFile of jsonFiles ) {
 			const relativePath = path.relative( srcDir, jsonFile );
 			const destPath = path.join( buildModuleDir, relativePath );
 			const destDir = path.dirname( destPath );
@@ -890,9 +885,9 @@ async function transpilePackage( packageName ) {
 /**
  * Compile styles for a single package.
  *
- * Discovers and compiles SCSS entry points based on package configuration,
- * supporting wpStyleEntryPoints in package.json for custom entry point
- * patterns.
+ * Discovers and compiles SCSS entry points based on package configuration
+ * (supporting wpStyleEntryPoints in package.json for custom entry point patterns),
+ * and all .module.css files in src/ directory.
  *
  * @param {string} packageName Package name.
  * @return {Promise<number|null>} Build time in milliseconds, or null if no styles.
@@ -915,13 +910,69 @@ async function compileStyles( packageName ) {
 		)
 	);
 
-	if ( scssEntries.length === 0 ) {
+	// Get CSS modules from anywhere in src/
+	const cssModuleEntries = await glob(
+		normalizePath( path.join( packageDir, 'src/**/*.module.css' ) ),
+		{ ignore: IGNORE_PATTERNS }
+	);
+
+	if ( scssEntries.length === 0 && cssModuleEntries.length === 0 ) {
 		return null;
 	}
 
 	const startTime = Date.now();
 	const buildStyleDir = path.join( packageDir, 'build-style' );
 	const srcDir = path.join( packageDir, 'src' );
+
+	// Process .module.css files and generate JS modules
+	await Promise.all(
+		cssModuleEntries.map( async ( styleEntryPath ) => {
+			const buildDir = path.join( packageDir, 'build' );
+			const buildModuleDir = path.join( packageDir, 'build-module' );
+
+			const cssContent = await readFile( styleEntryPath, 'utf8' );
+			const relativePath = path.relative( srcDir, styleEntryPath );
+
+			let mappings = {};
+			const result = await postcss( [
+				postcssModulesPlugin( {
+					getJSON: ( _, json ) => ( mappings = json ),
+				} ),
+			] ).process( cssContent, { from: styleEntryPath } );
+
+			// Generate JS modules with class name mappings (preserving directory structure)
+			const jsPath = `${ relativePath }.js`;
+			const mappingsOutput = Object.entries( mappings )
+				.map(
+					( [ key, value ] ) =>
+						`get [ ${ JSON.stringify( key ) } ]() {
+		const style = document.createElement( 'style' );
+		style.styleSheet.cssText = ${ JSON.stringify( result.css ) };
+		delete this[ ${ JSON.stringify( key ) } ];
+		return ${ JSON.stringify( value ) };
+	}`
+				)
+				.join( ',\n' );
+			await Promise.all( [
+				generateFromTemplate(
+					'css-module.cjs.template',
+					path.join(
+						buildDir,
+						relativePath.replace( '.module.css', '.js' )
+					),
+					{ '{{MAPPINGS}}': mappingsOutput }
+				),
+				generateFromTemplate(
+					'css-module.mjs.template',
+					path.join( buildModuleDir, jsPath ),
+					{ '{{MAPPINGS}}': mappingsOutput }
+				),
+			] );
+
+			// Return the processed CSS for combining
+			return result.css;
+		} )
+	);
 
 	// Process SCSS files
 	await Promise.all(
@@ -1067,6 +1118,9 @@ async function buildAll() {
 	for ( const level of levels ) {
 		await Promise.all(
 			level.map( async ( fullName ) => {
+				if ( fullName !== '@wordpress/theme' ) {
+					return;
+				}
 				const packageName = fullToShort.get( fullName );
 				const buildTime = await transpilePackage( packageName );
 				console.log(

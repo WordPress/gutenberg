@@ -13,12 +13,12 @@ import { getPackageInfoFromFile } from './package-utils.mjs';
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
 
 /**
- * Get PHP replacements from root package.json.
+ * Get replacements from root package.json.
  *
  * @param {string} rootDir Root directory path.
  * @return {Promise<Record<string, string>>} Replacements object with {{PREFIX}}, {{VERSION}}, {{VERSION_CONSTANT}}.
  */
-export async function getPhpReplacements( rootDir ) {
+export async function getReplacements( rootDir ) {
 	const rootPackageJson = getPackageInfoFromFile(
 		path.join( rootDir, 'package.json' )
 	);
@@ -40,13 +40,13 @@ export async function getPhpReplacements( rootDir ) {
 }
 
 /**
- * Generate a PHP file from a template with replacements.
+ * Generate a file from a template with replacements.
  *
  * @param {string}                 templateName Template file name.
  * @param {string}                 outputPath   Full output path.
  * @param {Record<string, string>} replacements Replacements object (e.g. {'{{PREFIX}}': 'gutenberg'}).
  */
-export async function generatePhpFromTemplate(
+export async function generateFromTemplate(
 	templateName,
 	outputPath,
 	replacements
