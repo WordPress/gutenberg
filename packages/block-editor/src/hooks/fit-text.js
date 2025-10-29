@@ -107,27 +107,34 @@ function useFitText( { fitText, name, clientId } ) {
 			return;
 		}
 
-		// Capture element reference before async operations
-		const element = blockElement;
-		const previousVisibility = element.style.visibility;
+		// Store current element value for cleanup
+		const currentElement = blockElement;
+		const previousVisibility = currentElement.style.visibility;
 
-		window.requestAnimationFrame( () => {
-			element.style.visibility = 'hidden';
+		// Store IDs for cleanup
+		let hideFrameId = null;
+		let calculateFrameId = null;
+		let showTimeoutId = null;
+
+		// We are hiding the element doing the calculation of fit text
+		// and then showing it again to avoid the user noticing a flash of potentially
+		// big fitText while the binary search is happening.
+		hideFrameId = window.requestAnimationFrame( () => {
+			currentElement.style.visibility = 'hidden';
 			// Wait for browser to render the hidden state
-			window.requestAnimationFrame( () => {
+			calculateFrameId = window.requestAnimationFrame( () => {
 				// Apply fit text while hidden
 				applyFitText();
 
-				// Wait 10ms for browser to render the new font size
-				setTimeout( () => {
+				// Using a timeout instead of requestAnimationFrame, because
+				// with requestAnimationFrame a flash of very high size
+				// can still occur although rare.
+				showTimeoutId = setTimeout( () => {
 					// Restore the original visibility value
-					element.style.visibility = previousVisibility;
+					currentElement.style.visibility = previousVisibility;
 				}, 10 );
 			} );
 		} );
-
-		// Store current element value for cleanup
-		const currentElement = blockElement;
 
 		// Watch for size changes
 		let resizeObserver;
@@ -138,6 +145,17 @@ function useFitText( { fitText, name, clientId } ) {
 
 		// Cleanup function
 		return () => {
+			// Cancel pending async operations
+			if ( hideFrameId !== null ) {
+				window.cancelAnimationFrame( hideFrameId );
+			}
+			if ( calculateFrameId !== null ) {
+				window.cancelAnimationFrame( calculateFrameId );
+			}
+			if ( showTimeoutId !== null ) {
+				clearTimeout( showTimeoutId );
+			}
+
 			if ( resizeObserver ) {
 				resizeObserver.disconnect();
 			}
