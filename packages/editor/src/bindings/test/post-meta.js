@@ -11,7 +11,8 @@ import postMetaBindings from '../post-meta';
 describe( 'post-meta bindings', () => {
 	describe( 'getValues', () => {
 		describe( 'when no postId is provided in context', () => {
-			it( 'should return the meta default value if it is defined', () => {
+			let select, selectReturn;
+			beforeAll( () => {
 				const getEditedEntityRecord = ( kind, type, id ) => ( {
 					meta: id
 						? {
@@ -20,21 +21,28 @@ describe( 'post-meta bindings', () => {
 						: {},
 				} );
 
-				const selectReturn = {
+				selectReturn = {
 					getEditedEntityRecord,
 				};
 
 				const getRegisteredPostMeta = () => ( {
+					field_with_label_only: {
+						title: 'Field With Label Only',
+					},
 					movie_field: {
-						label: 'Movie Field Label',
+						title: 'Movie Field Label',
 						default: 'Movie field default value',
 					},
 				} );
 
 				lock( selectReturn, { getRegisteredPostMeta } );
 
+				select = () => selectReturn;
+			} );
+
+			it( 'should return the meta default value if it is defined', () => {
 				const values = postMetaBindings.getValues( {
-					select: () => selectReturn,
+					select,
 					context: { postType: 'movie' },
 					bindings: {
 						content: {
@@ -44,6 +52,20 @@ describe( 'post-meta bindings', () => {
 				} );
 
 				expect( values.content ).toBe( 'Movie field default value' );
+			} );
+
+			it( 'should fall back to the field label if the meta default value is not defined', () => {
+				const values = postMetaBindings.getValues( {
+					select,
+					context: { postType: 'movie' },
+					bindings: {
+						content: {
+							args: { key: 'field_with_label_only' },
+						},
+					},
+				} );
+
+				expect( values.content ).toBe( 'Field With Label Only' );
 			} );
 		} );
 	} );
