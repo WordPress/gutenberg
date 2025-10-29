@@ -41,7 +41,8 @@
 	"dependencies": {
 		"@wordpress/element": "file:../element",
 		"@wordpress/private-apis": "file:../private-apis",
-		"colorjs.io": "^0.5.2"
+		"colorjs.io": "^0.5.2",
+		"memize": "^2.1.0"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",

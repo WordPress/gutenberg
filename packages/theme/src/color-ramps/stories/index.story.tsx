@@ -44,9 +44,7 @@ export const Default: StoryObj< typeof ColorGen > = {
 	render: ( args ) => {
 		const bgSeed = args.background ?? DEFAULT_SEED_COLORS.bg;
 		const primarySeed = args.primary ?? DEFAULT_SEED_COLORS.primary;
-		const bgRamp = buildBgRamp( {
-			seed: bgSeed,
-		} );
+		const bgRamp = buildBgRamp( bgSeed );
 
 		const bgRampObj = {
 			seed: {
@@ -61,47 +59,35 @@ export const Default: StoryObj< typeof ColorGen > = {
 				name: 'bgFill1' as const,
 				value: primarySeed,
 			},
-			ramp: buildAccentRamp( { seed: primarySeed, bgRamp } ).ramp,
+			ramp: buildAccentRamp( primarySeed, bgRamp ).ramp,
 		};
 		const infoRampObj = {
 			seed: {
 				name: 'bgFill1' as const,
 				value: DEFAULT_SEED_COLORS.info,
 			},
-			ramp: buildAccentRamp( {
-				seed: DEFAULT_SEED_COLORS.info,
-				bgRamp,
-			} ).ramp,
+			ramp: buildAccentRamp( DEFAULT_SEED_COLORS.info, bgRamp ).ramp,
 		};
 		const successRampObj = {
 			seed: {
 				name: 'bgFill1' as const,
 				value: DEFAULT_SEED_COLORS.success,
 			},
-			ramp: buildAccentRamp( {
-				seed: DEFAULT_SEED_COLORS.success,
-				bgRamp,
-			} ).ramp,
+			ramp: buildAccentRamp( DEFAULT_SEED_COLORS.success, bgRamp ).ramp,
 		};
 		const warningRampObj = {
 			seed: {
 				name: 'bgFill1' as const,
 				value: DEFAULT_SEED_COLORS.warning,
 			},
-			ramp: buildAccentRamp( {
-				seed: DEFAULT_SEED_COLORS.warning,
-				bgRamp,
-			} ).ramp,
+			ramp: buildAccentRamp( DEFAULT_SEED_COLORS.warning, bgRamp ).ramp,
 		};
 		const errorRampObj = {
 			seed: {
 				name: 'bgFill1' as const,
 				value: DEFAULT_SEED_COLORS.error,
 			},
-			ramp: buildAccentRamp( {
-				seed: DEFAULT_SEED_COLORS.error,
-				bgRamp,
-			} ).ramp,
+			ramp: buildAccentRamp( DEFAULT_SEED_COLORS.error, bgRamp ).ramp,
 		};
 
 		const unmetTargets = checkAccessibleCombinations( {
@@ -222,7 +208,7 @@ export const SampleCombinations: StoryObj< typeof ColorGen > = {
 		];
 
 		const ramps = combinations.map( ( { background, primary } ) => {
-			const bgRamp = buildBgRamp( { seed: background } );
+			const bgRamp = buildBgRamp( background );
 
 			const bgRampObj = {
 				seed: {
@@ -237,7 +223,7 @@ export const SampleCombinations: StoryObj< typeof ColorGen > = {
 					name: 'bgFill1' as const,
 					value: primary,
 				},
-				ramp: buildAccentRamp( { seed: primary, bgRamp } ).ramp,
+				ramp: buildAccentRamp( primary, bgRamp ).ramp,
 			};
 
 			return [ bgRampObj, primaryRampObj ];

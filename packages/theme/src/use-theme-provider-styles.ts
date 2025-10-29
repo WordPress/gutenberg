@@ -3,6 +3,7 @@
  */
 import type { CSSProperties } from 'react';
 import Color from 'colorjs.io';
+import memoize from 'memize';
 
 /**
  * WordPress dependencies
@@ -23,6 +24,9 @@ import {
 import type { ThemeProviderProps } from './types';
 
 type Entry = [ string, string ];
+
+const getCachedBgRamp = memoize( buildBgRamp, { maxSize: 10 } );
+const getCachedAccentRamp = memoize( buildAccentRamp, { maxSize: 10 } );
 
 const legacyWpComponentsOverridesCSS: Entry[] = [
 	[ '--wp-components-color-accent', 'var(--wp-admin-theme-color)' ],
@@ -219,17 +223,14 @@ export function useThemeProviderStyles( {
 
 		// Generate ramps.
 		const computedColorRamps = new Map< string, RampResult >();
-		const bgRamp = buildBgRamp( { seed: seeds.bg } );
+		const bgRamp = getCachedBgRamp( seeds.bg );
 		Object.entries( seeds ).forEach( ( [ rampName, seed ] ) => {
 			if ( rampName === 'bg' ) {
 				computedColorRamps.set( rampName, bgRamp );
 			} else {
 				computedColorRamps.set(
 					rampName,
-					buildAccentRamp( {
-						seed,
-						bgRamp,
-					} )
+					getCachedAccentRamp( seed, bgRamp )
 				);
 			}
 		} );

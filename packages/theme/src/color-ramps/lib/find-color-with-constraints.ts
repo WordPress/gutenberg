@@ -28,7 +28,6 @@ import { type TaperChromaOptions, taperChroma } from './taper-chroma';
  * @param direction
  * @param options
  * @param options.strict
- * @param options.debug
  * @param options.lightnessConstraint
  * @param options.lightnessConstraint.type
  * @param options.lightnessConstraint.value
@@ -43,7 +42,6 @@ export function findColorMeetingRequirements(
 		lightnessConstraint,
 		taperChromaOptions,
 		strict = true,
-		debug = false,
 	}: {
 		lightnessConstraint?: {
 			type: 'force' | 'onlyIfSucceeds';
@@ -51,7 +49,6 @@ export function findColorMeetingRequirements(
 		};
 		taperChromaOptions?: TaperChromaOptions;
 		strict?: boolean;
-		debug?: boolean;
 	} = {}
 ): { color: Color; reached: boolean; achieved: number } {
 	// A target of 1 means same color.
@@ -79,15 +76,6 @@ export function findColorMeetingRequirements(
 			new Color( 'oklch', [ newL, newC, seed.oklch.h ] )
 		);
 		const exactLContrast = getCachedContrast( reference, colorWithExactL );
-
-		if ( debug ) {
-			// eslint-disable-next-line no-console
-			console.log(
-				`Succeeded with ${ lightnessConstraint.type } lightness`,
-				lightnessConstraint.value,
-				colorWithExactL.oklch.l
-			);
-		}
 
 		// If the L constraint is of "force" type, apply it even when it doesn't
 		// meet the contrast target.
@@ -125,13 +113,6 @@ export function findColorMeetingRequirements(
 			);
 		}
 
-		if ( debug ) {
-			// eslint-disable-next-line no-console
-			console.log(
-				'Did not succeeded because it reached the limit',
-				mostContrastingL
-			);
-		}
 		return {
 			color: mostContrastingColor,
 			reached: false,

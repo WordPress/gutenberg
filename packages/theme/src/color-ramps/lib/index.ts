@@ -36,7 +36,6 @@ import { LIGHTNESS_EPSILON, MAX_BISECTION_ITERATIONS } from './constants';
  * @param params.pinLightness          - Optional lightness override for a given step
  * @param params.pinLightness.stepName
  * @param params.pinLightness.value
- * @param params.debug
  * @return Object containing ramp results and satisfaction status
  */
 function calculateRamp( {
@@ -46,7 +45,6 @@ function calculateRamp( {
 	mainDir,
 	oppDir,
 	pinLightness,
-	debug = false,
 }: {
 	seed: Color;
 	sortedSteps: ( keyof Ramp )[];
@@ -57,7 +55,6 @@ function calculateRamp( {
 		stepName: keyof Ramp;
 		value: number;
 	};
-	debug?: boolean;
 } ) {
 	const rampResults = {} as Record<
 		keyof Ramp,
@@ -163,7 +160,6 @@ function calculateRamp( {
 				strict: false,
 				lightnessConstraint,
 				taperChromaOptions,
-				debug,
 			}
 		);
 
@@ -213,7 +209,6 @@ export function buildRamp(
 	{
 		mainDirection,
 		pinLightness,
-		debug = false,
 		rescaleToFitContrastTargets = true,
 	}: {
 		mainDirection?: RampDirection;
@@ -222,7 +217,6 @@ export function buildRamp(
 			value: number;
 		};
 		rescaleToFitContrastTargets?: boolean;
-		debug?: boolean;
 	} = {}
 ): RampResult {
 	let seed: Color;
@@ -263,26 +257,11 @@ export function buildRamp(
 		mainDir,
 		oppDir,
 		pinLightness,
-		debug,
 	} );
 	const toReturn = {
 		ramp: rampResults,
 		direction: mainDir,
 	} as RampResult;
-
-	if ( debug ) {
-		// eslint-disable-next-line no-console
-		console.log( `First run`, {
-			SATISFIED_ALL_CONTRAST_REQUIREMENTS,
-			UNSATISFIED_DIRECTION,
-			seed: seed.toString(),
-			sortedSteps,
-			config,
-			mainDir,
-			oppDir,
-			pinLightness,
-		} );
-	}
 
 	if (
 		! SATISFIED_ALL_CONTRAST_REQUIREMENTS &&
@@ -307,15 +286,6 @@ export function buildRamp(
 				} )
 			);
 
-			if ( debug ) {
-				// eslint-disable-next-line no-console
-				console.log( `Iteration ${ i }`, {
-					worseSeedL,
-					newSeedL: ( worseSeedL + betterSeedL ) / 2,
-					betterSeedL,
-				} );
-			}
-
 			const iterationResults = calculateRamp( {
 				seed: newSeed,
 				sortedSteps,
@@ -323,7 +293,6 @@ export function buildRamp(
 				mainDir,
 				oppDir,
 				pinLightness,
-				debug,
 			} );
 
 			if ( iterationResults.SATISFIED_ALL_CONTRAST_REQUIREMENTS ) {
@@ -338,20 +307,6 @@ export function buildRamp(
 				// Failing constraint is in same direction as main ramp direction
 				// We haven't moved far enough in mainDir, continue searching
 				worseSeedL = newSeed.oklch.l;
-			}
-
-			if ( debug ) {
-				// eslint-disable-next-line no-console
-				console.log( `Retry #${ i }`, {
-					SATISFIED_ALL_CONTRAST_REQUIREMENTS,
-					UNSATISFIED_DIRECTION,
-					seed: newSeed.toString(),
-					sortedSteps,
-					config,
-					mainDir,
-					oppDir,
-					pinLightness,
-				} );
 			}
 		}
 	}
