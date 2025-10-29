@@ -55,12 +55,13 @@ function getElementIdentifier( element ) {
  * @param {HTMLElement} element Element with fit text enabled.
  */
 function initializeFitText( element ) {
-	// Check if already initialized by looking for active observer
-	if ( element.dataset.fitTextId && resizeObservers.has( element.dataset.fitTextId ) ) {
+	if (
+		element.dataset.fitTextId &&
+		resizeObservers.has( element.dataset.fitTextId )
+	) {
 		return;
 	}
 
-	// If has ID but no observer, clear stale ID
 	if ( element.dataset.fitTextId ) {
 		delete element.dataset.fitTextId;
 	}
@@ -79,7 +80,6 @@ function initializeFitText( element ) {
 		optimizeFitText( element, elementSelector, applyStylesFn );
 	};
 
-	// Initial sizing
 	applyFitText();
 
 	// Watch for parent container resize
@@ -105,13 +105,11 @@ function initializeAllFitText() {
  * @param {string} elementId The fit-text-id of the removed element.
  */
 function cleanupFitText( elementId ) {
-	// Remove the style element
 	const styleElement = document.getElementById( `fit-text-${ elementId }` );
 	if ( styleElement ) {
 		styleElement.remove();
 	}
 
-	// Disconnect and remove the ResizeObserver
 	const observer = resizeObservers.get( elementId );
 	if ( observer ) {
 		observer.disconnect();
@@ -119,27 +117,22 @@ function cleanupFitText( elementId ) {
 	}
 }
 
-// Initialize on page load
 window.addEventListener( 'load', initializeAllFitText );
 
 // Watch for dynamically added/removed fit-text elements (e.g., from Interactivity API navigation)
 if ( window.MutationObserver ) {
 	const observer = new window.MutationObserver( ( mutations ) => {
 		for ( const mutation of mutations ) {
-			// Handle removed nodes (cleanup)
 			if ( mutation.removedNodes.length > 0 ) {
 				for ( const node of mutation.removedNodes ) {
-					// Skip non-element nodes
 					if ( node.nodeType !== 1 ) {
 						continue;
 					}
 
-					// Check if removed node itself is a fit-text element
 					if ( node.dataset?.fitTextId ) {
 						cleanupFitText( node.dataset.fitTextId );
 					}
 
-					// Check for fit-text elements within removed node
 					const removedFitTextElements = node.querySelectorAll?.(
 						'.has-fit-text[data-fit-text-id]'
 					);
@@ -151,21 +144,18 @@ if ( window.MutationObserver ) {
 				}
 			}
 
-			// Handle added nodes (initialization)
 			if ( mutation.addedNodes.length > 0 ) {
 				for ( const node of mutation.addedNodes ) {
-					// Skip non-element nodes
 					if ( node.nodeType !== 1 ) {
 						continue;
 					}
 
-					// Check if the node itself is a fit-text element
 					if ( node.classList?.contains( 'has-fit-text' ) ) {
 						initializeFitText( node );
 					}
 
-					// Check for fit-text elements within the added node
-					const fitTextElements = node.querySelectorAll?.( '.has-fit-text' );
+					const fitTextElements =
+						node.querySelectorAll?.( '.has-fit-text' );
 					if ( fitTextElements?.length > 0 ) {
 						fitTextElements.forEach( initializeFitText );
 					}
@@ -174,7 +164,6 @@ if ( window.MutationObserver ) {
 		}
 	} );
 
-	// Start observing after page load
 	window.addEventListener( 'load', () => {
 		observer.observe( document.body, {
 			childList: true,
