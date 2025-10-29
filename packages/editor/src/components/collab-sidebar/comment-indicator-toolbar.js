@@ -1,8 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { ToolbarButton } from '@wordpress/components';
-import { __, _n, sprintf } from '@wordpress/i18n';
+import {
+	ToolbarButton,
+	__experimentalText as Text,
+	__experimentalHStack as HStack,
+} from '@wordpress/components';
+import { __, sprintf } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
@@ -49,10 +53,16 @@ const CommentAvatarIndicator = ( { onClick, thread } ) => {
 		return null;
 	}
 
-	// Show up to 3 avatars, with overflow indicator.
+	// If there are more than 3 participants, show 2 avatars and a "+n" number.
 	const maxAvatars = 3;
-	const visibleParticipants = threadParticipants.slice( 0, maxAvatars );
-	const overflowCount = Math.max( 0, threadParticipants.length - maxAvatars );
+	const isOverflow = threadParticipants.length > maxAvatars;
+	const visibleParticipants = isOverflow
+		? threadParticipants.slice( 0, maxAvatars - 1 )
+		: threadParticipants;
+	const overflowCount = Math.max(
+		0,
+		threadParticipants.length - visibleParticipants.length
+	);
 	const threadHasMoreParticipants = threadParticipants.length > 100;
 
 	// If we hit the comment limit, show "100+" instead of exact overflow count.
@@ -65,19 +75,6 @@ const CommentAvatarIndicator = ( { onClick, thread } ) => {
 					overflowCount
 			  );
 
-	const overflowTitle =
-		threadHasMoreParticipants && overflowCount > 0
-			? __( '100+ participants' )
-			: sprintf(
-					// translators: %s: Number of participants.
-					_n(
-						'+%s more participant',
-						'+%s more participants',
-						overflowCount
-					),
-					overflowCount
-			  );
-
 	return (
 		<CommentIconToolbarSlotFill.Fill>
 			<ToolbarButton
@@ -86,15 +83,14 @@ const CommentAvatarIndicator = ( { onClick, thread } ) => {
 				onClick={ onClick }
 				showTooltip
 			>
-				<div className="comment-avatar-stack">
-					{ visibleParticipants.map( ( participant, index ) => (
+				<HStack spacing="1">
+					{ visibleParticipants.map( ( participant ) => (
 						<img
 							key={ participant.id }
 							src={ participant.avatar }
 							alt={ participant.name }
 							className="comment-avatar"
 							style={ {
-								zIndex: maxAvatars - index,
 								borderColor: getAvatarBorderColor(
 									participant.id
 								),
@@ -102,15 +98,9 @@ const CommentAvatarIndicator = ( { onClick, thread } ) => {
 						/>
 					) ) }
 					{ overflowCount > 0 && (
-						<div
-							className="comment-avatar-overflow"
-							style={ { zIndex: 0 } }
-							title={ overflowTitle }
-						>
-							{ overflowText }
-						</div>
+						<Text weight={ 500 }>{ overflowText }</Text>
 					) }
-				</div>
+				</HStack>
 			</ToolbarButton>
 		</CommentIconToolbarSlotFill.Fill>
 	);
