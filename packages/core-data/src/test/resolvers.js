@@ -552,6 +552,17 @@ describe( 'getEntityRecords', () => {
 		// 3 calls for intermediate results (one per page), plus 1 final call with complete records
 		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledTimes( 4 );
 
+		// Check that the first call already includes pagination metadata
+		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+			'postType',
+			'attachment',
+			expect.any( Array ),
+			{ per_page: -1, [ RECEIVE_INTERMEDIATE_RESULTS ]: true },
+			false,
+			undefined,
+			expect.objectContaining( { totalItems: 5, totalPages: 1 } )
+		);
+
 		// Check that all calls include pagination metadata
 		dispatch.receiveEntityRecords.mock.calls.forEach( ( call ) => {
 			// 7th parameter is the pagination metadata
