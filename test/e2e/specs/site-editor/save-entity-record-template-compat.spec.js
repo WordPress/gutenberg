@@ -52,7 +52,7 @@ test.describe( 'calling saveEntityRecord with a theme template ID', () => {
 				.getByRole( 'button', { name: 'saveEntityRecord test' } )
 				.first()
 		).toBeVisible();
-		await expect( page.getByText( 'Template typeIndex' ) ).toBeVisible();
+		await expect( page.getByText( 'TypeIndex' ) ).toBeVisible();
 		await page.evaluate( async () => {
 			return await window.wp.data
 				.dispatch( 'core' )
