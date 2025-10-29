@@ -228,9 +228,7 @@ export function useColorRandomizer( blockName?: string ): [ () => void ] | [] {
 			return;
 		}
 
-		/* eslint-disable no-restricted-syntax */
 		const randomRotationValue = Math.floor( Math.random() * 225 );
-		/* eslint-enable no-restricted-syntax */
 
 		const newColors = themeColors.map( ( colorObject ) => {
 			const { color } = colorObject;

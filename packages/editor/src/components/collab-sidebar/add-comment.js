@@ -1,4 +1,8 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -18,7 +22,7 @@ import {
 import { unlock } from '../../lock-unlock';
 import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
-import { focusCommentThread } from './utils';
+import { focusCommentThread, noop } from './utils';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
@@ -27,6 +31,10 @@ export function AddComment( {
 	showCommentBoard,
 	setShowCommentBoard,
 	commentSidebarRef,
+	reflowComments = noop,
+	isFloating = false,
+	y,
+	refs,
 } ) {
 	const { clientId, blockCommentId } = useSelect( ( select ) => {
 		const { getSelectedBlock } = select( blockEditorStore );
@@ -44,11 +52,29 @@ export function AddComment( {
 
 	return (
 		<VStack
-			className="editor-collab-sidebar-panel__thread is-selected"
+			className={ clsx(
+				'editor-collab-sidebar-panel__thread is-selected',
+				{
+					'is-floating': isFloating,
+				}
+			) }
 			spacing="3"
 			tabIndex={ 0 }
-			role="treeitem"
 			aria-label={ __( 'New note' ) }
+			role="treeitem"
+			ref={ isFloating ? refs.setFloating : undefined }
+			style={
+				isFloating
+					? // Delay showing the floating note box until a Y position is known to prevent blink.
+					  { top: y, opacity: ! y ? 0 : undefined }
+					: undefined
+			}
+			onBlur={ ( event ) => {
+				if ( event.currentTarget.contains( event.relatedTarget ) ) {
+					return;
+				}
+				setShowCommentBoard( false );
+			} }
 		>
 			<HStack alignment="left" spacing="3">
 				<CommentAuthorInfo />
@@ -63,6 +89,7 @@ export function AddComment( {
 					setShowCommentBoard( false );
 					blockElement?.focus();
 				} }
+				reflowComments={ reflowComments }
 				submitButtonText={ __( 'Add note' ) }
 				labelText={ __( 'New note' ) }
 			/>

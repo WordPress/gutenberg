@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { proxifyState, proxifyStore, deepMerge } from './proxies';
+import { proxifyState, proxifyStore, deepMerge, peek } from './proxies';
 import { PENDING_GETTER } from './proxies/state';
 import { getNamespace } from './namespaces';
 import { isPlainObject, deepReadOnly, navigationSignal } from './utils';
@@ -315,10 +315,20 @@ export const populateServerData = ( data?: {
 					const pathParts = path.split( '.' );
 					const prop = pathParts.splice( -1, 1 )[ 0 ];
 					const parent = pathParts.reduce(
-						( prev, key ) => prev[ key ],
+						( prev, key ) => peek( prev, key ),
 						st
 					);
-					if ( isPlainObject( parent[ prop ] ) ) {
+
+					// Get the descriptor of the derived state prop.
+					const desc = Object.getOwnPropertyDescriptor(
+						parent,
+						prop
+					);
+
+					// The derived state prop is considered a pending getter
+					// only if its value is a plain object, which is how
+					// closures are serialized from PHP.
+					if ( isPlainObject( desc?.value ) ) {
 						parent[ prop ] = PENDING_GETTER;
 					}
 				} );

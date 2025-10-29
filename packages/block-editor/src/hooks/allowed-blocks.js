@@ -3,25 +3,17 @@
  */
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { store as blockEditorStore } from '../store';
 import { PrivateInspectorControlsAllowedBlocks } from '../components/inspector-controls/groups';
 import BlockAllowedBlocksControl from '../components/block-allowed-blocks/allowed-blocks-control';
+import { useBlockEditingMode } from '../components/block-editing-mode';
 
 function BlockEditAllowedBlocksControlPure( { clientId } ) {
-	const isContentOnly = useSelect(
-		( select ) => {
-			return (
-				select( blockEditorStore ).getBlockEditingMode( clientId ) ===
-				'contentOnly'
-			);
-		},
-		[ clientId ]
-	);
+	const blockEditingMode = useBlockEditingMode();
+	const isContentOnly = blockEditingMode === 'contentOnly';
 
 	if ( isContentOnly ) {
 		return null;

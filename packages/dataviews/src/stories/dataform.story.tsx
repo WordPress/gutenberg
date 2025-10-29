@@ -1252,7 +1252,13 @@ const VisibilityComponent = () => {
 	);
 };
 
-const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
+const LayoutCardComponent = ( {
+	withHeader,
+	isCollapsible,
+}: {
+	withHeader: boolean;
+	isCollapsible: boolean;
+} ) => {
 	type Customer = {
 		name: string;
 		email: string;
@@ -1383,7 +1389,11 @@ const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 			fields: [
 				{
 					id: 'customerCard',
-					layout: { type: 'card', summary: 'plan-summary' },
+					layout: {
+						type: 'card',
+						summary: 'plan-summary',
+						isCollapsible,
+					},
 					label: 'Customer',
 					description:
 						'Enter your contact details, plan type, and addresses to complete your customer information.',
@@ -1448,12 +1458,13 @@ const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 						type: 'card',
 						isOpened: false,
 						summary: [ { id: 'dueDate', visibility: 'always' } ],
+						isCollapsible,
 					},
 					children: [ 'vat', 'commission' ],
 				},
 			],
 		} ),
-		[ withHeader ]
+		[ withHeader, isCollapsible ]
 	);
 
 	return (
@@ -1860,9 +1871,14 @@ export const LayoutCard = {
 			control: { type: 'boolean' },
 			description: 'Whether the card has a header.',
 		},
+		isCollapsible: {
+			control: { type: 'boolean' },
+			description: 'Whether the card can be collapsed/expanded.',
+		},
 	},
 	args: {
 		withHeader: true,
+		isCollapsible: true,
 	},
 };
 

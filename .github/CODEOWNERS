@@ -60,22 +60,22 @@
 /docs/tool                                      @ajitbohra
 /packages/babel-plugin-import-jsx-pragma        @ntwb @nerrad @ajitbohra
 /packages/babel-plugin-makepot                  @ntwb @nerrad @ajitbohra
-/packages/babel-preset-default                  @gziolo @ntwb @nerrad @ajitbohra
+/packages/babel-preset-default                  @ntwb @nerrad @ajitbohra
 /packages/browserslist-config                   @ntwb @nerrad @ajitbohra
 /packages/create-block                          @gziolo @ryanwelcher
-/packages/create-block-tutorial-template        @gziolo @ryanwelcher
-/packages/dependency-extraction-webpack-plugin  @gziolo
+/packages/create-block-tutorial-template        @ryanwelcher
+/packages/dependency-extraction-webpack-plugin
 /packages/docgen
 /packages/e2e-test-utils                        @ntwb @nerrad @ajitbohra
 /packages/e2e-tests                             @ntwb @nerrad @ajitbohra
 /packages/e2e-test-utils-playwright             @kevin940726
-/packages/eslint-plugin                         @gziolo @ntwb @nerrad @ajitbohra
-/packages/jest-console                          @gziolo @ntwb @nerrad @ajitbohra
-/packages/jest-preset-default                   @gziolo @ntwb @nerrad @ajitbohra
-/packages/jest-puppeteer-axe                    @gziolo @ntwb @nerrad @ajitbohra
-/packages/npm-package-json-lint-config          @gziolo @ntwb @nerrad @ajitbohra
+/packages/eslint-plugin                         @ntwb @nerrad @ajitbohra
+/packages/jest-console                          @ntwb @nerrad @ajitbohra
+/packages/jest-preset-default                   @ntwb @nerrad @ajitbohra
+/packages/jest-puppeteer-axe                    @ntwb @nerrad @ajitbohra
+/packages/npm-package-json-lint-config          @ntwb @nerrad @ajitbohra
 /packages/postcss-themes                        @ntwb @nerrad @ajitbohra
-/packages/prettier-config                       @ntwb @gziolo
+/packages/prettier-config                       @ntwb
 /packages/scripts                               @gziolo @ntwb @nerrad @ajitbohra @ryanwelcher
 /packages/stylelint-config                      @ntwb
 /test/php/gutenberg-coding-standards            @anton-vlasenko
@@ -114,7 +114,7 @@
 
 # Extensibility
 /packages/hooks                                 @adamsilverstein
-/packages/plugins                               @gziolo @adamsilverstein
+/packages/plugins                               @adamsilverstein
 
 # Rich Text
 /packages/format-library                        @ellatrix

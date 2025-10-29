@@ -20,6 +20,7 @@ test.describe( 'Block Comments', () => {
 	} );
 
 	test( 'can pin and unpin comments sidebar', async ( {
+		editor,
 		page,
 		blockCommentUtils,
 	} ) => {
@@ -28,7 +29,17 @@ test.describe( 'Block Comments', () => {
 			.getByRole( 'button', { name: 'Unpin from toolbar' } )
 			.click();
 		await expect( topBarButton ).toBeHidden();
+
+		await editor.openDocumentSettingsSidebar();
+		await page
+			.getByRole( 'region', {
+				name: 'Editor top bar',
+			} )
+			.getByRole( 'button', { name: 'Options' } )
+			.click();
+		await page.getByRole( 'menuitemcheckbox', { name: 'Notes' } ).click();
 		await page.getByRole( 'button', { name: 'Pin to toolbar' } ).click();
+
 		await expect( topBarButton ).toBeVisible();
 	} );
 

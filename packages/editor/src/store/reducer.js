@@ -384,6 +384,40 @@ export function publishSidebarActive( state = false, action ) {
 	return state;
 }
 
+/**
+ * Reducer for the current global styles navigation path.
+ *
+ * @param {string} state  Current state.
+ * @param {Object} action Dispatched action.
+ * @return {string} Updated state.
+ */
+export function stylesPath( state = '/', action ) {
+	switch ( action.type ) {
+		case 'SET_STYLES_PATH':
+			return action.path;
+		case 'RESET_STYLES_NAVIGATION':
+			return '/';
+	}
+	return state;
+}
+
+/**
+ * Reducer for whether the stylebook is visible.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ * @return {boolean} Updated state.
+ */
+export function showStylebook( state = false, action ) {
+	switch ( action.type ) {
+		case 'SET_SHOW_STYLEBOOK':
+			return action.show;
+		case 'RESET_STYLES_NAVIGATION':
+			return false;
+	}
+	return state;
+}
+
 export default combineReducers( {
 	postId,
 	postType,
@@ -403,5 +437,7 @@ export default combineReducers( {
 	listViewPanel,
 	listViewToggleRef,
 	publishSidebarActive,
+	stylesPath,
+	showStylebook,
 	dataviews: dataviewsReducer,
 } );
