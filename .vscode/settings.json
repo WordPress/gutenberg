@@ -1,6 +1,0 @@
-{
-	"[scss]": {
-		"editor.defaultFormatter": "stylelint.vscode-stylelint"
-	},
-	"stylelint.configFile": ".stylelintrc.js"
-}
