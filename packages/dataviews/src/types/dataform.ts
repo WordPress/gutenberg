@@ -56,12 +56,15 @@ export type CardLayout =
 			// isOpened cannot be false if withHeader is false as well.
 			// Otherwise, the card would not be visible.
 			isOpened?: true;
+			// isCollapsible cannot be true if withHeader is false as well.
+			isCollapsible?: false;
 	  }
 	| {
 			type: 'card';
 			withHeader?: true | undefined;
 			isOpened?: boolean;
 			summary?: CardSummaryField;
+			isCollapsible?: boolean | undefined;
 	  };
 export type NormalizedCardLayout =
 	| {
@@ -72,12 +75,15 @@ export type NormalizedCardLayout =
 			isOpened: true;
 			// Summary is an empty array
 			summary: [];
+			// If no header, the card should not be collapsible.
+			isCollapsible: false;
 	  }
 	| {
 			type: 'card';
 			withHeader: true;
 			isOpened: boolean;
 			summary: NormalizedCardSummaryField;
+			isCollapsible: boolean;
 	  };
 
 export type RowLayout = {

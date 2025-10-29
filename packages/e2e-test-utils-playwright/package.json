@@ -30,7 +30,10 @@
 	],
 	"main": "./build/index.js",
 	"exports": {
-		".": "./build/index.js",
+		".": {
+			"types": "./build-types/index.d.ts",
+			"default": "./build/index.js"
+		},
 		"./package.json": "./package.json"
 	},
 	"types": "./build-types",

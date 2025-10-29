@@ -142,25 +142,14 @@ export default {
 		return true;
 	},
 	getFieldsList( { select, context } ) {
-		// Deprecated, will be removed after 6.9.
-		return getPostMetaFields( select, context );
-	},
-	editorUI( { select, context } ) {
-		const metaFields = Object.entries(
-			getPostMetaFields( select, context ) || {}
-		).map( ( [ key, field ] ) => ( {
+		const metaFields = getPostMetaFields( select, context );
+		if ( ! metaFields ) {
+			return [];
+		}
+		return Object.entries( metaFields ).map( ( [ key, field ] ) => ( {
 			label: field.label,
-			args: {
-				key,
-			},
 			type: field.type,
+			args: { key },
 		} ) );
-		/*
-		 * We need to define the data as [{ label: string, value: any, type: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#type-validation }]
-		 */
-		return {
-			mode: 'dropdown',
-			data: metaFields,
-		};
 	},
 };

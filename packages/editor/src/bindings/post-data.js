@@ -179,34 +179,23 @@ export default {
 		return true;
 	},
 	getFieldsList( { select, context } ) {
-		const clientId = select( blockEditorStore ).getSelectedBlockClientId();
-		// Deprecated, will be removed after 6.9.
-		return getPostDataFields( select, context, clientId );
-	},
-	editorUI( { select, context } ) {
 		const selectedBlock = select( blockEditorStore ).getSelectedBlock();
 		if ( selectedBlock?.name !== 'core/post-date' ) {
-			return {};
+			return [];
 		}
 		// Exit early for navigation blocks (read-only)
 		if ( NAVIGATION_BLOCK_TYPES.includes( selectedBlock?.name ) ) {
-			return {};
+			return [];
 		}
-		const postDataFields = Object.entries(
-			getPostDataFields( select, context ) || {}
-		).map( ( [ key, field ] ) => ( {
+		const clientId = select( blockEditorStore ).getSelectedBlockClientId();
+		const postDataFields = getPostDataFields( select, context, clientId );
+		if ( ! postDataFields ) {
+			return [];
+		}
+		return Object.entries( postDataFields ).map( ( [ key, field ] ) => ( {
 			label: field.label,
-			args: {
-				field: key,
-			},
 			type: field.type,
+			args: { field: key },
 		} ) );
-		/*
-		 * We need to define the data as [{ label: string, value: any, type: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#type-validation }]
-		 */
-		return {
-			mode: 'dropdown',
-			data: postDataFields,
-		};
 	},
 };

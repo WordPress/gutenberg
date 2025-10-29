@@ -34,6 +34,11 @@
 	},
 	"react-native": "src/index",
 	"wpScript": true,
+	"wpScriptExtraDependencies": [
+		"media-models",
+		"media-views",
+		"postbox"
+	],
 	"dependencies": {
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/admin-ui": "file:../admin-ui",
@@ -51,6 +56,7 @@
 		"@wordpress/dom": "file:../dom",
 		"@wordpress/editor": "file:../editor",
 		"@wordpress/element": "file:../element",
+		"@wordpress/global-styles-engine": "file:../global-styles-engine",
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/html-entities": "file:../html-entities",
 		"@wordpress/i18n": "file:../i18n",

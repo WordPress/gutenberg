@@ -15,7 +15,7 @@ import apiFetch from '@wordpress/api-fetch';
  */
 import { STORE_NAME } from './name';
 import { additionalEntityConfigLoaders, DEFAULT_ENTITY_KEY } from './entities';
-import { syncManager } from './sync';
+import { getSyncManager } from './sync';
 import {
 	forwardResolver,
 	getNormalizedCommaSeparable,
@@ -185,7 +185,7 @@ export const getEntityRecord =
 						} );
 
 					// Load the entity record for syncing.
-					await syncManager.load(
+					await getSyncManager()?.load(
 						entityConfig.syncConfig,
 						objectType,
 						objectId,
@@ -215,6 +215,14 @@ export const getEntityRecord =
 									name,
 									key
 								),
+							// Save the current entity record's unsaved edits.
+							saveRecord: () => {
+								dispatch.saveEditedEntityRecord(
+									kind,
+									name,
+									key
+								);
+							},
 						}
 					);
 				}
@@ -329,7 +337,7 @@ export const getEntityRecords =
 			// the registered templates and rewrites IDs in the form of
 			// `theme-slug/template-slug`. When turned off, we only fetch
 			// database templates (posts). To fetch registered templates without
-			// edits applied, use the `wp_registered_template` entity.
+			// edits applied, use the `registeredTemplate` entity.
 			const { combinedTemplates = true } = query;
 
 			if (
@@ -899,10 +907,6 @@ export const getDefaultTemplateId =
 		// Endpoint may return an empty object if no template is found.
 		if ( id ) {
 			template.id = id;
-			template.type =
-				typeof id === 'string'
-					? 'wp_registered_template'
-					: 'wp_template';
 			registry.batch( () => {
 				dispatch.receiveDefaultTemplateId( query, id );
 				dispatch.receiveEntityRecords( 'postType', template.type, [

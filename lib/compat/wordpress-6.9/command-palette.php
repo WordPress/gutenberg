@@ -8,7 +8,9 @@
 function gutenberg_enqueue_command_palette_assets() {
 	global $menu, $submenu;
 
-	$command_palette_settings = array();
+	$command_palette_settings = array(
+		'is_network_admin' => is_network_admin(),
+	);
 
 	if ( $menu ) {
 		$menu_commands = array();
@@ -93,6 +95,6 @@ function gutenberg_enqueue_command_palette_assets() {
 }
 
 if ( has_filter( 'admin_enqueue_scripts', 'wp_enqueue_command_palette_assets' ) ) {
-	remove_filter( 'admin_enqueue_scripts', 'wp_enqueue_command_palette_assets', 9 );
+	remove_filter( 'admin_enqueue_scripts', 'wp_enqueue_command_palette_assets' );
 }
 add_filter( 'admin_enqueue_scripts', 'gutenberg_enqueue_command_palette_assets', 9 );

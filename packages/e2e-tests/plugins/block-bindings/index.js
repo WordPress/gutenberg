@@ -34,89 +34,12 @@ registerBlockBindingsSource( {
 	getValues,
 	setValues,
 	canUserEditValue: () => true,
-	editorUI() {
-		return {
-			mode: 'dropdown',
-			data: Object.entries( fieldsList || {} ).map(
-				( [ key, field ] ) => ( {
-					label: field?.label || key,
-					type: field?.type || 'string',
-					args: {
-						key,
-					},
-				} )
-			),
-		};
-	},
-} );
-
-const ModalButton = ( { fieldKey, fieldLabel, attribute, closeModal } ) => {
-	const { updateBlockBindings } = wp.blockEditor.useBlockBindingsUtils();
-
-	return el(
-		'button',
-		{
-			onClick: () => {
-				updateBlockBindings( {
-					[ attribute ]: {
-						source: 'testing/modal-source',
-						args: { key: fieldKey },
-					},
-				} );
-				closeModal();
-			},
-			style: {
-				display: 'block',
-				margin: '5px 0',
-				padding: '10px',
-				width: '100%',
-			},
-		},
-		fieldLabel
-	);
-};
-
-registerBlockBindingsSource( {
-	name: 'testing/modal-source',
-	label: 'Modal Source',
-	getValues,
-	setValues,
-	canUserEditValue: () => true,
-	editorUI() {
-		return {
-			mode: 'modal',
-			data: Object.entries( fieldsList || {} ).map(
-				( [ key, field ] ) => ( {
-					label: field?.label || key,
-					type: field?.type || 'string',
-					args: {
-						key,
-					},
-				} )
-			),
-			renderModalContent( { attribute, closeModal } ) {
-				return el(
-					'div',
-					{ style: { padding: '20px' } },
-					el( 'h3', null, 'Select a field from the modal' ),
-					el(
-						'p',
-						null,
-						'This is a modal interface for selecting fields.'
-					),
-					Object.entries( fieldsList || {} ).map(
-						( [ key, field ] ) =>
-							el( ModalButton, {
-								key,
-								fieldKey: key,
-								fieldLabel: field?.label || key,
-								attribute,
-								closeModal,
-							} )
-					)
-				);
-			},
-		};
+	getFieldsList() {
+		return Object.entries( fieldsList || {} ).map( ( [ key, field ] ) => ( {
+			label: field.label || key,
+			type: field.type || 'string',
+			args: field.args || { key },
+		} ) );
 	},
 } );
 

@@ -9,6 +9,7 @@ gutenberg.zip
 coverage
 .phpunit.result.cache
 .reassure
+.dev-ready
 
 
 # Directories/files that may appear in your environment

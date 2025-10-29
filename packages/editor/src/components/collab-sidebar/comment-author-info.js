@@ -18,38 +18,45 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  */
 import { getAvatarBorderColor } from './utils';
 
-/**
- * Render author information for a comment.
- *
- * @param {Object} props        - Component properties.
- * @param {string} props.avatar - URL of the author's avatar.
- * @param {string} props.name   - Name of the author.
- * @param {string} props.date   - Date of the comment.
- * @param {string} props.userId - User ID of the author.
- *
- * @return {React.ReactNode} The JSX element representing the author's information.
- */
 function CommentAuthorInfo( { avatar, name, date, userId } ) {
+	const hasAvatar = !! avatar;
 	const dateSettings = getDateSettings();
 	const {
 		currentUserAvatar,
 		currentUserName,
 		currentUserId,
 		dateFormat = dateSettings.formats.date,
-	} = useSelect( ( select ) => {
-		const { getCurrentUser, getEntityRecord } = select( coreStore );
-		const { getSettings } = select( blockEditorStore );
-		const userData = getCurrentUser();
-		const { __experimentalDiscussionSettings } = getSettings();
-		const defaultAvatar = __experimentalDiscussionSettings?.avatarURL;
-		const siteSettings = getEntityRecord( 'root', 'site' );
-		return {
-			currentUserAvatar: userData?.avatar_urls?.[ 48 ] ?? defaultAvatar,
-			currentUserName: userData?.name,
-			currentUserId: userData?.id,
-			dateFormat: siteSettings?.date_format,
-		};
-	}, [] );
+	} = useSelect(
+		( select ) => {
+			const { canUser, getCurrentUser, getEntityRecord } =
+				select( coreStore );
+			const siteSettings = canUser( 'read', {
+				kind: 'root',
+				name: 'site',
+			} )
+				? getEntityRecord( 'root', 'site' )
+				: undefined;
+
+			if ( hasAvatar ) {
+				return {
+					dateFormat: siteSettings?.date_format,
+				};
+			}
+
+			const { getSettings } = select( blockEditorStore );
+			const { __experimentalDiscussionSettings } = getSettings();
+			const defaultAvatar = __experimentalDiscussionSettings?.avatarURL;
+			const userData = getCurrentUser();
+			return {
+				currentUserAvatar:
+					userData?.avatar_urls?.[ 48 ] ?? defaultAvatar,
+				currentUserName: userData?.name,
+				currentUserId: userData?.id,
+				dateFormat: siteSettings?.date_format,
+			};
+		},
+		[ hasAvatar ]
+	);
 
 	const commentDate = getDate( date );
 	const commentDateTime = dateI18n( 'c', commentDate );

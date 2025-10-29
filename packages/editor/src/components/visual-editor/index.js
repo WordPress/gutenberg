@@ -96,7 +96,6 @@ function checkForPostContentAtRootLevel( blocks ) {
 function VisualEditor( {
 	// Ideally as we unify post and site editors, we won't need these props.
 	autoFocus,
-	styles,
 	disableIframe = false,
 	iframeProps,
 	contentRef,
@@ -114,6 +113,7 @@ function VisualEditor( {
 		isDesignPostType,
 		postType,
 		isPreview,
+		styles,
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostId,
@@ -162,6 +162,7 @@ function VisualEditor( {
 			isFocusedEntity: !! editorSettings.onNavigateToPreviousEntityRecord,
 			postType: postTypeSlug,
 			isPreview: editorSettings.isPreviewMode,
+			styles: editorSettings.styles,
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
