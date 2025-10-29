@@ -961,12 +961,18 @@ async function compileStyles( packageName ) {
 						buildDir,
 						relativePath.replace( '.module.css', '.js' )
 					),
-					{ '{{MAPPINGS}}': mappingsOutput }
+					{
+						'{{EXPORTS}}': 'module.exports =',
+						'{{MAPPINGS}}': mappingsOutput,
+					}
 				),
 				generateFromTemplate(
 					'css-module.mjs.template',
 					path.join( buildModuleDir, jsPath ),
-					{ '{{MAPPINGS}}': mappingsOutput }
+					{
+						'{{EXPORTS}}': 'export default',
+						'{{MAPPINGS}}': mappingsOutput,
+					}
 				),
 			] );
 		} )
