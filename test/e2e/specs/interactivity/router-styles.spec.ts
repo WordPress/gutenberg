@@ -304,10 +304,13 @@ test.describe( 'Router styles', () => {
 		// The route handler is removed after navigation to simulate a
 		// temporary error.
 		const linkPattern = '**/router-styles-red/style-from-link.css*';
-		await page.route( linkPattern, async ( route ) => {
-			await route.abort( 'failed' );
-			await page.unrouteAll( { behavior: 'ignoreErrors' } );
-		} );
+		await page.route(
+			linkPattern,
+			async ( route ) => {
+				await route.abort( 'failed' );
+			},
+			{ times: 1 }
+		);
 
 		// Navigate to the page with the Red block
 		await page.getByTestId( 'link red' ).click();
