@@ -8,8 +8,11 @@ import * as Y from 'yjs';
  */
 import type { HistoryRecord } from '@wordpress/undo-manager';
 import { select, subscribe, dispatch } from '@wordpress/data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
-import type { WPBlockSelection, WPSelection } from '@wordpress/editor';
+import {
+	store as blockEditorStore,
+	type WPBlockSelection,
+	type WPSelection,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
