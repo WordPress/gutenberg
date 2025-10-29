@@ -78,6 +78,7 @@
 	border-width: var(--wp-admin-border-width-focus);
 	border-style: solid;
 	padding: var(--wp-admin-border-width-focus);
+	background: $white;
 }
 
 .editor-collab-sidebar-panel__comment-status {
@@ -174,21 +175,15 @@
 	width: $icon-size;
 	height: $icon-size;
 	border-radius: $radius-round;
-	border: 2px solid $white;
 	margin-left: -6px;
 	flex-shrink: 0;
+	border-width: var(--wp-admin-border-width-focus);
+	border-style: solid;
+	padding: var(--wp-admin-border-width-focus);
+	background: $white;
 
 	&:first-child {
 		margin-left: 0;
-		border-color: #de6e55;
-	}
-
-	&:nth-child(2) {
-		border-color: #599637;
-	}
-
-	&:nth-child(3) {
-		border-color: #3858e9;
 	}
 }
 
