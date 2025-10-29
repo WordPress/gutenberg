@@ -13,7 +13,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { LOCAL_EDITOR_ORIGIN, getSyncManager } from './sync';
+import { getSyncManager } from './sync';
 import {
 	applyPostChangesToCRDTDoc,
 	defaultApplyChangesToCRDTDoc,
@@ -280,13 +280,6 @@ export const prePersistPostType = (
 				...edits.meta,
 				...meta,
 			};
-
-			// Mark the doc as having been persisted.
-			getSyncManager()?.markPersisted(
-				objectType,
-				objectId,
-				LOCAL_EDITOR_ORIGIN
-			);
 		}
 	}
 

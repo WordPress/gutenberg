@@ -4,6 +4,11 @@
 import * as Y from 'yjs';
 
 /**
+ * WordPress dependencies
+ */
+import { addAction } from '@wordpress/hooks';
+
+/**
  * Internal dependencies
  */
 import {
@@ -11,6 +16,7 @@ import {
 	LOCAL_SYNC_MANAGER_ORIGIN,
 	CRDT_STATE_PERSISTED_AT_KEY as PERSISTED_AT_KEY,
 	CRDT_STATE_PERSISTED_BY_KEY as PERSISTED_BY_KEY,
+	LOCAL_EDITOR_ORIGIN,
 } from './config';
 import { createPersistedCRDTDoc, getPersistedCrdtDoc } from './persistence';
 import { getProviderCreators } from './providers';
@@ -147,6 +153,20 @@ export function createSyncManager(): SyncManager {
 			handlers.editRecord( { meta } );
 			handlers.saveRecord();
 		}
+
+		addAction(
+			'editor.savePost',
+			'sync.markCRDTDocPersisted',
+			async ( post, options ) => {
+				// Skip if the post's id doesn't match (including different ID types), or if it's an autosave.
+				if ( post.id !== objectId || options.isAutosave ) {
+					return;
+				}
+
+				// Mark the CRDT document as having been persisted.
+				recordPersistence( objectType, objectId, LOCAL_EDITOR_ORIGIN );
+			}
+		);
 	}
 
 	/**
