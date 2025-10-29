@@ -17,9 +17,16 @@ import { getPackageInfo } from './package-utils.mjs';
  *
  * @param {string} packageNamespace Custom package namespace (e.g., 'wordpress', 'my-plugin').
  * @param {string|false} scriptGlobal Global variable name (e.g., 'wp', 'myPlugin') or false to disable globals.
+ * @param {Object} externalNamespaces Additional namespaces to externalize (e.g., { 'woo': { global: 'woo', handlePrefix: 'woocommerce' } }).
+ * @param {string} handlePrefix Handle prefix for main package (e.g., 'wp', 'mp'). Defaults to packageNamespace.
  * @return {Function} Function that creates the esbuild plugin instance.
  */
-export function createWordpressExternalsPlugin( packageNamespace, scriptGlobal ) {
+export function createWordpressExternalsPlugin(
+	packageNamespace,
+	scriptGlobal,
+	externalNamespaces = {},
+	handlePrefix
+) {
 	/**
 	 * WordPress externals plugin for esbuild.
 	 *
@@ -115,7 +122,17 @@ export function createWordpressExternalsPlugin( packageNamespace, scriptGlobal )
 						namespace: packageNamespace,
 						pattern: new RegExp( `^@${ packageNamespace }/` ),
 						globalName: scriptGlobal,
-						handlePrefix: packageNamespace,
+						handlePrefix: handlePrefix || packageNamespace,
+					} );
+				}
+
+				// Add additional external namespaces from configuration
+				for ( const [ namespace, config ] of Object.entries( externalNamespaces ) ) {
+					packageExternals.push( {
+						namespace,
+						pattern: new RegExp( `^@${ namespace }/` ),
+						globalName: config.global,
+						handlePrefix: config.handlePrefix || namespace,
 					} );
 				}
 

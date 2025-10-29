@@ -155,6 +155,52 @@ The package scope to match for global exposure (without `@` prefix). Only packag
 }
 ```
 
+### `wpPlugin.handlePrefix`
+
+The prefix used for WordPress script handles in `.asset.php` files (e.g., `wp-data`, `my-plugin-editor`). Defaults to `packageNamespace`:
+
+```json
+{
+	"wpPlugin": {
+		"scriptGlobal": "myPlugin",
+		"packageNamespace": "my-plugin",
+		"handlePrefix": "mp"
+	}
+}
+```
+
+With this configuration:
+- `@my-plugin/editor` → `window.myPlugin.editor` with handle `mp-editor`
+- `@my-plugin/data` → `window.myPlugin.data` with handle `mp-data`
+
+### `wpPlugin.externalNamespaces`
+
+Additional package namespaces to externalize (consume as externals, not expose). Each namespace must be an object with `global` and optional `handlePrefix`:
+
+```json
+{
+	"wpPlugin": {
+		"externalNamespaces": {
+			"woo": {
+				"global": "woo",
+				"handlePrefix": "woocommerce"
+			},
+			"acme": {
+				"global": "acme",
+				"handlePrefix": "acme-plugin"
+			}
+		}
+	}
+}
+```
+
+This allows your packages to consume third-party dependencies as externals:
+- `import { Cart } from '@woo/cart'` → `window.woo.cart` with handle `woocommerce-cart`
+- `import { Button } from '@acme/ui'` → `window.acme.ui` with handle `acme-plugin-ui`
+- Dependencies are tracked in `.asset.php` files
+
+If `handlePrefix` is omitted, it defaults to the namespace key (e.g., `"woo"` → `woo-cart`).
+
 ### Example: WordPress Core (Gutenberg)
 
 ```json

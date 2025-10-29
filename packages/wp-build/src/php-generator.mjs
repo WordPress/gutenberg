@@ -27,13 +27,13 @@ export async function getPhpReplacements( rootDir ) {
 	}
 
 	// @ts-expect-error specific override to package.json
-	const prefix = rootPackageJson.wpPlugin?.prefix || 'gutenberg';
+	const name = rootPackageJson.wpPlugin?.name || 'gutenberg';
 	const version = rootPackageJson.version;
 	const versionConstant =
-		prefix.toUpperCase().replace( /-/g, '_' ) + '_VERSION';
+		name.toUpperCase().replace( /-/g, '_' ) + '_VERSION';
 
 	return {
-		'{{PREFIX}}': prefix,
+		'{{PREFIX}}': name,
 		'{{VERSION}}': version,
 		'{{VERSION_CONSTANT}}': versionConstant,
 	};

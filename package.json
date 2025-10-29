@@ -19,7 +19,7 @@
 		"npm": ">=10.2.3"
 	},
 	"wpPlugin": {
-		"prefix": "gutenberg",
+		"name": "gutenberg",
 		"scriptGlobal": "wp",
 		"packageNamespace": "wordpress"
 	},

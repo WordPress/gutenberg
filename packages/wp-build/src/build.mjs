@@ -65,6 +65,8 @@ const ROOT_PACKAGE_JSON = getPackageInfoFromFile( path.join( ROOT_DIR, 'package.
 const WP_PLUGIN_CONFIG = ROOT_PACKAGE_JSON.wpPlugin || {};
 const SCRIPT_GLOBAL = WP_PLUGIN_CONFIG.scriptGlobal;
 const PACKAGE_NAMESPACE = WP_PLUGIN_CONFIG.packageNamespace;
+const HANDLE_PREFIX = WP_PLUGIN_CONFIG.handlePrefix || PACKAGE_NAMESPACE;
+const EXTERNAL_NAMESPACES = WP_PLUGIN_CONFIG.externalNamespaces || {};
 
 
 const baseDefine = {
@@ -85,7 +87,9 @@ const getDefine = ( scriptDebug ) => ( {
  */
 const wordpressExternalsPlugin = createWordpressExternalsPlugin(
 	PACKAGE_NAMESPACE,
-	SCRIPT_GLOBAL
+	SCRIPT_GLOBAL,
+	EXTERNAL_NAMESPACES,
+	HANDLE_PREFIX
 );
 
 /**
