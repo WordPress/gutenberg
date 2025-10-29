@@ -36,6 +36,7 @@ const renamePost: Action< PostWithPermissions > = {
 			return false;
 		}
 
+		// Non-database template cannot be edited.
 		if ( post.type === 'wp_template' && typeof post.id === 'string' ) {
 			return false;
 		}
