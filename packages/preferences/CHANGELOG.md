@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.34.0 (2025-10-29)
+
 ### Internal
 
 - TypeScript conversion
