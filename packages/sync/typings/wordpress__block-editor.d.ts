@@ -1,8 +1,5 @@
-import type { WPBlockSelection, WPSelection } from '@wordpress/editor';
-import type { AnyConfig, StoreDescriptor } from '@wordpress/data/build-types/types';
-
 declare module '@wordpress/block-editor' {
-	export const store: StoreDescriptor< AnyConfig >;
+	const store: string;
 
 	interface BlockEditorStoreSelectors {
 		getSelectionStart: () => WPBlockSelection;
@@ -16,5 +13,16 @@ declare module '@wordpress/block-editor' {
 			startOffset: number,
 			endOffset: number
 		) => void;
+	}
+
+	interface WPBlockSelection {
+		clientId: string;
+		attributeKey: string;
+		offset: number;
+	}
+
+	interface WPSelection {
+		selectionEnd: WPBlockSelection;
+		selectionStart: WPBlockSelection;
 	}
 }
