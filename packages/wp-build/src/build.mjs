@@ -945,7 +945,7 @@ async function compileStyles( packageName ) {
 			const mappingsOutput = Object.entries( mappings )
 				.map(
 					( [ key, value ] ) =>
-						`get [ ${ JSON.stringify( key ) } ]() {
+						`	get [ ${ JSON.stringify( key ) } ]() {
 		const style = document.createElement( 'style' );
 		style.styleSheet.cssText = ${ JSON.stringify( result.css ) };
 		document.body.appendChild( style );
