@@ -80,6 +80,7 @@ export const DEFAULT_SEED_COLORS = {
 	primary: '#3858e9',
 	info: '#0090ff',
 	success: '#4ab866',
+	caution: '#f0d149',
 	warning: '#f0b849',
 	error: '#cc1818',
 };

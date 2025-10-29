@@ -57,6 +57,12 @@
 	--wpds-color-bg-surface-brand: var(
 		--wpds-color-private-primary-surface1
 	); /* Background color for surfaces with brand tone and normal emphasis. */
+	--wpds-color-bg-surface-caution: var(
+		--wpds-color-private-caution-surface4
+	); /* Background color for surfaces with caution tone and normal emphasis. */
+	--wpds-color-bg-surface-caution-weak: var(
+		--wpds-color-private-caution-surface2
+	); /* Background color for surfaces with caution tone and weak emphasis. */
 	--wpds-color-bg-surface-error: var(
 		--wpds-color-private-error-surface4
 	); /* Background color for surfaces with error tone and normal emphasis. */
@@ -111,12 +117,42 @@
 	--wpds-color-bg-track-neutral-weak: var(
 		--wpds-color-private-bg-stroke1
 	); /* Background color for tracks with a neutral tone and weak emphasis (eg. scrollbar track). */
+	--wpds-color-fg-content-caution: var(
+		--wpds-color-private-caution-fg-surface4
+	); /* Foreground color for content like text with caution tone and normal emphasis. */
+	--wpds-color-fg-content-caution-weak: var(
+		--wpds-color-private-caution-fg-surface3
+	); /* Foreground color for content like text with caution tone and weak emphasis. */
+	--wpds-color-fg-content-error: var(
+		--wpds-color-private-error-fg-surface4
+	); /* Foreground color for content like text with error tone and normal emphasis. */
+	--wpds-color-fg-content-error-weak: var(
+		--wpds-color-private-error-fg-surface3
+	); /* Foreground color for content like text with error tone and weak emphasis. */
+	--wpds-color-fg-content-info: var(
+		--wpds-color-private-info-fg-surface4
+	); /* Foreground color for content like text with info tone and normal emphasis. */
+	--wpds-color-fg-content-info-weak: var(
+		--wpds-color-private-info-fg-surface3
+	); /* Foreground color for content like text with info tone and weak emphasis. */
 	--wpds-color-fg-content-neutral: var(
 		--wpds-color-private-bg-fg-surface4
 	); /* Foreground color for content like text with normal emphasis. */
 	--wpds-color-fg-content-neutral-weak: var(
 		--wpds-color-private-bg-fg-surface3
 	); /* Foreground color for content like text with weak emphasis. */
+	--wpds-color-fg-content-success: var(
+		--wpds-color-private-success-fg-surface4
+	); /* Foreground color for content like text with success tone and normal emphasis. */
+	--wpds-color-fg-content-success-weak: var(
+		--wpds-color-private-success-fg-surface3
+	); /* Foreground color for content like text with success tone and weak emphasis. */
+	--wpds-color-fg-content-warning: var(
+		--wpds-color-private-warning-fg-surface4
+	); /* Foreground color for content like text with warning tone and normal emphasis. */
+	--wpds-color-fg-content-warning-weak: var(
+		--wpds-color-private-warning-fg-surface3
+	); /* Foreground color for content like text with warning tone and weak emphasis. */
 	--wpds-color-fg-interactive-brand: var(
 		--wpds-color-private-primary-fg-surface3
 	); /* Foreground color for interactive elements with brand tone and normal emphasis. */
@@ -181,6 +217,28 @@
 	--wpds-color-private-bg-surface4: #eaeaea;
 	--wpds-color-private-bg-surface5: #dfdfdf;
 	--wpds-color-private-bg-surface6: #d0d0d0;
+	--wpds-color-private-caution-bg-fill-dark: #1f1e1b;
+	--wpds-color-private-caution-bg-fill-inverted1: #3d2e00;
+	--wpds-color-private-caution-bg-fill-inverted2: #1f1e1b;
+	--wpds-color-private-caution-bg-fill1: #f0d149;
+	--wpds-color-private-caution-bg-fill2: #dabb2b;
+	--wpds-color-private-caution-fg-fill: #1f1e1b;
+	--wpds-color-private-caution-fg-fill-dark: #f6f1da;
+	--wpds-color-private-caution-fg-fill-inverted: #f6f1da;
+	--wpds-color-private-caution-fg-surface1: #c6a800;
+	--wpds-color-private-caution-fg-surface2: #a58700;
+	--wpds-color-private-caution-fg-surface3: #866a00;
+	--wpds-color-private-caution-fg-surface4: #291d00;
+	--wpds-color-private-caution-stroke1: #b8ab76;
+	--wpds-color-private-caution-stroke2: #988d61;
+	--wpds-color-private-caution-stroke3: #866a00;
+	--wpds-color-private-caution-stroke4: #644e00;
+	--wpds-color-private-caution-surface1: #faf1cb;
+	--wpds-color-private-caution-surface2: #fdf9e7;
+	--wpds-color-private-caution-surface3: #ffffff;
+	--wpds-color-private-caution-surface4: #f8ebb6;
+	--wpds-color-private-caution-surface5: #f4df8c;
+	--wpds-color-private-caution-surface6: #e7d072;
 	--wpds-color-private-error-bg-fill-dark: #231c1b;
 	--wpds-color-private-error-bg-fill-inverted1: #6d0000;
 	--wpds-color-private-error-bg-fill-inverted2: #231c1b;

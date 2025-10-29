@@ -690,6 +690,116 @@
 			".": "#efefef"
 		}
 	},
+	"Color/_Primitives/Caution/bgFill1": {
+		"value": {
+			".": "#f0d149"
+		}
+	},
+	"Color/_Primitives/Caution/fgFill": {
+		"value": {
+			".": "#1f1e1b"
+		}
+	},
+	"Color/_Primitives/Caution/bgFill2": {
+		"value": {
+			".": "#dabb2b"
+		}
+	},
+	"Color/_Primitives/Caution/surface2": {
+		"value": {
+			".": "#fdf9e7"
+		}
+	},
+	"Color/_Primitives/Caution/surface6": {
+		"value": {
+			".": "#e7d072"
+		}
+	},
+	"Color/_Primitives/Caution/surface5": {
+		"value": {
+			".": "#f4df8c"
+		}
+	},
+	"Color/_Primitives/Caution/surface4": {
+		"value": {
+			".": "#f8ebb6"
+		}
+	},
+	"Color/_Primitives/Caution/surface3": {
+		"value": {
+			".": "#fff"
+		}
+	},
+	"Color/_Primitives/Caution/fgSurface4": {
+		"value": {
+			".": "#291d00"
+		}
+	},
+	"Color/_Primitives/Caution/fgSurface3": {
+		"value": {
+			".": "#866a00"
+		}
+	},
+	"Color/_Primitives/Caution/fgSurface2": {
+		"value": {
+			".": "#a58700"
+		}
+	},
+	"Color/_Primitives/Caution/fgSurface1": {
+		"value": {
+			".": "#c6a800"
+		}
+	},
+	"Color/_Primitives/Caution/stroke3": {
+		"value": {
+			".": "#866a00"
+		}
+	},
+	"Color/_Primitives/Caution/stroke4": {
+		"value": {
+			".": "#644e00"
+		}
+	},
+	"Color/_Primitives/Caution/stroke2": {
+		"value": {
+			".": "#988d61"
+		}
+	},
+	"Color/_Primitives/Caution/stroke1": {
+		"value": {
+			".": "#b8ab76"
+		}
+	},
+	"Color/_Primitives/Caution/bgFillDark": {
+		"value": {
+			".": "#1f1e1b"
+		}
+	},
+	"Color/_Primitives/Caution/fgFillDark": {
+		"value": {
+			".": "#f6f1da"
+		}
+	},
+	"Color/_Primitives/Caution/bgFillInverted2": {
+		"value": {
+			".": "#1f1e1b"
+		}
+	},
+	"Color/_Primitives/Caution/bgFillInverted1": {
+		"value": {
+			".": "#3d2e00"
+		}
+	},
+	"Color/_Primitives/Caution/fgFillInverted": {
+		"value": {
+			".": "#f6f1da"
+		}
+	},
+	"Color/_Primitives/Caution/surface1": {
+		"value": {
+			".": "#faf1cb"
+		}
+	},
 	"Color/Semantic/Background/Neutral/bgSur-neutral": {
 		"value": {
 			".": "{Color/_Primitives/Bg/surface2}"
@@ -749,6 +859,18 @@
 			".": "{Color/_Primitives/Warning/surface2}"
 		},
 		"description": "Background color for surfaces with warning tone and weak emphasis."
+	},
+	"Color/Semantic/Background/Caution/bgSur-caution": {
+		"value": {
+			".": "{Color/_Primitives/Caution/surface4}"
+		},
+		"description": "Background color for surfaces with caution tone and normal emphasis."
+	},
+	"Color/Semantic/Background/Caution/bgSur-caution-weak": {
+		"value": {
+			".": "{Color/_Primitives/Caution/surface2}"
+		},
+		"description": "Background color for surfaces with caution tone and weak emphasis."
 	},
 	"Color/Semantic/Background/Error/bgSur-error": {
 		"value": {
@@ -923,6 +1045,66 @@
 			".": "{Color/_Primitives/Bg/fgSurface3}"
 		},
 		"description": "Foreground color for content like text with weak emphasis."
+	},
+	"Color/Semantic/Foreground/Success/fgCon-success": {
+		"value": {
+			".": "{Color/_Primitives/Success/fgSurface4}"
+		},
+		"description": "Foreground color for content like text with success tone and normal emphasis."
+	},
+	"Color/Semantic/Foreground/Success/fgCon-success-weak": {
+		"value": {
+			".": "{Color/_Primitives/Success/fgSurface3}"
+		},
+		"description": "Foreground color for content like text with success tone and weak emphasis."
+	},
+	"Color/Semantic/Foreground/Info/fgCon-info": {
+		"value": {
+			".": "{Color/_Primitives/Info/fgSurface4}"
+		},
+		"description": "Foreground color for content like text with info tone and normal emphasis."
+	},
+	"Color/Semantic/Foreground/Info/fgCon-info-weak": {
+		"value": {
+			".": "{Color/_Primitives/Info/fgSurface3}"
+		},
+		"description": "Foreground color for content like text with info tone and weak emphasis."
+	},
+	"Color/Semantic/Foreground/Warning/fgCon-warning": {
+		"value": {
+			".": "{Color/_Primitives/Warning/fgSurface4}"
+		},
+		"description": "Foreground color for content like text with warning tone and normal emphasis."
+	},
+	"Color/Semantic/Foreground/Warning/fgCon-warning-weak": {
+		"value": {
+			".": "{Color/_Primitives/Warning/fgSurface3}"
+		},
+		"description": "Foreground color for content like text with warning tone and weak emphasis."
+	},
+	"Color/Semantic/Foreground/Caution/fgCon-caution": {
+		"value": {
+			".": "{Color/_Primitives/Caution/fgSurface4}"
+		},
+		"description": "Foreground color for content like text with caution tone and normal emphasis."
+	},
+	"Color/Semantic/Foreground/Caution/fgCon-caution-weak": {
+		"value": {
+			".": "{Color/_Primitives/Caution/fgSurface3}"
+		},
+		"description": "Foreground color for content like text with caution tone and weak emphasis."
+	},
+	"Color/Semantic/Foreground/Error/fgCon-error": {
+		"value": {
+			".": "{Color/_Primitives/Error/fgSurface4}"
+		},
+		"description": "Foreground color for content like text with error tone and normal emphasis."
+	},
+	"Color/Semantic/Foreground/Error/fgCon-error-weak": {
+		"value": {
+			".": "{Color/_Primitives/Error/fgSurface3}"
+		},
+		"description": "Foreground color for content like text with error tone and weak emphasis."
 	},
 	"Color/Semantic/Foreground/Neutral/fgInt-neutral": {
 		"value": {
