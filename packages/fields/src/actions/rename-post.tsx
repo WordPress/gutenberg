@@ -35,6 +35,11 @@ const renamePost: Action< PostWithPermissions > = {
 		if ( post.status === 'trash' ) {
 			return false;
 		}
+
+		if ( post.type === 'wp_template' && typeof post.id === 'string' ) {
+			return false;
+		}
+
 		// Templates, template parts and patterns have special checks for renaming.
 		if (
 			! [
