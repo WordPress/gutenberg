@@ -184,13 +184,9 @@ function block_core_breadcrumbs_get_archive_breadcrumbs() {
 		if ( ! $year ) {
 			$m = get_query_var( 'm' );
 			if ( $m ) {
-				$year = substr( $m, 0, 4 );
-				if ( strlen( $m ) >= 6 ) {
-					$month = (int) substr( $m, 4, 2 );
-				}
-				if ( strlen( $m ) >= 8 ) {
-					$day = (int) substr( $m, 6, 2 );
-				}
+				$year  = substr( $m, 0, 4 );
+				$month = substr( $m, 4, 2 );
+				$day   = (int) substr( $m, 6, 2 );
 			}
 		}
 
