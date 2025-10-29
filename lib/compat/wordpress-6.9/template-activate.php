@@ -481,10 +481,10 @@ function gutenberg_locate_block_template( $template, $type, array $templates ) {
 // https://github.com/WordPress/wordpress-develop/blob/b2c8d8d2c8754cab5286b06efb4c11e2b6aa92d5/src/wp-includes/rest-api/endpoints/class-wp-rest-templates-controller.php#L571-L578
 // Priority 9 so it runs before default hooks like
 // `inject_ignored_hooked_blocks_metadata_attributes`.
+remove_action( 'rest_pre_insert_wp_template', 'wp_assign_new_template_to_theme', 9 );
 add_action( 'rest_pre_insert_wp_template', 'gutenberg_set_active_template_theme', 9, 2 );
 function gutenberg_set_active_template_theme( $changes, $request ) {
-	$template = $request['id'] ? get_block_template( $request['id'], 'wp_template' ) : null;
-	if ( $template ) {
+	if ( str_starts_with( $request->get_route(), '/wp/v2/templates' ) ) {
 		return $changes;
 	}
 	$changes->tax_input = array(
