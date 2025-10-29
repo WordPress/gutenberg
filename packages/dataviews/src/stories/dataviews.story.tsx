@@ -30,7 +30,12 @@ import { __, _n } from '@wordpress/i18n';
  * Internal dependencies
  */
 import DataViews from '../components/dataviews/index';
-import { LAYOUT_GRID, LAYOUT_LIST, LAYOUT_TABLE } from '../constants';
+import {
+	LAYOUT_GRID,
+	LAYOUT_LIST,
+	LAYOUT_TABLE,
+	LAYOUT_TIMELINE,
+} from '../constants';
 import filterSortAndPaginate from '../utils/filter-sort-and-paginate';
 import type { Field, View } from '../types';
 import {
@@ -555,5 +560,40 @@ export const InfiniteScroll = () => {
 				} }
 			/>
 		</>
+	);
+};
+
+export const Timeline = () => {
+	const [ view, setView ] = useState< View >( {
+		type: LAYOUT_TIMELINE,
+		search: '',
+		page: 1,
+		perPage: 20,
+		filters: [],
+		fields: [ 'satellites' ],
+		titleField: 'title',
+		descriptionField: 'description',
+		groupByField: 'date',
+		mediaField: 'image',
+		layout: {
+			eventField: 'date',
+		},
+	} );
+	const { data: shownData, paginationInfo } = useMemo( () => {
+		return filterSortAndPaginate( data, view, fields );
+	}, [ view ] );
+	return (
+		<DataViews
+			getItemId={ ( item ) => item.id.toString() }
+			paginationInfo={ paginationInfo }
+			data={ shownData }
+			view={ view }
+			fields={ fields }
+			onChangeView={ setView }
+			actions={ actions }
+			defaultLayouts={ {
+				[ LAYOUT_TIMELINE ]: {},
+			} }
+		/>
 	);
 };

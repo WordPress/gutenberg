@@ -237,6 +237,17 @@ export interface ViewList extends ViewBase {
 	type: 'list';
 }
 
+export interface ViewTimeline extends ViewBase {
+	type: 'timeline';
+
+	layout?: {
+		/**
+		 * The field to use as event field.
+		 */
+		eventField?: string;
+	};
+}
+
 export interface ViewGrid extends ViewBase {
 	type: 'grid';
 
@@ -295,7 +306,8 @@ export type View =
 	| ViewGrid
 	| ViewTable
 	| ViewPickerGrid
-	| ViewPickerTable;
+	| ViewPickerTable
+	| ViewTimeline;
 
 interface ActionBase< Item > {
 	/**
@@ -445,6 +457,10 @@ export interface ViewListProps< Item > extends ViewBaseProps< Item > {
 	view: ViewList;
 }
 
+export interface ViewTimelineProps< Item > extends ViewBaseProps< Item > {
+	view: ViewTimeline;
+}
+
 export interface ViewGridProps< Item > extends ViewBaseProps< Item > {
 	view: ViewGrid;
 }
@@ -462,7 +478,8 @@ export interface ViewPickerTableProps< Item >
 export type ViewProps< Item > =
 	| ViewTableProps< Item >
 	| ViewGridProps< Item >
-	| ViewListProps< Item >;
+	| ViewListProps< Item >
+	| ViewTimelineProps< Item >;
 
 export type ViewPickerProps< Item > =
 	| ViewPickerGridProps< Item >
@@ -472,6 +489,7 @@ export interface SupportedLayouts {
 	list?: Omit< ViewList, 'type' >;
 	grid?: Omit< ViewGrid, 'type' >;
 	table?: Omit< ViewTable, 'type' >;
+	timeline?: Omit< ViewTimeline, 'type' >;
 	pickerGrid?: Omit< ViewPickerGrid, 'type' >;
 	pickerTable?: Omit< ViewPickerTable, 'type' >;
 }
