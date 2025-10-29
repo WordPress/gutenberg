@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -90,6 +90,10 @@ function DimensionsTool( {
 	const aspectRatioValue = width && height ? 'custom' : lastAspectRatio;
 
 	const showScaleControl = aspectRatio || ( width && height );
+
+	useEffect( () => {
+		setLastAspectRatio( aspectRatio );
+	}, [ aspectRatio ] );
 
 	return (
 		<>
