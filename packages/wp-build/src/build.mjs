@@ -97,50 +97,6 @@ const wordpressExternalsPlugin = createWordpressExternalsPlugin(
 );
 
 /**
- * Create emotion babel plugin for esbuild.
- * This plugin enables emotion's babel transformations for proper CSS-in-JS handling.
- *
- * @return {Object} esbuild plugin.
- */
-function emotionBabelPlugin() {
-	return babel( {
-		filter: /\.[jt]sx?$/,
-		config: {
-			plugins: [ '@emotion/babel-plugin' ],
-		},
-	} );
-}
-
-/**
- * Plugin to externalize all imports except CSS/SCSS files.
- * This allows bundling to resolve CSS imports while keeping JS imports as-is.
- *
- * @return {Object} esbuild plugin.
- */
-function externalizeExceptCssPlugin() {
-	return {
-		name: 'externalize-except-css',
-		setup( build ) {
-			// Externalize all non-CSS imports
-			build.onResolve( { filter: /.*/ }, ( args ) => {
-				// Skip entry points
-				if ( args.kind === 'entry-point' ) {
-					return null;
-				}
-
-				// Let CSS/SCSS files be processed by sassPlugin
-				if ( args.path.match( /\.(css|scss)$/ ) ) {
-					return null;
-				}
-
-				// Externalize everything else (keep imports as-is)
-				return { path: args.path, external: true };
-			} );
-		},
-	};
-}
-
-/**
  * Normalize path separators for cross-platform compatibility.
  *
  * @param {string} p Path to normalize.
@@ -849,10 +805,35 @@ async function transpilePackage( packageName ) {
 	// Check if this is the components package that needs emotion babel plugin.
 	// Ideally we should remove this exception and move away from emotion.
 	const needsEmotionPlugin = packageName === 'components';
-	const basePlugins = needsEmotionPlugin ? [ emotionBabelPlugin() ] : [];
+	const emotionPlugin = babel( {
+		filter: /\.[jt]sx?$/,
+		config: {
+			plugins: [ '@emotion/babel-plugin' ],
+		},
+	} );
+	const externalizeAllExceptCssPlugin = {
+		name: 'externalize-except-css',
+		setup( build ) {
+			// Externalize all non-CSS imports
+			build.onResolve( { filter: /.*/ }, ( args ) => {
+				// Skip entry points
+				if ( args.kind === 'entry-point' ) {
+					return null;
+				}
+
+				// Let CSS/SCSS files be processed by sassPlugin
+				if ( args.path.match( /\.(css|scss)$/ ) ) {
+					return null;
+				}
+
+				// Externalize everything else (keep imports as-is)
+				return { path: args.path, external: true };
+			} );
+		},
+	};
 	const plugins = [
-		...basePlugins,
-		externalizeExceptCssPlugin(),
+		needsEmotionPlugin && emotionPlugin,
+		externalizeAllExceptCssPlugin,
 		// Handle CSS modules (.module.css and .module.scss)
 		sassPlugin( {
 			embedded: true,
@@ -877,7 +858,7 @@ async function transpilePackage( packageName ) {
 				path.join( PACKAGES_DIR, 'base-styles' ),
 			],
 		} ),
-	];
+	].filter( Boolean );
 
 	if ( packageJson.main ) {
 		builds.push(
