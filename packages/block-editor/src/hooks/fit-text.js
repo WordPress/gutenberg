@@ -101,19 +101,22 @@ function useFitText( { fitText, name, clientId } ) {
 
 		// Only hide/show on initial application to prevent flash on every keystroke
 		if ( shouldHideOnCalculation ) {
+			// Save the original visibility value before hiding
+			const previousVisibility = element.style.visibility;
+
 			// Hide element during calculation to prevent flash
 			// eslint-disable-next-line react-compiler/react-compiler
-			element.style.opacity = '0';
+			element.style.visibility = 'hidden';
 
 			// Wait for browser to render the hidden state
 			window.requestAnimationFrame( () => {
 				// Now do the calculation while hidden
 				optimizeFitText( element, blockSelector, applyStylesFn );
 
-				// Wait 100ms for browser to fully render the new font size
+				// Wait 10ms for browser to render the new font size
 				setTimeout( () => {
-					// Finally, show the element with the correct size
-					element.style.removeProperty( 'opacity' );
+					// Restore the original visibility value
+					element.style.visibility = previousVisibility;
 				}, 10 );
 			} );
 		} else {
