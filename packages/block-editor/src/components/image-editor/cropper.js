@@ -9,6 +9,7 @@ import clsx from 'clsx';
  */
 import { Spinner } from '@wordpress/components';
 import { useResizeObserver } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -34,16 +35,19 @@ export default function ImageCropper( {
 		setPosition,
 		setCrop,
 		setZoom,
-		rotation,
 	} = useImageEditingContext();
-	const [ contentResizeListener, { width: clientWidth } ] =
-		useResizeObserver();
+	const [ contentHeight, setContentHeight ] = useState( height );
+	const [ contentWidth, setContentWidth ] = useState( width );
+	const effectContentRef = useResizeObserver(
+		( [ entry ] ) => {
+			setContentWidth( entry.borderBoxSize[ 0 ].inlineSize );
+			setContentHeight( entry.borderBoxSize[ 0 ].blockSize );
+		},
+		{ box: 'border-box' }
+	);
 
-	let editedHeight = height || ( clientWidth * naturalHeight ) / naturalWidth;
-
-	if ( rotation % 180 === 90 ) {
-		editedHeight = ( clientWidth * naturalWidth ) / naturalHeight;
-	}
+	const editedWidth = contentWidth || width || naturalWidth;
+	const editedHeight = contentHeight || height || naturalHeight;
 
 	const area = (
 		<div
@@ -56,9 +60,10 @@ export default function ImageCropper( {
 			) }
 			style={ {
 				...borderProps?.style,
-				width: width || clientWidth,
+				width: editedWidth,
 				height: editedHeight,
 			} }
+			ref={ effectContentRef }
 		>
 			<Cropper
 				image={ editedUrl || url }
@@ -82,10 +87,5 @@ export default function ImageCropper( {
 		</div>
 	);
 
-	return (
-		<>
-			{ contentResizeListener }
-			{ area }
-		</>
-	);
+	return <>{ area }</>;
 }
