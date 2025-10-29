@@ -61,13 +61,14 @@ function getAllPackages() {
 }
 
 const PACKAGES = getAllPackages();
-const ROOT_PACKAGE_JSON = getPackageInfoFromFile( path.join( ROOT_DIR, 'package.json' ) );
+const ROOT_PACKAGE_JSON = getPackageInfoFromFile(
+	path.join( ROOT_DIR, 'package.json' )
+);
 const WP_PLUGIN_CONFIG = ROOT_PACKAGE_JSON.wpPlugin || {};
 const SCRIPT_GLOBAL = WP_PLUGIN_CONFIG.scriptGlobal;
 const PACKAGE_NAMESPACE = WP_PLUGIN_CONFIG.packageNamespace;
 const HANDLE_PREFIX = WP_PLUGIN_CONFIG.handlePrefix || PACKAGE_NAMESPACE;
 const EXTERNAL_NAMESPACES = WP_PLUGIN_CONFIG.externalNamespaces || {};
-
 
 const baseDefine = {
 	'globalThis.IS_GUTENBERG_PLUGIN': JSON.stringify(
@@ -278,7 +279,9 @@ async function bundlePackage( packageName ) {
 
 		// Check if package matches the namespace and should expose a global
 		const packageFullName = packageJson.name;
-		const matchesNamespace = packageFullName.startsWith( `@${ PACKAGE_NAMESPACE }/` );
+		const matchesNamespace = packageFullName.startsWith(
+			`@${ PACKAGE_NAMESPACE }/`
+		);
 		const shouldExposeGlobal = matchesNamespace && SCRIPT_GLOBAL !== false;
 
 		const globalName = shouldExposeGlobal
