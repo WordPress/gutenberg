@@ -37,16 +37,19 @@ const PACKAGES_DIR = path.join( ROOT_DIR, 'packages' );
 const BUILD_DIR = path.join( ROOT_DIR, 'build' );
 
 const SOURCE_EXTENSIONS = '{js,ts,tsx}';
-const ASSET_EXTENSIONS = '{json,module.css}';
+const ASSET_EXTENSIONS = 'json';
 const IGNORE_PATTERNS = [
 	'**/benchmark/**',
 	'**/{__mocks__,__tests__,test}/**',
 	'**/{storybook,stories}/**',
 	'**/*.native.*',
+	'**/*.ios.*',
+	'**/*.android.*',
 ];
 const TEST_FILE_PATTERNS = [
 	/\/(benchmark|__mocks__|__tests__|test|storybook|stories)\/.+/,
 	/\.(spec|test)\.(js|ts|tsx)$/,
+	/\.(native|ios|android)\.(js|ts|tsx)$/,
 ];
 
 /**
@@ -61,13 +64,14 @@ function getAllPackages() {
 }
 
 const PACKAGES = getAllPackages();
-const ROOT_PACKAGE_JSON = getPackageInfoFromFile( path.join( ROOT_DIR, 'package.json' ) );
+const ROOT_PACKAGE_JSON = getPackageInfoFromFile(
+	path.join( ROOT_DIR, 'package.json' )
+);
 const WP_PLUGIN_CONFIG = ROOT_PACKAGE_JSON.wpPlugin || {};
 const SCRIPT_GLOBAL = WP_PLUGIN_CONFIG.scriptGlobal;
 const PACKAGE_NAMESPACE = WP_PLUGIN_CONFIG.packageNamespace;
 const HANDLE_PREFIX = WP_PLUGIN_CONFIG.handlePrefix || PACKAGE_NAMESPACE;
 const EXTERNAL_NAMESPACES = WP_PLUGIN_CONFIG.externalNamespaces || {};
-
 
 const baseDefine = {
 	'globalThis.IS_GUTENBERG_PLUGIN': JSON.stringify(
@@ -105,6 +109,35 @@ function emotionBabelPlugin() {
 			plugins: [ '@emotion/babel-plugin' ],
 		},
 	} );
+}
+
+/**
+ * Plugin to externalize all imports except CSS/SCSS files.
+ * This allows bundling to resolve CSS imports while keeping JS imports as-is.
+ *
+ * @return {Object} esbuild plugin.
+ */
+function externalizeExceptCssPlugin() {
+	return {
+		name: 'externalize-except-css',
+		setup( build ) {
+			// Externalize all non-CSS imports
+			build.onResolve( { filter: /.*/ }, ( args ) => {
+				// Skip entry points
+				if ( args.kind === 'entry-point' ) {
+					return null;
+				}
+
+				// Let CSS/SCSS files be processed by sassPlugin
+				if ( args.path.match( /\.(css|scss)$/ ) ) {
+					return null;
+				}
+
+				// Externalize everything else (keep imports as-is)
+				return { path: args.path, external: true };
+			} );
+		},
+	};
 }
 
 /**
@@ -278,7 +311,9 @@ async function bundlePackage( packageName ) {
 
 		// Check if package matches the namespace and should expose a global
 		const packageFullName = packageJson.name;
-		const matchesNamespace = packageFullName.startsWith( `@${ PACKAGE_NAMESPACE }/` );
+		const matchesNamespace = packageFullName.startsWith(
+			`@${ PACKAGE_NAMESPACE }/`
+		);
 		const shouldExposeGlobal = matchesNamespace && SCRIPT_GLOBAL !== false;
 
 		const globalName = shouldExposeGlobal
@@ -814,7 +849,35 @@ async function transpilePackage( packageName ) {
 	// Check if this is the components package that needs emotion babel plugin.
 	// Ideally we should remove this exception and move away from emotion.
 	const needsEmotionPlugin = packageName === 'components';
-	const plugins = needsEmotionPlugin ? [ emotionBabelPlugin() ] : [];
+	const basePlugins = needsEmotionPlugin ? [ emotionBabelPlugin() ] : [];
+	const plugins = [
+		...basePlugins,
+		externalizeExceptCssPlugin(),
+		// Handle CSS modules (.module.css and .module.scss)
+		sassPlugin( {
+			embedded: true,
+			filter: /\.module\.(css|scss)$/,
+			transform: postcssModules( {
+				generateScopedName: '[name]__[local]__[hash:base64:5]',
+			} ),
+			type: 'style',
+			loadPaths: [
+				'node_modules',
+				path.join( PACKAGES_DIR, 'base-styles' ),
+			],
+		} ),
+		// Handle regular CSS/SCSS files
+		// Note: .module.css and .module.scss already handled by plugin above
+		sassPlugin( {
+			embedded: true,
+			filter: /\.(css|scss)$/,
+			type: 'style',
+			loadPaths: [
+				'node_modules',
+				path.join( PACKAGES_DIR, 'base-styles' ),
+			],
+		} ),
+	];
 
 	if ( packageJson.main ) {
 		builds.push(
@@ -822,7 +885,7 @@ async function transpilePackage( packageName ) {
 				entryPoints: srcFiles,
 				outdir: buildDir,
 				outbase: srcDir,
-				bundle: false,
+				bundle: true,
 				platform: 'node',
 				format: 'cjs',
 				sourcemap: true,
@@ -854,7 +917,7 @@ async function transpilePackage( packageName ) {
 				entryPoints: srcFiles,
 				outdir: buildModuleDir,
 				outbase: srcDir,
-				bundle: false,
+				bundle: true,
 				platform: 'neutral',
 				format: 'esm',
 				sourcemap: true,
