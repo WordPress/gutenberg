@@ -10,12 +10,13 @@ import { Tooltip } from '@wordpress/components';
 import { useMemo, useContext, useState } from '@wordpress/element';
 import { ENTER } from '@wordpress/keycodes';
 import { _x, sprintf } from '@wordpress/i18n';
+import { areGlobalStylesEqual } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
  */
 import { GlobalStylesContext } from '../context';
-import { areGlobalStyleConfigsEqual, filterObjectByProperties } from '../utils';
+import { filterObjectByProperties } from '../utils';
 
 interface VariationProps {
 	variation: any;
@@ -62,7 +63,7 @@ export default function Variation( {
 	};
 
 	const isActive = useMemo(
-		() => areGlobalStyleConfigsEqual( user, variation ),
+		() => areGlobalStylesEqual( user, variation ),
 		[ user, variation ]
 	);
 

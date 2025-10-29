@@ -20,7 +20,6 @@ import {
 	SIDEBARS,
 } from './constants';
 import { Comments } from './comments';
-import { AddComment } from './add-comment';
 import { store as editorStore } from '../../store';
 import AddCommentMenuItem from './comment-menu-item';
 import CommentAvatarIndicator from './comment-indicator-toolbar';
@@ -61,12 +60,6 @@ function NotesSidebarContent( {
 				}
 			} }
 		>
-			<AddComment
-				onSubmit={ onCreate }
-				showCommentBoard={ showCommentBoard }
-				setShowCommentBoard={ setShowCommentBoard }
-				commentSidebarRef={ commentSidebarRef }
-			/>
 			<Comments
 				threads={ comments }
 				onEditComment={ onEdit }
@@ -104,7 +97,6 @@ function NotesSidebar( { postId, mode } ) {
 	const {
 		resultComments,
 		unresolvedSortedThreads,
-		totalPages,
 		reflowComments,
 		commentLastUpdated,
 	} = useBlockComments( postId );
@@ -112,8 +104,6 @@ function NotesSidebar( { postId, mode } ) {
 		showFloatingSidebar &&
 			( unresolvedSortedThreads.length > 0 || showCommentBoard )
 	);
-
-	const hasMoreComments = totalPages && totalPages > 1;
 
 	// Get the global styles to set the background color of the sidebar.
 	const { merged: GlobalStyles } = useGlobalStylesContext();
@@ -128,8 +118,9 @@ function NotesSidebar( { postId, mode } ) {
 		const prevArea = await getActiveComplementaryArea( 'core' );
 		const activeNotesArea = SIDEBARS.find( ( name ) => name === prevArea );
 
-		// If the notes sidebar is not already active, enable the floating sidebar.
-		if ( ! activeNotesArea ) {
+		if ( currentThread?.status === 'approved' ) {
+			enableComplementaryArea( 'core', collabHistorySidebarName );
+		} else if ( ! activeNotesArea ) {
 			enableComplementaryArea(
 				'core',
 				showFloatingSidebar
@@ -158,7 +149,6 @@ function NotesSidebar( { postId, mode } ) {
 			{ blockCommentId && (
 				<CommentAvatarIndicator
 					thread={ currentThread }
-					hasMoreComments={ hasMoreComments }
 					onClick={ openTheSidebar }
 				/>
 			) }
@@ -179,7 +169,7 @@ function NotesSidebar( { postId, mode } ) {
 					commentLastUpdated={ commentLastUpdated }
 				/>
 			</PluginSidebar>
-			{ showFloatingSidebar && (
+			{ isLargeViewport && (
 				<PluginSidebar
 					isPinnable={ false }
 					header={ false }

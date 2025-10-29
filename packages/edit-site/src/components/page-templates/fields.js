@@ -16,7 +16,10 @@ import { useState, useMemo } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { parse } from '@wordpress/blocks';
 import { BlockPreview } from '@wordpress/block-editor';
-import { EditorProvider } from '@wordpress/editor';
+import {
+	EditorProvider,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 import {
 	privateApis as corePrivateApis,
 	store as coreStore,
@@ -30,17 +33,16 @@ import { useAddedBy } from './hooks';
 import { useDefaultTemplateTypes } from '../add-new-template/utils';
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 import { unlock } from '../../lock-unlock';
-import { useStyle } from '../global-styles';
 
 const { Badge } = unlock( componentsPrivateApis );
 const { useEntityRecordsWithPermissions } = unlock( corePrivateApis );
+const { useStyle } = unlock( editorPrivateApis );
 
 function useAllDefaultTemplateTypes() {
 	const defaultTemplateTypes = useDefaultTemplateTypes();
 	const { records: staticRecords } = useEntityRecordsWithPermissions(
-		'postType',
-		'wp_registered_template',
-		{ per_page: -1 }
+		'root',
+		'registeredTemplate'
 	);
 	return [
 		...defaultTemplateTypes,
@@ -153,23 +155,14 @@ export const activeField = {
 	type: 'boolean',
 	getValue: ( { item } ) => item._isActive,
 	render: function Render( { item } ) {
-		if ( item._isCustom ) {
-			return (
-				<Badge
-					intent="info"
-					title={ __(
-						'Custom templates cannot be active nor inactive.'
-					) }
-				>
-					{ __( 'N/A' ) }
-				</Badge>
-			);
-		}
-
+		const activeLabel = item._isCustom
+			? __( 'Active when used' )
+			: __( 'Active' );
+		const activeIntent = item._isCustom ? 'info' : 'success';
 		const isActive = item._isActive;
 		return (
-			<Badge intent={ isActive ? 'success' : 'default' }>
-				{ isActive ? __( 'Active' ) : __( 'Inactive' ) }
+			<Badge intent={ isActive ? activeIntent : 'default' }>
+				{ isActive ? activeLabel : __( 'Inactive' ) }
 			</Badge>
 		);
 	},
@@ -179,17 +172,20 @@ export const useThemeField = () => {
 	const activeTheme = useSelect( ( select ) =>
 		select( coreStore ).getCurrentTheme()
 	);
-	return {
-		label: __( 'Compatible Theme' ),
-		id: 'theme',
-		getValue: ( { item } ) => item.theme,
-		render: function Render( { item } ) {
-			if ( item.theme === activeTheme.stylesheet ) {
-				return <Badge intent="success">{ item.theme }</Badge>;
-			}
-			return <Badge intent="error">{ item.theme }</Badge>;
-		},
-	};
+	return useMemo(
+		() => ( {
+			label: __( 'Compatible Theme' ),
+			id: 'theme',
+			getValue: ( { item } ) => item.theme,
+			render: function Render( { item } ) {
+				if ( item.theme === activeTheme.stylesheet ) {
+					return <Badge intent="success">{ item.theme }</Badge>;
+				}
+				return <Badge intent="error">{ item.theme }</Badge>;
+			},
+		} ),
+		[ activeTheme ]
+	);
 };
 
 export const slugField = {

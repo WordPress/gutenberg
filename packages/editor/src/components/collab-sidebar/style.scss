@@ -161,27 +161,6 @@
 	min-width: auto;
 	background: transparent;
 	border: none;
-
-	&:hover::before {
-		background: rgba(0, 0, 0, 0.04);
-	}
-
-	&.has-unresolved {
-		.comment-avatar-stack {
-			&::after {
-				content: "";
-				position: absolute;
-				top: -2px;
-				right: -2px;
-				width: $grid-unit-10;
-				height: $grid-unit-10;
-				background: #d63638;
-				border-radius: $radius-round;
-				border: $border-width solid $white;
-				z-index: 10;
-			}
-		}
-	}
 }
 
 .comment-avatar-stack {

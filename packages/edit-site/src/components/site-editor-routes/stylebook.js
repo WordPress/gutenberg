@@ -2,14 +2,17 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationScreenUnsupported from '../sidebar-navigation-screen-unsupported';
-import { StyleBookPreview } from '../style-book';
+import { unlock } from '../../lock-unlock';
 import { isClassicThemeWithStyleBookSupport } from './utils';
+
+const { StyleBookPreview } = unlock( editorPrivateApis );
 
 export const stylebookRoute = {
 	name: 'stylebook',

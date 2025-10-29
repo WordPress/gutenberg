@@ -183,8 +183,8 @@ async function dev() {
 
 		// Start package build watch
 		const buildWatch = execAsync(
-			'node',
-			[ './bin/packages/build.mjs', '--watch' ],
+			'wp-build',
+			[ '--watch' ],
 			{
 				env: { ...process.env, NODE_ENV: 'development' },
 			}

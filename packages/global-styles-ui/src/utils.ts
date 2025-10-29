@@ -1,11 +1,7 @@
 /**
- * External dependencies
- */
-import fastDeepEqual from 'fast-deep-equal/es6';
-
-/**
  * WordPress dependencies
  */
+import { areGlobalStylesEqual } from '@wordpress/global-styles-engine';
 import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 
 /**
@@ -77,26 +73,6 @@ export const filterObjectByProperties = (
 };
 
 /**
- * Compares global style variations according to their styles and settings properties.
- *
- * @param original  A global styles object.
- * @param variation A global styles object.
- * @return Whether `original` and `variation` match.
- */
-export function areGlobalStyleConfigsEqual(
-	original: any,
-	variation: any
-): boolean {
-	if ( typeof original !== 'object' || typeof variation !== 'object' ) {
-		return original === variation;
-	}
-	return (
-		fastDeepEqual( original?.styles, variation?.styles ) &&
-		fastDeepEqual( original?.settings, variation?.settings )
-	);
-}
-
-/**
  * Compares a style variation to the same variation filtered by the specified properties.
  * Returns true if the variation contains only the properties specified.
  *
@@ -113,7 +89,7 @@ export function isVariationWithProperties(
 		properties
 	);
 
-	return areGlobalStyleConfigsEqual( variationWithProperties, variation );
+	return areGlobalStylesEqual( variationWithProperties, variation );
 }
 
 function getFontFamilyFromSetting( fontFamilies: any[], setting: string ): any {

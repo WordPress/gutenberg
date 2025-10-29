@@ -8,10 +8,9 @@
 	"description": "Display a breadcrumb trail for hierarchical post types or based on taxonomy terms.",
 	"textdomain": "default",
 	"attributes": {
-		"type": {
-			"type": "string",
-			"default": "auto",
-			"enum": [ "auto", "postWithTerms", "postWithAncestors" ]
+		"prefersTaxonomy": {
+			"type": "boolean",
+			"default": false
 		},
 		"separator": {
 			"type": "string",

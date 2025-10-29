@@ -2052,6 +2052,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/wp-build",
+		"slug": "packages-wp-build",
+		"markdown_source": "../packages/wp-build/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "Data Module Reference",
 		"slug": "data",
 		"markdown_source": "../docs/reference-guides/data/README.md",
