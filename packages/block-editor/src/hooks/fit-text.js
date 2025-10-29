@@ -3,7 +3,7 @@
  */
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
-import { useEffect, useCallback, useRef } from '@wordpress/element';
+import { useEffect, useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
@@ -61,7 +61,6 @@ function addAttributes( settings ) {
 function useFitText( { fitText, name, clientId } ) {
 	const hasFitTextSupport = hasBlockSupport( name, FIT_TEXT_SUPPORT_KEY );
 	const blockElement = useBlockElement( clientId );
-	const isInitialApplication = useRef( true );
 
 	// Monitor block attribute changes
 	// Any attribute may change the available space.
@@ -95,34 +94,7 @@ function useFitText( { fitText, name, clientId } ) {
 			styleElement.textContent = css;
 		};
 
-		// Capture element reference and initial state flag
-		const element = blockElement;
-		const shouldHideOnCalculation = isInitialApplication.current;
-
-		// Only hide/show on initial application to prevent flash on every keystroke
-		if ( shouldHideOnCalculation ) {
-			// Save the original visibility value before hiding
-			const previousVisibility = element.style.visibility;
-
-			// Hide element during calculation to prevent flash
-			// eslint-disable-next-line react-compiler/react-compiler
-			element.style.visibility = 'hidden';
-
-			// Wait for browser to render the hidden state
-			window.requestAnimationFrame( () => {
-				// Now do the calculation while hidden
-				optimizeFitText( element, blockSelector, applyStylesFn );
-
-				// Wait 10ms for browser to render the new font size
-				setTimeout( () => {
-					// Restore the original visibility value
-					element.style.visibility = previousVisibility;
-				}, 10 );
-			} );
-		} else {
-			// Subsequent calls: apply directly without hiding
-			optimizeFitText( element, blockSelector, applyStylesFn );
-		}
+		optimizeFitText( blockElement, blockSelector, applyStylesFn );
 	}, [ blockElement, clientId, hasFitTextSupport, fitText ] );
 
 	useEffect( () => {
@@ -135,14 +107,24 @@ function useFitText( { fitText, name, clientId } ) {
 			return;
 		}
 
-		// Reset flag when fit text is enabled
-		isInitialApplication.current = true;
+		// Capture element reference before async operations
+		const element = blockElement;
+		const previousVisibility = element.style.visibility;
 
-		// Apply initially
-		applyFitText();
+		window.requestAnimationFrame( () => {
+			element.style.visibility = 'hidden';
+			// Wait for browser to render the hidden state
+			window.requestAnimationFrame( () => {
+				// Apply fit text while hidden
+				applyFitText();
 
-		// Mark as no longer initial after first application
-		isInitialApplication.current = false;
+				// Wait 10ms for browser to render the new font size
+				setTimeout( () => {
+					// Restore the original visibility value
+					element.style.visibility = previousVisibility;
+				}, 10 );
+			} );
+		} );
 
 		// Store current element value for cleanup
 		const currentElement = blockElement;
