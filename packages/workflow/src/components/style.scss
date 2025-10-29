@@ -207,10 +207,10 @@
 
 .workflows-workflow-menu__output-error {
 	padding: $grid-unit-15;
-	background: #fee;
-	border: 1px solid #fcc;
+	background: $gray-200;
+	border: 1px solid #{color.adjust($alert-red, $lightness: -10%)};
 	border-radius: $radius-small;
-	color: #c00;
+	color: $alert-red;
 
 	p {
 		margin: 0;
