@@ -26,6 +26,7 @@ describe( 'post-meta bindings', () => {
 				};
 
 				const getRegisteredPostMeta = () => ( {
+					field_without_label_or_default: {},
 					field_with_label_only: {
 						title: 'Field With Label Only',
 					},
@@ -66,6 +67,20 @@ describe( 'post-meta bindings', () => {
 				} );
 
 				expect( values.content ).toBe( 'Field With Label Only' );
+			} );
+
+			it( 'should fall back to the field key if the field label is not defined', () => {
+				const values = postMetaBindings.getValues( {
+					select,
+					context: { postType: 'movie' },
+					bindings: {
+						content: {
+							args: { key: 'field_without_label_or_default' },
+						},
+					},
+				} );
+
+				expect( values.content ).toBe( 'field_without_label_or_default' );
 			} );
 		} );
 	} );
