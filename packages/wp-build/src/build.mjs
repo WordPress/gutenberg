@@ -948,6 +948,7 @@ async function compileStyles( packageName ) {
 						`get [ ${ JSON.stringify( key ) } ]() {
 		const style = document.createElement( 'style' );
 		style.styleSheet.cssText = ${ JSON.stringify( result.css ) };
+		document.body.appendChild( style );
 		delete this[ ${ JSON.stringify( key ) } ];
 		return ${ JSON.stringify( value ) };
 	}`
