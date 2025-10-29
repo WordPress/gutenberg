@@ -604,7 +604,7 @@ describe( 'DimensionsTool', () => {
 			expect( onChange.mock.calls ).toStrictEqual( [
 				[ { aspectRatio: '16/9', scale: 'cover', width: '8px' } ],
 				[ { scale: 'cover', width: '8px', height: '6px' } ],
-				[ { aspectRatio: '16/9', scale: 'cover', height: '6px' } ],
+				[ { height: '6px' } ],
 			] );
 		} );
 
