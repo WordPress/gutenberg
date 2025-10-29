@@ -39,7 +39,8 @@ import {
 } from './fields';
 import { defaultLayouts, getDefaultView } from './view-utils';
 
-const { usePostActions, templateTitleField } = unlock( editorPrivateApis );
+const { usePostActions, usePostFields, templateTitleField } =
+	unlock( editorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 const { useEntityRecordsWithPermissions } = unlock( corePrivateApis );
 
@@ -210,6 +211,10 @@ export default function PageTemplates() {
 		[ history, path, view?.type ]
 	);
 
+	const postTypeFields = usePostFields( {
+		postType: TEMPLATE_POST_TYPE,
+	} );
+	const dateField = postTypeFields.find( ( field ) => field.id === 'date' );
 	const themeField = useThemeField();
 	const fields = useMemo( () => {
 		const _fields = [
@@ -221,6 +226,9 @@ export default function PageTemplates() {
 		];
 		if ( activeView === 'user' ) {
 			_fields.push( themeField );
+			if ( dateField ) {
+				_fields.push( dateField );
+			}
 		}
 		const elements = [];
 		for ( const author in users ) {
@@ -234,7 +242,7 @@ export default function PageTemplates() {
 			elements,
 		} );
 		return _fields;
-	}, [ users, activeView, themeField ] );
+	}, [ users, activeView, themeField, dateField ] );
 
 	const { data, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( records, view, fields );
