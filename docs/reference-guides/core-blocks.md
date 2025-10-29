@@ -20,7 +20,7 @@ Displays a foldable layout that groups content in collapsible sections. ([Source
 
 ## Accordion Heading
 
-Toggles the accordion panel. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion-heading))
+Displays a heading that toggles the accordion panel. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion-heading))
 
 -	**Name:** core/accordion-heading
 -	**Category:** design
