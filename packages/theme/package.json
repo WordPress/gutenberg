@@ -32,8 +32,7 @@
 		},
 		"./design-tokens.css": "./src/prebuilt/css/design-tokens.css",
 		"./design-tokens.js": "./src/prebuilt/js/design-tokens.js",
-		"./package.json": "./package.json",
-		"./build-style/": "./build-style/"
+		"./package.json": "./package.json"
 	},
 	"react-native": "src/index",
 	"wpScript": true,
