@@ -123,14 +123,12 @@ function useFitText( { fitText, name, clientId } ) {
 			currentElement.style.visibility = 'hidden';
 			// Wait for browser to render the hidden state
 			calculateFrameId = window.requestAnimationFrame( () => {
-				// Apply fit text while hidden
 				applyFitText();
 
 				// Using a timeout instead of requestAnimationFrame, because
 				// with requestAnimationFrame a flash of very high size
 				// can still occur although rare.
 				showTimeoutId = setTimeout( () => {
-					// Restore the original visibility value
 					currentElement.style.visibility = previousVisibility;
 				}, 10 );
 			} );
