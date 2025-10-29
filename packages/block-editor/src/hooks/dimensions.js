@@ -116,20 +116,22 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 				defaultControls={ defaultControls }
 				onVisualize={ setVisualizedProperty }
 			/>
-			{ !! settings?.spacing?.padding && (
-				<PaddingVisualizer
-					forceShow={ visualizedProperty === 'padding' }
-					clientId={ clientId }
-					value={ value }
-				/>
-			) }
-			{ !! settings?.spacing?.margin && (
-				<MarginVisualizer
-					forceShow={ visualizedProperty === 'margin' }
-					clientId={ clientId }
-					value={ value }
-				/>
-			) }
+			{ !! settings?.spacing?.padding &&
+				visualizedProperty === 'padding' && (
+					<PaddingVisualizer
+						forceShow={ visualizedProperty === 'padding' }
+						clientId={ clientId }
+						value={ value }
+					/>
+				) }
+			{ !! settings?.spacing?.margin &&
+				visualizedProperty === 'margin' && (
+					<MarginVisualizer
+						forceShow={ visualizedProperty === 'margin' }
+						clientId={ clientId }
+						value={ value }
+					/>
+				) }
 		</>
 	);
 }
