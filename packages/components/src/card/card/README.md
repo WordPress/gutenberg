@@ -121,8 +121,8 @@ The `size` prop supports logical properties that adapt to different writing dire
 
 - `blockStart` - Maps to `top` in horizontal writing modes
 - `blockEnd` - Maps to `bottom` in horizontal writing modes
-- `inlineStart` - Maps to `left` in horizontal writing modes
-- `inlineEnd` - Maps to `right` in horizontal writing modes
+- `inlineStart` - Maps to `left` in horizontal left-to-right writing modes
+- `inlineEnd` - Maps to `right` in horizontal left-to-right writing modes
 
 ```jsx
 import { Card, CardBody } from '@wordpress/components';

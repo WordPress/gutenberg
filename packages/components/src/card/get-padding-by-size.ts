@@ -46,6 +46,8 @@ const getSinglePaddingValue = ( size: SizeToken ): string | undefined => {
 			return space( 6 );
 		case 'large':
 			return space( 8 );
+		default:
+			return space( 6 );
 	}
 };
 
