@@ -10,10 +10,10 @@ export type SizeToken = 'xSmall' | 'small' | 'medium' | 'large';
 export type SizeOptions =
 	| SizeToken
 	| {
-			blockStart?: SizeToken;
-			blockEnd?: SizeToken;
-			inlineStart?: SizeToken;
-			inlineEnd?: SizeToken;
+			blockStart: SizeToken;
+			blockEnd: SizeToken;
+			inlineStart: SizeToken;
+			inlineEnd: SizeToken;
 	  };
 type SizeableProps = {
 	/**

@@ -36,7 +36,7 @@ export const cardPaddings = {
 	extraSmall: xSmallCardPadding,
 };
 
-const getSinglePaddingValue = ( size?: SizeToken ): string | undefined => {
+const getSinglePaddingValue = ( size: SizeToken ): string | undefined => {
 	switch ( size ) {
 		case 'xSmall':
 			return space( 2 );
@@ -46,8 +46,6 @@ const getSinglePaddingValue = ( size?: SizeToken ): string | undefined => {
 			return space( 6 );
 		case 'large':
 			return space( 8 );
-		default:
-			return '0';
 	}
 };
 
@@ -65,10 +63,10 @@ export const getPaddingBySize = ( size: Props[ 'size' ] ): SerializedStyles => {
 		const right = size.inlineEnd;
 
 		return css`
-			padding: ${ getSinglePaddingValue( top ) }
-				${ getSinglePaddingValue( right ) }
-				${ getSinglePaddingValue( bottom ) }
-				${ getSinglePaddingValue( left ) };
+			padding-block-start: ${ getSinglePaddingValue( top ) };
+			padding-block-end: ${ getSinglePaddingValue( bottom ) };
+			padding-inline-start: ${ getSinglePaddingValue( left ) };
+			padding-inline-end: ${ getSinglePaddingValue( right ) };
 		`;
 	}
 
