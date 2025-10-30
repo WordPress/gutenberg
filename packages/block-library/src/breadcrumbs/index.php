@@ -128,9 +128,8 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
  * @return array Modified breadcrumb items with pagination if applicable.
  */
 function block_core_breadcrumbs_maybe_add_paged( $breadcrumb_items ) {
-	$paged = get_query_var( 'paged' );
-
-	if ( $paged && $paged > 1 ) {
+	$paged = (int) get_query_var( 'paged' );
+	if ( $paged > 1 ) {
 		// Get the last breadcrumb item (the current page).
 		$last_item = array_pop( $breadcrumb_items );
 
