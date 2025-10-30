@@ -120,10 +120,14 @@ export default {
 			return false;
 		}
 
-		// Empty string or `false` could be a valid value, so we need to check if the field value is undefined.
-		if ( getValue( { select, context, args } ) === undefined ) {
+		const metaFields = getPostMetaFields( select, context );
+		const hasMatchingMetaField = metaFields.some(
+			( field ) => field.args.key === args.key
+		);
+		if ( ! hasMatchingMetaField ) {
 			return false;
 		}
+
 		// Check that custom fields metabox is not enabled.
 		const areCustomFieldsEnabled =
 			select( editorStore ).getEditorSettings().enableCustomFields;
