@@ -26,6 +26,10 @@
 			"type": "string",
 			"default": "excerpt",
 			"enum": [ "none", "excerpt", "full" ]
+		},
+		"excludePostAuthor": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {
