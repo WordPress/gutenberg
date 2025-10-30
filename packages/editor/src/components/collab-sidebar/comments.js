@@ -156,6 +156,24 @@ export function Comments( {
 		setBlockRefs( ( prev ) => ( { ...prev, [ id ]: blockRef } ) );
 	}, [] );
 
+	// Set the editor minimum height to ensure notes are fully visible.
+	const setEditorMinHeight = ( minHeight ) => {
+		const iframe = document.querySelector( 'iframe[name="editor-canvas"]' );
+		if ( iframe && iframe.contentDocument ) {
+			const scrollTop =
+				iframe.contentDocument.documentElement.scrollTop ||
+				iframe.contentDocument.body.scrollTop;
+
+			if ( minHeight > 0 ) {
+				iframe.contentDocument.body.style.minHeight = `${
+					minHeight + scrollTop
+				}px`;
+			} else {
+				iframe.contentDocument.body.style.minHeight = '';
+			}
+		}
+	};
+
 	// Recalculate floating comment thread offsets whenever the heights change.
 	useEffect( () => {
 		/**
@@ -164,7 +182,6 @@ export function Comments( {
 		 */
 		const calculateAllOffsets = () => {
 			const offsets = {};
-			let editorMinHeight = 0;
 
 			if ( ! isFloating ) {
 				return offsets;
@@ -200,8 +217,6 @@ export function Comments( {
 				threadHeight: selectedThreadHeight,
 			};
 
-			editorMinHeight += selectedThreadTop + selectedThreadHeight + 16;
-
 			// Process threads after the selected thread, offsetting any overlapping
 			// threads downward.
 			for ( let i = breakIndex + 1; i < threads.length; i++ ) {
@@ -209,8 +224,6 @@ export function Comments( {
 				if ( ! blockRefs[ thread.id ] ) {
 					continue;
 				}
-
-				editorMinHeight += heights[ thread.id ] + 20;
 
 				blockElement = blockRefs[ thread.id ];
 				blockRect = blockElement?.getBoundingClientRect();
@@ -277,18 +290,21 @@ export function Comments( {
 				};
 			}
 
-			// Ensure the editor has enough height to scroll to all notes.
-			// last note top plus height to determine the bottom position.
-			const iframe = document.querySelector(
-				'iframe[name="editor-canvas"]'
-			);
-			if ( iframe && iframe.contentDocument ) {
-				if ( editorMinHeight > 0 ) {
-					iframe.contentDocument.body.style.minHeight = `${ editorMinHeight }px`;
-				} else {
-					iframe.contentDocument.body.style.minHeight = '';
-				}
+			let editorMinHeight = 0;
+			// Take the calculated top of the final note plus its height as the editor min height.
+			const lastThread = threads[ threads.length - 1 ];
+			if ( blockRefs[ lastThread.id ] ) {
+				const lastBlockElement = blockRefs[ lastThread.id ];
+				const lastBlockRect = lastBlockElement?.getBoundingClientRect();
+				const lastThreadTop = lastBlockRect?.top || 0;
+				const lastThreadHeight = heights[ lastThread.id ] || 0;
+				const lastThreadOffset = offsets[ lastThread.id ] || 0;
+				editorMinHeight =
+					lastThreadTop + lastThreadHeight + lastThreadOffset + 32;
 			}
+
+			// Ensure the editor has enough height to scroll to all notes.
+			setEditorMinHeight( editorMinHeight );
 
 			return offsets;
 		};
