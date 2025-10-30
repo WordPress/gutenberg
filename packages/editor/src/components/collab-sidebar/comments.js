@@ -164,6 +164,7 @@ export function Comments( {
 		 */
 		const calculateAllOffsets = () => {
 			const offsets = {};
+			let editorMinHeight = 0;
 
 			if ( ! isFloating ) {
 				return offsets;
@@ -199,6 +200,8 @@ export function Comments( {
 				threadHeight: selectedThreadHeight,
 			};
 
+			editorMinHeight += selectedThreadTop + selectedThreadHeight + 16;
+
 			// Process threads after the selected thread, offsetting any overlapping
 			// threads downward.
 			for ( let i = breakIndex + 1; i < threads.length; i++ ) {
@@ -206,6 +209,8 @@ export function Comments( {
 				if ( ! blockRefs[ thread.id ] ) {
 					continue;
 				}
+
+				editorMinHeight += heights[ thread.id ] + 20;
 
 				blockElement = blockRefs[ thread.id ];
 				blockRect = blockElement?.getBoundingClientRect();
@@ -271,6 +276,18 @@ export function Comments( {
 					threadTop: threadTop + additionalOffset,
 				};
 			}
+
+			// Ensure the editor has enough height to scroll to all notes.
+			// last note top plus height to determine the bottom position.
+			const iframe = document.querySelector( 'iframe[name="editor-canvas"]' );
+			if ( iframe && iframe.contentDocument ) {
+				if ( editorMinHeight > 0 ) {
+					iframe.contentDocument.body.style.minHeight = `${ editorMinHeight }px`;
+				} else {
+					iframe.contentDocument.body.style.minHeight = '';
+				}
+			}
+
 			return offsets;
 		};
 		const newOffsets = calculateAllOffsets();
