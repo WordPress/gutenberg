@@ -29,6 +29,7 @@ describe( 'post-meta bindings', () => {
 					field_without_label_or_default: {},
 					field_with_label_only: {
 						title: 'Field With Label Only',
+						default: '', // If there's no default set, getRegisteredPostMeta() will return an empty string.
 					},
 					movie_field: {
 						title: 'Movie Field Label',
@@ -80,7 +81,9 @@ describe( 'post-meta bindings', () => {
 					},
 				} );
 
-				expect( values.content ).toBe( 'field_without_label_or_default' );
+				expect( values.content ).toBe(
+					'field_without_label_or_default'
+				);
 			} );
 		} );
 	} );
