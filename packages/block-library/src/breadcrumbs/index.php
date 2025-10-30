@@ -17,23 +17,34 @@
  * @return string Returns the post breadcrumb for hierarchical post types.
  */
 function render_block_core_breadcrumbs( $attributes, $content, $block ) {
-	// Exclude breadcrumbs from special contexts.
-	if ( is_home() || is_front_page() ) {
+	$is_home_or_front_page = is_home() || is_front_page();
+	if ( ! $attributes['showOnHomePage'] && $is_home_or_front_page ) {
 		return '';
 	}
 
 	$breadcrumb_items = array();
 
 	if ( $attributes['showHomeLink'] ) {
-		$breadcrumb_items[] = sprintf(
-			'<a href="%s">%s</a>',
-			esc_url( home_url() ),
-			esc_html__( 'Home' )
-		);
+		// On home/front page, show as current page instead of link.
+		if ( $is_home_or_front_page ) {
+			$breadcrumb_items[] = sprintf(
+				'<span aria-current="page">%s</span>',
+				esc_html__( 'Home' )
+			);
+		} else {
+			$breadcrumb_items[] = sprintf(
+				'<a href="%s">%s</a>',
+				esc_url( home_url() ),
+				esc_html__( 'Home' )
+			);
+		}
 	}
 
-	// Handle search results.
-	if ( is_search() ) {
+	// Handle home and front page.
+	if ( $is_home_or_front_page ) {
+		$breadcrumb_items = block_core_breadcrumbs_maybe_add_paged( $breadcrumb_items );
+	} elseif ( is_search() ) {
+		// Handle search results.
 		$search_query       = get_search_query();
 		$breadcrumb_items[] = sprintf(
 			'<span aria-current="page">%s</span>',
@@ -90,6 +101,11 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 			$title = __( '(no title)' );
 		}
 		$breadcrumb_items[] = sprintf( '<span aria-current="page">%s</span>', $title );
+	}
+
+	// Remove last item if disabled.
+	if ( ! $attributes['showLastItem'] && ! empty( $breadcrumb_items ) ) {
+		array_pop( $breadcrumb_items );
 	}
 
 	if ( empty( $breadcrumb_items ) ) {
