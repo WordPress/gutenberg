@@ -16,6 +16,7 @@ import { __ } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import { moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -73,14 +74,13 @@ function ButtonTrigger< Item >( {
 		typeof action.label === 'string' ? action.label : action.label( items );
 	return (
 		<Button
-			label={ label }
-			icon={ action.icon }
 			disabled={ !! action.disabled }
 			accessibleWhenDisabled
-			isDestructive={ action.isDestructive }
 			size="compact"
 			onClick={ onClick }
-		/>
+		>
+			{ label }
+		</Button>
 	);
 }
 
@@ -105,9 +105,14 @@ export function ActionModal< Item >( {
 }: ActionModalProps< Item > ) {
 	const label =
 		typeof action.label === 'string' ? action.label : action.label( items );
+
+	const modalHeader =
+		typeof action.modalHeader === 'function'
+			? action.modalHeader( items )
+			: action.modalHeader;
 	return (
 		<Modal
-			title={ action.modalHeader || label }
+			title={ modalHeader || label }
 			__experimentalHideHeader={ !! action.hideModalHeader }
 			onRequestClose={ closeModal }
 			focusOnMount={ action.modalFocusOnMount ?? true }
@@ -160,7 +165,7 @@ export default function ItemActions< Item >( {
 			( action ) => ! action.isEligible || action.isEligible( item )
 		);
 		const _primaryActions = _eligibleActions.filter(
-			( action ) => action.isPrimary && !! action.icon
+			( action ) => action.isPrimary
 		);
 		return {
 			primaryActions: _primaryActions,
@@ -181,7 +186,7 @@ export default function ItemActions< Item >( {
 
 	return (
 		<HStack
-			spacing={ 1 }
+			spacing={ 0 }
 			justify="flex-end"
 			className="dataviews-item-actions"
 			style={ {
@@ -255,6 +260,12 @@ function PrimaryActions< Item >( {
 	registry,
 }: PrimaryActionsProps< Item > ) {
 	const [ activeModalAction, setActiveModalAction ] = useState( null as any );
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
+
+	if ( isMobileViewport ) {
+		return null;
+	}
+
 	if ( ! Array.isArray( actions ) || actions.length === 0 ) {
 		return null;
 	}

@@ -1,19 +1,15 @@
 /**
- * External dependencies
- */
-import deepMerge from 'deepmerge';
-
-/**
  * WordPress dependencies
  */
 import { privateApis } from '@wordpress/components';
-import { useState, useCallback } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import type { DataFormControlProps } from '../types';
 import { unlock } from '../lock-unlock';
+import getCustomValidity from './utils/get-custom-validity';
 
 const { ValidatedCheckboxControl } = unlock( privateApis );
 
@@ -22,14 +18,9 @@ export default function Checkbox< Item >( {
 	onChange,
 	data,
 	hideLabelFromVision,
+	validity,
 }: DataFormControlProps< Item > ) {
-	const { getValue, setValue, label, description } = field;
-	const [ customValidity, setCustomValidity ] =
-		useState<
-			React.ComponentProps<
-				typeof ValidatedCheckboxControl
-			>[ 'customValidity' ]
-		>( undefined );
+	const { getValue, setValue, label, description, isValid } = field;
 
 	const onChangeControl = useCallback( () => {
 		onChange(
@@ -37,37 +28,10 @@ export default function Checkbox< Item >( {
 		);
 	}, [ data, getValue, onChange, setValue ] );
 
-	const onValidateControl = useCallback(
-		( newValue: any ) => {
-			const message = field.isValid?.custom?.(
-				deepMerge(
-					data,
-					setValue( {
-						item: data,
-						value: newValue,
-					} ) as Partial< Item >
-				),
-				field
-			);
-
-			if ( message ) {
-				setCustomValidity( {
-					type: 'invalid',
-					message,
-				} );
-				return;
-			}
-
-			setCustomValidity( undefined );
-		},
-		[ data, field, setValue ]
-	);
-
 	return (
 		<ValidatedCheckboxControl
 			required={ !! field.isValid?.required }
-			onValidate={ onValidateControl }
-			customValidity={ customValidity }
+			customValidity={ getCustomValidity( isValid, validity ) }
 			hidden={ hideLabelFromVision }
 			label={ label }
 			help={ description }

@@ -122,7 +122,7 @@ test.describe( 'PHP-only auto-register blocks', () => {
 		await admin.createNewPost();
 	} );
 
-	test( 'should only register blocks with auto_register flag', async ( {
+	test( 'should register blocks with auto_register flag', async ( {
 		editor,
 	} ) => {
 		// Block with auto_register flag should be insertable
@@ -130,6 +130,13 @@ test.describe( 'PHP-only auto-register blocks', () => {
 
 		const block = editor.canvas.getByText( 'Auto-register block content' );
 		await expect( block ).toBeVisible();
+
+		// Verify the auto-registered block uses API version 3
+		// (minimum version set if not specified or registered with version < 3)
+		const blockType = await editor.page.evaluate( () => {
+			return window.wp.blocks.getBlockType( 'test/auto-register-block' );
+		} );
+		expect( blockType.apiVersion ).toBe( 3 );
 
 		// Block without auto_register flag should NOT exist in registry
 		const blockExists = await editor.page.evaluate( () => {
@@ -142,8 +149,9 @@ test.describe( 'PHP-only auto-register blocks', () => {
 		expect( blockExists ).toBe( false );
 	} );
 
-	test( 'should render server-side content for auto-registered blocks', async ( {
+	test( 'should render server-side content for auto-registered blocks with block supports', async ( {
 		editor,
+		page,
 	} ) => {
 		await editor.insertBlock( {
 			name: 'test/auto-register-block',
@@ -151,5 +159,43 @@ test.describe( 'PHP-only auto-register blocks', () => {
 
 		const block = editor.canvas.getByText( 'Auto-register block content' );
 		await expect( block ).toBeVisible();
+
+		// Verify default background value is shown
+		const backgroundText = editor.canvas.getByText( 'Background: default' );
+		await expect( backgroundText ).toBeVisible();
+
+		// Verify block has proper wrapper classes
+		const blockWrapper = editor.canvas.locator( '.auto-register-example' );
+		await expect( blockWrapper ).toBeVisible();
+
+		// Verify the block wrapper has the wp-block class applied
+		const wpBlockClass = editor.canvas
+			.locator( '.wp-block-test-auto-register-block' )
+			.first();
+		await expect( wpBlockClass ).toBeVisible();
+
+		// Change the background color and get its name
+		await blockWrapper.click();
+		await editor.openDocumentSettingsSidebar();
+
+		const colorsButton = page.getByRole( 'button', { name: /Color/i } );
+		await colorsButton.click();
+
+		const backgroundButton = page.getByRole( 'button', {
+			name: /Background/i,
+		} );
+		await backgroundButton.click();
+		const firstColor = page.getByRole( 'option' ).first();
+		const colorName = await firstColor.getAttribute( 'aria-label' );
+		await firstColor.click();
+
+		// Verify background is no longer 'default'
+		await expect( backgroundText ).toBeHidden();
+
+		// Verify the selected color appears in the block content
+		const colorText = editor.canvas.getByText(
+			`Background: ${ colorName.toLowerCase().replace( /\s+/g, '-' ) }`
+		);
+		await expect( colorText ).toBeVisible();
 	} );
 } );

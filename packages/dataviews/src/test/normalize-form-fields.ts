@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import normalizeFormFields from '../normalize-form-fields';
+import normalizeFormFields from '../dataform-layouts/normalize-form-fields';
 import type { Form } from '../types';
 
 describe( 'normalizeFormFields', () => {
@@ -28,11 +28,17 @@ describe( 'normalizeFormFields', () => {
 			expect( result ).toEqual( [
 				{
 					id: 'field1',
-					layout: { type: 'regular', labelPosition: 'top' },
+					layout: {
+						type: 'regular',
+						labelPosition: 'top',
+					},
 				},
 				{
 					id: 'field2',
-					layout: { type: 'regular', labelPosition: 'top' },
+					layout: {
+						type: 'regular',
+						labelPosition: 'top',
+					},
 				},
 			] );
 		} );
@@ -51,12 +57,18 @@ describe( 'normalizeFormFields', () => {
 			expect( result ).toEqual( [
 				{
 					id: 'field1',
-					layout: { type: 'regular', labelPosition: 'top' },
+					layout: {
+						type: 'regular',
+						labelPosition: 'top',
+					},
 				},
 				{
 					id: 'field2',
 					label: 'Field 2',
-					layout: { type: 'regular', labelPosition: 'top' },
+					layout: {
+						type: 'regular',
+						labelPosition: 'top',
+					},
 				},
 			] );
 		} );
@@ -72,7 +84,10 @@ describe( 'normalizeFormFields', () => {
 			expect( result ).toEqual( [
 				{
 					id: 'field1',
-					layout: { type: 'regular', labelPosition: 'top' },
+					layout: {
+						type: 'regular',
+						labelPosition: 'top',
+					},
 				},
 			] );
 		} );
@@ -86,7 +101,10 @@ describe( 'normalizeFormFields', () => {
 			expect( result ).toEqual( [
 				{
 					id: 'field1',
-					layout: { type: 'regular', labelPosition: 'side' },
+					layout: {
+						type: 'regular',
+						labelPosition: 'side',
+					},
 				},
 			] );
 		} );
@@ -104,6 +122,7 @@ describe( 'normalizeFormFields', () => {
 						type: 'panel',
 						labelPosition: 'side',
 						openAs: 'dropdown',
+						summary: [],
 					},
 				},
 			] );
@@ -122,6 +141,7 @@ describe( 'normalizeFormFields', () => {
 						type: 'panel',
 						labelPosition: 'top',
 						openAs: 'dropdown',
+						summary: [],
 					},
 				},
 			] );
@@ -140,15 +160,23 @@ describe( 'normalizeFormFields', () => {
 						type: 'card',
 						withHeader: true,
 						isOpened: true,
+						summary: [],
+						isCollapsible: true,
 					},
 				},
 			] );
 		} );
 
-		it( 'card: enforces isOpened=true when withHeader=false', () => {
+		it( 'card: enforces isOpened=true and summary=[] when withHeader=false', () => {
 			const form: Form = {
 				// @ts-ignore - Test intentionally uses invalid type to verify runtime behavior.
-				layout: { type: 'card', withHeader: false, isOpened: false },
+				layout: {
+					type: 'card',
+					withHeader: false,
+					// @ts-ignore - Test intentionally uses invalid type to verify runtime behavior.
+					isOpened: false,
+					summary: [ { id: 'field1', visibility: 'always' } ],
+				},
 				fields: [ 'field1' ],
 			};
 			const result = normalizeFormFields( form );
@@ -159,14 +187,21 @@ describe( 'normalizeFormFields', () => {
 						type: 'card',
 						withHeader: false,
 						isOpened: true,
+						summary: [],
+						isCollapsible: false,
 					},
 				},
 			] );
 		} );
 
-		it( 'card: respects isOpened when withHeader=true', () => {
+		it( 'card: respects isOpened and summary when withHeader=true', () => {
 			const form: Form = {
-				layout: { type: 'card', withHeader: true, isOpened: false },
+				layout: {
+					type: 'card',
+					withHeader: true,
+					isOpened: false,
+					summary: [ { id: 'field1', visibility: 'always' } ],
+				},
 				fields: [ 'field1' ],
 			};
 			const result = normalizeFormFields( form );
@@ -177,6 +212,40 @@ describe( 'normalizeFormFields', () => {
 						type: 'card',
 						withHeader: true,
 						isOpened: false,
+						summary: [ { id: 'field1', visibility: 'always' } ],
+						isCollapsible: true,
+					},
+				},
+			] );
+		} );
+
+		it( 'card: normalizes summary to array of objects when it is a string', () => {
+			const form: Form = {
+				layout: {
+					type: 'card',
+					withHeader: true,
+					isOpened: false,
+					summary: [
+						'field2',
+						{ id: 'field1', visibility: 'always' },
+					],
+					isCollapsible: true,
+				},
+				fields: [ 'field1' ],
+			};
+			const result = normalizeFormFields( form );
+			expect( result ).toEqual( [
+				{
+					id: 'field1',
+					layout: {
+						type: 'card',
+						withHeader: true,
+						isOpened: false,
+						summary: [
+							{ id: 'field2', visibility: 'when-collapsed' },
+							{ id: 'field1', visibility: 'always' },
+						],
+						isCollapsible: true,
 					},
 				},
 			] );
@@ -199,7 +268,10 @@ describe( 'normalizeFormFields', () => {
 			expect( result ).toEqual( [
 				{
 					id: 'field1',
-					layout: { type: 'regular', labelPosition: 'top' },
+					layout: {
+						type: 'regular',
+						labelPosition: 'top',
+					},
 				},
 				{
 					id: 'field2',
@@ -207,6 +279,7 @@ describe( 'normalizeFormFields', () => {
 						type: 'panel',
 						labelPosition: 'side',
 						openAs: 'dropdown',
+						summary: [],
 					},
 				},
 			] );
@@ -231,6 +304,8 @@ describe( 'normalizeFormFields', () => {
 						type: 'card',
 						withHeader: false,
 						isOpened: true,
+						summary: [],
+						isCollapsible: false,
 					},
 				},
 				{
@@ -239,6 +314,8 @@ describe( 'normalizeFormFields', () => {
 						type: 'card',
 						withHeader: true,
 						isOpened: false,
+						summary: [],
+						isCollapsible: true,
 					},
 				},
 			] );

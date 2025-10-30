@@ -31,6 +31,8 @@ import { TEMPLATE_POST_TYPES } from '../../store/constants';
 import { store as editorStore } from '../../store';
 import usePageTypeBadge from '../../utils/pageTypeBadge';
 import { getTemplateInfo } from '../../utils/get-template-info';
+import { getStylesCanvasTitle } from '../styles-canvas';
+import { unlock } from '../../lock-unlock';
 
 /** @typedef {import("@wordpress/components").IconType} IconType */
 
@@ -45,9 +47,9 @@ const MotionButton = motion.create( Button );
  * ```jsx
  * <DocumentBar />
  * ```
+ *
  * @param {Object}   props       The component props.
- * @param {string}   props.title A title for the document, defaulting to the document or
- *                               template title currently being edited.
+ * @param {string}   props.title A title for the document, defaulting to the document or template title currently being edited.
  * @param {IconType} props.icon  An icon for the document, no default.
  *                               (A default icon indicating the document post type is no longer used.)
  *
@@ -63,6 +65,7 @@ export default function DocumentBar( props ) {
 		templateTitle,
 		onNavigateToPreviousEntityRecord,
 		isTemplatePreview,
+		stylesCanvasTitle,
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostType,
@@ -94,6 +97,17 @@ export default function DocumentBar( props ) {
 		} );
 		const _postTypeLabel = getPostType( _postType )?.labels?.singular_name;
 
+		// Check if styles canvas is active and get its title
+		const { getStylesPath, getShowStylebook } = unlock(
+			select( editorStore )
+		);
+		const _stylesPath = getStylesPath();
+		const _showStylebook = getShowStylebook();
+		const _stylesCanvasTitle = getStylesCanvasTitle(
+			_stylesPath,
+			_showStylebook
+		);
+
 		return {
 			postId: _postId,
 			postType: _postType,
@@ -111,6 +125,7 @@ export default function DocumentBar( props ) {
 			onNavigateToPreviousEntityRecord:
 				getEditorSettings().onNavigateToPreviousEntityRecord,
 			isTemplatePreview: getRenderingMode() === 'template-locked',
+			stylesCanvasTitle: _stylesCanvasTitle,
 		};
 	}, [] );
 
@@ -120,7 +135,7 @@ export default function DocumentBar( props ) {
 	const isTemplate = TEMPLATE_POST_TYPES.includes( postType );
 	const hasBackButton = !! onNavigateToPreviousEntityRecord;
 	const entityTitle = isTemplate ? templateTitle : documentTitle;
-	const title = props.title || entityTitle;
+	const title = props.title || stylesCanvasTitle || entityTitle;
 	const icon = props.icon;
 
 	const pageTypeBadge = usePageTypeBadge( postId );

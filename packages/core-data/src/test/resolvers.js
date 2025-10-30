@@ -3,7 +3,15 @@
  */
 import triggerFetch from '@wordpress/api-fetch';
 
+/**
+ * Internal dependencies
+ */
+import { getSyncManager } from '../sync';
+
 jest.mock( '@wordpress/api-fetch' );
+jest.mock( '../sync', () => ( {
+	getSyncManager: jest.fn(),
+} ) );
 
 /**
  * Internal dependencies
@@ -32,6 +40,8 @@ describe( 'getEntityRecord', () => {
 	const resolveSelect = { getEntitiesConfig: jest.fn( () => ENTITIES ) };
 
 	let dispatch;
+	let syncManager;
+
 	beforeEach( async () => {
 		dispatch = Object.assign( jest.fn(), {
 			receiveEntityRecords: jest.fn(),
@@ -41,6 +51,15 @@ describe( 'getEntityRecord', () => {
 			finishResolutions: jest.fn(),
 		} );
 		triggerFetch.mockReset();
+
+		syncManager = {
+			load: jest.fn(),
+		};
+		getSyncManager.mockImplementation( () => syncManager );
+	} );
+
+	afterEach( () => {
+		delete window.__experimentalEnableSync;
 	} );
 
 	it( 'yields with requested post type', async () => {
@@ -110,6 +129,176 @@ describe( 'getEntityRecord', () => {
 		expect( dispatch.__unstableReleaseStoreLock ).toHaveBeenCalledTimes(
 			1
 		);
+	} );
+
+	it( 'loads entity with sync manager when __experimentalEnableSync is true', async () => {
+		const POST_RECORD = { id: 1, title: 'Test Post' };
+		const POST_RESPONSE = {
+			json: () => Promise.resolve( POST_RECORD ),
+		};
+		const ENTITIES_WITH_SYNC = [
+			{
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				baseURLParams: { context: 'edit' },
+				syncConfig: {},
+			},
+		];
+
+		window.__experimentalEnableSync = true;
+
+		const resolveSelectWithSync = {
+			getEntitiesConfig: jest.fn( () => ENTITIES_WITH_SYNC ),
+			getEditedEntityRecord: jest.fn(),
+		};
+
+		triggerFetch.mockImplementation( () => POST_RESPONSE );
+
+		await getEntityRecord(
+			'postType',
+			'post',
+			1
+		)( {
+			dispatch,
+			registry,
+			resolveSelect: resolveSelectWithSync,
+		} );
+
+		// Verify load was called with correct arguments.
+		expect( syncManager.load ).toHaveBeenCalledTimes( 1 );
+		expect( syncManager.load ).toHaveBeenCalledWith(
+			{},
+			'postType/post',
+			1,
+			POST_RECORD,
+			{
+				editRecord: expect.any( Function ),
+				getEditedRecord: expect.any( Function ),
+				saveRecord: expect.any( Function ),
+			}
+		);
+	} );
+
+	it( 'provides transient properties when read/write config is supplied', async () => {
+		const POST_RECORD = { id: 1, title: 'Test Post' };
+		const POST_RESPONSE = {
+			json: () => Promise.resolve( POST_RECORD ),
+		};
+		const ENTITIES_WITH_SYNC = [
+			{
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				baseURLParams: { context: 'edit' },
+				syncConfig: {},
+				transientEdits: {
+					foo: {
+						read: () => 'bar',
+					},
+				},
+			},
+		];
+
+		window.__experimentalEnableSync = true;
+
+		const resolveSelectWithSync = {
+			getEntitiesConfig: jest.fn( () => ENTITIES_WITH_SYNC ),
+			getEditedEntityRecord: jest.fn(),
+		};
+
+		triggerFetch.mockImplementation( () => POST_RESPONSE );
+
+		await getEntityRecord(
+			'postType',
+			'post',
+			1
+		)( {
+			dispatch,
+			registry,
+			resolveSelect: resolveSelectWithSync,
+		} );
+
+		// Verify load was called with correct arguments.
+		expect( syncManager.load ).toHaveBeenCalledTimes( 1 );
+		expect( syncManager.load ).toHaveBeenCalledWith(
+			{},
+			'postType/post',
+			1,
+			{ ...POST_RECORD, foo: 'bar' },
+			{
+				editRecord: expect.any( Function ),
+				getEditedRecord: expect.any( Function ),
+				saveRecord: expect.any( Function ),
+			}
+		);
+	} );
+
+	it( 'does not load entity when query is present', async () => {
+		const POST_RECORD = { id: 1, title: 'Test Post' };
+		const POST_RESPONSE = {
+			json: () => Promise.resolve( POST_RECORD ),
+		};
+		const ENTITIES_WITH_SYNC = [
+			{
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				baseURLParams: { context: 'edit' },
+				syncConfig: {},
+			},
+		];
+
+		window.__experimentalEnableSync = true;
+
+		const resolveSelectWithSync = {
+			getEntitiesConfig: jest.fn( () => ENTITIES_WITH_SYNC ),
+		};
+
+		triggerFetch.mockImplementation( () => POST_RESPONSE );
+
+		// Call with a query parameter
+		await getEntityRecord( 'postType', 'post', 1, { foo: 'bar' } )( {
+			dispatch,
+			registry,
+			resolveSelect: resolveSelectWithSync,
+		} );
+
+		expect( syncManager.load ).not.toHaveBeenCalled();
+	} );
+
+	it( 'does not load entity when __experimentalEnableSync is undefined', async () => {
+		const POST_RECORD = { id: 1, title: 'Test Post' };
+		const POST_RESPONSE = {
+			json: () => Promise.resolve( POST_RECORD ),
+		};
+		const ENTITIES_WITH_SYNC = [
+			{
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				baseURLParams: { context: 'edit' },
+				syncConfig: {},
+			},
+		];
+
+		const resolveSelectWithSync = {
+			getEntitiesConfig: jest.fn( () => ENTITIES_WITH_SYNC ),
+		};
+
+		triggerFetch.mockImplementation( () => POST_RESPONSE );
+
+		await getEntityRecord(
+			'postType',
+			'post',
+			1
+		)( {
+			dispatch,
+			registry,
+			resolveSelect: resolveSelectWithSync,
+		} );
+
+		expect( syncManager.load ).not.toHaveBeenCalled();
 	} );
 } );
 

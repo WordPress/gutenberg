@@ -26,8 +26,19 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
+                event: ['${{ github.event_name }}']
                 node: ['20', '22', '24']
                 os: ['macos-15', 'ubuntu-24.04', 'windows-2025']
+                exclude:
+                    # On PRs: Only test Node 20 on Ubuntu
+                    - event: 'pull_request'
+                      node: '22'
+                    - event: 'pull_request'
+                      node: '24'
+                    - event: 'pull_request'
+                      os: 'macos-15'
+                    - event: 'pull_request'
+                      os: 'windows-2025'
 
         steps:
             - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0

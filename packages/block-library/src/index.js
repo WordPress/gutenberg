@@ -7,9 +7,12 @@ import {
 	setUnregisteredTypeHandlerName,
 	setGroupingBlockName,
 	registerBlockType,
+	store as blocksStore,
 } from '@wordpress/blocks';
-import { createElement } from '@wordpress/element';
-import ServerSideRender from '@wordpress/server-side-render';
+import { select } from '@wordpress/data';
+import { useBlockProps } from '@wordpress/block-editor';
+import { useServerSideRender } from '@wordpress/server-side-render';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -24,12 +27,13 @@ import ServerSideRender from '@wordpress/server-side-render';
 //
 // See https://github.com/WordPress/gutenberg/pull/40655 for more context.
 import * as accordion from './accordion';
-import * as accordionContent from './accordion-content';
-import * as accordionHeader from './accordion-header';
+import * as accordionItem from './accordion-item';
+import * as accordionHeading from './accordion-heading';
 import * as accordionPanel from './accordion-panel';
 import * as archives from './archives';
 import * as avatar from './avatar';
 import * as audio from './audio';
+import * as breadcrumbs from './breadcrumbs';
 import * as button from './button';
 import * as buttons from './buttons';
 import * as calendar from './calendar';
@@ -68,6 +72,7 @@ import * as image from './image';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
 import * as list from './list';
+import * as math from './math';
 import * as listItem from './list-item';
 import * as logInOut from './loginout';
 import * as mediaText from './media-text';
@@ -124,7 +129,9 @@ import * as table from './table';
 import * as tableOfContents from './table-of-contents';
 import * as tagCloud from './tag-cloud';
 import * as templatePart from './template-part';
+import * as termCount from './term-count';
 import * as termDescription from './term-description';
+import * as termName from './term-name';
 import * as termsQuery from './terms-query';
 import * as termTemplate from './term-template';
 import * as textColumns from './text-columns';
@@ -133,6 +140,7 @@ import * as video from './video';
 import * as footnotes from './footnotes';
 
 import isBlockMetadataExperimental from './utils/is-block-metadata-experimental';
+import { unlock } from './lock-unlock';
 
 /**
  * Function to get all the block-library blocks in an array
@@ -150,6 +158,10 @@ const getAllBlocks = () => {
 		quote,
 
 		// Register all remaining core blocks.
+		accordion,
+		accordionItem,
+		accordionHeading,
+		accordionPanel,
 		archives,
 		audio,
 		button,
@@ -166,6 +178,7 @@ const getAllBlocks = () => {
 		file,
 		group,
 		html,
+		math,
 		latestComments,
 		latestPosts,
 		mediaText,
@@ -239,18 +252,17 @@ const getAllBlocks = () => {
 		tableOfContents,
 		homeLink,
 		logInOut,
+		termCount,
 		termDescription,
+		termName,
+		termsQuery,
+		termTemplate,
 		queryTitle,
 		postAuthorBiography,
 	];
 
 	if ( window?.__experimentalEnableBlockExperiments ) {
-		blocks.push( accordion );
-		blocks.push( accordionContent );
-		blocks.push( accordionHeader );
-		blocks.push( accordionPanel );
-		blocks.push( termsQuery );
-		blocks.push( termTemplate );
+		blocks.push( breadcrumbs );
 	}
 
 	if ( window?.__experimentalEnableFormBlocks ) {
@@ -315,13 +327,47 @@ export const registerCoreBlocks = (
 	// Auto-register PHP-only blocks with ServerSideRender
 	if ( window.__unstableAutoRegisterBlocks ) {
 		window.__unstableAutoRegisterBlocks.forEach( ( blockName ) => {
+			const bootstrappedBlockType = unlock(
+				select( blocksStore )
+			).getBootstrappedBlockType( blockName );
+			const bootstrappedApiVersion = bootstrappedBlockType.apiVersion;
+
 			registerBlockType( blockName, {
 				title: blockName,
-				edit: ( { attributes } ) => {
-					return createElement( ServerSideRender, {
+				...( bootstrappedApiVersion < 3 && { apiVersion: 3 } ),
+				edit: function Edit( { attributes } ) {
+					const blockProps = useBlockProps();
+					const { content, status, error } = useServerSideRender( {
 						block: blockName,
 						attributes,
 					} );
+
+					if ( status === 'loading' ) {
+						return (
+							<div { ...blockProps }>{ __( 'Loading…' ) }</div>
+						);
+					}
+
+					if ( status === 'error' ) {
+						return (
+							<div { ...blockProps }>
+								{ sprintf(
+									/* translators: %s: error message describing the problem */
+									__( 'Error loading block: %s' ),
+									error
+								) }
+							</div>
+						);
+					}
+
+					return (
+						<div
+							{ ...blockProps }
+							dangerouslySetInnerHTML={ {
+								__html: content || '',
+							} }
+						/>
+					);
 				},
 				save: () => null,
 			} );

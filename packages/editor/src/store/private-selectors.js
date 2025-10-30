@@ -270,3 +270,23 @@ export const getDefaultRenderingMode = createRegistrySelector(
 		return defaultMode;
 	}
 );
+
+/**
+ * Get the current global styles navigation path.
+ *
+ * @param {Object} state Global application state.
+ * @return {string} The current styles path.
+ */
+export function getStylesPath( state ) {
+	return state.stylesPath ?? '/';
+}
+
+/**
+ * Get whether the stylebook is currently visible.
+ *
+ * @param {Object} state Global application state.
+ * @return {boolean} Whether the stylebook is visible.
+ */
+export function getShowStylebook( state ) {
+	return state.showStylebook ?? false;
+}

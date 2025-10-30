@@ -16,14 +16,7 @@ import keywords from './keywords';
  */
 import type { ReactElement } from 'react';
 
-const {
-	Icon: _Icon,
-
-	// Deprecated aliases
-	warning: _warning,
-
-	...availableIcons
-} = icons;
+const { Icon: _Icon, ...availableIcons } = icons;
 
 const meta = {
 	component: Icon,
