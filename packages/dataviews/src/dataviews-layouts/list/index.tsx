@@ -106,12 +106,11 @@ function PrimaryActionGridCell< Item >( {
 					<Button
 						disabled={ !! primaryAction.disabled }
 						accessibleWhenDisabled
+						text={ label }
 						size="small"
 						onClick={ () => setIsModalOpen( true ) }
 						variant="link"
-					>
-						{ label }
-					</Button>
+					/>
 				}
 			>
 				{ isModalOpen && (

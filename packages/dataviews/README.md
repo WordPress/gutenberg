@@ -1610,6 +1610,7 @@ For example:
     -   A string (single field ID)
     -   An array of strings (multiple field IDs)
     -   An array of objects for per-field visibility control `[{ id: string, visibility: 'always' | 'when-collapsed' }]`
+-   `isCollapsible`: boolean. Optional. `true` by default. Specifies whether the card can be collapsed.
 
 Cards can be collapsed while visible, so you can control when summary fields appear:
 

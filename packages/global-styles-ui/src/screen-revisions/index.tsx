@@ -8,13 +8,13 @@ import {
 	useNavigator,
 } from '@wordpress/components';
 import { useContext, useState, useMemo } from '@wordpress/element';
+import { areGlobalStylesEqual } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
  */
 import { ScreenHeader } from '../screen-header';
 import { GlobalStylesContext } from '../context';
-import { areGlobalStyleConfigsEqual } from '../utils';
 import useGlobalStylesRevisions from './use-global-styles-revisions';
 import RevisionsButtons from './revisions-buttons';
 import Pagination from '../pagination';
@@ -57,7 +57,7 @@ function ScreenRevisions( { onClose }: ScreenRevisionsProps = {} ) {
 		return revision || currentEditorGlobalStyles;
 	}, [ revisionId, revisions, currentEditorGlobalStyles ] );
 
-	const selectedRevisionMatchesEditorStyles = areGlobalStyleConfigsEqual(
+	const selectedRevisionMatchesEditorStyles = areGlobalStylesEqual(
 		currentlySelectedRevision,
 		currentEditorGlobalStyles
 	);

@@ -52,7 +52,7 @@ test.describe( 'Block Comments', () => {
 			attributes: { content: 'Testing block comments' },
 		} );
 		const form = page.getByRole( 'textbox', {
-			name: 'New Note',
+			name: 'New note',
 			exact: true,
 		} );
 
@@ -75,7 +75,7 @@ test.describe( 'Block Comments', () => {
 		await editor.clickBlockOptionsMenuItem( 'Add note' );
 		await page
 			.getByRole( 'textbox', {
-				name: 'New Note',
+				name: 'New note',
 				exact: true,
 			} )
 			.fill( 'A test comment' );
@@ -681,7 +681,7 @@ class BlockCommentUtils {
 				await this.#editor.clickBlockOptionsMenuItem( 'Add note' );
 				await this.#page
 					.getByRole( 'textbox', {
-						name: 'New Note',
+						name: 'New note',
 						exact: true,
 					} )
 					.fill( comment );

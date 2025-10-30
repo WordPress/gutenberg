@@ -101,10 +101,6 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 		);
 
 		const commands = useMemo( () => {
-			if ( window.location.pathname.startsWith( '/wp-admin/network/' ) ) {
-				return [];
-			}
-
 			return ( records ?? [] ).map( ( record ) => {
 				const command = {
 					name: postType + '-' + record.id,
@@ -204,10 +200,6 @@ const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 		}, [ records, search ] );
 
 		const commands = useMemo( () => {
-			if ( window.location.pathname.startsWith( '/wp-admin/network/' ) ) {
-				return [];
-			}
-
 			if (
 				! canCreateTemplate ||
 				( ! isBlockBasedTheme && ! templateType === 'wp_template_part' )
@@ -305,10 +297,6 @@ const getSiteEditorBasicNavigationCommands = () =>
 				};
 			}, [] );
 		const commands = useMemo( () => {
-			if ( window.location.pathname.startsWith( '/wp-admin/network/' ) ) {
-				return [];
-			}
-
 			const result = [];
 
 			if ( canCreateTemplate && isBlockBasedTheme ) {
@@ -434,10 +422,6 @@ const getGlobalStylesOpenCssCommands = () =>
 		}, [] );
 
 		const commands = useMemo( () => {
-			if ( window.location.pathname.includes( '/wp-admin/network/' ) ) {
-				return [];
-			}
-
 			if ( ! canEditCSS ) {
 				return [];
 			}
@@ -472,30 +456,36 @@ const getGlobalStylesOpenCssCommands = () =>
 		};
 	};
 
-export function useSiteEditorNavigationCommands() {
+export function useSiteEditorNavigationCommands( isNetworkAdmin ) {
 	useCommandLoader( {
 		name: 'core/edit-site/navigate-pages',
 		hook: getNavigationCommandLoaderPerPostType( 'page' ),
+		disabled: isNetworkAdmin,
 	} );
 	useCommandLoader( {
 		name: 'core/edit-site/navigate-posts',
 		hook: getNavigationCommandLoaderPerPostType( 'post' ),
+		disabled: isNetworkAdmin,
 	} );
 	useCommandLoader( {
 		name: 'core/edit-site/navigate-templates',
 		hook: getNavigationCommandLoaderPerTemplate( 'wp_template' ),
+		disabled: isNetworkAdmin,
 	} );
 	useCommandLoader( {
 		name: 'core/edit-site/navigate-template-parts',
 		hook: getNavigationCommandLoaderPerTemplate( 'wp_template_part' ),
+		disabled: isNetworkAdmin,
 	} );
 	useCommandLoader( {
 		name: 'core/edit-site/basic-navigation',
 		hook: getSiteEditorBasicNavigationCommands(),
 		context: 'site-editor',
+		disabled: isNetworkAdmin,
 	} );
 	useCommandLoader( {
 		name: 'core/edit-site/global-styles-css',
 		hook: getGlobalStylesOpenCssCommands(),
+		disabled: isNetworkAdmin,
 	} );
 }

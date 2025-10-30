@@ -1,12 +1,8 @@
 /**
- * External dependencies
- */
-import type { CSSProperties } from 'react';
-
-/**
  * Internal dependencies
  */
 import type { SurfaceProps } from '../surface/types';
+import type { FlexProps } from '../flex/types';
 
 type DeprecatedSizeOptions = 'extraSmall';
 export type SizeToken = 'xSmall' | 'small' | 'medium' | 'large';
@@ -14,10 +10,10 @@ export type SizeToken = 'xSmall' | 'small' | 'medium' | 'large';
 export type SizeOptions =
 	| SizeToken
 	| {
-			blockStart?: SizeToken;
-			blockEnd?: SizeToken;
-			inlineStart?: SizeToken;
-			inlineEnd?: SizeToken;
+			blockStart: SizeToken;
+			blockEnd: SizeToken;
+			inlineStart: SizeToken;
+			inlineEnd: SizeToken;
 	  };
 type SizeableProps = {
 	/**
@@ -98,8 +94,6 @@ type MarginalSubComponentProps = BaseSubComponentProps & {
 	isBorderless?: boolean;
 };
 
-export type HeaderProps = MarginalSubComponentProps;
+export type HeaderProps = MarginalSubComponentProps & Partial< FlexProps >;
 
-export type FooterProps = MarginalSubComponentProps & {
-	justify?: CSSProperties[ 'justifyContent' ];
-};
+export type FooterProps = MarginalSubComponentProps & Partial< FlexProps >;

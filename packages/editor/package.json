@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/editor",
-	"version": "14.33.2",
+	"version": "14.34.0",
 	"description": "Enhanced block editor for WordPress posts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -71,6 +71,7 @@
 		"@wordpress/element": "file:../element",
 		"@wordpress/fields": "file:../fields",
 		"@wordpress/global-styles-engine": "file:../global-styles-engine",
+		"@wordpress/global-styles-ui": "file:../global-styles-ui",
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/html-entities": "file:../html-entities",
 		"@wordpress/i18n": "file:../i18n",

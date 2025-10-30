@@ -118,17 +118,10 @@ export const PaddingVariations: StoryObj< typeof Card > = {
 			</div>
 
 			<div>
-				<Card
-					size={ {
-						blockStart: 'large',
-						blockEnd: 'small',
-						inlineStart: 'medium',
-						inlineEnd: 'medium',
-					} }
-				>
+				<Card>
 					<CardHeader
 						size={ {
-							blockStart: 'small',
+							blockStart: 'large',
 							blockEnd: 'small',
 							inlineStart: 'xSmall',
 							inlineEnd: 'large',

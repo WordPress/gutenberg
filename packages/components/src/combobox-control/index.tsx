@@ -365,13 +365,10 @@ function ComboboxControl( props: ComboboxControlProps ) {
 							/>
 						</FlexBlock>
 						{ isLoading && <Spinner /> }
-						{ allowReset && (
+						{ allowReset && Boolean( value ) && ! isExpanded && (
 							<Button
 								size="small"
 								icon={ closeSmall }
-								// Disable reason: Focus returns to input field when reset is clicked.
-								// eslint-disable-next-line no-restricted-syntax
-								disabled={ ! value }
 								onClick={ handleOnReset }
 								onKeyDown={ handleResetStopPropagation }
 								label={ __( 'Reset' ) }

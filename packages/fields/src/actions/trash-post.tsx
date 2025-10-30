@@ -31,6 +31,11 @@ const trashPost: Action< PostWithPermissions > = {
 			return false;
 		}
 
+		// Non-database template cannot be trashed.
+		if ( item.type === 'wp_template' && typeof item.id === 'string' ) {
+			return false;
+		}
+
 		return (
 			!! item.status &&
 			! [ 'auto-draft', 'trash' ].includes( item.status ) &&

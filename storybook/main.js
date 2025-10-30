@@ -38,6 +38,7 @@ const stories = [
 	'../packages/global-styles-ui/src/**/stories/*.story.@(js|tsx|mdx)',
 	'../packages/dataviews/src/**/stories/*.story.@(js|tsx|mdx)',
 	'../packages/fields/src/**/stories/*.story.@(js|tsx|mdx)',
+	'../packages/theme/src/**/stories/*.story.@(tsx|mdx)',
 ].filter( Boolean );
 
 module.exports = {

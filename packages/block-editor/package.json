@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-editor",
-	"version": "15.6.0",
+	"version": "15.7.0",
 	"description": "Generic block editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -27,7 +27,6 @@
 	"module": "build-module/index.js",
 	"exports": {
 		".": {
-			"types": "./build-types/index.d.ts",
 			"import": "./build-module/index.js",
 			"require": "./build/index.js"
 		},

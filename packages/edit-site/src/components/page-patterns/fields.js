@@ -12,6 +12,7 @@ import { useState, useMemo, useId } from '@wordpress/element';
 import { BlockPreview } from '@wordpress/block-editor';
 import { Icon } from '@wordpress/icons';
 import { parse } from '@wordpress/blocks';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -22,7 +23,9 @@ import {
 	OPERATOR_IS,
 } from '../../utils/constants';
 import { useAddedBy } from '../page-templates/hooks';
-import { useStyle } from '../global-styles';
+import { unlock } from '../../lock-unlock';
+
+const { useStyle } = unlock( editorPrivateApis );
 
 function PreviewField( { item } ) {
 	const descriptionId = useId();

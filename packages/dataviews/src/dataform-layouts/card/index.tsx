@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { Button, Card, CardBody, CardHeader } from '@wordpress/components';
+import {
+	Button,
+	Card,
+	CardBody,
+	CardHeader as OriginalCardHeader,
+} from '@wordpress/components';
 import { useCallback, useContext, useMemo, useState } from '@wordpress/element';
 import { chevronDown, chevronUp } from '@wordpress/icons';
 
@@ -23,12 +28,30 @@ import { isCombinedField } from '../is-combined-field';
 import { DEFAULT_LAYOUT, normalizeLayout } from '../normalize-form-fields';
 import { getSummaryFields } from '../get-summary-fields';
 
-export function useCollapsibleCard( {
-	initialIsOpen,
+const NonCollapsibleCardHeader = ( {
+	children,
+	...props
 }: {
-	initialIsOpen: boolean;
-} ) {
-	const [ isOpen, setIsOpen ] = useState( initialIsOpen );
+	children: React.ReactNode;
+} ) => (
+	<OriginalCardHeader { ...props }>
+		<div
+			style={ {
+				height: '40px', // This is to match the chevron's __next40pxDefaultSize
+				width: '100%',
+				display: 'flex',
+				justifyContent: 'space-between',
+				alignItems: 'center',
+			} }
+		>
+			{ children }
+		</div>
+	</OriginalCardHeader>
+);
+
+export function useCardHeader( layout: NormalizedCardLayout ) {
+	const { isOpened, isCollapsible } = layout;
+	const [ isOpen, setIsOpen ] = useState( isOpened );
 
 	const toggle = useCallback( () => {
 		setIsOpen( ( prev ) => ! prev );
@@ -42,7 +65,7 @@ export function useCollapsibleCard( {
 			children: React.ReactNode;
 			[ key: string ]: any;
 		} ) => (
-			<CardHeader
+			<OriginalCardHeader
 				{ ...props }
 				onClick={ toggle }
 				style={ {
@@ -68,12 +91,17 @@ export function useCollapsibleCard( {
 					aria-expanded={ isOpen }
 					aria-label={ isOpen ? 'Collapse' : 'Expand' }
 				/>
-			</CardHeader>
+			</OriginalCardHeader>
 		),
 		[ toggle, isOpen ]
 	);
 
-	return { isOpen, CollapsibleCardHeader };
+	const effectiveIsOpen = isCollapsible ? isOpen : true;
+	const CardHeaderComponent = isCollapsible
+		? CollapsibleCardHeader
+		: NonCollapsibleCardHeader;
+
+	return { isOpen: effectiveIsOpen, CardHeader: CardHeaderComponent };
 }
 
 function isSummaryFieldVisible< Item >(
@@ -158,9 +186,7 @@ export default function FormCardField< Item >( {
 		  }
 		: undefined;
 
-	const { isOpen, CollapsibleCardHeader } = useCollapsibleCard( {
-		initialIsOpen: layout.isOpened,
-	} );
+	const { isOpen, CardHeader } = useCardHeader( layout );
 
 	const summaryFields = getSummaryFields< Item >( layout.summary, fields );
 
@@ -183,7 +209,7 @@ export default function FormCardField< Item >( {
 		return (
 			<Card className="dataforms-layouts-card__field" size={ sizeCard }>
 				{ withHeader && (
-					<CollapsibleCardHeader className="dataforms-layouts-card__field-header">
+					<CardHeader className="dataforms-layouts-card__field-header">
 						<span className="dataforms-layouts-card__field-header-label">
 							{ field.label }
 						</span>
@@ -201,7 +227,7 @@ export default function FormCardField< Item >( {
 									) }
 								</div>
 							) }
-					</CollapsibleCardHeader>
+					</CardHeader>
 				) }
 				{ ( isOpen || ! withHeader ) && (
 					// If it doesn't have a header, keep it open.
@@ -252,7 +278,7 @@ export default function FormCardField< Item >( {
 	return (
 		<Card className="dataforms-layouts-card__field">
 			{ withHeader && (
-				<CollapsibleCardHeader className="dataforms-layouts-card__field-header">
+				<CardHeader className="dataforms-layouts-card__field-header">
 					<span className="dataforms-layouts-card__field-header-label">
 						{ fieldDefinition.label }
 					</span>
@@ -267,7 +293,7 @@ export default function FormCardField< Item >( {
 							) ) }
 						</div>
 					) }
-				</CollapsibleCardHeader>
+				</CardHeader>
 			) }
 			{ ( isOpen || ! withHeader ) && (
 				// If it doesn't have a header, keep it open.

@@ -2,8 +2,15 @@
 
 ## Unreleased
 
+### Bug fixes
+
+- Fix: DataViews modal actions in list layout. [#72793](https://github.com/WordPress/gutenberg/pull/72793)
+
+## 10.2.0 (2025-10-29)
+
 ### Enhancements
 
+- DataViews: keep icon-only buttons on mobile for bulk actions. [#72761](https://github.com/WordPress/gutenberg/pull/72761)
 - DataForm: update spacing for regular and card layouts. [#72249](https://github.com/WordPress/gutenberg/pull/72249).
 - DataForm: Fix password field suffix alignment. [#72524](https://github.com/WordPress/gutenberg/pull/72524).
 
@@ -13,6 +20,7 @@
 
 - Consistently use font-weight 499 instead of 500 ([#72473](https://github.com/WordPress/gutenberg/pull/72473)).
 - Dataviews: Use text based buttons for actions instead of text. [#72417](https://github.com/WordPress/gutenberg/pull/72417)
+- DataForm: Add support for non collapsible cards. [#72540](https://github.com/WordPress/gutenberg/pull/72540)
 
 ## 10.0.0 (2025-10-17)
 

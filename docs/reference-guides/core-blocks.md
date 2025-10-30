@@ -10,7 +10,7 @@ This page lists the blocks included in the block-library package.
 
 ## Accordion
 
-Displays a group of accordion headings and associated expandable content. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion))
+Displays a foldable layout that groups content in collapsible sections. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion))
 
 -	**Name:** core/accordion
 -	**Category:** design
@@ -20,7 +20,7 @@ Displays a group of accordion headings and associated expandable content. ([Sour
 
 ## Accordion Heading
 
-Displays an accordion heading. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion-heading))
+Displays a heading that toggles the accordion panel. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion-heading))
 
 -	**Name:** core/accordion-heading
 -	**Category:** design
@@ -30,7 +30,7 @@ Displays an accordion heading. ([Source](https://github.com/WordPress/gutenberg/
 
 ## Accordion Item
 
-Displays a section of content in an accordion, including a heading and expandable content. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion-item))
+Wraps the heading and panel in one unit. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion-item))
 
 -	**Name:** core/accordion-item
 -	**Category:** design
@@ -41,7 +41,7 @@ Displays a section of content in an accordion, including a heading and expandabl
 
 ## Accordion Panel
 
-Displays an accordion panel. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion-panel))
+Contains the hidden or revealed content beneath the heading. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion-panel))
 
 -	**Name:** core/accordion-panel
 -	**Category:** design
@@ -93,7 +93,7 @@ Display a breadcrumb trail for hierarchical post types or based on taxonomy term
 -	**Experimental:** true
 -	**Category:** theme
 -	**Supports:** color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** separator, showHomeLink, type
+-	**Attributes:** prefersTaxonomy, separator, showHomeLink
 
 ## Button
 
@@ -382,7 +382,7 @@ Use the classic WordPress editor. ([Source](https://github.com/WordPress/gutenbe
 
 -	**Name:** core/freeform
 -	**Category:** text
--	**Supports:** ~~className~~, ~~customClassName~~, ~~reusable~~
+-	**Supports:** ~~blockVisibility~~, ~~className~~, ~~customClassName~~, ~~html~~, ~~lock~~, ~~renaming~~, ~~reusable~~
 -	**Attributes:** content
 
 ## Gallery
@@ -954,6 +954,17 @@ Add white space between blocks and customize its height. ([Source](https://githu
 -	**Supports:** anchor, interactivity (clientNavigation), spacing (margin)
 -	**Attributes:** height, width
 
+## Tab
+
+Content for a tab in a tabbed interface. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tab))
+
+-	**Name:** core/tab
+-	**Experimental:** true
+-	**Category:** design
+-	**Parent:** core/tabs
+-	**Supports:** anchor, layout (allowJustification, allowOrientation, allowSizingOnChildren, allowSwitching, allowVerticalAlignment, ~~allowInheriting~~), spacing (blockGap, padding, ~~margin~~), typography (fontSize), ~~html~~, ~~reusable~~
+-	**Attributes:** label
+
 ## Table
 
 Create structured content in rows and columns to display information. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/table))
@@ -972,6 +983,17 @@ Summarize your post with a list of headings. Add HTML anchors to Heading blocks 
 -	**Category:** design
 -	**Supports:** ariaLabel, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** headings, maxLevel, onlyIncludeCurrentPage, ordered
+
+## Tabs
+
+Display content in a tabbed interface to help users navigate detailed content with ease. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tabs))
+
+-	**Name:** core/tabs
+-	**Experimental:** true
+-	**Category:** design
+-	**Allowed Blocks:** core/tab
+-	**Supports:** align, color (~~background~~, ~~text~~), interactivity, spacing (blockGap, margin, ~~padding~~), typography (fontSize), ~~html~~
+-	**Attributes:** activeTabIndex, customTabActiveColor, customTabActiveTextColor, customTabHoverColor, customTabHoverTextColor, customTabInactiveColor, customTabTextColor, orientation, tabActiveColor, tabActiveTextColor, tabHoverColor, tabHoverTextColor, tabInactiveColor, tabTextColor, tabsId
 
 ## Tag Cloud
 
