@@ -3,8 +3,12 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { __experimentalVStack as VStack } from '@wordpress/components';
-import { useState, useRef } from '@wordpress/element';
+import { useEntityRecords } from '@wordpress/core-data';
+import {
+	__experimentalText as Text,
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
+import { useEffect, useState, useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { comment as commentIcon } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -76,7 +80,69 @@ function NotesSidebarContent( {
 	);
 }
 
-function NotesSidebar( { postId, mode } ) {
+// Wrapper component to prevent performance hit when there are no notes for the post
+// Once there are notes, the sidebar component will run as before.
+function NotesSetup( { postId, mode } ) {
+	// Check if there are any comments for the post
+	const queryArgs = {
+		post: postId,
+		type: 'note',
+		status: 'all',
+		per_page: 1,
+	};
+
+	const { records: notes } = useEntityRecords( 'root', 'comment', queryArgs, {
+		enabled: !! postId && typeof postId === 'number',
+	} );
+
+	const hasNotes = notes && notes.length > 0;
+	const [ shouldForceShow, setShouldForceShow ] = useState( false );
+
+	const forceOpenTheSidebar = () => {
+		setShouldForceShow( true );
+	};
+
+	// If there are no notes, we need:
+	// - an empty sidebar with a message so we show the notes button in the header.
+	// - The Add Comment Menu Item in the toolbar options
+	return (
+		<>
+			{ ! hasNotes && ! shouldForceShow && (
+				<>
+					<AddCommentMenuItem onClick={ forceOpenTheSidebar } />
+					<PluginSidebar
+						identifier={ collabHistorySidebarName }
+						name={ collabHistorySidebarName }
+						title={ __( 'Notes' ) }
+						icon={ commentIcon }
+						closeLabel={ __( 'Close Notes' ) }
+					>
+						<VStack
+							className="editor-collab-sidebar-panel"
+							role="list"
+							spacing="3"
+							justify="flex-start"
+						>
+							<Text as="p">{ __( 'No notes available.' ) }</Text>
+							<Text as="p" variant="muted">
+								{ __( 'Only logged in users can see Notes.' ) }
+							</Text>
+						</VStack>
+					</PluginSidebar>
+				</>
+			) }
+			{ ( hasNotes || shouldForceShow ) && (
+				<NotesSidebar
+					postId={ postId }
+					mode={ mode }
+					forceShowOnMount={ shouldForceShow }
+				/>
+			) }
+		</>
+	);
+}
+
+function NotesSidebar( { postId, mode, forceShowOnMount = false } ) {
 	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
@@ -143,6 +209,13 @@ function NotesSidebar( { postId, mode } ) {
 			! blockCommentId ? 'textarea' : undefined
 		);
 	}
+
+	// This should only run on mount
+	useEffect( () => {
+		if ( forceShowOnMount ) {
+			openTheSidebar();
+		}
+	}, [] ); // eslint-disable-line react-hooks/exhaustive-deps
 
 	return (
 		<>
@@ -211,7 +284,7 @@ export default function NotesSidebarContainer() {
 
 	return (
 		<PostTypeSupportCheck supportKeys="editor.notes">
-			<NotesSidebar postId={ postId } mode={ mode } />
+			<NotesSetup postId={ postId } mode={ mode } />
 		</PostTypeSupportCheck>
 	);
 }
