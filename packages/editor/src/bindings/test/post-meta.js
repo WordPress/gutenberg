@@ -125,10 +125,7 @@ describe( 'post-meta bindings', () => {
 
 	describe( 'canUserEditValue', () => {
 		beforeAll( () => {
-			const canUser = () => true;
-
-			selectReturn.canUser = canUser;
-			select = () => selectReturn;
+			select = () => ( { ...selectReturn, canUser: () => true } );
 		} );
 
 		it( 'should return false when meta field is not accessible', () => {
