@@ -153,6 +153,12 @@ export default {
 		return true;
 	},
 	getFieldsList( { select, context } ) {
-		return getPostMetaFields( select, context ); // TODO: Remove defaults.
+		const metaFields = getPostMetaFields( select, context );
+		// Remove 'default' property from meta fields.
+		return metaFields.map(
+			( { default: defaultProp, ...otherProps } ) => ( {
+				...otherProps,
+			} )
+		);
 	},
 };
