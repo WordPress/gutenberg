@@ -19,30 +19,6 @@ test.describe( 'Block Comments', () => {
 		await requestUtils.deleteAllComments( 'note' );
 	} );
 
-	test( 'can pin and unpin comments sidebar', async ( {
-		editor,
-		page,
-		blockCommentUtils,
-	} ) => {
-		const topBarButton = await blockCommentUtils.openBlockCommentSidebar();
-		await page
-			.getByRole( 'button', { name: 'Unpin from toolbar' } )
-			.click();
-		await expect( topBarButton ).toBeHidden();
-
-		await editor.openDocumentSettingsSidebar();
-		await page
-			.getByRole( 'region', {
-				name: 'Editor top bar',
-			} )
-			.getByRole( 'button', { name: 'Options' } )
-			.click();
-		await page.getByRole( 'menuitemcheckbox', { name: 'Notes' } ).click();
-		await page.getByRole( 'button', { name: 'Pin to toolbar' } ).click();
-
-		await expect( topBarButton ).toBeVisible();
-	} );
-
 	test( 'should move focus to add a new note form', async ( {
 		editor,
 		page,

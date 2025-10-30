@@ -157,6 +157,11 @@ function NotesSidebar( { postId, mode } ) {
 				identifier={ collabHistorySidebarName }
 				name={ collabHistorySidebarName }
 				title={ __( 'Notes' ) }
+				header={
+					<h2 className="interface-complementary-area-header__title">
+						{ __( 'Notes' ) }
+					</h2>
+				}
 				icon={ commentIcon }
 				closeLabel={ __( 'Close Notes' ) }
 			>
