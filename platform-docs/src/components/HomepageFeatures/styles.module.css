@@ -9,15 +9,15 @@
 }
 
 .grid {
-	max-inline-size: 800px;
+	max-width: 800px;
 	display: grid;
 	gap: 6rem;
 	grid-template-columns: 1fr 1fr;
 }
 
 .featureSvg {
-	block-size: 40px;
-	inline-size: 40px;
+	height: 40px;
+	width: 40px;
 	fill: #fff;
 }
 

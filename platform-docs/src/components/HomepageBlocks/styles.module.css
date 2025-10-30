@@ -6,7 +6,7 @@
 }
 
 .titleContainer {
-	max-inline-size: 1000px;
+	max-width: 1000px;
 }
 
 .title {
@@ -23,14 +23,14 @@
 }
 
 .grid {
-	max-inline-size: 1000px;
+	max-width: 1000px;
 	display: grid;
 	gap: 2rem;
 	grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
 }
 
 .image {
-	inline-size: 100%;
+	width: 100%;
 	aspect-ratio: 1/1;
 }
 

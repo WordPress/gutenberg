@@ -6,12 +6,12 @@
 
 .container > div {
 	margin: auto;
-	max-inline-size: var(--ifm-container-width);
+	max-width: var(--ifm-container-width);
 }
 
 .title {
 	text-align: center;
-	margin-block-end: 0;
+	margin-bottom: 0;
 	flex-shrink: 0;
 }
 
