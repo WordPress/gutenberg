@@ -323,7 +323,6 @@ test.describe( 'Fit Text', () => {
 
 			await admin.editPost( postId );
 
-
 			const headingBlock = editor.canvas.locator(
 				'[data-type="core/heading"]'
 			);
