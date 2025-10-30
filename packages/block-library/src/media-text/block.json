@@ -143,6 +143,12 @@
 		},
 		"allowedBlocks": true
 	},
+	"mediaRoles": {
+		"id": "mediaId",
+		"url": "mediaUrl",
+		"alt": "mediaAlt",
+		"type": { "attribute": "mediaType" }
+	},
 	"editorStyle": "wp-block-media-text-editor",
 	"style": "wp-block-media-text"
 }

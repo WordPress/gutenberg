@@ -17,6 +17,7 @@ import {
 	__experimentalSanitizeBlockAttributes,
 	getBlockAttributesNamesByRole,
 	isContentBlock,
+	getMediaRoleAttributes,
 } from '../utils';
 
 const noop = () => {};
@@ -512,5 +513,125 @@ describe( 'isUnmodifiedBlock', () => {
 			},
 		} );
 		expect( isUnmodifiedBlock( block, 'content' ) ).toBe( false );
+	} );
+} );
+
+describe( 'getMediaRoleAttributes', () => {
+	afterEach( () => {
+		getBlockTypes().forEach( ( block ) => {
+			unregisterBlockType( block.name );
+		} );
+	} );
+
+	it( 'should return null if block has no mediaRoles', () => {
+		registerBlockType( 'core/test-block', {
+			attributes: {
+				url: { type: 'string' },
+			},
+			title: 'Test block',
+		} );
+
+		const result = getMediaRoleAttributes( 'core/test-block', {
+			url: 'https://example.com/image.jpg',
+		} );
+
+		expect( result ).toBeNull();
+	} );
+
+	it( 'should return null when `type` is not defined', () => {
+		registerBlockType( 'core/image-block', {
+			attributes: {
+				id: { type: 'number' },
+				url: { type: 'string' },
+				alt: { type: 'string' },
+			},
+			mediaRoles: {
+				id: 'id',
+				url: 'url',
+				alt: 'alt',
+			},
+			title: 'Image block',
+		} );
+
+		const result = getMediaRoleAttributes( 'core/image-block', {
+			id: 123,
+			url: 'https://example.com/image.jpg',
+			alt: 'Test image',
+		} );
+
+		expect( result ).toBeNull();
+	} );
+
+	it( 'should resolve object config with value property as literal value', () => {
+		registerBlockType( 'core/video-block', {
+			attributes: {
+				id: { type: 'number' },
+				src: { type: 'string' },
+			},
+			mediaRoles: {
+				id: 'id',
+				url: 'src',
+				type: { value: 'video' },
+			},
+			title: 'Video block',
+		} );
+
+		const result = getMediaRoleAttributes( 'core/video-block', {
+			id: 456,
+			src: 'https://example.com/video.mp4',
+		} );
+
+		expect( result ).toEqual( {
+			id: 456,
+			url: 'https://example.com/video.mp4',
+			type: 'video',
+		} );
+	} );
+
+	it( 'should resolve object config with attribute property', () => {
+		registerBlockType( 'core/media-text-block', {
+			attributes: {
+				mediaId: { type: 'number' },
+				mediaUrl: { type: 'string' },
+				mediaType: { type: 'string' },
+			},
+			mediaRoles: {
+				id: 'mediaId',
+				url: 'mediaUrl',
+				type: { attribute: 'mediaType' },
+			},
+			title: 'Media Text block',
+		} );
+
+		const result = getMediaRoleAttributes( 'core/media-text-block', {
+			mediaId: 789,
+			mediaUrl: 'https://example.com/media.jpg',
+			mediaType: 'image',
+		} );
+
+		expect( result ).toEqual( {
+			id: 789,
+			url: 'https://example.com/media.jpg',
+			type: 'image',
+		} );
+	} );
+
+	it( 'should skip null or undefined config values but still return null if type is missing', () => {
+		registerBlockType( 'core/skip-null-block', {
+			attributes: {
+				id: { type: 'number' },
+			},
+			mediaRoles: {
+				id: 'id',
+				url: null,
+			},
+			title: 'Skip null block',
+		} );
+
+		const result = getMediaRoleAttributes( 'core/skip-null-block', {
+			id: 123,
+		} );
+
+		expect( result ).toBeNull();
 	} );
 } );

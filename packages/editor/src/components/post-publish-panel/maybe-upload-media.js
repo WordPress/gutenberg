@@ -13,11 +13,18 @@ import { __, _x } from '@wordpress/i18n';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
 import { isBlobURL } from '@wordpress/blob';
+import {
+	getBlockType,
+	privateApis as blocksPrivateApis,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { fetchMedia } from './media-util';
+import { unlock } from '../../lock-unlock';
+
+const { getMediaRoleAttributes } = unlock( blocksPrivateApis );
 
 function flattenBlocks( blocks ) {
 	const result = [];
@@ -33,46 +40,36 @@ function flattenBlocks( blocks ) {
 /**
  * Determine whether a block has external media.
  *
- * Different blocks use different attribute names (and potentially
- * different logic as well) in determining whether the media is
- * present, and whether it's external.
+ * Uses the generic `getMediaRoleAttributes` utility to work with any block
+ * that defines `mediaRoles` in block.json.
  *
  * @param {{name: string, attributes: Object}} block The block.
- * @return {boolean?} Whether the block has external media
+ * @return {boolean} Whether the block has external media
  */
 function hasExternalMedia( block ) {
-	if ( block.name === 'core/image' || block.name === 'core/cover' ) {
-		return block.attributes.url && ! block.attributes.id;
-	}
-
-	if ( block.name === 'core/media-text' ) {
-		return block.attributes.mediaUrl && ! block.attributes.mediaId;
-	}
-
-	return undefined;
+	const mediaAttributes = getMediaRoleAttributes(
+		block.name,
+		block.attributes
+	);
+	// Only handle `image` type for now.
+	return (
+		mediaAttributes?.type === 'image' &&
+		!! mediaAttributes?.url &&
+		! mediaAttributes?.id
+	);
 }
 
 /**
  * Retrieve media info from a block.
  *
- * Different blocks use different attribute names, so we need this
- * function to normalize things into a consistent naming scheme.
+ * Uses the generic `getMediaRoleAttributes` utility to work with any block
+ * that defines `mediaRoles` in block.json.
  *
  * @param {{name: string, attributes: Object}} block The block.
  * @return {{url: ?string, alt: ?string, id: ?number}} The media info for the block.
  */
 function getMediaInfo( block ) {
-	if ( block.name === 'core/image' || block.name === 'core/cover' ) {
-		const { url, alt, id } = block.attributes;
-		return { url, alt, id };
-	}
-
-	if ( block.name === 'core/media-text' ) {
-		const { mediaUrl: url, mediaAlt: alt, mediaId: id } = block.attributes;
-		return { url, alt, id };
-	}
-
-	return {};
+	return getMediaRoleAttributes( block.name, block.attributes ) || {};
 }
 
 // Image component to represent a single image in the upload dialog.
@@ -141,24 +138,28 @@ export default function MaybeUploadMediaPanel() {
 	/**
 	 * Update an individual block to point to newly-added library media.
 	 *
-	 * Different blocks use different attribute names, so we need this
-	 * function to ensure we modify the correct attributes for each type.
+	 * Uses the block's `mediaRoles` configuration to determine which
+	 * attributes need to be updated.
 	 *
 	 * @param {{name: string, attributes: Object}} block The block.
 	 * @param {{id: number, url: string}}          media Media library file info.
 	 */
 	function updateBlockWithUploadedMedia( block, media ) {
-		if ( block.name === 'core/image' || block.name === 'core/cover' ) {
-			updateBlockAttributes( block.clientId, {
-				id: media.id,
-				url: media.url,
-			} );
+		const blockType = getBlockType( block.name );
+		const mediaRoles = blockType?.mediaRoles;
+		if ( ! mediaRoles ) {
+			return;
 		}
-
-		if ( block.name === 'core/media-text' ) {
+		// Update only if `id` and `url` attributes are found to update.
+		const isEligibleToUpdate =
+			mediaRoles.id &&
+			Object.hasOwn( blockType.attributes, mediaRoles.id ) &&
+			mediaRoles.url &&
+			Object.hasOwn( blockType.attributes, mediaRoles.url );
+		if ( isEligibleToUpdate ) {
 			updateBlockAttributes( block.clientId, {
-				mediaId: media.id,
-				mediaUrl: media.url,
+				[ mediaRoles.id ]: media.id,
+				[ mediaRoles.url ]: media.url,
 			} );
 		}
 	}

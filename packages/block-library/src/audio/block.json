@@ -63,6 +63,11 @@
 			"clientNavigation": true
 		}
 	},
+	"mediaRoles": {
+		"id": "id",
+		"url": "src",
+		"type": { "value": "audio" }
+	},
 	"editorStyle": "wp-block-audio-editor",
 	"style": "wp-block-audio"
 }

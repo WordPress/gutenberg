@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { lock } from '../lock-unlock';
-import { isContentBlock } from './utils';
+import { isContentBlock, getMediaRoleAttributes } from './utils';
 
 // The blocktype is the most important concept within the block API. It defines
 // all aspects of the block configuration and its interfaces, including `edit`
@@ -177,4 +177,4 @@ export {
 } from './constants';
 
 export const privateApis = {};
-lock( privateApis, { isContentBlock } );
+lock( privateApis, { isContentBlock, getMediaRoleAttributes } );

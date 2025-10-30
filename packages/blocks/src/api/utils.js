@@ -433,6 +433,56 @@ export function isContentBlock( name ) {
 }
 
 /**
+ * Get media-related attributes from a block by resolving the mediaRoles.
+ * Returns an object with resolved media role values or null,
+ * if the block doesn't define mediaRoles or if no values are resolved.
+ *
+ * Note: Currently only supports core blocks (block names starting with 'core/').
+ *
+ * @param {string} blockName  The block's name.
+ * @param {Object} attributes The block's attributes.
+ *
+ * @return {Object|null} Object with resolved media role values or null.
+ */
+export function getMediaRoleAttributes( blockName, attributes ) {
+	// Only process core blocks.
+	if ( ! blockName.startsWith( 'core/' ) ) {
+		return null;
+	}
+	const blockType = getBlockType( blockName );
+	const mediaRoles = blockType?.mediaRoles;
+	if ( ! mediaRoles ) {
+		return null;
+	}
+	const resolved = Object.entries( mediaRoles ).reduce(
+		( accumulator, [ role, config ] ) => {
+			if ( ! config ) {
+				return accumulator;
+			}
+			// Check for static value first. This only applies to `type` for now.
+			if ( typeof config === 'object' && !! config.value ) {
+				accumulator[ role ] = config.value;
+			} else {
+				accumulator[ role ] =
+					attributes[
+						typeof config === 'string' ? config : config.attribute
+					];
+			}
+			return accumulator;
+		},
+		{}
+	);
+	// Type should always be defined.
+	if (
+		! [ 'image', 'video', 'audio' ].includes( resolved.type ) ||
+		! Object.keys( resolved ).length
+	) {
+		return null;
+	}
+	return resolved;
+}
+
+/**
  * Return a new object with the specified keys omitted.
  *
  * @param {Object} object Original object.
