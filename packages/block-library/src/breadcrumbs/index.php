@@ -102,7 +102,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 
 		// Build breadcrumb trail.
 		if ( ! $show_terms ) {
-			$breadcrumb_items = array_merge( $breadcrumb_items, block_core_breadcrumbs_get_hierarchical_post_type_breadcrumbs( $post_id ) );
+			$breadcrumb_items = array_merge( $breadcrumb_items, block_core_breadcrumbs_get_hierarchical_post_type_breadcrumbs( $post_id, $post_type ) );
 		} else {
 			$breadcrumb_items = array_merge( $breadcrumb_items, block_core_breadcrumbs_get_terms_breadcrumbs( $post_id, $post_type ) );
 		}
@@ -263,18 +263,52 @@ function block_core_breadcrumbs_get_post_title( $post_id_or_object ) {
 }
 
 /**
+ * Generates post type archive breadcrumb item.
+ *
+ * Returns the post type archive link item if the post type has archive enabled,
+ * otherwise returns null.
+ *
+ * @since 6.9.0
+ *
+ * @param string $post_type The post type name.
+ *
+ * @return string|null The archive breadcrumb item HTML, or null if not available.
+ */
+function block_core_breadcrumbs_get_post_type_archive_item( $post_type ) {
+	$post_type_object = get_post_type_object( $post_type );
+	if ( $post_type_object && $post_type_object->has_archive ) {
+		$archive_link = get_post_type_archive_link( $post_type );
+		if ( $archive_link ) {
+			return sprintf(
+				'<a href="%s">%s</a>',
+				esc_url( $archive_link ),
+				esc_html( $post_type_object->labels->name )
+			);
+		}
+	}
+	return null;
+}
+
+/**
  * Generates breadcrumb items from hierarchical post type ancestors.
  *
  * @since 7.0.0
  *
- * @param int $post_id   The post ID.
+ * @param int    $post_id   The post ID.
+ * @param string $post_type The post type name.
  *
  * @return array Array of breadcrumb HTML items.
  */
-function block_core_breadcrumbs_get_hierarchical_post_type_breadcrumbs( $post_id ) {
+function block_core_breadcrumbs_get_hierarchical_post_type_breadcrumbs( $post_id, $post_type ) {
 	$breadcrumb_items = array();
-	$ancestors        = get_post_ancestors( $post_id );
-	$ancestors        = array_reverse( $ancestors );
+
+	$archive_item = block_core_breadcrumbs_get_post_type_archive_item( $post_type );
+	if ( $archive_item ) {
+		$breadcrumb_items[] = $archive_item;
+	}
+
+	$ancestors = get_post_ancestors( $post_id );
+	$ancestors = array_reverse( $ancestors );
 
 	foreach ( $ancestors as $ancestor_id ) {
 		$breadcrumb_items[] = block_core_breadcrumbs_create_link(
@@ -466,6 +500,12 @@ function block_core_breadcrumbs_get_archive_breadcrumbs() {
  */
 function block_core_breadcrumbs_get_terms_breadcrumbs( $post_id, $post_type ) {
 	$breadcrumb_items = array();
+
+	$archive_item = block_core_breadcrumbs_get_post_type_archive_item( $post_type );
+	if ( $archive_item ) {
+		$breadcrumb_items[] = $archive_item;
+	}
+
 	// Get public taxonomies for this post type.
 	$taxonomies = wp_filter_object_list(
 		get_object_taxonomies( $post_type, 'objects' ),
@@ -476,7 +516,7 @@ function block_core_breadcrumbs_get_terms_breadcrumbs( $post_id, $post_type ) {
 	);
 
 	if ( empty( $taxonomies ) ) {
-		return array();
+		return $breadcrumb_items;
 	}
 
 	/**
