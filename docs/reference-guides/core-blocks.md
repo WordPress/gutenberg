@@ -382,7 +382,7 @@ Use the classic WordPress editor. ([Source](https://github.com/WordPress/gutenbe
 
 -	**Name:** core/freeform
 -	**Category:** text
--	**Supports:** ~~className~~, ~~customClassName~~, ~~reusable~~
+-	**Supports:** ~~blockVisibility~~, ~~className~~, ~~customClassName~~, ~~lock~~, ~~renaming~~, ~~reusable~~
 -	**Attributes:** content
 
 ## Gallery
