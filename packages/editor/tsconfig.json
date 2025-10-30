@@ -29,6 +29,7 @@
 		{ "path": "../media-utils" },
 		{ "path": "../notices" },
 		{ "path": "../plugins" },
+		{ "path": "../preferences" },
 		{ "path": "../private-apis" },
 		{ "path": "../rich-text" },
 		{ "path": "../url" },

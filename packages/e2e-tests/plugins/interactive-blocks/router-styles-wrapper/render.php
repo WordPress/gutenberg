@@ -88,7 +88,8 @@ $wrapper_attributes = get_block_wrapper_attributes();
 	<div
 		data-testid="hydrated"
 		data-wp-interactive="test/router-styles"
-		data-wp-bind--hidden="state.undefined"
+		data-wp-bind--hidden="!state.hydrated"
+		data-wp-init="callbacks.setHydrated"
 		hidden
 	>
 		Hydrated

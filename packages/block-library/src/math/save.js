@@ -11,10 +11,11 @@ export default function save( { attributes } ) {
 	}
 
 	return (
-		<math
-			{ ...useBlockProps.save() }
-			display="block"
-			dangerouslySetInnerHTML={ { __html: mathML } }
-		/>
+		<div { ...useBlockProps.save() }>
+			<math
+				display="block"
+				dangerouslySetInnerHTML={ { __html: mathML } }
+			/>
+		</div>
 	);
 }

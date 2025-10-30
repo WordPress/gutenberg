@@ -195,9 +195,9 @@ export function useThemeProviderStyles( {
 	const primary =
 		color.primary ??
 		inheritedSettings.color?.primary ??
-		DEFAULT_SEED_COLORS.bg;
+		DEFAULT_SEED_COLORS.primary;
 	const bg =
-		color.bg ?? inheritedSettings.color?.bg ?? DEFAULT_SEED_COLORS.primary;
+		color.bg ?? inheritedSettings.color?.bg ?? DEFAULT_SEED_COLORS.bg;
 
 	const resolvedSettings = useMemo(
 		() => ( {

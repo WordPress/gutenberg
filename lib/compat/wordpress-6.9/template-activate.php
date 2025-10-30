@@ -257,8 +257,8 @@ function gutenberg_resolve_block_template( $template_type, $template_hierarchy, 
 	// START CORE MODIFICATIONS //
 	//////////////////////////////
 
-	$object            = get_queried_object();
-	$specific_template = $object ? get_page_template_slug( $object ) : null;
+	$object_id         = get_queried_object_id();
+	$specific_template = $object_id ? get_page_template_slug( $object_id ) : null;
 	$active_templates  = (array) get_option( 'active_templates', array() );
 
 	// We expect one template for each slug. Use the active template if it is
@@ -309,12 +309,14 @@ function gutenberg_resolve_block_template( $template_type, $template_hierarchy, 
 	}
 
 	// For any remaining slugs, use the static template.
-	$query     = array(
-		'slug__in' => $remaining_slugs,
-	);
-	$templates = array_merge( $templates, gutenberg_get_registered_block_templates( $query ) );
+	if ( ! empty( $remaining_slugs ) ) {
+		$query     = array(
+			'slug__in' => $remaining_slugs,
+		);
+		$templates = array_merge( $templates, gutenberg_get_registered_block_templates( $query ) );
+	}
 
-	if ( $specific_template ) {
+	if ( $specific_template && in_array( $specific_template, $remaining_slugs, true ) ) {
 		$templates = array_merge( $templates, get_block_templates( array( 'slug__in' => array( $specific_template ) ) ) );
 	}
 
@@ -481,10 +483,10 @@ function gutenberg_locate_block_template( $template, $type, array $templates ) {
 // https://github.com/WordPress/wordpress-develop/blob/b2c8d8d2c8754cab5286b06efb4c11e2b6aa92d5/src/wp-includes/rest-api/endpoints/class-wp-rest-templates-controller.php#L571-L578
 // Priority 9 so it runs before default hooks like
 // `inject_ignored_hooked_blocks_metadata_attributes`.
+remove_action( 'rest_pre_insert_wp_template', 'wp_assign_new_template_to_theme', 9 );
 add_action( 'rest_pre_insert_wp_template', 'gutenberg_set_active_template_theme', 9, 2 );
 function gutenberg_set_active_template_theme( $changes, $request ) {
-	$template = $request['id'] ? get_block_template( $request['id'], 'wp_template' ) : null;
-	if ( $template ) {
+	if ( str_starts_with( $request->get_route(), '/wp/v2/templates' ) ) {
 		return $changes;
 	}
 	$changes->tax_input = array(

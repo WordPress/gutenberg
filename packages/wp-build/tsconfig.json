@@ -1,0 +1,27 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"module": "node16",
+		"moduleResolution": "node16",
+		"esModuleInterop": true,
+		"target": "es2021",
+		"lib": [ "es2021", "ES2020.string" ],
+		"rootDir": ".",
+		"types": [ "node" ],
+
+		// This package isn't published with types.
+		// Don't generate types, this is strictly for validation.
+		"incremental": true,
+		"declarationMap": false,
+		"emitDeclarationOnly": false,
+		"noEmit": true,
+		"outDir": ".cache"
+	},
+	"include": [ "." ],
+	"exclude": [
+		// Excluded to maintain consistency with bin/tsconfig.json
+		// where packages/build.mjs was also excluded
+		"src/build.mjs"
+	]
+}

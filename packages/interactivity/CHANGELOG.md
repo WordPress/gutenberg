@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.34.0 (2025-10-29)
+
 ### Bug Fixes
 
 -   Fix derived state closures processing on client-side navigation. ([#72725](https://github.com/WordPress/gutenberg/pull/72725))
