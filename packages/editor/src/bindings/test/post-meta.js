@@ -32,17 +32,20 @@ describe( 'post-meta bindings', () => {
 		};
 
 		const getRegisteredPostMeta = () => ( {
-			field_without_label_or_default: {},
+			field_without_label_or_default: { type: 'string' },
 			field_with_label_only: {
 				title: 'Field With Label Only',
 				default: '', // If there's no default set, getRegisteredPostMeta() will return an empty string.
+				type: 'string',
 			},
 			movie_field: {
 				title: 'Movie Field Label',
 				default: 'Movie field default value',
+				type: 'string',
 			},
 			_protected_field: {
 				default: 'Protected field default value',
+				type: 'string',
 			},
 		} );
 
@@ -99,6 +102,33 @@ describe( 'post-meta bindings', () => {
 				expect( values.content ).toBe(
 					'field_without_label_or_default'
 				);
+			} );
+		} );
+
+		describe( 'getFieldsList', () => {
+			it( 'should return the list of available meta fields, with correct fallbacks for labels', () => {
+				const fields = postMetaBindings.getFieldsList( {
+					select,
+					context,
+				} );
+
+				expect( fields ).toEqual( [
+					{
+						label: 'field_without_label_or_default',
+						type: 'string',
+						args: { key: 'field_without_label_or_default' },
+					},
+					{
+						label: 'Field With Label Only',
+						type: 'string',
+						args: { key: 'field_with_label_only' },
+					},
+					{
+						label: 'Movie Field Label',
+						type: 'string',
+						args: { key: 'movie_field' },
+					},
+				] );
 			} );
 		} );
 	} );
