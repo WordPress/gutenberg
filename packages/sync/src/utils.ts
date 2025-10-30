@@ -15,7 +15,11 @@ import {
 } from './config';
 import type { CRDTDoc } from './types';
 
-export function createYjsDoc( documentMeta: Record< string, unknown > ): Y.Doc {
+interface DocumentMeta {
+	[ key: string ]: boolean | number | string;
+}
+
+export function createYjsDoc( documentMeta: DocumentMeta = {} ): Y.Doc {
 	// Meta is not synced and does not get persisted with the document.
 	const metaMap = new Map< string, unknown >(
 		Object.entries( documentMeta )
@@ -42,11 +46,12 @@ export function deserializeCrdtDoc(
 		const { document } = JSON.parse( serializedCrdtDoc );
 
 		// Mark this document as from persistence.
-		const docMetaMap = new Map< string, boolean >();
-		docMetaMap.set( CRDT_DOC_META_PERSISTENCE_KEY, true );
+		const docMeta = {
+			[ CRDT_DOC_META_PERSISTENCE_KEY ]: true,
+		};
 
 		// Apply the document as an update against a new (temporary) Y.Doc.
-		const ydoc = createYjsDoc( { meta: docMetaMap } );
+		const ydoc = createYjsDoc( docMeta );
 		const yupdate = buffer.fromBase64( document );
 		Y.applyUpdateV2( ydoc, yupdate );
 
