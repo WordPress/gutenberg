@@ -61,11 +61,9 @@ const EditWithGeneratedProps = ( props ) => {
 	const registry = useRegistry();
 	const blockType = getBlockType( name );
 	const blockContext = useContext( BlockContext );
-	const registeredSources = useSelect(
-		( select ) =>
-			unlock( select( blocksStore ) ).getAllBlockBindingsSources(),
-		[]
-	);
+	// Get block bindings sources imperatively (no observer - it's a static registry).
+	const { getAllBlockBindingsSources } = unlock( useSelect( blocksStore ) );
+	const registeredSources = getAllBlockBindingsSources();
 	const { bindableAttributes } = useContext( PrivateBlockContext );
 
 	const { blockBindings, context, hasPatternOverrides } = useMemo( () => {
