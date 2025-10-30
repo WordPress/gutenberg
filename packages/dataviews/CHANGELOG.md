@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+- DataForm: simplify form normalization. [#72848](https://github.com/WordPress/gutenberg/pull/72848)
+
 ### Bug fixes
 
 - Fix: DataViews modal actions in list layout. [#72793](https://github.com/WordPress/gutenberg/pull/72793)
