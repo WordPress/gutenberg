@@ -136,6 +136,20 @@ describe( 'post-meta bindings', () => {
 
 				expect( values.content ).toBe( 'inaccessible_field' );
 			} );
+
+			it( 'should fall back to the key when meta field is protected', () => {
+				const values = postMetaBindings.getValues( {
+					select,
+					context,
+					bindings: {
+						content: {
+							args: { key: '_protected_field' },
+						},
+					},
+				} );
+
+				expect( values.content ).toBe( '_protected_field' );
+			} );
 		} );
 
 		describe( 'canUserEditValue', () => {
