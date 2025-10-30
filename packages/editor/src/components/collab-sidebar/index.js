@@ -99,6 +99,12 @@ function NotesSidebar( { postId, mode } ) {
 		};
 	}, [] );
 
+	const isDistractionFree = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings().isDistractionFree,
+		[]
+	);
+
 	const {
 		resultComments,
 		unresolvedSortedThreads,
@@ -152,35 +158,39 @@ function NotesSidebar( { postId, mode } ) {
 
 	return (
 		<>
-			{ blockCommentId && (
+			{ blockCommentId && ! isDistractionFree && (
 				<CommentAvatarIndicator
 					thread={ currentThread }
 					onClick={ openTheSidebar }
 				/>
 			) }
-			<AddCommentMenuItem onClick={ openTheSidebar } />
-			<PluginSidebar
-				identifier={ collabHistorySidebarName }
-				name={ collabHistorySidebarName }
-				title={ __( 'All notes' ) }
-				header={
-					<h2 className="interface-complementary-area-header__title">
-						{ __( 'All notes' ) }
-					</h2>
-				}
-				icon={ commentIcon }
-				closeLabel={ __( 'Close Notes' ) }
-			>
-				<NotesSidebarContent
-					comments={ resultComments }
-					showCommentBoard={ showCommentBoard }
-					setShowCommentBoard={ setShowCommentBoard }
-					commentSidebarRef={ commentSidebarRef }
-					reflowComments={ reflowComments }
-					commentLastUpdated={ commentLastUpdated }
-				/>
-			</PluginSidebar>
-			{ isLargeViewport && (
+			{ ! isDistractionFree && (
+				<AddCommentMenuItem onClick={ openTheSidebar } />
+			) }
+			{ ! isDistractionFree && (
+				<PluginSidebar
+					identifier={ collabHistorySidebarName }
+					name={ collabHistorySidebarName }
+					title={ __( 'All notes' ) }
+					header={
+						<h2 className="interface-complementary-area-header__title">
+							{ __( 'All notes' ) }
+						</h2>
+					}
+					icon={ commentIcon }
+					closeLabel={ __( 'Close Notes' ) }
+				>
+					<NotesSidebarContent
+						comments={ resultComments }
+						showCommentBoard={ showCommentBoard }
+						setShowCommentBoard={ setShowCommentBoard }
+						commentSidebarRef={ commentSidebarRef }
+						reflowComments={ reflowComments }
+						commentLastUpdated={ commentLastUpdated }
+					/>
+				</PluginSidebar>
+			) }
+			{ isLargeViewport && ! isDistractionFree && (
 				<PluginSidebar
 					isPinnable={ false }
 					header={ false }
