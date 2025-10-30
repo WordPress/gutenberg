@@ -145,5 +145,5 @@ export default {
 	},
 	getFieldsList( { select, context } ) {
 		return getPostMetaFields( select, context ); // TODO: Remove defaults.
-	}
+	},
 };
