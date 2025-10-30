@@ -279,7 +279,9 @@ export function Comments( {
 
 			// Ensure the editor has enough height to scroll to all notes.
 			// last note top plus height to determine the bottom position.
-			const iframe = document.querySelector( 'iframe[name="editor-canvas"]' );
+			const iframe = document.querySelector(
+				'iframe[name="editor-canvas"]'
+			);
 			if ( iframe && iframe.contentDocument ) {
 				if ( editorMinHeight > 0 ) {
 					iframe.contentDocument.body.style.minHeight = `${ editorMinHeight }px`;
