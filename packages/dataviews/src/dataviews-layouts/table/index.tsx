@@ -98,6 +98,20 @@ function TableColumnField< Item >( {
 	);
 }
 
+function getColumnStyles( view: ViewTableType, columnId: string ) {
+	const stylesById = view.layout?.styles ?? {};
+	const defaultStyles = stylesById.__default__ ?? {};
+	const columnStyles = stylesById[ columnId ] ?? {};
+	const { align, ...mergedStyles } = {
+		...defaultStyles,
+		...columnStyles,
+	};
+	return {
+		...mergedStyles,
+		textAlign: align,
+	};
+}
+
 function TableRow< Item >( {
 	hasBulkActions,
 	item,
@@ -194,7 +208,10 @@ function TableRow< Item >( {
 			} }
 		>
 			{ hasBulkActions && (
-				<td className="dataviews-view-table__checkbox-column">
+				<td
+					className="dataviews-view-table__checkbox-column"
+					style={ getColumnStyles( view, '__bulk_actions__' ) }
+				>
 					<div className="dataviews-view-table__cell-content-wrapper">
 						<DataViewsSelectionCheckbox
 							item={ item }
@@ -208,7 +225,7 @@ function TableRow< Item >( {
 				</td>
 			) }
 			{ hasPrimaryColumn && (
-				<td>
+				<td style={ getColumnStyles( view, '__primary__' ) }>
 					<ColumnPrimary
 						item={ item }
 						level={ level }
@@ -224,24 +241,14 @@ function TableRow< Item >( {
 				</td>
 			) }
 			{ columns.map( ( column: string ) => {
-				// Explicit picks the supported styles.
-				const { width, maxWidth, minWidth, align } =
-					view.layout?.styles?.[ column ] ?? {};
-
+				const columnStyles = getColumnStyles( view, column );
 				return (
-					<td
-						key={ column }
-						style={ {
-							width,
-							maxWidth,
-							minWidth,
-						} }
-					>
+					<td key={ column } style={ columnStyles }>
 						<TableColumnField
 							fields={ fields }
 							item={ item }
 							column={ column }
-							align={ align }
+							align={ columnStyles.textAlign }
 						/>
 					</td>
 				);
@@ -380,6 +387,10 @@ function ViewTable< Item >( {
 							<th
 								className="dataviews-view-table__checkbox-column"
 								scope="col"
+								style={ getColumnStyles(
+									view,
+									'__bulk_actions__'
+								) }
 							>
 								<BulkSelectionCheckbox
 									selection={ selection }
@@ -391,7 +402,10 @@ function ViewTable< Item >( {
 							</th>
 						) }
 						{ hasPrimaryColumn && (
-							<th scope="col">
+							<th
+								scope="col"
+								style={ getColumnStyles( view, '__primary__' ) }
+							>
 								{ titleField && (
 									<ColumnHeaderMenu
 										ref={ headerMenuRef(
@@ -410,18 +424,10 @@ function ViewTable< Item >( {
 							</th>
 						) }
 						{ columns.map( ( column, index ) => {
-							// Explicit picks the supported styles.
-							const { width, maxWidth, minWidth, align } =
-								view.layout?.styles?.[ column ] ?? {};
 							return (
 								<th
 									key={ column }
-									style={ {
-										width,
-										maxWidth,
-										minWidth,
-										textAlign: align,
-									} }
+									style={ getColumnStyles( view, column ) }
 									aria-sort={
 										view.sort?.direction &&
 										view.sort?.field === column
@@ -456,6 +462,7 @@ function ViewTable< Item >( {
 											! isHorizontalScrollEnd,
 									}
 								) }
+								style={ getColumnStyles( view, '__actions__' ) }
 							>
 								<span className="dataviews-view-table-header">
 									{ __( 'Actions' ) }

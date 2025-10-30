@@ -363,6 +363,13 @@ export const WithCard = () => {
 		titleField: 'title',
 		descriptionField: 'description',
 		mediaField: 'image',
+		layout: {
+			styles: {
+				__default__: {
+					paddingInlineStart: '10px',
+				},
+			},
+		},
 	} );
 	const { data: shownData, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( data, view, fields );

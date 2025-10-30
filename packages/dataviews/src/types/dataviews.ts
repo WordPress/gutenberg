@@ -188,27 +188,18 @@ interface ViewBase {
 	infiniteScrollEnabled?: boolean;
 }
 
-export interface ColumnStyle {
-	/**
-	 * The width of the field column.
-	 */
-	width?: string | number;
-
-	/**
-	 * The minimum width of the field column.
-	 */
-	maxWidth?: string | number;
-
-	/**
-	 * The maximum width of the field column.
-	 */
-	minWidth?: string | number;
-
-	/**
-	 * The alignment of the field column, defaults to left.
-	 */
-	align?: 'start' | 'center' | 'end';
-}
+export type ColumnStyle =
+	// Allow any valid inline CSS style for td/th
+	Omit< React.CSSProperties, 'textAlign' > & {
+		/**
+		 * Logical alignment; mapped to CSS textAlign where applicable.
+		 */
+		align?: 'start' | 'center' | 'end';
+		/**
+		 * Optional textAlign passthrough if ever needed for headers.
+		 */
+		textAlign?: React.CSSProperties[ 'textAlign' ];
+	};
 
 export type Density = 'compact' | 'balanced' | 'comfortable';
 
