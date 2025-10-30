@@ -200,6 +200,39 @@ export function MediaPlaceholder( {
 		setSrc( value?.src ?? '' );
 	}, [ value?.src ] );
 
+	const handleMediaSelection = ( selectedMedia ) => {
+		if ( Array.isArray( selectedMedia ) ) {
+			const validMedia = selectedMedia.filter( ( media ) => {
+				const mediaType = media.type?.split( '/' )[ 0 ];
+				return (
+					allowedTypes?.includes( mediaType ) ||
+					allowedTypes?.includes( media.type )
+				);
+			} );
+
+			if ( validMedia.length !== selectedMedia.length ) {
+				onError( __( 'Some files are not allowed.' ) );
+
+				if ( validMedia.length === 0 ) {
+					return;
+				}
+			}
+
+			onSelect( validMedia );
+		} else {
+			const mediaType = selectedMedia.type?.split( '/' )[ 0 ];
+			if (
+				! allowedTypes?.includes( mediaType ) ||
+				! allowedTypes?.includes( selectedMedia.type )
+			) {
+				onError( __( 'File type not allowed.' ) );
+				return;
+			}
+
+			onSelect( selectedMedia );
+		}
+	};
+
 	const onlyAllowsImages = () => {
 		if ( ! allowedTypes || allowedTypes.length === 0 ) {
 			return false;
@@ -492,7 +525,7 @@ export function MediaPlaceholder( {
 				addToGallery={ addToGallery }
 				gallery={ multiple && onlyAllowsImages() }
 				multiple={ multiple }
-				onSelect={ onSelect }
+				onSelect={ handleMediaSelection }
 				allowedTypes={ allowedTypes }
 				mode="browse"
 				value={
