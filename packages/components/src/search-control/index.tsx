@@ -157,4 +157,6 @@ function UnforwardedSearchControl(
  */
 export const SearchControl = forwardRef( UnforwardedSearchControl );
 
+export type { SearchControlProps };
+
 export default SearchControl;

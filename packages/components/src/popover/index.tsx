@@ -569,4 +569,6 @@ export const Popover = Object.assign(
 	}
 );
 
+export type { PopoverProps };
+
 export default Popover;

@@ -61,4 +61,6 @@ function UnforwardedProgressBar(
  */
 export const ProgressBar = forwardRef( UnforwardedProgressBar );
 
+export type { ProgressBarProps };
+
 export default ProgressBar;

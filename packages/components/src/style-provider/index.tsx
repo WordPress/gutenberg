@@ -45,4 +45,6 @@ export function StyleProvider( props: StyleProviderProps ) {
 	return <CacheProvider value={ cache }>{ children }</CacheProvider>;
 }
 
+export type { StyleProviderProps };
+
 export default StyleProvider;

@@ -177,4 +177,6 @@ function Guide( {
 	);
 }
 
+export type { GuideProps };
+
 export default Guide;

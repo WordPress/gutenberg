@@ -120,4 +120,6 @@ export const AlignmentMatrixControl = Object.assign(
 	}
 );
 
+export type { AlignmentMatrixControlProps };
+
 export default AlignmentMatrixControl;

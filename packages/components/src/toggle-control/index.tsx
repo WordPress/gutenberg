@@ -133,4 +133,6 @@ function UnforwardedToggleControl(
  */
 export const ToggleControl = forwardRef( UnforwardedToggleControl );
 
+export type { ToggleControlProps };
+
 export default ToggleControl;

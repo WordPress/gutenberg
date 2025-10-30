@@ -282,4 +282,6 @@ function UnforwardedNumberControl(
 
 export const NumberControl = forwardRef( UnforwardedNumberControl );
 
+export type { NumberControlProps };
+
 export default NumberControl;

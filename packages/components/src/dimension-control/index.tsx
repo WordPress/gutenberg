@@ -129,4 +129,6 @@ export function DimensionControl( props: DimensionControlProps ) {
 	);
 }
 
+export type { DimensionControlProps };
+
 export default DimensionControl;

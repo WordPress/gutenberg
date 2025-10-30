@@ -207,4 +207,6 @@ function UnforwardedSnackbar(
  */
 export const Snackbar = forwardRef( UnforwardedSnackbar );
 
+export type { SnackbarProps };
+
 export default Snackbar;

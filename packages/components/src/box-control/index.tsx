@@ -234,4 +234,7 @@ function BoxControl( {
 }
 
 export { applyValueToSides } from './utils';
+
+export type { BoxControlProps };
+
 export default BoxControl;

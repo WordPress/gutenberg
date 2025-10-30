@@ -82,4 +82,6 @@ export function FormFileUpload( {
 	);
 }
 
+export type { FormFileUploadProps };
+
 export default FormFileUpload;

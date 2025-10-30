@@ -102,4 +102,5 @@ function UnforwardedToolbar(
  * ```
  */
 export const Toolbar = forwardRef( UnforwardedToolbar );
+export type { ToolbarProps };
 export default Toolbar;

@@ -415,4 +415,6 @@ function UnforwardedModal(
  */
 export const Modal = forwardRef( UnforwardedModal );
 
+export type { ModalProps };
+
 export default Modal;

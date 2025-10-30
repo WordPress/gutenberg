@@ -172,4 +172,6 @@ function Notice( {
 	);
 }
 
+export type { NoticeProps };
+
 export default Notice;

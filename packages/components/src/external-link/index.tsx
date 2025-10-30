@@ -93,4 +93,6 @@ function UnforwardedExternalLink(
  */
 export const ExternalLink = forwardRef( UnforwardedExternalLink );
 
+export type { ExternalLinkProps };
+
 export default ExternalLink;

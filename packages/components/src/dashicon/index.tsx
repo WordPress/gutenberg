@@ -48,4 +48,6 @@ function Dashicon( {
 	return <span className={ iconClass } style={ styles } { ...extraProps } />;
 }
 
+export type { DashiconProps };
+
 export default Dashicon;

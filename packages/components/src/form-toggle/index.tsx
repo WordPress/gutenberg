@@ -80,4 +80,6 @@ function UnforwardedFormToggle(
  */
 export const FormToggle = forwardRef( UnforwardedFormToggle );
 
+export type { FormToggleProps };
+
 export default FormToggle;

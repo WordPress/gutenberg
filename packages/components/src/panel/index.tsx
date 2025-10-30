@@ -45,4 +45,6 @@ function UnforwardedPanel(
  */
 export const Panel = forwardRef( UnforwardedPanel );
 
+export type { PanelProps };
+
 export default Panel;

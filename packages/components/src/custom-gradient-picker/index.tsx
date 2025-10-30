@@ -208,4 +208,6 @@ export function CustomGradientPicker( {
 	);
 }
 
+export type { CustomGradientPickerProps };
+
 export default CustomGradientPicker;

@@ -119,4 +119,6 @@ export function TreeSelect( props: TreeSelectProps ) {
 	);
 }
 
+export type { TreeSelectProps };
+
 export default TreeSelect;

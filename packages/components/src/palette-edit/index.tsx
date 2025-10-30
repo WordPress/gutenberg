@@ -629,4 +629,6 @@ export function PaletteEdit( {
 	);
 }
 
+export type { PaletteEditProps };
+
 export default PaletteEdit;

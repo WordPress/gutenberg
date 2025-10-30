@@ -292,4 +292,6 @@ function SandBox( {
 	);
 }
 
+export type { SandBoxProps };
+
 export default SandBox;

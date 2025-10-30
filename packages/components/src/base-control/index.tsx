@@ -166,4 +166,6 @@ export const BaseControl = Object.assign(
 	}
 );
 
+export type { BaseControlProps };
+
 export default BaseControl;

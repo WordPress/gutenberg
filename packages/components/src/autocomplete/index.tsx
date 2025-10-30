@@ -446,6 +446,8 @@ export function useAutocompleteProps( options: UseAutocompleteProps ) {
 	};
 }
 
+export type { AutocompleteProps };
+
 export default function Autocomplete( {
 	children,
 	isSelected,

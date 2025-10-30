@@ -188,4 +188,6 @@ export const SelectControl = forwardRef( UnforwardedSelectControl ) as <
 	> & { ref?: React.Ref< HTMLSelectElement > }
 ) => React.JSX.Element | null;
 
+export type { SelectControlProps };
+
 export default SelectControl;

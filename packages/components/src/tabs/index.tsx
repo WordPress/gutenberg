@@ -152,3 +152,5 @@ export const Tabs = Object.assign(
 		} ),
 	}
 );
+
+export type { TabsProps } from './types';

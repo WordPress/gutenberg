@@ -60,4 +60,6 @@ export function MenuGroup( props: MenuGroupProps ) {
 	);
 }
 
+export type { MenuGroupProps };
+
 export default MenuGroup;

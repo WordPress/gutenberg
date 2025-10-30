@@ -159,4 +159,6 @@ function UnforwardedTooltip(
 }
 export const Tooltip = forwardRef( UnforwardedTooltip );
 
+export type { TooltipProps };
+
 export default Tooltip;

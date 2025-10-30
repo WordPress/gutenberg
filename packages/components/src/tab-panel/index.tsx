@@ -246,4 +246,7 @@ const UnforwardedTabPanel = (
 };
 
 export const TabPanel = forwardRef( UnforwardedTabPanel );
+
+export type { TabPanelProps };
+
 export default TabPanel;

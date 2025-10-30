@@ -249,3 +249,5 @@ export const Composite = Object.assign(
 		} ),
 	}
 );
+
+export type { CompositeProps } from './types';

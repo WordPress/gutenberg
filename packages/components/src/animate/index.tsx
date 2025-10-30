@@ -69,4 +69,6 @@ export function Animate( { type, options = {}, children }: AnimateProps ) {
 	} );
 }
 
+export type { AnimateProps };
+
 export default Animate;

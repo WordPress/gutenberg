@@ -259,4 +259,6 @@ export function Draggable( {
 	);
 }
 
+export type { DraggableProps };
+
 export default Draggable;

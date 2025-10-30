@@ -304,4 +304,7 @@ export function UnforwardedButton(
  * ```
  */
 export const Button = forwardRef( UnforwardedButton );
+
+export type { ButtonProps };
+
 export default Button;

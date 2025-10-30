@@ -81,4 +81,6 @@ function MenuItemsChoice( {
 	);
 }
 
+export type { MenuItemsChoiceProps };
+
 export default MenuItemsChoice;

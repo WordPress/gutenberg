@@ -63,4 +63,6 @@ function ResponsiveWrapper( {
 	);
 }
 
+export type { ResponsiveWrapperProps };
+
 export default ResponsiveWrapper;

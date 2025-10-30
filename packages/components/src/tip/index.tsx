@@ -19,4 +19,6 @@ export function Tip( props: TipProps ) {
 	);
 }
 
+export type { TipProps };
+
 export default Tip;

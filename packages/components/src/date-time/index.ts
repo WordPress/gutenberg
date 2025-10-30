@@ -7,3 +7,4 @@ import { default as DateTimePicker } from './date-time';
 
 export { DatePicker, TimePicker };
 export default DateTimePicker;
+export type { DatePickerProps, TimeInputProps, TimePickerProps } from './types';

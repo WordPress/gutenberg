@@ -19,6 +19,8 @@ import type { WordPressComponentProps } from '../context';
 
 const TIMEOUT = 4000;
 
+export type { ClipboardButtonProps };
+
 export default function ClipboardButton( {
 	className,
 	children,

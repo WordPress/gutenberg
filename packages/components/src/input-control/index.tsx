@@ -144,4 +144,6 @@ export function UnforwardedInputControl(
  */
 export const InputControl = forwardRef( UnforwardedInputControl );
 
+export type { InputControlProps };
+
 export default InputControl;

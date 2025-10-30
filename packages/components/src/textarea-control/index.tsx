@@ -89,4 +89,6 @@ function UnforwardedTextareaControl(
  */
 export const TextareaControl = forwardRef( UnforwardedTextareaControl );
 
+export type { TextareaControlProps };
+
 export default TextareaControl;

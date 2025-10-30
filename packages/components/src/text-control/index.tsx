@@ -95,4 +95,6 @@ function UnforwardedTextControl(
  */
 export const TextControl = forwardRef( UnforwardedTextControl );
 
+export type { TextControlProps };
+
 export default TextControl;

@@ -182,4 +182,6 @@ const UnconnectedDropdown = (
  */
 export const Dropdown = contextConnect( UnconnectedDropdown, 'Dropdown' );
 
+export type { DropdownProps };
+
 export default Dropdown;

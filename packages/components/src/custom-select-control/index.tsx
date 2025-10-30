@@ -212,4 +212,6 @@ function CustomSelectControl< T extends CustomSelectOption >(
 	);
 }
 
+export type { CustomSelectProps };
+
 export default CustomSelectControl;

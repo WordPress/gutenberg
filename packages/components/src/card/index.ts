@@ -4,3 +4,10 @@ export { default as CardDivider, useCardDivider } from './card-divider';
 export { default as CardFooter, useCardFooter } from './card-footer';
 export { default as CardHeader, useCardHeader } from './card-header';
 export { default as CardMedia, useCardMedia } from './card-media';
+export type {
+	Props as CardProps,
+	BodyProps as CardBodyProps,
+	FooterProps as CardFooterProps,
+	HeaderProps as CardHeaderProps,
+	MediaProps as CardMediaProps,
+} from './types';

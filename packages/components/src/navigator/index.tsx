@@ -129,3 +129,5 @@ export const Navigator = Object.assign( TopLevelNavigator, {
 		displayName: 'Navigator.BackButton',
 	} ),
 } );
+
+export type { NavigatorProps } from './types';

@@ -116,4 +116,6 @@ function ToolbarGroup( {
 	);
 }
 
+export type { ToolbarGroupProps };
+
 export default ToolbarGroup;

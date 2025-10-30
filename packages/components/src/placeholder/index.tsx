@@ -109,4 +109,6 @@ export function Placeholder(
 	);
 }
 
+export type { PlaceholderProps };
+
 export default Placeholder;

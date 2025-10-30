@@ -305,4 +305,6 @@ export function FocalPointPicker( {
 	);
 }
 
+export type { FocalPointPickerProps };
+
 export default FocalPointPicker;

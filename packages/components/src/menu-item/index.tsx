@@ -110,4 +110,6 @@ function UnforwardedMenuItem(
  */
 export const MenuItem = forwardRef( UnforwardedMenuItem );
 
+export type { MenuItemProps };
+
 export default MenuItem;

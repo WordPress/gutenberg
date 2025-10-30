@@ -405,4 +405,6 @@ function ComboboxControl( props: ComboboxControlProps ) {
 	/* eslint-enable jsx-a11y/no-static-element-interactions */
 }
 
+export type { ComboboxControlProps };
+
 export default ComboboxControl;

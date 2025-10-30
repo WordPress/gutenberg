@@ -387,6 +387,8 @@ function UnforwardedTreeGrid(
  */
 export const TreeGrid = forwardRef( UnforwardedTreeGrid );
 
+export type { TreeGridProps };
+
 export default TreeGrid;
 export { default as TreeGridRow } from './row';
 export { default as TreeGridCell } from './cell';

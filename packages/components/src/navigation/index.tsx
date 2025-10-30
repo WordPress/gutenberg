@@ -149,4 +149,6 @@ export function Navigation( {
 	);
 }
 
+export type { NavigationProps };
+
 export default Navigation;

@@ -155,4 +155,6 @@ export function CheckboxControl(
 	);
 }
 
+export type { CheckboxControlProps };
+
 export default CheckboxControl;

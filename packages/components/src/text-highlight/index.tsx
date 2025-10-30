@@ -42,4 +42,6 @@ export const TextHighlight = ( props: TextHighlightProps ) => {
 	} );
 };
 
+export type { TextHighlightProps };
+
 export default TextHighlight;

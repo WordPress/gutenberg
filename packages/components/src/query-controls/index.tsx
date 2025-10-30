@@ -204,4 +204,6 @@ export function QueryControls( {
 	);
 }
 
+export type { QueryControlsProps };
+
 export default QueryControls;

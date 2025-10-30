@@ -44,4 +44,6 @@ function UnforwardedColorIndicator(
  */
 export const ColorIndicator = forwardRef( UnforwardedColorIndicator );
 
+export type { ColorIndicatorProps };
+
 export default ColorIndicator;

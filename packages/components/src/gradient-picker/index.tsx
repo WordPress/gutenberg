@@ -245,4 +245,6 @@ export function GradientPicker( {
 	);
 }
 
+export type { GradientPickerComponentProps as GradientPickerProps };
+
 export default GradientPicker;

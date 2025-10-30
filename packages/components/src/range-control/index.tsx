@@ -410,4 +410,6 @@ function UnforwardedRangeControl(
  */
 export const RangeControl = forwardRef( UnforwardedRangeControl );
 
+export type { RangeControlProps };
+
 export default RangeControl;

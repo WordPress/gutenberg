@@ -137,4 +137,6 @@ export function DropZoneComponent( {
 	);
 }
 
+export type { DropZoneProps };
+
 export default DropZoneComponent;

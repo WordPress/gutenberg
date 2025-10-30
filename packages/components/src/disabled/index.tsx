@@ -89,4 +89,6 @@ function Disabled( {
 Disabled.Context = Context;
 Disabled.Consumer = Consumer;
 
+export type { DisabledProps };
+
 export default Disabled;

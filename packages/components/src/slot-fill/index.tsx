@@ -96,3 +96,5 @@ export function createSlotFill( key: SlotKey ) {
 		Slot: SlotComponent,
 	};
 }
+
+export type { FillProps } from './types';

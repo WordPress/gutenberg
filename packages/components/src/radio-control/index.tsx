@@ -161,4 +161,6 @@ export function RadioControl(
 	);
 }
 
+export type { RadioControlProps };
+
 export default RadioControl;

@@ -132,4 +132,5 @@ function UnforwardedToolbarButton(
  * ```
  */
 export const ToolbarButton = forwardRef( UnforwardedToolbarButton );
+export type { ToolbarButtonProps };
 export default ToolbarButton;

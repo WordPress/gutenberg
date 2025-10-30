@@ -54,4 +54,6 @@ function UnforwardedButtonGroup(
  */
 export const ButtonGroup = forwardRef( UnforwardedButtonGroup );
 
+export type { ButtonGroupProps };
+
 export default ButtonGroup;

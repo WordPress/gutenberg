@@ -40,4 +40,7 @@ const UnforwardedDisclosureContent = (
 };
 
 export const DisclosureContent = forwardRef( UnforwardedDisclosureContent );
+
+export type { DisclosureContentProps };
+
 export default DisclosureContent;

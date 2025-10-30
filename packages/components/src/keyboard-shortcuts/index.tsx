@@ -90,4 +90,6 @@ function KeyboardShortcuts( {
 	);
 }
 
+export type { KeyboardShortcutsProps };
+
 export default KeyboardShortcuts;

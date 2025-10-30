@@ -304,4 +304,6 @@ export const DropdownMenu = contextConnectWithoutRef(
 	'DropdownMenu'
 );
 
+export type { DropdownMenuProps };
+
 export default DropdownMenu;
