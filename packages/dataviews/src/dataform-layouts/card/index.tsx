@@ -199,7 +199,7 @@ export default function FormCardField< Item >( {
 
 		const sizeCardBody = withHeader
 			? {
-					blockStart: undefined,
+					blockStart: 'none' as const,
 					blockEnd: 'medium' as const,
 					inlineStart: 'medium' as const,
 					inlineEnd: 'medium' as const,
@@ -269,7 +269,7 @@ export default function FormCardField< Item >( {
 
 	const sizeCardBody = withHeader
 		? {
-				blockStart: undefined,
+				blockStart: 'none' as const,
 				blockEnd: 'medium' as const,
 				inlineStart: 'medium' as const,
 				inlineEnd: 'medium' as const,

@@ -1253,10 +1253,8 @@ const VisibilityComponent = () => {
 };
 
 const LayoutCardComponent = ( {
-	withHeader,
 	isCollapsible,
 }: {
-	withHeader: boolean;
 	isCollapsible: boolean;
 } ) => {
 	type Customer = {
@@ -1460,7 +1458,7 @@ const LayoutCardComponent = ( {
 				},
 			],
 		} ),
-		[ withHeader, isCollapsible ]
+		[ isCollapsible ]
 	);
 
 	return (
@@ -1876,7 +1874,6 @@ export const LayoutCard = {
 		withHeader: true,
 		isCollapsible: true,
 	},
-	args: { withHeader: true },
 };
 
 export const LayoutPanel = {
