@@ -25,7 +25,6 @@ import type {
 	NormalizedField,
 } from '../../types';
 import { DataFormLayout } from '../data-form-layout';
-import { isCombinedField } from '../is-combined-field';
 import { DEFAULT_LAYOUT } from '../normalize-form';
 import SummaryButton from './summary-button';
 import useFormValidity from '../../hooks/use-form-validity';
@@ -53,7 +52,7 @@ function ModalContent< Item >( {
 	const form: NormalizedForm = useMemo(
 		() => ( {
 			layout: DEFAULT_LAYOUT,
-			fields: isCombinedField( field )
+			fields: !! field.children
 				? field.children
 				: // If not explicit children return the field id itself.
 				  [ { id: field.id, layout: DEFAULT_LAYOUT } ],
@@ -142,9 +141,7 @@ function PanelModal< Item >( {
 } ) {
 	const [ isOpen, setIsOpen ] = useState( false );
 
-	const fieldLabel = isCombinedField( field )
-		? field.label
-		: fieldDefinition?.label;
+	const fieldLabel = !! field.children ? field.label : fieldDefinition?.label;
 
 	return (
 		<>

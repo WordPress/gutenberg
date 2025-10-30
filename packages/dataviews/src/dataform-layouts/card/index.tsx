@@ -23,7 +23,6 @@ import type {
 	NormalizedLayout,
 } from '../../types';
 import { DataFormLayout } from '../data-form-layout';
-import { isCombinedField } from '../is-combined-field';
 import { DEFAULT_LAYOUT } from '../normalize-form';
 import { getSummaryFields } from '../get-summary-fields';
 
@@ -166,7 +165,7 @@ export default function FormCardField< Item >( {
 	const form: NormalizedForm = useMemo(
 		() => ( {
 			layout: DEFAULT_LAYOUT as NormalizedLayout,
-			fields: isCombinedField( field ) ? field.children : [],
+			fields: field.children ?? [],
 		} ),
 		[ field ]
 	);
@@ -179,7 +178,7 @@ export default function FormCardField< Item >( {
 		isSummaryFieldVisible( summaryField, layout.summary, isOpen )
 	);
 
-	if ( isCombinedField( field ) ) {
+	if ( !! field.children ) {
 		const withHeader = !! field.label && layout.withHeader;
 
 		return (

@@ -22,7 +22,6 @@ import type {
 	NormalizedPanelLayout,
 } from '../../types';
 import DataFormContext from '../../components/dataform-context';
-import { isCombinedField } from '../is-combined-field';
 import PanelDropdown from './dropdown';
 import PanelModal from './modal';
 import { getSummaryFields } from '../get-summary-fields';
@@ -35,9 +34,9 @@ const getFieldDefinition = < Item, >(
 
 	if ( ! fieldDefinition ) {
 		return fields.find( ( _field ) => {
-			if ( isCombinedField( field ) ) {
+			if ( !! field.children ) {
 				const simpleChildren = field.children.filter(
-					( child ) => ! isCombinedField( child )
+					( child ) => ! child.children
 				);
 
 				if ( simpleChildren.length === 0 ) {
@@ -116,9 +115,7 @@ export default function FormPanelField< Item >( {
 		'dataforms-layouts-panel__field-label',
 		`dataforms-layouts-panel__field-label--label-position-${ labelPosition }`
 	);
-	const fieldLabel = isCombinedField( field )
-		? field.label
-		: fieldDefinition?.label;
+	const fieldLabel = !! field.children ? field.label : fieldDefinition?.label;
 
 	const renderedControl =
 		layout.openAs === 'modal' ? (

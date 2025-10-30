@@ -18,7 +18,6 @@ import type {
 	NormalizedRowLayout,
 } from '../../types';
 import { DataFormLayout } from '../data-form-layout';
-import { isCombinedField } from '../is-combined-field';
 import { DEFAULT_LAYOUT } from '../normalize-form';
 import { getFormFieldLayout } from '..';
 
@@ -48,7 +47,7 @@ export default function FormRowField< Item >( {
 }: FieldLayoutProps< Item > ) {
 	const layout = field.layout as NormalizedRowLayout;
 
-	if ( isCombinedField( field ) ) {
+	if ( !! field.children ) {
 		const form: NormalizedForm = {
 			layout: DEFAULT_LAYOUT as NormalizedLayout,
 			fields: field.children,

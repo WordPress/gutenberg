@@ -25,7 +25,6 @@ import type {
 } from '../../types';
 import DataFormContext from '../../components/dataform-context';
 import { DataFormLayout } from '../data-form-layout';
-import { isCombinedField } from '../is-combined-field';
 import { DEFAULT_LAYOUT } from '../normalize-form';
 
 function Header( { title }: { title: string } ) {
@@ -54,12 +53,12 @@ export default function FormRegularField< Item >( {
 	const form: NormalizedForm = useMemo(
 		() => ( {
 			layout: DEFAULT_LAYOUT,
-			fields: isCombinedField( field ) ? field.children : [],
+			fields: !! field.children ? field.children : [],
 		} ),
 		[ field ]
 	);
 
-	if ( isCombinedField( field ) ) {
+	if ( !! field.children ) {
 		return (
 			<>
 				{ ! hideLabelFromVision && field.label && (

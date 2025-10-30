@@ -15,7 +15,6 @@ import { __ } from '@wordpress/i18n';
 import normalizeFields from '../utils/normalize-fields';
 import normalizeForm from '../dataform-layouts/normalize-form';
 import type {
-	CombinedFormField,
 	Field,
 	FieldValidity,
 	Form,
@@ -119,8 +118,8 @@ function getFieldsToValidate< Item >(
 	const fieldToParent = new Map< string, string >();
 	const fieldIdsToValidate: string[] = [];
 	normalizedForm.fields.forEach( ( formField ) => {
-		if ( !! ( formField as CombinedFormField ).children ) {
-			( formField as CombinedFormField ).children.forEach( ( child ) => {
+		if ( !! formField.children ) {
+			formField.children.forEach( ( child ) => {
 				const childId = typeof child === 'string' ? child : child.id;
 				fieldIdsToValidate.push( childId );
 				fieldToParent.set( childId, formField.id );

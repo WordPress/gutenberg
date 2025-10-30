@@ -108,38 +108,20 @@ export type NormalizedSummaryField =
 	| NormalizedPanelSummaryField
 	| NormalizedCardSummaryField;
 
-export type SimpleFormField = {
-	id: string;
-	layout?: Layout;
-	label?: string;
-	description?: string;
-};
-export type NormalizedSimpleFormField = {
-	id: string;
-	layout: NormalizedLayout;
-	label?: string;
-	description?: string;
-};
-
-export type CombinedFormField = {
+export type FormField = {
 	id: string;
 	label?: string;
 	description?: string;
 	layout?: Layout;
-	children: Array< FormField | string >;
+	children?: Array< FormField | string >;
 };
-export type NormalizedCombinedFormField = {
+export type NormalizedFormField = {
 	id: string;
+	layout: NormalizedLayout;
 	label?: string;
 	description?: string;
-	layout: NormalizedLayout;
-	children: NormalizedFormField[];
+	children?: NormalizedFormField[];
 };
-
-export type FormField = SimpleFormField | CombinedFormField;
-export type NormalizedFormField =
-	| NormalizedSimpleFormField
-	| NormalizedCombinedFormField;
 
 /**
  * The form configuration.

@@ -12,11 +12,9 @@ import type {
 	FormValidity,
 	NormalizedForm,
 	NormalizedFormField,
-	NormalizedSimpleFormField,
 } from '../types';
 import { getFormFieldLayout } from './index';
 import DataFormContext from '../components/dataform-context';
-import { isCombinedField } from './is-combined-field';
 
 const DEFAULT_WRAPPER = ( { children }: { children: React.ReactNode } ) => (
 	<VStack className="dataforms-layouts__wrapper" spacing={ 4 }>
@@ -51,7 +49,7 @@ export function DataFormLayout< Item >( {
 } ) {
 	const { fields: fieldDefinitions } = useContext( DataFormContext );
 
-	function getFieldDefinition( field: NormalizedSimpleFormField ) {
+	function getFieldDefinition( field: NormalizedFormField ) {
 		return fieldDefinitions.find(
 			( fieldDefinition ) => fieldDefinition.id === field.id
 		);
@@ -72,7 +70,7 @@ export function DataFormLayout< Item >( {
 					return null;
 				}
 
-				const fieldDefinition = ! isCombinedField( formField )
+				const fieldDefinition = !! formField.children
 					? getFieldDefinition( formField )
 					: undefined;
 

@@ -13,9 +13,6 @@ import type {
 	NormalizedRowLayout,
 	NormalizedCardSummaryField,
 	CardSummaryField,
-	CombinedFormField,
-	NormalizedSimpleFormField,
-	NormalizedCombinedFormField,
 } from '../types';
 
 export const DEFAULT_LAYOUT: NormalizedLayout = {
@@ -111,26 +108,12 @@ function normalizeForm( form: Form ): NormalizedForm {
 				return {
 					id: field,
 					layout: normalizedFormLayout,
-				} satisfies NormalizedSimpleFormField;
+				} satisfies NormalizedFormField;
 			}
 
 			const fieldLayout = field.layout
 				? normalizeLayout( field.layout )
 				: normalizedFormLayout;
-
-			if (
-				! ( 'children' in field ) ||
-				! Array.isArray( field.children )
-			) {
-				return {
-					id: field.id,
-					layout: fieldLayout,
-					...( !! field.label && { label: field.label } ),
-					...( !! field.description && {
-						description: field.description,
-					} ),
-				} satisfies NormalizedSimpleFormField;
-			}
 
 			return {
 				id: field.id,
@@ -139,11 +122,14 @@ function normalizeForm( form: Form ): NormalizedForm {
 				...( !! field.description && {
 					description: field.description,
 				} ),
-				children: normalizeForm( {
-					fields: ( field as CombinedFormField ).children,
-					layout: fieldLayout,
-				} ).fields,
-			} satisfies NormalizedCombinedFormField;
+				...( 'children' in field &&
+					Array.isArray( field.children ) && {
+						children: normalizeForm( {
+							fields: field.children,
+							layout: fieldLayout,
+						} ).fields,
+					} ),
+			} satisfies NormalizedFormField;
 		}
 	);
 
