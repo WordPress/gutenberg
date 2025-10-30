@@ -44,9 +44,9 @@ Determines the amount of padding within the component. Can be specified either a
 
     ```ts
     {
-      blockStart?: 'xSmall' | 'small' | 'medium' | 'large';
-      blockEnd?: 'xSmall' | 'small' | 'medium' | 'large';
-      inlineStart?: 'xSmall' | 'small' | 'medium' | 'large';
-      inlineEnd?: 'xSmall' | 'small' | 'medium' | 'large';
+      blockStart: 'xSmall' | 'small' | 'medium' | 'large';
+      blockEnd: 'xSmall' | 'small' | 'medium' | 'large';
+      inlineStart: 'xSmall' | 'small' | 'medium' | 'large';
+      inlineEnd: 'xSmall' | 'small' | 'medium' | 'large';
     }
     ```
