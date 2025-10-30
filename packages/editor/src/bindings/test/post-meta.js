@@ -106,7 +106,7 @@ describe( 'post-meta bindings', () => {
 		} );
 
 		describe( 'getFieldsList', () => {
-			it( 'should return the list of available meta fields, with correct fallbacks for labels', () => {
+			it( 'should return the list of available meta fields, with correct fallbacks for labels, and exclude protected fields', () => {
 				const fields = postMetaBindings.getFieldsList( {
 					select,
 					context,
