@@ -62,15 +62,15 @@ function getValue( { select, context, args } ) {
 		( field ) => field.args.key === args.key
 	);
 
-	// Without a postId, we cannot look up a meta value.
-	if ( ! context?.postId ) {
-		// Return the default value for the meta field if available.
-		return metaField?.default || metaField?.label || args.key;
-	}
-
 	// If the meta field was not found, it's either protected, inaccessible, or simply doesn't exist.
 	if ( ! metaField ) {
 		return args.key;
+	}
+
+	// Without a postId, we cannot look up a meta value.
+	if ( ! context?.postId ) {
+		// Return the default value for the meta field if available.
+		return metaField.default || metaField.label || args.key;
 	}
 
 	const { getEditedEntityRecord } = select( coreDataStore );
