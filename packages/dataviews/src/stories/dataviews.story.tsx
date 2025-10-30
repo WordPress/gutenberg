@@ -366,7 +366,7 @@ export const WithCard = () => {
 		layout: {
 			styles: {
 				__default__: {
-					paddingInlineStart: '10px',
+					paddingInline: '100px',
 				},
 			},
 		},

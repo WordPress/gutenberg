@@ -7,7 +7,13 @@ import type { ReactNode, ComponentProps, ReactElement } from 'react';
  * WordPress dependencies
  */
 import { __experimentalHStack as HStack } from '@wordpress/components';
-import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
+import {
+	useContext,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { useResizeObserver, throttle } from '@wordpress/compose';
 
 /**
@@ -88,6 +94,8 @@ function DefaultUI( {
 	search = true,
 	searchLabel = undefined,
 }: DefaultUIProps ) {
+	const { view } = useContext( DataViewsContext );
+
 	return (
 		<>
 			<HStack
@@ -95,6 +103,7 @@ function DefaultUI( {
 				justify="space-between"
 				className="dataviews__view-actions"
 				spacing={ 1 }
+				style={ view.layout?.styles?.__default__ }
 			>
 				<HStack
 					justify="start"

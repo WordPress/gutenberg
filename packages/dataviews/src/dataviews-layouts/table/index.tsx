@@ -268,6 +268,7 @@ function TableRow< Item >( {
 							isActionsColumnSticky,
 					} ) }
 					onClick={ ( e ) => e.stopPropagation() }
+					style={ getColumnStyles( view, '__actions__' ) }
 				>
 					<ItemActions item={ item } actions={ actions } />
 				</td>

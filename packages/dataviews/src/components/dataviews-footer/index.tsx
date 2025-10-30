@@ -41,6 +41,7 @@ export default function DataViewsFooter() {
 				expanded={ false }
 				justify="end"
 				className="dataviews-footer"
+				style={ view.layout?.styles?.__default__ }
 			>
 				{ hasBulkActions && <BulkActionsFooter /> }
 				<DataViewsPagination />

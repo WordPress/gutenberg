@@ -226,6 +226,13 @@ export interface ViewTable extends ViewBase {
 
 export interface ViewList extends ViewBase {
 	type: 'list';
+
+	layout?: {
+		/**
+		 * The styles for the list.
+		 */
+		styles?: Record< string, ColumnStyle >;
+	};
 }
 
 export interface ViewGrid extends ViewBase {
@@ -241,6 +248,11 @@ export interface ViewGrid extends ViewBase {
 		 * The preview size of the grid.
 		 */
 		previewSize?: number;
+
+		/**
+		 * The styles for the list.
+		 */
+		styles?: Record< string, ColumnStyle >;
 	};
 }
 
@@ -257,6 +269,11 @@ export interface ViewPickerGrid extends ViewBase {
 		 * The preview size of the grid.
 		 */
 		previewSize?: number;
+
+		/**
+		 * The styles for the list.
+		 */
+		styles?: Record< string, ColumnStyle >;
 	};
 }
 
