@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Expose the TS types for props of public components ([#72831](https://github.com/WordPress/gutenberg/pull/72831)).
+
 ## 30.7.0 (2025-10-29)
 
 ### Bug Fixes
