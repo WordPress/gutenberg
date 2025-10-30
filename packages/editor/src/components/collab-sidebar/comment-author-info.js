@@ -94,7 +94,7 @@ function CommentAuthorInfo( { avatar, name, date, userId } ) {
 					{ name ?? currentUserName }
 				</span>
 				{ date && (
-					<Tooltip placement="top" text={ tooltipText }>
+					<Tooltip placement="bottom" text={ tooltipText }>
 						<time
 							dateTime={ commentDateTime }
 							className="editor-collab-sidebar-panel__user-time"
