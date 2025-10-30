@@ -5,7 +5,7 @@ import type { SurfaceProps } from '../surface/types';
 import type { FlexProps } from '../flex/types';
 
 type DeprecatedSizeOptions = 'extraSmall';
-export type SizeToken = 'xSmall' | 'small' | 'medium' | 'large';
+export type SizeToken = 'xSmall' | 'small' | 'medium' | 'large' | 'none';
 
 export type SizeOptions =
 	| SizeToken
