@@ -21,6 +21,9 @@ const xSmallCardPadding = css`
 `;
 
 export const cardPaddings = {
+	none: css`
+		padding: 0;
+	`,
 	large: css`
 		padding: ${ CONFIG.cardPaddingLarge };
 	`,
@@ -46,6 +49,8 @@ const getSinglePaddingValue = ( size: SizeToken ): string | undefined => {
 			return space( 6 );
 		case 'large':
 			return space( 8 );
+		case 'none':
+			return '0';
 		default:
 			return space( 6 );
 	}

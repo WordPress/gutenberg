@@ -63,15 +63,15 @@ Determines the amount of padding within the component. Can be specified either a
 - Required: No
 - Default: `medium`
 - Allowed values:
-   	- Single size token: `xSmall`, `small`, `medium`, `large`
+   	- Single size token: `none`, `xSmall`, `small`, `medium`, `large`
    	- Object:
 
     ```ts
     {
-      blockStart: 'xSmall' | 'small' | 'medium' | 'large';
-      blockEnd: 'xSmall' | 'small' | 'medium' | 'large';
-      inlineStart: 'xSmall' | 'small' | 'medium' | 'large';
-      inlineEnd: 'xSmall' | 'small' | 'medium' | 'large';
+      blockStart: 'none' | 'xSmall' | 'small' | 'medium' | 'large';
+      blockEnd: 'none' | 'xSmall' | 'small' | 'medium' | 'large';
+      inlineStart: 'none' | 'xSmall' | 'small' | 'medium' | 'large';
+      inlineEnd: 'none' | 'xSmall' | 'small' | 'medium' | 'large';
     }
     ```
 
