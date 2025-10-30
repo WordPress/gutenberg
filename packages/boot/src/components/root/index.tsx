@@ -6,6 +6,7 @@ import { Outlet } from '@tanstack/react-router';
 /**
  * WordPress dependencies
  */
+// @ts-expect-error Commands is not typed properly.
 import { CommandMenu } from '@wordpress/commands';
 import { privateApis as themePrivateApis } from '@wordpress/theme';
 

@@ -13,6 +13,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { search } from '@wordpress/icons';
 import { rawShortcut } from '@wordpress/keycodes';
+// @ts-expect-error Commands is not typed properly.
 import { store as commandsStore } from '@wordpress/commands';
 import { filterURLForDisplay } from '@wordpress/url';
 import type { UnstableBase } from '@wordpress/core-data';

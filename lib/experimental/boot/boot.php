@@ -69,7 +69,7 @@ function gutenberg_boot_admin_page() {
 		// Dummy script module to ensure dependencies are loaded.
 		wp_register_script_module(
 			'gutenberg-boot',
-			gutenberg_url( 'loader.js' ),
+			gutenberg_url( 'lib/experimental/boot/loader.js' ),
 			array(
 				'import' => 'static',
 				'id'     => '@wordpress/boot',
