@@ -38,6 +38,7 @@ import {
 	TEMPLATE_POST_TYPE,
 } from '../../store/constants';
 import { useZoomOutModeExit } from './use-zoom-out-mode-exit';
+import { useEditorCanvas } from '../provider/editor-canvas-context';
 
 const {
 	LayoutStyle,
@@ -332,28 +333,57 @@ function VisualEditor( {
 		// Disable resizing in zoomed-out mode.
 		! isZoomedOut;
 
+	const { canvasMinHeight } = useEditorCanvas();
+	const iframeRef = useRef();
+
+	// Calculate the iframe body min-height including scroll offset to fit all floating notes.
+	const calculatedMinHeight = useMemo( () => {
+		if ( ! canvasMinHeight || ! iframeRef.current ) {
+			return '';
+		}
+
+		// Parse the pixel value from canvasMinHeight (e.g., "1234px" → 1234).
+		const minHeightValue = parseInt( canvasMinHeight, 10 );
+		if ( isNaN( minHeightValue ) || minHeightValue <= 0 ) {
+			return '';
+		}
+
+		// Get scroll position from iframe.
+		const iframe = iframeRef.current;
+		let scrollTop = 0;
+		if ( iframe?.contentDocument ) {
+			scrollTop =
+				iframe.contentDocument.documentElement.scrollTop ||
+				iframe.contentDocument.body.scrollTop;
+		}
+
+		return `${ minHeightValue + scrollTop }px`;
+	}, [ canvasMinHeight ] );
+
 	const iframeStyles = useMemo( () => {
+		const baseMinHeight = calculatedMinHeight || '100vh';
+
 		return [
 			...( styles ?? [] ),
 			{
 				// Ensures margins of children are contained so that the body background paints behind them.
-				// Otherwise, the background of html (when zoomed out) would show there and appear broken. It’s
+				// Otherwise, the background of html (when zoomed out) would show there and appear broken. It's
 				// important mostly for post-only views yet conceivably an issue in templated views too.
-				css: `:where(.block-editor-iframe__body){display:flow-root;}.is-root-container{display:flow-root;${
+				css: `:where(.block-editor-iframe__body){display:flow-root;${ calculatedMinHeight ? `min-height:${ calculatedMinHeight };` : '' }}.is-root-container{display:flow-root;${
 					// Some themes will have `min-height: 100vh` for the root container,
 					// which isn't a requirement in auto resize mode.
 					enableResizing ? 'min-height:0!important;' : ''
 				}}
 				${
 					enableResizing
-						? '.block-editor-iframe__html{background:var(--wp-editor-canvas-background);display:flex;align-items:center;justify-content:center;min-height:100vh;}.block-editor-iframe__body{width:100%;}'
+						? `.block-editor-iframe__html{background:var(--wp-editor-canvas-background);display:flex;align-items:center;justify-content:center;min-height:${ baseMinHeight };}.block-editor-iframe__body{width:100%;}`
 						: ''
 				}`,
 				// The CSS above centers the body content vertically when resizing is enabled and applies a background
 				// color to the iframe HTML element to match the background color of the editor canvas.
 			},
 		];
-	}, [ styles, enableResizing ] );
+	}, [ styles, enableResizing, calculatedMinHeight ] );
 
 	const localRef = useRef();
 	const typewriterRef = useTypewriter();
@@ -369,6 +399,13 @@ function VisualEditor( {
 		} ),
 		useZoomOutModeExit(),
 	] );
+
+	// Update iframe ref when the iframe element changes
+	useEffect( () => {
+		if ( ! disableIframe && localRef.current?.parentNode ) {
+			iframeRef.current = localRef.current.parentNode;
+		}
+	}, [ disableIframe ] );
 
 	return (
 		<div
