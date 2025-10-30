@@ -112,11 +112,13 @@ export type SimpleFormField = {
 	id: string;
 	layout?: Layout;
 	label?: string;
+	description?: string;
 };
 export type NormalizedSimpleFormField = {
 	id: string;
 	layout: NormalizedLayout;
 	label?: string;
+	description?: string;
 };
 
 export type CombinedFormField = {

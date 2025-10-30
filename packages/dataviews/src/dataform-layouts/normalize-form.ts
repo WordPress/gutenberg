@@ -126,6 +126,9 @@ function normalizeForm( form: Form ): NormalizedForm {
 					id: field.id,
 					layout: fieldLayout,
 					...( !! field.label && { label: field.label } ),
+					...( !! field.description && {
+						description: field.description,
+					} ),
 				} satisfies NormalizedSimpleFormField;
 			}
 
