@@ -291,9 +291,16 @@ export function Comments( {
 					setShowCommentBoard={ setShowCommentBoard }
 					commentSidebarRef={ commentSidebarRef }
 				/>
-				<Text as="p">{ __( 'No notes available.' ) }</Text>
+				<Text as="p">
+					{ __(
+						'No notes have been created yet for this post. To start discussing edits, find “Add note 💬” in a block’s Options menu.'
+					) }
+				</Text>
+				<hr />
 				<Text as="p" variant="muted">
-					{ __( 'Only logged in users can see Notes.' ) }
+					{ __(
+						'Notes are private and only visible to those with the capability to edit or review their associated post.'
+					) }
 				</Text>
 			</>
 		);
