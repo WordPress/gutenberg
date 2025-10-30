@@ -9,14 +9,16 @@ import { lock } from '../../lock-unlock';
 import postMetaBindings from '../post-meta';
 
 describe( 'post-meta bindings', () => {
-	let select, selectReturn;
+	let context, select, selectReturn;
+
 	beforeAll( () => {
 		const getEditedEntityRecord = ( kind, type, id ) => ( {
-			meta: id
-				? {
-						movie_field: 'Test Movie Value',
-				  }
-				: {},
+			meta:
+				id === 123
+					? {
+							movie_field: 'Test Movie Value',
+					  }
+					: {},
 		} );
 
 		const getEditorSettings = () => ( {
@@ -48,12 +50,16 @@ describe( 'post-meta bindings', () => {
 		select = () => selectReturn;
 	} );
 
-	describe( 'getValues', () => {
-		describe( 'when no postId is provided in context', () => {
+	describe( 'when no postId is provided in context', () => {
+		beforeAll( () => {
+			context = { postType: 'movie' };
+		} );
+
+		describe( 'getValues', () => {
 			it( 'should return the meta default value if it is defined', () => {
 				const values = postMetaBindings.getValues( {
 					select,
-					context: { postType: 'movie' },
+					context,
 					bindings: {
 						content: {
 							args: { key: 'movie_field' },
@@ -67,7 +73,7 @@ describe( 'post-meta bindings', () => {
 			it( 'should fall back to the field label if the meta default value is not defined', () => {
 				const values = postMetaBindings.getValues( {
 					select,
-					context: { postType: 'movie' },
+					context,
 					bindings: {
 						content: {
 							args: { key: 'field_with_label_only' },
@@ -81,7 +87,7 @@ describe( 'post-meta bindings', () => {
 			it( 'should fall back to the field key if the field label is not defined', () => {
 				const values = postMetaBindings.getValues( {
 					select,
-					context: { postType: 'movie' },
+					context,
 					bindings: {
 						content: {
 							args: { key: 'field_without_label_or_default' },
@@ -94,12 +100,18 @@ describe( 'post-meta bindings', () => {
 				);
 			} );
 		} );
+	} );
 
-		describe( 'when postId is provided in context', () => {
+	describe( 'when postId is provided in context', () => {
+		beforeAll( () => {
+			context = { postType: 'movie', postId: 123 };
+		} );
+
+		describe( 'getValues', () => {
 			it( 'should return the meta value if it is defined', () => {
 				const values = postMetaBindings.getValues( {
 					select,
-					context: { postType: 'movie', postId: 123 },
+					context,
 					bindings: {
 						content: {
 							args: { key: 'movie_field' },
@@ -113,7 +125,7 @@ describe( 'post-meta bindings', () => {
 			it( 'should fall back to the key when meta field is not accessible', () => {
 				const values = postMetaBindings.getValues( {
 					select,
-					context: { postType: 'movie', postId: 123 },
+					context,
 					bindings: {
 						content: {
 							args: { key: 'inaccessible_field' },
@@ -124,31 +136,31 @@ describe( 'post-meta bindings', () => {
 				expect( values.content ).toBe( 'inaccessible_field' );
 			} );
 		} );
-	} );
 
-	describe( 'canUserEditValue', () => {
-		beforeAll( () => {
-			select = () => ( { ...selectReturn, canUser: () => true } );
-		} );
-
-		it( 'should return false when meta field is not accessible', () => {
-			const canUser = postMetaBindings.canUserEditValue( {
-				select,
-				context: { postType: 'movie', postId: 123 },
-				args: { key: 'inaccessible_field' },
+		describe( 'canUserEditValue', () => {
+			beforeAll( () => {
+				select = () => ( { ...selectReturn, canUser: () => true } );
 			} );
 
-			expect( canUser ).toBe( false );
-		} );
+			it( 'should return false when meta field is not accessible', () => {
+				const canUser = postMetaBindings.canUserEditValue( {
+					select,
+					context,
+					args: { key: 'inaccessible_field' },
+				} );
 
-		it( 'should return false when meta field is protected', () => {
-			const canUser = postMetaBindings.canUserEditValue( {
-				select,
-				context: { postType: 'movie', postId: 123 },
-				args: { key: '_protected_field' },
+				expect( canUser ).toBe( false );
 			} );
 
-			expect( canUser ).toBe( false );
+			it( 'should return false when meta field is protected', () => {
+				const canUser = postMetaBindings.canUserEditValue( {
+					select,
+					context,
+					args: { key: '_protected_field' },
+				} );
+
+				expect( canUser ).toBe( false );
+			} );
 		} );
 	} );
 } );
