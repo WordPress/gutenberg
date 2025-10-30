@@ -38,6 +38,9 @@ describe( 'post-meta bindings', () => {
 				title: 'Movie Field Label',
 				default: 'Movie field default value',
 			},
+			_protected_field: {
+				default: 'Protected field value',
+			},
 		} );
 
 		lock( selectReturn, { getRegisteredPostMeta } );
@@ -133,6 +136,16 @@ describe( 'post-meta bindings', () => {
 				select,
 				context: { postType: 'movie', postId: 123 },
 				args: { key: 'inaccessible_field' },
+			} );
+
+			expect( canUser ).toBe( false );
+		} );
+
+		it( 'should return false when meta field is protected', () => {
+			const canUser = postMetaBindings.canUserEditValue( {
+				select,
+				context: { postType: 'movie', postId: 123 },
+				args: { key: '_protected_field' },
 			} );
 
 			expect( canUser ).toBe( false );
