@@ -68,6 +68,11 @@ function getValue( { select, context, args } ) {
 		return metaField?.default || metaField?.label || args.key;
 	}
 
+	// If the meta field was not found, it's either protected, inaccessible, or simply doesn't exist.
+	if ( ! metaField ) {
+		return args.key;
+	}
+
 	const { getEditedEntityRecord } = select( coreDataStore );
 	const entityMetaValues = getEditedEntityRecord(
 		'postType',
