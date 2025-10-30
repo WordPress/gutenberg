@@ -16,12 +16,12 @@ $gutenberg_boot_menu_items = array();
 /**
  * Register a boot menu item.
  *
- * @param string $id     Unique menu item ID.
- * @param string $label  Menu item label.
- * @param string $to     Route path the menu item links to.
- * @param string $parent Optional parent menu item ID.
+ * @param string $id        Unique menu item ID.
+ * @param string $label     Menu item label.
+ * @param string $to        Route path the menu item links to.
+ * @param string $parent_id Optional parent menu item ID.
  */
-function gutenberg_register_boot_menu_item( $id, $label, $to, $parent = '' ) {
+function gutenberg_register_boot_menu_item( $id, $label, $to, $parent_id = '' ) {
 	global $gutenberg_boot_menu_items;
 
 	$menu_item = array(
@@ -31,8 +31,8 @@ function gutenberg_register_boot_menu_item( $id, $label, $to, $parent = '' ) {
 	);
 
 	// Only include parent if it's not empty (matches next-admin approach).
-	if ( ! empty( $parent ) ) {
-		$menu_item['parent'] = $parent;
+	if ( ! empty( $parent_id ) ) {
+		$menu_item['parent'] = $parent_id;
 	}
 
 	$gutenberg_boot_menu_items[] = $menu_item;
