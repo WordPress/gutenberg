@@ -28,30 +28,30 @@ import PanelModal from './modal';
 import { getSummaryFields } from '../get-summary-fields';
 
 const getFieldDefinition = < Item, >(
-	formField: NormalizedFormField,
+	field: NormalizedFormField,
 	fields: NormalizedField< Item >[]
 ) => {
-	const field = fields.find( ( _field ) => _field.id === formField.id );
+	const fieldDefinition = fields.find( ( _field ) => _field.id === field.id );
 
-	if ( field ) {
-		return field;
-	}
+	if ( ! fieldDefinition ) {
+		return fields.find( ( _field ) => {
+			if ( isCombinedField( field ) ) {
+				const simpleChildren = field.children.filter(
+					( child ) => ! isCombinedField( child )
+				);
 
-	return fields.find( ( _field ) => {
-		if ( isCombinedField( formField ) ) {
-			const simpleChildren = formField.children.filter(
-				( child ) => ! isCombinedField( child )
-			);
+				if ( simpleChildren.length === 0 ) {
+					return false;
+				}
 
-			if ( simpleChildren.length === 0 ) {
-				return false;
+				return _field.id === simpleChildren[ 0 ].id;
 			}
 
-			return _field.id === simpleChildren[ 0 ].id;
-		}
+			return _field.id === field.id;
+		} );
+	}
 
-		return _field.id === formField.id;
-	} );
+	return fieldDefinition;
 };
 
 /**
