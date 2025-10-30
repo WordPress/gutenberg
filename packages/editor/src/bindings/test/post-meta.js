@@ -17,6 +17,7 @@ describe( 'post-meta bindings', () => {
 				id === 123
 					? {
 							movie_field: 'Test Movie Value',
+							_protected_field: 'Protected field value',
 					  }
 					: {},
 		} );
@@ -41,7 +42,7 @@ describe( 'post-meta bindings', () => {
 				default: 'Movie field default value',
 			},
 			_protected_field: {
-				default: 'Protected field value',
+				default: 'Protected field default value',
 			},
 		} );
 
