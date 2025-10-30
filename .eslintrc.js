@@ -76,7 +76,7 @@ const restrictedSyntax = [
 	// here. That's why we use \\u002F in the regexes below.
 	{
 		selector:
-			'ImportDeclaration[source.value=/^@wordpress\\u002F.+\\u002F/]',
+			'ImportDeclaration[source.value=/^@wordpress\\u002F.+\\u002F/]:not([source.value=/^@wordpress\\u002F.+\\u002Fbuild-types\\u002F/])',
 		message: 'Path access on WordPress dependencies is not allowed.',
 	},
 	{

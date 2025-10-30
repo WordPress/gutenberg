@@ -240,5 +240,3 @@ export { default as withSpokenMessages } from './higher-order/with-spoken-messag
 
 // Private APIs.
 export { privateApis } from './private-apis';
-export type { ItemProps } from './item-group/types';
-export type { WordPressComponentProps } from './context';
