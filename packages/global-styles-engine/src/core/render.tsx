@@ -155,6 +155,7 @@ const ELEMENT_CLASS_NAMES = {
 const BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS = {
 	__experimentalBorder: 'border',
 	color: 'color',
+	dimensions: 'dimensions',
 	spacing: 'spacing',
 	typography: 'typography',
 };
