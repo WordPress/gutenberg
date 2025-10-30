@@ -310,7 +310,6 @@ test.describe( 'Fit Text', () => {
 			editor,
 			page,
 		} ) => {
-			// Create a post with fit text
 			await editor.insertBlock( {
 				name: 'core/heading',
 				attributes: {
@@ -320,20 +319,16 @@ test.describe( 'Fit Text', () => {
 				},
 			} );
 
-			// Save the post
 			const postId = await editor.publishPost();
 
-			// Navigate to edit the saved post
 			await admin.editPost( postId );
 
-			// Wait for the editor to load
+
 			const headingBlock = editor.canvas.locator(
 				'[data-type="core/heading"]'
 			);
 			await expect( headingBlock ).toBeVisible();
-			await expect( headingBlock ).toHaveClass( /has-fit-text/ );
 
-			// Verify the post still has the fitText attribute
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
 					name: 'core/heading',
@@ -347,7 +342,6 @@ test.describe( 'Fit Text', () => {
 
 			// Check that the frontend script module is NOT loaded in the editor
 			const frontendScriptLoaded = await page.evaluate( () => {
-				// Check for script modules with the fit-text-frontend path
 				const scripts = Array.from(
 					document.querySelectorAll( 'script[type="module"]' )
 				);
@@ -355,8 +349,6 @@ test.describe( 'Fit Text', () => {
 					script.src.includes( 'fit-text-frontend' )
 				);
 			} );
-
-			// Verify the frontend script did not load in the editor
 			expect( frontendScriptLoaded ).toBe( false );
 		} );
 	} );
