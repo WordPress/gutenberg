@@ -149,8 +149,10 @@ export function Comments( {
 
 	// Auto-select the related comment thread when a block is selected.
 	useEffect( () => {
-		setSelectedThread( blockCommentId ?? undefined );
-	}, [ blockCommentId ] );
+		// Fallback to 'new-note-thread' when showing the comment board for a new note.
+		const fallback = showCommentBoard ? 'new-note-thread' : null;
+		setSelectedThread( blockCommentId ?? fallback );
+	}, [ blockCommentId, showCommentBoard ] );
 
 	const setBlockRef = useCallback( ( id, blockRef ) => {
 		setBlockRefs( ( prev ) => ( { ...prev, [ id ]: blockRef } ) );

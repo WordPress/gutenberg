@@ -309,10 +309,12 @@ function gutenberg_resolve_block_template( $template_type, $template_hierarchy, 
 	}
 
 	// For any remaining slugs, use the static template.
-	$query     = array(
-		'slug__in' => $remaining_slugs,
-	);
-	$templates = array_merge( $templates, gutenberg_get_registered_block_templates( $query ) );
+	if ( ! empty( $remaining_slugs ) ) {
+		$query     = array(
+			'slug__in' => $remaining_slugs,
+		);
+		$templates = array_merge( $templates, gutenberg_get_registered_block_templates( $query ) );
+	}
 
 	if ( $specific_template && in_array( $specific_template, $remaining_slugs, true ) ) {
 		$templates = array_merge( $templates, get_block_templates( array( 'slug__in' => array( $specific_template ) ) ) );

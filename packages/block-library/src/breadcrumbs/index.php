@@ -17,9 +17,8 @@
  * @return string Returns the post breadcrumb for hierarchical post types.
  */
 function render_block_core_breadcrumbs( $attributes, $content, $block ) {
-	// Exclude breadcrumbs from special contexts like search, 404, etc.
-	// until they are explicitly supported.
-	if ( is_search() || is_404() || is_home() || is_front_page() ) {
+	// Exclude breadcrumbs from special contexts.
+	if ( is_home() || is_front_page() ) {
 		return '';
 	}
 
@@ -33,8 +32,23 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		);
 	}
 
-	// Handle archive pages (taxonomy, post type, date, author archives).
-	if ( is_archive() ) {
+	// Handle search results.
+	if ( is_search() ) {
+		$search_query       = get_search_query();
+		$breadcrumb_items[] = sprintf(
+			'<span aria-current="page">%s</span>',
+			/* translators: %s: search query */
+			sprintf( esc_html__( 'Search results for: "%s"' ), esc_html( $search_query ) )
+		);
+		$breadcrumb_items = block_core_breadcrumbs_maybe_add_paged( $breadcrumb_items );
+	} elseif ( is_404() ) {
+		// Handle 404 pages.
+		$breadcrumb_items[] = sprintf(
+			'<span aria-current="page">%s</span>',
+			esc_html__( '404 Not Found' )
+		);
+	} elseif ( is_archive() ) {
+		// Handle archive pages (taxonomy, post type, date, author archives).
 		$archive_breadcrumbs = block_core_breadcrumbs_get_archive_breadcrumbs();
 		if ( ! empty( $archive_breadcrumbs ) ) {
 			$breadcrumb_items = array_merge( $breadcrumb_items, $archive_breadcrumbs );
@@ -100,6 +114,47 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 	);
 
 	return $breadcrumb_html;
+}
+
+/**
+ * Adds pagination breadcrumb if on a paged view.
+ *
+ * Converts the last breadcrumb item to a link and adds "Page X" as the current page.
+ *
+ * @since 6.9.0
+ *
+ * @param array $breadcrumb_items Array of breadcrumb HTML items.
+ *
+ * @return array Modified breadcrumb items with pagination if applicable.
+ */
+function block_core_breadcrumbs_maybe_add_paged( $breadcrumb_items ) {
+	$paged = (int) get_query_var( 'paged' );
+	if ( $paged > 1 ) {
+		// Get the last breadcrumb item (the current page).
+		$last_item = array_pop( $breadcrumb_items );
+
+		if ( $last_item ) {
+			// Get URL for page 1.
+			$current_url = get_pagenum_link( 1 );
+
+			// Convert span to link by replacing the opening/closing tags.
+			$linked_item        = str_replace(
+				array( '<span aria-current="page">', '</span>' ),
+				array( '<a href="' . esc_url( $current_url ) . '">', '</a>' ),
+				$last_item
+			);
+			$breadcrumb_items[] = $linked_item;
+		}
+
+		// Add the "Page X" as the current page.
+		$breadcrumb_items[] = sprintf(
+			'<span aria-current="page">%s</span>',
+			/* translators: %s: page number */
+			sprintf( esc_html__( 'Page %s' ), number_format_i18n( $paged ) )
+		);
+	}
+
+	return $breadcrumb_items;
 }
 
 /**
@@ -227,6 +282,9 @@ function block_core_breadcrumbs_get_archive_breadcrumbs() {
 			}
 		}
 
+		// Add pagination breadcrumb if on a paged date archive.
+		$breadcrumb_items = block_core_breadcrumbs_maybe_add_paged( $breadcrumb_items );
+
 		return $breadcrumb_items;
 	}
 
@@ -274,6 +332,9 @@ function block_core_breadcrumbs_get_archive_breadcrumbs() {
 			esc_html( $author->display_name )
 		);
 	}
+
+	// Add pagination breadcrumb if on a paged archive.
+	$breadcrumb_items = block_core_breadcrumbs_maybe_add_paged( $breadcrumb_items );
 
 	return $breadcrumb_items;
 }
