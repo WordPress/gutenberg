@@ -72,3 +72,9 @@ function gutenberg_pre_init() {
 
 	require_once __DIR__ . '/lib/load.php';
 }
+
+add_action( 'admin_enqueue_scripts', function () {
+	wp_register_style( 'admin-inline-style', false );
+	wp_enqueue_style( 'admin-inline-style' );
+	wp_add_inline_style( 'admin-inline-style', '@view-transition { navigation: auto; }' );
+} );
