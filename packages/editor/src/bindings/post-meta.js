@@ -48,6 +48,7 @@ function getPostMetaFields( select, context ) {
 		metaFields.push( {
 			label: props.title || key,
 			args: { key },
+			default: props.default,
 			type: props.type,
 		} );
 	} );
@@ -56,17 +57,23 @@ function getPostMetaFields( select, context ) {
 }
 
 function getValue( { select, context, args } ) {
+	const metaFields = getPostMetaFields( select, context );
+	const metaField = metaFields.find(
+		( field ) => field.args.key === args.key
+	);
+
+	// Without a postId, we cannot look up a meta value.
+	if ( ! context?.postId ) {
+		// Return the default value for the meta field if available.
+		return metaField?.default || metaField?.label || args.key;
+	}
+
 	const { getEditedEntityRecord } = select( coreDataStore );
 	const entityMetaValues = getEditedEntityRecord(
 		'postType',
 		context?.postType,
 		context?.postId
 	).meta;
-
-	const metaFields = getPostMetaFields( select, context );
-	const metaField = metaFields.find(
-		( field ) => field.args.key === args.key
-	);
 
 	return entityMetaValues?.[ args.key ] ?? metaField?.label ?? args.key;
 }
@@ -137,6 +144,6 @@ export default {
 		return true;
 	},
 	getFieldsList( { select, context } ) {
-		return getPostMetaFields( select, context );
-	},
+		return getPostMetaFields( select, context ); // TODO: Remove defaults.
+	}
 };
