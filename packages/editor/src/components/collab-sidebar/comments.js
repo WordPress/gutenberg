@@ -170,7 +170,7 @@ export function Comments( {
 			const offsets = {};
 
 			if ( ! isFloating ) {
-				return offsets;
+				return { offsets, minHeight: 0 };
 			}
 
 			// Find the index of the selected thread.
@@ -188,7 +188,7 @@ export function Comments( {
 				! selectedThreadData ||
 				! blockRefs[ selectedThreadData.id ]
 			) {
-				return offsets;
+				return { offsets, minHeight: 0 };
 			}
 
 			let blockElement = blockRefs[ selectedThreadData.id ];
@@ -289,15 +289,14 @@ export function Comments( {
 					lastThreadTop + lastThreadHeight + lastThreadOffset + 32;
 			}
 
-			// Ensure the editor has enough height to scroll to all notes.
-			setCanvasMinHeight( editorMinHeight );
-
-			return offsets;
+			return { offsets, minHeight: editorMinHeight };
 		};
-		const newOffsets = calculateAllOffsets();
+		const { offsets: newOffsets, minHeight } = calculateAllOffsets();
 		if ( Object.keys( newOffsets ).length > 0 ) {
 			setBoardOffsets( newOffsets );
 		}
+		// Ensure the editor has enough height to scroll to all notes.
+		setCanvasMinHeight( minHeight );
 	}, [
 		heights,
 		blockRefs,
