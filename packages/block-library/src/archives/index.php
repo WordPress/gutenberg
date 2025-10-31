@@ -70,7 +70,7 @@ function render_block_core_archives( $attributes ) {
 		<option value="">' . esc_html( $label ) . '</option>' . $archives . '</select>';
 
 		// Inject the dropdown script immediately after the select dropdown.
-		$block_content .= build_dropdown_script_block_core_archives( $dropdown_id );
+		$block_content .= block_core_archives_build_dropdown_script( $dropdown_id );
 
 		return sprintf(
 			'<div %1$s>%2$s</div>',
@@ -118,7 +118,7 @@ function render_block_core_archives( $attributes ) {
  *
  * @return string Returns the dropdown onChange redirection script.
  */
-function build_dropdown_script_block_core_archives( $dropdown_id ) {
+function block_core_archives_build_dropdown_script( $dropdown_id ) {
 	ob_start();
 
 	$exports = array( $dropdown_id, home_url() );
