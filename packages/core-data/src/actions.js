@@ -753,7 +753,6 @@ export const saveEntityRecord =
 						true,
 						edits
 					);
-
 					if (
 						window.__experimentalEnableSync &&
 						entityConfig.syncConfig
