@@ -16,7 +16,7 @@
 	},
 	"engines": {
 		"node": ">=20.10.0",
-		"pnpm": ">=10.4.0"
+		"npm": ">=10.2.3"
 	},
 	"wpPlugin": {
 		"name": "gutenberg",
@@ -62,6 +62,9 @@
 		"@types/sprintf-js": "1.1.2",
 		"@types/uuid": "8.3.1",
 		"@wordpress/build": "workspace:./packages/wp-build",
+		"@wordpress/e2e-test-utils-playwright": "workspace:./packages/e2e-test-utils-playwright",
+		"@wordpress/prettier-config": "workspace:./packages/prettier-config",
+		"@wordpress/scripts": "workspace:./packages/scripts",
 		"ajv": "8.17.1",
 		"babel-jest": "29.7.0",
 		"babel-loader": "9.2.1",
@@ -103,6 +106,7 @@
 		"node-fetch": "2.7.0",
 		"npm-run-all": "4.1.5",
 		"patch-package": "8.0.0",
+		"postcss": "8.5.6",
 		"postcss-loader": "6.2.1",
 		"prettier": "npm:wp-prettier@3.0.3",
 		"raw-loader": "4.0.2",
@@ -111,6 +115,7 @@
 		"react-dom": "18.3.1",
 		"react-refresh": "0.14.0",
 		"react-scanner": "1.2.0",
+		"react-test-renderer": "18.3.1",
 		"reassure": "0.7.1",
 		"resize-observer-polyfill": "1.5.1",
 		"rimraf": "5.0.10",
@@ -125,6 +130,7 @@
 		"storybook-addon-source-link": "1.0.1",
 		"storybook-addon-tag-badges": "2.0.4",
 		"style-loader": "3.2.1",
+		"stylelint": "^16.25.0",
 		"stylelint-plugin-logical-css": "^1.2.3",
 		"typescript": "5.9.3",
 		"uuid": "9.0.1",
@@ -251,6 +257,5 @@
 		"**/tsconfig.json": [
 			"npm run lint:tsconfig"
 		]
-	},
-	"packageManager": "pnpm@10.4.0"
+	}
 }

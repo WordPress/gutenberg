@@ -142,5 +142,13 @@
 		"clean:watchman": "command -v watchman >/dev/null 2>&1 && watchman watch-del-all; true",
 		"clean:babel-cache": "rm -rf ../../node_modules/.cache/babel-loader/*",
 		"clean:i18n-cache": "rm -rf ./i18n-cache/data/*.json && rm -f ./i18n-cache/index.native.js"
+	},
+	"devDependencies": {
+		"@babel/plugin-proposal-nullish-coalescing-operator": "7.18.6",
+		"@babel/plugin-proposal-optional-chaining": "7.21.0",
+		"@babel/plugin-transform-arrow-functions": "7.27.1",
+		"@babel/plugin-transform-shorthand-properties": "7.27.1",
+		"@babel/plugin-transform-template-literals": "7.27.1",
+		"node-sass": "9.0.0"
 	}
 }
