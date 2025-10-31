@@ -6,7 +6,7 @@ import TextareaAutosize from 'react-autosize-textarea';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
@@ -16,6 +16,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useInstanceId, useDebounce } from '@wordpress/compose';
+import { isKeyboardEvent } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -30,6 +31,7 @@ function CommentForm( {
 	labelText,
 	reflowComments = noop,
 } ) {
+	const formRef = useRef();
 	const [ inputComment, setInputComment ] = useState(
 		thread?.content?.raw ?? ''
 	);
@@ -48,8 +50,23 @@ function CommentForm( {
 
 	return (
 		<VStack
+			ref={ formRef }
 			className="editor-collab-sidebar-panel__comment-form"
 			spacing="4"
+			as="form"
+			onSubmit={ ( event ) => {
+				event.preventDefault();
+				onSubmit( inputComment );
+				setInputComment( '' );
+			} }
+			onKeyDown={ ( event ) => {
+				if (
+					isKeyboardEvent.primary( event, 'Enter' ) &&
+					! isDisabled
+				) {
+					formRef.current.requestSubmit();
+				}
+			} }
 		>
 			<VisuallyHidden as="label" htmlFor={ inputId }>
 				{ labelText ?? __( 'Note' ) }
@@ -72,10 +89,7 @@ function CommentForm( {
 					size="compact"
 					accessibleWhenDisabled
 					variant="primary"
-					onClick={ () => {
-						onSubmit( inputComment );
-						setInputComment( '' );
-					} }
+					type="submit"
 					disabled={ isDisabled }
 				>
 					<Truncate>{ submitButtonText }</Truncate>
