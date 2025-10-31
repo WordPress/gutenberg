@@ -48,7 +48,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		// Handle search results.
 		$is_paged = block_core_breadcrumbs_is_paged();
 		/* translators: %s: search query */
-		$text = esc_html( sprintf( __( 'Search results for: "%s"' ), wp_trim_words( get_search_query(), 10 ) ) );
+		$text               = esc_html( sprintf( __( 'Search results for: "%s"' ), wp_trim_words( get_search_query(), 10 ) ) );
 		$breadcrumb_items[] = block_core_breadcrumbs_create_item( $text, $is_paged );
 		// Add the "Page X" as the current page if paginated.
 		if ( $is_paged ) {
@@ -97,11 +97,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 			$breadcrumb_items = array_merge( $breadcrumb_items, block_core_breadcrumbs_get_terms_breadcrumbs( $post_id, $post_type ) );
 		}
 		// Add current post title (not linked).
-		$title = get_the_title( $post );
-		if ( strlen( $title ) === 0 ) {
-			$title = __( '(no title)' );
-		}
-		$breadcrumb_items[] = block_core_breadcrumbs_create_current_item( $title );
+		$breadcrumb_items[] = block_core_breadcrumbs_create_current_item( block_core_breadcrumbs_get_post_title( $post ) );
 	}
 
 	// Remove last item if disabled.
@@ -158,8 +154,8 @@ function block_core_breadcrumbs_is_paged() {
  */
 function block_core_breadcrumbs_create_page_number_item() {
 	$paged = (int) get_query_var( 'paged' );
-	/* translators: %s: page number */
 	return block_core_breadcrumbs_create_current_item(
+		/* translators: %s: page number */
 		esc_html( sprintf( __( 'Page %s' ), number_format_i18n( $paged ) ) )
 	);
 }
@@ -219,6 +215,23 @@ function block_core_breadcrumbs_create_item( $text, $is_paged = false ) {
 }
 
 /**
+ * Gets a post title with fallback for empty titles.
+ *
+ * @since 6.9.0
+ *
+ * @param int|WP_Post $post The post ID or post object.
+ *
+ * @return string The post title or fallback text.
+ */
+function block_core_breadcrumbs_get_post_title( $post ) {
+	$title = get_the_title( $post );
+	if ( strlen( $title ) === 0 ) {
+		$title = __( '(no title)' );
+	}
+	return $title;
+}
+
+/**
  * Generates breadcrumb items from hierarchical post type ancestors.
  *
  * @since 6.9.0
@@ -233,13 +246,9 @@ function block_core_breadcrumbs_get_hierarchical_post_type_breadcrumbs( $post_id
 	$ancestors        = array_reverse( $ancestors );
 
 	foreach ( $ancestors as $ancestor_id ) {
-		$title = get_the_title( $ancestor_id );
-		if ( strlen( $title ) === 0 ) {
-			$title = __( '(no title)' );
-		}
 		$breadcrumb_items[] = block_core_breadcrumbs_create_link(
 			get_permalink( $ancestor_id ),
-			$title
+			block_core_breadcrumbs_get_post_title( $ancestor_id )
 		);
 	}
 	return $breadcrumb_items;
