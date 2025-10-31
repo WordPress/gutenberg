@@ -86,7 +86,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		}
 		// Add current post title (not linked).
 		$title = get_the_title( $post );
-		if ( empty( $title ) ) {
+		if ( strlen( $title ) === 0 ) {
 			$title = __( '(no title)' );
 		}
 		$breadcrumb_items[] = sprintf( '<span aria-current="page">%s</span>', $title );
@@ -177,7 +177,7 @@ function block_core_breadcrumbs_get_hierarchical_post_type_breadcrumbs( $post_id
 
 	foreach ( $ancestors as $ancestor_id ) {
 		$title = get_the_title( $ancestor_id );
-		if ( empty( $title ) ) {
+		if ( strlen( $title ) === 0 ) {
 			$title = __( '(no title)' );
 		}
 		$breadcrumb_items[] = sprintf(
