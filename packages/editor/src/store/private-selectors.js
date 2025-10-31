@@ -270,3 +270,13 @@ export const getDefaultRenderingMode = createRegistrySelector(
 		return defaultMode;
 	}
 );
+
+/**
+ * Get the canvas minimum height.
+ *
+ * @param {Object} state Global application state.
+ * @return {number} The canvas minimum height.
+ */
+export function getCanvasMinHeight( state ) {
+	return state.canvasMinHeight;
+}

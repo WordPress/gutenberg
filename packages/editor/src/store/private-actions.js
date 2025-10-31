@@ -526,3 +526,16 @@ export const setDefaultRenderingMode =
 			.dispatch( preferencesStore )
 			.set( 'core', 'renderingModes', newModes );
 	};
+
+/**
+ * Set the minimum height of the canvas.
+ *
+ * @param {number} minHeight
+ * @return {Object} Action object.
+ */
+export function setCanvasMinHeight( minHeight ) {
+	return {
+		type: 'SET_CANVAS_MIN_HEIGHT',
+		minHeight,
+	};
+}
