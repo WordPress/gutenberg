@@ -335,7 +335,7 @@ function VisualEditor( {
 
 	const { canvasMinHeight } = useEditorCanvas();
 
-	// Set the iframe body min-height directly to ensure notes are fully visible.
+	// Calculate the minimum height including scroll offset to fit all notes.
 	const calculatedMinHeight = useMemo( () => {
 		const iframe = document.querySelector( 'iframe[name="editor-canvas"]' );
 		if ( iframe && iframe.contentDocument ) {
