@@ -338,14 +338,16 @@ function VisualEditor( {
 
 	// Calculate the minimum height including scroll offset to fit all notes.
 	const calculatedMinHeight = useMemo( () => {
-		const iframe = document.querySelector( 'iframe[name="editor-canvas"]' );
-		if ( iframe && iframe.contentDocument ) {
-			const scrollTop =
-				iframe.contentDocument.documentElement.scrollTop ||
-				iframe.contentDocument.body.scrollTop;
-
-			return canvasMinHeight + scrollTop;
+		if ( ! localRef.current ) {
+			return canvasMinHeight;
 		}
+
+		const { ownerDocument } = localRef.current;
+		const scrollTop =
+			ownerDocument.documentElement.scrollTop ||
+			ownerDocument.body.scrollTop;
+
+		return canvasMinHeight + scrollTop;
 	}, [ canvasMinHeight ] );
 
 	const iframeStyles = useMemo( () => {
