@@ -34,7 +34,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		} else {
 			$breadcrumb_items[] = sprintf(
 				'<a href="%s">%s</a>',
-				esc_url( home_url() ),
+				esc_url( home_url( '/' ) ),
 				esc_html__( 'Home' )
 			);
 		}
