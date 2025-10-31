@@ -46,6 +46,21 @@ function CommentForm( {
 		inputComment === thread?.content?.raw ||
 		! sanitizeCommentString( inputComment ).length;
 
+	const handleSubmit = () => {
+		if ( ! isDisabled ) {
+			onSubmit( inputComment );
+			setInputComment( '' );
+		}
+	};
+
+	const handleKeyDown = ( event ) => {
+		// Submit on ⌘ + Enter (Mac) or Ctrl + Enter (Windows/Linux)
+		if ( event.key === 'Enter' && ( event.metaKey || event.ctrlKey ) ) {
+			event.preventDefault();
+			handleSubmit();
+		}
+	};
+
 	return (
 		<VStack
 			className="editor-collab-sidebar-panel__comment-form"
@@ -61,6 +76,7 @@ function CommentForm( {
 					updateComment( comment.target.value );
 					debouncedCommentUpdated();
 				} }
+				onKeyDown={ handleKeyDown }
 				rows={ 1 }
 				maxRows={ 20 }
 			/>
@@ -72,10 +88,7 @@ function CommentForm( {
 					size="compact"
 					accessibleWhenDisabled
 					variant="primary"
-					onClick={ () => {
-						onSubmit( inputComment );
-						setInputComment( '' );
-					} }
+					onClick={ handleSubmit }
 					disabled={ isDisabled }
 				>
 					<Truncate>{ submitButtonText }</Truncate>
