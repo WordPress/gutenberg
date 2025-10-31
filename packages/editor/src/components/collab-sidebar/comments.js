@@ -42,7 +42,7 @@ import CommentForm from './comment-form';
 import { focusCommentThread, getCommentExcerpt } from './utils';
 import { useFloatingThread } from './hooks';
 import { AddComment } from './add-comment';
-import { privateApis as editorPrivateApis } from '../../private-apis';
+import { useEditorCanvas } from '../provider/editor-canvas-context';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 const { Menu } = unlock( componentsPrivateApis );
@@ -290,9 +290,7 @@ export function Comments( {
 			}
 
 			// Ensure the editor has enough height to scroll to all notes.
-			setCanvasMinHeight(
-				editorMinHeight > 0 ? `${ editorMinHeight }px` : null
-			);
+			setCanvasMinHeight( editorMinHeight );
 
 			return offsets;
 		};
@@ -300,7 +298,7 @@ export function Comments( {
 		if ( Object.keys( newOffsets ).length > 0 ) {
 			setBoardOffsets( newOffsets );
 		}
-	}, [ heights, blockRefs, isFloating, threads, selectedThread ] );
+	}, [ heights, blockRefs, isFloating, threads, selectedThread, setCanvasMinHeight ] );
 
 	const hasThreads = Array.isArray( threads ) && threads.length > 0;
 	if ( ! hasThreads && ! isFloating ) {
