@@ -131,10 +131,8 @@ function block_core_archives_build_dropdown_script( $dropdown_id ) {
 				if ( 'escape' === dropdown.dataset.lastkey ) {
 					return;
 				}
-				if ( dropdown.value && parseInt( dropdown.value ) > 0 && dropdown instanceof HTMLSelectElement ) {
-					const url = new URL( homeUrl );
-					url.searchParams.set( dropdown.name, dropdown.value );
-					location.href = url.href;
+				if ( dropdown.value ) {
+					location.href = dropdown.value;
 				}
 			}, 250 );
 		}
