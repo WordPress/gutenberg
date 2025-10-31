@@ -64,11 +64,31 @@ export interface CollectionHandlers {
 	refetchRecords: () => Promise< void >;
 }
 
+interface WPBlockSelection {
+	clientId: string;
+	attributeKey: string;
+	offset: number;
+}
+
+interface WPSelection {
+	selectionEnd: WPBlockSelection;
+	selectionStart: WPBlockSelection;
+}
+
 export interface RecordHandlers {
 	editRecord: ( data: Partial< ObjectData > ) => void;
 	getEditedRecord: () => Promise< ObjectData >;
 	refetchRecord: () => Promise< void >;
 	saveRecord: () => Promise< void >;
+	setSelection: (
+		clientId: string,
+		attributeKey: string,
+		startOffset: number,
+		endOffset: number
+	) => void;
+	subscribeToSelectionChange: (
+		callback: ( selection: WPSelection ) => void
+	) => void;
 }
 
 export interface SyncConfig {
@@ -112,5 +132,18 @@ export interface SyncManager {
 }
 
 export interface SyncUndoManager extends WPUndoManager< ObjectData > {
-	addToScope: ( ymap: Y.Map< any > ) => void;
+	addToScope: (
+		ymap: Y.Map< any >,
+		handlers: {
+			subscribeToSelectionChange: (
+				callback: ( selection: WPSelection ) => void
+			) => void;
+			setSelection: (
+				clientId: string,
+				attributeKey: string,
+				startOffset: number,
+				endOffset: number
+			) => void;
+		}
+	) => void;
 }

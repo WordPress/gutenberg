@@ -136,7 +136,11 @@ export function createSyncManager(): SyncManager {
 			} );
 		};
 
-		undoManager.addToScope( recordMap );
+		const { subscribeToSelectionChange, setSelection } = handlers;
+		undoManager.addToScope( recordMap, {
+			subscribeToSelectionChange,
+			setSelection,
+		} );
 
 		const entityState: EntityState = {
 			handlers,

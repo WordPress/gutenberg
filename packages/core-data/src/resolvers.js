@@ -9,6 +9,12 @@ import { camelCase } from 'change-case';
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import apiFetch from '@wordpress/api-fetch';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	select as dataSelect,
+	dispatch as dataDispatch,
+	subscribe,
+} from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -221,6 +227,63 @@ export const getEntityRecord =
 									name,
 									key
 								);
+							},
+							// Get the current selection. This is used by the
+							// sync manager to save selection position on the
+							// undo stack.
+							subscribeToSelectionChange: ( callback ) => {
+								console.log( 'subscribeToSelectionChange():', {
+									select,
+								} );
+								const { getSelectionStart, getSelectionEnd } =
+									dataSelect( blockEditorStore );
+
+								let currentSelection = {
+									selectionStart: getSelectionStart(),
+									selectionEnd: getSelectionEnd(),
+								};
+
+								callback( currentSelection );
+
+								subscribe( () => {
+									const newSelection = {
+										selectionStart: getSelectionStart(),
+										selectionEnd: getSelectionEnd(),
+									};
+
+									// Only update if selection actually changed
+									if (
+										JSON.stringify( newSelection ) !==
+										JSON.stringify( currentSelection )
+									) {
+										callback( newSelection );
+										currentSelection = newSelection;
+									}
+								}, blockEditorStore );
+							},
+							// Set the current selection. This is used by the
+							// sync manager to restore selection position when
+							// triggering an undo.
+							setSelection: (
+								clientId,
+								attributeKey,
+								startOffset,
+								endOffset
+							) => {
+								dataDispatch(
+									blockEditorStore
+								).selectionChange(
+									clientId,
+									attributeKey,
+									startOffset,
+									endOffset
+								);
+							},
+							// Check if a block exists in the editor.
+							blockExists: ( clientId ) => {
+								const { getBlock } =
+									dataSelect( blockEditorStore );
+								return getBlock( clientId ) !== null;
 							},
 						}
 					);
