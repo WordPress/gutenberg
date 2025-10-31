@@ -170,6 +170,7 @@ describe( 'getEntityRecord', () => {
 			{
 				editRecord: expect.any( Function ),
 				getEditedRecord: expect.any( Function ),
+				refetchRecord: expect.any( Function ),
 				saveRecord: expect.any( Function ),
 			}
 		);
@@ -222,6 +223,7 @@ describe( 'getEntityRecord', () => {
 			{
 				editRecord: expect.any( Function ),
 				getEditedRecord: expect.any( Function ),
+				refetchRecord: expect.any( Function ),
 				saveRecord: expect.any( Function ),
 			}
 		);

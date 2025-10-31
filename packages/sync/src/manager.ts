@@ -9,6 +9,9 @@ import * as Y from 'yjs';
 import {
 	CRDT_RECORD_MAP_KEY as RECORD_KEY,
 	LOCAL_SYNC_MANAGER_ORIGIN,
+	CRDT_RECORD_METADATA_MAP_KEY as RECORD_METADATA_KEY,
+	CRDT_RECORD_METADATA_SAVED_AT_KEY as SAVED_AT_KEY,
+	CRDT_RECORD_METADATA_SAVED_BY_KEY as SAVED_BY_KEY,
 } from './config';
 import { createPersistedCRDTDoc, getPersistedCrdtDoc } from './persistence';
 import { getProviderCreators } from './providers';
@@ -105,6 +108,8 @@ export function createSyncManager(): SyncManager {
 
 		const ydoc = createYjsDoc( { objectType } );
 		const recordMap = ydoc.getMap( RECORD_KEY );
+		const recordMetaMap = ydoc.getMap( RECORD_METADATA_KEY );
+		const now = Date.now();
 
 		// Clean up providers and in-memory state when the entity is unloaded.
 		const unload = (): void => {
@@ -128,6 +133,28 @@ export function createSyncManager(): SyncManager {
 			}
 
 			void updateEntityRecord( objectType, objectId );
+		};
+
+		const onRecordMetaUpdate = (
+			event: Y.YMapEvent< unknown >,
+			transaction: Y.Transaction
+		) => {
+			if ( transaction.local ) {
+				return;
+			}
+
+			event.keysChanged.forEach( ( key ) => {
+				switch ( key ) {
+					case SAVED_AT_KEY:
+						const newValue = recordMetaMap.get( SAVED_AT_KEY );
+						if ( 'number' === typeof newValue && newValue > now ) {
+							// Another peer has saved the record. Refetch it so that we have
+							// a correct understanding of our own unsaved edits.
+							void handlers.refetchRecord().catch( () => {} );
+						}
+						break;
+				}
+			} );
 		};
 
 		// Lazily create the undo manager when the first entity is loaded.
@@ -159,6 +186,7 @@ export function createSyncManager(): SyncManager {
 
 		// Attach observers.
 		recordMap.observeDeep( onRecordUpdate );
+		recordMetaMap.observe( onRecordMetaUpdate );
 
 		// Get and apply the persisted CRDT document, if it exists.
 		const isInvalid = applyPersistedCrdtDoc( syncConfig, ydoc, record );
@@ -257,12 +285,14 @@ export function createSyncManager(): SyncManager {
 	 * @param {ObjectID}              objectId   Object ID.
 	 * @param {Partial< ObjectData >} changes    Updates to make.
 	 * @param {string}                origin     The source of change.
+	 * @param {boolean}               isSave     Whether this update is part of a save operation.
 	 */
 	function updateCRDTDoc(
 		objectType: ObjectType,
 		objectId: ObjectID,
 		changes: Partial< ObjectData >,
-		origin: string
+		origin: string,
+		isSave: boolean = false
 	): void {
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
@@ -275,6 +305,13 @@ export function createSyncManager(): SyncManager {
 
 		ydoc.transact( () => {
 			syncConfig.applyChangesToCRDTDoc( ydoc, changes );
+
+			if ( isSave ) {
+				// Mark the document as saved in the record metadata map.
+				const recordMeta = ydoc.getMap( RECORD_METADATA_KEY );
+				recordMeta.set( SAVED_AT_KEY, Date.now() );
+				recordMeta.set( SAVED_BY_KEY, ydoc.clientID );
+			}
 		}, origin );
 	}
 

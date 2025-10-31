@@ -19,6 +19,9 @@ import {
 import { createSyncManager } from '../manager';
 import {
 	CRDT_RECORD_MAP_KEY,
+	CRDT_RECORD_METADATA_MAP_KEY as RECORD_METADATA_MAP_KEY,
+	CRDT_RECORD_METADATA_SAVED_AT_KEY as SAVED_AT_KEY,
+	CRDT_RECORD_METADATA_SAVED_BY_KEY as SAVED_BY_KEY,
 	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 } from '../config';
 import { createPersistedCRDTDoc } from '../persistence';
@@ -88,6 +91,7 @@ describe( 'SyncManager', () => {
 			getEditedRecord: jest.fn( async () =>
 				Promise.resolve( mockRecord )
 			),
+			refetchRecord: jest.fn( async () => Promise.resolve() ),
 			saveRecord: jest.fn( async () => Promise.resolve() ),
 		};
 	} );
@@ -520,6 +524,19 @@ describe( 'SyncManager', () => {
 
 	describe( 'update', () => {
 		it( 'updates CRDT document with local changes', async () => {
+			// Capture the Y.Doc from provider creator
+			let capturedDoc: Y.Doc | null = null;
+			mockProviderCreator.mockImplementation(
+				async (
+					_objectType: string,
+					_objectId: string,
+					ydoc: Y.Doc
+				) => {
+					capturedDoc = ydoc;
+					return mockProviderResult;
+				}
+			);
+
 			const manager = createSyncManager();
 
 			await manager.load(
@@ -535,10 +552,17 @@ describe( 'SyncManager', () => {
 			const changes = { title: 'Updated Title' };
 			manager.update( 'post', '123', changes, 'local-editor' );
 
+			// Verify that applyChangesToCRDTDoc was called with the changes.
 			expect( mockSyncConfig.applyChangesToCRDTDoc ).toHaveBeenCalledWith(
 				expect.any( Y.Doc ),
 				changes
 			);
+
+			// Verify that the record metadata was not updated.
+			const ydoc = capturedDoc as unknown as Y.Doc;
+			const metadataMap = ydoc.getMap( RECORD_METADATA_MAP_KEY );
+			expect( metadataMap.get( SAVED_AT_KEY ) ).toBeUndefined();
+			expect( metadataMap.get( SAVED_BY_KEY ) ).toBeUndefined();
 		} );
 
 		it( 'does not update when entity is not loaded', () => {
@@ -594,6 +618,52 @@ describe( 'SyncManager', () => {
 				expect.any( Function ),
 				customOrigin
 			);
+		} );
+
+		it( 'updates the record metadata when the update is associated with a save', async () => {
+			// Capture the Y.Doc from provider creator.
+			let capturedDoc: Y.Doc | null = null;
+			mockProviderCreator.mockImplementation(
+				async (
+					_objectType: string,
+					_objectId: string,
+					ydoc: Y.Doc
+				) => {
+					capturedDoc = ydoc;
+					return mockProviderResult;
+				}
+			);
+
+			const manager = createSyncManager();
+
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+
+			jest.clearAllMocks();
+
+			const changes = { title: 'Updated Title' };
+			const now = Date.now();
+
+			manager.update( 'post', '123', changes, 'local-editor', true );
+
+			// Verify that applyChangesToCRDTDoc was called with the changes.
+			expect( mockSyncConfig.applyChangesToCRDTDoc ).toHaveBeenCalledWith(
+				expect.any( Y.Doc ),
+				changes
+			);
+
+			// Verify that the record metadata was updated.
+			const ydoc = capturedDoc as unknown as Y.Doc;
+			const metadataMap = ydoc.getMap( RECORD_METADATA_MAP_KEY );
+			expect( metadataMap.get( SAVED_AT_KEY ) ).toBeGreaterThanOrEqual(
+				now
+			);
+			expect( metadataMap.get( SAVED_BY_KEY ) ).toBe( ydoc.clientID );
 		} );
 	} );
 
