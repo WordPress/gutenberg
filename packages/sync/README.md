@@ -20,7 +20,19 @@ CRDT documents can hold meta information in a map. This map exists only in memor
 
 ### CRDT_RECORD_MAP_KEY
 
-Root-level key for the CRDT document that holds the entity record data.
+Root-level key for the map that holds the entity record data.
+
+### CRDT_RECORD_METADATA_MAP_KEY
+
+Root-level key for the map that holds entity record metadata. This map should only contain metadata that is not represented by the entity record itself.
+
+### CRDT_RECORD_METADATA_SAVED_AT_KEY
+
+Y.Map key representing the timestamp of the last save operation.
+
+### CRDT_RECORD_METADATA_SAVED_BY_KEY
+
+Y.Map key representing the Y.Doc client ID of the user who performed the last save operation.
 
 ### createSyncManager
 

@@ -13,13 +13,31 @@ export const CRDT_DOC_VERSION = 1;
 export const CRDT_DOC_META_PERSISTENCE_KEY = 'fromPersistence';
 
 /**
- * Root-level key for the CRDT document that holds the entity record data.
+ * Root-level key for the map that holds the entity record data.
  */
 export const CRDT_RECORD_MAP_KEY = 'document';
 
 /**
- * Root-level key for the CRDT document that holds the state descriptors (see
- * below).
+ * Root-level key for the map that holds entity record metadata. This map should
+ * only contain metadata that is not represented by the entity record itself.
+ */
+export const CRDT_RECORD_METADATA_MAP_KEY = 'documentMeta';
+
+/**
+ * Y.Map key representing the timestamp of the last save operation.
+ */
+export const CRDT_RECORD_METADATA_SAVED_AT_KEY = 'savedAt';
+
+/**
+ * Y.Map key representing the Y.Doc client ID of the user who performed the last
+ * save operation.
+ */
+export const CRDT_RECORD_METADATA_SAVED_BY_KEY = 'savedBy';
+
+/**
+ * Root-level key for the map that holds the state information about the CRDT
+ * document itself. It should not contain information related to the entity
+ * record.
  */
 export const CRDT_STATE_MAP_KEY = 'state';
 
