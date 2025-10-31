@@ -276,17 +276,18 @@ function block_core_breadcrumbs_get_post_title( $post_id_or_object ) {
  */
 function block_core_breadcrumbs_get_post_type_archive_item( $post_type ) {
 	$post_type_object = get_post_type_object( $post_type );
-	if ( $post_type_object && $post_type_object->has_archive ) {
-		$archive_link = get_post_type_archive_link( $post_type );
-		if ( $archive_link ) {
-			return sprintf(
-				'<a href="%s">%s</a>',
-				esc_url( $archive_link ),
-				esc_html( $post_type_object->labels->name )
-			);
-		}
+	if ( ! $post_type_object || ! $post_type_object->has_archive ) {
+		return null;
 	}
-	return null;
+	$archive_link = get_post_type_archive_link( $post_type );
+	if ( ! $archive_link ) {
+		return null;
+	}
+	return sprintf(
+		'<a href="%s">%s</a>',
+		esc_url( $archive_link ),
+		esc_html( $post_type_object->labels->archives )
+	);
 }
 
 /**
