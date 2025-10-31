@@ -2,8 +2,7 @@ name: 'Pull Request Labeler'
 on:
     workflow_dispatch:
     pull_request_target:
-        types:
-            [opened, closed, reopened, edited, ready_for_review, synchronized]
+        types: [opened, closed, reopened, edited, ready_for_review, synchronize]
 
 jobs:
     auto_label_pull_request:
