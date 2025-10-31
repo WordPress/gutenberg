@@ -293,7 +293,7 @@ export function Comments( {
 				/>
 				<Text as="p">
 					{ __(
-						'No notes have been created yet for this post. To start discussing edits, find “Add note 💬” in a block’s Options menu.'
+						'No notes have been created yet for this post. To start discussing edits, find “Add note” in a block’s Options menu.'
 					) }
 				</Text>
 				<hr />
