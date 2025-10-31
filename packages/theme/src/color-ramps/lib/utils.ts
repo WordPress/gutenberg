@@ -18,7 +18,7 @@ import {
 	ACCENT_SCALE_BASE_LIGHTNESS_THRESHOLDS,
 } from './constants';
 import type { Ramp, RampStepConfig, RampDirection } from './types';
-import { getCachedContrast } from './cache-utils';
+import { getContrast } from './color-utils';
 
 /**
  * Make sure that a color is valid in the p3 gamut, and converts it to oklch.
@@ -127,8 +127,8 @@ export function computeBetterFgColorDirection(
 	better: RampDirection;
 	worse: RampDirection;
 } {
-	const contrastAgainstBlack = getCachedContrast( seed, BLACK );
-	const contrastAgainstWhite = getCachedContrast( seed, WHITE );
+	const contrastAgainstBlack = getContrast( seed, BLACK );
+	const contrastAgainstWhite = getContrast( seed, WHITE );
 
 	return contrastAgainstBlack >
 		contrastAgainstWhite +

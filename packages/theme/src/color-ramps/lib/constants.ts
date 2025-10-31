@@ -36,10 +36,10 @@ export const ACCENT_SCALE_BASE_LIGHTNESS_THRESHOLDS = {
 	darker: { min: 0.75, max: 0.98 },
 } as const;
 
-// Minimum lightness difference noticed by the algorithm.
-export const LIGHTNESS_EPSILON = 1e-3;
+// Lightness precision we aim for. Approximately 1/256, resolution of an 8-bit number.
+export const LIGHTNESS_EPSILON = 4e-3;
 
-export const MAX_BISECTION_ITERATIONS = 25;
+export const MAX_BISECTION_ITERATIONS = 10;
 
 export const CONTRAST_COMBINATIONS: {
 	bgs: ( keyof Ramp )[];

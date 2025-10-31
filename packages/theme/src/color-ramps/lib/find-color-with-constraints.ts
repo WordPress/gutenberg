@@ -17,7 +17,7 @@ import {
 	LIGHTNESS_EPSILON,
 	MAX_BISECTION_ITERATIONS,
 } from './constants';
-import { getCachedContrast } from './cache-utils';
+import { getContrast } from './color-utils';
 import { type TaperChromaOptions, taperChroma } from './taper-chroma';
 
 /**
@@ -61,27 +61,34 @@ export function findColorMeetingRequirements(
 		return { color: seed, reached: true, achieved: 1 };
 	}
 
-	if ( lightnessConstraint ) {
-		// Apply a specific L value.
-		// Useful when pinning a step to a specific lightness, of to specify
-		// min/max L values.
-		let newL = lightnessConstraint.value;
+	function getColorForL( l: number ): ColorTypes {
+		let newL = l;
 		let newC = get( seed, [ OKLCH, 'c' ] );
 
 		if ( taperChromaOptions ) {
 			const tapered = taperChroma( seed, newL, taperChromaOptions );
-			if ( ! ( 'spaceId' in tapered ) ) {
-				const lcTapered = tapered as { l: number; c: number };
-				newL = lcTapered.l;
-				newC = lcTapered.c;
+			// taperChroma returns either { l, c } or a ColorObject
+			if ( 'l' in tapered && 'c' in tapered ) {
+				newL = tapered.l;
+				newC = tapered.c;
+			} else {
+				// It's already a ColorObject, return it directly
+				return tapered;
 			}
 		}
 
-		const colorWithExactL = clampToGamut( {
+		return clampToGamut( {
 			spaceId: 'oklch',
 			coords: [ newL, newC, get( seed, [ OKLCH, 'h' ] ) ],
 		} );
-		const exactLContrast = getCachedContrast( reference, colorWithExactL );
+	}
+
+	if ( lightnessConstraint ) {
+		// Apply a specific L value.
+		// Useful when pinning a step to a specific lightness, of to specify
+		// min/max L values.
+		const colorWithExactL = getColorForL( lightnessConstraint.value );
+		const exactLContrast = getContrast( reference, colorWithExactL );
 
 		// If the L constraint is of "force" type, apply it even when it doesn't
 		// meet the contrast target.
@@ -100,29 +107,24 @@ export function findColorMeetingRequirements(
 	// Set the boundary based on the direction.
 	const mostContrastingL = direction === 'lighter' ? 1 : 0;
 	const mostContrastingColor = direction === 'lighter' ? WHITE : BLACK;
-	const highestPossibleContrast = getCachedContrast(
-		reference,
-		mostContrastingColor
-	);
+	const highestContrast = getContrast( reference, mostContrastingColor );
 
 	// If even the most contrasting color can't reach the target,
 	// the target is unreachable.
-	if ( highestPossibleContrast < target ) {
+	if ( highestContrast < target ) {
 		if ( strict ) {
 			throw new Error(
 				`Contrast target ${ target.toFixed(
 					2
 				) }:1 unreachable in ${ direction } direction` +
-					`(boundary achieves ${ highestPossibleContrast.toFixed(
-						3
-					) }:1).`
+					`(boundary achieves ${ highestContrast.toFixed( 3 ) }:1).`
 			);
 		}
 
 		return {
 			color: mostContrastingColor,
 			reached: false,
-			achieved: highestPossibleContrast,
+			achieved: highestContrast,
 		};
 	}
 
@@ -131,49 +133,52 @@ export function findColorMeetingRequirements(
 	// only when we know for sure the direction of the search.
 	// TODO: can we bring this back to seed.oklch.l ?
 	let worseL = get( reference, [ OKLCH, 'l' ] );
+	let worseContrast = 1;
+	let replacedWorse = false;
 	let betterL = mostContrastingL;
+	let betterContrast = highestContrast;
+	let replacedBetter = false;
 
-	let bestContrastFound = highestPossibleContrast;
-	let resultingColor: ColorTypes = mostContrastingColor;
+	let bestColor: ColorTypes = mostContrastingColor;
+	let bestContrast = highestContrast;
 
-	for (
-		let i = 0;
-		i < MAX_BISECTION_ITERATIONS &&
-		Math.abs( betterL - worseL ) > LIGHTNESS_EPSILON;
-		i++
-	) {
-		let newL = ( worseL + betterL ) / 2;
-		let newC = get( seed, [ OKLCH, 'c' ] );
+	for ( let i = 0; i < MAX_BISECTION_ITERATIONS; i++ ) {
+		// Linear interpolation between worse and better L values, weighted by the contrast difference.
+		const newL =
+			( worseL * ( betterContrast - target ) -
+				betterL * ( worseContrast - target ) ) /
+			( betterContrast - worseContrast );
 
-		if ( taperChromaOptions ) {
-			const tapered = taperChroma( seed, newL, taperChromaOptions );
-			if ( ! ( 'spaceId' in tapered ) ) {
-				const lcTapered = tapered as { l: number; c: number };
-				newL = lcTapered.l;
-				newC = lcTapered.c;
-			}
+		bestColor = getColorForL( newL );
+		bestContrast = getContrast( reference, bestColor );
+
+		if ( Math.abs( bestContrast - target ) <= LIGHTNESS_EPSILON ) {
+			break;
 		}
 
-		const newColor = clampToGamut( {
-			spaceId: 'oklch',
-			coords: [ newL, newC, get( seed, [ OKLCH, 'h' ] ) ],
-		} );
-		const newContrast = getCachedContrast( reference, newColor );
-
-		if ( newContrast >= target ) {
+		// Update one of the boundary L values, using the Illinois method.
+		if ( bestContrast >= target ) {
 			betterL = newL;
-			// Only update the resulting color when the target is met, this ensuring
-			// at the end of the search the target is always met.
-			bestContrastFound = newContrast;
-			resultingColor = newColor;
+			betterContrast = bestContrast;
+			if ( replacedBetter ) {
+				worseContrast = ( worseContrast + target ) / 2;
+			}
+			replacedBetter = true;
+			replacedWorse = false;
 		} else {
 			worseL = newL;
+			worseContrast = bestContrast;
+			if ( replacedWorse ) {
+				betterContrast = ( betterContrast + target ) / 2;
+			}
+			replacedWorse = true;
+			replacedBetter = false;
 		}
 	}
 
 	return {
-		color: resultingColor,
+		color: bestColor,
 		reached: true,
-		achieved: bestContrastFound,
+		achieved: bestContrast,
 	};
 }

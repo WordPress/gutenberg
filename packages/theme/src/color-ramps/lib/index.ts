@@ -18,7 +18,7 @@ import {
  * Internal dependencies
  */
 import './register-color-spaces';
-import { getCachedContrast, getColorString } from './cache-utils';
+import { getContrast, getColorString } from './color-utils';
 import { findColorMeetingRequirements } from './find-color-with-constraints';
 import {
 	clampToGamut,
@@ -100,7 +100,7 @@ function calculateRamp( {
 		if ( sameAsIfPossible ) {
 			const candidateColor = calculatedColors.get( sameAsIfPossible );
 			if ( candidateColor ) {
-				const candidateContrast = getCachedContrast(
+				const candidateContrast = getContrast(
 					referenceColor,
 					candidateColor
 				);
@@ -187,7 +187,7 @@ function calculateRamp( {
 			// Weight the deficit by how much seed adjustment would help this constraint
 			// If seed has low contrast vs reference, adjusting seed has high impact
 			// If seed has high contrast vs reference, adjusting seed has low impact
-			const impactWeight = 1 / getCachedContrast( seed, referenceColor );
+			const impactWeight = 1 / getContrast( seed, referenceColor );
 			const weightedDeficit = deficitVsTarget * impactWeight;
 
 			// Track the most impactful failure for seed optimization

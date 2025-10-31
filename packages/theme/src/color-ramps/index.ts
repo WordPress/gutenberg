@@ -18,7 +18,7 @@ import type {
 	RampDirection,
 	Ramp,
 } from './lib/types';
-import { getCachedContrast } from './lib/cache-utils';
+import { getContrast } from './lib/color-utils';
 import { CONTRAST_COMBINATIONS } from './lib/constants';
 export { DEFAULT_SEED_COLORS } from './lib/constants';
 
@@ -101,7 +101,7 @@ export function checkAccessibleCombinations( {
 				for ( const fg of fgs ) {
 					const bgColor = parse( ramp.ramp[ bg ].color );
 					const fgColor = parse( ramp.ramp[ fg ].color );
-					if ( getCachedContrast( bgColor, fgColor ) < target ) {
+					if ( getContrast( bgColor, fgColor ) < target ) {
 						unmetTargets.push( {
 							bgName: bg,
 							bgColor: serialize( bgColor ),
@@ -121,7 +121,7 @@ export function checkAccessibleCombinations( {
 				for ( const fg of fgs ) {
 					const bgColor = parse( bgRamp.ramp[ bg ].color );
 					const fgColor = parse( ramp.ramp[ fg ].color );
-					if ( getCachedContrast( bgColor, fgColor ) < target ) {
+					if ( getContrast( bgColor, fgColor ) < target ) {
 						unmetTargets.push( {
 							bgName: bg,
 							bgColor: serialize( bgColor ),
