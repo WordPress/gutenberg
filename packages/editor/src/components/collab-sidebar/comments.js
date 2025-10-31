@@ -42,6 +42,7 @@ import CommentForm from './comment-form';
 import { focusCommentThread, getCommentExcerpt } from './utils';
 import { useFloatingThread } from './hooks';
 import { AddComment } from './add-comment';
+import { privateApis as editorPrivateApis } from '../../private-apis';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 const { Menu } = unlock( componentsPrivateApis );
@@ -62,6 +63,7 @@ export function Comments( {
 	const [ selectedThread, setSelectedThread ] = useState( null );
 	const [ boardOffsets, setBoardOffsets ] = useState( {} );
 	const [ blockRefs, setBlockRefs ] = useState( {} );
+	const { setCanvasMinHeight } = useEditorCanvas();
 
 	const { blockCommentId, selectedBlockClientId, orderedBlockIds } =
 		useSelect( ( select ) => {
@@ -157,24 +159,6 @@ export function Comments( {
 	const setBlockRef = useCallback( ( id, blockRef ) => {
 		setBlockRefs( ( prev ) => ( { ...prev, [ id ]: blockRef } ) );
 	}, [] );
-
-	// Set the editor minimum height to ensure notes are fully visible.
-	const setEditorMinHeight = ( minHeight ) => {
-		const iframe = document.querySelector( 'iframe[name="editor-canvas"]' );
-		if ( iframe && iframe.contentDocument ) {
-			const scrollTop =
-				iframe.contentDocument.documentElement.scrollTop ||
-				iframe.contentDocument.body.scrollTop;
-
-			if ( minHeight > 0 ) {
-				iframe.contentDocument.body.style.minHeight = `${
-					minHeight + scrollTop
-				}px`;
-			} else {
-				iframe.contentDocument.body.style.minHeight = '';
-			}
-		}
-	};
 
 	// Recalculate floating comment thread offsets whenever the heights change.
 	useEffect( () => {
@@ -306,7 +290,9 @@ export function Comments( {
 			}
 
 			// Ensure the editor has enough height to scroll to all notes.
-			setEditorMinHeight( editorMinHeight );
+			setCanvasMinHeight(
+				editorMinHeight > 0 ? `${ editorMinHeight }px` : null
+			);
 
 			return offsets;
 		};
