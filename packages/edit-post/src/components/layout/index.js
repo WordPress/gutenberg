@@ -82,15 +82,13 @@ const DESIGN_POST_TYPES = [
 	'wp_navigation',
 ];
 
-function useEditorStyles( settings, ...additionalStyles ) {
+function useEditorStyles( settings ) {
 	const { hasThemeStyleSupport } = useSelect( ( select ) => {
 		return {
 			hasThemeStyleSupport:
 				select( editPostStore ).isFeatureActive( 'themeStyles' ),
 		};
 	}, [] );
-
-	const addedStyles = additionalStyles.join( '\n' );
 
 	// Compute the default styles.
 	return useMemo( () => {
@@ -124,21 +122,12 @@ function useEditorStyles( settings, ...additionalStyles ) {
 			} );
 		}
 
-		const baseStyles = hasThemeStyles
-			? settings.styles ?? []
-			: defaultEditorStyles;
-
-		if ( addedStyles ) {
-			return [ ...baseStyles, { css: addedStyles } ];
-		}
-
-		return baseStyles;
+		return hasThemeStyles ? settings.styles ?? [] : defaultEditorStyles;
 	}, [
 		settings.defaultEditorStyles,
 		settings.disableLayoutStyles,
 		settings.styles,
 		hasThemeStyleSupport,
-		addedStyles,
 	] );
 }
 
