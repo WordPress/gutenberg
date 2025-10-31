@@ -85,7 +85,11 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 			$breadcrumb_items = array_merge( $breadcrumb_items, block_core_breadcrumbs_get_terms_breadcrumbs( $post_id, $post_type ) );
 		}
 		// Add current post title (not linked).
-		$breadcrumb_items[] = sprintf( '<span aria-current="page">%s</span>', get_the_title( $post ) );
+		$title = get_the_title( $post );
+		if ( empty( $title ) ) {
+			$title = __( '(no title)' );
+		}
+		$breadcrumb_items[] = sprintf( '<span aria-current="page">%s</span>', $title );
 	}
 
 	if ( empty( $breadcrumb_items ) ) {
@@ -172,10 +176,14 @@ function block_core_breadcrumbs_get_hierarchical_post_type_breadcrumbs( $post_id
 	$ancestors        = array_reverse( $ancestors );
 
 	foreach ( $ancestors as $ancestor_id ) {
+		$title = get_the_title( $ancestor_id );
+		if ( empty( $title ) ) {
+			$title = __( '(no title)' );
+		}
 		$breadcrumb_items[] = sprintf(
 			'<a href="%s">%s</a>',
 			esc_url( get_permalink( $ancestor_id ) ),
-			get_the_title( $ancestor_id )
+			$title
 		);
 	}
 	return $breadcrumb_items;
