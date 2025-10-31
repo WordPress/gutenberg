@@ -25,16 +25,13 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 	$breadcrumb_items = array();
 
 	if ( $attributes['showHomeLink'] ) {
-		// On home/front page, show as current page instead of link.
 		if ( $is_home_or_front_page ) {
-			$breadcrumb_items[] = sprintf(
-				'<span aria-current="page">%s</span>',
-				esc_html__( 'Home' )
+			$breadcrumb_items[] = block_core_breadcrumbs_create_current_item(
+				__( 'Home' )
 			);
 		} else {
-			$breadcrumb_items[] = sprintf(
-				'<a href="%s">%s</a>',
-				esc_url( home_url( '/' ) ),
+			$breadcrumb_items[] = block_core_breadcrumbs_create_link(
+				home_url( '/' ),
 				esc_html__( 'Home' )
 			);
 		}
@@ -42,32 +39,24 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 
 	// Handle home and front page.
 	if ( $is_home_or_front_page ) {
-		$breadcrumb_items = block_core_breadcrumbs_maybe_add_paged( $breadcrumb_items );
+		$is_paged = block_core_breadcrumbs_is_paged();
+		$breadcrumb_items = block_core_breadcrumbs_create_item( $text, $is_paged );
+		if ( $is_paged ) {
+			$breadcrumb_items[] = block_core_breadcrumbs_create_page_number_item();
+		}
 	} elseif ( is_search() ) {
-		$search_query = esc_html( wp_trim_words( get_search_query(), 10 ) );
-		$paged_item   = block_core_breadcrumbs_get_paged_item();
-		if ( $paged_item ) {
-			// If paginated, add search results as a link to page 1.
-			$breadcrumb_items[] = sprintf(
-				'<a href="%s">%s</a>',
-				esc_url( get_pagenum_link( 1 ) ),
-				/* translators: %s: search query */
-				sprintf( esc_html__( 'Search results for: "%s"' ), $search_query )
-			);
-			// Add the "Page X" as the current page.
-			$breadcrumb_items[] = $paged_item;
-		} else {
-			// Not paginated, add search results as current page.
-			$breadcrumb_items[] = sprintf(
-				'<span aria-current="page">%s</span>',
-				/* translators: %s: search query */
-				sprintf( esc_html__( 'Search results for: "%s"' ), $search_query )
-			);
+		// Handle search results.
+		$is_paged = block_core_breadcrumbs_is_paged();
+		/* translators: %s: search query */
+		$text = esc_html( sprintf( __( 'Search results for: "%s"' ), wp_trim_words( get_search_query(), 10 ) ) );
+		$breadcrumb_items[] = block_core_breadcrumbs_create_item( $text, $is_paged );
+		// Add the "Page X" as the current page if paginated.
+		if ( $is_paged ) {
+			$breadcrumb_items[] = block_core_breadcrumbs_create_page_number_item();
 		}
 	} elseif ( is_404() ) {
 		// Handle 404 pages.
-		$breadcrumb_items[] = sprintf(
-			'<span aria-current="page">%s</span>',
+		$breadcrumb_items[] = block_core_breadcrumbs_create_current_item(
 			esc_html__( 'Page not found' )
 		);
 	} elseif ( is_archive() ) {
@@ -112,7 +101,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		if ( strlen( $title ) === 0 ) {
 			$title = __( '(no title)' );
 		}
-		$breadcrumb_items[] = sprintf( '<span aria-current="page">%s</span>', $title );
+		$breadcrumb_items[] = block_core_breadcrumbs_create_current_item( $title );
 	}
 
 	// Remove last item if disabled.
@@ -149,22 +138,84 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 }
 
 /**
- * Returns pagination breadcrumb item if on a paged view.
+ * Checks if we're on a paginated view (page 2 or higher).
  *
  * @since 6.9.0
  *
- * @return string|null The "Page X" breadcrumb HTML if paged > 1, null otherwise.
+ * @return bool True if paged > 1, false otherwise.
  */
-function block_core_breadcrumbs_get_paged_item() {
+function block_core_breadcrumbs_is_paged() {
 	$paged = (int) get_query_var( 'paged' );
-	if ( $paged <= 1 ) {
-		return null;
-	}
+	return $paged > 1;
+}
+
+/**
+ * Creates a "Page X" breadcrumb item for paginated views.
+ *
+ * @since 6.9.0
+ *
+ * @return string The "Page X" breadcrumb HTML.
+ */
+function block_core_breadcrumbs_create_page_number_item() {
+	$paged = (int) get_query_var( 'paged' );
+	/* translators: %s: page number */
+	return block_core_breadcrumbs_create_current_item(
+		esc_html( sprintf( __( 'Page %s' ), number_format_i18n( $paged ) ) )
+	);
+}
+
+/**
+ * Creates a breadcrumb link item.
+ *
+ * @since 6.9.0
+ *
+ * @param string $url  The URL for the link (will be escaped).
+ * @param string $text The link text (should already be escaped).
+ *
+ * @return string The breadcrumb link HTML.
+ */
+function block_core_breadcrumbs_create_link( $url, $text ) {
+	return sprintf(
+		'<a href="%s">%s</a>',
+		esc_url( $url ),
+		$text
+	);
+}
+
+/**
+ * Creates a breadcrumb current page item.
+ *
+ * @since 6.9.0
+ *
+ * @param string $text The text content (should already be escaped).
+ *
+ * @return string The breadcrumb current page HTML.
+ */
+function block_core_breadcrumbs_create_current_item( $text ) {
 	return sprintf(
 		'<span aria-current="page">%s</span>',
-		/* translators: %s: page number */
-		sprintf( esc_html__( 'Page %s' ), number_format_i18n( $paged ) )
+		$text
 	);
+}
+
+/**
+ * Creates a breadcrumb item that's either a link or current page item.
+ *
+ * When paginated (is_paged is true), creates a link to page 1.
+ * Otherwise, creates a span marked as the current page.
+ *
+ * @since 6.9.0
+ *
+ * @param string $text     The text content (should already be escaped).
+ * @param bool   $is_paged Whether we're on a paginated view.
+ *
+ * @return string The breadcrumb HTML.
+ */
+function block_core_breadcrumbs_create_item( $text, $is_paged = false ) {
+	if ( $is_paged ) {
+		return block_core_breadcrumbs_create_link( get_pagenum_link( 1 ), $text );
+	}
+	return block_core_breadcrumbs_create_current_item( $text );
 }
 
 /**
@@ -186,9 +237,8 @@ function block_core_breadcrumbs_get_hierarchical_post_type_breadcrumbs( $post_id
 		if ( strlen( $title ) === 0 ) {
 			$title = __( '(no title)' );
 		}
-		$breadcrumb_items[] = sprintf(
-			'<a href="%s">%s</a>',
-			esc_url( get_permalink( $ancestor_id ) ),
+		$breadcrumb_items[] = block_core_breadcrumbs_create_link(
+			get_permalink( $ancestor_id ),
 			$title
 		);
 	}
@@ -217,9 +267,8 @@ function block_core_breadcrumbs_get_term_ancestors_items( $term_id, $taxonomy ) 
 		foreach ( $term_ancestors as $ancestor_id ) {
 			$ancestor_term = get_term( $ancestor_id, $taxonomy );
 			if ( $ancestor_term && ! is_wp_error( $ancestor_term ) ) {
-				$breadcrumb_items[] = sprintf(
-					'<a href="%s">%s</a>',
-					esc_url( get_term_link( $ancestor_term ) ),
+				$breadcrumb_items[] = block_core_breadcrumbs_create_link(
+					get_term_link( $ancestor_term ),
 					esc_html( $ancestor_term->name )
 				);
 			}
@@ -259,72 +308,46 @@ function block_core_breadcrumbs_get_archive_breadcrumbs() {
 			}
 		}
 
-		$paged_item = block_core_breadcrumbs_get_paged_item();
+		$is_paged = block_core_breadcrumbs_is_paged();
 
 		if ( $year ) {
 			if ( $month ) {
 				// Year is linked if we have month.
-				$breadcrumb_items[] = sprintf(
-					'<a href="%s">%s</a>',
-					esc_url( get_year_link( $year ) ),
+				$breadcrumb_items[] = block_core_breadcrumbs_create_link(
+					get_year_link( $year ),
 					esc_html( $year )
 				);
 
 				if ( $day ) {
 					// Month is linked if we have day.
-					$breadcrumb_items[] = sprintf(
-						'<a href="%s">%s</a>',
-						esc_url( get_month_link( $year, $month ) ),
+					$breadcrumb_items[] = block_core_breadcrumbs_create_link(
+						get_month_link( $year, $month ),
 						esc_html( date_i18n( 'F', mktime( 0, 0, 0, $month, 1, $year ) ) )
 					);
 					// Add day (current if not paginated, link if paginated).
-					if ( $paged_item ) {
-						$breadcrumb_items[] = sprintf(
-							'<a href="%s">%s</a>',
-							esc_url( get_pagenum_link( 1 ) ),
-							esc_html( $day )
-						);
-					} else {
-						$breadcrumb_items[] = sprintf(
-							'<span aria-current="page">%s</span>',
-							esc_html( $day )
-						);
-					}
+					$breadcrumb_items[] = block_core_breadcrumbs_create_item(
+						esc_html( $day ),
+						$is_paged
+					);
 				} else {
 					// Add month (current if not paginated, link if paginated).
-					if ( $paged_item ) {
-						$breadcrumb_items[] = sprintf(
-							'<a href="%s">%s</a>',
-							esc_url( get_pagenum_link( 1 ) ),
-							esc_html( date_i18n( 'F', mktime( 0, 0, 0, $month, 1, $year ) ) )
-						);
-					} else {
-						$breadcrumb_items[] = sprintf(
-							'<span aria-current="page">%s</span>',
-							esc_html( date_i18n( 'F', mktime( 0, 0, 0, $month, 1, $year ) ) )
-						);
-					}
+					$breadcrumb_items[] = block_core_breadcrumbs_create_item(
+						esc_html( date_i18n( 'F', mktime( 0, 0, 0, $month, 1, $year ) ) ),
+						$is_paged
+					);
 				}
 			} else {
 				// Add year (current if not paginated, link if paginated).
-				if ( $paged_item ) {
-					$breadcrumb_items[] = sprintf(
-						'<a href="%s">%s</a>',
-						esc_url( get_pagenum_link( 1 ) ),
-						esc_html( $year )
-					);
-				} else {
-					$breadcrumb_items[] = sprintf(
-						'<span aria-current="page">%s</span>',
-						esc_html( $year )
-					);
-				}
+				$breadcrumb_items[] = block_core_breadcrumbs_create_item(
+					esc_html( $year ),
+					$is_paged
+				);
 			}
 		}
 
 		// Add pagination breadcrumb if on a paged date archive.
-		if ( $paged_item ) {
-			$breadcrumb_items[] = $paged_item;
+		if ( $is_paged ) {
+			$breadcrumb_items[] = block_core_breadcrumbs_create_page_number_item();
 		}
 
 		return $breadcrumb_items;
@@ -337,7 +360,7 @@ function block_core_breadcrumbs_get_archive_breadcrumbs() {
 		return array();
 	}
 
-	$paged_item = block_core_breadcrumbs_get_paged_item();
+	$is_paged = block_core_breadcrumbs_is_paged();
 
 	// Taxonomy archive (category, tag, custom taxonomy).
 	if ( $queried_object instanceof WP_Term ) {
@@ -351,18 +374,10 @@ function block_core_breadcrumbs_get_archive_breadcrumbs() {
 		);
 
 		// Add current term (current if not paginated, link if paginated).
-		if ( $paged_item ) {
-			$breadcrumb_items[] = sprintf(
-				'<a href="%s">%s</a>',
-				esc_url( get_pagenum_link( 1 ) ),
-				esc_html( $term->name )
-			);
-		} else {
-			$breadcrumb_items[] = sprintf(
-				'<span aria-current="page">%s</span>',
-				esc_html( $term->name )
-			);
-		}
+		$breadcrumb_items[] = block_core_breadcrumbs_create_item(
+			esc_html( $term->name ),
+			$is_paged
+		);
 	} elseif ( is_post_type_archive() ) {
 		// Post type archive.
 		$post_type = get_query_var( 'post_type' );
@@ -372,40 +387,24 @@ function block_core_breadcrumbs_get_archive_breadcrumbs() {
 		$post_type_object = get_post_type_object( $post_type );
 		if ( $post_type_object ) {
 			// Add post type (current if not paginated, link if paginated).
-			if ( $paged_item ) {
-				$breadcrumb_items[] = sprintf(
-					'<a href="%s">%s</a>',
-					esc_url( get_pagenum_link( 1 ) ),
-					esc_html( $post_type_object->labels->name )
-				);
-			} else {
-				$breadcrumb_items[] = sprintf(
-					'<span aria-current="page">%s</span>',
-					esc_html( $post_type_object->labels->name )
-				);
-			}
+			$breadcrumb_items[] = block_core_breadcrumbs_create_item(
+				esc_html( $post_type_object->labels->name ),
+				$is_paged
+			);
 		}
 	} elseif ( is_author() ) {
 		// Author archive.
 		$author = $queried_object;
 		// Add author (current if not paginated, link if paginated).
-		if ( $paged_item ) {
-			$breadcrumb_items[] = sprintf(
-				'<a href="%s">%s</a>',
-				esc_url( get_pagenum_link( 1 ) ),
-				esc_html( $author->display_name )
-			);
-		} else {
-			$breadcrumb_items[] = sprintf(
-				'<span aria-current="page">%s</span>',
-				esc_html( $author->display_name )
-			);
-		}
+		$breadcrumb_items[] = block_core_breadcrumbs_create_item(
+			esc_html( $author->display_name ),
+			$is_paged
+		);
 	}
 
 	// Add pagination breadcrumb if on a paged archive.
-	if ( $paged_item ) {
-		$breadcrumb_items[] = $paged_item;
+	if ( $is_paged ) {
+		$breadcrumb_items[] = block_core_breadcrumbs_create_page_number_item();
 	}
 
 	return $breadcrumb_items;
@@ -459,9 +458,8 @@ function block_core_breadcrumbs_get_terms_breadcrumbs( $post_id, $post_type ) {
 			$breadcrumb_items,
 			block_core_breadcrumbs_get_term_ancestors_items( $term->term_id, $taxonomy_name )
 		);
-		$breadcrumb_items[] = sprintf(
-			'<a href="%s">%s</a>',
-			esc_url( get_term_link( $term ) ),
+		$breadcrumb_items[] = block_core_breadcrumbs_create_link(
+			get_term_link( $term ),
 			esc_html( $term->name )
 		);
 	}
