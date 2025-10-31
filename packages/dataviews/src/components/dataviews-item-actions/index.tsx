@@ -132,22 +132,34 @@ export function ActionsMenuGroup< Item >( {
 	registry,
 	setActiveModalAction,
 }: ActionsMenuGroupProps< Item > ) {
+	const primaryActions = actions.filter( ( action ) => action.isPrimary );
+	const regularActions = actions.filter( ( action ) => ! action.isPrimary );
+
+	const handleActionClick = ( action: Action< Item > ) => () => {
+		if ( 'RenderModal' in action ) {
+			setActiveModalAction( action );
+			return;
+		}
+		action.callback( [ item ], { registry } );
+	};
+
+	const renderActionGroup = ( actionList: Action< Item >[] ) =>
+		actionList.map( ( action ) => (
+			<MenuItemTrigger
+				key={ action.id }
+				action={ action }
+				onClick={ handleActionClick( action ) }
+				items={ [ item ] }
+			/>
+		) );
+
 	return (
 		<Menu.Group>
-			{ actions.map( ( action ) => (
-				<MenuItemTrigger
-					key={ action.id }
-					action={ action }
-					onClick={ () => {
-						if ( 'RenderModal' in action ) {
-							setActiveModalAction( action );
-							return;
-						}
-						action.callback( [ item ], { registry } );
-					} }
-					items={ [ item ] }
-				/>
-			) ) }
+			{ renderActionGroup( primaryActions ) }
+			{ primaryActions.length > 0 && regularActions.length > 0 && (
+				<Menu.Separator />
+			) }
+			{ renderActionGroup( regularActions ) }
 		</Menu.Group>
 	);
 }
