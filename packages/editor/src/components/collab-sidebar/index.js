@@ -83,6 +83,10 @@ function NotesSidebar( { postId, mode } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const commentSidebarRef = useRef( null );
 
+	const editorMode = useSelect( ( select ) => {
+		return select( editorStore ).getEditorMode();
+	}, [] );
+
 	const showFloatingSidebar = isLargeViewport && mode === 'post-only';
 
 	const blockCommentId = useSelect( ( select ) => {
@@ -108,6 +112,11 @@ function NotesSidebar( { postId, mode } ) {
 	// Get the global styles to set the background color of the sidebar.
 	const { merged: GlobalStyles } = useGlobalStylesContext();
 	const backgroundColor = GlobalStyles?.styles?.color?.background;
+
+	// Hide Notes sidebar in Code Editor mode.
+	if ( editorMode === 'text' ) {
+		return null;
+	}
 
 	// Find the current thread for the selected block.
 	const currentThread = blockCommentId
