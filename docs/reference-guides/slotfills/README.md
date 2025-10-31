@@ -61,7 +61,7 @@ const EditPostDocumentSettingPanel = () => {
 		return postTypeObject?.viewable;
 	}, [] );
 
-	// If the post type is not viewable, then do not render the fill.
+	// If the post type is not viewable, then do not render the plugin.
 	if ( ! isViewable ) {
 		return null;
 	}
