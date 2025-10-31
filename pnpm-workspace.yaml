@@ -1,0 +1,43 @@
+packages:
+    - '.'
+    - 'packages/*'
+    - 'routes/*'
+
+engineStrict: true
+managePackageManagerVersions: false
+preferWorkspacePackages: true
+
+# Be strict about peer deps
+autoInstallPeers: false
+dedupePeerDependents: false
+strictPeerDependencies: true
+
+# No hoisting by default.
+hoistPattern: []
+
+# Package compromise avoidance: require dep build script approval.
+strictDepBuilds: true
+verifyDepsBeforeRun: install
+ignoredBuiltDependencies:
+    - '@parcel/watcher'
+    - 'appium'
+    - 'core-js'
+    - 'core-js-pure'
+    - 'edgedriver'
+    - 'esbuild'
+    - 'fsevents'
+    - 'geckodriver'
+    - 'husky'
+    - 'node-sass'
+    - 'nx'
+    - 'puppeteer'
+    - 'sharp'
+    - 'unrs-resolver'
+
+# Dependencies needing patching.
+patchedDependencies:
+    'lighthouse@12.8.2': patches/lighthouse@12.8.2.patch
+    'react-autosize-textarea@7.1.0': patches/react-autosize-textarea@7.1.0.patch
+    'react-devtools-core@4.28.5': patches/react-devtools-core@4.28.5.patch
+    'react-native@0.73.3': patches/react-native@0.73.3.patch
+    'wasm-vips@0.0.10': patches/wasm-vips@0.0.10.patch
