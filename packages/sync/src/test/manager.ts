@@ -516,6 +516,19 @@ describe( 'SyncManager', () => {
 
 	describe( 'update', () => {
 		it( 'updates CRDT document with local changes', async () => {
+			// Capture the Y.Doc from provider creator
+			let capturedDoc: Y.Doc | null = null;
+			mockProviderCreator.mockImplementation(
+				async (
+					_objectType: string,
+					_objectId: string,
+					ydoc: Y.Doc
+				) => {
+					capturedDoc = ydoc;
+					return mockProviderResult;
+				}
+			);
+
 			const manager = createSyncManager();
 
 			await manager.load(
