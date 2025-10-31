@@ -265,9 +265,6 @@ export default function BreadcrumbEdit( {
 					onChange={ ( value ) =>
 						setAttributes( { showOnHomePage: value } )
 					}
-					help={ __(
-						'Display breadcrumbs on the site front page and blog posts index.'
-					) }
 				/>
 				<CheckboxControl
 					__nextHasNoMarginBottom
