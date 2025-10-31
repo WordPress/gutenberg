@@ -31,6 +31,7 @@ import {
 } from './hooks';
 import { focusCommentThread } from './utils';
 import PostTypeSupportCheck from '../post-type-support-check';
+import { unlock } from '../../lock-unlock';
 
 function NotesSidebarContent( {
 	showCommentBoard,
@@ -80,18 +81,22 @@ function NotesSidebar( { postId, mode } ) {
 	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
+	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const commentSidebarRef = useRef( null );
 
 	const showFloatingSidebar = isLargeViewport && mode === 'post-only';
 
-	const blockCommentId = useSelect( ( select ) => {
+	const { clientId, blockCommentId } = useSelect( ( select ) => {
 		const { getBlockAttributes, getSelectedBlockClientId } =
 			select( blockEditorStore );
-		const clientId = getSelectedBlockClientId();
-		return clientId
-			? getBlockAttributes( clientId )?.metadata?.noteId
-			: null;
+		const _clientId = getSelectedBlockClientId();
+		return {
+			clientId: _clientId,
+			blockCommentId: _clientId
+				? getBlockAttributes( _clientId )?.metadata?.noteId
+				: null,
+		};
 	}, [] );
 
 	const {
@@ -142,6 +147,7 @@ function NotesSidebar( { postId, mode } ) {
 			// Focus a comment thread when there's a selected block with a comment.
 			! blockCommentId ? 'textarea' : undefined
 		);
+		toggleBlockSpotlight( clientId, true );
 	}
 
 	return (
