@@ -23,7 +23,7 @@ import { useMemo, useContext } from '@wordpress/element';
  */
 import './color-ramps/lib/register-color-spaces';
 import { ThemeContext } from './context';
-import semanticVariables from './prebuilt/ts/design-tokens';
+import colorTokens from './prebuilt/ts/color-tokens';
 import {
 	buildBgRamp,
 	buildAccentRamp,
@@ -152,31 +152,25 @@ function legacyWpAdminThemeOverridesCSS( accent: string ): Entry[] {
 	];
 }
 
-function semanticTokensCSS(
-	filterFn: ( entry: [ string, Record< string, string > ] ) => boolean = () =>
-		true
+function colorTokensCSS(
+	computedColorRamps: Map< string, RampResult >
 ): Entry[] {
-	return Object.entries( semanticVariables )
-		.filter( filterFn )
-		.map( ( [ variableName, modesAndValues ] ) => [
-			variableName,
-			modesAndValues[ '.' ],
-		] );
-}
+	const entries: Entry[] = [];
 
-const toKebabCase = ( str: string ) =>
-	str.replace(
-		/[A-Z]+(?![a-z])|[A-Z]/g,
-		( $, ofs ) => ( ofs ? '-' : '' ) + $.toLowerCase()
-	);
+	for ( const [ rampName, { ramp } ] of computedColorRamps ) {
+		for ( const [ tokenName, tokenValue ] of Object.entries( ramp ) ) {
+			const key = `${ rampName }-${ tokenName }`;
+			const aliasedBy = colorTokens[ key ] ?? [];
+			for ( const aliasedId of aliasedBy ) {
+				entries.push( [
+					`--wpds-color-${ aliasedId }`,
+					tokenValue.color,
+				] );
+			}
+		}
+	}
 
-function colorRampCSS( ramp: RampResult, prefix: string ): Entry[] {
-	return [ ...Object.entries( ramp.ramp ) ].map(
-		( [ tokenName, tokenValue ] ) => [
-			`${ prefix }${ toKebabCase( tokenName ) }`,
-			tokenValue.color,
-		]
-	);
+	return entries;
 }
 
 function generateStyles( {
@@ -188,17 +182,8 @@ function generateStyles( {
 } ): CSSProperties {
 	return Object.fromEntries(
 		[
-			// Primitive tokens
-			Array.from( computedColorRamps )
-				.map( ( [ rampName, computedColorRamp ] ) => [
-					colorRampCSS(
-						computedColorRamp,
-						`--wpds-color-private-${ rampName }-`
-					),
-				] )
-				.flat( 2 ),
-			// Semantic color tokens (other semantic tokens for now are static)
-			semanticTokensCSS( ( [ key ] ) => /color/.test( key ) ),
+			// Semantic color tokens
+			colorTokensCSS( computedColorRamps ),
 			// Legacy overrides
 			legacyWpAdminThemeOverridesCSS( primary ),
 			legacyWpComponentsOverridesCSS,

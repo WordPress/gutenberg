@@ -113,6 +113,16 @@ Do not edit directly.
 
 | Variable name                              | Description                      |
 | ------------------------------------------ | -------------------------------- |
+| `--wpds-dimension-space-0`                 | Empty space                      |
+| `--wpds-dimension-space-10`                | 1x base spacing                  |
+| `--wpds-dimension-space-20`                | 2x base spacing                  |
+| `--wpds-dimension-space-30`                | 3x base spacing                  |
+| `--wpds-dimension-space-40`                | 4x base spacing                  |
+| `--wpds-dimension-space-50`                | 5x base spacing                  |
+| `--wpds-dimension-space-60`                | 6x base spacing                  |
+| `--wpds-dimension-space-70`                | 8x base spacing                  |
+| `--wpds-dimension-space-80`                | 10x base spacing                 |
+| `--wpds-dimension-space-90`                | 12x base spacing                 |
 | `--wpds-dimension-base`                    | Base dimension unit              |
 | `--wpds-dimension-padding-surface-x-small` | Extra small spacing for surfaces |
 | `--wpds-dimension-padding-surface-small`   | Small spacing for surfaces       |
@@ -147,181 +157,3 @@ Do not edit directly.
 | `--wpds-font-line-height-large`    | Large line height       |
 | `--wpds-font-line-height-x-large`  | Extra large line height |
 | `--wpds-font-line-height-2x-large` | 2X large line height    |
-
-## Primitive tokens
-
-**🚨 Note: These tokens are only private implementation details of the Theme, and should never be referenced / consumed directly in the code.**
-
-### Color (private)
-
-| Variable name                                    | Description |
-| ------------------------------------------------ | ----------- |
-| `--wpds-color-private-primary-bg-fill1`          | N/A         |
-| `--wpds-color-private-primary-fg-fill`           | N/A         |
-| `--wpds-color-private-primary-bg-fill2`          | N/A         |
-| `--wpds-color-private-primary-surface2`          | N/A         |
-| `--wpds-color-private-primary-surface6`          | N/A         |
-| `--wpds-color-private-primary-surface5`          | N/A         |
-| `--wpds-color-private-primary-surface4`          | N/A         |
-| `--wpds-color-private-primary-surface3`          | N/A         |
-| `--wpds-color-private-primary-fg-surface4`       | N/A         |
-| `--wpds-color-private-primary-fg-surface3`       | N/A         |
-| `--wpds-color-private-primary-fg-surface2`       | N/A         |
-| `--wpds-color-private-primary-fg-surface1`       | N/A         |
-| `--wpds-color-private-primary-stroke3`           | N/A         |
-| `--wpds-color-private-primary-stroke4`           | N/A         |
-| `--wpds-color-private-primary-stroke2`           | N/A         |
-| `--wpds-color-private-primary-stroke1`           | N/A         |
-| `--wpds-color-private-primary-bg-fill-dark`      | N/A         |
-| `--wpds-color-private-primary-fg-fill-dark`      | N/A         |
-| `--wpds-color-private-primary-bg-fill-inverted2` | N/A         |
-| `--wpds-color-private-primary-bg-fill-inverted1` | N/A         |
-| `--wpds-color-private-primary-fg-fill-inverted`  | N/A         |
-| `--wpds-color-private-primary-surface1`          | N/A         |
-| `--wpds-color-private-info-bg-fill1`             | N/A         |
-| `--wpds-color-private-info-fg-fill`              | N/A         |
-| `--wpds-color-private-info-bg-fill2`             | N/A         |
-| `--wpds-color-private-info-surface2`             | N/A         |
-| `--wpds-color-private-info-surface6`             | N/A         |
-| `--wpds-color-private-info-surface5`             | N/A         |
-| `--wpds-color-private-info-surface4`             | N/A         |
-| `--wpds-color-private-info-surface3`             | N/A         |
-| `--wpds-color-private-info-fg-surface4`          | N/A         |
-| `--wpds-color-private-info-fg-surface3`          | N/A         |
-| `--wpds-color-private-info-fg-surface2`          | N/A         |
-| `--wpds-color-private-info-fg-surface1`          | N/A         |
-| `--wpds-color-private-info-stroke3`              | N/A         |
-| `--wpds-color-private-info-stroke4`              | N/A         |
-| `--wpds-color-private-info-stroke2`              | N/A         |
-| `--wpds-color-private-info-stroke1`              | N/A         |
-| `--wpds-color-private-info-bg-fill-dark`         | N/A         |
-| `--wpds-color-private-info-fg-fill-dark`         | N/A         |
-| `--wpds-color-private-info-bg-fill-inverted2`    | N/A         |
-| `--wpds-color-private-info-bg-fill-inverted1`    | N/A         |
-| `--wpds-color-private-info-fg-fill-inverted`     | N/A         |
-| `--wpds-color-private-info-surface1`             | N/A         |
-| `--wpds-color-private-success-bg-fill1`          | N/A         |
-| `--wpds-color-private-success-fg-fill`           | N/A         |
-| `--wpds-color-private-success-bg-fill2`          | N/A         |
-| `--wpds-color-private-success-surface2`          | N/A         |
-| `--wpds-color-private-success-surface6`          | N/A         |
-| `--wpds-color-private-success-surface5`          | N/A         |
-| `--wpds-color-private-success-surface4`          | N/A         |
-| `--wpds-color-private-success-surface3`          | N/A         |
-| `--wpds-color-private-success-fg-surface4`       | N/A         |
-| `--wpds-color-private-success-fg-surface3`       | N/A         |
-| `--wpds-color-private-success-fg-surface2`       | N/A         |
-| `--wpds-color-private-success-fg-surface1`       | N/A         |
-| `--wpds-color-private-success-stroke3`           | N/A         |
-| `--wpds-color-private-success-stroke4`           | N/A         |
-| `--wpds-color-private-success-stroke2`           | N/A         |
-| `--wpds-color-private-success-stroke1`           | N/A         |
-| `--wpds-color-private-success-bg-fill-dark`      | N/A         |
-| `--wpds-color-private-success-fg-fill-dark`      | N/A         |
-| `--wpds-color-private-success-bg-fill-inverted2` | N/A         |
-| `--wpds-color-private-success-bg-fill-inverted1` | N/A         |
-| `--wpds-color-private-success-fg-fill-inverted`  | N/A         |
-| `--wpds-color-private-success-surface1`          | N/A         |
-| `--wpds-color-private-warning-bg-fill1`          | N/A         |
-| `--wpds-color-private-warning-fg-fill`           | N/A         |
-| `--wpds-color-private-warning-bg-fill2`          | N/A         |
-| `--wpds-color-private-warning-surface2`          | N/A         |
-| `--wpds-color-private-warning-surface6`          | N/A         |
-| `--wpds-color-private-warning-surface5`          | N/A         |
-| `--wpds-color-private-warning-surface4`          | N/A         |
-| `--wpds-color-private-warning-surface3`          | N/A         |
-| `--wpds-color-private-warning-fg-surface4`       | N/A         |
-| `--wpds-color-private-warning-fg-surface3`       | N/A         |
-| `--wpds-color-private-warning-fg-surface2`       | N/A         |
-| `--wpds-color-private-warning-fg-surface1`       | N/A         |
-| `--wpds-color-private-warning-stroke3`           | N/A         |
-| `--wpds-color-private-warning-stroke4`           | N/A         |
-| `--wpds-color-private-warning-stroke2`           | N/A         |
-| `--wpds-color-private-warning-stroke1`           | N/A         |
-| `--wpds-color-private-warning-bg-fill-dark`      | N/A         |
-| `--wpds-color-private-warning-fg-fill-dark`      | N/A         |
-| `--wpds-color-private-warning-bg-fill-inverted2` | N/A         |
-| `--wpds-color-private-warning-bg-fill-inverted1` | N/A         |
-| `--wpds-color-private-warning-fg-fill-inverted`  | N/A         |
-| `--wpds-color-private-warning-surface1`          | N/A         |
-| `--wpds-color-private-error-bg-fill1`            | N/A         |
-| `--wpds-color-private-error-fg-fill`             | N/A         |
-| `--wpds-color-private-error-bg-fill2`            | N/A         |
-| `--wpds-color-private-error-surface2`            | N/A         |
-| `--wpds-color-private-error-surface6`            | N/A         |
-| `--wpds-color-private-error-surface5`            | N/A         |
-| `--wpds-color-private-error-surface4`            | N/A         |
-| `--wpds-color-private-error-surface3`            | N/A         |
-| `--wpds-color-private-error-fg-surface4`         | N/A         |
-| `--wpds-color-private-error-fg-surface3`         | N/A         |
-| `--wpds-color-private-error-fg-surface2`         | N/A         |
-| `--wpds-color-private-error-fg-surface1`         | N/A         |
-| `--wpds-color-private-error-stroke3`             | N/A         |
-| `--wpds-color-private-error-stroke4`             | N/A         |
-| `--wpds-color-private-error-stroke2`             | N/A         |
-| `--wpds-color-private-error-stroke1`             | N/A         |
-| `--wpds-color-private-error-bg-fill-dark`        | N/A         |
-| `--wpds-color-private-error-fg-fill-dark`        | N/A         |
-| `--wpds-color-private-error-bg-fill-inverted2`   | N/A         |
-| `--wpds-color-private-error-bg-fill-inverted1`   | N/A         |
-| `--wpds-color-private-error-fg-fill-inverted`    | N/A         |
-| `--wpds-color-private-error-surface1`            | N/A         |
-| `--wpds-color-private-bg-surface2`               | N/A         |
-| `--wpds-color-private-bg-bg-fill1`               | N/A         |
-| `--wpds-color-private-bg-fg-fill`                | N/A         |
-| `--wpds-color-private-bg-bg-fill2`               | N/A         |
-| `--wpds-color-private-bg-surface6`               | N/A         |
-| `--wpds-color-private-bg-surface5`               | N/A         |
-| `--wpds-color-private-bg-surface4`               | N/A         |
-| `--wpds-color-private-bg-surface3`               | N/A         |
-| `--wpds-color-private-bg-fg-surface4`            | N/A         |
-| `--wpds-color-private-bg-fg-surface3`            | N/A         |
-| `--wpds-color-private-bg-fg-surface2`            | N/A         |
-| `--wpds-color-private-bg-fg-surface1`            | N/A         |
-| `--wpds-color-private-bg-stroke3`                | N/A         |
-| `--wpds-color-private-bg-stroke4`                | N/A         |
-| `--wpds-color-private-bg-stroke2`                | N/A         |
-| `--wpds-color-private-bg-stroke1`                | N/A         |
-| `--wpds-color-private-bg-bg-fill-dark`           | N/A         |
-| `--wpds-color-private-bg-fg-fill-dark`           | N/A         |
-| `--wpds-color-private-bg-bg-fill-inverted2`      | N/A         |
-| `--wpds-color-private-bg-bg-fill-inverted1`      | N/A         |
-| `--wpds-color-private-bg-fg-fill-inverted`       | N/A         |
-| `--wpds-color-private-bg-surface1`               | N/A         |
-| `--wpds-color-private-caution-bg-fill1`          | N/A         |
-| `--wpds-color-private-caution-fg-fill`           | N/A         |
-| `--wpds-color-private-caution-bg-fill2`          | N/A         |
-| `--wpds-color-private-caution-surface2`          | N/A         |
-| `--wpds-color-private-caution-surface6`          | N/A         |
-| `--wpds-color-private-caution-surface5`          | N/A         |
-| `--wpds-color-private-caution-surface4`          | N/A         |
-| `--wpds-color-private-caution-surface3`          | N/A         |
-| `--wpds-color-private-caution-fg-surface4`       | N/A         |
-| `--wpds-color-private-caution-fg-surface3`       | N/A         |
-| `--wpds-color-private-caution-fg-surface2`       | N/A         |
-| `--wpds-color-private-caution-fg-surface1`       | N/A         |
-| `--wpds-color-private-caution-stroke3`           | N/A         |
-| `--wpds-color-private-caution-stroke4`           | N/A         |
-| `--wpds-color-private-caution-stroke2`           | N/A         |
-| `--wpds-color-private-caution-stroke1`           | N/A         |
-| `--wpds-color-private-caution-bg-fill-dark`      | N/A         |
-| `--wpds-color-private-caution-fg-fill-dark`      | N/A         |
-| `--wpds-color-private-caution-bg-fill-inverted2` | N/A         |
-| `--wpds-color-private-caution-bg-fill-inverted1` | N/A         |
-| `--wpds-color-private-caution-fg-fill-inverted`  | N/A         |
-| `--wpds-color-private-caution-surface1`          | N/A         |
-
-### Dimension (private)
-
-| Variable name                       | Description      |
-| ----------------------------------- | ---------------- |
-| `--wpds-dimension-private-space-0`  | Empty space      |
-| `--wpds-dimension-private-space-10` | 1x base spacing  |
-| `--wpds-dimension-private-space-20` | 2x base spacing  |
-| `--wpds-dimension-private-space-30` | 3x base spacing  |
-| `--wpds-dimension-private-space-40` | 4x base spacing  |
-| `--wpds-dimension-private-space-50` | 5x base spacing  |
-| `--wpds-dimension-private-space-60` | 6x base spacing  |
-| `--wpds-dimension-private-space-70` | 8x base spacing  |
-| `--wpds-dimension-private-space-80` | 10x base spacing |
-| `--wpds-dimension-private-space-90` | 12x base spacing |
