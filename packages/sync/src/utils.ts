@@ -46,7 +46,7 @@ export function deserializeCrdtDoc(
 		const { document } = JSON.parse( serializedCrdtDoc );
 
 		// Mark this document as from persistence.
-		const docMeta = {
+		const docMeta: DocumentMeta = {
 			[ CRDT_DOC_META_PERSISTENCE_KEY ]: true,
 		};
 
