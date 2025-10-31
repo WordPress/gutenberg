@@ -6,7 +6,7 @@ import TextareaAutosize from 'react-autosize-textarea';
 /**
  * WordPress dependencies
  */
-import { useRef, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
@@ -31,7 +31,6 @@ function CommentForm( {
 	labelText,
 	reflowComments = noop,
 } ) {
-	const formRef = useRef();
 	const [ inputComment, setInputComment ] = useState(
 		thread?.content?.raw ?? ''
 	);
@@ -50,7 +49,6 @@ function CommentForm( {
 
 	return (
 		<VStack
-			ref={ formRef }
 			className="editor-collab-sidebar-panel__comment-form"
 			spacing="4"
 			as="form"
@@ -64,7 +62,7 @@ function CommentForm( {
 					isKeyboardEvent.primary( event, 'Enter' ) &&
 					! isDisabled
 				) {
-					formRef.current.requestSubmit();
+					event.target.parentNode.requestSubmit();
 				}
 			} }
 		>
