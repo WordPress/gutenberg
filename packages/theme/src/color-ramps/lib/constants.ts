@@ -1,15 +1,19 @@
 /**
  * External dependencies
  */
-import Color from 'colorjs.io';
+// Disable reason: ESLint resolver can't handle `exports`. Import resolver
+// checking is redundant in TypeScript files.
+// eslint-disable-next-line import/no-unresolved
+import { to, OKLCH } from 'colorjs.io/fn';
 
 /**
  * Internal dependencies
  */
+import './register-color-spaces';
 import type { Ramp } from './types';
 
-export const WHITE = new Color( '#fff' ).to( 'oklch' );
-export const BLACK = new Color( '#000' ).to( 'oklch' );
+export const WHITE = to( 'white', OKLCH );
+export const BLACK = to( 'black', OKLCH );
 
 // Margin added to target contrasts to counter for algorithm approximations
 // and rounding errors.

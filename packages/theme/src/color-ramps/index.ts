@@ -1,11 +1,15 @@
 /**
  * External dependencies
  */
-import Color from 'colorjs.io';
+// Disable reason: ESLint resolver can't handle `exports`. Import resolver
+// checking is redundant in TypeScript files.
+// eslint-disable-next-line import/no-unresolved
+import { get, OKLCH, parse, serialize } from 'colorjs.io/fn';
 
 /**
  * Internal dependencies
  */
+import './lib/register-color-spaces';
 import { buildRamp } from './lib/index';
 import { clampAccentScaleReferenceLightness } from './lib/utils';
 import { BG_RAMP_CONFIG, ACCENT_RAMP_CONFIG } from './lib/ramp-configs';
@@ -43,7 +47,7 @@ function getBgRampInfo( ramp: InternalRampResult ): {
 		pinLightness: {
 			stepName: STEP_TO_PIN,
 			value: clampAccentScaleReferenceLightness(
-				new Color( ramp.ramp[ STEP_TO_PIN ].color ).oklch.l,
+				get( parse( ramp.ramp[ STEP_TO_PIN ].color ), [ OKLCH, 'l' ] ),
 				ramp.direction
 			),
 		},
@@ -95,14 +99,14 @@ export function checkAccessibleCombinations( {
 		CONTRAST_COMBINATIONS.forEach( ( { bgs, fgs, target } ) => {
 			for ( const bg of bgs ) {
 				for ( const fg of fgs ) {
-					const bgColor = new Color( ramp.ramp[ bg ].color );
-					const fgColor = new Color( ramp.ramp[ fg ].color );
+					const bgColor = parse( ramp.ramp[ bg ].color );
+					const fgColor = parse( ramp.ramp[ fg ].color );
 					if ( getCachedContrast( bgColor, fgColor ) < target ) {
 						unmetTargets.push( {
 							bgName: bg,
-							bgColor: bgColor.toString(),
+							bgColor: serialize( bgColor ),
 							fgName: fg,
-							fgColor: fgColor.toString(),
+							fgColor: serialize( fgColor ),
 							unmetContrast: target,
 						} );
 					}
@@ -115,14 +119,14 @@ export function checkAccessibleCombinations( {
 		CONTRAST_COMBINATIONS.forEach( ( { bgs, fgs, target } ) => {
 			for ( const bg of bgs ) {
 				for ( const fg of fgs ) {
-					const bgColor = new Color( bgRamp.ramp[ bg ].color );
-					const fgColor = new Color( ramp.ramp[ fg ].color );
+					const bgColor = parse( bgRamp.ramp[ bg ].color );
+					const fgColor = parse( ramp.ramp[ fg ].color );
 					if ( getCachedContrast( bgColor, fgColor ) < target ) {
 						unmetTargets.push( {
 							bgName: bg,
-							bgColor: bgColor.toString(),
+							bgColor: serialize( bgColor ),
 							fgName: fg,
-							fgColor: fgColor.toString(),
+							fgColor: serialize( fgColor ),
 							unmetContrast: target,
 						} );
 					}

@@ -1,11 +1,15 @@
 /**
  * External dependencies
  */
-import Color from 'colorjs.io';
+// Disable reason: ESLint resolver can't handle `exports`. Import resolver
+// checking is redundant in TypeScript files.
+// eslint-disable-next-line import/no-unresolved
+import { get, OKLCH, type ColorTypes } from 'colorjs.io/fn';
 
 /**
  * Internal dependencies
  */
+import './register-color-spaces';
 import { clampToGamut } from './utils';
 import {
 	WHITE,
@@ -34,8 +38,8 @@ import { type TaperChromaOptions, taperChroma } from './taper-chroma';
  * @param options.taperChromaOptions
  */
 export function findColorMeetingRequirements(
-	reference: Color,
-	seed: Color,
+	reference: ColorTypes,
+	seed: ColorTypes,
 	target: number,
 	direction: 'lighter' | 'darker',
 	{
@@ -50,11 +54,11 @@ export function findColorMeetingRequirements(
 		taperChromaOptions?: TaperChromaOptions;
 		strict?: boolean;
 	} = {}
-): { color: Color; reached: boolean; achieved: number } {
+): { color: ColorTypes; reached: boolean; achieved: number } {
 	// A target of 1 means same color.
 	// A target lower than 1 doesn't make sense.
 	if ( target <= 1 ) {
-		return { color: seed.clone(), reached: true, achieved: 1 };
+		return { color: seed, reached: true, achieved: 1 };
 	}
 
 	if ( lightnessConstraint ) {
@@ -62,19 +66,21 @@ export function findColorMeetingRequirements(
 		// Useful when pinning a step to a specific lightness, of to specify
 		// min/max L values.
 		let newL = lightnessConstraint.value;
-		let newC = seed.oklch.c;
+		let newC = get( seed, [ OKLCH, 'c' ] );
 
 		if ( taperChromaOptions ) {
-			( { l: newL, c: newC } = taperChroma(
-				seed,
-				newL,
-				taperChromaOptions
-			) );
+			const tapered = taperChroma( seed, newL, taperChromaOptions );
+			if ( ! ( 'spaceId' in tapered ) ) {
+				const lcTapered = tapered as { l: number; c: number };
+				newL = lcTapered.l;
+				newC = lcTapered.c;
+			}
 		}
 
-		const colorWithExactL = clampToGamut(
-			new Color( 'oklch', [ newL, newC, seed.oklch.h ] )
-		);
+		const colorWithExactL = clampToGamut( {
+			spaceId: 'oklch',
+			coords: [ newL, newC, get( seed, [ OKLCH, 'h' ] ) ],
+		} );
 		const exactLContrast = getCachedContrast( reference, colorWithExactL );
 
 		// If the L constraint is of "force" type, apply it even when it doesn't
@@ -106,7 +112,7 @@ export function findColorMeetingRequirements(
 			throw new Error(
 				`Contrast target ${ target.toFixed(
 					2
-				) }:1 unreachable in ${ direction } direction against ${ mostContrastingColor.toString() }` +
+				) }:1 unreachable in ${ direction } direction` +
 					`(boundary achieves ${ highestPossibleContrast.toFixed(
 						3
 					) }:1).`
@@ -124,11 +130,11 @@ export function findColorMeetingRequirements(
 	// Originally this was seed.oklch.l — although it's an assumption that works
 	// only when we know for sure the direction of the search.
 	// TODO: can we bring this back to seed.oklch.l ?
-	let worseL = reference.oklch.l;
+	let worseL = get( reference, [ OKLCH, 'l' ] );
 	let betterL = mostContrastingL;
 
 	let bestContrastFound = highestPossibleContrast;
-	let resultingColor = mostContrastingColor;
+	let resultingColor: ColorTypes = mostContrastingColor;
 
 	for (
 		let i = 0;
@@ -137,19 +143,21 @@ export function findColorMeetingRequirements(
 		i++
 	) {
 		let newL = ( worseL + betterL ) / 2;
-		let newC = seed.oklch.c;
+		let newC = get( seed, [ OKLCH, 'c' ] );
 
 		if ( taperChromaOptions ) {
-			( { l: newL, c: newC } = taperChroma(
-				seed,
-				newL,
-				taperChromaOptions
-			) );
+			const tapered = taperChroma( seed, newL, taperChromaOptions );
+			if ( ! ( 'spaceId' in tapered ) ) {
+				const lcTapered = tapered as { l: number; c: number };
+				newL = lcTapered.l;
+				newC = lcTapered.c;
+			}
 		}
 
-		const newColor = clampToGamut(
-			new Color( 'oklch', [ newL, newC, seed.oklch.h ] )
-		);
+		const newColor = clampToGamut( {
+			spaceId: 'oklch',
+			coords: [ newL, newC, get( seed, [ OKLCH, 'h' ] ) ],
+		} );
 		const newContrast = getCachedContrast( reference, newColor );
 
 		if ( newContrast >= target ) {

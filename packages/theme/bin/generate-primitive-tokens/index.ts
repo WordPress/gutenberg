@@ -4,11 +4,22 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import Color from 'colorjs.io';
+import {
+	parse,
+	to,
+	serialize,
+	OKLCH,
+	sRGB,
+	type PlainColorObject,
+	// Disable reason: ESLint resolver can't handle `exports`. Import resolver
+	// checking is redundant in TypeScript files.
+	// eslint-disable-next-line import/no-unresolved
+} from 'colorjs.io/fn';
 
 /**
  * Internal dependencies
  */
+import '../../src/color-ramps/lib/register-color-spaces';
 import {
 	DEFAULT_SEED_COLORS,
 	buildBgRamp,
@@ -23,9 +34,9 @@ const colorJsonPath = path.join( __dirname, '../../tokens/color.json' );
 
 const transformColorStringToDTCGValue = ( color: string ) => {
 	if ( /oklch|p3/.test( color ) ) {
-		let parsed: Color;
+		let parsed: PlainColorObject;
 		try {
-			parsed = new Color( color ).to( 'oklch' );
+			parsed = to( parse( color ), OKLCH );
 		} catch {
 			return color;
 		}
@@ -39,7 +50,7 @@ const transformColorStringToDTCGValue = ( color: string ) => {
 				isNaN( coords[ 2 ] ) ? 0 : coords[ 2 ], // h
 			],
 			...( parsed.alpha < 1 ? { alpha: parsed.alpha } : undefined ),
-			hex: parsed.to( 'srgb' ).toString( { format: 'hex' } ),
+			hex: serialize( to( parsed, sRGB ), { format: 'hex' } ),
 		};
 	}
 

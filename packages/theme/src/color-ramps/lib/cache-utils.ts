@@ -1,7 +1,21 @@
 /**
  * External dependencies
  */
-import type Color from 'colorjs.io';
+import {
+	to,
+	serialize,
+	contrastWCAG21,
+	sRGB,
+	type ColorTypes,
+	// Disable reason: ESLint resolver can't handle `exports`. Import resolver
+	// checking is redundant in TypeScript files.
+	// eslint-disable-next-line import/no-unresolved
+} from 'colorjs.io/fn';
+
+/**
+ * Internal dependencies
+ */
+import './register-color-spaces';
 
 /**
  * Cache for WCAG contrast calculations
@@ -11,17 +25,17 @@ const contrastCache = new Map< string, number >();
 /**
  * Cache for color string representations
  */
-const colorStringCache = new Map< Color, string >();
+const colorStringCache = new Map< ColorTypes, string >();
 
 /**
  * Get cached string representation of a color
  * @param color - Color object to stringify
  * @return Cached string representation
  */
-export function getColorString( color: Color ): string {
+export function getColorString( color: ColorTypes ): string {
 	let str = colorStringCache.get( color );
 	if ( str === undefined ) {
-		str = color.to( 'srgb' ).toString( { format: 'hex', inGamut: true } );
+		str = serialize( to( color, sRGB ), { format: 'hex', inGamut: true } );
 		colorStringCache.set( color, str );
 	}
 	return str;
@@ -33,7 +47,10 @@ export function getColorString( color: Color ): string {
  * @param colorB - Second color
  * @return WCAG 2.1 contrast ratio
  */
-export function getCachedContrast( colorA: Color, colorB: Color ): number {
+export function getCachedContrast(
+	colorA: ColorTypes,
+	colorB: ColorTypes
+): number {
 	const keyA = getColorString( colorA );
 	const keyB = getColorString( colorB );
 	const cacheKey =
@@ -41,7 +58,7 @@ export function getCachedContrast( colorA: Color, colorB: Color ): number {
 
 	let contrast = contrastCache.get( cacheKey );
 	if ( contrast === undefined ) {
-		contrast = colorA.contrastWCAG21( colorB );
+		contrast = contrastWCAG21( colorA, colorB );
 		contrastCache.set( cacheKey, contrast );
 	}
 	return contrast;

@@ -1,11 +1,23 @@
 /**
  * External dependencies
  */
-import Color from 'colorjs.io';
+import {
+	clone,
+	get,
+	OKLCH,
+	parse,
+	set,
+	type ColorTypes,
+	type PlainColorObject,
+	// Disable reason: ESLint resolver can't handle `exports`. Import resolver
+	// checking is redundant in TypeScript files.
+	// eslint-disable-next-line import/no-unresolved
+} from 'colorjs.io/fn';
 
 /**
  * Internal dependencies
  */
+import './register-color-spaces';
 import { getCachedContrast, getColorString } from './cache-utils';
 import { findColorMeetingRequirements } from './find-color-with-constraints';
 import {
@@ -46,7 +58,7 @@ function calculateRamp( {
 	oppDir,
 	pinLightness,
 }: {
-	seed: Color;
+	seed: ColorTypes;
 	sortedSteps: ( keyof Ramp )[];
 	config: RampConfig;
 	mainDir: RampDirection;
@@ -66,7 +78,7 @@ function calculateRamp( {
 
 	// Keep track of the calculated colors, as they are going to be useful
 	// when other colors reference them.
-	const calculatedColors = new Map< keyof Ramp | 'seed', Color >();
+	const calculatedColors = new Map< keyof Ramp | 'seed', ColorTypes >();
 	calculatedColors.set( 'seed', seed );
 
 	for ( const stepName of sortedSteps ) {
@@ -108,7 +120,7 @@ function calculateRamp( {
 		}
 
 		function computeDirection(
-			color: Color,
+			color: ColorTypes,
 			followDirection: FollowDirection
 		): RampDirection {
 			if ( followDirection === 'main' ) {
@@ -219,9 +231,9 @@ export function buildRamp(
 		rescaleToFitContrastTargets?: boolean;
 	} = {}
 ): RampResult {
-	let seed: Color;
+	let seed: PlainColorObject;
 	try {
-		seed = clampToGamut( new Color( seedArg ) );
+		seed = clampToGamut( parse( seedArg ) );
 	} catch ( error ) {
 		throw new Error(
 			`Invalid seed color "${ seedArg }": ${
@@ -267,7 +279,7 @@ export function buildRamp(
 		! SATISFIED_ALL_CONTRAST_REQUIREMENTS &&
 		rescaleToFitContrastTargets
 	) {
-		let worseSeedL = seed.oklch.l;
+		let worseSeedL = get( seed, [ OKLCH, 'l' ] );
 		// For a scale with the "lighter" direction, the contrast can be improved
 		// by darkening the seed. For "darker" direction, by lightening the seed.
 		let betterSeedL = UNSATISFIED_DIRECTION === 'lighter' ? 0 : 1;
@@ -281,9 +293,11 @@ export function buildRamp(
 			i++
 		) {
 			const newSeed = clampToGamut(
-				seed.clone().set( {
-					l: ( worseSeedL + betterSeedL ) / 2,
-				} )
+				set(
+					clone( seed ),
+					[ OKLCH, 'l' ],
+					( worseSeedL + betterSeedL ) / 2
+				)
 			);
 
 			const iterationResults = calculateRamp( {
@@ -296,17 +310,17 @@ export function buildRamp(
 			} );
 
 			if ( iterationResults.SATISFIED_ALL_CONTRAST_REQUIREMENTS ) {
-				betterSeedL = newSeed.oklch.l;
+				betterSeedL = get( newSeed, [ OKLCH, 'l' ] );
 				// Only update toReturn when the ramp satisfies all constraints.
 				toReturn.ramp = iterationResults.rampResults;
 			} else if ( UNSATISFIED_DIRECTION !== mainDir ) {
 				// Failing constraint is in opposite direction to main ramp direction
 				// We've moved too far in mainDir, constrain the search
-				betterSeedL = newSeed.oklch.l;
+				betterSeedL = get( newSeed, [ OKLCH, 'l' ] );
 			} else {
 				// Failing constraint is in same direction as main ramp direction
 				// We haven't moved far enough in mainDir, continue searching
-				worseSeedL = newSeed.oklch.l;
+				worseSeedL = get( newSeed, [ OKLCH, 'l' ] );
 			}
 		}
 	}

@@ -2,7 +2,18 @@
  * External dependencies
  */
 import type { CSSProperties } from 'react';
-import Color from 'colorjs.io';
+import {
+	parse,
+	to,
+	get,
+	serialize,
+	sRGB,
+	HSL,
+	type ColorTypes,
+	// Disable reason: ESLint resolver can't handle `exports`. Import resolver
+	// checking is redundant in TypeScript files.
+	// eslint-disable-next-line import/no-unresolved
+} from 'colorjs.io/fn';
 import memoize from 'memize';
 
 /**
@@ -13,6 +24,7 @@ import { useMemo, useContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import './color-ramps/lib/register-color-spaces';
 import { ThemeContext } from './context';
 import semanticVariables from './prebuilt/ts/design-tokens';
 import {
@@ -84,37 +96,49 @@ const legacyWpComponentsOverridesCSS: Entry[] = [
 	],
 ];
 
-function customRgbFormat( color: Color ) {
-	const rgb = color.to( 'srgb' );
-	return [ rgb.r, rgb.g, rgb.b ]
+function customRgbFormat( color: ColorTypes ) {
+	const rgb = to( color, sRGB );
+	return [ get( rgb, 'srgb.r' ), get( rgb, 'srgb.g' ), get( rgb, 'srgb.b' ) ]
 		.map( ( n ) => Math.round( n * 255 ) )
 		.join( ', ' );
 }
 
 function legacyWpAdminThemeOverridesCSS( accent: string ): Entry[] {
-	const parsedAccent = new Color( accent ).to( 'hsl' );
+	const parsedAccent = to( parse( accent ), HSL );
 
-	const hsl = parsedAccent.coords;
-	const darker10 = new Color( 'hsl', [
-		hsl[ 0 ], // h
-		hsl[ 1 ], // s
-		Math.max( 0, Math.min( 100, hsl[ 2 ] - 5 ) ), // l (reduced by 5%)
-	] ).to( 'srgb' );
-	const darker20 = new Color( 'hsl', [
-		hsl[ 0 ], // h
-		hsl[ 1 ], // s
-		Math.max( 0, Math.min( 100, hsl[ 2 ] - 10 ) ), // l (reduced by 10%)
-	] ).to( 'srgb' );
+	const coords = parsedAccent.coords;
+	const darker10 = to(
+		{
+			space: HSL,
+			coords: [
+				coords[ 0 ], // h
+				coords[ 1 ], // s
+				Math.max( 0, Math.min( 100, coords[ 2 ] - 5 ) ), // l (reduced by 5%)
+			],
+		},
+		sRGB
+	);
+	const darker20 = to(
+		{
+			space: HSL,
+			coords: [
+				coords[ 0 ], // h
+				coords[ 1 ], // s
+				Math.max( 0, Math.min( 100, coords[ 2 ] - 10 ) ), // l (reduced by 10%)
+			],
+		},
+		sRGB
+	);
 
 	return [
 		[
 			'--wp-admin-theme-color',
-			parsedAccent.to( 'srgb' ).toString( { format: 'hex' } ),
+			serialize( to( parsedAccent, sRGB ), { format: 'hex' } ),
 		],
 		[ '--wp-admin-theme-color--rgb', customRgbFormat( parsedAccent ) ],
 		[
 			'--wp-admin-theme-color-darker-10',
-			darker10.toString( { format: 'hex' } ),
+			serialize( darker10, { format: 'hex' } ),
 		],
 		[
 			'--wp-admin-theme-color-darker-10--rgb',
@@ -122,7 +146,7 @@ function legacyWpAdminThemeOverridesCSS( accent: string ): Entry[] {
 		],
 		[
 			'--wp-admin-theme-color-darker-20',
-			darker20.toString( { format: 'hex' } ),
+			serialize( darker20, { format: 'hex' } ),
 		],
 		[
 			'--wp-admin-theme-color-darker-20--rgb',
