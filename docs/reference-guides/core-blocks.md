@@ -512,7 +512,7 @@ Your site doesn’t include support for this block. ([Source](https://github.com
 
 -	**Name:** core/missing
 -	**Category:** text
--	**Supports:** interactivity (clientNavigation), ~~className~~, ~~customClassName~~, ~~html~~, ~~inserter~~, ~~reusable~~
+-	**Supports:** interactivity (clientNavigation), ~~blockVisibility~~, ~~className~~, ~~customClassName~~, ~~html~~, ~~inserter~~, ~~lock~~, ~~renaming~~, ~~reusable~~
 -	**Attributes:** originalContent, originalName, originalUndelimitedContent
 
 ## More
