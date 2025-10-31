@@ -12,7 +12,7 @@ test.use( {
 test.describe( 'Block Comments', () => {
 	test.beforeEach( async ( { admin, blockCommentUtils } ) => {
 		await admin.createNewPost();
-		await blockCommentUtils.openBlockCommentSidebar();
+		// await blockCommentUtils.openBlockCommentSidebar();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -22,7 +22,13 @@ test.describe( 'Block Comments', () => {
 	test( 'should move focus to add a new note form', async ( {
 		editor,
 		page,
+		blockCommentUtils,
 	} ) => {
+		await blockCommentUtils.addBlockWithComment( {
+			type: 'core/paragraph',
+			attributes: { content: 'Howdy!' },
+			comment: 'Test comment',
+		} );
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'Testing block comments' },
