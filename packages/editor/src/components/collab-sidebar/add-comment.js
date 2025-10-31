@@ -80,6 +80,7 @@ export function AddComment( {
 				if ( event.currentTarget.contains( event.relatedTarget ) ) {
 					return;
 				}
+				toggleBlockSpotlight( clientId, false );
 				setShowCommentBoard( false );
 			} }
 		>
