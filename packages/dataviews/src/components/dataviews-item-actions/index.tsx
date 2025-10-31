@@ -132,8 +132,19 @@ export function ActionsMenuGroup< Item >( {
 	registry,
 	setActiveModalAction,
 }: ActionsMenuGroupProps< Item > ) {
-	const primaryActions = actions.filter( ( action ) => action.isPrimary );
-	const regularActions = actions.filter( ( action ) => ! action.isPrimary );
+	const { primaryActions, regularActions } = useMemo( () => {
+		const _primaryActions = actions.filter(
+			( action ) => action.isPrimary
+		);
+		const _regularActions = actions.filter(
+			( action ) => ! action.isPrimary
+		);
+
+		return {
+			primaryActions: _primaryActions,
+			regularActions: _regularActions,
+		};
+	}, [ actions ] );
 
 	const handleActionClick = ( action: Action< Item > ) => () => {
 		if ( 'RenderModal' in action ) {
