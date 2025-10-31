@@ -71,7 +71,7 @@ export function createYMap< T extends YMapRecord >(
  * @param value Value to check.
  */
 export function isYMap< T extends YMapRecord >(
-	value: unknown
+	value: YMapWrap< T > | undefined
 ): value is YMapWrap< T > {
 	return value instanceof Y.Map;
 }
