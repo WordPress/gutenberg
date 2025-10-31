@@ -126,7 +126,7 @@ function normalizeForm( form: Form ): NormalizedForm {
 					Array.isArray( field.children ) && {
 						children: normalizeForm( {
 							fields: field.children,
-							layout: fieldLayout,
+							layout: DEFAULT_LAYOUT,
 						} ).fields,
 					} ),
 			} satisfies NormalizedFormField;

@@ -411,7 +411,7 @@ describe( 'normalizeFormFields', () => {
 	} );
 
 	describe( 'nested fields', () => {
-		it( 'with same ID', () => {
+		it( 'with same ID are supported', () => {
 			const REGULAR = {
 				type: 'regular',
 				labelPosition: 'top',
@@ -445,7 +445,7 @@ describe( 'normalizeFormFields', () => {
 			} );
 		} );
 
-		it( 'are normalized as well', () => {
+		it( 'are normalized at any level', () => {
 			const REGULAR = {
 				type: 'regular',
 				labelPosition: 'top',
@@ -513,6 +513,51 @@ describe( 'normalizeFormFields', () => {
 										],
 									},
 								],
+							},
+						],
+					},
+				],
+			} );
+		} );
+
+		it( 'layout is only prefilled for top-level fields', () => {
+			const REGULAR = {
+				type: 'regular',
+				labelPosition: 'top',
+			};
+			const CARD = {
+				type: 'card',
+				withHeader: true,
+				isCollapsible: true,
+				isOpened: true,
+				summary: [],
+			};
+			const form: Form = {
+				layout: { type: 'card' },
+				fields: [
+					'field1',
+					{
+						id: 'field2',
+						children: [ 'field3', 'field4' ],
+					},
+				],
+			};
+			const result = normalizeForm( form );
+			expect( result ).toStrictEqual( {
+				layout: CARD,
+				fields: [
+					{
+						id: 'field1',
+						layout: CARD,
+					},
+					{
+						id: 'field2',
+						layout: CARD,
+						children: [
+							{ id: 'field3', layout: REGULAR },
+							{
+								id: 'field4',
+								layout: REGULAR,
 							},
 						],
 					},
