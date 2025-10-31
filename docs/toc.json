@@ -374,9 +374,6 @@
 							{
 								"docs/contributors/code/e2e/README.md": [
 									{
-										"docs/contributors/code/e2e/migration.md": []
-									},
-									{
 										"docs/contributors/code/e2e/overusing-snapshots.md": []
 									}
 								]
