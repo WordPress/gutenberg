@@ -13,7 +13,7 @@ jobs:
         permissions:
             pull-requests: write
         steps:
-            - uses: mheap/github-action-required-labels@v5
+            - uses: mheap/github-action-required-labels@fb29a14a076b0f74099f6198f77750e8fc236016 # v5.5.0
               with:
                   mode: exactly
                   count: 1
