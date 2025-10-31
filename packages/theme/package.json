@@ -44,6 +44,9 @@
 		"colorjs.io": "^0.5.2",
 		"memize": "^2.1.0"
 	},
+	"devDependencies": {
+		"esbuild-esm-loader": "0.3.3"
+	},
 	"peerDependencies": {
 		"react": "^18.0.0",
 		"react-dom": "^18.0.0"
