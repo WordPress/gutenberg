@@ -227,6 +227,7 @@ export function BlockSettingsDropdown( {
 				canDuplicate,
 				canInsertBlock,
 				canRemove,
+				canAddNote,
 				onDuplicate,
 				onInsertAfter,
 				onInsertBefore,
@@ -334,9 +335,12 @@ export function BlockSettingsDropdown( {
 											</MenuItem>
 										</>
 									) }
-									{ count === 1 && (
+									{ canAddNote && (
 										<CommentIconSlotFill.Slot
-											fillProps={ { onClose } }
+											fillProps={ {
+												clientId: firstBlockClientId,
+												onClose,
+											} }
 										/>
 									) }
 								</MenuGroup>
