@@ -47,8 +47,8 @@
 	},
 	"types": "build-types",
 	"dependencies": {
-		"@wordpress/a11y": "file:../a11y",
-		"@wordpress/interactivity": "file:../interactivity",
+		"@wordpress/a11y": "workspace:../a11y",
+		"@wordpress/interactivity": "workspace:../interactivity",
 		"es-module-lexer": "^1.5.4"
 	},
 	"publishConfig": {

@@ -65,8 +65,8 @@
 		"build-module/color-ramps/lib/register-color-spaces.js"
 	],
 	"dependencies": {
-		"@wordpress/element": "file:../element",
-		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/element": "workspace:../element",
+		"@wordpress/private-apis": "workspace:../private-apis",
 		"colorjs.io": "^0.5.2",
 		"memize": "^2.1.0"
 	},

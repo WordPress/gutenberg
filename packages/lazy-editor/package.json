@@ -46,18 +46,18 @@
 	"wpScriptModuleExports": "./build-module/index.js",
 	"types": "build-types",
 	"dependencies": {
-		"@wordpress/asset-loader": "file:../asset-loader",
-		"@wordpress/base-styles": "file:../base-styles",
-		"@wordpress/block-editor": "file:../block-editor",
-		"@wordpress/blocks": "file:../blocks",
-		"@wordpress/components": "file:../components",
-		"@wordpress/core-data": "file:../core-data",
-		"@wordpress/data": "file:../data",
-		"@wordpress/editor": "file:../editor",
-		"@wordpress/element": "file:../element",
-		"@wordpress/global-styles-engine": "file:../global-styles-engine",
-		"@wordpress/i18n": "file:../i18n",
-		"@wordpress/private-apis": "file:../private-apis"
+		"@wordpress/asset-loader": "workspace:../asset-loader",
+		"@wordpress/base-styles": "workspace:../base-styles",
+		"@wordpress/block-editor": "workspace:../block-editor",
+		"@wordpress/blocks": "workspace:../blocks",
+		"@wordpress/components": "workspace:../components",
+		"@wordpress/core-data": "workspace:../core-data",
+		"@wordpress/data": "workspace:../data",
+		"@wordpress/editor": "workspace:../editor",
+		"@wordpress/element": "workspace:../element",
+		"@wordpress/global-styles-engine": "workspace:../global-styles-engine",
+		"@wordpress/i18n": "workspace:../i18n",
+		"@wordpress/private-apis": "workspace:../private-apis"
 	},
 	"publishConfig": {
 		"access": "public"

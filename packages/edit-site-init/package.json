@@ -33,9 +33,9 @@
 	"module": "build-module/index.js",
 	"wpScriptModuleExports": "./build-module/index.js",
 	"dependencies": {
-		"@wordpress/boot": "file:../boot",
-		"@wordpress/data": "file:../data",
-		"@wordpress/icons": "file:../icons"
+		"@wordpress/boot": "workspace:../boot",
+		"@wordpress/data": "workspace:../data",
+		"@wordpress/icons": "workspace:../icons"
 	},
 	"publishConfig": {
 		"access": "public"

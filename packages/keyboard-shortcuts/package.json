@@ -42,9 +42,9 @@
 	"react-native": "src/index",
 	"wpScript": true,
 	"dependencies": {
-		"@wordpress/data": "file:../data",
-		"@wordpress/element": "file:../element",
-		"@wordpress/keycodes": "file:../keycodes"
+		"@wordpress/data": "workspace:../data",
+		"@wordpress/element": "workspace:../element",
+		"@wordpress/keycodes": "workspace:../keycodes"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0"

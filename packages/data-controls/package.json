@@ -45,9 +45,9 @@
 	"wpScript": true,
 	"types": "build-types",
 	"dependencies": {
-		"@wordpress/api-fetch": "file:../api-fetch",
-		"@wordpress/data": "file:../data",
-		"@wordpress/deprecated": "file:../deprecated"
+		"@wordpress/api-fetch": "workspace:../api-fetch",
+		"@wordpress/data": "workspace:../data",
+		"@wordpress/deprecated": "workspace:../deprecated"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0"

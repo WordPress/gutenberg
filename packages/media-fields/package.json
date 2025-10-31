@@ -50,15 +50,15 @@
 		"src/**/*.scss"
 	],
 	"dependencies": {
-		"@wordpress/components": "file:../components",
-		"@wordpress/core-data": "file:../core-data",
-		"@wordpress/data": "file:../data",
-		"@wordpress/dataviews": "file:../dataviews",
-		"@wordpress/element": "file:../element",
-		"@wordpress/i18n": "file:../i18n",
-		"@wordpress/icons": "file:../icons",
-		"@wordpress/primitives": "file:../primitives",
-		"@wordpress/url": "file:../url"
+		"@wordpress/components": "workspace:../components",
+		"@wordpress/core-data": "workspace:../core-data",
+		"@wordpress/data": "workspace:../data",
+		"@wordpress/dataviews": "workspace:../dataviews",
+		"@wordpress/element": "workspace:../element",
+		"@wordpress/i18n": "workspace:../i18n",
+		"@wordpress/icons": "workspace:../icons",
+		"@wordpress/primitives": "workspace:../primitives",
+		"@wordpress/url": "workspace:../url"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0"

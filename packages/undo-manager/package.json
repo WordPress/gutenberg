@@ -46,7 +46,7 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@wordpress/is-shallow-equal": "file:../is-shallow-equal"
+		"@wordpress/is-shallow-equal": "workspace:../is-shallow-equal"
 	},
 	"publishConfig": {
 		"access": "public"

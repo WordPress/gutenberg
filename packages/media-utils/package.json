@@ -48,17 +48,17 @@
 		"build-style/**"
 	],
 	"dependencies": {
-		"@wordpress/api-fetch": "file:../api-fetch",
-		"@wordpress/blob": "file:../blob",
-		"@wordpress/components": "file:../components",
-		"@wordpress/core-data": "file:../core-data",
-		"@wordpress/data": "file:../data",
-		"@wordpress/dataviews": "file:../dataviews",
-		"@wordpress/element": "file:../element",
-		"@wordpress/i18n": "file:../i18n",
-		"@wordpress/icons": "file:../icons",
-		"@wordpress/media-fields": "file:../media-fields",
-		"@wordpress/private-apis": "file:../private-apis"
+		"@wordpress/api-fetch": "workspace:../api-fetch",
+		"@wordpress/blob": "workspace:../blob",
+		"@wordpress/components": "workspace:../components",
+		"@wordpress/core-data": "workspace:../core-data",
+		"@wordpress/data": "workspace:../data",
+		"@wordpress/dataviews": "workspace:../dataviews",
+		"@wordpress/element": "workspace:../element",
+		"@wordpress/i18n": "workspace:../i18n",
+		"@wordpress/icons": "workspace:../icons",
+		"@wordpress/media-fields": "workspace:../media-fields",
+		"@wordpress/private-apis": "workspace:../private-apis"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0"

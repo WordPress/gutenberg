@@ -45,8 +45,8 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@wordpress/element": "file:../element",
-		"@wordpress/primitives": "file:../primitives"
+		"@wordpress/element": "workspace:../element",
+		"@wordpress/primitives": "workspace:../primitives"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0"

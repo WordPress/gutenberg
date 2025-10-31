@@ -10,17 +10,17 @@
 		]
 	},
 	"dependencies": {
-		"@wordpress/admin-ui": "file:../../packages/admin-ui",
-		"@wordpress/components": "file:../../packages/components",
-		"@wordpress/compose": "file:../../packages/compose",
-		"@wordpress/core-data": "file:../../packages/core-data",
-		"@wordpress/data": "file:../../packages/data",
-		"@wordpress/editor": "file:../../packages/editor",
-		"@wordpress/element": "file:../../packages/element",
-		"@wordpress/global-styles-engine": "file:../../packages/global-styles-engine",
-		"@wordpress/global-styles-ui": "file:../../packages/global-styles-ui",
-		"@wordpress/i18n": "file:../../packages/i18n",
-		"@wordpress/private-apis": "file:../../packages/private-apis",
-		"@wordpress/route": "file:../../packages/route"
+		"@wordpress/admin-ui": "workspace:../../packages/admin-ui",
+		"@wordpress/components": "workspace:../../packages/components",
+		"@wordpress/compose": "workspace:../../packages/compose",
+		"@wordpress/core-data": "workspace:../../packages/core-data",
+		"@wordpress/data": "workspace:../../packages/data",
+		"@wordpress/editor": "workspace:../../packages/editor",
+		"@wordpress/element": "workspace:../../packages/element",
+		"@wordpress/global-styles-engine": "workspace:../../packages/global-styles-engine",
+		"@wordpress/global-styles-ui": "workspace:../../packages/global-styles-ui",
+		"@wordpress/i18n": "workspace:../../packages/i18n",
+		"@wordpress/private-apis": "workspace:../../packages/private-apis",
+		"@wordpress/route": "workspace:../../packages/route"
 	}
 }
