@@ -6100,4 +6100,95 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$this->assertEquals( $expected, $block_nodes );
 	}
+
+	public function test_merge_incoming_data_duotone_presets_with_block_level_default_disabled() {
+		$defaults = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'color'  => array(
+						'defaultDuotone' => true,
+						'duotone'        => array(
+							array(
+								'slug'   => 'dark-grayscale',
+								'colors' => array( '#000000', '#7f7f7f' ),
+								'name'   => 'Default Dark grayscale',
+							),
+							array(
+								'slug'   => 'blue-orange',
+								'colors' => array( '#0000ff', '#ff8800' ),
+								'name'   => 'Blue Orange',
+							),
+						),
+					),
+				),
+			),
+			'default'
+		);
+		$theme    = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'blocks' => array(
+						'core/image' => array(
+							'color' => array(
+								'defaultDuotone' => false,
+								'duotone'        => array(
+									array(
+										'slug'   => 'dark-grayscale',
+										'colors' => array( '#000000', '#7f7f7f' ),
+										'name'   => 'Theme Dark grayscale',
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected = array(
+			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'settings' => array(
+				'color'  => array(
+					'defaultDuotone' => true,
+					'duotone'        => array(
+						'default' => array(
+							array(
+								'slug'   => 'dark-grayscale',
+								'colors' => array( '#000000', '#7f7f7f' ),
+								'name'   => 'Default Dark grayscale',
+							),
+							array(
+								'slug'   => 'blue-orange',
+								'colors' => array( '#0000ff', '#ff8800' ),
+								'name'   => 'Blue Orange',
+							),
+						),
+					),
+				),
+				'blocks' => array(
+					'core/image' => array(
+						'color' => array(
+							'defaultDuotone' => false,
+							'duotone'        => array(
+								'theme' => array(
+									array(
+										'slug'   => 'dark-grayscale',
+										'colors' => array( '#000000', '#7f7f7f' ),
+										'name'   => 'Theme Dark grayscale',
+									),
+								),
+							),
+						),
+					),
+				),
+			),
+		);
+
+		$defaults->merge( $theme );
+		$actual = $defaults->get_raw_data();
+
+		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
 }
