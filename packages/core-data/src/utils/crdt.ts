@@ -27,13 +27,40 @@ import {
 	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 } from '../sync';
 import type { WPSelection } from '../types';
+import {
+	createYMap,
+	getRootMap,
+	isYMap,
+	type YMapRecord,
+	type YMapWrap,
+} from './crdt-utils';
 
+// Changes that can be applied to a post entity record.
 export type PostChanges = Partial< Post > & {
 	blocks?: Block[];
 	excerpt?: Post[ 'excerpt' ] | string;
 	selection?: WPSelection;
 	title?: Post[ 'title' ] | string;
 };
+
+// A post record as represented in the CRDT document (Y.Map).
+export interface YPostRecord extends YMapRecord {
+	author: number;
+	blocks: YBlocks;
+	comment_status: string;
+	date: string | null;
+	excerpt: string;
+	featured_media: number;
+	format: string;
+	meta: YMapWrap< YMapRecord >;
+	ping_status: string;
+	slug: string;
+	status: string;
+	sticky: boolean;
+	tags: number[];
+	template: string;
+	title: string;
+}
 
 // Properties that are allowed to be synced for a post.
 const allowedPostProperties = new Set< string >( [
@@ -44,8 +71,8 @@ const allowedPostProperties = new Set< string >( [
 	'excerpt',
 	'featured_media',
 	'format',
-	'ping_status',
 	'meta',
+	'ping_status',
 	'slug',
 	'status',
 	'sticky',
@@ -71,7 +98,7 @@ export function defaultApplyChangesToCRDTDoc(
 	ydoc: CRDTDoc,
 	changes: ObjectData
 ): void {
-	const ymap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
+	const ymap = getRootMap( ydoc, CRDT_RECORD_MAP_KEY );
 
 	Object.entries( changes ).forEach( ( [ key, newValue ] ) => {
 		// Cannot serialize function values, so cannot sync them.
@@ -79,17 +106,12 @@ export function defaultApplyChangesToCRDTDoc(
 			return;
 		}
 
-		// Set the value in the root document.
-		function setValue< T = unknown >( updatedValue: T ): void {
-			ymap.set( key, updatedValue );
-		}
-
 		switch ( key ) {
 			// Add support for additional data types here.
 
 			default: {
 				const currentValue = ymap.get( key );
-				mergeValue( currentValue, newValue, setValue );
+				updateMapValue( ymap, key, currentValue, newValue );
 			}
 		}
 	} );
@@ -109,31 +131,28 @@ export function applyPostChangesToCRDTDoc(
 	changes: PostChanges,
 	_postType: Type // eslint-disable-line @typescript-eslint/no-unused-vars
 ): void {
-	const ymap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
+	const ymap = getRootMap< YPostRecord >( ydoc, CRDT_RECORD_MAP_KEY );
 
-	Object.entries( changes ).forEach( ( [ key, newValue ] ) => {
+	Object.keys( changes ).forEach( ( key ) => {
 		if ( ! allowedPostProperties.has( key ) ) {
 			return;
 		}
+
+		const newValue = changes[ key ];
 
 		// Cannot serialize function values, so cannot sync them.
 		if ( 'function' === typeof newValue ) {
 			return;
 		}
 
-		// Set the value in the root document.
-		function setValue< T = unknown >( updatedValue: T ): void {
-			ymap.set( key, updatedValue );
-		}
-
 		switch ( key ) {
 			case 'blocks': {
-				let currentBlocks = ymap.get( 'blocks' ) as YBlocks;
+				let currentBlocks = ymap.get( key );
 
 				// Initialize.
 				if ( ! ( currentBlocks instanceof Y.Array ) ) {
 					currentBlocks = new Y.Array< YBlock >();
-					setValue( currentBlocks );
+					ymap.set( key, currentBlocks );
 				}
 
 				// Block[] from local changes.
@@ -151,23 +170,21 @@ export function applyPostChangesToCRDTDoc(
 			}
 
 			case 'excerpt': {
-				const currentValue = ymap.get( 'excerpt' ) as
-					| string
-					| undefined;
+				const currentValue = ymap.get( 'excerpt' );
 				const rawNewValue = getRawValue( newValue );
 
-				mergeValue( currentValue, rawNewValue, setValue );
+				updateMapValue( ymap, key, currentValue, rawNewValue );
 				break;
 			}
 
 			// "Meta" is overloaded term; here, it refers to post meta.
 			case 'meta': {
-				let metaMap = ymap.get( 'meta' ) as Y.Map< unknown >;
+				let metaMap = ymap.get( 'meta' );
 
 				// Initialize.
-				if ( ! ( metaMap instanceof Y.Map ) ) {
-					metaMap = new Y.Map();
-					setValue( metaMap );
+				if ( ! isYMap( metaMap ) ) {
+					metaMap = createYMap< YMapRecord >();
+					ymap.set( 'meta', metaMap );
 				}
 
 				// Iterate over each meta property in the new value and merge it if it
@@ -178,12 +195,11 @@ export function applyPostChangesToCRDTDoc(
 							return;
 						}
 
-						mergeValue(
+						updateMapValue(
+							metaMap,
+							metaKey,
 							metaMap.get( metaKey ), // current value in CRDT
-							metaValue, // new value from changes
-							( updatedMetaValue: unknown ): void => {
-								metaMap.set( metaKey, updatedMetaValue );
-							}
+							metaValue // new value from changes
 						);
 					}
 				);
@@ -197,13 +213,13 @@ export function applyPostChangesToCRDTDoc(
 					break;
 				}
 
-				const currentValue = ymap.get( 'slug' ) as string;
-				mergeValue( currentValue, newValue, setValue );
+				const currentValue = ymap.get( key );
+				updateMapValue( ymap, key, currentValue, newValue );
 				break;
 			}
 
 			case 'title': {
-				const currentValue = ymap.get( 'title' ) as string | undefined;
+				const currentValue = ymap.get( key );
 
 				// Copy logic from prePersistPostType to ensure that the "Auto
 				// Draft" template title is not synced.
@@ -212,22 +228,22 @@ export function applyPostChangesToCRDTDoc(
 					rawNewValue = '';
 				}
 
-				mergeValue( currentValue, rawNewValue, setValue );
+				updateMapValue( ymap, key, currentValue, rawNewValue );
 				break;
 			}
 
-			// Add support for additional data types here.
+			// Add support for additional properties here.
 
 			default: {
 				const currentValue = ymap.get( key );
-				mergeValue( currentValue, newValue, setValue );
+				updateMapValue( ymap, key, currentValue, newValue );
 			}
 		}
 	} );
 }
 
 export function defaultGetChangesFromCRDTDoc( crdtDoc: CRDTDoc ): ObjectData {
-	return crdtDoc.getMap( CRDT_RECORD_MAP_KEY ).toJSON();
+	return getRootMap( crdtDoc, CRDT_RECORD_MAP_KEY ).toJSON();
 }
 
 /**
@@ -245,7 +261,7 @@ export function getPostChangesFromCRDTDoc(
 	editedRecord: Post,
 	_postType: Type // eslint-disable-line @typescript-eslint/no-unused-vars
 ): PostChanges {
-	const ymap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
+	const ymap = getRootMap< YPostRecord >( ydoc, CRDT_RECORD_MAP_KEY );
 
 	let allowedMetaChanges: Post[ 'meta' ] = {};
 
@@ -391,19 +407,25 @@ function getRawValue( value?: unknown ): string | undefined {
 	return undefined;
 }
 
-function haveValuesChanged< ValueType = any >(
-	currentValue: ValueType,
-	newValue: ValueType
+function haveValuesChanged< ValueType >(
+	currentValue: ValueType | undefined,
+	newValue: ValueType | undefined
 ): boolean {
 	return ! fastDeepEqual( currentValue, newValue );
 }
 
-function mergeValue< ValueType = any >(
-	currentValue: ValueType,
-	newValue: ValueType,
-	setValue: ( value: ValueType ) => void
+function updateMapValue< T extends YMapRecord, K extends keyof T >(
+	map: YMapWrap< T >,
+	key: K,
+	currentValue: T[ K ] | undefined,
+	newValue: T[ K ] | undefined
 ): void {
-	if ( haveValuesChanged< ValueType >( currentValue, newValue ) ) {
-		setValue( newValue );
+	if ( undefined === newValue ) {
+		map.delete( key );
+		return;
+	}
+
+	if ( haveValuesChanged< T[ K ] >( currentValue, newValue ) ) {
+		map.set( key, newValue );
 	}
 }
