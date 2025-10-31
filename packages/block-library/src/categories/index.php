@@ -110,7 +110,7 @@ function build_dropdown_script_block_core_categories( $dropdown_id ) {
 				if ( 'escape' === dropdown.dataset.lastkey ) {
 					return;
 				}
-				if ( dropdown.value && parseInt( dropdown.value ) > 0 && dropdown instanceof HTMLSelectElement ) {
+				if ( dropdown.value && dropdown instanceof HTMLSelectElement ) {
 					const url = new URL( homeUrl );
 					url.searchParams.set( dropdown.name, dropdown.value );
 					location.href = url.href;
