@@ -38,7 +38,6 @@ import {
 	TEMPLATE_POST_TYPE,
 } from '../../store/constants';
 import { useZoomOutModeExit } from './use-zoom-out-mode-exit';
-import { useEditorCanvas } from '../provider/editor-canvas-context';
 
 const {
 	LayoutStyle,
@@ -115,6 +114,7 @@ function VisualEditor( {
 		postType,
 		isPreview,
 		styles,
+		canvasMinHeight,
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostId,
@@ -123,7 +123,8 @@ function VisualEditor( {
 			getEditorSettings,
 			getRenderingMode,
 			getDeviceType,
-		} = select( editorStore );
+			getCanvasMinHeight,
+		} = unlock( select( editorStore ) );
 		const { getPostType, getEditedEntityRecord } = select( coreStore );
 		const postTypeSlug = getCurrentPostType();
 		const _renderingMode = getRenderingMode();
@@ -164,6 +165,7 @@ function VisualEditor( {
 			postType: postTypeSlug,
 			isPreview: editorSettings.isPreviewMode,
 			styles: editorSettings.styles,
+			canvasMinHeight: getCanvasMinHeight(),
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
@@ -187,6 +189,7 @@ function VisualEditor( {
 		};
 	}, [] );
 
+	const localRef = useRef();
 	const deviceStyles = useResizeCanvas( deviceType );
 	const [ globalLayoutSettings ] = useSettings( 'layout' );
 
@@ -333,8 +336,6 @@ function VisualEditor( {
 		// Disable resizing in zoomed-out mode.
 		! isZoomedOut;
 
-	const { canvasMinHeight } = useEditorCanvas();
-
 	// Calculate the minimum height including scroll offset to fit all notes.
 	const calculatedMinHeight = useMemo( () => {
 		const iframe = document.querySelector( 'iframe[name="editor-canvas"]' );
@@ -374,7 +375,6 @@ function VisualEditor( {
 		];
 	}, [ styles, enableResizing, calculatedMinHeight ] );
 
-	const localRef = useRef();
 	const typewriterRef = useTypewriter();
 	contentRef = useMergeRefs( [
 		localRef,

@@ -42,7 +42,7 @@ import CommentForm from './comment-form';
 import { focusCommentThread, getCommentExcerpt } from './utils';
 import { useFloatingThread } from './hooks';
 import { AddComment } from './add-comment';
-import { useEditorCanvas } from '../provider/editor-canvas-context';
+import { store as editorStore } from '../../store';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 const { Menu } = unlock( componentsPrivateApis );
@@ -63,8 +63,8 @@ export function Comments( {
 	const [ selectedThread, setSelectedThread ] = useState( null );
 	const [ boardOffsets, setBoardOffsets ] = useState( {} );
 	const [ blockRefs, setBlockRefs ] = useState( {} );
-	const { setCanvasMinHeight } = useEditorCanvas();
 
+	const { setCanvasMinHeight } = unlock( useDispatch( editorStore ) );
 	const { blockCommentId, selectedBlockClientId, orderedBlockIds } =
 		useSelect( ( select ) => {
 			const { getBlockAttributes, getSelectedBlockClientId } =
@@ -298,7 +298,14 @@ export function Comments( {
 		if ( Object.keys( newOffsets ).length > 0 ) {
 			setBoardOffsets( newOffsets );
 		}
-	}, [ heights, blockRefs, isFloating, threads, selectedThread, setCanvasMinHeight ] );
+	}, [
+		heights,
+		blockRefs,
+		isFloating,
+		threads,
+		selectedThread,
+		setCanvasMinHeight,
+	] );
 
 	const hasThreads = Array.isArray( threads ) && threads.length > 0;
 	if ( ! hasThreads && ! isFloating ) {

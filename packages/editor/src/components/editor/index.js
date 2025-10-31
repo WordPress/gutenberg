@@ -13,7 +13,6 @@ import { store as editorStore } from '../../store';
 import { TEMPLATE_POST_TYPE } from '../../store/constants';
 import EditorInterface from '../editor-interface';
 import { ExperimentalEditorProvider } from '../provider';
-import { EditorCanvasProvider } from '../provider/editor-canvas-context';
 import Sidebar from '../sidebar';
 import NotesSidebar from '../collab-sidebar';
 import GlobalStylesSidebar from '../global-styles-sidebar';
@@ -106,19 +105,17 @@ function Editor( {
 					initialEdits={ initialEdits }
 					useSubRegistry={ false }
 				>
-					<EditorCanvasProvider>
-						<EditorInterface { ...props }>
-							{ extraContent }
-						</EditorInterface>
-						{ children }
-						<NotesSidebar />
-						<Sidebar
-							onActionPerformed={ onActionPerformed }
-							extraPanels={ extraSidebarPanels }
-						/>
-						{ isBlockTheme && <GlobalStylesRenderer /> }
-						{ showGlobalStyles && <GlobalStylesSidebar /> }
-					</EditorCanvasProvider>
+					<EditorInterface { ...props }>
+						{ extraContent }
+					</EditorInterface>
+					{ children }
+					<NotesSidebar />
+					<Sidebar
+						onActionPerformed={ onActionPerformed }
+						extraPanels={ extraSidebarPanels }
+					/>
+					{ isBlockTheme && <GlobalStylesRenderer /> }
+					{ showGlobalStyles && <GlobalStylesSidebar /> }
 				</ExperimentalEditorProvider>
 			) }
 		</>
