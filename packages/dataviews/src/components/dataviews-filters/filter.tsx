@@ -62,6 +62,7 @@ import type {
 	View,
 } from '../../types';
 import useElements from '../../hooks/use-elements';
+import parseDateTime from '../../field-types/utils/parse-date-time';
 
 interface FilterTextProps {
 	activeElements: Option[];
@@ -499,7 +500,10 @@ export default function Filter( {
 
 		if ( field?.type === 'datetime' && typeof label === 'string' ) {
 			try {
-				label = new Date( label ).toLocaleString();
+				const dateValue = parseDateTime( label );
+				if ( dateValue !== null ) {
+					label = dateValue.toLocaleString();
+				}
 			} catch ( e ) {
 				label = filterInView.value;
 			}
