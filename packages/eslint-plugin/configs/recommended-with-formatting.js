@@ -22,6 +22,9 @@ const config = {
 	settings: {
 		'import/internal-regex': wpPackagesRegExp,
 		'import/extensions': [ '.js', '.jsx' ],
+		'import/resolver': {
+			typescript: true,
+		},
 	},
 	rules: {
 		'import/no-extraneous-dependencies': [

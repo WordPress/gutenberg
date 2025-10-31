@@ -5,6 +5,7 @@
 ### Enhancements
 
 - Disabled `import/no-unresolved`, `import/default`, and `import/named` checks for TypeScript files when TypeScript is installed, since these issues are [already checked by TypeScript](https://typescript-eslint.io/troubleshooting/typed-linting/performance/).
+- Improved resolution behavior to support modern package export semantics by updating default import resolver to [`eslint-import-resolver-typescript`](https://www.npmjs.com/package/eslint-import-resolver-typescript), including for non-TypeScript files.
 
 ## 22.20.0 (2025-10-29)
 
