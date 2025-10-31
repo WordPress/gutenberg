@@ -70,7 +70,7 @@ export function DataFormLayout< Item >( {
 					return null;
 				}
 
-				const fieldDefinition = !! formField.children
+				const fieldDefinition = ! formField.children
 					? getFieldDefinition( formField )
 					: undefined;
 
