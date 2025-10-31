@@ -57,14 +57,6 @@ function CommentForm( {
 				onSubmit( inputComment );
 				setInputComment( '' );
 			} }
-			onKeyDown={ ( event ) => {
-				if (
-					isKeyboardEvent.primary( event, 'Enter' ) &&
-					! isDisabled
-				) {
-					event.target.parentNode.requestSubmit();
-				}
-			} }
 		>
 			<VisuallyHidden as="label" htmlFor={ inputId }>
 				{ labelText ?? __( 'Note' ) }
@@ -78,6 +70,14 @@ function CommentForm( {
 				} }
 				rows={ 1 }
 				maxRows={ 20 }
+				onKeyDown={ ( event ) => {
+					if (
+						isKeyboardEvent.primary( event, 'Enter' ) &&
+						! isDisabled
+					) {
+						event.target.parentNode.requestSubmit();
+					}
+				} }
 			/>
 			<HStack spacing="2" justify="flex-end" wrap>
 				<Button size="compact" variant="tertiary" onClick={ onCancel }>
