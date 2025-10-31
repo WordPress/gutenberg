@@ -6,7 +6,7 @@ import { useEntityProp } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import { useTermContext } from '../utils/use-context-data';
+import { useTermContext } from '../utils/use-template-context';
 
 /**
  * Hook to fetch term count based on context or fallback to template parsing.

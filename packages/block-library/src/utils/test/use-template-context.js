@@ -4,7 +4,7 @@
 import {
 	parseTemplateSlug,
 	parseTemplateSlugWithValidation,
-} from '../use-context-data';
+} from '../use-template-context';
 
 describe( 'parseTemplateSlug', () => {
 	it( 'should handle empty template slug', () => {

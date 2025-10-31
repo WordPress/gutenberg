@@ -24,7 +24,7 @@ import { useEntityRecords } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import { useTermContext } from '../utils/use-context-data';
+import { useTermContext } from '../utils/use-template-context';
 
 const TEMPLATE = [ [ 'core/term-name' ] ];
 

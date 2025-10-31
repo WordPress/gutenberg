@@ -25,7 +25,7 @@ import { decodeEntities } from '@wordpress/html-entities';
  * Internal dependencies
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
-import { useTermContext } from '../utils/use-context-data';
+import { useTermContext } from '../utils/use-template-context';
 
 export default function TermNameEdit( {
 	attributes,

@@ -16,7 +16,7 @@ import { InspectorControls } from '@wordpress/block-editor';
  */
 import { useToolsPanelDropdownMenuProps } from '../../../utils/hooks';
 import { usePublicTaxonomies } from '../../utils';
-import { parseTemplateSlugWithValidation } from '../../../utils/use-context-data';
+import { parseTemplateSlugWithValidation } from '../../../utils/use-template-context';
 import TaxonomyControl from './taxonomy-control';
 import OrderControl from './order-control';
 import EmptyTermsControl from './empty-terms-control';
