@@ -16,7 +16,8 @@ import { addQueryArgs } from '@wordpress/url';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEvent } from '@wordpress/compose';
 import { useView } from '@wordpress/views';
-import { Button, Modal } from '@wordpress/components';
+import { Button, Modal, Icon, Tooltip } from '@wordpress/components';
+import { lock } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -219,17 +220,47 @@ export default function PageTemplates() {
 	const fields = useMemo( () => {
 		const _fields = [
 			previewField,
-			templateTitleField,
+
+			// Custom title field with lock icon
+			{
+				...templateTitleField,
+				render: ( item ) => (
+					<div className="page-template-title-wrapper">
+						<span className="page-template-title-text">
+							{ templateTitleField.render
+								? templateTitleField.render( item )
+								: item.title?.rendered || item.title }
+						</span>
+
+						{ ! item._isCustom && (
+							<div className="page-template-lock-icon">
+								<Tooltip
+									text={ __(
+										'This template cannot be edited'
+									) }
+								>
+									<Icon icon={ lock } size={ 24 } />
+								</Tooltip>
+							</div>
+						) }
+					</div>
+				),
+			},
+
 			descriptionField,
 			activeField,
 			slugField,
 		];
+
+		// Additional fields for "User" view
 		if ( activeView === 'user' ) {
 			_fields.push( themeField );
 			if ( dateField ) {
 				_fields.push( dateField );
 			}
 		}
+
+		// Build author dropdown options
 		const elements = [];
 		for ( const author in users ) {
 			elements.push( {
@@ -237,10 +268,13 @@ export default function PageTemplates() {
 				label: users[ author ]?.name ?? author,
 			} );
 		}
+
+		// Add author field
 		_fields.push( {
 			...authorField,
 			elements,
 		} );
+
 		return _fields;
 	}, [ users, activeView, themeField, dateField ] );
 

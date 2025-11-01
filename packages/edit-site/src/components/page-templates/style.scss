@@ -92,3 +92,24 @@
 		}
 	}
 }
+
+.page-template-title-wrapper {
+	display: flex;
+	align-items: center;
+	justify-content: space-between; // keep title and lock icon on same line
+	gap: 8px;
+	padding: 4px 0;
+
+	.page-template-title-text {
+		flex: 1;
+		text-align: left;
+	}
+
+	.page-template-lock-icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		cursor: default;
+		color: #000;
+	}
+}
