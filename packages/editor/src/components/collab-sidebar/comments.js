@@ -317,9 +317,11 @@ export function Comments( {
 					setShowCommentBoard={ setShowCommentBoard }
 					commentSidebarRef={ commentSidebarRef }
 				/>
-				<Text as="p">{ __( 'No notes available.' ) }</Text>
+				<Text as="p">{ __( 'Select a block to insert a Note.' ) }</Text>
 				<Text as="p" variant="muted">
-					{ __( 'Only logged in users can see Notes.' ) }
+					{ __(
+						'Notes are private. Only you and other editors can see them.'
+					) }
 				</Text>
 			</>
 		);
