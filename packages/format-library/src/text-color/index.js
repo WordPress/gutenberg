@@ -24,6 +24,10 @@ const title = __( 'Highlight' );
 const EMPTY_ARRAY = [];
 
 function getComputedStyleProperty( element, property ) {
+	if ( ! element || ! element.ownerDocument ) {
+		return null;
+	}
+
 	const { ownerDocument } = element;
 	const { defaultView } = ownerDocument;
 	const style = defaultView.getComputedStyle( element );
@@ -41,6 +45,10 @@ function getComputedStyleProperty( element, property ) {
 }
 
 function fillComputedColors( element, { color, backgroundColor } ) {
+	if ( ! element ) {
+		return;
+	}
+
 	if ( ! color && ! backgroundColor ) {
 		return;
 	}
@@ -66,14 +74,15 @@ function TextColorEdit( {
 		'color.palette'
 	);
 	const [ isAddingColor, setIsAddingColor ] = useState( false );
-	const colorIndicatorStyle = useMemo(
-		() =>
-			fillComputedColors(
-				contentRef.current,
-				getActiveColors( value, name, colors )
-			),
-		[ contentRef, value, colors ]
-	);
+	const colorIndicatorStyle = useMemo( () => {
+		if ( ! contentRef.current ) {
+			return undefined;
+		}
+		return fillComputedColors(
+			contentRef.current,
+			getActiveColors( value, name, colors )
+		);
+	}, [ contentRef, value, colors ] );
 
 	const hasColorsToChoose = !! colors.length || allowCustomControl;
 	if ( ! hasColorsToChoose && ! isActive ) {
