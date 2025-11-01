@@ -36,7 +36,7 @@ const AddCommentMenuItem = ( { clientId, onClick } ) => {
 			disabled={ isFreeformBlock }
 			info={
 				isFreeformBlock
-					? __( 'Not supported for this block.' )
+					? __( 'Convert to blocks to add notes.' )
 					: undefined
 			}
 		>
