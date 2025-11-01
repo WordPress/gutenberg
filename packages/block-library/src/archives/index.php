@@ -66,7 +66,7 @@ function render_block_core_archives( $attributes ) {
 		$show_label = empty( $attributes['showLabel'] ) ? ' screen-reader-text' : '';
 
 		$block_content = '<label for="' . $dropdown_id . '" class="wp-block-archives__label' . $show_label . '">' . esc_html( $title ) . '</label>
-		<select id="' . $dropdown_id . '" name="archive-dropdown">
+		<select id="' . esc_attr( $dropdown_id ) . '" name="archive-dropdown">
 		<option value="">' . esc_html( $label ) . '</option>' . $archives . '</select>';
 
 		// Inject the dropdown script immediately after the select dropdown.
