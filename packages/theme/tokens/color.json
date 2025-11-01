@@ -409,6 +409,74 @@
 				"surface1": {
 					"$value": "#efefef"
 				}
+			},
+			"caution": {
+				"bgFill1": {
+					"$value": "#f0d149"
+				},
+				"fgFill": {
+					"$value": "#1f1e1b"
+				},
+				"bgFill2": {
+					"$value": "#dabb2b"
+				},
+				"surface2": {
+					"$value": "#fdf9e7"
+				},
+				"surface6": {
+					"$value": "#e7d072"
+				},
+				"surface5": {
+					"$value": "#f4df8c"
+				},
+				"surface4": {
+					"$value": "#f8ebb6"
+				},
+				"surface3": {
+					"$value": "#fff"
+				},
+				"fgSurface4": {
+					"$value": "#291d00"
+				},
+				"fgSurface3": {
+					"$value": "#866a00"
+				},
+				"fgSurface2": {
+					"$value": "#a58700"
+				},
+				"fgSurface1": {
+					"$value": "#c6a800"
+				},
+				"stroke3": {
+					"$value": "#866a00"
+				},
+				"stroke4": {
+					"$value": "#644e00"
+				},
+				"stroke2": {
+					"$value": "#988d61"
+				},
+				"stroke1": {
+					"$value": "#b8ab76"
+				},
+				"bgFillDark": {
+					"$value": "#1f1e1b"
+				},
+				"fgFillDark": {
+					"$value": "#f6f1da"
+				},
+				"bgFillInverted2": {
+					"$value": "#1f1e1b"
+				},
+				"bgFillInverted1": {
+					"$value": "#3d2e00"
+				},
+				"fgFillInverted": {
+					"$value": "#f6f1da"
+				},
+				"surface1": {
+					"$value": "#faf1cb"
+				}
 			}
 		},
 		"semantic": {
@@ -480,6 +548,20 @@
 						"resting": {
 							"$value": "{color.primitive.warning.surface2}",
 							"$description": "Background color for surfaces with warning tone and weak emphasis."
+						}
+					}
+				},
+				"caution": {
+					"normal": {
+						"resting": {
+							"$value": "{color.primitive.caution.surface4}",
+							"$description": "Background color for surfaces with caution tone and normal emphasis."
+						}
+					},
+					"weak": {
+						"resting": {
+							"$value": "{color.primitive.caution.surface2}",
+							"$description": "Background color for surfaces with caution tone and weak emphasis."
 						}
 					}
 				},
@@ -646,6 +728,76 @@
 						"resting": {
 							"$value": "{color.primitive.bg.fgSurface3}",
 							"$description": "Foreground color for content like text with weak emphasis."
+						}
+					}
+				},
+				"success": {
+					"normal": {
+						"resting": {
+							"$value": "{color.primitive.success.fgSurface4}",
+							"$description": "Foreground color for content like text with success tone and normal emphasis."
+						}
+					},
+					"weak": {
+						"resting": {
+							"$value": "{color.primitive.success.fgSurface3}",
+							"$description": "Foreground color for content like text with success tone and weak emphasis."
+						}
+					}
+				},
+				"info": {
+					"normal": {
+						"resting": {
+							"$value": "{color.primitive.info.fgSurface4}",
+							"$description": "Foreground color for content like text with info tone and normal emphasis."
+						}
+					},
+					"weak": {
+						"resting": {
+							"$value": "{color.primitive.info.fgSurface3}",
+							"$description": "Foreground color for content like text with info tone and weak emphasis."
+						}
+					}
+				},
+				"warning": {
+					"normal": {
+						"resting": {
+							"$value": "{color.primitive.warning.fgSurface4}",
+							"$description": "Foreground color for content like text with warning tone and normal emphasis."
+						}
+					},
+					"weak": {
+						"resting": {
+							"$value": "{color.primitive.warning.fgSurface3}",
+							"$description": "Foreground color for content like text with warning tone and weak emphasis."
+						}
+					}
+				},
+				"caution": {
+					"normal": {
+						"resting": {
+							"$value": "{color.primitive.caution.fgSurface4}",
+							"$description": "Foreground color for content like text with caution tone and normal emphasis."
+						}
+					},
+					"weak": {
+						"resting": {
+							"$value": "{color.primitive.caution.fgSurface3}",
+							"$description": "Foreground color for content like text with caution tone and weak emphasis."
+						}
+					}
+				},
+				"error": {
+					"normal": {
+						"resting": {
+							"$value": "{color.primitive.error.fgSurface4}",
+							"$description": "Foreground color for content like text with error tone and normal emphasis."
+						}
+					},
+					"weak": {
+						"resting": {
+							"$value": "{color.primitive.error.fgSurface3}",
+							"$description": "Foreground color for content like text with error tone and weak emphasis."
 						}
 					}
 				}

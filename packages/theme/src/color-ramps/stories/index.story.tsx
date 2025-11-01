@@ -82,6 +82,13 @@ export const Default: StoryObj< typeof ColorGen > = {
 			},
 			ramp: buildAccentRamp( DEFAULT_SEED_COLORS.warning, bgRamp ).ramp,
 		};
+		const cautionRampObj = {
+			seed: {
+				name: 'bgFill1' as const,
+				value: DEFAULT_SEED_COLORS.caution,
+			},
+			ramp: buildAccentRamp( DEFAULT_SEED_COLORS.caution, bgRamp ).ramp,
+		};
 		const errorRampObj = {
 			seed: {
 				name: 'bgFill1' as const,
@@ -109,6 +116,7 @@ export const Default: StoryObj< typeof ColorGen > = {
 						infoRampObj,
 						successRampObj,
 						warningRampObj,
+						cautionRampObj,
 						errorRampObj,
 					] }
 				/>

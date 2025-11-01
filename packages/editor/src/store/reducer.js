@@ -418,6 +418,21 @@ export function showStylebook( state = false, action ) {
 	return state;
 }
 
+/**
+ * Reducer for the canvas minimum height.
+ *
+ * @param {number} state  Current state.
+ * @param {Object} action Dispatched action.
+ * @return {number} Updated state.
+ */
+export function canvasMinHeight( state = 0, action ) {
+	switch ( action.type ) {
+		case 'SET_CANVAS_MIN_HEIGHT':
+			return action.minHeight;
+	}
+	return state;
+}
+
 export default combineReducers( {
 	postId,
 	postType,
@@ -439,5 +454,6 @@ export default combineReducers( {
 	publishSidebarActive,
 	stylesPath,
 	showStylebook,
+	canvasMinHeight,
 	dataviews: dataviewsReducer,
 } );

@@ -9,6 +9,58 @@ A theming package that's part of the WordPress Design System. It has two parts:
 
 In the **[Design Tokens Reference](docs/ds-tokens.md)** document there is a complete reference of all available design tokens including colors, spacing, typography, and more.
 
+### Color Tokens
+
+The design system defines color tokens using the following naming scheme:
+
+```
+--wpds-<element>-<tone>[-<emphasis>][-<state>]
+```
+
+**Element** specifies what the color is applied to.
+
+| Value                | Description                                                                                 |
+| -------------------- | ------------------------------------------------------------------------------------------- |
+| `bg-surface`         | Backgrounds of layout or container surfaces.                                                |
+| `bg-interactive`     | Backgrounds of interactive elements such as buttons, inputs, and toggles.                   |
+| `bg-track`           | Backgrounds of track components like scrollbars and slider tracks.                          |
+| `bg-thumb`           | Backgrounds of thumb components like scrollbar thumbs and slider thumbs.                    |
+| `fg-content`         | Foreground color for text and icons in static content.                                      |
+| `fg-interactive`     | Foreground color for text and icons in interactive elements such as links and buttons.      |
+| `stroke-surface`     | Decorative borders and dividers for non-interactive surfaces.                               |
+| `stroke-interactive` | Accessible borders for interactive controls.                                                |
+| `stroke-focus`       | Stroke color specifically for focus rings.                                                  |
+
+**Tone** defines the semantic intent of the color.
+
+| Value     | Description                                                                              |
+| --------- | ---------------------------------------------------------------------------------------- |
+| `neutral` | Neutrally toned UI elements.                                                             |
+| `brand`   | Brand-accented or primary action colors.                                                 |
+| `success` | Positive or completed states.                                                            |
+| `info`    | Informational or system-generated context.                                               |
+| `caution` | Heads-up or low-severity issues; “proceed carefully.”                                    |
+| `warning` | Higher-severity or time-sensitive issues that require user attention but are not errors. |
+| `error`   | Blocking issues, validation failures, or destructive actions.                            |
+
+> [!NOTE]
+> `caution` and `warning` represent two escalation levels of non-error severity.
+> Use **`caution`** for guidance or minor risks, and **`warning`** when the user must act to prevent an error.
+
+**Emphasis** adjusts color strength relative to the base tone, if specified. The default is a normal emphasis.
+
+| Value                | Description                                 |
+| -------------------- | ------------------------------------------- |
+| `strong`             | Higher contrast and/or elevated emphasis.   |
+| `weak`               | Subtle variant for secondary or muted elements. |
+
+**State** represents the interactive state of the element, if specified. The default is an idle state.
+
+| Value      | Description                              |
+| ---------- | ---------------------------------------- |
+| `active`   | Hovered, pressed, or selected state.     |
+| `disabled` | Unavailable or inoperable state.         |
+
 ## Theme Provider
 
 The `ThemeProvider` is a React component that should wrap your application to provide design tokens and theme context to the child UI components.
