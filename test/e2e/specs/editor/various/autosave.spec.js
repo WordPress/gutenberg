@@ -270,7 +270,7 @@ test.describe( 'Autosave', () => {
 
 		await expect(
 			page.locator( '.components-notice__content' )
-		).toContainText( 'Updating failed. You are probably offline.' );
+		).toContainText( 'Updating failed because you were offline.' );
 		expect(
 			await page.evaluate( () => window.sessionStorage.length )
 		).toBe( 1 );

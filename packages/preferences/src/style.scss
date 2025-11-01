@@ -1,4 +1,4 @@
-@import "./components/preference-base-option/style.scss";
-@import "./components/preferences-modal/style.scss";
-@import "./components/preferences-modal-tabs/style.scss";
-@import "./components/preferences-modal-section/style.scss";
+@use "./components/preference-base-option/style.scss" as *;
+@use "./components/preferences-modal/style.scss" as *;
+@use "./components/preferences-modal-tabs/style.scss" as *;
+@use "./components/preferences-modal-section/style.scss" as *;

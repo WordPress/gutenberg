@@ -55,12 +55,14 @@ import {
 } from '../../constants';
 import type {
 	Filter,
+	NormalizedField,
 	NormalizedFilter,
 	Operator,
 	Option,
 	View,
-	NormalizedField,
 } from '../../types';
+import useElements from '../../hooks/use-elements';
+import parseDateTime from '../../field-types/utils/parse-date-time';
 
 interface FilterTextProps {
 	activeElements: Option[];
@@ -309,9 +311,9 @@ const FilterText = ( {
 
 		return createInterpolateElement(
 			sprintf(
-				/* translators: 1: Filter name. 2: Min value. 3: Max value. e.g.: "Item count between (inc): 10-180". */
+				/* translators: 1: Filter name. 2: Min value. 3: Max value. e.g.: "Item count between (inc): 10 and 180". */
 				__(
-					'<Name>%1$s between (inc): </Name><Value>%2$s-%3$s</Value>'
+					'<Name>%1$s between (inc): </Name><Value>%2$s and %3$s</Value>'
 				),
 				filter.name,
 				label[ 0 ],
@@ -480,25 +482,45 @@ export default function Filter( {
 
 	let activeElements: Option[] = [];
 
-	if ( filter.elements.length > 0 ) {
-		activeElements = filter.elements.filter( ( element ) => {
+	const { elements } = useElements( {
+		elements: filter.elements,
+		getElements: filter.getElements,
+	} );
+
+	if ( elements.length > 0 ) {
+		activeElements = elements.filter( ( element ) => {
 			if ( filter.singleSelection ) {
 				return element.value === filterInView?.value;
 			}
 			return filterInView?.value?.includes( element.value );
 		} );
 	} else if ( filterInView?.value !== undefined ) {
+		const field = fields.find( ( f ) => f.id === filter.field );
+		let label = filterInView.value;
+
+		if ( field?.type === 'datetime' && typeof label === 'string' ) {
+			try {
+				const dateValue = parseDateTime( label );
+				if ( dateValue !== null ) {
+					label = dateValue.toLocaleString();
+				}
+			} catch ( e ) {
+				label = filterInView.value;
+			}
+		}
+
 		activeElements = [
 			{
 				value: filterInView.value,
-				label: filterInView.value,
+				label,
 			},
 		];
 	}
 
 	const isPrimary = filter.isPrimary;
-	const hasValues = filterInView?.value !== undefined;
-	const canResetOrRemove = ! isPrimary || hasValues;
+	const isLocked = filterInView?.isLocked;
+	const hasValues = ! isLocked && filterInView?.value !== undefined;
+	const canResetOrRemove = ! isLocked && ( ! isPrimary || hasValues );
 	return (
 		<Dropdown
 			defaultOpen={ openedFilter === filter.field }
@@ -523,17 +545,26 @@ export default function Filter( {
 								{
 									'has-reset': canResetOrRemove,
 									'has-values': hasValues,
+									'is-not-clickable': isLocked,
 								}
 							) }
 							role="button"
-							tabIndex={ 0 }
-							onClick={ onToggle }
+							tabIndex={ isLocked ? -1 : 0 }
+							onClick={ () => {
+								if ( ! isLocked ) {
+									onToggle();
+								}
+							} }
 							onKeyDown={ ( event ) => {
-								if ( [ ENTER, SPACE ].includes( event.key ) ) {
+								if (
+									! isLocked &&
+									[ ENTER, SPACE ].includes( event.key )
+								) {
 									onToggle();
 									event.preventDefault();
 								}
 							} }
+							aria-disabled={ isLocked }
 							aria-pressed={ isOpen }
 							aria-expanded={ isOpen }
 							ref={ toggleRef }
@@ -584,12 +615,12 @@ export default function Filter( {
 				return (
 					<VStack spacing={ 0 } justify="flex-start">
 						<OperatorSelector { ...commonProps } />
-						{ commonProps.filter.elements.length > 0 ? (
+						{ commonProps.filter.hasElements ? (
 							<SearchWidget
 								{ ...commonProps }
 								filter={ {
 									...commonProps.filter,
-									elements: commonProps.filter.elements,
+									elements,
 								} }
 							/>
 						) : (

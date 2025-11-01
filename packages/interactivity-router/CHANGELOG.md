@@ -2,11 +2,30 @@
 
 ## Unreleased
 
+## 2.34.0 (2025-10-29)
+
+## 2.33.0 (2025-10-17)
+
+## 2.32.0 (2025-10-01)
+
+-   Update router regions inside elements with `data-wp-interactive`. ([#71635](https://github.com/WordPress/gutenberg/pull/71635))
+
+## 2.31.0 (2025-09-17)
+
+## 2.30.0 (2025-09-03)
+
+## 2.29.0 (2025-08-20)
+
+## 2.28.0 (2025-08-07)
+
 ## 2.27.0 (2025-07-23)
 
 ### Bug Fixes
 
 -   Preserve `media` attribute on intial style sheets after client-side navigation. ([70668](https://github.com/WordPress/gutenberg/pull/70668))
+
+-  Ignores `<noscript>` elements while preparing DOM. ([70905](https://github.com/WordPress/gutenberg/pull/70905))
+
 
 ## 2.26.0 (2025-06-25)
 

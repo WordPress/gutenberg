@@ -14,11 +14,19 @@ import { __ } from '@wordpress/i18n';
  */
 import PatternSelection, { useBlockPatterns } from './pattern-selection';
 
-export default function QueryToolbar( { clientId, attributes } ) {
+export default function QueryToolbar( {
+	clientId,
+	attributes,
+	hasInnerBlocks,
+} ) {
 	const hasPatterns = useBlockPatterns( clientId, attributes ).length;
 	if ( ! hasPatterns ) {
 		return null;
 	}
+
+	const buttonLabel = hasInnerBlocks
+		? __( 'Change design' )
+		: __( 'Choose pattern' );
 
 	return (
 		<ToolbarGroup className="wp-block-template-part__block-control-group">
@@ -33,7 +41,7 @@ export default function QueryToolbar( { clientId, attributes } ) {
 							aria-expanded={ isOpen }
 							onClick={ onToggle }
 						>
-							{ __( 'Change design' ) }
+							{ buttonLabel }
 						</ToolbarButton>
 					) }
 					renderContent={ () => (

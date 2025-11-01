@@ -104,6 +104,7 @@ describe( 'rendererPath', () => {
 							},
 						},
 					},
+					shadow: 'var:preset|shadow|crisp',
 					spacing: {
 						margin: {
 							top: '10px',

@@ -51,6 +51,16 @@ export const settings = {
 					},
 					{
 						name: 'core/post-date',
+						attributes: {
+							metadata: {
+								bindings: {
+									datetime: {
+										source: 'core/post-data',
+										args: { field: 'date' },
+									},
+								},
+							},
+						},
 					},
 					{
 						name: 'core/post-excerpt',

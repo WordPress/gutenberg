@@ -110,6 +110,14 @@ export const processBlockType =
 			null
 		);
 
+		if ( settings.apiVersion <= 2 ) {
+			warning(
+				`The block "${ name }" is registered with API version 2 or lower. This means that the post editor may work as a non-iframe editor.\n` +
+					`Since all editors are planned to work as iframes in the future, set the \`apiVersion\` field to 3 and test the block inside the iframe editor.\n` +
+					`See: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/#version-3-wordpress-6-3`
+			);
+		}
+
 		if (
 			settings.description &&
 			typeof settings.description !== 'string'

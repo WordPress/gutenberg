@@ -144,7 +144,7 @@ const { state, actions } = store(
 					}
 				}
 			} ),
-			handleMenuFocusout( event ) {
+			handleMenuFocusout: withSyncEvent( ( event ) => {
 				const { modal, type } = getContext();
 				// If focus is outside modal, and in the document, close menu
 				// event.target === The element losing focus
@@ -162,7 +162,7 @@ const { state, actions } = store(
 					actions.closeMenu( 'click' );
 					actions.closeMenu( 'focus' );
 				}
-			},
+			} ),
 
 			openMenu( menuOpenedOn = 'click' ) {
 				const { type } = getContext();

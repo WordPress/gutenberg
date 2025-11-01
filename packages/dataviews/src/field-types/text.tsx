@@ -4,10 +4,9 @@
 import type {
 	DataViewRenderFieldProps,
 	SortDirection,
-	ValidationContext,
 	FieldTypeDefinition,
 } from '../types';
-import { renderFromElements } from '../utils';
+import RenderFromElements from './utils/render-from-elements';
 import {
 	OPERATOR_CONTAINS,
 	OPERATOR_IS,
@@ -26,25 +25,19 @@ function sort( valueA: any, valueB: any, direction: SortDirection ) {
 		: valueB.localeCompare( valueA );
 }
 
-function isValid( value: any, context?: ValidationContext ) {
-	if ( context?.elements ) {
-		const validValues = context?.elements?.map( ( f ) => f.value );
-		if ( ! validValues.includes( value ) ) {
-			return false;
-		}
-	}
-
-	return true;
-}
-
 export default {
 	sort,
-	isValid,
+	isValid: {
+		elements: true,
+		custom: () => null,
+	},
 	Edit: 'text',
 	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
-		return field.elements
-			? renderFromElements( { item, field } )
-			: field.getValue( { item } );
+		return field.hasElements ? (
+			<RenderFromElements item={ item } field={ field } />
+		) : (
+			field.getValue( { item } )
+		);
 	},
 	enableSorting: true,
 	filterBy: {

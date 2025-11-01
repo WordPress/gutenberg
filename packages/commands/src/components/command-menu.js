@@ -50,6 +50,7 @@ function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
 				<Command.Item
 					key={ command.name }
 					value={ command.searchLabel ?? command.label }
+					keywords={ command.keywords }
 					onSelect={ () => command.callback( { close } ) }
 					id={ command.name }
 				>
@@ -121,6 +122,7 @@ export function CommandMenuGroup( { isContextual, search, setLoader, close } ) {
 				<Command.Item
 					key={ command.name }
 					value={ command.searchLabel ?? command.label }
+					keywords={ command.keywords }
 					onSelect={ () => command.callback( { close } ) }
 					id={ command.name }
 				>
@@ -269,12 +271,15 @@ export function CommandMenu() {
 			<div className="commands-command-menu__container">
 				<Command label={ inputLabel } onKeyDown={ onKeyDown }>
 					<div className="commands-command-menu__header">
+						<Icon
+							className="commands-command-menu__header-search-icon"
+							icon={ inputIcon }
+						/>
 						<CommandInput
 							search={ search }
 							setSearch={ setSearch }
 							isOpen={ isOpen }
 						/>
-						<Icon icon={ inputIcon } />
 					</div>
 					<Command.List label={ __( 'Command suggestions' ) }>
 						{ search && ! isLoading && (

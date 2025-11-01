@@ -2,6 +2,28 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   The `lint-js` script now includes `.cjs`, `.mjs`, `.cts`, and `.mts` as default extensions to lint. This is considered a breaking change because the script may now surface lint errors in your project which would not have been previously identified.
+
+## 30.27.0 (2025-10-29)
+
+## 30.26.0 (2025-10-17)
+
+## 30.25.0 (2025-10-01)
+
+## 30.24.0 (2025-09-17)
+
+## 30.23.0 (2025-09-03)
+
+### Internal
+
+-   Remove deprecated `clean-webpack-plugin` dependency in favor of webpack's native cleaning functionality ([#71080](https://github.com/WordPress/gutenberg/pull/71080))
+
+## 30.22.0 (2025-08-20)
+
+## 30.21.0 (2025-08-07)
+
 ## 30.20.0 (2025-07-23)
 
 ## 30.19.0 (2025-06-25)
@@ -19,7 +41,6 @@
 ### Bug Fixes
 
 -   Fix: `--blocks-manifest` CLI flag doesn't work when the directory name has space ([#69766](https://github.com/WordPress/gutenberg/pull/69766)).
-
 
 ## 30.14.0 (2025-03-27)
 

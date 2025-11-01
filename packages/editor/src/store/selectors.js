@@ -195,7 +195,7 @@ export function getCurrentPostType( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @return {?number} ID of current post.
+ * @return {?(number|string)} The current post ID (number) or template slug (string).
  */
 export function getCurrentPostId( state ) {
 	return state.postId;
@@ -330,10 +330,14 @@ const getNestedEditedPostProperty = createSelector(
  * 	const getFeaturedMediaUrl = useSelect( ( select ) => {
  * 		const getFeaturedMediaId =
  * 			select( 'core/editor' ).getEditedPostAttribute( 'featured_media' );
- * 		const getMedia = select( 'core' ).getMedia( getFeaturedMediaId );
+ * 		const media = select( 'core' ).getEntityRecord(
+ * 			'postType',
+ * 			'attachment',
+ * 			getFeaturedMediaId
+ * 		);
  *
  * 		return (
- * 			getMedia?.media_details?.sizes?.large?.source_url || getMedia?.source_url || ''
+ * 			media?.media_details?.sizes?.large?.source_url || media?.source_url || ''
  * 		);
  * }, [] );
  *```

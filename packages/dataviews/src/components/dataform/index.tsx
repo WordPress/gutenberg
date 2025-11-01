@@ -8,15 +8,18 @@ import { useMemo } from '@wordpress/element';
  */
 import type { DataFormProps } from '../../types';
 import { DataFormProvider } from '../dataform-context';
-import { normalizeFields } from '../../normalize-fields';
-import { DataFormLayout } from '../../dataforms-layouts/data-form-layout';
+import normalizeFields from '../../utils/normalize-fields';
+import { DataFormLayout } from '../../dataform-layouts/data-form-layout';
+import normalizeForm from '../../dataform-layouts/normalize-form';
 
 export default function DataForm< Item >( {
 	data,
 	form,
 	fields,
 	onChange,
+	validity,
 }: DataFormProps< Item > ) {
+	const normalizedForm = useMemo( () => normalizeForm( form ), [ form ] );
 	const normalizedFields = useMemo(
 		() => normalizeFields( fields ),
 		[ fields ]
@@ -28,7 +31,12 @@ export default function DataForm< Item >( {
 
 	return (
 		<DataFormProvider fields={ normalizedFields }>
-			<DataFormLayout data={ data } form={ form } onChange={ onChange } />
+			<DataFormLayout
+				data={ data }
+				form={ normalizedForm }
+				onChange={ onChange }
+				validity={ validity }
+			/>
 		</DataFormProvider>
 	);
 }

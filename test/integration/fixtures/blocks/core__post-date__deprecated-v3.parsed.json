@@ -1,0 +1,20 @@
+[
+	{
+		"blockName": "core/post-date",
+		"attrs": {
+			"metadata": {
+				"bindings": {
+					"datetime": {
+						"source": "core/post-data",
+						"args": {
+							"key": "date"
+						}
+					}
+				}
+			}
+		},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	}
+]

@@ -7,15 +7,17 @@ import type { ReactNode, ComponentProps, ReactElement } from 'react';
  * WordPress dependencies
  */
 import { __experimentalHStack as HStack } from '@wordpress/components';
-import { useContext, useMemo, useRef, useState } from '@wordpress/element';
-import { useMergeRefs, useResizeObserver } from '@wordpress/compose';
+import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
+import { useResizeObserver, throttle } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import DataViewsContext from '../dataviews-context';
+import { VIEW_LAYOUTS } from '../../dataviews-layouts';
 import {
-	default as DataViewsFilters,
+	Filters,
+	FiltersToggled,
 	useFilters,
 	FiltersToggle,
 } from '../dataviews-filters';
@@ -28,9 +30,9 @@ import DataViewsViewConfig, {
 	DataviewsViewConfigDropdown,
 	ViewTypeMenu,
 } from '../dataviews-view-config';
-import { normalizeFields } from '../../normalize-fields';
+import normalizeFields from '../../utils/normalize-fields';
 import type { Action, Field, View, SupportedLayouts } from '../../types';
-import type { SelectionOrUpdater } from '../../private-types';
+import type { SelectionOrUpdater } from '../../types/private';
 type ItemWithId = { id: string };
 
 type DataViewsProps< Item > = {
@@ -45,6 +47,7 @@ type DataViewsProps< Item > = {
 	paginationInfo: {
 		totalItems: number;
 		totalPages: number;
+		infiniteScrollHandler?: () => void;
 	};
 	defaultLayouts: SupportedLayouts;
 	selection?: string[];
@@ -59,7 +62,10 @@ type DataViewsProps< Item > = {
 	header?: ReactNode;
 	getItemLevel?: ( item: Item ) => number;
 	children?: ReactNode;
-	perPageSizes?: [ number, number, number, number ];
+	config?: {
+		perPageSizes: number[];
+	};
+	empty?: ReactNode;
 } & ( Item extends ItemWithId
 	? { getItemId?: ( item: Item ) => string }
 	: { getItemId: ( item: Item ) => string } );
@@ -67,6 +73,10 @@ type DataViewsProps< Item > = {
 const defaultGetItemId = ( item: ItemWithId ) => item.id;
 const defaultIsItemClickable = () => true;
 const EMPTY_ARRAY: any[] = [];
+
+const dataViewsLayouts = VIEW_LAYOUTS.filter(
+	( viewLayout ) => ! viewLayout.isPicker
+);
 
 type DefaultUIProps = Pick<
 	DataViewsProps< any >,
@@ -78,7 +88,6 @@ function DefaultUI( {
 	search = true,
 	searchLabel = undefined,
 }: DefaultUIProps ) {
-	const { isShowingFilter } = useContext( DataViewsContext );
 	return (
 		<>
 			<HStack
@@ -104,9 +113,7 @@ function DefaultUI( {
 					{ header }
 				</HStack>
 			</HStack>
-			{ isShowingFilter && (
-				<DataViewsFilters className="dataviews-filters__container" />
-			) }
+			<FiltersToggled className="dataviews-filters__container" />
 			<DataViewsLayout />
 			<DataViewsFooter />
 		</>
@@ -125,7 +132,7 @@ function DataViews< Item >( {
 	getItemLevel,
 	isLoading = false,
 	paginationInfo,
-	defaultLayouts,
+	defaultLayouts: defaultLayoutsProperty,
 	selection: selectionProperty,
 	onChangeSelection,
 	onClickItem,
@@ -133,8 +140,10 @@ function DataViews< Item >( {
 	isItemClickable = defaultIsItemClickable,
 	header,
 	children,
-	perPageSizes,
+	config = { perPageSizes: [ 10, 20, 50, 100 ] },
+	empty,
 }: DataViewsProps< Item > ) {
+	const { infiniteScrollHandler } = paginationInfo;
 	const containerRef = useRef< HTMLDivElement | null >( null );
 	const [ containerWidth, setContainerWidth ] = useState( 0 );
 	const resizeObserverRef = useResizeObserver(
@@ -168,9 +177,68 @@ function DataViews< Item >( {
 	}, [ selection, data, getItemId ] );
 
 	const filters = useFilters( _fields, view );
-	const [ isShowingFilter, setIsShowingFilter ] = useState< boolean >( () =>
-		( filters || [] ).some( ( filter ) => filter.isPrimary )
+	const hasPrimaryOrLockedFilters = useMemo(
+		() =>
+			( filters || [] ).some(
+				( filter ) => filter.isPrimary || filter.isLocked
+			),
+		[ filters ]
 	);
+	const [ isShowingFilter, setIsShowingFilter ] = useState< boolean >(
+		hasPrimaryOrLockedFilters
+	);
+
+	useEffect( () => {
+		if ( hasPrimaryOrLockedFilters && ! isShowingFilter ) {
+			setIsShowingFilter( true );
+		}
+	}, [ hasPrimaryOrLockedFilters, isShowingFilter ] );
+
+	// Attach scroll event listener for infinite scroll
+	useEffect( () => {
+		if ( ! view.infiniteScrollEnabled || ! containerRef.current ) {
+			return;
+		}
+
+		const handleScroll = throttle( ( event: unknown ) => {
+			const target = ( event as Event ).target as HTMLElement;
+			const scrollTop = target.scrollTop;
+			const scrollHeight = target.scrollHeight;
+			const clientHeight = target.clientHeight;
+
+			// Check if user has scrolled near the bottom
+			if ( scrollTop + clientHeight >= scrollHeight - 100 ) {
+				infiniteScrollHandler?.();
+			}
+		}, 100 ); // Throttle to 100ms
+
+		const container = containerRef.current;
+		container.addEventListener( 'scroll', handleScroll );
+
+		return () => {
+			container.removeEventListener( 'scroll', handleScroll );
+			handleScroll.cancel(); // Cancel any pending throttled calls
+		};
+	}, [ infiniteScrollHandler, view.infiniteScrollEnabled ] );
+
+	// Filter out DataViewsPicker layouts.
+	const defaultLayouts = useMemo(
+		() =>
+			Object.fromEntries(
+				Object.entries( defaultLayoutsProperty ).filter(
+					( [ layoutType ] ) => {
+						return dataViewsLayouts.some(
+							( viewLayout ) => viewLayout.type === layoutType
+						);
+					}
+				)
+			),
+		[ defaultLayoutsProperty ]
+	);
+
+	if ( ! defaultLayouts[ view.type ] ) {
+		return null;
+	}
 
 	return (
 		<DataViewsContext.Provider
@@ -193,17 +261,17 @@ function DataViews< Item >( {
 				renderItemLink,
 				containerWidth,
 				containerRef,
+				resizeObserverRef,
 				defaultLayouts,
 				filters,
 				isShowingFilter,
 				setIsShowingFilter,
-				perPageSizes,
+				config,
+				empty,
+				hasInfiniteScrollHandler: !! infiniteScrollHandler,
 			} }
 		>
-			<div
-				className="dataviews-wrapper"
-				ref={ useMergeRefs( [ containerRef, resizeObserverRef ] ) }
-			>
+			<div className="dataviews-wrapper" ref={ containerRef }>
 				{ children ?? (
 					<DefaultUI
 						header={ header }
@@ -219,22 +287,26 @@ function DataViews< Item >( {
 // Populate the DataViews sub components
 const DataViewsSubComponents = DataViews as typeof DataViews & {
 	BulkActionToolbar: typeof BulkActionsFooter;
-	Filters: typeof DataViewsFilters;
+	Filters: typeof Filters;
 	FiltersToggle: typeof FiltersToggle;
+	FiltersToggled: typeof FiltersToggled;
 	Layout: typeof DataViewsLayout;
 	LayoutSwitcher: typeof ViewTypeMenu;
 	Pagination: typeof DataViewsPagination;
 	Search: typeof DataViewsSearch;
 	ViewConfig: typeof DataviewsViewConfigDropdown;
+	Footer: typeof DataViewsFooter;
 };
 
 DataViewsSubComponents.BulkActionToolbar = BulkActionsFooter;
-DataViewsSubComponents.Filters = DataViewsFilters;
+DataViewsSubComponents.Filters = Filters;
+DataViewsSubComponents.FiltersToggled = FiltersToggled;
 DataViewsSubComponents.FiltersToggle = FiltersToggle;
 DataViewsSubComponents.Layout = DataViewsLayout;
 DataViewsSubComponents.LayoutSwitcher = ViewTypeMenu;
 DataViewsSubComponents.Pagination = DataViewsPagination;
 DataViewsSubComponents.Search = DataViewsSearch;
 DataViewsSubComponents.ViewConfig = DataviewsViewConfigDropdown;
+DataViewsSubComponents.Footer = DataViewsFooter;
 
 export default DataViewsSubComponents;

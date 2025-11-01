@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/variables" as *;
+
 // Editor specific styles for Social Links.
 .wp-block-social-links div.block-editor-url-input {
 	display: inline-block;

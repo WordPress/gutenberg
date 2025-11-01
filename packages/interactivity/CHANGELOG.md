@@ -2,6 +2,45 @@
 
 ## Unreleased
 
+## 6.34.0 (2025-10-29)
+
+### Bug Fixes
+
+-   Fix derived state closures processing on client-side navigation. ([#72725](https://github.com/WordPress/gutenberg/pull/72725))
+
+## 6.33.0 (2025-10-17)
+
+### Enhancements
+
+-   Add official support for unique IDs. ([#72161](https://github.com/WordPress/gutenberg/pull/72161))
+
+### Bug Fixes
+
+-   Change ordering of multiple `data-wp-context` directives in iAPI processing. ([#72395](https://github.com/WordPress/gutenberg/pull/72395))
+-   Handle client-server state synchronization scenarios for `getServerContext` and `getServerState`. ([#72381](https://github.com/WordPress/gutenberg/pull/72381))
+
+## 6.32.0 (2025-10-01)
+
+-   Update router regions inside elements with `data-wp-interactive`. ([#71635](https://github.com/WordPress/gutenberg/pull/71635))
+-   Fix nested `data-wp-each` directives using the same items key. ([#71870](https://github.com/WordPress/gutenberg/pull/71870))
+
+## 6.31.0 (2025-09-17)
+
+## 6.30.0 (2025-09-03)
+
+## 6.29.0 (2025-08-20)
+
+## 6.28.0 (2025-08-07)
+
+### Deprecations
+
+-   Deprecated the `"data-wp-ignore"` directive of the Interactivity API.([#70945](https://github.com/WordPress/gutenberg/pull/70945))  
+    It is deprecated as of WordPress 6.9 and will be removed in version 7.0.
+
+### Bug Fixes
+
+-   Make state getters to be updated asynchronously with `store()`. ([#70974](https://github.com/WordPress/gutenberg/pull/70974))
+
 ## 6.27.0 (2025-07-23)
 
 ## 6.26.0 (2025-06-25)

@@ -47,6 +47,7 @@ import { SORTING_DIRECTIONS, sortIcons, sortLabels } from '../../constants';
 import { VIEW_LAYOUTS } from '../../dataviews-layouts';
 import type { NormalizedField, View } from '../../types';
 import DataViewsContext from '../dataviews-context';
+import InfiniteScrollToggle from './infinite-scroll-toggle';
 import { unlock } from '../../lock-unlock';
 
 const { Menu } = unlock( componentsPrivateApis );
@@ -98,16 +99,16 @@ export function ViewTypeMenu() {
 									case 'list':
 									case 'grid':
 									case 'table':
+									case 'pickerGrid':
 										const viewWithoutLayout = { ...view };
 										if ( 'layout' in viewWithoutLayout ) {
 											delete viewWithoutLayout.layout;
 										}
-										// @ts-expect-error
 										return onChangeView( {
 											...viewWithoutLayout,
 											type: e.target.value,
 											...defaultLayouts[ e.target.value ],
-										} );
+										} as View );
 								}
 								warning( 'Invalid dataview' );
 							} }
@@ -213,10 +214,19 @@ function SortDirectionControl() {
 	);
 }
 
-const PAGE_SIZE_VALUES = [ 10, 20, 50, 100 ];
 function ItemsPerPageControl() {
-	const { view, perPageSizes, onChangeView } = useContext( DataViewsContext );
-	const pageSizeValues = perPageSizes ?? PAGE_SIZE_VALUES;
+	const { view, config, onChangeView } = useContext( DataViewsContext );
+	const { infiniteScrollEnabled } = view;
+	if (
+		! config ||
+		! config.perPageSizes ||
+		config.perPageSizes.length < 2 ||
+		config.perPageSizes.length > 6 ||
+		infiniteScrollEnabled
+	) {
+		return null;
+	}
+
 	return (
 		<ToggleGroupControl
 			__nextHasNoMarginBottom
@@ -238,7 +248,7 @@ function ItemsPerPageControl() {
 				} );
 			} }
 		>
-			{ pageSizeValues.map( ( value ) => {
+			{ config.perPageSizes.map( ( value ) => {
 				return (
 					<ToggleGroupControlOption
 						key={ value }
@@ -552,9 +562,10 @@ function FieldControl() {
 		( f ) =>
 			! visibleFieldIds.includes( f.id ) &&
 			! togglableFields.includes( f.id ) &&
-			f.type !== 'media'
+			f.type !== 'media' &&
+			f.enableHiding !== false
 	);
-	const visibleFields = visibleFieldIds
+	let visibleFields = visibleFieldIds
 		.map( ( fieldId ) => fields.find( ( f ) => f.id === fieldId ) )
 		.filter( isDefined );
 
@@ -612,7 +623,7 @@ function FieldControl() {
 			isVisibleFlag: 'showDescription',
 		},
 	].filter( ( { field } ) => isDefined( field ) );
-	const visibleLockedFields = lockedFields.filter(
+	let visibleLockedFields = lockedFields.filter(
 		( { field, isVisibleFlag } ) =>
 			// @ts-expect-error
 			isDefined( field ) && ( view[ isVisibleFlag ] ?? true )
@@ -621,6 +632,20 @@ function FieldControl() {
 		isVisibleFlag: string;
 		ui?: ReactNode;
 	} >;
+
+	// If only one locked field is visible, prevent it from being hidden.
+	if ( visibleLockedFields.length === 1 ) {
+		visibleLockedFields = visibleLockedFields.map( ( locked ) => ( {
+			...locked,
+			field: { ...locked.field, enableHiding: false },
+		} ) );
+	}
+
+	// If no locked fields are visible but there are visibleFields, lock the last visible field.
+	if ( visibleLockedFields.length === 0 && visibleFields.length === 1 ) {
+		visibleFields = [ { ...visibleFields[ 0 ], enableHiding: false } ];
+	}
+
 	const hiddenLockedFields = lockedFields.filter(
 		( { field, isVisibleFlag } ) =>
 			// @ts-expect-error
@@ -799,6 +824,7 @@ export function DataviewsViewConfigDropdown() {
 							{ !! activeLayout?.viewConfigOptions && (
 								<activeLayout.viewConfigOptions />
 							) }
+							<InfiniteScrollToggle />
 							<ItemsPerPageControl />
 						</SettingsSection>
 						<SettingsSection title={ __( 'Properties' ) }>

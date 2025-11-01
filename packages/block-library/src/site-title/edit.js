@@ -16,6 +16,7 @@ import {
 	BlockControls,
 	useBlockProps,
 	HeadingLevelDropdown,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import {
 	ToggleControl,
@@ -53,6 +54,7 @@ export default function SiteTitleEdit( {
 	}, [] );
 	const { editEntityRecord } = useDispatch( coreStore );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+	const blockEditingMode = useBlockEditingMode();
 
 	function setTitle( newTitle ) {
 		editEntityRecord( 'root', 'site', undefined, {
@@ -103,21 +105,23 @@ export default function SiteTitleEdit( {
 	);
 	return (
 		<>
-			<BlockControls group="block">
-				<HeadingLevelDropdown
-					value={ level }
-					options={ levelOptions }
-					onChange={ ( newLevel ) =>
-						setAttributes( { level: newLevel } )
-					}
-				/>
-				<AlignmentControl
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
-				/>
-			</BlockControls>
+			{ blockEditingMode === 'default' && (
+				<BlockControls group="block">
+					<HeadingLevelDropdown
+						value={ level }
+						options={ levelOptions }
+						onChange={ ( newLevel ) =>
+							setAttributes( { level: newLevel } )
+						}
+					/>
+					<AlignmentControl
+						value={ textAlign }
+						onChange={ ( nextAlign ) => {
+							setAttributes( { textAlign: nextAlign } );
+						} }
+					/>
+				</BlockControls>
+			) }
 			<InspectorControls>
 				<ToolsPanel
 					label={ __( 'Settings' ) }

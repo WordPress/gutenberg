@@ -1,100 +1,202 @@
 /**
+ * External dependencies
+ */
+import { format } from 'date-fns';
+
+/**
  * WordPress dependencies
  */
 import {
 	BaseControl,
-	TimePicker,
-	VisuallyHidden,
-	SelectControl,
-	__experimentalNumberControl as NumberControl,
-	__experimentalHStack as HStack,
+	privateApis as componentsPrivateApis,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { getSettings } from '@wordpress/date';
 
 /**
  * Internal dependencies
  */
 import type { DataFormControlProps } from '../types';
 import { OPERATOR_IN_THE_PAST, OPERATOR_OVER } from '../constants';
+import RelativeDateControl from './utils/relative-date-control';
+import getCustomValidity from './utils/get-custom-validity';
+import parseDateTime from '../field-types/utils/parse-date-time';
+import { unlock } from '../lock-unlock';
 
-const TIME_UNITS_OPTIONS = {
-	[ OPERATOR_IN_THE_PAST ]: [
-		{ value: 'days', label: __( 'Days' ) },
-		{ value: 'weeks', label: __( 'Weeks' ) },
-		{ value: 'months', label: __( 'Months' ) },
-		{ value: 'years', label: __( 'Years' ) },
-	],
-	[ OPERATOR_OVER ]: [
-		{ value: 'days', label: __( 'Days ago' ) },
-		{ value: 'weeks', label: __( 'Weeks ago' ) },
-		{ value: 'months', label: __( 'Months ago' ) },
-		{ value: 'years', label: __( 'Years ago' ) },
-	],
+const { DateCalendar, ValidatedInputControl } = unlock( componentsPrivateApis );
+
+const formatDateTime = ( date?: Date | string ): string => {
+	if ( ! date ) {
+		return '';
+	}
+	if ( typeof date === 'string' ) {
+		return date;
+	}
+	// Format as datetime-local input expects: YYYY-MM-DDTHH:mm
+	return format( date, "yyyy-MM-dd'T'HH:mm" );
 };
 
-function RelativeDateControls( {
-	id,
-	value,
+function CalendarDateTimeControl< Item >( {
+	data,
+	field,
 	onChange,
-	label,
 	hideLabelFromVision,
-	options,
-}: {
-	id: string;
-	value: { value?: string | number; unit?: string };
-	onChange: ( value: any ) => void;
-	label: string;
-	hideLabelFromVision?: boolean;
-	options: { value: string; label: string }[];
-} ) {
-	const { value: relValue = '', unit = options[ 0 ].value } = value;
+	validity,
+}: DataFormControlProps< Item > ) {
+	const { id, label, description, setValue, getValue, isValid } = field;
+	const fieldValue = getValue( { item: data } );
+	const value = typeof fieldValue === 'string' ? fieldValue : undefined;
 
-	const onChangeValue = useCallback(
+	const [ calendarMonth, setCalendarMonth ] = useState< Date >( () => {
+		const parsedDate = parseDateTime( value );
+		return parsedDate || new Date(); // Default to current month
+	} );
+
+	const inputControlRef = useRef< HTMLInputElement >( null );
+	const validationTimeoutRef = useRef< ReturnType< typeof setTimeout > >();
+	const previousFocusRef = useRef< Element | null >( null );
+
+	const onChangeCallback = useCallback(
 		( newValue: string | undefined ) =>
-			onChange( {
-				[ id ]: { value: Number( newValue ), unit },
-			} ),
-		[ id, onChange, unit ]
+			onChange( setValue( { item: data, value: newValue } ) ),
+		[ data, onChange, setValue ]
 	);
 
-	const onChangeUnit = useCallback(
-		( newUnit: string | undefined ) =>
-			onChange( {
-				[ id ]: { value: relValue, unit: newUnit },
-			} ),
-		[ id, onChange, relValue ]
+	// Cleanup timeout on unmount
+	useEffect( () => {
+		return () => {
+			if ( validationTimeoutRef.current ) {
+				clearTimeout( validationTimeoutRef.current );
+			}
+		};
+	}, [] );
+
+	const onSelectDate = useCallback(
+		( newDate: Date | undefined | null ) => {
+			let dateTimeValue: string | undefined;
+			if ( newDate ) {
+				// Preserve time if it exists in current value, otherwise use current time
+				let finalDateTime = newDate;
+
+				if ( value ) {
+					const currentDateTime = parseDateTime( value );
+					if ( currentDateTime ) {
+						// Preserve the time part
+						finalDateTime = new Date( newDate );
+						finalDateTime.setHours( currentDateTime.getHours() );
+						finalDateTime.setMinutes(
+							currentDateTime.getMinutes()
+						);
+					}
+				}
+
+				dateTimeValue = finalDateTime.toISOString();
+				onChangeCallback( dateTimeValue );
+
+				// Clear any existing timeout
+				if ( validationTimeoutRef.current ) {
+					clearTimeout( validationTimeoutRef.current );
+				}
+			} else {
+				onChangeCallback( undefined );
+			}
+			// Save the currently focused element
+			previousFocusRef.current =
+				inputControlRef.current &&
+				inputControlRef.current.ownerDocument.activeElement;
+
+			// Trigger validation display by simulating focus, blur, and changes.
+			// Use a timeout to ensure it runs after the value update.
+			validationTimeoutRef.current = setTimeout( () => {
+				if ( inputControlRef.current ) {
+					inputControlRef.current.focus();
+					inputControlRef.current.blur();
+					onChangeCallback( dateTimeValue );
+
+					// Restore focus to the previously focused element
+					if (
+						previousFocusRef.current &&
+						previousFocusRef.current instanceof HTMLElement
+					) {
+						previousFocusRef.current.focus();
+					}
+				}
+			}, 0 );
+		},
+		[ onChangeCallback, value ]
 	);
+
+	const handleManualDateTimeChange = useCallback(
+		( newValue?: string ) => {
+			if ( newValue ) {
+				// Convert from datetime-local format to ISO string
+				const dateTime = new Date( newValue );
+				onChangeCallback( dateTime.toISOString() );
+
+				// Update calendar month to match
+				const parsedDate = parseDateTime( dateTime.toISOString() );
+				if ( parsedDate ) {
+					setCalendarMonth( parsedDate );
+				}
+			} else {
+				onChangeCallback( undefined );
+			}
+		},
+		[ onChangeCallback ]
+	);
+
+	const {
+		timezone: { string: timezoneString },
+		l10n: { startOfWeek },
+	} = getSettings();
+
+	const displayLabel =
+		isValid?.required && ! hideLabelFromVision
+			? `${ label } (${ __( 'Required' ) })`
+			: label;
 
 	return (
 		<BaseControl
-			id={ id }
 			__nextHasNoMarginBottom
-			className="dataviews-controls__datetime"
-			label={ label }
+			id={ id }
+			label={ displayLabel }
+			help={ description }
 			hideLabelFromVision={ hideLabelFromVision }
 		>
-			<HStack spacing={ 2.5 }>
-				<NumberControl
-					__next40pxDefaultSize
-					className="dataviews-controls__datetime-number"
-					spinControls="none"
-					min={ 1 }
-					step={ 1 }
-					value={ relValue }
-					onChange={ onChangeValue }
+			<VStack spacing={ 4 }>
+				{ /* Calendar widget */ }
+				<DateCalendar
+					style={ { width: '100%' } }
+					selected={
+						value ? parseDateTime( value ) || undefined : undefined
+					}
+					onSelect={ onSelectDate }
+					month={ calendarMonth }
+					onMonthChange={ setCalendarMonth }
+					timeZone={ timezoneString || undefined }
+					weekStartsOn={ startOfWeek }
 				/>
-				<SelectControl
-					className="dataviews-controls__datetime-unit"
+				{ /* Manual datetime input */ }
+				<ValidatedInputControl
+					ref={ inputControlRef }
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
-					label={ __( 'Unit' ) }
-					value={ unit }
-					options={ options }
-					onChange={ onChangeUnit }
+					required={ !! isValid?.required }
+					customValidity={ getCustomValidity( isValid, validity ) }
+					type="datetime-local"
+					label={ __( 'Date time' ) }
 					hideLabelFromVision
+					value={
+						value
+							? formatDateTime(
+									parseDateTime( value ) || undefined
+							  )
+							: ''
+					}
+					onChange={ handleManualDateTimeChange }
 				/>
-			</HStack>
+			</VStack>
 		</BaseControl>
 	);
 }
@@ -105,43 +207,28 @@ export default function DateTime< Item >( {
 	onChange,
 	hideLabelFromVision,
 	operator,
+	validity,
 }: DataFormControlProps< Item > ) {
-	const { id, label } = field;
-	const value = field.getValue( { item: data } );
-
-	const onChangeControl = useCallback(
-		( newValue: string | null ) => onChange( { [ id ]: newValue } ),
-		[ id, onChange ]
-	);
-
 	if ( operator === OPERATOR_IN_THE_PAST || operator === OPERATOR_OVER ) {
 		return (
-			<RelativeDateControls
-				id={ id }
-				value={ value && typeof value === 'object' ? value : {} }
+			<RelativeDateControl
+				className="dataviews-controls__datetime"
+				data={ data }
+				field={ field }
 				onChange={ onChange }
-				label={ label }
 				hideLabelFromVision={ hideLabelFromVision }
-				options={ TIME_UNITS_OPTIONS[ operator ] }
+				operator={ operator }
 			/>
 		);
 	}
 
 	return (
-		<fieldset className="dataviews-controls__datetime">
-			{ ! hideLabelFromVision && (
-				<BaseControl.VisualLabel as="legend">
-					{ label }
-				</BaseControl.VisualLabel>
-			) }
-			{ hideLabelFromVision && (
-				<VisuallyHidden as="legend">{ label }</VisuallyHidden>
-			) }
-			<TimePicker
-				currentTime={ typeof value === 'string' ? value : undefined }
-				onChange={ onChangeControl }
-				hideLabelFromVision
-			/>
-		</fieldset>
+		<CalendarDateTimeControl
+			data={ data }
+			field={ field }
+			onChange={ onChange }
+			hideLabelFromVision={ hideLabelFromVision }
+			validity={ validity }
+		/>
 	);
 }

@@ -356,8 +356,18 @@ const { state, actions, callbacks } = store(
 				`;
 			},
 			setButtonStyles() {
-				const { imageId } = getContext();
 				const { ref } = getElement();
+
+				// This guard prevents errors in images with the `srcset`
+				// attribute, which can dispatch `load` events even after DOM
+				// removal. Preact doesn't automatically clean up `load` event
+				// listeners on unmounted `img` elements (see
+				// https://github.com/preactjs/preact/issues/3141).
+				if ( ! ref ) {
+					return;
+				}
+
+				const { imageId } = getContext();
 
 				state.metadata[ imageId ].imageRef = ref;
 				state.metadata[ imageId ].currentSrc = ref.currentSrc;

@@ -1,42 +1,40 @@
 /**
  * WordPress dependencies
  */
-import { TextControl } from '@wordpress/components';
-import { useCallback } from '@wordpress/element';
+import {
+	Icon,
+	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
+} from '@wordpress/components';
+import { atSymbol } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import type { DataFormControlProps } from '../types';
+import ValidatedText from './utils/validated-input';
 
 export default function Email< Item >( {
 	data,
 	field,
 	onChange,
 	hideLabelFromVision,
+	validity,
 }: DataFormControlProps< Item > ) {
-	const { id, label, placeholder, description } = field;
-	const value = field.getValue( { item: data } );
-
-	const onChangeControl = useCallback(
-		( newValue: string ) =>
-			onChange( {
-				[ id ]: newValue,
-			} ),
-		[ id, onChange ]
-	);
-
 	return (
-		<TextControl
-			type="email"
-			label={ label }
-			placeholder={ placeholder }
-			value={ value ?? '' }
-			help={ description }
-			onChange={ onChangeControl }
-			__next40pxDefaultSize
-			__nextHasNoMarginBottom
-			hideLabelFromVision={ hideLabelFromVision }
+		<ValidatedText
+			{ ...{
+				data,
+				field,
+				onChange,
+				hideLabelFromVision,
+				validity,
+				type: 'email',
+				prefix: (
+					<InputControlPrefixWrapper variant="icon">
+						<Icon icon={ atSymbol } />
+					</InputControlPrefixWrapper>
+				),
+			} }
 		/>
 	);
 }

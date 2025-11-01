@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/editor",
-	"version": "14.27.0",
+	"version": "14.34.0",
 	"description": "Enhanced block editor for WordPress posts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -24,18 +24,38 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.js",
+			"require": "./build/index.js"
+		},
+		"./package.json": "./package.json"
+	},
 	"react-native": "src/index",
 	"wpScript": true,
 	"types": "build-types",
 	"sideEffects": [
 		"build-style/**",
 		"src/**/*.scss",
-		"{src,build,build-module}/{index.js,store/index.js,hooks/**,bindings/**}"
+		"src/index.js",
+		"src/store/index.js",
+		"src/hooks/**",
+		"src/bindings/**",
+		"build/index.js",
+		"build/store/index.js",
+		"build/hooks/**",
+		"build/bindings/**",
+		"build-module/index.js",
+		"build-module/store/index.js",
+		"build-module/hooks/**",
+		"build-module/bindings/**"
 	],
 	"dependencies": {
-		"@babel/runtime": "7.25.7",
+		"@floating-ui/react-dom": "2.0.8",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
+		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/blob": "file:../blob",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/blocks": "file:../blocks",
@@ -50,6 +70,8 @@
 		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
 		"@wordpress/fields": "file:../fields",
+		"@wordpress/global-styles-engine": "file:../global-styles-engine",
+		"@wordpress/global-styles-ui": "file:../global-styles-ui",
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/html-entities": "file:../html-entities",
 		"@wordpress/i18n": "file:../i18n",
@@ -73,9 +95,7 @@
 		"client-zip": "^2.4.5",
 		"clsx": "^2.1.1",
 		"date-fns": "^3.6.0",
-		"deepmerge": "^4.3.0",
 		"fast-deep-equal": "^3.1.3",
-		"is-plain-object": "^5.0.0",
 		"memize": "^2.1.0",
 		"react-autosize-textarea": "^7.1.0",
 		"remove-accents": "^0.5.0",

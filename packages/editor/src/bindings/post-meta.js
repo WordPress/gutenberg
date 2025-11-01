@@ -72,6 +72,9 @@ function getPostMetaFields( select, context ) {
 	return metaFields;
 }
 
+/**
+ * @type {WPBlockBindingsSource}
+ */
 export default {
 	name: 'core/post-meta',
 	getValues( { select, context, bindings } ) {
@@ -139,6 +142,14 @@ export default {
 		return true;
 	},
 	getFieldsList( { select, context } ) {
-		return getPostMetaFields( select, context );
+		const metaFields = getPostMetaFields( select, context );
+		if ( ! metaFields ) {
+			return [];
+		}
+		return Object.entries( metaFields ).map( ( [ key, field ] ) => ( {
+			label: field.label,
+			type: field.type,
+			args: { key },
+		} ) );
 	},
 };

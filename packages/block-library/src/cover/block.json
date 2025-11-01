@@ -8,7 +8,8 @@
 	"textdomain": "default",
 	"attributes": {
 		"url": {
-			"type": "string"
+			"type": "string",
+			"role": "content"
 		},
 		"useFeaturedImage": {
 			"type": "boolean",
@@ -67,9 +68,6 @@
 		"isDark": {
 			"type": "boolean",
 			"default": true
-		},
-		"allowedBlocks": {
-			"type": "array"
 		},
 		"templateLock": {
 			"type": [ "string", "boolean" ],
@@ -147,7 +145,8 @@
 		},
 		"filter": {
 			"duotone": true
-		}
+		},
+		"allowedBlocks": true
 	},
 	"selectors": {
 		"filter": {

@@ -27,8 +27,15 @@ export function removeBlockSupportAttributes( attributes ) {
 		...restAttributes
 	} = attributes;
 
-	const { border, color, elements, spacing, typography, ...restStyles } =
-		attributes?.style || {};
+	const {
+		border,
+		color,
+		elements,
+		shadow,
+		spacing,
+		typography,
+		...restStyles
+	} = attributes?.style || {};
 
 	return {
 		...restAttributes,

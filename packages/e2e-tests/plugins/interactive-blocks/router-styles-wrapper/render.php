@@ -68,7 +68,7 @@ $wrapper_attributes = get_block_wrapper_attributes();
 			<a
 				data-testid="link <?php echo $label; ?>"
 				data-wp-on--click="actions.navigate"
-				data-wp-on-async--mouseenter="actions.prefetch"
+				data-wp-on--mouseenter="actions.prefetch"
 				href="<?php echo $link; ?>"
 			>
 				<?php echo $label; ?>
@@ -82,6 +82,17 @@ $wrapper_attributes = get_block_wrapper_attributes();
 		data-wp-router-region="router-styles"
 	>
 		<?php echo $content; ?>
+	</div>
+
+	<!-- Flag to check whether hydration has occurred. -->
+	<div
+		data-testid="hydrated"
+		data-wp-interactive="test/router-styles"
+		data-wp-bind--hidden="!state.hydrated"
+		data-wp-init="callbacks.setHydrated"
+		hidden
+	>
+		Hydrated
 	</div>
 
 	<!-- Text to check whether a navigation was client-side. -->
@@ -101,7 +112,16 @@ $wrapper_attributes = get_block_wrapper_attributes();
 
 	<!-- Text hidden when media=print applies. -->
 	<div class="hide-on-print" data-testid="hide-on-print">This should be visible when media is not "print".</div>
+
+	<!-- Element for testing noscript styles being ignored -->
+	<div data-testid="noscript-style-test" class="noscript-style-test">This should not be affected by styles in noscript tags</div>
+
+	<!-- Noscript styles that should be ignored -->
+	<noscript>
+		<style>
+			.noscript-style-test {
+				color: rgb(255, 0, 0) !important;
+			}
+		</style>
+	</noscript>
 </div>
-
-
-

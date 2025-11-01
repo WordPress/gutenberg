@@ -75,20 +75,8 @@ Private exports:
 - `ColorPanel`
 - `DimensionsPanel`
 - `FiltersPanel`
-- `GlobalStylesContext`
 - `ImageSettingsPanel`
 - `TypographyPanel`
-- `areGlobalStyleConfigsEqual`
-- `getBlockCSSSelector`
-- `getBlockSelectors`
-- `getGlobalStylesChanges`
-- `getLayoutStyles`
-- `toStyles`
-- `useGlobalSetting`
-- `useGlobalStyle`
-- `useGlobalStylesOutput`
-- `useGlobalStylesOutputWithConfig`
-- `useGlobalStylesReset`
 - `useHasBackgroundPanel`
 - `useHasBorderPanel`
 - `useHasBorderPanelControls`
@@ -207,6 +195,7 @@ Private exports:
 
 Private actions:
 - `receiveRegisteredPostMeta`
+- `editMediaEntity`
 
 Private selectors:
 - `getBlockPatternsForPostType`
@@ -275,9 +264,6 @@ Private exports:
 - `BackButton`
 - `EntitiesSavedStatesExtensible`
 - `Editor`
-- `EditorContentSlotFill`
-- `GlobalStylesProvider`
-- `mergeBaseAndUserConfigs`
 - `PluginPostExcerpt`
 - `PostCardPanel`
 - `PreferencesModal`
@@ -292,7 +278,6 @@ Private exports:
 - `ComplementaryAreaMoreMenuItem`
 - `FullscreenMode`
 - `InterfaceSkeleton`
-- `NavigableRegion`
 - `PinnedItems`
 
 ### `core/editor` store

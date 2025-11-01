@@ -4,10 +4,10 @@
 import type {
 	DataViewRenderFieldProps,
 	SortDirection,
-	ValidationContext,
 	FieldTypeDefinition,
 } from '../types';
-import { renderFromElements } from '../utils';
+import RenderFromElements from './utils/render-from-elements';
+import parseDateTime from './utils/parse-date-time';
 import {
 	OPERATOR_ON,
 	OPERATOR_NOT_ON,
@@ -26,25 +26,29 @@ function sort( a: any, b: any, direction: SortDirection ) {
 	return direction === 'asc' ? timeA - timeB : timeB - timeA;
 }
 
-function isValid( value: any, context?: ValidationContext ) {
-	if ( context?.elements ) {
-		const validValues = context?.elements.map( ( f ) => f.value );
-		if ( ! validValues.includes( value ) ) {
-			return false;
-		}
-	}
-
-	return true;
-}
-
 export default {
 	sort,
-	isValid,
+	isValid: {
+		elements: true,
+		custom: () => null,
+	},
 	Edit: 'datetime',
 	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
-		return field.elements
-			? renderFromElements( { item, field } )
-			: field.getValue( { item } );
+		if ( field.elements ) {
+			return <RenderFromElements item={ item } field={ field } />;
+		}
+
+		const value = field.getValue( { item } );
+		if ( [ '', undefined, null ].includes( value ) ) {
+			return null;
+		}
+
+		try {
+			const dateValue = parseDateTime( value );
+			return dateValue?.toLocaleString();
+		} catch ( error ) {
+			return null;
+		}
 	},
 	enableSorting: true,
 	filterBy: {

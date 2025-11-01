@@ -140,8 +140,15 @@ function Iframe( {
 				event.target.getAttribute( 'href' )?.startsWith( '#' )
 			) {
 				event.preventDefault();
-				// Manually handle link fragment navigation within the iframe to prevent page reloads.
-				// This ensures smooth scrolling to anchor links (e.g., footnotes) despite the iframe's different base URL.
+				// Manually handle link fragment navigation within the iframe. The iframe's
+				// location is a blob URL, which can't be used to resolve relative links like
+				// `#hash`. The relative link would be resolved against the iframe's base URL
+				// or the parent frame's URL, causing the iframe to navigate to a completely
+				// different page. Setting the `location.hash` works because it really sets the
+				// blob URL's hash.
+				//
+				// Links with fragments are used for example with footnotes. Clicking on these
+				// links will scroll smoothly to the anchors in the editor canvas.
 				iFrameDocument.defaultView.location.hash = event.target
 					.getAttribute( 'href' )
 					.slice( 1 );
