@@ -88,9 +88,9 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 										setAttributes( { latex: newLatex } );
 										return;
 									}
-									let nextMathML = '';
+									let newMathML = '';
 									try {
-										nextMathML = latexToMathML( newLatex, {
+										newMathML = latexToMathML( newLatex, {
 											displayMode: true,
 										} );
 										setError( null );
@@ -98,7 +98,7 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 										setError( err.message );
 									}
 									setAttributes( {
-										mathML: nextMathML,
+										mathML: newMathML,
 										latex: newLatex,
 									} );
 								} }
