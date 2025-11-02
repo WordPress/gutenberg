@@ -174,6 +174,18 @@ function gutenberg_get_registered_block_templates( $query ) {
 		}
 	);
 
+	$matching_registered_templates = array_map(
+		function ( $template ) {
+			$template->content = apply_block_hooks_to_content(
+				$template->content,
+				$template,
+				'insert_hooked_blocks_and_set_ignored_hooked_blocks_metadata'
+			);
+			return $template;
+		},
+		$matching_registered_templates
+	);
+
 	$query_result = array_merge( $query_result, $matching_registered_templates );
 
 	/**
