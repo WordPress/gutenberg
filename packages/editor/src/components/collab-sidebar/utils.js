@@ -44,15 +44,17 @@ export function getAvatarBorderColor( userId ) {
 }
 
 /**
- * Generates a comment excerpt from text based on word count type and length.
+ * Trims the comment text to an excerpt based on the word count type and length (default: 10).
  *
- * @param {string} text          - The comment text to generate excerpt from.
- * @param {number} excerptLength - The maximum length for the commentexcerpt.
- * @return {string} - The generated comment excerpt.
+ * @param {string} text          - The original comment text to trim.
+ * @param {number} excerptLength - The maximum length of the trimmed excerpt.
+ * @return {Object} - Is comment trimmed and the comment excerpt.
  */
-export function getCommentExcerpt( text, excerptLength = 10 ) {
+export function __trimComment( text, excerptLength = 10 ) {
+	let isTrimmed = false;
+	let trimmedExcerpt = '';
 	if ( ! text ) {
-		return '';
+		return { isTrimmed, trimmedExcerpt };
 	}
 
 	/*
@@ -63,7 +65,6 @@ export function getCommentExcerpt( text, excerptLength = 10 ) {
 	const wordCountType = _x( 'words', 'Word count type. Do not translate!' );
 
 	const rawText = text.trim();
-	let trimmedExcerpt = '';
 
 	if ( wordCountType === 'words' ) {
 		trimmedExcerpt = rawText.split( ' ', excerptLength ).join( ' ' );
@@ -88,7 +89,35 @@ export function getCommentExcerpt( text, excerptLength = 10 ) {
 		trimmedExcerpt = rawText.split( '', excerptLength ).join( '' );
 	}
 
-	const isTrimmed = trimmedExcerpt !== rawText;
+	if (trimmedExcerpt !== rawText) {
+		isTrimmed = true;
+	}
+
+	return { isTrimmed, trimmedExcerpt };
+}
+
+/**
+ *  Checks whether the given comment text would be trimmed
+ *  when generating an excerpt of the specified length (default: 10).
+ *
+ * @param {string} text          - The original comment text to check.
+ * @param {number} excerptLength - The maximum length of the trimmed excerpt.
+ * @return {boolean} - True if the comment is trimmed, false otherwise.
+ */
+export function isCommentTrimmed( text, excerptLength ) {
+	const { isTrimmed } = __trimComment(text, excerptLength);
+	return isTrimmed;
+}
+
+/**
+ * Generates a comment excerpt from text based on word count type and length (default: 10).
+ *
+ * @param {string} text          - The comment text to generate excerpt from.
+ * @param {number} excerptLength - The maximum length for the commentexcerpt.
+ * @return {string} - The generated comment excerpt.
+ */
+export function getCommentExcerpt( text, excerptLength ) {
+	const { isTrimmed, trimmedExcerpt } = __trimComment(text, excerptLength);
 	return isTrimmed ? trimmedExcerpt + '…' : trimmedExcerpt;
 }
 
