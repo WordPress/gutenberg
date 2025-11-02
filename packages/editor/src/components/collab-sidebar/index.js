@@ -4,11 +4,12 @@
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __experimentalVStack as VStack } from '@wordpress/components';
-import { useState, useRef } from '@wordpress/element';
+import { useState, useRef, useCallback, useEffect } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { comment as commentIcon } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
+import { useShortcut } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -79,25 +80,31 @@ function NotesSidebarContent( {
 
 function NotesSidebar( { postId, mode } ) {
 	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
-	const { getActiveComplementaryArea } = useSelect( interfaceStore );
-	const { enableComplementaryArea } = useDispatch( interfaceStore );
+	const [ pendingFocus, setPendingFocus ] = useState( null );
+	const { enableComplementaryArea, disableComplementaryArea } =
+		useDispatch( interfaceStore );
 	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const commentSidebarRef = useRef( null );
 
 	const showFloatingSidebar = isLargeViewport && mode === 'post-only';
 
-	const { clientId, blockCommentId } = useSelect( ( select ) => {
-		const { getBlockAttributes, getSelectedBlockClientId } =
-			select( blockEditorStore );
-		const _clientId = getSelectedBlockClientId();
-		return {
-			clientId: _clientId,
-			blockCommentId: _clientId
-				? getBlockAttributes( _clientId )?.metadata?.noteId
-				: null,
-		};
-	}, [] );
+	const { clientId, blockCommentId, activeComplementaryArea } = useSelect(
+		( select ) => {
+			const { getBlockAttributes, getSelectedBlockClientId } =
+				select( blockEditorStore );
+			const { getActiveComplementaryArea } = select( interfaceStore );
+			const _clientId = getSelectedBlockClientId();
+			return {
+				clientId: _clientId,
+				blockCommentId: _clientId
+					? getBlockAttributes( _clientId )?.metadata?.noteId
+					: null,
+				activeComplementaryArea: getActiveComplementaryArea( 'core' ),
+			};
+		},
+		[]
+	);
 
 	const {
 		resultComments,
@@ -119,9 +126,32 @@ function NotesSidebar( { postId, mode } ) {
 		? resultComments.find( ( thread ) => thread.id === blockCommentId )
 		: null;
 
-	async function openTheSidebar() {
-		const prevArea = await getActiveComplementaryArea( 'core' );
-		const activeNotesArea = SIDEBARS.find( ( name ) => name === prevArea );
+	// Handle pending focus actions after sidebar opens
+	useEffect( () => {
+		if ( pendingFocus && SIDEBARS.includes( activeComplementaryArea ) ) {
+			setShowCommentBoard( ! blockCommentId );
+			focusCommentThread(
+				blockCommentId,
+				commentSidebarRef.current,
+				! blockCommentId ? 'textarea' : undefined
+			);
+			if ( clientId ) {
+				toggleBlockSpotlight( clientId, true );
+			}
+			setPendingFocus( null );
+		}
+	}, [
+		pendingFocus,
+		activeComplementaryArea,
+		blockCommentId,
+		clientId,
+		toggleBlockSpotlight,
+	] );
+
+	const openTheSidebar = useCallback( () => {
+		const activeNotesArea = SIDEBARS.find(
+			( name ) => name === activeComplementaryArea
+		);
 
 		if ( currentThread?.status === 'approved' ) {
 			enableComplementaryArea( 'core', collabHistorySidebarName );
@@ -134,21 +164,93 @@ function NotesSidebar( { postId, mode } ) {
 			);
 		}
 
-		const currentArea = await getActiveComplementaryArea( 'core' );
-		// Bail out if the current active area is not one of note sidebars.
-		if ( ! SIDEBARS.includes( currentArea ) ) {
+		const currentArea = activeComplementaryArea;
+		if ( ! SIDEBARS.includes( currentArea ) && ! activeNotesArea ) {
 			return;
 		}
 
-		setShowCommentBoard( ! blockCommentId );
-		focusCommentThread(
-			blockCommentId,
-			commentSidebarRef.current,
-			// Focus a comment thread when there's a selected block with a comment.
-			! blockCommentId ? 'textarea' : undefined
+		setPendingFocus( true );
+	}, [
+		activeComplementaryArea,
+		currentThread,
+		enableComplementaryArea,
+		showFloatingSidebar,
+	] );
+
+	const toggleNotesSidebar = useCallback( () => {
+		const isNotesSidebarOpen =
+			activeComplementaryArea === collabHistorySidebarName;
+
+		if ( isNotesSidebarOpen ) {
+			disableComplementaryArea( 'core' );
+			if ( clientId ) {
+				toggleBlockSpotlight( clientId, false );
+			}
+		} else {
+			enableComplementaryArea( 'core', collabHistorySidebarName );
+		}
+	}, [
+		activeComplementaryArea,
+		clientId,
+		disableComplementaryArea,
+		enableComplementaryArea,
+		toggleBlockSpotlight,
+	] );
+
+	const addNoteToBlock = useCallback( () => {
+		if ( ! clientId ) {
+			return;
+		}
+
+		const isNotesSidebarOpen = SIDEBARS.includes(
+			activeComplementaryArea
 		);
-		toggleBlockSpotlight( clientId, true );
-	}
+
+		if ( ! isNotesSidebarOpen ) {
+			const sidebarToOpen = showFloatingSidebar
+				? collabSidebarName
+				: collabHistorySidebarName;
+			enableComplementaryArea( 'core', sidebarToOpen );
+			setPendingFocus( true );
+		} else {
+			setShowCommentBoard( ! blockCommentId );
+			focusCommentThread(
+				blockCommentId,
+				commentSidebarRef.current,
+				! blockCommentId ? 'textarea' : undefined
+			);
+			toggleBlockSpotlight( clientId, true );
+		}
+	}, [
+		activeComplementaryArea,
+		blockCommentId,
+		clientId,
+		enableComplementaryArea,
+		showFloatingSidebar,
+		toggleBlockSpotlight,
+	] );
+
+	useShortcut(
+		'core/editor/add-note',
+		( event ) => {
+			event.preventDefault();
+			addNoteToBlock();
+		},
+		{
+			bindGlobal: true,
+		}
+	);
+
+	useShortcut(
+		'core/editor/toggle-notes-sidebar',
+		( event ) => {
+			event.preventDefault();
+			toggleNotesSidebar();
+		},
+		{
+			bindGlobal: true,
+		}
+	);
 
 	return (
 		<>

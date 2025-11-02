@@ -100,6 +100,26 @@ function EditorKeyboardShortcutsRegister() {
 		} );
 
 		registerShortcut( {
+			name: 'core/editor/add-note',
+			category: 'block',
+			description: __( 'Add a note to the selected block.' ),
+			keyCombination: {
+				modifier: 'primaryAlt',
+				character: 'm',
+			},
+		} );
+
+		registerShortcut( {
+	name: 'core/editor/toggle-notes-sidebar',
+	category: 'global',
+	description: __( 'Show or hide the Notes panel.' ),
+	keyCombination: {
+		modifier: 'primaryAlt',
+		character: 'n',
+	},
+} );
+
+		registerShortcut( {
 			name: 'core/editor/keyboard-shortcuts',
 			category: 'main',
 			description: __( 'Display these keyboard shortcuts.' ),
