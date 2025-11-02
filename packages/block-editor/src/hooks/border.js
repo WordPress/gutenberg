@@ -160,15 +160,17 @@ export function BorderPanel( { clientId, name, setAttributes, settings } ) {
 		return null;
 	}
 
+	const defaultBorderControls = 
+		getBlockSupport( name, [ BORDER_SUPPORT_KEY, '__experimentalDefaultControls' ] ) ||
+		getBlockSupport( name, [ BORDER_SUPPORT_KEY, 'defaultControls' ] );
+
+	const defaultShadowControls = 
+		getBlockSupport( name, [ SHADOW_SUPPORT_KEY, '__experimentalDefaultControls' ] ) ||
+		getBlockSupport( name, [ SHADOW_SUPPORT_KEY, 'defaultControls' ] );
+
 	const defaultControls = {
-		...getBlockSupport( name, [
-			BORDER_SUPPORT_KEY,
-			'__experimentalDefaultControls',
-		] ),
-		...getBlockSupport( name, [
-			SHADOW_SUPPORT_KEY,
-			'__experimentalDefaultControls',
-		] ),
+		...defaultBorderControls,
+		...defaultShadowControls,
 	};
 
 	return (
