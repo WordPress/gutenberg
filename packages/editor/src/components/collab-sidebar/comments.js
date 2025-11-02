@@ -39,7 +39,11 @@ import {
 import { unlock } from '../../lock-unlock';
 import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
-import { focusCommentThread, getCommentExcerpt, isCommentTrimmed } from './utils';
+import {
+	focusCommentThread,
+	getCommentExcerpt,
+	isCommentTrimmed,
+} from './utils';
 import { useFloatingThread } from './hooks';
 import { AddComment } from './add-comment';
 import { store as editorStore } from '../../store';
@@ -714,11 +718,11 @@ const CommentBoard = ( {
 			? actions.filter( ( item ) => item.isEligible( thread ) )
 			: [];
 
-	const [expanded, setExpanded] = useState(false);
+	const [ expanded, setExpanded ] = useState( false );
 	const MAX_LENGTH = 16;
-	const handleComment = (comment) => {
-		return expanded ? comment : getCommentExcerpt(comment, MAX_LENGTH);
-	}
+	const handleComment = ( comment ) => {
+		return expanded ? comment : getCommentExcerpt( comment, MAX_LENGTH );
+	};
 
 	return (
 		<VStack spacing="2">
@@ -836,22 +840,22 @@ const CommentBoard = ( {
 										// translators: %1$s: action label ("Marked as resolved" or "Reopened"); %2$s: note text.
 										__( '%1$s: %2$s' ),
 										actionText,
-										handleComment(content)
+										handleComment( content )
 									);
 								}
 								// If no content, just show the action.
 								return actionText;
 						  } )()
-						: handleComment(thread.content?.raw) }
+						: handleComment( thread.content?.raw ) }
 				</p>
 			) }
-			{ isCommentTrimmed(thread.content?.raw, MAX_LENGTH) && (
+			{ isCommentTrimmed( thread.content?.raw, MAX_LENGTH ) && (
 				<Button
 					variant="tertiary"
 					size="small"
-					onClick={() => setExpanded(!expanded)}
+					onClick={ () => setExpanded( ! expanded ) }
 				>
-					{ expanded ? __('Show Less') : __('Show More') }
+					{ expanded ? __( 'Show Less' ) : __( 'Show More' ) }
 				</Button>
 			) }
 			{ 'delete' === actionState && (

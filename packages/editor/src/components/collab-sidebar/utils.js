@@ -89,7 +89,7 @@ export function __trimComment( text, excerptLength = 10 ) {
 		trimmedExcerpt = rawText.split( '', excerptLength ).join( '' );
 	}
 
-	if (trimmedExcerpt !== rawText) {
+	if ( trimmedExcerpt !== rawText ) {
 		isTrimmed = true;
 	}
 
@@ -105,7 +105,7 @@ export function __trimComment( text, excerptLength = 10 ) {
  * @return {boolean} - True if the comment is trimmed, false otherwise.
  */
 export function isCommentTrimmed( text, excerptLength ) {
-	const { isTrimmed } = __trimComment(text, excerptLength);
+	const { isTrimmed } = __trimComment( text, excerptLength );
 	return isTrimmed;
 }
 
@@ -117,7 +117,7 @@ export function isCommentTrimmed( text, excerptLength ) {
  * @return {string} - The generated comment excerpt.
  */
 export function getCommentExcerpt( text, excerptLength ) {
-	const { isTrimmed, trimmedExcerpt } = __trimComment(text, excerptLength);
+	const { isTrimmed, trimmedExcerpt } = __trimComment( text, excerptLength );
 	return isTrimmed ? trimmedExcerpt + '…' : trimmedExcerpt;
 }
 
