@@ -8,7 +8,6 @@ import clsx from 'clsx';
  */
 import {
 	useState,
-	RawHTML,
 	useEffect,
 	useCallback,
 	useMemo,
@@ -40,7 +39,7 @@ import {
 import { unlock } from '../../lock-unlock';
 import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
-import { focusCommentThread, getCommentExcerpt } from './utils';
+import { focusCommentThread, getCommentExcerpt, isCommentTrimmed } from './utils';
 import { useFloatingThread } from './hooks';
 import { AddComment } from './add-comment';
 import { store as editorStore } from '../../store';
@@ -715,6 +714,12 @@ const CommentBoard = ( {
 			? actions.filter( ( item ) => item.isEligible( thread ) )
 			: [];
 
+	const [expanded, setExpanded] = useState(false);
+	const MAX_LENGTH = 16;
+	const handleComment = (comment) => {
+		return expanded ? comment : getCommentExcerpt(comment, MAX_LENGTH);
+	}
+
 	return (
 		<VStack spacing="2">
 			<HStack alignment="left" spacing="3" justify="flex-start">
@@ -805,7 +810,7 @@ const CommentBoard = ( {
 					reflowComments={ reflowComments }
 				/>
 			) : (
-				<RawHTML
+				<p
 					className={ clsx(
 						'editor-collab-sidebar-panel__user-comment',
 						{
@@ -820,7 +825,7 @@ const CommentBoard = ( {
 									thread.meta._wp_note_status === 'resolved'
 										? __( 'Marked as resolved' )
 										: __( 'Reopened' );
-								const content = thread?.content?.raw;
+								const content = thread.content?.raw;
 
 								if (
 									content &&
@@ -831,14 +836,23 @@ const CommentBoard = ( {
 										// translators: %1$s: action label ("Marked as resolved" or "Reopened"); %2$s: note text.
 										__( '%1$s: %2$s' ),
 										actionText,
-										content
+										handleComment(content)
 									);
 								}
 								// If no content, just show the action.
 								return actionText;
 						  } )()
-						: thread?.content?.rendered }
-				</RawHTML>
+						: handleComment(thread.content?.raw) }
+				</p>
+			) }
+			{ isCommentTrimmed(thread.content?.raw, MAX_LENGTH) && (
+				<Button
+					variant="tertiary"
+					size="small"
+					onClick={() => setExpanded(!expanded)}
+				>
+					{ expanded ? __('Show Less') : __('Show More') }
+				</Button>
 			) }
 			{ 'delete' === actionState && (
 				<ConfirmDialog
