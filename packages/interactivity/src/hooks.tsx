@@ -232,6 +232,7 @@ const resolve = ( path: string, namespace: string ) => {
 		if ( e === PENDING_GETTER ) {
 			return PENDING_GETTER;
 		}
+		warn( `Failed to resolve "${ path }" in "${ namespace }" namespace.` );
 	}
 };
 
