@@ -21,13 +21,21 @@ store( 'core/fit-text', {
 			const context = getContext();
 			const { ref } = getElement();
 
+			const applyFontSize = ( fontSize ) => {
+				if ( fontSize === 0 ) {
+					ref.style.fontSize = '';
+				} else {
+					ref.style.fontSize = `${ fontSize }px`;
+				}
+			};
+
 			// Initial fit text optimization.
-			context.fontSize = optimizeFitText( ref );
+			context.fontSize = optimizeFitText( ref, applyFontSize );
 
 			// Starts ResizeObserver to handle dynamic resizing.
 			if ( window.ResizeObserver && ref.parentElement ) {
 				const resizeObserver = new window.ResizeObserver( () => {
-					context.fontSize = optimizeFitText( ref );
+					context.fontSize = optimizeFitText( ref, applyFontSize );
 				} );
 				resizeObserver.observe( ref.parentElement );
 
