@@ -230,10 +230,12 @@ const resolve = ( path: string, namespace: string ) => {
 		const result = pathParts.reduce( ( acc, key ) => acc[ key ], current );
 
 		// Show a warning when path is invalid or resolves to undefined.
-		if ( typeof result === 'undefined' ) {
-			warn(
-				`"${ path }" in "${ namespace }" namespace resolved to "undefined".`
-			);
+		if ( globalThis.SCRIPT_DEBUG ) {
+			if ( typeof result === 'undefined' ) {
+				warn(
+					`"${ path }" in "${ namespace }" namespace resolved to "undefined".`
+				);
+			}
 		}
 
 		return result;
@@ -241,7 +243,11 @@ const resolve = ( path: string, namespace: string ) => {
 		if ( e === PENDING_GETTER ) {
 			return PENDING_GETTER;
 		}
-		warn( `Failed to resolve "${ path }" in "${ namespace }" namespace.` );
+		if ( globalThis.SCRIPT_DEBUG ) {
+			warn(
+				`Failed to resolve "${ path }" in "${ namespace }" namespace.`
+			);
+		}
 	}
 };
 
