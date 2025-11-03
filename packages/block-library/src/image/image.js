@@ -911,9 +911,6 @@ export default function Image( {
 				<Spinner />
 			</Placeholder>
 		) : (
-			// Disable reason: Image itself is not meant to be interactive, but
-			// should direct focus to block.
-
 			<>
 				<img
 					src={ temporaryURL || url }

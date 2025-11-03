@@ -532,7 +532,6 @@ describe( 'Button', () => {
 			render(
 				<Button
 					// @ts-expect-error - a button should not have `href`
-
 					href="https://wordpress.org/"
 					disabled
 					accessibleWhenDisabled

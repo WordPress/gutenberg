@@ -133,9 +133,6 @@ const SiteLogo = ( {
 	);
 
 	let imgWrapper = img;
-
-	// Disable reason: Image itself is not meant to be interactive, but
-	// should direct focus to block.
 	if ( isLink ) {
 		imgWrapper = (
 			<a

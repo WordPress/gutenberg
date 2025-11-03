@@ -1,9 +1,6 @@
 /**
  * External dependencies
  */
-// Disable reason: ESLint resolver can't handle `exports`. Import resolver
-// checking is redundant in TypeScript files.
-
 import { to, OKLCH } from 'colorjs.io/fn';
 
 /**

@@ -238,7 +238,6 @@ export function useCompositeState(
 		loop: focusLoop = false,
 		wrap: focusWrap = false,
 		shift: focusShift = false,
-
 		unstable_virtual: virtualFocus,
 	} = legacyStateOptions;
 

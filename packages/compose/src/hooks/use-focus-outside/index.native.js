@@ -15,8 +15,6 @@ const INPUT_BUTTON_TYPES = [ 'button', 'submit' ];
  * @typedef {HTMLButtonElement | HTMLLinkElement | HTMLInputElement} FocusNormalizedButton
  */
 
-// Disable reason: Rule doesn't support predicate return types.
-
 /**
  * Returns true if the given element is a button element subject to focus
  * normalization, or false otherwise.

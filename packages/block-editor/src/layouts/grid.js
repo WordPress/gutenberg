@@ -181,8 +181,6 @@ export default {
 		}
 
 		if ( rules.length ) {
-			// Reason to disable: the extra line breaks added by prettier mess with the unit tests.
-
 			output = `${ appendSelectors( selector ) } { ${ rules.join(
 				'; '
 			) }; }`;

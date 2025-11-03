@@ -306,7 +306,6 @@ test.describe( 'Site Editor Performance', () => {
 				 * If there is a Replace template button (old UI), click it, otherwise, click the "transform into" button.
 				 * Once the performance tests are updated to compare compatible versions this code can be removed.
 				 */
-
 				const isActionsButtonVisible = await page
 					.locator(
 						'.edit-site-template-card__actions button[aria-label="Actions"]'

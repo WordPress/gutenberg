@@ -69,7 +69,6 @@ export default function useMergeRefs( refs ) {
 	const element = useRef();
 	const isAttachedRef = useRef( false );
 	const didElementChangeRef = useRef( false );
-
 	/** @type {import('react').MutableRefObject<TRef[]>} */
 	const previousRefsRef = useRef( [] );
 	const currentRefsRef = useRef( refs );

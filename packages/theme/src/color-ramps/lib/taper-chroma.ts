@@ -9,8 +9,6 @@ import {
 	sRGB,
 	type ColorTypes,
 	type ColorObject,
-	// Disable reason: ESLint resolver can't handle `exports`. Import resolver
-	// checking is redundant in TypeScript files.
 } from 'colorjs.io/fn';
 
 /**

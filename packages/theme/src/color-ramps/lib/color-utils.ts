@@ -7,8 +7,6 @@ import {
 	contrastWCAG21,
 	sRGB,
 	type ColorTypes,
-	// Disable reason: ESLint resolver can't handle `exports`. Import resolver
-	// checking is redundant in TypeScript files.
 } from 'colorjs.io/fn';
 
 /**

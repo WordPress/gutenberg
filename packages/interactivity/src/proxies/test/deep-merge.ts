@@ -1,5 +1,3 @@
-/* eslint-disable eslint-comments/disable-enable-pair */
-
 /**
  * External dependencies
  */
