@@ -198,6 +198,7 @@ test.describe( 'Block Comments', () => {
 			attributes: { content: 'Testing block comments' },
 			comment: 'Test comment to resolve.',
 		} );
+		await blockCommentUtils.openBlockCommentSidebar();
 
 		const thread = page
 			.getByRole( 'region', { name: 'Editor settings' } )
