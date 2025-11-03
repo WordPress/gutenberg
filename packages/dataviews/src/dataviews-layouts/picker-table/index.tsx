@@ -36,7 +36,6 @@ import type {
 import type { SetSelection } from '../../types/private';
 import ColumnHeaderMenu from '../table/column-header-menu';
 import ColumnPrimary from '../table/column-primary';
-import { useIsHorizontalScrollEnd } from '../table/use-is-horizontal-scroll-end';
 import getDataByGroup from '../utils/get-data-by-group';
 
 interface TableColumnFieldProps< Item > {
@@ -231,7 +230,6 @@ function ViewPickerTable< Item >( {
 	className,
 	empty,
 }: ViewPickerTableProps< Item > ) {
-	const { containerRef } = useContext( DataViewsContext );
 	const headerMenuRefs = useRef<
 		Map< string, { node: HTMLButtonElement; fallback: string } >
 	>( new Map() );
@@ -248,12 +246,6 @@ function ViewPickerTable< Item >( {
 	} );
 
 	const tableNoticeId = useId();
-
-	// Note: We don't use isHorizontalScrollEnd for pickers as we don't have sticky actions column
-	useIsHorizontalScrollEnd( {
-		scrollContainerRef: containerRef,
-		enabled: false,
-	} );
 
 	if ( nextHeaderMenuToFocus ) {
 		// If we need to force focus, we short-circuit rendering here
