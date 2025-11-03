@@ -19,81 +19,50 @@ export const Card = css`
 	outline: none;
 
 	/* Sets the default padding for the card */
-	--container-inline-padding: ${ CONFIG.cardPaddingMediumInline };
-	--container-block-padding: ${ CONFIG.cardPaddingMediumBlock };
-	--container-inline-start-padding: ${ CONFIG.cardPaddingMediumInline };
-	--container-inline-end-padding: ${ CONFIG.cardPaddingMediumInline };
+	--wp-container-inline-padding: ${ CONFIG.cardPaddingMediumInline };
+	--wp-container-block-padding: ${ CONFIG.cardPaddingMediumBlock };
+	--wp-container-inline-start-padding: ${ CONFIG.cardPaddingMediumInline };
+	--wp-container-inline-end-padding: ${ CONFIG.cardPaddingMediumInline };
 `;
 
-/**
- * Sets density-specific padding values for the card.
- * The --density-multiplier variable can be set to scale the padding values.
- */
-export const densitySmall = css`
-	&[data-density='small'] {
-		--density-multiplier: 0.75;
-		--container-inline-padding: calc(
-			${ CONFIG.cardPaddingSmallInline } * var( --density-multiplier )
-		);
-		--container-block-padding: calc(
-			${ CONFIG.cardPaddingSmallBlock } * var( --density-multiplier )
-		);
-		--container-inline-start-padding: calc(
-			${ CONFIG.cardPaddingSmallInline } * var( --density-multiplier )
-		);
-		--container-inline-end-padding: calc(
-			${ CONFIG.cardPaddingSmallInline } * var( --density-multiplier )
-		);
+export const sizeSmall = css`
+	&[data-wp-container-size='small'] {
+		--wp-container-inline-padding: ${ CONFIG.cardPaddingSmallInline };
+		--wp-container-block-padding: ${ CONFIG.cardPaddingSmallBlock };
+		--wp-container-inline-start-padding: ${ CONFIG.cardPaddingSmallInline };
+		--wp-container-inline-end-padding: ${ CONFIG.cardPaddingSmallInline };
 	}
 `;
 
-export const densityDefault = css`
-	&[data-density='default'] {
-		--density-multiplier: 1;
-		--container-inline-padding: calc(
-			${ CONFIG.cardPaddingMediumInline } * var( --density-multiplier )
-		);
-		--container-block-padding: calc(
-			${ CONFIG.cardPaddingMediumBlock } * var( --density-multiplier )
-		);
-		--container-inline-start-padding: calc(
-			${ CONFIG.cardPaddingMediumInline } * var( --density-multiplier )
-		);
-		--container-inline-end-padding: calc(
-			${ CONFIG.cardPaddingMediumInline } * var( --density-multiplier )
-		);
+export const sizeMedium = css`
+	&[data-wp-container-size='medium'] {
+		--wp-container-inline-padding: ${ CONFIG.cardPaddingMediumInline };
+		--wp-container-block-padding: ${ CONFIG.cardPaddingMediumBlock };
+		--wp-container-inline-start-padding: ${ CONFIG.cardPaddingMediumInline };
+		--wp-container-inline-end-padding: ${ CONFIG.cardPaddingMediumInline };
 	}
 `;
 
-export const densityLarge = css`
-	&[data-density='large'] {
-		--density-multiplier: 1.25;
-		--container-inline-padding: calc(
-			${ CONFIG.cardPaddingLargeInline } * var( --density-multiplier )
-		);
-		--container-block-padding: calc(
-			${ CONFIG.cardPaddingLargeBlock } * var( --density-multiplier )
-		);
-		--container-inline-start-padding: calc(
-			${ CONFIG.cardPaddingLargeInline } * var( --density-multiplier )
-		);
-		--container-inline-end-padding: calc(
-			${ CONFIG.cardPaddingLargeInline } * var( --density-multiplier )
-		);
+export const sizeLarge = css`
+	&[data-wp-container-size='large'] {
+		--wp-container-inline-padding: ${ CONFIG.cardPaddingLargeInline };
+		--wp-container-block-padding: ${ CONFIG.cardPaddingLargeBlock };
+		--wp-container-inline-start-padding: ${ CONFIG.cardPaddingLargeInline };
+		--wp-container-inline-end-padding: ${ CONFIG.cardPaddingLargeInline };
 	}
 `;
 
 export const containerInlinePadding = css`
 	padding-inline: var(
-		--container-inline-padding,
-		${ CONFIG.cardPaddingMediumInline } * var( --density-multiplier )
+		--wp-container-inline-padding,
+		${ CONFIG.cardPaddingMediumInline }
 	);
 `;
 
 export const containerBlockPadding = css`
 	padding-block: var(
-		--container-block-padding,
-		${ CONFIG.cardPaddingMediumBlock } * var( --density-multiplier )
+		--wp-container-block-padding,
+		${ CONFIG.cardPaddingMediumBlock }
 	);
 `;
 

@@ -16,17 +16,8 @@ type SizeableProps = {
 	size?: SizeOptions | DeprecatedSizeOptions;
 };
 
-export type DensityOptions = 'small' | 'default' | 'large';
-export type DensityProps = {
-	/**
-	 * Determines the density of the component.
-	 */
-	density?: DensityOptions;
-};
-
 export type Props = SurfaceProps &
-	SizeableProps &
-	DensityProps & {
+	SizeableProps & {
 		/**
 		 * Size of the elevation shadow, based on the Style system's elevation system.
 		 * Elevating a `Card` can be done by adjusting the `elevation` prop. This may

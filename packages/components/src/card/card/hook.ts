@@ -50,7 +50,6 @@ export function useCard( props: CardProps ) {
 		isBorderless = false,
 		isRounded = true,
 		size = 'medium',
-		density = 'default',
 		...otherProps
 	} = useContextSystem( useDeprecatedProps( props ), 'Card' );
 
@@ -61,9 +60,9 @@ export function useCard( props: CardProps ) {
 			styles.Card,
 			isBorderless && styles.boxShadowless,
 			isRounded && styles.rounded,
-			styles.densitySmall,
-			styles.densityDefault,
-			styles.densityLarge,
+			styles.sizeSmall,
+			styles.sizeMedium,
+			styles.sizeLarge,
 			className
 		);
 	}, [ className, cx, isBorderless, isRounded ] );
@@ -76,6 +75,5 @@ export function useCard( props: CardProps ) {
 		isBorderless,
 		isRounded,
 		size,
-		density,
 	};
 }

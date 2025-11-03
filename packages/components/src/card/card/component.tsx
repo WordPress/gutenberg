@@ -32,7 +32,6 @@ function UnconnectedCard(
 		isBorderless,
 		isRounded,
 		size,
-		density = 'default',
 		...otherProps
 	} = useCard( props );
 	const elevationBorderRadius = isRounded ? CONFIG.radiusLarge : 0;
@@ -60,7 +59,7 @@ function UnconnectedCard(
 		<ContextSystemProvider value={ contextProviderValue }>
 			<View
 				{ ...otherProps }
-				data-density={ density }
+				data-wp-container-size={ size }
 				ref={ forwardedRef }
 			>
 				<View className={ cx( styles.Content ) }>{ children }</View>
