@@ -1,5 +1,8 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"compilerOptions": {
+		"composite": true
+	},
 	"files": [],
 	"references": [
 		{ "path": "./tsconfig.src.json" },
