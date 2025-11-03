@@ -1,0 +1,23 @@
+// Picker-specific table styles
+// The table picker mainly reuses the regular table styles from ../table/style.scss
+// Add any picker-specific overrides here if needed in the future.
+
+.dataviews-view-table {
+	// When used in picker context, ensure row selection works as expected
+	.dataviews-view-table__row {
+		cursor: pointer;
+
+		&.is-selected {
+			// Ensure selected rows are visually distinct
+			background-color: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+		}
+
+		&.is-hovered {
+			background-color: rgba(var(--wp-admin-theme-color--rgb), 0.08);
+		}
+
+		&.is-selected.is-hovered {
+			background-color: rgba(var(--wp-admin-theme-color--rgb), 0.12);
+		}
+	}
+}

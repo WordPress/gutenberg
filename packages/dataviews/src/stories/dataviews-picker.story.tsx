@@ -17,7 +17,7 @@ import {
  * Internal dependencies
  */
 import DataViewsPicker from '../components/dataviews-picker/index';
-import { LAYOUT_PICKER_GRID } from '../constants';
+import { LAYOUT_PICKER_GRID, LAYOUT_PICKER_TABLE } from '../constants';
 import filterSortAndPaginate from '../utils/filter-sort-and-paginate';
 import type { ActionButton, View } from '../types';
 import { data, fields, type SpaceObject } from './dataviews.fixtures';
@@ -73,7 +73,6 @@ const DataViewsPickerContent = ( {
 	selection: customSelection,
 }: PickerContentProps ) => {
 	const [ view, setView ] = useState< View >( {
-		type: LAYOUT_PICKER_GRID,
 		fields: [],
 		titleField: 'title',
 		mediaField: 'image',
@@ -81,6 +80,7 @@ const DataViewsPickerContent = ( {
 		page: 1,
 		perPage: 10,
 		filters: [],
+		type: LAYOUT_PICKER_GRID,
 		groupByField: isGrouped ? 'type' : undefined,
 		infiniteScrollEnabled,
 	} );
@@ -171,6 +171,7 @@ const DataViewsPickerContent = ( {
 				itemListLabel="Galactic Bodies"
 				defaultLayouts={ {
 					[ LAYOUT_PICKER_GRID ]: {},
+					[ LAYOUT_PICKER_TABLE ]: {},
 				} }
 			/>
 		</>
@@ -329,7 +330,7 @@ function useInfiniteScroll( {
 			...view,
 			page: currentPage + 1,
 		} );
-	}, [ isLoadingMore, currentPage, totalPages, view ] );
+	}, [ isLoadingMore, currentPage, totalPages, view, setView ] );
 
 	// Initialize data on first load or when view changes significantly
 	useEffect( () => {
@@ -353,6 +354,8 @@ function useInfiniteScroll( {
 		view.perPage,
 		currentPage,
 		view.infiniteScrollEnabled,
+		shownData,
+		getItemId,
 	] );
 
 	const paginationInfo = {
