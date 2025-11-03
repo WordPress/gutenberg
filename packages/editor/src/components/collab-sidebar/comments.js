@@ -872,7 +872,7 @@ const CommentBoard = ( {
 			>
 				<RawHTML
 					className={ clsx(
-						'editor-collab-sidebar-panel__user-comment',
+						'editor-collab-sidebar-panel__user-comment--hidden',
 						{
 							'editor-collab-sidebar-panel__resolution-text':
 								isResolutionComment,
