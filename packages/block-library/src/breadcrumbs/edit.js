@@ -260,11 +260,14 @@ export default function BreadcrumbEdit( {
 			<InspectorControls group="advanced">
 				<CheckboxControl
 					__nextHasNoMarginBottom
-					label={ __( 'Show on home page' ) }
+					label={ __( 'Show on homepage' ) }
 					checked={ showOnHomePage }
 					onChange={ ( value ) =>
 						setAttributes( { showOnHomePage: value } )
 					}
+					help={ __(
+						'If this breadcrumbs block appears in a template or template part that’s shown on the homepage, enable this option to display the breadcrumb trail. Otherwise, this setting has no effect.'
+					) }
 				/>
 				<CheckboxControl
 					__nextHasNoMarginBottom
