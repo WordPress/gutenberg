@@ -168,6 +168,7 @@ module.exports = {
 		],
 		'@wordpress/no-unsafe-wp-apis': 'off',
 		'@wordpress/data-no-store-string-literals': 'error',
+		'eslint-comments/no-unused-disable': 'error',
 		'import/default': 'error',
 		'import/named': 'error',
 		'no-restricted-imports': [
