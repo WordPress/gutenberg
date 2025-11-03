@@ -9,6 +9,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
+import { getUnregisteredTypeHandlerName } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -18,15 +19,21 @@ import { unlock } from '../../lock-unlock';
 const { CommentIconSlotFill } = unlock( blockEditorPrivateApis );
 
 const AddCommentMenuItem = ( { clientId, onClick } ) => {
-	const isFreeformBlock = useSelect(
+	const block = useSelect(
 		( select ) => {
-			return (
-				select( blockEditorStore ).getBlockName( clientId ) ===
-				'core/freeform'
-			);
+			return select( blockEditorStore ).getBlock( clientId );
 		},
 		[ clientId ]
 	);
+
+	if (
+		! block?.isValid ||
+		block?.name === getUnregisteredTypeHandlerName()
+	) {
+		return null;
+	}
+
+	const isFreeformBlock = block?.name === 'core/freeform';
 
 	return (
 		<MenuItem

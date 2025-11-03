@@ -3,7 +3,6 @@
  */
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
-	getUnregisteredTypeHandlerName,
 	hasBlockSupport,
 	switchToBlockType,
 	store as blocksStore,
@@ -64,23 +63,13 @@ export default function BlockActions( {
 						canInsertBlockType( block.name, rootClientId )
 					);
 				} ),
-				canAddNote:
-					blocks.length === 1 &&
-					blocks[ 0 ].isValid &&
-					blocks[ 0 ].name !== getUnregisteredTypeHandlerName(),
 			};
 		},
 		[ clientIds, getDefaultBlockName ]
 	);
 	const { getBlocksByClientId, getBlocks } = useSelect( blockEditorStore );
 
-	const {
-		canRemove,
-		canInsertBlock,
-		canCopyStyles,
-		canDuplicate,
-		canAddNote,
-	} = selected;
+	const { canRemove, canInsertBlock, canCopyStyles, canDuplicate } = selected;
 
 	const {
 		removeBlocks,
@@ -98,7 +87,6 @@ export default function BlockActions( {
 		canDuplicate,
 		canInsertBlock,
 		canRemove,
-		canAddNote,
 		onDuplicate() {
 			return duplicateBlocks( clientIds, updateSelection );
 		},
