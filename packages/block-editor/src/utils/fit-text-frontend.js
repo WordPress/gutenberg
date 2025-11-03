@@ -101,7 +101,6 @@ store( 'core/fit-text', {
 					observer.disconnect();
 				}
 
-				// Remove the associated style element
 				const styleId = `fit-text-${ elementId }`;
 				const styleElement = document.getElementById( styleId );
 				if ( styleElement ) {
