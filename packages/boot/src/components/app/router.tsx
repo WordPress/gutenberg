@@ -16,7 +16,7 @@ import type { ComponentType } from 'react';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { lazy, Suspense, useState, useEffect } from '@wordpress/element';
+import { lazy, useState, useEffect } from '@wordpress/element';
 import { Page } from '@wordpress/admin-ui';
 
 /**
@@ -47,16 +47,12 @@ function RouteComponent( {
 		<>
 			{ Stage && (
 				<div className="boot-layout__stage">
-					<Suspense fallback={ <div>Loading...</div> }>
-						<Stage />
-					</Suspense>
+					<Stage />
 				</div>
 			) }
 			{ Inspector && (
 				<div className="boot-layout__inspector">
-					<Suspense fallback={ <div>Loading...</div> }>
-						<Inspector />
-					</Suspense>
+					<Inspector />
 				</div>
 			) }
 		</>
