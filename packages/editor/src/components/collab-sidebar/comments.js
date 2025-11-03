@@ -715,6 +715,48 @@ const CommentBoard = ( {
 			? actions.filter( ( item ) => item.isEligible( thread ) )
 			: [];
 
+	const content = isResolutionComment
+		? ( () => {
+				const actionText =
+					thread.meta._wp_note_status === 'resolved'
+						? __( 'Marked as resolved' )
+						: __( 'Reopened' );
+				const content = thread?.content?.raw;
+
+				if (
+					content &&
+					typeof content === 'string' &&
+					content.trim() !== ''
+				) {
+					return sprintf(
+						// translators: %1$s: action label ("Marked as resolved" or "Reopened"); %2$s: note text.
+						__( '%1$s: %2$s' ),
+						actionText,
+						content
+					);
+				}
+				// If no content, just show the action.
+				return actionText;
+		  } )()
+		: thread?.content?.rendered;
+	const MAX_HEIGHT = 60;
+	const hiddenCommentRef = useRef( null );
+	const [ isOverflowing, setIsOverflowing ] = useState( false );
+	const [ collapsed, setCollapsed ] = useState( null );
+
+	useEffect( () => {
+		const el = hiddenCommentRef.current;
+		if ( ! el ) return;
+
+		if ( el.scrollHeight > el.clientHeight ) {
+			setIsOverflowing( true );
+			setCollapsed( true );
+		} else {
+			setIsOverflowing( false );
+			setCollapsed( null );
+		}
+	}, [ thread?.content?.raw ] );
+
 	return (
 		<VStack spacing="2">
 			<HStack alignment="left" spacing="3" justify="flex-start">
@@ -809,36 +851,45 @@ const CommentBoard = ( {
 					className={ clsx(
 						'editor-collab-sidebar-panel__user-comment',
 						{
+							'is-collapsed': collapsed,
 							'editor-collab-sidebar-panel__resolution-text':
 								isResolutionComment,
 						}
 					) }
 				>
-					{ isResolutionComment
-						? ( () => {
-								const actionText =
-									thread.meta._wp_note_status === 'resolved'
-										? __( 'Marked as resolved' )
-										: __( 'Reopened' );
-								const content = thread?.content?.raw;
-
-								if (
-									content &&
-									typeof content === 'string' &&
-									content.trim() !== ''
-								) {
-									return sprintf(
-										// translators: %1$s: action label ("Marked as resolved" or "Reopened"); %2$s: note text.
-										__( '%1$s: %2$s' ),
-										actionText,
-										content
-									);
-								}
-								// If no content, just show the action.
-								return actionText;
-						  } )()
-						: thread?.content?.rendered }
+					{ content }
 				</RawHTML>
+			) }
+			{
+				<div
+					ref={ hiddenCommentRef }
+					style={ {
+						visibility: 'hidden',
+						position: 'absolute',
+						maxHeight: MAX_HEIGHT,
+					} }
+				>
+					<RawHTML
+						className={ clsx(
+							'editor-collab-sidebar-panel__user-comment',
+							{
+								'editor-collab-sidebar-panel__resolution-text':
+									isResolutionComment,
+							}
+						) }
+					>
+						{ content }
+					</RawHTML>
+				</div>
+			}
+			{ isOverflowing && (
+				<Button
+					variant="tertiary"
+					size="small"
+					onClick={ () => setCollapsed( ! collapsed ) }
+				>
+					{ collapsed ? __( 'Show More' ) : __( 'Show Less' ) }
+				</Button>
 			) }
 			{ 'delete' === actionState && (
 				<ConfirmDialog
