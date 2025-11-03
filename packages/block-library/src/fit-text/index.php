@@ -8,13 +8,14 @@
 /**
  * Renders the `core/fit-text` block on the server.
  *
- * @param array    $attributes Block attributes.
- * @param string   $content    Block default content.
- * @param WP_Block $block      Block instance.
+ * @since 22.0.0
+ *
+ * @param array  $attributes Block attributes.
+ * @param string $content    Block default content.
  *
  * @return string Returns the block content.
  */
-function render_block_core_fit_text( $attributes, $content, $block ) {
+function render_block_core_fit_text( $attributes, $content ) {
 	if ( ! $content || is_admin() ) {
 		return $content;
 	}
@@ -39,6 +40,8 @@ function render_block_core_fit_text( $attributes, $content, $block ) {
 
 /**
  * Registers the `core/fit-text` block on the server.
+ *
+ * @since 22.0.0
  */
 function register_block_core_fit_text() {
 	register_block_type_from_metadata(
