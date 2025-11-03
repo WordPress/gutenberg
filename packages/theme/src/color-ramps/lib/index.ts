@@ -69,8 +69,7 @@ function calculateRamp( {
 		keyof Ramp,
 		{ color: string; warning: boolean }
 	>;
-	let SATISFIED_ALL_CONTRAST_REQUIREMENTS = true;
-	let UNSATISFIED_DIRECTION: RampDirection = 'lighter';
+	let DEFICIT_DIRECTION: RampDirection = 'lighter';
 	let MAX_DEFICIT = -Infinity;
 
 	// Keep track of the calculated colors, as they are going to be useful
@@ -174,20 +173,14 @@ function calculateRamp( {
 
 		// When the target contrast is not met, take note of it and use
 		// that information to guide the ramp calculation bisection.
-		if ( ! searchResults.reached && ! contrast.ignoreWhenAdjustingSeed ) {
-			SATISFIED_ALL_CONTRAST_REQUIREMENTS = false;
-
+		if ( ! contrast.ignoreWhenAdjustingSeed ) {
 			if (
 				searchResults.deficit &&
 				searchResults.deficit > MAX_DEFICIT
 			) {
 				MAX_DEFICIT = searchResults.deficit;
-				UNSATISFIED_DIRECTION = computedDir;
+				DEFICIT_DIRECTION = computedDir;
 			}
-		}
-		if ( searchResults.deficit && searchResults.deficit > MAX_DEFICIT ) {
-			MAX_DEFICIT = searchResults.deficit;
-			UNSATISFIED_DIRECTION = computedDir;
 		}
 
 		// Store calculated color for future dependencies
@@ -203,8 +196,7 @@ function calculateRamp( {
 
 	return {
 		rampResults,
-		SATISFIED_ALL_CONTRAST_REQUIREMENTS,
-		UNSATISFIED_DIRECTION,
+		DEFICIT_DIRECTION,
 		MAX_DEFICIT,
 	};
 }
@@ -252,11 +244,7 @@ export function buildRamp(
 	const sortedSteps = sortByDependency( config );
 
 	// Calculate the ramp with the initial seed.
-	const {
-		rampResults,
-		SATISFIED_ALL_CONTRAST_REQUIREMENTS,
-		UNSATISFIED_DIRECTION,
-	} = calculateRamp( {
+	const { rampResults, DEFICIT_DIRECTION, MAX_DEFICIT } = calculateRamp( {
 		seed,
 		sortedSteps,
 		config,
@@ -264,29 +252,34 @@ export function buildRamp(
 		oppDir,
 		pinLightness,
 	} );
+
 	const toReturn = {
 		ramp: rampResults,
 		direction: mainDir,
 	} as RampResult;
 
-	if (
-		! SATISFIED_ALL_CONTRAST_REQUIREMENTS &&
-		rescaleToFitContrastTargets
-	) {
+	if ( MAX_DEFICIT > LIGHTNESS_EPSILON && rescaleToFitContrastTargets ) {
 		let worseSeedL = get( seed, [ OKLCH, 'l' ] );
+		let worseDeficit = MAX_DEFICIT;
+
 		// For a scale with the "lighter" direction, the contrast can be improved
 		// by darkening the seed. For "darker" direction, by lightening the seed.
-		let betterSeedL = UNSATISFIED_DIRECTION === 'lighter' ? 0 : 1;
+		let betterSeedL = DEFICIT_DIRECTION === 'lighter' ? 0 : 1;
+		let betterDeficit = -MAX_DEFICIT;
+
+		let bestDeficit = MAX_DEFICIT;
 
 		// Binary search: try a new seed and recompute the whole ramp
-		// (TODO: try a smarter approach?)
 		for (
 			let i = 0;
 			i < MAX_BISECTION_ITERATIONS &&
-			Math.abs( betterSeedL - worseSeedL ) > LIGHTNESS_EPSILON;
+			Math.abs( bestDeficit ) > LIGHTNESS_EPSILON;
 			i++
 		) {
-			const newSeedL = ( worseSeedL + betterSeedL ) / 2;
+			const newSeedL =
+				( worseSeedL * betterDeficit - betterSeedL * worseDeficit ) /
+				( betterDeficit - worseDeficit );
+
 			const newSeed = clampToGamut(
 				set( clone( seed ), [ OKLCH, 'l' ], newSeedL )
 			);
@@ -300,18 +293,26 @@ export function buildRamp(
 				pinLightness,
 			} );
 
-			if ( iterationResults.SATISFIED_ALL_CONTRAST_REQUIREMENTS ) {
+			toReturn.ramp = iterationResults.rampResults;
+			bestDeficit = iterationResults.MAX_DEFICIT;
+
+			if ( iterationResults.MAX_DEFICIT < 0 ) {
 				betterSeedL = newSeedL;
+				betterDeficit = iterationResults.MAX_DEFICIT;
 				// Only update toReturn when the ramp satisfies all constraints.
 				toReturn.ramp = iterationResults.rampResults;
-			} else if ( UNSATISFIED_DIRECTION !== mainDir ) {
+			} else if (
+				iterationResults.DEFICIT_DIRECTION !== DEFICIT_DIRECTION
+			) {
 				// Failing constraint is in opposite direction to main ramp direction
 				// We've moved too far in mainDir, constrain the search
 				betterSeedL = newSeedL;
+				betterDeficit = -MAX_DEFICIT;
 			} else {
 				// Failing constraint is in same direction as main ramp direction
 				// We haven't moved far enough in mainDir, continue searching
 				worseSeedL = newSeedL;
+				worseDeficit = iterationResults.MAX_DEFICIT;
 			}
 		}
 	}
