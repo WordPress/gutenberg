@@ -49,13 +49,11 @@ import deprecated from '@wordpress/deprecated';
  *                                    providing a custom `settings` prop.
  */
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * Custom settings values associated with a link.
  *
  * @typedef {{[setting:string]:any}} WPLinkControlSettingsValue
  */
-/* eslint-enable */
 
 /**
  * Custom settings values associated with a link.

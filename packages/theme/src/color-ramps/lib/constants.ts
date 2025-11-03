@@ -3,7 +3,7 @@
  */
 // Disable reason: ESLint resolver can't handle `exports`. Import resolver
 // checking is redundant in TypeScript files.
-// eslint-disable-next-line import/no-unresolved
+
 import { to, OKLCH } from 'colorjs.io/fn';
 
 /**

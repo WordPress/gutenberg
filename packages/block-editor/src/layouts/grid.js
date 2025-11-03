@@ -182,7 +182,7 @@ export default {
 
 		if ( rules.length ) {
 			// Reason to disable: the extra line breaks added by prettier mess with the unit tests.
-			// eslint-disable-next-line prettier/prettier
+
 			output = `${ appendSelectors( selector ) } { ${ rules.join(
 				'; '
 			) }; }`;

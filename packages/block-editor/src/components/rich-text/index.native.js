@@ -415,7 +415,7 @@ export function RichTextWrapper(
 				} );
 
 				// Allows us to ask for this information when we get a report.
-				// eslint-disable-next-line no-console
+
 				window.console.log( 'Received items:\n\n', files );
 
 				if ( onReplace && isEmpty( value ) ) {

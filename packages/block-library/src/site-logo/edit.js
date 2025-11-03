@@ -138,7 +138,6 @@ const SiteLogo = ( {
 	// should direct focus to block.
 	if ( isLink ) {
 		imgWrapper = (
-			/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 			<a
 				href={ siteUrl }
 				className="custom-logo-link"
@@ -148,7 +147,6 @@ const SiteLogo = ( {
 			>
 				{ img }
 			</a>
-			/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 		);
 	}
 

@@ -1871,7 +1871,7 @@ export const getPostTypeLabel = createRegistrySelector(
 		const currentPostType = getCurrentPostType( state );
 		const postType = select( coreStore ).getPostType( currentPostType );
 		// Disable reason: Post type labels object is shaped like this.
-		// eslint-disable-next-line camelcase
+
 		return postType?.labels?.singular_name;
 	}
 );

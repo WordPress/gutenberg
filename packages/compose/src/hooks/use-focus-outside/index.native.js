@@ -16,7 +16,7 @@ const INPUT_BUTTON_TYPES = [ 'button', 'submit' ];
  */
 
 // Disable reason: Rule doesn't support predicate return types.
-/* eslint-disable jsdoc/valid-types */
+
 /**
  * Returns true if the given element is a button element subject to focus
  * normalization, or false otherwise.
@@ -41,7 +41,6 @@ function isFocusNormalizedButton( eventTarget ) {
 
 	return false;
 }
-/* eslint-enable jsdoc/valid-types */
 
 /**
  * @typedef {import('react').SyntheticEvent} SyntheticEvent

@@ -9,7 +9,6 @@ import {
 	type ColorTypes,
 	// Disable reason: ESLint resolver can't handle `exports`. Import resolver
 	// checking is redundant in TypeScript files.
-	// eslint-disable-next-line import/no-unresolved
 } from 'colorjs.io/fn';
 
 /**

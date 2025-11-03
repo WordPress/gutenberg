@@ -132,7 +132,6 @@ function UploadFonts() {
 			const buffer = await readFileAsArrayBuffer( file );
 			await font.fromDataBuffer( buffer, 'font' );
 			return true;
-			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		} catch ( error ) {
 			return false;
 		}
