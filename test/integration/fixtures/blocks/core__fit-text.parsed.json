@@ -3,7 +3,7 @@
 		"blockName": "core/fit-text",
 		"attrs": {},
 		"innerBlocks": [],
-		"innerHTML": "\n<h2 class=\"wp-block-fit-text\">Fit Text</h2>\n",
-		"innerContent": [ "\n<h2 class=\"wp-block-fit-text\">Fit Text</h2>\n" ]
+		"innerHTML": "\n<p class=\"wp-block-fit-text\">Fit Text</p>\n",
+		"innerContent": [ "\n<p class=\"wp-block-fit-text\">Fit Text</p>\n" ]
 	}
 ]

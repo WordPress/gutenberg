@@ -154,7 +154,6 @@ export default function FitTextEdit( {
 				placeholder={ __( 'Add text…' ) }
 				value={ content }
 				onChange={ ( value ) => setAttributes( { content: value } ) }
-				allowedFormats={ [] }
 				disableLineBreaks
 				__unstableOnSplitAtEnd={ () =>
 					insertBlocksAfter( createBlock( getDefaultBlockName() ) )

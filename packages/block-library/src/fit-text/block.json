@@ -16,7 +16,7 @@
 		},
 		"level": {
 			"type": "number",
-			"default": 2
+			"default": 0
 		},
 		"levelOptions": {
 			"type": "array",
