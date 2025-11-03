@@ -1,0 +1,12 @@
+[
+	{
+		"name": "core/fit-text",
+		"isValid": true,
+		"attributes": {
+			"content": "Fit Text",
+			"level": 2,
+			"levelOptions": [ 0, 1, 2, 3, 4, 5, 6 ]
+		},
+		"innerBlocks": []
+	}
+]
