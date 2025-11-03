@@ -31,6 +31,7 @@ import {
 } from './hooks';
 import { focusCommentThread } from './utils';
 import PostTypeSupportCheck from '../post-type-support-check';
+import { unlock } from '../../lock-unlock';
 
 function NotesSidebarContent( {
 	showCommentBoard,
@@ -80,18 +81,22 @@ function NotesSidebar( { postId, mode } ) {
 	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
+	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const commentSidebarRef = useRef( null );
 
 	const showFloatingSidebar = isLargeViewport && mode === 'post-only';
 
-	const blockCommentId = useSelect( ( select ) => {
+	const { clientId, blockCommentId } = useSelect( ( select ) => {
 		const { getBlockAttributes, getSelectedBlockClientId } =
 			select( blockEditorStore );
-		const clientId = getSelectedBlockClientId();
-		return clientId
-			? getBlockAttributes( clientId )?.metadata?.noteId
-			: null;
+		const _clientId = getSelectedBlockClientId();
+		return {
+			clientId: _clientId,
+			blockCommentId: _clientId
+				? getBlockAttributes( _clientId )?.metadata?.noteId
+				: null,
+		};
 	}, [] );
 
 	const {
@@ -144,6 +149,7 @@ function NotesSidebar( { postId, mode } ) {
 			// Focus a comment thread when there's a selected block with a comment.
 			! blockCommentId ? 'textarea' : undefined
 		);
+		toggleBlockSpotlight( clientId, true );
 	}
 
 	return (
@@ -159,10 +165,10 @@ function NotesSidebar( { postId, mode } ) {
 				<PluginSidebar
 					identifier={ collabHistorySidebarName }
 					name={ collabHistorySidebarName }
-					title={ __( 'Notes' ) }
+					title={ __( 'All notes' ) }
 					header={
 						<h2 className="interface-complementary-area-header__title">
-							{ __( 'Notes' ) }
+							{ __( 'All notes' ) }
 						</h2>
 					}
 					icon={ commentIcon }
@@ -206,17 +212,22 @@ function NotesSidebar( { postId, mode } ) {
 }
 
 export default function NotesSidebarContainer() {
-	const { postId, mode, editorMode } = useSelect( ( select ) => {
-		const { getCurrentPostId, getRenderingMode, getEditorMode } =
-			select( editorStore );
-		return {
-			postId: getCurrentPostId(),
-			mode: getRenderingMode(),
-			editorMode: getEditorMode(),
-		};
-	}, [] );
+	const { postId, mode, editorMode, isDistractionFree } = useSelect(
+		( select ) => {
+			const { getCurrentPostId, getRenderingMode, getEditorMode } =
+				select( editorStore );
+			const { getSettings } = select( blockEditorStore );
+			return {
+				postId: getCurrentPostId(),
+				mode: getRenderingMode(),
+				editorMode: getEditorMode(),
+				isDistractionFree: getSettings().isDistractionFree,
+			};
+		},
+		[]
+	);
 
-	if ( ! postId || typeof postId !== 'number' ) {
+	if ( ! postId || typeof postId !== 'number' || isDistractionFree ) {
 		return null;
 	}
 

@@ -43,7 +43,7 @@ test.describe( 'Block Comments', () => {
 		// Close the pinned notes sidebar.
 		await page
 			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'Notes', exact: true } )
+			.getByRole( 'button', { name: 'All notes', exact: true } )
 			.click();
 		await editor.clickBlockOptionsMenuItem( 'Add note' );
 		await expect( form ).toBeFocused();
@@ -619,6 +619,48 @@ test.describe( 'Block Comments', () => {
 				} )
 			).toBeFocused();
 		} );
+
+		test( 'should focus action button when comment editing is cancelled or comment is updated', async ( {
+			page,
+			blockCommentUtils,
+		} ) => {
+			await blockCommentUtils.addBlockWithComment( {
+				type: 'core/heading',
+				attributes: { content: 'Testing block comments' },
+				comment: 'test comment before edit',
+			} );
+
+			// Test focus on action button when comment editing is cancelled.
+			await blockCommentUtils.clickBlockCommentActionMenuItem( 'Edit' );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Cancel' } )
+				.first()
+				.click();
+
+			await expect(
+				page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'button', { name: 'Actions' } )
+			).toBeFocused();
+
+			// Test focus on action button when comment is updated.
+			await blockCommentUtils.clickBlockCommentActionMenuItem( 'Edit' );
+			await page
+				.getByRole( 'textbox', { name: 'Note' } )
+				.first()
+				.fill( 'Test comment after edit.' );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Update' } )
+				.click();
+
+			await expect(
+				page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'button', { name: 'Actions' } )
+			).toBeFocused();
+		} );
 	} );
 } );
 
@@ -636,7 +678,7 @@ class BlockCommentUtils {
 	async openBlockCommentSidebar() {
 		const toggleButton = this.#page
 			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'Notes', exact: true } );
+			.getByRole( 'button', { name: 'All notes', exact: true } );
 
 		const isClosed =
 			( await toggleButton.getAttribute( 'aria-expanded' ) ) === 'false';

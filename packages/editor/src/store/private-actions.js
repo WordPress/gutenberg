@@ -563,3 +563,16 @@ export function resetStylesNavigation() {
 		type: 'RESET_STYLES_NAVIGATION',
 	};
 }
+
+/**
+ * Set the minimum height of the canvas.
+ *
+ * @param {number} minHeight
+ * @return {Object} Action object.
+ */
+export function setCanvasMinHeight( minHeight ) {
+	return {
+		type: 'SET_CANVAS_MIN_HEIGHT',
+		minHeight,
+	};
+}

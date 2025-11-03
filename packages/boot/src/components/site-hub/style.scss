@@ -1,0 +1,54 @@
+@use "@wordpress/base-styles/variables";
+
+.boot-site-hub {
+	position: sticky;
+	top: 0;
+	background-color: var(--wpds-color-bg-surface-neutral-weak, #f0f0f0);
+	z-index: 1;
+	display: grid;
+	grid-template-columns: 60px 1fr auto;
+	align-items: center;
+	padding-right: variables.$grid-unit-20;
+	flex-shrink: 0; // Prevent flex parent from shrinking this element.
+}
+
+.boot-site-hub__actions {
+	flex-shrink: 0;
+}
+
+.boot-site-hub__title {
+	color: var(--wpds-color-fg-content-neutral, #1e1e1e);
+	font-size: variables.$font-size-medium;
+	font-weight: variables.$font-weight-medium;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	text-decoration: none;
+
+	.components-external-link__contents {
+		text-decoration: none;
+		margin-inline-start: variables.$grid-unit-05;
+	}
+
+	// Show icon on hover
+	.components-external-link__icon {
+		opacity: 0;
+		transition: opacity 0.1s ease-out;
+	}
+
+	&:hover .components-external-link__icon {
+		opacity: 1;
+	}
+
+	// Focus styles
+	@media not (prefers-reduced-motion) {
+		transition: outline 0.1s ease-out;
+	}
+
+	&:focus:not(:active) {
+		outline:
+			var(--wpds-border-width-focus, 2px) solid
+			var(--wpds-color-stroke-focus-brand, #0073aa);
+		outline-offset: calc(-1 * var(--wpds-border-width-focus, 2px));
+	}
+}
