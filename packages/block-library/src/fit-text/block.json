@@ -5,7 +5,7 @@
 	"title": "Fit Text",
 	"category": "text",
 	"description": "Add text that automatically scales to fit its container.",
-	"keywords": [ "text", "heading", "resize", "scale" ],
+	"keywords": [ "text", "resize", "scale" ],
 	"textdomain": "default",
 	"attributes": {
 		"content": {
