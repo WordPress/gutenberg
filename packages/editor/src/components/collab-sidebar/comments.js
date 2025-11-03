@@ -715,7 +715,7 @@ const CommentBoard = ( {
 			? actions.filter( ( item ) => item.isEligible( thread ) )
 			: [];
 
-	const content = isResolutionComment
+	const commentContent = isResolutionComment
 		? ( () => {
 				const actionText =
 					thread.meta._wp_note_status === 'resolved'
@@ -746,7 +746,9 @@ const CommentBoard = ( {
 
 	useEffect( () => {
 		const el = hiddenCommentRef.current;
-		if ( ! el ) return;
+		if ( ! el ) {
+			return;
+		}
 
 		if ( el.scrollHeight > el.clientHeight ) {
 			setIsOverflowing( true );
@@ -857,31 +859,29 @@ const CommentBoard = ( {
 						}
 					) }
 				>
-					{ content }
+					{ commentContent }
 				</RawHTML>
 			) }
-			{
-				<div
-					ref={ hiddenCommentRef }
-					style={ {
-						visibility: 'hidden',
-						position: 'absolute',
-						maxHeight: MAX_HEIGHT,
-					} }
+			<div
+				ref={ hiddenCommentRef }
+				style={ {
+					visibility: 'hidden',
+					position: 'absolute',
+					maxHeight: MAX_HEIGHT,
+				} }
+			>
+				<RawHTML
+					className={ clsx(
+						'editor-collab-sidebar-panel__user-comment',
+						{
+							'editor-collab-sidebar-panel__resolution-text':
+								isResolutionComment,
+						}
+					) }
 				>
-					<RawHTML
-						className={ clsx(
-							'editor-collab-sidebar-panel__user-comment',
-							{
-								'editor-collab-sidebar-panel__resolution-text':
-									isResolutionComment,
-							}
-						) }
-					>
-						{ content }
-					</RawHTML>
-				</div>
-			}
+					{ commentContent }
+				</RawHTML>
+			</div>
 			{ isOverflowing && (
 				<Button
 					variant="tertiary"
