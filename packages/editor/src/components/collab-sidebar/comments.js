@@ -12,6 +12,7 @@ import {
 	useEffect,
 	useCallback,
 	useMemo,
+	useRef,
 } from '@wordpress/element';
 import {
 	__experimentalText as Text,
@@ -660,7 +661,7 @@ const CommentBoard = ( {
 } ) => {
 	const [ actionState, setActionState ] = useState( false );
 	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
-
+	const actionButtonRef = useRef( null );
 	const handleConfirmDelete = () => {
 		onDelete( thread );
 		setActionState( false );
@@ -670,6 +671,7 @@ const CommentBoard = ( {
 	const handleCancel = () => {
 		setActionState( false );
 		setShowConfirmDialog( false );
+		actionButtonRef.current?.focus();
 	};
 
 	// Check if this is a resolution comment by checking metadata.
@@ -755,6 +757,7 @@ const CommentBoard = ( {
 								<Menu.TriggerButton
 									render={
 										<Button
+											ref={ actionButtonRef }
 											size="small"
 											icon={ moreVertical }
 											label={ __( 'Actions' ) }
@@ -788,6 +791,7 @@ const CommentBoard = ( {
 							content: value,
 						} );
 						setActionState( false );
+						actionButtonRef.current?.focus();
 					} }
 					onCancel={ () => handleCancel() }
 					thread={ thread }

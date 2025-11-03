@@ -162,10 +162,10 @@ function NotesSidebar( { postId, mode } ) {
 			<PluginSidebar
 				identifier={ collabHistorySidebarName }
 				name={ collabHistorySidebarName }
-				title={ __( 'Notes' ) }
+				title={ __( 'All notes' ) }
 				header={
 					<h2 className="interface-complementary-area-header__title">
-						{ __( 'Notes' ) }
+						{ __( 'All notes' ) }
 					</h2>
 				}
 				icon={ commentIcon }
