@@ -308,21 +308,9 @@ export function Comments( {
 	] );
 
 	const hasThreads = Array.isArray( threads ) && threads.length > 0;
+	// This should no longer happen since https://github.com/WordPress/gutenberg/pull/72872.
 	if ( ! hasThreads && ! isFloating ) {
-		return (
-			<>
-				<AddComment
-					onSubmit={ onAddReply }
-					showCommentBoard={ showCommentBoard }
-					setShowCommentBoard={ setShowCommentBoard }
-					commentSidebarRef={ commentSidebarRef }
-				/>
-				<Text as="p">{ __( 'No notes available.' ) }</Text>
-				<Text as="p" variant="muted">
-					{ __( 'Only logged in users can see Notes.' ) }
-				</Text>
-			</>
-		);
+		return null;
 	}
 
 	return (
