@@ -6106,7 +6106,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			array(
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'settings' => array(
-					'color'  => array(
+					'color' => array(
 						'defaultDuotone' => true,
 						'duotone'        => array(
 							array(
@@ -6197,7 +6197,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			array(
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'settings' => array(
-					'color'  => array(
+					'color' => array(
 						'defaultDuotone' => true,
 						'duotone'        => array(
 							array(
@@ -6303,7 +6303,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			array(
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'settings' => array(
-					'color'  => array(
+					'color' => array(
 						'defaultDuotone' => true, // Defaults enabled
 						'duotone'        => array(
 							array(
