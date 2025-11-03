@@ -53,16 +53,6 @@ function getImageSrcset( { lightboxSrcset } ) {
 	return lightboxSrcset || '';
 }
 
-/**
- * Returns the appropriate sizes attribute for an image.
- *
- * @param {string} lightboxSizes - Image responsive sizes attribute.
- * @return {string} The sizes value, defaulting to 100vw.
- */
-function getImageSizes( { lightboxSizes } ) {
-	return lightboxSizes || '100vw';
-}
-
 const { state, actions, callbacks } = store(
 	'core/image',
 	{
@@ -87,9 +77,6 @@ const { state, actions, callbacks } = store(
 			},
 			get enlargedSrcset() {
 				return getImageSrcset( state.currentImage );
-			},
-			get enlargedSizes() {
-				return getImageSizes( state.currentImage );
 			},
 			get figureStyles() {
 				return (
@@ -252,10 +239,7 @@ const { state, actions, callbacks } = store(
 				const srcset = getImageSrcset( imageMetadata );
 				if ( srcset ) {
 					imageLink.setAttribute( 'imagesrcset', srcset );
-					imageLink.setAttribute(
-						'imagesizes',
-						getImageSizes( imageMetadata )
-					);
+					imageLink.setAttribute( 'imagesizes', '100vw' );
 				}
 
 				document.head.appendChild( imageLink );
@@ -264,10 +248,7 @@ const { state, actions, callbacks } = store(
 			preloadImageWithDelay() {
 				const { imageId } = getContext();
 
-				// Cancels any previous preload timer for the same image.
-				if ( state.preloadTimers.has( imageId ) ) {
-					clearTimeout( state.preloadTimers.get( imageId ) );
-				}
+				actions.cancelPreload();
 
 				// Set a new timer to preload the image after a short delay.
 				const timerId = setTimeout(
@@ -279,7 +260,7 @@ const { state, actions, callbacks } = store(
 				);
 				state.preloadTimers.set( imageId, timerId );
 			},
-			cancelPrefetch() {
+			cancelPreload() {
 				const { imageId } = getContext();
 				if ( state.preloadTimers.has( imageId ) ) {
 					clearTimeout( state.preloadTimers.get( imageId ) );

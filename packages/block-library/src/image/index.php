@@ -196,7 +196,6 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	$img_styles        = $processor->get_attribute( 'style' );
 	$img_width         = 'none';
 	$img_height        = 'none';
-	$img_sizes         = '100vw';
 	$aria_label        = __( 'Enlarge' );
 	$dialog_aria_label = __( 'Enlarged image' );
 
@@ -223,7 +222,6 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 				$unique_image_id => array(
 					'uploadedSrc'      => $img_uploaded_src,
 					'lightboxSrcset'   => $img_srcset,
-					'lightboxSizes'    => $img_sizes,
 					'figureClassNames' => $figure_class_names,
 					'figureStyles'     => $figure_styles,
 					'imgClassNames'    => $img_class_names,
@@ -262,7 +260,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	// before the predefined delay.
 	$processor->set_attribute( 'data-wp-on--pointerenter', 'actions.preloadImageWithDelay' );
 	$processor->set_attribute( 'data-wp-on--pointerdown', 'actions.preloadImage' );
-	$processor->set_attribute( 'data-wp-on--pointerleave', 'actions.cancelPrefetch' );
+	$processor->set_attribute( 'data-wp-on--pointerleave', 'actions.cancelPreload' );
 
 	// Sets an event callback on the `img` because the `figure` element can also
 	// contain a caption, and we don't want to trigger the lightbox when the
@@ -361,7 +359,7 @@ function block_core_image_print_lightbox_overlay() {
 							data-wp-bind--style="state.imgStyles"
 							data-wp-bind--src="state.enlargedSrc"
 							data-wp-bind--srcset="state.enlargedSrcset"
-							data-wp-bind--sizes="state.enlargedSizes"
+							sizes="100vw"
 						>
 					</figure>
 				</div>
