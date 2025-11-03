@@ -303,6 +303,7 @@
 		]
 	},
 	"workspaces": [
-		"packages/*"
+		"packages/*",
+		"routes/*"
 	]
 }

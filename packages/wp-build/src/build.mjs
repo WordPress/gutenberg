@@ -3,7 +3,7 @@
 /**
  * External dependencies
  */
-import { readFile, writeFile, copyFile, mkdir } from 'fs/promises';
+import { readFile, writeFile, copyFile, mkdir, unlink } from 'fs/promises';
 import path from 'path';
 import { parseArgs } from 'node:util';
 import esbuild from 'esbuild';
@@ -27,9 +27,16 @@ import { groupByDepth, findScriptsToRebundle } from './dependency-graph.mjs';
 import {
 	generatePhpFromTemplate,
 	getPhpReplacements,
+	generateRoutesPhp,
+	generateRoutesRegistry,
 } from './php-generator.mjs';
 import { getPackageInfo, getPackageInfoFromFile } from './package-utils.mjs';
 import { createWordpressExternalsPlugin } from './wordpress-externals-plugin.mjs';
+import {
+	getAllRoutes,
+	getRouteFiles,
+	generateContentEntryPoint,
+} from './route-utils.mjs';
 
 const ROOT_DIR = process.cwd();
 const PACKAGES_DIR = path.join( ROOT_DIR, 'packages' );
@@ -1087,6 +1094,123 @@ function getPackageName( filename ) {
 }
 
 /**
+ * Build a single route's files.
+ *
+ * @param {string} routeName Route name.
+ * @return {Promise<number>} Build time in milliseconds.
+ */
+async function buildRoute( routeName ) {
+	const startTime = Date.now();
+	const routeDir = path.join( ROOT_DIR, 'routes', routeName );
+	const outputDir = path.join( BUILD_DIR, 'routes', routeName );
+
+	// Ensure output directory exists
+	await mkdir( outputDir, { recursive: true } );
+
+	// Copy package.json
+	await copyFile(
+		path.join( routeDir, 'package.json' ),
+		path.join( outputDir, 'package.json' )
+	);
+
+	const files = getRouteFiles( routeDir );
+
+	// Build route.js if it exists
+	if ( files.hasRoute ) {
+		const routeEntryPoints = await glob( `route.${ SOURCE_EXTENSIONS }`, {
+			cwd: routeDir,
+			absolute: true,
+		} );
+
+		if ( routeEntryPoints.length > 0 ) {
+			await esbuild.build( {
+				entryPoints: routeEntryPoints,
+				outfile: path.join( outputDir, 'route.js' ),
+				bundle: true,
+				format: 'esm',
+				target: browserslistToEsbuild(),
+				define: getDefine( false ),
+				plugins: [
+					wordpressExternalsPlugin( 'route.min', 'esm' ),
+					babel( {
+						filter: /\.(tsx?)$/,
+						config: {
+							presets: [
+								'@babel/preset-typescript',
+								[
+									'@babel/preset-react',
+									{ runtime: 'automatic' },
+								],
+							],
+							plugins: [ '@emotion/babel-plugin' ],
+						},
+					} ),
+				],
+			} );
+		}
+	}
+
+	// Build content.js if stage or inspector exists
+	if ( files.hasStage || files.hasInspector ) {
+		// Create synthetic entry point
+		const syntheticEntry = generateContentEntryPoint( files );
+		const tempEntryPath = path.join( routeDir, '.content-entry.js' );
+
+		// Write temporary entry file
+		await writeFile( tempEntryPath, syntheticEntry );
+		await esbuild.build( {
+			entryPoints: [ tempEntryPath ],
+			outfile: path.join( outputDir, 'content.js' ),
+			bundle: true,
+			format: 'esm',
+			target: browserslistToEsbuild(),
+			define: getDefine( false ),
+			plugins: [
+				wordpressExternalsPlugin( 'content.min', 'esm' ),
+				babel( {
+					filter: /\.(tsx?)$/,
+					config: {
+						presets: [
+							'@babel/preset-typescript',
+							[ '@babel/preset-react', { runtime: 'automatic' } ],
+						],
+						plugins: [ '@emotion/babel-plugin' ],
+					},
+				} ),
+			],
+		} );
+		await unlink( tempEntryPath );
+	}
+
+	return Date.now() - startTime;
+}
+
+/**
+ * Build all discovered routes.
+ *
+ * @return {Promise<void>}
+ */
+async function buildAllRoutes() {
+	console.log( '\n🚦 Phase 3: Building routes...\n' );
+
+	const routes = getAllRoutes( ROOT_DIR );
+
+	if ( routes.length === 0 ) {
+		console.log( '   No routes found, skipping.\n' );
+		return;
+	}
+
+	await Promise.all(
+		routes.map( async ( routeName ) => {
+			const buildTime = await buildRoute( routeName );
+			console.log(
+				`   ✔ Built route ${ routeName } (${ buildTime }ms)`
+			);
+		} )
+	);
+}
+
+/**
  * Main build function.
  */
 async function buildAll() {
@@ -1148,6 +1272,9 @@ async function buildAll() {
 		} )
 	);
 
+	// Build routes
+	await buildAllRoutes();
+
 	console.log( '\n📄 Generating PHP registration files...\n' );
 	const phpReplacements = await getPhpReplacements( ROOT_DIR );
 	await Promise.all( [
@@ -1156,6 +1283,17 @@ async function buildAll() {
 		generateScriptRegistrationPhp( scripts, phpReplacements ),
 		generateStyleRegistrationPhp( styles, phpReplacements ),
 		generateVersionPhp( phpReplacements ),
+		generateRoutesRegistry(
+			ROOT_DIR,
+			BUILD_DIR,
+			phpReplacements[ '{{PREFIX}}' ]
+		),
+		generateRoutesPhp(
+			ROOT_DIR,
+			BUILD_DIR,
+			HANDLE_PREFIX,
+			phpReplacements[ '{{PREFIX}}' ]
+		),
 	] );
 	console.log( '   ✔ Generated build/modules.php' );
 	console.log( '   ✔ Generated build/modules/index.php' );
@@ -1164,6 +1302,7 @@ async function buildAll() {
 	console.log( '   ✔ Generated build/styles.php' );
 	console.log( '   ✔ Generated build/styles/index.php' );
 	console.log( '   ✔ Generated build/version.php' );
+	console.log( '   ✔ Generated build/routes.php' );
 	console.log( '   ✔ Generated build/index.php' );
 
 	const totalTime = Date.now() - startTime;

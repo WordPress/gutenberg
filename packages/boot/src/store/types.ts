@@ -40,7 +40,7 @@ export interface RouteLoaderContext {
 
 /**
  * Route configuration interface.
- * All routes must specify a content_module that exports surfaces.
+ * Routes specify content_module for surfaces and optionally route_module for lifecycle functions.
  */
 export interface Route {
 	/**
@@ -49,28 +49,19 @@ export interface Route {
 	path: string;
 
 	/**
-	 * Hook executed before the route loads.
-	 * Can throw redirect() or notFound() to prevent navigation.
-	 */
-	beforeLoad?: ( context: RouteLoaderContext ) => void | Promise< void >;
-
-	/**
-	 * Async data preloading function.
-	 * The returned data is available to route components.
-	 */
-	loader?: ( context: RouteLoaderContext ) => Promise< unknown >;
-
-	/**
-	 * Module path for lazy loading the route's surfaces.
-	 * The module must export: RouteSurfaces
+	 * Module path for lazy loading the route's surfaces (stage, inspector).
+	 * The module must export: RouteSurfaces (stage and/or inspector components)
 	 * This enables code splitting for better performance.
 	 */
 	content_module?: string;
 
 	/**
-	 * If the route is not lazy loaded, it can define a static "content" property.
+	 * Module path for route lifecycle functions.
+	 * The module should export a named export `route` containing:
+	 * - beforeLoad?: Pre-navigation hook (authentication, validation, redirects)
+	 * - loader?: Data preloading function
 	 */
-	content?: RouteSurfaces;
+	route_module?: string;
 }
 
 export interface State {

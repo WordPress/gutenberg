@@ -7,6 +7,7 @@
 
 // Include route and menu APIs.
 require_once __DIR__ . '/boot-menu-items.php';
+require_once __DIR__ . '/boot-routes.php';
 require_once __DIR__ . '/preload.php';
 
 /**
@@ -37,6 +38,7 @@ function gutenberg_boot_admin_page() {
 
 	// Get routes and menu items.
 	$menu_items = gutenberg_get_boot_menu_items();
+	$routes     = gutenberg_get_boot_routes();
 
 	// Get boot module asset file for dependencies.
 	$asset_file = gutenberg_dir_path() . 'build/modules/boot/index.min.asset.php';
@@ -52,8 +54,9 @@ function gutenberg_boot_admin_page() {
 		wp_add_inline_script(
 			'gutenberg-boot-prerequisites',
 			sprintf(
-				'import("@wordpress/boot").then(mod => mod.init({menuItems: %s}));',
-				wp_json_encode( $menu_items, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES )
+				'import("@wordpress/boot").then(mod => mod.init({menuItems: %s, routes: %s}));',
+				wp_json_encode( $menu_items, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ),
+				wp_json_encode( $routes, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES )
 			)
 		);
 
@@ -66,14 +69,35 @@ function gutenberg_boot_admin_page() {
 		);
 		wp_register_style( 'gutenberg-boot-prerequisites', false, $style_dependencies, $asset['version'] );
 
+		// Build dependencies for gutenberg-boot module.
+		$boot_dependencies = array(
+			array(
+				'import' => 'static',
+				'id'     => '@wordpress/boot',
+			),
+		);
+
+		// Add all registered routes as dependencies.
+		foreach ( $routes as $route ) {
+			if ( isset( $route['route_module'] ) ) {
+				$boot_dependencies[] = array(
+					'import' => 'static',
+					'id'     => $route['route_module'],
+				);
+			}
+			if ( isset( $route['content_module'] ) ) {
+				$boot_dependencies[] = array(
+					'import' => 'dynamic',
+					'id'     => $route['content_module'],
+				);
+			}
+		}
+
 		// Dummy script module to ensure dependencies are loaded.
 		wp_register_script_module(
 			'gutenberg-boot',
 			gutenberg_url( 'lib/experimental/boot/loader.js' ),
-			array(
-				'import' => 'static',
-				'id'     => '@wordpress/boot',
-			)
+			$boot_dependencies
 		);
 
 		// Enqueue the boot scripts a,d styles.

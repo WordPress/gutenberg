@@ -16,7 +16,7 @@ import type { ComponentType } from 'react';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { lazy, Suspense, useMemo } from '@wordpress/element';
+import { lazy, Suspense, useState, useEffect } from '@wordpress/element';
 import { Page } from '@wordpress/admin-ui';
 
 /**
@@ -24,7 +24,6 @@ import { Page } from '@wordpress/admin-ui';
  */
 import Root from '../root';
 import type { Route, RouteLoaderContext } from '../../store/types';
-import * as homeRoute from '../home';
 
 // Not found component
 function NotFoundComponent() {
@@ -71,16 +70,14 @@ function RouteComponent( {
  * @param parentRoute Parent route.
  * @return Tanstack Route.
  */
-function createRouteFromDefinition( route: Route, parentRoute: AnyRoute ) {
-	if ( ! route.content && ! route.content_module ) {
-		throw new Error( 'Route must have content or content_module property' );
-	}
-
+async function createRouteFromDefinition(
+	route: Route,
+	parentRoute: AnyRoute
+) {
 	// Create lazy components for stage and inspector surfaces
-	const SurfacesModule = route.content
-		? () => <RouteComponent { ...route.content } />
-		: lazy( async () => {
-				const module = await import( route.content_module as string );
+	const SurfacesModule = route.content_module
+		? lazy( async () => {
+				const module = await import( route.content_module! );
 				// Return a component that renders the surfaces
 				return {
 					default: () => (
@@ -90,27 +87,39 @@ function createRouteFromDefinition( route: Route, parentRoute: AnyRoute ) {
 						/>
 					),
 				};
-		  } );
+		  } )
+		: () => null;
+
+	// Load route module for lifecycle functions if specified
+	let routeConfig: {
+		beforeLoad?: ( context: RouteLoaderContext ) => void | Promise< void >;
+		loader?: ( context: RouteLoaderContext ) => Promise< unknown >;
+	} = {};
+
+	if ( route.route_module ) {
+		const module = await import( route.route_module );
+		routeConfig = module.route || {};
+	}
 
 	return createRoute( {
 		getParentRoute: () => parentRoute,
 		path: route.path,
-		beforeLoad: route.beforeLoad
+		beforeLoad: routeConfig.beforeLoad
 			? async ( opts: any ) => {
 					const context: RouteLoaderContext = {
 						params: opts.params || {},
 						search: opts.search || {},
 					};
-					await route.beforeLoad?.( context );
+					await routeConfig.beforeLoad!( context );
 			  }
 			: undefined,
-		loader: route.loader
+		loader: routeConfig.loader
 			? async ( opts: any ) => {
 					const context: RouteLoaderContext = {
 						params: opts.params || {},
 						search: opts.search || {},
 					};
-					return await route.loader?.( context );
+					return await routeConfig.loader!( context );
 			  }
 			: undefined,
 		component: SurfacesModule,
@@ -123,22 +132,15 @@ function createRouteFromDefinition( route: Route, parentRoute: AnyRoute ) {
  * @param routes Routes definition.
  * @return Router tree.
  */
-function createRouteTree( routes: Route[] ) {
+async function createRouteTree( routes: Route[] ) {
 	const rootRoute = createRootRoute( {
 		component: Root,
 		context: () => ( {} ),
 	} );
 
-	// Create home route using the route system
-	const homeRouteDefinition: Route = {
-		path: '/',
-		content: homeRoute,
-	};
-
-	// Create routes from definitions including home
-	const allRoutes = [ homeRouteDefinition, ...routes ];
-	const dynamicRoutes = allRoutes.map( ( route ) =>
-		createRouteFromDefinition( route, rootRoute )
+	// Create routes from definitions
+	const dynamicRoutes = await Promise.all(
+		routes.map( ( route ) => createRouteFromDefinition( route, rootRoute ) )
 	);
 
 	return rootRoute.addChildren( dynamicRoutes );
@@ -166,17 +168,35 @@ interface RouterProps {
 }
 
 export default function Router( { routes }: RouterProps ) {
-	// Create router with dynamic routes
-	const router = useMemo( () => {
-		const history = createPathHistory();
-		const routeTree = createRouteTree( routes );
+	const [ router, setRouter ] = useState< any >( null );
 
-		return createRouter( {
-			history,
-			routeTree,
-			defaultNotFoundComponent: NotFoundComponent,
-		} );
+	useEffect( () => {
+		let cancelled = false;
+
+		async function initializeRouter() {
+			const history = createPathHistory();
+			const routeTree = await createRouteTree( routes );
+
+			if ( ! cancelled ) {
+				const newRouter = createRouter( {
+					history,
+					routeTree,
+					defaultNotFoundComponent: NotFoundComponent,
+				} );
+				setRouter( newRouter );
+			}
+		}
+
+		initializeRouter();
+
+		return () => {
+			cancelled = true;
+		};
 	}, [ routes ] );
+
+	if ( ! router ) {
+		return <div>Loading routes...</div>;
+	}
 
 	return <RouterProvider router={ router } />;
 }

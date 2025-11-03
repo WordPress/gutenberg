@@ -252,6 +252,67 @@ Make sure to include the generated PHP file in your plugin file.
 require_once plugin_dir_path( __FILE__ ) . 'build/index.php';
 ```
 
+## Routes (Experimental)
+
+Routes provide a file-based routing system for WordPress admin pages. Create a `routes/` directory at your repository root with subdirectories for each route.
+
+### Structure
+
+```
+routes/
+  home/
+    package.json    # Route configuration
+    stage.tsx       # Main content component
+    inspector.tsx   # Optional sidebar component
+    route.tsx       # Optional lifecycle hooks (beforeLoad, loader)
+```
+
+### Route Configuration
+
+In `routes/{route-name}/package.json`:
+
+```json
+{
+	"route": {
+		"path": "/"
+	}
+}
+```
+
+### Components
+
+**stage.tsx** - Main content (required):
+```tsx
+export const stage = () => <div>Content</div>;
+```
+
+**inspector.tsx** - Sidebar content (optional):
+```tsx
+export const inspector = () => <div>Inspector</div>;
+```
+
+**route.tsx** - Lifecycle hooks (optional):
+```tsx
+export const route = {
+	beforeLoad: ({ params, search }) => {
+		// Pre-navigation validation, auth checks
+	},
+	loader: ({ params, search }) => {
+		// Data preloading
+	}
+};
+```
+
+### Build Output
+
+The build system generates:
+- `build/routes/{route-name}/content.js` - Bundled stage/inspector components
+- `build/routes/{route-name}/route.js` - Bundled lifecycle hooks (if present)
+- `build/routes/index.php` - Route registry data
+- `build/routes.php` - Route registration logic
+
+The boot package in Gutenberg will automatically use these routes and make them available.
+
 ## Contributing to this package
 
 This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose.
