@@ -167,30 +167,28 @@ function NotesSidebar( { postId, mode } ) {
 			{ ! isDistractionFree && (
 				<AddCommentMenuItem onClick={ openTheSidebar } />
 			) }
-			{ ! isDistractionFree && (
-				<PluginSidebar
-					identifier={ collabHistorySidebarName }
-					name={ collabHistorySidebarName }
-					title={ __( 'All notes' ) }
-					header={
-						<h2 className="interface-complementary-area-header__title">
-							{ __( 'All notes' ) }
-						</h2>
-					}
-					icon={ commentIcon }
-					closeLabel={ __( 'Close Notes' ) }
-				>
-					<NotesSidebarContent
-						comments={ resultComments }
-						showCommentBoard={ showCommentBoard }
-						setShowCommentBoard={ setShowCommentBoard }
-						commentSidebarRef={ commentSidebarRef }
-						reflowComments={ reflowComments }
-						commentLastUpdated={ commentLastUpdated }
-					/>
-				</PluginSidebar>
-			) }
-			{ isLargeViewport && ! isDistractionFree && (
+			<PluginSidebar
+				identifier={ collabHistorySidebarName }
+				name={ collabHistorySidebarName }
+				title={ __( 'All notes' ) }
+				header={
+					<h2 className="interface-complementary-area-header__title">
+						{ __( 'All notes' ) }
+					</h2>
+				}
+				icon={ commentIcon }
+				closeLabel={ __( 'Close Notes' ) }
+			>
+				<NotesSidebarContent
+					comments={ resultComments }
+					showCommentBoard={ showCommentBoard }
+					setShowCommentBoard={ setShowCommentBoard }
+					commentSidebarRef={ commentSidebarRef }
+					reflowComments={ reflowComments }
+					commentLastUpdated={ commentLastUpdated }
+				/>
+			</PluginSidebar>
+			{ isLargeViewport && (
 				<PluginSidebar
 					isPinnable={ false }
 					header={ false }
@@ -218,17 +216,22 @@ function NotesSidebar( { postId, mode } ) {
 }
 
 export default function NotesSidebarContainer() {
-	const { postId, mode, editorMode } = useSelect( ( select ) => {
-		const { getCurrentPostId, getRenderingMode, getEditorMode } =
-			select( editorStore );
-		return {
-			postId: getCurrentPostId(),
-			mode: getRenderingMode(),
-			editorMode: getEditorMode(),
-		};
-	}, [] );
+	const { postId, mode, editorMode, isDistractionFree } = useSelect(
+		( select ) => {
+			const { getCurrentPostId, getRenderingMode, getEditorMode } =
+				select( editorStore );
+			const { getSettings } = select( blockEditorStore );
+			return {
+				postId: getCurrentPostId(),
+				mode: getRenderingMode(),
+				editorMode: getEditorMode(),
+				isDistractionFree: getSettings().isDistractionFree,
+			};
+		},
+		[]
+	);
 
-	if ( ! postId || typeof postId !== 'number' ) {
+	if ( ! postId || typeof postId !== 'number' || isDistractionFree ) {
 		return null;
 	}
 
