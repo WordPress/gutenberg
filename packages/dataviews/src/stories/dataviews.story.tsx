@@ -368,7 +368,7 @@ export const WithCard = () => {
 		return filterSortAndPaginate( data, view, fields );
 	}, [ view ] );
 	return (
-		<Card size="large">
+		<Card>
 			<CardHeader>Header</CardHeader>
 			<CardBody>
 				<DataViews
