@@ -26,10 +26,11 @@ import { createBlock } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
+import { name as ACCORDION_HEADING_BLOCK_NAME } from '../accordion-heading';
+import { name as ACCORDION_PANEL_BLOCK_NAME } from '../accordion-panel';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const ACCORDION_BLOCK_NAME = 'core/accordion-item';
-const ACCORDION_HEADING_BLOCK_NAME = 'core/accordion-heading';
 const ACCORDION_BLOCK = {
 	name: ACCORDION_BLOCK_NAME,
 	attributesToCopy: [
@@ -58,7 +59,7 @@ export default function Edit( {
 	isSelected: isSingleSelected,
 } ) {
 	const registry = useRegistry();
-	const { getBlockOrder } = useSelect( blockEditorStore );
+	const { getBlockOrder, getBlock } = useSelect( blockEditorStore );
 	const blockProps = useBlockProps( {
 		role: 'group',
 	} );
@@ -76,13 +77,70 @@ export default function Edit( {
 	} );
 
 	const addAccordionItemBlock = () => {
-		// When adding, set the header's level to current headingLevel
-		const newAccordionItem = createBlock( ACCORDION_BLOCK_NAME, {}, [
-			createBlock( ACCORDION_HEADING_BLOCK_NAME, {
-				level: headingLevel,
-			} ),
-			createBlock( 'core/accordion-panel', {} ),
-		] );
+		const innerBlockClientIds = getBlockOrder( clientId );
+		const lastAccordionItemId =
+			innerBlockClientIds[ innerBlockClientIds.length - 1 ];
+
+		const accordionItemAttributes = {};
+		const accordionHeadingAttributes = { level: headingLevel };
+		const accordionPanelAttributes = {};
+
+		if ( lastAccordionItemId ) {
+			const lastAccordionItem = getBlock( lastAccordionItemId );
+
+			const attributesToCopy = [
+				'backgroundColor',
+				'border',
+				'className',
+				'fontFamily',
+				'fontSize',
+				'gradient',
+				'shadow',
+				'style',
+				'textColor',
+			];
+
+			if ( lastAccordionItem?.innerBlocks?.length ) {
+				const accordionHeading = lastAccordionItem.innerBlocks.find(
+					( block ) => block.name === ACCORDION_HEADING_BLOCK_NAME
+				);
+				const accordionPanel = lastAccordionItem.innerBlocks.find(
+					( block ) => block.name === ACCORDION_PANEL_BLOCK_NAME
+				);
+
+				attributesToCopy.forEach( ( key ) => {
+					if ( lastAccordionItem.attributes[ key ] ) {
+						accordionItemAttributes[ key ] =
+							lastAccordionItem.attributes[ key ];
+					}
+
+					if ( accordionHeading.attributes[ key ] ) {
+						accordionHeadingAttributes[ key ] =
+							accordionHeading.attributes[ key ];
+					}
+
+					if ( accordionPanel.attributes[ key ] ) {
+						accordionPanelAttributes[ key ] =
+							accordionPanel.attributes[ key ];
+					}
+				} );
+			}
+		}
+
+		const newAccordionItem = createBlock(
+			ACCORDION_BLOCK_NAME,
+			accordionItemAttributes,
+			[
+				createBlock(
+					ACCORDION_HEADING_BLOCK_NAME,
+					accordionHeadingAttributes
+				),
+				createBlock(
+					ACCORDION_PANEL_BLOCK_NAME,
+					accordionPanelAttributes
+				),
+			]
+		);
 		insertBlock( newAccordionItem, undefined, clientId );
 	};
 
