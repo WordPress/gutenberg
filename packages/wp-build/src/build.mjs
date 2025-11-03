@@ -4,7 +4,6 @@
  * External dependencies
  */
 import { readFile, writeFile, copyFile, mkdir } from 'fs/promises';
-import { readdirSync } from 'fs';
 import path from 'path';
 import { parseArgs } from 'node:util';
 import esbuild from 'esbuild';
@@ -58,9 +57,11 @@ const TEST_FILE_PATTERNS = [
  * @return {string[]} Array of package names.
  */
 function getAllPackages() {
-	return readdirSync( PACKAGES_DIR, { withFileTypes: true } )
-		.filter( ( dirent ) => dirent.isDirectory() )
-		.map( ( dirent ) => dirent.name );
+	return glob
+		.sync( path.join( PACKAGES_DIR, '*', 'package.json' ) )
+		.map( ( packageJsonPath ) =>
+			path.basename( path.dirname( packageJsonPath ) )
+		);
 }
 
 const PACKAGES = getAllPackages();
