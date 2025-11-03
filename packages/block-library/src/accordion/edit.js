@@ -32,6 +32,17 @@ const ACCORDION_BLOCK_NAME = 'core/accordion-item';
 const ACCORDION_HEADING_BLOCK_NAME = 'core/accordion-heading';
 const ACCORDION_BLOCK = {
 	name: ACCORDION_BLOCK_NAME,
+	attributesToCopy: [
+		'backgroundColor',
+		'border',
+		'className',
+		'fontFamily',
+		'fontSize',
+		'gradient',
+		'shadow',
+		'style',
+		'textColor',
+	],
 };
 
 export default function Edit( {
