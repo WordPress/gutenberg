@@ -106,10 +106,9 @@ function PrimaryActionGridCell< Item >( {
 					<Button
 						disabled={ !! primaryAction.disabled }
 						accessibleWhenDisabled
+						__next40pxDefaultSize
 						text={ label }
-						size="small"
 						onClick={ () => setIsModalOpen( true ) }
-						variant="link"
 					/>
 				}
 			>
@@ -130,11 +129,10 @@ function PrimaryActionGridCell< Item >( {
 					<Button
 						disabled={ !! primaryAction.disabled }
 						accessibleWhenDisabled
-						size="small"
+						__next40pxDefaultSize
 						onClick={ () => {
 							primaryAction.callback( [ item ], { registry } );
 						} }
-						variant="link"
 					>
 						{ label }
 					</Button>
