@@ -35,7 +35,6 @@
 		},
 		"color": {
 			"gradients": true,
-			"link": true,
 			"__experimentalDefaultControls": {
 				"background": true,
 				"text": true
@@ -57,7 +56,6 @@
 			"__experimentalLetterSpacing": true,
 			"__experimentalTextTransform": true,
 			"__experimentalTextDecoration": true,
-			"__experimentalWritingMode": true,
 			"__experimentalDefaultControls": {}
 		},
 		"interactivity": {
