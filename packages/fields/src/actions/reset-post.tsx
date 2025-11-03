@@ -22,12 +22,10 @@ import apiFetch from '@wordpress/api-fetch';
 /**
  * Internal dependencies
  */
-import { getItemTitle, isTemplateOrTemplatePart } from './utils';
-import type { CoreDataError, Template, TemplatePart } from '../types';
+import { getItemTitle } from './utils';
+import type { CoreDataError, TemplatePart } from '../types';
 
-const isTemplateRevertable = (
-	templateOrTemplatePart: Template | TemplatePart
-) => {
+const isTemplateRevertable = ( templateOrTemplatePart: TemplatePart ) => {
 	if ( ! templateOrTemplatePart ) {
 		return false;
 	}
@@ -48,7 +46,7 @@ const isTemplateRevertable = (
  *                                      reverting the template. Default true.
  */
 const revertTemplate = async (
-	template: TemplatePart | Template,
+	template: TemplatePart,
 	{ allowUndo = true } = {}
 ) => {
 	const noticeId = 'edit-site-template-reverted';
@@ -175,15 +173,14 @@ const revertTemplate = async (
 	}
 };
 
-const resetPostAction: Action< Template | TemplatePart > = {
+const resetPostAction: Action< TemplatePart > = {
 	id: 'reset-post',
 	label: __( 'Reset' ),
 	isEligible: ( item ) => {
 		return (
-			isTemplateOrTemplatePart( item ) &&
+			item.type === 'wp_template_part' &&
 			item?.source === 'custom' &&
-			( Boolean( item.type === 'wp_template' && item?.plugin ) ||
-				item?.has_theme_file )
+			item?.has_theme_file
 		);
 	},
 	icon: backup,
@@ -226,26 +223,14 @@ const resetPostAction: Action< Template | TemplatePart > = {
 					}
 				);
 			} catch ( error ) {
-				let fallbackErrorMessage;
-				if ( items[ 0 ].type === 'wp_template' ) {
-					fallbackErrorMessage =
-						items.length === 1
-							? __(
-									'An error occurred while reverting the template.'
-							  )
-							: __(
-									'An error occurred while reverting the templates.'
-							  );
-				} else {
-					fallbackErrorMessage =
-						items.length === 1
-							? __(
-									'An error occurred while reverting the template part.'
-							  )
-							: __(
-									'An error occurred while reverting the template parts.'
-							  );
-				}
+				const fallbackErrorMessage =
+					items.length === 1
+						? __(
+								'An error occurred while reverting the template part.'
+						  )
+						: __(
+								'An error occurred while reverting the template parts.'
+						  );
 
 				const typedError = error as CoreDataError;
 				const errorMessage =

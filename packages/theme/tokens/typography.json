@@ -1,0 +1,93 @@
+{
+	"font": {
+		"family": {
+			"$type": "fontFamily",
+			"heading": {
+				"$value": [
+					"-apple-system",
+					"system-ui",
+					"Segoe UI",
+					"Roboto",
+					"Oxygen-Sans",
+					"Ubuntu",
+					"Cantarell",
+					"Helvetica Neue",
+					"sans-serif"
+				],
+				"$description": "Headings font family"
+			},
+			"body": {
+				"$value": [
+					"-apple-system",
+					"system-ui",
+					"Segoe UI",
+					"Roboto",
+					"Oxygen-Sans",
+					"Ubuntu",
+					"Cantarell",
+					"Helvetica Neue",
+					"sans-serif"
+				],
+				"$description": "Body font family"
+			},
+			"mono": {
+				"$value": [ "Menlo", "Consolas", "monaco", "monospace" ],
+				"$description": "Monospace font family"
+			}
+		},
+		"size": {
+			"$type": "dimension",
+			"x-small": {
+				"$value": { "value": 11, "unit": "px" },
+				"$description": "Extra small font size"
+			},
+			"small": {
+				"$value": { "value": 12, "unit": "px" },
+				"$description": "Small font size"
+			},
+			"medium": {
+				"$value": { "value": 13, "unit": "px" },
+				"$description": "Medium font size"
+			},
+			"large": {
+				"$value": { "value": 15, "unit": "px" },
+				"$description": "Large font size"
+			},
+			"x-large": {
+				"$value": { "value": 20, "unit": "px" },
+				"$description": "Extra large font size"
+			},
+			"2x-large": {
+				"$value": { "value": 32, "unit": "px" },
+				"$description": "2X large font size"
+			}
+		},
+		"lineHeight": {
+			"$type": "dimension",
+			"x-small": {
+				"$value": { "value": 16, "unit": "px" },
+				"$description": "Extra small line height"
+			},
+			"small": {
+				"$value": { "value": 20, "unit": "px" },
+				"$description": "Small line height"
+			},
+			"medium": {
+				"$value": { "value": 24, "unit": "px" },
+				"$description": "Medium line height"
+			},
+			"large": {
+				"$value": { "value": 28, "unit": "px" },
+				"$description": "Large line height"
+			},
+			"x-large": {
+				"$value": { "value": 32, "unit": "px" },
+				"$description": "Extra large line height"
+			},
+			"2x-large": {
+				"$value": { "value": 40, "unit": "px" },
+				"$description": "2X large line height"
+			}
+		}
+	}
+}

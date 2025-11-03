@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-library",
-	"version": "9.31.0",
+	"version": "9.34.0",
 	"description": "Block library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -24,6 +24,16 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"exports": {
+		".": {
+			"import": "./build-module/index.js",
+			"require": "./build/index.js"
+		},
+		"./babel-plugin": "./babel-plugin.js",
+		"./build-module/*": "./build-module/*",
+		"./build-style/*": "./build-style/*",
+		"./package.json": "./package.json"
+	},
 	"react-native": "src/index",
 	"wpScript": true,
 	"wpScriptModuleExports": {
@@ -33,7 +43,38 @@
 		"./image/view": "./build-module/image/view.js",
 		"./navigation/view": "./build-module/navigation/view.js",
 		"./query/view": "./build-module/query/view.js",
-		"./search/view": "./build-module/search/view.js"
+		"./search/view": "./build-module/search/view.js",
+		"./tabs/view": "./build-module/tabs/view.js"
+	},
+	"wpStyleEntryPoints": [
+		"src/*.scss",
+		"src/*/style.scss",
+		"src/*/editor.scss",
+		"src/*/theme.scss"
+	],
+	"wpCopyFiles": {
+		"files": [
+			"src/**/*.php",
+			"src/*/block.json"
+		],
+		"transforms": {
+			"php": {
+				"functionPrefix": "gutenberg_",
+				"classSuffix": "_Gutenberg",
+				"prefixFunctions": [
+					"wp_apply_colors_support",
+					"wp_enqueue_block_support_styles",
+					"wp_get_typography_font_size_value",
+					"wp_style_engine_get_styles",
+					"wp_get_global_settings"
+				],
+				"suffixClasses": [
+					"WP_Navigation_Block_Renderer"
+				],
+				"addActionPriority": 20,
+				"flattenIndexFiles": true
+			}
+		}
 	},
 	"sideEffects": [
 		"build-style/**",
@@ -41,10 +82,10 @@
 		"{src,build,build-module}/*/init.js"
 	],
 	"dependencies": {
-		"@babel/runtime": "7.25.7",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/autop": "file:../autop",
+		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/blob": "file:../blob",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/blocks": "file:../blocks",
@@ -65,6 +106,7 @@
 		"@wordpress/interactivity-router": "file:../interactivity-router",
 		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
 		"@wordpress/keycodes": "file:../keycodes",
+		"@wordpress/latex-to-mathml": "file:../latex-to-mathml",
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/patterns": "file:../patterns",
 		"@wordpress/primitives": "file:../primitives",

@@ -40,13 +40,10 @@ test.describe( 'Templates', () => {
 	} );
 
 	test( 'Filtering', async ( { requestUtils, admin, page } ) => {
-		const template = await requestUtils.createTemplate( 'wp_template', {
+		await requestUtils.createTemplate( 'wp_template', {
 			slug: 'date',
 			title: 'Date Archives',
 			content: 'hi',
-		} );
-		await requestUtils.updateSiteSettings( {
-			active_templates: { date: template.wp_id },
 		} );
 		await admin.visitSiteEditor( { postType: 'wp_template' } );
 		// Global search.

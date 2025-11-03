@@ -142,6 +142,14 @@ export default {
 		return true;
 	},
 	getFieldsList( { select, context } ) {
-		return getPostMetaFields( select, context );
+		const metaFields = getPostMetaFields( select, context );
+		if ( ! metaFields ) {
+			return [];
+		}
+		return Object.entries( metaFields ).map( ( [ key, field ] ) => ( {
+			label: field.label,
+			type: field.type,
+			args: { key },
+		} ) );
 	},
 };

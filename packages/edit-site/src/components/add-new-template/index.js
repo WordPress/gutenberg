@@ -26,7 +26,7 @@ import {
 	calendar,
 	category,
 	commentAuthorAvatar,
-	edit,
+	pencil,
 	home,
 	layout,
 	list,
@@ -211,7 +211,9 @@ function NewTemplateModal( { onClose } ) {
 					status: 'publish',
 					title,
 					// This adds a post meta field in template that is part of `is_custom` value calculation.
-					is_wp_suggestion: isWPSuggestion,
+					meta: {
+						is_wp_suggestion: isWPSuggestion,
+					},
 				},
 				{ throwOnError: true }
 			);
@@ -315,7 +317,7 @@ function NewTemplateModal( { onClose } ) {
 						title={ __( 'Custom template' ) }
 						direction="row"
 						className="edit-site-add-new-template__custom-template-button"
-						icon={ edit }
+						icon={ pencil }
 						onClick={ () =>
 							setModalContent(
 								modalContentMap.customGenericTemplate

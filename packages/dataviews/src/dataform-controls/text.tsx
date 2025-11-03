@@ -15,6 +15,7 @@ export default function Text< Item >( {
 	onChange,
 	hideLabelFromVision,
 	config,
+	validity,
 }: DataFormControlProps< Item > ) {
 	const { prefix, suffix } = config || {};
 
@@ -25,6 +26,7 @@ export default function Text< Item >( {
 				field,
 				onChange,
 				hideLabelFromVision,
+				validity,
 				prefix: prefix ? createElement( prefix ) : undefined,
 				suffix: suffix ? createElement( suffix ) : undefined,
 			} }

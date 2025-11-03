@@ -23,8 +23,7 @@ export default function EnhancedPaginationModal( {
 	setAttributes,
 } ) {
 	const [ isOpen, setOpen ] = useState( false );
-	const { hasBlocksFromPlugins, hasPostContentBlock, hasUnsupportedBlocks } =
-		useUnsupportedBlocks( clientId );
+	const hasUnsupportedBlocks = useUnsupportedBlocks( clientId );
 
 	useEffect( () => {
 		if ( enhancedPagination && hasUnsupportedBlocks ) {
@@ -37,24 +36,14 @@ export default function EnhancedPaginationModal( {
 		setOpen( false );
 	};
 
-	let notice = __(
-		'If you still want to prevent full page reloads, remove that block, then disable "Reload full page" again in the Query Block settings.'
-	);
-	if ( hasBlocksFromPlugins ) {
-		notice =
-			__(
-				'Currently, avoiding full page reloads is not possible when non-interactive or non-client Navigation compatible blocks from plugins are present inside the Query block.'
-			) +
-			' ' +
-			notice;
-	} else if ( hasPostContentBlock ) {
-		notice =
-			__(
-				'Currently, avoiding full page reloads is not possible when a Content block is present inside the Query block.'
-			) +
-			' ' +
-			notice;
-	}
+	const notice =
+		__(
+			'Currently, avoiding full page reloads is not possible when non-interactive or non-client Navigation compatible blocks from plugins are present inside the Query block.'
+		) +
+		' ' +
+		__(
+			'If you still want to prevent full page reloads, remove that block, then disable "Reload full page" again in the Query Block settings.'
+		);
 
 	return (
 		isOpen && (

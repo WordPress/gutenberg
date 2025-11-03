@@ -43,16 +43,23 @@ export const IntersectionObserver = createContext();
 IntersectionObserver.displayName = 'IntersectionObserverContext';
 
 const pendingBlockVisibilityUpdatesPerRegistry = new WeakMap();
+const delayedBlockVisibilityDebounceOptions = {
+	trailing: true,
+};
 
 function Root( { className, ...settings } ) {
 	const { isOutlineMode, isFocusMode, temporarilyEditingAsBlocks } =
 		useSelect( ( select ) => {
-			const { getSettings, getTemporarilyEditingAsBlocks, isTyping } =
-				unlock( select( blockEditorStore ) );
+			const {
+				getSettings,
+				getTemporarilyEditingAsBlocks,
+				isTyping,
+				hasBlockSpotlight,
+			} = unlock( select( blockEditorStore ) );
 			const { outlineMode, focusMode } = getSettings();
 			return {
 				isOutlineMode: outlineMode && ! isTyping(),
-				isFocusMode: focusMode,
+				isFocusMode: focusMode || hasBlockSpotlight(),
 				temporarilyEditingAsBlocks: getTemporarilyEditingAsBlocks(),
 			};
 		}, [] );
@@ -70,9 +77,7 @@ function Root( { className, ...settings } ) {
 			setBlockVisibility( updates );
 		}, [ registry ] ),
 		300,
-		{
-			trailing: true,
-		}
+		delayedBlockVisibilityDebounceOptions
 	);
 	const intersectionObserver = useMemo( () => {
 		const { IntersectionObserver: Observer } = window;
@@ -179,7 +184,7 @@ function Items( {
 				getTemplateLock,
 				getBlockEditingMode,
 				isSectionBlock,
-				isContainerInsertableToInWriteMode,
+				isContainerInsertableToInContentOnlyMode,
 				getBlockName,
 				isZoomOut: _isZoomOut,
 				canInsertBlockType,
@@ -218,7 +223,7 @@ function Items( {
 				isZoomOut: _isZoomOut(),
 				shouldRenderAppender:
 					( ! isSectionBlock( rootClientId ) ||
-						isContainerInsertableToInWriteMode(
+						isContainerInsertableToInContentOnlyMode(
 							getBlockName( selectedBlockClientId ),
 							rootClientId
 						) ) &&

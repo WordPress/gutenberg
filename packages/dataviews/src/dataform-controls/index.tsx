@@ -19,6 +19,7 @@ import email from './email';
 import telephone from './telephone';
 import url from './url';
 import integer from './integer';
+import number from './number';
 import radio from './radio';
 import select from './select';
 import text from './text';
@@ -28,6 +29,7 @@ import toggleGroup from './toggle-group';
 import array from './array';
 import color from './color';
 import password from './password';
+import hasElements from '../utils/has-elements';
 
 interface FormControls {
 	[ key: string ]: ComponentType< DataFormControlProps< any > >;
@@ -43,6 +45,7 @@ const FORM_CONTROLS: FormControls = {
 	telephone,
 	url,
 	integer,
+	number,
 	password,
 	radio,
 	select,
@@ -85,7 +88,7 @@ export function getControl< Item >(
 		return createConfiguredControl( field.Edit );
 	}
 
-	if ( field.elements && field.type !== 'array' ) {
+	if ( hasElements( field ) && field.type !== 'array' ) {
 		return getControlByType( 'select' );
 	}
 

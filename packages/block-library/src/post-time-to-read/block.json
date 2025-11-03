@@ -1,7 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"__experimental": true,
 	"name": "core/post-time-to-read",
 	"title": "Time to Read",
 	"category": "theme",
@@ -16,13 +15,9 @@
 			"type": "boolean",
 			"default": true
 		},
-		"showTimeToRead": {
-			"type": "boolean",
-			"default": true
-		},
-		"showWordCount": {
-			"type": "boolean",
-			"default": false
+		"displayMode": {
+			"type": "string",
+			"default": "time"
 		},
 		"averageReadingSpeed": {
 			"type": "number",

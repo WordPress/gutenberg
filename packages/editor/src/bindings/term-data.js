@@ -3,6 +3,13 @@
  */
 import { __ } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+
+// Navigation block types that use special handling for backwards compatibility
+const NAVIGATION_BLOCK_TYPES = [
+	'core/navigation-link',
+	'core/navigation-submenu',
+];
 
 /**
  * Creates the data fields object with the given term data values and ID value.
@@ -57,8 +64,9 @@ function createDataFields( termDataValues, idValue ) {
  * If the value is not available based on context, like in templates,
  * it falls back to the default value, label, or key.
  *
- * @param {Object} select  The select function from the data store.
- * @param {Object} context The context provided.
+ * @param {Object} select   The select function from the data store.
+ * @param {Object} context  The context provided.
+ * @param {string} clientId The block client ID used to read attributes.
  * @return {Object} List of term data fields with their value and label.
  *
  * @example
@@ -76,23 +84,43 @@ function createDataFields( termDataValues, idValue ) {
  * }
  * ```
  */
-function getTermDataFields( select, context ) {
+function getTermDataFields( select, context, clientId ) {
 	const { getEntityRecord } = select( coreDataStore );
+	const { getBlockAttributes, getBlockName } = select( blockEditorStore );
 
 	let termDataValues, dataFields;
-	if ( context?.taxonomy && context?.termId ) {
-		termDataValues = getEntityRecord(
-			'taxonomy',
-			context?.taxonomy,
-			context?.termId
-		);
+
+	/*
+	 * BACKWARDS COMPATIBILITY: Hardcoded exception for navigation blocks.
+	 * Required for WordPress 6.9+ navigation blocks. DO NOT REMOVE.
+	 */
+	const blockName = getBlockName?.( clientId );
+	const isNavigationBlock = NAVIGATION_BLOCK_TYPES.includes( blockName );
+
+	let termId, taxonomy;
+
+	if ( isNavigationBlock ) {
+		// Navigation blocks: read from block attributes
+		const blockAttributes = getBlockAttributes?.( clientId );
+		termId = blockAttributes?.id;
+		const typeFromAttributes = blockAttributes?.type;
+		taxonomy =
+			typeFromAttributes === 'tag' ? 'post_tag' : typeFromAttributes;
+	} else {
+		// All other blocks: use context
+		termId = context?.termId;
+		taxonomy = context?.taxonomy;
+	}
+
+	if ( taxonomy && termId ) {
+		termDataValues = getEntityRecord( 'taxonomy', taxonomy, termId );
 
 		if ( ! termDataValues && context?.termData ) {
 			termDataValues = context.termData;
 		}
 
 		if ( termDataValues ) {
-			dataFields = createDataFields( termDataValues, context?.termId );
+			dataFields = createDataFields( termDataValues, termId );
 		}
 	} else if ( context?.termData ) {
 		termDataValues = context.termData;
@@ -115,13 +143,13 @@ function getTermDataFields( select, context ) {
 export default {
 	name: 'core/term-data',
 	usesContext: [ 'taxonomy', 'termId', 'termData' ],
-	getValues( { select, context, bindings } ) {
-		const dataFields = getTermDataFields( select, context );
+	getValues( { select, context, bindings, clientId } ) {
+		const dataFields = getTermDataFields( select, context, clientId );
 
 		const newValues = {};
 		for ( const [ attributeName, source ] of Object.entries( bindings ) ) {
 			// Use the value, the field label, or the field key.
-			const fieldKey = source.args.key;
+			const fieldKey = source.args.field;
 			const { value: fieldValue, label: fieldLabel } =
 				dataFields?.[ fieldKey ] || {};
 			newValues[ attributeName ] = fieldValue ?? fieldLabel ?? fieldKey;
@@ -134,8 +162,20 @@ export default {
 		return false;
 	},
 	canUserEditValue( { select, context, args } ) {
+		const { getBlockName, getSelectedBlockClientId } =
+			select( blockEditorStore );
+
+		const clientId = getSelectedBlockClientId();
+		const blockName = getBlockName?.( clientId );
+
+		// Navigaton block types are read-only.
+		// See https://github.com/WordPress/gutenberg/pull/72165.
+		if ( NAVIGATION_BLOCK_TYPES.includes( blockName ) ) {
+			return false;
+		}
+
 		// Terms are typically read-only when displayed.
-		if ( context?.termQuery || context?.termQueryId ) {
+		if ( context?.termQuery ) {
 			return false;
 		}
 
@@ -144,8 +184,9 @@ export default {
 			return false;
 		}
 
-		const fieldValue = getTermDataFields( select, context )?.[ args.key ]
-			?.value;
+		const fieldValue = getTermDataFields( select, context, undefined )?.[
+			args.field
+		]?.value;
 		// Empty string or `false` could be a valid value, so we need to check if the field value is undefined.
 		if ( fieldValue === undefined ) {
 			return false;
@@ -154,6 +195,15 @@ export default {
 		return false;
 	},
 	getFieldsList( { select, context } ) {
-		return getTermDataFields( select, context );
+		const clientId = select( blockEditorStore ).getSelectedBlockClientId();
+		const termDataFields = getTermDataFields( select, context, clientId );
+		if ( ! termDataFields ) {
+			return [];
+		}
+		return Object.entries( termDataFields ).map( ( [ key, field ] ) => ( {
+			label: field.label,
+			type: field.type,
+			args: { field: key },
+		} ) );
 	},
 };

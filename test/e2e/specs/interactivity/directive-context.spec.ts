@@ -405,4 +405,24 @@ test.describe( 'data-wp-context', () => {
 		await expect( childProp ).toHaveText( 'fromChildNs' );
 		await expect( parentProp ).toHaveText( 'fromParentNs' );
 	} );
+
+	test( 'should support multiple context directives in the same element', async ( {
+		page,
+	} ) => {
+		const defaultNamespace = page.getByTestId(
+			'multiple context in the same element'
+		);
+
+		await expect( defaultNamespace ).toHaveAttribute(
+			'data-test-prop',
+			'id1'
+		);
+
+		for ( const attribute of [ 'parent', 'default', 'id1', 'other' ] ) {
+			await expect( defaultNamespace ).toHaveAttribute(
+				`data-test-${ attribute }`,
+				'true'
+			);
+		}
+	} );
 } );

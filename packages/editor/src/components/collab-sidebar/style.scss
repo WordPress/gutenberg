@@ -1,3 +1,7 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .interface-interface-skeleton__sidebar:has(.editor-collab-sidebar) {
 	box-shadow: none;
 
@@ -8,33 +12,41 @@
 
 .editor-collab-sidebar {
 	height: 100%;
+	overflow: hidden;
 }
 
 .editor-collab-sidebar-panel {
-	padding: $grid-unit-20;
+	padding: $grid-unit-20 $grid-unit-20 $grid-unit-30;
 	height: 100%;
+	overflow: hidden;
 }
 
 .editor-collab-sidebar-panel__thread {
 	position: relative;
 	padding: $grid-unit-20;
 	border-radius: $radius-large;
-	border: 1.5px solid $gray-300;
+	border: $border-width solid $gray-300;
 	background-color: $gray-100;
+	overflow: hidden;
+	width: auto;
 
 	&.is-selected {
 		background-color: $white;
-		border: 1.5px solid #3858e9;
-		box-shadow: 0 5.5px 7.8px -0.3px rgba(0, 0, 0, 0.102);
+		box-shadow: $elevation-medium;
+		z-index: 1;
 	}
 
-	&:focus-visible {
-		outline: auto;
+	&:focus {
+		outline: var(--wp-admin-border-width-focus) solid var(--wp-admin-theme-color);
+		outline-offset: calc((-1 * var(--wp-admin-border-width-focus)));
 	}
-}
 
-.editor-collab-sidebar-panel__child-thread {
-	margin-top: 15px;
+	&.is-floating {
+		left: $grid-unit-20;
+		right: $grid-unit-20;
+		position: absolute;
+		margin-top: $grid-unit-20;
+	}
 }
 
 .editor-collab-sidebar-panel__user-name {
@@ -66,29 +78,7 @@
 	border-width: var(--wp-admin-border-width-focus);
 	border-style: solid;
 	padding: var(--wp-admin-border-width-focus);
-}
-
-.editor-collab-sidebar-panel__thread-overlay {
-	background-color: rgba(0, 0, 0, 0.7);
-	width: 100%;
-	height: 100%;
-	text-align: center;
-	position: absolute;
-	top: 0;
-	left: 0;
-	z-index: 1;
-	padding: 15px;
-	border-radius: $radius-large;
-	color: $white;
-
-	p {
-		margin-bottom: 15px;
-	}
-
-	button {
-		padding: 4px 10px;
-		color: $white;
-	}
+	background: $white;
 }
 
 .editor-collab-sidebar-panel__comment-status {
@@ -122,7 +112,11 @@
 }
 
 .editor-collab-sidebar-panel__more-reply-button {
-	font-weight: 500;
+	font-weight: $font-weight-medium;
+}
+
+.editor-collab-sidebar-panel__resolution-text {
+	font-style: italic;
 }
 
 .editor-collab-sidebar-panel__comment-form textarea {
@@ -135,78 +129,42 @@
 	display: block;
 }
 
-// Comment avatar indicators.
-.comment-avatar-indicator {
-	position: relative;
-	padding: 4px;
-	min-width: auto;
-	background: transparent;
-	border: none;
+// Visually hidden until focused (skip link pattern)
+.editor-collab-sidebar-panel__skip-to-comment,
+.editor-collab-sidebar-panel__skip-to-block {
+	position: absolute;
+	top: -9999px;
+	right: -9999px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	background: $white !important;
+	z-index: -1;
 
-	&:hover::before {
-		background: rgba(0, 0, 0, 0.04);
-	}
-
-	&.has-unresolved {
-		.comment-avatar-stack {
-			&::after {
-				content: "";
-				position: absolute;
-				top: -2px;
-				right: -2px;
-				width: $grid-unit-10;
-				height: $grid-unit-10;
-				background: #d63638;
-				border-radius: $radius-round;
-				border: $border-width solid $white;
-				z-index: 10;
-			}
-		}
+	&:focus {
+		overflow: visible;
+		clip-path: none;
+		z-index: 1;
+		right: $grid-unit-10;
 	}
 }
-
-.comment-avatar-stack {
-	display: flex;
-	align-items: center;
-	position: relative;
-	height: $icon-size;
+.editor-collab-sidebar-panel__skip-to-comment:focus {
+	top: $grid-unit-10;
+}
+.editor-collab-sidebar-panel__skip-to-block:focus {
+	top: auto;
+	bottom: $grid-unit-10;
 }
 
 .comment-avatar {
 	width: $icon-size;
-	height: $icon-size;
 	border-radius: $radius-round;
-	border: 2px solid $white;
-	margin-left: -6px;
-	flex-shrink: 0;
+	margin-left: -12px;
+	border-width: var(--wp-admin-border-width-focus);
+	border-style: solid;
+	padding: var(--wp-admin-border-width-focus);
+	background: $white;
 
 	&:first-child {
 		margin-left: 0;
-		border-color: #de6e55;
 	}
-
-	&:nth-child(2) {
-		border-color: #599637;
-	}
-
-	&:nth-child(3) {
-		border-color: #3858e9;
-	}
-}
-
-.comment-avatar-overflow {
-	width: fit-content;
-	height: $icon-size;
-	border-radius: 4rem;
-	padding: 0 4px;
-	background: #757575;
-	color: $white;
-	border: 2px solid $white;
-	margin-left: -6px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	font-size: 10px;
-	font-weight: 600;
-	flex-shrink: 0;
 }

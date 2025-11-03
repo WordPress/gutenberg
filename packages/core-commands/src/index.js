@@ -17,9 +17,10 @@ const { RouterProvider } = unlock( routerPrivateApis );
 
 // Register core commands and render the Command Palette.
 function CommandPalette( { settings } ) {
-	const { menu_commands: menuCommands } = settings;
+	const { menu_commands: menuCommands, is_network_admin: isNetworkAdmin } =
+		settings;
 	useAdminNavigationCommands( menuCommands );
-	useSiteEditorNavigationCommands();
+	useSiteEditorNavigationCommands( isNetworkAdmin );
 	return (
 		<RouterProvider pathArg="p">
 			<CommandMenu />
