@@ -12,7 +12,6 @@ test.use( {
 test.describe( 'Block Comments', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
-		// await blockCommentUtils.openBlockCommentSidebar();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
