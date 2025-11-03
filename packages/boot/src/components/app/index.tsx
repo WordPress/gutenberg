@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createRoot } from '@wordpress/element';
+import { createRoot, StrictMode } from '@wordpress/element';
 import { dispatch } from '@wordpress/data';
 
 /**
@@ -16,9 +16,6 @@ function App() {
 }
 
 export async function init( menuItems: MenuItem[] ) {
-	// Import the store to ensure it's registered
-	await import( '../../store' );
-
 	// Register menu items
 	menuItems.forEach( ( menuItem ) => {
 		// @ts-ignore
@@ -29,6 +26,10 @@ export async function init( menuItems: MenuItem[] ) {
 	const rootElement = document.getElementById( 'gutenberg-boot-app' );
 	if ( rootElement ) {
 		const root = createRoot( rootElement );
-		root.render( <App /> );
+		root.render(
+			<StrictMode>
+				<App />
+			</StrictMode>
+		);
 	}
 }

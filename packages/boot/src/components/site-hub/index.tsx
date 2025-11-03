@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { search } from '@wordpress/icons';
-import { rawShortcut } from '@wordpress/keycodes';
+import { displayShortcut } from '@wordpress/keycodes';
 // @ts-expect-error Commands is not typed properly.
 import { store as commandsStore } from '@wordpress/commands';
 import { filterURLForDisplay } from '@wordpress/url';
@@ -40,8 +40,6 @@ function SiteHub() {
 		};
 	}, [] );
 	const { open: openCommandCenter } = useDispatch( commandsStore );
-	const label = __( 'Open command palette' );
-	const shortcutAria = rawShortcut.primary( 'k' );
 
 	return (
 		<div className="boot-site-hub">
@@ -58,8 +56,8 @@ function SiteHub() {
 					icon={ search }
 					onClick={ () => openCommandCenter() }
 					size="compact"
-					label={ label }
-					aria-keyshortcuts={ shortcutAria }
+					label={ __( 'Open command palette' ) }
+					shortcut={ displayShortcut.primary( 'k' ) }
 				/>
 			</HStack>
 		</div>
