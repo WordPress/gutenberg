@@ -51,11 +51,15 @@ export function findColorMeetingRequirements(
 		taperChromaOptions?: TaperChromaOptions;
 		strict?: boolean;
 	} = {}
-): { color: ColorTypes; reached: boolean; achieved: number } {
+): { color: ColorTypes; reached: boolean; achieved: number; deficit?: number } {
 	// A target of 1 means same color.
 	// A target lower than 1 doesn't make sense.
 	if ( target <= 1 ) {
-		return { color: seed, reached: true, achieved: 1 };
+		return {
+			color: reference,
+			reached: true,
+			achieved: 1,
+		};
 	}
 
 	function getColorForL( l: number ): ColorTypes {
@@ -97,6 +101,10 @@ export function findColorMeetingRequirements(
 				color: colorWithExactL,
 				reached: exactLContrast >= target,
 				achieved: exactLContrast,
+				deficit:
+					exactLContrast >= target
+						? undefined
+						: target - exactLContrast,
 			};
 		}
 	}
@@ -122,6 +130,7 @@ export function findColorMeetingRequirements(
 			color: mostContrastingColor,
 			reached: false,
 			achieved: highestContrast,
+			deficit: target - highestContrast,
 		};
 	}
 
@@ -177,5 +186,6 @@ export function findColorMeetingRequirements(
 		color: bestColor,
 		reached: true,
 		achieved: bestContrast,
+		deficit: bestContrast - highestContrast, // Negative number that specifies how much room we have.
 	};
 }

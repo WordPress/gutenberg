@@ -71,7 +71,7 @@ function calculateRamp( {
 	>;
 	let SATISFIED_ALL_CONTRAST_REQUIREMENTS = true;
 	let UNSATISFIED_DIRECTION: RampDirection = 'lighter';
-	let MAX_WEIGHTED_DEFICIT = 0;
+	let MAX_DEFICIT = -Infinity;
 
 	// Keep track of the calculated colors, as they are going to be useful
 	// when other colors reference them.
@@ -177,21 +177,17 @@ function calculateRamp( {
 		if ( ! searchResults.reached && ! contrast.ignoreWhenAdjustingSeed ) {
 			SATISFIED_ALL_CONTRAST_REQUIREMENTS = false;
 
-			// Calculate constraint failure severity for seed optimization
-			// Use the relative deficit size, weighted by how changing the seed would impact this constraint
-			const deficitVsTarget = adjustedTarget - searchResults.achieved;
-
-			// Weight the deficit by how much seed adjustment would help this constraint
-			// If seed has low contrast vs reference, adjusting seed has high impact
-			// If seed has high contrast vs reference, adjusting seed has low impact
-			const impactWeight = 1 / getContrast( seed, referenceColor );
-			const weightedDeficit = deficitVsTarget * impactWeight;
-
-			// Track the most impactful failure for seed optimization
-			if ( weightedDeficit > MAX_WEIGHTED_DEFICIT ) {
-				MAX_WEIGHTED_DEFICIT = weightedDeficit;
+			if (
+				searchResults.deficit &&
+				searchResults.deficit > MAX_DEFICIT
+			) {
+				MAX_DEFICIT = searchResults.deficit;
 				UNSATISFIED_DIRECTION = computedDir;
 			}
+		}
+		if ( searchResults.deficit && searchResults.deficit > MAX_DEFICIT ) {
+			MAX_DEFICIT = searchResults.deficit;
+			UNSATISFIED_DIRECTION = computedDir;
 		}
 
 		// Store calculated color for future dependencies
@@ -209,6 +205,7 @@ function calculateRamp( {
 		rampResults,
 		SATISFIED_ALL_CONTRAST_REQUIREMENTS,
 		UNSATISFIED_DIRECTION,
+		MAX_DEFICIT,
 	};
 }
 
