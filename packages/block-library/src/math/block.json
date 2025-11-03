@@ -17,5 +17,8 @@
 			"source": "html",
 			"selector": "math"
 		}
+	},
+	"supports": {
+		"html": false
 	}
 }

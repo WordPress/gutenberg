@@ -13,7 +13,7 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useState, useEffect, useRef } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -22,12 +22,7 @@ import { unlock } from '../lock-unlock';
 
 const { Badge } = unlock( componentsPrivateApis );
 
-export default function MathEdit( {
-	attributes,
-	setAttributes,
-	isSelected,
-	clientId,
-} ) {
+export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 	const { latex } = attributes;
 	const [ blockRef, setBlockRef ] = useState();
 	const [ error, setError ] = useState( null );
@@ -35,17 +30,6 @@ export default function MathEdit( {
 	const initialLatex = useRef( attributes.latex );
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
-
-	// Check if block is in HTML editing mode
-	const { isEditingAsHTML } = useSelect(
-		( select ) => {
-			const { getBlockMode } = select( blockEditorStore );
-			return {
-				isEditingAsHTML: getBlockMode( clientId ) === 'html',
-			};
-		},
-		[ clientId ]
-	);
 
 	useEffect( () => {
 		import( '@wordpress/latex-to-mathml' ).then( ( module ) => {
@@ -83,7 +67,7 @@ export default function MathEdit( {
 			) : (
 				'\u200B'
 			) }
-			{ isSelected && ! isEditingAsHTML && (
+			{ isSelected && (
 				<Popover
 					placement="bottom-start"
 					offset={ 8 }
