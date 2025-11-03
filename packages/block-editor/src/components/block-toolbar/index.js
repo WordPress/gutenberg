@@ -15,15 +15,16 @@ import {
 	hasBlockSupport,
 	isReusableBlock,
 	isTemplatePart,
+	store as blocksStore,
 } from '@wordpress/blocks';
 import { ToolbarGroup } from '@wordpress/components';
+import { copy } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import BlockMover from '../block-mover';
 import BlockParentSelector from '../block-parent-selector';
-import BlockSwitcher from '../block-switcher';
 import BlockControls from '../block-controls';
 import __unstableBlockToolbarLastItem from './block-toolbar-last-item';
 import BlockSettingsMenu from '../block-settings-menu';
@@ -39,6 +40,7 @@ import { useHasBlockToolbar } from './use-has-block-toolbar';
 import ChangeDesign from './change-design';
 import SwitchSectionStyle from './switch-section-style';
 import { unlock } from '../../lock-unlock';
+import BlockToolbarIcon from './block-toolbar-icon';
 
 /**
  * Renders the block toolbar.
@@ -68,7 +70,6 @@ export function PrivateBlockToolbar( {
 		shouldShowVisualToolbar,
 		showParentSelector,
 		isUsingBindings,
-		hasParentPattern,
 		hasContentOnlyLocking,
 		showShuffleButton,
 		showSlots,
@@ -76,6 +77,10 @@ export function PrivateBlockToolbar( {
 		showLockButtons,
 		showBlockVisibilityButton,
 		showSwitchSectionStyleButton,
+		blockIcon,
+		showBlockSwitcher,
+		showPatternOverrides,
+		firstBlockName,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockName,
@@ -90,7 +95,10 @@ export function PrivateBlockToolbar( {
 			getParentSectionBlock,
 			isZoomOut,
 			isSectionBlock,
+			canRemoveBlocks,
 		} = unlock( select( blockEditorStore ) );
+		const { getActiveBlockVariation, getBlockStyles } =
+			select( blocksStore );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
 		const parents = getBlockParents( selectedBlockClientId );
@@ -118,6 +126,15 @@ export function PrivateBlockToolbar( {
 					.length > 0
 		);
 
+		const _hasPatternOverrides = selectedBlockClientIds.every(
+			( clientId ) =>
+				Object.values(
+					getBlockAttributes( clientId )?.metadata?.bindings ?? {}
+				).some(
+					( binding ) => binding?.source === 'core/pattern-overrides'
+				)
+		);
+
 		// If one or more selected blocks are locked, do not show the BlockGroupToolbar.
 		const _hasTemplateLock = selectedBlockClientIds.some(
 			( id ) => getTemplateLock( id ) === 'contentOnly'
@@ -130,6 +147,52 @@ export function PrivateBlockToolbar( {
 		const _showSwitchSectionStyleButton =
 			window?.__experimentalContentOnlyPatternInsertion &&
 			( _isZoomOut || isSectionBlock( selectedBlockClientId ) );
+
+		// Calculate the icon for the block toolbar
+		const _isSingleBlockSelected = selectedBlockClientIds.length === 1;
+		const _blockType = selectedBlockClientId && getBlockType( _blockName );
+		let _icon;
+		if ( _isSingleBlockSelected ) {
+			const match = getActiveBlockVariation(
+				_blockName,
+				getBlockAttributes( selectedBlockClientId )
+			);
+			// Take into account active block variations.
+			_icon = match?.icon || _blockType?.icon;
+		} else {
+			const blockNames = selectedBlockClientIds.map( ( id ) =>
+				getBlockName( id )
+			);
+			const isSelectionOfSameType = new Set( blockNames ).size === 1;
+			// When selection consists of blocks of multiple types, display an
+			// appropriate icon to communicate the non-uniformity.
+			_icon = isSelectionOfSameType ? _blockType?.icon : copy;
+		}
+
+		// Determine if we should show the BlockSwitcher dropdown or just the icon
+		const _hasBlockStyles =
+			_isSingleBlockSelected && !! getBlockStyles( _blockName )?.length;
+		const _canRemove = canRemoveBlocks( selectedBlockClientIds );
+		const _isDisabled = editingMode !== 'default';
+		const _isSectionInSelection = selectedBlockClientIds.some( ( id ) =>
+			isSectionBlock( id )
+		);
+		const _hideTransformsForSections =
+			window?.__experimentalContentOnlyPatternInsertion &&
+			_isSectionInSelection;
+		const _showBlockSwitcher =
+			! _hideTransformsForSections &&
+			! _isDisabled &&
+			( _hasBlockStyles || _canRemove ) &&
+			! _hasTemplateLock;
+
+		// Get the first block's metadata name for pattern overrides description
+		const _firstBlockName =
+			_hasPatternOverrides && selectedBlockClientId
+				? getBlockAttributes( selectedBlockClientId )?.metadata?.name
+				: undefined;
+
+		const _showPatternOverrides = _hasPatternOverrides && _hasParentPattern;
 
 		return {
 			blockClientId: selectedBlockClientId,
@@ -150,7 +213,6 @@ export function PrivateBlockToolbar( {
 				) &&
 				selectedBlockClientIds.length === 1,
 			isUsingBindings: _isUsingBindings,
-			hasParentPattern: _hasParentPattern,
 			hasContentOnlyLocking: _hasTemplateLock,
 			showShuffleButton: _isZoomOut,
 			showSlots: ! _isZoomOut,
@@ -158,6 +220,10 @@ export function PrivateBlockToolbar( {
 			showLockButtons: ! _isZoomOut,
 			showBlockVisibilityButton: ! _isZoomOut,
 			showSwitchSectionStyleButton: _showSwitchSectionStyleButton,
+			blockIcon: _icon,
+			showBlockSwitcher: _showBlockSwitcher,
+			showPatternOverrides: _showPatternOverrides,
+			firstBlockName: _firstBlockName,
 		};
 	}, [] );
 
@@ -179,7 +245,9 @@ export function PrivateBlockToolbar( {
 
 	const isMultiToolbar = blockClientIds.length > 1;
 	const isSynced =
-		isReusableBlock( blockType ) || isTemplatePart( blockType );
+		isReusableBlock( blockType ) ||
+		isTemplatePart( blockType ) ||
+		showPatternOverrides;
 
 	// Shifts the toolbar to make room for the parent block selector.
 	const classes = clsx( 'block-editor-block-contextual-toolbar', {
@@ -210,34 +278,36 @@ export function PrivateBlockToolbar( {
 				{ showParentSelector && ! isMultiToolbar && isLargeViewport && (
 					<BlockParentSelector />
 				) }
-				{ ( shouldShowVisualToolbar || isMultiToolbar ) &&
-					! hasParentPattern && (
-						<div
-							ref={ nodeRef }
-							{ ...showHoveredOrFocusedGestures }
-						>
-							<ToolbarGroup className="block-editor-block-toolbar__block-controls">
-								<BlockSwitcher clientIds={ blockClientIds } />
-								{ isDefaultEditingMode &&
-									showBlockVisibilityButton && (
-										<BlockVisibilityToolbar
-											clientIds={ blockClientIds }
-										/>
-									) }
-								{ ! isMultiToolbar &&
-									isDefaultEditingMode &&
-									showLockButtons && (
-										<BlockLockToolbar
-											clientId={ blockClientId }
-										/>
-									) }
-								<BlockMover
-									clientIds={ blockClientIds }
-									hideDragHandle={ hideDragHandle }
-								/>
-							</ToolbarGroup>
-						</div>
-					) }
+				{ ( shouldShowVisualToolbar || isMultiToolbar ) && (
+					<div ref={ nodeRef } { ...showHoveredOrFocusedGestures }>
+						<ToolbarGroup className="block-editor-block-toolbar__block-controls">
+							<BlockToolbarIcon
+								clientIds={ blockClientIds }
+								icon={ blockIcon }
+								showBlockSwitcher={ showBlockSwitcher }
+								showPatternOverrides={ showPatternOverrides }
+								firstBlockName={ firstBlockName }
+							/>
+							{ isDefaultEditingMode &&
+								showBlockVisibilityButton && (
+									<BlockVisibilityToolbar
+										clientIds={ blockClientIds }
+									/>
+								) }
+							{ ! isMultiToolbar &&
+								isDefaultEditingMode &&
+								showLockButtons && (
+									<BlockLockToolbar
+										clientId={ blockClientId }
+									/>
+								) }
+							<BlockMover
+								clientIds={ blockClientIds }
+								hideDragHandle={ hideDragHandle }
+							/>
+						</ToolbarGroup>
+					</div>
+				) }
 				{ ! hasContentOnlyLocking &&
 					shouldShowVisualToolbar &&
 					isMultiToolbar &&

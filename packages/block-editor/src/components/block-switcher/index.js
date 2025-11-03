@@ -4,7 +4,6 @@
 import { __, _n, sprintf, _x } from '@wordpress/i18n';
 import {
 	DropdownMenu,
-	ToolbarButton,
 	ToolbarGroup,
 	ToolbarItem,
 	__experimentalText as Text,
@@ -17,14 +16,12 @@ import {
 	isTemplatePart,
 } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { copy } from '@wordpress/icons';
 import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import BlockIcon from '../block-icon';
 import BlockTransformationsMenu from './block-transformations-menu';
 import { useBlockVariationTransforms } from './block-variation-transformations';
 import BlockStylesMenu from './block-styles-menu';
@@ -189,81 +186,40 @@ function BlockSwitcherDropdownMenuContents( {
 	);
 }
 
-export const BlockSwitcher = ( { clientIds } ) => {
-	const {
-		hasContentOnlyLocking,
-		canRemove,
-		hasBlockStyles,
-		icon,
-		invalidBlocks,
-		isReusable,
-		isTemplate,
-		isDisabled,
-		isSectionInSelection,
-	} = useSelect(
-		( select ) => {
-			const {
-				getTemplateLock,
-				getBlocksByClientId,
-				getBlockAttributes,
-				canRemoveBlocks,
-				getBlockEditingMode,
-				isSectionBlock,
-			} = unlock( select( blockEditorStore ) );
-			const { getBlockStyles, getBlockType, getActiveBlockVariation } =
-				select( blocksStore );
-			const _blocks = getBlocksByClientId( clientIds );
-			if ( ! _blocks.length || _blocks.some( ( block ) => ! block ) ) {
-				return { invalidBlocks: true };
-			}
-			const [ { name: firstBlockName } ] = _blocks;
-			const _isSingleBlockSelected = _blocks.length === 1;
-			const blockType = getBlockType( firstBlockName );
-			const editingMode = getBlockEditingMode( clientIds[ 0 ] );
-
-			let _icon;
-			let _hasTemplateLock;
-			if ( _isSingleBlockSelected ) {
-				const match = getActiveBlockVariation(
-					firstBlockName,
-					getBlockAttributes( clientIds[ 0 ] )
+export const BlockSwitcher = ( { clientIds, children } ) => {
+	const { hasBlockStyles, canRemove, invalidBlocks, isReusable, isTemplate } =
+		useSelect(
+			( select ) => {
+				const { getBlocksByClientId, canRemoveBlocks } = unlock(
+					select( blockEditorStore )
 				);
-				// Take into account active block variations.
-				_icon = match?.icon || blockType.icon;
-				_hasTemplateLock =
-					getTemplateLock( clientIds[ 0 ] ) === 'contentOnly';
-			} else {
-				const isSelectionOfSameType =
-					new Set( _blocks.map( ( { name } ) => name ) ).size === 1;
-				_hasTemplateLock = clientIds.some(
-					( id ) => getTemplateLock( id ) === 'contentOnly'
-				);
-				// When selection consists of blocks of multiple types, display an
-				// appropriate icon to communicate the non-uniformity.
-				_icon = isSelectionOfSameType ? blockType.icon : copy;
-			}
+				const _blocks = getBlocksByClientId( clientIds );
+				if (
+					! _blocks.length ||
+					_blocks.some( ( block ) => ! block )
+				) {
+					return { invalidBlocks: true };
+				}
+				const [ { name: firstBlockName } ] = _blocks;
+				const _isSingleBlockSelected = _blocks.length === 1;
 
-			const _isSectionInSelection = clientIds.some( ( id ) =>
-				isSectionBlock( id )
-			);
+				const { getBlockStyles } = select( blocksStore );
 
-			return {
-				canRemove: canRemoveBlocks( clientIds ),
-				hasBlockStyles:
-					_isSingleBlockSelected &&
-					!! getBlockStyles( firstBlockName )?.length,
-				icon: _icon,
-				isReusable:
-					_isSingleBlockSelected && isReusableBlock( _blocks[ 0 ] ),
-				isTemplate:
-					_isSingleBlockSelected && isTemplatePart( _blocks[ 0 ] ),
-				hasContentOnlyLocking: _hasTemplateLock,
-				isDisabled: editingMode !== 'default',
-				isSectionInSelection: _isSectionInSelection,
-			};
-		},
-		[ clientIds ]
-	);
+				return {
+					canRemove: canRemoveBlocks( clientIds ),
+					hasBlockStyles:
+						_isSingleBlockSelected &&
+						!! getBlockStyles( firstBlockName )?.length,
+					isReusable:
+						_isSingleBlockSelected &&
+						isReusableBlock( _blocks[ 0 ] ),
+					isTemplate:
+						_isSingleBlockSelected &&
+						isTemplatePart( _blocks[ 0 ] ),
+				};
+			},
+			[ clientIds ]
+		);
 	const blockTitle = useBlockDisplayTitle( {
 		clientId: clientIds?.[ 0 ],
 		maximumLength: 35,
@@ -288,35 +244,6 @@ export const BlockSwitcher = ( { clientIds } ) => {
 			? blockTitle
 			: undefined;
 
-	const hideTransformsForSections =
-		window?.__experimentalContentOnlyPatternInsertion &&
-		isSectionInSelection;
-	const hideDropdown =
-		hideTransformsForSections ||
-		isDisabled ||
-		( ! hasBlockStyles && ! canRemove ) ||
-		hasContentOnlyLocking;
-
-	if ( hideDropdown ) {
-		return (
-			<ToolbarGroup>
-				<ToolbarButton
-					disabled
-					className="block-editor-block-switcher__no-switcher-icon"
-					title={ blockSwitcherLabel }
-					icon={
-						<BlockIcon
-							className="block-editor-block-switcher__toggle"
-							icon={ icon }
-							showColors
-						/>
-					}
-					text={ blockIndicatorText }
-				/>
-			</ToolbarGroup>
-		);
-	}
-
 	const blockSwitcherDescription = isSingleBlock
 		? __( 'Change block type or style' )
 		: sprintf(
@@ -339,13 +266,7 @@ export const BlockSwitcher = ( { clientIds } ) => {
 							placement: 'bottom-start',
 							className: 'block-editor-block-switcher__popover',
 						} }
-						icon={
-							<BlockIcon
-								className="block-editor-block-switcher__toggle"
-								icon={ icon }
-								showColors
-							/>
-						}
+						icon={ children }
 						text={ blockIndicatorText }
 						toggleProps={ {
 							description: blockSwitcherDescription,

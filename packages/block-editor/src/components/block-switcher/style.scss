@@ -13,13 +13,13 @@
 }
 
 // Show an indicator triangle.
-.block-editor-block-switcher__no-switcher-icon,
+.block-editor-block-toolbar__block-icon-button,
 .block-editor-block-switcher__toggle {
 	position: relative;
 }
 
 .components-button.block-editor-block-switcher__toggle,
-.components-button.block-editor-block-switcher__no-switcher-icon {
+.components-button.block-editor-block-toolbar__block-icon-button {
 	margin: 0;
 	display: block;
 	height: $grid-unit-60;
@@ -29,7 +29,7 @@
 	}
 }
 
-.components-button.block-editor-block-switcher__no-switcher-icon {
+.components-button.block-editor-block-toolbar__block-icon-button {
 	display: flex;
 
 	.block-editor-block-icon {
@@ -39,8 +39,8 @@
 	}
 }
 
-// Even when the block switcher does not have any transformations, it still serves as a block indicator.
-.components-button.block-editor-block-switcher__no-switcher-icon[aria-disabled="true"] {
+// Block icon button - displays block type when no transforms are available.
+.components-button.block-editor-block-toolbar__block-icon-button[aria-disabled="true"] {
 	color: $gray-900;
 
 	// Since it's not clickable, though, don't show a hover state.
@@ -99,11 +99,11 @@
 
 // The block switcher in the contextual toolbar should be bigger.
 .block-editor-block-contextual-toolbar {
-	.components-button.block-editor-block-switcher__no-switcher-icon {
+	.components-button.block-editor-block-toolbar__block-icon-button {
 		min-width: $button-size;
 	}
 
-	.components-button.block-editor-block-switcher__no-switcher-icon,
+	.components-button.block-editor-block-toolbar__block-icon-button,
 	.components-button.block-editor-block-switcher__toggle {
 		height: $grid-unit-60;
 

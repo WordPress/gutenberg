@@ -52,11 +52,7 @@
 
 	&.is-synced,
 	&.is-connected {
-		.block-editor-block-switcher .components-button .block-editor-block-icon {
-			color: var(--wp-block-synced-color);
-		}
-
-		.block-editor-block-switcher__no-switcher-icon[aria-disabled="true"] .block-editor-block-icon {
+		.block-editor-block-toolbar__block-controls .block-editor-block-icon {
 			color: var(--wp-block-synced-color);
 		}
 	}
@@ -145,13 +141,10 @@
 
 // Block controls.
 .block-editor-block-toolbar__block-controls {
-	// Switcher.
-	.block-editor-block-switcher .components-dropdown-menu__toggle,
-	.block-editor-block-switcher__no-switcher-icon {
-		.block-editor-block-icon {
-			width: $button-size-small !important;
-			margin: 0 !important;
-		}
+	// Block icon sizing for switcher, pattern overrides, and disabled button.
+	.block-editor-block-icon {
+		width: $button-size-small !important;
+		margin: 0 !important;
 	}
 
 	// @todo override toolbar group inherited paddings from components/block-tools/style.scss.
@@ -159,6 +152,12 @@
 	.components-toolbar-group {
 		padding: 0;
 	}
+}
+
+// Pattern overrides indicator popover
+.block-editor-block-toolbar__pattern-overrides-popover .components-popover__content {
+	min-width: 260px;
+	padding: $grid-unit-20;
 }
 
 .block-editor-block-toolbar,
@@ -198,13 +197,10 @@
 		padding-right: 6px;
 	}
 
-	.block-editor-block-switcher .components-dropdown-menu__toggle,
-	.block-editor-block-switcher__no-switcher-icon {
-		.block-editor-block-icon {
-			width: 0 !important;
-			height: 0 !important;
-			min-width: 0 !important;
-		}
+	.block-editor-block-toolbar__block-controls .block-editor-block-icon {
+		width: 0 !important;
+		height: 0 !important;
+		min-width: 0 !important;
 	}
 
 	// Parent selector overrides
