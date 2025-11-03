@@ -1,7 +1,13 @@
 /**
  * Frontend fit text functionality.
  * Automatically detects and initializes fit text on blocks with the has-fit-text class.
+ * Supports both initial page load and Interactivity API client-side navigation.
  */
+
+/**
+ * WordPress dependencies
+ */
+import { store, getElement, useInit } from '@wordpress/interactivity';
 
 /**
  * Internal dependencies
@@ -47,6 +53,7 @@ function getElementIdentifier( element ) {
  * Initialize fit text functionality for a single element.
  *
  * @param {HTMLElement} element Element with fit text enabled.
+ * @return {ResizeObserver|null} The ResizeObserver instance, or null if not created.
  */
 function initializeFitText( element ) {
 	const elementId = getElementIdentifier( element );
@@ -70,15 +77,20 @@ function initializeFitText( element ) {
 	if ( window.ResizeObserver && element.parentElement ) {
 		const resizeObserver = new window.ResizeObserver( applyFitText );
 		resizeObserver.observe( element.parentElement );
+		return resizeObserver;
 	}
+
+	return null;
 }
 
-/**
- * Initialize fit text on all elements with the has-fit-text class.
- */
-function initializeAllFitText() {
-	const elements = document.querySelectorAll( '.has-fit-text' );
-	elements.forEach( initializeFitText );
-}
-
-window.addEventListener( 'load', initializeAllFitText );
+// Initialize via Interactivity API for client-side navigation
+store( 'core/fit-text', {
+	callbacks: {
+		init() {
+			const { ref } = getElement();
+			if ( ref && ref.classList.contains( 'has-fit-text' ) ) {
+				initializeFitText( ref );
+			}
+		},
+	},
+} );
