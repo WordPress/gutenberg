@@ -99,12 +99,6 @@ function NotesSidebar( { postId, mode } ) {
 		};
 	}, [] );
 
-	const isDistractionFree = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getSettings().isDistractionFree,
-		[]
-	);
-
 	const {
 		resultComments,
 		unresolvedSortedThreads,
@@ -158,15 +152,13 @@ function NotesSidebar( { postId, mode } ) {
 
 	return (
 		<>
-			{ blockCommentId && ! isDistractionFree && (
+			{ blockCommentId && (
 				<CommentAvatarIndicator
 					thread={ currentThread }
 					onClick={ openTheSidebar }
 				/>
 			) }
-			{ ! isDistractionFree && (
-				<AddCommentMenuItem onClick={ openTheSidebar } />
-			) }
+			<AddCommentMenuItem onClick={ openTheSidebar } />
 			<PluginSidebar
 				identifier={ collabHistorySidebarName }
 				name={ collabHistorySidebarName }
