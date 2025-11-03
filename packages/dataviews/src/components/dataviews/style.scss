@@ -106,9 +106,6 @@
 	@include link-reset();
 }
 
-/**
- * Applying a consistent 24px padding when DataViews are placed within cards.
- */
 .components-card__body:has(> .dataviews-wrapper),
 .components-card__body:has(> .dataviews-picker-wrapper) {
 	padding: $grid-unit-10 0 0;
@@ -120,16 +117,16 @@
 	.dataviews-view-grid,
 	.dataviews-loading,
 	.dataviews-no-results {
-		padding-inline: $grid-unit-30;
+		padding-inline: var(--container-inline-padding, $grid-unit-30);
 	}
 
 	.dataviews-view-table tr td:first-child,
 	.dataviews-view-table tr th:first-child {
-		padding-inline-start: $grid-unit-30;
+		padding-inline-start: var(--container-inline-start-padding, $grid-unit-30);
 	}
 
 	.dataviews-view-table tr td:last-child,
 	.dataviews-view-table tr th:last-child {
-		padding-inline-end: $grid-unit-30;
+		padding-inline-end: var(--container-inline-end-padding, $grid-unit-30);
 	}
 }

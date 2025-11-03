@@ -32,6 +32,7 @@ function UnconnectedCard(
 		isBorderless,
 		isRounded,
 		size,
+		density = 'default',
 		...otherProps
 	} = useCard( props );
 	const elevationBorderRadius = isRounded ? CONFIG.radiusLarge : 0;
@@ -57,7 +58,11 @@ function UnconnectedCard(
 
 	return (
 		<ContextSystemProvider value={ contextProviderValue }>
-			<View { ...otherProps } ref={ forwardedRef }>
+			<View
+				{ ...otherProps }
+				data-density={ density }
+				ref={ forwardedRef }
+			>
 				<View className={ cx( styles.Content ) }>{ children }</View>
 				<Elevation
 					className={ elevationClassName }
