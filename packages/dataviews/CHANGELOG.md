@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+- DatViews list layout: remove link variant from primary actions's button. [#72920](https://github.com/WordPress/gutenberg/pull/72920)
 - DataForm: simplify form normalization. [#72848](https://github.com/WordPress/gutenberg/pull/72848)
 
 ### Bug fixes
