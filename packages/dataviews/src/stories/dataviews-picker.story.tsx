@@ -210,7 +210,7 @@ export const WithModal = ( {
 	isGrouped: boolean;
 	infiniteScrollEnabled: boolean;
 } ) => {
-	const [ isModalOpen, setIsModalOpen ] = useState( true );
+	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const [ selectedItems, setSelectedItems ] = useState< SpaceObject[] >( [] );
 
 	const modalActions: ActionButton< SpaceObject >[] = [
