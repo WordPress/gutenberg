@@ -289,12 +289,9 @@ export function buildRamp(
 			Math.abs( betterSeedL - worseSeedL ) > LIGHTNESS_EPSILON;
 			i++
 		) {
+			const newSeedL = ( worseSeedL + betterSeedL ) / 2;
 			const newSeed = clampToGamut(
-				set(
-					clone( seed ),
-					[ OKLCH, 'l' ],
-					( worseSeedL + betterSeedL ) / 2
-				)
+				set( clone( seed ), [ OKLCH, 'l' ], newSeedL )
 			);
 
 			const iterationResults = calculateRamp( {
@@ -307,17 +304,17 @@ export function buildRamp(
 			} );
 
 			if ( iterationResults.SATISFIED_ALL_CONTRAST_REQUIREMENTS ) {
-				betterSeedL = get( newSeed, [ OKLCH, 'l' ] );
+				betterSeedL = newSeedL;
 				// Only update toReturn when the ramp satisfies all constraints.
 				toReturn.ramp = iterationResults.rampResults;
 			} else if ( UNSATISFIED_DIRECTION !== mainDir ) {
 				// Failing constraint is in opposite direction to main ramp direction
 				// We've moved too far in mainDir, constrain the search
-				betterSeedL = get( newSeed, [ OKLCH, 'l' ] );
+				betterSeedL = newSeedL;
 			} else {
 				// Failing constraint is in same direction as main ramp direction
 				// We haven't moved far enough in mainDir, continue searching
-				worseSeedL = get( newSeed, [ OKLCH, 'l' ] );
+				worseSeedL = newSeedL;
 			}
 		}
 	}
