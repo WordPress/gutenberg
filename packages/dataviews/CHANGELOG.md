@@ -5,6 +5,7 @@
 ### Enhancements
 
 - DataForm: simplify form normalization. [#72848](https://github.com/WordPress/gutenberg/pull/72848)
+- DataViewsPicker: Add With Modal story. [#72913](https://github.com/WordPress/gutenberg/pull/72913)
 
 ### Bug fixes
 
