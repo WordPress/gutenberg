@@ -1,6 +1,6 @@
 /**
  * Frontend fit text functionality.
- * Automatically detects and initializes fit text on blocks with the has-fit-text class.
+ * Automatically detects and initializes fit text on core/fit-text blocks.
  * Supports both initial page load and Interactivity API client-side navigation.
  */
 

@@ -35,7 +35,7 @@ test.describe( 'Fit Text', () => {
 				'[data-type="core/fit-text"]'
 			);
 
-			await expect( fitTextBlock ).toHaveClass( /has-fit-text/ );
+			await expect( fitTextBlock ).toBeVisible();
 		} );
 
 		test( 'should allow changing heading level', async ( {
@@ -128,7 +128,6 @@ test.describe( 'Fit Text', () => {
 
 			// Wait for fit text to apply
 			await fitTextBlock.waitFor( { state: 'attached' } );
-			await expect( fitTextBlock ).toHaveClass( /has-fit-text/ );
 
 			const initialFontSize = await fitTextBlock.evaluate( ( el ) => {
 				return window.getComputedStyle( el ).fontSize;
@@ -184,7 +183,6 @@ test.describe( 'Fit Text', () => {
 
 			// Wait for fit text to apply
 			await fitTextBlock.waitFor( { state: 'attached' } );
-			await expect( fitTextBlock ).toHaveClass( /has-fit-text/ );
 
 			const normalFontSize = await headingBlock.evaluate( ( el ) => {
 				return window.getComputedStyle( el ).fontSize;
@@ -267,10 +265,9 @@ test.describe( 'Fit Text', () => {
 
 			await page.goto( postUrl );
 
-			const fitText = page.locator( 'h2.has-fit-text' );
+			const fitText = page.locator( '.wp-block-fit-text h2' );
 
 			await expect( fitText ).toBeVisible();
-			await expect( fitText ).toHaveClass( /has-fit-text/ );
 
 			const inlineStyle = await fitText.getAttribute( 'style' );
 			expect( inlineStyle ).toContain( 'font-size' );
@@ -306,16 +303,15 @@ test.describe( 'Fit Text', () => {
 
 			await page.goto( postUrl );
 
-			const fitText = page.locator( 'h2.has-fit-text' );
+			const fitText = page.locator( '.wp-block-fit-text h2' );
 
 			// Wait for fit text to initialize
 			await fitText.waitFor( { state: 'visible' } );
-			await expect( fitText ).toHaveClass( /has-fit-text/ );
 
 			// Wait for inline style to be applied
 			await page.waitForFunction(
 				() => {
-					const el = document.querySelector( 'h2.has-fit-text' );
+					const el = document.querySelector( '.wp-block-fit-text h2' );
 					return el && el.style.fontSize && el.style.fontSize !== '';
 				},
 				{ timeout: 5000 }
@@ -332,7 +328,7 @@ test.describe( 'Fit Text', () => {
 			// Wait for inline font-size style to change after resize
 			await page.waitForFunction(
 				( previousStyle ) => {
-					const el = document.querySelector( 'h2.has-fit-text' );
+					const el = document.querySelector( '.wp-block-fit-text h2' );
 					return (
 						el &&
 						el.style.fontSize &&
@@ -383,16 +379,15 @@ test.describe( 'Fit Text', () => {
 
 			await page.goto( postUrl );
 
-			const fitText = page.locator( 'h2.has-fit-text' );
+			const fitText = page.locator( '.wp-block-fit-text h2' );
 
 			// Wait for fit text to initialize
 			await fitText.waitFor( { state: 'visible' } );
-			await expect( fitText ).toHaveClass( /has-fit-text/ );
 
 			// Wait for inline style to be applied
 			await page.waitForFunction(
 				() => {
-					const el = document.querySelector( 'h2.has-fit-text' );
+					const el = document.querySelector( '.wp-block-fit-text h2' );
 					return el && el.style.fontSize && el.style.fontSize !== '';
 				},
 				{ timeout: 5000 }

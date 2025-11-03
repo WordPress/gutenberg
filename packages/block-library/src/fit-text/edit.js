@@ -13,7 +13,6 @@ import {
 	useCallback,
 	useRef,
 } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
 import {
 	RichText,
 	AlignmentControl,
@@ -35,7 +34,7 @@ export default function FitTextEdit( {
 	insertBlocksAfter,
 	clientId,
 } ) {
-	const { level, levelOptions, textAlign, content } = attributes;
+	const { level, levelOptions, content } = attributes;
 	const blockEditingMode = useBlockEditingMode();
 	const blockRef = useRef();
 
@@ -73,16 +72,12 @@ export default function FitTextEdit( {
 			return;
 		}
 
-		// Store IDs for cleanup
-		let calculateTimeoutId = null;
+		let calculateFrameId = null;
 
-		// Hide the element during calculation to avoid flash
-		//blockRef.current.style.visibility = 'hidden';
-
-		// Wait 100ms for DOM to fully render and layout to settle
-		calculateTimeoutId = setTimeout( () => {
+		// Wait for next animation frame for DOM to fully render and layout to settle
+		calculateFrameId = window.requestAnimationFrame( () => {
 			applyFitText();
-		}, 100 );
+		} );
 
 		// Watch for size changes
 		let resizeObserver;
@@ -91,11 +86,12 @@ export default function FitTextEdit( {
 			resizeObserver.observe( blockRef.current.parentElement );
 		}
 
+		const blockRefToCleanup = blockRef.current;
+
 		// Cleanup function
 		return () => {
-			// Cancel pending async operations
-			if ( calculateTimeoutId !== null ) {
-				clearTimeout( calculateTimeoutId );
+			if ( calculateFrameId !== null ) {
+				window.cancelAnimationFrame( calculateFrameId );
 			}
 
 			if ( resizeObserver ) {
@@ -104,33 +100,44 @@ export default function FitTextEdit( {
 
 			const styleId = `fit-text-${ clientId }`;
 			const styleElement =
-				blockRef.current.ownerDocument.getElementById( styleId );
+				blockRefToCleanup.ownerDocument.getElementById( styleId );
 			if ( styleElement ) {
 				styleElement.remove();
 			}
 		};
 	}, [ clientId, applyFitText ] );
 
-	// Trigger fit text recalculation when content changes
+	// Trigger fit text recalculation when attributes change
 	useLayoutEffect( () => {
 		if ( blockRef.current ) {
-			// Wait 100ms for DOM layout to settle (especially for alignment changes)
-			const timeoutId = setTimeout( () => {
-				if ( blockRef.current ) {
-					applyFitText();
-				}
-			}, 100 );
+			// Wait for two animation frames for DOM layout to settle.
+			// If we do it in a single frame, because of some reason when changing
+			// alignment from full to wide or non things don't recompute correctly.
+			let firstFrameId = null;
+			let secondFrameId = null;
 
-			return () => clearTimeout( timeoutId );
+			firstFrameId = window.requestAnimationFrame( () => {
+				secondFrameId = window.requestAnimationFrame( () => {
+					if ( blockRef.current ) {
+						applyFitText();
+					}
+				} );
+			} );
+
+			return () => {
+				if ( firstFrameId !== null ) {
+					window.cancelAnimationFrame( firstFrameId );
+				}
+				if ( secondFrameId !== null ) {
+					window.cancelAnimationFrame( secondFrameId );
+				}
+			};
 		}
 	}, [ attributes, applyFitText ] );
 
 	const tagName = level === 0 ? 'p' : `h${ level }`;
 	const blockProps = useBlockProps( {
 		ref: blockRef,
-		className: clsx( 'has-fit-text', {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-		} ),
 	} );
 
 	return (
@@ -143,12 +150,6 @@ export default function FitTextEdit( {
 						onChange={ ( newLevel ) =>
 							setAttributes( { level: newLevel } )
 						}
-					/>
-					<AlignmentControl
-						value={ textAlign }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { textAlign: nextAlign } );
-						} }
 					/>
 				</BlockControls>
 			) }
