@@ -20,7 +20,6 @@ export function useCardFooter(
 		justify,
 		isBorderless = false,
 		isShady = false,
-		size = 'medium',
 		...otherProps
 	} = useContextSystem( props, 'CardFooter' );
 
@@ -32,14 +31,15 @@ export function useCardFooter(
 				styles.Footer,
 				styles.borderRadius,
 				styles.borderColor,
-				styles.cardPaddings[ size ],
+				styles.containerInlinePadding,
+				styles.containerBlockPadding,
 				isBorderless && styles.borderless,
 				isShady && styles.shady,
 				// This classname is added for legacy compatibility reasons.
 				'components-card__footer',
 				className
 			),
-		[ className, cx, isBorderless, isShady, size ]
+		[ className, cx, isBorderless, isShady ]
 	);
 
 	return {

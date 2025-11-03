@@ -19,7 +19,6 @@ export function useCardBody(
 		className,
 		isScrollable = false,
 		isShady = false,
-		size = 'medium',
 		...otherProps
 	} = useContextSystem( props, 'CardBody' );
 
@@ -30,13 +29,14 @@ export function useCardBody(
 			cx(
 				styles.Body,
 				styles.borderRadius,
-				styles.cardPaddings[ size ],
+				styles.containerInlinePadding,
+				styles.containerBlockPadding,
 				isShady && styles.shady,
 				// This classname is added for legacy compatibility reasons.
 				'components-card__body',
 				className
 			),
-		[ className, cx, isShady, size ]
+		[ className, cx, isShady ]
 	);
 
 	return {

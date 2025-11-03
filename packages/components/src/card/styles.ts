@@ -25,6 +25,16 @@ export const Card = css`
 	--wp-container-inline-end-padding: ${ CONFIG.cardPaddingMediumInline };
 `;
 
+export const extraSizeSmall = css`
+	&[data-wp-container-size='xSmall'],
+	&[data-wp-container-size='extraSmall'] {
+		--wp-container-inline-padding: ${ CONFIG.cardPaddingXSmall };
+		--wp-container-block-padding: ${ CONFIG.cardPaddingXSmall };
+		--wp-container-inline-start-padding: ${ CONFIG.cardPaddingXSmall };
+		--wp-container-inline-end-padding: ${ CONFIG.cardPaddingXSmall };
+	}
+`;
+
 export const sizeSmall = css`
 	&[data-wp-container-size='small'] {
 		--wp-container-inline-padding: ${ CONFIG.cardPaddingSmallInline };
@@ -140,26 +150,6 @@ export const borderless = css`
 export const rounded = css`
 	border-radius: ${ adjustedBorderRadius };
 `;
-
-const xSmallCardPadding = css`
-	padding: ${ CONFIG.cardPaddingXSmall };
-`;
-
-export const cardPaddings = {
-	large: css`
-		padding: ${ CONFIG.cardPaddingLarge };
-	`,
-	medium: css`
-		padding: ${ CONFIG.cardPaddingMedium };
-	`,
-	small: css`
-		padding: ${ CONFIG.cardPaddingSmall };
-	`,
-	xSmall: xSmallCardPadding,
-	// The `extraSmall` size is not officially documented, but the following styles
-	// are kept for legacy reasons to support older values of the `size` prop.
-	extraSmall: xSmallCardPadding,
-};
 
 export const shady = css`
 	background-color: ${ COLORS.ui.backgroundDisabled };

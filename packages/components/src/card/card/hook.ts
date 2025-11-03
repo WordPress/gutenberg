@@ -60,6 +60,7 @@ export function useCard( props: CardProps ) {
 			styles.Card,
 			isBorderless && styles.boxShadowless,
 			isRounded && styles.rounded,
+			styles.extraSizeSmall,
 			styles.sizeSmall,
 			styles.sizeMedium,
 			styles.sizeLarge,

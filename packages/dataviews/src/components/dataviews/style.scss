@@ -106,7 +106,6 @@
 	@include link-reset();
 }
 
-
 .components-card__body:has(> .dataviews-wrapper),
 .components-card__body:has(> .dataviews-picker-wrapper) {
 	padding: $grid-unit-10 0 0;
