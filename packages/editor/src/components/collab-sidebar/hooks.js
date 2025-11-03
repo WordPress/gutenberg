@@ -296,17 +296,29 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 		}
 	};
 
+	// Recursively delete a comment and all its replies.
+	const deleteCommentAndReplies = async ( comment ) => {
+		// First, delete all child replies recursively.
+		if (
+			comment.reply &&
+			Array.isArray( comment.reply ) &&
+			comment.reply.length > 0
+		) {
+			for ( const reply of comment.reply ) {
+				await deleteCommentAndReplies( reply );
+			}
+		}
+
+		// Then delete the comment itself.
+		await deleteEntityRecord( 'root', 'comment', comment.id, undefined, {
+			throwOnError: true,
+		} );
+	};
+
 	const onDelete = async ( comment ) => {
 		try {
-			await deleteEntityRecord(
-				'root',
-				'comment',
-				comment.id,
-				undefined,
-				{
-					throwOnError: true,
-				}
-			);
+			// Delete the comment and all its replies recursively.
+			await deleteCommentAndReplies( comment );
 
 			if ( ! comment.parent ) {
 				const clientId = getSelectedBlockClientId();
