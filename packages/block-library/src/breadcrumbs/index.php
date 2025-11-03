@@ -25,23 +25,20 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 	$breadcrumb_items = array();
 
 	if ( $attributes['showHomeLink'] ) {
-		if ( $is_home_or_front_page ) {
-			$breadcrumb_items[] = block_core_breadcrumbs_create_current_item(
+		if ( ! $is_home_or_front_page ) {
+			$breadcrumb_items[] = block_core_breadcrumbs_create_link(
+				home_url( '/' ),
 				__( 'Home' )
 			);
 		} else {
-			$breadcrumb_items[] = block_core_breadcrumbs_create_link(
-				home_url( '/' ),
-				esc_html__( 'Home' )
-			);
+			$breadcrumb_items[] = block_core_breadcrumbs_create_item( __( 'Home' ), block_core_breadcrumbs_is_paged() );
 		}
 	}
 
 	// Handle home and front page.
 	if ( $is_home_or_front_page ) {
-		$is_paged = block_core_breadcrumbs_is_paged();
-		$breadcrumb_items = block_core_breadcrumbs_create_item( $text, $is_paged );
-		if ( $is_paged ) {
+		// This check is explicitly nested in order not to execute the `else` branch.
+		if ( block_core_breadcrumbs_is_paged() ) {
 			$breadcrumb_items[] = block_core_breadcrumbs_create_page_number_item();
 		}
 	} elseif ( is_search() ) {
