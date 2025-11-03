@@ -9,123 +9,105 @@ test.describe( 'Fit Text', () => {
 	} );
 
 	test.describe( 'Editor functionality', () => {
-		test( 'should enable fit text on a heading block', async ( {
+		test( 'should insert a fit text block', async ( {
 			editor,
 			page,
 		} ) => {
 			await editor.insertBlock( {
-				name: 'core/heading',
+				name: 'core/fit-text',
 				attributes: {
-					content: 'Test Heading',
+					content: 'Test Fit Text',
 					level: 2,
 				},
 			} );
 
-			await editor.openDocumentSettingsSidebar();
-
-			// Enable Fit text control via Typography options menu
-			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'button', { name: 'Typography options' } )
-				.click();
-			await page
-				.getByRole( 'menu', { name: 'Typography options' } )
-				.getByRole( 'menuitemcheckbox', { name: 'Show Fit text' } )
-				.click();
-
-			const fitTextToggle = page.getByRole( 'checkbox', {
-				name: 'Fit text',
-			} );
-
-			await fitTextToggle.click();
-
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
-					name: 'core/heading',
+					name: 'core/fit-text',
 					attributes: {
-						content: 'Test Heading',
+						content: 'Test Fit Text',
 						level: 2,
-						fitText: true,
 					},
 				},
 			] );
 
-			const headingBlock = editor.canvas.locator(
-				'[data-type="core/heading"]'
+			const fitTextBlock = editor.canvas.locator(
+				'[data-type="core/fit-text"]'
 			);
 
-			await expect( headingBlock ).toHaveClass( /has-fit-text/ );
+			await expect( fitTextBlock ).toHaveClass( /has-fit-text/ );
 		} );
 
-		test( 'should disable fit text when toggled off', async ( {
+		test( 'should allow changing heading level', async ( {
 			editor,
 			page,
 		} ) => {
 			await editor.insertBlock( {
-				name: 'core/heading',
+				name: 'core/fit-text',
 				attributes: {
-					content: 'Test Heading',
+					content: 'Heading Level Test',
 					level: 2,
-					fitText: true,
 				},
 			} );
 
-			await editor.openDocumentSettingsSidebar();
+			const fitTextBlock = editor.canvas.locator(
+				'[data-type="core/fit-text"]'
+			);
+			await fitTextBlock.click();
 
-			const fitTextToggle = page.getByRole( 'checkbox', {
-				name: 'Fit text',
-			} );
-
-			await fitTextToggle.click();
-
-			const blocks = await editor.getBlocks();
-			expect( blocks[ 0 ].attributes.fitText ).toBeUndefined();
-		} );
-
-		test( 'should enable fit text on a paragraph block', async ( {
-			editor,
-			page,
-		} ) => {
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: {
-					content: 'Test paragraph with fit text enabled',
-				},
-			} );
-
-			await editor.openDocumentSettingsSidebar();
-
-			// Enable Fit text control via Typography options menu
+			// Open heading level dropdown
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'button', { name: 'Typography options' } )
-				.click();
-			await page
-				.getByRole( 'menu', { name: 'Typography options' } )
-				.getByRole( 'menuitemcheckbox', { name: 'Show Fit text' } )
+				.getByRole( 'button', { name: 'Change level' } )
 				.click();
 
-			const fitTextToggle = page.getByRole( 'checkbox', {
-				name: 'Fit text',
-			} );
-
-			await fitTextToggle.click();
+			// Select H4
+			await page.getByRole( 'menuitemradio', { name: 'Heading 4' } ).click();
 
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
-					name: 'core/paragraph',
+					name: 'core/fit-text',
 					attributes: {
-						content: 'Test paragraph with fit text enabled',
-						fitText: true,
+						content: 'Heading Level Test',
+						level: 4,
 					},
 				},
 			] );
+		} );
 
-			const paragraphBlock = editor.canvas.locator(
-				'[data-type="core/paragraph"]'
+		test( 'should allow changing to paragraph (level 0)', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/fit-text',
+				attributes: {
+					content: 'Paragraph Test',
+					level: 2,
+				},
+			} );
+
+			const fitTextBlock = editor.canvas.locator(
+				'[data-type="core/fit-text"]'
 			);
+			await fitTextBlock.click();
 
-			await expect( paragraphBlock ).toHaveClass( /has-fit-text/ );
+			// Open heading level dropdown
+			await page
+				.getByRole( 'button', { name: 'Change level' } )
+				.click();
+
+			// Select Paragraph
+			await page.getByRole( 'menuitemradio', { name: 'Paragraph' } ).click();
+
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/fit-text',
+					attributes: {
+						content: 'Paragraph Test',
+						level: 0,
+					},
+				},
+			] );
 		} );
 
 		test( 'should apply font size dynamically based on container width in editor', async ( {
@@ -133,37 +115,36 @@ test.describe( 'Fit Text', () => {
 			page,
 		} ) => {
 			await editor.insertBlock( {
-				name: 'core/heading',
+				name: 'core/fit-text',
 				attributes: {
 					content: 'Resizable Text',
 					level: 2,
-					fitText: true,
 				},
 			} );
 
-			const headingBlock = editor.canvas.locator(
-				'[data-type="core/heading"]'
+			const fitTextBlock = editor.canvas.locator(
+				'[data-type="core/fit-text"]'
 			);
 
 			// Wait for fit text to apply
-			await headingBlock.waitFor( { state: 'attached' } );
-			await expect( headingBlock ).toHaveClass( /has-fit-text/ );
+			await fitTextBlock.waitFor( { state: 'attached' } );
+			await expect( fitTextBlock ).toHaveClass( /has-fit-text/ );
 
-			const initialFontSize = await headingBlock.evaluate( ( el ) => {
+			const initialFontSize = await fitTextBlock.evaluate( ( el ) => {
 				return window.getComputedStyle( el ).fontSize;
 			} );
 
 			// Add more text to force smaller font size
-			await headingBlock.click();
+			await fitTextBlock.click();
 			await page.keyboard.press( 'End' );
 			await page.keyboard.type(
 				' that is much longer and should have smaller font'
 			);
 
 			// Wait for DOM to update and fit text to recalculate
-			await headingBlock.waitFor( { state: 'attached' } );
+			await fitTextBlock.waitFor( { state: 'attached' } );
 
-			const newFontSize = await headingBlock.evaluate( ( el ) => {
+			const newFontSize = await fitTextBlock.evaluate( ( el ) => {
 				return window.getComputedStyle( el ).fontSize;
 			} );
 
@@ -174,46 +155,44 @@ test.describe( 'Fit Text', () => {
 			expect( newSize ).toBeLessThan( initialSize );
 		} );
 
-		test( 'should apply much larger font size with fit text compared to without fit text for a short text', async ( {
+		test( 'should apply much larger font size with fit text compared to a normal heading for short text', async ( {
 			editor,
 		} ) => {
-			// Insert two paragraphs with same content for comparison
+			// Insert a regular heading and a fit text block with same content
 			await editor.insertBlock( {
-				name: 'core/paragraph',
+				name: 'core/heading',
 				attributes: {
 					content: 'Hello',
+					level: 2,
 				},
 			} );
 
 			await editor.insertBlock( {
-				name: 'core/paragraph',
+				name: 'core/fit-text',
 				attributes: {
 					content: 'Hello',
-					fitText: true,
+					level: 2,
 				},
 			} );
 
-			const paragraphBlocks = editor.canvas.locator(
-				'[data-type="core/paragraph"]'
+			const headingBlock = editor.canvas.locator(
+				'[data-type="core/heading"]'
+			);
+			const fitTextBlock = editor.canvas.locator(
+				'[data-type="core/fit-text"]'
 			);
 
 			// Wait for fit text to apply
-			await paragraphBlocks.nth( 1 ).waitFor( { state: 'attached' } );
-			await expect( paragraphBlocks.nth( 1 ) ).toHaveClass(
-				/has-fit-text/
-			);
+			await fitTextBlock.waitFor( { state: 'attached' } );
+			await expect( fitTextBlock ).toHaveClass( /has-fit-text/ );
 
-			const normalFontSize = await paragraphBlocks
-				.nth( 0 )
-				.evaluate( ( el ) => {
-					return window.getComputedStyle( el ).fontSize;
-				} );
+			const normalFontSize = await headingBlock.evaluate( ( el ) => {
+				return window.getComputedStyle( el ).fontSize;
+			} );
 
-			const fitTextFontSize = await paragraphBlocks
-				.nth( 1 )
-				.evaluate( ( el ) => {
-					return window.getComputedStyle( el ).fontSize;
-				} );
+			const fitTextFontSize = await fitTextBlock.evaluate( ( el ) => {
+				return window.getComputedStyle( el ).fontSize;
+			} );
 
 			const normalSize = parseFloat( normalFontSize );
 			const fitTextSize = parseFloat( fitTextFontSize );
@@ -222,100 +201,16 @@ test.describe( 'Fit Text', () => {
 			expect( fitTextSize ).toBeGreaterThan( normalSize * 2 );
 		} );
 
-		test( 'should disable fit text when a font size is selected', async ( {
-			editor,
-			page,
-		} ) => {
-			await editor.insertBlock( {
-				name: 'core/heading',
-				attributes: {
-					content: 'Test Heading',
-					level: 2,
-					fitText: true,
-				},
-			} );
-
-			await editor.openDocumentSettingsSidebar();
-
-			// Set a custom font size
-			await page.click(
-				'role=region[name="Editor settings"i] >> role=button[name="Set custom size"i]'
-			);
-			await page.click( 'role=spinbutton[name="Font size"i]' );
-			await page.keyboard.type( '24' );
-
-			// fitText should be cleared
-			await expect.poll( editor.getBlocks ).toMatchObject( [
-				{
-					name: 'core/heading',
-					attributes: expect.objectContaining( {
-						content: 'Test Heading',
-						level: 2,
-						style: {
-							typography: {
-								fontSize: '24px',
-							},
-						},
-					} ),
-				},
-			] );
-		} );
-
-		test( 'should clear font size when fit text is enabled', async ( {
-			editor,
-			page,
-		} ) => {
-			await editor.insertBlock( {
-				name: 'core/heading',
-				attributes: {
-					content: 'Test Heading',
-					level: 2,
-					fontSize: 'large',
-				},
-			} );
-
-			await editor.openDocumentSettingsSidebar();
-
-			// Enable Fit text control via Typography options menu
-			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'button', { name: 'Typography options' } )
-				.click();
-			await page
-				.getByRole( 'menu', { name: 'Typography options' } )
-				.getByRole( 'menuitemcheckbox', { name: 'Show Fit text' } )
-				.click();
-
-			const fitTextToggle = page.getByRole( 'checkbox', {
-				name: 'Fit text',
-			} );
-
-			await fitTextToggle.click();
-
-			// fontSize should be cleared
-			await expect.poll( editor.getBlocks ).toMatchObject( [
-				{
-					name: 'core/heading',
-					attributes: expect.objectContaining( {
-						content: 'Test Heading',
-						level: 2,
-						fitText: true,
-					} ),
-				},
-			] );
-		} );
-
 		test( 'should not load frontend script when editing a saved post with fit text', async ( {
 			admin,
 			editor,
 			page,
 		} ) => {
 			await editor.insertBlock( {
-				name: 'core/heading',
+				name: 'core/fit-text',
 				attributes: {
 					content: 'Test Heading',
 					level: 2,
-					fitText: true,
 				},
 			} );
 
@@ -323,18 +218,17 @@ test.describe( 'Fit Text', () => {
 
 			await admin.editPost( postId );
 
-			const headingBlock = editor.canvas.locator(
-				'[data-type="core/heading"]'
+			const fitTextBlock = editor.canvas.locator(
+				'[data-type="core/fit-text"]'
 			);
-			await expect( headingBlock ).toBeVisible();
+			await expect( fitTextBlock ).toBeVisible();
 
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
-					name: 'core/heading',
+					name: 'core/fit-text',
 					attributes: {
 						content: 'Test Heading',
 						level: 2,
-						fitText: true,
 					},
 				},
 			] );
@@ -345,7 +239,7 @@ test.describe( 'Fit Text', () => {
 					document.querySelectorAll( 'script[type="module"]' )
 				);
 				return scripts.some( ( script ) =>
-					script.src.includes( 'fit-text-frontend' )
+					script.src.includes( 'fit-text' ) && script.src.includes( 'view' )
 				);
 			} );
 			expect( frontendScriptLoaded ).toBe( false );
@@ -358,11 +252,10 @@ test.describe( 'Fit Text', () => {
 			page,
 		} ) => {
 			await editor.insertBlock( {
-				name: 'core/heading',
+				name: 'core/fit-text',
 				attributes: {
 					content: 'Frontend Test',
 					level: 2,
-					fitText: true,
 				},
 			} );
 
@@ -374,16 +267,16 @@ test.describe( 'Fit Text', () => {
 
 			await page.goto( postUrl );
 
-			const heading = page.locator( 'h2.has-fit-text' );
+			const fitText = page.locator( 'h2.has-fit-text' );
 
-			await expect( heading ).toBeVisible();
-			await expect( heading ).toHaveClass( /has-fit-text/ );
+			await expect( fitText ).toBeVisible();
+			await expect( fitText ).toHaveClass( /has-fit-text/ );
 
-			const inlineStyle = await heading.getAttribute( 'style' );
+			const inlineStyle = await fitText.getAttribute( 'style' );
 			expect( inlineStyle ).toContain( 'font-size' );
 			expect( inlineStyle ).toMatch( /font-size:\s*\d+px/ );
 
-			const computedFontSize = await heading.evaluate( ( el ) => {
+			const computedFontSize = await fitText.evaluate( ( el ) => {
 				return window.getComputedStyle( el ).fontSize;
 			} );
 
@@ -398,11 +291,10 @@ test.describe( 'Fit Text', () => {
 			page,
 		} ) => {
 			await editor.insertBlock( {
-				name: 'core/heading',
+				name: 'core/fit-text',
 				attributes: {
 					content: 'Resize Me',
 					level: 2,
-					fitText: true,
 				},
 			} );
 
@@ -414,11 +306,11 @@ test.describe( 'Fit Text', () => {
 
 			await page.goto( postUrl );
 
-			const heading = page.locator( 'h2.has-fit-text' );
+			const fitText = page.locator( 'h2.has-fit-text' );
 
 			// Wait for fit text to initialize
-			await heading.waitFor( { state: 'visible' } );
-			await expect( heading ).toHaveClass( /has-fit-text/ );
+			await fitText.waitFor( { state: 'visible' } );
+			await expect( fitText ).toHaveClass( /has-fit-text/ );
 
 			// Wait for inline style to be applied
 			await page.waitForFunction(
@@ -429,11 +321,11 @@ test.describe( 'Fit Text', () => {
 				{ timeout: 5000 }
 			);
 
-			const initialFontSize = await heading.evaluate( ( el ) => {
+			const initialFontSize = await fitText.evaluate( ( el ) => {
 				return window.getComputedStyle( el ).fontSize;
 			} );
 
-			const initialInlineStyle = await heading.getAttribute( 'style' );
+			const initialInlineStyle = await fitText.getAttribute( 'style' );
 
 			await page.setViewportSize( { width: 440, height: 720 } );
 
@@ -451,7 +343,7 @@ test.describe( 'Fit Text', () => {
 				{ timeout: 5000 }
 			);
 
-			const newFontSize = await heading.evaluate( ( el ) => {
+			const newFontSize = await fitText.evaluate( ( el ) => {
 				return window.getComputedStyle( el ).fontSize;
 			} );
 
@@ -466,19 +358,20 @@ test.describe( 'Fit Text', () => {
 			editor,
 			page,
 		} ) => {
-			// Insert two paragraphs with same content for comparison
+			// Insert two headings with same content for comparison
 			await editor.insertBlock( {
-				name: 'core/paragraph',
+				name: 'core/heading',
 				attributes: {
 					content: 'Hello',
+					level: 2,
 				},
 			} );
 
 			await editor.insertBlock( {
-				name: 'core/paragraph',
+				name: 'core/fit-text',
 				attributes: {
 					content: 'Hello',
-					fitText: true,
+					level: 2,
 				},
 			} );
 
@@ -490,30 +383,30 @@ test.describe( 'Fit Text', () => {
 
 			await page.goto( postUrl );
 
-			const fitTextParagraph = page.locator( 'p.has-fit-text' );
+			const fitText = page.locator( 'h2.has-fit-text' );
 
 			// Wait for fit text to initialize
-			await fitTextParagraph.waitFor( { state: 'visible' } );
-			await expect( fitTextParagraph ).toHaveClass( /has-fit-text/ );
+			await fitText.waitFor( { state: 'visible' } );
+			await expect( fitText ).toHaveClass( /has-fit-text/ );
 
 			// Wait for inline style to be applied
 			await page.waitForFunction(
 				() => {
-					const el = document.querySelector( 'p.has-fit-text' );
+					const el = document.querySelector( 'h2.has-fit-text' );
 					return el && el.style.fontSize && el.style.fontSize !== '';
 				},
 				{ timeout: 5000 }
 			);
 
-			const paragraphs = page.locator( 'p' );
+			const headings = page.locator( 'h2' );
 
-			const normalFontSize = await paragraphs
+			const normalFontSize = await headings
 				.first()
 				.evaluate( ( el ) => {
 					return window.getComputedStyle( el ).fontSize;
 				} );
 
-			const fitTextFontSize = await fitTextParagraph.evaluate( ( el ) => {
+			const fitTextFontSize = await fitText.evaluate( ( el ) => {
 				return window.getComputedStyle( el ).fontSize;
 			} );
 

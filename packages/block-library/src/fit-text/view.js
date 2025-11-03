@@ -12,7 +12,7 @@ import { store, getElement, getContext } from '@wordpress/interactivity';
 /**
  * Internal dependencies
  */
-import { optimizeFitText } from './fit-text-utils';
+import { optimizeFitText } from './utils';
 
 // Initialize via Interactivity API for client-side navigation
 store( 'core/fit-text', {

@@ -1,20 +1,17 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"name": "core/heading",
-	"title": "Heading",
+	"name": "core/fit-text",
+	"title": "Fit Text",
 	"category": "text",
-	"description": "Introduce new sections and organize content to help visitors (and search engines) understand the structure of your content.",
-	"keywords": [ "title", "subtitle" ],
+	"description": "Add text that automatically scales to fit its container.",
+	"keywords": [ "text", "heading", "resize", "scale" ],
 	"textdomain": "default",
 	"attributes": {
-		"textAlign": {
-			"type": "string"
-		},
 		"content": {
 			"type": "rich-text",
 			"source": "rich-text",
-			"selector": "h1,h2,h3,h4,h5,h6",
+			"selector": "h1,h2,h3,h4,h5,h6,p",
 			"role": "content"
 		},
 		"level": {
@@ -22,9 +19,10 @@
 			"default": 2
 		},
 		"levelOptions": {
-			"type": "array"
+			"type": "array",
+			"default": [ 0, 1, 2, 3, 4, 5, 6 ]
 		},
-		"placeholder": {
+		"textAlign": {
 			"type": "string"
 		}
 	},
@@ -32,7 +30,6 @@
 		"align": [ "wide", "full" ],
 		"anchor": true,
 		"className": true,
-		"splitting": true,
 		"__experimentalBorder": {
 			"color": true,
 			"radius": true,
@@ -56,7 +53,6 @@
 			}
 		},
 		"typography": {
-			"fontSize": true,
 			"lineHeight": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontStyle": true,
@@ -65,16 +61,14 @@
 			"__experimentalTextTransform": true,
 			"__experimentalTextDecoration": true,
 			"__experimentalWritingMode": true,
-			"__experimentalDefaultControls": {
-				"fontSize": true
-			}
+			"__experimentalDefaultControls": {}
 		},
-		"__unstablePasteTextInline": true,
-		"__experimentalSlashInserter": true,
 		"interactivity": {
 			"clientNavigation": true
-		}
+		},
+		"__unstablePasteTextInline": true,
+		"__experimentalSlashInserter": true
 	},
-	"editorStyle": "wp-block-heading-editor",
-	"style": "wp-block-heading"
+	"editorStyle": "wp-block-fit-text-editor",
+	"style": "wp-block-fit-text"
 }

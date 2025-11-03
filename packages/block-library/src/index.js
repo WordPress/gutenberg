@@ -59,6 +59,7 @@ import * as cover from './cover';
 import * as details from './details';
 import * as embed from './embed';
 import * as file from './file';
+import * as fitText from './fit-text';
 import * as form from './form';
 import * as formInput from './form-input';
 import * as formSubmitButton from './form-submit-button';
@@ -178,6 +179,7 @@ const getAllBlocks = () => {
 		details,
 		embed,
 		file,
+		fitText,
 		group,
 		html,
 		math,
