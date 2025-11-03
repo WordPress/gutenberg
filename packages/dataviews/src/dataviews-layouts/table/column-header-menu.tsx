@@ -7,7 +7,14 @@ import type { ReactNode, Ref, PropsWithoutRef, RefAttributes } from 'react';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { arrowLeft, arrowRight, unseen, funnel } from '@wordpress/icons';
+import {
+	arrowLeft,
+	arrowRight,
+	chevronRight,
+	chevronLeft,
+	unseen,
+	funnel,
+} from '@wordpress/icons';
 import {
 	Button,
 	Icon,
@@ -102,6 +109,20 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 		return header;
 	}
 
+	// Calculate hidden fields that can be inserted.
+	const togglableFields = [
+		view?.titleField,
+		view?.mediaField,
+		view?.descriptionField,
+	].filter( Boolean );
+	const hiddenFields = fields.filter(
+		( f ) =>
+			! visibleFieldIds.includes( f.id ) &&
+			! togglableFields.includes( f.id ) &&
+			f.type !== 'media' &&
+			f.enableHiding !== false
+	);
+
 	return (
 		<Menu>
 			<Menu.TriggerButton
@@ -192,82 +213,177 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 							</Menu.Item>
 						</Menu.Group>
 					) }
-					{ ( canMove || isHidable ) && field && (
-						<Menu.Group>
-							{ canMove && (
-								<Menu.Item
-									prefix={ <Icon icon={ arrowLeft } /> }
-									disabled={ index < 1 }
-									onClick={ () => {
-										onChangeView( {
-											...view,
-											fields: [
-												...( visibleFieldIds.slice(
-													0,
-													index - 1
-												) ?? [] ),
-												fieldId,
-												visibleFieldIds[ index - 1 ],
-												...visibleFieldIds.slice(
-													index + 1
+					{ ( canMove || isHidable || !! hiddenFields.length ) &&
+						field && (
+							<Menu.Group>
+								{ canMove && (
+									<Menu.Item
+										prefix={ <Icon icon={ chevronLeft } /> }
+										disabled={ index < 1 }
+										onClick={ () => {
+											onChangeView( {
+												...view,
+												fields: [
+													...( visibleFieldIds.slice(
+														0,
+														index - 1
+													) ?? [] ),
+													fieldId,
+													visibleFieldIds[
+														index - 1
+													],
+													...visibleFieldIds.slice(
+														index + 1
+													),
+												],
+											} );
+										} }
+									>
+										<Menu.ItemLabel>
+											{ __( 'Move left' ) }
+										</Menu.ItemLabel>
+									</Menu.Item>
+								) }
+								{ canMove && (
+									<Menu.Item
+										prefix={
+											<Icon icon={ chevronRight } />
+										}
+										disabled={
+											index >= visibleFieldIds.length - 1
+										}
+										onClick={ () => {
+											onChangeView( {
+												...view,
+												fields: [
+													...( visibleFieldIds.slice(
+														0,
+														index
+													) ?? [] ),
+													visibleFieldIds[
+														index + 1
+													],
+													fieldId,
+													...visibleFieldIds.slice(
+														index + 2
+													),
+												],
+											} );
+										} }
+									>
+										<Menu.ItemLabel>
+											{ __( 'Move right' ) }
+										</Menu.ItemLabel>
+									</Menu.Item>
+								) }
+								{ canMove && !! hiddenFields.length && (
+									<Menu>
+										<Menu.SubmenuTriggerItem
+											prefix={
+												<Icon icon={ arrowLeft } />
+											}
+										>
+											<Menu.ItemLabel>
+												{ __( 'Insert left' ) }
+											</Menu.ItemLabel>
+										</Menu.SubmenuTriggerItem>
+										<Menu.Popover>
+											{ hiddenFields.map(
+												( hiddenField ) => (
+													<Menu.Item
+														key={ hiddenField.id }
+														onClick={ () => {
+															onChangeView( {
+																...view,
+																fields: [
+																	...visibleFieldIds.slice(
+																		0,
+																		index
+																	),
+																	hiddenField.id,
+																	...visibleFieldIds.slice(
+																		index
+																	),
+																],
+															} );
+														} }
+													>
+														<Menu.ItemLabel>
+															{
+																hiddenField.label
+															}
+														</Menu.ItemLabel>
+													</Menu.Item>
+												)
+											) }
+										</Menu.Popover>
+									</Menu>
+								) }
+								{ !! hiddenFields.length && (
+									<Menu>
+										<Menu.SubmenuTriggerItem
+											prefix={
+												<Icon icon={ arrowRight } />
+											}
+										>
+											<Menu.ItemLabel>
+												{ __( 'Insert right' ) }
+											</Menu.ItemLabel>
+										</Menu.SubmenuTriggerItem>
+										<Menu.Popover>
+											{ hiddenFields.map(
+												( hiddenField ) => (
+													<Menu.Item
+														key={ hiddenField.id }
+														onClick={ () => {
+															onChangeView( {
+																...view,
+																fields: [
+																	...visibleFieldIds.slice(
+																		0,
+																		index +
+																			1
+																	),
+																	hiddenField.id,
+																	...visibleFieldIds.slice(
+																		index +
+																			1
+																	),
+																],
+															} );
+														} }
+													>
+														<Menu.ItemLabel>
+															{
+																hiddenField.label
+															}
+														</Menu.ItemLabel>
+													</Menu.Item>
+												)
+											) }
+										</Menu.Popover>
+									</Menu>
+								) }
+								{ isHidable && field && (
+									<Menu.Item
+										prefix={ <Icon icon={ unseen } /> }
+										onClick={ () => {
+											onHide( field );
+											onChangeView( {
+												...view,
+												fields: visibleFieldIds.filter(
+													( id ) => id !== fieldId
 												),
-											],
-										} );
-									} }
-								>
-									<Menu.ItemLabel>
-										{ __( 'Move left' ) }
-									</Menu.ItemLabel>
-								</Menu.Item>
-							) }
-							{ canMove && (
-								<Menu.Item
-									prefix={ <Icon icon={ arrowRight } /> }
-									disabled={
-										index >= visibleFieldIds.length - 1
-									}
-									onClick={ () => {
-										onChangeView( {
-											...view,
-											fields: [
-												...( visibleFieldIds.slice(
-													0,
-													index
-												) ?? [] ),
-												visibleFieldIds[ index + 1 ],
-												fieldId,
-												...visibleFieldIds.slice(
-													index + 2
-												),
-											],
-										} );
-									} }
-								>
-									<Menu.ItemLabel>
-										{ __( 'Move right' ) }
-									</Menu.ItemLabel>
-								</Menu.Item>
-							) }
-							{ isHidable && field && (
-								<Menu.Item
-									prefix={ <Icon icon={ unseen } /> }
-									onClick={ () => {
-										onHide( field );
-										onChangeView( {
-											...view,
-											fields: visibleFieldIds.filter(
-												( id ) => id !== fieldId
-											),
-										} );
-									} }
-								>
-									<Menu.ItemLabel>
-										{ __( 'Hide column' ) }
-									</Menu.ItemLabel>
-								</Menu.Item>
-							) }
-						</Menu.Group>
-					) }
+											} );
+										} }
+									>
+										<Menu.ItemLabel>
+											{ __( 'Hide column' ) }
+										</Menu.ItemLabel>
+									</Menu.Item>
+								) }
+							</Menu.Group>
+						) }
 				</WithMenuSeparators>
 			</Menu.Popover>
 		</Menu>
