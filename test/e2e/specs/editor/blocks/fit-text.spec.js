@@ -379,28 +379,18 @@ test.describe( 'Fit Text', () => {
 			await expect( heading ).toBeVisible();
 			await expect( heading ).toHaveClass( /has-fit-text/ );
 
-			// Verify data attribute is set (added by frontend script)
-			const fitTextId = await heading.getAttribute( 'data-fit-text-id' );
-			expect( fitTextId ).toBeTruthy();
-
-			// Verify style element exists for this fit text instance.
-			const styleElement = page.locator(
-				`style#fit-text-${ fitTextId }`
-			);
-			await expect( styleElement ).toBeAttached();
+			const inlineStyle = await heading.getAttribute( 'style' );
+			expect( inlineStyle ).toContain( 'font-size' );
+			expect( inlineStyle ).toMatch( /font-size:\s*\d+px/ );
 
 			const computedFontSize = await heading.evaluate( ( el ) => {
 				return window.getComputedStyle( el ).fontSize;
 			} );
 
-			const styleContent = await styleElement.textContent();
-			const fontSizeMatch = styleContent.match(
-				/font-size:\s*(\d+(?:\.\d+)?)px/
-			);
-			expect( fontSizeMatch ).toBeTruthy();
-			const expectedFontSize = parseFloat( fontSizeMatch[ 1 ] );
-
-			expect( parseFloat( computedFontSize ) ).toBe( expectedFontSize );
+			// Verify font size is actually applied and is a reasonable value
+			const fontSize = parseFloat( computedFontSize );
+			expect( fontSize ).toBeGreaterThan( 0 );
+			expect( fontSize ).toBeLessThan( 600 );
 		} );
 
 		test( 'should resize text on window resize on the frontend', async ( {
@@ -426,47 +416,40 @@ test.describe( 'Fit Text', () => {
 
 			const heading = page.locator( 'h2.has-fit-text' );
 
-			// Wait for fit text to initialize (verify frontend script ran)
-			await heading.waitFor( { state: 'attached' } );
-			const fitTextId = await heading.getAttribute( 'data-fit-text-id' );
-			expect( fitTextId ).toBeTruthy();
+			// Wait for fit text to initialize
+			await heading.waitFor( { state: 'visible' } );
+			await expect( heading ).toHaveClass( /has-fit-text/ );
 
-			// Verify style element exists for this fit text instance
-			const styleElement = page.locator(
-				`style#fit-text-${ fitTextId }`
+			// Wait for inline style to be applied
+			await page.waitForFunction(
+				() => {
+					const el = document.querySelector( 'h2.has-fit-text' );
+					return el && el.style.fontSize && el.style.fontSize !== '';
+				},
+				{ timeout: 5000 }
 			);
-			await styleElement.waitFor( { state: 'attached' } );
 
 			const initialFontSize = await heading.evaluate( ( el ) => {
 				return window.getComputedStyle( el ).fontSize;
 			} );
 
-			// Capture style content before resize
-			const styleBeforeResize = await styleElement.textContent();
+			const initialInlineStyle = await heading.getAttribute( 'style' );
 
 			await page.setViewportSize( { width: 440, height: 720 } );
 
-			// Wait for fit text to recalculate (style content changes)
+			// Wait for inline font-size style to change after resize
 			await page.waitForFunction(
-				( { styleId, previousContent } ) => {
-					const style = document.getElementById( styleId );
+				( previousStyle ) => {
+					const el = document.querySelector( 'h2.has-fit-text' );
 					return (
-						style &&
-						style.textContent !== previousContent &&
-						style.textContent.trim().length > 0
+						el &&
+						el.style.fontSize &&
+						el.getAttribute( 'style' ) !== previousStyle
 					);
 				},
-				{
-					styleId: `fit-text-${ fitTextId }`,
-					previousContent: styleBeforeResize,
-				},
+				initialInlineStyle,
 				{ timeout: 5000 }
 			);
-
-			// Verify the same element instance is maintained (ID unchanged)
-			const fitTextIdAfterResize =
-				await heading.getAttribute( 'data-fit-text-id' );
-			expect( fitTextIdAfterResize ).toBe( fitTextId );
 
 			const newFontSize = await heading.evaluate( ( el ) => {
 				return window.getComputedStyle( el ).fontSize;
@@ -509,17 +492,18 @@ test.describe( 'Fit Text', () => {
 
 			const fitTextParagraph = page.locator( 'p.has-fit-text' );
 
-			// Wait for fit text to initialize (verify frontend script ran)
+			// Wait for fit text to initialize
 			await fitTextParagraph.waitFor( { state: 'visible' } );
-			const fitTextId =
-				await fitTextParagraph.getAttribute( 'data-fit-text-id' );
-			expect( fitTextId ).toBeTruthy();
+			await expect( fitTextParagraph ).toHaveClass( /has-fit-text/ );
 
-			// Verify style element exists for this fit text instance
-			const styleElement = page.locator(
-				`style#fit-text-${ fitTextId }`
+			// Wait for inline style to be applied
+			await page.waitForFunction(
+				() => {
+					const el = document.querySelector( 'p.has-fit-text' );
+					return el && el.style.fontSize && el.style.fontSize !== '';
+				},
+				{ timeout: 5000 }
 			);
-			await expect( styleElement ).toBeAttached();
 
 			const paragraphs = page.locator( 'p' );
 

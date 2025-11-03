@@ -90,11 +90,15 @@ function useFitText( { fitText, name, clientId } ) {
 
 		const blockSelector = `#block-${ clientId }`;
 
-		const applyStylesFn = ( css ) => {
-			styleElement.textContent = css;
+		const applyFontSize = ( fontSize ) => {
+			if ( fontSize === 0 ) {
+				styleElement.textContent = '';
+			} else {
+				styleElement.textContent = `${ blockSelector } { font-size: ${ fontSize }px !important; }`;
+			}
 		};
 
-		optimizeFitText( blockElement, blockSelector, applyStylesFn );
+		optimizeFitText( blockElement, applyFontSize );
 	}, [ blockElement, clientId, hasFitTextSupport, fitText ] );
 
 	useEffect( () => {
