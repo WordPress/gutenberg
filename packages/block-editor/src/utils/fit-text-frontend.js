@@ -27,10 +27,8 @@ function initializeFitText( element ) {
 		// The callback receives font size in pixels from optimizeFitText.
 		const applyFontSize = ( fontSize ) => {
 			if ( fontSize === 0 ) {
-				// Clear: reset font-size
 				element.style.fontSize = '';
 			} else {
-				// Apply font size directly as inline style
 				element.style.fontSize = `${ fontSize }px`;
 			}
 		};
@@ -64,7 +62,6 @@ store( 'core/fit-text', {
 			const observer = initializeFitText( ref );
 
 			// Return cleanup function to be called when element is removed.
-			// No need to remove style elements since we're using inline styles.
 			return () => {
 				if ( observer ) {
 					observer.disconnect();
