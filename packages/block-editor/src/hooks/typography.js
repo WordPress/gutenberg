@@ -118,9 +118,7 @@ export function TypographyPanel( { clientId, name, setAttributes, settings } ) {
 			select( blockEditorStore ).getBlockAttributes( clientId ) || {};
 		return { style, fontFamily, fontSize };
 	}
-	const { style, fontFamily, fontSize } = useSelect( selector, [
-		clientId,
-	] );
+	const { style, fontFamily, fontSize } = useSelect( selector, [ clientId ] );
 	const isEnabled = useHasTypographyPanel( settings );
 	const value = useMemo(
 		() => attributesToStyle( { style, fontFamily, fontSize } ),

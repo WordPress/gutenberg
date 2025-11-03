@@ -9,10 +9,7 @@ test.describe( 'Fit Text', () => {
 	} );
 
 	test.describe( 'Editor functionality', () => {
-		test( 'should insert a fit text block', async ( {
-			editor,
-			page,
-		} ) => {
+		test( 'should insert a fit text block', async ( { editor, page } ) => {
 			await editor.insertBlock( {
 				name: 'core/fit-text',
 				attributes: {
@@ -56,12 +53,12 @@ test.describe( 'Fit Text', () => {
 			await fitTextBlock.click();
 
 			// Open heading level dropdown
-			await page
-				.getByRole( 'button', { name: 'Change level' } )
-				.click();
+			await page.getByRole( 'button', { name: 'Change level' } ).click();
 
 			// Select H4
-			await page.getByRole( 'menuitemradio', { name: 'Heading 4' } ).click();
+			await page
+				.getByRole( 'menuitemradio', { name: 'Heading 4' } )
+				.click();
 
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
@@ -92,12 +89,12 @@ test.describe( 'Fit Text', () => {
 			await fitTextBlock.click();
 
 			// Open heading level dropdown
-			await page
-				.getByRole( 'button', { name: 'Change level' } )
-				.click();
+			await page.getByRole( 'button', { name: 'Change level' } ).click();
 
 			// Select Paragraph
-			await page.getByRole( 'menuitemradio', { name: 'Paragraph' } ).click();
+			await page
+				.getByRole( 'menuitemradio', { name: 'Paragraph' } )
+				.click();
 
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
@@ -236,8 +233,10 @@ test.describe( 'Fit Text', () => {
 				const scripts = Array.from(
 					document.querySelectorAll( 'script[type="module"]' )
 				);
-				return scripts.some( ( script ) =>
-					script.src.includes( 'fit-text' ) && script.src.includes( 'view' )
+				return scripts.some(
+					( script ) =>
+						script.src.includes( 'fit-text' ) &&
+						script.src.includes( 'view' )
 				);
 			} );
 			expect( frontendScriptLoaded ).toBe( false );
@@ -265,7 +264,7 @@ test.describe( 'Fit Text', () => {
 
 			await page.goto( postUrl );
 
-			const fitText = page.locator( '.wp-block-fit-text h2' );
+			const fitText = page.locator( '.wp-block-fit-text' );
 
 			await expect( fitText ).toBeVisible();
 
@@ -303,7 +302,7 @@ test.describe( 'Fit Text', () => {
 
 			await page.goto( postUrl );
 
-			const fitText = page.locator( '.wp-block-fit-text h2' );
+			const fitText = page.locator( '.wp-block-fit-text' );
 
 			// Wait for fit text to initialize
 			await fitText.waitFor( { state: 'visible' } );
@@ -311,7 +310,9 @@ test.describe( 'Fit Text', () => {
 			// Wait for inline style to be applied
 			await page.waitForFunction(
 				() => {
-					const el = document.querySelector( '.wp-block-fit-text h2' );
+					const el = document.querySelector(
+						'.wp-block-fit-text'
+					);
 					return el && el.style.fontSize && el.style.fontSize !== '';
 				},
 				{ timeout: 5000 }
@@ -328,7 +329,9 @@ test.describe( 'Fit Text', () => {
 			// Wait for inline font-size style to change after resize
 			await page.waitForFunction(
 				( previousStyle ) => {
-					const el = document.querySelector( '.wp-block-fit-text h2' );
+					const el = document.querySelector(
+						'.wp-block-fit-text'
+					);
 					return (
 						el &&
 						el.style.fontSize &&
@@ -379,7 +382,7 @@ test.describe( 'Fit Text', () => {
 
 			await page.goto( postUrl );
 
-			const fitText = page.locator( '.wp-block-fit-text h2' );
+			const fitText = page.locator( '.wp-block-fit-text' );
 
 			// Wait for fit text to initialize
 			await fitText.waitFor( { state: 'visible' } );
@@ -387,7 +390,9 @@ test.describe( 'Fit Text', () => {
 			// Wait for inline style to be applied
 			await page.waitForFunction(
 				() => {
-					const el = document.querySelector( '.wp-block-fit-text h2' );
+					const el = document.querySelector(
+						'.wp-block-fit-text'
+					);
 					return el && el.style.fontSize && el.style.fontSize !== '';
 				},
 				{ timeout: 5000 }
@@ -395,11 +400,9 @@ test.describe( 'Fit Text', () => {
 
 			const headings = page.locator( 'h2' );
 
-			const normalFontSize = await headings
-				.first()
-				.evaluate( ( el ) => {
-					return window.getComputedStyle( el ).fontSize;
-				} );
+			const normalFontSize = await headings.first().evaluate( ( el ) => {
+				return window.getComputedStyle( el ).fontSize;
+			} );
 
 			const fitTextFontSize = await fitText.evaluate( ( el ) => {
 				return window.getComputedStyle( el ).fontSize;
