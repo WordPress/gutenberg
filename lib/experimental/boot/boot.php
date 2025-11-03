@@ -52,7 +52,7 @@ function gutenberg_boot_admin_page() {
 		wp_add_inline_script(
 			'gutenberg-boot-prerequisites',
 			sprintf(
-				'import("@wordpress/boot").then(mod => mod.init(%s));',
+				'import("@wordpress/boot").then(mod => mod.init({menuItems: %s}));',
 				wp_json_encode( $menu_items, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES )
 			)
 		);

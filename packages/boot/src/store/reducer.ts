@@ -6,6 +6,7 @@ import type { State } from './types';
 
 const initialState: State = {
 	menuItems: {},
+	routes: [],
 };
 
 export function reducer( state: State = initialState, action: Action ): State {
@@ -17,6 +18,12 @@ export function reducer( state: State = initialState, action: Action ): State {
 					...state.menuItems,
 					[ action.id ]: action.menuItem,
 				},
+			};
+
+		case 'REGISTER_ROUTE':
+			return {
+				...state,
+				routes: [ ...state.routes, action.route ],
 			};
 	}
 
