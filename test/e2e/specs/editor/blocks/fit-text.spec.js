@@ -9,7 +9,7 @@ test.describe( 'Fit Text', () => {
 	} );
 
 	test.describe( 'Editor functionality', () => {
-		test( 'should insert a fit text block', async ( { editor, page } ) => {
+		test( 'should insert a fit text block', async ( { editor } ) => {
 			await editor.insertBlock( {
 				name: 'core/fit-text',
 				attributes: {
@@ -137,8 +137,22 @@ test.describe( 'Fit Text', () => {
 				' that is much longer and should have smaller font'
 			);
 
-			// Wait for DOM to update and fit text to recalculate
-			await fitTextBlock.waitFor( { state: 'attached' } );
+			// Wait for font size to decrease after adding more text
+			await fitTextBlock.evaluate( ( el, prevSize ) => {
+				return new Promise( ( resolve ) => {
+					const checkSize = () => {
+						const currentSize = parseFloat(
+							window.getComputedStyle( el ).fontSize
+						);
+						if ( currentSize < prevSize ) {
+							resolve();
+						} else {
+							window.requestAnimationFrame( checkSize );
+						}
+					};
+					checkSize();
+				} );
+			}, parseFloat( initialFontSize ) );
 
 			const newFontSize = await fitTextBlock.evaluate( ( el ) => {
 				return window.getComputedStyle( el ).fontSize;
@@ -310,9 +324,7 @@ test.describe( 'Fit Text', () => {
 			// Wait for inline style to be applied
 			await page.waitForFunction(
 				() => {
-					const el = document.querySelector(
-						'.wp-block-fit-text'
-					);
+					const el = document.querySelector( '.wp-block-fit-text' );
 					return el && el.style.fontSize && el.style.fontSize !== '';
 				},
 				{ timeout: 5000 }
@@ -329,9 +341,7 @@ test.describe( 'Fit Text', () => {
 			// Wait for inline font-size style to change after resize
 			await page.waitForFunction(
 				( previousStyle ) => {
-					const el = document.querySelector(
-						'.wp-block-fit-text'
-					);
+					const el = document.querySelector( '.wp-block-fit-text' );
 					return (
 						el &&
 						el.style.fontSize &&
@@ -390,9 +400,7 @@ test.describe( 'Fit Text', () => {
 			// Wait for inline style to be applied
 			await page.waitForFunction(
 				() => {
-					const el = document.querySelector(
-						'.wp-block-fit-text'
-					);
+					const el = document.querySelector( '.wp-block-fit-text' );
 					return el && el.style.fontSize && el.style.fontSize !== '';
 				},
 				{ timeout: 5000 }
