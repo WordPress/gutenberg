@@ -7,7 +7,7 @@
 /**
  * WordPress dependencies
  */
-import { store, getElement, useInit } from '@wordpress/interactivity';
+import { store, getElement } from '@wordpress/interactivity';
 
 /**
  * Internal dependencies
@@ -88,9 +88,26 @@ store( 'core/fit-text', {
 	callbacks: {
 		init() {
 			const { ref } = getElement();
-			if ( ref && ref.classList.contains( 'has-fit-text' ) ) {
-				initializeFitText( ref );
+			if ( ! ref || ! ref.classList.contains( 'has-fit-text' ) ) {
+				return;
 			}
+
+			const elementId = getElementIdentifier( ref );
+			const observer = initializeFitText( ref );
+
+			// Return cleanup function to be called when element is removed.
+			return () => {
+				if ( observer ) {
+					observer.disconnect();
+				}
+
+				// Remove the associated style element
+				const styleId = `fit-text-${ elementId }`;
+				const styleElement = document.getElementById( styleId );
+				if ( styleElement ) {
+					styleElement.remove();
+				}
+			};
 		},
 	},
 } );
