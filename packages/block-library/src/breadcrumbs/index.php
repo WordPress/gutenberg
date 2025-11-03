@@ -48,7 +48,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		// Handle search results.
 		$is_paged = block_core_breadcrumbs_is_paged();
 		/* translators: %s: search query */
-		$text               = esc_html( sprintf( __( 'Search results for: "%s"' ), wp_trim_words( get_search_query(), 10 ) ) );
+		$text               = sprintf( __( 'Search results for: "%s"' ), wp_trim_words( get_search_query(), 10 ) );
 		$breadcrumb_items[] = block_core_breadcrumbs_create_item( $text, $is_paged );
 		// Add the "Page X" as the current page if paginated.
 		if ( $is_paged ) {
@@ -57,7 +57,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 	} elseif ( is_404() ) {
 		// Handle 404 pages.
 		$breadcrumb_items[] = block_core_breadcrumbs_create_current_item(
-			esc_html__( 'Page not found' )
+			__( 'Page not found' )
 		);
 	} elseif ( is_archive() ) {
 		// Handle archive pages (taxonomy, post type, date, author archives).
@@ -97,7 +97,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 			$breadcrumb_items = array_merge( $breadcrumb_items, block_core_breadcrumbs_get_terms_breadcrumbs( $post_id, $post_type ) );
 		}
 		// Add current post title (not linked).
-		$breadcrumb_items[] = block_core_breadcrumbs_create_current_item( block_core_breadcrumbs_get_post_title( $post ) );
+		$breadcrumb_items[] = block_core_breadcrumbs_create_current_item( block_core_breadcrumbs_get_post_title( $post ), true );
 	}
 
 	// Remove last item if disabled.
@@ -156,7 +156,7 @@ function block_core_breadcrumbs_create_page_number_item() {
 	$paged = (int) get_query_var( 'paged' );
 	return block_core_breadcrumbs_create_current_item(
 		/* translators: %s: page number */
-		esc_html( sprintf( __( 'Page %s' ), number_format_i18n( $paged ) ) )
+		sprintf( __( 'Page %s' ), number_format_i18n( $paged ) )
 	);
 }
 
@@ -165,16 +165,17 @@ function block_core_breadcrumbs_create_page_number_item() {
  *
  * @since 6.9.0
  *
- * @param string $url  The URL for the link (will be escaped).
- * @param string $text The link text (should already be escaped).
+ * @param string $url        The URL for the link (will be escaped).
+ * @param string $text       The link text (will be escaped).
+ * @param bool   $allow_html Whether to allow HTML in the text. If true, uses wp_kses_post(), otherwise uses esc_html(). Default false.
  *
  * @return string The breadcrumb link HTML.
  */
-function block_core_breadcrumbs_create_link( $url, $text ) {
+function block_core_breadcrumbs_create_link( $url, $text, $allow_html = false ) {
 	return sprintf(
 		'<a href="%s">%s</a>',
 		esc_url( $url ),
-		$text
+		$allow_html ? wp_kses_post( $text ) : esc_html( $text )
 	);
 }
 
@@ -183,14 +184,15 @@ function block_core_breadcrumbs_create_link( $url, $text ) {
  *
  * @since 6.9.0
  *
- * @param string $text The text content (should already be escaped).
+ * @param string $text       The text content (will be escaped).
+ * @param bool   $allow_html Whether to allow HTML in the text. If true, uses wp_kses_post(), otherwise uses esc_html(). Default false.
  *
  * @return string The breadcrumb current page HTML.
  */
-function block_core_breadcrumbs_create_current_item( $text ) {
+function block_core_breadcrumbs_create_current_item( $text, $allow_html = false ) {
 	return sprintf(
 		'<span aria-current="page">%s</span>',
-		$text
+		$allow_html ? wp_kses_post( $text ) : esc_html( $text )
 	);
 }
 
@@ -202,16 +204,17 @@ function block_core_breadcrumbs_create_current_item( $text ) {
  *
  * @since 6.9.0
  *
- * @param string $text     The text content (should already be escaped).
- * @param bool   $is_paged Whether we're on a paginated view.
+ * @param string $text       The text content (will be escaped).
+ * @param bool   $is_paged   Whether we're on a paginated view.
+ * @param bool   $allow_html Whether to allow HTML in the text. If true, uses wp_kses_post(), otherwise uses esc_html(). Default false.
  *
  * @return string The breadcrumb HTML.
  */
-function block_core_breadcrumbs_create_item( $text, $is_paged = false ) {
+function block_core_breadcrumbs_create_item( $text, $is_paged = false, $allow_html = false ) {
 	if ( $is_paged ) {
-		return block_core_breadcrumbs_create_link( get_pagenum_link( 1 ), $text );
+		return block_core_breadcrumbs_create_link( get_pagenum_link( 1 ), $text, $allow_html );
 	}
-	return block_core_breadcrumbs_create_current_item( $text );
+	return block_core_breadcrumbs_create_current_item( $text, $allow_html );
 }
 
 /**
@@ -219,12 +222,12 @@ function block_core_breadcrumbs_create_item( $text, $is_paged = false ) {
  *
  * @since 6.9.0
  *
- * @param int|WP_Post $post The post ID or post object.
+ * @param int|WP_Post $post_id_or_object The post ID or post object.
  *
  * @return string The post title or fallback text.
  */
-function block_core_breadcrumbs_get_post_title( $post ) {
-	$title = get_the_title( $post );
+function block_core_breadcrumbs_get_post_title( $post_id_or_object ) {
+	$title = get_the_title( $post_id_or_object );
 	if ( strlen( $title ) === 0 ) {
 		$title = __( '(no title)' );
 	}
@@ -248,7 +251,8 @@ function block_core_breadcrumbs_get_hierarchical_post_type_breadcrumbs( $post_id
 	foreach ( $ancestors as $ancestor_id ) {
 		$breadcrumb_items[] = block_core_breadcrumbs_create_link(
 			get_permalink( $ancestor_id ),
-			block_core_breadcrumbs_get_post_title( $ancestor_id )
+			block_core_breadcrumbs_get_post_title( $ancestor_id ),
+			true
 		);
 	}
 	return $breadcrumb_items;
@@ -278,7 +282,7 @@ function block_core_breadcrumbs_get_term_ancestors_items( $term_id, $taxonomy ) 
 			if ( $ancestor_term && ! is_wp_error( $ancestor_term ) ) {
 				$breadcrumb_items[] = block_core_breadcrumbs_create_link(
 					get_term_link( $ancestor_term ),
-					esc_html( $ancestor_term->name )
+					$ancestor_term->name
 				);
 			}
 		}
@@ -324,31 +328,31 @@ function block_core_breadcrumbs_get_archive_breadcrumbs() {
 				// Year is linked if we have month.
 				$breadcrumb_items[] = block_core_breadcrumbs_create_link(
 					get_year_link( $year ),
-					esc_html( $year )
+					$year
 				);
 
 				if ( $day ) {
 					// Month is linked if we have day.
 					$breadcrumb_items[] = block_core_breadcrumbs_create_link(
 						get_month_link( $year, $month ),
-						esc_html( date_i18n( 'F', mktime( 0, 0, 0, $month, 1, $year ) ) )
+						date_i18n( 'F', mktime( 0, 0, 0, $month, 1, $year ) )
 					);
 					// Add day (current if not paginated, link if paginated).
 					$breadcrumb_items[] = block_core_breadcrumbs_create_item(
-						esc_html( $day ),
+						$day,
 						$is_paged
 					);
 				} else {
 					// Add month (current if not paginated, link if paginated).
 					$breadcrumb_items[] = block_core_breadcrumbs_create_item(
-						esc_html( date_i18n( 'F', mktime( 0, 0, 0, $month, 1, $year ) ) ),
+						date_i18n( 'F', mktime( 0, 0, 0, $month, 1, $year ) ),
 						$is_paged
 					);
 				}
 			} else {
 				// Add year (current if not paginated, link if paginated).
 				$breadcrumb_items[] = block_core_breadcrumbs_create_item(
-					esc_html( $year ),
+					$year,
 					$is_paged
 				);
 			}
@@ -384,7 +388,7 @@ function block_core_breadcrumbs_get_archive_breadcrumbs() {
 
 		// Add current term (current if not paginated, link if paginated).
 		$breadcrumb_items[] = block_core_breadcrumbs_create_item(
-			esc_html( $term->name ),
+			$term->name,
 			$is_paged
 		);
 	} elseif ( is_post_type_archive() ) {
@@ -397,7 +401,7 @@ function block_core_breadcrumbs_get_archive_breadcrumbs() {
 		if ( $post_type_object ) {
 			// Add post type (current if not paginated, link if paginated).
 			$breadcrumb_items[] = block_core_breadcrumbs_create_item(
-				esc_html( $post_type_object->labels->name ),
+				$post_type_object->labels->name,
 				$is_paged
 			);
 		}
@@ -406,7 +410,7 @@ function block_core_breadcrumbs_get_archive_breadcrumbs() {
 		$author = $queried_object;
 		// Add author (current if not paginated, link if paginated).
 		$breadcrumb_items[] = block_core_breadcrumbs_create_item(
-			esc_html( $author->display_name ),
+			$author->display_name,
 			$is_paged
 		);
 	}
@@ -469,7 +473,7 @@ function block_core_breadcrumbs_get_terms_breadcrumbs( $post_id, $post_type ) {
 		);
 		$breadcrumb_items[] = block_core_breadcrumbs_create_link(
 			get_term_link( $term ),
-			esc_html( $term->name )
+			$term->name
 		);
 	}
 	return $breadcrumb_items;
