@@ -13,8 +13,6 @@ export default function ListViewExpander( { onClick } ) {
 		//
 		// We've mimicked this by adding an icon with aria-hidden set to true to hide this from the accessibility tree.
 		// For the current tree grid implementation, please do not try to make this a button.
-		//
-
 		<span
 			className="block-editor-list-view__expander"
 			onClick={ ( event ) => onClick( event, { forceToggle: true } ) }

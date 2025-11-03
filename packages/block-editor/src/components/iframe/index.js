@@ -342,9 +342,6 @@ function Iframe( {
 			>
 				{ iframeDocument &&
 					createPortal(
-						// We want to prevent React events from bubbling through the iframe
-						// we bubble these manually.
-
 						<body
 							ref={ bodyRef }
 							className={ clsx(

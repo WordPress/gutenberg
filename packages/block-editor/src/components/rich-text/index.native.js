@@ -414,8 +414,6 @@ export function RichTextWrapper(
 					preserveWhiteSpace,
 				} );
 
-				// Allows us to ask for this information when we get a report.
-
 				window.console.log( 'Received items:\n\n', files );
 
 				if ( onReplace && isEmpty( value ) ) {

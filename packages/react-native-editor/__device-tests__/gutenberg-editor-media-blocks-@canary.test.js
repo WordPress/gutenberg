@@ -152,7 +152,6 @@ onlyOniOS( 'Gutenberg Editor Cover Block test', () => {
 
 		// First modal should no longer be presented.
 		const replaceButtons = await editorPage.driver.$$( '~Replace' );
-
 		expect( replaceButtons.length ).toBe( 0 );
 
 		// Select different media.

@@ -391,7 +391,6 @@ export default function NavigationSubmenuEdit( {
 				/>
 			</InspectorControls>
 			<div { ...blockProps }>
-				{  }
 				<ParentElement className="wp-block-navigation-item__content">
 					<RichText
 						ref={ ref }
