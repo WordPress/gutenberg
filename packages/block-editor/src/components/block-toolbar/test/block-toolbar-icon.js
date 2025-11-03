@@ -22,8 +22,12 @@ jest.mock( '../../block-switcher', () =>
 	) )
 );
 jest.mock( '../pattern-overrides-dropdown', () =>
-	jest.fn( ( { label } ) => (
-		<div data-testid="pattern-overrides-dropdown">{ label }</div>
+	jest.fn( ( { clientIds } ) => (
+		<div data-testid="pattern-overrides-dropdown">
+			{ clientIds.length === 1
+				? 'Block Name'
+				: 'Multiple blocks selected' }
+		</div>
 	) )
 );
 
@@ -37,13 +41,12 @@ describe( 'BlockToolbarIcon', () => {
 		jest.clearAllMocks();
 	} );
 
-	describe( 'when showBlockSwitcher is true', () => {
+	describe( 'when variant is "switcher"', () => {
 		it( 'should render BlockSwitcher with icon', () => {
 			render(
 				<BlockToolbarIcon
 					{ ...defaultProps }
-					showBlockSwitcher
-					showPatternOverrides={ false }
+					variant="switcher"
 					firstBlockName={ undefined }
 				/>
 			);
@@ -57,13 +60,12 @@ describe( 'BlockToolbarIcon', () => {
 		} );
 	} );
 
-	describe( 'when showPatternOverrides is true', () => {
+	describe( 'when variant is "pattern-overrides"', () => {
 		it( 'should render PatternOverridesDropdown for single block', () => {
 			render(
 				<BlockToolbarIcon
 					{ ...defaultProps }
-					showBlockSwitcher={ false }
-					showPatternOverrides
+					variant="pattern-overrides"
 					firstBlockName="My Override"
 				/>
 			);
@@ -81,8 +83,7 @@ describe( 'BlockToolbarIcon', () => {
 				<BlockToolbarIcon
 					{ ...defaultProps }
 					clientIds={ [ 'test-1', 'test-2' ] }
-					showBlockSwitcher={ false }
-					showPatternOverrides
+					variant="pattern-overrides"
 					firstBlockName={ undefined }
 				/>
 			);
@@ -93,16 +94,9 @@ describe( 'BlockToolbarIcon', () => {
 		} );
 	} );
 
-	describe( 'when neither showBlockSwitcher nor showPatternOverrides is true', () => {
+	describe( 'when variant is "default"', () => {
 		it( 'should render disabled ToolbarButton for single block', () => {
-			render(
-				<BlockToolbarIcon
-					{ ...defaultProps }
-					showBlockSwitcher={ false }
-					showPatternOverrides={ false }
-					firstBlockName={ undefined }
-				/>
-			);
+			render( <BlockToolbarIcon { ...defaultProps } /> );
 
 			const button = screen.getByRole( 'button' );
 			expect( button ).toHaveAttribute( 'aria-disabled', 'true' );
@@ -120,9 +114,6 @@ describe( 'BlockToolbarIcon', () => {
 				<BlockToolbarIcon
 					{ ...defaultProps }
 					clientIds={ [ 'test-1', 'test-2', 'test-3' ] }
-					showBlockSwitcher={ false }
-					showPatternOverrides={ false }
-					firstBlockName={ undefined }
 				/>
 			);
 
@@ -137,13 +128,7 @@ describe( 'BlockToolbarIcon', () => {
 
 	describe( 'label calculation', () => {
 		it( 'should use block title for single block', () => {
-			render(
-				<BlockToolbarIcon
-					{ ...defaultProps }
-					showBlockSwitcher={ false }
-					showPatternOverrides={ false }
-				/>
-			);
+			render( <BlockToolbarIcon { ...defaultProps } /> );
 
 			const button = screen.getByRole( 'button' );
 			expect( button ).toHaveAttribute( 'aria-label', 'Block Name' );
@@ -154,8 +139,6 @@ describe( 'BlockToolbarIcon', () => {
 				<BlockToolbarIcon
 					{ ...defaultProps }
 					clientIds={ [ 'test-1', 'test-2' ] }
-					showBlockSwitcher={ false }
-					showPatternOverrides={ false }
 				/>
 			);
 

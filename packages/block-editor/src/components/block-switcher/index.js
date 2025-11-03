@@ -9,14 +9,8 @@ import {
 	__experimentalText as Text,
 	MenuGroup,
 } from '@wordpress/components';
-import {
-	switchToBlockType,
-	store as blocksStore,
-	isReusableBlock,
-	isTemplatePart,
-} from '@wordpress/blocks';
+import { switchToBlockType } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -26,48 +20,52 @@ import BlockTransformationsMenu from './block-transformations-menu';
 import { useBlockVariationTransforms } from './block-variation-transformations';
 import BlockStylesMenu from './block-styles-menu';
 import PatternTransformationsMenu from './pattern-transformations-menu';
-import useBlockDisplayTitle from '../block-title/use-block-display-title';
-import { unlock } from '../../lock-unlock';
 
 function BlockSwitcherDropdownMenuContents( {
 	onClose,
 	clientIds,
 	hasBlockStyles,
-	canRemove,
+	isSynced,
 } ) {
 	const { replaceBlocks, multiSelect, updateBlockAttributes } =
 		useDispatch( blockEditorStore );
-	const { possibleBlockTransformations, patterns, blocks, isUsingBindings } =
-		useSelect(
-			( select ) => {
-				const {
-					getBlockAttributes,
-					getBlocksByClientId,
-					getBlockRootClientId,
-					getBlockTransformItems,
-					__experimentalGetPatternTransformItems,
-				} = select( blockEditorStore );
-				const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
-				const _blocks = getBlocksByClientId( clientIds );
-				return {
-					blocks: _blocks,
-					possibleBlockTransformations: getBlockTransformItems(
-						_blocks,
-						rootClientId
-					),
-					patterns: __experimentalGetPatternTransformItems(
-						_blocks,
-						rootClientId
-					),
-					isUsingBindings: clientIds.every(
-						( clientId ) =>
-							!! getBlockAttributes( clientId )?.metadata
-								?.bindings
-					),
-				};
-			},
-			[ clientIds ]
-		);
+	const {
+		possibleBlockTransformations,
+		patterns,
+		blocks,
+		isUsingBindings,
+		canRemove,
+	} = useSelect(
+		( select ) => {
+			const {
+				getBlockAttributes,
+				getBlocksByClientId,
+				getBlockRootClientId,
+				getBlockTransformItems,
+				__experimentalGetPatternTransformItems,
+				canRemoveBlocks,
+			} = select( blockEditorStore );
+			const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
+			const _blocks = getBlocksByClientId( clientIds );
+			return {
+				blocks: _blocks,
+				possibleBlockTransformations: getBlockTransformItems(
+					_blocks,
+					rootClientId
+				),
+				patterns: __experimentalGetPatternTransformItems(
+					_blocks,
+					rootClientId
+				),
+				isUsingBindings: clientIds.every(
+					( clientId ) =>
+						!! getBlockAttributes( clientId )?.metadata?.bindings
+				),
+				canRemove: canRemoveBlocks( clientIds ),
+			};
+		},
+		[ clientIds ]
+	);
 	const blockVariationTransformations = useBlockVariationTransforms( {
 		clientIds,
 		blocks,
@@ -98,15 +96,8 @@ function BlockSwitcherDropdownMenuContents( {
 		replaceBlocks( clientIds, transformedBlocks );
 		selectForMultipleBlocks( transformedBlocks );
 	}
-	/**
-	 * The `isSynced` check is a stopgap solution here.
-	 * Ideally, the Transforms API should handle this
-	 * by allowing to exclude blocks from wildcard transformations.
-	 */
+
 	const isSingleBlock = blocks.length === 1;
-	const isSynced =
-		isSingleBlock &&
-		( isTemplatePart( blocks[ 0 ] ) || isReusableBlock( blocks[ 0 ] ) );
 	const hasPossibleBlockTransformations =
 		!! possibleBlockTransformations?.length && canRemove && ! isSynced;
 	const hasPossibleBlockVariationTransformations =
@@ -186,63 +177,15 @@ function BlockSwitcherDropdownMenuContents( {
 	);
 }
 
-export const BlockSwitcher = ( { clientIds, children } ) => {
-	const { hasBlockStyles, canRemove, invalidBlocks, isReusable, isTemplate } =
-		useSelect(
-			( select ) => {
-				const { getBlocksByClientId, canRemoveBlocks } = unlock(
-					select( blockEditorStore )
-				);
-				const _blocks = getBlocksByClientId( clientIds );
-				if (
-					! _blocks.length ||
-					_blocks.some( ( block ) => ! block )
-				) {
-					return { invalidBlocks: true };
-				}
-				const [ { name: firstBlockName } ] = _blocks;
-				const _isSingleBlockSelected = _blocks.length === 1;
-
-				const { getBlockStyles } = select( blocksStore );
-
-				return {
-					canRemove: canRemoveBlocks( clientIds ),
-					hasBlockStyles:
-						_isSingleBlockSelected &&
-						!! getBlockStyles( firstBlockName )?.length,
-					isReusable:
-						_isSingleBlockSelected &&
-						isReusableBlock( _blocks[ 0 ] ),
-					isTemplate:
-						_isSingleBlockSelected &&
-						isTemplatePart( _blocks[ 0 ] ),
-				};
-			},
-			[ clientIds ]
-		);
-	const blockTitle = useBlockDisplayTitle( {
-		clientId: clientIds?.[ 0 ],
-		maximumLength: 35,
-	} );
-	const showIconLabels = useSelect(
-		( select ) =>
-			select( preferencesStore ).get( 'core', 'showIconLabels' ),
-		[]
-	);
-
-	if ( invalidBlocks ) {
-		return null;
-	}
-
+export const BlockSwitcher = ( {
+	children,
+	clientIds,
+	hasBlockStyles,
+	isSynced,
+	label,
+	text,
+} ) => {
 	const isSingleBlock = clientIds.length === 1;
-	const blockSwitcherLabel = isSingleBlock
-		? blockTitle
-		: __( 'Multiple blocks selected' );
-
-	const blockIndicatorText =
-		( isReusable || isTemplate ) && ! showIconLabels && blockTitle
-			? blockTitle
-			: undefined;
 
 	const blockSwitcherDescription = isSingleBlock
 		? __( 'Change block type or style' )
@@ -261,13 +204,13 @@ export const BlockSwitcher = ( { clientIds, children } ) => {
 				{ ( toggleProps ) => (
 					<DropdownMenu
 						className="block-editor-block-switcher"
-						label={ blockSwitcherLabel }
+						label={ label }
 						popoverProps={ {
 							placement: 'bottom-start',
 							className: 'block-editor-block-switcher__popover',
 						} }
 						icon={ children }
-						text={ blockIndicatorText }
+						text={ text }
 						toggleProps={ {
 							description: blockSwitcherDescription,
 							...toggleProps,
@@ -279,7 +222,7 @@ export const BlockSwitcher = ( { clientIds, children } ) => {
 								onClose={ onClose }
 								clientIds={ clientIds }
 								hasBlockStyles={ hasBlockStyles }
-								canRemove={ canRemove }
+								isSynced={ isSynced }
 							/>
 						) }
 					</DropdownMenu>

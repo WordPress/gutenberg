@@ -19,6 +19,7 @@ import {
 } from '@wordpress/blocks';
 import { ToolbarGroup } from '@wordpress/components';
 import { copy } from '@wordpress/icons';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -70,6 +71,7 @@ export function PrivateBlockToolbar( {
 		shouldShowVisualToolbar,
 		showParentSelector,
 		isUsingBindings,
+		hasBlockStyles,
 		hasContentOnlyLocking,
 		showShuffleButton,
 		showSlots,
@@ -78,9 +80,9 @@ export function PrivateBlockToolbar( {
 		showBlockVisibilityButton,
 		showSwitchSectionStyleButton,
 		blockIcon,
-		showBlockSwitcher,
-		showPatternOverrides,
-		firstBlockName,
+		iconVariant,
+		isSynced,
+		showIconLabels,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockName,
@@ -186,13 +188,26 @@ export function PrivateBlockToolbar( {
 			( _hasBlockStyles || _canRemove ) &&
 			! _hasTemplateLock;
 
-		// Get the first block's metadata name for pattern overrides description
-		const _firstBlockName =
-			_hasPatternOverrides && selectedBlockClientId
-				? getBlockAttributes( selectedBlockClientId )?.metadata?.name
-				: undefined;
-
 		const _showPatternOverrides = _hasPatternOverrides && _hasParentPattern;
+
+		// Calculate icon variant based on priority
+		let _iconVariant;
+		if ( _showBlockSwitcher ) {
+			_iconVariant = 'switcher';
+		} else if ( _showPatternOverrides ) {
+			_iconVariant = 'pattern-overrides';
+		} else {
+			_iconVariant = 'default';
+		}
+
+		const _showIconLabels = select( preferencesStore ).get(
+			'core',
+			'showIconLabels'
+		);
+
+		// Check if block is reusable or template part for indicator text
+		const _isReusable = _blockType && isReusableBlock( _blockType );
+		const _isTemplate = _blockType && isTemplatePart( _blockType );
 
 		return {
 			blockClientId: selectedBlockClientId,
@@ -213,6 +228,8 @@ export function PrivateBlockToolbar( {
 				) &&
 				selectedBlockClientIds.length === 1,
 			isUsingBindings: _isUsingBindings,
+			isSynced: _isReusable || _isTemplate || _showPatternOverrides,
+			hasBlockStyles: _hasBlockStyles,
 			hasContentOnlyLocking: _hasTemplateLock,
 			showShuffleButton: _isZoomOut,
 			showSlots: ! _isZoomOut,
@@ -221,9 +238,12 @@ export function PrivateBlockToolbar( {
 			showBlockVisibilityButton: ! _isZoomOut,
 			showSwitchSectionStyleButton: _showSwitchSectionStyleButton,
 			blockIcon: _icon,
-			showBlockSwitcher: _showBlockSwitcher,
+			iconVariant: _iconVariant,
 			showPatternOverrides: _showPatternOverrides,
-			firstBlockName: _firstBlockName,
+			showIconLabels:
+				_isSingleBlockSelected &&
+				( _isReusable || _isTemplate ) &&
+				! _showIconLabels,
 		};
 	}, [] );
 
@@ -244,10 +264,6 @@ export function PrivateBlockToolbar( {
 	}
 
 	const isMultiToolbar = blockClientIds.length > 1;
-	const isSynced =
-		isReusableBlock( blockType ) ||
-		isTemplatePart( blockType ) ||
-		showPatternOverrides;
 
 	// Shifts the toolbar to make room for the parent block selector.
 	const classes = clsx( 'block-editor-block-contextual-toolbar', {
@@ -284,9 +300,9 @@ export function PrivateBlockToolbar( {
 							<BlockToolbarIcon
 								clientIds={ blockClientIds }
 								icon={ blockIcon }
-								showBlockSwitcher={ showBlockSwitcher }
-								showPatternOverrides={ showPatternOverrides }
-								firstBlockName={ firstBlockName }
+								variant={ iconVariant }
+								hasBlockStyles={ hasBlockStyles }
+								showBlockTitle={ showIconLabels }
 							/>
 							{ isDefaultEditingMode &&
 								showBlockVisibilityButton && (

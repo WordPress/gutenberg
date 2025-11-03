@@ -94,10 +94,18 @@ describe( 'BlockSwitcher', () => {
 				},
 			],
 			blocks: [ headingBlock1 ],
-			canRemove: true,
 		} ) );
 		const user = userEvent.setup();
-		render( <BlockSwitcher clientIds={ [ headingBlock1.clientId ] } /> );
+		render(
+			<BlockSwitcher
+				clientIds={ [ headingBlock1.clientId ] }
+				hasBlockStyles={ false }
+				canRemove
+				isReusable={ false }
+				isTemplate={ false }
+				showIconLabels={ false }
+			/>
+		);
 		expect(
 			screen.getByRole( 'button', {
 				name: 'Block Name',
@@ -139,9 +147,17 @@ describe( 'BlockSwitcher', () => {
 			possibleBlockTransformations: [],
 			blocks: [ headingBlock1 ],
 			icon: copy,
-			canRemove: true,
 		} ) );
-		render( <BlockSwitcher clientIds={ [ headingBlock1.clientId ] } /> );
+		render(
+			<BlockSwitcher
+				clientIds={ [ headingBlock1.clientId ] }
+				hasBlockStyles={ false }
+				canRemove
+				isReusable={ false }
+				isTemplate={ false }
+				showIconLabels={ false }
+			/>
+		);
 		const user = userEvent.setup();
 		await user.type(
 			screen.getByRole( 'button', {
