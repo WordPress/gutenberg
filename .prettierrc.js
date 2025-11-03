@@ -2,6 +2,7 @@
 // Useful for editor integrations.
 module.exports = {
 	...require( '@wordpress/prettier-config' ),
+	endOfLine: 'lf',
 	overrides: [
 		{
 			files: [ 'changelog.txt' ],
