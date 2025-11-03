@@ -44,15 +44,15 @@ export default function FitTextEdit( {
 			return;
 		}
 
-		const blockElement = blockRef.current;
-
 		// Get or create style element with unique ID
 		const styleId = `fit-text-${ clientId }`;
-		let styleElement = blockElement.ownerDocument.getElementById( styleId );
+		let styleElement =
+			blockRef.current.ownerDocument.getElementById( styleId );
 		if ( ! styleElement ) {
-			styleElement = blockElement.ownerDocument.createElement( 'style' );
+			styleElement =
+				blockRef.current.ownerDocument.createElement( 'style' );
 			styleElement.id = styleId;
-			blockElement.ownerDocument.head.appendChild( styleElement );
+			blockRef.current.ownerDocument.head.appendChild( styleElement );
 		}
 
 		const blockSelector = `#block-${ clientId }`;
@@ -65,7 +65,7 @@ export default function FitTextEdit( {
 			}
 		};
 
-		optimizeFitText( blockElement, applyFontSize );
+		optimizeFitText( blockRef.current, applyFontSize );
 	}, [ clientId ] );
 
 	useEffect( () => {
@@ -73,26 +73,38 @@ export default function FitTextEdit( {
 			return;
 		}
 
-		const currentElement = blockRef.current;
+		// Store IDs for cleanup
+		let calculateTimeoutId = null;
 
-		applyFitText();
+		// Hide the element during calculation to avoid flash
+		//blockRef.current.style.visibility = 'hidden';
+
+		// Wait 100ms for DOM to fully render and layout to settle
+		calculateTimeoutId = setTimeout( () => {
+			applyFitText();
+		}, 100 );
 
 		// Watch for size changes
 		let resizeObserver;
-		if ( window.ResizeObserver && currentElement.parentElement ) {
+		if ( window.ResizeObserver && blockRef.current.parentElement ) {
 			resizeObserver = new window.ResizeObserver( applyFitText );
-			resizeObserver.observe( currentElement.parentElement );
+			resizeObserver.observe( blockRef.current.parentElement );
 		}
 
 		// Cleanup function
 		return () => {
+			// Cancel pending async operations
+			if ( calculateTimeoutId !== null ) {
+				clearTimeout( calculateTimeoutId );
+			}
+
 			if ( resizeObserver ) {
 				resizeObserver.disconnect();
 			}
 
 			const styleId = `fit-text-${ clientId }`;
 			const styleElement =
-				currentElement.ownerDocument.getElementById( styleId );
+				blockRef.current.ownerDocument.getElementById( styleId );
 			if ( styleElement ) {
 				styleElement.remove();
 			}
@@ -102,7 +114,14 @@ export default function FitTextEdit( {
 	// Trigger fit text recalculation when content changes
 	useLayoutEffect( () => {
 		if ( blockRef.current ) {
-			applyFitText();
+			// Wait 100ms for DOM layout to settle (especially for alignment changes)
+			const timeoutId = setTimeout( () => {
+				if ( blockRef.current ) {
+					applyFitText();
+				}
+			}, 100 );
+
+			return () => clearTimeout( timeoutId );
 		}
 	}, [ attributes, applyFitText ] );
 
