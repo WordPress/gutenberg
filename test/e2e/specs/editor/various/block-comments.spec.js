@@ -55,25 +55,60 @@ test.describe( 'Block Comments', () => {
 			attributes: { content: 'Testing block comments' },
 		} );
 		await editor.clickBlockOptionsMenuItem( 'Add note' );
-		await page
-			.getByRole( 'textbox', {
-				name: 'New note',
-				exact: true,
-			} )
-			.fill( 'A test comment' );
+
+		const textBox = page.getByRole( 'textbox', {
+			name: 'New note',
+			exact: true,
+		} );
+
+		await textBox.fill( 'A test comment' );
+
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
 			.getByRole( 'button', { name: 'Add note', exact: true } )
 			.click();
-		const thread = page
+
+		await expect( textBox ).toBeHidden();
+
+		const thread1 = page
 			.getByRole( 'region', { name: 'Editor settings' } )
 			.getByRole( 'listitem', {
 				name: 'Note: A test comment',
 			} );
 
-		await expect( thread ).toBeVisible();
-		// Should focus the newly added comment thread.
-		// await expect( thread ).toBeFocused();
+		await expect( thread1 ).toBeVisible();
+		// await expect( thread1 ).toBeFocused(); // Should focus the newly added comment thread1.
+
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Another block' },
+		} );
+
+		await editor.clickBlockOptionsMenuItem( 'Add note' );
+
+		const textBox2 = page.getByRole( 'textbox', {
+			name: 'New note',
+			exact: true,
+		} );
+		await textBox2.fill( 'A test comment2' );
+
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Add note', exact: true } )
+			.click();
+
+		await expect( textBox2 ).toBeHidden();
+
+		const thread2 = page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'listitem', {
+				name: 'Note: A test comment2',
+			} )
+			.filter( { hasClass: 'is-selected' } );
+
+		await expect( thread2 ).toBeVisible();
+		// Should focus the newly added comment thread2.
+		await expect( thread2 ).toBeFocused();
 	} );
 
 	test( 'can reply to a block comment', async ( {
