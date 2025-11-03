@@ -251,11 +251,9 @@ function gutenberg_render_typography_support( $block_content, $block ) {
 		if ( ! empty( $block_content ) ) {
 			$processor = new WP_HTML_Tag_Processor( $block_content );
 			if ( $processor->next_tag() ) {
-				// Add data-wp-interactive directive if not already present.
 				if ( ! $processor->get_attribute( 'data-wp-interactive' ) ) {
 					$processor->set_attribute( 'data-wp-interactive', 'core/fit-text' );
 				}
-				// Add data-wp-init directive to initialize fit text.
 				$processor->set_attribute( 'data-wp-init', 'callbacks.init' );
 				$block_content = $processor->get_updated_html();
 			}
