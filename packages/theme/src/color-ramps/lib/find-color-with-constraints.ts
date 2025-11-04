@@ -84,6 +84,8 @@ export function findColorMeetingRequirements(
 		} );
 	}
 
+	const contrastWithSeed = getContrast( reference, seed );
+
 	if ( lightnessConstraint ) {
 		// Apply a specific L value.
 		// Useful when pinning a step to a specific lightness, of to specify
@@ -104,7 +106,7 @@ export function findColorMeetingRequirements(
 				deficit:
 					exactLContrast >= target
 						? undefined
-						: target - exactLContrast,
+						: ( target - exactLContrast ) * contrastWithSeed,
 			};
 		}
 	}
@@ -130,7 +132,7 @@ export function findColorMeetingRequirements(
 			color: mostContrastingColor,
 			reached: false,
 			achieved: highestContrast,
-			deficit: target - highestContrast,
+			deficit: ( target - highestContrast ) * contrastWithSeed,
 		};
 	}
 
@@ -186,6 +188,7 @@ export function findColorMeetingRequirements(
 		color: bestColor,
 		reached: true,
 		achieved: bestContrast,
-		deficit: bestContrast - highestContrast, // Negative number that specifies how much room we have.
+		// Negative number that specifies how much room we have.
+		deficit: ( bestContrast - highestContrast ) * contrastWithSeed,
 	};
 }
