@@ -65,7 +65,7 @@ const TEST_FILE_PATTERNS = [
  */
 function getAllPackages() {
 	return glob
-		.sync( path.join( PACKAGES_DIR, '*', 'package.json' ) )
+		.sync( normalizePath( path.join( PACKAGES_DIR, '*', 'package.json' ) ) )
 		.map( ( packageJsonPath ) =>
 			path.basename( path.dirname( packageJsonPath ) )
 		);
