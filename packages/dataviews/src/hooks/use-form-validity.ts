@@ -218,7 +218,7 @@ function handleElementsValidationAsync< Item >(
 						{
 							elements: {
 								type: 'invalid',
-								message: 'Could not validate elements.',
+								message: __( 'Could not validate elements.' ),
 							},
 						},
 						[ ...path, formField.id ]
@@ -240,7 +240,9 @@ function handleElementsValidationAsync< Item >(
 						{
 							elements: {
 								type: 'invalid',
-								message: 'Value must be one of the elements.',
+								message: __(
+									'Value must be one of the elements.'
+								),
 							},
 						},
 						[ ...path, formField.id ]
@@ -261,7 +263,7 @@ function handleElementsValidationAsync< Item >(
 						{
 							elements: {
 								type: 'invalid',
-								message: 'Value must be an array.',
+								message: __( 'Value must be an array.' ),
 							},
 						},
 						[ ...path, formField.id ]
@@ -284,7 +286,9 @@ function handleElementsValidationAsync< Item >(
 						{
 							elements: {
 								type: 'invalid',
-								message: 'Value must be one of the elements.',
+								message: __(
+									'Value must be one of the elements.'
+								),
 							},
 						},
 						[ ...path, formField.id ]
@@ -485,7 +489,7 @@ function validateFormField< Item >(
 		return {
 			elements: {
 				type: 'validating',
-				message: 'Validating…',
+				message: __( 'Validating…' ),
 			},
 		};
 	}
