@@ -90,7 +90,11 @@ export function Comments( {
 		// add a "new note" entry to the threads. This special thread type
 		// gets sorted and floated like regular threads, but shows an AddComment
 		// component instead of a regular comment thread.
-		if ( isFloating && showCommentBoard && undefined === blockCommentId ) {
+		if (
+			isFloating &&
+			showCommentBoard === 'open' &&
+			undefined === blockCommentId
+		) {
 			// Insert the new note entry at the correct location for its blockId.
 			const newNoteThread = {
 				id: 'new-note-thread',
@@ -144,7 +148,7 @@ export function Comments( {
 			focusCommentThread( prevThread.id, commentSidebarRef.current );
 		} else {
 			setSelectedThread( null );
-			setShowCommentBoard( false );
+			setShowCommentBoard( 'closed' );
 			// Move focus to the related block.
 			relatedBlockElement?.focus();
 		}
@@ -153,7 +157,7 @@ export function Comments( {
 	// Auto-select the related comment thread when a block is selected.
 	useEffect( () => {
 		// Fallback to 'new-note-thread' when showing the comment board for a new note.
-		const fallback = showCommentBoard ? 'new-note-thread' : null;
+		const fallback = showCommentBoard === 'open' ? 'new-note-thread' : null;
 		setSelectedThread( blockCommentId ?? fallback );
 	}, [ blockCommentId, showCommentBoard ] );
 
@@ -316,7 +320,7 @@ export function Comments( {
 	return (
 		<>
 			{ ! isFloating &&
-				showCommentBoard &&
+				showCommentBoard === 'open' &&
 				undefined === blockCommentId && (
 					<AddComment
 						onSubmit={ onAddReply }
@@ -394,7 +398,7 @@ function Thread( {
 	};
 
 	const handleCommentSelect = () => {
-		setShowCommentBoard( false );
+		setShowCommentBoard( 'closed' );
 		setSelectedThread( thread.id );
 		if ( !! thread.blockClientId ) {
 			// Pass `null` as the second parameter to prevent focusing the block.
@@ -405,7 +409,7 @@ function Thread( {
 
 	const unselectThread = () => {
 		setSelectedThread( null );
-		setShowCommentBoard( false );
+		setShowCommentBoard( 'closed' );
 		toggleBlockSpotlight( thread.blockClientId, false );
 	};
 
@@ -431,7 +435,11 @@ function Thread( {
 				commentExcerpt
 		  );
 
-	if ( 'new-note-thread' === thread.id && showCommentBoard && isFloating ) {
+	if (
+		thread.id === 'new-note-thread' &&
+		showCommentBoard === 'open' &&
+		isFloating
+	) {
 		return (
 			<AddComment
 				onSubmit={ onAddReply }

@@ -48,12 +48,16 @@ export function AddComment( {
 	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
 
 	const unselectThread = () => {
-		setShowCommentBoard( false );
+		setShowCommentBoard( 'closed' );
 		blockElement?.focus();
 		toggleBlockSpotlight( clientId, false );
 	};
 
-	if ( ! showCommentBoard || ! clientId || undefined !== blockCommentId ) {
+	if (
+		showCommentBoard !== 'open' ||
+		! clientId ||
+		undefined !== blockCommentId
+	) {
 		return null;
 	}
 
@@ -81,7 +85,7 @@ export function AddComment( {
 					return;
 				}
 				toggleBlockSpotlight( clientId, false );
-				setShowCommentBoard( false );
+				setShowCommentBoard( 'closed' );
 			} }
 		>
 			<HStack alignment="left" spacing="3">
@@ -91,7 +95,7 @@ export function AddComment( {
 				onSubmit={ async ( inputComment ) => {
 					const { id } = await onSubmit( { content: inputComment } );
 					focusCommentThread( id, commentSidebarRef.current );
-					setShowCommentBoard( false );
+					setShowCommentBoard( 'creating' );
 				} }
 				onCancel={ unselectThread }
 				reflowComments={ reflowComments }

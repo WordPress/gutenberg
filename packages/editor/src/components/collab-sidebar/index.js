@@ -81,7 +81,8 @@ function NotesSidebarContent( {
 }
 
 function NotesSidebar( { postId, mode } ) {
-	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
+	// Enum: 'closed' | 'creating' | 'open'
+	const [ showCommentBoard, setShowCommentBoard ] = useState( 'closed' );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
@@ -117,7 +118,8 @@ function NotesSidebar( { postId, mode } ) {
 	} = useBlockComments( postId );
 	useEnableFloatingSidebar(
 		showFloatingSidebar &&
-			( unresolvedSortedThreads.length > 0 || showCommentBoard )
+			( unresolvedSortedThreads.length > 0 ||
+				showCommentBoard !== 'closed' )
 	);
 
 	// Get the global styles to set the background color of the sidebar.
@@ -152,7 +154,7 @@ function NotesSidebar( { postId, mode } ) {
 			return;
 		}
 
-		setShowCommentBoard( ! blockCommentId );
+		setShowCommentBoard( ! blockCommentId ? 'open' : 'closed' );
 		focusCommentThread(
 			blockCommentId,
 			commentSidebarRef.current,
