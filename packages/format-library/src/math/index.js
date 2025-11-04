@@ -88,6 +88,7 @@ function InlineUI( {
 						onChange={ handleLatexChange }
 						placeholder={ __( 'e.g., x^2, \\frac{a}{b}' ) }
 						autoComplete="off"
+						className="block-editor-format-toolbar__math-input"
 					/>
 					{ error && (
 						<>

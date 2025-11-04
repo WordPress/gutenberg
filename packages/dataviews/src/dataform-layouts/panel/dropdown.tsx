@@ -18,14 +18,13 @@ import { closeSmall } from '@wordpress/icons';
  */
 import type {
 	FieldValidity,
-	Form,
-	FormField,
+	NormalizedForm,
+	NormalizedFormField,
 	FormValidity,
 	NormalizedField,
 } from '../../types';
 import { DataFormLayout } from '../data-form-layout';
-import { isCombinedField } from '../is-combined-field';
-import { DEFAULT_LAYOUT } from '../normalize-form-fields';
+import { DEFAULT_LAYOUT } from '../normalize-form';
 import SummaryButton from './summary-button';
 
 function DropdownHeader( {
@@ -71,7 +70,7 @@ function PanelDropdown< Item >( {
 	popoverAnchor,
 }: {
 	data: Item;
-	field: FormField;
+	field: NormalizedFormField;
 	onChange: ( value: any ) => void;
 	validity?: FieldValidity;
 	labelPosition: 'side' | 'top' | 'none';
@@ -79,17 +78,15 @@ function PanelDropdown< Item >( {
 	fieldDefinition: NormalizedField< Item >;
 	popoverAnchor: HTMLElement | null;
 } ) {
-	const fieldLabel = isCombinedField( field )
-		? field.label
-		: fieldDefinition?.label;
+	const fieldLabel = !! field.children ? field.label : fieldDefinition?.label;
 
-	const form: Form = useMemo(
-		(): Form => ( {
+	const form: NormalizedForm = useMemo(
+		() => ( {
 			layout: DEFAULT_LAYOUT,
-			fields: isCombinedField( field )
+			fields: !! field.children
 				? field.children
 				: // If not explicit children return the field id itself.
-				  [ { id: field.id } ],
+				  [ { id: field.id, layout: DEFAULT_LAYOUT } ],
 		} ),
 		[ field ]
 	);
@@ -98,7 +95,7 @@ function PanelDropdown< Item >( {
 			return undefined;
 		}
 
-		if ( isCombinedField( field ) ) {
+		if ( !! field.children ) {
 			return validity?.children;
 		}
 

@@ -93,7 +93,7 @@ Display a breadcrumb trail for hierarchical post types or based on taxonomy term
 -	**Experimental:** true
 -	**Category:** theme
 -	**Supports:** color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** prefersTaxonomy, separator, showHomeLink
+-	**Attributes:** prefersTaxonomy, separator, showHomeLink, showLastItem, showOnHomePage
 
 ## Button
 
@@ -512,7 +512,7 @@ Your site doesn’t include support for this block. ([Source](https://github.com
 
 -	**Name:** core/missing
 -	**Category:** text
--	**Supports:** interactivity (clientNavigation), ~~className~~, ~~customClassName~~, ~~html~~, ~~inserter~~, ~~reusable~~
+-	**Supports:** interactivity (clientNavigation), ~~blockVisibility~~, ~~className~~, ~~customClassName~~, ~~html~~, ~~inserter~~, ~~lock~~, ~~renaming~~, ~~reusable~~
 -	**Attributes:** originalContent, originalName, originalUndelimitedContent
 
 ## More

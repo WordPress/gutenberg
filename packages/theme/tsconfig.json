@@ -1,9 +1,11 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"moduleResolution": "bundler",
-		"types": [ "jest", "@testing-library/jest-dom" ]
+		"composite": true
 	},
-	"references": [ { "path": "../element" }, { "path": "../private-apis" } ]
+	"files": [],
+	"references": [
+		{ "path": "./tsconfig.src.json" },
+		{ "path": "./tsconfig.bin.json" }
+	]
 }

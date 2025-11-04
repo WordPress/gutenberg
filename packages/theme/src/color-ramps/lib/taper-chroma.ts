@@ -1,8 +1,23 @@
-// npm i colorjs.io
 /**
  * External dependencies
  */
-import Color from 'colorjs.io';
+import {
+	get,
+	inGamut,
+	OKLCH,
+	P3,
+	sRGB,
+	type ColorTypes,
+	type ColorObject,
+	// Disable reason: ESLint resolver can't handle `exports`. Import resolver
+	// checking is redundant in TypeScript files.
+	// eslint-disable-next-line import/no-unresolved
+} from 'colorjs.io/fn';
+
+/**
+ * Internal dependencies
+ */
+import './register-color-spaces';
 
 export interface TaperChromaOptions {
 	gamut?: 'p3' | 'srgb'; // target gamut (default "p3")
@@ -29,11 +44,12 @@ export interface TaperChromaOptions {
  * @param options
  */
 export function taperChroma(
-	seed: Color, // already OKLCH
+	seed: ColorTypes, // already OKLCH
 	lTarget: number, // [0..1]
 	options: TaperChromaOptions = {}
-): { l: number; c: number } {
+): { l: number; c: number } | ColorObject {
 	const gamut = options.gamut ?? 'p3';
+	const gamutSpace = gamut === 'p3' ? P3 : sRGB;
 	const alpha = options.alpha ?? 0.65; // 0.7-0.8 works well for accent surface
 	const carry = options.carry ?? 0.5;
 	const cUpperBound = options.cUpperBound ?? 0.45;
@@ -43,8 +59,8 @@ export function taperChroma(
 	const kDark = options.kDark ?? 0.85;
 	const achromaEpsilon = options.achromaEpsilon ?? 0.005;
 
-	const cSeed = Math.max( 0, seed.oklch.c );
-	let hSeed = Number( seed.oklch.h );
+	const cSeed = Math.max( 0, get( seed, [ OKLCH, 'c' ] ) );
+	let hSeed = Number( get( seed, [ OKLCH, 'h' ] ) );
 
 	const chromaIsTiny = cSeed < achromaEpsilon;
 	const hueIsInvalid = ! Number.isFinite( hSeed );
@@ -54,17 +70,25 @@ export function taperChroma(
 			hSeed = normalizeHue( options.hueFallback );
 		} else {
 			// Respect achromatic intent: grayscale at target L
-			return new Color( 'oklch', [ clamp01( lTarget ), 0, 0 ] );
+			return {
+				spaceId: 'oklch',
+				coords: [ clamp01( lTarget ), 0, 0 ],
+			};
 		}
 	}
 
 	// Capacity at seed and target
-	const lSeed = clamp01( seed.oklch.l );
-	const cmaxSeed = getCachedMaxChromaAtLH( lSeed, hSeed, gamut, cUpperBound );
+	const lSeed = clamp01( get( seed, [ OKLCH, 'l' ] ) );
+	const cmaxSeed = getCachedMaxChromaAtLH(
+		lSeed,
+		hSeed,
+		gamutSpace,
+		cUpperBound
+	);
 	const cmaxTarget = getCachedMaxChromaAtLH(
 		clamp01( lTarget ),
 		hSeed,
-		gamut,
+		gamutSpace,
 		cUpperBound
 	);
 
@@ -89,10 +113,13 @@ export function taperChroma(
 
 	// Downward-only clamp (preserve L & H)
 	const lOut = clamp01( lTarget );
-	const candidate = new Color( 'oklch', [ lOut, cPlanned, hSeed ] );
-	if ( ! candidate.inGamut( gamut ) ) {
+	const candidate: ColorTypes = {
+		spaceId: 'oklch',
+		coords: [ lOut, cPlanned, hSeed ],
+	};
+	if ( ! inGamut( candidate, gamutSpace ) ) {
 		const cap = Math.min( cPlanned, cUpperBound );
-		cPlanned = getCachedMaxChromaAtLH( lOut, hSeed, gamut, cap );
+		cPlanned = getCachedMaxChromaAtLH( lOut, hSeed, gamutSpace, cap );
 	}
 
 	cPlanned = Math.min( cPlanned, cSeed );
@@ -178,16 +205,17 @@ function quantize( x: number, step: number ): number {
 function getCachedMaxChromaAtLH(
 	l: number,
 	h: number,
-	gamut: 'p3' | 'srgb',
+	gamutSpace: typeof P3 | typeof sRGB,
 	cap: number
 ): number {
+	const gamut = gamutSpace === P3 ? 'p3' : 'srgb';
 	const key = keyMax( l, h, gamut, cap );
 	const hit = maxChromaCache.get( key );
 	if ( typeof hit === 'number' ) {
 		return hit;
 	}
 
-	const computed = maxInGamutChromaAtLH( l, h, gamut, cap );
+	const computed = maxInGamutChromaAtLH( l, h, gamutSpace, cap );
 	maxChromaCache.set( key, computed );
 	return computed;
 }
@@ -196,13 +224,13 @@ function getCachedMaxChromaAtLH(
  * Binary-search the max in-gamut chroma at fixed (L,H) in the target gamut
  * @param l
  * @param h
- * @param gamut
+ * @param gamutSpace
  * @param cap
  */
 function maxInGamutChromaAtLH(
 	l: number,
 	h: number,
-	gamut: 'p3' | 'srgb',
+	gamutSpace: typeof P3 | typeof sRGB,
 	cap: number
 ): number {
 	let lo = 0;
@@ -214,8 +242,11 @@ function maxInGamutChromaAtLH(
 
 	for ( let i = 0; i < 18; i++ ) {
 		const mid = ( lo + hi ) / 2;
-		const probe = new Color( 'oklch', [ lFixed, mid, hFixed ] );
-		if ( probe.inGamut( gamut ) ) {
+		const probe: ColorTypes = {
+			spaceId: 'oklch',
+			coords: [ lFixed, mid, hFixed ],
+		};
+		if ( inGamut( probe, gamutSpace ) ) {
 			ok = mid;
 			lo = mid;
 		} else {

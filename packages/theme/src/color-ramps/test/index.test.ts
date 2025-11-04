@@ -1,13 +1,15 @@
 /**
  * External dependencies
  */
-// Not sure why ESLint is erroring.
-// eslint-disable-next-line import/no-extraneous-dependencies
-import Color from 'colorjs.io';
+// Disable reason: ESLint resolver can't handle `exports`. Import resolver
+// checking is redundant in TypeScript files.
+// eslint-disable-next-line import/no-unresolved
+import { parse, to, serialize, sRGB } from 'colorjs.io/fn';
 
 /**
  * Internal dependencies
  */
+import '../lib/register-color-spaces';
 import { buildRamp } from '../lib';
 import { BG_RAMP_CONFIG, ACCENT_RAMP_CONFIG } from '../lib/ramp-configs';
 import { DEFAULT_SEED_COLORS } from '../lib/constants';
@@ -24,12 +26,17 @@ describe( 'buildRamps', () => {
 		expect(
 			allBgColors.map( ( bg ) => {
 				const ramp = buildRamp( bg, BG_RAMP_CONFIG );
-				const seedOriginal = new Color( bg )
-					.to( 'srgb' )
-					.toString( { format: 'hex', inGamut: true } );
-				const seedComputed = new Color( ramp.ramp.surface2.color )
-					.to( 'srgb' )
-					.toString( { format: 'hex', inGamut: true } );
+				const seedOriginal = serialize( to( parse( bg ), sRGB ), {
+					format: 'hex',
+					inGamut: true,
+				} );
+				const seedComputed = serialize(
+					to( parse( ramp.ramp.surface2.color ), sRGB ),
+					{
+						format: 'hex',
+						inGamut: true,
+					}
+				);
 
 				return {
 					input: {
@@ -71,12 +78,20 @@ describe( 'buildRamps', () => {
 			allPrimaryColors.map( ( primary ) =>
 				options.map( ( o ) => {
 					const ramp = buildRamp( primary, ACCENT_RAMP_CONFIG, o );
-					const seedOriginal = new Color( primary )
-						.to( 'srgb' )
-						.toString( { format: 'hex', inGamut: true } );
-					const seedComputed = new Color( ramp.ramp.bgFill1.color )
-						.to( 'srgb' )
-						.toString( { format: 'hex', inGamut: true } );
+					const seedOriginal = serialize(
+						to( parse( primary ), sRGB ),
+						{
+							format: 'hex',
+							inGamut: true,
+						}
+					);
+					const seedComputed = serialize(
+						to( parse( ramp.ramp.bgFill1.color ), sRGB ),
+						{
+							format: 'hex',
+							inGamut: true,
+						}
+					);
 
 					return {
 						input: {

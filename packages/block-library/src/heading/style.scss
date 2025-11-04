@@ -6,7 +6,7 @@ h3,
 h4,
 h5,
 h6 {
-	&.has-background {
+	&:where(.wp-block-heading).has-background {
 		padding: $block-bg-padding--v $block-bg-padding--h;
 	}
 	&.has-text-align-right[style*="writing-mode"]:where([style*="vertical-rl"]),

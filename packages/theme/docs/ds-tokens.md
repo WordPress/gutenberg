@@ -31,6 +31,8 @@ Do not edit directly.
 | `--wpds-color-bg-surface-info-weak`                   | Background color for surfaces with info tone and weak emphasis.                                                                             |
 | `--wpds-color-bg-surface-warning`                     | Background color for surfaces with warning tone and normal emphasis.                                                                        |
 | `--wpds-color-bg-surface-warning-weak`                | Background color for surfaces with warning tone and weak emphasis.                                                                          |
+| `--wpds-color-bg-surface-caution`                     | Background color for surfaces with caution tone and normal emphasis.                                                                        |
+| `--wpds-color-bg-surface-caution-weak`                | Background color for surfaces with caution tone and weak emphasis.                                                                          |
 | `--wpds-color-bg-surface-error`                       | Background color for surfaces with error tone and normal emphasis.                                                                          |
 | `--wpds-color-bg-surface-error-weak`                  | Background color for surfaces with error tone and weak emphasis.                                                                            |
 | `--wpds-color-bg-interactive-neutral`                 | Background color for interactive elements with neutral tone and normal emphasis.                                                            |
@@ -60,6 +62,16 @@ Do not edit directly.
 | `--wpds-color-bg-thumb-brand-disabled`                | Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track), in their disabled state.             |
 | `--wpds-color-fg-content-neutral`                     | Foreground color for content like text with normal emphasis.                                                                                |
 | `--wpds-color-fg-content-neutral-weak`                | Foreground color for content like text with weak emphasis.                                                                                  |
+| `--wpds-color-fg-content-success`                     | Foreground color for content like text with success tone and normal emphasis.                                                               |
+| `--wpds-color-fg-content-success-weak`                | Foreground color for content like text with success tone and weak emphasis.                                                                 |
+| `--wpds-color-fg-content-info`                        | Foreground color for content like text with info tone and normal emphasis.                                                                  |
+| `--wpds-color-fg-content-info-weak`                   | Foreground color for content like text with info tone and weak emphasis.                                                                    |
+| `--wpds-color-fg-content-warning`                     | Foreground color for content like text with warning tone and normal emphasis.                                                               |
+| `--wpds-color-fg-content-warning-weak`                | Foreground color for content like text with warning tone and weak emphasis.                                                                 |
+| `--wpds-color-fg-content-caution`                     | Foreground color for content like text with caution tone and normal emphasis.                                                               |
+| `--wpds-color-fg-content-caution-weak`                | Foreground color for content like text with caution tone and weak emphasis.                                                                 |
+| `--wpds-color-fg-content-error`                       | Foreground color for content like text with error tone and normal emphasis.                                                                 |
+| `--wpds-color-fg-content-error-weak`                  | Foreground color for content like text with error tone and weak emphasis.                                                                   |
 | `--wpds-color-fg-interactive-neutral`                 | Foreground color for interactive elements with neutral tone and normal emphasis.                                                            |
 | `--wpds-color-fg-interactive-neutral-active`          | Foreground color for interactive elements with neutral tone and normal emphasis that are hovered, focused, or active.                       |
 | `--wpds-color-fg-interactive-neutral-disabled`        | Foreground color for interactive elements with neutral tone and normal emphasis, in their disabled state.                                   |
@@ -281,3 +293,25 @@ Do not edit directly.
 | `--wpds-color-private-bg-bg-fill-inverted1`      | N/A         |
 | `--wpds-color-private-bg-fg-fill-inverted`       | N/A         |
 | `--wpds-color-private-bg-surface1`               | N/A         |
+| `--wpds-color-private-caution-bg-fill1`          | N/A         |
+| `--wpds-color-private-caution-fg-fill`           | N/A         |
+| `--wpds-color-private-caution-bg-fill2`          | N/A         |
+| `--wpds-color-private-caution-surface2`          | N/A         |
+| `--wpds-color-private-caution-surface6`          | N/A         |
+| `--wpds-color-private-caution-surface5`          | N/A         |
+| `--wpds-color-private-caution-surface4`          | N/A         |
+| `--wpds-color-private-caution-surface3`          | N/A         |
+| `--wpds-color-private-caution-fg-surface4`       | N/A         |
+| `--wpds-color-private-caution-fg-surface3`       | N/A         |
+| `--wpds-color-private-caution-fg-surface2`       | N/A         |
+| `--wpds-color-private-caution-fg-surface1`       | N/A         |
+| `--wpds-color-private-caution-stroke3`           | N/A         |
+| `--wpds-color-private-caution-stroke4`           | N/A         |
+| `--wpds-color-private-caution-stroke2`           | N/A         |
+| `--wpds-color-private-caution-stroke1`           | N/A         |
+| `--wpds-color-private-caution-bg-fill-dark`      | N/A         |
+| `--wpds-color-private-caution-fg-fill-dark`      | N/A         |
+| `--wpds-color-private-caution-bg-fill-inverted2` | N/A         |
+| `--wpds-color-private-caution-bg-fill-inverted1` | N/A         |
+| `--wpds-color-private-caution-fg-fill-inverted`  | N/A         |
+| `--wpds-color-private-caution-surface1`          | N/A         |
