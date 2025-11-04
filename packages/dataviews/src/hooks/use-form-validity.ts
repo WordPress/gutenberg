@@ -302,13 +302,24 @@ function handleElementsValidationAsync< Item >(
 				return;
 			}
 
+			let errorMessage;
+			if ( error instanceof Error ) {
+				errorMessage = error.message;
+			} else {
+				errorMessage =
+					String( error ) ||
+					__(
+						'Unknown error when running elements validation asynchronously.'
+					);
+			}
+
 			setFormValidity( ( prev ) => {
 				const newFormValidity = setValidityAtPath(
 					prev,
 					{
 						elements: {
 							type: 'invalid',
-							message: error.message,
+							message: errorMessage,
 						},
 					},
 					[ ...path, formField.id ]
@@ -386,13 +397,24 @@ function handleCustomValidationAsync< Item >(
 				return;
 			}
 
+			let errorMessage;
+			if ( error instanceof Error ) {
+				errorMessage = error.message;
+			} else {
+				errorMessage =
+					String( error ) ||
+					__(
+						'Unknown error when running custom validation asynchronously.'
+					);
+			}
+
 			setFormValidity( ( prev ) => {
 				const newFormValidity = setValidityAtPath(
 					prev,
 					{
 						custom: {
 							type: 'invalid',
-							message: error.message,
+							message: errorMessage,
 						},
 					},
 					[ ...path, formField.id ]
@@ -509,7 +531,7 @@ function validateFormField< Item >(
 				),
 				formField.field
 			);
-		} catch ( error: any ) {
+		} catch ( error ) {
 			let errorMessage;
 			if ( error instanceof Error ) {
 				errorMessage = error.message;
@@ -518,6 +540,7 @@ function validateFormField< Item >(
 					String( error ) ||
 					__( 'Unknown error when running custom validation.' );
 			}
+
 			return {
 				custom: {
 					type: 'invalid',
