@@ -1440,17 +1440,13 @@ const LayoutCardComponent = ( {
 
 	const form: Form = useMemo(
 		() => ( {
-			layout: getLayoutFromStoryArgs( {
-				type: 'card',
-				withHeader,
-			} ),
 			fields: [
 				{
 					id: 'customerCard',
 					layout: {
 						type: 'card',
 						summary: 'plan-summary',
-						isCollapsible,
+						withHeader,
 					},
 					label: 'Customer',
 					description:
