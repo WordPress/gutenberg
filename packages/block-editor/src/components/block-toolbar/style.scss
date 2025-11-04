@@ -151,12 +151,6 @@
 
 // Block controls.
 .block-editor-block-toolbar__block-controls {
-	// Block icon sizing for switcher, pattern overrides, and disabled button.
-	.block-editor-block-icon {
-		width: $button-size-small !important;
-		margin: 0 !important;
-	}
-
 	// @todo override toolbar group inherited paddings from components/block-tools/style.scss.
 	// This is best fixed by making the mover control area a proper single toolbar group.
 	.components-toolbar-group {
