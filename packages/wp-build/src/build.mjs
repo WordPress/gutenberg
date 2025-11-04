@@ -23,7 +23,11 @@ import { camelCase } from 'change-case';
 /**
  * Internal dependencies
  */
-import { groupByDepth, findScriptsToRebundle } from './dependency-graph.mjs';
+import {
+	groupByDepth,
+	findScriptsToRebundle,
+	findRoutesToRebuild,
+} from './dependency-graph.mjs';
 import {
 	generatePhpFromTemplate,
 	getPhpReplacements,
@@ -103,6 +107,27 @@ const wordpressExternalsPlugin = createWordpressExternalsPlugin(
 	EXTERNAL_NAMESPACES,
 	HANDLE_PREFIX
 );
+
+const styleBundlingPlugins = [
+	// Handle CSS modules (.module.css and .module.scss)
+	sassPlugin( {
+		embedded: true,
+		filter: /\.module\.(css|scss)$/,
+		transform: postcssModules( {
+			generateScopedName: '[name]__[local]__[hash:base64:5]',
+		} ),
+		type: 'style',
+		loadPaths: [ 'node_modules', path.join( PACKAGES_DIR, 'base-styles' ) ],
+	} ),
+	// Handle regular CSS/SCSS files
+	// Note: .module.css and .module.scss already handled by plugin above
+	sassPlugin( {
+		embedded: true,
+		filter: /\.(css|scss)$/,
+		type: 'style',
+		loadPaths: [ 'node_modules', path.join( PACKAGES_DIR, 'base-styles' ) ],
+	} ),
+];
 
 /**
  * Normalize path separators for cross-platform compatibility.
@@ -308,12 +333,6 @@ async function bundlePackage( packageName ) {
 				'iife',
 				packageJson.wpScriptExtraDependencies || []
 			),
-			sassPlugin( {
-				embedded: true,
-				filter: /\.module\.css$/,
-				transform: postcssModules( {} ),
-				type: 'style',
-			} ),
 		];
 
 		builds.push(
@@ -842,30 +861,7 @@ async function transpilePackage( packageName ) {
 	const plugins = [
 		needsEmotionPlugin && emotionPlugin,
 		externalizeAllExceptCssPlugin,
-		// Handle CSS modules (.module.css and .module.scss)
-		sassPlugin( {
-			embedded: true,
-			filter: /\.module\.(css|scss)$/,
-			transform: postcssModules( {
-				generateScopedName: '[name]__[local]__[hash:base64:5]',
-			} ),
-			type: 'style',
-			loadPaths: [
-				'node_modules',
-				path.join( PACKAGES_DIR, 'base-styles' ),
-			],
-		} ),
-		// Handle regular CSS/SCSS files
-		// Note: .module.css and .module.scss already handled by plugin above
-		sassPlugin( {
-			embedded: true,
-			filter: /\.(css|scss)$/,
-			type: 'style',
-			loadPaths: [
-				'node_modules',
-				path.join( PACKAGES_DIR, 'base-styles' ),
-			],
-		} ),
+		...styleBundlingPlugins,
 	].filter( Boolean );
 
 	if ( packageJson.main ) {
@@ -1123,30 +1119,33 @@ async function buildRoute( routeName ) {
 		} );
 
 		if ( routeEntryPoints.length > 0 ) {
-			await esbuild.build( {
-				entryPoints: routeEntryPoints,
-				outfile: path.join( outputDir, 'route.js' ),
-				bundle: true,
-				format: 'esm',
-				target: browserslistToEsbuild(),
-				define: getDefine( false ),
-				plugins: [
-					wordpressExternalsPlugin( 'route.min', 'esm' ),
-					babel( {
-						filter: /\.(tsx?)$/,
-						config: {
-							presets: [
-								'@babel/preset-typescript',
-								[
-									'@babel/preset-react',
-									{ runtime: 'automatic' },
-								],
-							],
-							plugins: [ '@emotion/babel-plugin' ],
-						},
-					} ),
-				],
-			} );
+			const routePlugins = [
+				wordpressExternalsPlugin( 'route.min', 'esm' ),
+			];
+
+			// Build both minified and non-minified versions in parallel
+			await Promise.all( [
+				esbuild.build( {
+					entryPoints: routeEntryPoints,
+					outfile: path.join( outputDir, 'route.min.js' ),
+					bundle: true,
+					format: 'esm',
+					target: browserslistToEsbuild(),
+					minify: true,
+					define: getDefine( false ),
+					plugins: routePlugins,
+				} ),
+				esbuild.build( {
+					entryPoints: routeEntryPoints,
+					outfile: path.join( outputDir, 'route.js' ),
+					bundle: true,
+					format: 'esm',
+					target: browserslistToEsbuild(),
+					minify: false,
+					define: getDefine( true ),
+					plugins: routePlugins,
+				} ),
+			] );
 		}
 	}
 
@@ -1158,27 +1157,36 @@ async function buildRoute( routeName ) {
 
 		// Write temporary entry file
 		await writeFile( tempEntryPath, syntheticEntry );
-		await esbuild.build( {
-			entryPoints: [ tempEntryPath ],
-			outfile: path.join( outputDir, 'content.js' ),
-			bundle: true,
-			format: 'esm',
-			target: browserslistToEsbuild(),
-			define: getDefine( false ),
-			plugins: [
-				wordpressExternalsPlugin( 'content.min', 'esm' ),
-				babel( {
-					filter: /\.(tsx?)$/,
-					config: {
-						presets: [
-							'@babel/preset-typescript',
-							[ '@babel/preset-react', { runtime: 'automatic' } ],
-						],
-						plugins: [ '@emotion/babel-plugin' ],
-					},
-				} ),
-			],
-		} );
+
+		const contentPlugins = [
+			wordpressExternalsPlugin( 'content.min', 'esm' ),
+			...styleBundlingPlugins,
+		];
+
+		// Build both minified and non-minified versions in parallel
+		await Promise.all( [
+			esbuild.build( {
+				entryPoints: [ tempEntryPath ],
+				outfile: path.join( outputDir, 'content.min.js' ),
+				bundle: true,
+				format: 'esm',
+				target: browserslistToEsbuild(),
+				minify: true,
+				define: getDefine( false ),
+				plugins: contentPlugins,
+			} ),
+			esbuild.build( {
+				entryPoints: [ tempEntryPath ],
+				outfile: path.join( outputDir, 'content.js' ),
+				bundle: true,
+				format: 'esm',
+				target: browserslistToEsbuild(),
+				minify: false,
+				define: getDefine( true ),
+				plugins: contentPlugins,
+			} ),
+		] );
+
 		await unlink( tempEntryPath );
 	}
 
@@ -1330,6 +1338,9 @@ async function watchMode() {
 	}
 	const allFullNames = Array.from( shortToFull.values() );
 
+	// Get all routes for dependency tracking
+	const allRoutes = getAllRoutes( ROOT_DIR );
+
 	/**
 	 * Rebuild a package and any affected scripts/modules.
 	 *
@@ -1366,8 +1377,49 @@ async function watchMode() {
 					);
 				}
 			}
+
+			// Find and rebuild affected routes
+			const affectedRoutes = findRoutesToRebuild(
+				fullName,
+				allFullNames,
+				ROOT_DIR,
+				allRoutes
+			);
+
+			for ( const route of affectedRoutes ) {
+				try {
+					const rebuildStartTime = Date.now();
+					await buildRoute( route );
+					const rebuildTime = Date.now() - rebuildStartTime;
+					console.log(
+						`✅ routes/${ route } (rebuilt) (${ rebuildTime }ms)`
+					);
+				} catch ( error ) {
+					console.log(
+						`❌ routes/${ route } - Rebuild error: ${ error.message }`
+					);
+				}
+			}
 		} catch ( error ) {
 			console.log( `❌ ${ packageName } - Error: ${ error.message }` );
+		}
+	}
+
+	/**
+	 * Rebuild a route.
+	 *
+	 * @param {string} routeName Route to rebuild.
+	 */
+	async function rebuildRoute( routeName ) {
+		try {
+			const startTime = Date.now();
+			await buildRoute( routeName );
+			const buildTime = Date.now() - startTime;
+			console.log( `✅ routes/${ routeName } (${ buildTime }ms)` );
+		} catch ( error ) {
+			console.log(
+				`❌ routes/${ routeName } - Error: ${ error.message }`
+			);
 		}
 	}
 
@@ -1377,11 +1429,17 @@ async function watchMode() {
 			return;
 		}
 
-		const packagesToRebuild = Array.from( needsRebuild );
+		const itemsToRebuild = Array.from( needsRebuild );
 		needsRebuild.clear();
 
-		for ( const packageName of packagesToRebuild ) {
-			await rebuildPackage( packageName );
+		for ( const item of itemsToRebuild ) {
+			// Check if it's a route (prefixed with 'route:')
+			if ( item.startsWith( 'route:' ) ) {
+				const routeName = item.slice( 6 ); // Remove 'route:' prefix
+				await rebuildRoute( routeName );
+			} else {
+				await rebuildPackage( item );
+			}
 		}
 
 		await processNextRebuild();
@@ -1443,6 +1501,54 @@ async function watchMode() {
 	watcher.on( 'change', handleFileChange );
 	watcher.on( 'add', handleFileChange );
 	watcher.on( 'unlink', handleFileChange );
+
+	// Watch route files if routes exist
+	if ( allRoutes.length > 0 ) {
+		const routeWatchPaths = allRoutes.map( ( routeName ) =>
+			path.join( ROOT_DIR, 'routes', routeName )
+		);
+
+		const routeWatcher = chokidar.watch( routeWatchPaths, {
+			persistent: true,
+			ignoreInitial: true,
+			useFsEvents: true,
+			depth: 10,
+			awaitWriteFinish: {
+				stabilityThreshold: 100,
+				pollInterval: 50,
+			},
+		} );
+
+		routeWatcher.on( 'error', ( error ) => {
+			console.error( '❌ Route watcher error:', error );
+		} );
+
+		const handleRouteFileChange = async ( filename ) => {
+			// Extract route name from path: routes/{routeName}/...
+			const routeMatch = filename.match( /routes[/\\]([^/\\]+)[/\\]/ );
+			if ( ! routeMatch ) {
+				return;
+			}
+
+			const routeName = routeMatch[ 1 ];
+			if ( ! allRoutes.includes( routeName ) ) {
+				return;
+			}
+
+			if ( isRebuilding ) {
+				needsRebuild.add( `route:${ routeName }` );
+				return;
+			}
+
+			isRebuilding = true;
+			await rebuildRoute( routeName );
+			await processNextRebuild();
+		};
+
+		routeWatcher.on( 'change', handleRouteFileChange );
+		routeWatcher.on( 'add', handleRouteFileChange );
+		routeWatcher.on( 'unlink', handleRouteFileChange );
+	}
 }
 
 /**

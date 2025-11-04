@@ -24,7 +24,7 @@ if ( ! function_exists( '{{NAMESPACE}}_register_routes' ) ) {
 
 		foreach ( $routes as $route ) {
 			// Register content module
-			$content_asset_path = $routes_dir . '/' . $route['name'] . '/content.asset.php';
+			$content_asset_path = $routes_dir . '/' . $route['name'] . '/content.min.asset.php';
 			$content_asset      = file_exists( $content_asset_path ) ? require $content_asset_path : array();
 			$content_handle     = '{{HANDLE_PREFIX}}/routes/' . $route['name'] . '/content';
 
@@ -39,7 +39,7 @@ if ( ! function_exists( '{{NAMESPACE}}_register_routes' ) ) {
 
 			// Register route module if it exists
 			if ( isset( $route['has_route'] ) && $route['has_route'] ) {
-				$route_asset_path = $routes_dir . '/' . $route['name'] . '/route.asset.php';
+				$route_asset_path = $routes_dir . '/' . $route['name'] . '/route.min.asset.php';
 				$route_asset      = file_exists( $route_asset_path ) ? require $route_asset_path : array();
 				$route_handle     = '{{HANDLE_PREFIX}}/routes/' . $route['name'] . '/route';
 
