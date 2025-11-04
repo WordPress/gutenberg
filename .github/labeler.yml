@@ -82,8 +82,6 @@
 
 '[Package] E2E Tests':
     - changed-files:
-          - any-glob-to-any-file: 'packages/e2e-tests/**'
-          - any-glob-to-any-file: 'packages/e2e-test-utils/**'
           - any-glob-to-any-file: 'packages/e2e-test-utils-playwright/**'
 
 '[Package] Edit Post':
