@@ -46,7 +46,6 @@ interface TableColumnFieldProps< Item > {
 }
 
 interface TableRowProps< Item > {
-	hasBulkActions: boolean;
 	item: Item;
 	actions: Action< Item >[];
 	fields: NormalizedField< Item >[];
@@ -86,7 +85,6 @@ function TableColumnField< Item >( {
 }
 
 function TableRow< Item >( {
-	hasBulkActions,
 	item,
 	actions,
 	fields,
@@ -162,20 +160,19 @@ function TableRow< Item >( {
 				}
 			} }
 		>
-			{ hasBulkActions && (
-				<td className="dataviews-view-table__checkbox-column">
-					<div className="dataviews-view-table__cell-content-wrapper">
-						<DataViewsSelectionCheckbox
-							item={ item }
-							selection={ selection }
-							onChangeSelection={ onChangeSelection }
-							getItemId={ getItemId }
-							titleField={ titleField }
-							disabled={ ! hasPossibleBulkAction }
-						/>
-					</div>
-				</td>
-			) }
+			<td className="dataviews-view-table__checkbox-column">
+				<div className="dataviews-view-table__cell-content-wrapper">
+					<DataViewsSelectionCheckbox
+						item={ item }
+						selection={ selection }
+						onChangeSelection={ onChangeSelection }
+						getItemId={ getItemId }
+						titleField={ titleField }
+						disabled={ ! hasPossibleBulkAction }
+					/>
+				</div>
+			</td>
+
 			{ hasPrimaryColumn && (
 				<td>
 					<ColumnPrimary
@@ -409,7 +406,6 @@ function ViewPickerTable< Item >( {
 									<TableRow
 										key={ getItemId( item ) }
 										item={ item }
-										hasBulkActions={ hasBulkActions }
 										actions={ actions }
 										fields={ fields }
 										id={
@@ -435,7 +431,6 @@ function ViewPickerTable< Item >( {
 								<TableRow
 									key={ getItemId( item ) }
 									item={ item }
-									hasBulkActions={ hasBulkActions }
 									actions={ actions }
 									fields={ fields }
 									id={ getItemId( item ) || index.toString() }
