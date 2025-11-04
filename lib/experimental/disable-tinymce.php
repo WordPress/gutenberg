@@ -44,7 +44,7 @@ function gutenberg_enqueue_tinymce_proxy() {
 add_action( 'admin_enqueue_scripts', 'gutenberg_enqueue_tinymce_proxy' );
 
 /**
- * Dequeue the `mce-view` script as it was only necessary for the Classic block
+ * Dequeue the `mce-view` script as it was only necessary for the Classic block.
  */
 function gutenberg_wp_enqueue_media() {
 	wp_dequeue_script( 'mce-view' );
