@@ -155,14 +155,23 @@ export const activeField = {
 	type: 'boolean',
 	getValue: ( { item } ) => item._isActive,
 	render: function Render( { item } ) {
-		const activeLabel = item._isCustom
-			? _x( 'Active when used', 'template' )
-			: _x( 'Active', 'template' );
-		const activeIntent = item._isCustom ? 'info' : 'success';
+		if ( item._isCustom ) {
+			return (
+				<Badge
+					intent="info"
+					title={ __(
+						'Custom templates cannot be active nor inactive.'
+					) }
+				>
+					{ __( 'N/A' ) }
+				</Badge>
+			);
+		}
+
 		const isActive = item._isActive;
 		return (
-			<Badge intent={ isActive ? activeIntent : 'default' }>
-				{ isActive ? activeLabel : _x( 'Inactive', 'template' ) }
+			<Badge intent={ isActive ? 'success' : 'default' }>
+				{ isActive ? __( 'Active' ) : __( 'Inactive' ) }
 			</Badge>
 		);
 	},
@@ -172,20 +181,17 @@ export const useThemeField = () => {
 	const activeTheme = useSelect( ( select ) =>
 		select( coreStore ).getCurrentTheme()
 	);
-	return useMemo(
-		() => ( {
-			label: __( 'Compatible Theme' ),
-			id: 'theme',
-			getValue: ( { item } ) => item.theme,
-			render: function Render( { item } ) {
-				if ( item.theme === activeTheme.stylesheet ) {
-					return <Badge intent="success">{ item.theme }</Badge>;
-				}
-				return <Badge intent="error">{ item.theme }</Badge>;
-			},
-		} ),
-		[ activeTheme ]
-	);
+	return {
+		label: __( 'Compatible Theme' ),
+		id: 'theme',
+		getValue: ( { item } ) => item.theme,
+		render: function Render( { item } ) {
+			if ( item.theme === activeTheme.stylesheet ) {
+				return <Badge intent="success">{ item.theme }</Badge>;
+			}
+			return <Badge intent="error">{ item.theme }</Badge>;
+		},
+	};
 };
 
 export const slugField = {

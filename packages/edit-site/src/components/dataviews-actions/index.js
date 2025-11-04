@@ -44,7 +44,7 @@ export const useSetActiveTemplateAction = () => {
 					return item._isActive === false;
 				}
 
-				return true;
+				return ! item._isCustom;
 			},
 			async callback( items ) {
 				const deactivate = items.some( ( item ) => item._isActive );

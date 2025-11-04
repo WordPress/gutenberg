@@ -38,12 +38,7 @@ export default function DataviewsTemplatesSidebarContent() {
 	const {
 		query: { activeView = 'active' },
 	} = useLocation();
-	const { records } = useEntityRecords( 'root', 'registeredTemplate', {
-		// This should not be needed, the endpoint returns all registered
-		// templates, but it's not possible right now to turn off pagination for
-		// entity configs.
-		per_page: -1,
-	} );
+	const { records } = useEntityRecords( 'root', 'registeredTemplate' );
 	const firstItemPerAuthorText = useMemo( () => {
 		const firstItemPerAuthor = records?.reduce( ( acc, template ) => {
 			const author = template.author_text;

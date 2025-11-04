@@ -93,15 +93,12 @@ export default function PageTemplates() {
 			combinedTemplates: false,
 		} );
 	const { records: staticRecords, isResolving: isLoadingStaticData } =
-		useEntityRecordsWithPermissions( 'root', 'registeredTemplate', {
-			// This should not be needed, the endpoint returns all registered
-			// templates, but it's not possible right now to turn off pagination
-			// for entity configs.
-			per_page: -1,
-		} );
+		useEntityRecordsWithPermissions( 'root', 'registeredTemplate' );
 
 	const activeTemplates = useMemo( () => {
-		const _active = [ ...staticRecords ];
+		const _active = [ ...staticRecords ].filter(
+			( record ) => ! record.is_custom
+		);
 		if ( activeTemplatesOption ) {
 			for ( const activeSlug in activeTemplatesOption ) {
 				const activeId = activeTemplatesOption[ activeSlug ];
@@ -126,55 +123,37 @@ export default function PageTemplates() {
 		return _active;
 	}, [ userRecords, staticRecords, activeTemplatesOption, activeTheme ] );
 
+	let _records;
 	let isLoadingData;
 	if ( activeView === 'active' ) {
+		_records = activeTemplates;
 		isLoadingData = isLoadingUserRecords || isLoadingStaticData;
 	} else if ( activeView === 'user' ) {
+		_records = userRecords;
 		isLoadingData = isLoadingUserRecords;
 	} else {
+		_records = staticRecords;
 		isLoadingData = isLoadingStaticData;
 	}
 
 	const records = useMemo( () => {
-		function isCustom( record ) {
-			// For registered templates, the is_custom field is defined.
-			return (
+		return _records.map( ( record ) => ( {
+			...record,
+			_isActive: !! activeTemplates.find(
+				( template ) => template.id === record.id
+			),
+			_isCustom:
+				// For registered templates, the is_custom field is defined.
 				record.is_custom ??
 				// For user templates it's custom if the is_wp_suggestion meta
 				// field is not set and the slug is not found in the default
 				// template types.
 				( ! record.meta?.is_wp_suggestion &&
-					! defaultTemplateTypes.some(
+					! defaultTemplateTypes.find(
 						( type ) => type.slug === record.slug
-					) )
-			);
-		}
-
-		let _records;
-		if ( activeView === 'active' ) {
-			// Don't show active custom templates in the active view.
-			_records = activeTemplates.filter(
-				( record ) => ! isCustom( record )
-			);
-		} else if ( activeView === 'user' ) {
-			_records = userRecords;
-		} else {
-			_records = staticRecords;
-		}
-		return _records.map( ( record ) => ( {
-			...record,
-			_isActive: activeTemplates.some(
-				( template ) => template.id === record.id
-			),
-			_isCustom: isCustom( record ),
+					) ),
 		} ) );
-	}, [
-		activeTemplates,
-		defaultTemplateTypes,
-		userRecords,
-		staticRecords,
-		activeView,
-	] );
+	}, [ _records, activeTemplates, defaultTemplateTypes ] );
 
 	const users = useSelect(
 		( select ) => {
