@@ -332,7 +332,7 @@ Add text that automatically scales to fit its container. ([Source](https://githu
 
 -	**Name:** core/fit-text
 -	**Category:** text
--	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, className, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (lineHeight)
+-	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, className, color (background, gradients, text), interactivity (clientNavigation), spacing (margin, padding), typography (lineHeight)
 -	**Attributes:** content, level, levelOptions
 
 ## Footnotes
