@@ -63,7 +63,7 @@ The design system defines color tokens using the following naming scheme:
 
 ## Theme Provider
 
-The `ThemeProvider` is a React component that should wrap your application to provide design tokens and theme context to the child UI components.
+The `ThemeProvider` is a React component that should wrap your application to provide design tokens and theme context to the child UI components. It accepts a set of customizable seed values and automatically generates a set of design tokens, which are exposed as CSS custom properties for use throughout the application.
 
 ```tsx
 import { ThemeProvider } from '@wordpress/theme';
