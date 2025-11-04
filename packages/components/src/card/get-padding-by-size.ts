@@ -9,15 +9,8 @@ import { css, type SerializedStyles } from '@emotion/react';
 import type { Props, SizeToken } from './types';
 import { space } from '../utils/space';
 
-const CONFIG = {
-	cardPaddingXSmall: `${ space( 2 ) }`,
-	cardPaddingSmall: `${ space( 4 ) }`,
-	cardPaddingMedium: `${ space( 4 ) } ${ space( 6 ) }`,
-	cardPaddingLarge: `${ space( 6 ) } ${ space( 8 ) }`,
-};
-
 const xSmallCardPadding = css`
-	padding: ${ CONFIG.cardPaddingXSmall };
+	padding: ${ space( 2 ) };
 `;
 
 export const cardPaddings = {
@@ -25,13 +18,13 @@ export const cardPaddings = {
 		padding: 0;
 	`,
 	large: css`
-		padding: ${ CONFIG.cardPaddingLarge };
+		padding: ${ space( 6 ) } ${ space( 8 ) };
 	`,
 	medium: css`
-		padding: ${ CONFIG.cardPaddingMedium };
+		padding: ${ space( 4 ) } ${ space( 6 ) };
 	`,
 	small: css`
-		padding: ${ CONFIG.cardPaddingSmall };
+		padding: ${ space( 4 ) };
 	`,
 	xSmall: xSmallCardPadding,
 	// The `extraSmall` size is not officially documented, but the following styles
