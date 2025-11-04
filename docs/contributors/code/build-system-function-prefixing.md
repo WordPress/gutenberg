@@ -1,14 +1,14 @@
-# Build System: Function Prefixing and Block Loading
+# Build system: Function prefixing and block loading
 
 Gutenberg uses a build system that automatically transforms PHP function names to avoid conflicts with WordPress Core. This system allows Gutenberg to use standard WordPress function names in source code while ensuring the plugin can coexist with WordPress Core without naming collisions.
 
-## Key Concept
+## Key concept
 
 **Source files use standard WordPress function names** (e.g., `block_core_navigation_link_build_css_colors`), but **the build system transforms them to prefixed versions** (e.g., `gutenberg_block_core_navigation_link_build_css_colors`) in the built files that are actually loaded at runtime.
 
-## How the System Works
+## How the system works
 
-### Source Code Structure
+### Source code structure
 
 Gutenberg's source code is organized in the `packages/` directory:
 
@@ -24,7 +24,7 @@ packages/block-library/src/
 └── ...
 ```
 
-### Build Process
+### Build process
 
 The build system is configured in `packages/block-library/package.json` and transforms:
 
@@ -32,7 +32,7 @@ The build system is configured in `packages/block-library/package.json` and tran
 -   **Function calls**: `wp_get_typography_font_size_value()` → `gutenberg_get_typography_font_size_value()`
 -   **Class names**: `WP_Style_Engine` → `WP_Style_Engine_Gutenberg`
 
-### Built File Locations
+### Built file locations
 
 The build system creates transformed files in the `build/` directory:
 
@@ -52,14 +52,14 @@ build/
 
 The `lib/blocks.php` file loads built blocks in priority order.
 
-## Why This System is Necessary
+## Why this system is necessary
 
 -   **Avoids function name conflicts** between WordPress Core and Gutenberg plugin
 -   **Enables backport compatibility** - Gutenberg can continue using prefixed versions when functions are backported to Core
 -   **Provides plugin independence** - Gutenberg can evolve independently of WordPress Core release cycles
 -   **Allows testing isolation** - Tests can target specific function versions (Gutenberg vs Core)
 
-## Testing Built PHP Functions
+## Testing built PHP functions
 
 For information on how to test the built (prefixed) PHP functions, see the [Testing Prefixed Functions](/docs/contributors/code/testing-overview.md#testing-prefixed-functions) section in the testing overview documentation.
 
