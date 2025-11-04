@@ -334,19 +334,12 @@ async function templateActivationNotice( { select, registry } ) {
 		return;
 	}
 
-	const currentTheme = await registry
-		.resolveSelect( coreStore )
-		.getCurrentTheme();
-	const templateType = currentTheme?.default_template_types.find(
-		( type ) => type.slug === slug
-	);
-
 	await registry.dispatch( noticesStore ).createNotice(
 		'info',
 		sprintf(
-			// translators: %s: The name (or slug) of the type of template.
-			__( 'Do you want to activate this "%s" template?' ),
-			templateType?.title ?? slug
+			// translators: %s: template slug
+			__( 'This is a "%s" template. Do you want to activate it?' ),
+			slug
 		),
 		{
 			id: 'template-activate-notice',

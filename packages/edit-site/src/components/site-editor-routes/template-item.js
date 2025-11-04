@@ -37,3 +37,9 @@ export const templateItemRoute = {
 	path: '/wp_template/*postId',
 	areas,
 };
+
+export const staticTemplateItemRoute = {
+	name: 'static-template-item',
+	path: '/wp_registered_template/*postId',
+	areas,
+};

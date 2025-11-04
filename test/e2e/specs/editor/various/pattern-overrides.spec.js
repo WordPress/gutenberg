@@ -430,7 +430,7 @@ test.describe( 'Pattern Overrides', () => {
 
 			await admin.visitSiteEditor( {
 				postId: 'emptytheme//index',
-				postType: 'wp_template',
+				postType: 'wp_registered_template',
 				canvas: 'edit',
 			} );
 
