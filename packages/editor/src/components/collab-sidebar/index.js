@@ -208,22 +208,17 @@ function NotesSidebar( { postId, mode } ) {
 }
 
 export default function NotesSidebarContainer() {
-	const { postId, mode, editorMode, isDistractionFree } = useSelect(
-		( select ) => {
-			const { getCurrentPostId, getRenderingMode, getEditorMode } =
-				select( editorStore );
-			const { getSettings } = select( blockEditorStore );
-			return {
-				postId: getCurrentPostId(),
-				mode: getRenderingMode(),
-				editorMode: getEditorMode(),
-				isDistractionFree: getSettings().isDistractionFree,
-			};
-		},
-		[]
-	);
+	const { postId, mode, editorMode } = useSelect( ( select ) => {
+		const { getCurrentPostId, getRenderingMode, getEditorMode } =
+			select( editorStore );
+		return {
+			postId: getCurrentPostId(),
+			mode: getRenderingMode(),
+			editorMode: getEditorMode(),
+		};
+	}, [] );
 
-	if ( ! postId || typeof postId !== 'number' || isDistractionFree ) {
+	if ( ! postId || typeof postId !== 'number' ) {
 		return null;
 	}
 
