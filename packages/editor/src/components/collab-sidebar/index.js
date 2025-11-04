@@ -137,7 +137,7 @@ function NotesSidebar( { postId, mode } ) {
 
 		if ( currentThread?.status === 'approved' ) {
 			enableComplementaryArea( 'core', collabHistorySidebarName );
-		} else if ( ! activeNotesArea ) {
+		} else if ( ! activeNotesArea || ! showAllNotesSidebar ) {
 			enableComplementaryArea(
 				'core',
 				showFloatingSidebar
