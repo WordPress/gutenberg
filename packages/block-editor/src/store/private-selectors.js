@@ -488,7 +488,7 @@ export const getContentLockingParent = ( state, clientId ) => {
  * @param {Object} state    Global application state.
  * @param {string} clientId Client Id of the block.
  *
- * @return {?string} Client ID of the ancestor block that is content locking the block.
+ * @return {?string} Client ID of the ancestor block that is a contentOnly section.
  */
 export const getParentSectionBlock = ( state, clientId ) => {
 	let current = clientId;
@@ -502,12 +502,12 @@ export const getParentSectionBlock = ( state, clientId ) => {
 };
 
 /**
- * Retrieves the client ID is a content locking parent
+ * Returns whether the block is a contentOnly section.
  *
  * @param {Object} state    Global application state.
  * @param {string} clientId Client Id of the block.
  *
- * @return {boolean} Whether the block is a content locking parent.
+ * @return {boolean} Whether the block is a contentOnly section.
  */
 export function isSectionBlock( state, clientId ) {
 	const blockName = getBlockName( state, clientId );
@@ -531,7 +531,7 @@ export function isSectionBlock( state, clientId ) {
 
 /**
  * Retrieves the client ID of the block that is a contentOnly section but is
- * currently being temporarily edited.
+ * currently being temporarily edited (contentOnly is deactivated).
  *
  * @param {Object} state Global application state.
  *
