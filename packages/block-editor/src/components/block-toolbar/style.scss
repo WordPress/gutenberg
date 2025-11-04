@@ -62,7 +62,7 @@
 
 	&.is-synced,
 	&.is-connected {
-		.block-editor-block-toolbar__block-controls .block-editor-block-icon {
+		.block-editor-block-icon {
 			color: var(--wp-block-synced-color);
 		}
 	}
