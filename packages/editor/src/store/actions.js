@@ -273,12 +273,7 @@ export const savePost =
 		}
 		dispatch( { type: 'REQUEST_POST_UPDATE_FINISH', options } );
 
-		if (
-			! options.isAutosave &&
-			previousRecord.type === 'wp_template' &&
-			( typeof previousRecord.id === 'number' ||
-				/^\d+$/.test( previousRecord.id ) )
-		) {
+		if ( ! options.isAutosave && previousRecord.type === 'wp_template' ) {
 			templateActivationNotice( { select, dispatch, registry } );
 		}
 

@@ -30,7 +30,7 @@ const postTypesWithoutParentTemplate = [
 
 const authorizedPostTypes = [ 'page', 'post' ];
 
-function getPostType( name ) {
+function getPostType( name, postId ) {
 	let postType;
 	if ( name === 'navigation-item' ) {
 		postType = NAVIGATION_POST_TYPE;
@@ -39,7 +39,9 @@ function getPostType( name ) {
 	} else if ( name === 'template-part-item' ) {
 		postType = TEMPLATE_PART_POST_TYPE;
 	} else if ( name === 'templates' ) {
-		postType = TEMPLATE_POST_TYPE;
+		postType = /^\d+$/.test( postId )
+			? TEMPLATE_POST_TYPE
+			: 'wp_registered_template';
 	} else if ( name === 'template-item' ) {
 		postType = TEMPLATE_POST_TYPE;
 	} else if ( name === 'static-template-item' ) {
@@ -124,6 +126,18 @@ export function useResolveEditedEntity() {
 		[ homePage, postId, postType ]
 	);
 
+	const editableResolvedTemplateId = useSelect(
+		( select ) => {
+			if ( typeof resolvedTemplateId !== 'string' ) {
+				return resolvedTemplateId;
+			}
+			return unlock( select( coreDataStore ) ).getTemplateAutoDraftId(
+				resolvedTemplateId
+			);
+		},
+		[ resolvedTemplateId ]
+	);
+
 	const context = useMemo( () => {
 		if ( postTypesWithoutParentTemplate.includes( postType ) && postId ) {
 			return {};
@@ -147,9 +161,9 @@ export function useResolveEditedEntity() {
 
 	if ( !! homePage ) {
 		return {
-			isReady: resolvedTemplateId !== undefined,
+			isReady: editableResolvedTemplateId !== undefined,
 			postType: TEMPLATE_POST_TYPE,
-			postId: resolvedTemplateId,
+			postId: editableResolvedTemplateId,
 			context,
 		};
 	}

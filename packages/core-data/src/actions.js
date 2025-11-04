@@ -323,20 +323,8 @@ export const deleteEntityRecord =
 			} );
 
 			let hasError = false;
-			let { baseURL } = entityConfig;
-			if (
-				kind === 'postType' &&
-				name === 'wp_template' &&
-				recordId &&
-				typeof recordId === 'string' &&
-				! /^\d+$/.test( recordId )
-			) {
-				baseURL =
-					baseURL.slice( 0, baseURL.lastIndexOf( '/' ) ) +
-					'/templates';
-			}
 			try {
-				let path = `${ baseURL }/${ recordId }`;
+				let path = `${ entityConfig.baseURL }/${ recordId }`;
 
 				if ( query ) {
 					path = addQueryArgs( path, query );
@@ -539,6 +527,46 @@ export const saveEntityRecord =
 		const recordId = record[ entityIdKey ];
 		const isNewRecord = !! entityIdKey && ! recordId;
 
+		// When called with a theme template ID, trigger the compatibility
+		// logic.
+		if (
+			kind === 'postType' &&
+			name === 'wp_template' &&
+			typeof recordId === 'string' &&
+			! /^\d+$/.test( recordId )
+		) {
+			// Get the theme template.
+			const template = await select.getEntityRecord(
+				'postType',
+				'wp_registered_template',
+				recordId
+			);
+			// Duplicate the theme template and make the edit.
+			const newTemplate = await dispatch.saveEntityRecord(
+				'postType',
+				'wp_template',
+				{
+					...template,
+					...record,
+					id: undefined,
+					type: 'wp_template',
+					status: 'publish',
+				}
+			);
+			// Make the new template active.
+			const activeTemplates = await select.getEntityRecord(
+				'root',
+				'site'
+			);
+			await dispatch.saveEntityRecord( 'root', 'site', {
+				active_templates: {
+					...activeTemplates.active_templates,
+					[ newTemplate.slug ]: newTemplate.id,
+				},
+			} );
+			return newTemplate;
+		}
+
 		const lock = await dispatch.__unstableAcquireStoreLock(
 			STORE_NAME,
 			[ 'entities', 'records', kind, name, recordId || uuid() ],
@@ -576,21 +604,10 @@ export const saveEntityRecord =
 			let updatedRecord;
 			let error;
 			let hasError = false;
-			let { baseURL } = entityConfig;
-			// For "string" IDs, use the old templates endpoint.
-			if (
-				kind === 'postType' &&
-				name === 'wp_template' &&
-				recordId &&
-				typeof recordId === 'string' &&
-				! /^\d+$/.test( recordId )
-			) {
-				baseURL =
-					baseURL.slice( 0, baseURL.lastIndexOf( '/' ) ) +
-					'/templates';
-			}
 			try {
-				const path = `${ baseURL }${ recordId ? '/' + recordId : '' }`;
+				const path = `${ entityConfig.baseURL }${
+					recordId ? '/' + recordId : ''
+				}`;
 				// Skip the raw values check when creating a new record; they don't exist yet.
 				const persistedRecord = ! isNewRecord
 					? select.getRawEntityRecord( kind, name, recordId )
