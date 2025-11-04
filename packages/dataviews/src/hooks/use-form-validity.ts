@@ -549,7 +549,7 @@ function validateFormField< Item >(
 	}
 
 	// Validate its children.
-	if ( formField.children ) {
+	if ( formField.children.length > 0 ) {
 		const result: Record< string, FieldValidity | undefined > = {};
 		formField.children.forEach( ( child ) => {
 			result[ child.id ] = validateFormField( item, child, {
