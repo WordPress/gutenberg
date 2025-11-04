@@ -171,15 +171,6 @@ export default function FormCardField< Item >( {
 		[ field ]
 	);
 
-	const sizeCard = layout.withHeader
-		? {
-				blockStart: 'medium' as const,
-				blockEnd: 'medium' as const,
-				inlineStart: 'medium' as const,
-				inlineEnd: 'medium' as const,
-		  }
-		: undefined;
-
 	const { isOpen, CardHeader } = useCardHeader( layout );
 
 	const summaryFields = getSummaryFields< Item >( layout.summary, fields );
@@ -188,17 +179,24 @@ export default function FormCardField< Item >( {
 		isSummaryFieldVisible( summaryField, layout.summary, isOpen )
 	);
 
+	const sizeCard = {
+		blockStart: 'medium' as const,
+		blockEnd: 'medium' as const,
+		inlineStart: 'medium' as const,
+		inlineEnd: 'medium' as const,
+	};
+
 	if ( !! field.children ) {
 		const withHeader = !! field.label && layout.withHeader;
 
-		const sizeCardBody = withHeader
-			? {
-					blockStart: 'none' as const,
-					blockEnd: 'medium' as const,
-					inlineStart: 'medium' as const,
-					inlineEnd: 'medium' as const,
-			  }
-			: undefined;
+		const sizeCardBody = {
+			blockStart: withHeader
+				? ( 'none' as const )
+				: ( 'medium' as const ),
+			blockEnd: 'medium' as const,
+			inlineStart: 'medium' as const,
+			inlineEnd: 'medium' as const,
+		};
 
 		return (
 			<Card className="dataforms-layouts-card__field" size={ sizeCard }>
@@ -261,16 +259,15 @@ export default function FormCardField< Item >( {
 	}
 	const withHeader = !! fieldDefinition.label && layout.withHeader;
 
-	const sizeCardBody = withHeader
-		? {
-				blockStart: 'none' as const,
-				blockEnd: 'medium' as const,
-				inlineStart: 'medium' as const,
-				inlineEnd: 'medium' as const,
-		  }
-		: undefined;
+	const sizeCardBody = {
+		blockStart: withHeader ? ( 'none' as const ) : ( 'medium' as const ),
+		blockEnd: 'medium' as const,
+		inlineStart: 'medium' as const,
+		inlineEnd: 'medium' as const,
+	};
+
 	return (
-		<Card className="dataforms-layouts-card__field">
+		<Card className="dataforms-layouts-card__field" size={ sizeCard }>
 			{ withHeader && (
 				<CardHeader className="dataforms-layouts-card__field-header">
 					<span className="dataforms-layouts-card__field-header-label">
