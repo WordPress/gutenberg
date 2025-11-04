@@ -618,10 +618,6 @@ To run unit tests only, without the linter, use `npm run test:unit:php` instead.
 
 Gutenberg's build system automatically prefixes PHP functions with `gutenberg_` to avoid conflicts with WordPress Core. When writing tests for block functions, you must test the **built (prefixed) versions** of functions, not the source versions.
 
-#### Understanding Function Prefixing
-
-For a detailed explanation of how function prefixing works, see the [Build System: Function Prefixing and Block Loading](/docs/contributors/code/build-system-function-prefixing.md) documentation.
-
 #### Writing Tests for Prefixed Functions & Classes
 
 Always test the built (prefixed) function names and class names in your PHPUnit tests:
