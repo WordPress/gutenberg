@@ -198,6 +198,52 @@ export function HierarchicalTermSelector( { slug } ) {
 			// Explicitly read postEdits to ensure subscription to changes (real-time sync)
 			getPostEdits();
 
+			const _terms = _taxonomy
+				? getEditedPostAttribute( _taxonomy.rest_base )
+				: EMPTY_ARRAY;
+
+			// Get all terms from default query
+			const allTerms =
+				getEntityRecords( 'taxonomy', slug, DEFAULT_QUERY ) ||
+				EMPTY_ARRAY;
+
+			// Also fetch selected terms individually to ensure they're available
+			// This handles cases where terms were added via real-time sync
+			const selectedTermsQuery = _terms?.length
+				? {
+						...DEFAULT_QUERY,
+						include: _terms.join( ',' ),
+						per_page: -1,
+				  }
+				: null;
+
+			// Get selected terms (this ensures newly synced terms are fetched)
+			// This query will trigger a fetch when terms change
+			const selectedTerms = selectedTermsQuery
+				? getEntityRecords( 'taxonomy', slug, selectedTermsQuery ) ||
+				  EMPTY_ARRAY
+				: EMPTY_ARRAY;
+
+			// Check if selected terms query is still loading
+			const selectedTermsLoading = selectedTermsQuery
+				? isResolving( 'getEntityRecords', [
+						'taxonomy',
+						slug,
+						selectedTermsQuery,
+				  ] )
+				: false;
+
+			// Merge and deduplicate terms
+			const availableTermIds = new Set(
+				allTerms.map( ( term ) => term.id )
+			);
+			const mergedTerms = [
+				...allTerms,
+				...selectedTerms.filter(
+					( term ) => ! availableTermIds.has( term.id )
+				),
+			];
+
 			return {
 				hasCreateAction: _taxonomy
 					? !! post._links?.[
@@ -209,17 +255,14 @@ export function HierarchicalTermSelector( { slug } ) {
 							'wp:action-assign-' + _taxonomy.rest_base
 					  ]
 					: false,
-				terms: _taxonomy
-					? getEditedPostAttribute( _taxonomy.rest_base )
-					: EMPTY_ARRAY,
-				loading: isResolving( 'getEntityRecords', [
-					'taxonomy',
-					slug,
-					DEFAULT_QUERY,
-				] ),
-				availableTerms:
-					getEntityRecords( 'taxonomy', slug, DEFAULT_QUERY ) ||
-					EMPTY_ARRAY,
+				terms: _terms,
+				loading:
+					isResolving( 'getEntityRecords', [
+						'taxonomy',
+						slug,
+						DEFAULT_QUERY,
+					] ) || selectedTermsLoading,
+				availableTerms: mergedTerms,
 				taxonomy: _taxonomy,
 			};
 		},
