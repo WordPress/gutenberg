@@ -1311,8 +1311,10 @@ const VisibilityComponent = () => {
 };
 
 const LayoutCardComponent = ( {
+	withHeader,
 	isCollapsible,
 }: {
+	withHeader: boolean;
 	isCollapsible: boolean;
 } ) => {
 	type Customer = {
@@ -1438,6 +1440,10 @@ const LayoutCardComponent = ( {
 
 	const form: Form = useMemo(
 		() => ( {
+			layout: getLayoutFromStoryArgs( {
+				type: 'card',
+				withHeader,
+			} ),
 			fields: [
 				{
 					id: 'customerCard',
@@ -1516,7 +1522,7 @@ const LayoutCardComponent = ( {
 				},
 			],
 		} ),
-		[ isCollapsible ]
+		[ withHeader, isCollapsible ]
 	);
 
 	return (
