@@ -3,26 +3,25 @@
  */
 import { __experimentalVStack as VStack } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
+import { createInterpolateElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import type { Action, NormalizedField, ViewTimeline } from '../../types';
 import TimelineItem from './timeline-item';
-import { getFormattedDate } from './utils';
 
 interface TimelineGroupProps< Item > {
 	groupName: string;
 	groupItems: Item[];
 	view: ViewTimeline;
-	eventField: string | undefined;
-	groupFieldLabel: string;
 	actions: Action< Item >[];
 	getItemId: ( item: Item ) => string;
 	titleField: NormalizedField< Item > | undefined;
 	mediaField: NormalizedField< Item > | undefined;
 	descriptionField: NormalizedField< Item > | undefined;
-	eventFieldObject: NormalizedField< Item > | undefined;
+	groupField: NormalizedField< Item >;
+	eventField: NormalizedField< Item > | undefined;
 	otherFields: NormalizedField< Item >[];
 	onClickItem?: ( item: Item ) => void;
 	renderItemLink?: (
@@ -37,29 +36,36 @@ export default function TimelineGroup< Item >( {
 	groupName,
 	groupItems,
 	view,
-	eventField,
-	groupFieldLabel,
+	groupField,
 	actions,
 	getItemId,
 	titleField,
 	mediaField,
 	descriptionField,
-	eventFieldObject,
+	eventField,
 	otherFields,
 	onClickItem,
 	renderItemLink,
 	isItemClickable,
 }: TimelineGroupProps< Item > ) {
-	// Determine if group header should show formatted date or field label
-	const isEventFieldGroup = eventField && eventField === view.groupByField;
-	const groupHeader = isEventFieldGroup
-		? getFormattedDate( groupName )
-		: sprintf(
-				// translators: 1: The label of the field e.g. "Status". 2: The value of the field, e.g.: "Published".
-				__( '%1$s: %2$s' ),
-				groupFieldLabel,
-				groupName
-		  );
+	// Determine if we should show the field label
+	const showGroupFieldLabel = view.layout?.showGroupFieldLabel ?? true;
+	const groupHeader = showGroupFieldLabel ? (
+		createInterpolateElement(
+			// translators: %s: The label of the field e.g. "Status".
+			sprintf( __( '%s: <groupName />' ), groupField.label ),
+			{
+				groupName: (
+					<groupField.render
+						item={ groupItems[ 0 ] }
+						field={ groupField }
+					/>
+				),
+			}
+		)
+	) : (
+		<groupField.render item={ groupItems[ 0 ] } field={ groupField } />
+	);
 
 	return (
 		<VStack key={ groupName } spacing={ 0 }>
@@ -77,7 +83,7 @@ export default function TimelineGroup< Item >( {
 						mediaField={ mediaField }
 						titleField={ titleField }
 						descriptionField={ descriptionField }
-						eventFieldObject={ eventFieldObject }
+						eventField={ eventField }
 						otherFields={ otherFields }
 						onClickItem={ onClickItem }
 						renderItemLink={ renderItemLink }

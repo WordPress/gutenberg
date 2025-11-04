@@ -34,17 +34,15 @@ export default function ViewTimeline< Item >(
 		isItemClickable,
 	} = props;
 
-	// Extract layout configuration
-	const { eventField = undefined } = view?.layout ?? {};
-
 	// Determine which fields to display based on view configuration
 	const titleField = fields.find( ( field ) => field.id === view.titleField );
 	const mediaField = fields.find( ( field ) => field.id === view.mediaField );
 	const descriptionField = fields.find(
 		( field ) => field.id === view.descriptionField
 	);
-	const eventFieldObject = eventField
-		? fields.find( ( field ) => field.id === eventField )
+	const eventFieldId = view?.layout?.eventField ?? undefined;
+	const eventField = eventFieldId
+		? fields.find( ( field ) => field.id === eventFieldId )
 		: undefined;
 	const otherFields = ( view?.fields ?? [] )
 		.map( ( fieldId ) => fields.find( ( f ) => fieldId === f.id ) )
@@ -92,14 +90,13 @@ export default function ViewTimeline< Item >(
 							groupName={ groupName }
 							groupItems={ groupItems }
 							view={ view }
-							eventField={ eventField }
-							groupFieldLabel={ groupField.label }
 							actions={ actions }
 							getItemId={ getItemId }
 							titleField={ titleField }
 							mediaField={ mediaField }
 							descriptionField={ descriptionField }
-							eventFieldObject={ eventFieldObject }
+							eventField={ eventField }
+							groupField={ groupField }
 							otherFields={ otherFields }
 							onClickItem={ onClickItem }
 							renderItemLink={ renderItemLink }
@@ -129,7 +126,7 @@ export default function ViewTimeline< Item >(
 							mediaField={ mediaField }
 							titleField={ titleField }
 							descriptionField={ descriptionField }
-							eventFieldObject={ eventFieldObject }
+							eventField={ eventField }
 							otherFields={ otherFields }
 							onClickItem={ onClickItem }
 							renderItemLink={ renderItemLink }

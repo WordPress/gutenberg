@@ -43,7 +43,7 @@ interface TimelineItemProps< Item > {
 	titleField?: NormalizedField< Item >;
 	mediaField?: NormalizedField< Item >;
 	descriptionField?: NormalizedField< Item >;
-	eventFieldObject?: NormalizedField< Item >;
+	eventField?: NormalizedField< Item > | undefined;
 	otherFields: NormalizedField< Item >[];
 	posinset?: number;
 	onClickItem?: ( item: Item ) => void;
@@ -66,7 +66,7 @@ function TimelineItem< Item >( {
 	titleField,
 	mediaField,
 	descriptionField,
-	eventFieldObject,
+	eventField,
 	otherFields,
 	posinset,
 	onClickItem,
@@ -242,18 +242,18 @@ function TimelineItem< Item >( {
 								</div>
 							) }
 							<div className="dataviews-view-timeline__fields">
-								{ eventFieldObject && (
+								{ eventField && (
 									<div className="dataviews-view-timeline__field dataviews-view-timeline__field--date">
 										<VisuallyHidden
 											as="span"
 											className="dataviews-view-timeline__field-label"
 										>
-											{ eventFieldObject.label }
+											{ eventField.label }
 										</VisuallyHidden>
 										<span className="dataviews-view-timeline__field-value">
-											<eventFieldObject.render
+											<eventField.render
 												item={ item }
-												field={ eventFieldObject }
+												field={ eventField }
 											/>
 										</span>
 									</div>
@@ -280,8 +280,8 @@ function TimelineItem< Item >( {
 							</div>
 							{ renderedPrimaryActions }
 						</VStack>
-						{ renderedDropdownMenu }
 					</HStack>
+					{ renderedDropdownMenu }
 				</HStack>
 			</div>
 			{ isModalOpen &&
