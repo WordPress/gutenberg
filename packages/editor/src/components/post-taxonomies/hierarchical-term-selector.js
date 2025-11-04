@@ -183,12 +183,20 @@ export function HierarchicalTermSelector( { slug } ) {
 		taxonomy,
 	} = useSelect(
 		( select ) => {
-			const { getCurrentPost, getEditedPostAttribute } =
-				select( editorStore );
+			const {
+				getCurrentPost,
+				getCurrentPostId,
+				getEditedPostAttribute,
+				getPostEdits,
+			} = select( editorStore );
 			const { getEntityRecord, getEntityRecords, isResolving } =
 				select( coreStore );
 			const _taxonomy = getEntityRecord( 'root', 'taxonomy', slug );
 			const post = getCurrentPost();
+			// Get post ID to ensure selector re-runs when post changes (real-time sync)
+			getCurrentPostId();
+			// Explicitly read postEdits to ensure subscription to changes (real-time sync)
+			getPostEdits();
 
 			return {
 				hasCreateAction: _taxonomy

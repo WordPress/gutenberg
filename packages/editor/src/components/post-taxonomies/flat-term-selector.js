@@ -98,11 +98,19 @@ export function FlatTermSelector( { slug, __nextHasNoMarginBottom } ) {
 		hasResolvedTerms,
 	} = useSelect(
 		( select ) => {
-			const { getCurrentPost, getEditedPostAttribute } =
-				select( editorStore );
+			const {
+				getCurrentPost,
+				getCurrentPostId,
+				getEditedPostAttribute,
+				getPostEdits,
+			} = select( editorStore );
 			const { getEntityRecords, getEntityRecord, hasFinishedResolution } =
 				select( coreStore );
 			const post = getCurrentPost();
+			// Get post ID to ensure selector re-runs when post changes (real-time sync)
+			getCurrentPostId();
+			// Explicitly read postEdits to ensure subscription to changes (real-time sync)
+			getPostEdits();
 			const _taxonomy = getEntityRecord( 'root', 'taxonomy', slug );
 			const _termIds = _taxonomy
 				? getEditedPostAttribute( _taxonomy.rest_base )
@@ -156,18 +164,25 @@ export function FlatTermSelector( { slug, __nextHasNoMarginBottom } ) {
 		[ search, slug ]
 	);
 
-	// Update terms state only after the selectors are resolved.
-	// We're using this to avoid terms temporarily disappearing on slow networks
-	// while core data makes REST API requests.
+	// Update terms state when termIds or resolved terms change.
+	// This ensures immediate response to real-time sync updates.
 	useEffect( () => {
-		if ( hasResolvedTerms ) {
-			const newValues = ( terms ?? [] ).map( ( term ) =>
+		if ( hasResolvedTerms && termIds?.length ) {
+			// Filter terms to only include those in termIds (for real-time sync)
+			const filteredTerms = ( terms ?? [] ).filter( ( term ) =>
+				termIds.includes( term.id )
+			);
+			const newValues = filteredTerms.map( ( term ) =>
 				unescapeString( term.name )
 			);
 
 			setValues( newValues );
+		} else if ( ! termIds?.length ) {
+			// If termIds becomes empty (e.g., categories removed via sync),
+			// immediately clear values.
+			setValues( [] );
 		}
-	}, [ terms, hasResolvedTerms ] );
+	}, [ terms, termIds, hasResolvedTerms ] );
 
 	const suggestions = useMemo( () => {
 		return ( searchResults ?? [] ).map( ( term ) =>
