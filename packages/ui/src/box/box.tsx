@@ -1,0 +1,111 @@
+/**
+ * WordPress dependencies
+ */
+import { forwardRef } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { type BoxProps } from './types';
+import { renderElement } from '../utils/element';
+
+/**
+ * Default render function that renders a div element with the given props.
+ *
+ * @param props The Box component props.
+ */
+const DEFAULT_RENDER = ( props: BoxProps ) => <div { ...props } />;
+
+/**
+ * Capitalizes the first character of a string.
+ *
+ * @param str The string to capitalize.
+ * @return The capitalized string.
+ */
+const capitalize = ( str: string ): string =>
+	str.charAt( 0 ).toUpperCase() + str.slice( 1 );
+
+/**
+ * Converts a size value to a CSS design token property reference (with
+ * fallback) or a calculated value based on the base unit.
+ *
+ * @param property The CSS property name.
+ * @param family   The design system token family.
+ * @param value    The size value, either a number (multiplier of base unit) or a string (token name).
+ * @return A CSS value string with variable references.
+ */
+const getSpacingValue = (
+	property: string,
+	family: string,
+	value: number | string
+): string =>
+	typeof value === 'number'
+		? `calc(var(--wpds-spacing-base) * ${ value })`
+		: `var(--wpds-spacing-${ property }-${ family }-${ value }, var(--wpds-spacing-${ property }-surface-${ value }))`;
+
+/**
+ * Generates CSS styles for properties with optionally directional values,
+ * normalizing single values and objects with directional keys for logical
+ * properties.
+ *
+ * @param property The CSS property name from BoxProps.
+ * @param family   The design system token family.
+ * @param value    The property value (single or object with directional keys).
+ * @return A CSSProperties object with the computed styles.
+ */
+const getDimensionVariantStyles = < T extends keyof BoxProps >(
+	property: T,
+	family: string,
+	value: NonNullable< BoxProps[ T ] >
+): React.CSSProperties =>
+	typeof value !== 'object'
+		? { [ property ]: getSpacingValue( property, family, value ) }
+		: Object.keys( value ).reduce(
+				( result, key ) => ( {
+					...result,
+					[ property + capitalize( key ) ]: getSpacingValue(
+						property,
+						family,
+						value[ key ]
+					),
+				} ),
+				{} as Record< string, string >
+		  );
+
+/**
+ * A low-level visual primitive that provides an interface for applying design
+ * token-based customization for background, text, padding, and more.
+ */
+export const Box = forwardRef< HTMLDivElement, BoxProps >( function Box(
+	{
+		family = 'surface',
+		background,
+		foreground,
+		padding,
+		bg = background,
+		fg = foreground,
+		p = padding,
+		render = DEFAULT_RENDER,
+		...props
+	},
+	ref
+) {
+	const style: React.CSSProperties = {};
+
+	if ( bg ) {
+		style.backgroundColor = `var(--wpds-color-bg-${ family }-${ bg }, var(--wpds-color-bg-surface-${ bg }))`;
+	}
+
+	if ( fg ) {
+		style.color = `var(--wpds-color-fg-${ family }-${ fg }, var(--wpds-color-fg-content-${ fg }))`;
+	}
+
+	if ( p ) {
+		Object.assign(
+			style,
+			getDimensionVariantStyles( 'padding', family, p )
+		);
+	}
+
+	return renderElement< 'div' >( render, { style, ...props }, ref );
+} );

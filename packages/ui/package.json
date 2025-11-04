@@ -1,0 +1,49 @@
+{
+	"name": "@wordpress/ui",
+	"version": "0.1.0",
+	"description": "Themeable React UI components for the WordPress Design System.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"components"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/ui/README.md",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/ui"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=20.10.0",
+		"npm": ">=10.2.3"
+	},
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.js",
+			"default": "./build/index.js"
+		},
+		"./package.json": "./package.json"
+	},
+	"wpScript": false,
+	"sideEffects": false,
+	"dependencies": {
+		"@wordpress/element": "file:../element",
+		"@wordpress/private-apis": "file:../private-apis"
+	},
+	"devDependencies": {
+		"@wordpress/theme": "file:../theme"
+	},
+	"peerDependencies": {
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

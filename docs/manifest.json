@@ -2016,6 +2016,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/ui",
+		"slug": "packages-ui",
+		"markdown_source": "../packages/ui/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/undo-manager",
 		"slug": "packages-undo-manager",
 		"markdown_source": "../packages/undo-manager/README.md",

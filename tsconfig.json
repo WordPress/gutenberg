@@ -62,6 +62,7 @@
 		{ "path": "packages/style-engine" },
 		{ "path": "packages/sync" },
 		{ "path": "packages/theme" },
+		{ "path": "packages/ui" },
 		{ "path": "packages/token-list" },
 		{ "path": "packages/undo-manager" },
 		{ "path": "packages/upload-media" },
