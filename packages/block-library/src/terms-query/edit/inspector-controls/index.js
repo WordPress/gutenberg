@@ -45,7 +45,7 @@ export default function TermsQueryInspectorControls( {
 		include,
 	} = termQuery;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
-	const [ hasAutoSetInherit, setHasAutoSetInherit ] = useState( false );
+	const [ hasAutoSetTaxonomy, setHasAutoSetTaxonomy ] = useState( false );
 
 	const taxonomies = usePublicTaxonomies();
 
@@ -74,17 +74,16 @@ export default function TermsQueryInspectorControls( {
 		templateSlug?.startsWith( 'category-' ) ||
 		templateSlug?.startsWith( 'tag-' );
 
-	// Auto-set inherit mode and taxonomy when we have a valid template context taxonomy.
+	// Automattically set the taxonomy when we have a valid template context taxonomy.
 	useEffect( () => {
 		if (
 			templateContext?.taxonomy &&
 			! inherit &&
 			displayInheritControl &&
-			! hasAutoSetInherit
+			! hasAutoSetTaxonomy
 		) {
-			setHasAutoSetInherit( true );
+			setHasAutoSetTaxonomy( true );
 			setQuery( {
-				inherit: true,
 				taxonomy: templateContext.taxonomy,
 			} );
 		}
@@ -92,7 +91,7 @@ export default function TermsQueryInspectorControls( {
 		templateContext?.taxonomy,
 		displayInheritControl,
 		inherit,
-		hasAutoSetInherit,
+		hasAutoSetTaxonomy,
 		setQuery,
 	] );
 
