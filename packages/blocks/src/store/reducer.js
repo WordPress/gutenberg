@@ -62,60 +62,24 @@ function bootstrappedBlockTypes( state = {}, action ) {
 		case 'ADD_BOOTSTRAPPED_BLOCK_TYPE':
 			const { name, blockType } = action;
 			const serverDefinition = state[ name ];
-			let newDefinition;
 			// Don't overwrite if already set. It covers the case when metadata
 			// was initialized from the server.
 			if ( serverDefinition ) {
-				// The `blockHooks` prop is not yet included in the server provided
-				// definitions and needs to be polyfilled. This can be removed when the
-				// minimum supported WordPress is >= 6.4.
-				if (
-					serverDefinition.blockHooks === undefined &&
-					blockType.blockHooks
-				) {
-					newDefinition = {
-						...serverDefinition,
-						...newDefinition,
-						blockHooks: blockType.blockHooks,
-					};
-				}
-
-				// The `allowedBlocks` prop is not yet included in the server provided
-				// definitions and needs to be polyfilled. This can be removed when the
-				// minimum supported WordPress is >= 6.5.
-				if (
-					serverDefinition.allowedBlocks === undefined &&
-					blockType.allowedBlocks
-				) {
-					newDefinition = {
-						...serverDefinition,
-						...newDefinition,
-						allowedBlocks: blockType.allowedBlocks,
-					};
-				}
-			} else {
-				newDefinition = Object.fromEntries(
-					Object.entries( blockType )
-						.filter(
-							( [ , value ] ) =>
-								value !== null && value !== undefined
-						)
-						.map( ( [ key, value ] ) => [
-							camelCase( key ),
-							value,
-						] )
-				);
-				newDefinition.name = name;
+				return state;
 			}
+			const newDefinition = Object.fromEntries(
+				Object.entries( blockType )
+					.filter(
+						( [ , value ] ) => value !== null && value !== undefined
+					)
+					.map( ( [ key, value ] ) => [ camelCase( key ), value ] )
+			);
+			newDefinition.name = name;
+			return {
+				...state,
+				[ name ]: newDefinition,
+			};
 
-			if ( newDefinition ) {
-				return {
-					...state,
-					[ name ]: newDefinition,
-				};
-			}
-
-			return state;
 		case 'REMOVE_BLOCK_TYPES':
 			return omit( state, action.names );
 	}

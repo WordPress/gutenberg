@@ -78,6 +78,7 @@
 	border-width: var(--wp-admin-border-width-focus);
 	border-style: solid;
 	padding: var(--wp-admin-border-width-focus);
+	background: $white;
 }
 
 .editor-collab-sidebar-panel__comment-status {
@@ -154,57 +155,16 @@
 	bottom: $grid-unit-10;
 }
 
-// Comment avatar indicators.
-.comment-avatar-indicator {
-	position: relative;
-	padding: 4px;
-	min-width: auto;
-	background: transparent;
-	border: none;
-}
-
-.comment-avatar-stack {
-	display: flex;
-	align-items: center;
-	position: relative;
-	height: $icon-size;
-}
-
 .comment-avatar {
 	width: $icon-size;
-	height: $icon-size;
 	border-radius: $radius-round;
-	border: 2px solid $white;
-	margin-left: -6px;
-	flex-shrink: 0;
+	margin-left: -12px;
+	border-width: var(--wp-admin-border-width-focus);
+	border-style: solid;
+	padding: var(--wp-admin-border-width-focus);
+	background: $white;
 
 	&:first-child {
 		margin-left: 0;
-		border-color: #de6e55;
 	}
-
-	&:nth-child(2) {
-		border-color: #599637;
-	}
-
-	&:nth-child(3) {
-		border-color: #3858e9;
-	}
-}
-
-.comment-avatar-overflow {
-	width: fit-content;
-	height: $icon-size;
-	border-radius: 4rem;
-	padding: 0 4px;
-	background: #757575;
-	color: $white;
-	border: 2px solid $white;
-	margin-left: -6px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	font-size: 10px;
-	font-weight: 600;
-	flex-shrink: 0;
 }

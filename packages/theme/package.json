@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/theme",
-	"version": "0.0.1",
+	"version": "0.1.0",
 	"description": "Theme and context provider for the WordPress Design System.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -32,17 +32,24 @@
 		},
 		"./design-tokens.css": "./src/prebuilt/css/design-tokens.css",
 		"./design-tokens.js": "./src/prebuilt/js/design-tokens.js",
-		"./package.json": "./package.json",
-		"./build-style/": "./build-style/"
+		"./package.json": "./package.json"
 	},
 	"react-native": "src/index",
 	"wpScript": true,
 	"types": "build-types",
-	"sideEffects": false,
+	"sideEffects": [
+		"src/color-ramps/lib/register-color-spaces.ts",
+		"build/color-ramps/lib/register-color-spaces.js",
+		"build-module/color-ramps/lib/register-color-spaces.js"
+	],
 	"dependencies": {
 		"@wordpress/element": "file:../element",
 		"@wordpress/private-apis": "file:../private-apis",
-		"colorjs.io": "^0.5.2"
+		"colorjs.io": "^0.5.2",
+		"memize": "^2.1.0"
+	},
+	"devDependencies": {
+		"esbuild-esm-loader": "0.3.3"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",
@@ -52,6 +59,9 @@
 		"access": "public"
 	},
 	"scripts": {
-		"build": "rimraf src/prebuilt docs && node bin/build-tokens.js && prettier --write tokens/color.json src/prebuilt docs"
+		"build:default-ramps": "node --import=esbuild-esm-loader/register bin/generate-default-ramps/index.ts",
+		"build:tokens": "node --import=esbuild-esm-loader/register bin/generate-primitive-tokens/index.ts && cross-env NODE_OPTIONS=--import=esbuild-esm-loader/register tz build --config terrazzo.config.ts",
+		"build": "npm run build:tokens && npm run build:default-ramps",
+		"postbuild": "prettier --write tokens/color.json src/prebuilt src/color-ramps/lib/default-ramps.ts docs"
 	}
 }

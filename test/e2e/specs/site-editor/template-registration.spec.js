@@ -54,6 +54,13 @@ test.describe( 'Block template registration', () => {
 		// Verify the template contents are rendered in the editor.
 		await page.getByText( 'Plugin Template' ).click();
 		await page.getByRole( 'button', { name: 'Duplicate' } ).click();
+		await page.waitForURL(
+			'/wp-admin/site-editor.php?p=%2Ftemplate&activeView=user'
+		);
+		await page
+			.getByRole( 'button', { name: 'Plugin Template (Copy)' } )
+			.first()
+			.click();
 		await expect(
 			editor.canvas.getByText( 'This is a plugin-registered template.' )
 		).toBeVisible();
@@ -196,6 +203,13 @@ test.describe( 'Block template registration', () => {
 		);
 		await page.getByText( 'Plugin Template' ).click();
 		await page.getByRole( 'button', { name: 'Duplicate' } ).click();
+		await page.waitForURL(
+			'/wp-admin/site-editor.php?p=%2Ftemplate&activeView=user'
+		);
+		await page
+			.getByRole( 'button', { name: 'Plugin Template (Copy)' } )
+			.first()
+			.click();
 		await expect(
 			editor.canvas.getByText( 'This is a plugin-registered template.' )
 		).toBeVisible();

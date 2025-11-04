@@ -7,16 +7,18 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalHeading as Heading,
 } from '@wordpress/components';
-import { useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import type { FieldLayoutProps, Form, NormalizedRowLayout } from '../../types';
-import DataFormContext from '../../components/dataform-context';
+import type {
+	FieldLayoutProps,
+	NormalizedForm,
+	NormalizedLayout,
+	NormalizedRowLayout,
+} from '../../types';
 import { DataFormLayout } from '../data-form-layout';
-import { isCombinedField } from '../is-combined-field';
-import { normalizeLayout } from '../normalize-form-fields';
+import { DEFAULT_LAYOUT } from '../normalize-form';
 import { getFormFieldLayout } from '..';
 
 function Header( { title }: { title: string } ) {
@@ -43,21 +45,12 @@ export default function FormRowField< Item >( {
 	hideLabelFromVision,
 	validity,
 }: FieldLayoutProps< Item > ) {
-	const { fields } = useContext( DataFormContext );
+	const layout = field.layout as NormalizedRowLayout;
 
-	const layout = normalizeLayout( {
-		...field.layout,
-		type: 'row',
-	} ) as NormalizedRowLayout;
-
-	if ( isCombinedField( field ) ) {
-		const form: Form = {
-			fields: field.children.map( ( child ) => {
-				if ( typeof child === 'string' ) {
-					return { id: child };
-				}
-				return child;
-			} ),
+	if ( !! field.children ) {
+		const form: NormalizedForm = {
+			layout: DEFAULT_LAYOUT as NormalizedLayout,
+			fields: field.children,
 		};
 
 		return (
@@ -94,12 +87,6 @@ export default function FormRowField< Item >( {
 		);
 	}
 
-	const fieldDefinition = fields.find( ( f ) => f.id === field.id );
-
-	if ( ! fieldDefinition || ! fieldDefinition.Edit ) {
-		return null;
-	}
-
 	const RegularLayout = getFormFieldLayout( 'regular' )?.component;
 	if ( ! RegularLayout ) {
 		return null;
@@ -110,7 +97,7 @@ export default function FormRowField< Item >( {
 			<div className="dataforms-layouts-row__field-control">
 				<RegularLayout
 					data={ data }
-					field={ fieldDefinition }
+					field={ field }
 					onChange={ onChange }
 					validity={ validity }
 				/>

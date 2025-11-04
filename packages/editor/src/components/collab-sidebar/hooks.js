@@ -70,6 +70,10 @@ export function useBlockComments( postId ) {
 
 	// Process comments to build the tree structure.
 	const { resultComments, unresolvedSortedThreads } = useMemo( () => {
+		if ( ! threads || threads.length === 0 ) {
+			return { resultComments: [], unresolvedSortedThreads: [] };
+		}
+
 		const blocksWithComments = clientIds.reduce( ( results, clientId ) => {
 			const commentId = getBlockAttributes( clientId )?.metadata?.noteId;
 			if ( commentId ) {
@@ -82,10 +86,8 @@ export function useBlockComments( postId ) {
 		const compare = {};
 		const result = [];
 
-		const allComments = threads ?? [];
-
 		// Initialize each object with an empty `reply` array and map blockClientId.
-		allComments.forEach( ( item ) => {
+		threads.forEach( ( item ) => {
 			const itemBlock = Object.keys( blocksWithComments ).find(
 				( key ) => blocksWithComments[ key ] === item.id
 			);
@@ -98,7 +100,7 @@ export function useBlockComments( postId ) {
 		} );
 
 		// Iterate over the data to build the tree structure.
-		allComments.forEach( ( item ) => {
+		threads.forEach( ( item ) => {
 			if ( item.parent === 0 ) {
 				// If parent is 0, it's a root item, push it to the result array.
 				result.push( compare[ item.id ] );

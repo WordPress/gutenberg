@@ -1,11 +1,15 @@
 /**
  * External dependencies
  */
-import type Color from 'colorjs.io';
+// Disable reason: ESLint resolver can't handle `exports`. Import resolver
+// checking is redundant in TypeScript files.
+// eslint-disable-next-line import/no-unresolved
+import { toGamut, to, P3, OKLCH, type ColorTypes } from 'colorjs.io/fn';
 
 /**
  * Internal dependencies
  */
+import './register-color-spaces';
 import {
 	WHITE,
 	BLACK,
@@ -14,16 +18,14 @@ import {
 	ACCENT_SCALE_BASE_LIGHTNESS_THRESHOLDS,
 } from './constants';
 import type { Ramp, RampStepConfig, RampDirection } from './types';
-import { getCachedContrast } from './cache-utils';
+import { getContrast } from './color-utils';
 
 /**
  * Make sure that a color is valid in the p3 gamut, and converts it to oklch.
  * @param c
  */
-export const clampToGamut = ( c: Color ) =>
-	c
-		.toGamut( { space: 'p3', method: 'css' } ) // map into Display-P3 using CSS OKLCH method
-		.to( 'oklch' );
+export const clampToGamut = ( c: ColorTypes ) =>
+	to( toGamut( c, { space: P3, method: 'css' } ), OKLCH ); // map into Display-P3 using CSS OKLCH method
 
 /**
  * Build a dependency graph from the steps configuration
@@ -119,14 +121,14 @@ export function sortByDependency(
  * ramp direction value.
  */
 export function computeBetterFgColorDirection(
-	seed: Color,
+	seed: ColorTypes,
 	preferLighter?: boolean
 ): {
 	better: RampDirection;
 	worse: RampDirection;
 } {
-	const contrastAgainstBlack = getCachedContrast( seed, BLACK );
-	const contrastAgainstWhite = getCachedContrast( seed, WHITE );
+	const contrastAgainstBlack = getContrast( seed, BLACK );
+	const contrastAgainstWhite = getContrast( seed, WHITE );
 
 	return contrastAgainstBlack >
 		contrastAgainstWhite +
