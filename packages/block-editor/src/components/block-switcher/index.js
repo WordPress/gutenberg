@@ -100,9 +100,17 @@ function BlockSwitcherDropdownMenuContents( { onClose, clientIds, isSynced } ) {
 		selectForMultipleBlocks( transformedBlocks );
 	}
 
+	/**
+	 * The `isSynced` check is a stopgap solution here.
+	 * Ideally, the Transforms API should handle this
+	 * by allowing to exclude blocks from wildcard transformations.
+	 */
 	const isSingleBlock = blocks.length === 1;
 	const hasPossibleBlockTransformations =
-		!! possibleBlockTransformations?.length && canRemove && ! isSynced;
+		!! possibleBlockTransformations?.length &&
+		canRemove &&
+		! isSynced &&
+		! isSingleBlock;
 	const hasPossibleBlockVariationTransformations =
 		!! blockVariationTransformations?.length;
 	const hasPatternTransformation = !! patterns?.length && canRemove;
