@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
-import { useMemo, useState } from '@wordpress/element';
+import { useMemo, useState, useEffect, useRef } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import {
 	Button,
@@ -172,6 +172,7 @@ export function HierarchicalTermSelector( { slug } ) {
 	const [ showForm, setShowForm ] = useState( false );
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ filteredTermsTree, setFilteredTermsTree ] = useState( [] );
+	const seenTermIdsRef = useRef( new Set() );
 	const debouncedSpeak = useDebounce( speak, 500 );
 
 	const {
@@ -207,29 +208,40 @@ export function HierarchicalTermSelector( { slug } ) {
 				getEntityRecords( 'taxonomy', slug, DEFAULT_QUERY ) ||
 				EMPTY_ARRAY;
 
-			// Also fetch selected terms individually to ensure they're available
-			// This handles cases where terms were added via real-time sync
-			const selectedTermsQuery = _terms?.length
-				? {
-						...DEFAULT_QUERY,
-						include: _terms.join( ',' ),
-						per_page: -1,
-				  }
-				: null;
+			// Track seen term IDs to keep them available even after unchecking
+			// This ensures categories added by other editors don't disappear when unchecked
+			const allTermIds = new Set( allTerms.map( ( term ) => term.id ) );
+			const currentSeenIds = new Set( seenTermIdsRef.current );
+			_terms?.forEach( ( termId ) => currentSeenIds.add( termId ) );
+			allTerms.forEach( ( term ) => currentSeenIds.add( term.id ) );
 
-			// Get selected terms (this ensures newly synced terms are fetched)
-			// This query will trigger a fetch when terms change
-			const selectedTerms = selectedTermsQuery
-				? getEntityRecords( 'taxonomy', slug, selectedTermsQuery ) ||
+			// Also fetch terms that have been seen but aren't in the default query results
+			// This handles cases where terms were added via real-time sync
+			const seenButNotInAll = Array.from( currentSeenIds ).filter(
+				( termId ) => ! allTermIds.has( termId )
+			);
+
+			const additionalTermsQuery =
+				seenButNotInAll.length > 0
+					? {
+							...DEFAULT_QUERY,
+							include: seenButNotInAll.join( ',' ),
+							per_page: -1,
+					  }
+					: null;
+
+			// Get additional terms (this ensures newly synced terms are fetched and stay available)
+			const additionalTerms = additionalTermsQuery
+				? getEntityRecords( 'taxonomy', slug, additionalTermsQuery ) ||
 				  EMPTY_ARRAY
 				: EMPTY_ARRAY;
 
-			// Check if selected terms query is still loading
-			const selectedTermsLoading = selectedTermsQuery
+			// Check if additional terms query is still loading
+			const additionalTermsLoading = additionalTermsQuery
 				? isResolving( 'getEntityRecords', [
 						'taxonomy',
 						slug,
-						selectedTermsQuery,
+						additionalTermsQuery,
 				  ] )
 				: false;
 
@@ -239,7 +251,7 @@ export function HierarchicalTermSelector( { slug } ) {
 			);
 			const mergedTerms = [
 				...allTerms,
-				...selectedTerms.filter(
+				...additionalTerms.filter(
 					( term ) => ! availableTermIds.has( term.id )
 				),
 			];
@@ -261,7 +273,7 @@ export function HierarchicalTermSelector( { slug } ) {
 						'taxonomy',
 						slug,
 						DEFAULT_QUERY,
-					] ) || selectedTermsLoading,
+					] ) || additionalTermsLoading,
 				availableTerms: mergedTerms,
 				taxonomy: _taxonomy,
 			};
@@ -271,6 +283,18 @@ export function HierarchicalTermSelector( { slug } ) {
 
 	const { editPost } = useDispatch( editorStore );
 	const { saveEntityRecord } = useDispatch( coreStore );
+
+	// Track seen term IDs to keep them available even after unchecking
+	// This ensures categories added by other editors don't disappear when unchecked
+	useEffect( () => {
+		if ( availableTerms?.length > 0 ) {
+			const newSeenIds = new Set(
+				availableTerms.map( ( term ) => term.id )
+			);
+			// Update ref to track all seen terms
+			seenTermIdsRef.current = newSeenIds;
+		}
+	}, [ availableTerms ] );
 
 	const availableTermsTree = useMemo(
 		() => sortBySelected( buildTermsTree( availableTerms ), terms ),
