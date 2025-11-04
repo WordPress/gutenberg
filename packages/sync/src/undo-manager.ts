@@ -7,14 +7,19 @@ import * as Y from 'yjs';
  * WordPress dependencies
  */
 import type { HistoryRecord } from '@wordpress/undo-manager';
-import type { WPSelection } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { LOCAL_EDITOR_ORIGIN } from './config';
 import { YMultiDocUndoManager } from './y-utilities/y-multidoc-undomanager';
-import type { ObjectData, RecordHandlers, SyncUndoManager } from './types';
+import type {
+	ObjectData,
+	RecordHandlers,
+	SyncUndoManager,
+	Position,
+} from './types';
+import { PositionType } from './types';
 import { findBlockByClientIdInDoc } from './utils';
 import { BlockSelectionHistory } from './block-selection-history';
 
@@ -25,26 +30,6 @@ interface StackItemEvent {
 	changedParentTypes: Map< Y.AbstractType< any >, Y.YEvent< any >[] >;
 	ydoc: Y.Doc;
 }
-
-enum PositionType {
-	RelativeSelection = 'RelativeSelection',
-	BlockSelection = 'BlockSelection',
-}
-
-interface RelativePosition {
-	type: PositionType.RelativeSelection;
-	attributeKey: string;
-	relativePosition: Y.RelativePosition;
-	clientId: string;
-	offset: number;
-}
-
-interface BlockPosition {
-	type: PositionType.BlockSelection;
-	clientId: string;
-}
-
-type Position = RelativePosition | BlockPosition;
 
 interface PositionMeta {
 	position: Position;
@@ -59,7 +44,7 @@ interface PositionMeta {
  */
 export function createUndoManager(): SyncUndoManager {
 	let setSelection: RecordHandlers[ 'setSelection' ] = () => {};
-	const selectionHistory = new BlockSelectionHistory( 10 );
+	const selectionHistory = new BlockSelectionHistory( 5 );
 
 	const yUndoManager = new YMultiDocUndoManager( [], {
 		// Throttle undo/redo captures.
@@ -69,98 +54,25 @@ export function createUndoManager(): SyncUndoManager {
 		trackedOrigins: new Set( [ LOCAL_EDITOR_ORIGIN ] ),
 	} );
 
-	function getPositionForSelection(
-		selection: WPSelection,
-		ydoc: Y.Doc
-	): Position | null {
-		const clientId = selection.selectionStart.clientId;
-		const block = findBlockByClientIdInDoc( clientId, ydoc );
-
-		const attributes = block?.get( 'attributes' ) as
-			| Y.Map< Y.Text >
-			| undefined;
-
-		let attributeKey = selection.selectionStart.attributeKey;
-
-		if ( attributeKey === undefined ) {
-			// When a new paragraph block is inserted via <Enter>, selectionStart
-			// will only have a clientId but no attributeKey (like 'content').
-			// In the event that we're unsure about the selected Y.Text, look in
-			// block attributes for a 'content' key or Y.Text attribute.
-
-			if ( attributes?.get( 'content' ) instanceof Y.Text ) {
-				attributeKey = 'content';
-			} else {
-				attributes?.forEach( ( value, key ) => {
-					if ( value instanceof Y.Text ) {
-						attributeKey = key;
-					}
-				} );
-			}
-		}
-
-		const changedYText = attributes?.get( attributeKey );
-
-		if ( ! ( changedYText instanceof Y.Text ) ) {
-			// Could not find the relevant YText in the document, skip bundling position
-			console.log( 'Could not find relavant YText, doing nothing' );
-			return null;
-		}
-
-		if ( attributeKey && clientId ) {
-			const offset = selection.selectionStart?.offset ?? 0;
-			const relativePosition = Y.createRelativePositionFromTypeIndex(
-				changedYText,
-				offset
-			);
-
-			return {
-				type: PositionType.RelativeSelection,
-				attributeKey,
-				relativePosition,
-				clientId,
-				offset,
-			};
-		}
-
-		return null;
-	}
-
 	function updatePositionMeta( event: StackItemEvent ): void {
-		const currentSelection = selectionHistory.getCurrentSelection();
+		const currentPosition = selectionHistory.getCurrentPosition();
 
-		if ( currentSelection === null ) {
+		if ( currentPosition === null ) {
 			// If we don't have a selection, then don't save anything extra
 			// to the stack.
 			return;
 		}
 
-		const position = getPositionForSelection(
-			currentSelection,
-			event.ydoc
-		);
+		// Also store the last 5 positions as backup positions.
+		const backupPositions = selectionHistory.getPreviousPositions( 5 );
 
-		if ( position ) {
-			// Also store the last 5 selections as backup positions.
-			const backupPositions: Position[] = [];
-			for ( const selection of selectionHistory.getLastSelections( 5 ) ) {
-				const backupPosition = getPositionForSelection(
-					selection,
-					event.ydoc
-				);
+		const positionMeta: PositionMeta = {
+			position: currentPosition,
+			backupPositions,
+		};
 
-				if ( backupPosition ) {
-					backupPositions.push( backupPosition );
-				}
-			}
-
-			const positionMeta: PositionMeta = {
-				position,
-				backupPositions,
-			};
-
-			event.stackItem.meta.set( 'position', positionMeta );
-		}
+		event.stackItem.meta.set( 'position', positionMeta );
+		console.log( 'Stored stackItem with positionMeta:', positionMeta );
 	}
 
 	function restorePosition( event: StackItemEvent ): void {
@@ -280,7 +192,11 @@ export function createUndoManager(): SyncUndoManager {
 		): void {
 			yUndoManager.addToScope( ymap );
 
+			// Pass the ydoc to the selection history so it can convert selections to positions
+			selectionHistory.setYDoc( ymap.doc as Y.Doc );
+
 			handlers.subscribeToSelectionChange( ( newSelection ) => {
+				console.log( 'newSelection:', newSelection );
 				selectionHistory.updateSelection( newSelection );
 			} );
 

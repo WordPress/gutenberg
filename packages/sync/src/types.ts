@@ -70,7 +70,7 @@ interface WPBlockSelection {
 	offset: number;
 }
 
-interface WPSelection {
+export interface WPSelection {
 	selectionEnd: WPBlockSelection;
 	selectionStart: WPBlockSelection;
 }
@@ -140,3 +140,23 @@ export interface SyncUndoManager extends WPUndoManager< ObjectData > {
 		}
 	) => void;
 }
+
+export enum PositionType {
+	RelativeSelection = 'RelativeSelection',
+	BlockSelection = 'BlockSelection',
+}
+
+export interface RelativePosition {
+	type: PositionType.RelativeSelection;
+	attributeKey: string;
+	relativePosition: Y.RelativePosition;
+	clientId: string;
+	offset: number;
+}
+
+export interface BlockPosition {
+	type: PositionType.BlockSelection;
+	clientId: string;
+}
+
+export type Position = RelativePosition | BlockPosition;
