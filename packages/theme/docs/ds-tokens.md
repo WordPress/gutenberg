@@ -120,18 +120,13 @@ Do not edit directly.
 
 ### Spacing
 
-| Variable name       | Description         |
-| ------------------- | ------------------- |
-| `--wpds-spacing-05` | Extra small spacing |
-| `--wpds-spacing-10` | Small spacing       |
-| `--wpds-spacing-15` | Medium spacing      |
-| `--wpds-spacing-20` | Large spacing       |
-| `--wpds-spacing-30` | Extra large spacing |
-| `--wpds-spacing-40` | 2X large spacing    |
-| `--wpds-spacing-50` | 3X large spacing    |
-| `--wpds-spacing-60` | 4X large spacing    |
-| `--wpds-spacing-70` | 5X large spacing    |
-| `--wpds-spacing-80` | 6X large spacing    |
+| Variable name                            | Description                      |
+| ---------------------------------------- | -------------------------------- |
+| `--wpds-spacing-base`                    | Base spacing unit                |
+| `--wpds-spacing-padding-surface-x-small` | Extra small spacing for surfaces |
+| `--wpds-spacing-padding-surface-small`   | Small spacing for surfaces       |
+| `--wpds-spacing-padding-surface-medium`  | Medium spacing for surfaces      |
+| `--wpds-spacing-padding-surface-large`   | Large spacing for surfaces       |
 
 ### Typography
 
@@ -315,3 +310,18 @@ Do not edit directly.
 | `--wpds-color-private-caution-bg-fill-inverted1` | N/A         |
 | `--wpds-color-private-caution-fg-fill-inverted`  | N/A         |
 | `--wpds-color-private-caution-surface1`          | N/A         |
+
+### Spacing (private)
+
+| Variable name               | Description      |
+| --------------------------- | ---------------- |
+| `--wpds-spacing-private-05` | 1x base spacing  |
+| `--wpds-spacing-private-10` | 2x base spacing  |
+| `--wpds-spacing-private-15` | 3x base spacing  |
+| `--wpds-spacing-private-20` | 4x base spacing  |
+| `--wpds-spacing-private-30` | 6x base spacing  |
+| `--wpds-spacing-private-40` | 8x base spacing  |
+| `--wpds-spacing-private-50` | 10x base spacing |
+| `--wpds-spacing-private-60` | 12x base spacing |
+| `--wpds-spacing-private-70` | 14x base spacing |
+| `--wpds-spacing-private-80` | 16x base spacing |

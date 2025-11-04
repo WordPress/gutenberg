@@ -440,16 +440,31 @@
 	--wpds-font-size-small: 12px; /* Small font size */
 	--wpds-font-size-x-large: 20px; /* Extra large font size */
 	--wpds-font-size-x-small: 11px; /* Extra small font size */
-	--wpds-spacing-05: 4px; /* Extra small spacing */
-	--wpds-spacing-10: 8px; /* Small spacing */
-	--wpds-spacing-15: 12px; /* Medium spacing */
-	--wpds-spacing-20: 16px; /* Large spacing */
-	--wpds-spacing-30: 24px; /* Extra large spacing */
-	--wpds-spacing-40: 32px; /* 2X large spacing */
-	--wpds-spacing-50: 40px; /* 3X large spacing */
-	--wpds-spacing-60: 48px; /* 4X large spacing */
-	--wpds-spacing-70: 56px; /* 5X large spacing */
-	--wpds-spacing-80: 64px; /* 6X large spacing */
+	--wpds-spacing-base: var(
+		--wpds-spacing-private-05
+	); /* Base spacing unit */
+	--wpds-spacing-padding-surface-large: var(
+		--wpds-spacing-private-30
+	); /* Large spacing for surfaces */
+	--wpds-spacing-padding-surface-medium: var(
+		--wpds-spacing-private-20
+	); /* Medium spacing for surfaces */
+	--wpds-spacing-padding-surface-small: var(
+		--wpds-spacing-private-10
+	); /* Small spacing for surfaces */
+	--wpds-spacing-padding-surface-x-small: var(
+		--wpds-spacing-private-05
+	); /* Extra small spacing for surfaces */
+	--wpds-spacing-private-05: 4px; /* 1x base spacing */
+	--wpds-spacing-private-10: 8px; /* 2x base spacing */
+	--wpds-spacing-private-15: 12px; /* 3x base spacing */
+	--wpds-spacing-private-20: 16px; /* 4x base spacing */
+	--wpds-spacing-private-30: 24px; /* 6x base spacing */
+	--wpds-spacing-private-40: 32px; /* 8x base spacing */
+	--wpds-spacing-private-50: 40px; /* 10x base spacing */
+	--wpds-spacing-private-60: 48px; /* 12x base spacing */
+	--wpds-spacing-private-70: 56px; /* 14x base spacing */
+	--wpds-spacing-private-80: 64px; /* 16x base spacing */
 }
 
 @media ( -webkit-min-device-pixel-ratio: 2 ), ( min-resolution: 192dpi ) {

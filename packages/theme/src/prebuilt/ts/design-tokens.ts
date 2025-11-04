@@ -293,35 +293,20 @@ export default {
 	'--wpds-elevation-large': {
 		'.': '0 5px 15px 0 #00000014, 0 15px 27px 0 #00000012, 0 30px 36px 0 #0000000a, 0 50px 43px 0 #00000005',
 	},
-	'--wpds-spacing-05': {
-		'.': '4px',
+	'--wpds-spacing-base': {
+		'.': 'var(--wpds-spacing-private-05)',
 	},
-	'--wpds-spacing-10': {
-		'.': '8px',
+	'--wpds-spacing-padding-surface-x-small': {
+		'.': 'var(--wpds-spacing-private-05)',
 	},
-	'--wpds-spacing-15': {
-		'.': '12px',
+	'--wpds-spacing-padding-surface-small': {
+		'.': 'var(--wpds-spacing-private-10)',
 	},
-	'--wpds-spacing-20': {
-		'.': '16px',
+	'--wpds-spacing-padding-surface-medium': {
+		'.': 'var(--wpds-spacing-private-20)',
 	},
-	'--wpds-spacing-30': {
-		'.': '24px',
-	},
-	'--wpds-spacing-40': {
-		'.': '32px',
-	},
-	'--wpds-spacing-50': {
-		'.': '40px',
-	},
-	'--wpds-spacing-60': {
-		'.': '48px',
-	},
-	'--wpds-spacing-70': {
-		'.': '56px',
-	},
-	'--wpds-spacing-80': {
-		'.': '64px',
+	'--wpds-spacing-padding-surface-large': {
+		'.': 'var(--wpds-spacing-private-30)',
 	},
 	'--wpds-font-family-heading': {
 		'.': '-apple-system, system-ui, "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", sans-serif',

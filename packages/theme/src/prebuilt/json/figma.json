@@ -1346,65 +1346,95 @@
 		},
 		"description": "For components that confirm decisions or handle necessary interruptions. Example: Modals."
 	},
-	"Spacing/05": {
+	"Spacing/_Primitives/05": {
 		"value": {
 			".": "4px"
 		},
-		"description": "Extra small spacing"
+		"description": "1x base spacing"
 	},
-	"Spacing/10": {
+	"Spacing/_Primitives/10": {
 		"value": {
 			".": "8px"
 		},
-		"description": "Small spacing"
+		"description": "2x base spacing"
 	},
-	"Spacing/15": {
+	"Spacing/_Primitives/15": {
 		"value": {
 			".": "12px"
 		},
-		"description": "Medium spacing"
+		"description": "3x base spacing"
 	},
-	"Spacing/20": {
+	"Spacing/_Primitives/20": {
 		"value": {
 			".": "16px"
 		},
-		"description": "Large spacing"
+		"description": "4x base spacing"
 	},
-	"Spacing/30": {
+	"Spacing/_Primitives/30": {
 		"value": {
 			".": "24px"
 		},
-		"description": "Extra large spacing"
+		"description": "6x base spacing"
 	},
-	"Spacing/40": {
+	"Spacing/_Primitives/40": {
 		"value": {
 			".": "32px"
 		},
-		"description": "2X large spacing"
+		"description": "8x base spacing"
 	},
-	"Spacing/50": {
+	"Spacing/_Primitives/50": {
 		"value": {
 			".": "40px"
 		},
-		"description": "3X large spacing"
+		"description": "10x base spacing"
 	},
-	"Spacing/60": {
+	"Spacing/_Primitives/60": {
 		"value": {
 			".": "48px"
 		},
-		"description": "4X large spacing"
+		"description": "12x base spacing"
 	},
-	"Spacing/70": {
+	"Spacing/_Primitives/70": {
 		"value": {
 			".": "56px"
 		},
-		"description": "5X large spacing"
+		"description": "14x base spacing"
 	},
-	"Spacing/80": {
+	"Spacing/_Primitives/80": {
 		"value": {
 			".": "64px"
 		},
-		"description": "6X large spacing"
+		"description": "16x base spacing"
+	},
+	"Spacing/Semantic/base": {
+		"value": {
+			".": "{Spacing/_Primitives/05}"
+		},
+		"description": "Base spacing unit"
+	},
+	"Spacing/Semantic/padding-surface-x-small": {
+		"value": {
+			".": "{Spacing/_Primitives/05}"
+		},
+		"description": "Extra small spacing for surfaces"
+	},
+	"Spacing/Semantic/padding-surface-small": {
+		"value": {
+			".": "{Spacing/_Primitives/10}"
+		},
+		"description": "Small spacing for surfaces"
+	},
+	"Spacing/Semantic/padding-surface-medium": {
+		"value": {
+			".": "{Spacing/_Primitives/20}"
+		},
+		"description": "Medium spacing for surfaces"
+	},
+	"Spacing/Semantic/padding-surface-large": {
+		"value": {
+			".": "{Spacing/_Primitives/30}"
+		},
+		"description": "Large spacing for surfaces"
 	},
 	"Font/family-heading": {
 		"value": {
