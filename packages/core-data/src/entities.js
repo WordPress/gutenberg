@@ -207,7 +207,7 @@ export const rootEntitiesConfig = [
 		label: __( 'Registered Templates' ),
 		name: 'registeredTemplate',
 		kind: 'root',
-		baseURL: '/wp/v2/registered-templates',
+		baseURL: '/wp/v2/wp_registered_template',
 		key: 'id',
 	},
 ];
