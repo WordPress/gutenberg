@@ -317,7 +317,7 @@ export function Comments( {
 					setShowCommentBoard={ setShowCommentBoard }
 					commentSidebarRef={ commentSidebarRef }
 				/>
-				<Text as="p">{ __( 'Select a block to insert a Note.' ) }</Text>
+				<Text as="p">{ __( 'Select a block to insert a note.' ) }</Text>
 				<Text as="p" variant="muted">
 					{ __(
 						'Notes are private. Only you and other editors can see them.'
