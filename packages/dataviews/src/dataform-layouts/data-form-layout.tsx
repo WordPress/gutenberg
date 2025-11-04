@@ -2,22 +2,19 @@
  * WordPress dependencies
  */
 import { __experimentalVStack as VStack } from '@wordpress/components';
-import { useContext, useMemo } from '@wordpress/element';
+import { useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import type {
 	FieldValidity,
-	Form,
-	FormField,
 	FormValidity,
-	SimpleFormField,
+	NormalizedForm,
+	NormalizedFormField,
 } from '../types';
 import { getFormFieldLayout } from './index';
 import DataFormContext from '../components/dataform-context';
-import { isCombinedField } from './is-combined-field';
-import normalizeFormFields, { normalizeLayout } from './normalize-form-fields';
 
 const DEFAULT_WRAPPER = ( { children }: { children: React.ReactNode } ) => (
 	<VStack className="dataforms-layouts__wrapper" spacing={ 4 }>
@@ -34,46 +31,38 @@ export function DataFormLayout< Item >( {
 	as,
 }: {
 	data: Item;
-	form: Form;
+	form: NormalizedForm;
 	onChange: ( value: any ) => void;
 	validity?: FormValidity;
 	children?: (
 		FieldLayout: ( props: {
 			data: Item;
-			field: FormField;
+			field: NormalizedFormField;
 			onChange: ( value: any ) => void;
 			hideLabelFromVision?: boolean;
 			validity?: FieldValidity;
 		} ) => React.JSX.Element | null,
-		childField: FormField,
+		childField: NormalizedFormField,
 		childFieldValidity?: FieldValidity
 	) => React.JSX.Element;
 	as?: React.ComponentType< { children: React.ReactNode } >;
 } ) {
 	const { fields: fieldDefinitions } = useContext( DataFormContext );
 
-	function getFieldDefinition( field: SimpleFormField | string ) {
-		const fieldId = typeof field === 'string' ? field : field.id;
-
+	function getFieldDefinition( field: NormalizedFormField ) {
 		return fieldDefinitions.find(
-			( fieldDefinition ) => fieldDefinition.id === fieldId
+			( fieldDefinition ) => fieldDefinition.id === field.id
 		);
 	}
 
-	const normalizedFormFields = useMemo(
-		() => normalizeFormFields( form ),
-		[ form ]
-	);
-
-	const normalizedFormLayout = normalizeLayout( form.layout );
 	const Wrapper =
 		as ??
-		getFormFieldLayout( normalizedFormLayout.type )?.wrapper ??
+		getFormFieldLayout( form.layout.type )?.wrapper ??
 		DEFAULT_WRAPPER;
 
 	return (
-		<Wrapper layout={ normalizedFormLayout }>
-			{ normalizedFormFields.map( ( formField ) => {
+		<Wrapper layout={ form.layout }>
+			{ form.fields.map( ( formField ) => {
 				const FieldLayout = getFormFieldLayout( formField.layout.type )
 					?.component;
 
@@ -81,7 +70,7 @@ export function DataFormLayout< Item >( {
 					return null;
 				}
 
-				const fieldDefinition = ! isCombinedField( formField )
+				const fieldDefinition = ! formField.children
 					? getFieldDefinition( formField )
 					: undefined;
 

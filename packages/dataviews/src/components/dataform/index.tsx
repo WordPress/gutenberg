@@ -10,6 +10,7 @@ import type { DataFormProps } from '../../types';
 import { DataFormProvider } from '../dataform-context';
 import normalizeFields from '../../utils/normalize-fields';
 import { DataFormLayout } from '../../dataform-layouts/data-form-layout';
+import normalizeForm from '../../dataform-layouts/normalize-form';
 
 export default function DataForm< Item >( {
 	data,
@@ -18,6 +19,7 @@ export default function DataForm< Item >( {
 	onChange,
 	validity,
 }: DataFormProps< Item > ) {
+	const normalizedForm = useMemo( () => normalizeForm( form ), [ form ] );
 	const normalizedFields = useMemo(
 		() => normalizeFields( fields ),
 		[ fields ]
@@ -31,7 +33,7 @@ export default function DataForm< Item >( {
 		<DataFormProvider fields={ normalizedFields }>
 			<DataFormLayout
 				data={ data }
-				form={ form }
+				form={ normalizedForm }
 				onChange={ onChange }
 				validity={ validity }
 			/>

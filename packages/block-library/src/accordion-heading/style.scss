@@ -1,9 +1,3 @@
-// The .wp-block-accordion selector is needed to make this CSS stronger
-// than the default heading padding when background color is applied.
-.wp-block-accordion .wp-block-accordion-heading {
-	padding: 0;
-}
-
 .wp-block-accordion-heading__toggle {
 	font-family: inherit;
 	font-size: inherit;

@@ -15,7 +15,6 @@ import dataviewsLtr from '../package-styles/dataviews-ltr.lazy.scss';
 import dataviewsRtl from '../package-styles/dataviews-rtl.lazy.scss';
 import fieldsLtr from '../package-styles/fields-ltr.lazy.scss';
 import fieldsRtl from '../package-styles/fields-rtl.lazy.scss';
-import theme from '../package-styles/theme.lazy.scss';
 
 /**
  * Stylesheets to lazy load when the story's context.componentId matches the
@@ -65,16 +64,6 @@ const CONFIG = [
 		componentIdMatcher: /^fields-/,
 		ltr: [ componentsLtr, dataviewsLtr, fieldsLtr ],
 		rtl: [ componentsRtl, dataviewsRtl, fieldsRtl ],
-	},
-
-	// These components exclusively use logical properties, so the same
-	// stylesheet is used regardless of text direction.
-	//
-	// See: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_logical_properties_and_values
-	{
-		componentIdMatcher: /^theme-/,
-		ltr: [ theme ],
-		rtl: [ theme ],
 	},
 ];
 

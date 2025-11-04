@@ -68,6 +68,12 @@ if ( isPackageInstalled( 'typescript' ) ) {
 				'no-shadow': 'off',
 				'@typescript-eslint/no-shadow': 'error',
 				'@typescript-eslint/method-signature-style': 'error',
+				// TypeScript already checks for these types of issues, so don't
+				// waste time checking them again.
+				// See: https://typescript-eslint.io/troubleshooting/typed-linting/performance/
+				'import/no-unresolved': 'off',
+				'import/default': 'off',
+				'import/named': 'off',
 			},
 		},
 	];

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.10.0 (2025-10-29)
+
 ### Enhancements
 
 -   Update `$font-weight-medium` to 499 ([#72473](https://github.com/WordPress/gutenberg/pull/72473)).

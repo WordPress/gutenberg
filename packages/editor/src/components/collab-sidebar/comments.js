@@ -12,6 +12,7 @@ import {
 	useEffect,
 	useCallback,
 	useMemo,
+	useRef,
 } from '@wordpress/element';
 import {
 	__experimentalText as Text,
@@ -42,6 +43,7 @@ import CommentForm from './comment-form';
 import { focusCommentThread, getCommentExcerpt } from './utils';
 import { useFloatingThread } from './hooks';
 import { AddComment } from './add-comment';
+import { store as editorStore } from '../../store';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 const { Menu } = unlock( componentsPrivateApis );
@@ -63,6 +65,7 @@ export function Comments( {
 	const [ boardOffsets, setBoardOffsets ] = useState( {} );
 	const [ blockRefs, setBlockRefs ] = useState( {} );
 
+	const { setCanvasMinHeight } = unlock( useDispatch( editorStore ) );
 	const { blockCommentId, selectedBlockClientId, orderedBlockIds } =
 		useSelect( ( select ) => {
 			const { getBlockAttributes, getSelectedBlockClientId } =
@@ -149,8 +152,10 @@ export function Comments( {
 
 	// Auto-select the related comment thread when a block is selected.
 	useEffect( () => {
-		setSelectedThread( blockCommentId ?? undefined );
-	}, [ blockCommentId ] );
+		// Fallback to 'new-note-thread' when showing the comment board for a new note.
+		const fallback = showCommentBoard ? 'new-note-thread' : null;
+		setSelectedThread( blockCommentId ?? fallback );
+	}, [ blockCommentId, showCommentBoard ] );
 
 	const setBlockRef = useCallback( ( id, blockRef ) => {
 		setBlockRefs( ( prev ) => ( { ...prev, [ id ]: blockRef } ) );
@@ -166,7 +171,7 @@ export function Comments( {
 			const offsets = {};
 
 			if ( ! isFloating ) {
-				return offsets;
+				return { offsets, minHeight: 0 };
 			}
 
 			// Find the index of the selected thread.
@@ -184,7 +189,7 @@ export function Comments( {
 				! selectedThreadData ||
 				! blockRefs[ selectedThreadData.id ]
 			) {
-				return offsets;
+				return { offsets, minHeight: 0 };
 			}
 
 			let blockElement = blockRefs[ selectedThreadData.id ];
@@ -271,13 +276,36 @@ export function Comments( {
 					threadTop: threadTop + additionalOffset,
 				};
 			}
-			return offsets;
+
+			let editorMinHeight = 0;
+			// Take the calculated top of the final note plus its height as the editor min height.
+			const lastThread = threads[ threads.length - 1 ];
+			if ( blockRefs[ lastThread.id ] ) {
+				const lastBlockElement = blockRefs[ lastThread.id ];
+				const lastBlockRect = lastBlockElement?.getBoundingClientRect();
+				const lastThreadTop = lastBlockRect?.top || 0;
+				const lastThreadHeight = heights[ lastThread.id ] || 0;
+				const lastThreadOffset = offsets[ lastThread.id ] || 0;
+				editorMinHeight =
+					lastThreadTop + lastThreadHeight + lastThreadOffset + 32;
+			}
+
+			return { offsets, minHeight: editorMinHeight };
 		};
-		const newOffsets = calculateAllOffsets();
+		const { offsets: newOffsets, minHeight } = calculateAllOffsets();
 		if ( Object.keys( newOffsets ).length > 0 ) {
 			setBoardOffsets( newOffsets );
 		}
-	}, [ heights, blockRefs, isFloating, threads, selectedThread ] );
+		// Ensure the editor has enough height to scroll to all notes.
+		setCanvasMinHeight( minHeight );
+	}, [
+		heights,
+		blockRefs,
+		isFloating,
+		threads,
+		selectedThread,
+		setCanvasMinHeight,
+	] );
 
 	const hasThreads = Array.isArray( threads ) && threads.length > 0;
 	if ( ! hasThreads && ! isFloating ) {
@@ -631,7 +659,7 @@ const CommentBoard = ( {
 } ) => {
 	const [ actionState, setActionState ] = useState( false );
 	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
-
+	const actionButtonRef = useRef( null );
 	const handleConfirmDelete = () => {
 		onDelete( thread );
 		setActionState( false );
@@ -641,6 +669,7 @@ const CommentBoard = ( {
 	const handleCancel = () => {
 		setActionState( false );
 		setShowConfirmDialog( false );
+		actionButtonRef.current?.focus();
 	};
 
 	// Check if this is a resolution comment by checking metadata.
@@ -729,6 +758,7 @@ const CommentBoard = ( {
 								<Menu.TriggerButton
 									render={
 										<Button
+											ref={ actionButtonRef }
 											size="small"
 											icon={ moreVertical }
 											label={ __( 'Actions' ) }
@@ -762,6 +792,7 @@ const CommentBoard = ( {
 							content: value,
 						} );
 						setActionState( false );
+						actionButtonRef.current?.focus();
 					} }
 					onCancel={ () => handleCancel() }
 					thread={ thread }

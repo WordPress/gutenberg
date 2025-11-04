@@ -6,7 +6,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -45,6 +45,13 @@ export function AddComment( {
 		};
 	}, [] );
 	const blockElement = useBlockElement( clientId );
+	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
+
+	const unselectThread = () => {
+		setShowCommentBoard( false );
+		blockElement?.focus();
+		toggleBlockSpotlight( clientId, false );
+	};
 
 	if ( ! showCommentBoard || ! clientId || undefined !== blockCommentId ) {
 		return null;
@@ -73,6 +80,7 @@ export function AddComment( {
 				if ( event.currentTarget.contains( event.relatedTarget ) ) {
 					return;
 				}
+				toggleBlockSpotlight( clientId, false );
 				setShowCommentBoard( false );
 			} }
 		>
@@ -85,10 +93,7 @@ export function AddComment( {
 					focusCommentThread( id, commentSidebarRef.current );
 					setShowCommentBoard( false );
 				} }
-				onCancel={ () => {
-					setShowCommentBoard( false );
-					blockElement?.focus();
-				} }
+				onCancel={ unselectThread }
 				reflowComments={ reflowComments }
 				submitButtonText={ __( 'Add note' ) }
 				labelText={ __( 'New note' ) }

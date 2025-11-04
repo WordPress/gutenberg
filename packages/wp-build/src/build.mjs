@@ -3,8 +3,7 @@
 /**
  * External dependencies
  */
-import { readFile, writeFile, copyFile, mkdir } from 'fs/promises';
-import { readdirSync } from 'fs';
+import { readFile, writeFile, copyFile, mkdir, unlink } from 'fs/promises';
 import path from 'path';
 import { parseArgs } from 'node:util';
 import esbuild from 'esbuild';
@@ -13,9 +12,8 @@ import chokidar from 'chokidar';
 // See https://github.com/WordPress/gutenberg/issues/72136
 // eslint-disable-next-line import/no-unresolved
 import browserslistToEsbuild from 'browserslist-to-esbuild';
-import { sassPlugin } from 'esbuild-sass-plugin';
+import { sassPlugin, postcssModules } from 'esbuild-sass-plugin';
 import postcss from 'postcss';
-import postcssModulesPlugin from 'postcss-modules';
 import autoprefixer from 'autoprefixer';
 import rtlcss from 'rtlcss';
 import cssnano from 'cssnano';
@@ -29,24 +27,35 @@ import { groupByDepth, findScriptsToRebundle } from './dependency-graph.mjs';
 import {
 	generatePhpFromTemplate,
 	getPhpReplacements,
+	generateRoutesPhp,
+	generateRoutesRegistry,
 } from './php-generator.mjs';
 import { getPackageInfo, getPackageInfoFromFile } from './package-utils.mjs';
 import { createWordpressExternalsPlugin } from './wordpress-externals-plugin.mjs';
+import {
+	getAllRoutes,
+	getRouteFiles,
+	generateContentEntryPoint,
+} from './route-utils.mjs';
 
 const ROOT_DIR = process.cwd();
 const PACKAGES_DIR = path.join( ROOT_DIR, 'packages' );
 const BUILD_DIR = path.join( ROOT_DIR, 'build' );
 
 const SOURCE_EXTENSIONS = '{js,ts,tsx}';
+const ASSET_EXTENSIONS = 'json';
 const IGNORE_PATTERNS = [
 	'**/benchmark/**',
 	'**/{__mocks__,__tests__,test}/**',
 	'**/{storybook,stories}/**',
 	'**/*.native.*',
+	'**/*.ios.*',
+	'**/*.android.*',
 ];
 const TEST_FILE_PATTERNS = [
 	/\/(benchmark|__mocks__|__tests__|test|storybook|stories)\/.+/,
 	/\.(spec|test)\.(js|ts|tsx)$/,
+	/\.(native|ios|android)\.(js|ts|tsx)$/,
 ];
 
 /**
@@ -55,19 +64,22 @@ const TEST_FILE_PATTERNS = [
  * @return {string[]} Array of package names.
  */
 function getAllPackages() {
-	return readdirSync( PACKAGES_DIR, { withFileTypes: true } )
-		.filter( ( dirent ) => dirent.isDirectory() )
-		.map( ( dirent ) => dirent.name );
+	return glob
+		.sync( path.join( PACKAGES_DIR, '*', 'package.json' ) )
+		.map( ( packageJsonPath ) =>
+			path.basename( path.dirname( packageJsonPath ) )
+		);
 }
 
 const PACKAGES = getAllPackages();
-const ROOT_PACKAGE_JSON = getPackageInfoFromFile( path.join( ROOT_DIR, 'package.json' ) );
+const ROOT_PACKAGE_JSON = getPackageInfoFromFile(
+	path.join( ROOT_DIR, 'package.json' )
+);
 const WP_PLUGIN_CONFIG = ROOT_PACKAGE_JSON.wpPlugin || {};
 const SCRIPT_GLOBAL = WP_PLUGIN_CONFIG.scriptGlobal;
 const PACKAGE_NAMESPACE = WP_PLUGIN_CONFIG.packageNamespace;
 const HANDLE_PREFIX = WP_PLUGIN_CONFIG.handlePrefix || PACKAGE_NAMESPACE;
 const EXTERNAL_NAMESPACES = WP_PLUGIN_CONFIG.externalNamespaces || {};
-
 
 const baseDefine = {
 	'globalThis.IS_GUTENBERG_PLUGIN': JSON.stringify(
@@ -91,21 +103,6 @@ const wordpressExternalsPlugin = createWordpressExternalsPlugin(
 	EXTERNAL_NAMESPACES,
 	HANDLE_PREFIX
 );
-
-/**
- * Create emotion babel plugin for esbuild.
- * This plugin enables emotion's babel transformations for proper CSS-in-JS handling.
- *
- * @return {Object} esbuild plugin.
- */
-function emotionBabelPlugin() {
-	return babel( {
-		filter: /\.[jt]sx?$/,
-		config: {
-			plugins: [ '@emotion/babel-plugin' ],
-		},
-	} );
-}
 
 /**
  * Normalize path separators for cross-platform compatibility.
@@ -278,7 +275,9 @@ async function bundlePackage( packageName ) {
 
 		// Check if package matches the namespace and should expose a global
 		const packageFullName = packageJson.name;
-		const matchesNamespace = packageFullName.startsWith( `@${ PACKAGE_NAMESPACE }/` );
+		const matchesNamespace = packageFullName.startsWith(
+			`@${ PACKAGE_NAMESPACE }/`
+		);
 		const shouldExposeGlobal = matchesNamespace && SCRIPT_GLOBAL !== false;
 
 		const globalName = shouldExposeGlobal
@@ -309,6 +308,12 @@ async function bundlePackage( packageName ) {
 				'iife',
 				packageJson.wpScriptExtraDependencies || []
 			),
+			sassPlugin( {
+				embedded: true,
+				filter: /\.module\.css$/,
+				transform: postcssModules( {} ),
+				type: 'style',
+			} ),
 		];
 
 		builds.push(
@@ -789,8 +794,10 @@ async function transpilePackage( packageName ) {
 		}
 	);
 
-	const jsonFiles = await glob(
-		normalizePath( path.join( packageDir, 'src/**/*.json' ) ),
+	const assetFiles = await glob(
+		normalizePath(
+			path.join( packageDir, `src/**/*.${ ASSET_EXTENSIONS }` )
+		),
 		{
 			ignore: IGNORE_PATTERNS,
 		}
@@ -806,7 +813,60 @@ async function transpilePackage( packageName ) {
 	// Check if this is the components package that needs emotion babel plugin.
 	// Ideally we should remove this exception and move away from emotion.
 	const needsEmotionPlugin = packageName === 'components';
-	const plugins = needsEmotionPlugin ? [ emotionBabelPlugin() ] : [];
+	const emotionPlugin = babel( {
+		filter: /\.[jt]sx?$/,
+		config: {
+			plugins: [ '@emotion/babel-plugin' ],
+		},
+	} );
+	const externalizeAllExceptCssPlugin = {
+		name: 'externalize-except-css',
+		setup( build ) {
+			// Externalize all non-CSS imports
+			build.onResolve( { filter: /.*/ }, ( args ) => {
+				// Skip entry points
+				if ( args.kind === 'entry-point' ) {
+					return null;
+				}
+
+				// Let CSS/SCSS files be processed by sassPlugin
+				if ( args.path.match( /\.(css|scss)$/ ) ) {
+					return null;
+				}
+
+				// Externalize everything else (keep imports as-is)
+				return { path: args.path, external: true };
+			} );
+		},
+	};
+	const plugins = [
+		needsEmotionPlugin && emotionPlugin,
+		externalizeAllExceptCssPlugin,
+		// Handle CSS modules (.module.css and .module.scss)
+		sassPlugin( {
+			embedded: true,
+			filter: /\.module\.(css|scss)$/,
+			transform: postcssModules( {
+				generateScopedName: '[name]__[local]__[hash:base64:5]',
+			} ),
+			type: 'style',
+			loadPaths: [
+				'node_modules',
+				path.join( PACKAGES_DIR, 'base-styles' ),
+			],
+		} ),
+		// Handle regular CSS/SCSS files
+		// Note: .module.css and .module.scss already handled by plugin above
+		sassPlugin( {
+			embedded: true,
+			filter: /\.(css|scss)$/,
+			type: 'style',
+			loadPaths: [
+				'node_modules',
+				path.join( PACKAGES_DIR, 'base-styles' ),
+			],
+		} ),
+	].filter( Boolean );
 
 	if ( packageJson.main ) {
 		builds.push(
@@ -814,7 +874,7 @@ async function transpilePackage( packageName ) {
 				entryPoints: srcFiles,
 				outdir: buildDir,
 				outbase: srcDir,
-				bundle: false,
+				bundle: true,
 				platform: 'node',
 				format: 'cjs',
 				sourcemap: true,
@@ -828,13 +888,13 @@ async function transpilePackage( packageName ) {
 			} )
 		);
 
-		for ( const jsonFile of jsonFiles ) {
-			const relativePath = path.relative( srcDir, jsonFile );
+		for ( const assetFile of assetFiles ) {
+			const relativePath = path.relative( srcDir, assetFile );
 			const destPath = path.join( buildDir, relativePath );
 			const destDir = path.dirname( destPath );
 			builds.push(
 				mkdir( destDir, { recursive: true } ).then( () =>
-					copyFile( jsonFile, destPath )
+					copyFile( assetFile, destPath )
 				)
 			);
 		}
@@ -846,7 +906,7 @@ async function transpilePackage( packageName ) {
 				entryPoints: srcFiles,
 				outdir: buildModuleDir,
 				outbase: srcDir,
-				bundle: false,
+				bundle: true,
 				platform: 'neutral',
 				format: 'esm',
 				sourcemap: true,
@@ -860,7 +920,7 @@ async function transpilePackage( packageName ) {
 			} )
 		);
 
-		for ( const jsonFile of jsonFiles ) {
+		for ( const jsonFile of assetFiles ) {
 			const relativePath = path.relative( srcDir, jsonFile );
 			const destPath = path.join( buildModuleDir, relativePath );
 			const destDir = path.dirname( destPath );
@@ -882,9 +942,9 @@ async function transpilePackage( packageName ) {
 /**
  * Compile styles for a single package.
  *
- * Discovers and compiles SCSS entry points based on package configuration
- * (supporting wpStyleEntryPoints in package.json for custom entry point patterns),
- * and all .module.css files in src/ directory.
+ * Discovers and compiles SCSS entry points based on package configuration,
+ * supporting wpStyleEntryPoints in package.json for custom entry point
+ * patterns.
  *
  * @param {string} packageName Package name.
  * @return {Promise<number|null>} Build time in milliseconds, or null if no styles.
@@ -907,77 +967,13 @@ async function compileStyles( packageName ) {
 		)
 	);
 
-	// Get CSS modules from anywhere in src/
-	const cssModuleEntries = await glob(
-		normalizePath( path.join( packageDir, 'src/**/*.module.css' ) ),
-		{ ignore: IGNORE_PATTERNS }
-	);
-
-	if ( scssEntries.length === 0 && cssModuleEntries.length === 0 ) {
+	if ( scssEntries.length === 0 ) {
 		return null;
 	}
 
 	const startTime = Date.now();
 	const buildStyleDir = path.join( packageDir, 'build-style' );
 	const srcDir = path.join( packageDir, 'src' );
-
-	// Process .module.css files and generate JS modules
-	const cssResults = await Promise.all(
-		cssModuleEntries.map( async ( styleEntryPath ) => {
-			const buildDir = path.join( packageDir, 'build' );
-			const buildModuleDir = path.join( packageDir, 'build-module' );
-
-			const cssContent = await readFile( styleEntryPath, 'utf8' );
-			const relativePath = path.relative( srcDir, styleEntryPath );
-
-			let mappings = {};
-			const result = await postcss( [
-				postcssModulesPlugin( {
-					getJSON: ( _, json ) => ( mappings = json ),
-				} ),
-			] ).process( cssContent, { from: styleEntryPath } );
-
-			// Write processed CSS to build-style (preserving directory structure)
-			const cssOutPath = path.join(
-				buildStyleDir,
-				relativePath.replace( '.module.css', '.css' )
-			);
-			await mkdir( path.dirname( cssOutPath ), { recursive: true } );
-			await writeFile( cssOutPath, result.css );
-
-			// Generate JS modules with class name mappings (preserving directory structure)
-			const jsExport = JSON.stringify( mappings );
-			const jsPath = `${ relativePath }.js`;
-			await Promise.all( [
-				mkdir( path.dirname( path.join( buildDir, jsPath ) ), {
-					recursive: true,
-				} ),
-				mkdir( path.dirname( path.join( buildModuleDir, jsPath ) ), {
-					recursive: true,
-				} ),
-			] );
-			await Promise.all( [
-				writeFile(
-					path.join( buildDir, jsPath ),
-					`"use strict";\nmodule.exports = ${ jsExport };\n`
-				),
-				writeFile(
-					path.join( buildModuleDir, jsPath ),
-					`export default ${ jsExport };\n`
-				),
-			] );
-
-			// Return the processed CSS for combining
-			return result.css;
-		} )
-	);
-
-	// Generate combined stylesheet from all CSS modules
-	if ( cssResults.length > 0 ) {
-		const combinedCss = cssResults.join( '\n' );
-		await mkdir( buildStyleDir, { recursive: true } );
-		await writeFile( path.join( buildStyleDir, 'style.css' ), combinedCss );
-	}
 
 	// Process SCSS files
 	await Promise.all(
@@ -1098,6 +1094,123 @@ function getPackageName( filename ) {
 }
 
 /**
+ * Build a single route's files.
+ *
+ * @param {string} routeName Route name.
+ * @return {Promise<number>} Build time in milliseconds.
+ */
+async function buildRoute( routeName ) {
+	const startTime = Date.now();
+	const routeDir = path.join( ROOT_DIR, 'routes', routeName );
+	const outputDir = path.join( BUILD_DIR, 'routes', routeName );
+
+	// Ensure output directory exists
+	await mkdir( outputDir, { recursive: true } );
+
+	// Copy package.json
+	await copyFile(
+		path.join( routeDir, 'package.json' ),
+		path.join( outputDir, 'package.json' )
+	);
+
+	const files = getRouteFiles( routeDir );
+
+	// Build route.js if it exists
+	if ( files.hasRoute ) {
+		const routeEntryPoints = await glob( `route.${ SOURCE_EXTENSIONS }`, {
+			cwd: routeDir,
+			absolute: true,
+		} );
+
+		if ( routeEntryPoints.length > 0 ) {
+			await esbuild.build( {
+				entryPoints: routeEntryPoints,
+				outfile: path.join( outputDir, 'route.js' ),
+				bundle: true,
+				format: 'esm',
+				target: browserslistToEsbuild(),
+				define: getDefine( false ),
+				plugins: [
+					wordpressExternalsPlugin( 'route.min', 'esm' ),
+					babel( {
+						filter: /\.(tsx?)$/,
+						config: {
+							presets: [
+								'@babel/preset-typescript',
+								[
+									'@babel/preset-react',
+									{ runtime: 'automatic' },
+								],
+							],
+							plugins: [ '@emotion/babel-plugin' ],
+						},
+					} ),
+				],
+			} );
+		}
+	}
+
+	// Build content.js if stage or inspector exists
+	if ( files.hasStage || files.hasInspector ) {
+		// Create synthetic entry point
+		const syntheticEntry = generateContentEntryPoint( files );
+		const tempEntryPath = path.join( routeDir, '.content-entry.js' );
+
+		// Write temporary entry file
+		await writeFile( tempEntryPath, syntheticEntry );
+		await esbuild.build( {
+			entryPoints: [ tempEntryPath ],
+			outfile: path.join( outputDir, 'content.js' ),
+			bundle: true,
+			format: 'esm',
+			target: browserslistToEsbuild(),
+			define: getDefine( false ),
+			plugins: [
+				wordpressExternalsPlugin( 'content.min', 'esm' ),
+				babel( {
+					filter: /\.(tsx?)$/,
+					config: {
+						presets: [
+							'@babel/preset-typescript',
+							[ '@babel/preset-react', { runtime: 'automatic' } ],
+						],
+						plugins: [ '@emotion/babel-plugin' ],
+					},
+				} ),
+			],
+		} );
+		await unlink( tempEntryPath );
+	}
+
+	return Date.now() - startTime;
+}
+
+/**
+ * Build all discovered routes.
+ *
+ * @return {Promise<void>}
+ */
+async function buildAllRoutes() {
+	console.log( '\n🚦 Phase 3: Building routes...\n' );
+
+	const routes = getAllRoutes( ROOT_DIR );
+
+	if ( routes.length === 0 ) {
+		console.log( '   No routes found, skipping.\n' );
+		return;
+	}
+
+	await Promise.all(
+		routes.map( async ( routeName ) => {
+			const buildTime = await buildRoute( routeName );
+			console.log(
+				`   ✔ Built route ${ routeName } (${ buildTime }ms)`
+			);
+		} )
+	);
+}
+
+/**
  * Main build function.
  */
 async function buildAll() {
@@ -1159,6 +1272,9 @@ async function buildAll() {
 		} )
 	);
 
+	// Build routes
+	await buildAllRoutes();
+
 	console.log( '\n📄 Generating PHP registration files...\n' );
 	const phpReplacements = await getPhpReplacements( ROOT_DIR );
 	await Promise.all( [
@@ -1167,6 +1283,17 @@ async function buildAll() {
 		generateScriptRegistrationPhp( scripts, phpReplacements ),
 		generateStyleRegistrationPhp( styles, phpReplacements ),
 		generateVersionPhp( phpReplacements ),
+		generateRoutesRegistry(
+			ROOT_DIR,
+			BUILD_DIR,
+			phpReplacements[ '{{PREFIX}}' ]
+		),
+		generateRoutesPhp(
+			ROOT_DIR,
+			BUILD_DIR,
+			HANDLE_PREFIX,
+			phpReplacements[ '{{PREFIX}}' ]
+		),
 	] );
 	console.log( '   ✔ Generated build/modules.php' );
 	console.log( '   ✔ Generated build/modules/index.php' );
@@ -1175,6 +1302,7 @@ async function buildAll() {
 	console.log( '   ✔ Generated build/styles.php' );
 	console.log( '   ✔ Generated build/styles/index.php' );
 	console.log( '   ✔ Generated build/version.php' );
+	console.log( '   ✔ Generated build/routes.php' );
 	console.log( '   ✔ Generated build/index.php' );
 
 	const totalTime = Date.now() - startTime;
