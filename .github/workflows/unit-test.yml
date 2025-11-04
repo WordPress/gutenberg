@@ -193,6 +193,8 @@ jobs:
                       wordpress: 'previous major version'
                     - php: '8.1'
                       wordpress: 'previous major version'
+                    - php: '8.2'
+                      wordpress: 'previous major version'
 
         env:
             WP_ENV_PHP_VERSION: ${{ matrix.php }}
