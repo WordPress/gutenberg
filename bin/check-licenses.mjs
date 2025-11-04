@@ -3,7 +3,7 @@
 /**
  * External dependencies
  */
-import { spawnSync } from 'node:child_process';
+import spawn from 'cross-spawn';
 
 /**
  * Internal dependencies
@@ -25,7 +25,7 @@ const ignored = [ '@ampproject/remapping', 'webpack' ];
 
 /** @type {ReadonlyArray<PackageInfo>} */
 const workspacePackages = JSON.parse(
-	spawnSync(
+	spawn.sync(
 		'npm',
 		[
 			'query',
@@ -42,7 +42,7 @@ const workspacePackages = JSON.parse(
 const packageNames = workspacePackages.map( ( { name } ) => name );
 
 const dependenciesToProcess = JSON.parse(
-	spawnSync(
+	spawn.sync(
 		'npm',
 		[
 			'ls',
