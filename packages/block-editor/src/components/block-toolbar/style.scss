@@ -58,8 +58,8 @@
 		}
 	}
 
-	// Disabled buttons should have a fixed color.
-	.components-button[aria-disabled="true"] {
+	// Disabled block toolbar icon should have a fixed color.
+	.components-button.block-editor-block-toolbar__block-icon[aria-disabled="true"] {
 		color: $gray-900;
 
 		// Since it's not clickable, though, don't show a hover state.
