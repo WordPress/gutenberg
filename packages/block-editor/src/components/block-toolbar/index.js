@@ -15,7 +15,6 @@ import {
 	hasBlockSupport,
 	isReusableBlock,
 	isTemplatePart,
-	store as blocksStore,
 } from '@wordpress/blocks';
 import { ToolbarGroup } from '@wordpress/components';
 
@@ -40,63 +39,6 @@ import ChangeDesign from './change-design';
 import SwitchSectionStyle from './switch-section-style';
 import { unlock } from '../../lock-unlock';
 import BlockToolbarIcon from './block-toolbar-icon';
-import { hasPatternOverridesDefaultBinding } from '../../utils/block-bindings';
-
-function getBlockIconVariant( {
-	select,
-	clientIds,
-	editingMode,
-	hasTemplateLock,
-} ) {
-	const {
-		getBlockName,
-		getBlockAttributes,
-		getBlockParentsByBlockName,
-		isSectionBlock,
-		canRemoveBlocks,
-	} = unlock( select( blockEditorStore ) );
-	const { getBlockStyles } = select( blocksStore );
-
-	// Calculate props only used in this function
-	const isSingleBlock = clientIds.length === 1;
-	const blockName = isSingleBlock && getBlockName( clientIds[ 0 ] );
-	const hasBlockStyles =
-		isSingleBlock && !! getBlockStyles( blockName )?.length;
-	const isSectionInSelection = clientIds.some( ( id ) =>
-		isSectionBlock( id )
-	);
-	const hasPatternOverrides = clientIds.every( ( clientId ) =>
-		hasPatternOverridesDefaultBinding(
-			getBlockAttributes( clientId )?.metadata?.bindings
-		)
-	);
-	const hasParentPattern = clientIds.every(
-		( clientId ) =>
-			getBlockParentsByBlockName( clientId, 'core/block', true ).length >
-			0
-	);
-	const canRemove = canRemoveBlocks( clientIds );
-
-	const _isDisabled = editingMode !== 'default';
-	const _hideTransformsForSections =
-		window?.__experimentalContentOnlyPatternInsertion &&
-		isSectionInSelection;
-	const _showBlockSwitcher =
-		! _hideTransformsForSections &&
-		! _isDisabled &&
-		( hasBlockStyles || canRemove ) &&
-		! hasTemplateLock;
-
-	const _showPatternOverrides = hasPatternOverrides && hasParentPattern;
-
-	if ( _showBlockSwitcher ) {
-		return 'switcher';
-	} else if ( _showPatternOverrides ) {
-		return 'pattern-overrides';
-	}
-
-	return 'default';
-}
 
 /**
  * Renders the block toolbar.
@@ -134,7 +76,6 @@ export function PrivateBlockToolbar( {
 		showLockButtons,
 		showBlockVisibilityButton,
 		showSwitchSectionStyleButton,
-		iconVariant,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockName,
@@ -217,12 +158,6 @@ export function PrivateBlockToolbar( {
 			showLockButtons: ! _isZoomOut,
 			showBlockVisibilityButton: ! _isZoomOut,
 			showSwitchSectionStyleButton: _showSwitchSectionStyleButton,
-			iconVariant: getBlockIconVariant( {
-				select,
-				clientIds: selectedBlockClientIds,
-				editingMode,
-				hasTemplateLock: _hasTemplateLock,
-			} ),
 		};
 	}, [] );
 
@@ -279,7 +214,6 @@ export function PrivateBlockToolbar( {
 							<BlockToolbarIcon
 								clientIds={ blockClientIds }
 								isSynced={ isSynced }
-								variant={ iconVariant }
 							/>
 							{ isDefaultEditingMode &&
 								showBlockVisibilityButton && (
