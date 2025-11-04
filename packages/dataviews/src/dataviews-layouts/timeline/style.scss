@@ -5,8 +5,7 @@
 	margin: 0 0 auto;
 	padding: $grid-unit-10 $grid-unit-60;
 
-	div[role="row"],
-	div[role="article"] {
+	.dataviews-view-timeline__row {
 		margin: 0;
 
 		.dataviews-view-timeline__item-wrapper {
