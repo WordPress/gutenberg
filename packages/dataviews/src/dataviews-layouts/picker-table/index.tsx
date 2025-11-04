@@ -21,12 +21,8 @@ import {
  */
 import DataViewsContext from '../../components/dataviews-context';
 import DataViewsSelectionCheckbox from '../../components/dataviews-selection-checkbox';
+import { useIsMultiselectPicker } from '../../components/dataviews-picker/footer';
 import { sortValues } from '../../constants';
-import {
-	useSomeItemHasAPossibleBulkAction,
-	useHasAPossibleBulkAction,
-	BulkSelectionCheckbox,
-} from '../../components/dataviews-bulk-actions';
 import type {
 	Action,
 	NormalizedField,
@@ -57,6 +53,7 @@ interface TableRowProps< Item > {
 	selection: string[];
 	getItemId: ( item: Item ) => string;
 	onChangeSelection: SetSelection;
+	multiselect: boolean;
 	posinset?: number;
 }
 
@@ -86,7 +83,6 @@ function TableColumnField< Item >( {
 
 function TableRow< Item >( {
 	item,
-	actions,
 	fields,
 	id,
 	view,
@@ -96,11 +92,11 @@ function TableRow< Item >( {
 	selection,
 	getItemId,
 	onChangeSelection,
+	multiselect,
 	posinset,
 }: TableRowProps< Item > ) {
 	const { paginationInfo } = useContext( DataViewsContext );
-	const hasPossibleBulkAction = useHasAPossibleBulkAction( actions, item );
-	const isSelected = hasPossibleBulkAction && selection.includes( id );
+	const isSelected = selection.includes( id );
 	const [ isHovered, setIsHovered ] = useState( false );
 	const {
 		showTitle = true,
@@ -124,9 +120,8 @@ function TableRow< Item >( {
 	return (
 		<tr
 			className={ clsx( 'dataviews-view-table__row', {
-				'is-selected': hasPossibleBulkAction && isSelected,
+				'is-selected': isSelected,
 				'is-hovered': isHovered,
-				'has-bulk-actions': hasPossibleBulkAction,
 			} ) }
 			onMouseEnter={ handleMouseEnter }
 			onMouseLeave={ handleMouseLeave }
@@ -136,26 +131,16 @@ function TableRow< Item >( {
 			aria-posinset={ posinset }
 			role={ infiniteScrollEnabled ? 'article' : undefined }
 			onClick={ ( event ) => {
-				if ( ! hasPossibleBulkAction ) {
-					return;
-				}
-
 				if ( event.target instanceof HTMLElement ) {
-					// Don't select when clicking on the checkbox or primary column
-					const isCheckbox = event.target.closest(
-						'.dataviews-view-table__checkbox-column'
-					);
-					const isPrimary =
-						event.target.closest( 'td' )?.cellIndex === 1;
-
-					if ( ! isCheckbox && ! isPrimary ) {
+					if ( isSelected ) {
 						onChangeSelection(
-							selection.includes( id )
-								? selection.filter(
-										( itemId ) => id !== itemId
-								  )
-								: [ id ]
+							selection.filter( ( itemId ) => id !== itemId )
 						);
+					} else {
+						const newSelection = multiselect
+							? [ ...selection, id ]
+							: [ id ];
+						onChangeSelection( newSelection );
 					}
 				}
 			} }
@@ -168,7 +153,7 @@ function TableRow< Item >( {
 						onChangeSelection={ onChangeSelection }
 						getItemId={ getItemId }
 						titleField={ titleField }
-						disabled={ ! hasPossibleBulkAction }
+						disabled={ false }
 					/>
 				</div>
 			</td>
@@ -233,7 +218,7 @@ function ViewPickerTable< Item >( {
 	const headerMenuToFocusRef = useRef< HTMLButtonElement >();
 	const [ nextHeaderMenuToFocus, setNextHeaderMenuToFocus ] =
 		useState< HTMLButtonElement >();
-	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
+	const isMultiselect = useIsMultiselectPicker( actions ) ?? false;
 
 	useEffect( () => {
 		if ( headerMenuToFocusRef.current ) {
@@ -309,20 +294,6 @@ function ViewPickerTable< Item >( {
 			>
 				<thead>
 					<tr className="dataviews-view-table__row">
-						{ hasBulkActions && (
-							<th
-								className="dataviews-view-table__checkbox-column"
-								scope="col"
-							>
-								<BulkSelectionCheckbox
-									selection={ selection }
-									onChangeSelection={ onChangeSelection }
-									data={ data }
-									actions={ actions }
-									getItemId={ getItemId }
-								/>
-							</th>
-						) }
 						{ hasPrimaryColumn && (
 							<th scope="col">
 								{ titleField && (
@@ -389,8 +360,7 @@ function ViewPickerTable< Item >( {
 									<td
 										colSpan={
 											columns.length +
-											( hasPrimaryColumn ? 1 : 0 ) +
-											( hasBulkActions ? 1 : 0 )
+											( hasPrimaryColumn ? 1 : 0 )
 										}
 										className="dataviews-view-table__group-header-cell"
 									>
@@ -419,6 +389,7 @@ function ViewPickerTable< Item >( {
 										selection={ selection }
 										getItemId={ getItemId }
 										onChangeSelection={ onChangeSelection }
+										multiselect={ isMultiselect }
 									/>
 								) ) }
 							</tbody>
@@ -441,6 +412,7 @@ function ViewPickerTable< Item >( {
 									selection={ selection }
 									getItemId={ getItemId }
 									onChangeSelection={ onChangeSelection }
+									multiselect={ isMultiselect }
 									posinset={
 										isInfiniteScroll ? index + 1 : undefined
 									}
