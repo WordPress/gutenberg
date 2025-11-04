@@ -60,6 +60,9 @@ function NotesSidebarContent( {
 					commentSidebarRef.current = node;
 				}
 			} }
+			aria-label={
+				isFloating ? __( 'Unresolved notes' ) : __( 'All notes' )
+			}
 		>
 			<Comments
 				threads={ comments }
