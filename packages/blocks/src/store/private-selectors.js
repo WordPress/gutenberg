@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createSelector } from '@wordpress/data';
+import { createSelector, createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 
 /**
@@ -210,6 +210,54 @@ export function getAllBlockBindingsSources( state ) {
 export function getBlockBindingsSource( state, sourceName ) {
 	return state.blockBindingsSources[ sourceName ];
 }
+
+export const getBlockBindingsSourcesForBlock = createRegistrySelector(
+	( select ) =>
+		createSelector(
+			( state, blockName, blockContext ) => {
+				const registeredSources = getAllBlockBindingsSources( state );
+				const sources = {};
+
+				Object.entries( registeredSources ).forEach(
+					( [
+						sourceName,
+						{ getFieldsList, usesContext, label, getValues },
+					] ) => {
+						// Populate context.
+						const context = {};
+						if ( usesContext?.length ) {
+							for ( const key of usesContext ) {
+								context[ key ] = blockContext[ key ];
+							}
+						}
+						if ( getFieldsList ) {
+							const fieldsListResult = getFieldsList( {
+								select,
+								context,
+							} );
+							sources[ sourceName ] = {
+								data: fieldsListResult || [],
+								label,
+								getValues,
+							};
+						} else {
+							/*
+							 * Include sources without getFieldsList if they are already used in a binding.
+							 * This allows them to be displayed in read-only mode.
+							 */
+							sources[ sourceName ] = {
+								data: [],
+								label,
+								getValues,
+							};
+						}
+					}
+				);
+				return sources;
+			},
+			( state ) => [ getAllBlockBindingsSources( state ) ]
+		)
+);
 
 /**
  * Determines if any of the block type's attributes have
