@@ -62,7 +62,9 @@ const duplicatePost: Action< BasePost > = {
 				return;
 			}
 
-			const isTemplate = item.type === 'wp_template';
+			const isTemplate =
+				item.type === 'wp_template' ||
+				item.type === 'wp_registered_template';
 
 			const newItemObject = {
 				status: isTemplate ? 'publish' : 'draft',
@@ -106,7 +108,9 @@ const duplicatePost: Action< BasePost > = {
 			try {
 				const newItem = await saveEntityRecord(
 					'postType',
-					item.type,
+					item.type === 'wp_registered_template'
+						? 'wp_template'
+						: item.type,
 					newItemObject,
 					{ throwOnError: true }
 				);
@@ -145,7 +149,7 @@ const duplicatePost: Action< BasePost > = {
 		return (
 			<form onSubmit={ createPage }>
 				<VStack spacing={ 3 }>
-					{ typeof item.id === 'string' && (
+					{ item.type === 'wp_registered_template' && (
 						<div>
 							{ __(
 								'You are about to duplicate a bundled template. Changes will not be live until you activate the new template.'

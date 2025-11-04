@@ -203,13 +203,6 @@ export const rootEntitiesConfig = [
 		plural: 'statuses',
 		key: 'slug',
 	},
-	{
-		label: __( 'Registered Templates' ),
-		name: 'registeredTemplate',
-		kind: 'root',
-		baseURL: '/wp/v2/wp_registered_template',
-		key: 'id',
-	},
 ];
 
 export const deprecatedEntities = {

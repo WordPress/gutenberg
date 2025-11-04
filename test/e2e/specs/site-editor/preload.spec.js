@@ -46,6 +46,7 @@ test.describe( 'Preload', () => {
 
 		// To do: these should all be removed or preloaded.
 		expect( requests ).toEqual( [
+			'/wp/v2/templates/emptytheme//index?context=edit',
 			// Seems to be coming from `enableComplementaryArea`.
 			'/wp/v2/users/me',
 			// There are two separate settings OPTIONS requests. We should fix
