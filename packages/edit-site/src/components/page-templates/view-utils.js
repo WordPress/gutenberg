@@ -28,13 +28,6 @@ const DEFAULT_VIEW = {
 export function getDefaultView( activeView ) {
 	return {
 		...DEFAULT_VIEW,
-		sort:
-			activeView === 'user'
-				? {
-						field: 'date',
-						direction: 'desc',
-				  }
-				: DEFAULT_VIEW.sort,
 		filters: ! [ 'active', 'user' ].includes( activeView )
 			? [
 					{

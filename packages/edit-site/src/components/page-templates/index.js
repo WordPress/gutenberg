@@ -39,8 +39,7 @@ import {
 } from './fields';
 import { defaultLayouts, getDefaultView } from './view-utils';
 
-const { usePostActions, usePostFields, templateTitleField } =
-	unlock( editorPrivateApis );
+const { usePostActions, templateTitleField } = unlock( editorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 const { useEntityRecordsWithPermissions } = unlock( corePrivateApis );
 
@@ -211,10 +210,6 @@ export default function PageTemplates() {
 		[ history, path, view?.type ]
 	);
 
-	const postTypeFields = usePostFields( {
-		postType: TEMPLATE_POST_TYPE,
-	} );
-	const dateField = postTypeFields.find( ( field ) => field.id === 'date' );
 	const themeField = useThemeField();
 	const fields = useMemo( () => {
 		const _fields = [
@@ -226,9 +221,6 @@ export default function PageTemplates() {
 		];
 		if ( activeView === 'user' ) {
 			_fields.push( themeField );
-			if ( dateField ) {
-				_fields.push( dateField );
-			}
 		}
 		const elements = [];
 		for ( const author in users ) {
@@ -242,7 +234,7 @@ export default function PageTemplates() {
 			elements,
 		} );
 		return _fields;
-	}, [ users, activeView, themeField, dateField ] );
+	}, [ users, activeView, themeField ] );
 
 	const { data, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( records, view, fields );
@@ -259,7 +251,6 @@ export default function PageTemplates() {
 							typeof newItem.title === 'string'
 								? newItem.title
 								: newItem.title?.rendered;
-						history.navigate( `/template?activeView=user` );
 						createSuccessNotice(
 							sprintf(
 								// translators: %s: Title of the created post or template, e.g: "Hello world".
@@ -367,6 +358,11 @@ export default function PageTemplates() {
 					<duplicateAction.RenderModal
 						items={ [ selectedRegisteredTemplate ] }
 						closeModal={ () => setSelectedRegisteredTemplate() }
+						onActionPerformed={ ( [ item ] ) => {
+							history.navigate(
+								`/${ item.type }/${ item.id }?canvas=edit`
+							);
+						} }
 					/>
 				</Modal>
 			) }
