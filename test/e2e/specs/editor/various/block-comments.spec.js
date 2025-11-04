@@ -76,7 +76,7 @@ test.describe( 'Block Comments', () => {
 			} );
 
 		await expect( thread1 ).toBeVisible();
-		// await expect( thread1 ).toBeFocused(); // Should focus the newly added comment thread1.
+		await expect( thread1 ).toBeFocused(); // Should focus the newly added comment thread1.
 
 		await editor.insertBlock( {
 			name: 'core/paragraph',
