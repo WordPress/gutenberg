@@ -133,33 +133,34 @@ export function ActionsMenuGroup< Item >( {
 	setActiveModalAction,
 }: ActionsMenuGroupProps< Item > ) {
 	const { primaryActions, regularActions } = useMemo( () => {
-		const _primaryActions = actions.filter(
-			( action ) => action.isPrimary
+		return actions.reduce(
+			( acc, action ) => {
+				if ( action.isPrimary ) {
+					acc.primaryActions.push( action );
+				} else {
+					acc.regularActions.push( action );
+				}
+				return acc;
+			},
+			{
+				primaryActions: [] as Action< Item >[],
+				regularActions: [] as Action< Item >[],
+			}
 		);
-		const _regularActions = actions.filter(
-			( action ) => ! action.isPrimary
-		);
-
-		return {
-			primaryActions: _primaryActions,
-			regularActions: _regularActions,
-		};
 	}, [ actions ] );
-
-	const handleActionClick = ( action: Action< Item > ) => () => {
-		if ( 'RenderModal' in action ) {
-			setActiveModalAction( action );
-			return;
-		}
-		action.callback( [ item ], { registry } );
-	};
 
 	const renderActionGroup = ( actionList: Action< Item >[] ) =>
 		actionList.map( ( action ) => (
 			<MenuItemTrigger
 				key={ action.id }
 				action={ action }
-				onClick={ handleActionClick( action ) }
+				onClick={ () => {
+					if ( 'RenderModal' in action ) {
+						setActiveModalAction( action );
+						return;
+					}
+					action.callback( [ item ], { registry } );
+				} }
 				items={ [ item ] }
 			/>
 		) );
