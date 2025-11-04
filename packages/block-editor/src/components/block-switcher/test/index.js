@@ -102,7 +102,6 @@ describe( 'BlockSwitcher', () => {
 		render(
 			<BlockSwitcher
 				clientIds={ [ headingBlock1.clientId ] }
-				hasBlockStyles={ false }
 				isSynced={ false }
 				label="Block Name"
 			/>
@@ -155,7 +154,6 @@ describe( 'BlockSwitcher', () => {
 		render(
 			<BlockSwitcher
 				clientIds={ [ headingBlock1.clientId ] }
-				hasBlockStyles={ false }
 				isSynced={ false }
 				label="Block Name"
 			/>

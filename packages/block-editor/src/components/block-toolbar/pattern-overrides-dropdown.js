@@ -2,12 +2,12 @@
  * WordPress dependencies
  */
 import {
-	DropdownMenu,
-	ToolbarItem,
+	Popover,
+	ToolbarButton,
 	__experimentalText as Text,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useId } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -16,19 +16,15 @@ import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 
 /**
- * Renders a dropdown menu that displays information about pattern overrides.
+ * Renders the content of the pattern overrides popover.
+ * Only mounts when the popover is opened.
  *
- * @param {Object}      props            Component props.
- * @param {JSX.Element} props.icon       The icon element to display.
- * @param {Array}       props.clientIds  The client IDs of selected blocks.
- * @param {string}      props.blockTitle The display title of the block.
- * @return {JSX.Element} The pattern overrides dropdown component.
+ * @param {Object} props            Component props.
+ * @param {Array}  props.clientIds  The client IDs of selected blocks.
+ * @param {string} props.blockTitle The display title of the block.
+ * @return {JSX.Element} The popover content.
  */
-export default function PatternOverridesDropdown( {
-	icon,
-	clientIds,
-	blockTitle,
-} ) {
+function PatternOverridesPopoverContent( { clientIds, blockTitle } ) {
 	const blockMetaName = useSelect(
 		( select ) => {
 			const { getBlockAttributes } = select( blockEditorStore );
@@ -38,7 +34,6 @@ export default function PatternOverridesDropdown( {
 	);
 
 	const isSingleBlock = clientIds.length === 1;
-	const label = isSingleBlock ? blockTitle : __( 'Multiple blocks selected' );
 
 	// Pattern overrides description
 	let description;
@@ -53,32 +48,52 @@ export default function PatternOverridesDropdown( {
 		description = __( 'These blocks are editable using overrides.' );
 	}
 
-	const descriptionId = useId();
+	return <Text>{ description }</Text>;
+}
+
+/**
+ * Renders a toolbar button that displays information about pattern overrides in a popover.
+ *
+ * @param {Object}      props            Component props.
+ * @param {JSX.Element} props.icon       The icon element to display.
+ * @param {Array}       props.clientIds  The client IDs of selected blocks.
+ * @param {string}      props.blockTitle The display title of the block.
+ * @param {string}      props.label      The label for the button.
+ * @return {JSX.Element} The pattern overrides button component.
+ */
+export default function PatternOverridesDropdown( {
+	icon,
+	clientIds,
+	blockTitle,
+	label,
+} ) {
+	const [ isOpen, setIsOpen ] = useState( false );
+	const anchorRef = useRef();
 
 	return (
-		<ToolbarItem>
-			{ ( toggleProps ) => (
-				<DropdownMenu
-					className="block-editor-block-toolbar__pattern-overrides-indicator"
-					label={ label }
-					popoverProps={ {
-						placement: 'bottom-start',
-						className:
-							'block-editor-block-toolbar__pattern-overrides-popover',
-					} }
-					icon={ icon }
-					toggleProps={ {
-						description,
-						...toggleProps,
-					} }
-					menuProps={ {
-						orientation: 'both',
-						'aria-describedby': descriptionId,
-					} }
+		<>
+			<ToolbarButton
+				ref={ anchorRef }
+				className="block-editor-block-toolbar__pattern-overrides-indicator"
+				icon={ icon }
+				label={ label }
+				onClick={ () => setIsOpen( ! isOpen ) }
+				aria-expanded={ isOpen }
+			/>
+			{ isOpen && (
+				<Popover
+					anchor={ anchorRef.current }
+					onClose={ () => setIsOpen( false ) }
+					placement="bottom-start"
+					offset={ 16 }
+					className="block-editor-block-toolbar__pattern-overrides-popover"
 				>
-					{ () => <Text id={ descriptionId }>{ description }</Text> }
-				</DropdownMenu>
+					<PatternOverridesPopoverContent
+						clientIds={ clientIds }
+						blockTitle={ blockTitle }
+					/>
+				</Popover>
 			) }
-		</ToolbarItem>
+		</>
 	);
 }

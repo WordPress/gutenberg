@@ -18,8 +18,6 @@ import {
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { ToolbarGroup } from '@wordpress/components';
-import { copy } from '@wordpress/icons';
-import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -43,6 +41,62 @@ import SwitchSectionStyle from './switch-section-style';
 import { unlock } from '../../lock-unlock';
 import BlockToolbarIcon from './block-toolbar-icon';
 import { hasPatternOverridesDefaultBinding } from '../../utils/block-bindings';
+
+function getBlockIconVariant( {
+	select,
+	clientIds,
+	editingMode,
+	hasTemplateLock,
+} ) {
+	const {
+		getBlockName,
+		getBlockAttributes,
+		getBlockParentsByBlockName,
+		isSectionBlock,
+		canRemoveBlocks,
+	} = unlock( select( blockEditorStore ) );
+	const { getBlockStyles } = select( blocksStore );
+
+	// Calculate props only used in this function
+	const isSingleBlock = clientIds.length === 1;
+	const blockName = isSingleBlock && getBlockName( clientIds[ 0 ] );
+	const hasBlockStyles =
+		isSingleBlock && !! getBlockStyles( blockName )?.length;
+	const isSectionInSelection = clientIds.some( ( id ) =>
+		isSectionBlock( id )
+	);
+	const hasPatternOverrides = clientIds.every( ( clientId ) =>
+		hasPatternOverridesDefaultBinding(
+			getBlockAttributes( clientId )?.metadata?.bindings
+		)
+	);
+	const hasParentPattern = clientIds.every(
+		( clientId ) =>
+			getBlockParentsByBlockName( clientId, 'core/block', true ).length >
+			0
+	);
+	const canRemove = canRemoveBlocks( clientIds );
+
+	const _isDisabled = editingMode !== 'default';
+	const _hideTransformsForSections =
+		window?.__experimentalContentOnlyPatternInsertion &&
+		isSectionInSelection;
+	const _showBlockSwitcher =
+		! _hideTransformsForSections &&
+		! _isDisabled &&
+		( hasBlockStyles || canRemove ) &&
+		! hasTemplateLock;
+
+	const _showPatternOverrides = hasPatternOverrides && hasParentPattern;
+
+	if ( _showBlockSwitcher ) {
+		return 'switcher';
+	} else if ( _showPatternOverrides ) {
+		return 'pattern-overrides';
+	}
+
+	return 'default';
+}
 
 /**
  * Renders the block toolbar.
@@ -72,7 +126,7 @@ export function PrivateBlockToolbar( {
 		shouldShowVisualToolbar,
 		showParentSelector,
 		isUsingBindings,
-		hasBlockStyles,
+		isSynced,
 		hasContentOnlyLocking,
 		showShuffleButton,
 		showSlots,
@@ -80,10 +134,7 @@ export function PrivateBlockToolbar( {
 		showLockButtons,
 		showBlockVisibilityButton,
 		showSwitchSectionStyleButton,
-		blockIcon,
 		iconVariant,
-		isSynced,
-		showIconLabels,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockName,
@@ -93,15 +144,11 @@ export function PrivateBlockToolbar( {
 			isBlockValid,
 			getBlockEditingMode,
 			getBlockAttributes,
-			getBlockParentsByBlockName,
 			getTemplateLock,
 			getParentSectionBlock,
 			isZoomOut,
 			isSectionBlock,
-			canRemoveBlocks,
 		} = unlock( select( blockEditorStore ) );
-		const { getActiveBlockVariation, getBlockStyles } =
-			select( blocksStore );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
 		const parents = getBlockParents( selectedBlockClientId );
@@ -123,19 +170,6 @@ export function PrivateBlockToolbar( {
 				!! getBlockAttributes( clientId )?.metadata?.bindings
 		);
 
-		const _hasParentPattern = selectedBlockClientIds.every(
-			( clientId ) =>
-				getBlockParentsByBlockName( clientId, 'core/block', true )
-					.length > 0
-		);
-
-		const _hasPatternOverrides = selectedBlockClientIds.every(
-			( clientId ) =>
-				hasPatternOverridesDefaultBinding(
-					getBlockAttributes( clientId )?.metadata?.bindings
-				)
-		);
-
 		// If one or more selected blocks are locked, do not show the BlockGroupToolbar.
 		const _hasTemplateLock = selectedBlockClientIds.some(
 			( id ) => getTemplateLock( id ) === 'contentOnly'
@@ -149,64 +183,12 @@ export function PrivateBlockToolbar( {
 			window?.__experimentalContentOnlyPatternInsertion &&
 			( _isZoomOut || isSectionBlock( selectedBlockClientId ) );
 
-		// Calculate the icon for the block toolbar
-		const _isSingleBlockSelected = selectedBlockClientIds.length === 1;
+		// Check if block is synced (for toolbar styling)
 		const _blockType = selectedBlockClientId && getBlockType( _blockName );
-		let _icon;
-		if ( _isSingleBlockSelected ) {
-			const match = getActiveBlockVariation(
-				_blockName,
-				getBlockAttributes( selectedBlockClientId )
-			);
-			// Take into account active block variations.
-			_icon = match?.icon || _blockType?.icon;
-		} else {
-			const blockNames = selectedBlockClientIds.map( ( id ) =>
-				getBlockName( id )
-			);
-			const isSelectionOfSameType = new Set( blockNames ).size === 1;
-			// When selection consists of blocks of multiple types, display an
-			// appropriate icon to communicate the non-uniformity.
-			_icon = isSelectionOfSameType ? _blockType?.icon : copy;
-		}
-
-		// Determine if we should show the BlockSwitcher dropdown or just the icon
-		const _hasBlockStyles =
-			_isSingleBlockSelected && !! getBlockStyles( _blockName )?.length;
-		const _canRemove = canRemoveBlocks( selectedBlockClientIds );
-		const _isDisabled = editingMode !== 'default';
-		const _isSectionInSelection = selectedBlockClientIds.some( ( id ) =>
-			isSectionBlock( id )
-		);
-		const _hideTransformsForSections =
-			window?.__experimentalContentOnlyPatternInsertion &&
-			_isSectionInSelection;
-		const _showBlockSwitcher =
-			! _hideTransformsForSections &&
-			! _isDisabled &&
-			( _hasBlockStyles || _canRemove ) &&
-			! _hasTemplateLock;
-
-		const _showPatternOverrides = _hasPatternOverrides && _hasParentPattern;
-
-		// Calculate icon variant based on priority
-		let _iconVariant;
-		if ( _showBlockSwitcher ) {
-			_iconVariant = 'switcher';
-		} else if ( _showPatternOverrides ) {
-			_iconVariant = 'pattern-overrides';
-		} else {
-			_iconVariant = 'default';
-		}
-
-		const _showIconLabels = select( preferencesStore ).get(
-			'core',
-			'showIconLabels'
-		);
-
-		// Check if block is reusable or template part for indicator text
 		const _isReusable = _blockType && isReusableBlock( _blockType );
 		const _isTemplate = _blockType && isTemplatePart( _blockType );
+
+		const _isSynced = _isReusable || _isTemplate;
 
 		return {
 			blockClientId: selectedBlockClientId,
@@ -227,8 +209,7 @@ export function PrivateBlockToolbar( {
 				) &&
 				selectedBlockClientIds.length === 1,
 			isUsingBindings: _isUsingBindings,
-			isSynced: _isReusable || _isTemplate || _showPatternOverrides,
-			hasBlockStyles: _hasBlockStyles,
+			isSynced: _isSynced,
 			hasContentOnlyLocking: _hasTemplateLock,
 			showShuffleButton: _isZoomOut,
 			showSlots: ! _isZoomOut,
@@ -236,13 +217,12 @@ export function PrivateBlockToolbar( {
 			showLockButtons: ! _isZoomOut,
 			showBlockVisibilityButton: ! _isZoomOut,
 			showSwitchSectionStyleButton: _showSwitchSectionStyleButton,
-			blockIcon: _icon,
-			iconVariant: _iconVariant,
-			showPatternOverrides: _showPatternOverrides,
-			showIconLabels:
-				_isSingleBlockSelected &&
-				( _isReusable || _isTemplate ) &&
-				! _showIconLabels,
+			iconVariant: getBlockIconVariant( {
+				select,
+				clientIds: selectedBlockClientIds,
+				editingMode,
+				hasTemplateLock: _hasTemplateLock,
+			} ),
 		};
 	}, [] );
 
@@ -298,10 +278,8 @@ export function PrivateBlockToolbar( {
 						<ToolbarGroup className="block-editor-block-toolbar__block-controls">
 							<BlockToolbarIcon
 								clientIds={ blockClientIds }
-								icon={ blockIcon }
+								isSynced={ isSynced }
 								variant={ iconVariant }
-								hasBlockStyles={ hasBlockStyles }
-								showBlockTitle={ showIconLabels }
 							/>
 							{ isDefaultEditingMode &&
 								showBlockVisibilityButton && (

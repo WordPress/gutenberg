@@ -9,7 +9,7 @@ import {
 	__experimentalText as Text,
 	MenuGroup,
 } from '@wordpress/components';
-import { switchToBlockType } from '@wordpress/blocks';
+import { switchToBlockType, store as blocksStore } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
@@ -21,12 +21,7 @@ import { useBlockVariationTransforms } from './block-variation-transformations';
 import BlockStylesMenu from './block-styles-menu';
 import PatternTransformationsMenu from './pattern-transformations-menu';
 
-function BlockSwitcherDropdownMenuContents( {
-	onClose,
-	clientIds,
-	hasBlockStyles,
-	isSynced,
-} ) {
+function BlockSwitcherDropdownMenuContents( { onClose, clientIds, isSynced } ) {
 	const { replaceBlocks, multiSelect, updateBlockAttributes } =
 		useDispatch( blockEditorStore );
 	const {
@@ -35,6 +30,7 @@ function BlockSwitcherDropdownMenuContents( {
 		blocks,
 		isUsingBindings,
 		canRemove,
+		hasBlockStyles,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -44,9 +40,15 @@ function BlockSwitcherDropdownMenuContents( {
 				getBlockTransformItems,
 				__experimentalGetPatternTransformItems,
 				canRemoveBlocks,
+				getBlockName,
 			} = select( blockEditorStore );
+			const { getBlockStyles } = select( blocksStore );
 			const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
 			const _blocks = getBlocksByClientId( clientIds );
+			const _isSingleBlock = clientIds.length === 1;
+			const _blockName = _isSingleBlock && getBlockName( clientIds[ 0 ] );
+			const _hasBlockStyles =
+				_isSingleBlock && !! getBlockStyles( _blockName )?.length;
 			return {
 				blocks: _blocks,
 				possibleBlockTransformations: getBlockTransformItems(
@@ -62,6 +64,7 @@ function BlockSwitcherDropdownMenuContents( {
 						!! getBlockAttributes( clientId )?.metadata?.bindings
 				),
 				canRemove: canRemoveBlocks( clientIds ),
+				hasBlockStyles: _hasBlockStyles,
 			};
 		},
 		[ clientIds ]
@@ -180,7 +183,6 @@ function BlockSwitcherDropdownMenuContents( {
 export const BlockSwitcher = ( {
 	children,
 	clientIds,
-	hasBlockStyles,
 	isSynced,
 	label,
 	text,
@@ -221,7 +223,6 @@ export const BlockSwitcher = ( {
 							<BlockSwitcherDropdownMenuContents
 								onClose={ onClose }
 								clientIds={ clientIds }
-								hasBlockStyles={ hasBlockStyles }
 								isSynced={ isSynced }
 							/>
 						) }
