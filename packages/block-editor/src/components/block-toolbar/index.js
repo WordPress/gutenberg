@@ -68,7 +68,6 @@ export function PrivateBlockToolbar( {
 		shouldShowVisualToolbar,
 		showParentSelector,
 		isUsingBindings,
-		isSynced,
 		hasContentOnlyLocking,
 		showShuffleButton,
 		showSlots,
@@ -124,13 +123,6 @@ export function PrivateBlockToolbar( {
 			window?.__experimentalContentOnlyPatternInsertion &&
 			( _isZoomOut || isSectionBlock( selectedBlockClientId ) );
 
-		// Check if block is synced (for toolbar styling)
-		const _blockType = selectedBlockClientId && getBlockType( _blockName );
-		const _isReusable = _blockType && isReusableBlock( _blockType );
-		const _isTemplate = _blockType && isTemplatePart( _blockType );
-
-		const _isSynced = _isReusable || _isTemplate;
-
 		return {
 			blockClientId: selectedBlockClientId,
 			blockClientIds: selectedBlockClientIds,
@@ -150,7 +142,6 @@ export function PrivateBlockToolbar( {
 				) &&
 				selectedBlockClientIds.length === 1,
 			isUsingBindings: _isUsingBindings,
-			isSynced: _isSynced,
 			hasContentOnlyLocking: _hasTemplateLock,
 			showShuffleButton: _isZoomOut,
 			showSlots: ! _isZoomOut,
@@ -178,6 +169,8 @@ export function PrivateBlockToolbar( {
 	}
 
 	const isMultiToolbar = blockClientIds.length > 1;
+	const isSynced =
+		isReusableBlock( blockType ) || isTemplatePart( blockType );
 
 	// Shifts the toolbar to make room for the parent block selector.
 	const classes = clsx( 'block-editor-block-contextual-toolbar', {

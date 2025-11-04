@@ -110,7 +110,7 @@ function BlockSwitcherDropdownMenuContents( { onClose, clientIds, isSynced } ) {
 		!! possibleBlockTransformations?.length &&
 		canRemove &&
 		! isSynced &&
-		! isSingleBlock;
+		isSingleBlock;
 	const hasPossibleBlockVariationTransformations =
 		!! blockVariationTransformations?.length;
 	const hasPatternTransformation = !! patterns?.length && canRemove;
