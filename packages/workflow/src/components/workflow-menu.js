@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { Command, useCommandState } from 'cmdk';
-import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -21,6 +20,8 @@ import {
 } from '@wordpress/keyboard-shortcuts';
 import { Icon, search as inputIcon } from '@wordpress/icons';
 import { executeAbility, store as abilitiesStore } from '@wordpress/abilities';
+
+const EMPTY_ARRAY = [];
 
 const inputLabel = __( 'Run abilities and workflows' );
 
@@ -62,7 +63,7 @@ export function WorkflowMenu() {
 
 	const abilities = useSelect( ( select ) => {
 		const allAbilities = select( abilitiesStore ).getAbilities();
-		return allAbilities || [];
+		return allAbilities || EMPTY_ARRAY;
 	}, [] );
 
 	const filteredAbilities = useMemo( () => {
@@ -126,23 +127,22 @@ export function WorkflowMenu() {
 		setSearch( '' );
 	};
 
-	const handleExecuteAbility = async ( abilityName ) => {
+	const handleExecuteAbility = async ( ability ) => {
 		setIsExecuting( true );
-		const ability = abilities.find( ( a ) => a.name === abilityName );
 		try {
-			const result = await executeAbility( abilityName );
+			const result = await executeAbility( ability.name );
 			setAbilityOutput( {
-				abilityName,
-				abilityLabel: ability?.label || abilityName,
-				abilityDescription: ability?.description || '',
+				name: ability.name,
+				label: ability?.label || ability.name,
+				description: ability?.description || '',
 				success: true,
 				data: result,
 			} );
 		} catch ( error ) {
 			setAbilityOutput( {
-				abilityName,
-				abilityLabel: ability?.label || abilityName,
-				abilityDescription: ability?.description || '',
+				name: ability.name,
+				label: ability?.label || ability.name,
+				description: ability?.description || '',
 				success: false,
 				error: error.message || String( error ),
 			} );
@@ -179,7 +179,7 @@ export function WorkflowMenu() {
 	};
 
 	if ( ! isOpen ) {
-		return false;
+		return null;
 	}
 
 	return (
@@ -200,10 +200,10 @@ export function WorkflowMenu() {
 				{ abilityOutput ? (
 					<div className="workflows-workflow-menu__output">
 						<div className="workflows-workflow-menu__output-header">
-							<h3>{ abilityOutput.abilityLabel }</h3>
-							{ abilityOutput.abilityDescription && (
+							<h3>{ abilityOutput.label }</h3>
+							{ abilityOutput.description && (
 								<p className="workflows-workflow-menu__output-hint">
-									{ abilityOutput.abilityDescription }
+									{ abilityOutput.description }
 								</p>
 							) }
 						</div>
@@ -229,7 +229,7 @@ export function WorkflowMenu() {
 						onKeyDown={ onKeyDown }
 						shouldFilter={ false }
 					>
-						<div className="workflows-workflow-menu__header">
+						<HStack className="workflows-workflow-menu__header">
 							<Icon
 								className="workflows-workflow-menu__header-search-icon"
 								icon={ inputIcon }
@@ -240,12 +240,15 @@ export function WorkflowMenu() {
 								isOpen={ isOpen }
 								abilities={ abilities }
 							/>
-						</div>
+						</HStack>
 						<Command.List label={ __( 'Workflow suggestions' ) }>
 							{ isExecuting && (
-								<div className="workflows-workflow-menu__executing">
+								<HStack
+									className="workflows-workflow-menu__executing"
+									align="center"
+								>
 									{ __( 'Executing ability…' ) }
-								</div>
+								</HStack>
 							) }
 							{ ! isExecuting &&
 								search &&
@@ -260,28 +263,13 @@ export function WorkflowMenu() {
 										<Command.Item
 											key={ ability.name }
 											value={ ability.label }
+											className="workflows-workflow-menu__item"
 											onSelect={ () =>
-												handleExecuteAbility(
-													ability.name
-												)
+												handleExecuteAbility( ability )
 											}
 											id={ ability.name }
 										>
-											<HStack
-												alignment="left"
-												className={ clsx(
-													'workflows-workflow-menu__item',
-													{
-														'has-icon':
-															ability.icon,
-													}
-												) }
-											>
-												{ ability.icon && (
-													<Icon
-														icon={ ability.icon }
-													/>
-												) }
+											<HStack alignment="left">
 												<span>
 													<TextHighlight
 														text={ ability.label }

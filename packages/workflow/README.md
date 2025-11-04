@@ -1,6 +1,6 @@
 # Workflow
 
-Workflow palette for running abilities in WordPress.
+Workflow palette for running abilities in WordPress. This package is private and should not be used directly.
 
 ## Installation
 

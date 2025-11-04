@@ -3,7 +3,7 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "sass:color";
 
-// dirty hack to clean up modal
+// Here we extend the modal styles to be tighter, and to the center. Because the palette uses the modal as a container.
 .workflows-workflow-menu {
 	border-radius: $grid-unit-05;
 	width: calc(100% - #{$grid-unit-40});
@@ -28,23 +28,7 @@
 }
 
 .workflows-workflow-menu__header {
-	display: flex;
-	align-items: center;
 	padding: 0 $grid-unit-20;
-
-	.components-button {
-		height: $grid-unit-70;
-		width: $grid-unit-70;
-		border: $border-width solid $gray-600;
-		border-right: 0;
-		justify-content: center;
-		border-radius: $radius-small 0 0 $radius-small;
-
-		& + [cmdk-input] {
-			border-top-left-radius: 0;
-			border-bottom-left-radius: 0;
-		}
-	}
 }
 
 .workflows-workflow-menu__header-search-icon {
@@ -94,10 +78,6 @@
 		&:active {
 			background: var(--wp-admin-theme-color);
 			color: $white;
-
-			svg {
-				fill: $white;
-			}
 		}
 
 		&[aria-disabled="true"] {
@@ -105,18 +85,10 @@
 			cursor: not-allowed;
 		}
 
-		svg {
-			fill: $gray-900;
-		}
-
 		> div {
 			min-height: $button-size-next-default-40px;
 			padding: $grid-unit-05;
-			padding-left: $grid-unit-50; // Account for workflows without icons.
-		}
-
-		> .has-icon {
-			padding-left: $grid-unit;
+			padding-left: $grid-unit-20;
 		}
 	}
 
@@ -125,7 +97,9 @@
 		overflow: auto;
 
 		// Ensures there is always padding bottom on the last group, when there are workflows.
-		& [cmdk-list-sizer] > [cmdk-group]:last-child [cmdk-group-items]:not(:empty) {
+		&
+		[cmdk-list-sizer] > [cmdk-group]:last-child
+		[cmdk-group-items]:not(:empty) {
 			padding-bottom: $grid-unit-10;
 		}
 
@@ -209,7 +183,7 @@
 .workflows-workflow-menu__output-error {
 	padding: $grid-unit-15;
 	background: $gray-200;
-	border: 1px solid #{color.adjust($alert-red, $lightness: -10%)};
+	border: 1px solid #{color.adjust( $alert-red, $lightness: -10% )};
 	border-radius: $radius-small;
 	color: $alert-red;
 
@@ -220,9 +194,6 @@
 }
 
 .workflows-workflow-menu__executing {
-	display: flex;
-	align-items: center;
-	justify-content: center;
 	padding: $grid-unit-30 $grid-unit-20;
 	color: $gray-700;
 	font-size: 14px;

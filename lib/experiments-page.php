@@ -194,7 +194,7 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Enables the experimental Workflow Palette for running abilities and workflows from a unified interface.', 'gutenberg' ),
+			'label' => __( 'Enables the Workflow Palette for running workflows composed of abilities, from a unified interface.', 'gutenberg' ),
 			'id'    => 'gutenberg-workflow-palette',
 		)
 	);
