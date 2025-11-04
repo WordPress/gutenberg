@@ -2,15 +2,7 @@
 @use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/z-index" as *;
-// Block icon button - displays block type when no transforms are available.
-.components-button.block-editor-block-toolbar__block-icon[aria-disabled="true"] {
-	color: $gray-900;
 
-	// Since it's not clickable, though, don't show a hover state.
-	&:hover {
-		color: $gray-900;
-	}
-}
 /**
  * Block Toolbar
  */
