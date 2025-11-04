@@ -12,19 +12,6 @@ const DEFAULT_CONTEXT = {
 };
 
 /**
- * Creates a template context object by merging provided context with default context.
- *
- * @param {Object} providedContext Provided context object to merge with default context.
- * @return {Object} Complete context object with all required fields.
- */
-function buildTemplateContext( providedContext = {} ) {
-	return {
-		...DEFAULT_CONTEXT,
-		...providedContext,
-	};
-}
-
-/**
  * Hook to get the current template slug from the editor context.
  *
  * @return {string|null} The current template slug or null if not available.
@@ -65,10 +52,11 @@ export function parseTemplateSlug( templateSlug ) {
 	// e.g. author, author-john-doe
 	const authorMatches = templateSlug.match( /^(author)$|^author-(.+)$/ );
 	if ( authorMatches ) {
-		return buildTemplateContext( {
+		return {
+			...DEFAULT_CONTEXT,
 			isAuthor: true,
 			authorSlug: authorMatches[ 2 ] || null,
-		} );
+		};
 	}
 
 	// Check for taxonomy patterns
@@ -80,13 +68,19 @@ export function parseTemplateSlug( templateSlug ) {
 		if ( taxonomyParts.length === 1 ) {
 			// No dashes, so the entire part is the taxonomy
 			// e.g. taxonomy-product -> taxonomy: "product", term: null
-			return buildTemplateContext( { taxonomy: taxonomyPart } );
+			return {
+				...DEFAULT_CONTEXT,
+				taxonomy: taxonomyPart,
+			};
 		}
 
 		if ( taxonomyParts.length === 2 ) {
 			// Single dash
 			// e.g. taxonomy-product-category -> taxonomy: "product-category", term: null
-			return buildTemplateContext( { taxonomy: taxonomyPart } );
+			return {
+				...DEFAULT_CONTEXT,
+				taxonomy: taxonomyPart,
+			};
 		}
 
 		// Multiple dashes
@@ -94,31 +88,43 @@ export function parseTemplateSlug( templateSlug ) {
 		const taxonomy = taxonomyParts.slice( 0, -1 ).join( '-' );
 		const termSlug = taxonomyParts[ taxonomyParts.length - 1 ];
 
-		return buildTemplateContext( { taxonomy, termSlug } );
+		return {
+			...DEFAULT_CONTEXT,
+			taxonomy,
+			termSlug,
+		};
 	}
 
 	// Check for built-in taxonomy patterns
 	// e.g. category, tag
 	if ( templateSlug === 'category' ) {
-		return buildTemplateContext( { taxonomy: 'category' } );
+		return {
+			...DEFAULT_CONTEXT,
+			taxonomy: 'category',
+		};
 	}
 	if ( templateSlug === 'tag' ) {
-		return buildTemplateContext( { taxonomy: 'post_tag' } );
+		return {
+			...DEFAULT_CONTEXT,
+			taxonomy: 'post_tag',
+		};
 	}
 
 	// Check for specific term patterns for built-in taxonomies
 	// e.g. category-news, tag-featured
 	if ( templateSlug.startsWith( 'category-' ) ) {
-		return buildTemplateContext( {
+		return {
+			...DEFAULT_CONTEXT,
 			taxonomy: 'category',
 			termSlug: templateSlug.substring( 9 ),
-		} );
+		};
 	}
 	if ( templateSlug.startsWith( 'tag-' ) ) {
-		return buildTemplateContext( {
+		return {
+			...DEFAULT_CONTEXT,
 			taxonomy: 'post_tag',
 			termSlug: templateSlug.substring( 4 ),
-		} );
+		};
 	}
 
 	return DEFAULT_CONTEXT;
@@ -147,17 +153,21 @@ export function parseTemplateSlugWithValidation( templateSlug, getTaxonomy ) {
 			// Check if this taxonomy exists.
 			const taxonomyRecord = getTaxonomy( potentialTaxonomy );
 			if ( taxonomyRecord ) {
-				return buildTemplateContext( {
+				return {
+					...DEFAULT_CONTEXT,
 					taxonomy: potentialTaxonomy,
 					termSlug: potentialTermSlug,
-				} );
+				};
 			}
 		}
 
 		// If no valid split found, try the entire string as taxonomy.
 		const taxonomyRecord = getTaxonomy( taxonomyPart );
 		if ( taxonomyRecord ) {
-			return buildTemplateContext( { taxonomy: taxonomyPart } );
+			return {
+				...DEFAULT_CONTEXT,
+				taxonomy: taxonomyPart,
+			};
 		}
 
 		// No valid taxonomy found.
