@@ -43,13 +43,13 @@ function applyOptionDeprecations( {
 	};
 }
 
-function getDescribedBy( currentValue: string, describedBy?: string ) {
+function getDescribedBy( currentName: string, describedBy?: string ) {
 	if ( describedBy ) {
 		return describedBy;
 	}
 
 	// translators: %s: The selected option.
-	return sprintf( __( 'Currently selected: %s' ), currentValue );
+	return sprintf( __( 'Currently selected: %s' ), currentName );
 }
 
 function CustomSelectControl< T extends CustomSelectOption >(
