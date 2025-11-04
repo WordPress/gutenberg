@@ -264,20 +264,28 @@ export const getEntityRecord =
 							// Set the current selection. This is used by the
 							// sync manager to restore selection position when
 							// triggering an undo.
+							// Support block-level selection with just a clientId,
+							// and offset-based selection with additional parameters.
 							setSelection: (
 								clientId,
 								attributeKey,
 								startOffset,
 								endOffset
 							) => {
-								dataDispatch(
-									blockEditorStore
-								).selectionChange(
-									clientId,
-									attributeKey,
-									startOffset,
-									endOffset
-								);
+								if ( attributeKey === undefined ) {
+									dataDispatch(
+										blockEditorStore
+									).selectBlock( clientId );
+								} else {
+									dataDispatch(
+										blockEditorStore
+									).selectionChange(
+										clientId,
+										attributeKey,
+										startOffset,
+										endOffset
+									);
+								}
 							},
 							// Check if a block exists in the editor.
 							blockExists: ( clientId ) => {

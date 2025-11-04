@@ -98,9 +98,7 @@ export function findBlockByClientIdInDoc(
 ): SelectableBlock | null {
 	// console.log( '--- findBlockByClientIdInDoc():', { blockId, ydoc } );
 	const ymap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
-	// console.log( 'ymap:', ymap );
 	const blocks = ymap.get( 'blocks' );
-	// console.log( 'blocks:', blocks );
 
 	if ( ! ( blocks instanceof Y.Array ) ) {
 		return null;

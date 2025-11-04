@@ -1,15 +1,15 @@
 /**
  * WordPress dependencies
  */
-import type { WPBlockSelection, WPSelection } from '@wordpress/block-editor';
+import type { WPSelection } from '@wordpress/block-editor';
 
 /**
  * This class is used to track recent block selections to help in restoring
  * a user's selection after an undo or redo operation.
  *
  * Tracks the last N unique block selections. When a user moves between blocks,
- * this class maintains a history of fully-qualified selections (clientId, attributeKey, offset)
- * for each unique block visited, keeping only the most recent selection per block.
+ * this class maintains a history of fully-defined selections (offset in a RichText
+ * with clientId and attributeKey) and block-level selections (just clientId) for each unique block visited, keeping only the most recent selection per block.
  */
 export class BlockSelectionHistory {
 	private historySize: number;
@@ -27,11 +27,7 @@ export class BlockSelectionHistory {
 	 * @param newSelection
 	 */
 	public updateSelection( newSelection: WPSelection ): void {
-		console.log( 'BlockSelectionHistory updateSelection():', newSelection );
-
-		// Only track fully qualified selections
-		if ( ! this.isFullSelection( newSelection ) ) {
-			console.log( 'New selection is not qualified, skipping' );
+		if ( ! newSelection || ! newSelection.selectionStart?.clientId ) {
 			return;
 		}
 
@@ -41,17 +37,13 @@ export class BlockSelectionHistory {
 			currentSelection?.selectionStart.clientId !== newClientId;
 
 		if ( isNewBlock ) {
-			console.log( 'New selection is in new block, adding to history' );
 			this.addToHistory( newSelection );
 		} else {
-			console.log(
-				'New selection is in same block, updating most recent'
-			);
 			this.updateMostRecent( newSelection );
 		}
 
-		console.log( '--- Selection history:' );
 		console.log( 'newSelection:', newSelection?.selectionStart );
+		console.log( '--- Selection history:' );
 		for ( const selection of this.history ) {
 			console.log( selection.selectionStart );
 		}
@@ -79,32 +71,6 @@ export class BlockSelectionHistory {
 	 */
 	public getLastSelections( count: number ): WPSelection[] {
 		return this.history.slice( 1, count + 1 );
-	}
-
-	/**
-	 * Check if a block selection has a defined clientID, attribute key, and offset.
-	 * Used to ignore less-specific selections, like just a clientId.
-	 * @param selection
-	 */
-	private isFullBlockSelection( selection?: WPBlockSelection ): boolean {
-		return Boolean(
-			selection &&
-				selection.clientId &&
-				selection.attributeKey &&
-				selection.offset !== undefined
-		);
-	}
-
-	/**
-	 * Check if a selection has both start and end properly defined.
-	 * @param selection
-	 */
-	private isFullSelection( selection?: WPSelection ): boolean {
-		return Boolean(
-			selection &&
-				this.isFullBlockSelection( selection.selectionStart ) &&
-				this.isFullBlockSelection( selection.selectionEnd )
-		);
 	}
 
 	/**

@@ -14,7 +14,7 @@ import type { WPSelection } from '@wordpress/block-editor';
  */
 import { LOCAL_EDITOR_ORIGIN } from './config';
 import { YMultiDocUndoManager } from './y-utilities/y-multidoc-undomanager';
-import type { ObjectData, SyncUndoManager } from './types';
+import type { ObjectData, RecordHandlers, SyncUndoManager } from './types';
 import { findBlockByClientIdInDoc } from './utils';
 import { BlockSelectionHistory } from './block-selection-history';
 
@@ -26,12 +26,29 @@ interface StackItemEvent {
 	ydoc: Y.Doc;
 }
 
-interface PositionMeta {
+enum PositionType {
+	RelativeSelection = 'RelativeSelection',
+	BlockSelection = 'BlockSelection',
+}
+
+interface RelativePosition {
+	type: PositionType.RelativeSelection;
 	attributeKey: string;
 	relativePosition: Y.RelativePosition;
 	clientId: string;
 	offset: number;
-	backupPositions?: PositionMeta[];
+}
+
+interface BlockPosition {
+	type: PositionType.BlockSelection;
+	clientId: string;
+}
+
+type Position = RelativePosition | BlockPosition;
+
+interface PositionMeta {
+	position: Position;
+	backupPositions?: Position[];
 }
 
 /**
@@ -41,13 +58,8 @@ interface PositionMeta {
  * without conflicts.
  */
 export function createUndoManager(): SyncUndoManager {
-	let setSelection: (
-		clientId: string,
-		attributeKey: string,
-		startOffset: number,
-		endOffset: number
-	) => void = () => {};
-	const selectionHistory = new BlockSelectionHistory( 5 );
+	let setSelection: RecordHandlers[ 'setSelection' ] = () => {};
+	const selectionHistory = new BlockSelectionHistory( 10 );
 
 	const yUndoManager = new YMultiDocUndoManager( [], {
 		// Throttle undo/redo captures.
@@ -57,43 +69,10 @@ export function createUndoManager(): SyncUndoManager {
 		trackedOrigins: new Set( [ LOCAL_EDITOR_ORIGIN ] ),
 	} );
 
-	const logStacks = ( message: string ) => {
-		console.log( `--- [${ message }] logStacks():` );
-
-		console.log( 'undoStack:' );
-		const undoStack = yUndoManager.undoStack[ 0 ]?.undoStack;
-		if ( undoStack ) {
-			for ( const item of undoStack ) {
-				console.log( item.meta.get( 'position' ), {
-					item,
-				} );
-			}
-		} else {
-			console.log( '(none)' );
-		}
-
-		console.log( 'redoStack:' );
-		const redoStack = yUndoManager.redoStack[ 0 ]?.redoStack;
-		if ( redoStack ) {
-			for ( const item of redoStack ) {
-				console.log( item.meta.get( 'position' ), {
-					item,
-				} );
-			}
-		} else {
-			console.log( '(none)' );
-		}
-
-		console.log( '---' );
-	};
-
-	// @ts-ignore
-	window.logStacks = logStacks;
-
-	function getPositionMetaForSelection(
+	function getPositionForSelection(
 		selection: WPSelection,
 		ydoc: Y.Doc
-	): PositionMeta | null {
+	): Position | null {
 		const clientId = selection.selectionStart.clientId;
 		const block = findBlockByClientIdInDoc( clientId, ydoc );
 
@@ -135,116 +114,123 @@ export function createUndoManager(): SyncUndoManager {
 				offset
 			);
 
-			return { attributeKey, relativePosition, clientId, offset };
+			return {
+				type: PositionType.RelativeSelection,
+				attributeKey,
+				relativePosition,
+				clientId,
+				offset,
+			};
 		}
 
 		return null;
 	}
 
 	function updatePositionMeta( event: StackItemEvent ): void {
-		console.log( '--- updatePositionMeta()' );
 		const currentSelection = selectionHistory.getCurrentSelection();
 
 		if ( currentSelection === null ) {
 			// If we don't have a selection, then don't save anything extra
 			// to the stack.
-			console.log( 'No currentSelection, doing nothing' );
 			return;
 		}
 
-		if ( event.type === 'redo' ) {
-			console.log( 'Procccesing redo event' );
-		}
-
-		const positionMeta = getPositionMetaForSelection(
+		const position = getPositionForSelection(
 			currentSelection,
 			event.ydoc
 		);
 
-		if ( positionMeta ) {
-			// Also store the last 3 selections as backup positions.
-			positionMeta.backupPositions = [];
-			for ( const selection of selectionHistory.getLastSelections( 3 ) ) {
-				const backupPositionMeta = getPositionMetaForSelection(
+		if ( position ) {
+			// Also store the last 5 selections as backup positions.
+			const backupPositions: Position[] = [];
+			for ( const selection of selectionHistory.getLastSelections( 5 ) ) {
+				const backupPosition = getPositionForSelection(
 					selection,
 					event.ydoc
 				);
 
-				if ( backupPositionMeta ) {
-					positionMeta.backupPositions?.push( backupPositionMeta );
+				if ( backupPosition ) {
+					backupPositions.push( backupPosition );
 				}
 			}
 
-			console.log( 'Setting relativePosition meta with:', positionMeta );
+			const positionMeta: PositionMeta = {
+				position,
+				backupPositions,
+			};
+
 			event.stackItem.meta.set( 'position', positionMeta );
-		} else {
-			console.log( 'Could not set position meta:', {
-				currentSelection,
-			} );
 		}
 	}
 
 	function restorePosition( event: StackItemEvent ): void {
-		const { relativePosition, clientId, attributeKey } =
-			event.stackItem.meta.get( 'position' ) ?? {};
+		const positionMeta: PositionMeta | undefined =
+			event.stackItem.meta.get( 'position' );
 
-		const yDocBlock = findBlockByClientIdInDoc( clientId, event.ydoc );
-
-		if ( ! yDocBlock ) {
-			const lastHistoricalSelection = selectionHistory.getLastSelection();
-			if ( lastHistoricalSelection ) {
-				const lastClientId =
-					lastHistoricalSelection.selectionStart.clientId;
-				const lastAttributeKey =
-					lastHistoricalSelection.selectionStart.attributeKey;
-				const lastOffset =
-					lastHistoricalSelection.selectionStart.offset;
-
-				console.log(
-					'Restoring selection from last historical selection:',
-					{
-						lastClientId,
-						lastAttributeKey,
-						lastOffset,
-					}
-				);
-				setSelection( clientId, attributeKey, lastOffset, lastOffset );
-			} else {
-				console.log( 'No historical selection, doing nothing' );
-			}
-
+		if ( ! positionMeta ) {
+			console.log(
+				'Unable to restore position from stack item:',
+				event.stackItem
+			);
 			return;
 		}
 
-		if ( relativePosition && clientId && attributeKey ) {
-			const absolutePosition =
-				Y.createAbsolutePositionFromRelativePosition(
-					relativePosition,
-					event.ydoc
+		const { position } = positionMeta;
+
+		// Build a stack of positions to try, starting with the primary position
+		const positionsToTry: Position[] = [ position ];
+		if ( positionMeta.backupPositions ) {
+			positionsToTry.push( ...positionMeta.backupPositions );
+		}
+
+		let isRestored = false;
+
+		// Try each position until we find one that exists in the document
+		for ( const positionToTry of positionsToTry ) {
+			const block = findBlockByClientIdInDoc(
+				positionToTry.clientId,
+				event.ydoc
+			);
+
+			if ( ! block ) {
+				console.log(
+					'Block not found, skipping:',
+					positionToTry.clientId
 				);
-
-			console.log( 'Got absolutePosition:', absolutePosition );
-
-			if ( absolutePosition ) {
-				console.log( 'Restoring selection:', {
-					clientId,
-					attributeKey,
-					offset: absolutePosition.index,
-				} );
-
-				setSelection(
-					clientId,
-					attributeKey,
-					absolutePosition.index,
-					absolutePosition.index
-				);
+				continue;
 			}
-		} else {
-			console.log( 'Could not restore position:', {
-				relativePosition,
-				clientId,
-				attributeKey,
-			} );
+
+			console.log( 'Restoring selection from position:', positionToTry );
+
+			if ( positionToTry.type === PositionType.RelativeSelection ) {
+				const { relativePosition, attributeKey, clientId } =
+					positionToTry;
+
+				const absolutePosition =
+					Y.createAbsolutePositionFromRelativePosition(
+						relativePosition,
+						event.ydoc
+					);
+
+				if ( absolutePosition ) {
+					setSelection(
+						clientId,
+						attributeKey,
+						absolutePosition.index,
+						absolutePosition.index
+					);
+					isRestored = true;
+					break;
+				}
+			} else if ( positionToTry.type === PositionType.BlockSelection ) {
+				setSelection( positionToTry.clientId );
+				isRestored = true;
+				break;
+			}
+		}
+
+		if ( ! isRestored ) {
+			console.log( 'No valid positions found to restore' );
 		}
 	}
 
@@ -273,11 +259,6 @@ export function createUndoManager(): SyncUndoManager {
 			_record?: HistoryRecord< ObjectData >,
 			_isStaged = false // eslint-disable-line @typescript-eslint/no-unused-vars
 		): void {
-			// console.log( '--- addRecord():', {
-			// 	_record,
-			// 	_isStaged,
-			// 	changes: _record?.[ 0 ]?.changes,
-			// } );
 			// This is a no-op for Yjs since it automatically tracks changes.
 			// If needed, we could implement custom logic to handle specific records.
 		},
@@ -287,22 +268,14 @@ export function createUndoManager(): SyncUndoManager {
 		 *
 		 * @param {Y.Map< any >} ymap                                The Yjs map to add to the scope.
 		 * @param                handlers
-		 * @param                handlers.getSelection
 		 * @param                handlers.setSelection
 		 * @param                handlers.subscribeToSelectionChange
 		 */
 		addToScope(
 			ymap: Y.Map< any >,
 			handlers: {
-				subscribeToSelectionChange: (
-					callback: ( selection: WPSelection ) => void
-				) => void;
-				setSelection: (
-					clientId: string,
-					attributeKey: string,
-					startOffset: number,
-					endOffset: number
-				) => void;
+				subscribeToSelectionChange: RecordHandlers[ 'subscribeToSelectionChange' ];
+				setSelection: RecordHandlers[ 'setSelection' ];
 			}
 		): void {
 			yUndoManager.addToScope( ymap );
@@ -323,12 +296,8 @@ export function createUndoManager(): SyncUndoManager {
 				return;
 			}
 
-			logStacks( 'before undo' );
-
 			// Perform the undo operation
 			yUndoManager.undo();
-
-			logStacks( 'after undo' );
 
 			// Intentionally return an empty array, because the SyncProvider will update
 			// the entity record based on the Yjs document changes.

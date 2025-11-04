@@ -82,9 +82,9 @@ export interface RecordHandlers {
 	saveRecord: () => Promise< void >;
 	setSelection: (
 		clientId: string,
-		attributeKey: string,
-		startOffset: number,
-		endOffset: number
+		attributeKey?: string,
+		startOffset?: number,
+		endOffset?: number
 	) => void;
 	subscribeToSelectionChange: (
 		callback: ( selection: WPSelection ) => void
@@ -135,15 +135,8 @@ export interface SyncUndoManager extends WPUndoManager< ObjectData > {
 	addToScope: (
 		ymap: Y.Map< any >,
 		handlers: {
-			subscribeToSelectionChange: (
-				callback: ( selection: WPSelection ) => void
-			) => void;
-			setSelection: (
-				clientId: string,
-				attributeKey: string,
-				startOffset: number,
-				endOffset: number
-			) => void;
+			subscribeToSelectionChange: RecordHandlers[ 'subscribeToSelectionChange' ];
+			setSelection: RecordHandlers[ 'setSelection' ];
 		}
 	) => void;
 }
