@@ -168,24 +168,19 @@ function setValidityAtPath(
 	// Clone the root to avoid mutations
 	const result = { ...formValidity };
 
-	// Navigate through the path, creating/cloning objects as needed
+	// Navigate through the result tree,
+	// setting up empty paths if they don't exist.
 	let current: any = result;
 	for ( let i = 0; i < path.length - 1; i++ ) {
 		const segment = path[ i ];
-
-		// Ensure the current segment exists
 		if ( ! current[ segment ] ) {
 			current[ segment ] = {};
-		} else {
-			// Clone to maintain immutability
-			current[ segment ] = { ...current[ segment ] };
 		}
 
-		// Move to the next level
 		current = current[ segment ];
 	}
 
-	// At the final destination, merge the new validity with existing
+	// At the final destination, merge the new validity with the existing.
 	const finalKey = path[ path.length - 1 ];
 	current[ finalKey ] = {
 		...( current[ finalKey ] || {} ),
