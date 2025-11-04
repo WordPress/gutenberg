@@ -17,7 +17,7 @@ import { unlock } from '../../lock-unlock';
 // Besides the components on this file and the file referenced above the implementation
 // also includes artifacts on the store (actions, reducers, and selector).
 
-export function ModifyContentLockMenuItem( { clientId, onClose } ) {
+export function ModifyContentOnlySectionMenuItem( { clientId, onClose } ) {
 	const { templateLock, isLockedByParent, isEditingContentOnlySection } =
 		useSelect(
 			( select ) => {
