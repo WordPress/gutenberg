@@ -23,6 +23,8 @@ jobs:
     check:
         name: All${{ (matrix.node != '20' || matrix.os != 'ubuntu-24.04') && format(' (Node.js {0} on {1})', matrix.node, contains(matrix.os, 'macos-') && 'MacOS' || contains(matrix.os, 'windows-') && 'Windows' || 'Linux') || '' }}
         runs-on: ${{ matrix.os }}
+        env:
+            NODE_OPTIONS: --max-old-space-size=4096
         permissions:
             contents: read
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
