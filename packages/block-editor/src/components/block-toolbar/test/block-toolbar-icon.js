@@ -6,6 +6,7 @@ import { render, screen } from '@testing-library/react';
 /**
  * WordPress dependencies
  */
+import { useSelect } from '@wordpress/data';
 import { paragraph } from '@wordpress/icons';
 
 /**
@@ -13,6 +14,7 @@ import { paragraph } from '@wordpress/icons';
  */
 import BlockToolbarIcon from '../block-toolbar-icon';
 
+jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
 jest.mock( '../../block-title/use-block-display-title', () =>
 	jest.fn().mockReturnValue( 'Block Name' )
 );
@@ -34,7 +36,7 @@ jest.mock( '../pattern-overrides-dropdown', () =>
 describe( 'BlockToolbarIcon', () => {
 	const defaultProps = {
 		clientIds: [ 'test-client-id' ],
-		icon: paragraph,
+		isSynced: false,
 	};
 
 	beforeEach( () => {
@@ -43,13 +45,13 @@ describe( 'BlockToolbarIcon', () => {
 
 	describe( 'when variant is "switcher"', () => {
 		it( 'should render BlockSwitcher with icon', () => {
-			render(
-				<BlockToolbarIcon
-					{ ...defaultProps }
-					variant="switcher"
-					firstBlockName={ undefined }
-				/>
-			);
+			useSelect.mockImplementation( () => ( {
+				icon: paragraph,
+				showIconLabels: false,
+				variant: 'switcher',
+			} ) );
+
+			render( <BlockToolbarIcon { ...defaultProps } /> );
 
 			expect(
 				screen.getByTestId( 'block-switcher' )
@@ -62,13 +64,13 @@ describe( 'BlockToolbarIcon', () => {
 
 	describe( 'when variant is "pattern-overrides"', () => {
 		it( 'should render PatternOverridesDropdown for single block', () => {
-			render(
-				<BlockToolbarIcon
-					{ ...defaultProps }
-					variant="pattern-overrides"
-					firstBlockName="My Override"
-				/>
-			);
+			useSelect.mockImplementation( () => ( {
+				icon: paragraph,
+				showIconLabels: false,
+				variant: 'pattern-overrides',
+			} ) );
+
+			render( <BlockToolbarIcon { ...defaultProps } /> );
 
 			const dropdown = screen.getByTestId( 'pattern-overrides-dropdown' );
 			expect( dropdown ).toBeInTheDocument();
@@ -79,12 +81,16 @@ describe( 'BlockToolbarIcon', () => {
 		} );
 
 		it( 'should render PatternOverridesDropdown for multiple blocks', () => {
+			useSelect.mockImplementation( () => ( {
+				icon: paragraph,
+				showIconLabels: false,
+				variant: 'pattern-overrides',
+			} ) );
+
 			render(
 				<BlockToolbarIcon
 					{ ...defaultProps }
 					clientIds={ [ 'test-1', 'test-2' ] }
-					variant="pattern-overrides"
-					firstBlockName={ undefined }
 				/>
 			);
 
@@ -96,6 +102,12 @@ describe( 'BlockToolbarIcon', () => {
 
 	describe( 'when variant is "default"', () => {
 		it( 'should render disabled ToolbarButton for single block', () => {
+			useSelect.mockImplementation( () => ( {
+				icon: paragraph,
+				showIconLabels: false,
+				variant: 'default',
+			} ) );
+
 			render( <BlockToolbarIcon { ...defaultProps } /> );
 
 			const button = screen.getByRole( 'button' );
@@ -110,6 +122,12 @@ describe( 'BlockToolbarIcon', () => {
 		} );
 
 		it( 'should render disabled ToolbarButton for multiple blocks', () => {
+			useSelect.mockImplementation( () => ( {
+				icon: paragraph,
+				showIconLabels: false,
+				variant: 'default',
+			} ) );
+
 			render(
 				<BlockToolbarIcon
 					{ ...defaultProps }
@@ -128,6 +146,12 @@ describe( 'BlockToolbarIcon', () => {
 
 	describe( 'label calculation', () => {
 		it( 'should use block title for single block', () => {
+			useSelect.mockImplementation( () => ( {
+				icon: paragraph,
+				showIconLabels: false,
+				variant: 'default',
+			} ) );
+
 			render( <BlockToolbarIcon { ...defaultProps } /> );
 
 			const button = screen.getByRole( 'button' );
@@ -135,6 +159,12 @@ describe( 'BlockToolbarIcon', () => {
 		} );
 
 		it( 'should use "Multiple blocks selected" for multiple blocks', () => {
+			useSelect.mockImplementation( () => ( {
+				icon: paragraph,
+				showIconLabels: false,
+				variant: 'default',
+			} ) );
+
 			render(
 				<BlockToolbarIcon
 					{ ...defaultProps }
