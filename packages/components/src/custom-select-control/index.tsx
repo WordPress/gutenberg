@@ -157,6 +157,10 @@ function CustomSelectControl< T extends CustomSelectOption >(
 			?.find( ( { key } ) => currentValue === key ) ?? options[ 0 ];
 
 	const renderSelectedValue = () => {
+		if ( ! showSelectedHint || ! selectedOption.hint ) {
+			return selectedOption.name;
+		}
+
 		return (
 			<Styled.SelectedExperimentalHintWrapper>
 				{ selectedOption.name }
