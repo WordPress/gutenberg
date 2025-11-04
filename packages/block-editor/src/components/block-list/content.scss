@@ -317,7 +317,7 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 }
 
 .is-focus-mode .block-editor-block-list__block.is-content-locked.has-child-selected,
-.is-focus-mode .block-editor-block-list__block.is-content-locked-temporarily-editing-as-blocks.has-child-selected {
+.is-focus-mode .block-editor-block-list__block.is-editing-content-only-section.has-child-selected {
 	&,
 	& .block-editor-block-list__block {
 		opacity: 1;

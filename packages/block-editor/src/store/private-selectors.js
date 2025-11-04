@@ -530,27 +530,15 @@ export function isSectionBlock( state, clientId ) {
 }
 
 /**
- * Retrieves the client ID of the block that is content locked but is
- * currently being temporarily edited as a non-locked block.
+ * Retrieves the client ID of the block that is a contentOnly section but is
+ * currently being temporarily edited.
  *
  * @param {Object} state Global application state.
  *
- * @return {?string} The client ID of the block being temporarily edited as a non-locked block.
+ * @return {?string} The client ID of the block being temporarily edited.
  */
-export function getTemporarilyEditingAsBlocks( state ) {
-	return state.temporarilyEditingAsBlocks;
-}
-
-/**
- * Returns the focus mode that should be reapplied when the user stops editing
- * a content locked blocks as a block without locking.
- *
- * @param {Object} state Global application state.
- *
- * @return {?string} The focus mode that should be re-set when temporarily editing as blocks stops.
- */
-export function getTemporarilyEditingFocusModeToRevert( state ) {
-	return state.temporarilyEditingFocusModeRevert;
+export function getEditedContentOnlySection( state ) {
+	return state.editedContentOnlySection;
 }
 
 /**
@@ -695,12 +683,15 @@ export const isBlockHidden = ( state, clientId ) => {
 };
 
 /**
- * Returns true if the current spotlighted block matches the block clientId.
+ * Returns true if there is a spotlighted block.
+ *
+ * The spotlight is also active when a contentOnly section is being edited, the selector
+ * also returns true if this is the case.
  *
  * @param {Object} state Global application state.
  *
  * @return {boolean} Whether the block is currently spotlighted.
  */
 export function hasBlockSpotlight( state ) {
-	return !! state.hasBlockSpotlight;
+	return !! state.hasBlockSpotlight || !! state.editedContentOnlySection;
 }
