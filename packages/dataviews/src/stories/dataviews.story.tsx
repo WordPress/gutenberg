@@ -570,9 +570,11 @@ export const InfiniteScroll = () => {
 const TimelineComponent = ( {
 	showMedia = 'true',
 	showGroupFieldLabel = 'true',
+	grouping = 'true',
 }: {
 	showMedia: 'true' | 'false';
 	showGroupFieldLabel: 'true' | 'false';
+	grouping: 'true' | 'false';
 } ) => {
 	const [ view, setView ] = useState< View >( {
 		type: LAYOUT_TIMELINE,
@@ -583,9 +585,13 @@ const TimelineComponent = ( {
 		fields: [ 'categories' ],
 		titleField: 'title',
 		descriptionField: 'description',
-		groupByField: 'date',
+		groupByField: grouping === 'true' ? 'date' : undefined,
 		mediaField: 'image',
 		showMedia: showMedia === 'true',
+		sort: {
+			field: 'datetime',
+			direction: 'asc',
+		},
 		layout: {
 			eventField: 'datetime',
 			showGroupFieldLabel: showGroupFieldLabel === 'true',
@@ -598,6 +604,7 @@ const TimelineComponent = ( {
 			return {
 				...prevView,
 				type: LAYOUT_TIMELINE,
+				groupByField: grouping === 'true' ? 'date' : undefined,
 				showMedia: showMedia === 'true',
 				layout: {
 					...prevLayout,
@@ -605,7 +612,7 @@ const TimelineComponent = ( {
 				},
 			};
 		} );
-	}, [ showMedia, showGroupFieldLabel ] );
+	}, [ showMedia, showGroupFieldLabel, grouping ] );
 
 	// Custom fields with render methods for date and datetime
 	const timelineFields: Field< SpaceObject >[] = fields.map( ( field ) => {
@@ -632,16 +639,32 @@ const TimelineComponent = ( {
 			return {
 				...field,
 				render: ( { item } ) => {
-					return (
-						<span>
-							{ new Date( item.datetime ).toLocaleTimeString(
-								'en-US',
-								{
+					const dateObj = new Date( item.datetime );
+					// When grouping is off, show date and time
+					if ( grouping === 'false' ) {
+						return (
+							<span>
+								{ dateObj.toLocaleDateString( 'en-US', {
+									month: 'short',
+									day: 'numeric',
+									year: 'numeric',
+								} ) }{ ' ' }
+								{ dateObj.toLocaleTimeString( 'en-US', {
 									hour: 'numeric',
 									minute: '2-digit',
 									hour12: true,
-								}
-							) }
+								} ) }
+							</span>
+						);
+					}
+					// When grouping is on, show only time
+					return (
+						<span>
+							{ dateObj.toLocaleTimeString( 'en-US', {
+								hour: 'numeric',
+								minute: '2-digit',
+								hour12: true,
+							} ) }
 						</span>
 					);
 				},
@@ -652,7 +675,7 @@ const TimelineComponent = ( {
 
 	const { data: shownData, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( data, view, timelineFields );
-	}, [ view, timelineFields ] );
+	}, [ view, timelineFields, grouping ] );
 	return (
 		<DataViews
 			getItemId={ ( item ) => item.id.toString() }
@@ -685,6 +708,7 @@ export const Timeline = {
 	args: {
 		showMedia: 'true',
 		showGroupFieldLabel: 'false',
+		grouping: 'true',
 	},
 	argTypes: {
 		showMedia: {
@@ -699,6 +723,12 @@ export const Timeline = {
 			defaultValue: 'true',
 			description:
 				'Whether the group field label is shown in the timeline',
+		},
+		grouping: {
+			control: 'select',
+			options: [ 'true', 'false' ],
+			defaultValue: 'true',
+			description: 'Whether items are grouped by date in the timeline',
 		},
 	},
 };

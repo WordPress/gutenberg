@@ -76,6 +76,11 @@ export default function ViewTimeline< Item >(
 		: null;
 	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
 
+	// Convert dataByGroup entries into array and reverse order
+	const groupedEntries = dataByGroup
+		? Array.from( dataByGroup.entries() )
+		: [];
+
 	// Render grouped timeline
 	if ( hasData && groupField && dataByGroup ) {
 		return (
@@ -83,27 +88,25 @@ export default function ViewTimeline< Item >(
 				spacing={ 2 }
 				className={ clsx( 'dataviews-view-timeline', className ) }
 			>
-				{ Array.from( dataByGroup.entries() ).map(
-					( [ groupName, groupItems ] ) => (
-						<TimelineGroup
-							key={ groupName }
-							groupName={ groupName }
-							groupItems={ groupItems }
-							view={ view }
-							actions={ actions }
-							getItemId={ getItemId }
-							titleField={ titleField }
-							mediaField={ mediaField }
-							descriptionField={ descriptionField }
-							eventField={ eventField }
-							groupField={ groupField }
-							otherFields={ otherFields }
-							onClickItem={ onClickItem }
-							renderItemLink={ renderItemLink }
-							isItemClickable={ isItemClickable }
-						/>
-					)
-				) }
+				{ groupedEntries.map( ( [ groupName, groupItems ] ) => (
+					<TimelineGroup
+						key={ groupName }
+						groupName={ groupName }
+						groupItems={ groupItems }
+						view={ view }
+						actions={ actions }
+						getItemId={ getItemId }
+						titleField={ titleField }
+						mediaField={ mediaField }
+						descriptionField={ descriptionField }
+						eventField={ eventField }
+						groupField={ groupField }
+						otherFields={ otherFields }
+						onClickItem={ onClickItem }
+						renderItemLink={ renderItemLink }
+						isItemClickable={ isItemClickable }
+					/>
+				) ) }
 			</VStack>
 		);
 	}
