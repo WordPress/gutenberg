@@ -33,6 +33,7 @@ const storyArgs = {
 	perPageSizes: [ 10, 25, 50, 100 ],
 	isMultiselectable: false,
 	isGrouped: false,
+	infiniteScrollEnabled: false,
 };
 
 const storyArgTypes = {
@@ -357,8 +358,6 @@ function useInfiniteScroll( {
 		view.perPage,
 		currentPage,
 		view.infiniteScrollEnabled,
-		shownData,
-		getItemId,
 	] );
 
 	const paginationInfo = {
