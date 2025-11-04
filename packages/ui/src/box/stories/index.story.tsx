@@ -27,6 +27,7 @@ const meta: Meta< typeof Box > = {
 			</ThemeProvider>
 		),
 	],
+	tags: [ 'status-experimental' ],
 };
 export default meta;
 
