@@ -3,6 +3,11 @@
  */
 import type * as Y from 'yjs';
 
+/**
+ * Internal dependencies
+ */
+import type { WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE } from './config';
+
 /* globalThis */
 declare global {
 	interface Window {
@@ -30,7 +35,13 @@ export type Origin = any;
 
 // Object data represents any entity record, post, term, user, site, etc. There
 // are not many expectations that can hold on its shape.
-export interface ObjectData extends Record< string, unknown > {}
+export interface ObjectData extends Record< string, unknown > {
+	meta?: ObjectMeta;
+}
+
+export interface ObjectMeta extends Record< string, unknown > {
+	[ WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]?: string;
+}
 
 export interface ProviderCreatorResult {
 	destroy: () => void;
@@ -45,6 +56,7 @@ export type ProviderCreator = (
 export interface RecordHandlers {
 	editRecord: ( data: Partial< ObjectData > ) => void;
 	getEditedRecord: () => Promise< ObjectData >;
+	saveRecord: () => Promise< void >;
 }
 
 export interface SyncConfig {
@@ -60,6 +72,10 @@ export interface SyncConfig {
 }
 
 export interface SyncManager {
+	createMeta: (
+		objectType: ObjectType,
+		objectId: ObjectID
+	) => Record< string, string >;
 	load: (
 		syncConfig: SyncConfig,
 		objectType: ObjectType,

@@ -10,6 +10,7 @@
 		{ "path": "packages/block-editor" },
 		{ "path": "packages/block-library" },
 		{ "path": "packages/block-serialization-default-parser" },
+		{ "path": "packages/boot" },
 		{ "path": "packages/components" },
 		{ "path": "packages/compose" },
 		{ "path": "packages/core-data" },
@@ -44,6 +45,7 @@
 		{ "path": "packages/media-utils" },
 		{ "path": "packages/notices" },
 		{ "path": "packages/plugins" },
+		{ "path": "packages/preferences" },
 		{ "path": "packages/prettier-config" },
 		{ "path": "packages/primitives" },
 		{ "path": "packages/priority-queue" },
@@ -66,6 +68,7 @@
 		{ "path": "packages/vips" },
 		{ "path": "packages/warning" },
 		{ "path": "packages/wordcount" },
+		{ "path": "packages/wp-build" },
 		{ "path": "test/e2e" },
 		{ "path": "packages/jest-console" },
 		{ "path": "test/performance" }

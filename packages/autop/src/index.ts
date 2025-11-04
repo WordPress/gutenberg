@@ -2,7 +2,6 @@
  * The regular expression for an HTML element.
  */
 const htmlSplitRegex: RegExp = ( () => {
-	/* eslint-disable no-multi-spaces */
 	const comments =
 		'!' + // Start of comment, after the <.
 		'(?:' + // Unroll the loop: Consume everything until --> is found.
@@ -43,7 +42,6 @@ const htmlSplitRegex: RegExp = ( () => {
 		')';
 
 	return new RegExp( regex );
-	/* eslint-enable no-multi-spaces */
 } )();
 
 /**

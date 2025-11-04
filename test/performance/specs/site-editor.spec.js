@@ -1,4 +1,4 @@
-/* eslint-disable playwright/no-conditional-in-test, playwright/expect-expect */
+/* eslint-disable playwright/expect-expect */
 
 /**
  * WordPress dependencies
@@ -306,7 +306,6 @@ test.describe( 'Site Editor Performance', () => {
 				 * If there is a Replace template button (old UI), click it, otherwise, click the "transform into" button.
 				 * Once the performance tests are updated to compare compatible versions this code can be removed.
 				 */
-				// eslint-disable-next-line no-restricted-syntax
 				const isActionsButtonVisible = await page
 					.locator(
 						'.edit-site-template-card__actions button[aria-label="Actions"]'
@@ -454,4 +453,4 @@ test.describe( 'Site Editor Performance', () => {
 	} );
 } );
 
-/* eslint-enable playwright/no-conditional-in-test, playwright/expect-expect */
+/* eslint-enable playwright/expect-expect */

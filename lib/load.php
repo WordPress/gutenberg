@@ -14,6 +14,12 @@ define( 'IS_GUTENBERG_PLUGIN', true );
 require_once __DIR__ . '/init.php';
 require_once __DIR__ . '/upgrade.php';
 
+// Load auto-generated build registration.
+$build_registration = plugin_dir_path( __DIR__ ) . 'build/index.php';
+if ( file_exists( $build_registration ) ) {
+	require_once $build_registration;
+}
+
 /**
  * Checks whether the Gutenberg experiment is enabled.
  *
@@ -95,6 +101,7 @@ require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/kses.php';
 require __DIR__ . '/experimental/synchronization.php';
 require __DIR__ . '/experimental/script-modules.php';
+require __DIR__ . '/experimental/boot/boot.php';
 require __DIR__ . '/experimental/posts/load.php';
 
 if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
@@ -169,10 +176,4 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-media-processing' ) ) {
 if ( gutenberg_is_experiment_enabled( 'gutenberg-full-page-client-side-navigation' ) ) {
 	require __DIR__ . '/experimental/interactivity-api/class-gutenberg-interactivity-api-full-page-navigation.php';
 	Gutenberg_Interactivity_API_Full_Page_Navigation::instance();
-}
-
-// Load auto-generated build registration.
-$build_registration = gutenberg_dir_path() . 'build/index.php';
-if ( file_exists( $build_registration ) ) {
-	require_once $build_registration;
 }

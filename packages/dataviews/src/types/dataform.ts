@@ -56,12 +56,15 @@ export type CardLayout =
 			// isOpened cannot be false if withHeader is false as well.
 			// Otherwise, the card would not be visible.
 			isOpened?: true;
+			// isCollapsible cannot be true if withHeader is false as well.
+			isCollapsible?: false;
 	  }
 	| {
 			type: 'card';
 			withHeader?: true | undefined;
 			isOpened?: boolean;
 			summary?: CardSummaryField;
+			isCollapsible?: boolean | undefined;
 	  };
 export type NormalizedCardLayout =
 	| {
@@ -72,12 +75,15 @@ export type NormalizedCardLayout =
 			isOpened: true;
 			// Summary is an empty array
 			summary: [];
+			// If no header, the card should not be collapsible.
+			isCollapsible: false;
 	  }
 	| {
 			type: 'card';
 			withHeader: true;
 			isOpened: boolean;
 			summary: NormalizedCardSummaryField;
+			isCollapsible: boolean;
 	  };
 
 export type RowLayout = {
@@ -102,20 +108,20 @@ export type NormalizedSummaryField =
 	| NormalizedPanelSummaryField
 	| NormalizedCardSummaryField;
 
-export type SimpleFormField = {
-	id: string;
-	layout?: Layout;
-};
-
-export type CombinedFormField = {
+export type FormField = {
 	id: string;
 	label?: string;
 	description?: string;
 	layout?: Layout;
-	children: Array< FormField | string >;
+	children?: Array< FormField | string >;
 };
-
-export type FormField = SimpleFormField | CombinedFormField;
+export type NormalizedFormField = {
+	id: string;
+	layout: NormalizedLayout;
+	label?: string;
+	description?: string;
+	children?: NormalizedFormField[];
+};
 
 /**
  * The form configuration.
@@ -123,6 +129,10 @@ export type FormField = SimpleFormField | CombinedFormField;
 export type Form = {
 	layout?: Layout;
 	fields?: Array< FormField | string >;
+};
+export type NormalizedForm = {
+	layout: NormalizedLayout;
+	fields: NormalizedFormField[];
 };
 
 export interface DataFormProps< Item > {
@@ -137,7 +147,7 @@ export type FormValidity = Record< string, FieldValidity > | undefined;
 
 export interface FieldLayoutProps< Item > {
 	data: Item;
-	field: FormField;
+	field: NormalizedFormField;
 	onChange: ( value: any ) => void;
 	hideLabelFromVision?: boolean;
 	validity?: FieldValidity;

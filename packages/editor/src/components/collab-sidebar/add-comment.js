@@ -1,8 +1,12 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -18,7 +22,7 @@ import {
 import { unlock } from '../../lock-unlock';
 import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
-import { focusCommentThread } from './utils';
+import { focusCommentThread, noop } from './utils';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
@@ -27,6 +31,10 @@ export function AddComment( {
 	showCommentBoard,
 	setShowCommentBoard,
 	commentSidebarRef,
+	reflowComments = noop,
+	isFloating = false,
+	y,
+	refs,
 } ) {
 	const { clientId, blockCommentId } = useSelect( ( select ) => {
 		const { getSelectedBlock } = select( blockEditorStore );
@@ -37,6 +45,13 @@ export function AddComment( {
 		};
 	}, [] );
 	const blockElement = useBlockElement( clientId );
+	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
+
+	const unselectThread = () => {
+		setShowCommentBoard( false );
+		blockElement?.focus();
+		toggleBlockSpotlight( clientId, false );
+	};
 
 	if ( ! showCommentBoard || ! clientId || undefined !== blockCommentId ) {
 		return null;
@@ -44,10 +59,30 @@ export function AddComment( {
 
 	return (
 		<VStack
-			className="editor-collab-sidebar-panel__thread is-selected"
+			className={ clsx(
+				'editor-collab-sidebar-panel__thread is-selected',
+				{
+					'is-floating': isFloating,
+				}
+			) }
 			spacing="3"
 			tabIndex={ 0 }
-			role="listitem"
+			aria-label={ __( 'New note' ) }
+			role="treeitem"
+			ref={ isFloating ? refs.setFloating : undefined }
+			style={
+				isFloating
+					? // Delay showing the floating note box until a Y position is known to prevent blink.
+					  { top: y, opacity: ! y ? 0 : undefined }
+					: undefined
+			}
+			onBlur={ ( event ) => {
+				if ( event.currentTarget.contains( event.relatedTarget ) ) {
+					return;
+				}
+				toggleBlockSpotlight( clientId, false );
+				setShowCommentBoard( false );
+			} }
 		>
 			<HStack alignment="left" spacing="3">
 				<CommentAuthorInfo />
@@ -58,12 +93,10 @@ export function AddComment( {
 					focusCommentThread( id, commentSidebarRef.current );
 					setShowCommentBoard( false );
 				} }
-				onCancel={ () => {
-					setShowCommentBoard( false );
-					blockElement?.focus();
-				} }
+				onCancel={ unselectThread }
+				reflowComments={ reflowComments }
 				submitButtonText={ __( 'Add note' ) }
-				labelText={ __( 'New Note' ) }
+				labelText={ __( 'New note' ) }
 			/>
 		</VStack>
 	);

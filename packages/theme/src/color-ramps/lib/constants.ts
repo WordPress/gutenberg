@@ -1,15 +1,16 @@
 /**
  * External dependencies
  */
-import Color from 'colorjs.io';
+import { to, OKLCH } from 'colorjs.io/fn';
 
 /**
  * Internal dependencies
  */
+import './register-color-spaces';
 import type { Ramp } from './types';
 
-export const WHITE = new Color( '#fff' ).to( 'oklch' );
-export const BLACK = new Color( '#000' ).to( 'oklch' );
+export const WHITE = to( 'white', OKLCH );
+export const BLACK = to( 'black', OKLCH );
 
 // Margin added to target contrasts to counter for algorithm approximations
 // and rounding errors.
@@ -32,10 +33,10 @@ export const ACCENT_SCALE_BASE_LIGHTNESS_THRESHOLDS = {
 	darker: { min: 0.75, max: 0.98 },
 } as const;
 
-// Minimum lightness difference noticed by the algorithm.
-export const LIGHTNESS_EPSILON = 1e-3;
+// Lightness precision we aim for. Approximately 1/256, resolution of an 8-bit number.
+export const LIGHTNESS_EPSILON = 4e-3;
 
-export const MAX_BISECTION_ITERATIONS = 25;
+export const MAX_BISECTION_ITERATIONS = 10;
 
 export const CONTRAST_COMBINATIONS: {
 	bgs: ( keyof Ramp )[];
@@ -80,6 +81,7 @@ export const DEFAULT_SEED_COLORS = {
 	primary: '#3858e9',
 	info: '#0090ff',
 	success: '#4ab866',
+	caution: '#f0d149',
 	warning: '#f0b849',
 	error: '#cc1818',
 };

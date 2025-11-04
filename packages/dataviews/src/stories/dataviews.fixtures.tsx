@@ -805,7 +805,10 @@ export const actions: Action< SpaceObject >[] = [
 	{
 		id: 'secondary',
 		label: 'Secondary action',
-		callback() {},
+		callback() {
+			// eslint-disable-next-line no-console
+			console.log( 'Perform secondary action.' );
+		},
 	},
 ];
 

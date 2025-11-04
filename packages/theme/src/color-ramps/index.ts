@@ -1,11 +1,12 @@
 /**
  * External dependencies
  */
-import Color from 'colorjs.io';
+import { get, OKLCH, parse, serialize } from 'colorjs.io/fn';
 
 /**
  * Internal dependencies
  */
+import './lib/register-color-spaces';
 import { buildRamp } from './lib/index';
 import { clampAccentScaleReferenceLightness } from './lib/utils';
 import { BG_RAMP_CONFIG, ACCENT_RAMP_CONFIG } from './lib/ramp-configs';
@@ -14,28 +15,20 @@ import type {
 	RampDirection,
 	Ramp,
 } from './lib/types';
-import { getCachedContrast } from './lib/cache-utils';
+import { getContrast } from './lib/color-utils';
 import { CONTRAST_COMBINATIONS } from './lib/constants';
 export { DEFAULT_SEED_COLORS } from './lib/constants';
 
 /**
  * Creates a background ramp.
- * @param params
- * @param params.seed
- * @param params.debug
+ * @param seed The seed color for the background ramp.
  */
-export function buildBgRamp( {
-	seed,
-	debug,
-}: {
-	seed: string;
-	debug?: boolean;
-} ): InternalRampResult {
+export function buildBgRamp( seed: string ) {
 	if ( typeof seed !== 'string' || seed.trim() === '' ) {
 		throw new Error( 'Seed color must be a non-empty string' );
 	}
 
-	return buildRamp( seed, BG_RAMP_CONFIG, { debug } );
+	return buildRamp( seed, BG_RAMP_CONFIG );
 }
 
 const STEP_TO_PIN = 'surface2';
@@ -51,7 +44,7 @@ function getBgRampInfo( ramp: InternalRampResult ): {
 		pinLightness: {
 			stepName: STEP_TO_PIN,
 			value: clampAccentScaleReferenceLightness(
-				new Color( ramp.ramp[ STEP_TO_PIN ].color ).oklch.l,
+				get( parse( ramp.ramp[ STEP_TO_PIN ].color ), [ OKLCH, 'l' ] ),
 				ramp.direction
 			),
 		},
@@ -61,29 +54,19 @@ function getBgRampInfo( ramp: InternalRampResult ): {
 /**
  * Creates an accent ramp (ie used by primary, success, info, warning and error
  * ramps).
- * @param params
- * @param params.seed
- * @param params.bgRamp
- * @param params.debug
+ * @param seed   The seed color for the accent ramp.
+ * @param bgRamp The ramp of the background on which the accent is shown.
  */
-export function buildAccentRamp( {
-	seed,
-	bgRamp,
-	debug,
-}: {
-	seed: string;
-	bgRamp?: InternalRampResult;
-	debug?: boolean;
-} ): InternalRampResult {
+export function buildAccentRamp(
+	seed: string,
+	bgRamp?: InternalRampResult
+): InternalRampResult {
 	if ( typeof seed !== 'string' || seed.trim() === '' ) {
 		throw new Error( 'Seed color must be a non-empty string' );
 	}
 
 	const bgRampInfo = bgRamp ? getBgRampInfo( bgRamp ) : undefined;
-	return buildRamp( seed, ACCENT_RAMP_CONFIG, {
-		...bgRampInfo,
-		debug,
-	} );
+	return buildRamp( seed, ACCENT_RAMP_CONFIG, bgRampInfo );
 }
 
 /**
@@ -113,14 +96,14 @@ export function checkAccessibleCombinations( {
 		CONTRAST_COMBINATIONS.forEach( ( { bgs, fgs, target } ) => {
 			for ( const bg of bgs ) {
 				for ( const fg of fgs ) {
-					const bgColor = new Color( ramp.ramp[ bg ].color );
-					const fgColor = new Color( ramp.ramp[ fg ].color );
-					if ( getCachedContrast( bgColor, fgColor ) < target ) {
+					const bgColor = parse( ramp.ramp[ bg ].color );
+					const fgColor = parse( ramp.ramp[ fg ].color );
+					if ( getContrast( bgColor, fgColor ) < target ) {
 						unmetTargets.push( {
 							bgName: bg,
-							bgColor: bgColor.toString(),
+							bgColor: serialize( bgColor ),
 							fgName: fg,
-							fgColor: fgColor.toString(),
+							fgColor: serialize( fgColor ),
 							unmetContrast: target,
 						} );
 					}
@@ -133,14 +116,14 @@ export function checkAccessibleCombinations( {
 		CONTRAST_COMBINATIONS.forEach( ( { bgs, fgs, target } ) => {
 			for ( const bg of bgs ) {
 				for ( const fg of fgs ) {
-					const bgColor = new Color( bgRamp.ramp[ bg ].color );
-					const fgColor = new Color( ramp.ramp[ fg ].color );
-					if ( getCachedContrast( bgColor, fgColor ) < target ) {
+					const bgColor = parse( bgRamp.ramp[ bg ].color );
+					const fgColor = parse( ramp.ramp[ fg ].color );
+					if ( getContrast( bgColor, fgColor ) < target ) {
 						unmetTargets.push( {
 							bgName: bg,
-							bgColor: bgColor.toString(),
+							bgColor: serialize( bgColor ),
 							fgName: fg,
-							fgColor: fgColor.toString(),
+							fgColor: serialize( fgColor ),
 							unmetContrast: target,
 						} );
 					}

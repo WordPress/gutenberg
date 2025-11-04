@@ -1,0 +1,15 @@
+@use "@wordpress/base-styles/variables";
+
+.boot-sidebar__scrollable {
+	overflow: auto;
+	height: 100%;
+	position: relative;
+	display: flex;
+	flex-direction: column;
+}
+
+.boot-sidebar__content {
+	flex-grow: 1;
+	contain: content;
+	position: relative;
+}

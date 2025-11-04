@@ -33,6 +33,7 @@
 		{ "path": "../notices" },
 		{ "path": "../keycodes" },
 		{ "path": "../plugins" },
+		{ "path": "../preferences" },
 		{ "path": "../primitives" },
 		{ "path": "../private-apis" },
 		{ "path": "../rich-text" },

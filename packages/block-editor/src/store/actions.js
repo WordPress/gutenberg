@@ -104,7 +104,6 @@ export const validateBlocksToTemplate =
  * @property {WPBlockSelection} end   The selection end.
  */
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * Returns an action object used in signalling that selection state should be
  * reset to the specified selection.
@@ -120,7 +119,6 @@ export function resetSelection(
 	selectionEnd,
 	initialPosition
 ) {
-	/* eslint-enable jsdoc/valid-types */
 	return {
 		type: 'RESET_SELECTION',
 		selectionStart,
@@ -194,7 +192,6 @@ export function updateBlock( clientId, updates ) {
 	};
 }
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * Returns an action object used in signalling that the block with the
  * specified client ID has been selected, optionally accepting a position
@@ -208,7 +205,6 @@ export function updateBlock( clientId, updates ) {
  * @return {Object} Action object.
  */
 export function selectBlock( clientId, initialPosition = 0 ) {
-	/* eslint-enable jsdoc/valid-types */
 	return {
 		type: 'SELECT_BLOCK',
 		initialPosition,
@@ -355,7 +351,6 @@ export function toggleSelection( isSelectionEnabled = true ) {
 	};
 }
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * Action that replaces given blocks with one or more replacement blocks.
  *
@@ -370,7 +365,6 @@ export function toggleSelection( isSelectionEnabled = true ) {
 export const replaceBlocks =
 	( clientIds, blocks, indexToSelect, initialPosition = 0, meta ) =>
 	( { select, dispatch, registry } ) => {
-		/* eslint-enable jsdoc/valid-types */
 		clientIds = castArray( clientIds );
 		blocks = castArray( blocks );
 		const rootClientId = select.getBlockRootClientId( clientIds[ 0 ] );
@@ -540,7 +534,6 @@ export function insertBlock(
 	);
 }
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * Action that inserts an array of blocks, optionally at a specific index respective a root block list.
  *
@@ -566,7 +559,6 @@ export const insertBlocks =
 		meta
 	) =>
 	( { select, dispatch } ) => {
-		/* eslint-enable jsdoc/valid-types */
 		if ( initialPosition !== null && typeof initialPosition === 'object' ) {
 			meta = initialPosition;
 			initialPosition = 0;
@@ -1400,7 +1392,6 @@ export function removeBlock( clientId, selectPrevious ) {
 	return removeBlocks( [ clientId ], selectPrevious );
 }
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * Returns an action object used in signalling that the inner blocks with the
  * specified client ID should be replaced.
@@ -1417,7 +1408,6 @@ export function replaceInnerBlocks(
 	updateSelection = false,
 	initialPosition = 0
 ) {
-	/* eslint-enable jsdoc/valid-types */
 	return {
 		type: 'REPLACE_INNER_BLOCKS',
 		rootClientId,

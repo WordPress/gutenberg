@@ -109,11 +109,11 @@ function Editor( {
 						{ extraContent }
 					</EditorInterface>
 					{ children }
-					<NotesSidebar />
 					<Sidebar
 						onActionPerformed={ onActionPerformed }
 						extraPanels={ extraSidebarPanels }
 					/>
+					<NotesSidebar />
 					{ isBlockTheme && <GlobalStylesRenderer /> }
 					{ showGlobalStyles && <GlobalStylesSidebar /> }
 				</ExperimentalEditorProvider>
