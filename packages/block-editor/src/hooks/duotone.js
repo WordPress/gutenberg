@@ -188,6 +188,7 @@ export default {
 	edit: DuotonePanelPure,
 	useBlockProps,
 	attributeKeys: [ 'style' ],
+	isMatch: ( { style } ) => !! style?.color?.duotone,
 	hasSupport( name ) {
 		return hasBlockSupport( name, 'filter.duotone' );
 	},

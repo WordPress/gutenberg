@@ -116,6 +116,7 @@ export default {
 	useBlockProps,
 	addSaveProps: addAssignedTextAlign,
 	attributeKeys: [ 'style' ],
+	isMatch: ( { style } ) => !! style?.typography?.textAlign,
 	hasSupport( name ) {
 		return hasBlockSupport( name, TEXT_ALIGN_SUPPORT_KEY, false );
 	},

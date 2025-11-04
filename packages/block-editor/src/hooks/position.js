@@ -305,6 +305,7 @@ export default {
 	},
 	useBlockProps,
 	attributeKeys: [ 'style' ],
+	isMatch: ( { style } ) => !! style?.position,
 	hasSupport( name ) {
 		return hasBlockSupport( name, POSITION_SUPPORT_KEY );
 	},
