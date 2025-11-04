@@ -137,7 +137,6 @@ export default function BlockToolbarIcon( { clientIds, isSynced } ) {
 		return (
 			<BlockSwitcher
 				clientIds={ clientIds }
-				isSynced={ isSynced }
 				label={ label }
 				text={ text }
 			>

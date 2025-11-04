@@ -9,7 +9,12 @@ import {
 	__experimentalText as Text,
 	MenuGroup,
 } from '@wordpress/components';
-import { switchToBlockType, store as blocksStore } from '@wordpress/blocks';
+import {
+	switchToBlockType,
+	store as blocksStore,
+	isReusableBlock,
+	isTemplatePart,
+} from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
@@ -21,7 +26,7 @@ import { useBlockVariationTransforms } from './block-variation-transformations';
 import BlockStylesMenu from './block-styles-menu';
 import PatternTransformationsMenu from './pattern-transformations-menu';
 
-function BlockSwitcherDropdownMenuContents( { onClose, clientIds, isSynced } ) {
+function BlockSwitcherDropdownMenuContents( { onClose, clientIds } ) {
 	const { replaceBlocks, multiSelect, updateBlockAttributes } =
 		useDispatch( blockEditorStore );
 	const {
@@ -106,11 +111,11 @@ function BlockSwitcherDropdownMenuContents( { onClose, clientIds, isSynced } ) {
 	 * by allowing to exclude blocks from wildcard transformations.
 	 */
 	const isSingleBlock = blocks.length === 1;
+	const isSynced =
+		isSingleBlock &&
+		( isTemplatePart( blocks[ 0 ] ) || isReusableBlock( blocks[ 0 ] ) );
 	const hasPossibleBlockTransformations =
-		!! possibleBlockTransformations?.length &&
-		canRemove &&
-		! isSynced &&
-		isSingleBlock;
+		!! possibleBlockTransformations?.length && canRemove && ! isSynced;
 	const hasPossibleBlockVariationTransformations =
 		!! blockVariationTransformations?.length;
 	const hasPatternTransformation = !! patterns?.length && canRemove;
@@ -188,13 +193,7 @@ function BlockSwitcherDropdownMenuContents( { onClose, clientIds, isSynced } ) {
 	);
 }
 
-export const BlockSwitcher = ( {
-	children,
-	clientIds,
-	isSynced,
-	label,
-	text,
-} ) => {
+export const BlockSwitcher = ( { children, clientIds, label, text } ) => {
 	const isSingleBlock = clientIds.length === 1;
 
 	const blockSwitcherDescription = isSingleBlock
@@ -231,7 +230,6 @@ export const BlockSwitcher = ( {
 							<BlockSwitcherDropdownMenuContents
 								onClose={ onClose }
 								clientIds={ clientIds }
-								isSynced={ isSynced }
 							/>
 						) }
 					</DropdownMenu>
