@@ -345,7 +345,7 @@ function build_variation_for_navigation_link( $entity, $kind ) {
 
 	// Set default title if needed
 	if ( $is_default_title || '' === $title ) {
-		$title = sprintf( /* translators: %s: Singular label of the entity. */ __( '%s Link' ), $singular );
+		$title = sprintf( /* translators: %s: Singular label of the entity. */ __( '%s link' ), $singular );
 	}
 
 	// Set default description if needed
@@ -410,7 +410,7 @@ function block_core_navigation_link_filter_variations( $variations, $block_type 
 
 	$generated_variations = block_core_navigation_link_build_variations();
 	// Merge with existing variations - put our generated variations first
-	// so they override any generic labels from existing variations
+	// so they override any generic labels from existing variations.
 	return array_merge( $generated_variations, $variations );
 }
 
