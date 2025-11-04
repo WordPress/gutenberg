@@ -7,6 +7,7 @@ import type {
 	FieldTypeDefinition,
 } from '../types';
 import RenderFromElements from './utils/render-from-elements';
+import parseDateTime from './utils/parse-date-time';
 import {
 	OPERATOR_ON,
 	OPERATOR_NOT_ON,
@@ -33,11 +34,21 @@ export default {
 	},
 	Edit: 'datetime',
 	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
-		return field.hasElements ? (
-			<RenderFromElements item={ item } field={ field } />
-		) : (
-			field.getValue( { item } )
-		);
+		if ( field.elements ) {
+			return <RenderFromElements item={ item } field={ field } />;
+		}
+
+		const value = field.getValue( { item } );
+		if ( [ '', undefined, null ].includes( value ) ) {
+			return null;
+		}
+
+		try {
+			const dateValue = parseDateTime( value );
+			return dateValue?.toLocaleString();
+		} catch ( error ) {
+			return null;
+		}
 	},
 	enableSorting: true,
 	filterBy: {

@@ -1,0 +1,9 @@
+{
+	"route": {
+		"path": "/"
+	},
+	"dependencies": {
+		"@wordpress/admin-ui": "file:../../packages/admin-ui",
+		"@wordpress/i18n": "file:../../packages/i18n"
+	}
+}

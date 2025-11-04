@@ -114,6 +114,7 @@ function VisualEditor( {
 		postType,
 		isPreview,
 		styles,
+		canvasMinHeight,
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostId,
@@ -122,7 +123,8 @@ function VisualEditor( {
 			getEditorSettings,
 			getRenderingMode,
 			getDeviceType,
-		} = select( editorStore );
+			getCanvasMinHeight,
+		} = unlock( select( editorStore ) );
 		const { getPostType, getEditedEntityRecord } = select( coreStore );
 		const postTypeSlug = getCurrentPostType();
 		const _renderingMode = getRenderingMode();
@@ -163,6 +165,7 @@ function VisualEditor( {
 			postType: postTypeSlug,
 			isPreview: editorSettings.isPreviewMode,
 			styles: editorSettings.styles,
+			canvasMinHeight: getCanvasMinHeight(),
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
@@ -186,6 +189,7 @@ function VisualEditor( {
 		};
 	}, [] );
 
+	const localRef = useRef();
 	const deviceStyles = useResizeCanvas( deviceType );
 	const [ globalLayoutSettings ] = useSettings( 'layout' );
 
@@ -332,30 +336,47 @@ function VisualEditor( {
 		// Disable resizing in zoomed-out mode.
 		! isZoomedOut;
 
+	// Calculate the minimum height including scroll offset to fit all notes.
+	const calculatedMinHeight = useMemo( () => {
+		if ( ! localRef.current ) {
+			return canvasMinHeight;
+		}
+
+		const { ownerDocument } = localRef.current;
+		const scrollTop =
+			ownerDocument.documentElement.scrollTop ||
+			ownerDocument.body.scrollTop;
+
+		return canvasMinHeight + scrollTop;
+	}, [ canvasMinHeight ] );
+
 	const iframeStyles = useMemo( () => {
 		return [
 			...( styles ?? [] ),
 			{
 				// Ensures margins of children are contained so that the body background paints behind them.
-				// Otherwise, the background of html (when zoomed out) would show there and appear broken. It’s
+				// Otherwise, the background of html (when zoomed out) would show there and appear broken. It's
 				// important mostly for post-only views yet conceivably an issue in templated views too.
-				css: `:where(.block-editor-iframe__body){display:flow-root;}.is-root-container{display:flow-root;${
+				css: `:where(.block-editor-iframe__body){display:flow-root;${
+					calculatedMinHeight
+						? `min-height:${ calculatedMinHeight }px;`
+						: ''
+				}}.is-root-container{display:flow-root;${
 					// Some themes will have `min-height: 100vh` for the root container,
 					// which isn't a requirement in auto resize mode.
 					enableResizing ? 'min-height:0!important;' : ''
 				}}
 				${
 					enableResizing
-						? '.block-editor-iframe__html{background:var(--wp-editor-canvas-background);display:flex;align-items:center;justify-content:center;min-height:100vh;}.block-editor-iframe__body{width:100%;}'
+						? `.block-editor-iframe__html{background:var(--wp-editor-canvas-background);display:flex;align-items:center;justify-content:center;min-height:100vh;}.block-editor-iframe__body{width:100%;}`
 						: ''
 				}`,
 				// The CSS above centers the body content vertically when resizing is enabled and applies a background
 				// color to the iframe HTML element to match the background color of the editor canvas.
 			},
 		];
-	}, [ styles, enableResizing ] );
+	}, [ styles, enableResizing, calculatedMinHeight ] );
 
-	const localRef = useRef();
 	const typewriterRef = useTypewriter();
 	contentRef = useMergeRefs( [
 		localRef,

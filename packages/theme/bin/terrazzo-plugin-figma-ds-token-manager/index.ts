@@ -3,11 +3,18 @@
  */
 import type { Plugin, TokenNormalized } from '@terrazzo/parser';
 import { transformCSSValue } from '@terrazzo/token-tools/css';
-import Color from 'colorjs.io';
+import {
+	parse,
+	to,
+	serialize,
+	sRGB,
+	type ColorConstructor,
+} from 'colorjs.io/fn';
 
 /**
  * Internal dependencies
  */
+import '../../src/color-ramps/lib/register-color-spaces';
 import { FORMAT_JSON_ID } from './lib';
 
 function titleCase( str: string ) {
@@ -113,15 +120,15 @@ function transformColorToken(
 
 	// Always convert to hex
 	// (easier to convert to Figma RGB, and includes clamping)
-	let convertedColor: Color;
+	let convertedColor: ColorConstructor;
 	try {
-		convertedColor = new Color( cssColorValue );
+		convertedColor = parse( cssColorValue );
 	} catch {
 		console.warn( 'Unexpected: could not convert token value to Color' );
 		return;
 	}
 
-	return convertedColor.to( 'srgb' ).toString( { format: 'hex' } );
+	return serialize( to( convertedColor, sRGB ), { format: 'hex' } );
 }
 
 export default function pluginFigmaDsTokenManager( {

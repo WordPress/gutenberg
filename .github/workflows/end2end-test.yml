@@ -86,7 +86,7 @@ jobs:
             has-flaky-test-report: ${{ !!steps.merge-flaky-tests-reports.outputs.artifact-id }}
         steps:
             - name: Merge failures artifacts
-              uses: actions/upload-artifact/merge@v5
+              uses: actions/upload-artifact/merge@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
               # Don't fail the job if there aren't any artifacts to merge.
               continue-on-error: true
               with:
@@ -97,7 +97,7 @@ jobs:
 
             - name: Merge flaky tests reports
               id: merge-flaky-tests-reports
-              uses: actions/upload-artifact/merge@v5
+              uses: actions/upload-artifact/merge@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
               continue-on-error: true
               with:
                   name: flaky-tests-report
@@ -122,7 +122,7 @@ jobs:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
 
-            - uses: actions/download-artifact@v6.0.0
+            - uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
               # Don't fail the job if there isn't any flaky tests report.
               continue-on-error: true
               with:

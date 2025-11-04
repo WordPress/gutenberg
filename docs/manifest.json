@@ -1518,6 +1518,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/boot",
+		"slug": "packages-boot",
+		"markdown_source": "../packages/boot/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/browserslist-config",
 		"slug": "packages-browserslist-config",
 		"markdown_source": "../packages/browserslist-config/README.md",

@@ -90,11 +90,15 @@ function useFitText( { fitText, name, clientId } ) {
 
 		const blockSelector = `#block-${ clientId }`;
 
-		const applyStylesFn = ( css ) => {
-			styleElement.textContent = css;
+		const applyFontSize = ( fontSize ) => {
+			if ( fontSize === 0 ) {
+				styleElement.textContent = '';
+			} else {
+				styleElement.textContent = `${ blockSelector } { font-size: ${ fontSize }px !important; }`;
+			}
 		};
 
-		optimizeFitText( blockElement, blockSelector, applyStylesFn );
+		optimizeFitText( blockElement, applyFontSize );
 	}, [ blockElement, clientId, hasFitTextSupport, fitText ] );
 
 	useEffect( () => {
@@ -107,11 +111,32 @@ function useFitText( { fitText, name, clientId } ) {
 			return;
 		}
 
-		// Apply initially
-		applyFitText();
-
 		// Store current element value for cleanup
 		const currentElement = blockElement;
+		const previousVisibility = currentElement.style.visibility;
+
+		// Store IDs for cleanup
+		let hideFrameId = null;
+		let calculateFrameId = null;
+		let showTimeoutId = null;
+
+		// We are hiding the element doing the calculation of fit text
+		// and then showing it again to avoid the user noticing a flash of potentially
+		// big fitText while the binary search is happening.
+		hideFrameId = window.requestAnimationFrame( () => {
+			currentElement.style.visibility = 'hidden';
+			// Wait for browser to render the hidden state
+			calculateFrameId = window.requestAnimationFrame( () => {
+				applyFitText();
+
+				// Using a timeout instead of requestAnimationFrame, because
+				// with requestAnimationFrame a flash of very high size
+				// can still occur although rare.
+				showTimeoutId = setTimeout( () => {
+					currentElement.style.visibility = previousVisibility;
+				}, 10 );
+			} );
+		} );
 
 		// Watch for size changes
 		let resizeObserver;
@@ -122,6 +147,17 @@ function useFitText( { fitText, name, clientId } ) {
 
 		// Cleanup function
 		return () => {
+			// Cancel pending async operations
+			if ( hideFrameId !== null ) {
+				window.cancelAnimationFrame( hideFrameId );
+			}
+			if ( calculateFrameId !== null ) {
+				window.cancelAnimationFrame( calculateFrameId );
+			}
+			if ( showTimeoutId !== null ) {
+				clearTimeout( showTimeoutId );
+			}
+
 			if ( resizeObserver ) {
 				resizeObserver.disconnect();
 			}

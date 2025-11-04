@@ -9,7 +9,6 @@
  * Build inline CSS custom properties for color settings.
  *
  * @param array $attributes Block attributes.
- * @param bool  $is_vertical Whether the tabs are vertical.
  *
  * @return string Inline CSS string.
  */
@@ -193,7 +192,7 @@ function block_core_tabs_render_block_callback( array $attributes, string $conte
 	/**
 	 * Build the tabs list markup.
 	 * We're doing this manually instead of using <template/> to make it possible
-	 * for other blocks to exten the tabs list via HTML api.
+	 * for other blocks to extend the tabs list via HTML api.
 	 */
 	$tabs_list_markup = array_map(
 		static function ( array $tab ): string {
