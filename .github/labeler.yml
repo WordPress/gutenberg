@@ -132,7 +132,7 @@
     - changed-files:
           - any-glob-to-any-file: 'packages/icons/**'
 
-'[Packages] Interactivity':
+'[Package] Interactivity':
     - changed-files:
           - any-glob-to-any-file: 'packages/interactivity/**'
 
@@ -224,7 +224,7 @@
     - changed-files:
           - any-glob-to-any-file: 'packages/style-engine/**'
 
-'[Packages] Sync':
+'[Package] Sync':
     - changed-files:
           - any-glob-to-any-file: 'packages/sync/**'
 
