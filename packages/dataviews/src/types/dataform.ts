@@ -108,20 +108,20 @@ export type NormalizedSummaryField =
 	| NormalizedPanelSummaryField
 	| NormalizedCardSummaryField;
 
-export type SimpleFormField = {
-	id: string;
-	layout?: Layout;
-};
-
-export type CombinedFormField = {
+export type FormField = {
 	id: string;
 	label?: string;
 	description?: string;
 	layout?: Layout;
-	children: Array< FormField | string >;
+	children?: Array< FormField | string >;
 };
-
-export type FormField = SimpleFormField | CombinedFormField;
+export type NormalizedFormField = {
+	id: string;
+	layout: NormalizedLayout;
+	label?: string;
+	description?: string;
+	children?: NormalizedFormField[];
+};
 
 /**
  * The form configuration.
@@ -129,6 +129,10 @@ export type FormField = SimpleFormField | CombinedFormField;
 export type Form = {
 	layout?: Layout;
 	fields?: Array< FormField | string >;
+};
+export type NormalizedForm = {
+	layout: NormalizedLayout;
+	fields: NormalizedFormField[];
 };
 
 export interface DataFormProps< Item > {
@@ -143,7 +147,7 @@ export type FormValidity = Record< string, FieldValidity > | undefined;
 
 export interface FieldLayoutProps< Item > {
 	data: Item;
-	field: FormField;
+	field: NormalizedFormField;
 	onChange: ( value: any ) => void;
 	hideLabelFromVision?: boolean;
 	validity?: FieldValidity;

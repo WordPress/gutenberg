@@ -9,6 +9,7 @@ import { fileURLToPath } from 'url';
  * Internal dependencies
  */
 import { getPackageInfoFromFile } from './package-utils.mjs';
+import { getAllRoutes, getRouteFiles } from './route-utils.mjs';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
 
@@ -69,4 +70,104 @@ export async function generatePhpFromTemplate(
 	// Write output file
 	await mkdir( path.dirname( outputPath ), { recursive: true } );
 	await writeFile( outputPath, content );
+}
+
+/**
+ * Generate routes/index.php file with route registry data.
+ *
+ * @param {string} rootDir  Root directory path.
+ * @param {string} buildDir Build directory path.
+ * @param {string} prefix   Package prefix.
+ */
+export async function generateRoutesRegistry( rootDir, buildDir, prefix ) {
+	const routeNames = getAllRoutes( rootDir );
+
+	if ( routeNames.length === 0 ) {
+		// No routes to register, skip generating routes registry
+		return;
+	}
+
+	// Build routes array
+	const routes = routeNames.map( ( routeName ) => {
+		// Read package.json to get route path
+		const routePackageJson =
+			/** @type {import('./package-utils.mjs').RoutePackageJson} */ (
+				getPackageInfoFromFile(
+					path.join( rootDir, 'routes', routeName, 'package.json' )
+				)
+			);
+		const routePath = routePackageJson.route.path;
+
+		// Check if route.js exists
+		const routeFiles = getRouteFiles(
+			path.join( rootDir, 'routes', routeName )
+		);
+
+		return {
+			name: routeName,
+			path: routePath,
+			has_route: routeFiles.hasRoute,
+		};
+	} );
+
+	// Generate PHP array entries
+	const routeEntries = routes
+		.map( ( route ) => {
+			const hasRouteStr = route.has_route ? 'true' : 'false';
+			return `\tarray(
+		'name'      => '${ route.name }',
+		'path'      => '${ route.path }',
+		'has_route' => ${ hasRouteStr },
+	)`;
+		} )
+		.join( ',\n' );
+
+	// Generate routes/index.php
+	const replacements = {
+		'{{PREFIX}}': prefix,
+		'{{ROUTES}}': routeEntries,
+	};
+
+	await generatePhpFromTemplate(
+		'route-registry.php.template',
+		path.join( buildDir, 'routes', 'index.php' ),
+		replacements
+	);
+}
+
+/**
+ * Generate routes.php file with route registration logic.
+ *
+ * @param {string} rootDir      Root directory path.
+ * @param {string} buildDir     Build directory path.
+ * @param {string} handlePrefix Handle prefix for script modules.
+ * @param {string} prefix       Package prefix.
+ */
+export async function generateRoutesPhp(
+	rootDir,
+	buildDir,
+	handlePrefix,
+	prefix
+) {
+	const routeNames = getAllRoutes( rootDir );
+
+	if ( routeNames.length === 0 ) {
+		// No routes to register, skip generating routes.php
+		return;
+	}
+
+	const namespace = handlePrefix.replace( /-/g, '_' );
+
+	// Generate routes.php
+	const replacements = {
+		'{{PREFIX}}': prefix,
+		'{{NAMESPACE}}': namespace,
+		'{{HANDLE_PREFIX}}': handlePrefix,
+	};
+
+	await generatePhpFromTemplate(
+		'routes.php.template',
+		path.join( buildDir, 'routes.php' ),
+		replacements
+	);
 }

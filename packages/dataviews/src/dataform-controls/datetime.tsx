@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { format, isValid as isValidDate } from 'date-fns';
+import { format } from 'date-fns';
 
 /**
  * WordPress dependencies
@@ -13,7 +13,7 @@ import {
 } from '@wordpress/components';
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { getDate, getSettings } from '@wordpress/date';
+import { getSettings } from '@wordpress/date';
 
 /**
  * Internal dependencies
@@ -22,17 +22,10 @@ import type { DataFormControlProps } from '../types';
 import { OPERATOR_IN_THE_PAST, OPERATOR_OVER } from '../constants';
 import RelativeDateControl from './utils/relative-date-control';
 import getCustomValidity from './utils/get-custom-validity';
+import parseDateTime from '../field-types/utils/parse-date-time';
 import { unlock } from '../lock-unlock';
 
 const { DateCalendar, ValidatedInputControl } = unlock( componentsPrivateApis );
-
-const parseDateTime = ( dateTimeString?: string ): Date | null => {
-	if ( ! dateTimeString ) {
-		return null;
-	}
-	const parsed = getDate( dateTimeString );
-	return parsed && isValidDate( parsed ) ? parsed : null;
-};
 
 const formatDateTime = ( date?: Date | string ): string => {
 	if ( ! date ) {

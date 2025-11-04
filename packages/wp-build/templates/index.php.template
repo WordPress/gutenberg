@@ -29,3 +29,9 @@ $styles_file = __DIR__ . '/styles.php';
 if ( file_exists( $styles_file ) ) {
 	require_once $styles_file;
 }
+
+// Load routes registration.
+$routes_file = __DIR__ . '/routes.php';
+if ( file_exists( $routes_file ) ) {
+	require_once $routes_file;
+}
