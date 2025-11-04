@@ -11,4 +11,5 @@ export {
 	useEntityBinding,
 	buildNavigationLinkEntityBinding,
 } from './use-entity-binding';
+export { useIsInvalidLink } from './use-is-invalid-link';
 export { LinkUI } from '../link-ui';

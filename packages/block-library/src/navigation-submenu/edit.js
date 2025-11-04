@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	BlockControls,
 	InnerBlocks,
@@ -37,6 +37,7 @@ import {
 	LinkUI,
 	updateAttributes,
 	useEntityBinding,
+	useIsInvalidLink,
 } from '../navigation-link/shared';
 import {
 	getColors,
@@ -128,7 +129,7 @@ export default function NavigationSubmenuEdit( {
 	context,
 	clientId,
 } ) {
-	const { label, url, description } = attributes;
+	const { label, url, description, id, kind, type } = attributes;
 
 	const {
 		showSubmenuIcon,
@@ -140,12 +141,6 @@ export default function NavigationSubmenuEdit( {
 	// Force click-only behavior in contentOnly mode to prevent hover dropdowns
 	const openSubmenusOnClick =
 		blockEditingMode !== 'default' ? true : contextOpenSubmenusOnClick;
-
-	// URL binding logic
-	const { clearBinding, createBinding } = useEntityBinding( {
-		clientId,
-		attributes,
-	} );
 
 	const { __unstableMarkNextChangeAsNotPersistent, replaceBlock } =
 		useDispatch( blockEditorStore );
@@ -165,6 +160,7 @@ export default function NavigationSubmenuEdit( {
 		hasChildren,
 		selectedBlockHasChildren,
 		onlyDescendantIsEmptyLink,
+		validateLinkStatus,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -174,11 +170,25 @@ export default function NavigationSubmenuEdit( {
 				getBlock,
 				getBlockCount,
 				getBlockOrder,
+				getBlockRootClientId,
+				getBlockName,
+				getBlockParentsByBlockName: getParentsByBlockName,
 			} = select( blockEditorStore );
 
 			let _onlyDescendantIsEmptyLink;
 
 			const selectedBlockId = getSelectedBlockClientId();
+			const rootClientId = getBlockRootClientId( clientId );
+			const parentBlockName = getBlockName( rootClientId );
+			const isTopLevel = parentBlockName === 'core/navigation';
+			const rootNavigationClientId = isTopLevel
+				? rootClientId
+				: getParentsByBlockName( clientId, 'core/navigation' )[ 0 ];
+
+			// Enable when the root Navigation block is selected or any of its inner blocks.
+			const enableLinkStatusValidation =
+				selectedBlockId === rootNavigationClientId ||
+				hasSelectedInnerBlock( rootNavigationClientId, true );
 
 			const selectedBlockChildren = getBlockOrder( selectedBlockId );
 
@@ -209,12 +219,45 @@ export default function NavigationSubmenuEdit( {
 				hasChildren: !! getBlockCount( clientId ),
 				selectedBlockHasChildren: !! selectedBlockChildren?.length,
 				onlyDescendantIsEmptyLink: _onlyDescendantIsEmptyLink,
+				validateLinkStatus: enableLinkStatusValidation,
 			};
 		},
 		[ clientId ]
 	);
 
 	const prevHasChildren = usePrevious( hasChildren );
+
+	// URL binding logic
+	const { clearBinding, createBinding } = useEntityBinding( {
+		clientId,
+		attributes,
+	} );
+
+	// Only validate when not in click mode (submenu has URL in non-click mode)
+	const [ isInvalid, isDraft ] = useIsInvalidLink(
+		kind,
+		type,
+		id,
+		! openSubmenusOnClick && validateLinkStatus
+	);
+
+	// Compute display label with i18n support
+	const getDisplayLabel = () => {
+		if ( ! label ) {
+			return __( 'Add text…' );
+		}
+
+		let suffix = '';
+		if ( isInvalid ) {
+			suffix = sprintf( '(%s)', __( 'Invalid' ) );
+		} else if ( isDraft ) {
+			suffix = sprintf( '(%s)', __( 'Draft' ) );
+		}
+
+		return sprintf( '%1$s %2$s', label, suffix ).trim();
+	};
+
+	const displayLabel = getDisplayLabel();
 
 	// Show the LinkControl on mount if the URL is empty
 	// ( When adding a new menu item)
@@ -392,27 +435,77 @@ export default function NavigationSubmenuEdit( {
 			</InspectorControls>
 			<div { ...blockProps }>
 				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
-				<ParentElement className="wp-block-navigation-item__content">
+				<ParentElement
+					className={ clsx( 'wp-block-navigation-item__content', {
+						'wp-block-navigation-link__placeholder':
+							! openSubmenusOnClick &&
+							( ! url || isInvalid || isDraft ),
+					} ) }
+					onClick={
+						! openSubmenusOnClick &&
+						( ! url || isInvalid || isDraft )
+							? () => {
+									setIsLinkOpen( true );
+							  }
+							: undefined
+					}
+				>
 					{ /* eslint-enable */ }
-					<RichText
-						ref={ ref }
-						identifier="label"
-						className="wp-block-navigation-item__label"
-						value={ label }
-						onChange={ ( labelValue ) =>
-							setAttributes( { label: labelValue } )
-						}
-						onMerge={ mergeBlocks }
-						onReplace={ onReplace }
-						aria-label={ __( 'Navigation link text' ) }
-						placeholder={ itemLabelPlaceholder }
-						withoutInteractiveFormatting
-						onClick={ () => {
-							if ( ! openSubmenusOnClick && ! url ) {
-								setIsLinkOpen( true );
+					{ ! openSubmenusOnClick &&
+						! isInvalid &&
+						! isDraft &&
+						url && (
+							<RichText
+								ref={ ref }
+								identifier="label"
+								className="wp-block-navigation-item__label"
+								value={ label }
+								onChange={ ( labelValue ) =>
+									setAttributes( { label: labelValue } )
+								}
+								onMerge={ mergeBlocks }
+								onReplace={ onReplace }
+								aria-label={ __( 'Navigation link text' ) }
+								placeholder={ itemLabelPlaceholder }
+								withoutInteractiveFormatting
+							/>
+						) }
+					{ ! openSubmenusOnClick &&
+						( isInvalid || isDraft || ! url ) && (
+							<div
+								className={ clsx(
+									'wp-block-navigation-link__placeholder-text',
+									'wp-block-navigation-link__label',
+									{
+										'is-invalid': isInvalid,
+										'is-draft': isDraft,
+									}
+								) }
+							>
+								<span>{ displayLabel }</span>
+							</div>
+						) }
+					{ openSubmenusOnClick && (
+						<RichText
+							ref={ ref }
+							identifier="label"
+							className="wp-block-navigation-item__label"
+							value={ label }
+							onChange={ ( labelValue ) =>
+								setAttributes( { label: labelValue } )
 							}
-						} }
-					/>
+							onMerge={ mergeBlocks }
+							onReplace={ onReplace }
+							aria-label={ __( 'Navigation link text' ) }
+							placeholder={ itemLabelPlaceholder }
+							withoutInteractiveFormatting
+							onClick={ () => {
+								if ( ! openSubmenusOnClick && ! url ) {
+									setIsLinkOpen( true );
+								}
+							} }
+						/>
+					) }
 					{ description && (
 						<span className="wp-block-navigation-item__description">
 							{ description }
