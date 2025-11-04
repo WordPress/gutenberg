@@ -606,17 +606,13 @@ function getFormFieldValue< Item >(
 	item: Item
 ): any {
 	const fieldValue = formField?.field?.getValue( { item } );
-	if ( ! formField.children ) {
+	if ( formField.children.length === 0 ) {
 		return fieldValue;
 	}
 
-	const childrenValues =
-		formField.children.length > 0
-			? formField.children.map( ( child ) =>
-					getFormFieldValue( child, item )
-			  )
-			: undefined;
-
+	const childrenValues = formField.children.map( ( child ) =>
+		getFormFieldValue( child, item )
+	);
 	if ( ! childrenValues ) {
 		return fieldValue;
 	}
