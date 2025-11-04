@@ -62,18 +62,13 @@ export const getPaddingBySize = ( size: Props[ 'size' ] ): SerializedStyles => {
 		return cardPaddings[ size as SizeToken ];
 	}
 
-	// Handle object-based sizes
-	if ( size && typeof size === 'object' ) {
-		const top = size.blockStart;
-		const bottom = size.blockEnd;
-		const left = size.inlineStart;
-		const right = size.inlineEnd;
-
+	if ( size ) {
+		const { blockStart, blockEnd, inlineStart, inlineEnd } = size;
 		return css`
-			padding-block-start: ${ getSinglePaddingValue( top ) };
-			padding-block-end: ${ getSinglePaddingValue( bottom ) };
-			padding-inline-start: ${ getSinglePaddingValue( left ) };
-			padding-inline-end: ${ getSinglePaddingValue( right ) };
+			padding-block-start: ${ getSinglePaddingValue( blockStart ) };
+			padding-block-end: ${ getSinglePaddingValue( blockEnd ) };
+			padding-inline-start: ${ getSinglePaddingValue( inlineStart ) };
+			padding-inline-end: ${ getSinglePaddingValue( inlineEnd ) };
 		`;
 	}
 
