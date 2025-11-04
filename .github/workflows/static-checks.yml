@@ -39,8 +39,8 @@ jobs:
                       node: '24'
                     - event: 'pull_request'
                       os: 'macos-15'
-                    # - event: 'pull_request'
-                    #   os: 'windows-2025'
+                    - event: 'pull_request'
+                      os: 'windows-2025'
 
         steps:
             - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
