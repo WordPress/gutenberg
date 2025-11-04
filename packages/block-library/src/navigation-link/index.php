@@ -343,12 +343,14 @@ function build_variation_for_navigation_link( $entity, $kind ) {
 
 	// Set default title if needed
 	if ( $is_default_title || '' === $title ) {
-		$title = sprintf( /* translators: %s: Singular label of the entity. */ __( '%s link' ), $singular );
+		/* translators: %s: Singular label of the entity. */
+		$title = sprintf( __( '%s link' ), $singular );
 	}
 
 	// Set default description if needed
 	if ( $is_default_description || '' === $description ) {
-		$description = sprintf( /* translators: %s: Singular label of the entity. */ __( 'A link to a %s' ), strtolower( $singular ) );
+		/* translators: %s: Singular label of the entity. */
+		$description = sprintf( __( 'A link to a %s' ), strtolower( $singular ) );
 	}
 
 	$variation = array(
