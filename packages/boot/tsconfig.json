@@ -10,6 +10,7 @@
 		{ "path": "../compose" },
 		{ "path": "../core-data" },
 		{ "path": "../data" },
+		{ "path": "../editor" },
 		{ "path": "../element" },
 		{ "path": "../html-entities" },
 		{ "path": "../i18n" },

@@ -33,8 +33,7 @@ function gutenberg_boot_admin_page() {
 
 	// Register some default menu items for demonstration.
 	gutenberg_register_boot_menu_item( 'home', __( 'Home', 'gutenberg' ), '/', '' );
-	gutenberg_register_boot_menu_item( 'about', __( 'About', 'gutenberg' ), '/', '' );
-	gutenberg_register_boot_menu_item( 'settings', __( 'Settings', 'gutenberg' ), '/', '' );
+	gutenberg_register_boot_menu_item( 'posts', __( 'Posts', 'gutenberg' ), '/types/post/list/all', '' );
 
 	// Get routes and menu items.
 	$menu_items = gutenberg_get_boot_menu_items();
