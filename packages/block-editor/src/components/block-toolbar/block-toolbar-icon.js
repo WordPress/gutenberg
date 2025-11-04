@@ -54,7 +54,7 @@ export default function BlockToolbarIcon( {
 	return (
 		<ToolbarButton
 			disabled
-			className="block-editor-block-toolbar__block-icon-button"
+			className="block-editor-block-toolbar__block-icon"
 			title={ label }
 			icon={ BlockIconElement }
 			text={ showBlockTitle && blockTitle ? blockTitle : undefined }
