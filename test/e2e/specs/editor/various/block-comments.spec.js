@@ -10,9 +10,8 @@ test.use( {
 } );
 
 test.describe( 'Block Comments', () => {
-	test.beforeEach( async ( { admin, blockCommentUtils } ) => {
+	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
-		await blockCommentUtils.openBlockCommentSidebar();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -22,7 +21,13 @@ test.describe( 'Block Comments', () => {
 	test( 'should move focus to add a new note form', async ( {
 		editor,
 		page,
+		blockCommentUtils,
 	} ) => {
+		await blockCommentUtils.addBlockWithComment( {
+			type: 'core/paragraph',
+			attributes: { content: 'Howdy!' },
+			comment: 'Test comment',
+		} );
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'Testing block comments' },
@@ -157,6 +162,7 @@ test.describe( 'Block Comments', () => {
 			attributes: { content: 'Testing block comments' },
 			comment: 'Test comment to resolve.',
 		} );
+		await blockCommentUtils.openBlockCommentSidebar();
 
 		const thread = page
 			.getByRole( 'region', { name: 'Editor settings' } )
@@ -206,6 +212,7 @@ test.describe( 'Block Comments', () => {
 				.filter( { hasText: 'Note marked as resolved.' } )
 		).toBeVisible();
 
+		await blockCommentUtils.openBlockCommentSidebar();
 		await page.locator( '.editor-collab-sidebar-panel__thread' ).click();
 		await expect( resolveButton ).toBeDisabled();
 		const commentForm = page.getByRole( 'textbox', { name: 'Reply to' } );
