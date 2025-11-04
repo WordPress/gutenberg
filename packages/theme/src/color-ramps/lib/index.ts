@@ -193,7 +193,6 @@ function calculateRamp( {
 				! contrast.ignoreWhenAdjustingSeed && ! searchResults.reached,
 		};
 	}
-
 	return {
 		rampResults,
 		DEFICIT_DIRECTION,
@@ -261,21 +260,18 @@ export function buildRamp(
 	if ( MAX_DEFICIT > LIGHTNESS_EPSILON && rescaleToFitContrastTargets ) {
 		let worseSeedL = get( seed, [ OKLCH, 'l' ] );
 		let worseDeficit = MAX_DEFICIT;
+		let worseReplaced = false;
 
 		// For a scale with the "lighter" direction, the contrast can be improved
 		// by darkening the seed. For "darker" direction, by lightening the seed.
 		let betterSeedL = DEFICIT_DIRECTION === 'lighter' ? 0 : 1;
 		let betterDeficit = -MAX_DEFICIT;
+		let betterReplaced = false;
 
 		let bestDeficit = MAX_DEFICIT;
 
 		// Binary search: try a new seed and recompute the whole ramp
-		for (
-			let i = 0;
-			i < MAX_BISECTION_ITERATIONS &&
-			Math.abs( bestDeficit ) > LIGHTNESS_EPSILON;
-			i++
-		) {
+		for ( let i = 0; i < MAX_BISECTION_ITERATIONS; i++ ) {
 			const newSeedL =
 				( worseSeedL * betterDeficit - betterSeedL * worseDeficit ) /
 				( betterDeficit - worseDeficit );
@@ -294,25 +290,36 @@ export function buildRamp(
 			} );
 
 			toReturn.ramp = iterationResults.rampResults;
-			bestDeficit = iterationResults.MAX_DEFICIT;
 
-			if ( iterationResults.MAX_DEFICIT < 0 ) {
+			// If the constraints start failing in the opposite direction to the original
+			// iteration's direction, that means we've moved too far away from the target.
+			// Don't use the `MAX_DEFICIT` value because it's not related to our search,
+			// and might even be positive, which would confuse the bisection algorithm.
+			bestDeficit =
+				iterationResults.DEFICIT_DIRECTION === DEFICIT_DIRECTION
+					? iterationResults.MAX_DEFICIT
+					: -MAX_DEFICIT;
+
+			if ( Math.abs( bestDeficit ) <= LIGHTNESS_EPSILON ) {
+				break;
+			}
+
+			if ( bestDeficit <= 0 ) {
 				betterSeedL = newSeedL;
-				betterDeficit = iterationResults.MAX_DEFICIT;
-				// Only update toReturn when the ramp satisfies all constraints.
-				toReturn.ramp = iterationResults.rampResults;
-			} else if (
-				iterationResults.DEFICIT_DIRECTION !== DEFICIT_DIRECTION
-			) {
-				// Failing constraint is in opposite direction to main ramp direction
-				// We've moved too far in mainDir, constrain the search
-				betterSeedL = newSeedL;
-				betterDeficit = -MAX_DEFICIT;
+				betterDeficit = bestDeficit;
+				if ( betterReplaced ) {
+					worseDeficit /= 2;
+				}
+				betterReplaced = true;
+				worseReplaced = false;
 			} else {
-				// Failing constraint is in same direction as main ramp direction
-				// We haven't moved far enough in mainDir, continue searching
 				worseSeedL = newSeedL;
-				worseDeficit = iterationResults.MAX_DEFICIT;
+				worseDeficit = bestDeficit;
+				if ( worseReplaced ) {
+					betterDeficit /= 2;
+				}
+				worseReplaced = true;
+				betterReplaced = false;
 			}
 		}
 	}
