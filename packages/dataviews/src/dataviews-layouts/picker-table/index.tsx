@@ -24,7 +24,6 @@ import DataViewsSelectionCheckbox from '../../components/dataviews-selection-che
 import { useIsMultiselectPicker } from '../../components/dataviews-picker/footer';
 import { sortValues } from '../../constants';
 import type {
-	Action,
 	NormalizedField,
 	ViewPickerTable as ViewPickerTableType,
 	ViewPickerTableProps,
@@ -43,7 +42,6 @@ interface TableColumnFieldProps< Item > {
 
 interface TableRowProps< Item > {
 	item: Item;
-	actions: Action< Item >[];
 	fields: NormalizedField< Item >[];
 	id: string;
 	view: ViewPickerTableType;
@@ -376,7 +374,6 @@ function ViewPickerTable< Item >( {
 									<TableRow
 										key={ getItemId( item ) }
 										item={ item }
-										actions={ actions }
 										fields={ fields }
 										id={
 											getItemId( item ) ||
@@ -402,7 +399,6 @@ function ViewPickerTable< Item >( {
 								<TableRow
 									key={ getItemId( item ) }
 									item={ item }
-									actions={ actions }
 									fields={ fields }
 									id={ getItemId( item ) || index.toString() }
 									view={ view }
