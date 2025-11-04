@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -13,15 +8,8 @@ import {
 	Button,
 	privateApis as componentsPrivateApis,
 	VisuallyHidden,
-	Composite,
 } from '@wordpress/components';
-import {
-	useEffect,
-	useRef,
-	useState,
-	useContext,
-	useMemo,
-} from '@wordpress/element';
+import { useRef, useState, useContext, useMemo } from '@wordpress/element';
 import { Icon, pinSmall, moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
 
@@ -34,34 +22,37 @@ import {
 	ActionModal,
 } from '../../components/dataviews-item-actions';
 import DataViewsContext from '../../components/dataviews-context';
+import { ItemClickWrapper } from '../utils/item-click-wrapper';
 import type {
 	Action,
 	NormalizedField,
 	ViewTimeline,
 	ActionModal as ActionModalType,
 } from '../../types';
-import {
-	generateItemWrapperCompositeId,
-	generatePrimaryActionCompositeId,
-	generateDropdownTriggerCompositeId,
-} from './utils';
+/**
+ * External dependencies
+ */
+import type { ReactElement, ComponentProps } from 'react';
 
 const { Menu } = unlock( componentsPrivateApis );
 
 interface TimelineItemProps< Item > {
 	view: ViewTimeline;
 	actions: Action< Item >[];
-	idPrefix: string;
-	isSelected: boolean;
 	item: Item;
 	titleField?: NormalizedField< Item >;
 	mediaField?: NormalizedField< Item >;
 	descriptionField?: NormalizedField< Item >;
 	eventFieldObject?: NormalizedField< Item >;
-	onSelect: ( item: Item ) => void;
 	otherFields: NormalizedField< Item >[];
-	onDropdownTriggerKeyDown: React.KeyboardEventHandler< HTMLButtonElement >;
 	posinset?: number;
+	onClickItem?: ( item: Item ) => void;
+	renderItemLink?: (
+		props: {
+			item: Item;
+		} & ComponentProps< 'a' >
+	) => ReactElement;
+	isItemClickable: ( item: Item ) => boolean;
 }
 
 function TimelineSpacer() {
@@ -71,17 +62,16 @@ function TimelineSpacer() {
 function TimelineItem< Item >( {
 	view,
 	actions,
-	idPrefix,
-	isSelected,
 	item,
 	titleField,
 	mediaField,
 	descriptionField,
 	eventFieldObject,
-	onSelect,
 	otherFields,
-	onDropdownTriggerKeyDown,
 	posinset,
+	onClickItem,
+	renderItemLink,
+	isItemClickable,
 }: TimelineItemProps< Item > ) {
 	const {
 		showTitle = true,
@@ -90,29 +80,12 @@ function TimelineItem< Item >( {
 		infiniteScrollEnabled,
 	} = view;
 	const itemRef = useRef< HTMLDivElement >( null );
-	const labelId = `${ idPrefix }-label`;
-	const descriptionId = `${ idPrefix }-description`;
 
 	const registry = useRegistry();
-	const [ isHovered, setIsHovered ] = useState( false );
+	const { paginationInfo } = useContext( DataViewsContext );
 	const [ activeModalAction, setActiveModalAction ] = useState(
 		null as ActionModalType< Item > | null
 	);
-	const handleHover: React.MouseEventHandler = ( { type } ) => {
-		const isHover = type === 'mouseenter';
-		setIsHovered( isHover );
-	};
-
-	const { paginationInfo } = useContext( DataViewsContext );
-	useEffect( () => {
-		if ( isSelected ) {
-			itemRef.current?.scrollIntoView( {
-				behavior: 'auto',
-				block: 'nearest',
-				inline: 'nearest',
-			} );
-		}
-	}, [ isSelected ] );
 
 	const { primaryAction, eligibleActions } = useMemo( () => {
 		// If an action is eligible for all items, doesn't need
@@ -155,66 +128,50 @@ function TimelineItem< Item >( {
 			spacing={ 2 }
 			className="dataviews-view-timeline__primary-actions"
 		>
-			<Composite.Item
-				id={ generatePrimaryActionCompositeId(
-					idPrefix,
-					primaryAction.id
-				) }
-				render={
-					'RenderModal' in primaryAction ? (
-						<Button
-							disabled={ !! primaryAction.disabled }
-							accessibleWhenDisabled
-							size="compact"
-							variant="secondary"
-							onClick={ () => setIsModalOpen( true ) }
-						>
-							{ typeof primaryAction.label === 'string'
-								? primaryAction.label
-								: primaryAction.label( [ item ] ) }
-						</Button>
-					) : (
-						<Button
-							disabled={ !! primaryAction.disabled }
-							accessibleWhenDisabled
-							size="compact"
-							variant="secondary"
-							onClick={ () => {
-								primaryAction.callback( [ item ], {
-									registry,
-								} );
-							} }
-						>
-							{ typeof primaryAction.label === 'string'
-								? primaryAction.label
-								: primaryAction.label( [ item ] ) }
-						</Button>
-					)
-				}
-			/>
+			{ 'RenderModal' in primaryAction ? (
+				<Button
+					disabled={ !! primaryAction.disabled }
+					accessibleWhenDisabled
+					size="compact"
+					variant="secondary"
+					onClick={ () => setIsModalOpen( true ) }
+				>
+					{ typeof primaryAction.label === 'string'
+						? primaryAction.label
+						: primaryAction.label( [ item ] ) }
+				</Button>
+			) : (
+				<Button
+					disabled={ !! primaryAction.disabled }
+					accessibleWhenDisabled
+					size="compact"
+					variant="secondary"
+					onClick={ () => {
+						primaryAction.callback( [ item ], {
+							registry,
+						} );
+					} }
+				>
+					{ typeof primaryAction.label === 'string'
+						? primaryAction.label
+						: primaryAction.label( [ item ] ) }
+				</Button>
+			) }
 		</HStack>
 	);
 
 	// Dropdown menu (rendered to right of title) - includes all actions
 	const renderedDropdownMenu = eligibleActions?.length > 0 && (
-		<div role="gridcell" className="dataviews-view-timeline__dropdown-cell">
+		<div className="dataviews-view-timeline__dropdown-cell">
 			<Menu placement="bottom-end">
 				<Menu.TriggerButton
 					render={
-						<Composite.Item
-							id={ generateDropdownTriggerCompositeId(
-								idPrefix
-							) }
-							render={
-								<Button
-									size="compact"
-									icon={ moreVertical }
-									label={ __( 'Actions' ) }
-									accessibleWhenDisabled
-									disabled={ ! eligibleActions.length }
-									onKeyDown={ onDropdownTriggerKeyDown }
-								/>
-							}
+						<Button
+							size="compact"
+							icon={ moreVertical }
+							label={ __( 'Actions' ) }
+							accessibleWhenDisabled
+							disabled={ ! eligibleActions.length }
 						/>
 					}
 				/>
@@ -234,41 +191,21 @@ function TimelineItem< Item >( {
 
 	return (
 		<>
-			<Composite.Row
+			<div
 				ref={ itemRef }
-				render={
-					/* aria-posinset breaks Composite.Row if passed to it directly. */
-					<div
-						aria-posinset={ posinset }
-						aria-setsize={
-							infiniteScrollEnabled
-								? paginationInfo.totalItems
-								: undefined
-						}
-					/>
+				role={ infiniteScrollEnabled ? 'article' : undefined }
+				aria-posinset={ posinset }
+				aria-setsize={
+					infiniteScrollEnabled
+						? paginationInfo.totalItems
+						: undefined
 				}
-				role={ infiniteScrollEnabled ? 'article' : 'row' }
-				className={ clsx( {
-					'is-selected': isSelected,
-					'is-hovered': isHovered,
-				} ) }
-				onMouseEnter={ handleHover }
-				onMouseLeave={ handleHover }
+				className="dataviews-view-timeline__row"
 			>
 				<HStack
 					className="dataviews-view-timeline__item-wrapper"
 					spacing={ 0 }
 				>
-					<div role="gridcell">
-						<Composite.Item
-							id={ generateItemWrapperCompositeId( idPrefix ) }
-							aria-pressed={ isSelected }
-							aria-labelledby={ labelId }
-							aria-describedby={ descriptionId }
-							className="dataviews-view-timeline__item"
-							onClick={ () => onSelect( item ) }
-						/>
-					</div>
 					<HStack
 						spacing={ 3 }
 						justify="start"
@@ -283,30 +220,44 @@ function TimelineItem< Item >( {
 							<TimelineSpacer />
 						</VStack>
 						<VStack
-							spacing={ 1 }
-							className="dataviews-view-timeline__field-wrapper"
+							spacing={ 0 }
+							alignment="flex-start"
+							className="dataviews-view-timelime__content"
 						>
-							<HStack spacing={ 1 } justify="space-between">
-								<div
-									className="dataviews-title-field"
-									id={ labelId }
-								>
-									{ renderedTitleField }
-								</div>
-								{ renderedDropdownMenu }
-							</HStack>
-							{ showDescription && descriptionField?.render && (
-								<div className="dataviews-view-timeline__field">
+							<ItemClickWrapper
+								item={ item }
+								isItemClickable={ isItemClickable }
+								onClickItem={ onClickItem }
+								renderItemLink={ renderItemLink }
+								className="dataviews-title-field"
+							>
+								{ renderedTitleField }
+							</ItemClickWrapper>
+							{ showDescription && descriptionField && (
+								<div className="dataviews-view-timeline__field--description">
 									<descriptionField.render
 										item={ item }
 										field={ descriptionField }
 									/>
 								</div>
 							) }
-							<div
-								className="dataviews-view-timeline__fields"
-								id={ descriptionId }
-							>
+							<div className="dataviews-view-timeline__fields">
+								{ eventFieldObject && (
+									<div className="dataviews-view-timeline__field dataviews-view-timeline__field--date">
+										<VisuallyHidden
+											as="span"
+											className="dataviews-view-timeline__field-label"
+										>
+											{ eventFieldObject.label }
+										</VisuallyHidden>
+										<span className="dataviews-view-timeline__field-value">
+											<eventFieldObject.render
+												item={ item }
+												field={ eventFieldObject }
+											/>
+										</span>
+									</div>
+								) }
 								{ otherFields.map( ( field ) => (
 									<div
 										key={ field.id }
@@ -327,19 +278,12 @@ function TimelineItem< Item >( {
 									</div>
 								) ) }
 							</div>
-							{ eventFieldObject?.render && (
-								<div className="dataviews-view-timeline__event-date">
-									<eventFieldObject.render
-										item={ item }
-										field={ eventFieldObject }
-									/>
-								</div>
-							) }
 							{ renderedPrimaryActions }
 						</VStack>
+						{ renderedDropdownMenu }
 					</HStack>
 				</HStack>
-			</Composite.Row>
+			</div>
 			{ isModalOpen &&
 				primaryAction &&
 				'RenderModal' in primaryAction && (

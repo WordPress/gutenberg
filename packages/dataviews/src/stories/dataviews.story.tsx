@@ -650,6 +650,17 @@ const TimelineComponent = ( {
 			fields={ timelineFields }
 			onChangeView={ setView }
 			actions={ actions }
+			renderItemLink={ ( { item, ...props }: { item: SpaceObject } ) => (
+				<button
+					style={ { background: 'none', border: 'none', padding: 0 } }
+					onClick={ () => {
+						// eslint-disable-next-line no-alert
+						alert( 'Clicked: ' + item.name.title );
+					} }
+					{ ...props }
+				/>
+			) }
+			isItemClickable={ () => true }
 			defaultLayouts={ {
 				[ LAYOUT_TIMELINE ]: {},
 			} }

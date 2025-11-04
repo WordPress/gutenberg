@@ -18,15 +18,19 @@ interface TimelineGroupProps< Item > {
 	eventField: string | undefined;
 	groupFieldLabel: string;
 	actions: Action< Item >[];
-	selectedItem: Item | undefined;
-	onSelect: ( item: Item ) => void;
+	getItemId: ( item: Item ) => string;
 	titleField: NormalizedField< Item > | undefined;
 	mediaField: NormalizedField< Item > | undefined;
 	descriptionField: NormalizedField< Item > | undefined;
 	eventFieldObject: NormalizedField< Item > | undefined;
 	otherFields: NormalizedField< Item >[];
-	generateCompositeItemIdPrefix: ( item: Item ) => string;
-	onDropdownTriggerKeyDown: React.KeyboardEventHandler< HTMLButtonElement >;
+	onClickItem?: ( item: Item ) => void;
+	renderItemLink?: (
+		props: {
+			item: Item;
+		} & React.ComponentProps< 'a' >
+	) => React.ReactElement;
+	isItemClickable: ( item: Item ) => boolean;
 }
 
 export default function TimelineGroup< Item >( {
@@ -36,15 +40,15 @@ export default function TimelineGroup< Item >( {
 	eventField,
 	groupFieldLabel,
 	actions,
-	selectedItem,
-	onSelect,
+	getItemId,
 	titleField,
 	mediaField,
 	descriptionField,
 	eventFieldObject,
 	otherFields,
-	generateCompositeItemIdPrefix,
-	onDropdownTriggerKeyDown,
+	onClickItem,
+	renderItemLink,
+	isItemClickable,
 }: TimelineGroupProps< Item > ) {
 	// Determine if group header should show formatted date or field label
 	const isEventFieldGroup = eventField && eventField === view.groupByField;
@@ -63,22 +67,21 @@ export default function TimelineGroup< Item >( {
 				{ groupHeader }
 			</h3>
 			{ groupItems.map( ( item ) => {
-				const id = generateCompositeItemIdPrefix( item );
+				const id = getItemId( item );
 				return (
 					<TimelineItem
 						key={ id }
 						view={ view }
-						idPrefix={ id }
 						actions={ actions }
 						item={ item }
-						isSelected={ item === selectedItem }
-						onSelect={ onSelect }
 						mediaField={ mediaField }
 						titleField={ titleField }
 						descriptionField={ descriptionField }
 						eventFieldObject={ eventFieldObject }
 						otherFields={ otherFields }
-						onDropdownTriggerKeyDown={ onDropdownTriggerKeyDown }
+						onClickItem={ onClickItem }
+						renderItemLink={ renderItemLink }
+						isItemClickable={ isItemClickable }
 					/>
 				);
 			} ) }
