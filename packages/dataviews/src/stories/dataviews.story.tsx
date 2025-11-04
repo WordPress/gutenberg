@@ -73,6 +73,7 @@ const defaultLayouts = {
 	[ LAYOUT_TABLE ]: {},
 	[ LAYOUT_GRID ]: {},
 	[ LAYOUT_LIST ]: {},
+	[ LAYOUT_TIMELINE ]: {},
 };
 
 export const Default = ( {
@@ -433,6 +434,7 @@ export const GroupByLayout = () => {
 				[ LAYOUT_GRID ]: {},
 				[ LAYOUT_LIST ]: {},
 				[ LAYOUT_TABLE ]: {},
+				[ LAYOUT_TIMELINE ]: {},
 			} }
 		/>
 	);
@@ -558,6 +560,7 @@ export const InfiniteScroll = () => {
 					[ LAYOUT_GRID ]: {},
 					[ LAYOUT_LIST ]: {},
 					[ LAYOUT_TABLE ]: {},
+					[ LAYOUT_TIMELINE ]: {},
 				} }
 			/>
 		</>
