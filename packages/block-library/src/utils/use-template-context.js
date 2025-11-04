@@ -75,35 +75,26 @@ export function parseTemplateSlug( templateSlug ) {
 	// e.g. taxonomy-product-category, taxonomy-product-category-electronics
 	if ( templateSlug.startsWith( 'taxonomy-' ) ) {
 		const taxonomyPart = templateSlug.substring( 9 );
+		const taxonomyParts = taxonomyPart.split( '-' );
 
-		// Find dash positions
-		const dashIndices = [];
-		for ( let i = 0; i < taxonomyPart.length; i++ ) {
-			if ( taxonomyPart[ i ] === '-' ) {
-				dashIndices.push( i );
-			}
+		if ( taxonomyParts.length === 1 ) {
+			// No dashes, so the entire part is the taxonomy
+			// e.g. taxonomy-product -> taxonomy: "product", term: null
+			return buildTemplateContext( { taxonomy: taxonomyPart } );
 		}
 
-		if ( dashIndices.length > 0 ) {
-			// If there's only one dash, treat it as taxonomy.
-			// If there are multiple dashes, use the last one as the split point.
-			if ( dashIndices.length === 1 ) {
-				// Single dash
-				// e.g. taxonomy-product-category -> taxonomy: "product-category", term: null
-				return buildTemplateContext( { taxonomy: taxonomyPart } );
-			}
-
-			// Multiple dashes
-			// e.g. taxonomy-product-category-electronics -> taxonomy: "product-category", term: "electronics"
-			const lastDashIndex = dashIndices[ dashIndices.length - 1 ];
-			const taxonomy = taxonomyPart.substring( 0, lastDashIndex );
-			const termSlug = taxonomyPart.substring( lastDashIndex + 1 );
-
-			return buildTemplateContext( { taxonomy, termSlug } );
+		if ( taxonomyParts.length === 2 ) {
+			// Single dash
+			// e.g. taxonomy-product-category -> taxonomy: "product-category", term: null
+			return buildTemplateContext( { taxonomy: taxonomyPart } );
 		}
 
-		// No dashes, so the entire part is the taxonomy
-		return buildTemplateContext( { taxonomy: taxonomyPart } );
+		// Multiple dashes
+		// e.g. taxonomy-product-category-electronics -> taxonomy: "product-category", term: "electronics"
+		const taxonomy = taxonomyParts.slice( 0, -1 ).join( '-' );
+		const termSlug = taxonomyParts[ taxonomyParts.length - 1 ];
+
+		return buildTemplateContext( { taxonomy, termSlug } );
 	}
 
 	// Check for built-in taxonomy patterns
@@ -147,35 +138,19 @@ export function parseTemplateSlugWithValidation( templateSlug, getTaxonomy ) {
 
 	if ( templateSlug.startsWith( 'taxonomy-' ) ) {
 		const taxonomyPart = templateSlug.substring( 9 );
-		const dashIndices = [];
+		const taxonomyParts = taxonomyPart.split( '-' );
 
-		// Find all dash positions.
-		for ( let i = 0; i < taxonomyPart.length; i++ ) {
-			if ( taxonomyPart[ i ] === '-' ) {
-				dashIndices.push( i );
-			}
-		}
+		for ( let i = 1; i < taxonomyParts.length; i++ ) {
+			const potentialTaxonomy = taxonomyParts.slice( 0, i ).join( '-' );
+			const potentialTermSlug = taxonomyParts.slice( i ).join( '-' );
 
-		// If we have dashes, try different split points to find a valid taxonomy
-		if ( dashIndices.length > 0 ) {
-			for ( let i = 0; i < dashIndices.length; i++ ) {
-				const splitIndex = dashIndices[ i ];
-				const potentialTaxonomy = taxonomyPart.substring(
-					0,
-					splitIndex
-				);
-				const potentialTermSlug = taxonomyPart.substring(
-					splitIndex + 1
-				);
-
-				// Check if this taxonomy exists
-				const taxonomyRecord = getTaxonomy( potentialTaxonomy );
-				if ( taxonomyRecord ) {
-					return buildTemplateContext( {
-						taxonomy: potentialTaxonomy,
-						termSlug: potentialTermSlug,
-					} );
-				}
+			// Check if this taxonomy exists.
+			const taxonomyRecord = getTaxonomy( potentialTaxonomy );
+			if ( taxonomyRecord ) {
+				return buildTemplateContext( {
+					taxonomy: potentialTaxonomy,
+					termSlug: potentialTermSlug,
+				} );
 			}
 		}
 
