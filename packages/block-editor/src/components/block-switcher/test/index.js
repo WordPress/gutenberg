@@ -94,16 +94,17 @@ describe( 'BlockSwitcher', () => {
 				},
 			],
 			blocks: [ headingBlock1 ],
+			patterns: [],
+			isUsingBindings: false,
+			canRemove: true,
 		} ) );
 		const user = userEvent.setup();
 		render(
 			<BlockSwitcher
 				clientIds={ [ headingBlock1.clientId ] }
 				hasBlockStyles={ false }
-				canRemove
-				isReusable={ false }
-				isTemplate={ false }
-				showIconLabels={ false }
+				isSynced={ false }
+				label="Block Name"
 			/>
 		);
 		expect(
@@ -146,16 +147,17 @@ describe( 'BlockSwitcher', () => {
 		useSelect.mockImplementation( () => ( {
 			possibleBlockTransformations: [],
 			blocks: [ headingBlock1 ],
+			patterns: [],
+			isUsingBindings: false,
+			canRemove: false,
 			icon: copy,
 		} ) );
 		render(
 			<BlockSwitcher
 				clientIds={ [ headingBlock1.clientId ] }
 				hasBlockStyles={ false }
-				canRemove
-				isReusable={ false }
-				isTemplate={ false }
-				showIconLabels={ false }
+				isSynced={ false }
+				label="Block Name"
 			/>
 		);
 		const user = userEvent.setup();
