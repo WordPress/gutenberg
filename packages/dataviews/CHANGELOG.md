@@ -11,6 +11,7 @@
 - DataForm: make the card layout borderless. [#72514](https://github.com/WordPress/gutenberg/pull/72514)
 - DataViews: Simplify the view config properties section. [#73064](https://github.com/WordPress/gutenberg/pull/73064)
 - DataViews: Add a contextual menu to the table layout header. [#73104](https://github.com/WordPress/gutenberg/pull/73104)
+- DataViewsPicker: Add table layout support. [#72914](https://github.com/WordPress/gutenberg/pull/72914)
 
 ### Bug fixes
 
