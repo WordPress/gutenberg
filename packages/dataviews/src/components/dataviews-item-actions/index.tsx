@@ -135,11 +135,10 @@ export function ActionsMenuGroup< Item >( {
 	const { primaryActions, regularActions } = useMemo( () => {
 		return actions.reduce(
 			( acc, action ) => {
-				if ( action.isPrimary ) {
-					acc.primaryActions.push( action );
-				} else {
-					acc.regularActions.push( action );
-				}
+				( action.isPrimary
+					? acc.primaryActions
+					: acc.regularActions
+				).push( action );
 				return acc;
 			},
 			{
