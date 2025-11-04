@@ -321,7 +321,6 @@ function build_variation_for_navigation_link( $entity, $kind ) {
 	}
 
 	// Get title and check if it's default
-	$title            = '';
 	$is_default_title = false;
 	if ( property_exists( $entity->labels, 'item_link' ) ) {
 		$title = $entity->labels->item_link;
@@ -331,7 +330,6 @@ function build_variation_for_navigation_link( $entity, $kind ) {
 	}
 
 	// Get description and check if it's default
-	$description            = '';
 	$is_default_description = false;
 	if ( property_exists( $entity->labels, 'item_link_description' ) ) {
 		$description = $entity->labels->item_link_description;

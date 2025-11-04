@@ -62,7 +62,7 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 		$variation = gutenberg_build_variation_for_navigation_link( $post_type, 'post-type' );
 
 		// Verify the title format.
-		$this->assertEquals( 'Product Link', $variation['title'], 'Custom post type should have appropriately named title' );
+		$this->assertEquals( 'Product link', $variation['title'], 'Custom post type should have appropriately named title' );
 
 		// Verify the description format.
 		$this->assertEquals( 'A link to a product', $variation['description'], 'Custom post type should have clear, unambiguous description' );
@@ -135,7 +135,7 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 		$variation = gutenberg_build_variation_for_navigation_link( $post_type, 'post-type' );
 
 		// Verify title is generated from singular_name
-		$this->assertEquals( 'Product Link', $variation['title'], 'Title should be generated from singular_name when item_link is missing' );
+		$this->assertEquals( 'Product link', $variation['title'], 'Title should be generated from singular_name when item_link is missing' );
 	}
 
 	/**
@@ -168,7 +168,7 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 		$variation = gutenberg_build_variation_for_navigation_link( $post_type, 'post-type' );
 
 		// Verify title and description use ucfirst(name)
-		$this->assertEquals( 'Product Link', $variation['title'], 'Title should use ucfirst(name) when singular_name is missing' );
+		$this->assertEquals( 'Product link', $variation['title'], 'Title should use ucfirst(name) when singular_name is missing' );
 		$this->assertEquals( 'A link to a product', $variation['description'], 'Description should use ucfirst(name) when singular_name is missing' );
 	}
 
@@ -205,7 +205,7 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 		$variation = gutenberg_build_variation_for_navigation_link( $taxonomy, 'taxonomy' );
 
 		// Verify labels are generated for taxonomy
-		$this->assertEquals( 'Product Category Link', $variation['title'], 'Title should be generated for taxonomy' );
+		$this->assertEquals( 'Product Category link', $variation['title'], 'Title should be generated for taxonomy' );
 		$this->assertEquals( 'A link to a product category', $variation['description'], 'Description should be generated for taxonomy' );
 	}
 
@@ -297,7 +297,7 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 		$variation = gutenberg_build_variation_for_navigation_link( $post_type, 'post-type' );
 
 		// Verify empty strings trigger generation
-		$this->assertEquals( 'Product Link', $variation['title'], 'Empty item_link should trigger title generation' );
+		$this->assertEquals( 'Product link', $variation['title'], 'Empty item_link should trigger title generation' );
 		$this->assertEquals( 'A link to a product', $variation['description'], 'Empty item_link_description should trigger description generation' );
 	}
 
@@ -314,7 +314,7 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 		$variation = gutenberg_build_variation_for_navigation_link( $post_type, 'post-type' );
 
 		// Verify case handling
-		$this->assertEquals( 'Product Link', $variation['title'], 'Title should preserve case from singular_name' );
+		$this->assertEquals( 'Product link', $variation['title'], 'Title should preserve case from singular_name' );
 		$this->assertEquals( 'A link to a product', $variation['description'], 'Description should use lowercase from singular_name' );
 	}
 
@@ -331,7 +331,7 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 		$variation = gutenberg_build_variation_for_navigation_link( $entity, 'post-type' );
 
 		// Verify function handles minimal entity gracefully
-		$this->assertEquals( 'Product Link', $variation['title'], 'Title should be generated from ucfirst(name) when no singular_name' );
+		$this->assertEquals( 'Product link', $variation['title'], 'Title should be generated from ucfirst(name) when no singular_name' );
 		$this->assertEquals( 'A link to a product', $variation['description'], 'Description should be generated from ucfirst(name) when no singular_name' );
 		$this->assertEquals( 'product', $variation['name'], 'Name should match entity name' );
 		$this->assertEquals( 'product', $variation['attributes']['type'], 'Type should match entity name' );
@@ -400,7 +400,7 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'test_product', $variation['name'], 'Name should match registered post type name' );
 		$this->assertEquals( 'test_product', $variation['attributes']['type'], 'Type should match registered post type name' );
 		$this->assertEquals( 'post-type', $variation['attributes']['kind'], 'Kind should be "post-type"' );
-		$this->assertEquals( 'Product Link', $variation['title'], 'Title should be generated from singular_name' );
+		$this->assertEquals( 'Product link', $variation['title'], 'Title should be generated from singular_name' );
 		$this->assertEquals( 'A link to a product', $variation['description'], 'Description should be generated from singular_name' );
 
 		// Clean up
@@ -486,7 +486,7 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'test_product_category', $variation['name'], 'Name should match registered taxonomy name' );
 		$this->assertEquals( 'test_product_category', $variation['attributes']['type'], 'Type should match registered taxonomy name' );
 		$this->assertEquals( 'taxonomy', $variation['attributes']['kind'], 'Kind should be "taxonomy"' );
-		$this->assertEquals( 'Product Category Link', $variation['title'], 'Title should be generated from singular_name' );
+		$this->assertEquals( 'Product Category link', $variation['title'], 'Title should be generated from singular_name' );
 		$this->assertEquals( 'A link to a product category', $variation['description'], 'Description should be generated from singular_name' );
 
 		// Clean up
