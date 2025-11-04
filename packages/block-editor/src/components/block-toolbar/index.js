@@ -42,6 +42,7 @@ import ChangeDesign from './change-design';
 import SwitchSectionStyle from './switch-section-style';
 import { unlock } from '../../lock-unlock';
 import BlockToolbarIcon from './block-toolbar-icon';
+import { hasPatternOverridesDefaultBinding } from '../../utils/block-bindings';
 
 /**
  * Renders the block toolbar.
@@ -130,10 +131,8 @@ export function PrivateBlockToolbar( {
 
 		const _hasPatternOverrides = selectedBlockClientIds.every(
 			( clientId ) =>
-				Object.values(
-					getBlockAttributes( clientId )?.metadata?.bindings ?? {}
-				).some(
-					( binding ) => binding?.source === 'core/pattern-overrides'
+				hasPatternOverridesDefaultBinding(
+					getBlockAttributes( clientId )?.metadata?.bindings
 				)
 		);
 
