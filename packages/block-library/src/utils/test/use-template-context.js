@@ -248,4 +248,52 @@ describe( 'parseTemplateSlugWithValidation', () => {
 			authorSlug: null,
 		} );
 	} );
+
+	it( 'should validate full string as taxonomy before splitting when overlapping taxonomies exist', () => {
+		mockGetTaxonomy.mockImplementation( ( taxonomy ) => {
+			if ( taxonomy === 'taxonomy-one' ) {
+				return { name: 'Taxonomy One' };
+			}
+			if ( taxonomy === 'taxonomy-one-more' ) {
+				return { name: 'Taxonomy One More' };
+			}
+			return null;
+		} );
+
+		const result = parseTemplateSlugWithValidation(
+			'taxonomy-taxonomy-one-more',
+			mockGetTaxonomy
+		);
+
+		expect( result ).toEqual( {
+			taxonomy: 'taxonomy-one-more',
+			termSlug: null,
+			isAuthor: false,
+			authorSlug: null,
+		} );
+	} );
+
+	it( 'should validate full string before splitting when overlapping taxonomies exist with a term slug', () => {
+		mockGetTaxonomy.mockImplementation( ( taxonomy ) => {
+			if ( taxonomy === 'taxonomy-one' ) {
+				return { name: 'Taxonomy One' };
+			}
+			if ( taxonomy === 'taxonomy-one-more' ) {
+				return { name: 'Taxonomy One More' };
+			}
+			return null;
+		} );
+
+		const result = parseTemplateSlugWithValidation(
+			'taxonomy-taxonomy-one-more-term-slug',
+			mockGetTaxonomy
+		);
+
+		expect( result ).toEqual( {
+			taxonomy: 'taxonomy-one-more',
+			termSlug: 'term-slug',
+			isAuthor: false,
+			authorSlug: null,
+		} );
+	} );
 } );

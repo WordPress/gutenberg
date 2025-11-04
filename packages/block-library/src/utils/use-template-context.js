@@ -146,11 +146,20 @@ export function parseTemplateSlugWithValidation( templateSlug, getTaxonomy ) {
 		const taxonomyPart = templateSlug.substring( 9 );
 		const taxonomyParts = taxonomyPart.split( '-' );
 
-		for ( let i = 1; i < taxonomyParts.length; i++ ) {
+		// Check if the entire string is a valid taxonomy.
+		const fullTaxonomyRecord = getTaxonomy( taxonomyPart );
+		if ( fullTaxonomyRecord ) {
+			return {
+				...DEFAULT_CONTEXT,
+				taxonomy: taxonomyPart,
+			};
+		}
+
+		// Try splitting the taxonomy into parts to find a valid taxonomy.
+		for ( let i = taxonomyParts.length - 1; i >= 1; i-- ) {
 			const potentialTaxonomy = taxonomyParts.slice( 0, i ).join( '-' );
 			const potentialTermSlug = taxonomyParts.slice( i ).join( '-' );
 
-			// Check if this taxonomy exists.
 			const taxonomyRecord = getTaxonomy( potentialTaxonomy );
 			if ( taxonomyRecord ) {
 				return {
@@ -161,30 +170,21 @@ export function parseTemplateSlugWithValidation( templateSlug, getTaxonomy ) {
 			}
 		}
 
-		// If no valid split found, try the entire string as taxonomy.
-		const taxonomyRecord = getTaxonomy( taxonomyPart );
-		if ( taxonomyRecord ) {
-			return {
-				...DEFAULT_CONTEXT,
-				taxonomy: taxonomyPart,
-			};
-		}
-
 		// No valid taxonomy found.
 		return DEFAULT_CONTEXT;
 	}
 
-	// For non-taxonomy prefixed slugs, use the basic parsing
-	const basicParse = parseTemplateSlug( templateSlug );
+	// For non-taxonomy prefixed slugs, use parseTemplateSlug.
+	const parsedTemplateSlug = parseTemplateSlug( templateSlug );
 
-	if ( basicParse.taxonomy && ! basicParse.isAuthor ) {
-		const taxonomyRecord = getTaxonomy( basicParse.taxonomy );
+	if ( parsedTemplateSlug.taxonomy && ! parsedTemplateSlug.isAuthor ) {
+		const taxonomyRecord = getTaxonomy( parsedTemplateSlug.taxonomy );
 		if ( ! taxonomyRecord ) {
 			return DEFAULT_CONTEXT;
 		}
 	}
 
-	return basicParse;
+	return parsedTemplateSlug;
 }
 
 /**
