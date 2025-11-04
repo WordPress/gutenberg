@@ -245,10 +245,6 @@ export interface ViewTimeline extends ViewBase {
 		 * The field to use as event field.
 		 */
 		eventField?: string;
-		/**
-		 * The date format to use for the event field.
-		 */
-		dateFormat?: string;
 	};
 }
 

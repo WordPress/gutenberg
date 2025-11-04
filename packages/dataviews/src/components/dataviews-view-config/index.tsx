@@ -114,6 +114,7 @@ export function ViewTypeMenu() {
 
 function SortFieldControl() {
 	const { view, fields, onChangeView } = useContext( DataViewsContext );
+
 	const orderOptions = useMemo( () => {
 		const sortableFields = fields.filter(
 			( field ) => field.enableSorting !== false
@@ -125,6 +126,11 @@ function SortFieldControl() {
 			};
 		} );
 	}, [ fields ] );
+
+	// Hide sorting controls for timeline layout
+	if ( view.type === 'timeline' ) {
+		return null;
+	}
 
 	return (
 		<SelectControl
@@ -149,6 +155,11 @@ function SortFieldControl() {
 
 function SortDirectionControl() {
 	const { view, fields, onChangeView } = useContext( DataViewsContext );
+
+	// Hide sorting controls for timeline layout
+	if ( view.type === 'timeline' ) {
+		return null;
+	}
 
 	const sortableFields = fields.filter(
 		( field ) => field.enableSorting !== false

@@ -196,10 +196,10 @@ const MinimalUIComponent = ( {
 	} ) );
 
 	useEffect( () => {
-		setView( {
-			...view,
+		setView( ( prevView ) => ( {
+			...prevView,
 			type: layout as any,
-		} );
+		} ) );
 	}, [ layout ] );
 
 	return (
@@ -509,6 +509,7 @@ export const InfiniteScroll = () => {
 		}
 		setIsLoadingMore( false );
 	}, [
+		shownData,
 		view.search,
 		view.filters,
 		view.perPage,
@@ -574,15 +575,14 @@ const TimelineComponent = ( {
 		page: 1,
 		perPage: 20,
 		filters: [],
-		fields: [ 'categories', 'datetime' ],
+		fields: [ 'categories' ],
 		titleField: 'title',
 		descriptionField: 'description',
 		groupByField: 'date',
 		mediaField: 'image',
 		showMedia: showMedia === 'true',
 		layout: {
-			eventField: 'date',
-			dateFormat: 'M j, Y',
+			eventField: 'datetime',
 		},
 	} );
 	useEffect( () => {
@@ -594,16 +594,60 @@ const TimelineComponent = ( {
 			} );
 		}
 	}, [ view, showMedia ] );
+
+	// Custom fields with render methods for date and datetime
+	const timelineFields: Field< SpaceObject >[] = fields.map( ( field ) => {
+		if ( field.id === 'date' ) {
+			return {
+				...field,
+				render: ( { item } ) => {
+					return (
+						<span>
+							{ new Date( item.date ).toLocaleDateString(
+								'en-US',
+								{
+									month: 'short',
+									day: 'numeric',
+									year: 'numeric',
+								}
+							) }
+						</span>
+					);
+				},
+			};
+		}
+		if ( field.id === 'datetime' ) {
+			return {
+				...field,
+				render: ( { item } ) => {
+					return (
+						<span>
+							{ new Date( item.datetime ).toLocaleTimeString(
+								'en-US',
+								{
+									hour: 'numeric',
+									minute: '2-digit',
+									hour12: true,
+								}
+							) }
+						</span>
+					);
+				},
+			};
+		}
+		return field;
+	} );
+
 	const { data: shownData, paginationInfo } = useMemo( () => {
-		return filterSortAndPaginate( data, view, fields );
-	}, [ view ] );
+		return filterSortAndPaginate( data, view, timelineFields );
+	}, [ view, timelineFields ] );
 	return (
 		<DataViews
 			getItemId={ ( item ) => item.id.toString() }
 			paginationInfo={ paginationInfo }
 			data={ shownData }
 			view={ view }
-			fields={ fields }
+			fields={ timelineFields }
 			onChangeView={ setView }
 			actions={ actions }
 			defaultLayouts={ {
