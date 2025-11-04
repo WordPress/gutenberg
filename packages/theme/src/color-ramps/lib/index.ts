@@ -31,7 +31,7 @@ import type {
 	RampConfig,
 	RampResult,
 } from './types';
-import { LIGHTNESS_EPSILON, MAX_BISECTION_ITERATIONS } from './constants';
+import { CONTRAST_EPSILON, MAX_BISECTION_ITERATIONS } from './constants';
 
 /**
  * Calculate a complete color ramp based on the provided configuration.
@@ -257,7 +257,7 @@ export function buildRamp(
 		direction: mainDir,
 	} as RampResult;
 
-	if ( MAX_DEFICIT > LIGHTNESS_EPSILON && rescaleToFitContrastTargets ) {
+	if ( MAX_DEFICIT > CONTRAST_EPSILON && rescaleToFitContrastTargets ) {
 		let worseSeedL = get( seed, [ OKLCH, 'l' ] );
 		let worseDeficit = MAX_DEFICIT;
 		let worseReplaced = false;
@@ -300,7 +300,7 @@ export function buildRamp(
 					? iterationResults.MAX_DEFICIT
 					: -MAX_DEFICIT;
 
-			if ( Math.abs( bestDeficit ) <= LIGHTNESS_EPSILON ) {
+			if ( Math.abs( bestDeficit ) <= CONTRAST_EPSILON ) {
 				break;
 			}
 

@@ -11,7 +11,7 @@ import { clampToGamut } from './utils';
 import {
 	WHITE,
 	BLACK,
-	LIGHTNESS_EPSILON,
+	CONTRAST_EPSILON,
 	MAX_BISECTION_ITERATIONS,
 } from './constants';
 import { getContrast } from './color-utils';
@@ -160,7 +160,7 @@ export function findColorMeetingRequirements(
 		bestColor = getColorForL( newL );
 		bestContrast = getContrast( reference, bestColor );
 
-		if ( Math.abs( bestContrast - target ) <= LIGHTNESS_EPSILON ) {
+		if ( Math.abs( bestContrast - target ) <= CONTRAST_EPSILON ) {
 			break;
 		}
 
