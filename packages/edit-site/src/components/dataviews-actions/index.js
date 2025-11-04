@@ -35,7 +35,6 @@ export const useSetActiveTemplateAction = () => {
 			icon: pencil,
 			isEligible( item ) {
 				return (
-					! item._isCustom &&
 					! ( item.slug === 'index' && item.source === 'theme' ) &&
 					item.theme === activeTheme.stylesheet
 				);
