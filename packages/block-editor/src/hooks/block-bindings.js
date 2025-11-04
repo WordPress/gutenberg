@@ -7,7 +7,7 @@ import fastDeepEqual from 'fast-deep-equal/es6';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { getBlockBindingsSources, getBlockType } from '@wordpress/blocks';
+import { getBlockType, store as blockStore } from '@wordpress/blocks';
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
@@ -299,8 +299,6 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 
 	// Use useSelect to ensure sources are updated whenever there are updates in block context
 	// or when underlying data changes.
-	// Still needs a fix regarding _sources scope.
-	const _sources = {};
 	const { sources, canUpdateBlockBindings, bindableAttributes } = useSelect(
 		( select ) => {
 			const { __experimentalBlockBindingsSupportedAttributes } =
@@ -311,48 +309,10 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 				return EMPTY_OBJECT;
 			}
 
-			const registeredSources = getBlockBindingsSources();
-			Object.entries( registeredSources ).forEach(
-				( [
-					sourceName,
-					{ getFieldsList, usesContext, label, getValues },
-				] ) => {
-					// Populate context.
-					const context = {};
-					if ( usesContext?.length ) {
-						for ( const key of usesContext ) {
-							context[ key ] = blockContext[ key ];
-						}
-					}
-					if ( getFieldsList ) {
-						const fieldsListResult = getFieldsList( {
-							select,
-							context,
-						} );
-						_sources[ sourceName ] = {
-							data: fieldsListResult || [],
-							label,
-							getValues,
-						};
-					} else {
-						/*
-						 * Include sources without getFieldsList if they are already used in a binding.
-						 * This allows them to be displayed in read-only mode.
-						 */
-						_sources[ sourceName ] = {
-							data: [],
-							label,
-							getValues,
-						};
-					}
-				}
-			);
-
 			return {
-				sources:
-					Object.values( _sources ).length > 0
-						? _sources
-						: EMPTY_OBJECT,
+				sources: unlock(
+					select( blockStore )
+				).getBlockBindingsSourcesForBlock( blockName, blockContext ),
 				canUpdateBlockBindings:
 					select( blockEditorStore ).getSettings()
 						.canUpdateBlockBindings,
