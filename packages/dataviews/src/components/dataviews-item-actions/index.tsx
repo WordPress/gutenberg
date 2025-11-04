@@ -132,22 +132,58 @@ export function ActionsMenuGroup< Item >( {
 	registry,
 	setActiveModalAction,
 }: ActionsMenuGroupProps< Item > ) {
+	const { setAsActions, otherActions } =
+		useMemo( () => {
+			const _setAsActions = actions.filter( ( action ) =>
+				action.id.includes( 'set-as-' )
+			);
+			const _otherActions = actions.filter(
+				( action ) => ! action.id.includes( 'set-as-' )
+			);
+
+			return {
+				setAsActions: _setAsActions,
+				otherActions: _otherActions,
+			};
+		}, [ actions ] );
+
+	const handleActionClick = ( action: Action< Item > ) => () => {
+		if ( 'RenderModal' in action ) {
+			setActiveModalAction( action );
+			return;
+		}
+		action.callback( [ item ], { registry } );
+	};
+
+	const renderActionGroup = ( actionList: Action< Item >[] ) =>
+		actionList.map( ( action ) => (
+			<MenuItemTrigger
+				key={ action.id }
+				action={ action }
+				onClick={ handleActionClick( action ) }
+				items={ [ item ] }
+			/>
+		) );
+
+	const renderSetAsSubmenu = ( actionList: Action< Item >[] ) => {
+		if ( actionList.length === 0 ) {
+			return null;
+		}
+
+		return (
+			<Menu>
+				<Menu.SubmenuTriggerItem>
+					<Menu.ItemLabel>{ __( 'Set as' ) }</Menu.ItemLabel>
+				</Menu.SubmenuTriggerItem>
+				<Menu.Popover>{ renderActionGroup( actionList ) }</Menu.Popover>
+			</Menu>
+		);
+	};
+
 	return (
 		<Menu.Group>
-			{ actions.map( ( action ) => (
-				<MenuItemTrigger
-					key={ action.id }
-					action={ action }
-					onClick={ () => {
-						if ( 'RenderModal' in action ) {
-							setActiveModalAction( action );
-							return;
-						}
-						action.callback( [ item ], { registry } );
-					} }
-					items={ [ item ] }
-				/>
-			) ) }
+			{ renderActionGroup( otherActions ) }
+			{ renderSetAsSubmenu( setAsActions ) }
 		</Menu.Group>
 	);
 }

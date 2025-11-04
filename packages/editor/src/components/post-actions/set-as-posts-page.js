@@ -135,7 +135,7 @@ export const useSetAsPostsPageAction = () => {
 	return useMemo(
 		() => ( {
 			id: 'set-as-posts-page',
-			label: __( 'Set as posts page' ),
+			label: __( 'Posts page' ),
 			isEligible( post ) {
 				if ( post.status !== 'publish' ) {
 					return false;

@@ -138,7 +138,7 @@ export const useSetAsHomepageAction = () => {
 	return useMemo(
 		() => ( {
 			id: 'set-as-homepage',
-			label: __( 'Set as homepage' ),
+			label: __( 'Homepage' ),
 			isEligible( post ) {
 				if ( post.status !== 'publish' ) {
 					return false;
