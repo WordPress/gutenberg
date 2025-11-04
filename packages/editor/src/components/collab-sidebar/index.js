@@ -87,17 +87,24 @@ function NotesSidebar( { postId, mode } ) {
 
 	const showFloatingSidebar = isLargeViewport && mode === 'post-only';
 
-	const { clientId, blockCommentId } = useSelect( ( select ) => {
-		const { getBlockAttributes, getSelectedBlockClientId } =
-			select( blockEditorStore );
-		const _clientId = getSelectedBlockClientId();
-		return {
-			clientId: _clientId,
-			blockCommentId: _clientId
-				? getBlockAttributes( _clientId )?.metadata?.noteId
-				: null,
-		};
-	}, [] );
+	const { clientId, blockCommentId, isDistractionFree } = useSelect(
+		( select ) => {
+			const {
+				getBlockAttributes,
+				getSelectedBlockClientId,
+				getSettings,
+			} = select( blockEditorStore );
+			const _clientId = getSelectedBlockClientId();
+			return {
+				clientId: _clientId,
+				blockCommentId: _clientId
+					? getBlockAttributes( _clientId )?.metadata?.noteId
+					: null,
+				isDistractionFree: getSettings().isDistractionFree,
+			};
+		},
+		[]
+	);
 
 	const {
 		resultComments,
@@ -148,6 +155,10 @@ function NotesSidebar( { postId, mode } ) {
 			! blockCommentId ? 'textarea' : undefined
 		);
 		toggleBlockSpotlight( clientId, true );
+	}
+
+	if ( isDistractionFree ) {
+		return <AddCommentMenuItem isDistractionFree />;
 	}
 
 	return (

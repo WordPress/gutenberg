@@ -18,7 +18,7 @@ import { unlock } from '../../lock-unlock';
 
 const { CommentIconSlotFill } = unlock( blockEditorPrivateApis );
 
-const AddCommentMenuItem = ( { clientId, onClick } ) => {
+const AddCommentMenuItem = ( { clientId, onClick, isDistractionFree } ) => {
 	const block = useSelect(
 		( select ) => {
 			return select( blockEditorStore ).getBlock( clientId );
@@ -33,31 +33,36 @@ const AddCommentMenuItem = ( { clientId, onClick } ) => {
 		return null;
 	}
 
-	const isFreeformBlock = block?.name === 'core/freeform';
+	const isDisabled = isDistractionFree || block?.name === 'core/freeform';
+
+	let infoText;
+
+	if ( isDistractionFree ) {
+		infoText = __( 'Notes are disabled in distraction free mode.' );
+	} else if ( block?.name === 'core/freeform' ) {
+		infoText = __( 'Convert to blocks to add notes.' );
+	}
 
 	return (
 		<MenuItem
 			icon={ commentIcon }
 			onClick={ onClick }
 			aria-haspopup="dialog"
-			disabled={ isFreeformBlock }
-			info={
-				isFreeformBlock
-					? __( 'Convert to blocks to add notes.' )
-					: undefined
-			}
+			disabled={ isDisabled }
+			info={ infoText }
 		>
 			{ __( 'Add note' ) }
 		</MenuItem>
 	);
 };
 
-const AddCommentMenuItemFill = ( { onClick } ) => {
+const AddCommentMenuItemFill = ( { onClick, isDistractionFree } ) => {
 	return (
 		<CommentIconSlotFill.Fill>
 			{ ( { clientId, onClose } ) => (
 				<AddCommentMenuItem
 					clientId={ clientId }
+					isDistractionFree={ isDistractionFree }
 					onClick={ () => {
 						onClick();
 						onClose();
