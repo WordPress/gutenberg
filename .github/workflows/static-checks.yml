@@ -37,8 +37,8 @@ jobs:
                       node: '22'
                     - event: 'pull_request'
                       node: '24'
-                    - event: 'pull_request'
-                      os: 'macos-15'
+                    # - event: 'pull_request'
+                    #   os: 'macos-15'
                     - event: 'pull_request'
                       os: 'windows-2025'
 
