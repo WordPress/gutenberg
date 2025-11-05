@@ -66,10 +66,10 @@ function addAttributes( settings ) {
  */
 function useFitText( { fitText, name, clientId } ) {
 	const hasFitTextSupport = hasBlockSupport( name, FIT_TEXT_SUPPORT_KEY );
-	const blockElement = useBlockElement( clientId );
+	const refBlockElement = useBlockElement( clientId );
 
-	// Fallback: Try to query the DOM directly when blockElement is null
-	// This is needed because in preview mode use useBlockElement always returns null
+	// Fallback: Try to query the DOM directly when refBlockElement is null
+	// This is needed because in preview mode useBlockElement always returns null
 	// that probably is an existing bug but the fix is not obvious so for now lets
 	// try this workaround on fit text only.
 	const [ fallbackElement, setFallbackElement ] = useState( null );
@@ -78,8 +78,8 @@ function useFitText( { fitText, name, clientId } ) {
 			return;
 		}
 
-		// If we already have blockElement from the ref system, use it
-		if ( blockElement ) {
+		// If we already have refBlockElement from the ref system, use it
+		if ( refBlockElement ) {
 			setFallbackElement( null );
 			return;
 		}
@@ -110,10 +110,10 @@ function useFitText( { fitText, name, clientId } ) {
 		if ( element ) {
 			setFallbackElement( element );
 		}
-	}, [ blockElement, clientId, fitText, hasFitTextSupport ] );
+	}, [ refBlockElement, clientId, fitText, hasFitTextSupport ] );
 
 	// Use whichever element is available
-	const actualElement = blockElement || fallbackElement;
+	const blockElement = refBlockElement || fallbackElement;
 
 	// Monitor block attribute changes
 	// Any attribute may change the available space.
@@ -128,17 +128,16 @@ function useFitText( { fitText, name, clientId } ) {
 	);
 
 	const applyFitText = useCallback( () => {
-		if ( ! actualElement || ! hasFitTextSupport || ! fitText ) {
+		if ( ! blockElement || ! hasFitTextSupport || ! fitText ) {
 			return;
 		}
 		// Get or create style element with unique ID
 		const styleId = `fit-text-${ clientId }`;
-		let styleElement =
-			actualElement.ownerDocument.getElementById( styleId );
+		let styleElement = blockElement.ownerDocument.getElementById( styleId );
 		if ( ! styleElement ) {
-			styleElement = actualElement.ownerDocument.createElement( 'style' );
+			styleElement = blockElement.ownerDocument.createElement( 'style' );
 			styleElement.id = styleId;
-			actualElement.ownerDocument.head.appendChild( styleElement );
+			blockElement.ownerDocument.head.appendChild( styleElement );
 		}
 
 		const blockSelector = `#block-${ clientId }`;
@@ -151,20 +150,20 @@ function useFitText( { fitText, name, clientId } ) {
 			}
 		};
 
-		optimizeFitText( actualElement, applyFontSize );
-	}, [ actualElement, clientId, hasFitTextSupport, fitText ] );
+		optimizeFitText( blockElement, applyFontSize );
+	}, [ blockElement, clientId, hasFitTextSupport, fitText ] );
 
 	useEffect( () => {
 		if (
 			! fitText ||
-			! actualElement ||
+			! blockElement ||
 			! clientId ||
 			! hasFitTextSupport
 		) {
 			return;
 		}
 		// Store current element value for cleanup
-		const currentElement = actualElement;
+		const currentElement = blockElement;
 		const previousVisibility = currentElement.style.visibility;
 
 		// Store IDs for cleanup
@@ -221,14 +220,14 @@ function useFitText( { fitText, name, clientId } ) {
 				styleElement.remove();
 			}
 		};
-	}, [ fitText, clientId, applyFitText, actualElement, hasFitTextSupport ] );
+	}, [ fitText, clientId, applyFitText, blockElement, hasFitTextSupport ] );
 
 	// Trigger fit text recalculation when content changes
 	useEffect( () => {
-		if ( fitText && actualElement && hasFitTextSupport ) {
+		if ( fitText && blockElement && hasFitTextSupport ) {
 			// Wait for next frame to ensure DOM has updated after content changes
 			const frameId = window.requestAnimationFrame( () => {
-				if ( actualElement ) {
+				if ( blockElement ) {
 					applyFitText();
 				}
 			} );
@@ -239,7 +238,7 @@ function useFitText( { fitText, name, clientId } ) {
 		blockAttributes,
 		fitText,
 		applyFitText,
-		actualElement,
+		blockElement,
 		hasFitTextSupport,
 	] );
 }
