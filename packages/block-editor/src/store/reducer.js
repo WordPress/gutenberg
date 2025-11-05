@@ -1965,12 +1965,12 @@ export function lastBlockInserted( state = {}, action ) {
 /**
  * Reducer returning the contentOnly block that is being edited.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {string|undefined} state  Current state.
+ * @param {Object}           action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return {string|undefined} Updated state.
  */
-export function editedContentOnlySection( state = '', action ) {
+export function editedContentOnlySection( state, action ) {
 	if ( action.type === 'EDIT_CONTENT_ONLY_SECTION' ) {
 		return action.clientId;
 	}
