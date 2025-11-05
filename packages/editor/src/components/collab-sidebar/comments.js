@@ -68,15 +68,18 @@ export function Comments( {
 	const { setCanvasMinHeight } = unlock( useDispatch( editorStore ) );
 	const { blockCommentId, selectedBlockClientId, orderedBlockIds } =
 		useSelect( ( select ) => {
-			const { getBlockAttributes, getSelectedBlockClientId } =
-				select( blockEditorStore );
+			const {
+				getBlockAttributes,
+				getSelectedBlockClientId,
+				getClientIdsWithDescendants,
+			} = select( blockEditorStore );
 			const clientId = getSelectedBlockClientId();
 			return {
 				blockCommentId: clientId
 					? getBlockAttributes( clientId )?.metadata?.noteId
 					: null,
 				selectedBlockClientId: clientId,
-				orderedBlockIds: select( blockEditorStore ).getBlockOrder(),
+				orderedBlockIds: getClientIdsWithDescendants(),
 			};
 		}, [] );
 
