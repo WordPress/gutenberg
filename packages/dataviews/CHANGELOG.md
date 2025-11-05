@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+- DatViews list layout: remove link variant from primary actions's button. [#72920](https://github.com/WordPress/gutenberg/pull/72920)
+
 ### Bug fixes
 
 - Fix: DataViews modal actions in list layout. [#72793](https://github.com/WordPress/gutenberg/pull/72793)
