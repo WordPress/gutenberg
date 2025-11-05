@@ -339,7 +339,17 @@ function checkDepsInTree( deps, options ) {
 				process.stdout.write( `${ WARNING_TEXT } ${ problem }.\n` );
 			}
 		} else {
-			checkDepLicense( dep.path, licenses );
+			// Ensure the package is actually installed before checking its license.
+			// On Windows, npm ls may return a path for optional deps that aren't installed
+			// due to platform mismatch. If optional and not installed, skip with a warning.
+			const packageJsonPath = dep.path + '/package.json';
+			if ( ! existsSync( packageJsonPath ) && dep.optional ) {
+				process.stdout.write(
+					`${ WARNING_TEXT } Skipping optional dependency ${ dep.name }@${ dep.version } (not installed on this platform).\n`
+				);
+			} else {
+				checkDepLicense( dep.path, licenses );
+			}
 		}
 
 		if ( dep.hasOwnProperty( 'dependencies' ) ) {
