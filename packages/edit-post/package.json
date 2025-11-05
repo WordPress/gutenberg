@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-post",
-	"version": "8.33.3-next.36001005c.0",
+	"version": "8.34.0",
 	"description": "Edit Post module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -34,6 +34,11 @@
 	},
 	"react-native": "src/index",
 	"wpScript": true,
+	"wpScriptExtraDependencies": [
+		"media-models",
+		"media-views",
+		"postbox"
+	],
 	"dependencies": {
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/admin-ui": "file:../admin-ui",

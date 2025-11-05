@@ -5,6 +5,7 @@ import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import {
 	Disabled,
 	RangeControl,
+	SelectControl,
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -31,7 +32,7 @@ const MIN_COMMENTS = 1;
 const MAX_COMMENTS = 100;
 
 export default function LatestComments( { attributes, setAttributes } ) {
-	const { commentsToShow, displayAvatar, displayDate, displayExcerpt } =
+	const { commentsToShow, displayAvatar, displayDate, displayContent } =
 		attributes;
 
 	const serverSideAttributes = {
@@ -54,7 +55,7 @@ export default function LatestComments( { attributes, setAttributes } ) {
 							commentsToShow: 5,
 							displayAvatar: true,
 							displayDate: true,
-							displayExcerpt: true,
+							displayContent: 'excerpt',
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
@@ -98,20 +99,26 @@ export default function LatestComments( { attributes, setAttributes } ) {
 					</ToolsPanelItem>
 
 					<ToolsPanelItem
-						hasValue={ () => ! displayExcerpt }
-						label={ __( 'Display excerpt' ) }
+						hasValue={ () => displayContent !== 'excerpt' }
+						label={ __( 'Display content' ) }
 						onDeselect={ () =>
-							setAttributes( { displayExcerpt: true } )
+							setAttributes( { displayContent: 'excerpt' } )
 						}
 						isShownByDefault
 					>
-						<ToggleControl
+						<SelectControl
 							__nextHasNoMarginBottom
-							label={ __( 'Display excerpt' ) }
-							checked={ displayExcerpt }
-							onChange={ () =>
+							__next40pxDefaultSize
+							label={ __( 'Display content' ) }
+							value={ displayContent }
+							options={ [
+								{ label: __( 'No content' ), value: 'none' },
+								{ label: __( 'Excerpt' ), value: 'excerpt' },
+								{ label: __( 'Full content' ), value: 'full' },
+							] }
+							onChange={ ( value ) =>
 								setAttributes( {
-									displayExcerpt: ! displayExcerpt,
+									displayContent: value,
 								} )
 							}
 						/>

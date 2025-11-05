@@ -24,17 +24,28 @@ test.describe( 'Site editor browser history', () => {
 			.click();
 		await page.getByRole( 'button', { name: 'Duplicate' } ).click();
 		await expect( page ).toHaveURL(
+			'/wp-admin/site-editor.php?p=%2Ftemplate&activeView=user'
+		);
+		await page
+			.getByRole( 'button', { name: 'Index (Copy)' } )
+			.first()
+			.click();
+		await expect( page ).toHaveURL(
 			/\/wp-admin\/site-editor\.php\?p=%2Fwp_template%2F\d+&canvas=edit$/
 		);
 
 		// Navigate back to the template list
 		await page.goBack();
 		await expect( page ).toHaveURL(
+			'/wp-admin/site-editor.php?p=%2Ftemplate&activeView=user'
+		);
+		await page.goBack();
+		await expect( page ).toHaveURL(
 			'/wp-admin/site-editor.php?p=%2Ftemplate'
 		);
-
 		// Navigate back to the dashboard
 		await page.goBack();
+		await expect( page ).toHaveURL( '/wp-admin/site-editor.php' );
 		await page.goBack();
 		await expect( page ).toHaveURL( '/wp-admin/index.php' );
 	} );

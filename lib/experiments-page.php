@@ -152,6 +152,18 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
+		'gutenberg-dataviews-media-modal',
+		__( 'Data Views: new media modal', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enables a new media modal experience powered by Data Views for improved media library management.', 'gutenberg' ),
+			'id'    => 'gutenberg-dataviews-media-modal',
+		)
+	);
+
+	add_settings_field(
 		'gutenberg-full-page-client-side-navigation',
 		__( 'Interactivity API: Full-page client-side navigation', 'gutenberg' ),
 		'gutenberg_display_experiment_field',

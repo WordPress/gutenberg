@@ -195,30 +195,15 @@ export default {
 		return false;
 	},
 	getFieldsList( { select, context } ) {
-		// Deprecated, will be removed after 6.9.
-		return getTermDataFields( select, context );
-	},
-	editorUI( { select, context } ) {
-		const selectedBlock = select( blockEditorStore ).getSelectedBlock();
-		// Exit early for navigation blocks (read-only)
-		if ( NAVIGATION_BLOCK_TYPES.includes( selectedBlock?.name ) ) {
-			return {};
+		const clientId = select( blockEditorStore ).getSelectedBlockClientId();
+		const termDataFields = getTermDataFields( select, context, clientId );
+		if ( ! termDataFields ) {
+			return [];
 		}
-		const termDataFields = Object.entries(
-			getTermDataFields( select, context ) || {}
-		).map( ( [ key, field ] ) => ( {
+		return Object.entries( termDataFields ).map( ( [ key, field ] ) => ( {
 			label: field.label,
 			type: field.type,
-			args: {
-				field: key,
-			},
+			args: { field: key },
 		} ) );
-		/*
-		 * We need to define the data as [{ label: string, value: any, type: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#type-validation }]
-		 */
-		return {
-			mode: 'dropdown',
-			data: termDataFields,
-		};
 	},
 };

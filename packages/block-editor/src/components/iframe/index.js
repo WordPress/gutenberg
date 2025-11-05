@@ -342,9 +342,6 @@ function Iframe( {
 			>
 				{ iframeDocument &&
 					createPortal(
-						// We want to prevent React events from bubbling through the iframe
-						// we bubble these manually.
-						/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */
 						<body
 							ref={ bodyRef }
 							className={ clsx(

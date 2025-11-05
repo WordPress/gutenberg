@@ -1963,31 +1963,16 @@ export function lastBlockInserted( state = {}, action ) {
 }
 
 /**
- * Reducer returning the block that is eding temporarily edited as blocks.
+ * Reducer returning the contentOnly block that is being edited.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {string|undefined} state  Current state.
+ * @param {Object}           action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return {string|undefined} Updated state.
  */
-export function temporarilyEditingAsBlocks( state = '', action ) {
-	if ( action.type === 'SET_TEMPORARILY_EDITING_AS_BLOCKS' ) {
-		return action.temporarilyEditingAsBlocks;
-	}
-	return state;
-}
-
-/**
- * Reducer returning the focus mode that should be used when temporarily edit as blocks finishes.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function temporarilyEditingFocusModeRevert( state = '', action ) {
-	if ( action.type === 'SET_TEMPORARILY_EDITING_AS_BLOCKS' ) {
-		return action.focusModeToRevert;
+export function editedContentOnlySection( state, action ) {
+	if ( action.type === 'EDIT_CONTENT_ONLY_SECTION' ) {
+		return action.clientId;
 	}
 	return state;
 }
@@ -2154,8 +2139,7 @@ const combinedReducers = combineReducers( {
 	expandedBlock,
 	highlightedBlock,
 	lastBlockInserted,
-	temporarilyEditingAsBlocks,
-	temporarilyEditingFocusModeRevert,
+	editedContentOnlySection,
 	blockVisibility,
 	blockEditingModes,
 	styleOverrides,
@@ -2328,6 +2312,26 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 
 	traverseBlockTree( state, treeClientId, ( block ) => {
 		const { clientId, name: blockName } = block;
+
+		// Set the edited section and all blocks within it to 'default', so that all changes can be made.
+		if ( state.editedContentOnlySection ) {
+			// If this is the edited section, use the default mode.
+			if ( state.editedContentOnlySection === clientId ) {
+				derivedBlockEditingModes.set( clientId, 'default' );
+				return;
+			}
+
+			// If the block is within the edited section also use the default mode.
+			const parentTempEditedClientId = findParentInClientIdsList(
+				state,
+				clientId,
+				[ state.editedContentOnlySection ]
+			);
+			if ( parentTempEditedClientId ) {
+				derivedBlockEditingModes.set( clientId, 'default' );
+				return;
+			}
+		}
 
 		// If the block already has an explicit block editing mode set,
 		// don't override it.
@@ -2817,6 +2821,7 @@ export function withDerivedBlockEditingModes( reducer ) {
 				break;
 			}
 			case 'RESET_BLOCKS':
+			case 'EDIT_CONTENT_ONLY_SECTION':
 			case 'SET_EDITOR_MODE':
 			case 'RESET_ZOOM_LEVEL':
 			case 'SET_ZOOM_LEVEL': {

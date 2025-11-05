@@ -7,6 +7,11 @@ import type { Meta } from '@storybook/react';
  * WordPress dependencies
  */
 import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
+import {
+	Modal,
+	Button,
+	__experimentalHStack as HStack,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -24,17 +29,49 @@ const meta = {
 
 export default meta;
 
-export const Default = ( {
-	perPageSizes = [ 10, 25, 50, 100 ],
-	isMultiselectable,
-	isGrouped,
-	infiniteScrollEnabled,
-}: {
+const storyArgs = {
+	perPageSizes: [ 10, 25, 50, 100 ],
+	isMultiselectable: false,
+	isGrouped: false,
+};
+
+const storyArgTypes = {
+	isMultiselectable: {
+		control: 'boolean',
+		description: 'Whether multiselection is supported',
+	},
+	perPageSizes: {
+		control: 'object',
+		description: 'Array of available page sizes',
+	},
+	isGrouped: {
+		control: 'boolean',
+		description: 'Whether the items are grouped or ungrouped',
+	},
+	infiniteScrollEnabled: {
+		control: 'boolean',
+		description:
+			'Whether the infinite scroll is enabled. Enabling this disables the "Is grouped" option',
+	},
+};
+
+interface PickerContentProps {
 	perPageSizes: number[];
 	isMultiselectable: boolean;
 	isGrouped: boolean;
 	infiniteScrollEnabled: boolean;
-} ) => {
+	actions?: ActionButton< SpaceObject >[];
+	selection?: string[];
+}
+
+const DataViewsPickerContent = ( {
+	perPageSizes = [ 10, 25, 50, 100 ],
+	isMultiselectable,
+	isGrouped,
+	infiniteScrollEnabled,
+	actions: customActions,
+	selection: customSelection,
+}: PickerContentProps ) => {
 	const [ view, setView ] = useState< View >( {
 		type: LAYOUT_PICKER_GRID,
 		fields: [],
@@ -61,9 +98,11 @@ export const Default = ( {
 		} ) );
 	}, [ isGrouped, infiniteScrollEnabled ] );
 
-	const [ selection, setSelection ] = useState< string[] >( [] );
+	const [ selection, setSelection ] = useState< string[] >(
+		customSelection || []
+	);
 
-	const actions: ActionButton< SpaceObject >[] = [
+	const actions: ActionButton< SpaceObject >[] = customActions || [
 		{
 			id: 'cancel',
 			label: 'Cancel',
@@ -138,31 +177,115 @@ export const Default = ( {
 	);
 };
 
-Default.args = {
-	perPageSizes: [ 10, 25, 50, 100 ],
-	isMultiselectable: false,
-	isGrouped: false,
+export const Default = ( {
+	perPageSizes = [ 10, 25, 50, 100 ],
+	isMultiselectable,
+	isGrouped,
+	infiniteScrollEnabled,
+}: {
+	perPageSizes: number[];
+	isMultiselectable: boolean;
+	isGrouped: boolean;
+	infiniteScrollEnabled: boolean;
+} ) => (
+	<DataViewsPickerContent
+		perPageSizes={ perPageSizes }
+		isMultiselectable={ isMultiselectable }
+		isGrouped={ isGrouped }
+		infiniteScrollEnabled={ infiniteScrollEnabled }
+	/>
+);
+
+Default.args = storyArgs;
+Default.argTypes = storyArgTypes;
+
+export const WithModal = ( {
+	perPageSizes = [ 10, 25, 50, 100 ],
+	isMultiselectable,
+	isGrouped,
+	infiniteScrollEnabled,
+}: {
+	perPageSizes: number[];
+	isMultiselectable: boolean;
+	isGrouped: boolean;
+	infiniteScrollEnabled: boolean;
+} ) => {
+	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	const [ selectedItems, setSelectedItems ] = useState< SpaceObject[] >( [] );
+
+	const modalActions: ActionButton< SpaceObject >[] = [
+		{
+			id: 'cancel',
+			label: 'Cancel',
+			supportsBulk: isMultiselectable,
+			callback() {
+				setIsModalOpen( false );
+			},
+		},
+		{
+			id: 'confirm',
+			label: 'Confirm',
+			isPrimary: true,
+			supportsBulk: isMultiselectable,
+			callback( items ) {
+				setSelectedItems( items );
+				setIsModalOpen( false );
+			},
+		},
+	];
+
+	return (
+		<>
+			<HStack justify="left">
+				<Button
+					variant="primary"
+					onClick={ () => setIsModalOpen( true ) }
+				>
+					Open Picker Modal
+				</Button>
+				<Button
+					onClick={ () => setSelectedItems( [] ) }
+					disabled={ ! selectedItems.length }
+					accessibleWhenDisabled
+				>
+					Clear Selection
+				</Button>
+			</HStack>
+			{ selectedItems.length > 0 && (
+				<p>
+					Selected:{ ' ' }
+					{ selectedItems
+						.map( ( item ) => item.name.title )
+						.join( ', ' ) }
+				</p>
+			) }
+			{ isModalOpen && (
+				<Modal
+					title="Select Items"
+					onRequestClose={ () => setIsModalOpen( false ) }
+					isFullScreen={ false }
+					size="fill"
+				>
+					<div style={ { padding: '16px' } }>
+						<DataViewsPickerContent
+							perPageSizes={ perPageSizes }
+							isMultiselectable={ isMultiselectable }
+							isGrouped={ isGrouped }
+							infiniteScrollEnabled={ infiniteScrollEnabled }
+							actions={ modalActions }
+							selection={ selectedItems.map( ( item ) =>
+								String( item.id )
+							) }
+						/>
+					</div>
+				</Modal>
+			) }
+		</>
+	);
 };
 
-Default.argTypes = {
-	isMultiselectable: {
-		control: 'boolean',
-		description: 'Whether multiselection is supported',
-	},
-	perPageSizes: {
-		control: 'object',
-		description: 'Array of available page sizes',
-	},
-	isGrouped: {
-		control: 'boolean',
-		description: 'Whether the items are grouped or ungrouped',
-	},
-	infiniteScrollEnabled: {
-		control: 'boolean',
-		description:
-			'Whether the infinite scroll is enabled. Enabling this disables the "Is grouped" option',
-	},
-};
+WithModal.args = storyArgs;
+WithModal.argTypes = storyArgTypes;
 
 function useInfiniteScroll( {
 	view,

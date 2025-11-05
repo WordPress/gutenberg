@@ -1,4 +1,4 @@
-/* eslint-disable playwright/no-conditional-in-test, playwright/expect-expect */
+/* eslint-disable playwright/expect-expect */
 
 /**
  * WordPress dependencies
@@ -717,4 +717,4 @@ test.describe( 'Post Editor Performance', () => {
 	} );
 } );
 
-/* eslint-enable playwright/no-conditional-in-test, playwright/expect-expect */
+/* eslint-enable playwright/expect-expect */

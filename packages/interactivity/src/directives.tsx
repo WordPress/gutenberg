@@ -459,7 +459,6 @@ export default () => {
 				let start;
 				if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 					if ( globalThis.SCRIPT_DEBUG ) {
-						// eslint-disable-next-line no-unused-vars
 						start = performance.now();
 					}
 				}
@@ -513,7 +512,6 @@ export default () => {
 						performance.measure(
 							`interactivity api init ${ entry.namespace }`,
 							{
-								// eslint-disable-next-line no-undef
 								start,
 								end: performance.now(),
 								detail: {
@@ -575,7 +573,6 @@ export default () => {
 							performance.measure(
 								`interactivity api on ${ entry.namespace }`,
 								{
-									// eslint-disable-next-line no-undef
 									start,
 									end: performance.now(),
 									detail: {

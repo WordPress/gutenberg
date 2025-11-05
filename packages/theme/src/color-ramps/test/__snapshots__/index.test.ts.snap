@@ -1,0 +1,1280 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`buildRamps accent ramp snapshots 1`] = `
+[
+  [
+    {
+      "input": {
+        "bgInfo": {
+          "mainDirection": "lighter",
+          "pinLightness": {
+            "stepName": "surface2",
+            "value": 0,
+          },
+        },
+        "seedComputed": "#3858e9",
+        "seedOriginal": "#3858e9",
+        "seedUnchanged": true,
+      },
+      "output": {
+        "direction": "lighter",
+        "ramp": {
+          "bgFill1": {
+            "color": "#3858e9",
+            "warning": false,
+          },
+          "bgFill2": {
+            "color": "#4569fb",
+            "warning": false,
+          },
+          "bgFillDark": {
+            "color": "#000",
+            "warning": false,
+          },
+          "bgFillInverted1": {
+            "color": "#c3d9ff",
+            "warning": false,
+          },
+          "bgFillInverted2": {
+            "color": "#eff0f2",
+            "warning": false,
+          },
+          "fgFill": {
+            "color": "#eff0f2",
+            "warning": false,
+          },
+          "fgFillDark": {
+            "color": "#eff0f2",
+            "warning": false,
+          },
+          "fgFillInverted": {
+            "color": "#1b1e26",
+            "warning": false,
+          },
+          "fgSurface1": {
+            "color": "#1f2dbf",
+            "warning": false,
+          },
+          "fgSurface2": {
+            "color": "#314dde",
+            "warning": false,
+          },
+          "fgSurface3": {
+            "color": "#8cafff",
+            "warning": false,
+          },
+          "fgSurface4": {
+            "color": "#e3f0ff",
+            "warning": false,
+          },
+          "stroke1": {
+            "color": "#576fb5",
+            "warning": false,
+          },
+          "stroke2": {
+            "color": "#778cc3",
+            "warning": false,
+          },
+          "stroke3": {
+            "color": "#8cafff",
+            "warning": false,
+          },
+          "stroke4": {
+            "color": "#c7dcff",
+            "warning": false,
+          },
+          "surface1": {
+            "color": "#000",
+            "warning": false,
+          },
+          "surface2": {
+            "color": "#000",
+            "warning": false,
+          },
+          "surface3": {
+            "color": "#040925",
+            "warning": false,
+          },
+          "surface4": {
+            "color": "#071034",
+            "warning": false,
+          },
+          "surface5": {
+            "color": "#0d1948",
+            "warning": false,
+          },
+          "surface6": {
+            "color": "#152460",
+            "warning": false,
+          },
+        },
+      },
+    },
+    {
+      "input": {
+        "bgInfo": {
+          "mainDirection": "lighter",
+          "pinLightness": {
+            "stepName": "surface2",
+            "value": 0.5,
+          },
+        },
+        "seedComputed": "#3858e9",
+        "seedOriginal": "#3858e9",
+        "seedUnchanged": true,
+      },
+      "output": {
+        "direction": "lighter",
+        "ramp": {
+          "bgFill1": {
+            "color": "#3858e9",
+            "warning": false,
+          },
+          "bgFill2": {
+            "color": "#4569fb",
+            "warning": false,
+          },
+          "bgFillDark": {
+            "color": "#000",
+            "warning": false,
+          },
+          "bgFillInverted1": {
+            "color": "#d7e7ff",
+            "warning": false,
+          },
+          "bgFillInverted2": {
+            "color": "#fff",
+            "warning": true,
+          },
+          "fgFill": {
+            "color": "#eff0f2",
+            "warning": false,
+          },
+          "fgFillDark": {
+            "color": "#eff0f2",
+            "warning": false,
+          },
+          "fgFillInverted": {
+            "color": "#1b1e26",
+            "warning": false,
+          },
+          "fgSurface1": {
+            "color": "#6b93ff",
+            "warning": false,
+          },
+          "fgSurface2": {
+            "color": "#9abaff",
+            "warning": false,
+          },
+          "fgSurface3": {
+            "color": "#d2e4ff",
+            "warning": false,
+          },
+          "fgSurface4": {
+            "color": "#fff",
+            "warning": true,
+          },
+          "stroke1": {
+            "color": "#8497c9",
+            "warning": false,
+          },
+          "stroke2": {
+            "color": "#aab8da",
+            "warning": false,
+          },
+          "stroke3": {
+            "color": "#d2e4ff",
+            "warning": false,
+          },
+          "stroke4": {
+            "color": "#fff",
+            "warning": true,
+          },
+          "surface1": {
+            "color": "#3652c1",
+            "warning": false,
+          },
+          "surface2": {
+            "color": "#3b58c3",
+            "warning": false,
+          },
+          "surface3": {
+            "color": "#405dc4",
+            "warning": false,
+          },
+          "surface4": {
+            "color": "#3f5fd5",
+            "warning": false,
+          },
+          "surface5": {
+            "color": "#4c6ac9",
+            "warning": false,
+          },
+          "surface6": {
+            "color": "#5876cd",
+            "warning": false,
+          },
+        },
+      },
+    },
+    {
+      "input": {
+        "bgInfo": {
+          "mainDirection": "darker",
+          "pinLightness": {
+            "stepName": "surface2",
+            "value": 1,
+          },
+        },
+        "seedComputed": "#3858e9",
+        "seedOriginal": "#3858e9",
+        "seedUnchanged": true,
+      },
+      "output": {
+        "direction": "darker",
+        "ramp": {
+          "bgFill1": {
+            "color": "#3858e9",
+            "warning": false,
+          },
+          "bgFill2": {
+            "color": "#2c47d7",
+            "warning": false,
+          },
+          "bgFillDark": {
+            "color": "#1b1e26",
+            "warning": false,
+          },
+          "bgFillInverted1": {
+            "color": "#1401a4",
+            "warning": false,
+          },
+          "bgFillInverted2": {
+            "color": "#1b1e26",
+            "warning": false,
+          },
+          "fgFill": {
+            "color": "#eff0f2",
+            "warning": false,
+          },
+          "fgFillDark": {
+            "color": "#eff0f2",
+            "warning": false,
+          },
+          "fgFillInverted": {
+            "color": "#eff0f2",
+            "warning": false,
+          },
+          "fgSurface1": {
+            "color": "#89adff",
+            "warning": false,
+          },
+          "fgSurface2": {
+            "color": "#5d86ff",
+            "warning": false,
+          },
+          "fgSurface3": {
+            "color": "#3858e9",
+            "warning": false,
+          },
+          "fgSurface4": {
+            "color": "#080071",
+            "warning": false,
+          },
+          "stroke1": {
+            "color": "#92a4cf",
+            "warning": false,
+          },
+          "stroke2": {
+            "color": "#6f85c0",
+            "warning": false,
+          },
+          "stroke3": {
+            "color": "#3858e9",
+            "warning": false,
+          },
+          "stroke4": {
+            "color": "#2236c7",
+            "warning": false,
+          },
+          "surface1": {
+            "color": "#f5f7fc",
+            "warning": false,
+          },
+          "surface2": {
+            "color": "#fff",
+            "warning": false,
+          },
+          "surface3": {
+            "color": "#fff",
+            "warning": false,
+          },
+          "surface4": {
+            "color": "#edf1fa",
+            "warning": false,
+          },
+          "surface5": {
+            "color": "#e0e6f6",
+            "warning": false,
+          },
+          "surface6": {
+            "color": "#ccd6f0",
+            "warning": false,
+          },
+        },
+      },
+    },
+  ],
+  [
+    {
+      "input": {
+        "bgInfo": {
+          "mainDirection": "lighter",
+          "pinLightness": {
+            "stepName": "surface2",
+            "value": 0,
+          },
+        },
+        "seedComputed": "#cc1818",
+        "seedOriginal": "#cc1818",
+        "seedUnchanged": true,
+      },
+      "output": {
+        "direction": "lighter",
+        "ramp": {
+          "bgFill1": {
+            "color": "#cc1818",
+            "warning": false,
+          },
+          "bgFill2": {
+            "color": "#df332c",
+            "warning": false,
+          },
+          "bgFillDark": {
+            "color": "#000",
+            "warning": false,
+          },
+          "bgFillInverted1": {
+            "color": "#ffc9be",
+            "warning": false,
+          },
+          "bgFillInverted2": {
+            "color": "#f2efef",
+            "warning": false,
+          },
+          "fgFill": {
+            "color": "#f2efef",
+            "warning": false,
+          },
+          "fgFillDark": {
+            "color": "#f2efef",
+            "warning": false,
+          },
+          "fgFillInverted": {
+            "color": "#231c1b",
+            "warning": false,
+          },
+          "fgSurface1": {
+            "color": "#900",
+            "warning": false,
+          },
+          "fgSurface2": {
+            "color": "#c10009",
+            "warning": false,
+          },
+          "fgSurface3": {
+            "color": "#ff7f6f",
+            "warning": false,
+          },
+          "fgSurface4": {
+            "color": "#ffe4dd",
+            "warning": false,
+          },
+          "stroke1": {
+            "color": "#ad4e44",
+            "warning": false,
+          },
+          "stroke2": {
+            "color": "#cc695d",
+            "warning": false,
+          },
+          "stroke3": {
+            "color": "#ff7f6f",
+            "warning": false,
+          },
+          "stroke4": {
+            "color": "#ffbfb2",
+            "warning": false,
+          },
+          "surface1": {
+            "color": "#000",
+            "warning": false,
+          },
+          "surface2": {
+            "color": "#000",
+            "warning": false,
+          },
+          "surface3": {
+            "color": "#1b0504",
+            "warning": false,
+          },
+          "surface4": {
+            "color": "#270907",
+            "warning": false,
+          },
+          "surface5": {
+            "color": "#38100c",
+            "warning": false,
+          },
+          "surface6": {
+            "color": "#4c1914",
+            "warning": false,
+          },
+        },
+      },
+    },
+    {
+      "input": {
+        "bgInfo": {
+          "mainDirection": "lighter",
+          "pinLightness": {
+            "stepName": "surface2",
+            "value": 0.5,
+          },
+        },
+        "seedComputed": "#cc1818",
+        "seedOriginal": "#cc1818",
+        "seedUnchanged": true,
+      },
+      "output": {
+        "direction": "lighter",
+        "ramp": {
+          "bgFill1": {
+            "color": "#cc1818",
+            "warning": false,
+          },
+          "bgFill2": {
+            "color": "#df332c",
+            "warning": false,
+          },
+          "bgFillDark": {
+            "color": "#000",
+            "warning": false,
+          },
+          "bgFillInverted1": {
+            "color": "#ffddd5",
+            "warning": false,
+          },
+          "bgFillInverted2": {
+            "color": "#fff",
+            "warning": true,
+          },
+          "fgFill": {
+            "color": "#f2efef",
+            "warning": false,
+          },
+          "fgFillDark": {
+            "color": "#f2efef",
+            "warning": false,
+          },
+          "fgFillInverted": {
+            "color": "#231c1b",
+            "warning": false,
+          },
+          "fgSurface1": {
+            "color": "#ff5b4e",
+            "warning": false,
+          },
+          "fgSurface2": {
+            "color": "#ff9b8b",
+            "warning": false,
+          },
+          "fgSurface3": {
+            "color": "#ffd5cc",
+            "warning": false,
+          },
+          "fgSurface4": {
+            "color": "#fff",
+            "warning": true,
+          },
+          "stroke1": {
+            "color": "#d77e72",
+            "warning": false,
+          },
+          "stroke2": {
+            "color": "#e3a79f",
+            "warning": false,
+          },
+          "stroke3": {
+            "color": "#ffd5cc",
+            "warning": false,
+          },
+          "stroke4": {
+            "color": "#fff",
+            "warning": true,
+          },
+          "surface1": {
+            "color": "#9b3b32",
+            "warning": false,
+          },
+          "surface2": {
+            "color": "#a23e35",
+            "warning": false,
+          },
+          "surface3": {
+            "color": "#a94138",
+            "warning": false,
+          },
+          "surface4": {
+            "color": "#af433a",
+            "warning": false,
+          },
+          "surface5": {
+            "color": "#ba483e",
+            "warning": false,
+          },
+          "surface6": {
+            "color": "#cb4f44",
+            "warning": false,
+          },
+        },
+      },
+    },
+    {
+      "input": {
+        "bgInfo": {
+          "mainDirection": "darker",
+          "pinLightness": {
+            "stepName": "surface2",
+            "value": 1,
+          },
+        },
+        "seedComputed": "#cc1818",
+        "seedOriginal": "#cc1818",
+        "seedUnchanged": true,
+      },
+      "output": {
+        "direction": "darker",
+        "ramp": {
+          "bgFill1": {
+            "color": "#cc1818",
+            "warning": false,
+          },
+          "bgFill2": {
+            "color": "#b90000",
+            "warning": false,
+          },
+          "bgFillDark": {
+            "color": "#231c1b",
+            "warning": false,
+          },
+          "bgFillInverted1": {
+            "color": "#6d0000",
+            "warning": false,
+          },
+          "bgFillInverted2": {
+            "color": "#231c1b",
+            "warning": false,
+          },
+          "fgFill": {
+            "color": "#f2efef",
+            "warning": false,
+          },
+          "fgFillDark": {
+            "color": "#f2efef",
+            "warning": false,
+          },
+          "fgFillInverted": {
+            "color": "#f2efef",
+            "warning": false,
+          },
+          "fgSurface1": {
+            "color": "#ff8a7a",
+            "warning": false,
+          },
+          "fgSurface2": {
+            "color": "#fc5145",
+            "warning": false,
+          },
+          "fgSurface3": {
+            "color": "#cc1818",
+            "warning": false,
+          },
+          "fgSurface4": {
+            "color": "#4a0000",
+            "warning": false,
+          },
+          "stroke1": {
+            "color": "#dc9085",
+            "warning": false,
+          },
+          "stroke2": {
+            "color": "#cd695d",
+            "warning": false,
+          },
+          "stroke3": {
+            "color": "#cc1818",
+            "warning": false,
+          },
+          "stroke4": {
+            "color": "#a40000",
+            "warning": false,
+          },
+          "surface1": {
+            "color": "#fdf5f4",
+            "warning": false,
+          },
+          "surface2": {
+            "color": "#fff",
+            "warning": false,
+          },
+          "surface3": {
+            "color": "#fff",
+            "warning": false,
+          },
+          "surface4": {
+            "color": "#fceeec",
+            "warning": false,
+          },
+          "surface5": {
+            "color": "#f9e1dd",
+            "warning": false,
+          },
+          "surface6": {
+            "color": "#f6cdc7",
+            "warning": false,
+          },
+        },
+      },
+    },
+  ],
+  [
+    {
+      "input": {
+        "bgInfo": {
+          "mainDirection": "lighter",
+          "pinLightness": {
+            "stepName": "surface2",
+            "value": 0,
+          },
+        },
+        "seedComputed": "#c7a589",
+        "seedOriginal": "#c7a589",
+        "seedUnchanged": true,
+      },
+      "output": {
+        "direction": "lighter",
+        "ramp": {
+          "bgFill1": {
+            "color": "#c7a589",
+            "warning": false,
+          },
+          "bgFill2": {
+            "color": "#dcb99d",
+            "warning": false,
+          },
+          "bgFillDark": {
+            "color": "#000",
+            "warning": false,
+          },
+          "bgFillInverted1": {
+            "color": "#f5d2b5",
+            "warning": false,
+          },
+          "bgFillInverted2": {
+            "color": "#f1f0ee",
+            "warning": false,
+          },
+          "fgFill": {
+            "color": "#1f1e1c",
+            "warning": false,
+          },
+          "fgFillDark": {
+            "color": "#f1f0ee",
+            "warning": false,
+          },
+          "fgFillInverted": {
+            "color": "#1f1e1c",
+            "warning": false,
+          },
+          "fgSurface1": {
+            "color": "#5c3f26",
+            "warning": false,
+          },
+          "fgSurface2": {
+            "color": "#77583e",
+            "warning": false,
+          },
+          "fgSurface3": {
+            "color": "#c7a589",
+            "warning": false,
+          },
+          "fgSurface4": {
+            "color": "#ffe9cb",
+            "warning": false,
+          },
+          "stroke1": {
+            "color": "#7e6a59",
+            "warning": false,
+          },
+          "stroke2": {
+            "color": "#9c836f",
+            "warning": false,
+          },
+          "stroke3": {
+            "color": "#c7a589",
+            "warning": false,
+          },
+          "stroke4": {
+            "color": "#f1ceb1",
+            "warning": false,
+          },
+          "surface1": {
+            "color": "#000",
+            "warning": false,
+          },
+          "surface2": {
+            "color": "#000",
+            "warning": false,
+          },
+          "surface3": {
+            "color": "#100a06",
+            "warning": false,
+          },
+          "surface4": {
+            "color": "#18110b",
+            "warning": false,
+          },
+          "surface5": {
+            "color": "#251b13",
+            "warning": false,
+          },
+          "surface6": {
+            "color": "#33271d",
+            "warning": false,
+          },
+        },
+      },
+    },
+    {
+      "input": {
+        "bgInfo": {
+          "mainDirection": "lighter",
+          "pinLightness": {
+            "stepName": "surface2",
+            "value": 0.5,
+          },
+        },
+        "seedComputed": "#c7a589",
+        "seedOriginal": "#c7a589",
+        "seedUnchanged": true,
+      },
+      "output": {
+        "direction": "lighter",
+        "ramp": {
+          "bgFill1": {
+            "color": "#c7a589",
+            "warning": false,
+          },
+          "bgFill2": {
+            "color": "#dcb99d",
+            "warning": false,
+          },
+          "bgFillDark": {
+            "color": "#000",
+            "warning": false,
+          },
+          "bgFillInverted1": {
+            "color": "#ffe0c2",
+            "warning": false,
+          },
+          "bgFillInverted2": {
+            "color": "#fff",
+            "warning": true,
+          },
+          "fgFill": {
+            "color": "#1f1e1c",
+            "warning": false,
+          },
+          "fgFillDark": {
+            "color": "#f1f0ee",
+            "warning": false,
+          },
+          "fgFillInverted": {
+            "color": "#1f1e1c",
+            "warning": false,
+          },
+          "fgSurface1": {
+            "color": "#b69579",
+            "warning": false,
+          },
+          "fgSurface2": {
+            "color": "#dab79b",
+            "warning": false,
+          },
+          "fgSurface3": {
+            "color": "#ffdfc2",
+            "warning": false,
+          },
+          "fgSurface4": {
+            "color": "#fff",
+            "warning": true,
+          },
+          "stroke1": {
+            "color": "#b1957e",
+            "warning": false,
+          },
+          "stroke2": {
+            "color": "#d3b59d",
+            "warning": false,
+          },
+          "stroke3": {
+            "color": "#ffdfc2",
+            "warning": false,
+          },
+          "stroke4": {
+            "color": "#fff",
+            "warning": true,
+          },
+          "surface1": {
+            "color": "#715946",
+            "warning": false,
+          },
+          "surface2": {
+            "color": "#765e49",
+            "warning": false,
+          },
+          "surface3": {
+            "color": "#7b624c",
+            "warning": false,
+          },
+          "surface4": {
+            "color": "#806650",
+            "warning": false,
+          },
+          "surface5": {
+            "color": "#886c55",
+            "warning": false,
+          },
+          "surface6": {
+            "color": "#95765d",
+            "warning": false,
+          },
+        },
+      },
+    },
+    {
+      "input": {
+        "bgInfo": {
+          "mainDirection": "darker",
+          "pinLightness": {
+            "stepName": "surface2",
+            "value": 1,
+          },
+        },
+        "seedComputed": "#c7a589",
+        "seedOriginal": "#c7a589",
+        "seedUnchanged": true,
+      },
+      "output": {
+        "direction": "darker",
+        "ramp": {
+          "bgFill1": {
+            "color": "#c7a589",
+            "warning": false,
+          },
+          "bgFill2": {
+            "color": "#b49277",
+            "warning": false,
+          },
+          "bgFillDark": {
+            "color": "#1f1e1c",
+            "warning": false,
+          },
+          "bgFillInverted1": {
+            "color": "#442910",
+            "warning": false,
+          },
+          "bgFillInverted2": {
+            "color": "#1f1e1c",
+            "warning": false,
+          },
+          "fgFill": {
+            "color": "#1f1e1c",
+            "warning": false,
+          },
+          "fgFillDark": {
+            "color": "#f1f0ee",
+            "warning": false,
+          },
+          "fgFillInverted": {
+            "color": "#f1f0ee",
+            "warning": false,
+          },
+          "fgSurface1": {
+            "color": "#cba88c",
+            "warning": false,
+          },
+          "fgSurface2": {
+            "color": "#a9886d",
+            "warning": false,
+          },
+          "fgSurface3": {
+            "color": "#8a6b50",
+            "warning": false,
+          },
+          "fgSurface4": {
+            "color": "#301700",
+            "warning": false,
+          },
+          "stroke1": {
+            "color": "#caaa90",
+            "warning": false,
+          },
+          "stroke2": {
+            "color": "#a78c77",
+            "warning": false,
+          },
+          "stroke3": {
+            "color": "#8a6b50",
+            "warning": false,
+          },
+          "stroke4": {
+            "color": "#6c4e34",
+            "warning": false,
+          },
+          "surface1": {
+            "color": "#faf6f3",
+            "warning": false,
+          },
+          "surface2": {
+            "color": "#fff",
+            "warning": false,
+          },
+          "surface3": {
+            "color": "#fff",
+            "warning": false,
+          },
+          "surface4": {
+            "color": "#f7f0ea",
+            "warning": false,
+          },
+          "surface5": {
+            "color": "#f1e4d9",
+            "warning": false,
+          },
+          "surface6": {
+            "color": "#e9d2c0",
+            "warning": false,
+          },
+        },
+      },
+    },
+  ],
+]
+`;
+
+exports[`buildRamps background ramp snapshots 1`] = `
+[
+  {
+    "input": {
+      "seedComputed": "#4d4c4d",
+      "seedOriginal": "#4d4d4d",
+      "seedUnchanged": false,
+    },
+    "output": {
+      "direction": "lighter",
+      "ramp": {
+        "bgFill1": {
+          "color": "#b3b3b3",
+          "warning": false,
+        },
+        "bgFill2": {
+          "color": "#c7c7c7",
+          "warning": false,
+        },
+        "bgFillDark": {
+          "color": "#000",
+          "warning": false,
+        },
+        "bgFillInverted1": {
+          "color": "#d9d9d9",
+          "warning": false,
+        },
+        "bgFillInverted2": {
+          "color": "#f1f1f1",
+          "warning": false,
+        },
+        "fgFill": {
+          "color": "#1e1e1e",
+          "warning": false,
+        },
+        "fgFillDark": {
+          "color": "#f0f0f0",
+          "warning": false,
+        },
+        "fgFillInverted": {
+          "color": "#1e1e1e",
+          "warning": false,
+        },
+        "fgSurface1": {
+          "color": "#818181",
+          "warning": false,
+        },
+        "fgSurface2": {
+          "color": "#a0a0a0",
+          "warning": false,
+        },
+        "fgSurface3": {
+          "color": "#c4c4c4",
+          "warning": false,
+        },
+        "fgSurface4": {
+          "color": "#f1f1f1",
+          "warning": false,
+        },
+        "stroke1": {
+          "color": "#656565",
+          "warning": false,
+        },
+        "stroke2": {
+          "color": "#7f7f7f",
+          "warning": false,
+        },
+        "stroke3": {
+          "color": "#a0a0a0",
+          "warning": false,
+        },
+        "stroke4": {
+          "color": "#c8c8c8",
+          "warning": false,
+        },
+        "surface1": {
+          "color": "#484848",
+          "warning": false,
+        },
+        "surface2": {
+          "color": "#4d4c4d",
+          "warning": false,
+        },
+        "surface3": {
+          "color": "#515151",
+          "warning": false,
+        },
+        "surface4": {
+          "color": "#545454",
+          "warning": false,
+        },
+        "surface5": {
+          "color": "#5b5b5b",
+          "warning": false,
+        },
+        "surface6": {
+          "color": "#646464",
+          "warning": false,
+        },
+      },
+    },
+  },
+  {
+    "input": {
+      "seedComputed": "#6c6",
+      "seedOriginal": "#6c6",
+      "seedUnchanged": true,
+    },
+    "output": {
+      "direction": "darker",
+      "ramp": {
+        "bgFill1": {
+          "color": "#005f00",
+          "warning": false,
+        },
+        "bgFill2": {
+          "color": "#004e00",
+          "warning": false,
+        },
+        "bgFillDark": {
+          "color": "#1c1f1c",
+          "warning": false,
+        },
+        "bgFillInverted1": {
+          "color": "#003a00",
+          "warning": false,
+        },
+        "bgFillInverted2": {
+          "color": "#1c1f1c",
+          "warning": false,
+        },
+        "fgFill": {
+          "color": "#edf2ed",
+          "warning": false,
+        },
+        "fgFillDark": {
+          "color": "#edf2ed",
+          "warning": false,
+        },
+        "fgFillInverted": {
+          "color": "#edf2ed",
+          "warning": false,
+        },
+        "fgSurface1": {
+          "color": "#707b6f",
+          "warning": false,
+        },
+        "fgSurface2": {
+          "color": "#575f56",
+          "warning": false,
+        },
+        "fgSurface3": {
+          "color": "#3f453e",
+          "warning": false,
+        },
+        "fgSurface4": {
+          "color": "#1c1f1c",
+          "warning": false,
+        },
+        "stroke1": {
+          "color": "#6ea36d",
+          "warning": false,
+        },
+        "stroke2": {
+          "color": "#598558",
+          "warning": false,
+        },
+        "stroke3": {
+          "color": "#436542",
+          "warning": false,
+        },
+        "stroke4": {
+          "color": "#2e472d",
+          "warning": false,
+        },
+        "surface1": {
+          "color": "#68c467",
+          "warning": false,
+        },
+        "surface2": {
+          "color": "#6c6",
+          "warning": false,
+        },
+        "surface3": {
+          "color": "#6fd26f",
+          "warning": false,
+        },
+        "surface4": {
+          "color": "#65bf65",
+          "warning": false,
+        },
+        "surface5": {
+          "color": "#62b561",
+          "warning": false,
+        },
+        "surface6": {
+          "color": "#5da75d",
+          "warning": false,
+        },
+      },
+    },
+  },
+  {
+    "input": {
+      "seedComputed": "#009",
+      "seedOriginal": "#009",
+      "seedUnchanged": true,
+    },
+    "output": {
+      "direction": "lighter",
+      "ramp": {
+        "bgFill1": {
+          "color": "#508bff",
+          "warning": false,
+        },
+        "bgFill2": {
+          "color": "#6ca0ff",
+          "warning": false,
+        },
+        "bgFillDark": {
+          "color": "#000",
+          "warning": false,
+        },
+        "bgFillInverted1": {
+          "color": "#bfdaff",
+          "warning": false,
+        },
+        "bgFillInverted2": {
+          "color": "#eff0f2",
+          "warning": false,
+        },
+        "fgFill": {
+          "color": "#0b1b41",
+          "warning": false,
+        },
+        "fgFillDark": {
+          "color": "#eff0f2",
+          "warning": false,
+        },
+        "fgFillInverted": {
+          "color": "#0b1b41",
+          "warning": false,
+        },
+        "fgSurface1": {
+          "color": "#505d78",
+          "warning": false,
+        },
+        "fgSurface2": {
+          "color": "#6f788b",
+          "warning": false,
+        },
+        "fgSurface3": {
+          "color": "#afb4be",
+          "warning": false,
+        },
+        "fgSurface4": {
+          "color": "#eff0f2",
+          "warning": false,
+        },
+        "stroke1": {
+          "color": "#1f3e88",
+          "warning": false,
+        },
+        "stroke2": {
+          "color": "#2f56b1",
+          "warning": false,
+        },
+        "stroke3": {
+          "color": "#5477c0",
+          "warning": false,
+        },
+        "stroke4": {
+          "color": "#7f99cf",
+          "warning": false,
+        },
+        "surface1": {
+          "color": "#041c65",
+          "warning": false,
+        },
+        "surface2": {
+          "color": "#009",
+          "warning": false,
+        },
+        "surface3": {
+          "color": "#06247d",
+          "warning": false,
+        },
+        "surface4": {
+          "color": "#072886",
+          "warning": false,
+        },
+        "surface5": {
+          "color": "#0a2e93",
+          "warning": false,
+        },
+        "surface6": {
+          "color": "#1038a4",
+          "warning": false,
+        },
+      },
+    },
+  },
+]
+`;

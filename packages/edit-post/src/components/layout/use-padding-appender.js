@@ -59,9 +59,9 @@ export function usePaddingAppender( enabled ) {
 			const { ownerDocument } = node;
 			// Adds the listener on the document so that in the iframed editor clicks below the
 			// padding can be handled as they too should be treated as intent to append.
-			ownerDocument.addEventListener( 'mousedown', onMouseDown );
+			ownerDocument.addEventListener( 'pointerdown', onMouseDown );
 			return () => {
-				ownerDocument.removeEventListener( 'mousedown', onMouseDown );
+				ownerDocument.removeEventListener( 'pointerdown', onMouseDown );
 			};
 		},
 		[ registry ]

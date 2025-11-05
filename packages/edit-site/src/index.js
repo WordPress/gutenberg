@@ -20,7 +20,6 @@ import {
 /**
  * Internal dependencies
  */
-import './hooks';
 import { store as editSiteStore } from './store';
 import { unlock } from './lock-unlock';
 import App from './components/app';

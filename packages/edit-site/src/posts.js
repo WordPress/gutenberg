@@ -18,7 +18,6 @@ import {
 /**
  * Internal dependencies
  */
-import './hooks';
 import { store as editSiteStore } from './store';
 
 /**

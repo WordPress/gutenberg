@@ -12,12 +12,11 @@ import { useInstanceId, useReducedMotion } from '@wordpress/compose';
 import {
 	EditorKeyboardShortcutsRegister,
 	privateApis as editorPrivateApis,
-	store as editorStore,
 } from '@wordpress/editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
-import { useCallback, useMemo } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -29,18 +28,11 @@ import { addQueryArgs } from '@wordpress/url';
  * Internal dependencies
  */
 import WelcomeGuide from '../welcome-guide';
-import { store as editSiteStore } from '../../store';
-import { GlobalStylesRenderer } from '../global-styles-renderer';
 import CanvasLoader from '../canvas-loader';
 import { unlock } from '../../lock-unlock';
 import { useSpecificEditorSettings } from '../block-editor/use-site-editor-settings';
 import PluginTemplateSettingPanel from '../plugin-template-setting-panel';
-import GlobalStylesSidebar from '../global-styles-sidebar';
 import { isPreviewingTheme } from '../../utils/is-previewing-theme';
-import {
-	getEditorCanvasContainerTitle,
-	useHasEditorCanvasContainer,
-} from '../editor-canvas-container';
 import SaveButton from '../save-button';
 import SavePanel from '../save-panel';
 import SiteEditorMoreMenu from '../more-menu';
@@ -49,7 +41,6 @@ import useEditorIframeProps from '../block-editor/use-editor-iframe-props';
 import useEditorTitle from './use-editor-title';
 import { useIsSiteEditorLoading } from '../layout/hooks';
 import { useAdaptEditorToCanvas } from './use-adapt-editor-to-canvas';
-import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 import {
 	useResolveEditedEntity,
 	useSyncDeprecatedEntityIntoState,
@@ -132,24 +123,12 @@ export default function EditSiteEditor( {
 	// deprecated sync state with url
 	useSyncDeprecatedEntityIntoState( entity );
 	const { postType, postId, context } = entity;
-	const {
-		isBlockBasedTheme,
-		editorCanvasView,
-		currentPostIsTrashed,
-		hasSiteIcon,
-	} = useSelect( ( select ) => {
-		const { getEditorCanvasContainerView } = unlock(
-			select( editSiteStore )
-		);
+	const { isBlockBasedTheme, hasSiteIcon } = useSelect( ( select ) => {
 		const { getCurrentTheme, getEntityRecord } = select( coreDataStore );
 		const siteData = getEntityRecord( 'root', '__unstableBase', undefined );
 
 		return {
 			isBlockBasedTheme: getCurrentTheme()?.is_block_theme,
-			editorCanvasView: getEditorCanvasContainerView(),
-			currentPostIsTrashed:
-				select( editorStore ).getCurrentPostAttribute( 'status' ) ===
-				'trash',
 			hasSiteIcon: !! siteData?.site_icon_url,
 		};
 	}, [] );
@@ -159,7 +138,6 @@ export default function EditSiteEditor( {
 		postWithTemplate ? context.postId : postId
 	);
 	const _isPreviewingTheme = isPreviewingTheme();
-	const hasDefaultEditorCanvasView = ! useHasEditorCanvasContainer();
 	const iframeProps = useEditorIframeProps();
 	const isEditMode = canvas === 'edit';
 	const loadingProgressId = useInstanceId(
@@ -168,22 +146,6 @@ export default function EditSiteEditor( {
 	);
 
 	const settings = useSpecificEditorSettings();
-	const styles = useMemo(
-		() => [
-			...settings.styles,
-			{
-				// Forming a "block formatting context" to prevent margin collapsing.
-				// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
-				css:
-					canvas === 'view'
-						? `body{min-height: 100vh; ${
-								currentPostIsTrashed ? '' : 'cursor: pointer;'
-						  }}`
-						: undefined,
-			},
-		],
-		[ settings.styles, canvas, currentPostIsTrashed ]
-	);
 	const { resetZoomLevel } = unlock( useDispatch( blockEditorStore ) );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const history = useHistory();
@@ -241,9 +203,6 @@ export default function EditSiteEditor( {
 		]
 	);
 
-	// Replace the title and icon displayed in the DocumentBar when there's an overlay visible.
-	const title = getEditorCanvasContainerTitle( editorCanvasView );
-
 	const isReady = ! isLoading;
 	const transition = {
 		duration: disableMotion ? 0 : 0.2,
@@ -253,9 +212,6 @@ export default function EditSiteEditor( {
 		<SitePreview />
 	) : (
 		<>
-			<GlobalStylesRenderer
-				disableRootPadding={ postType !== TEMPLATE_POST_TYPE }
-			/>
 			<EditorKeyboardShortcutsRegister />
 			{ isEditMode && <BlockKeyboardShortcuts /> }
 			{ ! isReady ? <CanvasLoader id={ loadingProgressId } /> : null }
@@ -271,13 +227,10 @@ export default function EditSiteEditor( {
 					templateId={ postWithTemplate ? postId : undefined }
 					settings={ settings }
 					className="edit-site-editor__editor-interface"
-					styles={ styles }
 					customSaveButton={
 						_isPreviewingTheme && <SaveButton size="compact" />
 					}
 					customSavePanel={ _isPreviewingTheme && <SavePanel /> }
-					forceDisableBlockTools={ ! hasDefaultEditorCanvasView }
-					title={ title }
 					iframeProps={ iframeProps }
 					onActionPerformed={ onActionPerformed }
 					extraSidebarPanels={
@@ -356,7 +309,6 @@ export default function EditSiteEditor( {
 						</BackButton>
 					) }
 					<SiteEditorMoreMenu />
-					{ isBlockBasedTheme && <GlobalStylesSidebar /> }
 				</Editor>
 			) }
 		</>

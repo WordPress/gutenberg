@@ -9,9 +9,10 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as noticesStore } from '@wordpress/notices';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useState } from '@wordpress/element';
 
@@ -57,6 +58,8 @@ export function LinkUIPageCreator( {
 	);
 
 	const { saveEntityRecord } = useDispatch( coreStore );
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
 
 	async function createPage( event ) {
 		event.preventDefault();
@@ -85,10 +88,30 @@ export function LinkUIPageCreator( {
 					kind: 'post-type',
 				};
 
+				// Show success notice
+				createSuccessNotice(
+					sprintf(
+						// translators: %s: the name of the new page being created.
+						__( '%s page created successfully.' ),
+						decodeEntities( savedRecord.title.rendered )
+					),
+					{
+						type: 'snackbar',
+						id: 'page-created-success',
+					}
+				);
+
 				onPageCreated( pageLink );
 			}
 		} catch ( error ) {
-			// Error handling is done via the data store selectors
+			// Show error notice
+			createErrorNotice(
+				__( 'Failed to create page. Please try again.' ),
+				{
+					type: 'snackbar',
+					id: 'page-created-error',
+				}
+			);
 		}
 	}
 

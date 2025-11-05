@@ -60,7 +60,7 @@ test.describe( 'Post Data source', () => {
 			// Check the fields registered by other sources are there.
 		} );
 
-		test( 'should include post data fields in UI to connect attributes on date blocks', async ( {
+		test( 'should not render Attributes panel for date blocks', async ( {
 			editor,
 			page,
 		} ) => {
@@ -77,15 +77,9 @@ test.describe( 'Post Data source', () => {
 					},
 				},
 			} );
-			await page
-				.getByRole( 'button', {
-					name: 'datetime',
-				} )
-				.click();
-			const postDataMenuItem = page.getByRole( 'menuitem', {
-				name: 'Post Data',
-			} );
-			await expect( postDataMenuItem ).toBeVisible();
+			await expect(
+				page.getByLabel( 'Attributes options' )
+			).toBeHidden();
 		} );
 	} );
 } );
