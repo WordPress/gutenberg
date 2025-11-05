@@ -8,14 +8,13 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import type {
-	Form,
-	FieldLayoutProps,
+	NormalizedForm,
 	NormalizedDetailsLayout,
-	DetailsLayout,
+	FieldLayoutProps,
 } from '../../types';
 import DataFormContext from '../../components/dataform-context';
 import { DataFormLayout } from '../data-form-layout';
-import { DEFAULT_LAYOUT, normalizeLayout } from '../normalize-form-fields';
+import { DEFAULT_LAYOUT } from '../normalize-form';
 
 export default function FormDetailsField< Item >( {
 	data,
@@ -24,13 +23,8 @@ export default function FormDetailsField< Item >( {
 }: FieldLayoutProps< Item > ) {
 	const { fields } = useContext( DataFormContext );
 
-	const layout: NormalizedDetailsLayout = normalizeLayout( {
-		...field.layout,
-		type: 'details',
-	} as DetailsLayout ) as NormalizedDetailsLayout;
-
-	const form: Form = useMemo(
-		(): Form => ( {
+	const form: NormalizedForm = useMemo(
+		() => ( {
 			layout: DEFAULT_LAYOUT,
 			fields: field.children ?? [],
 		} ),
@@ -42,7 +36,8 @@ export default function FormDetailsField< Item >( {
 	}
 
 	// Find the summary field definition if specified
-	const summaryFieldId = layout.summary;
+	const summaryFieldId =
+		( field.layout as NormalizedDetailsLayout ).summary ?? '';
 	const summaryField = summaryFieldId
 		? fields.find( ( fieldDef ) => fieldDef.id === summaryFieldId )
 		: undefined;
