@@ -1580,7 +1580,7 @@ export function getTemplateLock( state, rootClientId ) {
 		rootClientId
 	)?.templateLock;
 
-	// If this is a contentOnly template locked block that's being in the process
+	// If this is a contentOnly template locked block that's in the process
 	// of being edited, consider the template lock as temporarily inactive.
 	if (
 		blockListTemplateLock === 'contentOnly' &&
