@@ -34,8 +34,8 @@ import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
 
 function NotesSidebarContent( {
-	showCommentBoard,
-	setShowCommentBoard,
+	newNoteFormState,
+	setNewNoteFormState,
 	styles,
 	comments,
 	commentSidebarRef,
@@ -69,8 +69,8 @@ function NotesSidebarContent( {
 				onEditComment={ onEdit }
 				onAddReply={ onCreate }
 				onCommentDelete={ onDelete }
-				showCommentBoard={ showCommentBoard }
-				setShowCommentBoard={ setShowCommentBoard }
+				newNoteFormState={ newNoteFormState }
+				setNewNoteFormState={ setNewNoteFormState }
 				commentSidebarRef={ commentSidebarRef }
 				reflowComments={ reflowComments }
 				commentLastUpdated={ commentLastUpdated }
@@ -82,7 +82,7 @@ function NotesSidebarContent( {
 
 function NotesSidebar( { postId, mode } ) {
 	// Enum: 'closed' | 'creating' | 'open'
-	const [ showCommentBoard, setShowCommentBoard ] = useState( 'closed' );
+	const [ newNoteFormState, setNewNoteFormState ] = useState( 'closed' );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
@@ -119,7 +119,7 @@ function NotesSidebar( { postId, mode } ) {
 	useEnableFloatingSidebar(
 		showFloatingSidebar &&
 			( unresolvedSortedThreads.length > 0 ||
-				showCommentBoard !== 'closed' )
+				newNoteFormState !== 'closed' )
 	);
 
 	// Get the global styles to set the background color of the sidebar.
@@ -154,7 +154,7 @@ function NotesSidebar( { postId, mode } ) {
 			return;
 		}
 
-		setShowCommentBoard( ! blockCommentId ? 'open' : 'closed' );
+		setNewNoteFormState( ! blockCommentId ? 'open' : 'closed' );
 		focusCommentThread(
 			blockCommentId,
 			commentSidebarRef.current,
@@ -192,8 +192,8 @@ function NotesSidebar( { postId, mode } ) {
 				>
 					<NotesSidebarContent
 						comments={ resultComments }
-						showCommentBoard={ showCommentBoard }
-						setShowCommentBoard={ setShowCommentBoard }
+						newNoteFormState={ newNoteFormState }
+						setNewNoteFormState={ setNewNoteFormState }
 						commentSidebarRef={ commentSidebarRef }
 						reflowComments={ reflowComments }
 						commentLastUpdated={ commentLastUpdated }
@@ -211,8 +211,8 @@ function NotesSidebar( { postId, mode } ) {
 				>
 					<NotesSidebarContent
 						comments={ unresolvedSortedThreads }
-						showCommentBoard={ showCommentBoard }
-						setShowCommentBoard={ setShowCommentBoard }
+						newNoteFormState={ newNoteFormState }
+						setNewNoteFormState={ setNewNoteFormState }
 						commentSidebarRef={ commentSidebarRef }
 						reflowComments={ reflowComments }
 						commentLastUpdated={ commentLastUpdated }
