@@ -164,14 +164,12 @@ function CustomSelectControl< T extends CustomSelectOption >(
 		return (
 			<Styled.SelectedExperimentalHintWrapper>
 				{ selectedOption.name }
-				{ showSelectedHint && selectedOption.hint && (
-					<Styled.SelectedExperimentalHintItem
-						// Keeping the classname for legacy reasons
-						className="components-custom-select-control__hint"
-					>
-						{ selectedOption.hint }
-					</Styled.SelectedExperimentalHintItem>
-				) }
+				<Styled.SelectedExperimentalHintItem
+					// Keeping the classname for legacy reasons
+					className="components-custom-select-control__hint"
+				>
+					{ selectedOption.hint }
+				</Styled.SelectedExperimentalHintItem>
 			</Styled.SelectedExperimentalHintWrapper>
 		);
 	};
