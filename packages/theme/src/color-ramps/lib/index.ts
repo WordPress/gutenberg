@@ -69,8 +69,9 @@ function calculateRamp( {
 		keyof Ramp,
 		{ color: string; warning: boolean }
 	>;
-	let DEFICIT_DIRECTION: RampDirection = 'lighter';
 	let MAX_DEFICIT = -Infinity;
+	let MAX_DEFICIT_DIRECTION: RampDirection = 'lighter';
+	let MAX_DEFICIT_STEP = 'none';
 
 	// Keep track of the calculated colors, as they are going to be useful
 	// when other colors reference them.
@@ -165,7 +166,6 @@ function calculateRamp( {
 			adjustedTarget,
 			computedDir,
 			{
-				strict: false,
 				lightnessConstraint,
 				taperChromaOptions,
 			}
@@ -179,7 +179,8 @@ function calculateRamp( {
 				searchResults.deficit > MAX_DEFICIT
 			) {
 				MAX_DEFICIT = searchResults.deficit;
-				DEFICIT_DIRECTION = computedDir;
+				MAX_DEFICIT_DIRECTION = computedDir;
+				MAX_DEFICIT_STEP = stepName;
 			}
 		}
 
@@ -195,8 +196,9 @@ function calculateRamp( {
 	}
 	return {
 		rampResults,
-		DEFICIT_DIRECTION,
 		MAX_DEFICIT,
+		MAX_DEFICIT_DIRECTION,
+		MAX_DEFICIT_STEP,
 	};
 }
 
@@ -243,7 +245,7 @@ export function buildRamp(
 	const sortedSteps = sortByDependency( config );
 
 	// Calculate the ramp with the initial seed.
-	const { rampResults, DEFICIT_DIRECTION, MAX_DEFICIT } = calculateRamp( {
+	const { rampResults, MAX_DEFICIT, MAX_DEFICIT_DIRECTION } = calculateRamp( {
 		seed,
 		sortedSteps,
 		config,
@@ -264,7 +266,7 @@ export function buildRamp(
 
 		// For a scale with the "lighter" direction, the contrast can be improved
 		// by darkening the seed. For "darker" direction, by lightening the seed.
-		let betterSeedL = DEFICIT_DIRECTION === 'lighter' ? 0 : 1;
+		let betterSeedL = MAX_DEFICIT_DIRECTION === 'lighter' ? 0 : 1;
 		let betterDeficit = -MAX_DEFICIT;
 		let betterReplaced = false;
 
@@ -296,7 +298,7 @@ export function buildRamp(
 			// Don't use the `MAX_DEFICIT` value because it's not related to our search,
 			// and might even be positive, which would confuse the bisection algorithm.
 			bestDeficit =
-				iterationResults.DEFICIT_DIRECTION === DEFICIT_DIRECTION
+				iterationResults.MAX_DEFICIT_DIRECTION === MAX_DEFICIT_DIRECTION
 					? iterationResults.MAX_DEFICIT
 					: -MAX_DEFICIT;
 

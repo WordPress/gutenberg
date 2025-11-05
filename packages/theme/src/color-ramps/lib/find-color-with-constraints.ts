@@ -28,7 +28,6 @@ import { type TaperChromaOptions, taperChroma } from './taper-chroma';
  * @param target
  * @param direction
  * @param options
- * @param options.strict
  * @param options.lightnessConstraint
  * @param options.lightnessConstraint.type
  * @param options.lightnessConstraint.value
@@ -42,14 +41,12 @@ export function findColorMeetingRequirements(
 	{
 		lightnessConstraint,
 		taperChromaOptions,
-		strict = true,
 	}: {
 		lightnessConstraint?: {
 			type: 'force' | 'onlyIfSucceeds';
 			value: number;
 		};
 		taperChromaOptions?: TaperChromaOptions;
-		strict?: boolean;
 	} = {}
 ): { color: ColorTypes; reached: boolean; achieved: number; deficit?: number } {
 	// A target of 1 means same color.
@@ -86,6 +83,11 @@ export function findColorMeetingRequirements(
 
 	const contrastWithSeed = getContrast( reference, seed );
 
+	// Set the boundary based on the direction.
+	const mostContrastingL = direction === 'lighter' ? 1 : 0;
+	const mostContrastingColor = direction === 'lighter' ? WHITE : BLACK;
+	const highestContrast = getContrast( reference, mostContrastingColor );
+
 	if ( lightnessConstraint ) {
 		// Apply a specific L value.
 		// Useful when pinning a step to a specific lightness, of to specify
@@ -101,36 +103,22 @@ export function findColorMeetingRequirements(
 		) {
 			return {
 				color: colorWithExactL,
-				reached: exactLContrast >= target,
+				reached: exactLContrast + CONTRAST_EPSILON >= target,
 				achieved: exactLContrast,
 				deficit:
-					exactLContrast >= target
-						? undefined
-						: ( target - exactLContrast ) * contrastWithSeed,
+					( exactLContrast >= target
+						? exactLContrast - highestContrast
+						: target - exactLContrast ) * contrastWithSeed,
 			};
 		}
 	}
 
-	// Set the boundary based on the direction.
-	const mostContrastingL = direction === 'lighter' ? 1 : 0;
-	const mostContrastingColor = direction === 'lighter' ? WHITE : BLACK;
-	const highestContrast = getContrast( reference, mostContrastingColor );
-
-	// If even the most contrasting color can't reach the target,
-	// the target is unreachable.
-	if ( highestContrast < target ) {
-		if ( strict ) {
-			throw new Error(
-				`Contrast target ${ target.toFixed(
-					2
-				) }:1 unreachable in ${ direction } direction` +
-					`(boundary achieves ${ highestContrast.toFixed( 3 ) }:1).`
-			);
-		}
-
+	// If even the most contrasting color can't reach the target, the target is unreachable.
+	// On the othe hand, if the contrast is very close to the target, we consider it reached.
+	if ( highestContrast < target + CONTRAST_EPSILON ) {
 		return {
 			color: mostContrastingColor,
-			reached: false,
+			reached: highestContrast + CONTRAST_EPSILON >= target,
 			achieved: highestContrast,
 			deficit: ( target - highestContrast ) * contrastWithSeed,
 		};
