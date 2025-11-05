@@ -163,6 +163,7 @@
 	border-style: solid;
 	padding: var(--wp-admin-border-width-focus);
 	background: $white;
+	box-sizing: border-box;
 
 	&:first-child {
 		margin-left: 0;
