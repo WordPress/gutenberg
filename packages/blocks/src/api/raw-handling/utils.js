@@ -113,14 +113,49 @@ export function getBlockContentSchema( context ) {
 
 /**
  * Checks whether HTML can be considered plain text. That is, it does not contain
- * any elements that are not line breaks.
+ * any elements that are not line breaks, or it only contains a single non-semantic
+ * wrapper element (span/div/p) with no semantic child elements.
  *
  * @param {string} HTML The HTML to check.
  *
  * @return {boolean} Whether the HTML can be considered plain text.
  */
 export function isPlain( HTML ) {
-	return ! /<(?!br[ />])/i.test( HTML );
+	// Existing check: no tags except <br>
+	if ( ! /<(?!br[ />])/i.test( HTML ) ) {
+		return true;
+	}
+
+	// New check: single wrapper element with no semantic children
+	try {
+		const doc = document.implementation.createHTMLDocument( '' );
+		doc.body.innerHTML = HTML;
+
+		// Check if there's exactly one top-level element
+		const childElements = Array.from( doc.body.children );
+		if ( childElements.length !== 1 ) {
+			return false;
+		}
+
+		const wrapper = childElements[ 0 ];
+		const tagName = wrapper.tagName.toLowerCase();
+
+		// Only consider non-semantic wrapper tags
+		if ( ! [ 'span', 'div', 'p' ].includes( tagName ) ) {
+			return false;
+		}
+
+		// Check if the wrapper contains only text nodes and <br> tags
+		// (no other semantic elements)
+		const hasSemanticChildren = Array.from(
+			wrapper.getElementsByTagName( '*' )
+		).some( ( el ) => el.tagName.toLowerCase() !== 'br' );
+
+		return ! hasSemanticChildren;
+	} catch ( e ) {
+		// If parsing fails, fall back to the original behavior
+		return false;
+	}
 }
 
 /**
