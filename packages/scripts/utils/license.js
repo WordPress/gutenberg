@@ -3,7 +3,6 @@
  */
 const chalk = require( 'chalk' );
 const { existsSync, readFileSync } = require( 'node:fs' );
-const { checkPlatform } = require( 'npm-install-checks' );
 
 const ERROR_TEXT = chalk.reset.inverse.bold.red( ' ERROR ' );
 const WARNING_TEXT = chalk.reset.inverse.bold.yellow( ' WARNING ' );
@@ -103,22 +102,6 @@ const otherOssLicenses = [
  */
 const getLicenses = ( gpl2 ) => {
 	return [ ...gpl2CompatibleLicenses, ...( gpl2 ? [] : otherOssLicenses ) ];
-};
-
-/**
- * Check if a package is compatible with the current platform, using the same
- * internal logic as npm.
- *
- * @param {Record<string, unknown>} pkg The package object.
- * @return {boolean} true if the package is compatible with the current platform, false if it isn't.
- */
-const isCompatiblePlatform = ( pkg ) => {
-	try {
-		checkPlatform( pkg );
-		return true;
-	} catch ( error ) {
-		return error.code !== 'EBADPLATFORM';
-	}
 };
 
 /**
@@ -225,19 +208,13 @@ function detectTypeFromLicenseText( licenseText ) {
 const reportedPackages = new Set();
 
 /**
- * @param {string}   path
- * @param {Licenses} licenses
+ * @param {Record<string, unknown>} packageInfo
+ * @param {Licenses}                licenses
  * @return {void}
  */
-function checkDepLicense( path, licenses ) {
-	if ( ! path ) {
+function checkDepLicense( packageInfo, licenses ) {
+	if ( ! packageInfo.path ) {
 		return;
-	}
-
-	const filename = path + '/package.json';
-	if ( ! existsSync( filename ) ) {
-		process.stdout.write( `Unable to locate package.json in ${ path }.` );
-		process.exit( 1 );
 	}
 
 	/*
@@ -247,7 +224,6 @@ function checkDepLicense( path, licenses ) {
 	 * - { licenses: [ 'MIT', 'Zlib' ] }
 	 * - { licenses: [ { type: 'MIT' }, { type: 'Zlib' } ] }
 	 */
-	const packageInfo = require( filename );
 	const license =
 		packageInfo.license ||
 		( packageInfo.licenses &&
@@ -284,7 +260,7 @@ function checkDepLicense( path, licenses ) {
 	 * or the type was invalid, try reading it from the files defined in
 	 * license files, instead.
 	 */
-	const detectedLicenseType = detectTypeFromLicenseFiles( path );
+	const detectedLicenseType = detectTypeFromLicenseFiles( packageInfo.path );
 	if ( ! licenseType && ! detectedLicenseType ) {
 		return;
 	}
@@ -340,10 +316,6 @@ function checkDepsInTree( deps, options ) {
 			continue;
 		}
 
-		if ( dep.optional && ! isCompatiblePlatform( dep ) ) {
-			continue;
-		}
-
 		if ( ! dep.hasOwnProperty( 'path' ) && ! dep.missing ) {
 			if ( dep.hasOwnProperty( 'peerMissing' ) ) {
 				process.stdout.write(
@@ -360,7 +332,7 @@ function checkDepsInTree( deps, options ) {
 				process.stdout.write( `${ WARNING_TEXT } ${ problem }.\n` );
 			}
 		} else {
-			checkDepLicense( dep.path, licenses );
+			checkDepLicense( dep, licenses );
 		}
 
 		if ( dep.hasOwnProperty( 'dependencies' ) ) {

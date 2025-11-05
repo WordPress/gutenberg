@@ -8,7 +8,7 @@
 
 ### Bug Fixes
 
-- The `check-licenses` script skips checking optional dependencies which are invalid for the current platform
+-   The `check-licenses` now relies on `package-lock.json` to retrieve license information, reducing the number of file operations and resolving an issue on some platforms where empty folders may effect the result for optional dependencies.
 
 ## 30.27.0 (2025-10-29)
 
