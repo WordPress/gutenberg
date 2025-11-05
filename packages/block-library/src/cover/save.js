@@ -19,6 +19,7 @@ import {
 import {
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
+	EMBED_VIDEO_BACKGROUND_TYPE,
 	dimRatioToClass,
 	isContentPositionCenter,
 	getPositionClassName,
@@ -47,6 +48,7 @@ export default function save( { attributes } ) {
 		tagName: Tag,
 		sizeSlug,
 		poster,
+		embedSrc,
 	} = attributes;
 	const overlayColorClass = getColorClassName(
 		'background-color',
@@ -60,6 +62,8 @@ export default function save( { attributes } ) {
 
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
+	const isEmbedVideoBackground =
+		EMBED_VIDEO_BACKGROUND_TYPE === backgroundType;
 
 	const isImgElement = ! ( hasParallax || isRepeated );
 
@@ -143,6 +147,16 @@ export default function save( { attributes } ) {
 					data-object-fit="cover"
 					data-object-position={ objectPosition }
 				/>
+			) }
+			{ isEmbedVideoBackground && embedSrc && (
+				<div className="wp-block-cover__video-background wp-block-cover__embed-background">
+					<iframe
+						src={ embedSrc }
+						title="Background video"
+						frameBorder="0"
+						allow="autoplay; fullscreen"
+					/>
+				</div>
 			) }
 
 			{ /* The `wp-block-cover__background` needs to be immediately before

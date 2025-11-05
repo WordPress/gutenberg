@@ -32,6 +32,7 @@ import {
 	attributesFromMedia,
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
+	EMBED_VIDEO_BACKGROUND_TYPE,
 	dimRatioToClass,
 	isContentPositionCenter,
 	getPositionClassName,
@@ -48,6 +49,7 @@ import {
 	DEFAULT_OVERLAY_COLOR,
 } from './color-utils';
 import { DEFAULT_MEDIA_SIZE_SLUG } from '../constants';
+import { getIframeSrc, getBackgroundVideoSrc } from '../embed-video-utils';
 
 function getInnerBlocksTemplate( attributes ) {
 	return [
@@ -168,7 +170,16 @@ function CoverEdit( {
 			} );
 		} )();
 		// Update the block only when the featured image changes.
-	}, [ mediaUrl ] );
+	}, [
+		useFeaturedImage,
+		mediaUrl,
+		overlayColor.color,
+		isUserOverlayColor,
+		dimRatio,
+		__unstableMarkNextChangeAsNotPersistent,
+		setOverlayColor,
+		setAttributes,
+	] );
 
 	// instead of destructuring the attributes
 	// we define the url and background type
@@ -278,6 +289,8 @@ function CoverEdit( {
 			hasParallax: undefined,
 			isRepeated: undefined,
 			useFeaturedImage: undefined,
+			embedProvider: undefined,
+			embedSrc: undefined,
 			isDark: newIsDark,
 		} );
 	};
@@ -319,10 +332,81 @@ function CoverEdit( {
 		createErrorNotice( message, { type: 'snackbar' } );
 	};
 
+	const onSelectEmbedUrl = ( embedUrl, provider ) => {
+		// Set initial attributes with URL and provider
+		setAttributes( {
+			url: embedUrl,
+			backgroundType: EMBED_VIDEO_BACKGROUND_TYPE,
+			embedProvider: provider,
+			id: undefined,
+			focalPoint: undefined,
+			hasParallax: undefined,
+			isRepeated: undefined,
+			useFeaturedImage: undefined,
+		} );
+	};
+
+	// Fetch embed preview for embed videos
+	const { embedProvider, embedSrc: currentEmbedSrc } = attributes;
+	const { embedPreview, isFetchingEmbed } = useSelect(
+		( select ) => {
+			if ( backgroundType !== EMBED_VIDEO_BACKGROUND_TYPE || ! url ) {
+				return {
+					embedPreview: undefined,
+					isFetchingEmbed: false,
+				};
+			}
+
+			const { getEmbedPreview, isRequestingEmbedPreview } =
+				select( coreStore );
+
+			return {
+				embedPreview: getEmbedPreview( url ),
+				isFetchingEmbed: isRequestingEmbedPreview( url ),
+			};
+		},
+		[ url, backgroundType ]
+	);
+
+	// Process embed preview and update embedSrc attribute
+	useEffect( () => {
+		if (
+			backgroundType !== EMBED_VIDEO_BACKGROUND_TYPE ||
+			! embedPreview?.html ||
+			currentEmbedSrc
+		) {
+			return;
+		}
+
+		// Extract iframe src from embed HTML
+		const iframeSrc = getIframeSrc( embedPreview.html );
+		if ( ! iframeSrc ) {
+			return;
+		}
+
+		// Modify the src to add background video parameters
+		const backgroundVideoSrc = getBackgroundVideoSrc(
+			iframeSrc,
+			embedProvider
+		);
+
+		setAttributes( {
+			embedSrc: backgroundVideoSrc,
+		} );
+	}, [
+		embedPreview,
+		backgroundType,
+		embedProvider,
+		currentEmbedSrc,
+		setAttributes,
+	] );
+
 	const isUploadingMedia = isTemporaryMedia( id, url );
 
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
+	const isEmbedVideoBackground =
+		EMBED_VIDEO_BACKGROUND_TYPE === backgroundType;
 
 	const blockEditingMode = useBlockEditingMode();
 	const hasNonContentControls = blockEditingMode === 'default';
@@ -449,6 +533,7 @@ function CoverEdit( {
 			attributes={ attributes }
 			setAttributes={ setAttributes }
 			onSelectMedia={ onSelectMedia }
+			onSelectEmbedUrl={ onSelectEmbedUrl }
 			currentSettings={ currentSettings }
 			toggleUseFeaturedImage={ toggleUseFeaturedImage }
 			onClearMedia={ onClearMedia }
@@ -600,6 +685,23 @@ function CoverEdit( {
 						style={ mediaStyle }
 					/>
 				) }
+				{ isEmbedVideoBackground && currentEmbedSrc && (
+					<div
+						ref={ mediaElement }
+						className="wp-block-cover__video-background wp-block-cover__embed-background"
+						style={ mediaStyle }
+					>
+						<iframe
+							src={ currentEmbedSrc }
+							title="Background video"
+							frameBorder="0"
+							allow="autoplay; fullscreen"
+						/>
+					</div>
+				) }
+				{ isEmbedVideoBackground &&
+					! currentEmbedSrc &&
+					isFetchingEmbed && <Spinner /> }
 
 				{ showOverlay && (
 					<span

@@ -11,12 +11,15 @@ import {
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
+import { MenuItem } from '@wordpress/components';
+import { link } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { ALLOWED_MEDIA_TYPES } from '../shared';
 import { unlock } from '../../lock-unlock';
+import EmbedVideoUrlInput from './embed-video-url-input';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
@@ -27,6 +30,7 @@ export default function CoverBlockControls( {
 	currentSettings,
 	toggleUseFeaturedImage,
 	onClearMedia,
+	onSelectEmbedUrl,
 	blockEditingMode,
 } ) {
 	const { contentPosition, id, useFeaturedImage, minHeight, minHeightUnit } =
@@ -36,6 +40,7 @@ export default function CoverBlockControls( {
 	const [ prevMinHeightValue, setPrevMinHeightValue ] = useState( minHeight );
 	const [ prevMinHeightUnit, setPrevMinHeightUnit ] =
 		useState( minHeightUnit );
+	const [ isEmbedUrlInputOpen, setIsEmbedUrlInputOpen ] = useState( false );
 	const isMinFullHeight =
 		minHeightUnit === 'vh' &&
 		minHeight === 100 &&
@@ -108,8 +113,28 @@ export default function CoverBlockControls( {
 					useFeaturedImage={ useFeaturedImage }
 					name={ ! url ? __( 'Add media' ) : __( 'Replace' ) }
 					onReset={ onClearMedia }
-				/>
+				>
+					{ ( { onClose } ) => (
+						<MenuItem
+							icon={ link }
+							onClick={ () => {
+								setIsEmbedUrlInputOpen( true );
+								onClose();
+							} }
+						>
+							{ __( 'Embed video from URL' ) }
+						</MenuItem>
+					) }
+				</MediaReplaceFlow>
 			</BlockControls>
+			{ isEmbedUrlInputOpen && (
+				<EmbedVideoUrlInput
+					onSubmit={ ( embedUrl, provider ) => {
+						onSelectEmbedUrl( embedUrl, provider );
+					} }
+					onClose={ () => setIsEmbedUrlInputOpen( false ) }
+				/>
+			) }
 		</>
 	);
 }

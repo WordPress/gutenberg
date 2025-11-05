@@ -85,6 +85,12 @@
 			"source": "attribute",
 			"selector": "video",
 			"attribute": "poster"
+		},
+		"embedProvider": {
+			"type": "string"
+		},
+		"embedSrc": {
+			"type": "string"
 		}
 	},
 	"usesContext": [ "postId", "postType" ],
