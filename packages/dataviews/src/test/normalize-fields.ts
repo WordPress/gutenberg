@@ -333,4 +333,46 @@ describe( 'normalizeFields: default getValue', () => {
 			} );
 		} );
 	} );
+
+	describe( 'format normalization', () => {
+		it( 'applies default format when not provided for date fields', () => {
+			const fields: Field< {} >[] = [
+				{
+					id: 'publishDate',
+					type: 'date',
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+			expect( normalizedFields[ 0 ].format ).toBeDefined();
+			expect( typeof normalizedFields[ 0 ].format ).toBe( 'string' );
+		} );
+
+		it( 'preserves custom format when provided', () => {
+			const fields: Field< {} >[] = [
+				{
+					id: 'publishDate',
+					type: 'date',
+					format: 'F j, Y',
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+			expect( normalizedFields[ 0 ].format ).toBe( 'F j, Y' );
+		} );
+
+		it( 'does not add format for non-date field types', () => {
+			const fields: Field< {} >[] = [
+				{
+					id: 'title',
+					type: 'text',
+				},
+				{
+					id: 'count',
+					type: 'integer',
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+			expect( normalizedFields[ 0 ].format ).toBeUndefined();
+			expect( normalizedFields[ 1 ].format ).toBeUndefined();
+		} );
+	} );
 } );

@@ -4,6 +4,11 @@
 import type { FunctionComponent } from 'react';
 
 /**
+ * WordPress dependencies
+ */
+import { getSettings } from '@wordpress/date';
+
+/**
  * Internal dependencies
  */
 import getFieldTypeDefinition from '../field-types';
@@ -200,6 +205,12 @@ export default function normalizeFields< Item >(
 				true,
 			filterBy,
 			readOnly: field.readOnly ?? fieldTypeDefinition.readOnly ?? false,
+			format:
+				field.type === 'date' &&
+				field.format !== undefined &&
+				typeof field.format === 'string'
+					? field.format
+					: getSettings().formats.date,
 		};
 	} );
 }

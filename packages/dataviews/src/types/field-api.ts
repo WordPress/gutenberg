@@ -308,6 +308,12 @@ export type Field< Item > = {
 	 * Used for editing operations to update field values.
 	 */
 	setValue?: ( args: { item: Item; value: any } ) => DeepPartial< Item >;
+
+	/**
+	 * Format string for fields of type date.
+	 * If not provided, defaults to WordPress date format settings.
+	 */
+	format?: string;
 };
 
 export type NormalizedField< Item > = Omit< Field< Item >, 'Edit' > & {
@@ -324,6 +330,7 @@ export type NormalizedField< Item > = Omit< Field< Item >, 'Edit' > & {
 	enableSorting: boolean;
 	filterBy: NormalizedFilterByConfig | false;
 	readOnly: boolean;
+	format: string;
 };
 
 /**

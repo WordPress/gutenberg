@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { dateI18n, getDate, getSettings } from '@wordpress/date';
+import { dateI18n } from '@wordpress/date';
 
 /**
  * Internal dependencies
@@ -23,9 +23,6 @@ import {
 	OPERATOR_OVER,
 	OPERATOR_BETWEEN,
 } from '../constants';
-
-const getFormattedDate = ( dateToDisplay: string | null ) =>
-	dateI18n( getSettings().formats.date, getDate( dateToDisplay ) );
 
 function sort( a: any, b: any, direction: SortDirection ) {
 	const timeA = new Date( a ).getTime();
@@ -51,7 +48,7 @@ export default {
 			return '';
 		}
 
-		return getFormattedDate( value );
+		return dateI18n( field.format, value );
 	},
 	enableSorting: true,
 	filterBy: {
