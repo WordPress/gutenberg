@@ -374,7 +374,7 @@ export const deleteEntityRecord =
  */
 export const editEntityRecord =
 	( kind, name, recordId, edits, options = {} ) =>
-	( { select, dispatch } ) => {
+	async ( { select, dispatch } ) => {
 		logEntityDeprecation( kind, name, 'editEntityRecord' );
 		const entityConfig = select.getEntityConfig( kind, name );
 		if ( ! entityConfig ) {

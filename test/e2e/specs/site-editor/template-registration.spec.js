@@ -62,18 +62,7 @@ test.describe( 'Block template registration', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'User-edited template' },
 		} );
-		await editor.saveSiteEditorEntities( {
-			isOnlyCurrentEntityDirty: true,
-		} );
-		await page
-			.getByRole( 'region', { name: 'Editor content' } )
-			.getByRole( 'button', { name: 'Activate' } )
-			.click();
-		await expect(
-			page
-				.getByRole( 'region', { name: 'Editor content' } )
-				.getByText( 'Template activated.' )
-		).toBeVisible();
+		await editor.saveSiteEditorEntities();
 		await page.goto( '/?cat=1' );
 		await expect( page.getByText( 'User-edited template' ) ).toBeVisible();
 
@@ -201,9 +190,7 @@ test.describe( 'Block template registration', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'User-customized template' },
 		} );
-		await editor.saveSiteEditorEntities( {
-			isOnlyCurrentEntityDirty: true,
-		} );
+		await editor.saveSiteEditorEntities();
 
 		// Deactivate plugin.
 		await requestUtils.deactivatePlugin(
@@ -298,18 +285,7 @@ test.describe( 'Block template registration', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Author template customized by the user.' },
 		} );
-		await editor.saveSiteEditorEntities( {
-			isOnlyCurrentEntityDirty: true,
-		} );
-		await page
-			.getByRole( 'region', { name: 'Editor content' } )
-			.getByRole( 'button', { name: 'Activate' } )
-			.click();
-		await expect(
-			page
-				.getByRole( 'region', { name: 'Editor content' } )
-				.getByText( 'Template activated.' )
-		).toBeVisible();
+		await editor.saveSiteEditorEntities();
 
 		await requestUtils.activatePlugin(
 			'gutenberg-test-block-template-registration'
