@@ -1,53 +1,46 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 
 /**
- * Internal dependencies
- */
-import { store as blockEditorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
-
-/**
- * Source of truth for which block tools are showing in the block editor.
+ * Determines which block tools should be showing based on the current editor state.
+ * This is a pure function that can be called from within a selector.
+ *
+ * @param {Object}  options                        Calculation options.
+ * @param {Object}  options.block                  The selected block object.
+ * @param {string}  options.blockMode              The block mode ('visual' or 'html').
+ * @param {boolean} options.isBlockInterfaceHidden Whether the block interface is hidden.
+ * @param {string}  options.clientId               The selected block client ID.
+ * @param {boolean} options.isTyping               Whether the user is currently typing.
+ * @param {boolean} options.hasFixedToolbar        Whether the toolbar is fixed.
  *
  * @return {Object} Object of which block tools will be shown.
  */
-export function useShowBlockTools() {
-	return useSelect( ( select ) => {
-		const {
-			getSelectedBlockClientId,
-			getFirstMultiSelectedBlockClientId,
-			getBlock,
-			getBlockMode,
-			getSettings,
-			isTyping,
-			isBlockInterfaceHidden,
-		} = unlock( select( blockEditorStore ) );
+export function shouldShowBlockTools( {
+	block,
+	blockMode,
+	isBlockInterfaceHidden,
+	clientId,
+	isTyping,
+	hasFixedToolbar,
+} ) {
+	const hasSelectedBlock = !! clientId && !! block;
+	const isEmptyDefaultBlock =
+		hasSelectedBlock &&
+		isUnmodifiedDefaultBlock( block, 'content' ) &&
+		blockMode !== 'html';
+	const showEmptyBlockSideInserter =
+		clientId && ! isTyping && isEmptyDefaultBlock;
+	const showBlockToolbarPopover =
+		! isBlockInterfaceHidden &&
+		! hasFixedToolbar &&
+		! showEmptyBlockSideInserter &&
+		hasSelectedBlock &&
+		! isEmptyDefaultBlock;
 
-		const clientId =
-			getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
-
-		const block = getBlock( clientId );
-		const hasSelectedBlock = !! clientId && !! block;
-		const isEmptyDefaultBlock =
-			hasSelectedBlock &&
-			isUnmodifiedDefaultBlock( block, 'content' ) &&
-			getBlockMode( clientId ) !== 'html';
-		const _showEmptyBlockSideInserter =
-			clientId && ! isTyping() && isEmptyDefaultBlock;
-		const _showBlockToolbarPopover =
-			! isBlockInterfaceHidden() &&
-			! getSettings().hasFixedToolbar &&
-			! _showEmptyBlockSideInserter &&
-			hasSelectedBlock &&
-			! isEmptyDefaultBlock;
-
-		return {
-			showEmptyBlockSideInserter: _showEmptyBlockSideInserter,
-			showBlockToolbarPopover: _showBlockToolbarPopover,
-		};
-	}, [] );
+	return {
+		showEmptyBlockSideInserter,
+		showBlockToolbarPopover,
+	};
 }
