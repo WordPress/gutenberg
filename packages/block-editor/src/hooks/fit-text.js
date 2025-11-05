@@ -3,7 +3,12 @@
  */
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
-import { useEffect, useCallback, useState } from '@wordpress/element';
+import {
+	useEffect,
+	useCallback,
+	useState,
+	useLayoutEffect,
+} from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
@@ -64,51 +69,47 @@ function useFitText( { fitText, name, clientId } ) {
 	const blockElement = useBlockElement( clientId );
 
 	// Fallback: Try to query the DOM directly when blockElement is null
-	// This is needed for preview mode where the ref might not be set up properly
+	// This is needed because in preview mode use useBlockElement always returns null
+	// that probably is an existing bug but the fix is not obvious so for now lets
+	// try this workaround on fit text only.
 	const [ fallbackElement, setFallbackElement ] = useState( null );
-
-	useEffect( () => {
+	useLayoutEffect( () => {
 		if ( ! fitText || ! hasFitTextSupport || ! clientId ) {
 			return;
 		}
 
 		// If we already have blockElement from the ref system, use it
-		if ( blockElement && fallbackElement !== null ) {
+		if ( blockElement ) {
 			setFallbackElement( null );
 			return;
 		}
 
-		// Otherwise, try to query the DOM directly
+		// Otherwise, try to query the DOM directly to get the block element
 		// We need to check both the main document and the editor canvas iframe
-		const tryQueryElement = () => {
-			// Try main document first
-			let element = document.getElementById( `block-${ clientId }` );
+		let element = document.getElementById( `block-${ clientId }` );
 
-			// If not found, check the editor canvas iframe (for preview mode)
-			if ( ! element ) {
-				const iframe = document.querySelector( 'iframe[name="editor-canvas"]' );
-				if ( iframe ) {
-					try {
-						const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
-						if ( iframeDoc ) {
-							element = iframeDoc.getElementById( `block-${ clientId }` );
-						}
-					} catch ( e ) {
-						// Cross-origin iframe, skip
+		// If not found, check the editor canvas iframe
+		if ( ! element ) {
+			const iframe = document.querySelector(
+				'iframe[name="editor-canvas"]'
+			);
+			if ( iframe ) {
+				try {
+					const iframeDoc =
+						iframe.contentDocument ||
+						iframe.contentWindow?.document;
+					if ( iframeDoc ) {
+						element = iframeDoc.getElementById(
+							`block-${ clientId }`
+						);
 					}
-				}
+				} catch ( e ) {}
 			}
+		}
 
-			if ( element ) {
-				setFallbackElement( element );
-			} else {
-				// Element not found yet, retry on next frame
-				// requestAnimationFrame( tryQueryElement );
-			}
-		};
-
-		const timeoutId = setTimeout( tryQueryElement, 0 );
-		return () => clearTimeout( timeoutId );
+		if ( element ) {
+			setFallbackElement( element );
+		}
 	}, [ blockElement, clientId, fitText, hasFitTextSupport ] );
 
 	// Use whichever element is available
@@ -132,7 +133,8 @@ function useFitText( { fitText, name, clientId } ) {
 		}
 		// Get or create style element with unique ID
 		const styleId = `fit-text-${ clientId }`;
-		let styleElement = actualElement.ownerDocument.getElementById( styleId );
+		let styleElement =
+			actualElement.ownerDocument.getElementById( styleId );
 		if ( ! styleElement ) {
 			styleElement = actualElement.ownerDocument.createElement( 'style' );
 			styleElement.id = styleId;
