@@ -33,6 +33,8 @@ import { store as blockEditorStore } from '../store';
 
 const { Menu } = unlock( componentsPrivateApis );
 
+const EMPTY_OBJECT = {};
+
 /**
  * Get the normalized attribute type for block bindings.
  * Converts 'rich-text' to 'string' since rich-text is stored as string.
@@ -301,6 +303,11 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 		( select ) => {
 			const { __experimentalBlockBindingsSupportedAttributes } =
 				select( blockEditorStore ).getSettings();
+			const _bindableAttributes =
+				__experimentalBlockBindingsSupportedAttributes?.[ blockName ];
+			if ( ! _bindableAttributes || _bindableAttributes.length === 0 ) {
+				return EMPTY_OBJECT;
+			}
 
 			return {
 				sources: unlock(
@@ -309,10 +316,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 				canUpdateBlockBindings:
 					select( blockEditorStore ).getSettings()
 						.canUpdateBlockBindings,
-				bindableAttributes:
-					__experimentalBlockBindingsSupportedAttributes?.[
-						blockName
-					],
+				bindableAttributes: _bindableAttributes,
 			};
 		},
 		[ blockContext, blockName ]
