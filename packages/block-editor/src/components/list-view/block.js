@@ -127,16 +127,12 @@ function ListViewBlock( {
 		allowRightClickOverrides,
 		isBlockHidden,
 		hasSelectedChild,
-		isWithinEditedSection,
 	} = useSelect(
 		( select ) => {
 			const { getBlock, getBlockName, getSettings } =
 				select( blockEditorStore );
-			const {
-				isBlockHidden: _isBlockHidden,
-				hasSelectedInnerBlock,
-				isWithinEditedContentOnlySection,
-			} = unlock( select( blockEditorStore ) );
+			const { isBlockHidden: _isBlockHidden, hasSelectedInnerBlock } =
+				unlock( select( blockEditorStore ) );
 
 			return {
 				block: getBlock( clientId ),
@@ -148,8 +144,6 @@ function ListViewBlock( {
 					clientId,
 					true // deep check.
 				),
-				isWithinEditedSection:
-					isWithinEditedContentOnlySection( clientId ),
 			};
 		},
 		[ clientId ]
@@ -561,7 +555,6 @@ function ListViewBlock( {
 	const classes = clsx( {
 		'is-selected': isSelected,
 		'has-selected-child': hasSelectedChild,
-		'is-within-edited-section': isWithinEditedSection,
 		'is-first-selected': isFirstSelectedBlock,
 		'is-last-selected': isLastSelectedBlock,
 		'is-branch-selected': isBranchSelected,
