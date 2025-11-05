@@ -323,7 +323,9 @@ const BlockInspectorSingleBlock = ( {
 } ) => {
 	const hasMultipleTabs = availableTabs?.length > 1;
 	const hasParentChildBlockCards =
-		editedContentOnlySection && editedContentOnlySection !== clientId;
+		window?.__experimentalContentOnlyPatternInsertion &&
+		editedContentOnlySection &&
+		editedContentOnlySection !== clientId;
 	const parentBlockInformation = useBlockDisplayInformation(
 		editedContentOnlySection
 	);
@@ -333,18 +335,17 @@ const BlockInspectorSingleBlock = ( {
 
 	return (
 		<div className="block-editor-block-inspector">
-			{ window?.__experimentalContentOnlyPatternInsertion &&
-				hasParentChildBlockCards && (
-					<BlockCard
-						{ ...parentBlockInformation }
-						allowParentNavigation
-						parentClientId={ editedContentOnlySection }
-					/>
-				) }
+			{ hasParentChildBlockCards && (
+				<BlockCard
+					{ ...parentBlockInformation }
+					className={ parentBlockInformation.isSynced && 'is-synced' }
+					parentClientId={ editedContentOnlySection }
+				/>
+			) }
 			<BlockCard
 				{ ...blockInformation }
-				className={ isBlockSynced && 'is-synced' }
 				allowParentNavigation
+				className={ isBlockSynced && 'is-synced' }
 				isChild={ hasParentChildBlockCards }
 				clientId={ clientId }
 			/>
