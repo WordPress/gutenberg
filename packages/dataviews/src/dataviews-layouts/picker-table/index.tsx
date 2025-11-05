@@ -128,18 +128,16 @@ function TableRow< Item >( {
 			}
 			aria-posinset={ posinset }
 			role={ infiniteScrollEnabled ? 'article' : undefined }
-			onClick={ ( event ) => {
-				if ( event.target instanceof HTMLElement ) {
-					if ( isSelected ) {
-						onChangeSelection(
-							selection.filter( ( itemId ) => id !== itemId )
-						);
-					} else {
-						const newSelection = multiselect
-							? [ ...selection, id ]
-							: [ id ];
-						onChangeSelection( newSelection );
-					}
+			onClick={ () => {
+				if ( isSelected ) {
+					onChangeSelection(
+						selection.filter( ( itemId ) => id !== itemId )
+					);
+				} else {
+					const newSelection = multiselect
+						? [ ...selection, id ]
+						: [ id ];
+					onChangeSelection( newSelection );
 				}
 			} }
 		>
