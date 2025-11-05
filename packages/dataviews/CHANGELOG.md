@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+- DataForm: add new details layout. [#72355](https://github.com/WordPress/gutenberg/pull/72355)
 - DatViews list layout: remove link variant from primary actions's button. [#72920](https://github.com/WordPress/gutenberg/pull/72920)
 - DataForm: simplify form normalization. [#72848](https://github.com/WordPress/gutenberg/pull/72848)
 - DataViewsPicker: Add With Modal story. [#72913](https://github.com/WordPress/gutenberg/pull/72913)
