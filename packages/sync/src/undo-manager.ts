@@ -54,20 +54,72 @@ export function createUndoManager(): SyncUndoManager {
 		trackedOrigins: new Set( [ LOCAL_EDITOR_ORIGIN ] ),
 	} );
 
-	function updatePositionMeta( event: StackItemEvent ): void {
-		const currentPosition = selectionHistory.getCurrentPosition();
+	const logStacks = ( message: string ) => {
+		console.log( `--- [${ message }] logStacks():` );
 
-		if ( currentPosition === null ) {
-			// If we don't have a selection, then don't save anything extra
-			// to the stack.
-			return;
+		console.log( 'undoStack:' );
+
+		const undoStack = yUndoManager.undoStack[ 0 ]?.undoStack;
+
+		if ( undoStack ) {
+			for ( const item of undoStack ) {
+				const positionMeta = item.meta.get( 'position' );
+				const { position, backupPositions } = positionMeta;
+				console.log(
+					'position:',
+					position,
+					'backupPositions:',
+					backupPositions
+				);
+			}
+		} else {
+			console.log( '(none)' );
 		}
 
-		// Also store the last 5 positions as backup positions.
-		const backupPositions = selectionHistory.getPreviousPositions( 5 );
+		console.log( 'redoStack:' );
+
+		const redoStack = yUndoManager.redoStack[ 0 ]?.redoStack;
+
+		if ( redoStack ) {
+			for ( const item of redoStack ) {
+				const positionMeta = item.meta.get( 'position' );
+				const { position, backupPositions } = positionMeta;
+				console.log(
+					'position:',
+					position,
+					'backupPositions:',
+					backupPositions
+				);
+			}
+		} else {
+			console.log( '(none)' );
+		}
+
+		console.log( '---' );
+	};
+
+	// @ts-ignore
+	window.logStacks = logStacks;
+
+	function updatePositionMeta( event: StackItemEvent ): void {
+		// Prefer saving lastSelection with the undo stack, as it will most likely
+		// be where user started before making this change
+		let lastSelection =
+			selectionHistory.getLastSelection() ??
+			selectionHistory.getCurrentPosition();
+
+		const backupPositions = selectionHistory.getBlockHistory( 5 );
+
+		if ( lastSelection === null && backupPositions.length === 0 ) {
+			// If we don't have a last selection and no backup positions, then don't save anything extra
+			return;
+		} else if ( lastSelection === null ) {
+			// If lastSelection is null for some reason, use a backup position
+			lastSelection = backupPositions[ 0 ];
+		}
 
 		const positionMeta: PositionMeta = {
-			position: currentPosition,
+			position: lastSelection,
 			backupPositions,
 		};
 
@@ -147,12 +199,12 @@ export function createUndoManager(): SyncUndoManager {
 	}
 
 	yUndoManager.on( 'stack-item-added', ( event: StackItemEvent ) => {
+		console.log( 'stack-item-added' );
 		updatePositionMeta( event );
 	} );
 
-	yUndoManager.on( 'stack-item-updated', ( event: StackItemEvent ) => {
-		updatePositionMeta( event );
-	} );
+	// stack-item-updated not necessary - we already have the starting position
+	// for the undo operation stored in stack-item-added
 
 	yUndoManager.on( 'stack-item-popped', ( event: StackItemEvent ) => {
 		restorePosition( event );

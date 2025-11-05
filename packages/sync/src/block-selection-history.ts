@@ -19,16 +19,24 @@ import { findBlockByClientIdInDoc } from './utils';
  * This class is used to track recent block selections to help in restoring
  * a user's selection after an undo or redo operation.
  *
- * Tracks the last N unique block selections. When a user moves between blocks,
- * this class maintains a history of relative positions (or just clientIds for block selections)
- * for each unique block visited, keeping only the most recent selection per block.
+ * Maintains currentSelection and lastSelection for the current block, and a history
+ * array for previous blocks. These properties are useful for different things:
+ *
+ * - currentSelection: The most recent selection in the current block. This is updated
+ *                     before any undo stack operations are processed.
+ * - lastSelection: The last selection in the current block. This represents where
+ *                  the user started typing before the current character.
+ * - history: An array of previous blocks. Use this as a backup for restoration
+ *            locations.
  */
 export class BlockSelectionHistory {
 	private historySize: number;
 	private history: Position[] = [];
+	private currentSelection: Position | null = null;
+	private lastSelection: Position | null = null;
 	private ydoc: Y.Doc | null = null;
 
-	constructor( historySize: number = 5 ) {
+	constructor( historySize: number = 10 ) {
 		this.historySize = historySize;
 		this.history = [];
 	}
@@ -98,8 +106,8 @@ export class BlockSelectionHistory {
 
 	/**
 	 * Update the selection history with a new selection.
-	 * If the selection is in the same block as the most recent one, it updates that entry.
-	 * If it's in a new block, it adds a new entry to the history.
+	 * If the selection is in the same block as the current one, shift currentSelection to lastSelection.
+	 * If selection is in a new block, move currentSelection to history.
 	 * @param newSelection
 	 */
 	public updateSelection( newSelection: WPSelection ): void {
@@ -113,35 +121,55 @@ export class BlockSelectionHistory {
 		}
 
 		const newClientId = newSelection.selectionStart.clientId;
-		const currentPosition = this.getCurrentPosition();
-		const isNewBlock = currentPosition?.clientId !== newClientId;
+		const isNewBlock = this.currentSelection?.clientId !== newClientId;
 
 		if ( isNewBlock ) {
-			this.addToHistory( position );
+			// Remove the new block from history if it already exists (we're revisiting it)
+			this.history = this.history.filter(
+				( p ) => p.clientId !== newClientId
+			);
+
+			// Moving to a new block: push current selections to history
+			if ( this.currentSelection ) {
+				this.addToHistory( this.currentSelection );
+			}
+
+			// Reset for new block
+			this.lastSelection = null;
+			this.currentSelection = position;
 		} else {
-			this.updateMostRecent( position );
+			// Same block: shift current to last
+			this.lastSelection = this.currentSelection;
+			this.currentSelection = position;
 		}
 
 		console.log( '--- Selection history:' );
-		for ( const pos of this.history ) {
-			console.log( pos );
-		}
+		console.log( 'currentSelection:', this.currentSelection );
+		console.log( 'lastSelection:', this.lastSelection );
+		console.log( 'history:', this.history );
 		console.log( '---' );
 	}
 
 	/**
-	 * Get the most recent position (at the front of the history).
+	 * Get the current position (most recent selection in the current block).
 	 */
 	public getCurrentPosition(): Position | null {
-		return this.history.length > 0 ? this.history[ 0 ] : null;
+		return this.currentSelection;
 	}
 
 	/**
-	 * Get the last N positions from history, excluding the current one.
+	 * Get the last selection in the current block.
+	 */
+	public getLastSelection(): Position | null {
+		return this.lastSelection;
+	}
+
+	/**
+	 * Get the block history (previous blocks only, not current or last selection).
 	 * @param count Number of positions to retrieve
 	 */
-	public getPreviousPositions( count: number ): Position[] {
-		return this.history.slice( 1, count + 1 );
+	public getBlockHistory( count: number ): Position[] {
+		return this.history.slice( 0, count );
 	}
 
 	/**
@@ -161,18 +189,6 @@ export class BlockSelectionHistory {
 		// Trim to max size (remove oldest entries from the back)
 		if ( this.history.length > this.historySize ) {
 			this.history = this.history.slice( 0, this.historySize );
-		}
-	}
-
-	/**
-	 * Update the most recent position in the history.
-	 * @param position
-	 */
-	private updateMostRecent( position: Position ): void {
-		if ( this.history.length > 0 ) {
-			this.history[ 0 ] = position;
-		} else {
-			this.history.unshift( position );
 		}
 	}
 }

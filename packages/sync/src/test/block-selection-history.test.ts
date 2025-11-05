@@ -95,7 +95,8 @@ describe( 'BlockSelectionHistory', () => {
 	describe( 'initialization', () => {
 		test( 'should initialize with empty history', () => {
 			expect( history.getCurrentPosition() ).toBeNull();
-			expect( history.getPreviousPositions( 5 ) ).toEqual( [] );
+			expect( history.getLastSelection() ).toBeNull();
+			expect( history.getBlockHistory( 5 ) ).toEqual( [] );
 		} );
 	} );
 
@@ -145,8 +146,25 @@ describe( 'BlockSelectionHistory', () => {
 			const relativePosition = position as RelativePosition;
 			expect( relativePosition.offset ).toBe( 8 );
 
-			// Should still only have one position in history (updated, not added)
-			expect( history.getPreviousPositions( 5 ).length ).toBe( 0 );
+			// Should have no positions in block history (still in same block)
+			expect( history.getBlockHistory( 5 ).length ).toBe( 0 );
+		} );
+
+		test( 'should move current to last when selection changes within same block', () => {
+			const selection1 = createSelection( 'block-1', 'content', 5 );
+			history.updateSelection( selection1 );
+
+			const selection2 = createSelection( 'block-1', 'content', 8 );
+			history.updateSelection( selection2 );
+
+			const current = history.getCurrentPosition();
+			const last = history.getLastSelection();
+
+			expect( current?.clientId ).toBe( 'block-1' );
+			expect( ( current as RelativePosition ).offset ).toBe( 8 );
+
+			expect( last?.clientId ).toBe( 'block-1' );
+			expect( ( last as RelativePosition ).offset ).toBe( 5 );
 		} );
 
 		test( 'should add new position when moving to different block', () => {
@@ -157,10 +175,29 @@ describe( 'BlockSelectionHistory', () => {
 			history.updateSelection( selection2 );
 
 			const currentPosition = history.getCurrentPosition();
-			const lastPosition = history.getPreviousPositions( 1 )?.[ 0 ];
+			const blockHistory = history.getBlockHistory( 1 );
 
 			expect( currentPosition?.clientId ).toBe( 'block-2' );
-			expect( lastPosition?.clientId ).toBe( 'block-1' );
+			expect( blockHistory[ 0 ]?.clientId ).toBe( 'block-1' );
+		} );
+
+		test( 'should reset lastSelection when moving to different block', () => {
+			const selection1 = createSelection( 'block-1', 'content', 5 );
+			history.updateSelection( selection1 );
+
+			const selection2 = createSelection( 'block-1', 'content', 8 );
+			history.updateSelection( selection2 );
+
+			// lastSelection should exist now
+			expect( history.getLastSelection() ).not.toBeNull();
+
+			// Move to different block
+			const selection3 = createSelection( 'block-2', 'content', 3 );
+			history.updateSelection( selection3 );
+
+			// lastSelection should be reset
+			expect( history.getLastSelection() ).toBeNull();
+			expect( history.getCurrentPosition()?.clientId ).toBe( 'block-2' );
 		} );
 
 		test( 'should store offset 0 when offset is not provided', () => {
@@ -248,10 +285,10 @@ describe( 'BlockSelectionHistory', () => {
 			const currentPosition = history.getCurrentPosition();
 			expect( currentPosition?.clientId ).toBe( 'block-3' );
 
-			const lastPositions = history.getPreviousPositions( 5 );
-			expect( lastPositions.length ).toBe( 2 );
-			expect( lastPositions[ 0 ].clientId ).toBe( 'block-2' );
-			expect( lastPositions[ 1 ].clientId ).toBe( 'block-1' );
+			const blockHistory = history.getBlockHistory( 5 );
+			expect( blockHistory.length ).toBe( 2 );
+			expect( blockHistory[ 0 ].clientId ).toBe( 'block-2' );
+			expect( blockHistory[ 1 ].clientId ).toBe( 'block-1' );
 		} );
 
 		test( 'should respect history size limit', () => {
@@ -268,14 +305,15 @@ describe( 'BlockSelectionHistory', () => {
 				smallHistory.updateSelection( selection );
 			}
 
-			// Should only keep last 3
+			// Should only keep last 3 in block history
 			const currentPosition = smallHistory.getCurrentPosition();
-			const lastPositions = smallHistory.getPreviousPositions( 10 );
+			const blockHistory = smallHistory.getBlockHistory( 10 );
 
 			expect( currentPosition?.clientId ).toBe( 'block-5' );
-			expect( lastPositions.length ).toBe( 2 ); // Size is 3, so 2 in backup
-			expect( lastPositions[ 0 ].clientId ).toBe( 'block-4' );
-			expect( lastPositions[ 1 ].clientId ).toBe( 'block-3' );
+			expect( blockHistory.length ).toBe( 3 );
+			expect( blockHistory[ 0 ].clientId ).toBe( 'block-4' );
+			expect( blockHistory[ 1 ].clientId ).toBe( 'block-3' );
+			expect( blockHistory[ 2 ].clientId ).toBe( 'block-2' );
 		} );
 
 		test( 'should remove duplicate block from history when revisited', () => {
@@ -293,7 +331,7 @@ describe( 'BlockSelectionHistory', () => {
 			);
 
 			const currentPosition = history.getCurrentPosition();
-			const lastPositions = history.getPreviousPositions( 5 );
+			const blockHistory = history.getBlockHistory( 5 );
 
 			// block-1 should be current (most recent)
 			expect( currentPosition?.clientId ).toBe( 'block-1' );
@@ -304,14 +342,14 @@ describe( 'BlockSelectionHistory', () => {
 			const relativePosition = currentPosition as RelativePosition;
 			expect( relativePosition.offset ).toBe( 5 ); // Updated offset
 
-			// block-1 should not appear in backup positions
-			expect( lastPositions.length ).toBe( 2 );
-			expect( lastPositions[ 0 ].clientId ).toBe( 'block-3' );
-			expect( lastPositions[ 1 ].clientId ).toBe( 'block-2' );
+			// block-1 should not appear in block history
+			expect( blockHistory.length ).toBe( 2 );
+			expect( blockHistory[ 0 ].clientId ).toBe( 'block-3' );
+			expect( blockHistory[ 1 ].clientId ).toBe( 'block-2' );
 		} );
 	} );
 
-	describe( 'getPreviousPositions', () => {
+	describe( 'getBlockHistory', () => {
 		test( 'should return requested number of positions', () => {
 			const selections = [
 				createSelection( 'block-1', 'content', 1 ),
@@ -321,16 +359,16 @@ describe( 'BlockSelectionHistory', () => {
 
 			selections.forEach( ( sel ) => history.updateSelection( sel ) );
 
-			expect( history.getPreviousPositions( 1 ).length ).toBe( 1 );
-			expect( history.getPreviousPositions( 2 ).length ).toBe( 2 );
-			expect( history.getPreviousPositions( 10 ).length ).toBe( 2 ); // Only 2 backup positions available
+			expect( history.getBlockHistory( 1 ).length ).toBe( 1 );
+			expect( history.getBlockHistory( 2 ).length ).toBe( 2 );
+			expect( history.getBlockHistory( 10 ).length ).toBe( 2 ); // Only 2 backup positions available
 		} );
 
 		test( 'should return empty array when no backup positions exist', () => {
 			history.updateSelection(
 				createSelection( 'block-1', 'content', 1 )
 			);
-			expect( history.getPreviousPositions( 5 ) ).toEqual( [] );
+			expect( history.getBlockHistory( 5 ) ).toEqual( [] );
 		} );
 	} );
 
@@ -427,8 +465,8 @@ describe( 'BlockSelectionHistory', () => {
 
 			expect( relativePosition.offset ).toBe( 9 );
 
-			// Should still be only one position in history
-			expect( history.getPreviousPositions( 5 ).length ).toBe( 0 );
+			// Should still be no positions in block history
+			expect( history.getBlockHistory( 5 ).length ).toBe( 0 );
 		} );
 
 		test( 'should handle alternating between two blocks', () => {
@@ -446,13 +484,13 @@ describe( 'BlockSelectionHistory', () => {
 			);
 
 			const current = history.getCurrentPosition();
-			const last = history.getPreviousPositions( 1 )?.[ 0 ];
+			const blockHistory = history.getBlockHistory( 5 );
 
 			expect( current?.clientId ).toBe( 'block-2' );
-			expect( last?.clientId ).toBe( 'block-1' );
+			expect( blockHistory[ 0 ]?.clientId ).toBe( 'block-1' );
 
-			// Should only have these 2 blocks in history
-			expect( history.getPreviousPositions( 5 ).length ).toBe( 1 );
+			// Should only have 1 block in history (current block-2 is not in history)
+			expect( blockHistory.length ).toBe( 1 );
 		} );
 
 		test( 'should handle mixed block and relative selections', () => {
@@ -468,7 +506,7 @@ describe( 'BlockSelectionHistory', () => {
 
 			const positions = [
 				history.getCurrentPosition(),
-				...history.getPreviousPositions( 2 ),
+				...history.getBlockHistory( 2 ),
 			];
 
 			expect( positions[ 0 ]?.type ).toBe(
@@ -478,6 +516,63 @@ describe( 'BlockSelectionHistory', () => {
 			expect( positions[ 2 ]?.type ).toBe(
 				PositionType.RelativeSelection
 			);
+		} );
+	} );
+
+	describe( 'getLastSelection', () => {
+		test( 'should return null when only one selection exists', () => {
+			history.updateSelection(
+				createSelection( 'block-1', 'content', 5 )
+			);
+			expect( history.getLastSelection() ).toBeNull();
+		} );
+
+		test( 'should return previous selection in same block', () => {
+			history.updateSelection(
+				createSelection( 'block-1', 'content', 5 )
+			);
+			history.updateSelection(
+				createSelection( 'block-1', 'content', 8 )
+			);
+
+			const last = history.getLastSelection();
+			expect( last?.clientId ).toBe( 'block-1' );
+			expect( ( last as RelativePosition ).offset ).toBe( 5 );
+		} );
+
+		test( 'should track multiple selections in same block', () => {
+			history.updateSelection(
+				createSelection( 'block-1', 'content', 5 )
+			);
+			history.updateSelection(
+				createSelection( 'block-1', 'content', 8 )
+			);
+			history.updateSelection(
+				createSelection( 'block-1', 'content', 10 )
+			);
+
+			const current = history.getCurrentPosition();
+			const last = history.getLastSelection();
+
+			expect( ( current as RelativePosition ).offset ).toBe( 10 );
+			expect( ( last as RelativePosition ).offset ).toBe( 8 );
+		} );
+
+		test( 'should reset when moving to new block', () => {
+			history.updateSelection(
+				createSelection( 'block-1', 'content', 5 )
+			);
+			history.updateSelection(
+				createSelection( 'block-1', 'content', 8 )
+			);
+
+			expect( history.getLastSelection() ).not.toBeNull();
+
+			history.updateSelection(
+				createSelection( 'block-2', 'content', 3 )
+			);
+
+			expect( history.getLastSelection() ).toBeNull();
 		} );
 	} );
 } );
