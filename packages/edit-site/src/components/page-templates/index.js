@@ -76,7 +76,7 @@ export default function PageTemplates() {
 
 	const authors = useMemo( () => {
 		if ( ! records ) {
-			return EMPTY_ARRAY;
+			return [];
 		}
 		const authorsSet = new Set();
 		records.forEach( ( template ) => {
