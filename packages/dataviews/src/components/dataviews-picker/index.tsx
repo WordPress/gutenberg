@@ -63,6 +63,7 @@ type DataViewsPickerProps< Item > = {
 	};
 	itemListLabel?: string;
 	empty?: ReactNode;
+	paddingX?: string | number;
 } & ( Item extends ItemWithId
 	? { getItemId?: ( item: Item ) => string }
 	: { getItemId: ( item: Item ) => string } );
@@ -128,6 +129,7 @@ function DataViewsPicker< Item >( {
 	config = { perPageSizes: [ 10, 20, 50, 100 ] },
 	itemListLabel,
 	empty,
+	paddingX,
 }: DataViewsPickerProps< Item > ) {
 	const { infiniteScrollHandler } = paginationInfo;
 	const containerRef = useRef< HTMLDivElement | null >( null );
@@ -242,7 +244,20 @@ function DataViewsPicker< Item >( {
 				hasInfiniteScrollHandler: !! infiniteScrollHandler,
 			} }
 		>
-			<div className="dataviews-picker-wrapper" ref={ containerRef }>
+			<div
+				className="dataviews-picker-wrapper"
+				style={
+					paddingX !== undefined
+						? ( {
+								'--dataviews-padding-x':
+									typeof paddingX === 'number'
+										? `${ paddingX }px`
+										: paddingX,
+						  } as React.CSSProperties )
+						: undefined
+				}
+				ref={ containerRef }
+			>
 				{ children ?? (
 					<DefaultUI search={ search } searchLabel={ searchLabel } />
 				) }
