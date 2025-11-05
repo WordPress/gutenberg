@@ -202,6 +202,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	if ( isset( $block['attrs']['id'] ) ) {
 		$img_uploaded_src = wp_get_attachment_url( $block['attrs']['id'] );
 		$img_metadata     = wp_get_attachment_metadata( $block['attrs']['id'] );
+		$img_srcset       = wp_get_attachment_image_srcset( $block['attrs']['id'] );
 		$img_width        = $img_metadata['width'] ?? 'none';
 		$img_height       = $img_metadata['height'] ?? 'none';
 	}
@@ -220,6 +221,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 			'metadata' => array(
 				$unique_image_id => array(
 					'uploadedSrc'      => $img_uploaded_src,
+					'lightboxSrcset'   => $img_srcset,
 					'figureClassNames' => $figure_class_names,
 					'figureStyles'     => $figure_styles,
 					'imgClassNames'    => $img_class_names,
@@ -250,12 +252,20 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	// Image.
 	$processor->next_tag( 'img' );
 	$processor->set_attribute( 'data-wp-init', 'callbacks.setButtonStyles' );
-	$processor->set_attribute( 'data-wp-on-async--load', 'callbacks.setButtonStyles' );
-	$processor->set_attribute( 'data-wp-on-async-window--resize', 'callbacks.setButtonStyles' );
+	$processor->set_attribute( 'data-wp-on--load', 'callbacks.setButtonStyles' );
+	$processor->set_attribute( 'data-wp-on-window--resize', 'callbacks.setButtonStyles' );
+
+	// Set an event to preload the image on pointerenter and pointerdown(mobile).
+	// Pointerleave is used to cancel the preload if the user hovers away from the image
+	// before the predefined delay.
+	$processor->set_attribute( 'data-wp-on--pointerenter', 'actions.preloadImageWithDelay' );
+	$processor->set_attribute( 'data-wp-on--pointerdown', 'actions.preloadImage' );
+	$processor->set_attribute( 'data-wp-on--pointerleave', 'actions.cancelPreload' );
+
 	// Sets an event callback on the `img` because the `figure` element can also
 	// contain a caption, and we don't want to trigger the lightbox when the
 	// caption is clicked.
-	$processor->set_attribute( 'data-wp-on-async--click', 'actions.showLightbox' );
+	$processor->set_attribute( 'data-wp-on--click', 'actions.showLightbox' );
 	$processor->set_attribute( 'data-wp-class--hide', 'state.isContentHidden' );
 	$processor->set_attribute( 'data-wp-class--show', 'state.isContentVisible' );
 
@@ -273,7 +283,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 			aria-haspopup="dialog"
 			aria-label="' . esc_attr( $aria_label ) . '"
 			data-wp-init="callbacks.initTriggerButton"
-			data-wp-on-async--click="actions.showLightbox"
+			data-wp-on--click="actions.showLightbox"
 			data-wp-style--right="state.imageButtonRight"
 			data-wp-style--top="state.imageButtonTop"
 		>
@@ -324,12 +334,12 @@ function block_core_image_print_lightbox_overlay() {
 			data-wp-class--show-closing-animation="state.overlayOpened"
 			data-wp-watch="callbacks.setOverlayFocus"
 			data-wp-on--keydown="actions.handleKeydown"
-			data-wp-on-async--touchstart="actions.handleTouchStart"
+			data-wp-on--touchstart="actions.handleTouchStart"
 			data-wp-on--touchmove="actions.handleTouchMove"
-			data-wp-on-async--touchend="actions.handleTouchEnd"
-			data-wp-on-async--click="actions.hideLightbox"
-			data-wp-on-async-window--resize="callbacks.setOverlayStyles"
-			data-wp-on-async-window--scroll="actions.handleScroll"
+			data-wp-on--touchend="actions.handleTouchEnd"
+			data-wp-on--click="actions.hideLightbox"
+			data-wp-on-window--resize="callbacks.setOverlayStyles"
+			data-wp-on-window--scroll="actions.handleScroll"
 			data-wp-bind--style="state.overlayStyles"
 			tabindex="-1"
 			>
@@ -343,7 +353,14 @@ function block_core_image_print_lightbox_overlay() {
 				</div>
 				<div class="lightbox-image-container">
 					<figure data-wp-bind--class="state.currentImage.figureClassNames" data-wp-bind--style="state.figureStyles">
-						<img data-wp-bind--alt="state.currentImage.alt" data-wp-bind--class="state.currentImage.imgClassNames" data-wp-bind--style="state.imgStyles" data-wp-bind--src="state.enlargedSrc">
+						<img
+							data-wp-bind--alt="state.currentImage.alt"
+							data-wp-bind--class="state.currentImage.imgClassNames"
+							data-wp-bind--style="state.imgStyles"
+							data-wp-bind--src="state.enlargedSrc"
+							data-wp-bind--srcset="state.enlargedSrcset"
+							sizes="100vw"
+						>
 					</figure>
 				</div>
 				<div class="scrim" style="background-color: $background_color" aria-hidden="true"></div>

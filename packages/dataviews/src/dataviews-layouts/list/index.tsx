@@ -104,13 +104,12 @@ function PrimaryActionGridCell< Item >( {
 				id={ compositeItemId }
 				render={
 					<Button
-						label={ label }
 						disabled={ !! primaryAction.disabled }
 						accessibleWhenDisabled
-						icon={ primaryAction.icon }
-						isDestructive={ primaryAction.isDestructive }
+						text={ label }
 						size="small"
 						onClick={ () => setIsModalOpen( true ) }
+						variant="link"
 					/>
 				}
 			>
@@ -129,16 +128,16 @@ function PrimaryActionGridCell< Item >( {
 				id={ compositeItemId }
 				render={
 					<Button
-						label={ label }
 						disabled={ !! primaryAction.disabled }
 						accessibleWhenDisabled
-						icon={ primaryAction.icon }
-						isDestructive={ primaryAction.isDestructive }
 						size="small"
 						onClick={ () => {
 							primaryAction.callback( [ item ], { registry } );
 						} }
-					/>
+						variant="link"
+					>
+						{ label }
+					</Button>
 				}
 			/>
 		</div>
@@ -197,7 +196,7 @@ function ListItem< Item >( {
 			( action ) => ! action.isEligible || action.isEligible( item )
 		);
 		const _primaryActions = _eligibleActions.filter(
-			( action ) => action.isPrimary && !! action.icon
+			( action ) => action.isPrimary
 		);
 		return {
 			primaryAction: _primaryActions[ 0 ],

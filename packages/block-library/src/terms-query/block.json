@@ -1,7 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"__experimental": true,
 	"name": "core/terms-query",
 	"title": "Terms Query",
 	"category": "theme",
@@ -16,30 +15,25 @@
 				"taxonomy": "category",
 				"order": "asc",
 				"orderBy": "name",
+				"include": [],
 				"hideEmpty": true,
-				"parent": false,
-				"hierarchical": false
+				"showNested": false,
+				"inherit": false
 			}
-		},
-		"termsToShow": {
-			"type": "string",
-			"default": "all",
-			"enum": [ "all", "top-level", "subterms" ]
 		},
 		"tagName": {
 			"type": "string",
 			"default": "div"
 		}
 	},
+	"usesContext": [ "templateSlug" ],
 	"providesContext": {
-		"termQuery": "termQuery",
-		"termsToShow": "termsToShow"
+		"termQuery": "termQuery"
 	},
 	"supports": {
 		"align": [ "wide", "full" ],
 		"html": false,
+		"layout": true,
 		"interactivity": true
-	},
-	"allowedBlocks": [ "core/term-template" ],
-	"style": "wp-block-terms-query"
+	}
 }

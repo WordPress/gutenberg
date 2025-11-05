@@ -1160,18 +1160,6 @@ _Returns_
 
 -   `boolean`: True if multi-selecting, false if not.
 
-### isNavigationMode
-
-Returns whether the navigation mode is enabled.
-
-_Parameters_
-
--   _state_ `Object`: Editor state.
-
-_Returns_
-
--   `boolean`: Is navigation mode enabled.
-
 ### isSelectionEnabled
 
 Selector that returns if multi-selection is enabled or not.
@@ -1701,14 +1689,6 @@ _Parameters_
 
 -   _clientId_ `string`: The block's clientId.
 -   _hasControlledInnerBlocks_ `boolean`: True if the block's inner blocks are controlled.
-
-### setNavigationMode
-
-Action that enables or disables the navigation mode.
-
-_Parameters_
-
--   _isNavigationMode_ `boolean`: Enable/Disable navigation mode.
 
 ### setTemplateValidity
 

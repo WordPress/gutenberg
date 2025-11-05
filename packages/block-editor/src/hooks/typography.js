@@ -18,6 +18,7 @@ import { LINE_HEIGHT_SUPPORT_KEY } from './line-height';
 import { FONT_FAMILY_SUPPORT_KEY } from './font-family';
 import { FONT_SIZE_SUPPORT_KEY } from './font-size';
 import { TEXT_ALIGN_SUPPORT_KEY } from './text-align';
+import { FIT_TEXT_SUPPORT_KEY } from './fit-text';
 import { cleanEmptyObject } from './utils';
 import { store as blockEditorStore } from '../store';
 
@@ -47,6 +48,7 @@ export const TYPOGRAPHY_SUPPORT_KEYS = [
 	WRITING_MODE_SUPPORT_KEY,
 	TEXT_TRANSFORM_SUPPORT_KEY,
 	LETTER_SPACING_SUPPORT_KEY,
+	FIT_TEXT_SUPPORT_KEY,
 ];
 
 function styleToAttributes( style ) {
@@ -114,11 +116,13 @@ function TypographyInspectorControl( { children, resetAllFilter } ) {
 
 export function TypographyPanel( { clientId, name, setAttributes, settings } ) {
 	function selector( select ) {
-		const { style, fontFamily, fontSize } =
+		const { style, fontFamily, fontSize, fitText } =
 			select( blockEditorStore ).getBlockAttributes( clientId ) || {};
-		return { style, fontFamily, fontSize };
+		return { style, fontFamily, fontSize, fitText };
 	}
-	const { style, fontFamily, fontSize } = useSelect( selector, [ clientId ] );
+	const { style, fontFamily, fontSize, fitText } = useSelect( selector, [
+		clientId,
+	] );
 	const isEnabled = useHasTypographyPanel( settings );
 	const value = useMemo(
 		() => attributesToStyle( { style, fontFamily, fontSize } ),
@@ -126,7 +130,16 @@ export function TypographyPanel( { clientId, name, setAttributes, settings } ) {
 	);
 
 	const onChange = ( newStyle ) => {
-		setAttributes( styleToAttributes( newStyle ) );
+		const newAttributes = styleToAttributes( newStyle );
+
+		// If setting a font size and fitText is currently enabled, disable it
+		const hasFontSize =
+			newAttributes.fontSize || newAttributes.style?.typography?.fontSize;
+		if ( hasFontSize && fitText ) {
+			newAttributes.fitText = undefined;
+		}
+
+		setAttributes( newAttributes );
 	};
 
 	if ( ! isEnabled ) {

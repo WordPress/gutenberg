@@ -19,7 +19,6 @@ import {
 	getBlockName,
 	getTemplateLock,
 	getClientIdsWithDescendants,
-	isNavigationMode,
 	getBlockRootClientId,
 	getBlockAttributes,
 } from './selectors';
@@ -96,7 +95,7 @@ export const isBlockSubtreeDisabled = ( state, clientId ) => {
  * @param {string} rootClientId The client ID of the root container block.
  * @return {boolean} Whether the container allows insertion.
  */
-export function isContainerInsertableToInWriteMode(
+export function isContainerInsertableToInContentOnlyMode(
 	state,
 	blockName,
 	rootClientId
@@ -106,7 +105,7 @@ export function isContainerInsertableToInWriteMode(
 	const isContainerContentBlock = isContentBlock( rootBlockName );
 	const isRootBlockMain = getSectionRootClientId( state ) === rootClientId;
 
-	// In write mode, containers shouldn't be inserted into unless:
+	// In contentOnly mode, containers shouldn't be inserted into unless:
 	// 1. they are a section root;
 	// 2. they are a content block and the block to be inserted is also content.
 	return (
@@ -142,13 +141,11 @@ function getEnabledClientIdsTreeUnmemoized( state, rootClientId ) {
  *
  * @return {Object[]} Tree of block objects with only clientID and innerBlocks set.
  */
-export const getEnabledClientIdsTree = createRegistrySelector( ( select ) =>
+export const getEnabledClientIdsTree = createRegistrySelector( () =>
 	createSelector( getEnabledClientIdsTreeUnmemoized, ( state ) => [
 		state.blocks.order,
 		state.derivedBlockEditingModes,
-		state.derivedNavModeBlockEditingModes,
 		state.blockEditingModes,
-		select( STORE_NAME ).__unstableGetEditorMode( state ),
 	] )
 );
 
@@ -491,7 +488,7 @@ export const getContentLockingParent = ( state, clientId ) => {
  * @param {Object} state    Global application state.
  * @param {string} clientId Client Id of the block.
  *
- * @return {?string} Client ID of the ancestor block that is content locking the block.
+ * @return {?string} Client ID of the ancestor block that is a contentOnly section.
  */
 export const getParentSectionBlock = ( state, clientId ) => {
 	let current = clientId;
@@ -505,12 +502,12 @@ export const getParentSectionBlock = ( state, clientId ) => {
 };
 
 /**
- * Retrieves the client ID is a content locking parent
+ * Returns whether the block is a contentOnly section.
  *
  * @param {Object} state    Global application state.
  * @param {string} clientId Client Id of the block.
  *
- * @return {boolean} Whether the block is a content locking parent.
+ * @return {boolean} Whether the block is a contentOnly section.
  */
 export function isSectionBlock( state, clientId ) {
 	const blockName = getBlockName( state, clientId );
@@ -529,40 +526,19 @@ export function isSectionBlock( state, clientId ) {
 	) {
 		return true;
 	}
-
-	// Template parts become sections in navigation mode.
-	const _isNavigationMode = isNavigationMode( state );
-	if ( _isNavigationMode && isTemplatePart ) {
-		return true;
-	}
-
-	const sectionRootClientId = getSectionRootClientId( state );
-	const sectionClientIds = getBlockOrder( state, sectionRootClientId );
-	return _isNavigationMode && sectionClientIds.includes( clientId );
+	return false;
 }
 
 /**
- * Retrieves the client ID of the block that is content locked but is
- * currently being temporarily edited as a non-locked block.
+ * Retrieves the client ID of the block that is a contentOnly section but is
+ * currently being temporarily edited (contentOnly is deactivated).
  *
  * @param {Object} state Global application state.
  *
- * @return {?string} The client ID of the block being temporarily edited as a non-locked block.
+ * @return {?string} The client ID of the block being temporarily edited.
  */
-export function getTemporarilyEditingAsBlocks( state ) {
-	return state.temporarilyEditingAsBlocks;
-}
-
-/**
- * Returns the focus mode that should be reapplied when the user stops editing
- * a content locked blocks as a block without locking.
- *
- * @param {Object} state Global application state.
- *
- * @return {?string} The focus mode that should be re-set when temporarily editing as blocks stops.
- */
-export function getTemporarilyEditingFocusModeToRevert( state ) {
-	return state.temporarilyEditingFocusModeRevert;
+export function getEditedContentOnlySection( state ) {
+	return state.editedContentOnlySection;
 }
 
 /**
@@ -705,3 +681,17 @@ export const isBlockHidden = ( state, clientId ) => {
 	const attributes = state.blocks.attributes.get( clientId );
 	return attributes?.metadata?.blockVisibility === false;
 };
+
+/**
+ * Returns true if there is a spotlighted block.
+ *
+ * The spotlight is also active when a contentOnly section is being edited, the selector
+ * also returns true if this is the case.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the block is currently spotlighted.
+ */
+export function hasBlockSpotlight( state ) {
+	return !! state.hasBlockSpotlight || !! state.editedContentOnlySection;
+}

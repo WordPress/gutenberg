@@ -52,29 +52,15 @@ export function useAllowSwitchingTemplates() {
 }
 
 function useTemplates( postType ) {
-	// To do: create a new selector to checks if templates exist at all instead
-	// of and unbound request. In the modal, the user templates should be
-	// paginated and we should not make an unbound request.
-	const { staticTemplates, templates } = useSelect(
-		( select ) => {
-			return {
-				staticTemplates: select( coreStore ).getEntityRecords(
-					'postType',
-					'wp_registered_template',
-					{ per_page: -1, post_type: postType }
-				),
-				templates: select( coreStore ).getEntityRecords(
-					'postType',
-					'wp_template',
-					{ per_page: -1, post_type: postType }
-				),
-			};
-		},
+	return useSelect(
+		( select ) =>
+			select( coreStore ).getEntityRecords( 'postType', 'wp_template', {
+				per_page: -1,
+				post_type: postType,
+				// We look at the combined templates for now (old endpoint)
+				// because posts only accept slugs for templates, not IDs.
+			} ),
 		[ postType ]
-	);
-	return useMemo(
-		() => [ ...( staticTemplates || [] ), ...( templates || [] ) ],
-		[ staticTemplates, templates ]
 	);
 }
 

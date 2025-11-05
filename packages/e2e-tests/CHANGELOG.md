@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+- Removed test configurations from the package, as this package is now deprecated in favor of Playwright end-to-end tests residing at the root of the Gutenberg project.
+
+## 8.34.0 (2025-10-29)
+
+## 8.33.0 (2025-10-17)
+
 ## 8.32.0 (2025-10-01)
 
 ## 8.31.0 (2025-09-17)

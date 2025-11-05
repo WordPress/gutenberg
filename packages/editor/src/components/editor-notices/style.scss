@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 // Dismissible & non-dismissible notices.
 .components-editor-notices__dismissible,
 .components-editor-notices__pinned {

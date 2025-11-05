@@ -151,7 +151,12 @@ export type FieldTypeDefinition< Item > = {
 export type Rules< Item > = {
 	required?: boolean;
 	elements?: boolean;
-	custom?: ( item: Item, field: NormalizedField< Item > ) => null | string;
+	custom?:
+		| ( ( item: Item, field: NormalizedField< Item > ) => null | string )
+		| ( (
+				item: Item,
+				field: NormalizedField< Item >
+		  ) => Promise< null | string > );
 };
 
 /**
@@ -277,6 +282,11 @@ export type Field< Item > = {
 	elements?: Option[];
 
 	/**
+	 * Retrieval function for elements.
+	 */
+	getElements?: () => Promise< Option[] >;
+
+	/**
 	 * Filter config for the field.
 	 */
 	filterBy?: FilterByConfig | false;
@@ -307,6 +317,7 @@ export type NormalizedField< Item > = Omit< Field< Item >, 'Edit' > & {
 	setValue: ( args: { item: Item; value: any } ) => DeepPartial< Item >;
 	render: ComponentType< DataViewRenderFieldProps< Item > >;
 	Edit: ComponentType< DataFormControlProps< Item > > | null;
+	hasElements: boolean;
 	sort: ( a: Item, b: Item, direction: SortDirection ) => number;
 	isValid: Rules< Item >;
 	enableHiding: boolean;
@@ -320,6 +331,22 @@ export type NormalizedField< Item > = Omit< Field< Item >, 'Edit' > & {
  */
 export type Fields< Item > = Field< Item >[];
 
+export type FieldValidity = {
+	required?: {
+		type: 'valid' | 'invalid' | 'validating';
+		message?: string;
+	};
+	elements?: {
+		type: 'valid' | 'invalid' | 'validating';
+		message: string;
+	};
+	custom?: {
+		type: 'valid' | 'invalid' | 'validating';
+		message: string;
+	};
+	children?: Record< string, FieldValidity >;
+};
+
 export type DataFormControlProps< Item > = {
 	data: Item;
 	field: NormalizedField< Item >;
@@ -331,6 +358,10 @@ export type DataFormControlProps< Item > = {
 	 * Used by DataViews filters to determine which control to render based on the operator type.
 	 */
 	operator?: Operator;
+	/**
+	 * Validity information for the field, if any.
+	 */
+	validity?: FieldValidity;
 	/**
 	 * Configuration object for the control.
 	 */

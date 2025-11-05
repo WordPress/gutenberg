@@ -97,7 +97,7 @@ const LABEL_TYPE_MAPPING = {
  */
 const LABEL_FEATURE_MAPPING = {
 	'[Feature] Real-time Collaboration': 'Collaboration',
-	'[Feature] Block Commenting': 'Collaboration',
+	'[Feature] Notes': 'Collaboration',
 	'[Feature] Widgets Screen': 'Widgets Editor',
 	'[Feature] Widgets Customizer': 'Widgets Editor',
 	'[Feature] Design Tools': 'Design Tools',

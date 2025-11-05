@@ -240,11 +240,13 @@ export const getTemplateId = createRegistrySelector(
 		// First see if the post/page has an assigned template and fetch it.
 		const currentTemplateSlug = editedEntity.template;
 		if ( currentTemplateSlug ) {
-			const currentTemplate = select( STORE_NAME ).getDefaultTemplateId( {
-				slug: currentTemplateSlug,
-			} );
+			const currentTemplate = select( STORE_NAME )
+				.getEntityRecords( 'postType', 'wp_template', {
+					per_page: -1,
+				} )
+				?.find( ( { slug } ) => slug === currentTemplateSlug );
 			if ( currentTemplate ) {
-				return currentTemplate;
+				return currentTemplate.id;
 			}
 		}
 		// If no template is assigned, use the default template.
@@ -266,10 +268,3 @@ export const getTemplateId = createRegistrySelector(
 		} );
 	}
 );
-
-export function getTemplateAutoDraftId(
-	state: State,
-	staticTemplateId: string
-) {
-	return state.templateAutoDraftId[ staticTemplateId ];
-}

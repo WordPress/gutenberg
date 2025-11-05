@@ -14,6 +14,8 @@ const developmentFiles = [
 	'**/@(__mocks__|__tests__|test)/**/*.[tj]s?(x)',
 	'**/@(storybook|stories)/**/*.[tj]s?(x)',
 	'packages/babel-preset-default/bin/**/*.js',
+	'packages/theme/bin/**/*.[tj]s?(x)',
+	'packages/theme/terrazzo.config.ts',
 ];
 
 // All files from packages that have types provided with TypeScript.
@@ -74,7 +76,7 @@ const restrictedSyntax = [
 	// here. That's why we use \\u002F in the regexes below.
 	{
 		selector:
-			'ImportDeclaration[source.value=/^@wordpress\\u002F.+\\u002F/]',
+			'ImportDeclaration[source.value=/^@wordpress\\u002F.+\\u002F/]:not([source.value=/^@wordpress\\u002F.+\\u002Fbuild-types\\u002F/])',
 		message: 'Path access on WordPress dependencies is not allowed.',
 	},
 	{
@@ -90,17 +92,7 @@ const restrictedSyntax = [
 	},
 	{
 		selector: 'JSXAttribute[name.name="id"][value.type="Literal"]',
-		message:
-			'Do not use string literals for IDs; use withInstanceId instead.',
-	},
-	{
-		// Discourage the usage of `Math.random()` as it's a code smell
-		// for UUID generation, for which we already have a higher-order
-		// component: `withInstanceId`.
-		selector:
-			'CallExpression[callee.object.name="Math"][callee.property.name="random"]',
-		message:
-			'Do not use Math.random() to generate unique IDs; use withInstanceId instead. (If you’re not generating unique IDs: ignore this message.)',
+		message: 'Do not use string literals for IDs; use useId hook instead.',
 	},
 	{
 		selector:
@@ -176,6 +168,7 @@ module.exports = {
 		],
 		'@wordpress/no-unsafe-wp-apis': 'off',
 		'@wordpress/data-no-store-string-literals': 'error',
+		'eslint-comments/no-unused-disable': 'error',
 		'import/default': 'error',
 		'import/named': 'error',
 		'no-restricted-imports': [
@@ -430,7 +423,12 @@ module.exports = {
 			},
 		},
 		{
-			files: [ 'bin/**/*.js', 'bin/**/*.mjs', 'packages/env/**' ],
+			files: [
+				'bin/**/*.js',
+				'bin/**/*.mjs',
+				'packages/env/**',
+				'packages/theme/bin/**/*.[tj]s?(x)',
+			],
 			rules: {
 				'no-console': 'off',
 			},

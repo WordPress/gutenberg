@@ -4,7 +4,7 @@
 	"name": "core/accordion-heading",
 	"title": "Accordion Heading",
 	"category": "design",
-	"description": "Displays an accordion heading.",
+	"description": "Displays a heading that toggles the accordion panel.",
 	"parent": [ "core/accordion-item" ],
 	"usesContext": [
 		"core/accordion-icon-position",
@@ -40,6 +40,10 @@
 			}
 		},
 		"typography": {
+			"__experimentalSkipSerialization": [
+				"textDecoration",
+				"letterSpacing"
+			],
 			"fontSize": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
@@ -53,7 +57,14 @@
 			}
 		},
 		"shadow": true,
-		"blockVisibility": false
+		"blockVisibility": false,
+		"lock": false
+	},
+	"selectors": {
+		"typography": {
+			"letterSpacing": ".wp-block-accordion-heading .wp-block-accordion-heading__toggle-title",
+			"textDecoration": ".wp-block-accordion-heading .wp-block-accordion-heading__toggle-title"
+		}
 	},
 	"attributes": {
 		"openByDefault": {

@@ -15,6 +15,7 @@ import apiFetch from '@wordpress/api-fetch';
  */
 import { STORE_NAME } from './name';
 import { additionalEntityConfigLoaders, DEFAULT_ENTITY_KEY } from './entities';
+import { getSyncManager } from './sync';
 import {
 	forwardResolver,
 	getNormalizedCommaSeparable,
@@ -23,7 +24,6 @@ import {
 	ALLOWED_RESOURCE_ACTIONS,
 	RECEIVE_INTERMEDIATE_RESULTS,
 } from './utils';
-import { getSyncProvider } from './sync';
 import { fetchBlockPatterns } from './fetch';
 
 /**
@@ -66,18 +66,6 @@ export const getCurrentUser =
 export const getEntityRecord =
 	( kind, name, key = '', query ) =>
 	async ( { select, dispatch, registry, resolveSelect } ) => {
-		// For back-compat, we allow querying for static templates through
-		// wp_template.
-		if (
-			kind === 'postType' &&
-			name === 'wp_template' &&
-			typeof key === 'string' &&
-			// __experimentalGetDirtyEntityRecords always calls getEntityRecord
-			// with a string key, so we need that it's not a numeric ID.
-			! /^\d+$/.test( key )
-		) {
-			name = 'wp_registered_template';
-		}
 		const configs = await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
@@ -93,150 +81,180 @@ export const getEntityRecord =
 		);
 
 		try {
-			// Entity supports configs,
-			// use the sync algorithm instead of the old fetch behavior.
+			if ( query !== undefined && query._fields ) {
+				// If requesting specific fields, items and query association to said
+				// records are stored by ID reference. Thus, fields must always include
+				// the ID.
+				query = {
+					...query,
+					_fields: [
+						...new Set( [
+							...( getNormalizedCommaSeparable( query._fields ) ||
+								[] ),
+							entityConfig.key || DEFAULT_ENTITY_KEY,
+						] ),
+					].join(),
+				};
+			}
+
+			if ( query !== undefined && query._fields ) {
+				// The resolution cache won't consider query as reusable based on the
+				// fields, so it's tested here, prior to initiating the REST request,
+				// and without causing `getEntityRecord` resolution to occur.
+				const hasRecord = select.hasEntityRecord(
+					kind,
+					name,
+					key,
+					query
+				);
+				if ( hasRecord ) {
+					return;
+				}
+			}
+
+			let { baseURL } = entityConfig;
+
+			// For "string" IDs, use the old templates endpoint.
+			if (
+				kind === 'postType' &&
+				name === 'wp_template' &&
+				key &&
+				typeof key === 'string' &&
+				! /^\d+$/.test( key )
+			) {
+				baseURL =
+					baseURL.slice( 0, baseURL.lastIndexOf( '/' ) ) +
+					'/templates';
+			}
+
+			const path = addQueryArgs( baseURL + ( key ? '/' + key : '' ), {
+				...entityConfig.baseURLParams,
+				...query,
+			} );
+			const response = await apiFetch( { path, parse: false } );
+			const record = await response.json();
+			const permissions = getUserPermissionsFromAllowHeader(
+				response.headers?.get( 'allow' )
+			);
+
+			const canUserResolutionsArgs = [];
+			const receiveUserPermissionArgs = {};
+			for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
+				receiveUserPermissionArgs[
+					getUserPermissionCacheKey( action, {
+						kind,
+						name,
+						id: key,
+					} )
+				] = permissions[ action ];
+
+				canUserResolutionsArgs.push( [
+					action,
+					{ kind, name, id: key },
+				] );
+			}
+
+			// Entity supports syncing.
 			if (
 				window.__experimentalEnableSync &&
 				entityConfig.syncConfig &&
 				! query
 			) {
 				if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-					const objectId = entityConfig.getSyncObjectId( key );
+					const objectType = `${ kind }/${ name }`;
+					const objectId = key;
 
-					// Loads the persisted document.
-					await getSyncProvider().bootstrap(
-						entityConfig.syncObjectType,
+					// Use the new transient "read/write" config to compute transients for
+					// the sync manager. Otherwise these transients are not available
+					// if / until the record is edited. Use a copy of the record so that
+					// it does not change the behavior outside this experimental flag.
+					const recordWithTransients = { ...record };
+					Object.entries( entityConfig.transientEdits ?? {} )
+						.filter(
+							( [ propName, transientConfig ] ) =>
+								undefined ===
+									recordWithTransients[ propName ] &&
+								transientConfig &&
+								'object' === typeof transientConfig &&
+								'read' in transientConfig &&
+								'function' === typeof transientConfig.read
+						)
+						.forEach( ( [ propName, transientConfig ] ) => {
+							recordWithTransients[ propName ] =
+								transientConfig.read( recordWithTransients );
+						} );
+
+					// Load the entity record for syncing.
+					await getSyncManager()?.load(
+						entityConfig.syncConfig,
+						objectType,
 						objectId,
-						( record ) => {
-							dispatch.receiveEntityRecords(
-								kind,
-								name,
-								record,
-								query
-							);
+						recordWithTransients,
+						{
+							// Handle edits sourced from the sync manager.
+							editRecord: ( edits ) => {
+								if ( ! Object.keys( edits ).length ) {
+									return;
+								}
+
+								dispatch( {
+									type: 'EDIT_ENTITY_RECORD',
+									kind,
+									name,
+									recordId: key,
+									edits,
+									meta: {
+										undo: undefined,
+									},
+								} );
+							},
+							// Get the current entity record (with edits)
+							getEditedRecord: async () =>
+								await resolveSelect.getEditedEntityRecord(
+									kind,
+									name,
+									key
+								),
+							// Save the current entity record's unsaved edits.
+							saveRecord: () => {
+								dispatch.saveEditedEntityRecord(
+									kind,
+									name,
+									key
+								);
+							},
 						}
 					);
-
-					// Bootstraps the edited document as well (and load from peers).
-					await getSyncProvider().bootstrap(
-						entityConfig.syncObjectType + '--edit',
-						objectId,
-						( record ) => {
-							dispatch( {
-								type: 'EDIT_ENTITY_RECORD',
-								kind,
-								name,
-								recordId: key,
-								edits: record,
-								meta: {
-									undo: undefined,
-								},
-							} );
-						}
-					);
 				}
-			} else {
-				if ( query !== undefined && query._fields ) {
-					// If requesting specific fields, items and query association to said
-					// records are stored by ID reference. Thus, fields must always include
-					// the ID.
-					query = {
-						...query,
-						_fields: [
-							...new Set( [
-								...( getNormalizedCommaSeparable(
-									query._fields
-								) || [] ),
-								entityConfig.key || DEFAULT_ENTITY_KEY,
-							] ),
-						].join(),
-					};
-				}
-
-				if ( query !== undefined && query._fields ) {
-					// The resolution cache won't consider query as reusable based on the
-					// fields, so it's tested here, prior to initiating the REST request,
-					// and without causing `getEntityRecord` resolution to occur.
-					const hasRecord = select.hasEntityRecord(
-						kind,
-						name,
-						key,
-						query
-					);
-					if ( hasRecord ) {
-						return;
-					}
-				}
-
-				const path = addQueryArgs(
-					entityConfig.baseURL + ( key ? '/' + key : '' ),
-					{
-						...entityConfig.baseURLParams,
-						...query,
-					}
-				);
-				const response = await apiFetch( { path, parse: false } );
-				const record = await response.json();
-				const permissions = getUserPermissionsFromAllowHeader(
-					response.headers?.get( 'allow' )
-				);
-
-				const canUserResolutionsArgs = [];
-				const receiveUserPermissionArgs = {};
-				for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
-					receiveUserPermissionArgs[
-						getUserPermissionCacheKey( action, {
-							kind,
-							name,
-							id: key,
-						} )
-					] = permissions[ action ];
-
-					canUserResolutionsArgs.push( [
-						action,
-						{ kind, name, id: key },
-					] );
-				}
-
-				registry.batch( () => {
-					dispatch.receiveEntityRecords( kind, name, record, query );
-					dispatch.receiveUserPermissions(
-						receiveUserPermissionArgs
-					);
-					dispatch.finishResolutions(
-						'canUser',
-						canUserResolutionsArgs
-					);
-				} );
 			}
+
+			registry.batch( () => {
+				dispatch.receiveEntityRecords( kind, name, record, query );
+				dispatch.receiveUserPermissions( receiveUserPermissionArgs );
+				dispatch.finishResolutions( 'canUser', canUserResolutionsArgs );
+			} );
 		} finally {
 			dispatch.__unstableReleaseStoreLock( lock );
 		}
 	};
 
-export const getTemplateAutoDraftId =
-	( staticTemplateId ) =>
-	async ( { resolveSelect, dispatch } ) => {
-		const record = await resolveSelect.getEntityRecord(
-			'postType',
-			'wp_registered_template',
-			staticTemplateId
-		);
-		const autoDraft = await dispatch.saveEntityRecord(
-			'postType',
-			'wp_template',
-			{
-				...record,
-				id: undefined,
-				type: 'wp_template',
-				status: 'auto-draft',
-			}
-		);
-		await dispatch.receiveTemplateAutoDraftId(
-			staticTemplateId,
-			autoDraft.id
-		);
-	};
+// Whenever a template is saved, the active templates might be updated, so
+// invalidate the site settings when a template is updated or deleted.
+getEntityRecord.shouldInvalidate = ( action, kind, name ) => {
+	return (
+		kind === 'root' &&
+		name === 'site' &&
+		( ( action.type === 'RECEIVE_ITEMS' &&
+			// Making sure persistedEdits is set seems to be the only way of
+			// knowing whether it's an update or fetch. Only an update would
+			// have persistedEdits.
+			action.persistedEdits &&
+			action.persistedEdits.status !== 'auto-draft' ) ||
+			action.type === 'REMOVE_ITEMS' ) &&
+		action.kind === 'postType' &&
+		action.name === 'wp_template'
+	);
+};
 
 /**
  * Requests an entity's record from the REST API.
@@ -313,7 +331,26 @@ export const getEntityRecords =
 				};
 			}
 
-			const path = addQueryArgs( entityConfig.baseURL, {
+			let { baseURL } = entityConfig;
+			// `combinedTemplates` means that we fetch templates from the "old"
+			// /templates endpoint, which combines active user templates with
+			// the registered templates and rewrites IDs in the form of
+			// `theme-slug/template-slug`. When turned off, we only fetch
+			// database templates (posts). To fetch registered templates without
+			// edits applied, use the `registeredTemplate` entity.
+			const { combinedTemplates = true } = query;
+
+			if (
+				kind === 'postType' &&
+				name === 'wp_template' &&
+				combinedTemplates
+			) {
+				baseURL =
+					baseURL.slice( 0, baseURL.lastIndexOf( '/' ) ) +
+					'/templates';
+			}
+
+			const path = addQueryArgs( baseURL, {
 				...entityConfig.baseURLParams,
 				...query,
 			} );
@@ -870,10 +907,6 @@ export const getDefaultTemplateId =
 		// Endpoint may return an empty object if no template is found.
 		if ( id ) {
 			template.id = id;
-			template.type =
-				typeof id === 'string'
-					? 'wp_registered_template'
-					: 'wp_template';
 			registry.batch( () => {
 				dispatch.receiveDefaultTemplateId( query, id );
 				dispatch.receiveEntityRecords( 'postType', template.type, [
@@ -891,7 +924,7 @@ export const getDefaultTemplateId =
 
 getDefaultTemplateId.shouldInvalidate = ( action ) => {
 	return (
-		action.type === 'EDIT_ENTITY_RECORD' &&
+		action.type === 'RECEIVE_ITEMS' &&
 		action.kind === 'root' &&
 		action.name === 'site'
 	);

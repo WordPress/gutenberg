@@ -1,0 +1,201 @@
+{
+	"elevation": {
+		"$type": "shadow",
+		"x-small": {
+			"$value": [
+				{
+					"color": {
+						"colorSpace": "srgb",
+						"components": [ 0, 0, 0 ],
+						"alpha": 0.03
+					},
+					"offsetX": { "value": 0, "unit": "px" },
+					"offsetY": { "value": 1, "unit": "px" },
+					"blur": { "value": 1, "unit": "px" },
+					"spread": { "value": 0, "unit": "px" }
+				},
+				{
+					"color": {
+						"colorSpace": "srgb",
+						"components": [ 0, 0, 0 ],
+						"alpha": 0.02
+					},
+					"offsetX": { "value": 0, "unit": "px" },
+					"offsetY": { "value": 1, "unit": "px" },
+					"blur": { "value": 2, "unit": "px" },
+					"spread": { "value": 0, "unit": "px" }
+				},
+				{
+					"color": {
+						"colorSpace": "srgb",
+						"components": [ 0, 0, 0 ],
+						"alpha": 0.02
+					},
+					"offsetX": { "value": 0, "unit": "px" },
+					"offsetY": { "value": 3, "unit": "px" },
+					"blur": { "value": 3, "unit": "px" },
+					"spread": { "value": 0, "unit": "px" }
+				},
+				{
+					"color": {
+						"colorSpace": "srgb",
+						"components": [ 0, 0, 0 ],
+						"alpha": 0.01
+					},
+					"offsetX": { "value": 0, "unit": "px" },
+					"offsetY": { "value": 4, "unit": "px" },
+					"blur": { "value": 4, "unit": "px" },
+					"spread": { "value": 0, "unit": "px" }
+				}
+			],
+			"$description": "For sections and containers that group related content and controls, which may overlap other content. Example: Preview Frame."
+		},
+		"small": {
+			"$value": [
+				{
+					"color": {
+						"colorSpace": "srgb",
+						"components": [ 0, 0, 0 ],
+						"alpha": 0.05
+					},
+					"offsetX": { "value": 0, "unit": "px" },
+					"offsetY": { "value": 1, "unit": "px" },
+					"blur": { "value": 2, "unit": "px" },
+					"spread": { "value": 0, "unit": "px" }
+				},
+				{
+					"color": {
+						"colorSpace": "srgb",
+						"components": [ 0, 0, 0 ],
+						"alpha": 0.04
+					},
+					"offsetX": { "value": 0, "unit": "px" },
+					"offsetY": { "value": 2, "unit": "px" },
+					"blur": { "value": 3, "unit": "px" },
+					"spread": { "value": 0, "unit": "px" }
+				},
+				{
+					"color": {
+						"colorSpace": "srgb",
+						"components": [ 0, 0, 0 ],
+						"alpha": 0.03
+					},
+					"offsetX": { "value": 0, "unit": "px" },
+					"offsetY": { "value": 6, "unit": "px" },
+					"blur": { "value": 6, "unit": "px" },
+					"spread": { "value": 0, "unit": "px" }
+				},
+				{
+					"color": {
+						"colorSpace": "srgb",
+						"components": [ 0, 0, 0 ],
+						"alpha": 0.02
+					},
+					"offsetX": { "value": 0, "unit": "px" },
+					"offsetY": { "value": 8, "unit": "px" },
+					"blur": { "value": 8, "unit": "px" },
+					"spread": { "value": 0, "unit": "px" }
+				}
+			],
+			"$description": "For components that provide contextual feedback without being intrusive. Generally non-interruptive. Example: Tooltips, Snackbar."
+		},
+		"medium": {
+			"$value": [
+				{
+					"color": {
+						"colorSpace": "srgb",
+						"components": [ 0, 0, 0 ],
+						"alpha": 0.05
+					},
+					"offsetX": { "value": 0, "unit": "px" },
+					"offsetY": { "value": 2, "unit": "px" },
+					"blur": { "value": 3, "unit": "px" },
+					"spread": { "value": 0, "unit": "px" }
+				},
+				{
+					"color": {
+						"colorSpace": "srgb",
+						"components": [ 0, 0, 0 ],
+						"alpha": 0.04
+					},
+					"offsetX": { "value": 0, "unit": "px" },
+					"offsetY": { "value": 4, "unit": "px" },
+					"blur": { "value": 5, "unit": "px" },
+					"spread": { "value": 0, "unit": "px" }
+				},
+				{
+					"color": {
+						"colorSpace": "srgb",
+						"components": [ 0, 0, 0 ],
+						"alpha": 0.03
+					},
+					"offsetX": { "value": 0, "unit": "px" },
+					"offsetY": { "value": 12, "unit": "px" },
+					"blur": { "value": 12, "unit": "px" },
+					"spread": { "value": 0, "unit": "px" }
+				},
+				{
+					"color": {
+						"colorSpace": "srgb",
+						"components": [ 0, 0, 0 ],
+						"alpha": 0.02
+					},
+					"offsetX": { "value": 0, "unit": "px" },
+					"offsetY": { "value": 16, "unit": "px" },
+					"blur": { "value": 16, "unit": "px" },
+					"spread": { "value": 0, "unit": "px" }
+				}
+			],
+			"$description": "For components that offer additional actions. Example: Menus, Command Palette"
+		},
+		"large": {
+			"$value": [
+				{
+					"color": {
+						"colorSpace": "srgb",
+						"components": [ 0, 0, 0 ],
+						"alpha": 0.08
+					},
+					"offsetX": { "value": 0, "unit": "px" },
+					"offsetY": { "value": 5, "unit": "px" },
+					"blur": { "value": 15, "unit": "px" },
+					"spread": { "value": 0, "unit": "px" }
+				},
+				{
+					"color": {
+						"colorSpace": "srgb",
+						"components": [ 0, 0, 0 ],
+						"alpha": 0.07
+					},
+					"offsetX": { "value": 0, "unit": "px" },
+					"offsetY": { "value": 15, "unit": "px" },
+					"blur": { "value": 27, "unit": "px" },
+					"spread": { "value": 0, "unit": "px" }
+				},
+				{
+					"color": {
+						"colorSpace": "srgb",
+						"components": [ 0, 0, 0 ],
+						"alpha": 0.04
+					},
+					"offsetX": { "value": 0, "unit": "px" },
+					"offsetY": { "value": 30, "unit": "px" },
+					"blur": { "value": 36, "unit": "px" },
+					"spread": { "value": 0, "unit": "px" }
+				},
+				{
+					"color": {
+						"colorSpace": "srgb",
+						"components": [ 0, 0, 0 ],
+						"alpha": 0.02
+					},
+					"offsetX": { "value": 0, "unit": "px" },
+					"offsetY": { "value": 50, "unit": "px" },
+					"blur": { "value": 43, "unit": "px" },
+					"spread": { "value": 0, "unit": "px" }
+				}
+			],
+			"$description": "For components that confirm decisions or handle necessary interruptions. Example: Modals."
+		}
+	}
+}
