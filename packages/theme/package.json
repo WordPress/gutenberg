@@ -60,7 +60,7 @@
 	},
 	"scripts": {
 		"build:default-ramps": "node --import=esbuild-esm-loader/register bin/generate-default-ramps/index.ts",
-		"build:tokens": "node --import=esbuild-esm-loader/register bin/generate-primitive-tokens/index.ts && NODE_OPTIONS=--import=esbuild-esm-loader/register tz build --config terrazzo.config.ts",
+		"build:tokens": "node --import=esbuild-esm-loader/register bin/generate-primitive-tokens/index.ts && cross-env NODE_OPTIONS=--import=esbuild-esm-loader/register tz build --config terrazzo.config.ts",
 		"build": "npm run build:tokens && npm run build:default-ramps",
 		"postbuild": "prettier --write tokens/color.json src/prebuilt src/color-ramps/lib/default-ramps.ts docs"
 	}

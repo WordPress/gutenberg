@@ -1,84 +1,51 @@
 /**
  * Frontend fit text functionality.
  * Automatically detects and initializes fit text on blocks with the has-fit-text class.
+ * Supports both initial page load and Interactivity API client-side navigation.
  */
+
+/**
+ * WordPress dependencies
+ */
+import { store, getElement, getContext } from '@wordpress/interactivity';
 
 /**
  * Internal dependencies
  */
 import { optimizeFitText } from './fit-text-utils';
 
-/**
- * Counter for generating unique element IDs.
- */
-let idCounter = 0;
+// Initialize via Interactivity API for client-side navigation
+store( 'core/fit-text', {
+	callbacks: {
+		init() {
+			const context = getContext();
+			const { ref } = getElement();
 
-/**
- * Get or create a unique style element for a fit text element.
- *
- * @param {string} elementId Unique identifier for the element.
- * @return {HTMLElement} Style element.
- */
-function getOrCreateStyleElement( elementId ) {
-	const styleId = `fit-text-${ elementId }`;
-	let styleElement = document.getElementById( styleId );
-	if ( ! styleElement ) {
-		styleElement = document.createElement( 'style' );
-		styleElement.id = styleId;
-		document.head.appendChild( styleElement );
-	}
-	return styleElement;
-}
+			const applyFontSize = ( fontSize ) => {
+				if ( fontSize === 0 ) {
+					ref.style.fontSize = '';
+				} else {
+					ref.style.fontSize = `${ fontSize }px`;
+				}
+			};
 
-/**
- * Generate a unique identifier for a fit text element.
- *
- * @param {HTMLElement} element The element to identify.
- * @return {string} Unique identifier.
- */
-function getElementIdentifier( element ) {
-	if ( ! element.dataset.fitTextId ) {
-		element.dataset.fitTextId = `fit-text-${ ++idCounter }`;
-	}
-	return element.dataset.fitTextId;
-}
+			// Initial fit text optimization.
+			context.fontSize = optimizeFitText( ref, applyFontSize );
 
-/**
- * Initialize fit text functionality for a single element.
- *
- * @param {HTMLElement} element Element with fit text enabled.
- */
-function initializeFitText( element ) {
-	const elementId = getElementIdentifier( element );
+			// Starts ResizeObserver to handle dynamic resizing.
+			if ( window.ResizeObserver && ref.parentElement ) {
+				const resizeObserver = new window.ResizeObserver( () => {
+					context.fontSize = optimizeFitText( ref, applyFontSize );
+				} );
+				resizeObserver.observe( ref.parentElement );
 
-	const applyFitText = () => {
-		const styleElement = getOrCreateStyleElement( elementId );
-		const elementSelector = `[data-fit-text-id=\"${ elementId }\"]`;
-
-		// Style management callback
-		const applyStylesFn = ( css ) => {
-			styleElement.textContent = css;
-		};
-
-		optimizeFitText( element, elementSelector, applyStylesFn );
-	};
-
-	// Initial sizing
-	applyFitText();
-
-	// Watch for parent container resize
-	if ( window.ResizeObserver && element.parentElement ) {
-		const resizeObserver = new window.ResizeObserver( applyFitText );
-		resizeObserver.observe( element.parentElement );
-	}
-}
-
-/**
- * Initialize fit text on all elements with the has-fit-text class.
- */
-function initializeAllFitText() {
-	const elements = document.querySelectorAll( '.has-fit-text' );
-	elements.forEach( initializeFitText );
-}
-
-window.addEventListener( 'load', initializeAllFitText );
+				// Return cleanup function to be called when element is removed.
+				return () => {
+					if ( resizeObserver ) {
+						resizeObserver.disconnect();
+					}
+				};
+			}
+		},
+	},
+} );

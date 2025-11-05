@@ -35,6 +35,11 @@ const packagePathCache = new Map();
  * @property {string[]}               [keywords]              Package keywords.
  */
 
+// Create a new type that extends PackageJson with an optional "route" property
+/**
+ * @typedef {PackageJson & { route: { path: string } }} RoutePackageJson
+ */
+
 /**
  * Get package.json info using Node's module resolution.
  * Resolves the package using import.meta.resolve and reads its package.json.

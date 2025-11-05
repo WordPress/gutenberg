@@ -10,9 +10,8 @@ test.use( {
 } );
 
 test.describe( 'Block Comments', () => {
-	test.beforeEach( async ( { admin, blockCommentUtils } ) => {
+	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
-		await blockCommentUtils.openBlockCommentSidebar();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -22,7 +21,13 @@ test.describe( 'Block Comments', () => {
 	test( 'should move focus to add a new note form', async ( {
 		editor,
 		page,
+		blockCommentUtils,
 	} ) => {
+		await blockCommentUtils.addBlockWithComment( {
+			type: 'core/paragraph',
+			attributes: { content: 'Howdy!' },
+			comment: 'Test comment',
+		} );
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'Testing block comments' },
@@ -61,7 +66,7 @@ test.describe( 'Block Comments', () => {
 			.click();
 		const thread = page
 			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'listitem', {
+			.getByRole( 'treeitem', {
 				name: 'Note: A test comment',
 			} );
 
@@ -157,10 +162,11 @@ test.describe( 'Block Comments', () => {
 			attributes: { content: 'Testing block comments' },
 			comment: 'Test comment to resolve.',
 		} );
+		await blockCommentUtils.openBlockCommentSidebar();
 
 		const thread = page
 			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'listitem', {
+			.getByRole( 'treeitem', {
 				name: 'Note: Test comment to resolve.',
 			} );
 		await thread.click();
@@ -206,6 +212,7 @@ test.describe( 'Block Comments', () => {
 				.filter( { hasText: 'Note marked as resolved.' } )
 		).toBeVisible();
 
+		await blockCommentUtils.openBlockCommentSidebar();
 		await page.locator( '.editor-collab-sidebar-panel__thread' ).click();
 		await expect( resolveButton ).toBeDisabled();
 		const commentForm = page.getByRole( 'textbox', { name: 'Reply to' } );
@@ -249,9 +256,11 @@ test.describe( 'Block Comments', () => {
 			.getByRole( 'region', {
 				name: 'Editor settings',
 			} )
-			.getByRole( 'list' );
-		const threads = threadsContainer.getByRole( 'listitem' );
-		const activeThread = threadsContainer.locator( '.is-selected' );
+			.getByRole( 'tree' );
+		const threads = threadsContainer.getByRole( 'treeitem' );
+		const activeThread = threadsContainer.getByRole( 'treeitem', {
+			expanded: true,
+		} );
 		const replyTextbox = activeThread.getByRole( 'textbox', {
 			name: 'Reply to',
 		} );
@@ -294,7 +303,7 @@ test.describe( 'Block Comments', () => {
 				.getByRole( 'region', {
 					name: 'Editor settings',
 				} )
-				.getByRole( 'listitem', {
+				.getByRole( 'treeitem', {
 					name: 'Note: Test comment',
 				} );
 
@@ -328,7 +337,7 @@ test.describe( 'Block Comments', () => {
 				.getByRole( 'region', {
 					name: 'Editor settings',
 				} )
-				.getByRole( 'listitem', {
+				.getByRole( 'treeitem', {
 					name: 'Note: Test comment escape',
 				} );
 
@@ -354,7 +363,7 @@ test.describe( 'Block Comments', () => {
 				.getByRole( 'region', {
 					name: 'Editor settings',
 				} )
-				.getByRole( 'listitem', {
+				.getByRole( 'treeitem', {
 					name: 'Note: Test comment',
 				} );
 
@@ -379,7 +388,8 @@ test.describe( 'Block Comments', () => {
 				.getByRole( 'region', {
 					name: 'Editor settings',
 				} )
-				.getByRole( 'listitem' );
+				.getByRole( 'treeitem' )
+				.first();
 
 			await thread.focus();
 			await expect( thread ).toHaveAccessibleName( 'Note: Test comment' );
@@ -421,7 +431,7 @@ test.describe( 'Block Comments', () => {
 				.getByRole( 'region', {
 					name: 'Editor settings',
 				} )
-				.getByRole( 'listitem', {
+				.getByRole( 'treeitem', {
 					name: 'Note: Test comment',
 				} );
 
@@ -454,17 +464,17 @@ test.describe( 'Block Comments', () => {
 			} );
 			const firstThread = page
 				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'listitem', {
+				.getByRole( 'treeitem', {
 					name: 'Note: First block comment',
 				} );
 			const secondThread = page
 				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'listitem', {
+				.getByRole( 'treeitem', {
 					name: 'Note: Second block comment',
 				} );
 			const thirdThread = page
 				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'listitem', {
+				.getByRole( 'treeitem', {
 					name: 'Note: Third block comment',
 				} );
 
@@ -539,7 +549,7 @@ test.describe( 'Block Comments', () => {
 				.click();
 			const thread = page
 				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'listitem', {
+				.getByRole( 'treeitem', {
 					name: 'Note: Test comment',
 				} );
 
@@ -559,7 +569,7 @@ test.describe( 'Block Comments', () => {
 				.getByRole( 'region', {
 					name: 'Editor settings',
 				} )
-				.getByRole( 'listitem', {
+				.getByRole( 'treeitem', {
 					name: 'Note: Test comment',
 				} );
 			const addNewCommentButton = thread.getByRole( 'button', {
@@ -591,7 +601,7 @@ test.describe( 'Block Comments', () => {
 				.getByRole( 'region', {
 					name: 'Editor settings',
 				} )
-				.getByRole( 'listitem', {
+				.getByRole( 'treeitem', {
 					name: 'Note: Test comment',
 				} );
 			const replyButton = thread.getByRole( 'button', {

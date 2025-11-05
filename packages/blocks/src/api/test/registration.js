@@ -1,5 +1,3 @@
-/* eslint-disable react/forbid-elements */
-
 /**
  * WordPress dependencies
  */
@@ -1755,5 +1753,3 @@ describe( 'blocks', () => {
 		} );
 	} );
 } );
-
-/* eslint-enable react/forbid-elements */

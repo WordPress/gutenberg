@@ -189,8 +189,7 @@ function svgToTsx( svgContent ) {
 		.map( ( line ) => '\t' + line )
 		.join( '\n' );
 
-	return `/* eslint-disable prettier/prettier */
-/**
+	return `/**
  * WordPress dependencies
  */
 import { ${ Array.from( usedPrimitives )
@@ -200,7 +199,6 @@ import { ${ Array.from( usedPrimitives )
 export default (
 ${ jsxContent }
 );
-/* eslint-enable */
 `;
 }
 

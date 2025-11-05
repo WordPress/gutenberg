@@ -116,7 +116,7 @@ function PreferencesModalContents( { extraSections = {} } ) {
 									scope="core"
 									featureName="enableChoosePatternModal"
 									help={ __(
-										'Shows starter patterns when creating a new page.'
+										'Pick from starter content when creating a new page.'
 									) }
 									label={ __( 'Show starter patterns' ) }
 								/>

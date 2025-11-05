@@ -308,21 +308,9 @@ export function Comments( {
 	] );
 
 	const hasThreads = Array.isArray( threads ) && threads.length > 0;
+	// This should no longer happen since https://github.com/WordPress/gutenberg/pull/72872.
 	if ( ! hasThreads && ! isFloating ) {
-		return (
-			<>
-				<AddComment
-					onSubmit={ onAddReply }
-					showCommentBoard={ showCommentBoard }
-					setShowCommentBoard={ setShowCommentBoard }
-					commentSidebarRef={ commentSidebarRef }
-				/>
-				<Text as="p">{ __( 'No notes available.' ) }</Text>
-				<Text as="p" variant="muted">
-					{ __( 'Only logged in users can see Notes.' ) }
-				</Text>
-			</>
-		);
+		return null;
 	}
 
 	return (
@@ -459,8 +447,6 @@ function Thread( {
 	}
 
 	return (
-		// Disable reason: role="listitem" does in fact support aria-expanded.
-		// eslint-disable-next-line jsx-a11y/role-supports-aria-props
 		<VStack
 			className={ clsx( 'editor-collab-sidebar-panel__thread', {
 				'is-selected': isSelected,
@@ -495,7 +481,7 @@ function Thread( {
 				}
 			} }
 			tabIndex={ 0 }
-			role="listitem"
+			role="treeitem"
 			aria-label={ ariaLabel }
 			aria-expanded={ isSelected }
 			ref={ isFloating ? refs.setFloating : undefined }
@@ -586,7 +572,7 @@ function Thread( {
 				/>
 			) }
 			{ isSelected && (
-				<VStack spacing="2">
+				<VStack spacing="2" role="treeitem">
 					<HStack alignment="left" spacing="3" justify="flex-start">
 						<CommentAuthorInfo />
 					</HStack>
@@ -716,7 +702,10 @@ const CommentBoard = ( {
 			: [];
 
 	return (
-		<VStack spacing="2">
+		<VStack
+			spacing="2"
+			role={ thread.parent !== 0 ? 'treeitem' : undefined }
+		>
 			<HStack alignment="left" spacing="3" justify="flex-start">
 				<CommentAuthorInfo
 					avatar={ thread?.author_avatar_urls?.[ 48 ] }

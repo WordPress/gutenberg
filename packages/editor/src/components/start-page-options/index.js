@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Flex, FlexItem, Modal, ToggleControl } from '@wordpress/components';
+import { Flex, FlexItem, Modal, CheckboxControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState, useMemo, useEffect } from '@wordpress/element';
 import {
@@ -119,16 +119,15 @@ function StartPageOptionsModal( { onClose } ) {
 			</div>
 			<Flex
 				className="editor-start-page-options__modal__actions"
-				justify="flex-end"
+				justify="flex-start"
 				expanded={ false }
 			>
 				<FlexItem>
-					<ToggleControl
+					<CheckboxControl
 						__nextHasNoMarginBottom
 						checked={ showStartPatterns }
-						label={ __( 'Show starter patterns' ) }
-						help={ __(
-							'Shows starter patterns when creating a new page.'
+						label={ __(
+							'Always show starter patterns for new pages'
 						) }
 						onChange={ ( newValue ) => {
 							setShowStartPatterns( newValue );

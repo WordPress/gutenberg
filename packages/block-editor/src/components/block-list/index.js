@@ -48,11 +48,11 @@ const delayedBlockVisibilityDebounceOptions = {
 };
 
 function Root( { className, ...settings } ) {
-	const { isOutlineMode, isFocusMode, temporarilyEditingAsBlocks } =
-		useSelect( ( select ) => {
+	const { isOutlineMode, isFocusMode, editedContentOnlySection } = useSelect(
+		( select ) => {
 			const {
 				getSettings,
-				getTemporarilyEditingAsBlocks,
+				getEditedContentOnlySection,
 				isTyping,
 				hasBlockSpotlight,
 			} = unlock( select( blockEditorStore ) );
@@ -60,9 +60,11 @@ function Root( { className, ...settings } ) {
 			return {
 				isOutlineMode: outlineMode && ! isTyping(),
 				isFocusMode: focusMode || hasBlockSpotlight(),
-				temporarilyEditingAsBlocks: getTemporarilyEditingAsBlocks(),
+				editedContentOnlySection: getEditedContentOnlySection(),
 			};
-		}, [] );
+		},
+		[]
+	);
 	const registry = useRegistry();
 	const { setBlockVisibility } = useDispatch( blockEditorStore );
 
@@ -116,17 +118,19 @@ function Root( { className, ...settings } ) {
 	return (
 		<IntersectionObserver.Provider value={ intersectionObserver }>
 			<div { ...innerBlocksProps } />
-			{ !! temporarilyEditingAsBlocks && (
-				<StopEditingAsBlocksOnOutsideSelect
-					clientId={ temporarilyEditingAsBlocks }
+			{ !! editedContentOnlySection && (
+				<StopEditingContentOnlySectionOnOutsideSelect
+					clientId={ editedContentOnlySection }
 				/>
 			) }
 		</IntersectionObserver.Provider>
 	);
 }
 
-function StopEditingAsBlocksOnOutsideSelect( { clientId } ) {
-	const { stopEditingAsBlocks } = unlock( useDispatch( blockEditorStore ) );
+function StopEditingContentOnlySectionOnOutsideSelect( { clientId } ) {
+	const { stopEditingContentOnlySection } = unlock(
+		useDispatch( blockEditorStore )
+	);
 	const isBlockOrDescendantSelected = useSelect(
 		( select ) => {
 			const { isBlockSelected, hasSelectedInnerBlock } =
@@ -140,9 +144,13 @@ function StopEditingAsBlocksOnOutsideSelect( { clientId } ) {
 	);
 	useEffect( () => {
 		if ( ! isBlockOrDescendantSelected ) {
-			stopEditingAsBlocks( clientId );
+			stopEditingContentOnlySection();
 		}
-	}, [ isBlockOrDescendantSelected, clientId, stopEditingAsBlocks ] );
+	}, [
+		isBlockOrDescendantSelected,
+		clientId,
+		stopEditingContentOnlySection,
+	] );
 	return null;
 }
 

@@ -257,7 +257,6 @@ const MediaReplaceFlow = ( {
 							: children }
 					</NavigableMenu>
 					{ onSelectURL && (
-						// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
 						<form className="block-editor-media-flow__url-input">
 							<span className="block-editor-media-replace-flow__image-url-label">
 								{ __( 'Current media URL:' ) }

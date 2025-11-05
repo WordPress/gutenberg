@@ -50,7 +50,7 @@ function NotesSidebarContent( {
 		<VStack
 			className="editor-collab-sidebar-panel"
 			style={ styles }
-			role="list"
+			role="tree"
 			spacing="3"
 			justify="flex-start"
 			ref={ ( node ) => {
@@ -60,6 +60,9 @@ function NotesSidebarContent( {
 					commentSidebarRef.current = node;
 				}
 			} }
+			aria-label={
+				isFloating ? __( 'Unresolved notes' ) : __( 'All notes' )
+			}
 		>
 			<Comments
 				threads={ comments }
@@ -87,17 +90,24 @@ function NotesSidebar( { postId, mode } ) {
 
 	const showFloatingSidebar = isLargeViewport && mode === 'post-only';
 
-	const { clientId, blockCommentId } = useSelect( ( select ) => {
-		const { getBlockAttributes, getSelectedBlockClientId } =
-			select( blockEditorStore );
-		const _clientId = getSelectedBlockClientId();
-		return {
-			clientId: _clientId,
-			blockCommentId: _clientId
-				? getBlockAttributes( _clientId )?.metadata?.noteId
-				: null,
-		};
-	}, [] );
+	const { clientId, blockCommentId, isDistractionFree } = useSelect(
+		( select ) => {
+			const {
+				getBlockAttributes,
+				getSelectedBlockClientId,
+				getSettings,
+			} = select( blockEditorStore );
+			const _clientId = getSelectedBlockClientId();
+			return {
+				clientId: _clientId,
+				blockCommentId: _clientId
+					? getBlockAttributes( _clientId )?.metadata?.noteId
+					: null,
+				isDistractionFree: getSettings().isDistractionFree,
+			};
+		},
+		[]
+	);
 
 	const {
 		resultComments,
@@ -118,6 +128,8 @@ function NotesSidebar( { postId, mode } ) {
 	const currentThread = blockCommentId
 		? resultComments.find( ( thread ) => thread.id === blockCommentId )
 		: null;
+	const showAllNotesSidebar =
+		resultComments.length > 0 || ! showFloatingSidebar;
 
 	async function openTheSidebar() {
 		const prevArea = await getActiveComplementaryArea( 'core' );
@@ -125,7 +137,7 @@ function NotesSidebar( { postId, mode } ) {
 
 		if ( currentThread?.status === 'approved' ) {
 			enableComplementaryArea( 'core', collabHistorySidebarName );
-		} else if ( ! activeNotesArea ) {
+		} else if ( ! activeNotesArea || ! showAllNotesSidebar ) {
 			enableComplementaryArea(
 				'core',
 				showFloatingSidebar
@@ -150,6 +162,10 @@ function NotesSidebar( { postId, mode } ) {
 		toggleBlockSpotlight( clientId, true );
 	}
 
+	if ( isDistractionFree ) {
+		return <AddCommentMenuItem isDistractionFree />;
+	}
+
 	return (
 		<>
 			{ blockCommentId && (
@@ -159,27 +175,29 @@ function NotesSidebar( { postId, mode } ) {
 				/>
 			) }
 			<AddCommentMenuItem onClick={ openTheSidebar } />
-			<PluginSidebar
-				identifier={ collabHistorySidebarName }
-				name={ collabHistorySidebarName }
-				title={ __( 'All notes' ) }
-				header={
-					<h2 className="interface-complementary-area-header__title">
-						{ __( 'All notes' ) }
-					</h2>
-				}
-				icon={ commentIcon }
-				closeLabel={ __( 'Close Notes' ) }
-			>
-				<NotesSidebarContent
-					comments={ resultComments }
-					showCommentBoard={ showCommentBoard }
-					setShowCommentBoard={ setShowCommentBoard }
-					commentSidebarRef={ commentSidebarRef }
-					reflowComments={ reflowComments }
-					commentLastUpdated={ commentLastUpdated }
-				/>
-			</PluginSidebar>
+			{ showAllNotesSidebar && (
+				<PluginSidebar
+					identifier={ collabHistorySidebarName }
+					name={ collabHistorySidebarName }
+					title={ __( 'All notes' ) }
+					header={
+						<h2 className="interface-complementary-area-header__title">
+							{ __( 'All notes' ) }
+						</h2>
+					}
+					icon={ commentIcon }
+					closeLabel={ __( 'Close Notes' ) }
+				>
+					<NotesSidebarContent
+						comments={ resultComments }
+						showCommentBoard={ showCommentBoard }
+						setShowCommentBoard={ setShowCommentBoard }
+						commentSidebarRef={ commentSidebarRef }
+						reflowComments={ reflowComments }
+						commentLastUpdated={ commentLastUpdated }
+					/>
+				</PluginSidebar>
+			) }
 			{ isLargeViewport && (
 				<PluginSidebar
 					isPinnable={ false }

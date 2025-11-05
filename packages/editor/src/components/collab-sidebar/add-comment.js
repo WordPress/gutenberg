@@ -68,7 +68,7 @@ export function AddComment( {
 			spacing="3"
 			tabIndex={ 0 }
 			aria-label={ __( 'New note' ) }
-			role="listitem"
+			role="treeitem"
 			ref={ isFloating ? refs.setFloating : undefined }
 			style={
 				isFloating

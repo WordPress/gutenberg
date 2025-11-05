@@ -2,24 +2,34 @@
  * WordPress dependencies
  */
 import { createRoot, StrictMode } from '@wordpress/element';
-import { dispatch } from '@wordpress/data';
+import { dispatch, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import Router from './router';
-import { STORE_NAME } from '../../store';
-import type { MenuItem } from '../../store/types';
+import { store } from '../../store';
+import type { MenuItem, Route } from '../../store/types';
 
 function App() {
-	return <Router />;
+	const routes = useSelect( ( select ) => select( store ).getRoutes(), [] );
+
+	return <Router routes={ routes } />;
 }
 
-export async function init( menuItems: MenuItem[] ) {
-	// Register menu items
-	menuItems.forEach( ( menuItem ) => {
-		// @ts-ignore
-		dispatch( STORE_NAME ).registerMenuItem( menuItem.id, menuItem );
+export async function init( {
+	menuItems,
+	routes,
+}: {
+	menuItems?: MenuItem[];
+	routes?: Route[];
+} ) {
+	( menuItems ?? [] ).forEach( ( menuItem ) => {
+		dispatch( store ).registerMenuItem( menuItem.id, menuItem );
+	} );
+
+	( routes ?? [] ).forEach( ( route ) => {
+		dispatch( store ).registerRoute( route );
 	} );
 
 	// Render the app

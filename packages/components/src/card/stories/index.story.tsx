@@ -91,3 +91,62 @@ export const FullBleedContent: StoryObj< typeof Card > = {
 		),
 	},
 };
+
+/**
+ * The Card component supports three approaches to padding:
+ * 1. Default padding (medium) - no size prop needed
+ * 2. Token-based padding - using size tokens: xSmall, small, medium, large
+ * 3. Logical padding - customize each direction using logical properties
+ *
+ * Each component (Card, CardHeader, CardBody) can have its own padding configuration.
+ */
+export const PaddingVariations: StoryObj< typeof Card > = {
+	render: () => (
+		<div
+			style={ { display: 'flex', flexDirection: 'column', gap: '32px' } }
+		>
+			{ /* 1. Default Padding */ }
+			<div>
+				<Card>
+					<CardHeader>
+						<Text>Header with default padding</Text>
+					</CardHeader>
+					<CardBody>
+						<Text>Body with default padding (medium)</Text>
+					</CardBody>
+				</Card>
+			</div>
+
+			<div>
+				<Card>
+					<CardHeader
+						size={ {
+							blockStart: 'large',
+							blockEnd: 'small',
+							inlineStart: 'xSmall',
+							inlineEnd: 'large',
+						} }
+					>
+						<Text>
+							Header with logical padding (large blockStart, small
+							blockEnd, xSmall inlineStart, large inlineEnd)
+						</Text>
+					</CardHeader>
+					<CardBody
+						size={ {
+							blockStart: 'medium',
+							blockEnd: 'xSmall',
+							inlineStart: 'large',
+							inlineEnd: 'xSmall',
+						} }
+					>
+						<Text>
+							Body with logical padding (medium blockStart, xSmall
+							blockEnd, large inlineStart, xSmall inlineEnd)
+						</Text>
+					</CardBody>
+				</Card>
+			</div>
+		</div>
+	),
+};

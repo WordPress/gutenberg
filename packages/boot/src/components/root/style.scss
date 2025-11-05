@@ -2,37 +2,40 @@
 
 .boot-layout {
 	height: 100%;
+	width: 100%;
 	display: flex;
-	flex-direction: column;
+	flex-direction: row;
 	color: var(--wpds-color-fg-content-neutral, #1e1e1e);
 	isolation: isolate;
 	background: var(--wpds-color-bg-surface-neutral-weak, #f0f0f0);
 }
 
-.boot-layout__content {
-	height: 100%;
-	flex-grow: 1;
-	display: flex;
-}
-
-.boot-layout__sidebar-region {
-	flex-shrink: 0;
-	width: 240px;
-}
-
 .boot-layout__sidebar {
 	height: 100%;
+	flex-shrink: 0;
+	width: 240px;
 	position: relative;
 	overflow: hidden;
 }
 
-.boot-layout__stage {
+.boot-layout__surfaces {
+	display: flex;
+	flex-grow: 1;
+	margin: variables.$grid-unit-10;
+	gap: variables.$grid-unit-10;
+}
+
+.boot-layout__stage,
+.boot-layout__inspector {
 	flex: 1;
 	overflow-y: auto;
 	background: var(--wpds-color-bg-surface-neutral, #fff);
 	color: var(--wpds-color-fg-content-neutral, #1e1e1e);
-	margin: variables.$grid-unit-10;
 	border-radius: 8px;
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 	border: 1px solid var(--wpds-color-stroke-surface-neutral-weak, #ddd);
+}
+
+.boot-layout__inspector {
+	max-width: 400px;
 }

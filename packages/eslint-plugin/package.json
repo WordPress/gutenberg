@@ -44,6 +44,7 @@
 		"@wordpress/prettier-config": "file:../prettier-config",
 		"cosmiconfig": "^7.0.0",
 		"eslint-config-prettier": "^8.3.0",
+		"eslint-import-resolver-typescript": "^4.4.4",
 		"eslint-plugin-import": "^2.25.2",
 		"eslint-plugin-jest": "^27.4.3",
 		"eslint-plugin-jsdoc": "^46.4.6",

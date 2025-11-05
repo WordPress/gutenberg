@@ -105,12 +105,13 @@
 		"copy-webpack-plugin": "10.2.0",
 		"core-js-builder": "3.39.0",
 		"cross-env": "7.0.3",
+		"cross-spawn": "^7.0.6",
 		"css-loader": "6.2.0",
 		"deep-freeze": "0.0.1",
 		"equivalent-key-map": "0.2.2",
 		"esbuild": "0.25.10",
 		"escape-html": "1.0.3",
-		"eslint-import-resolver-node": "0.3.4",
+		"eslint-import-resolver-typescript": "4.4.4",
 		"eslint-plugin-eslint-comments": "3.1.2",
 		"eslint-plugin-import": "2.25.2",
 		"eslint-plugin-jest": "27.4.3",
@@ -292,8 +293,7 @@
 			"npm run docs:api-ref",
 			"npm run docs:blocks",
 			"npm run docs:theme-ref",
-			"node ./bin/api-docs/are-api-docs-unstaged.js",
-			"node ./bin/packages/lint-staged-typecheck.js"
+			"node ./bin/api-docs/are-api-docs-unstaged.js"
 		],
 		"packages/icons/src/library/*": [
 			"npm run -w packages/icons build"
@@ -303,6 +303,7 @@
 		]
 	},
 	"workspaces": [
-		"packages/*"
+		"packages/*",
+		"routes/*"
 	]
 }

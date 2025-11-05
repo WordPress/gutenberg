@@ -56,7 +56,7 @@ export default function Edit( {
 			const { getEntityRecord } = select( coreStore );
 
 			const comment = getEntityRecord( 'root', 'comment', commentId );
-			const authorName = comment?.author_name; // eslint-disable-line camelcase
+			const authorName = comment?.author_name;
 
 			if ( comment && ! authorName ) {
 				const user = getEntityRecord( 'root', 'user', comment.author );
