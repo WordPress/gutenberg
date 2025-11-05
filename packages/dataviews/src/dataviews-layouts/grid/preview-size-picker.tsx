@@ -3,7 +3,7 @@
  */
 import { RangeControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useContext } from '@wordpress/element';
+import { useContext, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -37,6 +37,25 @@ const imageSizes = [
 		breakpoint: 588, // at minimum image width, 2 images display at this container size
 	},
 ];
+
+/**
+ * Calculate the number of grid columns based on container width and preview size.
+ * This matches how CSS grid auto-fill works: repeat(auto-fill, minmax(previewSize, 1fr)).
+ */
+export function useGridColumns() {
+	const context = useContext( DataViewsContext );
+	const view = context.view as ViewGrid;
+	return useMemo( () => {
+		const containerWidth = context.containerWidth;
+		const gap = 32; // This is the value of the grid gap in CSS.
+		// Default to the third smallest size if no preview size is set.
+		const previewSize = view.layout?.previewSize ?? 230;
+		const columns = Math.floor(
+			( containerWidth + gap ) / ( previewSize + gap )
+		);
+		return Math.max( 1, columns ); // Ensure at least 1 column.
+	}, [ context.containerWidth, view.layout?.previewSize ] );
+}
 
 export default function PreviewSizePicker() {
 	const context = useContext( DataViewsContext );

@@ -5,6 +5,38 @@
 @use "../utils/grid-items.scss" as *;
 
 .dataviews-view-grid {
+	&.dataviews-view-grid__content {
+		padding: 0 $grid-unit-60 $grid-unit-30;
+		display: flex;
+		flex-direction: column;
+		gap: $grid-unit-40;
+		container-type: inline-size;
+
+		@media not (prefers-reduced-motion) {
+			transition: padding ease-out 0.1s;
+		}
+
+		@container (max-width: 430px) {
+			padding-left: $grid-unit-30;
+			padding-right: $grid-unit-30;
+		}
+
+		.dataviews-view-grid__row {
+			display: grid;
+			gap: $grid-unit-40;
+
+			.dataviews-view-grid__row__gridcell {
+				outline: 0;
+				outline-style: solid;
+
+				&[data-focus-visible] {
+					outline-color: var(--wp-admin-theme-color);
+					outline-width: var(--wp-admin-border-width-focus);
+				}
+			}
+		}
+	}
+
 	.dataviews-view-grid__card {
 		height: 100%;
 		justify-content: flex-start;
