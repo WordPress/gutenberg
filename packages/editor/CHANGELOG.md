@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+- PostActions: Change the label for set-as-homepage and set-as-posts-page to use it correctly in DataViews Actions Grouping. [#73000](https://github.com/WordPress/gutenberg/pull/73000)
+
 ## 14.34.0 (2025-10-29)
 
 ## 14.33.0 (2025-10-17)
