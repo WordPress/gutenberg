@@ -45,8 +45,8 @@ function ContentLockControlsPure( { clientId } ) {
 		! isLockedByParent && templateLock === 'contentOnly';
 
 	const stopEditingAsBlockCallback = useCallback( () => {
-		stopEditingContentOnlySection( clientId );
-	}, [ clientId, stopEditingContentOnlySection ] );
+		stopEditingContentOnlySection();
+	}, [ stopEditingContentOnlySection ] );
 
 	// Hide the Done button when the content only pattern insertion experiment is active.
 	// This is replaced by an alternative UI in the experiment.
