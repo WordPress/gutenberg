@@ -4,6 +4,7 @@
 	"references": [
 		{ "path": "../data" },
 		{ "path": "../dataviews" },
-		{ "path": "../element" }
+		{ "path": "../element" },
+		{ "path": "../preferences" }
 	]
 }

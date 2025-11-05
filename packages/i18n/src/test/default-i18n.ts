@@ -1,5 +1,3 @@
-/* eslint-disable @wordpress/i18n-text-domain, @wordpress/i18n-translator-comments */
-
 /**
  * WordPress dependencies
  */
@@ -42,5 +40,3 @@ describe( 'i18n filters', () => {
 		expect( _nx( 'hello', 'hellos', 2, 'context' ) ).toBe( 'goodbyes' );
 	} );
 } );
-
-/* eslint-enable @wordpress/i18n-text-domain, @wordpress/i18n-translator-comments */

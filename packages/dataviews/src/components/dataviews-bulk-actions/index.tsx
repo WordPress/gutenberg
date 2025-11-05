@@ -15,6 +15,7 @@ import { __, sprintf, _n } from '@wordpress/i18n';
 import { useMemo, useState, useRef, useContext } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
 import { closeSmall } from '@wordpress/icons';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -165,18 +166,32 @@ function ActionTrigger< Item >( {
 }: ActionTriggerProps< Item > ) {
 	const label =
 		typeof action.label === 'string' ? action.label : action.label( items );
+	const isMobile = useViewportMatch( 'medium', '<' );
+
+	if ( isMobile ) {
+		return (
+			<Button
+				disabled={ isBusy }
+				accessibleWhenDisabled
+				label={ label }
+				icon={ action.icon }
+				size="compact"
+				onClick={ onClick }
+				isBusy={ isBusy }
+			/>
+		);
+	}
+
 	return (
 		<Button
 			disabled={ isBusy }
 			accessibleWhenDisabled
-			label={ label }
-			icon={ action.icon }
-			isDestructive={ action.isDestructive }
 			size="compact"
 			onClick={ onClick }
 			isBusy={ isBusy }
-			tooltipPosition="top"
-		/>
+		>
+			{ label }
+		</Button>
 	);
 }
 
@@ -310,6 +325,7 @@ function FooterContent< Item >( {
 		null
 	);
 	const footerContentRef = useRef< JSX.Element | null >( null );
+	const isMobile = useViewportMatch( 'medium', '<' );
 
 	const bulkActions = useMemo(
 		() => actions.filter( ( action ) => action.supportsBulk ),
@@ -336,14 +352,14 @@ function FooterContent< Item >( {
 			actions.filter( ( action ) => {
 				return (
 					action.supportsBulk &&
-					action.icon &&
+					( ! isMobile || action.icon ) &&
 					selectedItems.some(
 						( item ) =>
 							! action.isEligible || action.isEligible( item )
 					)
 				);
 			} ),
-		[ actions, selectedItems ]
+		[ actions, selectedItems, isMobile ]
 	);
 	if ( ! actionInProgress ) {
 		if ( footerContentRef.current ) {

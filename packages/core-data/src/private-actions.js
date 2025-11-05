@@ -132,7 +132,3 @@ export const editMediaEntity =
 			dispatch.__unstableReleaseStoreLock( lock );
 		}
 	};
-
-export function receiveTemplateAutoDraftId( target, id ) {
-	return { type: 'RECEIVE_TEMPLATE_AUTO_DRAFT_ID', target, id };
-}

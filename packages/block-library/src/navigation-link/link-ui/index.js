@@ -66,7 +66,7 @@ export function getSuggestionsQuery( type, kind ) {
 }
 
 function UnforwardedLinkUI( props, ref ) {
-	const { label, url, opensInNewTab, type, kind, id } = props.link;
+	const { label, url, opensInNewTab, type, kind, id, metadata } = props.link;
 	const postType = type || 'page';
 
 	const [ addingBlock, setAddingBlock ] = useState( false );
@@ -77,6 +77,13 @@ function UnforwardedLinkUI( props, ref ) {
 		kind: 'postType',
 		name: postType,
 	} );
+
+	// Check if there's a URL binding with the new binding sources
+	// Only enable handleEntities when there's actually a binding present
+	const hasUrlBinding =
+		( metadata?.bindings?.url?.source === 'core/post-data' ||
+			metadata?.bindings?.url?.source === 'core/term-data' ) &&
+		!! id;
 
 	// Memoize link value to avoid overriding the LinkControl's internal state.
 	// This is a temporary fix. See https://github.com/WordPress/gutenberg/issues/50976#issuecomment-1568226407.
@@ -145,7 +152,7 @@ function UnforwardedLinkUI( props, ref ) {
 						onChange={ props.onChange }
 						onRemove={ props.onRemove }
 						onCancel={ props.onCancel }
-						handleEntities
+						handleEntities={ hasUrlBinding }
 						renderControlBottom={ () => {
 							// Don't show the tools when there is submitted link (preview state).
 							if ( link?.url?.length ) {

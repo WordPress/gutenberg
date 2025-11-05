@@ -1,5 +1,17 @@
 <?php
 
+/*
+ * Note: As of WordPress 6.9, there is a template enhancement output buffer which can be used instead of the following
+ * template_include code which opens its own buffer. It is enabled by default in classic themes, but it can be enabled
+ * by default even for block themes via:
+ *
+ *     add_filter( 'wp_should_output_buffer_template_for_enhancement', '__return_true' );
+ *
+ * Alternatively, instead of using the template_include filter to start output buffering, this can be done via the
+ * wp_before_include_template action which fires after the template_include filter and immediately before the template
+ * is loaded.
+ */
+
 add_filter(
 	'template_include',
 	static function ( $template ) {
@@ -11,13 +23,8 @@ add_filter(
 
 		$server_timing_values['wpBeforeTemplate'] = $template_start - $timestart;
 
-		ob_start();
-
-		add_action(
-			'shutdown',
-			static function () use ( $server_timing_values, $template_start, $wpdb ) {
-				$output = ob_get_clean();
-
+		ob_start(
+			static function ( $output ) use ( $server_timing_values, $template_start, $wpdb ) {
 				$server_timing_values['wpTemplate'] = microtime( true ) - $template_start;
 
 				$server_timing_values['wpTotal'] = $server_timing_values['wpBeforeTemplate'] + $server_timing_values['wpTemplate'];
@@ -39,9 +46,8 @@ add_filter(
 				}
 				header( 'Server-Timing: ' . implode( ', ', $header_values ) );
 
-				echo $output;
-			},
-			PHP_INT_MIN
+				return $output;
+			}
 		);
 
 		return $template;
@@ -54,13 +60,8 @@ add_action(
 	static function () {
 		global $timestart, $wpdb;
 
-		ob_start();
-
-		add_action(
-			'shutdown',
-			static function () use ( $wpdb, $timestart ) {
-				$output = ob_get_clean();
-
+		ob_start(
+			static function ( $output ) use ( $wpdb, $timestart ) {
 				$server_timing_values = array();
 
 				$server_timing_values['wpTotal'] = microtime( true ) - $timestart;
@@ -82,9 +83,8 @@ add_action(
 				}
 				header( 'Server-Timing: ' . implode( ', ', $header_values ) );
 
-				echo $output;
-			},
-			PHP_INT_MIN
+				return $output;
+			}
 		);
 	},
 	PHP_INT_MAX

@@ -1,0 +1,63 @@
+{
+	"name": "@wordpress/boot",
+	"version": "0.1.0",
+	"description": "Minimal boot package for WordPress admin pages.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"boot"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/boot/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/boot"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
+	"module": "build-module/index.js",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.js"
+		},
+		"./package.json": "./package.json"
+	},
+	"react-native": "src/index",
+	"wpScriptModuleExports": "./build-module/index.js",
+	"types": "build-types",
+	"dependencies": {
+		"@tanstack/history": "^1.133.28",
+		"@tanstack/react-router": "^1.120.5",
+		"@wordpress/admin-ui": "file:../admin-ui",
+		"@wordpress/commands": "file:../commands",
+		"@wordpress/components": "file:../components",
+		"@wordpress/compose": "file:../compose",
+		"@wordpress/core-data": "file:../core-data",
+		"@wordpress/data": "file:../data",
+		"@wordpress/element": "file:../element",
+		"@wordpress/html-entities": "file:../html-entities",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/icons": "file:../icons",
+		"@wordpress/keycodes": "file:../keycodes",
+		"@wordpress/primitives": "file:../primitives",
+		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/theme": "file:../theme",
+		"@wordpress/url": "file:../url",
+		"clsx": "^2.1.1"
+	},
+	"peerDependencies": {
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

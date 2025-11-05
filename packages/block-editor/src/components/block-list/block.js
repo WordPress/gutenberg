@@ -569,7 +569,7 @@ function BlockListBlockProvider( props ) {
 				canMoveBlock,
 
 				getSettings,
-				getTemporarilyEditingAsBlocks,
+				getEditedContentOnlySection,
 				getBlockEditingMode,
 				getBlockName,
 				isFirstMultiSelectedBlock,
@@ -606,7 +606,15 @@ function BlockListBlockProvider( props ) {
 			const attributes = getBlockAttributes( clientId );
 			const { name: blockName, isValid } = blockWithoutAttributes;
 			const blockType = getBlockType( blockName );
-			const { supportsLayout, isPreviewMode } = getSettings();
+			const {
+				supportsLayout,
+				isPreviewMode,
+				__experimentalBlockBindingsSupportedAttributes,
+			} = getSettings();
+
+			const bindableAttributes =
+				__experimentalBlockBindingsSupportedAttributes?.[ blockName ];
+
 			const hasLightBlockWrapper = blockType?.apiVersion > 1;
 			const previewContext = {
 				isPreviewMode,
@@ -625,6 +633,7 @@ function BlockListBlockProvider( props ) {
 					: undefined,
 				blockTitle: blockType?.title,
 				isBlockHidden: attributes?.metadata?.blockVisibility === false,
+				bindableAttributes,
 			};
 
 			// When in preview mode, we can avoid a lot of selection and
@@ -668,8 +677,8 @@ function BlockListBlockProvider( props ) {
 				canRemove,
 				canMove,
 				isSelected: _isSelected,
-				isTemporarilyEditingAsBlocks:
-					getTemporarilyEditingAsBlocks() === clientId,
+				isEditingContentOnlySection:
+					getEditedContentOnlySection() === clientId,
 				blockEditingMode,
 				mayDisplayControls:
 					_isSelected ||
@@ -730,7 +739,7 @@ function BlockListBlockProvider( props ) {
 		isValid,
 		isSelected = false,
 		themeSupportsLayout,
-		isTemporarilyEditingAsBlocks,
+		isEditingContentOnlySection,
 		blockEditingMode,
 		mayDisplayControls,
 		mayDisplayParentControls,
@@ -753,6 +762,7 @@ function BlockListBlockProvider( props ) {
 		defaultClassName,
 		originalBlockClientId,
 		isBlockHidden,
+		bindableAttributes,
 	} = selectedProps;
 
 	// Users of the editor.BlockListBlock filter used to be able to
@@ -794,7 +804,7 @@ function BlockListBlockProvider( props ) {
 		isSectionBlock,
 		isEditingDisabled,
 		hasEditableOutline,
-		isTemporarilyEditingAsBlocks,
+		isEditingContentOnlySection,
 		defaultClassName,
 		mayDisplayControls,
 		mayDisplayParentControls,
@@ -802,6 +812,7 @@ function BlockListBlockProvider( props ) {
 		themeSupportsLayout,
 		canMove,
 		isBlockHidden,
+		bindableAttributes,
 	};
 
 	if (

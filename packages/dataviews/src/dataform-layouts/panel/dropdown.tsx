@@ -16,10 +16,15 @@ import { closeSmall } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import type { Form, FormField, NormalizedField } from '../../types';
+import type {
+	FieldValidity,
+	NormalizedForm,
+	NormalizedFormField,
+	FormValidity,
+	NormalizedField,
+} from '../../types';
 import { DataFormLayout } from '../data-form-layout';
-import { isCombinedField } from '../is-combined-field';
-import { DEFAULT_LAYOUT } from '../normalize-form-fields';
+import { DEFAULT_LAYOUT } from '../normalize-form';
 import SummaryButton from './summary-button';
 
 function DropdownHeader( {
@@ -55,36 +60,47 @@ function DropdownHeader( {
 }
 
 function PanelDropdown< Item >( {
-	fieldDefinition,
-	summaryFields,
-	popoverAnchor,
-	labelPosition = 'side',
 	data,
-	onChange,
 	field,
+	onChange,
+	validity,
+	labelPosition = 'side',
+	summaryFields,
+	fieldDefinition,
+	popoverAnchor,
 }: {
-	fieldDefinition: NormalizedField< Item >;
-	summaryFields: NormalizedField< Item >[];
-	popoverAnchor: HTMLElement | null;
-	labelPosition: 'side' | 'top' | 'none';
 	data: Item;
+	field: NormalizedFormField;
 	onChange: ( value: any ) => void;
-	field: FormField;
+	validity?: FieldValidity;
+	labelPosition: 'side' | 'top' | 'none';
+	summaryFields: NormalizedField< Item >[];
+	fieldDefinition: NormalizedField< Item >;
+	popoverAnchor: HTMLElement | null;
 } ) {
-	const fieldLabel = isCombinedField( field )
-		? field.label
-		: fieldDefinition?.label;
+	const fieldLabel = !! field.children ? field.label : fieldDefinition?.label;
 
-	const form: Form = useMemo(
-		(): Form => ( {
+	const form: NormalizedForm = useMemo(
+		() => ( {
 			layout: DEFAULT_LAYOUT,
-			fields: isCombinedField( field )
+			fields: !! field.children
 				? field.children
 				: // If not explicit children return the field id itself.
-				  [ { id: field.id } ],
+				  [ { id: field.id, layout: DEFAULT_LAYOUT } ],
 		} ),
 		[ field ]
 	);
+	const formValidity = useMemo( (): FormValidity => {
+		if ( validity === undefined ) {
+			return undefined;
+		}
+
+		if ( !! field.children ) {
+			return validity?.children;
+		}
+
+		return { [ field.id ]: validity };
+	}, [ validity, field ] );
 
 	// Memoize popoverProps to avoid returning a new object every time.
 	const popoverProps = useMemo(
@@ -127,16 +143,18 @@ function PanelDropdown< Item >( {
 						data={ data }
 						form={ form }
 						onChange={ onChange }
+						validity={ formValidity }
 					>
-						{ ( FieldLayout, nestedField ) => (
+						{ ( FieldLayout, childField, childFieldValidity ) => (
 							<FieldLayout
-								key={ nestedField.id }
+								key={ childField.id }
 								data={ data }
-								field={ nestedField }
+								field={ childField }
 								onChange={ onChange }
 								hideLabelFromVision={
 									( form?.fields ?? [] ).length < 2
 								}
+								validity={ childFieldValidity }
 							/>
 						) }
 					</DataFormLayout>

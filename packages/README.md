@@ -192,7 +192,7 @@ _Example:_
 
 ## Unreleased
 
-### Bug Fix
+### Bug Fixes
 
 -   Fixed an off-by-one error with the `sum` function.
 ```

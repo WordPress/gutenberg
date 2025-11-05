@@ -17,6 +17,7 @@ import {
 	InspectorControls,
 	RichText,
 	useBlockProps,
+	useBlockEditingMode,
 	store as blockEditorStore,
 	getColorClassName,
 } from '@wordpress/block-editor';
@@ -129,7 +130,16 @@ export default function NavigationSubmenuEdit( {
 } ) {
 	const { label, url, description } = attributes;
 
-	const { showSubmenuIcon, maxNestingLevel, openSubmenusOnClick } = context;
+	const {
+		showSubmenuIcon,
+		maxNestingLevel,
+		openSubmenusOnClick: contextOpenSubmenusOnClick,
+	} = context;
+	const blockEditingMode = useBlockEditingMode();
+
+	// Force click-only behavior in contentOnly mode to prevent hover dropdowns
+	const openSubmenusOnClick =
+		blockEditingMode !== 'default' ? true : contextOpenSubmenusOnClick;
 
 	// URL binding logic
 	const { clearBinding, createBinding } = useEntityBinding( {
@@ -137,14 +147,9 @@ export default function NavigationSubmenuEdit( {
 		attributes,
 	} );
 
-	const {
-		__unstableMarkNextChangeAsNotPersistent,
-		replaceBlock,
-		selectBlock,
-	} = useDispatch( blockEditorStore );
+	const { __unstableMarkNextChangeAsNotPersistent, replaceBlock } =
+		useDispatch( blockEditorStore );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
-	// Store what element opened the popover, so we know where to return focus to (toolbar button vs navigation link text)
-	const [ openedBy, setOpenedBy ] = useState( null );
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
@@ -276,7 +281,6 @@ export default function NavigationSubmenuEdit( {
 			// If we don't stop propagation, this event bubbles up to the parent submenu item
 			event.stopPropagation();
 			setIsLinkOpen( true );
-			setOpenedBy( ref.current );
 		}
 	}
 
@@ -363,9 +367,8 @@ export default function NavigationSubmenuEdit( {
 							icon={ linkIcon }
 							title={ __( 'Link' ) }
 							shortcut={ displayShortcut.primary( 'k' ) }
-							onClick={ ( event ) => {
+							onClick={ () => {
 								setIsLinkOpen( true );
-								setOpenedBy( event.currentTarget );
 							} }
 						/>
 					) }
@@ -388,9 +391,7 @@ export default function NavigationSubmenuEdit( {
 				/>
 			</InspectorControls>
 			<div { ...blockProps }>
-				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
 				<ParentElement className="wp-block-navigation-item__content">
-					{ /* eslint-enable */ }
 					<RichText
 						ref={ ref }
 						identifier="label"
@@ -407,7 +408,6 @@ export default function NavigationSubmenuEdit( {
 						onClick={ () => {
 							if ( ! openSubmenusOnClick && ! url ) {
 								setIsLinkOpen( true );
-								setOpenedBy( ref.current );
 							}
 						} }
 					/>
@@ -422,12 +422,6 @@ export default function NavigationSubmenuEdit( {
 							link={ attributes }
 							onClose={ () => {
 								setIsLinkOpen( false );
-								if ( openedBy ) {
-									openedBy.focus();
-									setOpenedBy( null );
-								} else {
-									selectBlock( clientId );
-								}
 							} }
 							anchor={ popoverAnchor }
 							onRemove={ () => {
@@ -435,17 +429,23 @@ export default function NavigationSubmenuEdit( {
 								speak( __( 'Link removed.' ), 'assertive' );
 							} }
 							onChange={ ( updatedValue ) => {
-								updateAttributes(
+								// updateAttributes determines the final state and returns metadata
+								const {
+									isEntityLink,
+									attributes: updatedAttributes,
+								} = updateAttributes(
 									updatedValue,
 									setAttributes,
 									attributes
 								);
 
-								// Handle URL binding
-								if ( ! updatedValue?.id ) {
-									clearBinding();
+								// Handle URL binding based on the final computed state
+								// Only create bindings for entity links (posts, pages, taxonomies)
+								// Never create bindings for custom links (manual URLs)
+								if ( isEntityLink ) {
+									createBinding( updatedAttributes );
 								} else {
-									createBinding();
+									clearBinding();
 								}
 							} }
 						/>

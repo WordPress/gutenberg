@@ -41,6 +41,7 @@ import {
 	openedBlockSettingsMenu,
 	expandedBlock,
 	zoomLevel,
+	editedContentOnlySection,
 	withDerivedBlockEditingModes,
 } from '../reducer';
 
@@ -3577,6 +3578,7 @@ describe( 'state', () => {
 				zoomLevel,
 				blockListSettings,
 				blockEditingModes,
+				editedContentOnlySection,
 			} )
 		);
 
@@ -3643,7 +3645,7 @@ describe( 'state', () => {
 				);
 			} );
 
-			it( 'returns no block editing modes when zoomed out / navigation mode are not active and there are no synced patterns', () => {
+			it( 'returns no block editing modes when zoomed out is not active and there are no synced patterns', () => {
 				expect( initialState.derivedBlockEditingModes ).toEqual(
 					new Map()
 				);
@@ -3815,28 +3817,6 @@ describe( 'state', () => {
 				);
 			} );
 
-			it( 'returns the expected block editing modes for synced patterns in navigation mode', () => {
-				expect( initialState.derivedNavModeBlockEditingModes ).toEqual(
-					new Map(
-						Object.entries( {
-							'': 'contentOnly', // Section root.
-							'group-1': 'contentOnly', // Section.
-							'paragraph-1': 'contentOnly', // Content block in section.
-							'group-2': 'disabled',
-							'paragraph-2': 'contentOnly', // Content block in section.
-							'root-pattern': 'contentOnly', // Section.
-							'pattern-paragraph': 'disabled',
-							'pattern-group': 'disabled',
-							'pattern-paragraph-with-overrides': 'contentOnly', // Pattern child with bindings.
-							'nested-pattern': 'disabled',
-							'nested-paragraph': 'disabled',
-							'nested-group': 'disabled',
-							'nested-paragraph-with-overrides': 'disabled',
-						} )
-					)
-				);
-			} );
-
 			it( 'removes block editing modes when synced patterns are removed', () => {
 				const { derivedBlockEditingModes } = dispatchActions(
 					[
@@ -3990,173 +3970,58 @@ describe( 'state', () => {
 					)
 				);
 			} );
-		} );
-
-		describe( 'navigation mode', () => {
-			let initialState;
-
-			beforeAll( () => {
-				initialState = dispatchActions(
-					[
-						{
-							type: 'UPDATE_SETTINGS',
-							settings: {
-								[ sectionRootClientIdKey ]: 'section-root',
-							},
-						},
-						{
-							type: 'RESET_BLOCKS',
-							blocks: [
-								{
-									name: 'core/template-part',
-									clientId: 'header',
-									attributes: {},
-									innerBlocks: [],
-								},
-								{
-									name: 'core/group',
-									clientId: 'section-root',
-									attributes: {},
-									innerBlocks: [
-										{
-											name: 'core/group',
-											clientId: 'group-1',
-											attributes: {},
-											innerBlocks: [
-												{
-													name: 'core/paragraph',
-													clientId: 'paragraph-1',
-													attributes: {},
-													innerBlocks: [],
-												},
-												{
-													name: 'core/group',
-													clientId: 'group-2',
-													attributes: {},
-													innerBlocks: [
-														{
-															name: 'core/paragraph',
-															clientId:
-																'paragraph-2',
-															attributes: {},
-															innerBlocks: [],
-														},
-													],
-												},
-											],
-										},
-									],
-								},
-								{
-									name: 'core/template-part',
-									clientId: 'footer',
-									attributes: {},
-									innerBlocks: [],
-								},
-							],
-						},
-						{
-							type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
-							clientId: 'header',
-							hasControlledInnerBlocks: true,
-						},
-						{
-							type: 'REPLACE_INNER_BLOCKS',
-							rootClientId: 'header',
-							blocks: [
-								{
-									name: 'core/group',
-									clientId: 'header-group',
-									attributes: {},
-									innerBlocks: [
-										{
-											name: 'core/paragraph',
-											clientId: 'header-paragraph',
-											attributes: {},
-											innerBlocks: [],
-										},
-									],
-								},
-							],
-						},
-						{
-							type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
-							clientId: 'footer',
-							hasControlledInnerBlocks: true,
-						},
-						{
-							type: 'REPLACE_INNER_BLOCKS',
-							rootClientId: 'footer',
-							blocks: [
-								{
-									name: 'core/paragraph',
-									clientId: 'footer-paragraph',
-									attributes: {},
-									innerBlocks: [],
-								},
-							],
-						},
-					],
-					testReducer
-				);
-			} );
-
-			it( 'returns the expected block editing modes', () => {
-				expect( initialState.derivedNavModeBlockEditingModes ).toEqual(
+			it( 'the editContentOnlySection action switches the section and all children to default mode when editing, then restores contentOnly modes when stopped', () => {
+				// Initial state should match the contentOnly template locking test
+				expect( initialState.derivedBlockEditingModes ).toEqual(
 					new Map(
 						Object.entries( {
-							'': 'disabled',
-							header: 'contentOnly', // Template part.
-							'header-group': 'disabled', // Content block in template part.
-							'header-paragraph': 'contentOnly', // Content block in template part.
-							footer: 'contentOnly', // Template part.
-							'footer-paragraph': 'contentOnly', // Content block in template part.
-							'section-root': 'contentOnly', // Section root.
-							'group-1': 'contentOnly', // Section block.
-							'paragraph-1': 'contentOnly', // Content block in section.
-							'group-2': 'disabled', // Non-content block in section.
-							'paragraph-2': 'contentOnly', // Content block in section.
+							'paragraph-1': 'contentOnly',
+							'group-2': 'disabled',
+							'paragraph-2': 'contentOnly',
 						} )
 					)
 				);
-			} );
 
-			it( 'allows content blocks to be disabled explicitly using the block editing mode', () => {
-				const {
-					derivedNavModeBlockEditingModes,
-					blockEditingModes: _blockEditingModes,
-				} = dispatchActions(
+				// Start editing the content-only section
+				const editingState = dispatchActions(
 					[
 						{
-							type: 'SET_BLOCK_EDITING_MODE',
-							clientId: 'paragraph-1',
-							mode: 'disabled',
+							type: 'EDIT_CONTENT_ONLY_SECTION',
+							clientId: 'group-1',
 						},
 					],
 					testReducer,
 					initialState
 				);
 
-				// Paragraph 1 is explicitly disabled and omitted from the
-				// derived block editing modes.
-				expect( _blockEditingModes ).toEqual(
+				// All blocks in the section should now be in default mode
+				expect( editingState.derivedBlockEditingModes ).toEqual(
 					new Map(
 						Object.entries( {
-							'paragraph-1': 'disabled',
+							'group-1': 'default',
+							'paragraph-1': 'default',
+							'group-2': 'default',
+							'paragraph-2': 'default',
 						} )
 					)
 				);
-				expect( derivedNavModeBlockEditingModes ).toEqual(
+
+				// Stop editing the content-only section
+				const restoredState = dispatchActions(
+					[
+						{
+							type: 'EDIT_CONTENT_ONLY_SECTION',
+						},
+					],
+					testReducer,
+					editingState
+				);
+
+				// Should restore to original contentOnly modes
+				expect( restoredState.derivedBlockEditingModes ).toEqual(
 					new Map(
 						Object.entries( {
-							'': 'disabled',
-							header: 'contentOnly',
-							'header-group': 'disabled',
-							'header-paragraph': 'contentOnly',
-							footer: 'contentOnly',
-							'footer-paragraph': 'contentOnly',
-							'section-root': 'contentOnly',
-							'group-1': 'contentOnly',
+							'paragraph-1': 'contentOnly',
 							'group-2': 'disabled',
 							'paragraph-2': 'contentOnly',
 						} )
@@ -4164,56 +4029,34 @@ describe( 'state', () => {
 				);
 			} );
 
-			it( 'removes block editing modes when blocks are removed', () => {
-				const { derivedNavModeBlockEditingModes } = dispatchActions(
+			it( 'editContentOnlySection only affects the edited section, not other blocks', () => {
+				// Set up a state with two separate contentOnly sections
+				const stateWithTwoSections = dispatchActions(
 					[
 						{
-							type: 'REMOVE_BLOCKS',
-							clientIds: [ 'group-2' ],
-						},
-					],
-					testReducer,
-					initialState
-				);
-
-				expect( derivedNavModeBlockEditingModes ).toEqual(
-					new Map(
-						Object.entries( {
-							'': 'disabled',
-							header: 'contentOnly', // Template part.
-							'header-group': 'disabled', // Content block in template part.
-							'header-paragraph': 'contentOnly', // Content block in template part.
-							footer: 'contentOnly', // Template part.
-							'footer-paragraph': 'contentOnly', // Content block in template part.
-							'section-root': 'contentOnly',
-							'group-1': 'contentOnly',
-							'paragraph-1': 'contentOnly',
-						} )
-					)
-				);
-			} );
-
-			it( 'updates block editing modes when new blocks are inserted', () => {
-				const { derivedNavModeBlockEditingModes } = dispatchActions(
-					[
-						{
-							type: 'INSERT_BLOCKS',
-							rootClientId: 'section-root',
+							type: 'RESET_BLOCKS',
 							blocks: [
 								{
 									name: 'core/group',
-									clientId: 'group-3',
+									clientId: 'section-1',
 									attributes: {},
 									innerBlocks: [
 										{
 											name: 'core/paragraph',
-											clientId: 'paragraph-3',
+											clientId: 'section-1-paragraph',
 											attributes: {},
 											innerBlocks: [],
 										},
+									],
+								},
+								{
+									name: 'core/group',
+									clientId: 'section-2',
+									attributes: {},
+									innerBlocks: [
 										{
-											name: 'core/group',
-											clientId: 'group-4',
+											name: 'core/paragraph',
+											clientId: 'section-2-paragraph',
 											attributes: {},
 											innerBlocks: [],
 										},
@@ -4221,93 +4064,52 @@ describe( 'state', () => {
 								},
 							],
 						},
-					],
-					testReducer,
-					initialState
-				);
-
-				expect( derivedNavModeBlockEditingModes ).toEqual(
-					new Map(
-						Object.entries( {
-							'': 'disabled', // Section root.
-							header: 'contentOnly', // Template part.
-							'header-group': 'disabled', // Content block in template part.
-							'header-paragraph': 'contentOnly', // Content block in template part.
-							footer: 'contentOnly', // Template part.
-							'footer-paragraph': 'contentOnly', // Content block in template part.
-							'section-root': 'contentOnly', // Section root.
-							'group-1': 'contentOnly', // Section block.
-							'paragraph-1': 'contentOnly', // Content block in section.
-							'group-2': 'disabled', // Non-content block in section.
-							'paragraph-2': 'contentOnly', // Content block in section.
-							'group-3': 'contentOnly', // New section block.
-							'paragraph-3': 'contentOnly', // New content block in section.
-							'group-4': 'disabled', // Non-content block in section.
-						} )
-					)
-				);
-			} );
-
-			it( 'updates block editing modes when blocks are moved to a new position', () => {
-				const { derivedNavModeBlockEditingModes } = dispatchActions(
-					[
 						{
-							type: 'MOVE_BLOCKS_TO_POSITION',
-							clientIds: [ 'group-2' ],
-							fromRootClientId: 'group-1',
-							toRootClientId: 'section-root',
-						},
-					],
-					testReducer,
-					initialState
-				);
-				expect( derivedNavModeBlockEditingModes ).toEqual(
-					new Map(
-						Object.entries( {
-							'': 'disabled', // Section root.
-							header: 'contentOnly', // Template part.
-							'header-group': 'disabled', // Content block in template part.
-							'header-paragraph': 'contentOnly', // Content block in template part.
-							footer: 'contentOnly', // Template part.
-							'footer-paragraph': 'contentOnly', // Content block in template part.
-							'section-root': 'contentOnly', // Section root.
-							'group-1': 'contentOnly', // Section block.
-							'paragraph-1': 'contentOnly', // Content block in section.
-							'group-2': 'contentOnly', // New section block.
-							'paragraph-2': 'contentOnly', // Still a content block in a section.
-						} )
-					)
-				);
-			} );
-
-			it( 'handles changes to the section root', () => {
-				const { derivedNavModeBlockEditingModes } = dispatchActions(
-					[
-						{
-							type: 'UPDATE_SETTINGS',
+							type: 'UPDATE_BLOCK_LIST_SETTINGS',
+							clientId: 'section-1',
 							settings: {
-								[ sectionRootClientIdKey ]: 'group-1',
+								templateLock: 'contentOnly',
+							},
+						},
+						{
+							type: 'UPDATE_BLOCK_LIST_SETTINGS',
+							clientId: 'section-2',
+							settings: {
+								templateLock: 'contentOnly',
 							},
 						},
 					],
-					testReducer,
-					initialState
+					testReducer
 				);
 
-				expect( derivedNavModeBlockEditingModes ).toEqual(
+				// Both sections should be in contentOnly mode initially
+				expect( stateWithTwoSections.derivedBlockEditingModes ).toEqual(
 					new Map(
 						Object.entries( {
-							'': 'disabled',
-							header: 'contentOnly', // Template part.
-							'header-group': 'disabled', // Content block in template part.
-							'header-paragraph': 'contentOnly', // Content block in template part.
-							footer: 'contentOnly', // Template part.
-							'footer-paragraph': 'contentOnly', // Content block in template part.
-							'section-root': 'disabled',
-							'group-1': 'contentOnly', // New section root.
-							'paragraph-1': 'contentOnly', // Section and content block
-							'group-2': 'contentOnly', // Section.
-							'paragraph-2': 'contentOnly', // Content block.
+							'section-1-paragraph': 'contentOnly',
+							'section-2-paragraph': 'contentOnly',
+						} )
+					)
+				);
+
+				// Start editing only section-1
+				const editingSection1 = dispatchActions(
+					[
+						{
+							type: 'EDIT_CONTENT_ONLY_SECTION',
+							clientId: 'section-1',
+						},
+					],
+					testReducer,
+					stateWithTwoSections
+				);
+
+				expect( editingSection1.derivedBlockEditingModes ).toEqual(
+					new Map(
+						Object.entries( {
+							'section-1': 'default',
+							'section-1-paragraph': 'default',
+							'section-2-paragraph': 'contentOnly',
 						} )
 					)
 				);
