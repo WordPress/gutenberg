@@ -3,13 +3,14 @@
  */
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
-import { useEffect, useCallback } from '@wordpress/element';
+import { useEffect, useCallback, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
 	ToggleControl,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
+import { useRefEffect } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -62,6 +63,57 @@ function useFitText( { fitText, name, clientId } ) {
 	const hasFitTextSupport = hasBlockSupport( name, FIT_TEXT_SUPPORT_KEY );
 	const blockElement = useBlockElement( clientId );
 
+	// Fallback: Try to query the DOM directly when blockElement is null
+	// This is needed for preview mode where the ref might not be set up properly
+	const [ fallbackElement, setFallbackElement ] = useState( null );
+
+	useEffect( () => {
+		if ( ! fitText || ! hasFitTextSupport || ! clientId ) {
+			return;
+		}
+
+		// If we already have blockElement from the ref system, use it
+		if ( blockElement && fallbackElement !== null ) {
+			setFallbackElement( null );
+			return;
+		}
+
+		// Otherwise, try to query the DOM directly
+		// We need to check both the main document and the editor canvas iframe
+		const tryQueryElement = () => {
+			// Try main document first
+			let element = document.getElementById( `block-${ clientId }` );
+
+			// If not found, check the editor canvas iframe (for preview mode)
+			if ( ! element ) {
+				const iframe = document.querySelector( 'iframe[name="editor-canvas"]' );
+				if ( iframe ) {
+					try {
+						const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+						if ( iframeDoc ) {
+							element = iframeDoc.getElementById( `block-${ clientId }` );
+						}
+					} catch ( e ) {
+						// Cross-origin iframe, skip
+					}
+				}
+			}
+
+			if ( element ) {
+				setFallbackElement( element );
+			} else {
+				// Element not found yet, retry on next frame
+				// requestAnimationFrame( tryQueryElement );
+			}
+		};
+
+		const timeoutId = setTimeout( tryQueryElement, 0 );
+		return () => clearTimeout( timeoutId );
+	}, [ blockElement, clientId, fitText, hasFitTextSupport ] );
+
+	// Use whichever element is available
+	const actualElement = blockElement || fallbackElement;
+
 	// Monitor block attribute changes
 	// Any attribute may change the available space.
 	const blockAttributes = useSelect(
@@ -75,17 +127,16 @@ function useFitText( { fitText, name, clientId } ) {
 	);
 
 	const applyFitText = useCallback( () => {
-		if ( ! blockElement || ! hasFitTextSupport || ! fitText ) {
+		if ( ! actualElement || ! hasFitTextSupport || ! fitText ) {
 			return;
 		}
-
 		// Get or create style element with unique ID
 		const styleId = `fit-text-${ clientId }`;
-		let styleElement = blockElement.ownerDocument.getElementById( styleId );
+		let styleElement = actualElement.ownerDocument.getElementById( styleId );
 		if ( ! styleElement ) {
-			styleElement = blockElement.ownerDocument.createElement( 'style' );
+			styleElement = actualElement.ownerDocument.createElement( 'style' );
 			styleElement.id = styleId;
-			blockElement.ownerDocument.head.appendChild( styleElement );
+			actualElement.ownerDocument.head.appendChild( styleElement );
 		}
 
 		const blockSelector = `#block-${ clientId }`;
@@ -98,21 +149,20 @@ function useFitText( { fitText, name, clientId } ) {
 			}
 		};
 
-		optimizeFitText( blockElement, applyFontSize );
-	}, [ blockElement, clientId, hasFitTextSupport, fitText ] );
+		optimizeFitText( actualElement, applyFontSize );
+	}, [ actualElement, clientId, hasFitTextSupport, fitText ] );
 
 	useEffect( () => {
 		if (
 			! fitText ||
-			! blockElement ||
+			! actualElement ||
 			! clientId ||
 			! hasFitTextSupport
 		) {
 			return;
 		}
-
 		// Store current element value for cleanup
-		const currentElement = blockElement;
+		const currentElement = actualElement;
 		const previousVisibility = currentElement.style.visibility;
 
 		// Store IDs for cleanup
@@ -169,14 +219,14 @@ function useFitText( { fitText, name, clientId } ) {
 				styleElement.remove();
 			}
 		};
-	}, [ fitText, clientId, applyFitText, blockElement, hasFitTextSupport ] );
+	}, [ fitText, clientId, applyFitText, actualElement, hasFitTextSupport ] );
 
 	// Trigger fit text recalculation when content changes
 	useEffect( () => {
-		if ( fitText && blockElement && hasFitTextSupport ) {
+		if ( fitText && actualElement && hasFitTextSupport ) {
 			// Wait for next frame to ensure DOM has updated after content changes
 			const frameId = window.requestAnimationFrame( () => {
-				if ( blockElement ) {
+				if ( actualElement ) {
 					applyFitText();
 				}
 			} );
@@ -187,7 +237,7 @@ function useFitText( { fitText, name, clientId } ) {
 		blockAttributes,
 		fitText,
 		applyFitText,
-		blockElement,
+		actualElement,
 		hasFitTextSupport,
 	] );
 }
