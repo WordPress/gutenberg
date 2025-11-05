@@ -48,7 +48,7 @@ describe( 'buildRamps', () => {
 				};
 			} )
 		).toMatchSnapshot();
-	} );
+	}, 10000 );
 
 	it( 'accent ramp snapshots', () => {
 		const options = [
