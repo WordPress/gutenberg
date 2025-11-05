@@ -539,6 +539,7 @@ describe( 'DataViews component', () => {
 			await user.click( viewOptionsButton );
 
 			await user.tab();
+			await user.tab();
 
 			expect(
 				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
@@ -582,6 +583,7 @@ describe( 'DataViews component', () => {
 			// instead of a direct .focus() so that effects have time to complete.
 			await user.click( viewOptionsButton );
 			await user.click( viewOptionsButton );
+			await user.tab();
 			await user.tab();
 
 			expect(
