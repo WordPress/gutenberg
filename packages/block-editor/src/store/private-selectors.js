@@ -113,11 +113,7 @@ export function isContainerInsertableToInContentOnlyMode(
 	);
 }
 
-function getEnabledClientIdsTreeUnmemoized(
-	state,
-	rootClientId,
-	includeRoot = false
-) {
+function getEnabledClientIdsTreeUnmemoized( state, rootClientId ) {
 	const blockOrder = getBlockOrder( state, rootClientId );
 	const result = [];
 
@@ -131,18 +127,6 @@ function getEnabledClientIdsTreeUnmemoized(
 		} else {
 			result.push( ...innerBlocks );
 		}
-	}
-
-	if (
-		includeRoot &&
-		getBlockEditingMode( state, rootClientId ) !== 'disabled'
-	) {
-		return [
-			{
-				clientId: rootClientId,
-				innerBlocks: result,
-			},
-		];
 	}
 
 	return result;
