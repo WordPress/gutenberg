@@ -1384,7 +1384,7 @@ const LayoutCardComponent = ( {
 			isVisible: ( item ) => item.displayPayments,
 			render: ( { item } ) => {
 				return (
-					<p>
+					<p style={ { margin: 0 } }>
 						The customer has made a total of { item.totalOrders }{ ' ' }
 						orders, amounting to { item.totalRevenue } dollars. The
 						average order value is { item.averageOrderValue }{ ' ' }
