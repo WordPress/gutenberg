@@ -102,13 +102,22 @@ export function createUndoManager(): SyncUndoManager {
 	window.logStacks = logStacks;
 
 	function updatePositionMeta( event: StackItemEvent ): void {
-		// Prefer saving lastSelection with the undo stack, as it will most likely
-		// be where user started before making this change
-		let lastSelection =
-			selectionHistory.getLastSelection() ??
-			selectionHistory.getCurrentPosition();
+		let lastSelection;
+		if ( event.origin?.redoing === true ) {
+			// If we're redoing, the current position is the location where the user
+			// was before making this change.
+			lastSelection =
+				selectionHistory.getCurrentPosition() ??
+				selectionHistory.getLastSelection();
+		} else {
+			// Otherwise, prefer saving lastSelection with the undo stack,
+			// as it will be where user started before making this change
+			lastSelection =
+				selectionHistory.getLastSelection() ??
+				selectionHistory.getCurrentPosition();
+		}
 
-		const backupPositions = selectionHistory.getBlockHistory( 5 );
+		const backupPositions = selectionHistory.getBlockHistory( 3 );
 
 		if ( lastSelection === null && backupPositions.length === 0 ) {
 			// If we don't have a last selection and no backup positions, then don't save anything extra
@@ -124,7 +133,10 @@ export function createUndoManager(): SyncUndoManager {
 		};
 
 		event.stackItem.meta.set( 'position', positionMeta );
-		console.log( 'Stored stackItem with positionMeta:', positionMeta );
+		console.log(
+			`Stored ${ event.type } stackItem with positionMeta:`,
+			positionMeta
+		);
 	}
 
 	function restorePosition( event: StackItemEvent ): void {
@@ -199,7 +211,6 @@ export function createUndoManager(): SyncUndoManager {
 	}
 
 	yUndoManager.on( 'stack-item-added', ( event: StackItemEvent ) => {
-		console.log( 'stack-item-added' );
 		updatePositionMeta( event );
 	} );
 
@@ -248,7 +259,6 @@ export function createUndoManager(): SyncUndoManager {
 			selectionHistory.setYDoc( ymap.doc as Y.Doc );
 
 			handlers.subscribeToSelectionChange( ( newSelection ) => {
-				console.log( 'newSelection:', newSelection );
 				selectionHistory.updateSelection( newSelection );
 			} );
 
