@@ -1913,6 +1913,12 @@ export function setBlockVisibility( updates ) {
  * @param {?string} clientId The clientId of the block being temporarily edited.
  */
 export function __unstableSetTemporarilyEditingAsBlocks( clientId ) {
+	deprecated(
+		"wp.data.dispatch( 'core/block-editor' ).__unstableSetTemporarilyEditingAsBlocks",
+		{
+			since: '7.0',
+		}
+	);
 	return editContentOnlySection( clientId );
 }
 
