@@ -6,6 +6,10 @@
 
 -   The `lint-js` script now includes `.cjs`, `.mjs`, `.cts`, and `.mts` as default extensions to lint. This is considered a breaking change because the script may now surface lint errors in your project which would not have been previously identified.
 
+### Bug Fixes
+
+-   Skip license check for uninstalled optional dependencies on Windows to prevent false license validation failures ([#72996](https://github.com/WordPress/gutenberg/pull/72996)).
+
 ## 30.27.0 (2025-10-29)
 
 ## 30.26.0 (2025-10-17)

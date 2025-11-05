@@ -343,7 +343,11 @@ function checkDepsInTree( deps, options ) {
 			// On Windows, npm ls may return a path for optional deps that aren't installed
 			// due to platform mismatch. If optional and not installed, skip with a warning.
 			const packageJsonPath = dep.path + '/package.json';
-			if ( ! existsSync( packageJsonPath ) && dep.optional ) {
+			if (
+				process.platform === 'win32' &&
+				! existsSync( packageJsonPath ) &&
+				dep.optional
+			) {
 				process.stdout.write(
 					`${ WARNING_TEXT } Skipping optional dependency ${ dep.name }@${ dep.version } (not installed on this platform).\n`
 				);
