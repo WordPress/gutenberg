@@ -371,7 +371,8 @@ function ViewPickerTable< Item >( {
 									<td
 										colSpan={
 											columns.length +
-											( hasPrimaryColumn ? 1 : 0 )
+											( hasPrimaryColumn ? 1 : 0 ) +
+											1
 										}
 										className="dataviews-view-table__group-header-cell"
 									>
