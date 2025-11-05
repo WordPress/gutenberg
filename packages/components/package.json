@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/components",
-	"version": "30.7.1-prerelease",
+	"version": "30.7.2-next.2f1c7c01b.0",
 	"description": "UI components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
