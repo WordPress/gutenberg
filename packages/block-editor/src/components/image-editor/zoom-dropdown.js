@@ -15,6 +15,7 @@ import { useImageCropper } from '@wordpress/image-cropper';
  * Internal dependencies
  */
 import { MIN_ZOOM, MAX_ZOOM, POPOVER_PROPS } from './constants';
+import { useImageEditingContext } from './context';
 
 function roundToTwo( numValue ) {
 	return Math.round( numValue * 100 ) / 100;
@@ -22,6 +23,7 @@ function roundToTwo( numValue ) {
 
 export default function ZoomDropdown() {
 	const { cropperState, setCropperState } = useImageCropper();
+	const { isInProgress } = useImageEditingContext();
 	const { zoom } = cropperState;
 	const value = ( roundToTwo( zoom * 100 ) || 0 ) + '%';
 	const setZoom = ( newValue ) => {
@@ -40,7 +42,7 @@ export default function ZoomDropdown() {
 					label={ __( 'Zoom' ) }
 					onClick={ onToggle }
 					aria-expanded={ isOpen }
-					//disabled={ isInProgress }
+					disabled={ isInProgress }
 				/>
 			) }
 			renderContent={ () => (

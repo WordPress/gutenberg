@@ -13,6 +13,7 @@ import Cropper from './cropper';
 import ZoomDropdown from './zoom-dropdown';
 import RotationButton from './rotation-button';
 import FormControls from './form-controls';
+import ImageEditingProvider from './context';
 
 export default function ImageEditor( {
 	id,
@@ -27,36 +28,37 @@ export default function ImageEditor( {
 } ) {
 	return (
 		<ImageCropperProvider>
-			<Cropper
-				borderProps={ borderProps }
+			<ImageEditingProvider
+				id={ id }
 				url={ url }
-				width={ width }
-				height={ height }
-				naturalHeight={ naturalHeight }
-				naturalWidth={ naturalWidth }
-			/>
-			<BlockControls>
-				<ToolbarGroup>
-					<ZoomDropdown />
-					<RotationButton />
-				</ToolbarGroup>
-			</BlockControls>
-
-
-			{/* <BlockControls>
-				<ToolbarGroup>
-					<ZoomDropdown />
-					<ToolbarItem>
-						{ ( toggleProps ) => (
-							<AspectRatioDropdown toggleProps={ toggleProps } />
-						) }
-					</ToolbarItem>
-					<RotationButton />
-				</ToolbarGroup>
-				<ToolbarGroup>
-					<FormControls />
-				</ToolbarGroup>
-			</BlockControls> */}
+				onSaveImage={ onSaveImage }
+				onFinishEditing={ onFinishEditing }
+			>
+				<Cropper
+					borderProps={ borderProps }
+					url={ url }
+					width={ width }
+					height={ height }
+					naturalHeight={ naturalHeight }
+					naturalWidth={ naturalWidth }
+				/>
+				<BlockControls>
+					<ToolbarGroup>
+						<ZoomDropdown />
+						<ToolbarItem>
+							{ ( toggleProps ) => (
+								<AspectRatioDropdown
+									toggleProps={ toggleProps }
+								/>
+							) }
+						</ToolbarItem>
+						<RotationButton />
+					</ToolbarGroup>
+					<ToolbarGroup>
+						<FormControls />
+					</ToolbarGroup>
+				</BlockControls>
+			</ImageEditingProvider>
 		</ImageCropperProvider>
 	);
 }

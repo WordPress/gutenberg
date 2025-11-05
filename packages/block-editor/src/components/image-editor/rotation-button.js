@@ -14,6 +14,7 @@ import { useImageEditingContext } from './context';
 
 export default function RotationButton() {
 	const { cropperState, setCropperState } = useImageCropper();
+	const { isInProgress } = useImageEditingContext();
 	const { rotation } = cropperState;
 	const rotateClockwise = () => {
 		setCropperState( { rotation: rotation + 90 } );
@@ -23,7 +24,7 @@ export default function RotationButton() {
 			icon={ rotateRightIcon }
 			label={ __( 'Rotate' ) }
 			onClick={ rotateClockwise }
-			//disabled={ isInProgress }
+			disabled={ isInProgress }
 		/>
 	);
 }
