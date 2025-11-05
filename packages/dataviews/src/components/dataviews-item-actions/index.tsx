@@ -132,35 +132,34 @@ export function ActionsMenuGroup< Item >( {
 	registry,
 	setActiveModalAction,
 }: ActionsMenuGroupProps< Item > ) {
-	const { setAsActions, otherActions } =
-		useMemo( () => {
-			const _setAsActions = actions.filter( ( action ) =>
-				action.id.includes( 'set-as-' )
-			);
-			const _otherActions = actions.filter(
-				( action ) => ! action.id.includes( 'set-as-' )
-			);
-
-			return {
-				setAsActions: _setAsActions,
-				otherActions: _otherActions,
-			};
-		}, [ actions ] );
-
-	const handleActionClick = ( action: Action< Item > ) => () => {
-		if ( 'RenderModal' in action ) {
-			setActiveModalAction( action );
-			return;
-		}
-		action.callback( [ item ], { registry } );
-	};
+	const { setAsActions, otherActions } = useMemo( () => {
+		return actions.reduce(
+			( acc, action ) => {
+				( action.id.includes( 'set-as-' )
+					? acc.setAsActions
+					: acc.otherActions
+				).push( action );
+				return acc;
+			},
+			{
+				setAsActions: [] as Action< Item >[],
+				otherActions: [] as Action< Item >[],
+			}
+		);
+	}, [ actions ] );
 
 	const renderActionGroup = ( actionList: Action< Item >[] ) =>
 		actionList.map( ( action ) => (
 			<MenuItemTrigger
 				key={ action.id }
 				action={ action }
-				onClick={ handleActionClick( action ) }
+				onClick={ () => {
+					if ( 'RenderModal' in action ) {
+						setActiveModalAction( action );
+						return;
+					}
+					action.callback( [ item ], { registry } );
+				} }
 				items={ [ item ] }
 			/>
 		) );
