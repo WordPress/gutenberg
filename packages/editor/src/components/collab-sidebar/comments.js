@@ -510,14 +510,17 @@ function Thread( {
 				thread={ thread }
 				isExpanded={ isSelected }
 				onEdit={ ( params = {} ) => {
-					const { status } = params;
 					onEditComment( params );
-					if ( status === 'approved' ) {
+					if ( params.status === 'approved' ) {
 						unselectThread();
-						focusCommentThread(
-							thread.id,
-							commentSidebarRef.current
-						);
+						if ( isFloating ) {
+							relatedBlockElement?.focus();
+						} else {
+							focusCommentThread(
+								thread.id,
+								commentSidebarRef.current
+							);
+						}
 					}
 				} }
 				onDelete={ onCommentDelete }
