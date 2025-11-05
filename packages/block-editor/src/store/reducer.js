@@ -2331,8 +2331,6 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 				derivedBlockEditingModes.set( clientId, 'default' );
 				return;
 			}
-
-			return;
 		}
 
 		// If the block already has an explicit block editing mode set,
