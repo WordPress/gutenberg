@@ -23,11 +23,11 @@ import { unlock } from '../lock-unlock';
 const { Badge } = unlock( componentsPrivateApis );
 
 export default function MathEdit( { attributes, setAttributes, isSelected } ) {
-	const { latex } = attributes;
+	const { latex, mathML } = attributes;
 	const [ blockRef, setBlockRef ] = useState();
 	const [ error, setError ] = useState( null );
 	const [ latexToMathML, setLatexToMathML ] = useState();
-	const initialLatex = useRef( attributes.latex );
+	const initialLatex = useRef( latex );
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
@@ -56,13 +56,13 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 
 	return (
 		<div { ...blockProps }>
-			{ attributes.mathML ? (
+			{ mathML ? (
 				<math
 					// We can't spread block props on the math element because
 					// it only supports a limited amount of global attributes.
 					// For example, draggable will have no effect.
 					display="block"
-					dangerouslySetInnerHTML={ { __html: attributes.mathML } }
+					dangerouslySetInnerHTML={ { __html: mathML } }
 				/>
 			) : (
 				'\u200B'
@@ -88,9 +88,9 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 										setAttributes( { latex: newLatex } );
 										return;
 									}
-									let mathML = '';
+									let newMathML = '';
 									try {
-										mathML = latexToMathML( newLatex, {
+										newMathML = latexToMathML( newLatex, {
 											displayMode: true,
 										} );
 										setError( null );
@@ -98,7 +98,7 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 										setError( err.message );
 									}
 									setAttributes( {
-										mathML,
+										mathML: newMathML,
 										latex: newLatex,
 									} );
 								} }
