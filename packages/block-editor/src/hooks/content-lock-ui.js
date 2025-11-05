@@ -14,8 +14,8 @@ import { BlockControls } from '../components';
 import { unlock } from '../lock-unlock';
 
 // The implementation of content locking is mainly in this file, although the mechanism
-// to stop editing a content only section when an outside block is selected is on component StopEditingContentOnlySectionOnOutsideSelect
-// at block-editor/src/components/block-list/index.js.
+// to stop editing a content only section when an outside block is selected is in the component
+// `StopEditingContentOnlySectionOnOutsideSelect` at block-editor/src/components/block-list/index.js.
 // Besides the components on this file and the file referenced above the implementation
 // also includes artifacts on the store (actions, reducers, and selector).
 
