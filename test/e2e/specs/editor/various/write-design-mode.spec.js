@@ -13,7 +13,7 @@ test.describe.skip( 'Write/Design mode', () => {
 		} );
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//index',
-			postType: 'wp_registered_template',
+			postType: 'wp_template',
 			canvas: 'edit',
 		} );
 	} );

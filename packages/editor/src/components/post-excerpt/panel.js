@@ -23,7 +23,6 @@ import PostExcerptCheck from './check';
 import PluginPostExcerpt from './plugin';
 import { TEMPLATE_ORIGINS } from '../../store/constants';
 import { store as editorStore } from '../../store';
-import { getTemplateInfo } from '../../utils/get-template-info';
 
 /**
  * Module Constants
@@ -133,22 +132,13 @@ function PrivateExcerpt() {
 					postType,
 					getCurrentPostId()
 				);
-			const fallback =
-				! _excerpt && isTemplateOrTemplatePart
-					? getTemplateInfo( {
-							template,
-							templateTypes:
-								select( coreStore ).getCurrentTheme()
-									?.default_template_types,
-					  } )?.description
-					: undefined;
 			// For post types that use excerpt as description, we do not abide
 			// by the `isEnabled` panel flag in order to render them as text.
 			const _shouldRender =
 				isEditorPanelEnabled( PANEL_NAME ) ||
 				_shouldBeUsedAsDescription;
 			return {
-				excerpt: _excerpt ?? fallback,
+				excerpt: _excerpt,
 				shouldRender: _shouldRender,
 				shouldBeUsedAsDescription: _shouldBeUsedAsDescription,
 				// If we should render, allow editing for all post types that are not used as description.
