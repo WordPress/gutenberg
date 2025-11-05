@@ -143,9 +143,13 @@ export function useBlockComments( postId ) {
 			);
 
 		// Append orphaned notes (whose related block was deleted or missing).
-		const orphanedComments = updatedResult.filter(
-			( thread ) => ! mappedIds.has( String( thread.id ) )
-		);
+		const orphanedComments = updatedResult
+			.filter( ( thread ) => ! mappedIds.has( String( thread.id ) ) )
+			.map( ( thread ) => ( {
+				...thread,
+				// This is an interim status for orphaned comments.
+				status: 'orphaned',
+			} ) );
 
 		const allSortedComments = [
 			...unresolvedSortedComments,

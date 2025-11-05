@@ -13,6 +13,7 @@ import {
 	useCallback,
 	useMemo,
 	useRef,
+	Fragment,
 } from '@wordpress/element';
 import {
 	__experimentalText as Text,
@@ -313,6 +314,13 @@ export function Comments( {
 		return null;
 	}
 
+	const lastUnresolvedIndex = ! isFloating
+		? threads.findLastIndex( ( thread ) => thread.status === 'hold' )
+		: -1;
+	const lastResolvedIndex = ! isFloating
+		? threads.findLastIndex( ( thread ) => thread.status === 'approved' )
+		: -1;
+
 	return (
 		<>
 			{ ! isFloating &&
@@ -325,26 +333,41 @@ export function Comments( {
 						commentSidebarRef={ commentSidebarRef }
 					/>
 				) }
-			{ threads.map( ( thread ) => (
-				<Thread
-					key={ thread.id }
-					thread={ thread }
-					onAddReply={ onAddReply }
-					onCommentDelete={ handleDelete }
-					onEditComment={ onEditComment }
-					isSelected={ selectedThread === thread.id }
-					setSelectedThread={ setSelectedThread }
-					setShowCommentBoard={ setShowCommentBoard }
-					commentSidebarRef={ commentSidebarRef }
-					reflowComments={ reflowComments }
-					isFloating={ isFloating }
-					calculatedOffset={ boardOffsets[ thread.id ] ?? 0 }
-					setHeights={ setHeights }
-					setBlockRef={ setBlockRef }
-					selectedThread={ selectedThread }
-					commentLastUpdated={ commentLastUpdated }
-					showCommentBoard={ showCommentBoard }
-				/>
+			{ threads.map( ( thread, index ) => (
+				<Fragment key={ thread.id }>
+					<Thread
+						thread={ thread }
+						onAddReply={ onAddReply }
+						onCommentDelete={ handleDelete }
+						onEditComment={ onEditComment }
+						isSelected={ selectedThread === thread.id }
+						setSelectedThread={ setSelectedThread }
+						setShowCommentBoard={ setShowCommentBoard }
+						commentSidebarRef={ commentSidebarRef }
+						reflowComments={ reflowComments }
+						isFloating={ isFloating }
+						calculatedOffset={ boardOffsets[ thread.id ] ?? 0 }
+						setHeights={ setHeights }
+						setBlockRef={ setBlockRef }
+						selectedThread={ selectedThread }
+						commentLastUpdated={ commentLastUpdated }
+						showCommentBoard={ showCommentBoard }
+					/>
+					{ ( index === lastUnresolvedIndex ||
+						index === lastResolvedIndex ) && (
+						<HStack
+							className="editor-collab-sidebar-panel__status-separator"
+							alignment="center"
+							justify="center"
+						>
+							<Text as="p" variant="muted">
+								{ index === lastUnresolvedIndex
+									? __( 'Resolved' )
+									: __( 'Deleted' ) }
+							</Text>
+						</HStack>
+					) }
+				</Fragment>
 			) ) }
 		</>
 	);

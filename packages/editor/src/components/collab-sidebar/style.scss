@@ -99,7 +99,8 @@
 	flex-shrink: 0;
 }
 
-.editor-collab-sidebar-panel__more-reply-separator {
+.editor-collab-sidebar-panel__more-reply-separator,
+.editor-collab-sidebar-panel__status-separator {
 	&::before,
 	&::after {
 		content: "";
