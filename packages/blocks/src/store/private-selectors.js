@@ -212,51 +212,47 @@ export function getBlockBindingsSource( state, sourceName ) {
 }
 
 export const getBlockBindingsSourcesForBlock = createRegistrySelector(
-	( select ) =>
-		createSelector(
-			( state, blockName, blockContext ) => {
-				const registeredSources = getAllBlockBindingsSources( state );
-				const sources = {};
+	( select ) => ( state, blockName, blockContext ) => {
+		const registeredSources = getAllBlockBindingsSources( state );
+		const sources = {};
 
-				Object.entries( registeredSources ).forEach(
-					( [
-						sourceName,
-						{ getFieldsList, usesContext, label, getValues },
-					] ) => {
-						// Populate context.
-						const context = {};
-						if ( usesContext?.length ) {
-							for ( const key of usesContext ) {
-								context[ key ] = blockContext[ key ];
-							}
-						}
-						if ( getFieldsList ) {
-							const fieldsListResult = getFieldsList( {
-								select,
-								context,
-							} );
-							sources[ sourceName ] = {
-								data: fieldsListResult || [],
-								label,
-								getValues,
-							};
-						} else {
-							/*
-							 * Include sources without getFieldsList if they are already used in a binding.
-							 * This allows them to be displayed in read-only mode.
-							 */
-							sources[ sourceName ] = {
-								data: [],
-								label,
-								getValues,
-							};
-						}
+		Object.entries( registeredSources ).forEach(
+			( [
+				sourceName,
+				{ getFieldsList, usesContext, label, getValues },
+			] ) => {
+				// Populate context.
+				const context = {};
+				if ( usesContext?.length ) {
+					for ( const key of usesContext ) {
+						context[ key ] = blockContext[ key ];
 					}
-				);
-				return sources;
-			},
-			( state ) => [ getAllBlockBindingsSources( state ) ]
-		)
+				}
+				if ( getFieldsList ) {
+					const fieldsListResult = getFieldsList( {
+						select,
+						context,
+					} );
+					sources[ sourceName ] = {
+						data: fieldsListResult || [],
+						label,
+						getValues,
+					};
+				} else {
+					/*
+					 * Include sources without getFieldsList if they are already used in a binding.
+					 * This allows them to be displayed in read-only mode.
+					 */
+					sources[ sourceName ] = {
+						data: [],
+						label,
+						getValues,
+					};
+				}
+			}
+		);
+		return sources;
+	}
 );
 
 /**
