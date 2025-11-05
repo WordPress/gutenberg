@@ -171,5 +171,5 @@
 	font-weight: $font-weight-medium;
 	color: $gray-900;
 	margin: 0 0 $grid-unit-10 0;
-	padding: 0 $grid-unit-60;
+	padding: 0 var(--dataviews-padding-x, #{$grid-unit-60});
 }

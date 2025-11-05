@@ -43,6 +43,6 @@
 .dataviews-wrapper,
 .dataviews-picker-wrapper {
 	.dataviews-footer {
-		padding: $grid-unit-15 var(--dataviews-padding-x, $grid-unit-60);
+		padding: $grid-unit-15 var(--dataviews-padding-x, #{$grid-unit-60});
 	}
 }
