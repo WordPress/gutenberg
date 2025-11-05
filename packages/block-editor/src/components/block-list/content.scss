@@ -1,3 +1,8 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
 // This remove the margins set here: https://github.com/WordPress/gutenberg/blob/17e5c2d870d84fb6de48dcd5bc3c38cd0c0fb0d0/packages/block-library/src/editor.scss#L56
 // It removes the margins around blocks when a BlockPreview is rendered in the block style selector
 .block-editor-block-styles .block-editor-block-list__block {
@@ -206,20 +211,24 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	&[data-clear="true"] {
 		float: none;
 	}
+
+	&:not([draggable="true"]),
+	&:not([data-draggable="true"]) {
+		cursor: default;
+	}
+
+	&[draggable="true"],
+	&[data-draggable="true"] {
+		cursor: grab;
+	}
+
+	&[contenteditable],
+	[contenteditable] {
+		cursor: text;
+	}
 }
 
 .is-outline-mode .block-editor-block-list__block:not(.remove-outline) {
-
-	&.is-selected,
-	&.is-hovered {
-		cursor: default;
-
-		&.rich-text,
-		.rich-text {
-			cursor: auto;
-		}
-	}
-
 	&.is-hovered:not(.is-selected),
 	&:not(.rich-text):not([contenteditable="true"]).is-selected {
 
@@ -307,8 +316,9 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	}
 }
 
-.is-focus-mode .block-editor-block-list__block.is-content-locked.has-child-selected,
-.is-focus-mode .block-editor-block-list__block.is-content-locked-temporarily-editing-as-blocks.has-child-selected {
+// When editing a content only section in focus mode, the entire section stays at full opacity,
+// the following overrides focus modes usual rule of only the selected block being at full opacity.
+.is-focus-mode .block-editor-block-list__block.is-editing-content-only-section.has-child-selected {
 	&,
 	& .block-editor-block-list__block {
 		opacity: 1;
@@ -460,3 +470,4 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 .is-dragging {
 	cursor: grabbing;
 }
+

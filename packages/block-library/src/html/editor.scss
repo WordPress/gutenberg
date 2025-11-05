@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/mixins" as *;
+
 .block-library-html__edit {
 	.block-library-html__preview-overlay {
 		position: absolute;

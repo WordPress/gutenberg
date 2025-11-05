@@ -1,18 +1,13 @@
 /**
- * WordPress dependencies
- */
-import { __ } from '@wordpress/i18n';
-
-/**
  * Internal dependencies
  */
 import type {
 	DataViewRenderFieldProps,
 	SortDirection,
-	NormalizedField,
 	FieldTypeDefinition,
 } from '../types';
-import renderFromElements from './utils/render-from-elements';
+import RenderFromElements from './utils/render-from-elements';
+import parseDateTime from './utils/parse-date-time';
 import {
 	OPERATOR_ON,
 	OPERATOR_NOT_ON,
@@ -34,23 +29,26 @@ function sort( a: any, b: any, direction: SortDirection ) {
 export default {
 	sort,
 	isValid: {
-		custom: ( item: any, field: NormalizedField< any > ) => {
-			const value = field.getValue( { item } );
-			if ( field?.elements ) {
-				const validValues = field.elements.map( ( f ) => f.value );
-				if ( ! validValues.includes( value ) ) {
-					return __( 'Value must be one of the elements.' );
-				}
-			}
-
-			return null;
-		},
+		elements: true,
+		custom: () => null,
 	},
 	Edit: 'datetime',
 	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
-		return field.elements
-			? renderFromElements( { item, field } )
-			: field.getValue( { item } );
+		if ( field.elements ) {
+			return <RenderFromElements item={ item } field={ field } />;
+		}
+
+		const value = field.getValue( { item } );
+		if ( [ '', undefined, null ].includes( value ) ) {
+			return null;
+		}
+
+		try {
+			const dateValue = parseDateTime( value );
+			return dateValue?.toLocaleString();
+		} catch ( error ) {
+			return null;
+		}
 	},
 	enableSorting: true,
 	filterBy: {

@@ -46,14 +46,15 @@ const { Badge } = unlock( componentsPrivateApis );
  * }
  * ```
  *
- * @param {Object}        props             Component props.
- * @param {string}        props.title       The title of the block.
- * @param {string|Object} props.icon        The icon of the block. This can be any of [WordPress' Dashicons](https://developer.wordpress.org/resource/dashicons/), or a custom `svg` element.
- * @param {string}        props.description The description of the block.
- * @param {Object}        [props.blockType] Deprecated: Object containing block type data.
- * @param {string}        [props.className] Additional classes to apply to the card.
- * @param {string}        [props.name]      Custom block name to display before the title.
- * @param {Element}       [props.children]  Children.
+ * @param {Object}        props                         Component props.
+ * @param {string}        props.title                   The title of the block.
+ * @param {string|Object} props.icon                    The icon of the block. This can be any of [WordPress' Dashicons](https://developer.wordpress.org/resource/dashicons/), or a custom `svg` element.
+ * @param {string}        props.description             The description of the block.
+ * @param {Object}        [props.blockType]             Deprecated: Object containing block type data.
+ * @param {string}        [props.className]             Additional classes to apply to the card.
+ * @param {string}        [props.name]                  Custom block name to display before the title.
+ * @param {string}        [props.allowParentNavigation] Show a back arrow to the parent block in some situations.
+ * @param {Element}       [props.children]              Children.
  * @return {Element}                        Block card component.
  */
 function BlockCard( {
@@ -63,6 +64,7 @@ function BlockCard( {
 	blockType,
 	className,
 	name,
+	allowParentNavigation,
 	children,
 } ) {
 	if ( blockType ) {
@@ -73,38 +75,43 @@ function BlockCard( {
 		( { title, icon, description } = blockType );
 	}
 
-	const { parentNavBlockClientId } = useSelect( ( select ) => {
-		const { getSelectedBlockClientId, getBlockParentsByBlockName } =
-			select( blockEditorStore );
+	const parentNavBlockClientId = useSelect(
+		( select ) => {
+			if ( ! allowParentNavigation ) {
+				return;
+			}
+			const { getSelectedBlockClientId, getBlockParentsByBlockName } =
+				select( blockEditorStore );
 
-		const _selectedBlockClientId = getSelectedBlockClientId();
+			const _selectedBlockClientId = getSelectedBlockClientId();
 
-		return {
-			parentNavBlockClientId: getBlockParentsByBlockName(
+			return getBlockParentsByBlockName(
 				_selectedBlockClientId,
 				'core/navigation',
 				true
-			)[ 0 ],
-		};
-	}, [] );
+			)[ 0 ];
+		},
+		[ allowParentNavigation ]
+	);
 
 	const { selectBlock } = useDispatch( blockEditorStore );
 
 	return (
 		<div className={ clsx( 'block-editor-block-card', className ) }>
-			{ parentNavBlockClientId && ( // This is only used by the Navigation block for now. It's not ideal having Navigation block specific code here.
-				<Button
-					onClick={ () => selectBlock( parentNavBlockClientId ) }
-					label={ __( 'Go to parent Navigation block' ) }
-					style={
-						// TODO: This style override is also used in ToolsPanelHeader.
-						// It should be supported out-of-the-box by Button.
-						{ minWidth: 24, padding: 0 }
-					}
-					icon={ isRTL() ? chevronRight : chevronLeft }
-					size="small"
-				/>
-			) }
+			{ allowParentNavigation &&
+				parentNavBlockClientId && ( // This is only used by the Navigation block for now. It's not ideal having Navigation block specific code here.
+					<Button
+						onClick={ () => selectBlock( parentNavBlockClientId ) }
+						label={ __( 'Go to parent Navigation block' ) }
+						style={
+							// TODO: This style override is also used in ToolsPanelHeader.
+							// It should be supported out-of-the-box by Button.
+							{ minWidth: 24, padding: 0 }
+						}
+						icon={ isRTL() ? chevronRight : chevronLeft }
+						size="small"
+					/>
+				) }
 			<BlockIcon icon={ icon } showColors />
 			<VStack spacing={ 1 }>
 				<h2 className="block-editor-block-card__title">

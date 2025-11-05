@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
 .wp-block-cover {
 	// Override default cover styles
 	// because we're not ready yet to show the cover block.

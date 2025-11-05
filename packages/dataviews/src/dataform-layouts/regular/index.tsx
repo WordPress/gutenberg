@@ -19,14 +19,13 @@ import {
  * Internal dependencies
  */
 import type {
-	Form,
 	FieldLayoutProps,
+	NormalizedForm,
 	NormalizedRegularLayout,
 } from '../../types';
 import DataFormContext from '../../components/dataform-context';
 import { DataFormLayout } from '../data-form-layout';
-import { isCombinedField } from '../is-combined-field';
-import { DEFAULT_LAYOUT, normalizeLayout } from '../normalize-form-fields';
+import { DEFAULT_LAYOUT } from '../normalize-form';
 
 function Header( { title }: { title: string } ) {
 	return (
@@ -46,18 +45,20 @@ export default function FormRegularField< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	validity,
 }: FieldLayoutProps< Item > ) {
 	const { fields } = useContext( DataFormContext );
+	const layout = field.layout as NormalizedRegularLayout;
 
-	const form: Form = useMemo(
-		(): Form => ( {
+	const form: NormalizedForm = useMemo(
+		() => ( {
 			layout: DEFAULT_LAYOUT,
-			fields: isCombinedField( field ) ? field.children : [],
+			fields: !! field.children ? field.children : [],
 		} ),
 		[ field ]
 	);
 
-	if ( isCombinedField( field ) ) {
+	if ( !! field.children ) {
 		return (
 			<>
 				{ ! hideLabelFromVision && field.label && (
@@ -67,15 +68,11 @@ export default function FormRegularField< Item >( {
 					data={ data }
 					form={ form }
 					onChange={ onChange }
+					validity={ validity?.children }
 				/>
 			</>
 		);
 	}
-
-	const layout: NormalizedRegularLayout = normalizeLayout( {
-		...field.layout,
-		type: 'regular',
-	} ) as NormalizedRegularLayout;
 
 	const labelPosition = layout.labelPosition;
 	const fieldDefinition = fields.find(
@@ -110,6 +107,7 @@ export default function FormRegularField< Item >( {
 							field={ fieldDefinition }
 							onChange={ onChange }
 							hideLabelFromVision
+							validity={ validity }
 						/>
 					) }
 				</div>
@@ -141,6 +139,7 @@ export default function FormRegularField< Item >( {
 					hideLabelFromVision={
 						labelPosition === 'none' ? true : hideLabelFromVision
 					}
+					validity={ validity }
 				/>
 			) }
 		</div>

@@ -43,19 +43,28 @@ export const IntersectionObserver = createContext();
 IntersectionObserver.displayName = 'IntersectionObserverContext';
 
 const pendingBlockVisibilityUpdatesPerRegistry = new WeakMap();
+const delayedBlockVisibilityDebounceOptions = {
+	trailing: true,
+};
 
 function Root( { className, ...settings } ) {
-	const { isOutlineMode, isFocusMode, temporarilyEditingAsBlocks } =
-		useSelect( ( select ) => {
-			const { getSettings, getTemporarilyEditingAsBlocks, isTyping } =
-				unlock( select( blockEditorStore ) );
+	const { isOutlineMode, isFocusMode, editedContentOnlySection } = useSelect(
+		( select ) => {
+			const {
+				getSettings,
+				getEditedContentOnlySection,
+				isTyping,
+				hasBlockSpotlight,
+			} = unlock( select( blockEditorStore ) );
 			const { outlineMode, focusMode } = getSettings();
 			return {
 				isOutlineMode: outlineMode && ! isTyping(),
-				isFocusMode: focusMode,
-				temporarilyEditingAsBlocks: getTemporarilyEditingAsBlocks(),
+				isFocusMode: focusMode || hasBlockSpotlight(),
+				editedContentOnlySection: getEditedContentOnlySection(),
 			};
-		}, [] );
+		},
+		[]
+	);
 	const registry = useRegistry();
 	const { setBlockVisibility } = useDispatch( blockEditorStore );
 
@@ -70,9 +79,7 @@ function Root( { className, ...settings } ) {
 			setBlockVisibility( updates );
 		}, [ registry ] ),
 		300,
-		{
-			trailing: true,
-		}
+		delayedBlockVisibilityDebounceOptions
 	);
 	const intersectionObserver = useMemo( () => {
 		const { IntersectionObserver: Observer } = window;
@@ -111,17 +118,19 @@ function Root( { className, ...settings } ) {
 	return (
 		<IntersectionObserver.Provider value={ intersectionObserver }>
 			<div { ...innerBlocksProps } />
-			{ !! temporarilyEditingAsBlocks && (
-				<StopEditingAsBlocksOnOutsideSelect
-					clientId={ temporarilyEditingAsBlocks }
+			{ !! editedContentOnlySection && (
+				<StopEditingContentOnlySectionOnOutsideSelect
+					clientId={ editedContentOnlySection }
 				/>
 			) }
 		</IntersectionObserver.Provider>
 	);
 }
 
-function StopEditingAsBlocksOnOutsideSelect( { clientId } ) {
-	const { stopEditingAsBlocks } = unlock( useDispatch( blockEditorStore ) );
+function StopEditingContentOnlySectionOnOutsideSelect( { clientId } ) {
+	const { stopEditingContentOnlySection } = unlock(
+		useDispatch( blockEditorStore )
+	);
 	const isBlockOrDescendantSelected = useSelect(
 		( select ) => {
 			const { isBlockSelected, hasSelectedInnerBlock } =
@@ -135,9 +144,13 @@ function StopEditingAsBlocksOnOutsideSelect( { clientId } ) {
 	);
 	useEffect( () => {
 		if ( ! isBlockOrDescendantSelected ) {
-			stopEditingAsBlocks( clientId );
+			stopEditingContentOnlySection();
 		}
-	}, [ isBlockOrDescendantSelected, clientId, stopEditingAsBlocks ] );
+	}, [
+		isBlockOrDescendantSelected,
+		clientId,
+		stopEditingContentOnlySection,
+	] );
 	return null;
 }
 
@@ -179,7 +192,7 @@ function Items( {
 				getTemplateLock,
 				getBlockEditingMode,
 				isSectionBlock,
-				isContainerInsertableToInWriteMode,
+				isContainerInsertableToInContentOnlyMode,
 				getBlockName,
 				isZoomOut: _isZoomOut,
 				canInsertBlockType,
@@ -218,7 +231,7 @@ function Items( {
 				isZoomOut: _isZoomOut(),
 				shouldRenderAppender:
 					( ! isSectionBlock( rootClientId ) ||
-						isContainerInsertableToInWriteMode(
+						isContainerInsertableToInContentOnlyMode(
 							getBlockName( selectedBlockClientId ),
 							rootClientId
 						) ) &&

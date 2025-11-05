@@ -12,7 +12,7 @@ import type {
 	NormalizedField,
 	FieldTypeDefinition,
 } from '../types';
-import renderFromElements from './utils/render-from-elements';
+import RenderFromElements from './utils/render-from-elements';
 import {
 	OPERATOR_IS,
 	OPERATOR_IS_ALL,
@@ -39,6 +39,7 @@ const emailRegex =
 export default {
 	sort,
 	isValid: {
+		elements: true,
 		custom: ( item: any, field: NormalizedField< any > ) => {
 			const value = field.getValue( { item } );
 
@@ -49,21 +50,16 @@ export default {
 				return __( 'Value must be a valid email address.' );
 			}
 
-			if ( field.elements ) {
-				const validValues = field.elements.map( ( f ) => f.value );
-				if ( ! validValues.includes( value ) ) {
-					return __( 'Value must be one of the elements.' );
-				}
-			}
-
 			return null;
 		},
 	},
 	Edit: 'email',
 	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
-		return field.elements
-			? renderFromElements( { item, field } )
-			: field.getValue( { item } );
+		return field.hasElements ? (
+			<RenderFromElements item={ item } field={ field } />
+		) : (
+			field.getValue( { item } )
+		);
 	},
 	enableSorting: true,
 	filterBy: {

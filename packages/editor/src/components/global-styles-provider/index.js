@@ -1,47 +1,18 @@
 /**
- * External dependencies
- */
-import deepmerge from 'deepmerge';
-import { isPlainObject } from 'is-plain-object';
-
-/**
  * WordPress dependencies
  */
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMemo, useCallback } from '@wordpress/element';
+import { mergeGlobalStyles } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
 
-const { GlobalStylesContext, cleanEmptyObject } = unlock(
-	blockEditorPrivateApis
-);
-
-export function mergeBaseAndUserConfigs( base, user ) {
-	return deepmerge( base, user, {
-		/*
-		 * We only pass as arrays the presets,
-		 * in which case we want the new array of values
-		 * to override the old array (no merging).
-		 */
-		isMergeableObject: isPlainObject,
-		/*
-		 * Exceptions to the above rule.
-		 * Background images should be replaced, not merged,
-		 * as they themselves are specific object definitions for the style.
-		 */
-		customMerge: ( key ) => {
-			if ( key === 'backgroundImage' ) {
-				return ( baseConfig, userConfig ) => userConfig;
-			}
-			return undefined;
-		},
-	} );
-}
+const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
 function useGlobalStylesUserConfig() {
 	const { globalStylesId, isReady, settings, styles, _links } = useSelect(
@@ -212,7 +183,7 @@ export function useGlobalStylesContext() {
 			return {};
 		}
 
-		return mergeBaseAndUserConfigs( baseConfig, userConfig );
+		return mergeGlobalStyles( baseConfig, userConfig );
 	}, [ userConfig, baseConfig ] );
 
 	const context = useMemo( () => {
@@ -233,17 +204,4 @@ export function useGlobalStylesContext() {
 	] );
 
 	return context;
-}
-
-export function GlobalStylesProvider( { children } ) {
-	const context = useGlobalStylesContext();
-	if ( ! context.isReady ) {
-		return null;
-	}
-
-	return (
-		<GlobalStylesContext.Provider value={ context }>
-			{ children }
-		</GlobalStylesContext.Provider>
-	);
 }

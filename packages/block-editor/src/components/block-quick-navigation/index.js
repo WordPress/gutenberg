@@ -60,6 +60,7 @@ function BlockQuickNavigationItem( { clientId, onSelect } ) {
 	return (
 		<Button
 			__next40pxDefaultSize
+			className="block-editor-block-quick-navigation__item"
 			isPressed={ isSelected }
 			onClick={ async () => {
 				await selectBlock( clientId );

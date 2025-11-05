@@ -6,7 +6,14 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useState, RawHTML, useEffect } from '@wordpress/element';
+import {
+	useState,
+	RawHTML,
+	useEffect,
+	useCallback,
+	useMemo,
+	useRef,
+} from '@wordpress/element';
 import {
 	__experimentalText as Text,
 	__experimentalHStack as HStack,
@@ -33,77 +40,314 @@ import {
 import { unlock } from '../../lock-unlock';
 import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
-import { getCommentExcerpt, focusCommentThread } from './utils';
+import { focusCommentThread, getCommentExcerpt } from './utils';
+import { useFloatingThread } from './hooks';
+import { AddComment } from './add-comment';
+import { store as editorStore } from '../../store';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 const { Menu } = unlock( componentsPrivateApis );
 
-/**
- * Renders the Comments component.
- *
- * @param {Object}   props                     - The component props.
- * @param {Array}    props.threads             - The array of comment threads.
- * @param {Function} props.onEditComment       - The function to handle comment editing.
- * @param {Function} props.onAddReply          - The function to add a reply to a comment.
- * @param {Function} props.onCommentDelete     - The function to delete a comment.
- * @param {Function} props.setShowCommentBoard - The function to set the comment board visibility.
- * @param {Ref}      props.commentSidebarRef   - The ref to the comment sidebar.
- * @return {React.ReactNode} The rendered Comments component.
- */
 export function Comments( {
-	threads,
+	threads: noteThreads,
 	onEditComment,
 	onAddReply,
 	onCommentDelete,
+	showCommentBoard,
 	setShowCommentBoard,
 	commentSidebarRef,
+	reflowComments,
+	isFloating = false,
+	commentLastUpdated,
 } ) {
-	const [ selectedThread, setSelectedThread ] = useState();
+	const [ heights, setHeights ] = useState( {} );
+	const [ selectedThread, setSelectedThread ] = useState( null );
+	const [ boardOffsets, setBoardOffsets ] = useState( {} );
+	const [ blockRefs, setBlockRefs ] = useState( {} );
 
-	const blockCommentId = useSelect( ( select ) => {
-		const { getBlockAttributes, getSelectedBlockClientId } =
-			select( blockEditorStore );
-		const clientId = getSelectedBlockClientId();
-		return clientId
-			? getBlockAttributes( clientId )?.metadata?.commentId
-			: null;
-	}, [] );
+	const { setCanvasMinHeight } = unlock( useDispatch( editorStore ) );
+	const { blockCommentId, selectedBlockClientId, orderedBlockIds } =
+		useSelect( ( select ) => {
+			const { getBlockAttributes, getSelectedBlockClientId } =
+				select( blockEditorStore );
+			const clientId = getSelectedBlockClientId();
+			return {
+				blockCommentId: clientId
+					? getBlockAttributes( clientId )?.metadata?.noteId
+					: null,
+				selectedBlockClientId: clientId,
+				orderedBlockIds: select( blockEditorStore ).getBlockOrder(),
+			};
+		}, [] );
+
+	const relatedBlockElement = useBlockElement( selectedBlockClientId );
+
+	const threads = useMemo( () => {
+		const t = [ ...noteThreads ];
+		const orderedThreads = [];
+		// In floating mode, when the note board is shown, and as long
+		// as the selected block doesn't have an existing note attached -
+		// add a "new note" entry to the threads. This special thread type
+		// gets sorted and floated like regular threads, but shows an AddComment
+		// component instead of a regular comment thread.
+		if ( isFloating && showCommentBoard && undefined === blockCommentId ) {
+			// Insert the new note entry at the correct location for its blockId.
+			const newNoteThread = {
+				id: 'new-note-thread',
+				blockClientId: selectedBlockClientId,
+				content: { rendered: '' },
+			};
+			// Insert the new comment block at the right order within the threads.
+			orderedBlockIds.forEach( ( blockId ) => {
+				if ( blockId === selectedBlockClientId ) {
+					orderedThreads.push( newNoteThread );
+				} else {
+					const threadForBlock = t.find(
+						( thread ) => thread.blockClientId === blockId
+					);
+					if ( threadForBlock ) {
+						orderedThreads.push( threadForBlock );
+					}
+				}
+			} );
+			return orderedThreads;
+		}
+		return t;
+	}, [
+		noteThreads,
+		isFloating,
+		showCommentBoard,
+		blockCommentId,
+		selectedBlockClientId,
+		orderedBlockIds,
+	] );
+
+	const handleDelete = async ( comment ) => {
+		const currentIndex = threads.findIndex( ( t ) => t.id === comment.id );
+		const nextThread = threads[ currentIndex + 1 ];
+		const prevThread = threads[ currentIndex - 1 ];
+
+		await onCommentDelete( comment );
+
+		if ( comment.parent !== 0 ) {
+			// Move focus to the parent thread when a reply was deleted.
+			setSelectedThread( comment.parent );
+			focusCommentThread( comment.parent, commentSidebarRef.current );
+			return;
+		}
+
+		if ( nextThread ) {
+			setSelectedThread( nextThread.id );
+			focusCommentThread( nextThread.id, commentSidebarRef.current );
+		} else if ( prevThread ) {
+			setSelectedThread( prevThread.id );
+			focusCommentThread( prevThread.id, commentSidebarRef.current );
+		} else {
+			setSelectedThread( null );
+			setShowCommentBoard( false );
+			// Move focus to the related block.
+			relatedBlockElement?.focus();
+		}
+	};
 
 	// Auto-select the related comment thread when a block is selected.
 	useEffect( () => {
-		setSelectedThread( blockCommentId ?? undefined );
-	}, [ blockCommentId ] );
+		// Fallback to 'new-note-thread' when showing the comment board for a new note.
+		const fallback = showCommentBoard ? 'new-note-thread' : null;
+		setSelectedThread( blockCommentId ?? fallback );
+	}, [ blockCommentId, showCommentBoard ] );
+
+	const setBlockRef = useCallback( ( id, blockRef ) => {
+		setBlockRefs( ( prev ) => ( { ...prev, [ id ]: blockRef } ) );
+	}, [] );
+
+	// Recalculate floating comment thread offsets whenever the heights change.
+	useEffect( () => {
+		/**
+		 * Calculate the y offsets for all comment threads. Account for potentially
+		 * overlapping threads and adjust their positions accordingly.
+		 */
+		const calculateAllOffsets = () => {
+			const offsets = {};
+
+			if ( ! isFloating ) {
+				return { offsets, minHeight: 0 };
+			}
+
+			// Find the index of the selected thread.
+			const selectedThreadIndex = threads.findIndex(
+				( t ) => t.id === selectedThread
+			);
+
+			const breakIndex =
+				selectedThreadIndex === -1 ? 0 : selectedThreadIndex;
+
+			// If there is a selected thread, push threads above up and threads below down.
+			const selectedThreadData = threads[ breakIndex ];
+
+			if (
+				! selectedThreadData ||
+				! blockRefs[ selectedThreadData.id ]
+			) {
+				return { offsets, minHeight: 0 };
+			}
+
+			let blockElement = blockRefs[ selectedThreadData.id ];
+			let blockRect = blockElement?.getBoundingClientRect();
+			const selectedThreadTop = blockRect?.top || 0;
+			const selectedThreadHeight = heights[ selectedThreadData.id ] || 0;
+
+			offsets[ selectedThreadData.id ] = -16;
+
+			let previousThreadData = {
+				threadTop: selectedThreadTop - 16,
+				threadHeight: selectedThreadHeight,
+			};
+
+			// Process threads after the selected thread, offsetting any overlapping
+			// threads downward.
+			for ( let i = breakIndex + 1; i < threads.length; i++ ) {
+				const thread = threads[ i ];
+				if ( ! blockRefs[ thread.id ] ) {
+					continue;
+				}
+
+				blockElement = blockRefs[ thread.id ];
+				blockRect = blockElement?.getBoundingClientRect();
+				const threadTop = blockRect?.top || 0;
+				const threadHeight = heights[ thread.id ] || 0;
+
+				let additionalOffset = -16;
+
+				// Check if the thread overlaps with the previous one.
+				const previousBottom =
+					previousThreadData.threadTop +
+					previousThreadData.threadHeight;
+				if ( threadTop < previousBottom + 16 ) {
+					// Shift down by the difference plus a margin to avoid overlap.
+					additionalOffset = previousBottom - threadTop + 20;
+				}
+
+				offsets[ thread.id ] = additionalOffset;
+
+				// Update for next iteration.
+				previousThreadData = {
+					threadTop: threadTop + additionalOffset,
+					threadHeight,
+				};
+			}
+
+			// Process threads before the selected thread, offsetting any overlapping
+			// threads upward.
+			let nextThreadData = {
+				threadTop: selectedThreadTop - 16,
+			};
+
+			for ( let i = selectedThreadIndex - 1; i >= 0; i-- ) {
+				const thread = threads[ i ];
+				if ( ! blockRefs[ thread.id ] ) {
+					continue;
+				}
+
+				blockElement = blockRefs[ thread.id ];
+				blockRect = blockElement?.getBoundingClientRect();
+				const threadTop = blockRect?.top || 0;
+				const threadHeight = heights[ thread.id ] || 0;
+
+				let additionalOffset = -16;
+
+				// Calculate the bottom position of this thread with default offset.
+				const threadBottom = threadTop + threadHeight;
+
+				// Check if this thread's bottom would overlap with the next thread's top.
+				if ( threadBottom > nextThreadData.threadTop ) {
+					// Shift up by the difference plus a margin to avoid overlap.
+					additionalOffset =
+						nextThreadData.threadTop -
+						threadTop -
+						threadHeight -
+						20;
+				}
+
+				offsets[ thread.id ] = additionalOffset;
+
+				// Update for next iteration (going upward).
+				nextThreadData = {
+					threadTop: threadTop + additionalOffset,
+				};
+			}
+
+			let editorMinHeight = 0;
+			// Take the calculated top of the final note plus its height as the editor min height.
+			const lastThread = threads[ threads.length - 1 ];
+			if ( blockRefs[ lastThread.id ] ) {
+				const lastBlockElement = blockRefs[ lastThread.id ];
+				const lastBlockRect = lastBlockElement?.getBoundingClientRect();
+				const lastThreadTop = lastBlockRect?.top || 0;
+				const lastThreadHeight = heights[ lastThread.id ] || 0;
+				const lastThreadOffset = offsets[ lastThread.id ] || 0;
+				editorMinHeight =
+					lastThreadTop + lastThreadHeight + lastThreadOffset + 32;
+			}
+
+			return { offsets, minHeight: editorMinHeight };
+		};
+		const { offsets: newOffsets, minHeight } = calculateAllOffsets();
+		if ( Object.keys( newOffsets ).length > 0 ) {
+			setBoardOffsets( newOffsets );
+		}
+		// Ensure the editor has enough height to scroll to all notes.
+		setCanvasMinHeight( minHeight );
+	}, [
+		heights,
+		blockRefs,
+		isFloating,
+		threads,
+		selectedThread,
+		setCanvasMinHeight,
+	] );
 
 	const hasThreads = Array.isArray( threads ) && threads.length > 0;
-	if ( ! hasThreads ) {
-		return (
-			<VStack
-				alignment="left"
-				className="editor-collab-sidebar-panel__thread"
-				justify="flex-start"
-				spacing="2"
-			>
-				{
-					// translators: message displayed when there are no comments available
-					__( 'No comments available' )
-				}
-			</VStack>
-		);
+	// This should no longer happen since https://github.com/WordPress/gutenberg/pull/72872.
+	if ( ! hasThreads && ! isFloating ) {
+		return null;
 	}
 
-	return threads.map( ( thread ) => (
-		<Thread
-			key={ thread.id }
-			thread={ thread }
-			onAddReply={ onAddReply }
-			onCommentDelete={ onCommentDelete }
-			onEditComment={ onEditComment }
-			isSelected={ selectedThread === thread.id }
-			setSelectedThread={ setSelectedThread }
-			setShowCommentBoard={ setShowCommentBoard }
-			commentSidebarRef={ commentSidebarRef }
-		/>
-	) );
+	return (
+		<>
+			{ ! isFloating &&
+				showCommentBoard &&
+				undefined === blockCommentId && (
+					<AddComment
+						onSubmit={ onAddReply }
+						showCommentBoard={ showCommentBoard }
+						setShowCommentBoard={ setShowCommentBoard }
+						commentSidebarRef={ commentSidebarRef }
+					/>
+				) }
+			{ threads.map( ( thread ) => (
+				<Thread
+					key={ thread.id }
+					thread={ thread }
+					onAddReply={ onAddReply }
+					onCommentDelete={ handleDelete }
+					onEditComment={ onEditComment }
+					isSelected={ selectedThread === thread.id }
+					setSelectedThread={ setSelectedThread }
+					setShowCommentBoard={ setShowCommentBoard }
+					commentSidebarRef={ commentSidebarRef }
+					reflowComments={ reflowComments }
+					isFloating={ isFloating }
+					calculatedOffset={ boardOffsets[ thread.id ] ?? 0 }
+					setHeights={ setHeights }
+					setBlockRef={ setBlockRef }
+					selectedThread={ selectedThread }
+					commentLastUpdated={ commentLastUpdated }
+					showCommentBoard={ showCommentBoard }
+				/>
+			) ) }
+		</>
+	);
 }
 
 function Thread( {
@@ -112,17 +356,34 @@ function Thread( {
 	onAddReply,
 	onCommentDelete,
 	isSelected,
-	setSelectedThread,
 	setShowCommentBoard,
 	commentSidebarRef,
+	reflowComments,
+	isFloating,
+	calculatedOffset,
+	setHeights,
+	setBlockRef,
+	setSelectedThread,
+	selectedThread,
+	commentLastUpdated,
+	showCommentBoard,
 } ) {
-	const { toggleBlockHighlight, selectBlock } =
-		useDispatch( blockEditorStore );
+	const { toggleBlockHighlight, selectBlock, toggleBlockSpotlight } = unlock(
+		useDispatch( blockEditorStore )
+	);
 	const relatedBlockElement = useBlockElement( thread.blockClientId );
 	const debouncedToggleBlockHighlight = useDebounce(
 		toggleBlockHighlight,
 		50
 	);
+	const { y, refs } = useFloatingThread( {
+		thread,
+		calculatedOffset,
+		setHeights,
+		setBlockRef,
+		selectedThread,
+		commentLastUpdated,
+	} );
 
 	const onMouseEnter = () => {
 		debouncedToggleBlockHighlight( thread.blockClientId, true );
@@ -135,52 +396,73 @@ function Thread( {
 	const handleCommentSelect = () => {
 		setShowCommentBoard( false );
 		setSelectedThread( thread.id );
-		// pass `null` as the second parameter to prevent focusing the block.
-		selectBlock( thread.blockClientId, null );
+		if ( !! thread.blockClientId ) {
+			// Pass `null` as the second parameter to prevent focusing the block.
+			selectBlock( thread.blockClientId, null );
+			toggleBlockSpotlight( thread.blockClientId, true );
+		}
 	};
 
 	const unselectThread = () => {
 		setSelectedThread( null );
 		setShowCommentBoard( false );
+		toggleBlockSpotlight( thread.blockClientId, false );
 	};
 
-	const replies = thread?.reply;
-	const lastReply = !! replies.length
-		? replies[ replies.length - 1 ]
-		: undefined;
-	const restReplies = !! replies.length ? replies.slice( 0, -1 ) : [];
+	const allReplies = thread?.reply || [];
+
+	const lastReply =
+		allReplies.length > 0 ? allReplies[ allReplies.length - 1 ] : undefined;
+	const restReplies = allReplies.length > 0 ? allReplies.slice( 0, -1 ) : [];
 
 	const commentExcerpt = getCommentExcerpt(
-		stripHTML( thread.content.rendered ),
+		stripHTML( thread.content?.rendered ),
 		10
 	);
-	const ariaLabel = relatedBlockElement
+	const ariaLabel = !! thread.blockClientId
 		? sprintf(
-				// translators: %s: comment excerpt
-				__( 'Comment: %s' ),
+				// translators: %s: note excerpt
+				__( 'Note: %s' ),
 				commentExcerpt
 		  )
 		: sprintf(
-				// translators: %s: comment excerpt
-				__( 'Original block deleted. Comment: %s' ),
+				// translators: %s: note excerpt
+				__( 'Original block deleted. Note: %s' ),
 				commentExcerpt
 		  );
 
+	if ( 'new-note-thread' === thread.id && showCommentBoard && isFloating ) {
+		return (
+			<AddComment
+				onSubmit={ onAddReply }
+				showCommentBoard={ showCommentBoard }
+				setShowCommentBoard={ setShowCommentBoard }
+				commentSidebarRef={ commentSidebarRef }
+				reflowComments={ reflowComments }
+				isFloating={ isFloating }
+				y={ y }
+				refs={ refs }
+			/>
+		);
+	}
+
 	return (
-		// Disable reason: role="listitem" does in fact support aria-expanded.
-		// eslint-disable-next-line jsx-a11y/role-supports-aria-props
 		<VStack
 			className={ clsx( 'editor-collab-sidebar-panel__thread', {
 				'is-selected': isSelected,
+				'is-floating': isFloating,
 			} ) }
 			id={ `comment-thread-${ thread.id }` }
-			spacing="2"
+			spacing="3"
 			onClick={ handleCommentSelect }
 			onMouseEnter={ onMouseEnter }
 			onMouseLeave={ onMouseLeave }
 			onFocus={ onMouseEnter }
 			onBlur={ onMouseLeave }
 			onKeyDown={ ( event ) => {
+				if ( event.defaultPrevented ) {
+					return;
+				}
 				// Expand or Collapse thread.
 				if (
 					event.key === 'Enter' &&
@@ -199,17 +481,34 @@ function Thread( {
 				}
 			} }
 			tabIndex={ 0 }
-			role="listitem"
+			role="treeitem"
 			aria-label={ ariaLabel }
 			aria-expanded={ isSelected }
+			ref={ isFloating ? refs.setFloating : undefined }
+			style={ isFloating ? { top: y } : undefined }
 		>
-			{ ! relatedBlockElement && (
+			<Button
+				className="editor-collab-sidebar-panel__skip-to-comment"
+				variant="secondary"
+				size="compact"
+				onClick={ () => {
+					focusCommentThread(
+						thread.id,
+						commentSidebarRef.current,
+						'textarea'
+					);
+				} }
+			>
+				{ __( 'Add new note' ) }
+			</Button>
+			{ ! thread.blockClientId && (
 				<Text as="p" weight={ 500 } variant="muted">
 					{ __( 'Original block deleted.' ) }
 				</Text>
 			) }
 			<CommentBoard
 				thread={ thread }
+				isExpanded={ isSelected }
 				onEdit={ ( params = {} ) => {
 					const { status } = params;
 					onEditComment( params );
@@ -222,30 +521,19 @@ function Thread( {
 					}
 				} }
 				onDelete={ onCommentDelete }
-				status={ thread.status }
+				reflowComments={ reflowComments }
 			/>
 			{ isSelected &&
-				replies.map( ( reply ) => (
-					<VStack
+				allReplies.map( ( reply ) => (
+					<CommentBoard
 						key={ reply.id }
-						className="editor-collab-sidebar-panel__child-thread"
-						id={ reply.id }
-						spacing="2"
-					>
-						<CommentBoard
-							thread={ reply }
-							onEdit={
-								'approved' !== thread.status
-									? onEditComment
-									: undefined
-							}
-							onDelete={
-								'approved' !== thread.status
-									? onCommentDelete
-									: undefined
-							}
-						/>
-					</VStack>
+						thread={ reply }
+						parent={ thread }
+						isExpanded={ isSelected }
+						onEdit={ onEditComment }
+						onDelete={ onCommentDelete }
+						reflowComments={ reflowComments }
+					/>
 				) ) }
 			{ ! isSelected && restReplies.length > 0 && (
 				<HStack className="editor-collab-sidebar-panel__more-reply-separator">
@@ -276,21 +564,15 @@ function Thread( {
 			{ ! isSelected && lastReply && (
 				<CommentBoard
 					thread={ lastReply }
-					onEdit={
-						'approved' !== thread.status ? onEditComment : undefined
-					}
-					onDelete={
-						'approved' !== thread.status
-							? onCommentDelete
-							: undefined
-					}
+					parent={ thread }
+					isExpanded={ isSelected }
+					onEdit={ onEditComment }
+					onDelete={ onCommentDelete }
+					reflowComments={ reflowComments }
 				/>
 			) }
 			{ isSelected && (
-				<VStack
-					className="editor-collab-sidebar-panel__child-thread"
-					spacing="2"
-				>
+				<VStack spacing="2" role="treeitem">
 					<HStack alignment="left" spacing="3" justify="flex-start">
 						<CommentAuthorInfo />
 					</HStack>
@@ -298,18 +580,23 @@ function Thread( {
 						<CommentForm
 							onSubmit={ ( inputComment ) => {
 								if ( 'approved' === thread.status ) {
+									// For reopening, include the content in the reopen action.
 									onEditComment( {
 										id: thread.id,
 										status: 'hold',
+										content: inputComment,
+									} );
+								} else {
+									// For regular replies, add as separate comment.
+									onAddReply( {
+										content: inputComment,
+										parent: thread.id,
 									} );
 								}
-								onAddReply( {
-									content: inputComment,
-									parent: thread.id,
-								} );
 							} }
 							onCancel={ ( event ) => {
-								event.stopPropagation(); // Prevent the parent onClick from being triggered
+								// Prevent the parent onClick from being triggered.
+								event.stopPropagation();
 								unselectThread();
 								focusCommentThread(
 									thread.id,
@@ -323,23 +610,44 @@ function Thread( {
 							}
 							rows={ 'approved' === thread.status ? 2 : 4 }
 							labelText={ sprintf(
-								// translators: %1$s: comment identifier, %2$s: author name
-								__( 'Reply to Comment %1$s by %2$s' ),
+								// translators: %1$s: note identifier, %2$s: author name
+								__( 'Reply to note %1$s by %2$s' ),
 								thread.id,
-								thread?.author_name || 'Unknown'
+								thread.author_name
 							) }
+							reflowComments={ reflowComments }
 						/>
 					</VStack>
 				</VStack>
+			) }
+			{ !! thread.blockClientId && (
+				<Button
+					className="editor-collab-sidebar-panel__skip-to-block"
+					variant="secondary"
+					size="compact"
+					onClick={ ( event ) => {
+						event.stopPropagation();
+						relatedBlockElement?.focus();
+					} }
+				>
+					{ __( 'Back to block' ) }
+				</Button>
 			) }
 		</VStack>
 	);
 }
 
-const CommentBoard = ( { thread, onEdit, onDelete, status } ) => {
+const CommentBoard = ( {
+	thread,
+	parent,
+	isExpanded,
+	onEdit,
+	onDelete,
+	reflowComments,
+} ) => {
 	const [ actionState, setActionState ] = useState( false );
 	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
-
+	const actionButtonRef = useRef( null );
 	const handleConfirmDelete = () => {
 		onDelete( thread );
 		setActionState( false );
@@ -349,40 +657,55 @@ const CommentBoard = ( { thread, onEdit, onDelete, status } ) => {
 	const handleCancel = () => {
 		setActionState( false );
 		setShowConfirmDialog( false );
+		actionButtonRef.current?.focus();
 	};
 
+	// Check if this is a resolution comment by checking metadata.
+	const isResolutionComment =
+		thread.type === 'note' &&
+		thread.meta &&
+		( thread.meta._wp_note_status === 'resolved' ||
+			thread.meta._wp_note_status === 'reopen' );
+
 	const actions = [
-		onEdit &&
-			status !== 'approved' && {
-				id: 'edit',
-				title: _x( 'Edit', 'Edit comment' ),
-				onClick: () => {
-					setActionState( 'edit' );
-				},
+		{
+			id: 'edit',
+			title: __( 'Edit' ),
+			isEligible: ( { status } ) => status !== 'approved',
+			onClick: () => {
+				setActionState( 'edit' );
 			},
-		onDelete && {
+		},
+		{
+			id: 'reopen',
+			title: _x( 'Reopen', 'Reopen note' ),
+			isEligible: ( { status } ) => status === 'approved',
+			onClick: () => {
+				onEdit( { id: thread.id, status: 'hold' } );
+			},
+		},
+		{
 			id: 'delete',
-			title: _x( 'Delete', 'Delete comment' ),
+			title: __( 'Delete' ),
+			isEligible: () => true,
 			onClick: () => {
 				setActionState( 'delete' );
 				setShowConfirmDialog( true );
 			},
 		},
-		onEdit &&
-			status === 'approved' && {
-				id: 'reopen',
-				title: _x( 'Reopen', 'Reopen comment' ),
-				onClick: () => {
-					onEdit( { id: thread.id, status: 'hold' } );
-				},
-			},
 	];
 
-	const canResolve = thread?.parent === 0;
-	const moreActions = actions.filter( ( item ) => item?.onClick );
+	const canResolve = thread.parent === 0;
+	const moreActions =
+		parent?.status !== 'approved'
+			? actions.filter( ( item ) => item.isEligible( thread ) )
+			: [];
 
 	return (
-		<>
+		<VStack
+			spacing="2"
+			role={ thread.parent !== 0 ? 'treeitem' : undefined }
+		>
 			<HStack alignment="left" spacing="3" justify="flex-start">
 				<CommentAuthorInfo
 					avatar={ thread?.author_avatar_urls?.[ 48 ] }
@@ -390,59 +713,64 @@ const CommentBoard = ( { thread, onEdit, onDelete, status } ) => {
 					date={ thread?.date }
 					userId={ thread?.author }
 				/>
-				<FlexItem
-					className="editor-collab-sidebar-panel__comment-status"
-					onClick={ ( event ) => {
-						// Prevent the thread from being selected.
-						event.stopPropagation();
-					} }
-				>
-					<HStack spacing="0">
-						{ canResolve && (
-							<Button
-								label={ _x(
-									'Resolve',
-									'Mark comment as resolved'
-								) }
-								size="small"
-								icon={ published }
-								disabled={ status === 'approved' }
-								accessibleWhenDisabled={ status === 'approved' }
-								onClick={ () => {
-									onEdit( {
-										id: thread.id,
-										status: 'approved',
-									} );
-								} }
-							/>
-						) }
-						<Menu placement="bottom-end">
-							<Menu.TriggerButton
-								render={
-									<Button
-										size="small"
-										icon={ moreVertical }
-										label={ __( 'Actions' ) }
-										disabled={ ! moreActions.length }
-										accessibleWhenDisabled
-									/>
-								}
-							/>
-							<Menu.Popover>
-								{ moreActions.map( ( action ) => (
-									<Menu.Item
-										key={ action.id }
-										onClick={ () => action.onClick() }
-									>
-										<Menu.ItemLabel>
-											{ action.title }
-										</Menu.ItemLabel>
-									</Menu.Item>
-								) ) }
-							</Menu.Popover>
-						</Menu>
-					</HStack>
-				</FlexItem>
+				{ isExpanded && (
+					<FlexItem
+						className="editor-collab-sidebar-panel__comment-status"
+						onClick={ ( event ) => {
+							// Prevent the thread from being selected.
+							event.stopPropagation();
+						} }
+					>
+						<HStack spacing="0">
+							{ canResolve && (
+								<Button
+									label={ _x(
+										'Resolve',
+										'Mark note as resolved'
+									) }
+									size="small"
+									icon={ published }
+									disabled={ thread.status === 'approved' }
+									accessibleWhenDisabled={
+										thread.status === 'approved'
+									}
+									onClick={ () => {
+										onEdit( {
+											id: thread.id,
+											status: 'approved',
+										} );
+									} }
+								/>
+							) }
+							<Menu placement="bottom-end">
+								<Menu.TriggerButton
+									render={
+										<Button
+											ref={ actionButtonRef }
+											size="small"
+											icon={ moreVertical }
+											label={ __( 'Actions' ) }
+											disabled={ ! moreActions.length }
+											accessibleWhenDisabled
+										/>
+									}
+								/>
+								<Menu.Popover>
+									{ moreActions.map( ( action ) => (
+										<Menu.Item
+											key={ action.id }
+											onClick={ () => action.onClick() }
+										>
+											<Menu.ItemLabel>
+												{ action.title }
+											</Menu.ItemLabel>
+										</Menu.Item>
+									) ) }
+								</Menu.Popover>
+							</Menu>
+						</HStack>
+					</FlexItem>
+				) }
 			</HStack>
 			{ 'edit' === actionState ? (
 				<CommentForm
@@ -452,20 +780,53 @@ const CommentBoard = ( { thread, onEdit, onDelete, status } ) => {
 							content: value,
 						} );
 						setActionState( false );
+						actionButtonRef.current?.focus();
 					} }
 					onCancel={ () => handleCancel() }
 					thread={ thread }
 					submitButtonText={ _x( 'Update', 'verb' ) }
 					labelText={ sprintf(
-						// translators: %1$s: comment identifier, %2$s: author name.
-						__( 'Edit Comment %1$s by %2$s' ),
+						// translators: %1$s: note identifier, %2$s: author name.
+						__( 'Edit note %1$s by %2$s' ),
 						thread.id,
-						thread?.author_name || 'Unknown'
+						thread.author_name
 					) }
+					reflowComments={ reflowComments }
 				/>
 			) : (
-				<RawHTML className="editor-collab-sidebar-panel__user-comment">
-					{ thread?.content?.rendered }
+				<RawHTML
+					className={ clsx(
+						'editor-collab-sidebar-panel__user-comment',
+						{
+							'editor-collab-sidebar-panel__resolution-text':
+								isResolutionComment,
+						}
+					) }
+				>
+					{ isResolutionComment
+						? ( () => {
+								const actionText =
+									thread.meta._wp_note_status === 'resolved'
+										? __( 'Marked as resolved' )
+										: __( 'Reopened' );
+								const content = thread?.content?.raw;
+
+								if (
+									content &&
+									typeof content === 'string' &&
+									content.trim() !== ''
+								) {
+									return sprintf(
+										// translators: %1$s: action label ("Marked as resolved" or "Reopened"); %2$s: note text.
+										__( '%1$s: %2$s' ),
+										actionText,
+										content
+									);
+								}
+								// If no content, just show the action.
+								return actionText;
+						  } )()
+						: thread?.content?.rendered }
 				</RawHTML>
 			) }
 			{ 'delete' === actionState && (
@@ -475,12 +836,13 @@ const CommentBoard = ( { thread, onEdit, onDelete, status } ) => {
 					onCancel={ handleCancel }
 					confirmButtonText={ __( 'Delete' ) }
 				>
-					{
-						// translators: message displayed when confirming an action
-						__( 'Are you sure you want to delete this comment?' )
-					}
+					{ __(
+						"Are you sure you want to delete this note? This will also delete all of this note's replies."
+					) }
 				</ConfirmDialog>
 			) }
-		</>
+		</VStack>
 	);
 };
+
+export default Comments;

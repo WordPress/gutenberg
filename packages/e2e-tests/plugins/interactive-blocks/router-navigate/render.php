@@ -7,7 +7,7 @@
  * @phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
  */
 
-if ( $attributes['disableNavigation'] ) {
+if ( isset( $attributes['disableNavigation'] ) && $attributes['disableNavigation'] ) {
 	wp_interactivity_config(
 		'core/router',
 		array( 'clientNavigationDisabled' => true )
@@ -18,6 +18,31 @@ if ( isset( $attributes['data'] ) ) {
 	wp_interactivity_state(
 		'router',
 		array( 'data' => $attributes['data'] )
+	);
+}
+
+if ( isset( $attributes['derivedStateClosure'] ) && $attributes['derivedStateClosure'] ) {
+	wp_interactivity_state(
+		'router/derived-state',
+		array(
+			'derivedStateClosure' => function () {
+				$context = wp_interactivity_get_context();
+				return $context['value'] . 'FromClosure';
+			},
+		)
+	);
+
+	add_filter(
+		'script_module_data_@wordpress/interactivity',
+		function ( $data ) {
+			if ( ! isset( $data ) ) {
+				$data = array();
+			}
+			$data['derivedStateClosures'] = array(
+				'router/derived-state' => array( 'state.derivedStateClosure' ),
+			);
+			return $data;
+		}
 	);
 }
 ?>
@@ -74,4 +99,8 @@ HTML;
 	<div data-testid="prop1" data-wp-text="state.data.prop1"></div>
 	<div data-testid="prop2" data-wp-text="state.data.prop2"></div>
 	<div data-testid="prop3" data-wp-text="state.data.prop3"></div>
+</div>
+
+<div data-wp-interactive="router/derived-state" data-wp-context='{"value": "hello"}'>
+	<div data-testid="derivedStateClosure" data-wp-text="state.derivedStateClosure">helloFromClosure</div>
 </div>

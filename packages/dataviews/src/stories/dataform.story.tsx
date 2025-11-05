@@ -17,17 +17,21 @@ import {
  * Internal dependencies
  */
 import DataForm from '../components/dataform';
-import isItemValid from '../utils/is-item-valid';
+import useFormValidity from '../hooks/use-form-validity';
+
 import type {
-	Field,
-	Form,
-	DataFormControlProps,
-	Layout,
-	RegularLayout,
-	PanelLayout,
 	CardLayout,
+	DataFormControlProps,
+	Field,
+	FieldValidity,
+	Form,
+	Layout,
+	PanelLayout,
+	RegularLayout,
+	Rules,
 } from '../types';
 import { unlock } from '../lock-unlock';
+import DateControl from '../dataform-controls/date';
 
 const { ValidatedTextControl, Badge } = unlock( privateApis );
 
@@ -479,13 +483,35 @@ const LayoutPanelComponent = ( {
 	);
 };
 
+function getCustomValidity< Item >(
+	isValid: Rules< Item >,
+	validity: FieldValidity | undefined
+) {
+	let customValidity;
+	if ( isValid?.required && validity?.required ) {
+		// If the consumer provides a message for required,
+		// use it instead of the native built-in message.
+		customValidity = validity?.required?.message
+			? validity.required
+			: undefined;
+	} else if ( isValid?.elements && validity?.elements ) {
+		customValidity = validity.elements;
+	} else if ( validity?.custom ) {
+		customValidity = validity.custom;
+	}
+
+	return customValidity;
+}
+
 function CustomEditControl< Item >( {
 	data,
 	field,
 	onChange,
 	hideLabelFromVision,
+	validity,
 }: DataFormControlProps< Item > ) {
-	const { label, placeholder, description, getValue, setValue } = field;
+	const { label, placeholder, description, getValue, setValue, isValid } =
+		field;
 	const value = getValue( { item: data } );
 
 	const onChangeControl = useCallback(
@@ -496,7 +522,8 @@ function CustomEditControl< Item >( {
 
 	return (
 		<ValidatedTextControl
-			required={ !! field.isValid?.required }
+			required={ !! isValid?.required }
+			customValidity={ getCustomValidity( isValid, validity ) }
 			label={ label }
 			placeholder={ placeholder }
 			value={ value ?? '' }
@@ -511,12 +538,12 @@ function CustomEditControl< Item >( {
 
 const ValidationComponent = ( {
 	required,
-	type,
+	elements,
 	custom,
 }: {
 	required: boolean;
-	custom: boolean;
-	type: 'regular' | 'panel';
+	elements: 'sync' | 'async' | 'none';
+	custom: 'sync' | 'async' | 'none';
 } ) => {
 	type ValidatedItem = {
 		text: string;
@@ -536,6 +563,9 @@ const ValidationComponent = ( {
 		password: string;
 		toggle?: boolean;
 		toggleGroup?: string;
+		date?: string;
+		dateRange?: string;
+		datetime?: string;
 	};
 
 	const [ post, setPost ] = useState< ValidatedItem >( {
@@ -556,335 +586,625 @@ const ValidationComponent = ( {
 		password: 'secretpassword123',
 		toggle: undefined,
 		toggleGroup: undefined,
+		date: undefined,
+		dateRange: undefined,
+		datetime: undefined,
 	} );
 
-	const customTextRule = ( value: ValidatedItem ) => {
-		if ( ! /^[a-zA-Z ]+$/.test( value.text ) ) {
-			return 'Value must only contain letters and spaces.';
-		}
+	// Cache for getElements functions - ensures promises are only created once
+	const getElements = useMemo( () => {
+		const promiseCache: Record< string, Promise< any > > = {};
 
-		return null;
-	};
+		return ( fieldId: string ) => {
+			return () => {
+				if ( fieldId in promiseCache ) {
+					return promiseCache[ fieldId ];
+				}
 
-	const customSelectRule = ( value: ValidatedItem ) => {
-		if ( value.select !== 'option1' ) {
-			return 'Value must be Option 1.';
-		}
-		return null;
-	};
+				switch ( fieldId ) {
+					case 'select':
+						promiseCache[ fieldId ] = new Promise( ( resolve ) =>
+							setTimeout(
+								() =>
+									resolve( [
+										{
+											value: 'option1',
+											label: 'Option 1',
+										},
+										{
+											value: 'option2',
+											label: 'Option 2',
+										},
+									] ),
+								3500
+							)
+						);
+						break;
 
-	const customTextRadioRule = ( value: ValidatedItem ) => {
-		if ( value.textWithRadio !== 'item1' ) {
-			return 'Value must be Item 1.';
-		}
+					case 'textWithRadio':
+						promiseCache[ fieldId ] = new Promise( ( resolve ) =>
+							setTimeout(
+								() =>
+									resolve( [
+										{
+											value: 'item1',
+											label: 'Item 1',
+										},
+										{
+											value: 'item2',
+											label: 'Item 2',
+										},
+									] ),
+								3500
+							)
+						);
+						break;
 
-		return null;
-	};
+					case 'countries':
+						promiseCache[ fieldId ] = new Promise( ( resolve ) =>
+							setTimeout(
+								() =>
+									resolve( [
+										{
+											value: 'us',
+											label: 'United States',
+										},
+										{
+											value: 'ca',
+											label: 'Canada',
+										},
+										{
+											value: 'uk',
+											label: 'United Kingdom',
+										},
+										{
+											value: 'fr',
+											label: 'France',
+										},
+										{
+											value: 'de',
+											label: 'Germany',
+										},
+										{ value: 'jp', label: 'Japan' },
+										{
+											value: 'au',
+											label: 'Australia',
+										},
+									] ),
+								3500
+							)
+						);
+						break;
 
-	const customTextareaRule = ( value: ValidatedItem ) => {
-		if ( ! /^[a-zA-Z ]+$/.test( value.textarea ) ) {
-			return 'Value must only contain letters and spaces.';
-		}
+					case 'toggleGroup':
+						promiseCache[ fieldId ] = new Promise( ( resolve ) =>
+							setTimeout(
+								() =>
+									resolve( [
+										{
+											value: 'option1',
+											label: 'Option 1',
+										},
+										{
+											value: 'option2',
+											label: 'Option 2',
+										},
+										{
+											value: 'option3',
+											label: 'Option 3',
+										},
+									] ),
+								3500
+							)
+						);
+						break;
 
-		return null;
-	};
-	const customEmailRule = ( value: ValidatedItem ) => {
-		if ( ! /^[a-zA-Z0-9._%+-]+@example\.com$/.test( value.email ) ) {
-			return 'Email address must be from @example.com domain.';
-		}
+					default:
+						throw new Error( `Unknown field ID: ${ fieldId }` );
+				}
 
-		return null;
-	};
-	const customTelephoneRule = ( value: ValidatedItem ) => {
-		if ( ! /^\+30\d{10}$/.test( value.telephone ) ) {
-			return 'Telephone number must start with +30 and have 10 digits after.';
-		}
+				return promiseCache[ fieldId ];
+			};
+		};
+	}, [] );
 
-		return null;
-	};
-	const customUrlRule = ( value: ValidatedItem ) => {
-		if ( ! /^https:\/\/example\.com$/.test( value.url ) ) {
-			return 'URL must be from https://example.com domain.';
-		}
+	const _fields: Field< ValidatedItem >[] = useMemo( () => {
+		const DateRangeEdit = (
+			props: DataFormControlProps< ValidatedItem >
+		) => {
+			return <DateControl { ...props } operator="between" />;
+		};
+		const makeAsync = (
+			rule: ( item: ValidatedItem ) => null | string
+		) => {
+			return async ( value: ValidatedItem ) => {
+				return await new Promise< string | null >( ( resolve ) => {
+					setTimeout( () => {
+						const validationResult = rule( value );
+						resolve( validationResult );
+					}, 2000 );
+				} );
+			};
+		};
 
-		return null;
-	};
-	const customColorRule = ( value: ValidatedItem ) => {
-		if ( ! /^#[0-9A-Fa-f]{6}$/.test( value.color ) ) {
-			return 'Color must be a valid hex format (e.g., #ff6600).';
-		}
+		const customTextRule = ( value: ValidatedItem ) => {
+			if ( ! /^[a-zA-Z ]+$/.test( value.text ) ) {
+				return 'Value must only contain letters and spaces.';
+			}
 
-		return null;
-	};
-	const customIntegerRule = ( value: ValidatedItem ) => {
-		if ( value.integer % 2 !== 0 ) {
-			return 'Integer must be an even number.';
-		}
+			return null;
+		};
 
-		return null;
-	};
-	const customNumberRule = ( value: ValidatedItem ) => {
-		if ( ! /^\d+\.\d{2}$/.test( value?.number?.toString() ) ) {
-			return 'Number must have exactly two decimal places.';
-		}
+		const customSelectRule = ( value: ValidatedItem ) => {
+			if ( value.select !== 'option1' ) {
+				return 'Value must be Option 1.';
+			}
+			return null;
+		};
 
-		return null;
-	};
-	const customBooleanRule = ( value: ValidatedItem ) => {
-		if ( value.boolean !== true ) {
-			return 'Boolean must be active.';
-		}
+		const customTextRadioRule = ( value: ValidatedItem ) => {
+			if ( value.textWithRadio !== 'item1' ) {
+				return 'Value must be Item 1.';
+			}
 
-		return null;
-	};
-	const customToggleRule = ( value: ValidatedItem ) => {
-		if ( value.toggle !== true ) {
-			return 'Toggle must be checked.';
-		}
+			return null;
+		};
 
-		return null;
-	};
-	const customToggleGroupRule = ( value: ValidatedItem ) => {
-		if ( value.toggleGroup !== 'option1' ) {
-			return 'Value must be Option 1.';
-		}
+		const customTextareaRule = ( value: ValidatedItem ) => {
+			if ( ! /^[a-zA-Z ]+$/.test( value.textarea ) ) {
+				return 'Value must only contain letters and spaces.';
+			}
 
-		return null;
-	};
+			return null;
+		};
+		const customEmailRule = ( value: ValidatedItem ) => {
+			if ( ! /^[a-zA-Z0-9._%+-]+@example\.com$/.test( value.email ) ) {
+				return 'Email address must be from @example.com domain.';
+			}
 
-	const customPasswordRule = ( value: ValidatedItem ) => {
-		if ( value.password.length < 8 ) {
-			return 'Password must be at least 8 characters long.';
-		}
-		if ( ! /[A-Z]/.test( value.password ) ) {
-			return 'Password must contain at least one uppercase letter.';
-		}
-		if ( ! /[0-9]/.test( value.password ) ) {
-			return 'Password must contain at least one number.';
-		}
+			return null;
+		};
+		const customTelephoneRule = ( value: ValidatedItem ) => {
+			if ( ! /^\+30\d{10}$/.test( value.telephone ) ) {
+				return 'Telephone number must start with +30 and have 10 digits after.';
+			}
 
-		return null;
-	};
+			return null;
+		};
+		const customUrlRule = ( value: ValidatedItem ) => {
+			if ( ! /^https:\/\/example\.com$/.test( value.url ) ) {
+				return 'URL must be from https://example.com domain.';
+			}
 
-	const maybeCustomRule = (
-		rule: ( item: ValidatedItem ) => null | string
-	) => {
-		return custom ? rule : undefined;
-	};
+			return null;
+		};
+		const customColorRule = ( value: ValidatedItem ) => {
+			if ( ! /^#[0-9A-Fa-f]{6}$/.test( value.color ) ) {
+				return 'Color must be a valid hex format (e.g., #ff6600).';
+			}
 
-	const _fields: Field< ValidatedItem >[] = [
-		{
-			id: 'text',
-			type: 'text',
-			label: 'Text',
-			isValid: {
-				required,
-				custom: maybeCustomRule( customTextRule ),
+			return null;
+		};
+		const customIntegerRule = ( value: ValidatedItem ) => {
+			if ( value.integer % 2 !== 0 ) {
+				return 'Integer must be an even number.';
+			}
+
+			return null;
+		};
+		const customNumberRule = ( value: ValidatedItem ) => {
+			if ( ! /^\d+\.\d{2}$/.test( value?.number?.toString() ) ) {
+				return 'Number must have exactly two decimal places.';
+			}
+
+			return null;
+		};
+		const customBooleanRule = ( value: ValidatedItem ) => {
+			if ( value.boolean !== true ) {
+				return 'Boolean must be active.';
+			}
+
+			return null;
+		};
+		const customToggleRule = ( value: ValidatedItem ) => {
+			if ( value.toggle !== true ) {
+				return 'Toggle must be checked.';
+			}
+
+			return null;
+		};
+		const customToggleGroupRule = ( value: ValidatedItem ) => {
+			if ( value.toggleGroup !== 'option1' ) {
+				return 'Value must be Option 1.';
+			}
+
+			return null;
+		};
+
+		const customPasswordRule = ( value: ValidatedItem ) => {
+			if ( value.password.length < 8 ) {
+				return 'Password must be at least 8 characters long.';
+			}
+			if ( ! /[A-Z]/.test( value.password ) ) {
+				return 'Password must contain at least one uppercase letter.';
+			}
+			if ( ! /[0-9]/.test( value.password ) ) {
+				return 'Password must contain at least one number.';
+			}
+
+			return null;
+		};
+
+		const customDateRule = ( value: ValidatedItem ) => {
+			if ( ! value.date ) {
+				return null;
+			}
+			const selectedDate = new Date( value.date );
+			const today = new Date();
+			today.setHours( 0, 0, 0, 0 );
+			if ( selectedDate < today ) {
+				return 'Date must not be in the past.';
+			}
+
+			return null;
+		};
+		const customDateTimeRule = ( value: ValidatedItem ) => {
+			if ( ! value.datetime ) {
+				return null;
+			}
+			const selectedDateTime = new Date( value.datetime );
+			const now = new Date();
+			if ( selectedDateTime < now ) {
+				return 'Date and time must not be in the past.';
+			}
+
+			return null;
+		};
+
+		const customDateRangeRule = ( value: ValidatedItem ) => {
+			if ( ! value.dateRange ) {
+				return null;
+			}
+			const [ fromDate, toDate ] = value.dateRange;
+			if ( ! fromDate || ! toDate ) {
+				return null;
+			}
+			const from = new Date( fromDate );
+			const to = new Date( toDate );
+			const daysDiff = Math.ceil(
+				( to.getTime() - from.getTime() ) / ( 1000 * 60 * 60 * 24 )
+			);
+			if ( daysDiff > 30 ) {
+				return 'Date range must not exceed 30 days.';
+			}
+			return null;
+		};
+
+		const maybeCustomRule = (
+			rule: ( item: ValidatedItem ) => null | string
+		) => {
+			if ( custom === 'sync' ) {
+				return rule;
+			}
+
+			if ( custom === 'async' ) {
+				return makeAsync( rule );
+			}
+
+			return undefined;
+		};
+
+		return [
+			{
+				id: 'text',
+				type: 'text',
+				label: 'Text',
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+					custom: maybeCustomRule( customTextRule ),
+				},
 			},
-		},
-		{
-			id: 'select',
-			type: 'text',
-			label: 'Select',
-			elements: [
-				{ value: 'option1', label: 'Option 1' },
-				{ value: 'option2', label: 'Option 2' },
+			{
+				id: 'select',
+				type: 'text',
+				label: 'Select',
+				elements:
+					elements === 'async'
+						? undefined
+						: [
+								{ value: 'option1', label: 'Option 1' },
+								{ value: 'option2', label: 'Option 2' },
+						  ],
+				getElements:
+					elements === 'async' ? getElements( 'select' ) : undefined,
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+					custom: maybeCustomRule( customSelectRule ),
+				},
+			},
+			{
+				id: 'textWithRadio',
+				type: 'text',
+				Edit: 'radio',
+				label: 'Text with radio',
+				elements:
+					elements === 'async'
+						? undefined
+						: [
+								{ value: 'item1', label: 'Item 1' },
+								{ value: 'item2', label: 'Item 2' },
+						  ],
+				getElements:
+					elements === 'async'
+						? getElements( 'textWithRadio' )
+						: undefined,
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+					custom: maybeCustomRule( customTextRadioRule ),
+				},
+			},
+			{
+				id: 'textarea',
+				type: 'text',
+				Edit: 'textarea',
+				label: 'Textarea',
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+					custom: maybeCustomRule( customTextareaRule ),
+				},
+			},
+			{
+				id: 'email',
+				type: 'email',
+				label: 'e-mail',
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+					custom: maybeCustomRule( customEmailRule ),
+				},
+			},
+			{
+				id: 'telephone',
+				type: 'telephone',
+				label: 'telephone',
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+					custom: maybeCustomRule( customTelephoneRule ),
+				},
+			},
+			{
+				id: 'url',
+				type: 'url',
+				label: 'URL',
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+					custom: maybeCustomRule( customUrlRule ),
+				},
+			},
+			{
+				id: 'color',
+				type: 'color',
+				label: 'Color',
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+					custom: maybeCustomRule( customColorRule ),
+				},
+			},
+			{
+				id: 'integer',
+				type: 'integer',
+				label: 'Integer',
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+					custom: maybeCustomRule( customIntegerRule ),
+				},
+			},
+			{
+				id: 'number',
+				type: 'number',
+				label: 'Number',
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+					custom: maybeCustomRule( customNumberRule ),
+				},
+			},
+			{
+				id: 'boolean',
+				type: 'boolean',
+				label: 'Boolean',
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+					custom: maybeCustomRule( customBooleanRule ),
+				},
+			},
+			{
+				id: 'array',
+				label: 'Array',
+				type: 'array',
+				placeholder: 'Select countries',
+				description: 'Countries you have visited',
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+				},
+				elements:
+					elements === 'async'
+						? undefined
+						: [
+								{ value: 'us', label: 'United States' },
+								{ value: 'ca', label: 'Canada' },
+								{ value: 'uk', label: 'United Kingdom' },
+								{ value: 'fr', label: 'France' },
+								{ value: 'de', label: 'Germany' },
+								{ value: 'jp', label: 'Japan' },
+								{ value: 'au', label: 'Australia' },
+						  ],
+				getElements:
+					elements === 'async'
+						? getElements( 'countries' )
+						: undefined,
+			},
+			{
+				id: 'customEdit',
+				label: 'Custom Control',
+				Edit: CustomEditControl,
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+				},
+			},
+			{
+				id: 'password',
+				type: 'password',
+				label: 'Password',
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+					custom: maybeCustomRule( customPasswordRule ),
+				},
+			},
+			{
+				id: 'toggle',
+				type: 'boolean',
+				label: 'Toggle',
+				Edit: 'toggle',
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+					custom: maybeCustomRule( customToggleRule ),
+				},
+			},
+			{
+				id: 'toggleGroup',
+				type: 'text',
+				label: 'Toggle Group',
+				Edit: 'toggleGroup',
+				elements:
+					elements === 'async'
+						? undefined
+						: [
+								{ value: 'option1', label: 'Option 1' },
+								{ value: 'option2', label: 'Option 2' },
+								{ value: 'option3', label: 'Option 3' },
+						  ],
+				getElements:
+					elements === 'async'
+						? getElements( 'toggleGroup' )
+						: undefined,
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+					custom: maybeCustomRule( customToggleGroupRule ),
+				},
+			},
+			{
+				id: 'date',
+				type: 'date',
+				label: 'Date',
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+					custom: maybeCustomRule( customDateRule ),
+				},
+			},
+			{
+				id: 'dateRange',
+				type: 'date',
+				label: 'Date Range',
+				Edit: DateRangeEdit,
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+					custom: maybeCustomRule( customDateRangeRule ),
+				},
+			},
+			{
+				id: 'datetime',
+				type: 'datetime',
+				label: 'Date Time',
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+					custom: maybeCustomRule( customDateTimeRule ),
+				},
+			},
+		];
+	}, [ elements, custom, required, getElements ] );
+
+	const form = useMemo(
+		() => ( {
+			fields: [
+				'text',
+				{ id: 'customEdit' },
+				{
+					id: 'level1Integer',
+					children: [ 'integer' ],
+				},
+				{
+					id: 'level1Number',
+					children: [
+						{ id: 'level2Number', children: [ 'number' ] },
+					],
+				},
+				{
+					id: 'level1Email',
+					children: [
+						{
+							id: 'level2Email',
+							children: [
+								{ id: 'level3Email', children: [ 'email' ] },
+							],
+						},
+					],
+				},
+				{
+					id: 'level1Telephone',
+					children: [
+						{
+							id: 'level2Telephone',
+							children: [
+								{
+									id: 'level3Telephone',
+									children: [
+										{
+											id: 'level4Telephone',
+											children: [ 'telephone' ],
+										},
+									],
+								},
+							],
+						},
+					],
+				},
+				'url',
+				'color',
+				'password',
+				'textarea',
+				'select',
+				'textWithRadio',
+				'boolean',
+				'toggle',
+				'toggleGroup',
+				'array',
+				'date',
+				'dateRange',
+				'datetime',
 			],
-			isValid: {
-				required,
-				custom: maybeCustomRule( customSelectRule ),
-			},
-		},
-		{
-			id: 'textWithRadio',
-			type: 'text',
-			Edit: 'radio',
-			label: 'Text with radio',
-			elements: [
-				{ value: 'item1', label: 'Item 1' },
-				{ value: 'item2', label: 'Item 2' },
-			],
-			isValid: {
-				required,
-				custom: maybeCustomRule( customTextRadioRule ),
-			},
-		},
-		{
-			id: 'textarea',
-			type: 'text',
-			Edit: 'textarea',
-			label: 'Textarea',
-			isValid: {
-				required,
-				custom: maybeCustomRule( customTextareaRule ),
-			},
-		},
-		{
-			id: 'email',
-			type: 'email',
-			label: 'e-mail',
-			isValid: {
-				required,
-				custom: maybeCustomRule( customEmailRule ),
-			},
-		},
-		{
-			id: 'telephone',
-			type: 'telephone',
-			label: 'telephone',
-			isValid: {
-				required,
-				custom: maybeCustomRule( customTelephoneRule ),
-			},
-		},
-		{
-			id: 'url',
-			type: 'url',
-			label: 'URL',
-			isValid: {
-				required,
-				custom: maybeCustomRule( customUrlRule ),
-			},
-		},
-		{
-			id: 'color',
-			type: 'color',
-			label: 'Color',
-			isValid: {
-				required,
-				custom: maybeCustomRule( customColorRule ),
-			},
-		},
-		{
-			id: 'integer',
-			type: 'integer',
-			label: 'Integer',
-			isValid: {
-				required,
-				custom: maybeCustomRule( customIntegerRule ),
-			},
-		},
-		{
-			id: 'number',
-			type: 'number',
-			label: 'Number',
-			isValid: {
-				required,
-				custom: maybeCustomRule( customNumberRule ),
-			},
-		},
-		{
-			id: 'boolean',
-			type: 'boolean',
-			label: 'Boolean',
-			isValid: {
-				required,
-				custom: maybeCustomRule( customBooleanRule ),
-			},
-		},
-		{
-			id: 'categories',
-			type: 'array' as const,
-			label: 'Categories',
-			isValid: {
-				required,
-			},
-			elements: [
-				{ value: 'astronomy', label: 'Astronomy' },
-				{ value: 'book-review', label: 'Book review' },
-				{ value: 'event', label: 'Event' },
-				{ value: 'photography', label: 'Photography' },
-				{ value: 'travel', label: 'Travel' },
-			],
-		},
-		{
-			id: 'countries',
-			label: 'Countries Visited',
-			type: 'array' as const,
-			placeholder: 'Select countries',
-			description: 'Countries you have visited',
-			isValid: {
-				required,
-				elements: true,
-			},
-			elements: [
-				{ value: 'us', label: 'United States' },
-				{ value: 'ca', label: 'Canada' },
-				{ value: 'uk', label: 'United Kingdom' },
-				{ value: 'fr', label: 'France' },
-				{ value: 'de', label: 'Germany' },
-				{ value: 'jp', label: 'Japan' },
-				{ value: 'au', label: 'Australia' },
-			],
-		},
-		{
-			id: 'customEdit',
-			label: 'Custom Control',
-			Edit: CustomEditControl,
-			isValid: {
-				required,
-			},
-		},
-		{
-			id: 'password',
-			type: 'password',
-			label: 'Password',
-			isValid: {
-				required,
-				custom: maybeCustomRule( customPasswordRule ),
-			},
-		},
-		{
-			id: 'toggle',
-			type: 'boolean',
-			label: 'Toggle',
-			Edit: 'toggle',
-			isValid: {
-				required,
-				custom: maybeCustomRule( customToggleRule ),
-			},
-		},
-		{
-			id: 'toggleGroup',
-			type: 'text',
-			label: 'Toggle Group',
-			Edit: 'toggleGroup',
-			elements: [
-				{ value: 'option1', label: 'Option 1' },
-				{ value: 'option2', label: 'Option 2' },
-				{ value: 'option3', label: 'Option 3' },
-			],
-			isValid: {
-				required,
-				custom: maybeCustomRule( customToggleGroupRule ),
-			},
-		},
-	];
+		} ),
+		[]
+	);
 
-	const form = {
-		layout: { type },
-		fields: [
-			'text',
-			'select',
-			'textWithRadio',
-			'textarea',
-			'email',
-			'telephone',
-			'url',
-			'color',
-			'integer',
-			'number',
-			'boolean',
-			'categories',
-			'countries',
-			'toggle',
-			'toggleGroup',
-			'password',
-			'customEdit',
-		],
-	};
-
-	const canSave = isItemValid( post, _fields, form );
+	const { validity, isValid } = useFormValidity( post, _fields, form );
 
 	return (
 		<form>
@@ -893,6 +1213,7 @@ const ValidationComponent = ( {
 					data={ post }
 					fields={ _fields }
 					form={ form }
+					validity={ validity }
 					onChange={ ( edits ) =>
 						setPost( ( prev ) => ( {
 							...prev,
@@ -903,7 +1224,7 @@ const ValidationComponent = ( {
 				<Button
 					__next40pxDefaultSize
 					accessibleWhenDisabled
-					disabled={ ! canSave }
+					disabled={ ! isValid }
 					variant="primary"
 				>
 					Submit
@@ -989,7 +1310,13 @@ const VisibilityComponent = () => {
 	);
 };
 
-const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
+const LayoutCardComponent = ( {
+	withHeader,
+	isCollapsible,
+}: {
+	withHeader: boolean;
+	isCollapsible: boolean;
+} ) => {
 	type Customer = {
 		name: string;
 		email: string;
@@ -1120,7 +1447,11 @@ const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 			fields: [
 				{
 					id: 'customerCard',
-					layout: { type: 'card', summary: 'plan-summary' },
+					layout: {
+						type: 'card',
+						summary: 'plan-summary',
+						isCollapsible,
+					},
 					label: 'Customer',
 					description:
 						'Enter your contact details, plan type, and addresses to complete your customer information.',
@@ -1185,12 +1516,13 @@ const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 						type: 'card',
 						isOpened: false,
 						summary: [ { id: 'dueDate', visibility: 'always' } ],
+						isCollapsible,
 					},
 					children: [ 'vat', 'commission' ],
 				},
 			],
 		} ),
-		[ withHeader ]
+		[ withHeader, isCollapsible ]
 	);
 
 	return (
@@ -1536,6 +1868,7 @@ const LayoutMixedComponent = () => {
 	} );
 
 	const form: Form = {
+		layout: { type: 'card' },
 		fields: [
 			{
 				id: 'title-and-status',
@@ -1596,9 +1929,14 @@ export const LayoutCard = {
 			control: { type: 'boolean' },
 			description: 'Whether the card has a header.',
 		},
+		isCollapsible: {
+			control: { type: 'boolean' },
+			description: 'Whether the card can be collapsed/expanded.',
+		},
 	},
 	args: {
 		withHeader: true,
+		isCollapsible: true,
 	},
 };
 
@@ -1652,22 +1990,25 @@ export const Validation = {
 	argTypes: {
 		required: {
 			control: { type: 'boolean' },
-			description: 'Whether or not the fields are required.',
+			description:
+				'Whether or not the required validation rule is active.',
 		},
-		type: {
+		elements: {
 			control: { type: 'select' },
-			description: 'Chooses the validation type.',
-			options: [ 'regular', 'panel' ],
+			description:
+				'Whether or not the elements validation rule is active.',
+			options: [ 'sync', 'async', 'none' ],
 		},
 		custom: {
-			control: { type: 'boolean' },
-			description: 'Whether or not the fields have custom validation.',
+			control: { type: 'select' },
+			description: 'Whether or not the custom validation rule is active.',
+			options: [ 'sync', 'async', 'none' ],
 		},
 	},
 	args: {
 		required: true,
-		type: 'regular',
-		custom: true,
+		elements: 'sync',
+		custom: 'sync',
 	},
 };
 

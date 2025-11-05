@@ -23,7 +23,19 @@ import { list, grid } from '@wordpress/icons';
 
 const TEMPLATE = [
 	[ 'core/post-title' ],
-	[ 'core/post-date' ],
+	[
+		'core/post-date',
+		{
+			metadata: {
+				bindings: {
+					datetime: {
+						source: 'core/post-data',
+						args: { field: 'date' },
+					},
+				},
+			},
+		},
+	],
 	[ 'core/post-excerpt' ],
 ];
 

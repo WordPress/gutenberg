@@ -25,7 +25,7 @@ test.describe( 'Post Meta source', () => {
 		test.beforeEach( async ( { admin, editor } ) => {
 			await admin.visitSiteEditor( {
 				postId: 'gutenberg-test-themes/block-bindings//single-movie',
-				postType: 'wp_registered_template',
+				postType: 'wp_template',
 				canvas: 'edit',
 			} );
 			await editor.openDocumentSettingsSidebar();
@@ -300,7 +300,7 @@ test.describe( 'Post Meta source', () => {
 		test.beforeEach( async ( { admin, editor } ) => {
 			await admin.visitSiteEditor( {
 				postId: 'gutenberg-test-themes/block-bindings//custom-template',
-				postType: 'wp_registered_template',
+				postType: 'wp_template',
 				canvas: 'edit',
 			} );
 			await editor.openDocumentSettingsSidebar();

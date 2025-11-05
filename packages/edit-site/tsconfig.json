@@ -3,6 +3,7 @@
 	"extends": "../../tsconfig.base.json",
 	"references": [
 		{ "path": "../a11y" },
+		{ "path": "../admin-ui" },
 		{ "path": "../api-fetch" },
 		{ "path": "../autop" },
 		{ "path": "../blob" },
@@ -20,6 +21,8 @@
 		{ "path": "../element" },
 		{ "path": "../escape-html" },
 		{ "path": "../fields" },
+		{ "path": "../global-styles-engine" },
+		{ "path": "../global-styles-ui" },
 		{ "path": "../hooks" },
 		{ "path": "../html-entities" },
 		{ "path": "../i18n" },
@@ -30,6 +33,7 @@
 		{ "path": "../notices" },
 		{ "path": "../keycodes" },
 		{ "path": "../plugins" },
+		{ "path": "../preferences" },
 		{ "path": "../primitives" },
 		{ "path": "../private-apis" },
 		{ "path": "../rich-text" },
@@ -38,17 +42,6 @@
 		{ "path": "../url" },
 		{ "path": "../views" },
 		{ "path": "../wordcount" }
-	],
-	// NOTE: This package is being progressively typed. You are encouraged to
-	// expand this array with files which can be type-checked. At some point in
-	// the future, this can be simplified to an `includes` of `src/**/*`.
-	"files": [
-		"src/components/style-book/categories.ts",
-		"src/components/style-book/constants.ts",
-		"src/components/style-book/types.ts",
-		"src/components/style-book/color-examples.tsx",
-		"src/components/style-book/duotone-examples.tsx",
-		"src/components/style-book/examples.tsx"
 	],
 	"include": []
 }

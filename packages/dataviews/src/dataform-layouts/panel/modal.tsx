@@ -13,34 +13,58 @@ import {
 	Modal,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useState, useMemo } from '@wordpress/element';
+import { useContext, useState, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import type { Form, FormField, NormalizedField } from '../../types';
+import type {
+	Field,
+	NormalizedForm,
+	NormalizedFormField,
+	NormalizedField,
+} from '../../types';
 import { DataFormLayout } from '../data-form-layout';
-import { isCombinedField } from '../is-combined-field';
-import { DEFAULT_LAYOUT } from '../normalize-form-fields';
+import { DEFAULT_LAYOUT } from '../normalize-form';
 import SummaryButton from './summary-button';
+import useFormValidity from '../../hooks/use-form-validity';
+import DataFormContext from '../../components/dataform-context';
 
 function ModalContent< Item >( {
 	data,
-	form,
-	fieldLabel,
+	field,
 	onChange,
+	fieldLabel,
 	onClose,
 }: {
 	data: Item;
-	form: Form;
-	fieldLabel: string;
+	field: NormalizedFormField;
 	onChange: ( data: Partial< Item > ) => void;
 	onClose: () => void;
+	fieldLabel: string;
 } ) {
+	const { fields } = useContext( DataFormContext );
 	const [ changes, setChanges ] = useState< Partial< Item > >( {} );
 	const modalData = useMemo( () => {
 		return deepMerge( data, changes );
 	}, [ data, changes ] );
+
+	const form: NormalizedForm = useMemo(
+		() => ( {
+			layout: DEFAULT_LAYOUT,
+			fields: !! field.children
+				? field.children
+				: // If not explicit children return the field id itself.
+				  [ { id: field.id, layout: DEFAULT_LAYOUT } ],
+		} ),
+		[ field ]
+	);
+
+	const { validity } = useFormValidity(
+		modalData,
+		fields as Field< any >[],
+		form
+	);
 
 	const onApply = () => {
 		onChange( changes );
@@ -63,16 +87,16 @@ function ModalContent< Item >( {
 				data={ modalData }
 				form={ form }
 				onChange={ handleOnChange }
+				validity={ validity }
 			>
-				{ ( FieldLayout, nestedField ) => (
+				{ ( FieldLayout, childField, childFieldValidity ) => (
 					<FieldLayout
-						key={ nestedField.id }
+						key={ childField.id }
 						data={ modalData }
-						field={ nestedField }
+						field={ childField }
 						onChange={ handleOnChange }
-						hideLabelFromVision={
-							( form?.fields ?? [] ).length < 2
-						}
+						hideLabelFromVision={ form.fields.length < 2 }
+						validity={ childFieldValidity }
 					/>
 				) }
 			</DataFormLayout>
@@ -101,36 +125,23 @@ function ModalContent< Item >( {
 }
 
 function PanelModal< Item >( {
-	fieldDefinition,
-	summaryFields,
-	labelPosition,
 	data,
-	onChange,
 	field,
+	onChange,
+	labelPosition,
+	summaryFields,
+	fieldDefinition,
 }: {
-	fieldDefinition: NormalizedField< Item >;
-	summaryFields: NormalizedField< Item >[];
-	labelPosition: 'side' | 'top' | 'none';
 	data: Item;
+	field: NormalizedFormField;
 	onChange: ( value: any ) => void;
-	field: FormField;
+	labelPosition: 'side' | 'top' | 'none';
+	summaryFields: NormalizedField< Item >[];
+	fieldDefinition: NormalizedField< Item >;
 } ) {
 	const [ isOpen, setIsOpen ] = useState( false );
 
-	const fieldLabel = isCombinedField( field )
-		? field.label
-		: fieldDefinition?.label;
-
-	const form: Form = useMemo(
-		(): Form => ( {
-			layout: DEFAULT_LAYOUT,
-			fields: isCombinedField( field )
-				? field.children
-				: // If not explicit children return the field id itself.
-				  [ { id: field.id } ],
-		} ),
-		[ field ]
-	);
+	const fieldLabel = !! field.children ? field.label : fieldDefinition?.label;
 
 	return (
 		<>
@@ -146,9 +157,9 @@ function PanelModal< Item >( {
 			{ isOpen && (
 				<ModalContent
 					data={ data }
-					form={ form as Form }
-					fieldLabel={ fieldLabel ?? '' }
+					field={ field }
 					onChange={ onChange }
+					fieldLabel={ fieldLabel ?? '' }
 					onClose={ () => setIsOpen( false ) }
 				/>
 			) }

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/commands",
-	"version": "1.32.0",
+	"version": "1.34.0",
 	"description": "Handles the commands menu.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -25,10 +25,18 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"exports": {
+		".": {
+			"import": "./build-module/index.js",
+			"require": "./build/index.js"
+		},
+		"./package.json": "./package.json",
+		"./build-style/": "./build-style/"
+	},
 	"react-native": "src/index",
 	"wpScript": true,
 	"dependencies": {
-		"@babel/runtime": "7.25.7",
+		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/components": "file:../components",
 		"@wordpress/data": "file:../data",
 		"@wordpress/element": "file:../element",

@@ -4,10 +4,11 @@
 	"name": "core/accordion-item",
 	"title": "Accordion Item",
 	"category": "design",
-	"description": "Displays a section of content in an accordion, including a heading and expandable content.",
+	"description": "Wraps the heading and panel in one unit.",
 	"parent": [ "core/accordion" ],
 	"allowedBlocks": [ "core/accordion-heading", "core/accordion-panel" ],
 	"supports": {
+		"html": false,
 		"color": {
 			"background": true,
 			"gradients": true
@@ -30,6 +31,9 @@
 			}
 		},
 		"shadow": true,
+		"layout": {
+			"allowEditing": false
+		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
