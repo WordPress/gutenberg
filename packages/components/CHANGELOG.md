@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 30.7.1-next.0 (2025-11-05)
+
 ### Bug Fixes
 
 -   `TextareaControl`: Add `min-height` to the textarea element ([#72867](https://github.com/WordPress/gutenberg/pull/72867)).

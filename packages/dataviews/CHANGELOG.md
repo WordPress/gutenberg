@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 10.3.0-next.0 (2025-11-05)
+
 ### Enhancements
 
 - DatViews list layout: remove link variant from primary actions's button. [#72920](https://github.com/WordPress/gutenberg/pull/72920)
