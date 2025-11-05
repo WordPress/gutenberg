@@ -17,9 +17,6 @@ import { unlock } from '../../lock-unlock';
 const { useHistory } = unlock( routerPrivateApis );
 
 export const useSetActiveTemplateAction = () => {
-	const activeTheme = useSelect( ( select ) =>
-		select( coreStore ).getCurrentTheme()
-	);
 	const { getEntityRecord } = useSelect( coreStore );
 	const { editEntityRecord, saveEditedEntityRecord } =
 		useDispatch( coreStore );
@@ -34,10 +31,7 @@ export const useSetActiveTemplateAction = () => {
 			isPrimary: true,
 			icon: pencil,
 			isEligible( item ) {
-				return (
-					! ( item.slug === 'index' && item.source === 'theme' ) &&
-					item.theme === activeTheme.stylesheet
-				);
+				return ! ( item.slug === 'index' && item.source === 'theme' );
 			},
 			async callback( items ) {
 				const deactivate = items.some( ( item ) => item._isActive );
@@ -67,12 +61,7 @@ export const useSetActiveTemplateAction = () => {
 				await saveEditedEntityRecord( 'root', 'site' );
 			},
 		} ),
-		[
-			editEntityRecord,
-			saveEditedEntityRecord,
-			getEntityRecord,
-			activeTheme,
-		]
+		[ editEntityRecord, saveEditedEntityRecord, getEntityRecord ]
 	);
 };
 

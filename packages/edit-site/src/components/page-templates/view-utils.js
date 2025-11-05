@@ -20,7 +20,7 @@ const DEFAULT_VIEW = {
 	titleField: 'title',
 	descriptionField: 'description',
 	mediaField: 'preview',
-	fields: [ 'author', 'active', 'slug', 'theme' ],
+	fields: [ 'author', 'active', 'slug' ],
 	filters: [],
 	...defaultLayouts.grid,
 };

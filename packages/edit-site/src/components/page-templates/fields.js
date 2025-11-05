@@ -20,11 +20,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { EditorProvider } from '@wordpress/editor';
-import {
-	privateApis as corePrivateApis,
-	store as coreStore,
-} from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
+import { privateApis as corePrivateApis } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -163,23 +159,6 @@ export const activeField = {
 			</Badge>
 		);
 	},
-};
-
-export const useThemeField = () => {
-	const activeTheme = useSelect( ( select ) =>
-		select( coreStore ).getCurrentTheme()
-	);
-	return {
-		label: __( 'Compatible Theme' ),
-		id: 'theme',
-		getValue: ( { item } ) => item.theme,
-		render: function Render( { item } ) {
-			if ( item.theme === activeTheme.stylesheet ) {
-				return <Badge intent="success">{ item.theme }</Badge>;
-			}
-			return <Badge intent="error">{ item.theme }</Badge>;
-		},
-	};
 };
 
 export const slugField = {
