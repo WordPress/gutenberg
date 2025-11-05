@@ -45,8 +45,6 @@ import { BlockSettingsDropdown } from '../block-settings-menu/block-settings-dro
 import { focusListItem } from './utils';
 import useClipboardHandler from './use-clipboard-handler';
 
-import { unlock } from '../../lock-unlock';
-
 const expanded = ( state, action ) => {
 	if ( action.type === 'clear' ) {
 		return {};
@@ -123,9 +121,8 @@ function ListViewComponent(
 	const { getBlock } = useSelect( blockEditorStore );
 	const { visibleBlockCount } = useSelect(
 		( select ) => {
-			const { getGlobalBlockCount, getClientIdsOfDescendants } = unlock(
-				select( blockEditorStore )
-			);
+			const { getGlobalBlockCount, getClientIdsOfDescendants } =
+				select( blockEditorStore );
 			const draggedBlockCount =
 				draggedClientIds?.length > 0
 					? getClientIdsOfDescendants( draggedClientIds ).length + 1

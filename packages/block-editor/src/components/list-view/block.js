@@ -121,33 +121,25 @@ function ListViewBlock( {
 
 	const pasteStyles = usePasteStyles();
 
-	const {
-		block,
-		blockName,
-		allowRightClickOverrides,
-		isBlockHidden,
-		hasSelectedChild,
-	} = useSelect(
-		( select ) => {
-			const { getBlock, getBlockName, getSettings } =
-				select( blockEditorStore );
-			const { isBlockHidden: _isBlockHidden, hasSelectedInnerBlock } =
-				unlock( select( blockEditorStore ) );
+	const { block, blockName, allowRightClickOverrides, isBlockHidden } =
+		useSelect(
+			( select ) => {
+				const { getBlock, getBlockName, getSettings } =
+					select( blockEditorStore );
+				const { isBlockHidden: _isBlockHidden } = unlock(
+					select( blockEditorStore )
+				);
 
-			return {
-				block: getBlock( clientId ),
-				blockName: getBlockName( clientId ),
-				allowRightClickOverrides:
-					getSettings().allowRightClickOverrides,
-				isBlockHidden: _isBlockHidden( clientId ),
-				hasSelectedChild: hasSelectedInnerBlock(
-					clientId,
-					true // deep check.
-				),
-			};
-		},
-		[ clientId ]
-	);
+				return {
+					block: getBlock( clientId ),
+					blockName: getBlockName( clientId ),
+					allowRightClickOverrides:
+						getSettings().allowRightClickOverrides,
+					isBlockHidden: _isBlockHidden( clientId ),
+				};
+			},
+			[ clientId ]
+		);
 
 	const showBlockActions =
 		// When a block hides its toolbar it also hides the block settings menu,
@@ -554,7 +546,6 @@ function ListViewBlock( {
 
 	const classes = clsx( {
 		'is-selected': isSelected,
-		'has-selected-child': hasSelectedChild,
 		'is-first-selected': isFirstSelectedBlock,
 		'is-last-selected': isLastSelectedBlock,
 		'is-branch-selected': isBranchSelected,
