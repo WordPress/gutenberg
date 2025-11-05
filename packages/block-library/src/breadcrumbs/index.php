@@ -283,10 +283,9 @@ function block_core_breadcrumbs_get_post_type_archive_item( $post_type ) {
 	if ( ! $archive_link ) {
 		return null;
 	}
-	return sprintf(
-		'<a href="%s">%s</a>',
-		esc_url( $archive_link ),
-		esc_html( $post_type_object->labels->archives )
+	return block_core_breadcrumbs_create_link(
+		$archive_link,
+		$post_type_object->labels->name
 	);
 }
 
