@@ -174,7 +174,7 @@
 		"stylelint-plugin-logical-css": "^1.2.3",
 		"terser": "5.32.0",
 		"terser-webpack-plugin": "5.3.10",
-		"typescript": "5.7.2",
+		"typescript": "5.9.3",
 		"uuid": "9.0.1",
 		"wait-on": "8.0.1",
 		"webdriverio": "8.16.20",
