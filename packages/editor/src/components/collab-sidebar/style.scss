@@ -169,3 +169,18 @@
 		margin-left: 0;
 	}
 }
+
+.show-icon-labels {
+	.comment-avatar-indicator {
+		width: auto;
+		// Hide the user avatars container when labels are set to display...
+		div {
+			display: none;
+		}
+		// ... and display labels.
+		&::after {
+			content: attr(aria-label);
+			font-size: $helptext-font-size;
+		}
+	}
+}
