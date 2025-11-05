@@ -60,6 +60,10 @@ export type ProviderCreator = (
 	awareness?: Awareness
 ) => Promise< ProviderCreatorResult >;
 
+export interface CollectionHandlers {
+	refetchRecords: () => Promise< void >;
+}
+
 export interface RecordHandlers {
 	editRecord: ( data: Partial< ObjectData > ) => void;
 	getEditedRecord: () => Promise< ObjectData >;
@@ -90,6 +94,10 @@ export interface SyncManager {
 		objectId: ObjectID,
 		record: ObjectData,
 		handlers: RecordHandlers
+	) => Promise< void >;
+	loadCollection: (
+		objectType: ObjectType,
+		handlers: CollectionHandlers
 	) => Promise< void >;
 	undoManager: SyncUndoManager;
 	unload: ( objectType: ObjectType, objectId: ObjectID ) => void;

@@ -430,6 +430,20 @@ export const getEntityRecords =
 				};
 			}
 
+			if ( query.per_page === -1 ) {
+				getSyncManager()?.loadCollection( `${ kind }/${ name }`, {
+					refetchRecords: async () => {
+						console.log( 'refetchRecords called' );
+						dispatch.receiveEntityRecords(
+							kind,
+							name,
+							await apiFetch( { path, parse: true } ),
+							query
+						);
+					},
+				} );
+			}
+
 			// If we request fields but the result doesn't contain the fields,
 			// explicitly set these fields as "undefined"
 			// that way we consider the query "fulfilled".

@@ -126,15 +126,7 @@ export const rootEntitiesConfig = [
 		plural: 'users',
 		supportsPagination: true,
 	},
-	{
-		name: 'comment',
-		kind: 'root',
-		baseURL: '/wp/v2/comments',
-		baseURLParams: { context: 'edit' },
-		plural: 'comments',
-		label: __( 'Comment' ),
-		supportsPagination: true,
-	},
+	...loadCommentEntity(),
 	{
 		name: 'menu',
 		kind: 'root',
@@ -393,7 +385,7 @@ async function loadTaxonomyEntities() {
 	} );
 	return Object.entries( taxonomies ?? {} ).map( ( [ name, taxonomy ] ) => {
 		const namespace = taxonomy?.rest_namespace ?? 'wp/v2';
-		return {
+		const entity = {
 			kind: 'taxonomy',
 			baseURL: `/${ namespace }/${ taxonomy.rest_base }`,
 			baseURLParams: { context: 'edit' },
@@ -402,7 +394,44 @@ async function loadTaxonomyEntities() {
 			getTitle: ( record ) => record?.name,
 			supportsPagination: true,
 		};
+
+		if ( 'category' === name ) {
+			entity.syncConfig = {};
+		}
+
+		return entity;
 	} );
+}
+
+/**
+ * Returns the Comment entity.
+ *
+ * @return {object} Entity
+ */
+function loadCommentEntity() {
+	const entity = {
+		name: 'comment',
+		kind: 'root',
+		baseURL: '/wp/v2/comments',
+		baseURLParams: { context: 'edit' },
+		plural: 'comments',
+		label: __( 'Comment' ),
+		supportsPagination: true,
+	};
+
+	if ( window.__experimentalEnableSync ) {
+		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+			/**
+			 * @type {import('@wordpress/sync').SyncConfig}
+			 */
+			entity.syncConfig = {
+				applyChangesToCRDTDoc: defaultApplyChangesToCRDTDoc,
+				getChangesFromCRDTDoc: defaultGetChangesFromCRDTDoc,
+			};
+		}
+	}
+
+	return [ entity ];
 }
 
 /**

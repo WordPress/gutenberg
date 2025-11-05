@@ -47,6 +47,7 @@ export type PostChanges = Partial< Post > & {
 export interface YPostRecord extends YMapRecord {
 	author: number;
 	blocks: YBlocks;
+	categories: number[];
 	comment_status: string;
 	date: string | null;
 	excerpt: string;
@@ -66,6 +67,7 @@ export interface YPostRecord extends YMapRecord {
 const allowedPostProperties = new Set< string >( [
 	'author',
 	'blocks',
+	'categories',
 	'comment_status',
 	'date',
 	'excerpt',
