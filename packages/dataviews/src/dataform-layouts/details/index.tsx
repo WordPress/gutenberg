@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useContext, useMemo } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -14,14 +15,12 @@ import type {
 } from '../../types';
 import DataFormContext from '../../components/dataform-context';
 import { DataFormLayout } from '../data-form-layout';
-import { isCombinedField } from '../is-combined-field';
 import { DEFAULT_LAYOUT, normalizeLayout } from '../normalize-form-fields';
 
 export default function FormDetailsField< Item >( {
 	data,
 	field,
 	onChange,
-	hideLabelFromVision,
 }: FieldLayoutProps< Item > ) {
 	const { fields } = useContext( DataFormContext );
 
@@ -33,12 +32,12 @@ export default function FormDetailsField< Item >( {
 	const form: Form = useMemo(
 		(): Form => ( {
 			layout: DEFAULT_LAYOUT,
-			fields: isCombinedField( field ) ? field.children : [],
+			fields: field.children ?? [],
 		} ),
 		[ field ]
 	);
 
-	if ( ! isCombinedField( field ) ) {
+	if ( ! field.children ) {
 		return null;
 	}
 
@@ -57,7 +56,7 @@ export default function FormDetailsField< Item >( {
 		);
 	} else {
 		// Fall back to the label
-		summaryContent = field.label || 'Add more details';
+		summaryContent = field.label || __( 'More details' );
 	}
 
 	return (
