@@ -3,6 +3,7 @@
  */
 const chalk = require( 'chalk' );
 const { existsSync, readFileSync } = require( 'node:fs' );
+const { checkPlatform } = require( 'npm-install-checks' );
 
 const ERROR_TEXT = chalk.reset.inverse.bold.red( ' ERROR ' );
 const WARNING_TEXT = chalk.reset.inverse.bold.yellow( ' WARNING ' );
@@ -102,6 +103,22 @@ const otherOssLicenses = [
  */
 const getLicenses = ( gpl2 ) => {
 	return [ ...gpl2CompatibleLicenses, ...( gpl2 ? [] : otherOssLicenses ) ];
+};
+
+/**
+ * Check if a package is compatible with the current platform, using the same
+ * internal logic as npm.
+ *
+ * @param {Record<string, unknown>} pkg The package object.
+ * @return {boolean} true if the package is compatible with the current platform, false if it isn't.
+ */
+const isCompatiblePlatform = ( pkg ) => {
+	try {
+		checkPlatform( pkg );
+		return true;
+	} catch ( error ) {
+		return error.code !== 'EBADPLATFORM';
+	}
 };
 
 /**
@@ -320,6 +337,10 @@ function checkDepsInTree( deps, options ) {
 		}
 
 		if ( Object.keys( dep ).length === 0 ) {
+			continue;
+		}
+
+		if ( dep.optional && ! isCompatiblePlatform( dep ) ) {
 			continue;
 		}
 
