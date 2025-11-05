@@ -37,7 +37,7 @@ if ( isPackageInstalled( 'prettier' ) ) {
 if ( isPackageInstalled( 'typescript' ) ) {
 	config.settings = {
 		'import/resolver': {
-			node: {
+			typescript: {
 				extensions: [ '.js', '.jsx', '.ts', '.tsx' ],
 			},
 		},

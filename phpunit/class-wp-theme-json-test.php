@@ -6100,4 +6100,288 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$this->assertEquals( $expected, $block_nodes );
 	}
+
+	public function test_merge_incoming_data_duotone_presets_with_block_level_default_disabled() {
+		$defaults = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'color' => array(
+						'defaultDuotone' => true,
+						'duotone'        => array(
+							array(
+								'slug'   => 'dark-grayscale',
+								'colors' => array( '#000000', '#7f7f7f' ),
+								'name'   => 'Default Dark grayscale',
+							),
+							array(
+								'slug'   => 'blue-orange',
+								'colors' => array( '#0000ff', '#ff8800' ),
+								'name'   => 'Blue Orange',
+							),
+						),
+					),
+				),
+			),
+			'default'
+		);
+		$theme    = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'blocks' => array(
+						'core/image' => array(
+							'color' => array(
+								'defaultDuotone' => false,
+								'duotone'        => array(
+									array(
+										'slug'   => 'dark-grayscale',
+										'colors' => array( '#000000', '#7f7f7f' ),
+										'name'   => 'Theme Dark grayscale',
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected = array(
+			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'settings' => array(
+				'color'  => array(
+					'defaultDuotone' => true,
+					'duotone'        => array(
+						'default' => array(
+							array(
+								'slug'   => 'dark-grayscale',
+								'colors' => array( '#000000', '#7f7f7f' ),
+								'name'   => 'Default Dark grayscale',
+							),
+							array(
+								'slug'   => 'blue-orange',
+								'colors' => array( '#0000ff', '#ff8800' ),
+								'name'   => 'Blue Orange',
+							),
+						),
+					),
+				),
+				'blocks' => array(
+					'core/image' => array(
+						'color' => array(
+							'defaultDuotone' => false,
+							'duotone'        => array(
+								'theme' => array(
+									array(
+										'slug'   => 'dark-grayscale',
+										'colors' => array( '#000000', '#7f7f7f' ),
+										'name'   => 'Theme Dark grayscale',
+									),
+								),
+							),
+						),
+					),
+				),
+			),
+		);
+
+		$defaults->merge( $theme );
+		$actual = $defaults->get_raw_data();
+
+		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
+
+	public function test_merge_incoming_data_block_level_inherits_global_default_setting() {
+		$defaults = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'color' => array(
+						'defaultDuotone' => true,
+						'duotone'        => array(
+							array(
+								'slug'   => 'dark-grayscale',
+								'colors' => array( '#000000', '#7f7f7f' ),
+								'name'   => 'Default Dark grayscale',
+							),
+						),
+					),
+				),
+			),
+			'default'
+		);
+		$theme    = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'color'  => array(
+						'defaultDuotone' => false,
+					),
+					'blocks' => array(
+						'core/image' => array(
+							'color' => array(
+								// No defaultDuotone setting - should inherit global (false) set by theme.
+								'duotone' => array(
+									array(
+										'slug'   => 'dark-grayscale',
+										'colors' => array( '#000000', '#7f7f7f' ),
+										'name'   => 'Theme Dark grayscale',
+									),
+								),
+							),
+						),
+						'core/cover' => array(
+							'color' => array(
+								'defaultDuotone' => true, // Explicitly enabled at block level
+								'duotone'        => array(
+									array(
+										'slug'   => 'dark-grayscale',
+										'colors' => array( '#000000', '#7f7f7f' ),
+										'name'   => 'Cover Dark grayscale',
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected = array(
+			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'settings' => array(
+				'color'  => array(
+					'defaultDuotone' => false,
+					'duotone'        => array(
+						'default' => array(
+							array(
+								'slug'   => 'dark-grayscale',
+								'colors' => array( '#000000', '#7f7f7f' ),
+								'name'   => 'Default Dark grayscale',
+							),
+						),
+					),
+				),
+				'blocks' => array(
+					'core/image' => array(
+						'color' => array(
+							'duotone' => array(
+								'theme' => array(
+									array(
+										'slug'   => 'dark-grayscale',
+										'colors' => array( '#000000', '#7f7f7f' ),
+										'name'   => 'Theme Dark grayscale',
+									),
+								),
+							),
+						),
+					),
+					'core/cover' => array(
+						'color' => array(
+							'defaultDuotone' => true,
+							'duotone'        => array(
+								'theme' => array(
+									// Should be filtered out because block-level defaults are enabled
+									// and slug matches default
+								),
+							),
+						),
+					),
+				),
+			),
+		);
+
+		$defaults->merge( $theme );
+		$actual = $defaults->get_raw_data();
+
+		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
+
+	public function test_merge_incoming_data_unique_slugs_always_preserved() {
+		$defaults = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'color' => array(
+						'defaultDuotone' => true, // Defaults enabled
+						'duotone'        => array(
+							array(
+								'slug'   => 'dark-grayscale',
+								'colors' => array( '#000000', '#7f7f7f' ),
+								'name'   => 'Default Dark grayscale',
+							),
+						),
+					),
+				),
+			),
+			'default'
+		);
+		$theme    = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'blocks' => array(
+						'core/image' => array(
+							'color' => array(
+								'defaultDuotone' => true, // Block-level defaults enabled
+								'duotone'        => array(
+									array(
+										'slug'   => 'custom-unique',
+										'colors' => array( '#ff0000', '#00ff00' ),
+										'name'   => 'Custom Unique',
+									),
+									array(
+										'slug'   => 'dark-grayscale', // Matches default slug
+										'colors' => array( '#111111', '#888888' ),
+										'name'   => 'Theme Dark grayscale',
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected = array(
+			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'settings' => array(
+				'color'  => array(
+					'defaultDuotone' => true,
+					'duotone'        => array(
+						'default' => array(
+							array(
+								'slug'   => 'dark-grayscale',
+								'colors' => array( '#000000', '#7f7f7f' ),
+								'name'   => 'Default Dark grayscale',
+							),
+						),
+					),
+				),
+				'blocks' => array(
+					'core/image' => array(
+						'color' => array(
+							'defaultDuotone' => true,
+							'duotone'        => array(
+								'theme' => array(
+									array(
+										'slug'   => 'custom-unique', // Should always be preserved
+										'colors' => array( '#ff0000', '#00ff00' ),
+										'name'   => 'Custom Unique',
+									),
+									// 'dark-grayscale' should be filtered out due to slug match
+								),
+							),
+						),
+					),
+				),
+			),
+		);
+
+		$defaults->merge( $theme );
+		$actual = $defaults->get_raw_data();
+
+		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
 }

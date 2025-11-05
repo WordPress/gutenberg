@@ -9,8 +9,6 @@ import { parseArgs } from 'node:util';
 import esbuild from 'esbuild';
 import glob from 'fast-glob';
 import chokidar from 'chokidar';
-// See https://github.com/WordPress/gutenberg/issues/72136
-// eslint-disable-next-line import/no-unresolved
 import browserslistToEsbuild from 'browserslist-to-esbuild';
 import { sassPlugin, postcssModules } from 'esbuild-sass-plugin';
 import postcss from 'postcss';

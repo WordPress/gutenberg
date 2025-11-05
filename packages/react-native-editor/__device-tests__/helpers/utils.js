@@ -2,7 +2,7 @@
  * External dependencies
  */
 const childProcess = require( 'child_process' );
-// eslint-disable-next-line import/no-extraneous-dependencies, import/named
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { remote, Key } from 'webdriverio';
 
 const crypto = require( 'crypto' );

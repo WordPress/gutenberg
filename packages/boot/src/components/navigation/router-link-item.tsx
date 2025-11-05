@@ -9,11 +9,9 @@ import type { ForwardedRef } from 'react';
  */
 import { forwardRef } from '@wordpress/element';
 import { __experimentalItem as Item } from '@wordpress/components';
-import type { ItemProps } from '@wordpress/components/build-types/item-group/types';
-import type { WordPressComponentProps } from '@wordpress/components/build-types/context';
 
 function AnchorOnlyItem(
-	props: WordPressComponentProps< ItemProps, 'a' >,
+	props: React.ComponentProps< typeof Item >,
 	forwardedRef: ForwardedRef< HTMLAnchorElement >
 ) {
 	return <Item as="a" ref={ forwardedRef } { ...props } />;

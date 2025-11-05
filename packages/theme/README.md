@@ -63,33 +63,41 @@ The design system defines color tokens using the following naming scheme:
 
 ## Theme Provider
 
-The `ThemeProvider` is a React component that should wrap your application to provide design tokens and theme context to the child UI components.
+The `ThemeProvider` is a React component that should wrap your application to provide design tokens and theme context to the child UI components. It accepts a set of customizable seed values and automatically generates a set of design tokens, which are exposed as CSS custom properties for use throughout the application.
 
 ```tsx
 import { ThemeProvider } from '@wordpress/theme';
 
 function App() {
 	return (
-		<ThemeProvider color={ { scheme: 'light', accent: 'blue' } }>
+		<ThemeProvider color={ { primary: 'blue' } }>
 			{ /* Your app content */ }
 		</ThemeProvider>
 	);
 }
 ```
 
+The `color` prop accepts an object with the following optional properties:
+
+-   `primary`: The primary/accent seed color (default: `'#3858e9'`)
+-   `bg`: The background seed color (default: `'#f8f8f8'`)
+
+Both properties accept any valid CSS color value. The theme system automatically generates appropriate color ramps and determines light/dark mode based on these seed colors.
+
+### Nesting Providers
+
 The provider can be used recursively to override or modify the theme for a specific subtree.
 
 ```tsx
-<ThemeProvider>
-	{ /* system-themed UI components */ }
-	<ThemeProvider color={ { scheme: 'dark' } }>
+<ThemeProvider color={ { bg: 'white' } }>
+	{ /* light-themed UI components */ }
+	<ThemeProvider color={ { bg: '#1e1e1e' } }>
 		{ /* dark-themed UI components */ }
-		<ThemeProvider color={ { scheme: 'light' } }>
-			{ /* light-themed UI components */ }
+		<ThemeProvider color={ { primary: 'red' } }>
+			{ /* dark-themed with red accent */ }
 		</ThemeProvider>
-		{ /* dark-themed UI components */ }
 	</ThemeProvider>
-	{ /* system-themed UI components */ }
+	{ /* light-themed UI components */ }
 </ThemeProvider>
 ```
 

@@ -152,7 +152,6 @@ onlyOniOS( 'Gutenberg Editor Cover Block test', () => {
 
 		// First modal should no longer be presented.
 		const replaceButtons = await editorPage.driver.$$( '~Replace' );
-		// eslint-disable-next-line jest/no-conditional-expect
 		expect( replaceButtons.length ).toBe( 0 );
 
 		// Select different media.

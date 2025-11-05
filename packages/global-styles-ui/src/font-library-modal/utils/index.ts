@@ -106,7 +106,6 @@ export async function loadFontFaceInBrowser(
 
 	if ( typeof source === 'string' ) {
 		dataSource = `url(${ source })`;
-		// eslint-disable-next-line no-undef
 	} else if ( source instanceof File ) {
 		dataSource = await source.arrayBuffer();
 	} else {
@@ -209,7 +208,6 @@ export function getDisplaySrcFromFontFace(
 export function makeFontFamilyFormData( fontFamily: FontFamily ): FormData {
 	const formData = new FormData();
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const { fontFace, category, ...familyWithValidParameters } = fontFamily;
 	const fontFamilySettings = {
 		...familyWithValidParameters,

@@ -2,7 +2,8 @@
  * External dependencies
  */
 import { writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 /**
  * Internal dependencies
@@ -12,6 +13,8 @@ import {
 	buildBgRamp,
 	buildAccentRamp,
 } from '../../src/color-ramps/index.ts';
+
+const __dirname = dirname( fileURLToPath( import.meta.url ) );
 
 const bgRamp = buildBgRamp( DEFAULT_SEED_COLORS.bg );
 const accentRamps = Object.fromEntries(
@@ -26,7 +29,7 @@ const accentRamps = Object.fromEntries(
 const ramps = { bg: bgRamp, ...accentRamps };
 
 const outputPath = join(
-	import.meta.dirname,
+	__dirname,
 	'../../src/color-ramps/lib/default-ramps.ts'
 );
 

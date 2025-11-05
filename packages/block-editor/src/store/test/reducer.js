@@ -41,6 +41,7 @@ import {
 	openedBlockSettingsMenu,
 	expandedBlock,
 	zoomLevel,
+	editedContentOnlySection,
 	withDerivedBlockEditingModes,
 } from '../reducer';
 
@@ -3577,6 +3578,7 @@ describe( 'state', () => {
 				zoomLevel,
 				blockListSettings,
 				blockEditingModes,
+				editedContentOnlySection,
 			} )
 		);
 
@@ -3964,6 +3966,150 @@ describe( 'state', () => {
 							'paragraph-1': 'contentOnly',
 							'group-2': 'disabled',
 							// Paragraph 2 already has an explicit mode, so isn't set as a derived mode.
+						} )
+					)
+				);
+			} );
+			it( 'the editContentOnlySection action switches the section and all children to default mode when editing, then restores contentOnly modes when stopped', () => {
+				// Initial state should match the contentOnly template locking test
+				expect( initialState.derivedBlockEditingModes ).toEqual(
+					new Map(
+						Object.entries( {
+							'paragraph-1': 'contentOnly',
+							'group-2': 'disabled',
+							'paragraph-2': 'contentOnly',
+						} )
+					)
+				);
+
+				// Start editing the content-only section
+				const editingState = dispatchActions(
+					[
+						{
+							type: 'EDIT_CONTENT_ONLY_SECTION',
+							clientId: 'group-1',
+						},
+					],
+					testReducer,
+					initialState
+				);
+
+				// All blocks in the section should now be in default mode
+				expect( editingState.derivedBlockEditingModes ).toEqual(
+					new Map(
+						Object.entries( {
+							'group-1': 'default',
+							'paragraph-1': 'default',
+							'group-2': 'default',
+							'paragraph-2': 'default',
+						} )
+					)
+				);
+
+				// Stop editing the content-only section
+				const restoredState = dispatchActions(
+					[
+						{
+							type: 'EDIT_CONTENT_ONLY_SECTION',
+						},
+					],
+					testReducer,
+					editingState
+				);
+
+				// Should restore to original contentOnly modes
+				expect( restoredState.derivedBlockEditingModes ).toEqual(
+					new Map(
+						Object.entries( {
+							'paragraph-1': 'contentOnly',
+							'group-2': 'disabled',
+							'paragraph-2': 'contentOnly',
+						} )
+					)
+				);
+			} );
+
+			it( 'editContentOnlySection only affects the edited section, not other blocks', () => {
+				// Set up a state with two separate contentOnly sections
+				const stateWithTwoSections = dispatchActions(
+					[
+						{
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									name: 'core/group',
+									clientId: 'section-1',
+									attributes: {},
+									innerBlocks: [
+										{
+											name: 'core/paragraph',
+											clientId: 'section-1-paragraph',
+											attributes: {},
+											innerBlocks: [],
+										},
+									],
+								},
+								{
+									name: 'core/group',
+									clientId: 'section-2',
+									attributes: {},
+									innerBlocks: [
+										{
+											name: 'core/paragraph',
+											clientId: 'section-2-paragraph',
+											attributes: {},
+											innerBlocks: [],
+										},
+									],
+								},
+							],
+						},
+						{
+							type: 'UPDATE_BLOCK_LIST_SETTINGS',
+							clientId: 'section-1',
+							settings: {
+								templateLock: 'contentOnly',
+							},
+						},
+						{
+							type: 'UPDATE_BLOCK_LIST_SETTINGS',
+							clientId: 'section-2',
+							settings: {
+								templateLock: 'contentOnly',
+							},
+						},
+					],
+					testReducer
+				);
+
+				// Both sections should be in contentOnly mode initially
+				expect( stateWithTwoSections.derivedBlockEditingModes ).toEqual(
+					new Map(
+						Object.entries( {
+							'section-1-paragraph': 'contentOnly',
+							'section-2-paragraph': 'contentOnly',
+						} )
+					)
+				);
+
+				// Start editing only section-1
+				const editingSection1 = dispatchActions(
+					[
+						{
+							type: 'EDIT_CONTENT_ONLY_SECTION',
+							clientId: 'section-1',
+						},
+					],
+					testReducer,
+					stateWithTwoSections
+				);
+
+				expect( editingSection1.derivedBlockEditingModes ).toEqual(
+					new Map(
+						Object.entries( {
+							'section-1': 'default',
+							'section-1-paragraph': 'default',
+							'section-2-paragraph': 'contentOnly',
 						} )
 					)
 				);

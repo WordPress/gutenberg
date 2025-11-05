@@ -1,9 +1,6 @@
 /**
  * External dependencies
  */
-// Disable reason: ESLint resolver can't handle `exports`. Import resolver
-// checking is redundant in TypeScript files.
-// eslint-disable-next-line import/no-unresolved
 import { get, OKLCH, parse, serialize } from 'colorjs.io/fn';
 
 /**

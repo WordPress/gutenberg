@@ -2,10 +2,8 @@
 
 ## Unreleased
 
-
 ### Bug Fixes
 
--   Reexport all of the `build-types` folder from the `components` package entry point ([#72809](https://github.com/WordPress/gutenberg/pull/72809)).
 -   `TextareaControl`: Add `min-height` to the textarea element ([#72867](https://github.com/WordPress/gutenberg/pull/72867)).
 -   `Card`, `CardHeader`, `CardBody` and `CardFooter`: Add support for directional padding through object-based size prop, allowing independent control of padding for each side ([#72511](https://github.com/WordPress/gutenberg/pull/72511)).
 
