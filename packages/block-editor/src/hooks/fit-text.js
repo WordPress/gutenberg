@@ -64,12 +64,17 @@ function useFitText( { fitText, name, clientId } ) {
 
 	// Monitor block attribute changes
 	// Any attribute may change the available space.
-	const blockAttributes = useSelect(
+	const { blockAttributes, parentId } = useSelect(
 		( select ) => {
 			if ( ! clientId || ! hasFitTextSupport || ! fitText ) {
 				return;
 			}
-			return select( blockEditorStore ).getBlockAttributes( clientId );
+			return {
+				blockAttributes:
+					select( blockEditorStore ).getBlockAttributes( clientId ),
+				parentId:
+					select( blockEditorStore ).getBlockRootClientId( clientId ),
+			};
 		},
 		[ clientId, hasFitTextSupport, fitText ]
 	);
@@ -143,6 +148,7 @@ function useFitText( { fitText, name, clientId } ) {
 		if ( window.ResizeObserver && currentElement.parentElement ) {
 			resizeObserver = new window.ResizeObserver( applyFitText );
 			resizeObserver.observe( currentElement.parentElement );
+			resizeObserver.observe( currentElement );
 		}
 
 		// Cleanup function
@@ -169,7 +175,14 @@ function useFitText( { fitText, name, clientId } ) {
 				styleElement.remove();
 			}
 		};
-	}, [ fitText, clientId, applyFitText, blockElement, hasFitTextSupport ] );
+	}, [
+		fitText,
+		clientId,
+		parentId,
+		applyFitText,
+		blockElement,
+		hasFitTextSupport,
+	] );
 
 	// Trigger fit text recalculation when content changes
 	useEffect( () => {
