@@ -22,6 +22,7 @@ import {
 import DataViewsContext from '../../components/dataviews-context';
 import DataViewsSelectionCheckbox from '../../components/dataviews-selection-checkbox';
 import { useIsMultiselectPicker } from '../../components/dataviews-picker/footer';
+import { BulkSelectionCheckbox } from '../../components/dataviews-bulk-actions';
 import { sortValues } from '../../constants';
 import type {
 	NormalizedField,
@@ -290,6 +291,20 @@ function ViewPickerTable< Item >( {
 			>
 				<thead>
 					<tr className="dataviews-view-table__row">
+						<th
+							className="dataviews-view-table__checkbox-column"
+							scope="col"
+						>
+							{ isMultiselect && (
+								<BulkSelectionCheckbox
+									selection={ selection }
+									onChangeSelection={ onChangeSelection }
+									data={ data }
+									actions={ actions }
+									getItemId={ getItemId }
+								/>
+							) }
+						</th>
 						{ hasPrimaryColumn && (
 							<th scope="col">
 								{ titleField && (
