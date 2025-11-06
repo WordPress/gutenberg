@@ -173,7 +173,10 @@ function ListViewBranch( props ) {
 
 	// Hide this entire branch if the parent is a pattern block.
 	// This prevents pattern internals from appearing in the list view.
-	if ( shouldHideChildren ) {
+	if (
+		shouldHideChildren &&
+		window?.__experimentalContentOnlyPatternInsertion
+	) {
 		return null;
 	}
 
