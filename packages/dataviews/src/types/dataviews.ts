@@ -183,6 +183,11 @@ interface ViewBase {
 	groupByField?: string;
 
 	/**
+	 * The direction to use for sorting groups.
+	 */
+	groupByFieldDirection?: SortDirection;
+
+	/**
 	 * Whether infinite scroll is enabled.
 	 */
 	infiniteScrollEnabled?: boolean;

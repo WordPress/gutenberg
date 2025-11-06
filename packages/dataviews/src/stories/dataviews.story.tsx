@@ -586,13 +586,14 @@ const TimelineComponent = ( {
 		fields: [ 'categories', 'orderNumber' ],
 		titleField: 'title',
 		descriptionField: 'description',
-		groupByField: grouping === 'true' ? 'date' : undefined,
 		mediaField: 'icon',
 		showMedia: showMedia === 'true',
 		sort: {
 			field: 'datetime',
 			direction: 'asc',
 		},
+		groupByField: grouping === 'true' ? 'date' : undefined,
+		groupByFieldDirection: 'asc',
 		layout: {
 			eventField: 'datetime',
 			showGroupFieldLabel: showGroupFieldLabel === 'true',

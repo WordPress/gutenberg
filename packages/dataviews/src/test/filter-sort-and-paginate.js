@@ -949,6 +949,62 @@ describe( 'sorting', () => {
 		expect( terrestrialItems[ 3 ].name.title ).toBe( 'Earth' );
 	} );
 
+	it( 'should sort by groupByField in descending order first, then by sort.field', () => {
+		const { data: result } = filterSortAndPaginate(
+			data,
+			{
+				sort: { field: 'title', direction: 'desc' },
+				groupByField: 'type',
+				groupByFieldDirection: 'desc',
+			},
+			fields
+		);
+
+		expect( result ).toHaveLength( 19 );
+
+		// Terrestrial group should come first (reverse alphabetical: T)
+		expect( result[ 0 ].type ).toBe( 'Terrestrial' );
+		expect( result[ 0 ].name.title ).toBe( 'Venus' );
+		expect( result[ 1 ].type ).toBe( 'Terrestrial' );
+		expect( result[ 1 ].name.title ).toBe( 'Mercury' );
+		expect( result[ 2 ].type ).toBe( 'Terrestrial' );
+		expect( result[ 2 ].name.title ).toBe( 'Mars' );
+		expect( result[ 3 ].type ).toBe( 'Terrestrial' );
+		expect( result[ 3 ].name.title ).toBe( 'Earth' );
+
+		// Satellite group should come second (reverse alphabetical: S)
+		expect( result[ 4 ].type ).toBe( 'Satellite' );
+		expect( result[ 4 ].name.title ).toBe( 'Triton' );
+		expect( result[ 5 ].type ).toBe( 'Satellite' );
+		expect( result[ 5 ].name.title ).toBe( 'Proteus' );
+
+		// Verify all satellites are grouped together
+		const satelliteItems = result.filter(
+			( item ) => item.type === 'Satellite'
+		);
+		expect( satelliteItems ).toHaveLength( 10 );
+		expect( satelliteItems[ 0 ].name.title ).toBe( 'Triton' );
+		expect( satelliteItems[ 1 ].name.title ).toBe( 'Proteus' );
+		expect( satelliteItems[ 2 ].name.title ).toBe( 'Nereid' );
+		expect( satelliteItems[ 3 ].name.title ).toBe( 'Moon' );
+		expect( satelliteItems[ 4 ].name.title ).toBe( 'Io' );
+		expect( satelliteItems[ 5 ].name.title ).toBe( 'Himalia' );
+		expect( satelliteItems[ 6 ].name.title ).toBe( 'Ganymede' );
+		expect( satelliteItems[ 7 ].name.title ).toBe( 'Europa' );
+		expect( satelliteItems[ 8 ].name.title ).toBe( 'Callisto' );
+		expect( satelliteItems[ 9 ].name.title ).toBe( 'Amalthea' );
+
+		// Verify all terrestrial planets are grouped together
+		const terrestrialItems = result.filter(
+			( item ) => item.type === 'Terrestrial'
+		);
+		expect( terrestrialItems ).toHaveLength( 4 );
+		expect( terrestrialItems[ 0 ].name.title ).toBe( 'Venus' );
+		expect( terrestrialItems[ 1 ].name.title ).toBe( 'Mercury' );
+		expect( terrestrialItems[ 2 ].name.title ).toBe( 'Mars' );
+		expect( terrestrialItems[ 3 ].name.title ).toBe( 'Earth' );
+	} );
+
 	it( 'should sort integer field types', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,

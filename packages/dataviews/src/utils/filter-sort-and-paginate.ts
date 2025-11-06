@@ -398,7 +398,7 @@ export default function filterSortAndPaginate< Item >(
 				const groupCompare = groupByField.sort(
 					a,
 					b,
-					view.sort?.direction ?? 'asc'
+					view?.groupByFieldDirection ?? 'asc'
 				);
 
 				// If items are in different groups, return the group comparison result.
