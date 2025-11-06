@@ -268,6 +268,19 @@ const fields: Field< SamplePost >[] = [
 		label: 'Seat',
 		type: 'text',
 	},
+	{
+		id: 'metadata_summary',
+		label: 'Metadata',
+		type: 'text',
+		render: ( { item } ) => {
+			return (
+				<span>
+					<>Metadata</>
+					{ item.filesize ? `, ${ item.filesize } KB` : '' }
+				</span>
+			);
+		},
+	},
 ];
 
 const LayoutRegularComponent = ( {
@@ -1850,6 +1863,73 @@ const LayoutRowComponent = ( {
 	);
 };
 
+const LayoutDetailsComponent = () => {
+	const [ post, setPost ] = useState< SamplePost >( {
+		title: 'Hello, World!',
+		order: 2,
+		author: 1,
+		status: 'draft',
+		reviewer: 'fulano',
+		date: '2021-01-01T12:00:00',
+		birthdate: '1950-02-23T12:00:00',
+		filesize: 1024,
+		dimensions: '1920x1080',
+		comment_status: 'open',
+		ping_status: true,
+		tags: [ 'photography' ],
+	} );
+
+	const form: Form = {
+		fields: [
+			{
+				id: 'discussion',
+				label: 'Discussion',
+				children: [ 'comment_status', 'ping_status' ],
+				layout: {
+					type: 'details',
+					summary: 'discussion',
+				},
+			},
+			{
+				id: 'metadata',
+				label: 'Metadata',
+				children: [ 'filesize', 'dimensions' ],
+				layout: {
+					type: 'details',
+					summary: 'metadata_summary',
+				},
+			},
+			{
+				id: 'categorization',
+				label: 'Categorization',
+				children: [ 'tags', 'description' ],
+				layout: { type: 'details' },
+			},
+			{
+				id: 'scheduling',
+				children: [ 'date', 'birthdate' ],
+				layout: {
+					type: 'details',
+				},
+			},
+		],
+	};
+
+	return (
+		<DataForm< SamplePost >
+			data={ post }
+			fields={ fields }
+			form={ form }
+			onChange={ ( edits ) =>
+				setPost( ( prev ) => ( {
+					...prev,
+					...edits,
+				} ) )
+			}
+		/>
+	);
+};
+
 const LayoutMixedComponent = () => {
 	const [ post, setPost ] = useState< SamplePost >( {
 		title: 'Hello, World!',
@@ -1975,6 +2055,10 @@ export const LayoutRow = {
 	args: {
 		alignment: 'center',
 	},
+};
+
+export const LayoutDetails = {
+	render: LayoutDetailsComponent,
 };
 
 export const LayoutMixed = {
