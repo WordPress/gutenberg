@@ -105,8 +105,8 @@ test.describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 		await expect( blockLibrary ).toBeVisible();
 		await expect( blockLibrary.getByRole( 'option' ) ).toHaveText( [
 			'Paragraph',
-			'Stretch Text',
 			'Heading',
+			'Stretch Text',
 			'Stretch Heading',
 			'Image',
 		] );
@@ -121,6 +121,9 @@ test.describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/Allowed Blocks Dynamic' );
+		await expect(
+			page.getByRole( 'option', { name: /Allowed Blocks Dynamic/i } )
+		).toBeVisible();
 		await page.keyboard.press( 'Enter' );
 
 		const blockAppender = editor.canvas.getByRole( 'button', {

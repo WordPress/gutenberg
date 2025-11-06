@@ -79,9 +79,9 @@ test.describe( 'Block variations', () => {
 				.getByRole( 'option' )
 		).toHaveText( [
 			'Paragraph',
-			'Stretch Text',
 			'Success Message',
 			'Warning Message',
+			'Stretch Text',
 		] );
 	} );
 
