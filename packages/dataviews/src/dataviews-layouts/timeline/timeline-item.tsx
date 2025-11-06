@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -10,7 +15,7 @@ import {
 	VisuallyHidden,
 } from '@wordpress/components';
 import { useRef, useState, useContext, useMemo } from '@wordpress/element';
-import { Icon, pinSmall, moreVertical } from '@wordpress/icons';
+import { Icon, pin, moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
 
 /**
@@ -45,6 +50,7 @@ interface TimelineItemProps< Item > {
 	mediaField?: NormalizedField< Item >;
 	descriptionField?: NormalizedField< Item >;
 	eventField?: NormalizedField< Item > | undefined;
+	eventIconSize?: 'default' | 'small' | 'medium';
 	otherFields: NormalizedField< Item >[];
 	posinset?: number;
 	onClickItem?: ( item: Item ) => void;
@@ -68,6 +74,7 @@ function TimelineItem< Item >( {
 	mediaField,
 	descriptionField,
 	eventField,
+	eventIconSize,
 	otherFields,
 	posinset,
 	onClickItem,
@@ -103,18 +110,24 @@ function TimelineItem< Item >( {
 		};
 	}, [ actions, item ] );
 
+	const mediaSize = eventIconSize === 'small' ? 24 : 32;
 	const mediaContent =
 		showMedia && mediaField?.render ? (
 			<mediaField.render
 				item={ item }
 				field={ mediaField }
-				config={ { sizes: '52px' } }
+				config={ { sizes: mediaSize + 'px' } }
 			/>
 		) : null;
 
 	const renderedMediaField = (
-		<div className="dataviews-view-timeline__event-type-icon">
-			{ mediaContent || <Icon icon={ pinSmall } /> }
+		<div
+			className={ clsx(
+				'dataviews-view-timeline__event-type-icon',
+				eventIconSize === 'small' && 'is-small'
+			) }
+		>
+			{ mediaContent || <Icon icon={ pin } size={ mediaSize } /> }
 		</div>
 	);
 

@@ -250,6 +250,11 @@ export interface ViewTimeline extends ViewBase {
 		 * Whether to show the group field label.
 		 */
 		showGroupFieldLabel?: boolean;
+
+		/**
+		 * The size of the event icon.
+		 */
+		eventIconSize?: 'default' | 'small' | 'medium';
 	};
 }
 

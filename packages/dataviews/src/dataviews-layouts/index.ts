@@ -7,7 +7,7 @@ import {
 	category,
 	formatListBullets,
 	formatListBulletsRTL,
-	timeToRead,
+	scheduled,
 } from '@wordpress/icons';
 
 /**
@@ -59,7 +59,7 @@ export const VIEW_LAYOUTS = [
 		type: LAYOUT_TIMELINE,
 		label: __( 'Timeline' ),
 		component: ViewTimeline,
-		icon: timeToRead,
+		icon: scheduled,
 		supports: [] as string[],
 	},
 	{

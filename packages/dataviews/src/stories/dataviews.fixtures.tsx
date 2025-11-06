@@ -12,7 +12,7 @@ import {
 	shipping as shippingIcon,
 	starFilled,
 	check,
-	pinSmall,
+	pin,
 } from '@wordpress/icons';
 import {
 	Button,
@@ -1031,7 +1031,7 @@ export const orderEventFields: Field< OrderEvent >[] = [
 		id: 'icon',
 		type: 'media',
 		render: ( { item } ) => (
-			<Icon icon={ eventTypeIcons[ item.type ] || pinSmall } />
+			<Icon icon={ eventTypeIcons[ item.type ] || pin } />
 		),
 	},
 	{

@@ -47,6 +47,7 @@ export default function ViewTimeline< Item >(
 	const otherFields = ( view?.fields ?? [] )
 		.map( ( fieldId ) => fields.find( ( f ) => fieldId === f.id ) )
 		.filter( isDefined );
+	const eventIconSize = view?.layout?.eventIconSize ?? 'default';
 
 	// Handle empty/loading states
 	const hasData = data?.length;
@@ -100,6 +101,7 @@ export default function ViewTimeline< Item >(
 						mediaField={ mediaField }
 						descriptionField={ descriptionField }
 						eventField={ eventField }
+						eventIconSize={ eventIconSize }
 						groupField={ groupField }
 						otherFields={ otherFields }
 						onClickItem={ onClickItem }
@@ -130,6 +132,7 @@ export default function ViewTimeline< Item >(
 							titleField={ titleField }
 							descriptionField={ descriptionField }
 							eventField={ eventField }
+							eventIconSize={ eventIconSize }
 							otherFields={ otherFields }
 							onClickItem={ onClickItem }
 							renderItemLink={ renderItemLink }

@@ -22,6 +22,7 @@ interface TimelineGroupProps< Item > {
 	descriptionField: NormalizedField< Item > | undefined;
 	groupField: NormalizedField< Item >;
 	eventField: NormalizedField< Item > | undefined;
+	eventIconSize?: 'default' | 'small' | 'medium';
 	otherFields: NormalizedField< Item >[];
 	onClickItem?: ( item: Item ) => void;
 	renderItemLink?: (
@@ -43,6 +44,7 @@ export default function TimelineGroup< Item >( {
 	mediaField,
 	descriptionField,
 	eventField,
+	eventIconSize,
 	otherFields,
 	onClickItem,
 	renderItemLink,
@@ -84,6 +86,7 @@ export default function TimelineGroup< Item >( {
 						titleField={ titleField }
 						descriptionField={ descriptionField }
 						eventField={ eventField }
+						eventIconSize={ eventIconSize }
 						otherFields={ otherFields }
 						onClickItem={ onClickItem }
 						renderItemLink={ renderItemLink }
