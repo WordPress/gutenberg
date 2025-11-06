@@ -12,9 +12,11 @@ import { renderElement } from '../utils/element';
 /**
  * Default render function that renders a div element with the given props.
  *
- * @param props The Box component props.
+ * @param props The props to apply to the HTML element.
  */
-const DEFAULT_RENDER = ( props: BoxProps ) => <div { ...props } />;
+const DEFAULT_RENDER = ( props: React.ComponentPropsWithoutRef< 'div' > ) => (
+	<div { ...props } />
+);
 
 /**
  * Capitalizes the first character of a string.
@@ -79,11 +81,11 @@ const getDimensionVariantStyles = < T extends keyof BoxProps >(
 export const Box = forwardRef< HTMLDivElement, BoxProps >( function Box(
 	{
 		target = 'surface',
-		background,
-		foreground,
+		backgroundColor,
+		color,
 		padding,
-		bg = background,
-		fg = foreground,
+		bg = backgroundColor,
+		fg = color,
 		p = padding,
 		render = DEFAULT_RENDER,
 		...props

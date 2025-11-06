@@ -36,8 +36,8 @@ type Story = StoryObj< typeof Box >;
 export const Default: Story = {
 	args: {
 		children: 'Box',
-		background: 'info',
-		foreground: 'info',
+		backgroundColor: 'info',
+		color: 'info',
 		padding: 4,
 	},
 	argTypes: {
@@ -55,8 +55,8 @@ export const Default: Story = {
 export const DirectionalPadding: Story = {
 	args: {
 		children: 'Box',
-		background: 'info',
-		foreground: 'info',
+		backgroundColor: 'info',
+		color: 'info',
 		padding: {
 			blockStart: 'small',
 			inline: 'medium',
