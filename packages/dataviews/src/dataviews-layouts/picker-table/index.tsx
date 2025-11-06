@@ -124,11 +124,12 @@ function TableRow< Item >( {
 			} ) }
 			onMouseEnter={ handleMouseEnter }
 			onMouseLeave={ handleMouseLeave }
+			aria-selected={ isSelected }
 			aria-setsize={
 				infiniteScrollEnabled ? paginationInfo.totalItems : undefined
 			}
 			aria-posinset={ posinset }
-			role={ infiniteScrollEnabled ? 'article' : undefined }
+			role={ infiniteScrollEnabled ? 'article' : 'option' }
 			onClick={ () => {
 				if ( isSelected ) {
 					onChangeSelection(
@@ -142,7 +143,10 @@ function TableRow< Item >( {
 				}
 			} }
 		>
-			<td className="dataviews-view-table__checkbox-column">
+			<td
+				className="dataviews-view-table__checkbox-column"
+				role="presentation"
+			>
 				<div className="dataviews-view-table__cell-content-wrapper">
 					<DataViewsSelectionCheckbox
 						item={ item }
@@ -156,7 +160,7 @@ function TableRow< Item >( {
 			</td>
 
 			{ hasPrimaryColumn && (
-				<td>
+				<td role="presentation">
 					<ColumnPrimary
 						item={ item }
 						titleField={ showTitle ? titleField : undefined }
@@ -181,6 +185,7 @@ function TableRow< Item >( {
 							maxWidth,
 							minWidth,
 						} }
+						role="presentation"
 					>
 						<TableColumnField
 							fields={ fields }
@@ -287,14 +292,14 @@ function ViewPickerTable< Item >( {
 				} ) }
 				aria-busy={ isLoading }
 				aria-describedby={ tableNoticeId }
-				role={ isInfiniteScroll ? 'feed' : undefined }
+				role={ isInfiniteScroll ? 'feed' : 'listbox' }
 			>
-				<thead>
-					<tr className="dataviews-view-table__row">
-						<th
-							className="dataviews-view-table__checkbox-column"
-							scope="col"
-						>
+				<thead role="presentation">
+					<tr
+						className="dataviews-view-table__row"
+						role="presentation"
+					>
+						<th className="dataviews-view-table__checkbox-column">
 							{ isMultiselect && (
 								<BulkSelectionCheckbox
 									selection={ selection }
@@ -306,7 +311,7 @@ function ViewPickerTable< Item >( {
 							) }
 						</th>
 						{ hasPrimaryColumn && (
-							<th scope="col">
+							<th>
 								{ titleField && (
 									<ColumnHeaderMenu
 										ref={ headerMenuRef(
@@ -366,8 +371,14 @@ function ViewPickerTable< Item >( {
 				{ hasData && groupField && dataByGroup ? (
 					Array.from( dataByGroup.entries() ).map(
 						( [ groupName, groupItems ] ) => (
-							<tbody key={ `group-${ groupName }` }>
-								<tr className="dataviews-view-table__group-header-row">
+							<tbody
+								key={ `group-${ groupName }` }
+								role="presentation"
+							>
+								<tr
+									className="dataviews-view-table__group-header-row"
+									role="presentation"
+								>
 									<td
 										colSpan={
 											columns.length +
@@ -375,6 +386,7 @@ function ViewPickerTable< Item >( {
 											1
 										}
 										className="dataviews-view-table__group-header-cell"
+										role="presentation"
 									>
 										{ sprintf(
 											// translators: 1: The label of the field e.g. "Date". 2: The value of the field, e.g.: "May 2022".
@@ -407,7 +419,7 @@ function ViewPickerTable< Item >( {
 						)
 					)
 				) : (
-					<tbody>
+					<tbody role="presentation">
 						{ hasData &&
 							data.map( ( item, index ) => (
 								<TableRow
