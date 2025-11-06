@@ -32,6 +32,7 @@ import {
 	isNumericID,
 } from './utils';
 import { fetchBlockPatterns } from './fetch';
+import { areSelectionsEqual } from './utils/selection';
 
 /**
  * Requests authors from the REST API.
@@ -232,9 +233,6 @@ export const getEntityRecord =
 							// sync manager to save selection position on the
 							// undo stack.
 							subscribeToSelectionChange: ( callback ) => {
-								console.log( 'subscribeToSelectionChange():', {
-									select,
-								} );
 								const { getSelectionStart, getSelectionEnd } =
 									dataSelect( blockEditorStore );
 
@@ -251,11 +249,14 @@ export const getEntityRecord =
 										selectionEnd: getSelectionEnd(),
 									};
 
+									const isSelectionUpdated =
+										! areSelectionsEqual(
+											newSelection,
+											currentSelection
+										);
+
 									// Only update if selection actually changed
-									if (
-										JSON.stringify( newSelection ) !==
-										JSON.stringify( currentSelection )
-									) {
+									if ( isSelectionUpdated ) {
 										callback( newSelection );
 										currentSelection = newSelection;
 									}
@@ -272,11 +273,7 @@ export const getEntityRecord =
 								startOffset,
 								endOffset
 							) => {
-								if ( attributeKey === undefined ) {
-									dataDispatch(
-										blockEditorStore
-									).selectBlock( clientId );
-								} else {
+								if ( clientId && attributeKey && startOffset ) {
 									dataDispatch(
 										blockEditorStore
 									).selectionChange(
@@ -285,13 +282,11 @@ export const getEntityRecord =
 										startOffset,
 										endOffset
 									);
+								} else if ( clientId ) {
+									dataDispatch(
+										blockEditorStore
+									).selectBlock( clientId );
 								}
-							},
-							// Check if a block exists in the editor.
-							blockExists: ( clientId ) => {
-								const { getBlock } =
-									dataSelect( blockEditorStore );
-								return getBlock( clientId ) !== null;
 							},
 						}
 					);
