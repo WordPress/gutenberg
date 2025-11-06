@@ -4,6 +4,5 @@
 	"compilerOptions": {
 		"types": [ "node" ]
 	},
-	"include": [ "src", "typings" ],
 	"references": [ { "path": "../hooks" }, { "path": "../url" } ]
 }

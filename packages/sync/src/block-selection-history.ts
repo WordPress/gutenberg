@@ -4,14 +4,9 @@
 import * as Y from 'yjs';
 
 /**
- * WordPress dependencies
- */
-import type { WPSelection } from '@wordpress/block-editor';
-
-/**
  * Internal dependencies
  */
-import type { Position } from './types';
+import type { Position, WPSelection } from './types';
 import { PositionType } from './types';
 import { findBlockByClientIdInDoc } from './utils';
 
