@@ -11,6 +11,8 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 
+const EMPTY_OBJECT = {};
+
 /**
  * Internal dependencies
  */
@@ -62,14 +64,19 @@ function useFitText( { fitText, name, clientId } ) {
 	const hasFitTextSupport = hasBlockSupport( name, FIT_TEXT_SUPPORT_KEY );
 	const blockElement = useBlockElement( clientId );
 
-	// Monitor block attribute changes
-	// Any attribute may change the available space.
-	const blockAttributes = useSelect(
+	// Monitor block attribute changes, and parent changes.
+	// Any attribute or parent change may change the available space.
+	const { blockAttributes, parentId } = useSelect(
 		( select ) => {
 			if ( ! clientId || ! hasFitTextSupport || ! fitText ) {
-				return;
+				return EMPTY_OBJECT;
 			}
-			return select( blockEditorStore ).getBlockAttributes( clientId );
+			return {
+				blockAttributes:
+					select( blockEditorStore ).getBlockAttributes( clientId ),
+				parentId:
+					select( blockEditorStore ).getBlockRootClientId( clientId ),
+			};
 		},
 		[ clientId, hasFitTextSupport, fitText ]
 	);
@@ -143,6 +150,7 @@ function useFitText( { fitText, name, clientId } ) {
 		if ( window.ResizeObserver && currentElement.parentElement ) {
 			resizeObserver = new window.ResizeObserver( applyFitText );
 			resizeObserver.observe( currentElement.parentElement );
+			resizeObserver.observe( currentElement );
 		}
 
 		// Cleanup function
@@ -169,7 +177,14 @@ function useFitText( { fitText, name, clientId } ) {
 				styleElement.remove();
 			}
 		};
-	}, [ fitText, clientId, applyFitText, blockElement, hasFitTextSupport ] );
+	}, [
+		fitText,
+		clientId,
+		parentId,
+		applyFitText,
+		blockElement,
+		hasFitTextSupport,
+	] );
 
 	// Trigger fit text recalculation when content changes
 	useEffect( () => {

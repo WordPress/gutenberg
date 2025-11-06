@@ -90,6 +90,7 @@ async function createRouteFromDefinition(
 	let routeConfig: {
 		beforeLoad?: ( context: RouteLoaderContext ) => void | Promise< void >;
 		loader?: ( context: RouteLoaderContext ) => Promise< unknown >;
+		canvas?: ( context: RouteLoaderContext ) => Promise< any >;
 	} = {};
 
 	if ( route.route_module ) {
@@ -109,15 +110,27 @@ async function createRouteFromDefinition(
 					await routeConfig.beforeLoad!( context );
 			  }
 			: undefined,
-		loader: routeConfig.loader
-			? async ( opts: any ) => {
-					const context: RouteLoaderContext = {
-						params: opts.params || {},
-						search: opts.search || {},
-					};
-					return await routeConfig.loader!( context );
-			  }
-			: undefined,
+		loader: async ( opts: any ) => {
+			const context: RouteLoaderContext = {
+				params: opts.params || {},
+				search: opts.search || {},
+			};
+
+			// Call both loader and canvas functions if they exist
+			const [ loaderData, canvasData ] = await Promise.all( [
+				routeConfig.loader
+					? routeConfig.loader( context )
+					: Promise.resolve( undefined ),
+				routeConfig.canvas
+					? routeConfig.canvas( context )
+					: Promise.resolve( undefined ),
+			] );
+
+			return {
+				...( loaderData as any ),
+				canvas: canvasData,
+			};
+		},
 		component: SurfacesModule,
 	} );
 }
