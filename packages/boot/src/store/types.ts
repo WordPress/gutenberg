@@ -39,6 +39,14 @@ export interface RouteLoaderContext {
 }
 
 /**
+ * Canvas data returned by route's canvas function.
+ */
+export interface CanvasData {
+	postType: string;
+	postId: string;
+}
+
+/**
  * Route configuration interface.
  * Routes specify content_module for surfaces and optionally route_module for lifecycle functions.
  */
@@ -60,6 +68,7 @@ export interface Route {
 	 * The module should export a named export `route` containing:
 	 * - beforeLoad?: Pre-navigation hook (authentication, validation, redirects)
 	 * - loader?: Data preloading function
+	 * - canvas?: Function that returns canvas data for rendering an editor
 	 */
 	route_module?: string;
 }

@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { Outlet } from '@tanstack/react-router';
+import { Outlet, useMatches } from '@tanstack/react-router';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -14,16 +15,29 @@ import { privateApis as themePrivateApis } from '@wordpress/theme';
  * Internal dependencies
  */
 import Sidebar from '../sidebar';
+import Canvas from '../canvas';
 import { unlock } from '../../lock-unlock';
+import type { CanvasData } from '../../store/types';
 import './style.scss';
 
 const { ThemeProvider } = unlock( themePrivateApis );
 
 export default function Root() {
+	// Get canvas data from the current route's loader
+	const matches = useMatches();
+	const currentMatch = matches[ matches.length - 1 ];
+	const canvas = ( currentMatch?.loaderData as any )?.canvas as
+		| CanvasData
+		| undefined;
+
 	return (
 		<ThemeProvider isRoot color={ { bg: '#f8f8f8', primary: '#3858e9' } }>
 			<ThemeProvider color={ { bg: '#1e1e1e', primary: '#3858e9' } }>
-				<div className="boot-layout">
+				<div
+					className={ clsx( 'boot-layout', {
+						'has-canvas': !! canvas,
+					} ) }
+				>
 					<CommandMenu />
 					<div className="boot-layout__sidebar">
 						<Sidebar />
@@ -33,6 +47,11 @@ export default function Root() {
 							color={ { bg: '#ffffff', primary: '#3858e9' } }
 						>
 							<Outlet />
+							{ canvas && (
+								<div className="boot-layout__canvas">
+									<Canvas canvas={ canvas } />
+								</div>
+							) }
 						</ThemeProvider>
 					</div>
 				</div>

@@ -17,6 +17,7 @@
  * @return string Returns the post breadcrumb for hierarchical post types.
  */
 function render_block_core_breadcrumbs( $attributes, $content, $block ) {
+	die('test');
 	$is_home_or_front_page = is_home() || is_front_page();
 	if ( ! $attributes['showOnHomePage'] && $is_home_or_front_page ) {
 		return '';

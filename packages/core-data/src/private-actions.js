@@ -132,3 +132,31 @@ export const editMediaEntity =
 			dispatch.__unstableReleaseStoreLock( lock );
 		}
 	};
+
+/**
+ * Returns an action object used to receive editor settings.
+ *
+ * @param {Object} settings Editor settings object.
+ *
+ * @return {Object} Action object.
+ */
+export function receiveEditorSettings( settings ) {
+	return {
+		type: 'RECEIVE_EDITOR_SETTINGS',
+		settings,
+	};
+}
+
+/**
+ * Returns an action object used to receive editor assets.
+ *
+ * @param {Object} assets Editor assets object.
+ *
+ * @return {Object} Action object.
+ */
+export function receiveEditorAssets( assets ) {
+	return {
+		type: 'RECEIVE_EDITOR_ASSETS',
+		assets,
+	};
+}
