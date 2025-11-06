@@ -30,18 +30,24 @@ export default function Root() {
 		| CanvasData
 		| undefined;
 
+	// Hide sidebar in full-screen canvas mode
+	const isFullScreen = canvas && ! canvas.isPreview;
+
 	return (
 		<ThemeProvider isRoot color={ { bg: '#f8f8f8', primary: '#3858e9' } }>
 			<ThemeProvider color={ { bg: '#1e1e1e', primary: '#3858e9' } }>
 				<div
 					className={ clsx( 'boot-layout', {
 						'has-canvas': !! canvas,
+						'has-full-canvas': isFullScreen,
 					} ) }
 				>
 					<CommandMenu />
-					<div className="boot-layout__sidebar">
-						<Sidebar />
-					</div>
+					{ ! isFullScreen && (
+						<div className="boot-layout__sidebar">
+							<Sidebar />
+						</div>
+					) }
 					<div className="boot-layout__surfaces">
 						<ThemeProvider
 							color={ { bg: '#ffffff', primary: '#3858e9' } }

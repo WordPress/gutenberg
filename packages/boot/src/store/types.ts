@@ -44,6 +44,7 @@ export interface RouteLoaderContext {
 export interface CanvasData {
 	postType: string;
 	postId: string;
+	isPreview?: boolean;
 }
 
 /**

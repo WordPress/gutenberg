@@ -107,6 +107,7 @@ export async function generateRoutesRegistry( rootDir, buildDir, prefix ) {
 			name: routeName,
 			path: routePath,
 			has_route: routeFiles.hasRoute,
+			has_content: routeFiles.hasStage || routeFiles.hasInspector,
 		};
 	} );
 
@@ -114,10 +115,12 @@ export async function generateRoutesRegistry( rootDir, buildDir, prefix ) {
 	const routeEntries = routes
 		.map( ( route ) => {
 			const hasRouteStr = route.has_route ? 'true' : 'false';
+			const hasContentStr = route.has_content ? 'true' : 'false';
 			return `\tarray(
-		'name'      => '${ route.name }',
-		'path'      => '${ route.path }',
-		'has_route' => ${ hasRouteStr },
+		'name'        => '${ route.name }',
+		'path'        => '${ route.path }',
+		'has_route'   => ${ hasRouteStr },
+		'has_content' => ${ hasContentStr },
 	)`;
 		} )
 		.join( ',\n' );

@@ -49,3 +49,28 @@
 	top: 0 !important;
 	left: 0 !important;
 }
+
+// Full-screen canvas mode
+.boot-layout.has-full-canvas .boot-layout__surfaces {
+	margin: 0;
+	gap: 0;
+}
+
+.boot-layout.has-full-canvas .boot-layout__stage,
+.boot-layout.has-full-canvas .boot-layout__inspector {
+	display: none;
+}
+
+.boot-layout.has-full-canvas .boot-layout__canvas {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	max-width: none;
+	margin: 0;
+	border-radius: 0;
+	border: none;
+	box-shadow: none;
+	overflow: hidden;
+}

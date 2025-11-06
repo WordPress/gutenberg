@@ -21,7 +21,7 @@ export const route = {
 		search: {
 			page?: number;
 			search?: string;
-			postId?: string;
+			postIds?: string[];
 		};
 	} ) {
 		const { params, search } = context;
@@ -38,10 +38,11 @@ export const route = {
 		}
 
 		// Check if postId is provided in query params
-		if ( search.postId ) {
+		if ( search.postIds && search.postIds.length > 0 ) {
 			return {
 				postType: params.type,
-				postId: search.postId.toString(),
+				postId: search.postIds[ 0 ].toString(),
+				isPreview: true,
 			};
 		}
 
@@ -58,6 +59,7 @@ export const route = {
 			return {
 				postType: params.type,
 				postId: ( posts[ 0 ] as any ).id.toString(),
+				isPreview: true,
 			};
 		}
 

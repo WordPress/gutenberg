@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { ReactNode } from 'react';
+
+/**
  * WordPress dependencies
  */
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
@@ -15,24 +20,31 @@ import { useEditorSettings } from './hooks/use-editor-settings';
 import { useEditorAssets } from './hooks/use-editor-assets';
 import { unlock } from './lock-unlock';
 
-const { Editor: PrivateEditor } = unlock( editorPrivateApis );
+const { Editor: PrivateEditor, BackButton } = unlock( editorPrivateApis );
 
 interface EditorProps {
 	postType: string;
 	postId: string;
 	settings?: Record< string, any >;
+	backButton?: ReactNode;
 }
 
 /**
  * Lazy-loading editor component that handles asset loading and settings initialization.
  *
- * @param {Object} props          Component props
- * @param {string} props.postType The post type to edit
- * @param {string} props.postId   The post ID to edit
- * @param {Object} props.settings Optional extra settings to merge with editor settings
+ * @param {Object}    props            Component props
+ * @param {string}    props.postType   The post type to edit
+ * @param {string}    props.postId     The post ID to edit
+ * @param {Object}    props.settings   Optional extra settings to merge with editor settings
+ * @param {ReactNode} props.backButton Optional back button to render in editor header
  * @return The editor component with loading states
  */
-export function Editor( { postType, postId, settings }: EditorProps ) {
+export function Editor( {
+	postType,
+	postId,
+	settings,
+	backButton,
+}: EditorProps ) {
 	// Resolve template ID from post type/ID
 	const templateId = useSelect(
 		( select ) => {
@@ -91,6 +103,8 @@ export function Editor( { postType, postId, settings }: EditorProps ) {
 			templateId={ templateId }
 			settings={ finalSettings }
 			styles={ finalSettings.styles }
-		/>
+		>
+			{ backButton && <BackButton>{ backButton }</BackButton> }
+		</PrivateEditor>
 	);
 }

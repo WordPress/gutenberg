@@ -8,6 +8,7 @@ import { Spinner } from '@wordpress/components';
  * Internal dependencies
  */
 import type { CanvasData } from '../../store/types';
+import BootBackButton from './back-button';
 
 interface CanvasProps {
 	canvas: CanvasData;
@@ -52,12 +53,32 @@ export default function Canvas( { canvas }: CanvasProps ) {
 		);
 	}
 
+	// Conditionally set preview mode based on isPreview
+	const editorSettings = canvas.isPreview
+		? { isPreviewMode: true }
+		: { isPreviewMode: false };
+
+	// Render back button in full-screen mode (when not preview)
+	// Uses render prop pattern to receive fillProps from Slot
+	const backButton = ! canvas.isPreview
+		? ( { length }: { length: number } ) => (
+				<BootBackButton length={ length } />
+		  )
+		: undefined;
+
 	// Render the editor with canvas data
 	return (
-		<Editor
-			postType={ canvas.postType }
-			postId={ canvas.postId }
-			settings={ { isPreviewMode: true } }
-		/>
+		<div
+			style={ { height: '100%' } }
+			// @ts-expect-error inert untyped properly.
+			inert={ canvas.isPreview ? 'true' : undefined }
+		>
+			<Editor
+				postType={ canvas.postType }
+				postId={ canvas.postId }
+				settings={ editorSettings }
+				backButton={ backButton }
+			/>
+		</div>
 	);
 }

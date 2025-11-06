@@ -113,7 +113,7 @@ async function createRouteFromDefinition(
 		loader: async ( opts: any ) => {
 			const context: RouteLoaderContext = {
 				params: opts.params || {},
-				search: opts.search || {},
+				search: opts.deps || {},
 			};
 
 			// Call both loader and canvas functions if they exist
@@ -131,6 +131,7 @@ async function createRouteFromDefinition(
 				canvas: canvasData,
 			};
 		},
+		loaderDeps: ( opts: any ) => opts.search,
 		component: SurfacesModule,
 	} );
 }
