@@ -65,7 +65,7 @@ function ListViewBlockSelectButton(
 		canToggleBlockVisibility,
 		isBlockHidden,
 		isContentOnly,
-		isSectionBlock: isSection,
+		isSectionBlock,
 	} = useSelect(
 		( select ) => {
 			const { getBlockName } = select( blockEditorStore );
@@ -134,10 +134,10 @@ function ListViewBlockSelectButton(
 			aria-expanded={ isExpanded }
 		>
 			<ListViewExpander
-				onClick={ isSection ? undefined : onToggleExpanded }
+				onClick={ isSectionBlock ? undefined : onToggleExpanded }
 			/>
 			<BlockIcon
-				icon={ isSection ? symbol : blockInformation?.icon }
+				icon={ isSectionBlock ? symbol : blockInformation?.icon }
 				showColors
 				context="list-view"
 			/>
