@@ -11,7 +11,6 @@ import {
 	LOCAL_SYNC_MANAGER_ORIGIN,
 	CRDT_RECORD_METADATA_MAP_KEY as RECORD_METADATA_KEY,
 	CRDT_RECORD_METADATA_SAVED_AT_KEY as SAVED_AT_KEY,
-	CRDT_RECORD_METADATA_SAVED_BY_KEY as SAVED_BY_KEY,
 } from './config';
 import { createPersistedCRDTDoc, getPersistedCrdtDoc } from './persistence';
 import { getProviderCreators } from './providers';
@@ -28,7 +27,7 @@ import type {
 	SyncManager,
 } from './types';
 import { createUndoManager } from './undo-manager';
-import { createYjsDoc } from './utils';
+import { createYjsDoc, markEntityAsSaved } from './utils';
 import { Awareness } from 'y-protocols/awareness';
 
 interface CollectionState {
@@ -361,22 +360,14 @@ export function createSyncManager(): SyncManager {
 				syncConfig.applyChangesToCRDTDoc( ydoc, changes );
 
 				if ( isSave ) {
-					// Mark the document as saved in the record metadata map.
-					const recordMeta = ydoc.getMap( RECORD_METADATA_KEY );
-					recordMeta.set( SAVED_AT_KEY, Date.now() );
-					recordMeta.set( SAVED_BY_KEY, ydoc.clientID );
+					markEntityAsSaved( ydoc );
 				}
 			}, origin );
 		}
 
 		if ( collectionState && isSave ) {
-			const { ydoc } = collectionState;
-			ydoc.transact( () => {
-				// Mark the document as saved in the record metadata map.
-				const recordMeta = ydoc.getMap( RECORD_METADATA_KEY );
-
-				recordMeta.set( SAVED_AT_KEY, Date.now() );
-				recordMeta.set( SAVED_BY_KEY, ydoc.clientID );
+			collectionState.ydoc.transact( () => {
+				markEntityAsSaved( collectionState.ydoc );
 			}, origin );
 		}
 	}
