@@ -313,3 +313,8 @@
 		color: $gray-900;
 	}
 }
+
+/* Column width intents via colgroup: make non-primary columns shrink-to-fit */
+.dataviews-view-table col[class^="dataviews-view-table__col-"]:not(.dataviews-view-table__col-primary) {
+	width: 1%;
+}
