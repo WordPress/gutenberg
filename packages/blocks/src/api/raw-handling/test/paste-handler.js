@@ -287,4 +287,33 @@ describe( 'pasteHandler', () => {
 		expect( result.name ).toEqual( 'core/video' );
 		expect( result.isValid ).toBeTruthy();
 	} );
+
+	it( 'can handle Grok markdown wrapped in a styled span', () => {
+		// Simulates pasting markdown from Grok, which wraps content in a styled span
+		const grokMarkdownHTML =
+			'<span style="font-family: system-ui, -apple-system, sans-serif; font-size: 14px;"># Heading\n\nThis is a paragraph with **bold text** and *italic text*.\n\n## Subheading\n\nAnother paragraph with a [link](https://example.com).</span>';
+
+		const result = pasteHandler( {
+			HTML: grokMarkdownHTML,
+			mode: 'BLOCKS',
+		} );
+
+		expect( console ).toHaveLogged();
+
+		// Should convert markdown to proper blocks
+		expect( result.length ).toBeGreaterThan( 1 );
+
+		// First block should be a heading
+		expect( result[ 0 ].name ).toEqual( 'core/heading' );
+		expect( result[ 0 ].attributes.content ).toContain( 'Heading' );
+
+		// Should have converted markdown formatting
+		const hasFormattedContent = result.some(
+			( block ) =>
+				block.name === 'core/paragraph' &&
+				( block.attributes.content.includes( '<strong>' ) ||
+					block.attributes.content.includes( '<em>' ) )
+		);
+		expect( hasFormattedContent ).toBe( true );
+	} );
 } );

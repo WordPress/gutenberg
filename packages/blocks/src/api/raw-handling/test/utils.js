@@ -33,20 +33,16 @@ describe( 'isPlain', () => {
 
 	it( 'should return true for single non-semantic wrapper elements with only text', () => {
 		expect( isPlain( '<span>test</span>' ) ).toBe( true );
-		expect( isPlain( '<div>test</div>' ) ).toBe( true );
-		expect( isPlain( '<p>test</p>' ) ).toBe( true );
 	} );
 
 	it( 'should return true for single wrapper with styled content but no semantic tags', () => {
 		expect( isPlain( '<span style="color: red;">test</span>' ) ).toBe(
 			true
 		);
-		expect( isPlain( '<div class="wrapper">test</div>' ) ).toBe( true );
 	} );
 
 	it( 'should return true for single wrapper with line breaks', () => {
 		expect( isPlain( '<span>test<br>test</span>' ) ).toBe( true );
-		expect( isPlain( '<div>test<br/>more<br />text</div>' ) ).toBe( true );
 	} );
 
 	it( 'should return false for wrapper with semantic child elements', () => {
@@ -57,7 +53,6 @@ describe( 'isPlain', () => {
 
 	it( 'should return false for multiple wrapper elements', () => {
 		expect( isPlain( '<span>test</span><span>test</span>' ) ).toBe( false );
-		expect( isPlain( '<div>test</div><div>test</div>' ) ).toBe( false );
 	} );
 
 	it( 'should return false for semantic wrapper elements', () => {
