@@ -3,6 +3,7 @@
  */
 const chalk = require( 'chalk' );
 const { existsSync, readFileSync } = require( 'node:fs' );
+const { checkPlatform } = require( 'npm-install-checks' );
 
 const ERROR_TEXT = chalk.reset.inverse.bold.red( ' ERROR ' );
 const WARNING_TEXT = chalk.reset.inverse.bold.yellow( ' WARNING ' );
@@ -102,6 +103,22 @@ const otherOssLicenses = [
  */
 const getLicenses = ( gpl2 ) => {
 	return [ ...gpl2CompatibleLicenses, ...( gpl2 ? [] : otherOssLicenses ) ];
+};
+
+/**
+ * Check if a package is compatible with the current platform, using the same
+ * internal logic as npm.
+ *
+ * @param {Record<string, unknown>} pkg The package object.
+ * @return {boolean} true if the package is compatible with the current platform, false if it isn't.
+ */
+const isCompatiblePlatform = ( pkg ) => {
+	try {
+		checkPlatform( pkg );
+		return true;
+	} catch ( error ) {
+		return error.code !== 'EBADPLATFORM';
+	}
 };
 
 /**
@@ -208,30 +225,19 @@ function detectTypeFromLicenseText( licenseText ) {
 const reportedPackages = new Set();
 
 /**
- * @param {Record<string, unknown>} packageInfo
- * @param {Licenses}                licenses
+ * @param {string}   path
+ * @param {Licenses} licenses
  * @return {void}
  */
-function checkDepLicense( packageInfo, licenses ) {
-	const { path } = packageInfo;
+function checkDepLicense( path, licenses ) {
 	if ( ! path ) {
 		return;
 	}
 
-	// We expect license to be included through the package-lock.json package
-	// information, but historically there have been some npm bugs where this
-	// is not always included. If it's not included, try reading the package
-	// information from the package.json file.
-	if ( ! packageInfo.license ) {
-		const filename = path + '/package.json';
-		if ( ! existsSync( filename ) ) {
-			process.stdout.write(
-				`Unable to locate package.json in ${ path }.`
-			);
-			process.exit( 1 );
-		}
-
-		packageInfo = require( filename );
+	const filename = path + '/package.json';
+	if ( ! existsSync( filename ) ) {
+		process.stdout.write( `Unable to locate package.json in ${ path }.` );
+		process.exit( 1 );
 	}
 
 	/*
@@ -241,6 +247,7 @@ function checkDepLicense( packageInfo, licenses ) {
 	 * - { licenses: [ 'MIT', 'Zlib' ] }
 	 * - { licenses: [ { type: 'MIT' }, { type: 'Zlib' } ] }
 	 */
+	const packageInfo = require( filename );
 	const license =
 		packageInfo.license ||
 		( packageInfo.licenses &&
@@ -333,6 +340,10 @@ function checkDepsInTree( deps, options ) {
 			continue;
 		}
 
+		if ( dep.optional && ! isCompatiblePlatform( dep ) ) {
+			continue;
+		}
+
 		if ( ! dep.hasOwnProperty( 'path' ) && ! dep.missing ) {
 			if ( dep.hasOwnProperty( 'peerMissing' ) ) {
 				process.stdout.write(
@@ -349,7 +360,7 @@ function checkDepsInTree( deps, options ) {
 				process.stdout.write( `${ WARNING_TEXT } ${ problem }.\n` );
 			}
 		} else {
-			checkDepLicense( dep, licenses );
+			checkDepLicense( dep.path, licenses );
 		}
 
 		if ( dep.hasOwnProperty( 'dependencies' ) ) {
