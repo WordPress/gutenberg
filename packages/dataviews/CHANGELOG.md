@@ -30,6 +30,7 @@
 - DataForm: add new details layout. [#72355](https://github.com/WordPress/gutenberg/pull/72355)
 - DatViews list layout: remove link variant from primary actions's button. [#72920](https://github.com/WordPress/gutenberg/pull/72920)
 - DataForm: simplify form normalization. [#72848](https://github.com/WordPress/gutenberg/pull/72848)
+- DataViews: Add insert left/right in table column header. [#72929](https://github.com/WordPress/gutenberg/pull/72929)
 - DataViewsPicker: Add With Modal story. [#72913](https://github.com/WordPress/gutenberg/pull/72913)
 - DataForm: make the card layout borderless. [#72514](https://github.com/WordPress/gutenberg/pull/72514)
 - DataViews: Simplify the view config properties section. [#73064](https://github.com/WordPress/gutenberg/pull/73064)
