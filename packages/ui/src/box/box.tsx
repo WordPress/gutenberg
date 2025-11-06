@@ -30,18 +30,18 @@ const capitalize = ( str: string ): string =>
  * fallback) or a calculated value based on the base unit.
  *
  * @param property The CSS property name.
- * @param family   The design system token family.
+ * @param target   The design system token target.
  * @param value    The size value, either a number (multiplier of base unit) or a string (token name).
  * @return A CSS value string with variable references.
  */
 const getSpacingValue = (
 	property: string,
-	family: string,
+	target: string,
 	value: number | string
 ): string =>
 	typeof value === 'number'
 		? `calc(var(--wpds-dimension-base) * ${ value })`
-		: `var(--wpds-dimension-${ property }-${ family }-${ value }, var(--wpds-dimension-${ property }-surface-${ value }))`;
+		: `var(--wpds-dimension-${ property }-${ target }-${ value }, var(--wpds-dimension-${ property }-surface-${ value }))`;
 
 /**
  * Generates CSS styles for properties with optionally directional values,
@@ -49,23 +49,23 @@ const getSpacingValue = (
  * properties.
  *
  * @param property The CSS property name from BoxProps.
- * @param family   The design system token family.
+ * @param target   The design system token target.
  * @param value    The property value (single or object with directional keys).
  * @return A CSSProperties object with the computed styles.
  */
 const getDimensionVariantStyles = < T extends keyof BoxProps >(
 	property: T,
-	family: string,
+	target: string,
 	value: NonNullable< BoxProps[ T ] >
 ): React.CSSProperties =>
 	typeof value !== 'object'
-		? { [ property ]: getSpacingValue( property, family, value ) }
+		? { [ property ]: getSpacingValue( property, target, value ) }
 		: Object.keys( value ).reduce(
 				( result, key ) => ( {
 					...result,
 					[ property + capitalize( key ) ]: getSpacingValue(
 						property,
-						family,
+						target,
 						value[ key ]
 					),
 				} ),
@@ -78,7 +78,7 @@ const getDimensionVariantStyles = < T extends keyof BoxProps >(
  */
 export const Box = forwardRef< HTMLDivElement, BoxProps >( function Box(
 	{
-		family = 'surface',
+		target = 'surface',
 		background,
 		foreground,
 		padding,
@@ -93,17 +93,17 @@ export const Box = forwardRef< HTMLDivElement, BoxProps >( function Box(
 	const style: React.CSSProperties = {};
 
 	if ( bg ) {
-		style.backgroundColor = `var(--wpds-color-bg-${ family }-${ bg }, var(--wpds-color-bg-surface-${ bg }))`;
+		style.backgroundColor = `var(--wpds-color-bg-${ target }-${ bg }, var(--wpds-color-bg-surface-${ bg }))`;
 	}
 
 	if ( fg ) {
-		style.color = `var(--wpds-color-fg-${ family }-${ fg }, var(--wpds-color-fg-content-${ fg }))`;
+		style.color = `var(--wpds-color-fg-${ target }-${ fg }, var(--wpds-color-fg-content-${ fg }))`;
 	}
 
 	if ( p ) {
 		Object.assign(
 			style,
-			getDimensionVariantStyles( 'padding', family, p )
+			getDimensionVariantStyles( 'padding', target, p )
 		);
 	}
 

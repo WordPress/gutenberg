@@ -48,9 +48,9 @@ type DimensionVariant< T > = {
 
 export interface BoxProps extends ComponentProps< 'div' > {
 	/**
-	 * The family of design tokens to use for the box.
+	 * The target rendering element design token grouping to use for the box.
 	 */
-	family?: string;
+	target?: string;
 
 	/**
 	 * The surface background design token for box background color.
