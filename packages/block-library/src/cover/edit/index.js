@@ -333,11 +333,17 @@ function CoverEdit( {
 	};
 
 	const onSelectEmbedUrl = ( embedUrl, provider ) => {
+		// Only set a new dimRatio if there was no previous media selected
+		// to avoid resetting to 50 if it has been explicitly set to 100.
+		const newDimRatio =
+			originalUrl === undefined && dimRatio === 100 ? 50 : dimRatio;
+
 		// Set initial attributes with URL and provider
 		setAttributes( {
 			url: embedUrl,
 			backgroundType: EMBED_VIDEO_BACKGROUND_TYPE,
 			embedProvider: provider,
+			dimRatio: newDimRatio,
 			id: undefined,
 			focalPoint: undefined,
 			hasParallax: undefined,
