@@ -176,7 +176,7 @@ export function ActionsMenuGroup< Item >( {
 		return (
 			<Menu>
 				<Menu.SubmenuTriggerItem>
-					<Menu.ItemLabel>{ __( 'Set as' ) }</Menu.ItemLabel>
+					<Menu.ItemLabel>{ __( 'Set as…' ) }</Menu.ItemLabel>
 				</Menu.SubmenuTriggerItem>
 				<Menu.Popover>{ renderActionGroup( actionList ) }</Menu.Popover>
 			</Menu>
