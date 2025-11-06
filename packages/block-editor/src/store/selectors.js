@@ -2274,6 +2274,8 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 					} ) );
 			}
 
+			// Collect stretch variations separately to add them at the end
+			const stretchVariations = [];
 			const items = blockTypeInserterItems.reduce(
 				( accumulator, item ) => {
 					const { variations = [] } = item;
@@ -2286,14 +2288,26 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 							state,
 							item
 						);
-						accumulator.push(
-							...variations.map( variationMapper )
-						);
+						const mappedVariations = variations.map( variationMapper );
+						// Separate stretch variations from regular variations
+						mappedVariations.forEach( ( variation ) => {
+							if (
+								variation.id === 'core/paragraph/stretch-text' ||
+								variation.id === 'core/heading/stretch-heading'
+							) {
+								stretchVariations.push( variation );
+							} else {
+								accumulator.push( variation );
+							}
+						} );
 					}
 					return accumulator;
 				},
 				[]
 			);
+
+			// Add stretch variations at the end
+			items.push( ...stretchVariations );
 
 			// Ensure core blocks are prioritized in the returned results,
 			// because third party blocks can be registered earlier than
