@@ -15,14 +15,11 @@ import BlockSwitcher from '../block-switcher';
 import BlockIcon from '../block-icon';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import { store as blockEditorStore } from '../../store';
-import { hasPatternOverridesDefaultBinding } from '../../utils/block-bindings';
 import { unlock } from '../../lock-unlock';
 
 function getBlockIconVariant( { select, clientIds } ) {
 	const {
 		getBlockName,
-		getBlockAttributes,
-		getBlockParentsByBlockName,
 		isSectionBlock,
 		canRemoveBlocks,
 		getTemplateLock,
@@ -42,16 +39,6 @@ function getBlockIconVariant( { select, clientIds } ) {
 	const isSectionInSelection = clientIds.some( ( id ) =>
 		isSectionBlock( id )
 	);
-	const hasPatternOverrides = clientIds.every( ( clientId ) =>
-		hasPatternOverridesDefaultBinding(
-			getBlockAttributes( clientId )?.metadata?.bindings
-		)
-	);
-	const hasParentPattern = clientIds.every(
-		( clientId ) =>
-			getBlockParentsByBlockName( clientId, 'core/block', true ).length >
-			0
-	);
 	const canRemove = canRemoveBlocks( clientIds );
 
 	const isDefaultEditingMode =
@@ -59,13 +46,11 @@ function getBlockIconVariant( { select, clientIds } ) {
 	const hideTransformsForSections =
 		window?.__experimentalContentOnlyPatternInsertion &&
 		isSectionInSelection;
-	const isPatternOverride = hasPatternOverrides && hasParentPattern;
 	const showBlockSwitcher =
 		! hideTransformsForSections &&
 		isDefaultEditingMode &&
 		( hasBlockStyles || canRemove ) &&
-		! hasTemplateLock &&
-		! isPatternOverride;
+		! hasTemplateLock;
 
 	if ( showBlockSwitcher ) {
 		return 'switcher';
