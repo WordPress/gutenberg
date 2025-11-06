@@ -112,10 +112,15 @@ test.describe( 'Page List', () => {
 			},
 			statusVisibility: {
 				performEdit: async ( page ) => {
-					const statusAndVisibility = page.getByLabel(
-						'Status & Visibility'
+					const statusAndVisibilityButton = page.getByLabel(
+						'Edit Status & Visibility'
 					);
-					await statusAndVisibility.click();
+					await statusAndVisibilityButton.click();
+
+					// Get parent wrapper that contains the summary text
+					const statusAndVisibility =
+						statusAndVisibilityButton.locator( '..' );
+
 					const options = [
 						'Published',
 						'Draft',
