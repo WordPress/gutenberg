@@ -7,14 +7,7 @@ import type { ReactNode, Ref, PropsWithoutRef, RefAttributes } from 'react';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	arrowLeft,
-	arrowRight,
-	chevronRight,
-	chevronLeft,
-	unseen,
-	funnel,
-} from '@wordpress/icons';
+import { arrowLeft, arrowRight, unseen, funnel } from '@wordpress/icons';
 import {
 	Button,
 	Icon,
@@ -218,7 +211,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 							<Menu.Group>
 								{ canMove && (
 									<Menu.Item
-										prefix={ <Icon icon={ chevronLeft } /> }
+										prefix={ <Icon icon={ arrowLeft } /> }
 										disabled={ index < 1 }
 										onClick={ () => {
 											onChangeView( {
@@ -246,9 +239,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 								) }
 								{ canMove && (
 									<Menu.Item
-										prefix={
-											<Icon icon={ chevronRight } />
-										}
+										prefix={ <Icon icon={ arrowRight } /> }
 										disabled={
 											index >= visibleFieldIds.length - 1
 										}
@@ -278,11 +269,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 								) }
 								{ canMove && !! hiddenFields.length && (
 									<Menu>
-										<Menu.SubmenuTriggerItem
-											prefix={
-												<Icon icon={ arrowLeft } />
-											}
-										>
+										<Menu.SubmenuTriggerItem>
 											<Menu.ItemLabel>
 												{ __( 'Insert left' ) }
 											</Menu.ItemLabel>
@@ -321,11 +308,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 								) }
 								{ !! hiddenFields.length && (
 									<Menu>
-										<Menu.SubmenuTriggerItem
-											prefix={
-												<Icon icon={ arrowRight } />
-											}
-										>
+										<Menu.SubmenuTriggerItem>
 											<Menu.ItemLabel>
 												{ __( 'Insert right' ) }
 											</Menu.ItemLabel>
