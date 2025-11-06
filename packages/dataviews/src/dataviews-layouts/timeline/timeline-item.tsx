@@ -29,6 +29,7 @@ import type {
 	ViewTimeline,
 	ActionModal as ActionModalType,
 } from '../../types';
+
 /**
  * External dependencies
  */
@@ -200,87 +201,83 @@ function TimelineItem< Item >( {
 						? paginationInfo.totalItems
 						: undefined
 				}
-				className="dataviews-view-timeline__row"
+				className="dataviews-view-timeline__item"
 			>
 				<HStack
-					className="dataviews-view-timeline__item-wrapper"
-					spacing={ 0 }
+					spacing={ 3 }
+					justify="start"
+					alignment="flex-start"
+					className="dataviews-view-timeline__row"
 				>
-					<HStack
-						spacing={ 3 }
-						justify="start"
-						alignment="flex-start"
+					<VStack
+						spacing={ 1 }
+						className="dataviews-view-timeline__event-type"
 					>
-						<VStack
-							spacing={ 1 }
-							className="dataviews-view-timeline__event-type-wrapper"
+						<TimelineSpacer />
+						{ renderedMediaField }
+						<TimelineSpacer />
+					</VStack>
+					<VStack
+						spacing={ 0 }
+						alignment="flex-start"
+						className="dataviews-view-timeline__event-content"
+					>
+						<ItemClickWrapper
+							item={ item }
+							isItemClickable={ isItemClickable }
+							onClickItem={ onClickItem }
+							renderItemLink={ renderItemLink }
+							className="dataviews-view-timeline__event-title"
 						>
-							<TimelineSpacer />
-							{ renderedMediaField }
-							<TimelineSpacer />
-						</VStack>
-						<VStack
-							spacing={ 0 }
-							alignment="flex-start"
-							className="dataviews-view-timelime__content"
-						>
-							<ItemClickWrapper
-								item={ item }
-								isItemClickable={ isItemClickable }
-								onClickItem={ onClickItem }
-								renderItemLink={ renderItemLink }
-								className="dataviews-title-field"
-							>
-								{ renderedTitleField }
-							</ItemClickWrapper>
-							{ showDescription && descriptionField && (
-								<div className="dataviews-view-timeline__field--description">
-									<descriptionField.render
-										item={ item }
-										field={ descriptionField }
-									/>
+							{ renderedTitleField }
+						</ItemClickWrapper>
+						{ showDescription && descriptionField && (
+							<div className="dataviews-view-timeline__event-description">
+								<descriptionField.render
+									item={ item }
+									field={ descriptionField }
+								/>
+							</div>
+						) }
+						<div className="dataviews-view-timeline__fields">
+							{ eventField && (
+								<div className="dataviews-view-timeline__field dataviews-view-timeline__field--date">
+									<VisuallyHidden
+										as="span"
+										className="dataviews-view-timeline__field-label"
+									>
+										{ eventField.label }
+									</VisuallyHidden>
+									<span className="dataviews-view-timeline__field-value">
+										<eventField.render
+											item={ item }
+											field={ eventField }
+										/>
+									</span>
 								</div>
 							) }
-							<div className="dataviews-view-timeline__fields">
-								{ eventField && (
-									<div className="dataviews-view-timeline__field dataviews-view-timeline__field--date">
-										<VisuallyHidden
-											as="span"
-											className="dataviews-view-timeline__field-label"
-										>
-											{ eventField.label }
-										</VisuallyHidden>
-										<span className="dataviews-view-timeline__field-value">
-											<eventField.render
-												item={ item }
-												field={ eventField }
-											/>
-										</span>
-									</div>
-								) }
-								{ otherFields.map( ( field ) => (
-									<div
-										key={ field.id }
-										className="dataviews-view-timeline__field"
+							{ otherFields.map( ( field ) => (
+								<div
+									key={ field.id }
+									className="dataviews-view-timeline__field"
+								>
+									<VisuallyHidden
+										as="span"
+										className="dataviews-view-timeline__field-label"
 									>
-										<VisuallyHidden
-											as="span"
-											className="dataviews-view-timeline__field-label"
-										>
-											{ field.label }
-										</VisuallyHidden>
-										<span className="dataviews-view-timeline__field-value">
-											<field.render
-												item={ item }
-												field={ field }
-											/>
-										</span>
-									</div>
-								) ) }
-							</div>
-							{ renderedPrimaryActions }
-						</VStack>
-					</HStack>
+										{ field.label }
+									</VisuallyHidden>
+									<span className="dataviews-view-timeline__field-value">
+										<field.render
+											item={ item }
+											field={ field }
+										/>
+									</span>
+								</div>
+							) ) }
+						</div>
+						{ renderedPrimaryActions }
+					</VStack>
 					{ renderedDropdownMenu }
 				</HStack>
 			</div>
