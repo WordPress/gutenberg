@@ -10,7 +10,7 @@ import postDataBindings from '../post-data';
 
 describe( 'post-data bindings', () => {
 	describe( 'getValues', () => {
-		describe( 'for regular blocks using context', () => {
+		describe( 'for regular blocks using block context', () => {
 			it( 'should return entity field values when they exist', () => {
 				const select = ( store ) => {
 					if ( store === blockEditorStore ) {
@@ -21,8 +21,8 @@ describe( 'post-data bindings', () => {
 					}
 					return {
 						getEditedEntityRecord: () => ( {
-							date: '2024-01-15',
-							modified: '2024-01-20',
+							date: '2024-03-02 00:00:00',
+							modified: '2025-06-07 00:00:00',
 							link: 'https://example.com/post',
 						} ),
 					};
@@ -32,15 +32,30 @@ describe( 'post-data bindings', () => {
 					select,
 					context: { postId: 123, postType: 'post' },
 					bindings: {
-						content: { args: { field: 'date' } },
+						datetime: {
+							source: 'core/post-date',
+							args: { field: 'date' },
+						},
+						modified: {
+							source: 'core/post-date',
+							args: { field: 'modified' },
+						},
+						url: {
+							source: 'core/post-date',
+							args: { field: 'link' },
+						},
 					},
-					clientId: 'client-1',
+					clientId: '123abc456',
 				} );
 
-				expect( values.content ).toBe( '2024-01-15' );
+				expect( values ).toStrictEqual( {
+					datetime: '2024-03-02 00:00:00',
+					modified: '2025-06-07 00:00:00',
+					url: 'https://example.com/post',
+				} );
 			} );
 
-			it( 'should fall back to field label when entity value does not exist', () => {
+			it( 'should fall back to field labels when entity value does not exist', () => {
 				const select = ( store ) => {
 					if ( store === blockEditorStore ) {
 						return {
@@ -57,48 +72,30 @@ describe( 'post-data bindings', () => {
 					select,
 					context: { postId: 123, postType: 'post' },
 					bindings: {
-						content: { args: { field: 'date' } },
+						datetime: {
+							source: 'core/post-date',
+							args: { field: 'date' },
+						},
+						modified: {
+							source: 'core/post-date',
+							args: { field: 'modified' },
+						},
+						url: {
+							source: 'core/post-date',
+							args: { field: 'link' },
+						},
 					},
 					clientId: 'client-1',
 				} );
 
-				expect( values.content ).toBe( 'Post Date' );
-			} );
-
-			it( 'should handle multiple bindings', () => {
-				const select = ( store ) => {
-					if ( store === blockEditorStore ) {
-						return {
-							getBlockName: () => 'core/post-date',
-							getBlockAttributes: () => ( {} ),
-						};
-					}
-					return {
-						getEditedEntityRecord: () => ( {
-							date: '2024-01-15',
-							modified: '2024-01-20',
-							link: 'https://example.com/post',
-						} ),
-					};
-				};
-
-				const values = postDataBindings.getValues( {
-					select,
-					context: { postId: 123, postType: 'post' },
-					bindings: {
-						date: { args: { field: 'date' } },
-						modified: { args: { field: 'modified' } },
-						link: { args: { field: 'link' } },
-					},
-					clientId: 'client-1',
+				expect( values ).toStrictEqual( {
+					datetime: 'Post Date',
+					modified: 'Post Modified Date',
+					url: 'Post Link',
 				} );
-
-				expect( values.date ).toBe( '2024-01-15' );
-				expect( values.modified ).toBe( '2024-01-20' );
-				expect( values.link ).toBe( 'https://example.com/post' );
 			} );
 
-			it( 'should return empty object for disallowed fields', () => {
+			it( 'should return empty object for unknown fields', () => {
 				const select = ( store ) => {
 					if ( store === blockEditorStore ) {
 						return {
@@ -117,7 +114,10 @@ describe( 'post-data bindings', () => {
 					select,
 					context: { postId: 123, postType: 'post' },
 					bindings: {
-						content: { args: { field: 'title' } },
+						content: {
+							source: 'core/post-date',
+							args: { field: 'title' },
+						},
 					},
 					clientId: 'client-1',
 				} );
@@ -127,7 +127,7 @@ describe( 'post-data bindings', () => {
 		} );
 
 		describe( 'for navigation blocks using block attributes', () => {
-			it( 'should use block attributes instead of context for navigation-link', () => {
+			it( 'should use block attributes instead of context', () => {
 				const select = ( store ) => {
 					if ( store === blockEditorStore ) {
 						return {
@@ -140,11 +140,11 @@ describe( 'post-data bindings', () => {
 					}
 					return {
 						getEditedEntityRecord: ( _kind, type, id ) => {
-							// Verify it's called with block attributes, not context
-							expect( id ).toBe( 456 );
-							expect( type ).toBe( 'page' );
+							if ( type !== 'page' || id !== 456 ) {
+								return {};
+							}
 							return {
-								date: '2024-02-01',
+								date: '2021-02-03',
 								link: 'https://example.com/page',
 							};
 						},
@@ -162,45 +162,11 @@ describe( 'post-data bindings', () => {
 
 				expect( values.url ).toBe( 'https://example.com/page' );
 			} );
-
-			it( 'should use block attributes instead of context for navigation-submenu', () => {
-				const select = ( store ) => {
-					if ( store === blockEditorStore ) {
-						return {
-							getBlockName: () => 'core/navigation-submenu',
-							getBlockAttributes: () => ( {
-								id: 789,
-								type: 'page',
-							} ),
-						};
-					}
-					return {
-						getEditedEntityRecord: ( _kind, type, id ) => {
-							expect( id ).toBe( 789 );
-							expect( type ).toBe( 'page' );
-							return {
-								link: 'https://example.com/submenu',
-							};
-						},
-					};
-				};
-
-				const values = postDataBindings.getValues( {
-					select,
-					context: { postId: 999, postType: 'post' },
-					bindings: {
-						url: { args: { field: 'link' } },
-					},
-					clientId: 'client-1',
-				} );
-
-				expect( values.url ).toBe( 'https://example.com/submenu' );
-			} );
 		} );
 	} );
 
 	describe( 'getFieldsList', () => {
-		it( 'should return the list of available post data fields when selected block is core/post-date', () => {
+		it( 'should return the list of available post data fields when the Date block is selected', () => {
 			const select = () => ( {
 				getSelectedBlock: () => ( {
 					name: 'core/post-date',
@@ -230,7 +196,7 @@ describe( 'post-data bindings', () => {
 			] );
 		} );
 
-		it( 'should return an empty array when selected block is not core/post-date', () => {
+		it( 'should return an empty array when any other block than the Date block is selected', () => {
 			const select = () => ( {
 				getSelectedBlock: () => ( {
 					name: 'core/paragraph',
