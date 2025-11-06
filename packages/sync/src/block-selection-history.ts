@@ -47,10 +47,6 @@ export class BlockSelectionHistory {
 	private convertSelectionToPosition(
 		selection: WPSelection
 	): Position | null {
-		if ( ! this.ydoc ) {
-			return null;
-		}
-
 		const clientId = selection.selectionStart.clientId;
 		const block = findBlockByClientIdInDoc( clientId, this.ydoc );
 
@@ -64,33 +60,31 @@ export class BlockSelectionHistory {
 			? attributes?.get( attributeKey )
 			: undefined;
 
-		if ( ! ( changedYText instanceof Y.Text ) ) {
-			// Could not find the relevant YText in the document, store as block selection
+		const isYText = changedYText instanceof Y.Text;
+		const isFullyDefinedPosition = attributeKey && clientId;
+
+		if ( ! isYText || ! isFullyDefinedPosition ) {
+			// We either don't have a valid YText (it's been deleted) or we've
+			// been passed a selection that's just a block clientId.
+			// Store as BlockSelection.
 			return {
 				type: PositionType.BlockSelection,
 				clientId,
 			};
 		}
 
-		if ( attributeKey && clientId ) {
-			const offset = selection.selectionStart?.offset ?? 0;
-			const relativePosition = Y.createRelativePositionFromTypeIndex(
-				changedYText,
-				offset
-			);
-
-			return {
-				type: PositionType.RelativeSelection,
-				attributeKey,
-				relativePosition,
-				clientId,
-				offset,
-			};
-		}
+		const offset = selection.selectionStart?.offset ?? 0;
+		const relativePosition = Y.createRelativePositionFromTypeIndex(
+			changedYText,
+			offset
+		);
 
 		return {
-			type: PositionType.BlockSelection,
+			type: PositionType.RelativeSelection,
+			attributeKey,
+			relativePosition,
 			clientId,
+			offset,
 		};
 	}
 
