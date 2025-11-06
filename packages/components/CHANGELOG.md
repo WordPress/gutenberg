@@ -8,6 +8,10 @@
 -   `TextareaControl`: Add `min-height` to the textarea element ([#72867](https://github.com/WordPress/gutenberg/pull/72867)).
 -   `Card`, `CardHeader`, `CardBody` and `CardFooter`: Add support for directional padding through object-based size prop, allowing independent control of padding for each side ([#72511](https://github.com/WordPress/gutenberg/pull/72511)).
 
+### Enhancements
+
+-   `ConfirmDialog`: Add `isBusy` prop to component. ([#73041](https://github.com/WordPress/gutenberg/pull/73041)).
+
 ## 30.7.0 (2025-10-29)
 
 ### Bug Fixes
