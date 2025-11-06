@@ -52,10 +52,10 @@ test.describe( 'Homepage Settings via Editor', () => {
 			} )
 			.click();
 		await expect(
-			page.getByRole( 'menuitem', { name: 'Set as homepage' } )
+			page.getByRole( 'menuitem', { name: 'Homepage' } )
 		).toBeHidden();
 		await expect(
-			page.getByRole( 'menuitem', { name: 'Set as posts page' } )
+			page.getByRole( 'menuitem', { name: 'Posts page' } )
 		).toBeHidden();
 	} );
 
@@ -74,13 +74,13 @@ test.describe( 'Homepage Settings via Editor', () => {
 				name: 'Actions',
 			} )
 			.click();
-		await page.getByRole( 'menuitem', { name: 'Set as homepage' } ).click();
+		await page.getByRole( 'menuitem', { name: 'Homepage' } ).click();
 		await page.getByRole( 'button', { name: 'Set homepage' } ).click();
 		await expect(
-			page.getByRole( 'menuitem', { name: 'Set as homepage' } )
+			page.getByRole( 'menuitem', { name: 'Homepage' } )
 		).toBeHidden();
 		await expect(
-			page.getByRole( 'menuitem', { name: 'Set as posts page' } )
+			page.getByRole( 'menuitem', { name: 'Posts page' } )
 		).toBeHidden();
 
 		const samplePageTwo = page
@@ -96,15 +96,13 @@ test.describe( 'Homepage Settings via Editor', () => {
 				name: 'Actions',
 			} )
 			.click();
-		await page
-			.getByRole( 'menuitem', { name: 'Set as posts page' } )
-			.click();
+		await page.getByRole( 'menuitem', { name: 'Posts page' } ).click();
 		await page.getByRole( 'button', { name: 'Set posts page' } ).click();
 		await expect(
-			page.getByRole( 'menuitem', { name: 'Set as homepage' } )
+			page.getByRole( 'menuitem', { name: 'Homepage' } )
 		).toBeHidden();
 		await expect(
-			page.getByRole( 'menuitem', { name: 'Set as posts page' } )
+			page.getByRole( 'menuitem', { name: 'Posts page' } )
 		).toBeHidden();
 	} );
 } );
