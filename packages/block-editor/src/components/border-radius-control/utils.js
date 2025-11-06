@@ -63,7 +63,6 @@ export function getAllValue( values = {} ) {
 	const parsedQuantitiesAndUnits = Object.values( values ).map( ( value ) => {
 		const newValue = parseQuantityAndUnitFromRawValue( value );
 		if ( typeof value === 'string' && newValue[ 0 ] === undefined ) {
-			// Should we do some string testing here, like the font size picker's `isSimpleCssValue`?
 			return [ value, '' ];
 		}
 		return newValue;
