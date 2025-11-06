@@ -77,7 +77,7 @@ export default function ViewTimeline< Item >(
 		: null;
 	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
 
-	// Convert dataByGroup entries into array and reverse order
+	// Convert dataByGroup entries into array.
 	const groupedEntries = dataByGroup
 		? Array.from( dataByGroup.entries() )
 		: [];

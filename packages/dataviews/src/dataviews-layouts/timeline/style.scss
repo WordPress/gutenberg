@@ -104,11 +104,11 @@
 	.dataviews-view-timeline__event-type {
 		display: flex;
 		align-items: center;
-		justify-content: top;
 		align-self: stretch;
 		gap: $grid-unit-05;
 		flex-direction: column;
 		width: $grid-unit-40;
+		flex-shrink: 0;
 
 		&::before {
 			content: "";

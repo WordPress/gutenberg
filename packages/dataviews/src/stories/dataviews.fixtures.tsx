@@ -850,6 +850,20 @@ export const eventTypeIcons: Record< string, any > = {
 
 export const orderEventData: OrderEvent[] = [
 	{
+		id: 13,
+		name: {
+			title: 'Customer Review Received',
+			description:
+				'Customer left a 5-star review: "Great product and fast shipping!"',
+		},
+		type: 'review',
+		categories: [ 'Review', 'Customer' ],
+		date: '2025-01-22',
+		datetime: '2025-01-22T19:45:33Z',
+		email: 'alice.wonderland@fictional-store.test',
+		orderNumber: '#2502',
+	},
+	{
 		id: 1,
 		name: {
 			title: 'Order Created',
@@ -1009,20 +1023,6 @@ export const orderEventData: OrderEvent[] = [
 		datetime: '2025-01-20T14:32:51Z',
 		orderNumber: '#2502',
 	},
-	{
-		id: 13,
-		name: {
-			title: 'Customer Review Received',
-			description:
-				'Customer left a 5-star review: "Great product and fast shipping!"',
-		},
-		type: 'review',
-		categories: [ 'Review', 'Customer' ],
-		date: '2025-01-22',
-		datetime: '2025-01-22T19:45:33Z',
-		email: 'alice.wonderland@fictional-store.test',
-		orderNumber: '#2502',
-	},
 ];
 
 export const orderEventFields: Field< OrderEvent >[] = [
@@ -1087,6 +1087,7 @@ export const orderEventFields: Field< OrderEvent >[] = [
 		label: 'Email',
 		id: 'email',
 		type: 'email',
+		enableSorting: false,
 	},
 	{
 		label: 'Categories',
