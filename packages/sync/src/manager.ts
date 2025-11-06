@@ -231,8 +231,8 @@ export function createSyncManager(): SyncManager {
 					case SAVED_AT_KEY:
 						const newValue = recordMetaMap.get( SAVED_AT_KEY );
 						if ( 'number' === typeof newValue && newValue > now ) {
-							// Another peer has saved the record. Refetch it so that we have
-							// a correct understanding of our own unsaved edits.
+							// Another peer has mutated the collection. Refetch it so that we
+							// obtain the updated records.
 							void handlers.refetchRecords().catch( () => {} );
 						}
 						break;
