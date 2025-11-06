@@ -114,6 +114,9 @@ function ListViewBlockSelectButton(
 		}
 	}
 
+	const isContentOnlyPattern =
+		isPattern && window?.__experimentalContentOnlyPatternInsertion;
+
 	return (
 		<a
 			className={ clsx(
@@ -135,10 +138,10 @@ function ListViewBlockSelectButton(
 			aria-expanded={ isExpanded }
 		>
 			<ListViewExpander
-				onClick={ isPattern ? undefined : onToggleExpanded }
+				onClick={ isContentOnlyPattern ? undefined : onToggleExpanded }
 			/>
 			<BlockIcon
-				icon={ isPattern ? symbol : blockInformation?.icon }
+				icon={ isContentOnlyPattern ? symbol : blockInformation?.icon }
 				showColors
 				context="list-view"
 			/>
