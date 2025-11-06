@@ -9,35 +9,19 @@ test.describe( 'Fit Text', () => {
 	} );
 
 	test.describe( 'Editor functionality', () => {
-		test( 'should enable fit text on a heading block', async ( {
+		test( 'should enable fit text on a heading block via Stretch Heading variation', async ( {
 			editor,
 			page,
 		} ) => {
-			await editor.insertBlock( {
-				name: 'core/heading',
-				attributes: {
-					content: 'Test Heading',
-					level: 2,
-				},
-			} );
-
-			await editor.openDocumentSettingsSidebar();
-
-			// Enable Fit text control via Typography options menu
+			// Insert Stretch Heading variation from block inserter
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'button', { name: 'Typography options' } )
+				.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 				.click();
 			await page
-				.getByRole( 'menu', { name: 'Typography options' } )
-				.getByRole( 'menuitemcheckbox', { name: 'Show Fit text' } )
+				.getByRole( 'listbox', { name: 'Text' } )
+				.getByRole( 'option', { name: 'Stretch Heading', exact: true } )
 				.click();
-
-			const fitTextToggle = page.getByRole( 'checkbox', {
-				name: 'Fit text',
-			} );
-
-			await fitTextToggle.click();
+			await page.keyboard.type( 'Test Heading' );
 
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
@@ -57,59 +41,19 @@ test.describe( 'Fit Text', () => {
 			await expect( headingBlock ).toHaveClass( /has-fit-text/ );
 		} );
 
-		test( 'should disable fit text when toggled off', async ( {
+		test( 'should enable fit text on a paragraph block via Stretch Text variation', async ( {
 			editor,
 			page,
 		} ) => {
-			await editor.insertBlock( {
-				name: 'core/heading',
-				attributes: {
-					content: 'Test Heading',
-					level: 2,
-					fitText: true,
-				},
-			} );
-
-			await editor.openDocumentSettingsSidebar();
-
-			const fitTextToggle = page.getByRole( 'checkbox', {
-				name: 'Fit text',
-			} );
-
-			await fitTextToggle.click();
-
-			const blocks = await editor.getBlocks();
-			expect( blocks[ 0 ].attributes.fitText ).toBeUndefined();
-		} );
-
-		test( 'should enable fit text on a paragraph block', async ( {
-			editor,
-			page,
-		} ) => {
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: {
-					content: 'Test paragraph with fit text enabled',
-				},
-			} );
-
-			await editor.openDocumentSettingsSidebar();
-
-			// Enable Fit text control via Typography options menu
+			// Insert Stretch Text variation from block inserter
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'button', { name: 'Typography options' } )
+				.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 				.click();
 			await page
-				.getByRole( 'menu', { name: 'Typography options' } )
-				.getByRole( 'menuitemcheckbox', { name: 'Show Fit text' } )
+				.getByRole( 'listbox', { name: 'Text' } )
+				.getByRole( 'option', { name: 'Stretch Text', exact: true } )
 				.click();
-
-			const fitTextToggle = page.getByRole( 'checkbox', {
-				name: 'Fit text',
-			} );
-
-			await fitTextToggle.click();
+			await page.keyboard.type( 'Test paragraph with fit text enabled' );
 
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
@@ -222,87 +166,33 @@ test.describe( 'Fit Text', () => {
 			expect( fitTextSize ).toBeGreaterThan( normalSize * 2 );
 		} );
 
-		test( 'should disable fit text when a font size is selected', async ( {
+		test( 'should not show font size UI for Stretch Text and Stretch Heading variations', async ( {
 			editor,
 			page,
 		} ) => {
-			await editor.insertBlock( {
-				name: 'core/heading',
-				attributes: {
-					content: 'Test Heading',
-					level: 2,
-					fitText: true,
-				},
-			} );
+			// Insert Stretch Heading variation
+			await page
+				.getByRole( 'button', { name: 'Block Inserter', exact: true } )
+				.click();
+			await page
+				.getByRole( 'listbox', { name: 'Text' } )
+				.getByRole( 'option', { name: 'Stretch Heading', exact: true } )
+				.click();
+			await page.keyboard.type( 'Test Heading' );
 
 			await editor.openDocumentSettingsSidebar();
 
-			// Set a custom font size
-			await page.click(
-				'role=region[name="Editor settings"i] >> role=button[name="Set custom size"i]'
+			// Font size controls should not be visible
+			const fontSizeButton = page.getByRole( 'button', {
+				name: 'Set custom size',
+			} );
+			await expect( fontSizeButton ).not.toBeVisible();
+
+			// Verify no font size picker is present
+			const fontSizePicker = page.locator(
+				'[aria-label="Font size"], [aria-label="Size"]'
 			);
-			await page.click( 'role=spinbutton[name="Font size"i]' );
-			await page.keyboard.type( '24' );
-
-			// fitText should be cleared
-			await expect.poll( editor.getBlocks ).toMatchObject( [
-				{
-					name: 'core/heading',
-					attributes: expect.objectContaining( {
-						content: 'Test Heading',
-						level: 2,
-						style: {
-							typography: {
-								fontSize: '24px',
-							},
-						},
-					} ),
-				},
-			] );
-		} );
-
-		test( 'should clear font size when fit text is enabled', async ( {
-			editor,
-			page,
-		} ) => {
-			await editor.insertBlock( {
-				name: 'core/heading',
-				attributes: {
-					content: 'Test Heading',
-					level: 2,
-					fontSize: 'large',
-				},
-			} );
-
-			await editor.openDocumentSettingsSidebar();
-
-			// Enable Fit text control via Typography options menu
-			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'button', { name: 'Typography options' } )
-				.click();
-			await page
-				.getByRole( 'menu', { name: 'Typography options' } )
-				.getByRole( 'menuitemcheckbox', { name: 'Show Fit text' } )
-				.click();
-
-			const fitTextToggle = page.getByRole( 'checkbox', {
-				name: 'Fit text',
-			} );
-
-			await fitTextToggle.click();
-
-			// fontSize should be cleared
-			await expect.poll( editor.getBlocks ).toMatchObject( [
-				{
-					name: 'core/heading',
-					attributes: expect.objectContaining( {
-						content: 'Test Heading',
-						level: 2,
-						fitText: true,
-					} ),
-				},
-			] );
+			await expect( fontSizePicker ).not.toBeVisible();
 		} );
 
 		test( 'should not load frontend script when editing a saved post with fit text', async ( {
