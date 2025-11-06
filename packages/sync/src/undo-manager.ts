@@ -54,77 +54,15 @@ export function createUndoManager(): SyncUndoManager {
 		trackedOrigins: new Set( [ LOCAL_EDITOR_ORIGIN ] ),
 	} );
 
-	const logStacks = ( message: string ) => {
-		console.log( `${ message } logStacks():` );
-
-		console.log( 'undoStack:' );
-
-		const undoStack = yUndoManager.undoStack[ 0 ]?.undoStack;
-
-		if ( undoStack ) {
-			for ( const item of undoStack ) {
-				const positionMeta = item.meta.get( 'position' );
-				if ( ! positionMeta ) {
-					console.log( '    NO POSITION META' );
-					continue;
-				}
-				const { position, backupPositions } = positionMeta;
-				console.log(
-					`    position (off ${ position?.offset }):`,
-					position,
-					'backupPositions:',
-					backupPositions
-				);
-			}
-		} else {
-			console.log( '(none)' );
-		}
-
-		console.log( 'redoStack:' );
-
-		const redoStack = yUndoManager.redoStack[ 0 ]?.redoStack;
-
-		if ( redoStack ) {
-			for ( const item of redoStack ) {
-				const positionMeta = item.meta.get( 'position' );
-				if ( ! positionMeta ) {
-					console.log( '    NO POSITION META' );
-					continue;
-				}
-				const { position, backupPositions } = positionMeta;
-				console.log(
-					`    position (off ${ position?.offset }):`,
-					position,
-					'backupPositions:',
-					backupPositions
-				);
-			}
-		} else {
-			console.log( '(none)' );
-		}
-
-		console.log( '---' );
-	};
-
-	// @ts-ignore
-	window.logStacks = logStacks;
-
 	function updatePositionMeta( event: StackItemEvent ): void {
 		let positionToStore = selectionHistory.getCurrentPosition();
 
 		const backupPositions = selectionHistory.getBlockHistory( 3 );
 
 		if ( positionToStore === null && backupPositions.length === 0 ) {
-			console.log(
-				'No last selection and no backup positions, quitting updatePositionMeta()'
-			);
 			// If we don't have a last selection and no backup positions, then don't save anything extra
 			return;
 		} else if ( positionToStore === null ) {
-			console.log(
-				'positionToStore is null, using backup position:',
-				backupPositions[ 0 ]
-			);
 			// If positionToStore is null for some reason, use a backup position
 			positionToStore = backupPositions[ 0 ];
 		}
@@ -135,12 +73,6 @@ export function createUndoManager(): SyncUndoManager {
 		};
 
 		event.stackItem.meta.set( 'position', positionMeta );
-		console.log(
-			`Stored ${ event.type } stackItem with position:`,
-			positionMeta.position,
-			'backupPositions:',
-			positionMeta.backupPositions
-		);
 	}
 
 	function restorePosition( event: StackItemEvent ): void {
@@ -148,10 +80,7 @@ export function createUndoManager(): SyncUndoManager {
 			event.stackItem.meta.get( 'position' );
 
 		if ( ! positionMeta ) {
-			console.log(
-				'Unable to restore position from stack item:',
-				event.stackItem
-			);
+			// No position meta stored with this item, do nothing.
 			return;
 		}
 
@@ -163,8 +92,6 @@ export function createUndoManager(): SyncUndoManager {
 			positionsToTry.push( ...positionMeta.backupPositions );
 		}
 
-		let isRestored = false;
-
 		// Try each position until we find one that exists in the document
 		for ( const positionToTry of positionsToTry ) {
 			const block = findBlockByClientIdInDoc(
@@ -173,14 +100,9 @@ export function createUndoManager(): SyncUndoManager {
 			);
 
 			if ( ! block ) {
-				console.log(
-					'Block not found, skipping:',
-					positionToTry.clientId
-				);
+				// This block no longer exists, skip it.
 				continue;
 			}
-
-			console.log( 'Restoring selection from position:', positionToTry );
 
 			if ( positionToTry.type === PositionType.RelativeSelection ) {
 				const { relativePosition, attributeKey, clientId } =
@@ -199,33 +121,23 @@ export function createUndoManager(): SyncUndoManager {
 						absolutePosition.index,
 						absolutePosition.index
 					);
-					isRestored = true;
 					break;
 				}
 			} else if ( positionToTry.type === PositionType.BlockSelection ) {
 				setSelection( positionToTry.clientId );
-				isRestored = true;
 				break;
 			}
-		}
-
-		if ( ! isRestored ) {
-			console.log( 'No valid positions found to restore' );
 		}
 	}
 
 	yUndoManager.on( 'stack-item-added', ( event: StackItemEvent ) => {
 		updatePositionMeta( event );
-
-		logStacks( '! after stack-item-added' );
 	} );
 
 	// stack-item-updated not necessary - we already have the starting position
 	// for the undo operation stored in stack-item-added
 
 	yUndoManager.on( 'stack-item-popped', ( event: StackItemEvent ) => {
-		logStacks( '! before stack-item-popped' );
-
 		restorePosition( event );
 	} );
 
@@ -270,9 +182,7 @@ export function createUndoManager(): SyncUndoManager {
 				// Selection updates occur before the underlying Y.Text data is updated,
 				// so wait until the current event loop has completed so that a valid
 				// relative position can be calculated.
-				console.log( 'Scheduling selection change...' );
 				setTimeout( () => {
-					console.log( 'Running selection change!' );
 					selectionHistory.updateSelection( newSelection );
 				}, 0 );
 			} );
