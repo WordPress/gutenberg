@@ -19,13 +19,11 @@ import { findBlockByClientIdInDoc } from './utils';
  * This class is used to track recent block selections to help in restoring
  * a user's selection after an undo or redo operation.
  *
- * Maintains currentSelection and lastSelection for the current block, and a history
- * array for previous blocks. These properties are useful for different things:
+ * Maintains currentSelection for the current block, and a history array for
+ * previous blocks. These properties are useful for different things:
  *
  * - currentSelection: The most recent selection in the current block. This is updated
  *                     before any undo stack operations are processed.
- * - lastSelection: The last selection in the current block. This represents where
- *                  the user started typing before the current character.
  * - history: An array of previous blocks. Use this as a backup for restoration
  *            locations.
  */
@@ -33,7 +31,6 @@ export class BlockSelectionHistory {
 	private historySize: number;
 	private history: Position[] = [];
 	private currentSelection: Position | null = null;
-	private lastSelection: Position | null = null;
 	private ydoc: Y.Doc | null = null;
 
 	constructor( historySize: number = 10 ) {
@@ -106,7 +103,6 @@ export class BlockSelectionHistory {
 
 	/**
 	 * Update the selection history with a new selection.
-	 * If the selection is in the same block as the current one, shift currentSelection to lastSelection.
 	 * If selection is in a new block, move currentSelection to history.
 	 * @param newSelection
 	 */
@@ -129,25 +125,13 @@ export class BlockSelectionHistory {
 				( p ) => p.clientId !== newClientId
 			);
 
-			// Moving to a new block: push current selections to history
+			// Moving to a new block: push current selection to history
 			if ( this.currentSelection ) {
 				this.addToHistory( this.currentSelection );
 			}
-
-			// Reset for new block
-			this.lastSelection = null;
-			this.currentSelection = position;
-		} else {
-			// Same block: shift current to last
-			this.lastSelection = this.currentSelection;
-			this.currentSelection = position;
 		}
 
-		console.log( '--- Selection history:' );
-		console.log( 'currentSelection:', this.currentSelection );
-		console.log( 'lastSelection:', this.lastSelection );
-		console.log( 'history:', this.history );
-		console.log( '---' );
+		this.currentSelection = position;
 	}
 
 	/**
@@ -155,13 +139,6 @@ export class BlockSelectionHistory {
 	 */
 	public getCurrentPosition(): Position | null {
 		return this.currentSelection;
-	}
-
-	/**
-	 * Get the last selection in the current block.
-	 */
-	public getLastSelection(): Position | null {
-		return this.lastSelection;
 	}
 
 	/**

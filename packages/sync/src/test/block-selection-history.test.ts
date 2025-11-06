@@ -83,9 +83,6 @@ describe( 'BlockSelectionHistory', () => {
 		history = new BlockSelectionHistory( 5 );
 		ydoc = createTestDoc();
 		history.setYDoc( ydoc );
-
-		// Suppress console.log calls during tests
-		// jest.spyOn( console, 'log' ).mockImplementation( () => {} );
 	} );
 
 	afterEach( () => {
@@ -95,7 +92,6 @@ describe( 'BlockSelectionHistory', () => {
 	describe( 'initialization', () => {
 		test( 'should initialize with empty history', () => {
 			expect( history.getCurrentPosition() ).toBeNull();
-			expect( history.getLastSelection() ).toBeNull();
 			expect( history.getBlockHistory( 5 ) ).toEqual( [] );
 		} );
 	} );
@@ -150,23 +146,6 @@ describe( 'BlockSelectionHistory', () => {
 			expect( history.getBlockHistory( 5 ).length ).toBe( 0 );
 		} );
 
-		test( 'should move current to last when selection changes within same block', () => {
-			const selection1 = createSelection( 'block-1', 'content', 5 );
-			history.updateSelection( selection1 );
-
-			const selection2 = createSelection( 'block-1', 'content', 8 );
-			history.updateSelection( selection2 );
-
-			const current = history.getCurrentPosition();
-			const last = history.getLastSelection();
-
-			expect( current?.clientId ).toBe( 'block-1' );
-			expect( ( current as RelativePosition ).offset ).toBe( 8 );
-
-			expect( last?.clientId ).toBe( 'block-1' );
-			expect( ( last as RelativePosition ).offset ).toBe( 5 );
-		} );
-
 		test( 'should add new position when moving to different block', () => {
 			const selection1 = createSelection( 'block-1', 'content', 5 );
 			history.updateSelection( selection1 );
@@ -179,25 +158,6 @@ describe( 'BlockSelectionHistory', () => {
 
 			expect( currentPosition?.clientId ).toBe( 'block-2' );
 			expect( blockHistory[ 0 ]?.clientId ).toBe( 'block-1' );
-		} );
-
-		test( 'should reset lastSelection when moving to different block', () => {
-			const selection1 = createSelection( 'block-1', 'content', 5 );
-			history.updateSelection( selection1 );
-
-			const selection2 = createSelection( 'block-1', 'content', 8 );
-			history.updateSelection( selection2 );
-
-			// lastSelection should exist now
-			expect( history.getLastSelection() ).not.toBeNull();
-
-			// Move to different block
-			const selection3 = createSelection( 'block-2', 'content', 3 );
-			history.updateSelection( selection3 );
-
-			// lastSelection should be reset
-			expect( history.getLastSelection() ).toBeNull();
-			expect( history.getCurrentPosition()?.clientId ).toBe( 'block-2' );
 		} );
 
 		test( 'should store offset 0 when offset is not provided', () => {
@@ -516,63 +476,6 @@ describe( 'BlockSelectionHistory', () => {
 			expect( positions[ 2 ]?.type ).toBe(
 				PositionType.RelativeSelection
 			);
-		} );
-	} );
-
-	describe( 'getLastSelection', () => {
-		test( 'should return null when only one selection exists', () => {
-			history.updateSelection(
-				createSelection( 'block-1', 'content', 5 )
-			);
-			expect( history.getLastSelection() ).toBeNull();
-		} );
-
-		test( 'should return previous selection in same block', () => {
-			history.updateSelection(
-				createSelection( 'block-1', 'content', 5 )
-			);
-			history.updateSelection(
-				createSelection( 'block-1', 'content', 8 )
-			);
-
-			const last = history.getLastSelection();
-			expect( last?.clientId ).toBe( 'block-1' );
-			expect( ( last as RelativePosition ).offset ).toBe( 5 );
-		} );
-
-		test( 'should track multiple selections in same block', () => {
-			history.updateSelection(
-				createSelection( 'block-1', 'content', 5 )
-			);
-			history.updateSelection(
-				createSelection( 'block-1', 'content', 8 )
-			);
-			history.updateSelection(
-				createSelection( 'block-1', 'content', 10 )
-			);
-
-			const current = history.getCurrentPosition();
-			const last = history.getLastSelection();
-
-			expect( ( current as RelativePosition ).offset ).toBe( 10 );
-			expect( ( last as RelativePosition ).offset ).toBe( 8 );
-		} );
-
-		test( 'should reset when moving to new block', () => {
-			history.updateSelection(
-				createSelection( 'block-1', 'content', 5 )
-			);
-			history.updateSelection(
-				createSelection( 'block-1', 'content', 8 )
-			);
-
-			expect( history.getLastSelection() ).not.toBeNull();
-
-			history.updateSelection(
-				createSelection( 'block-2', 'content', 3 )
-			);
-
-			expect( history.getLastSelection() ).toBeNull();
 		} );
 	} );
 } );

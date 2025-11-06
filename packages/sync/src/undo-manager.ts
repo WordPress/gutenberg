@@ -55,7 +55,7 @@ export function createUndoManager(): SyncUndoManager {
 	} );
 
 	const logStacks = ( message: string ) => {
-		console.log( `--- [${ message }] logStacks():` );
+		console.log( `${ message } logStacks():` );
 
 		console.log( 'undoStack:' );
 
@@ -64,9 +64,13 @@ export function createUndoManager(): SyncUndoManager {
 		if ( undoStack ) {
 			for ( const item of undoStack ) {
 				const positionMeta = item.meta.get( 'position' );
+				if ( ! positionMeta ) {
+					console.log( '    NO POSITION META' );
+					continue;
+				}
 				const { position, backupPositions } = positionMeta;
 				console.log(
-					'position:',
+					`    position (off ${ position?.offset }):`,
 					position,
 					'backupPositions:',
 					backupPositions
@@ -83,9 +87,13 @@ export function createUndoManager(): SyncUndoManager {
 		if ( redoStack ) {
 			for ( const item of redoStack ) {
 				const positionMeta = item.meta.get( 'position' );
+				if ( ! positionMeta ) {
+					console.log( '    NO POSITION META' );
+					continue;
+				}
 				const { position, backupPositions } = positionMeta;
 				console.log(
-					'position:',
+					`    position (off ${ position?.offset }):`,
 					position,
 					'backupPositions:',
 					backupPositions
@@ -102,40 +110,36 @@ export function createUndoManager(): SyncUndoManager {
 	window.logStacks = logStacks;
 
 	function updatePositionMeta( event: StackItemEvent ): void {
-		let lastSelection;
-		if ( event.origin?.redoing === true ) {
-			// If we're redoing, the current position is the location where the user
-			// was before making this change.
-			lastSelection =
-				selectionHistory.getCurrentPosition() ??
-				selectionHistory.getLastSelection();
-		} else {
-			// Otherwise, prefer saving lastSelection with the undo stack,
-			// as it will be where user started before making this change
-			lastSelection =
-				selectionHistory.getLastSelection() ??
-				selectionHistory.getCurrentPosition();
-		}
+		let positionToStore = selectionHistory.getCurrentPosition();
 
 		const backupPositions = selectionHistory.getBlockHistory( 3 );
 
-		if ( lastSelection === null && backupPositions.length === 0 ) {
+		if ( positionToStore === null && backupPositions.length === 0 ) {
+			console.log(
+				'No last selection and no backup positions, quitting updatePositionMeta()'
+			);
 			// If we don't have a last selection and no backup positions, then don't save anything extra
 			return;
-		} else if ( lastSelection === null ) {
-			// If lastSelection is null for some reason, use a backup position
-			lastSelection = backupPositions[ 0 ];
+		} else if ( positionToStore === null ) {
+			console.log(
+				'positionToStore is null, using backup position:',
+				backupPositions[ 0 ]
+			);
+			// If positionToStore is null for some reason, use a backup position
+			positionToStore = backupPositions[ 0 ];
 		}
 
 		const positionMeta: PositionMeta = {
-			position: lastSelection,
+			position: positionToStore,
 			backupPositions,
 		};
 
 		event.stackItem.meta.set( 'position', positionMeta );
 		console.log(
-			`Stored ${ event.type } stackItem with positionMeta:`,
-			positionMeta
+			`Stored ${ event.type } stackItem with position:`,
+			positionMeta.position,
+			'backupPositions:',
+			positionMeta.backupPositions
 		);
 	}
 
@@ -212,12 +216,16 @@ export function createUndoManager(): SyncUndoManager {
 
 	yUndoManager.on( 'stack-item-added', ( event: StackItemEvent ) => {
 		updatePositionMeta( event );
+
+		logStacks( '! after stack-item-added' );
 	} );
 
 	// stack-item-updated not necessary - we already have the starting position
 	// for the undo operation stored in stack-item-added
 
 	yUndoManager.on( 'stack-item-popped', ( event: StackItemEvent ) => {
+		logStacks( '! before stack-item-popped' );
+
 		restorePosition( event );
 	} );
 
@@ -259,7 +267,14 @@ export function createUndoManager(): SyncUndoManager {
 			selectionHistory.setYDoc( ymap.doc as Y.Doc );
 
 			handlers.subscribeToSelectionChange( ( newSelection ) => {
-				selectionHistory.updateSelection( newSelection );
+				// Selection updates occur before the underlying Y.Text data is updated,
+				// so wait until the current event loop has completed so that a valid
+				// relative position can be calculated.
+				console.log( 'Scheduling selection change...' );
+				setTimeout( () => {
+					console.log( 'Running selection change!' );
+					selectionHistory.updateSelection( newSelection );
+				}, 0 );
 			} );
 
 			setSelection = handlers.setSelection;
