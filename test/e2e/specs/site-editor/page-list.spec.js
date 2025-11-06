@@ -141,17 +141,23 @@ test.describe( 'Page List', () => {
 					}
 				},
 				assertInitialState: async ( page ) => {
-					const statusAndVisibility = page.getByLabel(
-						'Status & Visibility'
+					// Find the edit button.
+					const statusAndVisibilityButton = page.getByLabel(
+						'Edit Status & Visibility'
 					);
+					// Get the parent wrapper which contains the summary text.
+					const statusAndVisibility =
+						statusAndVisibilityButton.locator( '..' );
 					await expect( statusAndVisibility ).toContainText(
 						'Published'
 					);
 				},
 				assertEditedState: async ( page ) => {
-					const statusAndVisibility = page.getByLabel(
-						'Status & Visibility'
+					const statusAndVisibilityButton = page.getByLabel(
+						'Edit Status & Visibility'
 					);
+					const statusAndVisibility =
+						statusAndVisibilityButton.locator( '..' );
 					await expect( statusAndVisibility ).toContainText(
 						'Private'
 					);
@@ -159,11 +165,12 @@ test.describe( 'Page List', () => {
 			},
 			author: {
 				assertInitialState: async ( page ) => {
-					const author = page.getByLabel( 'Author' );
+					const authorButton = page.getByLabel( 'Edit Author' );
+					const author = authorButton.locator( '..' );
 					await expect( author ).toContainText( 'admin' );
 				},
 				performEdit: async ( page ) => {
-					const author = page.getByLabel( 'Author' );
+					const author = page.getByLabel( 'Edit Author' );
 					await author.click();
 					const selectElement = page.locator(
 						'select:has(option[value="1"])'
@@ -174,7 +181,8 @@ test.describe( 'Page List', () => {
 			},
 			date: {
 				assertInitialState: async ( page ) => {
-					const dateEl = page.getByLabel( 'Edit Date' );
+					const dateButton = page.getByLabel( 'Edit Date' );
+					const dateEl = dateButton.locator( '..' );
 					const date = new Date();
 					const yy = String( date.getFullYear() );
 
@@ -207,13 +215,15 @@ test.describe( 'Page List', () => {
 				assertEditedState: async ( page ) => {
 					const date = new Date();
 					const yy = Number( date.getFullYear() );
-					const dateEl = page.getByLabel( 'Edit Date' );
+					const dateButton = page.getByLabel( 'Edit Date' );
+					const dateEl = dateButton.locator( '..' );
 					await expect( dateEl ).toContainText( String( yy + 1 ) );
 				},
 			},
 			slug: {
 				assertInitialState: async ( page ) => {
-					const slug = page.getByLabel( 'Edit Slug' );
+					const slugButton = page.getByLabel( 'Edit Slug' );
+					const slug = slugButton.locator( '..' );
 					await expect( slug ).toContainText( 'privacy-policy' );
 				},
 				performEdit: async ( page ) => {
@@ -229,7 +239,8 @@ test.describe( 'Page List', () => {
 			},
 			parent: {
 				assertInitialState: async ( page ) => {
-					const parent = page.getByLabel( 'Edit Parent' );
+					const parentButton = page.getByLabel( 'Edit Parent' );
+					const parent = parentButton.locator( '..' );
 					await expect( parent ).toContainText( 'None' );
 				},
 				performEdit: async ( page ) => {
@@ -244,7 +255,8 @@ test.describe( 'Page List', () => {
 						.click();
 				},
 				assertEditedState: async ( page ) => {
-					const parent = page.getByLabel( 'Edit Parent' );
+					const parentButton = page.getByLabel( 'Edit Parent' );
+					const parent = parentButton.locator( '..' );
 					await expect( parent ).toContainText( 'Sample Page' );
 				},
 			},
@@ -271,7 +283,9 @@ test.describe( 'Page List', () => {
 			// },
 			discussion: {
 				assertInitialState: async ( page ) => {
-					const discussion = page.getByLabel( 'Edit Discussion' );
+					const discussionButton =
+						page.getByLabel( 'Edit Discussion' );
+					const discussion = discussionButton.locator( '..' );
 					await expect( discussion ).toContainText( 'Closed' );
 				},
 				performEdit: async ( page ) => {
@@ -284,7 +298,9 @@ test.describe( 'Page List', () => {
 						.check();
 				},
 				assertEditedState: async ( page ) => {
-					const discussion = page.getByLabel( 'Edit Discussion' );
+					const discussionButton =
+						page.getByLabel( 'Edit Discussion' );
+					const discussion = discussionButton.locator( '..' );
 					await expect( discussion ).toContainText( 'Comments only' );
 				},
 			},
