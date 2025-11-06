@@ -140,15 +140,6 @@ function SortFieldControl() {
 		} );
 	}, [ fields ] );
 
-	const activeLayout = VIEW_LAYOUTS.find(
-		( layout ) => layout.type === view.type
-	);
-
-	// Hide sorting controls for layouts that don't support sorting.
-	if ( activeLayout && ! activeLayout.supports.includes( FEATURE_SORTING ) ) {
-		return null;
-	}
-
 	return (
 		<SelectControl
 			__nextHasNoMarginBottom
@@ -172,15 +163,6 @@ function SortFieldControl() {
 
 function SortDirectionControl() {
 	const { view, fields, onChangeView } = useContext( DataViewsContext );
-
-	const activeLayout = VIEW_LAYOUTS.find(
-		( layout ) => layout.type === view.type
-	);
-
-	// Hide sorting controls for layouts that don't support sorting.
-	if ( activeLayout && ! activeLayout.supports.includes( FEATURE_SORTING ) ) {
-		return null;
-	}
 
 	const sortableFields = fields.filter(
 		( field ) => field.enableSorting !== false
@@ -356,10 +338,14 @@ export function DataviewsViewConfigDropdown() {
 				>
 					<VStack className="dataviews-view-config" spacing={ 6 }>
 						<SettingsSection title={ __( 'Appearance' ) }>
-							<HStack expanded className="is-divided-in-two">
-								<SortFieldControl />
-								<SortDirectionControl />
-							</HStack>
+							{ !! activeLayout?.supports.includes(
+								FEATURE_SORTING
+							) && (
+								<HStack expanded className="is-divided-in-two">
+									<SortFieldControl />
+									<SortDirectionControl />
+								</HStack>
+							) }
 							{ !! activeLayout?.viewConfigOptions && (
 								<activeLayout.viewConfigOptions />
 							) }
