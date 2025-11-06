@@ -102,67 +102,84 @@
 	}
 
 	.dataviews-view-timeline__event-type {
+		display: flex;
+		align-items: center;
+		justify-content: top;
 		align-self: stretch;
-		min-width: $grid-unit-40;
+		gap: $grid-unit-05;
+		flex-direction: column;
+		width: $grid-unit-40;
 
-		.dataviews-view-timeline__spacer {
-			position: relative;
-			flex: 1 0 auto;
-			&::after {
-				content: "";
-				position: absolute;
-				top: 0;
-				left: 50%;
-				width: 1px;
-				height: 100%;
-				background-color: $gray-100;
-			}
-			&:first-child {
-				height: $grid-unit-05;
-				flex: 0 0 auto;
-			}
+		&::before {
+			content: "";
+			flex: 0 0 auto;
+			width: 1px;
+			margin: 0 auto;
+			background-color: $gray-300;
+			height: $grid-unit-05;
 		}
 
-		&:has(.dataviews-view-timeline__event-type-icon.is-small) {
-			min-width: $grid-unit-30;
-
-			.dataviews-view-timeline__spacer:first-child {
-				height: $grid-unit-10;
-			}
+		&::after {
+			content: "";
+			flex: 1 1 auto;
+			width: 1px;
+			margin: 0 auto;
+			background-color: $gray-300;
 		}
 
 		.dataviews-view-timeline__event-type-icon {
 			width: $grid-unit-40;
 			height: $grid-unit-40;
-			overflow: hidden;
-			position: relative;
-			flex-shrink: 0;
-			background-color: $white;
-			border-radius: $radius-round;
+		}
 
-			img {
-				width: 100%;
-				height: 100%;
-				object-fit: cover;
-			}
-
-			svg {
-				max-width: $grid-unit-30;
-				max-height: $grid-unit-30;
-				padding: $grid-unit-05;
-				border-radius: $radius-round;
-				box-shadow: inset 0 0 0 $border-width $gray-100;
-			}
-
-			&.is-small {
+		&.is-small {
+			width: $grid-unit-30;
+			.dataviews-view-timeline__event-type-icon {
 				width: $grid-unit-30;
 				height: $grid-unit-30;
-
-				svg {
-					max-width: $grid-unit-20;
-					max-height: $grid-unit-20;
-				}
 			}
+			&::before {
+				height: $grid-unit-10;
+			}
+		}
+
+		&.has-bullet {
+			width: $grid-unit-10;
+			.dataviews-view-timeline__event-type-icon {
+				width: $grid-unit-10;
+				height: $grid-unit-10;
+			}
+			&::before {
+				height: $grid-unit-20;
+			}
+		}
+	}
+
+	.dataviews-view-timeline__event-type-icon {
+		overflow: hidden;
+		flex-shrink: 0;
+		background-color: $white;
+
+		img,
+		svg,
+		.dataviews-view-timeline__event-bullet {
+			display: block;
+			width: 100%;
+			height: 100%;
+			margin: 0 auto;
+			object-fit: cover;
+			border-radius: $radius-round;
+			box-sizing: border-box;
+			box-shadow: inset 0 0 0 $border-width $gray-300;
+		}
+
+		svg {
+			padding: $grid-unit-05;
+		}
+
+		.dataviews-view-timeline__event-bullet {
+			content: "";
+			background-color: $gray-300;
 		}
 	}
 

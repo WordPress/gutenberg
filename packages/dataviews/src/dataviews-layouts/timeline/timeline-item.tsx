@@ -15,7 +15,7 @@ import {
 	VisuallyHidden,
 } from '@wordpress/components';
 import { useRef, useState, useContext, useMemo } from '@wordpress/element';
-import { Icon, pin, moreVertical } from '@wordpress/icons';
+import { moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
 
 /**
@@ -60,10 +60,6 @@ interface TimelineItemProps< Item > {
 		} & ComponentProps< 'a' >
 	) => ReactElement;
 	isItemClickable: ( item: Item ) => boolean;
-}
-
-function TimelineSpacer() {
-	return <div className="dataviews-view-timeline__spacer" />;
 }
 
 function TimelineItem< Item >( {
@@ -121,13 +117,13 @@ function TimelineItem< Item >( {
 		) : null;
 
 	const renderedMediaField = (
-		<div
-			className={ clsx(
-				'dataviews-view-timeline__event-type-icon',
-				eventIconSize === 'small' && 'is-small'
+		<div className="dataviews-view-timeline__event-type-icon">
+			{ mediaContent || (
+				<span
+					className="dataviews-view-timeline__event-bullet"
+					aria-hidden="true"
+				/>
 			) }
-		>
-			{ mediaContent || <Icon icon={ pin } size={ mediaSize } /> }
 		</div>
 	);
 
@@ -222,14 +218,15 @@ function TimelineItem< Item >( {
 					alignment="flex-start"
 					className="dataviews-view-timeline__row"
 				>
-					<VStack
-						spacing={ 1 }
-						className="dataviews-view-timeline__event-type"
+					<div
+						className={ clsx(
+							'dataviews-view-timeline__event-type',
+							eventIconSize === 'small' && 'is-small',
+							mediaContent ? 'has-media' : 'has-bullet'
+						) }
 					>
-						<TimelineSpacer />
 						{ renderedMediaField }
-						<TimelineSpacer />
-					</VStack>
+					</div>
 					<VStack
 						spacing={ 0 }
 						alignment="flex-start"

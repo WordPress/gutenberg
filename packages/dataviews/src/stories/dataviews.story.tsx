@@ -46,6 +46,7 @@ import {
 	type SpaceObject,
 	orderEventData,
 	orderEventFields,
+	orderEventActions,
 	type OrderEvent,
 } from './dataviews.fixtures';
 
@@ -693,6 +694,7 @@ const TimelineComponent = ( {
 			view={ view }
 			fields={ timelineFields }
 			onChangeView={ setView }
+			actions={ orderEventActions }
 			defaultLayouts={ {
 				[ LAYOUT_TIMELINE ]: {},
 			} }

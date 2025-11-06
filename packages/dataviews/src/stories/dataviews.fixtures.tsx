@@ -1120,6 +1120,23 @@ export const orderEventFields: Field< OrderEvent >[] = [
 	},
 ];
 
+export const orderEventActions: Action< OrderEvent >[] = [
+	{
+		id: 'delete-note',
+		label: 'Delete Note',
+		isPrimary: true,
+		icon: trash,
+		isEligible: ( item ) => item.type === 'note',
+		callback: ( items ) => {
+			const item = items[ 0 ];
+			// eslint-disable-next-line no-alert
+			alert(
+				`Delete note: "${ item.name.title }"\n\n${ item.name.description }`
+			);
+		},
+	},
+];
+
 export const fields: Field< SpaceObject >[] = [
 	{
 		label: 'Image',
