@@ -16,7 +16,11 @@ import { store as blockEditorStore } from '../../store';
 import { ColorEdit } from '../../hooks/color';
 import { ColorToolsPanel } from '../global-styles/color-panel';
 
-function SectionBlockControls( { blockName, clientId, contentClientIds } ) {
+function SectionBlockColorControls( {
+	blockName,
+	clientId,
+	contentClientIds,
+} ) {
 	const settings = useBlockSettings( blockName );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
@@ -74,13 +78,14 @@ const StylesTab = ( {
 					</PanelBody>
 				</div>
 			) }
-			{ isSectionBlock && (
-				<SectionBlockControls
-					blockName={ blockName }
-					clientId={ clientId }
-					contentClientIds={ contentClientIds }
-				/>
-			) }
+			{ isSectionBlock &&
+				window?.__experimentalContentOnlyPatternInsertion && (
+					<SectionBlockColorControls
+						blockName={ blockName }
+						clientId={ clientId }
+						contentClientIds={ contentClientIds }
+					/>
+				) }
 			{ ! isSectionBlock && (
 				<>
 					<InspectorControls.Slot
