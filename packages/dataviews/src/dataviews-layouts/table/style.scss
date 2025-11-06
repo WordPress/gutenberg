@@ -47,7 +47,6 @@
 
 		&.dataviews-view-table__checkbox-column {
 			padding-right: 0;
-			width: 1%;
 
 			.dataviews-view-table__cell-content-wrapper {
 				max-width: auto;
@@ -172,6 +171,7 @@
 			min-height: $grid-unit-40;
 			display: flex;
 			align-items: center;
+			white-space: nowrap;
 
 			&.dataviews-view-table__cell-align-end {
 				justify-content: flex-end;
