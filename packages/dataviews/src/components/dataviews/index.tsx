@@ -194,23 +194,6 @@ function DataViews< Item >( {
 		}
 	}, [ hasPrimaryOrLockedFilters, isShowingFilter ] );
 
-	// Auto-sort timeline by eventField if defined
-	useEffect( () => {
-		if (
-			view.type === 'timeline' &&
-			view.layout?.eventField &&
-			view.sort?.field !== view.layout.eventField
-		) {
-			onChangeView( {
-				...view,
-				sort: {
-					field: view.layout.eventField,
-					direction: view.sort?.direction || 'asc',
-				},
-			} );
-		}
-	}, [ view, onChangeView ] );
-
 	// Attach scroll event listener for infinite scroll
 	useEffect( () => {
 		if ( ! view.infiniteScrollEnabled || ! containerRef.current ) {
