@@ -343,6 +343,7 @@ function CoverEdit( {
 			url: embedUrl,
 			backgroundType: EMBED_VIDEO_BACKGROUND_TYPE,
 			embedProvider: provider,
+			embedSrc: undefined, // Clear old embedSrc to allow useEffect to process new URL
 			dimRatio: newDimRatio,
 			id: undefined,
 			focalPoint: undefined,
