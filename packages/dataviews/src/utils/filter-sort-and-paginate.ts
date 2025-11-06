@@ -395,7 +395,11 @@ export default function filterSortAndPaginate< Item >(
 	if ( sortByField || groupByField ) {
 		filteredData.sort( ( a, b ) => {
 			if ( groupByField ) {
-				const groupCompare = groupByField.sort( a, b, 'asc' );
+				const groupCompare = groupByField.sort(
+					a,
+					b,
+					view.sort?.direction ?? 'asc'
+				);
 
 				// If items are in different groups, return the group comparison result.
 				// Otherwise, fall back to sorting by the sort field.
