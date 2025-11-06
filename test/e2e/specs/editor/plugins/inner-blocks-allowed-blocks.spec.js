@@ -105,7 +105,9 @@ test.describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 		await expect( blockLibrary ).toBeVisible();
 		await expect( blockLibrary.getByRole( 'option' ) ).toHaveText( [
 			'Paragraph',
+			'Stretch Text',
 			'Heading',
+			'Stretch Heading',
 			'Image',
 		] );
 	} );
