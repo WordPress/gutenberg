@@ -203,13 +203,6 @@ export const rootEntitiesConfig = [
 		plural: 'statuses',
 		key: 'slug',
 	},
-	{
-		label: __( 'Registered Templates' ),
-		name: 'registeredTemplate',
-		kind: 'root',
-		baseURL: '/wp/v2/registered-templates',
-		key: 'id',
-	},
 ];
 
 export const deprecatedEntities = {
@@ -307,7 +300,7 @@ async function loadPostTypeEntities() {
 				}/${ parentId }/revisions${
 					revisionId ? '/' + revisionId : ''
 				}`,
-			revisionKey: DEFAULT_ENTITY_KEY,
+			revisionKey: isTemplate ? 'wp_id' : DEFAULT_ENTITY_KEY,
 		};
 
 		if ( window.__experimentalEnableSync ) {

@@ -292,7 +292,11 @@ test.describe( 'Site Editor Performance', () => {
 			for ( let i = 1; i <= samples; i++ ) {
 				// We want to start from a fresh state each time, without
 				// queries or patterns already cached.
-				await admin.visitSiteEditor( { canvas: 'edit' } );
+				await admin.visitSiteEditor( {
+					postId: 'twentytwentyfour//home',
+					postType: 'wp_template',
+					canvas: 'edit',
+				} );
 				await editor.openDocumentSettingsSidebar();
 
 				/*

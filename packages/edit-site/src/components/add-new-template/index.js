@@ -53,6 +53,7 @@ import { TEMPLATE_POST_TYPE } from '../../utils/constants';
  */
 import AddCustomTemplateModalContent from './add-custom-template-modal-content';
 import {
+	useExistingTemplates,
 	useDefaultTemplateTypes,
 	useTaxonomiesMenuItems,
 	usePostTypeMenuItems,
@@ -211,9 +212,7 @@ function NewTemplateModal( { onClose } ) {
 					status: 'publish',
 					title,
 					// This adds a post meta field in template that is part of `is_custom` value calculation.
-					meta: {
-						is_wp_suggestion: isWPSuggestion,
-					},
+					is_wp_suggestion: isWPSuggestion,
 				},
 				{ throwOnError: true }
 			);
@@ -389,9 +388,15 @@ function NewTemplate() {
 }
 
 function useMissingTemplates( setEntityForSuggestions, onClick ) {
+	const existingTemplates = useExistingTemplates();
 	const defaultTemplateTypes = useDefaultTemplateTypes();
+	const existingTemplateSlugs = ( existingTemplates || [] ).map(
+		( { slug } ) => slug
+	);
 	const missingDefaultTemplates = ( defaultTemplateTypes || [] ).filter(
-		( template ) => DEFAULT_TEMPLATE_SLUGS.includes( template.slug )
+		( template ) =>
+			DEFAULT_TEMPLATE_SLUGS.includes( template.slug ) &&
+			! existingTemplateSlugs.includes( template.slug )
 	);
 	const onClickMenuItem = ( _entityForSuggestions ) => {
 		onClick?.();

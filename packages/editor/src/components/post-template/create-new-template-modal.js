@@ -99,7 +99,6 @@ export default function CreateNewTemplateModal( { onClose } ) {
 			slug: kebabCase( title || DEFAULT_TITLE ) || 'wp-custom-template',
 			content: newTemplateContent,
 			title: title || DEFAULT_TITLE,
-			status: 'publish',
 		} );
 
 		setIsBusy( false );

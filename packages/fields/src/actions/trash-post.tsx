@@ -18,7 +18,7 @@ import type { Action } from '@wordpress/dataviews';
 /**
  * Internal dependencies
  */
-import { getItemTitle } from './utils';
+import { getItemTitle, isTemplateOrTemplatePart } from './utils';
 import type { CoreDataError, PostWithPermissions } from '../types';
 
 const trashPost: Action< PostWithPermissions > = {
@@ -27,12 +27,7 @@ const trashPost: Action< PostWithPermissions > = {
 	isPrimary: true,
 	icon: trash,
 	isEligible( item ) {
-		if ( item.type === 'wp_template_part' || item.type === 'wp_block' ) {
-			return false;
-		}
-
-		// Non-database template cannot be trashed.
-		if ( item.type === 'wp_template' && typeof item.id === 'string' ) {
+		if ( isTemplateOrTemplatePart( item ) || item.type === 'wp_block' ) {
 			return false;
 		}
 

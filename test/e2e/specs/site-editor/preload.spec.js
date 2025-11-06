@@ -31,9 +31,7 @@ test.describe( 'Preload', () => {
 				const urlObject = new URL( url );
 				const restRoute = urlObject.searchParams.get( 'rest_route' );
 				if ( restRoute ) {
-					urlObject.searchParams.delete( 'rest_route' );
-					urlObject.searchParams.delete( '_locale' );
-					requests.push( restRoute + urlObject.search );
+					requests.push( restRoute );
 				} else {
 					requests.push( url );
 				}

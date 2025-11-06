@@ -357,6 +357,7 @@ export const getEntityRecord = createSelector(
 		query?: GetRecordsHttpQuery
 	): EntityRecord | undefined => {
 		logEntityDeprecation( kind, name, 'getEntityRecord' );
+
 		const queriedState =
 			state.entities.records?.[ kind ]?.[ name ]?.queriedData;
 		if ( ! queriedState ) {

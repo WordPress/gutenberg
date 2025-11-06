@@ -282,8 +282,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			setEditedPost,
 			setRenderingMode,
 		} = unlock( useDispatch( editorStore ) );
-		const { createWarningNotice, removeNotice } =
-			useDispatch( noticesStore );
+		const { createWarningNotice } = useDispatch( noticesStore );
 
 		// Ideally this should be synced on each change and not just something you do once.
 		useLayoutEffect( () => {
@@ -319,9 +318,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		// Synchronizes the active post with the state
 		useEffect( () => {
 			setEditedPost( post.type, post.id );
-			// Clear any notices dependent on the post context.
-			removeNotice( 'template-activate-notice' );
-		}, [ post.type, post.id, setEditedPost, removeNotice ] );
+		}, [ post.type, post.id, setEditedPost ] );
 
 		// Synchronize the editor settings as they change.
 		useEffect( () => {
