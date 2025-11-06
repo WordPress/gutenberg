@@ -5,9 +5,5 @@
 		"types": [ "node" ]
 	},
 	"include": [ "src", "typings" ],
-	"references": [
-		{ "path": "../block-editor" },
-		{ "path": "../hooks" },
-		{ "path": "../url" }
-	]
+	"references": [ { "path": "../hooks" }, { "path": "../url" } ]
 }
