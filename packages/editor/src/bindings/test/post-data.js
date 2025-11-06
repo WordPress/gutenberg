@@ -144,7 +144,6 @@ describe( 'post-data bindings', () => {
 								return {};
 							}
 							return {
-								date: '2021-02-03',
 								link: 'https://example.com/page',
 							};
 						},
@@ -155,7 +154,10 @@ describe( 'post-data bindings', () => {
 					select,
 					context: { postId: 123, postType: 'post' },
 					bindings: {
-						url: { args: { field: 'link' } },
+						url: {
+							source: 'core/post-date',
+							args: { field: 'link' },
+						},
 					},
 					clientId: 'client-1',
 				} );
