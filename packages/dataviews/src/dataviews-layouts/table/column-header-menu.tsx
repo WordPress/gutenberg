@@ -28,6 +28,7 @@ import type {
 	Operator,
 } from '../../types';
 import DataViewsContext from '../../components/dataviews-context';
+import getHiddenFields from '../../utils/get-hidden-fields';
 
 const { Menu } = unlock( componentsPrivateApis );
 
@@ -102,19 +103,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 		return header;
 	}
 
-	// Calculate hidden fields that can be inserted.
-	const togglableFields = [
-		view?.titleField,
-		view?.mediaField,
-		view?.descriptionField,
-	].filter( Boolean );
-	const hiddenFields = fields.filter(
-		( f ) =>
-			! visibleFieldIds.includes( f.id ) &&
-			! togglableFields.includes( f.id ) &&
-			f.type !== 'media' &&
-			f.enableHiding !== false
-	);
+	const hiddenFields = getHiddenFields( view, fields );
 
 	return (
 		<Menu>
