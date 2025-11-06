@@ -158,12 +158,6 @@
 	}
 }
 
-// Pattern overrides indicator popover
-.block-editor-block-toolbar__pattern-overrides-popover .components-popover__content {
-	min-width: 260px;
-	padding: $grid-unit-20;
-}
-
 .block-editor-block-toolbar,
 .block-editor-rich-text__inline-format-toolbar-group {
 	// Override Toolbar buttons size.
