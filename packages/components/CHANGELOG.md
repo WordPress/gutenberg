@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   `Badge`: Add max-width for text truncation ([#72653](https://github.com/WordPress/gutenberg/pull/72653)).
+-   `Button`: Revert disabled primary button state to its previous one ([#73037](https://github.com/WordPress/gutenberg/pull/73037)).
 
 ## 30.6.0 (2025-10-17)
 
