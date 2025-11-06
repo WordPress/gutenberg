@@ -167,10 +167,6 @@ test.describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.type( 'You say goodbye' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '## Hello, hello' );
-		// Wait for the heading block to be created
-		await expect(
-			editor.canvas.getByRole( 'document', { name: 'Block: Heading' } )
-		).toBeVisible();
 
 		// Open list view and return to the first block.
 		await pageUtils.pressKeys( 'access+o' );
@@ -223,11 +219,6 @@ test.describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.type( 'just a paragraph' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/spacer' );
-		await expect(
-			page.getByRole( 'option', { name: 'Spacer', exact: true } )
-		).toBeVisible();
-		// Small delay to ensure autocomplete is fully ready
-		await page.waitForTimeout( 100 );
 		await page.keyboard.press( 'Enter' );
 
 		// Verify group block contents.
