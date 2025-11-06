@@ -1322,6 +1322,96 @@
 		},
 		"description": "Accessible stroke color applied to focus rings."
 	},
+	"Dimension/_Primitives/space-0": {
+		"value": {
+			".": "0"
+		},
+		"description": "Empty space"
+	},
+	"Dimension/_Primitives/space-10": {
+		"value": {
+			".": "4px"
+		},
+		"description": "1x base spacing"
+	},
+	"Dimension/_Primitives/space-20": {
+		"value": {
+			".": "8px"
+		},
+		"description": "2x base spacing"
+	},
+	"Dimension/_Primitives/space-30": {
+		"value": {
+			".": "12px"
+		},
+		"description": "3x base spacing"
+	},
+	"Dimension/_Primitives/space-40": {
+		"value": {
+			".": "16px"
+		},
+		"description": "4x base spacing"
+	},
+	"Dimension/_Primitives/space-50": {
+		"value": {
+			".": "20px"
+		},
+		"description": "5x base spacing"
+	},
+	"Dimension/_Primitives/space-60": {
+		"value": {
+			".": "24px"
+		},
+		"description": "6x base spacing"
+	},
+	"Dimension/_Primitives/space-70": {
+		"value": {
+			".": "32px"
+		},
+		"description": "8x base spacing"
+	},
+	"Dimension/_Primitives/space-80": {
+		"value": {
+			".": "40px"
+		},
+		"description": "10x base spacing"
+	},
+	"Dimension/_Primitives/space-90": {
+		"value": {
+			".": "48px"
+		},
+		"description": "12x base spacing"
+	},
+	"Dimension/Semantic/base": {
+		"value": {
+			".": "{Dimension/_Primitives/space-10}"
+		},
+		"description": "Base dimension unit"
+	},
+	"Dimension/Semantic/padding-surface-x-small": {
+		"value": {
+			".": "{Dimension/_Primitives/space-20}"
+		},
+		"description": "Extra small spacing for surfaces"
+	},
+	"Dimension/Semantic/padding-surface-small": {
+		"value": {
+			".": "{Dimension/_Primitives/space-30}"
+		},
+		"description": "Small spacing for surfaces"
+	},
+	"Dimension/Semantic/padding-surface-medium": {
+		"value": {
+			".": "{Dimension/_Primitives/space-40}"
+		},
+		"description": "Medium spacing for surfaces"
+	},
+	"Dimension/Semantic/padding-surface-large": {
+		"value": {
+			".": "{Dimension/_Primitives/space-60}"
+		},
+		"description": "Large spacing for surfaces"
+	},
 	"Elevation/x-small": {
 		"value": {
 			".": "0 1px 1px 0 color(srgb 0 0 0 / 0.03), 0 1px 2px 0 color(srgb 0 0 0 / 0.02), 0 3px 3px 0 color(srgb 0 0 0 / 0.02), 0 4px 4px 0 color(srgb 0 0 0 / 0.01)"
@@ -1345,96 +1435,6 @@
 			".": "0 5px 15px 0 color(srgb 0 0 0 / 0.08), 0 15px 27px 0 color(srgb 0 0 0 / 0.07), 0 30px 36px 0 color(srgb 0 0 0 / 0.04), 0 50px 43px 0 color(srgb 0 0 0 / 0.02)"
 		},
 		"description": "For components that confirm decisions or handle necessary interruptions. Example: Modals."
-	},
-	"Spacing/_Primitives/05": {
-		"value": {
-			".": "4px"
-		},
-		"description": "1x base spacing"
-	},
-	"Spacing/_Primitives/10": {
-		"value": {
-			".": "8px"
-		},
-		"description": "2x base spacing"
-	},
-	"Spacing/_Primitives/15": {
-		"value": {
-			".": "12px"
-		},
-		"description": "3x base spacing"
-	},
-	"Spacing/_Primitives/20": {
-		"value": {
-			".": "16px"
-		},
-		"description": "4x base spacing"
-	},
-	"Spacing/_Primitives/30": {
-		"value": {
-			".": "24px"
-		},
-		"description": "6x base spacing"
-	},
-	"Spacing/_Primitives/40": {
-		"value": {
-			".": "32px"
-		},
-		"description": "8x base spacing"
-	},
-	"Spacing/_Primitives/50": {
-		"value": {
-			".": "40px"
-		},
-		"description": "10x base spacing"
-	},
-	"Spacing/_Primitives/60": {
-		"value": {
-			".": "48px"
-		},
-		"description": "12x base spacing"
-	},
-	"Spacing/_Primitives/70": {
-		"value": {
-			".": "56px"
-		},
-		"description": "14x base spacing"
-	},
-	"Spacing/_Primitives/80": {
-		"value": {
-			".": "64px"
-		},
-		"description": "16x base spacing"
-	},
-	"Spacing/Semantic/base": {
-		"value": {
-			".": "{Spacing/_Primitives/05}"
-		},
-		"description": "Base spacing unit"
-	},
-	"Spacing/Semantic/padding-surface-x-small": {
-		"value": {
-			".": "{Spacing/_Primitives/05}"
-		},
-		"description": "Extra small spacing for surfaces"
-	},
-	"Spacing/Semantic/padding-surface-small": {
-		"value": {
-			".": "{Spacing/_Primitives/10}"
-		},
-		"description": "Small spacing for surfaces"
-	},
-	"Spacing/Semantic/padding-surface-medium": {
-		"value": {
-			".": "{Spacing/_Primitives/20}"
-		},
-		"description": "Medium spacing for surfaces"
-	},
-	"Spacing/Semantic/padding-surface-large": {
-		"value": {
-			".": "{Spacing/_Primitives/30}"
-		},
-		"description": "Large spacing for surfaces"
 	},
 	"Font/family-heading": {
 		"value": {

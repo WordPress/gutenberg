@@ -40,8 +40,8 @@ const getSpacingValue = (
 	value: number | string
 ): string =>
 	typeof value === 'number'
-		? `calc(var(--wpds-spacing-base) * ${ value })`
-		: `var(--wpds-spacing-${ property }-${ family }-${ value }, var(--wpds-spacing-${ property }-surface-${ value }))`;
+		? `calc(var(--wpds-dimension-base) * ${ value })`
+		: `var(--wpds-dimension-${ property }-${ family }-${ value }, var(--wpds-dimension-${ property }-surface-${ value }))`;
 
 /**
  * Generates CSS styles for properties with optionally directional values,

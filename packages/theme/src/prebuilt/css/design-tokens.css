@@ -415,6 +415,31 @@
 	--wpds-color-stroke-surface-warning-strong: var(
 		--wpds-color-private-warning-stroke3
 	); /* Decorative stroke color used to define warning-toned surface boundaries with strong emphasis. */
+	--wpds-dimension-base: var(
+		--wpds-dimension-private-space-10
+	); /* Base dimension unit */
+	--wpds-dimension-padding-surface-large: var(
+		--wpds-dimension-private-space-60
+	); /* Large spacing for surfaces */
+	--wpds-dimension-padding-surface-medium: var(
+		--wpds-dimension-private-space-40
+	); /* Medium spacing for surfaces */
+	--wpds-dimension-padding-surface-small: var(
+		--wpds-dimension-private-space-30
+	); /* Small spacing for surfaces */
+	--wpds-dimension-padding-surface-x-small: var(
+		--wpds-dimension-private-space-20
+	); /* Extra small spacing for surfaces */
+	--wpds-dimension-private-space-0: 0; /* Empty space */
+	--wpds-dimension-private-space-10: 4px; /* 1x base spacing */
+	--wpds-dimension-private-space-20: 8px; /* 2x base spacing */
+	--wpds-dimension-private-space-30: 12px; /* 3x base spacing */
+	--wpds-dimension-private-space-40: 16px; /* 4x base spacing */
+	--wpds-dimension-private-space-50: 20px; /* 5x base spacing */
+	--wpds-dimension-private-space-60: 24px; /* 6x base spacing */
+	--wpds-dimension-private-space-70: 32px; /* 8x base spacing */
+	--wpds-dimension-private-space-80: 40px; /* 10x base spacing */
+	--wpds-dimension-private-space-90: 48px; /* 12x base spacing */
 	--wpds-elevation-large: 0 5px 15px 0 #00000014, 0 15px 27px 0 #00000012,
 		0 30px 36px 0 #0000000a, 0 50px 43px 0 #00000005; /* For components that confirm decisions or handle necessary interruptions. Example: Modals. */
 	--wpds-elevation-medium: 0 2px 3px 0 #0000000d, 0 4px 5px 0 #0000000a,
@@ -440,31 +465,6 @@
 	--wpds-font-size-small: 12px; /* Small font size */
 	--wpds-font-size-x-large: 20px; /* Extra large font size */
 	--wpds-font-size-x-small: 11px; /* Extra small font size */
-	--wpds-spacing-base: var(
-		--wpds-spacing-private-05
-	); /* Base spacing unit */
-	--wpds-spacing-padding-surface-large: var(
-		--wpds-spacing-private-30
-	); /* Large spacing for surfaces */
-	--wpds-spacing-padding-surface-medium: var(
-		--wpds-spacing-private-20
-	); /* Medium spacing for surfaces */
-	--wpds-spacing-padding-surface-small: var(
-		--wpds-spacing-private-10
-	); /* Small spacing for surfaces */
-	--wpds-spacing-padding-surface-x-small: var(
-		--wpds-spacing-private-05
-	); /* Extra small spacing for surfaces */
-	--wpds-spacing-private-05: 4px; /* 1x base spacing */
-	--wpds-spacing-private-10: 8px; /* 2x base spacing */
-	--wpds-spacing-private-15: 12px; /* 3x base spacing */
-	--wpds-spacing-private-20: 16px; /* 4x base spacing */
-	--wpds-spacing-private-30: 24px; /* 6x base spacing */
-	--wpds-spacing-private-40: 32px; /* 8x base spacing */
-	--wpds-spacing-private-50: 40px; /* 10x base spacing */
-	--wpds-spacing-private-60: 48px; /* 12x base spacing */
-	--wpds-spacing-private-70: 56px; /* 14x base spacing */
-	--wpds-spacing-private-80: 64px; /* 16x base spacing */
 }
 
 @media ( -webkit-min-device-pixel-ratio: 2 ), ( min-resolution: 192dpi ) {

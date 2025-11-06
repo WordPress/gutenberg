@@ -109,6 +109,16 @@ Do not edit directly.
 | `--wpds-color-stroke-interactive-error-strong`        | Accessible stroke color used for interactive error-toned elements with strong emphasis.                                                     |
 | `--wpds-color-stroke-focus-brand`                     | Accessible stroke color applied to focus rings.                                                                                             |
 
+### Dimension
+
+| Variable name                              | Description                      |
+| ------------------------------------------ | -------------------------------- |
+| `--wpds-dimension-base`                    | Base dimension unit              |
+| `--wpds-dimension-padding-surface-x-small` | Extra small spacing for surfaces |
+| `--wpds-dimension-padding-surface-small`   | Small spacing for surfaces       |
+| `--wpds-dimension-padding-surface-medium`  | Medium spacing for surfaces      |
+| `--wpds-dimension-padding-surface-large`   | Large spacing for surfaces       |
+
 ### Elevation
 
 | Variable name              | Description                                                                                                                       |
@@ -117,16 +127,6 @@ Do not edit directly.
 | `--wpds-elevation-small`   | For components that provide contextual feedback without being intrusive. Generally non-interruptive. Example: Tooltips, Snackbar. |
 | `--wpds-elevation-medium`  | For components that offer additional actions. Example: Menus, Command Palette                                                     |
 | `--wpds-elevation-large`   | For components that confirm decisions or handle necessary interruptions. Example: Modals.                                         |
-
-### Spacing
-
-| Variable name                            | Description                      |
-| ---------------------------------------- | -------------------------------- |
-| `--wpds-spacing-base`                    | Base spacing unit                |
-| `--wpds-spacing-padding-surface-x-small` | Extra small spacing for surfaces |
-| `--wpds-spacing-padding-surface-small`   | Small spacing for surfaces       |
-| `--wpds-spacing-padding-surface-medium`  | Medium spacing for surfaces      |
-| `--wpds-spacing-padding-surface-large`   | Large spacing for surfaces       |
 
 ### Typography
 
@@ -311,17 +311,17 @@ Do not edit directly.
 | `--wpds-color-private-caution-fg-fill-inverted`  | N/A         |
 | `--wpds-color-private-caution-surface1`          | N/A         |
 
-### Spacing (private)
+### Dimension (private)
 
-| Variable name               | Description      |
-| --------------------------- | ---------------- |
-| `--wpds-spacing-private-05` | 1x base spacing  |
-| `--wpds-spacing-private-10` | 2x base spacing  |
-| `--wpds-spacing-private-15` | 3x base spacing  |
-| `--wpds-spacing-private-20` | 4x base spacing  |
-| `--wpds-spacing-private-30` | 6x base spacing  |
-| `--wpds-spacing-private-40` | 8x base spacing  |
-| `--wpds-spacing-private-50` | 10x base spacing |
-| `--wpds-spacing-private-60` | 12x base spacing |
-| `--wpds-spacing-private-70` | 14x base spacing |
-| `--wpds-spacing-private-80` | 16x base spacing |
+| Variable name                       | Description      |
+| ----------------------------------- | ---------------- |
+| `--wpds-dimension-private-space-0`  | Empty space      |
+| `--wpds-dimension-private-space-10` | 1x base spacing  |
+| `--wpds-dimension-private-space-20` | 2x base spacing  |
+| `--wpds-dimension-private-space-30` | 3x base spacing  |
+| `--wpds-dimension-private-space-40` | 4x base spacing  |
+| `--wpds-dimension-private-space-50` | 5x base spacing  |
+| `--wpds-dimension-private-space-60` | 6x base spacing  |
+| `--wpds-dimension-private-space-70` | 8x base spacing  |
+| `--wpds-dimension-private-space-80` | 10x base spacing |
+| `--wpds-dimension-private-space-90` | 12x base spacing |

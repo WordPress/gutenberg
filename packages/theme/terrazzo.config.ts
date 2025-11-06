@@ -15,8 +15,8 @@ export default defineConfig( {
 	tokens: [
 		'./tokens/border.json',
 		'./tokens/color.json',
+		'./tokens/dimension.json',
 		'./tokens/elevation.json',
-		'./tokens/spacing.json',
 		'./tokens/typography.json',
 	],
 	outDir: './src/prebuilt',

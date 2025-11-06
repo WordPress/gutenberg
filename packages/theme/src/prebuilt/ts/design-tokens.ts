@@ -281,6 +281,21 @@ export default {
 	'--wpds-color-stroke-focus-brand': {
 		'.': 'var(--wpds-color-private-primary-stroke3)',
 	},
+	'--wpds-dimension-base': {
+		'.': 'var(--wpds-dimension-private-space-10)',
+	},
+	'--wpds-dimension-padding-surface-x-small': {
+		'.': 'var(--wpds-dimension-private-space-20)',
+	},
+	'--wpds-dimension-padding-surface-small': {
+		'.': 'var(--wpds-dimension-private-space-30)',
+	},
+	'--wpds-dimension-padding-surface-medium': {
+		'.': 'var(--wpds-dimension-private-space-40)',
+	},
+	'--wpds-dimension-padding-surface-large': {
+		'.': 'var(--wpds-dimension-private-space-60)',
+	},
 	'--wpds-elevation-x-small': {
 		'.': '0 1px 1px 0 #00000008, 0 1px 2px 0 #00000005, 0 3px 3px 0 #00000005, 0 4px 4px 0 #00000003',
 	},
@@ -292,21 +307,6 @@ export default {
 	},
 	'--wpds-elevation-large': {
 		'.': '0 5px 15px 0 #00000014, 0 15px 27px 0 #00000012, 0 30px 36px 0 #0000000a, 0 50px 43px 0 #00000005',
-	},
-	'--wpds-spacing-base': {
-		'.': 'var(--wpds-spacing-private-05)',
-	},
-	'--wpds-spacing-padding-surface-x-small': {
-		'.': 'var(--wpds-spacing-private-05)',
-	},
-	'--wpds-spacing-padding-surface-small': {
-		'.': 'var(--wpds-spacing-private-10)',
-	},
-	'--wpds-spacing-padding-surface-medium': {
-		'.': 'var(--wpds-spacing-private-20)',
-	},
-	'--wpds-spacing-padding-surface-large': {
-		'.': 'var(--wpds-spacing-private-30)',
 	},
 	'--wpds-font-family-heading': {
 		'.': '-apple-system, system-ui, "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", sans-serif',
