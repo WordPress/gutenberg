@@ -170,16 +170,7 @@ function CoverEdit( {
 			} );
 		} )();
 		// Update the block only when the featured image changes.
-	}, [
-		useFeaturedImage,
-		mediaUrl,
-		overlayColor.color,
-		isUserOverlayColor,
-		dimRatio,
-		__unstableMarkNextChangeAsNotPersistent,
-		setOverlayColor,
-		setAttributes,
-	] );
+	}, [ mediaUrl ] );
 
 	// instead of destructuring the attributes
 	// we define the url and background type
@@ -290,7 +281,6 @@ function CoverEdit( {
 			isRepeated: undefined,
 			useFeaturedImage: undefined,
 			embedProvider: undefined,
-			embedSrc: undefined,
 			isDark: newIsDark,
 		} );
 	};
@@ -343,7 +333,6 @@ function CoverEdit( {
 			url: embedUrl,
 			backgroundType: EMBED_VIDEO_BACKGROUND_TYPE,
 			embedProvider: provider,
-			embedSrc: undefined, // Clear old embedSrc to allow useEffect to process new URL
 			dimRatio: newDimRatio,
 			id: undefined,
 			focalPoint: undefined,
@@ -354,7 +343,7 @@ function CoverEdit( {
 	};
 
 	// Fetch embed preview for embed videos
-	const { embedProvider, embedSrc: currentEmbedSrc } = attributes;
+	const { embedProvider } = attributes;
 	const { embedPreview, isFetchingEmbed } = useSelect(
 		( select ) => {
 			if ( backgroundType !== EMBED_VIDEO_BACKGROUND_TYPE || ! url ) {
@@ -375,38 +364,24 @@ function CoverEdit( {
 		[ url, backgroundType ]
 	);
 
-	// Process embed preview and update embedSrc attribute
-	useEffect( () => {
+	// Compute embedSrc on-the-fly from embed preview for editor display
+	const embedSrc = useMemo( () => {
 		if (
 			backgroundType !== EMBED_VIDEO_BACKGROUND_TYPE ||
-			! embedPreview?.html ||
-			currentEmbedSrc
+			! embedPreview?.html
 		) {
-			return;
+			return null;
 		}
 
 		// Extract iframe src from embed HTML
 		const iframeSrc = getIframeSrc( embedPreview.html );
 		if ( ! iframeSrc ) {
-			return;
+			return null;
 		}
 
 		// Modify the src to add background video parameters
-		const backgroundVideoSrc = getBackgroundVideoSrc(
-			iframeSrc,
-			embedProvider
-		);
-
-		setAttributes( {
-			embedSrc: backgroundVideoSrc,
-		} );
-	}, [
-		embedPreview,
-		backgroundType,
-		embedProvider,
-		currentEmbedSrc,
-		setAttributes,
-	] );
+		return getBackgroundVideoSrc( iframeSrc, embedProvider );
+	}, [ embedPreview, backgroundType, embedProvider ] );
 
 	const isUploadingMedia = isTemporaryMedia( id, url );
 
@@ -692,23 +667,23 @@ function CoverEdit( {
 						style={ mediaStyle }
 					/>
 				) }
-				{ isEmbedVideoBackground && currentEmbedSrc && (
+				{ isEmbedVideoBackground && embedSrc && (
 					<div
 						ref={ mediaElement }
 						className="wp-block-cover__video-background wp-block-cover__embed-background"
 						style={ mediaStyle }
 					>
 						<iframe
-							src={ currentEmbedSrc }
+							src={ embedSrc }
 							title="Background video"
 							frameBorder="0"
 							allow="autoplay; fullscreen"
 						/>
 					</div>
 				) }
-				{ isEmbedVideoBackground &&
-					! currentEmbedSrc &&
-					isFetchingEmbed && <Spinner /> }
+				{ isEmbedVideoBackground && ! embedSrc && isFetchingEmbed && (
+					<Spinner />
+				) }
 
 				{ showOverlay && (
 					<span

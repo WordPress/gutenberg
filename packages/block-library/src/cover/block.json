@@ -88,9 +88,6 @@
 		},
 		"embedProvider": {
 			"type": "string"
-		},
-		"embedSrc": {
-			"type": "string"
 		}
 	},
 	"usesContext": [ "postId", "postType" ],
