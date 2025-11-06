@@ -26,8 +26,8 @@
 - DataViews: Simplify the view config properties section. [#73064](https://github.com/WordPress/gutenberg/pull/73064)
 - DataViews: Add a contextual menu to the table layout header. [#73104](https://github.com/WordPress/gutenberg/pull/73104)
 - DataViewsPicker: Add table layout support. [#72914](https://github.com/WordPress/gutenberg/pull/72914)
-- DataForm: use envelope icon instead of atSymbol for email control component. [#73184](https://github.com/WordPress/gutenberg/pull/73184)
 - DataViews: Group DataViews actions based on primary actions and regular actions and adds a separator between the groups. [#72866](https://github.com/WordPress/gutenberg/pull/72866)
+- DataViews: add support for timeline layout. [#72780](https://github.com/WordPress/gutenberg/pull/72780)
 
 ### Bug fixes
 
