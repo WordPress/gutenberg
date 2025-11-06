@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import type { ChangeEvent, ReactNode } from 'react';
-import clsx from 'clsx';
+import type { ChangeEvent } from 'react';
 
 /**
  * WordPress dependencies
@@ -26,17 +25,9 @@ import {
 	BaseControl,
 	Icon,
 } from '@wordpress/components';
-import { __, _x, sprintf } from '@wordpress/i18n';
-import { memo, useContext, useMemo, useState } from '@wordpress/element';
-import {
-	chevronDown,
-	chevronUp,
-	cog,
-	seen,
-	unseen,
-	lock,
-	moreVertical,
-} from '@wordpress/icons';
+import { __, _x } from '@wordpress/i18n';
+import { memo, useContext, useMemo } from '@wordpress/element';
+import { cog, check } from '@wordpress/icons';
 import warning from '@wordpress/warning';
 import { useInstanceId } from '@wordpress/compose';
 
@@ -261,287 +252,24 @@ function ItemsPerPageControl() {
 	);
 }
 
-function PreviewOptions( {
-	previewOptions,
-	onChangePreviewOption,
-	onMenuOpenChange,
-	activeOption,
-}: {
-	previewOptions?: Array< { label: string; id: string } >;
-	onChangePreviewOption?: ( newPreviewOption: string ) => void;
-	onMenuOpenChange: ( isOpen: boolean ) => void;
-	activeOption?: string;
-} ) {
-	const focusPreviewOptionsField = ( id: string ) => {
-		// Focus the visibility button to avoid focus loss.
-		// Our code is safe against the component being unmounted, so we don't need to worry about cleaning the timeout.
-		// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
-		setTimeout( () => {
-			const element = document.querySelector(
-				`.dataviews-field-control__field-${ id } .dataviews-field-control__field-preview-options-button`
-			);
-			if ( element instanceof HTMLElement ) {
-				element.focus();
-			}
-		}, 50 );
-	};
-	return (
-		<Menu onOpenChange={ onMenuOpenChange }>
-			<Menu.TriggerButton
-				render={
-					<Button
-						className="dataviews-field-control__field-preview-options-button"
-						size="compact"
-						icon={ moreVertical }
-						label={ __( 'Preview' ) }
-					/>
-				}
-			/>
-			<Menu.Popover>
-				{ previewOptions?.map( ( { id, label } ) => {
-					return (
-						<Menu.RadioItem
-							key={ id }
-							value={ id }
-							checked={ id === activeOption }
-							onChange={ () => {
-								onChangePreviewOption?.( id );
-								focusPreviewOptionsField( id );
-							} }
-						>
-							<Menu.ItemLabel>{ label }</Menu.ItemLabel>
-						</Menu.RadioItem>
-					);
-				} ) }
-			</Menu.Popover>
-		</Menu>
-	);
-}
 function FieldItem( {
 	field,
-	label,
-	description,
 	isVisible,
-	isFirst,
-	isLast,
-	canMove = true,
 	onToggleVisibility,
-	onMoveUp,
-	onMoveDown,
-	previewOptions,
-	onChangePreviewOption,
 }: {
 	field: NormalizedField< any >;
-	label?: string;
-	description?: string;
 	isVisible: boolean;
-	isFirst?: boolean;
-	isLast?: boolean;
-	canMove?: boolean;
 	onToggleVisibility?: () => void;
-	onMoveUp?: () => void;
-	onMoveDown?: () => void;
-	previewOptions?: Array< { label: string; id: string } >;
-	onChangePreviewOption?: ( newPreviewOption: string ) => void;
 } ) {
-	const [ isChangingPreviewOption, setIsChangingPreviewOption ] =
-		useState< boolean >( false );
-
-	const focusVisibilityField = () => {
-		// Focus the visibility button to avoid focus loss.
-		// Our code is safe against the component being unmounted, so we don't need to worry about cleaning the timeout.
-		// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
-		setTimeout( () => {
-			const element = document.querySelector(
-				`.dataviews-field-control__field-${ field.id } .dataviews-field-control__field-visibility-button`
-			);
-			if ( element instanceof HTMLElement ) {
-				element.focus();
-			}
-		}, 50 );
-	};
-
 	return (
-		<Item>
-			<HStack
-				expanded
-				className={ clsx(
-					'dataviews-field-control__field',
-					`dataviews-field-control__field-${ field.id }`,
-					// The actions are hidden when the mouse is not hovering the item, or focus
-					// is outside the item.
-					// For actions that require a popover, a menu etc, that would mean that when the interactive element
-					// opens and the focus goes there the actions would be hidden.
-					// To avoid that we add a class to the item, that makes sure actions are visible while there is some
-					// interaction with the item.
-					{ 'is-interacting': isChangingPreviewOption }
-				) }
-				justify="flex-start"
-			>
-				<span className="dataviews-field-control__icon">
-					{ ! canMove && ! field.enableHiding && (
-						<Icon icon={ lock } />
-					) }
-				</span>
-				<span className="dataviews-field-control__label-sub-label-container">
-					<span className="dataviews-field-control__label">
-						{ label || field.label }
-					</span>
-					{ description && (
-						<span className="dataviews-field-control__sub-label">
-							{ description }
-						</span>
-					) }
-				</span>
-				<HStack
-					justify="flex-end"
-					expanded={ false }
-					className="dataviews-field-control__actions"
-				>
-					{ isVisible && (
-						<>
-							<Button
-								disabled={ isFirst || ! canMove }
-								accessibleWhenDisabled
-								size="compact"
-								onClick={ onMoveUp }
-								icon={ chevronUp }
-								label={
-									isFirst || ! canMove
-										? __( "This field can't be moved up" )
-										: sprintf(
-												/* translators: %s: field label */
-												__( 'Move %s up' ),
-												field.label
-										  )
-								}
-							/>
-							<Button
-								disabled={ isLast || ! canMove }
-								accessibleWhenDisabled
-								size="compact"
-								onClick={ onMoveDown }
-								icon={ chevronDown }
-								label={
-									isLast || ! canMove
-										? __( "This field can't be moved down" )
-										: sprintf(
-												/* translators: %s: field label */
-												__( 'Move %s down' ),
-												field.label
-										  )
-								}
-							/>
-						</>
-					) }
-					{ onToggleVisibility && (
-						<Button
-							className="dataviews-field-control__field-visibility-button"
-							disabled={ ! field.enableHiding }
-							accessibleWhenDisabled
-							size="compact"
-							onClick={ () => {
-								onToggleVisibility();
-								focusVisibilityField();
-							} }
-							icon={ isVisible ? unseen : seen }
-							label={
-								isVisible
-									? sprintf(
-											/* translators: %s: field label */
-											_x( 'Hide %s', 'field' ),
-											field.label
-									  )
-									: sprintf(
-											/* translators: %s: field label */
-											_x( 'Show %s', 'field' ),
-											field.label
-									  )
-							}
-						/>
-					) }
-					{ previewOptions && (
-						<PreviewOptions
-							previewOptions={ previewOptions }
-							onChangePreviewOption={ onChangePreviewOption }
-							onMenuOpenChange={ setIsChangingPreviewOption }
-							activeOption={ field.id }
-						/>
-					) }
-				</HStack>
+		<Item onClick={ field.enableHiding ? onToggleVisibility : undefined }>
+			<HStack expanded justify="flex-start" alignment="center">
+				<div style={ { height: 24, width: 24 } }>
+					{ isVisible && <Icon icon={ check } /> }
+				</div>
+				<span>{ field.label }</span>
 			</HStack>
 		</Item>
-	);
-}
-
-function RegularFieldItem( {
-	index,
-	field,
-	view,
-	onChangeView,
-}: {
-	index?: number;
-	field: NormalizedField< any >;
-	view: View;
-	onChangeView: ( view: View ) => void;
-} ) {
-	const visibleFieldIds = view.fields ?? [];
-	const isVisible =
-		index !== undefined && visibleFieldIds.includes( field.id );
-
-	return (
-		<FieldItem
-			field={ field }
-			isVisible={ isVisible }
-			isFirst={ index !== undefined && index < 1 }
-			isLast={
-				index !== undefined && index === visibleFieldIds.length - 1
-			}
-			onToggleVisibility={ () => {
-				onChangeView( {
-					...view,
-					fields: isVisible
-						? visibleFieldIds.filter(
-								( fieldId ) => fieldId !== field.id
-						  )
-						: [ ...visibleFieldIds, field.id ],
-				} );
-			} }
-			onMoveUp={
-				index !== undefined
-					? () => {
-							onChangeView( {
-								...view,
-								fields: [
-									...( visibleFieldIds.slice(
-										0,
-										index - 1
-									) ?? [] ),
-									field.id,
-									visibleFieldIds[ index - 1 ],
-									...visibleFieldIds.slice( index + 1 ),
-								],
-							} );
-					  }
-					: undefined
-			}
-			onMoveDown={
-				index !== undefined
-					? () => {
-							onChangeView( {
-								...view,
-								fields: [
-									...( visibleFieldIds.slice( 0, index ) ??
-										[] ),
-									visibleFieldIds[ index + 1 ],
-									field.id,
-									...visibleFieldIds.slice( index + 2 ),
-								],
-							} );
-					  }
-					: undefined
-			}
-		/>
 	);
 }
 
@@ -557,19 +285,16 @@ function FieldControl() {
 		view?.mediaField,
 		view?.descriptionField,
 	].filter( Boolean );
-	const visibleFieldIds = view.fields ?? [];
-	const hiddenFields = fields.filter(
+
+	// Get all regular fields (non-locked) in their original order from fields prop
+	const regularFields = fields.filter(
 		( f ) =>
-			! visibleFieldIds.includes( f.id ) &&
 			! togglableFields.includes( f.id ) &&
 			f.type !== 'media' &&
 			f.enableHiding !== false
 	);
-	let visibleFields = visibleFieldIds
-		.map( ( fieldId ) => fields.find( ( f ) => f.id === fieldId ) )
-		.filter( isDefined );
 
-	if ( ! visibleFields?.length && ! hiddenFields?.length ) {
+	if ( ! regularFields?.length ) {
 		return null;
 	}
 	const titleField = fields.find( ( f ) => f.id === view.titleField );
@@ -578,36 +303,6 @@ function FieldControl() {
 		( f ) => f.id === view.descriptionField
 	);
 
-	const previewFields = fields.filter( ( f ) => f.type === 'media' );
-
-	let previewFieldUI;
-	if ( previewFields.length > 1 ) {
-		const isPreviewFieldVisible =
-			isDefined( previewField ) && ( view.showMedia ?? true );
-		previewFieldUI = isDefined( previewField ) && (
-			<FieldItem
-				key={ previewField.id }
-				field={ previewField }
-				label={ __( 'Preview' ) }
-				description={ previewField.label }
-				isVisible={ isPreviewFieldVisible }
-				onToggleVisibility={ () => {
-					onChangeView( {
-						...view,
-						showMedia: ! isPreviewFieldVisible,
-					} );
-				} }
-				canMove={ false }
-				previewOptions={ previewFields.map( ( field ) => ( {
-					label: field.label,
-					id: field.id,
-				} ) ) }
-				onChangePreviewOption={ ( newPreviewId ) =>
-					onChangeView( { ...view, mediaField: newPreviewId } )
-				}
-			/>
-		);
-	}
 	const lockedFields = [
 		{
 			field: titleField,
@@ -616,13 +311,17 @@ function FieldControl() {
 		{
 			field: previewField,
 			isVisibleFlag: 'showMedia',
-			ui: previewFieldUI,
 		},
 		{
 			field: descriptionField,
 			isVisibleFlag: 'showDescription',
 		},
 	].filter( ( { field } ) => isDefined( field ) );
+	const visibleFieldIds = view.fields ?? [];
+	const visibleRegularFieldsCount = regularFields.filter( ( f ) =>
+		visibleFieldIds.includes( f.id )
+	).length;
+
 	let visibleLockedFields = lockedFields.filter(
 		( { field, isVisibleFlag } ) =>
 			// @ts-expect-error
@@ -630,20 +329,18 @@ function FieldControl() {
 	) as Array< {
 		field: NormalizedField< any >;
 		isVisibleFlag: string;
-		ui?: ReactNode;
 	} >;
 
-	// If only one locked field is visible, prevent it from being hidden.
-	if ( visibleLockedFields.length === 1 ) {
-		visibleLockedFields = visibleLockedFields.map( ( locked ) => ( {
-			...locked,
-			field: { ...locked.field, enableHiding: false },
-		} ) );
-	}
-
-	// If no locked fields are visible but there are visibleFields, lock the last visible field.
-	if ( visibleLockedFields.length === 0 && visibleFields.length === 1 ) {
-		visibleFields = [ { ...visibleFields[ 0 ], enableHiding: false } ];
+	// If only one field (locked or regular) is visible, prevent it from being hidden
+	const totalVisibleFields =
+		visibleLockedFields.length + visibleRegularFieldsCount;
+	if ( totalVisibleFields === 1 ) {
+		if ( visibleLockedFields.length === 1 ) {
+			visibleLockedFields = visibleLockedFields.map( ( locked ) => ( {
+				...locked,
+				field: { ...locked.field, enableHiding: false },
+			} ) );
+		}
 	}
 
 	const hiddenLockedFields = lockedFields.filter(
@@ -653,93 +350,77 @@ function FieldControl() {
 	) as Array< {
 		field: NormalizedField< any >;
 		isVisibleFlag: string;
-		ui?: ReactNode;
 	} >;
 
 	return (
-		<VStack className="dataviews-field-control" spacing={ 6 }>
+		<VStack className="dataviews-field-control" spacing={ 0 }>
+			<BaseControl.VisualLabel>
+				{ __( 'Properties' ) }
+			</BaseControl.VisualLabel>
 			<VStack className="dataviews-view-config__properties" spacing={ 0 }>
-				{ ( visibleLockedFields.length > 0 ||
-					!! visibleFields?.length ) && (
-					<ItemGroup isBordered isSeparated>
-						{ visibleLockedFields.map(
-							( { field, isVisibleFlag, ui } ) => {
-								return (
-									ui ?? (
-										<FieldItem
-											key={ field.id }
-											field={ field }
-											isVisible
-											onToggleVisibility={ () => {
-												onChangeView( {
-													...view,
-													[ isVisibleFlag ]: false,
-												} );
-											} }
-											canMove={ false }
-										/>
-									)
-								);
-							}
-						) }
-
-						{ visibleFields.map( ( field, index ) => (
-							<RegularFieldItem
+				<ItemGroup isBordered isSeparated size="medium">
+					{ visibleLockedFields.map( ( { field, isVisibleFlag } ) => {
+						return (
+							<FieldItem
 								key={ field.id }
 								field={ field }
-								view={ view }
-								onChangeView={ onChangeView }
-								index={ index }
+								isVisible
+								onToggleVisibility={ () => {
+									onChangeView( {
+										...view,
+										[ isVisibleFlag ]: false,
+									} );
+								} }
 							/>
-						) ) }
-					</ItemGroup>
-				) }
-			</VStack>
+						);
+					} ) }
 
-			{ ( !! hiddenFields?.length || !! hiddenLockedFields.length ) && (
-				<VStack spacing={ 4 }>
-					<BaseControl.VisualLabel style={ { margin: 0 } }>
-						{ __( 'Hidden' ) }
-					</BaseControl.VisualLabel>
-					<VStack
-						className="dataviews-view-config__properties"
-						spacing={ 0 }
-					>
-						<ItemGroup isBordered isSeparated>
-							{ hiddenLockedFields.length > 0 &&
-								hiddenLockedFields.map(
-									( { field, isVisibleFlag, ui } ) => {
-										return (
-											ui ?? (
-												<FieldItem
-													key={ field.id }
-													field={ field }
-													isVisible={ false }
-													onToggleVisibility={ () => {
-														onChangeView( {
-															...view,
-															[ isVisibleFlag ]:
-																true,
-														} );
-													} }
-													canMove={ false }
-												/>
-											)
-										);
-									}
-								) }
-							{ hiddenFields.map( ( field ) => (
-								<RegularFieldItem
-									key={ field.id }
-									field={ field }
-									view={ view }
-									onChangeView={ onChangeView }
-								/>
-							) ) }
-						</ItemGroup>
-					</VStack>
-				</VStack>
-			) }
+					{ hiddenLockedFields.map( ( { field, isVisibleFlag } ) => {
+						return (
+							<FieldItem
+								key={ field.id }
+								field={ field }
+								isVisible={ false }
+								onToggleVisibility={ () => {
+									onChangeView( {
+										...view,
+										[ isVisibleFlag ]: true,
+									} );
+								} }
+							/>
+						);
+					} ) }
+
+					{ regularFields.map( ( field ) => {
+						// Check if this is the last visible field to prevent hiding
+						const isVisible = visibleFieldIds.includes( field.id );
+						const isLastVisible =
+							totalVisibleFields === 1 && isVisible;
+						const fieldToRender = isLastVisible
+							? { ...field, enableHiding: false }
+							: field;
+
+						return (
+							<FieldItem
+								key={ field.id }
+								field={ fieldToRender }
+								isVisible={ isVisible }
+								onToggleVisibility={ () => {
+									onChangeView( {
+										...view,
+										fields: isVisible
+											? visibleFieldIds.filter(
+													( fieldId ) =>
+														fieldId !== field.id
+											  )
+											: [ ...visibleFieldIds, field.id ],
+									} );
+								} }
+							/>
+						);
+					} ) }
+				</ItemGroup>
+			</VStack>
 		</VStack>
 	);
 }
@@ -826,8 +507,6 @@ export function DataviewsViewConfigDropdown() {
 							) }
 							<InfiniteScrollToggle />
 							<ItemsPerPageControl />
-						</SettingsSection>
-						<SettingsSection title={ __( 'Properties' ) }>
 							<FieldControl />
 						</SettingsSection>
 					</VStack>
