@@ -81,8 +81,6 @@ export function findColorMeetingRequirements(
 		} );
 	}
 
-	const contrastWithSeed = getContrast( reference, seed );
-
 	// Set the boundary based on the direction.
 	const mostContrastingL = direction === 'lighter' ? 1 : 0;
 	const mostContrastingColor = direction === 'lighter' ? WHITE : BLACK;
@@ -99,28 +97,28 @@ export function findColorMeetingRequirements(
 		// meet the contrast target.
 		if (
 			lightnessConstraint.type === 'force' ||
-			exactLContrast >= target
+			exactLContrast >= target - CONTRAST_EPSILON
 		) {
 			return {
 				color: colorWithExactL,
-				reached: exactLContrast + CONTRAST_EPSILON >= target,
+				reached: exactLContrast >= target - CONTRAST_EPSILON,
 				achieved: exactLContrast,
 				deficit:
-					( exactLContrast >= target
+					exactLContrast >= target
 						? exactLContrast - highestContrast
-						: target - exactLContrast ) * contrastWithSeed,
+						: target - exactLContrast,
 			};
 		}
 	}
 
 	// If even the most contrasting color can't reach the target, the target is unreachable.
 	// On the othe hand, if the contrast is very close to the target, we consider it reached.
-	if ( highestContrast < target + CONTRAST_EPSILON ) {
+	if ( highestContrast <= target + CONTRAST_EPSILON ) {
 		return {
 			color: mostContrastingColor,
-			reached: highestContrast + CONTRAST_EPSILON >= target,
+			reached: highestContrast >= target - CONTRAST_EPSILON,
 			achieved: highestContrast,
-			deficit: ( target - highestContrast ) * contrastWithSeed,
+			deficit: target - highestContrast,
 		};
 	}
 
@@ -177,6 +175,6 @@ export function findColorMeetingRequirements(
 		reached: true,
 		achieved: bestContrast,
 		// Negative number that specifies how much room we have.
-		deficit: ( bestContrast - highestContrast ) * contrastWithSeed,
+		deficit: bestContrast - highestContrast,
 	};
 }
