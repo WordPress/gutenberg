@@ -51,7 +51,7 @@
 	}
 
 	// Disabled block toolbar icon should have a fixed color.
-	.components-button.block-editor-block-toolbar__block-icon[aria-disabled="true"] {
+	.components-button.block-editor-block-toolbar__block-icon-button[aria-disabled="true"] {
 		color: $gray-900;
 
 		// Since it's not clickable, though, don't show a hover state.
@@ -62,7 +62,7 @@
 
 	&.is-synced,
 	&.is-connected {
-		.block-editor-block-icon {
+		.block-editor-block-toolbar__block-icon {
 			color: var(--wp-block-synced-color);
 		}
 	}
