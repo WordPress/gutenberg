@@ -7,7 +7,10 @@ import { __experimentalVStack as VStack } from '@wordpress/components';
 import { useState, useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { comment as commentIcon } from '@wordpress/icons';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
 
 /**
@@ -32,6 +35,8 @@ import {
 import { focusCommentThread } from './utils';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
+
+const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
 function NotesSidebarContent( {
 	newNoteFormState,
@@ -85,30 +90,32 @@ function NotesSidebar( { postId, mode } ) {
 	const [ newNoteFormState, setNewNoteFormState ] = useState( 'closed' );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
-	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
+	const { toggleBlockSpotlight, updateBlockAttributes } = unlock(
+		useDispatch( blockEditorStore )
+	);
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const commentSidebarRef = useRef( null );
 
 	const showFloatingSidebar = isLargeViewport && mode === 'post-only';
 
-	const { clientId, blockCommentId, isDistractionFree } = useSelect(
-		( select ) => {
-			const {
-				getBlockAttributes,
-				getSelectedBlockClientId,
-				getSettings,
-			} = select( blockEditorStore );
-			const _clientId = getSelectedBlockClientId();
-			return {
-				clientId: _clientId,
-				blockCommentId: _clientId
-					? getBlockAttributes( _clientId )?.metadata?.noteId
-					: null,
-				isDistractionFree: getSettings().isDistractionFree,
-			};
-		},
-		[]
-	);
+	const {
+		clientId,
+		blockCommentId,
+		isDistractionFree,
+		getBlockAttributesSelector,
+	} = useSelect( ( select ) => {
+		const { getBlockAttributes, getSelectedBlockClientId, getSettings } =
+			select( blockEditorStore );
+		const _clientId = getSelectedBlockClientId();
+		return {
+			clientId: _clientId,
+			blockCommentId: _clientId
+				? getBlockAttributes( _clientId )?.metadata?.noteId
+				: null,
+			isDistractionFree: getSettings().isDistractionFree,
+			getBlockAttributesSelector: getBlockAttributes,
+		};
+	}, [] );
 
 	const {
 		resultComments,
@@ -148,18 +155,29 @@ function NotesSidebar( { postId, mode } ) {
 			);
 		}
 
+		// Remove non-existing note reference from the selected block.
+		if ( blockCommentId && ! currentThread ) {
+			const metadata = getBlockAttributesSelector( clientId )?.metadata;
+			updateBlockAttributes( clientId, {
+				metadata: cleanEmptyObject( {
+					...metadata,
+					noteId: undefined,
+				} ),
+			} );
+		}
+
 		const currentArea = await getActiveComplementaryArea( 'core' );
 		// Bail out if the current active area is not one of note sidebars.
 		if ( ! SIDEBARS.includes( currentArea ) ) {
 			return;
 		}
 
-		setNewNoteFormState( ! blockCommentId ? 'open' : 'closed' );
+		setNewNoteFormState( ! currentThread ? 'open' : 'closed' );
 		focusCommentThread(
-			blockCommentId,
+			currentThread?.id,
 			commentSidebarRef.current,
 			// Focus a comment thread when there's a selected block with a comment.
-			! blockCommentId ? 'textarea' : undefined
+			! currentThread ? 'textarea' : undefined
 		);
 		toggleBlockSpotlight( clientId, true );
 	}
