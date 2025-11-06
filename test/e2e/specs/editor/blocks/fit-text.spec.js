@@ -21,6 +21,14 @@ test.describe( 'Fit Text', () => {
 				.getByRole( 'listbox', { name: 'Text' } )
 				.getByRole( 'option', { name: 'Stretch Heading', exact: true } )
 				.click();
+
+			// Wait for the block to be inserted and click into it to ensure focus
+			const headingBlock = editor.canvas.locator(
+				'[data-type="core/heading"]'
+			);
+			await headingBlock.waitFor( { state: 'attached' } );
+			await headingBlock.click();
+
 			await page.keyboard.type( 'Test Heading' );
 
 			await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -33,10 +41,6 @@ test.describe( 'Fit Text', () => {
 					},
 				},
 			] );
-
-			const headingBlock = editor.canvas.locator(
-				'[data-type="core/heading"]'
-			);
 
 			await expect( headingBlock ).toHaveClass( /has-fit-text/ );
 		} );
@@ -53,6 +57,14 @@ test.describe( 'Fit Text', () => {
 				.getByRole( 'listbox', { name: 'Text' } )
 				.getByRole( 'option', { name: 'Stretch Text', exact: true } )
 				.click();
+
+			// Wait for the block to be inserted and click into it to ensure focus
+			const paragraphBlock = editor.canvas.locator(
+				'[data-type="core/paragraph"]'
+			);
+			await paragraphBlock.waitFor( { state: 'attached' } );
+			await paragraphBlock.click();
+
 			await page.keyboard.type( 'Test paragraph with fit text enabled' );
 
 			await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -64,10 +76,6 @@ test.describe( 'Fit Text', () => {
 					},
 				},
 			] );
-
-			const paragraphBlock = editor.canvas.locator(
-				'[data-type="core/paragraph"]'
-			);
 
 			await expect( paragraphBlock ).toHaveClass( /has-fit-text/ );
 		} );
@@ -178,6 +186,14 @@ test.describe( 'Fit Text', () => {
 				.getByRole( 'listbox', { name: 'Text' } )
 				.getByRole( 'option', { name: 'Stretch Heading', exact: true } )
 				.click();
+
+			// Wait for the block to be inserted and click into it to ensure focus
+			const headingBlock = editor.canvas.locator(
+				'[data-type="core/heading"]'
+			);
+			await headingBlock.waitFor( { state: 'attached' } );
+			await headingBlock.click();
+
 			await page.keyboard.type( 'Test Heading' );
 
 			await editor.openDocumentSettingsSidebar();
