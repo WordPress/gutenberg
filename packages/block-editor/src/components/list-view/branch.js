@@ -17,6 +17,7 @@ import { useListViewContext } from './context';
 import { getDragDisplacementValues, isClientIdSelected } from './utils';
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayInformation from '../use-block-display-information';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Given a block, returns the total number of blocks in that subtree. This is used to help determine
@@ -114,28 +115,26 @@ function ListViewBranch( props ) {
 		[ parentId ]
 	);
 
-	const { shouldHideChildren, patternsWithSelectedChildren } = useSelect(
+	const { shouldHideChildren, sectionsWithSelectedChildren } = useSelect(
 		( select ) => {
-			const { getBlockAttributes, getClientIdsOfDescendants } =
-				select( blockEditorStore );
+			const { getClientIdsOfDescendants } = select( blockEditorStore );
+			const { isSectionBlock } = unlock( select( blockEditorStore ) );
 
-			// Check if parent should hide children
+			// Check if parent is a section block that should hide children
 			let hideChildren = false;
 			if ( parentId ) {
-				const parentAttributes = getBlockAttributes( parentId );
-				hideChildren = !! parentAttributes?.metadata?.patternName;
+				hideChildren = isSectionBlock( parentId );
 			}
 
-			// Find patterns in this branch that have selected descendants
-			const patternsWithSelected = new Set();
+			// Find section blocks in this branch that have selected descendants
+			const sectionsWithSelected = new Set();
 			blocks.forEach( ( block ) => {
 				if ( ! block?.clientId ) {
 					return;
 				}
-				const blockAttributes = getBlockAttributes( block.clientId );
-				const isPattern = !! blockAttributes?.metadata?.patternName;
+				const isSection = isSectionBlock( block.clientId );
 
-				if ( isPattern ) {
+				if ( isSection ) {
 					const descendants = getClientIdsOfDescendants(
 						block.clientId
 					);
@@ -143,14 +142,14 @@ function ListViewBranch( props ) {
 						( selectedId ) => descendants.includes( selectedId )
 					);
 					if ( hasSelectedDescendant ) {
-						patternsWithSelected.add( block.clientId );
+						sectionsWithSelected.add( block.clientId );
 					}
 				}
 			} );
 
 			return {
 				shouldHideChildren: hideChildren,
-				patternsWithSelectedChildren: patternsWithSelected,
+				sectionsWithSelectedChildren: sectionsWithSelected,
 			};
 		},
 		[ parentId, blocks, selectedClientIds ]
@@ -239,17 +238,17 @@ function ListViewBranch( props ) {
 					selectedClientIds
 				);
 
-				// Check if this pattern block has a selected child
-				const isPatternWithSelectedChild =
-					patternsWithSelectedChildren.has( clientId );
+				// Check if this section block has a selected child
+				const isSectionWithSelectedChild =
+					sectionsWithSelectedChildren.has( clientId );
 
-				// Treat pattern blocks with selected children as fully selected
-				const isSelectedOrPatternWithChild =
-					isSelected || isPatternWithSelectedChild;
+				// Treat section blocks with selected children as fully selected
+				const isSelectedOrSectionWithChild =
+					isSelected || isSectionWithSelectedChild;
 
 				const isSelectedBranch =
 					isBranchSelected ||
-					( isSelectedOrPatternWithChild && hasNestedBlocks );
+					( isSelectedOrSectionWithChild && hasNestedBlocks );
 
 				// To avoid performance issues, we only render blocks that are in view,
 				// or blocks that are selected or dragged. If a block is selected,
@@ -263,19 +262,19 @@ function ListViewBranch( props ) {
 					isDragged ||
 					blockInView ||
 					( isSelected && clientId === selectedClientIds[ 0 ] ) ||
-					isPatternWithSelectedChild ||
+					isSectionWithSelectedChild ||
 					index === 0 ||
 					index === blockCount - 1;
 				return (
 					<AsyncModeProvider
 						key={ clientId }
-						value={ ! isSelectedOrPatternWithChild }
+						value={ ! isSelectedOrSectionWithChild }
 					>
 						{ showBlock && (
 							<ListViewBlock
 								block={ block }
 								selectBlock={ selectBlock }
-								isSelected={ isSelectedOrPatternWithChild }
+								isSelected={ isSelectedOrSectionWithChild }
 								isBranchSelected={ isSelectedBranch }
 								isDragged={ isDragged }
 								level={ level }
