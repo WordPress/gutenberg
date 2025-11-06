@@ -139,8 +139,9 @@
 			}
 
 			svg {
-				width: $grid-unit-30;
-				height: $grid-unit-30;
+				max-width: $grid-unit-20;
+				max-height: $grid-unit-20;
+				padding: $grid-unit-05;
 				border-radius: $radius-round;
 				box-shadow: inset 0 0 0 $border-width $gray-100;
 			}

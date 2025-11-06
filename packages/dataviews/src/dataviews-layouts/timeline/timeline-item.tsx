@@ -103,20 +103,20 @@ function TimelineItem< Item >( {
 		};
 	}, [ actions, item ] );
 
-	const renderedMediaField =
+	const mediaContent =
 		showMedia && mediaField?.render ? (
-			<div className="dataviews-view-timeline__event-type-icon">
-				<mediaField.render
-					item={ item }
-					field={ mediaField }
-					config={ { sizes: '52px' } }
-				/>
-			</div>
-		) : (
-			<div className="dataviews-view-timeline__event-type-icon">
-				<Icon icon={ pinSmall } />
-			</div>
-		);
+			<mediaField.render
+				item={ item }
+				field={ mediaField }
+				config={ { sizes: '52px' } }
+			/>
+		) : null;
+
+	const renderedMediaField = (
+		<div className="dataviews-view-timeline__event-type-icon">
+			{ mediaContent || <Icon icon={ pinSmall } /> }
+		</div>
+	);
 
 	const renderedTitleField =
 		showTitle && titleField?.render ? (

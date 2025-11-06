@@ -44,6 +44,9 @@ import {
 	data,
 	fields,
 	type SpaceObject,
+	orderEventData,
+	orderEventFields,
+	type OrderEvent,
 } from './dataviews.fixtures';
 
 import './dataviews.style.css';
@@ -582,11 +585,11 @@ const TimelineComponent = ( {
 		page: 1,
 		perPage: 20,
 		filters: [],
-		fields: [ 'categories' ],
+		fields: [ 'categories', 'orderNumber' ],
 		titleField: 'title',
 		descriptionField: 'description',
 		groupByField: grouping === 'true' ? 'date' : undefined,
-		mediaField: 'image',
+		mediaField: 'icon',
 		showMedia: showMedia === 'true',
 		sort: {
 			field: 'datetime',
@@ -615,40 +618,52 @@ const TimelineComponent = ( {
 	}, [ showMedia, showGroupFieldLabel, grouping ] );
 
 	// Custom fields with render methods for date and datetime
-	const timelineFields: Field< SpaceObject >[] = fields.map( ( field ) => {
-		if ( field.id === 'date' ) {
-			return {
-				...field,
-				render: ( { item } ) => {
-					return (
-						<span>
-							{ new Date( item.date ).toLocaleDateString(
-								'en-US',
-								{
-									month: 'short',
-									day: 'numeric',
-									year: 'numeric',
-								}
-							) }
-						</span>
-					);
-				},
-			};
-		}
-		if ( field.id === 'datetime' ) {
-			return {
-				...field,
-				render: ( { item } ) => {
-					const dateObj = new Date( item.datetime );
-					// When grouping is off, show date and time
-					if ( grouping === 'false' ) {
+	const timelineFields: Field< OrderEvent >[] = orderEventFields.map(
+		( field ) => {
+			if ( field.id === 'date' ) {
+				return {
+					...field,
+					render: ( { item } ) => {
 						return (
 							<span>
-								{ dateObj.toLocaleDateString( 'en-US', {
-									month: 'short',
-									day: 'numeric',
-									year: 'numeric',
-								} ) }{ ' ' }
+								{ new Date( item.date ).toLocaleDateString(
+									'en-US',
+									{
+										month: 'short',
+										day: 'numeric',
+										year: 'numeric',
+									}
+								) }
+							</span>
+						);
+					},
+				};
+			}
+			if ( field.id === 'datetime' ) {
+				return {
+					...field,
+					render: ( { item } ) => {
+						const dateObj = new Date( item.datetime );
+						// When grouping is off, show date and time
+						if ( grouping === 'false' ) {
+							return (
+								<span>
+									{ dateObj.toLocaleDateString( 'en-US', {
+										month: 'short',
+										day: 'numeric',
+										year: 'numeric',
+									} ) }{ ' ' }
+									{ dateObj.toLocaleTimeString( 'en-US', {
+										hour: 'numeric',
+										minute: '2-digit',
+										hour12: true,
+									} ) }
+								</span>
+							);
+						}
+						// When grouping is on, show only time
+						return (
+							<span>
 								{ dateObj.toLocaleTimeString( 'en-US', {
 									hour: 'numeric',
 									minute: '2-digit',
@@ -656,26 +671,16 @@ const TimelineComponent = ( {
 								} ) }
 							</span>
 						);
-					}
-					// When grouping is on, show only time
-					return (
-						<span>
-							{ dateObj.toLocaleTimeString( 'en-US', {
-								hour: 'numeric',
-								minute: '2-digit',
-								hour12: true,
-							} ) }
-						</span>
-					);
-				},
-			};
+					},
+				};
+			}
+			return field;
 		}
-		return field;
-	} );
+	);
 
 	const { data: shownData, paginationInfo } = useMemo( () => {
-		return filterSortAndPaginate( data, view, timelineFields );
-	}, [ view, timelineFields, grouping ] );
+		return filterSortAndPaginate( orderEventData, view, timelineFields );
+	}, [ view, timelineFields ] );
 	return (
 		<DataViews
 			getItemId={ ( item ) => item.id.toString() }
@@ -684,18 +689,6 @@ const TimelineComponent = ( {
 			view={ view }
 			fields={ timelineFields }
 			onChangeView={ setView }
-			actions={ actions }
-			renderItemLink={ ( { item, ...props }: { item: SpaceObject } ) => (
-				<button
-					style={ { background: 'none', border: 'none', padding: 0 } }
-					onClick={ () => {
-						// eslint-disable-next-line no-alert
-						alert( 'Clicked: ' + item.name.title );
-					} }
-					{ ...props }
-				/>
-			) }
-			isItemClickable={ () => true }
 			defaultLayouts={ {
 				[ LAYOUT_TIMELINE ]: {},
 			} }
@@ -715,7 +708,7 @@ export const Timeline = {
 			control: 'select',
 			options: [ 'true', 'false' ],
 			defaultValue: 'true',
-			description: 'Whether the media is shown in the timeline',
+			description: 'Whether the icon is shown in the timeline',
 		},
 		showGroupFieldLabel: {
 			control: 'select',

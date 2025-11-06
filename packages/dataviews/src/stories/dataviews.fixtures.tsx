@@ -1,7 +1,19 @@
 /**
  * WordPress dependencies
  */
-import { trash, image, Icon, category } from '@wordpress/icons';
+import {
+	trash,
+	image,
+	Icon,
+	category,
+	envelope,
+	payment,
+	archive,
+	shipping as shippingIcon,
+	starFilled,
+	check,
+	pinSmall,
+} from '@wordpress/icons';
 import {
 	Button,
 	__experimentalText as Text,
@@ -809,6 +821,302 @@ export const actions: Action< SpaceObject >[] = [
 			// eslint-disable-next-line no-console
 			console.log( 'Perform secondary action.' );
 		},
+	},
+];
+
+export type OrderEvent = {
+	id: number;
+	name: {
+		title: string;
+		description: string;
+	};
+	type: string;
+	categories: string[];
+	date: string;
+	datetime: string;
+	email?: string;
+	orderNumber: string;
+};
+
+// Icon mapping for event types
+export const eventTypeIcons: Record< string, any > = {
+	status: check,
+	payment,
+	email: envelope,
+	fulfillment: archive,
+	shipping: shippingIcon,
+	review: starFilled,
+};
+
+export const orderEventData: OrderEvent[] = [
+	{
+		id: 1,
+		name: {
+			title: 'Order Created',
+			description: 'Order #2502 was created.',
+		},
+		type: 'status',
+		categories: [ 'Order', 'Status' ],
+		date: '2025-01-15',
+		datetime: '2025-01-15T09:23:15Z',
+		email: 'alice.wonderland@fictional-store.test',
+		orderNumber: '#2502',
+	},
+	{
+		id: 2,
+		name: {
+			title: 'Payment Received',
+			description: 'Payment through Credit Card accepted.',
+		},
+		type: 'payment',
+		categories: [ 'Payment', 'Credit Card' ],
+		date: '2025-01-15',
+		datetime: '2025-01-15T09:23:47Z',
+		email: 'alice.wonderland@fictional-store.test',
+		orderNumber: '#2502',
+	},
+	{
+		id: 3,
+		name: {
+			title: 'Order Confirmation Sent',
+			description:
+				'Order confirmation #1259 sent to alice.wonderland@fictional-store.test',
+		},
+		type: 'email',
+		categories: [ 'Email', 'Communication' ],
+		date: '2025-01-15',
+		datetime: '2025-01-15T09:24:02Z',
+		email: 'alice.wonderland@fictional-store.test',
+		orderNumber: '#2502',
+	},
+	{
+		id: 4,
+		name: {
+			title: 'Private Note Added',
+			description:
+				'Buyer has requested to wait a couple days to send the order, they are not going to be home until the weekend.',
+		},
+		type: 'note',
+		categories: [ 'Note', 'Internal' ],
+		date: '2025-01-15',
+		datetime: '2025-01-15T14:32:18Z',
+		email: 'store.admin@fictional-store.test',
+		orderNumber: '#2502',
+	},
+	{
+		id: 5,
+		name: {
+			title: 'Status Changed to Processing',
+			description:
+				'Order status automatically changed from pending to processing.',
+		},
+		type: 'status',
+		categories: [ 'Order', 'Status' ],
+		date: '2025-01-15',
+		datetime: '2025-01-15T14:35:00Z',
+		orderNumber: '#2502',
+	},
+	{
+		id: 6,
+		name: {
+			title: 'Customer Note Added',
+			description:
+				'Customer added note: "Please leave the package at the back door. Thank you!"',
+		},
+		type: 'note',
+		categories: [ 'Note', 'Customer' ],
+		date: '2025-01-16',
+		datetime: '2025-01-16T08:15:42Z',
+		email: 'alice.wonderland@fictional-store.test',
+		orderNumber: '#2502',
+	},
+	{
+		id: 7,
+		name: {
+			title: 'Items Packed',
+			description:
+				'All items have been packed and are ready for shipment.',
+		},
+		type: 'fulfillment',
+		categories: [ 'Fulfillment', 'Warehouse' ],
+		date: '2025-01-18',
+		datetime: '2025-01-18T10:22:33Z',
+		orderNumber: '#2502',
+	},
+	{
+		id: 8,
+		name: {
+			title: 'Shipping Label Created',
+			description:
+				'Shipping label created with USPS Priority Mail. Tracking #9400111899562854217803',
+		},
+		type: 'shipping',
+		categories: [ 'Shipping', 'USPS' ],
+		date: '2025-01-18',
+		datetime: '2025-01-18T11:05:14Z',
+		orderNumber: '#2502',
+	},
+	{
+		id: 9,
+		name: {
+			title: 'Order Shipped',
+			description:
+				'Order has been shipped via USPS Priority Mail. Expected delivery: Jan 20, 2025',
+		},
+		type: 'shipping',
+		categories: [ 'Shipping', 'Status' ],
+		date: '2025-01-18',
+		datetime: '2025-01-18T16:42:09Z',
+		email: 'alice.wonderland@fictional-store.test',
+		orderNumber: '#2502',
+	},
+	{
+		id: 10,
+		name: {
+			title: 'Shipment Notification Sent',
+			description:
+				'Shipment notification email with tracking information sent to customer.',
+		},
+		type: 'email',
+		categories: [ 'Email', 'Communication' ],
+		date: '2025-01-18',
+		datetime: '2025-01-18T16:42:25Z',
+		email: 'alice.wonderland@fictional-store.test',
+		orderNumber: '#2502',
+	},
+	{
+		id: 11,
+		name: {
+			title: 'Package Out for Delivery',
+			description:
+				'Package is out for delivery with carrier. Delivery expected today.',
+		},
+		type: 'shipping',
+		categories: [ 'Shipping', 'Tracking' ],
+		date: '2025-01-20',
+		datetime: '2025-01-20T08:15:00Z',
+		orderNumber: '#2502',
+	},
+	{
+		id: 12,
+		name: {
+			title: 'Order Delivered',
+			description: 'Order successfully delivered and left at back door.',
+		},
+		type: 'status',
+		categories: [ 'Order', 'Status', 'Delivered' ],
+		date: '2025-01-20',
+		datetime: '2025-01-20T14:32:51Z',
+		orderNumber: '#2502',
+	},
+	{
+		id: 13,
+		name: {
+			title: 'Customer Review Received',
+			description:
+				'Customer left a 5-star review: "Great product and fast shipping!"',
+		},
+		type: 'review',
+		categories: [ 'Review', 'Customer' ],
+		date: '2025-01-22',
+		datetime: '2025-01-22T19:45:33Z',
+		email: 'alice.wonderland@fictional-store.test',
+		orderNumber: '#2502',
+	},
+];
+
+export const orderEventFields: Field< OrderEvent >[] = [
+	{
+		label: 'Icon',
+		id: 'icon',
+		type: 'media',
+		render: ( { item } ) => (
+			<Icon icon={ eventTypeIcons[ item.type ] || pinSmall } />
+		),
+	},
+	{
+		label: 'Order',
+		id: 'orderNumber',
+		type: 'text',
+		enableHiding: true,
+	},
+	{
+		label: 'Title',
+		id: 'title',
+		type: 'text',
+		enableHiding: true,
+		enableGlobalSearch: true,
+		getValue: ( { item } ) => item.name.title,
+	},
+	{
+		label: 'Description',
+		id: 'description',
+		type: 'text',
+		enableSorting: false,
+		enableGlobalSearch: true,
+		getValue: ( { item } ) => item.name.description,
+	},
+	{
+		id: 'date',
+		label: 'Date',
+		type: 'date',
+	},
+	{
+		id: 'datetime',
+		label: 'Datetime',
+		type: 'datetime',
+	},
+	{
+		label: 'Type',
+		id: 'type',
+		enableHiding: false,
+		elements: [
+			{ value: 'status', label: 'Status' },
+			{ value: 'payment', label: 'Payment' },
+			{ value: 'email', label: 'Email' },
+			{ value: 'note', label: 'Note' },
+			{ value: 'fulfillment', label: 'Fulfillment' },
+			{ value: 'shipping', label: 'Shipping' },
+			{ value: 'review', label: 'Review' },
+		],
+		filterBy: {
+			operators: [ 'is', 'isNot' ],
+		},
+	},
+	{
+		label: 'Email',
+		id: 'email',
+		type: 'email',
+	},
+	{
+		label: 'Categories',
+		id: 'categories',
+		header: (
+			<HStack spacing={ 1 } justify="start">
+				<Icon icon={ category } />
+				<span>Categories</span>
+			</HStack>
+		),
+		elements: [
+			{ value: 'Order', label: 'Order' },
+			{ value: 'Status', label: 'Status' },
+			{ value: 'Payment', label: 'Payment' },
+			{ value: 'Credit Card', label: 'Credit Card' },
+			{ value: 'Email', label: 'Email' },
+			{ value: 'Communication', label: 'Communication' },
+			{ value: 'Note', label: 'Note' },
+			{ value: 'Internal', label: 'Internal' },
+			{ value: 'Customer', label: 'Customer' },
+			{ value: 'Fulfillment', label: 'Fulfillment' },
+			{ value: 'Warehouse', label: 'Warehouse' },
+			{ value: 'Shipping', label: 'Shipping' },
+			{ value: 'USPS', label: 'USPS' },
+			{ value: 'Tracking', label: 'Tracking' },
+			{ value: 'Delivered', label: 'Delivered' },
+			{ value: 'Review', label: 'Review' },
+		],
+		type: 'array',
+		enableGlobalSearch: true,
 	},
 ];
 
