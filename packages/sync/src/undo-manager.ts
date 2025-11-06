@@ -44,7 +44,9 @@ interface PositionMeta {
  */
 export function createUndoManager(): SyncUndoManager {
 	let setSelection: RecordHandlers[ 'setSelection' ] = () => {};
-	const selectionHistory = new BlockSelectionHistory( 5 );
+
+	// A map of Yjs document guids to their BlockSelectionHistory instances.
+	const selectionHistoryMap = new Map< string, BlockSelectionHistory >();
 
 	const yUndoManager = new YMultiDocUndoManager( [], {
 		// Throttle undo/redo captures.
@@ -55,8 +57,12 @@ export function createUndoManager(): SyncUndoManager {
 	} );
 
 	function updatePositionMeta( event: StackItemEvent ): void {
-		let positionToStore = selectionHistory.getCurrentPosition();
+		const selectionHistory = selectionHistoryMap.get( event.ydoc.guid );
+		if ( ! selectionHistory ) {
+			return;
+		}
 
+		let positionToStore = selectionHistory.getCurrentPosition();
 		const backupPositions = selectionHistory.getBlockHistory( 3 );
 
 		if ( positionToStore === null && backupPositions.length === 0 ) {
@@ -174,20 +180,31 @@ export function createUndoManager(): SyncUndoManager {
 			}
 		): void {
 			yUndoManager.addToScope( ymap );
-
-			// Pass the ydoc to the selection history so it can convert selections to positions
-			selectionHistory.setYDoc( ymap.doc as Y.Doc );
-
-			handlers.subscribeToSelectionChange( ( newSelection ) => {
-				// Selection updates occur before the underlying Y.Text data is updated,
-				// so wait until the current event loop has completed so that a valid
-				// relative position can be calculated.
-				setTimeout( () => {
-					selectionHistory.updateSelection( newSelection );
-				}, 0 );
-			} );
-
 			setSelection = handlers.setSelection;
+
+			if ( ! ymap.doc ) {
+				// Necessary for a type check, but this shouldn't happen.
+				return;
+			}
+
+			const existingSelectionHistory = selectionHistoryMap.get(
+				ymap.doc.guid
+			);
+
+			if ( ! existingSelectionHistory ) {
+				// Setup a selection history once per document.
+				const selectionHistory = new BlockSelectionHistory( ymap.doc );
+				selectionHistoryMap.set( ymap.doc.guid, selectionHistory );
+
+				handlers.subscribeToSelectionChange( ( newSelection ) => {
+					// Selection updates occur before the underlying Y.Text data is updated,
+					// so wait until the current event loop has completed so that a valid
+					// relative position can be calculated.
+					setTimeout( () => {
+						selectionHistory.updateSelection( newSelection );
+					}, 0 );
+				} );
+			}
 		},
 
 		/**

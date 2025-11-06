@@ -31,19 +31,12 @@ export class BlockSelectionHistory {
 	private historySize: number;
 	private history: Position[] = [];
 	private currentSelection: Position | null = null;
-	private ydoc: Y.Doc | null = null;
+	private ydoc: Y.Doc;
 
-	constructor( historySize: number = 10 ) {
+	constructor( ydoc: Y.Doc, historySize: number = 10 ) {
+		this.ydoc = ydoc;
 		this.historySize = historySize;
 		this.history = [];
-	}
-
-	/**
-	 * Set the Y.Doc to use for converting selections to relative positions.
-	 * @param ydoc
-	 */
-	public setYDoc( ydoc: Y.Doc ): void {
-		this.ydoc = ydoc;
 	}
 
 	/**

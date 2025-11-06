@@ -80,9 +80,8 @@ describe( 'BlockSelectionHistory', () => {
 	let ydoc: Y.Doc;
 
 	beforeEach( () => {
-		history = new BlockSelectionHistory( 5 );
 		ydoc = createTestDoc();
-		history.setYDoc( ydoc );
+		history = new BlockSelectionHistory( ydoc, 5 );
 	} );
 
 	afterEach( () => {
@@ -93,22 +92,6 @@ describe( 'BlockSelectionHistory', () => {
 		test( 'should initialize with empty history', () => {
 			expect( history.getCurrentPosition() ).toBeNull();
 			expect( history.getBlockHistory( 5 ) ).toEqual( [] );
-		} );
-	} );
-
-	describe( 'setYDoc', () => {
-		test( 'should set the Y.Doc for relative position conversion', () => {
-			const newHistory = new BlockSelectionHistory();
-			const newDoc = createTestDoc();
-			newHistory.setYDoc( newDoc );
-
-			const selection = createSelection( 'block-1', 'content', 5 );
-			newHistory.updateSelection( selection );
-
-			expect( newHistory.getCurrentPosition() ).not.toBeNull();
-			expect( newHistory.getCurrentPosition()?.type ).toBe(
-				PositionType.RelativeSelection
-			);
 		} );
 	} );
 
@@ -252,8 +235,7 @@ describe( 'BlockSelectionHistory', () => {
 		} );
 
 		test( 'should respect history size limit', () => {
-			const smallHistory = new BlockSelectionHistory( 3 );
-			smallHistory.setYDoc( ydoc );
+			const smallHistory = new BlockSelectionHistory( ydoc, 3 );
 
 			// Add more selections than history size
 			for ( let i = 1; i <= 5; i++ ) {
