@@ -201,7 +201,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 						'has-aspect-ratio' => true,
 					),
 				),
-				'height'       => array(
+				'height'      => array(
 					'property_keys' => array(
 						'default' => 'height',
 					),
