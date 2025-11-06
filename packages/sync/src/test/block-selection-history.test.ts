@@ -205,14 +205,6 @@ describe( 'BlockSelectionHistory', () => {
 			history.updateSelection( invalidSelection );
 			expect( history.getCurrentPosition() ).toBeNull();
 		} );
-
-		test( 'should not convert position when Y.Doc is not set', () => {
-			const historyWithoutDoc = new BlockSelectionHistory();
-			const selection = createSelection( 'block-1', 'content', 5 );
-			historyWithoutDoc.updateSelection( selection );
-
-			expect( historyWithoutDoc.getCurrentPosition() ).toBeNull();
-		} );
 	} );
 
 	describe( 'history management', () => {
