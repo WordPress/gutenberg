@@ -64,8 +64,8 @@ function useFitText( { fitText, name, clientId } ) {
 	const hasFitTextSupport = hasBlockSupport( name, FIT_TEXT_SUPPORT_KEY );
 	const blockElement = useBlockElement( clientId );
 
-	// Monitor block attribute changes
-	// Any attribute may change the available space.
+	// Monitor block attribute changes, and parent changes.
+	// Any attribute or parent change may change the available space.
 	const { blockAttributes, parentId } = useSelect(
 		( select ) => {
 			if ( ! clientId || ! hasFitTextSupport || ! fitText ) {
