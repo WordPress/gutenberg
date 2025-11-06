@@ -2288,13 +2288,20 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 							state,
 							item
 						);
-						variations.map( variationMapper ).forEach( ( variation ) => {
-							if ( variation.id === 'core/paragraph/stretch-text' || variation.id === 'core/heading/stretch-heading' ) {
-								stretchVariations.push( variation );
-							} else {
-								accumulator.push( variation );
-							}
-						} );
+						variations
+							.map( variationMapper )
+							.forEach( ( variation ) => {
+								if (
+									variation.id ===
+										'core/paragraph/stretch-text' ||
+									variation.id ===
+										'core/heading/stretch-heading'
+								) {
+									stretchVariations.push( variation );
+								} else {
+									accumulator.push( variation );
+								}
+							} );
 					}
 					return accumulator;
 				},
