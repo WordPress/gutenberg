@@ -213,8 +213,25 @@ const reportedPackages = new Set();
  * @return {void}
  */
 function checkDepLicense( packageInfo, licenses ) {
-	if ( ! packageInfo.path ) {
+	const { path } = packageInfo;
+	if ( ! path ) {
 		return;
+	}
+
+	// We expect license to be included through the package-lock.json package
+	// information, but historically there have been some npm bugs where this
+	// is not always included. If it's not included, try reading the package
+	// information from the package.json file.
+	if ( ! packageInfo.license ) {
+		const filename = path + '/package.json';
+		if ( ! existsSync( filename ) ) {
+			process.stdout.write(
+				`Unable to locate package.json in ${ path }.`
+			);
+			process.exit( 1 );
+		}
+
+		packageInfo = require( filename );
 	}
 
 	/*
@@ -260,7 +277,7 @@ function checkDepLicense( packageInfo, licenses ) {
 	 * or the type was invalid, try reading it from the files defined in
 	 * license files, instead.
 	 */
-	const detectedLicenseType = detectTypeFromLicenseFiles( packageInfo.path );
+	const detectedLicenseType = detectTypeFromLicenseFiles( path );
 	if ( ! licenseType && ! detectedLicenseType ) {
 		return;
 	}
