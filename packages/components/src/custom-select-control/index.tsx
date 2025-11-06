@@ -158,17 +158,17 @@ function CustomSelectControl< T extends CustomSelectOption >(
 
 	const renderSelectedValue = () => {
 		if ( ! showSelectedHint || ! selectedOption.hint ) {
-			return selectedOption.name;
+			return selectedOption?.name;
 		}
 
 		return (
 			<Styled.SelectedExperimentalHintWrapper>
-				{ selectedOption.name }
+				{ selectedOption?.name }
 				<Styled.SelectedExperimentalHintItem
 					// Keeping the classname for legacy reasons
 					className="components-custom-select-control__hint"
 				>
-					{ selectedOption.hint }
+					{ selectedOption?.hint }
 				</Styled.SelectedExperimentalHintItem>
 			</Styled.SelectedExperimentalHintWrapper>
 		);
@@ -206,7 +206,7 @@ function CustomSelectControl< T extends CustomSelectOption >(
 			</_CustomSelect>
 			<VisuallyHidden>
 				<span id={ descriptionId }>
-					{ getDescribedBy( selectedOption.name, describedBy ) }
+					{ getDescribedBy( selectedOption?.name, describedBy ) }
 				</span>
 			</VisuallyHidden>
 		</>
