@@ -51,7 +51,7 @@ function ColumnPrimary< Item >( {
 					className="dataviews-view-table__cell-content-wrapper dataviews-column-primary__media"
 					aria-label={
 						isItemClickable( item ) &&
-						!! onClickItem &&
+						( !! onClickItem || !! renderItemLink ) &&
 						!! titleField
 							? titleField.getValue?.( { item } )
 							: undefined
