@@ -144,16 +144,7 @@ export function TypographyPanel( { clientId, name, setAttributes, settings } ) {
 	);
 
 	const onChange = ( newStyle ) => {
-		const newAttributes = styleToAttributes( newStyle );
-
-		// If setting a font size and fitText is currently enabled, disable it
-		const hasFontSize =
-			newAttributes.fontSize || newAttributes.style?.typography?.fontSize;
-		if ( hasFontSize && fitText ) {
-			newAttributes.fitText = undefined;
-		}
-
-		setAttributes( newAttributes );
+		setAttributes( styleToAttributes( newStyle ) );
 	};
 
 	if ( ! isEnabled ) {
@@ -173,6 +164,7 @@ export function TypographyPanel( { clientId, name, setAttributes, settings } ) {
 			value={ value }
 			onChange={ onChange }
 			defaultControls={ defaultControls }
+			fitText={ fitText }
 		/>
 	);
 }

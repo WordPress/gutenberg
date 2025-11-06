@@ -5,11 +5,6 @@ import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
 import { useEffect, useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
-import {
-	ToggleControl,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-} from '@wordpress/components';
 
 const EMPTY_OBJECT = {};
 
@@ -19,7 +14,6 @@ const EMPTY_OBJECT = {};
 import { optimizeFitText } from '../utils/fit-text-utils';
 import { store as blockEditorStore } from '../store';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
-import InspectorControls from '../components/inspector-controls';
 
 export const FIT_TEXT_SUPPORT_KEY = 'typography.fitText';
 
