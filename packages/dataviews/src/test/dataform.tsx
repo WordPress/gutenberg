@@ -550,9 +550,12 @@ describe( 'DataForm component', () => {
 				/>
 			);
 
-			const titleField = screen.getByText( data.title );
+			// Find and click the edit button instead of the field text
+			const editButton = screen.getByRole( 'button', {
+				name: /edit title/i,
+			} );
 			const user = await userEvent.setup();
-			await user.click( titleField );
+			await user.click( editButton );
 			const titleEditField = screen.getByText(
 				'This is the Title Field'
 			);
