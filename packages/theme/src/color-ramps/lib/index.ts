@@ -85,8 +85,8 @@ function calculateRamp( {
 			taperChromaOptions,
 			sameAsIfPossible,
 		} = config[ stepName ];
-		const referenceColor = calculatedColors.get( contrast.reference );
 
+		const referenceColor = calculatedColors.get( contrast.reference );
 		if ( ! referenceColor ) {
 			throw new Error(
 				`Reference color for step ${ stepName } not found: ${ contrast.reference }`
@@ -96,23 +96,27 @@ function calculateRamp( {
 		// Check if we can reuse color from the `sameAsIfPossible` config option
 		if ( sameAsIfPossible ) {
 			const candidateColor = calculatedColors.get( sameAsIfPossible );
-			if ( candidateColor ) {
-				const candidateContrast = getContrast(
-					referenceColor,
-					candidateColor
+			if ( ! candidateColor ) {
+				throw new Error(
+					`Same-as color for step ${ stepName } not found: ${ sameAsIfPossible }`
 				);
-				const adjustedTarget = adjustContrastTarget( contrast.target );
-				// If the candidate meets the contrast requirement, use it
-				if ( candidateContrast >= adjustedTarget ) {
-					// Store the reused color
-					calculatedColors.set( stepName, candidateColor );
-					rampResults[ stepName ] = {
-						color: getColorString( candidateColor ),
-						warning: false,
-					};
+			}
 
-					continue; // Skip to next step
-				}
+			const candidateContrast = getContrast(
+				referenceColor,
+				candidateColor
+			);
+			const adjustedTarget = adjustContrastTarget( contrast.target );
+			// If the candidate meets the contrast requirement, use it
+			if ( candidateContrast >= adjustedTarget ) {
+				// Store the reused color
+				calculatedColors.set( stepName, candidateColor );
+				rampResults[ stepName ] = {
+					color: getColorString( candidateColor ),
+					warning: false,
+				};
+
+				continue; // Skip to next step
 			}
 		}
 
@@ -202,6 +206,27 @@ function calculateRamp( {
 	};
 }
 
+// Return minimal set of steps that are needed to calculate `stepName` from the seed.
+function stepsForStep(
+	stepName: keyof Ramp,
+	config: RampConfig
+): ( keyof Ramp )[] {
+	const result = new Set< keyof Ramp >();
+	function addDeps( step: keyof Ramp | 'seed' ) {
+		if ( step === 'seed' ) {
+			return;
+		}
+		const stepConfig = config[ step ];
+		addDeps( stepConfig.contrast.reference );
+		if ( stepConfig.sameAsIfPossible ) {
+			addDeps( stepConfig.sameAsIfPossible );
+		}
+		result.add( step );
+	}
+	addDeps( stepName );
+	return Array.from( result );
+}
+
 export function buildRamp(
 	seedArg: string,
 	config: RampConfig,
@@ -245,7 +270,12 @@ export function buildRamp(
 	const sortedSteps = sortByDependency( config );
 
 	// Calculate the ramp with the initial seed.
-	const { rampResults, MAX_DEFICIT, MAX_DEFICIT_DIRECTION } = calculateRamp( {
+	const {
+		rampResults,
+		MAX_DEFICIT,
+		MAX_DEFICIT_DIRECTION,
+		MAX_DEFICIT_STEP,
+	} = calculateRamp( {
 		seed,
 		sortedSteps,
 		config,
@@ -270,7 +300,13 @@ export function buildRamp(
 		let betterDeficit = -MAX_DEFICIT;
 		let betterReplaced = false;
 
+		let bestSeed = seed;
 		let bestDeficit = MAX_DEFICIT;
+
+		const iterSteps = stepsForStep(
+			MAX_DEFICIT_STEP as keyof Ramp,
+			config
+		);
 
 		// Binary search: try a new seed and recompute the whole ramp
 		for ( let i = 0; i < MAX_BISECTION_ITERATIONS; i++ ) {
@@ -278,20 +314,18 @@ export function buildRamp(
 				( worseSeedL * betterDeficit - betterSeedL * worseDeficit ) /
 				( betterDeficit - worseDeficit );
 
-			const newSeed = clampToGamut(
+			bestSeed = clampToGamut(
 				set( clone( seed ), [ OKLCH, 'l' ], newSeedL )
 			);
 
 			const iterationResults = calculateRamp( {
-				seed: newSeed,
-				sortedSteps,
+				seed: bestSeed,
+				sortedSteps: iterSteps,
 				config,
 				mainDir,
 				oppDir,
 				pinLightness,
 			} );
-
-			toReturn.ramp = iterationResults.rampResults;
 
 			// If the constraints start failing in the opposite direction to the original
 			// iteration's direction, that means we've moved too far away from the target.
@@ -324,6 +358,16 @@ export function buildRamp(
 				betterReplaced = false;
 			}
 		}
+
+		// Calculate the final ramp with adjusted seed.
+		toReturn.ramp = calculateRamp( {
+			seed: bestSeed,
+			sortedSteps,
+			config,
+			mainDir,
+			oppDir,
+			pinLightness,
+		} ).rampResults;
 	}
 
 	// Swap surface1 and surface3 for darker ramps to maintain visual elevation hierarchy.
