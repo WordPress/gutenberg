@@ -349,5 +349,73 @@ describe( 'Confirm', () => {
 
 			expect( onConfirm ).toHaveBeenCalled();
 		} );
+
+		it( 'should set confirm button busy and disable both buttons when `isBusy` is true', () => {
+			render(
+				<ConfirmDialog
+					isOpen
+					onConfirm={ noop }
+					onCancel={ noop }
+					isBusy
+				>
+					Are you sure?
+				</ConfirmDialog>
+			);
+
+			const cancelButton = screen.getByRole( 'button', {
+				name: 'Cancel',
+			} );
+			const confirmButton = screen.getByRole( 'button', { name: 'OK' } );
+
+			// Only confirm button shows busy spinner
+			expect( cancelButton ).not.toHaveClass( 'is-busy' );
+			expect( confirmButton ).toHaveClass( 'is-busy' );
+
+			// Both buttons are disabled (exposed via aria-disabled due to accessibleWhenDisabled)
+			// Intentionally rely on aria-disabled rather than disabled attribute
+			expect( cancelButton ).toHaveAttribute( 'aria-disabled', 'true' );
+			expect( confirmButton ).toHaveAttribute( 'aria-disabled', 'true' );
+		} );
+
+		it( 'should not set busy and should keep buttons enabled when `isBusy` is false', () => {
+			render(
+				<ConfirmDialog
+					isOpen
+					onConfirm={ noop }
+					onCancel={ noop }
+					isBusy={ false }
+				>
+					Are you sure?
+				</ConfirmDialog>
+			);
+
+			const cancelButton = screen.getByRole( 'button', {
+				name: 'Cancel',
+			} );
+			const confirmButton = screen.getByRole( 'button', { name: 'OK' } );
+
+			expect( cancelButton ).not.toHaveClass( 'is-busy' );
+			expect( confirmButton ).not.toHaveClass( 'is-busy' );
+			expect( cancelButton ).toBeEnabled();
+			expect( confirmButton ).toBeEnabled();
+		} );
+
+		it( 'should not set busy and should keep buttons enabled when `isBusy` is undefined', () => {
+			render(
+				<ConfirmDialog isOpen onConfirm={ noop } onCancel={ noop }>
+					Are you sure?
+				</ConfirmDialog>
+			);
+
+			const cancelButton = screen.getByRole( 'button', {
+				name: 'Cancel',
+			} );
+			const confirmButton = screen.getByRole( 'button', { name: 'OK' } );
+
+			expect( cancelButton ).not.toHaveClass( 'is-busy' );
+			expect( confirmButton ).not.toHaveClass( 'is-busy' );
+			expect( cancelButton ).toBeEnabled();
+			expect( confirmButton ).toBeEnabled();
+		} );
 	} );
 } );

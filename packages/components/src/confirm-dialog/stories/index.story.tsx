@@ -124,3 +124,54 @@ WithCustomButtonLabels.args = {
 	cancelButtonText: 'No thanks',
 	confirmButtonText: 'Yes please!',
 };
+
+// To show a busy state while an action is being performed, pass the `isBusy` prop.
+export const WithBusyState = Template.bind( {} );
+const _withBusyStateSnippet = `() => {
+  const [ isOpen, setIsOpen ] = useState( false );
+  const [ isBusy, setIsBusy ] = useState( false );
+
+  const handleConfirm = async () => {
+    setIsBusy( true );
+    // Simulate an async operation.
+	// In a real-world scenario, you would replace this with an async operation, such as an API call.
+    await new Promise( ( resolve ) => setTimeout( resolve, 2000 ) );
+    setIsBusy( false );
+    setIsOpen( false );
+  };
+
+  const handleCancel = () => {
+    setIsBusy( false );
+    setIsOpen( false );
+  };
+
+  return (
+    <>
+      <ConfirmDialog
+        isOpen={ isOpen }
+        onConfirm={ handleConfirm }
+        onCancel={ handleCancel }
+        isBusy={ isBusy }
+      >
+        Are you sure you want to delete this item?
+      </ConfirmDialog>
+
+      <Button variant="primary" onClick={ () => setIsOpen( true ) }>
+        Open ConfirmDialog
+      </Button>
+    </>
+  );
+};`;
+WithBusyState.args = {
+	...Default.args,
+	isBusy: true,
+};
+WithBusyState.parameters = {
+	docs: {
+		source: {
+			code: _withBusyStateSnippet,
+			language: 'jsx',
+			type: 'auto',
+		},
+	},
+};
