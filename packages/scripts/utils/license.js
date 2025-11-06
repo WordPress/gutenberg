@@ -318,8 +318,9 @@ function checkDepLicense( path, licenses ) {
 /**
  *
  * @typedef Options
- * @property {boolean}       gpl2      Only allow GPL2 compatible licenses.
- * @property {Array<string>} [ignored] The list of ignored packages.
+ * @property {boolean}       gpl2                   Only allow GPL2 compatible licenses.
+ * @property {Array<string>} [ignored]              The list of ignored packages.
+ * @property {string[]}      [optionalDependencies] List of known optional dependencies.
  */
 
 /**
@@ -340,7 +341,10 @@ function checkDepsInTree( deps, options ) {
 			continue;
 		}
 
-		if ( dep.optional && ! isCompatiblePlatform( dep ) ) {
+		if (
+			options.optionalDependencies?.includes( dep.name ) &&
+			! isCompatiblePlatform( dep )
+		) {
 			continue;
 		}
 
@@ -361,6 +365,17 @@ function checkDepsInTree( deps, options ) {
 			}
 		} else {
 			checkDepLicense( dep.path, licenses );
+		}
+
+		if ( dep.optionalDependencies ) {
+			const optionalDependencies = Array.from(
+				new Set( [
+					...( options?.optionalDependencies ?? [] ),
+					...Object.keys( dep.optionalDependencies ),
+				] )
+			);
+
+			options = { ...options, optionalDependencies };
 		}
 
 		if ( dep.hasOwnProperty( 'dependencies' ) ) {
