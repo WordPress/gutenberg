@@ -11,6 +11,8 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 
+const EMPTY_OBJECT = {};
+
 /**
  * Internal dependencies
  */
@@ -67,7 +69,7 @@ function useFitText( { fitText, name, clientId } ) {
 	const { blockAttributes, parentId } = useSelect(
 		( select ) => {
 			if ( ! clientId || ! hasFitTextSupport || ! fitText ) {
-				return;
+				return EMPTY_OBJECT;
 			}
 			return {
 				blockAttributes:
