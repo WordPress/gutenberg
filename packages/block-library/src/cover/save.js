@@ -48,7 +48,7 @@ export default function save( { attributes } ) {
 		tagName: Tag,
 		sizeSlug,
 		poster,
-		embedSrc,
+		embedProvider,
 	} = attributes;
 	const overlayColorClass = getColorClassName(
 		'background-color',
@@ -148,15 +148,19 @@ export default function save( { attributes } ) {
 					data-object-position={ objectPosition }
 				/>
 			) }
-			{ isEmbedVideoBackground && embedSrc && (
-				<div className="wp-block-cover__video-background wp-block-cover__embed-background">
-					<iframe
-						src={ embedSrc }
-						title="Background video"
-						frameBorder="0"
-						allow="autoplay; fullscreen"
-					/>
-				</div>
+			{ isEmbedVideoBackground && url && (
+				<figure
+					className={ clsx(
+						'wp-block-cover__video-background',
+						'wp-block-cover__embed-background',
+						'wp-block-embed',
+						embedProvider
+							? `wp-block-embed-${ embedProvider }`
+							: null
+					) }
+				>
+					<div className="wp-block-embed__wrapper">{ url }</div>
+				</figure>
 			) }
 
 			{ /* The `wp-block-cover__background` needs to be immediately before

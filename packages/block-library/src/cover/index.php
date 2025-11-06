@@ -16,6 +16,47 @@
  * @return string Returns the cover block markup, if useFeaturedImage is true.
  */
 function render_block_core_cover( $attributes, $content ) {
+	// Handle embed video background.
+	if (
+		isset( $attributes['backgroundType'] ) &&
+		'embed-video' === $attributes['backgroundType'] &&
+		isset( $attributes['embedSrc'] ) &&
+		! empty( $attributes['embedSrc'] ) &&
+		is_string( $attributes['embedSrc'] )
+	) {
+		$embed_src = $attributes['embedSrc'];
+
+		// Build the iframe HTML that will replace the figure.
+		$iframe_html = sprintf(
+			'<div class="wp-block-cover__video-background wp-block-cover__embed-background"><iframe src="%s" title="Background video" frameborder="0" allow="autoplay; fullscreen"></iframe></div>',
+			esc_url( $embed_src )
+		);
+
+		// Use the HTML API to find and replace the figure.wp-block-embed element.
+		$processor = new WP_HTML_Tag_Processor( $content );
+
+		if ( $processor->next_tag(
+			array(
+				'tag_name'   => 'FIGURE',
+				'class_name' => 'wp-block-embed',
+			)
+		) ) {
+			// Use regex with PREG_OFFSET_CAPTURE to find the position of the figure element.
+			// This follows the same pattern used for featured image insertion below.
+			$figure_pattern = '/<figure\s+[^>]*\bwp-block-embed\b[^>]*>.*?<\/figure>/is';
+			if ( 1 === preg_match( $figure_pattern, $content, $matches, PREG_OFFSET_CAPTURE ) ) {
+				$figure_start  = $matches[0][1];
+				$figure_length = strlen( $matches[0][0] );
+				$figure_end    = $figure_start + $figure_length;
+
+				// Replace the figure element with the iframe HTML.
+				$content = substr( $content, 0, $figure_start ) . $iframe_html . substr( $content, $figure_end );
+			}
+		}
+
+		return $content;
+	}
+
 	if ( 'image' !== $attributes['backgroundType'] || false === $attributes['useFeaturedImage'] ) {
 		return $content;
 	}
