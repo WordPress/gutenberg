@@ -119,7 +119,7 @@ export function TypographyPanel( { clientId, name, setAttributes, settings } ) {
 
 	const { style, fontFamily, fontSize, fitText } = useSelect(
 		( select ) => {
-			// Early return INSIDE selector to avoid subscription when disabled
+			// Early return to avoid subscription when disabled.
 			if ( ! isEnabled ) {
 				return {};
 			}
