@@ -46,6 +46,49 @@
 	}
 }
 
+.dataforms-layouts-panel__summary-wrapper {
+	display: flex;
+	align-items: center;
+	gap: $grid-unit-10;
+	width: 100%;
+	min-height: $button-size-compact;
+	padding: $grid-unit-05 0;
+
+	&:hover .dataforms-layouts-panel__edit-button,
+	&:focus-within .dataforms-layouts-panel__edit-button {
+		opacity: 1;
+	}
+}
+
+.dataforms-layouts-panel__summary-content {
+	flex: 1;
+	min-height: $button-size-compact;
+	display: flex;
+	align-items: center;
+	line-height: $grid-unit-05 * 5;
+	text-wrap: balance;
+	text-wrap: pretty;
+}
+
+.dataforms-layouts-panel__edit-button {
+	opacity: 0;
+	transition: opacity 0.2s ease-in-out;
+	flex-shrink: 0;
+
+	&[aria-expanded="true"] {
+		opacity: 1;
+	}
+
+	&[aria-disabled="true"] {
+		display: none;
+	}
+
+	// Always show edit button on mobile/touch devices
+	@media (hover: none) {
+		opacity: 1;
+	}
+}
+
 .dataforms-layouts-panel__field-dropdown .components-popover__content {
 	min-width: 320px;
 	padding: $grid-unit-20;

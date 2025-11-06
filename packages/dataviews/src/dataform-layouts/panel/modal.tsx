@@ -128,14 +128,12 @@ function PanelModal< Item >( {
 	data,
 	field,
 	onChange,
-	labelPosition,
 	summaryFields,
 	fieldDefinition,
 }: {
 	data: Item;
 	field: NormalizedFormField;
 	onChange: ( value: any ) => void;
-	labelPosition: 'side' | 'top' | 'none';
 	summaryFields: NormalizedField< Item >[];
 	fieldDefinition: NormalizedField< Item >;
 } ) {
@@ -148,7 +146,6 @@ function PanelModal< Item >( {
 			<SummaryButton
 				summaryFields={ summaryFields }
 				data={ data }
-				labelPosition={ labelPosition }
 				fieldLabel={ fieldLabel }
 				disabled={ fieldDefinition.readOnly === true }
 				onClick={ () => setIsOpen( true ) }

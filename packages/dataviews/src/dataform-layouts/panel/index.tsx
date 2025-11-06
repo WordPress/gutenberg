@@ -123,7 +123,6 @@ export default function FormPanelField< Item >( {
 				data={ data }
 				field={ field }
 				onChange={ onChange }
-				labelPosition={ labelPosition }
 				summaryFields={ summaryFields }
 				fieldDefinition={ fieldDefinition }
 			/>
@@ -133,7 +132,6 @@ export default function FormPanelField< Item >( {
 				field={ field }
 				onChange={ onChange }
 				validity={ validity }
-				labelPosition={ labelPosition }
 				summaryFields={ summaryFields }
 				fieldDefinition={ fieldDefinition }
 				popoverAnchor={ popoverAnchor }

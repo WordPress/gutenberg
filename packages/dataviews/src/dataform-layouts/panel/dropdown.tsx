@@ -64,7 +64,6 @@ function PanelDropdown< Item >( {
 	field,
 	onChange,
 	validity,
-	labelPosition = 'side',
 	summaryFields,
 	fieldDefinition,
 	popoverAnchor,
@@ -73,7 +72,6 @@ function PanelDropdown< Item >( {
 	field: NormalizedFormField;
 	onChange: ( value: any ) => void;
 	validity?: FieldValidity;
-	labelPosition: 'side' | 'top' | 'none';
 	summaryFields: NormalizedField< Item >[];
 	fieldDefinition: NormalizedField< Item >;
 	popoverAnchor: HTMLElement | null;
@@ -129,7 +127,6 @@ function PanelDropdown< Item >( {
 				<SummaryButton
 					summaryFields={ summaryFields }
 					data={ data }
-					labelPosition={ labelPosition }
 					fieldLabel={ fieldLabel }
 					disabled={ fieldDefinition.readOnly === true }
 					onClick={ onToggle }
