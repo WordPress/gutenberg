@@ -37,7 +37,6 @@ const child = spawn.sync(
 		'--json',
 		'--long',
 		'--all',
-		'--package-lock-only',
 		...( prod ? [ '--omit=dev' ] : [] ),
 		...( dev ? [ '--include=dev' ] : [] ),
 	],
