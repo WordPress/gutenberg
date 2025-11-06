@@ -404,7 +404,7 @@ async function runPerformanceTests( branches, options ) {
 						WP_DEBUG: false,
 						SCRIPT_DEBUG: false,
 					},
-					core: wpZipUrl || 'WordPress/WordPress#6.8.3',
+					core: wpZipUrl || 'WordPress/WordPress',
 					plugins: [ buildDir ],
 					themes: [ path.join( testRunnerDir, 'test/emptytheme' ) ],
 					env: {

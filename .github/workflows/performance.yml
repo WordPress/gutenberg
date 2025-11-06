@@ -56,7 +56,7 @@ jobs:
 
             - name: Compare performance with base branch
               if: github.event_name == 'pull_request'
-              run: ./bin/plugin/cli.js perf "$GITHUB_SHA" "$GITHUB_BASE_REF" --tests-branch "$GITHUB_SHA"
+              run: ./bin/plugin/cli.js perf "$GITHUB_SHA" "$GITHUB_BASE_REF" --tests-branch "$GITHUB_SHA" --wp-version "6.8"
 
             - name: Compare performance with current WordPress Core and previous Gutenberg versions
               if: github.event_name == 'release'
