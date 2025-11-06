@@ -41,7 +41,7 @@ import { unlock } from '../../lock-unlock';
 import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
 import { focusCommentThread, getCommentExcerpt } from './utils';
-import { useFloatingThread } from './hooks';
+import { useFloatingThread, useBlockMode } from './hooks';
 import { AddComment } from './add-comment';
 import { store as editorStore } from '../../store';
 
@@ -126,6 +126,9 @@ export function Comments( {
 		selectedBlockClientId,
 		orderedBlockIds,
 	] );
+
+	// Track mode change for the selected block to reflow offsets on "Edit as HTML"
+	const blockMode = useBlockMode( selectedBlockClientId );
 
 	const handleDelete = async ( comment ) => {
 		const currentIndex = threads.findIndex( ( t ) => t.id === comment.id );
@@ -311,6 +314,7 @@ export function Comments( {
 		threads,
 		selectedThread,
 		setCanvasMinHeight,
+		blockMode,
 	] );
 
 	const handleThreadNavigation = ( event, thread, isSelected ) => {

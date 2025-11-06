@@ -361,6 +361,16 @@ export function useEnableFloatingSidebar( enabled = false ) {
 	}, [ enabled, registry ] );
 }
 
+export function useBlockMode( blockClientId ) {
+	return useSelect(
+		( select ) =>
+			blockClientId
+				? select( blockEditorStore ).getBlockMode( blockClientId )
+				: null,
+		[ blockClientId ]
+	);
+}
+
 export function useFloatingThread( {
 	thread,
 	calculatedOffset,
@@ -371,6 +381,8 @@ export function useFloatingThread( {
 } ) {
 	const blockRef = useRef();
 	useBlockElementRef( thread.blockClientId, blockRef );
+
+	const blockMode = useBlockMode( thread.blockClientId );
 
 	const updateHeight = useCallback(
 		( id, newHeight ) => {
@@ -400,7 +412,7 @@ export function useFloatingThread( {
 		if ( blockRef.current ) {
 			refs.setReference( blockRef.current );
 		}
-	}, [ blockRef, refs, commentLastUpdated ] );
+	}, [ blockRef, refs, commentLastUpdated, blockMode ] );
 
 	// Track thread heights.
 	useEffect( () => {
