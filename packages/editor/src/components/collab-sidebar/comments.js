@@ -41,7 +41,7 @@ import { unlock } from '../../lock-unlock';
 import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
 import { focusCommentThread, getCommentExcerpt } from './utils';
-import { useFloatingThread, useBlockMode } from './hooks';
+import { useFloatingThread } from './hooks';
 import { AddComment } from './add-comment';
 import { store as editorStore } from '../../store';
 
@@ -69,22 +69,29 @@ export function Comments( {
 	const { selectBlock, toggleBlockSpotlight } = unlock(
 		useDispatch( blockEditorStore )
 	);
-	const { blockCommentId, selectedBlockClientId, orderedBlockIds } =
-		useSelect( ( select ) => {
-			const {
-				getBlockAttributes,
-				getSelectedBlockClientId,
-				getClientIdsWithDescendants,
-			} = select( blockEditorStore );
-			const clientId = getSelectedBlockClientId();
-			return {
-				blockCommentId: clientId
-					? getBlockAttributes( clientId )?.metadata?.noteId
-					: null,
-				selectedBlockClientId: clientId,
-				orderedBlockIds: getClientIdsWithDescendants(),
-			};
-		}, [] );
+
+	const {
+		blockCommentId,
+		selectedBlockClientId,
+		orderedBlockIds,
+		blockMode,
+	} = useSelect( ( select ) => {
+		const {
+			getBlockAttributes,
+			getSelectedBlockClientId,
+			getClientIdsWithDescendants,
+			getBlockMode,
+		} = select( blockEditorStore );
+		const clientId = getSelectedBlockClientId();
+		return {
+			blockCommentId: clientId
+				? getBlockAttributes( clientId )?.metadata?.noteId
+				: null,
+			selectedBlockClientId: clientId,
+			orderedBlockIds: getClientIdsWithDescendants(),
+			blockMode: clientId ? getBlockMode( clientId ) : null,
+		};
+	}, [] );
 
 	const relatedBlockElement = useBlockElement( selectedBlockClientId );
 
@@ -126,9 +133,6 @@ export function Comments( {
 		selectedBlockClientId,
 		orderedBlockIds,
 	] );
-
-	// Track mode change for the selected block to reflow offsets on "Edit as HTML"
-	const blockMode = useBlockMode( selectedBlockClientId );
 
 	const handleDelete = async ( comment ) => {
 		const currentIndex = threads.findIndex( ( t ) => t.id === comment.id );
