@@ -30,7 +30,12 @@ import { useInstanceId } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { SORTING_DIRECTIONS, sortIcons, sortLabels } from '../../constants';
+import {
+	SORTING_DIRECTIONS,
+	sortIcons,
+	sortLabels,
+	FEATURE_SORTING,
+} from '../../constants';
 import { VIEW_LAYOUTS } from '../../dataviews-layouts';
 import type { View } from '../../types';
 import DataViewsContext from '../dataviews-context';
@@ -127,8 +132,12 @@ function SortFieldControl() {
 		} );
 	}, [ fields ] );
 
-	// Hide sorting controls for timeline layout
-	if ( view.type === 'timeline' ) {
+	const activeLayout = VIEW_LAYOUTS.find(
+		( layout ) => layout.type === view.type
+	);
+
+	// Hide sorting controls for layouts that don't support sorting.
+	if ( activeLayout && ! activeLayout.supports.includes( FEATURE_SORTING ) ) {
 		return null;
 	}
 
@@ -156,8 +165,12 @@ function SortFieldControl() {
 function SortDirectionControl() {
 	const { view, fields, onChangeView } = useContext( DataViewsContext );
 
-	// Hide sorting controls for timeline layout
-	if ( view.type === 'timeline' ) {
+	const activeLayout = VIEW_LAYOUTS.find(
+		( layout ) => layout.type === view.type
+	);
+
+	// Hide sorting controls for layouts that don't support sorting.
+	if ( activeLayout && ! activeLayout.supports.includes( FEATURE_SORTING ) ) {
 		return null;
 	}
 

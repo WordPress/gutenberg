@@ -188,3 +188,6 @@ export const LAYOUT_TIMELINE = 'timeline';
 // Picker view layouts.
 export const LAYOUT_PICKER_GRID = 'pickerGrid';
 export const LAYOUT_PICKER_TABLE = 'pickerTable';
+
+// Supported features for layouts.
+export const FEATURE_SORTING = 'sorting' as const;
