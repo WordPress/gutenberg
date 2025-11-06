@@ -493,7 +493,10 @@ export const getContentLockingParent = ( state, clientId ) => {
 export const getParentSectionBlock = ( state, clientId ) => {
 	let current = clientId;
 	let result;
-	while ( ! result && ( current = state.blocks.parents.get( current ) ) ) {
+
+	// If sections are nested, return the top level section block.
+	// Don't return early.
+	while ( ( current = state.blocks.parents.get( current ) ) ) {
 		if ( isSectionBlock( state, current ) ) {
 			result = current;
 		}
@@ -510,6 +513,10 @@ export const getParentSectionBlock = ( state, clientId ) => {
  * @return {boolean} Whether the block is a contentOnly section.
  */
 export function isSectionBlock( state, clientId ) {
+	if ( clientId === state.editedContentOnlySection ) {
+		return false;
+	}
+
 	const blockName = getBlockName( state, clientId );
 	if (
 		blockName === 'core/block' ||
@@ -539,6 +546,24 @@ export function isSectionBlock( state, clientId ) {
  */
 export function getEditedContentOnlySection( state ) {
 	return state.editedContentOnlySection;
+}
+
+export function isWithinEditedContentOnlySection( state, clientId ) {
+	if ( ! state.editedContentOnlySection ) {
+		return false;
+	}
+
+	if ( state.editedContentOnlySection === clientId ) {
+		return true;
+	}
+
+	let current = clientId;
+	while ( ( current = state.blocks.parents.get( current ) ) ) {
+		if ( state.editedContentOnlySection === current ) {
+			return true;
+		}
+	}
+	return false;
 }
 
 /**

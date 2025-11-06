@@ -99,15 +99,11 @@ export function getCommentExcerpt( text, excerptLength = 10 ) {
  * @typedef {import('@wordpress/element').RefObject} RefObject
  *
  * @param {string}       commentId          The ID of the comment thread to focus.
- * @param {?HTMLElement} threadContainer    The container element to search within.
+ * @param {?HTMLElement} container          The container element to search within.
  * @param {string}       additionalSelector The additional selector to focus on.
  */
-export function focusCommentThread(
-	commentId,
-	threadContainer,
-	additionalSelector
-) {
-	if ( ! threadContainer ) {
+export function focusCommentThread( commentId, container, additionalSelector ) {
+	if ( ! container ) {
 		return;
 	}
 
@@ -120,11 +116,6 @@ export function focusCommentThread(
 		: threadSelector;
 
 	return new Promise( ( resolve ) => {
-		// Watch the sidebar skeleton in case the sidebar disappears and re-appears.
-		const container = threadContainer.closest(
-			'.interface-interface-skeleton__sidebar'
-		);
-
 		if ( container.querySelector( selector ) ) {
 			return resolve( container.querySelector( selector ) );
 		}

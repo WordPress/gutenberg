@@ -132,18 +132,22 @@ export function ActionsMenuGroup< Item >( {
 	registry,
 	setActiveModalAction,
 }: ActionsMenuGroupProps< Item > ) {
-	const { setAsActions, otherActions } = useMemo( () => {
+	const { setAsActions, primaryActions, regularActions } = useMemo( () => {
 		return actions.reduce(
 			( acc, action ) => {
-				( action.id.includes( 'set-as-' )
-					? acc.setAsActions
-					: acc.otherActions
-				).push( action );
+				if ( action.id.includes( 'set-as-' ) ) {
+					acc.setAsActions.push( action );
+				} else if ( action.isPrimary ) {
+					acc.primaryActions.push( action );
+				} else {
+					acc.regularActions.push( action );
+				}
 				return acc;
 			},
 			{
 				setAsActions: [] as Action< Item >[],
-				otherActions: [] as Action< Item >[],
+				primaryActions: [] as Action< Item >[],
+				regularActions: [] as Action< Item >[],
 			}
 		);
 	}, [ actions ] );
@@ -181,7 +185,13 @@ export function ActionsMenuGroup< Item >( {
 
 	return (
 		<Menu.Group>
-			{ renderActionGroup( otherActions ) }
+			{ renderActionGroup( primaryActions ) }
+			{ primaryActions.length > 0 && regularActions.length > 0 && (
+				<Menu.Separator />
+			) }
+			{ renderActionGroup( regularActions ) }
+			{ ( primaryActions.length > 0 || regularActions.length > 0 ) &&
+				setAsActions.length > 0 && <Menu.Separator /> }
 			{ renderSetAsSubmenu( setAsActions ) }
 		</Menu.Group>
 	);

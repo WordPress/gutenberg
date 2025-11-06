@@ -53,8 +53,8 @@ export function Comments( {
 	onEditComment,
 	onAddReply,
 	onCommentDelete,
-	showCommentBoard,
-	setShowCommentBoard,
+	newNoteFormState,
+	setNewNoteFormState,
 	commentSidebarRef,
 	reflowComments,
 	isFloating = false,
@@ -68,15 +68,18 @@ export function Comments( {
 	const { setCanvasMinHeight } = unlock( useDispatch( editorStore ) );
 	const { blockCommentId, selectedBlockClientId, orderedBlockIds } =
 		useSelect( ( select ) => {
-			const { getBlockAttributes, getSelectedBlockClientId } =
-				select( blockEditorStore );
+			const {
+				getBlockAttributes,
+				getSelectedBlockClientId,
+				getClientIdsWithDescendants,
+			} = select( blockEditorStore );
 			const clientId = getSelectedBlockClientId();
 			return {
 				blockCommentId: clientId
 					? getBlockAttributes( clientId )?.metadata?.noteId
 					: null,
 				selectedBlockClientId: clientId,
-				orderedBlockIds: select( blockEditorStore ).getBlockOrder(),
+				orderedBlockIds: getClientIdsWithDescendants(),
 			};
 		}, [] );
 
@@ -90,7 +93,11 @@ export function Comments( {
 		// add a "new note" entry to the threads. This special thread type
 		// gets sorted and floated like regular threads, but shows an AddComment
 		// component instead of a regular comment thread.
-		if ( isFloating && showCommentBoard && undefined === blockCommentId ) {
+		if (
+			isFloating &&
+			newNoteFormState === 'open' &&
+			undefined === blockCommentId
+		) {
 			// Insert the new note entry at the correct location for its blockId.
 			const newNoteThread = {
 				id: 'new-note-thread',
@@ -116,7 +123,7 @@ export function Comments( {
 	}, [
 		noteThreads,
 		isFloating,
-		showCommentBoard,
+		newNoteFormState,
 		blockCommentId,
 		selectedBlockClientId,
 		orderedBlockIds,
@@ -144,7 +151,7 @@ export function Comments( {
 			focusCommentThread( prevThread.id, commentSidebarRef.current );
 		} else {
 			setSelectedThread( null );
-			setShowCommentBoard( false );
+			setNewNoteFormState( 'closed' );
 			// Move focus to the related block.
 			relatedBlockElement?.focus();
 		}
@@ -153,9 +160,9 @@ export function Comments( {
 	// Auto-select the related comment thread when a block is selected.
 	useEffect( () => {
 		// Fallback to 'new-note-thread' when showing the comment board for a new note.
-		const fallback = showCommentBoard ? 'new-note-thread' : null;
+		const fallback = newNoteFormState === 'open' ? 'new-note-thread' : null;
 		setSelectedThread( blockCommentId ?? fallback );
-	}, [ blockCommentId, showCommentBoard ] );
+	}, [ blockCommentId, newNoteFormState ] );
 
 	const setBlockRef = useCallback( ( id, blockRef ) => {
 		setBlockRefs( ( prev ) => ( { ...prev, [ id ]: blockRef } ) );
@@ -316,12 +323,12 @@ export function Comments( {
 	return (
 		<>
 			{ ! isFloating &&
-				showCommentBoard &&
+				newNoteFormState === 'open' &&
 				undefined === blockCommentId && (
 					<AddComment
 						onSubmit={ onAddReply }
-						showCommentBoard={ showCommentBoard }
-						setShowCommentBoard={ setShowCommentBoard }
+						newNoteFormState={ newNoteFormState }
+						setNewNoteFormState={ setNewNoteFormState }
 						commentSidebarRef={ commentSidebarRef }
 					/>
 				) }
@@ -334,7 +341,7 @@ export function Comments( {
 					onEditComment={ onEditComment }
 					isSelected={ selectedThread === thread.id }
 					setSelectedThread={ setSelectedThread }
-					setShowCommentBoard={ setShowCommentBoard }
+					setNewNoteFormState={ setNewNoteFormState }
 					commentSidebarRef={ commentSidebarRef }
 					reflowComments={ reflowComments }
 					isFloating={ isFloating }
@@ -343,7 +350,7 @@ export function Comments( {
 					setBlockRef={ setBlockRef }
 					selectedThread={ selectedThread }
 					commentLastUpdated={ commentLastUpdated }
-					showCommentBoard={ showCommentBoard }
+					newNoteFormState={ newNoteFormState }
 				/>
 			) ) }
 		</>
@@ -356,7 +363,7 @@ function Thread( {
 	onAddReply,
 	onCommentDelete,
 	isSelected,
-	setShowCommentBoard,
+	setNewNoteFormState,
 	commentSidebarRef,
 	reflowComments,
 	isFloating,
@@ -366,7 +373,7 @@ function Thread( {
 	setSelectedThread,
 	selectedThread,
 	commentLastUpdated,
-	showCommentBoard,
+	newNoteFormState,
 } ) {
 	const { toggleBlockHighlight, selectBlock, toggleBlockSpotlight } = unlock(
 		useDispatch( blockEditorStore )
@@ -394,7 +401,7 @@ function Thread( {
 	};
 
 	const handleCommentSelect = () => {
-		setShowCommentBoard( false );
+		setNewNoteFormState( 'closed' );
 		setSelectedThread( thread.id );
 		if ( !! thread.blockClientId ) {
 			// Pass `null` as the second parameter to prevent focusing the block.
@@ -405,7 +412,7 @@ function Thread( {
 
 	const unselectThread = () => {
 		setSelectedThread( null );
-		setShowCommentBoard( false );
+		setNewNoteFormState( 'closed' );
 		toggleBlockSpotlight( thread.blockClientId, false );
 	};
 
@@ -431,12 +438,16 @@ function Thread( {
 				commentExcerpt
 		  );
 
-	if ( 'new-note-thread' === thread.id && showCommentBoard && isFloating ) {
+	if (
+		thread.id === 'new-note-thread' &&
+		newNoteFormState === 'open' &&
+		isFloating
+	) {
 		return (
 			<AddComment
 				onSubmit={ onAddReply }
-				showCommentBoard={ showCommentBoard }
-				setShowCommentBoard={ setShowCommentBoard }
+				newNoteFormState={ newNoteFormState }
+				setNewNoteFormState={ setNewNoteFormState }
 				commentSidebarRef={ commentSidebarRef }
 				reflowComments={ reflowComments }
 				isFloating={ isFloating }
@@ -510,14 +521,17 @@ function Thread( {
 				thread={ thread }
 				isExpanded={ isSelected }
 				onEdit={ ( params = {} ) => {
-					const { status } = params;
 					onEditComment( params );
-					if ( status === 'approved' ) {
+					if ( params.status === 'approved' ) {
 						unselectThread();
-						focusCommentThread(
-							thread.id,
-							commentSidebarRef.current
-						);
+						if ( isFloating ) {
+							relatedBlockElement?.focus();
+						} else {
+							focusCommentThread(
+								thread.id,
+								commentSidebarRef.current
+							);
+						}
 					}
 				} }
 				onDelete={ onCommentDelete }

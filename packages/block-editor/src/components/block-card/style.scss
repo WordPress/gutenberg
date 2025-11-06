@@ -6,6 +6,21 @@
 	color: $gray-900;
 	display: flex;
 	padding: $grid-unit-20;
+
+	&.is-parent {
+		padding-bottom: $grid-unit-05;
+	}
+
+	&.is-child {
+		padding-top: $grid-unit-05;
+	}
+}
+
+.block-editor-block-card__parent-select-button {
+	padding: 0;
+	align-items: start;
+	text-align: start;
+	height: auto !important;
 }
 
 .block-editor-block-card__title {
@@ -26,7 +41,8 @@
 	padding: 3px 0; // This makes the title as high as the icon.
 }
 
-.block-editor-block-card .block-editor-block-icon {
+.block-editor-block-card .block-editor-block-icon,
+.block-editor-block-card__child-indicator-icon {
 	flex: 0 0 $button-size-small;
 	margin-left: 0;
 	margin-right: $grid-unit-15;
