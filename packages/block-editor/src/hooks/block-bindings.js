@@ -20,7 +20,6 @@ import {
 import { useSelect } from '@wordpress/data';
 import { useContext } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
-import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
@@ -120,12 +119,7 @@ function BlockBindingsPanelMenuContent( { attribute, binding, sources } ) {
 												[ attribute ]: itemBindings,
 											},
 										} );
-									} catch ( error ) {
-										warning(
-											`Error in getValues for source "${ sourceKey }" and item "${ item?.key }":`,
-											error
-										);
-									}
+									} catch ( e ) {}
 
 									return (
 										<Menu.CheckboxItem
