@@ -206,7 +206,12 @@ function calculateRamp( {
 	};
 }
 
-// Return minimal set of steps that are needed to calculate `stepName` from the seed.
+/**
+ * Return minimal set of steps that are needed to calculate `stepName` from the seed.
+ * @param stepName Name of the step.
+ * @param config   Configuration of the ramp.
+ * @return Array of steps that `stepName` depends on.
+ */
 function stepsForStep(
 	stepName: keyof Ramp,
 	config: RampConfig
