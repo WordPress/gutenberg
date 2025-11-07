@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { justifyStretch, paragraph } from '@wordpress/icons';
+import { textColor, paragraph } from '@wordpress/icons';
 
 const variations = [
 	{
@@ -22,7 +22,7 @@ const variations = [
 		name: 'stretchy-text',
 		title: __( 'Stretchy Text' ),
 		description: __( 'Text that resizes to fit its container.' ),
-		icon: justifyStretch,
+		icon: textColor,
 		attributes: {
 			fitText: true,
 		},
