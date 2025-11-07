@@ -3,7 +3,6 @@
  */
 const chalk = require( 'chalk' );
 const { existsSync, readFileSync } = require( 'node:fs' );
-const { checkPlatform } = require( 'npm-install-checks' );
 
 const ERROR_TEXT = chalk.reset.inverse.bold.red( ' ERROR ' );
 const WARNING_TEXT = chalk.reset.inverse.bold.yellow( ' WARNING ' );
@@ -103,22 +102,6 @@ const otherOssLicenses = [
  */
 const getLicenses = ( gpl2 ) => {
 	return [ ...gpl2CompatibleLicenses, ...( gpl2 ? [] : otherOssLicenses ) ];
-};
-
-/**
- * Check if a package is compatible with the current platform, using the same
- * internal logic as npm.
- *
- * @param {Record<string, unknown>} pkg The package object.
- * @return {boolean} true if the package is compatible with the current platform, false if it isn't.
- */
-const isCompatiblePlatform = ( pkg ) => {
-	try {
-		checkPlatform( pkg );
-		return true;
-	} catch ( error ) {
-		return error.code !== 'EBADPLATFORM';
-	}
 };
 
 /**
@@ -318,16 +301,15 @@ function checkDepLicense( path, licenses ) {
 /**
  *
  * @typedef Options
- * @property {boolean}       gpl2                   Only allow GPL2 compatible licenses.
- * @property {Array<string>} [ignored]              The list of ignored packages.
- * @property {string[]}      [optionalDependencies] List of known optional dependencies.
+ * @property {boolean}       gpl2      Only allow GPL2 compatible licenses.
+ * @property {Array<string>} [ignored] The list of ignored packages.
  */
 
 /**
  * @param {Object}  deps    The dependencies tree.
  * @param {Options} options
  */
-function checkDepsInTree( deps, options ) {
+function checkDeps( deps, options ) {
 	const licenses = getLicenses( options.gpl2 );
 
 	for ( const key in deps ) {
@@ -338,18 +320,6 @@ function checkDepsInTree( deps, options ) {
 		}
 
 		if ( Object.keys( dep ).length === 0 ) {
-			continue;
-		}
-
-		// Optional dependencies that are incompatible with the current platform
-		// are normally not installed, and we cannot access their files to check
-		// the license. This install behavior is not always consistent, and it's
-		// been seen in some platforms (e.g. Windows) that empty directories are
-		// created for optional dependencies.
-		if (
-			options.optionalDependencies?.includes( dep.name ) &&
-			! isCompatiblePlatform( dep )
-		) {
 			continue;
 		}
 
@@ -370,23 +340,6 @@ function checkDepsInTree( deps, options ) {
 			}
 		} else {
 			checkDepLicense( dep.path, licenses );
-		}
-
-		if ( dep.optionalDependencies ) {
-			// Create a unique set of optional dependencies to recursively merge
-			// with the current options.
-			const optionalDependencies = Array.from(
-				new Set( [
-					...( options?.optionalDependencies ?? [] ),
-					...Object.keys( dep.optionalDependencies ),
-				] )
-			);
-
-			options = { ...options, optionalDependencies };
-		}
-
-		if ( dep.hasOwnProperty( 'dependencies' ) ) {
-			checkDepsInTree( dep.dependencies, options );
 		}
 	}
 }
@@ -416,5 +369,6 @@ function detectTypeFromLicenseFiles( path ) {
 module.exports = {
 	detectTypeFromLicenseText,
 	checkAllCompatible,
-	checkDepsInTree,
+	checkDeps,
+	getLicenses,
 };

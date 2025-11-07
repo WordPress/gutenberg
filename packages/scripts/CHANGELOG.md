@@ -6,10 +6,6 @@
 
 -   The `lint-js` script now includes `.cjs`, `.mjs`, `.cts`, and `.mts` as default extensions to lint. This is considered a breaking change because the script may now surface lint errors in your project which would not have been previously identified.
 
-### Bug Fixes
-
-- The `check-licenses` script skips checking optional dependencies which are invalid for the current platform
-
 ## 30.27.0 (2025-10-29)
 
 ## 30.26.0 (2025-10-17)
