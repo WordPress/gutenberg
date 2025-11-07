@@ -16,8 +16,7 @@ import { __ } from '@wordpress/i18n';
 import { getSyncManager } from './sync';
 import {
 	applyPostChangesToCRDTDoc,
-	defaultApplyChangesToCRDTDoc,
-	defaultGetChangesFromCRDTDoc,
+	defaultSyncConfig,
 	getPostChangesFromCRDTDoc,
 } from './utils/crdt';
 
@@ -204,7 +203,20 @@ export const rootEntitiesConfig = [
 		plural: 'statuses',
 		key: 'slug',
 	},
-];
+].map( ( entity ) => {
+	const syncEnabledRootEntities = new Set( [ 'comment' ] );
+
+	// Add using `if` statement to preserve tree-shaking based on IS_GUTENBERG_PLUGIN.
+	if (
+		syncEnabledRootEntities.has( entity.name ) &&
+		window.__experimentalEnableSync
+	) {
+		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+			entity.syncConfig = defaultSyncConfig;
+		}
+	}
+	return entity;
+} );
 
 export const deprecatedEntities = {
 	root: {
@@ -386,7 +398,7 @@ async function loadTaxonomyEntities() {
 	} );
 	return Object.entries( taxonomies ?? {} ).map( ( [ name, taxonomy ] ) => {
 		const namespace = taxonomy?.rest_namespace ?? 'wp/v2';
-		return {
+		const entity = {
 			kind: 'taxonomy',
 			baseURL: `/${ namespace }/${ taxonomy.rest_base }`,
 			baseURLParams: { context: 'edit' },
@@ -395,6 +407,15 @@ async function loadTaxonomyEntities() {
 			getTitle: ( record ) => record?.name,
 			supportsPagination: true,
 		};
+
+		// Add using `if` statement to preserve tree-shaking based on IS_GUTENBERG_PLUGIN.
+		if ( window.__experimentalEnableSync ) {
+			if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+				entity.syncConfig = defaultSyncConfig;
+			}
+		}
+
+		return entity;
 	} );
 }
 
@@ -413,15 +434,10 @@ async function loadSiteEntity() {
 		meta: {},
 	};
 
+	// Add using `if` statement to preserve tree-shaking based on IS_GUTENBERG_PLUGIN.
 	if ( window.__experimentalEnableSync ) {
 		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-			/**
-			 * @type {import('@wordpress/sync').SyncConfig}
-			 */
-			entity.syncConfig = {
-				applyChangesToCRDTDoc: defaultApplyChangesToCRDTDoc,
-				getChangesFromCRDTDoc: defaultGetChangesFromCRDTDoc,
-			};
+			entity.syncConfig = defaultSyncConfig;
 		}
 	}
 
