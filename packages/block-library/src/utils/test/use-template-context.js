@@ -9,37 +9,23 @@ import {
 describe( 'parseTemplateSlug', () => {
 	it( 'should handle empty template slug', () => {
 		const result = parseTemplateSlug( '' );
-		expect( result ).toEqual( {
-			taxonomy: null,
-			termSlug: null,
-			isAuthor: false,
-			authorSlug: null,
-		} );
+		expect( result ).toEqual( {} );
 	} );
 
 	it( 'should handle null template slug', () => {
 		const result = parseTemplateSlug( null );
-		expect( result ).toEqual( {
-			taxonomy: null,
-			termSlug: null,
-			isAuthor: false,
-			authorSlug: null,
-		} );
+		expect( result ).toEqual( {} );
 	} );
 
 	it( 'should handle author patterns', () => {
 		const resultAuthor = parseTemplateSlug( 'author' );
 		expect( resultAuthor ).toEqual( {
-			taxonomy: null,
-			termSlug: null,
 			isAuthor: true,
 			authorSlug: null,
 		} );
 
 		const resultAuthorJohnDoe = parseTemplateSlug( 'author-john-doe' );
 		expect( resultAuthorJohnDoe ).toEqual( {
-			taxonomy: null,
-			termSlug: null,
 			isAuthor: true,
 			authorSlug: 'john-doe',
 		} );
@@ -49,17 +35,11 @@ describe( 'parseTemplateSlug', () => {
 		const resultCategory = parseTemplateSlug( 'category' );
 		expect( resultCategory ).toEqual( {
 			taxonomy: 'category',
-			termSlug: null,
-			isAuthor: false,
-			authorSlug: null,
 		} );
 
 		const resultTag = parseTemplateSlug( 'tag' );
 		expect( resultTag ).toEqual( {
 			taxonomy: 'post_tag',
-			termSlug: null,
-			isAuthor: false,
-			authorSlug: null,
 		} );
 	} );
 
@@ -68,16 +48,12 @@ describe( 'parseTemplateSlug', () => {
 		expect( resultCategoryNews ).toEqual( {
 			taxonomy: 'category',
 			termSlug: 'news',
-			isAuthor: false,
-			authorSlug: null,
 		} );
 
 		const resultTagFeatured = parseTemplateSlug( 'tag-featured' );
 		expect( resultTagFeatured ).toEqual( {
 			taxonomy: 'post_tag',
 			termSlug: 'featured',
-			isAuthor: false,
-			authorSlug: null,
 		} );
 	} );
 
@@ -85,9 +61,6 @@ describe( 'parseTemplateSlug', () => {
 		const result = parseTemplateSlug( 'taxonomy-product' );
 		expect( result ).toEqual( {
 			taxonomy: 'product',
-			termSlug: null,
-			isAuthor: false,
-			authorSlug: null,
 		} );
 	} );
 
@@ -95,9 +68,6 @@ describe( 'parseTemplateSlug', () => {
 		const result = parseTemplateSlug( 'taxonomy-product-category' );
 		expect( result ).toEqual( {
 			taxonomy: 'product-category',
-			termSlug: null,
-			isAuthor: false,
-			authorSlug: null,
 		} );
 	} );
 
@@ -108,8 +78,6 @@ describe( 'parseTemplateSlug', () => {
 		expect( result ).toEqual( {
 			taxonomy: 'product-category',
 			termSlug: 'electronics',
-			isAuthor: false,
-			authorSlug: null,
 		} );
 	} );
 
@@ -120,19 +88,12 @@ describe( 'parseTemplateSlug', () => {
 		expect( resultComplexCustomTaxonomy ).toEqual( {
 			taxonomy: 'product-category-sub-category',
 			termSlug: 'item',
-			isAuthor: false,
-			authorSlug: null,
 		} );
 	} );
 
 	it( 'should handle unknown patterns', () => {
 		const result = parseTemplateSlug( 'unknown-pattern' );
-		expect( result ).toEqual( {
-			taxonomy: null,
-			termSlug: null,
-			isAuthor: false,
-			authorSlug: null,
-		} );
+		expect( result ).toEqual( {} );
 	} );
 } );
 
@@ -157,9 +118,6 @@ describe( 'parseTemplateSlugWithValidation', () => {
 		);
 		expect( result ).toEqual( {
 			taxonomy: 'product-category',
-			termSlug: null,
-			isAuthor: false,
-			authorSlug: null,
 		} );
 	} );
 
@@ -171,8 +129,6 @@ describe( 'parseTemplateSlugWithValidation', () => {
 			mockGetTaxonomy
 		);
 		expect( result ).toEqual( {
-			taxonomy: null,
-			termSlug: null,
 			isAuthor: true,
 			authorSlug: 'john-doe',
 		} );
@@ -187,9 +143,6 @@ describe( 'parseTemplateSlugWithValidation', () => {
 		);
 		expect( result ).toEqual( {
 			taxonomy: 'category',
-			termSlug: null,
-			isAuthor: false,
-			authorSlug: null,
 		} );
 	} );
 
@@ -208,24 +161,17 @@ describe( 'parseTemplateSlugWithValidation', () => {
 		expect( result ).toEqual( {
 			taxonomy: 'product-category',
 			termSlug: 'electronics-gadgets',
-			isAuthor: false,
-			authorSlug: null,
 		} );
 	} );
 
-	it( 'should return null values when taxonomy does not exist', () => {
+	it( 'should return empty object when taxonomy does not exist', () => {
 		mockGetTaxonomy.mockReturnValue( null );
 
 		const result = parseTemplateSlugWithValidation(
 			'taxonomy-nonexistent-taxonomy',
 			mockGetTaxonomy
 		);
-		expect( result ).toEqual( {
-			taxonomy: null,
-			termSlug: null,
-			isAuthor: false,
-			authorSlug: null,
-		} );
+		expect( result ).toEqual( {} );
 	} );
 
 	it( 'should fallback to entire string if no valid split found', () => {
@@ -243,9 +189,6 @@ describe( 'parseTemplateSlugWithValidation', () => {
 
 		expect( result ).toEqual( {
 			taxonomy: 'coffee_type-flat-white',
-			termSlug: null,
-			isAuthor: false,
-			authorSlug: null,
 		} );
 	} );
 
@@ -267,9 +210,6 @@ describe( 'parseTemplateSlugWithValidation', () => {
 
 		expect( result ).toEqual( {
 			taxonomy: 'taxonomy-one-more',
-			termSlug: null,
-			isAuthor: false,
-			authorSlug: null,
 		} );
 	} );
 
@@ -292,8 +232,6 @@ describe( 'parseTemplateSlugWithValidation', () => {
 		expect( result ).toEqual( {
 			taxonomy: 'taxonomy-one-more',
 			termSlug: 'term-slug',
-			isAuthor: false,
-			authorSlug: null,
 		} );
 	} );
 } );

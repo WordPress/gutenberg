@@ -4,13 +4,6 @@
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
-const DEFAULT_CONTEXT = {
-	taxonomy: null,
-	termSlug: null,
-	isAuthor: false,
-	authorSlug: null,
-};
-
 /**
  * Hook to get the current template slug from the editor context.
  *
@@ -45,7 +38,7 @@ export function useTemplateSlug() {
  */
 export function parseTemplateSlug( templateSlug ) {
 	if ( ! templateSlug ) {
-		return DEFAULT_CONTEXT;
+		return {};
 	}
 
 	// Check for author patterns
@@ -53,7 +46,6 @@ export function parseTemplateSlug( templateSlug ) {
 	const authorMatches = templateSlug.match( /^(author)$|^author-(.+)$/ );
 	if ( authorMatches ) {
 		return {
-			...DEFAULT_CONTEXT,
 			isAuthor: true,
 			authorSlug: authorMatches[ 2 ] || null,
 		};
@@ -69,7 +61,6 @@ export function parseTemplateSlug( templateSlug ) {
 			// No dashes, so the entire part is the taxonomy
 			// e.g. taxonomy-product -> taxonomy: "product", term: null
 			return {
-				...DEFAULT_CONTEXT,
 				taxonomy: taxonomyPart,
 			};
 		}
@@ -78,7 +69,6 @@ export function parseTemplateSlug( templateSlug ) {
 			// Single dash
 			// e.g. taxonomy-product-category -> taxonomy: "product-category", term: null
 			return {
-				...DEFAULT_CONTEXT,
 				taxonomy: taxonomyPart,
 			};
 		}
@@ -89,7 +79,6 @@ export function parseTemplateSlug( templateSlug ) {
 		const termSlug = taxonomyParts[ taxonomyParts.length - 1 ];
 
 		return {
-			...DEFAULT_CONTEXT,
 			taxonomy,
 			termSlug,
 		};
@@ -99,13 +88,11 @@ export function parseTemplateSlug( templateSlug ) {
 	// e.g. category, tag
 	if ( templateSlug === 'category' ) {
 		return {
-			...DEFAULT_CONTEXT,
 			taxonomy: 'category',
 		};
 	}
 	if ( templateSlug === 'tag' ) {
 		return {
-			...DEFAULT_CONTEXT,
 			taxonomy: 'post_tag',
 		};
 	}
@@ -114,20 +101,18 @@ export function parseTemplateSlug( templateSlug ) {
 	// e.g. category-news, tag-featured
 	if ( templateSlug.startsWith( 'category-' ) ) {
 		return {
-			...DEFAULT_CONTEXT,
 			taxonomy: 'category',
 			termSlug: templateSlug.substring( 9 ),
 		};
 	}
 	if ( templateSlug.startsWith( 'tag-' ) ) {
 		return {
-			...DEFAULT_CONTEXT,
 			taxonomy: 'post_tag',
 			termSlug: templateSlug.substring( 4 ),
 		};
 	}
 
-	return DEFAULT_CONTEXT;
+	return {};
 }
 
 /**
@@ -139,7 +124,7 @@ export function parseTemplateSlug( templateSlug ) {
  */
 export function parseTemplateSlugWithValidation( templateSlug, getTaxonomy ) {
 	if ( ! templateSlug ) {
-		return DEFAULT_CONTEXT;
+		return {};
 	}
 
 	if ( templateSlug.startsWith( 'taxonomy-' ) ) {
@@ -150,7 +135,6 @@ export function parseTemplateSlugWithValidation( templateSlug, getTaxonomy ) {
 		const fullTaxonomyRecord = getTaxonomy( taxonomyPart );
 		if ( fullTaxonomyRecord ) {
 			return {
-				...DEFAULT_CONTEXT,
 				taxonomy: taxonomyPart,
 			};
 		}
@@ -163,7 +147,6 @@ export function parseTemplateSlugWithValidation( templateSlug, getTaxonomy ) {
 			const taxonomyRecord = getTaxonomy( potentialTaxonomy );
 			if ( taxonomyRecord ) {
 				return {
-					...DEFAULT_CONTEXT,
 					taxonomy: potentialTaxonomy,
 					termSlug: potentialTermSlug,
 				};
@@ -171,7 +154,7 @@ export function parseTemplateSlugWithValidation( templateSlug, getTaxonomy ) {
 		}
 
 		// No valid taxonomy found.
-		return DEFAULT_CONTEXT;
+		return {};
 	}
 
 	// For non-taxonomy prefixed slugs, use parseTemplateSlug.
@@ -180,7 +163,7 @@ export function parseTemplateSlugWithValidation( templateSlug, getTaxonomy ) {
 	if ( parsedTemplateSlug.taxonomy && ! parsedTemplateSlug.isAuthor ) {
 		const taxonomyRecord = getTaxonomy( parsedTemplateSlug.taxonomy );
 		if ( ! taxonomyRecord ) {
-			return DEFAULT_CONTEXT;
+			return {};
 		}
 	}
 
