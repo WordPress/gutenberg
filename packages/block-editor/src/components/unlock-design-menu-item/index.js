@@ -33,10 +33,7 @@ export function UnlockDesignMenuItem( { clientId, onClose } ) {
 				onClose();
 			} }
 		>
-			{ _x(
-				'Unlock design',
-				'Unlocking section block design in the Editor'
-			) }
+			{ _x( 'Edit pattern', 'Editing a pattern block in the Editor' ) }
 		</MenuItem>
 	);
 }

@@ -296,7 +296,7 @@ const getQuickActionsCommands = () =>
 			commands.push( {
 				name: shouldShowUnlockDesign ? 'unlock-design' : 'ungroup',
 				label: shouldShowUnlockDesign
-					? __( 'Unlock design' )
+					? __( 'Edit pattern' )
 					: __( 'Ungroup' ),
 				callback: shouldShowUnlockDesign ? onUnlockDesign : onUngroup,
 				icon: ungroup,
