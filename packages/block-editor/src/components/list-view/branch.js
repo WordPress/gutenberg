@@ -115,45 +115,28 @@ function ListViewBranch( props ) {
 		[ parentId ]
 	);
 
-	const { shouldHideChildren, sectionsWithSelectedChildren } = useSelect(
-		( select ) => {
-			const { getClientIdsOfDescendants } = select( blockEditorStore );
-			const { isSectionBlock } = unlock( select( blockEditorStore ) );
+	const { shouldHideChildren, isSectionBlock, hasSelectedInnerBlock } =
+		useSelect(
+			( select ) => {
+				const { isSectionBlock: _isSectionBlock } = unlock(
+					select( blockEditorStore )
+				);
+				const { hasSelectedInnerBlock: _hasSelectedInnerBlock } =
+					select( blockEditorStore );
 
-			// Check if parent is a section block that should hide children
-			let hideChildren = false;
-			if ( parentId ) {
-				hideChildren = isSectionBlock( parentId );
-			}
+				// Check if parent is a section block that should hide children
+				const hideChildren = parentId
+					? _isSectionBlock( parentId )
+					: false;
 
-			// Find section blocks in this branch that have selected descendants
-			const sectionsWithSelected = new Set();
-			blocks.forEach( ( block ) => {
-				if ( ! block?.clientId ) {
-					return;
-				}
-				const isSection = isSectionBlock( block.clientId );
-
-				if ( isSection ) {
-					const descendants = getClientIdsOfDescendants(
-						block.clientId
-					);
-					const hasSelectedDescendant = selectedClientIds.some(
-						( selectedId ) => descendants.includes( selectedId )
-					);
-					if ( hasSelectedDescendant ) {
-						sectionsWithSelected.add( block.clientId );
-					}
-				}
-			} );
-
-			return {
-				shouldHideChildren: hideChildren,
-				sectionsWithSelectedChildren: sectionsWithSelected,
-			};
-		},
-		[ parentId, blocks, selectedClientIds ]
-	);
+				return {
+					shouldHideChildren: hideChildren,
+					isSectionBlock: _isSectionBlock,
+					hasSelectedInnerBlock: _hasSelectedInnerBlock,
+				};
+			},
+			[ parentId ]
+		);
 
 	const {
 		blockDropPosition,
@@ -238,9 +221,14 @@ function ListViewBranch( props ) {
 					selectedClientIds
 				);
 
+				// Check if this is a section block
+				const isSection =
+					isSectionBlock( clientId ) &&
+					window?.__experimentalContentOnlyPatternInsertion;
+
 				// Check if this section block has a selected child
 				const isSectionWithSelectedChild =
-					sectionsWithSelectedChildren.has( clientId );
+					isSection && hasSelectedInnerBlock( clientId, true );
 
 				// Treat section blocks with selected children as fully selected
 				const isSelectedOrSectionWithChild =
@@ -297,22 +285,25 @@ function ListViewBranch( props ) {
 								<td className="block-editor-list-view-placeholder" />
 							</tr>
 						) }
-						{ hasNestedBlocks && shouldExpand && ! isDragged && (
-							<ListViewBranch
-								parentId={ clientId }
-								blocks={ innerBlocks }
-								selectBlock={ selectBlock }
-								showBlockMovers={ showBlockMovers }
-								level={ level + 1 }
-								path={ updatedPath }
-								listPosition={ nextPositionRef.current + 1 }
-								fixedListWindow={ fixedListWindow }
-								isBranchSelected={ isSelectedBranch }
-								selectedClientIds={ selectedClientIds }
-								isExpanded={ isExpanded }
-								isSyncedBranch={ syncedBranch }
-							/>
-						) }
+						{ ! isSection &&
+							hasNestedBlocks &&
+							shouldExpand &&
+							! isDragged && (
+								<ListViewBranch
+									parentId={ clientId }
+									blocks={ innerBlocks }
+									selectBlock={ selectBlock }
+									showBlockMovers={ showBlockMovers }
+									level={ level + 1 }
+									path={ updatedPath }
+									listPosition={ nextPositionRef.current + 1 }
+									fixedListWindow={ fixedListWindow }
+									isBranchSelected={ isSelectedBranch }
+									selectedClientIds={ selectedClientIds }
+									isExpanded={ isExpanded }
+									isSyncedBranch={ syncedBranch }
+								/>
+							) }
 					</AsyncModeProvider>
 				);
 			} ) }
