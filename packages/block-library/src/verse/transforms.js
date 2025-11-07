@@ -23,13 +23,6 @@ const transforms = {
 				return createBlock( 'core/verse', { content } );
 			},
 		},
-		{
-			type: 'block',
-			blocks: [ 'core/pullquote' ],
-			transform: ( { value } ) => {
-				return createBlock( 'core/verse', { content: value } );
-			},
-		},
 	],
 	to: [
 		{
@@ -47,13 +40,6 @@ const transforms = {
 				createBlock( 'core/quote', {}, [
 					createBlock( 'core/paragraph', { content } ),
 				] ),
-		},
-		{
-			type: 'block',
-			blocks: [ 'core/pullquote' ],
-			priority: 10,
-			transform: ( { content } ) =>
-				createBlock( 'core/pullquote', { value: content } ),
 		},
 	],
 };

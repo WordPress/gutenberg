@@ -8,13 +8,6 @@ const transforms = {
 	from: [
 		{
 			type: 'block',
-			blocks: [ 'core/verse' ],
-			transform: ( { content } ) => {
-				return createBlock( 'core/pullquote', { value: content } );
-			},
-		},
-		{
-			type: 'block',
 			isMultiBlock: true,
 			blocks: [ 'core/paragraph' ],
 			transform: ( attributes ) => {
@@ -43,13 +36,6 @@ const transforms = {
 		},
 	],
 	to: [
-		{
-			type: 'block',
-			blocks: [ 'core/verse' ],
-			transform: ( { value } ) => {
-				return createBlock( 'core/verse', { content: value } );
-			},
-		},
 		{
 			type: 'block',
 			blocks: [ 'core/paragraph' ],
