@@ -8,6 +8,15 @@ const transforms = {
 	from: [
 		{
 			type: 'block',
+			blocks: [ 'core/verse' ],
+			transform: ( { content } ) => {
+				return createBlock( 'core/quote', {}, [
+					createBlock( 'core/paragraph', { content } ),
+				] );
+			},
+		},
+		{
+			type: 'block',
 			blocks: [ 'core/pullquote' ],
 			transform: ( {
 				value,
@@ -117,6 +126,17 @@ const transforms = {
 					fontSize,
 					style,
 				} );
+			},
+		},
+		{
+			type: 'block',
+			blocks: [ 'core/verse' ],
+			transform: ( {}, innerBlocks ) => {
+				const content = innerBlocks
+					.map( ( { attributes } ) => attributes.content || '' )
+					.filter( Boolean )
+					.join( '<br>' );
+				return createBlock( 'core/verse', { content } );
 			},
 		},
 		{
