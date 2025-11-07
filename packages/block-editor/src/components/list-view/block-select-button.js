@@ -21,8 +21,8 @@ import { hasBlockSupport } from '@wordpress/blocks';
  * Internal dependencies
  */
 import BlockIcon from '../block-icon';
-import useBlockDisplayInformation from '../use-block-display-information';
-import useBlockDisplayTitle from '../block-title/use-block-display-title';
+import { getBlockDisplayInformation } from '../use-block-display-information';
+import { getBlockDisplayTitle } from '../block-title/use-block-display-title';
 import ListViewExpander from './expander';
 import { useBlockLock } from '../block-lock';
 import useListViewImages from './use-list-view-images';
@@ -49,34 +49,42 @@ function ListViewBlockSelectButton(
 	},
 	ref
 ) {
-	const blockInformation = useBlockDisplayInformation( clientId );
-	const blockTitle = useBlockDisplayTitle( {
-		clientId,
-		context: 'list-view',
-	} );
 	const { isLocked } = useBlockLock( clientId );
-	const { canToggleBlockVisibility, isBlockHidden, isContentOnly } =
-		useSelect(
-			( select ) => {
-				const { getBlockName } = select( blockEditorStore );
-				const { isBlockHidden: _isBlockHidden } = unlock(
-					select( blockEditorStore )
-				);
-				return {
-					canToggleBlockVisibility: hasBlockSupport(
-						getBlockName( clientId ),
-						'blockVisibility',
-						true
-					),
-					isBlockHidden: _isBlockHidden( clientId ),
-					isContentOnly:
-						select( blockEditorStore ).getBlockEditingMode(
-							clientId
-						) === 'contentOnly',
-				};
-			},
-			[ clientId ]
-		);
+	const {
+		canToggleBlockVisibility,
+		isBlockHidden,
+		isContentOnly,
+		blockInformation,
+		blockTitle,
+	} = useSelect(
+		( select ) => {
+			const { getBlockName } = select( blockEditorStore );
+			const { isBlockHidden: _isBlockHidden } = unlock(
+				select( blockEditorStore )
+			);
+			return {
+				canToggleBlockVisibility: hasBlockSupport(
+					getBlockName( clientId ),
+					'blockVisibility',
+					true
+				),
+				isBlockHidden: _isBlockHidden( clientId ),
+				isContentOnly:
+					select( blockEditorStore ).getBlockEditingMode(
+						clientId
+					) === 'contentOnly',
+				blockInformation: getBlockDisplayInformation( select, {
+					clientId,
+					context: 'list-view',
+				} ),
+				blockTitle: getBlockDisplayTitle( select, {
+					clientId,
+					context: 'list-view',
+				} ),
+			};
+		},
+		[ clientId ]
+	);
 	const shouldShowLockIcon = isLocked && ! isContentOnly;
 	const shouldShowBlockVisibilityIcon =
 		canToggleBlockVisibility && isBlockHidden;

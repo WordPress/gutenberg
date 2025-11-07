@@ -14,7 +14,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import BlockSwitcher from '../block-switcher';
 import BlockIcon from '../block-icon';
 import PatternOverridesDropdown from './pattern-overrides-dropdown';
-import useBlockDisplayTitle from '../block-title/use-block-display-title';
+import { getBlockDisplayTitle } from '../block-title/use-block-display-title';
 import { store as blockEditorStore } from '../../store';
 import { hasPatternOverridesDefaultBinding } from '../../utils/block-bindings';
 import { unlock } from '../../lock-unlock';
@@ -103,7 +103,7 @@ function getBlockIcon( { select, clientIds } ) {
 }
 
 export default function BlockToolbarIcon( { clientIds, isSynced } ) {
-	const { icon, showIconLabels, variant } = useSelect(
+	const { icon, showIconLabels, variant, blockTitle } = useSelect(
 		( select ) => {
 			return {
 				icon: getBlockIcon( { select, clientIds } ),
@@ -115,15 +115,14 @@ export default function BlockToolbarIcon( { clientIds, isSynced } ) {
 					select,
 					clientIds,
 				} ),
+				blockTitle: getBlockDisplayTitle( select, {
+					clientId: clientIds?.[ 0 ],
+					maximumLength: 35,
+				} ),
 			};
 		},
 		[ clientIds ]
 	);
-
-	const blockTitle = useBlockDisplayTitle( {
-		clientId: clientIds?.[ 0 ],
-		maximumLength: 35,
-	} );
 
 	const isSingleBlock = clientIds.length === 1;
 	const showBlockTitle = isSingleBlock && isSynced && ! showIconLabels;

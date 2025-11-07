@@ -18,7 +18,7 @@ import SkipToSelectedBlock from '../skip-to-selected-block';
 import BlockCard from '../block-card';
 import MultiSelectionInspector from '../multi-selection-inspector';
 import BlockVariationTransforms from '../block-variation-transforms';
-import useBlockDisplayInformation from '../use-block-display-information';
+import { getBlockDisplayInformation } from '../use-block-display-information';
 import { store as blockEditorStore } from '../../store';
 import BlockStyles from '../block-styles';
 import { default as InspectorControls } from '../inspector-controls';
@@ -326,10 +326,17 @@ const BlockInspectorSingleBlock = ( {
 		window?.__experimentalContentOnlyPatternInsertion &&
 		editedContentOnlySection &&
 		editedContentOnlySection !== clientId;
-	const parentBlockInformation = useBlockDisplayInformation(
-		editedContentOnlySection
+	const { parentBlockInformation, blockInformation } = useSelect(
+		( select ) => ( {
+			parentBlockInformation: getBlockDisplayInformation( select, {
+				clientId: editedContentOnlySection,
+			} ),
+			blockInformation: getBlockDisplayInformation( select, {
+				clientId,
+			} ),
+		} ),
+		[ editedContentOnlySection, clientId ]
 	);
-	const blockInformation = useBlockDisplayInformation( clientId );
 	const isBlockSynced = blockInformation.isSynced;
 	const shouldShowTabs = ! isBlockSynced && hasMultipleTabs;
 

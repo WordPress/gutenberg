@@ -390,6 +390,23 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/font-sizes/README.md>
 
+### getBlockDisplayInformation
+
+Hook used to try to find a matching block variation and return the appropriate information for display reasons. In order to to try to find a match we need to things: 1. Block's client id to extract it's current attributes. 2. A block variation should have set `isActive` prop to a proper function.
+
+If for any reason a block variation match cannot be found, the returned information come from the Block Type. If no blockType is found with the provided clientId, returns null.
+
+_Parameters_
+
+-   _select_ `Object`: The select function from the WordPress data store.
+-   _options_ `Object`: Options object.
+-   _options.clientId_ `string`: Block's client id.
+-   _options.context_ `string`: Context in which the block is being displayed.
+
+_Returns_
+
+-   `?WPBlockDisplayInformation`: Block's display information, or `null` when the block or its type not found.
+
 ### getColorClassName
 
 Returns a class based on the context a color is being used and its slug.
@@ -939,17 +956,7 @@ Undocumented declaration.
 
 ### useBlockDisplayInformation
 
-Hook used to try to find a matching block variation and return the appropriate information for display reasons. In order to to try to find a match we need to things: 1. Block's client id to extract it's current attributes. 2. A block variation should have set `isActive` prop to a proper function.
-
-If for any reason a block variation match cannot be found, the returned information come from the Block Type. If no blockType is found with the provided clientId, returns null.
-
-_Parameters_
-
--   _clientId_ `string`: Block's client id.
-
-_Returns_
-
--   `?WPBlockDisplayInformation`: Block's display information, or `null` when the block or its type not found.
+Undocumented declaration.
 
 ### useBlockEditContext
 

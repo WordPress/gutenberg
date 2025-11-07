@@ -48,7 +48,7 @@ import {
 	focusListItem,
 } from './utils';
 import { store as blockEditorStore } from '../../store';
-import useBlockDisplayInformation from '../use-block-display-information';
+import { getBlockDisplayInformation } from '../use-block-display-information';
 import { useBlockLock } from '../block-lock';
 import AriaReferencedText from './aria-referenced-text';
 import { unlock } from '../../lock-unlock';
@@ -117,29 +117,35 @@ function ListViewBlock( {
 	} = useSelect( blockEditorStore );
 	const { getGroupingBlockName } = useSelect( blocksStore );
 
-	const blockInformation = useBlockDisplayInformation( clientId );
-
 	const pasteStyles = usePasteStyles();
 
-	const { block, blockName, allowRightClickOverrides, isBlockHidden } =
-		useSelect(
-			( select ) => {
-				const { getBlock, getBlockName, getSettings } =
-					select( blockEditorStore );
-				const { isBlockHidden: _isBlockHidden } = unlock(
-					select( blockEditorStore )
-				);
+	const {
+		block,
+		blockName,
+		allowRightClickOverrides,
+		isBlockHidden,
+		blockInformation,
+	} = useSelect(
+		( select ) => {
+			const { getBlock, getBlockName, getSettings } =
+				select( blockEditorStore );
+			const { isBlockHidden: _isBlockHidden } = unlock(
+				select( blockEditorStore )
+			);
 
-				return {
-					block: getBlock( clientId ),
-					blockName: getBlockName( clientId ),
-					allowRightClickOverrides:
-						getSettings().allowRightClickOverrides,
-					isBlockHidden: _isBlockHidden( clientId ),
-				};
-			},
-			[ clientId ]
-		);
+			return {
+				block: getBlock( clientId ),
+				blockName: getBlockName( clientId ),
+				allowRightClickOverrides:
+					getSettings().allowRightClickOverrides,
+				isBlockHidden: _isBlockHidden( clientId ),
+				blockInformation: getBlockDisplayInformation( select, {
+					clientId,
+				} ),
+			};
+		},
+		[ clientId ]
+	);
 
 	const showBlockActions =
 		// When a block hides its toolbar it also hides the block settings menu,

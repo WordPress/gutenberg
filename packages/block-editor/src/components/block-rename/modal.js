@@ -17,19 +17,21 @@ import { useSelect, useDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import { useBlockDisplayInformation } from '..';
+import { getBlockDisplayInformation } from '../use-block-display-information';
 import isEmptyString from './is-empty-string';
 import { cleanEmptyObject } from '../../hooks/utils';
 
 export default function BlockRenameModal( { clientId, onClose } ) {
 	const [ editedBlockName, setEditedBlockName ] = useState();
 
-	const blockInformation = useBlockDisplayInformation( clientId );
-	const { metadata } = useSelect(
+	const { blockInformation, metadata } = useSelect(
 		( select ) => {
 			const { getBlockAttributes } = select( blockEditorStore );
 
 			return {
+				blockInformation: getBlockDisplayInformation( select, {
+					clientId,
+				} ),
 				metadata: getBlockAttributes( clientId )?.metadata,
 			};
 		},

@@ -9,7 +9,7 @@ import { useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import useBlockDisplayInformation from '../use-block-display-information';
+import { getBlockDisplayInformation } from '../use-block-display-information';
 import BlockIcon from '../block-icon';
 import { useShowHoveredOrFocusedGestures } from '../block-toolbar/utils';
 import { store as blockEditorStore } from '../../store';
@@ -23,7 +23,7 @@ import { unlock } from '../../lock-unlock';
  */
 export default function BlockParentSelector() {
 	const { selectBlock } = useDispatch( blockEditorStore );
-	const { parentClientId } = useSelect( ( select ) => {
+	const { parentClientId, blockInformation } = useSelect( ( select ) => {
 		const {
 			getBlockParents,
 			getSelectedBlockClientId,
@@ -35,9 +35,11 @@ export default function BlockParentSelector() {
 		const _parentClientId = parentSection ?? parents[ parents.length - 1 ];
 		return {
 			parentClientId: _parentClientId,
+			blockInformation: getBlockDisplayInformation( select, {
+				clientId: _parentClientId,
+			} ),
 		};
 	}, [] );
-	const blockInformation = useBlockDisplayInformation( parentClientId );
 
 	// Allows highlighting the parent block outline when focusing or hovering
 	// the parent block selector within the child.

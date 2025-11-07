@@ -20,7 +20,7 @@ import { getBlockType } from '@wordpress/blocks';
  * Internal dependencies
  */
 import useBlockLock from './use-block-lock';
-import useBlockDisplayInformation from '../use-block-display-information';
+import { getBlockDisplayInformation } from '../use-block-display-information';
 import { store as blockEditorStore } from '../../store';
 
 // Entity based blocks which allow edit locking
@@ -43,7 +43,12 @@ function getTemplateLockValue( lock ) {
 export default function BlockLockModal( { clientId, onClose } ) {
 	const [ lock, setLock ] = useState( { move: false, remove: false } );
 	const { canEdit, canMove, canRemove } = useBlockLock( clientId );
-	const { allowsEditLocking, templateLock, hasTemplateLock } = useSelect(
+	const {
+		allowsEditLocking,
+		templateLock,
+		hasTemplateLock,
+		blockInformation,
+	} = useSelect(
 		( select ) => {
 			const { getBlockName, getBlockAttributes } =
 				select( blockEditorStore );
@@ -54,6 +59,9 @@ export default function BlockLockModal( { clientId, onClose } ) {
 				allowsEditLocking: ALLOWS_EDIT_LOCKING.includes( blockName ),
 				templateLock: getBlockAttributes( clientId )?.templateLock,
 				hasTemplateLock: !! blockType?.attributes?.templateLock,
+				blockInformation: getBlockDisplayInformation( select, {
+					clientId,
+				} ),
 			};
 		},
 		[ clientId ]
@@ -62,7 +70,6 @@ export default function BlockLockModal( { clientId, onClose } ) {
 		!! templateLock
 	);
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-	const blockInformation = useBlockDisplayInformation( clientId );
 
 	useEffect( () => {
 		setLock( {

@@ -18,7 +18,7 @@ import { useMemo, Platform } from '@wordpress/element';
  */
 import { useSettings } from '../components/use-settings';
 import InspectorControls from '../components/inspector-controls';
-import useBlockDisplayInformation from '../components/use-block-display-information';
+import { getBlockDisplayInformation } from '../components/use-block-display-information';
 import { cleanEmptyObject, useStyleOverride } from './utils';
 import { store as blockEditorStore } from '../store';
 
@@ -202,16 +202,19 @@ export function PositionPanelPure( {
 	const allowSticky = hasStickyPositionSupport( blockName );
 	const value = style?.position?.type;
 
-	const { firstParentClientId } = useSelect(
+	const { blockInformation } = useSelect(
 		( select ) => {
 			const { getBlockParents } = select( blockEditorStore );
 			const parents = getBlockParents( clientId );
-			return { firstParentClientId: parents[ parents.length - 1 ] };
+			const firstParentClientId = parents[ parents.length - 1 ];
+			return {
+				blockInformation: getBlockDisplayInformation( select, {
+					clientId: firstParentClientId,
+				} ),
+			};
 		},
 		[ clientId ]
 	);
-
-	const blockInformation = useBlockDisplayInformation( firstParentClientId );
 	const stickyHelpText =
 		allowSticky && value === STICKY_OPTION.value && blockInformation
 			? sprintf(

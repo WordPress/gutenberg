@@ -16,8 +16,8 @@ import {
  */
 import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
-import useBlockDisplayInformation from '../use-block-display-information';
-import useBlockDisplayTitle from '../block-title/use-block-display-title';
+import { getBlockDisplayInformation } from '../use-block-display-information';
+import { getBlockDisplayTitle } from '../block-title/use-block-display-title';
 
 export default function BlockQuickNavigation( { clientIds, onSelect } ) {
 	if ( ! clientIds.length ) {
@@ -37,12 +37,7 @@ export default function BlockQuickNavigation( { clientIds, onSelect } ) {
 }
 
 function BlockQuickNavigationItem( { clientId, onSelect } ) {
-	const blockInformation = useBlockDisplayInformation( clientId );
-	const blockTitle = useBlockDisplayTitle( {
-		clientId,
-		context: 'list-view',
-	} );
-	const { isSelected } = useSelect(
+	const { isSelected, blockInformation, blockTitle } = useSelect(
 		( select ) => {
 			const { isBlockSelected, hasSelectedInnerBlock } =
 				select( blockEditorStore );
@@ -51,6 +46,14 @@ function BlockQuickNavigationItem( { clientId, onSelect } ) {
 				isSelected:
 					isBlockSelected( clientId ) ||
 					hasSelectedInnerBlock( clientId, /* deep: */ true ),
+				blockInformation: getBlockDisplayInformation( select, {
+					clientId,
+					context: 'list-view',
+				} ),
+				blockTitle: getBlockDisplayTitle( select, {
+					clientId,
+					context: 'list-view',
+				} ),
 			};
 		},
 		[ clientId ]

@@ -11,7 +11,47 @@ import {
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+export function getBlockDisplayTitle(
+	select,
+	{ clientId, context, maximumLength }
+) {
+	const { getBlockName, getBlockAttributes } = select( blockEditorStore );
+	const { getBlockType, getActiveBlockVariation } = select( blocksStore );
 
+	const blockName = getBlockName( clientId );
+	const blockType = getBlockType( blockName );
+	if ( ! blockType ) {
+		return null;
+	}
+
+	const attributes = getBlockAttributes( clientId );
+	const label = getBlockLabel( blockType, attributes, context );
+	// If the label is defined we prioritize it over a possible block variation title match.
+	if ( label !== blockType.title ) {
+		return label;
+	}
+
+	const match = getActiveBlockVariation( blockName, attributes );
+
+	const blockTitle = match?.title || blockType.title;
+
+	if ( ! blockTitle ) {
+		return null;
+	}
+
+	if (
+		maximumLength &&
+		maximumLength > 0 &&
+		blockTitle.length > maximumLength
+	) {
+		const omission = '...';
+		return (
+			blockTitle.slice( 0, maximumLength - omission.length ) + omission
+		);
+	}
+
+	return blockTitle;
+}
 /**
  * Returns the block's configured title as a string, or empty if the title
  * cannot be determined.
@@ -33,51 +73,18 @@ export default function useBlockDisplayTitle( {
 	maximumLength,
 	context,
 } ) {
-	const blockTitle = useSelect(
+	return useSelect(
 		( select ) => {
 			if ( ! clientId ) {
 				return null;
 			}
 
-			const { getBlockName, getBlockAttributes } =
-				select( blockEditorStore );
-			const { getBlockType, getActiveBlockVariation } =
-				select( blocksStore );
-
-			const blockName = getBlockName( clientId );
-			const blockType = getBlockType( blockName );
-			if ( ! blockType ) {
-				return null;
-			}
-
-			const attributes = getBlockAttributes( clientId );
-			const label = getBlockLabel( blockType, attributes, context );
-			// If the label is defined we prioritize it over a possible block variation title match.
-			if ( label !== blockType.title ) {
-				return label;
-			}
-
-			const match = getActiveBlockVariation( blockName, attributes );
-			// Label will fallback to the title if no label is defined for the current label context.
-			return match?.title || blockType.title;
+			return getBlockDisplayTitle( select, {
+				clientId,
+				context,
+				maximumLength,
+			} );
 		},
-		[ clientId, context ]
+		[ clientId, context, maximumLength ]
 	);
-
-	if ( ! blockTitle ) {
-		return null;
-	}
-
-	if (
-		maximumLength &&
-		maximumLength > 0 &&
-		blockTitle.length > maximumLength
-	) {
-		const omission = '...';
-		return (
-			blockTitle.slice( 0, maximumLength - omission.length ) + omission
-		);
-	}
-
-	return blockTitle;
 }

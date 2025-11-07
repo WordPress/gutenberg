@@ -15,13 +15,14 @@ import {
 import { getScrollContainer } from '@wordpress/dom';
 import { useCallback, useMemo } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import BlockIcon from '../block-icon';
-import useBlockDisplayInformation from '../use-block-display-information';
-import useBlockDisplayTitle from '../block-title/use-block-display-title';
+import { getBlockDisplayInformation } from '../use-block-display-information';
+import { getBlockDisplayTitle } from '../block-title/use-block-display-title';
 import ListViewExpander from './expander';
 
 export default function ListViewDropIndicatorPreview( {
@@ -29,11 +30,19 @@ export default function ListViewDropIndicatorPreview( {
 	listViewRef,
 	blockDropTarget,
 } ) {
-	const blockInformation = useBlockDisplayInformation( draggedBlockClientId );
-	const blockTitle = useBlockDisplayTitle( {
-		clientId: draggedBlockClientId,
-		context: 'list-view',
-	} );
+	const { blockInformation, blockTitle } = useSelect(
+		( select ) => ( {
+			blockInformation: getBlockDisplayInformation( select, {
+				clientId: draggedBlockClientId,
+				context: 'list-view',
+			} ),
+			blockTitle: getBlockDisplayTitle( select, {
+				clientId: draggedBlockClientId,
+				context: 'list-view',
+			} ),
+		} ),
+		[ draggedBlockClientId ]
+	);
 
 	const { rootClientId, clientId, dropPosition } = blockDropTarget || {};
 

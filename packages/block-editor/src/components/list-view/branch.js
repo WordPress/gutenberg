@@ -16,7 +16,7 @@ import ListViewBlock from './block';
 import { useListViewContext } from './context';
 import { getDragDisplacementValues, isClientIdSelected } from './utils';
 import { store as blockEditorStore } from '../../store';
-import useBlockDisplayInformation from '../use-block-display-information';
+import { getBlockDisplayInformation } from '../use-block-display-information';
 
 /**
  * Given a block, returns the total number of blocks in that subtree. This is used to help determine
@@ -101,18 +101,23 @@ function ListViewBranch( props ) {
 		showAppender: showAppenderProp = true,
 	} = props;
 
-	const parentBlockInformation = useBlockDisplayInformation( parentId );
-	const syncedBranch = isSyncedBranch || !! parentBlockInformation?.isSynced;
-
-	const canParentExpand = useSelect(
+	const { parentBlockInformation, canParentExpand } = useSelect(
 		( select ) => {
 			if ( ! parentId ) {
-				return true;
+				return { parentBlockInformation: null, canParentExpand: true };
 			}
-			return select( blockEditorStore ).canEditBlock( parentId );
+			return {
+				parentBlockInformation: getBlockDisplayInformation( select, {
+					clientId: parentId,
+				} ),
+				canParentExpand:
+					select( blockEditorStore ).canEditBlock( parentId ),
+			};
 		},
 		[ parentId ]
 	);
+
+	const syncedBranch = isSyncedBranch || !! parentBlockInformation?.isSynced;
 
 	const {
 		blockDropPosition,

@@ -11,7 +11,7 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import useBlockDisplayTitle from '../block-title/use-block-display-title';
+import { getBlockDisplayTitle } from '../block-title/use-block-display-title';
 import { useListViewContext } from './context';
 import Inserter from '../inserter';
 import AriaReferencedText from './aria-referenced-text';
@@ -22,33 +22,32 @@ export const Appender = forwardRef(
 		const { insertedBlock, setInsertedBlock } = useListViewContext();
 
 		const instanceId = useInstanceId( Appender );
-		const { directInsert, hideInserter } = useSelect(
-			( select ) => {
-				const { getBlockListSettings, getTemplateLock, isZoomOut } =
-					unlock( select( blockEditorStore ) );
+		const { directInsert, hideInserter, blockTitle, insertedBlockTitle } =
+			useSelect(
+				( select ) => {
+					const { getBlockListSettings, getTemplateLock, isZoomOut } =
+						unlock( select( blockEditorStore ) );
 
-				const settings = getBlockListSettings( clientId );
-				const directInsertValue = settings?.directInsert || false;
-				const hideInserterValue =
-					!! getTemplateLock( clientId ) || isZoomOut();
+					const settings = getBlockListSettings( clientId );
+					const directInsertValue = settings?.directInsert || false;
+					const hideInserterValue =
+						!! getTemplateLock( clientId ) || isZoomOut();
 
-				return {
-					directInsert: directInsertValue,
-					hideInserter: hideInserterValue,
-				};
-			},
-			[ clientId ]
-		);
-
-		const blockTitle = useBlockDisplayTitle( {
-			clientId,
-			context: 'list-view',
-		} );
-
-		const insertedBlockTitle = useBlockDisplayTitle( {
-			clientId: insertedBlock?.clientId,
-			context: 'list-view',
-		} );
+					return {
+						directInsert: directInsertValue,
+						hideInserter: hideInserterValue,
+						blockTitle: getBlockDisplayTitle( select, {
+							clientId,
+							context: 'list-view',
+						} ),
+						insertedBlockTitle: getBlockDisplayTitle( select, {
+							clientId: insertedBlock?.clientId,
+							context: 'list-view',
+						} ),
+					};
+				},
+				[ clientId, insertedBlock?.clientId ]
+			);
 
 		useEffect( () => {
 			if ( ! insertedBlockTitle?.length ) {

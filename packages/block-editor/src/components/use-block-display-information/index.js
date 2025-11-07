@@ -61,59 +61,63 @@ function getPositionTypeLabel( attributes ) {
  * the returned information come from the Block Type.
  * If no blockType is found with the provided clientId, returns null.
  *
- * @param {string} clientId Block's client id.
+ * @param {Object} select           The select function from the WordPress data store.
+ * @param {Object} options          Options object.
+ * @param {string} options.clientId Block's client id.
+ * @param {string} options.context  Context in which the block is being displayed.
  * @return {?WPBlockDisplayInformation} Block's display information, or `null` when the block or its type not found.
  */
+export function getBlockDisplayInformation( select, { clientId, context } ) {
+	const { getBlockName, getBlockAttributes } = select( blockEditorStore );
+	const { getBlockType, getActiveBlockVariation } = select( blocksStore );
+	const blockName = getBlockName( clientId );
+	const blockType = getBlockType( blockName );
+	if ( ! blockType ) {
+		return null;
+	}
+	const attributes = getBlockAttributes( clientId );
+	const match = getActiveBlockVariation( blockName, attributes );
+	const isSynced =
+		isReusableBlock( blockType ) || isTemplatePart( blockType );
+	const syncedTitle = isSynced
+		? getBlockLabel( blockType, attributes, context )
+		: undefined;
+	const title = syncedTitle || blockType.title;
+	const positionLabel = getPositionTypeLabel( attributes );
+	const blockTypeInfo = {
+		isSynced,
+		title,
+		icon: blockType.icon,
+		description: blockType.description,
+		anchor: attributes?.anchor,
+		positionLabel,
+		positionType: attributes?.style?.position?.type,
+		name: attributes?.metadata?.name,
+	};
+	if ( ! match ) {
+		return blockTypeInfo;
+	}
 
-export default function useBlockDisplayInformation( clientId ) {
+	return {
+		isSynced,
+		title: match.title || blockType.title,
+		icon: match.icon || blockType.icon,
+		description: match.description || blockType.description,
+		anchor: attributes?.anchor,
+		positionLabel,
+		positionType: attributes?.style?.position?.type,
+		name: attributes?.metadata?.name,
+	};
+}
+
+export default function useBlockDisplayInformation( clientId, context ) {
 	return useSelect(
 		( select ) => {
 			if ( ! clientId ) {
 				return null;
 			}
-			const { getBlockName, getBlockAttributes } =
-				select( blockEditorStore );
-			const { getBlockType, getActiveBlockVariation } =
-				select( blocksStore );
-			const blockName = getBlockName( clientId );
-			const blockType = getBlockType( blockName );
-			if ( ! blockType ) {
-				return null;
-			}
-			const attributes = getBlockAttributes( clientId );
-			const match = getActiveBlockVariation( blockName, attributes );
-			const isSynced =
-				isReusableBlock( blockType ) || isTemplatePart( blockType );
-			const syncedTitle = isSynced
-				? getBlockLabel( blockType, attributes )
-				: undefined;
-			const title = syncedTitle || blockType.title;
-			const positionLabel = getPositionTypeLabel( attributes );
-			const blockTypeInfo = {
-				isSynced,
-				title,
-				icon: blockType.icon,
-				description: blockType.description,
-				anchor: attributes?.anchor,
-				positionLabel,
-				positionType: attributes?.style?.position?.type,
-				name: attributes?.metadata?.name,
-			};
-			if ( ! match ) {
-				return blockTypeInfo;
-			}
-
-			return {
-				isSynced,
-				title: match.title || blockType.title,
-				icon: match.icon || blockType.icon,
-				description: match.description || blockType.description,
-				anchor: attributes?.anchor,
-				positionLabel,
-				positionType: attributes?.style?.position?.type,
-				name: attributes?.metadata?.name,
-			};
+			return getBlockDisplayInformation( select, { clientId, context } );
 		},
-		[ clientId ]
+		[ clientId, context ]
 	);
 }

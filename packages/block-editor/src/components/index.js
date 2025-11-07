@@ -151,7 +151,10 @@ export {
 } from './typewriter';
 export { default as Warning } from './warning';
 export { default as WritingFlow } from './writing-flow';
-export { default as useBlockDisplayInformation } from './use-block-display-information';
+export {
+	default as useBlockDisplayInformation,
+	getBlockDisplayInformation,
+} from './use-block-display-information';
 export { default as __unstableIframe } from './iframe';
 export {
 	RecursionProvider,

@@ -11,7 +11,7 @@ import {
 	InspectorControls,
 	BlockControls,
 	useBlockProps,
-	useBlockDisplayInformation,
+	getBlockDisplayInformation,
 	RichText,
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
@@ -50,23 +50,29 @@ export default function PostTermsEdit( {
 	const blockEditingMode = useBlockEditingMode();
 	const showControls = blockEditingMode === 'default';
 
-	const selectedTerm = useSelect(
+	const { selectedTerm, blockInformation } = useSelect(
 		( select ) => {
 			if ( ! term ) {
-				return {};
+				return { selectedTerm: {}, blockInformation: null };
 			}
 			const { getTaxonomy } = select( coreStore );
 			const taxonomy = getTaxonomy( term );
-			return taxonomy?.visibility?.publicly_queryable ? taxonomy : {};
+			return {
+				selectedTerm: taxonomy?.visibility?.publicly_queryable
+					? taxonomy
+					: {},
+				blockInformation: getBlockDisplayInformation( select, {
+					clientId,
+				} ),
+			};
 		},
-		[ term ]
+		[ term, clientId ]
 	);
 	const { postTerms, hasPostTerms, isLoading } = usePostTerms( {
 		postId,
 		term: selectedTerm,
 	} );
 	const hasPost = postId && postType;
-	const blockInformation = useBlockDisplayInformation( clientId );
 	const blockProps = useBlockProps( {
 		className: clsx( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
