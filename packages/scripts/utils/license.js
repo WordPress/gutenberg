@@ -341,6 +341,11 @@ function checkDepsInTree( deps, options ) {
 			continue;
 		}
 
+		// Optional dependencies that are incompatible with the current platform
+		// are normally not installed, and we cannot access their files to check
+		// the license. This install behavior is not always consistent, and it's
+		// been seen in some platforms (e.g. Windows) that empty directories are
+		// created for optional dependencies.
 		if (
 			options.optionalDependencies?.includes( dep.name ) &&
 			! isCompatiblePlatform( dep )
@@ -368,6 +373,8 @@ function checkDepsInTree( deps, options ) {
 		}
 
 		if ( dep.optionalDependencies ) {
+			// Create a unique set of optional dependencies to recursively merge
+			// with the current options.
 			const optionalDependencies = Array.from(
 				new Set( [
 					...( options?.optionalDependencies ?? [] ),
