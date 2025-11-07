@@ -27,6 +27,7 @@ const results = {
 	typeContainer: [],
 	focus: [],
 	listViewOpen: [],
+	typeWithListViewOpen: [],
 	inserterOpen: [],
 	inserterHover: [],
 	inserterSearch: [],
@@ -352,6 +353,41 @@ test.describe( 'Post Editor Performance', () => {
 				await listViewToggle.click();
 				await perfUtils.expectExpandedState( listViewToggle, 'false' );
 			}
+		} );
+	} );
+
+	test.describe( 'Typing (with List View open)', () => {
+		let draftId = null;
+
+		test( 'Setup the test post', async ( { admin, perfUtils, editor } ) => {
+			await admin.createNewPost();
+			await perfUtils.loadBlocksForLargePost();
+			await editor.insertBlock( { name: 'core/paragraph' } );
+			draftId = await perfUtils.saveDraft();
+		} );
+
+		test( 'Run the test', async ( { admin, perfUtils, metrics, page } ) => {
+			await admin.editPost( draftId );
+			await perfUtils.disableAutosave();
+
+			// Open List View
+			const listViewToggle = page.getByRole( 'button', {
+				name: 'Document Overview',
+			} );
+			await listViewToggle.click();
+			await perfUtils.expectExpandedState( listViewToggle, 'true' );
+
+			const canvas = await perfUtils.getCanvas();
+
+			const paragraph = canvas.getByRole( 'document', {
+				name: /Empty block/i,
+			} );
+
+			await type( paragraph, metrics, 'typeWithListViewOpen' );
+
+			// Close List View
+			await listViewToggle.click();
+			await perfUtils.expectExpandedState( listViewToggle, 'false' );
 		} );
 	} );
 

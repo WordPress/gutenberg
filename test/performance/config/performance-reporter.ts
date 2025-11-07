@@ -29,6 +29,7 @@ export interface WPRawPerformanceResults {
 	typeWithoutInspector: number[];
 	typeWithTopToolbar: number[];
 	typeContainer: number[];
+	typeWithListViewOpen: number[];
 	focus: number[];
 	inserterOpen: number[];
 	inserterSearch: number[];
@@ -65,6 +66,7 @@ export interface WPPerformanceResults {
 	typeWithoutInspector?: PerformanceStats;
 	typeWithTopToolbar?: PerformanceStats;
 	typeContainer?: PerformanceStats;
+	typeWithListViewOpen?: PerformanceStats;
 	focus?: PerformanceStats;
 	inserterOpen?: PerformanceStats;
 	inserterSearch?: PerformanceStats;
@@ -103,6 +105,7 @@ export function curateResults(
 		typeWithoutInspector: stats( results.typeWithoutInspector ),
 		typeWithTopToolbar: stats( results.typeWithTopToolbar ),
 		typeContainer: stats( results.typeContainer ),
+		typeWithListViewOpen: stats( results.typeWithListViewOpen ),
 		focus: stats( results.focus ),
 		inserterOpen: stats( results.inserterOpen ),
 		inserterSearch: stats( results.inserterSearch ),
