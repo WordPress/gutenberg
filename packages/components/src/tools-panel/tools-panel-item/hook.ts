@@ -54,7 +54,10 @@ export function useToolsPanelItem(
 
 	// hasValue is a new function on every render, so do not add it as a
 	// dependency to the useCallback hook! If needed, we should use a ref.
-	const hasValueCallback = useCallback( hasValue, [ panelId ] );
+	const hasValueCallback = useCallback(
+		() => Boolean( hasValue() ),
+		[ panelId ]
+	);
 	// resetAllFilter is a new function on every render, so do not add it as a
 	// dependency to the useCallback hook! If needed, we should use a ref.
 	const resetAllFilterCallback = useCallback( resetAllFilter, [ panelId ] );
@@ -122,7 +125,7 @@ export function useToolsPanelItem(
 	const wasMenuItemChecked = usePrevious( isMenuItemChecked );
 	const isRegistered = menuItems?.[ menuGroup ]?.[ label ] !== undefined;
 
-	const isValueSet = hasValue();
+	const isValueSet = Boolean( hasValue() );
 	// Notify the panel when an item's value has changed except for optional
 	// items without value because the item should not cause itself to hide.
 	useEffect( () => {
