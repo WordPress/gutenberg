@@ -324,7 +324,7 @@ function build_variation_for_navigation_link( $entity, $kind ) {
 	$is_default_title = false;
 	if ( property_exists( $entity->labels, 'item_link' ) ) {
 		$title = $entity->labels->item_link;
-		if ( $default_labels && isset( $default_labels['item_link'] ) ) {
+		if ( isset( $default_labels['item_link'] ) ) {
 			$is_default_title = in_array( $title, $default_labels['item_link'], true );
 		}
 	}
@@ -333,7 +333,7 @@ function build_variation_for_navigation_link( $entity, $kind ) {
 	$is_default_description = false;
 	if ( property_exists( $entity->labels, 'item_link_description' ) ) {
 		$description = $entity->labels->item_link_description;
-		if ( $default_labels && isset( $default_labels['item_link_description'] ) ) {
+		if ( isset( $default_labels['item_link_description'] ) ) {
 			$is_default_description = in_array( $description, $default_labels['item_link_description'], true );
 		}
 	}
