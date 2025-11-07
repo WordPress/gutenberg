@@ -32,7 +32,30 @@ class Gutenberg_REST_Attachments_Controller_6_9 extends WP_REST_Attachments_Cont
 	 * @return array Array of query arguments.
 	 */
 	protected function prepare_items_query( $prepared_args = array(), $request = null ) {
+		// Store array parameters that we'll handle separately.
+		$media_type_array = null;
+		$mime_type_array  = null;
+
+		if ( ! empty( $request['media_type'] ) && is_array( $request['media_type'] ) ) {
+			$media_type_array = $request['media_type'];
+			unset( $request['media_type'] );
+		}
+
+		if ( ! empty( $request['mime_type'] ) && is_array( $request['mime_type'] ) ) {
+			$mime_type_array = $request['mime_type'];
+			unset( $request['mime_type'] );
+		}
+
 		$query_args = parent::prepare_items_query( $prepared_args, $request );
+
+		// Restore the array parameters to the request.
+		if ( null !== $media_type_array ) {
+			$request['media_type'] = $media_type_array;
+		}
+
+		if ( null !== $mime_type_array ) {
+			$request['mime_type'] = $mime_type_array;
+		}
 
 		if ( empty( $query_args['post_status'] ) ) {
 			$query_args['post_status'] = 'inherit';
@@ -41,16 +64,16 @@ class Gutenberg_REST_Attachments_Controller_6_9 extends WP_REST_Attachments_Cont
 		$all_mime_types = array();
 		$media_types    = $this->get_media_types();
 
-		if ( ! empty( $request['media_type'] ) && is_array( $request['media_type'] ) ) {
-			foreach ( $request['media_type'] as $type ) {
+		if ( null !== $media_type_array ) {
+			foreach ( $media_type_array as $type ) {
 				if ( isset( $media_types[ $type ] ) ) {
 					$all_mime_types = array_merge( $all_mime_types, $media_types[ $type ] );
 				}
 			}
 		}
 
-		if ( ! empty( $request['mime_type'] ) && is_array( $request['mime_type'] ) ) {
-			foreach ( $request['mime_type'] as $mime_type ) {
+		if ( null !== $mime_type_array ) {
+			foreach ( $mime_type_array as $mime_type ) {
 				$parts = explode( '/', $mime_type );
 				if ( isset( $media_types[ $parts[0] ] ) && in_array( $mime_type, $media_types[ $parts[0] ], true ) ) {
 					$all_mime_types[] = $mime_type;
