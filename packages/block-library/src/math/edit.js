@@ -13,7 +13,7 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useState, useEffect, useRef } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -22,30 +22,14 @@ import { unlock } from '../lock-unlock';
 
 const { Badge } = unlock( componentsPrivateApis );
 
-export default function MathEdit( {
-	attributes,
-	setAttributes,
-	isSelected,
-	clientId,
-} ) {
-	const { latex } = attributes;
+export default function MathEdit( { attributes, setAttributes, isSelected } ) {
+	const { latex, mathML } = attributes;
 	const [ blockRef, setBlockRef ] = useState();
 	const [ error, setError ] = useState( null );
 	const [ latexToMathML, setLatexToMathML ] = useState();
-	const initialLatex = useRef( attributes.latex );
+	const initialLatex = useRef( latex );
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
-
-	// Check if block is in HTML editing mode
-	const { isEditingAsHTML } = useSelect(
-		( select ) => {
-			const { getBlockMode } = select( blockEditorStore );
-			return {
-				isEditingAsHTML: getBlockMode( clientId ) === 'html',
-			};
-		},
-		[ clientId ]
-	);
 
 	useEffect( () => {
 		import( '@wordpress/latex-to-mathml' ).then( ( module ) => {
@@ -72,18 +56,18 @@ export default function MathEdit( {
 
 	return (
 		<div { ...blockProps }>
-			{ attributes.mathML ? (
+			{ mathML ? (
 				<math
 					// We can't spread block props on the math element because
 					// it only supports a limited amount of global attributes.
 					// For example, draggable will have no effect.
 					display="block"
-					dangerouslySetInnerHTML={ { __html: attributes.mathML } }
+					dangerouslySetInnerHTML={ { __html: mathML } }
 				/>
 			) : (
 				'\u200B'
 			) }
-			{ isSelected && ! isEditingAsHTML && (
+			{ isSelected && (
 				<Popover
 					placement="bottom-start"
 					offset={ 8 }
@@ -104,9 +88,9 @@ export default function MathEdit( {
 										setAttributes( { latex: newLatex } );
 										return;
 									}
-									let mathML = '';
+									let newMathML = '';
 									try {
-										mathML = latexToMathML( newLatex, {
+										newMathML = latexToMathML( newLatex, {
 											displayMode: true,
 										} );
 										setError( null );
@@ -114,7 +98,7 @@ export default function MathEdit( {
 										setError( err.message );
 									}
 									setAttributes( {
-										mathML,
+										mathML: newMathML,
 										latex: newLatex,
 									} );
 								} }

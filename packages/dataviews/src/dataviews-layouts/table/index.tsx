@@ -374,6 +374,23 @@ function ViewTable< Item >( {
 				aria-describedby={ tableNoticeId }
 				role={ isInfiniteScroll ? 'feed' : undefined }
 			>
+				<colgroup>
+					{ hasBulkActions && (
+						<col className="dataviews-view-table__col-checkbox" />
+					) }
+					{ hasPrimaryColumn && (
+						<col className="dataviews-view-table__col-primary" />
+					) }
+					{ columns.map( ( column ) => (
+						<col
+							key={ `col-${ column }` }
+							className={ `dataviews-view-table__col-${ column }` }
+						/>
+					) ) }
+					{ !! actions?.length && (
+						<col className="dataviews-view-table__col-actions" />
+					) }
+				</colgroup>
 				<thead>
 					<tr className="dataviews-view-table__row">
 						{ hasBulkActions && (

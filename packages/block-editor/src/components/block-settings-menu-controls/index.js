@@ -19,7 +19,7 @@ import {
 import { BlockLockMenuItem, useBlockLock } from '../block-lock';
 import { store as blockEditorStore } from '../../store';
 import BlockModeToggle from '../block-settings-menu/block-mode-toggle';
-import { ModifyContentLockMenuItem } from '../content-lock';
+import { ModifyContentOnlySectionMenuItem } from '../content-lock';
 import { BlockRenameControl, useBlockRename } from '../block-rename';
 import { BlockVisibilityMenuItem } from '../block-visibility';
 
@@ -115,7 +115,7 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 						) }
 						{ fills }
 						{ selectedClientIds.length === 1 && (
-							<ModifyContentLockMenuItem
+							<ModifyContentOnlySectionMenuItem
 								clientId={ selectedClientIds[ 0 ] }
 								onClose={ fillProps?.onClose }
 							/>

@@ -47,7 +47,6 @@
 
 		&.dataviews-view-table__checkbox-column {
 			padding-right: 0;
-			width: 1%;
 
 			.dataviews-view-table__cell-content-wrapper {
 				max-width: auto;
@@ -172,6 +171,7 @@
 			min-height: $grid-unit-40;
 			display: flex;
 			align-items: center;
+			white-space: nowrap;
 
 			&.dataviews-view-table__cell-align-end {
 				justify-content: flex-end;
@@ -312,4 +312,9 @@
 		padding: $grid-unit-15 $grid-unit-60;
 		color: $gray-900;
 	}
+}
+
+/* Column width intents via colgroup: make non-primary columns shrink-to-fit */
+.dataviews-view-table col[class^="dataviews-view-table__col-"]:not(.dataviews-view-table__col-primary) {
+	width: 1%;
 }

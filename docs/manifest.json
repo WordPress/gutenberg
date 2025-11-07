@@ -1446,6 +1446,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/asset-loader",
+		"slug": "packages-asset-loader",
+		"markdown_source": "../packages/asset-loader/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/autop",
 		"slug": "packages-autop",
 		"markdown_source": "../packages/autop/README.md",
@@ -1650,12 +1656,6 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/e2e-test-utils",
-		"slug": "packages-e2e-test-utils",
-		"markdown_source": "../packages/e2e-test-utils/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "@wordpress/e2e-tests",
 		"slug": "packages-e2e-tests",
 		"markdown_source": "../packages/e2e-tests/README.md",
@@ -1815,6 +1815,12 @@
 		"title": "@wordpress/latex-to-mathml",
 		"slug": "packages-latex-to-mathml",
 		"markdown_source": "../packages/latex-to-mathml/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/lazy-editor",
+		"slug": "packages-lazy-editor",
+		"markdown_source": "../packages/lazy-editor/README.md",
 		"parent": "packages"
 	},
 	{
@@ -2308,12 +2314,6 @@
 		"slug": "e2e",
 		"markdown_source": "../docs/contributors/code/e2e/README.md",
 		"parent": "testing-overview"
-	},
-	{
-		"title": "Migration guide",
-		"slug": "migration",
-		"markdown_source": "../docs/contributors/code/e2e/migration.md",
-		"parent": "e2e"
 	},
 	{
 		"title": "Overusing snapshots",

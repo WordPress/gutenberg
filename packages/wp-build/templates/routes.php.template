@@ -23,17 +23,21 @@ if ( ! function_exists( '{{NAMESPACE}}_register_routes' ) ) {
 		$extension = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.js' : '.min.js';
 
 		foreach ( $routes as $route ) {
-			// Register content module
-			$content_asset_path = $routes_dir . '/' . $route['name'] . '/content.min.asset.php';
-			$content_asset      = file_exists( $content_asset_path ) ? require $content_asset_path : array();
-			$content_handle     = '{{HANDLE_PREFIX}}/routes/' . $route['name'] . '/content';
+			$content_handle = null;
 
-			wp_register_script_module(
-				$content_handle,
-				$base_url . $route['name'] . '/content' . $extension,
-				$content_asset['module_dependencies'] ?? array(),
-				$content_asset['version'] ?? false
-			);
+			// Register content module if it exists
+			if ( isset( $route['has_content'] ) && $route['has_content'] ) {
+				$content_asset_path = $routes_dir . '/' . $route['name'] . '/content.min.asset.php';
+				$content_asset      = file_exists( $content_asset_path ) ? require $content_asset_path : array();
+				$content_handle     = '{{HANDLE_PREFIX}}/routes/' . $route['name'] . '/content';
+
+				wp_register_script_module(
+					$content_handle,
+					$base_url . $route['name'] . '/content' . $extension,
+					$content_asset['module_dependencies'] ?? array(),
+					$content_asset['version'] ?? false
+				);
+			}
 
 			$route_handle = null;
 

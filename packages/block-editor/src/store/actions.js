@@ -34,6 +34,7 @@ import {
 import {
 	__experimentalUpdateSettings,
 	privateRemoveBlocks,
+	editContentOnlySection,
 } from './private-actions';
 
 /** @typedef {import('../components/use-on-block-drop/types').WPDropOperation} WPDropOperation */
@@ -1899,18 +1900,16 @@ export function setBlockVisibility( updates ) {
  * This action is created for internal/experimental only usage and may be
  * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
  *
- * @param {?string} temporarilyEditingAsBlocks The block's clientId being temporarily edited as blocks.
- * @param {?string} focusModeToRevert          The focus mode to revert after temporarily edit as blocks finishes.
+ * @param {?string} clientId The clientId of the block being temporarily edited.
  */
-export function __unstableSetTemporarilyEditingAsBlocks(
-	temporarilyEditingAsBlocks,
-	focusModeToRevert
-) {
-	return {
-		type: 'SET_TEMPORARILY_EDITING_AS_BLOCKS',
-		temporarilyEditingAsBlocks,
-		focusModeToRevert,
-	};
+export function __unstableSetTemporarilyEditingAsBlocks( clientId ) {
+	deprecated(
+		"wp.data.dispatch( 'core/block-editor' ).__unstableSetTemporarilyEditingAsBlocks",
+		{
+			since: '7.0',
+		}
+	);
+	return editContentOnlySection( clientId );
 }
 
 /**

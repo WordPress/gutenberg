@@ -4,13 +4,22 @@
 
 ### Enhancements
 
+- DataForm: add new details layout. [#72355](https://github.com/WordPress/gutenberg/pull/72355)
+- DatViews list layout: remove link variant from primary actions's button. [#72920](https://github.com/WordPress/gutenberg/pull/72920)
 - DataForm: simplify form normalization. [#72848](https://github.com/WordPress/gutenberg/pull/72848)
 - DataViewsPicker: Add With Modal story. [#72913](https://github.com/WordPress/gutenberg/pull/72913)
+- DataForm: make the card layout borderless. [#72514](https://github.com/WordPress/gutenberg/pull/72514)
 
 ### Bug fixes
 
 - useFormValidity: make it work with any level of nesting in the form. [#72588](https://github.com/WordPress/gutenberg/pull/72588)
 - Fix: DataViews modal actions in list layout. [#72793](https://github.com/WordPress/gutenberg/pull/72793)
+- Fix: Incorrect aria-label in table layout when items are not clickable. [#73034](https://github.com/WordPress/gutenberg/pull/73034)
+- Fix: Table layout column spacing. [#72969](https://github.com/WordPress/gutenberg/pull/72969)
+
+### Enhancements
+
+- DataViews: Group DataViews actions based on primary actions and regular actions and adds a separator between the groups. [#72866](https://github.com/WordPress/gutenberg/pull/72866)
 
 ## 10.2.0 (2025-10-29)
 

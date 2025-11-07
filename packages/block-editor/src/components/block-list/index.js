@@ -15,9 +15,9 @@ import {
 import { useMergeRefs, useDebounce } from '@wordpress/compose';
 import {
 	createContext,
+	useEffect,
 	useMemo,
 	useCallback,
-	useEffect,
 } from '@wordpress/element';
 import { getDefaultBlockName } from '@wordpress/blocks';
 
@@ -48,21 +48,23 @@ const delayedBlockVisibilityDebounceOptions = {
 };
 
 function Root( { className, ...settings } ) {
-	const { isOutlineMode, isFocusMode, temporarilyEditingAsBlocks } =
-		useSelect( ( select ) => {
+	const { isOutlineMode, isFocusMode, editedContentOnlySection } = useSelect(
+		( select ) => {
 			const {
 				getSettings,
-				getTemporarilyEditingAsBlocks,
 				isTyping,
 				hasBlockSpotlight,
+				getEditedContentOnlySection,
 			} = unlock( select( blockEditorStore ) );
 			const { outlineMode, focusMode } = getSettings();
 			return {
 				isOutlineMode: outlineMode && ! isTyping(),
 				isFocusMode: focusMode || hasBlockSpotlight(),
-				temporarilyEditingAsBlocks: getTemporarilyEditingAsBlocks(),
+				editedContentOnlySection: getEditedContentOnlySection(),
 			};
-		}, [] );
+		},
+		[]
+	);
 	const registry = useRegistry();
 	const { setBlockVisibility } = useDispatch( blockEditorStore );
 
@@ -116,33 +118,41 @@ function Root( { className, ...settings } ) {
 	return (
 		<IntersectionObserver.Provider value={ intersectionObserver }>
 			<div { ...innerBlocksProps } />
-			{ !! temporarilyEditingAsBlocks && (
-				<StopEditingAsBlocksOnOutsideSelect
-					clientId={ temporarilyEditingAsBlocks }
+			{ !! editedContentOnlySection && (
+				<StopEditingContentOnlySectionOnOutsideSelect
+					clientId={ editedContentOnlySection }
 				/>
 			) }
 		</IntersectionObserver.Provider>
 	);
 }
 
-function StopEditingAsBlocksOnOutsideSelect( { clientId } ) {
-	const { stopEditingAsBlocks } = unlock( useDispatch( blockEditorStore ) );
+function StopEditingContentOnlySectionOnOutsideSelect( { clientId } ) {
+	const { stopEditingContentOnlySection } = unlock(
+		useDispatch( blockEditorStore )
+	);
 	const isBlockOrDescendantSelected = useSelect(
 		( select ) => {
-			const { isBlockSelected, hasSelectedInnerBlock } =
-				select( blockEditorStore );
+			const {
+				isBlockSelected,
+				hasSelectedInnerBlock,
+				getBlockSelectionStart,
+			} = select( blockEditorStore );
 			return (
+				! getBlockSelectionStart() ||
 				isBlockSelected( clientId ) ||
 				hasSelectedInnerBlock( clientId, true )
 			);
 		},
 		[ clientId ]
 	);
+
 	useEffect( () => {
 		if ( ! isBlockOrDescendantSelected ) {
-			stopEditingAsBlocks( clientId );
+			stopEditingContentOnlySection();
 		}
-	}, [ isBlockOrDescendantSelected, clientId, stopEditingAsBlocks ] );
+	}, [ isBlockOrDescendantSelected, stopEditingContentOnlySection ] );
+
 	return null;
 }
 

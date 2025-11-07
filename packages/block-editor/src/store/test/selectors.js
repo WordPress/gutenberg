@@ -3879,6 +3879,19 @@ describe( 'selectors', () => {
 
 			expect( getTemplateLock( state, 'chicken' ) ).toBe( 'insert' );
 		} );
+
+		it( 'should return false if the block has contentOnly template lock and is an edited section', () => {
+			const state = {
+				editedContentOnlySection: 'chicken',
+				blockListSettings: {
+					chicken: {
+						templateLock: 'contentOnly',
+					},
+				},
+			};
+
+			expect( getTemplateLock( state, 'chicken' ) ).toBe( false );
+		} );
 	} );
 
 	describe( 'getBlockListSettings', () => {

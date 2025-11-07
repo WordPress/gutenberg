@@ -70,7 +70,10 @@ const defaultLayouts = {
 	[ LAYOUT_LIST ]: {},
 };
 
-export const Default = ( { perPageSizes = [ 10, 25, 50, 100 ] } ) => {
+export const Default = ( {
+	perPageSizes = [ 10, 25, 50, 100 ],
+	hasClickableItems = true,
+} ) => {
 	const [ view, setView ] = useState< View >( {
 		...DEFAULT_VIEW,
 		fields: [ 'categories' ],
@@ -100,7 +103,7 @@ export const Default = ( { perPageSizes = [ 10, 25, 50, 100 ] } ) => {
 					{ ...props }
 				/>
 			) }
-			isItemClickable={ () => true }
+			isItemClickable={ () => hasClickableItems }
 			defaultLayouts={ defaultLayouts }
 			config={ { perPageSizes } }
 		/>
@@ -109,12 +112,17 @@ export const Default = ( { perPageSizes = [ 10, 25, 50, 100 ] } ) => {
 
 Default.args = {
 	perPageSizes: [ 10, 25, 50, 100 ],
+	hasClickableItems: true,
 };
 
 Default.argTypes = {
 	perPageSizes: {
 		control: 'object',
 		description: 'Array of available page sizes',
+	},
+	hasClickableItems: {
+		control: 'boolean',
+		description: 'Are the items clickable',
 	},
 };
 

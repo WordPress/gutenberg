@@ -7,13 +7,8 @@ import { get, OKLCH, type ColorTypes } from 'colorjs.io/fn';
  * Internal dependencies
  */
 import './register-color-spaces';
-import { clampToGamut } from './utils';
-import {
-	WHITE,
-	BLACK,
-	LIGHTNESS_EPSILON,
-	MAX_BISECTION_ITERATIONS,
-} from './constants';
+import { clampToGamut, solveWithBisect } from './utils';
+import { WHITE, BLACK, CONTRAST_EPSILON } from './constants';
 import { getContrast } from './color-utils';
 import { type TaperChromaOptions, taperChroma } from './taper-chroma';
 
@@ -28,7 +23,6 @@ import { type TaperChromaOptions, taperChroma } from './taper-chroma';
  * @param target
  * @param direction
  * @param options
- * @param options.strict
  * @param options.lightnessConstraint
  * @param options.lightnessConstraint.type
  * @param options.lightnessConstraint.value
@@ -42,20 +36,22 @@ export function findColorMeetingRequirements(
 	{
 		lightnessConstraint,
 		taperChromaOptions,
-		strict = true,
 	}: {
 		lightnessConstraint?: {
 			type: 'force' | 'onlyIfSucceeds';
 			value: number;
 		};
 		taperChromaOptions?: TaperChromaOptions;
-		strict?: boolean;
 	} = {}
-): { color: ColorTypes; reached: boolean; achieved: number } {
+): { color: ColorTypes; reached: boolean; achieved: number; deficit?: number } {
 	// A target of 1 means same color.
 	// A target lower than 1 doesn't make sense.
 	if ( target <= 1 ) {
-		return { color: seed, reached: true, achieved: 1 };
+		return {
+			color: reference,
+			reached: true,
+			achieved: 1,
+		};
 	}
 
 	function getColorForL( l: number ): ColorTypes {
@@ -80,48 +76,45 @@ export function findColorMeetingRequirements(
 		} );
 	}
 
+	// Set the boundary based on the direction.
+	const mostContrastingL = direction === 'lighter' ? 1 : 0;
+	const mostContrastingColor = direction === 'lighter' ? WHITE : BLACK;
+	const highestContrast = getContrast( reference, mostContrastingColor );
+
 	if ( lightnessConstraint ) {
 		// Apply a specific L value.
 		// Useful when pinning a step to a specific lightness, of to specify
 		// min/max L values.
 		const colorWithExactL = getColorForL( lightnessConstraint.value );
 		const exactLContrast = getContrast( reference, colorWithExactL );
+		const exactLContrastMeetsTarget =
+			exactLContrast >= target - CONTRAST_EPSILON;
 
 		// If the L constraint is of "force" type, apply it even when it doesn't
 		// meet the contrast target.
 		if (
-			lightnessConstraint.type === 'force' ||
-			exactLContrast >= target
+			exactLContrastMeetsTarget ||
+			lightnessConstraint.type === 'force'
 		) {
 			return {
 				color: colorWithExactL,
-				reached: exactLContrast >= target,
+				reached: exactLContrastMeetsTarget,
 				achieved: exactLContrast,
+				deficit: exactLContrastMeetsTarget
+					? exactLContrast - highestContrast
+					: target - exactLContrast,
 			};
 		}
 	}
 
-	// Set the boundary based on the direction.
-	const mostContrastingL = direction === 'lighter' ? 1 : 0;
-	const mostContrastingColor = direction === 'lighter' ? WHITE : BLACK;
-	const highestContrast = getContrast( reference, mostContrastingColor );
-
-	// If even the most contrasting color can't reach the target,
-	// the target is unreachable.
-	if ( highestContrast < target ) {
-		if ( strict ) {
-			throw new Error(
-				`Contrast target ${ target.toFixed(
-					2
-				) }:1 unreachable in ${ direction } direction` +
-					`(boundary achieves ${ highestContrast.toFixed( 3 ) }:1).`
-			);
-		}
-
+	// If even the most contrasting color can't reach the target, the target is unreachable.
+	// On the othe hand, if the contrast is very close to the target, we consider it reached.
+	if ( highestContrast <= target + CONTRAST_EPSILON ) {
 		return {
 			color: mostContrastingColor,
-			reached: false,
+			reached: highestContrast >= target - CONTRAST_EPSILON,
 			achieved: highestContrast,
+			deficit: target - highestContrast,
 		};
 	}
 
@@ -129,53 +122,25 @@ export function findColorMeetingRequirements(
 	// Originally this was seed.oklch.l — although it's an assumption that works
 	// only when we know for sure the direction of the search.
 	// TODO: can we bring this back to seed.oklch.l ?
-	let worseL = get( reference, [ OKLCH, 'l' ] );
-	let worseContrast = 1;
-	let replacedWorse = false;
-	let betterL = mostContrastingL;
-	let betterContrast = highestContrast;
-	let replacedBetter = false;
+	const lowerL = get( reference, [ OKLCH, 'l' ] );
+	const lowerContrast = 1 - target;
+	const upperL = mostContrastingL;
+	const upperContrast = highestContrast - target;
 
-	let bestColor: ColorTypes = mostContrastingColor;
-	let bestContrast = highestContrast;
-
-	for ( let i = 0; i < MAX_BISECTION_ITERATIONS; i++ ) {
-		// Linear interpolation between worse and better L values, weighted by the contrast difference.
-		const newL =
-			( worseL * ( betterContrast - target ) -
-				betterL * ( worseContrast - target ) ) /
-			( betterContrast - worseContrast );
-
-		bestColor = getColorForL( newL );
-		bestContrast = getContrast( reference, bestColor );
-
-		if ( Math.abs( bestContrast - target ) <= LIGHTNESS_EPSILON ) {
-			break;
-		}
-
-		// Update one of the boundary L values, using the Illinois method.
-		if ( bestContrast >= target ) {
-			betterL = newL;
-			betterContrast = bestContrast;
-			if ( replacedBetter ) {
-				worseContrast = ( worseContrast + target ) / 2;
-			}
-			replacedBetter = true;
-			replacedWorse = false;
-		} else {
-			worseL = newL;
-			worseContrast = bestContrast;
-			if ( replacedWorse ) {
-				betterContrast = ( betterContrast + target ) / 2;
-			}
-			replacedWorse = true;
-			replacedBetter = false;
-		}
-	}
+	const bestColor = solveWithBisect(
+		getColorForL,
+		( c: ColorTypes ) => getContrast( reference, c ) - target,
+		lowerL,
+		lowerContrast,
+		upperL,
+		upperContrast
+	);
 
 	return {
 		color: bestColor,
 		reached: true,
-		achieved: bestContrast,
+		achieved: target,
+		// Negative number that specifies how much room we have.
+		deficit: target - highestContrast,
 	};
 }
