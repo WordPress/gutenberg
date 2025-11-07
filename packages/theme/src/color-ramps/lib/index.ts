@@ -71,7 +71,7 @@ function calculateRamp( {
 	>;
 	let maxDeficit = -Infinity;
 	let maxDeficitDirection: RampDirection = 'lighter';
-	let maxDeficitStep = 'none';
+	let maxDeficitStep;
 
 	// Keep track of the calculated colors, as they are going to be useful
 	// when other colors reference them.
@@ -177,12 +177,14 @@ function calculateRamp( {
 
 		// When the target contrast is not met, take note of it and use
 		// that information to guide the ramp calculation bisection.
-		if ( ! contrast.ignoreWhenAdjustingSeed ) {
-			if ( searchResults.deficit && searchResults.deficit > maxDeficit ) {
-				maxDeficit = searchResults.deficit;
-				maxDeficitDirection = computedDir;
-				maxDeficitStep = stepName;
-			}
+		if (
+			! contrast.ignoreWhenAdjustingSeed &&
+			searchResults.deficit &&
+			searchResults.deficit > maxDeficit
+		) {
+			maxDeficit = searchResults.deficit;
+			maxDeficitDirection = computedDir;
+			maxDeficitStep = stepName;
 		}
 
 		// Store calculated color for future dependencies
@@ -301,7 +303,7 @@ export function buildRamp(
 		let bestSeed = seed;
 		let bestDeficit = maxDeficit;
 
-		const iterSteps = stepsForStep( maxDeficitStep as keyof Ramp, config );
+		const iterSteps = stepsForStep( maxDeficitStep!, config );
 
 		// Binary search: try a new seed and recompute the whole ramp
 		for ( let i = 0; i < MAX_BISECTION_ITERATIONS; i++ ) {
