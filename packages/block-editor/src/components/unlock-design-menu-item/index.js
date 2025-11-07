@@ -2,31 +2,19 @@
  * WordPress dependencies
  */
 import { MenuItem } from '@wordpress/components';
-import { useDispatch, useSelect } from '@wordpress/data';
 import { _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { store as blockEditorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
+import useContentOnlySectionEdit from '../use-content-only-section-edit';
 
 export function UnlockDesignMenuItem( { clientId, onClose } ) {
-	const { isSectionBlock, isEditingContentOnlySection } = useSelect(
-		( select ) => {
-			const {
-				isSectionBlock: _isSectionBlock,
-				getEditedContentOnlySection,
-			} = unlock( select( blockEditorStore ) );
-			return {
-				isSectionBlock: _isSectionBlock( clientId ),
-				isEditingContentOnlySection:
-					getEditedContentOnlySection() === clientId,
-			};
-		},
-		[ clientId ]
-	);
-	const blockEditorActions = useDispatch( blockEditorStore );
+	const {
+		isSectionBlock,
+		isEditingContentOnlySection,
+		editContentOnlySection,
+	} = useContentOnlySectionEdit( clientId );
 
 	// Only show when the experiment is enabled, the block is a section block,
 	// and we're not already editing it
@@ -37,8 +25,6 @@ export function UnlockDesignMenuItem( { clientId, onClose } ) {
 	) {
 		return null;
 	}
-
-	const { editContentOnlySection } = unlock( blockEditorActions );
 
 	return (
 		<MenuItem
