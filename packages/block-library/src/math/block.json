@@ -8,7 +8,15 @@
 	"keywords": [ "equation", "formula", "latex", "mathematics" ],
 	"textdomain": "default",
 	"supports": {
-		"html": false
+		"html": false,
+		"color": {
+			"text": true,
+			"background": true,
+			"__experimentalDefaultControls": {
+				"text": true,
+				"background": true
+			}
+		}
 	},
 	"attributes": {
 		"latex": {
@@ -19,6 +27,25 @@
 			"type": "string",
 			"source": "html",
 			"selector": "math"
+		},
+		"fontSize": {
+			"type": "number",
+			"default": 16
+		},
+		"textColor": {
+			"type": "string"
+		},
+		"backgroundColor": {
+			"type": "string"
+		},
+		"border": {
+			"type": "object"
+		},
+		"borderRadius": {
+			"type": "string"
+		},
+		"padding": {
+			"type": "string"
 		}
 	}
 }
