@@ -69,9 +69,9 @@ function calculateRamp( {
 		keyof Ramp,
 		{ color: string; warning: boolean }
 	>;
-	let MAX_DEFICIT = -Infinity;
-	let MAX_DEFICIT_DIRECTION: RampDirection = 'lighter';
-	let MAX_DEFICIT_STEP = 'none';
+	let maxDeficit = -Infinity;
+	let maxDeficitDirection: RampDirection = 'lighter';
+	let maxDeficitStep = 'none';
 
 	// Keep track of the calculated colors, as they are going to be useful
 	// when other colors reference them.
@@ -178,13 +178,10 @@ function calculateRamp( {
 		// When the target contrast is not met, take note of it and use
 		// that information to guide the ramp calculation bisection.
 		if ( ! contrast.ignoreWhenAdjustingSeed ) {
-			if (
-				searchResults.deficit &&
-				searchResults.deficit > MAX_DEFICIT
-			) {
-				MAX_DEFICIT = searchResults.deficit;
-				MAX_DEFICIT_DIRECTION = computedDir;
-				MAX_DEFICIT_STEP = stepName;
+			if ( searchResults.deficit && searchResults.deficit > maxDeficit ) {
+				maxDeficit = searchResults.deficit;
+				maxDeficitDirection = computedDir;
+				maxDeficitStep = stepName;
 			}
 		}
 
@@ -200,9 +197,9 @@ function calculateRamp( {
 	}
 	return {
 		rampResults,
-		MAX_DEFICIT,
-		MAX_DEFICIT_DIRECTION,
-		MAX_DEFICIT_STEP,
+		maxDeficit,
+		maxDeficitDirection,
+		maxDeficitStep,
 	};
 }
 
@@ -275,43 +272,36 @@ export function buildRamp(
 	const sortedSteps = sortByDependency( config );
 
 	// Calculate the ramp with the initial seed.
-	const {
-		rampResults,
-		MAX_DEFICIT,
-		MAX_DEFICIT_DIRECTION,
-		MAX_DEFICIT_STEP,
-	} = calculateRamp( {
-		seed,
-		sortedSteps,
-		config,
-		mainDir,
-		oppDir,
-		pinLightness,
-	} );
+	const { rampResults, maxDeficit, maxDeficitDirection, maxDeficitStep } =
+		calculateRamp( {
+			seed,
+			sortedSteps,
+			config,
+			mainDir,
+			oppDir,
+			pinLightness,
+		} );
 
 	const toReturn = {
 		ramp: rampResults,
 		direction: mainDir,
 	} as RampResult;
 
-	if ( MAX_DEFICIT > CONTRAST_EPSILON && rescaleToFitContrastTargets ) {
+	if ( maxDeficit > CONTRAST_EPSILON && rescaleToFitContrastTargets ) {
 		let worseSeedL = get( seed, [ OKLCH, 'l' ] );
-		let worseDeficit = MAX_DEFICIT;
+		let worseDeficit = maxDeficit;
 		let worseReplaced = false;
 
 		// For a scale with the "lighter" direction, the contrast can be improved
 		// by darkening the seed. For "darker" direction, by lightening the seed.
-		let betterSeedL = MAX_DEFICIT_DIRECTION === 'lighter' ? 0 : 1;
-		let betterDeficit = -MAX_DEFICIT;
+		let betterSeedL = maxDeficitDirection === 'lighter' ? 0 : 1;
+		let betterDeficit = -maxDeficit;
 		let betterReplaced = false;
 
 		let bestSeed = seed;
-		let bestDeficit = MAX_DEFICIT;
+		let bestDeficit = maxDeficit;
 
-		const iterSteps = stepsForStep(
-			MAX_DEFICIT_STEP as keyof Ramp,
-			config
-		);
+		const iterSteps = stepsForStep( maxDeficitStep as keyof Ramp, config );
 
 		// Binary search: try a new seed and recompute the whole ramp
 		for ( let i = 0; i < MAX_BISECTION_ITERATIONS; i++ ) {
@@ -334,12 +324,12 @@ export function buildRamp(
 
 			// If the constraints start failing in the opposite direction to the original
 			// iteration's direction, that means we've moved too far away from the target.
-			// Don't use the `MAX_DEFICIT` value because it's not related to our search,
+			// Don't use the `maxDeficit` value because it's not related to our search,
 			// and might even be positive, which would confuse the bisection algorithm.
 			bestDeficit =
-				iterationResults.MAX_DEFICIT_DIRECTION === MAX_DEFICIT_DIRECTION
-					? iterationResults.MAX_DEFICIT
-					: -MAX_DEFICIT;
+				iterationResults.maxDeficitDirection === maxDeficitDirection
+					? iterationResults.maxDeficit
+					: -maxDeficit;
 
 			if ( Math.abs( bestDeficit ) <= CONTRAST_EPSILON ) {
 				break;
