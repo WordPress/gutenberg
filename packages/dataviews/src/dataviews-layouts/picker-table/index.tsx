@@ -7,7 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { Spinner } from '@wordpress/components';
+import { Spinner, Composite } from '@wordpress/components';
 import {
 	useContext,
 	useEffect,
@@ -117,13 +117,25 @@ function TableRow< Item >( {
 		( descriptionField && showDescription );
 
 	return (
-		<tr
-			className={ clsx( 'dataviews-view-table__row', {
-				'is-selected': isSelected,
-				'is-hovered': isHovered,
-			} ) }
-			onMouseEnter={ handleMouseEnter }
-			onMouseLeave={ handleMouseLeave }
+		<Composite.Item
+			key={ id }
+			render={ ( { children, ...props } ) => (
+				<tr
+					className={ clsx( 'dataviews-view-table__row', {
+						'is-selected': isSelected,
+						'is-hovered': isHovered,
+					} ) }
+					onMouseEnter={ handleMouseEnter }
+					onMouseLeave={ handleMouseLeave }
+					children={ children }
+					{ ...props }
+				/>
+			) }
+			aria-label={
+				titleField
+					? titleField.getValue( { item } ) || __( '(no title)' )
+					: undefined
+			}
 			aria-selected={ isSelected }
 			aria-setsize={
 				infiniteScrollEnabled ? paginationInfo.totalItems : undefined
@@ -155,6 +167,8 @@ function TableRow< Item >( {
 						getItemId={ getItemId }
 						titleField={ titleField }
 						disabled={ false }
+						aria-hidden
+						tabIndex={ -1 }
 					/>
 				</div>
 			</td>
@@ -196,7 +210,7 @@ function TableRow< Item >( {
 					</td>
 				);
 			} ) }
-		</tr>
+		</Composite.Item>
 	);
 }
 
@@ -369,57 +383,71 @@ function ViewPickerTable< Item >( {
 				</thead>
 				{ /* Render grouped data if groupByField is specified */ }
 				{ hasData && groupField && dataByGroup ? (
-					Array.from( dataByGroup.entries() ).map(
-						( [ groupName, groupItems ] ) => (
-							<tbody
-								key={ `group-${ groupName }` }
-								role="presentation"
-							>
-								<tr
-									className="dataviews-view-table__group-header-row"
-									role="presentation"
+					<Composite
+						virtualFocus
+						orientation="vertical"
+						render={ ( { children } ) => <>{ children }</> }
+					>
+						{ Array.from( dataByGroup.entries() ).map(
+							( [ groupName, groupItems ] ) => (
+								<tbody
+									key={ `group-${ groupName }` }
+									role="group"
 								>
-									<td
-										colSpan={
-											columns.length +
-											( hasPrimaryColumn ? 1 : 0 ) +
-											1
-										}
-										className="dataviews-view-table__group-header-cell"
+									<tr
+										className="dataviews-view-table__group-header-row"
 										role="presentation"
 									>
-										{ sprintf(
-											// translators: 1: The label of the field e.g. "Date". 2: The value of the field, e.g.: "May 2022".
-											__( '%1$s: %2$s' ),
-											groupField.label,
-											groupName
-										) }
-									</td>
-								</tr>
-								{ groupItems.map( ( item, index ) => (
-									<TableRow
-										key={ getItemId( item ) }
-										item={ item }
-										fields={ fields }
-										id={
-											getItemId( item ) ||
-											index.toString()
-										}
-										view={ view }
-										titleField={ titleField }
-										mediaField={ mediaField }
-										descriptionField={ descriptionField }
-										selection={ selection }
-										getItemId={ getItemId }
-										onChangeSelection={ onChangeSelection }
-										multiselect={ isMultiselect }
-									/>
-								) ) }
-							</tbody>
-						)
-					)
+										<td
+											colSpan={
+												columns.length +
+												( hasPrimaryColumn ? 1 : 0 ) +
+												1
+											}
+											className="dataviews-view-table__group-header-cell"
+											role="presentation"
+										>
+											{ sprintf(
+												// translators: 1: The label of the field e.g. "Date". 2: The value of the field, e.g.: "May 2022".
+												__( '%1$s: %2$s' ),
+												groupField.label,
+												groupName
+											) }
+										</td>
+									</tr>
+									{ groupItems.map( ( item, index ) => (
+										<TableRow
+											key={ getItemId( item ) }
+											item={ item }
+											fields={ fields }
+											id={
+												getItemId( item ) ||
+												index.toString()
+											}
+											view={ view }
+											titleField={ titleField }
+											mediaField={ mediaField }
+											descriptionField={
+												descriptionField
+											}
+											selection={ selection }
+											getItemId={ getItemId }
+											onChangeSelection={
+												onChangeSelection
+											}
+											multiselect={ isMultiselect }
+										/>
+									) ) }
+								</tbody>
+							)
+						) }
+					</Composite>
 				) : (
-					<tbody role="presentation">
+					<Composite
+						render={ <tbody role="presentation" /> }
+						virtualFocus
+						orientation="vertical"
+					>
 						{ hasData &&
 							data.map( ( item, index ) => (
 								<TableRow
@@ -440,7 +468,7 @@ function ViewPickerTable< Item >( {
 									}
 								/>
 							) ) }
-					</tbody>
+					</Composite>
 				) }
 			</table>
 			<div

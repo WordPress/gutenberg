@@ -22,8 +22,9 @@ import { unlock } from '../../lock-unlock';
 
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 
-// Layout constant - matching the picker grid layout type
+// Layout constants - matching the picker layout types
 const LAYOUT_PICKER_GRID = 'pickerGrid';
+const LAYOUT_PICKER_TABLE = 'pickerTable';
 
 interface MediaUploadModalProps {
 	/**
@@ -301,6 +302,7 @@ export function MediaUploadModal( {
 	const defaultLayouts = useMemo(
 		() => ( {
 			[ LAYOUT_PICKER_GRID ]: {},
+			[ LAYOUT_PICKER_TABLE ]: {},
 		} ),
 		[]
 	);
