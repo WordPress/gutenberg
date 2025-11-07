@@ -9,17 +9,20 @@ test.describe( 'Fit Text', () => {
 	} );
 
 	test.describe( 'Editor functionality', () => {
-		test( 'should enable fit text on a heading block via Stretch Heading variation', async ( {
+		test( 'should enable fit text on a heading block via Stretchy Heading variation', async ( {
 			editor,
 			page,
 		} ) => {
-			// Insert Stretch Heading variation from block inserter
+			// Insert Stretchy Heading variation from block inserter
 			await page
 				.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 				.click();
 			await page
 				.getByRole( 'listbox', { name: 'Text' } )
-				.getByRole( 'option', { name: 'Stretch Heading', exact: true } )
+				.getByRole( 'option', {
+					name: 'Stretchy Heading',
+					exact: true,
+				} )
 				.click();
 
 			// Wait for the block to be inserted and click into it to ensure focus
@@ -45,17 +48,17 @@ test.describe( 'Fit Text', () => {
 			await expect( headingBlock ).toHaveClass( /has-fit-text/ );
 		} );
 
-		test( 'should enable fit text on a paragraph block via Stretch Text variation', async ( {
+		test( 'should enable fit text on a paragraph block via Stretchy Text variation', async ( {
 			editor,
 			page,
 		} ) => {
-			// Insert Stretch Text variation from block inserter
+			// Insert Stretchy Text variation from block inserter
 			await page
 				.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 				.click();
 			await page
 				.getByRole( 'listbox', { name: 'Text' } )
-				.getByRole( 'option', { name: 'Stretch Text', exact: true } )
+				.getByRole( 'option', { name: 'Stretchy Text', exact: true } )
 				.click();
 
 			// Wait for the block to be inserted and click into it to ensure focus
@@ -174,17 +177,20 @@ test.describe( 'Fit Text', () => {
 			expect( fitTextSize ).toBeGreaterThan( normalSize * 2 );
 		} );
 
-		test( 'should not show font size UI for Stretch Text and Stretch Heading variations', async ( {
+		test( 'should not show font size UI for Stretchy Text and Stretchy Heading variations', async ( {
 			editor,
 			page,
 		} ) => {
-			// Insert Stretch Heading variation
+			// Insert Stretchy Heading variation
 			await page
 				.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 				.click();
 			await page
 				.getByRole( 'listbox', { name: 'Text' } )
-				.getByRole( 'option', { name: 'Stretch Heading', exact: true } )
+				.getByRole( 'option', {
+					name: 'Stretchy Heading',
+					exact: true,
+				} )
 				.click();
 
 			// Wait for the block to be inserted and click into it to ensure focus
@@ -202,13 +208,13 @@ test.describe( 'Fit Text', () => {
 			const fontSizeButton = page.getByRole( 'button', {
 				name: 'Set custom size',
 			} );
-			await expect( fontSizeButton ).not.toBeVisible();
+			await expect( fontSizeButton ).toBeHidden();
 
 			// Verify no font size picker is present
 			const fontSizePicker = page.locator(
 				'[aria-label="Font size"], [aria-label="Size"]'
 			);
-			await expect( fontSizePicker ).not.toBeVisible();
+			await expect( fontSizePicker ).toBeHidden();
 		} );
 
 		test( 'should not load frontend script when editing a saved post with fit text', async ( {
