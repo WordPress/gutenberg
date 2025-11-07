@@ -227,7 +227,7 @@ describe( 'Store Selectors', () => {
 		it( 'should return null if ability not found', () => {
 			const ability = getAbility( state, 'non-existent' );
 
-			expect( ability ).toBeNull();
+			expect( ability ).toBeUndefined();
 		} );
 
 		it( 'should handle empty state', () => {
@@ -238,7 +238,7 @@ describe( 'Store Selectors', () => {
 
 			const ability = getAbility( emptyState, 'test/ability' );
 
-			expect( ability ).toBeNull();
+			expect( ability ).toBeUndefined();
 		} );
 
 		it( 'should return client abilities with callbacks', () => {
@@ -350,7 +350,7 @@ describe( 'Store Selectors', () => {
 		it( 'should return null if category not found', () => {
 			const category = getAbilityCategory( state, 'non-existent' );
 
-			expect( category ).toBeNull();
+			expect( category ).toBeUndefined();
 		} );
 
 		it( 'should handle empty state', () => {
@@ -361,7 +361,7 @@ describe( 'Store Selectors', () => {
 
 			const category = getAbilityCategory( emptyState, 'data-retrieval' );
 
-			expect( category ).toBeNull();
+			expect( category ).toBeUndefined();
 		} );
 
 		it( 'should return categories with meta', () => {
