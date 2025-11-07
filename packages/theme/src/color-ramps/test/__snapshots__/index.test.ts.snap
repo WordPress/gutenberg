@@ -4324,7 +4324,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
             "warning": false,
           },
           "bgFillInverted2": {
-            "color": "#f6f1dc",
+            "color": "#f6f1db",
             "warning": false,
           },
           "fgFill": {
@@ -4332,7 +4332,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
             "warning": false,
           },
           "fgFillDark": {
-            "color": "#f6f1dc",
+            "color": "#f6f1db",
             "warning": false,
           },
           "fgFillInverted": {
@@ -6357,7 +6357,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
             "warning": false,
           },
           "bgFillInverted1": {
-            "color": "#460000",
+            "color": "#470000",
             "warning": false,
           },
           "bgFillInverted2": {
@@ -6385,7 +6385,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
             "warning": false,
           },
           "fgSurface3": {
-            "color": "#5c130d",
+            "color": "#5c130c",
             "warning": false,
           },
           "fgSurface4": {
@@ -6401,7 +6401,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
             "warning": false,
           },
           "stroke3": {
-            "color": "#5c130d",
+            "color": "#5c130c",
             "warning": false,
           },
           "stroke4": {
@@ -6409,11 +6409,11 @@ exports[`buildRamps accent ramp snapshots 1`] = `
             "warning": false,
           },
           "surface1": {
-            "color": "#d37f73",
+            "color": "#d37f72",
             "warning": false,
           },
           "surface2": {
-            "color": "#d88478",
+            "color": "#d88477",
             "warning": false,
           },
           "surface3": {
@@ -22024,7 +22024,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
   },
   {
     "input": {
-      "seedComputed": "#f07676",
+      "seedComputed": "#f07675",
       "seedOriginal": "#f07575",
       "seedUnchanged": false,
     },
@@ -22084,7 +22084,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "stroke2": {
-          "color": "#955250",
+          "color": "#955150",
           "warning": false,
         },
         "stroke3": {
@@ -22100,7 +22100,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "surface2": {
-          "color": "#f07676",
+          "color": "#f07675",
           "warning": false,
         },
         "surface3": {
@@ -23092,7 +23092,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "stroke4": {
-          "color": "#282751",
+          "color": "#282651",
           "warning": false,
         },
         "surface1": {
@@ -23116,7 +23116,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "surface6": {
-          "color": "#7675cf",
+          "color": "#7575cf",
           "warning": false,
         },
       },
@@ -25668,7 +25668,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "fgSurface2": {
-          "color": "#544543",
+          "color": "#544544",
           "warning": false,
         },
         "fgSurface3": {
@@ -25704,7 +25704,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "surface3": {
-          "color": "#f27f77",
+          "color": "#f27f78",
           "warning": false,
         },
         "surface4": {
@@ -26172,7 +26172,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "fgSurface3": {
-          "color": "#342c33",
+          "color": "#332c33",
           "warning": false,
         },
         "fgSurface4": {
@@ -26268,11 +26268,11 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "fgSurface2": {
-          "color": "#534645",
+          "color": "#534545",
           "warning": false,
         },
         "fgSurface3": {
-          "color": "#352c2c",
+          "color": "#352c2b",
           "warning": false,
         },
         "fgSurface4": {
@@ -26312,11 +26312,11 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "surface5": {
-          "color": "#de6262",
+          "color": "#dd6262",
           "warning": false,
         },
         "surface6": {
-          "color": "#cd5a5a",
+          "color": "#cd5a59",
           "warning": false,
         },
       },
@@ -26796,7 +26796,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "surface1": {
-          "color": "#da6ada",
+          "color": "#da69da",
           "warning": false,
         },
         "surface2": {
@@ -26884,11 +26884,11 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "stroke2": {
-          "color": "#8d5655",
+          "color": "#8c5655",
           "warning": false,
         },
         "stroke3": {
-          "color": "#673d3d",
+          "color": "#663d3d",
           "warning": false,
         },
         "stroke4": {
@@ -27224,7 +27224,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
   },
   {
     "input": {
-      "seedComputed": "#9193e8",
+      "seedComputed": "#9193e7",
       "seedOriginal": "#7070c2",
       "seedUnchanged": false,
     },
@@ -27300,7 +27300,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "surface2": {
-          "color": "#9193e8",
+          "color": "#9193e7",
           "warning": false,
         },
         "surface3": {
@@ -27424,7 +27424,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
   },
   {
     "input": {
-      "seedComputed": "#ba9190",
+      "seedComputed": "#ba9191",
       "seedOriginal": "#ad8585",
       "seedUnchanged": false,
     },
@@ -27500,7 +27500,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "surface2": {
-          "color": "#ba9190",
+          "color": "#ba9191",
           "warning": false,
         },
         "surface3": {
@@ -27888,7 +27888,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "stroke3": {
-          "color": "#46456a",
+          "color": "#464569",
           "warning": false,
         },
         "stroke4": {
@@ -28008,7 +28008,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "surface4": {
-          "color": "#ac83ac",
+          "color": "#ac84ac",
           "warning": false,
         },
         "surface5": {
@@ -28708,7 +28708,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "surface4": {
-          "color": "#f46150",
+          "color": "#f4614f",
           "warning": false,
         },
         "surface5": {
@@ -29816,7 +29816,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "surface6": {
-          "color": "#c053bd",
+          "color": "#bf53bd",
           "warning": false,
         },
       },
@@ -30408,7 +30408,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "surface4": {
-          "color": "#da61d8",
+          "color": "#d961d8",
           "warning": false,
         },
         "surface5": {
@@ -30972,7 +30972,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "fgSurface3": {
-          "color": "#332c32",
+          "color": "#322c32",
           "warning": false,
         },
         "fgSurface4": {
@@ -31016,7 +31016,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "surface6": {
-          "color": "#b260b1",
+          "color": "#b160b1",
           "warning": false,
         },
       },
@@ -31396,7 +31396,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "surface1": {
-          "color": "#6b9f9e",
+          "color": "#6b9e9e",
           "warning": false,
         },
         "surface2": {
@@ -31412,7 +31412,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "surface5": {
-          "color": "#609293",
+          "color": "#609292",
           "warning": false,
         },
         "surface6": {
@@ -33724,7 +33724,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
   },
   {
     "input": {
-      "seedComputed": "#34abab",
+      "seedComputed": "#34abaa",
       "seedOriginal": "#29a3a3",
       "seedUnchanged": false,
     },
@@ -33800,7 +33800,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "surface2": {
-          "color": "#34abab",
+          "color": "#34abaa",
           "warning": false,
         },
         "surface3": {
@@ -33808,7 +33808,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "surface4": {
-          "color": "#479e9e",
+          "color": "#479e9d",
           "warning": false,
         },
         "surface5": {
@@ -34336,7 +34336,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "bgFill2": {
-          "color": "#003334",
+          "color": "#003234",
           "warning": false,
         },
         "bgFillDark": {
@@ -34364,7 +34364,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "fgSurface1": {
-          "color": "#5b6464",
+          "color": "#5b6463",
           "warning": false,
         },
         "fgSurface2": {
@@ -34380,7 +34380,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "stroke1": {
-          "color": "#5c8686",
+          "color": "#5c8685",
           "warning": false,
         },
         "stroke2": {
@@ -34408,7 +34408,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "surface4": {
-          "color": "#549d9c",
+          "color": "#539d9c",
           "warning": false,
         },
         "surface5": {
@@ -34612,7 +34612,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "surface5": {
-          "color": "#924591",
+          "color": "#914591",
           "warning": false,
         },
         "surface6": {
@@ -35016,7 +35016,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "surface6": {
-          "color": "#4b7474",
+          "color": "#4b7374",
           "warning": false,
         },
       },
@@ -35312,7 +35312,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "surface5": {
-          "color": "#626262",
+          "color": "#636363",
           "warning": false,
         },
         "surface6": {
@@ -35412,7 +35412,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "surface5": {
-          "color": "#626262",
+          "color": "#636363",
           "warning": false,
         },
         "surface6": {
@@ -35512,7 +35512,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "surface5": {
-          "color": "#626262",
+          "color": "#636363",
           "warning": false,
         },
         "surface6": {
@@ -35612,7 +35612,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "surface5": {
-          "color": "#626262",
+          "color": "#636363",
           "warning": false,
         },
         "surface6": {
@@ -35712,7 +35712,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "surface5": {
-          "color": "#626262",
+          "color": "#636363",
           "warning": false,
         },
         "surface6": {
@@ -35812,7 +35812,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "surface5": {
-          "color": "#626262",
+          "color": "#636363",
           "warning": false,
         },
         "surface6": {
@@ -36216,7 +36216,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "surface6": {
-          "color": "#418a89",
+          "color": "#418989",
           "warning": false,
         },
       },
@@ -36772,7 +36772,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "fgSurface3": {
-          "color": "#2b2f2f",
+          "color": "#2a2f2f",
           "warning": false,
         },
         "fgSurface4": {
@@ -36792,7 +36792,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "stroke4": {
-          "color": "#1c2f2f",
+          "color": "#1c2f2e",
           "warning": false,
         },
         "surface1": {
@@ -36808,7 +36808,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "surface4": {
-          "color": "#4b9d9d",
+          "color": "#4a9d9d",
           "warning": false,
         },
         "surface5": {
@@ -36816,7 +36816,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "surface6": {
-          "color": "#458989",
+          "color": "#458988",
           "warning": false,
         },
       },
@@ -37132,7 +37132,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
       "direction": "darker",
       "ramp": {
         "bgFill1": {
-          "color": "#3e3d00",
+          "color": "#3e3c00",
           "warning": false,
         },
         "bgFill2": {
@@ -37372,7 +37372,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "fgSurface3": {
-          "color": "#c0d4d3",
+          "color": "#c0d3d3",
           "warning": false,
         },
         "fgSurface4": {
@@ -37388,11 +37388,11 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "stroke3": {
-          "color": "#6eb7b6",
+          "color": "#6eb6b6",
           "warning": false,
         },
         "stroke4": {
-          "color": "#8ee2e1",
+          "color": "#8de2e1",
           "warning": false,
         },
         "surface1": {
@@ -37724,7 +37724,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
   },
   {
     "input": {
-      "seedComputed": "#575717",
+      "seedComputed": "#575718",
       "seedOriginal": "#6b6b2e",
       "seedUnchanged": false,
     },
@@ -37792,7 +37792,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "stroke4": {
-          "color": "#d6d798",
+          "color": "#d6d898",
           "warning": false,
         },
         "surface1": {
@@ -37800,7 +37800,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "surface2": {
-          "color": "#575717",
+          "color": "#575718",
           "warning": false,
         },
         "surface3": {
@@ -37808,7 +37808,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "surface4": {
-          "color": "#5e5e2c",
+          "color": "#5e5f2c",
           "warning": false,
         },
         "surface5": {
@@ -39612,7 +39612,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "surface5": {
-          "color": "#656628",
+          "color": "#656627",
           "warning": false,
         },
         "surface6": {
@@ -39636,7 +39636,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "bgFill2": {
-          "color": "#92e88b",
+          "color": "#92e78b",
           "warning": false,
         },
         "bgFillDark": {
@@ -39704,11 +39704,11 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "surface3": {
-          "color": "#276524",
+          "color": "#276523",
           "warning": false,
         },
         "surface4": {
-          "color": "#296925",
+          "color": "#296926",
           "warning": false,
         },
         "surface5": {
@@ -39772,7 +39772,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "fgSurface3": {
-          "color": "#c0d3d3",
+          "color": "#c0d4d3",
           "warning": false,
         },
         "fgSurface4": {
@@ -39780,7 +39780,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "stroke1": {
-          "color": "#457574",
+          "color": "#467574",
           "warning": false,
         },
         "stroke2": {
@@ -39788,7 +39788,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
           "warning": false,
         },
         "stroke3": {
-          "color": "#70b6b5",
+          "color": "#70b6b6",
           "warning": false,
         },
         "stroke4": {
