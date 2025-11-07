@@ -462,6 +462,26 @@ export const getEntityRecords =
 				};
 			}
 
+			if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+				if ( entityConfig.syncConfig && -1 === query.per_page ) {
+					const objectType = `${ kind }/${ name }`;
+					getSyncManager()?.loadCollection(
+						entityConfig.syncConfig,
+						objectType,
+						{
+							refetchRecords: async () => {
+								dispatch.receiveEntityRecords(
+									kind,
+									name,
+									await apiFetch( { path, parse: true } ),
+									query
+								);
+							},
+						}
+					);
+				}
+			}
+
 			// If we request fields but the result doesn't contain the fields,
 			// explicitly set these fields as "undefined"
 			// that way we consider the query "fulfilled".

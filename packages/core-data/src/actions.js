@@ -339,6 +339,15 @@ export const deleteEntityRecord =
 				} );
 
 				await dispatch( removeItems( kind, name, recordId, true ) );
+
+				if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+					if ( entityConfig.syncConfig ) {
+						const objectType = `${ kind }/${ name }`;
+						const objectId = recordId;
+
+						getSyncManager()?.unload( objectType, objectId );
+					}
+				}
 			} catch ( _error ) {
 				hasError = true;
 				error = _error;
