@@ -133,9 +133,14 @@ function ListViewBlockSelectButton(
 			aria-describedby={ ariaDescribedBy }
 			aria-expanded={ isExpanded }
 		>
-			<ListViewExpander
-				onClick={ isSectionBlock ? undefined : onToggleExpanded }
-			/>
+			{ isSectionBlock ? (
+				<span
+					className="block-editor-list-view__expander"
+					aria-hidden="true"
+				/>
+			) : (
+				<ListViewExpander onClick={ onToggleExpanded } />
+			) }
 			<BlockIcon
 				icon={ isSectionBlock ? symbol : blockInformation?.icon }
 				showColors

@@ -15,17 +15,11 @@ export default function ListViewExpander( { onClick } ) {
 		// For the current tree grid implementation, please do not try to make this a button.
 		<span
 			className="block-editor-list-view__expander"
-			onClick={
-				onClick
-					? ( event ) => onClick( event, { forceToggle: true } )
-					: undefined
-			}
+			onClick={ ( event ) => onClick( event, { forceToggle: true } ) }
 			aria-hidden="true"
 			data-testid="list-view-expander"
 		>
-			{ onClick && (
-				<Icon icon={ isRTL() ? chevronLeftSmall : chevronRightSmall } />
-			) }
+			<Icon icon={ isRTL() ? chevronLeftSmall : chevronRightSmall } />
 		</span>
 	);
 }
