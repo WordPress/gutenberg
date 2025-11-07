@@ -106,6 +106,37 @@ export function sortByDependency( config: RampConfig ): ( keyof Ramp )[] {
 
 	return result;
 }
+/**
+ * Return minimal set of steps that are needed to calculate `stepName` from the seed.
+ * @param stepName Name of the step.
+ * @param config   Configuration of the ramp.
+ * @return Array of steps that `stepName` depends on.
+ */
+export function stepsForStep(
+	stepName: keyof Ramp,
+	config: RampConfig
+): ( keyof Ramp )[] {
+	const result = new Set< keyof Ramp >();
+	function visit( step: keyof Ramp | 'seed' ) {
+		if ( step === 'seed' || result.has( step ) ) {
+			return;
+		}
+
+		const stepConfig = config[ step ];
+		if ( ! stepConfig ) {
+			return;
+		}
+
+		visit( stepConfig.contrast.reference );
+		if ( stepConfig.sameAsIfPossible ) {
+			visit( stepConfig.sameAsIfPossible );
+		}
+
+		result.add( step );
+	}
+	visit( stepName );
+	return Array.from( result );
+}
 
 /**
  * Finds out whether a lighter or a darker foreground color achieves a better

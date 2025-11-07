@@ -22,6 +22,7 @@ import {
 	sortByDependency,
 	computeBetterFgColorDirection,
 	adjustContrastTarget,
+	stepsForStep,
 } from './utils';
 
 import type {
@@ -203,32 +204,6 @@ function calculateRamp( {
 		maxDeficitDirection,
 		maxDeficitStep,
 	};
-}
-
-/**
- * Return minimal set of steps that are needed to calculate `stepName` from the seed.
- * @param stepName Name of the step.
- * @param config   Configuration of the ramp.
- * @return Array of steps that `stepName` depends on.
- */
-function stepsForStep(
-	stepName: keyof Ramp,
-	config: RampConfig
-): ( keyof Ramp )[] {
-	const result = new Set< keyof Ramp >();
-	function addDeps( step: keyof Ramp | 'seed' ) {
-		if ( step === 'seed' ) {
-			return;
-		}
-		const stepConfig = config[ step ];
-		addDeps( stepConfig.contrast.reference );
-		if ( stepConfig.sameAsIfPossible ) {
-			addDeps( stepConfig.sameAsIfPossible );
-		}
-		result.add( step );
-	}
-	addDeps( stepName );
-	return Array.from( result );
 }
 
 export function buildRamp(
