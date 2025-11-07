@@ -267,25 +267,29 @@ export const getEntityRecord =
 							// triggering an undo.
 							// Support block-level selection with just a clientId,
 							// and offset-based selection with additional parameters.
-							setSelection: (
-								clientId,
-								attributeKey,
-								startOffset,
-								endOffset
+							resetSelection: (
+								selectionStart,
+								selectionEnd
 							) => {
-								if ( clientId && attributeKey && startOffset ) {
+								if (
+									areSelectionsEqual(
+										selectionStart,
+										selectionEnd
+									) &&
+									! selectionStart.attributeKey
+								) {
+									// Use selectBlock() for individual block selection.
 									dataDispatch(
 										blockEditorStore
-									).selectionChange(
-										clientId,
-										attributeKey,
-										startOffset,
-										endOffset
+									).selectBlock( selectionStart.clientId );
+								} else {
+									dataDispatch(
+										blockEditorStore
+									).resetSelection(
+										selectionStart,
+										selectionEnd,
+										null /* initialPosition */
 									);
-								} else if ( clientId ) {
-									dataDispatch(
-										blockEditorStore
-									).selectBlock( clientId );
 								}
 							},
 						}
