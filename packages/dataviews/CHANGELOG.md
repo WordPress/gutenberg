@@ -9,6 +9,7 @@
 - DataForm: simplify form normalization. [#72848](https://github.com/WordPress/gutenberg/pull/72848)
 - DataViewsPicker: Add With Modal story. [#72913](https://github.com/WordPress/gutenberg/pull/72913)
 - DataForm: make the card layout borderless. [#72514](https://github.com/WordPress/gutenberg/pull/72514)
+- DataViews: Simplify the view config properties section. [#73064](https://github.com/WordPress/gutenberg/pull/73064)
 
 ### Bug fixes
 
