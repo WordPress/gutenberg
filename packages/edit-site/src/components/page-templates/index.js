@@ -16,8 +16,7 @@ import { addQueryArgs } from '@wordpress/url';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEvent } from '@wordpress/compose';
 import { useView } from '@wordpress/views';
-import { Button, Modal, Icon, Tooltip } from '@wordpress/components';
-import { lock } from '@wordpress/icons';
+import { Button, Modal } from '@wordpress/components';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -224,29 +223,7 @@ export default function PageTemplates() {
 			// Custom title field with lock icon
 			{
 				...templateTitleField,
-				render: ( item ) => (
-					<div className="page-template-title-wrapper">
-						<span className="page-template-title-text">
-							{ templateTitleField.render
-								? templateTitleField.render( item )
-								: item.title?.rendered || item.title }
-						</span>
-
-						{ ! item._isCustom && (
-							<div className="page-template-lock-icon">
-								<Tooltip
-									text={ __(
-										'This template cannot be edited'
-									) }
-								>
-									<Icon icon={ lock } size={ 24 } />
-								</Tooltip>
-							</div>
-						) }
-					</div>
-				),
 			},
-
 			descriptionField,
 			activeField,
 			slugField,

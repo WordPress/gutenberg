@@ -9,15 +9,15 @@ import { __ } from '@wordpress/i18n';
  */
 import type { Template } from '../../types';
 import { getItemTitle } from '../../actions/utils';
-import TitleView from '../title/view';
+import TemplateTitleView from './view'; 
 
-const templateTitleField: Field< Template > = {
+const templateTitleField: Field<Template> = {
 	type: 'text',
 	label: __( 'Template' ),
 	placeholder: __( 'No title' ),
 	id: 'title',
-	getValue: ( { item } ) => getItemTitle( item ),
-	render: TitleView,
+	getValue: ({ item }) => getItemTitle(item),
+	render: TemplateTitleView,
 	enableHiding: false,
 	enableGlobalSearch: true,
 	filterBy: false,
