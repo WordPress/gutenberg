@@ -45,6 +45,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-6.8/rest-api.php';
 
 	// WordPress 6.9 compat.
+	require __DIR__ . '/compat/wordpress-6.9/class-gutenberg-rest-attachments-controller.php';
 	require __DIR__ . '/compat/wordpress-6.9/class-gutenberg-rest-static-templates-controller.php';
 	require __DIR__ . '/compat/wordpress-6.9/template-activate.php';
 	require __DIR__ . '/compat/wordpress-6.9/block-bindings.php';
