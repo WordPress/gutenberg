@@ -11,24 +11,32 @@ import {
 	LOCAL_SYNC_MANAGER_ORIGIN,
 	CRDT_RECORD_METADATA_MAP_KEY as RECORD_METADATA_KEY,
 	CRDT_RECORD_METADATA_SAVED_AT_KEY as SAVED_AT_KEY,
-	CRDT_RECORD_METADATA_SAVED_BY_KEY as SAVED_BY_KEY,
 } from './config';
 import { createPersistedCRDTDoc, getPersistedCrdtDoc } from './persistence';
 import { getProviderCreators } from './providers';
 import type {
+	CollectionHandlers,
 	CRDTDoc,
 	EntityID,
 	ObjectID,
 	ObjectData,
 	ObjectType,
+	ProviderCreator,
 	RecordHandlers,
 	SyncConfig,
 	SyncManager,
 	SyncUndoManager,
 } from './types';
 import { createUndoManager } from './undo-manager';
-import { createYjsDoc } from './utils';
+import { createYjsDoc, markEntityAsSaved } from './utils';
 import { createAwareness } from './awareness/awareness-manager';
+
+interface CollectionState {
+	handlers: CollectionHandlers;
+	syncConfig: SyncConfig;
+	unload: () => void;
+	ydoc: CRDTDoc;
+}
 
 interface EntityState {
 	handlers: RecordHandlers;
@@ -45,6 +53,7 @@ interface EntityState {
  * and coordinates with the `core-data` store.
  */
 export function createSyncManager(): SyncManager {
+	const collectionStates: Map< ObjectType, CollectionState > = new Map();
 	const entityStates: Map< EntityID, EntityState > = new Map();
 
 	/**
@@ -115,6 +124,7 @@ export function createSyncManager(): SyncManager {
 		const unload = (): void => {
 			providerResults.forEach( ( result ) => result.destroy() );
 			recordMap.unobserveDeep( onRecordUpdate );
+			recordMetaMap.unobserve( onRecordMetaUpdate );
 			ydoc.destroy();
 			entityStates.delete( entityId );
 		};
@@ -193,24 +203,102 @@ export function createSyncManager(): SyncManager {
 	}
 
 	/**
-	 * Unload an entity, stop syncing, and destroy its in-memory state.
+	 * Load a collection for syncing and manage its lifecycle.
+	 *
+	 * @param {SyncConfig}         syncConfig Sync configuration for the object type.
+	 * @param {ObjectType}         objectType Object type.
+	 * @param {CollectionHandlers} handlers   Handlers for updating the collection.
+	 */
+	async function loadCollection(
+		syncConfig: SyncConfig,
+		objectType: ObjectType,
+		handlers: CollectionHandlers
+	): Promise< void > {
+		const providerCreators: ProviderCreator[] = getProviderCreators();
+
+		if ( 0 === providerCreators.length ) {
+			return; // No provider creators, so syncing is effectively disabled.
+		}
+
+		if ( collectionStates.has( objectType ) ) {
+			return; // Already loaded.
+		}
+
+		const ydoc = createYjsDoc( { collection: true, objectType } );
+		const recordMetaMap = ydoc.getMap( RECORD_METADATA_KEY );
+		const now = Date.now();
+
+		// Clean up providers and in-memory state when the entity is unloaded.
+		const unload = (): void => {
+			providerResults.forEach( ( result ) => result.destroy() );
+			recordMetaMap.unobserve( onRecordMetaUpdate );
+			ydoc.destroy();
+			collectionStates.delete( objectType );
+		};
+
+		const onRecordMetaUpdate = (
+			event: Y.YMapEvent< unknown >,
+			transaction: Y.Transaction
+		) => {
+			if ( transaction.local ) {
+				return;
+			}
+
+			event.keysChanged.forEach( ( key ) => {
+				switch ( key ) {
+					case SAVED_AT_KEY:
+						const newValue = recordMetaMap.get( SAVED_AT_KEY );
+						if ( 'number' === typeof newValue && newValue > now ) {
+							// Another peer has mutated the collection. Refetch it so that we
+							// obtain the updated records.
+							void handlers.refetchRecords().catch( () => {} );
+						}
+						break;
+				}
+			} );
+		};
+
+		const collectionState: CollectionState = {
+			handlers,
+			syncConfig,
+			unload,
+			ydoc,
+		};
+
+		collectionStates.set( objectType, collectionState );
+
+		// Create providers for the given entity and its Yjs document.
+		const providerResults = await Promise.all(
+			providerCreators.map( ( create ) => {
+				return create( objectType, null, ydoc );
+			} )
+		);
+
+		// Attach observers.
+		recordMetaMap.observe( onRecordMetaUpdate );
+	}
+
+	/**
+	 * Unload an entity, stop syncing, destroy its in-memory state, and trigger an
+	 * update of the collection.
 	 *
 	 * @param {ObjectType} objectType Object type to discard.
-	 * @param {ObjectID}   objectId   Object ID to discard.
+	 * @param {ObjectID}   objectId   Object ID to discard, or null for collections.
 	 */
 	function unloadEntity( objectType: ObjectType, objectId: ObjectID ): void {
 		entityStates.get( getEntityId( objectType, objectId ) )?.unload();
+		updateCRDTDoc( objectType, null, {}, origin, true /* isSave */ );
 	}
 
 	/**
 	 * Get the entity ID for the given object type and object ID.
 	 *
-	 * @param {ObjectType} objectType Object type.
-	 * @param {ObjectID}   objectId   Object ID.
+	 * @param {ObjectType}    objectType Object type.
+	 * @param {ObjectID|null} objectId   Object ID.
 	 */
 	function getEntityId(
 		objectType: ObjectType,
-		objectId: ObjectID
+		objectId: ObjectID | null
 	): EntityID {
 		return `${ objectType }_${ objectId }`;
 	}
@@ -322,30 +410,31 @@ export function createSyncManager(): SyncManager {
 	 */
 	function updateCRDTDoc(
 		objectType: ObjectType,
-		objectId: ObjectID,
+		objectId: ObjectID | null,
 		changes: Partial< ObjectData >,
 		origin: string,
 		isSave: boolean = false
 	): void {
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
+		const collectionState = collectionStates.get( objectType );
 
-		if ( ! entityState ) {
-			return;
+		if ( entityState ) {
+			const { syncConfig, ydoc } = entityState;
+			ydoc.transact( () => {
+				syncConfig.applyChangesToCRDTDoc( ydoc, changes );
+
+				if ( isSave ) {
+					markEntityAsSaved( ydoc );
+				}
+			}, origin );
 		}
 
-		const { syncConfig, ydoc } = entityState;
-
-		ydoc.transact( () => {
-			syncConfig.applyChangesToCRDTDoc( ydoc, changes );
-
-			if ( isSave ) {
-				// Mark the document as saved in the record metadata map.
-				const recordMeta = ydoc.getMap( RECORD_METADATA_KEY );
-				recordMeta.set( SAVED_AT_KEY, Date.now() );
-				recordMeta.set( SAVED_BY_KEY, ydoc.clientID );
-			}
-		}, origin );
+		if ( collectionState && isSave ) {
+			collectionState.ydoc.transact( () => {
+				markEntityAsSaved( collectionState.ydoc );
+			}, origin );
+		}
 	}
 
 	/**
@@ -409,6 +498,7 @@ export function createSyncManager(): SyncManager {
 	return {
 		createMeta: createEntityMeta,
 		load: loadEntity,
+		loadCollection,
 		// Use getter to ensure we always return the current value of `undoManager`.
 		get undoManager(): SyncUndoManager | undefined {
 			return undoManager;

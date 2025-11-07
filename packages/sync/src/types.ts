@@ -55,10 +55,14 @@ export interface ProviderCreatorResult {
 
 export type ProviderCreator = (
 	objectType: ObjectType,
-	objectId: ObjectID,
+	objectId: ObjectID | null,
 	ydoc: Y.Doc,
 	awareness?: Awareness
 ) => Promise< ProviderCreatorResult >;
+
+export interface CollectionHandlers {
+	refetchRecords: () => Promise< void >;
+}
 
 export interface RecordHandlers {
 	editRecord: ( data: Partial< ObjectData > ) => void;
@@ -91,12 +95,17 @@ export interface SyncManager {
 		record: ObjectData,
 		handlers: RecordHandlers
 	) => Promise< void >;
+	loadCollection: (
+		syncConfig: SyncConfig,
+		objectType: ObjectType,
+		handlers: CollectionHandlers
+	) => Promise< void >;
 	// undoManager is undefined until the first entity is loaded.
 	undoManager: SyncUndoManager | undefined;
 	unload: ( objectType: ObjectType, objectId: ObjectID ) => void;
 	update: (
 		objectType: ObjectType,
-		objectId: ObjectID,
+		objectId: ObjectID | null,
 		changes: Partial< ObjectData >,
 		origin: string,
 		isSave?: boolean
