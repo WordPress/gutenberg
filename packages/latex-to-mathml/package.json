@@ -34,7 +34,6 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"wpScript": true,
 	"wpScriptModuleExports": {
 		".": "./build-module/index.js",
 		"./loader": "./build-module/loader.js"
