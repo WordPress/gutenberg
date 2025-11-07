@@ -88,25 +88,25 @@ export default function useBlockDisplayInformation( clientId ) {
 
 			// Check if this block is a pattern
 			const patternName = attributes?.metadata?.patternName;
+
 			if (
 				patternName &&
 				window?.__experimentalContentOnlyPatternInsertion
 			) {
 				const pattern = __experimentalGetParsedPattern( patternName );
-				if ( pattern ) {
-					const positionLabel = getPositionTypeLabel( attributes );
-					return {
-						isSynced: false,
-						title: __( 'Pattern' ),
-						icon: symbol,
-						description:
-							pattern.description || __( 'A block pattern.' ),
-						anchor: attributes?.anchor,
-						positionLabel,
-						positionType: attributes?.style?.position?.type,
-						name: pattern.title || attributes?.metadata?.name,
-					};
-				}
+
+				const positionLabel = getPositionTypeLabel( attributes );
+				return {
+					isSynced: false,
+					title: __( 'Pattern' ),
+					icon: symbol,
+					description:
+						pattern?.description || __( 'A block pattern.' ),
+					anchor: attributes?.anchor,
+					positionLabel,
+					positionType: attributes?.style?.position?.type,
+					name: pattern?.title || attributes?.metadata?.name,
+				};
 			}
 
 			const match = getActiveBlockVariation( blockName, attributes );
