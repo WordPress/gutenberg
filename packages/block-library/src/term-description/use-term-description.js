@@ -14,10 +14,11 @@ import { useTermContext } from '../utils/use-template-context';
  * This hook prioritizes context-provided termId and taxonomy, but falls back to
  * template-based detection when no context is available.
  *
- * @param {string|number} termId   The term ID from context
- * @param {string}        taxonomy The taxonomy name from context
+ * @param {string}        templateSlug The template slug from context (optional)
+ * @param {string|number} termId       The term ID from context
+ * @param {string}        taxonomy     The taxonomy name from context
  */
-export function useTermDescription( termId, taxonomy ) {
+export function useTermDescription( templateSlug = null, termId, taxonomy ) {
 	const [ description, setDescription, fullDescription ] = useEntityProp(
 		'taxonomy',
 		taxonomy,
@@ -25,7 +26,11 @@ export function useTermDescription( termId, taxonomy ) {
 		termId
 	);
 
-	const { hasContext, term } = useTermContext( termId, taxonomy );
+	const { hasContext, term } = useTermContext(
+		templateSlug,
+		termId,
+		taxonomy
+	);
 
 	return {
 		hasContext,

@@ -30,10 +30,10 @@ import { useTermContext } from '../utils/use-template-context';
 export default function TermNameEdit( {
 	attributes,
 	setAttributes,
-	context: { termId, taxonomy },
+	context: { termId, taxonomy, templateSlug },
 } ) {
 	const { textAlign, level = 0, isLink } = attributes;
-	const { term } = useTermContext( termId, taxonomy );
+	const { term } = useTermContext( templateSlug, termId, taxonomy );
 
 	const termName = term?.name
 		? decodeEntities( term.name )

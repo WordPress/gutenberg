@@ -89,6 +89,7 @@ export default function TermTemplateEdit( {
 			include,
 			inherit = false,
 		} = {},
+		templateSlug,
 	},
 	__unstableLayoutClassNames,
 } ) {
@@ -96,7 +97,7 @@ export default function TermTemplateEdit( {
 	const [ activeBlockContextId, setActiveBlockContextId ] = useState();
 
 	// Get current term context for inherit mode.
-	const termContext = useTermContext();
+	const termContext = useTermContext( templateSlug );
 	const { term: currentTerm, taxonomy: contextTaxonomy } = termContext;
 
 	const queryArgs = {

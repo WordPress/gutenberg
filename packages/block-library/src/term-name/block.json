@@ -7,7 +7,7 @@
 	"description": "Displays the name of a taxonomy term.",
 	"keywords": [ "term title" ],
 	"textdomain": "default",
-	"usesContext": [ "termId", "taxonomy" ],
+	"usesContext": [ "termId", "taxonomy", "templateSlug" ],
 	"attributes": {
 		"textAlign": {
 			"type": "string"

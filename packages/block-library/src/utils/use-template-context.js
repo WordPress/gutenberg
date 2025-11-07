@@ -7,27 +7,41 @@ import { useSelect } from '@wordpress/data';
 /**
  * Hook to get the current template slug from the editor context.
  *
+ * @param {string|null} [templateSlug] The template slug from block context (optional).
  * @return {string|null} The current template slug or null if not available.
  */
-export function useTemplateSlug() {
-	return useSelect( ( select ) => {
-		// Access core/editor by string to avoid @wordpress/editor dependency.
-		// eslint-disable-next-line @wordpress/data-no-store-string-literals
-		const { getCurrentPostId, getCurrentPostType, getCurrentTemplateId } =
-			select( 'core/editor' );
-		const currentPostType = getCurrentPostType();
-		const templateId =
-			getCurrentTemplateId() ||
-			( currentPostType === 'wp_template' ? getCurrentPostId() : null );
+export function useTemplateSlug( templateSlug = null ) {
+	return useSelect(
+		( select ) => {
+			// Use templateSlug from context if available.
+			if ( templateSlug ) {
+				return templateSlug;
+			}
 
-		return templateId
-			? select( coreStore ).getEditedEntityRecord(
-					'postType',
-					'wp_template',
-					templateId
-			  )?.slug
-			: null;
-	}, [] );
+			// Access core/editor by string to avoid @wordpress/editor dependency.
+			// eslint-disable-next-line @wordpress/data-no-store-string-literals
+			const {
+				getCurrentPostId,
+				getCurrentPostType,
+				getCurrentTemplateId,
+			} = select( 'core/editor' );
+			const currentPostType = getCurrentPostType();
+			const templateId =
+				getCurrentTemplateId() ||
+				( currentPostType === 'wp_template'
+					? getCurrentPostId()
+					: null );
+
+			return templateId
+				? select( coreStore ).getEditedEntityRecord(
+						'postType',
+						'wp_template',
+						templateId
+				  )?.slug
+				: null;
+		},
+		[ templateSlug ]
+	);
 }
 
 /**
@@ -173,12 +187,17 @@ export function parseTemplateSlugWithValidation( templateSlug, getTaxonomy ) {
 /**
  * Hook to get term context including term data and archive labels.
  *
- * @param {string|number} [termId]   The term ID from context (optional)
- * @param {string}        [taxonomy] The taxonomy name from context (optional)
- * @return {Object} Object containing term data, archive labels, and context information
+ * @param {string}        [templateSlug] The template slug from context (optional).
+ * @param {string|number} [termId]       The term ID from context (optional).
+ * @param {string}        [taxonomy]     The taxonomy name from context (optional).
+ * @return {Object} Object containing term data, archive labels, and context information.
  */
-export function useTermContext( termId = null, taxonomy = null ) {
-	const templateSlug = useTemplateSlug();
+export function useTermContext(
+	templateSlug = null,
+	termId = null,
+	taxonomy = null
+) {
+	const templateSlugFromContext = useTemplateSlug( templateSlug );
 
 	const {
 		taxonomy: fallbackTaxonomy,
@@ -188,9 +207,12 @@ export function useTermContext( termId = null, taxonomy = null ) {
 	} = useSelect(
 		( select ) => {
 			const { getTaxonomy } = select( coreStore );
-			return parseTemplateSlugWithValidation( templateSlug, getTaxonomy );
+			return parseTemplateSlugWithValidation(
+				templateSlugFromContext,
+				getTaxonomy
+			);
 		},
-		[ templateSlug ]
+		[ templateSlugFromContext ]
 	);
 
 	const hasContext = Boolean( termId && taxonomy );

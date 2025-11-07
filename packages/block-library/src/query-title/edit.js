@@ -40,9 +40,10 @@ export default function QueryTitleEdit( {
 		showSearchTerm,
 	},
 	setAttributes,
-	context: { query },
+	context: { query, templateSlug },
 } ) {
-	const { archiveTypeLabel, archiveNameLabel } = useTermContext();
+	const { archiveTypeLabel, archiveNameLabel } =
+		useTermContext( templateSlug );
 	const { postTypeLabel } = usePostTypeLabel( query?.postType );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
