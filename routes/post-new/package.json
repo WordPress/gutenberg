@@ -1,0 +1,12 @@
+{
+	"name": "@wordpress/post-new",
+	"version": "1.0.0",
+	"private": true,
+	"route": {
+		"path": "/types/$type/new"
+	},
+	"dependencies": {
+		"@wordpress/core-data": "file:../../packages/core-data",
+		"@wordpress/data": "file:../../packages/data"
+	}
+}
