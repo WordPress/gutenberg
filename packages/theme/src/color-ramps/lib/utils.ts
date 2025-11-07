@@ -14,7 +14,7 @@ import {
 	WHITE_TEXT_CONTRAST_MARGIN,
 	ACCENT_SCALE_BASE_LIGHTNESS_THRESHOLDS,
 } from './constants';
-import type { Ramp, RampStepConfig, RampDirection } from './types';
+import type { Ramp, RampConfig, RampDirection } from './types';
 import { getContrast } from './color-utils';
 
 /**
@@ -28,7 +28,7 @@ export const clampToGamut = ( c: ColorTypes ) =>
  * Build a dependency graph from the steps configuration
  * @param config - The steps configuration object
  */
-function buildDependencyGraph( config: Record< keyof Ramp, RampStepConfig > ): {
+function buildDependencyGraph( config: RampConfig ): {
 	dependencies: Map< keyof Ramp, ( keyof Ramp | 'seed' )[] >;
 	dependents: Map< keyof Ramp | 'seed', ( keyof Ramp )[] >;
 } {
@@ -66,9 +66,7 @@ function buildDependencyGraph( config: Record< keyof Ramp, RampStepConfig > ): {
  * Topologically sort steps based on their dependencies
  * @param config - The steps configuration object
  */
-export function sortByDependency(
-	config: Record< keyof Ramp, RampStepConfig >
-): ( keyof Ramp )[] {
+export function sortByDependency( config: RampConfig ): ( keyof Ramp )[] {
 	const { dependents } = buildDependencyGraph( config );
 	const result: ( keyof Ramp )[] = [];
 	const visited = new Set< keyof Ramp | 'seed' >();
