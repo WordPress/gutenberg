@@ -1,0 +1,63 @@
+/**
+ * WordPress dependencies
+ */
+import { useState, useEffect } from '@wordpress/element';
+import { Spinner } from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import type { CanvasData } from '../../store/types';
+
+interface CanvasProps {
+	canvas: CanvasData;
+}
+
+/**
+ * Canvas component that dynamically loads and renders the lazy editor.
+ *
+ * @param {Object} props        - Component props
+ * @param {Object} props.canvas - Canvas data containing postType and postId
+ * @return Canvas surface with editor
+ */
+export default function Canvas( { canvas }: CanvasProps ) {
+	const [ Editor, setEditor ] = useState< any >( null );
+
+	useEffect( () => {
+		// Dynamically import the lazy-editor module
+		import( '@wordpress/lazy-editor' )
+			.then( ( module ) => {
+				setEditor( () => module.Editor );
+			} )
+			.catch( ( error ) => {
+				// eslint-disable-next-line no-console
+				console.error( 'Failed to load lazy editor:', error );
+			} );
+	}, [] );
+
+	// Show spinner while loading the editor module
+	if ( ! Editor ) {
+		return (
+			<div
+				style={ {
+					display: 'flex',
+					justifyContent: 'center',
+					alignItems: 'center',
+					height: '100%',
+					padding: '2rem',
+				} }
+			>
+				<Spinner />
+			</div>
+		);
+	}
+
+	// Render the editor with canvas data
+	return (
+		<Editor
+			postType={ canvas.postType }
+			postId={ canvas.postId }
+			settings={ { isPreviewMode: true } }
+		/>
+	);
+}

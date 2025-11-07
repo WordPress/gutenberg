@@ -1446,6 +1446,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/asset-loader",
+		"slug": "packages-asset-loader",
+		"markdown_source": "../packages/asset-loader/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/autop",
 		"slug": "packages-autop",
 		"markdown_source": "../packages/autop/README.md",
@@ -1809,6 +1815,12 @@
 		"title": "@wordpress/latex-to-mathml",
 		"slug": "packages-latex-to-mathml",
 		"markdown_source": "../packages/latex-to-mathml/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/lazy-editor",
+		"slug": "packages-lazy-editor",
+		"markdown_source": "../packages/lazy-editor/README.md",
 		"parent": "packages"
 	},
 	{

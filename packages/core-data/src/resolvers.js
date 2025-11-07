@@ -1164,3 +1164,27 @@ export const getEntitiesConfig =
 			// Do nothing if the request comes back with an API error.
 		}
 	};
+
+/**
+ * Requests editor settings from the REST API.
+ */
+export const getEditorSettings =
+	() =>
+	async ( { dispatch } ) => {
+		const settings = await apiFetch( {
+			path: '/wp-block-editor/v1/settings',
+		} );
+		dispatch.receiveEditorSettings( settings );
+	};
+
+/**
+ * Requests editor assets from the REST API.
+ */
+export const getEditorAssets =
+	() =>
+	async ( { dispatch } ) => {
+		const assets = await apiFetch( {
+			path: '/wp-block-editor/v1/assets',
+		} );
+		dispatch.receiveEditorAssets( assets );
+	};

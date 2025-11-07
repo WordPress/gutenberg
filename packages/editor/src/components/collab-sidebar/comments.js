@@ -93,11 +93,7 @@ export function Comments( {
 		// add a "new note" entry to the threads. This special thread type
 		// gets sorted and floated like regular threads, but shows an AddComment
 		// component instead of a regular comment thread.
-		if (
-			isFloating &&
-			newNoteFormState === 'open' &&
-			undefined === blockCommentId
-		) {
+		if ( isFloating && newNoteFormState === 'open' ) {
 			// Insert the new note entry at the correct location for its blockId.
 			const newNoteThread = {
 				id: 'new-note-thread',
@@ -124,7 +120,6 @@ export function Comments( {
 		noteThreads,
 		isFloating,
 		newNoteFormState,
-		blockCommentId,
 		selectedBlockClientId,
 		orderedBlockIds,
 	] );
@@ -160,8 +155,9 @@ export function Comments( {
 	// Auto-select the related comment thread when a block is selected.
 	useEffect( () => {
 		// Fallback to 'new-note-thread' when showing the comment board for a new note.
-		const fallback = newNoteFormState === 'open' ? 'new-note-thread' : null;
-		setSelectedThread( blockCommentId ?? fallback );
+		setSelectedThread(
+			newNoteFormState === 'open' ? 'new-note-thread' : blockCommentId
+		);
 	}, [ blockCommentId, newNoteFormState ] );
 
 	const setBlockRef = useCallback( ( id, blockRef ) => {
@@ -322,16 +318,14 @@ export function Comments( {
 
 	return (
 		<>
-			{ ! isFloating &&
-				newNoteFormState === 'open' &&
-				undefined === blockCommentId && (
-					<AddComment
-						onSubmit={ onAddReply }
-						newNoteFormState={ newNoteFormState }
-						setNewNoteFormState={ setNewNoteFormState }
-						commentSidebarRef={ commentSidebarRef }
-					/>
-				) }
+			{ ! isFloating && newNoteFormState === 'open' && (
+				<AddComment
+					onSubmit={ onAddReply }
+					newNoteFormState={ newNoteFormState }
+					setNewNoteFormState={ setNewNoteFormState }
+					commentSidebarRef={ commentSidebarRef }
+				/>
+			) }
 			{ threads.map( ( thread ) => (
 				<Thread
 					key={ thread.id }

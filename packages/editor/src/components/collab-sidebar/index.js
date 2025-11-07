@@ -154,12 +154,12 @@ function NotesSidebar( { postId, mode } ) {
 			return;
 		}
 
-		setNewNoteFormState( ! blockCommentId ? 'open' : 'closed' );
+		setNewNoteFormState( ! currentThread ? 'open' : 'closed' );
 		focusCommentThread(
-			blockCommentId,
+			currentThread?.id,
 			commentSidebarRef.current,
 			// Focus a comment thread when there's a selected block with a comment.
-			! blockCommentId ? 'textarea' : undefined
+			! currentThread ? 'textarea' : undefined
 		);
 		toggleBlockSpotlight( clientId, true );
 	}
@@ -170,7 +170,7 @@ function NotesSidebar( { postId, mode } ) {
 
 	return (
 		<>
-			{ blockCommentId && (
+			{ !! currentThread && (
 				<CommentAvatarIndicator
 					thread={ currentThread }
 					onClick={ openTheSidebar }

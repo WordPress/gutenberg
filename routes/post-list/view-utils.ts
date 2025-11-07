@@ -141,7 +141,7 @@ export async function ensureView(
 	} );
 }
 
-export default function viewToQuery( view: View, postType: string ) {
+export function viewToQuery( view: View, postType: string ) {
 	const result: Record< string, any > = {};
 
 	// Pagination, sorting, search.

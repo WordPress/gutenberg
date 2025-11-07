@@ -26,7 +26,8 @@
 }
 
 .boot-layout__stage,
-.boot-layout__inspector {
+.boot-layout__inspector,
+.boot-layout__canvas {
 	flex: 1;
 	overflow-y: auto;
 	background: var(--wpds-color-bg-surface-neutral, #fff);
@@ -34,8 +35,17 @@
 	border-radius: 8px;
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 	border: 1px solid var(--wpds-color-stroke-surface-neutral-weak, #ddd);
+	position: relative;
 }
 
+.boot-layout.has-canvas .boot-layout__stage,
 .boot-layout__inspector {
 	max-width: 400px;
+}
+
+.boot-layout__canvas .interface-interface-skeleton {
+	position: relative;
+	height: 100%;
+	top: 0 !important;
+	left: 0 !important;
 }

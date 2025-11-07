@@ -38,7 +38,7 @@ import {
 	getDefaultView,
 	DEFAULT_VIEWS,
 	DEFAULT_LAYOUTS,
-	default as viewToQuery,
+	viewToQuery,
 } from './view-utils';
 
 // Unlock WordPress private APIs

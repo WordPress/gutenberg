@@ -16,6 +16,7 @@
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
 		{ "path": "../keycodes" },
+		{ "path": "../lazy-editor" },
 		{ "path": "../primitives" },
 		{ "path": "../private-apis" },
 		{ "path": "../theme" },

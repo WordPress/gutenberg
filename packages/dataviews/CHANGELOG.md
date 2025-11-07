@@ -14,6 +14,7 @@
 
 - useFormValidity: make it work with any level of nesting in the form. [#72588](https://github.com/WordPress/gutenberg/pull/72588)
 - Fix: DataViews modal actions in list layout. [#72793](https://github.com/WordPress/gutenberg/pull/72793)
+- Fix: Incorrect aria-label in table layout when items are not clickable. [#73034](https://github.com/WordPress/gutenberg/pull/73034)
 - Fix: Table layout column spacing. [#72969](https://github.com/WordPress/gutenberg/pull/72969)
 
 ### Enhancements
