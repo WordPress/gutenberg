@@ -2293,9 +2293,9 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 							.forEach( ( variation ) => {
 								if (
 									variation.id ===
-										'core/paragraph/stretch-text' ||
+										'core/paragraph/stretchy-text' ||
 									variation.id ===
-										'core/heading/stretch-heading'
+										'core/heading/stretchy-heading'
 								) {
 									stretchVariations.push( variation );
 								} else {

@@ -16,9 +16,11 @@ const variations = [
 		attributes: { fitText: undefined },
 		icon: paragraph,
 	},
+	// There is a hardcoded workaround in packages/block-editor/src/store/selectors.js
+	// to make Stretchy variations appear as the last of their sections in the inserter.
 	{
-		name: 'stretch-text',
-		title: __( 'Stretch Text' ),
+		name: 'stretchy-text',
+		title: __( 'Stretchy Text' ),
 		description: __( 'Text that resizes to fit its container.' ),
 		icon: justifyStretch,
 		attributes: {

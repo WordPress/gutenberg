@@ -202,16 +202,6 @@ function useFitText( { fitText, name, clientId } ) {
 }
 
 /**
- * NOTE: This control has been disabled. FitText can only be used
- * via block variations (Stretch Text / Stretch Heading).
- * This is still included because an edit component is required-
- *
- */
-export function FitTextControl() {
-	return null;
-}
-
-/**
  * Override props applied to the block element on save.
  *
  * @param {Object} props      Additional props applied to the block element.
@@ -272,7 +262,7 @@ const hasFitTextSupport = ( blockNameOrType ) => {
 export default {
 	useBlockProps,
 	addSaveProps,
-	attributeKeys: [ 'fitText', 'fontSize', 'style' ],
+	attributeKeys: [ 'fitText' ],
 	hasSupport: hasFitTextSupport,
-	edit: FitTextControl,
+	edit: () => null,
 };
