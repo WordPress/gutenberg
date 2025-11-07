@@ -402,6 +402,7 @@ function build_variation_for_navigation_link( $entity, $kind ) {
  *
  * @param array         $variations Array of registered variations for a block type.
  * @param WP_Block_Type $block_type The full block type object.
+ * @return array Numerically indexed array of block variations.
  */
 function block_core_navigation_link_filter_variations( $variations, $block_type ) {
 	if ( 'core/navigation-link' !== $block_type->name ) {
@@ -409,8 +410,27 @@ function block_core_navigation_link_filter_variations( $variations, $block_type 
 	}
 
 	$generated_variations = block_core_navigation_link_build_variations();
-	// Merge with existing variations - put our generated variations first
-	// so they override any generic labels from existing variations.
+
+	/*
+	 * IMPORTANT: Order matters for deduplication.
+	 *
+	 * The variations returned from this filter are bootstrapped to JavaScript and
+	 * processed by the block variations reducer. The reducer uses `getUniqueItemsByName()`
+	 * (packages/blocks/src/store/reducer.js:51-57) which keeps the FIRST variation with
+	 * a given 'name' and discards later duplicates when processing the array in order.
+	 *
+	 * By placing generated variations first in `array_merge()`, the improved
+	 * labels (e.g., "Product link" instead of generic "Post Link") are processed first
+	 * and preserved. The generic incoming variations are then discarded as duplicates.
+	 *
+	 * Why `array_merge()` instead of manual deduplication?
+	 * - Both arrays use numeric indices (0, 1, 2...), so `array_merge()` concatenates
+	 *   and re-indexes them sequentially, preserving order
+	 * - The reducer handles deduplication, so it is not needed here
+	 * - This keeps the PHP code simple and relies on the established JavaScript behavior
+	 *
+	 * See: https://github.com/WordPress/gutenberg/pull/72517
+	 */
 	return array_merge( $generated_variations, $variations );
 }
 
