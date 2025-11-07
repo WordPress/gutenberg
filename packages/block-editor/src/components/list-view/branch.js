@@ -115,28 +115,18 @@ function ListViewBranch( props ) {
 		[ parentId ]
 	);
 
-	const { shouldHideChildren, isSectionBlock, hasSelectedInnerBlock } =
-		useSelect(
-			( select ) => {
-				const { isSectionBlock: _isSectionBlock } = unlock(
-					select( blockEditorStore )
-				);
-				const { hasSelectedInnerBlock: _hasSelectedInnerBlock } =
-					select( blockEditorStore );
-
-				// Check if parent is a section block that should hide children
-				const hideChildren = parentId
-					? _isSectionBlock( parentId )
-					: false;
-
-				return {
-					shouldHideChildren: hideChildren,
-					isSectionBlock: _isSectionBlock,
-					hasSelectedInnerBlock: _hasSelectedInnerBlock,
-				};
-			},
-			[ parentId ]
+	const { isSectionBlock, hasSelectedInnerBlock } = useSelect( ( select ) => {
+		const { isSectionBlock: _isSectionBlock } = unlock(
+			select( blockEditorStore )
 		);
+		const { hasSelectedInnerBlock: _hasSelectedInnerBlock } =
+			select( blockEditorStore );
+
+		return {
+			isSectionBlock: _isSectionBlock,
+			hasSelectedInnerBlock: _hasSelectedInnerBlock,
+		};
+	}, [] );
 
 	const {
 		blockDropPosition,
@@ -150,15 +140,6 @@ function ListViewBranch( props ) {
 	const nextPositionRef = useRef();
 
 	if ( ! canParentExpand ) {
-		return null;
-	}
-
-	// Hide this entire branch if the parent is a pattern block.
-	// This prevents pattern internals from appearing in the list view.
-	if (
-		shouldHideChildren &&
-		window?.__experimentalContentOnlyPatternInsertion
-	) {
 		return null;
 	}
 
