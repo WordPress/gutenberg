@@ -106,7 +106,7 @@ function abilitiesByName(
 			if ( ! action.abilities ) {
 				return state;
 			}
-			const newState = { ...state };
+			const newState: Record< string, Ability > = {};
 			action.abilities.forEach( ( ability ) => {
 				newState[ ability.name ] = sanitizeAbility( ability );
 			} );
@@ -151,7 +151,7 @@ function categoriesBySlug(
 			if ( ! action.categories ) {
 				return state;
 			}
-			const newState = { ...state };
+			const newState: Record< string, AbilityCategory > = {};
 			action.categories.forEach( ( category ) => {
 				newState[ category.slug ] = sanitizeCategory( category );
 			} );

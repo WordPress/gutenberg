@@ -8,7 +8,12 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import type { Ability, AbilityCategory } from '../types';
 import { ENTITY_KIND, ENTITY_NAME, ENTITY_NAME_CATEGORIES } from './constants';
-import { receiveAbilities, receiveCategories } from './actions';
+import {
+	receiveAbilities,
+	receiveCategories,
+	registerAbility,
+	registerAbilityCategory,
+} from './actions';
 
 /**
  * Resolver for getAbilities selector.
@@ -65,10 +70,10 @@ export function getAbility( name: string ) {
 				.getEntityRecord( ENTITY_KIND, ENTITY_NAME, name );
 
 			if ( ability ) {
-				dispatch( receiveAbilities( [ ability ] ) );
+				await dispatch( registerAbility( ability ) );
 			}
 		} catch ( error ) {
-			// If ability doesn't exist ore return, we'll return null from the selector
+			// If ability doesn't exist or error, we'll return undefined from the selector
 			// eslint-disable-next-line no-console
 			console.debug( `Ability not found: ${ name }` );
 		}
@@ -130,7 +135,13 @@ export function getAbilityCategory( slug: string ) {
 				.getEntityRecord( ENTITY_KIND, ENTITY_NAME_CATEGORIES, slug );
 
 			if ( category ) {
-				dispatch( receiveCategories( [ category ] ) );
+				await dispatch(
+					registerAbilityCategory( category.slug, {
+						label: category.label,
+						description: category.description,
+						meta: category.meta,
+					} )
+				);
 			}
 		} catch ( error ) {
 			// eslint-disable-next-line no-console

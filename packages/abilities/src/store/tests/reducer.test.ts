@@ -546,7 +546,7 @@ describe( 'Store Reducer', () => {
 				expect( category ).not.toHaveProperty( 'extra_field' );
 			} );
 
-			it( 'should merge with existing categories', () => {
+			it( 'should overwrite existing categories', () => {
 				const initialState = {
 					'existing-category': {
 						slug: 'existing-category',
@@ -573,8 +573,8 @@ describe( 'Store Reducer', () => {
 					action
 				);
 
-				// Should have both old and new categories
-				expect( state.categoriesBySlug ).toHaveProperty(
+				// Should only have new categories, old ones are replaced
+				expect( state.categoriesBySlug ).not.toHaveProperty(
 					'existing-category'
 				);
 				expect( state.categoriesBySlug ).toHaveProperty(
