@@ -24,10 +24,12 @@ import { WebrtcProviderWithHttpSignaling } from './webrtc-http-stream-signaling'
 export function createWebRTCProvider( { signaling, password } ) {
 	return function (
 		/** @type {ObjectType} */ objectType,
-		/** @type {ObjectID} */ objectId,
+		/** @type {ObjectID|null} */ objectId,
 		/** @type {CRDTDoc} */ doc
 	) {
-		const roomName = `${ objectType }-${ objectId }`;
+		const roomName = objectId
+			? `${ objectType }-${ objectId }`
+			: objectType;
 		const provider = new WebrtcProviderWithHttpSignaling( roomName, doc, {
 			signaling,
 			password,
