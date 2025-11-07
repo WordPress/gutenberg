@@ -26,14 +26,15 @@ export function getBlockDisplayTitle(
 
 	const attributes = getBlockAttributes( clientId );
 	const label = getBlockLabel( blockType, attributes, context );
+
+	let blockTitle;
 	// If the label is defined we prioritize it over a possible block variation title match.
 	if ( label !== blockType.title ) {
-		return label;
+		blockTitle = label;
+	} else {
+		const match = getActiveBlockVariation( blockName, attributes );
+		blockTitle = match?.title || blockType.title;
 	}
-
-	const match = getActiveBlockVariation( blockName, attributes );
-
-	const blockTitle = match?.title || blockType.title;
 
 	if ( ! blockTitle ) {
 		return null;
