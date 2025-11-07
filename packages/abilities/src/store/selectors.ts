@@ -77,6 +77,6 @@ export const getAbilityCategories = createSelector(
 export function getAbilityCategory(
 	state: AbilitiesState,
 	slug: string
-): AbilityCategory | null {
-	return state.categoriesBySlug[ slug ] || null;
+): AbilityCategory | undefined {
+	return state.categoriesBySlug[ slug ];
 }

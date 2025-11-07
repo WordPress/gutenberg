@@ -302,7 +302,9 @@ describe( 'Store Reducer', () => {
 					'test/ability2'
 				);
 			} );
+		} );
 
+		describe( 'Edge cases', () => {
 			it( 'should handle unregistering non-existent ability', () => {
 				const initialState = {
 					'test/ability': {
@@ -324,9 +326,7 @@ describe( 'Store Reducer', () => {
 
 				expect( state.abilitiesByName ).toEqual( initialState );
 			} );
-		} );
 
-		describe( 'Edge cases', () => {
 			it( 'should handle undefined abilities in RECEIVE_ABILITIES', () => {
 				const action = {
 					type: RECEIVE_ABILITIES,
