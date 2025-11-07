@@ -2,12 +2,13 @@
  * WordPress dependencies
  */
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useMediaQuery, useViewportMatch } from '@wordpress/compose';
-import { __unstableMotion as motion } from '@wordpress/components';
+import { __unstableMotion as motion, Button } from '@wordpress/components';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { useState } from '@wordpress/element';
 import { PinnedItems } from '@wordpress/interface';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -64,6 +65,7 @@ function Header( {
 		hasBlockSelection,
 		hasSectionRootClientId,
 		isStylesCanvasActive,
+		editedContentOnlySection,
 	} = useSelect( ( select ) => {
 		const { get: getPreference } = select( preferencesStore );
 		const {
@@ -74,9 +76,11 @@ function Header( {
 		const { getStylesPath, getShowStylebook } = unlock(
 			select( editorStore )
 		);
-		const { getBlockSelectionStart, getSectionRootClientId } = unlock(
-			select( blockEditorStore )
-		);
+		const {
+			getBlockSelectionStart,
+			getSectionRootClientId,
+			getEditedContentOnlySection,
+		} = unlock( select( blockEditorStore ) );
 
 		return {
 			postType: getCurrentPostType(),
@@ -89,8 +93,13 @@ function Header( {
 			isStylesCanvasActive:
 				!! getStylesPath()?.startsWith( '/revisions' ) ||
 				getShowStylebook(),
+			editedContentOnlySection: getEditedContentOnlySection(),
 		};
 	}, [] );
+
+	const { stopEditingContentOnlySection } = unlock(
+		useDispatch( blockEditorStore )
+	);
 
 	const canBeZoomedOut =
 		[ 'post', 'page', 'wp_template' ].includes( postType ) &&
@@ -149,7 +158,18 @@ function Header( {
 					variants={ toolbarVariations }
 					transition={ { type: 'tween' } }
 				>
-					<DocumentBar />
+					{ editedContentOnlySection ? (
+						<Button
+							className="editor-header__done-editing-button"
+							onClick={ stopEditingContentOnlySection }
+							variant="primary"
+							__next40pxDefaultSize
+						>
+							{ __( 'Done editing pattern' ) }
+						</Button>
+					) : (
+						<DocumentBar />
+					) }
 				</motion.div>
 			) }
 			<motion.div

@@ -56,8 +56,8 @@ export default function EditContents( { clientId } ) {
 				} }
 			>
 				{ editedContentOnlySection
-					? __( 'Lock design' )
-					: __( 'Unlock design' ) }
+					? __( 'Done editing pattern' )
+					: __( 'Edit pattern' ) }
 			</Button>
 		</VStack>
 	);
