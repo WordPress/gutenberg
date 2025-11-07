@@ -36,6 +36,13 @@ interface CollectionState {
 	ydoc: CRDTDoc;
 }
 
+interface CollectionState {
+	handlers: CollectionHandlers;
+	syncConfig: SyncConfig;
+	unload: () => void;
+	ydoc: CRDTDoc;
+}
+
 interface EntityState {
 	handlers: RecordHandlers;
 	objectId: ObjectID;
