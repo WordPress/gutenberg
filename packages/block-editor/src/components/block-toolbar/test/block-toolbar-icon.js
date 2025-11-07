@@ -106,6 +106,7 @@ describe( 'BlockToolbarIcon', () => {
 				icon: paragraph,
 				showIconLabels: false,
 				variant: 'default',
+				blockTitle: 'Block Name',
 			} ) );
 
 			render( <BlockToolbarIcon { ...defaultProps } /> );
@@ -126,6 +127,7 @@ describe( 'BlockToolbarIcon', () => {
 				icon: paragraph,
 				showIconLabels: false,
 				variant: 'default',
+				blockTitle: 'Block Name',
 			} ) );
 
 			render(
@@ -150,6 +152,7 @@ describe( 'BlockToolbarIcon', () => {
 				icon: paragraph,
 				showIconLabels: false,
 				variant: 'default',
+				blockTitle: 'Block Name',
 			} ) );
 
 			render( <BlockToolbarIcon { ...defaultProps } /> );
@@ -163,6 +166,7 @@ describe( 'BlockToolbarIcon', () => {
 				icon: paragraph,
 				showIconLabels: false,
 				variant: 'default',
+				blockTitle: 'Block Name',
 			} ) );
 
 			render(

@@ -22,6 +22,7 @@ import { hasBlockSupport } from '@wordpress/blocks';
  */
 import BlockIcon from '../block-icon';
 import { getBlockDisplayInformation } from '../use-block-display-information';
+import { getBlockDisplayTitle } from '../block-title/use-block-display-title';
 import ListViewExpander from './expander';
 import { useBlockLock } from '../block-lock';
 import useListViewImages from './use-list-view-images';
@@ -79,7 +80,10 @@ function ListViewBlockSelectButton(
 					select( blockEditorStore ).getBlockEditingMode(
 						clientId
 					) === 'contentOnly',
-				blockTitle: blockInformation?.title,
+				blockTitle: getBlockDisplayTitle( select, {
+					clientId,
+					context: 'list-view',
+				} ),
 				icon: blockInformation?.icon,
 				anchor: blockInformation?.anchor,
 				isSticky: blockInformation?.positionType === 'sticky',
