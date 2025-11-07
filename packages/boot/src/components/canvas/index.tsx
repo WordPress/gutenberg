@@ -53,11 +53,6 @@ export default function Canvas( { canvas }: CanvasProps ) {
 		);
 	}
 
-	// Conditionally set preview mode based on isPreview
-	const editorSettings = canvas.isPreview
-		? { isPreviewMode: true }
-		: { isPreviewMode: false };
-
 	// Render back button in full-screen mode (when not preview)
 	// Uses render prop pattern to receive fillProps from Slot
 	const backButton = ! canvas.isPreview
@@ -76,7 +71,7 @@ export default function Canvas( { canvas }: CanvasProps ) {
 			<Editor
 				postType={ canvas.postType }
 				postId={ canvas.postId }
-				settings={ editorSettings }
+				settings={ { isPreviewMode: canvas.isPreview } }
 				backButton={ backButton }
 			/>
 		</div>
