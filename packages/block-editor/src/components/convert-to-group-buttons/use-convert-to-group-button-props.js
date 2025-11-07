@@ -8,6 +8,7 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Contains the properties `ConvertToGroupButton` component needs.
@@ -39,6 +40,7 @@ export default function useConvertToGroupButtonProps( selectedClientIds ) {
 				isUngroupable,
 				isGroupable,
 			} = select( blockEditorStore );
+			const { isSectionBlock } = unlock( select( blockEditorStore ) );
 			const { getGroupingBlockName, getBlockType } =
 				select( blocksStore );
 			const clientIds = selectedClientIds?.length
@@ -46,8 +48,19 @@ export default function useConvertToGroupButtonProps( selectedClientIds ) {
 				: getSelectedBlockClientIds();
 			const blocksSelection = getBlocksByClientId( clientIds );
 			const [ firstSelectedBlock ] = blocksSelection;
-			const _isUngroupable =
+			let _isUngroupable =
 				clientIds.length === 1 && isUngroupable( clientIds[ 0 ] );
+
+			// Don't show ungroup for section blocks when the experiment is enabled
+			// since we show "Unlock design" instead
+			if (
+				_isUngroupable &&
+				window?.__experimentalContentOnlyPatternInsertion &&
+				isSectionBlock( clientIds[ 0 ] )
+			) {
+				_isUngroupable = false;
+			}
+
 			return {
 				clientIds,
 				isGroupable: isGroupable( clientIds ),
