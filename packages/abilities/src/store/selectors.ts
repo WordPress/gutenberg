@@ -45,13 +45,13 @@ export const getAbilities = createSelector(
  *
  * @param state Store state.
  * @param name  Ability name.
- * @return Ability object or null if not found.
+ * @return Ability object or undefined if not found.
  */
 export function getAbility(
 	state: AbilitiesState,
 	name: string
-): Ability | null {
-	return state.abilitiesByName[ name ] || null;
+): Ability | undefined {
+	return state.abilitiesByName[ name ];
 }
 
 /**
@@ -72,7 +72,7 @@ export const getAbilityCategories = createSelector(
  *
  * @param state Store state.
  * @param slug  Category slug.
- * @return Category object or null if not found.
+ * @return Category object or undefined if not found.
  */
 export function getAbilityCategory(
 	state: AbilitiesState,

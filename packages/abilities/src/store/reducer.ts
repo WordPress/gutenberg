@@ -39,13 +39,13 @@ const ABILITY_KEYS = [
 const CATEGORY_KEYS = [ 'slug', 'label', 'description', 'meta' ] as const;
 
 /**
- * Filters an ability object to only include valid properties.
+ * Sanitizes an ability object to only include valid properties.
  * This ensures consistent shape regardless of source (server/client).
  *
  * @param ability Raw ability object that may contain extra properties.
- * @return Filtered ability with only valid properties.
+ * @return Sanitized ability with only valid properties.
  */
-function filterAbility( ability: any ): Ability {
+function sanitizeAbility( ability: any ): Ability {
 	return Object.keys( ability )
 		.filter(
 			( key ) =>
@@ -59,13 +59,13 @@ function filterAbility( ability: any ): Ability {
 }
 
 /**
- * Filters a category object to only include valid properties.
+ * Sanitizes a category object to only include valid properties.
  * This ensures consistent shape regardless of source.
  *
  * @param category Raw category object that may contain extra properties.
- * @return Filtered category with only valid properties.
+ * @return Sanitized category with only valid properties.
  */
-function filterCategory( category: any ): AbilityCategory {
+function sanitizeCategory( category: any ): AbilityCategory {
 	return Object.keys( category )
 		.filter(
 			( key ) =>
@@ -108,7 +108,7 @@ function abilitiesByName(
 			}
 			const newState = { ...state };
 			action.abilities.forEach( ( ability ) => {
-				newState[ ability.name ] = filterAbility( ability );
+				newState[ ability.name ] = sanitizeAbility( ability );
 			} );
 			return newState;
 		}
@@ -118,15 +118,14 @@ function abilitiesByName(
 			}
 			return {
 				...state,
-				[ action.ability.name ]: filterAbility( action.ability ),
+				[ action.ability.name ]: sanitizeAbility( action.ability ),
 			};
 		}
 		case UNREGISTER_ABILITY: {
 			if ( ! action.name || ! state[ action.name ] ) {
 				return state;
 			}
-			const newState = { ...state };
-			delete newState[ action.name ];
+			const { [ action.name ]: _, ...newState } = state;
 			return newState;
 		}
 		default:
@@ -154,7 +153,7 @@ function categoriesBySlug(
 			}
 			const newState = { ...state };
 			action.categories.forEach( ( category ) => {
-				newState[ category.slug ] = filterCategory( category );
+				newState[ category.slug ] = sanitizeCategory( category );
 			} );
 			return newState;
 		}
@@ -164,15 +163,14 @@ function categoriesBySlug(
 			}
 			return {
 				...state,
-				[ action.category.slug ]: filterCategory( action.category ),
+				[ action.category.slug ]: sanitizeCategory( action.category ),
 			};
 		}
 		case UNREGISTER_ABILITY_CATEGORY: {
 			if ( ! action.slug || ! state[ action.slug ] ) {
 				return state;
 			}
-			const newState = { ...state };
-			delete newState[ action.slug ];
+			const { [ action.slug ]: _, ...newState } = state;
 			return newState;
 		}
 		default:
