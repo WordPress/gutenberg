@@ -23,7 +23,7 @@ import { unlock } from '../../lock-unlock';
  */
 export default function BlockParentSelector() {
 	const { selectBlock } = useDispatch( blockEditorStore );
-	const { parentClientId, blockInformation } = useSelect( ( select ) => {
+	const { parentClientId, title, icon } = useSelect( ( select ) => {
 		const {
 			getBlockParents,
 			getSelectedBlockClientId,
@@ -33,11 +33,13 @@ export default function BlockParentSelector() {
 		const parentSection = getParentSectionBlock( selectedBlockClientId );
 		const parents = getBlockParents( selectedBlockClientId );
 		const _parentClientId = parentSection ?? parents[ parents.length - 1 ];
+		const blockInformation = getBlockDisplayInformation( select, {
+			clientId: _parentClientId,
+		} );
 		return {
 			parentClientId: _parentClientId,
-			blockInformation: getBlockDisplayInformation( select, {
-				clientId: _parentClientId,
-			} ),
+			title: blockInformation?.title,
+			icon: blockInformation?.icon,
 		};
 	}, [] );
 
@@ -62,10 +64,10 @@ export default function BlockParentSelector() {
 				label={ sprintf(
 					/* translators: %s: Name of the block's parent. */
 					__( 'Select parent block: %s' ),
-					blockInformation?.title
+					title
 				) }
 				showTooltip
-				icon={ <BlockIcon icon={ blockInformation?.icon } /> }
+				icon={ <BlockIcon icon={ icon } /> }
 			/>
 		</div>
 	);

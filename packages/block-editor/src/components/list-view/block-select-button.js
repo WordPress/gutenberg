@@ -22,7 +22,6 @@ import { hasBlockSupport } from '@wordpress/blocks';
  */
 import BlockIcon from '../block-icon';
 import { getBlockDisplayInformation } from '../use-block-display-information';
-import { getBlockDisplayTitle } from '../block-title/use-block-display-title';
 import ListViewExpander from './expander';
 import { useBlockLock } from '../block-lock';
 import useListViewImages from './use-list-view-images';
@@ -54,14 +53,21 @@ function ListViewBlockSelectButton(
 		canToggleBlockVisibility,
 		isBlockHidden,
 		isContentOnly,
-		blockInformation,
 		blockTitle,
+		anchor,
+		icon,
+		isSticky,
 	} = useSelect(
 		( select ) => {
 			const { getBlockName } = select( blockEditorStore );
 			const { isBlockHidden: _isBlockHidden } = unlock(
 				select( blockEditorStore )
 			);
+
+			const blockInformation = getBlockDisplayInformation( select, {
+				clientId,
+				context: 'list-view',
+			} );
 			return {
 				canToggleBlockVisibility: hasBlockSupport(
 					getBlockName( clientId ),
@@ -73,14 +79,10 @@ function ListViewBlockSelectButton(
 					select( blockEditorStore ).getBlockEditingMode(
 						clientId
 					) === 'contentOnly',
-				blockInformation: getBlockDisplayInformation( select, {
-					clientId,
-					context: 'list-view',
-				} ),
-				blockTitle: getBlockDisplayTitle( select, {
-					clientId,
-					context: 'list-view',
-				} ),
+				blockTitle: blockInformation?.title,
+				icon: blockInformation?.icon,
+				anchor: blockInformation?.anchor,
+				isSticky: blockInformation?.positionType === 'sticky',
 			};
 		},
 		[ clientId ]
@@ -88,7 +90,6 @@ function ListViewBlockSelectButton(
 	const shouldShowLockIcon = isLocked && ! isContentOnly;
 	const shouldShowBlockVisibilityIcon =
 		canToggleBlockVisibility && isBlockHidden;
-	const isSticky = blockInformation?.positionType === 'sticky';
 	const images = useListViewImages( { clientId, isExpanded } );
 
 	// The `href` attribute triggers the browser's native HTML drag operations.
@@ -130,11 +131,7 @@ function ListViewBlockSelectButton(
 			aria-expanded={ isExpanded }
 		>
 			<ListViewExpander onClick={ onToggleExpanded } />
-			<BlockIcon
-				icon={ blockInformation?.icon }
-				showColors
-				context="list-view"
-			/>
+			<BlockIcon icon={ icon } showColors context="list-view" />
 			<HStack
 				alignment="center"
 				className="block-editor-list-view-block-select-button__label-wrapper"
@@ -144,10 +141,10 @@ function ListViewBlockSelectButton(
 				<span className="block-editor-list-view-block-select-button__title">
 					<Truncate ellipsizeMode="auto">{ blockTitle }</Truncate>
 				</span>
-				{ blockInformation?.anchor && (
+				{ anchor && (
 					<span className="block-editor-list-view-block-select-button__anchor-wrapper">
 						<Badge className="block-editor-list-view-block-select-button__anchor">
-							{ blockInformation.anchor }
+							{ anchor }
 						</Badge>
 					</span>
 				) }

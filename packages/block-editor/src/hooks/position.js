@@ -18,7 +18,7 @@ import { useMemo, Platform } from '@wordpress/element';
  */
 import { useSettings } from '../components/use-settings';
 import InspectorControls from '../components/inspector-controls';
-import { getBlockDisplayInformation } from '../components/use-block-display-information';
+import { getBlockDisplayTitle } from '../components/block-title/use-block-display-title';
 import { cleanEmptyObject, useStyleOverride } from './utils';
 import { store as blockEditorStore } from '../store';
 
@@ -202,13 +202,13 @@ export function PositionPanelPure( {
 	const allowSticky = hasStickyPositionSupport( blockName );
 	const value = style?.position?.type;
 
-	const { blockInformation } = useSelect(
+	const { blockTitle } = useSelect(
 		( select ) => {
 			const { getBlockParents } = select( blockEditorStore );
 			const parents = getBlockParents( clientId );
 			const firstParentClientId = parents[ parents.length - 1 ];
 			return {
-				blockInformation: getBlockDisplayInformation( select, {
+				blockTitle: getBlockDisplayTitle( select, {
 					clientId: firstParentClientId,
 				} ),
 			};
@@ -216,13 +216,13 @@ export function PositionPanelPure( {
 		[ clientId ]
 	);
 	const stickyHelpText =
-		allowSticky && value === STICKY_OPTION.value && blockInformation
+		allowSticky && value === STICKY_OPTION.value && blockTitle
 			? sprintf(
 					/* translators: %s: the name of the parent block. */
 					__(
 						'The block will stick to the scrollable area of the parent %s block.'
 					),
-					blockInformation.title
+					blockTitle
 			  )
 			: null;
 

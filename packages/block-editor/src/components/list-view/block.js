@@ -124,7 +124,8 @@ function ListViewBlock( {
 		blockName,
 		allowRightClickOverrides,
 		isBlockHidden,
-		blockInformation,
+		isSynced,
+		positionLabel,
 	} = useSelect(
 		( select ) => {
 			const { getBlock, getBlockName, getSettings } =
@@ -133,15 +134,18 @@ function ListViewBlock( {
 				select( blockEditorStore )
 			);
 
+			const blockInformation = getBlockDisplayInformation( select, {
+				clientId,
+			} );
+
 			return {
 				block: getBlock( clientId ),
 				blockName: getBlockName( clientId ),
 				allowRightClickOverrides:
 					getSettings().allowRightClickOverrides,
 				isBlockHidden: _isBlockHidden( clientId ),
-				blockInformation: getBlockDisplayInformation( select, {
-					clientId,
-				} ),
+				isSynced: blockInformation?.isSynced,
+				positionLabel: blockInformation?.positionLabel,
 			};
 		},
 		[ clientId ]
@@ -523,7 +527,7 @@ function ListViewBlock( {
 	);
 
 	const blockPropertiesDescription = getBlockPropertiesDescription(
-		blockInformation,
+		{ positionLabel },
 		isLocked
 	);
 
@@ -558,7 +562,7 @@ function ListViewBlock( {
 		'is-synced-branch': isSyncedBranch,
 		'is-dragging': isDragged,
 		'has-single-cell': ! showBlockActions,
-		'is-synced': blockInformation?.isSynced,
+		'is-synced': isSynced,
 		'is-draggable': canMove,
 		'is-displacement-normal': displacement === 'normal',
 		'is-displacement-up': displacement === 'up',

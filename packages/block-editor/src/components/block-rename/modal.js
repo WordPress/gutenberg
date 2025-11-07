@@ -24,14 +24,14 @@ import { cleanEmptyObject } from '../../hooks/utils';
 export default function BlockRenameModal( { clientId, onClose } ) {
 	const [ editedBlockName, setEditedBlockName ] = useState();
 
-	const { blockInformation, metadata } = useSelect(
+	const { originalBlockName, metadata } = useSelect(
 		( select ) => {
 			const { getBlockAttributes } = select( blockEditorStore );
 
 			return {
-				blockInformation: getBlockDisplayInformation( select, {
+				originalBlockName: getBlockDisplayInformation( select, {
 					clientId,
-				} ),
+				} )?.title,
 				metadata: getBlockAttributes( clientId )?.metadata,
 			};
 		},
@@ -40,7 +40,6 @@ export default function BlockRenameModal( { clientId, onClose } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const blockName = metadata?.name || '';
-	const originalBlockName = blockInformation?.title;
 	// Pattern Overrides is a WordPress-only feature but it also uses the Block Binding API.
 	// Ideally this should not be inside the block editor package, but we keep it here for simplicity.
 	const hasOverridesWarning =

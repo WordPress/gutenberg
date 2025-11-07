@@ -101,15 +101,15 @@ function ListViewBranch( props ) {
 		showAppender: showAppenderProp = true,
 	} = props;
 
-	const { parentBlockInformation, canParentExpand } = useSelect(
+	const { isSynced, canParentExpand } = useSelect(
 		( select ) => {
 			if ( ! parentId ) {
-				return { parentBlockInformation: null, canParentExpand: true };
+				return { isSynced: null, canParentExpand: true };
 			}
 			return {
-				parentBlockInformation: getBlockDisplayInformation( select, {
+				isSynced: getBlockDisplayInformation( select, {
 					clientId: parentId,
-				} ),
+				} ).isSynced,
 				canParentExpand:
 					select( blockEditorStore ).canEditBlock( parentId ),
 			};
@@ -117,7 +117,7 @@ function ListViewBranch( props ) {
 		[ parentId ]
 	);
 
-	const syncedBranch = isSyncedBranch || !! parentBlockInformation?.isSynced;
+	const syncedBranch = isSyncedBranch || !! isSynced;
 
 	const {
 		blockDropPosition,

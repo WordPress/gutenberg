@@ -37,19 +37,21 @@ export default function BlockQuickNavigation( { clientIds, onSelect } ) {
 }
 
 function BlockQuickNavigationItem( { clientId, onSelect } ) {
-	const { isSelected, blockInformation, blockTitle } = useSelect(
+	const { isSelected, icon, blockTitle } = useSelect(
 		( select ) => {
 			const { isBlockSelected, hasSelectedInnerBlock } =
 				select( blockEditorStore );
+
+			const blockInformation = getBlockDisplayInformation( select, {
+				clientId,
+				context: 'list-view',
+			} );
 
 			return {
 				isSelected:
 					isBlockSelected( clientId ) ||
 					hasSelectedInnerBlock( clientId, /* deep: */ true ),
-				blockInformation: getBlockDisplayInformation( select, {
-					clientId,
-					context: 'list-view',
-				} ),
+				icon: blockInformation?.icon,
 				blockTitle: getBlockDisplayTitle( select, {
 					clientId,
 					context: 'list-view',
@@ -74,7 +76,7 @@ function BlockQuickNavigationItem( { clientId, onSelect } ) {
 		>
 			<Flex>
 				<FlexItem>
-					<BlockIcon icon={ blockInformation?.icon } />
+					<BlockIcon icon={ icon } />
 				</FlexItem>
 				<FlexBlock style={ { textAlign: 'left' } }>
 					<Truncate>{ blockTitle }</Truncate>

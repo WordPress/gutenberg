@@ -326,31 +326,60 @@ const BlockInspectorSingleBlock = ( {
 		window?.__experimentalContentOnlyPatternInsertion &&
 		editedContentOnlySection &&
 		editedContentOnlySection !== clientId;
-	const { parentBlockInformation, blockInformation } = useSelect(
-		( select ) => ( {
-			parentBlockInformation: getBlockDisplayInformation( select, {
+	const {
+		parentTitle,
+		parentIcon,
+		parentDescription,
+		parentName,
+		parentIsSynced,
+		blockTitle,
+		blockIcon,
+		blockDescription,
+		blockCustomName,
+		isBlockSynced,
+	} = useSelect(
+		( select ) => {
+			const parentBlockInformation = getBlockDisplayInformation( select, {
 				clientId: editedContentOnlySection,
-			} ),
-			blockInformation: getBlockDisplayInformation( select, {
+			} );
+			const blockInformation = getBlockDisplayInformation( select, {
 				clientId,
-			} ),
-		} ),
+			} );
+
+			return {
+				parentTitle: parentBlockInformation?.title,
+				parentIcon: parentBlockInformation?.icon,
+				parentDescription: parentBlockInformation?.description,
+				parentName: parentBlockInformation?.name,
+				parentIsSynced: parentBlockInformation?.isSynced,
+				blockTitle: blockInformation?.title,
+				blockIcon: blockInformation?.icon,
+				blockDescription: blockInformation?.description,
+				blockCustomName: blockInformation?.name,
+				isBlockSynced: blockInformation?.isSynced,
+			};
+		},
 		[ editedContentOnlySection, clientId ]
 	);
-	const isBlockSynced = blockInformation.isSynced;
 	const shouldShowTabs = ! isBlockSynced && hasMultipleTabs;
 
 	return (
 		<div className="block-editor-block-inspector">
 			{ hasParentChildBlockCards && (
 				<BlockCard
-					{ ...parentBlockInformation }
-					className={ parentBlockInformation.isSynced && 'is-synced' }
+					title={ parentTitle }
+					icon={ parentIcon }
+					description={ parentDescription }
+					name={ parentName }
+					className={ parentIsSynced && 'is-synced' }
 					parentClientId={ editedContentOnlySection }
 				/>
 			) }
 			<BlockCard
-				{ ...blockInformation }
+				title={ blockTitle }
+				icon={ blockIcon }
+				description={ blockDescription }
+				name={ blockCustomName }
 				allowParentNavigation
 				className={ isBlockSynced && 'is-synced' }
 				isChild={ hasParentChildBlockCards }

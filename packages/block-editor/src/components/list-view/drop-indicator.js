@@ -22,7 +22,6 @@ import { useSelect } from '@wordpress/data';
  */
 import BlockIcon from '../block-icon';
 import { getBlockDisplayInformation } from '../use-block-display-information';
-import { getBlockDisplayTitle } from '../block-title/use-block-display-title';
 import ListViewExpander from './expander';
 
 export default function ListViewDropIndicatorPreview( {
@@ -30,17 +29,18 @@ export default function ListViewDropIndicatorPreview( {
 	listViewRef,
 	blockDropTarget,
 } ) {
-	const { blockInformation, blockTitle } = useSelect(
-		( select ) => ( {
-			blockInformation: getBlockDisplayInformation( select, {
+	const { blockIcon, blockTitle } = useSelect(
+		( select ) => {
+			const blockInformation = getBlockDisplayInformation( select, {
 				clientId: draggedBlockClientId,
 				context: 'list-view',
-			} ),
-			blockTitle: getBlockDisplayTitle( select, {
-				clientId: draggedBlockClientId,
-				context: 'list-view',
-			} ),
-		} ),
+			} );
+
+			return {
+				blockTitle: blockInformation?.title,
+				blockIcon: blockInformation?.icon,
+			};
+		},
 		[ draggedBlockClientId ]
 	);
 
@@ -332,7 +332,7 @@ export default function ListViewDropIndicatorPreview( {
 					>
 						<ListViewExpander onClick={ () => {} } />
 						<BlockIcon
-							icon={ blockInformation?.icon }
+							icon={ blockIcon }
 							showColors
 							context="list-view"
 						/>

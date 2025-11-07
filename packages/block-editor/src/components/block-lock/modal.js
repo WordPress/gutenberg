@@ -43,29 +43,26 @@ function getTemplateLockValue( lock ) {
 export default function BlockLockModal( { clientId, onClose } ) {
 	const [ lock, setLock ] = useState( { move: false, remove: false } );
 	const { canEdit, canMove, canRemove } = useBlockLock( clientId );
-	const {
-		allowsEditLocking,
-		templateLock,
-		hasTemplateLock,
-		blockInformation,
-	} = useSelect(
-		( select ) => {
-			const { getBlockName, getBlockAttributes } =
-				select( blockEditorStore );
-			const blockName = getBlockName( clientId );
-			const blockType = getBlockType( blockName );
+	const { allowsEditLocking, templateLock, hasTemplateLock, title } =
+		useSelect(
+			( select ) => {
+				const { getBlockName, getBlockAttributes } =
+					select( blockEditorStore );
+				const blockName = getBlockName( clientId );
+				const blockType = getBlockType( blockName );
 
-			return {
-				allowsEditLocking: ALLOWS_EDIT_LOCKING.includes( blockName ),
-				templateLock: getBlockAttributes( clientId )?.templateLock,
-				hasTemplateLock: !! blockType?.attributes?.templateLock,
-				blockInformation: getBlockDisplayInformation( select, {
-					clientId,
-				} ),
-			};
-		},
-		[ clientId ]
-	);
+				return {
+					allowsEditLocking:
+						ALLOWS_EDIT_LOCKING.includes( blockName ),
+					templateLock: getBlockAttributes( clientId )?.templateLock,
+					hasTemplateLock: !! blockType?.attributes?.templateLock,
+					title: getBlockDisplayInformation( select, {
+						clientId,
+					} )?.title,
+				};
+			},
+			[ clientId ]
+		);
 	const [ applyTemplateLock, setApplyTemplateLock ] = useState(
 		!! templateLock
 	);
@@ -87,7 +84,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
 			title={ sprintf(
 				/* translators: %s: Name of the block. */
 				__( 'Lock %s' ),
-				blockInformation.title
+				title
 			) }
 			overlayClassName="block-editor-block-lock-modal"
 			onRequestClose={ onClose }

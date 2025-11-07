@@ -50,10 +50,10 @@ export default function PostTermsEdit( {
 	const blockEditingMode = useBlockEditingMode();
 	const showControls = blockEditingMode === 'default';
 
-	const { selectedTerm, blockInformation } = useSelect(
+	const { selectedTerm, blockTitle } = useSelect(
 		( select ) => {
 			if ( ! term ) {
-				return { selectedTerm: {}, blockInformation: null };
+				return { selectedTerm: {}, blockTitle: null };
 			}
 			const { getTaxonomy } = select( coreStore );
 			const taxonomy = getTaxonomy( term );
@@ -61,9 +61,9 @@ export default function PostTermsEdit( {
 				selectedTerm: taxonomy?.visibility?.publicly_queryable
 					? taxonomy
 					: {},
-				blockInformation: getBlockDisplayInformation( select, {
+				blockTitle: getBlockDisplayInformation( select, {
 					clientId,
-				} ),
+				} )?.title,
 			};
 		},
 		[ term, clientId ]
@@ -121,9 +121,7 @@ export default function PostTermsEdit( {
 						tagName="span"
 					/>
 				) }
-				{ ( ! hasPost || ! term ) && (
-					<span>{ blockInformation.title }</span>
-				) }
+				{ ( ! hasPost || ! term ) && <span>{ blockTitle }</span> }
 				{ hasPost &&
 					! isLoading &&
 					hasPostTerms &&
