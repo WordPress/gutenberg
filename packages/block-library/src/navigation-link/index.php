@@ -347,10 +347,15 @@ function build_variation_for_navigation_link( $entity, $kind ) {
 		$title = sprintf( __( '%s link' ), $singular );
 	}
 
-	// Set default description if needed
+	// Default description if needed.
+	// Use a single space character instead of an empty string to prevent fallback to the
+	// block.json default description ("Add a page, link, or another item to your navigation.").
+	// An empty string would be treated as missing and trigger the fallback, while a single
+	// space appears blank in the UI but prevents the fallback behavior.
+	// We avoid generating descriptions like "A link to a %s" to prevent grammatical errors
+	// (e.g., "A link to a event" should be "A link to an event").
 	if ( $is_default_description || '' === $description ) {
-		/* translators: %s: Singular label of the entity. */
-		$description = sprintf( __( 'A link to a %s' ), strtolower( $singular ) );
+		$description = ' ';
 	}
 
 	$variation = array(
