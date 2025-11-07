@@ -23,6 +23,7 @@ import {
 	computeBetterFgColorDirection,
 	adjustContrastTarget,
 	stepsForStep,
+	solveWithBisect,
 } from './utils';
 
 import type {
@@ -32,7 +33,7 @@ import type {
 	RampConfig,
 	RampResult,
 } from './types';
-import { CONTRAST_EPSILON, MAX_BISECTION_ITERATIONS } from './constants';
+import { CONTRAST_EPSILON } from './constants';
 
 /**
  * Calculate a complete color ramp based on the provided configuration.
@@ -259,39 +260,18 @@ export function buildRamp(
 			pinLightness,
 		} );
 
-	const toReturn = {
-		ramp: rampResults,
-		direction: mainDir,
-	} as RampResult;
+	let bestRamp = rampResults;
 
 	if ( maxDeficit > CONTRAST_EPSILON && rescaleToFitContrastTargets ) {
-		let worseSeedL = get( seed, [ OKLCH, 'l' ] );
-		let worseDeficit = maxDeficit;
-		let worseReplaced = false;
-
-		// For a scale with the "lighter" direction, the contrast can be improved
-		// by darkening the seed. For "darker" direction, by lightening the seed.
-		let betterSeedL = maxDeficitDirection === 'lighter' ? 0 : 1;
-		let betterDeficit = -maxDeficit;
-		let betterReplaced = false;
-
-		let bestSeed = seed;
-		let bestDeficit = maxDeficit;
-
 		const iterSteps = stepsForStep( maxDeficitStep!, config );
 
-		// Binary search: try a new seed and recompute the whole ramp
-		for ( let i = 0; i < MAX_BISECTION_ITERATIONS; i++ ) {
-			const newSeedL =
-				( worseSeedL * betterDeficit - betterSeedL * worseDeficit ) /
-				( betterDeficit - worseDeficit );
+		function getSeedForL( l: number ): ColorTypes {
+			return clampToGamut( set( clone( seed ), [ OKLCH, 'l' ], l ) );
+		}
 
-			bestSeed = clampToGamut(
-				set( clone( seed ), [ OKLCH, 'l' ], newSeedL )
-			);
-
+		function getDeficitForSeed( s: ColorTypes ): number {
 			const iterationResults = calculateRamp( {
-				seed: bestSeed,
+				seed: s,
 				sortedSteps: iterSteps,
 				config,
 				mainDir,
@@ -303,36 +283,29 @@ export function buildRamp(
 			// iteration's direction, that means we've moved too far away from the target.
 			// Don't use the `maxDeficit` value because it's not related to our search,
 			// and might even be positive, which would confuse the bisection algorithm.
-			bestDeficit =
-				iterationResults.maxDeficitDirection === maxDeficitDirection
-					? iterationResults.maxDeficit
-					: -maxDeficit;
-
-			if ( Math.abs( bestDeficit ) <= CONTRAST_EPSILON ) {
-				break;
-			}
-
-			if ( bestDeficit <= 0 ) {
-				betterSeedL = newSeedL;
-				betterDeficit = bestDeficit;
-				if ( betterReplaced ) {
-					worseDeficit /= 2;
-				}
-				betterReplaced = true;
-				worseReplaced = false;
-			} else {
-				worseSeedL = newSeedL;
-				worseDeficit = bestDeficit;
-				if ( worseReplaced ) {
-					betterDeficit /= 2;
-				}
-				worseReplaced = true;
-				betterReplaced = false;
-			}
+			return iterationResults.maxDeficitDirection === maxDeficitDirection
+				? iterationResults.maxDeficit
+				: -maxDeficit;
 		}
 
+		// For a scale with the "lighter" direction, the contrast can be improved
+		// by darkening the seed. For "darker" direction, by lightening the seed.
+		const lowerSeedL = maxDeficitDirection === 'lighter' ? 0 : 1;
+		const lowerDeficit = -maxDeficit;
+		const upperSeedL = get( seed, [ OKLCH, 'l' ] );
+		const upperDeficit = maxDeficit;
+
+		const bestSeed = solveWithBisect(
+			getSeedForL,
+			getDeficitForSeed,
+			lowerSeedL,
+			lowerDeficit,
+			upperSeedL,
+			upperDeficit
+		);
+
 		// Calculate the final ramp with adjusted seed.
-		toReturn.ramp = calculateRamp( {
+		bestRamp = calculateRamp( {
 			seed: bestSeed,
 			sortedSteps,
 			config,
@@ -346,10 +319,13 @@ export function buildRamp(
 	// This ensures surface1 appears "behind" surface2, and surface3 appears "in front",
 	// regardless of the ramp's main direction.
 	if ( mainDir === 'darker' ) {
-		const tmpSurface1 = toReturn.ramp.surface1;
-		toReturn.ramp.surface1 = toReturn.ramp.surface3;
-		toReturn.ramp.surface3 = tmpSurface1;
+		const tmpSurface1 = bestRamp.surface1;
+		bestRamp.surface1 = bestRamp.surface3;
+		bestRamp.surface3 = tmpSurface1;
 	}
 
-	return toReturn;
+	return {
+		ramp: bestRamp,
+		direction: mainDir,
+	};
 }

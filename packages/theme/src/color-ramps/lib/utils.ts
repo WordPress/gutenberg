@@ -13,6 +13,8 @@ import {
 	UNIVERSAL_CONTRAST_TOPUP,
 	WHITE_TEXT_CONTRAST_MARGIN,
 	ACCENT_SCALE_BASE_LIGHTNESS_THRESHOLDS,
+	MAX_BISECTION_ITERATIONS,
+	CONTRAST_EPSILON,
 } from './constants';
 import type { Ramp, RampConfig, RampDirection } from './types';
 import { getContrast } from './color-utils';
@@ -186,4 +188,77 @@ export function clampAccentScaleReferenceLightness(
 ) {
 	const thresholds = ACCENT_SCALE_BASE_LIGHTNESS_THRESHOLDS[ direction ];
 	return Math.max( thresholds.min, Math.min( thresholds.max, rawLightness ) );
+}
+
+/**
+ * Find the value of of `L` (luminance) that produces a `C` (color) that has a
+ * `value` (contrast delta) equal to zero.
+ * @param calculateC     Calculate `C` from a given `L`.
+ * @param calculateValue Calculate value (delta) for a given `C`.
+ * @param initLowerL     Initial lower value of `L`.
+ * @param initLowerValue Initial lower delta (negative).
+ * @param initUpperL     Initial upper value of `L`.
+ * @param initUpperValue Initial upper delta (positive).
+ * @return Resulting value of type `C`.
+ */
+export function solveWithBisect< C >(
+	calculateC: ( l: number ) => C,
+	calculateValue: ( t: C ) => number,
+	initLowerL: number,
+	initLowerValue: number,
+	initUpperL: number,
+	initUpperValue: number
+): C {
+	let lowerL = initLowerL;
+	let lowerValue = initLowerValue;
+	let lowerReplaced = false;
+
+	let upperL = initUpperL;
+	let upperValue = initUpperValue;
+	let upperReplaced = false;
+
+	let bestC: C;
+	let bestValue: number;
+	let iterations = 0;
+
+	while ( true ) {
+		iterations++;
+
+		// Linear interpolation: find the point where a line would cross the zero axis.
+		const newL =
+			( lowerL * upperValue - upperL * lowerValue ) /
+			( upperValue - lowerValue );
+
+		bestC = calculateC( newL );
+		bestValue = calculateValue( bestC );
+
+		if (
+			Math.abs( bestValue ) <= CONTRAST_EPSILON ||
+			iterations >= MAX_BISECTION_ITERATIONS
+		) {
+			break;
+		}
+
+		// Update the lower/upper bracket values. When only one side is repeatedly updated,
+		// apply so-called "Illinois trick" for faster convergence: halve the opposite value.
+		if ( bestValue <= 0 ) {
+			lowerL = newL;
+			lowerValue = bestValue;
+			if ( lowerReplaced ) {
+				upperValue /= 2;
+			}
+			lowerReplaced = true;
+			upperReplaced = false;
+		} else {
+			upperL = newL;
+			upperValue = bestValue;
+			if ( upperReplaced ) {
+				lowerValue /= 2;
+			}
+			upperReplaced = true;
+			lowerReplaced = false;
+		}
+	}
+
+	return bestC;
 }
