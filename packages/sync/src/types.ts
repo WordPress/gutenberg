@@ -55,7 +55,7 @@ export interface ProviderCreatorResult {
 
 export type ProviderCreator = (
 	objectType: ObjectType,
-	objectId: ObjectID,
+	objectId: ObjectID | null,
 	ydoc: Y.Doc,
 	awareness?: Awareness
 ) => Promise< ProviderCreatorResult >;
