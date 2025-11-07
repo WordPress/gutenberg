@@ -43,7 +43,7 @@ interface PositionMeta {
  * without conflicts.
  */
 export function createUndoManager(): SyncUndoManager {
-	let setSelection: RecordHandlers[ 'setSelection' ] = () => {};
+	let resetSelection: RecordHandlers[ 'resetSelection' ] = () => {};
 
 	// A map of Yjs document guids to their BlockSelectionHistory instances.
 	const selectionHistoryMap = new Map< string, BlockSelectionHistory >();
@@ -121,16 +121,21 @@ export function createUndoManager(): SyncUndoManager {
 					);
 
 				if ( absolutePosition ) {
-					setSelection(
+					const selectionStart = {
 						clientId,
 						attributeKey,
-						absolutePosition.index,
-						absolutePosition.index
-					);
+						offset: absolutePosition.index,
+					};
+
+					resetSelection( selectionStart, selectionStart );
 					break;
 				}
 			} else if ( positionToTry.type === PositionType.BlockSelection ) {
-				setSelection( positionToTry.clientId );
+				const selectionStart = {
+					clientId: positionToTry.clientId,
+				};
+
+				resetSelection( selectionStart, selectionStart );
 				break;
 			}
 		}
@@ -169,18 +174,18 @@ export function createUndoManager(): SyncUndoManager {
 		 *
 		 * @param {Y.Map< any >} ymap                                The Yjs map to add to the scope.
 		 * @param                handlers
-		 * @param                handlers.setSelection
+		 * @param                handlers.resetSelection
 		 * @param                handlers.subscribeToSelectionChange
 		 */
 		addToScope(
 			ymap: Y.Map< any >,
 			handlers: {
 				subscribeToSelectionChange: RecordHandlers[ 'subscribeToSelectionChange' ];
-				setSelection: RecordHandlers[ 'setSelection' ];
+				resetSelection: RecordHandlers[ 'resetSelection' ];
 			}
 		): void {
 			yUndoManager.addToScope( ymap );
-			setSelection = handlers.setSelection;
+			resetSelection = handlers.resetSelection;
 
 			if ( ! ymap.doc ) {
 				// Necessary for a type check, but this shouldn't happen.

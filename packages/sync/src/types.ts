@@ -80,11 +80,9 @@ export interface RecordHandlers {
 	getEditedRecord: () => Promise< ObjectData >;
 	refetchRecord: () => Promise< void >;
 	saveRecord: () => Promise< void >;
-	setSelection: (
-		clientId: string,
-		attributeKey?: string,
-		startOffset?: number,
-		endOffset?: number
+	resetSelection: (
+		selectionStart: WPBlockSelection | { clientId: string },
+		selectionEnd: WPBlockSelection | { clientId: string }
 	) => void;
 	subscribeToSelectionChange: (
 		callback: ( selection: WPSelection ) => void
@@ -136,7 +134,7 @@ export interface SyncUndoManager extends WPUndoManager< ObjectData > {
 		ymap: Y.Map< any >,
 		handlers: {
 			subscribeToSelectionChange: RecordHandlers[ 'subscribeToSelectionChange' ];
-			setSelection: RecordHandlers[ 'setSelection' ];
+			resetSelection: RecordHandlers[ 'resetSelection' ];
 		}
 	) => void;
 }
