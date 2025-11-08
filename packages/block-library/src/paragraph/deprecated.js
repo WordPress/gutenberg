@@ -93,6 +93,52 @@ const migrateCustomColorsAndFontSizes = ( attributes ) => {
 const { style, ...restBlockAttributes } = blockAttributes;
 
 const deprecated = [
+	// Version with `align` attribute.
+	{
+		supports,
+		attributes: blockAttributes,
+		isEligible( attributes ) {
+			return (
+				!! attributes.align ||
+				!! attributes.className?.match(
+					/\bhas-text-align-(left|center|right)\b/
+				)
+			);
+		},
+		save( { attributes } ) {
+			const { align, content, dropCap, direction } = attributes;
+			const className = clsx( {
+				'has-drop-cap':
+					align === ( isRTL() ? 'left' : 'right' ) ||
+					align === 'center'
+						? false
+						: dropCap,
+				[ `has-text-align-${ align }` ]: align,
+			} );
+
+			return (
+				<p { ...useBlockProps.save( { className, dir: direction } ) }>
+					<RichText.Content value={ content } />
+				</p>
+			);
+		},
+		migrate( attributes ) {
+			const { align, ...restAttributes } = attributes;
+			if ( ! align ) {
+				return attributes;
+			}
+			return {
+				...restAttributes,
+				style: {
+					...attributes.style,
+					typography: {
+						...attributes.style?.typography,
+						textAlign: align,
+					},
+				},
+			};
+		},
+	},
 	// Version without drop cap on aligned text.
 	{
 		supports,
