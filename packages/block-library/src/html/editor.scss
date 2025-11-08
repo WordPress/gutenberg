@@ -1,4 +1,6 @@
 @use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
 
 .block-library-html__edit {
 	.block-library-html__preview-overlay {
@@ -8,16 +10,32 @@
 		top: 0;
 		left: 0;
 	}
+}
 
-	// The editing view for the HTML block is equivalent to block UI.
-	// Therefore we increase specificity to avoid theme styles bleeding in.
-	.block-editor-plain-text {
-		display: block;
-		box-sizing: border-box;
-		max-height: 250px;
-		@include editor-input-reset();
-		// HTML input is always LTR regardless of language.
-		/*rtl:ignore*/
-		direction: ltr;
+// Modal styles
+.block-library-html__modal {
+	// Make modal content scrollable
+	.components-modal__content {
+		display: flex;
+		flex-direction: column;
+		padding: 0;
 	}
+}
+
+.block-library-html__modal-tabs {
+	min-height: 500px;
+	padding: 0 $grid-unit-40 $grid-unit-40;
+}
+
+.block-library-html__modal-tab {
+	height: 100%;
+}
+
+.block-library-html__modal-editor {
+	width: 100%;
+	height: 100%;
+	@include editor-input-reset();
+	// HTML input is always LTR regardless of language.
+	/*rtl:ignore*/
+	direction: ltr;
 }
