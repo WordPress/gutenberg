@@ -1,9 +1,9 @@
 /**
  * External dependencies
  */
-import type { ForwardedRef } from 'react';
+import type { ClipboardEvent, ForwardedRef } from 'react';
 import type { Colord } from 'colord';
-import { colord, extend } from 'colord';
+import { colord, extend, getFormat } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 
 /**
@@ -76,8 +76,62 @@ const UnconnectedColorPicker = (
 		copyFormat || 'hex'
 	);
 
+	/*
+	 * ! Listener intended for the CAPTURE phase
+	 *
+	 * Capture paste events over the entire color picker, looking for clipboard
+	 * data that could be parsed as a color.
+	 *
+	 * - If so, set both the color and color type to match the paste.
+	 *
+	 * - If not, let the paste event propagate normally, so that individual
+	 *   input controls within the component have a chance to handle it.
+	 */
+	const maybeHandlePaste = useCallback(
+		( event: ClipboardEvent ) => {
+			const pastedText = event.clipboardData?.getData( 'text' )?.trim();
+			if ( ! pastedText ) {
+				return;
+			}
+
+			const parsedColor = colord( pastedText );
+			if ( ! parsedColor.isValid() ) {
+				return;
+			}
+
+			const detectedFormat = getFormat( pastedText );
+			if ( ! detectedFormat ) {
+				return;
+			}
+
+			// This redundancy helps TypeScript and is safer than assertions
+			const supportedFormats: Record< string, ColorType | undefined > = {
+				hex: 'hex',
+				rgb: 'rgb',
+				hsl: 'hsl',
+			};
+
+			const newColorType = supportedFormats[ detectedFormat ];
+			if ( ! newColorType ) {
+				return;
+			}
+
+			setColorType( newColorType );
+			handleChange( parsedColor );
+
+			// Stop at capture phase; no bubbling
+			event.stopPropagation();
+			event.preventDefault();
+		},
+		[ handleChange, setColorType ]
+	);
+
 	return (
-		<ColorfulWrapper ref={ forwardedRef } { ...divProps }>
+		<ColorfulWrapper
+			ref={ forwardedRef }
+			{ ...divProps }
+			onPasteCapture={ maybeHandlePaste }
+		>
 			<Picker
 				onChange={ handleChange }
 				color={ safeColordColor }
