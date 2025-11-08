@@ -141,7 +141,7 @@ export function isPlain( HTML ) {
 		const tagName = wrapper.tagName.toLowerCase();
 
 		// Only consider non-semantic wrapper tags
-		if ( ! [ 'span' ].includes( tagName ) ) {
+		if ( tagName !== 'span' ) {
 			return false;
 		}
 
