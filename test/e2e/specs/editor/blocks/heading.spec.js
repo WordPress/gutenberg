@@ -333,7 +333,11 @@ test.describe( 'Heading', () => {
 				name: 'core/paragraph',
 				attributes: {
 					content: 'Heading',
-					align: 'center',
+					style: {
+						typography: {
+							textAlign: 'center',
+						},
+					},
 				},
 			},
 		] );
