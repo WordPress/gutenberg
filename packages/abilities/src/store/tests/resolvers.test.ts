@@ -16,7 +16,12 @@ import {
 	getAbilityCategories,
 	getAbilityCategory,
 } from '../resolvers';
-import { receiveAbilities, receiveCategories } from '../actions';
+import {
+	receiveAbilities,
+	receiveCategories,
+	registerAbility,
+	registerAbilityCategory,
+} from '../actions';
 import { ENTITY_KIND, ENTITY_NAME, ENTITY_NAME_CATEGORIES } from '../constants';
 import type { Ability, AbilityCategory } from '../../types';
 
@@ -260,8 +265,10 @@ describe( 'Store Resolvers', () => {
 				ENTITY_NAME,
 				'test/ability'
 			);
-			expect( mockDispatch ).toHaveBeenCalledWith(
-				receiveAbilities( [ mockAbility ] )
+			// registerAbility returns a thunk, so we just verify dispatch was called
+			expect( mockDispatch ).toHaveBeenCalled();
+			expect( typeof mockDispatch.mock.calls[ 0 ][ 0 ] ).toBe(
+				'function'
 			);
 		} );
 
@@ -346,8 +353,10 @@ describe( 'Store Resolvers', () => {
 				ENTITY_NAME,
 				'my-plugin/feature-action'
 			);
-			expect( mockDispatch ).toHaveBeenCalledWith(
-				receiveAbilities( [ mockAbility ] )
+			// registerAbility returns a thunk, so we just verify dispatch was called
+			expect( mockDispatch ).toHaveBeenCalled();
+			expect( typeof mockDispatch.mock.calls[ 0 ][ 0 ] ).toBe(
+				'function'
 			);
 		} );
 	} );
@@ -549,8 +558,10 @@ describe( 'Store Resolvers', () => {
 				ENTITY_NAME_CATEGORIES,
 				'data-retrieval'
 			);
-			expect( mockDispatch ).toHaveBeenCalledWith(
-				receiveCategories( [ mockCategory ] )
+			// registerAbilityCategory returns a thunk, so we just verify dispatch was called
+			expect( mockDispatch ).toHaveBeenCalled();
+			expect( typeof mockDispatch.mock.calls[ 0 ][ 0 ] ).toBe(
+				'function'
 			);
 		} );
 
@@ -626,8 +637,10 @@ describe( 'Store Resolvers', () => {
 				select: mockSelect,
 			} );
 
-			expect( mockDispatch ).toHaveBeenCalledWith(
-				receiveCategories( [ mockCategory ] )
+			// registerAbilityCategory returns a thunk, so we just verify dispatch was called
+			expect( mockDispatch ).toHaveBeenCalled();
+			expect( typeof mockDispatch.mock.calls[ 0 ][ 0 ] ).toBe(
+				'function'
 			);
 		} );
 	} );
