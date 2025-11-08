@@ -4,6 +4,7 @@
 import { isBlobURL } from '@wordpress/blob';
 import {
 	ExternalLink,
+	FocalPointPicker,
 	ResizableBox,
 	Spinner,
 	TextareaControl,
@@ -62,6 +63,7 @@ import {
 	DEFAULT_MEDIA_SIZE_SLUG,
 } from './constants';
 import { evalAspectRatio } from './utils';
+import { mediaPosition } from '../cover/shared';
 
 const { DimensionsTool, ResolutionTool } = unlock( blockEditorPrivateApis );
 
@@ -279,6 +281,7 @@ export default function Image( {
 		height,
 		aspectRatio,
 		scale,
+		focalPoint,
 		linkTarget,
 		sizeSlug,
 		lightbox,
@@ -595,6 +598,7 @@ export default function Image( {
 	const resetSettings = () => {
 		setAttributes( {
 			lightbox: undefined,
+			focalPoint: undefined,
 		} );
 		updateImage( DEFAULT_MEDIA_SIZE_SLUG );
 	};
@@ -881,6 +885,30 @@ export default function Image( {
 							onChange={ updateImage }
 							options={ imageSizeOptions }
 						/>
+						{ ( aspectRatio || scale ) && url && (
+							<ToolsPanelItem
+								label={ __( 'Focal point' ) }
+								isShownByDefault
+								hasValue={ () => !! focalPoint }
+								onDeselect={ () =>
+									setAttributes( {
+										focalPoint: undefined,
+									} )
+								}
+							>
+								<FocalPointPicker
+									__nextHasNoMarginBottom
+									label={ __( 'Focal point' ) }
+									url={ url }
+									value={ focalPoint }
+									onChange={ ( newFocalPoint ) =>
+										setAttributes( {
+											focalPoint: newFocalPoint,
+										} )
+									}
+								/>
+							</ToolsPanelItem>
+						) }
 					</ToolsPanel>
 				</InspectorControls>
 			) }
@@ -965,6 +993,10 @@ export default function Image( {
 							  }
 							: { width, height } ),
 						objectFit: scale,
+						objectPosition:
+							focalPoint && scale
+								? mediaPosition( focalPoint )
+								: undefined,
 						...borderProps.style,
 						...shadowProps.style,
 					} }
