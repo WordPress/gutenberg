@@ -9,6 +9,10 @@
 -   `Card`, `CardHeader`, `CardBody` and `CardFooter`: Add support for directional padding through object-based size prop, allowing independent control of padding for each side ([#72511](https://github.com/WordPress/gutenberg/pull/72511)).
 -   `CustomSelectControl`: Fix the options with the same name are shown as the selected option ([#72189](https://github.com/WordPress/gutenberg/pull/72189)).
 
+### Internal
+
+-   `Modal`: Add a classname to simplify full height content modal styling ([#73108](https://github.com/WordPress/gutenberg/pull/73108)).
+
 ## 30.7.0 (2025-10-29)
 
 ### Bug Fixes
