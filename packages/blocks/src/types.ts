@@ -274,6 +274,8 @@ export interface BlockType<
 	 * Allowed child block types.
 	 */
 	allowedBlocks?: string[];
+
+	allowsReconstruction?: boolean;
 	/**
 	 * Context provided for available access by descendants of
 	 * blocks of this type, in the form of an object which maps
@@ -487,6 +489,10 @@ export interface Block<
 	 */
 	originalContent?: string;
 	/**
+	 * Validation level.
+	 */
+	validationLevel?: number;
+	/**
 	 * Validation issues.
 	 */
 	validationIssues?: Array< { log: Function; args: unknown[] } >;
@@ -494,6 +500,10 @@ export interface Block<
 	 * Un-processed original copy of block if created through parser.
 	 */
 	__unstableBlockSource?: RawBlock;
+	/**
+	 * Whether the block was migrated via deprecation.
+	 */
+	__wasMigrated?: boolean;
 }
 
 /**

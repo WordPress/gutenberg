@@ -16,6 +16,7 @@ exports[`Actions __experimentalConvertBlockToStatic should convert a static reus
         "name": "core/test-block",
         "originalContent": "",
         "validationIssues": [],
+        "validationLevel": 0,
       },
       {
         "attributes": {
@@ -26,12 +27,14 @@ exports[`Actions __experimentalConvertBlockToStatic should convert a static reus
         "name": "core/test-block",
         "originalContent": "",
         "validationIssues": [],
+        "validationLevel": 0,
       },
     ],
     "isValid": true,
     "name": "core/test-block",
     "originalContent": "",
     "validationIssues": [],
+    "validationLevel": 0,
   },
 ]
 `;

@@ -976,16 +976,20 @@ _Parameters_
 
 ### validateBlock
 
-Returns an object with `isValid` property set to `true` if the parsed block is valid given the input content. A block is considered valid if, when serialized with assumed attributes, the content matches the original value. If block is invalid, this function returns all validations issues as well.
+Returns validation results for a parsed block. The validation system uses a 5-level classification to determine content integrity with varying degrees of confidence, from perfect match (ValidBlock) to requiring user intervention (InvalidBlock).
+
+Note: Level 1 (MigratedBlock) is handled by the parser during deprecation checks, not by this function. This function handles Levels 0, 2, 3, and 4.
 
 _Parameters_
 
 -   _block_ `Block`: Block object.
 -   _blockTypeOrName_ `BlockType | string`: Block type or name, inferred from block if not given.
+-   _options_ `{ log: boolean; }`: Validation options.
+-   _options.log_ `{ log: boolean; }`: Whether to log Level 3 regenerations.
 
 _Returns_
 
--   `[ boolean, LoggerItem[] ]`: Validation results.
+-   `[ boolean, LoggerItem[], ValidationMetadata ]`: Validation results tuple: - isValid: boolean indicating if block is valid - issues: array of validation issues - metadata: object containing validationLevel, originalContent, generatedContent
 
 ### withBlockContentContext
 

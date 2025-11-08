@@ -10,3 +10,9 @@ export interface Logger {
 	warning: ( ...args: unknown[] ) => void;
 	getItems: () => LoggerItem[];
 }
+
+export interface ValidationMetadata {
+	validationLevel: number;
+	originalContent: string | undefined;
+	generatedContent: string | undefined;
+}

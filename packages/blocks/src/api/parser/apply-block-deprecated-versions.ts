@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { DEPRECATED_ENTRY_KEYS } from '../constants';
-import { validateBlock } from '../validation';
+import { validateBlock, VALIDATION_LEVEL } from '../validation';
 import { getBlockAttributes } from './get-block-attributes';
 import { applyBuiltInValidationFixes } from './apply-built-in-validation-fixes';
 import { omit } from '../utils';
@@ -50,8 +50,8 @@ export function applyBlockDeprecatedVersions(
 	// matched successfully with any of the registered deprecation definitions.
 	for ( let i = 0; i < deprecatedDefinitions.length; i++ ) {
 		// A block can opt into a migration even if the block is valid by
-		// defining `isEligible` on its deprecation. If the block is both valid
-		// and does not opt to migrate, skip.
+		// defining `isEligible` on its deprecation. If the block is valid
+		// (Level 0 perfect match) and does not opt to migrate, skip.
 		const { isEligible = stubFalse } = deprecatedDefinitions[ i ];
 		if (
 			block.isValid &&
@@ -83,21 +83,41 @@ export function applyBlockDeprecatedVersions(
 			),
 		};
 
-		// Ignore the deprecation if it produces a block which is not valid.
-		let [ isValid ] = validateBlock( migratedBlock, deprecatedBlockType );
+		// Deprecations require a perfect match. Unlike parsing where automated
+		// reconstruction is acceptable, deprecations are explicit author instructions
+		// that should only apply when the old `save()` output matches the stored
+		// content exactly.
+		let [ , , metadata ] = validateBlock(
+			migratedBlock,
+			deprecatedBlockType,
+			{
+				log: false,
+			}
+		);
+		let isValidDeprecation =
+			metadata?.validationLevel === VALIDATION_LEVEL.VALID_BLOCK;
 
 		// If the migrated block is not valid initially, try the built-in fixes.
-		if ( ! isValid ) {
+		if ( ! isValidDeprecation ) {
 			migratedBlock = applyBuiltInValidationFixes(
 				migratedBlock,
 				deprecatedBlockType
 			);
-			[ isValid ] = validateBlock( migratedBlock, deprecatedBlockType );
+			[ , , metadata ] = validateBlock(
+				migratedBlock,
+				deprecatedBlockType,
+				{
+					log: false,
+				}
+			);
+			isValidDeprecation =
+				metadata?.validationLevel === VALIDATION_LEVEL.VALID_BLOCK;
 		}
 
 		// An invalid block does not imply incorrect HTML but the fact block
-		// source information could be lost on re-serialization.
-		if ( ! isValid ) {
+		// source information could be lost on re-serialization. We continue to
+		// the next deprecation to see if the block becomes valid.
+		if ( ! isValidDeprecation ) {
 			continue;
 		}
 
@@ -128,6 +148,7 @@ export function applyBlockDeprecatedVersions(
 			innerBlocks: migratedInnerBlocks,
 			isValid: true,
 			validationIssues: [],
+			__wasMigrated: true, // Flag to indicate Level 1 (MIGRATED_BLOCK)
 		};
 	}
 

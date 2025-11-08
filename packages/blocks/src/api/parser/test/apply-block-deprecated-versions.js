@@ -89,6 +89,8 @@ describe( 'applyBlockDeprecatedVersions', () => {
 		);
 
 		expect( migratedBlock ).toEqual( expect.objectContaining( block ) );
+		// Should not log Level 3 regeneration during deprecation validation
+		expect( console ).not.toHaveLogged();
 	} );
 
 	it( 'should return with attributes parsed by the deprecated version', () => {

@@ -13,7 +13,7 @@ import {
 	getBlockType,
 } from '../registration';
 import { getSaveContent } from '../serializer';
-import { validateBlock } from '../validation';
+import { validateBlock, VALIDATION_LEVEL } from '../validation';
 import { createBlock } from '../factory';
 import { convertLegacyBlockNameAndAttributes } from './convert-legacy-block';
 import { serializeRawBlock } from './serialize-raw-block';
@@ -135,26 +135,59 @@ function applyBlockValidation(
 	unvalidatedBlock: Block,
 	blockType: BlockType
 ): Block {
-	// Attempt to validate the block.
-	const [ isValid ] = validateBlock( unvalidatedBlock, blockType );
+	// Attempt to validate the block. Suppress logging during validation
+	// discovery since we may try multiple approaches (fixes, deprecations).
+	const [ , , metadata ] = validateBlock( unvalidatedBlock, blockType, {
+		log: false,
+	} );
 
-	if ( isValid ) {
-		return { ...unvalidatedBlock, isValid, validationIssues: [] };
+	// Only accept perfect match as valid here. A valid block is an idempotent
+	// operation where the source and save() output match exactly. Deprecations
+	// must be tried before we attempt automatic block reconstruction.
+	if ( metadata?.validationLevel === VALIDATION_LEVEL.VALID_BLOCK ) {
+		return {
+			...unvalidatedBlock,
+			isValid: true,
+			validationIssues: [],
+			validationLevel: VALIDATION_LEVEL.VALID_BLOCK,
+		};
 	}
 
-	// If the block is invalid, attempt some built-in fixes
-	// like custom classNames handling.
+	// Built-in fixes extract attributes present in HTML but missing from the
+	// block comment (e.g., className, ariaLabel). Unlike Level 2/3 reconstruction
+	// which would lose these values on save, fixes preserve them in the block's
+	// attributes for regeneration.
 	const fixedBlock = applyBuiltInValidationFixes(
 		unvalidatedBlock,
 		blockType
 	);
-	// Attempt to validate the block once again after the built-in fixes.
-	const [ isFixedValid, validationIssues ] = validateBlock(
+	// eslint-disable-next-line @wordpress/no-unused-vars-before-return -- validationIssues is used in final return
+	const [ , validationIssues, fixedMetadata ] = validateBlock(
 		fixedBlock,
-		blockType
+		blockType,
+		{ log: false }
 	);
 
-	return { ...fixedBlock, isValid: isFixedValid, validationIssues };
+	// After fixes, only accept a perfect match as valid. Automated
+	// reconstruction is determined in `parseRawBlock` after deprecations
+	// have been tried.
+	if ( fixedMetadata?.validationLevel === VALIDATION_LEVEL.VALID_BLOCK ) {
+		return {
+			...fixedBlock,
+			isValid: true,
+			validationIssues: [],
+			validationLevel: VALIDATION_LEVEL.VALID_BLOCK,
+		};
+	}
+
+	// Return as invalid - deprecations will be tried next, and if they fail,
+	// `parseRawBlock` will check for reconstruction eligibility.
+	return {
+		...fixedBlock,
+		isValid: false,
+		validationIssues,
+		validationLevel: VALIDATION_LEVEL.INVALID_BLOCK,
+	};
 }
 
 /**
@@ -227,6 +260,29 @@ export function parseRawBlock(
 		normalizedBlock,
 		blockType
 	);
+
+	// If the block was migrated via deprecation, update validation level to Level 1
+	if ( updatedBlock.__wasMigrated ) {
+		updatedBlock.validationLevel = VALIDATION_LEVEL.MIGRATED_BLOCK;
+		delete updatedBlock.__wasMigrated; // Clean up internal flag
+	}
+
+	// If still invalid after deprecations, check if it qualifies for reconstruction.
+	// This ensures deprecations (explicit author instructions) take priority over
+	// automated block reconstruction.
+	if ( ! updatedBlock.isValid ) {
+		const [ canReconstruct, , reconstructMeta ] = validateBlock(
+			updatedBlock,
+			blockType,
+			{ log: false }
+		);
+
+		if ( canReconstruct ) {
+			updatedBlock.isValid = true;
+			updatedBlock.validationIssues = [];
+			updatedBlock.validationLevel = reconstructMeta.validationLevel;
+		}
+	}
 
 	if ( ! updatedBlock.isValid ) {
 		// Preserve the original unprocessed version of the block

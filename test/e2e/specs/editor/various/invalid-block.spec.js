@@ -8,7 +8,7 @@ test.describe( 'Invalid blocks', () => {
 		await admin.createNewPost();
 	} );
 
-	test( 'should show an invalid block message with clickable options', async ( {
+	test( 'should regenerate malformed HTML at validation Level 3', async ( {
 		editor,
 		page,
 	} ) => {
@@ -21,32 +21,24 @@ test.describe( 'Invalid blocks', () => {
 		// Change to HTML mode and close the options.
 		await editor.clickBlockOptionsMenuItem( 'Edit as HTML' );
 
-		// Focus on the textarea and enter an invalid paragraph.
+		// Focus on the textarea and enter malformed HTML (missing closing tag).
 		await editor.canvas
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.getByRole( 'textbox' )
 			.fill( '<p>invalid paragraph' );
 
-		// Takes the focus away from the block so the invalid warning is triggered.
+		// Takes the focus away from the block.
 		await editor.saveDraft();
 
-		// Click on the 'three-dots' menu toggle.
-		await editor.canvas
-			.getByRole( 'document', { name: 'Block: Paragraph' } )
-			.getByRole( 'button', { name: 'More options' } )
-			.click();
-
-		await page
-			.getByRole( 'menu', { name: 'More options' } )
-			.getByRole( 'menuitem', { name: 'Resolve' } )
-			.click();
-
-		// Check we get the resolve modal with the appropriate contents.
+		// The block should be regenerated (Level 3) and show a validation indicator.
+		// The malformed HTML is fixed by regenerating from attributes.
 		await expect(
-			page
-				.getByRole( 'dialog', { name: 'Resolve Block' } )
-				.locator( '.block-editor-block-compare__html' )
-		).toHaveText( [ '<p>invalid paragraph', '<p>invalid paragraph</p>' ] );
+			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
+		).toBeVisible();
+
+		// Check that the block was regenerated properly.
+		const content = await editor.getEditedPostContent();
+		expect( content ).toContain( '<p>invalid paragraph</p>' );
 	} );
 
 	test( 'should strip potentially malicious on* attributes', async ( {
@@ -54,21 +46,9 @@ test.describe( 'Invalid blocks', () => {
 		page,
 	} ) => {
 		let hasAlert = false;
-		let error = '';
-		let warning = '';
 
 		page.on( 'dialog', () => {
 			hasAlert = true;
-		} );
-
-		page.on( 'console', ( msg ) => {
-			if ( msg.type() === 'error' ) {
-				error = msg.text();
-			}
-
-			if ( msg.type() === 'warning' ) {
-				warning = msg.text();
-			}
 		} );
 
 		await editor.setContent( `
@@ -77,20 +57,13 @@ test.describe( 'Invalid blocks', () => {
 			<!-- /wp:paragraph -->
 		` );
 
-		// Give the browser time to show the alert.
+		// The block should be regenerated (Level 3) and the malicious
+		// attributes stripped during the regeneration process.
 		await expect(
-			editor.canvas
-				.getByRole( 'document', { name: 'Block: Paragraph' } )
-				.getByRole( 'button', { name: 'Attempt recovery' } )
+			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
 		).toBeVisible();
 
 		expect( hasAlert ).toBe( false );
-		expect( error ).toContain(
-			'Block validation: Block validation failed'
-		);
-		expect( warning ).toContain(
-			'Block validation: Malformed HTML detected'
-		);
 	} );
 
 	test( 'should not trigger malicious script tags when using a shortcode block', async ( {
