@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import {
 	Modal,
 	Button,
@@ -11,7 +12,7 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { PlainText } from '@wordpress/block-editor';
+import { PlainText, store as blockEditorStore } from '@wordpress/block-editor';
 import { fullscreen, square } from '@wordpress/icons';
 
 /**
@@ -37,6 +38,15 @@ export default function HTMLEditModal( {
 	const [ isDirty, setIsDirty ] = useState( false );
 	const [ showUnsavedWarning, setShowUnsavedWarning ] = useState( false );
 	const [ isFullscreen, setIsFullscreen ] = useState( false );
+
+	// Check if user has permission to save scripts
+	const canUserUseUnfilteredHTML = useSelect( ( select ) => {
+		return select( blockEditorStore ).getSettings()
+			.__experimentalCanUserUseUnfilteredHTML;
+	}, [] );
+
+	// Show JS tab if user has permission OR if block contains JavaScript
+	const shouldShowJsTab = canUserUseUnfilteredHTML || js.trim() !== '';
 
 	if ( ! isOpen ) {
 		return null;
@@ -110,9 +120,11 @@ export default function HTMLEditModal( {
 								<Tabs.TabList>
 									<Tabs.Tab tabId="html">HTML</Tabs.Tab>
 									<Tabs.Tab tabId="css">CSS</Tabs.Tab>
-									<Tabs.Tab tabId="js">
-										{ __( 'JavaScript' ) }
-									</Tabs.Tab>
+									{ shouldShowJsTab && (
+										<Tabs.Tab tabId="js">
+											{ __( 'JavaScript' ) }
+										</Tabs.Tab>
+									) }
 								</Tabs.TabList>
 							</div>
 							<div>
@@ -159,21 +171,23 @@ export default function HTMLEditModal( {
 										className="block-library-html__modal-editor"
 									/>
 								</Tabs.TabPanel>
-								<Tabs.TabPanel
-									tabId="js"
-									focusable={ false }
-									className="block-library-html__modal-tab"
-								>
-									<PlainText
-										value={ editedJs }
-										onChange={ handleJsChange }
-										placeholder={ __(
-											'Write JavaScript…'
-										) }
-										aria-label={ __( 'JavaScript' ) }
-										className="block-library-html__modal-editor"
-									/>
-								</Tabs.TabPanel>
+								{ shouldShowJsTab && (
+									<Tabs.TabPanel
+										tabId="js"
+										focusable={ false }
+										className="block-library-html__modal-tab"
+									>
+										<PlainText
+											value={ editedJs }
+											onChange={ handleJsChange }
+											placeholder={ __(
+												'Write JavaScript…'
+											) }
+											aria-label={ __( 'JavaScript' ) }
+											className="block-library-html__modal-editor"
+										/>
+									</Tabs.TabPanel>
+								) }
 							</div>
 							<div
 								className="block-library-html__preview"
