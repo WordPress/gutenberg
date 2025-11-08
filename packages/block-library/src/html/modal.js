@@ -9,8 +9,10 @@ import {
 	Flex,
 	privateApis as componentsPrivateApis,
 	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { PlainText } from '@wordpress/block-editor';
+import { fullscreen, square } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -34,27 +36,24 @@ export default function HTMLEditModal( {
 	const [ editedJs, setEditedJs ] = useState( js );
 	const [ isDirty, setIsDirty ] = useState( false );
 	const [ showUnsavedWarning, setShowUnsavedWarning ] = useState( false );
+	const [ isFullscreen, setIsFullscreen ] = useState( false );
 
 	if ( ! isOpen ) {
 		return null;
 	}
 
-	// Wrapper functions that mark content as dirty
 	const handleHtmlChange = ( value ) => {
 		setEditedHtml( value );
 		setIsDirty( true );
 	};
-
 	const handleCssChange = ( value ) => {
 		setEditedCss( value );
 		setIsDirty( true );
 	};
-
 	const handleJsChange = ( value ) => {
 		setEditedJs( value );
 		setIsDirty( true );
 	};
-
 	const handleUpdate = () => {
 		setAttributes( {
 			content: serializeContent( {
@@ -65,13 +64,10 @@ export default function HTMLEditModal( {
 		} );
 		setIsDirty( false );
 	};
-
 	const handleCancel = () => {
 		setIsDirty( false );
 		onRequestClose();
 	};
-
-	// Handle close request - check for unsaved changes
 	const handleRequestClose = () => {
 		if ( isDirty ) {
 			setShowUnsavedWarning( true );
@@ -79,22 +75,19 @@ export default function HTMLEditModal( {
 			onRequestClose();
 		}
 	};
-
-	// Handle discard confirmation
 	const handleDiscardChanges = () => {
 		setShowUnsavedWarning( false );
 		onRequestClose();
 	};
-
-	// Handle continue editing
 	const handleContinueEditing = () => {
 		setShowUnsavedWarning( false );
 	};
-
-	// Handle update and close
 	const handleUpdateAndClose = () => {
 		handleUpdate();
 		onRequestClose();
+	};
+	const toggleFullscreen = () => {
+		setIsFullscreen( ( prevState ) => ! prevState );
 	};
 
 	return (
@@ -107,89 +100,84 @@ export default function HTMLEditModal( {
 				isDismissible={ false }
 				shouldCloseOnClickOutside={ ! isDirty }
 				shouldCloseOnEsc={ ! isDirty }
-				isFullScreen
-				headerActions={
-					<>
-						<Button
-							__next40pxDefaultSize
-							variant="tertiary"
-							onClick={ handleCancel }
-						>
-							{ __( 'Cancel' ) }
-						</Button>
-						<Button
-							__next40pxDefaultSize
-							variant="primary"
-							onClick={ handleUpdate }
-						>
-							{ __( 'Save' ) }
-						</Button>
-					</>
-				}
+				isFullScreen={ isFullscreen }
+				__experimentalHideHeader
 			>
-				<Tabs orientation="vertical" defaultTabId="html">
-					<HStack
-						alignment="stretch"
-						justify="flex-start"
-						spacing={ 4 }
-						className="block-library-html__modal-tabs"
-					>
-						<div>
-							<Tabs.TabList>
-								<Tabs.Tab tabId="html">HTML</Tabs.Tab>
-								<Tabs.Tab tabId="css">CSS</Tabs.Tab>
-								<Tabs.Tab tabId="js">
-									{ __( 'JavaScript' ) }
-								</Tabs.Tab>
-								<Tabs.Tab tabId="preview">
-									{ __( 'Preview' ) }
-								</Tabs.Tab>
-							</Tabs.TabList>
-						</div>
-						<div style={ { flexGrow: 1 } }>
-							<Tabs.TabPanel
-								tabId="html"
-								focusable={ false }
-								className="block-library-html__modal-tab"
-							>
-								<PlainText
-									value={ editedHtml }
-									onChange={ handleHtmlChange }
-									placeholder={ __( 'Write HTML…' ) }
-									aria-label={ __( 'HTML' ) }
-									className="block-library-html__modal-editor"
+				<Tabs orientation="horizontal" defaultTabId="html">
+					<VStack spacing={ 4 } style={ { height: '100%' } }>
+						<HStack justify="space-between">
+							<div>
+								<Tabs.TabList>
+									<Tabs.Tab tabId="html">HTML</Tabs.Tab>
+									<Tabs.Tab tabId="css">CSS</Tabs.Tab>
+									<Tabs.Tab tabId="js">
+										{ __( 'JavaScript' ) }
+									</Tabs.Tab>
+								</Tabs.TabList>
+							</div>
+							<div>
+								<Button
+									__next40pxDefaultSize
+									icon={ isFullscreen ? square : fullscreen }
+									label={ __( 'Enable/disable fullscreen' ) }
+									onClick={ toggleFullscreen }
+									variant="tertiary"
 								/>
-							</Tabs.TabPanel>
-							<Tabs.TabPanel
-								tabId="css"
-								focusable={ false }
-								className="block-library-html__modal-tab"
-							>
-								<PlainText
-									value={ editedCss }
-									onChange={ handleCssChange }
-									placeholder={ __( 'Write CSS…' ) }
-									aria-label={ __( 'CSS' ) }
-									className="block-library-html__modal-editor"
-								/>
-							</Tabs.TabPanel>
-							<Tabs.TabPanel
-								tabId="js"
-								focusable={ false }
-								className="block-library-html__modal-tab"
-							>
-								<PlainText
-									value={ editedJs }
-									onChange={ handleJsChange }
-									placeholder={ __( 'Write JavaScript…' ) }
-									aria-label={ __( 'JavaScript' ) }
-									className="block-library-html__modal-editor"
-								/>
-							</Tabs.TabPanel>
-							<Tabs.TabPanel
-								tabId="preview"
-								focusable={ false }
-								className="block-library-html__modal-tab"
+							</div>
+						</HStack>
+						<HStack
+							alignment="stretch"
+							justify="flex-start"
+							spacing={ 4 }
+							className="block-library-html__modal-tabs"
+							style={ { flexGrow: 1 } }
+						>
+							<div style={ { flexGrow: 1 } }>
+								<Tabs.TabPanel
+									tabId="html"
+									focusable={ false }
+									className="block-library-html__modal-tab"
+								>
+									<PlainText
+										value={ editedHtml }
+										onChange={ handleHtmlChange }
+										placeholder={ __( 'Write HTML…' ) }
+										aria-label={ __( 'HTML' ) }
+										className="block-library-html__modal-editor"
+									/>
+								</Tabs.TabPanel>
+								<Tabs.TabPanel
+									tabId="css"
+									focusable={ false }
+									className="block-library-html__modal-tab"
+								>
+									<PlainText
+										value={ editedCss }
+										onChange={ handleCssChange }
+										placeholder={ __( 'Write CSS…' ) }
+										aria-label={ __( 'CSS' ) }
+										className="block-library-html__modal-editor"
+									/>
+								</Tabs.TabPanel>
+								<Tabs.TabPanel
+									tabId="js"
+									focusable={ false }
+									className="block-library-html__modal-tab"
+								>
+									<PlainText
+										value={ editedJs }
+										onChange={ handleJsChange }
+										placeholder={ __(
+											'Write JavaScript…'
+										) }
+										aria-label={ __( 'JavaScript' ) }
+										className="block-library-html__modal-editor"
+									/>
+								</Tabs.TabPanel>
+							</div>
+							<div
+								className="block-library-html__preview"
+								style={ { width: '50%' } }
 							>
 								<Preview
 									content={ serializeContent( {
@@ -197,11 +185,30 @@ export default function HTMLEditModal( {
 										css: editedCss,
 										js: editedJs,
 									} ) }
-									isSelected
 								/>
-							</Tabs.TabPanel>
-						</div>
-					</HStack>
+							</div>
+						</HStack>
+						<HStack
+							alignment="center"
+							justify="flex-end"
+							spacing={ 4 }
+						>
+							<Button
+								__next40pxDefaultSize
+								variant="tertiary"
+								onClick={ handleCancel }
+							>
+								{ __( 'Cancel' ) }
+							</Button>
+							<Button
+								__next40pxDefaultSize
+								variant="primary"
+								onClick={ handleUpdateAndClose }
+							>
+								{ __( 'Update' ) }
+							</Button>
+						</HStack>
+					</VStack>
 				</Tabs>
 			</Modal>
 
@@ -236,7 +243,7 @@ export default function HTMLEditModal( {
 							variant="primary"
 							onClick={ handleUpdateAndClose }
 						>
-							{ __( 'Save and close' ) }
+							{ __( 'Update and close' ) }
 						</Button>
 					</Flex>
 				</Modal>
