@@ -1024,10 +1024,10 @@ describe( 'validation', () => {
 	} );
 
 	describe( 'Validation Levels - Level 3: ReconstructedSource', () => {
-		it( 'should validate when block explicitly allows reconstruction', () => {
+		it( 'should validate reconstruction by default', () => {
 			registerBlockType( 'core/test-block', {
 				...defaultBlockSettings,
-				allowsReconstruction: true,
+				// allowsReconstruction not set - defaults to true
 				attributes: {
 					content: { type: 'string' },
 				},
@@ -1044,10 +1044,10 @@ describe( 'validation', () => {
 			expect( isValid ).toBe( true );
 		} );
 
-		it( 'should not validate reconstruction if not explicitly allowed', () => {
+		it( 'should not validate reconstruction when explicitly disabled', () => {
 			registerBlockType( 'core/test-block', {
 				...defaultBlockSettings,
-				// allowsReconstruction not set (defaults to undefined)
+				allowsReconstruction: false, // Explicitly opt out
 				attributes: {
 					content: { type: 'string' },
 				},
@@ -1066,7 +1066,6 @@ describe( 'validation', () => {
 		it( 'should validate when class names are generated from attributes', () => {
 			registerBlockType( 'core/heading', {
 				...defaultBlockSettings,
-				allowsReconstruction: true,
 				attributes: {
 					level: { type: 'number', default: 2 },
 					textColor: { type: 'string' },

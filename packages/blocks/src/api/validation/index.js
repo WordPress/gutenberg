@@ -837,8 +837,10 @@ export function createValidationResult(
  * @param {WPBlock}            block                          Block object.
  * @param {WPBlockType|string} [blockTypeOrName = block.name] Block type or name, inferred from block if not given.
  *
- * @return {[boolean,Array<LoggerItem>]|Object} Validation results. Returns legacy tuple format [isValid, issues]
- *                                              for backward compatibility, or new result object with validationLevel.
+ * @return {[boolean, Array<LoggerItem>, Object]} Validation results tuple:
+ *                                                - isValid: boolean indicating if block is valid
+ *                                                - issues: array of validation issues
+ *                                                - metadata: object containing validationLevel, originalContent, generatedContent
  */
 export function validateBlock( block, blockTypeOrName = block.name ) {
 	const isFallbackBlock =
@@ -848,7 +850,15 @@ export function validateBlock( block, blockTypeOrName = block.name ) {
 	// Shortcut: Fallback blocks (freeform/unregistered) are marked as raw transformed.
 	if ( isFallbackBlock ) {
 		// Return legacy format for backward compatibility
-		return [ true, [] ];
+		return [
+			true,
+			[],
+			{
+				validationLevel: VALIDATION_LEVEL.RAW_TRANSFORMED_SOURCE,
+				originalContent: block.originalContent,
+				generatedContent: block.originalContent, // No regeneration for fallback blocks
+			},
+		];
 	}
 
 	const logger = createQueuedLogger();
@@ -862,7 +872,15 @@ export function validateBlock( block, blockTypeOrName = block.name ) {
 				? blockTypeOrName
 				: blockTypeOrName?.name || block.name
 		);
-		return [ false, logger.getItems() ];
+		return [
+			false,
+			logger.getItems(),
+			{
+				validationLevel: VALIDATION_LEVEL.INVALID_BLOCK,
+				originalContent: block.originalContent,
+				generatedContent: null,
+			},
+		];
 	}
 
 	let generatedBlockContent;
@@ -875,7 +893,15 @@ export function validateBlock( block, blockTypeOrName = block.name ) {
 		);
 
 		// Return legacy format for backward compatibility
-		return [ false, logger.getItems() ];
+		return [
+			false,
+			logger.getItems(),
+			{
+				validationLevel: VALIDATION_LEVEL.INVALID_BLOCK,
+				originalContent: block.originalContent,
+				generatedContent: null,
+			},
+		];
 	}
 
 	// Level 0: ValidBlock - Perfect match (idempotent save operation)
@@ -887,7 +913,15 @@ export function validateBlock( block, blockTypeOrName = block.name ) {
 
 	if ( isValid ) {
 		// Valid blocks return empty issues array
-		return [ true, [] ];
+		return [
+			true,
+			[],
+			{
+				validationLevel: VALIDATION_LEVEL.VALID_BLOCK,
+				originalContent: block.originalContent,
+				generatedContent: generatedBlockContent,
+			},
+		];
 	}
 
 	// Create a new logger for innerHTML-only comparison
@@ -913,23 +947,36 @@ export function validateBlock( block, blockTypeOrName = block.name ) {
 			)
 		) {
 			// innerHTML is preserved, only block delimiter attributes differ
-			return [ true, [] ];
+			return [
+				true,
+				[],
+				{
+					validationLevel: VALIDATION_LEVEL.PRESERVED_SOURCE,
+					originalContent: block.originalContent,
+					generatedContent: generatedBlockContent,
+				},
+			];
 		}
 	}
 
 	// Level 3: ReconstructedSource - Attributes allow reconstruction
-	// Check if the block type explicitly allows reconstruction
-	// By default, blocks can be reconstructed unless they opt out
+	// By default, blocks can be reconstructed unless they explicitly opt out
+	// This allows blocks with generated class names or dynamic content to validate
 	const allowsReconstruction = blockType.allowsReconstruction !== false;
 
 	if ( allowsReconstruction && block.attributes ) {
 		// If attributes exist and reconstruction is allowed, consider it valid
 		// This level accepts that innerHTML may differ but can be rebuilt from attributes
-		// Note: This is a permissive level for dynamic/template blocks
-		// For now, we only apply this if the block type explicitly opts in
-		if ( blockType.allowsReconstruction === true ) {
-			return [ true, [] ];
-		}
+		// Block authors can opt out by setting allowsReconstruction: false
+		return [
+			true,
+			[],
+			{
+				validationLevel: VALIDATION_LEVEL.RECONSTRUCTED_SOURCE,
+				originalContent: block.originalContent,
+				generatedContent: generatedBlockContent,
+			},
+		];
 	}
 
 	// All validation levels failed - mark as invalid
@@ -942,7 +989,15 @@ export function validateBlock( block, blockTypeOrName = block.name ) {
 	);
 
 	// Return legacy format for backward compatibility
-	return [ false, logger.getItems() ];
+	return [
+		false,
+		logger.getItems(),
+		{
+			validationLevel: VALIDATION_LEVEL.INVALID_BLOCK,
+			originalContent: block.originalContent,
+			generatedContent: generatedBlockContent,
+		},
+	];
 }
 
 /**

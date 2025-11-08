@@ -998,7 +998,7 @@ _Parameters_
 
 _Returns_
 
--   `[boolean,Array<LoggerItem>]|Object`: Validation results. Returns legacy tuple format [isValid, issues] for backward compatibility, or new result object with validationLevel.
+-   `[boolean, Array<LoggerItem>, Object]`: Validation results tuple: - isValid: boolean indicating if block is valid - issues: array of validation issues - metadata: object containing validationLevel, originalContent, generatedContent
 
 ### withBlockContentContext
 
