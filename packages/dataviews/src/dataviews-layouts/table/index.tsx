@@ -8,7 +8,7 @@ import type { ComponentProps, ReactElement } from 'react';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { Spinner } from '@wordpress/components';
+import { Spinner, Popover } from '@wordpress/components';
 import {
 	useContext,
 	useEffect,
@@ -41,6 +41,7 @@ import ColumnHeaderMenu from './column-header-menu';
 import ColumnPrimary from './column-primary';
 import { useIsHorizontalScrollEnd } from './use-is-horizontal-scroll-end';
 import getDataByGroup from '../utils/get-data-by-group';
+import { PropertiesSection } from '../../components/dataviews-view-config/properties-section';
 
 interface TableColumnFieldProps< Item > {
 	fields: NormalizedField< Item >[];
@@ -296,6 +297,9 @@ function ViewTable< Item >( {
 	const [ nextHeaderMenuToFocus, setNextHeaderMenuToFocus ] =
 		useState< HTMLButtonElement >();
 	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
+	const [ contextMenuAnchor, setContextMenuAnchor ] = useState< {
+		getBoundingClientRect: () => DOMRect;
+	} | null >( null );
 
 	useEffect( () => {
 		if ( headerMenuToFocusRef.current ) {
@@ -327,6 +331,27 @@ function ViewTable< Item >( {
 			? headerMenuRefs.current.get( hidden.fallback )
 			: undefined;
 		setNextHeaderMenuToFocus( fallback?.node );
+	};
+
+	const handleHeaderContextMenu = ( event: React.MouseEvent ) => {
+		event.preventDefault();
+		event.stopPropagation();
+		const virtualAnchor = {
+			getBoundingClientRect: () => ( {
+				x: event.clientX,
+				y: event.clientY,
+				top: event.clientY,
+				left: event.clientX,
+				right: event.clientX,
+				bottom: event.clientY,
+				width: 0,
+				height: 0,
+				toJSON: () => ( {} ),
+			} ),
+		};
+		window.requestAnimationFrame( () => {
+			setContextMenuAnchor( virtualAnchor );
+		} );
 	};
 
 	const hasData = !! data?.length;
@@ -391,12 +416,22 @@ function ViewTable< Item >( {
 						<col className="dataviews-view-table__col-actions" />
 					) }
 				</colgroup>
-				<thead>
+				{ contextMenuAnchor && (
+					<Popover
+						anchor={ contextMenuAnchor }
+						onClose={ () => setContextMenuAnchor( null ) }
+						placement="bottom-start"
+					>
+						<PropertiesSection showLabel={ false } />
+					</Popover>
+				) }
+				<thead onContextMenu={ handleHeaderContextMenu }>
 					<tr className="dataviews-view-table__row">
 						{ hasBulkActions && (
 							<th
 								className="dataviews-view-table__checkbox-column"
 								scope="col"
+								onContextMenu={ handleHeaderContextMenu }
 							>
 								<BulkSelectionCheckbox
 									selection={ selection }
