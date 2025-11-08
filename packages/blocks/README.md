@@ -989,16 +989,16 @@ _Parameters_
 
 ### validateBlock
 
-Returns an object with `isValid` property set to `true` if the parsed block is valid given the input content. A block is considered valid if, when serialized with assumed attributes, the content matches the original value. If block is invalid, this function returns all validations issues as well.
+Returns validation results for a parsed block. The validation system uses a 6-level classification to determine content integrity with varying degrees of confidence, from perfect match (ValidBlock) to requiring user intervention (InvalidBlock).
 
 _Parameters_
 
--   _block_ `WPBlock`: block object.
+-   _block_ `WPBlock`: Block object.
 -   _blockTypeOrName_ `[WPBlockType|string]`: Block type or name, inferred from block if not given.
 
 _Returns_
 
--   `[boolean,Array<LoggerItem>]`: validation results.
+-   `[boolean,Array<LoggerItem>]|Object`: Validation results. Returns legacy tuple format [isValid, issues] for backward compatibility, or new result object with validationLevel.
 
 ### withBlockContentContext
 

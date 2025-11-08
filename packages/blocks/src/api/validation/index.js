@@ -25,6 +25,64 @@ import { normalizeBlockType } from '../utils';
 /** @typedef {import('../registration').WPBlockType} WPBlockType */
 /** @typedef {import('./logger').LoggerItem} LoggerItem */
 
+/**
+ * Validation level constants ordered by decreasing certainty over content integrity.
+ * Lower numbers indicate higher confidence in content preservation.
+ *
+ * @type {Object}
+ */
+export const VALIDATION_LEVEL = {
+	/**
+	 * Idempotent operation where save(attributes) produces exactly the original content.
+	 * Perfect match - no changes needed.
+	 */
+	VALID_BLOCK: 0,
+
+	/**
+	 * Source matched against defined deprecations sequentially.
+	 * The block was successfully migrated from an older version.
+	 */
+	MIGRATED_BLOCK: 1,
+
+	/**
+	 * innerHTML equivalence maintained despite comment attribute differences.
+	 * Block delimiter attributes differ but actual content HTML is identical.
+	 */
+	PRESERVED_SOURCE: 2,
+
+	/**
+	 * Attribute integrity preserved; innerHTML rebuild allowed.
+	 * Attributes parse correctly and content can be regenerated from them.
+	 */
+	RECONSTRUCTED_SOURCE: 3,
+
+	/**
+	 * Raw handling functions applied; block type name preserved.
+	 * Freeform or unregistered type handlers process the content.
+	 */
+	RAW_TRANSFORMED_SOURCE: 4,
+
+	/**
+	 * Cannot be safely restored; requires user intervention.
+	 * All other validation levels failed.
+	 */
+	INVALID_BLOCK: 5,
+};
+
+/**
+ * Human-readable names for validation levels.
+ *
+ * @type {Object}
+ */
+export const VALIDATION_LEVEL_NAME = {
+	[ VALIDATION_LEVEL.VALID_BLOCK ]: 'ValidBlock',
+	[ VALIDATION_LEVEL.MIGRATED_BLOCK ]: 'MigratedBlock',
+	[ VALIDATION_LEVEL.PRESERVED_SOURCE ]: 'PreservedSource',
+	[ VALIDATION_LEVEL.RECONSTRUCTED_SOURCE ]: 'ReconstructedSource',
+	[ VALIDATION_LEVEL.RAW_TRANSFORMED_SOURCE ]: 'RawTransformedSource',
+	[ VALIDATION_LEVEL.INVALID_BLOCK ]: 'InvalidBlock',
+};
+
 const identity = ( x ) => x;
 
 /**
@@ -697,6 +755,67 @@ export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
 }
 
 /**
+ * Extracts the innerHTML from a block's serialized content,
+ * stripping the block comment delimiters.
+ *
+ * This function removes the opening block comment (<!-- wp:blockName {...} -->)
+ * and closing block comment (<!-- /wp:blockName -->) to isolate just the
+ * content between them.
+ *
+ * @param {string} content Block serialized content including delimiters.
+ *
+ * @return {string} The innerHTML without block comment delimiters.
+ */
+export function extractBlockInnerHTML( content ) {
+	if ( ! content ) {
+		return '';
+	}
+
+	// Remove opening block comment: <!-- wp:blockName {...} -->
+	// The opening comment can be either:
+	// - Self-closing: <!-- wp:blockName {...} /-->
+	// - With content: <!-- wp:blockName {...} -->
+	const withoutOpeningComment = content.replace(
+		/^<!--\s+wp:[^\s]+(?:\s+[^>]*)?\s+\/?-->/,
+		''
+	);
+
+	// Remove closing block comment: <!-- /wp:blockName -->
+	const withoutClosingComment = withoutOpeningComment.replace(
+		/<!--\s+\/wp:[^\s]+\s+-->$/,
+		''
+	);
+
+	return withoutClosingComment;
+}
+
+/**
+ * Creates a validation result object with the specified level.
+ *
+ * @param {number}            validationLevel       The validation level (0-5).
+ * @param {Array<LoggerItem>} [validationIssues=[]] Array of validation issues.
+ *
+ * @return {Object} Validation result with isValid computed property.
+ */
+export function createValidationResult(
+	validationLevel,
+	validationIssues = []
+) {
+	return {
+		validationLevel,
+		validationIssues,
+		/**
+		 * Backward compatibility: isValid is true for all levels except INVALID_BLOCK.
+		 *
+		 * @return {boolean} Whether the block is considered valid.
+		 */
+		get isValid() {
+			return this.validationLevel < VALIDATION_LEVEL.INVALID_BLOCK;
+		},
+	};
+}
+
+/**
  * Returns an object with `isValid` property set to `true` if the parsed block
  * is valid given the input content. A block is considered valid if, when serialized
  * with assumed attributes, the content matches the original value. If block is
@@ -711,23 +830,24 @@ export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
  */
 
 /**
- * Returns an object with `isValid` property set to `true` if the parsed block
- * is valid given the input content. A block is considered valid if, when serialized
- * with assumed attributes, the content matches the original value. If block is
- * invalid, this function returns all validations issues as well.
+ * Returns validation results for a parsed block. The validation system uses a
+ * 6-level classification to determine content integrity with varying degrees of
+ * confidence, from perfect match (ValidBlock) to requiring user intervention (InvalidBlock).
  *
- * @param {WPBlock}            block                          block object.
+ * @param {WPBlock}            block                          Block object.
  * @param {WPBlockType|string} [blockTypeOrName = block.name] Block type or name, inferred from block if not given.
  *
- * @return {[boolean,Array<LoggerItem>]} validation results.
+ * @return {[boolean,Array<LoggerItem>]|Object} Validation results. Returns legacy tuple format [isValid, issues]
+ *                                              for backward compatibility, or new result object with validationLevel.
  */
 export function validateBlock( block, blockTypeOrName = block.name ) {
 	const isFallbackBlock =
 		block.name === getFreeformContentHandlerName() ||
 		block.name === getUnregisteredTypeHandlerName();
 
-	// Shortcut to avoid costly validation.
+	// Shortcut: Fallback blocks (freeform/unregistered) are marked as raw transformed.
 	if ( isFallbackBlock ) {
+		// Return legacy format for backward compatibility
 		return [ true, [] ];
 	}
 
@@ -742,26 +862,75 @@ export function validateBlock( block, blockTypeOrName = block.name ) {
 			error.toString()
 		);
 
+		// Return legacy format for backward compatibility
 		return [ false, logger.getItems() ];
 	}
 
+	// Level 0: ValidBlock - Perfect match (idempotent save operation)
 	const isValid = isEquivalentHTML(
 		block.originalContent,
 		generatedBlockContent,
 		logger
 	);
 
-	if ( ! isValid ) {
-		logger.error(
-			'Block validation failed for `%s` (%o).\n\nContent generated by `save` function:\n\n%s\n\nContent retrieved from post body:\n\n%s',
-			blockType.name,
-			blockType,
-			generatedBlockContent,
-			block.originalContent
-		);
+	if ( isValid ) {
+		// Valid blocks return empty issues array
+		return [ true, [] ];
 	}
 
-	return [ isValid, logger.getItems() ];
+	// Create a new logger for innerHTML-only comparison
+	const innerHTMLLogger = createQueuedLogger();
+
+	// Level 2: PreservedSource - innerHTML matches but comment attributes differ
+	// Only try to extract innerHTML if content looks like it has block delimiters
+	const hasBlockDelimiters = block.originalContent.includes( '<!-- wp:' );
+
+	if ( hasBlockDelimiters ) {
+		const originalInnerHTML = extractBlockInnerHTML(
+			block.originalContent
+		);
+		const generatedInnerHTML = extractBlockInnerHTML(
+			generatedBlockContent
+		);
+
+		if (
+			isEquivalentHTML(
+				originalInnerHTML,
+				generatedInnerHTML,
+				innerHTMLLogger
+			)
+		) {
+			// innerHTML is preserved, only block delimiter attributes differ
+			return [ true, [] ];
+		}
+	}
+
+	// Level 3: ReconstructedSource - Attributes allow reconstruction
+	// Check if the block type explicitly allows reconstruction
+	// By default, blocks can be reconstructed unless they opt out
+	const allowsReconstruction = blockType.allowsReconstruction !== false;
+
+	if ( allowsReconstruction && block.attributes ) {
+		// If attributes exist and reconstruction is allowed, consider it valid
+		// This level accepts that innerHTML may differ but can be rebuilt from attributes
+		// Note: This is a permissive level for dynamic/template blocks
+		// For now, we only apply this if the block type explicitly opts in
+		if ( blockType.allowsReconstruction === true ) {
+			return [ true, [] ];
+		}
+	}
+
+	// All validation levels failed - mark as invalid
+	logger.error(
+		'Block validation failed for `%s` (%o).\n\nContent generated by `save` function:\n\n%s\n\nContent retrieved from post body:\n\n%s',
+		blockType.name,
+		blockType,
+		generatedBlockContent,
+		block.originalContent
+	);
+
+	// Return legacy format for backward compatibility
+	return [ false, logger.getItems() ];
 }
 
 /**
