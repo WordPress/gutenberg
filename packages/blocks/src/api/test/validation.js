@@ -971,6 +971,56 @@ describe( 'validation', () => {
 
 			expect( isValid ).toBe( true );
 		} );
+
+		it( 'should validate with empty innerHTML', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				save: () => '',
+			} );
+
+			const [ isValid ] = validateBlock( {
+				name: 'core/test-block',
+				attributes: {},
+				originalContent:
+					'<!-- wp:test-block {"someAttr":"value"} --><!-- /wp:test-block -->',
+			} );
+
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'should validate self-closing blocks with attributes', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				save: () => '',
+			} );
+
+			const [ isValid ] = validateBlock( {
+				name: 'core/test-block',
+				attributes: {},
+				originalContent: '<!-- wp:test-block {"attr":"value"} /-->',
+			} );
+
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'should not apply PreservedSource if no block delimiters', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					text: { type: 'string' },
+				},
+				save: ( { attributes } ) => attributes.text,
+			} );
+
+			// No block delimiters, so innerHTML extraction is skipped
+			const [ isValid ] = validateBlock( {
+				name: 'core/test-block',
+				attributes: { text: 'Expected' },
+				originalContent: 'Different',
+			} );
+
+			expect( isValid ).toBe( false );
+		} );
 	} );
 
 	describe( 'Validation Levels - Level 3: ReconstructedSource', () => {
@@ -1012,6 +1062,50 @@ describe( 'validation', () => {
 
 			expect( isValid ).toBe( false );
 		} );
+
+		it( 'should validate when class names are generated from attributes', () => {
+			registerBlockType( 'core/heading', {
+				...defaultBlockSettings,
+				allowsReconstruction: true,
+				attributes: {
+					level: { type: 'number', default: 2 },
+					textColor: { type: 'string' },
+				},
+				save: ( { attributes } ) => {
+					const className = attributes.textColor
+						? `has-${ attributes.textColor }-color has-text-color`
+						: '';
+					return attributes.level === 6
+						? `<h6 class="${ className }">Testing Header</h6>`
+						: '<h2>Testing Header</h2>';
+				},
+			} );
+
+			// Source has no generated class names, output generates them from attributes
+			// This is ReconstructedSource - attributes allow rebuilding innerHTML
+			const [ isValid ] = validateBlock( {
+				name: 'core/heading',
+				attributes: { level: 6, textColor: 'pale-pink' },
+				originalContent:
+					'<!-- wp:heading {"level":6,"textColor":"pale-pink"} --><h6>Testing Header</h6><!-- /wp:heading -->',
+			} );
+
+			expect( isValid ).toBe( true );
+		} );
+	} );
+
+	describe( 'Validation Levels - Level 4: RawTransformedSource', () => {
+		it( 'should handle unregistered block types', () => {
+			// Block type that doesn't exist should fail validation
+			const [ isValid, issues ] = validateBlock( {
+				name: 'core/nonexistent-block',
+				attributes: {},
+				originalContent: '<p>Content</p>',
+			} );
+
+			expect( isValid ).toBe( false );
+			expect( issues.length ).toBeGreaterThan( 0 );
+		} );
 	} );
 
 	describe( 'Validation Levels - Level 5: InvalidBlock', () => {
@@ -1025,6 +1119,43 @@ describe( 'validation', () => {
 				name: 'core/test-block',
 				attributes: { expected: 'Expected content' },
 				originalContent: 'Completely different content',
+			} );
+
+			expect( isValid ).toBe( false );
+			expect( issues.length ).toBeGreaterThan( 0 );
+		} );
+
+		it( 'should invalidate when HTML structure completely changes', () => {
+			registerBlockType( 'core/heading', {
+				...defaultBlockSettings,
+				save: () => '<h2>Testing Header</h2>',
+			} );
+
+			// Source has span wrapping, but heading should have h2
+			// This would require changing block type to paragraph, so it's invalid
+			const [ isValid, issues ] = validateBlock( {
+				name: 'core/heading',
+				attributes: {},
+				originalContent:
+					'<!-- wp:heading --><span>Testing Header</span><!-- /wp:heading -->',
+			} );
+
+			expect( isValid ).toBe( false );
+			expect( issues.length ).toBeGreaterThan( 0 );
+		} );
+
+		it( 'should invalidate malformed HTML that cannot be fixed', () => {
+			registerBlockType( 'core/heading', {
+				...defaultBlockSettings,
+				save: () => '<h2>Testing Header</h2>',
+			} );
+
+			// Malformed: h2 opening tag but p closing tag
+			const [ isValid, issues ] = validateBlock( {
+				name: 'core/heading',
+				attributes: {},
+				originalContent:
+					'<!-- wp:heading --><h2>Testing Header</p><!-- /wp:heading -->',
 			} );
 
 			expect( isValid ).toBe( false );

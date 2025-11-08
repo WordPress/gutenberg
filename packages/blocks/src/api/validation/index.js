@@ -853,6 +853,18 @@ export function validateBlock( block, blockTypeOrName = block.name ) {
 
 	const logger = createQueuedLogger();
 	const blockType = normalizeBlockType( blockTypeOrName );
+
+	// If block type doesn't exist (unregistered), treat as invalid
+	if ( ! blockType ) {
+		logger.error(
+			'Block type `%s` is not registered.',
+			typeof blockTypeOrName === 'string'
+				? blockTypeOrName
+				: blockTypeOrName?.name || block.name
+		);
+		return [ false, logger.getItems() ];
+	}
+
 	let generatedBlockContent;
 	try {
 		generatedBlockContent = getSaveContent( blockType, block.attributes );
