@@ -90,12 +90,34 @@ const migrateCustomColorsAndFontSizes = ( attributes ) => {
 	};
 };
 
+const migrateTextAlign = ( attributes ) => {
+	const { align, ...restAttributes } = attributes;
+	if ( ! align ) {
+		return attributes;
+	}
+	return {
+		...restAttributes,
+		style: {
+			...attributes.style,
+			typography: {
+				...attributes.style?.typography,
+				textAlign: align,
+			},
+		},
+	};
+};
+
 const { style, ...restBlockAttributes } = blockAttributes;
 
 const deprecated = [
 	// Version with `align` attribute.
 	{
-		supports,
+		supports: {
+			className: false,
+			typography: {
+				fontSize: true,
+			},
+		},
 		attributes: blockAttributes,
 		isEligible( attributes ) {
 			return (
@@ -122,22 +144,7 @@ const deprecated = [
 				</p>
 			);
 		},
-		migrate( attributes ) {
-			const { align, ...restAttributes } = attributes;
-			if ( ! align ) {
-				return attributes;
-			}
-			return {
-				...restAttributes,
-				style: {
-					...attributes.style,
-					typography: {
-						...attributes.style?.typography,
-						textAlign: align,
-					},
-				},
-			};
-		},
+		migrate: migrateTextAlign,
 	},
 	// Version without drop cap on aligned text.
 	{
@@ -154,6 +161,7 @@ const deprecated = [
 				type: 'number',
 			},
 		},
+		migrate: migrateTextAlign,
 		save( { attributes } ) {
 			const { align, content, dropCap, direction } = attributes;
 			const className = clsx( {
@@ -186,7 +194,11 @@ const deprecated = [
 				type: 'number',
 			},
 		},
-		migrate: migrateCustomColorsAndFontSizes,
+		migrate( attributes ) {
+			return migrateCustomColorsAndFontSizes(
+				migrateTextAlign( attributes )
+			);
+		},
 		save( { attributes } ) {
 			const {
 				align,
@@ -251,7 +263,11 @@ const deprecated = [
 				type: 'number',
 			},
 		},
-		migrate: migrateCustomColorsAndFontSizes,
+		migrate( attributes ) {
+			return migrateCustomColorsAndFontSizes(
+				migrateTextAlign( attributes )
+			);
+		},
 		save( { attributes } ) {
 			const {
 				align,
@@ -319,7 +335,11 @@ const deprecated = [
 				type: 'string',
 			},
 		},
-		migrate: migrateCustomColorsAndFontSizes,
+		migrate( attributes ) {
+			return migrateCustomColorsAndFontSizes(
+				migrateTextAlign( attributes )
+			);
+		},
 		save( { attributes } ) {
 			const {
 				width,
@@ -409,21 +429,24 @@ const deprecated = [
 			);
 		},
 		migrate( attributes ) {
-			return migrateCustomColorsAndFontSizes( {
-				...attributes,
-				customFontSize: Number.isFinite( attributes.fontSize )
-					? attributes.fontSize
-					: undefined,
-				customTextColor:
-					attributes.textColor && '#' === attributes.textColor[ 0 ]
-						? attributes.textColor
+			return migrateCustomColorsAndFontSizes(
+				migrateTextAlign( {
+					...attributes,
+					customFontSize: Number.isFinite( attributes.fontSize )
+						? attributes.fontSize
 						: undefined,
-				customBackgroundColor:
-					attributes.backgroundColor &&
-					'#' === attributes.backgroundColor[ 0 ]
-						? attributes.backgroundColor
-						: undefined,
-			} );
+					customTextColor:
+						attributes.textColor &&
+						'#' === attributes.textColor[ 0 ]
+							? attributes.textColor
+							: undefined,
+					customBackgroundColor:
+						attributes.backgroundColor &&
+						'#' === attributes.backgroundColor[ 0 ]
+							? attributes.backgroundColor
+							: undefined,
+				} )
+			);
 		},
 	},
 	{
@@ -439,9 +462,7 @@ const deprecated = [
 		save( { attributes } ) {
 			return <RawHTML>{ attributes.content }</RawHTML>;
 		},
-		migrate( attributes ) {
-			return attributes;
-		},
+		migrate: ( attributes ) => attributes,
 	},
 ];
 
