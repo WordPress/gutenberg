@@ -80,12 +80,9 @@ const UnconnectedColorPicker = (
 	 * ! Listener intended for the CAPTURE phase
 	 *
 	 * Capture paste events over the entire color picker, looking for clipboard
-	 * data that could be parsed as a color.
-	 *
-	 * - If so, set both the color and color type to match the paste.
-	 *
-	 * - If not, let the paste event propagate normally, so that individual
-	 *   input controls within the component have a chance to handle it.
+	 * data that could be parsed as a color. If not, let the paste event
+	 * propagate normally, so that individual input controls within the
+	 * component have a chance to handle it.
 	 */
 	const maybeHandlePaste = useCallback(
 		( event: ClipboardEvent ) => {
@@ -111,13 +108,15 @@ const UnconnectedColorPicker = (
 				hsl: 'hsl',
 			};
 
-			const newColorType = supportedFormats[ detectedFormat ];
-			if ( ! newColorType ) {
-				return;
-			}
-
-			setColorType( newColorType );
+			// Apply all valid colors, even if the format isn't supported in
+			// the UI (e.g. names like "cyan" or, in the future color spaces
+			// like "lch" if we add the right colord plugins)
 			handleChange( parsedColor );
+
+			const newColorType = supportedFormats[ detectedFormat ];
+			if ( newColorType ) {
+				setColorType( newColorType );
+			}
 
 			// Stop at capture phase; no bubbling
 			event.stopPropagation();
