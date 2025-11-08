@@ -62,7 +62,7 @@
 	},
 	"Color/_Primitives/Primary/surface4": {
 		"value": {
-			".": "#e5eaf7"
+			".": "#e6ebf7"
 		}
 	},
 	"Color/_Primitives/Primary/surface3": {
@@ -87,7 +87,7 @@
 	},
 	"Color/_Primitives/Primary/fgSurface1": {
 		"value": {
-			".": "#81a7ff"
+			".": "#82a7ff"
 		}
 	},
 	"Color/_Primitives/Primary/stroke3": {
@@ -107,7 +107,7 @@
 	},
 	"Color/_Primitives/Primary/stroke1": {
 		"value": {
-			".": "#92a4cf"
+			".": "#92a4d0"
 		}
 	},
 	"Color/_Primitives/Primary/bgFillDark": {
@@ -127,7 +127,7 @@
 	},
 	"Color/_Primitives/Primary/bgFillInverted1": {
 		"value": {
-			".": "#1401a4"
+			".": "#1401a5"
 		}
 	},
 	"Color/_Primitives/Primary/fgFillInverted": {
@@ -137,7 +137,7 @@
 	},
 	"Color/_Primitives/Primary/surface1": {
 		"value": {
-			".": "#ecf0f9"
+			".": "#edf1fa"
 		}
 	},
 	"Color/_Primitives/Info/bgFill1": {
@@ -187,7 +187,7 @@
 	},
 	"Color/_Primitives/Info/fgSurface3": {
 		"value": {
-			".": "#006cd8"
+			".": "#006dd9"
 		}
 	},
 	"Color/_Primitives/Info/fgSurface2": {
@@ -197,12 +197,12 @@
 	},
 	"Color/_Primitives/Info/fgSurface1": {
 		"value": {
-			".": "#4dafff"
+			".": "#4fb0ff"
 		}
 	},
 	"Color/_Primitives/Info/stroke3": {
 		"value": {
-			".": "#006cd8"
+			".": "#006dd9"
 		}
 	},
 	"Color/_Primitives/Info/stroke4": {
@@ -212,7 +212,7 @@
 	},
 	"Color/_Primitives/Info/stroke2": {
 		"value": {
-			".": "#5e90c7"
+			".": "#5d90c8"
 		}
 	},
 	"Color/_Primitives/Info/stroke1": {
@@ -247,7 +247,7 @@
 	},
 	"Color/_Primitives/Info/surface1": {
 		"value": {
-			".": "#e9f1fa"
+			".": "#eaf2fa"
 		}
 	},
 	"Color/_Primitives/Success/bgFill1": {
@@ -277,12 +277,12 @@
 	},
 	"Color/_Primitives/Success/surface5": {
 		"value": {
-			".": "#acf0b7"
+			".": "#adf0b8"
 		}
 	},
 	"Color/_Primitives/Success/surface4": {
 		"value": {
-			".": "#cdf5d3"
+			".": "#cef5d3"
 		}
 	},
 	"Color/_Primitives/Success/surface3": {
@@ -297,22 +297,22 @@
 	},
 	"Color/_Primitives/Success/fgSurface3": {
 		"value": {
-			".": "#008030"
+			".": "#008031"
 		}
 	},
 	"Color/_Primitives/Success/fgSurface2": {
 		"value": {
-			".": "#2a9e4d"
+			".": "#2b9e4e"
 		}
 	},
 	"Color/_Primitives/Success/fgSurface1": {
 		"value": {
-			".": "#52bf6d"
+			".": "#52c06d"
 		}
 	},
 	"Color/_Primitives/Success/stroke3": {
 		"value": {
-			".": "#008030"
+			".": "#008031"
 		}
 	},
 	"Color/_Primitives/Success/stroke4": {
@@ -322,12 +322,12 @@
 	},
 	"Color/_Primitives/Success/stroke2": {
 		"value": {
-			".": "#62996c"
+			".": "#629a6c"
 		}
 	},
 	"Color/_Primitives/Success/stroke1": {
 		"value": {
-			".": "#78ba84"
+			".": "#78bb84"
 		}
 	},
 	"Color/_Primitives/Success/bgFillDark": {
@@ -357,7 +357,7 @@
 	},
 	"Color/_Primitives/Success/surface1": {
 		"value": {
-			".": "#ddf8e0"
+			".": "#def8e1"
 		}
 	},
 	"Color/_Primitives/Warning/bgFill1": {
@@ -392,7 +392,7 @@
 	},
 	"Color/_Primitives/Warning/surface4": {
 		"value": {
-			".": "#f8e9cd"
+			".": "#f8e9ce"
 		}
 	},
 	"Color/_Primitives/Warning/surface3": {
@@ -407,37 +407,37 @@
 	},
 	"Color/_Primitives/Warning/fgSurface3": {
 		"value": {
-			".": "#966200"
+			".": "#976300"
 		}
 	},
 	"Color/_Primitives/Warning/fgSurface2": {
 		"value": {
-			".": "#b58000"
+			".": "#b68000"
 		}
 	},
 	"Color/_Primitives/Warning/fgSurface1": {
 		"value": {
-			".": "#d7a02b"
+			".": "#d8a12b"
 		}
 	},
 	"Color/_Primitives/Warning/stroke3": {
 		"value": {
-			".": "#966200"
+			".": "#976300"
 		}
 	},
 	"Color/_Primitives/Warning/stroke4": {
 		"value": {
-			".": "#724700"
+			".": "#734700"
 		}
 	},
 	"Color/_Primitives/Warning/stroke2": {
 		"value": {
-			".": "#a08961"
+			".": "#a18a61"
 		}
 	},
 	"Color/_Primitives/Warning/stroke1": {
 		"value": {
-			".": "#c2a777"
+			".": "#c3a877"
 		}
 	},
 	"Color/_Primitives/Warning/bgFillDark": {
@@ -457,7 +457,7 @@
 	},
 	"Color/_Primitives/Warning/bgFillInverted1": {
 		"value": {
-			".": "#472900"
+			".": "#462800"
 		}
 	},
 	"Color/_Primitives/Warning/fgFillInverted": {
@@ -467,7 +467,7 @@
 	},
 	"Color/_Primitives/Warning/surface1": {
 		"value": {
-			".": "#faefdb"
+			".": "#faefdd"
 		}
 	},
 	"Color/_Primitives/Error/bgFill1": {
@@ -502,7 +502,7 @@
 	},
 	"Color/_Primitives/Error/surface4": {
 		"value": {
-			".": "#fae6e2"
+			".": "#fae5e2"
 		}
 	},
 	"Color/_Primitives/Error/surface3": {
@@ -522,12 +522,12 @@
 	},
 	"Color/_Primitives/Error/fgSurface2": {
 		"value": {
-			".": "#f64b40"
+			".": "#f74c40"
 		}
 	},
 	"Color/_Primitives/Error/fgSurface1": {
 		"value": {
-			".": "#ff8070"
+			".": "#ff8171"
 		}
 	},
 	"Color/_Primitives/Error/stroke3": {
@@ -577,7 +577,7 @@
 	},
 	"Color/_Primitives/Error/surface1": {
 		"value": {
-			".": "#fcecea"
+			".": "#fcedeb"
 		}
 	},
 	"Color/_Primitives/Bg/surface2": {
@@ -607,12 +607,12 @@
 	},
 	"Color/_Primitives/Bg/surface5": {
 		"value": {
-			".": "#dfdfdf"
+			".": "#e0e0e0"
 		}
 	},
 	"Color/_Primitives/Bg/surface4": {
 		"value": {
-			".": "#eaeaea"
+			".": "#ebebeb"
 		}
 	},
 	"Color/_Primitives/Bg/surface3": {
@@ -632,27 +632,27 @@
 	},
 	"Color/_Primitives/Bg/fgSurface2": {
 		"value": {
-			".": "#898989"
+			".": "#8a8a8a"
 		}
 	},
 	"Color/_Primitives/Bg/fgSurface1": {
 		"value": {
-			".": "#a9a9a9"
+			".": "#aaa"
 		}
 	},
 	"Color/_Primitives/Bg/stroke3": {
 		"value": {
-			".": "#898989"
+			".": "#8a8a8a"
 		}
 	},
 	"Color/_Primitives/Bg/stroke4": {
 		"value": {
-			".": "#6a6a6a"
+			".": "#6b6b6b"
 		}
 	},
 	"Color/_Primitives/Bg/stroke2": {
 		"value": {
-			".": "#adadad"
+			".": "#aeaeae"
 		}
 	},
 	"Color/_Primitives/Bg/stroke1": {
@@ -687,7 +687,7 @@
 	},
 	"Color/_Primitives/Bg/surface1": {
 		"value": {
-			".": "#f0f0f0"
+			".": "#f1f1f1"
 		}
 	},
 	"Color/_Primitives/Caution/bgFill1": {
@@ -712,7 +712,7 @@
 	},
 	"Color/_Primitives/Caution/surface6": {
 		"value": {
-			".": "#e7d070"
+			".": "#e7d071"
 		}
 	},
 	"Color/_Primitives/Caution/surface5": {
@@ -737,37 +737,37 @@
 	},
 	"Color/_Primitives/Caution/fgSurface3": {
 		"value": {
-			".": "#866a00"
+			".": "#876a00"
 		}
 	},
 	"Color/_Primitives/Caution/fgSurface2": {
 		"value": {
-			".": "#a58700"
+			".": "#a68800"
 		}
 	},
 	"Color/_Primitives/Caution/fgSurface1": {
 		"value": {
-			".": "#c6a800"
+			".": "#c7a800"
 		}
 	},
 	"Color/_Primitives/Caution/stroke3": {
 		"value": {
-			".": "#866a00"
+			".": "#876a00"
 		}
 	},
 	"Color/_Primitives/Caution/stroke4": {
 		"value": {
-			".": "#644e00"
+			".": "#654e00"
 		}
 	},
 	"Color/_Primitives/Caution/stroke2": {
 		"value": {
-			".": "#988d60"
+			".": "#998e61"
 		}
 	},
 	"Color/_Primitives/Caution/stroke1": {
 		"value": {
-			".": "#b8ab76"
+			".": "#b9ac76"
 		}
 	},
 	"Color/_Primitives/Caution/bgFillDark": {
@@ -797,7 +797,7 @@
 	},
 	"Color/_Primitives/Caution/surface1": {
 		"value": {
-			".": "#faf1cb"
+			".": "#faf1cd"
 		}
 	},
 	"Color/Semantic/Background/Neutral/bgSur-neutral": {
