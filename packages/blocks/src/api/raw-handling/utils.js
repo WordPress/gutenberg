@@ -114,7 +114,7 @@ export function getBlockContentSchema( context ) {
 /**
  * Checks whether HTML can be considered plain text. That is, it does not contain
  * any elements that are not line breaks, or it only contains a single non-semantic
- * wrapper element (span/div/p) with no semantic child elements.
+ * wrapper element (span) with no semantic child elements.
  *
  * @param {string} HTML The HTML to check.
  *
