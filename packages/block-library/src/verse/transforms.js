@@ -14,6 +14,14 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/quote' ],
+			isMatch: ( {}, blocks ) => {
+				// Only allow transform when quote contains only paragraphs or headings
+				const block = Array.isArray( blocks ) ? blocks[ 0 ] : blocks;
+				return block.innerBlocks.every(
+					( { name } ) =>
+						name === 'core/paragraph' || name === 'core/heading'
+				);
+			},
 			transform: ( {}, innerBlocks ) => {
 				// Extract content from the quote's inner blocks
 				const content = innerBlocks

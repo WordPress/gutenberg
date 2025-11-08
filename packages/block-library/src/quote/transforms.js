@@ -131,6 +131,12 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/verse' ],
+			isMatch: ( {}, block ) => {
+				return block.innerBlocks.every(
+					( { name } ) =>
+						name === 'core/paragraph' || name === 'core/heading'
+				);
+			},
 			transform: ( {}, innerBlocks ) => {
 				const content = innerBlocks
 					.map( ( { attributes } ) => attributes.content || '' )
