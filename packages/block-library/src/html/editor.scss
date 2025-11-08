@@ -20,11 +20,15 @@
 		flex-direction: column;
 		padding: 0;
 	}
+
+	.components-modal__children-container {
+		height: 100%;
+	}
 }
 
 .block-library-html__modal-tabs {
-	min-height: 500px;
-	padding: 0 $grid-unit-40 $grid-unit-40;
+	height: 100%;
+	padding: $grid-unit-20 $grid-unit-40 $grid-unit-40;
 }
 
 .block-library-html__modal-tab {
@@ -38,4 +42,10 @@
 	// HTML input is always LTR regardless of language.
 	/*rtl:ignore*/
 	direction: ltr;
+	overflow-x: auto;
+}
+
+.block-library-html__modal-actions {
+	margin-top: $grid-unit-20;
+	padding: 0 $grid-unit-40 $grid-unit-40;
 }
