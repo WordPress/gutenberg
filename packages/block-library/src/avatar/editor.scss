@@ -1,9 +1,15 @@
-.wp-block-avatar__image img {
-	width: 100%;
-}
+.wp-block-avatar {
+	&.aligncenter {
+		.components-resizable-box__container {
+			margin: 0 auto;
+		}
+	}
 
-.wp-block-avatar.aligncenter {
-	.components-resizable-box__container {
-		margin: 0 auto;
+	&__image {
+		width: 100%;
+	}
+
+	&__link {
+		pointer-events: none;
 	}
 }

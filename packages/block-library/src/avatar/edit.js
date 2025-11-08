@@ -144,6 +144,42 @@ const ResizableAvatar = ( {
 			s: attributes?.size * 2,
 		}
 	);
+
+	const img = (
+		<>
+			<img
+				src={ doubledSizedSrc }
+				alt={ avatar.alt }
+				className={ clsx(
+					'avatar',
+					'avatar-' + attributes.size,
+					'photo',
+					'wp-block-avatar__image',
+					borderProps.className
+				) }
+				style={ borderProps.style }
+			/>
+		</>
+	);
+
+	let imgWrapper = img;
+
+	// Disable reason: Image itself is not meant to be interactive, but
+	// should direct focus to block.
+	if ( attributes.isLink ) {
+		imgWrapper = (
+			/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
+			<a
+				href="#avatar-pseudo-link"
+				className="wp-block-avatar__link"
+				onClick={ ( event ) => event.preventDefault() }
+			>
+				{ img }
+			</a>
+			/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
+		);
+	}
+
 	return (
 		<div { ...blockProps }>
 			<ResizableBox
@@ -170,22 +206,12 @@ const ResizableAvatar = ( {
 				minWidth={ avatar.minSize }
 				maxWidth={ avatar.maxSize }
 			>
-				<img
-					src={ doubledSizedSrc }
-					alt={ avatar.alt }
-					className={ clsx(
-						'avatar',
-						'avatar-' + attributes.size,
-						'photo',
-						'wp-block-avatar__image',
-						borderProps.className
-					) }
-					style={ borderProps.style }
-				/>
+				{ imgWrapper }
 			</ResizableBox>
 		</div>
 	);
 };
+
 const CommentEdit = ( { attributes, context, setAttributes, isSelected } ) => {
 	const { commentId } = context;
 	const blockProps = useBlockProps();
@@ -198,29 +224,13 @@ const CommentEdit = ( { attributes, context, setAttributes, isSelected } ) => {
 				attributes={ attributes }
 				selectUser={ false }
 			/>
-			{ attributes.isLink ? (
-				<a
-					href="#avatar-pseudo-link"
-					className="wp-block-avatar__link"
-					onClick={ ( event ) => event.preventDefault() }
-				>
-					<ResizableAvatar
-						attributes={ attributes }
-						avatar={ avatar }
-						blockProps={ blockProps }
-						isSelected={ isSelected }
-						setAttributes={ setAttributes }
-					/>
-				</a>
-			) : (
-				<ResizableAvatar
-					attributes={ attributes }
-					avatar={ avatar }
-					blockProps={ blockProps }
-					isSelected={ isSelected }
-					setAttributes={ setAttributes }
-				/>
-			) }
+			<ResizableAvatar
+				attributes={ attributes }
+				avatar={ avatar }
+				blockProps={ blockProps }
+				isSelected={ isSelected }
+				setAttributes={ setAttributes }
+			/>
 		</>
 	);
 };
@@ -241,29 +251,13 @@ const UserEdit = ( { attributes, context, setAttributes, isSelected } ) => {
 				avatar={ avatar }
 				setAttributes={ setAttributes }
 			/>
-			{ attributes.isLink ? (
-				<a
-					href="#avatar-pseudo-link"
-					className="wp-block-avatar__link"
-					onClick={ ( event ) => event.preventDefault() }
-				>
-					<ResizableAvatar
-						attributes={ attributes }
-						avatar={ avatar }
-						blockProps={ blockProps }
-						isSelected={ isSelected }
-						setAttributes={ setAttributes }
-					/>
-				</a>
-			) : (
-				<ResizableAvatar
-					attributes={ attributes }
-					avatar={ avatar }
-					blockProps={ blockProps }
-					isSelected={ isSelected }
-					setAttributes={ setAttributes }
-				/>
-			) }
+			<ResizableAvatar
+				attributes={ attributes }
+				avatar={ avatar }
+				blockProps={ blockProps }
+				isSelected={ isSelected }
+				setAttributes={ setAttributes }
+			/>
 		</>
 	);
 };
