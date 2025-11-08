@@ -58,6 +58,9 @@
 		"useFirstImageFromPost": {
 			"type": "boolean",
 			"default": false
+		},
+		"focalPoint": {
+			"type": "object"
 		}
 	},
 	"usesContext": [ "postId", "postType", "queryId" ],
