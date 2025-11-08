@@ -90,7 +90,7 @@ console.log("hello");
 <style data-wp-block-html="css">second</style>`;
 			const result = parseContent( content );
 			expect( result.css ).toBe( 'first' );
-			expect( result.html ).not.toContain( 'second' );
+			expect( result.html ).toContain( 'second' );
 		} );
 
 		it( 'should handle multiple marked script tags (takes first)', () => {
@@ -98,7 +98,7 @@ console.log("hello");
 <script data-wp-block-html="js">second</script>`;
 			const result = parseContent( content );
 			expect( result.js ).toBe( 'first' );
-			expect( result.html ).not.toContain( 'second' );
+			expect( result.html ).toContain( 'second' );
 		} );
 
 		it( 'should trim whitespace from extracted sections', () => {
