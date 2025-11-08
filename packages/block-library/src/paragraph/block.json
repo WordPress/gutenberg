@@ -62,6 +62,7 @@
 			"__experimentalFontStyle": true,
 			"__experimentalFontWeight": true,
 			"__experimentalLetterSpacing": true,
+			"__experimentalTextIndent": true,
 			"__experimentalTextTransform": true,
 			"__experimentalWritingMode": true,
 			"fitText": true,

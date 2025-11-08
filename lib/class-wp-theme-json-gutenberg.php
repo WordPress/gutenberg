@@ -305,6 +305,7 @@ class WP_Theme_JSON_Gutenberg {
 		'--wp--style--root--padding-left'   => array( 'spacing', 'padding', 'left' ),
 		'text-decoration'                   => array( 'typography', 'textDecoration' ),
 		'text-transform'                    => array( 'typography', 'textTransform' ),
+		'text-indent'                       => array( 'typography', 'textIndent' ),
 		'filter'                            => array( 'filter', 'duotone' ),
 		'box-shadow'                        => array( 'shadow' ),
 		'height'                            => array( 'dimensions', 'height' ),
@@ -484,6 +485,7 @@ class WP_Theme_JSON_Gutenberg {
 			'textAlign'        => null,
 			'textColumns'      => null,
 			'textDecoration'   => null,
+			'textIndent'       => null,
 			'textTransform'    => null,
 			'writingMode'      => null,
 		),
@@ -584,6 +586,7 @@ class WP_Theme_JSON_Gutenberg {
 			'textAlign'      => null,
 			'textColumns'    => null,
 			'textDecoration' => null,
+			'textIndent'     => null,
 			'textTransform'  => null,
 			'writingMode'    => null,
 		),
@@ -641,6 +644,7 @@ class WP_Theme_JSON_Gutenberg {
 		// The block classes are necessary to target older content that won't use the new class names.
 		'caption'   => '.wp-element-caption, .wp-block-audio figcaption, .wp-block-embed figcaption, .wp-block-gallery figcaption, .wp-block-image figcaption, .wp-block-table figcaption, .wp-block-video figcaption',
 		'cite'      => 'cite',
+		'text'      => 'p',
 		'select'    => 'select',
 		'textInput' => 'textarea, input:where([type=email],[type=number],[type=password],[type=search],[type=text],[type=tel],[type=url])',
 	);
@@ -3120,6 +3124,24 @@ class WP_Theme_JSON_Gutenberg {
 			$declarations = static::update_separator_declarations( $declarations );
 		}
 
+		// Handle text-indent for paragraph blocks and text element: extract it and generate p + p selector.
+		$text_indent_declarations = array();
+		$is_processing_element = in_array( 'elements', $block_metadata['path'], true );
+		$current_element = $is_processing_element ? $block_metadata['path'][ count( $block_metadata['path'] ) - 1 ] : null;
+		$should_use_p_plus_p = ( ! empty( $block_metadata['name'] ) && 'core/paragraph' === $block_metadata['name'] ) ||
+		                       ( 'text' === $current_element );
+
+		if ( $should_use_p_plus_p ) {
+			foreach ( $declarations as $index => $declaration ) {
+				if ( 'text-indent' === $declaration['name'] ) {
+					$text_indent_declarations[] = $declaration;
+					unset( $declarations[ $index ] );
+				}
+			}
+			// Re-index array after unsetting elements.
+			$declarations = array_values( $declarations );
+		}
+
 		/*
 		 * Root selector (body) styles should not be wrapped in `:root where()` to keep
 		 * specificity at (0,0,1) and maintain backwards compatibility.
@@ -3146,6 +3168,11 @@ class WP_Theme_JSON_Gutenberg {
 		// 3. Generate and append the rules that use the duotone selector.
 		if ( isset( $block_metadata['duotone'] ) && ! empty( $declarations_duotone ) ) {
 			$block_rules .= static::to_ruleset( $block_metadata['duotone'], $declarations_duotone );
+		}
+
+		// 3a. Generate and append text-indent rules for paragraph blocks using p + p selector.
+		if ( ! empty( $text_indent_declarations ) ) {
+			$block_rules .= static::to_ruleset( 'p + p', $text_indent_declarations );
 		}
 
 		// 4. Generate Layout block gap styles.

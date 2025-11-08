@@ -100,6 +100,7 @@ export function useSettingsForBlockElement(
 			'textAlign',
 			'textTransform',
 			'textDecoration',
+			'textIndent',
 			'writingMode',
 		].forEach( ( key ) => {
 			if ( ! supportedStyles.includes( key ) ) {
@@ -109,6 +110,19 @@ export function useSettingsForBlockElement(
 				};
 			}
 		} );
+
+		// Text indent needs explicit handling since it may not be in parent settings.
+		if ( supportedStyles.includes( 'textIndent' ) ) {
+			updatedSettings.typography = {
+				...updatedSettings.typography,
+				textIndent: updatedSettings.typography?.textIndent ?? true,
+			};
+		} else {
+			updatedSettings.typography = {
+				...updatedSettings.typography,
+				textIndent: false,
+			};
+		}
 
 		// The column-count style is named text column to reduce confusion with
 		// the columns block and manage expectations from the support.
