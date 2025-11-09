@@ -890,7 +890,6 @@ export function validateBlock( block, blockTypeOrName = block.name ) {
 
 	// Shortcut: Fallback blocks (freeform/unregistered) are marked as raw transformed.
 	if ( isFallbackBlock ) {
-		// Return legacy format for backward compatibility
 		return [
 			true,
 			[],
@@ -933,7 +932,6 @@ export function validateBlock( block, blockTypeOrName = block.name ) {
 			error.toString()
 		);
 
-		// Return legacy format for backward compatibility
 		return [
 			false,
 			logger.getItems(),
@@ -1008,7 +1006,6 @@ export function validateBlock( block, blockTypeOrName = block.name ) {
 		block.originalContent
 	);
 
-	// Return legacy format for backward compatibility
 	return [
 		false,
 		logger.getItems(),

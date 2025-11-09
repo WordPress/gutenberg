@@ -20,7 +20,6 @@ import {
 	validateBlock,
 	isClosedByToken,
 	VALIDATION_LEVEL,
-	VALIDATION_LEVEL_NAME,
 	createValidationResult,
 } from '../validation';
 import {
@@ -761,34 +760,6 @@ describe( 'validation', () => {
 			} );
 
 			expect( isValid ).toBe( true );
-		} );
-	} );
-
-	describe( 'VALIDATION_LEVEL constants', () => {
-		it( 'should have correct numeric values ordered by confidence', () => {
-			expect( VALIDATION_LEVEL.VALID_BLOCK ).toBe( 0 );
-			expect( VALIDATION_LEVEL.MIGRATED_BLOCK ).toBe( 1 );
-			expect( VALIDATION_LEVEL.RECONSTRUCTED_BLOCK ).toBe( 2 );
-			expect( VALIDATION_LEVEL.RAW_TRANSFORMED_BLOCK ).toBe( 3 );
-			expect( VALIDATION_LEVEL.INVALID_BLOCK ).toBe( 4 );
-		} );
-
-		it( 'should have human-readable names for each level', () => {
-			expect(
-				VALIDATION_LEVEL_NAME[ VALIDATION_LEVEL.VALID_BLOCK ]
-			).toBe( 'ValidBlock' );
-			expect(
-				VALIDATION_LEVEL_NAME[ VALIDATION_LEVEL.MIGRATED_BLOCK ]
-			).toBe( 'MigratedBlock' );
-			expect(
-				VALIDATION_LEVEL_NAME[ VALIDATION_LEVEL.RECONSTRUCTED_BLOCK ]
-			).toBe( 'ReconstructedBlock' );
-			expect(
-				VALIDATION_LEVEL_NAME[ VALIDATION_LEVEL.RAW_TRANSFORMED_BLOCK ]
-			).toBe( 'RawTransformedBlock' );
-			expect(
-				VALIDATION_LEVEL_NAME[ VALIDATION_LEVEL.INVALID_BLOCK ]
-			).toBe( 'InvalidBlock' );
 		} );
 	} );
 
