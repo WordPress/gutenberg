@@ -205,15 +205,12 @@ export function registerAbilityCategory(
 			);
 		}
 
-		if ( args.meta !== undefined && typeof args.meta !== 'object' ) {
+		if (
+			args.meta !== undefined &&
+			( typeof args.meta !== 'object' || Array.isArray( args.meta ) )
+		) {
 			throw new Error(
-				'The category properties should provide a valid `meta` array.'
-			);
-		}
-
-		if ( args.meta !== undefined && Array.isArray( args.meta ) ) {
-			throw new Error(
-				'The category properties should provide a valid `meta` array.'
+				'The category properties should provide a valid `meta` object.'
 			);
 		}
 
