@@ -35,6 +35,7 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 		inserterSidebarToggleRef,
 		listViewToggleRef,
 		showIconLabels,
+		renderingMode,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		const {
@@ -42,6 +43,7 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 			getEditorMode,
 			getInserterSidebarToggleRef,
 			getListViewToggleRef,
+			getRenderingMode,
 		} = unlock( select( editorStore ) );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 
@@ -56,6 +58,7 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 			showIconLabels: get( 'core', 'showIconLabels' ),
 			isDistractionFree: get( 'core', 'distractionFree' ),
 			isVisualMode: getEditorMode() === 'visual',
+			renderingMode: getRenderingMode(),
 		};
 	}, [] );
 
@@ -93,6 +96,8 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 		'Generic label for block inserter button'
 	);
 	const shortLabel = ! isInserterOpened ? __( 'Add' ) : __( 'Close' );
+	const showInserter =
+		! isDistractionFree || renderingMode === 'template-locked';
 
 	return (
 		// Some plugins expect and use the `edit-post-header-toolbar` CSS class to
@@ -109,7 +114,7 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 			variant="unstyled"
 		>
 			<div className="editor-document-tools__left">
-				{ ! isDistractionFree && (
+				{ showInserter && (
 					<ToolbarButton
 						ref={ inserterSidebarToggleRef }
 						className="editor-document-tools__inserter-toggle"

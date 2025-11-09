@@ -64,12 +64,14 @@ function Header( {
 		hasBlockSelection,
 		hasSectionRootClientId,
 		isStylesCanvasActive,
+		renderingMode,
 	} = useSelect( ( select ) => {
 		const { get: getPreference } = select( preferencesStore );
 		const {
 			getEditorMode,
 			getCurrentPostType,
 			isPublishSidebarOpened: _isPublishSidebarOpened,
+			getRenderingMode,
 		} = select( editorStore );
 		const { getStylesPath, getShowStylebook } = unlock(
 			select( editorStore )
@@ -89,6 +91,7 @@ function Header( {
 			isStylesCanvasActive:
 				!! getStylesPath()?.startsWith( '/revisions' ) ||
 				getShowStylebook(),
+			renderingMode: getRenderingMode(),
 		};
 	}, [] );
 
@@ -106,10 +109,14 @@ function Header( {
 	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
 		useState( true );
 
+	// In template-locked mode, we don't show the toolbar, so treat it as if there's no fixed toolbar
+	const showsFixedToolbar =
+		hasFixedToolbar && renderingMode !== 'template-locked';
+
 	const hasCenter =
 		! isTooNarrowForDocumentBar &&
-		( ! hasFixedToolbar ||
-			( hasFixedToolbar &&
+		( ! showsFixedToolbar ||
+			( showsFixedToolbar &&
 				( ! hasBlockSelection || isBlockToolsCollapsed ) ) );
 	const hasBackButton = useHasBackButton();
 
@@ -136,7 +143,7 @@ function Header( {
 				<DocumentTools
 					disableBlockTools={ isStylesCanvasActive || isTextEditor }
 				/>
-				{ hasFixedToolbar && isLargeViewport && (
+				{ showsFixedToolbar && isLargeViewport && (
 					<CollapsibleBlockToolbar
 						isCollapsed={ isBlockToolsCollapsed }
 						onToggle={ setIsBlockToolsCollapsed }
