@@ -995,8 +995,7 @@ export function validateBlock( block, blockTypeOrName = block.name ) {
 			{} // Empty comment attrs - parse from HTML only
 		);
 
-		// Regenerate HTML using ONLY HTML-derived attributes (ignore comment attrs entirely)
-		// Use getSaveContent to properly serialize both JSX and string save functions
+		// First, check if HTML is self-consistent by regenerating with htmlOnlyAttrs
 		let htmlOnlyContent;
 		try {
 			htmlOnlyContent = getSaveContent( blockType, htmlOnlyAttrs );
@@ -1005,9 +1004,7 @@ export function validateBlock( block, blockTypeOrName = block.name ) {
 			htmlOnlyContent = null;
 		}
 
-		// If regenerated HTML matches original (exact or attribute-only differences),
-		// the HTML is self-consistent and we can trust it over the comment attributes.
-		// We allow attribute-only differences since generated classes are expected.
+		// Check if regenerated HTML matches original (exact or attribute-only differences)
 		if ( htmlOnlyContent ) {
 			const innerHTMLLogger = createQueuedLogger();
 			const htmlMatches = isEquivalentHTML(
@@ -1021,6 +1018,8 @@ export function validateBlock( block, blockTypeOrName = block.name ) {
 			const onlyAttributeDiffs =
 				htmlMatches || areOnlyAttributeDifferences( level2Issues );
 
+			// If HTML is self-consistent, use htmlOnlyAttrs as the reconciled attributes
+			// This represents trusting the HTML as the source of truth
 			if ( onlyAttributeDiffs ) {
 				return [
 					true,
@@ -1029,7 +1028,7 @@ export function validateBlock( block, blockTypeOrName = block.name ) {
 						validationLevel: VALIDATION_LEVEL.PRESERVED_SOURCE,
 						originalContent: block.originalContent,
 						generatedContent: generatedBlockContent,
-						reconciledAttributes: htmlOnlyAttrs, // Return HTML-parsed attrs to update the block
+						reconciledAttributes: htmlOnlyAttrs, // Use HTML-derived attrs directly
 					},
 				];
 			}

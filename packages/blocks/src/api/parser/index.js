@@ -181,9 +181,15 @@ function applyBlockValidation( unvalidatedBlock, blockType ) {
 				attributes: metadata.reconciledAttributes,
 				isValid,
 				validationIssues: [],
+				validationLevel: metadata.validationLevel,
 			};
 		}
-		return { ...unvalidatedBlock, isValid, validationIssues: [] };
+		return {
+			...unvalidatedBlock,
+			isValid,
+			validationIssues: [],
+			validationLevel: metadata?.validationLevel,
+		};
 	}
 
 	// If the block is invalid, attempt some built-in fixes
@@ -193,12 +199,17 @@ function applyBlockValidation( unvalidatedBlock, blockType ) {
 		blockType
 	);
 	// Attempt to validate the block once again after the built-in fixes.
-	const [ isFixedValid, validationIssues ] = validateBlock(
+	const [ isFixedValid, validationIssues, fixedMetadata ] = validateBlock(
 		fixedBlock,
 		blockType
 	);
 
-	return { ...fixedBlock, isValid: isFixedValid, validationIssues };
+	return {
+		...fixedBlock,
+		isValid: isFixedValid,
+		validationIssues,
+		validationLevel: fixedMetadata?.validationLevel,
+	};
 }
 
 /**
@@ -268,6 +279,12 @@ export function parseRawBlock( rawBlock, options ) {
 		normalizedBlock,
 		blockType
 	);
+
+	// If the block was migrated via deprecation, update validation level to Level 1
+	if ( updatedBlock.__wasMigrated ) {
+		updatedBlock.validationLevel = VALIDATION_LEVEL.MIGRATED_BLOCK;
+		delete updatedBlock.__wasMigrated; // Clean up internal flag
+	}
 
 	if ( ! updatedBlock.isValid ) {
 		// Preserve the original unprocessed version of the block

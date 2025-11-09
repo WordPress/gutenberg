@@ -117,6 +117,7 @@ export function applyBlockDeprecatedVersions( block, rawBlock, blockType ) {
 			innerBlocks: migratedInnerBlocks,
 			isValid: true,
 			validationIssues: [],
+			__wasMigrated: true, // Flag to indicate Level 1 (MIGRATED_BLOCK)
 		};
 	}
 

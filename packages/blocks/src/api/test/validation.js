@@ -1005,6 +1005,50 @@ describe( 'validation', () => {
 		} );
 	} );
 
+	describe( 'Validation Levels - Level 1: MigratedBlock', () => {
+		it( 'should validate via block deprecation', () => {
+			registerBlockType( 'core/deprecated-block', {
+				...defaultBlockSettings,
+				attributes: {
+					value: { type: 'string', default: '' },
+				},
+				save: ( { attributes } ) => attributes.value,
+				deprecated: [
+					{
+						attributes: {
+							oldValue: { type: 'string', default: '' },
+						},
+						save: ( { attributes } ) => attributes.oldValue,
+						migrate: ( attributes ) => ( {
+							value: attributes.oldValue,
+						} ),
+					},
+				],
+			} );
+
+			// Use the parser's parseRawBlock since Level 1 requires deprecation checking
+			const { parseRawBlock } = require( '../parser' );
+
+			const rawBlock = {
+				blockName: 'core/deprecated-block',
+				attrs: { oldValue: 'Deprecated Content' },
+				innerHTML: 'Deprecated Content',
+				innerBlocks: [],
+				innerContent: [ 'Deprecated Content' ],
+			};
+
+			// Skip migration console logs in tests
+			const options = { __unstableSkipMigrationLogs: true };
+			const parsedBlock = parseRawBlock( rawBlock, options );
+
+			expect( parsedBlock.isValid ).toBe( true );
+			expect( parsedBlock.validationLevel ).toBe(
+				VALIDATION_LEVEL.MIGRATED_BLOCK
+			);
+			expect( parsedBlock.attributes.value ).toBe( 'Deprecated Content' );
+		} );
+	} );
+
 	describe( 'Validation Levels - Level 2: PreservedSource', () => {
 		it( 'should validate when innerHTML matches but comment attributes differ', () => {
 			registerBlockType( 'core/heading', {
@@ -1129,6 +1173,54 @@ describe( 'validation', () => {
 			expect( metadata.validationLevel ).toBe(
 				VALIDATION_LEVEL.PRESERVED_SOURCE
 			);
+		} );
+
+		it( 'should use HTML-derived attributes when reconciling', () => {
+			registerBlockType( 'core/metadata-block', {
+				...defaultBlockSettings,
+				attributes: {
+					content: {
+						type: 'string',
+						source: 'html',
+						selector: 'p',
+					},
+					// Non-sourceable attribute (only in comment)
+					customField: {
+						type: 'string',
+					},
+				},
+				save: ( { attributes } ) =>
+					`<p>${ attributes.content || '' }</p>`,
+			} );
+
+			// Scenario: Comment has wrong content
+			// - Comment: {content: "Wrong", customField: "value"}
+			// - HTML: <p>Correct</p>
+			//
+			// Level 2:
+			//   1. Parse from HTML → {content: "Correct", customField: undefined}
+			//   2. Regenerate → <p>Correct</p>
+			//   3. Match! ✅
+			//   4. Use HTML-derived attrs (trusts HTML, discards comment-only data)
+			const [ isValid, , metadata ] = validateBlock(
+				{
+					name: 'core/metadata-block',
+					attributes: {
+						content: 'Wrong',
+						customField: 'value',
+					},
+					originalContent: '<p>Correct</p>',
+				},
+				'core/metadata-block'
+			);
+
+			expect( isValid ).toBe( true );
+			expect( metadata.validationLevel ).toBe(
+				VALIDATION_LEVEL.PRESERVED_SOURCE
+			);
+			// Level 2 uses HTML-derived attributes only
+			expect( metadata.reconciledAttributes.content ).toBe( 'Correct' );
+			expect( metadata.reconciledAttributes.customField ).toBeUndefined();
 		} );
 
 		it( 'should not apply PreservedSource when content differs', () => {
