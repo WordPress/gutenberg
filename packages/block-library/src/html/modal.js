@@ -173,30 +173,26 @@ export default function HTMLEditModal( {
 									focusable={ false }
 									className="block-library-html__modal-tab"
 								>
-									<pre className="wp-block-code">
-										<PlainText
-											value={ editedHtml }
-											onChange={ handleHtmlChange }
-											placeholder={ __( 'Write HTML…' ) }
-											aria-label={ __( 'HTML' ) }
-											className="block-library-html__modal-editor"
-										/>
-									</pre>
+									<PlainText
+										value={ editedHtml }
+										onChange={ handleHtmlChange }
+										placeholder={ __( 'Write HTML…' ) }
+										aria-label={ __( 'HTML' ) }
+										className="block-library-html__modal-editor"
+									/>
 								</Tabs.TabPanel>
 								<Tabs.TabPanel
 									tabId="css"
 									focusable={ false }
 									className="block-library-html__modal-tab"
 								>
-									<pre className="wp-block-code">
-										<PlainText
-											value={ editedCss }
-											onChange={ handleCssChange }
-											placeholder={ __( 'Write CSS…' ) }
-											aria-label={ __( 'CSS' ) }
-											className="block-library-html__modal-editor"
-										/>
-									</pre>
+									<PlainText
+										value={ editedCss }
+										onChange={ handleCssChange }
+										placeholder={ __( 'Write CSS…' ) }
+										aria-label={ __( 'CSS' ) }
+										className="block-library-html__modal-editor"
+									/>
 								</Tabs.TabPanel>
 								{ shouldShowJsTab && (
 									<Tabs.TabPanel
@@ -204,19 +200,15 @@ export default function HTMLEditModal( {
 										focusable={ false }
 										className="block-library-html__modal-tab"
 									>
-										<pre className="wp-block-code">
-											<PlainText
-												value={ editedJs }
-												onChange={ handleJsChange }
-												placeholder={ __(
-													'Write JavaScript…'
-												) }
-												aria-label={ __(
-													'JavaScript'
-												) }
-												className="block-library-html__modal-editor"
-											/>
-										</pre>
+										<PlainText
+											value={ editedJs }
+											onChange={ handleJsChange }
+											placeholder={ __(
+												'Write JavaScript…'
+											) }
+											aria-label={ __( 'JavaScript' ) }
+											className="block-library-html__modal-editor"
+										/>
 									</Tabs.TabPanel>
 								) }
 							</div>
