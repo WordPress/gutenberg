@@ -134,12 +134,49 @@ const transforms = {
 			isMatch: ( {}, block ) => {
 				return block.innerBlocks.every(
 					( { name } ) =>
-						name === 'core/paragraph' || name === 'core/heading'
+						name === 'core/paragraph' ||
+						name === 'core/heading' ||
+						name === 'core/list' ||
+						name === 'core/verse'
 				);
 			},
 			transform: ( {}, innerBlocks ) => {
+				// Helper function to extract content from list items
+				const getListContent = ( listItemBlocks ) => {
+					return listItemBlocks.flatMap(
+						( {
+							name,
+							attributes,
+							innerBlocks: nestedBlocks = [],
+						} ) => {
+							if ( name === 'core/list-item' ) {
+								return [
+									attributes.content,
+									...getListContent( nestedBlocks ),
+								];
+							}
+							return getListContent( nestedBlocks );
+						}
+					);
+				};
+
 				const content = innerBlocks
-					.map( ( { attributes } ) => attributes.content || '' )
+					.map(
+						( {
+							attributes,
+							name,
+							innerBlocks: childBlocks = [],
+						} ) => {
+							// Handle list blocks - extract text from list items
+							if ( name === 'core/list' ) {
+								return getListContent( childBlocks )
+									.filter( Boolean )
+									.join( '<br>' );
+							}
+							// Handle paragraph, heading, and verse blocks
+							return attributes.content || '';
+						}
+					)
 					.filter( Boolean )
 					.join( '<br>' );
 				return createBlock( 'core/verse', { content } );
