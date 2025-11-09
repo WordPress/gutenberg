@@ -419,6 +419,7 @@ describe( 'Blocks raw handling', () => {
 			'one-image',
 			'two-images',
 			'markdown',
+			'grok-markdown',
 			'wordpress',
 			'gutenberg',
 			'shortcode-matching',

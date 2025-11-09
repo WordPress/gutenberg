@@ -121,12 +121,10 @@ export function getBlockContentSchema( context ) {
  * @return {boolean} Whether the HTML can be considered plain text.
  */
 export function isPlain( HTML ) {
-	// Existing check: no tags except <br>
 	if ( ! /<(?!br[ />])/i.test( HTML ) ) {
 		return true;
 	}
 
-	// New check: single wrapper element with no semantic children
 	try {
 		const doc = document.implementation.createHTMLDocument( '' );
 		doc.body.innerHTML = HTML;
@@ -136,7 +134,7 @@ export function isPlain( HTML ) {
 			return false;
 		}
 
-		const wrapper = doc.body.children.item(0);
+		const wrapper = doc.body.children.item( 0 );
 		const tagName = wrapper.tagName.toLowerCase();
 
 		// Only consider non-semantic wrapper tags
