@@ -132,12 +132,11 @@ export function isPlain( HTML ) {
 		doc.body.innerHTML = HTML;
 
 		// Check if there's exactly one top-level element
-		const childElements = Array.from( doc.body.children );
-		if ( childElements.length !== 1 ) {
+		if ( doc.body.children.length !== 1 ) {
 			return false;
 		}
 
-		const wrapper = childElements[ 0 ];
+		const wrapper = doc.body.children.item(0);
 		const tagName = wrapper.tagName.toLowerCase();
 
 		// Only consider non-semantic wrapper tags
