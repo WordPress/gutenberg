@@ -20,6 +20,7 @@ import {
 	getUnregisteredTypeHandlerName,
 } from '../registration';
 import { normalizeBlockType } from '../utils';
+import { getBlockAttributes } from '../parser/get-block-attributes';
 
 /** @typedef {import('../parser').WPBlock} WPBlock */
 /** @typedef {import('../registration').WPBlockType} WPBlockType */
@@ -837,41 +838,6 @@ export function areOnlyAttributeDifferences( validationIssues ) {
 }
 
 /**
- * Extracts the innerHTML from a block's serialized content,
- * stripping the block comment delimiters.
- *
- * This function removes the opening block comment (<!-- wp:blockName {...} -->)
- * and closing block comment (<!-- /wp:blockName -->) to isolate just the
- * content between them.
- *
- * @param {string} content Block serialized content including delimiters.
- *
- * @return {string} The innerHTML without block comment delimiters.
- */
-export function extractBlockInnerHTML( content ) {
-	if ( ! content ) {
-		return '';
-	}
-
-	// Remove opening block comment: <!-- wp:blockName {...} -->
-	// The opening comment can be either:
-	// - Self-closing: <!-- wp:blockName {...} /-->
-	// - With content: <!-- wp:blockName {...} -->
-	const withoutOpeningComment = content.replace(
-		/^<!--\s+wp:[^\s]+(?:\s+[^>]*)?\s+\/?-->/,
-		''
-	);
-
-	// Remove closing block comment: <!-- /wp:blockName -->
-	const withoutClosingComment = withoutOpeningComment.replace(
-		/<!--\s+\/wp:[^\s]+\s+-->$/,
-		''
-	);
-
-	return withoutClosingComment;
-}
-
-/**
  * Creates a validation result object with the specified level.
  *
  * @param {number}            validationLevel       The validation level (0-5).
@@ -1006,38 +972,66 @@ export function validateBlock( block, blockTypeOrName = block.name ) {
 		];
 	}
 
-	// Create a new logger for innerHTML-only comparison
-	const innerHTMLLogger = createQueuedLogger();
+	// Level 2: PreservedSource - innerHTML is self-consistent
+	// This handles cases where the innerHTML from the post is internally consistent
+	// but the comment delimiter attributes are wrong/outdated (e.g., {"level":3} when HTML is <h2>).
+	// We completely discard comment attributes and trust only what's in the HTML.
+	//
+	// Strategy: Parse attributes from the HTML itself (ignoring comment attrs entirely),
+	// regenerate with those HTML-only attributes, and check if output matches original.
+	// If yes, the HTML is self-consistent and we can trust it over the comment.
+	//
+	// Only apply Level 2 if the block has attributes with `source` defined.
+	// Without sourceable attributes, there's nothing to parse from HTML.
+	const hasSourceableAttributes = Object.values(
+		blockType.attributes || {}
+	).some( ( attr ) => attr.source );
 
-	// Level 2: PreservedSource - innerHTML matches but comment attributes differ
-	// Only try to extract innerHTML if content looks like it has block delimiters
-	const hasBlockDelimiters = block.originalContent.includes( '<!-- wp:' );
-
-	if ( hasBlockDelimiters ) {
-		const originalInnerHTML = extractBlockInnerHTML(
-			block.originalContent
+	if ( hasSourceableAttributes ) {
+		// Parse attributes from HTML only (completely discard comment attrs)
+		const htmlOnlyAttrs = getBlockAttributes(
+			blockType,
+			block.originalContent,
+			{} // Empty comment attrs - parse from HTML only
 		);
-		const generatedInnerHTML = extractBlockInnerHTML(
-			generatedBlockContent
-		);
 
-		if (
-			isEquivalentHTML(
-				originalInnerHTML,
-				generatedInnerHTML,
+		// Regenerate HTML using ONLY HTML-derived attributes (ignore comment attrs entirely)
+		// Use getSaveContent to properly serialize both JSX and string save functions
+		let htmlOnlyContent;
+		try {
+			htmlOnlyContent = getSaveContent( blockType, htmlOnlyAttrs );
+		} catch ( error ) {
+			// If regeneration fails, can't validate at Level 2
+			htmlOnlyContent = null;
+		}
+
+		// If regenerated HTML matches original (exact or attribute-only differences),
+		// the HTML is self-consistent and we can trust it over the comment attributes.
+		// We allow attribute-only differences since generated classes are expected.
+		if ( htmlOnlyContent ) {
+			const innerHTMLLogger = createQueuedLogger();
+			const htmlMatches = isEquivalentHTML(
+				block.originalContent,
+				htmlOnlyContent,
 				innerHTMLLogger
-			)
-		) {
-			// innerHTML is preserved, only block delimiter attributes differ
-			return [
-				true,
-				[],
-				{
-					validationLevel: VALIDATION_LEVEL.PRESERVED_SOURCE,
-					originalContent: block.originalContent,
-					generatedContent: generatedBlockContent,
-				},
-			];
+			);
+
+			// Check for exact match or attribute-only differences
+			const level2Issues = innerHTMLLogger.getItems();
+			const onlyAttributeDiffs =
+				htmlMatches || areOnlyAttributeDifferences( level2Issues );
+
+			if ( onlyAttributeDiffs ) {
+				return [
+					true,
+					[],
+					{
+						validationLevel: VALIDATION_LEVEL.PRESERVED_SOURCE,
+						originalContent: block.originalContent,
+						generatedContent: generatedBlockContent,
+					},
+				];
+			}
 		}
 	}
 

@@ -21,7 +21,6 @@ import {
 	isClosedByToken,
 	VALIDATION_LEVEL,
 	VALIDATION_LEVEL_NAME,
-	extractBlockInnerHTML,
 	createValidationResult,
 } from '../validation';
 import {
@@ -915,49 +914,6 @@ describe( 'validation', () => {
 		} );
 	} );
 
-	describe( 'extractBlockInnerHTML()', () => {
-		it( 'should extract innerHTML from block with attributes', () => {
-			const content =
-				'<!-- wp:paragraph {"align":"center"} --><p class="has-text-align-center">Hello World</p><!-- /wp:paragraph -->';
-			const innerHTML = extractBlockInnerHTML( content );
-
-			expect( innerHTML ).toBe(
-				'<p class="has-text-align-center">Hello World</p>'
-			);
-		} );
-
-		it( 'should extract innerHTML from block without attributes', () => {
-			const content =
-				'<!-- wp:paragraph --><p>Hello World</p><!-- /wp:paragraph -->';
-			const innerHTML = extractBlockInnerHTML( content );
-
-			expect( innerHTML ).toBe( '<p>Hello World</p>' );
-		} );
-
-		it( 'should handle self-closing blocks', () => {
-			const content = '<!-- wp:separator /-->';
-			const innerHTML = extractBlockInnerHTML( content );
-
-			expect( innerHTML ).toBe( '' );
-		} );
-
-		it( 'should handle empty content', () => {
-			const innerHTML = extractBlockInnerHTML( '' );
-
-			expect( innerHTML ).toBe( '' );
-		} );
-
-		it( 'should handle content with nested blocks (returns outer HTML only)', () => {
-			const content =
-				'<!-- wp:group --><div class="wp-block-group"><!-- wp:paragraph --><p>Nested</p><!-- /wp:paragraph --></div><!-- /wp:group -->';
-			const innerHTML = extractBlockInnerHTML( content );
-
-			expect( innerHTML ).toBe(
-				'<div class="wp-block-group"><!-- wp:paragraph --><p>Nested</p><!-- /wp:paragraph --></div>'
-			);
-		} );
-	} );
-
 	describe( 'createValidationResult()', () => {
 		it( 'should create result with validationLevel and isValid getter', () => {
 			const result = createValidationResult(
@@ -1050,97 +1006,152 @@ describe( 'validation', () => {
 	} );
 
 	describe( 'Validation Levels - Level 2: PreservedSource', () => {
-		it( 'should validate when innerHTML matches but block attributes differ', () => {
+		it( 'should validate when innerHTML matches but comment attributes differ', () => {
+			registerBlockType( 'core/heading', {
+				...defaultBlockSettings,
+				attributes: {
+					content: {
+						type: 'string',
+						source: 'html',
+						selector: 'h1,h2,h3,h4,h5,h6',
+					},
+					level: { type: 'number', default: 2 },
+				},
+				save: ( { attributes } ) => {
+					const Tag = `h${ attributes.level }`;
+					return `<${ Tag } class="wp-block-heading">${ attributes.content }</${ Tag }>`;
+				},
+			} );
+
+			// Scenario: Comment has wrong level attribute
+			// - Comment says: {"level":3}
+			// - HTML contains: <h2> (which means level 2)
+			// - block.attributes comes from comment: {level: 3}
+			//
+			// Level 0 fails: generate with {level:3} → <h3> ≠ <h2>
+			// Level 2 should pass:
+			//   1. Parse attrs from HTML → {level: 2}
+			//   2. Regenerate with {level: 2} → <h2>
+			//   3. Compare: <h2> === <h2> ✅
+			//   4. HTML is self-consistent, trust it
+			const [ isValid, , metadata ] = validateBlock(
+				{
+					name: 'core/heading',
+					attributes: { content: 'Testing Header', level: 3 }, // From comment (wrong!)
+					originalContent:
+						'<h2 class="wp-block-heading">Testing Header</h2>',
+				},
+				'core/heading'
+			);
+
+			expect( isValid ).toBe( true );
+			expect( metadata.validationLevel ).toBe(
+				VALIDATION_LEVEL.PRESERVED_SOURCE
+			);
+		} );
+
+		it( 'should validate when comment attribute value is wrong but HTML is consistent', () => {
+			registerBlockType( 'core/paragraph', {
+				...defaultBlockSettings,
+				attributes: {
+					content: { type: 'string', source: 'html', selector: 'p' },
+					align: {
+						type: 'string',
+						source: 'attribute',
+						selector: 'p',
+						attribute: 'class',
+					},
+				},
+				save: ( { attributes } ) => {
+					// Parse align from class attribute
+					const align = attributes.align
+						? attributes.align.replace( 'has-text-align-', '' )
+						: '';
+					const className = align ? `has-text-align-${ align }` : '';
+					return `<p class="${ className }">${ attributes.content }</p>`;
+				},
+			} );
+
+			// Scenario: Comment has wrong align value
+			// - Comment: {align: "left"}
+			// - HTML: <p class="has-text-align-center">Test</p> (align should be "center")
+			//
+			// Level 0 fails: generate with {align:"left"} → has-text-align-left ≠ has-text-align-center
+			// Level 2 should pass:
+			//   1. Parse attrs from HTML → {align: "center"}
+			//   2. Regenerate with {align: "center"} → has-text-align-center
+			//   3. Compare: matches original ✅
+			const [ isValid, , metadata ] = validateBlock(
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Test', align: 'left' }, // From comment (wrong!)
+					originalContent:
+						'<p class="has-text-align-center">Test</p>',
+				},
+				'core/paragraph'
+			);
+
+			expect( isValid ).toBe( true );
+			expect( metadata.validationLevel ).toBe(
+				VALIDATION_LEVEL.PRESERVED_SOURCE
+			);
+		} );
+
+		it( 'should validate when comment has wrong content but HTML is self-consistent', () => {
 			registerBlockType( 'core/test-block', {
 				...defaultBlockSettings,
 				attributes: {
-					content: { type: 'string' },
+					text: { type: 'string', source: 'text', selector: 'div' },
 				},
-				save: ( { attributes } ) => attributes.content,
+				save: ( { attributes } ) =>
+					`<div>${ attributes.text || '' }</div>`,
 			} );
 
-			// Original content has block delimiters with attributes
-			// but the innerHTML portion is the same as what save generates
-			const [ isValid ] = validateBlock( {
-				name: 'core/test-block',
-				attributes: { content: 'Hello' },
-				originalContent:
-					'<!-- wp:test-block {"content":"Hello","extraAttr":"value"} -->Hello<!-- /wp:test-block -->',
-			} );
+			// Scenario: Comment has wrong text value
+			// - Comment: {text: "Wrong"}
+			// - HTML: <div>Correct</div>
+			//
+			// Level 0 fails: generate with {text:"Wrong"} → <div>Wrong</div> ≠ <div>Correct</div>
+			// Level 2 should pass:
+			//   1. Parse attrs from HTML → {text: "Correct"}
+			//   2. Regenerate with {text: "Correct"} → <div>Correct</div>
+			//   3. Compare: matches original ✅
+			const [ isValid, , metadata ] = validateBlock(
+				{
+					name: 'core/test-block',
+					attributes: { text: 'Wrong' }, // From comment (wrong!)
+					originalContent: '<div>Correct</div>',
+				},
+				'core/test-block'
+			);
 
 			expect( isValid ).toBe( true );
+			expect( metadata.validationLevel ).toBe(
+				VALIDATION_LEVEL.PRESERVED_SOURCE
+			);
 		} );
 
-		it( 'should validate when only block comment attributes differ', () => {
+		it( 'should not apply PreservedSource when content differs', () => {
 			registerBlockType( 'core/test-block', {
 				...defaultBlockSettings,
+				allowsReconstruction: false, // Disable Level 3 to ensure failure
 				attributes: {
 					text: { type: 'string' },
 				},
 				save: ( { attributes } ) => attributes.text,
 			} );
 
-			// The actual HTML content is identical, only the comment attributes differ
-			const [ isValid ] = validateBlock( {
-				name: 'core/test-block',
-				attributes: { text: 'Content' },
-				originalContent:
-					'<!-- wp:test-block {"text":"Content","color":"red"} -->Content<!-- /wp:test-block -->',
-			} );
-
-			expect( isValid ).toBe( true );
-		} );
-
-		it( 'should validate with empty innerHTML', () => {
-			registerBlockType( 'core/test-block', {
-				...defaultBlockSettings,
-				save: () => '',
-			} );
-
-			const [ isValid ] = validateBlock( {
-				name: 'core/test-block',
-				attributes: {},
-				originalContent:
-					'<!-- wp:test-block {"someAttr":"value"} --><!-- /wp:test-block -->',
-			} );
-
-			expect( isValid ).toBe( true );
-		} );
-
-		it( 'should validate self-closing blocks with attributes', () => {
-			registerBlockType( 'core/test-block', {
-				...defaultBlockSettings,
-				save: () => '',
-			} );
-
-			const [ isValid ] = validateBlock( {
-				name: 'core/test-block',
-				attributes: {},
-				originalContent: '<!-- wp:test-block {"attr":"value"} /-->',
-			} );
-
-			expect( isValid ).toBe( true );
-		} );
-
-		it( 'should not apply PreservedSource if no block delimiters', () => {
-			registerBlockType( 'core/test-block', {
-				...defaultBlockSettings,
-				allowsReconstruction: false, // Disable Level 3 to test Level 2 specifically
-				attributes: {
-					text: { type: 'string' },
-				},
-				save: ( { attributes } ) => attributes.text,
-			} );
-
-			// No block delimiters, so innerHTML extraction is skipped
-			// Level 2 won't apply, and Level 3 is disabled, so this should fail
-			const [ isValid ] = validateBlock( {
+			// Content differs, so Level 2 won't apply, and Level 3 is disabled
+			const [ isValid, , metadata ] = validateBlock( {
 				name: 'core/test-block',
 				attributes: { text: 'Expected' },
 				originalContent: 'Different',
 			} );
 
 			expect( isValid ).toBe( false );
+			expect( metadata.validationLevel ).toBe(
+				VALIDATION_LEVEL.INVALID_BLOCK
+			);
 		} );
 	} );
 
