@@ -14,7 +14,6 @@ const DEFAULT_EMBED_BLOCK = 'core/embed';
 const VIDEO_PROVIDERS = [
 	'youtube',
 	'vimeo',
-	'dailymotion',
 	'videopress',
 	'animoto',
 	'tiktok',
@@ -90,19 +89,60 @@ export function getIframeSrc( html ) {
 }
 
 /**
- * Modifies an iframe src URL to add background video parameters.
+ * Detects the video provider from an iframe src URL.
  *
- * @param {string} src      The iframe src URL.
- * @param {string} provider The provider name slug.
+ * @param {string} src The iframe src URL.
+ * @return {string|null} The provider name slug or null if not recognized.
+ */
+export function detectProviderFromSrc( src ) {
+	if ( ! src ) {
+		return null;
+	}
+
+	const lowerSrc = src.toLowerCase();
+
+	if (
+		lowerSrc.includes( 'youtube.com' ) ||
+		lowerSrc.includes( 'youtu.be' )
+	) {
+		return 'youtube';
+	}
+	if ( lowerSrc.includes( 'vimeo.com' ) ) {
+		return 'vimeo';
+	}
+	if ( lowerSrc.includes( 'videopress.com' ) ) {
+		return 'videopress';
+	}
+	if ( lowerSrc.includes( 'animoto.com' ) ) {
+		return 'animoto';
+	}
+	if ( lowerSrc.includes( 'tiktok.com' ) ) {
+		return 'tiktok';
+	}
+	if ( lowerSrc.includes( 'wordpress.tv' ) ) {
+		return 'wordpress-tv';
+	}
+
+	return null;
+}
+
+/**
+ * Modifies an iframe src URL to add background video parameters.
+ * Automatically detects the provider from the URL.
+ *
+ * @param {string} src The iframe src URL.
  * @return {string} The modified URL.
  */
-export function getBackgroundVideoSrc( src, provider ) {
+export function getBackgroundVideoSrc( src ) {
 	if ( ! src ) {
 		return src;
 	}
 
 	try {
 		const url = new URL( src );
+
+		// Detect provider from the iframe src URL
+		const provider = detectProviderFromSrc( src );
 
 		// Add provider-specific parameters for background video behavior
 		switch ( provider ) {
@@ -130,15 +170,6 @@ export function getBackgroundVideoSrc( src, provider ) {
 				url.searchParams.set( 'loop', '1' );
 				url.searchParams.set( 'background', '1' );
 				url.searchParams.set( 'controls', '0' );
-				break;
-
-			case 'dailymotion':
-				// Dailymotion parameters
-				url.searchParams.set( 'autoplay', '1' );
-				url.searchParams.set( 'mute', '1' );
-				url.searchParams.set( 'loop', '1' );
-				url.searchParams.set( 'controls', '0' );
-				url.searchParams.set( 'ui-start-screen-info', '0' );
 				break;
 
 			case 'videopress':

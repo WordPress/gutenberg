@@ -13,10 +13,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import {
-	isValidVideoEmbedUrl,
-	getVideoEmbedProvider,
-} from '../embed-video-utils';
+import { isValidVideoEmbedUrl } from '../embed-video-utils';
 
 export default function EmbedVideoUrlInput( { onSubmit, onClose } ) {
 	const [ url, setUrl ] = useState( '' );
@@ -37,8 +34,7 @@ export default function EmbedVideoUrlInput( { onSubmit, onClose } ) {
 			return;
 		}
 
-		const provider = getVideoEmbedProvider( url );
-		onSubmit( url, provider );
+		onSubmit( url );
 		onClose();
 	};
 

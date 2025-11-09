@@ -48,7 +48,6 @@ export default function save( { attributes } ) {
 		tagName: Tag,
 		sizeSlug,
 		poster,
-		embedProvider,
 	} = attributes;
 	const overlayColorClass = getColorClassName(
 		'background-color',
@@ -153,10 +152,7 @@ export default function save( { attributes } ) {
 					className={ clsx(
 						'wp-block-cover__video-background',
 						'wp-block-cover__embed-background',
-						'wp-block-embed',
-						embedProvider
-							? `wp-block-embed-${ embedProvider }`
-							: null
+						'wp-block-embed'
 					) }
 				>
 					<div className="wp-block-embed__wrapper">{ url }</div>

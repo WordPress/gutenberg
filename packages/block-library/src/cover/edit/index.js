@@ -280,7 +280,6 @@ function CoverEdit( {
 			hasParallax: undefined,
 			isRepeated: undefined,
 			useFeaturedImage: undefined,
-			embedProvider: undefined,
 			isDark: newIsDark,
 		} );
 	};
@@ -322,17 +321,16 @@ function CoverEdit( {
 		createErrorNotice( message, { type: 'snackbar' } );
 	};
 
-	const onSelectEmbedUrl = ( embedUrl, provider ) => {
+	const onSelectEmbedUrl = ( embedUrl ) => {
 		// Only set a new dimRatio if there was no previous media selected
 		// to avoid resetting to 50 if it has been explicitly set to 100.
 		const newDimRatio =
 			originalUrl === undefined && dimRatio === 100 ? 50 : dimRatio;
 
-		// Set initial attributes with URL and provider
+		// Set initial attributes with URL
 		setAttributes( {
 			url: embedUrl,
 			backgroundType: EMBED_VIDEO_BACKGROUND_TYPE,
-			embedProvider: provider,
 			dimRatio: newDimRatio,
 			id: undefined,
 			focalPoint: undefined,
@@ -343,7 +341,6 @@ function CoverEdit( {
 	};
 
 	// Fetch embed preview for embed videos
-	const { embedProvider } = attributes;
 	const { embedPreview, isFetchingEmbed } = useSelect(
 		( select ) => {
 			if ( backgroundType !== EMBED_VIDEO_BACKGROUND_TYPE || ! url ) {
@@ -379,9 +376,9 @@ function CoverEdit( {
 			return null;
 		}
 
-		// Modify the src to add background video parameters
-		return getBackgroundVideoSrc( iframeSrc, embedProvider );
-	}, [ embedPreview, backgroundType, embedProvider ] );
+		// Modify the src to add background video parameters (provider auto-detected)
+		return getBackgroundVideoSrc( iframeSrc );
+	}, [ embedPreview, backgroundType ] );
 
 	const isUploadingMedia = isTemporaryMedia( id, url );
 

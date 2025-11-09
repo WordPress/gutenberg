@@ -24,8 +24,7 @@ function render_block_core_cover( $attributes, $content ) {
 		! empty( $attributes['url'] ) &&
 		is_string( $attributes['url'] )
 	) {
-		$url      = $attributes['url'];
-		$provider = isset( $attributes['embedProvider'] ) ? $attributes['embedProvider'] : '';
+		$url = $attributes['url'];
 
 		// Use WordPress's native oEmbed processing (includes caching).
 		$oembed_html = wp_oembed_get( $url );
@@ -35,6 +34,20 @@ function render_block_core_cover( $attributes, $content ) {
 			preg_match( '/src=["\']([^"\']+)["\']/', $oembed_html, $src_matches );
 			if ( ! empty( $src_matches[1] ) ) {
 				$iframe_src = $src_matches[1];
+
+				// Detect provider from iframe src URL.
+				$lower_src = strtolower( $iframe_src );
+				$provider  = null;
+
+				if ( strpos( $lower_src, 'youtube.com' ) !== false || strpos( $lower_src, 'youtu.be' ) !== false ) {
+					$provider = 'youtube';
+				} elseif ( strpos( $lower_src, 'vimeo.com' ) !== false ) {
+					$provider = 'vimeo';
+				} elseif ( strpos( $lower_src, 'videopress.com' ) !== false ) {
+					$provider = 'videopress';
+				} elseif ( strpos( $lower_src, 'wordpress.tv' ) !== false ) {
+					$provider = 'wordpress-tv';
+				}
 
 				// Modify iframe src to add background video parameters based on provider.
 				$parsed_url = wp_parse_url( $iframe_src );
@@ -46,27 +59,21 @@ function render_block_core_cover( $attributes, $content ) {
 					}
 
 					// Add background video parameters based on provider.
-					if ( strpos( $provider, 'youtube' ) !== false ) {
+					if ( 'youtube' === $provider ) {
 						$query_params['autoplay']       = '1';
 						$query_params['mute']           = '1';
 						$query_params['loop']           = '1';
 						$query_params['controls']       = '0';
 						$query_params['modestbranding'] = '1';
 						$query_params['playsinline']    = '1';
-					} elseif ( strpos( $provider, 'vimeo' ) !== false ) {
+					} elseif ( 'vimeo' === $provider ) {
 						$query_params['autoplay']    = '1';
 						$query_params['muted']       = '1';
 						$query_params['loop']        = '1';
 						$query_params['background']  = '1';
 						$query_params['controls']    = '0';
 						$query_params['transparent'] = '0';
-					} elseif ( strpos( $provider, 'dailymotion' ) !== false ) {
-						$query_params['autoplay']        = '1';
-						$query_params['mute']            = '1';
-						$query_params['loop']            = '1';
-						$query_params['controls']        = '0';
-						$query_params['ui-start-screen'] = '0';
-					} elseif ( strpos( $provider, 'videopress' ) !== false ) {
+					} elseif ( 'videopress' === $provider || 'wordpress-tv' === $provider ) {
 						$query_params['autoplay'] = '1';
 						$query_params['loop']     = '1';
 						$query_params['muted']    = '1';

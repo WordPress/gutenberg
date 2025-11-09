@@ -129,8 +129,8 @@ export default function CoverBlockControls( {
 			</BlockControls>
 			{ isEmbedUrlInputOpen && (
 				<EmbedVideoUrlInput
-					onSubmit={ ( embedUrl, provider ) => {
-						onSelectEmbedUrl( embedUrl, provider );
+					onSubmit={ ( embedUrl ) => {
+						onSelectEmbedUrl( embedUrl );
 					} }
 					onClose={ () => setIsEmbedUrlInputOpen( false ) }
 				/>
