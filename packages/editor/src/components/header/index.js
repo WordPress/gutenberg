@@ -28,6 +28,7 @@ import {
 	TEMPLATE_PART_POST_TYPE,
 	PATTERN_POST_TYPE,
 	NAVIGATION_POST_TYPE,
+	DESIGN_POST_TYPES,
 } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
 
@@ -109,9 +110,12 @@ function Header( {
 	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
 		useState( true );
 
-	// In template-locked mode, we don't show the toolbar, so treat it as if there's no fixed toolbar
+	const isDesignPostType = DESIGN_POST_TYPES.includes( postType );
+	// In template-locked mode or design post types, we don't show the toolbar
 	const showsFixedToolbar =
-		hasFixedToolbar && renderingMode !== 'template-locked';
+		hasFixedToolbar &&
+		renderingMode !== 'template-locked' &&
+		! isDesignPostType;
 
 	const hasCenter =
 		! isTooNarrowForDocumentBar &&

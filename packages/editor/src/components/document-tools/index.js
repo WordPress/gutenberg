@@ -21,6 +21,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
  */
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
+import { DESIGN_POST_TYPES } from '../../store/constants';
 import EditorHistoryRedo from '../editor-history/redo';
 import EditorHistoryUndo from '../editor-history/undo';
 
@@ -36,6 +37,7 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 		listViewToggleRef,
 		showIconLabels,
 		renderingMode,
+		postType,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		const {
@@ -44,6 +46,7 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 			getInserterSidebarToggleRef,
 			getListViewToggleRef,
 			getRenderingMode,
+			getCurrentPostType,
 		} = unlock( select( editorStore ) );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 
@@ -59,6 +62,7 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 			isDistractionFree: get( 'core', 'distractionFree' ),
 			isVisualMode: getEditorMode() === 'visual',
 			renderingMode: getRenderingMode(),
+			postType: getCurrentPostType(),
 		};
 	}, [] );
 
@@ -96,8 +100,11 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 		'Generic label for block inserter button'
 	);
 	const shortLabel = ! isInserterOpened ? __( 'Add' ) : __( 'Close' );
+	const isDesignPostType = DESIGN_POST_TYPES.includes( postType );
 	const showInserter =
-		! isDistractionFree || renderingMode === 'template-locked';
+		! isDistractionFree ||
+		renderingMode === 'template-locked' ||
+		isDesignPostType;
 
 	return (
 		// Some plugins expect and use the `edit-post-header-toolbar` CSS class to
