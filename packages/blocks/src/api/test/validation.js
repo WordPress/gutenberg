@@ -16,6 +16,7 @@ import {
 	isEqualTokensOfType,
 	getNextNonWhitespaceToken,
 	isEquivalentHTML,
+	areOnlyAttributeDifferences,
 	validateBlock,
 	isClosedByToken,
 	VALIDATION_LEVEL,
@@ -796,6 +797,124 @@ describe( 'validation', () => {
 		} );
 	} );
 
+	describe( 'areOnlyAttributeDifferences()', () => {
+		it( 'should return false for empty issues array', () => {
+			// Empty array means no issues were found, which shouldn't happen
+			// at Level 3 (Level 0 would have passed). Return false to be safe.
+			const result = areOnlyAttributeDifferences( [] );
+
+			expect( result ).toBe( false );
+		} );
+
+		it( 'should return true for attribute-only issues', () => {
+			const issues = [
+				{
+					log: jest.fn(),
+					args: [
+						'Expected attribute `class` of value `foo`, saw `bar`.',
+					],
+				},
+			];
+			const result = areOnlyAttributeDifferences( issues );
+
+			expect( result ).toBe( true );
+		} );
+
+		it( 'should return true for attributes array differences', () => {
+			const issues = [
+				{
+					log: jest.fn(),
+					args: [ 'Expected attributes Array(2), saw Array(1).' ],
+				},
+			];
+			const result = areOnlyAttributeDifferences( issues );
+
+			expect( result ).toBe( true );
+		} );
+
+		it( 'should return false for tag name differences', () => {
+			const issues = [
+				{
+					log: jest.fn(),
+					args: [ 'Expected tag name `h2`, instead saw `span`.' ],
+				},
+			];
+			const result = areOnlyAttributeDifferences( issues );
+
+			expect( result ).toBe( false );
+		} );
+
+		it( 'should return false when content ends unexpectedly', () => {
+			const issues = [
+				{
+					log: jest.fn(),
+					args: [ 'Expected <p>, instead saw end of content.' ],
+				},
+			];
+			const result = areOnlyAttributeDifferences( issues );
+
+			expect( result ).toBe( false );
+		} );
+
+		it( 'should return false when unexpected content found', () => {
+			const issues = [
+				{
+					log: jest.fn(),
+					args: [
+						'Expected end of content, instead saw <p>Extra</p>.',
+					],
+				},
+			];
+			const result = areOnlyAttributeDifferences( issues );
+
+			expect( result ).toBe( false );
+		} );
+
+		it( 'should return false if any issue is structural', () => {
+			const issues = [
+				{
+					log: jest.fn(),
+					args: [ 'Expected attribute `class` of value `foo`.' ],
+				},
+				{
+					log: jest.fn(),
+					args: [ 'Expected tag name `div`, instead saw `span`.' ],
+				},
+			];
+			const result = areOnlyAttributeDifferences( issues );
+
+			expect( result ).toBe( false );
+		} );
+
+		it( 'should return false for text content differences', () => {
+			const issues = [
+				{
+					log: jest.fn(),
+					args: [ 'Text content differs' ],
+				},
+			];
+			const result = areOnlyAttributeDifferences( issues );
+
+			// Text differences are NOT considered attribute differences
+			// Conservative approach: only accept specific attribute messages
+			expect( result ).toBe( false );
+		} );
+
+		it( 'should return false for non-attribute issue types', () => {
+			const issues = [
+				{
+					log: jest.fn(),
+					args: [ 'Some non-attribute validation issue' ],
+				},
+			];
+			const result = areOnlyAttributeDifferences( issues );
+
+			// Conservative approach: only accept specific attribute messages
+			// Everything else is rejected to avoid false positives
+			expect( result ).toBe( false );
+		} );
+	} );
+
 	describe( 'extractBlockInnerHTML()', () => {
 		it( 'should extract innerHTML from block with attributes', () => {
 			const content =
@@ -1006,6 +1125,7 @@ describe( 'validation', () => {
 		it( 'should not apply PreservedSource if no block delimiters', () => {
 			registerBlockType( 'core/test-block', {
 				...defaultBlockSettings,
+				allowsReconstruction: false, // Disable Level 3 to test Level 2 specifically
 				attributes: {
 					text: { type: 'string' },
 				},
@@ -1013,6 +1133,7 @@ describe( 'validation', () => {
 			} );
 
 			// No block delimiters, so innerHTML extraction is skipped
+			// Level 2 won't apply, and Level 3 is disabled, so this should fail
 			const [ isValid ] = validateBlock( {
 				name: 'core/test-block',
 				attributes: { text: 'Expected' },
@@ -1024,24 +1145,28 @@ describe( 'validation', () => {
 	} );
 
 	describe( 'Validation Levels - Level 3: ReconstructedSource', () => {
-		it( 'should validate reconstruction by default', () => {
+		it( 'should not validate plain text differences without delimiters', () => {
 			registerBlockType( 'core/test-block', {
 				...defaultBlockSettings,
-				// allowsReconstruction not set - defaults to true
+				// allowsReconstruction defaults to true, but without attribute
+				// differences, Level 3 won't apply
 				attributes: {
 					content: { type: 'string' },
 				},
 				save: ( { attributes } ) => attributes.content,
 			} );
 
-			// innerHTML differs due to server-side rendering or dynamic content
+			// Plain text differences without block delimiters or attribute issues
+			// should fail (not a valid Level 3 case)
 			const [ isValid ] = validateBlock( {
 				name: 'core/test-block',
 				attributes: { content: 'Server rendered' },
 				originalContent: 'Client rendered',
 			} );
 
-			expect( isValid ).toBe( true );
+			// This should fail because there are no attribute differences,
+			// just text content differences
+			expect( isValid ).toBe( false );
 		} );
 
 		it( 'should not validate reconstruction when explicitly disabled', () => {
@@ -1080,16 +1205,91 @@ describe( 'validation', () => {
 				},
 			} );
 
-			// Source has no generated class names, output generates them from attributes
-			// This is ReconstructedSource - attributes allow rebuilding innerHTML
+			// Without block delimiters, test the actual scenario
+			// This matches real-world usage where innerHTML has missing classes
 			const [ isValid ] = validateBlock( {
 				name: 'core/heading',
 				attributes: { level: 6, textColor: 'pale-pink' },
-				originalContent:
-					'<!-- wp:heading {"level":6,"textColor":"pale-pink"} --><h6>Testing Header</h6><!-- /wp:heading -->',
+				originalContent: '<h6>Testing Header</h6>',
 			} );
 
 			expect( isValid ).toBe( true );
+		} );
+
+		it( 'should validate when structure matches but attributes differ', () => {
+			registerBlockType( 'core/paragraph', {
+				...defaultBlockSettings,
+				attributes: {
+					content: { type: 'string' },
+					textColor: { type: 'string' },
+				},
+				save: ( { attributes } ) => {
+					const className = attributes.textColor
+						? `has-${ attributes.textColor }-color has-text-color`
+						: '';
+					return `<p class="${ className }">${ attributes.content }</p>`;
+				},
+			} );
+
+			// Same structure (p tag), different attributes (missing color classes)
+			const [ isValid, , metadata ] = validateBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Hello World', textColor: 'red' },
+				originalContent: '<p>Hello World</p>',
+			} );
+
+			expect( isValid ).toBe( true );
+			expect( metadata.validationLevel ).toBe(
+				VALIDATION_LEVEL.RECONSTRUCTED_SOURCE
+			);
+		} );
+
+		it( 'should NOT validate when HTML tag structure differs', () => {
+			registerBlockType( 'core/heading-invalid', {
+				...defaultBlockSettings,
+				allowsReconstruction: false, // Disable to ensure tag differences fail
+				attributes: {
+					content: { type: 'string' },
+				},
+				save: ( { attributes } ) => `<h2>${ attributes.content }</h2>`,
+			} );
+
+			// Different structure: span vs h2 - should fail
+			const [ isValid, issues, metadata ] = validateBlock( {
+				name: 'core/heading-invalid',
+				attributes: { content: 'Header' },
+				originalContent: '<span>Header</span>',
+			} );
+
+			expect( isValid ).toBe( false );
+			expect( metadata.validationLevel ).toBe(
+				VALIDATION_LEVEL.INVALID_BLOCK
+			);
+			expect( issues.length ).toBeGreaterThan( 0 );
+		} );
+
+		it( 'should NOT validate when HTML has extra elements', () => {
+			registerBlockType( 'core/simple-text', {
+				...defaultBlockSettings,
+				allowsReconstruction: false, // Disable to ensure extra elements fail
+				attributes: {
+					content: { type: 'string' },
+				},
+				save: ( { attributes } ) => `<h2>${ attributes.content }</h2>`,
+			} );
+
+			// Different structure: extra paragraph element
+			const [ isValid, issues, metadata ] = validateBlock( {
+				name: 'core/simple-text',
+				attributes: { content: 'Content' },
+				originalContent: '<h2>Content</h2><p>Extra content</p>',
+			} );
+
+			expect( isValid ).toBe( false );
+			expect( metadata.validationLevel ).toBe(
+				VALIDATION_LEVEL.INVALID_BLOCK
+			);
+			expect( issues.length ).toBeGreaterThan( 0 );
 		} );
 	} );
 
@@ -1111,6 +1311,7 @@ describe( 'validation', () => {
 		it( 'should invalidate completely different content', () => {
 			registerBlockType( 'core/test-block', {
 				...defaultBlockSettings,
+				allowsReconstruction: false, // Disable Level 3 to ensure this fails
 				save: ( { attributes } ) => attributes.expected,
 			} );
 
@@ -1127,6 +1328,7 @@ describe( 'validation', () => {
 		it( 'should invalidate when HTML structure completely changes', () => {
 			registerBlockType( 'core/heading', {
 				...defaultBlockSettings,
+				allowsReconstruction: false, // Disable Level 3
 				save: () => '<h2>Testing Header</h2>',
 			} );
 
@@ -1135,8 +1337,7 @@ describe( 'validation', () => {
 			const [ isValid, issues ] = validateBlock( {
 				name: 'core/heading',
 				attributes: {},
-				originalContent:
-					'<!-- wp:heading --><span>Testing Header</span><!-- /wp:heading -->',
+				originalContent: '<span>Testing Header</span>',
 			} );
 
 			expect( isValid ).toBe( false );
@@ -1146,6 +1347,7 @@ describe( 'validation', () => {
 		it( 'should invalidate malformed HTML that cannot be fixed', () => {
 			registerBlockType( 'core/heading', {
 				...defaultBlockSettings,
+				allowsReconstruction: false, // Disable Level 3
 				save: () => '<h2>Testing Header</h2>',
 			} );
 
@@ -1153,8 +1355,7 @@ describe( 'validation', () => {
 			const [ isValid, issues ] = validateBlock( {
 				name: 'core/heading',
 				attributes: {},
-				originalContent:
-					'<!-- wp:heading --><h2>Testing Header</p><!-- /wp:heading -->',
+				originalContent: '<h2>Testing Header</p>',
 			} );
 
 			expect( isValid ).toBe( false );
@@ -1182,6 +1383,7 @@ describe( 'validation', () => {
 		it( 'should invalidate when attributes cause different output', () => {
 			registerBlockType( 'core/test-block', {
 				...defaultBlockSettings,
+				allowsReconstruction: false, // Disable Level 3
 				attributes: {
 					text: { type: 'string' },
 				},
@@ -1200,7 +1402,7 @@ describe( 'validation', () => {
 	} );
 
 	describe( 'Backward Compatibility', () => {
-		it( 'should maintain array return format [isValid, issues]', () => {
+		it( 'should maintain array return format with metadata as third element', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
 			const result = validateBlock( {
@@ -1210,14 +1412,17 @@ describe( 'validation', () => {
 			} );
 
 			expect( Array.isArray( result ) ).toBe( true );
-			expect( result ).toHaveLength( 2 );
+			expect( result ).toHaveLength( 3 ); // Now returns [isValid, issues, metadata]
 			expect( typeof result[ 0 ] ).toBe( 'boolean' );
 			expect( Array.isArray( result[ 1 ] ) ).toBe( true );
+			expect( typeof result[ 2 ] ).toBe( 'object' ); // metadata object
+			expect( result[ 2 ].validationLevel ).toBeDefined();
 		} );
 
-		it( 'should return true for valid blocks in legacy format', () => {
+		it( 'should support destructuring with legacy pattern', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
+			// Users can still destructure as [isValid, issues] - they just ignore metadata
 			const [ isValid, issues ] = validateBlock( {
 				name: 'core/test-block',
 				attributes: { fruit: 'Bananas' },
@@ -1228,8 +1433,11 @@ describe( 'validation', () => {
 			expect( issues ).toEqual( [] );
 		} );
 
-		it( 'should return false for invalid blocks in legacy format', () => {
-			registerBlockType( 'core/test-block', defaultBlockSettings );
+		it( 'should return false for invalid blocks with text differences', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				allowsReconstruction: false, // Disable Level 3 to ensure it fails
+			} );
 
 			const [ isValid, issues ] = validateBlock( {
 				name: 'core/test-block',

@@ -755,6 +755,88 @@ export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
 }
 
 /**
+ * Returns true if validation issues are only related to attributes or content
+ * differences (not structural problems like wrong tags or missing elements).
+ * This is used for Level 3 validation (ReconstructedSource).
+ *
+ * @param {Array} validationIssues Array of validation issues from logger.
+ *
+ * @return {boolean} Whether issues are only attribute/content-related.
+ */
+export function areOnlyAttributeDifferences( validationIssues ) {
+	if ( ! validationIssues || validationIssues.length === 0 ) {
+		// No issues means HTML matches exactly - shouldn't reach Level 3
+		// Return false to be safe
+		return false;
+	}
+
+	// For Level 3, we're VERY conservative: we ONLY accept attribute-related issues.
+	// Everything else (text differences, structural differences) is rejected.
+	// This prevents false positives where wrong content passes as "reconstructable".
+	return validationIssues.every( ( issue ) => {
+		const message = issue.args?.[ 0 ] || '';
+
+		// Check for direct attribute-related messages:
+		// - "Expected attribute `X` of value Y, saw Z"
+		// - "Expected attributes Array(X), saw Array(Y)"
+		// - "Unexpected attribute `X`"
+		const isDirectAttributeIssue =
+			message.includes( 'Expected attribute' ) ||
+			message.includes( 'Expected attributes' ) ||
+			message.includes( 'Unexpected attribute' );
+
+		if ( isDirectAttributeIssue ) {
+			return true;
+		}
+
+		// Check for token type mismatches that could be attribute-related
+		// "Expected token of type `Chars` (%o), instead saw `StartTag` (%o)"
+		if ( message.includes( 'Expected token of type' ) ) {
+			// Get the token objects from args
+			const expectedToken = issue.args?.[ 2 ];
+			const actualToken = issue.args?.[ 4 ];
+
+			// Extract tag names from both tokens
+			let expectedTagName = null;
+			let actualTagName = null;
+
+			// Extract from expected token
+			if ( expectedToken?.type === 'Chars' && expectedToken?.chars ) {
+				// Chars token contains raw HTML - extract tag name
+				const match = expectedToken.chars.match( /<(\w+)/ );
+				expectedTagName = match?.[ 1 ];
+			} else if ( expectedToken?.tagName ) {
+				expectedTagName = expectedToken.tagName;
+			}
+
+			// Extract from actual token
+			if ( actualToken?.tagName ) {
+				actualTagName = actualToken.tagName;
+			} else if ( actualToken?.type === 'Chars' && actualToken?.chars ) {
+				const match = actualToken.chars.match( /<(\w+)/ );
+				actualTagName = match?.[ 1 ];
+			}
+
+			// If both tokens refer to the same HTML tag, this is likely an attribute difference
+			// (e.g., <h6> vs <h6 class="...">), not a structural difference
+			if (
+				expectedTagName &&
+				actualTagName &&
+				expectedTagName === actualTagName
+			) {
+				return true;
+			}
+
+			// Different tags or couldn't extract tag names - this is a structural issue
+			return false;
+		}
+
+		// All other issues are not attribute-related
+		return false;
+	} );
+}
+
+/**
  * Extracts the innerHTML from a block's serialized content,
  * stripping the block comment delimiters.
  *
@@ -965,18 +1047,26 @@ export function validateBlock( block, blockTypeOrName = block.name ) {
 	const allowsReconstruction = blockType.allowsReconstruction !== false;
 
 	if ( allowsReconstruction && block.attributes ) {
-		// If attributes exist and reconstruction is allowed, consider it valid
-		// This level accepts that innerHTML may differ but can be rebuilt from attributes
-		// Block authors can opt out by setting allowsReconstruction: false
-		return [
-			true,
-			[],
-			{
-				validationLevel: VALIDATION_LEVEL.RECONSTRUCTED_SOURCE,
-				originalContent: block.originalContent,
-				generatedContent: generatedBlockContent,
-			},
-		];
+		// Check if the validation failures from Level 0 are only attribute-related
+		// (not structural problems like wrong tags or missing elements).
+		// We reuse the issues already captured by the logger instead of re-parsing.
+		const validationIssues = logger.getItems();
+		const onlyAttributeDifferences =
+			areOnlyAttributeDifferences( validationIssues );
+
+		if ( onlyAttributeDifferences ) {
+			// If attributes exist, reconstruction is allowed, and only attributes differ,
+			// consider it valid. The block can be rebuilt from attributes.
+			return [
+				true,
+				[],
+				{
+					validationLevel: VALIDATION_LEVEL.RECONSTRUCTED_SOURCE,
+					originalContent: block.originalContent,
+					generatedContent: generatedBlockContent,
+				},
+			];
+		}
 	}
 
 	// All validation levels failed - mark as invalid
