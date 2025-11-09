@@ -2090,24 +2090,17 @@ class WP_Theme_JSON_Gutenberg {
 	 * creates the corresponding ruleset.
 	 *
 	 * @since 5.8.0
+	 * @deprecated 7.0.0 Use WP_Style_Engine_Gutenberg::compile_css() instead.
 	 *
 	 * @param string $selector     CSS selector.
 	 * @param array  $declarations List of declarations.
 	 * @return string The resulting CSS ruleset.
 	 */
 	protected static function to_ruleset( $selector, $declarations ) {
-		if ( empty( $declarations ) ) {
-			return '';
-		}
+		_deprecated_function( __METHOD__, 'Gutenberg 7.0.0', 'WP_Style_Engine_Gutenberg::compile_css()' );
 
-		$declaration_block = array_reduce(
-			$declarations,
-			static function ( $carry, $element ) {
-				return $carry .= $element['name'] . ': ' . $element['value'] . ';'; },
-			''
-		);
-
-		return $selector . '{' . $declaration_block . '}';
+		// Delegate to Style Engine, which handles format detection and conversion.
+		return WP_Style_Engine_Gutenberg::compile_css( $declarations, $selector );
 	}
 
 	/**

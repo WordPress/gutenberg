@@ -136,9 +136,9 @@ class WP_Style_Engine_Utils_Test extends WP_UnitTestCase {
 		);
 
 		$expected = array(
-			'--wp--preset--color--grey'     => 'grey',
+			'--wp--preset--color--grey'      => 'grey',
 			'--wp--preset--font-size--small' => '14px',
-			'--wp--custom--base-font'      => '16',
+			'--wp--custom--base-font'        => '16',
 		);
 
 		$result = WP_Style_Engine_Utils_Gutenberg::convert_theme_json_declarations( $theme_json_declarations );
@@ -194,8 +194,8 @@ class WP_Style_Engine_Utils_Test extends WP_UnitTestCase {
 		);
 
 		$expected = array(
-			'background'  => 'linear-gradient(135deg, rgba(0,0,0) 0%, rgb(0,0,0) 100%)',
-			'font-size'   => 'clamp(14px, 0.875rem + ((1vw - 3.2px) * 0.156), 16px)',
+			'background' => 'linear-gradient(135deg, rgba(0,0,0) 0%, rgb(0,0,0) 100%)',
+			'font-size'  => 'clamp(14px, 0.875rem + ((1vw - 3.2px) * 0.156), 16px)',
 			'box-shadow' => '5px 5px 5px 0 black',
 		);
 
@@ -222,7 +222,7 @@ class WP_Style_Engine_Utils_Test extends WP_UnitTestCase {
 		);
 
 		$expected = array(
-			'opacity'  => '0',
+			'opacity' => '0',
 			'z-index' => '999',
 		);
 
@@ -231,4 +231,3 @@ class WP_Style_Engine_Utils_Test extends WP_UnitTestCase {
 		$this->assertSame( $expected, $result );
 	}
 }
-
