@@ -807,7 +807,7 @@ describe( 'Store Actions', () => {
 			await expect(
 				action( { select: mockSelect, dispatch: mockDispatch } )
 			).rejects.toThrow(
-				'The category properties should provide a valid `meta` array.'
+				'The category properties should provide a valid `meta` object.'
 			);
 			expect( mockDispatch ).not.toHaveBeenCalled();
 		} );
@@ -825,7 +825,7 @@ describe( 'Store Actions', () => {
 			await expect(
 				action( { select: mockSelect, dispatch: mockDispatch } )
 			).rejects.toThrow(
-				'The category properties should provide a valid `meta` array.'
+				'The category properties should provide a valid `meta` object.'
 			);
 			expect( mockDispatch ).not.toHaveBeenCalled();
 		} );
