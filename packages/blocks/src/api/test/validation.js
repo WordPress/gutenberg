@@ -768,10 +768,9 @@ describe( 'validation', () => {
 		it( 'should have correct numeric values ordered by confidence', () => {
 			expect( VALIDATION_LEVEL.VALID_BLOCK ).toBe( 0 );
 			expect( VALIDATION_LEVEL.MIGRATED_BLOCK ).toBe( 1 );
-			expect( VALIDATION_LEVEL.PRESERVED_SOURCE ).toBe( 2 );
-			expect( VALIDATION_LEVEL.RECONSTRUCTED_SOURCE ).toBe( 3 );
-			expect( VALIDATION_LEVEL.RAW_TRANSFORMED_SOURCE ).toBe( 4 );
-			expect( VALIDATION_LEVEL.INVALID_BLOCK ).toBe( 5 );
+			expect( VALIDATION_LEVEL.RECONSTRUCTED_BLOCK ).toBe( 2 );
+			expect( VALIDATION_LEVEL.RAW_TRANSFORMED_BLOCK ).toBe( 3 );
+			expect( VALIDATION_LEVEL.INVALID_BLOCK ).toBe( 4 );
 		} );
 
 		it( 'should have human-readable names for each level', () => {
@@ -782,14 +781,11 @@ describe( 'validation', () => {
 				VALIDATION_LEVEL_NAME[ VALIDATION_LEVEL.MIGRATED_BLOCK ]
 			).toBe( 'MigratedBlock' );
 			expect(
-				VALIDATION_LEVEL_NAME[ VALIDATION_LEVEL.PRESERVED_SOURCE ]
-			).toBe( 'PreservedSource' );
+				VALIDATION_LEVEL_NAME[ VALIDATION_LEVEL.RECONSTRUCTED_BLOCK ]
+			).toBe( 'ReconstructedBlock' );
 			expect(
-				VALIDATION_LEVEL_NAME[ VALIDATION_LEVEL.RECONSTRUCTED_SOURCE ]
-			).toBe( 'ReconstructedSource' );
-			expect(
-				VALIDATION_LEVEL_NAME[ VALIDATION_LEVEL.RAW_TRANSFORMED_SOURCE ]
-			).toBe( 'RawTransformedSource' );
+				VALIDATION_LEVEL_NAME[ VALIDATION_LEVEL.RAW_TRANSFORMED_BLOCK ]
+			).toBe( 'RawTransformedBlock' );
 			expect(
 				VALIDATION_LEVEL_NAME[ VALIDATION_LEVEL.INVALID_BLOCK ]
 			).toBe( 'InvalidBlock' );
@@ -799,7 +795,7 @@ describe( 'validation', () => {
 	describe( 'areOnlyAttributeDifferences()', () => {
 		it( 'should return false for empty issues array', () => {
 			// Empty array means no issues were found, which shouldn't happen
-			// at Level 3 (Level 0 would have passed). Return false to be safe.
+			// at Level 2 (Level 0 would have passed). Return false to be safe.
 			const result = areOnlyAttributeDifferences( [] );
 
 			expect( result ).toBe( false );
@@ -930,7 +926,7 @@ describe( 'validation', () => {
 				VALIDATION_LEVEL.INVALID_BLOCK
 			);
 
-			expect( result.validationLevel ).toBe( 5 );
+			expect( result.validationLevel ).toBe( 4 );
 			expect( result.isValid ).toBe( false );
 		} );
 
@@ -938,9 +934,8 @@ describe( 'validation', () => {
 			const levels = [
 				VALIDATION_LEVEL.VALID_BLOCK,
 				VALIDATION_LEVEL.MIGRATED_BLOCK,
-				VALIDATION_LEVEL.PRESERVED_SOURCE,
-				VALIDATION_LEVEL.RECONSTRUCTED_SOURCE,
-				VALIDATION_LEVEL.RAW_TRANSFORMED_SOURCE,
+				VALIDATION_LEVEL.RECONSTRUCTED_BLOCK,
+				VALIDATION_LEVEL.RAW_TRANSFORMED_BLOCK,
 			];
 
 			levels.forEach( ( level ) => {
@@ -1049,227 +1044,29 @@ describe( 'validation', () => {
 		} );
 	} );
 
-	describe( 'Validation Levels - Level 2: PreservedSource', () => {
-		it( 'should validate when innerHTML matches but comment attributes differ', () => {
-			registerBlockType( 'core/heading', {
-				...defaultBlockSettings,
-				attributes: {
-					content: {
-						type: 'string',
-						source: 'html',
-						selector: 'h1,h2,h3,h4,h5,h6',
-					},
-					level: { type: 'number', default: 2 },
-				},
-				save: ( { attributes } ) => {
-					const Tag = `h${ attributes.level }`;
-					return `<${ Tag } class="wp-block-heading">${ attributes.content }</${ Tag }>`;
-				},
-			} );
-
-			// Scenario: Comment has wrong level attribute
-			// - Comment says: {"level":3}
-			// - HTML contains: <h2> (which means level 2)
-			// - block.attributes comes from comment: {level: 3}
-			//
-			// Level 0 fails: generate with {level:3} → <h3> ≠ <h2>
-			// Level 2 should pass:
-			//   1. Parse attrs from HTML → {level: 2}
-			//   2. Regenerate with {level: 2} → <h2>
-			//   3. Compare: <h2> === <h2> ✅
-			//   4. HTML is self-consistent, trust it
-			const [ isValid, , metadata ] = validateBlock(
-				{
-					name: 'core/heading',
-					attributes: { content: 'Testing Header', level: 3 }, // From comment (wrong!)
-					originalContent:
-						'<h2 class="wp-block-heading">Testing Header</h2>',
-				},
-				'core/heading'
-			);
-
-			expect( isValid ).toBe( true );
-			expect( metadata.validationLevel ).toBe(
-				VALIDATION_LEVEL.PRESERVED_SOURCE
-			);
-		} );
-
-		it( 'should validate when comment attribute value is wrong but HTML is consistent', () => {
-			registerBlockType( 'core/paragraph', {
-				...defaultBlockSettings,
-				attributes: {
-					content: { type: 'string', source: 'html', selector: 'p' },
-					align: {
-						type: 'string',
-						source: 'attribute',
-						selector: 'p',
-						attribute: 'class',
-					},
-				},
-				save: ( { attributes } ) => {
-					// Parse align from class attribute
-					const align = attributes.align
-						? attributes.align.replace( 'has-text-align-', '' )
-						: '';
-					const className = align ? `has-text-align-${ align }` : '';
-					return `<p class="${ className }">${ attributes.content }</p>`;
-				},
-			} );
-
-			// Scenario: Comment has wrong align value
-			// - Comment: {align: "left"}
-			// - HTML: <p class="has-text-align-center">Test</p> (align should be "center")
-			//
-			// Level 0 fails: generate with {align:"left"} → has-text-align-left ≠ has-text-align-center
-			// Level 2 should pass:
-			//   1. Parse attrs from HTML → {align: "center"}
-			//   2. Regenerate with {align: "center"} → has-text-align-center
-			//   3. Compare: matches original ✅
-			const [ isValid, , metadata ] = validateBlock(
-				{
-					name: 'core/paragraph',
-					attributes: { content: 'Test', align: 'left' }, // From comment (wrong!)
-					originalContent:
-						'<p class="has-text-align-center">Test</p>',
-				},
-				'core/paragraph'
-			);
-
-			expect( isValid ).toBe( true );
-			expect( metadata.validationLevel ).toBe(
-				VALIDATION_LEVEL.PRESERVED_SOURCE
-			);
-		} );
-
-		it( 'should validate when comment has wrong content but HTML is self-consistent', () => {
+	describe( 'Validation Levels - Level 2: ReconstructedBlock', () => {
+		it( 'should validate when content differs (trusts attributes for reconstruction)', () => {
 			registerBlockType( 'core/test-block', {
 				...defaultBlockSettings,
-				attributes: {
-					text: { type: 'string', source: 'text', selector: 'div' },
-				},
-				save: ( { attributes } ) =>
-					`<div>${ attributes.text || '' }</div>`,
-			} );
-
-			// Scenario: Comment has wrong text value
-			// - Comment: {text: "Wrong"}
-			// - HTML: <div>Correct</div>
-			//
-			// Level 0 fails: generate with {text:"Wrong"} → <div>Wrong</div> ≠ <div>Correct</div>
-			// Level 2 should pass:
-			//   1. Parse attrs from HTML → {text: "Correct"}
-			//   2. Regenerate with {text: "Correct"} → <div>Correct</div>
-			//   3. Compare: matches original ✅
-			const [ isValid, , metadata ] = validateBlock(
-				{
-					name: 'core/test-block',
-					attributes: { text: 'Wrong' }, // From comment (wrong!)
-					originalContent: '<div>Correct</div>',
-				},
-				'core/test-block'
-			);
-
-			expect( isValid ).toBe( true );
-			expect( metadata.validationLevel ).toBe(
-				VALIDATION_LEVEL.PRESERVED_SOURCE
-			);
-		} );
-
-		it( 'should use HTML-derived attributes when reconciling', () => {
-			registerBlockType( 'core/metadata-block', {
-				...defaultBlockSettings,
-				attributes: {
-					content: {
-						type: 'string',
-						source: 'html',
-						selector: 'p',
-					},
-					// Non-sourceable attribute (only in comment)
-					customField: {
-						type: 'string',
-					},
-				},
-				save: ( { attributes } ) =>
-					`<p>${ attributes.content || '' }</p>`,
-			} );
-
-			// Scenario: Comment has wrong content
-			// - Comment: {content: "Wrong", customField: "value"}
-			// - HTML: <p>Correct</p>
-			//
-			// Level 2:
-			//   1. Parse from HTML → {content: "Correct", customField: undefined}
-			//   2. Regenerate → <p>Correct</p>
-			//   3. Match! ✅
-			//   4. Use HTML-derived attrs (trusts HTML, discards comment-only data)
-			const [ isValid, , metadata ] = validateBlock(
-				{
-					name: 'core/metadata-block',
-					attributes: {
-						content: 'Wrong',
-						customField: 'value',
-					},
-					originalContent: '<p>Correct</p>',
-				},
-				'core/metadata-block'
-			);
-
-			expect( isValid ).toBe( true );
-			expect( metadata.validationLevel ).toBe(
-				VALIDATION_LEVEL.PRESERVED_SOURCE
-			);
-			// Level 2 uses HTML-derived attributes only
-			expect( metadata.reconciledAttributes.content ).toBe( 'Correct' );
-			expect( metadata.reconciledAttributes.customField ).toBeUndefined();
-		} );
-
-		it( 'should not apply PreservedSource when content differs', () => {
-			registerBlockType( 'core/test-block', {
-				...defaultBlockSettings,
-				allowsReconstruction: false, // Disable Level 3 to ensure failure
-				attributes: {
-					text: { type: 'string' },
-				},
-				save: ( { attributes } ) => attributes.text,
-			} );
-
-			// Content differs, so Level 2 won't apply, and Level 3 is disabled
-			const [ isValid, , metadata ] = validateBlock( {
-				name: 'core/test-block',
-				attributes: { text: 'Expected' },
-				originalContent: 'Different',
-			} );
-
-			expect( isValid ).toBe( false );
-			expect( metadata.validationLevel ).toBe(
-				VALIDATION_LEVEL.INVALID_BLOCK
-			);
-		} );
-	} );
-
-	describe( 'Validation Levels - Level 3: ReconstructedSource', () => {
-		it( 'should not validate plain text differences without delimiters', () => {
-			registerBlockType( 'core/test-block', {
-				...defaultBlockSettings,
-				// allowsReconstruction defaults to true, but without attribute
-				// differences, Level 3 won't apply
 				attributes: {
 					content: { type: 'string' },
 				},
 				save: ( { attributes } ) => attributes.content,
 			} );
 
-			// Plain text differences without block delimiters or attribute issues
-			// should fail (not a valid Level 3 case)
-			const [ isValid ] = validateBlock( {
+			// Level 2 trusts the attributes and will regenerate HTML from them
+			// Attributes say "Server rendered", HTML has "Client rendered"
+			// Level 2 will regenerate as "Server rendered"
+			const [ isValid, , metadata ] = validateBlock( {
 				name: 'core/test-block',
 				attributes: { content: 'Server rendered' },
 				originalContent: 'Client rendered',
 			} );
 
-			// This should fail because there are no attribute differences,
-			// just text content differences
-			expect( isValid ).toBe( false );
+			expect( isValid ).toBe( true );
+			expect( metadata.validationLevel ).toBe(
+				VALIDATION_LEVEL.RECONSTRUCTED_BLOCK
+			);
 		} );
 
 		it( 'should not validate reconstruction when explicitly disabled', () => {
@@ -1343,7 +1140,34 @@ describe( 'validation', () => {
 
 			expect( isValid ).toBe( true );
 			expect( metadata.validationLevel ).toBe(
-				VALIDATION_LEVEL.RECONSTRUCTED_SOURCE
+				VALIDATION_LEVEL.RECONSTRUCTED_BLOCK
+			);
+		} );
+
+		it( 'should validate when HTML tag differs from attributes (reconstruct from attributes)', () => {
+			registerBlockType( 'core/heading', {
+				...defaultBlockSettings,
+				attributes: {
+					content: { type: 'string' },
+					level: { type: 'number', default: 2 },
+				},
+				save: ( { attributes } ) => {
+					const Tag = `h${ attributes.level }`;
+					return `<${ Tag }>${ attributes.content }</${ Tag }>`;
+				},
+			} );
+
+			// Comment says level:3, but HTML has h2
+			// Level 2 should accept this and regenerate from attributes
+			const [ isValid, , metadata ] = validateBlock( {
+				name: 'core/heading',
+				attributes: { content: 'Testing Header', level: 3 },
+				originalContent: '<h2>Testing Header</h2>',
+			} );
+
+			expect( isValid ).toBe( true );
+			expect( metadata.validationLevel ).toBe(
+				VALIDATION_LEVEL.RECONSTRUCTED_BLOCK
 			);
 		} );
 
@@ -1396,7 +1220,7 @@ describe( 'validation', () => {
 		} );
 	} );
 
-	describe( 'Validation Levels - Level 4: RawTransformedSource', () => {
+	describe( 'Validation Levels - Level 3: RawTransformedBlock', () => {
 		it( 'should handle unregistered block types', () => {
 			// Block type that doesn't exist should fail validation
 			const [ isValid, issues ] = validateBlock( {
@@ -1410,11 +1234,11 @@ describe( 'validation', () => {
 		} );
 	} );
 
-	describe( 'Validation Levels - Level 5: InvalidBlock', () => {
+	describe( 'Validation Levels - Level 4: InvalidBlock', () => {
 		it( 'should invalidate completely different content', () => {
 			registerBlockType( 'core/test-block', {
 				...defaultBlockSettings,
-				allowsReconstruction: false, // Disable Level 3 to ensure this fails
+				allowsReconstruction: false, // Disable Level 2 to ensure this fails
 				save: ( { attributes } ) => attributes.expected,
 			} );
 
@@ -1431,7 +1255,7 @@ describe( 'validation', () => {
 		it( 'should invalidate when HTML structure completely changes', () => {
 			registerBlockType( 'core/heading', {
 				...defaultBlockSettings,
-				allowsReconstruction: false, // Disable Level 3
+				allowsReconstruction: false, // Disable Level 2
 				save: () => '<h2>Testing Header</h2>',
 			} );
 
@@ -1450,7 +1274,7 @@ describe( 'validation', () => {
 		it( 'should invalidate malformed HTML that cannot be fixed', () => {
 			registerBlockType( 'core/heading', {
 				...defaultBlockSettings,
-				allowsReconstruction: false, // Disable Level 3
+				allowsReconstruction: false, // Disable Level 2
 				save: () => '<h2>Testing Header</h2>',
 			} );
 
@@ -1486,7 +1310,7 @@ describe( 'validation', () => {
 		it( 'should invalidate when attributes cause different output', () => {
 			registerBlockType( 'core/test-block', {
 				...defaultBlockSettings,
-				allowsReconstruction: false, // Disable Level 3
+				allowsReconstruction: false, // Disable Level 2
 				attributes: {
 					text: { type: 'string' },
 				},
@@ -1539,7 +1363,7 @@ describe( 'validation', () => {
 		it( 'should return false for invalid blocks with text differences', () => {
 			registerBlockType( 'core/test-block', {
 				...defaultBlockSettings,
-				allowsReconstruction: false, // Disable Level 3 to ensure it fails
+				allowsReconstruction: false, // Disable Level 2 to ensure it fails
 			} );
 
 			const [ isValid, issues ] = validateBlock( {

@@ -20,7 +20,6 @@ import {
 	getUnregisteredTypeHandlerName,
 } from '../registration';
 import { normalizeBlockType } from '../utils';
-import { getBlockAttributes } from '../parser/get-block-attributes';
 
 /** @typedef {import('../parser').WPBlock} WPBlock */
 /** @typedef {import('../registration').WPBlockType} WPBlockType */
@@ -46,28 +45,23 @@ export const VALIDATION_LEVEL = {
 	MIGRATED_BLOCK: 1,
 
 	/**
-	 * innerHTML equivalence maintained despite comment attribute differences.
-	 * Block delimiter attributes differ but actual content HTML is identical.
-	 */
-	PRESERVED_SOURCE: 2,
-
-	/**
 	 * Attribute integrity preserved; innerHTML rebuild allowed.
 	 * Attributes parse correctly and content can be regenerated from them.
+	 * This is the default behavior for most blocks.
 	 */
-	RECONSTRUCTED_SOURCE: 3,
+	RECONSTRUCTED_BLOCK: 2,
 
 	/**
 	 * Raw handling functions applied; block type name preserved.
 	 * Freeform or unregistered type handlers process the content.
 	 */
-	RAW_TRANSFORMED_SOURCE: 4,
+	RAW_TRANSFORMED_BLOCK: 3,
 
 	/**
 	 * Cannot be safely restored; requires user intervention.
 	 * All other validation levels failed.
 	 */
-	INVALID_BLOCK: 5,
+	INVALID_BLOCK: 4,
 };
 
 /**
@@ -78,9 +72,8 @@ export const VALIDATION_LEVEL = {
 export const VALIDATION_LEVEL_NAME = {
 	[ VALIDATION_LEVEL.VALID_BLOCK ]: 'ValidBlock',
 	[ VALIDATION_LEVEL.MIGRATED_BLOCK ]: 'MigratedBlock',
-	[ VALIDATION_LEVEL.PRESERVED_SOURCE ]: 'PreservedSource',
-	[ VALIDATION_LEVEL.RECONSTRUCTED_SOURCE ]: 'ReconstructedSource',
-	[ VALIDATION_LEVEL.RAW_TRANSFORMED_SOURCE ]: 'RawTransformedSource',
+	[ VALIDATION_LEVEL.RECONSTRUCTED_BLOCK ]: 'ReconstructedBlock',
+	[ VALIDATION_LEVEL.RAW_TRANSFORMED_BLOCK ]: 'RawTransformedBlock',
 	[ VALIDATION_LEVEL.INVALID_BLOCK ]: 'InvalidBlock',
 };
 
@@ -758,7 +751,7 @@ export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
 /**
  * Returns true if validation issues are only related to attributes or content
  * differences (not structural problems like wrong tags or missing elements).
- * This is used for Level 3 validation (ReconstructedSource).
+ * This is used for Level 2 validation (ReconstructedBlock).
  *
  * @param {Array} validationIssues Array of validation issues from logger.
  *
@@ -902,7 +895,7 @@ export function validateBlock( block, blockTypeOrName = block.name ) {
 			true,
 			[],
 			{
-				validationLevel: VALIDATION_LEVEL.RAW_TRANSFORMED_SOURCE,
+				validationLevel: VALIDATION_LEVEL.RAW_TRANSFORMED_BLOCK,
 				originalContent: block.originalContent,
 				generatedContent: block.originalContent, // No regeneration for fallback blocks
 			},
@@ -972,90 +965,33 @@ export function validateBlock( block, blockTypeOrName = block.name ) {
 		];
 	}
 
-	// Level 2: PreservedSource - innerHTML is self-consistent
-	// This handles cases where the innerHTML from the post is internally consistent
-	// but the comment delimiter attributes are wrong/outdated (e.g., {"level":3} when HTML is <h2>).
-	// We completely discard comment attributes and trust only what's in the HTML.
-	//
-	// Strategy: Parse attributes from the HTML itself (ignoring comment attrs entirely),
-	// regenerate with those HTML-only attributes, and check if output matches original.
-	// If yes, the HTML is self-consistent and we can trust it over the comment.
-	//
-	// Only apply Level 2 if the block has attributes with `source` defined.
-	// Without sourceable attributes, there's nothing to parse from HTML.
-	const hasSourceableAttributes = Object.values(
-		blockType.attributes || {}
-	).some( ( attr ) => attr.source );
-
-	if ( hasSourceableAttributes ) {
-		// Parse attributes from HTML only (completely discard comment attrs)
-		const htmlOnlyAttrs = getBlockAttributes(
-			blockType,
-			block.originalContent,
-			{} // Empty comment attrs - parse from HTML only
-		);
-
-		// First, check if HTML is self-consistent by regenerating with htmlOnlyAttrs
-		let htmlOnlyContent;
-		try {
-			htmlOnlyContent = getSaveContent( blockType, htmlOnlyAttrs );
-		} catch ( error ) {
-			// If regeneration fails, can't validate at Level 2
-			htmlOnlyContent = null;
-		}
-
-		// Check if regenerated HTML matches original (exact or attribute-only differences)
-		if ( htmlOnlyContent ) {
-			const innerHTMLLogger = createQueuedLogger();
-			const htmlMatches = isEquivalentHTML(
-				block.originalContent,
-				htmlOnlyContent,
-				innerHTMLLogger
-			);
-
-			// Check for exact match or attribute-only differences
-			const level2Issues = innerHTMLLogger.getItems();
-			const onlyAttributeDiffs =
-				htmlMatches || areOnlyAttributeDifferences( level2Issues );
-
-			// If HTML is self-consistent, use htmlOnlyAttrs as the reconciled attributes
-			// This represents trusting the HTML as the source of truth
-			if ( onlyAttributeDiffs ) {
-				return [
-					true,
-					[],
-					{
-						validationLevel: VALIDATION_LEVEL.PRESERVED_SOURCE,
-						originalContent: block.originalContent,
-						generatedContent: generatedBlockContent,
-						reconciledAttributes: htmlOnlyAttrs, // Use HTML-derived attrs directly
-					},
-				];
-			}
-		}
-	}
-
-	// Level 3: ReconstructedSource - Attributes allow reconstruction
+	// Level 2: ReconstructedBlock - Attributes allow reconstruction
 	// By default, blocks can be reconstructed unless they explicitly opt out
-	// This allows blocks with generated class names or dynamic content to validate
+	// However, we need to ensure the generated content is reasonable - if it's empty
+	// when the original wasn't, or if save() fails, this isn't a valid Level 2 case
 	const allowsReconstruction = blockType.allowsReconstruction !== false;
 
 	if ( allowsReconstruction && block.attributes ) {
-		// Check if the validation failures from Level 0 are only attribute-related
-		// (not structural problems like wrong tags or missing elements).
-		// We reuse the issues already captured by the logger instead of re-parsing.
-		const validationIssues = logger.getItems();
-		const onlyAttributeDifferences =
-			areOnlyAttributeDifferences( validationIssues );
+		// Check if generated content is reasonable
+		// If original content exists but generated is empty/trivial, this might be
+		// a deprecated block with wrong attribute schema - let deprecations handle it
+		const hasOriginalContent =
+			block.originalContent && block.originalContent.trim().length > 0;
+		const hasGeneratedContent =
+			generatedBlockContent && generatedBlockContent.trim().length > 0;
 
-		if ( onlyAttributeDifferences ) {
-			// If attributes exist, reconstruction is allowed, and only attributes differ,
-			// consider it valid. The block can be rebuilt from attributes.
+		// Only pass Level 2 if:
+		// - Both have content, OR
+		// - Both are empty (valid empty block), OR
+		// - Original is empty but generated has content (adding generated classes/structure)
+		const contentIsReasonable = hasGeneratedContent || ! hasOriginalContent;
+
+		if ( contentIsReasonable ) {
 			return [
 				true,
 				[],
 				{
-					validationLevel: VALIDATION_LEVEL.RECONSTRUCTED_SOURCE,
+					validationLevel: VALIDATION_LEVEL.RECONSTRUCTED_BLOCK,
 					originalContent: block.originalContent,
 					generatedContent: generatedBlockContent,
 				},

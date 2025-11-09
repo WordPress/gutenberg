@@ -170,20 +170,6 @@ function applyBlockValidation( unvalidatedBlock, blockType ) {
 	);
 
 	if ( isValid ) {
-		// For Level 2 (PreservedSource), update the block's attributes to match HTML
-		// This ensures the block uses HTML-parsed attributes, not comment attributes
-		if (
-			metadata?.validationLevel === VALIDATION_LEVEL.PRESERVED_SOURCE &&
-			metadata?.reconciledAttributes
-		) {
-			return {
-				...unvalidatedBlock,
-				attributes: metadata.reconciledAttributes,
-				isValid,
-				validationIssues: [],
-				validationLevel: metadata.validationLevel,
-			};
-		}
 		return {
 			...unvalidatedBlock,
 			isValid,
