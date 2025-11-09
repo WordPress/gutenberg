@@ -32,17 +32,17 @@ import {
 import { unlock } from '../../lock-unlock';
 
 const toolbarVariations = {
-	distractionFreeDisabled: { y: '-50px' },
-	distractionFreeHover: { y: 0 },
-	distractionFreeHidden: { y: '-50px' },
+	animatedDisabled: { y: '-50px' },
+	animatedHover: { y: 0 },
+	animatedHidden: { y: '-50px' },
 	visible: { y: 0 },
 	hidden: { y: 0 },
 };
 
 const backButtonVariations = {
-	distractionFreeDisabled: { x: '-100%' },
-	distractionFreeHover: { x: 0 },
-	distractionFreeHidden: { x: '-100%' },
+	animatedDisabled: { x: '-100%' },
+	animatedHover: { x: 0 },
+	animatedHidden: { x: '-100%' },
 	visible: { x: 0 },
 	hidden: { x: 0 },
 };

@@ -43,7 +43,7 @@ function useHTMLClass( className ) {
 const headerVariants = {
 	hidden: { opacity: 1, marginTop: -60 },
 	visible: { opacity: 1, marginTop: 0 },
-	distractionFreeHover: {
+	animatedHover: {
 		opacity: 1,
 		marginTop: 0,
 		transition: {
@@ -52,11 +52,11 @@ const headerVariants = {
 			delayChildren: 0.2,
 		},
 	},
-	distractionFreeHidden: {
+	animatedHidden: {
 		opacity: 0,
 		marginTop: -60,
 	},
-	distractionFreeDisabled: {
+	animatedDisabled: {
 		opacity: 0,
 		marginTop: 0,
 		transition: {
@@ -69,7 +69,8 @@ const headerVariants = {
 
 function InterfaceSkeleton(
 	{
-		isDistractionFree,
+		shouldAnimateHeader,
+		noticesInHeader,
 		footer,
 		header,
 		editorNotices,
@@ -116,7 +117,8 @@ function InterfaceSkeleton(
 			className={ clsx(
 				className,
 				'interface-interface-skeleton',
-				!! footer && 'has-footer'
+				!! footer && 'has-footer',
+				shouldAnimateHeader && 'has-animated-header'
 			) }
 		>
 			<div className="interface-interface-skeleton__editor">
@@ -127,23 +129,23 @@ function InterfaceSkeleton(
 							className="interface-interface-skeleton__header"
 							aria-label={ mergedLabels.header }
 							initial={
-								isDistractionFree && ! isMobileViewport
-									? 'distractionFreeHidden'
+								shouldAnimateHeader && ! isMobileViewport
+									? 'animatedHidden'
 									: 'hidden'
 							}
 							whileHover={
-								isDistractionFree && ! isMobileViewport
-									? 'distractionFreeHover'
+								shouldAnimateHeader && ! isMobileViewport
+									? 'animatedHover'
 									: 'visible'
 							}
 							animate={
-								isDistractionFree && ! isMobileViewport
-									? 'distractionFreeDisabled'
+								shouldAnimateHeader && ! isMobileViewport
+									? 'animatedDisabled'
 									: 'visible'
 							}
 							exit={
-								isDistractionFree && ! isMobileViewport
-									? 'distractionFreeHidden'
+								shouldAnimateHeader && ! isMobileViewport
+									? 'animatedHidden'
 									: 'hidden'
 							}
 							variants={ headerVariants }
@@ -153,7 +155,7 @@ function InterfaceSkeleton(
 						</NavigableRegion>
 					) }
 				</AnimatePresence>
-				{ isDistractionFree && (
+				{ noticesInHeader && (
 					<div className="interface-interface-skeleton__header">
 						{ editorNotices }
 					</div>

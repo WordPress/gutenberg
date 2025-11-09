@@ -63,9 +63,11 @@ export default function EditorInterface( {
 		documentLabel,
 		stylesPath,
 		showStylebook,
+		renderingMode,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
-		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
+		const { getEditorSettings, getPostTypeLabel, getRenderingMode } =
+			select( editorStore );
 		const { getStylesPath, getShowStylebook } = unlock(
 			select( editorStore )
 		);
@@ -92,6 +94,7 @@ export default function EditorInterface( {
 				postTypeLabel || _x( 'Document', 'noun, breadcrumb' ),
 			stylesPath: getStylesPath(),
 			showStylebook: getShowStylebook(),
+			renderingMode: getRenderingMode(),
 		};
 	}, [] );
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -115,9 +118,14 @@ export default function EditorInterface( {
 		[ entitiesSavedStatesCallback ]
 	);
 
+	const shouldAnimateHeader =
+		isDistractionFree && renderingMode !== 'template-locked';
+	const noticesInHeader = isDistractionFree;
+
 	return (
 		<InterfaceSkeleton
-			isDistractionFree={ isDistractionFree }
+			shouldAnimateHeader={ shouldAnimateHeader }
+			noticesInHeader={ noticesInHeader }
 			className={ clsx( 'editor-editor-interface', className, {
 				'is-entity-save-view-open': !! entitiesSavedStatesCallback,
 				'is-distraction-free': isDistractionFree && ! isPreviewMode,

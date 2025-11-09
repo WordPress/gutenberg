@@ -31,8 +31,8 @@ $regionOutlineRatio: 2;
 	// a more abstracted approach to make the navigable regions focus style work
 	// regardless of the CSS used on other components.
 
-	// Header top bar when Distraction free mode is on.
-	&.is-distraction-free .interface-interface-skeleton__header .edit-post-header,
+	// Header top bar when animated header is enabled.
+	&.has-animated-header .interface-interface-skeleton__header .edit-post-header,
 	.interface-interface-skeleton__sidebar .editor-layout__toggle-sidebar-panel,
 	.interface-interface-skeleton__actions .editor-layout__toggle-publish-panel,
 	.interface-interface-skeleton__actions .editor-layout__toggle-entities-saved-states-panel,
