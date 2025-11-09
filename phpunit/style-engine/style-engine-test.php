@@ -794,4 +794,46 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 
 		$this->assertSame( '.foo{@media (orientation: landscape){background-color:blue;}}.foo{@media (min-width > 1024px){background-color:cotton-blue;}}', $compiled_stylesheet );
 	}
+
+	/**
+	 * Tests that compile_css auto-detects and converts theme.json format.
+	 *
+	 * @covers WP_Style_Engine_Gutenberg::compile_css
+	 * @covers WP_Style_Engine_Utils_Gutenberg::normalize_declarations
+	 */
+	public function test_compile_css_auto_detects_theme_json_format() {
+		// Test with theme.json format (array of arrays with 'name' and 'value' keys).
+		$theme_json_declarations = array(
+			array(
+				'name'  => 'color',
+				'value' => 'red',
+			),
+			array(
+				'name'  => 'background-color',
+				'value' => 'blue',
+			),
+		);
+
+		$result = WP_Style_Engine_Gutenberg::compile_css( $theme_json_declarations, '.test-selector' );
+
+		$this->assertSame( '.test-selector{color:red;background-color:blue;}', $result );
+	}
+
+	/**
+	 * Tests that compile_css works with associative array format (backward compatibility).
+	 *
+	 * @covers WP_Style_Engine_Gutenberg::compile_css
+	 * @covers WP_Style_Engine_Utils_Gutenberg::normalize_declarations
+	 */
+	public function test_compile_css_works_with_associative_array_format() {
+		// Test with associative array format (existing format).
+		$associative_declarations = array(
+			'color'            => 'red',
+			'background-color' => 'blue',
+		);
+
+		$result = WP_Style_Engine_Gutenberg::compile_css( $associative_declarations, '.test-selector' );
+
+		$this->assertSame( '.test-selector{color:red;background-color:blue;}', $result );
+	}
 }

@@ -657,46 +657,54 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 			return $css_declarations;
 		}
 
-		/**
-		 * Returns compiled CSS from css_declarations.
-		 *
-		 * @param string[] $css_declarations An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
-		 * @param string   $css_selector     When a selector is passed, the function will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
-		 *
-		 * @return string A compiled CSS string.
-		 */
-		public static function compile_css( $css_declarations, $css_selector ) {
-			if ( empty( $css_declarations ) || ! is_array( $css_declarations ) ) {
-				return '';
-			}
-
-			// Return an entire rule if there is a selector.
-			if ( $css_selector ) {
-				$css_rule = new WP_Style_Engine_CSS_Rule( $css_selector, $css_declarations );
-				return $css_rule->get_css();
-			}
-
-			$css_declarations = new WP_Style_Engine_CSS_Declarations( $css_declarations );
-			return $css_declarations->get_declarations_string();
+	/**
+	 * Returns compiled CSS from css_declarations.
+	 *
+	 * Accepts declarations in either format:
+	 * - Associative array: array( 'property' => 'value', ... )
+	 * - Theme.json format: array( array( 'name' => 'property', 'value' => 'value' ), ... )
+	 *
+	 * @param string[]|array[] $css_declarations An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ),
+	 *                                           or theme.json format array( array( 'name' => 'property', 'value' => 'value' ), ... ).
+	 * @param string            $css_selector     When a selector is passed, the function will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
+	 *
+	 * @return string A compiled CSS string.
+	 */
+	public static function compile_css( $css_declarations, $css_selector ) {
+		if ( empty( $css_declarations ) || ! is_array( $css_declarations ) ) {
+			return '';
 		}
 
-		/**
-		 * Returns a compiled stylesheet from stored CSS rules.
-		 *
-		 * @param WP_Style_Engine_CSS_Rule[] $css_rules An array of WP_Style_Engine_CSS_Rule objects from a store or otherwise.
-		 * @param array                      $options   {
-		 *     Optional. An array of options. Default empty array.
-		 *
-		 *     @type bool $optimize Whether to optimize the CSS output, e.g., combine rules. Default is `false`.
-		 *     @type bool $prettify Whether to add new lines and indents to output. Default is the test of whether the global constant `SCRIPT_DEBUG` is defined.
-		 * }
-		 *
-		 * @return string A compiled stylesheet from stored CSS rules.
-		 */
-		public static function compile_stylesheet_from_css_rules( $css_rules, $options = array() ) {
-			$processor = new WP_Style_Engine_Processor();
-			$processor->add_rules( $css_rules );
-			return $processor->get_css( $options );
+		// Auto-detect and convert theme.json format if needed.
+		$css_declarations = WP_Style_Engine_Utils::normalize_declarations( $css_declarations );
+
+		// Return an entire rule if there is a selector.
+		if ( $css_selector ) {
+			$css_rule = new WP_Style_Engine_CSS_Rule( $css_selector, $css_declarations );
+			return $css_rule->get_css();
 		}
+
+		$css_declarations = new WP_Style_Engine_CSS_Declarations( $css_declarations );
+		return $css_declarations->get_declarations_string();
+	}
+
+	/**
+	 * Returns a compiled stylesheet from stored CSS rules.
+	 *
+	 * @param WP_Style_Engine_CSS_Rule[] $css_rules An array of WP_Style_Engine_CSS_Rule objects from a store or otherwise.
+	 * @param array                      $options   {
+	 *     Optional. An array of options. Default empty array.
+	 *
+	 *     @type bool $optimize Whether to optimize the CSS output, e.g., combine rules. Default is `false`.
+	 *     @type bool $prettify Whether to add new lines and indents to output. Default is the test of whether the global constant `SCRIPT_DEBUG` is defined.
+	 * }
+	 *
+	 * @return string A compiled stylesheet from stored CSS rules.
+	 */
+	public static function compile_stylesheet_from_css_rules( $css_rules, $options = array() ) {
+		$processor = new WP_Style_Engine_Processor();
+		$processor->add_rules( $css_rules );
+		return $processor->get_css( $options );
+	}
 	}
 }
