@@ -6,6 +6,7 @@ import { useState } from '@wordpress/element';
 import {
 	BlockControls,
 	BlockIcon,
+	InspectorControls,
 	useBlockProps,
 } from '@wordpress/block-editor';
 import {
@@ -13,6 +14,7 @@ import {
 	ToolbarGroup,
 	Placeholder,
 	Button,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { code } from '@wordpress/icons';
 
@@ -62,10 +64,25 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 			<BlockControls>
 				<ToolbarGroup>
 					<ToolbarButton onClick={ () => setIsModalOpen( true ) }>
-						{ __( 'Edit' ) }
+						{ __( 'Edit code' ) }
 					</ToolbarButton>
 				</ToolbarGroup>
 			</BlockControls>
+			<InspectorControls>
+				<VStack
+					className="block-editor-block-inspector-edit-contents"
+					expanded
+				>
+					<Button
+						className="block-editor-block-inspector-edit-contents__button"
+						__next40pxDefaultSize
+						variant="secondary"
+						onClick={ () => setIsModalOpen( true ) }
+					>
+						{ __( 'Edit code' ) }
+					</Button>
+				</VStack>
+			</InspectorControls>
 			<Preview content={ attributes.content } isSelected={ isSelected } />
 			<HTMLEditModal
 				isOpen={ isModalOpen }
