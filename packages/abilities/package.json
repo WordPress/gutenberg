@@ -10,14 +10,14 @@
 		"api",
 		"ai"
 	],
-	"homepage": "https://github.com/WordPress/abilities-api/tree/HEAD/packages/abilities/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/abilities/README.md",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/WordPress/abilities-api.git",
+		"url": "https://github.com/WordPress/gutenberg.git",
 		"directory": "packages/abilities"
 	},
 	"bugs": {
-		"url": "https://github.com/WordPress/abilities-api/issues"
+		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
 		"node": ">=18.12.0",
