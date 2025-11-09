@@ -131,15 +131,8 @@ function TableRow< Item >( {
 					{ ...props }
 				/>
 			) }
-			aria-label={
-				titleField
-					? titleField.getValue( { item } ) || __( '(no title)' )
-					: undefined
-			}
 			aria-selected={ isSelected }
-			aria-setsize={
-				infiniteScrollEnabled ? paginationInfo.totalItems : undefined
-			}
+			aria-setsize={ paginationInfo.totalItems || undefined }
 			aria-posinset={ posinset }
 			role={ infiniteScrollEnabled ? 'article' : 'option' }
 			onClick={ () => {
@@ -383,65 +376,57 @@ function ViewPickerTable< Item >( {
 				</thead>
 				{ /* Render grouped data if groupByField is specified */ }
 				{ hasData && groupField && dataByGroup ? (
-					<Composite
-						virtualFocus
-						orientation="vertical"
-						render={ ( { children } ) => <>{ children }</> }
-					>
-						{ Array.from( dataByGroup.entries() ).map(
-							( [ groupName, groupItems ] ) => (
-								<tbody
-									key={ `group-${ groupName }` }
-									role="group"
+					Array.from( dataByGroup.entries() ).map(
+						( [ groupName, groupItems ] ) => (
+							<Composite
+								key={ `group-${ groupName }` }
+								virtualFocus
+								orientation="vertical"
+								render={ <tbody role="group" /> }
+							>
+								<tr
+									className="dataviews-view-table__group-header-row"
+									role="presentation"
 								>
-									<tr
-										className="dataviews-view-table__group-header-row"
+									<td
+										colSpan={
+											columns.length +
+											( hasPrimaryColumn ? 1 : 0 ) +
+											1
+										}
+										className="dataviews-view-table__group-header-cell"
 										role="presentation"
 									>
-										<td
-											colSpan={
-												columns.length +
-												( hasPrimaryColumn ? 1 : 0 ) +
-												1
-											}
-											className="dataviews-view-table__group-header-cell"
-											role="presentation"
-										>
-											{ sprintf(
-												// translators: 1: The label of the field e.g. "Date". 2: The value of the field, e.g.: "May 2022".
-												__( '%1$s: %2$s' ),
-												groupField.label,
-												groupName
-											) }
-										</td>
-									</tr>
-									{ groupItems.map( ( item, index ) => (
-										<TableRow
-											key={ getItemId( item ) }
-											item={ item }
-											fields={ fields }
-											id={
-												getItemId( item ) ||
-												index.toString()
-											}
-											view={ view }
-											titleField={ titleField }
-											mediaField={ mediaField }
-											descriptionField={
-												descriptionField
-											}
-											selection={ selection }
-											getItemId={ getItemId }
-											onChangeSelection={
-												onChangeSelection
-											}
-											multiselect={ isMultiselect }
-										/>
-									) ) }
-								</tbody>
-							)
-						) }
-					</Composite>
+										{ sprintf(
+											// translators: 1: The label of the field e.g. "Date". 2: The value of the field, e.g.: "May 2022".
+											__( '%1$s: %2$s' ),
+											groupField.label,
+											groupName
+										) }
+									</td>
+								</tr>
+								{ groupItems.map( ( item, index ) => (
+									<TableRow
+										key={ getItemId( item ) }
+										item={ item }
+										fields={ fields }
+										id={
+											getItemId( item ) ||
+											index.toString()
+										}
+										view={ view }
+										titleField={ titleField }
+										mediaField={ mediaField }
+										descriptionField={ descriptionField }
+										selection={ selection }
+										getItemId={ getItemId }
+										onChangeSelection={ onChangeSelection }
+										multiselect={ isMultiselect }
+									/>
+								) ) }
+							</Composite>
+						)
+					)
 				) : (
 					<Composite
 						render={ <tbody role="presentation" /> }
@@ -463,9 +448,7 @@ function ViewPickerTable< Item >( {
 									getItemId={ getItemId }
 									onChangeSelection={ onChangeSelection }
 									multiselect={ isMultiselect }
-									posinset={
-										isInfiniteScroll ? index + 1 : undefined
-									}
+									posinset={ index + 1 }
 								/>
 							) ) }
 					</Composite>
