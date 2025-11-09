@@ -29,14 +29,13 @@ import {
 import {
 	generatePhpFromTemplate,
 	getPhpReplacements,
-	generateRoutesPhp,
-	generateRoutesRegistry,
 } from './php-generator.mjs';
 import { getPackageInfo, getPackageInfoFromFile } from './package-utils.mjs';
 import { createWordpressExternalsPlugin } from './wordpress-externals-plugin.mjs';
 import {
 	getAllRoutes,
 	getRouteFiles,
+	getRouteMetadata,
 	generateContentEntryPoint,
 } from './route-utils.mjs';
 
@@ -82,6 +81,7 @@ const SCRIPT_GLOBAL = WP_PLUGIN_CONFIG.scriptGlobal;
 const PACKAGE_NAMESPACE = WP_PLUGIN_CONFIG.packageNamespace;
 const HANDLE_PREFIX = WP_PLUGIN_CONFIG.handlePrefix || PACKAGE_NAMESPACE;
 const EXTERNAL_NAMESPACES = WP_PLUGIN_CONFIG.externalNamespaces || {};
+const PAGES = WP_PLUGIN_CONFIG.pages || [];
 
 const baseDefine = {
 	'globalThis.IS_GUTENBERG_PLUGIN': JSON.stringify(
@@ -784,6 +784,123 @@ async function generateMainIndexPhp( replacements ) {
 }
 
 /**
+ * Generate global route registry file.
+ * Creates a single registry with all routes including page metadata.
+ *
+ * @param {Array}                  routes       Array of route objects.
+ * @param {Record<string, string>} replacements PHP template replacements.
+ */
+async function generateRoutesRegistry( routes, replacements ) {
+	if ( routes.length === 0 ) {
+		// No routes to register, skip generating routes registry
+		return;
+	}
+
+	// Generate PHP array entries with page metadata
+	const routeEntries = routes
+		.map( ( route ) => {
+			const hasRouteStr = route.hasRoute ? 'true' : 'false';
+			const hasContentStr = route.hasContent ? 'true' : 'false';
+			return `\tarray(
+		'name'        => '${ route.name }',
+		'path'        => '${ route.path }',
+		'page'        => '${ route.page }',
+		'has_route'   => ${ hasRouteStr },
+		'has_content' => ${ hasContentStr },
+	)`;
+		} )
+		.join( ',\n' );
+
+	// Generate single global registry at build/routes/index.php
+	await generatePhpFromTemplate(
+		'route-registry.php.template',
+		path.join( BUILD_DIR, 'routes', 'index.php' ),
+		{ ...replacements, '{{ROUTES}}': routeEntries }
+	);
+}
+
+/**
+ * Generate routes.php file with route registration logic.
+ * Uses registry pattern with loop-based registration on page init hooks.
+ *
+ * @param {Array}                  routes       Array of route objects.
+ * @param {Record<string, string>} replacements PHP template replacements.
+ */
+async function generateRoutesPhp( routes, replacements ) {
+	if ( routes.length === 0 ) {
+		// No routes to register, skip generating routes.php
+		return;
+	}
+
+	// Generate routes.php from template
+	await generatePhpFromTemplate(
+		'routes-registration.php.template',
+		path.join( BUILD_DIR, 'routes.php' ),
+		{ ...replacements, '{{HANDLE_PREFIX}}': HANDLE_PREFIX }
+	);
+}
+
+/**
+ * Generate page-specific PHP files for all pages.
+ *
+ * @param {Array}                  pageData     Array of page objects with routes.
+ * @param {Record<string, string>} replacements PHP template replacements.
+ */
+async function generatePagesPhp( pageData, replacements ) {
+	if ( pageData.length === 0 ) {
+		// No pages to generate
+		return;
+	}
+
+	// Generate files for each page
+	const pageGenerationPromises = pageData.map( async ( page ) => {
+		// Skip pages with no routes
+		if ( page.routes.length === 0 ) {
+			return;
+		}
+
+		const pageSlugUnderscore = page.slug.replace( /-/g, '_' );
+		const prefixUnderscore = replacements[ '{{PREFIX}}' ].replace(
+			/-/g,
+			'_'
+		);
+
+		// Generate page.php
+		await generatePhpFromTemplate(
+			'page.php.template',
+			path.join( BUILD_DIR, 'pages', page.slug, 'page.php' ),
+			{
+				...replacements,
+				'{{PAGE_SLUG}}': page.slug,
+				'{{PAGE_SLUG_UNDERSCORE}}': pageSlugUnderscore,
+				'{{PREFIX}}': prefixUnderscore,
+			}
+		);
+
+		// Generate empty loader.js (dummy module for dependencies)
+		await writeFile(
+			path.join( BUILD_DIR, 'pages', page.slug, 'loader.js' ),
+			'// Empty module loader for page dependencies\n'
+		);
+	} );
+
+	await Promise.all( pageGenerationPromises );
+
+	// Generate pages.php loader
+	const pageIncludes = pageData
+		.map( ( page ) => {
+			return `require_once __DIR__ . '/pages/${ page.slug }/page.php';`;
+		} )
+		.join( '\n' );
+
+	await generatePhpFromTemplate(
+		'pages.php.template',
+		path.join( BUILD_DIR, 'pages.php' ),
+		{ ...replacements, '{{PAGE_INCLUDES}}': pageIncludes }
+	);
+}
+
+/**
  * Transpile a single package's source files and copy JSON files.
  *
  * @param {string} packageName Package name.
@@ -1281,6 +1398,29 @@ async function buildAll() {
 	// Build routes
 	await buildAllRoutes();
 
+	// Collect route and page data for PHP generation
+	const routes = getAllRoutes( ROOT_DIR ).map( ( routeName ) => {
+		const metadata = getRouteMetadata( ROOT_DIR, routeName );
+		const routeFiles = getRouteFiles(
+			path.join( ROOT_DIR, 'routes', routeName )
+		);
+		return {
+			name: routeName,
+			path: metadata?.path,
+			page: metadata?.page,
+			hasRoute: routeFiles.hasRoute,
+			hasContent: routeFiles.hasStage || routeFiles.hasInspector,
+		};
+	} );
+
+	const pageData = PAGES.map( ( pageSlug ) => {
+		const pageRoutes = routes.filter( ( r ) => r.page === pageSlug );
+		return {
+			slug: pageSlug,
+			routes: pageRoutes,
+		};
+	} );
+
 	console.log( '\n📄 Generating PHP registration files...\n' );
 	const phpReplacements = await getPhpReplacements( ROOT_DIR );
 	await Promise.all( [
@@ -1289,17 +1429,9 @@ async function buildAll() {
 		generateScriptRegistrationPhp( scripts, phpReplacements ),
 		generateStyleRegistrationPhp( styles, phpReplacements ),
 		generateVersionPhp( phpReplacements ),
-		generateRoutesRegistry(
-			ROOT_DIR,
-			BUILD_DIR,
-			phpReplacements[ '{{PREFIX}}' ]
-		),
-		generateRoutesPhp(
-			ROOT_DIR,
-			BUILD_DIR,
-			HANDLE_PREFIX,
-			phpReplacements[ '{{PREFIX}}' ]
-		),
+		generateRoutesRegistry( routes, phpReplacements ),
+		generateRoutesPhp( routes, phpReplacements ),
+		generatePagesPhp( pageData, phpReplacements ),
 	] );
 	console.log( '   ✔ Generated build/modules.php' );
 	console.log( '   ✔ Generated build/modules/index.php' );
@@ -1309,6 +1441,12 @@ async function buildAll() {
 	console.log( '   ✔ Generated build/styles/index.php' );
 	console.log( '   ✔ Generated build/version.php' );
 	console.log( '   ✔ Generated build/routes.php' );
+	if ( PAGES.length > 0 ) {
+		console.log( '   ✔ Generated build/pages.php' );
+		for ( const page of PAGES ) {
+			console.log( `   ✔ Generated build/pages/${ page }/page.php` );
+		}
+	}
 	console.log( '   ✔ Generated build/index.php' );
 
 	const totalTime = Date.now() - startTime;

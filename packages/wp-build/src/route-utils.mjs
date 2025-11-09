@@ -5,6 +5,11 @@ import { readdirSync } from 'fs';
 import path from 'path';
 
 /**
+ * Internal dependencies
+ */
+import { getPackageInfoFromFile } from './package-utils.mjs';
+
+/**
  * Get all route names from the routes directory.
  *
  * @param {string} rootDir Root directory of the project.
@@ -21,6 +26,39 @@ export function getAllRoutes( rootDir ) {
 		// Routes directory doesn't exist, return empty array
 		return [];
 	}
+}
+
+/**
+ * @typedef {Object} RouteMetadata
+ * @property {string}      name Route name.
+ * @property {string}      path Route path.
+ * @property {string|null} page Page slug this route belongs to.
+ */
+
+/**
+ * Get route metadata from package.json.
+ *
+ * @param {string} rootDir   Root directory of the project.
+ * @param {string} routeName Route name.
+ * @return {RouteMetadata|null} Route metadata object or null if not found.
+ */
+export function getRouteMetadata( rootDir, routeName ) {
+	const routePackageJson =
+		/** @type {import('./package-utils.mjs').RoutePackageJson|null} */ (
+			getPackageInfoFromFile(
+				path.join( rootDir, 'routes', routeName, 'package.json' )
+			)
+		);
+
+	if ( ! routePackageJson || ! routePackageJson.route ) {
+		return null;
+	}
+
+	return {
+		name: routeName,
+		path: routePackageJson.route.path,
+		page: routePackageJson.route.page || null,
+	};
 }
 
 /**

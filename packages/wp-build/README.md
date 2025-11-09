@@ -201,6 +201,28 @@ This allows your packages to consume third-party dependencies as externals:
 
 If `handlePrefix` is omitted, it defaults to the namespace key (e.g., `"woo"` → `woo-cart`).
 
+### `wpPlugin.pages` (Experimental)
+
+Define admin pages that support routes. Each page gets generated PHP functions for route registration and can be extended by other plugins:
+
+```json
+{
+	"wpPlugin": {
+		"pages": ["my-admin-page"]
+	}
+}
+```
+
+This generates:
+- `build/pages/my-admin-page/page.php` - Page scaffold with route registration functions
+- `build/pages.php` - Loader for all pages
+
+The generated page scaffold includes:
+- `register_my_admin_page_route()` - Function to register routes
+- `register_my_admin_page_menu_item()` - Function to register menu items
+- `my_admin_page_render_page()` - Function to render the page
+- `my_admin_page_init` - Action hook for extensions to register routes/menu items
+
 ### Example: WordPress Core (Gutenberg)
 
 ```json
@@ -254,7 +276,7 @@ require_once plugin_dir_path( __FILE__ ) . 'build/index.php';
 
 ## Routes (Experimental)
 
-Routes provide a file-based routing system for WordPress admin pages. Create a `routes/` directory at your repository root with subdirectories for each route.
+Routes provide a file-based routing system for WordPress admin pages. Each route must be associated with a page defined in `wpPlugin.pages` (see above). Create a `routes/` directory at your repository root with subdirectories for each route.
 
 ### Structure
 
@@ -274,10 +296,13 @@ In `routes/{route-name}/package.json`:
 ```json
 {
 	"route": {
-		"path": "/"
+		"path": "/",
+		"page": "my-admin-page"
 	}
 }
 ```
+
+The `page` field must match one of the pages defined in `wpPlugin.pages` in your root `package.json`. This tells the build system which page this route belongs to. It can also map to an existing page registered by another plugin.
 
 ### Components
 
