@@ -13,7 +13,7 @@ import {
 	getBlockType,
 } from '../registration';
 import { getSaveContent } from '../serializer';
-import { validateBlock } from '../validation';
+import { validateBlock, VALIDATION_LEVEL } from '../validation';
 import { createBlock } from '../factory';
 import { convertLegacyBlockNameAndAttributes } from './convert-legacy-block';
 import { serializeRawBlock } from './serialize-raw-block';
@@ -164,9 +164,25 @@ function createMissingBlockType( rawBlock ) {
  */
 function applyBlockValidation( unvalidatedBlock, blockType ) {
 	// Attempt to validate the block.
-	const [ isValid ] = validateBlock( unvalidatedBlock, blockType );
+	const [ isValid, , metadata ] = validateBlock(
+		unvalidatedBlock,
+		blockType
+	);
 
 	if ( isValid ) {
+		// For Level 2 (PreservedSource), update the block's attributes to match HTML
+		// This ensures the block uses HTML-parsed attributes, not comment attributes
+		if (
+			metadata?.validationLevel === VALIDATION_LEVEL.PRESERVED_SOURCE &&
+			metadata?.reconciledAttributes
+		) {
+			return {
+				...unvalidatedBlock,
+				attributes: metadata.reconciledAttributes,
+				isValid,
+				validationIssues: [],
+			};
+		}
 		return { ...unvalidatedBlock, isValid, validationIssues: [] };
 	}
 

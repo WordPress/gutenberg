@@ -1029,6 +1029,7 @@ export function validateBlock( block, blockTypeOrName = block.name ) {
 						validationLevel: VALIDATION_LEVEL.PRESERVED_SOURCE,
 						originalContent: block.originalContent,
 						generatedContent: generatedBlockContent,
+						reconciledAttributes: htmlOnlyAttrs, // Return HTML-parsed attrs to update the block
 					},
 				];
 			}
