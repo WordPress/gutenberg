@@ -74,11 +74,16 @@ export function useEntityBinding( { clientId, attributes } ) {
 	// Check if the bound entity is available (not deleted)
 	const isBoundEntityAvailable = useSelect(
 		( select ) => {
-			const isPostType =
-				kind === 'post-type' || type === 'post' || type === 'page';
+			const isPostType = kind === 'post-type';
+			const isTaxonomy = kind === 'taxonomy';
 
-			if ( ! isPostType || ! hasCorrectBinding || ! id ) {
-				return true; // Assume available if not a post type or no binding
+			// Only check entity availability for post types and taxonomies with bindings
+			if (
+				( ! isPostType && ! isTaxonomy ) ||
+				! hasCorrectBinding ||
+				! id
+			) {
+				return false; // No bound entity available if not a post type/taxonomy or no binding
 			}
 
 			// Skip check in disabled contexts to avoid unnecessary requests
@@ -88,9 +93,12 @@ export function useEntityBinding( { clientId, attributes } ) {
 
 			const { getEntityRecord, hasFinishedResolution } =
 				select( coreStore );
-			const entityRecord = getEntityRecord( 'postType', type, id );
+
+			// Use the correct entity type based on kind
+			const entityType = isTaxonomy ? 'taxonomy' : 'postType';
+			const entityRecord = getEntityRecord( entityType, type, id );
 			const hasResolved = hasFinishedResolution( 'getEntityRecord', [
-				'postType',
+				entityType,
 				type,
 				id,
 			] );
