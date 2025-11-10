@@ -188,6 +188,19 @@ export function Controls( {
 						isDeleted && hasUrlBinding ? 'true' : undefined
 					}
 					aria-describedby={ helpTextId }
+					className={
+						isDeleted && hasUrlBinding
+							? 'navigation-link-control__input-with-error-suffix'
+							: undefined
+					}
+					onClick={
+						isDeleted && hasUrlBinding
+							? () => {
+									unsyncBoundLink();
+									shouldFocusURLInputRef.current = true;
+							  }
+							: undefined
+					}
 					onChange={ ( newValue ) => {
 						if ( isBindingActive ) {
 							return;
@@ -252,6 +265,11 @@ export function Controls( {
 								showTooltip
 								label={ __( 'Unsync and edit' ) }
 								__next40pxDefaultSize
+								className={
+									isDeleted && hasUrlBinding
+										? 'navigation-link-control__error-suffix-button'
+										: undefined
+								}
 							/>
 						)
 					}

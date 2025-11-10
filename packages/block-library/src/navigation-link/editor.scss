@@ -143,3 +143,67 @@
 		text-transform: uppercase;
 	}
 }
+
+/**
+ * Error state for navigation link control input.
+ * When entity is deleted, make the suffix button fill the entire input area
+ * so clicking anywhere in the input triggers unsync.
+ */
+.navigation-link-control__input-with-error-suffix {
+	cursor: pointer;
+
+	// Make the input container position relative so we can absolutely position the suffix
+	.components-input-control__container {
+		position: relative;
+	}
+
+	// Make the input field appear clickable
+	input[type="url"] {
+		cursor: pointer;
+	}
+
+	// Make the suffix wrapper fill the entire input area
+	.components-input-control__suffix {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		padding: 0;
+		pointer-events: none; // Allow clicks to pass through to the button
+		z-index: 1;
+	}
+
+	// Make the button fill the entire suffix area (which fills the input)
+	.navigation-link-control__error-suffix-button {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		width: 100%;
+		height: 100%;
+		pointer-events: auto; // Re-enable pointer events for the button
+		background: transparent;
+		border: none;
+		border-radius: 0;
+		padding: 0;
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		padding-right: $grid-unit-10;
+		margin: 0;
+
+		&:hover {
+			background: transparent;
+		}
+
+		// Keep the icon visible on the right side
+		svg {
+			pointer-events: none;
+		}
+	}
+}
