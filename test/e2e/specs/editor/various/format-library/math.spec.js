@@ -13,26 +13,30 @@ test.describe( 'Format Library - Math', () => {
 		page,
 		pageUtils,
 	} ) => {
-		// Add a paragraph block
 		await editor.canvas
 			.getByRole( 'button', { name: 'Add default block' } )
 			.click();
 
-		// Type some text
 		await page.keyboard.type( 'equation: ' );
 
-		// Access Math format via More menu
 		await editor.clickBlockToolbarButton( 'More' );
 		await page.getByRole( 'menuitem', { name: 'Math' } ).click();
 
-		// Type LaTeX in the popover input
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'equation: ',
+				},
+			},
+		] );
+
 		const mathInput = page.locator(
 			'.block-editor-format-toolbar__math-input input'
 		);
 		await mathInput.fill( 'x^2' );
 
-		// Verify the block contains math element with data-latex attribute
-		await expect.poll( editor.getBlocks ).toMatchObject( [
+		expect( await editor.getBlocks() ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: {
@@ -42,18 +46,12 @@ test.describe( 'Format Library - Math', () => {
 			},
 		] );
 
-		// Test arrow key navigation around math element
-		// Shift+Tab to move focus out of the input
+		// Test typing before.
 		await pageUtils.pressKeys( 'shift+Tab' );
-
-		// Arrow left to move cursor before the math element
 		await page.keyboard.press( 'ArrowLeft' );
-
-		// Type text before the math
 		await page.keyboard.type( 'a' );
 
-		// Verify text is before the math
-		await expect.poll( editor.getBlocks ).toMatchObject( [
+		expect( await editor.getBlocks() ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: {
@@ -63,14 +61,11 @@ test.describe( 'Format Library - Math', () => {
 			},
 		] );
 
-		// Arrow right to move cursor after the math element
+		// Test typing after.
 		await page.keyboard.press( 'ArrowRight' );
-
-		// Type text after the math
 		await page.keyboard.type( 'b' );
 
-		// Verify text is after the math
-		await expect.poll( editor.getBlocks ).toMatchObject( [
+		expect( await editor.getBlocks() ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: {
@@ -80,19 +75,12 @@ test.describe( 'Format Library - Math', () => {
 			},
 		] );
 
+		// Test removing math element.
 		await pageUtils.pressKeys( 'ArrowLeft' );
-
-		// Test selecting and clearing math element
-		// Shift+ArrowLeft to select the math element (cursor is already after it)
 		await pageUtils.pressKeys( 'shift+ArrowLeft' );
-
-		// Shift+Tab to focus into the input
 		await page.keyboard.press( 'Tab' );
-
-		// Empty the content
 		await page.keyboard.press( 'Backspace' );
 
-		// Verify the math element is removed
 		expect( await editor.getBlocks() ).toMatchObject( [
 			{
 				name: 'core/paragraph',
