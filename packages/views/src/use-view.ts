@@ -66,7 +66,7 @@ export function useView( config: ViewConfig ): UseViewReturn {
 	const { set } = useDispatch( preferencesStore );
 
 	const baseView: View = persistedView ?? defaultView;
-	const page = queryParams?.page ?? baseView.page ?? 1;
+	const page = Number( queryParams?.page ?? baseView.page ?? 1 );
 	const search = queryParams?.search ?? baseView.search ?? '';
 
 	// Merge URL query parameters (page, search) into the view
@@ -84,7 +84,7 @@ export function useView( config: ViewConfig ): UseViewReturn {
 		( newView: View ) => {
 			// Extract URL params (page, search) from the new view
 			const urlParams: { page?: number; search?: string } = {
-				page: newView?.page,
+				page: Number( newView?.page ),
 				search: newView?.search,
 			};
 			const preferenceView = omit( newView, [ 'page', 'search' ] );
