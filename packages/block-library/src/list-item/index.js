@@ -34,7 +34,7 @@ export const settings = {
 };
 
 if ( window.__experimentalContentOnlyPatternInsertion ) {
-	settings.controls = [
+	settings.fields = [
 		{
 			label: __( 'Content' ),
 			type: 'RichText',
