@@ -49,6 +49,8 @@ function Editor( {
 				getResolutionError,
 				hasFinishedResolution,
 				getCurrentTheme,
+				__experimentalGetCurrentGlobalStylesId,
+				canUser,
 			} = select( coreStore );
 			const { getRenderingMode, getCurrentPostType } =
 				select( editorStore );
@@ -57,6 +59,14 @@ function Editor( {
 			const renderingMode = getRenderingMode();
 			const currentPostType = getCurrentPostType();
 			const _isBlockTheme = getCurrentTheme()?.is_block_theme;
+			const globalStylesId = __experimentalGetCurrentGlobalStylesId();
+			const userCanEditGlobalStyles = globalStylesId
+				? canUser( 'update', {
+						kind: 'root',
+						name: 'globalStyles',
+						id: globalStylesId,
+				  } )
+				: false;
 
 			return {
 				post: getEntityRecord( ...postArgs ),
@@ -76,6 +86,7 @@ function Editor( {
 				isBlockTheme: _isBlockTheme,
 				showGlobalStyles:
 					_isBlockTheme &&
+					userCanEditGlobalStyles &&
 					( currentPostType === 'wp_template' ||
 						renderingMode === 'template-locked' ),
 			};

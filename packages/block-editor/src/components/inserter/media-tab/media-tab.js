@@ -77,7 +77,13 @@ function MediaTab( {
 			if ( ! media?.url ) {
 				return;
 			}
-			const [ block ] = getBlockAndPreviewFromMedia( media, media.type );
+			// When the experimental DataViews media modal is enabled,
+			// we need to extract the media type from mime_type (e.g., 'image/jpeg' -> 'image')
+			const mediaType =
+				window.__experimentalDataViewsMediaModal && media.mime_type
+					? media.mime_type.split( '/' )[ 0 ]
+					: media.type;
+			const [ block ] = getBlockAndPreviewFromMedia( media, mediaType );
 			onInsert( block );
 		},
 		[ onInsert ]

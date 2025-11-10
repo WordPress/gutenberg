@@ -131,7 +131,12 @@ export default function BlockToolbarIcon( { clientIds, isSynced } ) {
 	// Used to hide the block icon when the showIconLabels preference is enabled, or to display the template title when it's a template.
 	const text = showBlockTitle && blockTitle ? blockTitle : undefined;
 
-	const BlockIconElement = <BlockIcon icon={ icon } />;
+	const BlockIconElement = (
+		<BlockIcon
+			className="block-editor-block-toolbar__block-icon"
+			icon={ icon }
+		/>
+	);
 
 	if ( variant === 'switcher' ) {
 		return (
@@ -159,7 +164,7 @@ export default function BlockToolbarIcon( { clientIds, isSynced } ) {
 	return (
 		<ToolbarButton
 			disabled
-			className="block-editor-block-toolbar__block-icon"
+			className="block-editor-block-toolbar__block-icon-button"
 			title={ label }
 			icon={ BlockIconElement }
 			text={ text }

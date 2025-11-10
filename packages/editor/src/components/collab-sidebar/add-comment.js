@@ -36,12 +36,10 @@ export function AddComment( {
 	y,
 	refs,
 } ) {
-	const { clientId, blockCommentId } = useSelect( ( select ) => {
-		const { getSelectedBlock } = select( blockEditorStore );
-		const selectedBlock = getSelectedBlock();
+	const { clientId } = useSelect( ( select ) => {
+		const { getSelectedBlockClientId } = select( blockEditorStore );
 		return {
-			clientId: selectedBlock?.clientId,
-			blockCommentId: selectedBlock?.attributes?.metadata?.noteId,
+			clientId: getSelectedBlockClientId(),
 		};
 	}, [] );
 	const blockElement = useBlockElement( clientId );
@@ -53,11 +51,7 @@ export function AddComment( {
 		toggleBlockSpotlight( clientId, false );
 	};
 
-	if (
-		newNoteFormState !== 'open' ||
-		! clientId ||
-		undefined !== blockCommentId
-	) {
+	if ( newNoteFormState !== 'open' || ! clientId ) {
 		return null;
 	}
 
