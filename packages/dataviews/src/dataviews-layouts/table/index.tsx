@@ -196,7 +196,37 @@ function TableRow< Item >( {
 		>
 			{ hasBulkActions && (
 				<td className="dataviews-view-table__checkbox-column">
-					<div className="dataviews-view-table__cell-content-wrapper">
+					{ /* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */ }
+					<div
+						className="dataviews-view-table__cell-content-wrapper"
+						onClick={ ( event ) => {
+							if ( ! hasPossibleBulkAction ) {
+								return;
+							}
+							// Prevent triggering if clicking directly on the checkbox
+							if (
+								event.target instanceof HTMLElement &&
+								( event.target.tagName === 'INPUT' ||
+									event.target.closest( 'input' ) )
+							) {
+								return;
+							}
+							// Stop propagation to prevent row click handler from interfering
+							event.stopPropagation();
+							onChangeSelection(
+								selection.includes( id )
+									? selection.filter(
+											( itemId ) => id !== itemId
+									  )
+									: [ ...selection, id ]
+							);
+						} }
+						style={ {
+							cursor: hasPossibleBulkAction
+								? 'pointer'
+								: 'default',
+						} }
+					>
 						<DataViewsSelectionCheckbox
 							item={ item }
 							selection={ selection }

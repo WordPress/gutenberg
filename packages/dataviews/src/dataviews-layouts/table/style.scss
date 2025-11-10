@@ -47,10 +47,24 @@
 
 		&.dataviews-view-table__checkbox-column {
 			padding-right: 0;
+			padding-left: 0;
 
 			.dataviews-view-table__cell-content-wrapper {
 				max-width: auto;
 				min-width: auto;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				padding: $grid-unit-15;
+				min-height: 100%;
+			}
+
+			> div {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				padding: $grid-unit-15;
+				min-height: 100%;
 			}
 		}
 	}

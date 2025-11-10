@@ -121,25 +121,44 @@ export function BulkSelectionCheckbox< Item >( {
 			selectableItems.includes( item )
 	);
 	const areAllSelected = selectedItems.length === selectableItems.length;
+	const handleToggle = () => {
+		if ( areAllSelected ) {
+			onChangeSelection( [] );
+		} else {
+			onChangeSelection(
+				selectableItems.map( ( item ) => getItemId( item ) )
+			);
+		}
+	};
 	return (
-		<CheckboxControl
-			className="dataviews-view-table-selection-checkbox"
-			__nextHasNoMarginBottom
-			checked={ areAllSelected }
-			indeterminate={ ! areAllSelected && !! selectedItems.length }
-			onChange={ () => {
-				if ( areAllSelected ) {
-					onChangeSelection( [] );
-				} else {
-					onChangeSelection(
-						selectableItems.map( ( item ) => getItemId( item ) )
-					);
+		// eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
+		<div
+			onClick={ ( event ) => {
+				// Prevent triggering if clicking directly on the checkbox
+				if (
+					event.target instanceof HTMLElement &&
+					( event.target.tagName === 'INPUT' ||
+						event.target.closest( 'input' ) )
+				) {
+					return;
 				}
+				// Stop propagation to prevent any parent handlers from interfering
+				event.stopPropagation();
+				handleToggle();
 			} }
-			aria-label={
-				areAllSelected ? __( 'Deselect all' ) : __( 'Select all' )
-			}
-		/>
+			style={ { cursor: 'pointer' } }
+		>
+			<CheckboxControl
+				className="dataviews-view-table-selection-checkbox"
+				__nextHasNoMarginBottom
+				checked={ areAllSelected }
+				indeterminate={ ! areAllSelected && !! selectedItems.length }
+				onChange={ handleToggle }
+				aria-label={
+					areAllSelected ? __( 'Deselect all' ) : __( 'Select all' )
+				}
+			/>
+		</div>
 	);
 }
 
