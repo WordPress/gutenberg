@@ -495,6 +495,16 @@ function Thread( {
 					event.relatedTarget &&
 					! event.currentTarget.contains( event.relatedTarget )
 				) {
+					// Don't collapse if focus moved to a menu or menu item
+					// (menus may be rendered in portals outside the thread).
+					const related = event.relatedTarget;
+					if (
+						related.closest?.(
+							'[role="menu"], [role="menuitem"], .components-popover'
+						)
+					) {
+						return;
+					}
 					unselectThread();
 				}
 			} }
