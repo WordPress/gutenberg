@@ -34,7 +34,7 @@ const DEFAULT_POST_BASE = {
 	},
 	showLevels: true,
 	titleField: 'title',
-	mediaField: 'featured_media',
+	mediaField: 'content-preview',
 	fields: [ 'author', 'status' ],
 	...defaultLayouts.list,
 };
