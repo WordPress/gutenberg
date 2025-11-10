@@ -660,9 +660,9 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		/**
 		 * Returns compiled CSS from css_declarations.
 		 *
-		 * Accepts declarations in either format:
+		 * For backwards compatibility, accepts declarations in two formats:
 		 * - Associative array: array( 'property' => 'value', ... )
-		 * - Theme.json format: array( array( 'name' => 'property', 'value' => 'value' ), ... )
+		 * - Theme.json format (deprecated): array( array( 'name' => 'property', 'value' => 'value' ), ... )
 		 *
 		 * @param string[]|array[] $css_declarations An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ),
 		 *                                           or theme.json format array( array( 'name' => 'property', 'value' => 'value' ), ... ).
