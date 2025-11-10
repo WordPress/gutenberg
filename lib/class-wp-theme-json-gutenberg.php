@@ -3126,10 +3126,10 @@ class WP_Theme_JSON_Gutenberg {
 
 		// Handle text-indent for paragraph blocks and text element: extract it and generate p + p selector.
 		$text_indent_declarations = array();
-		$is_processing_element = in_array( 'elements', $block_metadata['path'], true );
-		$current_element = $is_processing_element ? $block_metadata['path'][ count( $block_metadata['path'] ) - 1 ] : null;
-		$should_use_p_plus_p = ( ! empty( $block_metadata['name'] ) && 'core/paragraph' === $block_metadata['name'] ) ||
-		                       ( 'text' === $current_element );
+		$is_processing_element    = in_array( 'elements', $block_metadata['path'], true );
+		$current_element          = $is_processing_element ? $block_metadata['path'][ count( $block_metadata['path'] ) - 1 ] : null;
+		$should_use_p_plus_p      = ( ! empty( $block_metadata['name'] ) && 'core/paragraph' === $block_metadata['name'] ) ||
+									( 'text' === $current_element );
 
 		if ( $should_use_p_plus_p ) {
 			foreach ( $declarations as $index => $declaration ) {
