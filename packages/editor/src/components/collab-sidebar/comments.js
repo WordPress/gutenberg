@@ -319,12 +319,16 @@ export function Comments( {
 				return;
 			}
 
-			// Expand thread.
+			const currentIndex = threads.findIndex(
+				( t ) => t.id === thread.id
+			);
+
 			if (
 				( event.key === 'Enter' || event.key === 'ArrowRight' ) &&
 				event.currentTarget === event.target &&
 				! isSelected
 			) {
+				// Expand thread.
 				setNewNoteFormState( 'closed' );
 				setSelectedThread( thread.id );
 				if ( !! thread.blockClientId ) {
@@ -332,64 +336,49 @@ export function Comments( {
 					selectBlock( thread.blockClientId, null );
 					toggleBlockSpotlight( thread.blockClientId, true );
 				}
-				return;
-			}
-
-			// Collapse thread.
-			if (
+			} else if (
 				( ( event.key === 'Enter' || event.key === 'ArrowLeft' ) &&
 					event.currentTarget === event.target &&
 					isSelected ) ||
 				event.key === 'Escape'
 			) {
+				// Collapse thread.
 				setSelectedThread( null );
 				setNewNoteFormState( 'closed' );
 				if ( thread.blockClientId ) {
 					toggleBlockSpotlight( thread.blockClientId, false );
 				}
 				focusCommentThread( thread.id, commentSidebarRef.current );
-				return;
-			}
-
-			const currentIndex = threads.findIndex(
-				( t ) => t.id === thread.id
-			);
-
-			// Move to the next thread.
-			if (
+			} else if (
 				event.key === 'ArrowDown' &&
 				currentIndex < threads.length - 1 &&
 				event.currentTarget === event.target
 			) {
+				// Move to the next thread.
 				const nextThread = threads[ currentIndex + 1 ];
 				focusCommentThread( nextThread.id, commentSidebarRef.current );
-				return;
-			}
-
-			// Move to the previous thread.
-			if (
+			} else if (
 				event.key === 'ArrowUp' &&
 				currentIndex > 0 &&
 				event.currentTarget === event.target
 			) {
+				// Move to the previous thread.
 				const prevThread = threads[ currentIndex - 1 ];
 				focusCommentThread( prevThread.id, commentSidebarRef.current );
-			}
-
-			// Move to the first thread.
-			if (
+			} else if (
 				event.key === 'Home' &&
 				event.currentTarget === event.target
 			) {
+				// Move to the first thread.
 				focusCommentThread(
 					threads[ 0 ].id,
 					commentSidebarRef.current
 				);
-				return;
-			}
-
-			// Move to the last thread.
-			if ( event.key === 'End' && event.currentTarget === event.target ) {
+			} else if (
+				event.key === 'End' &&
+				event.currentTarget === event.target
+			) {
+				// Move to the last thread.
 				focusCommentThread(
 					threads[ threads.length - 1 ].id,
 					commentSidebarRef.current
