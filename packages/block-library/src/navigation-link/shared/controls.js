@@ -98,9 +98,9 @@ export function Controls( {
 		attributes,
 	} );
 
-	// When entity is deleted, treat as if binding doesn't exist for UI purposes
-	// but keep binding so invalid state remains visible
-	const isBindingActive = hasUrlBinding && ! isDeleted;
+	// When entity is deleted, keep binding active for UI (locked state)
+	// User must unlock to edit
+	const isBindingActive = hasUrlBinding;
 
 	// Get direct store dispatch to bypass setBoundAttributes wrapper
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
@@ -176,7 +176,7 @@ export function Controls( {
 					id={ inputId }
 					label={ __( 'Link' ) }
 					value={ ( () => {
-						if ( isDeleted ) {
+						if ( isDeleted && hasUrlBinding ) {
 							return '';
 						}
 						return inputValue ? safeDecodeURI( inputValue ) : '';
@@ -184,7 +184,9 @@ export function Controls( {
 					autoComplete="off"
 					type="url"
 					disabled={ isBindingActive }
-					aria-invalid={ isDeleted ? 'true' : undefined }
+					aria-invalid={
+						isDeleted && hasUrlBinding ? 'true' : undefined
+					}
 					aria-describedby={ helpTextId }
 					onChange={ ( newValue ) => {
 						if ( isBindingActive ) {
@@ -221,7 +223,7 @@ export function Controls( {
 						} );
 					} }
 					help={
-						isDeleted ? (
+						isDeleted && hasUrlBinding ? (
 							<MissingEntityHelpText
 								id={ helpTextId }
 								type={ attributes.type }
