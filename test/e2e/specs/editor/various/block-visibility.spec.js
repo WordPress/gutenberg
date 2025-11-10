@@ -96,7 +96,7 @@ test.describe( 'Block Visibility', () => {
 		await expect(
 			page
 				.getByRole( 'tabpanel', { name: 'Blocks' } )
-				.getByRole( 'option', { name: 'Heading' } ),
+				.getByRole( 'option', { name: 'Heading', exact: true } ),
 			'Heading block should be visible'
 		).toBeVisible();
 	} );
