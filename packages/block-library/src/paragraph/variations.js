@@ -6,17 +6,6 @@ import { Path, SVG } from '@wordpress/primitives';
 import { paragraph } from '@wordpress/icons';
 
 const variations = [
-	{
-		name: 'paragraph',
-		title: __( 'Paragraph' ),
-		description: __(
-			'Start with the basic building block of all narrative.'
-		),
-		isDefault: true,
-		scope: [ 'block', 'inserter', 'transform' ],
-		attributes: { fitText: undefined },
-		icon: paragraph,
-	},
 	// There is a hardcoded workaround in packages/block-editor/src/store/selectors.js
 	// to make Stretchy variations appear as the last of their sections in the inserter.
 	{
@@ -31,7 +20,7 @@ const variations = [
 		attributes: {
 			fitText: true,
 		},
-		scope: [ 'inserter', 'transform' ],
+		scope: [ 'inserter' ],
 		isActive: ( blockAttributes ) => blockAttributes.fitText === true,
 	},
 ];
