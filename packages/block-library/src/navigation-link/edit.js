@@ -145,7 +145,7 @@ const useIsInvalidLink = ( kind, type, id, enabled ) => {
 		( isDeleted || ( postStatus && 'trash' === postStatus ) );
 	const isDraft = 'draft' === postStatus;
 
-	return [ isInvalid, isDraft, isDeleted ];
+	return [ isInvalid, isDraft ];
 };
 
 function getMissingText( type ) {
