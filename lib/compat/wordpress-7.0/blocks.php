@@ -58,6 +58,13 @@ if ( ! function_exists( 'gutenberg_resolve_pattern_blocks' ) ) {
 					$block_metadata = $blocks_to_insert[0]['attrs']['metadata'] ?? array();
 					$metadata       = array( 'patternName' => $slug );
 
+					/*
+					* Merge pattern metadata with existing block metadata.
+					* Pattern metadata takes precedence, but existing block metadata
+					* is preserved as a fallback when the pattern doesn't define that field.
+					* Only the defined fields (name, description, categories) are merged;
+					* other metadata keys are not preserved.
+					*/
 					foreach ( array(
 						'name'        => 'title',
 						'description' => 'description',

@@ -178,36 +178,33 @@ class Tests_Resolve_Patterns_In_Templates extends WP_Test_REST_Controller_Testca
 		// Verify pattern block is resolved.
 		$blocks = parse_blocks( $data['content']['raw'] );
 		$this->assertNotEmpty( $blocks );
+		$this->assertGreaterThanOrEqual( 3, count( $blocks ), 'Template should have at least 3 blocks after pattern resolution.' );
 
-		// Find the resolved paragraph block (should not be a pattern block).
-		$has_pattern_block    = false;
-		$has_resolved_content = false;
-		$has_metadata         = false;
+		// Block structure after resolution:
+		// blocks[0] = "Before pattern" paragraph
+		// blocks[1] = Resolved pattern content (single paragraph with metadata)
+		// blocks[2] = "After pattern" paragraph
+
+		// Verify the resolved pattern block (should be at index 1).
+		$resolved_block = $blocks[1];
+		$this->assertSame( 'core/paragraph', $resolved_block['blockName'], 'Resolved pattern should be a paragraph block.' );
+		$this->assertStringContainsString( 'Single root content', $resolved_block['innerHTML'] ?? '', 'Resolved pattern should contain expected content.' );
+
+		// Verify metadata is present on single-root pattern.
+		$this->assertArrayHasKey( 'metadata', $resolved_block['attrs'], 'Resolved pattern block should have metadata.' );
+		$metadata = $resolved_block['attrs']['metadata'];
+		$this->assertSame( 'test/single-root', $metadata['patternName'], 'Pattern name should match.' );
+		$this->assertArrayHasKey( 'name', $metadata, 'Pattern name should be in metadata.' );
+		$this->assertArrayHasKey( 'description', $metadata, 'Pattern description should be in metadata.' );
+		$this->assertArrayHasKey( 'categories', $metadata, 'Pattern categories should be in metadata.' );
+		$this->assertSame( 'Single Root Pattern', $metadata['name'], 'Pattern name should match.' );
+		$this->assertSame( 'A single root pattern.', $metadata['description'], 'Pattern description should match.' );
+		$this->assertSame( array( 'text' ), $metadata['categories'], 'Pattern categories should match.' );
+
+		// Verify no pattern blocks remain.
 		foreach ( $blocks as $block ) {
-			if ( 'core/pattern' === $block['blockName'] ) {
-				$has_pattern_block = true;
-			}
-			if ( 'core/paragraph' === $block['blockName'] && isset( $block['innerHTML'] ) && strpos( $block['innerHTML'], 'Single root content' ) !== false ) {
-				$has_resolved_content = true;
-				// Verify metadata is present on single-root pattern.
-				if ( isset( $block['attrs']['metadata'] ) ) {
-					$metadata = $block['attrs']['metadata'];
-					if ( isset( $metadata['patternName'] ) && 'test/single-root' === $metadata['patternName'] ) {
-						$has_metadata = true;
-						$this->assertArrayHasKey( 'name', $metadata, 'Pattern name should be in metadata.' );
-						$this->assertArrayHasKey( 'description', $metadata, 'Pattern description should be in metadata.' );
-						$this->assertArrayHasKey( 'categories', $metadata, 'Pattern categories should be in metadata.' );
-						$this->assertSame( 'Single Root Pattern', $metadata['name'], 'Pattern name should match.' );
-						$this->assertSame( 'A single root pattern.', $metadata['description'], 'Pattern description should match.' );
-						$this->assertSame( array( 'text' ), $metadata['categories'], 'Pattern categories should match.' );
-					}
-				}
-			}
+			$this->assertNotSame( 'core/pattern', $block['blockName'], 'Pattern block should be resolved and not present in the content.' );
 		}
-
-		$this->assertFalse( $has_pattern_block, 'Pattern block should be resolved and not present in the content.' );
-		$this->assertTrue( $has_resolved_content, 'Pattern content should be resolved in the template.' );
-		$this->assertTrue( $has_metadata, 'Pattern metadata should be preserved in resolved blocks.' );
 
 		unregister_block_template( $template_name );
 	}
@@ -261,46 +258,43 @@ class Tests_Resolve_Patterns_In_Templates extends WP_Test_REST_Controller_Testca
 		$this->assertNotNull( $template_2, 'Template 2 should be found. Available template IDs: ' . implode( ', ', wp_list_pluck( $data, 'id' ) ) );
 
 		// Verify pattern blocks are resolved in template 1.
-		if ( $template_1 ) {
-			$blocks            = parse_blocks( $template_1['content']['raw'] );
-			$has_pattern_block = false;
-			$has_metadata      = false;
-			foreach ( $blocks as $block ) {
-				if ( 'core/pattern' === $block['blockName'] ) {
-					$has_pattern_block = true;
-					break;
-				}
-				// Verify metadata is present on single-root pattern.
-				if ( 'core/paragraph' === $block['blockName'] && isset( $block['attrs']['metadata'] ) ) {
-					$metadata = $block['attrs']['metadata'];
-					if ( isset( $metadata['patternName'] ) && 'test/single-root' === $metadata['patternName'] ) {
-						$has_metadata = true;
-						$this->assertArrayHasKey( 'name', $metadata, 'Pattern name should be in metadata.' );
-						$this->assertArrayHasKey( 'description', $metadata, 'Pattern description should be in metadata.' );
-						$this->assertArrayHasKey( 'categories', $metadata, 'Pattern categories should be in metadata.' );
-					}
-				}
-			}
-			$this->assertFalse( $has_pattern_block, 'Pattern block should be resolved in template 1.' );
-			$this->assertTrue( $has_metadata, 'Pattern metadata should be preserved in template 1.' );
+		$blocks = parse_blocks( $template_1['content']['raw'] );
+		$this->assertNotEmpty( $blocks, 'Template 1 should have at least one block after pattern resolution.' );
+
+		// Block structure after resolution:
+		// blocks[0] = Resolved pattern content (single paragraph with metadata)
+
+		// Verify the resolved pattern block (should be at index 0).
+		$resolved_block = $blocks[0];
+		$this->assertSame( 'core/paragraph', $resolved_block['blockName'], 'Resolved pattern should be a paragraph block.' );
+
+		// Verify metadata is present on single-root pattern.
+		$this->assertArrayHasKey( 'metadata', $resolved_block['attrs'], 'Resolved pattern block should have metadata.' );
+		$metadata = $resolved_block['attrs']['metadata'];
+		$this->assertSame( 'test/single-root', $metadata['patternName'], 'Pattern name should match.' );
+		$this->assertArrayHasKey( 'name', $metadata, 'Pattern name should be in metadata.' );
+		$this->assertArrayHasKey( 'description', $metadata, 'Pattern description should be in metadata.' );
+		$this->assertArrayHasKey( 'categories', $metadata, 'Pattern categories should be in metadata.' );
+
+		// Verify no pattern blocks remain.
+		foreach ( $blocks as $block ) {
+			$this->assertNotSame( 'core/pattern', $block['blockName'], 'Pattern block should be resolved in template 1.' );
 		}
 
 		// Verify pattern blocks are resolved in template 2.
-		if ( $template_2 ) {
-			$blocks            = parse_blocks( $template_2['content']['raw'] );
-			$has_pattern_block = false;
-			$paragraph_count   = 0;
-			foreach ( $blocks as $block ) {
-				if ( 'core/pattern' === $block['blockName'] ) {
-					$has_pattern_block = true;
-				}
-				if ( 'core/paragraph' === $block['blockName'] ) {
-					++$paragraph_count;
-				}
+		$blocks            = parse_blocks( $template_2['content']['raw'] );
+		$has_pattern_block = false;
+		$paragraph_count   = 0;
+		foreach ( $blocks as $block ) {
+			if ( 'core/pattern' === $block['blockName'] ) {
+				$has_pattern_block = true;
 			}
-			$this->assertFalse( $has_pattern_block, 'Pattern block should be resolved in template 2.' );
-			$this->assertGreaterThanOrEqual( 2, $paragraph_count, 'Template 2 should have resolved pattern content with multiple blocks.' );
+			if ( 'core/paragraph' === $block['blockName'] ) {
+				++$paragraph_count;
+			}
 		}
+		$this->assertFalse( $has_pattern_block, 'Pattern block should be resolved in template 2.' );
+		$this->assertGreaterThanOrEqual( 2, $paragraph_count, 'Template 2 should have resolved pattern content with multiple blocks.' );
 
 		unregister_block_template( $template_name_1 );
 		unregister_block_template( $template_name_2 );
