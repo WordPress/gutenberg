@@ -25,6 +25,7 @@ const {
 	routerRegions,
 	cloneElement,
 	navigationSignal,
+	warn,
 } = privateApis(
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
 );
@@ -190,6 +191,29 @@ const preparePage: PreparePage = async ( url, dom, { vdom } = {} ) => {
 
 	const regions = {};
 	const regionsToAttach = {};
+
+	if ( globalThis.SCRIPT_DEBUG ) {
+		// Warn about router regions without a `data-wp-interactive` directive.
+		const invalidRouterRegions = document.querySelectorAll(
+			'[data-wp-router-region]:not([data-wp-interactive])'
+		);
+
+		if ( invalidRouterRegions.length > 0 ) {
+			const ids = Array.from( invalidRouterRegions )
+				.map( ( region ) => {
+					const { id } = parseRegionAttribute( region );
+					return `"${ id }"`;
+				} )
+				.join( ', ' );
+
+			warn(
+				`Page "${ url }" contains the following router regions without a 'data-wp-interactive' attribute: ${ ids }.
+
+Elements with a 'data-wp-router-region' directive must also include a 'data-wp-interactive' attribute on the same element in order for these router regions to be updated correctly during navigation.`
+			);
+		}
+	}
+
 	dom.querySelectorAll( regionsSelector ).forEach( ( region ) => {
 		const { id, attachTo } = parseRegionAttribute( region );
 
