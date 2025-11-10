@@ -9,7 +9,7 @@ test.describe( 'Fit Text', () => {
 	} );
 
 	test.describe( 'Editor functionality', () => {
-		test( 'should enable fit text on a heading block via Stretchy Heading variation', async ( {
+		test( 'should enable stretchy text on a heading block via Stretchy Heading variation', async ( {
 			editor,
 			page,
 		} ) => {
@@ -48,7 +48,7 @@ test.describe( 'Fit Text', () => {
 			await expect( headingBlock ).toHaveClass( /has-fit-text/ );
 		} );
 
-		test( 'should enable fit text on a paragraph block via Stretchy Paragraph variation', async ( {
+		test( 'should enable stretchy text on a paragraph block via Stretchy Paragraph variation', async ( {
 			editor,
 			page,
 		} ) => {
@@ -132,7 +132,7 @@ test.describe( 'Fit Text', () => {
 			expect( newSize ).toBeLessThan( initialSize );
 		} );
 
-		test( 'should apply much larger font size with fit text compared to without fit text for a short text', async ( {
+		test( 'should apply much larger font size with stretchy text compared to without stretchy text for a short text', async ( {
 			editor,
 		} ) => {
 			// Insert two paragraphs with same content for comparison
@@ -268,7 +268,7 @@ test.describe( 'Fit Text', () => {
 	} );
 
 	test.describe( 'Frontend functionality', () => {
-		test( 'should render fit text correctly on the frontend', async ( {
+		test( 'should render stretchy text correctly on the frontend', async ( {
 			editor,
 			page,
 		} ) => {
@@ -377,7 +377,7 @@ test.describe( 'Fit Text', () => {
 			expect( newSize ).toBeLessThan( initialSize );
 		} );
 
-		test( 'should apply much larger font size with fit text compared to without fit text on frontend for a short text', async ( {
+		test( 'should apply much larger font size with stretchy text compared to without stretchy text on frontend for a short text', async ( {
 			editor,
 			page,
 		} ) => {
