@@ -66,6 +66,9 @@ export function Comments( {
 	const [ blockRefs, setBlockRefs ] = useState( {} );
 
 	const { setCanvasMinHeight } = unlock( useDispatch( editorStore ) );
+	const { selectBlock, toggleBlockSpotlight } = unlock(
+		useDispatch( blockEditorStore )
+	);
 	const { blockCommentId, selectedBlockClientId, orderedBlockIds } =
 		useSelect( ( select ) => {
 			const {
@@ -310,6 +313,88 @@ export function Comments( {
 		setCanvasMinHeight,
 	] );
 
+	const handleThreadNavigation = useCallback(
+		( event, thread, isSelected ) => {
+			if ( event.defaultPrevented ) {
+				return;
+			}
+
+			const currentIndex = threads.findIndex(
+				( t ) => t.id === thread.id
+			);
+
+			if (
+				( event.key === 'Enter' || event.key === 'ArrowRight' ) &&
+				event.currentTarget === event.target &&
+				! isSelected
+			) {
+				// Expand thread.
+				setNewNoteFormState( 'closed' );
+				setSelectedThread( thread.id );
+				if ( !! thread.blockClientId ) {
+					// Pass `null` as the second parameter to prevent focusing the block.
+					selectBlock( thread.blockClientId, null );
+					toggleBlockSpotlight( thread.blockClientId, true );
+				}
+			} else if (
+				( ( event.key === 'Enter' || event.key === 'ArrowLeft' ) &&
+					event.currentTarget === event.target &&
+					isSelected ) ||
+				event.key === 'Escape'
+			) {
+				// Collapse thread.
+				setSelectedThread( null );
+				setNewNoteFormState( 'closed' );
+				if ( thread.blockClientId ) {
+					toggleBlockSpotlight( thread.blockClientId, false );
+				}
+				focusCommentThread( thread.id, commentSidebarRef.current );
+			} else if (
+				event.key === 'ArrowDown' &&
+				currentIndex < threads.length - 1 &&
+				event.currentTarget === event.target
+			) {
+				// Move to the next thread.
+				const nextThread = threads[ currentIndex + 1 ];
+				focusCommentThread( nextThread.id, commentSidebarRef.current );
+			} else if (
+				event.key === 'ArrowUp' &&
+				currentIndex > 0 &&
+				event.currentTarget === event.target
+			) {
+				// Move to the previous thread.
+				const prevThread = threads[ currentIndex - 1 ];
+				focusCommentThread( prevThread.id, commentSidebarRef.current );
+			} else if (
+				event.key === 'Home' &&
+				event.currentTarget === event.target
+			) {
+				// Move to the first thread.
+				focusCommentThread(
+					threads[ 0 ].id,
+					commentSidebarRef.current
+				);
+			} else if (
+				event.key === 'End' &&
+				event.currentTarget === event.target
+			) {
+				// Move to the last thread.
+				focusCommentThread(
+					threads[ threads.length - 1 ].id,
+					commentSidebarRef.current
+				);
+			}
+		},
+		[
+			threads,
+			setSelectedThread,
+			setNewNoteFormState,
+			commentSidebarRef,
+			selectBlock,
+			toggleBlockSpotlight,
+		]
+	);
+
 	const hasThreads = Array.isArray( threads ) && threads.length > 0;
 	// This should no longer happen since https://github.com/WordPress/gutenberg/pull/72872.
 	if ( ! hasThreads && ! isFloating ) {
@@ -345,6 +430,13 @@ export function Comments( {
 					selectedThread={ selectedThread }
 					commentLastUpdated={ commentLastUpdated }
 					newNoteFormState={ newNoteFormState }
+					onKeyDown={ ( event ) =>
+						handleThreadNavigation(
+							event,
+							thread,
+							selectedThread === thread.id
+						)
+					}
 				/>
 			) ) }
 		</>
@@ -368,6 +460,7 @@ function Thread( {
 	selectedThread,
 	commentLastUpdated,
 	newNoteFormState,
+	onKeyDown,
 } ) {
 	const { toggleBlockHighlight, selectBlock, toggleBlockSpotlight } = unlock(
 		useDispatch( blockEditorStore )
@@ -464,27 +557,7 @@ function Thread( {
 			onMouseLeave={ onMouseLeave }
 			onFocus={ onMouseEnter }
 			onBlur={ onMouseLeave }
-			onKeyDown={ ( event ) => {
-				if ( event.defaultPrevented ) {
-					return;
-				}
-				// Expand or Collapse thread.
-				if (
-					event.key === 'Enter' &&
-					event.currentTarget === event.target
-				) {
-					if ( isSelected ) {
-						unselectThread();
-					} else {
-						handleCommentSelect();
-					}
-				}
-				// Collapse thread and focus the thread.
-				if ( event.key === 'Escape' ) {
-					unselectThread();
-					focusCommentThread( thread.id, commentSidebarRef.current );
-				}
-			} }
+			onKeyDown={ onKeyDown }
 			tabIndex={ 0 }
 			role="treeitem"
 			aria-label={ ariaLabel }
