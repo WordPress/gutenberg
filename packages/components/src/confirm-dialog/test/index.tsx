@@ -350,8 +350,8 @@ describe( 'Confirm', () => {
 			expect( onConfirm ).toHaveBeenCalled();
 		} );
 
-		it( 'should set confirm button busy and disable both buttons when `isBusy` is true', () => {
-			render(
+		it( 'should handle `isBusy` prop with different combinations', () => {
+			const { rerender } = render(
 				<ConfirmDialog
 					isOpen
 					onConfirm={ noop }
@@ -362,10 +362,10 @@ describe( 'Confirm', () => {
 				</ConfirmDialog>
 			);
 
-			const cancelButton = screen.getByRole( 'button', {
+			let cancelButton = screen.getByRole( 'button', {
 				name: 'Cancel',
 			} );
-			const confirmButton = screen.getByRole( 'button', { name: 'OK' } );
+			let confirmButton = screen.getByRole( 'button', { name: 'OK' } );
 
 			// Only confirm button shows busy spinner
 			expect( cancelButton ).not.toHaveClass( 'is-busy' );
@@ -375,10 +375,9 @@ describe( 'Confirm', () => {
 			// Intentionally rely on aria-disabled rather than disabled attribute
 			expect( cancelButton ).toHaveAttribute( 'aria-disabled', 'true' );
 			expect( confirmButton ).toHaveAttribute( 'aria-disabled', 'true' );
-		} );
 
-		it( 'should not set busy and should keep buttons enabled when `isBusy` is false', () => {
-			render(
+			// Test when isBusy is false
+			rerender(
 				<ConfirmDialog
 					isOpen
 					onConfirm={ noop }
@@ -389,28 +388,27 @@ describe( 'Confirm', () => {
 				</ConfirmDialog>
 			);
 
-			const cancelButton = screen.getByRole( 'button', {
+			cancelButton = screen.getByRole( 'button', {
 				name: 'Cancel',
 			} );
-			const confirmButton = screen.getByRole( 'button', { name: 'OK' } );
+			confirmButton = screen.getByRole( 'button', { name: 'OK' } );
 
 			expect( cancelButton ).not.toHaveClass( 'is-busy' );
 			expect( confirmButton ).not.toHaveClass( 'is-busy' );
 			expect( cancelButton ).toBeEnabled();
 			expect( confirmButton ).toBeEnabled();
-		} );
 
-		it( 'should not set busy and should keep buttons enabled when `isBusy` is undefined', () => {
-			render(
+			// Test when isBusy is undefined
+			rerender(
 				<ConfirmDialog isOpen onConfirm={ noop } onCancel={ noop }>
 					Are you sure?
 				</ConfirmDialog>
 			);
 
-			const cancelButton = screen.getByRole( 'button', {
+			cancelButton = screen.getByRole( 'button', {
 				name: 'Cancel',
 			} );
-			const confirmButton = screen.getByRole( 'button', { name: 'OK' } );
+			confirmButton = screen.getByRole( 'button', { name: 'OK' } );
 
 			expect( cancelButton ).not.toHaveClass( 'is-busy' );
 			expect( confirmButton ).not.toHaveClass( 'is-busy' );
