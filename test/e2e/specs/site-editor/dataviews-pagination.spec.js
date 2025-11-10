@@ -7,15 +7,17 @@ test.describe( 'DataViews Pagination', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
 		// Create 11 pages to force pagination when perPage is set to 10.
-		await Promise.all(
+		await requestUtils.batchRest(
 			Array( 11 )
 				.fill()
-				.map( ( _, i ) =>
-					requestUtils.createPage( {
+				.map( ( _, i ) => ( {
+					method: 'POST',
+					path: '/wp/v2/pages',
+					body: {
 						title: `Test Page ${ i + 1 }`,
 						status: 'publish',
-					} )
-				)
+					},
+				} ) )
 		);
 	} );
 
