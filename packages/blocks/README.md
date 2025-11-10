@@ -989,7 +989,9 @@ _Parameters_
 
 ### validateBlock
 
-Returns validation results for a parsed block. The validation system uses a 6-level classification to determine content integrity with varying degrees of confidence, from perfect match (ValidBlock) to requiring user intervention (InvalidBlock).
+Returns validation results for a parsed block. The validation system uses a 5-level classification to determine content integrity with varying degrees of confidence, from perfect match (ValidBlock) to requiring user intervention (InvalidBlock).
+
+Note: Level 1 (MigratedBlock) is handled by the parser during deprecation checks, not by this function. This function handles Levels 0, 2, 3, and 4.
 
 _Parameters_
 

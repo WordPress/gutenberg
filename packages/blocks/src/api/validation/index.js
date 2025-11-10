@@ -751,13 +751,13 @@ export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
 }
 
 /**
- * Returns true if validation issues are only related to attributes or content
- * differences (not structural problems like wrong tags or missing elements).
- * This is used for Level 2 validation (ReconstructedBlock).
+ * Returns true if validation issues are only related to attributes
+ * (not structural problems like wrong tags, text differences, or missing elements).
+ * This is used to distinguish Level 2 (ReconstructedBlock) from Level 3 (RegeneratedBlock).
  *
  * @param {Array} validationIssues Array of validation issues from logger.
  *
- * @return {boolean} Whether issues are only attribute/content-related.
+ * @return {boolean} Whether issues are only attribute-related.
  */
 export function areOnlyAttributeDifferences( validationIssues ) {
 	if ( ! validationIssues || validationIssues.length === 0 ) {
@@ -766,18 +766,18 @@ export function areOnlyAttributeDifferences( validationIssues ) {
 		return false;
 	}
 
-	// For Level 2, we're conservative: we only accept attribute-related issues.
-	// Everything else (text differences, structural differences) is rejected.
+	// Level 2 only accepts attribute-related issues.
+	// Text differences and structural differences are rejected.
 	// This prevents false positives where wrong content passes as reconstructable.
 	return validationIssues.every( ( issue ) => {
 		const message = issue.args?.[ 0 ] || '';
 
-		// Reject text content differences - these are structural, not attribute-only
+		// Reject text content differences - these are structural, not attribute-only.
 		if ( message.includes( 'Expected text' ) ) {
 			return false;
 		}
 
-		// Check for direct attribute-related messages:
+		// Accept direct attribute-related messages:
 		// - "Expected attribute `X` of value Y, saw Z"
 		// - "Expected attributes Array(X), saw Array(Y)"
 		// - "Unexpected attribute `X`"
@@ -790,27 +790,29 @@ export function areOnlyAttributeDifferences( validationIssues ) {
 			return true;
 		}
 
-		// Check for token type mismatches that could be attribute-related
-		// "Expected token of type `Chars` (%o), instead saw `StartTag` (%o)"
+		// Handle token type mismatches that could be attribute-related.
+		// Example: "Expected token of type `Chars` (%o), instead saw `StartTag` (%o)"
+		// This happens when the tokenizer sees raw HTML vs a parsed tag.
+		// We need to check if both tokens refer to the same HTML element.
 		if ( message.includes( 'Expected token of type' ) ) {
-			// Get the token objects from args
+			// Extract the token objects from the logger arguments.
 			const expectedToken = issue.args?.[ 2 ];
 			const actualToken = issue.args?.[ 4 ];
 
-			// Extract tag names from both tokens
+			// Try to extract tag names from both tokens.
 			let expectedTagName = null;
 			let actualTagName = null;
 
-			// Extract from expected token
+			// Extract from expected token.
 			if ( expectedToken?.type === 'Chars' && expectedToken?.chars ) {
-				// Chars token contains raw HTML - extract tag name
+				// Chars token contains raw HTML - extract tag name.
 				const match = expectedToken.chars.match( /<(\w+)/ );
 				expectedTagName = match?.[ 1 ];
 			} else if ( expectedToken?.tagName ) {
 				expectedTagName = expectedToken.tagName;
 			}
 
-			// Extract from actual token
+			// Extract from actual token.
 			if ( actualToken?.tagName ) {
 				actualTagName = actualToken.tagName;
 			} else if ( actualToken?.type === 'Chars' && actualToken?.chars ) {
@@ -818,8 +820,9 @@ export function areOnlyAttributeDifferences( validationIssues ) {
 				actualTagName = match?.[ 1 ];
 			}
 
-			// If both tokens refer to the same HTML tag, this is likely an attribute difference
-			// (e.g., <h6> vs <h6 class="...">), not a structural difference
+			// If both tokens refer to the same HTML tag, this is likely an attribute difference.
+			// Example: <h6> vs <h6 class="has-text-color"> - same tag, different attributes.
+			// If tags are different, it's a structural issue and belongs in Level 3.
 			if (
 				expectedTagName &&
 				actualTagName &&
@@ -828,11 +831,11 @@ export function areOnlyAttributeDifferences( validationIssues ) {
 				return true;
 			}
 
-			// Different tags or couldn't extract tag names - this is a structural issue
+			// Different tags or couldn't extract tag names means structural difference.
 			return false;
 		}
 
-		// All other issues are not attribute-related
+		// All other issue types (missing elements, extra content, etc.) are structural.
 		return false;
 	} );
 }
@@ -880,8 +883,11 @@ export function createValidationResult(
 
 /**
  * Returns validation results for a parsed block. The validation system uses a
- * 6-level classification to determine content integrity with varying degrees of
+ * 5-level classification to determine content integrity with varying degrees of
  * confidence, from perfect match (ValidBlock) to requiring user intervention (InvalidBlock).
+ *
+ * Note: Level 1 (MigratedBlock) is handled by the parser during deprecation checks,
+ * not by this function. This function handles Levels 0, 2, 3, and 4.
  *
  * @param {WPBlock}            block                          Block object.
  * @param {WPBlockType|string} [blockTypeOrName = block.name] Block type or name, inferred from block if not given.
@@ -896,8 +902,9 @@ export function validateBlock( block, blockTypeOrName = block.name ) {
 		block.name === getFreeformContentHandlerName() ||
 		block.name === getUnregisteredTypeHandlerName();
 
-	// Shortcut: Fallback blocks (freeform/unregistered) are regenerated.
-	// They trust the content as-is since there's no defined save() function.
+	// Shortcut: Fallback blocks (freeform/unregistered) always use Level 3.
+	// These blocks have no save() function to compare against, so we trust
+	// the content as-is and mark them as regenerated.
 	if ( isFallbackBlock ) {
 		return [
 			true,
@@ -973,8 +980,9 @@ export function validateBlock( block, blockTypeOrName = block.name ) {
 	}
 
 	// Level 2: ReconstructedBlock - Conservative reconstruction
-	// Only attribute-level differences (missing classes, etc.)
-	// This level is always safe and allowed
+	// Only attribute-level differences (missing classes, different attribute values).
+	// This level is always safe and doesn't check allowsReconstruction.
+	// Structural differences (wrong tags, text content) will skip to Level 3.
 	if ( block.attributes ) {
 		// Get validation issues from logger to check if they're only attribute-related
 		const validationIssues = logger.getItems();
@@ -996,8 +1004,10 @@ export function validateBlock( block, blockTypeOrName = block.name ) {
 	}
 
 	// Level 3: RegeneratedBlock - Content regenerated from attributes
-	// Requires allowsReconstruction !== false (default is true)
-	// Accepts any differences as long as content can be regenerated from attributes
+	// Requires allowsReconstruction !== false (default is true).
+	// Accepts any differences including structural ones (wrong tags, different text).
+	// At this level, we trust that attributes contain enough information to regenerate
+	// the block correctly, even if the HTML is completely different.
 	const allowsReconstruction = blockType.allowsReconstruction !== false;
 
 	if ( allowsReconstruction && block.attributes ) {
@@ -1009,17 +1019,15 @@ export function validateBlock( block, blockTypeOrName = block.name ) {
 		const hasGeneratedContent =
 			generatedBlockContent && generatedBlockContent.trim().length > 0;
 
-		// Pass Level 3 if:
-		// - Both have content, OR
-		// - Both are empty (valid empty block), OR
-		// - Original is empty but generated has content (adding generated classes/structure)
+		// Pass Level 3 when both have content, both are empty, or when
+		// the original is empty but generated has content (adding generated classes/structure).
 		const contentIsReasonable = hasGeneratedContent || ! hasOriginalContent;
 
 		if ( contentIsReasonable ) {
-			// Log regeneration for visibility
+			// Log regeneration for visibility and debugging.
 			// eslint-disable-next-line no-console
 			console.log(
-				`Block "${ blockType.name }" content regenerated from attributes (Level 3).`,
+				`Block "${ blockType.name }" regenerated from attributes (Level 3).`,
 				'\nOriginal:',
 				block.originalContent,
 				'\nGenerated:',
