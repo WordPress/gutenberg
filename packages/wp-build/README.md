@@ -213,15 +213,24 @@ Define admin pages that support routes. Each page gets generated PHP functions f
 }
 ```
 
-This generates:
-- `build/pages/my-admin-page/page.php` - Page scaffold with route registration functions
+This generates two page modes:
+- `build/pages/my-admin-page/page.php` - Full-page mode (takes over entire admin screen with custom sidebar)
+- `build/pages/my-admin-page/page-wp-admin.php` - WP-Admin mode (integrates within standard wp-admin interface)
 - `build/pages.php` - Loader for all pages
 
-The generated page scaffold includes:
-- `register_my_admin_page_route()` - Function to register routes
-- `register_my_admin_page_menu_item()` - Function to register menu items
-- `my_admin_page_render_page()` - Function to render the page
-- `my_admin_page_init` - Action hook for extensions to register routes/menu items
+Each mode provides route/menu registration functions and a render callback. Routes are automatically registered for both modes.
+
+**Registering a menu item for WP-Admin mode:**
+```php
+// Build URL with initial route via 'p' query parameter
+$url = admin_url( 'admin.php?page=my-admin-page-wp-admin&p=' . urlencode( '/my/route' ) );
+add_menu_page( 'Title', 'Menu', 'capability', $url, '', 'icon', 20 );
+```
+
+**Registering a menu item for full-page mode:**
+```php
+add_menu_page( 'Title', 'Menu', 'capability', 'my-admin-page', 'my_admin_page_render_page', 'icon', 20 );
+```
 
 ### Example: WordPress Core (Gutenberg)
 

@@ -25,56 +25,66 @@ foreach ( $routes as $route ) {
 	$routes_by_page[ $page_slug ][] = $route;
 }
 
-// Register one init hook per page
+// Helper function to register routes for a page
+$register_routes_callback = function ( $page_routes, $page_slug_underscore, $register_function_name ) {
+	return function () use ( $page_routes, $page_slug_underscore, $register_function_name ) {
+		foreach ( $page_routes as $route ) {
+			$content_handle = null;
+			$route_handle = null;
+
+			// Register content module if exists
+			if ( $route['has_content'] ) {
+				$content_asset_path = __DIR__ . "/routes/{$route['name']}/content.min.asset.php";
+				if ( file_exists( $content_asset_path ) ) {
+					$content_asset = require $content_asset_path;
+					$content_handle = '{{HANDLE_PREFIX}}/routes/' . $route['name'] . '/content';
+					$extension = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.js' : '.min.js';
+					wp_register_script_module(
+						$content_handle,
+						plugins_url( 'build/routes/' . $route['name'] . '/content' . $extension, dirname( __FILE__ ) ),
+						$content_asset['module_dependencies'] ?? array(),
+						$content_asset['version'] ?? false
+					);
+				}
+			}
+
+			// Register route module if exists
+			if ( $route['has_route'] ) {
+				$route_asset_path = __DIR__ . "/routes/{$route['name']}/route.min.asset.php";
+				if ( file_exists( $route_asset_path ) ) {
+					$route_asset = require $route_asset_path;
+					$route_handle = '{{HANDLE_PREFIX}}/routes/' . $route['name'] . '/route';
+					$extension = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.js' : '.min.js';
+					wp_register_script_module(
+						$route_handle,
+						plugins_url( 'build/routes/' . $route['name'] . '/route' . $extension, dirname( __FILE__ ) ),
+						$route_asset['module_dependencies'] ?? array(),
+						$route_asset['version'] ?? false
+					);
+				}
+			}
+
+			// Register route with page
+			if ( function_exists( $register_function_name ) ) {
+				call_user_func( $register_function_name, $route['path'], $content_handle, $route_handle );
+			}
+		}
+	};
+};
+
+// Register hooks for both full-page and wp-admin modes
 foreach ( $routes_by_page as $page_slug => $page_routes ) {
 	$page_slug_underscore = str_replace( '-', '_', $page_slug );
 
-	// Register all routes for this page on its init hook
+	// Register all routes for full-page mode (page.php)
 	add_action(
 		"{$page_slug}_init",
-		function () use ( $page_routes, $page_slug_underscore ) {
-			foreach ( $page_routes as $route ) {
-				$content_handle = null;
-				$route_handle = null;
+		$register_routes_callback( $page_routes, $page_slug_underscore, "register_{$page_slug_underscore}_route" )
+	);
 
-				// Register content module if exists
-				if ( $route['has_content'] ) {
-					$content_asset_path = __DIR__ . "/routes/{$route['name']}/content.min.asset.php";
-					if ( file_exists( $content_asset_path ) ) {
-						$content_asset = require $content_asset_path;
-						$content_handle = '{{HANDLE_PREFIX}}/routes/' . $route['name'] . '/content';
-						$extension = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.js' : '.min.js';
-						wp_register_script_module(
-							$content_handle,
-							plugins_url( 'build/routes/' . $route['name'] . '/content' . $extension, dirname( __FILE__ ) ),
-							$content_asset['module_dependencies'] ?? array(),
-							$content_asset['version'] ?? false
-						);
-					}
-				}
-
-				// Register route module if exists
-				if ( $route['has_route'] ) {
-					$route_asset_path = __DIR__ . "/routes/{$route['name']}/route.min.asset.php";
-					if ( file_exists( $route_asset_path ) ) {
-						$route_asset = require $route_asset_path;
-						$route_handle = '{{HANDLE_PREFIX}}/routes/' . $route['name'] . '/route';
-						$extension = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.js' : '.min.js';
-						wp_register_script_module(
-							$route_handle,
-							plugins_url( 'build/routes/' . $route['name'] . '/route' . $extension, dirname( __FILE__ ) ),
-							$route_asset['module_dependencies'] ?? array(),
-							$route_asset['version'] ?? false
-						);
-					}
-				}
-
-				// Register route with page
-				$register_function = "register_{$page_slug_underscore}_route";
-				if ( function_exists( $register_function ) ) {
-					$register_function( $route['path'], $content_handle, $route_handle );
-				}
-			}
-		}
+	// Register all routes for wp-admin mode (page-wp-admin.php)
+	add_action(
+		"{$page_slug}-wp-admin_init",
+		$register_routes_callback( $page_routes, $page_slug_underscore, "register_{$page_slug_underscore}_wp_admin_route" )
 	);
 }

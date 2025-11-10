@@ -865,17 +865,26 @@ async function generatePagesPhp( pageData, replacements ) {
 			'_'
 		);
 
-		// Generate page.php
-		await generatePhpFromTemplate(
-			'page.php.template',
-			path.join( BUILD_DIR, 'pages', page.slug, 'page.php' ),
-			{
-				...replacements,
-				'{{PAGE_SLUG}}': page.slug,
-				'{{PAGE_SLUG_UNDERSCORE}}': pageSlugUnderscore,
-				'{{PREFIX}}': prefixUnderscore,
-			}
-		);
+		const templateReplacements = {
+			...replacements,
+			'{{PAGE_SLUG}}': page.slug,
+			'{{PAGE_SLUG_UNDERSCORE}}': pageSlugUnderscore,
+			'{{PREFIX}}': prefixUnderscore,
+		};
+
+		// Generate both page.php and page-wp-admin.php
+		await Promise.all( [
+			generatePhpFromTemplate(
+				'page.php.template',
+				path.join( BUILD_DIR, 'pages', page.slug, 'page.php' ),
+				templateReplacements
+			),
+			generatePhpFromTemplate(
+				'page-wp-admin.php.template',
+				path.join( BUILD_DIR, 'pages', page.slug, 'page-wp-admin.php' ),
+				templateReplacements
+			),
+		] );
 
 		// Generate empty loader.js (dummy module for dependencies)
 		await writeFile(
@@ -889,7 +898,7 @@ async function generatePagesPhp( pageData, replacements ) {
 	// Generate pages.php loader
 	const pageIncludes = pageData
 		.map( ( page ) => {
-			return `require_once __DIR__ . '/pages/${ page.slug }/page.php';`;
+			return `require_once __DIR__ . '/pages/${ page.slug }/page.php';\nrequire_once __DIR__ . '/pages/${ page.slug }/page-wp-admin.php';`;
 		} )
 		.join( '\n' );
 
@@ -1445,6 +1454,9 @@ async function buildAll() {
 		console.log( '   ✔ Generated build/pages.php' );
 		for ( const page of PAGES ) {
 			console.log( `   ✔ Generated build/pages/${ page }/page.php` );
+			console.log(
+				`   ✔ Generated build/pages/${ page }/page-wp-admin.php`
+			);
 		}
 	}
 	console.log( '   ✔ Generated build/index.php' );
