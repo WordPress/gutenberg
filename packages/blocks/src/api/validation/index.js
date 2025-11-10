@@ -45,17 +45,19 @@ export const VALIDATION_LEVEL = {
 	MIGRATED_BLOCK: 1,
 
 	/**
-	 * Attribute integrity preserved; innerHTML rebuild allowed.
-	 * Attributes parse correctly and content can be regenerated from them.
-	 * This is the default behavior for most blocks.
+	 * Conservative reconstruction with only attribute-level differences.
+	 * Content structure is intact but attributes differ (e.g., missing generated classes).
+	 * This level is always allowed and considered safe.
 	 */
 	RECONSTRUCTED_BLOCK: 2,
 
 	/**
-	 * Raw handling functions applied; block type name preserved.
-	 * Freeform or unregistered type handlers process the content.
+	 * Content regenerated from attributes.
+	 * Content may have structural differences (wrong tags, different text, etc.)
+	 * but can be regenerated from attributes. Requires allowsReconstruction !== false.
+	 * Includes freeform/unregistered blocks as they trust content as-is.
 	 */
-	RAW_TRANSFORMED_BLOCK: 3,
+	REGENERATED_BLOCK: 3,
 
 	/**
 	 * Cannot be safely restored; requires user intervention.
@@ -73,7 +75,7 @@ export const VALIDATION_LEVEL_NAME = {
 	[ VALIDATION_LEVEL.VALID_BLOCK ]: 'ValidBlock',
 	[ VALIDATION_LEVEL.MIGRATED_BLOCK ]: 'MigratedBlock',
 	[ VALIDATION_LEVEL.RECONSTRUCTED_BLOCK ]: 'ReconstructedBlock',
-	[ VALIDATION_LEVEL.RAW_TRANSFORMED_BLOCK ]: 'RawTransformedBlock',
+	[ VALIDATION_LEVEL.REGENERATED_BLOCK ]: 'RegeneratedBlock',
 	[ VALIDATION_LEVEL.INVALID_BLOCK ]: 'InvalidBlock',
 };
 
@@ -759,16 +761,21 @@ export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
  */
 export function areOnlyAttributeDifferences( validationIssues ) {
 	if ( ! validationIssues || validationIssues.length === 0 ) {
-		// No issues means HTML matches exactly - shouldn't reach Level 3
-		// Return false to be safe
+		// No issues means the HTML matches exactly.
+		// This shouldn't happen since Level 0 would have caught it.
 		return false;
 	}
 
-	// For Level 3, we're VERY conservative: we ONLY accept attribute-related issues.
+	// For Level 2, we're conservative: we only accept attribute-related issues.
 	// Everything else (text differences, structural differences) is rejected.
-	// This prevents false positives where wrong content passes as "reconstructable".
+	// This prevents false positives where wrong content passes as reconstructable.
 	return validationIssues.every( ( issue ) => {
 		const message = issue.args?.[ 0 ] || '';
+
+		// Reject text content differences - these are structural, not attribute-only
+		if ( message.includes( 'Expected text' ) ) {
+			return false;
+		}
 
 		// Check for direct attribute-related messages:
 		// - "Expected attribute `X` of value Y, saw Z"
@@ -846,7 +853,8 @@ export function createValidationResult(
 		validationLevel,
 		validationIssues,
 		/**
-		 * Backward compatibility: isValid is true for all levels except INVALID_BLOCK.
+		 * Returns whether the block is considered valid.
+		 * All levels are valid except INVALID_BLOCK.
 		 *
 		 * @return {boolean} Whether the block is considered valid.
 		 */
@@ -888,13 +896,14 @@ export function validateBlock( block, blockTypeOrName = block.name ) {
 		block.name === getFreeformContentHandlerName() ||
 		block.name === getUnregisteredTypeHandlerName();
 
-	// Shortcut: Fallback blocks (freeform/unregistered) are marked as raw transformed.
+	// Shortcut: Fallback blocks (freeform/unregistered) are regenerated.
+	// They trust the content as-is since there's no defined save() function.
 	if ( isFallbackBlock ) {
 		return [
 			true,
 			[],
 			{
-				validationLevel: VALIDATION_LEVEL.RAW_TRANSFORMED_BLOCK,
+				validationLevel: VALIDATION_LEVEL.REGENERATED_BLOCK,
 				originalContent: block.originalContent,
 				generatedContent: block.originalContent, // No regeneration for fallback blocks
 			},
@@ -963,28 +972,17 @@ export function validateBlock( block, blockTypeOrName = block.name ) {
 		];
 	}
 
-	// Level 2: ReconstructedBlock - Attributes allow reconstruction
-	// By default, blocks can be reconstructed unless they explicitly opt out
-	// However, we need to ensure the generated content is reasonable - if it's empty
-	// when the original wasn't, or if save() fails, this isn't a valid Level 2 case
-	const allowsReconstruction = blockType.allowsReconstruction !== false;
+	// Level 2: ReconstructedBlock - Conservative reconstruction
+	// Only attribute-level differences (missing classes, etc.)
+	// This level is always safe and allowed
+	if ( block.attributes ) {
+		// Get validation issues from logger to check if they're only attribute-related
+		const validationIssues = logger.getItems();
 
-	if ( allowsReconstruction && block.attributes ) {
-		// Check if generated content is reasonable
-		// If original content exists but generated is empty/trivial, this might be
-		// a deprecated block with wrong attribute schema - let deprecations handle it
-		const hasOriginalContent =
-			block.originalContent && block.originalContent.trim().length > 0;
-		const hasGeneratedContent =
-			generatedBlockContent && generatedBlockContent.trim().length > 0;
-
-		// Only pass Level 2 if:
-		// - Both have content, OR
-		// - Both are empty (valid empty block), OR
-		// - Original is empty but generated has content (adding generated classes/structure)
-		const contentIsReasonable = hasGeneratedContent || ! hasOriginalContent;
-
-		if ( contentIsReasonable ) {
+		// Pass Level 2 if differences are purely attribute-related
+		// (missing classes, different attribute values, etc.)
+		// Structural issues (wrong tags, wrong content) move to Level 3
+		if ( areOnlyAttributeDifferences( validationIssues ) ) {
 			return [
 				true,
 				[],
@@ -997,7 +995,50 @@ export function validateBlock( block, blockTypeOrName = block.name ) {
 		}
 	}
 
-	// All validation levels failed - mark as invalid
+	// Level 3: RegeneratedBlock - Content regenerated from attributes
+	// Requires allowsReconstruction !== false (default is true)
+	// Accepts any differences as long as content can be regenerated from attributes
+	const allowsReconstruction = blockType.allowsReconstruction !== false;
+
+	if ( allowsReconstruction && block.attributes ) {
+		// Verify generated content is reasonable.
+		// If original content exists but generated is empty, this may be
+		// a deprecated block with the wrong attribute schema.
+		const hasOriginalContent =
+			block.originalContent && block.originalContent.trim().length > 0;
+		const hasGeneratedContent =
+			generatedBlockContent && generatedBlockContent.trim().length > 0;
+
+		// Pass Level 3 if:
+		// - Both have content, OR
+		// - Both are empty (valid empty block), OR
+		// - Original is empty but generated has content (adding generated classes/structure)
+		const contentIsReasonable = hasGeneratedContent || ! hasOriginalContent;
+
+		if ( contentIsReasonable ) {
+			// Log regeneration for visibility
+			// eslint-disable-next-line no-console
+			console.log(
+				`Block "${ blockType.name }" content regenerated from attributes (Level 3).`,
+				'\nOriginal:',
+				block.originalContent,
+				'\nGenerated:',
+				generatedBlockContent
+			);
+
+			return [
+				true,
+				[],
+				{
+					validationLevel: VALIDATION_LEVEL.REGENERATED_BLOCK,
+					originalContent: block.originalContent,
+					generatedContent: generatedBlockContent,
+				},
+			];
+		}
+	}
+
+	// Set validation level to invalid.
 	logger.error(
 		'Block validation failed for `%s` (%o).\n\nContent generated by `save` function:\n\n%s\n\nContent retrieved from post body:\n\n%s',
 		blockType.name,

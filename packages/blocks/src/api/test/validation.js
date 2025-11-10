@@ -26,6 +26,7 @@ import {
 	registerBlockType,
 	unregisterBlockType,
 	getBlockTypes,
+	getFreeformContentHandlerName,
 } from '../registration';
 
 describe( 'validation', () => {
@@ -906,7 +907,7 @@ describe( 'validation', () => {
 				VALIDATION_LEVEL.VALID_BLOCK,
 				VALIDATION_LEVEL.MIGRATED_BLOCK,
 				VALIDATION_LEVEL.RECONSTRUCTED_BLOCK,
-				VALIDATION_LEVEL.RAW_TRANSFORMED_BLOCK,
+				VALIDATION_LEVEL.REGENERATED_BLOCK,
 			];
 
 			levels.forEach( ( level ) => {
@@ -1016,49 +1017,6 @@ describe( 'validation', () => {
 	} );
 
 	describe( 'Validation Levels - Level 2: ReconstructedBlock', () => {
-		it( 'should validate when content differs (trusts attributes for reconstruction)', () => {
-			registerBlockType( 'core/test-block', {
-				...defaultBlockSettings,
-				attributes: {
-					content: { type: 'string' },
-				},
-				save: ( { attributes } ) => attributes.content,
-			} );
-
-			// Level 2 trusts the attributes and will regenerate HTML from them
-			// Attributes say "Server rendered", HTML has "Client rendered"
-			// Level 2 will regenerate as "Server rendered"
-			const [ isValid, , metadata ] = validateBlock( {
-				name: 'core/test-block',
-				attributes: { content: 'Server rendered' },
-				originalContent: 'Client rendered',
-			} );
-
-			expect( isValid ).toBe( true );
-			expect( metadata.validationLevel ).toBe(
-				VALIDATION_LEVEL.RECONSTRUCTED_BLOCK
-			);
-		} );
-
-		it( 'should not validate reconstruction when explicitly disabled', () => {
-			registerBlockType( 'core/test-block', {
-				...defaultBlockSettings,
-				allowsReconstruction: false, // Explicitly opt out
-				attributes: {
-					content: { type: 'string' },
-				},
-				save: ( { attributes } ) => attributes.content,
-			} );
-
-			const [ isValid ] = validateBlock( {
-				name: 'core/test-block',
-				attributes: { content: 'Server rendered' },
-				originalContent: 'Client rendered',
-			} );
-
-			expect( isValid ).toBe( false );
-		} );
-
 		it( 'should validate when class names are generated from attributes', () => {
 			registerBlockType( 'core/heading', {
 				...defaultBlockSettings,
@@ -1115,34 +1073,7 @@ describe( 'validation', () => {
 			);
 		} );
 
-		it( 'should validate when HTML tag differs from attributes (reconstruct from attributes)', () => {
-			registerBlockType( 'core/heading', {
-				...defaultBlockSettings,
-				attributes: {
-					content: { type: 'string' },
-					level: { type: 'number', default: 2 },
-				},
-				save: ( { attributes } ) => {
-					const Tag = `h${ attributes.level }`;
-					return `<${ Tag }>${ attributes.content }</${ Tag }>`;
-				},
-			} );
-
-			// Comment says level:3, but HTML has h2
-			// Level 2 should accept this and regenerate from attributes
-			const [ isValid, , metadata ] = validateBlock( {
-				name: 'core/heading',
-				attributes: { content: 'Testing Header', level: 3 },
-				originalContent: '<h2>Testing Header</h2>',
-			} );
-
-			expect( isValid ).toBe( true );
-			expect( metadata.validationLevel ).toBe(
-				VALIDATION_LEVEL.RECONSTRUCTED_BLOCK
-			);
-		} );
-
-		it( 'should NOT validate when HTML tag structure differs', () => {
+		it( 'should NOT validate when HTML tag structure differs (without allowsReconstruction)', () => {
 			registerBlockType( 'core/heading-invalid', {
 				...defaultBlockSettings,
 				allowsReconstruction: false, // Disable to ensure tag differences fail
@@ -1166,21 +1097,131 @@ describe( 'validation', () => {
 			expect( issues.length ).toBeGreaterThan( 0 );
 		} );
 
-		it( 'should NOT validate when HTML has extra elements', () => {
-			registerBlockType( 'core/simple-text', {
+		it( 'should pass Level 2 when only attributes differ', () => {
+			registerBlockType( 'core/paragraph', {
 				...defaultBlockSettings,
-				allowsReconstruction: false, // Disable to ensure extra elements fail
+				attributes: {
+					content: { type: 'string' },
+					className: { type: 'string' },
+				},
+				save: ( { attributes } ) => {
+					const className = attributes.className || '';
+					return `<p class="${ className }">${ attributes.content }</p>`;
+				},
+			} );
+
+			// Same structure, just missing class attribute
+			const [ isValid, , metadata ] = validateBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Content', className: 'my-class' },
+				originalContent: '<p>Content</p>',
+			} );
+
+			expect( isValid ).toBe( true );
+			expect( metadata.validationLevel ).toBe(
+				VALIDATION_LEVEL.RECONSTRUCTED_BLOCK
+			);
+		} );
+	} );
+
+	describe( 'Validation Levels - Level 3: RegeneratedBlock', () => {
+		it( 'should regenerate when text content differs', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
 				attributes: {
 					content: { type: 'string' },
 				},
-				save: ( { attributes } ) => `<h2>${ attributes.content }</h2>`,
+				save: ( { attributes } ) => attributes.content,
 			} );
 
-			// Different structure: extra paragraph element
+			// Level 3 trusts the attributes and will regenerate HTML from them
+			// Attributes say "Server rendered", HTML has "Client rendered"
+			// Level 3 will regenerate as "Server rendered"
+			const [ isValid, , metadata ] = validateBlock( {
+				name: 'core/test-block',
+				attributes: { content: 'Server rendered' },
+				originalContent: 'Client rendered',
+			} );
+
+			expect( console ).toHaveLogged();
+			expect( isValid ).toBe( true );
+			expect( metadata.validationLevel ).toBe(
+				VALIDATION_LEVEL.REGENERATED_BLOCK
+			);
+		} );
+
+		it( 'should regenerate when HTML tag differs from attributes', () => {
+			registerBlockType( 'core/heading', {
+				...defaultBlockSettings,
+				attributes: {
+					content: { type: 'string' },
+					level: { type: 'number', default: 2 },
+				},
+				save: ( { attributes } ) => {
+					const Tag = `h${ attributes.level }`;
+					return `<${ Tag }>${ attributes.content }</${ Tag }>`;
+				},
+			} );
+
+			// Attributes say level:3 (h3), but HTML has h2
+			// Level 3 should accept this and regenerate from attributes
+			const [ isValid, , metadata ] = validateBlock( {
+				name: 'core/heading',
+				attributes: { content: 'Testing Header', level: 3 },
+				originalContent: '<h2>Testing Header</h2>',
+			} );
+
+			expect( console ).toHaveLogged();
+			expect( isValid ).toBe( true );
+			expect( metadata.validationLevel ).toBe(
+				VALIDATION_LEVEL.REGENERATED_BLOCK
+			);
+		} );
+
+		it( 'should NOT regenerate when allowsReconstruction is false', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				allowsReconstruction: false, // Explicitly opt out of Level 3
+				attributes: {
+					content: { type: 'string' },
+				},
+				save: ( { attributes } ) => attributes.content,
+			} );
+
+			// Text content differs, but allowsReconstruction=false blocks Level 3
+			const [ isValid, , metadata ] = validateBlock( {
+				name: 'core/test-block',
+				attributes: { content: 'Server rendered' },
+				originalContent: 'Client rendered',
+			} );
+
+			expect( isValid ).toBe( false );
+			expect( metadata.validationLevel ).toBe(
+				VALIDATION_LEVEL.INVALID_BLOCK
+			);
+		} );
+
+		it( 'should handle freeform blocks', () => {
+			// Freeform blocks should pass as RegeneratedBlock
+			const freeformName = getFreeformContentHandlerName();
+			const [ isValid, , metadata ] = validateBlock( {
+				name: freeformName,
+				attributes: {},
+				originalContent: '<p>Classic editor content</p>',
+			} );
+
+			expect( isValid ).toBe( true );
+			expect( metadata.validationLevel ).toBe(
+				VALIDATION_LEVEL.REGENERATED_BLOCK
+			);
+		} );
+
+		it( 'should handle unregistered block types as invalid', () => {
+			// Block type that doesn't exist should fail validation
 			const [ isValid, issues, metadata ] = validateBlock( {
-				name: 'core/simple-text',
-				attributes: { content: 'Content' },
-				originalContent: '<h2>Content</h2><p>Extra content</p>',
+				name: 'core/nonexistent-block',
+				attributes: {},
+				originalContent: '<p>Content</p>',
 			} );
 
 			expect( isValid ).toBe( false );
@@ -1191,25 +1232,11 @@ describe( 'validation', () => {
 		} );
 	} );
 
-	describe( 'Validation Levels - Level 3: RawTransformedBlock', () => {
-		it( 'should handle unregistered block types', () => {
-			// Block type that doesn't exist should fail validation
-			const [ isValid, issues ] = validateBlock( {
-				name: 'core/nonexistent-block',
-				attributes: {},
-				originalContent: '<p>Content</p>',
-			} );
-
-			expect( isValid ).toBe( false );
-			expect( issues.length ).toBeGreaterThan( 0 );
-		} );
-	} );
-
 	describe( 'Validation Levels - Level 4: InvalidBlock', () => {
 		it( 'should invalidate completely different content', () => {
 			registerBlockType( 'core/test-block', {
 				...defaultBlockSettings,
-				allowsReconstruction: false, // Disable Level 2 to ensure this fails
+				allowsReconstruction: false, // Disable Level 3 to ensure this fails
 				save: ( { attributes } ) => attributes.expected,
 			} );
 
@@ -1226,7 +1253,7 @@ describe( 'validation', () => {
 		it( 'should invalidate when HTML structure completely changes', () => {
 			registerBlockType( 'core/heading', {
 				...defaultBlockSettings,
-				allowsReconstruction: false, // Disable Level 2
+				allowsReconstruction: false, // Disable Level 3
 				save: () => '<h2>Testing Header</h2>',
 			} );
 
@@ -1242,21 +1269,27 @@ describe( 'validation', () => {
 			expect( issues.length ).toBeGreaterThan( 0 );
 		} );
 
-		it( 'should invalidate malformed HTML that cannot be fixed', () => {
-			registerBlockType( 'core/heading', {
+		it( 'should invalidate when allowsReconstruction is false and content differs', () => {
+			registerBlockType( 'core/strict-block', {
 				...defaultBlockSettings,
-				allowsReconstruction: false, // Disable Level 2
-				save: () => '<h2>Testing Header</h2>',
+				allowsReconstruction: false,
+				attributes: {
+					content: { type: 'string' },
+				},
+				save: ( { attributes } ) => attributes.content,
 			} );
 
-			// Malformed: h2 opening tag but p closing tag
-			const [ isValid, issues ] = validateBlock( {
-				name: 'core/heading',
-				attributes: {},
-				originalContent: '<h2>Testing Header</p>',
+			// Text content differs and allowsReconstruction is false
+			const [ isValid, issues, metadata ] = validateBlock( {
+				name: 'core/strict-block',
+				attributes: { content: 'Expected content' },
+				originalContent: 'Different content',
 			} );
 
 			expect( isValid ).toBe( false );
+			expect( metadata.validationLevel ).toBe(
+				VALIDATION_LEVEL.INVALID_BLOCK
+			);
 			expect( issues.length ).toBeGreaterThan( 0 );
 		} );
 
