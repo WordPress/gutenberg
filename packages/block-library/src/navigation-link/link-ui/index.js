@@ -80,10 +80,13 @@ function UnforwardedLinkUI( props, ref ) {
 
 	// Check if there's a URL binding with the new binding sources
 	// Only enable handleEntities when there's actually a binding present
+	// Disable handleEntities if entity is deleted so user can edit the link
+	const { isDeleted = false } = props;
 	const hasUrlBinding =
 		( metadata?.bindings?.url?.source === 'core/post-data' ||
 			metadata?.bindings?.url?.source === 'core/term-data' ) &&
-		!! id;
+		!! id &&
+		! isDeleted;
 
 	// Memoize link value to avoid overriding the LinkControl's internal state.
 	// This is a temporary fix. See https://github.com/WordPress/gutenberg/issues/50976#issuecomment-1568226407.
