@@ -246,9 +246,8 @@ class Tests_Resolve_Patterns_In_Templates extends WP_Test_REST_Controller_Testca
 		$this->assertIsArray( $data );
 
 		// Find our test templates by slug (REST API may normalize IDs to theme slug format).
-		$template_1    = null;
-		$template_2    = null;
-		$current_theme = get_stylesheet();
+		$template_1 = null;
+		$template_2 = null;
 		foreach ( $data as $template ) {
 			if ( isset( $template['slug'] ) && 'test-template-1' === $template['slug'] ) {
 				$template_1 = $template;
