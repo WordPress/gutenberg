@@ -30,7 +30,7 @@ function gutenberg_register_boot_menu_item( $id, $label, $to, $parent_id = '' ) 
 		'to'    => $to,
 	);
 
-	// Only include parent if it's not empty (matches next-admin approach).
+	// Only include parent if it's not empty.
 	if ( ! empty( $parent_id ) ) {
 		$menu_item['parent'] = $parent_id;
 	}

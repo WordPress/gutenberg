@@ -185,7 +185,7 @@ export function MediaUploadModal( {
 		if ( ! filters.media_type ) {
 			filters.media_type = allowedTypes.includes( '*' )
 				? undefined
-				: allowedTypes[ 0 ];
+				: allowedTypes;
 		}
 
 		return {

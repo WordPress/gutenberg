@@ -202,7 +202,7 @@ test.describe( 'Embedding content', () => {
 
 		await expect(
 			editor.canvas.getByRole( 'document', {
-				name: 'Block: Twitter',
+				name: 'Block: X',
 			} )
 		).toBeVisible();
 	} );
@@ -235,7 +235,7 @@ test.describe( 'Embedding content', () => {
 		await embedBlock.getByRole( 'button', { name: 'Try again' } ).click();
 		await expect(
 			editor.canvas.getByRole( 'document', {
-				name: 'Block: Twitter',
+				name: 'Block: X',
 			} )
 		).toBeVisible();
 	} );

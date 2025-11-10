@@ -38,16 +38,22 @@ export function ModifyContentOnlySectionMenuItem( { clientId, onClose } ) {
 	const blockEditorActions = useDispatch( blockEditorStore );
 	const isContentLocked =
 		! isLockedByParent && templateLock === 'contentOnly';
-	if ( ! isContentLocked && ! isEditingContentOnlySection ) {
+
+	// Hide the Modify button when the content only pattern insertion experiment is active.
+	// This is replaced by an alternative UI in the experiment.
+	if (
+		window?.__experimentalContentOnlyPatternInsertion ||
+		( ! isContentLocked && ! isEditingContentOnlySection )
+	) {
 		return null;
 	}
 
 	const { editContentOnlySection } = unlock( blockEditorActions );
-	const showStartEditingAsBlocks =
+	const showContentOnlyModifyButton =
 		! isEditingContentOnlySection && isContentLocked;
 
 	return (
-		showStartEditingAsBlocks && (
+		showContentOnlyModifyButton && (
 			<MenuItem
 				onClick={ () => {
 					editContentOnlySection( clientId );

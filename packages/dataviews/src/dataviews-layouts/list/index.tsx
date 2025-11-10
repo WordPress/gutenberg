@@ -109,7 +109,6 @@ function PrimaryActionGridCell< Item >( {
 						text={ label }
 						size="small"
 						onClick={ () => setIsModalOpen( true ) }
-						variant="link"
 					/>
 				}
 			>
@@ -134,7 +133,6 @@ function PrimaryActionGridCell< Item >( {
 						onClick={ () => {
 							primaryAction.callback( [ item ], { registry } );
 						} }
-						variant="link"
 					>
 						{ label }
 					</Button>

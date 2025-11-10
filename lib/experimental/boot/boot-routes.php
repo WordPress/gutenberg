@@ -16,17 +16,21 @@ $gutenberg_boot_routes = array();
 /**
  * Register a boot route.
  *
- * @param string $path           Route path (e.g., "/").
- * @param string $content_module Script module ID for route content (stage/inspector).
- * @param string $route_module   Optional script module ID for route lifecycle (beforeLoad/loader).
+ * @param string      $path           Route path (e.g., "/").
+ * @param string|null $content_module Optional script module ID for route content (stage/inspector).
+ * @param string|null $route_module   Optional script module ID for route lifecycle (beforeLoad/loader).
  */
-function gutenberg_register_boot_route( $path, $content_module, $route_module = null ) {
+function gutenberg_register_boot_route( $path, $content_module = null, $route_module = null ) {
 	global $gutenberg_boot_routes;
 
 	$route = array(
-		'path'           => $path,
-		'content_module' => $content_module,
+		'path' => $path,
 	);
+
+	// Only include content_module if it's not empty.
+	if ( ! empty( $content_module ) ) {
+		$route['content_module'] = $content_module;
+	}
 
 	// Only include route_module if it's not empty.
 	if ( ! empty( $route_module ) ) {

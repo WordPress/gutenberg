@@ -1509,6 +1509,18 @@ async function watchMode() {
 		const routeWatcher = chokidar.watch( routeWatchPaths, {
 			persistent: true,
 			ignoreInitial: true,
+			ignored: ( filepath ) => {
+				const basename = path.basename( filepath );
+				// Ignore .content-entry.js temporary build files
+				if ( basename === '.content-entry.js' ) {
+					return true;
+				}
+				// Ignore node_modules directories and contents
+				if ( filepath.includes( 'node_modules' ) ) {
+					return true;
+				}
+				return false;
+			},
 			useFsEvents: true,
 			depth: 10,
 			awaitWriteFinish: {

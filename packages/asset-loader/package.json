@@ -1,0 +1,43 @@
+{
+	"name": "@wordpress/asset-loader",
+	"version": "1.0.0",
+	"description": "Utility to dynamically load WordPress scripts and styles with dependency resolution.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"assets",
+		"scripts",
+		"styles",
+		"loader"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/asset-loader/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/asset-loader"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.js",
+			"default": "./build/index.js"
+		},
+		"./package.json": "./package.json"
+	},
+	"react-native": "src/index",
+	"types": "build-types",
+	"publishConfig": {
+		"access": "public"
+	}
+}
