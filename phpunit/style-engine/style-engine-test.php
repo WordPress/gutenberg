@@ -799,7 +799,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	 * Tests that compile_css auto-detects and converts theme.json format.
 	 *
 	 * @covers WP_Style_Engine_Gutenberg::compile_css
-	 * @covers WP_Style_Engine_Utils_Gutenberg::normalize_declarations
+	 * @covers WP_Style_Engine_Gutenberg::normalize_declarations
 	 */
 	public function test_compile_css_auto_detects_theme_json_format() {
 		// Test with theme.json format (array of arrays with 'name' and 'value' keys).
@@ -823,7 +823,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	 * Tests that compile_css works with associative array format (backward compatibility).
 	 *
 	 * @covers WP_Style_Engine_Gutenberg::compile_css
-	 * @covers WP_Style_Engine_Utils_Gutenberg::normalize_declarations
+	 * @covers WP_Style_Engine_Gutenberg::normalize_declarations
 	 */
 	public function test_compile_css_works_with_associative_array_format() {
 		// Test with associative array format (existing format).

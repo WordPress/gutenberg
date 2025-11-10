@@ -676,7 +676,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 			}
 
 			// Auto-detect and convert theme.json format if needed.
-			$css_declarations = WP_Style_Engine_Utils::normalize_declarations( $css_declarations );
+			$css_declarations = static::normalize_declarations( $css_declarations );
 
 			// Return an entire rule if there is a selector.
 			if ( $css_selector ) {
@@ -705,6 +705,62 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 			$processor = new WP_Style_Engine_Processor();
 			$processor->add_rules( $css_rules );
 			return $processor->get_css( $options );
+		}
+
+		/**
+		 * Normalizes CSS declarations to associative array format.
+		 *
+		 * Detects and converts theme.json format (array of arrays with 'name' and 'value' keys)
+		 * to associative array format. If already in associative format, returns as-is.
+		 * Marked as private because it is only used internally, and will be removed in the future.
+		 *
+		 * @since 7.0.0
+		 *
+		 * @param array $declarations CSS declarations in either format.
+		 * @return array Associative array of property => value pairs.
+		 */
+		private static function normalize_declarations( $declarations ) {
+			if ( empty( $declarations ) || ! is_array( $declarations ) ) {
+				return array();
+			}
+
+			// Check if this is theme.json format (indexed array with 'name' and 'value' keys).
+			$first_key = array_key_first( $declarations );
+			if ( is_numeric( $first_key ) && isset( $declarations[ $first_key ]['name'], $declarations[ $first_key ]['value'] ) ) {
+				// Convert from theme.json format to associative array.
+				return static::convert_theme_json_declarations( $declarations );
+			}
+
+			// Already in associative array format.
+			return $declarations;
+		}
+
+		/**
+		 * Converts declarations from theme.json format to style engine format.
+		 * Marked as private because it is only used internally, and will be removed in the future.
+		 *
+		 * Converts from theme.json's array-of-arrays format:
+		 *   array(array('name' => 'color', 'value' => 'red'), ...)
+		 * To style engine's associative array format:
+		 *   array('color' => 'red', ...)
+		 *
+		 * @since 7.0.0
+		 *
+		 * @param array $declarations Array of declarations with 'name' and 'value' keys.
+		 * @return array Associative array of property => value pairs.
+		 */
+		private static function convert_theme_json_declarations( $declarations ) {
+			if ( empty( $declarations ) || ! is_array( $declarations ) ) {
+				return array();
+			}
+
+			$associative = array();
+			foreach ( $declarations as $declaration ) {
+				if ( isset( $declaration['name'], $declaration['value'] ) ) {
+					$associative[ $declaration['name'] ] = $declaration['value'];
+				}
+			}
+			return $associative;
 		}
 	}
 }
