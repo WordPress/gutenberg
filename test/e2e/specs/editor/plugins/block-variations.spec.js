@@ -81,7 +81,7 @@ test.describe( 'Block variations', () => {
 			'Paragraph',
 			'Success Message',
 			'Warning Message',
-			'Stretchy Text',
+			'Stretchy Paragraph',
 		] );
 	} );
 

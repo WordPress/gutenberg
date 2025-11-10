@@ -98,7 +98,7 @@ test.describe( 'Child Blocks', () => {
 		await expect( blockLibrary ).toBeVisible();
 		await expect( blockLibrary.getByRole( 'option' ) ).toHaveText( [
 			'Paragraph',
-			'Stretchy Text',
+			'Stretchy Paragraph',
 			'Child Blocks Child',
 			'Image',
 		] );

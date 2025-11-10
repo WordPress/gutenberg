@@ -48,17 +48,20 @@ test.describe( 'Fit Text', () => {
 			await expect( headingBlock ).toHaveClass( /has-fit-text/ );
 		} );
 
-		test( 'should enable fit text on a paragraph block via Stretchy Text variation', async ( {
+		test( 'should enable fit text on a paragraph block via Stretchy Paragraph variation', async ( {
 			editor,
 			page,
 		} ) => {
-			// Insert Stretchy Text variation from block inserter
+			// Insert Stretchy Paragraph variation from block inserter
 			await page
 				.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 				.click();
 			await page
 				.getByRole( 'listbox', { name: 'Text' } )
-				.getByRole( 'option', { name: 'Stretchy Text', exact: true } )
+				.getByRole( 'option', {
+					name: 'Stretchy Paragraph',
+					exact: true,
+				} )
 				.click();
 
 			// Wait for the block to be inserted and click into it to ensure focus
@@ -177,7 +180,7 @@ test.describe( 'Fit Text', () => {
 			expect( fitTextSize ).toBeGreaterThan( normalSize * 2 );
 		} );
 
-		test( 'should not show font size UI for Stretchy Text and Stretchy Heading variations', async ( {
+		test( 'should not show font size UI for Stretchy Paragraph and Stretchy Heading variations', async ( {
 			editor,
 			page,
 		} ) => {
