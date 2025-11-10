@@ -204,6 +204,7 @@ export default function DataviewsPatterns() {
 				className="edit-site-page-patterns-dataviews"
 				title={ title }
 				subTitle={ description }
+				hasPadding
 				actions={
 					<>
 						{ isModified && (

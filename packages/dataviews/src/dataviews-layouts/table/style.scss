@@ -63,16 +63,10 @@
 
 		td:first-child,
 		th:first-child {
-			padding-left: $grid-unit-60;
-
+			// TODO: Should this be removed?
 			.dataviews-view-table-header-button {
 				margin-left: - #{$grid-unit-10};
 			}
-		}
-
-		td:last-child,
-		th:last-child {
-			padding-right: $grid-unit-60;
 		}
 
 		&:last-child {
@@ -250,18 +244,6 @@
 				padding-right: 0;
 			}
 		}
-	}
-}
-
-@container (max-width: 430px) {
-	.dataviews-view-table tr td:first-child,
-	.dataviews-view-table tr th:first-child {
-		padding-left: $grid-unit-30;
-	}
-
-	.dataviews-view-table tr td:last-child,
-	.dataviews-view-table tr th:last-child {
-		padding-right: $grid-unit-30;
 	}
 }
 
