@@ -2,7 +2,8 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { justifyStretch, heading } from '@wordpress/icons';
+import { Path, SVG } from '@wordpress/primitives';
+import { heading } from '@wordpress/icons';
 
 const variations = [
 	{
@@ -22,7 +23,11 @@ const variations = [
 		name: 'stretchy-heading',
 		title: __( 'Stretchy Heading' ),
 		description: __( 'Heading that resizes to fit its container.' ),
-		icon: justifyStretch,
+		icon: (
+			<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+				<Path d="m3 18.6 6-4.7 6 4.7V5H3v13.6Zm16.2-9.8v1.5h2.2L17.7 14l1.1 1.1 3.7-3.7v2.2H24V8.8h-4.8Z" />
+			</SVG>
+		),
 		attributes: { fitText: true },
 		scope: [ 'inserter', 'transform' ],
 		isActive: ( blockAttributes ) => blockAttributes.fitText === true,
