@@ -8,7 +8,8 @@ import {
 	store as coreStore,
 } from '@wordpress/core-data';
 import { resolveSelect } from '@wordpress/data';
-import { Modal, DropZone } from '@wordpress/components';
+import { Modal, DropZone, FormFileUpload, Button } from '@wordpress/components';
+import { upload as uploadIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -290,6 +291,23 @@ export function MediaUploadModal( {
 		onClose?.();
 	}, [ onClose ] );
 
+	// Use onUpload if provided, otherwise fall back to uploadMedia
+	const handleUpload = onUpload || uploadMedia;
+
+	const handleFileSelect = useCallback(
+		( event: React.ChangeEvent< HTMLInputElement > ) => {
+			const files = event.target.files;
+			if ( files && files.length > 0 ) {
+				const filesArray = Array.from( files );
+				handleUpload( {
+					allowedTypes,
+					filesList: filesArray,
+				} );
+			}
+		},
+		[ allowedTypes, handleUpload ]
+	);
+
 	const paginationInfo = useMemo(
 		() => ( {
 			totalItems,
@@ -305,12 +323,17 @@ export function MediaUploadModal( {
 		[]
 	);
 
+	// Build accept attribute from allowedTypes
+	const acceptTypes = useMemo( () => {
+		if ( allowedTypes.includes( '*' ) ) {
+			return undefined;
+		}
+		return allowedTypes.join( ',' );
+	}, [ allowedTypes ] );
+
 	if ( ! isOpen ) {
 		return null;
 	}
-
-	// Use onUpload if provided, otherwise fall back to uploadMedia
-	const handleUpload = onUpload || uploadMedia;
 
 	return (
 		<Modal
@@ -319,6 +342,23 @@ export function MediaUploadModal( {
 			isDismissible={ isDismissible }
 			className={ modalClass }
 			size="fill"
+			headerActions={
+				<FormFileUpload
+					accept={ acceptTypes }
+					multiple
+					onChange={ handleFileSelect }
+					__next40pxDefaultSize
+					render={ ( { openFileDialog } ) => (
+						<Button
+							onClick={ openFileDialog }
+							icon={ uploadIcon }
+							__next40pxDefaultSize
+						>
+							{ __( 'Upload media' ) }
+						</Button>
+					) }
+				/>
+			}
 		>
 			<DropZone
 				onFilesDrop={ ( files ) => {
@@ -341,7 +381,6 @@ export function MediaUploadModal( {
 						handleUpload( {
 							allowedTypes,
 							filesList: filteredFiles,
-							multiple,
 						} );
 					}
 				} }
