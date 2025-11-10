@@ -26,6 +26,7 @@ import { useInstanceId } from '@wordpress/compose';
  */
 import { LinkUIPageCreator } from './page-creator';
 import LinkUIBlockInserter from './block-inserter';
+import { useEntityBinding } from '../shared/use-entity-binding';
 
 /**
  * Given the Link block's type attribute, return the query params to give to
@@ -66,7 +67,8 @@ export function getSuggestionsQuery( type, kind ) {
 }
 
 function UnforwardedLinkUI( props, ref ) {
-	const { label, url, opensInNewTab, type, kind, id, metadata } = props.link;
+	const { label, url, opensInNewTab, type, kind, id } = props.link;
+	const { clientId } = props;
 	const postType = type || 'page';
 
 	const [ addingBlock, setAddingBlock ] = useState( false );
@@ -78,15 +80,15 @@ function UnforwardedLinkUI( props, ref ) {
 		name: postType,
 	} );
 
-	// Check if there's a URL binding with the new binding sources
-	// Only enable handleEntities when there's actually a binding present
-	// Disable handleEntities if entity is deleted so user can edit the link
-	const { isDeleted = false } = props;
-	const hasUrlBinding =
-		( metadata?.bindings?.url?.source === 'core/post-data' ||
-			metadata?.bindings?.url?.source === 'core/term-data' ) &&
-		!! id &&
-		! isDeleted;
+	// Use the entity binding hook to get binding status
+	const { isBindingActive } = useEntityBinding( {
+		clientId,
+		attributes: props.link,
+	} );
+
+	// Only enable handleEntities when binding is active (exists AND entity available)
+	// This allows editing when entity is missing even though binding exists
+	const hasUrlBinding = isBindingActive;
 
 	// Memoize link value to avoid overriding the LinkControl's internal state.
 	// This is a temporary fix. See https://github.com/WordPress/gutenberg/issues/50976#issuecomment-1568226407.

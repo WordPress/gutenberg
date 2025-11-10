@@ -67,14 +67,8 @@ function getEntityTypeName( type, kind ) {
  * @param {Object}   props.attributes    - Block attributes
  * @param {Function} props.setAttributes - Function to update block attributes
  * @param {string}   props.clientId      - Block client ID
- * @param {boolean}  props.isDeleted     - Whether the linked entity is deleted
  */
-export function Controls( {
-	attributes,
-	setAttributes,
-	clientId,
-	isDeleted = false,
-} ) {
+export function Controls( { attributes, setAttributes, clientId } ) {
 	const { label, url, description, rel, opensInNewTab } = attributes;
 	const lastURLRef = useRef( url );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
@@ -93,14 +87,15 @@ export function Controls( {
 	}, [ url ] );
 
 	// Use the entity binding hook internally
-	const { hasUrlBinding, clearBinding } = useEntityBinding( {
+	const {
+		hasUrlBinding,
+		isBoundEntityAvailable,
+		isBindingActive,
+		clearBinding,
+	} = useEntityBinding( {
 		clientId,
 		attributes,
 	} );
-
-	// When entity is deleted, keep binding active for UI (locked state)
-	// User must unlock to edit
-	const isBindingActive = hasUrlBinding;
 
 	// Get direct store dispatch to bypass setBoundAttributes wrapper
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
@@ -176,7 +171,7 @@ export function Controls( {
 					id={ inputId }
 					label={ __( 'Link' ) }
 					value={ ( () => {
-						if ( isDeleted && hasUrlBinding ) {
+						if ( ! isBoundEntityAvailable && hasUrlBinding ) {
 							return '';
 						}
 						return inputValue ? safeDecodeURI( inputValue ) : '';
@@ -185,16 +180,18 @@ export function Controls( {
 					type="url"
 					disabled={ isBindingActive }
 					aria-invalid={
-						isDeleted && hasUrlBinding ? 'true' : undefined
+						! isBoundEntityAvailable && hasUrlBinding
+							? 'true'
+							: undefined
 					}
 					aria-describedby={ helpTextId }
 					className={
-						isDeleted && hasUrlBinding
+						! isBoundEntityAvailable && hasUrlBinding
 							? 'navigation-link-control__input-with-error-suffix'
 							: undefined
 					}
 					onClick={
-						isDeleted && hasUrlBinding
+						! isBoundEntityAvailable && hasUrlBinding
 							? () => {
 									unsyncBoundLink();
 									shouldFocusURLInputRef.current = true;
@@ -236,7 +233,7 @@ export function Controls( {
 						} );
 					} }
 					help={
-						isDeleted && hasUrlBinding ? (
+						! isBoundEntityAvailable && hasUrlBinding ? (
 							<MissingEntityHelpText
 								id={ helpTextId }
 								type={ attributes.type }
@@ -252,7 +249,7 @@ export function Controls( {
 						)
 					}
 					suffix={
-						isBindingActive && (
+						hasUrlBinding && (
 							<Button
 								icon={ unlinkIcon }
 								onClick={ () => {
@@ -266,7 +263,7 @@ export function Controls( {
 								label={ __( 'Unsync and edit' ) }
 								__next40pxDefaultSize
 								className={
-									isDeleted && hasUrlBinding
+									! isBoundEntityAvailable && hasUrlBinding
 										? 'navigation-link-control__error-suffix-button'
 										: undefined
 								}

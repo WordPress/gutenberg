@@ -2,7 +2,12 @@
  * WordPress dependencies
  */
 import { useCallback } from '@wordpress/element';
-import { useBlockBindingsUtils } from '@wordpress/block-editor';
+import {
+	useBlockBindingsUtils,
+	useBlockEditingMode,
+} from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Builds entity binding configuration for navigation link URLs.
@@ -57,13 +62,45 @@ export function buildNavigationLinkEntityBinding( kind ) {
  */
 export function useEntityBinding( { clientId, attributes } ) {
 	const { updateBlockBindings } = useBlockBindingsUtils( clientId );
-	const { metadata, id, kind } = attributes;
+	const { metadata, id, kind, type } = attributes;
+	const blockEditingMode = useBlockEditingMode();
 
 	const hasUrlBinding = !! metadata?.bindings?.url && !! id;
 	const expectedSource =
 		kind === 'post-type' ? 'core/post-data' : 'core/term-data';
 	const hasCorrectBinding =
 		hasUrlBinding && metadata?.bindings?.url?.source === expectedSource;
+
+	// Check if the bound entity is available (not deleted)
+	const isBoundEntityAvailable = useSelect(
+		( select ) => {
+			const isPostType =
+				kind === 'post-type' || type === 'post' || type === 'page';
+
+			if ( ! isPostType || ! hasCorrectBinding || ! id ) {
+				return true; // Assume available if not a post type or no binding
+			}
+
+			// Skip check in disabled contexts to avoid unnecessary requests
+			if ( blockEditingMode === 'disabled' ) {
+				return true; // Assume available in disabled contexts
+			}
+
+			const { getEntityRecord, hasFinishedResolution } =
+				select( coreStore );
+			const entityRecord = getEntityRecord( 'postType', type, id );
+			const hasResolved = hasFinishedResolution( 'getEntityRecord', [
+				'postType',
+				type,
+				id,
+			] );
+
+			// If resolution has finished and entityRecord is undefined, the entity was deleted
+			// Return true if entity exists, false if deleted
+			return hasResolved ? entityRecord !== undefined : true;
+		},
+		[ kind, type, id, hasCorrectBinding, blockEditingMode ]
+	);
 
 	const clearBinding = useCallback( () => {
 		if ( hasUrlBinding ) {
@@ -94,11 +131,17 @@ export function useEntityBinding( { clientId, attributes } ) {
 				// Don't create binding if validation fails
 			}
 		},
-		[ updateBlockBindings, kind, id ]
+		[ updateBlockBindings, kind ]
 	);
+
+	// A binding is "active" only when it exists AND the entity is available
+	// This determines when the input should be disabled/locked
+	const isBindingActive = hasCorrectBinding && isBoundEntityAvailable;
 
 	return {
 		hasUrlBinding: hasCorrectBinding,
+		isBoundEntityAvailable,
+		isBindingActive,
 		clearBinding,
 		createBinding,
 	};

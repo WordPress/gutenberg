@@ -265,12 +265,13 @@ export default function NavigationLinkEdit( {
 	const { getBlocks } = useSelect( blockEditorStore );
 
 	// URL binding logic
-	const { clearBinding, createBinding } = useEntityBinding( {
-		clientId,
-		attributes,
-	} );
+	const { clearBinding, createBinding, isBoundEntityAvailable } =
+		useEntityBinding( {
+			clientId,
+			attributes,
+		} );
 
-	const [ isInvalid, isDraft, isDeleted ] = useIsInvalidLink(
+	const [ isInvalid, isDraft ] = useIsInvalidLink(
 		kind,
 		type,
 		id,
@@ -319,10 +320,16 @@ export default function NavigationLinkEdit( {
 		transformToSubmenu,
 	] );
 
-	// Auto-clear URL and open Link UI when entity is deleted and block is selected
+	// Auto-clear URL and open Link UI when entity is not available and block is selected
 	// Keep binding so invalid state remains until user selects a new entity
 	useEffect( () => {
-		if ( isSelected && isDeleted && id && metadata?.bindings?.url && url ) {
+		if (
+			isSelected &&
+			! isBoundEntityAvailable &&
+			id &&
+			metadata?.bindings?.url &&
+			url
+		) {
 			// Mark this change as not persistent to avoid creating undo levels
 			// for automatic cleanup of broken bindings
 			__unstableMarkNextChangeAsNotPersistent();
@@ -336,7 +343,7 @@ export default function NavigationLinkEdit( {
 		}
 	}, [
 		isSelected,
-		isDeleted,
+		isBoundEntityAvailable,
 		id,
 		metadata?.bindings?.url,
 		url,
@@ -492,7 +499,6 @@ export default function NavigationLinkEdit( {
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 					clientId={ clientId }
-					isDeleted={ isDeleted }
 				/>
 			</InspectorControls>
 			<div { ...blockProps }>
@@ -573,7 +579,6 @@ export default function NavigationLinkEdit( {
 							ref={ linkUIref }
 							clientId={ clientId }
 							link={ attributes }
-							isDeleted={ isDeleted }
 							onClose={ () => {
 								setIsLinkOpen( false );
 								// If there is no link then remove the auto-inserted block.
