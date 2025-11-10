@@ -13,7 +13,7 @@ const variations = [
 			'Introduce new sections and organize content to help visitors (and search engines) understand the structure of your content.'
 		),
 		isDefault: true,
-		scope: [ 'block', 'inserter', 'transform' ],
+		scope: [ 'inserter', 'transform' ],
 		attributes: { fitText: undefined },
 		icon: heading,
 	},
