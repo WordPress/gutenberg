@@ -118,7 +118,7 @@ class Gutenberg_Resolve_Pattern_Blocks_Test extends WP_UnitTestCase {
 			// Metadata is merged with existing metadata and existing metadata is preserved.
 			'existing metadata preserved'   => array(
 				'<!-- wp:pattern {"slug":"core/existing-metadata"} /-->',
-				'<!-- wp:paragraph {"metadata":{"patternName":"core/existing-metadata","name":"Existing Metadata Pattern","description":"A existing metadata pattern.","categories":["cake"]}} -->Existing metadata content<!-- /wp:paragraph -->',
+				'<!-- wp:paragraph {"metadata":{"patternName":"core/existing-metadata","description":"A existing metadata pattern.","categories":["cake"],"name":"Existing Metadata Pattern"}} -->Existing metadata content<!-- /wp:paragraph -->',
 			),
 		);
 	}
