@@ -3,7 +3,6 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Path, SVG } from '@wordpress/primitives';
-import { paragraph } from '@wordpress/icons';
 
 const variations = [
 	// There is a hardcoded workaround in packages/block-editor/src/store/selectors.js
