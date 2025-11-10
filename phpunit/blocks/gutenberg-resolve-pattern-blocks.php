@@ -65,6 +65,15 @@ class Gutenberg_Resolve_Pattern_Blocks_Test extends WP_UnitTestCase {
 				'content' => '<!-- wp:paragraph {"metadata":{"patternName":"core/existing-metadata-should-not-overwrite","description":"A existing metadata pattern.","categories":["cake"]}} -->Existing metadata content<!-- /wp:paragraph -->',
 			)
 		);
+		register_block_pattern(
+			'core/with-custom-metadata',
+			array(
+				'title'       => 'Pattern With Custom Metadata',
+				'content'     => '<!-- wp:paragraph {"metadata":{"customKey":"customValue","anotherKey":123,"booleanKey":true}} -->Content with custom metadata<!-- /wp:paragraph -->',
+				'description' => 'A pattern with custom metadata keys.',
+				'categories'  => array( 'test' ),
+			)
+		);
 	}
 
 	public function tear_down() {
@@ -73,6 +82,7 @@ class Gutenberg_Resolve_Pattern_Blocks_Test extends WP_UnitTestCase {
 		unregister_block_pattern( 'core/with-attrs' );
 		unregister_block_pattern( 'core/nested-single' );
 		unregister_block_pattern( 'core/existing-metadata' );
+		unregister_block_pattern( 'core/with-custom-metadata' );
 		parent::tear_down();
 	}
 
@@ -119,6 +129,11 @@ class Gutenberg_Resolve_Pattern_Blocks_Test extends WP_UnitTestCase {
 			'existing metadata preserved'   => array(
 				'<!-- wp:pattern {"slug":"core/existing-metadata"} /-->',
 				'<!-- wp:paragraph {"metadata":{"patternName":"core/existing-metadata","description":"A existing metadata pattern.","categories":["cake"],"name":"Existing Metadata Pattern"}} -->Existing metadata content<!-- /wp:paragraph -->',
+			),
+			// Custom metadata keys are preserved when resolving patterns.
+			'custom metadata preserved'     => array(
+				'<!-- wp:pattern {"slug":"core/with-custom-metadata"} /-->',
+				'<!-- wp:paragraph {"metadata":{"customKey":"customValue","anotherKey":123,"booleanKey":true,"patternName":"core/with-custom-metadata","name":"Pattern With Custom Metadata","description":"A pattern with custom metadata keys.","categories":["test"]}} -->Content with custom metadata<!-- /wp:paragraph -->',
 			),
 		);
 	}
