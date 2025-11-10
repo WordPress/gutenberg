@@ -73,7 +73,8 @@ if ( ! class_exists( 'Gutenberg_HTTP_Singling_Server' ) ) {
 	require_once __DIR__ . '/experimental/sync/class-gutenberg-http-signaling-server.php';
 }
 
-require __DIR__ . '/experimental/editor-settings.php';
+require_once __DIR__ . '/experimental/editor-settings.php';
+require_once __DIR__ . '/experimental/rest-api-overrides.php';
 
 // Gutenberg plugin compat.
 require __DIR__ . '/compat/plugin/edit-site-routes-backwards-compat.php';
@@ -106,7 +107,7 @@ require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/kses.php';
 require __DIR__ . '/experimental/synchronization.php';
 require __DIR__ . '/experimental/script-modules.php';
-require __DIR__ . '/experimental/boot/boot.php';
+require __DIR__ . '/experimental/pages/gutenberg-boot.php';
 require __DIR__ . '/experimental/posts/load.php';
 
 if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {

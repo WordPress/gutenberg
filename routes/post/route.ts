@@ -1,14 +1,16 @@
 /**
- * External dependencies
- */
-import { redirect } from '@tanstack/react-router';
-
-/**
  * Route configuration for post redirect.
  */
 export const route = {
-	beforeLoad: ( { params }: { params: { type: string } } ) => {
+	beforeLoad: ( {
+		params,
+		redirect,
+	}: {
+		params: { type: string };
+		redirect: Function;
+	} ) => {
 		throw redirect( {
+			throw: true,
 			to: '/types/$type/list/$slug',
 			params: {
 				type: params.type,

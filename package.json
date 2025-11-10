@@ -21,7 +21,10 @@
 	"wpPlugin": {
 		"name": "gutenberg",
 		"scriptGlobal": "wp",
-		"packageNamespace": "wordpress"
+		"packageNamespace": "wordpress",
+		"pages": [
+			"gutenberg-boot"
+		]
 	},
 	"config": {
 		"IS_GUTENBERG_PLUGIN": true

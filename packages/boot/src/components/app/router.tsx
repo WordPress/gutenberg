@@ -8,6 +8,7 @@ import {
 	RouterProvider,
 	createBrowserHistory,
 	type AnyRoute,
+	redirect,
 } from '@tanstack/react-router';
 import { parseHref } from '@tanstack/history';
 import type { ComponentType } from 'react';
@@ -88,7 +89,9 @@ async function createRouteFromDefinition(
 
 	// Load route module for lifecycle functions if specified
 	let routeConfig: {
-		beforeLoad?: ( context: RouteLoaderContext ) => void | Promise< void >;
+		beforeLoad?: (
+			context: RouteLoaderContext & { redirect: Function }
+		) => void | Promise< void >;
 		loader?: ( context: RouteLoaderContext ) => Promise< unknown >;
 		canvas?: ( context: RouteLoaderContext ) => Promise< any >;
 	} = {};
@@ -102,13 +105,12 @@ async function createRouteFromDefinition(
 		getParentRoute: () => parentRoute,
 		path: route.path,
 		beforeLoad: routeConfig.beforeLoad
-			? async ( opts: any ) => {
-					const context: RouteLoaderContext = {
+			? ( opts: any ) =>
+					routeConfig.beforeLoad!( {
 						params: opts.params || {},
 						search: opts.search || {},
-					};
-					await routeConfig.beforeLoad!( context );
-			  }
+						redirect,
+					} )
 			: undefined,
 		loader: async ( opts: any ) => {
 			const context: RouteLoaderContext = {
@@ -139,12 +141,16 @@ async function createRouteFromDefinition(
 /**
  * Creates a route tree from route definitions.
  *
- * @param routes Routes definition.
+ * @param routes        Routes definition.
+ * @param rootComponent Root component to use for the router.
  * @return Router tree.
  */
-async function createRouteTree( routes: Route[] ) {
+async function createRouteTree(
+	routes: Route[],
+	rootComponent: ComponentType = Root
+) {
 	const rootRoute = createRootRoute( {
-		component: Root,
+		component: rootComponent as any,
 		context: () => ( {} ),
 	} );
 
@@ -175,9 +181,13 @@ function createPathHistory() {
 
 interface RouterProps {
 	routes: Route[];
+	rootComponent?: ComponentType;
 }
 
-export default function Router( { routes }: RouterProps ) {
+export default function Router( {
+	routes,
+	rootComponent = Root,
+}: RouterProps ) {
 	const [ router, setRouter ] = useState< any >( null );
 
 	useEffect( () => {
@@ -185,7 +195,7 @@ export default function Router( { routes }: RouterProps ) {
 
 		async function initializeRouter() {
 			const history = createPathHistory();
-			const routeTree = await createRouteTree( routes );
+			const routeTree = await createRouteTree( routes, rootComponent );
 
 			if ( ! cancelled ) {
 				const newRouter = createRouter( {
@@ -202,7 +212,7 @@ export default function Router( { routes }: RouterProps ) {
 		return () => {
 			cancelled = true;
 		};
-	}, [ routes ] );
+	}, [ routes, rootComponent ] );
 
 	if ( ! router ) {
 		return <div>Loading routes...</div>;

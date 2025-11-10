@@ -3,7 +3,8 @@
 	"version": "1.0.0",
 	"private": true,
 	"route": {
-		"path": "/types/$type/list/$slug"
+		"path": "/types/$type/list/$slug",
+		"page": "gutenberg-boot"
 	},
 	"dependencies": {
 		"@tanstack/react-router": ">=1.120.5 <1.121.0",

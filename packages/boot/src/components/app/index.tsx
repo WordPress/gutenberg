@@ -18,9 +18,11 @@ function App() {
 }
 
 export async function init( {
+	mountId,
 	menuItems,
 	routes,
 }: {
+	mountId: string;
 	menuItems?: MenuItem[];
 	routes?: Route[];
 } ) {
@@ -33,7 +35,7 @@ export async function init( {
 	} );
 
 	// Render the app
-	const rootElement = document.getElementById( 'gutenberg-boot-app' );
+	const rootElement = document.getElementById( mountId );
 	if ( rootElement ) {
 		const root = createRoot( rootElement );
 		root.render(
