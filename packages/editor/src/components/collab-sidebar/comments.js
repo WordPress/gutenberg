@@ -59,6 +59,7 @@ export function Comments( {
 	reflowComments,
 	isFloating = false,
 	commentLastUpdated,
+	onClearSelection,
 } ) {
 	const [ heights, setHeights ] = useState( {} );
 	const [ selectedThread, setSelectedThread ] = useState( null );
@@ -66,6 +67,7 @@ export function Comments( {
 	const [ blockRefs, setBlockRefs ] = useState( {} );
 
 	const { setCanvasMinHeight } = unlock( useDispatch( editorStore ) );
+	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
 	const { blockCommentId, selectedBlockClientId, orderedBlockIds } =
 		useSelect( ( select ) => {
 			const {
@@ -123,6 +125,28 @@ export function Comments( {
 		selectedBlockClientId,
 		orderedBlockIds,
 	] );
+
+	// Clear selection and block spotlights when clicking outside notes.
+	const clearSelection = useCallback( () => {
+		if ( selectedThread ) {
+			// Find the thread that was selected to clear its spotlight.
+			const selectedThreadData = threads.find(
+				( t ) => t.id === selectedThread
+			);
+			if ( selectedThreadData?.blockClientId ) {
+				toggleBlockSpotlight( selectedThreadData.blockClientId, false );
+			}
+		}
+		setSelectedThread( null );
+		setNewNoteFormState( 'closed' );
+	}, [ selectedThread, threads, toggleBlockSpotlight, setNewNoteFormState ] );
+
+	// Expose clearSelection to parent component via callback.
+	useEffect( () => {
+		if ( onClearSelection ) {
+			onClearSelection( clearSelection );
+		}
+	}, [ clearSelection, onClearSelection ] );
 
 	const handleDelete = async ( comment ) => {
 		const currentIndex = threads.findIndex( ( t ) => t.id === comment.id );
@@ -463,7 +487,17 @@ function Thread( {
 			onMouseEnter={ onMouseEnter }
 			onMouseLeave={ onMouseLeave }
 			onFocus={ onMouseEnter }
-			onBlur={ onMouseLeave }
+			onBlur={ ( event ) => {
+				onMouseLeave();
+				// Collapse note when focus moves away from the thread.
+				if (
+					isSelected &&
+					event.relatedTarget &&
+					! event.currentTarget.contains( event.relatedTarget )
+				) {
+					unselectThread();
+				}
+			} }
 			onKeyDown={ ( event ) => {
 				if ( event.defaultPrevented ) {
 					return;
