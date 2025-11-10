@@ -121,6 +121,7 @@ export default function TextIndentControl( {
 								min={ 0 }
 								max={ isValueUnitRelative ? 10 : 100 }
 								step={ isValueUnitRelative ? 0.1 : 1 }
+								initialPosition={ 0 }
 							/>
 						</Spacer>
 					</FlexItem>
