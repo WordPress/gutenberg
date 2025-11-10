@@ -61,7 +61,7 @@ function BlockAttributeToolsPanelItem( {
 	);
 }
 
-function BlockControls( { clientId } ) {
+function BlockFields( { clientId } ) {
 	const { attributes, blockType } = useSelect(
 		( select ) => {
 			const { getBlockAttributes, getBlockName } =
@@ -83,8 +83,8 @@ function BlockControls( { clientId } ) {
 	const blockInformation = useBlockDisplayInformation( clientId );
 	const popoverPlacementProps = useInspectorPopoverPlacement();
 
-	if ( ! blockType?.controls?.length ) {
-		// TODO - we might still want to show a placeholder for blocks with no controls.
+	if ( ! blockType?.fields?.length ) {
+		// TODO - we might still want to show a placeholder for blocks with no fields.
 		// for example, a way to select the block.
 		return null;
 	}
@@ -100,11 +100,11 @@ function BlockControls( { clientId } ) {
 			panelId={ clientId }
 			dropdownMenuProps={ popoverPlacementProps }
 		>
-			{ blockType?.controls?.map( ( control, index ) => (
+			{ blockType?.fields?.map( ( field, index ) => (
 				<BlockAttributeToolsPanelItem
 					key={ `${ clientId }/${ index }` }
 					clientId={ clientId }
-					control={ control }
+					control={ field }
 					blockType={ blockType }
 					attributeValues={ attributes }
 				/>
@@ -169,9 +169,7 @@ function ContentOnlyControlsScreen( {
 					</Navigator.BackButton>
 				</div>
 			) }
-			{ isRootContentBlock && (
-				<BlockControls clientId={ rootClientId } />
-			) }
+			{ isRootContentBlock && <BlockFields clientId={ rootClientId } /> }
 			{ contentClientIds.map( ( clientId ) => {
 				if ( parentClientIds?.[ clientId ] ) {
 					return (
@@ -182,7 +180,7 @@ function ContentOnlyControlsScreen( {
 					);
 				}
 
-				return <BlockControls key={ clientId } clientId={ clientId } />;
+				return <BlockFields key={ clientId } clientId={ clientId } />;
 			} ) }
 		</div>
 	);

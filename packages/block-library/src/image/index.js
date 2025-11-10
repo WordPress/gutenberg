@@ -63,7 +63,7 @@ export const settings = {
 };
 
 if ( window.__experimentalContentOnlyPatternInsertion ) {
-	settings.controls = [
+	settings.fields = [
 		{
 			label: __( 'Image' ),
 			type: 'Media',
