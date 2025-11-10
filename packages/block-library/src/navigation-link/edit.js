@@ -492,6 +492,7 @@ export default function NavigationLinkEdit( {
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 					clientId={ clientId }
+					isDeleted={ isDeleted }
 				/>
 			</InspectorControls>
 			<div { ...blockProps }>

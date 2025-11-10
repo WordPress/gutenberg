@@ -67,8 +67,14 @@ function getEntityTypeName( type, kind ) {
  * @param {Object}   props.attributes    - Block attributes
  * @param {Function} props.setAttributes - Function to update block attributes
  * @param {string}   props.clientId      - Block client ID
+ * @param {boolean}  props.isDeleted     - Whether the linked entity is deleted
  */
-export function Controls( { attributes, setAttributes, clientId } ) {
+export function Controls( {
+	attributes,
+	setAttributes,
+	clientId,
+	isDeleted = false,
+} ) {
 	const { label, url, description, rel, opensInNewTab } = attributes;
 	const lastURLRef = useRef( url );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
@@ -92,6 +98,10 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 		attributes,
 	} );
 
+	// When entity is deleted, treat as if binding doesn't exist for UI purposes
+	// but keep binding so invalid state remains visible
+	const isBindingActive = hasUrlBinding && ! isDeleted;
+
 	// Get direct store dispatch to bypass setBoundAttributes wrapper
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
@@ -111,15 +121,15 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 	};
 
 	useEffect( () => {
-		// Checking for ! hasUrlBinding is a defensive check, as we would
+		// Checking for ! isBindingActive is a defensive check, as we would
 		// only want to focus the input if the url is not bound to an entity.
-		if ( ! hasUrlBinding && shouldFocusURLInputRef.current ) {
+		if ( ! isBindingActive && shouldFocusURLInputRef.current ) {
 			// focuses and highlights the url input value, giving the user
 			// the ability to delete the value quickly or edit it.
 			urlInputRef.current?.select();
 		}
 		shouldFocusURLInputRef.current = false;
-	}, [ hasUrlBinding ] );
+	}, [ isBindingActive ] );
 
 	return (
 		<ToolsPanel
@@ -165,12 +175,19 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 					__next40pxDefaultSize
 					id={ inputId }
 					label={ __( 'Link' ) }
-					value={ inputValue ? safeDecodeURI( inputValue ) : '' }
+					value={ ( () => {
+						if ( isDeleted ) {
+							return '';
+						}
+						return inputValue ? safeDecodeURI( inputValue ) : '';
+					} )() }
 					autoComplete="off"
 					type="url"
-					disabled={ hasUrlBinding }
+					disabled={ isBindingActive }
+					aria-invalid={ isDeleted ? 'true' : undefined }
+					aria-describedby={ helpTextId }
 					onChange={ ( newValue ) => {
-						if ( hasUrlBinding ) {
+						if ( isBindingActive ) {
 							return;
 						}
 
@@ -180,13 +197,13 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 						setInputValue( newValue );
 					} }
 					onFocus={ () => {
-						if ( hasUrlBinding ) {
+						if ( isBindingActive ) {
 							return;
 						}
 						lastURLRef.current = url;
 					} }
 					onBlur={ () => {
-						if ( hasUrlBinding ) {
+						if ( isBindingActive ) {
 							return;
 						}
 
@@ -204,15 +221,23 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 						} );
 					} }
 					help={
-						hasUrlBinding && (
-							<BindingHelpText
+						isDeleted ? (
+							<MissingEntityHelpText
+								id={ helpTextId }
 								type={ attributes.type }
 								kind={ attributes.kind }
 							/>
+						) : (
+							isBindingActive && (
+								<BindingHelpText
+									type={ attributes.type }
+									kind={ attributes.kind }
+								/>
+							)
 						)
 					}
 					suffix={
-						hasUrlBinding && (
+						isBindingActive && (
 							<Button
 								icon={ unlinkIcon }
 								onClick={ () => {
@@ -304,5 +329,32 @@ function BindingHelpText( { type, kind } ) {
 		/* translators: %s is the entity type (e.g., "page", "post", "category") */
 		__( 'Synced with the selected %s.' ),
 		entityType
+	);
+}
+
+/**
+ * Component to display error help text for missing entity bindings.
+ *
+ * @param {Object} props      - Component props
+ * @param {string} props.id   - ID for the help text element (for aria-describedby)
+ * @param {string} props.type - The entity type
+ * @param {string} props.kind - The entity kind
+ * @return {JSX.Element} Error help text component
+ */
+function MissingEntityHelpText( { id, type, kind } ) {
+	const entityType = getEntityTypeName( type, kind );
+	return (
+		<span
+			id={ id }
+			style={ { color: '#d63638' } } // WordPress error red
+			role="alert"
+			aria-live="polite"
+		>
+			{ sprintf(
+				/* translators: %s is the entity type (e.g., "page", "post", "category") */
+				__( 'Synced %s could not be found. Please update.' ),
+				entityType
+			) }
+		</span>
 	);
 }
