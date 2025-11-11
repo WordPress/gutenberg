@@ -352,6 +352,8 @@ test.describe( 'Post-type locking', () => {
 					.getByRole( 'menu', { name: 'Paragraph', exact: true } )
 					.getByRole( 'menuitem' )
 			).toHaveText( [
+				'Paragraph',
+				'Stretchy Paragraph',
 				'Heading',
 				'List',
 				'Quote',

@@ -3,8 +3,20 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Path, SVG } from '@wordpress/primitives';
+import { heading } from '@wordpress/icons';
 
 const variations = [
+	{
+		name: 'heading',
+		title: __( 'Heading' ),
+		description: __(
+			'Introduce new sections and organize content to help visitors (and search engines) understand the structure of your content.'
+		),
+		isDefault: true,
+		scope: [ 'inserter', 'transform' ],
+		attributes: { fitText: undefined },
+		icon: heading,
+	},
 	// There is a hardcoded workaround in packages/block-editor/src/store/selectors.js
 	// to make Stretchy variations appear as the last of their sections in the inserter.
 	{
@@ -17,7 +29,7 @@ const variations = [
 			</SVG>
 		),
 		attributes: { fitText: true },
-		scope: [ 'inserter' ],
+		scope: [ 'inserter', 'transform' ],
 		isActive: ( blockAttributes ) => blockAttributes.fitText === true,
 	},
 ];
