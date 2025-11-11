@@ -21,7 +21,7 @@ import { store as coreStore } from '@wordpress/core-data';
  * @throws {Error} If kind is not 'post-type' or 'taxonomy'
  */
 export function buildNavigationLinkEntityBinding( kind ) {
-	// Validate kind parameter exists
+	// Validate kind parameter exists.
 	if ( kind === undefined ) {
 		throw new Error(
 			'buildNavigationLinkEntityBinding requires a kind parameter. ' +
@@ -29,7 +29,7 @@ export function buildNavigationLinkEntityBinding( kind ) {
 		);
 	}
 
-	// Validate kind parameter value
+	// Validate kind parameter value.
 	if ( kind !== 'post-type' && kind !== 'taxonomy' ) {
 		throw new Error(
 			`Invalid kind "${ kind }" provided to buildNavigationLinkEntityBinding. ` +
@@ -134,11 +134,11 @@ export function useEntityBinding( { clientId, attributes } ) {
 
 	const createBinding = useCallback(
 		( updatedAttributes ) => {
-			// Use updated attributes if provided, otherwise fall back to closure attributes
-			// updatedAttributes needed to access the most up-to-date data when called synchronously
+			// Use updated attributes if provided, otherwise fall back to closure attributes.
+			// updatedAttributes needed to access the most up-to-date data when called synchronously.
 			const kindToUse = updatedAttributes?.kind ?? kind;
 
-			// Avoid creating binding if no kind is provided
+			// Avoid creating binding if no kind is provided.
 			if ( ! kindToUse ) {
 				return;
 			}
@@ -152,10 +152,10 @@ export function useEntityBinding( { clientId, attributes } ) {
 					'Failed to create entity binding:',
 					error.message
 				);
-				// Don't create binding if validation fails
+				// Don't create binding if validation fails.
 			}
 		},
-		[ updateBlockBindings, kind, id ]
+		[ updateBlockBindings, kind ]
 	);
 
 	return {

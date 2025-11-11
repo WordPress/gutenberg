@@ -1225,6 +1225,50 @@ test.describe( 'Navigation block', () => {
 				settingsControls.getByText( 'Synced with the selected page.' )
 			).toBeVisible();
 		} );
+
+		test( 'automatically removes navigation link when synced entity is deleted', async ( {
+			editor,
+			admin,
+			navigation,
+			requestUtils,
+		} ) => {
+			await test.step( 'Setup - Create menu with binding to non-existent entity', async () => {
+				await admin.createNewPost();
+
+				// Use a non-existent page ID to simulate a deleted/unavailable entity
+				// This is simpler than creating and deleting a page, and tests the same behavior
+				const nonExistentPageId = 99999;
+
+				// Create a menu with a navigation-link that has a binding to the non-existent page
+				const menu = await requestUtils.createNavigationMenu( {
+					title: 'Test Menu with Unavailable Entity',
+					content: `<!-- wp:navigation-link {"label":"Unavailable Page","type":"page","id":${ nonExistentPageId },"kind":"post-type","metadata":{"bindings":{"url":{"source":"core/post-data","args":{"field":"link"}}}}} /-->`,
+				} );
+
+				await editor.insertBlock( {
+					name: 'core/navigation',
+					attributes: {
+						ref: menu.id,
+					},
+				} );
+			} );
+
+			await test.step( 'Verify navigation link is automatically removed', async () => {
+				// Get the Navigation block
+				const navBlock = navigation.getNavBlock();
+				await expect( navBlock ).toBeVisible();
+
+				// Verify the navigation link with unavailable entity was automatically removed
+				// The link should not exist (or disappear quickly) as the entity is unavailable
+				const navLinkBlocks = navBlock.getByRole( 'document', {
+					name: 'Block: Page Link',
+				} );
+
+				// Should have 0 navigation links since the only link was removed
+				// Use waitFor to handle async deletion
+				await expect( navLinkBlocks ).toHaveCount( 0 );
+			} );
+		} );
 	} );
 } );
 
