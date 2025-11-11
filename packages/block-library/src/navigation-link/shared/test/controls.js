@@ -28,6 +28,7 @@ jest.mock( '../../../utils/hooks', () => ( {
 jest.mock( '../use-entity-binding', () => ( {
 	useEntityBinding: jest.fn( () => ( {
 		hasUrlBinding: false,
+		isBoundEntityAvailable: false,
 		clearBinding: jest.fn(),
 	} ) ),
 } ) );
@@ -202,6 +203,7 @@ describe( 'Controls', () => {
 			const { useEntityBinding } = require( '../use-entity-binding' );
 			useEntityBinding.mockReturnValue( {
 				hasUrlBinding: true,
+				isBoundEntityAvailable: true,
 				clearBinding: jest.fn(),
 			} );
 
@@ -225,6 +227,7 @@ describe( 'Controls', () => {
 			const { useEntityBinding } = require( '../use-entity-binding' );
 			useEntityBinding.mockReturnValue( {
 				hasUrlBinding: true,
+				isBoundEntityAvailable: true,
 				clearBinding: jest.fn(),
 			} );
 
@@ -262,6 +265,7 @@ describe( 'Controls', () => {
 			const { useEntityBinding } = require( '../use-entity-binding' );
 			useEntityBinding.mockReturnValue( {
 				hasUrlBinding: true,
+				isBoundEntityAvailable: true,
 				clearBinding: jest.fn(),
 			} );
 
@@ -285,6 +289,7 @@ describe( 'Controls', () => {
 			const { useEntityBinding } = require( '../use-entity-binding' );
 			useEntityBinding.mockReturnValue( {
 				hasUrlBinding: true,
+				isBoundEntityAvailable: true,
 				clearBinding: jest.fn(),
 			} );
 

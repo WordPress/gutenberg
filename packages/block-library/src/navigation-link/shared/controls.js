@@ -87,10 +87,11 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 	}, [ url ] );
 
 	// Use the entity binding hook internally
-	const { hasUrlBinding, clearBinding } = useEntityBinding( {
-		clientId,
-		attributes,
-	} );
+	const { hasUrlBinding, isBoundEntityAvailable, clearBinding } =
+		useEntityBinding( {
+			clientId,
+			attributes,
+		} );
 
 	// Get direct store dispatch to bypass setBoundAttributes wrapper
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
@@ -111,8 +112,7 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 	};
 
 	useEffect( () => {
-		// Checking for ! hasUrlBinding is a defensive check, as we would
-		// only want to focus the input if the url is not bound to an entity.
+		// Only want to focus the input if the url is not bound to an entity.
 		if ( ! hasUrlBinding && shouldFocusURLInputRef.current ) {
 			// focuses and highlights the url input value, giving the user
 			// the ability to delete the value quickly or edit it.
@@ -165,12 +165,28 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 					__next40pxDefaultSize
 					id={ inputId }
 					label={ __( 'Link' ) }
-					value={ inputValue ? safeDecodeURI( inputValue ) : '' }
+					value={ ( () => {
+						if ( hasUrlBinding && ! isBoundEntityAvailable ) {
+							return '';
+						}
+						return inputValue ? safeDecodeURI( inputValue ) : '';
+					} )() }
 					autoComplete="off"
 					type="url"
 					disabled={ hasUrlBinding }
+					aria-invalid={
+						hasUrlBinding && ! isBoundEntityAvailable
+							? 'true'
+							: undefined
+					}
+					aria-describedby={ helpTextId }
+					className={
+						hasUrlBinding && ! isBoundEntityAvailable
+							? 'navigation-link-control__input-with-error-suffix'
+							: undefined
+					}
 					onChange={ ( newValue ) => {
-						if ( hasUrlBinding ) {
+						if ( isBoundEntityAvailable ) {
 							return;
 						}
 
@@ -180,13 +196,13 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 						setInputValue( newValue );
 					} }
 					onFocus={ () => {
-						if ( hasUrlBinding ) {
+						if ( isBoundEntityAvailable ) {
 							return;
 						}
 						lastURLRef.current = url;
 					} }
 					onBlur={ () => {
-						if ( hasUrlBinding ) {
+						if ( isBoundEntityAvailable ) {
 							return;
 						}
 
@@ -204,11 +220,19 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 						} );
 					} }
 					help={
-						hasUrlBinding && (
-							<BindingHelpText
+						hasUrlBinding && ! isBoundEntityAvailable ? (
+							<MissingEntityHelpText
+								id={ helpTextId }
 								type={ attributes.type }
 								kind={ attributes.kind }
 							/>
+						) : (
+							isBoundEntityAvailable && (
+								<BindingHelpText
+									type={ attributes.type }
+									kind={ attributes.kind }
+								/>
+							)
 						)
 					}
 					suffix={
@@ -225,6 +249,11 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 								showTooltip
 								label={ __( 'Unsync and edit' ) }
 								__next40pxDefaultSize
+								className={
+									hasUrlBinding && ! isBoundEntityAvailable
+										? 'navigation-link-control__error-suffix-button'
+										: undefined
+								}
 							/>
 						)
 					}
@@ -304,5 +333,34 @@ function BindingHelpText( { type, kind } ) {
 		/* translators: %s is the entity type (e.g., "page", "post", "category") */
 		__( 'Synced with the selected %s.' ),
 		entityType
+	);
+}
+
+/**
+ * Component to display error help text for missing entity bindings.
+ *
+ * @param {Object} props      - Component props
+ * @param {string} props.id   - ID for the help text element (for aria-describedby)
+ * @param {string} props.type - The entity type
+ * @param {string} props.kind - The entity kind
+ * @return {JSX.Element} Error help text component
+ */
+function MissingEntityHelpText( { id, type, kind } ) {
+	const entityType = getEntityTypeName( type, kind );
+	return (
+		<span
+			id={ id }
+			className="navigation-link-control__error-text"
+			role="alert"
+			aria-live="polite"
+		>
+			{ sprintf(
+				/* translators: %s is the entity type (e.g., "page", "post", "category") */
+				__(
+					'Synced %s is missing. Please update or remove this link.'
+				),
+				entityType
+			) }
+		</span>
 	);
 }
