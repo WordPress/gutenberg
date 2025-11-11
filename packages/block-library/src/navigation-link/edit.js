@@ -324,15 +324,6 @@ export default function NavigationLinkEdit( {
 		transformToSubmenu,
 	] );
 
-	// Auto-clear URL and open Link UI when entity is not available and block is selected
-	// Keep binding so invalid state remains until user selects a new entity
-	useEffect( () => {
-		if ( isSelected && ! isBoundEntityAvailable && hasUrlBinding ) {
-			// Open Link UI so user can immediately select a new entity
-			setIsLinkOpen( true );
-		}
-	}, [ isSelected, isBoundEntityAvailable, hasUrlBinding, setIsLinkOpen ] );
-
 	// If the LinkControl popover is open and the URL has changed, close the LinkControl and focus the label text.
 	useEffect( () => {
 		// We only want to do this when the URL has gone from nothing to a new URL AND the label looks like a URL
@@ -436,14 +427,23 @@ export default function NavigationLinkEdit( {
 		}
 	);
 
-	if ( ! url || isInvalid || isDraft ) {
+	if (
+		! url ||
+		isInvalid ||
+		isDraft ||
+		( ! isBoundEntityAvailable && hasUrlBinding )
+	) {
 		blockProps.onClick = () => {
 			setIsLinkOpen( true );
 		};
 	}
 
 	const classes = clsx( 'wp-block-navigation-item__content', {
-		'wp-block-navigation-link__placeholder': ! url || isInvalid || isDraft,
+		'wp-block-navigation-link__placeholder':
+			! url ||
+			isInvalid ||
+			isDraft ||
+			( ! isBoundEntityAvailable && hasUrlBinding ),
 	} );
 
 	const missingText = getMissingText( type );
