@@ -31,6 +31,13 @@ export default function Textarea< Item >( {
 		[ data, onChange, setValue ]
 	);
 
+	// Convert pattern to string if it's a RegExp
+	const pattern = isValid?.pattern
+		? isValid.pattern instanceof RegExp
+			? isValid.pattern.source
+			: isValid.pattern
+		: undefined;
+
 	return (
 		<ValidatedTextareaControl
 			required={ !! isValid?.required }
@@ -41,6 +48,7 @@ export default function Textarea< Item >( {
 			help={ description }
 			onChange={ onChangeControl }
 			rows={ rows }
+			pattern={ pattern }
 			__next40pxDefaultSize
 			__nextHasNoMarginBottom
 			hideLabelFromVision={ hideLabelFromVision }

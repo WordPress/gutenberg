@@ -579,6 +579,12 @@ const ValidationComponent = ( {
 		date?: string;
 		dateRange?: string;
 		datetime?: string;
+		username?: string;
+		zipcode?: string;
+		phonePattern?: string;
+		emailPattern?: string;
+		urlPattern?: string;
+		textareaPattern?: string;
 	};
 
 	const [ post, setPost ] = useState< ValidatedItem >( {
@@ -602,6 +608,12 @@ const ValidationComponent = ( {
 		date: undefined,
 		dateRange: undefined,
 		datetime: undefined,
+		username: 'john_doe_123',
+		zipcode: '12345',
+		phonePattern: '+1-555-123-4567',
+		emailPattern: 'user@company.com',
+		urlPattern: 'https://github.com/wordpress/gutenberg',
+		textareaPattern: '#wordpress #gutenberg #react',
 	} );
 
 	// Cache for getElements functions - ensures promises are only created once
@@ -919,6 +931,29 @@ const ValidationComponent = ( {
 				},
 			},
 			{
+				id: 'username',
+				type: 'text',
+				label: 'Username (pattern: alphanumeric + underscore)',
+				placeholder: 'user_name123',
+				description:
+					'Must contain only letters, numbers, and underscores',
+				isValid: {
+					required,
+					pattern: /^[a-zA-Z0-9_]+$/,
+				},
+			},
+			{
+				id: 'zipcode',
+				type: 'text',
+				label: 'Zip Code (pattern: 5 digits)',
+				placeholder: '12345',
+				description: 'Must be exactly 5 digits',
+				isValid: {
+					required,
+					pattern: '[0-9]{5}',
+				},
+			},
+			{
 				id: 'select',
 				type: 'text',
 				label: 'Select',
@@ -971,6 +1006,18 @@ const ValidationComponent = ( {
 				},
 			},
 			{
+				id: 'textareaPattern',
+				type: 'text',
+				Edit: 'textarea',
+				label: 'Textarea (pattern: hashtags only)',
+				placeholder: '#tag1 #tag2 #tag3',
+				description: 'Must contain only hashtags separated by spaces',
+				isValid: {
+					required,
+					pattern: /^(#\w+\s*)+$/,
+				},
+			},
+			{
 				id: 'email',
 				type: 'email',
 				label: 'e-mail',
@@ -978,6 +1025,17 @@ const ValidationComponent = ( {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customEmailRule ),
+				},
+			},
+			{
+				id: 'emailPattern',
+				type: 'email',
+				label: 'Email (pattern: must end with @company.com)',
+				placeholder: 'user@company.com',
+				description: 'Email must be from @company.com domain',
+				isValid: {
+					required,
+					pattern: /^[a-zA-Z0-9._%+-]+@company\.com$/,
 				},
 			},
 			{
@@ -991,6 +1049,17 @@ const ValidationComponent = ( {
 				},
 			},
 			{
+				id: 'phonePattern',
+				type: 'telephone',
+				label: 'Phone (pattern: +1-XXX-XXX-XXXX)',
+				placeholder: '+1-555-123-4567',
+				description: 'US phone format with country code',
+				isValid: {
+					required,
+					pattern: /^\+1-\d{3}-\d{3}-\d{4}$/,
+				},
+			},
+			{
 				id: 'url',
 				type: 'url',
 				label: 'URL',
@@ -998,6 +1067,17 @@ const ValidationComponent = ( {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customUrlRule ),
+				},
+			},
+			{
+				id: 'urlPattern',
+				type: 'url',
+				label: 'URL (pattern: must be GitHub repo)',
+				placeholder: 'https://github.com/user/repo',
+				description: 'Must be a GitHub repository URL',
+				isValid: {
+					required,
+					pattern: /^https:\/\/github\.com\/[\w-]+\/[\w-]+\/?$/,
 				},
 			},
 			{
@@ -1158,6 +1238,8 @@ const ValidationComponent = ( {
 		() => ( {
 			fields: [
 				'text',
+				'username',
+				'zipcode',
 				{ id: 'customEdit' },
 				{
 					id: 'level1Integer',
@@ -1180,6 +1262,7 @@ const ValidationComponent = ( {
 						},
 					],
 				},
+				'emailPattern',
 				{
 					id: 'level1Telephone',
 					children: [
@@ -1199,10 +1282,13 @@ const ValidationComponent = ( {
 						},
 					],
 				},
+				'phonePattern',
 				'url',
+				'urlPattern',
 				'color',
 				'password',
 				'textarea',
+				'textareaPattern',
 				'select',
 				'textWithRadio',
 				'boolean',
