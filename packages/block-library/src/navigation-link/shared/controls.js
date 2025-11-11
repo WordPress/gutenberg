@@ -87,15 +87,11 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 	}, [ url ] );
 
 	// Use the entity binding hook internally
-	const {
-		hasUrlBinding,
-		isEntityUnavailable,
-		isBindingActive,
-		clearBinding,
-	} = useEntityBinding( {
-		clientId,
-		attributes,
-	} );
+	const { hasUrlBinding, isBoundEntityAvailable, clearBinding } =
+		useEntityBinding( {
+			clientId,
+			attributes,
+		} );
 
 	// Get direct store dispatch to bypass setBoundAttributes wrapper
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
@@ -116,15 +112,14 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 	};
 
 	useEffect( () => {
-		// Checking for ! isBindingActive is a defensive check, as we would
-		// only want to focus the input if the url is not bound to an entity.
-		if ( ! isBindingActive && shouldFocusURLInputRef.current ) {
+		// Only want to focus the input if the url is not bound to an entity.
+		if ( ! isBoundEntityAvailable && shouldFocusURLInputRef.current ) {
 			// focuses and highlights the url input value, giving the user
 			// the ability to delete the value quickly or edit it.
 			urlInputRef.current?.select();
 		}
 		shouldFocusURLInputRef.current = false;
-	}, [ isBindingActive ] );
+	}, [ isBoundEntityAvailable ] );
 
 	return (
 		<ToolsPanel
@@ -171,23 +166,27 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 					id={ inputId }
 					label={ __( 'Link' ) }
 					value={ ( () => {
-						if ( isEntityUnavailable ) {
+						if ( hasUrlBinding && ! isBoundEntityAvailable ) {
 							return '';
 						}
 						return inputValue ? safeDecodeURI( inputValue ) : '';
 					} )() }
 					autoComplete="off"
 					type="url"
-					disabled={ isBindingActive }
-					aria-invalid={ isEntityUnavailable ? 'true' : undefined }
+					disabled={ isBoundEntityAvailable }
+					aria-invalid={
+						hasUrlBinding && ! isBoundEntityAvailable
+							? 'true'
+							: undefined
+					}
 					aria-describedby={ helpTextId }
 					className={
-						isEntityUnavailable
+						hasUrlBinding && ! isBoundEntityAvailable
 							? 'navigation-link-control__input-with-error-suffix'
 							: undefined
 					}
 					onClick={
-						isEntityUnavailable
+						hasUrlBinding && ! isBoundEntityAvailable
 							? () => {
 									unsyncBoundLink();
 									shouldFocusURLInputRef.current = true;
@@ -195,7 +194,7 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 							: undefined
 					}
 					onChange={ ( newValue ) => {
-						if ( isBindingActive ) {
+						if ( isBoundEntityAvailable ) {
 							return;
 						}
 
@@ -205,13 +204,13 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 						setInputValue( newValue );
 					} }
 					onFocus={ () => {
-						if ( isBindingActive ) {
+						if ( isBoundEntityAvailable ) {
 							return;
 						}
 						lastURLRef.current = url;
 					} }
 					onBlur={ () => {
-						if ( isBindingActive ) {
+						if ( isBoundEntityAvailable ) {
 							return;
 						}
 
@@ -229,14 +228,14 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 						} );
 					} }
 					help={
-						isEntityUnavailable ? (
+						hasUrlBinding && ! isBoundEntityAvailable ? (
 							<MissingEntityHelpText
 								id={ helpTextId }
 								type={ attributes.type }
 								kind={ attributes.kind }
 							/>
 						) : (
-							isBindingActive && (
+							isBoundEntityAvailable && (
 								<BindingHelpText
 									type={ attributes.type }
 									kind={ attributes.kind }
@@ -259,7 +258,7 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 								label={ __( 'Unsync and edit' ) }
 								__next40pxDefaultSize
 								className={
-									isEntityUnavailable
+									hasUrlBinding && ! isBoundEntityAvailable
 										? 'navigation-link-control__error-suffix-button'
 										: undefined
 								}

@@ -74,16 +74,17 @@ export function useEntityBinding( { clientId, attributes } ) {
 	// Check if the bound entity is available (not deleted).
 	const isBoundEntityAvailable = useSelect(
 		( select ) => {
+			// First check: metadata/binding must exist
+			if ( ! hasCorrectBinding || ! id ) {
+				return false;
+			}
+
 			const isPostType = kind === 'post-type';
 			const isTaxonomy = kind === 'taxonomy';
 
-			// Only check entity availability for post types and taxonomies with bindings.
-			if (
-				( ! isPostType && ! isTaxonomy ) ||
-				! hasCorrectBinding ||
-				! id
-			) {
-				return false; // No bound entity available if not a post type/taxonomy or no binding.
+			// Only check entity availability for post types and taxonomies.
+			if ( ! isPostType && ! isTaxonomy ) {
+				return false;
 			}
 
 			// Skip check in disabled contexts to avoid unnecessary requests.
@@ -91,6 +92,7 @@ export function useEntityBinding( { clientId, attributes } ) {
 				return true; // Assume available in disabled contexts.
 			}
 
+			// Second check: entity must exist
 			const { getEntityRecord, hasFinishedResolution } =
 				select( coreStore );
 
@@ -142,18 +144,9 @@ export function useEntityBinding( { clientId, attributes } ) {
 		[ updateBlockBindings, kind ]
 	);
 
-	// A binding is "active" only when it exists AND the entity is available.
-	// This determines when the input should be disabled/locked.
-	const isBindingActive = hasCorrectBinding && isBoundEntityAvailable;
-
-	// Computed: entity is unavailable when binding exists but entity is missing.
-	const isEntityUnavailable = hasCorrectBinding && ! isBoundEntityAvailable;
-
 	return {
 		hasUrlBinding: hasCorrectBinding,
-		isEntityAvailable: isBoundEntityAvailable,
-		isEntityUnavailable,
-		isBindingActive,
+		isBoundEntityAvailable,
 		clearBinding,
 		createBinding,
 	};

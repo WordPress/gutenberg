@@ -81,7 +81,7 @@ function UnforwardedLinkUI( props, ref ) {
 	} );
 
 	// Use the entity binding hook to get binding status
-	const { isBindingActive } = useEntityBinding( {
+	const { isBoundEntityAvailable } = useEntityBinding( {
 		clientId,
 		attributes: props.link,
 	} );
@@ -153,7 +153,7 @@ function UnforwardedLinkUI( props, ref ) {
 						onChange={ props.onChange }
 						onRemove={ props.onRemove }
 						onCancel={ props.onCancel }
-						handleEntities={ isBindingActive }
+						handleEntities={ isBoundEntityAvailable }
 						renderControlBottom={ () => {
 							// Don't show the tools when there is submitted link (preview state).
 							if ( link?.url?.length ) {
