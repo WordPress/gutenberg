@@ -2972,9 +2972,6 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'settings' => array(
 					'appearanceTools'               => true,
 					'useRootPaddingAwareAlignments' => true,
-					'color'                         => array(
-						'custom' => true,
-					),
 					'layout'                        => array(
 						'allowEditing'                  => true,
 						'allowCustomContentAndWideSize' => true,
@@ -2984,9 +2981,6 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'lightbox'                      => array(
 						'enabled'      => true,
 						'allowEditing' => false,
-					),
-					'spacing'                       => array(
-						'padding' => true,
 					),
 					'blocks'                        => array(
 						'core/image' => array(
@@ -3005,9 +2999,6 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			'settings' => array(
 				'appearanceTools'               => true,
 				'useRootPaddingAwareAlignments' => true,
-				'color'                         => array(
-					'custom' => true,
-				),
 				'layout'                        => array(
 					'allowEditing'                  => true,
 					'allowCustomContentAndWideSize' => true,
@@ -3017,9 +3008,6 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'lightbox'                      => array(
 					'enabled'      => true,
 					'allowEditing' => false,
-				),
-				'spacing'                       => array(
-					'padding' => true,
 				),
 				'blocks'                        => array(
 					'core/image' => array(
