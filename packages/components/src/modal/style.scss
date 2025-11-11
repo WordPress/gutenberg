@@ -106,6 +106,16 @@
 	@include break-large() {
 		max-height: 70%;
 	}
+
+	&.is-full-screen {
+		// When full screen, set explicit heights so contents can be scrollable.
+		.components-modal__content {
+			height: calc(100% - 72px); // Subtract header height
+		}
+		.components-modal__children-container {
+			height: 100%;
+		}
+	}
 }
 
 @keyframes components-modal__appear-animation {
