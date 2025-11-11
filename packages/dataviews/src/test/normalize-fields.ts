@@ -353,7 +353,7 @@ describe( 'normalizeFields: default getValue', () => {
 			).toBeDefined();
 			expect(
 				typeof normalizedFields[ 0 ].displayFormat.weekStartsOn
-			).toBe( 'number' );
+			).toBe( 'string' );
 		} );
 
 		it( 'preserves custom format when provided', () => {
@@ -363,14 +363,14 @@ describe( 'normalizeFields: default getValue', () => {
 					type: 'date',
 					displayFormat: {
 						date: 'F j, Y',
-						weekStartsOn: 1,
+						weekStartsOn: 'monday',
 					},
 				},
 			];
 			const normalizedFields = normalizeFields( fields );
 			expect( normalizedFields[ 0 ].displayFormat.date ).toBe( 'F j, Y' );
 			expect( normalizedFields[ 0 ].displayFormat.weekStartsOn ).toBe(
-				1
+				'monday'
 			);
 		} );
 

@@ -839,7 +839,14 @@ export const DateComponent = ( {
 	Edit: ControlTypes;
 	asyncElements: boolean;
 	displayFormatDate?: string;
-	displayFormatWeekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+	displayFormatWeekStartsOn?:
+		| 'sunday'
+		| 'monday'
+		| 'tuesday'
+		| 'wednesday'
+		| 'thursday'
+		| 'friday'
+		| 'saturday';
 } ) => {
 	const dateFields = useMemo(
 		() =>
@@ -852,7 +859,14 @@ export const DateComponent = ( {
 					) {
 						const displayFormat: {
 							date?: string;
-							weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+							weekStartsOn?:
+								| 'sunday'
+								| 'monday'
+								| 'tuesday'
+								| 'wednesday'
+								| 'thursday'
+								| 'friday'
+								| 'saturday';
 						} = {};
 						if ( displayFormatDate ) {
 							displayFormat.date = displayFormatDate;
@@ -895,13 +909,13 @@ DateComponent.argTypes = {
 		control: 'select',
 		options: {
 			Default: undefined,
-			Sunday: 0,
-			Monday: 1,
-			Tuesday: 2,
-			Wednesday: 3,
-			Thursday: 4,
-			Friday: 5,
-			Saturday: 6,
+			Sunday: 'sunday',
+			Monday: 'monday',
+			Tuesday: 'tuesday',
+			Wednesday: 'wednesday',
+			Thursday: 'thursday',
+			Friday: 'friday',
+			Saturday: 'saturday',
 		},
 		description:
 			'Day that the week starts on. Leave as Default to use WordPress default.',

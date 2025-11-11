@@ -51,6 +51,7 @@ import type {
 	NormalizedField,
 } from '../types';
 import getCustomValidity from './utils/get-custom-validity';
+import { weekStartsOnToNumber } from '../utils/week-starts-on';
 
 const { DateCalendar, DateRangeCalendar } = unlock( componentsPrivateApis );
 
@@ -395,7 +396,9 @@ function CalendarDateControl< Item >( {
 						month={ calendarMonth }
 						onMonthChange={ setCalendarMonth }
 						timeZone={ timezoneString || undefined }
-						weekStartsOn={ field.displayFormat.weekStartsOn }
+						weekStartsOn={ weekStartsOnToNumber(
+							field.displayFormat.weekStartsOn
+						) }
 					/>
 				</VStack>
 			</BaseControl>
@@ -608,7 +611,9 @@ function CalendarDateRangeControl< Item >( {
 						month={ calendarMonth }
 						onMonthChange={ setCalendarMonth }
 						timeZone={ timezone.string || undefined }
-						weekStartsOn={ field.displayFormat.weekStartsOn }
+						weekStartsOn={ weekStartsOnToNumber(
+							field.displayFormat.weekStartsOn
+						) }
 					/>
 				</VStack>
 			</BaseControl>

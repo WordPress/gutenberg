@@ -26,6 +26,7 @@ import {
 	SINGLE_SELECTION_OPERATORS,
 } from '../constants';
 import hasElements from './has-elements';
+import { numberToWeekStartsOn } from './week-starts-on';
 
 const getValueFromId =
 	( id: string ) =>
@@ -216,7 +217,9 @@ export default function normalizeFields< Item >(
 					field.type === 'date' &&
 					field.displayFormat?.weekStartsOn !== undefined
 						? field.displayFormat.weekStartsOn
-						: getSettings().l10n.startOfWeek,
+						: numberToWeekStartsOn(
+								getSettings().l10n.startOfWeek
+						  ),
 			},
 		};
 	} );

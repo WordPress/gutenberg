@@ -319,13 +319,20 @@ export type Field< Item > = {
  * Format for date fields:
  *
  * - date: the format string (e.g., 'F j, Y' for WordPress default format like 'March 10, 2023')
- * - weekStartsOn: to specify the first day of the week (0 is Sunday).
+ * - weekStartsOn: to specify the first day of the week ('sunday', 'monday', etc.).
  *
  * If not provided, defaults to WordPress date format settings.
  */
 type DisplayFormatDate = {
 	date?: string;
-	weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+	weekStartsOn?:
+		| 'sunday'
+		| 'monday'
+		| 'tuesday'
+		| 'wednesday'
+		| 'thursday'
+		| 'friday'
+		| 'saturday';
 };
 
 export type NormalizedField< Item > = Omit< Field< Item >, 'Edit' > & {
