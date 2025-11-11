@@ -72,12 +72,10 @@ export const settings = {
 if ( window.__experimentalContentOnlyPatternInsertion ) {
 	settings.fields = [
 		{
+			id: 'content',
 			label: __( 'Content' ),
-			type: 'RichText',
-			shownByDefault: true,
-			mapping: {
-				value: 'content',
-			},
+			type: 'richtext',
+			isVisible: true,
 		},
 	];
 }

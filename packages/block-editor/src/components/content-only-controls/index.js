@@ -3,12 +3,12 @@
  */
 import { store as blocksStore } from '@wordpress/blocks';
 import {
-	__experimentalToolsPanel as ToolsPanel,
 	__experimentalHStack as HStack,
 	Icon,
 	Navigator,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { arrowLeft, arrowRight } from '@wordpress/icons';
 
@@ -20,46 +20,20 @@ import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import useBlockDisplayInformation from '../use-block-display-information';
-import { useInspectorPopoverPlacement } from './use-inspector-popover-placement';
+import { DataForm } from '@wordpress/dataviews';
+import RichTextEdit from './data-form-controls/rich-text-edit';
+import LinkEdit from './data-form-controls/link-edit';
+import MediaEdit from './data-form-controls/media-edit';
 
-// controls
-import PlainText from './plain-text';
-import RichText from './rich-text';
-import Media from './media';
-import Link from './link';
-
-const controls = {
-	PlainText,
-	RichText,
-	Media,
-	Link,
+/**
+ * Maps field types to their corresponding DataForm Edit components
+ */
+const fieldTypeToEditComponent = {
+	richtext: RichTextEdit,
+	text: 'text',
+	media: MediaEdit,
+	link: LinkEdit,
 };
-
-function BlockAttributeToolsPanelItem( {
-	clientId,
-	control,
-	blockType,
-	attributeValues,
-} ) {
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-	const ControlComponent = controls[ control.type ];
-
-	if ( ! ControlComponent ) {
-		return null;
-	}
-
-	return (
-		<ControlComponent
-			clientId={ clientId }
-			control={ control }
-			blockType={ blockType }
-			attributeValues={ attributeValues }
-			updateAttributes={ ( attributes ) =>
-				updateBlockAttributes( clientId, attributes )
-			}
-		/>
-	);
-}
 
 function BlockFields( { clientId } ) {
 	const { attributes, blockType } = useSelect(
@@ -76,12 +50,91 @@ function BlockFields( { clientId } ) {
 		[ clientId ]
 	);
 
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+
 	const blockTitle = useBlockDisplayTitle( {
 		clientId,
 		context: 'list-view',
 	} );
 	const blockInformation = useBlockDisplayInformation( clientId );
-	const popoverPlacementProps = useInspectorPopoverPlacement();
+
+	// Prepare fields for DataForm with defaults
+	const dataFormFields = useMemo( () => {
+		if ( ! blockType?.fields?.length ) {
+			return [];
+		}
+
+		return blockType.fields.map( ( field ) => {
+			// Provide default getValue if not specified
+			const getValue =
+				field.getValue ||
+				( ( { item } ) => {
+					// Simple case: id maps directly to attribute
+					if ( ! field.mapping ) {
+						return item[ field.id ] ?? '';
+					}
+					// Complex case: mapping multiple attributes
+					const result = {};
+					for ( const [ key, attrName ] of Object.entries(
+						field.mapping
+					) ) {
+						result[ key ] = item[ attrName ] ?? '';
+					}
+					return result;
+				} );
+
+			// Provide default setValue if not specified
+			const setValue =
+				field.setValue ||
+				( ( { value } ) => {
+					// Simple case: id maps directly to attribute
+					if ( ! field.mapping ) {
+						return { [ field.id ]: value };
+					}
+					// Complex case: mapping multiple attributes
+					const result = {};
+					for ( const [ key, attrName ] of Object.entries(
+						field.mapping
+					) ) {
+						result[ attrName ] = value[ key ];
+					}
+					return result;
+				} );
+
+			// Resolve Edit component - handle both component and config object formats
+			let Edit;
+			let editConfig = {};
+			if ( field.Edit ) {
+				if ( typeof field.Edit === 'object' && ! field.Edit.$$typeof ) {
+					// Edit is a config object like { control: 'media', ... }
+					editConfig = field.Edit;
+					const controlName = editConfig.control;
+					Edit = fieldTypeToEditComponent[ controlName ];
+				} else {
+					// Edit is already a component or string
+					Edit = field.Edit;
+				}
+			} else {
+				// Fall back to type-based lookup
+				Edit = fieldTypeToEditComponent[ field.type ];
+			}
+
+			// Convert boolean isVisible to function for DataForm compatibility
+			let isVisible = field.isVisible;
+			if ( typeof isVisible !== 'function' ) {
+				isVisible = isVisible !== false ? () => true : () => false;
+			}
+
+			return {
+				...field,
+				...editConfig, // Spread edit config properties so component receives them
+				getValue,
+				setValue,
+				Edit,
+				isVisible,
+			};
+		} );
+	}, [ blockType?.fields ] );
 
 	if ( ! blockType?.fields?.length ) {
 		// TODO - we might still want to show a placeholder for blocks with no fields.
@@ -90,26 +143,28 @@ function BlockFields( { clientId } ) {
 	}
 
 	return (
-		<ToolsPanel
-			label={
+		<div className="block-editor-content-only-controls__block-fields">
+			<div className="block-editor-content-only-controls__block-header">
 				<HStack spacing={ 1 }>
 					<BlockIcon icon={ blockInformation?.icon } />
 					<div>{ blockTitle }</div>
 				</HStack>
-			}
-			panelId={ clientId }
-			dropdownMenuProps={ popoverPlacementProps }
-		>
-			{ blockType?.fields?.map( ( field, index ) => (
-				<BlockAttributeToolsPanelItem
-					key={ `${ clientId }/${ index }` }
-					clientId={ clientId }
-					control={ field }
-					blockType={ blockType }
-					attributeValues={ attributes }
-				/>
-			) ) }
-		</ToolsPanel>
+			</div>
+
+			<DataForm
+				data={ attributes }
+				fields={ dataFormFields }
+				form={ {
+					layout: 'regular',
+					fields: dataFormFields
+						.filter( ( f ) => f.isVisible !== false )
+						.map( ( f ) => f.id ),
+				} }
+				onChange={ ( updates ) =>
+					updateBlockAttributes( clientId, updates )
+				}
+			/>
+		</div>
 	);
 }
 

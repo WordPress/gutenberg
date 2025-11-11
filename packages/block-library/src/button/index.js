@@ -37,17 +37,16 @@ export const settings = {
 if ( window.__experimentalContentOnlyPatternInsertion ) {
 	settings.fields = [
 		{
+			id: 'text',
 			label: __( 'Content' ),
-			type: 'RichText',
-			shownByDefault: true,
-			mapping: {
-				value: 'text',
-			},
+			type: 'richtext',
+			isVisible: true,
 		},
 		{
+			id: 'link',
 			label: __( 'Link' ),
-			type: 'Link',
-			shownByDefault: false,
+			type: 'link',
+			isVisible: false,
 			mapping: {
 				href: 'url',
 				rel: 'rel',

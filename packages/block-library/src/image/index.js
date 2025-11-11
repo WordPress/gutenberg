@@ -65,24 +65,27 @@ export const settings = {
 if ( window.__experimentalContentOnlyPatternInsertion ) {
 	settings.fields = [
 		{
+			id: 'image',
 			label: __( 'Image' ),
-			type: 'Media',
-			shownByDefault: true,
+			type: 'media',
+			isVisible: true,
+			Edit: {
+				control: 'media',
+				allowedTypes: [ 'image' ],
+				multiple: false,
+			},
 			mapping: {
 				id: 'id',
 				src: 'url',
 				caption: 'caption',
 				alt: 'alt',
 			},
-			args: {
-				allowedTypes: [ 'image' ],
-				multiple: false,
-			},
 		},
 		{
+			id: 'link',
 			label: __( 'Link' ),
-			type: 'Link',
-			shownByDefault: false,
+			type: 'link',
+			isVisible: false,
 			mapping: {
 				href: 'href',
 				rel: 'rel',
@@ -91,20 +94,16 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 			},
 		},
 		{
+			id: 'caption',
 			label: __( 'Caption' ),
-			type: 'RichText',
-			shownByDefault: false,
-			mapping: {
-				value: 'caption',
-			},
+			type: 'richtext',
+			isVisible: false,
 		},
 		{
+			id: 'alt',
 			label: __( 'Alt text' ),
-			type: 'PlainText',
-			shownByDefault: false,
-			mapping: {
-				value: 'alt',
-			},
+			type: 'text',
+			isVisible: false,
 		},
 	];
 }
