@@ -39,17 +39,10 @@ function selector( select ) {
 		isTyping,
 		isDragging,
 		isZoomOut,
-		getBlocksByClientId,
-		getSelectedBlockClientIds,
-		getBlockRootClientId,
-		isGroupable,
-		getBlockName,
 		getBlock,
 		getBlockMode,
 		isBlockInterfaceHidden,
 	} = unlock( select( blockEditorStore ) );
-
-	const { getGroupingBlockName } = select( blocksStore );
 
 	const clientId =
 		getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
@@ -74,12 +67,6 @@ function selector( select ) {
 		isDragging: isDragging(),
 		showEmptyBlockSideInserter,
 		showBlockToolbarPopover,
-		getBlocksByClientId,
-		getSelectedBlockClientIds,
-		getBlockRootClientId,
-		isGroupable,
-		getBlockName,
-		getGroupingBlockName,
 	};
 }
 
@@ -103,6 +90,11 @@ export default function BlockTools( {
 		isTyping,
 		isZoomOutMode,
 		isDragging,
+		showEmptyBlockSideInserter,
+		showBlockToolbarPopover,
+	} = useSelect( selector, [] );
+	const { getGroupingBlockName } = useSelect( blocksStore );
+	const {
 		getBlocksByClientId,
 		getSelectedBlockClientIds,
 		getBlockRootClientId,
@@ -110,9 +102,6 @@ export default function BlockTools( {
 		getBlockName,
 		getEditedContentOnlySection,
 	} = unlock( useSelect( blockEditorStore ) );
-	const { getGroupingBlockName } = useSelect( blocksStore );
-	const { showEmptyBlockSideInserter, showBlockToolbarPopover } =
-		useShowBlockTools();
 
 	const isMatch = useShortcutEventMatch();
 	const pasteStyles = usePasteStyles();
