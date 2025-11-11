@@ -1397,12 +1397,6 @@ test.describe( 'Navigation block', () => {
 				// Verify Link input becomes enabled
 				await expect( linkInput ).toBeEnabled();
 
-				// TODO: fix focus loss bug.
-				// Focus is set automatically by the unsync handler, but we just ensure
-				// the input is ready for editing (enabled) which is the key requirement
-				// Focus the input before filling to ensure it's ready
-				await linkInput.focus();
-
 				// Update URL to a valid value
 				await linkInput.fill( 'https://example.com' );
 				await linkInput.blur();
