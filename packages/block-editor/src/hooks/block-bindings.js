@@ -323,37 +323,21 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 		[ blockName ]
 	);
 
-	const contexts = useSelect(
+	const sources = useSelect(
 		( select ) => {
 			const { getAllBlockBindingsSources, getContextForSource } = unlock(
 				select( blockStore )
 			);
-			const _contexts = {};
-			Object.entries( getAllBlockBindingsSources() ).forEach(
-				( [ sourceName, source ] ) => {
-					_contexts[ sourceName ] = getContextForSource(
-						source,
-						blockContext
-					);
-				}
-			);
-			return _contexts;
-		},
-		[ blockContext ]
-	);
-
-	const sources = useSelect(
-		( select ) => {
-			const registeredSources = unlock(
-				select( blockStore )
-			).getAllBlockBindingsSources();
 			const data = {};
-			Object.entries( registeredSources ).forEach(
+			Object.entries( getAllBlockBindingsSources() ).forEach(
 				( [ sourceName, source ] ) => {
 					if ( source.getFieldsList ) {
 						data[ sourceName ] = source.getFieldsList( {
 							select,
-							context: contexts[ sourceName ],
+							context: getContextForSource(
+								source,
+								blockContext
+							),
 						} );
 						if ( data[ sourceName ].length === 0 ) {
 							data[ sourceName ] = EMPTY_ARRAY;
@@ -363,7 +347,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 			);
 			return data;
 		},
-		[ contexts ]
+		[ blockContext ]
 	);
 
 	// Return early if there are no bindable attributes.
