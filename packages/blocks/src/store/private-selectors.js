@@ -1,14 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { createSelector, createRegistrySelector } from '@wordpress/data';
+import { createSelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
-import { STORE_NAME } from './constants';
-import { unlock } from '../lock-unlock';
 import { getBlockType } from './selectors';
 import { getValueFromObjectPath } from './utils';
 import { __EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY } from '../api/constants';
@@ -213,23 +211,6 @@ export function getBlockBindingsSource( state, sourceName ) {
 	return state.blockBindingsSources[ sourceName ];
 }
 
-// Separate selector to compute context for source?
-
-export const getSourceFieldsList = createRegistrySelector( ( select ) =>
-	createSelector(
-		( state, source, blockContext ) => {
-			const context = {};
-			if ( source?.usesContext?.length ) {
-				for ( const key of source.usesContext ) {
-					context[ key ] = blockContext[ key ];
-				}
-			}
-			return source.getFieldsList( { select, context } );
-		},
-		( state, source, blockContext ) => [ source, blockContext ]
-	)
-);
-
 export const getContextForSource = createSelector(
 	( state, source, blockContext ) => {
 		const context = {};
@@ -241,47 +222,6 @@ export const getContextForSource = createSelector(
 		return context;
 	},
 	( state, source, blockContext ) => [ source, blockContext ]
-);
-
-export const getBlockBindingsSourcesForBlock = createRegistrySelector(
-	( select ) => ( state, blockName, blockContext ) => {
-		const registeredSources = getAllBlockBindingsSources( state );
-		const sources = {};
-
-		Object.entries( registeredSources ).forEach(
-			( [ sourceName, source ] ) => {
-				const { getFieldsList, usesContext, label, getValues } = source;
-				// Populate context.
-				const context = {};
-				if ( usesContext?.length ) {
-					for ( const key of usesContext ) {
-						context[ key ] = blockContext[ key ];
-					}
-				}
-				if ( getFieldsList ) {
-					const fieldsListResult = unlock(
-						select( STORE_NAME )
-					).getSourceFieldsList( source, blockContext );
-					sources[ sourceName ] = {
-						data: fieldsListResult || [],
-						label,
-						getValues,
-					};
-				} else {
-					/*
-					 * Include sources without getFieldsList if they are already used in a binding.
-					 * This allows them to be displayed in read-only mode.
-					 */
-					sources[ sourceName ] = {
-						data: [],
-						label,
-						getValues,
-					};
-				}
-			}
-		);
-		return sources;
-	}
 );
 
 /**
