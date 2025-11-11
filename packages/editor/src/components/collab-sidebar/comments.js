@@ -575,6 +575,7 @@ function Thread( {
 			} ) }
 			id={ `comment-thread-${ thread.id }` }
 			spacing="3"
+			onMouseDown={ handleCommentSelect }
 			onClick={ handleCommentSelect }
 			onMouseEnter={ onMouseEnter }
 			onMouseLeave={ onMouseLeave }
@@ -600,27 +601,7 @@ function Thread( {
 					unselectThread();
 				}
 			} }
-			onKeyDown={ ( event ) => {
-				if ( event.defaultPrevented ) {
-					return;
-				}
-				// Expand or Collapse thread.
-				if (
-					event.key === 'Enter' &&
-					event.currentTarget === event.target
-				) {
-					if ( isSelected ) {
-						unselectThread();
-					} else {
-						handleCommentSelect();
-					}
-				}
-				// Collapse thread and focus the thread.
-				if ( event.key === 'Escape' ) {
-					unselectThread();
-					focusCommentThread( thread.id, commentSidebarRef.current );
-				}
-			} }
+			onKeyDown={ onKeyDown }
 			tabIndex={ 0 }
 			role="treeitem"
 			aria-label={ ariaLabel }
