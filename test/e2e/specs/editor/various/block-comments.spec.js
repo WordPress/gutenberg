@@ -785,7 +785,7 @@ test.describe( 'Block Comments', () => {
 			} );
 			const thread = page
 				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'listitem', {
+				.getByRole( 'treeitem', {
 					name: 'Note: A test comment',
 				} );
 
