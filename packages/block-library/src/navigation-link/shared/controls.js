@@ -113,13 +113,13 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 
 	useEffect( () => {
 		// Only want to focus the input if the url is not bound to an entity.
-		if ( ! isBoundEntityAvailable && shouldFocusURLInputRef.current ) {
+		if ( ! hasUrlBinding && shouldFocusURLInputRef.current ) {
 			// focuses and highlights the url input value, giving the user
 			// the ability to delete the value quickly or edit it.
 			urlInputRef.current?.select();
 		}
 		shouldFocusURLInputRef.current = false;
-	}, [ isBoundEntityAvailable ] );
+	}, [ hasUrlBinding ] );
 
 	return (
 		<ToolsPanel
