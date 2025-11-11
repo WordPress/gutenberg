@@ -575,7 +575,6 @@ function Thread( {
 			} ) }
 			id={ `comment-thread-${ thread.id }` }
 			spacing="3"
-			onMouseDown={ handleCommentSelect }
 			onClick={ handleCommentSelect }
 			onMouseEnter={ onMouseEnter }
 			onMouseLeave={ onMouseLeave }
