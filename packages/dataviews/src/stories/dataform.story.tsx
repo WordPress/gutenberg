@@ -1035,7 +1035,7 @@ const ValidationComponent = ( {
 				description: 'Email must be from @company.com domain',
 				isValid: {
 					required,
-					pattern: /^[a-zA-Z0-9._%+-]+@company\.com$/,
+					pattern: /^[a-zA-Z0-9]+@company\.com$/,
 				},
 			},
 			{
@@ -1077,7 +1077,7 @@ const ValidationComponent = ( {
 				description: 'Must be a GitHub repository URL',
 				isValid: {
 					required,
-					pattern: /^https:\/\/github\.com\/[\w-]+\/[\w-]+\/?$/,
+					pattern: /^https:\/\/github\.com\/.*/,
 				},
 			},
 			{
