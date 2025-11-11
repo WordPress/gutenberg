@@ -483,7 +483,13 @@ function Thread( {
 		debouncedToggleBlockHighlight( thread.blockClientId, true );
 	};
 
+	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
+
 	const onBlur = ( event ) => {
+		// Don't close the thread if a dialog is open.
+		if ( showConfirmDialog ) {
+			return;
+		}
 		if (
 			event.currentTarget &&
 			( ! event.relatedTarget ||
@@ -610,6 +616,8 @@ function Thread( {
 				} }
 				onDelete={ onCommentDelete }
 				reflowComments={ reflowComments }
+				showConfirmDialog={ showConfirmDialog }
+				setShowConfirmDialog={ setShowConfirmDialog }
 			/>
 			{ isSelected &&
 				allReplies.map( ( reply ) => (
@@ -621,6 +629,8 @@ function Thread( {
 						onEdit={ onEditComment }
 						onDelete={ onCommentDelete }
 						reflowComments={ reflowComments }
+						showConfirmDialog={ showConfirmDialog }
+						setShowConfirmDialog={ setShowConfirmDialog }
 					/>
 				) ) }
 			{ ! isSelected && restReplies.length > 0 && (
@@ -657,6 +667,8 @@ function Thread( {
 					onEdit={ onEditComment }
 					onDelete={ onCommentDelete }
 					reflowComments={ reflowComments }
+					showConfirmDialog={ showConfirmDialog }
+					setShowConfirmDialog={ setShowConfirmDialog }
 				/>
 			) }
 			{ isSelected && (
@@ -732,9 +744,10 @@ const CommentBoard = ( {
 	onEdit,
 	onDelete,
 	reflowComments,
+	showConfirmDialog,
+	setShowConfirmDialog,
 } ) => {
 	const [ actionState, setActionState ] = useState( false );
-	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
 	const actionButtonRef = useRef( null );
 	const handleConfirmDelete = () => {
 		onDelete( thread );
