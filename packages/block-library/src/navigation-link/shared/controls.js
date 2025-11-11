@@ -173,7 +173,7 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 					} )() }
 					autoComplete="off"
 					type="url"
-					disabled={ isBoundEntityAvailable }
+					disabled={ hasUrlBinding }
 					aria-invalid={
 						hasUrlBinding && ! isBoundEntityAvailable
 							? 'true'
@@ -183,14 +183,6 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 					className={
 						hasUrlBinding && ! isBoundEntityAvailable
 							? 'navigation-link-control__input-with-error-suffix'
-							: undefined
-					}
-					onClick={
-						hasUrlBinding && ! isBoundEntityAvailable
-							? () => {
-									unsyncBoundLink();
-									shouldFocusURLInputRef.current = true;
-							  }
 							: undefined
 					}
 					onChange={ ( newValue ) => {

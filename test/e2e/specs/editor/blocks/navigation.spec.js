@@ -1348,6 +1348,9 @@ test.describe( 'Navigation block', () => {
 					name: 'Link',
 				} );
 
+				// Verify input is disabled when entity is unavailable
+				await expect( linkInput ).toBeDisabled();
+
 				// Verify input shows empty value (error state)
 				await expect( linkInput ).toHaveValue( '' );
 
