@@ -584,7 +584,6 @@ const ValidationComponent = ( {
 		phonePattern?: string;
 		emailPattern?: string;
 		urlPattern?: string;
-		textareaPattern?: string;
 	};
 
 	const [ post, setPost ] = useState< ValidatedItem >( {
@@ -613,7 +612,6 @@ const ValidationComponent = ( {
 		phonePattern: '+1-555-123-4567',
 		emailPattern: 'user@company.com',
 		urlPattern: 'https://github.com/wordpress/gutenberg',
-		textareaPattern: '#wordpress #gutenberg #react',
 	} );
 
 	// Cache for getElements functions - ensures promises are only created once
@@ -1006,18 +1004,6 @@ const ValidationComponent = ( {
 				},
 			},
 			{
-				id: 'textareaPattern',
-				type: 'text',
-				Edit: 'textarea',
-				label: 'Textarea (pattern: hashtags only)',
-				placeholder: '#tag1 #tag2 #tag3',
-				description: 'Must contain only hashtags separated by spaces',
-				isValid: {
-					required,
-					pattern: /^(#\w+\s*)+$/,
-				},
-			},
-			{
 				id: 'email',
 				type: 'email',
 				label: 'e-mail',
@@ -1288,7 +1274,6 @@ const ValidationComponent = ( {
 				'color',
 				'password',
 				'textarea',
-				'textareaPattern',
 				'select',
 				'textWithRadio',
 				'boolean',
