@@ -30,12 +30,7 @@ import { useInstanceId } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import {
-	SORTING_DIRECTIONS,
-	sortIcons,
-	sortLabels,
-	FEATURE_SORTING,
-} from '../../constants';
+import { SORTING_DIRECTIONS, sortIcons, sortLabels } from '../../constants';
 import { VIEW_LAYOUTS } from '../../dataviews-layouts';
 import type { View } from '../../types';
 import DataViewsContext from '../dataviews-context';
@@ -330,9 +325,7 @@ export function DataviewsViewConfigDropdown() {
 				>
 					<VStack className="dataviews-view-config" spacing={ 6 }>
 						<SettingsSection title={ __( 'Appearance' ) }>
-							{ !! activeLayout?.supports.includes(
-								FEATURE_SORTING
-							) && (
+							{ !! activeLayout?.supports?.sorting && (
 								<HStack expanded className="is-divided-in-two">
 									<SortFieldControl />
 									<SortDirectionControl />

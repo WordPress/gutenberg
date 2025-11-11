@@ -26,7 +26,6 @@ import {
 	LAYOUT_TIMELINE,
 	LAYOUT_PICKER_GRID,
 	LAYOUT_PICKER_TABLE,
-	FEATURE_SORTING,
 } from '../constants';
 import PreviewSizePicker from './utils/preview-size-picker';
 import DensityPicker from './table/density-picker';
@@ -38,7 +37,7 @@ export const VIEW_LAYOUTS = [
 		component: ViewTable,
 		icon: blockTable,
 		viewConfigOptions: DensityPicker,
-		supports: [ FEATURE_SORTING ],
+		supports: { sorting: true },
 	},
 	{
 		type: LAYOUT_GRID,
@@ -46,21 +45,21 @@ export const VIEW_LAYOUTS = [
 		component: ViewGrid,
 		icon: category,
 		viewConfigOptions: PreviewSizePicker,
-		supports: [ FEATURE_SORTING ],
+		supports: { sorting: true },
 	},
 	{
 		type: LAYOUT_LIST,
 		label: __( 'List' ),
 		component: ViewList,
 		icon: isRTL() ? formatListBulletsRTL : formatListBullets,
-		supports: [ FEATURE_SORTING ],
+		supports: { sorting: true },
 	},
 	{
 		type: LAYOUT_TIMELINE,
 		label: __( 'Timeline' ),
 		component: ViewTimeline,
 		icon: scheduled,
-		supports: [] as string[],
+		supports: {},
 	},
 	{
 		type: LAYOUT_PICKER_GRID,
@@ -69,7 +68,7 @@ export const VIEW_LAYOUTS = [
 		icon: category,
 		viewConfigOptions: PreviewSizePicker,
 		isPicker: true,
-		supports: [ FEATURE_SORTING ],
+		supports: { sorting: true },
 	},
 	{
 		type: LAYOUT_PICKER_TABLE,
@@ -78,5 +77,6 @@ export const VIEW_LAYOUTS = [
 		icon: blockTable,
 		viewConfigOptions: DensityPicker,
 		isPicker: true,
+		supports: { sorting: true },
 	},
 ];
