@@ -503,7 +503,7 @@ export default function Filter( {
 			try {
 				const dateValue = parseDateTime( label );
 				if ( dateValue !== null ) {
-					label = dateI18n( field.format, label );
+					label = dateI18n( field.displayFormat.date, label );
 				}
 			} catch ( e ) {
 				label = filterInView.value;

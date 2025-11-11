@@ -832,19 +832,26 @@ export const DateComponent = ( {
 	type,
 	Edit,
 	asyncElements,
-	format,
+	displayFormatDate,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
-	format?: string;
+	displayFormatDate?: string;
 } ) => {
 	const dateFields = useMemo(
 		() =>
 			fields
 				.filter( ( field ) => field.type === 'date' )
-				.map( ( field ) => ( format ? { ...field, format } : field ) ),
-		[ format ]
+				.map( ( field ) =>
+					displayFormatDate
+						? {
+								...field,
+								displayFormat: { date: displayFormatDate },
+						  }
+						: field
+				),
+		[ displayFormatDate ]
 	);
 
 	return (
@@ -858,10 +865,10 @@ export const DateComponent = ( {
 };
 DateComponent.storyName = 'date';
 DateComponent.args = {
-	format: '',
+	displayFormatDate: '',
 };
 DateComponent.argTypes = {
-	format: {
+	displayFormatDate: {
 		control: 'text',
 		description:
 			'Custom PHP date format string (e.g., "F j, Y" for "November 6, 2010"). Leave empty to use WordPress default.',

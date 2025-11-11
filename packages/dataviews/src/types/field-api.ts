@@ -310,10 +310,13 @@ export type Field< Item > = {
 	setValue?: ( args: { item: Item; value: any } ) => DeepPartial< Item >;
 
 	/**
-	 * Format string for fields of type date.
+	 * Display format configuration for fields.
+	 * For date fields, contains a date property with the format string.
 	 * If not provided, defaults to WordPress date format settings.
 	 */
-	format?: string;
+	displayFormat?: {
+		date: string;
+	};
 };
 
 export type NormalizedField< Item > = Omit< Field< Item >, 'Edit' > & {
@@ -330,7 +333,9 @@ export type NormalizedField< Item > = Omit< Field< Item >, 'Edit' > & {
 	enableSorting: boolean;
 	filterBy: NormalizedFilterByConfig | false;
 	readOnly: boolean;
-	format: string;
+	displayFormat: {
+		date: string;
+	};
 };
 
 /**

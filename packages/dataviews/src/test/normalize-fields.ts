@@ -334,7 +334,7 @@ describe( 'normalizeFields: default getValue', () => {
 		} );
 	} );
 
-	describe( 'format normalization', () => {
+	describe( 'displayFormat normalization', () => {
 		it( 'applies default format when not provided for date fields', () => {
 			const fields: Field< {} >[] = [
 				{
@@ -343,8 +343,11 @@ describe( 'normalizeFields: default getValue', () => {
 				},
 			];
 			const normalizedFields = normalizeFields( fields );
-			expect( normalizedFields[ 0 ].format ).toBeDefined();
-			expect( typeof normalizedFields[ 0 ].format ).toBe( 'string' );
+			expect( normalizedFields[ 0 ].displayFormat ).toBeDefined();
+			expect( normalizedFields[ 0 ].displayFormat.date ).toBeDefined();
+			expect( typeof normalizedFields[ 0 ].displayFormat.date ).toBe(
+				'string'
+			);
 		} );
 
 		it( 'preserves custom format when provided', () => {
@@ -352,14 +355,16 @@ describe( 'normalizeFields: default getValue', () => {
 				{
 					id: 'publishDate',
 					type: 'date',
-					format: 'F j, Y',
+					displayFormat: {
+						date: 'F j, Y',
+					},
 				},
 			];
 			const normalizedFields = normalizeFields( fields );
-			expect( normalizedFields[ 0 ].format ).toBe( 'F j, Y' );
+			expect( normalizedFields[ 0 ].displayFormat.date ).toBe( 'F j, Y' );
 		} );
 
-		it( 'does not add format for non-date field types', () => {
+		it( 'always adds displayFormat.date for all field types', () => {
 			const fields: Field< {} >[] = [
 				{
 					id: 'title',
@@ -371,8 +376,8 @@ describe( 'normalizeFields: default getValue', () => {
 				},
 			];
 			const normalizedFields = normalizeFields( fields );
-			expect( normalizedFields[ 0 ].format ).toBeUndefined();
-			expect( normalizedFields[ 1 ].format ).toBeUndefined();
+			expect( normalizedFields[ 0 ].displayFormat.date ).toBeDefined();
+			expect( normalizedFields[ 1 ].displayFormat.date ).toBeDefined();
 		} );
 	} );
 } );

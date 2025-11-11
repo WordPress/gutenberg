@@ -205,12 +205,14 @@ export default function normalizeFields< Item >(
 				true,
 			filterBy,
 			readOnly: field.readOnly ?? fieldTypeDefinition.readOnly ?? false,
-			format:
-				field.type === 'date' &&
-				field.format !== undefined &&
-				typeof field.format === 'string'
-					? field.format
-					: getSettings().formats.date,
+			displayFormat: {
+				date:
+					field.type === 'date' &&
+					field.displayFormat?.date !== undefined &&
+					typeof field.displayFormat.date === 'string'
+						? field.displayFormat.date
+						: getSettings().formats.date,
+			},
 		};
 	} );
 }

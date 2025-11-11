@@ -48,7 +48,7 @@ export default {
 			return '';
 		}
 
-		return dateI18n( field.format, value );
+		return dateI18n( field.displayFormat.date, value );
 	},
 	enableSorting: true,
 	filterBy: {
