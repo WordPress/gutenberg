@@ -16,6 +16,7 @@ import { privateApis as themePrivateApis } from '@wordpress/theme';
  */
 import Sidebar from '../sidebar';
 import Canvas from '../canvas';
+import SavePanel from '../save-panel';
 import { unlock } from '../../lock-unlock';
 import type { CanvasData } from '../../store/types';
 import './style.scss';
@@ -23,7 +24,6 @@ import './style.scss';
 const { ThemeProvider } = unlock( themePrivateApis );
 
 export default function Root() {
-	// Get canvas data from the current route's loader
 	const matches = useMatches();
 	const currentMatch = matches[ matches.length - 1 ];
 	const canvas = ( currentMatch?.loaderData as any )?.canvas as
@@ -43,6 +43,7 @@ export default function Root() {
 					} ) }
 				>
 					<CommandMenu />
+					<SavePanel />
 					{ ! isFullScreen && (
 						<div className="boot-layout__sidebar">
 							<Sidebar />

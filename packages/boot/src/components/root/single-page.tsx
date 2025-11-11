@@ -15,6 +15,7 @@ import { privateApis as themePrivateApis } from '@wordpress/theme';
  * Internal dependencies
  */
 import Canvas from '../canvas';
+import SavePanel from '../save-panel';
 import { unlock } from '../../lock-unlock';
 import type { CanvasData } from '../../store/types';
 import './style.scss';
@@ -26,7 +27,6 @@ const { ThemeProvider } = unlock( themePrivateApis );
  * Used when rendering pages within wp-admin without taking over the full page.
  */
 export default function RootSinglePage() {
-	// Get canvas data from the current route's loader
 	const matches = useMatches();
 	const currentMatch = matches[ matches.length - 1 ];
 	const canvas = ( currentMatch?.loaderData as any )?.canvas as
@@ -42,6 +42,7 @@ export default function RootSinglePage() {
 					} ) }
 				>
 					<CommandMenu />
+					<SavePanel />
 					<div className="boot-layout__surfaces">
 						<ThemeProvider
 							color={ { bg: '#ffffff', primary: '#3858e9' } }
