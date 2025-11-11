@@ -891,13 +891,20 @@ export function createValidationResult(
  *
  * @param {WPBlock}            block                          Block object.
  * @param {WPBlockType|string} [blockTypeOrName = block.name] Block type or name, inferred from block if not given.
+ * @param {Object}             [options]                      Validation options.
+ * @param {boolean}            [options.log=true]             Whether to log Level 3 regenerations.
  *
  * @return {[boolean, Array<LoggerItem>, Object]} Validation results tuple:
  *                                                - isValid: boolean indicating if block is valid
  *                                                - issues: array of validation issues
  *                                                - metadata: object containing validationLevel, originalContent, generatedContent
  */
-export function validateBlock( block, blockTypeOrName = block.name ) {
+export function validateBlock(
+	block,
+	blockTypeOrName = block.name,
+	options = {}
+) {
+	const { log = true } = options;
 	const isFallbackBlock =
 		block.name === getFreeformContentHandlerName() ||
 		block.name === getUnregisteredTypeHandlerName();
@@ -1025,14 +1032,16 @@ export function validateBlock( block, blockTypeOrName = block.name ) {
 
 		if ( contentIsReasonable ) {
 			// Log regeneration for visibility and debugging.
-			// eslint-disable-next-line no-console
-			console.log(
-				`Block "${ blockType.name }" regenerated from attributes (Level 3).`,
-				'\nOriginal:',
-				block.originalContent,
-				'\nGenerated:',
-				generatedBlockContent
-			);
+			if ( log ) {
+				// eslint-disable-next-line no-console
+				console.log(
+					`Block "${ blockType.name }" regenerated from attributes (Level 3).`,
+					'\nOriginal:',
+					block.originalContent,
+					'\nGenerated:',
+					generatedBlockContent
+				);
+			}
 
 			return [
 				true,

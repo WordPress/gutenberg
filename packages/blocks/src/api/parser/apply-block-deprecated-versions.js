@@ -76,7 +76,13 @@ export function applyBlockDeprecatedVersions( block, rawBlock, blockType ) {
 		};
 
 		// Ignore the deprecation if it produces a block which is not valid.
-		let [ isValid ] = validateBlock( migratedBlock, deprecatedBlockType );
+		// Suppress logging during deprecation validation checks.
+		let validationResult = validateBlock(
+			migratedBlock,
+			deprecatedBlockType,
+			{ log: false }
+		);
+		let [ isValid, , validationMeta ] = validationResult;
 
 		// If the migrated block is not valid initially, try the built-in fixes.
 		if ( ! isValid ) {
@@ -84,12 +90,27 @@ export function applyBlockDeprecatedVersions( block, rawBlock, blockType ) {
 				migratedBlock,
 				deprecatedBlockType
 			);
-			[ isValid ] = validateBlock( migratedBlock, deprecatedBlockType );
+			validationResult = validateBlock(
+				migratedBlock,
+				deprecatedBlockType,
+				{ log: false }
+			);
+			[ isValid, , validationMeta ] = validationResult;
 		}
 
 		// An invalid block does not imply incorrect HTML but the fact block
 		// source information could be lost on re-serialization.
 		if ( ! isValid ) {
+			continue;
+		}
+
+		// Deprecations should only apply when the content actually matches
+		// the deprecated save output (validation levels 0-2). If it only
+		// passes via Level 3 regeneration, the content doesn't truly match
+		// this deprecated version.
+		const { validationLevel } = validationMeta || {};
+		if ( validationLevel === 3 ) {
+			// VALIDATION_LEVEL.REGENERATED_BLOCK
 			continue;
 		}
 

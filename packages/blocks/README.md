@@ -997,6 +997,8 @@ _Parameters_
 
 -   _block_ `WPBlock`: Block object.
 -   _blockTypeOrName_ `[WPBlockType|string]`: Block type or name, inferred from block if not given.
+-   _options_ `[Object]`: Validation options.
+-   _options.log_ `[boolean]`: Whether to log Level 3 regenerations.
 
 _Returns_
 
