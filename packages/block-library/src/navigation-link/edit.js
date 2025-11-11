@@ -265,11 +265,15 @@ export default function NavigationLinkEdit( {
 	const { getBlocks } = useSelect( blockEditorStore );
 
 	// URL binding logic
-	const { clearBinding, createBinding, isBoundEntityAvailable } =
-		useEntityBinding( {
-			clientId,
-			attributes,
-		} );
+	const {
+		clearBinding,
+		createBinding,
+		isBoundEntityAvailable,
+		hasUrlBinding,
+	} = useEntityBinding( {
+		clientId,
+		attributes,
+	} );
 
 	const [ isInvalid, isDraft ] = useIsInvalidLink(
 		kind,
@@ -323,34 +327,11 @@ export default function NavigationLinkEdit( {
 	// Auto-clear URL and open Link UI when entity is not available and block is selected
 	// Keep binding so invalid state remains until user selects a new entity
 	useEffect( () => {
-		if (
-			isSelected &&
-			! isBoundEntityAvailable &&
-			id &&
-			metadata?.bindings?.url &&
-			url
-		) {
-			// Mark this change as not persistent to avoid creating undo levels
-			// for automatic cleanup of broken bindings
-			__unstableMarkNextChangeAsNotPersistent();
-			// Clear URL so user is forced to select a new entity
-			// Keep binding and ID so invalid state remains visible
-			setAttributes( {
-				url: undefined,
-			} );
+		if ( isSelected && ! isBoundEntityAvailable && hasUrlBinding ) {
 			// Open Link UI so user can immediately select a new entity
 			setIsLinkOpen( true );
 		}
-	}, [
-		isSelected,
-		isBoundEntityAvailable,
-		id,
-		metadata?.bindings?.url,
-		url,
-		setAttributes,
-		setIsLinkOpen,
-		__unstableMarkNextChangeAsNotPersistent,
-	] );
+	}, [ isSelected, isBoundEntityAvailable, hasUrlBinding, setIsLinkOpen ] );
 
 	// If the LinkControl popover is open and the URL has changed, close the LinkControl and focus the label text.
 	useEffect( () => {
