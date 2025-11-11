@@ -63,8 +63,7 @@ export const setupEditor =
 		if (
 			edits &&
 			Object.values( edits ).some(
-				( [ key, edit ] ) =>
-					edit !== ( post[ key ]?.raw ?? post[ key ] )
+				( key, edit ) => edit !== ( post[ key ]?.raw ?? post[ key ] )
 			)
 		) {
 			dispatch.editPost( edits );
