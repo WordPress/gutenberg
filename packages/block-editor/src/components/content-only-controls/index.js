@@ -158,7 +158,7 @@ function ContentOnlyControlsScreen( {
 	}
 
 	return (
-		<div className="block-editor-content-only-controls__screen">
+		<>
 			{ isNested && (
 				<div className="block-editor-content-only-controls__button-panel">
 					<Navigator.BackButton className="block-editor-content-only-controls__back-button">
@@ -182,7 +182,7 @@ function ContentOnlyControlsScreen( {
 
 				return <BlockFields key={ clientId } clientId={ clientId } />;
 			} ) }
-		</div>
+		</>
 	);
 }
 
@@ -268,7 +268,10 @@ export default function ContentOnlyControls( { rootClientId } ) {
 
 	return (
 		<Navigator initialPath="/">
-			<Navigator.Screen path="/">
+			<Navigator.Screen
+				path="/"
+				className="block-editor-content-only-controls__screen"
+			>
 				<ContentOnlyControlsScreen
 					rootClientId={ updatedRootClientId ?? rootClientId }
 					contentClientIds={ contentClientIds }
@@ -276,7 +279,11 @@ export default function ContentOnlyControls( { rootClientId } ) {
 				/>
 			</Navigator.Screen>
 			{ Object.keys( nestedContentClientIds ).map( ( clientId ) => (
-				<Navigator.Screen key={ clientId } path={ `/${ clientId }` }>
+				<Navigator.Screen
+					key={ clientId }
+					path={ `/${ clientId }` }
+					className="block-editor-content-only-controls__screen"
+				>
 					<ContentOnlyControlsScreen
 						isNested
 						rootClientId={ clientId }
