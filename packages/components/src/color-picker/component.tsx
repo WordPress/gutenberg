@@ -96,10 +96,10 @@ const UnconnectedColorPicker = (
 				return;
 			}
 
-			const detectedFormat = getFormat( pastedText );
-			if ( ! detectedFormat ) {
-				return;
-			}
+			// Apply all valid colors, even if the format isn't supported in
+			// the UI (e.g. names like "cyan" or, in the future color spaces
+			// like "lch" if we add the right colord plugins)
+			handleChange( parsedColor );
 
 			// This redundancy helps TypeScript and is safer than assertions
 			const supportedFormats: Record< string, ColorType | undefined > = {
@@ -108,11 +108,7 @@ const UnconnectedColorPicker = (
 				hsl: 'hsl',
 			};
 
-			// Apply all valid colors, even if the format isn't supported in
-			// the UI (e.g. names like "cyan" or, in the future color spaces
-			// like "lch" if we add the right colord plugins)
-			handleChange( parsedColor );
-
+			const detectedFormat = String( getFormat( pastedText ) );
 			const newColorType = supportedFormats[ detectedFormat ];
 			if ( newColorType ) {
 				setColorType( newColorType );
