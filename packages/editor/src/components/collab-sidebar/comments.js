@@ -774,11 +774,15 @@ const CommentBoard = ( {
 			? actions.filter( ( item ) => item.isEligible( thread ) )
 			: [];
 
-	const deleteConfirmMessage = canResolve
-		? __(
-				"Are you sure you want to delete this note? This will also delete all of this note's replies."
-		  )
-		: __( 'Are you sure you want to delete this note?' );
+	let deleteConfirmMessage = __(
+		'Are you sure you want to delete this note?'
+	);
+
+	// When deleting a top level note, descendants will also be deleted.
+	if ( canResolve ) {
+		deleteConfirmMessage +=
+			' ' + __( "This will also delete all of this note's replies." );
+	}
 
 	return (
 		<VStack
