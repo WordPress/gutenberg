@@ -86,10 +86,6 @@ function UnforwardedLinkUI( props, ref ) {
 		attributes: props.link,
 	} );
 
-	// Only enable handleEntities when binding is active (exists AND entity available)
-	// This allows editing when entity is missing even though binding exists
-	const hasUrlBinding = isBindingActive;
-
 	// Memoize link value to avoid overriding the LinkControl's internal state.
 	// This is a temporary fix. See https://github.com/WordPress/gutenberg/issues/50976#issuecomment-1568226407.
 	const link = useMemo(
@@ -157,7 +153,7 @@ function UnforwardedLinkUI( props, ref ) {
 						onChange={ props.onChange }
 						onRemove={ props.onRemove }
 						onCancel={ props.onCancel }
-						handleEntities={ hasUrlBinding }
+						handleEntities={ isBindingActive }
 						renderControlBottom={ () => {
 							// Don't show the tools when there is submitted link (preview state).
 							if ( link?.url?.length ) {

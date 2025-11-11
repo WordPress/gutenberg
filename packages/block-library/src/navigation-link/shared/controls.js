@@ -89,7 +89,7 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 	// Use the entity binding hook internally
 	const {
 		hasUrlBinding,
-		isBoundEntityAvailable,
+		isEntityUnavailable,
 		isBindingActive,
 		clearBinding,
 	} = useEntityBinding( {
@@ -171,7 +171,7 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 					id={ inputId }
 					label={ __( 'Link' ) }
 					value={ ( () => {
-						if ( ! isBoundEntityAvailable && hasUrlBinding ) {
+						if ( isEntityUnavailable ) {
 							return '';
 						}
 						return inputValue ? safeDecodeURI( inputValue ) : '';
@@ -179,19 +179,15 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 					autoComplete="off"
 					type="url"
 					disabled={ isBindingActive }
-					aria-invalid={
-						! isBoundEntityAvailable && hasUrlBinding
-							? 'true'
-							: undefined
-					}
+					aria-invalid={ isEntityUnavailable ? 'true' : undefined }
 					aria-describedby={ helpTextId }
 					className={
-						! isBoundEntityAvailable && hasUrlBinding
+						isEntityUnavailable
 							? 'navigation-link-control__input-with-error-suffix'
 							: undefined
 					}
 					onClick={
-						! isBoundEntityAvailable && hasUrlBinding
+						isEntityUnavailable
 							? () => {
 									unsyncBoundLink();
 									shouldFocusURLInputRef.current = true;
@@ -233,7 +229,7 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 						} );
 					} }
 					help={
-						! isBoundEntityAvailable && hasUrlBinding ? (
+						isEntityUnavailable ? (
 							<MissingEntityHelpText
 								id={ helpTextId }
 								type={ attributes.type }
@@ -263,7 +259,7 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 								label={ __( 'Unsync and edit' ) }
 								__next40pxDefaultSize
 								className={
-									! isBoundEntityAvailable && hasUrlBinding
+									isEntityUnavailable
 										? 'navigation-link-control__error-suffix-button'
 										: undefined
 								}

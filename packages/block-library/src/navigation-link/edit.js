@@ -265,15 +265,11 @@ export default function NavigationLinkEdit( {
 	const { getBlocks } = useSelect( blockEditorStore );
 
 	// URL binding logic
-	const {
-		clearBinding,
-		createBinding,
-		isBoundEntityAvailable,
-		hasUrlBinding,
-	} = useEntityBinding( {
-		clientId,
-		attributes,
-	} );
+	const { clearBinding, createBinding, isEntityUnavailable } =
+		useEntityBinding( {
+			clientId,
+			attributes,
+		} );
 
 	const [ isInvalid, isDraft ] = useIsInvalidLink(
 		kind,
@@ -427,12 +423,7 @@ export default function NavigationLinkEdit( {
 		}
 	);
 
-	if (
-		! url ||
-		isInvalid ||
-		isDraft ||
-		( ! isBoundEntityAvailable && hasUrlBinding )
-	) {
+	if ( ! url || isInvalid || isDraft || isEntityUnavailable ) {
 		blockProps.onClick = () => {
 			setIsLinkOpen( true );
 		};
@@ -440,10 +431,7 @@ export default function NavigationLinkEdit( {
 
 	const classes = clsx( 'wp-block-navigation-item__content', {
 		'wp-block-navigation-link__placeholder':
-			! url ||
-			isInvalid ||
-			isDraft ||
-			( ! isBoundEntityAvailable && hasUrlBinding ),
+			! url || isInvalid || isDraft || isEntityUnavailable,
 	} );
 
 	const missingText = getMissingText( type );

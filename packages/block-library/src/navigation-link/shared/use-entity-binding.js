@@ -146,9 +146,13 @@ export function useEntityBinding( { clientId, attributes } ) {
 	// This determines when the input should be disabled/locked
 	const isBindingActive = hasCorrectBinding && isBoundEntityAvailable;
 
+	// Computed: entity is unavailable when binding exists but entity is missing
+	const isEntityUnavailable = hasCorrectBinding && ! isBoundEntityAvailable;
+
 	return {
 		hasUrlBinding: hasCorrectBinding,
-		isBoundEntityAvailable,
+		isEntityAvailable: isBoundEntityAvailable,
+		isEntityUnavailable,
 		isBindingActive,
 		clearBinding,
 		createBinding,
