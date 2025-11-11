@@ -479,6 +479,21 @@ function Thread( {
 		debouncedToggleBlockHighlight( thread.blockClientId, false );
 	};
 
+	const onFocus = () => {
+		debouncedToggleBlockHighlight( thread.blockClientId, true );
+	};
+
+	const onBlur = ( event ) => {
+		if (
+			event.currentTarget &&
+			( ! event.relatedTarget ||
+				! event.currentTarget.contains( event.relatedTarget ) )
+		) {
+			debouncedToggleBlockHighlight( thread.blockClientId, false );
+			unselectThread();
+		}
+	};
+
 	const handleCommentSelect = () => {
 		setNewNoteFormState( 'closed' );
 		setSelectedThread( thread.id );
@@ -547,8 +562,8 @@ function Thread( {
 			onClick={ handleCommentSelect }
 			onMouseEnter={ onMouseEnter }
 			onMouseLeave={ onMouseLeave }
-			onFocus={ onMouseEnter }
-			onBlur={ onMouseLeave }
+			onFocus={ onFocus }
+			onBlur={ onBlur }
 			onKeyDown={ onKeyDown }
 			tabIndex={ 0 }
 			role="treeitem"
@@ -828,7 +843,10 @@ const CommentBoard = ( {
 										/>
 									}
 								/>
-								<Menu.Popover>
+								<Menu.Popover
+									// Use a non-modal popover so focus isn't trapped like a dialog.
+									modal={ false }
+								>
 									{ moreActions.map( ( action ) => (
 										<Menu.Item
 											key={ action.id }
