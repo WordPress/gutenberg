@@ -21,7 +21,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( 'b' );
 
-			expect( await editor.getBlocks() ).toMatchObject( [
+			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
 					name: blockName,
 					attributes: {
@@ -39,7 +39,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 			await page.keyboard.press( 'ArrowLeft' );
 			await page.keyboard.press( 'Backspace' );
 
-			expect( await editor.getBlocks() ).toMatchObject( [
+			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
 					name: blockName,
 					attributes: {

@@ -68,7 +68,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await expect( activeElementLocator ).toBeFocused();
 		await expect( activeElementLocator ).toHaveText( 'First paragraph' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: { content: 'First paragraph' },
@@ -165,7 +165,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( 'Before' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: { content: 'FirstAfter' },
@@ -437,7 +437,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await pageUtils.pressKeys( 'Enter', { times: 10 } );
 
 		// Check that none of the paragraph blocks have <br> in them.
-		expect( await editor.getBlocks() ).toMatchObject(
+		await expect.poll( editor.getBlocks ).toMatchObject(
 			Array( 11 ).fill( {
 				name: 'core/paragraph',
 				attributes: { content: '' },
@@ -456,7 +456,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( '3' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: { content: '1' },
@@ -489,7 +489,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.type( '2' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: { content: '1' },
@@ -513,7 +513,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.type( '1' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: { content: '1' },
@@ -541,7 +541,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.keyboard.up( 'Shift' );
 		await page.keyboard.press( 'Backspace' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: { content: '1' },
@@ -563,7 +563,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.keyboard.press( 'ArrowUp' );
 
 		// Ensure setup is correct.
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: { content: '' },
@@ -576,7 +576,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 
 		await page.keyboard.press( 'Backspace' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: { content: '2' },
@@ -747,7 +747,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.type( '1' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: { content: '1' },

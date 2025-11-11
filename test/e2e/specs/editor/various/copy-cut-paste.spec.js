@@ -531,7 +531,7 @@ test.describe( 'Copy/cut/paste', () => {
 			html: '<a href="https://wordpress.org/gutenberg">https://wordpress.org/gutenberg</a>',
 		} );
 		await pageUtils.pressKeys( 'primary+v' );
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: {
@@ -624,7 +624,7 @@ test.describe( 'Copy/cut/paste', () => {
 		await page.keyboard.type( 'a' );
 		await pageUtils.pressKeys( 'shift+ArrowLeft' );
 		await pageUtils.pressKeys( 'primary+v' );
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: {
@@ -665,7 +665,7 @@ test.describe( 'Copy/cut/paste', () => {
 			html: 'https://wordpress.org/gutenberg',
 		} );
 		await pageUtils.pressKeys( 'primary+v' );
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: {
@@ -683,9 +683,9 @@ test.describe( 'Copy/cut/paste', () => {
 			html: 'https://www.youtube.com/watch?v=FcTLMTyD2DU',
 		} );
 		await pageUtils.pressKeys( 'primary+v' );
-		expect( await editor.getBlocks() ).toMatchObject( [
-			{ name: 'core/embed' },
-		] );
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [ { name: 'core/embed' } ] );
 	} );
 
 	test( 'should not link selection for non http(s) protocol', async ( {
@@ -704,7 +704,7 @@ test.describe( 'Copy/cut/paste', () => {
 			html: 'movie: b',
 		} );
 		await pageUtils.pressKeys( 'primary+v' );
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: {
@@ -741,7 +741,7 @@ test.describe( 'Copy/cut/paste', () => {
 
 		await pageUtils.pressKeys( 'primary+v' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: {
@@ -776,7 +776,7 @@ test.describe( 'Copy/cut/paste', () => {
 		} );
 		await pageUtils.pressKeys( 'primary+v' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/heading',
 				attributes: {

@@ -337,7 +337,7 @@ test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
 		await pageUtils.pressKeys( 'primary+z' );
 
 		// Check the content.
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: {
@@ -542,14 +542,14 @@ test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
 			await pageUtils.pressKeys( 'ArrowUp', { times: 3 } );
 			await page.keyboard.press( 'Delete' );
 
-			expect( await editor.getBlocks() ).toMatchObject( snap1 );
+			await expect.poll( editor.getBlocks ).toMatchObject( snap1 );
 
 			await page.keyboard.press( 'Delete' );
 			// Caret should be in the first block and at the proper position.
 			await page.keyboard.type( '-' );
 
 			// Check the content.
-			expect( await editor.getBlocks() ).toMatchObject( snap2 );
+			await expect.poll( editor.getBlocks ).toMatchObject( snap2 );
 		} );
 
 		test( 'on backspace', async ( { editor, page, pageUtils } ) => {
@@ -563,14 +563,14 @@ test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
 			await pageUtils.pressKeys( 'ArrowLeft', { times: 6 } );
 			await page.keyboard.press( 'Backspace' );
 
-			expect( await editor.getBlocks() ).toMatchObject( snap1 );
+			await expect.poll( editor.getBlocks ).toMatchObject( snap1 );
 
 			await page.keyboard.press( 'Backspace' );
 			// Caret should be in the first block and at the proper position.
 			await page.keyboard.type( '-' );
 
 			// Check the content.
-			expect( await editor.getBlocks() ).toMatchObject( snap2 );
+			await expect.poll( editor.getBlocks ).toMatchObject( snap2 );
 		} );
 	} );
 } );

@@ -71,7 +71,7 @@ test.describe( 'Preventing Pattern Recursion (server)', () => {
 		await page.getByRole( 'option', { name: 'Evil recursive' } ).click();
 		// By simply checking the editor content, we know that the pattern
 		// endpoint did not crash.
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: { content: 'Hello' },

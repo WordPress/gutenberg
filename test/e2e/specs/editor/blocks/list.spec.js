@@ -1587,7 +1587,7 @@ test.describe( 'List (@firefox)', () => {
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'Backspace' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/list',
 				innerBlocks: [

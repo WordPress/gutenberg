@@ -22,7 +22,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		await editor.clickBlockToolbarButton( 'Change level' );
 		await page.locator( 'role=menuitemradio[name="Heading 3"]' ).click();
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/heading',
 				attributes: { level: 3 },
@@ -42,7 +42,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		await pageUtils.pressKeys( 'primary+a' );
 		await pageUtils.pressKeys( 'primary+b' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: { content: '<strong>test</strong>' },
@@ -64,7 +64,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		await pageUtils.pressKeys( 'primary+b' );
 		await page.keyboard.type( '.' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: { content: 'Some <strong>bold</strong>.' },
@@ -87,7 +87,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		await pageUtils.pressKeys( 'primary+b' );
 		await page.keyboard.type( '.' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: { content: '<strong><em>1</em></strong>.' },
@@ -132,7 +132,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		await editor.clickBlockToolbarButton( 'Bold' );
 		await page.keyboard.type( '.' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: { content: 'Some <strong>bold</strong>.' },
@@ -150,7 +150,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 			.click();
 		await page.keyboard.type( 'A `backtick`' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: { content: 'A <code>backtick</code>' },
@@ -159,9 +159,9 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 
 		await pageUtils.pressKeys( 'primary+z' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
-			{ name: 'core/paragraph' },
-		] );
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [ { name: 'core/paragraph' } ] );
 	} );
 
 	test( 'should undo backtick transform with backspace', async ( {
@@ -174,7 +174,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		await page.keyboard.type( '`a`' );
 		await page.keyboard.press( 'Backspace' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: { content: '`a`' },
@@ -194,7 +194,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.press( 'Backspace' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [] );
+		await expect.poll( editor.getBlocks ).toMatchObject( [] );
 	} );
 
 	test( 'should not undo backtick transform with backspace after selection change', async ( {
@@ -212,7 +212,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'Backspace' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [] );
+		await expect.poll( editor.getBlocks ).toMatchObject( [] );
 	} );
 
 	test( 'should not format text after code backtick', async ( {
@@ -224,7 +224,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 			.click();
 		await page.keyboard.type( 'A `backtick` and more.' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: { content: 'A <code>backtick</code> and more.' },
@@ -247,7 +247,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		await pageUtils.pressKeys( 'shiftAlt+ArrowRight' );
 		await page.keyboard.type( '`' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: { content: 'A <code>selection</code> test.' },
@@ -256,7 +256,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 
 		await pageUtils.pressKeys( 'primary+z' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: { content: 'A `selection` test.' },
@@ -351,7 +351,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 			window.unsubscribes.forEach( ( unsubscribe ) => unsubscribe() );
 		} );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: { content: '1<strong>2</strong>34' },
@@ -383,7 +383,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		// deleting the numbers.
 		await page.keyboard.type( '-' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: { content: '<strong>1</strong>2-3' },
@@ -407,7 +407,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		await page.keyboard.press( 'End' );
 		await page.keyboard.type( '+' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: { content: '-<strong>12</strong>+' },
@@ -430,7 +430,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		await page.keyboard.type( '2' );
 		await pageUtils.pressKeys( 'primary+b' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: { content: '1<strong>2</strong>' },
@@ -463,7 +463,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		await page.keyboard.type( '2' );
 		await pageUtils.pressKeys( 'primary+b' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: { content: '1<strong>2</strong>' },
@@ -489,7 +489,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		await page.keyboard.press( 'ArrowLeft' );
 		await pageUtils.pressKeys( 'primary+v' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: { content: 'a1' },
@@ -516,7 +516,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		await page.keyboard.press( 'ArrowLeft' );
 		await pageUtils.pressKeys( 'primary+v' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: { content: '123' },
@@ -543,7 +543,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		await page.keyboard.press( 'ArrowLeft' );
 		await pageUtils.pressKeys( 'primary+v' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: { content: 'a1<strong>2</strong>3b' },
@@ -565,7 +565,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		await pageUtils.pressKeys( 'primary+b' );
 		await page.keyboard.type( '2' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: { content: '1<strong>2</strong>' },
@@ -593,7 +593,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		await page.keyboard.press( 'ArrowLeft' );
 		await pageUtils.pressKeys( 'primary+v' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: { content: '<strong>132</strong>3' },
@@ -634,7 +634,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 			},
 		};
 
-		expect( await editor.getBlocks() ).toMatchObject( [ result ] );
+		await expect.poll( editor.getBlocks ).toMatchObject( [ result ] );
 
 		// Dismiss color picker popover.
 		await page.keyboard.press( 'Escape' );
@@ -654,9 +654,9 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		// Paste the colored text.
 		await pageUtils.pressKeys( 'primary+v' );
 
-		expect( await editor.getBlocks() ).toMatchObject(
-			Array( 2 ).fill( result )
-		);
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( Array( 2 ).fill( result ) );
 	} );
 
 	test( 'should paste paragraph contents into list', async ( {
@@ -686,7 +686,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		// Paste paragraph contents.
 		await pageUtils.pressKeys( 'primary+v' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: { content: '1<br>2' },
@@ -734,7 +734,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		// Paste paragraph contents.
 		await pageUtils.pressKeys( 'primary+v' );
 
-		expect( await editor.getBlocks() ).toMatchObject(
+		await expect.poll( editor.getBlocks ).toMatchObject(
 			Array( 2 ).fill( {
 				name: 'core/list',
 				innerBlocks: [
@@ -768,7 +768,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.type( '1' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: { content: '1🍓' },
@@ -800,7 +800,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 			);
 		} );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: { content: '<code>a</code>' },
@@ -823,7 +823,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		await page.keyboard.type( '2' );
 		await pageUtils.pressKeys( 'primary+i' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: { content: '<strong>1</strong><em>2</em>' },
@@ -839,7 +839,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 
 		await page.keyboard.type( '-' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: { content: '<strong>1</strong>-<em>2</em>' },

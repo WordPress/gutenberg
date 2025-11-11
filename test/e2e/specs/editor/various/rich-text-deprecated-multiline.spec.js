@@ -51,7 +51,7 @@ test.describe( 'RichText deprecated multiline', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/rich-text-deprecated-multiline',
 				attributes: {
@@ -75,7 +75,7 @@ test.describe( 'RichText deprecated multiline', () => {
 		// Test selection after split.
 		await page.keyboard.type( '‸' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/rich-text-deprecated-multiline',
 				attributes: {
@@ -94,7 +94,7 @@ test.describe( 'RichText deprecated multiline', () => {
 		// Test selection after merge.
 		await page.keyboard.type( '‸' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/rich-text-deprecated-multiline',
 				attributes: {
@@ -114,7 +114,7 @@ test.describe( 'RichText deprecated multiline', () => {
 		// Test selection after merge.
 		await page.keyboard.type( '‸' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/rich-text-deprecated-multiline',
 				attributes: {

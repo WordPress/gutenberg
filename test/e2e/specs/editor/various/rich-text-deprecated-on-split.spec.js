@@ -57,7 +57,7 @@ test.describe( 'RichText deprecated onSplit', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/rich-text-deprecated-on-split',
 				attributes: {

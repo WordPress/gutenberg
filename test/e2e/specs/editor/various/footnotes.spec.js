@@ -44,7 +44,7 @@ test.describe( 'Footnotes', () => {
 			return document.activeElement.id;
 		} );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: { content: 'first paragraph' },
@@ -75,7 +75,7 @@ test.describe( 'Footnotes', () => {
 			return document.activeElement.id;
 		} );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: {
@@ -109,7 +109,7 @@ test.describe( 'Footnotes', () => {
 		await editor.showBlockToolbar();
 		await editor.clickBlockToolbarButton( 'Move down' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: {
@@ -141,7 +141,7 @@ test.describe( 'Footnotes', () => {
 		await editor.canvas.locator( `a[href="#${ id2 }-link"]` ).click();
 		await page.keyboard.press( 'Backspace' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: {
@@ -169,7 +169,7 @@ test.describe( 'Footnotes', () => {
 		await editor.canvas.locator( `a[href="#${ id1 }-link"]` ).click();
 		await page.keyboard.press( 'Backspace' );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: {
@@ -204,7 +204,7 @@ test.describe( 'Footnotes', () => {
 			return document.activeElement.id;
 		} );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/list',
 				innerBlocks: [
@@ -245,7 +245,7 @@ test.describe( 'Footnotes', () => {
 			return document.activeElement.id;
 		} );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/table',
 				attributes: {

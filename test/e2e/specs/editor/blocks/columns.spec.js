@@ -342,14 +342,14 @@ test.describe( 'Columns', () => {
 
 			await page.keyboard.press( 'Backspace' );
 
-			expect( await editor.getBlocks() ).toMatchObject( [
-				columnsBlock,
-			] );
+			await expect
+				.poll( editor.getBlocks )
+				.toMatchObject( [ columnsBlock ] );
 
 			// Ensure focus is on the columns block.
 			await page.keyboard.press( 'Backspace' );
 
-			expect( await editor.getBlocks() ).toMatchObject( [] );
+			await expect.poll( editor.getBlocks ).toMatchObject( [] );
 		} );
 
 		test( 'should only select Columns on Backspace when non-empty', async ( {
@@ -365,17 +365,16 @@ test.describe( 'Columns', () => {
 
 			await page.keyboard.press( 'Backspace' );
 
-			expect( await editor.getBlocks() ).toMatchObject( [
-				columnsBlock,
-				paragraphBlock,
-			] );
+			await expect
+				.poll( editor.getBlocks )
+				.toMatchObject( [ columnsBlock, paragraphBlock ] );
 
 			// Ensure focus is on the columns block.
 			await page.keyboard.press( 'Backspace' );
 
-			expect( await editor.getBlocks() ).toMatchObject( [
-				paragraphBlock,
-			] );
+			await expect
+				.poll( editor.getBlocks )
+				.toMatchObject( [ paragraphBlock ] );
 		} );
 	} );
 
