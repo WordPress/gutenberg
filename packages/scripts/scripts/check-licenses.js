@@ -42,7 +42,7 @@ query += `:not(${ getLicenses( gpl2 )
 	.map( ( license ) => `[license=${ JSON.stringify( license ) }]` )
 	.join( ',' ) })`;
 
-// Use `npm ls` to grab a list of all the packages.
+// Use `npm query` to grab a list of all the packages.
 const child = spawn.sync( 'npm', [ 'query', query ] );
 
 const packages = JSON.parse( child.stdout.toString() );
