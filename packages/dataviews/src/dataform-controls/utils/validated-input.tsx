@@ -55,11 +55,13 @@ export default function ValidatedText< Item >( {
 	);
 
 	// Convert pattern to string if it's a RegExp
-	const pattern = isValid?.pattern
-		? isValid.pattern instanceof RegExp
-			? isValid.pattern.source
-			: isValid.pattern
-		: undefined;
+	let pattern;
+	if ( isValid?.pattern ) {
+		pattern =
+			isValid.pattern instanceof RegExp
+				? isValid.pattern.source
+				: isValid.pattern;
+	}
 
 	return (
 		<ValidatedInputControl
