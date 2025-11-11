@@ -38,7 +38,6 @@ import { store as blockEditorStore } from '../store';
 const { Menu } = unlock( componentsPrivateApis );
 
 const EMPTY_ARRAY = [];
-const EMPTY_OBJECT = {};
 
 /**
  * Get the normalized attribute type for block bindings.
@@ -306,23 +305,10 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 
 	// Use useSelect to ensure sources are updated whenever there are updates in block context
 	// or when underlying data changes.
-	const { bindableAttributes, canUpdateBlockBindings, contexts } = useSelect(
+	const { canUpdateBlockBindings, bindableAttributes } = useSelect(
 		( select ) => {
 			const { __experimentalBlockBindingsSupportedAttributes } =
 				select( blockEditorStore ).getSettings();
-			const { getContextForSource } = unlock( select( blockStore ) );
-
-			const registeredSources = unlock(
-				select( blockStore )
-			).getAllBlockBindingsSources();
-
-			const _contexts = Object.entries( registeredSources ).reduce(
-				( acc, [ sourceName, source ] ) => ( {
-					...acc,
-					[ sourceName ]: getContextForSource( source, blockContext ),
-				} ),
-				EMPTY_OBJECT
-			);
 
 			return {
 				canUpdateBlockBindings:
@@ -332,10 +318,27 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 					__experimentalBlockBindingsSupportedAttributes?.[
 						blockName
 					],
-				contexts: _contexts,
 			};
 		},
-		[ blockName, blockContext ]
+		[ blockName ]
+	);
+
+	const contexts = useSelect(
+		( select ) => {
+			const registeredSources = unlock(
+				select( blockStore )
+			).getAllBlockBindingsSources();
+			const _contexts = {};
+			Object.entries( registeredSources ).forEach(
+				( [ sourceName, source ] ) => {
+					_contexts[ sourceName ] = unlock(
+						select( blockStore )
+					).getContextForSource( source, blockContext );
+				}
+			);
+			return _contexts;
+		},
+		[ blockContext ]
 	);
 
 	const sources = useSelect(
