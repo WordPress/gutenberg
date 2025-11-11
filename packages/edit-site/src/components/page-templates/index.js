@@ -219,17 +219,12 @@ export default function PageTemplates() {
 	const fields = useMemo( () => {
 		const _fields = [
 			previewField,
-
-			// Custom title field with lock icon
-			{
-				...templateTitleField,
-			},
+			templateTitleField,
 			descriptionField,
 			activeField,
 			slugField,
 		];
 
-		// Additional fields for "User" view
 		if ( activeView === 'user' ) {
 			_fields.push( themeField );
 			if ( dateField ) {
@@ -237,7 +232,6 @@ export default function PageTemplates() {
 			}
 		}
 
-		// Build author dropdown options
 		const elements = [];
 		for ( const author in users ) {
 			elements.push( {
@@ -246,7 +240,6 @@ export default function PageTemplates() {
 			} );
 		}
 
-		// Add author field
 		_fields.push( {
 			...authorField,
 			elements,
