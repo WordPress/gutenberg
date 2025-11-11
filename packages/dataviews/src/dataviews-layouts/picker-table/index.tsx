@@ -290,13 +290,18 @@ function ViewPickerTable< Item >( {
 	return (
 		<>
 			<table
-				className={ clsx( 'dataviews-view-table', className, {
-					[ `has-${ view.layout?.density }-density` ]:
-						view.layout?.density &&
-						[ 'compact', 'comfortable' ].includes(
-							view.layout.density
-						),
-				} ) }
+				className={ clsx(
+					'dataviews-view-table',
+					'dataviews-view-picker-table',
+					className,
+					{
+						[ `has-${ view.layout?.density }-density` ]:
+							view.layout?.density &&
+							[ 'compact', 'comfortable' ].includes(
+								view.layout.density
+							),
+					}
+				) }
 				aria-busy={ isLoading }
 				aria-describedby={ tableNoticeId }
 				role={ isInfiniteScroll ? 'feed' : 'listbox' }

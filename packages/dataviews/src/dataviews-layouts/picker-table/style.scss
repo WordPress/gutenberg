@@ -2,7 +2,7 @@
 // The table picker mainly reuses the regular table styles from ../table/style.scss
 // Add any picker-specific overrides here if needed in the future.
 
-.dataviews-view-table {
+.dataviews-view-picker-table {
 	tbody:focus-visible {
 		// Only show one focus outline at a time. When focus is on a child element,
 		// hide the table's own focus outline.
