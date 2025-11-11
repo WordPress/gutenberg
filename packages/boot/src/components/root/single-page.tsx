@@ -32,6 +32,7 @@ export default function RootSinglePage() {
 	const canvas = ( currentMatch?.loaderData as any )?.canvas as
 		| CanvasData
 		| undefined;
+	const isFullScreen = canvas && ! canvas.isPreview;
 
 	return (
 		<ThemeProvider isRoot color={ { bg: '#f8f8f8', primary: '#3858e9' } }>
@@ -39,6 +40,7 @@ export default function RootSinglePage() {
 				<div
 					className={ clsx( 'boot-layout boot-layout--single-page', {
 						'has-canvas': !! canvas,
+						'has-full-canvas': isFullScreen,
 					} ) }
 				>
 					<CommandMenu />

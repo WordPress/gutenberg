@@ -29,8 +29,6 @@ export default function Root() {
 	const canvas = ( currentMatch?.loaderData as any )?.canvas as
 		| CanvasData
 		| undefined;
-
-	// Hide sidebar in full-screen canvas mode
 	const isFullScreen = canvas && ! canvas.isPreview;
 
 	return (
