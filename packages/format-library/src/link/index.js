@@ -41,6 +41,7 @@ function Edit( {
 	onChange,
 	onFocus,
 	contentRef,
+	isVisible = true,
 } ) {
 	const [ addingLink, setAddingLink ] = useState( false );
 
@@ -190,19 +191,21 @@ function Edit( {
 				character="k"
 				onUse={ onRemoveFormat }
 			/>
-			<RichTextToolbarButton
-				name="link"
-				icon={ linkIcon }
-				title={ isActive ? __( 'Link' ) : title }
-				onClick={ ( event ) => {
-					addLink( event.currentTarget );
-				} }
-				isActive={ isActive || addingLink }
-				shortcutType="primary"
-				shortcutCharacter="k"
-				aria-haspopup="true"
-				aria-expanded={ addingLink }
-			/>
+			{ isVisible && (
+				<RichTextToolbarButton
+					name="link"
+					icon={ linkIcon }
+					title={ isActive ? __( 'Link' ) : title }
+					onClick={ ( event ) => {
+						addLink( event.currentTarget );
+					} }
+					isActive={ isActive || addingLink }
+					shortcutType="primary"
+					shortcutCharacter="k"
+					aria-haspopup="true"
+					aria-expanded={ addingLink }
+				/>
+			) }
 			{ addingLink && (
 				<InlineLinkUI
 					stopAddingLink={ stopAddingLink }
