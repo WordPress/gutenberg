@@ -325,15 +325,16 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 
 	const contexts = useSelect(
 		( select ) => {
-			const registeredSources = unlock(
+			const { getAllBlockBindingsSources, getContextForSource } = unlock(
 				select( blockStore )
-			).getAllBlockBindingsSources();
+			);
 			const _contexts = {};
-			Object.entries( registeredSources ).forEach(
+			Object.entries( getAllBlockBindingsSources() ).forEach(
 				( [ sourceName, source ] ) => {
-					_contexts[ sourceName ] = unlock(
-						select( blockStore )
-					).getContextForSource( source, blockContext );
+					_contexts[ sourceName ] = getContextForSource(
+						source,
+						blockContext
+					);
 				}
 			);
 			return _contexts;
