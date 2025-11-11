@@ -35,7 +35,7 @@ export default function Root() {
 
 	return (
 		<ThemeProvider isRoot color={ { bg: '#f8f8f8', primary: '#3858e9' } }>
-			<ThemeProvider color={ { bg: '#1e1e1e', primary: '#3858e9' } }>
+			<ThemeProvider color={ { bg: '#1d2327', primary: '#3858e9' } }>
 				<div
 					className={ clsx( 'boot-layout', {
 						'has-canvas': !! canvas,
