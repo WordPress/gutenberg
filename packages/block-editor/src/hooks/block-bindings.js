@@ -38,7 +38,6 @@ import { store as blockEditorStore } from '../store';
 const { Menu } = unlock( componentsPrivateApis );
 
 const EMPTY_ARRAY = [];
-const EMPTY_OBJECT = {};
 
 /**
  * Get the normalized attribute type for block bindings.
@@ -310,17 +309,15 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 		( select ) => {
 			const { __experimentalBlockBindingsSupportedAttributes } =
 				select( blockEditorStore ).getSettings();
-			const _bindableAttributes =
-				__experimentalBlockBindingsSupportedAttributes?.[ blockName ];
-			if ( ! _bindableAttributes || _bindableAttributes.length === 0 ) {
-				return EMPTY_OBJECT;
-			}
 
 			return {
 				canUpdateBlockBindings:
 					select( blockEditorStore ).getSettings()
 						.canUpdateBlockBindings,
-				bindableAttributes: _bindableAttributes,
+				bindableAttributes:
+					__experimentalBlockBindingsSupportedAttributes?.[
+						blockName
+					],
 			};
 		},
 		[ blockName ]
