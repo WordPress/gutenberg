@@ -320,7 +320,6 @@ function CalendarDateControl< Item >( {
 
 	const {
 		timezone: { string: timezoneString },
-		l10n: { startOfWeek },
 	} = getSettings();
 
 	const displayLabel = isValid?.required
@@ -396,7 +395,7 @@ function CalendarDateControl< Item >( {
 						month={ calendarMonth }
 						onMonthChange={ setCalendarMonth }
 						timeZone={ timezoneString || undefined }
-						weekStartsOn={ startOfWeek }
+						weekStartsOn={ field.displayFormat.weekStartsOn }
 					/>
 				</VStack>
 			</BaseControl>
@@ -521,7 +520,7 @@ function CalendarDateRangeControl< Item >( {
 		[ value, updateDateRange ]
 	);
 
-	const { timezone, l10n } = getSettings();
+	const { timezone } = getSettings();
 
 	const displayLabel = field.isValid?.required
 		? `${ label } (${ __( 'Required' ) })`
@@ -609,7 +608,7 @@ function CalendarDateRangeControl< Item >( {
 						month={ calendarMonth }
 						onMonthChange={ setCalendarMonth }
 						timeZone={ timezone.string || undefined }
-						weekStartsOn={ l10n.startOfWeek }
+						weekStartsOn={ field.displayFormat.weekStartsOn }
 					/>
 				</VStack>
 			</BaseControl>

@@ -348,6 +348,12 @@ describe( 'normalizeFields: default getValue', () => {
 			expect( typeof normalizedFields[ 0 ].displayFormat.date ).toBe(
 				'string'
 			);
+			expect(
+				normalizedFields[ 0 ].displayFormat.weekStartsOn
+			).toBeDefined();
+			expect(
+				typeof normalizedFields[ 0 ].displayFormat.weekStartsOn
+			).toBe( 'number' );
 		} );
 
 		it( 'preserves custom format when provided', () => {
@@ -357,14 +363,18 @@ describe( 'normalizeFields: default getValue', () => {
 					type: 'date',
 					displayFormat: {
 						date: 'F j, Y',
+						weekStartsOn: 1,
 					},
 				},
 			];
 			const normalizedFields = normalizeFields( fields );
 			expect( normalizedFields[ 0 ].displayFormat.date ).toBe( 'F j, Y' );
+			expect( normalizedFields[ 0 ].displayFormat.weekStartsOn ).toBe(
+				1
+			);
 		} );
 
-		it( 'always adds displayFormat.date for all field types', () => {
+		it( 'always adds displayFormat.date and displayFormat.weekStartsOn for all field types', () => {
 			const fields: Field< {} >[] = [
 				{
 					id: 'title',
@@ -378,6 +388,12 @@ describe( 'normalizeFields: default getValue', () => {
 			const normalizedFields = normalizeFields( fields );
 			expect( normalizedFields[ 0 ].displayFormat.date ).toBeDefined();
 			expect( normalizedFields[ 1 ].displayFormat.date ).toBeDefined();
+			expect(
+				normalizedFields[ 0 ].displayFormat.weekStartsOn
+			).toBeDefined();
+			expect(
+				normalizedFields[ 1 ].displayFormat.weekStartsOn
+			).toBeDefined();
 		} );
 	} );
 } );

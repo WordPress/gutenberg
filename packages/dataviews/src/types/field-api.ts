@@ -311,12 +311,21 @@ export type Field< Item > = {
 
 	/**
 	 * Display format configuration for fields.
-	 * For date fields, contains a date property with the format string.
-	 * If not provided, defaults to WordPress date format settings.
 	 */
-	displayFormat?: {
-		date: string;
-	};
+	displayFormat?: DisplayFormatDate;
+};
+
+/**
+ * Format for date fields:
+ *
+ * - date: the format string (e.g., 'F j, Y' for WordPress default format like 'March 10, 2023')
+ * - weekStartsOn: to specify the first day of the week (0 is Sunday).
+ *
+ * If not provided, defaults to WordPress date format settings.
+ */
+type DisplayFormatDate = {
+	date?: string;
+	weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
 };
 
 export type NormalizedField< Item > = Omit< Field< Item >, 'Edit' > & {
@@ -333,9 +342,7 @@ export type NormalizedField< Item > = Omit< Field< Item >, 'Edit' > & {
 	enableSorting: boolean;
 	filterBy: NormalizedFilterByConfig | false;
 	readOnly: boolean;
-	displayFormat: {
-		date: string;
-	};
+	displayFormat: Required< DisplayFormatDate >;
 };
 
 /**
