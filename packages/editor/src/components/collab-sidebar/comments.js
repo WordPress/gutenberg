@@ -313,87 +313,72 @@ export function Comments( {
 		setCanvasMinHeight,
 	] );
 
-	const handleThreadNavigation = useCallback(
-		( event, thread, isSelected ) => {
-			if ( event.defaultPrevented ) {
-				return;
+	const handleThreadNavigation = ( event, thread, isSelected ) => {
+		if ( event.defaultPrevented ) {
+			return;
+		}
+
+		const currentIndex = threads.findIndex( ( t ) => t.id === thread.id );
+
+		if (
+			( event.key === 'Enter' || event.key === 'ArrowRight' ) &&
+			event.currentTarget === event.target &&
+			! isSelected
+		) {
+			// Expand thread.
+			setNewNoteFormState( 'closed' );
+			setSelectedThread( thread.id );
+			if ( !! thread.blockClientId ) {
+				// Pass `null` as the second parameter to prevent focusing the block.
+				selectBlock( thread.blockClientId, null );
+				toggleBlockSpotlight( thread.blockClientId, true );
 			}
-
-			const currentIndex = threads.findIndex(
-				( t ) => t.id === thread.id
-			);
-
-			if (
-				( event.key === 'Enter' || event.key === 'ArrowRight' ) &&
+		} else if (
+			( ( event.key === 'Enter' || event.key === 'ArrowLeft' ) &&
 				event.currentTarget === event.target &&
-				! isSelected
-			) {
-				// Expand thread.
-				setNewNoteFormState( 'closed' );
-				setSelectedThread( thread.id );
-				if ( !! thread.blockClientId ) {
-					// Pass `null` as the second parameter to prevent focusing the block.
-					selectBlock( thread.blockClientId, null );
-					toggleBlockSpotlight( thread.blockClientId, true );
-				}
-			} else if (
-				( ( event.key === 'Enter' || event.key === 'ArrowLeft' ) &&
-					event.currentTarget === event.target &&
-					isSelected ) ||
-				event.key === 'Escape'
-			) {
-				// Collapse thread.
-				setSelectedThread( null );
-				setNewNoteFormState( 'closed' );
-				if ( thread.blockClientId ) {
-					toggleBlockSpotlight( thread.blockClientId, false );
-				}
-				focusCommentThread( thread.id, commentSidebarRef.current );
-			} else if (
-				event.key === 'ArrowDown' &&
-				currentIndex < threads.length - 1 &&
-				event.currentTarget === event.target
-			) {
-				// Move to the next thread.
-				const nextThread = threads[ currentIndex + 1 ];
-				focusCommentThread( nextThread.id, commentSidebarRef.current );
-			} else if (
-				event.key === 'ArrowUp' &&
-				currentIndex > 0 &&
-				event.currentTarget === event.target
-			) {
-				// Move to the previous thread.
-				const prevThread = threads[ currentIndex - 1 ];
-				focusCommentThread( prevThread.id, commentSidebarRef.current );
-			} else if (
-				event.key === 'Home' &&
-				event.currentTarget === event.target
-			) {
-				// Move to the first thread.
-				focusCommentThread(
-					threads[ 0 ].id,
-					commentSidebarRef.current
-				);
-			} else if (
-				event.key === 'End' &&
-				event.currentTarget === event.target
-			) {
-				// Move to the last thread.
-				focusCommentThread(
-					threads[ threads.length - 1 ].id,
-					commentSidebarRef.current
-				);
+				isSelected ) ||
+			event.key === 'Escape'
+		) {
+			// Collapse thread.
+			setSelectedThread( null );
+			setNewNoteFormState( 'closed' );
+			if ( thread.blockClientId ) {
+				toggleBlockSpotlight( thread.blockClientId, false );
 			}
-		},
-		[
-			threads,
-			setSelectedThread,
-			setNewNoteFormState,
-			commentSidebarRef,
-			selectBlock,
-			toggleBlockSpotlight,
-		]
-	);
+			focusCommentThread( thread.id, commentSidebarRef.current );
+		} else if (
+			event.key === 'ArrowDown' &&
+			currentIndex < threads.length - 1 &&
+			event.currentTarget === event.target
+		) {
+			// Move to the next thread.
+			const nextThread = threads[ currentIndex + 1 ];
+			focusCommentThread( nextThread.id, commentSidebarRef.current );
+		} else if (
+			event.key === 'ArrowUp' &&
+			currentIndex > 0 &&
+			event.currentTarget === event.target
+		) {
+			// Move to the previous thread.
+			const prevThread = threads[ currentIndex - 1 ];
+			focusCommentThread( prevThread.id, commentSidebarRef.current );
+		} else if (
+			event.key === 'Home' &&
+			event.currentTarget === event.target
+		) {
+			// Move to the first thread.
+			focusCommentThread( threads[ 0 ].id, commentSidebarRef.current );
+		} else if (
+			event.key === 'End' &&
+			event.currentTarget === event.target
+		) {
+			// Move to the last thread.
+			focusCommentThread(
+				threads[ threads.length - 1 ].id,
+				commentSidebarRef.current
+			);
+		}
+	};
 
 	const hasThreads = Array.isArray( threads ) && threads.length > 0;
 	// This should no longer happen since https://github.com/WordPress/gutenberg/pull/72872.
