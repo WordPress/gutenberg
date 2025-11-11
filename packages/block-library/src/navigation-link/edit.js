@@ -561,9 +561,10 @@ export default function NavigationLinkEdit( {
 							link={ attributes }
 							onClose={ () => {
 								setIsLinkOpen( false );
-								// If there is no link then remove the auto-inserted block.
+								// If there is no link and no binding, remove the auto-inserted block.
 								// This avoids empty blocks which can provided a poor UX.
-								if ( ! url ) {
+								// Don't remove if binding exists (even if entity is unavailable) so user can fix it.
+								if ( ! url && ! hasUrlBinding ) {
 									onReplace( [] );
 								} else if ( isNewLink.current ) {
 									// If we just created a new link, select it
