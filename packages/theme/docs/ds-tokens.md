@@ -113,16 +113,6 @@ Do not edit directly.
 
 | Variable name                              | Description                      |
 | ------------------------------------------ | -------------------------------- |
-| `--wpds-dimension-space-0`                 | Empty space                      |
-| `--wpds-dimension-space-10`                | 1x base spacing                  |
-| `--wpds-dimension-space-20`                | 2x base spacing                  |
-| `--wpds-dimension-space-30`                | 3x base spacing                  |
-| `--wpds-dimension-space-40`                | 4x base spacing                  |
-| `--wpds-dimension-space-50`                | 5x base spacing                  |
-| `--wpds-dimension-space-60`                | 6x base spacing                  |
-| `--wpds-dimension-space-70`                | 8x base spacing                  |
-| `--wpds-dimension-space-80`                | 10x base spacing                 |
-| `--wpds-dimension-space-90`                | 12x base spacing                 |
 | `--wpds-dimension-base`                    | Base dimension unit              |
 | `--wpds-dimension-padding-surface-x-small` | Extra small spacing for surfaces |
 | `--wpds-dimension-padding-surface-small`   | Small spacing for surfaces       |

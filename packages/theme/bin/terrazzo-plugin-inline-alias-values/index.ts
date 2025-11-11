@@ -7,7 +7,7 @@ interface InlineAliasValuesOptions {
 	/**
 	 * Output filename for the generated aliased tokens mapping.
 	 */
-	filename: string;
+	filename?: string;
 
 	/**
 	 * Pattern matching IDs of tokens whose values should be inlined into their alias references.
@@ -61,6 +61,10 @@ export default function inlineAliasValues( {
 				} );
 		},
 		async build( { outputFile } ) {
+			if ( ! filename ) {
+				return;
+			}
+
 			const json = JSON.stringify( aliasedBy, null, 2 );
 
 			outputFile(

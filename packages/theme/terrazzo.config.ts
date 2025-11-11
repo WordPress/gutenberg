@@ -33,6 +33,7 @@ export default defineConfig( {
 					.replace( /^color\./, '' )
 					.replace( /\./g, '-' ),
 		} ),
+		inlineAliasValues( { pattern: /^dimension\.primitive\./ } ),
 		pluginCSS( {
 			filename: 'css/design-tokens.css',
 			variableName: ( token ) =>

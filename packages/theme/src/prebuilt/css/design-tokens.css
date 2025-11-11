@@ -95,31 +95,11 @@
 	--wpds-color-stroke-surface-success-strong: #008031; /* Decorative stroke color used to define success-toned surface boundaries with strong emphasis. */
 	--wpds-color-stroke-surface-warning: #c3a877; /* Decorative stroke color used to define warning-toned surface boundaries with normal emphasis. */
 	--wpds-color-stroke-surface-warning-strong: #976300; /* Decorative stroke color used to define warning-toned surface boundaries with strong emphasis. */
-	--wpds-dimension-base: var(
-		--wpds-dimension-space-10
-	); /* Base dimension unit */
-	--wpds-dimension-padding-surface-large: var(
-		--wpds-dimension-space-60
-	); /* Large spacing for surfaces */
-	--wpds-dimension-padding-surface-medium: var(
-		--wpds-dimension-space-40
-	); /* Medium spacing for surfaces */
-	--wpds-dimension-padding-surface-small: var(
-		--wpds-dimension-space-30
-	); /* Small spacing for surfaces */
-	--wpds-dimension-padding-surface-x-small: var(
-		--wpds-dimension-space-20
-	); /* Extra small spacing for surfaces */
-	--wpds-dimension-space-0: 0; /* Empty space */
-	--wpds-dimension-space-10: 4px; /* 1x base spacing */
-	--wpds-dimension-space-20: 8px; /* 2x base spacing */
-	--wpds-dimension-space-30: 12px; /* 3x base spacing */
-	--wpds-dimension-space-40: 16px; /* 4x base spacing */
-	--wpds-dimension-space-50: 20px; /* 5x base spacing */
-	--wpds-dimension-space-60: 24px; /* 6x base spacing */
-	--wpds-dimension-space-70: 32px; /* 8x base spacing */
-	--wpds-dimension-space-80: 40px; /* 10x base spacing */
-	--wpds-dimension-space-90: 48px; /* 12x base spacing */
+	--wpds-dimension-base: 4px; /* Base dimension unit */
+	--wpds-dimension-padding-surface-large: 24px; /* Large spacing for surfaces */
+	--wpds-dimension-padding-surface-medium: 16px; /* Medium spacing for surfaces */
+	--wpds-dimension-padding-surface-small: 12px; /* Small spacing for surfaces */
+	--wpds-dimension-padding-surface-x-small: 8px; /* Extra small spacing for surfaces */
 	--wpds-elevation-large: 0 5px 15px 0 #00000014, 0 15px 27px 0 #00000012,
 		0 30px 36px 0 #0000000a, 0 50px 43px 0 #00000005; /* For components that confirm decisions or handle necessary interruptions. Example: Modals. */
 	--wpds-elevation-medium: 0 2px 3px 0 #0000000d, 0 4px 5px 0 #0000000a,
