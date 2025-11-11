@@ -335,6 +335,69 @@ class WP_Theme_JSON_Gutenberg {
 	);
 
 	/**
+	 * Settings that are safe to allow under KSES.
+	 *
+	 * These settings are scalar or boolean values that don't require CSS validation.
+	 * They control behavior rather than generating CSS output directly.
+	 *
+	 * Each element is an array path to the safe setting in theme.json settings.
+	 *
+	 * @since 6.8.0
+	 */
+	const SAFE_SETTINGS = array(
+		array( 'appearanceTools' ),
+		array( 'useRootPaddingAwareAlignments' ),
+		array( 'background', 'backgroundSize' ),
+		array( 'border', 'color' ),
+		array( 'border', 'radius' ),
+		array( 'border', 'style' ),
+		array( 'border', 'width' ),
+		array( 'color', 'background' ),
+		array( 'color', 'custom' ),
+		array( 'color', 'customDuotone' ),
+		array( 'color', 'customGradient' ),
+		array( 'color', 'defaultDuotone' ),
+		array( 'color', 'defaultGradients' ),
+		array( 'color', 'defaultPalette' ),
+		array( 'color', 'link' ),
+		array( 'color', 'heading' ),
+		array( 'color', 'button' ),
+		array( 'color', 'caption' ),
+		array( 'color', 'text' ),
+		array( 'custom' ),
+		array( 'dimensions', 'aspectRatio' ),
+		array( 'dimensions', 'defaultAspectRatios' ),
+		array( 'dimensions', 'minHeight' ),
+		array( 'layout', 'allowEditing' ),
+		array( 'layout', 'allowCustomContentAndWideSize' ),
+		array( 'lightbox', 'enabled' ),
+		array( 'lightbox', 'allowEditing' ),
+		array( 'position', 'fixed' ),
+		array( 'position', 'sticky' ),
+		array( 'shadow', 'defaultPresets' ),
+		array( 'spacing', 'customSpacingSize' ),
+		array( 'spacing', 'defaultSpacingSizes' ),
+		array( 'spacing', 'spacingScale' ),
+		array( 'spacing', 'blockGap' ),
+		array( 'spacing', 'margin' ),
+		array( 'spacing', 'padding' ),
+		array( 'spacing', 'units' ),
+		array( 'typography', 'fluid' ),
+		array( 'typography', 'customFontSize' ),
+		array( 'typography', 'defaultFontSizes' ),
+		array( 'typography', 'dropCap' ),
+		array( 'typography', 'fontStyle' ),
+		array( 'typography', 'fontWeight' ),
+		array( 'typography', 'letterSpacing' ),
+		array( 'typography', 'lineHeight' ),
+		array( 'typography', 'textAlign' ),
+		array( 'typography', 'textColumns' ),
+		array( 'typography', 'textDecoration' ),
+		array( 'typography', 'textTransform' ),
+		array( 'typography', 'writingMode' ),
+	);
+
+	/**
 	 * Protected style properties.
 	 *
 	 * These style properties are only rendered if a setting enables it
@@ -3762,6 +3825,14 @@ class WP_Theme_JSON_Gutenberg {
 
 		// Ensure indirect properties not included in any `PRESETS_METADATA` value are allowed.
 		static::remove_indirect_properties( $input, $output );
+
+		// Ensure safe settings are allowed.
+		foreach ( static::SAFE_SETTINGS as $path ) {
+			$value = _wp_array_get( $input, $path, null );
+			if ( null !== $value ) {
+				_wp_array_set( $output, $path, $value );
+			}
+		}
 
 		return $output;
 	}
