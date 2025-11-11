@@ -93,7 +93,6 @@ export default function BlockTools( {
 		showEmptyBlockSideInserter,
 		showBlockToolbarPopover,
 	} = useSelect( selector, [] );
-	const { getGroupingBlockName } = useSelect( blocksStore );
 	const {
 		getBlocksByClientId,
 		getSelectedBlockClientIds,
@@ -102,7 +101,7 @@ export default function BlockTools( {
 		getBlockName,
 		getEditedContentOnlySection,
 	} = unlock( useSelect( blockEditorStore ) );
-
+	const { getGroupingBlockName } = useSelect( blocksStore );
 	const isMatch = useShortcutEventMatch();
 	const pasteStyles = usePasteStyles();
 
