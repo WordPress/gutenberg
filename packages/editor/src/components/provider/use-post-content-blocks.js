@@ -1,15 +1,10 @@
 /**
  * WordPress dependencies
  */
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
-
-/**
- * Internal dependencies
- */
-import { store as editorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
 
 const POST_CONTENT_BLOCK_TYPES = [
 	'core/post-title',
@@ -32,8 +27,15 @@ export default function usePostContentBlocks() {
 	// returns a new array.
 	const contentOnlyIds = useSelect(
 		( select ) => {
-			const { getPostBlocksByName } = unlock( select( editorStore ) );
-			return getPostBlocksByName( contentOnlyBlockTypes );
+			const { getClientIdsWithDescendants, getBlock } =
+				select( blockEditorStore );
+			return getClientIdsWithDescendants().filter( ( clientId ) => {
+				const block = getBlock( clientId );
+				return (
+					contentOnlyBlockTypes.includes( block.name ) ||
+					block.attributes?.metadata?.bindings
+				);
+			} );
 		},
 		[ contentOnlyBlockTypes ]
 	);

@@ -8,6 +8,7 @@ import {
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
 import { dispatch } from '@wordpress/data';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { createRoot, StrictMode } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
@@ -19,11 +20,14 @@ import {
  * Internal dependencies
  */
 import { store as editSiteStore } from './store';
+import { unlock } from './lock-unlock';
 
 /**
  * Internal dependencies
  */
 import PostsApp from './components/posts-app';
+
+const { registerCoreBlockBindingsSources } = unlock( editorPrivateApis );
 
 /**
  * Initializes the "Posts Dashboard"
@@ -42,6 +46,7 @@ export function initializePostsDashboard( id, settings ) {
 		( { name } ) => name !== 'core/freeform'
 	);
 	registerCoreBlocks( coreBlocks );
+	registerCoreBlockBindingsSources();
 	dispatch( blocksStore ).setFreeformFallbackBlockName( 'core/html' );
 	registerLegacyWidgetBlock( { inserter: false } );
 	registerWidgetGroupBlock( { inserter: false } );

@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import {
+	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 import { PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as interfaceStore } from '@wordpress/interface';
@@ -38,19 +41,28 @@ export default function TemplateContentPanel() {
 
 	const { clientIds, postType, renderingMode } = useSelect(
 		( select ) => {
-			const {
-				getCurrentPostType,
-				getPostBlocksByName,
-				getRenderingMode,
-			} = unlock( select( editorStore ) );
+			const { getCurrentPostType, getRenderingMode } = unlock(
+				select( editorStore )
+			);
 			const _postType = getCurrentPostType();
+			const { getClientIdsWithDescendants, getBlock } =
+				select( blockEditorStore );
+			const _clientIds = getClientIdsWithDescendants().filter(
+				( clientId ) => {
+					const block = getBlock( clientId );
+					const supportedBlockTypes =
+						TEMPLATE_POST_TYPE === _postType
+							? TEMPLATE_PART_BLOCK
+							: postContentBlockTypes;
+					return (
+						supportedBlockTypes.includes( block.name ) ||
+						block.attributes?.metadata?.bindings
+					);
+				}
+			);
 			return {
 				postType: _postType,
-				clientIds: getPostBlocksByName(
-					TEMPLATE_POST_TYPE === _postType
-						? TEMPLATE_PART_BLOCK
-						: postContentBlockTypes
-				),
+				clientIds: _clientIds,
 				renderingMode: getRenderingMode(),
 			};
 		},
