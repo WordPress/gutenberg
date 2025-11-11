@@ -119,7 +119,7 @@ const useIsInvalidLink = ( kind, type, id, enabled ) => {
 				id,
 			] );
 
-			// If resolution has finished and entityRecord is undefined, the entity was deleted
+			// If resolution has finished and entityRecord is undefined, the entity was deleted.
 			const deleted = hasResolved && entityRecord === undefined;
 
 			return {
