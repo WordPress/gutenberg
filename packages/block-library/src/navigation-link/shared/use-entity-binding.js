@@ -21,7 +21,7 @@ import { store as coreStore } from '@wordpress/core-data';
  * @throws {Error} If kind is not 'post-type' or 'taxonomy'
  */
 export function buildNavigationLinkEntityBinding( kind ) {
-	// Validate kind parameter exists
+	// Validate kind parameter exists.
 	if ( kind === undefined ) {
 		throw new Error(
 			'buildNavigationLinkEntityBinding requires a kind parameter. ' +
@@ -29,7 +29,7 @@ export function buildNavigationLinkEntityBinding( kind ) {
 		);
 	}
 
-	// Validate kind parameter value
+	// Validate kind parameter value.
 	if ( kind !== 'post-type' && kind !== 'taxonomy' ) {
 		throw new Error(
 			`Invalid kind "${ kind }" provided to buildNavigationLinkEntityBinding. ` +
@@ -71,30 +71,30 @@ export function useEntityBinding( { clientId, attributes } ) {
 	const hasCorrectBinding =
 		hasUrlBinding && metadata?.bindings?.url?.source === expectedSource;
 
-	// Check if the bound entity is available (not deleted)
+	// Check if the bound entity is available (not deleted).
 	const isBoundEntityAvailable = useSelect(
 		( select ) => {
 			const isPostType = kind === 'post-type';
 			const isTaxonomy = kind === 'taxonomy';
 
-			// Only check entity availability for post types and taxonomies with bindings
+			// Only check entity availability for post types and taxonomies with bindings.
 			if (
 				( ! isPostType && ! isTaxonomy ) ||
 				! hasCorrectBinding ||
 				! id
 			) {
-				return false; // No bound entity available if not a post type/taxonomy or no binding
+				return false; // No bound entity available if not a post type/taxonomy or no binding.
 			}
 
-			// Skip check in disabled contexts to avoid unnecessary requests
+			// Skip check in disabled contexts to avoid unnecessary requests.
 			if ( blockEditingMode === 'disabled' ) {
-				return true; // Assume available in disabled contexts
+				return true; // Assume available in disabled contexts.
 			}
 
 			const { getEntityRecord, hasFinishedResolution } =
 				select( coreStore );
 
-			// Use the correct entity type based on kind
+			// Use the correct entity type based on kind.
 			const entityType = isTaxonomy ? 'taxonomy' : 'postType';
 			const entityRecord = getEntityRecord( entityType, type, id );
 			const hasResolved = hasFinishedResolution( 'getEntityRecord', [
@@ -103,8 +103,8 @@ export function useEntityBinding( { clientId, attributes } ) {
 				id,
 			] );
 
-			// If resolution has finished and entityRecord is undefined, the entity was deleted
-			// Return true if entity exists, false if deleted
+			// If resolution has finished and entityRecord is undefined, the entity was deleted.
+			// Return true if entity exists, false if deleted.
 			return hasResolved ? entityRecord !== undefined : true;
 		},
 		[ kind, type, id, hasCorrectBinding, blockEditingMode ]
@@ -118,11 +118,11 @@ export function useEntityBinding( { clientId, attributes } ) {
 
 	const createBinding = useCallback(
 		( updatedAttributes ) => {
-			// Use updated attributes if provided, otherwise fall back to closure attributes
-			// updatedAttributes needed to access the most up-to-date data when called synchronously
+			// Use updated attributes if provided, otherwise fall back to closure attributes.
+			// updatedAttributes needed to access the most up-to-date data when called synchronously.
 			const kindToUse = updatedAttributes?.kind ?? kind;
 
-			// Avoid creating binding if no kind is provided
+			// Avoid creating binding if no kind is provided.
 			if ( ! kindToUse ) {
 				return;
 			}
@@ -136,14 +136,14 @@ export function useEntityBinding( { clientId, attributes } ) {
 					'Failed to create entity binding:',
 					error.message
 				);
-				// Don't create binding if validation fails
+				// Don't create binding if validation fails.
 			}
 		},
 		[ updateBlockBindings, kind ]
 	);
 
-	// A binding is "active" only when it exists AND the entity is available
-	// This determines when the input should be disabled/locked
+	// A binding is "active" only when it exists AND the entity is available.
+	// This determines when the input should be disabled/locked.
 	const isBindingActive = hasCorrectBinding && isBoundEntityAvailable;
 
 	// Computed: entity is unavailable when binding exists but entity is missing
