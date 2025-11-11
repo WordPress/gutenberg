@@ -7,6 +7,8 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
+import { STORE_NAME } from './constants';
+import { unlock } from '../lock-unlock';
 import { getBlockType } from './selectors';
 import { getValueFromObjectPath } from './utils';
 import { __EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY } from '../api/constants';
@@ -211,16 +213,44 @@ export function getBlockBindingsSource( state, sourceName ) {
 	return state.blockBindingsSources[ sourceName ];
 }
 
+// Separate selector to compute context for source?
+
+export const getSourceFieldsList = createRegistrySelector( ( select ) =>
+	createSelector(
+		( state, source, blockContext ) => {
+			const context = {};
+			if ( source?.usesContext?.length ) {
+				for ( const key of source.usesContext ) {
+					context[ key ] = blockContext[ key ];
+				}
+			}
+			return source.getFieldsList( { select, context } );
+		},
+		( state, source, blockContext ) => [ source, blockContext ]
+	)
+);
+
+export const getContextForSource = createSelector(
+	( state, source, blockContext ) => {
+		const context = {};
+		if ( source?.usesContext?.length ) {
+			for ( const key of source.usesContext ) {
+				context[ key ] = blockContext[ key ];
+			}
+		}
+		return context;
+	},
+	( state, source, blockContext ) => [ source, blockContext ]
+);
+
 export const getBlockBindingsSourcesForBlock = createRegistrySelector(
 	( select ) => ( state, blockName, blockContext ) => {
 		const registeredSources = getAllBlockBindingsSources( state );
 		const sources = {};
 
 		Object.entries( registeredSources ).forEach(
-			( [
-				sourceName,
-				{ getFieldsList, usesContext, label, getValues },
-			] ) => {
+			( [ sourceName, source ] ) => {
+				const { getFieldsList, usesContext, label, getValues } = source;
 				// Populate context.
 				const context = {};
 				if ( usesContext?.length ) {
@@ -229,10 +259,9 @@ export const getBlockBindingsSourcesForBlock = createRegistrySelector(
 					}
 				}
 				if ( getFieldsList ) {
-					const fieldsListResult = getFieldsList( {
-						select,
-						context,
-					} );
+					const fieldsListResult = unlock(
+						select( STORE_NAME )
+					).getSourceFieldsList( source, blockContext );
 					sources[ sourceName ] = {
 						data: fieldsListResult || [],
 						label,

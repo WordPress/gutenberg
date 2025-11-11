@@ -7,7 +7,11 @@ import fastDeepEqual from 'fast-deep-equal/es6';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { getBlockType, store as blockStore } from '@wordpress/blocks';
+import {
+	getBlockBindingsSource,
+	getBlockType,
+	store as blockStore,
+} from '@wordpress/blocks';
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
@@ -33,6 +37,7 @@ import { store as blockEditorStore } from '../store';
 
 const { Menu } = unlock( componentsPrivateApis );
 
+const EMPTY_ARRAY = [];
 const EMPTY_OBJECT = {};
 
 /**
@@ -80,9 +85,9 @@ function BlockBindingsPanelMenuContent( { attribute, binding, sources } ) {
 	);
 	return (
 		<Menu placement={ isMobile ? 'bottom-start' : 'left-start' }>
-			{ Object.entries( sources ).map( ( [ sourceKey, source ] ) => {
+			{ Object.entries( sources ).map( ( [ sourceKey, data ] ) => {
 				// Only show sources that have compatible data for this specific attribute.
-				const sourceDataItems = source.data?.filter(
+				const sourceDataItems = data?.filter(
 					( item ) => item?.type === attributeType
 				);
 
@@ -92,6 +97,8 @@ function BlockBindingsPanelMenuContent( { attribute, binding, sources } ) {
 				if ( noItemsAvailable ) {
 					return null;
 				}
+
+				const source = getBlockBindingsSource( sourceKey );
 
 				return (
 					<Menu
@@ -179,7 +186,8 @@ function BlockBindingsPanelMenuContent( { attribute, binding, sources } ) {
 
 function BlockBindingsAttribute( { attribute, binding, sources, blockName } ) {
 	const { source: sourceName, args } = binding || {};
-	const source = sources?.[ sourceName ];
+	const data = sources?.[ sourceName ];
+	const source = getBlockBindingsSource( sourceName );
 
 	let displayText;
 	let isValid = true;
@@ -189,8 +197,8 @@ function BlockBindingsAttribute( { attribute, binding, sources, blockName } ) {
 		// Check if there are any compatible sources for this attribute type.
 		const attributeType = getAttributeType( blockName, attribute );
 
-		const hasCompatibleSources = Object.values( sources ).some( ( src ) =>
-			src.data?.some( ( item ) => item?.type === attributeType )
+		const hasCompatibleSources = Object.values( sources ).some( ( _data ) =>
+			_data?.some( ( item ) => item?.type === attributeType )
 		);
 
 		if ( ! hasCompatibleSources ) {
@@ -208,9 +216,8 @@ function BlockBindingsAttribute( { attribute, binding, sources, blockName } ) {
 		}
 	} else {
 		displayText =
-			source.data?.find( ( item ) => fastDeepEqual( item.args, args ) )
-				?.label ||
-			source.label ||
+			data?.find( ( item ) => fastDeepEqual( item.args, args ) )?.label ||
+			source?.label ||
 			sourceName;
 	}
 
@@ -299,7 +306,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 
 	// Use useSelect to ensure sources are updated whenever there are updates in block context
 	// or when underlying data changes.
-	const { sources, canUpdateBlockBindings, bindableAttributes } = useSelect(
+	const { canUpdateBlockBindings, bindableAttributes } = useSelect(
 		( select ) => {
 			const { __experimentalBlockBindingsSupportedAttributes } =
 				select( blockEditorStore ).getSettings();
@@ -310,17 +317,57 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 			}
 
 			return {
-				sources: unlock(
-					select( blockStore )
-				).getBlockBindingsSourcesForBlock( blockName, blockContext ),
 				canUpdateBlockBindings:
 					select( blockEditorStore ).getSettings()
 						.canUpdateBlockBindings,
 				bindableAttributes: _bindableAttributes,
 			};
 		},
-		[ blockContext, blockName ]
+		[ blockName ]
 	);
+
+	const contexts = useSelect(
+		( select ) => {
+			const registeredSources = unlock(
+				select( blockStore )
+			).getAllBlockBindingsSources();
+			const _contexts = {};
+			Object.entries( registeredSources ).forEach(
+				( [ sourceName, source ] ) => {
+					_contexts[ sourceName ] = unlock(
+						select( blockStore )
+					).getContextForSource( source, blockContext );
+				}
+			);
+			return _contexts;
+		},
+		[ blockContext ]
+	);
+
+	const sources = useSelect(
+		( select ) => {
+			const registeredSources = unlock(
+				select( blockStore )
+			).getAllBlockBindingsSources();
+			const data = {};
+			Object.entries( registeredSources ).forEach(
+				( [ sourceName, source ] ) => {
+					if ( source.getFieldsList ) {
+						data[ sourceName ] = source.getFieldsList( {
+							select,
+							context: contexts[ sourceName ],
+						} );
+						if ( data[ sourceName ].length === 0 ) {
+							data[ sourceName ] = EMPTY_ARRAY;
+						}
+					}
+				}
+			);
+			return data;
+		},
+		[ contexts ]
+	);
+
 	// Return early if there are no bindable attributes.
 	if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
 		return null;
@@ -330,7 +377,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 
 	// Check if all sources have empty data arrays.
 	const hasCompatibleData = Object.values( sources ).some(
-		( source ) => source.data && source.data.length > 0
+		( data ) => data && data.length > 0
 	);
 
 	// Lock the UI when the user can't update bindings or there are no fields to connect to.
@@ -362,8 +409,8 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 
 						const hasCompatibleDataForAttribute = Object.values(
 							sources
-						).some( ( source ) =>
-							source.data?.some(
+						).some( ( data ) =>
+							data?.some(
 								( item ) => item?.type === attributeType
 							)
 						);
