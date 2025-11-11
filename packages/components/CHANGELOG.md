@@ -17,6 +17,7 @@
 ### Enhancements
 
 -   `ConfirmDialog`: Add `isBusy` prop to component. ([#73041](https://github.com/WordPress/gutenberg/pull/73041)).
+-   `ColorPicker`: Support pasting whole color values. ([#73166](https://github.com/WordPress/gutenberg/pull/73166)).
 
 ## 30.7.0 (2025-10-29)
 
