@@ -97,35 +97,21 @@ const useIsInvalidLink = ( kind, type, id, enabled ) => {
 	const hasId = Number.isInteger( id );
 	const blockEditingMode = useBlockEditingMode();
 
-	const { postStatus, isDeleted } = useSelect(
+	const postStatus = useSelect(
 		( select ) => {
 			if ( ! isPostType ) {
-				return { postStatus: null, isDeleted: false };
+				return null;
 			}
 
 			// Fetching the posts status is an "expensive" operation. Especially for sites with large navigations.
 			// When the block is rendered in a template or other disabled contexts we can skip this check in order
 			// to avoid all these additional requests that don't really add any value in that mode.
 			if ( blockEditingMode === 'disabled' || ! enabled ) {
-				return { postStatus: null, isDeleted: false };
+				return null;
 			}
 
-			const { getEntityRecord, hasFinishedResolution } =
-				select( coreStore );
-			const entityRecord = getEntityRecord( 'postType', type, id );
-			const hasResolved = hasFinishedResolution( 'getEntityRecord', [
-				'postType',
-				type,
-				id,
-			] );
-
-			// If resolution has finished and entityRecord is undefined, the entity was deleted.
-			const deleted = hasResolved && entityRecord === undefined;
-
-			return {
-				postStatus: entityRecord?.status,
-				isDeleted: deleted,
-			};
+			const { getEntityRecord } = select( coreStore );
+			return getEntityRecord( 'postType', type, id )?.status;
 		},
 		[ isPostType, blockEditingMode, enabled, type, id ]
 	);
@@ -135,13 +121,11 @@ const useIsInvalidLink = ( kind, type, id, enabled ) => {
 	// 2. It has an id.
 	// 3. It's neither null, nor undefined, as valid items might be either of those while loading.
 	// If those conditions are met, check if
-	// 1. The post status is trash (trashed).
-	// 2. The entity doesn't exist (deleted).
+	// 1. The post status is published.
+	// 2. The Navigation Link item has no label.
 	// If either of those is true, invalidate.
 	const isInvalid =
-		isPostType &&
-		hasId &&
-		( isDeleted || ( postStatus && 'trash' === postStatus ) );
+		isPostType && hasId && postStatus && 'trash' === postStatus;
 	const isDraft = 'draft' === postStatus;
 
 	return [ isInvalid, isDraft ];
@@ -264,12 +248,7 @@ export default function NavigationLinkEdit( {
 	const { getBlocks } = useSelect( blockEditorStore );
 
 	// URL binding logic
-	const {
-		clearBinding,
-		createBinding,
-		hasUrlBinding,
-		isBoundEntityAvailable,
-	} = useEntityBinding( {
+	const { clearBinding, createBinding } = useEntityBinding( {
 		clientId,
 		attributes,
 	} );
@@ -426,23 +405,14 @@ export default function NavigationLinkEdit( {
 		}
 	);
 
-	if (
-		! url ||
-		isInvalid ||
-		isDraft ||
-		( hasUrlBinding && ! isBoundEntityAvailable )
-	) {
+	if ( ! url || isInvalid || isDraft ) {
 		blockProps.onClick = () => {
 			setIsLinkOpen( true );
 		};
 	}
 
 	const classes = clsx( 'wp-block-navigation-item__content', {
-		'wp-block-navigation-link__placeholder':
-			! url ||
-			isInvalid ||
-			isDraft ||
-			( hasUrlBinding && ! isBoundEntityAvailable ),
+		'wp-block-navigation-link__placeholder': ! url || isInvalid || isDraft,
 	} );
 
 	const missingText = getMissingText( type );
@@ -561,10 +531,9 @@ export default function NavigationLinkEdit( {
 							link={ attributes }
 							onClose={ () => {
 								setIsLinkOpen( false );
-								// If there is no link and no binding, remove the auto-inserted block.
+								// If there is no link then remove the auto-inserted block.
 								// This avoids empty blocks which can provided a poor UX.
-								// Don't remove if binding exists (even if entity is unavailable) so user can fix it.
-								if ( ! url && ! hasUrlBinding ) {
+								if ( ! url ) {
 									onReplace( [] );
 								} else if ( isNewLink.current ) {
 									// If we just created a new link, select it

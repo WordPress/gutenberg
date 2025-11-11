@@ -2,12 +2,7 @@
  * WordPress dependencies
  */
 import { useCallback } from '@wordpress/element';
-import {
-	useBlockBindingsUtils,
-	useBlockEditingMode,
-} from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
+import { useBlockBindingsUtils } from '@wordpress/block-editor';
 
 /**
  * Builds entity binding configuration for navigation link URLs.
@@ -21,7 +16,7 @@ import { store as coreStore } from '@wordpress/core-data';
  * @throws {Error} If kind is not 'post-type' or 'taxonomy'
  */
 export function buildNavigationLinkEntityBinding( kind ) {
-	// Validate kind parameter exists.
+	// Validate kind parameter exists
 	if ( kind === undefined ) {
 		throw new Error(
 			'buildNavigationLinkEntityBinding requires a kind parameter. ' +
@@ -29,7 +24,7 @@ export function buildNavigationLinkEntityBinding( kind ) {
 		);
 	}
 
-	// Validate kind parameter value.
+	// Validate kind parameter value
 	if ( kind !== 'post-type' && kind !== 'taxonomy' ) {
 		throw new Error(
 			`Invalid kind "${ kind }" provided to buildNavigationLinkEntityBinding. ` +
@@ -62,55 +57,13 @@ export function buildNavigationLinkEntityBinding( kind ) {
  */
 export function useEntityBinding( { clientId, attributes } ) {
 	const { updateBlockBindings } = useBlockBindingsUtils( clientId );
-	const { metadata, id, kind, type } = attributes;
-	const blockEditingMode = useBlockEditingMode();
+	const { metadata, id, kind } = attributes;
 
 	const hasUrlBinding = !! metadata?.bindings?.url && !! id;
 	const expectedSource =
 		kind === 'post-type' ? 'core/post-data' : 'core/term-data';
 	const hasCorrectBinding =
 		hasUrlBinding && metadata?.bindings?.url?.source === expectedSource;
-
-	// Check if the bound entity is available (not deleted).
-	const isBoundEntityAvailable = useSelect(
-		( select ) => {
-			// First check: metadata/binding must exist
-			if ( ! hasCorrectBinding || ! id ) {
-				return false;
-			}
-
-			const isPostType = kind === 'post-type';
-			const isTaxonomy = kind === 'taxonomy';
-
-			// Only check entity availability for post types and taxonomies.
-			if ( ! isPostType && ! isTaxonomy ) {
-				return false;
-			}
-
-			// Skip check in disabled contexts to avoid unnecessary requests.
-			if ( blockEditingMode === 'disabled' ) {
-				return true; // Assume available in disabled contexts.
-			}
-
-			// Second check: entity must exist
-			const { getEntityRecord, hasFinishedResolution } =
-				select( coreStore );
-
-			// Use the correct entity type based on kind.
-			const entityType = isTaxonomy ? 'taxonomy' : 'postType';
-			const entityRecord = getEntityRecord( entityType, type, id );
-			const hasResolved = hasFinishedResolution( 'getEntityRecord', [
-				entityType,
-				type,
-				id,
-			] );
-
-			// If resolution has finished and entityRecord is undefined, the entity was deleted.
-			// Return true if entity exists, false if deleted.
-			return hasResolved ? entityRecord !== undefined : true;
-		},
-		[ kind, type, id, hasCorrectBinding, blockEditingMode ]
-	);
 
 	const clearBinding = useCallback( () => {
 		if ( hasUrlBinding ) {
@@ -120,11 +73,11 @@ export function useEntityBinding( { clientId, attributes } ) {
 
 	const createBinding = useCallback(
 		( updatedAttributes ) => {
-			// Use updated attributes if provided, otherwise fall back to closure attributes.
-			// updatedAttributes needed to access the most up-to-date data when called synchronously.
+			// Use updated attributes if provided, otherwise fall back to closure attributes
+			// updatedAttributes needed to access the most up-to-date data when called synchronously
 			const kindToUse = updatedAttributes?.kind ?? kind;
 
-			// Avoid creating binding if no kind is provided.
+			// Avoid creating binding if no kind is provided
 			if ( ! kindToUse ) {
 				return;
 			}
@@ -138,15 +91,14 @@ export function useEntityBinding( { clientId, attributes } ) {
 					'Failed to create entity binding:',
 					error.message
 				);
-				// Don't create binding if validation fails.
+				// Don't create binding if validation fails
 			}
 		},
-		[ updateBlockBindings, kind ]
+		[ updateBlockBindings, kind, id ]
 	);
 
 	return {
 		hasUrlBinding: hasCorrectBinding,
-		isBoundEntityAvailable,
 		clearBinding,
 		createBinding,
 	};
