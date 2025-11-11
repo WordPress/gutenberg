@@ -1363,7 +1363,7 @@ test.describe( 'Navigation block', () => {
 				// Verify help text shows error message
 				await expect(
 					settingsControls.getByText(
-						'Synced page could not be found. Please update.'
+						'Synced page is missing. Please update or remove this link.'
 					)
 				).toBeVisible();
 
@@ -1408,7 +1408,7 @@ test.describe( 'Navigation block', () => {
 				// Wait for error help text to disappear (state updates asynchronously)
 				await expect(
 					settingsControls.getByText(
-						'Synced page could not be found. Please update.'
+						'Synced page is missing. Please update or remove this link.'
 					)
 				).toBeHidden();
 

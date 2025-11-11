@@ -356,7 +356,9 @@ function MissingEntityHelpText( { id, type, kind } ) {
 		>
 			{ sprintf(
 				/* translators: %s is the entity type (e.g., "page", "post", "category") */
-				__( 'Synced %s could not be found. Please update.' ),
+				__(
+					'Synced %s is missing. Please update or remove this link.'
+				),
 				entityType
 			) }
 		</span>
