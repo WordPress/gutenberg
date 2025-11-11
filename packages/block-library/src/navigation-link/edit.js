@@ -26,13 +26,7 @@ import {
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
-import {
-	useState,
-	useEffect,
-	useRef,
-	useCallback,
-	useMemo,
-} from '@wordpress/element';
+import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
@@ -48,7 +42,6 @@ import {
 	updateAttributes,
 	useEntityBinding,
 	MissingEntityHelpText,
-	BindingHelpText,
 } from './shared';
 
 const DEFAULT_BLOCK = { name: 'core/navigation-link' };
@@ -426,44 +419,11 @@ export default function NavigationLinkEdit( {
 	/* translators: Whether the navigation link is Invalid or a Draft. */
 	const errorText = getErrorText();
 
-	// Generate screen reader description for block states
-	const navigationLinkDescription = useMemo( () => {
-		if ( isBoundEntityAvailable ) {
-			return BindingHelpText( { type, kind } );
-		}
-
-		// Handle missing URL states (informational, not an error)
-		if ( hasUrlBinding && ! isBoundEntityAvailable ) {
-			return MissingEntityHelpText( { type, kind } );
-		}
-
-		if ( ! url && ! metadata?.bindings?.url ) {
-			return missingText;
-		}
-
-		// Generic error text for draft or invalid links
-		if ( isDraft || isInvalid ) {
-			return getErrorText();
-		}
-
-		return null;
-	}, [
-		type,
-		kind,
-		metadata?.bindings?.url,
-		missingText,
-		url,
-		isBoundEntityAvailable,
-		isInvalid,
-		isDraft,
-		getErrorText,
-		hasUrlBinding,
-	] );
 	const instanceId = useInstanceId( NavigationLinkEdit );
-	const navigationLinkDescriptionId = sprintf(
-		'navigation-link-edit-%d-desc',
-		instanceId
-	);
+	const hasMissingEntity = hasUrlBinding && ! isBoundEntityAvailable;
+	const missingEntityDescriptionId = hasMissingEntity
+		? sprintf( 'navigation-link-edit-%d-desc', instanceId )
+		: undefined;
 
 	const blockProps = useBlockProps( {
 		ref: useMergeRefs( [ setPopoverAnchor, listItemRef ] ),
@@ -478,11 +438,8 @@ export default function NavigationLinkEdit( {
 			[ getColorClassName( 'background-color', backgroundColor ) ]:
 				!! backgroundColor,
 		} ),
-		'aria-describedby': navigationLinkDescription
-			? navigationLinkDescriptionId
-			: undefined,
-		'aria-invalid':
-			isInvalid || ( hasUrlBinding && ! isBoundEntityAvailable ),
+		'aria-describedby': missingEntityDescriptionId,
+		'aria-invalid': hasMissingEntity,
 		style: {
 			color: ! textColor && customTextColor,
 			backgroundColor: ! backgroundColor && customBackgroundColor,
@@ -552,9 +509,9 @@ export default function NavigationLinkEdit( {
 				/>
 			</InspectorControls>
 			<div { ...blockProps }>
-				{ navigationLinkDescription && (
-					<VisuallyHidden id={ navigationLinkDescriptionId }>
-						{ navigationLinkDescription }
+				{ hasMissingEntity && (
+					<VisuallyHidden id={ missingEntityDescriptionId }>
+						<MissingEntityHelpText type={ type } kind={ kind } />
 					</VisuallyHidden>
 				) }
 				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
