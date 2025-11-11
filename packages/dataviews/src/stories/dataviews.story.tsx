@@ -567,14 +567,14 @@ export const InfiniteScroll = () => {
 };
 
 const TimelineComponent = ( {
-	showMedia = 'true',
-	showGroupFieldLabel = 'true',
-	grouping = 'true',
+	showMedia = true,
+	showGroupFieldLabel = true,
+	grouping = true,
 	eventIconSize = 'default',
 }: {
-	showMedia: 'true' | 'false';
-	showGroupFieldLabel: 'true' | 'false';
-	grouping: 'true' | 'false';
+	showMedia: boolean;
+	showGroupFieldLabel: boolean;
+	grouping: boolean;
 	eventIconSize: 'default' | 'small' | 'medium';
 } ) => {
 	const [ view, setView ] = useState< View >( {
@@ -587,16 +587,16 @@ const TimelineComponent = ( {
 		titleField: 'title',
 		descriptionField: 'description',
 		mediaField: 'icon',
-		showMedia: showMedia === 'true',
+		showMedia,
 		sort: {
 			field: 'datetime',
 			direction: 'asc',
 		},
-		groupByField: grouping === 'true' ? 'date' : undefined,
+		groupByField: grouping ? 'date' : undefined,
 		groupByFieldDirection: 'asc',
 		layout: {
 			eventField: 'datetime',
-			showGroupFieldLabel: showGroupFieldLabel === 'true',
+			showGroupFieldLabel,
 			eventIconSize,
 		},
 	} );
@@ -607,11 +607,11 @@ const TimelineComponent = ( {
 			return {
 				...prevView,
 				type: LAYOUT_TIMELINE,
-				groupByField: grouping === 'true' ? 'date' : undefined,
-				showMedia: showMedia === 'true',
+				groupByField: grouping ? 'date' : undefined,
+				showMedia,
 				layout: {
 					...prevLayout,
-					showGroupFieldLabel: showGroupFieldLabel === 'true',
+					showGroupFieldLabel,
 					eventIconSize,
 				},
 			};
@@ -646,7 +646,7 @@ const TimelineComponent = ( {
 					render: ( { item } ) => {
 						const dateObj = new Date( item.datetime );
 						// When grouping is off, show date and time
-						if ( grouping === 'false' ) {
+						if ( ! grouping ) {
 							return (
 								<span>
 									{ dateObj.toLocaleDateString( 'en-US', {
@@ -706,29 +706,29 @@ const TimelineComponent = ( {
 export const Timeline = {
 	render: TimelineComponent,
 	args: {
-		showMedia: 'true',
-		showGroupFieldLabel: 'false',
-		grouping: 'true',
+		showMedia: true,
+		showGroupFieldLabel: false,
+		grouping: true,
 		eventIconSize: 'default',
 	},
 	argTypes: {
 		showMedia: {
 			control: 'select',
-			options: [ 'true', 'false' ],
-			defaultValue: 'true',
+			options: [ true, false ],
+			defaultValue: true,
 			description: 'Whether the icon is shown in the timeline',
 		},
 		showGroupFieldLabel: {
 			control: 'select',
-			options: [ 'true', 'false' ],
-			defaultValue: 'true',
+			options: [ true, false ],
+			defaultValue: false,
 			description:
 				'Whether the group field label is shown in the timeline',
 		},
 		grouping: {
 			control: 'select',
-			options: [ 'true', 'false' ],
-			defaultValue: 'true',
+			options: [ true, false ],
+			defaultValue: true,
 			description: 'Whether items are grouped by date in the timeline',
 		},
 		eventIconSize: {
