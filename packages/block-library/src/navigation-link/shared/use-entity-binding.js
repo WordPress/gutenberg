@@ -2,7 +2,12 @@
  * WordPress dependencies
  */
 import { useCallback } from '@wordpress/element';
-import { useBlockBindingsUtils } from '@wordpress/block-editor';
+import {
+	useBlockBindingsUtils,
+	useBlockEditingMode,
+} from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Builds entity binding configuration for navigation link URLs.
@@ -57,13 +62,69 @@ export function buildNavigationLinkEntityBinding( kind ) {
  */
 export function useEntityBinding( { clientId, attributes } ) {
 	const { updateBlockBindings } = useBlockBindingsUtils( clientId );
-	const { metadata, id, kind } = attributes;
+	const { metadata, id, kind, type } = attributes;
+	const blockEditingMode = useBlockEditingMode();
 
 	const hasUrlBinding = !! metadata?.bindings?.url && !! id;
 	const expectedSource =
 		kind === 'post-type' ? 'core/post-data' : 'core/term-data';
 	const hasCorrectBinding =
 		hasUrlBinding && metadata?.bindings?.url?.source === expectedSource;
+
+	// Check if the bound entity is available (not deleted).
+	const { isBoundEntityAvailable, hasResolvedBoundEntity } = useSelect(
+		( select ) => {
+			// First check: metadata/binding must exist
+			if ( ! hasCorrectBinding || ! id ) {
+				return {
+					isBoundEntityAvailable: false,
+					hasResolvedBoundEntity: true,
+				};
+			}
+
+			const isPostType = kind === 'post-type';
+			const isTaxonomy = kind === 'taxonomy';
+
+			// Only check entity availability for post types and taxonomies.
+			if ( ! isPostType && ! isTaxonomy ) {
+				return {
+					isBoundEntityAvailable: false,
+					hasResolvedBoundEntity: true,
+				};
+			}
+
+			// Skip check in disabled contexts to avoid unnecessary requests.
+			if ( blockEditingMode === 'disabled' ) {
+				return {
+					isBoundEntityAvailable: true,
+					hasResolvedBoundEntity: true,
+				}; // Assume available in disabled contexts.
+			}
+
+			// Second check: entity must exist
+			const { getEntityRecord, hasFinishedResolution } =
+				select( coreStore );
+
+			// Use the correct entity type based on kind.
+			const entityType = isTaxonomy ? 'taxonomy' : 'postType';
+			const entityRecord = getEntityRecord( entityType, type, id );
+			const hasResolved = hasFinishedResolution( 'getEntityRecord', [
+				entityType,
+				type,
+				id,
+			] );
+
+			// If resolution has finished and entityRecord is undefined, the entity was deleted.
+			// Return true if entity exists, false if deleted.
+			return {
+				isBoundEntityAvailable: hasResolved
+					? entityRecord !== undefined
+					: true,
+				hasResolvedBoundEntity: hasResolved,
+			};
+		},
+		[ kind, type, id, hasCorrectBinding, blockEditingMode ]
+	);
 
 	const clearBinding = useCallback( () => {
 		if ( hasUrlBinding ) {
@@ -99,6 +160,8 @@ export function useEntityBinding( { clientId, attributes } ) {
 
 	return {
 		hasUrlBinding: hasCorrectBinding,
+		isBoundEntityAvailable,
+		hasResolvedBoundEntity,
 		clearBinding,
 		createBinding,
 	};

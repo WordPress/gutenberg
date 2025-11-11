@@ -248,10 +248,34 @@ export default function NavigationLinkEdit( {
 	const { getBlocks } = useSelect( blockEditorStore );
 
 	// URL binding logic
-	const { clearBinding, createBinding } = useEntityBinding( {
+	const {
+		clearBinding,
+		createBinding,
+		hasUrlBinding,
+		isBoundEntityAvailable,
+		hasResolvedBoundEntity,
+	} = useEntityBinding( {
 		clientId,
 		attributes,
 	} );
+
+	// Automatically remove navigation links when their synced source entity is deleted
+	useEffect( () => {
+		// Only delete after we've confirmed the entity is truly missing (not while loading)
+		if (
+			hasUrlBinding &&
+			hasResolvedBoundEntity &&
+			! isBoundEntityAvailable
+		) {
+			// Remove the block since its synced source no longer exists
+			onReplace( [] );
+		}
+	}, [
+		hasUrlBinding,
+		hasResolvedBoundEntity,
+		isBoundEntityAvailable,
+		onReplace,
+	] );
 
 	const [ isInvalid, isDraft ] = useIsInvalidLink(
 		kind,
@@ -404,6 +428,12 @@ export default function NavigationLinkEdit( {
 			renderAppender: false,
 		}
 	);
+
+	// Don't render the block internals while we're checking if the bound entity exists
+	// This prevents a flash of the link before it gets removed if the entity is not available
+	if ( hasUrlBinding && ! hasResolvedBoundEntity ) {
+		return <div { ...blockProps } />;
+	}
 
 	if ( ! url || isInvalid || isDraft ) {
 		blockProps.onClick = () => {
