@@ -844,7 +844,9 @@ const CommentBoard = ( {
 									}
 								/>
 								<Menu.Popover
-									// Use a non-modal popover so focus isn't trapped like a dialog.
+									// The menu popover is rendered in a portal, which causes focus to be
+									// lost and the note to be collapsed unintentionally. To prevent this,
+									// the popover should be rendered as an inline.
 									modal={ false }
 								>
 									{ moreActions.map( ( action ) => (
