@@ -221,7 +221,7 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 					} }
 					help={
 						hasUrlBinding && ! isBoundEntityAvailable ? (
-							<MissingEntityHelpText
+							<MissingEntityHelp
 								id={ helpTextId }
 								type={ attributes.type }
 								kind={ attributes.kind }
@@ -327,7 +327,7 @@ export function Controls( { attributes, setAttributes, clientId } ) {
  * @param {string} props.kind - The entity kind
  * @return {string} Help text for the bound URL
  */
-function BindingHelpText( { type, kind } ) {
+export function BindingHelpText( { type, kind } ) {
 	const entityType = getEntityTypeName( type, kind );
 	return sprintf(
 		/* translators: %s is the entity type (e.g., "page", "post", "category") */
@@ -340,20 +340,24 @@ function BindingHelpText( { type, kind } ) {
  * Component to display error help text for missing entity bindings.
  *
  * @param {Object} props      - Component props
- * @param {string} props.id   - ID for the help text element (for aria-describedby)
  * @param {string} props.type - The entity type
  * @param {string} props.kind - The entity kind
  * @return {JSX.Element} Error help text component
  */
-function MissingEntityHelpText( { id, type, kind } ) {
+export function MissingEntityHelpText( { type, kind } ) {
 	const entityType = getEntityTypeName( type, kind );
+	return sprintf(
+		/* translators: %s is the entity type (e.g., "page", "post", "category") */
+		__( 'Synced %s is missing. Please edit or remove this link.' ),
+		entityType
+	);
+}
+
+function MissingEntityHelp( { id, type, kind } ) {
+	const helpText = MissingEntityHelpText( { type, kind } );
 	return (
 		<span id={ id } className="navigation-link-control__error-text">
-			{ sprintf(
-				/* translators: %s is the entity type (e.g., "page", "post", "category") */
-				__( 'Synced %s is missing. Please edit or remove this link.' ),
-				entityType
-			) }
+			{ helpText }
 		</span>
 	);
 }

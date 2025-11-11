@@ -8,9 +8,13 @@ import clsx from 'clsx';
  */
 import { createBlock } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
+import {
+	ToolbarButton,
+	ToolbarGroup,
+	VisuallyHidden,
+} from '@wordpress/components';
 import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	BlockControls,
 	InspectorControls,
@@ -22,17 +26,30 @@ import {
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
-import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
+import {
+	useState,
+	useEffect,
+	useRef,
+	useCallback,
+	useMemo,
+} from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
-import { useMergeRefs, usePrevious } from '@wordpress/compose';
+import { useMergeRefs, usePrevious, useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { getColors } from '../navigation/edit/utils';
-import { Controls, LinkUI, updateAttributes, useEntityBinding } from './shared';
+import {
+	Controls,
+	LinkUI,
+	updateAttributes,
+	useEntityBinding,
+	MissingEntityHelpText,
+	BindingHelpText,
+} from './shared';
 
 const DEFAULT_BLOCK = { name: 'core/navigation-link' };
 const NESTING_BLOCK_NAMES = [
@@ -394,6 +411,60 @@ export default function NavigationLinkEdit( {
 		}
 	}
 
+	const missingText = getMissingText( type );
+
+	const getErrorText = useCallback( () => {
+		if ( isInvalid ) {
+			return __( 'Invalid' );
+		}
+		if ( isDraft ) {
+			return __( 'Draft' );
+		}
+		return null;
+	}, [ isInvalid, isDraft ] );
+
+	/* translators: Whether the navigation link is Invalid or a Draft. */
+	const errorText = getErrorText();
+
+	// Generate screen reader description for block states
+	const navigationLinkDescription = useMemo( () => {
+		if ( isBoundEntityAvailable ) {
+			return BindingHelpText( { type, kind } );
+		}
+
+		// Handle missing URL states (informational, not an error)
+		if ( hasUrlBinding && ! isBoundEntityAvailable ) {
+			return MissingEntityHelpText( { type, kind } );
+		}
+
+		if ( ! url && ! metadata?.bindings?.url ) {
+			return missingText;
+		}
+
+		// Generic error text for draft or invalid links
+		if ( isDraft || isInvalid ) {
+			return getErrorText();
+		}
+
+		return null;
+	}, [
+		type,
+		kind,
+		metadata?.bindings?.url,
+		missingText,
+		url,
+		isBoundEntityAvailable,
+		isInvalid,
+		isDraft,
+		getErrorText,
+		hasUrlBinding,
+	] );
+	const instanceId = useInstanceId( NavigationLinkEdit );
+	const navigationLinkDescriptionId = sprintf(
+		'navigation-link-edit-%d-desc',
+		instanceId
+	);
+
 	const blockProps = useBlockProps( {
 		ref: useMergeRefs( [ setPopoverAnchor, listItemRef ] ),
 		className: clsx( 'wp-block-navigation-item', {
@@ -407,6 +478,11 @@ export default function NavigationLinkEdit( {
 			[ getColorClassName( 'background-color', backgroundColor ) ]:
 				!! backgroundColor,
 		} ),
+		'aria-describedby': navigationLinkDescription
+			? navigationLinkDescriptionId
+			: undefined,
+		'aria-invalid':
+			isInvalid || ( hasUrlBinding && ! isBoundEntityAvailable ),
 		style: {
 			color: ! textColor && customTextColor,
 			backgroundColor: ! backgroundColor && customBackgroundColor,
@@ -445,12 +521,6 @@ export default function NavigationLinkEdit( {
 			( hasUrlBinding && ! isBoundEntityAvailable ),
 	} );
 
-	const missingText = getMissingText( type );
-	/* translators: Whether the navigation link is Invalid or a Draft. */
-	const placeholderText = `(${
-		isInvalid ? __( 'Invalid' ) : __( 'Draft' )
-	})`;
-
 	return (
 		<>
 			<BlockControls>
@@ -482,6 +552,11 @@ export default function NavigationLinkEdit( {
 				/>
 			</InspectorControls>
 			<div { ...blockProps }>
+				{ navigationLinkDescription && (
+					<VisuallyHidden id={ navigationLinkDescriptionId }>
+						{ navigationLinkDescription }
+					</VisuallyHidden>
+				) }
 				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
 				<a className={ classes }>
 					{ /* eslint-enable */ }
@@ -544,8 +619,8 @@ export default function NavigationLinkEdit( {
 											// so they display without encoding.
 											// See `updateAttributes` for more details.
 											`${ decodeEntities( label ) } ${
-												isInvalid || isDraft
-													? placeholderText
+												errorText
+													? `(${ errorText })`
 													: ''
 											}`.trim()
 										}
