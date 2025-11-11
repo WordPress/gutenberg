@@ -363,7 +363,7 @@ function MissingEntityHelpText( { id, type, kind } ) {
 	return (
 		<span
 			id={ id }
-			style={ { color: '#d63638' } } // WordPress error red
+			className="navigation-link-control__error-text"
 			role="alert"
 			aria-live="polite"
 		>
