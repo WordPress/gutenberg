@@ -374,7 +374,7 @@ describe( 'normalizeFields: default getValue', () => {
 			);
 		} );
 
-		it( 'always adds displayFormat.date and displayFormat.weekStartsOn for all field types', () => {
+		it( 'adds empty displayFormat for non-date field types', () => {
 			const fields: Field< {} >[] = [
 				{
 					id: 'title',
@@ -386,14 +386,8 @@ describe( 'normalizeFields: default getValue', () => {
 				},
 			];
 			const normalizedFields = normalizeFields( fields );
-			expect( normalizedFields[ 0 ].displayFormat.date ).toBeDefined();
-			expect( normalizedFields[ 1 ].displayFormat.date ).toBeDefined();
-			expect(
-				normalizedFields[ 0 ].displayFormat.weekStartsOn
-			).toBeDefined();
-			expect(
-				normalizedFields[ 1 ].displayFormat.weekStartsOn
-			).toBeDefined();
+			expect( normalizedFields[ 0 ].displayFormat ).toEqual( {} );
+			expect( normalizedFields[ 1 ].displayFormat ).toEqual( {} );
 		} );
 	} );
 } );

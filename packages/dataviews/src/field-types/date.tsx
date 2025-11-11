@@ -48,6 +48,15 @@ export default {
 			return '';
 		}
 
+		// Not all fields have displayFormat, but date fields do.
+		//
+		// At runtime, this method will never be called for non-date fields.
+		// However, the type system does not know this, so we need to check it.
+		// There's an opportunity here to improve the type system.
+		if ( field.type !== 'date' ) {
+			return '';
+		}
+
 		return dateI18n( field.displayFormat.date, value );
 	},
 	enableSorting: true,

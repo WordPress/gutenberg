@@ -258,10 +258,16 @@ function CalendarDateControl< Item >( {
 	hideLabelFromVision,
 	validity,
 }: DataFormControlProps< Item > ) {
-	const { id, label, setValue, getValue, isValid } = field;
+	const { id, type, label, setValue, getValue, isValid, displayFormat } =
+		field;
 	const [ selectedPresetId, setSelectedPresetId ] = useState< string | null >(
 		null
 	);
+
+	let weekStartsOn;
+	if ( type === 'date' ) {
+		weekStartsOn = weekStartsOnToNumber( displayFormat.weekStartsOn );
+	}
 
 	const fieldValue = getValue( { item: data } );
 	const value = typeof fieldValue === 'string' ? fieldValue : undefined;
@@ -396,9 +402,7 @@ function CalendarDateControl< Item >( {
 						month={ calendarMonth }
 						onMonthChange={ setCalendarMonth }
 						timeZone={ timezoneString || undefined }
-						weekStartsOn={ weekStartsOnToNumber(
-							field.displayFormat.weekStartsOn
-						) }
+						weekStartsOn={ weekStartsOn }
 					/>
 				</VStack>
 			</BaseControl>
@@ -413,7 +417,7 @@ function CalendarDateRangeControl< Item >( {
 	hideLabelFromVision,
 	validity,
 }: DataFormControlProps< Item > ) {
-	const { id, label, getValue, setValue } = field;
+	const { id, type, label, getValue, setValue, displayFormat } = field;
 	let value: DateRange;
 	const fieldValue = getValue( { item: data } );
 	if (
@@ -422,6 +426,11 @@ function CalendarDateRangeControl< Item >( {
 		fieldValue.every( ( date ) => typeof date === 'string' )
 	) {
 		value = fieldValue as DateRange;
+	}
+
+	let weekStartsOn;
+	if ( type === 'date' ) {
+		weekStartsOn = weekStartsOnToNumber( displayFormat.weekStartsOn );
 	}
 
 	const onChangeCallback = useCallback(
@@ -611,9 +620,7 @@ function CalendarDateRangeControl< Item >( {
 						month={ calendarMonth }
 						onMonthChange={ setCalendarMonth }
 						timeZone={ timezone.string || undefined }
-						weekStartsOn={ weekStartsOnToNumber(
-							field.displayFormat.weekStartsOn
-						) }
+						weekStartsOn={ weekStartsOn }
 					/>
 				</VStack>
 			</BaseControl>

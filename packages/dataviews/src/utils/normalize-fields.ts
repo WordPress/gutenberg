@@ -188,8 +188,15 @@ export default function normalizeFields< Item >(
 
 		const filterBy = getFilterBy( field, fieldTypeDefinition );
 
-		return {
-			...field,
+		// TypeScript is unable to figure out that we're returning the proper types
+		// (either NormalizedFieldDate or NormalizedFieldGeneric)
+		// when the type is part of the object spread below.
+		//
+		// Hence, why we remove it and add back it later.
+		const { type, ...fieldWithoutType } = field;
+
+		const baseField = {
+			...fieldWithoutType,
 			label: field.label || field.id,
 			header: field.header || field.label || field.id,
 			getValue,
@@ -206,21 +213,32 @@ export default function normalizeFields< Item >(
 				true,
 			filterBy,
 			readOnly: field.readOnly ?? fieldTypeDefinition.readOnly ?? false,
-			displayFormat: {
-				date:
-					field.type === 'date' &&
-					field.displayFormat?.date !== undefined &&
-					typeof field.displayFormat.date === 'string'
-						? field.displayFormat.date
-						: getSettings().formats.date,
-				weekStartsOn:
-					field.type === 'date' &&
-					field.displayFormat?.weekStartsOn !== undefined
-						? field.displayFormat.weekStartsOn
-						: numberToWeekStartsOn(
-								getSettings().l10n.startOfWeek
-						  ),
-			},
+		};
+
+		if ( field.type === 'date' ) {
+			return {
+				...baseField,
+				type: 'date' as const,
+				displayFormat: {
+					date:
+						field.displayFormat?.date !== undefined &&
+						typeof field.displayFormat.date === 'string'
+							? field.displayFormat.date
+							: getSettings().formats.date,
+					weekStartsOn:
+						field.displayFormat?.weekStartsOn !== undefined
+							? field.displayFormat.weekStartsOn
+							: numberToWeekStartsOn(
+									getSettings().l10n.startOfWeek
+							  ),
+				},
+			};
+		}
+
+		return {
+			...baseField,
+			type: field.type,
+			displayFormat: {},
 		};
 	} );
 }
