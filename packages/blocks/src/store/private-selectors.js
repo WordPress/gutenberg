@@ -211,19 +211,6 @@ export function getBlockBindingsSource( state, sourceName ) {
 	return state.blockBindingsSources[ sourceName ];
 }
 
-export const getContextForSource = createSelector(
-	( state, source, blockContext ) => {
-		const context = {};
-		if ( source?.usesContext?.length ) {
-			for ( const key of source.usesContext ) {
-				context[ key ] = blockContext[ key ];
-			}
-		}
-		return context;
-	},
-	( state, source, blockContext ) => [ source, blockContext ]
-);
-
 /**
  * Determines if any of the block type's attributes have
  * the content role attribute.

@@ -325,23 +325,29 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 
 	const sources = useSelect(
 		( select ) => {
-			const { getAllBlockBindingsSources, getContextForSource } = unlock(
+			const { getAllBlockBindingsSources } = unlock(
 				select( blockStore )
 			);
 			const data = {};
 			Object.entries( getAllBlockBindingsSources() ).forEach(
 				( [ sourceName, source ] ) => {
-					if ( source.getFieldsList ) {
-						data[ sourceName ] = source.getFieldsList( {
-							select,
-							context: getContextForSource(
-								source,
-								blockContext
-							),
-						} );
-						if ( data[ sourceName ].length === 0 ) {
-							data[ sourceName ] = EMPTY_ARRAY;
+					if ( ! source.getFieldsList ) {
+						return;
+					}
+
+					const context = {};
+					if ( source?.usesContext?.length ) {
+						for ( const key of source.usesContext ) {
+							context[ key ] = blockContext[ key ];
 						}
+					}
+
+					data[ sourceName ] = source.getFieldsList( {
+						select,
+						context,
+					} );
+					if ( data[ sourceName ].length === 0 ) {
+						data[ sourceName ] = EMPTY_ARRAY;
 					}
 				}
 			);
