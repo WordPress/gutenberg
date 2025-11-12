@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 10.3.0 (2025-11-12)
+
 ### Enhancements
 
 - DataForm: add new details layout. [#72355](https://github.com/WordPress/gutenberg/pull/72355)

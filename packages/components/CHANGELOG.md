@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 30.8.0 (2025-11-12)
+
 ### Bug Fixes
 
 -   `Button`: Revert disabled primary button state to its previous one ([#73037](https://github.com/WordPress/gutenberg/pull/73037)).
