@@ -4312,15 +4312,6 @@ describe( 'state', () => {
 		// If/when the experiment is stabilized, this wrapping `describe` and
 		// `beforeAll`/`afterAll` can be removed, un-nesting the tests within.
 		describe( 'contentOnly patterns experiment', () => {
-			beforeAll( () => {
-				globalThis.window.__experimentalContentOnlyPatternInsertion = true;
-			} );
-
-			afterAll( () => {
-				delete globalThis.window
-					.__experimentalContentOnlyPatternInsertion;
-			} );
-
 			describe( 'unsynced patterns', () => {
 				let initialState;
 				beforeAll( () => {

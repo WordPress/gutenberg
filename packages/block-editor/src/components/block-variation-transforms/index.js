@@ -206,10 +206,7 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 		} );
 	};
 
-	const hideVariationsForSections =
-		window?.__experimentalContentOnlyPatternInsertion && isSection;
-
-	if ( ! variations?.length || isContentOnly || hideVariationsForSections ) {
+	if ( ! variations?.length || isContentOnly || isSection ) {
 		return null;
 	}
 

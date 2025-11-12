@@ -323,9 +323,7 @@ const BlockInspectorSingleBlock = ( {
 } ) => {
 	const hasMultipleTabs = availableTabs?.length > 1;
 	const hasParentChildBlockCards =
-		window?.__experimentalContentOnlyPatternInsertion &&
-		editedContentOnlySection &&
-		editedContentOnlySection !== clientId;
+		editedContentOnlySection && editedContentOnlySection !== clientId;
 	const parentBlockInformation = useBlockDisplayInformation(
 		editedContentOnlySection
 	);
@@ -349,9 +347,7 @@ const BlockInspectorSingleBlock = ( {
 				isChild={ hasParentChildBlockCards }
 				clientId={ clientId }
 			/>
-			{ window?.__experimentalContentOnlyPatternInsertion && (
-				<EditContents clientId={ clientId } />
-			) }
+			<EditContents clientId={ clientId } />
 			<BlockVariationTransforms blockClientId={ clientId } />
 			{ shouldShowTabs && (
 				<InspectorControlsTabs

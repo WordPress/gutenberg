@@ -2294,20 +2294,16 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 	);
 	// Use array.from for better back compat. Older versions of the iterator returned
 	// from `keys()` didn't have the `filter` method.
-	const unsyncedPatternClientIds =
-		!! window?.__experimentalContentOnlyPatternInsertion
-			? Array.from( state.blocks.attributes.keys() ).filter(
-					( clientId ) =>
-						state.blocks.attributes.get( clientId )?.metadata
-							?.patternName
-			  )
-			: [];
+	const unsyncedPatternClientIds = Array.from(
+		state.blocks.attributes.keys()
+	).filter(
+		( clientId ) =>
+			state.blocks.attributes.get( clientId )?.metadata?.patternName
+	);
 	const contentOnlyParents = [
 		...contentOnlyTemplateLockedClientIds,
 		...unsyncedPatternClientIds,
-		...( window?.__experimentalContentOnlyPatternInsertion
-			? templatePartClientIds
-			: [] ),
+		...templatePartClientIds,
 	];
 
 	traverseBlockTree( state, treeClientId, ( block ) => {
@@ -2332,11 +2328,8 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 				return;
 			}
 
-			// For the content only pattern experiment, disable blocks that are outside of the edited section.
-			if ( window?.__experimentalContentOnlyPatternInsertion ) {
-				derivedBlockEditingModes.set( clientId, 'disabled' );
-				return;
-			}
+			// For the content only patterns, disable blocks that are outside of the edited section.
+			derivedBlockEditingModes.set( clientId, 'disabled' );
 		}
 
 		// If the block already has an explicit block editing mode set,

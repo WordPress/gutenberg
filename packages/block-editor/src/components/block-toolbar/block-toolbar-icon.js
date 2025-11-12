@@ -57,11 +57,9 @@ function getBlockIconVariant( { select, clientIds } ) {
 
 	const isDefaultEditingMode =
 		getBlockEditingMode( clientIds[ 0 ] ) === 'default';
-	const _hideTransformsForSections =
-		window?.__experimentalContentOnlyPatternInsertion &&
-		isSectionInSelection;
+
 	const _showBlockSwitcher =
-		! _hideTransformsForSections &&
+		! isSectionInSelection &&
 		isDefaultEditingMode &&
 		( hasBlockStyles || canRemove ) &&
 		! hasTemplateLock;

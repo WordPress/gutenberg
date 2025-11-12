@@ -39,12 +39,9 @@ export function ModifyContentOnlySectionMenuItem( { clientId, onClose } ) {
 	const isContentLocked =
 		! isLockedByParent && templateLock === 'contentOnly';
 
-	// Hide the Modify button when the content only pattern insertion experiment is active.
+	// Hide the Modify button when the content only pattern insertion is active.
 	// This is replaced by an alternative UI in the experiment.
-	if (
-		window?.__experimentalContentOnlyPatternInsertion ||
-		( ! isContentLocked && ! isEditingContentOnlySection )
-	) {
+	if ( ! isContentLocked && ! isEditingContentOnlySection ) {
 		return null;
 	}
 

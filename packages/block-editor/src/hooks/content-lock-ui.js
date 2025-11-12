@@ -50,10 +50,7 @@ function ContentLockControlsPure( { clientId } ) {
 
 	// Hide the Done button when the content only pattern insertion experiment is active.
 	// This is replaced by an alternative UI in the experiment.
-	if (
-		window?.__experimentalContentOnlyPatternInsertion ||
-		( ! isContentLocked && ! isEditingContentOnlySection )
-	) {
+	if ( ! isContentLocked && ! isEditingContentOnlySection ) {
 		return null;
 	}
 

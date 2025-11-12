@@ -78,14 +78,13 @@ const StylesTab = ( {
 					</PanelBody>
 				</div>
 			) }
-			{ isSectionBlock &&
-				window?.__experimentalContentOnlyPatternInsertion && (
-					<SectionBlockColorControls
-						blockName={ blockName }
-						clientId={ clientId }
-						contentClientIds={ contentClientIds }
-					/>
-				) }
+			{ isSectionBlock && (
+				<SectionBlockColorControls
+					blockName={ blockName }
+					clientId={ clientId }
+					contentClientIds={ contentClientIds }
+				/>
+			) }
 			{ ! isSectionBlock && (
 				<>
 					<InspectorControls.Slot
