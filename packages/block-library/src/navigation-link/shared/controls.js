@@ -348,7 +348,7 @@ export function MissingEntityHelpText( { type, kind } ) {
 	const entityType = getEntityTypeName( type, kind );
 	return sprintf(
 		/* translators: %s is the entity type (e.g., "page", "post", "category") */
-		__( 'Synced %s is missing. Please edit or remove this link.' ),
+		__( 'Synced %s is missing. Please update or remove this link.' ),
 		entityType
 	);
 }
