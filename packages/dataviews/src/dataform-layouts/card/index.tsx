@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -201,7 +206,15 @@ export default function FormCardField< Item >( {
 		return (
 			<Card className="dataforms-layouts-card__field" size={ sizeCard }>
 				{ withHeader && (
-					<CardHeader className="dataforms-layouts-card__field-header">
+					<CardHeader
+						className={ clsx(
+							'dataforms-layouts-card__field-header',
+							{
+								'dataforms-layouts-card__field-header-open':
+									isOpen,
+							}
+						) }
+					>
 						<span className="dataforms-layouts-card__field-header-label">
 							{ field.label }
 						</span>
