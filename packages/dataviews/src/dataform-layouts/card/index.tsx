@@ -211,7 +211,9 @@ export default function FormCardField< Item >( {
 							'dataforms-layouts-card__field-header',
 							{
 								'dataforms-layouts-card__field-header-open':
-									isOpen,
+									// Apply the class only when the field has a description.
+									// This ensures that padding between the header and the body is consistent.
+									isOpen && field.description,
 							}
 						) }
 					>
