@@ -4,13 +4,17 @@
 import { store as blocksStore } from '@wordpress/blocks';
 import {
 	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
+	DropdownMenu,
 	Icon,
+	MenuGroup,
+	MenuItem,
 	Navigator,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { arrowLeft, arrowRight } from '@wordpress/icons';
+import { arrowLeft, arrowRight, check, moreVertical } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -35,6 +39,56 @@ const fieldTypeToEditComponent = {
 	link: LinkEdit,
 };
 
+function renderFieldVisibilityMenu( {
+	fields,
+	fieldVisibilityOverrides,
+	onToggleField,
+} ) {
+	const getFieldVisibility = ( f ) => {
+		const override = fieldVisibilityOverrides.get( f.id );
+		if ( override !== undefined ) {
+			return override;
+		}
+		return f.isVisibleBoolean !== false;
+	};
+
+	const visibleFields = fields.filter( ( f ) => getFieldVisibility( f ) );
+	const hiddenFields = fields.filter( ( f ) => ! getFieldVisibility( f ) );
+
+	return () => (
+		<>
+			{ visibleFields.length > 0 && (
+				<MenuGroup label={ __( 'Visible fields' ) }>
+					{ visibleFields.map( ( field ) => (
+						<MenuItem
+							key={ field.id }
+							onClick={ () => onToggleField( field.id ) }
+							icon={ check }
+							isSelected
+							role="menuitemcheckbox"
+						>
+							{ field.label || field.id }
+						</MenuItem>
+					) ) }
+				</MenuGroup>
+			) }
+			{ hiddenFields.length > 0 && (
+				<MenuGroup label={ __( 'Hidden fields' ) }>
+					{ hiddenFields.map( ( field ) => (
+						<MenuItem
+							key={ field.id }
+							onClick={ () => onToggleField( field.id ) }
+							role="menuitemcheckbox"
+						>
+							{ field.label || field.id }
+						</MenuItem>
+					) ) }
+				</MenuGroup>
+			) }
+		</>
+	);
+}
+
 function BlockFields( { clientId } ) {
 	const { attributes, blockType } = useSelect(
 		( select ) => {
@@ -51,6 +105,9 @@ function BlockFields( { clientId } ) {
 	);
 
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const [ fieldVisibilityOverrides, setFieldVisibilityOverrides ] = useState(
+		new Map()
+	);
 
 	const blockTitle = useBlockDisplayTitle( {
 		clientId,
@@ -120,10 +177,20 @@ function BlockFields( { clientId } ) {
 			}
 
 			// Convert boolean isVisible to function for DataForm compatibility
-			let isVisible = field.isVisible;
-			if ( typeof isVisible !== 'function' ) {
-				isVisible = isVisible !== false ? () => true : () => false;
+			// This function needs to check the current fieldVisibilityOverrides
+			let isVisibleBoolean = true; // Default to visible
+			if ( typeof field.isVisible !== 'function' ) {
+				isVisibleBoolean = field.isVisible !== false;
 			}
+
+			// Create an isVisible function that checks overrides dynamically
+			const isVisible = () => {
+				const override = fieldVisibilityOverrides.get( field.id );
+				if ( override !== undefined ) {
+					return override;
+				}
+				return isVisibleBoolean;
+			};
 
 			return {
 				...field,
@@ -132,9 +199,35 @@ function BlockFields( { clientId } ) {
 				setValue,
 				Edit,
 				isVisible,
+				isVisibleBoolean, // Store the original boolean for visibility control
 			};
 		} );
-	}, [ blockType?.fields ] );
+	}, [ blockType?.fields, fieldVisibilityOverrides ] );
+
+	const getFieldVisibility = ( f ) => {
+		const override = fieldVisibilityOverrides.get( f.id );
+		if ( override !== undefined ) {
+			return override;
+		}
+		return f.isVisibleBoolean !== false;
+	};
+
+	const handleToggleField = ( fieldId ) => {
+		setFieldVisibilityOverrides( ( prev ) => {
+			const updated = new Map( prev );
+			const field = dataFormFields.find( ( f ) => f.id === fieldId );
+			const currentVisibility = getFieldVisibility( field );
+
+			if ( currentVisibility ) {
+				// Currently visible, hide it
+				updated.set( fieldId, false );
+			} else {
+				// Currently hidden, show it
+				updated.set( fieldId, true );
+			}
+			return updated;
+		} );
+	};
 
 	if ( ! blockType?.fields?.length ) {
 		// TODO - we might still want to show a placeholder for blocks with no fields.
@@ -142,12 +235,32 @@ function BlockFields( { clientId } ) {
 		return null;
 	}
 
+	// Determine visible fields based on isVisible and user overrides
+	const visibleFieldIds = dataFormFields
+		.filter( ( f ) => getFieldVisibility( f ) )
+		.map( ( f ) => f.id );
+
 	return (
 		<div className="block-editor-content-only-controls__block-fields">
 			<div className="block-editor-content-only-controls__block-header">
-				<HStack spacing={ 1 }>
-					<BlockIcon icon={ blockInformation?.icon } />
-					<div>{ blockTitle }</div>
+				<HStack spacing={ 1 } justify="space-between">
+					<HStack spacing={ 1 } justify="flex-start">
+						<BlockIcon icon={ blockInformation?.icon } />
+						<div>{ blockTitle }</div>
+					</HStack>
+					{ dataFormFields.length > 0 && (
+						<DropdownMenu
+							icon={ moreVertical }
+							label={ __( 'Show/hide fields' ) }
+							toggleProps={ { size: 'compact' } }
+						>
+							{ renderFieldVisibilityMenu( {
+								fields: dataFormFields,
+								fieldVisibilityOverrides,
+								onToggleField: handleToggleField,
+							} ) }
+						</DropdownMenu>
+					) }
 				</HStack>
 			</div>
 
@@ -156,9 +269,7 @@ function BlockFields( { clientId } ) {
 				fields={ dataFormFields }
 				form={ {
 					layout: 'regular',
-					fields: dataFormFields
-						.filter( ( f ) => f.isVisible !== false )
-						.map( ( f ) => f.id ),
+					fields: visibleFieldIds,
 				} }
 				onChange={ ( updates ) =>
 					updateBlockAttributes( clientId, updates )
@@ -224,19 +335,25 @@ function ContentOnlyControlsScreen( {
 					</Navigator.BackButton>
 				</div>
 			) }
-			{ isRootContentBlock && <BlockFields clientId={ rootClientId } /> }
-			{ contentClientIds.map( ( clientId ) => {
-				if ( parentClientIds?.[ clientId ] ) {
-					return (
-						<DrillDownButton
-							key={ clientId }
-							clientId={ clientId }
-						/>
-					);
-				}
+			<VStack spacing={ 4 }>
+				{ isRootContentBlock && (
+					<BlockFields clientId={ rootClientId } />
+				) }
+				{ contentClientIds.map( ( clientId ) => {
+					if ( parentClientIds?.[ clientId ] ) {
+						return (
+							<DrillDownButton
+								key={ clientId }
+								clientId={ clientId }
+							/>
+						);
+					}
 
-				return <BlockFields key={ clientId } clientId={ clientId } />;
-			} ) }
+					return (
+						<BlockFields key={ clientId } clientId={ clientId } />
+					);
+				} ) }
+			</VStack>
 		</>
 	);
 }
