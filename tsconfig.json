@@ -57,6 +57,7 @@
 		{ "path": "packages/redux-routine" },
 		{ "path": "packages/report-flaky-tests" },
 		{ "path": "packages/rich-text" },
+		{ "path": "packages/route" },
 		{ "path": "packages/router" },
 		{ "path": "packages/shortcode" },
 		{ "path": "packages/style-engine" },

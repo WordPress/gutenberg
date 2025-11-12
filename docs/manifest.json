@@ -1956,6 +1956,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/route",
+		"slug": "packages-route",
+		"markdown_source": "../packages/route/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/router",
 		"slug": "packages-router",
 		"markdown_source": "../packages/router/README.md",

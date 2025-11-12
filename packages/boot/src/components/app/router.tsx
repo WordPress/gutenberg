@@ -1,16 +1,6 @@
 /**
  * External dependencies
  */
-import {
-	createRouter,
-	createRootRoute,
-	createRoute,
-	RouterProvider,
-	createBrowserHistory,
-	type AnyRoute,
-	redirect,
-} from '@tanstack/react-router';
-import { parseHref } from '@tanstack/history';
 import type { ComponentType } from 'react';
 
 /**
@@ -19,12 +9,26 @@ import type { ComponentType } from 'react';
 import { __ } from '@wordpress/i18n';
 import { lazy, useState, useEffect } from '@wordpress/element';
 import { Page } from '@wordpress/admin-ui';
+import {
+	privateApis as routePrivateApis,
+	type AnyRoute,
+} from '@wordpress/route';
 
 /**
  * Internal dependencies
  */
 import Root from '../root';
 import type { Route, RouteLoaderContext } from '../../store/types';
+import { unlock } from '../../lock-unlock';
+
+const {
+	createRouter,
+	createRootRoute,
+	createRoute,
+	RouterProvider,
+	createBrowserHistory,
+	parseHref,
+} = unlock( routePrivateApis );
 
 // Not found component
 function NotFoundComponent() {
@@ -89,9 +93,7 @@ async function createRouteFromDefinition(
 
 	// Load route module for lifecycle functions if specified
 	let routeConfig: {
-		beforeLoad?: (
-			context: RouteLoaderContext & { redirect: Function }
-		) => void | Promise< void >;
+		beforeLoad?: ( context: RouteLoaderContext ) => void | Promise< void >;
 		loader?: ( context: RouteLoaderContext ) => Promise< unknown >;
 		canvas?: ( context: RouteLoaderContext ) => Promise< any >;
 	} = {};
@@ -109,7 +111,6 @@ async function createRouteFromDefinition(
 					routeConfig.beforeLoad!( {
 						params: opts.params || {},
 						search: opts.search || {},
-						redirect,
 					} )
 			: undefined,
 		loader: async ( opts: any ) => {
@@ -171,7 +172,7 @@ function createPathHistory() {
 			const pathHref = `${ path }${ url.hash }`;
 			return parseHref( pathHref, window.history.state );
 		},
-		createHref: ( href ) => {
+		createHref: ( href: string ) => {
 			const searchParams = new URLSearchParams( window.location.search );
 			searchParams.set( 'p', href );
 			return `${ window.location.pathname }?${ searchParams }`;
