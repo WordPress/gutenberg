@@ -480,7 +480,7 @@ function Thread( {
 	};
 
 	const onFocus = () => {
-		debouncedToggleBlockHighlight( thread.blockClientId, true );
+		toggleBlockHighlight( thread.blockClientId, true );
 	};
 
 	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
@@ -495,7 +495,7 @@ function Thread( {
 			( ! event.relatedTarget ||
 				! event.currentTarget.contains( event.relatedTarget ) )
 		) {
-			debouncedToggleBlockHighlight( thread.blockClientId, false );
+			toggleBlockHighlight( thread.blockClientId, false );
 			unselectThread();
 		}
 	};
