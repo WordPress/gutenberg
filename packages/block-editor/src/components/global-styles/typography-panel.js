@@ -609,6 +609,7 @@ export default function TypographyPanel( {
 					<TextAlignmentControl
 						value={ textAlign }
 						onChange={ setTextAlign }
+						options={ [ 'left', 'center', 'right', 'justify' ] }
 						size="__unstable-large"
 						__nextHasNoMarginBottom
 					/>
