@@ -22,10 +22,10 @@
 					"$value": "#dce3f5"
 				},
 				"surface4": {
-					"$value": "#eaeef9"
+					"$value": "#e5ebf7"
 				},
 				"surface3": {
-					"$value": "#fbfcfe"
+					"$value": "#fff"
 				},
 				"fgSurface4": {
 					"$value": "#080071"
@@ -34,10 +34,10 @@
 					"$value": "#3858e9"
 				},
 				"fgSurface2": {
-					"$value": "#5c85ff"
+					"$value": "#5881ff"
 				},
 				"fgSurface1": {
-					"$value": "#89adff"
+					"$value": "#84a9ff"
 				},
 				"stroke3": {
 					"$value": "#3858e9"
@@ -67,7 +67,7 @@
 					"$value": "#eff0f2"
 				},
 				"surface1": {
-					"$value": "#f2f5fb"
+					"$value": "#edf0fa"
 				}
 			},
 			"info": {
@@ -90,34 +90,34 @@
 					"$value": "#d5e5f6"
 				},
 				"surface4": {
-					"$value": "#e7f0fa"
+					"$value": "#e0ebf8"
 				},
 				"surface3": {
-					"$value": "#fafcfe"
+					"$value": "#fff"
 				},
 				"fgSurface4": {
 					"$value": "#001758"
 				},
 				"fgSurface3": {
-					"$value": "#0070dc"
+					"$value": "#006dd9"
 				},
 				"fgSurface2": {
-					"$value": "#008ffe"
+					"$value": "#008cfb"
 				},
 				"fgSurface1": {
-					"$value": "#5bb5ff"
+					"$value": "#53b1ff"
 				},
 				"stroke3": {
-					"$value": "#0070dc"
+					"$value": "#006dd9"
 				},
 				"stroke4": {
-					"$value": "#0051bb"
+					"$value": "#004eb8"
 				},
 				"stroke2": {
-					"$value": "#5692d2"
+					"$value": "#5d8fc6"
 				},
 				"stroke1": {
-					"$value": "#8fb1d7"
+					"$value": "#8aaed6"
 				},
 				"bgFillDark": {
 					"$value": "#1b1e23"
@@ -135,7 +135,7 @@
 					"$value": "#eff0f2"
 				},
 				"surface1": {
-					"$value": "#f0f5fc"
+					"$value": "#eaf1fa"
 				}
 			},
 			"success": {
@@ -158,34 +158,34 @@
 					"$value": "#b7f2c1"
 				},
 				"surface4": {
-					"$value": "#d8f7dc"
+					"$value": "#cdf5d3"
 				},
 				"surface3": {
-					"$value": "#f9fef9"
+					"$value": "#fff"
 				},
 				"fgSurface4": {
 					"$value": "#002b00"
 				},
 				"fgSurface3": {
-					"$value": "#008334"
+					"$value": "#008031"
 				},
 				"fgSurface2": {
-					"$value": "#30a251"
+					"$value": "#2c9f4e"
 				},
 				"fgSurface1": {
-					"$value": "#57c472"
+					"$value": "#54c16f"
 				},
 				"stroke3": {
-					"$value": "#008334"
+					"$value": "#008031"
 				},
 				"stroke4": {
-					"$value": "#006616"
+					"$value": "#006314"
 				},
 				"stroke2": {
-					"$value": "#639b6d"
+					"$value": "#61986b"
 				},
 				"stroke1": {
-					"$value": "#7abd86"
+					"$value": "#77ba84"
 				},
 				"bgFillDark": {
 					"$value": "#1b1f1c"
@@ -203,7 +203,7 @@
 					"$value": "#edf2ed"
 				},
 				"surface1": {
-					"$value": "#e8faea"
+					"$value": "#ddf8e1"
 				}
 			},
 			"warning": {
@@ -226,34 +226,34 @@
 					"$value": "#f6e0bb"
 				},
 				"surface4": {
-					"$value": "#faedd7"
+					"$value": "#f8e9cd"
 				},
 				"surface3": {
-					"$value": "#fefbf7"
+					"$value": "#fff"
 				},
 				"fgSurface4": {
 					"$value": "#2f1800"
 				},
 				"fgSurface3": {
-					"$value": "#9a6600"
+					"$value": "#976300"
 				},
 				"fgSurface2": {
-					"$value": "#ba8400"
+					"$value": "#b78100"
 				},
 				"fgSurface1": {
-					"$value": "#dda632"
+					"$value": "#d9a22e"
 				},
 				"stroke3": {
-					"$value": "#9a6600"
+					"$value": "#976300"
 				},
 				"stroke4": {
-					"$value": "#794c00"
+					"$value": "#754900"
 				},
 				"stroke2": {
-					"$value": "#a28b62"
+					"$value": "#9f8860"
 				},
 				"stroke1": {
-					"$value": "#c6aa79"
+					"$value": "#c2a776"
 				},
 				"bgFillDark": {
 					"$value": "#1f1e1b"
@@ -271,7 +271,7 @@
 					"$value": "#f3f0e9"
 				},
 				"surface1": {
-					"$value": "#fcf4e6"
+					"$value": "#faefdc"
 				}
 			},
 			"error": {
@@ -294,10 +294,10 @@
 					"$value": "#f9dcd8"
 				},
 				"surface4": {
-					"$value": "#fbeae7"
+					"$value": "#fae5e2"
 				},
 				"surface3": {
-					"$value": "#fefbfa"
+					"$value": "#fff"
 				},
 				"fgSurface4": {
 					"$value": "#4a0000"
@@ -306,10 +306,10 @@
 					"$value": "#cc1818"
 				},
 				"fgSurface2": {
-					"$value": "#fb5044"
+					"$value": "#f84d41"
 				},
 				"fgSurface1": {
-					"$value": "#ff8979"
+					"$value": "#ff8373"
 				},
 				"stroke3": {
 					"$value": "#cc1818"
@@ -339,7 +339,7 @@
 					"$value": "#f2efef"
 				},
 				"surface1": {
-					"$value": "#fdf2f0"
+					"$value": "#fcedea"
 				}
 			},
 			"bg": {
@@ -362,34 +362,34 @@
 					"$value": "#e3e3e3"
 				},
 				"surface4": {
-					"$value": "#eee"
+					"$value": "#eaeaea"
 				},
 				"surface3": {
-					"$value": "#fcfcfc"
+					"$value": "#fff"
 				},
 				"fgSurface4": {
 					"$value": "#1e1e1e"
 				},
 				"fgSurface3": {
-					"$value": "#707070"
+					"$value": "#6e6e6e"
 				},
 				"fgSurface2": {
-					"$value": "#8e8e8e"
+					"$value": "#8b8b8b"
 				},
 				"fgSurface1": {
-					"$value": "#afafaf"
+					"$value": "#ababab"
 				},
 				"stroke3": {
-					"$value": "#8e8e8e"
+					"$value": "#8b8b8b"
 				},
 				"stroke4": {
-					"$value": "#707070"
+					"$value": "#6d6d6d"
 				},
 				"stroke2": {
-					"$value": "#b0b0b0"
+					"$value": "#adadad"
 				},
 				"stroke1": {
-					"$value": "#d3d3d3"
+					"$value": "#cfcfcf"
 				},
 				"bgFillDark": {
 					"$value": "#1e1e1e"
@@ -407,7 +407,7 @@
 					"$value": "#f0f0f0"
 				},
 				"surface1": {
-					"$value": "#f5f5f5"
+					"$value": "#f0f0f0"
 				}
 			},
 			"caution": {
@@ -430,34 +430,34 @@
 					"$value": "#f5e399"
 				},
 				"surface4": {
-					"$value": "#f9efc4"
+					"$value": "#f8ebb5"
 				},
 				"surface3": {
-					"$value": "#fefcf4"
+					"$value": "#fff"
 				},
 				"fgSurface4": {
 					"$value": "#291d00"
 				},
 				"fgSurface3": {
-					"$value": "#8a6d00"
+					"$value": "#876b00"
 				},
 				"fgSurface2": {
-					"$value": "#aa8c00"
+					"$value": "#a78900"
 				},
 				"fgSurface1": {
-					"$value": "#ccad0c"
+					"$value": "#c9aa00"
 				},
 				"stroke3": {
-					"$value": "#8a6d00"
+					"$value": "#876b00"
 				},
 				"stroke4": {
-					"$value": "#6a5300"
+					"$value": "#675000"
 				},
 				"stroke2": {
-					"$value": "#9a8f62"
+					"$value": "#978c60"
 				},
 				"stroke1": {
-					"$value": "#bbae78"
+					"$value": "#b8ab75"
 				},
 				"bgFillDark": {
 					"$value": "#1f1e1b"
@@ -475,7 +475,7 @@
 					"$value": "#f6f1da"
 				},
 				"surface1": {
-					"$value": "#fbf5db"
+					"$value": "#faf1cd"
 				}
 			}
 		},
