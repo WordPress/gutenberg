@@ -194,8 +194,8 @@ function BlockBindingsAttribute( { attribute, binding, sources, blockName } ) {
 		// Check if there are any compatible sources for this attribute type.
 		const attributeType = getAttributeType( blockName, attribute );
 
-		const hasCompatibleSources = Object.values( sources ).some( ( _data ) =>
-			_data.some( ( item ) => item.type === attributeType )
+		const hasCompatibleSources = Object.values( sources ).some( ( items ) =>
+			items.some( ( item ) => item.type === attributeType )
 		);
 
 		if ( ! hasCompatibleSources ) {
