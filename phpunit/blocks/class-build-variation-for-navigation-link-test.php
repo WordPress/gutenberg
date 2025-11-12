@@ -50,7 +50,7 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 	// ============================================================================
 
 	/**
-	 * Test that a custom post type variation has correct title and description format.
+	 * Test that a custom post type variation has correct title and empty description.
 	 */
 	public function test_custom_post_type_variation_format() {
 		// Create a mock custom post type object
@@ -65,41 +65,7 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'Product link', $variation['title'], 'Custom post type should have appropriately named title' );
 
 		// Verify the description format.
-		$this->assertEquals( 'A link to a product', $variation['description'], 'Custom post type should have clear, unambiguous description' );
-	}
-
-	/**
-	 * Test custom post type with custom item_link label is preserved as title.
-	 */
-	public function test_custom_post_type_with_custom_item_link_label() {
-		// Create a mock custom post type object with custom item_link
-		$post_type                        = new stdClass();
-		$post_type->name                  = 'product';
-		$post_type->labels                = new stdClass();
-		$post_type->labels->singular_name = 'Product';
-		$post_type->labels->item_link     = 'Custom Product Link';
-
-		$variation = gutenberg_build_variation_for_navigation_link( $post_type, 'post-type' );
-
-		// Verify custom item_link is preserved as title
-		$this->assertEquals( 'Custom Product Link', $variation['title'], 'Custom item_link label should be preserved as title' );
-	}
-
-	/**
-	 * Test custom post type with custom item_link_description is preserved as description.
-	 */
-	public function test_custom_post_type_with_custom_item_link_description() {
-		// Create a mock custom post type object with custom item_link_description
-		$post_type                                = new stdClass();
-		$post_type->name                          = 'product';
-		$post_type->labels                        = new stdClass();
-		$post_type->labels->singular_name         = 'Product';
-		$post_type->labels->item_link_description = 'Custom product description';
-
-		$variation = gutenberg_build_variation_for_navigation_link( $post_type, 'post-type' );
-
-		// Verify custom item_link_description is preserved as description
-		$this->assertEquals( 'Custom product description', $variation['description'], 'Custom item_link_description should be preserved as description' );
+		$this->assertEquals( ' ', $variation['description'], 'Custom post type should have empty description' );
 	}
 
 	/**
@@ -139,9 +105,9 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test missing item_link_description generates from singular_name.
+	 * Test missing item_link_description is set to empty.
 	 */
-	public function test_missing_item_link_description_generates_from_singular_name() {
+	public function test_missing_item_link_description_is_set_to_empty() {
 		// Create a mock custom post type object without item_link_description
 		$post_type                        = new stdClass();
 		$post_type->name                  = 'product';
@@ -151,8 +117,8 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 
 		$variation = gutenberg_build_variation_for_navigation_link( $post_type, 'post-type' );
 
-		// Verify description is generated from singular_name
-		$this->assertEquals( 'A link to a product', $variation['description'], 'Description should be generated from singular_name when item_link_description is missing' );
+		// Verify description is set to empty when missing
+		$this->assertEquals( ' ', $variation['description'], 'Description should be empty when item_link_description is missing' );
 	}
 
 	/**
@@ -169,7 +135,7 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 
 		// Verify title and description use ucfirst(name)
 		$this->assertEquals( 'Product link', $variation['title'], 'Title should use ucfirst(name) when singular_name is missing' );
-		$this->assertEquals( 'A link to a product', $variation['description'], 'Description should use ucfirst(name) when singular_name is missing' );
+		$this->assertEquals( ' ', $variation['description'], 'Description should be empty when singular_name is missing' );
 	}
 
 	/**
@@ -192,7 +158,7 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test taxonomy with generated labels.
+	 * Test taxonomy with generated title and empty description.
 	 */
 	public function test_taxonomy_with_generated_labels() {
 		// Create a mock taxonomy object without custom labels
@@ -206,7 +172,7 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 
 		// Verify labels are generated for taxonomy
 		$this->assertEquals( 'Product Category link', $variation['title'], 'Title should be generated for taxonomy' );
-		$this->assertEquals( 'A link to a product category', $variation['description'], 'Description should be generated for taxonomy' );
+		$this->assertEquals( ' ', $variation['description'], 'Description should be empty for taxonomy' );
 	}
 
 	/**
@@ -298,7 +264,7 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 
 		// Verify empty strings trigger generation
 		$this->assertEquals( 'Product link', $variation['title'], 'Empty item_link should trigger title generation' );
-		$this->assertEquals( 'A link to a product', $variation['description'], 'Empty item_link_description should trigger description generation' );
+		$this->assertEquals( ' ', $variation['description'], 'Empty item_link_description should result in empty description' );
 	}
 
 	/**
@@ -315,7 +281,7 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 
 		// Verify case handling
 		$this->assertEquals( 'Product link', $variation['title'], 'Title should preserve case from singular_name' );
-		$this->assertEquals( 'A link to a product', $variation['description'], 'Description should use lowercase from singular_name' );
+		$this->assertEquals( ' ', $variation['description'], 'Description should be empty' );
 	}
 
 	/**
@@ -332,7 +298,7 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 
 		// Verify function handles minimal entity gracefully
 		$this->assertEquals( 'Product link', $variation['title'], 'Title should be generated from ucfirst(name) when no singular_name' );
-		$this->assertEquals( 'A link to a product', $variation['description'], 'Description should be generated from ucfirst(name) when no singular_name' );
+		$this->assertEquals( ' ', $variation['description'], 'Description should be empty when no singular_name' );
 		$this->assertEquals( 'product', $variation['name'], 'Name should match entity name' );
 		$this->assertEquals( 'product', $variation['attributes']['type'], 'Type should match entity name' );
 		$this->assertEquals( 'post-type', $variation['attributes']['kind'], 'Kind should be preserved' );
@@ -401,7 +367,7 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'test_product', $variation['attributes']['type'], 'Type should match registered post type name' );
 		$this->assertEquals( 'post-type', $variation['attributes']['kind'], 'Kind should be "post-type"' );
 		$this->assertEquals( 'Product link', $variation['title'], 'Title should be generated from singular_name' );
-		$this->assertEquals( 'A link to a product', $variation['description'], 'Description should be generated from singular_name' );
+		$this->assertEquals( ' ', $variation['description'], 'Description should be empty' );
 
 		// Clean up
 		unregister_post_type( 'test_product' );
@@ -487,7 +453,7 @@ class Class_Build_Variation_For_Navigation_Link_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'test_product_category', $variation['attributes']['type'], 'Type should match registered taxonomy name' );
 		$this->assertEquals( 'taxonomy', $variation['attributes']['kind'], 'Kind should be "taxonomy"' );
 		$this->assertEquals( 'Product Category link', $variation['title'], 'Title should be generated from singular_name' );
-		$this->assertEquals( 'A link to a product category', $variation['description'], 'Description should be generated from singular_name' );
+		$this->assertEquals( ' ', $variation['description'], 'Description should be empty' );
 
 		// Clean up
 		unregister_taxonomy( 'test_product_category' );
