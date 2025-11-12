@@ -295,7 +295,8 @@ routes/
     package.json    # Route configuration
     stage.tsx       # Main content component
     inspector.tsx   # Optional sidebar component
-    route.tsx       # Optional lifecycle hooks (beforeLoad, loader)
+    canvas.tsx      # Optional custom canvas component
+    route.tsx       # Optional lifecycle hooks (beforeLoad, loader, canvas)
 ```
 
 ### Route Configuration
@@ -325,6 +326,13 @@ export const stage = () => <div>Content</div>;
 export const inspector = () => <div>Inspector</div>;
 ```
 
+**canvas.tsx** - Custom canvas component (optional):
+```tsx
+export const canvas = () => <div>Custom Canvas</div>;
+```
+
+The canvas is a full-screen area typically used for editor previews. You can provide a custom canvas component that will be conditionally rendered based on the `canvas()` function's return value in `route.tsx`.
+
 **route.tsx** - Lifecycle hooks (optional):
 ```tsx
 export const route = {
@@ -333,14 +341,33 @@ export const route = {
 	},
 	loader: ({ params, search }) => {
 		// Data preloading
+	},
+	canvas: ({ params, search }) => {
+		// Return CanvasData to use default canvas (editor)
+		return {
+			postType: 'post',
+			postId: '123',
+			isPreview: true
+		};
+
+		// Return null to use custom canvas.tsx component
+		// return null;
+
+		// Return undefined to show no canvas
+		// return undefined;
 	}
 };
 ```
 
+The `canvas()` function controls which canvas is rendered:
+- Returns `CanvasData` object (`{ postType, postId, isPreview? }`) → Renders the default WordPress editor canvas
+- Returns `null` → Renders the custom canvas component from `canvas.tsx` (if provided)
+- Returns `undefined` or is omitted → No canvas is rendered
+
 ### Build Output
 
 The build system generates:
-- `build/routes/{route-name}/content.js` - Bundled stage/inspector components
+- `build/routes/{route-name}/content.js` - Bundled stage/inspector/canvas components
 - `build/routes/{route-name}/route.js` - Bundled lifecycle hooks (if present)
 - `build/routes/index.php` - Route registry data
 - `build/routes.php` - Route registration logic
