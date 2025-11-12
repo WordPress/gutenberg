@@ -5,9 +5,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Post Meta source', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme(
-			'gutenberg-test-themes/block-bindings'
-		);
+		await requestUtils.activateTheme( 'emptytheme' );
 		await requestUtils.activatePlugin( 'gutenberg-test-block-bindings' );
 	} );
 
@@ -19,12 +17,18 @@ test.describe( 'Post Meta source', () => {
 	} );
 
 	test.describe( 'Movie CPT template', () => {
-		test.beforeEach( async ( { admin, editor } ) => {
+		test.beforeEach( async ( { admin, editor, page } ) => {
+			// The 'single-movie' template doesn't exist yet, but will be created on the fly from the 'singular' template.
 			await admin.visitSiteEditor( {
-				postId: 'gutenberg-test-themes/block-bindings//single-movie',
+				postId: 'emptytheme//single-movie',
 				postType: 'wp_template',
 				canvas: 'edit',
 			} );
+			// Close the pattern suggestions dialog.
+			await page
+				.getByRole( 'dialog', { name: 'Choose a pattern' } )
+				.getByRole( 'button', { name: 'Close' } )
+				.click();
 			await editor.openDocumentSettingsSidebar();
 		} );
 
