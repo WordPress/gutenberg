@@ -117,11 +117,13 @@ export function PrivateBlockToolbar( {
 
 		const _isZoomOut = isZoomOut();
 
+		const _isSectionBlock = isSectionBlock( selectedBlockClientId );
+
 		// The switch style button appears more prominently with the
 		// content only pattern experiment.
 		const _showSwitchSectionStyleButton =
 			window?.__experimentalContentOnlyPatternInsertion &&
-			( _isZoomOut || isSectionBlock( selectedBlockClientId ) );
+			( _isZoomOut || _isSectionBlock );
 
 		return {
 			blockClientId: selectedBlockClientId,
@@ -144,7 +146,7 @@ export function PrivateBlockToolbar( {
 			isUsingBindings: _isUsingBindings,
 			hasContentOnlyLocking: _hasTemplateLock,
 			showShuffleButton: _isZoomOut,
-			showSlots: ! _isZoomOut,
+			showSlots: ! _isZoomOut && ! _isSectionBlock,
 			showGroupButtons: ! _isZoomOut,
 			showLockButtons: ! _isZoomOut,
 			showBlockVisibilityButton: ! _isZoomOut,
