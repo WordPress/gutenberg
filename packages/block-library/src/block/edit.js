@@ -134,7 +134,7 @@ function ReusableBlockControl( {
 			) }
 
 			{ canOverrideBlocks && (
-				<BlockControls>
+				<BlockControls group="other">
 					<ToolbarGroup>
 						<ToolbarButton
 							onClick={ resetContent }
