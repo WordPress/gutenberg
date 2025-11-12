@@ -296,13 +296,15 @@ test.describe( 'Navigation block', () => {
 	} );
 
 	test.describe( 'Focus management', () => {
+		let catPage, dogPage;
+
 		test.beforeAll( async ( { requestUtils } ) => {
 			// We need pages to be published so the Link Control can return pages
-			await requestUtils.createPage( {
+			catPage = await requestUtils.createPage( {
 				title: 'Cat',
 				status: 'publish',
 			} );
-			await requestUtils.createPage( {
+			dogPage = await requestUtils.createPage( {
 				title: 'Dog',
 				status: 'publish',
 			} );
@@ -682,6 +684,140 @@ test.describe( 'Navigation block', () => {
 			} );
 
 			expect( focusIsInSidebar ).toBe( true );
+		} );
+
+		test( 'Selecting a new block from another link with a popover open should respect the new block selection', async ( {
+			editor,
+			page,
+			pageUtils,
+			navigation,
+			requestUtils,
+		} ) => {
+			let inspectorNavigationLabel,
+				catLinkText,
+				dogLinkText,
+				linkPopover,
+				unavailableLinkText;
+			// Test setup step
+			await test.step( 'Test setup', async () => {
+				const nonExistentPageId = 99999;
+				// Create a menu with three links:
+				// 1. Invalid synced link (deleted page)
+				// 2. Valid synced link (Cat page)
+				// 3. Valid synced link (Dog page)
+				// 4. Custom URL link (example.com)
+				const menu = await requestUtils.createNavigationMenu( {
+					title: 'Test Menu with Unavailable Entity, Synced Cat Page, and Custom URL',
+					content: `<!-- wp:navigation-link {"label":"Unavailable Page","type":"page","id":${ nonExistentPageId },"kind":"post-type","metadata":{"bindings":{"url":{"source":"core/post-data","args":{"field":"link"}}}}} /-->
+<!-- wp:navigation-link {"label":"Cat","type":"page","id":${ catPage.id },"url":"${ catPage.link }","kind":"post-type","metadata":{"bindings":{"url":{"source":"core/post-data","args":{"field":"link"}}}}} /-->
+<!-- wp:navigation-link {"label":"Dog","type":"page","id":${ dogPage.id },"url":"${ dogPage.link }","kind":"post-type","metadata":{"bindings":{"url":{"source":"core/post-data","args":{"field":"link"}}}}} /-->
+<!-- wp:navigation-link {"label":"example.com","url":"http://example.com","kind":"custom","isTopLevelLink":true} /-->`,
+				} );
+
+				await editor.insertBlock( {
+					name: 'core/navigation',
+					attributes: {
+						ref: menu.id,
+					},
+				} );
+
+				// Open the insepctor sidebar, as this is the easiest way to visually see block selection
+				await editor.openDocumentSettingsSidebar();
+
+				// CRITICAL: Wait for synced link entities to load BEFORE interacting with them
+				// Synced links load their URLs asynchronously. If we click them before the URLs
+				// are loaded, the popover opens in edit mode (url: null) instead of preview mode.
+				// Select the Cat link temporarily to check if its URL is loaded in the sidebar.
+				catLinkText = editor.canvas
+					.getByRole( 'textbox', {
+						name: 'Navigation link text',
+					} )
+					.filter( { hasText: 'Cat' } );
+				await catLinkText.click();
+
+				const linkInput = page
+					.getByRole( 'tabpanel', { name: 'Settings' } )
+					.getByRole( 'textbox', {
+						name: 'Link',
+					} );
+				// Wait for the Cat link's URL to load
+				await expect( linkInput ).not.toHaveValue( '' );
+				await expect( linkInput ).toBeDisabled(); // Synced links have disabled Link field
+			} );
+
+			await test.step( 'Popover closing from unsynced link to a synced link should not steal focus back to the previously selected (Cat) link', async () => {
+				// Cat link is already selected from setup step, with entity loaded
+				// Verify sidebar shows Cat
+				inspectorNavigationLabel = page
+					.getByRole( 'tabpanel', { name: 'Settings' } )
+					.getByRole( 'textbox', {
+						name: 'Text',
+					} );
+				await expect( inspectorNavigationLabel ).toHaveValue( 'Cat' );
+
+				await pageUtils.pressKeys( 'primary+k' );
+				linkPopover = navigation.getLinkPopover();
+				await expect( linkPopover ).toBeVisible();
+
+				// Check that the popover has focus on the Cat link
+				await expect(
+					linkPopover.getByRole( 'link', {
+						name: 'Cat (Opens in a new tab)',
+					} )
+				).toBeFocused();
+
+				dogLinkText = editor.canvas
+					.getByRole( 'textbox', {
+						name: 'Navigation link text',
+					} )
+					.filter( { hasText: 'Dog' } );
+				await dogLinkText.click();
+
+				// Verify the popover is closed
+				await expect( linkPopover ).toBeHidden();
+				// Check that the Label in the inspector sidebar is Dog
+				await expect( inspectorNavigationLabel ).toHaveValue( 'Dog' );
+			} );
+
+			await test.step( 'Popover closing from synced (Dog) link to an unsynced link should not steal focus back to the previously selected (Dog) link', async () => {
+				await pageUtils.pressKeys( 'primary+k' );
+				await expect( linkPopover ).toBeVisible();
+
+				// Check that the popover has focus on the Dog link
+				await expect(
+					linkPopover.getByRole( 'link', {
+						name: 'Dog (Opens in a new tab)',
+					} )
+				).toBeFocused();
+
+				unavailableLinkText = editor.canvas
+					.locator( 'a' )
+					.filter( { hasText: 'Unavailable Page (Invalid)' } );
+				await unavailableLinkText.click();
+
+				// Check that the Label in the inspector sidebar is Unavailable Page
+				await expect( inspectorNavigationLabel ).toHaveValue(
+					'Unavailable Page'
+				);
+			} );
+
+			await test.step( 'Selecting a new block from a invalid synced link with a popover open should respect the new block selection', async () => {
+				// Verify the popover is visible (we want the invalid link click to have opened the popover)
+				await expect( linkPopover ).toBeVisible();
+				await expect(
+					linkPopover.getByRole( 'combobox', {
+						name: 'Search or type URL',
+					} )
+				).toBeFocused();
+				// Check that the popover has focus in the editable link state
+
+				await catLinkText.click();
+
+				// Verify the popover is closed
+				await expect( linkPopover ).toBeHidden();
+				// Check that the Label in the inspector sidebar is Cat
+				await expect( inspectorNavigationLabel ).toHaveValue( 'Cat' );
+			} );
 		} );
 	} );
 
