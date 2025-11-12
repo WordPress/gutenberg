@@ -404,21 +404,6 @@ export default function NavigationLinkEdit( {
 		}
 	}
 
-	const missingText = getMissingText( type );
-
-	const getErrorText = useCallback( () => {
-		if ( isInvalid ) {
-			return __( 'Invalid' );
-		}
-		if ( isDraft ) {
-			return __( 'Draft' );
-		}
-		return null;
-	}, [ isInvalid, isDraft ] );
-
-	/* translators: Whether the navigation link is Invalid or a Draft. */
-	const errorText = getErrorText();
-
 	const instanceId = useInstanceId( NavigationLinkEdit );
 	const hasMissingEntity = hasUrlBinding && ! isBoundEntityAvailable;
 	const missingEntityDescriptionId = hasMissingEntity
@@ -477,6 +462,12 @@ export default function NavigationLinkEdit( {
 			isDraft ||
 			( hasUrlBinding && ! isBoundEntityAvailable ),
 	} );
+
+	const missingText = getMissingText( type );
+	/* translators: Whether the navigation link is Invalid or a Draft. */
+	const placeholderText = `(${
+		isInvalid ? __( 'Invalid' ) : __( 'Draft' )
+	})`;
 
 	return (
 		<>
@@ -576,8 +567,8 @@ export default function NavigationLinkEdit( {
 											// so they display without encoding.
 											// See `updateAttributes` for more details.
 											`${ decodeEntities( label ) } ${
-												errorText
-													? `(${ errorText })`
+												isInvalid || isDraft
+													? placeholderText
 													: ''
 											}`.trim()
 										}
