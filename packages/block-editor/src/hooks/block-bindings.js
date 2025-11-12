@@ -85,7 +85,7 @@ function BlockBindingsPanelMenuContent( { attribute, binding, sources } ) {
 			{ Object.entries( sources ).map( ( [ sourceKey, data ] ) => {
 				// Only show sources that have compatible data for this specific attribute.
 				const sourceDataItems = data.filter(
-					( item ) => item?.type === attributeType
+					( item ) => item.type === attributeType
 				);
 
 				const noItemsAvailable =
@@ -110,7 +110,7 @@ function BlockBindingsPanelMenuContent( { attribute, binding, sources } ) {
 								{ sourceDataItems.map( ( item ) => {
 									const itemBindings = {
 										source: sourceKey,
-										args: item?.args || {
+										args: item.args || {
 											key: item.key,
 										},
 									};
@@ -164,7 +164,7 @@ function BlockBindingsPanelMenuContent( { attribute, binding, sources } ) {
 											}
 										>
 											<Menu.ItemLabel>
-												{ item?.label }
+												{ item.label }
 											</Menu.ItemLabel>
 											<Menu.ItemHelpText>
 												{ values[ attribute ] }
