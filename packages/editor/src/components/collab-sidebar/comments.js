@@ -569,7 +569,7 @@ function Thread( {
 					);
 				} }
 			>
-				{ __( 'Add new note' ) }
+				{ __( 'Add new reply' ) }
 			</Button>
 			{ ! thread.blockClientId && (
 				<Text as="p" weight={ 500 } variant="muted">
