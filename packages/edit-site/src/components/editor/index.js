@@ -110,10 +110,7 @@ function getNavigationPath( location, postType ) {
 	return addQueryArgs( path, { canvas: undefined } );
 }
 
-export default function EditSiteEditor( {
-	isHomeRoute = false,
-	isPostsList = false,
-} ) {
+export default function EditSiteEditor( { isHomeRoute = false } ) {
 	const disableMotion = useReducedMotion();
 	const location = useLocation();
 	const { canvas = 'view' } = location.query;
@@ -258,31 +255,18 @@ export default function EditSiteEditor( {
 											tooltipPosition="middle right"
 											onClick={ () => {
 												resetZoomLevel();
-
-												// TODO: this is a temporary solution to navigate to the posts list if we are
-												// come here through `posts list` and are in focus mode editing a template, template part etc..
-												if (
-													isPostsList &&
-													location.query?.focusMode
-												) {
-													history.navigate( '/', {
+												history.navigate(
+													getNavigationPath(
+														location,
+														postWithTemplate
+															? context.postType
+															: postType
+													),
+													{
 														transition:
 															'canvas-mode-view-transition',
-													} );
-												} else {
-													history.navigate(
-														getNavigationPath(
-															location,
-															postWithTemplate
-																? context.postType
-																: postType
-														),
-														{
-															transition:
-																'canvas-mode-view-transition',
-														}
-													);
-												}
+													}
+												);
 											} }
 										>
 											<motion.div
