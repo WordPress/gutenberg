@@ -214,6 +214,8 @@ export default function NavigationLinkEdit( {
 	const ref = useRef();
 	const linkUIref = useRef();
 	const prevUrl = usePrevious( url );
+	// A link is "new" only if it has no URL and no URL binding
+	// If it has a URL binding (synced link), it's not new even if the URL is empty (e.g., deleted page)
 	const isNewLink = useRef( ! url && ! metadata?.bindings?.url );
 
 	const {
@@ -314,7 +316,7 @@ export default function NavigationLinkEdit( {
 	// If we leave focus on this block, then when we close the link without creating a link, focus will
 	// be lost during the new block selection process.
 	useEffect( () => {
-		if ( isNewLink.current && isSelected && ! url ) {
+		if ( isNewLink.current && isSelected ) {
 			selectBlock( parentBlockClientId );
 		}
 	}, [] ); // eslint-disable-line react-hooks/exhaustive-deps
@@ -445,7 +447,7 @@ export default function NavigationLinkEdit( {
 	);
 
 	if (
-		! url ||
+		( ! url && ! ( hasUrlBinding && isBoundEntityAvailable ) ) ||
 		isInvalid ||
 		isDraft ||
 		( hasUrlBinding && ! isBoundEntityAvailable )
@@ -457,7 +459,7 @@ export default function NavigationLinkEdit( {
 
 	const classes = clsx( 'wp-block-navigation-item__content', {
 		'wp-block-navigation-link__placeholder':
-			! url ||
+			( ! url && ! ( hasUrlBinding && isBoundEntityAvailable ) ) ||
 			isInvalid ||
 			isDraft ||
 			( hasUrlBinding && ! isBoundEntityAvailable ),
@@ -592,6 +594,8 @@ export default function NavigationLinkEdit( {
 								} else if ( isNewLink.current ) {
 									// If we just created a new link, select it
 									selectBlock( clientId );
+									// Mark as no longer new so we don't re-select on subsequent popover closes
+									isNewLink.current = false;
 								}
 							} }
 							anchor={ popoverAnchor }
