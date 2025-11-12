@@ -483,17 +483,14 @@ function Thread( {
 		toggleBlockHighlight( thread.blockClientId, true );
 	};
 
-	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
-
 	const onBlur = ( event ) => {
-		// Don't close the thread if a dialog is open.
-		if ( showConfirmDialog ) {
-			return;
-		}
+		// Don't close the thread if focus is moving to a dialog or within the thread.
+		// Check if the related target is within the current thread element or a dialog.
 		if (
 			event.currentTarget &&
 			( ! event.relatedTarget ||
-				! event.currentTarget.contains( event.relatedTarget ) )
+				( ! event.currentTarget.contains( event.relatedTarget ) &&
+					! event.relatedTarget.closest( '[role="dialog"]' ) ) )
 		) {
 			toggleBlockHighlight( thread.blockClientId, false );
 			unselectThread();
@@ -616,8 +613,6 @@ function Thread( {
 				} }
 				onDelete={ onCommentDelete }
 				reflowComments={ reflowComments }
-				showConfirmDialog={ showConfirmDialog }
-				setShowConfirmDialog={ setShowConfirmDialog }
 			/>
 			{ isSelected &&
 				allReplies.map( ( reply ) => (
@@ -629,8 +624,6 @@ function Thread( {
 						onEdit={ onEditComment }
 						onDelete={ onCommentDelete }
 						reflowComments={ reflowComments }
-						showConfirmDialog={ showConfirmDialog }
-						setShowConfirmDialog={ setShowConfirmDialog }
 					/>
 				) ) }
 			{ ! isSelected && restReplies.length > 0 && (
@@ -667,8 +660,6 @@ function Thread( {
 					onEdit={ onEditComment }
 					onDelete={ onCommentDelete }
 					reflowComments={ reflowComments }
-					showConfirmDialog={ showConfirmDialog }
-					setShowConfirmDialog={ setShowConfirmDialog }
 				/>
 			) }
 			{ isSelected && (
@@ -744,10 +735,9 @@ const CommentBoard = ( {
 	onEdit,
 	onDelete,
 	reflowComments,
-	showConfirmDialog,
-	setShowConfirmDialog,
 } ) => {
 	const [ actionState, setActionState ] = useState( false );
+	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
 	const actionButtonRef = useRef( null );
 	const handleConfirmDelete = () => {
 		onDelete( thread );
