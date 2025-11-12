@@ -7,32 +7,19 @@ import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as editorStore } from '@wordpress/editor';
 
-/**
- * Internal dependencies
- */
-import { store as editSiteStore } from '../../store';
-
 export default function WelcomeGuideTemplate() {
 	const { toggle } = useDispatch( preferencesStore );
 
-	const isVisible = useSelect( ( select ) => {
-		const isTemplateActive = !! select( preferencesStore ).get(
-			'core/edit-site',
-			'welcomeGuideTemplate'
-		);
-		const isEditorActive = !! select( preferencesStore ).get(
-			'core/edit-site',
-			'welcomeGuide'
-		);
-		const { isPage } = select( editSiteStore );
-		const { getCurrentPostType } = select( editorStore );
-		return (
-			isTemplateActive &&
-			! isEditorActive &&
-			isPage() &&
-			getCurrentPostType() === 'wp_template'
-		);
+	const { isActive, hasPreviousEntity } = useSelect( ( select ) => {
+		const { getEditorSettings } = select( editorStore );
+		const { get } = select( preferencesStore );
+		return {
+			isActive: get( 'core/edit-site', 'welcomeGuideTemplate' ),
+			hasPreviousEntity:
+				!! getEditorSettings().onNavigateToPreviousEntityRecord,
+		};
 	}, [] );
+	const isVisible = isActive && hasPreviousEntity;
 
 	if ( ! isVisible ) {
 		return null;

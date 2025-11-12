@@ -309,10 +309,11 @@ describe( 'normalizing args', () => {
 
 		expect( normalizingFunction ).toHaveBeenCalledWith( [ 'foo', 'bar' ] );
 
-		// Needs to be called twice:
+		// Needs to be called three times:
 		// 1. When the selector is called.
-		// 2. When the resolver is fullfilled.
-		expect( normalizingFunction ).toHaveBeenCalledTimes( 2 );
+		// 2. When the resolver check if it's already running.
+		// 3. When the resolver is fulfilled.
+		expect( normalizingFunction ).toHaveBeenCalledTimes( 3 );
 	} );
 
 	it( 'should not call the __unstableNormalizeArgs method if there are no arguments passed to the selector (and thus the resolver)', async () => {

@@ -15,12 +15,13 @@ import TextareaControl from '..';
 
 const meta: Meta< typeof TextareaControl > = {
 	component: TextareaControl,
-	title: 'Components/TextareaControl',
+	title: 'Components/Selection & Input/Common/TextareaControl',
+	id: 'components-textareacontrol',
 	argTypes: {
 		onChange: { action: 'onChange' },
 		label: { control: { type: 'text' } },
 		help: { control: { type: 'text' } },
-		value: { control: { type: null } },
+		value: { control: false },
 	},
 	parameters: {
 		controls: {
@@ -51,6 +52,8 @@ const Template: StoryFn< typeof TextareaControl > = ( {
 
 export const Default: StoryFn< typeof TextareaControl > = Template.bind( {} );
 Default.args = {
+	__nextHasNoMarginBottom: true,
 	label: 'Text',
 	help: 'Enter some text',
+	placeholder: 'Placeholder',
 };

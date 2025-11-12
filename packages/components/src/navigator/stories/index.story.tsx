@@ -1,314 +1,154 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
 
 /**
  * Internal dependencies
  */
 import Button from '../../button';
-import { Card, CardBody, CardFooter, CardHeader } from '../../card';
 import { VStack } from '../../v-stack';
-import Dropdown from '../../dropdown';
-import {
-	NavigatorProvider,
-	NavigatorScreen,
-	NavigatorButton,
-	NavigatorBackButton,
-	NavigatorToParentButton,
-	useNavigator,
-} from '..';
+import { HStack } from '../../h-stack';
+import { Navigator, useNavigator } from '../';
 
-const meta: Meta< typeof NavigatorProvider > = {
-	component: NavigatorProvider,
-	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
-	subcomponents: { NavigatorScreen, NavigatorButton, NavigatorBackButton },
-	title: 'Components (Experimental)/Navigator',
+const meta: Meta< typeof Navigator > = {
+	component: Navigator,
+	subcomponents: {
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		Screen: Navigator.Screen,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		Button: Navigator.Button,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		BackButton: Navigator.BackButton,
+	},
+	title: 'Components/Navigation/Navigator',
+	id: 'components-navigator',
 	argTypes: {
-		as: { control: { type: null } },
-		children: { control: { type: null } },
-		initialPath: { control: { type: null } },
+		as: { control: false },
+		children: { control: false },
+		initialPath: { control: false },
 	},
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},
+	decorators: [
+		( Story ) => {
+			return (
+				<>
+					<style>{ `
+					  /* The data-wp-component attribute is a private implementation
+						 * detail of the Navigator component. Do not use outside of
+						 * its source code.
+						 */
+						[data-wp-component="Navigator"] {
+							height: 250px;
+						}
+						[data-wp-component="Navigator.Screen"] {
+							padding: 8px;
+						}
+					` }</style>
+					<Story />
+				</>
+			);
+		},
+	],
 };
 export default meta;
 
-const Template: StoryFn< typeof NavigatorProvider > = ( {
-	style,
-	...props
-} ) => (
-	<NavigatorProvider
-		style={ { ...style, height: '100vh', maxHeight: '450px' } }
-		{ ...props }
-	>
-		<NavigatorScreen path="/">
-			<Card>
-				<CardBody>
-					<p>This is the home screen.</p>
+export const Default: StoryObj< typeof Navigator > = {
+	args: {
+		initialPath: '/',
+		children: (
+			<>
+				<Navigator.Screen path="/">
+					<h2>This is the home screen.</h2>
 
 					<VStack alignment="left">
-						<NavigatorButton variant="secondary" path="/child">
-							Navigate to child screen.
-						</NavigatorButton>
+						<Navigator.Button variant="primary" path="/child">
+							Go to child screen.
+						</Navigator.Button>
 
-						<NavigatorButton
-							variant="secondary"
-							path="/overflow-child"
-						>
-							Navigate to screen with horizontal overflow.
-						</NavigatorButton>
+						<Navigator.Button variant="primary" path="/product/1">
+							Go to dynamic path screen with id 1.
+						</Navigator.Button>
 
-						<NavigatorButton variant="secondary" path="/stickies">
-							Navigate to screen with sticky content.
-						</NavigatorButton>
-
-						<NavigatorButton variant="secondary" path="/product/1">
-							Navigate to product screen with id 1.
-						</NavigatorButton>
-
-						<Dropdown
-							renderToggle={ ( {
-								isOpen,
-								onToggle,
-							}: {
-								// TODO: remove once `Dropdown` is refactored to TypeScript
-								isOpen: boolean;
-								onToggle: () => void;
-							} ) => (
-								<Button
-									onClick={ onToggle }
-									aria-expanded={ isOpen }
-									variant="primary"
-								>
-									Open test dialog
-								</Button>
-							) }
-							renderContent={ () => (
-								<Card>
-									<CardHeader>Go</CardHeader>
-									<CardBody>Stuff</CardBody>
-								</Card>
-							) }
-						/>
+						<Navigator.Button variant="primary" path="/product/2">
+							Go to dynamic path screen with id 2.
+						</Navigator.Button>
 					</VStack>
-				</CardBody>
-			</Card>
-		</NavigatorScreen>
+				</Navigator.Screen>
 
-		<NavigatorScreen path="/child">
-			<Card>
-				<CardBody>
-					<p>This is the child screen.</p>
-					<NavigatorBackButton variant="secondary">
-						Go back
-					</NavigatorBackButton>
-				</CardBody>
-			</Card>
-		</NavigatorScreen>
+				<Navigator.Screen path="/child">
+					<h2>This is the child screen.</h2>
+					<HStack spacing={ 2 } alignment="left">
+						<Navigator.BackButton variant="secondary">
+							Go back
+						</Navigator.BackButton>
 
-		<NavigatorScreen path="/overflow-child">
-			<Card>
-				<CardBody>
-					<NavigatorBackButton variant="secondary">
-						Go back
-					</NavigatorBackButton>
-					<div
-						style={ {
-							display: 'inline-block',
-							background: 'papayawhip',
-						} }
-					>
-						<span
-							style={ {
-								color: 'palevioletred',
-								whiteSpace: 'nowrap',
-								fontSize: '42vw',
-							} }
+						<Navigator.Button
+							variant="primary"
+							path="/child/grandchild"
 						>
-							¯\_(ツ)_/¯
-						</span>
-					</div>
-				</CardBody>
-			</Card>
-		</NavigatorScreen>
+							Go to grand child screen.
+						</Navigator.Button>
+					</HStack>
+				</Navigator.Screen>
 
-		<NavigatorScreen path="/stickies">
-			<Card>
-				<CardHeader style={ getStickyStyles( { zIndex: 2 } ) }>
-					<NavigatorBackButton variant="secondary">
+				<Navigator.Screen path="/child/grandchild">
+					<h2>This is the grand child screen.</h2>
+					<Navigator.BackButton variant="secondary">
 						Go back
-					</NavigatorBackButton>
-				</CardHeader>
-				<CardBody>
-					<div
-						style={ getStickyStyles( {
-							top: 69,
-							bgColor: 'peachpuff',
-						} ) }
-					>
-						<h2>A wild sticky element appears</h2>
-					</div>
-					<MetaphorIpsum quantity={ 3 } />
-				</CardBody>
-				<CardBody>
-					<div
-						style={ getStickyStyles( {
-							top: 69,
-							bgColor: 'paleturquoise',
-						} ) }
-					>
-						<h2>Another wild sticky element appears</h2>
-					</div>
-					<MetaphorIpsum quantity={ 3 } />
-				</CardBody>
-				<CardFooter
-					style={ getStickyStyles( {
-						bgColor: 'mistyrose',
-					} ) }
-				>
-					<Button variant="primary">Primary noop</Button>
-				</CardFooter>
-			</Card>
-		</NavigatorScreen>
+					</Navigator.BackButton>
+				</Navigator.Screen>
 
-		<NavigatorScreen path="/product/:id">
-			<ProductDetails />
-		</NavigatorScreen>
-	</NavigatorProvider>
-);
-
-export const Default: StoryFn< typeof NavigatorProvider > = Template.bind( {} );
-Default.args = {
-	initialPath: '/',
+				<Navigator.Screen path="/product/:id">
+					<DynamicScreen />
+				</Navigator.Screen>
+			</>
+		),
+	},
 };
 
-function getStickyStyles( {
-	bottom = 0,
-	bgColor = 'whitesmoke',
-	top = 0,
-	zIndex = 1,
-} ): React.CSSProperties {
-	return {
-		display: 'flex',
-		position: 'sticky',
-		top,
-		bottom,
-		zIndex,
-		backgroundColor: bgColor,
-	};
-}
+function DynamicScreen() {
+	const { params } = useNavigator();
 
-function MetaphorIpsum( { quantity }: { quantity: number } ) {
-	const list = [
-		'A loopy clarinet’s year comes with it the thought that the fenny step-son is an ophthalmologist. The literature would have us believe that a glabrate country is not but a rhythm. A beech is a rub from the right perspective. In ancient times few can name an unglossed walrus that isn’t an unspilt trial.',
-		'Authors often misinterpret the afterthought as a roseless mother-in-law, when in actuality it feels more like an uncapped thunderstorm. In recent years, some posit the tarry bottle to be less than acerb. They were lost without the unkissed timbale that composed their customer. A donna is a springtime breath.',
-		'It’s an undeniable fact, really; their museum was, in this moment, a snotty beef. The swordfishes could be said to resemble prowessed lasagnas. However, the rainier authority comes from a cureless soup. Unfortunately, that is wrong; on the contrary, the cover is a powder.',
-	];
-	quantity = Math.min( list.length, quantity );
 	return (
 		<>
-			{ list.slice( 0, quantity ).map( ( text, key ) => (
-				<p style={ { maxWidth: '20em' } } key={ key }>
-					{ text }
-				</p>
-			) ) }
+			<h2>This is the dynamic screen</h2>
+			<p>
+				This screen can parse params dynamically. The current id is:{ ' ' }
+				{ params.id }
+			</p>
+			<Navigator.BackButton variant="secondary">
+				Go back
+			</Navigator.BackButton>
 		</>
 	);
 }
 
-function ProductDetails() {
-	const { params } = useNavigator();
-
-	return (
-		<Card>
-			<CardBody>
-				<NavigatorBackButton variant="secondary">
-					Go back
-				</NavigatorBackButton>
-				<p>This is the screen for the product with id: { params.id }</p>
-			</CardBody>
-		</Card>
-	);
-}
-
-const NestedNavigatorTemplate: StoryFn< typeof NavigatorProvider > = ( {
-	style,
-	...props
-} ) => (
-	<NavigatorProvider
-		style={ { ...style, height: '100vh', maxHeight: '450px' } }
-		{ ...props }
-	>
-		<NavigatorScreen path="/">
-			<Card>
-				<CardBody>
-					<NavigatorButton variant="secondary" path="/child1">
-						Go to first child.
-					</NavigatorButton>
-					<NavigatorButton variant="secondary" path="/child2">
-						Go to second child.
-					</NavigatorButton>
-				</CardBody>
-			</Card>
-		</NavigatorScreen>
-		<NavigatorScreen path="/child1">
-			<Card>
-				<CardBody>
-					This is the first child
-					<NavigatorToParentButton variant="secondary">
-						Go back to parent
-					</NavigatorToParentButton>
-				</CardBody>
-			</Card>
-		</NavigatorScreen>
-		<NavigatorScreen path="/child2">
-			<Card>
-				<CardBody>
-					This is the second child
-					<NavigatorToParentButton variant="secondary">
-						Go back to parent
-					</NavigatorToParentButton>
-					<NavigatorButton
-						variant="secondary"
-						path="/child2/grandchild"
-					>
-						Go to grand child.
-					</NavigatorButton>
-				</CardBody>
-			</Card>
-		</NavigatorScreen>
-		<NavigatorScreen path="/child2/grandchild">
-			<Card>
-				<CardBody>
-					This is the grand child
-					<NavigatorToParentButton variant="secondary">
-						Go back to parent
-					</NavigatorToParentButton>
-				</CardBody>
-			</Card>
-		</NavigatorScreen>
-	</NavigatorProvider>
-);
-
-export const NestedNavigator: StoryFn< typeof NavigatorProvider > =
-	NestedNavigatorTemplate.bind( {} );
-NestedNavigator.args = {
-	initialPath: '/child2/grandchild',
+export const WithNestedInitialPath: StoryObj< typeof Navigator > = {
+	...Default,
+	args: {
+		...Default.args,
+		initialPath: '/child/grandchild',
+	},
 };
 
 const NavigatorButtonWithSkipFocus = ( {
 	path,
 	onClick,
 	...props
-}: React.ComponentProps< typeof NavigatorButton > ) => {
+}: React.ComponentProps< typeof Navigator.Button > ) => {
 	const { goTo } = useNavigator();
 
 	return (
 		<Button
 			{ ...props }
+			style={ {
+				marginInline: '8px',
+				...props.style,
+			} }
 			onClick={ ( e: React.MouseEvent< HTMLButtonElement > ) => {
 				goTo( path, { skipFocus: true } );
 				onClick?.( e );
@@ -317,50 +157,39 @@ const NavigatorButtonWithSkipFocus = ( {
 	);
 };
 
-export const SkipFocus: StoryFn< typeof NavigatorProvider > = ( args ) => {
-	return <NavigatorProvider { ...args } />;
-};
-SkipFocus.args = {
-	initialPath: '/',
-	children: (
-		<>
-			<div
-				style={ {
-					height: 250,
-					border: '1px solid black',
-				} }
-			>
-				<NavigatorScreen
-					path="/"
+export const SkipFocus: StoryObj< typeof Navigator > = {
+	args: {
+		initialPath: '/',
+		children: (
+			<>
+				<div
 					style={ {
-						height: '100%',
+						height: 150,
+						outline: '1px solid black',
+						outlineOffset: '-1px',
+						marginBlockEnd: '1rem',
+						display: 'contents',
 					} }
 				>
-					<h1>Home screen</h1>
-					<NavigatorButton variant="secondary" path="/child">
-						Go to child screen.
-					</NavigatorButton>
-				</NavigatorScreen>
-				<NavigatorScreen
-					path="/child"
-					style={ {
-						height: '100%',
-					} }
-				>
-					<h2>Child screen</h2>
-					<NavigatorToParentButton variant="secondary">
-						Go to parent screen.
-					</NavigatorToParentButton>
-				</NavigatorScreen>
-			</div>
+					<Navigator.Screen path="/">
+						<h2>Home screen</h2>
+						<Navigator.Button variant="primary" path="/child">
+							Go to child screen.
+						</Navigator.Button>
+					</Navigator.Screen>
 
-			<NavigatorButtonWithSkipFocus
-				variant="secondary"
-				path="/child"
-				style={ { margin: '1rem 2rem' } }
-			>
-				Go to child screen, but keep focus on this button
-			</NavigatorButtonWithSkipFocus>
-		</>
-	),
+					<Navigator.Screen path="/child">
+						<h2>Child screen</h2>
+						<Navigator.BackButton variant="secondary">
+							Go back to home screen
+						</Navigator.BackButton>
+					</Navigator.Screen>
+				</div>
+
+				<NavigatorButtonWithSkipFocus path="/child">
+					Go to child screen, but keep focus on this button
+				</NavigatorButtonWithSkipFocus>
+			</>
+		),
+	},
 };

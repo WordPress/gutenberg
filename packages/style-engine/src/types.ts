@@ -94,7 +94,7 @@ export interface StyleOptions {
 
 export interface GeneratedCSSRule {
 	selector?: string;
-	value: string;
+	value: string | unknown;
 	/**
 	 * The CSS key in JS style attribute format, compatible with React.
 	 * E.g. `paddingTop` instead of `padding-top`.

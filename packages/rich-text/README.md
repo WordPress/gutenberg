@@ -430,7 +430,7 @@ Create an HTML string from a Rich Text value.
 
 _Parameters_
 
--   _$1_ `Object`: Named argements.
+-   _$1_ `Object`: Named arguments.
 -   _$1.value_ `RichTextValue`: Rich text value.
 -   _$1.preserveWhiteSpace_ `[boolean]`: Preserves newlines if true.
 

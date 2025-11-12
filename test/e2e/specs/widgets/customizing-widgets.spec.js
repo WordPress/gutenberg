@@ -79,7 +79,7 @@ test.describe( 'Widgets Customizer', () => {
 		);
 
 		const inlineInserterSearchBox = page.locator(
-			'role=searchbox[name="Search for blocks and patterns"i]'
+			'role=searchbox[name="Search"i]'
 		);
 
 		await expect( inlineInserterSearchBox ).toBeFocused();
@@ -358,9 +358,7 @@ test.describe( 'Widgets Customizer', () => {
 		const legacyWidgetBlock =
 			await widgetsCustomizerPage.addBlock( 'Legacy Widget' );
 		await page
-			.locator(
-				'role=combobox[name="Select a legacy widget to display:"i]'
-			)
+			.locator( 'role=combobox[name="Legacy widget"i]' )
 			.selectOption( 'test_widget' );
 
 		await expect(
@@ -467,16 +465,6 @@ test.describe( 'Widgets Customizer', () => {
 		await expect( paragraphBlock ).toBeVisible();
 
 		await paragraphBlock.focus();
-
-		// Expect pressing the Escape key to enter navigation mode,
-		// but not close the editor.
-		await page.keyboard.press( 'Escape' );
-		await expect(
-			page.locator(
-				'css=.block-editor-block-list__layout.is-navigate-mode'
-			)
-		).toBeVisible();
-		await expect( paragraphBlock ).toBeVisible();
 	} );
 
 	test( 'should move (inner) blocks to another sidebar', async ( {
@@ -594,10 +582,13 @@ test.describe( 'Widgets Customizer', () => {
 		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
 
 		await widgetsCustomizerPage.addBlock( 'Custom HTML' );
-		const HTMLBlockTextarea = page.locator(
-			'role=document[name="Block: Custom HTML"i] >> role=textbox[name="HTML"i]'
-		);
-		await HTMLBlockTextarea.type( 'hello' );
+		await page.getByRole( 'button', { name: 'Edit HTML' } ).click();
+		await page.getByRole( 'dialog' ).getByRole( 'textbox' ).click();
+		await page.keyboard.type( 'hello' );
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'button', { name: 'Update' } )
+			.click();
 
 		// Click Publish
 		await Promise.all( [
@@ -608,8 +599,13 @@ test.describe( 'Widgets Customizer', () => {
 		// reload
 		await widgetsCustomizerPage.visitCustomizerPage();
 		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
-
-		await expect( HTMLBlockTextarea ).toHaveText( 'hello' );
+		await page
+			.locator( 'role=document[name="Block: Custom HTML"i]' )
+			.click();
+		await page.getByRole( 'button', { name: 'Edit' } ).click();
+		await expect(
+			page.getByRole( 'dialog' ).getByRole( 'textbox' )
+		).toHaveText( 'hello' );
 	} );
 } );
 
@@ -663,9 +659,7 @@ class WidgetsCustomizerPage {
 			'role=toolbar[name="Document tools"i] >> role=button[name="Add block"i]'
 		);
 
-		const searchBox = this.page.locator(
-			'role=searchbox[name="Search for blocks and patterns"i]'
-		);
+		const searchBox = this.page.locator( 'role=searchbox[name="Search"i]' );
 
 		// Clear the input.
 		await searchBox.evaluate( ( node ) => {

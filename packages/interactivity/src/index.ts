@@ -1,22 +1,33 @@
+if ( globalThis.SCRIPT_DEBUG ) {
+	await import( 'preact/debug' );
+}
+
 /**
  * External dependencies
  */
 import { h, cloneElement, render } from 'preact';
 import { batch } from '@preact/signals';
-import { deepSignal } from 'deepsignal';
 
 /**
  * Internal dependencies
  */
-import registerDirectives from './directives';
+import registerDirectives, { routerRegions } from './directives';
 import { init, getRegionRootFragment, initialVdom } from './init';
-import { directivePrefix } from './constants';
 import { toVdom } from './vdom';
-import { directive, getNamespace } from './hooks';
-import { parseInitialData, populateInitialData } from './store';
+import { directive } from './hooks';
+import { getNamespace } from './namespaces';
+import { parseServerData, populateServerData } from './store';
+import { proxifyState } from './proxies';
+import { deepReadOnly, navigationSignal } from './utils';
 
-export { store, getConfig } from './store';
-export { getContext, getElement } from './hooks';
+export {
+	store,
+	getConfig,
+	getServerState,
+	type AsyncAction,
+	type TypeYield,
+} from './store';
+export { getContext, getServerContext, getElement } from './scopes';
 export {
 	withScope,
 	useWatch,
@@ -25,6 +36,8 @@ export {
 	useLayoutEffect,
 	useCallback,
 	useMemo,
+	splitTask,
+	withSyncEvent,
 } from './utils';
 
 export { useState, useRef } from 'preact/hooks';
@@ -32,10 +45,11 @@ export { useState, useRef } from 'preact/hooks';
 const requiredConsent =
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.';
 
-export const privateApis = ( lock ): any => {
+export const privateApis = (
+	lock: 'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
+): any => {
 	if ( lock === requiredConsent ) {
 		return {
-			directivePrefix,
 			getRegionRootFragment,
 			initialVdom,
 			toVdom,
@@ -44,17 +58,18 @@ export const privateApis = ( lock ): any => {
 			h,
 			cloneElement,
 			render,
-			deepSignal,
-			parseInitialData,
-			populateInitialData,
+			proxifyState,
+			parseServerData,
+			populateServerData,
 			batch,
+			routerRegions,
+			deepReadOnly,
+			navigationSignal,
 		};
 	}
 
 	throw new Error( 'Forbidden access.' );
 };
 
-document.addEventListener( 'DOMContentLoaded', async () => {
-	registerDirectives();
-	await init();
-} );
+registerDirectives();
+init();

@@ -70,14 +70,14 @@ function findVariant( name, extensions, includePaths, projectRoot ) {
 		}
 
 		// Try to find the file iterating through the extensions, in order.
-		const foundExtention = extensions.find( ( extension ) => {
+		const foundExtension = extensions.find( ( extension ) => {
 			const fname = includePath + '/' + name + extension;
 			const partialfname = includePath + '/_' + name + extension;
 			return fs.existsSync( fname ) || fs.existsSync( partialfname );
 		} );
 
-		if ( foundExtention ) {
-			return includePath + '/' + name + foundExtention;
+		if ( foundExtension ) {
+			return includePath + '/' + name + foundExtension;
 		}
 	}
 

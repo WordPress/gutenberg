@@ -10,12 +10,7 @@ import { InterfaceSkeleton, ComplementaryArea } from '@wordpress/interface';
 import { useSelect } from '@wordpress/data';
 import { __, _x } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
-import {
-	store as blockEditorStore,
-	BlockBreadcrumb,
-	BlockToolbar,
-} from '@wordpress/block-editor';
-import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { BlockBreadcrumb, BlockToolbar } from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
 import { useState, useCallback } from '@wordpress/element';
 
@@ -23,6 +18,7 @@ import { useState, useCallback } from '@wordpress/element';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 import EditorNotices from '../editor-notices';
 import Header from '../header';
 import InserterSidebar from '../inserter-sidebar';
@@ -30,7 +26,7 @@ import ListViewSidebar from '../list-view-sidebar';
 import SavePublishPanels from '../save-publish-panels';
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
-import EditorContentSlotFill from './content-slot-fill';
+import StylesCanvas from '../styles-canvas';
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor top bar landmark region. */
@@ -47,61 +43,63 @@ const interfaceLabels = {
 
 export default function EditorInterface( {
 	className,
-	enableRegionNavigation,
-	styles,
 	children,
 	forceIsDirty,
 	contentRef,
 	disableIframe,
 	autoFocus,
 	customSaveButton,
+	customSavePanel,
 	forceDisableBlockTools,
-	title,
 	iframeProps,
 } ) {
 	const {
 		mode,
-		isRichEditingEnabled,
 		isInserterOpened,
 		isListViewOpened,
 		isDistractionFree,
 		isPreviewMode,
-		previousShortcut,
-		nextShortcut,
 		showBlockBreadcrumbs,
 		documentLabel,
-		blockEditorMode,
+		stylesPath,
+		showStylebook,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
+		const { getStylesPath, getShowStylebook } = unlock(
+			select( editorStore )
+		);
 		const editorSettings = getEditorSettings();
 		const postTypeLabel = getPostTypeLabel();
 
+		let _mode = select( editorStore ).getEditorMode();
+		if ( ! editorSettings.richEditingEnabled && _mode === 'visual' ) {
+			_mode = 'text';
+		}
+		if ( ! editorSettings.codeEditingEnabled && _mode === 'text' ) {
+			_mode = 'visual';
+		}
+
 		return {
-			mode: select( editorStore ).getEditorMode(),
-			isRichEditingEnabled: editorSettings.richEditingEnabled,
+			mode: _mode,
 			isInserterOpened: select( editorStore ).isInserterOpened(),
 			isListViewOpened: select( editorStore ).isListViewOpened(),
 			isDistractionFree: get( 'core', 'distractionFree' ),
-			isPreviewMode: editorSettings.__unstableIsPreviewMode,
-			previousShortcut: select(
-				keyboardShortcutsStore
-			).getAllShortcutKeyCombinations( 'core/editor/previous-region' ),
-			nextShortcut: select(
-				keyboardShortcutsStore
-			).getAllShortcutKeyCombinations( 'core/editor/next-region' ),
+			isPreviewMode: editorSettings.isPreviewMode,
 			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
-			// translators: Default label for the Document in the Block Breadcrumb.
-			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
-			blockEditorMode:
-				select( blockEditorStore ).__unstableGetEditorMode(),
+			documentLabel:
+				// translators: Default label for the Document in the Block Breadcrumb.
+				postTypeLabel || _x( 'Document', 'noun, breadcrumb' ),
+			stylesPath: getStylesPath(),
+			showStylebook: getShowStylebook(),
 		};
 	}, [] );
-	const isWideViewport = useViewportMatch( 'large' );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const secondarySidebarLabel = isListViewOpened
 		? __( 'Document Overview' )
 		: __( 'Block Library' );
+	const shouldShowStylesCanvas =
+		showStylebook || stylesPath?.startsWith( '/revisions' );
 
 	// Local state for save panel.
 	// Note 'truthy' callback implies an open panel.
@@ -119,12 +117,10 @@ export default function EditorInterface( {
 
 	return (
 		<InterfaceSkeleton
-			enableRegionNavigation={ enableRegionNavigation }
-			isDistractionFree={ isDistractionFree && isWideViewport }
+			isDistractionFree={ isDistractionFree }
 			className={ clsx( 'editor-editor-interface', className, {
 				'is-entity-save-view-open': !! entitiesSavedStatesCallback,
-				'is-distraction-free':
-					isDistractionFree && isWideViewport && ! isPreviewMode,
+				'is-distraction-free': isDistractionFree && ! isPreviewMode,
 			} ) }
 			labels={ {
 				...interfaceLabels,
@@ -139,7 +135,6 @@ export default function EditorInterface( {
 						}
 						customSaveButton={ customSaveButton }
 						forceDisableBlockTools={ forceDisableBlockTools }
-						title={ title }
 					/>
 				)
 			}
@@ -160,44 +155,35 @@ export default function EditorInterface( {
 						<EditorNotices />
 					) }
 
-					<EditorContentSlotFill.Slot>
-						{ ( [ editorCanvasView ] ) =>
-							editorCanvasView ? (
-								editorCanvasView
-							) : (
-								<>
-									{ ! isPreviewMode &&
-										( mode === 'text' ||
-											! isRichEditingEnabled ) && (
-											<TextEditor
-												// We should auto-focus the canvas (title) on load.
-												// eslint-disable-next-line jsx-a11y/no-autofocus
-												autoFocus={ autoFocus }
-											/>
-										) }
-									{ ! isPreviewMode &&
-										! isLargeViewport &&
-										mode === 'visual' && (
-											<BlockToolbar hideDragHandle />
-										) }
-									{ ( isPreviewMode ||
-										( isRichEditingEnabled &&
-											mode === 'visual' ) ) && (
-										<VisualEditor
-											styles={ styles }
-											contentRef={ contentRef }
-											disableIframe={ disableIframe }
-											// We should auto-focus the canvas (title) on load.
-											// eslint-disable-next-line jsx-a11y/no-autofocus
-											autoFocus={ autoFocus }
-											iframeProps={ iframeProps }
-										/>
-									) }
-									{ children }
-								</>
-							)
-						}
-					</EditorContentSlotFill.Slot>
+					{ shouldShowStylesCanvas ? (
+						<StylesCanvas />
+					) : (
+						<>
+							{ ! isPreviewMode && mode === 'text' && (
+								<TextEditor
+									// We should auto-focus the canvas (title) on load.
+									// eslint-disable-next-line jsx-a11y/no-autofocus
+									autoFocus={ autoFocus }
+								/>
+							) }
+							{ ! isPreviewMode &&
+								! isLargeViewport &&
+								mode === 'visual' && (
+									<BlockToolbar hideDragHandle />
+								) }
+							{ ( isPreviewMode || mode === 'visual' ) && (
+								<VisualEditor
+									contentRef={ contentRef }
+									disableIframe={ disableIframe }
+									// We should auto-focus the canvas (title) on load.
+									// eslint-disable-next-line jsx-a11y/no-autofocus
+									autoFocus={ autoFocus }
+									iframeProps={ iframeProps }
+								/>
+							) }
+							{ children }
+						</>
+					) }
 				</>
 			}
 			footer={
@@ -205,26 +191,28 @@ export default function EditorInterface( {
 				! isDistractionFree &&
 				isLargeViewport &&
 				showBlockBreadcrumbs &&
-				isRichEditingEnabled &&
-				blockEditorMode !== 'zoom-out' &&
 				mode === 'visual' && (
 					<BlockBreadcrumb rootLabelText={ documentLabel } />
 				)
 			}
 			actions={
-				<SavePublishPanels
-					closeEntitiesSavedStates={ closeEntitiesSavedStates }
-					isEntitiesSavedStatesOpen={ entitiesSavedStatesCallback }
-					setEntitiesSavedStatesCallback={
-						setEntitiesSavedStatesCallback
-					}
-					forceIsDirtyPublishPanel={ forceIsDirty }
-				/>
+				! isPreviewMode
+					? customSavePanel || (
+							<SavePublishPanels
+								closeEntitiesSavedStates={
+									closeEntitiesSavedStates
+								}
+								isEntitiesSavedStatesOpen={
+									entitiesSavedStatesCallback
+								}
+								setEntitiesSavedStatesCallback={
+									setEntitiesSavedStatesCallback
+								}
+								forceIsDirtyPublishPanel={ forceIsDirty }
+							/>
+					  )
+					: undefined
 			}
-			shortcuts={ {
-				previous: previousShortcut,
-				next: nextShortcut,
-			} }
 		/>
 	);
 }

@@ -15,7 +15,7 @@ const CIRCLE_SIZE = 32;
 const INNER_CIRCLE_SIZE = 6;
 
 export const CircleRoot = styled.div`
-	border-radius: 50%;
+	border-radius: ${ CONFIG.radiusRound };
 	border: ${ CONFIG.borderWidth } solid ${ COLORS.ui.border };
 	box-sizing: border-box;
 	cursor: grab;
@@ -41,7 +41,7 @@ export const CircleIndicatorWrapper = styled.div`
 
 export const CircleIndicator = styled.div`
 	background: ${ COLORS.theme.accent };
-	border-radius: 50%;
+	border-radius: ${ CONFIG.radiusRound };
 	box-sizing: border-box;
 	display: block;
 	left: 50%;

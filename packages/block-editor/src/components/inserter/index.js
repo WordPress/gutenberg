@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import { speak } from '@wordpress/a11y';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Dropdown, Button } from '@wordpress/components';
-import { forwardRef, Component } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, ifCondition } from '@wordpress/compose';
 import { createBlock, store as blocksStore } from '@wordpress/blocks';
@@ -29,7 +29,6 @@ const defaultRenderToggle = ( {
 	blockTitle,
 	hasSingleBlockType,
 	toggleProps = {},
-	prioritizePatterns,
 } ) => {
 	const {
 		as: Wrapper = Button,
@@ -45,8 +44,6 @@ const defaultRenderToggle = ( {
 			_x( 'Add %s', 'directly add the only allowed block' ),
 			blockTitle
 		);
-	} else if ( ! label && prioritizePatterns ) {
-		label = __( 'Add pattern' );
 	} else if ( ! label ) {
 		label = _x( 'Add block', 'Generic label for block inserter button' );
 	}
@@ -63,6 +60,7 @@ const defaultRenderToggle = ( {
 
 	return (
 		<Wrapper
+			__next40pxDefaultSize={ toggleProps.as ? undefined : true }
 			icon={ plus }
 			label={ label }
 			tooltipPosition="bottom"
@@ -76,7 +74,7 @@ const defaultRenderToggle = ( {
 	);
 };
 
-class PrivateInserter extends Component {
+class Inserter extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -113,7 +111,6 @@ class PrivateInserter extends Component {
 			toggleProps,
 			hasItems,
 			renderToggle = defaultRenderToggle,
-			prioritizePatterns,
 		} = this.props;
 
 		return renderToggle( {
@@ -124,7 +121,6 @@ class PrivateInserter extends Component {
 			hasSingleBlockType,
 			directInsertBlock,
 			toggleProps,
-			prioritizePatterns,
 		} );
 	}
 
@@ -147,7 +143,6 @@ class PrivateInserter extends Component {
 			// This prop is experimental to give some time for the quick inserter to mature
 			// Feel free to make them stable after a few releases.
 			__experimentalIsQuick: isQuick,
-			prioritizePatterns,
 			onSelectOrClose,
 			selectBlockOnInsert,
 		} = this.props;
@@ -171,7 +166,6 @@ class PrivateInserter extends Component {
 					rootClientId={ rootClientId }
 					clientId={ clientId }
 					isAppender={ isAppender }
-					prioritizePatterns={ prioritizePatterns }
 					selectBlockOnInsert={ selectBlockOnInsert }
 				/>
 			);
@@ -222,7 +216,7 @@ class PrivateInserter extends Component {
 	}
 }
 
-export const ComposedPrivateInserter = compose( [
+export default compose( [
 	withSelect(
 		( select, { clientId, rootClientId, shouldDirectInsert = true } ) => {
 			const {
@@ -230,7 +224,6 @@ export const ComposedPrivateInserter = compose( [
 				hasInserterItems,
 				getAllowedBlocks,
 				getDirectInsertBlock,
-				getSettings,
 			} = select( blockEditorStore );
 
 			const { getBlockVariations } = select( blocksStore );
@@ -242,8 +235,6 @@ export const ComposedPrivateInserter = compose( [
 
 			const directInsertBlock =
 				shouldDirectInsert && getDirectInsertBlock( rootClientId );
-
-			const settings = getSettings();
 
 			const hasSingleBlockType =
 				allowedBlocks?.length === 1 &&
@@ -262,9 +253,6 @@ export const ComposedPrivateInserter = compose( [
 				allowedBlockType,
 				directInsertBlock,
 				rootClientId,
-				prioritizePatterns:
-					settings.__experimentalPreferPatternsOnRoot &&
-					! rootClientId,
 			};
 		}
 	),
@@ -398,9 +386,7 @@ export const ComposedPrivateInserter = compose( [
 				);
 
 				if ( onSelectOrClose ) {
-					onSelectOrClose( {
-						clientId: blockToInsert?.clientId,
-					} );
+					onSelectOrClose( blockToInsert );
 				}
 
 				const message = sprintf(
@@ -418,10 +404,4 @@ export const ComposedPrivateInserter = compose( [
 		( { hasItems, isAppender, rootClientId, clientId } ) =>
 			hasItems || ( ! isAppender && ! rootClientId && ! clientId )
 	),
-] )( PrivateInserter );
-
-const Inserter = forwardRef( ( props, ref ) => {
-	return <ComposedPrivateInserter ref={ ref } { ...props } />;
-} );
-
-export default Inserter;
+] )( Inserter );

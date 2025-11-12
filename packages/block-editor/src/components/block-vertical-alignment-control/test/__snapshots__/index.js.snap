@@ -42,7 +42,7 @@ exports[`BlockVerticalAlignmentUI should match snapshot when controls are visibl
       <button
         aria-label="Align top"
         aria-pressed="true"
-        class="components-button components-toolbar__control is-pressed has-icon"
+        class="components-button components-toolbar__control is-compact is-pressed has-icon"
         data-toolbar-item="true"
         type="button"
       >
@@ -64,7 +64,7 @@ exports[`BlockVerticalAlignmentUI should match snapshot when controls are visibl
       <button
         aria-label="Align middle"
         aria-pressed="false"
-        class="components-button components-toolbar__control has-icon"
+        class="components-button components-toolbar__control is-compact has-icon"
         data-toolbar-item="true"
         type="button"
       >
@@ -86,7 +86,7 @@ exports[`BlockVerticalAlignmentUI should match snapshot when controls are visibl
       <button
         aria-label="Align bottom"
         aria-pressed="false"
-        class="components-button components-toolbar__control has-icon"
+        class="components-button components-toolbar__control is-compact has-icon"
         data-toolbar-item="true"
         type="button"
       >

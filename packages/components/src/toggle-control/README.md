@@ -15,6 +15,7 @@ const MyToggleControl = () => {
 
 	return (
 		<ToggleControl
+			__nextHasNoMarginBottom
 			label="Fixed Background"
 			help={
 				hasFixedBackground
@@ -78,3 +79,11 @@ The class that will be added with `components-base-control` and `components-togg
 
 -		Type: `String`
 -		Required: No
+
+### `__nextHasNoMarginBottom`
+
+Start opting into the new margin-free styles that will become the default in a future version.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`

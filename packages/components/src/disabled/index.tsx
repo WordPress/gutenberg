@@ -12,6 +12,8 @@ import type { WordPressComponentProps } from '../context';
 import { useCx } from '../utils';
 
 const Context = createContext< boolean >( false );
+Context.displayName = 'DisabledContext';
+
 const { Consumer, Provider } = Context;
 
 /**
@@ -31,7 +33,14 @@ const { Consumer, Provider } = Context;
  * const MyDisabled = () => {
  * 	const [ isDisabled, setIsDisabled ] = useState( true );
  *
- * 	let input = <TextControl label="Input" onChange={ () => {} } />;
+ *	let input = (
+ *		<TextControl
+ *			__next40pxDefaultSize
+ *			__nextHasNoMarginBottom
+ *			label="Input"
+ *			onChange={ () => {} }
+ *		/>
+ *	);
  * 	if ( isDisabled ) {
  * 		input = <Disabled>{ input }</Disabled>;
  * 	}

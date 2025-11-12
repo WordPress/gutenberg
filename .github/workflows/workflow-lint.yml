@@ -1,0 +1,36 @@
+name: Lint GitHub Actions workflow files
+
+on:
+    push:
+        branches:
+            - trunk
+        paths:
+            # Only run when changes are made to workflow files.
+            - '.github/workflows/**'
+    pull_request:
+        branches:
+            - trunk
+        paths:
+            # Only run when changes are made to workflow files.
+            - '.github/workflows/**'
+    workflow_dispatch:
+
+# Cancels all previous workflow runs for pull requests that have not completed.
+concurrency:
+    # The concurrency group contains the workflow name and the branch name for pull requests
+    # or the commit hash for any other events.
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+    cancel-in-progress: true
+
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
+jobs:
+    lint:
+        name: Lint GitHub Action files
+        permissions:
+            security-events: write
+            actions: read
+            contents: read
+        uses: ./.github/workflows/reusable-workflow-lint.yml

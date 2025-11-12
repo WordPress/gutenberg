@@ -81,7 +81,7 @@ test.describe( 'Invalid blocks', () => {
 		await expect(
 			editor.canvas
 				.getByRole( 'document', { name: 'Block: Paragraph' } )
-				.getByRole( 'button', { name: 'Attempt Block Recovery' } )
+				.getByRole( 'button', { name: 'Attempt recovery' } )
 		).toBeVisible();
 
 		expect( hasAlert ).toBe( false );

@@ -1,3 +1,7 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "../utils/theme-variables" as *;
+
 .components-panel {
 	background: $white;
 	border: $border-width solid $gray-200;
@@ -62,9 +66,12 @@
 	font-size: inherit;
 	margin-top: 0;
 	margin-bottom: 0;
-	transition: 0.1s background ease-in-out;
-	@include reduce-motion("transition");
+
+	@media not (prefers-reduced-motion) {
+		transition: 0.1s background ease-in-out;
+	}
 }
+
 .components-panel__body.is-opened > .components-panel__body-title {
 	margin: -1 * $grid-unit-20;
 	margin-bottom: 5px;
@@ -82,13 +89,16 @@
 	padding: $grid-unit-20 $grid-unit-60 $grid-unit-20 $grid-unit-20;
 	outline: none;
 	width: 100%;
-	font-weight: 500;
+	font-weight: $font-weight-medium;
 	text-align: left;
 	color: $gray-900;
 	border: none;
 	box-shadow: none;
-	transition: 0.1s background ease-in-out;
-	@include reduce-motion("transition");
+
+	@media not (prefers-reduced-motion) {
+		transition: 0.1s background ease-in-out;
+	}
+
 	height: auto;
 
 	&:focus {
@@ -103,8 +113,10 @@
 		transform: translateY(-50%);
 		color: $gray-900;
 		fill: currentColor;
-		transition: 0.1s color ease-in-out;
-		@include reduce-motion("transition");
+
+		@media not (prefers-reduced-motion) {
+			transition: 0.1s color ease-in-out;
+		}
 	}
 
 	// mirror the arrow horizontally in RTL languages

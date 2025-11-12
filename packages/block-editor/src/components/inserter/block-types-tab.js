@@ -186,7 +186,7 @@ export function BlockTypesTab(
 			continue;
 		}
 
-		if ( rootClientId && item.rootClientId === rootClientId ) {
+		if ( item.isAllowedInCurrentRoot ) {
 			itemsForCurrentRoot.push( item );
 		} else {
 			itemsRemaining.push( item );

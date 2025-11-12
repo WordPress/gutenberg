@@ -198,9 +198,9 @@ Callback called when urls can be configured. No media insertion from url will be
 
 ### handleUpload
 
-When set to false the handling of the upload is left to the calling component.
+When the value is set to `false` or returned as `false`, the handling of the upload is left to the consumer component. The function signature accepts an array containing the files to be uploaded.
 
--   Type: `Boolean`
+-   Type: `Boolean|Function`
 -   Required: No
 -   Default: `true`
 -   Platform: Web

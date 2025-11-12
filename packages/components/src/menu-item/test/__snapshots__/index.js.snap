@@ -3,7 +3,7 @@
 exports[`MenuItem should match snapshot when all props provided 1`] = `
 <button
   aria-checked="true"
-  class="components-button components-menu-item__button my-class"
+  class="components-button components-menu-item__button my-class is-next-40px-default-size"
   role="menuitemcheckbox"
   type="button"
 >
@@ -35,7 +35,7 @@ exports[`MenuItem should match snapshot when all props provided 1`] = `
 
 exports[`MenuItem should match snapshot when info is provided 1`] = `
 <button
-  class="components-button components-menu-item__button"
+  class="components-button components-menu-item__button is-next-40px-default-size"
   role="menuitem"
   type="button"
 >
@@ -62,7 +62,7 @@ exports[`MenuItem should match snapshot when info is provided 1`] = `
 
 exports[`MenuItem should match snapshot when isSelected and role are optionally provided 1`] = `
 <button
-  class="components-button components-menu-item__button my-class"
+  class="components-button components-menu-item__button my-class is-next-40px-default-size"
   role="menuitem"
   type="button"
 >
@@ -94,7 +94,7 @@ exports[`MenuItem should match snapshot when isSelected and role are optionally 
 
 exports[`MenuItem should match snapshot when only label provided 1`] = `
 <button
-  class="components-button components-menu-item__button"
+  class="components-button components-menu-item__button is-next-40px-default-size"
   role="menuitem"
   type="button"
 >

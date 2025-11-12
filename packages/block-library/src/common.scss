@@ -1,4 +1,7 @@
-@import "./elements.scss";
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/default-custom-properties";
+@use "./elements.scss" as *;
 
 // The following selectors have increased specificity (using the :root prefix)
 // to assure colors take effect over another base class color, mainly to let
@@ -31,6 +34,26 @@
 	font-size: var(--wp--preset--font-size--huge);
 }
 
+// Text alignments.
+.has-text-align-center {
+	text-align: center;
+}
+
+.has-text-align-left {
+	/*rtl:ignore*/
+	text-align: left;
+}
+
+.has-text-align-right {
+	/*rtl:ignore*/
+	text-align: right;
+}
+
+// Fit Text
+.has-fit-text {
+	white-space: nowrap !important;
+}
+
 // This tag marks the end of the styles that apply to editing canvas contents and need to be manipulated when we resize the editor.
 #end-resizable-editor-section {
 	display: none;
@@ -60,8 +83,6 @@
 
 .screen-reader-text {
 	border: 0;
-	clip: rect(1px, 1px, 1px, 1px);
-	-webkit-clip-path: inset(50%);
 	clip-path: inset(50%);
 	height: 1px;
 	margin: -1px;
@@ -74,7 +95,6 @@
 
 .screen-reader-text:focus {
 	background-color: $gray-300;
-	clip: auto !important;
 	clip-path: none;
 	color: #444;
 	display: block;

@@ -8,10 +8,11 @@ function listener( event ) {
 		return;
 	}
 
-	const action = event.type === 'mouseover' ? 'add' : 'remove';
-
 	event.preventDefault();
-	event.currentTarget.classList[ action ]( 'is-hovered' );
+	event.currentTarget.classList.toggle(
+		'is-hovered',
+		event.type === 'mouseover'
+	);
 }
 
 /*

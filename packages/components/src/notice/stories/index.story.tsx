@@ -17,7 +17,8 @@ import NoticeList from '../list';
 import type { NoticeListProps } from '../types';
 
 const meta: Meta< typeof Notice > = {
-	title: 'Components/Notice',
+	title: 'Components/Feedback/Notice',
+	id: 'components-notice',
 	component: Notice,
 	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { NoticeList },
@@ -109,7 +110,11 @@ export const NoticeListSubcomponent: StoryFn< typeof NoticeList > = () => {
 	return (
 		<>
 			<NoticeList notices={ notices } onRemove={ removeNotice } />
-			<Button variant="primary" onClick={ resetNotices }>
+			<Button
+				__next40pxDefaultSize
+				variant="primary"
+				onClick={ resetNotices }
+			>
 				Reset Notices
 			</Button>
 		</>

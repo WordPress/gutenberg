@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { store, getContext, getElement } from '@wordpress/interactivity';
+import {
+	store,
+	getContext,
+	getElement,
+	withSyncEvent,
+} from '@wordpress/interactivity';
 
 const focusableSelectors = [
 	'a[href]',
@@ -106,12 +111,13 @@ const { state, actions } = store(
 					actions.openMenu( 'click' );
 				}
 			},
-			handleMenuKeydown( event ) {
+			handleMenuKeydown: withSyncEvent( ( event ) => {
 				const { type, firstFocusableElement, lastFocusableElement } =
 					getContext();
 				if ( state.menuOpenedBy.click ) {
 					// If Escape close the menu.
-					if ( event?.key === 'Escape' ) {
+					if ( event.key === 'Escape' ) {
+						event.stopPropagation(); // Keeps ancestor menus open.
 						actions.closeMenu( 'click' );
 						actions.closeMenu( 'focus' );
 						return;
@@ -137,8 +143,8 @@ const { state, actions } = store(
 						}
 					}
 				}
-			},
-			handleMenuFocusout( event ) {
+			} ),
+			handleMenuFocusout: withSyncEvent( ( event ) => {
 				const { modal, type } = getContext();
 				// If focus is outside modal, and in the document, close menu
 				// event.target === The element losing focus
@@ -156,7 +162,7 @@ const { state, actions } = store(
 					actions.closeMenu( 'click' );
 					actions.closeMenu( 'focus' );
 				}
-			},
+			} ),
 
 			openMenu( menuOpenedOn = 'click' ) {
 				const { type } = getContext();

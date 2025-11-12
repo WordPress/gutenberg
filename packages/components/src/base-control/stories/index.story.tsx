@@ -10,10 +10,15 @@ import BaseControl, { useBaseControlProps } from '..';
 import Button from '../../button';
 
 const meta: Meta< typeof BaseControl > = {
-	title: 'Components/BaseControl',
+	title: 'Components/Selection & Input/Common/BaseControl',
+	id: 'components-basecontrol',
 	component: BaseControl,
+	subcomponents: {
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		'BaseControl.VisualLabel': BaseControl.VisualLabel,
+	},
 	argTypes: {
-		children: { control: { type: null } },
+		children: { control: false },
 		help: { control: { type: 'text' } },
 		label: { control: { type: 'text' } },
 	},
@@ -55,7 +60,6 @@ WithHelpText.args = {
  * otherwise use if the `label` prop was passed.
  */
 export const WithVisualLabel: StoryFn< typeof BaseControl > = ( props ) => {
-	// @ts-expect-error - Unclear how to fix, see also https://github.com/WordPress/gutenberg/pull/39468#discussion_r827150516
 	BaseControl.VisualLabel.displayName = 'BaseControl.VisualLabel';
 
 	return (

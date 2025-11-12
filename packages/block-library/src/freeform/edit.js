@@ -75,10 +75,10 @@ function ClassicEdit( {
 	onReplace,
 } ) {
 	const { getMultiSelectedBlockClientIds } = useSelect( blockEditorStore );
-	const didMount = useRef( false );
+	const didMountRef = useRef( false );
 
 	useEffect( () => {
-		if ( ! didMount.current ) {
+		if ( ! didMountRef.current ) {
 			return;
 		}
 
@@ -96,7 +96,7 @@ function ClassicEdit( {
 	useEffect( () => {
 		const { baseURL, suffix } = window.wpEditorL10n.tinymce;
 
-		didMount.current = true;
+		didMountRef.current = true;
 
 		window.tinymce.EditorManager.overrideDefaults( {
 			base_url: baseURL,
@@ -188,6 +188,13 @@ function ClassicEdit( {
 				}
 			} );
 
+			editor.on( 'paste', ( event ) => {
+				// TinyMCE selection isn’t synced with the block editor selection store.
+				// This event handler prevents paste from bubbling so the useClipboardHandler
+				// won’t replace the block.
+				event.stopPropagation();
+			} );
+
 			editor.on( 'init', () => {
 				const rootNode = editor.getBody();
 
@@ -230,7 +237,7 @@ function ClassicEdit( {
 				onReadyStateChange
 			);
 			wp.oldEditor.remove( `editor-${ clientId }` );
-			didMount.current = false;
+			didMountRef.current = false;
 		};
 	}, [] );
 

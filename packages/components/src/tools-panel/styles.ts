@@ -21,7 +21,7 @@ const toolsPanelGrid = {
 		grid-template-columns: ${ `repeat( ${ columns }, minmax(0, 1fr) )` };
 	`,
 	spacing: css`
-		column-gap: ${ space( 2 ) };
+		column-gap: ${ space( 4 ) };
 		row-gap: ${ space( 4 ) };
 	`,
 	item: {
@@ -86,7 +86,7 @@ export const ToolsPanelHeader = css`
 
 export const ToolsPanelHeading = css`
 	font-size: inherit;
-	font-weight: 500;
+	font-weight: ${ CONFIG.fontWeightMedium };
 	line-height: normal;
 
 	/* Required to meet specificity requirements to ensure zero margin */
@@ -150,7 +150,7 @@ export const DropdownMenu = css`
 export const ResetLabel = styled.span`
 	color: ${ COLORS.theme.accentDarker10 };
 	font-size: 11px;
-	font-weight: 500;
+	font-weight: ${ CONFIG.fontWeightMedium };
 	line-height: 1.4;
 	${ rtl( { marginLeft: space( 3 ) } ) }
 	text-transform: uppercase;

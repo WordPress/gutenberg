@@ -171,31 +171,8 @@ test.describe( 'Navigation block - List view editing', () => {
 
 		await appender.click();
 
-		// Expect to see the block inserter.
-		await expect(
-			page.getByRole( 'searchbox', {
-				name: 'Search for blocks and patterns',
-			} )
-		).toBeFocused();
-
-		const blockResults = page.getByRole( 'listbox', {
-			name: 'Blocks',
-		} );
-
-		await expect( blockResults ).toBeVisible();
-
-		const blockResultOptions = blockResults.getByRole( 'option' );
-
-		// Expect to see the Page Link and Custom Link blocks as the nth(0) and nth(1) results.
-		// This is important for usability as the Page Link block is the most likely to be used.
-		await expect( blockResultOptions.nth( 0 ) ).toHaveText( 'Page Link' );
-		await expect( blockResultOptions.nth( 1 ) ).toHaveText( 'Custom Link' );
-
-		// Select the Page Link option.
-		const customLinkResult = blockResultOptions.nth( 1 );
-		await customLinkResult.click();
-
-		// Expect to see the Link creation UI be focused.
+		// Expect a Navigation Link block to be inserted
+		// and immediately trigger its Link UI.
 		const linkUIInput = linkControl.getSearchInput();
 
 		// Coverage for bug whereby Link UI input would be incorrectly prepopulated.
@@ -215,17 +192,17 @@ test.describe( 'Navigation block - List view editing', () => {
 		const thirdResult = await linkControl.getNthSearchResult( 2 );
 
 		const firstResultType =
-			await linkControl.getSearchResultType( firstResult );
+			await linkControl.getSearchResultText( firstResult );
 
 		const secondResultType =
-			await linkControl.getSearchResultType( secondResult );
+			await linkControl.getSearchResultText( secondResult );
 
 		const thirdResultType =
-			await linkControl.getSearchResultType( thirdResult );
+			await linkControl.getSearchResultText( thirdResult );
 
-		expect( firstResultType ).toBe( 'Page' );
-		expect( secondResultType ).toBe( 'Page' );
-		expect( thirdResultType ).toBe( 'Page' );
+		expect( firstResultType ).toContain( 'Page' );
+		expect( secondResultType ).toContain( 'Page' );
+		expect( thirdResultType ).toContain( 'Page' );
 
 		// Grab the text from the first result so we can check (later on) that it was inserted.
 		const firstResultText =
@@ -503,16 +480,8 @@ test.describe( 'Navigation block - List view editing', () => {
 			} )
 			.click();
 
-		const blockResults = page.getByRole( 'listbox', {
-			name: 'Blocks',
-		} );
-
-		await expect( blockResults ).toBeVisible();
-
-		const blockResultOptions = blockResults.getByRole( 'option' );
-
-		// Select the Page Link option.
-		await blockResultOptions.nth( 0 ).click();
+		// Expect the Link UI to be focused.
+		await expect( linkControl.getSearchInput() ).toBeFocused();
 
 		// Immediately dismiss the Link UI thereby not populating the `url` attribute
 		// of the block.
@@ -555,7 +524,10 @@ test.describe( 'Navigation block - List view editing', () => {
 
 		await editor.openDocumentSettingsSidebar();
 
-		await page.getByLabel( 'Test Menu' ).click();
+		await page
+			.getByRole( 'tabpanel' )
+			.getByRole( 'button', { name: 'Test Menu' } )
+			.click();
 
 		await page.keyboard.press( 'ArrowUp' );
 
@@ -588,7 +560,7 @@ class LinkControl {
 
 	getSearchInput() {
 		return this.page.getByRole( 'combobox', {
-			name: 'Link',
+			name: 'Search or type URL',
 		} );
 	}
 
@@ -626,14 +598,6 @@ class LinkControl {
 
 		return result
 			.locator( '.components-menu-item__item' ) // this is the only way to get the label text without the URL.
-			.innerText();
-	}
-
-	async getSearchResultType( result ) {
-		await expect( result ).toBeVisible();
-
-		return result
-			.locator( '.components-menu-item__shortcut' ) // this is the only way to get the type text.
 			.innerText();
 	}
 }

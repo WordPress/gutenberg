@@ -8,7 +8,6 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { store as editorStore } from '../../store';
 import PageAttributesCheck from './check';
-import { OrderRow } from './order';
 import { ParentRow } from './parent';
 
 const PANEL_NAME = 'page-attributes';
@@ -28,18 +27,13 @@ function AttributesPanel() {
 		return null;
 	}
 
-	return (
-		<>
-			<ParentRow />
-			<OrderRow />
-		</>
-	);
+	return <ParentRow />;
 }
 
 /**
  * Renders the Page Attributes Panel component.
  *
- * @return {Component} The component to be rendered.
+ * @return {React.ReactNode} The rendered component.
  */
 export default function PageAttributesPanel() {
 	return (

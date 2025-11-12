@@ -14,12 +14,12 @@
 		"emitDeclarationOnly": true,
 		"isolatedModules": true,
 
+		"skipDefaultLibCheck": true,
+
 		/* Strict Type-Checking Options */
 		"strict": true,
 
 		/* Additional Checks */
-		"noUnusedLocals": true,
-		"noUnusedParameters": true,
 		"noImplicitReturns": true,
 		"noFallthroughCasesInSwitch": true,
 
@@ -31,8 +31,12 @@
 		"resolveJsonModule": true,
 
 		"typeRoots": [ "./typings", "./node_modules/@types" ],
-		"types": []
+		"types": [],
+
+		"rootDir": "${configDir}/src",
+		"declarationDir": "${configDir}/build-types"
 	},
+	"include": [ "${configDir}/src" ],
 	"exclude": [
 		"**/*.android.js",
 		"**/*.ios.js",

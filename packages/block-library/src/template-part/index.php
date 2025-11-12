@@ -70,7 +70,9 @@ function render_block_core_template_part( $attributes ) {
 			if ( 0 === validate_file( $attributes['slug'] ) ) {
 				$block_template = get_block_file_template( $template_part_id, 'wp_template_part' );
 
-				$content = $block_template->content;
+				if ( isset( $block_template->content ) ) {
+					$content = $block_template->content;
+				}
 				if ( isset( $block_template->area ) ) {
 					$area = $block_template->area;
 				}
@@ -161,7 +163,7 @@ function render_block_core_template_part( $attributes ) {
 	global $wp_embed;
 	$content = $wp_embed->autoembed( $content );
 
-	if ( empty( $attributes['tagName'] ) ) {
+	if ( empty( $attributes['tagName'] ) || tag_escape( $attributes['tagName'] ) !== $attributes['tagName'] ) {
 		$area_tag = 'div';
 		if ( $area_definition && isset( $area_definition['area_tag'] ) ) {
 			$area_tag = $area_definition['area_tag'];

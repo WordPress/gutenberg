@@ -23,16 +23,16 @@ const initialHtmlWithVideo = `
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:media-text -->`;
 
-const tranformsWithInnerBlocks = [ 'Columns', 'Group' ];
+const transformsWithInnerBlocks = [ 'Columns', 'Group' ];
 const blockTransformsWithImage = [
 	'Image',
 	'Cover',
-	...tranformsWithInnerBlocks,
+	...transformsWithInnerBlocks,
 ];
 const blockTransformsWithVideo = [
 	'Video',
 	'Cover',
-	...tranformsWithInnerBlocks,
+	...transformsWithInnerBlocks,
 ];
 
 setupCoreBlocks();
@@ -52,7 +52,9 @@ describe( `${ block } block transformations`, () => {
 					{
 						isMediaBlock: true,
 						hasInnerBlocks:
-							tranformsWithInnerBlocks.includes( blockTransform ),
+							transformsWithInnerBlocks.includes(
+								blockTransform
+							),
 					}
 				);
 				expect( newBlock ).toBeVisible();
@@ -88,7 +90,9 @@ describe( `${ block } block transformations`, () => {
 					{
 						isMediaBlock: true,
 						hasInnerBlocks:
-							tranformsWithInnerBlocks.includes( blockTransform ),
+							transformsWithInnerBlocks.includes(
+								blockTransform
+							),
 					}
 				);
 				expect( newBlock ).toBeVisible();

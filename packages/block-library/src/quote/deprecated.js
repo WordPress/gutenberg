@@ -70,14 +70,14 @@ const v4 = {
 			selector: 'blockquote',
 			multiline: 'p',
 			default: '',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		citation: {
 			type: 'string',
 			source: 'html',
 			selector: 'cite',
 			default: '',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		align: {
 			type: 'string',
@@ -138,14 +138,14 @@ const v3 = {
 			selector: 'blockquote',
 			multiline: 'p',
 			default: '',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		citation: {
 			type: 'string',
 			source: 'html',
 			selector: 'cite',
 			default: '',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		align: {
 			type: 'string',

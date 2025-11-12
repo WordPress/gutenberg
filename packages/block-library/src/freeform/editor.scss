@@ -1,3 +1,9 @@
+@use "sass:math";
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
 .wp-block-freeform.block-library-rich-text__tinymce {
 	height: auto; /* Allow height of embed iframes to be calculated properly */
 	p,
@@ -240,12 +246,13 @@
 
 div[data-type="core/freeform"] {
 	&::before {
-		transition: border-color 0.1s linear, box-shadow 0.1s linear;
-		@include reduce-motion("transition");
 		border: $border-width solid $gray-300;
-
 		// Windows High Contrast mode will show this outline.
 		outline: $border-width solid transparent;
+
+		@media not (prefers-reduced-motion) {
+			transition: border-color 0.1s linear, box-shadow 0.1s linear;
+		}
 	}
 
 	&.is-selected::before {
@@ -299,7 +306,7 @@ div[data-type="core/freeform"] {
 	top: 0;
 	border: $border-width solid $gray-300;
 	border-bottom: none;
-	border-radius: $radius-block-ui;
+	border-radius: $radius-small;
 	margin-bottom: $grid-unit-10;
 
 	// On mobile, toolbars go edge to edge.

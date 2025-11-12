@@ -45,6 +45,8 @@ export default function save( { attributes } ) {
 		minHeight: minHeightProp,
 		minHeightUnit,
 		tagName: Tag,
+		sizeSlug,
+		poster,
 	} = attributes;
 	const overlayColorClass = getColorClassName(
 		'background-color',
@@ -95,6 +97,7 @@ export default function save( { attributes } ) {
 		'wp-block-cover__image-background',
 		id ? `wp-image-${ id }` : null,
 		{
+			[ `size-${ sizeSlug }` ]: sizeSlug,
 			'has-parallax': hasParallax,
 			'is-repeated': isRepeated,
 		}
@@ -104,26 +107,6 @@ export default function save( { attributes } ) {
 
 	return (
 		<Tag { ...useBlockProps.save( { className: classes, style } ) }>
-			<span
-				aria-hidden="true"
-				className={ clsx(
-					'wp-block-cover__background',
-					overlayColorClass,
-					dimRatioToClass( dimRatio ),
-					{
-						'has-background-dim': dimRatio !== undefined,
-						// For backwards compatibility. Former versions of the Cover Block applied
-						// `.wp-block-cover__gradient-background` in the presence of
-						// media, a gradient and a dim.
-						'wp-block-cover__gradient-background':
-							url && gradientValue && dimRatio !== 0,
-						'has-background-gradient': gradientValue,
-						[ gradientClass ]: gradientClass,
-					}
-				) }
-				style={ bgStyle }
-			/>
-
 			{ ! useFeaturedImage &&
 				isImageBackground &&
 				url &&
@@ -155,11 +138,39 @@ export default function save( { attributes } ) {
 					loop
 					playsInline
 					src={ url }
+					poster={ poster }
 					style={ { objectPosition } }
 					data-object-fit="cover"
 					data-object-position={ objectPosition }
 				/>
 			) }
+
+			{ /* The `wp-block-cover__background` needs to be immediately before
+			the `wp-block-cover__inner-container`, so the exclusion CSS selector
+			`.wp-block-cover__background + .wp-block-cover__inner-container`
+			works properly. If it needs to be changed in the future, the
+			selector for the backward compatibility for v14 deprecation also
+			needs change. */ }
+			<span
+				aria-hidden="true"
+				className={ clsx(
+					'wp-block-cover__background',
+					overlayColorClass,
+					dimRatioToClass( dimRatio ),
+					{
+						'has-background-dim': dimRatio !== undefined,
+						// For backwards compatibility. Former versions of the Cover Block applied
+						// `.wp-block-cover__gradient-background` in the presence of
+						// media, a gradient and a dim.
+						'wp-block-cover__gradient-background':
+							url && gradientValue && dimRatio !== 0,
+						'has-background-gradient': gradientValue,
+						[ gradientClass ]: gradientClass,
+					}
+				) }
+				style={ bgStyle }
+			/>
+
 			<div
 				{ ...useInnerBlocksProps.save( {
 					className: 'wp-block-cover__inner-container',

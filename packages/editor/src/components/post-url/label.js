@@ -12,7 +12,7 @@ import { store as editorStore } from '../../store';
 /**
  * Represents a label component for a post URL.
  *
- * @return {Component} The PostURLLabel component.
+ * @return {React.ReactNode} The PostURLLabel component.
  */
 export default function PostURLLabel() {
 	return usePostURLLabel();

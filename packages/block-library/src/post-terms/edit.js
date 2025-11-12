@@ -13,6 +13,7 @@ import {
 	useBlockProps,
 	useBlockDisplayInformation,
 	RichText,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { Spinner, TextControl } from '@wordpress/components';
@@ -46,6 +47,8 @@ export default function PostTermsEdit( {
 } ) {
 	const { term, textAlign, separator, prefix, suffix } = attributes;
 	const { postId, postType } = context;
+	const blockEditingMode = useBlockEditingMode();
+	const showControls = blockEditingMode === 'default';
 
 	const selectedTerm = useSelect(
 		( select ) => {
@@ -73,16 +76,19 @@ export default function PostTermsEdit( {
 
 	return (
 		<>
-			<BlockControls>
-				<AlignmentToolbar
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
-				/>
-			</BlockControls>
+			{ showControls && (
+				<BlockControls>
+					<AlignmentToolbar
+						value={ textAlign }
+						onChange={ ( nextAlign ) => {
+							setAttributes( { textAlign: nextAlign } );
+						} }
+					/>
+				</BlockControls>
+			) }
 			<InspectorControls group="advanced">
 				<TextControl
+					__next40pxDefaultSize
 					__nextHasNoMarginBottom
 					autoComplete="off"
 					label={ __( 'Separator' ) }
@@ -121,6 +127,7 @@ export default function PostTermsEdit( {
 								key={ postTerm.id }
 								href={ postTerm.link }
 								onClick={ ( event ) => event.preventDefault() }
+								rel="tag"
 							>
 								{ decodeEntities( postTerm.name ) }
 							</a>

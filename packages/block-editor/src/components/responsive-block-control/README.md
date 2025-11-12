@@ -27,9 +27,6 @@ import {
 	InspectorControls,
 	__experimentalResponsiveBlockControl as ResponsiveBlockControl,
 } from '@wordpress/block-editor';
-import {
-	DimensionControl,
-} from '@wordpress/components';
 
 registerBlockType( 'my-plugin/my-block', {
 	// ...
@@ -37,33 +34,13 @@ registerBlockType( 'my-plugin/my-block', {
 	edit( { attributes, setAttributes } ) {
 
 		const [ isResponsive, setIsResponsive ] = useState( false );
-
-		// Used for example purposes only
-		const sizeOptions = [
-			{
-				label: 'Small',
-				value: 'small',
-			},
-			{
-				label: 'Medium',
-				value: 'medium',
-			},
-			{
-				label: 'Large',
-				value: 'large',
-			},
-		];
-
 		const { paddingSize } = attributes;
 
-
 		// Your custom control can be anything you'd like to use.
-		// You are not restricted to `DimensionControl`s, but this
-		// makes life easier if dealing with standard CSS values.
-		// see `packages/components/src/dimension-control/README.md`
 		const paddingControl = ( labelComponent, viewport ) => {
 			return (
-				<DimensionControl
+				<input
+					type="number"
 					label={ viewport.label }
 					onChange={ // handle update to padding value here  }
 					value={ paddingSize }
@@ -154,7 +131,7 @@ const renderDefaultControl = ( labelComponent, viewport ) => {
 	// 	id: 'small',
 	// 	label: 'All'
 	// }
-	return <DimensionControl label={ labelComponent } />;
+	return <SelectControl label={ labelComponent } />;
 };
 ```
 

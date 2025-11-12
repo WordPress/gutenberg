@@ -23,7 +23,19 @@ import { list, grid } from '@wordpress/icons';
 
 const TEMPLATE = [
 	[ 'core/post-title' ],
-	[ 'core/post-date' ],
+	[
+		'core/post-date',
+		{
+			metadata: {
+				bindings: {
+					datetime: {
+						source: 'core/post-data',
+						args: { field: 'date' },
+					},
+				},
+			},
+		},
+	],
 	[ 'core/post-excerpt' ],
 ];
 
@@ -90,6 +102,7 @@ export default function PostTemplateEdit( {
 			taxQuery,
 			parents,
 			pages,
+			format,
 			// We gather extra query args to pass to the REST API call.
 			// This way extenders of Query Loop can add their own query args,
 			// and have accurate previews in the editor.
@@ -117,6 +130,15 @@ export default function PostTemplateEdit( {
 					per_page: 1,
 					_fields: [ 'id' ],
 					slug: templateSlug.replace( 'category-', '' ),
+				} );
+			const templateTag =
+				inherit &&
+				templateSlug?.startsWith( 'tag-' ) &&
+				getEntityRecords( 'taxonomy', 'post_tag', {
+					context: 'view',
+					per_page: 1,
+					_fields: [ 'id' ],
+					slug: templateSlug.replace( 'tag-', '' ),
 				} );
 			const query = {
 				offset: offset || 0,
@@ -163,25 +185,49 @@ export default function PostTemplateEdit( {
 			if ( parents?.length ) {
 				query.parent = parents;
 			}
-			// If sticky is not set, it will return all posts in the results.
-			// If sticky is set to `only`, it will limit the results to sticky posts only.
-			// If it is anything else, it will exclude sticky posts from results. For the record the value stored is `exclude`.
-			if ( sticky ) {
+			if ( format?.length ) {
+				query.format = format;
+			}
+
+			/*
+			 * Handle cases where sticky is set to `exclude` or `only`.
+			 * Which works as a `post__in/post__not_in` query for sticky posts.
+			 */
+			if ( [ 'exclude', 'only' ].includes( sticky ) ) {
 				query.sticky = sticky === 'only';
 			}
+
+			// Empty string represents the default behavior of including sticky posts.
+			if ( [ '', 'ignore' ].includes( sticky ) ) {
+				// Remove any leftover sticky query parameter.
+				delete query.sticky;
+				query.ignore_sticky = sticky === 'ignore';
+			}
+
 			// If `inherit` is truthy, adjust conditionally the query to create a better preview.
+			let currentPostType = postType;
 			if ( inherit ) {
 				// Change the post-type if needed.
 				if ( templateSlug?.startsWith( 'archive-' ) ) {
 					query.postType = templateSlug.replace( 'archive-', '' );
-					postType = query.postType;
+					currentPostType = query.postType;
 				} else if ( templateCategory ) {
 					query.categories = templateCategory[ 0 ]?.id;
+				} else if ( templateTag ) {
+					query.tags = templateTag[ 0 ]?.id;
+				} else if (
+					templateSlug?.startsWith( 'taxonomy-post_format' )
+				) {
+					// Get the post format slug from the template slug by removing the prefix.
+					query.format = templateSlug.replace(
+						'taxonomy-post_format-post-format-',
+						''
+					);
 				}
 			}
 			// When we preview Query Loop blocks we should prefer the current
 			// block's postType, which is passed through block context.
-			const usedPostType = previewPostType || postType;
+			const usedPostType = previewPostType || currentPostType;
 			return {
 				posts: getEntityRecords( 'postType', usedPostType, {
 					...query,
@@ -205,6 +251,7 @@ export default function PostTemplateEdit( {
 			templateSlug,
 			taxQuery,
 			parents,
+			format,
 			restQueryArgs,
 			previewPostType,
 		]

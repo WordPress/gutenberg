@@ -6,6 +6,7 @@ import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { decodeEntities } from '@wordpress/html-entities';
+import { __ } from '@wordpress/i18n';
 import {
 	cloneBlock,
 	getBlockSupport,
@@ -13,6 +14,7 @@ import {
 } from '@wordpress/blocks';
 
 /** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
+/** @typedef {import('@wordpress/components/build-types/query-controls/types').OrderByOption} OrderByOption */
 
 /**
  * @typedef IHasNameAndId
@@ -81,7 +83,7 @@ export const getValueFromObjectPath = ( object, path ) => {
  *
  * @param {Object[]} entities The array of entities.
  * @param {string}   path     The path to map a `name` property from the entity.
- * @return {IHasNameAndId[]} An array of enitities that now implement the `IHasNameAndId` interface.
+ * @return {IHasNameAndId[]} An array of entities that now implement the `IHasNameAndId` interface.
  */
 export const mapToIHasNameAndId = ( entities, path ) => {
 	return ( entities || [] ).map( ( entity ) => ( {
@@ -94,6 +96,7 @@ export const mapToIHasNameAndId = ( entities, path ) => {
  * Returns a helper object that contains:
  * 1. An `options` object from the available post types, to be passed to a `SelectControl`.
  * 2. A helper map with available taxonomies per post type.
+ * 3. A helper map with post format support per post type.
  *
  * @return {Object} The helper object related to post types.
  */
@@ -124,7 +127,21 @@ export const usePostTypes = () => {
 			} ) ),
 		[ postTypes ]
 	);
-	return { postTypesTaxonomiesMap, postTypesSelectOptions };
+	const postTypeFormatSupportMap = useMemo( () => {
+		if ( ! postTypes?.length ) {
+			return {};
+		}
+		return postTypes.reduce( ( accumulator, type ) => {
+			accumulator[ type.slug ] =
+				type.supports?.[ 'post-formats' ] || false;
+			return accumulator;
+		}, {} );
+	}, [ postTypes ] );
+	return {
+		postTypesTaxonomiesMap,
+		postTypesSelectOptions,
+		postTypeFormatSupportMap,
+	};
 };
 
 /**
@@ -136,11 +153,15 @@ export const usePostTypes = () => {
 export const useTaxonomies = ( postType ) => {
 	const taxonomies = useSelect(
 		( select ) => {
-			const { getTaxonomies } = select( coreStore );
-			return getTaxonomies( {
-				type: postType,
-				per_page: -1,
-			} );
+			const { getTaxonomies, getPostType } = select( coreStore );
+			// Does the post type have taxonomies?
+			if ( getPostType( postType )?.taxonomies?.length > 0 ) {
+				return getTaxonomies( {
+					type: postType,
+					per_page: -1,
+				} );
+			}
+			return [];
 		},
 		[ postType ]
 	);
@@ -165,6 +186,62 @@ export function useIsPostTypeHierarchical( postType ) {
 		},
 		[ postType ]
 	);
+}
+
+/**
+ * List of avaiable options to order by.
+ *
+ * @param {string} postType The post type to check.
+ * @return {OrderByOption[]} List of order options.
+ */
+export function useOrderByOptions( postType ) {
+	const supportsCustomOrder = useSelect(
+		( select ) => {
+			const type = select( coreStore ).getPostType( postType );
+			return !! type?.supports?.[ 'page-attributes' ];
+		},
+		[ postType ]
+	);
+
+	return useMemo( () => {
+		const orderByOptions = [
+			{
+				label: __( 'Newest to oldest' ),
+				value: 'date/desc',
+			},
+			{
+				label: __( 'Oldest to newest' ),
+				value: 'date/asc',
+			},
+			{
+				/* translators: Label for ordering posts by title in ascending order. */
+				label: __( 'A → Z' ),
+				value: 'title/asc',
+			},
+			{
+				/* translators: Label for ordering posts by title in descending order. */
+				label: __( 'Z → A' ),
+				value: 'title/desc',
+			},
+		];
+
+		if ( supportsCustomOrder ) {
+			orderByOptions.push(
+				{
+					/* translators: Label for ordering posts by ascending menu order. */
+					label: __( 'Ascending by order' ),
+					value: 'menu_order/asc',
+				},
+				{
+					/* translators: Label for ordering posts by descending menu order. */
+					label: __( 'Descending by order' ),
+					value: 'menu_order/desc',
+				}
+			);
+		}
+
+		return orderByOptions;
+	}, [ supportsCustomOrder ] );
 }
 
 /**
@@ -213,6 +290,7 @@ export const getTransformedBlocksFromPattern = (
 ) => {
 	const {
 		query: { postType, inherit },
+		namespace,
 	} = queryBlockAttributes;
 	const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
 	const queryClientIds = [];
@@ -225,6 +303,9 @@ export const getTransformedBlocksFromPattern = (
 				postType,
 				inherit,
 			};
+			if ( namespace ) {
+				block.attributes.namespace = namespace;
+			}
 			queryClientIds.push( block.clientId );
 		}
 		block.innerBlocks?.forEach( ( innerBlock ) => {
@@ -249,32 +330,31 @@ export const getTransformedBlocksFromPattern = (
  * @return {string} The block name to be used in the patterns suggestions.
  */
 export function useBlockNameForPatterns( clientId, attributes ) {
-	const activeVariationName = useSelect(
-		( select ) =>
-			select( blocksStore ).getActiveBlockVariation(
-				'core/query',
-				attributes
-			)?.name,
-		[ attributes ]
-	);
-	const blockName = `core/query/${ activeVariationName }`;
-	const hasActiveVariationPatterns = useSelect(
+	return useSelect(
 		( select ) => {
+			const activeVariationName = select(
+				blocksStore
+			).getActiveBlockVariation( 'core/query', attributes )?.name;
+
 			if ( ! activeVariationName ) {
-				return false;
+				return 'core/query';
 			}
+
 			const { getBlockRootClientId, getPatternsByBlockTypes } =
 				select( blockEditorStore );
+
 			const rootClientId = getBlockRootClientId( clientId );
 			const activePatterns = getPatternsByBlockTypes(
-				blockName,
+				`core/query/${ activeVariationName }`,
 				rootClientId
 			);
-			return activePatterns.length > 0;
+
+			return activePatterns.length > 0
+				? `core/query/${ activeVariationName }`
+				: 'core/query';
 		},
-		[ clientId, activeVariationName, blockName ]
+		[ clientId, attributes ]
 	);
-	return hasActiveVariationPatterns ? blockName : 'core/query';
 }
 
 /**
@@ -354,31 +434,17 @@ export const usePatterns = ( clientId, name ) => {
 };
 
 /**
- * The object returned by useUnsupportedBlocks with info about the type of
- * unsupported blocks present inside the Query block.
- *
- * @typedef  {Object}  UnsupportedBlocksInfo
- * @property {boolean} hasBlocksFromPlugins True if blocks from plugins are present.
- * @property {boolean} hasPostContentBlock  True if a 'core/post-content' block is present.
- * @property {boolean} hasUnsupportedBlocks True if there are any unsupported blocks.
- */
-
-/**
- * Hook that returns an object with information about the unsupported blocks
- * present inside a Query Loop with the given `clientId`. The returned object
- * contains props that are true when a certain type of unsupported block is
- * present.
+ * Hook that, given a block clientId, determines if it has unsupported blocks or not.
  *
  * @param {string} clientId The block's client ID.
- * @return {UnsupportedBlocksInfo} The object containing the information.
+ * @return {boolean} True if there are any unsupported blocks.
  */
 export const useUnsupportedBlocks = ( clientId ) => {
 	return useSelect(
 		( select ) => {
 			const { getClientIdsOfDescendants, getBlockName } =
 				select( blockEditorStore );
-			const blocks = {};
-			getClientIdsOfDescendants( clientId ).forEach(
+			return getClientIdsOfDescendants( clientId ).some(
 				( descendantClientId ) => {
 					const blockName = getBlockName( descendantClientId );
 					/*
@@ -395,20 +461,43 @@ export const useUnsupportedBlocks = ( clientId ) => {
 							blockName,
 							'interactivity.clientNavigation'
 						);
-					const blockInteractivity =
-						blockSupportsInteractivity ||
-						blockSupportsInteractivityClientNavigation;
-					if ( ! blockInteractivity ) {
-						blocks.hasBlocksFromPlugins = true;
-					} else if ( blockName === 'core/post-content' ) {
-						blocks.hasPostContentBlock = true;
-					}
+
+					return (
+						! blockSupportsInteractivity &&
+						! blockSupportsInteractivityClientNavigation
+					);
 				}
 			);
-			blocks.hasUnsupportedBlocks =
-				blocks.hasBlocksFromPlugins || blocks.hasPostContentBlock;
-			return blocks;
 		},
 		[ clientId ]
 	);
 };
+
+/**
+ * Helper function that returns the query context from the editor based on the
+ * available template slug.
+ *
+ * @param {string} templateSlug Current template slug based on context.
+ * @return {Object} An object with isSingular and templateType properties.
+ */
+export function getQueryContextFromTemplate( templateSlug ) {
+	// In the Post Editor, the template slug is not available.
+	if ( ! templateSlug ) {
+		return { isSingular: true };
+	}
+	let isSingular = false;
+	let templateType = templateSlug === 'wp' ? 'custom' : templateSlug;
+	const singularTemplates = [ '404', 'blank', 'single', 'page', 'custom' ];
+	const templateTypeFromSlug = templateSlug.includes( '-' )
+		? templateSlug.split( '-', 1 )[ 0 ]
+		: templateSlug;
+	const queryFromTemplateSlug = templateSlug.includes( '-' )
+		? templateSlug.split( '-' ).slice( 1 ).join( '-' )
+		: '';
+	if ( queryFromTemplateSlug ) {
+		templateType = templateTypeFromSlug;
+	}
+	isSingular = singularTemplates.includes( templateType );
+
+	return { isSingular, templateType };
+}

@@ -21,7 +21,11 @@ function UnforwardedTreeGridCell(
 	return (
 		<td { ...props } role="gridcell">
 			{ withoutGridItem ? (
-				<>{ children }</>
+				<>
+					{ typeof children === 'function'
+						? children( { ...props, ref } )
+						: children }
+				</>
 			) : (
 				<TreeGridItem ref={ ref }>{ children }</TreeGridItem>
 			) }

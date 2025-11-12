@@ -2,12 +2,9 @@
  * WordPress dependencies
  */
 import { Draggable } from '@wordpress/components';
-import {
-	createBlock,
-	serialize,
-	store as blocksStore,
-} from '@wordpress/blocks';
+import { createBlock, store as blocksStore } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -24,11 +21,6 @@ const InserterDraggableBlocks = ( {
 	children,
 	pattern,
 } ) => {
-	const transferData = {
-		type: 'inserter',
-		blocks,
-	};
-
 	const blockTypeIcon = useSelect(
 		( select ) => {
 			const { getBlockType } = select( blocksStore );
@@ -43,21 +35,36 @@ const InserterDraggableBlocks = ( {
 		useDispatch( blockEditorStore )
 	);
 
+	const patternBlock = useMemo( () => {
+		return pattern?.type === INSERTER_PATTERN_TYPES.user &&
+			pattern?.syncStatus !== 'unsynced'
+			? [ createBlock( 'core/block', { ref: pattern.id } ) ]
+			: undefined;
+	}, [ pattern?.type, pattern?.syncStatus, pattern?.id ] );
+
+	if ( ! isEnabled ) {
+		return children( {
+			draggable: false,
+			onDragStart: undefined,
+			onDragEnd: undefined,
+		} );
+	}
+
+	const draggableBlocks = patternBlock ?? blocks;
 	return (
 		<Draggable
 			__experimentalTransferDataType="wp-blocks"
-			transferData={ transferData }
+			transferData={ { type: 'inserter', blocks: draggableBlocks } }
 			onDragStart={ ( event ) => {
 				startDragging();
-				const parsedBlocks =
-					pattern?.type === INSERTER_PATTERN_TYPES.user &&
-					pattern?.syncStatus !== 'unsynced'
-						? [ createBlock( 'core/block', { ref: pattern.id } ) ]
-						: blocks;
-				event.dataTransfer.setData(
-					'text/html',
-					serialize( parsedBlocks )
-				);
+				for ( const block of draggableBlocks ) {
+					const type = `wp-block:${ block.name }`;
+					// This will fill in the dataTransfer.types array so that
+					// the drop zone can check if the draggable is eligible.
+					// Unfortuantely, on drag start, we don't have access to the
+					// actual data, only the data keys/types.
+					event.dataTransfer.items.add( '', type );
+				}
 			} }
 			onDragEnd={ () => {
 				stopDragging();
@@ -72,9 +79,9 @@ const InserterDraggableBlocks = ( {
 		>
 			{ ( { onDraggableStart, onDraggableEnd } ) => {
 				return children( {
-					draggable: isEnabled,
-					onDragStart: isEnabled ? onDraggableStart : undefined,
-					onDragEnd: isEnabled ? onDraggableEnd : undefined,
+					draggable: true,
+					onDragStart: onDraggableStart,
+					onDragEnd: onDraggableEnd,
 				} );
 			} }
 		</Draggable>

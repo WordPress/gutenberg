@@ -15,7 +15,7 @@ import EditorStyles from '../editor-styles';
 import { store } from '../../store';
 
 // This is used to avoid rendering the block list if the sizes change.
-let MemoizedBlockList;
+const MemoizedBlockList = memo( BlockList );
 
 const MAX_HEIGHT = 2000;
 const EMPTY_ADDITIONAL_STYLES = [];
@@ -54,9 +54,6 @@ function ScaledBlockPreview( {
 
 		return styles;
 	}, [ styles, additionalStyles ] );
-
-	// Initialize on render instead of module top level, to avoid circular dependency issues.
-	MemoizedBlockList = MemoizedBlockList || memo( BlockList );
 
 	const scale = containerWidth / viewportWidth;
 	const aspectRatio = contentHeight

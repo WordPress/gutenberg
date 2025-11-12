@@ -21,9 +21,9 @@ const meta: Meta< typeof Placeholder > = {
 	component: Placeholder,
 	title: 'Components/Placeholder',
 	argTypes: {
-		children: { control: { type: null } },
-		notices: { control: { type: null } },
-		preview: { control: { type: null } },
+		children: { control: false },
+		notices: { control: false },
+		preview: { control: false },
 		icon: {
 			control: { type: 'select' },
 			options: Object.keys( ICONS ),
@@ -45,6 +45,7 @@ const Template: StoryFn< typeof Placeholder > = ( args ) => {
 			<div>
 				<TextControl
 					__nextHasNoMarginBottom
+					__next40pxDefaultSize
 					label="Sample Field"
 					placeholder="Enter something here"
 					value={ value }

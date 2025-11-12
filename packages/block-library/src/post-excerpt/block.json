@@ -11,7 +11,8 @@
 			"type": "string"
 		},
 		"moreText": {
-			"type": "string"
+			"type": "string",
+			"role": "content"
 		},
 		"showMoreOnNewLine": {
 			"type": "boolean",
@@ -23,6 +24,9 @@
 		}
 	},
 	"usesContext": [ "postId", "postType", "queryId" ],
+	"example": {
+		"viewportWidth": 350
+	},
 	"supports": {
 		"html": false,
 		"color": {
@@ -53,6 +57,18 @@
 		},
 		"interactivity": {
 			"clientNavigation": true
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true,
+			"__experimentalDefaultControls": {
+				"radius": true,
+				"color": true,
+				"width": true,
+				"style": true
+			}
 		}
 	},
 	"editorStyle": "wp-block-post-excerpt-editor",

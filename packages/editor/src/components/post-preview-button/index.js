@@ -112,7 +112,7 @@ function writeInterstitialMessage( targetDocument ) {
  * @param {string}   props.role                The role attribute for the button.
  * @param {Function} props.onPreview           The callback function for preview event.
  *
- * @return {JSX.Element|null} The rendered button component.
+ * @return {React.ReactNode} The rendered button component.
  */
 export default function PostPreviewButton( {
 	className,
@@ -129,13 +129,17 @@ export default function PostPreviewButton( {
 			const postType = core.getPostType(
 				editor.getCurrentPostType( 'type' )
 			);
+			const canView = postType?.viewable ?? false;
+			if ( ! canView ) {
+				return { isViewable: canView };
+			}
 
 			return {
 				postId: editor.getCurrentPostId(),
 				currentPostLink: editor.getCurrentPostAttribute( 'link' ),
 				previewLink: editor.getEditedPostPreviewLink(),
 				isSaveable: editor.isEditedPostSaveable(),
-				isViewable: postType?.viewable ?? false,
+				isViewable: canView,
 			};
 		}, [] );
 
@@ -183,7 +187,7 @@ export default function PostPreviewButton( {
 			className={ className || 'editor-post-preview' }
 			href={ href }
 			target={ targetId }
-			__experimentalIsFocusable
+			accessibleWhenDisabled
 			disabled={ ! isSaveable }
 			onClick={ openPreviewWindow }
 			role={ role }

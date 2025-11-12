@@ -1,50 +1,36 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useState, useEffect, createPortal } from '@wordpress/element';
+import { useObservableValue } from '@wordpress/compose';
+import {
+	useContext,
+	useRef,
+	useEffect,
+	createPortal,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import useSlot from './use-slot';
+import SlotFillContext from './slot-fill-context';
 import StyleProvider from '../../style-provider';
 import type { FillComponentProps } from '../types';
 
-function useForceUpdate() {
-	const [ , setState ] = useState( {} );
-	const mounted = useRef( true );
+export default function Fill( { name, children }: FillComponentProps ) {
+	const registry = useContext( SlotFillContext );
+	const slot = useObservableValue( registry.slots, name );
+	const instanceRef = useRef( {} );
 
+	// We register fills so we can keep track of their existence.
+	// Slots can use the `useSlotFills` hook to know if there're already fills
+	// registered so they can choose to render themselves or not.
 	useEffect( () => {
-		mounted.current = true;
-		return () => {
-			mounted.current = false;
-		};
-	}, [] );
+		const instance = instanceRef.current;
+		registry.registerFill( name, instance );
+		return () => registry.unregisterFill( name, instance );
+	}, [ registry, name ] );
 
-	return () => {
-		if ( mounted.current ) {
-			setState( {} );
-		}
-	};
-}
-
-export default function Fill( props: FillComponentProps ) {
-	const { name, children } = props;
-	const { registerFill, unregisterFill, ...slot } = useSlot( name );
-	const rerender = useForceUpdate();
-	const ref = useRef( { rerender } );
-
-	useEffect( () => {
-		// We register fills so we can keep track of their existence.
-		// Some Slot implementations need to know if there're already fills
-		// registered so they can choose to render themselves or not.
-		registerFill( ref );
-		return () => {
-			unregisterFill( ref );
-		};
-	}, [ registerFill, unregisterFill ] );
-
-	if ( ! slot.ref || ! slot.ref.current ) {
+	if ( ! slot || ! slot.ref.current ) {
 		return null;
 	}
 

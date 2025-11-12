@@ -23,6 +23,7 @@ const defaultAttributes = {
 	opacity: 'alpha-channel',
 	style: {},
 	className: '',
+	tagName: 'hr',
 };
 const defaultProps = {
 	attributes: defaultAttributes,

@@ -9,6 +9,7 @@ import { createContext } from '@wordpress/element';
 import defaultRegistry from '../../default-registry';
 
 export const Context = createContext( defaultRegistry );
+Context.displayName = 'RegistryProviderContext';
 
 const { Consumer, Provider } = Context;
 
@@ -17,7 +18,7 @@ const { Consumer, Provider } = Context;
  * children components. Used along with the RegistryProvider.
  *
  * You can read more about the react context api here:
- * https://reactjs.org/docs/context.html#contextprovider
+ * https://react.dev/learn/passing-data-deeply-with-context#step-3-provide-the-context
  *
  * @example
  * ```js

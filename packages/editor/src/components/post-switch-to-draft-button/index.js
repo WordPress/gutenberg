@@ -18,7 +18,7 @@ import { store as editorStore } from '../../store';
 /**
  * Renders a button component that allows the user to switch a post to draft status.
  *
- * @return {JSX.Element} The rendered component.
+ * @return {React.ReactNode} The rendered component.
  */
 export default function PostSwitchToDraftButton() {
 	deprecated( 'wp.editor.PostSwitchToDraftButton', {

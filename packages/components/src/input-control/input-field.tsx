@@ -9,7 +9,6 @@ import type {
 	PointerEvent,
 	FocusEvent,
 	ForwardedRef,
-	MouseEvent,
 } from 'react';
 
 /**
@@ -187,22 +186,6 @@ function InputField(
 	);
 
 	const dragProps = isDragEnabled ? dragGestureProps() : {};
-	/*
-	 * Works around the odd UA (e.g. Firefox) that does not focus inputs of
-	 * type=number when their spinner arrows are pressed.
-	 */
-	let handleOnMouseDown;
-	if ( type === 'number' ) {
-		handleOnMouseDown = ( event: MouseEvent< HTMLInputElement > ) => {
-			props.onMouseDown?.( event );
-			if (
-				event.currentTarget !==
-				event.currentTarget.ownerDocument.activeElement
-			) {
-				event.currentTarget.focus();
-			}
-		};
-	}
 
 	return (
 		<Input
@@ -216,7 +199,6 @@ function InputField(
 			onBlur={ handleOnBlur }
 			onChange={ handleOnChange }
 			onKeyDown={ withIgnoreIMEEvents( handleOnKeyDown ) }
-			onMouseDown={ handleOnMouseDown }
 			ref={ ref }
 			inputSize={ size }
 			// Fallback to `''` to avoid "uncontrolled to controlled" warning.

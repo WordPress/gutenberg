@@ -80,9 +80,7 @@ test.describe( 'Change detection', () => {
 
 		// Toggle post as needing review (not persisted for autosave).
 		await editor.openDocumentSettingsSidebar();
-		await page
-			.getByRole( 'button', { name: 'Change post status:' } )
-			.click();
+		await page.getByRole( 'button', { name: 'Change status:' } ).click();
 		await page.getByRole( 'radio', { name: 'Pending' } ).click();
 		// Force autosave to occur immediately.
 		await Promise.all( [
@@ -245,7 +243,7 @@ test.describe( 'Change detection', () => {
 		await expect(
 			page
 				.getByRole( 'region', { name: 'Editor content' } )
-				.getByText( 'Updating failed. You are probably offline.' )
+				.getByText( 'Updating failed because you were offline.' )
 		).toBeVisible();
 		await expect(
 			page
@@ -416,7 +414,7 @@ test.describe( 'Change detection', () => {
 			.click();
 		await page
 			.getByRole( 'menu' )
-			.getByRole( 'menuitem', { name: 'Move to Trash' } )
+			.getByRole( 'menuitem', { name: 'Trash' } )
 			.click();
 		await page
 			.getByRole( 'dialog' )

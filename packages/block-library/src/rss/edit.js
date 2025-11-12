@@ -9,18 +9,26 @@ import {
 import {
 	Button,
 	Disabled,
-	PanelBody,
 	Placeholder,
 	RangeControl,
 	ToggleControl,
 	ToolbarGroup,
+	TextControl,
+	ExternalLink,
 	__experimentalInputControl as InputControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { useState } from '@wordpress/element';
-import { grid, list, edit, rss } from '@wordpress/icons';
+import { createInterpolateElement, useState } from '@wordpress/element';
+import { grid, list, pencil, rss } from '@wordpress/icons';
 import { __, _x } from '@wordpress/i18n';
 import { prependHTTP } from '@wordpress/url';
 import ServerSideRender from '@wordpress/server-side-render';
+
+/**
+ * Internal dependencies
+ */
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const DEFAULT_MIN_ITEMS = 1;
 const DEFAULT_MAX_ITEMS = 20;
@@ -37,7 +45,11 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 		excerptLength,
 		feedURL,
 		itemsToShow,
+		openInNewTab,
+		rel,
 	} = attributes;
+
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	function toggleAttribute( propName ) {
 		return () => {
@@ -77,6 +89,7 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 						<InputControl
 							__next40pxDefaultSize
 							label={ label }
+							type="url"
 							hideLabelFromVision
 							placeholder={ __( 'Enter URL here…' ) }
 							value={ feedURL }
@@ -100,7 +113,7 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 
 	const toolbarControls = [
 		{
-			icon: edit,
+			icon: pencil,
 			title: __( 'Edit RSS URL' ),
 			onClick: () => setIsEditing( true ),
 		},
@@ -118,78 +131,197 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 		},
 	];
 
+	/*
+	 * This function merges the existing attributes with additional style properties.
+	 * The `border` and `spacing` properties are set to `undefined` to ensure that
+	 * these styles are reset and not applied on the server side.
+	 */
+	const serverSideAttributes = {
+		...attributes,
+		style: {
+			...attributes?.style,
+			border: undefined,
+			spacing: undefined,
+		},
+	};
 	return (
 		<>
 			<BlockControls>
 				<ToolbarGroup controls={ toolbarControls } />
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Settings' ) }>
-					<RangeControl
-						__nextHasNoMarginBottom
-						__next40pxDefaultSize
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ () => {
+						setAttributes( {
+							itemsToShow: 5,
+							displayAuthor: false,
+							displayDate: false,
+							displayExcerpt: false,
+							excerptLength: 55,
+							columns: 2,
+							openInNewTab: false,
+						} );
+					} }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					<ToolsPanelItem
 						label={ __( 'Number of items' ) }
-						value={ itemsToShow }
-						onChange={ ( value ) =>
-							setAttributes( { itemsToShow: value } )
-						}
-						min={ DEFAULT_MIN_ITEMS }
-						max={ DEFAULT_MAX_ITEMS }
-						required
-					/>
-					<ToggleControl
-						__nextHasNoMarginBottom
+						hasValue={ () => itemsToShow !== 5 }
+						onDeselect={ () => setAttributes( { itemsToShow: 5 } ) }
+						isShownByDefault
+					>
+						<RangeControl
+							__nextHasNoMarginBottom
+							__next40pxDefaultSize
+							label={ __( 'Number of items' ) }
+							value={ itemsToShow }
+							onChange={ ( value ) =>
+								setAttributes( { itemsToShow: value } )
+							}
+							min={ DEFAULT_MIN_ITEMS }
+							max={ DEFAULT_MAX_ITEMS }
+							required
+						/>
+					</ToolsPanelItem>
+
+					<ToolsPanelItem
 						label={ __( 'Display author' ) }
-						checked={ displayAuthor }
-						onChange={ toggleAttribute( 'displayAuthor' ) }
-					/>
-					<ToggleControl
-						__nextHasNoMarginBottom
+						hasValue={ () => !! displayAuthor }
+						onDeselect={ () =>
+							setAttributes( { displayAuthor: false } )
+						}
+						isShownByDefault
+					>
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Display author' ) }
+							checked={ displayAuthor }
+							onChange={ toggleAttribute( 'displayAuthor' ) }
+						/>
+					</ToolsPanelItem>
+
+					<ToolsPanelItem
 						label={ __( 'Display date' ) }
-						checked={ displayDate }
-						onChange={ toggleAttribute( 'displayDate' ) }
-					/>
-					<ToggleControl
-						__nextHasNoMarginBottom
+						hasValue={ () => !! displayDate }
+						onDeselect={ () =>
+							setAttributes( { displayDate: false } )
+						}
+						isShownByDefault
+					>
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Display date' ) }
+							checked={ displayDate }
+							onChange={ toggleAttribute( 'displayDate' ) }
+						/>
+					</ToolsPanelItem>
+
+					<ToolsPanelItem
 						label={ __( 'Display excerpt' ) }
-						checked={ displayExcerpt }
-						onChange={ toggleAttribute( 'displayExcerpt' ) }
-					/>
+						hasValue={ () => !! displayExcerpt }
+						onDeselect={ () =>
+							setAttributes( { displayExcerpt: false } )
+						}
+						isShownByDefault
+					>
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Display excerpt' ) }
+							checked={ displayExcerpt }
+							onChange={ toggleAttribute( 'displayExcerpt' ) }
+						/>
+					</ToolsPanelItem>
+
 					{ displayExcerpt && (
-						<RangeControl
-							__nextHasNoMarginBottom
-							__next40pxDefaultSize
+						<ToolsPanelItem
 							label={ __( 'Max number of words in excerpt' ) }
-							value={ excerptLength }
-							onChange={ ( value ) =>
-								setAttributes( { excerptLength: value } )
+							hasValue={ () => excerptLength !== 55 }
+							onDeselect={ () =>
+								setAttributes( { excerptLength: 55 } )
 							}
-							min={ 10 }
-							max={ 100 }
-							required
-						/>
+							isShownByDefault
+						>
+							<RangeControl
+								__nextHasNoMarginBottom
+								__next40pxDefaultSize
+								label={ __( 'Max number of words in excerpt' ) }
+								value={ excerptLength }
+								onChange={ ( value ) =>
+									setAttributes( { excerptLength: value } )
+								}
+								min={ 10 }
+								max={ 100 }
+								required
+							/>
+						</ToolsPanelItem>
 					) }
+
 					{ blockLayout === 'grid' && (
-						<RangeControl
-							__nextHasNoMarginBottom
-							__next40pxDefaultSize
+						<ToolsPanelItem
 							label={ __( 'Columns' ) }
-							value={ columns }
-							onChange={ ( value ) =>
-								setAttributes( { columns: value } )
-							}
-							min={ 2 }
-							max={ 6 }
-							required
-						/>
+							hasValue={ () => columns !== 2 }
+							onDeselect={ () => setAttributes( { columns: 2 } ) }
+							isShownByDefault
+						>
+							<RangeControl
+								__nextHasNoMarginBottom
+								__next40pxDefaultSize
+								label={ __( 'Columns' ) }
+								value={ columns }
+								onChange={ ( value ) =>
+									setAttributes( { columns: value } )
+								}
+								min={ 2 }
+								max={ 6 }
+								required
+							/>
+						</ToolsPanelItem>
 					) }
-				</PanelBody>
+
+					<ToolsPanelItem
+						label={ __( 'Open links in new tab' ) }
+						hasValue={ () => !! openInNewTab }
+						onDeselect={ () =>
+							setAttributes( { openInNewTab: false } )
+						}
+						isShownByDefault
+					>
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Open links in new tab' ) }
+							checked={ openInNewTab }
+							onChange={ ( value ) =>
+								setAttributes( { openInNewTab: value } )
+							}
+						/>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			</InspectorControls>
+			<InspectorControls group="advanced">
+				<TextControl
+					__next40pxDefaultSize
+					__nextHasNoMarginBottom
+					label={ __( 'Link relation' ) }
+					help={ createInterpolateElement(
+						__(
+							'The <a>Link Relation</a> attribute defines the relationship between a linked resource and the current document.'
+						),
+						{
+							a: (
+								<ExternalLink href="https://developer.mozilla.org/docs/Web/HTML/Attributes/rel" />
+							),
+						}
+					) }
+					value={ rel || '' }
+					onChange={ ( value ) => setAttributes( { rel: value } ) }
+				/>
 			</InspectorControls>
 			<div { ...blockProps }>
 				<Disabled>
 					<ServerSideRender
 						block="core/rss"
-						attributes={ attributes }
+						attributes={ serverSideAttributes }
 					/>
 				</Disabled>
 			</div>

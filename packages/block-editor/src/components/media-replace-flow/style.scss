@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
 // Hack to hide when the media modal is open
 // Otherwise in Firefox the popover remains visible on top of the modal
 // Changing the z-index of Popovers have wider implications.
@@ -9,16 +12,16 @@
 	margin-left: 4px;
 }
 
+.block-editor-media-replace-flow__media-upload-menu:not(:empty) + .block-editor-media-flow__url-input {
+	border-top: $border-width solid $gray-900;
+	margin-top: $grid-unit-10;
+	padding-bottom: $grid-unit-10;
+}
+
 .block-editor-media-flow__url-input {
 	margin-right: -$grid-unit-10;
 	margin-left: -$grid-unit-10;
 	padding: $grid-unit-20;
-
-	&.has-siblings {
-		border-top: $border-width solid $gray-900;
-		margin-top: $grid-unit-10;
-		padding-bottom: $grid-unit-10;
-	}
 
 	.block-editor-media-replace-flow__image-url-label {
 		display: block;
@@ -32,12 +35,6 @@
 		.block-editor-url-input {
 			padding: 0; // Cancel unnecessary default 1px padding in this case.
 			margin: 0; // Reset default LinkControl margins.
-		}
-
-		.block-editor-link-control__search-item-title,
-		.block-editor-link-control__search-item-info {
-			max-width: 200px;
-			white-space: nowrap;
 		}
 
 		.block-editor-link-control__tools {

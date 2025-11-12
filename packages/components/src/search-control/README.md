@@ -76,6 +76,8 @@ A function that receives the value of the input.
 
 #### onClose
 
+_Note: this prop is deprecated._
+
 When an `onClose` callback is provided, the search control will render a close button that will trigger the given callback.
 
 Use this if you want the button to trigger your own logic to close the search field entirely, rather than just clearing the input value.

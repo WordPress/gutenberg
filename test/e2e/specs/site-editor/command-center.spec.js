@@ -9,7 +9,10 @@ test.describe( 'Site editor command palette', () => {
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
+		await Promise.all( [
+			requestUtils.activateTheme( 'twentytwentyone' ),
+			requestUtils.deleteAllPages(),
+		] );
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
@@ -18,20 +21,29 @@ test.describe( 'Site editor command palette', () => {
 	} );
 
 	test( 'Open the command palette and navigate to the page create page', async ( {
-		page,
 		editor,
+		page,
 	} ) => {
+		await editor.setPreferences( 'core/edit-post', {
+			welcomeGuide: false,
+		} );
+
 		await page
 			.getByRole( 'button', { name: 'Open command palette' } )
-			.focus();
-		await page.keyboard.press( 'Meta+k' );
-		await page.keyboard.type( 'new page' );
-		await page.getByRole( 'option', { name: 'Add new page' } ).click();
+			.click();
+		await page
+			.getByRole( 'combobox', { name: 'Search commands and settings' } )
+			.fill( 'add page' );
+		await page
+			.getByRole( 'option', { name: 'Go to: Pages > Add Page' } )
+			.click();
 		await expect( page ).toHaveURL(
-			'/wp-admin/post-new.php?post_type=page'
+			/\/wp-admin\/post-new.php\?post_type=page/
 		);
 		await expect(
-			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
+			page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'No title · Page' } )
 		).toBeVisible();
 	} );
 
@@ -47,7 +59,7 @@ test.describe( 'Site editor command palette', () => {
 			page
 				.getByRole( 'region', { name: 'Editor top bar' } )
 				.getByRole( 'heading', { level: 1 } )
-		).toHaveText( 'Index' );
+		).toContainText( 'Index' );
 	} );
 
 	test( 'Open the command palette and navigate to Customize CSS', async ( {
@@ -56,12 +68,8 @@ test.describe( 'Site editor command palette', () => {
 		await page
 			.getByRole( 'button', { name: 'Open command palette' } )
 			.click();
-		await page.keyboard.type( 'Customize' );
-		await page.getByRole( 'option', { name: 'customize css' } ).click();
-		await expect(
-			page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByLabel( 'Additional CSS' )
-		).toBeVisible();
+		await page.keyboard.type( 'custom CSS' );
+		await page.getByRole( 'option', { name: 'Open custom CSS' } ).click();
+		await expect( page.getByLabel( 'Additional CSS' ) ).toBeVisible();
 	} );
 } );

@@ -64,7 +64,7 @@ It is recommended to use the main `wp-polyfill` script handle which takes care o
 | [Fetch Polyfill](https://www.npmjs.com/package/whatwg-fetch)              | wp-polyfill-fetch           | Polyfill that implements a subset of the standard Fetch specification                                |
 | [Promise Polyfill](https://www.npmjs.com/package/promise-polyfill)        | wp-polyfill-promise         | Lightweight ES6 Promise polyfill for the browser and node                                            |
 | [Formdata Polyfill](https://www.npmjs.com/package/formdata-polyfill)      | wp-polyfill-formdata        | Polyfill conditionally replaces the native implementation                                            |
-| [Node Contains Polyfill](https://polyfill.io)                             | wp-polyfill-node-contains   | Polyfill for Node.contains                                                                           |
+| [Node Contains Polyfill](https://www.npmjs.com/package/polyfill-library)  | wp-polyfill-node-contains   | Polyfill for Node.contains                                                                           |
 | [Element Closest Polyfill](https://www.npmjs.com/package/element-closest) | wp-polyfill-element-closest | Return the closest element matching a selector up the DOM tree                                       |
 
 ## Bundling and code sharing

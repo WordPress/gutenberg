@@ -45,13 +45,6 @@ test.describe( 'Site editor navigation', () => {
 			page.getByRole( 'button', { name: 'Pages' } )
 		).toBeFocused();
 
-		// Navigate to the Saved button first, as it precedes the editor iframe.
-		await editorNavigationUtils.tabToLabel( 'Saved' );
-		const savedButton = page.getByRole( 'button', {
-			name: 'Saved',
-		} );
-		await expect( savedButton ).toBeFocused();
-
 		// Get the iframe when it has a role=button and Edit label.
 		const editorCanvasRegion = page.getByRole( 'region', {
 			name: 'Editor content',
@@ -59,6 +52,15 @@ test.describe( 'Site editor navigation', () => {
 		const editorCanvasButton = editorCanvasRegion.getByRole( 'button', {
 			name: 'Edit',
 		} );
+
+		await expect( editorCanvasButton ).toBeVisible();
+
+		// Navigate to the Saved button first, as it precedes the editor iframe.
+		await editorNavigationUtils.tabToLabel( 'Saved' );
+		const savedButton = page.getByRole( 'button', {
+			name: 'Saved',
+		} );
+		await expect( savedButton ).toBeFocused();
 
 		// Test that there are no tab stops between the Saved button and the
 		// focusable iframe with role=button.
@@ -83,19 +85,6 @@ test.describe( 'Site editor navigation', () => {
 		// The button role should have been removed from the iframe.
 		await expect( editorCanvasButton ).toBeHidden();
 
-		// Test to make sure a Tab keypress works as expected.
-		// As of this writing, we are in select mode and a tab
-		// keypress will reveal the header template select mode
-		// button. This test is not documenting that we _want_
-		// that action, but checking that we are within the site
-		// editor and keypresses work as intened.
-		await pageUtils.pressKeys( 'Tab' );
-		await expect(
-			page.getByRole( 'button', {
-				name: 'Template Part Block. Row 1. header',
-			} )
-		).toBeFocused();
-
 		// Test: We can go back to the main navigation from the editor frame
 		// Move to the document toolbar
 		await pageUtils.pressKeys( 'alt+F10' );
@@ -116,6 +105,23 @@ test.describe( 'Site editor navigation', () => {
 		).toBeFocused();
 		// We should have our editor canvas button back
 		await expect( editorCanvasButton ).toBeVisible();
+	} );
+
+	test( 'Should show 404 page when navigating to non-existent template', async ( {
+		admin,
+		page,
+	} ) => {
+		// Navigate to a non-existent template.
+		await admin.visitAdminPage( 'site-editor.php', 'p=/template-foo-bar' );
+
+		// Verify the 404 error notice is displayed with the correct message.
+		await expect(
+			page.locator(
+				'.edit-site-layout__area .components-notice__content'
+			)
+		).toHaveText(
+			'The requested page could not be found. Please check the URL.'
+		);
 	} );
 } );
 

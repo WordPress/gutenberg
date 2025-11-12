@@ -29,7 +29,6 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import './store';
 import './filters';
 import * as widgetArea from './blocks/widget-area';
-
 import Layout from './components/layout';
 import {
 	ALLOW_REUSABLE_BLOCKS,

@@ -61,31 +61,45 @@ test.describe( 'Block Toolbar', () => {
 			await editor.insertBlock( { name: 'core/paragraph' } );
 			await page.keyboard.type( 'Paragraph' );
 			await BlockToolbarUtils.focusBlockToolbar();
-			await BlockToolbarUtils.expectLabelToHaveFocus( 'Paragraph' );
+			await expect(
+				page.getByRole( 'button', { name: 'Paragraph', exact: true } )
+			).toBeFocused();
 			// // Navigate to Align Text
 			await page.keyboard.press( 'ArrowRight' );
-			await BlockToolbarUtils.expectLabelToHaveFocus( 'Align text' );
+			await expect(
+				page.getByRole( 'button', { name: 'Align text', exact: true } )
+			).toBeFocused();
 			// // Open the dropdown
 			await page.keyboard.press( 'Enter' );
-			await BlockToolbarUtils.expectLabelToHaveFocus( 'Align text left' );
+			await expect(
+				page.getByRole( 'menuitemradio', { name: 'Align text left' } )
+			).toBeFocused();
 			await page.keyboard.press( 'ArrowDown' );
-			await BlockToolbarUtils.expectLabelToHaveFocus(
-				'Align text center'
-			);
+			await expect(
+				page.getByRole( 'menuitemradio', { name: 'Align text center' } )
+			).toBeFocused();
 			await page.keyboard.press( 'Escape' );
-			await BlockToolbarUtils.expectLabelToHaveFocus( 'Align text' );
+			await expect(
+				page.getByRole( 'button', { name: 'Align text', exact: true } )
+			).toBeFocused();
 
 			// Navigate to the Bold item. Testing items via the fills within the block toolbar are especially important
 			await page.keyboard.press( 'ArrowRight' );
-			await BlockToolbarUtils.expectLabelToHaveFocus( 'Bold' );
+			await expect(
+				page.getByRole( 'button', { name: 'Bold', exact: true } )
+			).toBeFocused();
 
 			await BlockToolbarUtils.focusBlock();
-			await BlockToolbarUtils.expectLabelToHaveFocus(
-				'Block: Paragraph'
-			);
+			await expect(
+				editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} )
+			).toBeFocused();
 
 			await BlockToolbarUtils.focusBlockToolbar();
-			await BlockToolbarUtils.expectLabelToHaveFocus( 'Bold' );
+			await expect(
+				page.getByRole( 'button', { name: 'Bold', exact: true } )
+			).toBeFocused();
 
 			await BlockToolbarUtils.focusBlock();
 
@@ -102,7 +116,9 @@ test.describe( 'Block Toolbar', () => {
 
 			// Go back to the toolbar and apply a formatting option
 			await BlockToolbarUtils.focusBlockToolbar();
-			await BlockToolbarUtils.expectLabelToHaveFocus( 'Bold' );
+			await expect(
+				page.getByRole( 'button', { name: 'Bold', exact: true } )
+			).toBeFocused();
 			await page.keyboard.press( 'Enter' );
 			// Should focus the selected text again
 			expect(
@@ -124,7 +140,7 @@ test.describe( 'Block Toolbar', () => {
 		await expect(
 			page
 				.getByRole( 'toolbar', { name: 'Block Tools' } )
-				.getByRole( 'button', { name: 'Paragraph' } )
+				.getByRole( 'button', { name: 'Paragraph', exact: true } )
 		).toBeFocused();
 	} );
 
@@ -136,8 +152,6 @@ test.describe( 'Block Toolbar', () => {
 		page,
 		pageUtils,
 	} ) => {
-		/* eslint-disable playwright/expect-expect */
-		/* eslint-disable playwright/no-wait-for-timeout */
 		// Set the fixed toolbar
 		await editor.setIsFixedToolbar( true );
 		// Insert a block with a lot of tool buttons
@@ -168,8 +182,6 @@ test.describe( 'Block Toolbar', () => {
 		// Test cleanup
 		await editor.setIsFixedToolbar( false );
 		await pageUtils.setBrowserViewport( 'large' );
-		/* eslint-enable playwright/expect-expect */
-		/* eslint-enable playwright/no-wait-for-timeout */
 	} );
 
 	test( 'Tab order of the block toolbar aligns with visual order', async ( {

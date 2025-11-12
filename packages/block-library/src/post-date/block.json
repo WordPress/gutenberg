@@ -4,9 +4,13 @@
 	"name": "core/post-date",
 	"title": "Date",
 	"category": "theme",
-	"description": "Display the publish date for an entry such as a post or page.",
+	"description": "Display a custom date.",
 	"textdomain": "default",
 	"attributes": {
+		"datetime": {
+			"type": "string",
+			"role": "content"
+		},
 		"textAlign": {
 			"type": "string"
 		},
@@ -15,14 +19,14 @@
 		},
 		"isLink": {
 			"type": "boolean",
-			"default": false
-		},
-		"displayType": {
-			"type": "string",
-			"default": "date"
+			"default": false,
+			"role": "content"
 		}
 	},
 	"usesContext": [ "postId", "postType", "queryId" ],
+	"example": {
+		"viewportWidth": 350
+	},
 	"supports": {
 		"html": false,
 		"color": {
@@ -53,6 +57,18 @@
 		},
 		"interactivity": {
 			"clientNavigation": true
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true,
+			"__experimentalDefaultControls": {
+				"radius": true,
+				"color": true,
+				"width": true,
+				"style": true
+			}
 		}
 	}
 }

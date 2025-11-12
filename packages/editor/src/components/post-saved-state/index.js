@@ -21,6 +21,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
 /**
  * Internal dependencies
  */
+import { STATUS_OPTIONS } from '../../components/post-status';
 import { store as editorStore } from '../../store';
 
 /**
@@ -104,10 +105,19 @@ export default function PostSavedState( { forceIsDirty } ) {
 		return null;
 	}
 
+	// We shouldn't render the button if the post has not one of the following statuses: pending, draft, auto-draft.
+	// The reason for this is that this button handles the `save as pending` and `save draft` actions.
+	// An exception for this is when the post has a custom status and there should be a way to save changes without
+	// having to publish. This should be handled better in the future when custom statuses have better support.
+	// @see https://github.com/WordPress/gutenberg/issues/3144.
+	const isIneligibleStatus =
+		! [ 'pending', 'draft', 'auto-draft' ].includes( postStatus ) &&
+		STATUS_OPTIONS.map( ( { value } ) => value ).includes( postStatus );
+
 	if (
 		isPublished ||
 		isScheduled ||
-		! [ 'pending', 'draft', 'auto-draft' ].includes( postStatus ) ||
+		isIneligibleStatus ||
 		( postStatusHasChanged &&
 			[ 'pending', 'draft' ].includes( postStatus ) )
 	) {

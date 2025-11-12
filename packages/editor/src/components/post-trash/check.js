@@ -8,32 +8,39 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import { GLOBAL_POST_TYPES } from '../../store/constants';
 
 /**
- * Wrapper component that renders its children only if the post can trashed.
+ * Wrapper component that renders its children only if the post can be trashed.
  *
- * @param {Object}  props          - The component props.
- * @param {Element} props.children - The child components to render.
+ * @param {Object}          props          The component props.
+ * @param {React.ReactNode} props.children The child components.
  *
- * @return {Component|null} The rendered child components or null if the post can not trashed.
+ * @return {React.ReactNode} The rendered child components or null if the post can't be trashed.
  */
 export default function PostTrashCheck( { children } ) {
 	const { canTrashPost } = useSelect( ( select ) => {
 		const { isEditedPostNew, getCurrentPostId, getCurrentPostType } =
 			select( editorStore );
-		const { getPostType, canUser } = select( coreStore );
-		const postType = getPostType( getCurrentPostType() );
+		const { canUser } = select( coreStore );
+		const postType = getCurrentPostType();
 		const postId = getCurrentPostId();
 		const isNew = isEditedPostNew();
-		const resource = postType?.rest_base || ''; // eslint-disable-line camelcase
-		const canUserDelete =
-			postId && resource ? canUser( 'delete', resource, postId ) : false;
+		const canUserDelete = !! postId
+			? canUser( 'delete', {
+					kind: 'postType',
+					name: postType,
+					id: postId,
+			  } )
+			: false;
 
 		return {
-			canTrashPost: ( ! isNew || postId ) && canUserDelete,
+			canTrashPost:
+				( ! isNew || postId ) &&
+				canUserDelete &&
+				! GLOBAL_POST_TYPES.includes( postType ),
 		};
 	}, [] );
-
 	if ( ! canTrashPost ) {
 		return null;
 	}

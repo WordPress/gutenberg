@@ -2,16 +2,13 @@
  * External dependencies
  */
 import type { ForwardedRef } from 'react';
-// eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
-// eslint-disable-next-line no-restricted-imports
-import { motion } from 'framer-motion';
 
 /**
  * WordPress dependencies
  */
-import { useReducedMotion, useInstanceId } from '@wordpress/compose';
-import { useMemo } from '@wordpress/element';
+import { useInstanceId } from '@wordpress/compose';
+import { useLayoutEffect, useMemo, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -28,12 +25,6 @@ import { useCx } from '../../utils/hooks';
 import Tooltip from '../../tooltip';
 
 const { ButtonContentView, LabelView } = styles;
-
-const REDUCED_MOTION_TRANSITION_CONFIG = {
-	duration: 0,
-};
-
-const LAYOUT_ID = 'toggle-group-backdrop-shared-layout-id';
 
 const WithToolTip = ( { showTooltip, text, children }: WithToolTipProps ) => {
 	if ( showTooltip && text ) {
@@ -54,11 +45,12 @@ function ToggleGroupControlOptionBase(
 			false
 		>,
 		// the element's id is generated internally
-		'id'
+		| 'id'
+		// due to how the component works, only the `disabled` prop should be used
+		| 'aria-disabled'
 	>,
 	forwardedRef: ForwardedRef< any >
 ) {
-	const shouldReduceMotion = useReducedMotion();
 	const toggleGroupControlContext = useToggleGroupControlContext();
 
 	const id = useInstanceId(
@@ -83,7 +75,7 @@ function ToggleGroupControlOptionBase(
 		value,
 		children,
 		showTooltip = false,
-		onFocus: onFocusProp,
+		disabled,
 		...otherButtonProps
 	} = buttonProps;
 
@@ -106,7 +98,6 @@ function ToggleGroupControlOptionBase(
 			),
 		[ cx, isDeselectable, isIcon, isPressed, size, className ]
 	);
-	const backdropClasses = useMemo( () => cx( styles.backdropView ), [ cx ] );
 
 	const buttonOnClick = () => {
 		if ( isDeselectable && isPressed ) {
@@ -123,8 +114,15 @@ function ToggleGroupControlOptionBase(
 		ref: forwardedRef,
 	};
 
+	const labelRef = useRef< HTMLDivElement | null >( null );
+	useLayoutEffect( () => {
+		if ( isPressed && labelRef.current ) {
+			toggleGroupControlContext.setSelectedElement( labelRef.current );
+		}
+	}, [ isPressed, toggleGroupControlContext ] );
+
 	return (
-		<LabelView className={ labelViewClasses }>
+		<LabelView ref={ labelRef } className={ labelViewClasses }>
 			<WithToolTip
 				showTooltip={ showTooltip }
 				text={ otherButtonProps[ 'aria-label' ] }
@@ -132,7 +130,7 @@ function ToggleGroupControlOptionBase(
 				{ isDeselectable ? (
 					<button
 						{ ...commonProps }
-						onFocus={ onFocusProp }
+						disabled={ disabled }
 						aria-pressed={ isPressed }
 						type="button"
 						onClick={ buttonOnClick }
@@ -141,40 +139,28 @@ function ToggleGroupControlOptionBase(
 					</button>
 				) : (
 					<Ariakit.Radio
-						render={
-							<button
-								type="button"
-								{ ...commonProps }
-								onFocus={ ( event ) => {
-									onFocusProp?.( event );
-									if ( event.defaultPrevented ) {
-										return;
-									}
-									toggleGroupControlContext.setValue( value );
-								} }
-							/>
-						}
+						disabled={ disabled }
+						onFocusVisible={ () => {
+							const selectedValueIsEmpty =
+								toggleGroupControlContext.value === null ||
+								toggleGroupControlContext.value === '';
+
+							// Conditions ensure that the first visible focus to a radio group
+							// without a selected option will not automatically select the option.
+							if (
+								! selectedValueIsEmpty ||
+								toggleGroupControlContext.activeItemIsNotFirstItem?.()
+							) {
+								toggleGroupControlContext.setValue( value );
+							}
+						} }
+						render={ <button type="button" { ...commonProps } /> }
 						value={ value }
 					>
 						<ButtonContentView>{ children }</ButtonContentView>
 					</Ariakit.Radio>
 				) }
 			</WithToolTip>
-			{ /* Animated backdrop using framer motion's shared layout animation */ }
-			{ isPressed ? (
-				<motion.div layout layoutRoot>
-					<motion.div
-						className={ backdropClasses }
-						transition={
-							shouldReduceMotion
-								? REDUCED_MOTION_TRANSITION_CONFIG
-								: undefined
-						}
-						role="presentation"
-						layoutId={ LAYOUT_ID }
-					/>
-				</motion.div>
-			) : null }
 		</LabelView>
 	);
 }

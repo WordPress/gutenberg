@@ -23,26 +23,28 @@ function createSlotRegistry(): SlotFillBubblesVirtuallyContext {
 		ref,
 		fillProps
 	) => {
-		const slot = slots.get( name );
-
-		slots.set( name, {
-			...slot,
-			ref: ref || slot?.ref,
-			fillProps: fillProps || slot?.fillProps || {},
-		} );
+		slots.set( name, { ref, fillProps } );
 	};
 
 	const unregisterSlot: SlotFillBubblesVirtuallyContext[ 'unregisterSlot' ] =
 		( name, ref ) => {
+			const slot = slots.get( name );
+			if ( ! slot ) {
+				return;
+			}
+
 			// Make sure we're not unregistering a slot registered by another element
 			// See https://github.com/WordPress/gutenberg/pull/19242#issuecomment-590295412
-			if ( slots.get( name )?.ref === ref ) {
-				slots.delete( name );
+			if ( slot.ref !== ref ) {
+				return;
 			}
+
+			slots.delete( name );
 		};
 
 	const updateSlot: SlotFillBubblesVirtuallyContext[ 'updateSlot' ] = (
 		name,
+		ref,
 		fillProps
 	) => {
 		const slot = slots.get( name );
@@ -50,16 +52,15 @@ function createSlotRegistry(): SlotFillBubblesVirtuallyContext {
 			return;
 		}
 
+		if ( slot.ref !== ref ) {
+			return;
+		}
+
 		if ( isShallowEqual( slot.fillProps, fillProps ) ) {
 			return;
 		}
 
-		slot.fillProps = fillProps;
-		const slotFills = fills.get( name );
-		if ( slotFills ) {
-			// Force update fills.
-			slotFills.forEach( ( fill ) => fill.current.rerender() );
-		}
+		slots.set( name, { ref, fillProps } );
 	};
 
 	const registerFill: SlotFillBubblesVirtuallyContext[ 'registerFill' ] = (
@@ -69,20 +70,18 @@ function createSlotRegistry(): SlotFillBubblesVirtuallyContext {
 		fills.set( name, [ ...( fills.get( name ) || [] ), ref ] );
 	};
 
-	const unregisterFill: SlotFillBubblesVirtuallyContext[ 'registerFill' ] = (
-		name,
-		ref
-	) => {
-		const fillsForName = fills.get( name );
-		if ( ! fillsForName ) {
-			return;
-		}
+	const unregisterFill: SlotFillBubblesVirtuallyContext[ 'unregisterFill' ] =
+		( name, ref ) => {
+			const fillsForName = fills.get( name );
+			if ( ! fillsForName ) {
+				return;
+			}
 
-		fills.set(
-			name,
-			fillsForName.filter( ( fillRef ) => fillRef !== ref )
-		);
-	};
+			fills.set(
+				name,
+				fillsForName.filter( ( fillRef ) => fillRef !== ref )
+			);
+		};
 
 	return {
 		slots,

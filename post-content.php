@@ -6,8 +6,8 @@
  */
 
 ?>
-<!-- wp:cover {"url":"https://cldup.com/Fz-ASbo2s3.jpg","align":"wide"} -->
-<div class="wp-block-cover has-background-dim alignwide" style="background-image:url(https://cldup.com/Fz-ASbo2s3.jpg)"><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","textColor":"white","fontSize":"large"} -->
+<!-- wp:cover {"url":"https://cldup.com/Fz-ASbo2s3.jpg","dimRatio":50,"align":"wide"} -->
+<div class="wp-block-cover alignwide is-light"><img class="wp-block-cover__image-background" src="https://cldup.com/Fz-ASbo2s3.jpg" data-object-fit="cover"/><span aria-hidden="true" class="wp-block-cover__background has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","textColor":"white","fontSize":"large"} -->
 <p class="has-text-align-center has-white-color has-text-color has-large-font-size"><?php _e( 'Of Mountains &amp; Printing Presses', 'gutenberg' ); ?></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->
@@ -28,8 +28,8 @@
 <p><?php _e( 'Headings are separate blocks as well, which helps with the outline and organization of your content.', 'gutenberg' ); ?></p>
 <!-- /wp:paragraph -->
 
-<!-- wp:heading {"level":2} -->
-<h2><?php _e( 'A Picture is Worth a Thousand Words', 'gutenberg' ); ?></h2>
+<!-- wp:heading -->
+<h2 class="wp-block-heading"><?php _e( 'A Picture is Worth a Thousand Words', 'gutenberg' ); ?></h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
@@ -37,19 +37,17 @@
 <!-- /wp:paragraph -->
 
 <!-- wp:image {"align":"center"} -->
-<div class="wp-block-image">
-	<figure class="aligncenter"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="<?php esc_attr_e( 'Beautiful landscape', 'gutenberg' ); ?>" />
-		<figcaption><?php _e( 'If your theme supports it, you&#8217;ll see the "wide" button on the image toolbar. Give it a try.', 'gutenberg' ); ?></figcaption>
-	</figure>
-</div>
+<figure class="wp-block-image aligncenter"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="<?php esc_attr_e( 'Beautiful landscape', 'gutenberg' ); ?>" />
+	<figcaption class="wp-element-caption"><?php _e( 'If your theme supports it, you&#8217;ll see the "wide" button on the image toolbar. Give it a try.', 'gutenberg' ); ?></figcaption>
+</figure>
 <!-- /wp:image -->
 
 <!-- wp:paragraph -->
 <p><?php _e( 'Try selecting and removing or editing the caption, now you don&#8217;t have to be careful about selecting the image or other text by mistake and ruining the presentation.', 'gutenberg' ); ?></p>
 <!-- /wp:paragraph -->
 
-<!-- wp:heading {"level":2} -->
-<h2><?php _e( 'The <em>Inserter</em> Tool', 'gutenberg' ); ?></h2>
+<!-- wp:heading -->
+<h2 class="wp-block-heading"><?php _e( 'The <em>Inserter</em> Tool', 'gutenberg' ); ?></h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
@@ -60,32 +58,46 @@
 <p><?php _e( 'Go give it a try, you may discover things WordPress can already add into your posts that you didn&#8217;t know about. Here&#8217;s a short list of what you can currently find there:', 'gutenberg' ); ?></p>
 <!-- /wp:paragraph -->
 
-<!-- wp:list -->
+<!-- wp:list {"className":"wp-block-list"} -->
 <ul class="wp-block-list">
+	<!-- wp:list-item -->
 	<li><?php _e( 'Text &amp; Headings', 'gutenberg' ); ?></li>
+	<!-- /wp:list-item -->
+	<!-- wp:list-item -->
 	<li><?php _e( 'Images &amp; Videos', 'gutenberg' ); ?></li>
+	<!-- /wp:list-item -->
+	<!-- wp:list-item -->
 	<li><?php _e( 'Galleries', 'gutenberg' ); ?></li>
+	<!-- /wp:list-item -->
+	<!-- wp:list-item -->
 	<li><?php _e( 'Embeds, like YouTube, Tweets, or other WordPress posts.', 'gutenberg' ); ?></li>
+	<!-- /wp:list-item -->
+	<!-- wp:list-item -->
 	<li><?php _e( 'Layout blocks, like Buttons, Hero Images, Separators, etc.', 'gutenberg' ); ?></li>
+	<!-- /wp:list-item -->
+	<!-- wp:list-item -->
 	<li><?php _e( 'And <em>Lists</em> like this one of course :)', 'gutenberg' ); ?></li>
+	<!-- /wp:list-item -->
 </ul>
 <!-- /wp:list -->
 
-<!-- wp:separator -->
-<hr class="wp-block-separator" />
+<!-- wp:separator {"opacity":"css"} -->
+<hr class="wp-block-separator has-css-opacity" />
 <!-- /wp:separator -->
 
-<!-- wp:heading {"level":2} -->
-<h2><?php _e( 'Visual Editing', 'gutenberg' ); ?></h2>
+<!-- wp:heading -->
+<h2 class="wp-block-heading"><?php _e( 'Visual Editing', 'gutenberg' ); ?></h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
 <p><?php _e( 'A huge benefit of blocks is that you can edit them in place and manipulate your content directly. Instead of having fields for editing things like the source of a quote, or the text of a button, you can directly change the content. Try editing the following quote:', 'gutenberg' ); ?></p>
 <!-- /wp:paragraph -->
 
-<!-- wp:quote {"style":1} -->
+<!-- wp:quote -->
 <blockquote class="wp-block-quote">
+	<!-- wp:paragraph -->
 	<p><?php _e( 'The editor will endeavor to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.', 'gutenberg' ); ?></p>
+	<!-- /wp:paragraph -->
 	<cite><?php _e( 'Matt Mullenweg, 2017', 'gutenberg' ); ?></cite>
 </blockquote>
 <!-- /wp:quote -->
@@ -98,13 +110,17 @@
 <p><?php _e( 'Blocks can be anything you need. For instance, you may want to add a subdued quote as part of the composition of your text, or you may prefer to display a giant stylized one. All of these options are available in the inserter.', 'gutenberg' ); ?></p>
 <!-- /wp:paragraph -->
 
-<!-- wp:gallery {"ids":[null,null,null],"columns":2} -->
-<figure class="wp-block-gallery columns-2 is-cropped">
-<ul class="blocks-gallery-grid">
-<li class="blocks-gallery-item"><figure><img src="https://cldup.com/n0g6ME5VKC.jpg" alt="" /></figure></li>
-<li class="blocks-gallery-item"><figure><img src="https://cldup.com/ZjESfxPI3R.jpg" alt="" /></figure></li>
-<li class="blocks-gallery-item"><figure><img src="https://cldup.com/EKNF8xD2UM.jpg" alt="" /></figure></li>
-</ul>
+<!-- wp:gallery {"columns":2,"linkTo":"none"} -->
+<figure class="wp-block-gallery has-nested-images columns-2 is-cropped">
+	<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
+	<figure class="wp-block-image size-large"><img src="https://cldup.com/n0g6ME5VKC.jpg" alt="" /></figure>
+	<!-- /wp:image -->
+	<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
+	<figure class="wp-block-image size-large"><img src="https://cldup.com/ZjESfxPI3R.jpg" alt="" /></figure>
+	<!-- /wp:image -->
+	<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
+	<figure class="wp-block-image size-large"><img src="https://cldup.com/EKNF8xD2UM.jpg" alt="" /></figure>
+	<!-- /wp:image -->
 </figure>
 <!-- /wp:gallery -->
 
@@ -112,8 +128,8 @@
 <p><?php _e( 'You can change the amount of columns in your galleries by dragging a slider in the block inspector in the sidebar.', 'gutenberg' ); ?></p>
 <!-- /wp:paragraph -->
 
-<!-- wp:heading {"level":2} -->
-<h2><?php _e( 'Media Rich', 'gutenberg' ); ?></h2>
+<!-- wp:heading -->
+<h2 class="wp-block-heading"><?php _e( 'Media Rich', 'gutenberg' ); ?></h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
@@ -128,12 +144,14 @@
 <p><?php _e( 'Sure, the full-wide image can be pretty big. But sometimes the image is worth it.', 'gutenberg' ); ?></p>
 <!-- /wp:paragraph -->
 
-<!-- wp:gallery {"ids":[null,null],"align":"wide"} -->
-<figure class="wp-block-gallery alignwide columns-2 is-cropped">
-<ul class="blocks-gallery-grid">
-<li class="blocks-gallery-item"><figure><img src="https://cldup.com/_rSwtEeDGD.jpg" alt="" /></figure></li>
-<li class="blocks-gallery-item"><figure><img src="https://cldup.com/L-cC3qX2DN.jpg" alt="" /></figure></li>
-</ul>
+<!-- wp:gallery {"linkTo":"none","align":"wide"} -->
+<figure class="wp-block-gallery alignwide has-nested-images columns-default is-cropped">
+	<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
+	<figure class="wp-block-image size-large"><img src="https://cldup.com/_rSwtEeDGD.jpg" alt="" /></figure>
+	<!-- /wp:image -->
+	<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
+	<figure class="wp-block-image size-large"><img src="https://cldup.com/L-cC3qX2DN.jpg" alt="" /></figure>
+	<!-- /wp:image -->
 </figure>
 <!-- /wp:gallery -->
 
@@ -145,8 +163,8 @@
 <p><?php _e( 'Any block can opt into these alignments. The embed block has them also, and is responsive out of the box:', 'gutenberg' ); ?></p>
 <!-- /wp:paragraph -->
 
-<!-- wp:embed {"url":"https://vimeo.com/22439234","type":"video","providerNameSlug":"vimeo","align":"wide","className":"wp-has-aspect-ratio wp-embed-aspect-16-9","responsive":true} -->
-<figure class="wp-block-embed-vimeo alignwide wp-block-embed is-type-video is-provider-vimeo wp-has-aspect-ratio wp-embed-aspect-16-9"><div class="wp-block-embed__wrapper">
+<!-- wp:embed {"url":"https://vimeo.com/22439234","type":"video","providerNameSlug":"vimeo","responsive":true,"align":"wide","className":"wp-has-aspect-ratio wp-embed-aspect-16-9"} -->
+<figure class="wp-block-embed alignwide is-type-video is-provider-vimeo wp-block-embed-vimeo wp-has-aspect-ratio wp-embed-aspect-16-9"><div class="wp-block-embed__wrapper">
 https://vimeo.com/22439234
 </div></figure>
 <!-- /wp:embed -->
@@ -163,7 +181,7 @@ https://vimeo.com/22439234
 <p class="has-text-align-center">
 	<em>
 		<?php
-		echo sprintf(
+		printf(
 			/* translators: %s: Gutenberg GitHub repository URL */
 			__( 'If you want to learn more about how to build additional blocks, or if you are interested in helping with the project, head over to the <a href="%s">GitHub repository</a>.', 'gutenberg' ),
 			'https://github.com/WordPress/gutenberg'
@@ -173,12 +191,12 @@ https://vimeo.com/22439234
 </p>
 <!-- /wp:paragraph -->
 
-<!-- wp:button { "align": "center" } -->
-<div class="wp-block-button aligncenter"><a class="wp-block-button__link" href="https://github.com/WordPress/gutenberg"><?php _e( 'Help build Gutenberg', 'gutenberg' ); ?></a></div>
+<!-- wp:button {"className":"aligncenter"} -->
+<div class="wp-block-button aligncenter"><a class="wp-block-button__link wp-element-button" href="https://github.com/WordPress/gutenberg"><?php _e( 'Help build Gutenberg', 'gutenberg' ); ?></a></div>
 <!-- /wp:button -->
 
-<!-- wp:separator -->
-<hr class="wp-block-separator" />
+<!-- wp:separator {"opacity":"css"} -->
+<hr class="wp-block-separator has-css-opacity" />
 <!-- /wp:separator -->
 
 <!-- wp:paragraph {"align":"center"} -->

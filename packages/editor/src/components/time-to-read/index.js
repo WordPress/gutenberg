@@ -23,7 +23,7 @@ const AVERAGE_READING_RATE = 189;
 /**
  * Component for showing Time To Read in Content.
  *
- * @return {JSX.Element} The rendered TimeToRead component.
+ * @return {React.ReactNode} The rendered TimeToRead component.
  */
 export default function TimeToRead() {
 	const content = useSelect(
@@ -47,10 +47,10 @@ export default function TimeToRead() {
 			  } )
 			: createInterpolateElement(
 					sprintf(
-						/* translators: %s is the number of minutes the post will take to read. */
+						/* translators: %s: the number of minutes to read the post. */
 						_n(
-							'<span>%d</span> minute',
-							'<span>%d</span> minutes',
+							'<span>%s</span> minute',
+							'<span>%s</span> minutes',
 							minutesToRead
 						),
 						minutesToRead

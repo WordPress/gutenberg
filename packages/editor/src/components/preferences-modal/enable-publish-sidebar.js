@@ -1,8 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/compose';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { privateApis as preferencesPrivateApis } from '@wordpress/preferences';
 
 /**
@@ -13,16 +12,20 @@ import { store as editorStore } from '../../store';
 
 const { PreferenceBaseOption } = unlock( preferencesPrivateApis );
 
-export default compose(
-	withSelect( ( select ) => ( {
-		isChecked: select( editorStore ).isPublishSidebarEnabled(),
-	} ) ),
-	withDispatch( ( dispatch ) => {
-		const { enablePublishSidebar, disablePublishSidebar } =
-			dispatch( editorStore );
-		return {
-			onChange: ( isEnabled ) =>
-				isEnabled ? enablePublishSidebar() : disablePublishSidebar(),
-		};
-	} )
-)( PreferenceBaseOption );
+export default function EnablePublishSidebarOption( props ) {
+	const isChecked = useSelect( ( select ) => {
+		return select( editorStore ).isPublishSidebarEnabled();
+	}, [] );
+	const { enablePublishSidebar, disablePublishSidebar } =
+		useDispatch( editorStore );
+
+	return (
+		<PreferenceBaseOption
+			isChecked={ isChecked }
+			onChange={ ( isEnabled ) =>
+				isEnabled ? enablePublishSidebar() : disablePublishSidebar()
+			}
+			{ ...props }
+		/>
+	);
+}

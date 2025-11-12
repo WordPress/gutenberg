@@ -6,20 +6,47 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { HorizontalRule } from '@wordpress/components';
 import {
-	useBlockProps,
 	getColorClassName,
+	InspectorControls,
+	useBlockProps,
 	__experimentalUseColorProps as useColorProps,
 } from '@wordpress/block-editor';
+import { HorizontalRule, SelectControl } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import useDeprecatedOpacity from './use-deprecated-opacity';
 
+const HtmlElementControl = ( { tagName, setAttributes } ) => {
+	return (
+		<SelectControl
+			label={ __( 'HTML element' ) }
+			value={ tagName }
+			onChange={ ( newValue ) => setAttributes( { tagName: newValue } ) }
+			options={ [
+				{ label: __( 'Default (<hr>)' ), value: 'hr' },
+				{ label: '<div>', value: 'div' },
+			] }
+			help={
+				tagName === 'hr'
+					? __(
+							'Only select <hr> if the separator conveys important information and should be announced by screen readers.'
+					  )
+					: __(
+							'The <div> element should only be used if the block is a design element with no semantic meaning.'
+					  )
+			}
+			__next40pxDefaultSize
+			__nextHasNoMarginBottom
+		/>
+	);
+};
+
 export default function SeparatorEdit( { attributes, setAttributes } ) {
-	const { backgroundColor, opacity, style } = attributes;
+	const { backgroundColor, opacity, style, tagName } = attributes;
 	const colorProps = useColorProps( attributes );
 	const currentColor = colorProps?.style?.backgroundColor;
 	const hasCustomColor = !! style?.color?.background;
@@ -44,10 +71,17 @@ export default function SeparatorEdit( { attributes, setAttributes } ) {
 		color: currentColor,
 		backgroundColor: currentColor,
 	};
+	const Wrapper = tagName === 'hr' ? HorizontalRule : tagName;
 
 	return (
 		<>
-			<HorizontalRule
+			<InspectorControls group="advanced">
+				<HtmlElementControl
+					tagName={ tagName }
+					setAttributes={ setAttributes }
+				/>
+			</InspectorControls>
+			<Wrapper
 				{ ...useBlockProps( {
 					className,
 					style: hasCustomColor ? styles : undefined,

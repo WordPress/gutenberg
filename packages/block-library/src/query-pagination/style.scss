@@ -1,19 +1,4 @@
-$pagination-margin: 0.5em;
 .wp-block-query-pagination {
-	// Increased specificity to override blocks default margin.
-	> .wp-block-query-pagination-next,
-	> .wp-block-query-pagination-previous,
-	> .wp-block-query-pagination-numbers {
-		/*rtl:ignore*/
-		margin-right: $pagination-margin;
-		margin-bottom: $pagination-margin;
-
-		&:last-child {
-			/*rtl:ignore*/
-			margin-right: 0;
-		}
-	}
-
 	// This moves the next link to the right side of the container,
 	// which is important when it's the only block displayed
 	// and the block has a "space-between" justification.

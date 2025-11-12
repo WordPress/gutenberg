@@ -1,4 +1,6 @@
-.wp-block-video figcaption {
+@use "@wordpress/base-styles/mixins" as *;
+
+.wp-block-video :where(figcaption) {
 	@include caption-style-theme();
 }
 

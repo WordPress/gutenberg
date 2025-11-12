@@ -18,7 +18,7 @@ export default function WelcomeGuideDefault() {
 	return (
 		<Guide
 			className="edit-post-welcome-guide"
-			contentLabel={ __( 'Welcome to the block editor' ) }
+			contentLabel={ __( 'Welcome to the editor' ) }
 			finishButtonText={ __( 'Get started' ) }
 			onFinish={ () => toggleFeature( 'welcomeGuide' ) }
 			pages={ [
@@ -32,7 +32,7 @@ export default function WelcomeGuideDefault() {
 					content: (
 						<>
 							<h1 className="edit-post-welcome-guide__heading">
-								{ __( 'Welcome to the block editor' ) }
+								{ __( 'Welcome to the editor' ) }
 							</h1>
 							<p className="edit-post-welcome-guide__text">
 								{ __(
@@ -52,7 +52,7 @@ export default function WelcomeGuideDefault() {
 					content: (
 						<>
 							<h1 className="edit-post-welcome-guide__heading">
-								{ __( 'Make each block your own' ) }
+								{ __( 'Customize each block' ) }
 							</h1>
 							<p className="edit-post-welcome-guide__text">
 								{ __(
@@ -72,7 +72,7 @@ export default function WelcomeGuideDefault() {
 					content: (
 						<>
 							<h1 className="edit-post-welcome-guide__heading">
-								{ __( 'Get to know the block library' ) }
+								{ __( 'Explore all blocks' ) }
 							</h1>
 							<p className="edit-post-welcome-guide__text">
 								{ createInterpolateElement(
@@ -102,19 +102,23 @@ export default function WelcomeGuideDefault() {
 					content: (
 						<>
 							<h1 className="edit-post-welcome-guide__heading">
-								{ __( 'Learn how to use the block editor' ) }
+								{ __( 'Learn more' ) }
 							</h1>
 							<p className="edit-post-welcome-guide__text">
-								{ __(
-									'New to the block editor? Want to learn more about using it? '
+								{ createInterpolateElement(
+									__(
+										"New to the block editor? Want to learn more about using it? <a>Here's a detailed guide.</a>"
+									),
+									{
+										a: (
+											<ExternalLink
+												href={ __(
+													'https://wordpress.org/documentation/article/wordpress-block-editor/'
+												) }
+											/>
+										),
+									}
 								) }
-								<ExternalLink
-									href={ __(
-										'https://wordpress.org/documentation/article/wordpress-block-editor/'
-									) }
-								>
-									{ __( "Here's a detailed guide." ) }
-								</ExternalLink>
 							</p>
 						</>
 					),

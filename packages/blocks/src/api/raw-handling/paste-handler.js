@@ -32,6 +32,8 @@ import brRemover from './br-remover';
 import { deepFilterHTML, isPlain, getBlockContentSchema } from './utils';
 import emptyParagraphRemover from './empty-paragraph-remover';
 import slackParagraphCorrector from './slack-paragraph-corrector';
+import isLatexMathMode from './latex-to-math';
+import { createBlock } from '../factory';
 
 const log = ( ...args ) => window?.console?.log?.( ...args );
 
@@ -111,7 +113,6 @@ export function pasteHandler( {
 	}
 
 	// Normalize unicode to use composed characters.
-	// This is unsupported in IE 11 but it's a nice-to-have feature, not mandatory.
 	// Not normalizing the content will only affect older browsers and won't
 	// entirely break the app.
 	// See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize
@@ -128,6 +129,10 @@ export function pasteHandler( {
 	// * There is a plain text version.
 	// * There is no HTML version, or it has no formatting.
 	const isPlainText = plainText && ( ! HTML || isPlain( HTML ) );
+
+	if ( isPlainText && isLatexMathMode( plainText ) ) {
+		return [ createBlock( 'core/math', { latex: plainText } ) ];
+	}
 
 	// Parse Markdown (and encoded HTML) if it's considered plain text.
 	if ( isPlainText ) {

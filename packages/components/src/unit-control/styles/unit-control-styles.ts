@@ -40,12 +40,15 @@ const baseUnitLabelStyles = ( { selectSize }: SelectProps ) => {
 			box-sizing: border-box;
 			padding: 2px 1px;
 			width: 20px;
-			color: ${ COLORS.gray[ 800 ] };
 			font-size: 8px;
 			line-height: 1;
 			letter-spacing: -0.5px;
 			text-transform: uppercase;
 			text-align-last: center;
+
+			&:not( :disabled ) {
+				color: ${ COLORS.gray[ 800 ] };
+			}
 		`,
 		default: css`
 			box-sizing: border-box;
@@ -54,13 +57,18 @@ const baseUnitLabelStyles = ( { selectSize }: SelectProps ) => {
 			height: 24px;
 			margin-inline-end: ${ space( 2 ) };
 			padding: ${ space( 1 ) };
-			color: ${ COLORS.theme.accent };
+
 			font-size: 13px;
 			line-height: 1;
 			text-align-last: center;
 			white-space: nowrap;
 			overflow: hidden;
 			text-overflow: ellipsis;
+			field-sizing: content;
+
+			&:not( :disabled ) {
+				color: ${ COLORS.theme.accent };
+			}
 		`,
 	};
 
@@ -106,9 +114,8 @@ const unitSelectSizes = ( { selectSize = 'default' }: SelectProps ) => {
 			justify-content: center;
 			align-items: center;
 
-			&:hover {
-				color: ${ COLORS.ui.borderFocus };
-				box-shadow: inset 0 0 0
+			&:where( :not( :disabled ) ):hover {
+				box-shadow: 0 0 0
 					${ CONFIG.borderWidth + ' ' + COLORS.ui.borderFocus };
 				outline: ${ CONFIG.borderWidth } solid transparent; // For High Contrast Mode
 			}
@@ -129,7 +136,7 @@ export const UnitSelect = styled.select< SelectProps >`
 	&&& {
 		appearance: none;
 		background: transparent;
-		border-radius: 2px;
+		border-radius: ${ CONFIG.radiusXSmall };
 		border: none;
 		display: block;
 		outline: none;

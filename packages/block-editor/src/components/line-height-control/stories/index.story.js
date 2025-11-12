@@ -22,7 +22,7 @@ const Template = ( props ) => {
 
 export const Default = Template.bind( {} );
 Default.args = {
-	__nextHasNoMarginBottom: true,
+	__next40pxDefaultSize: true,
 	__unstableInputWidth: '100px',
 };
 

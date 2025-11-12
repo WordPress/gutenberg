@@ -71,6 +71,7 @@ export function Provider( {
 		</SlotFillProvider>
 	);
 }
+Provider.displayName = 'SlotFillProvider';
 
 export function createSlotFill( key: SlotKey ) {
 	const baseName = typeof key === 'symbol' ? key.description : key;
@@ -83,17 +84,15 @@ export function createSlotFill( key: SlotKey ) {
 		props: DistributiveOmit< SlotComponentProps, 'name' >
 	) => <Slot name={ key } { ...props } />;
 	SlotComponent.displayName = `${ baseName }Slot`;
+	/**
+	 * @deprecated 6.8.0
+	 * Please use `slotFill.name` instead of `slotFill.Slot.__unstableName`.
+	 */
 	SlotComponent.__unstableName = key;
 
 	return {
+		name: key,
 		Fill: FillComponent,
 		Slot: SlotComponent,
 	};
 }
-
-export const createPrivateSlotFill = ( name: string ) => {
-	const privateKey = Symbol( name );
-	const privateSlotFill = createSlotFill( privateKey );
-
-	return { privateKey, ...privateSlotFill };
-};

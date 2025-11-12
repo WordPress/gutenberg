@@ -37,7 +37,7 @@ test.describe( 'Unsynced pattern', () => {
 		await page.getByRole( 'menuitem', { name: 'Create pattern' } ).click();
 
 		const createPatternDialog = page.getByRole( 'dialog', {
-			name: 'add new pattern',
+			name: 'add pattern',
 		} );
 		await createPatternDialog
 			.getByRole( 'textbox', { name: 'Name' } )
@@ -52,18 +52,9 @@ test.describe( 'Unsynced pattern', () => {
 
 		await page.keyboard.press( 'Enter' );
 
-		// Check that the block content is still the same. If the pattern was added as synced
-		// the content would be wrapped by a pattern block.
-		await expect
-			.poll(
-				editor.getBlocks,
-				'The block content should be the same after converting to an unsynced pattern'
-			)
-			.toEqual( before );
-
 		// Check that the new pattern is available in the inserter and that it gets inserted as
 		// a plain paragraph block.
-		await page.getByLabel( 'Toggle block inserter' ).click();
+		await page.getByLabel( 'Block Inserter' ).click();
 		await page
 			.getByRole( 'tab', {
 				name: 'Patterns',
@@ -74,28 +65,52 @@ test.describe( 'Unsynced pattern', () => {
 				name: newCategory,
 			} )
 			.click();
+
 		const pattern = page.getByLabel( 'My unsynced pattern' ).first();
 
 		const insertedPatternId = await pattern.evaluate(
 			( element ) => element.id
 		);
 
-		await pattern.click();
-
-		await expect.poll( editor.getBlocks ).toEqual( [
-			...before,
-			{
-				...before[ 0 ],
-				attributes: {
-					...before[ 0 ].attributes,
-					metadata: {
-						categories: [ 'contact-details' ],
-						name: 'My unsynced pattern',
-						patternName: insertedPatternId,
-					},
+		// Check that the block content is still the same. If the pattern was added as synced
+		// the content would be wrapped by a pattern block.
+		const expectedUnsyncedPattern = {
+			...before[ 0 ],
+			attributes: {
+				...before[ 0 ].attributes,
+				metadata: {
+					name: 'My unsynced pattern',
+					patternName: insertedPatternId,
+					// When a pattern is created for the first time the `categories` are missing.
+					// This is a known issue that needs to be fixed.
 				},
 			},
-		] );
+		};
+
+		await expect
+			.poll( editor.getBlocks )
+			.toEqual( [ expectedUnsyncedPattern ] );
+
+		const expectedInserterUnsyncedPattern = {
+			...before[ 0 ],
+			attributes: {
+				...before[ 0 ].attributes,
+				metadata: {
+					name: 'My unsynced pattern',
+					patternName: insertedPatternId,
+					categories: [ 'contact-details' ],
+				},
+			},
+		};
+
+		// Insert and check that there are two identical unsynced patterns.
+		await pattern.click();
+		await expect
+			.poll( editor.getBlocks )
+			.toEqual( [
+				expectedUnsyncedPattern,
+				expectedInserterUnsyncedPattern,
+			] );
 	} );
 } );
 
@@ -136,7 +151,7 @@ test.describe( 'Synced pattern', () => {
 		await page.getByRole( 'menuitem', { name: 'Create pattern' } ).click();
 
 		const createPatternDialog = page.getByRole( 'dialog', {
-			name: 'add new pattern',
+			name: 'add pattern',
 		} );
 		await createPatternDialog
 			.getByRole( 'textbox', { name: 'Name' } )
@@ -166,7 +181,7 @@ test.describe( 'Synced pattern', () => {
 		).toBe( true );
 
 		// Check that the new pattern is available in the inserter.
-		await page.getByLabel( 'Toggle block inserter' ).click();
+		await page.getByLabel( 'Block Inserter' ).click();
 		await page
 			.getByRole( 'tab', {
 				name: 'Patterns',
@@ -319,7 +334,7 @@ test.describe( 'Synced pattern', () => {
 		await editor.selectBlocks(
 			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
 		);
-		await editor.clickBlockOptionsMenuItem( 'Detach' );
+		await editor.clickBlockOptionsMenuItem( 'Disconnect pattern' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
@@ -354,7 +369,7 @@ test.describe( 'Synced pattern', () => {
 		await editor.selectBlocks(
 			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
 		);
-		await editor.clickBlockOptionsMenuItem( 'Detach' );
+		await editor.clickBlockOptionsMenuItem( 'Disconnect pattern' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
@@ -376,7 +391,7 @@ test.describe( 'Synced pattern', () => {
 		await editor.clickBlockOptionsMenuItem( 'Create pattern' );
 
 		const createPatternDialog = page.getByRole( 'dialog', {
-			name: 'add new pattern',
+			name: 'add pattern',
 		} );
 		await createPatternDialog
 			.getByRole( 'textbox', { name: 'Name' } )
@@ -426,7 +441,7 @@ test.describe( 'Synced pattern', () => {
 		await editor.clickBlockOptionsMenuItem( 'Create pattern' );
 
 		const createPatternDialog = editor.page.getByRole( 'dialog', {
-			name: 'add new pattern',
+			name: 'add pattern',
 		} );
 		await createPatternDialog
 			.getByRole( 'textbox', { name: 'Name' } )
@@ -455,7 +470,7 @@ test.describe( 'Synced pattern', () => {
 		await editor.selectBlocks(
 			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
 		);
-		await editor.clickBlockOptionsMenuItem( 'Detach' );
+		await editor.clickBlockOptionsMenuItem( 'Disconnect pattern' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
@@ -496,11 +511,11 @@ test.describe( 'Synced pattern', () => {
 		} );
 
 		await page
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 			.click();
 		await page
 			.getByRole( 'searchbox', {
-				name: 'Search for blocks and patterns',
+				name: 'Search',
 			} )
 			.fill( 'Awesome empty' );
 
@@ -517,7 +532,7 @@ test.describe( 'Synced pattern', () => {
 	test( 'should show a proper message when the reusable block is missing', async ( {
 		editor,
 	} ) => {
-		// Insert a non-existant reusable block.
+		// Insert a non-existent reusable block.
 		await editor.insertBlock( {
 			name: 'core/block',
 			attributes: { ref: 123456 },
@@ -610,7 +625,7 @@ test.describe( 'Synced pattern', () => {
 		await editor.clickBlockOptionsMenuItem( 'Create pattern' );
 
 		const createPatternDialog = editor.page.getByRole( 'dialog', {
-			name: 'add new pattern',
+			name: 'add pattern',
 		} );
 		await createPatternDialog
 			.getByRole( 'textbox', { name: 'Name' } )

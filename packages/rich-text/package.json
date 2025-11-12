@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/rich-text",
-	"version": "7.1.0",
+	"version": "7.34.0",
 	"description": "Rich text value and manipulation API.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -24,14 +24,22 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.js",
+			"require": "./build/index.js"
+		},
+		"./package.json": "./package.json"
+	},
 	"react-native": "src/index",
+	"wpScript": true,
+	"types": "build-types",
 	"sideEffects": [
 		"src/**/*.scss",
 		"{src,build,build-module}/{index.js,store/index.js}"
 	],
-	"types": "build-types",
 	"dependencies": {
-		"@babel/runtime": "^7.16.0",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
@@ -40,6 +48,7 @@
 		"@wordpress/escape-html": "file:../escape-html",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/keycodes": "file:../keycodes",
+		"colord": "2.9.3",
 		"memize": "^2.1.0"
 	},
 	"peerDependencies": {

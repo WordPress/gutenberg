@@ -53,9 +53,6 @@ export default function listReducer( node ) {
 		if ( prevListItem ) {
 			prevListItem.appendChild( list );
 			parentList.removeChild( parentListItem );
-		} else {
-			parentList.parentNode.insertBefore( list, parentList );
-			parentList.parentNode.removeChild( parentList );
 		}
 	}
 

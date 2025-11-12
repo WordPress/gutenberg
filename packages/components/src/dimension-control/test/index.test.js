@@ -12,7 +12,17 @@ import { plus } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { DimensionControl } from '../';
+import { DimensionControl as _DimensionControl } from '../';
+
+const DimensionControl = ( props ) => {
+	return (
+		<_DimensionControl
+			{ ...props }
+			__next40pxDefaultSize
+			__nextHasNoMarginBottom
+		/>
+	);
+};
 
 describe( 'DimensionControl', () => {
 	const onChangeHandler = jest.fn();
@@ -27,6 +37,7 @@ describe( 'DimensionControl', () => {
 			const { container } = render(
 				<DimensionControl instanceId={ instanceId } label="Padding" />
 			);
+			expect( console ).toHaveWarned();
 			expect( container ).toMatchSnapshot();
 		} );
 

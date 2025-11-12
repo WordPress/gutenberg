@@ -6,32 +6,38 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import {
-	BlockControls,
 	useInnerBlocksProps,
 	useBlockProps,
 	InspectorControls,
 	ContrastChecker,
 	withColors,
+	InnerBlocks,
 	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
-	MenuGroup,
-	MenuItem,
-	PanelBody,
 	ToggleControl,
-	ToolbarDropdownMenu,
+	SelectControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { check } from '@wordpress/icons';
+import { useSelect } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const sizeOptions = [
-	{ name: __( 'Small' ), value: 'has-small-icon-size' },
-	{ name: __( 'Normal' ), value: 'has-normal-icon-size' },
-	{ name: __( 'Large' ), value: 'has-large-icon-size' },
-	{ name: __( 'Huge' ), value: 'has-huge-icon-size' },
+	{ label: __( 'Default' ), value: '' },
+	{ label: __( 'Small' ), value: 'has-small-icon-size' },
+	{ label: __( 'Normal' ), value: 'has-normal-icon-size' },
+	{ label: __( 'Large' ), value: 'has-large-icon-size' },
+	{ label: __( 'Huge' ), value: 'has-huge-icon-size' },
 ];
 
 export function SocialLinksEdit( props ) {
@@ -48,50 +54,51 @@ export function SocialLinksEdit( props ) {
 
 	const {
 		iconBackgroundColorValue,
-		customIconBackgroundColor,
 		iconColorValue,
 		openInNewTab,
 		showLabels,
 		size,
 	} = attributes;
 
+	const { hasSocialIcons, hasSelectedChild } = useSelect(
+		( select ) => {
+			const { getBlockCount, hasSelectedInnerBlock } =
+				select( blockEditorStore );
+			return {
+				hasSocialIcons: getBlockCount( clientId ) > 0,
+				hasSelectedChild: hasSelectedInnerBlock( clientId ),
+			};
+		},
+		[ clientId ]
+	);
+
+	const hasAnySelected = isSelected || hasSelectedChild;
+
 	const logosOnly = attributes.className?.includes( 'is-style-logos-only' );
+
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	// Remove icon background color when logos only style is selected or
 	// restore it when any other style is selected.
-	const backgroundBackup = useRef( {} );
 	useEffect( () => {
 		if ( logosOnly ) {
-			backgroundBackup.current = {
-				iconBackgroundColor,
-				iconBackgroundColorValue,
-				customIconBackgroundColor,
-			};
-			setAttributes( {
-				iconBackgroundColor: undefined,
-				customIconBackgroundColor: undefined,
-				iconBackgroundColorValue: undefined,
+			let restore;
+			setAttributes( ( prev ) => {
+				restore = {
+					iconBackgroundColor: prev.iconBackgroundColor,
+					iconBackgroundColorValue: prev.iconBackgroundColorValue,
+					customIconBackgroundColor: prev.customIconBackgroundColor,
+				};
+				return {
+					iconBackgroundColor: undefined,
+					iconBackgroundColorValue: undefined,
+					customIconBackgroundColor: undefined,
+				};
 			} );
-		} else {
-			setAttributes( { ...backgroundBackup.current } );
+
+			return () => setAttributes( { ...restore } );
 		}
-	}, [ logosOnly ] );
-
-	const SocialPlaceholder = (
-		<li className="wp-block-social-links__social-placeholder">
-			<div className="wp-block-social-links__social-placeholder-icons">
-				<div className="wp-social-link wp-social-link-twitter"></div>
-				<div className="wp-social-link wp-social-link-facebook"></div>
-				<div className="wp-social-link wp-social-link-instagram"></div>
-			</div>
-		</li>
-	);
-
-	const SelectedSocialPlaceholder = (
-		<li className="wp-block-social-links__social-prompt">
-			{ __( 'Click plus to add' ) }
-		</li>
-	);
+	}, [ logosOnly, setAttributes ] );
 
 	// Fallback color values are used maintain selections in case switching
 	// themes and named colors in palette do not match.
@@ -104,15 +111,14 @@ export function SocialLinksEdit( props ) {
 
 	const blockProps = useBlockProps( { className } );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		placeholder: isSelected ? SelectedSocialPlaceholder : SocialPlaceholder,
 		templateLock: false,
 		orientation: attributes.layout?.orientation ?? 'horizontal',
 		__experimentalAppenderTagName: 'li',
+		renderAppender:
+			! hasSocialIcons || hasAnySelected
+				? InnerBlocks.ButtonBlockAppender
+				: undefined,
 	} );
-
-	const POPOVER_PROPS = {
-		position: 'bottom right',
-	};
 
 	const colorSettings = [
 		{
@@ -154,62 +160,76 @@ export function SocialLinksEdit( props ) {
 
 	return (
 		<>
-			<BlockControls group="other">
-				<ToolbarDropdownMenu
-					label={ __( 'Size' ) }
-					text={ __( 'Size' ) }
-					icon={ null }
-					popoverProps={ POPOVER_PROPS }
-				>
-					{ ( { onClose } ) => (
-						<MenuGroup>
-							{ sizeOptions.map( ( entry ) => {
-								return (
-									<MenuItem
-										icon={
-											( size === entry.value ||
-												( ! size &&
-													entry.value ===
-														'has-normal-icon-size' ) ) &&
-											check
-										}
-										isSelected={ size === entry.value }
-										key={ entry.value }
-										onClick={ () => {
-											setAttributes( {
-												size: entry.value,
-											} );
-										} }
-										onClose={ onClose }
-										role="menuitemradio"
-									>
-										{ entry.name }
-									</MenuItem>
-								);
-							} ) }
-						</MenuGroup>
-					) }
-				</ToolbarDropdownMenu>
-			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Settings' ) }>
-					<ToggleControl
-						__nextHasNoMarginBottom
-						label={ __( 'Open links in new tab' ) }
-						checked={ openInNewTab }
-						onChange={ () =>
-							setAttributes( { openInNewTab: ! openInNewTab } )
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ () => {
+						setAttributes( {
+							openInNewTab: false,
+							showLabels: false,
+							size: undefined,
+						} );
+					} }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					<ToolsPanelItem
+						isShownByDefault
+						hasValue={ () => !! size }
+						label={ __( 'Icon size' ) }
+						onDeselect={ () =>
+							setAttributes( { size: undefined } )
 						}
-					/>
-					<ToggleControl
-						__nextHasNoMarginBottom
+					>
+						<SelectControl
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
+							label={ __( 'Icon Size' ) }
+							onChange={ ( newSize ) => {
+								setAttributes( {
+									size: newSize === '' ? undefined : newSize,
+								} );
+							} }
+							value={ size ?? '' }
+							options={ sizeOptions }
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						isShownByDefault
 						label={ __( 'Show text' ) }
-						checked={ showLabels }
-						onChange={ () =>
-							setAttributes( { showLabels: ! showLabels } )
+						hasValue={ () => !! showLabels }
+						onDeselect={ () =>
+							setAttributes( { showLabels: false } )
 						}
-					/>
-				</PanelBody>
+					>
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Show text' ) }
+							checked={ showLabels }
+							onChange={ () =>
+								setAttributes( { showLabels: ! showLabels } )
+							}
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						isShownByDefault
+						label={ __( 'Open links in new tab' ) }
+						hasValue={ () => !! openInNewTab }
+						onDeselect={ () =>
+							setAttributes( { openInNewTab: false } )
+						}
+					>
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Open links in new tab' ) }
+							checked={ openInNewTab }
+							onChange={ () =>
+								setAttributes( {
+									openInNewTab: ! openInNewTab,
+								} )
+							}
+						/>
+					</ToolsPanelItem>
+				</ToolsPanel>
 			</InspectorControls>
 			{ colorGradientSettings.hasColorsOrGradients && (
 				<InspectorControls group="color">
@@ -226,6 +246,7 @@ export function SocialLinksEdit( props ) {
 										isShownByDefault: true,
 										resetAllFilter,
 										enableAlpha: true,
+										clearable: true,
 									},
 								] }
 								panelId={ clientId }

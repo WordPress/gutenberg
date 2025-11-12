@@ -55,6 +55,9 @@ export default function save( { attributes } ) {
 
 	const blockProps = useBlockProps.save();
 
+	// Note: radio inputs aren't implemented yet.
+	const isCheckboxOrRadio = type === 'checkbox' || type === 'radio';
+
 	if ( 'hidden' === type ) {
 		return <input type={ type } name={ name } value={ value } />;
 	}
@@ -67,9 +70,11 @@ export default function save( { attributes } ) {
 					'is-label-inline': inlineLabel,
 				} ) }
 			>
-				<span className="wp-block-form-input__label-content">
-					<RichText.Content value={ label } />
-				</span>
+				{ ! isCheckboxOrRadio && (
+					<span className="wp-block-form-input__label-content">
+						<RichText.Content value={ label } />
+					</span>
+				) }
 				<TagName
 					className={ inputClasses }
 					type={ 'textarea' === type ? undefined : type }
@@ -79,6 +84,11 @@ export default function save( { attributes } ) {
 					placeholder={ placeholder || undefined }
 					style={ inputStyle }
 				/>
+				{ isCheckboxOrRadio && (
+					<span className="wp-block-form-input__label-content">
+						<RichText.Content value={ label } />
+					</span>
+				) }
 			</label>
 			{ /* eslint-enable jsx-a11y/label-has-associated-control */ }
 		</div>

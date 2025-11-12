@@ -1,0 +1,20 @@
+[
+	{
+		"name": "core/post-date",
+		"isValid": true,
+		"attributes": {
+			"metadata": {
+				"bindings": {
+					"datetime": {
+						"source": "core/post-data",
+						"args": {
+							"field": "date"
+						}
+					}
+				}
+			},
+			"isLink": false
+		},
+		"innerBlocks": []
+	}
+]

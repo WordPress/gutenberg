@@ -14,10 +14,11 @@ import { useState } from '@wordpress/element';
 import ToggleControl from '..';
 
 const meta: Meta< typeof ToggleControl > = {
-	title: 'Components/ToggleControl',
+	title: 'Components/Selection & Input/Common/ToggleControl',
+	id: 'components-togglecontrol',
 	component: ToggleControl,
 	argTypes: {
-		checked: { control: { type: null } },
+		checked: { control: false },
 		help: { control: { type: 'text' } },
 		label: { control: { type: 'text' } },
 		onChange: { action: 'onChange' },
@@ -48,6 +49,7 @@ const Template: StoryFn< typeof ToggleControl > = ( {
 
 export const Default = Template.bind( {} );
 Default.args = {
+	__nextHasNoMarginBottom: true,
 	label: 'Enable something',
 };
 

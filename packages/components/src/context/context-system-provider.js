@@ -25,6 +25,8 @@ import { useUpdateEffect } from '../utils';
 export const ComponentsContext = createContext(
 	/** @type {Record<string, any>} */ ( {} )
 );
+ComponentsContext.displayName = 'ComponentsContext';
+
 export const useComponentsContext = () => useContext( ComponentsContext );
 
 /**

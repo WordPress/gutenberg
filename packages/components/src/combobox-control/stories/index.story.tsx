@@ -34,10 +34,11 @@ const countries = [
 ];
 
 const meta: Meta< typeof ComboboxControl > = {
-	title: 'Components/ComboboxControl',
+	title: 'Components/Selection & Input/Common/ComboboxControl',
+	id: 'components-comboboxcontrol',
 	component: ComboboxControl,
 	argTypes: {
-		value: { control: { type: null } },
+		value: { control: false },
 	},
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
@@ -76,7 +77,8 @@ const Template: StoryFn< typeof ComboboxControl > = ( {
 };
 export const Default = Template.bind( {} );
 Default.args = {
-	allowReset: false,
+	__next40pxDefaultSize: true,
+	__nextHasNoMarginBottom: true,
 	label: 'Select a country',
 	options: countryOptions,
 };
@@ -135,8 +137,7 @@ const optionsWithDisabledOptions = countryOptions.map( ( option, index ) => ( {
 } ) );
 
 WithDisabledOptions.args = {
-	allowReset: false,
-	label: 'Select a country',
+	...Default.args,
 	options: optionsWithDisabledOptions,
 };
 
@@ -148,8 +149,7 @@ WithDisabledOptions.args = {
 export const NotExpandOnFocus = Template.bind( {} );
 
 NotExpandOnFocus.args = {
-	allowReset: false,
-	label: 'Select a country',
+	...Default.args,
 	options: countryOptions,
 	expandOnFocus: false,
 };

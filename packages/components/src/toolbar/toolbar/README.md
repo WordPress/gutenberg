@@ -74,6 +74,15 @@ Leave undefined for the default style. Or `'unstyled'` which removes the border 
 -   Required: No
 -   Default: `undefined`
 
+#### `orientation`: `'horizontal' | 'vertical'`
+
+Specifies the toolbar's orientation.
+
+Leave undefined or 'horizontal' for horizontal orientation keyboard interactions, choose 'vertical' for the alternative.
+
+-   Required: No
+-   Default: `horizontal`
+
 ## Related components
 
 -   Toolbar may contain [ToolbarGroup](/packages/components/src/toolbar-group/README.md), [ToolbarButton](/packages/components/src/toolbar-button/README.md) and [ToolbarItem](/packages/components/src/toolbar-Item/README.md) as children.

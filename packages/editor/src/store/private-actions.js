@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { store as coreStore } from '@wordpress/core-data';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -34,7 +34,7 @@ export function setCurrentTemplateId( id ) {
 /**
  * Create a block based template.
  *
- * @param {Object?} template Template to create and assign.
+ * @param {?Object} template Template to create and assign.
  */
 export const createTemplate =
 	( template ) =>
@@ -137,7 +137,9 @@ export const saveDirtyEntities =
 			{ kind: 'postType', name: 'wp_navigation' },
 		];
 		const saveNoticeId = 'site-editor-save-success';
-		const homeUrl = registry.select( coreStore ).getUnstableBase()?.home;
+		const homeUrl = registry
+			.select( coreStore )
+			.getEntityRecord( 'root', '__unstableBase' )?.home;
 		registry.dispatch( noticesStore ).removeNotice( saveNoticeId );
 		const entitiesToSave = dirtyEntityRecords.filter(
 			( { kind, name, key, property } ) => {
@@ -214,6 +216,7 @@ export const saveDirtyEntities =
 								{
 									label: __( 'View site' ),
 									url: homeUrl,
+									openInNewTab: true,
 								},
 							],
 						} );
@@ -269,7 +272,7 @@ export const revertTemplate =
 
 			const fileTemplatePath = addQueryArgs(
 				`${ templateEntityConfig.baseURL }/${ template.id }`,
-				{ context: 'edit', source: 'theme' }
+				{ context: 'edit', source: template.origin }
 			);
 
 			const fileTemplate = await apiFetch( { path: fileTemplatePath } );
@@ -370,12 +373,7 @@ export const revertTemplate =
 export const removeTemplates =
 	( items ) =>
 	async ( { registry } ) => {
-		const isResetting = items.every(
-			( item ) =>
-				!! item &&
-				( item.has_theme_file ||
-					( item.templatePart && item.templatePart.has_theme_file ) )
-		);
+		const isResetting = items.every( ( item ) => item?.has_theme_file );
 
 		const promiseResult = await Promise.allSettled(
 			items.map( ( item ) => {
@@ -391,26 +389,30 @@ export const removeTemplates =
 			} )
 		);
 
-		// If all the promises were fulfilled with sucess.
+		// If all the promises were fulfilled with success.
 		if ( promiseResult.every( ( { status } ) => status === 'fulfilled' ) ) {
 			let successMessage;
 
 			if ( items.length === 1 ) {
 				// Depending on how the entity was retrieved its title might be
 				// an object or simple string.
-				const title =
-					typeof items[ 0 ].title === 'string'
-						? items[ 0 ].title
-						: items[ 0 ].title?.rendered;
+				let title;
+				if ( typeof items[ 0 ].title === 'string' ) {
+					title = items[ 0 ].title;
+				} else if ( typeof items[ 0 ].title?.rendered === 'string' ) {
+					title = items[ 0 ].title?.rendered;
+				} else if ( typeof items[ 0 ].title?.raw === 'string' ) {
+					title = items[ 0 ].title?.raw;
+				}
 				successMessage = isResetting
 					? sprintf(
-							/* translators: The template/part's name. */
+							/* translators: %s: The template/part's name. */
 							__( '"%s" reset.' ),
 							decodeEntities( title )
 					  )
 					: sprintf(
-							/* translators: The template/part's name. */
-							__( '"%s" deleted.' ),
+							/* translators: %s: The template/part's name. */
+							_x( '"%s" deleted.', 'template part' ),
 							decodeEntities( title )
 					  );
 			} else {
@@ -491,3 +493,86 @@ export const removeTemplates =
 				.createErrorNotice( errorMessage, { type: 'snackbar' } );
 		}
 	};
+
+/**
+ * Set the default rendering mode preference for the current post type.
+ *
+ * @param {string} mode The rendering mode to set as default.
+ */
+export const setDefaultRenderingMode =
+	( mode ) =>
+	( { select, registry } ) => {
+		const postType = select.getCurrentPostType();
+		const theme = registry
+			.select( coreStore )
+			.getCurrentTheme()?.stylesheet;
+		const renderingModes =
+			registry
+				.select( preferencesStore )
+				.get( 'core', 'renderingModes' )?.[ theme ] ?? {};
+
+		if ( renderingModes[ postType ] === mode ) {
+			return;
+		}
+
+		const newModes = {
+			[ theme ]: {
+				...renderingModes,
+				[ postType ]: mode,
+			},
+		};
+
+		registry
+			.dispatch( preferencesStore )
+			.set( 'core', 'renderingModes', newModes );
+	};
+
+/**
+ * Set the current global styles navigation path.
+ *
+ * @param {string} path The navigation path.
+ * @return {Object} Action object.
+ */
+export function setStylesPath( path ) {
+	return {
+		type: 'SET_STYLES_PATH',
+		path,
+	};
+}
+
+/**
+ * Set whether the stylebook is visible.
+ *
+ * @param {boolean} show Whether to show the stylebook.
+ * @return {Object} Action object.
+ */
+export function setShowStylebook( show ) {
+	return {
+		type: 'SET_SHOW_STYLEBOOK',
+		show,
+	};
+}
+
+/**
+ * Reset the global styles navigation to initial state.
+ *
+ * @return {Object} Action object.
+ */
+export function resetStylesNavigation() {
+	return {
+		type: 'RESET_STYLES_NAVIGATION',
+	};
+}
+
+/**
+ * Set the minimum height of the canvas.
+ *
+ * @param {number} minHeight
+ * @return {Object} Action object.
+ */
+export function setCanvasMinHeight( minHeight ) {
+	return {
+		type: 'SET_CANVAS_MIN_HEIGHT',
+		minHeight,
+	};
+}

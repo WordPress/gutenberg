@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 import {
 	Button,
 	Spinner,
@@ -27,15 +27,30 @@ export class PostPublishPanel extends Component {
 	constructor() {
 		super( ...arguments );
 		this.onSubmit = this.onSubmit.bind( this );
+		this.cancelButtonNode = createRef();
+	}
+
+	componentDidMount() {
+		// This timeout is necessary to make sure the `useEffect` hook of
+		// `useFocusReturn` gets the correct element (the button that opens the
+		// PostPublishPanel) otherwise it will get this button.
+		this.timeoutID = setTimeout( () => {
+			this.cancelButtonNode.current.focus();
+		}, 0 );
+	}
+
+	componentWillUnmount() {
+		clearTimeout( this.timeoutID );
 	}
 
 	componentDidUpdate( prevProps ) {
 		// Automatically collapse the publish sidebar when a post
 		// is published and the user makes an edit.
 		if (
-			prevProps.isPublished &&
-			! this.props.isSaving &&
-			this.props.isDirty
+			( prevProps.isPublished &&
+				! this.props.isSaving &&
+				this.props.isDirty ) ||
+			this.props.currentPostId !== prevProps.currentPostId
 		) {
 			this.props.onClose();
 		}
@@ -61,6 +76,7 @@ export class PostPublishPanel extends Component {
 			onTogglePublishSidebar,
 			PostPublishExtension,
 			PrePublishExtension,
+			currentPostId,
 			...additionalProps
 		} = this.props;
 		const {
@@ -78,22 +94,17 @@ export class PostPublishPanel extends Component {
 				<div className="editor-post-publish-panel__header">
 					{ isPostPublish ? (
 						<Button
+							size="compact"
 							onClick={ onClose }
 							icon={ closeSmall }
 							label={ __( 'Close panel' ) }
 						/>
 					) : (
 						<>
-							<div className="editor-post-publish-panel__header-publish-button">
-								<PostPublishButton
-									focusOnMount
-									onSubmit={ this.onSubmit }
-									forceIsDirty={ forceIsDirty }
-								/>
-							</div>
 							<div className="editor-post-publish-panel__header-cancel-button">
 								<Button
-									__experimentalIsFocusable
+									ref={ this.cancelButtonNode }
+									accessibleWhenDisabled
 									disabled={ isSavingNonPostEntityChanges }
 									onClick={ onClose }
 									variant="secondary"
@@ -101,6 +112,12 @@ export class PostPublishPanel extends Component {
 								>
 									{ __( 'Cancel' ) }
 								</Button>
+							</div>
+							<div className="editor-post-publish-panel__header-publish-button">
+								<PostPublishButton
+									onSubmit={ this.onSubmit }
+									forceIsDirty={ forceIsDirty }
+								/>
 							</div>
 						</>
 					) }
@@ -139,6 +156,7 @@ export default compose( [
 		const { getPostType } = select( coreStore );
 		const {
 			getCurrentPost,
+			getCurrentPostId,
 			getEditedPostAttribute,
 			isCurrentPostPublished,
 			isCurrentPostScheduled,
@@ -162,6 +180,7 @@ export default compose( [
 			isSaving: isSavingPost() && ! isAutosavingPost(),
 			isSavingNonPostEntityChanges: isSavingNonPostEntityChanges(),
 			isScheduled: isCurrentPostScheduled(),
+			currentPostId: getCurrentPostId(),
 		};
 	} ),
 	withDispatch( ( dispatch, { isPublishSidebarEnabled } ) => {

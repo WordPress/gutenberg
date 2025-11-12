@@ -12,10 +12,11 @@ import {
 	insert,
 	create,
 } from '@wordpress/rich-text';
-import { isURL, isEmail } from '@wordpress/url';
+import { isURL, isEmail, isPhoneNumber } from '@wordpress/url';
 import {
 	RichTextToolbarButton,
 	RichTextShortcut,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { decodeEntities } from '@wordpress/html-entities';
 import { link as linkIcon } from '@wordpress/icons';
@@ -26,6 +27,9 @@ import { speak } from '@wordpress/a11y';
  */
 import InlineLinkUI from './inline';
 import { isValidHref } from './utils';
+import { unlock } from '../lock-unlock';
+
+const { essentialFormatKey } = unlock( blockEditorPrivateApis );
 
 const name = 'core/link';
 const title = __( 'Link' );
@@ -104,6 +108,13 @@ function Edit( {
 					attributes: { url: `mailto:${ text }` },
 				} )
 			);
+		} else if ( ! isActive && text && isPhoneNumber( text ) ) {
+			onChange(
+				applyFormat( value, {
+					type: name,
+					attributes: { url: `tel:${ text.replace( /\D/g, '' ) }` },
+				} )
+			);
 		} else {
 			if ( target ) {
 				setOpenedBy( {
@@ -163,9 +174,17 @@ function Edit( {
 		openedBy?.el?.tagName === 'A' && openedBy?.action === 'click'
 	);
 
+	const hasSelection = ! isCollapsed( value );
+
 	return (
 		<>
-			<RichTextShortcut type="primary" character="k" onUse={ addLink } />
+			{ hasSelection && (
+				<RichTextShortcut
+					type="primary"
+					character="k"
+					onUse={ addLink }
+				/>
+			) }
 			<RichTextShortcut
 				type="primaryShift"
 				character="k"
@@ -212,7 +231,9 @@ export const link = {
 		_id: 'id',
 		target: 'target',
 		rel: 'rel',
+		class: 'class',
 	},
+	[ essentialFormatKey ]: true,
 	__unstablePasteRule( value, { html, plainText } ) {
 		const pastedText = ( html || plainText )
 			.replace( /<[^>]+>/g, '' )

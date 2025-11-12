@@ -20,8 +20,9 @@ const SidebarHeader = ( _, ref ) => {
 		const { getPostTypeLabel } = select( editorStore );
 
 		return {
-			// translators: Default label for the Document sidebar tab, not selected.
-			documentLabel: getPostTypeLabel() || _x( 'Document', 'noun' ),
+			documentLabel:
+				// translators: Default label for the Document sidebar tab, not selected.
+				getPostTypeLabel() || _x( 'Document', 'noun, panel' ),
 		};
 	}, [] );
 

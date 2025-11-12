@@ -128,18 +128,28 @@ export type ToggleGroupControlProps = Pick<
 	 * @default false
 	 */
 	__next40pxDefaultSize?: boolean;
+	/**
+	 * Do not throw a warning for the deprecated 36px default size.
+	 * For internal components of other components that already throw the warning.
+	 *
+	 * @ignore
+	 */
+	__shouldNotWarnDeprecated36pxSize?: boolean;
 };
 
 export type ToggleGroupControlContextProps = {
+	activeItemIsNotFirstItem?: () => boolean;
 	isDeselectable?: boolean;
 	baseId: string;
 	isBlock: ToggleGroupControlProps[ 'isBlock' ];
 	size: ToggleGroupControlProps[ 'size' ];
 	value: ToggleGroupControlProps[ 'value' ];
 	setValue: ( newValue: string | number | undefined ) => void;
+	setSelectedElement: ( element: HTMLElement | undefined ) => void;
 };
 
 export type ToggleGroupControlMainControlProps = Pick<
 	ToggleGroupControlProps,
 	'children' | 'isAdaptiveWidth' | 'label' | 'size' | 'onChange' | 'value'
->;
+> &
+	Pick< ToggleGroupControlContextProps, 'setSelectedElement' >;

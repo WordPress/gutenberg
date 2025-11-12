@@ -39,6 +39,7 @@ function buildSelector( sequential ) {
 		'iframe:not([tabindex^="-"])',
 		'object',
 		'embed',
+		'summary',
 		'area[href]',
 		'[contenteditable]:not([contenteditable=false])',
 	].join( ',' );

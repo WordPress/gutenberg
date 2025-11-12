@@ -376,15 +376,16 @@ const elementTypes = [
 	},
 ];
 
-function useBlockProps( { name, style } ) {
-	const blockElementsContainerIdentifier = `wp-elements-${ useInstanceId(
-		useBlockProps
-	) }`;
+// Used for generating the instance ID
+const STYLE_BLOCK_PROPS_REFERENCE = {};
 
-	// The .editor-styles-wrapper selector is required on elements styles. As it is
-	// added to all other editor styles, not providing it causes reset and global
-	// styles to override element styles because of higher specificity.
-	const baseElementSelector = `.editor-styles-wrapper .${ blockElementsContainerIdentifier }`;
+function useBlockProps( { name, style } ) {
+	const blockElementsContainerIdentifier = useInstanceId(
+		STYLE_BLOCK_PROPS_REFERENCE,
+		'wp-elements'
+	);
+
+	const baseElementSelector = `.${ blockElementsContainerIdentifier }`;
 	const blockElementStyles = style?.elements;
 
 	const styles = useMemo( () => {

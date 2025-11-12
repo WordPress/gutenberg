@@ -2,6 +2,7 @@
  * External dependencies
  */
 import type { Meta, StoryFn } from '@storybook/react';
+import { fn } from '@storybook/test';
 
 /**
  * WordPress dependencies
@@ -12,13 +13,15 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import Tabs from '..';
+import { Tabs } from '..';
 import { Slot, Fill, Provider as SlotFillProvider } from '../../slot-fill';
-import DropdownMenu from '../../dropdown-menu';
 import Button from '../../button';
+import Tooltip from '../../tooltip';
+import Icon from '../../icon';
 
 const meta: Meta< typeof Tabs > = {
-	title: 'Components (Experimental)/Tabs',
+	title: 'Components/Containers/Tabs',
+	id: 'components-tabs',
 	component: Tabs,
 	subcomponents: {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
@@ -27,12 +30,18 @@ const meta: Meta< typeof Tabs > = {
 		'Tabs.Tab': Tabs.Tab,
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Tabs.TabPanel': Tabs.TabPanel,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		'Tabs.Context': Tabs.Context,
 	},
 	tags: [ 'status-private' ],
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+	},
+	args: {
+		onActiveTabIdChange: fn(),
+		onSelect: fn(),
 	},
 };
 export default meta;
@@ -67,6 +76,112 @@ const Template: StoryFn< typeof Tabs > = ( props ) => {
 };
 
 export const Default = Template.bind( {} );
+
+export const SizeAndOverflowPlayground: StoryFn< typeof Tabs > = ( props ) => {
+	const [ fullWidth, setFullWidth ] = useState( false );
+	return (
+		<div>
+			<div style={ { maxWidth: '40rem', marginBottom: '1rem' } }>
+				<p>
+					This story helps understand how the TabList component
+					behaves under different conditions. The container below
+					(with the dotted red border) can be horizontally resized,
+					and it has a bit of padding to be out of the way of the
+					TabList.
+				</p>
+				<p>
+					The button will toggle between full width (adding{ ' ' }
+					<code>width: 100%</code>) and the default width.
+				</p>
+				<p>Try the following:</p>
+				<ul>
+					<li>
+						<strong>Small container</strong> that causes tabs to
+						overflow with scroll.
+					</li>
+					<li>
+						<strong>Large container</strong> that exceeds the normal
+						width of the tabs.
+						<ul>
+							<li>
+								<strong>
+									With <code>width: 100%</code>
+								</strong>{ ' ' }
+								set on the TabList (tabs fill up the space).
+							</li>
+							<li>
+								<strong>
+									Without <code>width: 100%</code>
+								</strong>{ ' ' }
+								(defaults to <code>auto</code>) set on the
+								TabList (tabs take up space proportional to
+								their content).
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+			<Button
+				style={ { marginBottom: '1rem' } }
+				variant="primary"
+				onClick={ () => setFullWidth( ! fullWidth ) }
+			>
+				{ fullWidth
+					? 'Remove width: 100% from TabList'
+					: 'Set width: 100% in TabList' }
+			</Button>
+			<Tabs { ...props }>
+				<div
+					style={ {
+						width: '20rem',
+						border: '2px dotted red',
+						padding: '1rem',
+						resize: 'horizontal',
+						overflow: 'auto',
+					} }
+				>
+					<Tabs.TabList
+						style={ {
+							maxWidth: '100%',
+							width: fullWidth ? '100%' : undefined,
+						} }
+					>
+						<Tabs.Tab tabId="tab1">
+							Label with multiple words
+						</Tabs.Tab>
+						<Tabs.Tab tabId="tab2">Short</Tabs.Tab>
+						<Tabs.Tab tabId="tab3">
+							Hippopotomonstrosesquippedaliophobia
+						</Tabs.Tab>
+						<Tabs.Tab tabId="tab4">Tab 4</Tabs.Tab>
+						<Tabs.Tab tabId="tab5">Tab 5</Tabs.Tab>
+					</Tabs.TabList>
+				</div>
+				<Tabs.TabPanel tabId="tab1">
+					<p>Selected tab: Tab 1</p>
+					<p>(Label with multiple words)</p>
+				</Tabs.TabPanel>
+				<Tabs.TabPanel tabId="tab2">
+					<p>Selected tab: Tab 2</p>
+					<p>(Short)</p>
+				</Tabs.TabPanel>
+				<Tabs.TabPanel tabId="tab3">
+					<p>Selected tab: Tab 3</p>
+					<p>(Hippopotomonstrosesquippedaliophobia)</p>
+				</Tabs.TabPanel>
+				<Tabs.TabPanel tabId="tab4">
+					<p>Selected tab: Tab 4</p>
+				</Tabs.TabPanel>
+				<Tabs.TabPanel tabId="tab5">
+					<p>Selected tab: Tab 5</p>
+				</Tabs.TabPanel>
+			</Tabs>
+		</div>
+	);
+};
+SizeAndOverflowPlayground.args = {
+	defaultTabId: 'tab4',
+};
 
 const VerticalTemplate: StoryFn< typeof Tabs > = ( props ) => {
 	return (
@@ -110,24 +225,29 @@ const WithTabIconsAndTooltipsTemplate: StoryFn< typeof Tabs > = ( props ) => {
 	return (
 		<Tabs { ...props }>
 			<Tabs.TabList>
-				<Tabs.Tab
-					tabId="tab1"
-					render={
-						<Button icon={ wordpress } label="Tab 1" showTooltip />
-					}
-				/>
-				<Tabs.Tab
-					tabId="tab2"
-					render={
-						<Button icon={ link } label="Tab 2" showTooltip />
-					}
-				/>
-				<Tabs.Tab
-					tabId="tab3"
-					render={
-						<Button icon={ more } label="Tab 3" showTooltip />
-					}
-				/>
+				{ [
+					{
+						id: 'tab1',
+						label: 'Tab one',
+						icon: wordpress,
+					},
+					{
+						id: 'tab2',
+						label: 'Tab two',
+						icon: link,
+					},
+					{
+						id: 'tab3',
+						label: 'Tab three',
+						icon: more,
+					},
+				].map( ( { id, label, icon } ) => (
+					<Tooltip text={ label } key={ id }>
+						<Tabs.Tab tabId={ id } aria-label={ label }>
+							<Icon icon={ icon } />
+						</Tabs.Tab>
+					</Tooltip>
+				) ) }
 			</Tabs.TabList>
 			<Tabs.TabPanel tabId="tab1">
 				<p>Selected tab: Tab 1</p>
@@ -246,133 +366,3 @@ const CloseButtonTemplate: StoryFn< typeof Tabs > = ( props ) => {
 	);
 };
 export const InsertCustomElements = CloseButtonTemplate.bind( {} );
-
-const ControlledModeTemplate: StoryFn< typeof Tabs > = ( props ) => {
-	const [ selectedTabId, setSelectedTabId ] = useState<
-		string | undefined | null
-	>( props.selectedTabId );
-
-	return (
-		<>
-			<Tabs
-				{ ...props }
-				selectedTabId={ selectedTabId }
-				onSelect={ ( selectedId ) => {
-					setSelectedTabId( selectedId );
-					props.onSelect?.( selectedId );
-				} }
-			>
-				<Tabs.TabList>
-					<Tabs.Tab tabId="tab1">Tab 1</Tabs.Tab>
-
-					<Tabs.Tab tabId="tab2">Tab 2</Tabs.Tab>
-
-					<Tabs.Tab tabId="tab3">Tab 3</Tabs.Tab>
-				</Tabs.TabList>
-				<Tabs.TabPanel tabId="tab1">
-					<p>Selected tab: Tab 1</p>
-				</Tabs.TabPanel>
-				<Tabs.TabPanel tabId="tab2">
-					<p>Selected tab: Tab 2</p>
-				</Tabs.TabPanel>
-				<Tabs.TabPanel tabId="tab3">
-					<p>Selected tab: Tab 3</p>
-				</Tabs.TabPanel>
-			</Tabs>
-			<div style={ { marginTop: '200px' } }>
-				<p>Select a tab:</p>
-				<DropdownMenu
-					controls={ [
-						{
-							onClick: () => setSelectedTabId( 'tab1' ),
-							title: 'Tab 1',
-							isActive: selectedTabId === 'tab1',
-						},
-						{
-							onClick: () => setSelectedTabId( 'tab2' ),
-							title: 'Tab 2',
-							isActive: selectedTabId === 'tab2',
-						},
-						{
-							onClick: () => setSelectedTabId( 'tab3' ),
-							title: 'Tab 3',
-							isActive: selectedTabId === 'tab3',
-						},
-					] }
-					label="Choose a tab. The power is yours."
-				/>
-			</div>
-		</>
-	);
-};
-
-export const ControlledMode = ControlledModeTemplate.bind( {} );
-ControlledMode.args = {
-	selectedTabId: 'tab3',
-};
-
-const TabBecomesDisabledTemplate: StoryFn< typeof Tabs > = ( props ) => {
-	const [ disableTab2, setDisableTab2 ] = useState( false );
-
-	return (
-		<>
-			<Button
-				variant="primary"
-				onClick={ () => setDisableTab2( ! disableTab2 ) }
-			>
-				{ disableTab2 ? 'Enable' : 'Disable' } Tab 2
-			</Button>
-			<Tabs { ...props }>
-				<Tabs.TabList>
-					<Tabs.Tab tabId="tab1">Tab 1</Tabs.Tab>
-					<Tabs.Tab tabId="tab2" disabled={ disableTab2 }>
-						Tab 2
-					</Tabs.Tab>
-					<Tabs.Tab tabId="tab3">Tab 3</Tabs.Tab>
-				</Tabs.TabList>
-				<Tabs.TabPanel tabId="tab1">
-					<p>Selected tab: Tab 1</p>
-				</Tabs.TabPanel>
-				<Tabs.TabPanel tabId="tab2">
-					<p>Selected tab: Tab 2</p>
-				</Tabs.TabPanel>
-				<Tabs.TabPanel tabId="tab3">
-					<p>Selected tab: Tab 3</p>
-				</Tabs.TabPanel>
-			</Tabs>
-		</>
-	);
-};
-export const TabBecomesDisabled = TabBecomesDisabledTemplate.bind( {} );
-
-const TabGetsRemovedTemplate: StoryFn< typeof Tabs > = ( props ) => {
-	const [ removeTab1, setRemoveTab1 ] = useState( false );
-
-	return (
-		<>
-			<Button
-				variant="primary"
-				onClick={ () => setRemoveTab1( ! removeTab1 ) }
-			>
-				{ removeTab1 ? 'Restore' : 'Remove' } Tab 1
-			</Button>
-			<Tabs { ...props }>
-				<Tabs.TabList>
-					{ ! removeTab1 && <Tabs.Tab tabId="tab1">Tab 1</Tabs.Tab> }
-					<Tabs.Tab tabId="tab2">Tab 2</Tabs.Tab>
-					<Tabs.Tab tabId="tab3">Tab 3</Tabs.Tab>
-				</Tabs.TabList>
-				<Tabs.TabPanel tabId="tab1">
-					<p>Selected tab: Tab 1</p>
-				</Tabs.TabPanel>
-				<Tabs.TabPanel tabId="tab2">
-					<p>Selected tab: Tab 2</p>
-				</Tabs.TabPanel>
-				<Tabs.TabPanel tabId="tab3">
-					<p>Selected tab: Tab 3</p>
-				</Tabs.TabPanel>
-			</Tabs>
-		</>
-	);
-};
-export const TabGetsRemoved = TabGetsRemovedTemplate.bind( {} );

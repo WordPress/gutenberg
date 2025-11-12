@@ -1,3 +1,7 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 textarea.editor-post-text-editor {
 	border: $border-width solid $gray-600;
 	border-radius: 0;
@@ -10,8 +14,10 @@ textarea.editor-post-text-editor {
 	font-family: $editor-html-font;
 	line-height: 2.4;
 	min-height: 200px;
-	transition: border 0.1s ease-out, box-shadow 0.1s linear;
-	@include reduce-motion("transition");
+
+	@media not (prefers-reduced-motion) {
+		transition: border 0.1s ease-out, box-shadow 0.1s linear;
+	}
 
 	// Same padding as title.
 	padding: $grid-unit-20;
@@ -39,8 +45,6 @@ textarea.editor-post-text-editor {
 
 	&::-moz-placeholder {
 		color: $dark-gray-placeholder;
-		// Override Firefox default.
-		opacity: 1;
 	}
 
 	&:-ms-input-placeholder {

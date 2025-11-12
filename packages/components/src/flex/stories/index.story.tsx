@@ -17,7 +17,7 @@ const meta: Meta< typeof Flex > = {
 	argTypes: {
 		align: { control: { type: 'text' } },
 		as: { control: { type: 'text' } },
-		children: { control: { type: null } },
+		children: { control: false },
 		gap: { control: { type: 'text' } },
 		justify: { control: { type: 'text' } },
 		// Disabled isReversed because it's deprecated.

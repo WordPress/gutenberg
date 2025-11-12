@@ -15,6 +15,7 @@ import { createContext, useContext, useMemo } from '@wordpress/element';
 
 /** @type {import('react').Context<Record<string,*>>} */
 const Context = createContext( {} );
+Context.displayName = 'BlockContext';
 
 /**
  * Component which merges passed value with current consumed block context.

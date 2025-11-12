@@ -10,6 +10,8 @@ import { v4 as uuid } from 'uuid';
 import { createElement, cloneElement } from '@wordpress/element';
 // eslint-disable-next-line no-restricted-imports
 import { initializeEditor as internalInitializeEditor } from '@wordpress/edit-post';
+import { store as coreStore } from '@wordpress/core-data';
+import { select } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -28,6 +30,21 @@ import { getGlobalStyles } from './get-global-styles';
  * @return {import('@testing-library/react-native').RenderAPI} A Testing Library screen.
  */
 export async function initializeEditor( props, { component } = {} ) {
+	const resolutionSpy = jest.spyOn(
+		select( coreStore ),
+		'hasFinishedResolution'
+	);
+	const actualResolution = resolutionSpy.getMockImplementation();
+	resolutionSpy.mockImplementation( ( selectorName, args ) => {
+		// The mobile editor only supports the `post-only` rendering mode, so we
+		// presume a resolved `getPostType` selector to unblock editor rendering.
+		if ( [ 'getPostType', 'getCurrentTheme' ].includes( selectorName ) ) {
+			return true;
+		}
+
+		return actualResolution( selectorName, args );
+	} );
+
 	const uniqueId = uuid();
 	const postId = `post-id-${ uniqueId }`;
 	const postType = 'post';

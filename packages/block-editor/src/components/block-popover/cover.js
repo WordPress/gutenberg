@@ -6,7 +6,7 @@ import { useEffect, useState, useMemo, forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
+import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import { PrivateBlockPopover } from '.';
 
 function BlockPopoverCover(

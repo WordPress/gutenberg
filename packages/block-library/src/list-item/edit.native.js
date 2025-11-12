@@ -54,7 +54,7 @@ export default function ListItemEdit( {
 				getBlockParentsByBlockName,
 				getBlockRootClientId,
 			} = select( blockEditorStore );
-			const currentIdentationLevel = getBlockParentsByBlockName(
+			const currentIndentationLevel = getBlockParentsByBlockName(
 				clientId,
 				'core/list-item',
 				true
@@ -73,7 +73,7 @@ export default function ListItemEdit( {
 			return {
 				blockIndex: currentBlockIndex,
 				hasInnerBlocks: blockWithInnerBlocks,
-				indentationLevel: currentIdentationLevel,
+				indentationLevel: currentIndentationLevel,
 				numberOfListItems: totalListItems,
 				ordered: isOrdered,
 				reversed: isReversed,

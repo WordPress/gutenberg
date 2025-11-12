@@ -1,5 +1,9 @@
 # FontFamilyControl
 
+<div class="callout callout-alert">
+This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+</div>
+
 FontFamilyControl is a React component that renders a UI that allows users to select a font family.
 The component renders a user interface that allows the user to select from a set of predefined font families as defined by the `typography.fontFamilies` presets.
 Optionally, you can provide a `fontFamilies` prop that overrides the predefined font families.
@@ -10,7 +14,7 @@ Optionally, you can provide a `fontFamilies` prop that overrides the predefined 
 
 ```jsx
 import { useState } from 'react';
-import { FontFamilyControl } from '@wordpress/block-editor';
+import { __experimentalFontFamilyControl as FontFamilyControl } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
 // ...
@@ -24,6 +28,8 @@ const MyFontFamilyControl = () => {
 			onChange={ ( newFontFamily ) => {
 				setFontFamily( newFontFamily );
 			} }
+			__nextHasNoMarginBottom
+			__next40pxDefaultSize
 		/>
 	);
 };
@@ -69,3 +75,19 @@ The current font family value.
 - Default: ''
 
 The rest of the props are passed down to the underlying `<SelectControl />` instance.
+
+#### `__next40pxDefaultSize`
+
+- Type: `boolean`
+- Required: No
+- Default: `false`
+
+Start opting into the larger default height that will become the default size in a future version.
+
+#### `__nextHasNoMarginBottom`
+
+- Type: `boolean`
+- Required: No
+- Default: `false`
+
+Start opting into the new margin-free styles that will become the default in a future version.

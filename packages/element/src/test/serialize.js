@@ -715,6 +715,14 @@ describe( 'renderStyle()', () => {
 
 			expect( result ).toBe( 'order:10' );
 		} );
+
+		it( 'should not render numeric units for CSS custom properties', () => {
+			const result = renderStyle( {
+				'--myOrder': 10,
+			} );
+
+			expect( result ).toBe( '--myOrder:10' );
+		} );
 	} );
 } );
 

@@ -15,12 +15,12 @@ const initialHtml = `
 <figure class="wp-block-image size-large is-style-default"><a href="https://cldup.com/cXyG__fTLN.jpg"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/></a><figcaption class="wp-element-caption">Mountain</figcaption></figure>
 <!-- /wp:image -->`;
 
-const tranformsWithInnerBlocks = [ 'Gallery', 'Columns', 'Group' ];
+const transformsWithInnerBlocks = [ 'Gallery', 'Columns', 'Group' ];
 const nonMediaTransforms = [ 'File' ];
 const blockTransforms = [
 	'Cover',
 	'Media & Text',
-	...tranformsWithInnerBlocks,
+	...transformsWithInnerBlocks,
 	...nonMediaTransforms,
 ];
 
@@ -31,7 +31,8 @@ describe( `${ block } block transformations`, () => {
 		const screen = await initializeEditor( { initialHtml } );
 		const newBlock = await transformBlock( screen, block, blockTransform, {
 			isMediaBlock: ! nonMediaTransforms.includes( blockTransform ),
-			hasInnerBlocks: tranformsWithInnerBlocks.includes( blockTransform ),
+			hasInnerBlocks:
+				transformsWithInnerBlocks.includes( blockTransform ),
 		} );
 		expect( newBlock ).toBeVisible();
 		expect( getEditorHtml() ).toMatchSnapshot();

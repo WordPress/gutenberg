@@ -12,6 +12,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { useDebounce, useInstanceId, usePrevious } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import isShallowEqual from '@wordpress/is-shallow-equal';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -29,6 +30,7 @@ import {
 import { Spacer } from '../spacer';
 import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
 import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
+import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
 
 const identity = ( value: string ) => value;
 
@@ -77,6 +79,20 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		tokenizeOnBlur = false,
 	} = useDeprecated36pxDefaultSizeProp< FormTokenFieldProps >( props );
 
+	if ( ! __nextHasNoMarginBottom ) {
+		deprecated( 'Bottom margin styles for wp.components.FormTokenField', {
+			since: '6.7',
+			version: '7.0',
+			hint: 'Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version.',
+		} );
+	}
+
+	maybeWarnDeprecated36pxSize( {
+		componentName: 'FormTokenField',
+		size: undefined,
+		__next40pxDefaultSize,
+	} );
+
 	const instanceId = useInstanceId( FormTokenField );
 
 	// We reset to these initial values again in the onBlur
@@ -115,17 +131,14 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		}
 
 		// TODO: updateSuggestions() should first be refactored so its actual deps are clearer.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ suggestions, prevSuggestions, value, prevValue ] );
 
 	useEffect( () => {
 		updateSuggestions();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ incompleteTokenValue ] );
 
 	useEffect( () => {
 		updateSuggestions();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ __experimentalAutoSelectFirstMatch ] );
 
 	if ( disabled && isActive ) {
@@ -227,6 +240,9 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 				break;
 			case 'Escape':
 				preventDefault = handleEscapeKey( event );
+				break;
+			case 'Tab':
+				preventDefault = handleTabKey( event );
 				break;
 			default:
 				break;
@@ -359,15 +375,23 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		return true; // PreventDefault.
 	}
 
-	function handleEscapeKey( event: KeyboardEvent ) {
+	function collapseSuggestionsList( event: KeyboardEvent ) {
 		if ( event.target instanceof HTMLInputElement ) {
 			setIncompleteTokenValue( event.target.value );
 			setIsExpanded( false );
 			setSelectedSuggestionIndex( -1 );
 			setSelectedSuggestionScroll( false );
 		}
+	}
 
+	function handleEscapeKey( event: KeyboardEvent ) {
+		collapseSuggestionsList( event );
 		return true; // PreventDefault.
+	}
+
+	function handleTabKey( event: KeyboardEvent ) {
+		collapseSuggestionsList( event );
+		return false; // Do not prevent the default behavior.
 	}
 
 	function handleCommaKey() {
@@ -500,10 +524,13 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 				( suggestion ) => ! normalizedValue.includes( suggestion )
 			);
 		} else {
-			match = match.toLocaleLowerCase();
+			match = match.normalize( 'NFKC' ).toLocaleLowerCase();
 
 			_suggestions.forEach( ( suggestion ) => {
-				const index = suggestion.toLocaleLowerCase().indexOf( match );
+				const index = suggestion
+					.normalize( 'NFKC' )
+					.toLocaleLowerCase()
+					.indexOf( match );
 				if ( normalizedValue.indexOf( suggestion ) === -1 ) {
 					if ( index === 0 ) {
 						startsWithMatch.push( suggestion );

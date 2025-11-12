@@ -1,24 +1,19 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { useViewportMatch } from '@wordpress/compose';
+import { useMediaQuery, useViewportMatch } from '@wordpress/compose';
 import { __unstableMotion as motion } from '@wordpress/components';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { useState } from '@wordpress/element';
 import { PinnedItems } from '@wordpress/interface';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import BackButton from './back-button';
-import CollapsableBlockToolbar from '../collapsible-block-toolbar';
+import BackButton, { useHasBackButton } from './back-button';
+import CollapsibleBlockToolbar from '../collapsible-block-toolbar';
 import DocumentBar from '../document-bar';
 import DocumentTools from '../document-tools';
 import MoreMenu from '../more-menu';
@@ -27,7 +22,14 @@ import PostPublishButtonOrToggle from '../post-publish-button/post-publish-butto
 import PostSavedState from '../post-saved-state';
 import PostViewLink from '../post-view-link';
 import PreviewDropdown from '../preview-dropdown';
+import ZoomOutToggle from '../zoom-out-toggle';
 import { store as editorStore } from '../../store';
+import {
+	TEMPLATE_PART_POST_TYPE,
+	PATTERN_POST_TYPE,
+	NAVIGATION_POST_TYPE,
+} from '../../store/constants';
+import { unlock } from '../../lock-unlock';
 
 const toolbarVariations = {
 	distractionFreeDisabled: { y: '-50px' },
@@ -48,99 +50,144 @@ const backButtonVariations = {
 function Header( {
 	customSaveButton,
 	forceIsDirty,
-	forceDisableBlockTools,
 	setEntitiesSavedStatesCallback,
-	title,
 } ) {
 	const isWideViewport = useViewportMatch( 'large' );
 	const isLargeViewport = useViewportMatch( 'medium' );
+	const isTooNarrowForDocumentBar = useMediaQuery( '(max-width: 403px)' );
 	const {
+		postType,
 		isTextEditor,
 		isPublishSidebarOpened,
 		showIconLabels,
 		hasFixedToolbar,
-		isNestedEntity,
-		isZoomedOutView,
+		hasBlockSelection,
+		hasSectionRootClientId,
+		isStylesCanvasActive,
 	} = useSelect( ( select ) => {
 		const { get: getPreference } = select( preferencesStore );
 		const {
 			getEditorMode,
-			getEditorSettings,
+			getCurrentPostType,
 			isPublishSidebarOpened: _isPublishSidebarOpened,
 		} = select( editorStore );
-		const { __unstableGetEditorMode } = select( blockEditorStore );
+		const { getStylesPath, getShowStylebook } = unlock(
+			select( editorStore )
+		);
+		const { getBlockSelectionStart, getSectionRootClientId } = unlock(
+			select( blockEditorStore )
+		);
 
 		return {
+			postType: getCurrentPostType(),
 			isTextEditor: getEditorMode() === 'text',
 			isPublishSidebarOpened: _isPublishSidebarOpened(),
 			showIconLabels: getPreference( 'core', 'showIconLabels' ),
 			hasFixedToolbar: getPreference( 'core', 'fixedToolbar' ),
-			isNestedEntity:
-				!! getEditorSettings().onNavigateToPreviousEntityRecord,
-			isZoomedOutView: __unstableGetEditorMode() === 'zoom-out',
+			hasBlockSelection: !! getBlockSelectionStart(),
+			hasSectionRootClientId: !! getSectionRootClientId(),
+			isStylesCanvasActive:
+				!! getStylesPath()?.startsWith( '/revisions' ) ||
+				getShowStylebook(),
 		};
 	}, [] );
 
-	const hasTopToolbar = isLargeViewport && hasFixedToolbar;
+	const canBeZoomedOut =
+		[ 'post', 'page', 'wp_template' ].includes( postType ) &&
+		hasSectionRootClientId;
+
+	const disablePreviewOption =
+		[
+			NAVIGATION_POST_TYPE,
+			TEMPLATE_PART_POST_TYPE,
+			PATTERN_POST_TYPE,
+		].includes( postType ) || isStylesCanvasActive;
 
 	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
 		useState( true );
 
-	// The edit-post-header classname is only kept for backward compatibilty
-	// as some plugins might be relying on its presence.
+	const hasCenter =
+		! isTooNarrowForDocumentBar &&
+		( ! hasFixedToolbar ||
+			( hasFixedToolbar &&
+				( ! hasBlockSelection || isBlockToolsCollapsed ) ) );
+	const hasBackButton = useHasBackButton();
+
+	/*
+	 * The edit-post-header classname is only kept for backward compatibility
+	 * as some plugins might be relying on its presence.
+	 */
 	return (
 		<div className="editor-header edit-post-header">
-			<motion.div
-				variants={ backButtonVariations }
-				transition={ { type: 'tween' } }
-			>
-				<BackButton.Slot />
-			</motion.div>
+			{ hasBackButton && (
+				<motion.div
+					className="editor-header__back-button"
+					variants={ backButtonVariations }
+					transition={ { type: 'tween' } }
+				>
+					<BackButton.Slot />
+				</motion.div>
+			) }
 			<motion.div
 				variants={ toolbarVariations }
 				className="editor-header__toolbar"
 				transition={ { type: 'tween' } }
 			>
 				<DocumentTools
-					disableBlockTools={ forceDisableBlockTools || isTextEditor }
+					disableBlockTools={ isStylesCanvasActive || isTextEditor }
 				/>
-				{ hasTopToolbar && (
-					<CollapsableBlockToolbar
+				{ hasFixedToolbar && isLargeViewport && (
+					<CollapsibleBlockToolbar
 						isCollapsed={ isBlockToolsCollapsed }
 						onToggle={ setIsBlockToolsCollapsed }
 					/>
 				) }
-				<div
-					className={ clsx( 'editor-header__center', {
-						'is-collapsed':
-							! isBlockToolsCollapsed && hasTopToolbar,
-					} ) }
-				>
-					{ ! title ? <DocumentBar /> : title }
-				</div>
 			</motion.div>
+			{ hasCenter && (
+				<motion.div
+					className="editor-header__center"
+					variants={ toolbarVariations }
+					transition={ { type: 'tween' } }
+				>
+					<DocumentBar />
+				</motion.div>
+			) }
 			<motion.div
 				variants={ toolbarVariations }
 				transition={ { type: 'tween' } }
 				className="editor-header__settings"
 			>
 				{ ! customSaveButton && ! isPublishSidebarOpened && (
-					// This button isn't completely hidden by the publish sidebar.
-					// We can't hide the whole toolbar when the publish sidebar is open because
-					// we want to prevent mounting/unmounting the PostPublishButtonOrToggle DOM node.
-					// We track that DOM node to return focus to the PostPublishButtonOrToggle
-					// when the publish sidebar has been closed.
+					/*
+					 * This button isn't completely hidden by the publish sidebar.
+					 * We can't hide the whole toolbar when the publish sidebar is open because
+					 * we want to prevent mounting/unmounting the PostPublishButtonOrToggle DOM node.
+					 * We track that DOM node to return focus to the PostPublishButtonOrToggle
+					 * when the publish sidebar has been closed.
+					 */
 					<PostSavedState forceIsDirty={ forceIsDirty } />
 				) }
+
+				<PostViewLink />
+
 				<PreviewDropdown
 					forceIsAutosaveable={ forceIsDirty }
-					disabled={ isNestedEntity || isZoomedOutView }
+					disabled={ disablePreviewOption }
 				/>
+
 				<PostPreviewButton
 					className="editor-header__post-preview-button"
 					forceIsAutosaveable={ forceIsDirty }
 				/>
-				<PostViewLink />
+
+				{ isWideViewport && canBeZoomedOut && (
+					<ZoomOutToggle disabled={ isStylesCanvasActive } />
+				) }
+
+				{ ( isWideViewport || ! showIconLabels ) && (
+					<PinnedItems.Slot scope="core" />
+				) }
+
 				{ ! customSaveButton && (
 					<PostPublishButtonOrToggle
 						forceIsDirty={ forceIsDirty }
@@ -150,9 +197,6 @@ function Header( {
 					/>
 				) }
 				{ customSaveButton }
-				{ ( isWideViewport || ! showIconLabels ) && (
-					<PinnedItems.Slot scope="core" />
-				) }
 				<MoreMenu />
 			</motion.div>
 		</div>

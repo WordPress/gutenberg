@@ -1,13 +1,14 @@
 # Managing Packages
 
-This repository uses [monorepo] to manage WordPress modules and publish them with [lerna] as packages to [npm].
+This repository uses [npm workspaces](https://docs.npmjs.com/cli/v10/using-npm/workspaces) to manage WordPress packages and [lerna](https://lerna.js.org/) to publish them with to [npm](https://www.npmjs.com/).
 
 ## Creating a New Package
 
-When creating a new package, you need to provide at least the following:
+When creating a new package, you need to provide at least the following. Packages bundled in Gutenberg or WordPress must include a `wpScript` and or `wpScriptModuleExports` field in their `package.json` file. See the details below.
 
 1. `package.json` based on the template:
-    ```json
+
+    ```jsonc
     {
     	"name": "@wordpress/package-name",
     	"version": "1.0.0-prerelease",
@@ -24,23 +25,54 @@ When creating a new package, you need to provide at least the following:
     	"bugs": {
     		"url": "https://github.com/WordPress/gutenberg/issues"
     	},
+    	"engines": {
+    		"node": ">=18.12.0",
+    		"npm": ">=8.19.2"
+    	},
     	"main": "build/index.js",
     	"module": "build-module/index.js",
     	"react-native": "src/index",
+    	// Include this line to include the package as a WordPress script.
+    	"wpScript": true,
+    	// Include this line to include the package as a WordPress script module.
+    	"wpScriptModuleExports": "./build-module/index.js",
+    	"types": "build-types",
+    	"sideEffects": false,
     	"dependencies": {
-    		"@babel/runtime": "^7.16.0"
+    		"@babel/runtime": "7.25.7"
     	},
     	"publishConfig": {
     		"access": "public"
     	}
     }
     ```
+
     This assumes that your code is located in the `src` folder and will be transpiled with `Babel`.
-2. `.npmrc` file which disables creating `package-lock.json` file for the package:
+
+    For production packages that will ship as a WordPress script, include `wpScript: true` in the `package.json` file. This tells the build system to bundle the package for use as a WordPress script.
+
+    For production packages that will ship as a WordPress script module, include a `wpScriptModuleExports` field in the `package.json` file. The value of this field can be a string to expose a single script module, or an object with a [shape like the standard `exports` object](https://nodejs.org/docs/latest-v20.x/api/packages.html#subpath-exports) to expose multiple script modules from a single package:
+
+    ```jsonc
+    {
+    	"name": "@wordpress/example",
+
+    	// The string form exposes the `@wordpress/example` script module.
+    	"wpScriptModuleExports": "./build-module/index.js",
+
+    	// Multiple sub-modules can be exposed by providing an object:
+    	"wpScriptModuleExports": {
+    		// Exposed as `@wordpress/example` script module.
+    		".": "./build-module/index.js",
+    		// Exposed as `@wordpress/example/demo-block/view` script module.
+    		"./demo-block/view": "./build-module/index.js"
+    	}
+    }
     ```
-    package-lock=false
-    ```
-3. `README.md` file containing at least:
+
+    Both `wpScript` and `wpScriptModuleExports` may be included if the package exposes both a script and a script module. These fields are also essential when performing a license check for all their dependencies, because they trigger strict validation against compatibility with GPL v2. All remaining dependencies WordPress doesn't distribute but uses for development purposes can contain also a few other OSS compatible licenses.
+
+1. `README.md` file containing at least:
     - Package name
     - Package description
     - Installation details
@@ -48,7 +80,7 @@ When creating a new package, you need to provide at least the following:
     - API documentation, if applicable ([more info](#maintaining-api-documentation))
     - A link to the contributing guidelines ([here's an example](https://github.com/WordPress/gutenberg/tree/HEAD/packages/a11y/README.md#contributing-to-this-package) from the a11y package)
     - `Code is Poetry` logo (`<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>`)
-4. `CHANGELOG.md` file containing at least:
+1. `CHANGELOG.md` file containing at least:
 
     ```
     <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
@@ -58,7 +90,7 @@ When creating a new package, you need to provide at least the following:
     Initial release.
     ```
 
-To ensure your package is recognised, you should also _manually_ add your new package to the root `package.json` file and then run `npm install` to update the dependencies.
+To ensure your package is recognized in npm workspaces, you should run `npm install` to update the package lock file.
 
 ## Managing Dependencies
 
@@ -70,41 +102,38 @@ Production dependencies are stored in the `dependencies` section of the packageâ
 
 #### Adding New Dependencies
 
-The simplest way to add a production dependency to one of the packages is to run a very convenient [lerna add](https://github.com/lerna/lerna/tree/HEAD/commands/add#readme) command from the root of the project.
+The simplest way to add a production dependency to one of the packages is to run a command like the following from the root of the project.
 
 _Example:_
 
 ```bash
-lerna add change-case packages/a11y
+npm install change-case -w packages/a11y
 ```
 
-This command adds the latest version of `change-case` as a dependency to the `@wordpress/a11y` package, which is located in `packages/a11y` folder.
-
-#### Removing Existing Dependencies
-
-Removing a dependency from one of the WordPress packages requires some manual work. You need to remove the line in the corresponding `dependencies` section of the `package.json` file.
+This command adds the `change-case` as a dependency to the `@wordpress/a11y` package, which is located in `packages/a11y` folder. If there was the same dependency installed then the version specified in the `package-lock.json` file is going to be reused. If you want to enforce a different version, you can do so by adding the `@` suffix to the package name.
 
 _Example:_
 
-```diff
-+++ b/packages/scripts/package.json
-@@ -43,7 +43,6 @@
-                "check-node-version": "^4.1.0",
-                "cross-spawn": "^5.1.0",
-                "eslint": "^7.1.0",
--               "jest": "^29.6.2",
-                "minimist": "^1.2.0",
-                "npm-package-json-lint": "^6.4.0",
+```bash
+npm install change-case@latest -w packages/a11y
 ```
 
-Next, you need to run `npm install` in the root of the project to ensure that `package-lock.json` file gets properly regenerated.
+#### Removing Existing Dependencies
+
+Removing a dependency from one of the WordPress packages is similar to installation. You need to run a command like the following from the root of the project.
+
+_Example:_
+
+```bash
+npm uninstall change-case -w packages/a11y
+```
 
 #### Updating Existing Dependencies
 
 This is the most confusing part of working with [monorepo] which causes a lot of hassles for contributors. The most successful strategy so far is to do the following:
 
 1.  First, remove the existing dependency as described in the previous section.
-2.  Next, add the same dependency back as described in the first section of this chapter. This time it wil get the latest version applied unless you enforce a different version explicitly.
+2.  Next, add the same dependency back as described in the first section of this chapter. This time it will get the latest version applied unless you enforce a different version explicitly.
 
 ### Development Dependencies
 
@@ -152,9 +181,9 @@ It's very important to have a good plan for what a new package will include. All
 
 ## Maintaining Changelogs
 
-In maintaining dozens of npm packages, it can be tough to keep track of changes. To simplify the release process, each package includes a `CHANGELOG.md` file which details all published releases and the unreleased ("Unreleased") changes, if any exist.
+When maintaining dozens of npm packages, it can be tough to keep track of changes. To simplify the release process, each package includes a `CHANGELOG.md` file which details all published releases and the unreleased ("Unreleased") changes, if any exist.
 
-For each pull request, you should always include relevant changes in a "Unreleased" heading at the top of the file. You should add the heading if it doesn't already exist.
+For each pull request, you should always include relevant changes under an "Unreleased" heading at the top of the file. You should add the heading if it doesn't already exist.
 
 _Example:_
 
@@ -163,7 +192,7 @@ _Example:_
 
 ## Unreleased
 
-### Bug Fix
+### Bug Fixes
 
 -   Fixed an off-by-one error with the `sum` function.
 ```
@@ -185,7 +214,7 @@ If you are publishing new versions of packages, note that there are versioning r
 
 ## TypeScript
 
-The [TypeScript](http://www.typescriptlang.org/) language is a typed superset of JavaScript that compiles to plain JavaScript.
+The [TypeScript](https://www.typescriptlang.org/) language is a typed superset of JavaScript that compiles to plain JavaScript.
 Gutenberg does not use the TypeScript language, however TypeScript has powerful tooling that can be applied to JavaScript projects.
 
 Gutenberg uses TypeScript for several reasons, including:
@@ -200,7 +229,7 @@ Gutenberg uses TypeScript by running the TypeScript compiler (`tsc`) on select p
 These packages benefit from type checking and produced type declarations in the published packages.
 
 To opt-in to TypeScript tooling, packages should include a `tsconfig.json` file in the package root and add an entry to the root `tsconfig.json` references.
-The changes will indicate that the package has opted-in and will be included in the TypeScript build process.
+The changes will indicate that the package has opted in and will be included in the TypeScript build process.
 
 A `tsconfig.json` file should look like the following (comments are not necessary):
 
@@ -232,16 +261,16 @@ For consumers to use the published type declarations, we'll set the `types` fiel
 ```json
 {
 	"main": "build/index.js",
-	"main-module": "build-module/index.js",
+	"module": "build-module/index.js",
 	"types": "build-types"
 }
 ```
 
 Ensure that the `build-types` directory will be included in the published package, for example if a `files` field is declared.
 
-[lerna]: https://lerna.js.org/
-[monorepo]: https://monorepo.tools
-[npm]: https://www.npmjs.com/
+## Supported Node.js and npm versions
+
+WordPress packages adhere the [Node.js Release Schedule](https://nodejs.org/en/about/previous-releases/). Consequently, the minimum required versions of Node.js and npm are specified using the `engines` field in `package.json` for all packages. This ensures that production applications run only on Active LTS or Maintenance LTS releases on Node.js. LTS release status is "long-term support", which typically guarantees that critical bugs will be fixed for a total of 30 months.
 
 ## Optimizing for bundlers
 

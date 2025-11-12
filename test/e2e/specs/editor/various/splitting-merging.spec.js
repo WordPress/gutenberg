@@ -373,6 +373,112 @@ test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
 		);
 	} );
 
+	// Fix for https://github.com/WordPress/gutenberg/issues/65174.
+	test( 'should handle unwrapping and merging blocks with empty contents', async ( {
+		editor,
+		page,
+	} ) => {
+		const emptyAlignedParagraph = {
+			name: 'core/paragraph',
+			attributes: { content: '', align: 'center', dropCap: false },
+			innerBlocks: [],
+		};
+		const emptyAlignedHeading = {
+			name: 'core/heading',
+			attributes: { content: '', textAlign: 'center', level: 2 },
+			innerBlocks: [],
+		};
+		const headingWithContent = {
+			name: 'core/heading',
+			attributes: { content: 'heading', level: 2 },
+			innerBlocks: [],
+		};
+		const paragraphWithContent = {
+			name: 'core/paragraph',
+			attributes: { content: 'heading', dropCap: false },
+			innerBlocks: [],
+		};
+		const placeholderBlock = { name: 'core/separator' };
+		await editor.insertBlock( {
+			name: 'core/group',
+			innerBlocks: [
+				emptyAlignedParagraph,
+				emptyAlignedHeading,
+				headingWithContent,
+				placeholderBlock,
+			],
+		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Empty block' } )
+			.focus();
+
+		// Remove the alignment.
+		await page.keyboard.press( 'Backspace' );
+		// Remove the empty paragraph block.
+		await page.keyboard.press( 'Backspace' );
+		await expect
+			.poll( editor.getBlocks, 'Remove the default empty block' )
+			.toEqual( [
+				{
+					name: 'core/group',
+					attributes: { tagName: 'div' },
+					innerBlocks: [
+						emptyAlignedHeading,
+						headingWithContent,
+						expect.objectContaining( placeholderBlock ),
+					],
+				},
+			] );
+
+		// Convert the heading to a default block.
+		await page.keyboard.press( 'Backspace' );
+		await expect
+			.poll(
+				editor.getBlocks,
+				'Convert the non-default empty block to a default block'
+			)
+			.toEqual( [
+				{
+					name: 'core/group',
+					attributes: { tagName: 'div' },
+					innerBlocks: [
+						emptyAlignedParagraph,
+						headingWithContent,
+						expect.objectContaining( placeholderBlock ),
+					],
+				},
+			] );
+		// Remove the alignment.
+		await page.keyboard.press( 'Backspace' );
+		// Remove the empty default block.
+		await page.keyboard.press( 'Backspace' );
+		await expect.poll( editor.getBlocks ).toEqual( [
+			{
+				name: 'core/group',
+				attributes: { tagName: 'div' },
+				innerBlocks: [
+					headingWithContent,
+					expect.objectContaining( placeholderBlock ),
+				],
+			},
+		] );
+
+		// Convert a non-empty non-default block to a default block.
+		await page.keyboard.press( 'Backspace' );
+		await expect
+			.poll( editor.getBlocks, 'Lift the non-empty non-default block' )
+			.toEqual( [
+				{
+					name: 'core/group',
+					attributes: { tagName: 'div' },
+					innerBlocks: [
+						paragraphWithContent,
+						expect.objectContaining( placeholderBlock ),
+					],
+				},
+			] );
+	} );
+
 	test.describe( 'test restore selection when merge produces more than one block', () => {
 		const snap1 = [
 			{
@@ -433,7 +539,7 @@ test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
 			expect( await editor.getBlocks() ).toMatchObject( snap1 );
 
 			await page.keyboard.press( 'Delete' );
-			// Carret should be in the first block and at the proper position.
+			// Caret should be in the first block and at the proper position.
 			await page.keyboard.type( '-' );
 
 			// Check the content.
@@ -454,7 +560,7 @@ test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
 			expect( await editor.getBlocks() ).toMatchObject( snap1 );
 
 			await page.keyboard.press( 'Backspace' );
-			// Carret should be in the first block and at the proper position.
+			// Caret should be in the first block and at the proper position.
 			await page.keyboard.type( '-' );
 
 			// Check the content.

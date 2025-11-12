@@ -48,7 +48,7 @@ This handbook should be considered the canonical resource for all things related
 
 ## Are you in the right place?
 
-The Block Editor Handbook is designed for those looking to create and develop for the Block Editor. However, it's important to note that there are multiple other handbooks available within the [Developer Resources](http://developer.wordpress.org/) that you may find beneficial:
+The Block Editor Handbook is designed for those looking to create and develop for the Block Editor. However, it's important to note that there are multiple other handbooks available within the [Developer Resources](https://developer.wordpress.org/) that you may find beneficial:
 
 - [Theme Handbook](https://developer.wordpress.org/themes)
 - [Plugin Handbook](https://developer.wordpress.org/plugins)

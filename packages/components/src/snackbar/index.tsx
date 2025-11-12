@@ -22,6 +22,7 @@ import warning from '@wordpress/warning';
  * Internal dependencies
  */
 import Button from '../button';
+import ExternalLink from '../external-link';
 import type { SnackbarProps } from './types';
 import type { NoticeAction } from '../notice/types';
 import type { WordPressComponentProps } from '../context';
@@ -80,7 +81,7 @@ function UnforwardedSnackbar(
 	}
 
 	function onActionClick(
-		event: MouseEvent< HTMLButtonElement >,
+		event: MouseEvent< HTMLButtonElement | HTMLAnchorElement >,
 		onClick: NoticeAction[ 'onClick' ]
 	) {
 		event.stopPropagation();
@@ -96,17 +97,17 @@ function UnforwardedSnackbar(
 
 	// The `onDismiss/onRemove` can have unstable references,
 	// trigger side-effect cleanup, and reset timers.
-	const callbackRefs = useRef( { onDismiss, onRemove } );
+	const callbacksRef = useRef( { onDismiss, onRemove } );
 	useLayoutEffect( () => {
-		callbackRefs.current = { onDismiss, onRemove };
+		callbacksRef.current = { onDismiss, onRemove };
 	} );
 
 	useEffect( () => {
 		// Only set up the timeout dismiss if we're not explicitly dismissing.
 		const timeoutHandle = setTimeout( () => {
 			if ( ! explicitDismiss ) {
-				callbackRefs.current.onDismiss?.();
-				callbackRefs.current.onRemove?.();
+				callbacksRef.current.onDismiss?.();
+				callbacksRef.current.onRemove?.();
 			}
 		}, NOTICE_TIMEOUT );
 
@@ -147,21 +148,34 @@ function UnforwardedSnackbar(
 					<div className="components-snackbar__icon">{ icon }</div>
 				) }
 				{ children }
-				{ actions.map( ( { label, onClick, url }, index ) => {
-					return (
-						<Button
-							key={ index }
-							href={ url }
-							variant="tertiary"
-							onClick={ (
-								event: MouseEvent< HTMLButtonElement >
-							) => onActionClick( event, onClick ) }
-							className="components-snackbar__action"
-						>
-							{ label }
-						</Button>
-					);
-				} ) }
+				{ actions.map(
+					( { label, onClick, url, openInNewTab = false }, index ) =>
+						url !== undefined && openInNewTab ? (
+							<ExternalLink
+								key={ index }
+								href={ url }
+								onClick={ ( event ) =>
+									onActionClick( event, onClick )
+								}
+								className="components-snackbar__action"
+							>
+								{ label }
+							</ExternalLink>
+						) : (
+							<Button
+								__next40pxDefaultSize
+								key={ index }
+								href={ url }
+								variant="link"
+								onClick={ (
+									event: MouseEvent< HTMLButtonElement >
+								) => onActionClick( event, onClick ) }
+								className="components-snackbar__action"
+							>
+								{ label }
+							</Button>
+						)
+				) }
 				{ explicitDismiss && (
 					<span
 						role="button"

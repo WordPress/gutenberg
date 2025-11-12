@@ -22,6 +22,7 @@ export default function InstallButton( { attributes, block, clientId } ) {
 
 	return (
 		<Button
+			__next40pxDefaultSize
 			onClick={ () =>
 				installBlockType( block ).then( ( success ) => {
 					if ( success ) {
@@ -42,7 +43,7 @@ export default function InstallButton( { attributes, block, clientId } ) {
 					}
 				} )
 			}
-			__experimentalIsFocusable
+			accessibleWhenDisabled
 			disabled={ isInstallingBlock }
 			isBusy={ isInstallingBlock }
 			variant="primary"

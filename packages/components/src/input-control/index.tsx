@@ -20,6 +20,7 @@ import { space } from '../utils/space';
 import { useDraft } from './utils';
 import BaseControl from '../base-control';
 import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
+import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
 
 const noop = () => {};
 
@@ -36,6 +37,7 @@ export function UnforwardedInputControl(
 ) {
 	const {
 		__next40pxDefaultSize,
+		__shouldNotWarnDeprecated36pxSize,
 		__unstableStateReducer: stateReducer = ( state ) => state,
 		__unstableInputWidth,
 		className,
@@ -67,6 +69,13 @@ export function UnforwardedInputControl(
 	} );
 
 	const helpProp = !! help ? { 'aria-describedby': `${ id }__help` } : {};
+
+	maybeWarnDeprecated36pxSize( {
+		componentName: 'InputControl',
+		__next40pxDefaultSize,
+		size,
+		__shouldNotWarnDeprecated36pxSize,
+	} );
 
 	return (
 		<BaseControl
@@ -100,8 +109,8 @@ export function UnforwardedInputControl(
 					isPressEnterToChange={ isPressEnterToChange }
 					onKeyDown={ onKeyDown }
 					onValidate={ onValidate }
-					paddingInlineStart={ prefix ? space( 2 ) : undefined }
-					paddingInlineEnd={ suffix ? space( 2 ) : undefined }
+					paddingInlineStart={ prefix ? space( 1 ) : undefined }
+					paddingInlineEnd={ suffix ? space( 1 ) : undefined }
 					ref={ ref }
 					size={ size }
 					stateReducer={ stateReducer }
@@ -125,6 +134,7 @@ export function UnforwardedInputControl(
  *
  *   return (
  *  	<InputControl
+ * 			__next40pxDefaultSize
  *  		value={ value }
  *  		onChange={ ( nextValue ) => setValue( nextValue ?? '' ) }
  *  	/>

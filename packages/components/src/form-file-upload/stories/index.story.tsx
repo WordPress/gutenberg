@@ -14,12 +14,13 @@ import { upload as uploadIcon } from '@wordpress/icons';
 import FormFileUpload from '..';
 
 const meta: Meta< typeof FormFileUpload > = {
-	title: 'Components/FormFileUpload',
+	title: 'Components/Selection & Input/File Upload/FormFileUpload',
+	id: 'components-formfileupload',
 	component: FormFileUpload,
 	argTypes: {
-		icon: { control: { type: null } },
-		onChange: { action: 'onChange', control: { type: null } },
-		onClick: { control: { type: null } },
+		icon: { control: false },
+		onChange: { action: 'onChange', control: false },
+		onClick: { control: false },
 	},
 	parameters: {
 		controls: { expanded: true },
@@ -35,6 +36,7 @@ const Template: StoryFn< typeof FormFileUpload > = ( props ) => {
 export const Default = Template.bind( {} );
 Default.args = {
 	children: 'Select file',
+	__next40pxDefaultSize: true,
 };
 
 export const RestrictFileTypes = Template.bind( {} );

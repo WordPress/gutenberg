@@ -2,8 +2,6 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"rootDir": "src",
-		"declarationDir": "build-types",
 		"types": [ "gutenberg-env" ],
 		"checkJs": false
 	},
@@ -16,6 +14,5 @@
 		{ "path": "../escape-html" },
 		{ "path": "../i18n" },
 		{ "path": "../keycodes" }
-	],
-	"include": [ "src/**/*" ]
+	]
 }

@@ -7,6 +7,15 @@
 	"description": "Displays the contents of a post or page.",
 	"textdomain": "default",
 	"usesContext": [ "postId", "postType", "queryId" ],
+	"attributes": {
+		"tagName": {
+			"type": "string",
+			"default": "div"
+		}
+	},
+	"example": {
+		"viewportWidth": 350
+	},
 	"supports": {
 		"align": [ "wide", "full" ],
 		"html": false,
@@ -24,6 +33,7 @@
 		"spacing": {
 			"blockGap": true,
 			"padding": true,
+			"margin": true,
 			"__experimentalDefaultControls": {
 				"margin": false,
 				"padding": false
@@ -31,6 +41,7 @@
 		},
 		"color": {
 			"gradients": true,
+			"heading": true,
 			"link": true,
 			"__experimentalDefaultControls": {
 				"background": false,
@@ -49,7 +60,23 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true,
+			"__experimentalDefaultControls": {
+				"radius": true,
+				"color": true,
+				"width": true,
+				"style": true
+			}
 		}
 	},
+	"style": "wp-block-post-content",
 	"editorStyle": "wp-block-post-content-editor"
 }

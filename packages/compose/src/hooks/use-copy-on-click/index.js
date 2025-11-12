@@ -9,7 +9,6 @@ import Clipboard from 'clipboard';
 import { useRef, useEffect, useState } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
-/* eslint-disable jsdoc/no-undefined-types */
 /**
  * Copies the text to the clipboard when the element is clicked.
  *
@@ -24,14 +23,13 @@ import deprecated from '@wordpress/deprecated';
  *                   timeout.
  */
 export default function useCopyOnClick( ref, text, timeout = 4000 ) {
-	/* eslint-enable jsdoc/no-undefined-types */
 	deprecated( 'wp.compose.useCopyOnClick', {
 		since: '5.8',
 		alternative: 'wp.compose.useCopyToClipboard',
 	} );
 
 	/** @type {import('react').MutableRefObject<Clipboard | undefined>} */
-	const clipboard = useRef();
+	const clipboardRef = useRef();
 	const [ hasCopied, setHasCopied ] = useState( false );
 
 	useEffect( () => {
@@ -43,11 +41,11 @@ export default function useCopyOnClick( ref, text, timeout = 4000 ) {
 		}
 
 		// Clipboard listens to click events.
-		clipboard.current = new Clipboard( ref.current, {
+		clipboardRef.current = new Clipboard( ref.current, {
 			text: () => ( typeof text === 'function' ? text() : text ),
 		} );
 
-		clipboard.current.on( 'success', ( { clearSelection, trigger } ) => {
+		clipboardRef.current.on( 'success', ( { clearSelection, trigger } ) => {
 			// Clearing selection will move focus back to the triggering button,
 			// ensuring that it is not reset to the body, and further that it is
 			// kept within the rendered node.
@@ -66,8 +64,8 @@ export default function useCopyOnClick( ref, text, timeout = 4000 ) {
 		} );
 
 		return () => {
-			if ( clipboard.current ) {
-				clipboard.current.destroy();
+			if ( clipboardRef.current ) {
+				clipboardRef.current.destroy();
 			}
 			clearTimeout( timeoutId );
 		};

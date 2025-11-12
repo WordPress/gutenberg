@@ -89,7 +89,7 @@ exports[`Audio block renders audio block error state without crashing 1`] = `
           <Svg
             height={16}
             style={{}}
-            viewBox="-2 -2 24 24"
+            viewBox="0 0 24 24"
             width={16}
             xmlns="http://www.w3.org/2000/svg"
           >

@@ -31,6 +31,7 @@ import type { WordPressComponentProps } from '../context';
  *   const [ isChecked, setChecked ] = useState( true );
  *   return (
  *     <CheckboxControl
+ *       __nextHasNoMarginBottom
  *       label="Is author"
  *       help="Is the user a author or not?"
  *       checked={ isChecked }
@@ -53,6 +54,7 @@ export function CheckboxControl(
 		help,
 		id: idProp,
 		onChange,
+		onClick,
 		...additionalProps
 	} = props;
 
@@ -94,6 +96,7 @@ export function CheckboxControl(
 	return (
 		<BaseControl
 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+			__associatedWPComponentName="CheckboxControl"
 			label={ heading }
 			id={ id }
 			help={
@@ -116,6 +119,12 @@ export function CheckboxControl(
 						onChange={ onChangeValue }
 						checked={ checked }
 						aria-describedby={ !! help ? id + '__help' : undefined }
+						onClick={ ( event ) => {
+							// Compat code for Safari to ensure that the checkbox is focused when clicked.
+							event.currentTarget.focus();
+
+							onClick?.( event );
+						} }
 						{ ...additionalProps }
 					/>
 					{ showIndeterminateIcon ? (

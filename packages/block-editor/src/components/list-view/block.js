@@ -15,7 +15,7 @@ import {
 	__experimentalTreeGridCell as TreeGridCell,
 	__experimentalTreeGridItem as TreeGridItem,
 } from '@wordpress/components';
-import { useInstanceId } from '@wordpress/compose';
+import { useInstanceId, useDebounce } from '@wordpress/compose';
 import { moreVertical } from '@wordpress/icons';
 import {
 	useCallback,
@@ -52,6 +52,8 @@ import useBlockDisplayInformation from '../use-block-display-information';
 import { useBlockLock } from '../block-lock';
 import AriaReferencedText from './aria-referenced-text';
 import { unlock } from '../../lock-unlock';
+import usePasteStyles from '../use-paste-styles';
+import { cleanEmptyObject } from '../../hooks/utils';
 
 function ListViewBlock( {
 	block: { clientId },
@@ -95,7 +97,12 @@ function ListViewBlock( {
 		insertAfterBlock,
 		insertBeforeBlock,
 		setOpenedBlockSettingsMenu,
+		updateBlockAttributes,
 	} = unlock( useDispatch( blockEditorStore ) );
+	const debouncedToggleBlockHighlight = useDebounce(
+		toggleBlockHighlight,
+		50
+	);
 
 	const {
 		canInsertBlockType,
@@ -112,20 +119,27 @@ function ListViewBlock( {
 
 	const blockInformation = useBlockDisplayInformation( clientId );
 
-	const { block, blockName, allowRightClickOverrides } = useSelect(
-		( select ) => {
-			const { getBlock, getBlockName, getSettings } =
-				select( blockEditorStore );
+	const pasteStyles = usePasteStyles();
 
-			return {
-				block: getBlock( clientId ),
-				blockName: getBlockName( clientId ),
-				allowRightClickOverrides:
-					getSettings().allowRightClickOverrides,
-			};
-		},
-		[ clientId ]
-	);
+	const { block, blockName, allowRightClickOverrides, isBlockHidden } =
+		useSelect(
+			( select ) => {
+				const { getBlock, getBlockName, getSettings } =
+					select( blockEditorStore );
+				const { isBlockHidden: _isBlockHidden } = unlock(
+					select( blockEditorStore )
+				);
+
+				return {
+					block: getBlock( clientId ),
+					blockName: getBlockName( clientId ),
+					allowRightClickOverrides:
+						getSettings().allowRightClickOverrides,
+					isBlockHidden: _isBlockHidden( clientId ),
+				};
+			},
+			[ clientId ]
+		);
 
 	const showBlockActions =
 		// When a block hides its toolbar it also hides the block settings menu,
@@ -233,6 +247,13 @@ function ListViewBlock( {
 			}
 
 			updateFocusAndSelection( blockToFocus, shouldUpdateSelection );
+		} else if ( isMatch( 'core/block-editor/paste-styles', event ) ) {
+			event.preventDefault();
+
+			const { blocksToUpdate } = getBlocksToUpdate();
+			const blocks = getBlocksByClientId( blocksToUpdate );
+
+			pasteStyles( blocks );
 		} else if ( isMatch( 'core/block-editor/duplicate', event ) ) {
 			event.preventDefault();
 
@@ -348,17 +369,47 @@ function ListViewBlock( {
 				setOpenedBlockSettingsMenu( undefined );
 				updateFocusAndSelection( newlySelectedBlocks[ 0 ], false );
 			}
+		} else if (
+			isMatch( 'core/block-editor/toggle-block-visibility', event )
+		) {
+			event.preventDefault();
+			const { blocksToUpdate } = getBlocksToUpdate();
+			const blocks = getBlocksByClientId( blocksToUpdate );
+			const canToggleBlockVisibility = blocks.every( ( blockToUpdate ) =>
+				hasBlockSupport( blockToUpdate.name, 'blockVisibility', true )
+			);
+			if ( ! canToggleBlockVisibility ) {
+				return;
+			}
+			const hasHiddenBlock = blocks.some(
+				( blockToUpdate ) =>
+					blockToUpdate.attributes.metadata?.blockVisibility === false
+			);
+			const attributesByClientId = Object.fromEntries(
+				blocks.map( ( { clientId: mapClientId, attributes } ) => [
+					mapClientId,
+					{
+						metadata: cleanEmptyObject( {
+							...attributes?.metadata,
+							blockVisibility: hasHiddenBlock ? undefined : false,
+						} ),
+					},
+				] )
+			);
+			updateBlockAttributes( blocksToUpdate, attributesByClientId, {
+				uniqueByBlock: true,
+			} );
 		}
 	}
 
 	const onMouseEnter = useCallback( () => {
 		setIsHovered( true );
-		toggleBlockHighlight( clientId, true );
-	}, [ clientId, setIsHovered, toggleBlockHighlight ] );
+		debouncedToggleBlockHighlight( clientId, true );
+	}, [ clientId, setIsHovered, debouncedToggleBlockHighlight ] );
 	const onMouseLeave = useCallback( () => {
 		setIsHovered( false );
-		toggleBlockHighlight( clientId, false );
-	}, [ clientId, setIsHovered, toggleBlockHighlight ] );
+		debouncedToggleBlockHighlight( clientId, false );
+	}, [ clientId, setIsHovered, debouncedToggleBlockHighlight ] );
 
 	const selectEditorBlock = useCallback(
 		( event ) => {
@@ -465,8 +516,14 @@ function ListViewBlock( {
 		level
 	);
 
-	const blockPropertiesDescription =
-		getBlockPropertiesDescription( isLocked );
+	const blockPropertiesDescription = getBlockPropertiesDescription(
+		blockInformation,
+		isLocked
+	);
+
+	const blockVisibilityDescription = isBlockHidden
+		? __( 'Block is hidden.' )
+		: null;
 
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
@@ -562,7 +619,13 @@ function ListViewBlock( {
 							ariaDescribedBy={ descriptionId }
 						/>
 						<AriaReferencedText id={ descriptionId }>
-							{ `${ blockPositionDescription } ${ blockPropertiesDescription }` }
+							{ [
+								blockPositionDescription,
+								blockPropertiesDescription,
+								blockVisibilityDescription,
+							]
+								.filter( Boolean )
+								.join( ' ' ) }
 						</AriaReferencedText>
 					</div>
 				) }
@@ -620,6 +683,7 @@ function ListViewBlock( {
 								tabIndex,
 								onClick: clearSettingsAnchorRect,
 								onFocus,
+								size: 'small',
 							} }
 							disableOpenOnArrowDown
 							expand={ expand }

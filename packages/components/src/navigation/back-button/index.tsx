@@ -49,6 +49,7 @@ function UnforwardedNavigationBackButton(
 	const icon = isRTL() ? chevronRight : chevronLeft;
 	return (
 		<MenuBackButtonUI
+			__next40pxDefaultSize
 			className={ classes }
 			href={ href }
 			variant="tertiary"

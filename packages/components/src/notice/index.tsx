@@ -142,6 +142,7 @@ function Notice( {
 
 							return (
 								<Button
+									__next40pxDefaultSize
 									key={ index }
 									href={ url }
 									variant={ computedVariant }
@@ -160,6 +161,7 @@ function Notice( {
 			</div>
 			{ isDismissible && (
 				<Button
+					size="small"
 					className="components-notice__dismiss"
 					icon={ close }
 					label={ __( 'Close' ) }

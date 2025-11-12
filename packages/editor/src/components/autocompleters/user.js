@@ -5,8 +5,6 @@ import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
-/** @typedef {import('@wordpress/components').WPCompleter} WPCompleter */
-
 export function getUserLabel( user ) {
 	const avatar =
 		user.avatar_urls && user.avatar_urls[ 24 ] ? (
@@ -35,7 +33,7 @@ export function getUserLabel( user ) {
 /**
  * A user mentions completer.
  *
- * @type {WPCompleter}
+ * @type {Object}
  */
 export default {
 	name: 'users',

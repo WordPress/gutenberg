@@ -260,16 +260,37 @@ function ColorInspectorControl( { children, resetAllFilter } ) {
 	);
 }
 
-export function ColorEdit( { clientId, name, setAttributes, settings } ) {
+export function ColorEdit( {
+	clientId,
+	name,
+	setAttributes,
+	settings,
+	asWrapper,
+	label,
+	defaultControls,
+} ) {
 	const isEnabled = useHasColorPanel( settings );
-	function selector( select ) {
-		const { style, textColor, backgroundColor, gradient } =
-			select( blockEditorStore ).getBlockAttributes( clientId ) || {};
-		return { style, textColor, backgroundColor, gradient };
-	}
+
 	const { style, textColor, backgroundColor, gradient } = useSelect(
-		selector,
-		[ clientId ]
+		( select ) => {
+			// Early return to avoid subscription when disabled
+			if ( ! isEnabled ) {
+				return {};
+			}
+			const {
+				style: _style,
+				textColor: _textColor,
+				backgroundColor: _backgroundColor,
+				gradient: _gradient,
+			} = select( blockEditorStore ).getBlockAttributes( clientId ) || {};
+			return {
+				style: _style,
+				textColor: _textColor,
+				backgroundColor: _backgroundColor,
+				gradient: _gradient,
+			};
+		},
+		[ clientId, isEnabled ]
 	);
 	const value = useMemo( () => {
 		return attributesToStyle( {
@@ -288,10 +309,12 @@ export function ColorEdit( { clientId, name, setAttributes, settings } ) {
 		return null;
 	}
 
-	const defaultControls = getBlockSupport( name, [
-		COLOR_SUPPORT_KEY,
-		'__experimentalDefaultControls',
-	] );
+	defaultControls = defaultControls
+		? defaultControls
+		: getBlockSupport( name, [
+				COLOR_SUPPORT_KEY,
+				'__experimentalDefaultControls',
+		  ] );
 
 	const enableContrastChecking =
 		Platform.OS === 'web' &&
@@ -306,14 +329,18 @@ export function ColorEdit( { clientId, name, setAttributes, settings } ) {
 				'enableContrastChecker',
 			] );
 
+	// Use provided wrapper or default to ColorInspectorControl
+	const Wrapper = asWrapper || ColorInspectorControl;
+
 	return (
 		<StylesColorPanel
-			as={ ColorInspectorControl }
+			as={ Wrapper }
 			panelId={ clientId }
 			settings={ settings }
 			value={ value }
 			onChange={ onChange }
 			defaultControls={ defaultControls }
+			label={ label }
 			enableContrastChecker={
 				false !==
 				getBlockSupport( name, [

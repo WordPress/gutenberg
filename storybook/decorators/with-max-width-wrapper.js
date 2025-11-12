@@ -3,15 +3,12 @@
  */
 import styled from '@emotion/styled';
 
-/**
- * A Storybook decorator to wrap a story in a div applying a max width and
- * padding. This can be used to simulate real world constraints on components
- * such as being located within the WordPress editor sidebars.
- */
-
-const Wrapper = styled.div`
-	max-width: 248px;
-`;
+const maxWidthWrapperMap = {
+	none: 0,
+	'wordpress-sidebar': 248,
+	'small-container': 600,
+	'large-container': 960,
+};
 
 const Indicator = styled.div`
 	display: flex;
@@ -27,14 +24,19 @@ const Indicator = styled.div`
 `;
 
 export const WithMaxWidthWrapper = ( Story, context ) => {
-	if ( context.globals.maxWidthWrapper === 'none' ) {
+	/**
+	 * A Storybook decorator to wrap a story in a div applying a max width.
+	 * This can be used to simulate real world constraints on components
+	 * such as being located within the WordPress editor sidebars.
+	 */
+	const maxWidth = maxWidthWrapperMap[ context.globals.maxWidthWrapper ];
+	if ( ! maxWidth ) {
 		return <Story { ...context } />;
 	}
-
 	return (
-		<Wrapper>
+		<div style={ { maxWidth } }>
 			<Story { ...context } />
-			<Indicator>Max-Width Wrapper - 248px</Indicator>
-		</Wrapper>
+			<Indicator>{ `Max-Width Wrapper - ${ maxWidth }px` }</Indicator>
+		</div>
 	);
 };

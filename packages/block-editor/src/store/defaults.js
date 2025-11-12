@@ -33,7 +33,6 @@ export const PREFERENCES_DEFAULTS = {
  * @property {boolean}       __experimentalBlockDirectory           Whether the user has enabled the Block Directory
  * @property {Array}         __experimentalBlockPatterns            Array of objects representing the block patterns
  * @property {Array}         __experimentalBlockPatternCategories   Array of objects representing the block pattern categories
- * @property {boolean}       __unstableGalleryWithImageBlocks       Whether the user has enabled the refactored gallery block which uses InnerBlocks
  */
 export const SETTINGS_DEFAULTS = {
 	alignWide: false,
@@ -168,8 +167,8 @@ export const SETTINGS_DEFAULTS = {
 	__mobileEnablePageTemplates: false,
 	__experimentalBlockPatterns: [],
 	__experimentalBlockPatternCategories: [],
-	__unstableGalleryWithImageBlocks: false,
-	__unstableIsPreviewMode: false,
+
+	isPreviewMode: false,
 
 	// These settings will be completely revamped in the future.
 	// The goal is to evolve this into an API which will instruct

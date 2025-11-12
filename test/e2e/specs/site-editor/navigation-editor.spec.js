@@ -40,6 +40,10 @@ test.describe( 'Editing Navigation Menus', () => {
 				canvas: 'edit',
 			} );
 
+			await expect(
+				page.getByRole( 'button', { name: 'Document Overview' } )
+			).toBeVisible();
+
 			// Open List View.
 			await pageUtils.pressKeys( 'access+o' );
 
@@ -54,7 +58,7 @@ test.describe( 'Editing Navigation Menus', () => {
 			await expect( listView ).toBeVisible();
 
 			const navBlockNode = listView.getByRole( 'link', {
-				name: 'Navigation',
+				name: 'Primary Menu',
 				exact: true,
 			} );
 
@@ -62,11 +66,9 @@ test.describe( 'Editing Navigation Menus', () => {
 			await expect( navBlockNode ).toBeVisible();
 
 			// The Navigation block description should contain the locked state information.
-			const navBlockNodeDescriptionId =
-				await navBlockNode.getAttribute( 'aria-describedby' );
-			await expect(
-				listView.locator( `id=${ navBlockNodeDescriptionId }` )
-			).toHaveText( /This block is locked./ );
+			await expect( navBlockNode ).toHaveAccessibleDescription(
+				/This block is locked./
+			);
 
 			// The block should have no options menu.
 			await expect(

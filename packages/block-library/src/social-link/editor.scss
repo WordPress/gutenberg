@@ -14,6 +14,9 @@
 	font-size: inherit;
 	color: currentColor;
 	height: auto;
+	font-weight: inherit;
+	font-family: inherit;
+	margin: 0;
 
 	// This rule ensures social link buttons display correctly in template parts.
 	opacity: 1;
@@ -21,13 +24,10 @@
 	// This rule is duplicated from the style.scss and needs to be the same as there.
 	padding: 0.25em;
 
-	// Focus styles replicate the `@wordpress/components` button component.
-	&:focus:not(:disabled) {
-		border-radius: 2px;
-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-
-		// Windows High Contrast mode will show this outline, but not the box-shadow.
-		outline: 3px solid transparent;
+	// Override the shared `.wp-block-social-link` class used on both the li and button
+	// due to backwards compatibility from moving the blockProps from the li to the button.
+	&:hover {
+		transform: none;
 	}
 }
 
@@ -38,4 +38,9 @@
 
 :root :where(.wp-block-social-links.is-style-logos-only .wp-social-link button) {
 	padding: 0;
+}
+
+.wp-block-social-link__toolbar_content_text {
+	// Corresponds to the size of the text control input in the block inspector.
+	width: 250px;
 }

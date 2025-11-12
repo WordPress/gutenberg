@@ -75,7 +75,8 @@
 		"caption": {
 			"type": "rich-text",
 			"source": "rich-text",
-			"selector": ".blocks-gallery-caption"
+			"selector": ".blocks-gallery-caption",
+			"role": "content"
 		},
 		"imageCrop": {
 			"type": "boolean",
@@ -102,6 +103,10 @@
 		"allowResize": {
 			"type": "boolean",
 			"default": false
+		},
+		"aspectRatio": {
+			"type": "string",
+			"default": "auto"
 		}
 	},
 	"providesContext": {
@@ -112,6 +117,16 @@
 	"supports": {
 		"anchor": true,
 		"align": true,
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"radius": true
+			}
+		},
 		"html": false,
 		"units": [ "px", "em", "rem", "vh", "vw" ],
 		"spacing": {

@@ -13,6 +13,7 @@ import edit from './edit';
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
+import variations from './variations';
 
 const { name } = metadata;
 
@@ -24,6 +25,7 @@ export const settings = {
 		attributes: {
 			content: __( 'Code is Poetry' ),
 			level: 2,
+			textAlign: 'center',
 		},
 	},
 	__experimentalLabel( attributes, { context } ) {
@@ -64,6 +66,7 @@ export const settings = {
 	},
 	edit,
 	save,
+	variations,
 };
 
 export const init = () => initBlock( { name, metadata, settings } );

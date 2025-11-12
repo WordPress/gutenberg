@@ -6,11 +6,11 @@ Render an auto-growing textarea allow users to fill any textual content.
 
 ### `value: string`
 
-_Required._ String value of the textarea
+_Required._ String value of the textarea.
 
 ### `onChange( value: string ): Function`
 
-_Required._ Called when the value changes.
+_Required._ Function called when the text value changes.
 
 You can also pass any extra prop to the textarea rendered by this component.
 

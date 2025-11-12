@@ -14,6 +14,7 @@ import BlockMover from '../';
 import { ExperimentalBlockEditorProvider } from '../../provider';
 import { store as blockEditorStore } from '../../../store';
 
+// For the purpose of this story, we need to register the core blocks samples.
 registerCoreBlocks();
 const blocks = [
 	// vertical
@@ -30,81 +31,82 @@ const blocks = [
 	] ),
 ];
 
-function Provider( { children } ) {
-	const wrapperStyle = { margin: '24px', position: 'relative' };
-
-	return (
-		<div style={ wrapperStyle }>
-			<ExperimentalBlockEditorProvider value={ blocks }>
-				{ children }
-			</ExperimentalBlockEditorProvider>
-		</div>
-	);
-}
-
-function BlockMoverStory() {
-	const { updateBlockListSettings } = useDispatch( blockEditorStore );
-
-	useEffect( () => {
-		/**
-		 * This shouldn't be needed but unfortunatley
-		 * the layout orientation is not declarative, we need
-		 *  to render the blocks to update the block settings in the state.
-		 */
-		updateBlockListSettings( blocks[ 1 ].clientId, {
-			orientation: 'horizontal',
-		} );
-	}, [] );
-
-	return (
-		<div>
-			<p>The mover by default is vertical</p>
-			<Toolbar label="Block Mover">
-				<BlockMover
-					clientIds={
-						blocks.length
-							? [ blocks[ 0 ].innerBlocks[ 1 ].clientId ]
-							: []
-					}
-				/>
-			</Toolbar>
-
-			<p style={ { marginTop: 36 } }>
-				But it can also accommodate horizontal blocks.
-			</p>
-			<Toolbar label="Block Mover">
-				<BlockMover
-					clientIds={
-						blocks.length
-							? [ blocks[ 1 ].innerBlocks[ 1 ].clientId ]
-							: []
-					}
-				/>
-			</Toolbar>
-
-			<p style={ { marginTop: 36 } }>We can also hide the drag handle.</p>
-			<Toolbar label="Block Mover">
-				<BlockMover
-					clientIds={
-						blocks.length
-							? [ blocks[ 1 ].innerBlocks[ 0 ].clientId ]
-							: []
-					}
-					hideDragHandle
-				/>
-			</Toolbar>
-		</div>
-	);
-}
-
-export default {
+/**
+ * BlockMover component allows moving blocks inside the editor using up and down buttons.
+ */
+const meta = {
 	title: 'BlockEditor/BlockMover',
+	component: BlockMover,
+	parameters: {
+		docs: { canvas: { sourceState: 'shown' } },
+	},
+	decorators: [
+		( Story ) => (
+			<ExperimentalBlockEditorProvider value={ blocks }>
+				<Toolbar label="Block Mover">
+					<Story />
+				</Toolbar>
+			</ExperimentalBlockEditorProvider>
+		),
+	],
+	argTypes: {
+		clientIds: {
+			control: {
+				type: 'none',
+			},
+			description: 'The client IDs of the blocks to move.',
+		},
+		hideDragHandle: {
+			control: {
+				type: 'boolean',
+			},
+			description: 'If this property is true, the drag handle is hidden.',
+		},
+	},
+};
+export default meta;
+
+export const Default = {
+	args: {
+		clientIds: [ blocks[ 0 ].innerBlocks[ 1 ].clientId ],
+	},
 };
 
-export const _default = () => {
-	return (
-		<Provider>
-			<BlockMoverStory />
-		</Provider>
-	);
+/**
+ * This story shows the block mover with horizontal orientation.
+ * It is necessary to render the blocks to update the block settings in the state.
+ */
+export const Horizontal = {
+	decorators: [
+		( Story ) => {
+			const { updateBlockListSettings } = useDispatch( blockEditorStore );
+			useEffect( () => {
+				/**
+				 * This shouldn't be needed but unfortunately
+				 * the layout orientation is not declarative, we need
+				 * to render the blocks to update the block settings in the state.
+				 */
+				updateBlockListSettings( blocks[ 1 ].clientId, {
+					orientation: 'horizontal',
+				} );
+			}, [] );
+			return <Story />;
+		},
+	],
+	args: {
+		clientIds: [ blocks[ 1 ].innerBlocks[ 1 ].clientId ],
+	},
+	parameters: {
+		docs: { canvas: { sourceState: 'hidden' } },
+	},
+};
+
+/**
+ * You can hide the drag handle by `hideDragHandle` attribute.
+ */
+export const HideDragHandle = {
+	args: {
+		...Default.args,
+		hideDragHandle: true,
+	},
 };

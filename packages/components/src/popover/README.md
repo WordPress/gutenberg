@@ -223,8 +223,19 @@ Possible values:
 
 Adjusts the size of the popover to prevent its contents from going out of view when meeting the viewport edges.
 
+**Note:** The `resize` and `shift` props are not intended to be used together. Enabling both can cause unexpected behavior.
+
 -   Required: No
 -   Default: `true`
+
+### `shift`: `boolean`
+
+Enables the `Popover` to shift in order to stay in view when meeting the viewport edges.
+
+**Note:** The `shift` and `resize` props are not intended to be used together. If you enable `shift`, set `resize` to `false`.
+
+-   Required: No
+-   Default: `false`
 
 ### `variant`: `'toolbar' | 'unstyled'`
 

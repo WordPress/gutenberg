@@ -32,7 +32,8 @@ function HeadingEdit( {
 	style,
 	clientId,
 } ) {
-	const { textAlign, content, level, placeholder, anchor } = attributes;
+	const { textAlign, content, level, levelOptions, placeholder, anchor } =
+		attributes;
 	const tagName = 'h' + level;
 	const blockProps = useBlockProps( {
 		className: clsx( {
@@ -95,6 +96,7 @@ function HeadingEdit( {
 				<BlockControls group="block">
 					<HeadingLevelDropdown
 						value={ level }
+						options={ levelOptions }
 						onChange={ ( newLevel ) =>
 							setAttributes( { level: newLevel } )
 						}

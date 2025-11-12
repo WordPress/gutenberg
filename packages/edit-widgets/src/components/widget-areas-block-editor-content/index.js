@@ -45,7 +45,7 @@ export default function WidgetAreasBlockEditorContent( {
 				<KeyboardShortcuts />
 				<EditorStyles
 					styles={ styles }
-					scope=".editor-styles-wrapper"
+					scope=":where(.editor-styles-wrapper)"
 				/>
 				<BlockSelectionClearer>
 					<WritingFlow>

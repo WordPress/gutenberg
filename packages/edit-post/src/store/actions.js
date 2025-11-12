@@ -8,8 +8,10 @@ import {
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 import deprecated from '@wordpress/deprecated';
-import { addFilter } from '@wordpress/hooks';
+import { addAction } from '@wordpress/hooks';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as noticesStore } from '@wordpress/notices';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -478,21 +480,14 @@ export const initializeMetaBoxes =
 		metaBoxesInitialized = true;
 
 		// Save metaboxes on save completion, except for autosaves.
-		addFilter(
-			'editor.__unstableSavePost',
+		addAction(
+			'editor.savePost',
 			'core/edit-post/save-metaboxes',
-			( previous, options ) =>
-				previous.then( () => {
-					if ( options.isAutosave ) {
-						return;
-					}
-
-					if ( ! select.hasMetaBoxes() ) {
-						return;
-					}
-
-					return dispatch.requestMetaBoxUpdates();
-				} )
+			async ( post, options ) => {
+				if ( ! options.isAutosave && select.hasMetaBoxes() ) {
+					await dispatch.requestMetaBoxUpdates();
+				}
+			}
 		);
 
 		dispatch( {
@@ -515,4 +510,45 @@ export const toggleDistractionFree =
 			alternative: "dispatch( 'core/editor').toggleDistractionFree",
 		} );
 		registry.dispatch( editorStore ).toggleDistractionFree();
+	};
+
+/**
+ * Action that toggles the Fullscreen Mode view option.
+ */
+export const toggleFullscreenMode =
+	() =>
+	( { registry } ) => {
+		const isFullscreen = registry
+			.select( preferencesStore )
+			.get( 'core/edit-post', 'fullscreenMode' );
+
+		registry
+			.dispatch( preferencesStore )
+			.toggle( 'core/edit-post', 'fullscreenMode' );
+
+		registry
+			.dispatch( noticesStore )
+			.createInfoNotice(
+				isFullscreen
+					? __( 'Fullscreen mode deactivated.' )
+					: __( 'Fullscreen mode activated.' ),
+				{
+					id: 'core/edit-post/toggle-fullscreen-mode/notice',
+					type: 'snackbar',
+					actions: [
+						{
+							label: __( 'Undo' ),
+
+							onClick: () => {
+								registry
+									.dispatch( preferencesStore )
+									.toggle(
+										'core/edit-post',
+										'fullscreenMode'
+									);
+							},
+						},
+					],
+				}
+			);
 	};

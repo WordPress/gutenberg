@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useLayoutEffect, useMemo, useState } from '@wordpress/element';
+import { useLayoutEffect, useState } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import isShallowEqual from '@wordpress/is-shallow-equal';
@@ -16,12 +16,21 @@ import { getLayoutType } from '../../layouts';
 
 const pendingSettingsUpdates = new WeakMap();
 
+// Creates a memoizing caching function that remembers the last value and keeps returning it
+// as long as the new values are shallowly equal. Helps keep dependencies stable.
+function createShallowMemo() {
+	let value;
+	return ( newValue ) => {
+		if ( value === undefined || ! isShallowEqual( value, newValue ) ) {
+			value = newValue;
+		}
+		return value;
+	};
+}
+
 function useShallowMemo( value ) {
-	const [ prevValue, setPrevValue ] = useState( value );
-	if ( ! isShallowEqual( prevValue, value ) ) {
-		setPrevValue( value );
-	}
-	return prevValue;
+	const [ memo ] = useState( createShallowMemo );
+	return memo( value );
 }
 
 /**
@@ -77,10 +86,7 @@ export default function useNestedSettingsUpdate(
 	// otherwise if the arrays change length but the first elements are equal the comparison,
 	// does not works as expected.
 	const _allowedBlocks = useShallowMemo( allowedBlocks );
-
-	const _prioritizedInserterBlocks = useMemo(
-		() => prioritizedInserterBlocks,
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+	const _prioritizedInserterBlocks = useShallowMemo(
 		prioritizedInserterBlocks
 	);
 

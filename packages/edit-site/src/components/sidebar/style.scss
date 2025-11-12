@@ -1,6 +1,16 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .edit-site-sidebar__content {
 	flex-grow: 1;
 	overflow-y: auto;
+	// Prevents horizontal overflow while animating screen transitions
+	overflow-x: hidden;
+	// Mark this section of the DOM as isolated, providing performance benefits
+	// by limiting calculations of layout, style and paint to a DOM subtree rather
+	// than the entire page.
+	contain: content;
 }
 
 @keyframes local--slide-from-right {

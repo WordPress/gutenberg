@@ -45,7 +45,7 @@ test.describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 
 		const blockInserter = page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Toggle block inserter' } );
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } );
 		const blockLibrary = page
 			.getByRole( 'region', {
 				name: 'Block Library',
@@ -92,7 +92,7 @@ test.describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 
 		const blockInserter = page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Toggle block inserter' } );
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } );
 		const blockLibrary = page
 			.getByRole( 'region', {
 				name: 'Block Library',
@@ -106,6 +106,8 @@ test.describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 		await expect( blockLibrary.getByRole( 'option' ) ).toHaveText( [
 			'Paragraph',
 			'Heading',
+			'Stretchy Paragraph',
+			'Stretchy Heading',
 			'Image',
 		] );
 	} );
@@ -119,6 +121,9 @@ test.describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/Allowed Blocks Dynamic' );
+		await expect(
+			page.getByRole( 'option', { name: /Allowed Blocks Dynamic/i } )
+		).toBeVisible();
 		await page.keyboard.press( 'Enter' );
 
 		const blockAppender = editor.canvas.getByRole( 'button', {

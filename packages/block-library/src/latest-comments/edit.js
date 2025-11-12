@@ -4,12 +4,19 @@
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import {
 	Disabled,
-	PanelBody,
 	RangeControl,
+	SelectControl,
 	ToggleControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import ServerSideRender from '@wordpress/server-side-render';
 import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 /**
  * Minimum number of comments a user can show using this block.
@@ -25,7 +32,7 @@ const MIN_COMMENTS = 1;
 const MAX_COMMENTS = 100;
 
 export default function LatestComments( { attributes, setAttributes } ) {
-	const { commentsToShow, displayAvatar, displayDate, displayExcerpt } =
+	const { commentsToShow, displayAvatar, displayDate, displayContent } =
 		attributes;
 
 	const serverSideAttributes = {
@@ -36,49 +43,109 @@ export default function LatestComments( { attributes, setAttributes } ) {
 		},
 	};
 
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
 	return (
 		<div { ...useBlockProps() }>
 			<InspectorControls>
-				<PanelBody title={ __( 'Settings' ) }>
-					<ToggleControl
-						__nextHasNoMarginBottom
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ () => {
+						setAttributes( {
+							commentsToShow: 5,
+							displayAvatar: true,
+							displayDate: true,
+							displayContent: 'excerpt',
+						} );
+					} }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					<ToolsPanelItem
+						hasValue={ () => ! displayAvatar }
 						label={ __( 'Display avatar' ) }
-						checked={ displayAvatar }
-						onChange={ () =>
-							setAttributes( { displayAvatar: ! displayAvatar } )
+						onDeselect={ () =>
+							setAttributes( { displayAvatar: true } )
 						}
-					/>
-					<ToggleControl
-						__nextHasNoMarginBottom
+						isShownByDefault
+					>
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Display avatar' ) }
+							checked={ displayAvatar }
+							onChange={ () =>
+								setAttributes( {
+									displayAvatar: ! displayAvatar,
+								} )
+							}
+						/>
+					</ToolsPanelItem>
+
+					<ToolsPanelItem
+						hasValue={ () => ! displayDate }
 						label={ __( 'Display date' ) }
-						checked={ displayDate }
-						onChange={ () =>
-							setAttributes( { displayDate: ! displayDate } )
+						onDeselect={ () =>
+							setAttributes( { displayDate: true } )
 						}
-					/>
-					<ToggleControl
-						__nextHasNoMarginBottom
-						label={ __( 'Display excerpt' ) }
-						checked={ displayExcerpt }
-						onChange={ () =>
-							setAttributes( {
-								displayExcerpt: ! displayExcerpt,
-							} )
+						isShownByDefault
+					>
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Display date' ) }
+							checked={ displayDate }
+							onChange={ () =>
+								setAttributes( { displayDate: ! displayDate } )
+							}
+						/>
+					</ToolsPanelItem>
+
+					<ToolsPanelItem
+						hasValue={ () => displayContent !== 'excerpt' }
+						label={ __( 'Display content' ) }
+						onDeselect={ () =>
+							setAttributes( { displayContent: 'excerpt' } )
 						}
-					/>
-					<RangeControl
-						__nextHasNoMarginBottom
-						__next40pxDefaultSize
+						isShownByDefault
+					>
+						<SelectControl
+							__nextHasNoMarginBottom
+							__next40pxDefaultSize
+							label={ __( 'Display content' ) }
+							value={ displayContent }
+							options={ [
+								{ label: __( 'No content' ), value: 'none' },
+								{ label: __( 'Excerpt' ), value: 'excerpt' },
+								{ label: __( 'Full content' ), value: 'full' },
+							] }
+							onChange={ ( value ) =>
+								setAttributes( {
+									displayContent: value,
+								} )
+							}
+						/>
+					</ToolsPanelItem>
+
+					<ToolsPanelItem
+						hasValue={ () => commentsToShow !== 5 }
 						label={ __( 'Number of comments' ) }
-						value={ commentsToShow }
-						onChange={ ( value ) =>
-							setAttributes( { commentsToShow: value } )
+						onDeselect={ () =>
+							setAttributes( { commentsToShow: 5 } )
 						}
-						min={ MIN_COMMENTS }
-						max={ MAX_COMMENTS }
-						required
-					/>
-				</PanelBody>
+						isShownByDefault
+					>
+						<RangeControl
+							__nextHasNoMarginBottom
+							__next40pxDefaultSize
+							label={ __( 'Number of comments' ) }
+							value={ commentsToShow }
+							onChange={ ( value ) =>
+								setAttributes( { commentsToShow: value } )
+							}
+							min={ MIN_COMMENTS }
+							max={ MAX_COMMENTS }
+							required
+						/>
+					</ToolsPanelItem>
+				</ToolsPanel>
 			</InspectorControls>
 			<Disabled>
 				<ServerSideRender

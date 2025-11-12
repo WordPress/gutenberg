@@ -31,7 +31,7 @@ registerBlockType( 'create-block/gutenpride', {
 	// This is an icon for your block type.
 	icon: (
 		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-			<path d="M16.7 7.1l-6.3 8.5-3.3-2.5-.9 1.2 4.5 3.4L17.9 8z" />
+			<path d="M16.5 7.5 10 13.9l-2.5-2.4-1 1 3.5 3.6 7.5-7.6z" />
 		</svg>
 	),
 

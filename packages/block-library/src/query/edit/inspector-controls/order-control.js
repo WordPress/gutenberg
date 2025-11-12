@@ -4,7 +4,7 @@
 import { SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-const orderOptions = [
+const defaultOrderByOptions = [
 	{
 		label: __( 'Newest to oldest' ),
 		value: 'date/desc',
@@ -14,23 +14,30 @@ const orderOptions = [
 		value: 'date/asc',
 	},
 	{
-		/* translators: label for ordering posts by title in ascending order */
+		/* translators: Label for ordering posts by title in ascending order. */
 		label: __( 'A → Z' ),
 		value: 'title/asc',
 	},
 	{
-		/* translators: label for ordering posts by title in descending order */
+		/* translators: Label for ordering posts by title in descending order. */
 		label: __( 'Z → A' ),
 		value: 'title/desc',
 	},
 ];
-function OrderControl( { order, orderBy, onChange } ) {
+
+function OrderControl( {
+	order,
+	orderBy,
+	orderByOptions = defaultOrderByOptions,
+	onChange,
+} ) {
 	return (
 		<SelectControl
 			__nextHasNoMarginBottom
+			__next40pxDefaultSize
 			label={ __( 'Order by' ) }
 			value={ `${ orderBy }/${ order }` }
-			options={ orderOptions }
+			options={ orderByOptions }
 			onChange={ ( value ) => {
 				const [ newOrderBy, newOrder ] = value.split( '/' );
 				onChange( { order: newOrder, orderBy: newOrderBy } );

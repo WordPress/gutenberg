@@ -30,7 +30,12 @@ export default function BlockView( {
 			</div>
 
 			<div className="block-editor-block-compare__action">
-				<Button variant="secondary" tabIndex="0" onClick={ action }>
+				<Button
+					__next40pxDefaultSize
+					variant="secondary"
+					tabIndex="0"
+					onClick={ action }
+				>
 					{ actionText }
 				</Button>
 			</div>

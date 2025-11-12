@@ -33,6 +33,15 @@ React was considered first because Gutenberg developers are familiar with it. Ot
 
 Alpine.js is a great framework, and it inspired a lot of functionality in the Interactivity API. However, it doesn’t support server-side rendering of its [directives](https://github.com/alpinejs/alpine/tree/d7f9d641f7a763c56c598d118bd189a406a22383/packages/docs/src/en/directives), and having a similar system tailored for WordPress blocks has many benefits.
 
+Preact was chosen instead of Alpine.js for numerous reasons, such as its smaller size, its better performance (especially with the addition of [signals](https://preactjs.com/guide/v10/signals/)), the fact that custom directives are written with Preact’s declarative syntax and tooling (hooks, signals), it’s more battle-tested and has a larger community than Alpine.js. It’s also compatible with React (for sharing client-side rendered components from the Editor), and it provides to the Interactivity API the fastest DOM diffing algorithm out of the box, including UI state preservation.
+
+Furthermore, with Preact operating in the background, the Interactivity API manages "the final layer" so it can be better adapted to WordPress requirements. For example, JavaScript expressions are not allowed inside directives to avoid security risks and ensure compliance with strict security policies, and all WordPress directives are spec-compliant HTML attributes.
+
+<div class="callout callout-info">
+  Have a look at the conversation at <a href="https://github.com/WordPress/gutenberg/discussions/53022#discussioncomment-4696611">"Why Preact instead of Alpine?"</a> to learn more about this.
+</div>
+
+
 ### Plain JavaScript
 
 See the answer below. 
@@ -57,7 +66,7 @@ To summarize, using the Interactivity API rather than just using React comes wit
 
 - If you use React, your interactive blocks must generate the same markup on the client as they do on the server in PHP. Using the Interactivity API, there is no such requirement as directives are added to server-rendered HTML.
 - The Interactivity API is PHP-friendlier. It works out of the box with WordPress hooks or other server functionalities such as internationalization. For example, with React, you can’t know which hooks are applied on the server, and their modifications would be overwritten after hydration.
-- All the benefits of [using a standard](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/what-is-interactivity-api#why-a-standard).
+- All the benefits of [using a standard](/docs/reference-guides/interactivity-api/iapi-about.md#why-a-standard).
 
 
 ## What are the benefits of Interactivity API over just using jQuery or vanilla JavaScript?

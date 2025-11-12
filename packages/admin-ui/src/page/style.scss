@@ -1,0 +1,74 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/breakpoints" as *;
+
+.admin-ui-page {
+	display: flex;
+	height: 100%;
+	background-color: $white;
+	color: $gray-800;
+	position: relative;
+	z-index: 1;
+	flex-flow: column;
+	container: admin-ui-page / inline-size;
+
+	@media not (prefers-reduced-motion) {
+		transition: width ease-out 0.2s;
+	}
+}
+
+.admin-ui-page__header {
+	padding: $grid-unit-20 $grid-unit-60;
+	border-bottom: 1px solid $gray-100;
+	background: $white;
+	position: sticky;
+	top: 0;
+
+	@container (max-width: 430px) {
+		padding: $grid-unit-20 $grid-unit-30;
+	}
+}
+
+.admin-ui-page__header-subtitle {
+	padding-block-end: $grid-unit-10;
+	color: $gray-700;
+	@include body-medium();
+	margin: 0;
+}
+
+.admin-ui-page__content {
+	flex-grow: 1;
+	overflow: auto;
+	display: flex;
+	flex-direction: column;
+
+	&.has-padding {
+		padding: $grid-unit-20 $grid-unit * 2.5;
+		@container (max-width: 430px) {
+			padding: $grid-unit-20 $grid-unit-30;
+		}
+	}
+}
+
+// Show button text labels when preference is enabled.
+.show-icon-labels {
+	.admin-ui-page__header-actions {
+		.components-button.has-icon {
+			width: auto;
+			padding: 0 $grid-unit-10;
+
+			// Hide the button icons when labels are set to display...
+			svg {
+				display: none;
+			}
+			// ... and display labels.
+			&::after {
+				content: attr(aria-label);
+				font-size: $helptext-font-size;
+			}
+		}
+
+	}
+}
+

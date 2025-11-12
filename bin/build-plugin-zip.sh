@@ -72,37 +72,18 @@ npm ci
 status "Generating build... 👷‍♀️"
 npm run build
 
-# Temporarily modify `gutenberg.php` with production constants defined. Use a
-# temp file because `bin/generate-gutenberg-php.php` reads from `gutenberg.php`
-# so we need to avoid writing to that file at the same time.
-php bin/generate-gutenberg-php.php > gutenberg.tmp.php
-mv gutenberg.tmp.php gutenberg.php
-
-build_files=$(
-	ls build/*/*.{js,js.map,css,asset.php} \
-	build/block-library/blocks/*.php \
-	build/block-library/blocks/*/block.json \
-	build/block-library/blocks/*/*.{js,js.map,css,asset.php} \
-	build/edit-widgets/blocks/*/block.json \
-	build/widgets/blocks/*.php \
-	build/widgets/blocks/*/block.json \
-	build/style-engine/*.php \
-)
-
-
 # Generate the plugin zip file.
 status "Creating archive... 🎁"
-zip -r gutenberg.zip \
+zip --recurse-paths --no-dir-entries \
+	gutenberg.zip \
 	gutenberg.php \
 	lib \
 	packages/block-serialization-default-parser/*.php \
 	post-content.php \
-	$build_files \
+	build \
+	build-module \
 	readme.txt \
 	changelog.txt \
 	README.md
-
-# Reset `gutenberg.php`.
-git checkout gutenberg.php
 
 success "Done. You've built Gutenberg! 🎉 "

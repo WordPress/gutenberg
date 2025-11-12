@@ -15,11 +15,12 @@ import DateTimePicker from '../date-time';
 import { daysFromNow, isWeekend } from './utils';
 
 const meta: Meta< typeof DateTimePicker > = {
-	title: 'Components/DateTimePicker',
+	title: 'Components/Selection & Input/Time & Date/DateTimePicker',
+	id: 'components-datetimepicker',
 	component: DateTimePicker,
 	argTypes: {
 		currentDate: { control: 'date' },
-		onChange: { action: 'onChange', control: { type: null } },
+		onChange: { action: 'onChange', control: false },
 	},
 	parameters: {
 		controls: { expanded: true },
@@ -50,6 +51,9 @@ const Template: StoryFn< typeof DateTimePicker > = ( {
 };
 
 export const Default: StoryFn< typeof DateTimePicker > = Template.bind( {} );
+Default.args = {
+	currentDate: new Date(),
+};
 
 export const WithEvents: StoryFn< typeof DateTimePicker > = Template.bind( {} );
 WithEvents.args = {

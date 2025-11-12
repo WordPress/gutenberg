@@ -18,6 +18,17 @@ const transforms = {
 			},
 		},
 	],
+	to: [
+		{
+			type: 'block',
+			blocks: [ 'core/spacer' ], // Transform to Spacer.
+			transform: ( { anchor } ) => {
+				return createBlock( 'core/spacer', {
+					anchor: anchor || '',
+				} );
+			},
+		},
+	],
 };
 
 export default transforms;

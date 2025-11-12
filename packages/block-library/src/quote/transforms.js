@@ -9,10 +9,18 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/pullquote' ],
-			transform: ( { value, citation, anchor, fontSize, style } ) => {
+			transform: ( {
+				value,
+				align,
+				citation,
+				anchor,
+				fontSize,
+				style,
+			} ) => {
 				return createBlock(
 					'core/quote',
 					{
+						align,
 						citation,
 						anchor,
 						fontSize,
@@ -59,7 +67,7 @@ const transforms = {
 			isMultiBlock: true,
 			blocks: [ '*' ],
 			isMatch: ( {}, blocks ) => {
-				// When a single block is selected make the tranformation
+				// When a single block is selected make the transformation
 				// available only to specific blocks that make sense.
 				if ( blocks.length === 1 ) {
 					return [
@@ -95,7 +103,7 @@ const transforms = {
 				);
 			},
 			transform: (
-				{ citation, anchor, fontSize, style },
+				{ align, citation, anchor, fontSize, style },
 				innerBlocks
 			) => {
 				const value = innerBlocks
@@ -103,6 +111,7 @@ const transforms = {
 					.join( '<br>' );
 				return createBlock( 'core/pullquote', {
 					value,
+					align,
 					citation,
 					anchor,
 					fontSize,

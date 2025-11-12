@@ -22,13 +22,23 @@
 			"type": "boolean",
 			"default": true
 		},
-		"displayExcerpt": {
-			"type": "boolean",
-			"default": true
+		"displayContent": {
+			"type": "string",
+			"default": "excerpt",
+			"enum": [ "none", "excerpt", "full" ]
 		}
 	},
 	"supports": {
 		"align": true,
+		"color": {
+			"gradients": true,
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true,
+				"link": true
+			}
+		},
 		"html": false,
 		"spacing": {
 			"margin": true,

@@ -9,10 +9,11 @@ import type { Meta, StoryFn } from '@storybook/react';
 import { TabbableContainer } from '..';
 
 const meta: Meta< typeof TabbableContainer > = {
-	title: 'Components/TabbableContainer',
+	title: 'Components/Containers/TabbableContainer',
+	id: 'components-tabbablecontainer',
 	component: TabbableContainer,
 	argTypes: {
-		children: { control: { type: null } },
+		children: { control: false },
 	},
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },

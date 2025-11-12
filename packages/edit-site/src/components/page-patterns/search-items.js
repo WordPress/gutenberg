@@ -20,12 +20,46 @@ import {
 	PATTERN_DEFAULT_CATEGORY,
 	PATTERN_USER_CATEGORY,
 	PATTERN_TYPES,
+	TEMPLATE_PART_POST_TYPE,
 } from '../../utils/constants';
 
 // Default search helpers.
-const defaultGetName = ( item ) => item.name || '';
-const defaultGetTitle = ( item ) => item.title;
-const defaultGetDescription = ( item ) => item.description || '';
+const defaultGetName = ( item ) => {
+	if ( item.type === PATTERN_TYPES.user ) {
+		return item.slug;
+	}
+
+	if ( item.type === TEMPLATE_PART_POST_TYPE ) {
+		return '';
+	}
+
+	return item.name || '';
+};
+
+export const defaultGetTitle = ( item ) => {
+	if ( typeof item.title === 'string' ) {
+		return item.title;
+	}
+
+	if ( item.title && item.title.rendered ) {
+		return item.title.rendered;
+	}
+
+	if ( item.title && item.title.raw ) {
+		return item.title.raw;
+	}
+
+	return '';
+};
+
+const defaultGetDescription = ( item ) => {
+	if ( item.type === PATTERN_TYPES.user ) {
+		return item.excerpt.raw;
+	}
+
+	return item.description || '';
+};
+
 const defaultGetKeywords = ( item ) => item.keywords || [];
 const defaultHasCategory = () => false;
 

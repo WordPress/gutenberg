@@ -1,15 +1,21 @@
 @use "sass:math";
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+@use "../utils/theme-variables" as *;
 
-$toggle-width: 36px;
-$toggle-height: 18px;
+$toggle-width: $grid-unit-40;
+$toggle-height: $grid-unit-20;
 $toggle-border-width: 1px;
-$thumb-size:  $toggle-height - ($toggle-border-width * 6);
+$toggle-thumb-size:  $grid-unit-15;
 
 $transition-duration: 0.2s;
 
 .components-form-toggle {
 	position: relative;
 	display: inline-block;
+	height: $toggle-height;
 
 	// Unchecked state.
 	.components-form-toggle__track {
@@ -19,14 +25,17 @@ $transition-duration: 0.2s;
 		box-sizing: border-box;
 		vertical-align: top;
 		background-color: $white;
-		border: $toggle-border-width solid $gray-900;
+		border: $toggle-border-width solid $gray-600;
 		width: $toggle-width;
 		height: $toggle-height;
 		border-radius: math.div($toggle-height, 2);
-		transition:
-			$transition-duration background-color ease,
-			$transition-duration border-color ease;
-		@include reduce-motion("transition");
+
+		@media not (prefers-reduced-motion) {
+			transition:
+				$transition-duration background-color ease,
+				$transition-duration border-color ease;
+		}
+
 		overflow: hidden;
 
 		// Windows High Contrast Mode
@@ -38,8 +47,9 @@ $transition-duration: 0.2s;
 			// Expand the border to fake a solid in Windows High Contrast Mode.
 			border-top: #{ $toggle-height } solid transparent;
 
-			transition: $transition-duration opacity ease;
-			@include reduce-motion("transition");
+			@media not (prefers-reduced-motion) {
+				transition: $transition-duration opacity ease;
+			}
 
 			opacity: 0;
 		}
@@ -49,19 +59,23 @@ $transition-duration: 0.2s;
 		display: block;
 		position: absolute;
 		box-sizing: border-box;
-		top: $toggle-border-width * 3;
-		left: $toggle-border-width * 3;
-		width: $thumb-size;
-		height: $thumb-size;
-		border-radius: 50%;
-		transition:
-			$transition-duration transform ease,
-			$transition-duration background-color ease-out;
-		@include reduce-motion("transition");
+		top: math.div($toggle-thumb-size, 6);
+		left: math.div($toggle-thumb-size, 6);
+		width: $toggle-thumb-size;
+		height: $toggle-thumb-size;
+		border-radius: $radius-round;
+
+		@media not (prefers-reduced-motion) {
+			transition:
+				$transition-duration transform ease,
+				$transition-duration background-color ease-out;
+		}
+
 		background-color: $gray-900;
+		box-shadow: $elevation-x-small;
 
 		// Transparent border acts as a fill in Windows High Contrast Mode.
-		border: math.div($thumb-size, 2) solid transparent;
+		border: math.div($toggle-thumb-size, 2) solid transparent;
 	}
 
 	// Checked state.
@@ -115,5 +129,9 @@ $transition-duration: 0.2s;
 	// Don't show custom checkbox checkmark.
 	&::before {
 		content: "";
+	}
+
+	&:not(:disabled, [aria-disabled="true"]) {
+		cursor: pointer;
 	}
 }

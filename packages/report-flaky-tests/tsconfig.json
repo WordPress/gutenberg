@@ -3,10 +3,7 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"module": "CommonJS",
-		"declarationDir": "build-types",
-		"rootDir": "src",
 		"types": [ "jest" ]
 	},
-	"include": [ "src/**/*" ],
-	"exclude": [ "src/__tests__/**/*", "src/__fixtures__/**/*" ]
+	"exclude": [ "src/__tests__", "src/__fixtures__" ]
 }

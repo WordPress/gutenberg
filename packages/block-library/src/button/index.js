@@ -22,7 +22,7 @@ export const settings = {
 	example: {
 		attributes: {
 			className: 'is-style-fill',
-			text: __( 'Call to Action' ),
+			text: __( 'Call to action' ),
 		},
 	},
 	edit,

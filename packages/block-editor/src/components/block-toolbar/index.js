@@ -23,19 +23,22 @@ import { ToolbarGroup } from '@wordpress/components';
  */
 import BlockMover from '../block-mover';
 import BlockParentSelector from '../block-parent-selector';
-import BlockSwitcher from '../block-switcher';
 import BlockControls from '../block-controls';
 import __unstableBlockToolbarLastItem from './block-toolbar-last-item';
 import BlockSettingsMenu from '../block-settings-menu';
 import { BlockLockToolbar } from '../block-lock';
+import { BlockVisibilityToolbar } from '../block-visibility';
 import { BlockGroupToolbar } from '../convert-to-group-buttons';
 import BlockEditVisuallyButton from '../block-edit-visually-button';
 import { useShowHoveredOrFocusedGestures } from './utils';
 import { store as blockEditorStore } from '../../store';
 import __unstableBlockNameContext from './block-name-context';
 import NavigableToolbar from '../navigable-toolbar';
-import Shuffle from './shuffle';
 import { useHasBlockToolbar } from './use-has-block-toolbar';
+import ChangeDesign from './change-design';
+import SwitchSectionStyle from './switch-section-style';
+import { unlock } from '../../lock-unlock';
+import BlockToolbarIcon from './block-toolbar-icon';
 
 /**
  * Renders the block toolbar.
@@ -65,6 +68,14 @@ export function PrivateBlockToolbar( {
 		shouldShowVisualToolbar,
 		showParentSelector,
 		isUsingBindings,
+		isSectionContainer,
+		hasContentOnlyLocking,
+		showShuffleButton,
+		showSlots,
+		showGroupButtons,
+		showLockButtons,
+		showBlockVisibilityButton,
+		showSwitchSectionStyleButton,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockName,
@@ -72,19 +83,22 @@ export function PrivateBlockToolbar( {
 			getBlockParents,
 			getSelectedBlockClientIds,
 			isBlockValid,
-			getBlockRootClientId,
 			getBlockEditingMode,
 			getBlockAttributes,
-		} = select( blockEditorStore );
+			getTemplateLock,
+			getParentSectionBlock,
+			isZoomOut,
+			isSectionBlock,
+		} = unlock( select( blockEditorStore ) );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
-		const blockRootClientId = getBlockRootClientId( selectedBlockClientId );
 		const parents = getBlockParents( selectedBlockClientId );
-		const firstParentClientId = parents[ parents.length - 1 ];
-		const parentBlockName = getBlockName( firstParentClientId );
+		const parentSection = getParentSectionBlock( selectedBlockClientId );
+		const parentClientId = parentSection ?? parents[ parents.length - 1 ];
+		const parentBlockName = getBlockName( parentClientId );
 		const parentBlockType = getBlockType( parentBlockName );
-		const _isDefaultEditingMode =
-			getBlockEditingMode( selectedBlockClientId ) === 'default';
+		const editingMode = getBlockEditingMode( selectedBlockClientId );
+		const _isDefaultEditingMode = editingMode === 'default';
 		const _blockName = getBlockName( selectedBlockClientId );
 		const isValid = selectedBlockClientIds.every( ( id ) =>
 			isBlockValid( id )
@@ -96,25 +110,49 @@ export function PrivateBlockToolbar( {
 			( clientId ) =>
 				!! getBlockAttributes( clientId )?.metadata?.bindings
 		);
+
+		// If one or more selected blocks are locked, do not show the BlockGroupToolbar.
+		const _hasTemplateLock = selectedBlockClientIds.some(
+			( id ) => getTemplateLock( id ) === 'contentOnly'
+		);
+
+		const _isZoomOut = isZoomOut();
+
+		const _isSectionBlock = isSectionBlock( selectedBlockClientId );
+
+		// The switch style button appears more prominently with the
+		// content only pattern experiment.
+		const _showSwitchSectionStyleButton =
+			window?.__experimentalContentOnlyPatternInsertion &&
+			( _isZoomOut || _isSectionBlock );
+
 		return {
 			blockClientId: selectedBlockClientId,
 			blockClientIds: selectedBlockClientIds,
 			isDefaultEditingMode: _isDefaultEditingMode,
 			blockType: selectedBlockClientId && getBlockType( _blockName ),
 			shouldShowVisualToolbar: isValid && isVisual,
-			rootClientId: blockRootClientId,
-			toolbarKey: `${ selectedBlockClientId }${ firstParentClientId }`,
+			toolbarKey: `${ selectedBlockClientId }${ parentClientId }`,
 			showParentSelector:
+				! _isZoomOut &&
 				parentBlockType &&
-				getBlockEditingMode( firstParentClientId ) === 'default' &&
+				editingMode !== 'contentOnly' &&
+				getBlockEditingMode( parentClientId ) !== 'disabled' &&
 				hasBlockSupport(
 					parentBlockType,
 					'__experimentalParentSelector',
 					true
 				) &&
-				selectedBlockClientIds.length === 1 &&
-				_isDefaultEditingMode,
+				selectedBlockClientIds.length === 1,
 			isUsingBindings: _isUsingBindings,
+			isSectionContainer: _isSectionBlock,
+			hasContentOnlyLocking: _hasTemplateLock,
+			showShuffleButton: _isZoomOut,
+			showSlots: ! _isZoomOut,
+			showGroupButtons: ! _isZoomOut,
+			showLockButtons: ! _isZoomOut,
+			showBlockVisibilityButton: ! _isZoomOut,
+			showSwitchSectionStyleButton: _showSwitchSectionStyleButton,
 		};
 	}, [] );
 
@@ -164,56 +202,65 @@ export function PrivateBlockToolbar( {
 			key={ toolbarKey }
 		>
 			<div ref={ toolbarWrapperRef } className={ innerClasses }>
-				{ ! isMultiToolbar &&
-					isLargeViewport &&
-					isDefaultEditingMode && <BlockParentSelector /> }
-				{ ( shouldShowVisualToolbar || isMultiToolbar ) &&
-					( isDefaultEditingMode || isSynced ) && (
-						<div
-							ref={ nodeRef }
-							{ ...showHoveredOrFocusedGestures }
-						>
-							<ToolbarGroup className="block-editor-block-toolbar__block-controls">
-								<BlockSwitcher
-									clientIds={ blockClientIds }
-									disabled={ ! isDefaultEditingMode }
-									isUsingBindings={ isUsingBindings }
-								/>
-								{ isDefaultEditingMode && (
-									<>
-										{ ! isMultiToolbar && (
-											<BlockLockToolbar
-												clientId={ blockClientId }
-											/>
-										) }
-										<BlockMover
-											clientIds={ blockClientIds }
-											hideDragHandle={ hideDragHandle }
-										/>
-									</>
-								) }
-							</ToolbarGroup>
-						</div>
-					) }
-				<Shuffle clientId={ blockClientId } />
-				{ shouldShowVisualToolbar && isMultiToolbar && (
-					<BlockGroupToolbar />
+				{ showParentSelector && ! isMultiToolbar && isLargeViewport && (
+					<BlockParentSelector />
 				) }
-				{ shouldShowVisualToolbar && (
+				{ ( shouldShowVisualToolbar || isMultiToolbar ) && (
+					<div ref={ nodeRef } { ...showHoveredOrFocusedGestures }>
+						<ToolbarGroup className="block-editor-block-toolbar__block-controls">
+							<BlockToolbarIcon
+								clientIds={ blockClientIds }
+								isSynced={ isSynced }
+							/>
+							{ isDefaultEditingMode &&
+								showBlockVisibilityButton && (
+									<BlockVisibilityToolbar
+										clientIds={ blockClientIds }
+									/>
+								) }
+							{ ! isMultiToolbar &&
+								isDefaultEditingMode &&
+								showLockButtons && (
+									<BlockLockToolbar
+										clientId={ blockClientId }
+									/>
+								) }
+							<BlockMover
+								clientIds={ blockClientIds }
+								hideDragHandle={ hideDragHandle }
+							/>
+						</ToolbarGroup>
+					</div>
+				) }
+				{ ! hasContentOnlyLocking &&
+					shouldShowVisualToolbar &&
+					isMultiToolbar &&
+					showGroupButtons && <BlockGroupToolbar /> }
+				{ showShuffleButton && (
+					<ChangeDesign clientId={ blockClientIds[ 0 ] } />
+				) }
+				{ showSwitchSectionStyleButton && (
+					<SwitchSectionStyle clientId={ blockClientIds[ 0 ] } />
+				) }
+				{ shouldShowVisualToolbar && showSlots && (
 					<>
-						<BlockControls.Slot
-							group="parent"
-							className="block-editor-block-toolbar__slot"
-						/>
-						<BlockControls.Slot
-							group="block"
-							className="block-editor-block-toolbar__slot"
-						/>
-						<BlockControls.Slot className="block-editor-block-toolbar__slot" />
-						<BlockControls.Slot
-							group="inline"
-							className="block-editor-block-toolbar__slot"
-						/>
+						{ ! isSectionContainer && (
+							<>
+								<BlockControls.Slot
+									group="parent"
+									className="block-editor-block-toolbar__slot"
+								/>
+								<BlockControls.Slot
+									group="block"
+									className="block-editor-block-toolbar__slot"
+								/>
+								<BlockControls.Slot className="block-editor-block-toolbar__slot" />
+								<BlockControls.Slot
+									group="inline"
+									className="block-editor-block-toolbar__slot"
+								/>
+							</>
+						) }
 						<BlockControls.Slot
 							group="other"
 							className="block-editor-block-toolbar__slot"
@@ -226,9 +273,7 @@ export function PrivateBlockToolbar( {
 					</>
 				) }
 				<BlockEditVisuallyButton clientIds={ blockClientIds } />
-				{ isDefaultEditingMode && (
-					<BlockSettingsMenu clientIds={ blockClientIds } />
-				) }
+				<BlockSettingsMenu clientIds={ blockClientIds } />
 			</div>
 		</NavigableToolbar>
 	);

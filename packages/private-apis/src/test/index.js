@@ -236,7 +236,7 @@ describe( 'Specific use-cases of sharing private APIs', () => {
 		 *
 		 * ```js
 		 * import { logData } from 'package1';
-		 * const experimenalLogData = unlock( logData );
+		 * const experimentalLogData = unlock( logData );
 		 * ```
 		 */
 		expect( unlock( logData ) ).toBe( __privateLogData );

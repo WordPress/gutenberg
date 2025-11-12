@@ -14,11 +14,16 @@ import {
 	ExternalLink,
 } from '@wordpress/components';
 import { debounce } from '@wordpress/compose';
-import { useState, useMemo } from '@wordpress/element';
+import {
+	createInterpolateElement,
+	useState,
+	useMemo,
+} from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
+import { filterURLForDisplay } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -51,52 +56,68 @@ export const getItemPriority = ( name, searchValue ) => {
  * Renders the Page Attributes Parent component. A dropdown menu in an editor interface
  * for selecting the parent page of a given page.
  *
- * @return {Component|null} The component to be rendered. Return null if post type is not hierarchical.
+ * @return {React.ReactNode} The component to be rendered. Return null if post type is not hierarchical.
  */
 export function PageAttributesParent() {
 	const { editPost } = useDispatch( editorStore );
 	const [ fieldValue, setFieldValue ] = useState( false );
-	const { isHierarchical, parentPostId, parentPostTitle, pageItems } =
-		useSelect(
-			( select ) => {
-				const { getPostType, getEntityRecords, getEntityRecord } =
-					select( coreStore );
-				const { getCurrentPostId, getEditedPostAttribute } =
-					select( editorStore );
-				const postTypeSlug = getEditedPostAttribute( 'type' );
-				const pageId = getEditedPostAttribute( 'parent' );
-				const pType = getPostType( postTypeSlug );
-				const postId = getCurrentPostId();
-				const postIsHierarchical = pType?.hierarchical ?? false;
-				const query = {
-					per_page: 100,
-					exclude: postId,
-					parent_exclude: postId,
-					orderby: 'menu_order',
-					order: 'asc',
-					_fields: 'id,title,parent',
-				};
+	const {
+		isHierarchical,
+		parentPostId,
+		parentPostTitle,
+		pageItems,
+		isLoading,
+	} = useSelect(
+		( select ) => {
+			const {
+				getPostType,
+				getEntityRecords,
+				getEntityRecord,
+				isResolving,
+			} = select( coreStore );
+			const { getCurrentPostId, getEditedPostAttribute } =
+				select( editorStore );
+			const postTypeSlug = getEditedPostAttribute( 'type' );
+			const pageId = getEditedPostAttribute( 'parent' );
+			const pType = getPostType( postTypeSlug );
+			const postId = getCurrentPostId();
+			const postIsHierarchical = pType?.hierarchical ?? false;
+			const query = {
+				per_page: 100,
+				exclude: postId,
+				parent_exclude: postId,
+				orderby: 'menu_order',
+				order: 'asc',
+				_fields: 'id,title,parent',
+			};
 
-				// Perform a search when the field is changed.
-				if ( !! fieldValue ) {
-					query.search = fieldValue;
-				}
+			// Perform a search when the field is changed.
+			if ( !! fieldValue ) {
+				query.search = fieldValue;
+			}
 
-				const parentPost = pageId
-					? getEntityRecord( 'postType', postTypeSlug, pageId )
-					: null;
+			const parentPost = pageId
+				? getEntityRecord( 'postType', postTypeSlug, pageId )
+				: null;
 
-				return {
-					isHierarchical: postIsHierarchical,
-					parentPostId: pageId,
-					parentPostTitle: parentPost ? getTitle( parentPost ) : '',
-					pageItems: postIsHierarchical
-						? getEntityRecords( 'postType', postTypeSlug, query )
-						: null,
-				};
-			},
-			[ fieldValue ]
-		);
+			return {
+				isHierarchical: postIsHierarchical,
+				parentPostId: pageId,
+				parentPostTitle: parentPost ? getTitle( parentPost ) : '',
+				pageItems: postIsHierarchical
+					? getEntityRecords( 'postType', postTypeSlug, query )
+					: null,
+				isLoading: postIsHierarchical
+					? isResolving( 'getEntityRecords', [
+							'postType',
+							postTypeSlug,
+							query,
+					  ] )
+					: false,
+			};
+		},
+		[ fieldValue ]
+	);
 
 	const parentOptions = useMemo( () => {
 		const getOptionsFromTree = ( tree, level = 0 ) => {
@@ -182,6 +203,7 @@ export function PageAttributesParent() {
 			onFilterValueChange={ debounce( handleKeydown, 300 ) }
 			onChange={ handleChange }
 			hideLabelFromVision
+			isLoading={ isLoading }
 		/>
 	);
 }
@@ -207,8 +229,10 @@ function PostParentToggle( { isOpen, onClick } ) {
 			className="editor-post-parent__panel-toggle"
 			variant="tertiary"
 			aria-expanded={ isOpen }
-			// translators: %s: Current post parent.
-			aria-label={ sprintf( __( 'Change parent: %s' ), parentTitle ) }
+			aria-label={
+				// translators: %s: Current post parent.
+				sprintf( __( 'Change parent: %s' ), parentTitle )
+			}
 			onClick={ onClick }
 		>
 			{ parentTitle }
@@ -217,6 +241,11 @@ function PostParentToggle( { isOpen, onClick } ) {
 }
 
 export function ParentRow() {
+	const homeUrl = useSelect( ( select ) => {
+		// Site index.
+		return select( coreStore ).getEntityRecord( 'root', '__unstableBase' )
+			?.home;
+	}, [] );
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
@@ -249,20 +278,36 @@ export function ParentRow() {
 							onClose={ onClose }
 						/>
 						<div>
-							{ __(
-								"Child pages inherit characteristics from their parent, such as URL structure. For instance, if 'Web Design' is a child of 'Services,' its URL would be mysite.com/services/web-design."
+							{ createInterpolateElement(
+								sprintf(
+									/* translators: %s: The home URL of the WordPress installation without the scheme. */
+									__(
+										'Child pages inherit characteristics from their parent, such as URL structure. For instance, if "Pricing" is a child of "Services", its URL would be %s<wbr />/services<wbr />/pricing.'
+									),
+									filterURLForDisplay( homeUrl ).replace(
+										/([/.])/g,
+										'<wbr />$1'
+									)
+								),
+								{
+									wbr: <wbr />,
+								}
 							) }
 							<p>
-								{ __(
-									'They also show up as sub-items in the default navigation menu. '
+								{ createInterpolateElement(
+									__(
+										'They also show up as sub-items in the default navigation menu. <a>Learn more.</a>'
+									),
+									{
+										a: (
+											<ExternalLink
+												href={ __(
+													'https://wordpress.org/documentation/article/page-post-settings-sidebar/#page-attributes'
+												) }
+											/>
+										),
+									}
 								) }
-								<ExternalLink
-									href={ __(
-										'https://wordpress.org/documentation/article/page-post-settings-sidebar/#page-attributes'
-									) }
-								>
-									{ __( 'Learn more' ) }
-								</ExternalLink>
 							</p>
 						</div>
 						<PageAttributesParent />

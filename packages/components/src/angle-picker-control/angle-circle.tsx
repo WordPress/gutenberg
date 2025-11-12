@@ -28,8 +28,10 @@ function AngleCircle( {
 	...props
 }: WordPressComponentProps< AngleCircleProps, 'div' > ) {
 	const angleCircleRef = useRef< HTMLDivElement | null >( null );
-	const angleCircleCenter = useRef< { x: number; y: number } | undefined >();
-	const previousCursorValue = useRef< CSSStyleDeclaration[ 'cursor' ] >();
+	const angleCircleCenterRef = useRef<
+		{ x: number; y: number } | undefined
+	>();
+	const previousCursorValueRef = useRef< CSSStyleDeclaration[ 'cursor' ] >();
 
 	const setAngleCircleCenter = () => {
 		if ( angleCircleRef.current === null ) {
@@ -37,7 +39,7 @@ function AngleCircle( {
 		}
 
 		const rect = angleCircleRef.current.getBoundingClientRect();
-		angleCircleCenter.current = {
+		angleCircleCenterRef.current = {
 			x: rect.x + rect.width / 2,
 			y: rect.y + rect.height / 2,
 		};
@@ -55,10 +57,10 @@ function AngleCircle( {
 		( event.target as HTMLDivElement | null )?.focus();
 
 		if (
-			angleCircleCenter.current !== undefined &&
+			angleCircleCenterRef.current !== undefined &&
 			onChange !== undefined
 		) {
-			const { x: centerX, y: centerY } = angleCircleCenter.current;
+			const { x: centerX, y: centerY } = angleCircleCenterRef.current;
 			onChange(
 				getAngle( centerX, centerY, event.clientX, event.clientY )
 			);
@@ -76,13 +78,13 @@ function AngleCircle( {
 
 	useEffect( () => {
 		if ( isDragging ) {
-			if ( previousCursorValue.current === undefined ) {
-				previousCursorValue.current = document.body.style.cursor;
+			if ( previousCursorValueRef.current === undefined ) {
+				previousCursorValueRef.current = document.body.style.cursor;
 			}
 			document.body.style.cursor = 'grabbing';
 		} else {
-			document.body.style.cursor = previousCursorValue.current || '';
-			previousCursorValue.current = undefined;
+			document.body.style.cursor = previousCursorValueRef.current || '';
+			previousCursorValueRef.current = undefined;
 		}
 	}, [ isDragging ] );
 

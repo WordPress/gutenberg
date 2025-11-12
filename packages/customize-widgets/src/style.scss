@@ -1,11 +1,13 @@
-@import "./components/block-inspector-button/style.scss";
-@import "./components/header/style.scss";
-@import "./components/inserter/style.scss";
-@import "./components/keyboard-shortcut-help-modal/style.scss";
-@import "./components/more-menu/style.scss";
-@import "./components/sidebar-block-editor/style.scss";
-@import "./components/welcome-guide/style.scss";
-@import "./controls/style.scss";
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/default-custom-properties";
+@use "./components/block-inspector-button/style.scss" as *;
+@use "./components/header/style.scss" as *;
+@use "./components/inserter/style.scss" as *;
+@use "./components/keyboard-shortcut-help-modal/style.scss" as *;
+@use "./components/more-menu/style.scss" as *;
+@use "./components/sidebar-block-editor/style.scss" as *;
+@use "./components/welcome-guide/style.scss" as *;
+@use "./controls/style.scss" as *;
 
 // Modals need a higher z-index in the customizer.
 .components-modal__screen-overlay {

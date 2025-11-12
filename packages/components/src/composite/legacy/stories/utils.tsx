@@ -8,6 +8,25 @@ import type { StoryContext } from '@storybook/react';
  */
 import type { LegacyStateOptions } from '..';
 
+/**
+ * Renders a composite widget.
+ *
+ * This unstable component is deprecated. Use `Composite` instead.
+ *
+ * ```jsx
+ * import {
+ * 	__unstableUseCompositeState as useCompositeState,
+ * 	__unstableComposite as Composite,
+ * 	__unstableCompositeItem as CompositeItem,
+ * } from '@wordpress/components';
+ *
+ * const state = useCompositeState();
+ * <Composite state={ state }>
+ * 	<CompositeItem>Item 1</CompositeItem>
+ * 	<CompositeItem>Item 2</CompositeItem>
+ * </Composite>;
+ * ```
+ */
 export function UseCompositeStatePlaceholder( props: LegacyStateOptions ) {
 	return (
 		<dl>

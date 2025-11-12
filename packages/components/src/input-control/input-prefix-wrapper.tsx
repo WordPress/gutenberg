@@ -6,19 +6,23 @@ import type { ForwardedRef } from 'react';
 /**
  * Internal dependencies
  */
-import { Spacer } from '../spacer';
 import type { WordPressComponentProps } from '../context';
 import { contextConnect, useContextSystem } from '../context';
-import type { InputControlPrefixWrapperProps } from './types';
+import type { PrefixSuffixWrapperProps } from './types';
+import { PrefixSuffixWrapper } from './styles/input-control-styles';
 
 function UnconnectedInputControlPrefixWrapper(
-	props: WordPressComponentProps< InputControlPrefixWrapperProps, 'div' >,
+	props: WordPressComponentProps< PrefixSuffixWrapperProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const derivedProps = useContextSystem( props, 'InputControlPrefixWrapper' );
 
 	return (
-		<Spacer marginBottom={ 0 } { ...derivedProps } ref={ forwardedRef } />
+		<PrefixSuffixWrapper
+			{ ...derivedProps }
+			isPrefix
+			ref={ forwardedRef }
+		/>
 	);
 }
 

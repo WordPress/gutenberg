@@ -26,6 +26,12 @@
 	},
 	"supports": {
 		"align": true,
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true
+		},
 		"html": false,
 		"spacing": {
 			"margin": true,
@@ -46,6 +52,15 @@
 			"__experimentalLetterSpacing": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
+			}
+		},
+		"color": {
+			"gradients": true,
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true,
+				"link": true
 			}
 		},
 		"interactivity": {

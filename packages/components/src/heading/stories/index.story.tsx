@@ -10,7 +10,8 @@ import { Heading } from '..';
 
 const meta: Meta< typeof Heading > = {
 	component: Heading,
-	title: 'Components (Experimental)/Heading',
+	title: 'Components/Typography/Heading',
+	id: 'components-heading',
 	argTypes: {
 		as: { control: { type: 'text' } },
 		color: { control: { type: 'color' } },
@@ -24,6 +25,7 @@ const meta: Meta< typeof Heading > = {
 		},
 		weight: { control: { type: 'text' } },
 	},
+	tags: [ 'status-experimental' ],
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },

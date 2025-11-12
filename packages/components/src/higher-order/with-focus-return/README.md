@@ -13,7 +13,12 @@ import { withFocusReturn, TextControl, Button } from '@wordpress/components';
 const EnhancedComponent = withFocusReturn( () => (
 	<div>
 		Focus will return to the previous input when this component is unmounted
-		<TextControl autoFocus={ true } onChange={ () => {} } />
+		<TextControl
+			__nextHasNoMarginBottom
+			__next40pxDefaultSize
+			autoFocus={ true }
+			onChange={ () => {} }
+		/>
 	</div>
 ) );
 
@@ -27,6 +32,8 @@ const MyComponentWithFocusReturn = () => {
 	return (
 		<div>
 			<TextControl
+				__nextHasNoMarginBottom
+				__next40pxDefaultSize
 				placeholder="Type something"
 				value={ text }
 				onChange={ ( value ) => setText( value ) }
@@ -39,7 +46,7 @@ const MyComponentWithFocusReturn = () => {
 			) }
 		</div>
 	);
-}
+};
 ```
 
 `withFocusReturn` can optionally be called as a higher-order function creator. Provided an options object, a new higher-order function is returned.

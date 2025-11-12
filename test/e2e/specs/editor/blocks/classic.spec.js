@@ -59,13 +59,13 @@ test.describe( 'Classic', () => {
 		await expect( modalGalleryTab ).toBeVisible();
 		await modalGalleryTab.click();
 
-		const filename = await mediaUtils.upload(
+		const fileName = await mediaUtils.upload(
 			page.locator( '.media-modal .moxie-shim input[type=file]' )
 		);
 
 		// Wait for upload
 		await expect(
-			page.locator( `role=checkbox[name="${ filename }"i]` )
+			page.locator( `role=checkbox[name="${ fileName }"i]` )
 		).toBeChecked();
 
 		const createGallery = page.getByRole( 'button', {
@@ -106,7 +106,7 @@ test.describe( 'Classic', () => {
 		page,
 		pageUtils,
 	} ) => {
-		// Based on docs routing diables caching.
+		// Based on docs routing disables caching.
 		// See: https://playwright.dev/docs/api/class-page#page-route
 		await page.route( '**', async ( route ) => {
 			await route.continue();
@@ -161,12 +161,12 @@ class MediaUtils {
 		const tmpDirectory = await fs.mkdtemp(
 			path.join( os.tmpdir(), 'gutenberg-test-image-' )
 		);
-		const filename = uuid();
-		const tmpFileName = path.join( tmpDirectory, filename + '.png' );
+		const fileName = uuid();
+		const tmpFileName = path.join( tmpDirectory, fileName + '.png' );
 		await fs.copyFile( this.TEST_IMAGE_FILE_PATH, tmpFileName );
 
 		await inputElement.setInputFiles( tmpFileName );
 
-		return filename;
+		return fileName;
 	}
 }

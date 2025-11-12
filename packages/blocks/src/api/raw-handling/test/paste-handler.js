@@ -61,6 +61,26 @@ const tableWithHeaderFooterAndBodyUsingRowspan = `
 	</tfoot>
 </table>`;
 
+const tableWithCellAlignments = `
+<table>
+	<thead>
+		<tr>
+			<th style="text-align: left;">A - Left</th>
+			<th style="text-align: center;">B - Centered</th>
+			<th style="text-align: right;">C - Right</th>
+			<th>D - None</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td style="text-align: left;">100</td>
+			<td style="text-align: center;">150</td>
+			<td style="text-align: right;">200</td>
+			<td>250</td>
+		</tr>
+	</tbody>
+</table>`;
+
 describe( 'pasteHandler', () => {
 	beforeAll( () => {
 		initAndRegisterTableBlock();
@@ -154,6 +174,93 @@ describe( 'pasteHandler', () => {
 		} );
 		expect( result.name ).toEqual( 'core/table' );
 		expect( result.isValid ).toBeTruthy();
+	} );
+
+	it( 'can handle a table with cell alignments', () => {
+		const [ result ] = pasteHandler( {
+			HTML: tableWithCellAlignments,
+			tagName: 'p',
+		} );
+
+		expect( console ).toHaveLogged();
+
+		delete result.attributes.caption;
+
+		expect( result.name ).toEqual( 'core/table' );
+		expect( result.isValid ).toBeTruthy();
+
+		expect( result.attributes ).toEqual( {
+			hasFixedLayout: true,
+			head: [
+				{
+					cells: [
+						{
+							content: 'A - Left',
+							tag: 'th',
+							align: 'left',
+							colspan: undefined,
+							rowspan: undefined,
+						},
+						{
+							content: 'B - Centered',
+							tag: 'th',
+							align: 'center',
+							colspan: undefined,
+							rowspan: undefined,
+						},
+						{
+							content: 'C - Right',
+							tag: 'th',
+							align: 'right',
+							colspan: undefined,
+							rowspan: undefined,
+						},
+						{
+							content: 'D - None',
+							tag: 'th',
+							align: undefined,
+							colspan: undefined,
+							rowspan: undefined,
+						},
+					],
+				},
+			],
+			body: [
+				{
+					cells: [
+						{
+							content: '100',
+							tag: 'td',
+							align: 'left',
+							colspan: undefined,
+							rowspan: undefined,
+						},
+						{
+							content: '150',
+							tag: 'td',
+							align: 'center',
+							colspan: undefined,
+							rowspan: undefined,
+						},
+						{
+							content: '200',
+							tag: 'td',
+							align: 'right',
+							colspan: undefined,
+							rowspan: undefined,
+						},
+						{
+							content: '250',
+							tag: 'td',
+							align: undefined,
+							colspan: undefined,
+							rowspan: undefined,
+						},
+					],
+				},
+			],
+			foot: [],
+		} );
 	} );
 
 	it( 'can handle a video', () => {

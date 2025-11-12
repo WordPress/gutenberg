@@ -14,7 +14,7 @@ const transforms = {
 			isMatch( files ) {
 				return files.length > 0;
 			},
-			// We define a lower priorty (higher number) than the default of 10. This
+			// We define a lower priority (higher number) than the default of 10. This
 			// ensures that the File block is only created as a fallback.
 			priority: 15,
 			transform: ( files ) => {
@@ -24,13 +24,32 @@ const transforms = {
 					const blobURL = createBlobURL( file );
 
 					// File will be uploaded in componentDidMount()
-					blocks.push(
-						createBlock( 'core/file', {
-							href: blobURL,
-							fileName: file.name,
-							textLinkHref: blobURL,
-						} )
-					);
+					if ( file.type.startsWith( 'video/' ) ) {
+						blocks.push(
+							createBlock( 'core/video', {
+								blob: createBlobURL( file ),
+							} )
+						);
+					} else if ( file.type.startsWith( 'image/' ) ) {
+						blocks.push(
+							createBlock( 'core/image', {
+								blob: createBlobURL( file ),
+							} )
+						);
+					} else if ( file.type.startsWith( 'audio/' ) ) {
+						blocks.push(
+							createBlock( 'core/audio', {
+								blob: createBlobURL( file ),
+							} )
+						);
+					} else {
+						blocks.push(
+							createBlock( 'core/file', {
+								blob: blobURL,
+								fileName: file.name,
+							} )
+						);
+					}
 				} );
 
 				return blocks;
@@ -85,8 +104,8 @@ const transforms = {
 				if ( ! id ) {
 					return false;
 				}
-				const { getMedia } = select( coreStore );
-				const media = getMedia( id );
+				const { getEntityRecord } = select( coreStore );
+				const media = getEntityRecord( 'postType', 'attachment', id );
 				return !! media && media.mime_type.includes( 'audio' );
 			},
 			transform: ( attributes ) => {
@@ -105,8 +124,8 @@ const transforms = {
 				if ( ! id ) {
 					return false;
 				}
-				const { getMedia } = select( coreStore );
-				const media = getMedia( id );
+				const { getEntityRecord } = select( coreStore );
+				const media = getEntityRecord( 'postType', 'attachment', id );
 				return !! media && media.mime_type.includes( 'video' );
 			},
 			transform: ( attributes ) => {
@@ -125,8 +144,8 @@ const transforms = {
 				if ( ! id ) {
 					return false;
 				}
-				const { getMedia } = select( coreStore );
-				const media = getMedia( id );
+				const { getEntityRecord } = select( coreStore );
+				const media = getEntityRecord( 'postType', 'attachment', id );
 				return !! media && media.mime_type.includes( 'image' );
 			},
 			transform: ( attributes ) => {

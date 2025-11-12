@@ -9,9 +9,9 @@ import clsx from 'clsx';
 import { cloneBlock } from '@wordpress/blocks';
 import { useEffect, useState, forwardRef, useMemo } from '@wordpress/element';
 import {
+	Composite,
 	VisuallyHidden,
 	Tooltip,
-	privateApis as componentsPrivateApis,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
@@ -21,17 +21,10 @@ import { Icon, symbol } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../lock-unlock';
 import BlockPreview from '../block-preview';
 import InserterDraggableBlocks from '../inserter-draggable-blocks';
 import BlockPatternsPaging from '../block-patterns-paging';
 import { INSERTER_PATTERN_TYPES } from '../inserter/block-patterns-tab/utils';
-
-const {
-	CompositeV2: Composite,
-	CompositeItemV2: CompositeItem,
-	useCompositeStoreV2: useCompositeStore,
-} = unlock( componentsPrivateApis );
 
 const WithToolTip = ( { showTooltip, title, children } ) => {
 	if ( showTooltip ) {
@@ -46,14 +39,15 @@ function BlockPattern( {
 	pattern,
 	onClick,
 	onHover,
-	showTitle = true,
-	showTooltip,
+	showTitlesAsTooltip,
 	category,
+	isSelected,
 } ) {
 	const [ isDragging, setIsDragging ] = useState( false );
 	const { blocks, viewportWidth } = pattern;
 	const instanceId = useInstanceId( BlockPattern );
 	const descriptionId = `block-editor-block-patterns-list__item-description-${ instanceId }`;
+	const isUserPattern = pattern.type === INSERTER_PATTERN_TYPES.user;
 
 	// When we have a selected category and the pattern is draggable, we need to update the
 	// pattern's categories in metadata to only contain the selected category, and pass this to
@@ -101,13 +95,10 @@ function BlockPattern( {
 					} }
 				>
 					<WithToolTip
-						showTooltip={
-							showTooltip &&
-							! pattern.type !== INSERTER_PATTERN_TYPES.user
-						}
+						showTooltip={ showTitlesAsTooltip && ! isUserPattern }
 						title={ pattern.title }
 					>
-						<CompositeItem
+						<Composite.Item
 							render={
 								<div
 									role="option"
@@ -124,6 +115,7 @@ function BlockPattern( {
 												pattern.type ===
 													INSERTER_PATTERN_TYPES.user &&
 												! pattern.syncStatus,
+											'is-selected': isSelected,
 										}
 									) }
 								/>
@@ -141,33 +133,30 @@ function BlockPattern( {
 							} }
 							onMouseLeave={ () => onHover?.( null ) }
 						>
-							<BlockPreview
-								blocks={ blocks }
-								viewportWidth={ viewportWidth }
-							/>
-
-							{ showTitle && (
+							<BlockPreview.Async
+								placeholder={ <BlockPatternPlaceholder /> }
+							>
+								<BlockPreview
+									blocks={ blocks }
+									viewportWidth={ viewportWidth }
+								/>
+							</BlockPreview.Async>
+							{ ( ! showTitlesAsTooltip || isUserPattern ) && (
 								<HStack
 									className="block-editor-patterns__pattern-details"
 									spacing={ 2 }
 								>
-									{ pattern.type ===
-										INSERTER_PATTERN_TYPES.user &&
-										! pattern.syncStatus && (
-											<div className="block-editor-patterns__pattern-icon-wrapper">
-												<Icon
-													className="block-editor-patterns__pattern-icon"
-													icon={ symbol }
-												/>
-											</div>
-										) }
-									{ ( ! showTooltip ||
-										pattern.type ===
-											INSERTER_PATTERN_TYPES.user ) && (
-										<div className="block-editor-block-patterns-list__item-title">
-											{ pattern.title }
+									{ isUserPattern && ! pattern.syncStatus && (
+										<div className="block-editor-patterns__pattern-icon-wrapper">
+											<Icon
+												className="block-editor-patterns__pattern-icon"
+												icon={ symbol }
+											/>
 										</div>
 									) }
+									<div className="block-editor-block-patterns-list__item-title">
+										{ pattern.title }
+									</div>
 								</HStack>
 							) }
 
@@ -176,7 +165,7 @@ function BlockPattern( {
 									{ pattern.description }
 								</VisuallyHidden>
 							) }
-						</CompositeItem>
+						</Composite.Item>
 					</WithToolTip>
 				</div>
 			) }
@@ -194,54 +183,57 @@ function BlockPatternsList(
 	{
 		isDraggable,
 		blockPatterns,
-		shownPatterns,
 		onHover,
 		onClickPattern,
 		orientation,
 		label = __( 'Block patterns' ),
 		category,
-		showTitle = true,
 		showTitlesAsTooltip,
 		pagingProps,
 	},
 	ref
 ) {
-	const compositeStore = useCompositeStore( { orientation } );
-	const { setActiveId } = compositeStore;
+	const [ activeCompositeId, setActiveCompositeId ] = useState( undefined );
+	const [ activePattern, setActivePattern ] = useState( null ); // State to track active pattern
 
 	useEffect( () => {
-		// We reset the active composite item whenever the
-		// available patterns change, to make sure that
-		// focus is put back to the start.
-		setActiveId( undefined );
-	}, [ setActiveId, shownPatterns, blockPatterns ] );
+		// Reset the active composite item whenever the available patterns change,
+		// to make sure that Composite widget can receive focus correctly when its
+		// composite items change. The first composite item will receive focus.
+		const firstCompositeItemId = blockPatterns[ 0 ]?.name;
+		setActiveCompositeId( firstCompositeItemId );
+	}, [ blockPatterns ] );
+
+	const handleClickPattern = ( pattern, blocks ) => {
+		setActivePattern( pattern.name );
+		onClickPattern( pattern, blocks );
+	};
 
 	return (
 		<Composite
-			store={ compositeStore }
+			orientation={ orientation }
+			activeId={ activeCompositeId }
+			setActiveId={ setActiveCompositeId }
 			role="listbox"
 			className="block-editor-block-patterns-list"
 			aria-label={ label }
 			ref={ ref }
 		>
-			{ blockPatterns.map( ( pattern ) => {
-				const isShown = shownPatterns.includes( pattern );
-				return isShown ? (
-					<BlockPattern
-						key={ pattern.name }
-						id={ pattern.name }
-						pattern={ pattern }
-						onClick={ onClickPattern }
-						onHover={ onHover }
-						isDraggable={ isDraggable }
-						showTitle={ showTitle }
-						showTooltip={ showTitlesAsTooltip }
-						category={ category }
-					/>
-				) : (
-					<BlockPatternPlaceholder key={ pattern.name } />
-				);
-			} ) }
+			{ blockPatterns.map( ( pattern ) => (
+				<BlockPattern
+					key={ pattern.name }
+					id={ pattern.name }
+					pattern={ pattern }
+					onClick={ handleClickPattern }
+					onHover={ onHover }
+					isDraggable={ isDraggable }
+					showTitlesAsTooltip={ showTitlesAsTooltip }
+					category={ category }
+					isSelected={
+						!! activePattern && activePattern === pattern.name
+					}
+				/>
+			) ) }
 			{ pagingProps && <BlockPatternsPaging { ...pagingProps } /> }
 		</Composite>
 	);

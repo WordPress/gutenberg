@@ -1,6 +1,10 @@
 # DimensionControl
 
 <div class="callout callout-alert">
+This component is deprecated.
+</div>
+
+<div class="callout callout-alert">
 This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </div>
 
@@ -17,6 +21,8 @@ export default function MyCustomDimensionControl() {
 
 	return (
 		<DimensionControl
+			__nextHasNoMarginBottom
+			__next40pxDefaultSize
 			label={ 'Padding' }
 			icon={ 'desktop' }
 			onChange={ ( value ) => setPaddingSize( value ) }
@@ -91,3 +97,19 @@ A callback which is triggered when a spacing size value changes (is selected/cli
 -   **Required:** No
 
 A string of classes to be added to the control component.
+
+### `__next40pxDefaultSize`
+
+-   **Type:** `Boolean`
+-   **Required:** No
+-   **Default:** `false`
+
+Start opting into the larger default height that will become the default size in a future version.
+
+### `__nextHasNoMarginBottom`
+
+-   **Type:** `Boolean`
+-   **Required:** No
+-   **Default:** `false`
+
+Start opting into the new margin-free styles that will become the default in a future version.

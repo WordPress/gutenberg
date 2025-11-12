@@ -50,6 +50,7 @@ function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
 				<Command.Item
 					key={ command.name }
 					value={ command.searchLabel ?? command.label }
+					keywords={ command.keywords }
 					onSelect={ () => command.callback( { close } ) }
 					id={ command.name }
 				>
@@ -79,11 +80,11 @@ export function CommandMenuLoaderWrapper( { hook, search, setLoader, close } ) {
 	// the CommandMenuLoaderWrapper component need to be
 	// remounted on each hook prop change
 	// We use the key state to make sure we do that properly.
-	const currentLoader = useRef( hook );
+	const currentLoaderRef = useRef( hook );
 	const [ key, setKey ] = useState( 0 );
 	useEffect( () => {
-		if ( currentLoader.current !== hook ) {
-			currentLoader.current = hook;
+		if ( currentLoaderRef.current !== hook ) {
+			currentLoaderRef.current = hook;
 			setKey( ( prevKey ) => prevKey + 1 );
 		}
 	}, [ hook ] );
@@ -91,7 +92,7 @@ export function CommandMenuLoaderWrapper( { hook, search, setLoader, close } ) {
 	return (
 		<CommandMenuLoader
 			key={ key }
-			hook={ currentLoader.current }
+			hook={ currentLoaderRef.current }
 			search={ search }
 			setLoader={ setLoader }
 			close={ close }
@@ -121,6 +122,7 @@ export function CommandMenuGroup( { isContextual, search, setLoader, close } ) {
 				<Command.Item
 					key={ command.name }
 					value={ command.searchLabel ?? command.label }
+					keywords={ command.keywords }
 					onSelect={ () => command.callback( { close } ) }
 					id={ command.name }
 				>
@@ -192,7 +194,6 @@ export function CommandMenu() {
 	);
 	const { open, close } = useDispatch( commandsStore );
 	const [ loaders, setLoaders ] = useState( {} );
-	const commandListRef = useRef();
 
 	useEffect( () => {
 		registerShortcut( {
@@ -205,16 +206,6 @@ export function CommandMenu() {
 			},
 		} );
 	}, [ registerShortcut ] );
-
-	// Temporary fix for the suggestions Listbox labeling.
-	// See https://github.com/pacocoursey/cmdk/issues/196
-	useEffect( () => {
-		commandListRef.current?.removeAttribute( 'aria-labelledby' );
-		commandListRef.current?.setAttribute(
-			'aria-label',
-			__( 'Command suggestions' )
-		);
-	}, [ commandListRef.current ] );
 
 	useShortcut(
 		'core/commands',
@@ -280,14 +271,17 @@ export function CommandMenu() {
 			<div className="commands-command-menu__container">
 				<Command label={ inputLabel } onKeyDown={ onKeyDown }>
 					<div className="commands-command-menu__header">
+						<Icon
+							className="commands-command-menu__header-search-icon"
+							icon={ inputIcon }
+						/>
 						<CommandInput
 							search={ search }
 							setSearch={ setSearch }
 							isOpen={ isOpen }
 						/>
-						<Icon icon={ inputIcon } />
 					</div>
-					<Command.List ref={ commandListRef }>
+					<Command.List label={ __( 'Command suggestions' ) }>
 						{ search && ! isLoading && (
 							<Command.Empty>
 								{ __( 'No results found.' ) }

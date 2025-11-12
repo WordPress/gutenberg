@@ -90,22 +90,36 @@ function BlockKeyboardShortcuts() {
 				},
 			} );
 		} );
-	}, [] );
+	}, [ registerShortcut ] );
 
 	useShortcut(
 		'core/block-editor/transform-heading-to-paragraph',
 		( event ) => handleTransformHeadingAndParagraph( event, 0 )
 	);
-
-	[ 1, 2, 3, 4, 5, 6 ].forEach( ( level ) => {
-		//the loop is based off on a constant therefore
-		//the hook will execute the same way every time
-		//eslint-disable-next-line react-hooks/rules-of-hooks
-		useShortcut(
-			`core/block-editor/transform-paragraph-to-heading-${ level }`,
-			( event ) => handleTransformHeadingAndParagraph( event, level )
-		);
-	} );
+	useShortcut(
+		'core/block-editor/transform-paragraph-to-heading-1',
+		( event ) => handleTransformHeadingAndParagraph( event, 1 )
+	);
+	useShortcut(
+		'core/block-editor/transform-paragraph-to-heading-2',
+		( event ) => handleTransformHeadingAndParagraph( event, 2 )
+	);
+	useShortcut(
+		'core/block-editor/transform-paragraph-to-heading-3',
+		( event ) => handleTransformHeadingAndParagraph( event, 3 )
+	);
+	useShortcut(
+		'core/block-editor/transform-paragraph-to-heading-4',
+		( event ) => handleTransformHeadingAndParagraph( event, 4 )
+	);
+	useShortcut(
+		'core/block-editor/transform-paragraph-to-heading-5',
+		( event ) => handleTransformHeadingAndParagraph( event, 5 )
+	);
+	useShortcut(
+		'core/block-editor/transform-paragraph-to-heading-6',
+		( event ) => handleTransformHeadingAndParagraph( event, 6 )
+	);
 
 	return null;
 }

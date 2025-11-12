@@ -9,7 +9,7 @@ import {
 	__unstableAnimatePresence as AnimatePresence,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
 import { isBlobURL } from '@wordpress/blob';
@@ -17,7 +17,7 @@ import { isBlobURL } from '@wordpress/blob';
 /**
  * Internal dependencies
  */
-import { store as editorStore } from '../../store';
+import { fetchMedia } from './media-util';
 
 function flattenBlocks( blocks ) {
 	const result = [];
@@ -30,7 +30,53 @@ function flattenBlocks( blocks ) {
 	return result;
 }
 
-function Image( block ) {
+/**
+ * Determine whether a block has external media.
+ *
+ * Different blocks use different attribute names (and potentially
+ * different logic as well) in determining whether the media is
+ * present, and whether it's external.
+ *
+ * @param {{name: string, attributes: Object}} block The block.
+ * @return {boolean?} Whether the block has external media
+ */
+function hasExternalMedia( block ) {
+	if ( block.name === 'core/image' || block.name === 'core/cover' ) {
+		return block.attributes.url && ! block.attributes.id;
+	}
+
+	if ( block.name === 'core/media-text' ) {
+		return block.attributes.mediaUrl && ! block.attributes.mediaId;
+	}
+
+	return undefined;
+}
+
+/**
+ * Retrieve media info from a block.
+ *
+ * Different blocks use different attribute names, so we need this
+ * function to normalize things into a consistent naming scheme.
+ *
+ * @param {{name: string, attributes: Object}} block The block.
+ * @return {{url: ?string, alt: ?string, id: ?number}} The media info for the block.
+ */
+function getMediaInfo( block ) {
+	if ( block.name === 'core/image' || block.name === 'core/cover' ) {
+		const { url, alt, id } = block.attributes;
+		return { url, alt, id };
+	}
+
+	if ( block.name === 'core/media-text' ) {
+		const { mediaUrl: url, mediaAlt: alt, mediaId: id } = block.attributes;
+		return { url, alt, id };
+	}
+
+	return {};
+}
+
+// Image component to represent a single image in the upload dialog.
+function Image( { clientId, alt, url } ) {
 	const { selectBlock } = useDispatch( blockEditorStore );
 	return (
 		<motion.img
@@ -38,22 +84,22 @@ function Image( block ) {
 			role="button"
 			aria-label={ __( 'Select image block.' ) }
 			onClick={ () => {
-				selectBlock( block.clientId );
+				selectBlock( clientId );
 			} }
 			onKeyDown={ ( event ) => {
 				if ( event.key === 'Enter' || event.key === ' ' ) {
-					selectBlock( block.clientId );
+					selectBlock( clientId );
 					event.preventDefault();
 				}
 			} }
-			key={ block.clientId }
-			alt={ block.attributes.alt }
-			src={ block.attributes.url }
+			key={ clientId }
+			alt={ alt }
+			src={ url }
 			animate={ { opacity: 1 } }
 			exit={ { opacity: 0, scale: 0 } }
 			style={ {
-				width: '36px',
-				height: '36px',
+				width: '32px',
+				height: '32px',
 				objectFit: 'cover',
 				borderRadius: '2px',
 				cursor: 'pointer',
@@ -63,24 +109,25 @@ function Image( block ) {
 	);
 }
 
-export default function PostFormatPanel() {
+export default function MaybeUploadMediaPanel() {
 	const [ isUploading, setIsUploading ] = useState( false );
+	const [ isAnimating, setIsAnimating ] = useState( false );
+	const [ hadUploadError, setHadUploadError ] = useState( false );
 	const { editorBlocks, mediaUpload } = useSelect(
 		( select ) => ( {
-			editorBlocks: select( editorStore ).getEditorBlocks(),
+			editorBlocks: select( blockEditorStore ).getBlocks(),
 			mediaUpload: select( blockEditorStore ).getSettings().mediaUpload,
 		} ),
 		[]
 	);
-	const externalImages = flattenBlocks( editorBlocks ).filter(
-		( block ) =>
-			block.name === 'core/image' &&
-			block.attributes.url &&
-			! block.attributes.id
+
+	// Get a list of blocks with external media.
+	const blocksWithExternalMedia = flattenBlocks( editorBlocks ).filter(
+		( block ) => hasExternalMedia( block )
 	);
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
-	if ( ! mediaUpload || ! externalImages.length ) {
+	if ( ! mediaUpload || ! blocksWithExternalMedia.length ) {
 		return null;
 	}
 
@@ -91,18 +138,51 @@ export default function PostFormatPanel() {
 		</span>,
 	];
 
+	/**
+	 * Update an individual block to point to newly-added library media.
+	 *
+	 * Different blocks use different attribute names, so we need this
+	 * function to ensure we modify the correct attributes for each type.
+	 *
+	 * @param {{name: string, attributes: Object}} block The block.
+	 * @param {{id: number, url: string}}          media Media library file info.
+	 */
+	function updateBlockWithUploadedMedia( block, media ) {
+		if ( block.name === 'core/image' || block.name === 'core/cover' ) {
+			updateBlockAttributes( block.clientId, {
+				id: media.id,
+				url: media.url,
+			} );
+		}
+
+		if ( block.name === 'core/media-text' ) {
+			updateBlockAttributes( block.clientId, {
+				mediaId: media.id,
+				mediaUrl: media.url,
+			} );
+		}
+	}
+
+	// Handle fetching and uploading all external media in the post.
 	function uploadImages() {
 		setIsUploading( true );
-		Promise.all(
-			externalImages.map( ( image ) =>
-				window
-					.fetch(
-						image.attributes.url.includes( '?' )
-							? image.attributes.url
-							: image.attributes.url + '?'
-					)
-					.then( ( response ) => response.blob() )
-					.then(
+		setHadUploadError( false );
+
+		// Multiple blocks can be using the same URL, so we
+		// should ensure we only fetch and upload each of them once.
+		const mediaUrls = new Set(
+			blocksWithExternalMedia.map( ( block ) => {
+				const { url } = getMediaInfo( block );
+				return url;
+			} )
+		);
+
+		// Create an upload promise for each URL, that we can wait for in all
+		// blocks that make use of that media.
+		const uploadPromises = Object.fromEntries(
+			Object.entries( fetchMedia( [ ...mediaUrls ] ) ).map(
+				( [ url, filePromise ] ) => {
+					const uploadPromise = filePromise.then(
 						( blob ) =>
 							new Promise( ( resolve, reject ) => {
 								mediaUpload( {
@@ -112,19 +192,32 @@ export default function PostFormatPanel() {
 											return;
 										}
 
-										updateBlockAttributes( image.clientId, {
-											id: media.id,
-											url: media.url,
-										} );
-										resolve();
+										resolve( media );
 									},
 									onError() {
 										reject();
 									},
 								} );
 							} )
-					)
+					);
+
+					return [ url, uploadPromise ];
+				}
 			)
+		);
+
+		// Wait for all blocks to be updated with library media.
+		Promise.allSettled(
+			blocksWithExternalMedia.map( ( block ) => {
+				const { url } = getMediaInfo( block );
+
+				return uploadPromises[ url ]
+					.then( ( media ) =>
+						updateBlockWithUploadedMedia( block, media )
+					)
+					.then( () => setIsAnimating( true ) )
+					.catch( () => setHadUploadError( true ) );
+			} )
 		).finally( () => {
 			setIsUploading( false );
 		} );
@@ -144,19 +237,34 @@ export default function PostFormatPanel() {
 					gap: '8px',
 				} }
 			>
-				<AnimatePresence>
-					{ externalImages.map( ( image ) => {
-						return <Image key={ image.clientId } { ...image } />;
+				<AnimatePresence
+					onExitComplete={ () => setIsAnimating( false ) }
+				>
+					{ blocksWithExternalMedia.map( ( block ) => {
+						const { url, alt } = getMediaInfo( block );
+						return (
+							<Image
+								key={ block.clientId }
+								clientId={ block.clientId }
+								url={ url }
+								alt={ alt }
+							/>
+						);
 					} ) }
 				</AnimatePresence>
-				{ isUploading ? (
+				{ isUploading || isAnimating ? (
 					<Spinner />
 				) : (
-					<Button variant="primary" onClick={ uploadImages }>
-						{ __( 'Upload' ) }
+					<Button
+						size="compact"
+						variant="primary"
+						onClick={ uploadImages }
+					>
+						{ _x( 'Upload', 'verb' ) }
 					</Button>
 				) }
 			</div>
+			{ hadUploadError && <p>{ __( 'Upload failed, try again.' ) }</p> }
 		</PanelBody>
 	);
 }

@@ -16,17 +16,18 @@ import {
 	useBlockProps,
 	__experimentalUseColorProps as useColorProps,
 	__experimentalUseBorderProps as useBorderProps,
-	__experimentalGetElementClassName,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import {
 	Button,
-	PanelBody,
 	Placeholder,
 	TextControl,
 	ToggleControl,
 	ToolbarDropdownMenu,
 	__experimentalHasSplitBorders as hasSplitBorders,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import {
 	alignLeft,
@@ -41,7 +42,6 @@ import {
 	tableRowDelete,
 	table,
 } from '@wordpress/icons';
-import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -57,6 +57,8 @@ import {
 	toggleSection,
 	isEmptyTableSection,
 } from './state';
+import { Caption } from '../utils/caption';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const ALIGNMENT_CONTROLS = [
 	{
@@ -96,18 +98,21 @@ function TableEdit( {
 	attributes,
 	setAttributes,
 	insertBlocksAfter,
-	isSelected,
+	isSelected: isSingleSelected,
 } ) {
-	const { hasFixedLayout, caption, head, foot } = attributes;
+	const { hasFixedLayout, head, foot } = attributes;
 	const [ initialRowCount, setInitialRowCount ] = useState( 2 );
 	const [ initialColumnCount, setInitialColumnCount ] = useState( 2 );
 	const [ selectedCell, setSelectedCell ] = useState();
 
 	const colorProps = useColorProps( attributes );
 	const borderProps = useBorderProps( attributes );
+	const blockEditingMode = useBlockEditingMode();
 
 	const tableRef = useRef();
 	const [ hasTableCreated, setHasTableCreated ] = useState( false );
+
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	/**
 	 * Updates the initial column count used for table creation.
@@ -341,10 +346,10 @@ function TableEdit( {
 	}
 
 	useEffect( () => {
-		if ( ! isSelected ) {
+		if ( ! isSingleSelected ) {
 			setSelectedCell();
 		}
-	}, [ isSelected ] );
+	}, [ isSingleSelected ] );
 
 	useEffect( () => {
 		if ( hasTableCreated ) {
@@ -452,7 +457,7 @@ function TableEdit( {
 
 	return (
 		<figure { ...useBlockProps( { ref: tableRef } ) }>
-			{ ! isEmpty && (
+			{ ! isEmpty && blockEditingMode === 'default' && (
 				<>
 					<BlockControls group="block">
 						<AlignmentControl
@@ -466,7 +471,6 @@ function TableEdit( {
 					</BlockControls>
 					<BlockControls group="other">
 						<ToolbarDropdownMenu
-							hasArrowIndicator
 							icon={ table }
 							label={ __( 'Edit table' ) }
 							controls={ tableControls }
@@ -475,33 +479,67 @@ function TableEdit( {
 				</>
 			) }
 			<InspectorControls>
-				<PanelBody
-					title={ __( 'Settings' ) }
-					className="blocks-table-settings"
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ () => {
+						setAttributes( {
+							hasFixedLayout: true,
+							head: [],
+							foot: [],
+						} );
+					} }
+					dropdownMenuProps={ dropdownMenuProps }
 				>
-					<ToggleControl
-						__nextHasNoMarginBottom
+					<ToolsPanelItem
+						hasValue={ () => hasFixedLayout !== true }
 						label={ __( 'Fixed width table cells' ) }
-						checked={ !! hasFixedLayout }
-						onChange={ onChangeFixedLayout }
-					/>
+						onDeselect={ () =>
+							setAttributes( { hasFixedLayout: true } )
+						}
+						isShownByDefault
+					>
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Fixed width table cells' ) }
+							checked={ !! hasFixedLayout }
+							onChange={ onChangeFixedLayout }
+						/>
+					</ToolsPanelItem>
 					{ ! isEmpty && (
 						<>
-							<ToggleControl
-								__nextHasNoMarginBottom
+							<ToolsPanelItem
+								hasValue={ () => head && head.length }
 								label={ __( 'Header section' ) }
-								checked={ !! ( head && head.length ) }
-								onChange={ onToggleHeaderSection }
-							/>
-							<ToggleControl
-								__nextHasNoMarginBottom
+								onDeselect={ () =>
+									setAttributes( { head: [] } )
+								}
+								isShownByDefault
+							>
+								<ToggleControl
+									__nextHasNoMarginBottom
+									label={ __( 'Header section' ) }
+									checked={ !! ( head && head.length ) }
+									onChange={ onToggleHeaderSection }
+								/>
+							</ToolsPanelItem>
+							<ToolsPanelItem
+								hasValue={ () => foot && foot.length }
 								label={ __( 'Footer section' ) }
-								checked={ !! ( foot && foot.length ) }
-								onChange={ onToggleFooterSection }
-							/>
+								onDeselect={ () =>
+									setAttributes( { foot: [] } )
+								}
+								isShownByDefault
+							>
+								<ToggleControl
+									__nextHasNoMarginBottom
+									label={ __( 'Footer section' ) }
+									checked={ !! ( foot && foot.length ) }
+									onChange={ onToggleFooterSection }
+								/>
+							</ToolsPanelItem>
 						</>
 					) }
-				</PanelBody>
+				</ToolsPanel>
 			</InspectorControls>
 			{ ! isEmpty && (
 				<table
@@ -523,27 +561,7 @@ function TableEdit( {
 					{ renderedSections }
 				</table>
 			) }
-			{ ! isEmpty && (
-				<RichText
-					identifier="caption"
-					tagName="figcaption"
-					className={ __experimentalGetElementClassName( 'caption' ) }
-					aria-label={ __( 'Table caption text' ) }
-					placeholder={ __( 'Add caption' ) }
-					value={ caption }
-					onChange={ ( value ) =>
-						setAttributes( { caption: value } )
-					}
-					// Deselect the selected table cell when the caption is focused.
-					onFocus={ () => setSelectedCell() }
-					__unstableOnSplitAtEnd={ () =>
-						insertBlocksAfter(
-							createBlock( getDefaultBlockName() )
-						)
-					}
-				/>
-			) }
-			{ isEmpty && (
+			{ isEmpty ? (
 				<Placeholder
 					label={ __( 'Table' ) }
 					icon={ <BlockIcon icon={ icon } showColors /> }
@@ -582,6 +600,17 @@ function TableEdit( {
 						</Button>
 					</form>
 				</Placeholder>
+			) : (
+				<Caption
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					isSelected={ isSingleSelected }
+					insertBlocksAfter={ insertBlocksAfter }
+					label={ __( 'Table caption text' ) }
+					showToolbarButton={
+						isSingleSelected && blockEditingMode === 'default'
+					}
+				/>
 			) }
 		</figure>
 	);

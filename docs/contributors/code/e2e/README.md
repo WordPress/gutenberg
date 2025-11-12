@@ -2,12 +2,6 @@
 
 This living document serves to prescribe instructions and best practices for writing end-to-end (E2E) tests with Playwright in the Gutenberg project.
 
-<div class="callout callout-info">
-
-See the dedicated guide if you're working with the previous Jest + Puppeteer framework. See the <a href="https://github.com/WordPress/gutenberg/tree/HEAD/docs/contributors/code/e2e/migration.md">migration guide</a> if you're migrating tests from Jest + Puppeteer.
-</div>
-
-
 ## Running tests
 
 ```bash
@@ -69,13 +63,13 @@ See the [official documentation](https://playwright.dev/docs/locators) for more 
 
 To encourage better practices for querying elements, selectors are [strict](https://playwright.dev/docs/api/class-browser#browser-new-page-option-strict-selectors) by default, meaning that it will throw an error if the query returns more than one element.
 
-### Don't overload test-utils, inline simple utils
+### Inline simple utility helper function
 
-`e2e-test-utils` are too bloated with too many utils. Most of them are simple enough to be inlined directly in tests. With the help of accessible selectors, simple utils are easier to write now. For utils that only take place on a certain page, use Page Object Model instead (with an exception of clearing states with `requestUtils` which are better placed in `e2e-test-utils`). Otherwise, only create an util if the action is complex and repetitive enough.
+Most utility functions are simple enough to be inlined directly in tests. With the help of accessible selectors, simple utils are easier to write now. For utils that only take place on a certain page, use Page Object Model instead. Otherwise, only create an util if the action is complex and repetitive enough.
 
 ### Favor Page Object Model over utils
 
-As mentioned above, [Page Object Model](https://playwright.dev/docs/test-pom) is the preferred way to create reusable utility functions on a certain page.
+As mentioned above, [Page Object Model](https://playwright.dev/docs/pom) is the preferred way to create reusable utility functions on a certain page.
 
 The rationale behind using a POM is to group utils under namespaces to be easier to discover and use. In fact, `PageUtils` in the `e2e-test-utils-playwright` package is also a POM, which avoids the need for global variables, and utils can reference each other with `this`.
 

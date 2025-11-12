@@ -23,9 +23,6 @@ export default function CoverPlaceholder( {
 			icon={ <BlockIcon icon={ icon } /> }
 			labels={ {
 				title: __( 'Cover' ),
-				instructions: __(
-					'Drag and drop onto this block, upload, or select existing media from your library.'
-				),
 			} }
 			onSelect={ onSelectMedia }
 			accept="image/*,video/*"

@@ -17,7 +17,12 @@ export { metadata, name };
 
 export const settings = {
 	icon,
-	example: {},
+	example: {
+		viewportWidth: 350,
+		attributes: {
+			textAlign: 'center',
+		},
+	},
 	edit,
 	transforms,
 	deprecated,

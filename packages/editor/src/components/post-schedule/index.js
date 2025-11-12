@@ -7,6 +7,7 @@ import { parseISO, endOfMonth, startOfMonth } from 'date-fns';
  * WordPress dependencies
  */
 import { getSettings } from '@wordpress/date';
+import { _x } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useState, useMemo } from '@wordpress/element';
@@ -26,7 +27,7 @@ const { PrivatePublishDateTimePicker } = unlock( blockEditorPrivateApis );
  * @param {Object}   props         Props.
  * @param {Function} props.onClose Function to close the component.
  *
- * @return {Component} The component to be rendered.
+ * @return {React.ReactNode} The rendered component.
  */
 export default function PostSchedule( props ) {
 	return (
@@ -58,7 +59,7 @@ export function PrivatePostSchedule( {
 		startOfMonth( new Date( postDate ) )
 	);
 
-	// Pick up published and schduled site posts.
+	// Pick up published and scheduled site posts.
 	const eventsByPostType = useSelect(
 		( select ) =>
 			select( coreStore ).getEntityRecords( 'postType', postType, {
@@ -98,6 +99,10 @@ export function PrivatePostSchedule( {
 			currentDate={ postDate }
 			onChange={ onUpdateDate }
 			is12Hour={ is12HourTime }
+			dateOrder={
+				/* translators: Order of day, month, and year. Available formats are 'dmy', 'mdy', and 'ymd'. */
+				_x( 'dmy', 'date order' )
+			}
 			events={ events }
 			onMonthPreviewed={ ( date ) =>
 				setPreviewedMonth( parseISO( date ) )

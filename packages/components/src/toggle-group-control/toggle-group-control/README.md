@@ -20,7 +20,13 @@ import {
 
 function Example() {
 	return (
-		<ToggleGroupControl label="my label" value="vertical" isBlock>
+		<ToggleGroupControl
+			label="my label"
+			value="vertical"
+			isBlock
+			__nextHasNoMarginBottom
+			__next40pxDefaultSize
+		>
 			<ToggleGroupControlOption value="horizontal" label="Horizontal" />
 			<ToggleGroupControlOption value="vertical" label="Vertical" />
 		</ToggleGroupControl>
@@ -82,3 +88,17 @@ Callback when a segment is selected.
 The value of the `ToggleGroupControl`.
 
 -   Required: No
+
+### `__next40pxDefaultSize`: `boolean`
+
+Start opting into the larger default height that will become the default size in a future version.
+
+-   Required: No
+-   Default: `false`
+
+### `__nextHasNoMarginBottom`: `boolean`
+
+Start opting into the new margin-free styles that will become the default in a future version.
+
+-   Required: No
+-   Default: `false`

@@ -11,7 +11,7 @@ import { useShortcut } from '@wordpress/keyboard-shortcuts';
 /**
  * Internal dependencies
  */
-import BlockPopover from '../block-popover';
+import { PrivateBlockPopover } from '../block-popover';
 import useBlockToolbarPopoverProps from './use-block-toolbar-popover-props';
 import useSelectedBlockToolProps from './use-selected-block-tool-props';
 import { store as blockEditorStore } from '../../store';
@@ -36,37 +36,42 @@ export default function BlockToolbarPopover( {
 	}, [ clientId ] );
 
 	const { stopTyping } = useDispatch( blockEditorStore );
-	const isToolbarForced = useRef( false );
+	const isToolbarForcedRef = useRef( false );
 
 	useShortcut( 'core/block-editor/focus-toolbar', () => {
-		isToolbarForced.current = true;
+		isToolbarForcedRef.current = true;
 		stopTyping( true );
 	} );
 
 	useEffect( () => {
-		isToolbarForced.current = false;
+		isToolbarForcedRef.current = false;
 	} );
+
+	// If the block has a parent with __experimentalCaptureToolbars enabled,
+	// the toolbar should be positioned over the topmost capturing parent.
+	const clientIdToPositionOver = capturingClientId || clientId;
 
 	const popoverProps = useBlockToolbarPopoverProps( {
 		contentElement: __unstableContentRef?.current,
-		clientId,
+		clientId: clientIdToPositionOver,
 	} );
 
 	return (
 		! isTyping && (
-			<BlockPopover
-				clientId={ capturingClientId || clientId }
+			<PrivateBlockPopover
+				clientId={ clientIdToPositionOver }
 				bottomClientId={ lastClientId }
 				className={ clsx( 'block-editor-block-list__block-popover', {
 					'is-insertion-point-visible': isInsertionPointVisible,
 				} ) }
 				resize={ false }
 				{ ...popoverProps }
+				__unstableContentRef={ __unstableContentRef }
 			>
 				<PrivateBlockToolbar
 					// If the toolbar is being shown because of being forced
 					// it should focus the toolbar right after the mount.
-					focusOnMount={ isToolbarForced.current }
+					focusOnMount={ isToolbarForcedRef.current }
 					__experimentalInitialIndex={
 						initialToolbarItemIndexRef.current
 					}
@@ -75,7 +80,7 @@ export default function BlockToolbarPopover( {
 					} }
 					variant="toolbar"
 				/>
-			</BlockPopover>
+			</PrivateBlockPopover>
 		)
 	);
 }

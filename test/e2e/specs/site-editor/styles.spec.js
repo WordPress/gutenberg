@@ -12,6 +12,14 @@ test.describe( 'Styles', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
+	test.afterEach( async ( { page } ) => {
+		await page.evaluate( async () => {
+			window.wp.data
+				.dispatch( 'core/editor' )
+				.setRenderingMode( 'post-only' );
+		}, [] );
+	} );
+
 	test( 'should override reset styles and library styles', async ( {
 		admin,
 		editor,
@@ -39,10 +47,15 @@ test.describe( 'Styles', () => {
 
 		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
 		// Navigate to Styles -> Blocks -> Heading -> Typography
+		await page.evaluate( async () => {
+			window.wp.data
+				.dispatch( 'core/editor' )
+				.setRenderingMode( 'template-locked' );
+		}, [] );
 		await topBar.getByRole( 'button', { name: 'Styles' } ).click();
-		await page.getByRole( 'button', { name: 'Blocks styles' } ).click();
+		await page.getByRole( 'button', { name: 'Blocks' } ).click();
 		await page
-			.getByRole( 'button', { name: 'Social Icons block styles' } )
+			.getByRole( 'button', { name: 'Social Icons', exact: true } )
 			.click();
 
 		// Find the second padding control and change the padding value

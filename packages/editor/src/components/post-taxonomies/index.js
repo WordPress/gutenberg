@@ -18,7 +18,11 @@ export function PostTaxonomies( { taxonomyWrapper = identity } ) {
 	const { postType, taxonomies } = useSelect( ( select ) => {
 		return {
 			postType: select( editorStore ).getCurrentPostType(),
-			taxonomies: select( coreStore ).getTaxonomies( { per_page: -1 } ),
+			taxonomies: select( coreStore ).getEntityRecords(
+				'root',
+				'taxonomy',
+				{ per_page: -1 }
+			),
 		};
 	}, [] );
 	const visibleTaxonomies = ( taxonomies ?? [] ).filter(
@@ -32,10 +36,17 @@ export function PostTaxonomies( { taxonomyWrapper = identity } ) {
 		const TaxonomyComponent = taxonomy.hierarchical
 			? HierarchicalTermSelector
 			: FlatTermSelector;
+		const taxonomyComponentProps = {
+			slug: taxonomy.slug,
+			...( taxonomy.hierarchical
+				? {}
+				: { __nextHasNoMarginBottom: true } ),
+		};
+
 		return (
 			<Fragment key={ `taxonomy-${ taxonomy.slug }` }>
 				{ taxonomyWrapper(
-					<TaxonomyComponent slug={ taxonomy.slug } />,
+					<TaxonomyComponent { ...taxonomyComponentProps } />,
 					taxonomy
 				) }
 			</Fragment>

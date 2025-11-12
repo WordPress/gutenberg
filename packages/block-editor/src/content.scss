@@ -1,18 +1,19 @@
-@import "./components/block-icon/content.scss";
-@import "./components/block-list/content.scss";
-@import "./components/block-list-appender/content.scss";
-@import "./components/block-content-overlay/content.scss";
-@import "./components/block-draggable/content.scss";
-@import "./components/block-preview/content.scss";
-@import "./components/block-variation-picker/content.scss";
-@import "./components/button-block-appender/content.scss";
-@import "./components/default-block-appender/content.scss";
-@import "./components/iframe/content.scss";
-@import "./components/inner-blocks/content.scss";
-@import "./components/media-placeholder/content.scss";
-@import "./components/plain-text/content.scss";
-@import "./components/rich-text/content.scss";
-@import "./components/warning/content.scss";
+@use "@wordpress/base-styles/default-custom-properties";
+@use "@wordpress/base-styles/mixins" as *;
+@use "./components/block-icon/content.scss" as *;
+@use "./components/block-list/content.scss" as *;
+@use "./components/block-list-appender/content.scss" as *;
+@use "./components/block-content-overlay/content.scss" as *;
+@use "./components/block-draggable/content.scss" as *;
+@use "./components/block-preview/content.scss" as *;
+@use "./components/block-variation-picker/content.scss" as *;
+@use "./components/button-block-appender/content.scss" as *;
+@use "./components/default-block-appender/content.scss" as *;
+@use "./components/iframe/content.scss" as *;
+@use "./components/media-placeholder/content.scss" as *;
+@use "./components/plain-text/content.scss" as *;
+@use "./components/rich-text/content.scss" as *;
+@use "./components/warning/content.scss" as *;
 
 // To do: ideally the iframe does not contain UI, but there's still the block
 // placeholders that will be moved to shadow DOM in the future.

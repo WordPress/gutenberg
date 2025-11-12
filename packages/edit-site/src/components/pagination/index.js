@@ -11,7 +11,7 @@ import {
 	__experimentalText as Text,
 	Button,
 } from '@wordpress/components';
-import { __, _x, _n, sprintf } from '@wordpress/i18n';
+import { __, _x, _n, sprintf, isRTL } from '@wordpress/i18n';
 import { previous, chevronLeft, chevronRight, next } from '@wordpress/icons';
 
 export default function Pagination( {
@@ -22,7 +22,7 @@ export default function Pagination( {
 	className,
 	disabled = false,
 	buttonVariant = 'tertiary',
-	label = __( 'Pagination Navigation' ),
+	label = __( 'Pagination' ),
 } ) {
 	return (
 		<HStack
@@ -47,25 +47,25 @@ export default function Pagination( {
 				<Button
 					variant={ buttonVariant }
 					onClick={ () => changePage( 1 ) }
-					__experimentalIsFocusable
+					accessibleWhenDisabled
 					disabled={ disabled || currentPage === 1 }
 					label={ __( 'First page' ) }
-					icon={ previous }
+					icon={ isRTL() ? next : previous }
 					size="compact"
 				/>
 				<Button
 					variant={ buttonVariant }
 					onClick={ () => changePage( currentPage - 1 ) }
-					__experimentalIsFocusable
+					accessibleWhenDisabled
 					disabled={ disabled || currentPage === 1 }
 					label={ __( 'Previous page' ) }
-					icon={ chevronLeft }
+					icon={ isRTL() ? chevronRight : chevronLeft }
 					size="compact"
 				/>
 			</HStack>
 			<Text variant="muted">
 				{ sprintf(
-					// translators: %1$s: Current page number, %2$s: Total number of pages.
+					// translators: 1: Current page number. 2: Total number of pages.
 					_x( '%1$s of %2$s', 'paging' ),
 					currentPage,
 					numPages
@@ -75,19 +75,19 @@ export default function Pagination( {
 				<Button
 					variant={ buttonVariant }
 					onClick={ () => changePage( currentPage + 1 ) }
-					__experimentalIsFocusable
+					accessibleWhenDisabled
 					disabled={ disabled || currentPage === numPages }
 					label={ __( 'Next page' ) }
-					icon={ chevronRight }
+					icon={ isRTL() ? chevronLeft : chevronRight }
 					size="compact"
 				/>
 				<Button
 					variant={ buttonVariant }
 					onClick={ () => changePage( numPages ) }
-					__experimentalIsFocusable
+					accessibleWhenDisabled
 					disabled={ disabled || currentPage === numPages }
 					label={ __( 'Last page' ) }
-					icon={ next }
+					icon={ isRTL() ? previous : next }
 					size="compact"
 				/>
 			</HStack>

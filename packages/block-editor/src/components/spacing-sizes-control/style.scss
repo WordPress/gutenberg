@@ -1,4 +1,11 @@
+@use "@wordpress/base-styles/variables" as *;
+
 .spacing-sizes-control {
+	// Reset `fieldset` browser defaults.
+	border: 0;
+	padding: 0;
+	margin: 0;
+
 	.spacing-sizes-control__custom-value-input,
 	.spacing-sizes-control__label {
 		margin-bottom: 0;
@@ -6,36 +13,8 @@
 
 	.spacing-sizes-control__range-control,
 	.spacing-sizes-control__custom-value-range {
-		height: 40px;
-		/* Vertically center the RangeControl until it has true 40px height. */
-		display: flex;
-		align-items: center;
-		margin-bottom: 0;
 		flex: 1;
-
-		> .components-base-control__field {
-			/* Fixes RangeControl contents when the outer wrapper is flex */
-			flex: 1;
-		}
-	}
-
-	.components-range-control__mark {
-		height: $grid-unit-05;
-		width: 3px;
-		background-color: #fff;
-		z-index: 1;
-	}
-
-	.components-range-control__marks {
-		margin-top: 17px;
-
-		:first-child {
-			display: none;
-		}
-	}
-
-	.components-range-control__thumb-wrapper {
-		z-index: 3;
+		margin-bottom: 0; // Needed for some instances of the range control, such as the Spacer block.
 	}
 }
 

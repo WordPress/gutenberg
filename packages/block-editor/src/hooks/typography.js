@@ -18,6 +18,7 @@ import { LINE_HEIGHT_SUPPORT_KEY } from './line-height';
 import { FONT_FAMILY_SUPPORT_KEY } from './font-family';
 import { FONT_SIZE_SUPPORT_KEY } from './font-size';
 import { TEXT_ALIGN_SUPPORT_KEY } from './text-align';
+import { FIT_TEXT_SUPPORT_KEY } from './fit-text';
 import { cleanEmptyObject } from './utils';
 import { store as blockEditorStore } from '../store';
 
@@ -47,15 +48,18 @@ export const TYPOGRAPHY_SUPPORT_KEYS = [
 	WRITING_MODE_SUPPORT_KEY,
 	TEXT_TRANSFORM_SUPPORT_KEY,
 	LETTER_SPACING_SUPPORT_KEY,
+	FIT_TEXT_SUPPORT_KEY,
 ];
 
 function styleToAttributes( style ) {
 	const updatedStyle = { ...omit( style, [ 'fontFamily' ] ) };
 	const fontSizeValue = style?.typography?.fontSize;
 	const fontFamilyValue = style?.typography?.fontFamily;
-	const fontSizeSlug = fontSizeValue?.startsWith( 'var:preset|font-size|' )
-		? fontSizeValue.substring( 'var:preset|font-size|'.length )
-		: undefined;
+	const fontSizeSlug =
+		typeof fontSizeValue === 'string' &&
+		fontSizeValue?.startsWith( 'var:preset|font-size|' )
+			? fontSizeValue.substring( 'var:preset|font-size|'.length )
+			: undefined;
 	const fontFamilySlug = fontFamilyValue?.startsWith(
 		'var:preset|font-family|'
 	)
@@ -111,13 +115,29 @@ function TypographyInspectorControl( { children, resetAllFilter } ) {
 }
 
 export function TypographyPanel( { clientId, name, setAttributes, settings } ) {
-	function selector( select ) {
-		const { style, fontFamily, fontSize } =
-			select( blockEditorStore ).getBlockAttributes( clientId ) || {};
-		return { style, fontFamily, fontSize };
-	}
-	const { style, fontFamily, fontSize } = useSelect( selector, [ clientId ] );
 	const isEnabled = useHasTypographyPanel( settings );
+
+	const { style, fontFamily, fontSize, fitText } = useSelect(
+		( select ) => {
+			// Early return to avoid subscription when disabled.
+			if ( ! isEnabled ) {
+				return {};
+			}
+			const {
+				style: _style,
+				fontFamily: _fontFamily,
+				fontSize: _fontSize,
+				fitText: _fitText,
+			} = select( blockEditorStore ).getBlockAttributes( clientId ) || {};
+			return {
+				style: _style,
+				fontFamily: _fontFamily,
+				fontSize: _fontSize,
+				fitText: _fitText,
+			};
+		},
+		[ clientId, isEnabled ]
+	);
 	const value = useMemo(
 		() => attributesToStyle( { style, fontFamily, fontSize } ),
 		[ style, fontSize, fontFamily ]
@@ -144,6 +164,7 @@ export function TypographyPanel( { clientId, name, setAttributes, settings } ) {
 			value={ value }
 			onChange={ onChange }
 			defaultControls={ defaultControls }
+			fitText={ fitText }
 		/>
 	);
 }

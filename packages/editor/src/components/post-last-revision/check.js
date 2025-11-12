@@ -12,10 +12,10 @@ import { store as editorStore } from '../../store';
 /**
  * Wrapper component that renders its children if the post has more than one revision.
  *
- * @param {Object}  props          Props.
- * @param {Element} props.children Children to be rendered.
+ * @param {Object}          props          Props.
+ * @param {React.ReactNode} props.children Children to be rendered.
  *
- * @return {Component|null} Rendered child components if post has more than one revision, otherwise null.
+ * @return {React.ReactNode} Rendered child components if post has more than one revision, otherwise null.
  */
 function PostLastRevisionCheck( { children } ) {
 	const { lastRevisionId, revisionsCount } = useSelect( ( select ) => {

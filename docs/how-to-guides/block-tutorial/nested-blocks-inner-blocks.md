@@ -70,7 +70,7 @@ By default this behavior is disabled until the `directInsert` prop is set to `tr
 
 ## Template
 
-Use the template property to define a set of blocks that prefill the InnerBlocks component when inserted. You can set attributes on the blocks to define their use. The example below shows a book review template using InnerBlocks component and setting placeholders values to show the block usage.
+Use the template property to define a set of blocks that prefill the InnerBlocks component when it has no existing content.. You can set attributes on the blocks to define their use. The example below shows a book review template using InnerBlocks component and setting placeholders values to show the block usage.
 
 
 ```js
@@ -175,6 +175,8 @@ When defining a set of possible descendant blocks, use the `allowedBlocks` block
 You can use a react hook called `useInnerBlocksProps` instead of the `InnerBlocks` component. This hook allows you to take more control over the markup of inner blocks areas.
 
 The `useInnerBlocksProps` is exported from the `@wordpress/block-editor` package same as the `InnerBlocks` component itself and supports everything the component does. It also works like the `useBlockProps` hook.
+
+It is important to note that `useBlockProps` hook must be called *before* `useInnerBlocksProps`, otherwise `useBlockProps` will return empty object. 
 
 Here is the basic `useInnerBlocksProps` hook usage.
 

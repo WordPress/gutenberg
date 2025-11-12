@@ -22,7 +22,7 @@ test.describe( 'Post title', () => {
 				editor.canvas.getByRole( 'document', {
 					name: 'Empty block',
 				} ),
-				'sould move focus to an empty paragraph block when the Enter key is pressed'
+				'should move focus to an empty paragraph block when the Enter key is pressed'
 			).toBeFocused();
 		} );
 

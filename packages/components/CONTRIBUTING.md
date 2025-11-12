@@ -2,24 +2,24 @@
 
 Thank you for taking the time to contribute.
 
-The following is a set of guidelines for contributing to the `@wordpress/components` package to be considered in addition to the general ones described in our [Contributing Policy](/CONTRIBUTING.md).
+The following is a set of guidelines for contributing to the `@wordpress/components` package to be considered in addition to the general ones described in our [Contributing Policy](https://github.com/WordPress/gutenberg/blob/HEAD/CONTRIBUTING.md).
 
 This set of guidelines should apply especially to newly introduced components. In fact, while these guidelines should also be retroactively applied to existing components, it is sometimes impossible to do so for legacy/compatibility reasons.
 
-For an example of a component that follows these requirements, take a look at [`ItemGroup`](/packages/components/src/item-group).
-- [Introducing new components](#introducing-new-components)
-- [Compatibility](#compatibility)
-- [Compound components](#compound-components)
-- [Components & Hooks](#components--hooks)
-- [TypeScript](#typescript)
-- [Styling](#styling)
-- [Context system](#context-system)
-- [Unit tests](#unit-tests)
-- [Storybook](#storybook)
-- [Documentation](#documentation)
-- [README example](#README-example)
-- [Folder structure](#folder-structure)
-- [Component versioning](#component-versioning)
+-   [Introducing new components](#introducing-new-components)
+-   [Compatibility](#compatibility)
+-   [Compound components](#compound-components)
+-   [Components & Hooks](#components--hooks)
+-   [Naming Conventions](#naming-conventions)
+-   [TypeScript](#typescript)
+-   [Styling](#styling)
+-   [Context system](#context-system)
+-   [Unit tests](#unit-tests)
+-   [Storybook](#storybook)
+-   [Documentation](#documentation)
+-   [README example](#README-example)
+-   [Folder structure](#folder-structure)
+-   [Component versioning](#component-versioning)
 
 ## Introducing new components
 
@@ -36,7 +36,7 @@ To determine if a component should be added, ask yourself:
 
 Here’s a flowchart that can help determine if a new component is necessary:
 
-[![New component flowchart](https://wordpress.org/gutenberg/files/2019/07/New_component_flowchart.png)](https://coggle.it/diagram/WtUSrld3uAYZHsn-/t/new-ui-component/992b38cbe685d897b4aec6d0dd93cc4b47c06e0d4484eeb0d7d9a47fb2c48d94)
+![New component flowchart](https://wordpress.org/gutenberg/files/2019/07/New_component_flowchart.png)
 
 ### First steps
 
@@ -95,13 +95,13 @@ In these situations, one possible approach is to "soft-deprecate" a given legacy
 2. Updating all places in Gutenberg that use that API.
 3. Adding deprecation warnings (only after the previous point is completed, otherwise the Browser Console will be polluted by all those warnings and some e2e tests may fail).
 
-When adding new components or new props to existing components, it's recommended to prefix them with `__unstable` or `__experimental` until they're stable enough to be exposed as part of the public API.
+When adding new components or new props to existing components, it's recommended to create a [private version](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-private-apis/) of the component until the changes are stable enough to be exposed as part of the public API.
 
 ### Learn more
 
-- [How to preserve backward compatibility for a React Component](/docs/contributors/code/backward-compatibility.md#how-to-preserve-backward-compatibility-for-a-react-component)
-- [Experimental and Unstable APIs](/docs/contributors/code/coding-guidelines.md#experimental-and-unstable-apis)
-- [Deprecating styles](#deprecating-styles)
+-   [How to preserve backward compatibility for a React Component](https://developer.wordpress.org/block-editor/contributors/code/backward-compatibility/#how-to-preserve-backward-compatibility-for-a-react-component)
+-   [Experimental and Unstable APIs](https://developer.wordpress.org/block-editor/contributors/code/coding-guidelines/#legacy-experimental-apis-plugin-only-apis-and-private-apis)
+-   [Deprecating styles](#deprecating-styles)
 
 <!-- ## Polymorphic Components (i.e. the `as` prop)
 
@@ -121,20 +121,16 @@ When creating components that render a list of subcomponents, prefer to expose t
 ```jsx
 // ❌ Don't:
 <List
-	items={ [
-		{ value: 'Item 1' },
-		{ value: 'Item 2' },
-		{ value: 'Item 3' },
-	] }
+	items={ [ { value: 'Item 1' }, { value: 'Item 2' }, { value: 'Item 3' } ] }
 />
 ```
 
 ```jsx
 // ✅ Do:
 <List>
-	<ListItem value="Item 1" />
-	<ListItem value="Item 2" />
-	<ListItem value="Item 3" />
+	<List.Item value="Item 1" />
+	<List.Item value="Item 2" />
+	<List.Item value="Item 3" />
 </List>
 ```
 
@@ -185,25 +181,25 @@ One way to enable reusability and composition is to extract a component's underl
 
 ```tsx
 // in `hook.ts`
-function useExampleComponent( props: PolymorphicComponentProps< ExampleProps, 'div' > ) {
+function useExampleComponent(
+	props: PolymorphicComponentProps< ExampleProps, 'div' >
+) {
 	// Merge received props with the context system.
-	const { isVisible, className, ...otherProps } = useContextSystem( props, 'Example' );
+	const { isVisible, className, ...otherProps } = useContextSystem(
+		props,
+		'Example'
+	);
 
 	// Any other reusable rendering logic (e.g. computing className, state, event listeners...)
 	const cx = useCx();
 	const classes = useMemo(
-		() =>
-			cx(
-				styles.example,
-				isVisible && styles.visible,
-				className
-			),
+		() => cx( styles.example, isVisible && styles.visible, className ),
 		[ className, isVisible ]
 	);
 
 	return {
 		...otherProps,
-		className: classes
+		className: classes,
 	};
 }
 
@@ -220,8 +216,8 @@ function Example(
 
 A couple of good examples of how hooks are used for composition are:
 
-- the `Card` component, which builds on top of the `Surface` component by [calling the `useSurface` hook inside its own hook](/packages/components/src/card/card/hook.ts);
-- the `HStack` component, which builds on top of the `Flex` component and [calls the `useFlex` hook inside its own hook](/packages/components/src/h-stack/hook.tsx).
+-   the `Card` component, which builds on top of the `Surface` component by [calling the `useSurface` hook inside its own hook](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/src/card/card/hook.ts);
+-   the `HStack` component, which builds on top of the `Flex` component and [calls the `useFlex` hook inside its own hook](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/src/h-stack/hook.tsx).
 
 <!-- ## API Consinstency
 
@@ -235,6 +231,118 @@ A couple of good examples of how hooks are used for composition are:
 ## Performance
 
 TDB -->
+
+## Naming Conventions
+
+It is recommended that compound components use dot notation to separate the namespace from the individual component names. The top-level compound component should be called the namespace (no dot notation).
+
+Dedicated React context should also use dot notation, while hooks should not.
+
+When exporting compound components and preparing them to be consumed, it is important that:
+
+-   the JSDocs appear correctly in IntelliSense;
+-   the top-level component's JSDoc appears in the Storybook docs page;
+-   the top-level and subcomponent's prop types appear correctly in the Storybook props table.
+
+To meet the above requirements, we recommend:
+
+-   using `Object.assign()` to add subcomponents as properties of the top-level component;
+-   using named functions for all components;
+-   using a separate file for each component, context and hook;
+-   setting explicitly the `displayName` on all subcomponents;
+-   adding the top-level JSDoc to the result of the `Object.assign` call;
+-   adding inline subcomponent JSDocs inside the `Object.assign` call.
+
+The following example implements all of the above recommendations.
+
+```tsx
+//=======================
+// subcomponent.tsx
+//=======================
+import { forwardRef } from '@wordpress/element';
+
+export const ComponentSubcomponent = forwardRef(
+	function UnforwardedComponentSubcomponent( props, ref ) {
+		/* ... */
+	}
+);
+
+//=======================
+// context.ts
+//=======================
+import { createContext } from '@wordpress/element';
+
+export const ComponentContext = createContext();
+
+//=======================
+// hook.ts
+//=======================
+
+/** The hook's JSDoc. */
+export function useComponent() {
+	/* ... */
+}
+
+//=======================
+// component.tsx
+//=======================
+import { forwardRef } from '@wordpress/element';
+import { ComponentSubcomponent } from './subcomponent';
+import { ComponentContext } from './context';
+
+/** The top-level component's JSDoc. */
+export const Component = Object.assign(
+	forwardRef( function UnforwardedTopLevelComponent( props, ref ) {
+		/* ... */
+	} ),
+	{
+		/** The subcomponent's JSDoc. */
+		Subcomponent: Object.assign(ComponentSubcomponent, {
+			displayName: 'Component.SubComponent';,
+		}),
+		/** The context's JSDoc. */
+		Context: Object.assign(ComponentContext, {
+			displayName: 'Component.Context'
+		}),
+	}
+);
+
+export default Component;
+
+//=======================
+// App.tsx
+//=======================
+import { Component, useComponent } from '@wordpress/components';
+import { useContext } from '@wordpress/element';
+
+function CompoundComponentExample() {
+	return (
+		<Component>
+			<Component.SubComponent />
+		</Component>
+	);
+}
+
+function ContextProviderExample() {
+	return (
+		<Component.Context.Provider value={ /* ... */ }>
+			{ /* React tree */ }
+		</Component.Context.Provider>
+	);
+}
+
+function ContextConsumerExample() {
+	const componentContext = useContext( Component.Context );
+
+	// etc
+}
+
+function HookExample() {
+	const hookReturnValue = useComponent();
+
+	// etc.
+}
+```
 
 ## TypeScript
 
@@ -278,8 +386,10 @@ function UnconnectedMyComponent(
 	//   parameter (`div` in this example)
 	// - the special `as` prop (which marks the component as polymorphic),
 	//   unless the third parameter is `false`
-	props:  WordPressComponentProps< ComponentOwnProps, 'div', true >
-) { /* ... */ }
+	props: WordPressComponentProps< ComponentOwnProps, 'div', true >
+) {
+	/* ... */
+}
 ```
 
 ### Considerations for the docgen
@@ -287,23 +397,28 @@ function UnconnectedMyComponent(
 Make sure you have a **named** export for the component, not just the default export ([example](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/src/divider/component.tsx)). This ensures that the docgen can properly extract the types data. The naming should be so that the connected/forwarded component has the plain component name (`MyComponent`), and the raw component is prefixed (`UnconnectedMyComponent` or `UnforwardedMyComponent`). This makes the component's `displayName` look nicer in React devtools and in the autogenerated Storybook code snippets.
 
 ```js
-function UnconnectedMyComponent() { /* ... */ }
+function UnconnectedMyComponent() {
+	/* ... */
+}
 
 // 👇 Without this named export, the docgen will not work!
-export const MyComponent = contextConnect( UnconnectedMyComponent, 'MyComponent' );
+export const MyComponent = contextConnect(
+	UnconnectedMyComponent,
+	'MyComponent'
+);
 export default MyComponent;
 ```
 
 On the component's main named export, add a JSDoc comment that includes the main description and the example code snippet from the README ([example](https://github.com/WordPress/gutenberg/blob/43d9c82922619c1d1ff6b454f86f75c3157d3de6/packages/components/src/date-time/date-time/index.tsx#L193-L217)). _At the time of writing, the `@example` JSDoc keyword is not recognized by StoryBook's docgen, so please avoid using it_.
 
-<!-- TODO: add to the previous paragraph once the composision section gets added to this document.
+<!-- TODO: add to the previous paragraph once the compositions section gets added to this document.
 (more details about polymorphism can be found above in the "Components composition" section). -->
 
 ## Styling
 
 All new component should be styled using [Emotion](https://emotion.sh/docs/introduction).
 
-Note: Instead of using Emotion's standard `cx` function, the custom [`useCx` hook](/packages/components/src/utils/hooks/use-cx.ts) should be used instead.
+Note: Instead of using Emotion's standard `cx` function, the custom [`useCx` hook](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/src/utils/hooks/use-cx.ts) should be used instead.
 
 ### Deprecating styles
 
@@ -314,16 +429,15 @@ Changing the styles of a non-experimental component must be done with care. To p
 import deprecated from '@wordpress/deprecated';
 import { Wrapper } from './styles.ts';
 
-function MyComponent({ __nextHasNoOuterMargins = false }) {
+function MyComponent( { __nextHasNoOuterMargins = false } ) {
 	if ( ! __nextHasNoOuterMargins ) {
 		deprecated( 'Outer margin styles for wp.components.MyComponent', {
 			since: '6.0',
 			version: '6.2', // Set a reasonable grace period depending on impact
-			hint:
-				'Set the `__nextHasNoOuterMargins` prop to true to start opting into the new styles, which will become the default in a future version.',
+			hint: 'Set the `__nextHasNoOuterMargins` prop to true to start opting into the new styles, which will become the default in a future version.',
 		} );
 	}
-	return <Wrapper __nextHasNoOuterMargins={__nextHasNoOuterMargins} />
+	return <Wrapper __nextHasNoOuterMargins={ __nextHasNoOuterMargins } />;
 }
 ```
 
@@ -331,7 +445,7 @@ Styles should be structured so the deprecated styles are cleanly encapsulated, a
 
 ```js
 // styles.ts
-const deprecatedMargins = ({ __nextHasNoOuterMargins }) => {
+const deprecatedMargins = ( { __nextHasNoOuterMargins } ) => {
 	if ( ! __nextHasNoOuterMargins ) {
 		return css`
 			margin: 8px;
@@ -342,13 +456,13 @@ const deprecatedMargins = ({ __nextHasNoOuterMargins }) => {
 export const Wrapper = styled.div`
 	margin: 0;
 
-	${deprecatedMargins}
+	${ deprecatedMargins }
 `;
 ```
 
 Once deprecated, code examples in docs/stories should include the opt-in prop set to `true` so that new consumers are encouraged to adopt it from the start.
 
-Remember to [add a **Needs Dev Note** label](/docs/contributors/code/backward-compatibility.md##dev-notes) to the pull request so third-party developers can be informed of the deprecation.
+Remember to [add a **Needs Dev Note** label](https://developer.wordpress.org/block-editor/contributors/code/backward-compatibility/#dev-notes) to the pull request so third-party developers can be informed of the deprecation.
 
 When the grace period is over and the deprecation version arrives, the `__next*` prop, deprecation notice, and deprecated styles should all be completely removed from the codebase.
 
@@ -358,26 +472,26 @@ Not all style changes justify a formal deprecation process. The main thing to lo
 
 ##### DOES need formal deprecation
 
-- Removing an outer margin.
-- Substantial changes to width/height, such as adding or removing a size restriction.
+-   Removing an outer margin.
+-   Substantial changes to width/height, such as adding or removing a size restriction.
 
 ##### DOES NOT need formal deprecation
 
-- Breakage only occurs in non-standard usage, such as when the consumer is overriding component internals.
-- Minor layout shifts of a few pixels.
-- Internal layout changes of a higher-level component.
+-   Breakage only occurs in non-standard usage, such as when the consumer is overriding component internals.
+-   Minor layout shifts of a few pixels.
+-   Internal layout changes of a higher-level component.
 
 ## Context system
 
-The `@wordpress/components` context system is based on [React's `Context` API](https://reactjs.org/docs/context.html), and is a way for components to adapt to the "context" they're being rendered in.
+The `@wordpress/components` context system is based on [React's `Context` API](https://react.dev/reference/react/createContext), and is a way for components to adapt to the "context" they're being rendered in.
 
 Components can use this system via a couple of functions:
 
-- they can provide values using a shared `ContextSystemProvider` component
-- they can connect to the Context via `contextConnect`
-- they can read the "computed" values from the context via `useContextSystem`
+-   they can provide values using a shared `ContextSystemProvider` component
+-   they can connect to the Context via `contextConnect`
+-   they can read the "computed" values from the context via `useContextSystem`
 
-An example of how this is used can be found in the [`Card` component family](/packages/components/src/card). For example, this is how the `Card` component injects the `size` and `isBorderless` props down to its `CardBody` subcomponent — which makes it use the correct spacing and border settings "auto-magically".
+An example of how this is used can be found in the [`Card` component family](https://github.com/WordPress/gutenberg/tree/trunk/packages/components/src/card). For example, this is how the `Card` component injects the `size` and `isBorderless` props down to its `CardBody` subcomponent — which makes it use the correct spacing and border settings "auto-magically".
 
 ```jsx
 //=========================================================================
@@ -400,11 +514,7 @@ export function useCard( props ) {
 import { contextConnect, ContextSystemProvider } from '../../context';
 
 function Card( props, forwardedRef ) {
-	const {
-		size,
-		isBorderless,
-		...otherComputedHookProps
-	} = useCard( props );
+	const { size, isBorderless, ...otherComputedHookProps } = useCard( props );
 
 	// [...]
 
@@ -440,8 +550,11 @@ export function useCardBody( props ) {
 	// Read any derived registered prop from the Context System in the `CardBody` namespace.
 	// If a `CardBody` component is rendered as a child of a `Card` component, the value of
 	// the `size` prop will be the one set by the parent `Card` component via the Context
-	// System (unless the prop gets explicitely set on the `CardBody` component).
-	const { size = 'medium', ...otherDerivedProps } = useContextSystem( props, 'CardBody' );
+	// System (unless the prop gets explicitly set on the `CardBody` component).
+	const { size = 'medium', ...otherDerivedProps } = useContextSystem(
+		props,
+		'CardBody'
+	);
 
 	// [...]
 
@@ -451,13 +564,13 @@ export function useCardBody( props ) {
 
 ## Unit tests
 
-Please refer to the [JavaScript Testing Overview docs](/docs/contributors/code/testing-overview.md#snapshot-testing).
+Please refer to the [JavaScript Testing Overview docs](https://developer.wordpress.org/block-editor/contributors/code/testing-overview/#snapshot-testing).
 
 ## Storybook
 
 All new components should add stories to the project's [Storybook](https://storybook.js.org/). Each [story](https://storybook.js.org/docs/react/get-started/whats-a-story) captures the rendered state of a UI component in isolation. This greatly simplifies working on a given component, while also serving as an interactive form of documentation.
 
-A component's story should be showcasing its different states — for example, the different variants of a  `Button`:
+A component's story should be showcasing its different states — for example, the different variants of a `Button`:
 
 ```jsx
 import Button from '../';
@@ -483,13 +596,13 @@ Primary.args = {
 
 A great tool to use when writing stories is the [Storybook Controls addon](https://storybook.js.org/addons/@storybook/addon-controls). Ideally props should be exposed by using this addon, which provides a graphical UI to interact dynamically with the component without needing to write code. Historically, we used [Knobs](https://storybook.js.org/addons/@storybook/addon-knobs), but it was deprecated and later removed in [#47152](https://github.com/WordPress/gutenberg/pull/47152).
 
-The default value of each control should coincide with the default value of the props (i.e. it should be `undefined` if a prop is not required). A story should, therefore, also explicitly show how values from the Context System are applied to (sub)components. A good example of how this may look like is the [`Card` story](https://wordpress.github.io/gutenberg/?path=/story/components-card--default) (code [here](/packages/components/src/card/stories/index.tsx)).
+The default value of each control should coincide with the default value of the props (i.e. it should be `undefined` if a prop is not required). A story should, therefore, also explicitly show how values from the Context System are applied to (sub)components. A good example of how this may look like is the [`Card` story](https://wordpress.github.io/gutenberg/?path=/story/components-card--default) (code [here](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/src/card/stories/index.story.tsx)).
 
 Storybook can be started on a local machine by running `npm run storybook:dev`. Alternatively, the components' catalogue (up to date with the latest code on `trunk`) can be found at [wordpress.github.io/gutenberg/](https://wordpress.github.io/gutenberg/).
 
 ## Documentation
 
-All components, in addition to being typed, should be using JSDoc when necessary — as explained in the [Coding Guidelines](/docs/contributors/code/coding-guidelines.md#javascript-documentation-using-jsdoc).
+All components, in addition to being typed, should be using JSDoc when necessary — as explained in the [Coding Guidelines](https://developer.wordpress.org/block-editor/contributors/code/coding-guidelines/#javascript-documentation-using-jsdoc).
 
 Each component that is exported from the `@wordpress/components` package should include a `README.md` file, explaining how to use the component, showing examples, and documenting all the props.
 
@@ -512,7 +625,7 @@ Description of the component.
 
 ## Usage
 
-Code example using correct markdown syntax and formatted using project's formatting rules. See [ItemGroup](/packages/components/src/item-group/item-group/README.md#usage) for a real-world example.
+Code example using correct markdown syntax and formatted using project's formatting rules. See [ItemGroup](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/src/item-group/item-group/README.md) for a real-world example.
 
 ```jsx
 import { ExampleComponent } from '@wordpress/components';
@@ -540,12 +653,13 @@ Prop description. With a new line before and after the description and before an
 
 ### Inherited props
 
-Add this section when there are props that are drilled down into an internal component. See [ClipboardButton](/packages/components/src/clipboard-button/README.md) for an example.
+Add this section when there are props that are drilled down into an internal component. See [ClipboardButton](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/src/clipboard-button/README.md) for an example.
 
 <!-- Only add the next section if the component relies on the [Context System](#context-system) -->
+
 ## Context
 
-See examples for this section for the [ItemGroup](/packages/components/src/item-group/item-group/README.md#context) and [`Card`](/packages/components/src/card/card/README.md#context) components.
+See examples for this section for the [ItemGroup](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/src/item-group/item-group/README.md#context) and [`Card`](https://github.com/WordPress/gutenberg/tree/trunk/packages/components/src/card/card#context) components.
 ````
 
 ## Folder structure
@@ -601,8 +715,8 @@ As the needs of the package evolve with time, sometimes we may opt to fully rewr
 
 Here is some terminology that will be used in the upcoming sections:
 
-- "Legacy" component: the version(s) of the component that existsted on `trunk` before the rewrite;
-- API surface: the component's public APIs. It includes the list of components (and sub-components) exported from the package, their props, any associated React context. It does not include internal classnames and internal DOM structure of the components.
+-   "Legacy" component: the version(s) of the component that existsted on `trunk` before the rewrite;
+-   API surface: the component's public APIs. It includes the list of components (and subcomponents) exported from the package, their props, any associated React context. It does not include internal classnames and internal DOM structure of the components.
 
 ### Approaches
 
@@ -645,13 +759,13 @@ function NewComponentImplementation( props ) {
 
 In case that is not possible (eg. too difficult to reconciliate new and legacy implementations, or impossible to preserve backward compatibility), then the legacy implementation can stay as-is.
 
-In any case, extra attention should be payed to legacy component families made of two or more subcomponents. It is possible, in fact, that the a legacy subcomponent is used as a parent / child of a subcomponent from the new version (this can happen, for example, when Gutenberg allows third party developers to inject React components via Slot/Fill). To avoid incompatibility issues and unexpected behavior, there should be some code in the components warning when the above scenario happens — or even better, aliasing to the correct version of the component.
+In any case, extra attention should be paid to legacy component families made of two or more subcomponents. It is possible, in fact, that the a legacy subcomponent is used as a parent / child of a subcomponent from the new version (this can happen, for example, when Gutenberg allows third party developers to inject React components via Slot/Fill). To avoid incompatibility issues and unexpected behavior, there should be some code in the components warning when the above scenario happens — or even better, aliasing to the correct version of the component.
 
 ##### Naming
 
 When it comes to naming the newly added component, there are two options.
 
-If there is a good reason for it, pick a new name for the component. For example, some legacy components have names that don't correspond to the corrent name of UI widget that they implement (for example, `TabPanel` should be called `Tabs`, and `Modal` should be called `Dialog`).
+If there is a good reason for it, pick a new name for the component. For example, some legacy components have names that don't correspond to the current name of UI widget that they implement (for example, `TabPanel` should be called `Tabs`, and `Modal` should be called `Dialog`).
 
 Alternatively, version the component name. For example, the new version of `Component` could be called `ComponentV2`. This also applies for namespaced subcomponents (ie. `ComponentV2.SubComponent`).
 

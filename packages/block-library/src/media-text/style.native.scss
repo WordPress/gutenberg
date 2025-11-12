@@ -7,6 +7,7 @@ $media-to-text: 12px;
 }
 
 .has-media-on-the-right {
+	/* stylelint-disable-next-line declaration-property-value-allowed-list -- This should be refactored to not use the row-reverse value. */
 	flex-direction: row-reverse;
 }
 
@@ -14,6 +15,7 @@ $media-to-text: 12px;
 	flex-direction: column;
 
 	&.has-media-on-the-right {
+		/* stylelint-disable-next-line declaration-property-value-allowed-list -- This should be refactored to not use the column-reverse value. */
 		flex-direction: column-reverse;
 	}
 }

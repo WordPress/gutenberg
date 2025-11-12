@@ -306,14 +306,22 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			 * They're added separately because padding might only be set on one side.
 			 */
 			if ( isset( $block_spacing_values['declarations']['padding-right'] ) ) {
-				$padding_right   = $block_spacing_values['declarations']['padding-right'];
+				$padding_right = $block_spacing_values['declarations']['padding-right'];
+				// Add unit if 0.
+				if ( '0' === $padding_right ) {
+					$padding_right = '0px';
+				}
 				$layout_styles[] = array(
 					'selector'     => "$selector > .alignfull",
 					'declarations' => array( 'margin-right' => "calc($padding_right * -1)" ),
 				);
 			}
 			if ( isset( $block_spacing_values['declarations']['padding-left'] ) ) {
-				$padding_left    = $block_spacing_values['declarations']['padding-left'];
+				$padding_left = $block_spacing_values['declarations']['padding-left'];
+				// Add unit if 0.
+				if ( '0' === $padding_left ) {
+					$padding_left = '0px';
+				}
 				$layout_styles[] = array(
 					'selector'     => "$selector > .alignfull",
 					'declarations' => array( 'margin-left' => "calc($padding_left * -1)" ),
@@ -466,29 +474,8 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			}
 		}
 	} elseif ( 'grid' === $layout_type ) {
-		if ( ! empty( $layout['columnCount'] ) ) {
-			$layout_styles[] = array(
-				'selector'     => $selector,
-				'declarations' => array( 'grid-template-columns' => 'repeat(' . $layout['columnCount'] . ', minmax(0, 1fr))' ),
-			);
-			if ( ! empty( $layout['rowCount'] ) ) {
-				$layout_styles[] = array(
-					'selector'     => $selector,
-					'declarations' => array( 'grid-template-rows' => 'repeat(' . $layout['rowCount'] . ', minmax(0, 1fr))' ),
-				);
-			}
-		} else {
-			$minimum_column_width = ! empty( $layout['minimumColumnWidth'] ) ? $layout['minimumColumnWidth'] : '12rem';
-
-			$layout_styles[] = array(
-				'selector'     => $selector,
-				'declarations' => array(
-					'grid-template-columns' => 'repeat(auto-fill, minmax(min(' . $minimum_column_width . ', 100%), 1fr))',
-					'container-type'        => 'inline-size',
-				),
-			);
-		}
-
+		// Deal with block gap first so it can be used for responsive computation.
+		$responsive_gap_value = '1.2rem';
 		if ( $has_block_gap_support && isset( $gap_value ) ) {
 			$combined_gap_value = '';
 			$gap_sides          = is_array( $gap_value ) ? array( 'top', 'left' ) : array( 'top' );
@@ -506,14 +493,53 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 				}
 				$combined_gap_value .= "$process_value ";
 			}
-			$gap_value = trim( $combined_gap_value );
+			$gap_value            = trim( $combined_gap_value );
+			$responsive_gap_value = $gap_value;
+		}
 
-			if ( null !== $gap_value && ! $should_skip_gap_serialization ) {
+		if ( ! empty( $layout['columnCount'] ) && ! empty( $layout['minimumColumnWidth'] ) ) {
+			$max_value       = 'max(' . $layout['minimumColumnWidth'] . ', (100% - (' . $responsive_gap_value . ' * (' . $layout['columnCount'] . ' - 1))) /' . $layout['columnCount'] . ')';
+			$layout_styles[] = array(
+				'selector'     => $selector,
+				'declarations' => array(
+					'grid-template-columns' => 'repeat(auto-fill, minmax(' . $max_value . ', 1fr))',
+					'container-type'        => 'inline-size',
+				),
+			);
+			if ( ! empty( $layout['rowCount'] ) ) {
 				$layout_styles[] = array(
 					'selector'     => $selector,
-					'declarations' => array( 'gap' => $gap_value ),
+					'declarations' => array( 'grid-template-rows' => 'repeat(' . $layout['rowCount'] . ', minmax(1rem, auto))' ),
 				);
 			}
+		} elseif ( ! empty( $layout['columnCount'] ) ) {
+			$layout_styles[] = array(
+				'selector'     => $selector,
+				'declarations' => array( 'grid-template-columns' => 'repeat(' . $layout['columnCount'] . ', minmax(0, 1fr))' ),
+			);
+			if ( ! empty( $layout['rowCount'] ) ) {
+				$layout_styles[] = array(
+					'selector'     => $selector,
+					'declarations' => array( 'grid-template-rows' => 'repeat(' . $layout['rowCount'] . ', minmax(1rem, auto))' ),
+				);
+			}
+		} else {
+			$minimum_column_width = ! empty( $layout['minimumColumnWidth'] ) ? $layout['minimumColumnWidth'] : '12rem';
+
+			$layout_styles[] = array(
+				'selector'     => $selector,
+				'declarations' => array(
+					'grid-template-columns' => 'repeat(auto-fill, minmax(min(' . $minimum_column_width . ', 100%), 1fr))',
+					'container-type'        => 'inline-size',
+				),
+			);
+		}
+
+		if ( $has_block_gap_support && null !== $gap_value && ! $should_skip_gap_serialization ) {
+			$layout_styles[] = array(
+				'selector'     => $selector,
+				'declarations' => array( 'gap' => $gap_value ),
+			);
 		}
 	}
 
@@ -557,6 +583,24 @@ function gutenberg_incremental_id_per_prefix( $prefix = '' ) {
 }
 
 /**
+ * Generates a unique ID based on the structure and values of a given array.
+ *
+ * This function serializes the array into a JSON string and generates a hash
+ * that serves as a unique identifier. Optionally, a prefix can be added to
+ * the generated ID for context or categorization.
+ *
+ * @param array  $data   The input array to generate an ID from.
+ * @param string $prefix Optional. A prefix to prepend to the generated ID. Default ''.
+ *
+ * @return string The generated unique ID for the array.
+ */
+function gutenberg_unique_id_from_values( array $data, string $prefix = '' ): string {
+	$serialized = wp_json_encode( $data );
+	$hash       = substr( md5( $serialized ), 0, 8 );
+	return $prefix . $hash;
+}
+
+/**
  * Renders the layout config to the block wrapper.
  *
  * @param  string $block_content Rendered block content.
@@ -577,7 +621,33 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 	// Child layout specific logic.
 	if ( $child_layout ) {
-		$container_content_class   = wp_unique_prefixed_id( 'wp-container-content-' );
+		/*
+		 * Generates a unique class for child block layout styles.
+		 *
+		 * To ensure consistent class generation across different page renders,
+		 * only properties that affect layout styling are used. These properties
+		 * come from `$block['attrs']['style']['layout']` and `$block['parentLayout']`.
+		 *
+		 * As long as these properties coincide, the generated class will be the same.
+		 */
+		$container_content_class = gutenberg_unique_id_from_values(
+			array(
+				'layout'       => array_intersect_key(
+					$block['attrs']['style']['layout'] ?? array(),
+					array_flip(
+						array( 'selfStretch', 'flexSize', 'columnStart', 'columnSpan', 'rowStart', 'rowSpan' )
+					)
+				),
+				'parentLayout' => array_intersect_key(
+					$block['parentLayout'] ?? array(),
+					array_flip(
+						array( 'minimumColumnWidth', 'columnCount' )
+					)
+				),
+			),
+			'wp-container-content-'
+		);
+
 		$child_layout_declarations = array();
 		$child_layout_styles       = array();
 
@@ -628,10 +698,18 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		if ( ( $column_span || $column_start ) && ( $minimum_column_width || ! $column_count ) ) {
 			$column_span_number  = floatval( $column_span );
 			$column_start_number = floatval( $column_start );
-			$highest_number      = max( $column_span_number, $column_start_number );
 			$parent_column_width = $minimum_column_width ? $minimum_column_width : '12rem';
 			$parent_column_value = floatval( $parent_column_width );
 			$parent_column_unit  = explode( $parent_column_value, $parent_column_width );
+
+			$num_cols_to_break_at = 2;
+			if ( $column_span_number && $column_start_number ) {
+				$num_cols_to_break_at = $column_start_number + $column_span_number - 1;
+			} elseif ( $column_span_number ) {
+				$num_cols_to_break_at = $column_span_number;
+			} else {
+				$num_cols_to_break_at = $column_start_number;
+			}
 
 			/*
 			 * If there is no unit, the width has somehow been mangled so we reset both unit and value
@@ -653,17 +731,19 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			 * A default gap value is used for this computation because custom gap values may not be
 			 * viable to use in the computation of the container query value.
 			 */
-			$default_gap_value     = 'px' === $parent_column_unit ? 24 : 1.5;
-			$container_query_value = $highest_number * $parent_column_value + ( $highest_number - 1 ) * $default_gap_value;
-			$container_query_value = $container_query_value . $parent_column_unit;
+			$default_gap_value             = 'px' === $parent_column_unit ? 24 : 1.5;
+			$container_query_value         = $num_cols_to_break_at * $parent_column_value + ( $num_cols_to_break_at - 1 ) * $default_gap_value;
+			$minimum_container_query_value = $parent_column_value * 2 + $default_gap_value - 1;
+			$container_query_value         = max( $container_query_value, $minimum_container_query_value ) . $parent_column_unit;
 			// If a span is set we want to preserve it as long as possible, otherwise we just reset the value.
-			$grid_column_value = $column_span ? '1/-1' : 'auto';
+			$grid_column_value = $column_span && $column_span > 1 ? '1/-1' : 'auto';
 
 			$child_layout_styles[] = array(
 				'rules_group'  => "@container (max-width: $container_query_value )",
 				'selector'     => ".$container_content_class",
 				'declarations' => array(
 					'grid-column' => $grid_column_value,
+					'grid-row'    => 'auto',
 				),
 			);
 		}
@@ -718,16 +798,6 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 	$class_names        = array();
 	$layout_definitions = gutenberg_get_layout_definitions();
-
-	/*
-	* We use an incremental ID that is independent per prefix to make sure that
-	* rendering different numbers of blocks doesn't affect the IDs of other
-	* blocks. We need this to make the CSS class names stable across paginations
-	* for features like the enhanced pagination of the Query block.
-	*/
-	$container_class = gutenberg_incremental_id_per_prefix(
-		'wp-container-' . sanitize_title( $block['blockName'] ) . '-is-layout-'
-	);
 
 	// Set the correct layout type for blocks using legacy content width.
 	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] || isset( $used_layout['contentSize'] ) && $used_layout['contentSize'] ) {
@@ -801,6 +871,25 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 		$block_gap             = $global_settings['spacing']['blockGap'] ?? null;
 		$has_block_gap_support = isset( $block_gap );
+
+		/*
+		 * We generate a unique ID based on all the data required to obtain the
+		 * corresponding layout style. This way, the CSS class names keep the same
+		 * even for different blocks with the same layout definition. We need this to
+		 * make the CSS class names stable across paginations for features like the
+		 * enhanced pagination of the Query block.
+		 */
+		$container_class = gutenberg_unique_id_from_values(
+			array(
+				$used_layout,
+				$has_block_gap_support,
+				$gap_value,
+				$should_skip_gap_serialization,
+				$fallback_gap_value,
+				$block_spacing,
+			),
+			'wp-container-' . sanitize_title( $block['blockName'] ) . '-is-layout-'
+		);
 
 		$style = gutenberg_get_layout_style(
 			".$container_class",
@@ -983,27 +1072,10 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 	$processor      = new WP_HTML_Tag_Processor( $block_content );
 
 	if ( $processor->next_tag( array( 'class_name' => 'wp-block-group' ) ) ) {
-		if ( method_exists( $processor, 'class_list' ) ) {
-			foreach ( $processor->class_list() as $class_name ) {
-				if ( str_contains( $class_name, 'layout' ) ) {
-					array_push( $layout_classes, $class_name );
-					$processor->remove_class( $class_name );
-				}
-			}
-		} else {
-			/*
-			* The class_list method was only added in 6.4 so this needs a temporary fallback.
-			* This fallback should be removed when the minimum supported version is 6.4.
-			*/
-			$classes = $processor->get_attribute( 'class' );
-			if ( $classes ) {
-				$classes = explode( ' ', $classes );
-				foreach ( $classes as $class_name ) {
-					if ( str_contains( $class_name, 'is-layout-' ) ) {
-						array_push( $layout_classes, $class_name );
-						$processor->remove_class( $class_name );
-					}
-				}
+		foreach ( $processor->class_list() as $class_name ) {
+			if ( str_contains( $class_name, 'layout' ) ) {
+				array_push( $layout_classes, $class_name );
+				$processor->remove_class( $class_name );
 			}
 		}
 	}
@@ -1036,11 +1108,10 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 }
 
 if ( function_exists( 'wp_restore_group_inner_container' ) ) {
-	remove_filter( 'render_block', 'wp_restore_group_inner_container', 10, 2 );
-	remove_filter( 'render_block_core/group', 'wp_restore_group_inner_container', 10, 2 );
+	remove_filter( 'render_block', 'wp_restore_group_inner_container', 10 );
+	remove_filter( 'render_block_core/group', 'wp_restore_group_inner_container', 10 );
 }
 add_filter( 'render_block_core/group', 'gutenberg_restore_group_inner_container', 10, 2 );
-
 
 /**
  * For themes without theme.json file, make sure
@@ -1052,53 +1123,56 @@ add_filter( 'render_block_core/group', 'gutenberg_restore_group_inner_container'
  * @return string Filtered block content.
  */
 function gutenberg_restore_image_outer_container( $block_content, $block ) {
-	$image_with_align = "
-/# 1) everything up to the class attribute contents
-(
-	^\s*
-	<figure\b
-	[^>]*
-	\bclass=
-	[\"']
-)
-# 2) the class attribute contents
-(
-	[^\"']*
-	\bwp-block-image\b
-	[^\"']*
-	\b(?:alignleft|alignright|aligncenter)\b
-	[^\"']*
-)
-# 3) everything after the class attribute contents
-(
-	[\"']
-	[^>]*
-	>
-	.*
-	<\/figure>
-)/iUx";
+	if ( wp_theme_has_theme_json() ) {
+		return $block_content;
+	}
 
+	$figure_processor = new WP_HTML_Tag_Processor( $block_content );
 	if (
-		wp_theme_has_theme_json() ||
-		0 === preg_match( $image_with_align, $block_content, $matches )
+		! $figure_processor->next_tag( 'FIGURE' ) ||
+		! $figure_processor->has_class( 'wp-block-image' ) ||
+		! (
+			$figure_processor->has_class( 'alignleft' ) ||
+			$figure_processor->has_class( 'aligncenter' ) ||
+			$figure_processor->has_class( 'alignright' )
+		)
 	) {
 		return $block_content;
 	}
 
-	$wrapper_classnames = array( 'wp-block-image' );
+	/*
+	 * The next section of code wraps the existing figure in a new DIV element.
+	 * While doing it, it needs to transfer the layout and the additional CSS
+	 * class names from the original figure upward to the wrapper.
+	 *
+	 * Example:
+	 *
+	 *     // From this…
+	 *     <!-- wp:image {"className":"hires"} -->
+	 *     <figure class="wp-block-image wide hires">…
+	 *
+	 *     // To this…
+	 *     <div class="wp-block-image hires"><figure class="wide">…
+	 */
+	$wrapper_processor = new WP_HTML_Tag_Processor( '<div>' );
+	$wrapper_processor->next_token();
+	$wrapper_processor->set_attribute(
+		'class',
+		is_string( $block['attrs']['className'] ?? null )
+			? "wp-block-image {$block['attrs']['className']}"
+			: 'wp-block-image'
+	);
 
-	// If the block has a classNames attribute these classnames need to be removed from the content and added back
-	// to the new wrapper div also.
-	if ( ! empty( $block['attrs']['className'] ) ) {
-		$wrapper_classnames = array_merge( $wrapper_classnames, explode( ' ', $block['attrs']['className'] ) );
+	// And remove them from the existing content; it has been transferred upward.
+	$figure_processor->remove_class( 'wp-block-image' );
+	foreach ( $wrapper_processor->class_list() as $class_name ) {
+		$figure_processor->remove_class( $class_name );
 	}
-	$content_classnames          = explode( ' ', $matches[2] );
-	$filtered_content_classnames = array_diff( $content_classnames, $wrapper_classnames );
 
-	return '<div class="' . implode( ' ', $wrapper_classnames ) . '">' . $matches[1] . implode( ' ', $filtered_content_classnames ) . $matches[3] . '</div>';
+	return "{$wrapper_processor->get_updated_html()}{$figure_processor->get_updated_html()}</div>";
 }
 
 if ( function_exists( 'wp_restore_image_outer_container' ) ) {
-	remove_filter( 'render_block_core/image', 'wp_restore_image_outer_container', 10, 2 );
+	remove_filter( 'render_block_core/image', 'wp_restore_image_outer_container', 10 );
 }
 add_filter( 'render_block_core/image', 'gutenberg_restore_image_outer_container', 10, 2 );

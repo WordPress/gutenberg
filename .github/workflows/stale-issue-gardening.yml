@@ -4,10 +4,17 @@ on:
     schedule:
         - cron: '0 0 * * *'
 
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
 jobs:
     issue-gardening:
         name: ${{ matrix.name }}
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            issues: write
+            pull-requests: write
         if: ${{ github.repository == 'WordPress/gutenberg' }}
         strategy:
             matrix:
@@ -36,7 +43,7 @@ jobs:
 
         steps:
             - name: Update issues
-              uses: actions/stale@28ca1036281a5e5922ead5184a1bbf96e5fc984e # v9.0.0
+              uses: actions/stale@5f858e3efba33a5ca4407a664cc011ad407f2008 # v10.1.0
               with:
                   repo-token: ${{ secrets.GITHUB_TOKEN }}
                   stale-issue-message: ${{ matrix.message }}

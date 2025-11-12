@@ -21,6 +21,7 @@ function EditorHistoryUndo( props, ref ) {
 	const { undo } = useDispatch( editorStore );
 	return (
 		<Button
+			__next40pxDefaultSize
 			{ ...props }
 			ref={ ref }
 			icon={ ! isRTL() ? undoIcon : redoIcon }
@@ -45,6 +46,6 @@ function EditorHistoryUndo( props, ref ) {
  * @param {Object} props - Props.
  * @param {Ref}    ref   - Forwarded ref.
  *
- * @return {Component} The component to be rendered.
+ * @return {React.ReactNode} The rendered component.
  */
 export default forwardRef( EditorHistoryUndo );

@@ -3,9 +3,12 @@
  */
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Button } from '@wordpress/components';
+import {
+	Button,
+	__experimentalHStack as HStack,
+	__experimentalText as Text,
+} from '@wordpress/components';
 import { select } from '@wordpress/data';
-import { Warning } from '@wordpress/block-editor';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { doAction } from '@wordpress/hooks';
 
@@ -26,10 +29,10 @@ function getContent() {
 	} catch ( error ) {}
 }
 
-function CopyButton( { text, children } ) {
+function CopyButton( { text, children, variant = 'secondary' } ) {
 	const ref = useCopyToClipboard( text );
 	return (
-		<Button variant="secondary" ref={ ref }>
+		<Button __next40pxDefaultSize variant={ variant } ref={ ref }>
 			{ children }
 		</Button>
 	);
@@ -54,23 +57,34 @@ class ErrorBoundary extends Component {
 
 	render() {
 		const { error } = this.state;
+		const { canCopyContent = false } = this.props;
 		if ( ! error ) {
 			return this.props.children;
 		}
 
-		const actions = [
-			<CopyButton key="copy-post" text={ getContent }>
-				{ __( 'Copy Post Text' ) }
-			</CopyButton>,
-			<CopyButton key="copy-error" text={ error.stack }>
-				{ __( 'Copy Error' ) }
-			</CopyButton>,
-		];
-
 		return (
-			<Warning className="editor-error-boundary" actions={ actions }>
-				{ __( 'The editor has encountered an unexpected error.' ) }
-			</Warning>
+			<HStack
+				className="editor-error-boundary"
+				alignment="baseline"
+				spacing={ 4 }
+				justify="space-between"
+				expanded={ false }
+				wrap
+			>
+				<Text as="p">
+					{ __( 'The editor has encountered an unexpected error.' ) }
+				</Text>
+				<HStack expanded={ false }>
+					{ canCopyContent && (
+						<CopyButton text={ getContent }>
+							{ __( 'Copy contents' ) }
+						</CopyButton>
+					) }
+					<CopyButton variant="primary" text={ error?.stack }>
+						{ __( 'Copy error' ) }
+					</CopyButton>
+				</HStack>
+			</HStack>
 		);
 	}
 }

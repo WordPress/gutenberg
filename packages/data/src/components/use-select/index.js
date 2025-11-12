@@ -19,6 +19,25 @@ import useAsyncMode from '../async-mode-provider/use-async-mode';
 
 const renderQueue = createQueue();
 
+function warnOnUnstableReference( a, b ) {
+	if ( ! a || ! b ) {
+		return;
+	}
+
+	const keys =
+		typeof a === 'object' && typeof b === 'object'
+			? Object.keys( a ).filter( ( k ) => a[ k ] !== b[ k ] )
+			: [];
+
+	// eslint-disable-next-line no-console
+	console.warn(
+		'The `useSelect` hook returns different values when called with the same state and parameters.\n' +
+			'This can lead to unnecessary re-renders and performance issues if not fixed.\n\n' +
+			'Non-equal value keys: %s\n\n',
+		keys.join( ', ' )
+	);
+}
+
 /**
  * @typedef {import('../../types').StoreDescriptor<C>} StoreDescriptor
  * @template {import('../../types').AnyConfig} C
@@ -155,14 +174,11 @@ function Store( registry, suspense ) {
 				listeningStores
 			);
 
-			if ( process.env.NODE_ENV === 'development' ) {
+			if ( globalThis.SCRIPT_DEBUG ) {
 				if ( ! didWarnUnstableReference ) {
 					const secondMapResult = mapSelect( select, registry );
 					if ( ! isShallowEqual( mapResult, secondMapResult ) ) {
-						// eslint-disable-next-line no-console
-						console.warn(
-							`The 'useSelect' hook returns different values when called with the same state and parameters. This can lead to unnecessary rerenders.`
-						);
+						warnOnUnstableReference( mapResult, secondMapResult );
 						didWarnUnstableReference = true;
 					}
 				}
@@ -209,11 +225,11 @@ function Store( registry, suspense ) {
 	};
 }
 
-function useStaticSelect( storeName ) {
+function _useStaticSelect( storeName ) {
 	return useRegistry().select( storeName );
 }
 
-function useMappingSelect( suspense, mapSelect, deps ) {
+function _useMappingSelect( suspense, mapSelect, deps ) {
 	const registry = useRegistry();
 	const isAsync = useAsyncMode();
 	const store = useMemo(
@@ -223,7 +239,6 @@ function useMappingSelect( suspense, mapSelect, deps ) {
 
 	// These are "pass-through" dependencies from the parent hook,
 	// and the parent should catch any hook rule violations.
-	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const selector = useCallback( mapSelect, deps );
 	const { subscribe, getValue } = store( selector, isAsync );
 	const result = useSyncExternalStore( subscribe, getValue, getValue );
@@ -235,7 +250,7 @@ function useMappingSelect( suspense, mapSelect, deps ) {
  * Custom react hook for retrieving props from registered selectors.
  *
  * In general, this custom React hook follows the
- * [rules of hooks](https://reactjs.org/docs/hooks-rules.html).
+ * [rules of hooks](https://react.dev/reference/rules/rules-of-hooks).
  *
  * @template {MapSelect | StoreDescriptor<any>} T
  * @param {T}         mapSelect Function called on every state change. The returned value is
@@ -309,13 +324,11 @@ export default function useSelect( mapSelect, deps ) {
 		);
 	}
 
-	/* eslint-disable react-hooks/rules-of-hooks */
 	// `staticSelectMode` is not allowed to change during the hook instance's,
 	// lifetime, so the rules of hooks are not really violated.
 	return staticSelectMode
-		? useStaticSelect( mapSelect )
-		: useMappingSelect( false, mapSelect, deps );
-	/* eslint-enable react-hooks/rules-of-hooks */
+		? _useStaticSelect( mapSelect )
+		: _useMappingSelect( false, mapSelect, deps );
 }
 
 /**
@@ -338,5 +351,5 @@ export default function useSelect( mapSelect, deps ) {
  * @return {ReturnType<T>} Data object returned by the `mapSelect` function.
  */
 export function useSuspenseSelect( mapSelect, deps ) {
-	return useMappingSelect( true, mapSelect, deps );
+	return _useMappingSelect( true, mapSelect, deps );
 }

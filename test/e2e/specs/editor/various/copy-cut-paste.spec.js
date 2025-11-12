@@ -541,6 +541,75 @@ test.describe( 'Copy/cut/paste', () => {
 		] );
 	} );
 
+	test( 'should paste styles using keyboard shortcut', async ( {
+		pageUtils,
+		editor,
+		page,
+		context,
+	} ) => {
+		// Grant clipboard access for copying and pasting styles between blocks.
+		await context.grantPermissions( [
+			'clipboard-read',
+			'clipboard-write',
+		] );
+
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: 'First Block',
+				style: {
+					color: {
+						text: '#ff0000',
+						background: '#00ff00',
+					},
+				},
+			},
+		} );
+
+		await editor.clickBlockToolbarButton( 'Options' );
+		await page
+			.getByRole( 'menu', { name: 'Options' } )
+			.getByRole( 'menuitem', {
+				name: 'Copy Styles',
+			} )
+			.click();
+
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: 'Second Block',
+			},
+		} );
+
+		await pageUtils.pressKeys( 'primaryAlt+v' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'First Block',
+					style: {
+						color: {
+							text: '#ff0000',
+							background: '#00ff00',
+						},
+					},
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Second Block',
+					style: {
+						color: {
+							text: '#ff0000',
+							background: '#00ff00',
+						},
+					},
+				},
+			},
+		] );
+	} );
+
 	test( 'should link selection on internal paste', async ( {
 		pageUtils,
 		editor,
@@ -563,6 +632,27 @@ test.describe( 'Copy/cut/paste', () => {
 				},
 			},
 		] );
+	} );
+
+	test( 'should paste link to formatted text', async ( {
+		page,
+		pageUtils,
+		editor,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: '<strong>test</strong>' },
+		} );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowRight' );
+		await pageUtils.pressKeys( 'shift+ArrowRight' );
+		await pageUtils.pressKeys( 'shift+ArrowRight' );
+		pageUtils.setClipboardData( {
+			plainText: 'https://wordpress.org/gutenberg',
+			html: 'https://wordpress.org/gutenberg',
+		} );
+		await pageUtils.pressKeys( 'primary+v' );
+		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	test( 'should auto-link', async ( { pageUtils, editor } ) => {

@@ -44,6 +44,7 @@ const props = {
 		props.value = newValue;
 	} ),
 	value: undefined,
+	__next40pxDefaultSize: true,
 };
 
 const toggleLabelRegex = /Border color( and style)* picker/;
@@ -201,7 +202,7 @@ describe( 'BorderBoxControl', () => {
 			await waitFor( () =>
 				expect(
 					screen.getByRole( 'button', {
-						name: 'Custom color picker.',
+						name: 'Custom color picker',
 					} )
 				).toBeVisible()
 			);

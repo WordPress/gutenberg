@@ -67,10 +67,13 @@ export {
 	JustifyToolbar,
 	JustifyContentControl,
 } from './justify-content-control';
-export { default as __experimentalLinkControl } from './link-control';
-export { default as __experimentalLinkControlSearchInput } from './link-control/search-input';
-export { default as __experimentalLinkControlSearchResults } from './link-control/search-results';
-export { default as __experimentalLinkControlSearchItem } from './link-control/search-item';
+export {
+	default as LinkControl,
+	DeprecatedExperimentalLinkControl as __experimentalLinkControl,
+} from './link-control';
+export { __experimentalLinkControlSearchInput } from './link-control/search-input';
+export { __experimentalLinkControlSearchResults } from './link-control/search-results';
+export { __experimentalLinkControlSearchItem } from './link-control/search-item';
 export { default as LineHeightControl } from './line-height-control';
 export { default as __experimentalListView } from './list-view';
 export { default as MediaReplaceFlow } from './media-replace-flow';
@@ -86,7 +89,6 @@ export {
 	RichTextToolbarButton,
 	__unstableRichTextInputEvent,
 } from './rich-text';
-export { default as ToolSelector } from './tool-selector';
 export { default as __experimentalUnitControl } from './unit-control';
 export { default as URLInput } from './url-input';
 export { default as URLInputButton } from './url-input/button';
@@ -170,8 +172,3 @@ export { useBlockEditingMode } from './block-editing-mode';
 export { default as BlockEditorProvider } from './provider';
 export { useSettings, useSetting } from './use-settings';
 export { useBlockCommands } from './use-block-commands';
-
-/*
- * The following rename hint component can be removed in 6.4.
- */
-export { default as ReusableBlocksRenameHint } from './inserter/reusable-block-rename-hint';

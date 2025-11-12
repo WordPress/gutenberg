@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
 .block-editor-url-popover__additional-controls {
 	border-top: $border-width solid $gray-900;
 	padding: $grid-unit-10 $grid-unit-10;
@@ -10,6 +13,7 @@
 .block-editor-url-popover__row {
 	display: flex;
 	gap: $grid-unit-05;
+	align-items: center;
 }
 
 // Any children of the popover-row that are not the settings-toggle

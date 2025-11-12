@@ -69,7 +69,7 @@ describe( 'utils', () => {
 			expect( getClassNames( html, '', false ) ).toEqual( expected );
 		} );
 
-		it( 'should preserve exsiting class names when removing responsive classes', () => {
+		it( 'should preserve existing class names when removing responsive classes', () => {
 			const html = '<iframe height="9" width="16"></iframe>';
 			const expected = 'lovely';
 			expect(
@@ -200,7 +200,7 @@ describe( 'utils', () => {
 			expect( getEmbedInfoByProvider( 'instagram' ) ).toEqual(
 				expect.objectContaining( {
 					icon: embedInstagramIcon,
-					title: 'Instagram',
+					title: 'Instagram Embed',
 				} )
 			);
 		} );

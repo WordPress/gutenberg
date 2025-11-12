@@ -124,7 +124,7 @@ export default function Edit( { attributes, setAttributes } ) {
 						<legend className="blocks-base-control__label">
 							{ __( 'Background color', 'block-development-examples' ) }
 						</legend>
-						<ColorPalette // Element Tag for Gutenberg standard colour selector
+						<ColorPalette // Element Tag for Gutenberg standard color selector
 							onChange={ onChangeBGColor } // onChange event callback
 						/>
 					</fieldset>
@@ -139,6 +139,8 @@ export default function Edit( { attributes, setAttributes } ) {
 				</div>
 			</InspectorControls>
 			<TextControl
+				__nextHasNoMarginBottom
+				__next40pxDefaultSize
 				value={ attributes.message }
 				onChange={ ( val ) => setAttributes( { message: val } ) }
 				style={ {

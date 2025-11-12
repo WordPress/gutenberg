@@ -7,7 +7,7 @@ module.exports = {
 	defaultValues: {
 		slug: 'example-interactive',
 		title: 'Example Interactive',
-		description: 'An interactive block with the Interactivity API',
+		description: 'An interactive block with the Interactivity API.',
 		dashicon: 'media-interactive',
 		npmDependencies: [ '@wordpress/interactivity' ],
 		customPackageJSON: { files: [ '[^.]*' ] },
@@ -24,7 +24,14 @@ module.exports = {
 		},
 	},
 	variants: {
-		basic: {},
+		default: {},
+		typescript: {
+			slug: 'example-interactive-typescript',
+			title: 'Example Interactive TypeScript',
+			description:
+				'An interactive block with the Interactivity API using TypeScript.',
+			viewScriptModule: 'file:./view.ts',
+		},
 	},
 	pluginTemplatesPath: join( __dirname, 'plugin-templates' ),
 	blockTemplatesPath: join( __dirname, 'block-templates' ),

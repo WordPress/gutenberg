@@ -27,6 +27,7 @@ import { useControlledState } from '../utils/hooks';
 import { escapeRegExp } from '../utils/strings';
 import type { UnitControlProps, UnitControlOnChangeCallback } from './types';
 import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
+import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
 
 function UnforwardedUnitControl(
 	unitControlProps: WordPressComponentProps<
@@ -55,8 +56,16 @@ function UnforwardedUnitControl(
 		units: unitsProp = CSS_UNITS,
 		value: valueProp,
 		onFocus: onFocusProp,
+		__shouldNotWarnDeprecated36pxSize,
 		...props
 	} = useDeprecated36pxDefaultSizeProp( unitControlProps );
+
+	maybeWarnDeprecated36pxSize( {
+		componentName: 'UnitControl',
+		__next40pxDefaultSize: props.__next40pxDefaultSize,
+		size,
+		__shouldNotWarnDeprecated36pxSize,
+	} );
 
 	if ( 'unit' in unitControlProps ) {
 		deprecated( 'UnitControl unit prop', {
@@ -167,11 +176,12 @@ function UnforwardedUnitControl(
 	if ( ! disableUnits && isUnitSelectTabbable && units.length ) {
 		handleOnKeyDown = ( event: KeyboardEvent< HTMLInputElement > ) => {
 			props.onKeyDown?.( event );
-			// Unless the meta key was pressed (to avoid interfering with
-			// shortcuts, e.g. pastes), moves focus to the unit select if a key
+			// Unless the meta or ctrl key was pressed (to avoid interfering with
+			// shortcuts, e.g. pastes), move focus to the unit select if a key
 			// matches the first character of a unit.
 			if (
 				! event.metaKey &&
+				! event.ctrlKey &&
 				reFirstCharacterOfUnits.test( event.key )
 			) {
 				refInputSuffix.current?.focus();
@@ -214,6 +224,7 @@ function UnforwardedUnitControl(
 	return (
 		<ValueInput
 			{ ...props }
+			__shouldNotWarnDeprecated36pxSize
 			autoComplete={ autoComplete }
 			className={ classes }
 			disabled={ disabled }
@@ -245,7 +256,7 @@ function UnforwardedUnitControl(
  * const Example = () => {
  *   const [ value, setValue ] = useState( '10px' );
  *
- *   return <UnitControl onChange={ setValue } value={ value } />;
+ *   return <UnitControl __next40pxDefaultSize onChange={ setValue } value={ value } />;
  * };
  * ```
  */

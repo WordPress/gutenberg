@@ -74,6 +74,10 @@ declare module './base-entity-records' {
 			 */
 			wp_id: number;
 			/**
+			 * Plugin that registered the template.
+			 */
+			plugin?: string;
+			/**
 			 * Theme file exists.
 			 */
 			has_theme_file: Record< string, string >;

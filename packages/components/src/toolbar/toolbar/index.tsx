@@ -40,6 +40,9 @@ function UnforwardedToolbar(
 			Dropdown: {
 				variant: 'toolbar',
 			},
+			Menu: {
+				variant: 'toolbar',
+			},
 		};
 	}, [ isVariantDefined ] );
 

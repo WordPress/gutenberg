@@ -111,7 +111,7 @@ body {
 
 ## Specification
 
-This specification is the same for the three different origins that use this format: core, themes, and users. Themes can override core's defaults by creating a file called `theme.json`. Users, via the site editor, will also be able to override theme's or core's preferences via an user interface that is being worked on.
+This specification is the same for the three different origins that use this format: core, themes, and users. Themes can override core's defaults by creating a file called `theme.json`. Users, via the site editor, will also be able to override theme's or core's preferences via a user interface that is being worked on.
 
 ```json
 {
@@ -1034,7 +1034,7 @@ h3 {
 {% end %}
 ##### Element pseudo selectors
 
-Pseudo selectors `:hover`, `:focus`, `:visited`, `:active`, `:link`, `:any-link` are supported by Gutenberg.
+Pseudo selectors `:hover`, `:focus`, `:focus-visible`, `:visited`, `:active`, `:link`, `:any-link` are supported by Gutenberg.
 
 ```json
 "elements": {
@@ -1053,16 +1053,16 @@ Pseudo selectors `:hover`, `:focus`, `:visited`, `:active`, `:link`, `:any-link`
 
 #### Variations
 
-A block can have a "style variation", as defined per the [block.json specification](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/#styles-optional). Theme authors can define the style attributes for an existing style variation using the theme.json file. Styles for unregistered style variations will be ignored.
+A block can have a "style variation," as defined in the [block.json specification](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/#styles-optional). Theme authors can define the style attributes for an existing style variation using the `theme.json` file. Styles for unregistered style variations will be ignored.
 
-Note that variations are a "block concept", they only exist bound to blocks. The `theme.json` specification respects that distinction by only allowing `variations` at the block-level but not at the top-level. It's also worth highlighting that only variations defined in the `block.json` file of the block are considered "registered": so far, the style variations added via `register_block_style` or in the client are ignored, see [this issue](https://github.com/WordPress/gutenberg/issues/49602) for more information.
+Note that variations are a "block concept"—they only exist when bound to blocks. The `theme.json` specification respects this distinction by only allowing `variations` at the block level, not the top level. It’s also worth highlighting that only variations defined in the `block.json` file of the block or via `register_block_style` on the server are considered "registered" for `theme.json` styling purposes.
 
 For example, this is how to provide styles for the existing `plain` variation for the `core/quote` block:
 
 ```json
 {
 	"version": 3,
-	"styles":{
+	"styles": {
 		"blocks": {
 			"core/quote": {
 				"variations": {
@@ -1078,12 +1078,105 @@ For example, this is how to provide styles for the existing `plain` variation fo
 }
 ```
 
-The resulting CSS output is this:
+The resulting CSS output is:
 
 ```css
 .wp-block-quote.is-style-plain {
 	background-color: red;
 }
+```
+
+It is also possible for multiple block types to share the same variation styles. There are two recommended ways to define such shared styles:
+
+1. `theme.json` partial files
+2. programmatically, using `register_block_style`
+
+##### Variation Theme.json Partials
+
+Like theme style variation partials, those for block style variations reside within a theme's `/styles` directory. However, they are differentiated from theme style variations by the introduction of a top-level property called `blockTypes`. The `blockTypes` property is an array of block types for which the block style variation has been registered.
+
+Additionally, a `slug` property is available to provide consistency between the different sources that may define block style variations and to decouple the `slug` from the translatable `title` property.
+
+The following is an example of a `theme.json` partial that defines styles for the "Variation A" block style for the Group, Columns, and Media & Text block types:
+
+```json
+{
+	"$schema": "https://schemas.wp.org/trunk/theme.json",
+	"version": 3,
+	"title": "Variation A",
+	"slug": "variation-a",
+	"blockTypes": [ "core/group", "core/columns", "core/media-text" ],
+	"styles": {
+		"color": {
+			"background": "#eed8d3",
+			"text": "#201819"
+		},
+		"elements": {
+			"heading": {
+				"color": {
+					"text": "#201819"
+				}
+			}
+		},
+		"blocks": {
+			"core/group": {
+				"color": {
+					"background": "#825f58",
+					"text": "#eed8d3"
+				},
+				"elements": {
+					"heading": {
+						"color": {
+							"text": "#eed8d3"
+						}
+					}
+				}
+			}
+		}
+	}
+}
+```
+
+##### Programmatically Registering Variation Styles
+
+As an alternative to `theme.json` partials, you can register variation styles at the same time as registering the variation itself through `register_block_style`. This is done by registering the block style for an array of block types while also passing a "style object" within the `style_data` option.
+
+The example below registers a "Green" variation for the Group and Columns blocks. Note that the style object passed via `style_data` follows the same shape as the `styles` property of a `theme.json` partial.
+
+```php
+register_block_style(
+    array( 'core/group', 'core/columns' ),
+    array(
+        'name'       => 'green',
+        'label'      => __( 'Green' ),
+        'style_data' => array(
+            'color'    => array(
+                'background' => '#4f6f52',
+                'text'       => '#d2e3c8',
+            ),
+            'blocks'   => array(
+                'core/group' => array(
+                    'color' => array(
+                        'background' => '#739072',
+                        'text'       => '#e3eedd',
+                    ),
+                ),
+            ),
+            'elements' => array(
+                'link'   => array(
+                    'color'  => array(
+                        'text' => '#ead196',
+                    ),
+                    ':hover' => array(
+                        'color' => array(
+                            'text' => '#ebd9b4',
+                        ),
+                    ),
+                ),
+            ),
+        ),
+    )
+);
 ```
 
 ### customTemplates

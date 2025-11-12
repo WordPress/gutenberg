@@ -21,8 +21,8 @@ import {
 	useSettings,
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
+import { getBlockSupport } from '@wordpress/blocks';
 import { formatLtr } from '@wordpress/icons';
-
 /**
  * Internal dependencies
  */
@@ -47,7 +47,7 @@ function hasDropCapDisabled( align ) {
 	return align === ( isRTL() ? 'left' : 'right' ) || align === 'center';
 }
 
-function DropCapControl( { clientId, attributes, setAttributes } ) {
+function DropCapControl( { clientId, attributes, setAttributes, name } ) {
 	// Please do not add a useSelect call to the paragraph block unconditionally.
 	// Every useSelect added to a (frequently used) block will degrade load
 	// and type performance. By moving it within InspectorControls, the subscription is
@@ -66,26 +66,35 @@ function DropCapControl( { clientId, attributes, setAttributes } ) {
 	} else if ( dropCap ) {
 		helpText = __( 'Showing large initial letter.' );
 	} else {
-		helpText = __( 'Toggle to show a large initial letter.' );
+		helpText = __( 'Show a large initial letter.' );
 	}
 
+	const isDropCapControlEnabledByDefault = getBlockSupport(
+		name,
+		'typography.defaultControls.dropCap',
+		false
+	);
+
 	return (
-		<ToolsPanelItem
-			hasValue={ () => !! dropCap }
-			label={ __( 'Drop cap' ) }
-			onDeselect={ () => setAttributes( { dropCap: undefined } ) }
-			resetAllFilter={ () => ( { dropCap: undefined } ) }
-			panelId={ clientId }
-		>
-			<ToggleControl
-				__nextHasNoMarginBottom
+		<InspectorControls group="typography">
+			<ToolsPanelItem
+				hasValue={ () => !! dropCap }
 				label={ __( 'Drop cap' ) }
-				checked={ !! dropCap }
-				onChange={ () => setAttributes( { dropCap: ! dropCap } ) }
-				help={ helpText }
-				disabled={ hasDropCapDisabled( align ) ? true : false }
-			/>
-		</ToolsPanelItem>
+				isShownByDefault={ isDropCapControlEnabledByDefault }
+				onDeselect={ () => setAttributes( { dropCap: false } ) }
+				resetAllFilter={ () => ( { dropCap: false } ) }
+				panelId={ clientId }
+			>
+				<ToggleControl
+					__nextHasNoMarginBottom
+					label={ __( 'Drop cap' ) }
+					checked={ !! dropCap }
+					onChange={ () => setAttributes( { dropCap: ! dropCap } ) }
+					help={ helpText }
+					disabled={ hasDropCapDisabled( align ) }
+				/>
+			</ToolsPanelItem>
+		</InspectorControls>
 	);
 }
 
@@ -96,6 +105,8 @@ function ParagraphBlock( {
 	onRemove,
 	setAttributes,
 	clientId,
+	isSelected: isSingleSelected,
+	name,
 } ) {
 	const { align, content, direction, dropCap, placeholder } = attributes;
 	const blockProps = useBlockProps( {
@@ -131,13 +142,14 @@ function ParagraphBlock( {
 					/>
 				</BlockControls>
 			) }
-			<InspectorControls group="typography">
+			{ isSingleSelected && (
 				<DropCapControl
+					name={ name }
 					clientId={ clientId }
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 				/>
-			</InspectorControls>
+			) }
 			<RichText
 				identifier="content"
 				tagName="p"

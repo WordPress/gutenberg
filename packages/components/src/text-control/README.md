@@ -62,6 +62,8 @@ const MyTextControl = () => {
 
 	return (
 		<TextControl
+			__nextHasNoMarginBottom
+			__next40pxDefaultSize
 			label="Additional CSS Class"
 			value={ className }
 			onChange={ ( value ) => setClassName( value ) }
@@ -125,6 +127,14 @@ A function that receives the value of the input.
 
 -   Type: `function`
 -   Required: Yes
+
+#### __next40pxDefaultSize
+
+Start opting into the larger default height that will become the default size in a future version.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
 
 ## Related components
 

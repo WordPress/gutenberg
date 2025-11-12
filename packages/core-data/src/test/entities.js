@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import triggerFetch from '@wordpress/api-fetch';
+import apiFetch from '@wordpress/api-fetch';
+
 jest.mock( '@wordpress/api-fetch' );
 
 /**
@@ -10,8 +11,8 @@ jest.mock( '@wordpress/api-fetch' );
 import {
 	getMethodName,
 	rootEntitiesConfig,
-	getOrLoadEntitiesConfig,
 	prePersistPostType,
+	additionalEntityConfigLoaders,
 } from '../entities';
 
 describe( 'getMethodName', () => {
@@ -43,86 +44,13 @@ describe( 'getMethodName', () => {
 	} );
 } );
 
-describe( 'getKindEntities', () => {
-	beforeEach( async () => {
-		triggerFetch.mockReset();
-	} );
-
-	it( 'shouldn’t do anything if the entities have already been resolved', async () => {
-		const dispatch = jest.fn();
-		const select = {
-			getEntitiesConfig: jest.fn( () => entities ),
-			getEntityConfig: jest.fn( () => ( {
-				kind: 'postType',
-				name: 'post',
-			} ) ),
-		};
-		const entities = [ { kind: 'postType' } ];
-		await getOrLoadEntitiesConfig(
-			'postType',
-			'post'
-		)( { dispatch, select } );
-		expect( dispatch ).not.toHaveBeenCalled();
-	} );
-
-	it( 'shouldn’t do anything if there no defined kind config', async () => {
-		const dispatch = jest.fn();
-		const select = {
-			getEntitiesConfig: jest.fn( () => [] ),
-			getEntityConfig: jest.fn( () => undefined ),
-		};
-		await getOrLoadEntitiesConfig(
-			'unknownKind',
-			undefined
-		)( { dispatch, select } );
-		expect( dispatch ).not.toHaveBeenCalled();
-	} );
-
-	it( 'should fetch and add the entities', async () => {
-		const fetchedEntities = [
-			{
-				rest_base: 'posts',
-				labels: {
-					singular_name: 'post',
-				},
-				supports: {
-					revisions: true,
-				},
-			},
-		];
-		const dispatch = jest.fn();
-		const select = {
-			getEntitiesConfig: jest.fn( () => [] ),
-			getEntityConfig: jest.fn( () => undefined ),
-		};
-		triggerFetch.mockImplementation( () => fetchedEntities );
-
-		await getOrLoadEntitiesConfig(
-			'postType',
-			'post'
-		)( { dispatch, select } );
-		expect( dispatch ).toHaveBeenCalledTimes( 1 );
-		expect( dispatch.mock.calls[ 0 ][ 0 ].type ).toBe( 'ADD_ENTITIES' );
-		expect( dispatch.mock.calls[ 0 ][ 0 ].entities.length ).toBe( 1 );
-		expect( dispatch.mock.calls[ 0 ][ 0 ].entities[ 0 ].baseURL ).toBe(
-			'/wp/v2/posts'
-		);
-		expect(
-			dispatch.mock.calls[ 0 ][ 0 ].entities[ 0 ].getRevisionsUrl( 1 )
-		).toBe( '/wp/v2/posts/1/revisions' );
-		expect(
-			dispatch.mock.calls[ 0 ][ 0 ].entities[ 0 ].getRevisionsUrl( 1, 2 )
-		).toBe( '/wp/v2/posts/1/revisions/2' );
-	} );
-} );
-
 describe( 'prePersistPostType', () => {
 	it( 'set the status to draft and empty the title when saving auto-draft posts', () => {
 		let record = {
 			status: 'auto-draft',
 		};
 		const edits = {};
-		expect( prePersistPostType( record, edits ) ).toEqual( {
+		expect( prePersistPostType( record, edits, 'post', false ) ).toEqual( {
 			status: 'draft',
 			title: '',
 		} );
@@ -130,13 +58,15 @@ describe( 'prePersistPostType', () => {
 		record = {
 			status: 'publish',
 		};
-		expect( prePersistPostType( record, edits ) ).toEqual( {} );
+		expect( prePersistPostType( record, edits, 'post', false ) ).toEqual(
+			{}
+		);
 
 		record = {
 			status: 'auto-draft',
 			title: 'Auto Draft',
 		};
-		expect( prePersistPostType( record, edits ) ).toEqual( {
+		expect( prePersistPostType( record, edits, 'post', false ) ).toEqual( {
 			status: 'draft',
 			title: '',
 		} );
@@ -145,6 +75,43 @@ describe( 'prePersistPostType', () => {
 			status: 'publish',
 			title: 'My Title',
 		};
-		expect( prePersistPostType( record, edits ) ).toEqual( {} );
+		expect( prePersistPostType( record, edits, 'post', false ) ).toEqual(
+			{}
+		);
+	} );
+
+	it( 'does not set the status to draft and empty the title when saving templates', () => {
+		const record = {
+			status: 'auto-draft',
+			title: 'Auto Draft',
+		};
+		const edits = {};
+		expect( prePersistPostType( record, edits, 'post', true ) ).toEqual(
+			{}
+		);
+	} );
+} );
+
+describe( 'loadTaxonomyEntities', () => {
+	beforeEach( () => {
+		apiFetch.mockReset();
+	} );
+
+	it( 'should add supportsPagination: true to taxonomy entities', async () => {
+		const mockTaxonomies = {
+			category: {
+				name: 'Categories',
+				rest_base: 'categories',
+			},
+		};
+
+		apiFetch.mockResolvedValueOnce( mockTaxonomies );
+
+		const taxonomyLoader = additionalEntityConfigLoaders.find(
+			( loader ) => loader.kind === 'taxonomy'
+		);
+		const entities = await taxonomyLoader.loadEntities();
+
+		expect( entities[ 0 ].supportsPagination ).toBe( true );
 	} );
 } );

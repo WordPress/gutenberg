@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import { fixCustomClassname } from './fix-custom-classname';
+import { fixAriaLabel } from './fix-aria-label';
 
 /**
  * Attempts to fix block invalidation by applying build-in validation fixes
@@ -15,11 +16,22 @@ import { fixCustomClassname } from './fix-custom-classname';
  * @return {WPBlock} Fixed block object
  */
 export function applyBuiltInValidationFixes( block, blockType ) {
-	const updatedBlockAttributes = fixCustomClassname(
-		block.attributes,
+	const { attributes, originalContent } = block;
+	let updatedBlockAttributes = attributes;
+
+	// Fix block invalidation for className attribute.
+	updatedBlockAttributes = fixCustomClassname(
+		attributes,
 		blockType,
-		block.originalContent
+		originalContent
 	);
+	// Fix block invalidation for ariaLabel attribute.
+	updatedBlockAttributes = fixAriaLabel(
+		updatedBlockAttributes,
+		blockType,
+		originalContent
+	);
+
 	return {
 		...block,
 		attributes: updatedBlockAttributes,

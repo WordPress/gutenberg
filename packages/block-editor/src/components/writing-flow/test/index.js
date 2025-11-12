@@ -50,7 +50,7 @@ describe( 'isNavigationCandidate', () => {
 		} );
 	} );
 
-	it( 'should return false if vertically navigating inputs with vertial support like number', () => {
+	it( 'should return false if vertically navigating inputs with vertical support like number', () => {
 		[ UP, DOWN ].forEach( ( keyCode ) => {
 			const result = isNavigationCandidate(
 				elements.inputNumber,

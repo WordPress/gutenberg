@@ -5,6 +5,7 @@ import { createSlotFill } from '@wordpress/components';
 
 const InspectorControlsDefault = createSlotFill( 'InspectorControls' );
 const InspectorControlsAdvanced = createSlotFill( 'InspectorAdvancedControls' );
+const InspectorControlsBindings = createSlotFill( 'InspectorControlsBindings' );
 const InspectorControlsBackground = createSlotFill(
 	'InspectorControlsBackground'
 );
@@ -26,6 +27,7 @@ const groups = {
 	default: InspectorControlsDefault,
 	advanced: InspectorControlsAdvanced,
 	background: InspectorControlsBackground,
+	bindings: InspectorControlsBindings,
 	border: InspectorControlsBorder,
 	color: InspectorControlsColor,
 	dimensions: InspectorControlsDimensions,
@@ -39,3 +41,8 @@ const groups = {
 };
 
 export default groups;
+
+// Private slot for allowed blocks control UI.
+export const PrivateInspectorControlsAllowedBlocks = createSlotFill(
+	Symbol( 'PrivateInspectorControlsAllowedBlocks' )
+);

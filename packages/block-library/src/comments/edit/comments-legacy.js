@@ -29,6 +29,7 @@ export default function CommentsLegacy( {
 
 	const actions = [
 		<Button
+			__next40pxDefaultSize
 			key="convert"
 			onClick={ () => void setAttributes( { legacy: false } ) }
 			variant="primary"

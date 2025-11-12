@@ -21,7 +21,6 @@ import {
 	MenuItem,
 	ToolbarButton,
 } from '@wordpress/components';
-import { useAsyncList } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { useState } from '@wordpress/element';
@@ -85,7 +84,6 @@ function TemplatesList( { area, clientId, isEntityAvailable, onSelect } ) {
 		isEntityAvailable &&
 		!! blockPatterns.length &&
 		( area === 'header' || area === 'footer' );
-	const shownTemplates = useAsyncList( blockPatterns );
 
 	if ( ! canReplace ) {
 		return null;
@@ -96,9 +94,8 @@ function TemplatesList( { area, clientId, isEntityAvailable, onSelect } ) {
 			<BlockPatternsList
 				label={ __( 'Templates' ) }
 				blockPatterns={ blockPatterns }
-				shownPatterns={ shownTemplates }
 				onClickPattern={ onSelect }
-				showTitle={ false }
+				showTitlesAsTooltip
 			/>
 		</PanelBody>
 	);
@@ -128,7 +125,7 @@ export default function TemplatePartEdit( {
 		area,
 		onNavigateToEntityRecord,
 		title,
-		canEditTemplate,
+		canUserEdit,
 	} = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, hasFinishedResolution } =
@@ -151,8 +148,13 @@ export default function TemplatePartEdit( {
 				  )
 				: false;
 
-			const _canEditTemplate =
-				select( coreStore ).canUser( 'create', 'templates' ) ?? false;
+			const _canUserEdit = hasResolvedEntity
+				? select( coreStore ).canUser( 'update', {
+						kind: 'postType',
+						name: 'wp_template_part',
+						id: templatePartId,
+				  } )
+				: false;
 
 			return {
 				hasInnerBlocks: getBlockCount( clientId ) > 0,
@@ -165,7 +167,7 @@ export default function TemplatePartEdit( {
 				onNavigateToEntityRecord:
 					getSettings().onNavigateToEntityRecord,
 				title: entityRecord?.title,
-				canEditTemplate: _canEditTemplate,
+				canUserEdit: !! _canUserEdit,
 			};
 		},
 		[ templatePartId, attributes.area, clientId ]
@@ -209,7 +211,7 @@ export default function TemplatePartEdit( {
 			<TagName { ...blockProps }>
 				<Warning>
 					{ sprintf(
-						/* translators: %s: Template part slug */
+						/* translators: %s: Template part slug. */
 						__(
 							'Template part has been deleted or is unavailable: %s'
 						),
@@ -235,7 +237,7 @@ export default function TemplatePartEdit( {
 			<RecursionProvider uniqueId={ templatePartId }>
 				{ isEntityAvailable &&
 					onNavigateToEntityRecord &&
-					canEditTemplate && (
+					canUserEdit && (
 						<BlockControls group="other">
 							<ToolbarButton
 								onClick={ () =>
@@ -249,16 +251,19 @@ export default function TemplatePartEdit( {
 							</ToolbarButton>
 						</BlockControls>
 					) }
-				<InspectorControls group="advanced">
-					<TemplatePartAdvancedControls
-						tagName={ tagName }
-						setAttributes={ setAttributes }
-						isEntityAvailable={ isEntityAvailable }
-						templatePartId={ templatePartId }
-						defaultWrapper={ areaObject.tagName }
-						hasInnerBlocks={ hasInnerBlocks }
-					/>
-				</InspectorControls>
+				{ canUserEdit && (
+					<InspectorControls group="advanced">
+						<TemplatePartAdvancedControls
+							tagName={ tagName }
+							setAttributes={ setAttributes }
+							isEntityAvailable={ isEntityAvailable }
+							templatePartId={ templatePartId }
+							defaultWrapper={ areaObject.tagName }
+							hasInnerBlocks={ hasInnerBlocks }
+							clientId={ clientId }
+						/>
+					</InspectorControls>
+				) }
 				{ isPlaceholder && (
 					<TagName { ...blockProps }>
 						<TemplatePartPlaceholder

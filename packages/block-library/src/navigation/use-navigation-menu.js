@@ -14,7 +14,11 @@ import { useSelect } from '@wordpress/data';
 import { PRELOADED_NAVIGATION_MENUS_QUERY } from './constants';
 
 export default function useNavigationMenu( ref ) {
-	const permissions = useResourcePermissions( 'navigation', ref );
+	const permissions = useResourcePermissions( {
+		kind: 'postType',
+		name: 'wp_navigation',
+		id: ref,
+	} );
 
 	const {
 		navigationMenu,

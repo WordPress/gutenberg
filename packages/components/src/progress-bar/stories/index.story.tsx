@@ -10,7 +10,8 @@ import { ProgressBar } from '..';
 
 const meta: Meta< typeof ProgressBar > = {
 	component: ProgressBar,
-	title: 'Components/ProgressBar',
+	title: 'Components/Feedback/ProgressBar',
+	id: 'components-progressbar',
 	argTypes: {
 		value: { control: { type: 'number', min: 0, max: 100, step: 1 } },
 	},
@@ -42,7 +43,7 @@ const withCustomWidthCustomCSS = `
  * You can override the default `width` by passing a custom CSS class via the
  * `className` prop.
  *
- * This example shows a progress bar with an overriden `width` of `100%` which
+ * This example shows a progress bar with an overridden `width` of `100%` which
  * makes it fit all available horizontal space of the parent element. The CSS
  * class looks like this:
  *

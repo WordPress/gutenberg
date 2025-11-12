@@ -2,6 +2,166 @@
 
 ## Unreleased
 
+## 6.34.0 (2025-10-29)
+
+### Bug Fixes
+
+-   Fix derived state closures processing on client-side navigation. ([#72725](https://github.com/WordPress/gutenberg/pull/72725))
+
+## 6.33.0 (2025-10-17)
+
+### Enhancements
+
+-   Add official support for unique IDs. ([#72161](https://github.com/WordPress/gutenberg/pull/72161))
+
+### Bug Fixes
+
+-   Change ordering of multiple `data-wp-context` directives in iAPI processing. ([#72395](https://github.com/WordPress/gutenberg/pull/72395))
+-   Handle client-server state synchronization scenarios for `getServerContext` and `getServerState`. ([#72381](https://github.com/WordPress/gutenberg/pull/72381))
+
+## 6.32.0 (2025-10-01)
+
+-   Update router regions inside elements with `data-wp-interactive`. ([#71635](https://github.com/WordPress/gutenberg/pull/71635))
+-   Fix nested `data-wp-each` directives using the same items key. ([#71870](https://github.com/WordPress/gutenberg/pull/71870))
+
+## 6.31.0 (2025-09-17)
+
+## 6.30.0 (2025-09-03)
+
+## 6.29.0 (2025-08-20)
+
+## 6.28.0 (2025-08-07)
+
+### Deprecations
+
+-   Deprecated the `"data-wp-ignore"` directive of the Interactivity API.([#70945](https://github.com/WordPress/gutenberg/pull/70945))  
+    It is deprecated as of WordPress 6.9 and will be removed in version 7.0.
+
+### Bug Fixes
+
+-   Make state getters to be updated asynchronously with `store()`. ([#70974](https://github.com/WordPress/gutenberg/pull/70974))
+
+## 6.27.0 (2025-07-23)
+
+## 6.26.0 (2025-06-25)
+
+## 6.25.0 (2025-06-04)
+
+### Bug Fixes
+
+-   Fix `store()` types to support typing it without passing a store part. ([#70296](https://github.com/WordPress/gutenberg/pull/70296))
+-   Fix captured errors in `withScope` for passed generators. ([#70303](https://github.com/WordPress/gutenberg/pull/70303))
+-   Fix parsing of HTML comments without siblings. ([#70304](https://github.com/WordPress/gutenberg/pull/70304))
+
+## 6.24.0 (2025-05-22)
+
+## 6.23.0 (2025-05-07)
+
+## 6.22.0 (2025-04-11)
+
+## 6.21.0 (2025-03-27)
+
+## 6.20.0 (2025-03-13)
+
+## 6.19.0 (2025-02-28)
+
+## 6.18.0 (2025-02-12)
+
+## 6.17.0 (2025-01-29)
+
+## 6.16.0 (2025-01-15)
+
+### Bug Fixes
+
+-   Fix the logic path that merges plain objects ([#68579](https://github.com/WordPress/gutenberg/pull/68579)).
+
+## 6.15.0 (2025-01-02)
+
+### Enhancements
+
+-   Allow more iterables to be used in each directives ([#67798](https://github.com/WordPress/gutenberg/pull/67798)).
+
+### Bug Fixes
+
+-   Fix an error when the value used in an each directive is not iterable ([#67798](https://github.com/WordPress/gutenberg/pull/67798)).
+
+## 6.14.0 (2024-12-11)
+
+## 6.13.0 (2024-11-27)
+
+## 6.12.0 (2024-11-16)
+
+### Bug Fixes
+
+-   Fix property modification from inherited context two or more levels above ([#66872](https://github.com/WordPress/gutenberg/pull/66872)).
+
+## 6.11.0 (2024-10-30)
+
+### Bug Fixes
+
+-   Fix reactivity of undefined objects and arrays added with `deepMerge()` ([#66183](https://github.com/WordPress/gutenberg/pull/66183)).
+
+## 6.10.0 (2024-10-16)
+
+### Internal
+
+-   Upgrade preact libraries [#66008](https://github.com/WordPress/gutenberg/pull/66008).
+
+### Bug Fixes
+
+-   Fix an issue where "default" could not be used as a directive suffix ([#65815](https://github.com/WordPress/gutenberg/pull/65815)).
+-   Correctly handle lazily added, deeply nested properties with `deepMerge()` ([#65465](https://github.com/WordPress/gutenberg/pull/65465)).
+
+## 6.9.0 (2024-10-03)
+
+## 6.8.0 (2024-09-19)
+
+### Enhancements
+
+-   Improve TypeScript support for generators ([#64577](https://github.com/WordPress/gutenberg/pull/64577)).
+-   Refactor internal context proxies implementation ([#64713](https://github.com/WordPress/gutenberg/pull/64713)).
+
+### Bug Fixes
+
+-   Prevent calling `proxifyContext` over an already-proxified context inside `wp-context` ([#65090](https://github.com/WordPress/gutenberg/pull/65090)).
+-   Update iterable signals when `deepMerge()` adds new properties ([#65135](https://github.com/WordPress/gutenberg/pull/65135)).
+
+## 6.7.0 (2024-09-05)
+
+### Enhancements
+
+-   Improve internal `deepMerge` function ([#64879](https://github.com/WordPress/gutenberg/pull/64879)).
+
+### Bug Fixes
+
+-   Fix computeds without scope in Firefox ([#64825](https://github.com/WordPress/gutenberg/pull/64825)).
+
+## 6.6.0 (2024-08-21)
+
+### Bug Fixes
+
+-   Fix context inheritance from namespaces different than the current one ([#64677](https://github.com/WordPress/gutenberg/pull/64677)).
+
+## 6.5.0 (2024-08-07)
+
+### Enhancements
+
+-   Refactor internal proxy and signals system ([#62734](https://github.com/WordPress/gutenberg/pull/62734)).
+
+### Bug Fixes
+
+-   Prevent overriding of existing properties on state and context after a client-side navigation ([#62734](https://github.com/WordPress/gutenberg/pull/62734)).
+
+## 6.4.0 (2024-07-24)
+
+## 6.3.0 (2024-07-10)
+
+## 6.2.0 (2024-06-26)
+
+### Enhancements
+
+-   Export `splitTask` function from `@wordpress/interactivity` package to facilitate yielding to the main thread. See example in [async actions](https://github.com/WordPress/gutenberg/blob/trunk/docs/reference-guides/interactivity-api/api-reference.md#async-actions) documentation. ([#62665](https://github.com/WordPress/gutenberg/pull/62665))
+
 ## 6.1.0 (2024-06-15)
 
 ## 6.0.0 (2024-05-31)

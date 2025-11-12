@@ -822,6 +822,95 @@ describe( 'selectors', () => {
 					} )
 				).toEqual( variations[ 1 ] );
 			} );
+			it( 'should fall back to default variation if no other variation matches and scope is "block"', () => {
+				const variations = [
+					{
+						name: 'variation-1',
+						attributes: {
+							testAttribute: 1,
+						},
+						isDefault: true,
+					},
+					{
+						name: 'variation-2',
+						attributes: {
+							testAttribute: 2,
+						},
+						isActive: ( blockAttributes, variationAttributes ) => {
+							return (
+								blockAttributes.testAttribute ===
+								variationAttributes.testAttribute
+							);
+						},
+					},
+					{
+						name: 'variation-3',
+						attributes: {
+							firstTestAttribute: 3,
+						},
+						isActive: [ 'testAttribute' ],
+					},
+				];
+
+				const state =
+					createBlockVariationsStateWithTestBlockType( variations );
+
+				expect(
+					getActiveBlockVariation(
+						state,
+						blockName,
+						{
+							testAttribute: 55,
+						},
+						'block'
+					)
+				).toEqual( variations[ 0 ] );
+			} );
+			it( 'should return undefined if no variation matches, including the default one', () => {
+				const variations = [
+					{
+						name: 'variation-1',
+						attributes: {
+							testAttribute: 1,
+						},
+						isDefault: true,
+						isActive: [ 'testAttribute' ],
+					},
+					{
+						name: 'variation-2',
+						attributes: {
+							testAttribute: 2,
+						},
+						isActive: ( blockAttributes, variationAttributes ) => {
+							return (
+								blockAttributes.testAttribute ===
+								variationAttributes.testAttribute
+							);
+						},
+					},
+					{
+						name: 'variation-3',
+						attributes: {
+							firstTestAttribute: 3,
+						},
+						isActive: [ 'testAttribute' ],
+					},
+				];
+
+				const state =
+					createBlockVariationsStateWithTestBlockType( variations );
+
+				expect(
+					getActiveBlockVariation(
+						state,
+						blockName,
+						{
+							testAttribute: 55,
+						},
+						'block'
+					)
+				).toBeUndefined();
+			} );
 		} );
 		describe( 'getDefaultBlockVariation', () => {
 			it( 'should return the default variation when set', () => {

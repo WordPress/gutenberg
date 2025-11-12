@@ -16,14 +16,14 @@ import { BorderControl } from '..';
 import type { Border } from '../types';
 
 const meta: Meta< typeof BorderControl > = {
-	title: 'Components (Experimental)/BorderControl',
+	title: 'Components/BorderControl',
 	component: BorderControl,
 	argTypes: {
 		onChange: {
 			action: 'onChange',
 		},
 		width: { control: { type: 'text' } },
-		value: { control: { type: null } },
+		value: { control: false },
 	},
 	parameters: {
 		controls: { expanded: true },
@@ -93,6 +93,10 @@ export const Default = Template.bind( {} );
 Default.args = {
 	colors,
 	label: 'Border',
+	__next40pxDefaultSize: true,
+	enableAlpha: true,
+	enableStyle: true,
+	shouldSanitizeBorder: true,
 };
 
 /**
@@ -132,13 +136,4 @@ export const WithMultipleOrigins = Template.bind( {} );
 WithMultipleOrigins.args = {
 	...Default.args,
 	colors: multipleOriginColors,
-};
-
-/**
- * Allow the alpha channel to be edited on each color.
- */
-export const WithAlphaEnabled = Template.bind( {} );
-WithAlphaEnabled.args = {
-	...Default.args,
-	enableAlpha: true,
 };

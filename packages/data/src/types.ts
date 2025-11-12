@@ -161,14 +161,6 @@ export interface DataRegistry {
 	register: ( store: StoreDescriptor< any > ) => void;
 }
 
-export interface DataEmitter {
-	emit: () => void;
-	subscribe: ( listener: () => void ) => () => void;
-	pause: () => void;
-	resume: () => void;
-	isPaused: boolean;
-}
-
 // Type Helpers.
 
 export type ConfigOf< S > = S extends StoreDescriptor< infer C > ? C : never;

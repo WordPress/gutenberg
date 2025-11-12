@@ -112,12 +112,12 @@ export default ( props ) => ( element ) => {
 
 		const value = getValue();
 		const transformed = formatTypes.reduce(
-			( accumlator, { __unstableInputRule } ) => {
+			( accumulator, { __unstableInputRule } ) => {
 				if ( __unstableInputRule ) {
-					accumlator = __unstableInputRule( accumlator );
+					accumulator = __unstableInputRule( accumulator );
 				}
 
-				return accumlator;
+				return accumulator;
 			},
 			preventEventDiscovery( value )
 		);

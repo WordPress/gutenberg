@@ -31,7 +31,7 @@ const DESIGN_POST_TYPES = [
 /**
  * Renders the Post Schedule Panel component.
  *
- * @return {Component} The component to be rendered.
+ * @return {React.ReactNode} The rendered component.
  */
 export default function PostSchedulePanel() {
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );

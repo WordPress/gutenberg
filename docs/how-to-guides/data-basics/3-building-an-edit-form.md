@@ -63,6 +63,8 @@ function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	return (
 		<div className="my-gutenberg-form">
 			<TextControl
+				__nextHasNoMarginBottom
+				__next40pxDefaultSize
 				value=''
 				label='Page title:'
 			/>
@@ -139,6 +141,8 @@ function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	return (
 		<div className="my-gutenberg-form">
 			<TextControl
+				__nextHasNoMarginBottom
+				__next40pxDefaultSize
 				label='Page title:'
 				value={ page.title.rendered }
 			/>
@@ -164,6 +168,8 @@ function VanillaReactForm({ initialTitle }) {
 	const [title, setTitle] = useState( initialTitle );
 	return (
 		<TextControl
+			__nextHasNoMarginBottom
+			__next40pxDefaultSize
 			value={ title }
 			onChange={ setTitle }
 		/>
@@ -233,6 +239,8 @@ function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	return (
 		<div className="my-gutenberg-form">
 			<TextControl
+				__nextHasNoMarginBottom
+				__next40pxDefaultSize
 				label="Page title:"
 				value={ page.title }
 				onChange={ handleChange }
@@ -501,6 +509,8 @@ function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	return (
 		<div className="my-gutenberg-form">
 			<TextControl
+				__nextHasNoMarginBottom
+				__next40pxDefaultSize
 				label="Page title:"
 				value={ page.title }
 				onChange={ handleChange }
@@ -539,5 +549,5 @@ function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 ## What's next?
 
 * **Previous part:** [Building a list of pages](/docs/how-to-guides/data-basics/2-building-a-list-of-pages.md)
-* **Next part:** Building a *New Page* form (coming soon)
+* **Next part:** [Building a Create Page form](/docs/how-to-guides/data-basics/4-building-a-create-page-form.md)
 * (optional) Review the [finished app](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/data-basics-59c8f8) in the block-development-examples repository

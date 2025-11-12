@@ -1,14 +1,37 @@
 <script>
 	( function redirectIfStoryMoved() {
 		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [
-			'navigation',
+			'alignmentmatrixcontrol',
+			'borderboxcontrol',
+			'bordercontrol',
+			'boxcontrol',
+			'confirmdialog',
 			'customselectcontrol-v2',
-			'theme',
+			'dimensioncontrol',
+			'heading',
+			'hstack',
+			'inputcontrol',
+			'menu',
+			'navigation',
+			'navigator',
+			'numbercontrol',
 			'progressbar',
+			'tabs',
+			'text',
+			'theme',
+			'togglegroupcontrol',
+			'treegrid',
+			'truncate',
+			'unitcontrol',
+			'vstack',
 		];
 		const REDIRECTS = [
 			{
 				from: /\/components-deprecated-/,
+				to: '/components-',
+			},
+			{
+				from: /\/components-experimental-validated-form-controls-/,
 				to: '/components-',
 			},
 			{

@@ -30,7 +30,7 @@ function AuthorControl( { value, onChange } ) {
 	const authorsInfo = getEntitiesInfo( authorsList );
 	/**
 	 * We need to normalize the value because the block operates on a
-	 * comma(`,`) separated string value and `FormTokenFiels` needs an
+	 * comma(`,`) separated string value and `FormTokenField` needs an
 	 * array.
 	 */
 	const normalizedValue = ! value ? [] : value.toString().split( ',' );
@@ -76,6 +76,8 @@ function AuthorControl( { value, onChange } ) {
 			suggestions={ authorsInfo.names }
 			onChange={ onAuthorChange }
 			__experimentalShowHowTo={ false }
+			__nextHasNoMarginBottom
+			__next40pxDefaultSize
 		/>
 	);
 }

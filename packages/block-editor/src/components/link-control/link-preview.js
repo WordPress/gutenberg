@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
 	Button,
 	ExternalLink,
@@ -14,7 +14,14 @@ import {
 } from '@wordpress/components';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { filterURLForDisplay, safeDecodeURI } from '@wordpress/url';
-import { Icon, globe, info, linkOff, edit, copySmall } from '@wordpress/icons';
+import {
+	Icon,
+	globe,
+	info,
+	linkOff,
+	pencil,
+	copySmall,
+} from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
@@ -96,7 +103,8 @@ export default function LinkPreview( {
 
 	return (
 		<div
-			aria-label={ __( 'Currently selected' ) }
+			role="group"
+			aria-label={ __( 'Manage link' ) }
 			className={ clsx( 'block-editor-link-control__search-item', {
 				'is-current': true,
 				'is-rich': hasRichData,
@@ -107,7 +115,14 @@ export default function LinkPreview( {
 			} ) }
 		>
 			<div className="block-editor-link-control__search-item-top">
-				<span className="block-editor-link-control__search-item-header">
+				<span
+					className="block-editor-link-control__search-item-header"
+					role="figure"
+					aria-label={
+						/* translators: Accessibility text for the link preview when editing a link. */
+						__( 'Link information' )
+					}
+				>
 					<span
 						className={ clsx(
 							'block-editor-link-control__search-item-icon',
@@ -145,10 +160,11 @@ export default function LinkPreview( {
 					</span>
 				</span>
 				<Button
-					icon={ edit }
+					icon={ pencil }
 					label={ __( 'Edit link' ) }
 					onClick={ onEditClick }
 					size="compact"
+					showTooltip={ ! showIconLabels }
 				/>
 				{ hasUnlinkControl && (
 					<Button
@@ -156,19 +172,17 @@ export default function LinkPreview( {
 						label={ __( 'Remove link' ) }
 						onClick={ onRemove }
 						size="compact"
+						showTooltip={ ! showIconLabels }
 					/>
 				) }
 				<Button
 					icon={ copySmall }
-					label={ sprintf(
-						// Translators: %s is a placeholder for the link URL and an optional colon, (if a Link URL is present).
-						__( 'Copy link%s' ), // Ends up looking like "Copy link: https://example.com".
-						isEmptyURL || showIconLabels ? '' : ': ' + value.url
-					) }
+					label={ __( 'Copy link' ) }
 					ref={ ref }
-					__experimentalIsFocusable
+					accessibleWhenDisabled
 					disabled={ isEmptyURL }
 					size="compact"
+					showTooltip={ ! showIconLabels }
 				/>
 				<ViewerSlot fillProps={ value } />
 			</div>

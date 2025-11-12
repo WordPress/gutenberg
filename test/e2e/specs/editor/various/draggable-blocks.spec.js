@@ -18,6 +18,14 @@ test.use( {
 	},
 } );
 
+async function dragTo( page, x, y ) {
+	// Call the move function twice to make sure the `dragOver` event is sent.
+	// @see https://github.com/microsoft/playwright/issues/17153
+	for ( let i = 0; i < 2; i += 1 ) {
+		await page.mouse.move( x, y );
+	}
+}
+
 test.describe( 'Draggable block', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
@@ -60,14 +68,7 @@ test.describe( 'Draggable block', () => {
 			'role=document[name="Block: Paragraph"i] >> text=1'
 		);
 		const firstParagraphBound = await firstParagraph.boundingBox();
-		// Call the move function twice to make sure the `dragOver` event is sent.
-		// @see https://github.com/microsoft/playwright/issues/17153
-		for ( let i = 0; i < 2; i += 1 ) {
-			await page.mouse.move(
-				firstParagraphBound.x,
-				firstParagraphBound.y
-			);
-		}
+		await dragTo( page, firstParagraphBound.x, firstParagraphBound.y );
 
 		await expect(
 			page.locator( 'data-testid=block-draggable-chip >> visible=true' )
@@ -132,15 +133,11 @@ test.describe( 'Draggable block', () => {
 			'role=document[name="Block: Paragraph"i] >> text=2'
 		);
 		const secondParagraphBound = await secondParagraph.boundingBox();
-		// Call the move function twice to make sure the `dragOver` event is sent.
-		// @see https://github.com/microsoft/playwright/issues/17153
-		// Make sure mouse is > 30px within the block for bottom drop indicator to appear.
-		for ( let i = 0; i < 2; i += 1 ) {
-			await page.mouse.move(
-				secondParagraphBound.x + 32,
-				secondParagraphBound.y + secondParagraphBound.height * 0.75
-			);
-		}
+		await dragTo(
+			page,
+			secondParagraphBound.x + 32,
+			secondParagraphBound.y + secondParagraphBound.height * 0.75
+		);
 
 		await expect(
 			page.locator( 'data-testid=block-draggable-chip >> visible=true' )
@@ -216,14 +213,11 @@ test.describe( 'Draggable block', () => {
 			'role=document[name="Block: Paragraph"i] >> text=1'
 		);
 		const firstParagraphBound = await firstParagraph.boundingBox();
-		// Call the move function twice to make sure the `dragOver` event is sent.
-		// @see https://github.com/microsoft/playwright/issues/17153
-		for ( let i = 0; i < 2; i += 1 ) {
-			await page.mouse.move(
-				firstParagraphBound.x + firstParagraphBound.width * 0.25,
-				firstParagraphBound.y
-			);
-		}
+		await dragTo(
+			page,
+			firstParagraphBound.x + firstParagraphBound.width * 0.25,
+			firstParagraphBound.y
+		);
 
 		await expect(
 			page.locator( 'data-testid=block-draggable-chip >> visible=true' )
@@ -297,14 +291,11 @@ test.describe( 'Draggable block', () => {
 			'role=document[name="Block: Paragraph"i] >> text=2'
 		);
 		const secondParagraphBound = await secondParagraph.boundingBox();
-		// Call the move function twice to make sure the `dragOver` event is sent.
-		// @see https://github.com/microsoft/playwright/issues/17153
-		for ( let i = 0; i < 2; i += 1 ) {
-			await page.mouse.move(
-				secondParagraphBound.x + secondParagraphBound.width * 0.75,
-				secondParagraphBound.y
-			);
-		}
+		await dragTo(
+			page,
+			secondParagraphBound.x + secondParagraphBound.width * 0.75,
+			secondParagraphBound.y
+		);
 
 		await expect(
 			page.locator( 'data-testid=block-draggable-chip >> visible=true' )
@@ -464,5 +455,48 @@ test.describe( 'Draggable block', () => {
 				},
 			] );
 		}
+	} );
+
+	test( 'can directly drag an image', async ( { page, editor } ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+		await editor.insertBlock( {
+			name: 'core/group',
+			attributes: { layout: { type: 'constrained' } },
+			innerBlocks: [ { name: 'core/paragraph' } ],
+		} );
+
+		const imageBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Image',
+		} );
+
+		const groupBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Group',
+		} );
+
+		await imageBlock.hover();
+		await page.mouse.down();
+		const groupBlockBox = await groupBlock.boundingBox();
+		await dragTo(
+			page,
+			groupBlockBox.x + groupBlockBox.width * 0.5,
+			groupBlockBox.y + groupBlockBox.height * 0.5
+		);
+		await page.mouse.up();
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/group',
+				attributes: {
+					tagName: 'div',
+					layout: { type: 'constrained' },
+				},
+				innerBlocks: [
+					{
+						name: 'core/image',
+						attributes: { alt: '', caption: '' },
+					},
+				],
+			},
+		] );
 	} );
 } );

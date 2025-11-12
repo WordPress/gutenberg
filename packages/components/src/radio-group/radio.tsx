@@ -6,7 +6,6 @@ import { forwardRef, useContext } from '@wordpress/element';
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
 
 /**
@@ -16,6 +15,7 @@ import Button from '../button';
 import { RadioGroupContext } from './context';
 import type { WordPressComponentProps } from '../context';
 import type { RadioProps } from './types';
+import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
 
 function UnforwardedRadio(
 	{
@@ -27,8 +27,14 @@ function UnforwardedRadio(
 ) {
 	const { store, disabled } = useContext( RadioGroupContext );
 
-	const selectedValue = store?.useState( 'value' );
+	const selectedValue = Ariakit.useStoreState( store, 'value' );
 	const isChecked = selectedValue !== undefined && selectedValue === value;
+
+	maybeWarnDeprecated36pxSize( {
+		componentName: 'Radio',
+		size: undefined,
+		__next40pxDefaultSize: props.__next40pxDefaultSize,
+	} );
 
 	return (
 		<Ariakit.Radio

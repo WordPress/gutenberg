@@ -1,7 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"__experimental": "fse",
 	"name": "core/post-comments-link",
 	"title": "Comments Link",
 	"category": "theme",
@@ -12,6 +11,9 @@
 		"textAlign": {
 			"type": "string"
 		}
+	},
+	"example": {
+		"viewportWidth": 350
 	},
 	"supports": {
 		"html": false,
@@ -42,6 +44,19 @@
 		},
 		"interactivity": {
 			"clientNavigation": true
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true,
+			"__experimentalDefaultControls": {
+				"radius": true,
+				"color": true,
+				"width": true,
+				"style": true
+			}
 		}
-	}
+	},
+	"style": "wp-block-post-comments-link"
 }

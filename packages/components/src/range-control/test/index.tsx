@@ -6,7 +6,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import RangeControl from '../';
+import _RangeControl from '../';
 
 const getRangeInput = (): HTMLInputElement => screen.getByRole( 'slider' );
 const getNumberInput = (): HTMLInputElement => screen.getByRole( 'spinbutton' );
@@ -14,6 +14,18 @@ const getResetButton = (): HTMLButtonElement => screen.getByRole( 'button' );
 
 const fireChangeEvent = ( input: HTMLInputElement, value?: number | string ) =>
 	fireEvent.change( input, { target: { value } } );
+
+const RangeControl = (
+	props: React.ComponentProps< typeof _RangeControl >
+) => {
+	return (
+		<_RangeControl
+			{ ...props }
+			__nextHasNoMarginBottom
+			__next40pxDefaultSize
+		/>
+	);
+};
 
 describe( 'RangeControl', () => {
 	describe( '#render()', () => {
@@ -292,7 +304,60 @@ describe( 'RangeControl', () => {
 	} );
 
 	describe( 'reset', () => {
-		it( 'should reset to a custom fallback value, defined by a parent component', () => {
+		it( 'should clear the input value when clicking the reset button', () => {
+			const spy = jest.fn();
+			render( <RangeControl allowReset onChange={ spy } /> );
+
+			const resetButton = getResetButton();
+			const rangeInput = getRangeInput();
+			const numberInput = getNumberInput();
+
+			fireChangeEvent( numberInput, '14' );
+
+			expect( rangeInput.value ).toBe( '14' );
+			expect( numberInput.value ).toBe( '14' );
+			expect( spy ).toHaveBeenCalledWith( 14 );
+
+			fireEvent.click( resetButton );
+
+			// range input resets to min + (max-min)/2
+			expect( rangeInput.value ).toBe( '50' );
+			expect( numberInput.value ).toBe( '' );
+			expect( spy ).toHaveBeenCalledWith( undefined );
+
+			expect( resetButton ).toHaveAttribute( 'aria-disabled', 'true' );
+		} );
+
+		it( 'should reset to the `initialPosition` value when clicking the reset button', () => {
+			const spy = jest.fn();
+			render(
+				<RangeControl
+					allowReset
+					initialPosition={ 23 }
+					onChange={ spy }
+				/>
+			);
+
+			const resetButton = getResetButton();
+			const rangeInput = getRangeInput();
+			const numberInput = getNumberInput();
+
+			fireChangeEvent( numberInput, '14' );
+
+			expect( rangeInput.value ).toBe( '14' );
+			expect( numberInput.value ).toBe( '14' );
+			expect( spy ).toHaveBeenCalledWith( 14 );
+
+			fireEvent.click( resetButton );
+
+			expect( rangeInput.value ).toBe( '23' );
+			expect( numberInput.value ).toBe( '23' );
+			expect( spy ).toHaveBeenCalledWith( undefined );
+
+			expect( resetButton ).toHaveAttribute( 'aria-disabled', 'true' );
+		} );
+
+		it( 'should reset to the `resetFallbackValue` value when clicking the reset button', () => {
 			const spy = jest.fn();
 			render(
 				<RangeControl
@@ -312,27 +377,8 @@ describe( 'RangeControl', () => {
 			expect( rangeInput.value ).toBe( '33' );
 			expect( numberInput.value ).toBe( '33' );
 			expect( spy ).toHaveBeenCalledWith( 33 );
-		} );
 
-		it( 'should reset to a 50% of min/max value, of no initialPosition or value is defined', () => {
-			render(
-				<RangeControl
-					initialPosition={ undefined }
-					min={ 0 }
-					max={ 100 }
-					allowReset
-					resetFallbackValue={ undefined }
-				/>
-			);
-
-			const resetButton = getResetButton();
-			const rangeInput = getRangeInput();
-			const numberInput = getNumberInput();
-
-			fireEvent.click( resetButton );
-
-			expect( rangeInput.value ).toBe( '50' );
-			expect( numberInput.value ).toBe( '' );
+			expect( resetButton ).toHaveAttribute( 'aria-disabled', 'true' );
 		} );
 	} );
 } );

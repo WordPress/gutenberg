@@ -233,6 +233,13 @@ export type RangeControlProps = Pick<
 		 * @default true
 		 */
 		withInputField?: boolean;
+		/**
+		 * Do not throw a warning for the deprecated 36px default size.
+		 * For internal components of other components that already throw the warning.
+		 *
+		 * @ignore
+		 */
+		__shouldNotWarnDeprecated36pxSize?: boolean;
 	};
 
 export type RailProps = MarksProps & {
@@ -262,9 +269,9 @@ export type ThumbProps = {
 
 export type TooltipProps = {
 	show?: boolean;
-	position?: string;
+	placement?: string;
 	inputRef?: MutableRefObject< HTMLElement | undefined >;
-	tooltipPosition?: string;
+	tooltipPlacement?: string;
 	value?: ControlledRangeValue;
 	renderTooltipContent?: (
 		value?: ControlledRangeValue

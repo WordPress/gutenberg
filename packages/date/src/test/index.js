@@ -608,7 +608,7 @@ describe( 'Moment.js Localization', () => {
 			},
 		} );
 
-		// Get the freshly changed setings.
+		// Get the freshly changed settings.
 		const newSettings = getSettings();
 
 		// Test the unchanged values.

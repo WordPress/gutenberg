@@ -12,7 +12,7 @@ import {
 /**
  * Internal dependencies
  */
-import editorStyles from '../editor-styles';
+import { editorStyles } from '../editor-styles';
 import './style.css';
 
 export default function EditorBox() {
@@ -37,7 +37,7 @@ export default function EditorBox() {
 				} }
 			>
 				<BlockToolbar hideDragHandle />
-				<BlockCanvas height="100%" styles={ editorStyles } />
+				<BlockCanvas height="500px" styles={ editorStyles } />
 			</BlockEditorProvider>
 		</div>
 	);

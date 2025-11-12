@@ -1,15 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
-import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { ComplementaryArea } from '@wordpress/interface';
-
-/**
- * Internal dependencies
- */
-import { store as editorStore } from '../../store';
 
 /**
  * Renders a sidebar when activated. The contents within the `PluginSidebar` will appear as content within the sidebar.
@@ -24,6 +16,7 @@ import { store as editorStore } from '../../store';
  *
  * @param {Object}                props                                 Element props.
  * @param {string}                props.name                            A string identifying the sidebar. Must be unique for every sidebar registered within the scope of your plugin.
+ * @param {React.ReactNode}       [props.children]                      Children to be rendered.
  * @param {string}                [props.className]                     An optional class name added to the sidebar body.
  * @param {string}                props.title                           Title displayed at the top of the sidebar.
  * @param {boolean}               [props.isPinnable=true]               Whether to allow to pin sidebar to the toolbar. When set to `true` it also automatically renders a corresponding menu item.
@@ -77,21 +70,11 @@ import { store as editorStore } from '../../store';
  * ```
  */
 export default function PluginSidebar( { className, ...props } ) {
-	const { postTitle, shortcut } = useSelect( ( select ) => {
-		return {
-			postTitle: select( editorStore ).getEditedPostAttribute( 'title' ),
-			shortcut: select(
-				keyboardShortcutsStore
-			).getShortcutRepresentation( 'core/editor/toggle-sidebar' ),
-		};
-	}, [] );
 	return (
 		<ComplementaryArea
 			panelClassName={ className }
 			className="editor-sidebar"
-			smallScreenTitle={ postTitle || __( '(no title)' ) }
 			scope="core"
-			toggleShortcut={ shortcut }
 			{ ...props }
 		/>
 	);

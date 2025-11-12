@@ -5,7 +5,6 @@ import { useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useDispatch } from '@wordpress/data';
-import { useAsyncList } from '@wordpress/compose';
 import { __experimentalBlockPatternsList as BlockPatternsList } from '@wordpress/block-editor';
 import {
 	SearchControl,
@@ -43,7 +42,6 @@ export default function TemplatePartSelectionModal( {
 
 		return searchPatterns( partsAsPatterns, searchValue );
 	}, [ templateParts, searchValue ] );
-	const shownTemplateParts = useAsyncList( filteredTemplateParts );
 	const blockPatterns = useAlternativeBlockPatterns( area, clientId );
 	const filteredBlockPatterns = useMemo( () => {
 		return searchPatterns( blockPatterns, searchValue );
@@ -80,7 +78,7 @@ export default function TemplatePartSelectionModal( {
 					__nextHasNoMarginBottom
 					onChange={ setSearchValue }
 					value={ searchValue }
-					label={ __( 'Search for replacements' ) }
+					label={ __( 'Search' ) }
 					placeholder={ __( 'Search' ) }
 				/>
 			</div>
@@ -89,7 +87,6 @@ export default function TemplatePartSelectionModal( {
 					<h2>{ __( 'Existing template parts' ) }</h2>
 					<BlockPatternsList
 						blockPatterns={ filteredTemplateParts }
-						shownPatterns={ shownTemplateParts }
 						onClickPattern={ ( pattern ) => {
 							onTemplatePartSelect( pattern.templatePart );
 						} }

@@ -15,13 +15,14 @@ import RadioControl from '..';
 
 const meta: Meta< typeof RadioControl > = {
 	component: RadioControl,
-	title: 'Components/RadioControl',
+	title: 'Components/Selection & Input/Common/RadioControl',
+	id: 'components-radiocontrol',
 	argTypes: {
 		onChange: {
 			action: 'onChange',
 		},
 		selected: {
-			control: { type: null },
+			control: false,
 		},
 		label: {
 			control: { type: 'text' },
@@ -66,5 +67,28 @@ Default.args = {
 		{ label: 'Public', value: 'public' },
 		{ label: 'Private', value: 'private' },
 		{ label: 'Password Protected', value: 'password' },
+	],
+};
+
+export const WithOptionDescriptions: StoryFn< typeof RadioControl > =
+	Template.bind( {} );
+WithOptionDescriptions.args = {
+	...Default.args,
+	options: [
+		{
+			label: 'Public',
+			value: 'public',
+			description: 'Visible to everyone',
+		},
+		{
+			label: 'Private',
+			value: 'private',
+			description: 'Only visible to you',
+		},
+		{
+			label: 'Password Protected',
+			value: 'password',
+			description: 'Protected by a password',
+		},
 	],
 };

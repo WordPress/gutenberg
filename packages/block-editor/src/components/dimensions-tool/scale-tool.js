@@ -105,6 +105,7 @@ export default function ScaleTool( {
 			panelId={ panelId }
 		>
 			<ToggleGroupControl
+				__nextHasNoMarginBottom
 				label={ __( 'Scale' ) }
 				isBlock
 				help={ scaleHelp[ displayValue ] }

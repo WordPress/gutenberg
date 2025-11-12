@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { render, screen } from '@testing-library/react';
-import { press, sleep } from '@ariakit/test';
+import { press } from '@ariakit/test';
 
 /**
  * Internal dependencies
@@ -57,6 +57,7 @@ describe( 'CircularOptionPicker', () => {
 
 			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
 			expect( screen.queryByRole( 'option' ) ).not.toBeInTheDocument();
+			expect( screen.getByRole( 'group' ) ).toBeInTheDocument();
 			expect( screen.getByRole( 'button' ) ).toBeInTheDocument();
 		} );
 	} );
@@ -70,7 +71,6 @@ describe( 'CircularOptionPicker', () => {
 				/>
 			);
 
-			await sleep();
 			await press.Tab();
 			expect( getOption( 'Option One' ) ).toHaveFocus();
 			await press.ArrowRight();
@@ -90,7 +90,6 @@ describe( 'CircularOptionPicker', () => {
 				/>
 			);
 
-			await sleep();
 			await press.Tab();
 			expect( getOption( 'Option One' ) ).toHaveFocus();
 			await press.ArrowRight();
@@ -110,7 +109,6 @@ describe( 'CircularOptionPicker', () => {
 				/>
 			);
 
-			await sleep();
 			await press.Tab();
 			expect( getOption( 'Option One' ) ).toHaveFocus();
 			await press.ArrowRight();
