@@ -271,12 +271,18 @@ export default function DocumentBar( props ) {
 									? stripHTML( title )
 									: __( 'No title' ) }
 							</span>
-							{ pageTypeBadge && (
+							{ unlockedPatternInfo && (
+								<span className="editor-document-bar__post-type-label">
+									{ `· ${ __( 'Pattern' ) }` }
+								</span>
+							) }
+							{ ! unlockedPatternInfo && pageTypeBadge && (
 								<span className="editor-document-bar__post-type-label">
 									{ `· ${ pageTypeBadge }` }
 								</span>
 							) }
-							{ postTypeLabel &&
+							{ ! unlockedPatternInfo &&
+								postTypeLabel &&
 								! props.title &&
 								! pageTypeBadge && (
 									<span className="editor-document-bar__post-type-label">
