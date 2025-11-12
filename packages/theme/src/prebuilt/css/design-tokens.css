@@ -127,6 +127,20 @@
 	--wpds-font-size-x-small: 11px; /* Extra small font size */
 }
 
+[data-wpds-theme-provider-id][data-wpds-density='compact'] {
+	--wpds-dimension-padding-surface-large: 16px; /* Large spacing for surfaces */
+	--wpds-dimension-padding-surface-medium: 12px; /* Medium spacing for surfaces */
+	--wpds-dimension-padding-surface-small: 8px; /* Small spacing for surfaces */
+	--wpds-dimension-padding-surface-x-small: 4px; /* Extra small spacing for surfaces */
+}
+
+[data-wpds-theme-provider-id][data-wpds-density='comfortable'] {
+	--wpds-dimension-padding-surface-large: 24px; /* Large spacing for surfaces */
+	--wpds-dimension-padding-surface-medium: 20px; /* Medium spacing for surfaces */
+	--wpds-dimension-padding-surface-small: 16px; /* Small spacing for surfaces */
+	--wpds-dimension-padding-surface-x-small: 12px; /* Extra small spacing for surfaces */
+}
+
 @media ( -webkit-min-device-pixel-ratio: 2 ), ( min-resolution: 192dpi ) {
 	:root {
 		--wpds-border-width-focus: 1.5px; /* Border width for focus ring */

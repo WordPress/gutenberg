@@ -23,6 +23,11 @@ export interface ThemeProviderSettings {
 		 */
 		bg?: string;
 	};
+
+	/**
+	 * The density of the theme.
+	 */
+	density?: 'compact' | 'comfortable';
 }
 
 export interface ThemeProviderProps extends ThemeProviderSettings {

@@ -41,6 +41,18 @@ export default defineConfig( {
 			baseSelector: ':root',
 			modeSelectors: [
 				{
+					mode: 'compact',
+					selectors: [
+						"[data-wpds-theme-provider-id][data-wpds-density='compact']",
+					],
+				},
+				{
+					mode: 'comfortable',
+					selectors: [
+						"[data-wpds-theme-provider-id][data-wpds-density='comfortable']",
+					],
+				},
+				{
 					mode: 'high-dpi',
 					selectors: [
 						'@media ( -webkit-min-device-pixel-ratio: 2 ), ( min-resolution: 192dpi )',

@@ -54,19 +54,43 @@
 				"surface": {
 					"x-small": {
 						"$value": "{dimension.primitive.space.20}",
-						"$description": "Extra small spacing for surfaces"
+						"$description": "Extra small spacing for surfaces",
+						"$extensions": {
+							"mode": {
+								"compact": "{dimension.primitive.space.10}",
+								"comfortable": "{dimension.primitive.space.30}"
+							}
+						}
 					},
 					"small": {
 						"$value": "{dimension.primitive.space.30}",
-						"$description": "Small spacing for surfaces"
+						"$description": "Small spacing for surfaces",
+						"$extensions": {
+							"mode": {
+								"compact": "{dimension.primitive.space.20}",
+								"comfortable": "{dimension.primitive.space.40}"
+							}
+						}
 					},
 					"medium": {
 						"$value": "{dimension.primitive.space.40}",
-						"$description": "Medium spacing for surfaces"
+						"$description": "Medium spacing for surfaces",
+						"$extensions": {
+							"mode": {
+								"compact": "{dimension.primitive.space.30}",
+								"comfortable": "{dimension.primitive.space.50}"
+							}
+						}
 					},
 					"large": {
 						"$value": "{dimension.primitive.space.60}",
-						"$description": "Large spacing for surfaces"
+						"$description": "Large spacing for surfaces",
+						"$extensions": {
+							"mode": {
+								"compact": "{dimension.primitive.space.40}",
+								"comfortable": "{dimension.primitive.space.60}"
+							}
+						}
 					}
 				}
 			}

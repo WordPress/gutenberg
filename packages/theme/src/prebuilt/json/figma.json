@@ -560,25 +560,33 @@
 	},
 	"Dimension/Semantic/padding-surface-x-small": {
 		"value": {
-			".": "8px"
+			".": "8px",
+			"compact": "4px",
+			"comfortable": "12px"
 		},
 		"description": "Extra small spacing for surfaces"
 	},
 	"Dimension/Semantic/padding-surface-small": {
 		"value": {
-			".": "12px"
+			".": "12px",
+			"compact": "8px",
+			"comfortable": "16px"
 		},
 		"description": "Small spacing for surfaces"
 	},
 	"Dimension/Semantic/padding-surface-medium": {
 		"value": {
-			".": "16px"
+			".": "16px",
+			"compact": "12px",
+			"comfortable": "20px"
 		},
 		"description": "Medium spacing for surfaces"
 	},
 	"Dimension/Semantic/padding-surface-large": {
 		"value": {
-			".": "24px"
+			".": "24px",
+			"compact": "16px",
+			"comfortable": "24px"
 		},
 		"description": "Large spacing for surfaces"
 	},
