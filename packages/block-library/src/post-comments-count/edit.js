@@ -57,6 +57,14 @@ export default function PostCommentsCountEdit( {
 			: undefined,
 	};
 
+	if ( ! postId ) {
+		return (
+			<div { ...blockProps }>
+				<p>0</p>
+			</div>
+		);
+	}
+
 	return (
 		<>
 			<BlockControls group="block">

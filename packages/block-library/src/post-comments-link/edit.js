@@ -59,6 +59,19 @@ function PostCommentsLinkEdit( { context, attributes, setAttributes } ) {
 		[ postType, postId ]
 	);
 
+	if ( ! postId ) {
+		return (
+			<div { ...blockProps }>
+				<a
+					href="#post-comments-link-pseudo-link"
+					onClick={ ( event ) => event.preventDefault() }
+				>
+					{ __( 'No comments' ) }
+				</a>
+			</div>
+		);
+	}
+
 	if ( ! post ) {
 		return (
 			<div { ...blockProps }>
