@@ -14,7 +14,7 @@ import {
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
 } from '@wordpress/components';
-import { BlockIcon } from '@wordpress/block-editor';
+import { BlockIcon, store as blockEditorStore } from '@wordpress/block-editor';
 import { chevronLeftSmall, chevronRightSmall, layout } from '@wordpress/icons';
 import { displayShortcut } from '@wordpress/keycodes';
 import { store as coreStore } from '@wordpress/core-data';
@@ -56,6 +56,44 @@ const MotionButton = motion.create( Button );
  * @return {React.ReactNode} The rendered DocumentBar component.
  */
 export default function DocumentBar( props ) {
+	// Get action to lock the pattern design
+	const { stopEditingContentOnlySection } = unlock(
+		useDispatch( blockEditorStore )
+	);
+
+	// Check if a pattern block is unlocked and being edited
+	const unlockedPatternInfo = useSelect( ( select ) => {
+		const { getBlockAttributes, __experimentalGetParsedPattern } =
+			select( blockEditorStore );
+		const { getEditedContentOnlySection } = unlock(
+			select( blockEditorStore )
+		);
+
+		// Get the clientId of the unlocked pattern/section
+		const editedSectionId = getEditedContentOnlySection();
+		if ( ! editedSectionId ) {
+			return null;
+		}
+
+		const attributes = getBlockAttributes( editedSectionId );
+		const patternName = attributes?.metadata?.patternName;
+
+		if ( ! patternName ) {
+			return null;
+		}
+
+		// Get pattern details if available
+		const pattern =
+			typeof __experimentalGetParsedPattern === 'function'
+				? __experimentalGetParsedPattern( patternName )
+				: null;
+
+		return {
+			patternName,
+			patternTitle: pattern?.title || attributes?.metadata?.name,
+		};
+	}, [] );
+
 	const {
 		postId,
 		postType,
@@ -133,10 +171,27 @@ export default function DocumentBar( props ) {
 	const isReducedMotion = useReducedMotion();
 
 	const isTemplate = TEMPLATE_POST_TYPES.includes( postType );
-	const hasBackButton = !! onNavigateToPreviousEntityRecord;
+	const hasBackButton =
+		!! onNavigateToPreviousEntityRecord || !! unlockedPatternInfo;
 	const entityTitle = isTemplate ? templateTitle : documentTitle;
-	const title = props.title || stylesCanvasTitle || entityTitle;
+
+	// Use pattern info if a pattern block is unlocked, otherwise use document/entity info
+	const title =
+		unlockedPatternInfo?.patternTitle ||
+		props.title ||
+		stylesCanvasTitle ||
+		entityTitle;
 	const icon = props.icon;
+
+	// Determine the back button action
+	const handleBackClick = ( event ) => {
+		event.stopPropagation();
+		if ( unlockedPatternInfo ) {
+			stopEditingContentOnlySection();
+		} else if ( onNavigateToPreviousEntityRecord ) {
+			onNavigateToPreviousEntityRecord();
+		}
+	};
 
 	const pageTypeBadge = usePageTypeBadge( postId );
 
@@ -156,10 +211,7 @@ export default function DocumentBar( props ) {
 					<MotionButton
 						className="editor-document-bar__back"
 						icon={ isRTL() ? chevronRightSmall : chevronLeftSmall }
-						onClick={ ( event ) => {
-							event.stopPropagation();
-							onNavigateToPreviousEntityRecord();
-						} }
+						onClick={ handleBackClick }
 						size="compact"
 						initial={
 							mountedRef.current
