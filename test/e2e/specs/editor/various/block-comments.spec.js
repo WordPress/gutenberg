@@ -676,7 +676,7 @@ test.describe( 'Block Comments', () => {
 					name: 'Note: Test comment',
 				} );
 			const addNewCommentButton = thread.getByRole( 'button', {
-				name: 'Add new note',
+				name: 'Add new reply',
 			} );
 			await thread.focus();
 			await page.keyboard.press( 'Tab' );
@@ -709,6 +709,7 @@ test.describe( 'Block Comments', () => {
 				} );
 			const replyButton = thread.getByRole( 'button', {
 				name: 'Reply',
+				exact: true,
 			} );
 			const backToBlockButton = thread.getByRole( 'button', {
 				name: 'Back to block',
