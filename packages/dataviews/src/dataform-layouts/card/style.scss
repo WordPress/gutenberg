@@ -2,8 +2,14 @@
 @use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/base-styles/mixins" as *;
 
-.dataforms-layouts-card__field-header-label {
-	@include heading-large();
+.dataforms-layouts-card__field-header {
+	&-label {
+		@include heading-large();
+	}
+
+	&-open {
+		padding-bottom: 0;
+	}
 }
 
 .dataforms-layouts-card__field {
