@@ -21,8 +21,8 @@ const meta: Meta< typeof Box > = {
 	title: 'Design System/Components/Box',
 	component: Box,
 	decorators: [
-		( Story ) => (
-			<ThemeProvider>
+		( Story, context ) => (
+			<ThemeProvider density={ context.globals.density }>
 				<Story />
 			</ThemeProvider>
 		),
@@ -53,14 +53,20 @@ export const Default: Story = {
 };
 
 export const DirectionalPadding: Story = {
+	...Default,
 	args: {
-		children: 'Box',
-		backgroundColor: 'info',
-		color: 'info',
+		...Default.args,
 		padding: {
 			blockStart: 'small',
 			inline: 'medium',
 			blockEnd: 'large',
 		},
+	},
+};
+
+export const Compact: Story = {
+	...Default,
+	globals: {
+		density: 'compact',
 	},
 };
