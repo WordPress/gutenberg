@@ -86,12 +86,11 @@ function ContextScreens( { name, parentMenu = '' }: ContextScreensProps ) {
 
 	return (
 		<>
-			<Navigator.Screen
-				className="global-styles-ui-sidebar__navigator-screen"
+			<GlobalStylesNavigationScreen
 				path={ parentMenu + '/colors/palette' }
 			>
 				<ScreenColorPalette name={ name } />
-			</Navigator.Screen>
+			</GlobalStylesNavigationScreen>
 
 			{ !! blockStyleVariations?.length && (
 				<BlockStylesNavigationScreens
