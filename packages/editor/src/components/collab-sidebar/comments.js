@@ -487,10 +487,8 @@ function Thread( {
 		// Don't close the thread if focus is moving to a dialog or within the thread.
 		// Check if the related target is within the current thread element or a dialog.
 		if (
-			event.currentTarget &&
-			( ! event.relatedTarget ||
-				( ! event.currentTarget.contains( event.relatedTarget ) &&
-					! event.relatedTarget.closest( '[role="dialog"]' ) ) )
+			! event.currentTarget.contains( event.relatedTarget ) &&
+			! event.relatedTarget.closest( '[role="dialog"]' )
 		) {
 			toggleBlockHighlight( thread.blockClientId, false );
 			unselectThread();
