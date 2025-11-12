@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/variables" as *;
+
 .color-block-support-panel {
 	.block-editor-contrast-checker {
 		grid-column: span 2;

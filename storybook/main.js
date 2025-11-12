@@ -76,6 +76,10 @@ module.exports = {
 				rules: [
 					...config.module.rules,
 					{
+						test: /\.md$/,
+						type: 'asset/source',
+					},
+					{
 						test: /\/stories\/.+\.story\.(j|t)sx?$/,
 						use: [
 							{

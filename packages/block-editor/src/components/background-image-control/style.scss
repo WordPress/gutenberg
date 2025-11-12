@@ -1,3 +1,7 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
 .block-editor-global-styles-background-panel__inspector-media-replace-container {
 	border: $border-width solid $gray-300;
 	border-radius: $radius-small;

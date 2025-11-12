@@ -79,7 +79,7 @@ test.describe( 'Site editor url navigation', () => {
 		await navigation.getByRole( 'button', { name: 'General' } ).click();
 		await page
 			.getByRole( 'region', {
-				name: 'Patterns content',
+				name: 'General',
 			} )
 			.getByText( 'header', { exact: true } )
 			.click();

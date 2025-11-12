@@ -6,6 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
+import { NavigableRegion } from '@wordpress/admin-ui';
 import {
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
@@ -47,7 +48,7 @@ import SaveHub from '../save-hub';
 import SavePanel from '../save-panel';
 
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
-const { NavigableRegion, GlobalStylesProvider } = unlock( editorPrivateApis );
+const { GlobalStylesProvider } = unlock( editorPrivateApis );
 const { useLocation } = unlock( routerPrivateApis );
 
 const ANIMATION_DURATION = 0.3;

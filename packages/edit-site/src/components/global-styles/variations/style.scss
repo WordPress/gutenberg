@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .edit-site-global-styles-variations_item {
 	box-sizing: border-box;
 	// To round the outline in Windows 10 high contrast mode.

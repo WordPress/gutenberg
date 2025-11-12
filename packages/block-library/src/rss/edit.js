@@ -20,7 +20,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { createInterpolateElement, useState } from '@wordpress/element';
-import { grid, list, edit, rss } from '@wordpress/icons';
+import { grid, list, pencil, rss } from '@wordpress/icons';
 import { __, _x } from '@wordpress/i18n';
 import { prependHTTP } from '@wordpress/url';
 import ServerSideRender from '@wordpress/server-side-render';
@@ -113,7 +113,7 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 
 	const toolbarControls = [
 		{
-			icon: edit,
+			icon: pencil,
 			title: __( 'Edit RSS URL' ),
 			onClick: () => setIsEditing( true ),
 		},

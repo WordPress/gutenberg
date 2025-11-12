@@ -1,4 +1,4 @@
-@import "./image/style.scss";
-@import "./link/style.scss";
-@import "./text-color/style.scss";
-@import "./language/style.scss";
+@use "./image/style.scss" as *;
+@use "./link/style.scss" as *;
+@use "./text-color/style.scss" as *;
+@use "./language/style.scss" as *;

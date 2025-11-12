@@ -10,7 +10,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { BlockControls, InspectorControls } from '@wordpress/block-editor';
-import { edit } from '@wordpress/icons';
+import { pencil } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -45,7 +45,7 @@ const EmbedControls = ( {
 						<ToolbarButton
 							className="components-toolbar__control"
 							label={ __( 'Edit URL' ) }
-							icon={ edit }
+							icon={ pencil }
 							onClick={ switchBackToURLInput }
 						/>
 					) }

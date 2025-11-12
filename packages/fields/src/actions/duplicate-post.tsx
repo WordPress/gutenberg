@@ -142,6 +142,13 @@ const duplicatePost: Action< BasePost > = {
 		return (
 			<form onSubmit={ createPage }>
 				<VStack spacing={ 3 }>
+					{ item.type === 'wp_registered_template' && (
+						<div>
+							{ __(
+								'You are about to duplicate a bundled template. Changes will not be live until you activate the new template.'
+							) }
+						</div>
+					) }
 					<DataForm
 						data={ item }
 						fields={ fields }

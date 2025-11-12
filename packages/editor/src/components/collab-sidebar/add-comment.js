@@ -1,59 +1,46 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { store as blockEditorStore } from '@wordpress/block-editor';
-import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
+import {
+	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
+import { focusCommentThread } from './utils';
 
-/**
- * Renders the UI for adding a comment in the Gutenberg editor's collaboration sidebar.
- *
- * @param {Object}   props                     - The component props.
- * @param {Function} props.onSubmit            - A callback function to be called when the user submits a comment.
- * @param {boolean}  props.showCommentBoard    - The function to edit the comment.
- * @param {Function} props.setShowCommentBoard - The function to delete the comment.
- * @return {React.ReactNode} The rendered comment input UI.
- */
+const { useBlockElement } = unlock( blockEditorPrivateApis );
+
 export function AddComment( {
 	onSubmit,
 	showCommentBoard,
 	setShowCommentBoard,
+	commentSidebarRef,
 } ) {
-	const { clientId, blockCommentId, isEmptyDefaultBlock } = useSelect(
-		( select ) => {
-			const { getSelectedBlock } = select( blockEditorStore );
-			const selectedBlock = getSelectedBlock();
-			return {
-				clientId: selectedBlock?.clientId,
-				blockCommentId: selectedBlock?.attributes?.metadata?.commentId,
-				isEmptyDefaultBlock: selectedBlock
-					? isUnmodifiedDefaultBlock( selectedBlock )
-					: false,
-			};
-		}
-	);
+	const { clientId, blockCommentId } = useSelect( ( select ) => {
+		const { getSelectedBlock } = select( blockEditorStore );
+		const selectedBlock = getSelectedBlock();
+		return {
+			clientId: selectedBlock?.clientId,
+			blockCommentId: selectedBlock?.attributes?.metadata?.noteId,
+		};
+	}, [] );
+	const blockElement = useBlockElement( clientId );
 
-	if (
-		! showCommentBoard ||
-		! clientId ||
-		undefined !== blockCommentId ||
-		isEmptyDefaultBlock
-	) {
+	if ( ! showCommentBoard || ! clientId || undefined !== blockCommentId ) {
 		return null;
 	}
-
-	const commentLabel = __( 'New Comment' );
 
 	return (
 		<VStack
@@ -66,14 +53,17 @@ export function AddComment( {
 				<CommentAuthorInfo />
 			</HStack>
 			<CommentForm
-				onSubmit={ ( inputComment ) => {
-					onSubmit( { content: inputComment } );
+				onSubmit={ async ( inputComment ) => {
+					const { id } = await onSubmit( { content: inputComment } );
+					focusCommentThread( id, commentSidebarRef.current );
+					setShowCommentBoard( false );
 				} }
 				onCancel={ () => {
 					setShowCommentBoard( false );
+					blockElement?.focus();
 				} }
-				submitButtonText={ _x( 'Comment', 'Add comment button' ) }
-				labelText={ commentLabel }
+				submitButtonText={ __( 'Add note' ) }
+				labelText={ __( 'New Note' ) }
 			/>
 		</VStack>
 	);

@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .dataviews-view-config {
 	width: 320px;
 	/* stylelint-disable-next-line property-no-unknown -- the linter needs to be updated to accepted the container-type property */

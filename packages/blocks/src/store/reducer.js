@@ -414,6 +414,7 @@ export function blockBindingsSources( state = {}, action ) {
 					canUserEditValue:
 						action.setValues && action.canUserEditValue,
 					getFieldsList,
+					editorUI: action.editorUI,
 				},
 			};
 		case 'REMOVE_BLOCK_BINDINGS_SOURCE':

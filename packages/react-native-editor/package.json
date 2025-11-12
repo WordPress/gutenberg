@@ -27,9 +27,15 @@
 		"npm": ">=8.19.2"
 	},
 	"main": "src/index.js",
+	"exports": {
+		".": {
+			"react-native": "./src/index",
+			"default": "./src/index.js"
+		},
+		"./package.json": "./package.json"
+	},
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "7.25.7",
 		"@react-native-clipboard/clipboard": "1.11.2",
 		"@react-native-community/blur": "4.2.0",
 		"@react-native-community/slider": "https://raw.githubusercontent.com/wordpress-mobile/react-native-slider/v3.0.2-wp-5/react-native-community-slider-3.0.2-wp-5.tgz",

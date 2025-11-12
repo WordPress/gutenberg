@@ -44,9 +44,32 @@ add_action( 'init', 'minimal_block_ca6eda___register_block' );
 
 _See the [full block example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/minimal-block-ca6eda) of the  [code above](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/minimal-block-ca6eda/plugin.php)_
 
+### PHP-only blocks with auto-registration
+
+For blocks that only need server-side rendering, you can register them exclusively in PHP using the [`auto_register`](/docs/reference-guides/block-api/block-supports.md#auto_register) flag and a `render_callback`. These blocks automatically appear in the editor without requiring any JavaScript registration or client-side code and use [dynamic rendering](/docs/getting-started/fundamentals/static-dynamic-rendering.md).
+
+```php
+register_block_type( 'my-plugin/server-block', array(
+	'render_callback' => function( $attributes ) {
+		$wrapper_attributes = get_block_wrapper_attributes();
+
+		return sprintf(
+			'<div %1$s>Server content</div>',
+			$wrapper_attributes
+		);
+	},
+	'supports' => array(
+		'auto_register' => true,
+		'color' => array(
+			'background' => true,
+		),
+	),
+) );
+```
+
 ## Registering a block with JavaScript (client-side)
 
-When the block has already been registered on the server, you only need to register the client-side settings in JavaScript using the [`registerBlockType`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-blocks/#registerblocktype) method from the `@wordpress/blocks` package. You just need to make sure you use the same block name as defined in the block's `block.json` file. Here's an example:
+When the block has already been registered on the server and unless using [PHP-only auto-registered blocks](#php-only-blocks-with-auto-registration), you only need to register the client-side settings in JavaScript using the [`registerBlockType`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-blocks/#registerblocktype) method from the `@wordpress/blocks` package. You just need to make sure you use the same block name as defined in the block's `block.json` file. Here's an example:
 
 ```js
 import { registerBlockType } from '@wordpress/blocks';

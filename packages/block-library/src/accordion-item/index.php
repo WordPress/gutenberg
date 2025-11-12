@@ -4,7 +4,7 @@
  * Server-side rendering of the `core/accordion-item` block.
  *
  * @package WordPress
- * @since 6.6.0
+ * @since 6.9.0
  *
  * @param array $attributes The block attributes.
  * @param string $content The block content.
@@ -61,7 +61,7 @@ function block_core_accordion_item_render( $attributes, $content ) {
 /**
  * Registers the `core/accordion-item` block on server.
  *
- * @since 6.6.0
+ * @since 6.9.0
  */
 function register_block_core_accordion_item() {
 	register_block_type_from_metadata(

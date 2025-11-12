@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/element",
-	"version": "6.32.0",
+	"version": "6.33.0",
 	"description": "Element React module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -25,12 +25,19 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.js",
+			"require": "./build/index.js"
+		},
+		"./package.json": "./package.json"
+	},
 	"react-native": "src/index",
 	"wpScript": true,
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "7.25.7",
 		"@types/react": "^18.2.79",
 		"@types/react-dom": "^18.2.25",
 		"@wordpress/escape-html": "file:../escape-html",

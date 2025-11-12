@@ -1,5 +1,64 @@
 # Gutenberg plugin releases
 
+## Quick Reference
+
+### Timeline
+
+-   Release RC1 on milestone date, generally Wednesday
+-   Release stable version, the following Wednesday
+
+### General Release Process
+
+#### Step 1: Setup
+
+-   Create a [release issue](https://github.com/WordPress/gutenberg/issues/new?template=New_release.md) using the template. This is optional but will help you go through the process step by step
+-   Review all PRs in the milestone and add proper labels (`[Type] Bug`, `[Type] Enhancement`, etc.)
+-   Test the changelog: `npm run other:changelog -- --milestone="Gutenberg X.Y"`
+
+#### Step 2: Build the Release
+
+-   Announce in [#core-editor](https://wordpress.slack.com/messages/C02QB2JS7) Slack channel
+-   Go to GitHub Actions → [Build Plugin Zip workflow](https://github.com/WordPress/gutenberg/actions/workflows/build-plugin-zip.yml)
+-   Keep the `Use workflow from` option set to `trunk` (default)
+-   Type `rc` for release candidate OR `stable` for final release
+-   Click `Run workflow`
+-   When the release draft is generated in [GitHub Releases](https://github.com/WordPress/gutenberg/releases), publish it for the workflow to continue
+-   For stable releases only: wait for team approval to upload to WordPress.org - this is the last step of the workflow for the plugin to be deployed to the plugin directory ([example](https://github.com/WordPress/gutenberg/actions/runs/18559811968))
+
+#### Step 3: Edit the Release Notes
+
+-   Find the draft in [GitHub Releases](https://github.com/WordPress/gutenberg/releases)
+-   Clean up the changelog: fix spelling, move miscategorized items, combine related PRs
+-   Remove mobile-only changes and reverted PRs
+
+#### Step 4: Write Release Post
+
+-   Use the [Google Doc template](https://docs.google.com/document/d/1D-MTOCmL9eMlP9TDTXqlzuKVOg_ghCPm9_whHFViqMk/edit)
+-   Highlight 3-5 key features from the release
+-   Publish on [make.wordpress.org/core](https://make.wordpress.org/core/) after stable release is live
+
+### Additional Release Candidates and Minor Versions (X.Y.Z)
+
+For urgent fixes after RC1 or critical bug fixes between major releases:
+
+#### Cherry-pick Bug Fixes
+
+-   For new RCs: Use PRs labeled `Backport to Gutenberg RC`
+-   For minor releases: Use PRs labeled `Backport to Gutenberg Minor Release`
+-   Checkout the appropriate release branch: `git checkout release/X.Y`
+-   Run: `npm run other:cherry-pick "[Label Name]"`
+-   Reassign PRs to correct milestone (e.g., from `12.6` to `12.5`) **before** running the workflow
+
+#### Run Release Workflow
+
+-   Go to [Build Plugin Zip workflow](https://github.com/WordPress/gutenberg/actions/workflows/build-plugin-zip.yml)
+-   Select the release branch from `Use workflow from` dropdown
+-   Continue with the steps 2-4 above
+
+---
+
+## Detailed Process
+
 The first step in releasing a stable version of the Gutenberg plugin is to [create an issue](https://github.com/WordPress/gutenberg/issues/new?template=New_release.md) in the Gutenberg repository. The issue template is called "Gutenberg Release," and it contains a checklist for the complete release process, from release candidate to changelog curation to cherry-picking, stable release, and release post. The issue for [Gutenberg 21.2](https://github.com/WordPress/gutenberg/issues/70662) is a good example.
 
 The checklist helps you coordinate with developers and other teams involved in the release process. It ensures that all of the necessary steps are completed and that everyone is aware of the schedule and important milestones.
@@ -219,11 +278,11 @@ This has happened occasionally, see [this one](https://github.com/WordPress/gute
 
 It's important to check that:
 
-- the plugin from the directory works as expected
-- the ZIP contents (see [Downloads](https://plugins.trac.wordpress.org/browser/gutenberg/)) looks correct (doesn't have anything obvious missing)
-- the [Gutenberg SVN repo](https://plugins.trac.wordpress.org/browser/gutenberg/) has two new commits (see [the log](https://plugins.trac.wordpress.org/browser/gutenberg/)):
-  - the `trunk` folder should have "Committing version X.Y.Z"
-  - there is a new `tags/X.Y.Z` folder with the same contents as `trunk` whose latest commit is "Tagging version X.Y.Z"
+-   the plugin from the directory works as expected
+-   the ZIP contents (see [Downloads](https://plugins.trac.wordpress.org/browser/gutenberg/)) looks correct (doesn't have anything obvious missing)
+-   the [Gutenberg SVN repo](https://plugins.trac.wordpress.org/browser/gutenberg/) has two new commits (see [the log](https://plugins.trac.wordpress.org/browser/gutenberg/)):
+    -   the `trunk` folder should have "Committing version X.Y.Z"
+    -   there is a new `tags/X.Y.Z` folder with the same contents as `trunk` whose latest commit is "Tagging version X.Y.Z"
 
 Most likely, the tag folder couldn't be created. This is a [known issue](https://github.com/WordPress/gutenberg/issues/55295) that [can be fixed manually](https://github.com/WordPress/gutenberg/issues/55295#issuecomment-1759292978).
 

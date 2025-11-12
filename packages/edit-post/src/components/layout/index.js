@@ -6,6 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
+import { NavigableRegion } from '@wordpress/admin-ui';
 import {
 	AutosaveMonitor,
 	LocalAutosaveMonitor,
@@ -76,7 +77,7 @@ import { useMetaBoxInitialization } from '../meta-boxes/use-meta-box-initializat
 
 const { getLayoutStyles } = unlock( blockEditorPrivateApis );
 const { useCommandContext } = unlock( commandsPrivateApis );
-const { Editor, FullscreenMode, NavigableRegion } = unlock( editorPrivateApis );
+const { Editor, FullscreenMode } = unlock( editorPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 const DESIGN_POST_TYPES = [
 	'wp_template',
@@ -265,7 +266,7 @@ function MetaBoxesMain( { isLegacy } ) {
 		<div
 			// The class name 'edit-post-layout__metaboxes' is retained because some plugins use it.
 			className="edit-post-layout__metaboxes edit-post-meta-boxes-main__liner"
-			hidden={ ! isOpen }
+			hidden={ ! isLegacy && ! isOpen }
 		>
 			<MetaBoxes location="normal" />
 			<MetaBoxes location="advanced" />
@@ -518,17 +519,6 @@ function Layout( {
 
 	useMetaBoxInitialization( hasActiveMetaboxes && hasResolvedMode );
 
-	const editableResolvedTemplateId = useSelect(
-		( select ) => {
-			if ( typeof templateId !== 'string' ) {
-				return templateId;
-			}
-			return unlock( select( coreStore ) ).getTemplateAutoDraftId(
-				templateId
-			);
-		},
-		[ templateId ]
-	);
 	const [ paddingAppenderRef, paddingStyle ] = usePaddingAppender(
 		enablePaddingAppender
 	);
@@ -652,7 +642,7 @@ function Layout( {
 						initialEdits={ initialEdits }
 						postType={ currentPostType }
 						postId={ currentPostId }
-						templateId={ editableResolvedTemplateId }
+						templateId={ templateId }
 						className={ className }
 						styles={ styles }
 						forceIsDirty={ hasActiveMetaboxes }

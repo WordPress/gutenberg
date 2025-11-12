@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .edit-site-sidebar-navigation-screen-patterns__group {
 	margin-bottom: $grid-unit-30;
 	margin-left: -$grid-unit-20;

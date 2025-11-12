@@ -1,0 +1,12 @@
+[
+	{
+		"name": "core/missing",
+		"isValid": true,
+		"attributes": {
+			"originalName": "core/breadcrumbs",
+			"originalUndelimitedContent": "",
+			"originalContent": "<!-- wp:breadcrumbs /-->"
+		},
+		"innerBlocks": []
+	}
+]

@@ -84,6 +84,16 @@ $wrapper_attributes = get_block_wrapper_attributes();
 		<?php echo $content; ?>
 	</div>
 
+	<!-- Flag to check whether hydration has occurred. -->
+	<div
+		data-testid="hydrated"
+		data-wp-interactive="test/router-styles"
+		data-wp-bind--hidden="state.undefined"
+		hidden
+	>
+		Hydrated
+	</div>
+
 	<!-- Text to check whether a navigation was client-side. -->
 	<div
 		data-testid="client-side navigation"

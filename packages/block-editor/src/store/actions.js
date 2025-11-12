@@ -202,8 +202,8 @@ export function updateBlock( clientId, updates ) {
  * reflects a reverse selection.
  *
  * @param {string}    clientId        Block client ID.
- * @param {0|-1|null} initialPosition Optional initial position. Pass as -1 to
- *                                    reflect reverse selection.
+ * @param {0|-1|null} initialPosition Optional initial position. Pass -1 to reflect reverse selection
+ *                                    or `null` to prevent focusing the block.
  *
  * @return {Object} Action object.
  */
@@ -1663,19 +1663,6 @@ export const __unstableMarkAutomaticChange =
 		requestIdleCallback( () => {
 			dispatch( { type: 'MARK_AUTOMATIC_CHANGE_FINAL' } );
 		} );
-	};
-
-/**
- * Action that enables or disables the navigation mode.
- *
- * @param {boolean} isNavigationMode Enable/Disable navigation mode.
- */
-export const setNavigationMode =
-	( isNavigationMode = true ) =>
-	( { dispatch } ) => {
-		dispatch.__unstableSetEditorMode(
-			isNavigationMode ? 'navigation' : 'edit'
-		);
 	};
 
 /**

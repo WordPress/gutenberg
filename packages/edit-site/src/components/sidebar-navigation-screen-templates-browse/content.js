@@ -73,7 +73,13 @@ export default function DataviewsTemplatesSidebarContent() {
 				icon={ layout }
 				aria-current={ activeView === 'user' }
 			>
-				{ __( 'Custom templates' ) }
+				{
+					// Let's avoid calling them "custom templates" to avoid
+					// confusion. "Created" is closest to meaning database
+					// templates, created by users.
+					// https://developer.wordpress.org/themes/classic-themes/templates/page-template-files/#creating-custom-page-templates-for-global-use
+					__( 'Created templates' )
+				}
 			</SidebarNavigationItem>
 			{ firstItemPerAuthorText.map( ( template ) => {
 				return (

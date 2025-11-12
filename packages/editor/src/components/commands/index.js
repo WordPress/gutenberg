@@ -8,7 +8,7 @@ import {
 	code,
 	drawerLeft,
 	drawerRight,
-	edit,
+	pencil,
 	formatListBullets,
 	listView,
 	external,
@@ -293,7 +293,7 @@ const getEditedEntityContextualCommands = () =>
 			commands.push( {
 				name: 'core/rename-pattern',
 				label: __( 'Rename pattern' ),
-				icon: edit,
+				icon: pencil,
 				callback: ( { close } ) => {
 					openModal( patternRenameModalName );
 					close();

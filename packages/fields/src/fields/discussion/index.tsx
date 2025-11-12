@@ -28,6 +28,7 @@ const discussionField: Field< BasePost > = {
 		}
 		return __( 'Closed' );
 	},
+	filterBy: false,
 };
 
 /**

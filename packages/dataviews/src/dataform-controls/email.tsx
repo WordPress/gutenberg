@@ -18,6 +18,7 @@ export default function Email< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	validity,
 }: DataFormControlProps< Item > ) {
 	return (
 		<ValidatedText
@@ -26,6 +27,7 @@ export default function Email< Item >( {
 				field,
 				onChange,
 				hideLabelFromVision,
+				validity,
 				type: 'email',
 				prefix: (
 					<InputControlPrefixWrapper variant="icon">

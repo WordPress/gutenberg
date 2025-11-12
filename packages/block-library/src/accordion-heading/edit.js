@@ -7,6 +7,8 @@ import {
 	useBlockProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 	RichText,
+	getTypographyClassesAndStyles as useTypographyProps,
+	useSettings,
 } from '@wordpress/block-editor';
 
 export default function Edit( { attributes, setAttributes, context } ) {
@@ -28,6 +30,19 @@ export default function Edit( { attributes, setAttributes, context } ) {
 		}
 	}, [ iconPosition, showIcon, setAttributes ] );
 
+	const [ fluidTypographySettings, layout ] = useSettings(
+		'typography.fluid',
+		'layout'
+	);
+	const typographyProps = useTypographyProps( attributes, {
+		typography: {
+			fluid: fluidTypographySettings,
+		},
+		layout: {
+			wideSize: layout?.wideSize,
+		},
+	} );
+
 	const blockProps = useBlockProps();
 	const spacingProps = useSpacingProps( attributes );
 
@@ -36,6 +51,7 @@ export default function Edit( { attributes, setAttributes, context } ) {
 			<button
 				className="wp-block-accordion-heading__toggle"
 				style={ spacingProps.style }
+				tabIndex="-1"
 			>
 				{ showIcon && iconPosition === 'left' && (
 					<span
@@ -55,6 +71,10 @@ export default function Edit( { attributes, setAttributes, context } ) {
 					}
 					placeholder={ __( 'Accordion title' ) }
 					className="wp-block-accordion-heading__toggle-title"
+					style={ {
+						letterSpacing: typographyProps.style.letterSpacing,
+						textDecoration: typographyProps.style.textDecoration,
+					} }
 				/>
 				{ showIcon && iconPosition === 'right' && (
 					<span

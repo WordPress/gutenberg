@@ -17,7 +17,6 @@ import {
 	useBlockProps,
 	HeadingLevelDropdown,
 	useBlockEditingMode,
-	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	ToggleControl,
@@ -38,11 +37,9 @@ export default function SiteTitleEdit( {
 	insertBlocksAfter,
 } ) {
 	const { level, levelOptions, textAlign, isLink, linkTarget } = attributes;
-	const { canUserEdit, title, isNavigationMode } = useSelect( ( select ) => {
+	const { canUserEdit, title } = useSelect( ( select ) => {
 		const { canUser, getEntityRecord, getEditedEntityRecord } =
 			select( coreStore );
-		const { isNavigationMode: _isNavigationMode } =
-			select( blockEditorStore );
 		const canEdit = canUser( 'update', {
 			kind: 'root',
 			name: 'site',
@@ -53,7 +50,6 @@ export default function SiteTitleEdit( {
 		return {
 			canUserEdit: canEdit,
 			title: canEdit ? settings?.title : readOnlySettings?.name,
-			isNavigationMode: _isNavigationMode(),
 		};
 	}, [] );
 	const { editEntityRecord } = useDispatch( coreStore );
@@ -109,7 +105,7 @@ export default function SiteTitleEdit( {
 	);
 	return (
 		<>
-			{ ! isNavigationMode && blockEditingMode === 'default' && (
+			{ blockEditingMode === 'default' && (
 				<BlockControls group="block">
 					<HeadingLevelDropdown
 						value={ level }

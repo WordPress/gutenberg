@@ -12,172 +12,38 @@
 function gutenberg_reregister_core_block_types() {
 	// Blocks directory may not exist if working from a fresh clone.
 	$blocks_dirs = array(
-		__DIR__ . '/../build/block-library/blocks/' => array(
-			'block_folders' => array(
-				'accordion-heading',
-				'accordion-panel',
-				'audio',
-				'button',
-				'buttons',
-				'freeform',
-				'code',
-				'column',
-				'columns',
-				'details',
-				'form-input',
-				'form-submit-button',
-				'group',
-				'html',
-				'list-item',
-				'missing',
-				'more',
-				'nextpage',
-				'paragraph',
-				'preformatted',
-				'pullquote',
-				'quote',
-				'separator',
-				'social-links',
-				'spacer',
-				'table',
-				'table-of-contents',
-				'text-columns',
-				'verse',
-				'embed',
-			),
-			'block_names'   => array(
-				'accordion-item.php'               => 'core/accordion-item',
-				'accordion.php'                    => 'core/accordion',
-				'archives.php'                     => 'core/archives',
-				'avatar.php'                       => 'core/avatar',
-				'block.php'                        => 'core/block',
-				'button.php'                       => 'core/button',
-				'calendar.php'                     => 'core/calendar',
-				'categories.php'                   => 'core/categories',
-				'cover.php'                        => 'core/cover',
-				'comment-author-avatar.php'        => 'core/comment-author-avatar',
-				'comment-author-name.php'          => 'core/comment-author-name',
-				'comment-content.php'              => 'core/comment-content',
-				'comment-date.php'                 => 'core/comment-date',
-				'comment-edit-link.php'            => 'core/comment-edit-link',
-				'comment-reply-link.php'           => 'core/comment-reply-link',
-				'comment-template.php'             => 'core/comment-template',
-				'comments-pagination.php'          => 'core/comments-pagination',
-				'comments-pagination-next.php'     => 'core/comments-pagination-next',
-				'comments-pagination-numbers.php'  => 'core/comments-pagination-numbers',
-				'comments-pagination-previous.php' => 'core/comments-pagination-previous',
-				'comments-title.php'               => 'core/comments-title',
-				'comments.php'                     => 'core/comments',
-				'footnotes.php'                    => 'core/footnotes',
-				'file.php'                         => 'core/file',
-				'form.php'                         => 'core/form',
-				'form-input.php'                   => 'core/form-input',
-				'form-submission-notification.php' => 'core/form-submission-notification',
-				'home-link.php'                    => 'core/home-link',
-				'image.php'                        => 'core/image',
-				'gallery.php'                      => 'core/gallery',
-				'heading.php'                      => 'core/heading',
-				'latest-comments.php'              => 'core/latest-comments',
-				'latest-posts.php'                 => 'core/latest-posts',
-				'list.php'                         => 'core/list',
-				'loginout.php'                     => 'core/loginout',
-				'media-text.php'                   => 'core/media-text',
-				'navigation.php'                   => 'core/navigation',
-				'navigation-link.php'              => 'core/navigation-link',
-				'navigation-submenu.php'           => 'core/navigation-submenu',
-				'page-list.php'                    => 'core/page-list',
-				'page-list-item.php'               => 'core/page-list-item',
-				'pattern.php'                      => 'core/pattern',
-				'post-author.php'                  => 'core/post-author',
-				'post-author-name.php'             => 'core/post-author-name',
-				'post-author-biography.php'        => 'core/post-author-biography',
-				'post-comment.php'                 => 'core/post-comment',
-				'post-comments-count.php'          => 'core/post-comments-count',
-				'post-comments-form.php'           => 'core/post-comments-form',
-				'post-comments-link.php'           => 'core/post-comments-link',
-				'post-content.php'                 => 'core/post-content',
-				'post-date.php'                    => 'core/post-date',
-				'post-excerpt.php'                 => 'core/post-excerpt',
-				'post-featured-image.php'          => 'core/post-featured-image',
-				'post-navigation-link.php'         => 'core/post-navigation-link',
-				'post-terms.php'                   => 'core/post-terms',
-				'post-time-to-read.php'            => 'core/post-time-to-read',
-				'post-title.php'                   => 'core/post-title',
-				'query.php'                        => 'core/query',
-				'post-template.php'                => 'core/post-template',
-				'query-no-results.php'             => 'core/query-no-results',
-				'query-pagination.php'             => 'core/query-pagination',
-				'query-pagination-next.php'        => 'core/query-pagination-next',
-				'query-pagination-numbers.php'     => 'core/query-pagination-numbers',
-				'query-pagination-previous.php'    => 'core/query-pagination-previous',
-				'query-title.php'                  => 'core/query-title',
-				'query-total.php'                  => 'core/query-total',
-				'read-more.php'                    => 'core/read-more',
-				'rss.php'                          => 'core/rss',
-				'search.php'                       => 'core/search',
-				'shortcode.php'                    => 'core/shortcode',
-				'social-link.php'                  => 'core/social-link',
-				'site-logo.php'                    => 'core/site-logo',
-				'site-tagline.php'                 => 'core/site-tagline',
-				'site-title.php'                   => 'core/site-title',
-				'table-of-contents.php'            => 'core/table-of-contents',
-				'tag-cloud.php'                    => 'core/tag-cloud',
-				'template-part.php'                => 'core/template-part',
-				'term-description.php'             => 'core/term-description',
-				'terms-query.php'                  => 'core/terms-query',
-				'term-template.php'                => 'core/term-template',
-				'video.php'                        => 'core/video',
-			),
-		),
-		__DIR__ . '/../build/edit-widgets/blocks/'  => array(
-			'block_folders' => array(
-				'widget-area',
-			),
-			'block_names'   => array(),
-		),
-		__DIR__ . '/../build/widgets/blocks/'       => array(
-			'block_folders' => array(
-				'legacy-widget',
-				'widget-group',
-			),
-			'block_names'   => array(
-				'legacy-widget.php' => 'core/legacy-widget',
-				'widget-group.php'  => 'core/widget-group',
-			),
-		),
+		__DIR__ . '/../build/block-library/',
+		__DIR__ . '/../build/edit-widgets/blocks/',
+		__DIR__ . '/../build/widgets/blocks/',
 	);
-	foreach ( $blocks_dirs as $blocks_dir => $details ) {
-		$block_folders = $details['block_folders'];
-		$block_names   = $details['block_names'];
 
-		foreach ( $block_folders as $folder_name ) {
-			$block_json_file = $blocks_dir . $folder_name . '/block.json';
-
-			// Ideally, all paths to block metadata files should be listed in
-			// WordPress core. In this place we should rather use filter
-			// to replace paths with overrides defined by the plugin.
-			$metadata = json_decode( file_get_contents( $block_json_file ), true );
-			if ( ! is_array( $metadata ) || ! $metadata['name'] ) {
-				continue;
-			}
-
-			gutenberg_deregister_core_block_and_assets( $metadata['name'] );
-			gutenberg_register_core_block_assets( $folder_name );
-			register_block_type_from_metadata( $block_json_file );
+	foreach ( $blocks_dirs as $blocks_dir ) {
+		if ( ! is_dir( $blocks_dir ) ) {
+			continue;
 		}
 
-		foreach ( $block_names as $file => $sub_block_names ) {
-			if ( ! file_exists( $blocks_dir . $file ) ) {
+		// Scan for block directories (those with block.json).
+		$block_json_files = glob( $blocks_dir . '*/block.json' );
+
+		foreach ( $block_json_files as $block_json_file ) {
+			$block_folder      = dirname( $block_json_file );
+			$block_name_folder = basename( $block_folder );
+
+			// Read block.json to get block name.
+			$metadata = json_decode( file_get_contents( $block_json_file ), true );
+			if ( ! is_array( $metadata ) || ! isset( $metadata['name'] ) ) {
 				continue;
 			}
 
-			$sub_block_names_normalized = is_string( $sub_block_names ) ? array( $sub_block_names ) : $sub_block_names;
-			foreach ( $sub_block_names_normalized as $block_name ) {
-				gutenberg_deregister_core_block_and_assets( $block_name );
-				gutenberg_register_core_block_assets( $block_name );
+			// Deregister core version.
+			gutenberg_deregister_core_block_and_assets( $metadata['name'] );
+			gutenberg_register_core_block_assets( $block_name_folder );
+			$php_file = dirname( $block_folder ) . '/' . $block_name_folder . '.php';
+			if ( file_exists( $php_file ) ) {
+				require_once $php_file;
+			} else {
+				register_block_type_from_metadata( $block_json_file );
 			}
-
-			require_once $blocks_dir . $file;
 		}
 	}
 }
@@ -258,11 +124,12 @@ function gutenberg_register_core_block_assets( $block_name ) {
 	// else (for development or test) default to use the current time.
 	$default_version = defined( 'GUTENBERG_VERSION' ) && ! SCRIPT_DEBUG ? GUTENBERG_VERSION : time();
 
-	$style_path      = "build/block-library/blocks/$block_name/";
+	$style_path      = "build/block-library/$block_name/";
 	$stylesheet_url  = gutenberg_url( $style_path . 'style.css' );
 	$stylesheet_path = gutenberg_dir_path() . $style_path . ( is_rtl() ? 'style-rtl.css' : 'style.css' );
 
 	if ( file_exists( $stylesheet_path ) ) {
+
 		wp_deregister_style( "wp-block-{$block_name}" );
 		wp_register_style(
 			"wp-block-{$block_name}",
@@ -271,7 +138,6 @@ function gutenberg_register_core_block_assets( $block_name ) {
 			$default_version
 		);
 		wp_style_add_data( "wp-block-{$block_name}", 'rtl', 'replace' );
-
 		// Add a reference to the stylesheet's path to allow calculations for inlining styles in `wp_head`.
 		wp_style_add_data( "wp-block-{$block_name}", 'path', $stylesheet_path );
 	} else {
@@ -286,8 +152,8 @@ function gutenberg_register_core_block_assets( $block_name ) {
 
 		// Get the path to the block's stylesheet.
 		$theme_style_path = is_rtl()
-			? "build/block-library/blocks/$block_name/theme-rtl.css"
-			: "build/block-library/blocks/$block_name/theme.css";
+			? "build/block-library/$block_name/theme-rtl.css"
+			: "build/block-library/$block_name/theme.css";
 
 		// If the file exists, enqueue it.
 		if ( file_exists( gutenberg_dir_path() . $theme_style_path ) ) {
@@ -302,7 +168,7 @@ function gutenberg_register_core_block_assets( $block_name ) {
 		}
 	}
 
-	$editor_style_path = "build/block-library/blocks/$block_name/style-editor.css";
+	$editor_style_path = "build/block-library/$block_name/style-editor.css";
 	if ( file_exists( gutenberg_dir_path() . $editor_style_path ) ) {
 		wp_deregister_style( "wp-block-{$block_name}-editor" );
 		wp_register_style(

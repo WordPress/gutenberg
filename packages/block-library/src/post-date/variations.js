@@ -14,16 +14,21 @@ const variations = [
 				bindings: {
 					datetime: {
 						source: 'core/post-data',
-						args: { key: 'date' },
+						args: { field: 'date' },
 					},
 				},
 			},
 		},
 		scope: [ 'block', 'inserter', 'transform' ],
-		isActive: ( blockAttributes ) =>
-			blockAttributes?.metadata?.bindings?.datetime?.source ===
-				'core/post-data' &&
-			blockAttributes?.metadata?.bindings?.datetime?.args?.key === 'date',
+		isActive: ( blockAttributes ) => {
+			const fieldValue =
+				blockAttributes?.metadata?.bindings?.datetime?.args?.field ||
+				blockAttributes?.metadata?.bindings?.datetime?.args?.key;
+			return (
+				blockAttributes?.metadata?.bindings?.datetime?.source ===
+					'core/post-data' && fieldValue === 'date'
+			);
+		},
 		icon: postDate,
 	},
 	{
@@ -35,18 +40,22 @@ const variations = [
 				bindings: {
 					datetime: {
 						source: 'core/post-data',
-						args: { key: 'modified' },
+						args: { field: 'modified' },
 					},
 				},
 			},
 			className: 'wp-block-post-date__modified-date',
 		},
 		scope: [ 'block', 'inserter', 'transform' ],
-		isActive: ( blockAttributes ) =>
-			blockAttributes?.metadata?.bindings?.datetime?.source ===
-				'core/post-data' &&
-			blockAttributes?.metadata?.bindings?.datetime?.args?.key ===
-				'modified',
+		isActive: ( blockAttributes ) => {
+			const fieldValue =
+				blockAttributes?.metadata?.bindings?.datetime?.args?.field ||
+				blockAttributes?.metadata?.bindings?.datetime?.args?.key;
+			return (
+				blockAttributes?.metadata?.bindings?.datetime?.source ===
+					'core/post-data' && fieldValue === 'modified'
+			);
+		},
 		icon: postDate,
 	},
 ];

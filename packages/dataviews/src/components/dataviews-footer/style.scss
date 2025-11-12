@@ -1,3 +1,7 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
 .dataviews-footer {
 	position: sticky;
 	bottom: 0;

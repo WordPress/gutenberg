@@ -36,7 +36,7 @@ import type {
 	ViewTable as ViewTableType,
 	ViewTableProps,
 } from '../../types';
-import type { SetSelection } from '../../private-types';
+import type { SetSelection } from '../../types/private';
 import ColumnHeaderMenu from './column-header-menu';
 import ColumnPrimary from './column-primary';
 import { useIsHorizontalScrollEnd } from './use-is-horizontal-scroll-end';

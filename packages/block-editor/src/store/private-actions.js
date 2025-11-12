@@ -484,3 +484,18 @@ export function resetZoomLevel() {
 		type: 'RESET_ZOOM_LEVEL',
 	};
 }
+
+/**
+ * Action that toggles the spotlighted block state.
+ *
+ * @param {string}  clientId          The block's clientId.
+ * @param {boolean} hasBlockSpotlight The spotlight state.
+ * @return {Object} Action object.
+ */
+export function toggleBlockSpotlight( clientId, hasBlockSpotlight ) {
+	return {
+		type: 'TOGGLE_BLOCK_SPOTLIGHT',
+		clientId,
+		hasBlockSpotlight,
+	};
+}

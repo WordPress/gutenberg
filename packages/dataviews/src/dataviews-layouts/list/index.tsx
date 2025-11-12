@@ -108,7 +108,6 @@ function PrimaryActionGridCell< Item >( {
 						disabled={ !! primaryAction.disabled }
 						accessibleWhenDisabled
 						icon={ primaryAction.icon }
-						isDestructive={ primaryAction.isDestructive }
 						size="small"
 						onClick={ () => setIsModalOpen( true ) }
 					/>
@@ -133,7 +132,6 @@ function PrimaryActionGridCell< Item >( {
 						disabled={ !! primaryAction.disabled }
 						accessibleWhenDisabled
 						icon={ primaryAction.icon }
-						isDestructive={ primaryAction.isDestructive }
 						size="small"
 						onClick={ () => {
 							primaryAction.callback( [ item ], { registry } );

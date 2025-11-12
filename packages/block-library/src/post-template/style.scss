@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/breakpoints" as *;
+@use "@wordpress/base-styles/mixins" as *;
+
 .wp-block-post-template {
 	margin-top: 0;
 	margin-bottom: 0;

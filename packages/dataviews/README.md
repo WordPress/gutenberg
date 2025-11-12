@@ -318,7 +318,6 @@ const actions = [
 	{
 		id: 'delete',
 		label: 'Delete',
-		isDestructive: true,
 		supportsBulk: true,
 		RenderModal: ( { items, closeModal, onActionPerformed } ) => (
 			<div>
@@ -643,7 +642,7 @@ Example:
 const form = {
 	layout: {
 		type: 'panel',
-		labelPosition: 'side'
+		labelPosition: 'side',
 	},
 	fields: [
 		'title',
@@ -698,6 +697,54 @@ return (
 );
 ```
 
+### validity
+
+Object that determines the validation status of each field. There's a `useFormValidity` hook that can be used to create the validity object — see the utility below. This section documents the `validity` object in case you want to create it via other means.
+
+The top-level props of the `validity` object are the field IDs. Fields declare their validity status for each of the validation rules supported: `required`, `elements`, `custom`. If a rule is valid, it should not be present in the object; if a field is valid for all the rules, it should not be present in the object either.
+
+For example:
+
+```json
+{
+  "title": {
+    "required": {
+      "type": "invalid"
+    }
+  },
+  "author": {
+    "elements": {
+      "type": "invalid",
+      "message": "Value must be one of the elements."
+    }
+  },
+  "publisher": {
+    "custom": {
+      "type": "validating",
+      "message": "Validating..."
+    }
+  },
+  "isbn": {
+    "custom": {
+      "type": "valid",
+      "message": "Valid."
+    }
+  }
+}
+```
+
+Each rule, can have a `type` and a `message`.
+
+The `message` is the text to be displayed in the UI controls. The message for the `required` rule is optional, and the built-in browser message will be used if not provided.
+
+The `type` can be:
+
+- `validating`: when the value is being validated (e.g., custom async rule)
+- `invalid`: when the value is invalid according to the rule
+- `valid`: when the value _became_ valid after having been invalid (e.g., custom async rule)
+
+Note the `valid` status. This is useful for displaying a "Valid." message when the field transitions from invalid to valid.  The `useFormValidity` hook implements this only for the custom async validation.
+
 ## Utilities
 
 ### `filterSortAndPaginate`
@@ -717,17 +764,39 @@ Returns an object containing:
     -   `totalItems`: total number of items for the current view config.
     -   `totalPages`: total number of pages for the current view config.
 
-### `isItemValid`
+### `useFormValidity`
 
-Utility is used to determine whether or not the given item's value is valid according to the current fields and form configuration.
+Hook to determine the form validation status.
 
 Parameters:
 
--   `item`: the item, as described in the "data" property of DataForm.
--   `fields`: the fields config, as described in the "fields" property of DataForm.
--   `form`: the form config, as described in the "form" property of DataForm.
+-   `item`: the item being edited.
+-   `fields`: the fields config, as described in the "fields" property of DataViews.
+-   `form`: the form config, as described in the "form" property of DataViews.
 
-Returns a boolean indicating if the item is valid (true) or not (false).
+Returns an object containing:
+
+-   `isValid`: a boolean indicating if the form is valid.
+-   `validity`: an object containing the errors. Each property is a field ID, containing a description of each error type. See `validity` prop for more info. For example:
+
+```js
+{
+	fieldId: {
+		required: {
+			type: 'invalid',
+			message: 'Required.' // Optional
+		},
+		elements: {
+			type: 'invalid',
+			message: 'Value must be one of the elements.' // Optional
+		},
+		custom: {
+			type: 'validating',
+			message: 'Validating...'
+		}
+	}
+}
+```
 
 ## Actions API
 
@@ -788,13 +857,6 @@ Function that determines whether the action can be performed for a given record.
 	isEligible: ( item ) => item.status === 'published';
 }
 ```
-
-### `isDestructive`
-
-Whether the action can delete data, in which case the UI communicates it via a red color.
-
--   Type: `boolean`
--   Optional
 
 ### `supportsBulk`
 
@@ -883,8 +945,9 @@ Controls visibility of the modal's header when using `RenderModal`.
 
 The header text to show in the modal.
 
--   Type: `string`
+-   Type: `string | (items: Item[]) => string`
 -   Optional
+-   If a function is provided, it receives the selected items as an argument and should return the header text
 
 ### `modalSize`
 
@@ -1235,9 +1298,9 @@ Example:
 
 Object that contains the validation rules for the field. If a rule is not met, the control will be marked as invalid and a message will be displayed.
 
-- `required`: boolean indicating whether the field is required or not.
-- `elements`: boolean restricting selection to the provided list of elements only. Used with the `array` field type.
-- `custom`: a function that validates a field's value. If the value is invalid, the function should return a string explaining why the value is invalid. Otherwise, the function must return null.
+-   `required`: boolean indicating whether the field is required or not. Disabled by default.
+-   `elements`: boolean restricting selection to the provided list of elements only. Enabled by default. The `array` Edit control uses it to restrict the input values as well.
+-   `custom`: a function that validates a field's value. If the value is invalid, the function should return a string explaining why the value is invalid. Otherwise, the function must return null.
 
 Example:
 
@@ -1280,9 +1343,9 @@ Fields that define their own Edit component have access to the validation rules 
 
 ```js
 {
-  Edit: ( { field }) => {
-	  return <input required={ !! field.isValid.required } />
-  }
+	Edit: ( { field } ) => {
+		return <input required={ !! field.isValid.required } />;
+	};
 }
 ```
 
@@ -1375,11 +1438,28 @@ Example:
 		{ value: '2', label: 'Product B' },
 		{ value: '3', label: 'Product C' },
 		{ value: '4', label: 'Product D' },
-	];
+	]
 }
 ```
 
-By default, we add an empty value (label: "Select item"). The label can be overriden by providing an empty element (`{ value: '', label: 'Custom label for empty value'}`).
+### `getElements`
+
+Async function that fetches elements only when they are needed, enabling lazy loading. It returns a promise that resolves to an array of elements.
+
+Note this function may be called many times in the lifetime of the DataViews/DataForm component. For example, if elements are used in the `render` method of a field, it'll trigger as many times as records displayed in the page. It's the consumer responsibility to cache the results to avoid unnecessary costly operations (network requests, etc.).
+
+```js
+{
+	getElements: () => {
+		return Promise.resolve( [
+			{ value: '1', label: 'Product A' },
+			{ value: '2', label: 'Product B' },
+			{ value: '3', label: 'Product C' },
+			{ value: '4', label: 'Product D' },
+		] );
+	}
+}
+```
 
 ### `filterBy`
 
@@ -1409,8 +1489,8 @@ Operators:
 | `contains`           | Text           | `CONTAINS`. The item's field contains the given substring.                                           | Title contains: Mars                               |
 | `notContains`        | Text           | `NOT CONTAINS`. The item's field does not contain the given substring.                               | Description doesn't contain: photo                 |
 | `startsWith`         | Text           | `STARTS WITH`. The item's field starts with the given substring.                                     | Title starts with: Mar                             |
-| `on`                 | Date           | `ON`. The item's field is on a given date (date equality using proper date parsing).                | Date is on: 2024-01-01                             |
-| `notOn`              | Date           | `NOT ON`. The item's field is not on a given date (date inequality using proper date parsing).      | Date is not on: 2024-01-01                         |
+| `on`                 | Date           | `ON`. The item's field is on a given date (date equality using proper date parsing).                 | Date is on: 2024-01-01                             |
+| `notOn`              | Date           | `NOT ON`. The item's field is not on a given date (date inequality using proper date parsing).       | Date is not on: 2024-01-01                         |
 | `before`             | Date           | `BEFORE`. The item's field is before a given date.                                                   | Date is before 2024-01-01                          |
 | `after`              | Date           | `AFTER`. The item's field is after a given date.                                                     | Date is after 2024-01-01                           |
 | `beforeInc`          | Date           | `BEFORE (Inc)`. The item's field is before a given date, including the date.                         | Date is before 2024-01-01, including 2024-01-01    |
@@ -1480,8 +1560,8 @@ Represents the type of layout used to render the field. It'll be one of Regular,
 
 #### Regular
 
-- `type`: `regular`. Required.
-- `labelPosition`: one of `side`, `top`, or `none`. Optional. `top` by default.
+-   `type`: `regular`. Required.
+-   `labelPosition`: one of `side`, `top`, or `none`. Optional. `top` by default.
 
 For example:
 
@@ -1499,6 +1579,16 @@ For example:
 
 - `type`: `panel`. Required.
 - `labelPosition`: one of `side`, `top`, or `none`. Optional. `top` by default.
+- `summary`: Summary field configuration. Optional. Specifies which field(s) to display in the panel header. Can be:
+   	- A string (single field ID)
+    - An array of strings (multiple field IDs)
+
+When no summary fields are explicitly configured, the panel automatically determines which fields to display using this priority:
+
+1. Use `summary` fields if they exist
+2. Fall back to the field definition that matches the form field's id
+3. If the form field id doesn't exist, pick the first child field
+4. If no field definition is found, return empty summary fields
 
 For example:
 ```js
@@ -1513,9 +1603,18 @@ For example:
 
 #### Card
 
-- `type`: `card`. Required.
-- `isOpened`: boolean. Optional. `true` by default.
-- `withHeader`: boolean. Optional. `true` by default.
+-   `type`: `card`. Required.
+-   `isOpened`: boolean. Optional. `true` by default.
+-   `withHeader`: boolean. Optional. `true` by default.
+-   `summary`: Summary field configuration. Optional. Specifies which field(s) to display in the card header. Can be:
+    -   A string (single field ID)
+    -   An array of strings (multiple field IDs)
+    -   An array of objects for per-field visibility control `[{ id: string, visibility: 'always' | 'when-collapsed' }]`
+
+Cards can be collapsed while visible, so you can control when summary fields appear:
+
+-   `'always'`: Show the field in both expanded and collapsed states.
+-   `'when-collapsed'`: Show the field only when the card is collapsed. This is the default.
 
 For example:
 
@@ -1532,8 +1631,8 @@ For example:
 
 #### Row
 
-- `type`: `row`. Required.
-- `alignment`: one of `start`, `center`, or `end`. Optional. `center` by default.
+-   `type`: `row`. Required.
+-   `alignment`: one of `start`, `center`, or `end`. Optional. `center` by default.
 
 The Row layout displays fields horizontally in a single row. It's particularly useful for grouping related fields that should be displayed side by side. This layout can be used both as a top-level form layout and for individual field groups.
 
@@ -1576,7 +1675,9 @@ Example:
 ```js
 {
 	id: 'status',
-	layout: 'panel',
+	layout: {
+		type: 'panel',
+	},
 	label: 'Combined Field',
 	children: [ 'field1', 'field2' ],
 }

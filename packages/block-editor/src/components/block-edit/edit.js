@@ -25,8 +25,8 @@ import {
 	hasPatternOverridesDefaultBinding,
 	replacePatternOverridesDefaultBinding,
 } from '../../utils/block-bindings';
-import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { PrivateBlockContext } from '../block-list/private-block-context';
 
 /**
  * Default value used for blocks which do not define their own context needs,
@@ -56,8 +56,6 @@ const Edit = ( props ) => {
 
 const EditWithFilters = withFilters( 'editor.BlockEdit' )( Edit );
 
-const EMPTY_ARRAY = [];
-
 const EditWithGeneratedProps = ( props ) => {
 	const { name, clientId, attributes, setAttributes } = props;
 	const registry = useRegistry();
@@ -68,17 +66,7 @@ const EditWithGeneratedProps = ( props ) => {
 			unlock( select( blocksStore ) ).getAllBlockBindingsSources(),
 		[]
 	);
-	const bindableAttributes = useSelect(
-		( select ) => {
-			const { __experimentalBlockBindingsSupportedAttributes } =
-				select( blockEditorStore ).getSettings();
-			return (
-				__experimentalBlockBindingsSupportedAttributes?.[ name ] ||
-				EMPTY_ARRAY
-			);
-		},
-		[ name ]
-	);
+	const { bindableAttributes } = useContext( PrivateBlockContext );
 
 	const { blockBindings, context, hasPatternOverrides } = useMemo( () => {
 		// Assign context values using the block type's declared context needs.
@@ -135,7 +123,7 @@ const EditWithGeneratedProps = ( props ) => {
 				const source = registeredSources[ sourceName ];
 				if (
 					! source ||
-					! bindableAttributes.includes( attributeName )
+					! bindableAttributes?.includes( attributeName )
 				) {
 					continue;
 				}
@@ -214,7 +202,7 @@ const EditWithGeneratedProps = ( props ) => {
 				) ) {
 					if (
 						! blockBindings[ attributeName ] ||
-						! bindableAttributes.includes( attributeName )
+						! bindableAttributes?.includes( attributeName )
 					) {
 						continue;
 					}

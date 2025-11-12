@@ -90,7 +90,7 @@ const v2 = {
 					bindings: {
 						datetime: {
 							source: 'core/post-data',
-							args: { key: displayType },
+							args: { field: displayType },
 						},
 					},
 				},

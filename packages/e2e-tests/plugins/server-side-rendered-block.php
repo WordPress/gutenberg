@@ -48,12 +48,25 @@ add_action(
 		register_block_type(
 			'test/auto-register-block',
 			array(
-				'api_version'     => 3,
-				'render_callback' => static function () {
-					return '<div>Auto-register block content</div>';
+				'render_callback' => static function ( $attributes ) {
+					$wrapper_attributes = get_block_wrapper_attributes(
+						array(
+							'class' => 'auto-register-example',
+						)
+					);
+
+					return sprintf(
+						'<div %1$s><p>Auto-register block content</p><p>Background: %2$s</p></div>',
+						$wrapper_attributes,
+						isset( $attributes['backgroundColor'] ) ? esc_html( $attributes['backgroundColor'] ) : 'default'
+					);
 				},
 				'supports'        => array(
 					'auto_register' => true,
+					'color'         => array(
+						'background' => true,
+						'text'       => false,
+					),
 				),
 			)
 		);

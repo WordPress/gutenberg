@@ -53,7 +53,7 @@ jobs:
               run: npm run lint
 
             - name: Type checking
-              run: npm run build:package-types
+              run: npm run build
 
             - name: Check local changes
               run: npm run other:check-local-changes

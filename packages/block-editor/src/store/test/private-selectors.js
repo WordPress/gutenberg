@@ -11,7 +11,7 @@ import {
 	isDragging,
 	getBlockStyles,
 } from '../private-selectors';
-import { getBlockEditingMode, __unstableGetEditorMode } from '../selectors';
+import { getBlockEditingMode } from '../selectors';
 
 describe( 'private selectors', () => {
 	describe( 'isBlockInterfaceHidden', () => {
@@ -130,11 +130,6 @@ describe( 'private selectors', () => {
 		getBlockEditingMode.registry = {
 			select: jest.fn( () => ( {
 				hasContentRoleAttribute,
-				get,
-			} ) ),
-		};
-		__unstableGetEditorMode.registry = {
-			select: jest.fn( () => ( {
 				get,
 			} ) ),
 		};
@@ -327,9 +322,7 @@ describe( 'private selectors', () => {
 			},
 		};
 		getEnabledClientIdsTree.registry = {
-			select: jest.fn( () => ( {
-				__unstableGetEditorMode: () => 'edit',
-			} ) ),
+			select: jest.fn( () => ( {} ) ),
 		};
 
 		it( 'should return tree containing only clientId and innerBlocks', () => {

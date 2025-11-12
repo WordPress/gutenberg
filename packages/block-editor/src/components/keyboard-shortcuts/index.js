@@ -197,6 +197,16 @@ function KeyboardShortcutsRegister() {
 				character: 'g',
 			},
 		} );
+
+		registerShortcut( {
+			name: 'core/block-editor/toggle-block-visibility',
+			category: 'block',
+			description: __( 'Show or hide the selected block(s).' ),
+			keyCombination: {
+				modifier: 'primaryShift',
+				character: 'h',
+			},
+		} );
 	}, [ registerShortcut ] );
 
 	return null;

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { ToolbarButton } from '@wordpress/components';
-import { _x, __, _n, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
@@ -98,7 +98,7 @@ const CommentAvatarIndicator = ( { onClick, thread, hasMoreComments } ) => {
 				className={ clsx( 'comment-avatar-indicator', {
 					'has-unresolved': hasUnresolved,
 				} ) }
-				label={ _x( 'View comments', 'View comment thread' ) }
+				label={ __( 'View notes' ) }
 				onClick={ onClick }
 				showTooltip
 			>

@@ -53,6 +53,7 @@ import { useBlockLock } from '../block-lock';
 import AriaReferencedText from './aria-referenced-text';
 import { unlock } from '../../lock-unlock';
 import usePasteStyles from '../use-paste-styles';
+import { cleanEmptyObject } from '../../hooks/utils';
 
 function ListViewBlock( {
 	block: { clientId },
@@ -96,6 +97,7 @@ function ListViewBlock( {
 		insertAfterBlock,
 		insertBeforeBlock,
 		setOpenedBlockSettingsMenu,
+		updateBlockAttributes,
 	} = unlock( useDispatch( blockEditorStore ) );
 	const debouncedToggleBlockHighlight = useDebounce(
 		toggleBlockHighlight,
@@ -367,6 +369,36 @@ function ListViewBlock( {
 				setOpenedBlockSettingsMenu( undefined );
 				updateFocusAndSelection( newlySelectedBlocks[ 0 ], false );
 			}
+		} else if (
+			isMatch( 'core/block-editor/toggle-block-visibility', event )
+		) {
+			event.preventDefault();
+			const { blocksToUpdate } = getBlocksToUpdate();
+			const blocks = getBlocksByClientId( blocksToUpdate );
+			const canToggleBlockVisibility = blocks.every( ( blockToUpdate ) =>
+				hasBlockSupport( blockToUpdate.name, 'blockVisibility', true )
+			);
+			if ( ! canToggleBlockVisibility ) {
+				return;
+			}
+			const hasHiddenBlock = blocks.some(
+				( blockToUpdate ) =>
+					blockToUpdate.attributes.metadata?.blockVisibility === false
+			);
+			const attributesByClientId = Object.fromEntries(
+				blocks.map( ( { clientId: mapClientId, attributes } ) => [
+					mapClientId,
+					{
+						metadata: cleanEmptyObject( {
+							...attributes?.metadata,
+							blockVisibility: hasHiddenBlock ? undefined : false,
+						} ),
+					},
+				] )
+			);
+			updateBlockAttributes( blocksToUpdate, attributesByClientId, {
+				uniqueByBlock: true,
+			} );
 		}
 	}
 

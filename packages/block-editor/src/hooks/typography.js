@@ -18,6 +18,7 @@ import { LINE_HEIGHT_SUPPORT_KEY } from './line-height';
 import { FONT_FAMILY_SUPPORT_KEY } from './font-family';
 import { FONT_SIZE_SUPPORT_KEY } from './font-size';
 import { TEXT_ALIGN_SUPPORT_KEY } from './text-align';
+import { FIT_TEXT_SUPPORT_KEY } from './fit-text';
 import { cleanEmptyObject } from './utils';
 import { store as blockEditorStore } from '../store';
 
@@ -47,6 +48,7 @@ export const TYPOGRAPHY_SUPPORT_KEYS = [
 	WRITING_MODE_SUPPORT_KEY,
 	TEXT_TRANSFORM_SUPPORT_KEY,
 	LETTER_SPACING_SUPPORT_KEY,
+	FIT_TEXT_SUPPORT_KEY,
 ];
 
 function styleToAttributes( style ) {

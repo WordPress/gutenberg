@@ -19,7 +19,6 @@ import {
 	getBlockName,
 	getTemplateLock,
 	getClientIdsWithDescendants,
-	isNavigationMode,
 	getBlockRootClientId,
 	getBlockAttributes,
 } from './selectors';
@@ -142,13 +141,11 @@ function getEnabledClientIdsTreeUnmemoized( state, rootClientId ) {
  *
  * @return {Object[]} Tree of block objects with only clientID and innerBlocks set.
  */
-export const getEnabledClientIdsTree = createRegistrySelector( ( select ) =>
+export const getEnabledClientIdsTree = createRegistrySelector( () =>
 	createSelector( getEnabledClientIdsTreeUnmemoized, ( state ) => [
 		state.blocks.order,
 		state.derivedBlockEditingModes,
-		state.derivedNavModeBlockEditingModes,
 		state.blockEditingModes,
-		select( STORE_NAME ).__unstableGetEditorMode( state ),
 	] )
 );
 
@@ -529,16 +526,7 @@ export function isSectionBlock( state, clientId ) {
 	) {
 		return true;
 	}
-
-	// Template parts become sections in navigation mode.
-	const _isNavigationMode = isNavigationMode( state );
-	if ( _isNavigationMode && isTemplatePart ) {
-		return true;
-	}
-
-	const sectionRootClientId = getSectionRootClientId( state );
-	const sectionClientIds = getBlockOrder( state, sectionRootClientId );
-	return _isNavigationMode && sectionClientIds.includes( clientId );
+	return false;
 }
 
 /**
@@ -705,3 +693,14 @@ export const isBlockHidden = ( state, clientId ) => {
 	const attributes = state.blocks.attributes.get( clientId );
 	return attributes?.metadata?.blockVisibility === false;
 };
+
+/**
+ * Returns true if the current spotlighted block matches the block clientId.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the block is currently spotlighted.
+ */
+export function hasBlockSpotlight( state ) {
+	return !! state.hasBlockSpotlight;
+}

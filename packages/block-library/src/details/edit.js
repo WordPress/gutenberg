@@ -122,6 +122,7 @@ function DetailsEdit( { attributes, setAttributes, clientId } ) {
 				{ ...innerBlocksProps }
 				open={ isOpen || hasSelectedInnerBlock }
 				onToggle={ ( event ) => setIsOpen( event.target.open ) }
+				name={ name || '' }
 			>
 				<summary
 					onKeyDown={ withIgnoreIMEEvents( handleSummaryKeyDown ) }

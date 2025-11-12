@@ -1,40 +1,37 @@
 /**
+ * External dependencies
+ */
+import { format, isValid as isValidDate } from 'date-fns';
+
+/**
  * WordPress dependencies
  */
 import {
 	BaseControl,
 	privateApis as componentsPrivateApis,
-	__experimentalInputControl as InputControl,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { useCallback, useState } from '@wordpress/element';
+import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getDate, getSettings } from '@wordpress/date';
-
-/**
- * External dependencies
- */
-import { format, isValid } from 'date-fns';
 
 /**
  * Internal dependencies
  */
 import type { DataFormControlProps } from '../types';
 import { OPERATOR_IN_THE_PAST, OPERATOR_OVER } from '../constants';
-import RelativeDateControl, {
-	TIME_UNITS_OPTIONS,
-	type DateRelative,
-} from './relative-date-control';
+import RelativeDateControl from './utils/relative-date-control';
+import getCustomValidity from './utils/get-custom-validity';
 import { unlock } from '../lock-unlock';
 
-const { DateCalendar } = unlock( componentsPrivateApis );
+const { DateCalendar, ValidatedInputControl } = unlock( componentsPrivateApis );
 
 const parseDateTime = ( dateTimeString?: string ): Date | null => {
 	if ( ! dateTimeString ) {
 		return null;
 	}
 	const parsed = getDate( dateTimeString );
-	return parsed && isValid( parsed ) ? parsed : null;
+	return parsed && isValidDate( parsed ) ? parsed : null;
 };
 
 const formatDateTime = ( date?: Date | string ): string => {
@@ -48,28 +45,44 @@ const formatDateTime = ( date?: Date | string ): string => {
 	return format( date, "yyyy-MM-dd'T'HH:mm" );
 };
 
-function CalendarDateTimeControl( {
-	id,
-	value,
+function CalendarDateTimeControl< Item >( {
+	data,
+	field,
 	onChange,
-	label,
-	description,
 	hideLabelFromVision,
-}: {
-	id: string;
-	value: string | undefined;
-	onChange: ( value: string | undefined ) => void;
-	label: string;
-	description?: string;
-	hideLabelFromVision?: boolean;
-} ) {
+	validity,
+}: DataFormControlProps< Item > ) {
+	const { id, label, description, setValue, getValue, isValid } = field;
+	const fieldValue = getValue( { item: data } );
+	const value = typeof fieldValue === 'string' ? fieldValue : undefined;
+
 	const [ calendarMonth, setCalendarMonth ] = useState< Date >( () => {
 		const parsedDate = parseDateTime( value );
 		return parsedDate || new Date(); // Default to current month
 	} );
 
+	const inputControlRef = useRef< HTMLInputElement >( null );
+	const validationTimeoutRef = useRef< ReturnType< typeof setTimeout > >();
+	const previousFocusRef = useRef< Element | null >( null );
+
+	const onChangeCallback = useCallback(
+		( newValue: string | undefined ) =>
+			onChange( setValue( { item: data, value: newValue } ) ),
+		[ data, onChange, setValue ]
+	);
+
+	// Cleanup timeout on unmount
+	useEffect( () => {
+		return () => {
+			if ( validationTimeoutRef.current ) {
+				clearTimeout( validationTimeoutRef.current );
+			}
+		};
+	}, [] );
+
 	const onSelectDate = useCallback(
 		( newDate: Date | undefined | null ) => {
+			let dateTimeValue: string | undefined;
 			if ( newDate ) {
 				// Preserve time if it exists in current value, otherwise use current time
 				let finalDateTime = newDate;
@@ -86,13 +99,40 @@ function CalendarDateTimeControl( {
 					}
 				}
 
-				const dateTimeValue = finalDateTime.toISOString();
-				onChange( dateTimeValue );
+				dateTimeValue = finalDateTime.toISOString();
+				onChangeCallback( dateTimeValue );
+
+				// Clear any existing timeout
+				if ( validationTimeoutRef.current ) {
+					clearTimeout( validationTimeoutRef.current );
+				}
 			} else {
-				onChange( undefined );
+				onChangeCallback( undefined );
 			}
+			// Save the currently focused element
+			previousFocusRef.current =
+				inputControlRef.current &&
+				inputControlRef.current.ownerDocument.activeElement;
+
+			// Trigger validation display by simulating focus, blur, and changes.
+			// Use a timeout to ensure it runs after the value update.
+			validationTimeoutRef.current = setTimeout( () => {
+				if ( inputControlRef.current ) {
+					inputControlRef.current.focus();
+					inputControlRef.current.blur();
+					onChangeCallback( dateTimeValue );
+
+					// Restore focus to the previously focused element
+					if (
+						previousFocusRef.current &&
+						previousFocusRef.current instanceof HTMLElement
+					) {
+						previousFocusRef.current.focus();
+					}
+				}
+			}, 0 );
 		},
-		[ onChange, value ]
+		[ onChangeCallback, value ]
 	);
 
 	const handleManualDateTimeChange = useCallback(
@@ -100,7 +140,7 @@ function CalendarDateTimeControl( {
 			if ( newValue ) {
 				// Convert from datetime-local format to ISO string
 				const dateTime = new Date( newValue );
-				onChange( dateTime.toISOString() );
+				onChangeCallback( dateTime.toISOString() );
 
 				// Update calendar month to match
 				const parsedDate = parseDateTime( dateTime.toISOString() );
@@ -108,10 +148,10 @@ function CalendarDateTimeControl( {
 					setCalendarMonth( parsedDate );
 				}
 			} else {
-				onChange( undefined );
+				onChangeCallback( undefined );
 			}
 		},
-		[ onChange ]
+		[ onChangeCallback ]
 	);
 
 	const {
@@ -119,11 +159,16 @@ function CalendarDateTimeControl( {
 		l10n: { startOfWeek },
 	} = getSettings();
 
+	const displayLabel =
+		isValid?.required && ! hideLabelFromVision
+			? `${ label } (${ __( 'Required' ) })`
+			: label;
+
 	return (
 		<BaseControl
 			__nextHasNoMarginBottom
 			id={ id }
-			label={ label }
+			label={ displayLabel }
 			help={ description }
 			hideLabelFromVision={ hideLabelFromVision }
 		>
@@ -141,8 +186,11 @@ function CalendarDateTimeControl( {
 					weekStartsOn={ startOfWeek }
 				/>
 				{ /* Manual datetime input */ }
-				<InputControl
+				<ValidatedInputControl
+					ref={ inputControlRef }
 					__next40pxDefaultSize
+					required={ !! isValid?.required }
+					customValidity={ getCustomValidity( isValid, validity ) }
 					type="datetime-local"
 					label={ __( 'Date time' ) }
 					hideLabelFromVision
@@ -166,44 +214,28 @@ export default function DateTime< Item >( {
 	onChange,
 	hideLabelFromVision,
 	operator,
+	validity,
 }: DataFormControlProps< Item > ) {
-	const { id, label, description, getValue, setValue } = field;
-	const value = getValue( { item: data } );
-
-	const onChangeRelativeDateControl = useCallback(
-		( newValue: DateRelative ) =>
-			onChange( setValue( { item: data, value: newValue } ) ),
-		[ data, onChange, setValue ]
-	);
-
-	const onChangeCalendarDateTimeControl = useCallback(
-		( newValue: string | undefined ) =>
-			onChange( setValue( { item: data, value: newValue } ) ),
-		[ data, onChange, setValue ]
-	);
-
 	if ( operator === OPERATOR_IN_THE_PAST || operator === OPERATOR_OVER ) {
 		return (
 			<RelativeDateControl
 				className="dataviews-controls__datetime"
-				id={ id }
-				value={ value && typeof value === 'object' ? value : {} }
-				onChange={ onChangeRelativeDateControl }
-				label={ label }
+				data={ data }
+				field={ field }
+				onChange={ onChange }
 				hideLabelFromVision={ hideLabelFromVision }
-				options={ TIME_UNITS_OPTIONS[ operator ] }
+				operator={ operator }
 			/>
 		);
 	}
 
 	return (
 		<CalendarDateTimeControl
-			id={ id }
-			value={ typeof value === 'string' ? value : undefined }
-			onChange={ onChangeCalendarDateTimeControl }
-			label={ label }
-			description={ description }
+			data={ data }
+			field={ field }
+			onChange={ onChange }
 			hideLabelFromVision={ hideLabelFromVision }
+			validity={ validity }
 		/>
 	);
 }

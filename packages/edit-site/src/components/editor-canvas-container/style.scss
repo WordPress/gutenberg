@@ -1,9 +1,12 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .edit-site-editor-canvas-container {
 	height: 100%;
 
 	// This is the gray background color that's applied behind "isolation mode".
 	// The color normally comes from .editor-visual-editor, but that class is missing here.
-	background-color: $gray-300;
+	background-color: var(--wp-editor-canvas-background);
 
 	// Controls height of editor and editor canvas container (style book, global styles revisions previews etc.)
 	iframe {

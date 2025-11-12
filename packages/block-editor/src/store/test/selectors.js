@@ -2669,6 +2669,7 @@ describe( 'selectors', () => {
 				},
 				blockListSettings: {},
 				settings: {},
+				blockEditingModes: new Map(),
 			};
 			expect( canInsertBlockType( state, 'core/invalid' ) ).toBe( false );
 		} );
@@ -2683,6 +2684,7 @@ describe( 'selectors', () => {
 				settings: {
 					allowedBlockTypes: [],
 				},
+				blockEditingModes: new Map(),
 			};
 			expect( canInsertBlockType( state, 'core/test-block-a' ) ).toBe(
 				false
@@ -2719,6 +2721,7 @@ describe( 'selectors', () => {
 				settings: {
 					templateLock: 'all',
 				},
+				blockEditingModes: new Map(),
 			};
 			expect( canInsertBlockType( state, 'core/test-block-a' ) ).toBe(
 				false
@@ -4394,7 +4397,6 @@ describe( 'getBlockEditingMode', () => {
 	const baseState = {
 		blockEditingModes: new Map( [] ),
 		derivedBlockEditingModes: new Map( [] ),
-		derivedNavModeBlockEditingModes: new Map( [] ),
 	};
 
 	const hasContentRoleAttribute = jest.fn( () => false );
