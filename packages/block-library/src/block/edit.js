@@ -124,7 +124,7 @@ function ReusableBlockControl( {
 	return (
 		<>
 			{ canUserEdit && !! handleEditOriginal && (
-				<BlockControls>
+				<BlockControls group="other">
 					<ToolbarGroup>
 						<ToolbarButton onClick={ handleEditOriginal }>
 							{ __( 'Edit original' ) }
