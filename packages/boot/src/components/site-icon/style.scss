@@ -1,0 +1,19 @@
+@use "@wordpress/base-styles/variables";
+
+.boot-site-icon {
+	display: flex;
+}
+
+.boot-site-icon__icon {
+	width: variables.$grid-unit-40;
+	height: variables.$grid-unit-40;
+	color: var(--wpds-color-fg-content-neutral, #1e1e1e);
+}
+
+.boot-site-icon__image {
+	width: variables.$grid-unit-40;
+	height: variables.$grid-unit-40;
+	object-fit: cover;
+	aspect-ratio: 1 / 1;
+	border-radius: var(--wpds-border-radius-medium, 4px);
+}

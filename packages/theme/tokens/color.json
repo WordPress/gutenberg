@@ -10,19 +10,19 @@
 					"$value": "#eff0f2"
 				},
 				"bgFill2": {
-					"$value": "#2c47d7"
+					"$value": "#2e49da"
 				},
 				"surface2": {
 					"$value": "#f6f8fc"
 				},
 				"surface6": {
-					"$value": "#c4d0ee"
+					"$value": "#c7d3ef"
 				},
 				"surface5": {
-					"$value": "#d7dff3"
+					"$value": "#dce3f5"
 				},
 				"surface4": {
-					"$value": "#e5eaf7"
+					"$value": "#e5ebf7"
 				},
 				"surface3": {
 					"$value": "#fff"
@@ -34,22 +34,22 @@
 					"$value": "#3858e9"
 				},
 				"fgSurface2": {
-					"$value": "#577fff"
+					"$value": "#5881ff"
 				},
 				"fgSurface1": {
-					"$value": "#81a6ff"
+					"$value": "#84a9ff"
 				},
 				"stroke3": {
 					"$value": "#3858e9"
 				},
 				"stroke4": {
-					"$value": "#2236c7"
+					"$value": "#2337c8"
 				},
 				"stroke2": {
-					"$value": "#7085c0"
+					"$value": "#6d83bf"
 				},
 				"stroke1": {
-					"$value": "#93a4d0"
+					"$value": "#91a2cf"
 				},
 				"bgFillDark": {
 					"$value": "#1b1e26"
@@ -61,13 +61,13 @@
 					"$value": "#1b1e26"
 				},
 				"bgFillInverted1": {
-					"$value": "#1401a5"
+					"$value": "#12009f"
 				},
 				"fgFillInverted": {
 					"$value": "#eff0f2"
 				},
 				"surface1": {
-					"$value": "#ecf0f9"
+					"$value": "#edf0fa"
 				}
 			},
 			"info": {
@@ -78,19 +78,19 @@
 					"$value": "#1b1e23"
 				},
 				"bgFill2": {
-					"$value": "#007eec"
+					"$value": "#0081ef"
 				},
 				"surface2": {
 					"$value": "#f5f9fd"
 				},
 				"surface6": {
-					"$value": "#b9d3f0"
+					"$value": "#bed6f1"
 				},
 				"surface5": {
-					"$value": "#d0e1f5"
+					"$value": "#d5e5f6"
 				},
 				"surface4": {
-					"$value": "#e0ecf8"
+					"$value": "#e0ebf8"
 				},
 				"surface3": {
 					"$value": "#fff"
@@ -99,25 +99,25 @@
 					"$value": "#001758"
 				},
 				"fgSurface3": {
-					"$value": "#006cd8"
+					"$value": "#006dd9"
 				},
 				"fgSurface2": {
-					"$value": "#008bf9"
+					"$value": "#008cfb"
 				},
 				"fgSurface1": {
-					"$value": "#4dafff"
+					"$value": "#53b1ff"
 				},
 				"stroke3": {
-					"$value": "#006cd8"
+					"$value": "#006dd9"
 				},
 				"stroke4": {
-					"$value": "#004bb5"
+					"$value": "#004eb8"
 				},
 				"stroke2": {
-					"$value": "#5c90c9"
+					"$value": "#5d8fc6"
 				},
 				"stroke1": {
-					"$value": "#8baed6"
+					"$value": "#8aaed6"
 				},
 				"bgFillDark": {
 					"$value": "#1b1e23"
@@ -129,13 +129,13 @@
 					"$value": "#1b1e23"
 				},
 				"bgFillInverted1": {
-					"$value": "#00297b"
+					"$value": "#002675"
 				},
 				"fgFillInverted": {
 					"$value": "#eff0f2"
 				},
 				"surface1": {
-					"$value": "#e9f1fa"
+					"$value": "#eaf1fa"
 				}
 			},
 			"success": {
@@ -146,19 +146,19 @@
 					"$value": "#1b1f1c"
 				},
 				"bgFill2": {
-					"$value": "#34a554"
+					"$value": "#37a857"
 				},
 				"surface2": {
 					"$value": "#f0fcf2"
 				},
 				"surface6": {
-					"$value": "#7be792"
+					"$value": "#7eea95"
 				},
 				"surface5": {
-					"$value": "#abf0b7"
+					"$value": "#b7f2c1"
 				},
 				"surface4": {
-					"$value": "#cdf5d2"
+					"$value": "#cdf5d3"
 				},
 				"surface3": {
 					"$value": "#fff"
@@ -167,25 +167,25 @@
 					"$value": "#002b00"
 				},
 				"fgSurface3": {
-					"$value": "#008030"
+					"$value": "#008031"
 				},
 				"fgSurface2": {
-					"$value": "#2a9e4d"
+					"$value": "#2c9f4e"
 				},
 				"fgSurface1": {
-					"$value": "#52bf6d"
+					"$value": "#54c16f"
 				},
 				"stroke3": {
-					"$value": "#008030"
+					"$value": "#008031"
 				},
 				"stroke4": {
-					"$value": "#006013"
+					"$value": "#006314"
 				},
 				"stroke2": {
-					"$value": "#629a6c"
+					"$value": "#61986b"
 				},
 				"stroke1": {
-					"$value": "#78bb84"
+					"$value": "#77ba84"
 				},
 				"bgFillDark": {
 					"$value": "#1b1f1c"
@@ -197,7 +197,7 @@
 					"$value": "#1b1f1c"
 				},
 				"bgFillInverted1": {
-					"$value": "#003b00"
+					"$value": "#003800"
 				},
 				"fgFillInverted": {
 					"$value": "#edf2ed"
@@ -214,19 +214,19 @@
 					"$value": "#1f1e1b"
 				},
 				"bgFill2": {
-					"$value": "#dba32f"
+					"$value": "#dea633"
 				},
 				"surface2": {
 					"$value": "#fdf7ee"
 				},
 				"surface6": {
-					"$value": "#f0cb89"
+					"$value": "#f1ce90"
 				},
 				"surface5": {
-					"$value": "#f5dcb2"
+					"$value": "#f6e0bb"
 				},
 				"surface4": {
-					"$value": "#f8e8cd"
+					"$value": "#f8e9cd"
 				},
 				"surface3": {
 					"$value": "#fff"
@@ -235,25 +235,25 @@
 					"$value": "#2f1800"
 				},
 				"fgSurface3": {
-					"$value": "#966200"
+					"$value": "#976300"
 				},
 				"fgSurface2": {
-					"$value": "#b58000"
+					"$value": "#b78100"
 				},
 				"fgSurface1": {
-					"$value": "#d7a02b"
+					"$value": "#d9a22e"
 				},
 				"stroke3": {
-					"$value": "#966200"
+					"$value": "#976300"
 				},
 				"stroke4": {
-					"$value": "#724700"
+					"$value": "#754900"
 				},
 				"stroke2": {
-					"$value": "#a18a61"
+					"$value": "#9f8860"
 				},
 				"stroke1": {
-					"$value": "#c3a777"
+					"$value": "#c2a776"
 				},
 				"bgFillDark": {
 					"$value": "#1f1e1b"
@@ -265,7 +265,7 @@
 					"$value": "#1f1e1b"
 				},
 				"bgFillInverted1": {
-					"$value": "#472900"
+					"$value": "#432600"
 				},
 				"fgFillInverted": {
 					"$value": "#f3f0e9"
@@ -282,16 +282,16 @@
 					"$value": "#f2efef"
 				},
 				"bgFill2": {
-					"$value": "#b90000"
+					"$value": "#bc0001"
 				},
 				"surface2": {
 					"$value": "#fdf6f5"
 				},
 				"surface6": {
-					"$value": "#f5c5bd"
+					"$value": "#f5c9c2"
 				},
 				"surface5": {
-					"$value": "#f8d8d3"
+					"$value": "#f9dcd8"
 				},
 				"surface4": {
 					"$value": "#fae5e2"
@@ -306,22 +306,22 @@
 					"$value": "#cc1818"
 				},
 				"fgSurface2": {
-					"$value": "#f64b40"
+					"$value": "#f84d41"
 				},
 				"fgSurface1": {
-					"$value": "#ff8070"
+					"$value": "#ff8373"
 				},
 				"stroke3": {
 					"$value": "#cc1818"
 				},
 				"stroke4": {
-					"$value": "#a30000"
+					"$value": "#a70000"
 				},
 				"stroke2": {
-					"$value": "#cd695d"
+					"$value": "#ca675c"
 				},
 				"stroke1": {
-					"$value": "#dc9085"
+					"$value": "#dc8e83"
 				},
 				"bgFillDark": {
 					"$value": "#231c1b"
@@ -333,7 +333,7 @@
 					"$value": "#231c1b"
 				},
 				"bgFillInverted1": {
-					"$value": "#6d0000"
+					"$value": "#680000"
 				},
 				"fgFillInverted": {
 					"$value": "#f2efef"
@@ -353,13 +353,13 @@
 					"$value": "#f0f0f0"
 				},
 				"bgFill2": {
-					"$value": "#474747"
+					"$value": "#494949"
 				},
 				"surface6": {
-					"$value": "#d0d0d0"
+					"$value": "#d3d3d3"
 				},
 				"surface5": {
-					"$value": "#dfdfdf"
+					"$value": "#e3e3e3"
 				},
 				"surface4": {
 					"$value": "#eaeaea"
@@ -371,25 +371,25 @@
 					"$value": "#1e1e1e"
 				},
 				"fgSurface3": {
-					"$value": "#6c6c6c"
+					"$value": "#6e6e6e"
 				},
 				"fgSurface2": {
-					"$value": "#898989"
+					"$value": "#8b8b8b"
 				},
 				"fgSurface1": {
-					"$value": "#a9a9a9"
+					"$value": "#ababab"
 				},
 				"stroke3": {
-					"$value": "#898989"
+					"$value": "#8b8b8b"
 				},
 				"stroke4": {
-					"$value": "#6a6a6a"
+					"$value": "#6d6d6d"
 				},
 				"stroke2": {
-					"$value": "#aeaeae"
+					"$value": "#adadad"
 				},
 				"stroke1": {
-					"$value": "#d0d0d0"
+					"$value": "#cfcfcf"
 				},
 				"bgFillDark": {
 					"$value": "#1e1e1e"
@@ -401,13 +401,81 @@
 					"$value": "#1e1e1e"
 				},
 				"bgFillInverted1": {
-					"$value": "#2f2f2f"
+					"$value": "#2d2d2d"
 				},
 				"fgFillInverted": {
 					"$value": "#f0f0f0"
 				},
 				"surface1": {
-					"$value": "#efefef"
+					"$value": "#f0f0f0"
+				}
+			},
+			"caution": {
+				"bgFill1": {
+					"$value": "#f0d149"
+				},
+				"fgFill": {
+					"$value": "#1f1e1b"
+				},
+				"bgFill2": {
+					"$value": "#ddbe30"
+				},
+				"surface2": {
+					"$value": "#fdf9e7"
+				},
+				"surface6": {
+					"$value": "#ecd367"
+				},
+				"surface5": {
+					"$value": "#f5e399"
+				},
+				"surface4": {
+					"$value": "#f8ebb5"
+				},
+				"surface3": {
+					"$value": "#fff"
+				},
+				"fgSurface4": {
+					"$value": "#291d00"
+				},
+				"fgSurface3": {
+					"$value": "#876b00"
+				},
+				"fgSurface2": {
+					"$value": "#a78900"
+				},
+				"fgSurface1": {
+					"$value": "#c9aa00"
+				},
+				"stroke3": {
+					"$value": "#876b00"
+				},
+				"stroke4": {
+					"$value": "#675000"
+				},
+				"stroke2": {
+					"$value": "#978c60"
+				},
+				"stroke1": {
+					"$value": "#b8ab75"
+				},
+				"bgFillDark": {
+					"$value": "#1f1e1b"
+				},
+				"fgFillDark": {
+					"$value": "#f6f1da"
+				},
+				"bgFillInverted2": {
+					"$value": "#1f1e1b"
+				},
+				"bgFillInverted1": {
+					"$value": "#3a2b00"
+				},
+				"fgFillInverted": {
+					"$value": "#f6f1da"
+				},
+				"surface1": {
+					"$value": "#faf1cd"
 				}
 			}
 		},
@@ -480,6 +548,20 @@
 						"resting": {
 							"$value": "{color.primitive.warning.surface2}",
 							"$description": "Background color for surfaces with warning tone and weak emphasis."
+						}
+					}
+				},
+				"caution": {
+					"normal": {
+						"resting": {
+							"$value": "{color.primitive.caution.surface4}",
+							"$description": "Background color for surfaces with caution tone and normal emphasis."
+						}
+					},
+					"weak": {
+						"resting": {
+							"$value": "{color.primitive.caution.surface2}",
+							"$description": "Background color for surfaces with caution tone and weak emphasis."
 						}
 					}
 				},
@@ -646,6 +728,76 @@
 						"resting": {
 							"$value": "{color.primitive.bg.fgSurface3}",
 							"$description": "Foreground color for content like text with weak emphasis."
+						}
+					}
+				},
+				"success": {
+					"normal": {
+						"resting": {
+							"$value": "{color.primitive.success.fgSurface4}",
+							"$description": "Foreground color for content like text with success tone and normal emphasis."
+						}
+					},
+					"weak": {
+						"resting": {
+							"$value": "{color.primitive.success.fgSurface3}",
+							"$description": "Foreground color for content like text with success tone and weak emphasis."
+						}
+					}
+				},
+				"info": {
+					"normal": {
+						"resting": {
+							"$value": "{color.primitive.info.fgSurface4}",
+							"$description": "Foreground color for content like text with info tone and normal emphasis."
+						}
+					},
+					"weak": {
+						"resting": {
+							"$value": "{color.primitive.info.fgSurface3}",
+							"$description": "Foreground color for content like text with info tone and weak emphasis."
+						}
+					}
+				},
+				"warning": {
+					"normal": {
+						"resting": {
+							"$value": "{color.primitive.warning.fgSurface4}",
+							"$description": "Foreground color for content like text with warning tone and normal emphasis."
+						}
+					},
+					"weak": {
+						"resting": {
+							"$value": "{color.primitive.warning.fgSurface3}",
+							"$description": "Foreground color for content like text with warning tone and weak emphasis."
+						}
+					}
+				},
+				"caution": {
+					"normal": {
+						"resting": {
+							"$value": "{color.primitive.caution.fgSurface4}",
+							"$description": "Foreground color for content like text with caution tone and normal emphasis."
+						}
+					},
+					"weak": {
+						"resting": {
+							"$value": "{color.primitive.caution.fgSurface3}",
+							"$description": "Foreground color for content like text with caution tone and weak emphasis."
+						}
+					}
+				},
+				"error": {
+					"normal": {
+						"resting": {
+							"$value": "{color.primitive.error.fgSurface4}",
+							"$description": "Foreground color for content like text with error tone and normal emphasis."
+						}
+					},
+					"weak": {
+						"resting": {
+							"$value": "{color.primitive.error.fgSurface3}",
+							"$description": "Foreground color for content like text with error tone and weak emphasis."
 						}
 					}
 				}

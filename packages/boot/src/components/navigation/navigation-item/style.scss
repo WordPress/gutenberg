@@ -1,0 +1,52 @@
+@use "@wordpress/base-styles/variables";
+@use "@wordpress/base-styles/mixins";
+
+.boot-navigation-item.components-item {
+	color: var(--wpds-color-fg-interactive-neutral, #1e1e1e);
+	padding-inline: variables.$grid-unit-05;
+	padding-block: 0;
+	margin-inline: variables.$grid-unit-15;
+	margin-block-end: variables.$grid-unit-05;
+	width: calc(100% - variables.$grid-unit-15 * 2);
+	border: none;
+	min-height: variables.$grid-unit-40;
+	display: flex;
+	align-items: center;
+	@include mixins.body-medium();
+
+	.boot-dropdown-item__children & {
+		min-height: variables.$grid-unit-30;
+	}
+
+	// Rounded focus ring
+	border-radius: var(--wpds-border-radius-small, 2px);
+
+	&.active,
+	&:hover,
+	&:focus,
+	&[aria-current="true"] {
+		color: var(--wpds-color-fg-interactive-brand-active, #0073aa);
+	}
+
+	&.active {
+		font-weight: variables.$font-weight-medium;
+	}
+
+	svg:last-child {
+		padding: variables.$grid-unit-05;
+	}
+
+	&[aria-current="true"] {
+		color: var(--wpds-color-fg-interactive-brand-active, #0073aa);
+		font-weight: variables.$font-weight-medium;
+	}
+
+	// Make sure the focus style is drawn on top of the current item background.
+	&:focus-visible {
+		transform: translateZ(0);
+	}
+
+	&.with-suffix {
+		padding-right: variables.$grid-unit-20;
+	}
+}

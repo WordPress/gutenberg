@@ -182,13 +182,9 @@ async function dev() {
 		] );
 
 		// Start package build watch
-		const buildWatch = execAsync(
-			'wp-build',
-			[ '--watch' ],
-			{
-				env: { ...process.env, NODE_ENV: 'development' },
-			}
-		);
+		const buildWatch = execAsync( 'wp-build', [ '--watch' ], {
+			env: { ...process.env, NODE_ENV: 'development' },
+		} );
 
 		// Handle process termination
 		const cleanup = () => {

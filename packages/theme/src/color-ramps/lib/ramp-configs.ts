@@ -59,7 +59,7 @@ export const BG_RAMP_CONFIG: RampConfig = {
 		contrast: {
 			reference: 'surface2',
 			followDirection: 'opposite',
-			target: 1.02,
+			target: 1.06,
 			ignoreWhenAdjustingSeed: true,
 		},
 		taperChromaOptions: BG_SURFACE_TAPER_CHROMA,
@@ -75,7 +75,7 @@ export const BG_RAMP_CONFIG: RampConfig = {
 		contrast: {
 			reference: 'surface2',
 			followDirection: 'main',
-			target: 1.02,
+			target: 1.06,
 		},
 		taperChromaOptions: BG_SURFACE_TAPER_CHROMA,
 	},
@@ -83,7 +83,7 @@ export const BG_RAMP_CONFIG: RampConfig = {
 		contrast: {
 			reference: 'surface2',
 			followDirection: 'main',
-			target: 1.08,
+			target: 1.12,
 		},
 		taperChromaOptions: BG_SURFACE_TAPER_CHROMA,
 	},

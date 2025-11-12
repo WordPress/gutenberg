@@ -226,7 +226,6 @@ function FontCollection( { slug }: { slug: string } ) {
 					} )
 				);
 			}
-			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		} catch ( error ) {
 			// If any of the fonts fail to download,
 			// show an error notice and stop the request from being sent.

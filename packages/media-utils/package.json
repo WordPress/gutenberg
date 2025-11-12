@@ -44,6 +44,7 @@
 		"@wordpress/dataviews": "file:../dataviews",
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/icons": "file:../icons",
 		"@wordpress/private-apis": "file:../private-apis"
 	},
 	"publishConfig": {

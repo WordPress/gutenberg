@@ -29,7 +29,10 @@
 	],
 	"main": "lib/index.js",
 	"exports": {
-		".": "./lib/index.js",
+		".": {
+			"types": "./lib/types.d.ts",
+			"default": "./lib/index.js"
+		},
 		"./lib/util": "./lib/util.js",
 		"./package.json": "./package.json"
 	},

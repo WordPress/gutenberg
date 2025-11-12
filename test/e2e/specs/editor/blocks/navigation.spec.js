@@ -1225,6 +1225,206 @@ test.describe( 'Navigation block', () => {
 				settingsControls.getByText( 'Synced with the selected page.' )
 			).toBeVisible();
 		} );
+
+		test( 'handles unavailable entity binding', async ( {
+			editor,
+			page,
+			admin,
+			navigation,
+			requestUtils,
+		} ) => {
+			await test.step( 'Setup - Create menu with binding to non-existent entity', async () => {
+				await admin.createNewPost();
+
+				// Use a non-existent page ID to simulate a deleted/unavailable entity
+				// This is simpler than creating and deleting a page, and tests the same behavior
+				const nonExistentPageId = 99999;
+
+				// Create a menu with a navigation-link that has a binding to the non-existent page
+				const menu = await requestUtils.createNavigationMenu( {
+					title: 'Test Menu with Unavailable Entity',
+					content: `<!-- wp:navigation-link {"label":"Unavailable Page","type":"page","id":${ nonExistentPageId },"kind":"post-type","metadata":{"bindings":{"url":{"source":"core/post-data","args":{"field":"link"}}}}} /-->`,
+				} );
+
+				await editor.insertBlock( {
+					name: 'core/navigation',
+					attributes: {
+						ref: menu.id,
+					},
+				} );
+			} );
+
+			await test.step( 'Verify Nav Link shows "Invalid" suffix', async () => {
+				// Select the Navigation Link block
+				const navBlock = navigation.getNavBlock();
+				await editor.selectBlocks( navBlock );
+
+				const navLinkBlock = navBlock
+					.getByRole( 'document', {
+						name: 'Block: Page Link',
+					} )
+					.first();
+
+				await editor.selectBlocks( navLinkBlock );
+
+				// Check that the link displays with "(Invalid)" placeholder text
+				// When invalid, it shows a div with placeholder-text class, not a textbox
+				const placeholderText = navLinkBlock.locator(
+					'.wp-block-navigation-link__placeholder-text'
+				);
+				await expect( placeholderText ).toBeVisible();
+				await expect( placeholderText ).toContainText( '(Invalid)' );
+			} );
+
+			await test.step( 'Verify clicking link auto-opens Link UI', async () => {
+				// Click on the navigation link in canvas
+				const navLinkBlock = navigation
+					.getNavBlock()
+					.getByRole( 'document', {
+						name: 'Block: Page Link',
+					} )
+					.first();
+
+				await navLinkBlock.click();
+
+				// Verify Link UI popover opens automatically
+				const linkPopover = navigation.getLinkPopover();
+				await expect( linkPopover ).toBeVisible();
+
+				// Verify search field is empty and ready for input
+				const searchInput = linkPopover.getByRole( 'combobox', {
+					name: 'Search or type URL',
+				} );
+				await expect( searchInput ).toBeVisible();
+				await expect( searchInput ).toBeEnabled();
+				await expect( searchInput ).toHaveValue( '' );
+
+				// Verify "Unsync and edit" button is NOT shown in Link UI popover
+				const unsyncButton = linkPopover.getByRole( 'button', {
+					name: 'Unsync and edit',
+				} );
+				await expect( unsyncButton ).toBeHidden();
+
+				// Close the popover
+				await page.keyboard.press( 'Escape' );
+				await expect( linkPopover ).toBeHidden();
+			} );
+
+			await test.step( 'Verify link block is not auto-removed after closing Link UI', async () => {
+				// Verify the link block is NOT auto-removed after closing
+				// This ensures the user can see they have a broken link to fix
+				const navLinkBlockAfterClose = navigation
+					.getNavBlock()
+					.getByRole( 'document', {
+						name: 'Block: Page Link',
+					} )
+					.first();
+				await expect( navLinkBlockAfterClose ).toBeVisible();
+			} );
+
+			await test.step( 'Verify sidebar shows error state help text', async () => {
+				// Select the Navigation Link block
+				const navBlock = navigation.getNavBlock();
+				await editor.selectBlocks( navBlock );
+
+				const navLinkBlock = navBlock
+					.getByRole( 'document', {
+						name: 'Block: Page Link',
+					} )
+					.first();
+
+				await editor.selectBlocks( navLinkBlock );
+
+				// Open document settings sidebar
+				await editor.openDocumentSettingsSidebar();
+				const settingsControls = page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'tabpanel', { name: 'Settings' } );
+
+				await expect( settingsControls ).toBeVisible();
+
+				// Verify Link input field shows error state
+				const linkInput = settingsControls.getByRole( 'textbox', {
+					name: 'Link',
+				} );
+
+				// Verify input is disabled when entity is unavailable
+				await expect( linkInput ).toBeDisabled();
+
+				// Verify input shows empty value (error state)
+				await expect( linkInput ).toHaveValue( '' );
+
+				// Verify input has aria-invalid="true"
+				await expect( linkInput ).toHaveAttribute(
+					'aria-invalid',
+					'true'
+				);
+
+				// Verify help text shows error message
+				await expect(
+					settingsControls.getByText(
+						'Synced page is missing. Please update or remove this link.'
+					)
+				).toBeVisible();
+
+				// Verify unsync button is visible
+				const helpTextId =
+					await linkInput.getAttribute( 'aria-describedby' );
+				const unlinkButton = settingsControls.getByRole( 'button', {
+					name: 'Unsync and edit',
+					description: helpTextId,
+				} );
+				await expect( unlinkButton ).toBeVisible();
+			} );
+
+			await test.step( 'Verify unlocking and amending resolves error states', async () => {
+				const settingsControls = page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'tabpanel', { name: 'Settings' } );
+
+				const linkInput = settingsControls.getByRole( 'textbox', {
+					name: 'Link',
+				} );
+
+				// Get the unsync button
+				const helpTextId =
+					await linkInput.getAttribute( 'aria-describedby' );
+				const unlinkButton = settingsControls.getByRole( 'button', {
+					name: 'Unsync and edit',
+					description: helpTextId,
+				} );
+
+				// Click "Unsync and edit" button
+				await unlinkButton.click();
+
+				// Verify Link input becomes enabled
+				await expect( linkInput ).toBeEnabled();
+
+				// Update URL to a valid value
+				await linkInput.fill( 'https://example.com' );
+				await linkInput.blur();
+
+				// Verify error states are cleared
+				// Wait for error help text to disappear (state updates asynchronously)
+				await expect(
+					settingsControls.getByText(
+						'Synced page is missing. Please update or remove this link.'
+					)
+				).toBeHidden();
+
+				// Verify input no longer has aria-invalid
+				await expect( linkInput ).not.toHaveAttribute(
+					'aria-invalid',
+					'true'
+				);
+
+				// Verify input has the new URL value
+				await expect( linkInput ).toHaveValue( 'https://example.com' );
+
+				// Verify link works normally (no error styling)
+				await expect( linkInput ).toBeEnabled();
+			} );
+		} );
 	} );
 } );
 

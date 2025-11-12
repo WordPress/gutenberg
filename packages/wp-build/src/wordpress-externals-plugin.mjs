@@ -15,10 +15,10 @@ import { getPackageInfo } from './package-utils.mjs';
  * This plugin handles WordPress package externals and vendor libraries,
  * treating them as external dependencies available via global variables.
  *
- * @param {string} packageNamespace Custom package namespace (e.g., 'wordpress', 'my-plugin').
- * @param {string|false} scriptGlobal Global variable name (e.g., 'wp', 'myPlugin') or false to disable globals.
- * @param {Object} externalNamespaces Additional namespaces to externalize (e.g., { 'woo': { global: 'woo', handlePrefix: 'woocommerce' } }).
- * @param {string} handlePrefix Handle prefix for main package (e.g., 'wp', 'mp'). Defaults to packageNamespace.
+ * @param {string}       packageNamespace   Custom package namespace (e.g., 'wordpress', 'my-plugin').
+ * @param {string|false} scriptGlobal       Global variable name (e.g., 'wp', 'myPlugin') or false to disable globals.
+ * @param {Object}       externalNamespaces Additional namespaces to externalize (e.g., { 'woo': { global: 'woo', handlePrefix: 'woocommerce' } }).
+ * @param {string}       handlePrefix       Handle prefix for main package (e.g., 'wp', 'mp'). Defaults to packageNamespace.
  * @return {Function} Function that creates the esbuild plugin instance.
  */
 export function createWordpressExternalsPlugin(
@@ -117,7 +117,11 @@ export function createWordpressExternalsPlugin(
 				];
 
 				// Add custom namespace if different from wordpress and scriptGlobal is not false
-				if ( packageNamespace && packageNamespace !== 'wordpress' && scriptGlobal !== false ) {
+				if (
+					packageNamespace &&
+					packageNamespace !== 'wordpress' &&
+					scriptGlobal !== false
+				) {
 					packageExternals.push( {
 						namespace: packageNamespace,
 						pattern: new RegExp( `^@${ packageNamespace }/` ),
@@ -127,7 +131,9 @@ export function createWordpressExternalsPlugin(
 				}
 
 				// Add additional external namespaces from configuration
-				for ( const [ namespace, config ] of Object.entries( externalNamespaces ) ) {
+				for ( const [ namespace, config ] of Object.entries(
+					externalNamespaces
+				) ) {
 					packageExternals.push( {
 						namespace,
 						pattern: new RegExp( `^@${ namespace }/` ),
@@ -198,11 +204,17 @@ export function createWordpressExternalsPlugin(
 
 							if ( isScriptModule ) {
 								if ( kind === 'static' ) {
-									moduleDependencies.set( args.path, 'static' );
+									moduleDependencies.set(
+										args.path,
+										'static'
+									);
 								} else if (
 									! moduleDependencies.has( args.path )
 								) {
-									moduleDependencies.set( args.path, 'dynamic' );
+									moduleDependencies.set(
+										args.path,
+										'dynamic'
+									);
 								}
 
 								return {
@@ -217,7 +229,9 @@ export function createWordpressExternalsPlugin(
 								return {
 									path: args.path,
 									namespace: 'package-external',
-									pluginData: { globalName: externalConfig.globalName },
+									pluginData: {
+										globalName: externalConfig.globalName,
+									},
 								};
 							}
 
@@ -246,7 +260,10 @@ export function createWordpressExternalsPlugin(
 						const globalName = args.pluginData.globalName;
 						// Extract package name after '@namespace/' prefix
 						// e.g., '@wordpress/blocks' or '@my-plugin/data'
-						const packagePath = args.path.split( '/' ).slice( 1 ).join( '/' );
+						const packagePath = args.path
+							.split( '/' )
+							.slice( 1 )
+							.join( '/' );
 						const camelCasedName = camelCase( packagePath );
 
 						return {

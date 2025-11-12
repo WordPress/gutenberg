@@ -114,7 +114,7 @@ export default function Edit( {
 					</BlockControls>
 					<BlockControls group="other">
 						<ToolbarButton onClick={ addAccordionItemBlock }>
-							{ __( 'Add' ) }
+							{ __( 'Add item' ) }
 						</ToolbarButton>
 					</BlockControls>
 				</>

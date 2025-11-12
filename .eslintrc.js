@@ -76,7 +76,7 @@ const restrictedSyntax = [
 	// here. That's why we use \\u002F in the regexes below.
 	{
 		selector:
-			'ImportDeclaration[source.value=/^@wordpress\\u002F.+\\u002F/]',
+			'ImportDeclaration[source.value=/^@wordpress\\u002F.+\\u002F/]:not([source.value=/^@wordpress\\u002F.+\\u002Fbuild-types\\u002F/])',
 		message: 'Path access on WordPress dependencies is not allowed.',
 	},
 	{
@@ -168,6 +168,7 @@ module.exports = {
 		],
 		'@wordpress/no-unsafe-wp-apis': 'off',
 		'@wordpress/data-no-store-string-literals': 'error',
+		'eslint-comments/no-unused-disable': 'error',
 		'import/default': 'error',
 		'import/named': 'error',
 		'no-restricted-imports': [

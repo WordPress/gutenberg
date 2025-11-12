@@ -2,10 +2,33 @@
 
 ## Unreleased
 
+### Enhancements
+
+- DataForm: add new details layout. [#72355](https://github.com/WordPress/gutenberg/pull/72355)
+- DatViews list layout: remove link variant from primary actions's button. [#72920](https://github.com/WordPress/gutenberg/pull/72920)
+- DataForm: simplify form normalization. [#72848](https://github.com/WordPress/gutenberg/pull/72848)
+- DataViewsPicker: Add With Modal story. [#72913](https://github.com/WordPress/gutenberg/pull/72913)
+- DataForm: make the card layout borderless. [#72514](https://github.com/WordPress/gutenberg/pull/72514)
+- DataViews: Simplify the view config properties section. [#73064](https://github.com/WordPress/gutenberg/pull/73064)
+- DataViews: Add a contextual menu to the table layout header. [#73104](https://github.com/WordPress/gutenberg/pull/73104)
+- DataViewsPicker: Add table layout support. [#72914](https://github.com/WordPress/gutenberg/pull/72914)
+
+### Bug fixes
+
+- useFormValidity: make it work with any level of nesting in the form. [#72588](https://github.com/WordPress/gutenberg/pull/72588)
+- Fix: DataViews modal actions in list layout. [#72793](https://github.com/WordPress/gutenberg/pull/72793)
+- Fix: Incorrect aria-label in table layout when items are not clickable. [#73034](https://github.com/WordPress/gutenberg/pull/73034)
+- Fix: Table layout column spacing. [#72969](https://github.com/WordPress/gutenberg/pull/72969)
+
+### Enhancements
+
+- DataViews: Group DataViews actions based on primary actions and regular actions and adds a separator between the groups. [#72866](https://github.com/WordPress/gutenberg/pull/72866)
+
 ## 10.2.0 (2025-10-29)
 
 ### Enhancements
 
+- DataViews: datetime filter and default render use local time. [#72756](https://github.com/WordPress/gutenberg/pull/72756)
 - DataViews: keep icon-only buttons on mobile for bulk actions. [#72761](https://github.com/WordPress/gutenberg/pull/72761)
 - DataForm: update spacing for regular and card layouts. [#72249](https://github.com/WordPress/gutenberg/pull/72249).
 - DataForm: Fix password field suffix alignment. [#72524](https://github.com/WordPress/gutenberg/pull/72524).

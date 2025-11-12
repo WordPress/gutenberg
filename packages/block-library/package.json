@@ -43,7 +43,8 @@
 		"./image/view": "./build-module/image/view.js",
 		"./navigation/view": "./build-module/navigation/view.js",
 		"./query/view": "./build-module/query/view.js",
-		"./search/view": "./build-module/search/view.js"
+		"./search/view": "./build-module/search/view.js",
+		"./tabs/view": "./build-module/tabs/view.js"
 	},
 	"wpStyleEntryPoints": [
 		"src/*.scss",

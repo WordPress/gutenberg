@@ -11,9 +11,14 @@
 import toposort from 'toposort';
 
 /**
+ * Node dependencies
+ */
+import path from 'path';
+
+/**
  * Internal dependencies
  */
-import { getPackageInfo } from './package-utils.mjs';
+import { getPackageInfo, getPackageInfoFromFile } from './package-utils.mjs';
 
 /**
  * Check if a package is a script or script module.
@@ -31,12 +36,12 @@ function isScriptOrModule( packageName ) {
 }
 
 /**
- * Get WordPress package dependencies from a package.json file.
+ * Get package dependencies from a package.json file.
  *
  * @param {string} packageName The full package name (e.g., '@wordpress/blocks').
- * @return {string[]} Array of WordPress package names this package depends on.
+ * @return {string[]} Array of package names this package depends on.
  */
-function getWordPressDependencies( packageName ) {
+function getDependencies( packageName ) {
 	const packageJson = getPackageInfo( packageName );
 	if ( ! packageJson ) {
 		return [];
@@ -44,10 +49,7 @@ function getWordPressDependencies( packageName ) {
 
 	const deps = packageJson.dependencies || {};
 
-	// Extract @wordpress/* package names (keep full names)
-	return Object.keys( deps ).filter( ( dep ) =>
-		dep.startsWith( '@wordpress/' )
-	);
+	return Object.keys( deps );
 }
 
 /**
@@ -62,7 +64,7 @@ function buildDependencyGraph( packages ) {
 	const packagesSet = new Set( packages );
 
 	for ( const packageName of packages ) {
-		const deps = getWordPressDependencies( packageName );
+		const deps = getDependencies( packageName );
 
 		// Only include edges where both packages are in our list
 		for ( const dep of deps ) {
@@ -143,7 +145,7 @@ function groupByDepth( packages ) {
 
 		visited.add( packageName );
 
-		const deps = getWordPressDependencies( packageName );
+		const deps = getDependencies( packageName );
 		const relevantDeps = deps.filter( ( dep ) => packagesSet.has( dep ) );
 
 		if ( relevantDeps.length === 0 ) {
@@ -192,7 +194,7 @@ function getReverseDependencies( packageName, allPackages ) {
 	const dependents = [];
 
 	for ( const pkg of allPackages ) {
-		const deps = getWordPressDependencies( pkg );
+		const deps = getDependencies( pkg );
 		if ( deps.includes( packageName ) ) {
 			dependents.push( pkg );
 		}
@@ -260,12 +262,108 @@ function findScriptsToRebundle( changedPackage, allPackages ) {
 	return Array.from( scriptsToRebundle );
 }
 
+/**
+ * Get package dependencies from a route's package.json file.
+ *
+ * @param {string} rootDir   Root directory path.
+ * @param {string} routeName The route name (e.g., 'home').
+ * @return {string[]} Array of package names this route depends on.
+ */
+function getRouteDependencies( rootDir, routeName ) {
+	const packageJson = getPackageInfoFromFile(
+		path.join( rootDir, 'routes', routeName, 'package.json' )
+	);
+	if ( ! packageJson ) {
+		return [];
+	}
+
+	const deps = packageJson.dependencies || {};
+
+	return Object.keys( deps );
+}
+
+/**
+ * Find routes that need to be rebuilt when a bundled package changes.
+ * Uses BFS to traverse reverse dependencies, stopping at script/module boundaries.
+ *
+ * When a bundled package changes, we need to rebuild any routes that depend on it
+ * through a chain of bundled packages. Routes are leaf nodes like scripts/modules.
+ *
+ * Example:
+ * - A (bundled) changes
+ * - B (bundled) depends on A
+ * - C (script) depends on B
+ * - home (route) depends on B
+ * Result: Both C and home need rebuilding
+ *
+ * @param {string}   changedPackage The full package name that changed.
+ * @param {string[]} allPackages    Array of all full package names.
+ * @param {string}   rootDir        Root directory path.
+ * @param {string[]} allRoutes      Array of all route names.
+ * @return {string[]} Array of route names to rebuild.
+ */
+function findRoutesToRebuild(
+	changedPackage,
+	allPackages,
+	rootDir,
+	allRoutes
+) {
+	// If the changed package itself is a script/module, routes won't be affected
+	// (routes depend on bundled packages, not scripts/modules)
+	if ( isScriptOrModule( changedPackage ) ) {
+		return [];
+	}
+
+	const routesToRebuild = new Set();
+	const visited = new Set();
+	const queue = [ changedPackage ];
+
+	while ( queue.length > 0 ) {
+		const currentPackage = queue.shift();
+
+		if ( ! currentPackage || visited.has( currentPackage ) ) {
+			continue;
+		}
+		visited.add( currentPackage );
+
+		// Check if any routes depend on the current package
+		for ( const route of allRoutes ) {
+			const deps = getRouteDependencies( rootDir, route );
+			if ( deps.includes( currentPackage ) ) {
+				routesToRebuild.add( route );
+			}
+		}
+
+		// Get all packages that depend on the current package
+		const dependents = getReverseDependencies(
+			currentPackage,
+			allPackages
+		);
+
+		for ( const dependent of dependents ) {
+			// If this dependent is a script/module, don't traverse further
+			// (stop at script boundaries)
+			if (
+				! isScriptOrModule( dependent ) &&
+				! visited.has( dependent )
+			) {
+				// If it's a bundled package, continue traversing
+				queue.push( dependent );
+			}
+		}
+	}
+
+	return Array.from( routesToRebuild );
+}
+
 export {
-	getWordPressDependencies,
+	getDependencies,
 	buildDependencyGraph,
 	topologicalSort,
 	groupByDepth,
 	isScriptOrModule,
 	getReverseDependencies,
 	findScriptsToRebundle,
+	getRouteDependencies,
+	findRoutesToRebuild,
 };

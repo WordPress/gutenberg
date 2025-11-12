@@ -16,16 +16,14 @@ import { chevronDown, chevronUp } from '@wordpress/icons';
 import { getFormFieldLayout } from '..';
 import DataFormContext from '../../components/dataform-context';
 import type {
-	NormalizedCardLayout,
-	CardLayout,
 	FieldLayoutProps,
-	Form,
-	Layout,
+	NormalizedCardLayout,
 	NormalizedField,
+	NormalizedForm,
+	NormalizedLayout,
 } from '../../types';
 import { DataFormLayout } from '../data-form-layout';
-import { isCombinedField } from '../is-combined-field';
-import { DEFAULT_LAYOUT, normalizeLayout } from '../normalize-form-fields';
+import { DEFAULT_LAYOUT } from '../normalize-form';
 import { getSummaryFields } from '../get-summary-fields';
 
 const NonCollapsibleCardHeader = ( {
@@ -34,7 +32,7 @@ const NonCollapsibleCardHeader = ( {
 }: {
 	children: React.ReactNode;
 } ) => (
-	<OriginalCardHeader { ...props }>
+	<OriginalCardHeader isBorderless { ...props }>
 		<div
 			style={ {
 				height: '40px', // This is to match the chevron's __next40pxDefaultSize
@@ -72,6 +70,7 @@ export function useCardHeader( layout: NormalizedCardLayout ) {
 					cursor: 'pointer',
 					...props.style,
 				} }
+				isBorderless
 			>
 				<div
 					style={ {
@@ -162,16 +161,12 @@ export default function FormCardField< Item >( {
 	validity,
 }: FieldLayoutProps< Item > ) {
 	const { fields } = useContext( DataFormContext );
+	const layout = field.layout as NormalizedCardLayout;
 
-	const layout: NormalizedCardLayout = normalizeLayout( {
-		...field.layout,
-		type: 'card',
-	} as CardLayout ) as NormalizedCardLayout;
-
-	const form: Form = useMemo(
-		(): Form => ( {
-			layout: DEFAULT_LAYOUT as Layout,
-			fields: isCombinedField( field ) ? field.children : [],
+	const form: NormalizedForm = useMemo(
+		() => ( {
+			layout: DEFAULT_LAYOUT as NormalizedLayout,
+			fields: field.children ?? [],
 		} ),
 		[ field ]
 	);
@@ -184,11 +179,27 @@ export default function FormCardField< Item >( {
 		isSummaryFieldVisible( summaryField, layout.summary, isOpen )
 	);
 
-	if ( isCombinedField( field ) ) {
+	const sizeCard = {
+		blockStart: 'medium' as const,
+		blockEnd: 'medium' as const,
+		inlineStart: 'medium' as const,
+		inlineEnd: 'medium' as const,
+	};
+
+	if ( !! field.children ) {
 		const withHeader = !! field.label && layout.withHeader;
 
+		const sizeCardBody = {
+			blockStart: withHeader
+				? ( 'none' as const )
+				: ( 'medium' as const ),
+			blockEnd: 'medium' as const,
+			inlineStart: 'medium' as const,
+			inlineEnd: 'medium' as const,
+		};
+
 		return (
-			<Card className="dataforms-layouts-card__field">
+			<Card className="dataforms-layouts-card__field" size={ sizeCard }>
 				{ withHeader && (
 					<CardHeader className="dataforms-layouts-card__field-header">
 						<span className="dataforms-layouts-card__field-header-label">
@@ -213,7 +224,10 @@ export default function FormCardField< Item >( {
 				{ ( isOpen || ! withHeader ) && (
 					// If it doesn't have a header, keep it open.
 					// Otherwise, the card will not be visible.
-					<CardBody className="dataforms-layouts-card__field-control">
+					<CardBody
+						size={ sizeCardBody }
+						className="dataforms-layouts-card__field-control"
+					>
 						{ field.description && (
 							<div className="dataforms-layouts-card__field-description">
 								{ field.description }
@@ -245,8 +259,15 @@ export default function FormCardField< Item >( {
 	}
 	const withHeader = !! fieldDefinition.label && layout.withHeader;
 
+	const sizeCardBody = {
+		blockStart: withHeader ? ( 'none' as const ) : ( 'medium' as const ),
+		blockEnd: 'medium' as const,
+		inlineStart: 'medium' as const,
+		inlineEnd: 'medium' as const,
+	};
+
 	return (
-		<Card className="dataforms-layouts-card__field">
+		<Card className="dataforms-layouts-card__field" size={ sizeCard }>
 			{ withHeader && (
 				<CardHeader className="dataforms-layouts-card__field-header">
 					<span className="dataforms-layouts-card__field-header-label">
@@ -268,7 +289,10 @@ export default function FormCardField< Item >( {
 			{ ( isOpen || ! withHeader ) && (
 				// If it doesn't have a header, keep it open.
 				// Otherwise, the card will not be visible.
-				<CardBody className="dataforms-layouts-card__field-control">
+				<CardBody
+					size={ sizeCardBody }
+					className="dataforms-layouts-card__field-control"
+				>
 					<RegularLayout
 						data={ data }
 						field={ field }

@@ -27,14 +27,8 @@ export function getTransformedAttributes(
 
 	const transformedAttributes = {};
 
-	// Handle attributes derived from block support. The custom class name
-	// attribute is handled in the `core/customClassName/addTransforms` hook.
-	if (
-		hasBlockSupport( newBlockType, 'allowedBlocks' ) &&
-		attributes.allowedBlocks
-	) {
-		transformedAttributes.allowedBlocks = attributes.allowedBlocks;
-	}
+	// Handle attributes derived from block support. The custom class name and
+	// allowed blocks attribute is handled separately.
 	if ( hasBlockSupport( newBlockType, 'anchor' ) && attributes.anchor ) {
 		transformedAttributes.anchor = attributes.anchor;
 	}

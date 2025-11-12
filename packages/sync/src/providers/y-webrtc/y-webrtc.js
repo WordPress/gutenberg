@@ -19,7 +19,7 @@ import * as buffer from 'lib0/buffer';
 import * as math from 'lib0/math';
 import { createMutex } from 'lib0/mutex';
 
-import * as Y from 'yjs'; // eslint-disable-line
+import * as Y from 'yjs';
 import Peer from 'simple-peer/simplepeer.min.js';
 
 import * as syncProtocol from 'y-protocols/sync';

@@ -42,7 +42,6 @@
 		"packages/build-vendors.mjs",
 		"packages/build.mjs",
 		"packages/check-build-type-declaration-files.js",
-		"packages/lint-staged-typecheck.js",
 		"plugin/cli.js",
 		"plugin/commands/common.js",
 		"plugin/commands/packages.js",

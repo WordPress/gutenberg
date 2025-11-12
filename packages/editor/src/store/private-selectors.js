@@ -290,3 +290,13 @@ export function getStylesPath( state ) {
 export function getShowStylebook( state ) {
 	return state.showStylebook ?? false;
 }
+
+/**
+ * Get the canvas minimum height.
+ *
+ * @param {Object} state Global application state.
+ * @return {number} The canvas minimum height.
+ */
+export function getCanvasMinHeight( state ) {
+	return state.canvasMinHeight;
+}

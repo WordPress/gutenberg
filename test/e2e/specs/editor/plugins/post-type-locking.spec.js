@@ -337,7 +337,7 @@ test.describe( 'Post-type locking', () => {
 
 			const blockSwitcher = page
 				.getByRole( 'toolbar', { name: 'Block tools' } )
-				.getByRole( 'button', { name: 'Paragraph' } );
+				.getByRole( 'button', { name: 'Paragraph', exact: true } );
 
 			// Verify the block switcher exists.
 			await expect( blockSwitcher ).toHaveAttribute(
@@ -349,9 +349,11 @@ test.describe( 'Post-type locking', () => {
 			await blockSwitcher.click();
 			await expect(
 				page
-					.getByRole( 'menu', { name: 'Paragraph' } )
+					.getByRole( 'menu', { name: 'Paragraph', exact: true } )
 					.getByRole( 'menuitem' )
 			).toHaveText( [
+				'Paragraph',
+				'Stretchy Paragraph',
 				'Heading',
 				'List',
 				'Quote',

@@ -35,41 +35,52 @@ import { unlock } from '../lock-unlock';
  * ```
  */
 function getPostMetaFields( select, context ) {
-	const { getEditedEntityRecord } = select( coreDataStore );
 	const { getRegisteredPostMeta } = unlock( select( coreDataStore ) );
 
-	let entityMetaValues;
-	// Try to get the current entity meta values.
-	if ( context?.postType && context?.postId ) {
-		entityMetaValues = getEditedEntityRecord(
-			'postType',
-			context?.postType,
-			context?.postId
-		).meta;
-	}
-
 	const registeredFields = getRegisteredPostMeta( context?.postType );
-	const metaFields = {};
-	Object.entries( registeredFields || {} ).forEach( ( [ key, props ] ) => {
+	const metaFields = [];
+	Object.entries( registeredFields ).forEach( ( [ key, props ] ) => {
 		// Don't include footnotes or private fields.
-		if ( key !== 'footnotes' && key.charAt( 0 ) !== '_' ) {
-			metaFields[ key ] = {
-				label: props.title || key,
-				value:
-					// When using the entity value, an empty string IS a valid value.
-					entityMetaValues?.[ key ] ??
-					// When using the default, an empty string IS NOT a valid value.
-					( props.default || undefined ),
-				type: props.type,
-			};
+		if ( key === 'footnotes' || key.charAt( 0 ) === '_' ) {
+			return;
 		}
+
+		metaFields.push( {
+			label: props.title || key,
+			args: { key },
+			default: props.default,
+			type: props.type,
+		} );
 	} );
 
-	if ( ! Object.keys( metaFields || {} ).length ) {
-		return null;
+	return metaFields;
+}
+
+function getValue( { select, context, args } ) {
+	const metaFields = getPostMetaFields( select, context );
+	const metaField = metaFields.find(
+		( field ) => field.args.key === args.key
+	);
+
+	// If the meta field was not found, it's either protected, inaccessible, or simply doesn't exist.
+	if ( ! metaField ) {
+		return args.key;
 	}
 
-	return metaFields;
+	// Without a postId, we cannot look up a meta value.
+	if ( ! context?.postId ) {
+		// Return the default value for the meta field if available.
+		return metaField.default || metaField.label || args.key;
+	}
+
+	const { getEditedEntityRecord } = select( coreDataStore );
+	const entityMetaValues = getEditedEntityRecord(
+		'postType',
+		context?.postType,
+		context?.postId
+	).meta;
+
+	return entityMetaValues?.[ args.key ] ?? metaField?.label ?? args.key;
 }
 
 /**
@@ -78,15 +89,13 @@ function getPostMetaFields( select, context ) {
 export default {
 	name: 'core/post-meta',
 	getValues( { select, context, bindings } ) {
-		const metaFields = getPostMetaFields( select, context );
-
 		const newValues = {};
-		for ( const [ attributeName, source ] of Object.entries( bindings ) ) {
-			// Use the value, the field label, or the field key.
-			const fieldKey = source.args.key;
-			const { value: fieldValue, label: fieldLabel } =
-				metaFields?.[ fieldKey ] || {};
-			newValues[ attributeName ] = fieldValue ?? fieldLabel ?? fieldKey;
+		for ( const [ attributeName, binding ] of Object.entries( bindings ) ) {
+			newValues[ attributeName ] = getValue( {
+				select,
+				context,
+				args: binding.args,
+			} );
 		}
 		return newValues;
 	},
@@ -116,12 +125,14 @@ export default {
 			return false;
 		}
 
-		const fieldValue = getPostMetaFields( select, context )?.[ args.key ]
-			?.value;
-		// Empty string or `false` could be a valid value, so we need to check if the field value is undefined.
-		if ( fieldValue === undefined ) {
+		const metaFields = getPostMetaFields( select, context );
+		const hasMatchingMetaField = metaFields.some(
+			( field ) => field.args.key === args.key
+		);
+		if ( ! hasMatchingMetaField ) {
 			return false;
 		}
+
 		// Check that custom fields metabox is not enabled.
 		const areCustomFieldsEnabled =
 			select( editorStore ).getEditorSettings().enableCustomFields;
@@ -143,13 +154,11 @@ export default {
 	},
 	getFieldsList( { select, context } ) {
 		const metaFields = getPostMetaFields( select, context );
-		if ( ! metaFields ) {
-			return [];
-		}
-		return Object.entries( metaFields ).map( ( [ key, field ] ) => ( {
-			label: field.label,
-			type: field.type,
-			args: { key },
-		} ) );
+		// Remove 'default' property from meta fields.
+		return metaFields.map(
+			( { default: defaultProp, ...otherProps } ) => ( {
+				...otherProps,
+			} )
+		);
 	},
 };

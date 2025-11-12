@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   The `lint-js` script now includes `.cjs`, `.mjs`, `.cts`, and `.mts` as default extensions to lint. This is considered a breaking change because the script may now surface lint errors in your project which would not have been previously identified.
+
 ## 30.27.0 (2025-10-29)
 
 ## 30.26.0 (2025-10-17)
@@ -37,7 +41,6 @@
 ### Bug Fixes
 
 -   Fix: `--blocks-manifest` CLI flag doesn't work when the directory name has space ([#69766](https://github.com/WordPress/gutenberg/pull/69766)).
-
 
 ## 30.14.0 (2025-03-27)
 

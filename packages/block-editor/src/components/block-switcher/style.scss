@@ -1,54 +1,6 @@
 @use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/base-styles/colors" as *;
 
-.block-editor-block-switcher {
-	position: relative;
-
-	// @todo override toolbar group inherited paddings from components/block-tools/style.scss.
-	// This is best fixed by making the mover control area a proper single toolbar group.
-	// It needs specificity due to style inherited from .components-accessible-toolbar .components-button.has-icon.has-icon.
-	.components-button.components-dropdown-menu__toggle.has-icon.has-icon {
-		min-width: $button-size;
-	}
-}
-
-// Show an indicator triangle.
-.block-editor-block-switcher__no-switcher-icon,
-.block-editor-block-switcher__toggle {
-	position: relative;
-}
-
-.components-button.block-editor-block-switcher__toggle,
-.components-button.block-editor-block-switcher__no-switcher-icon {
-	margin: 0;
-	display: block;
-	height: $grid-unit-60;
-
-	.block-editor-block-icon {
-		margin: auto;
-	}
-}
-
-.components-button.block-editor-block-switcher__no-switcher-icon {
-	display: flex;
-
-	.block-editor-block-icon {
-		margin-right: auto;
-		margin-left: auto;
-		min-width: $icon-size !important;
-	}
-}
-
-// Even when the block switcher does not have any transformations, it still serves as a block indicator.
-.components-button.block-editor-block-switcher__no-switcher-icon[aria-disabled="true"] {
-	color: $gray-900;
-
-	// Since it's not clickable, though, don't show a hover state.
-	&:hover {
-		color: $gray-900;
-	}
-}
-
 .components-popover.block-editor-block-switcher__popover .components-popover__content {
 	min-width: 300px;
 }
@@ -95,28 +47,6 @@
 	text-transform: uppercase;
 	font-size: 11px;
 	font-weight: $font-weight-medium;
-}
-
-// The block switcher in the contextual toolbar should be bigger.
-.block-editor-block-contextual-toolbar {
-	.components-button.block-editor-block-switcher__no-switcher-icon {
-		min-width: $button-size;
-	}
-
-	.components-button.block-editor-block-switcher__no-switcher-icon,
-	.components-button.block-editor-block-switcher__toggle {
-		height: $grid-unit-60;
-
-		.block-editor-block-icon,
-		.block-editor-block-switcher__transform {
-			width: $block-toolbar-height;
-			height: $block-toolbar-height;
-		}
-
-		.block-editor-block-switcher__transform {
-			padding: $grid-unit-15;
-		}
-	}
 }
 
 .block-editor-block-switcher__preview-patterns-container {

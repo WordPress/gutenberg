@@ -336,7 +336,10 @@ export function BlockSettingsDropdown( {
 									) }
 									{ count === 1 && (
 										<CommentIconSlotFill.Slot
-											fillProps={ { onClose } }
+											fillProps={ {
+												clientId: firstBlockClientId,
+												onClose,
+											} }
 										/>
 									) }
 								</MenuGroup>

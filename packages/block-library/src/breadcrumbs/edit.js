@@ -28,7 +28,13 @@ export default function BreadcrumbEdit( {
 	setAttributes,
 	context: { postId, postType, templateSlug },
 } ) {
-	const { separator, showHomeLink, prefersTaxonomy } = attributes;
+	const {
+		separator,
+		showHomeLink,
+		showLastItem,
+		prefersTaxonomy,
+		showOnHomePage,
+	} = attributes;
 	const {
 		post,
 		isPostTypeHierarchical,
@@ -160,9 +166,11 @@ export default function BreadcrumbEdit( {
 							</a>
 						</li>
 					) ) }
-					<li>
-						<span aria-current="page">{ __( 'Current' ) }</span>
-					</li>
+					{ showLastItem && (
+						<li>
+							<span aria-current="page">{ __( 'Current' ) }</span>
+						</li>
+					) }
 				</ol>
 			</nav>
 		);
@@ -176,6 +184,7 @@ export default function BreadcrumbEdit( {
 						setAttributes( {
 							separator: separatorDefaultValue,
 							showHomeLink: true,
+							showLastItem: true,
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
@@ -197,6 +206,25 @@ export default function BreadcrumbEdit( {
 								setAttributes( { showHomeLink: value } )
 							}
 							checked={ showHomeLink }
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						label={ __( 'Show last item' ) }
+						isShownByDefault
+						hasValue={ () => ! showLastItem }
+						onDeselect={ () =>
+							setAttributes( {
+								showLastItem: true,
+							} )
+						}
+					>
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Show last item' ) }
+							onChange={ ( value ) =>
+								setAttributes( { showLastItem: value } )
+							}
+							checked={ showLastItem }
 						/>
 					</ToolsPanelItem>
 					<ToolsPanelItem
@@ -230,6 +258,17 @@ export default function BreadcrumbEdit( {
 				</ToolsPanel>
 			</InspectorControls>
 			<InspectorControls group="advanced">
+				<CheckboxControl
+					__nextHasNoMarginBottom
+					label={ __( 'Show on homepage' ) }
+					checked={ showOnHomePage }
+					onChange={ ( value ) =>
+						setAttributes( { showOnHomePage: value } )
+					}
+					help={ __(
+						'If this breadcrumbs block appears in a template or template part that’s shown on the homepage, enable this option to display the breadcrumb trail. Otherwise, this setting has no effect.'
+					) }
+				/>
 				<CheckboxControl
 					__nextHasNoMarginBottom
 					label={ __( 'Prefer taxonomy terms' ) }

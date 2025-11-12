@@ -19,6 +19,14 @@
 		"showHomeLink": {
 			"type": "boolean",
 			"default": true
+		},
+		"showLastItem": {
+			"type": "boolean",
+			"default": true
+		},
+		"showOnHomePage": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"usesContext": [ "postId", "postType", "templateSlug" ],

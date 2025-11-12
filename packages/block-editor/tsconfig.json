@@ -22,6 +22,7 @@
 		{ "path": "../html-entities" },
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
+		{ "path": "../interactivity" },
 		{ "path": "../is-shallow-equal" },
 		{ "path": "../keycodes" },
 		{ "path": "../notices" },

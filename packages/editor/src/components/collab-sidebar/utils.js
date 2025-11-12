@@ -109,8 +109,8 @@ export function focusCommentThread( commentId, container, additionalSelector ) {
 
 	// A thread without a commentId is a new comment thread.
 	const threadSelector = commentId
-		? `[role=listitem][id="comment-thread-${ commentId }"]`
-		: '[role=listitem]:not([id])';
+		? `[role=treeitem][id="comment-thread-${ commentId }"]`
+		: '[role=treeitem]:not([id])';
 	const selector = additionalSelector
 		? `${ threadSelector } ${ additionalSelector }`
 		: threadSelector;
@@ -129,6 +129,7 @@ export function focusCommentThread( commentId, container, additionalSelector ) {
 				resolve( container.querySelector( selector ) );
 			}
 		} );
+
 		observer.observe( container, {
 			childList: true,
 			subtree: true,

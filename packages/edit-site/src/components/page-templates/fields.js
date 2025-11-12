@@ -156,13 +156,13 @@ export const activeField = {
 	getValue: ( { item } ) => item._isActive,
 	render: function Render( { item } ) {
 		const activeLabel = item._isCustom
-			? __( 'Active when used' )
-			: __( 'Active' );
+			? _x( 'Active when used', 'template' )
+			: _x( 'Active', 'template' );
 		const activeIntent = item._isCustom ? 'info' : 'success';
 		const isActive = item._isActive;
 		return (
 			<Badge intent={ isActive ? activeIntent : 'default' }>
-				{ isActive ? activeLabel : __( 'Inactive' ) }
+				{ isActive ? activeLabel : _x( 'Inactive', 'template' ) }
 			</Badge>
 		);
 	},

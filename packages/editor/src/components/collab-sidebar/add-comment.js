@@ -6,7 +6,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -28,25 +28,30 @@ const { useBlockElement } = unlock( blockEditorPrivateApis );
 
 export function AddComment( {
 	onSubmit,
-	showCommentBoard,
-	setShowCommentBoard,
+	newNoteFormState,
+	setNewNoteFormState,
 	commentSidebarRef,
 	reflowComments = noop,
 	isFloating = false,
 	y,
 	refs,
 } ) {
-	const { clientId, blockCommentId } = useSelect( ( select ) => {
-		const { getSelectedBlock } = select( blockEditorStore );
-		const selectedBlock = getSelectedBlock();
+	const { clientId } = useSelect( ( select ) => {
+		const { getSelectedBlockClientId } = select( blockEditorStore );
 		return {
-			clientId: selectedBlock?.clientId,
-			blockCommentId: selectedBlock?.attributes?.metadata?.noteId,
+			clientId: getSelectedBlockClientId(),
 		};
 	}, [] );
 	const blockElement = useBlockElement( clientId );
+	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
 
-	if ( ! showCommentBoard || ! clientId || undefined !== blockCommentId ) {
+	const unselectThread = () => {
+		setNewNoteFormState( 'closed' );
+		blockElement?.focus();
+		toggleBlockSpotlight( clientId, false );
+	};
+
+	if ( newNoteFormState !== 'open' || ! clientId ) {
 		return null;
 	}
 
@@ -61,7 +66,7 @@ export function AddComment( {
 			spacing="3"
 			tabIndex={ 0 }
 			aria-label={ __( 'New note' ) }
-			role="listitem"
+			role="treeitem"
 			ref={ isFloating ? refs.setFloating : undefined }
 			style={
 				isFloating
@@ -73,7 +78,8 @@ export function AddComment( {
 				if ( event.currentTarget.contains( event.relatedTarget ) ) {
 					return;
 				}
-				setShowCommentBoard( false );
+				toggleBlockSpotlight( clientId, false );
+				setNewNoteFormState( 'closed' );
 			} }
 		>
 			<HStack alignment="left" spacing="3">
@@ -83,12 +89,9 @@ export function AddComment( {
 				onSubmit={ async ( inputComment ) => {
 					const { id } = await onSubmit( { content: inputComment } );
 					focusCommentThread( id, commentSidebarRef.current );
-					setShowCommentBoard( false );
+					setNewNoteFormState( 'creating' );
 				} }
-				onCancel={ () => {
-					setShowCommentBoard( false );
-					blockElement?.focus();
-				} }
+				onCancel={ unselectThread }
 				reflowComments={ reflowComments }
 				submitButtonText={ __( 'Add note' ) }
 				labelText={ __( 'New note' ) }

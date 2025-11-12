@@ -37,8 +37,7 @@ import { unlock } from '../lock-unlock';
 
 import {
 	getContentLockingParent,
-	getTemporarilyEditingAsBlocks,
-	getTemporarilyEditingFocusModeToRevert,
+	getEditedContentOnlySection,
 	getSectionRootClientId,
 	isSectionBlock,
 	getParentSectionBlock,
@@ -788,7 +787,6 @@ export function getNextBlockClientId( state, startClientId ) {
 	return getAdjacentBlockClientId( state, startClientId, 1 );
 }
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * Returns the initial caret position for the selected block.
  * This position is to used to position the caret properly when the selected block changes.
@@ -799,7 +797,6 @@ export function getNextBlockClientId( state, startClientId ) {
  * @return {0|-1|null} Initial position.
  */
 export function getSelectedBlocksInitialCaretPosition( state ) {
-	/* eslint-enable jsdoc/valid-types */
 	return state.initialPosition;
 }
 
@@ -1576,7 +1573,21 @@ export function getTemplateLock( state, rootClientId ) {
 		return state.settings.templateLock ?? false;
 	}
 
-	return getBlockListSettings( state, rootClientId )?.templateLock ?? false;
+	const blockListTemplateLock = getBlockListSettings(
+		state,
+		rootClientId
+	)?.templateLock;
+
+	// If this is a contentOnly template locked block that's in the process
+	// of being edited, consider the template lock as temporarily inactive.
+	if (
+		blockListTemplateLock === 'contentOnly' &&
+		state.editedContentOnlySection === rootClientId
+	) {
+		return false;
+	}
+
+	return blockListTemplateLock ?? false;
 }
 
 /**
@@ -2263,6 +2274,8 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 					} ) );
 			}
 
+			// Hardcode: Collect stretch variations separately to add at the end
+			const stretchVariations = [];
 			const items = blockTypeInserterItems.reduce(
 				( accumulator, item ) => {
 					const { variations = [] } = item;
@@ -2275,14 +2288,26 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 							state,
 							item
 						);
-						accumulator.push(
-							...variations.map( variationMapper )
-						);
+						variations
+							.map( variationMapper )
+							.forEach( ( variation ) => {
+								if (
+									variation.id ===
+										'core/paragraph/stretchy-paragraph' ||
+									variation.id ===
+										'core/heading/stretchy-heading'
+								) {
+									stretchVariations.push( variation );
+								} else {
+									accumulator.push( variation );
+								}
+							} );
 					}
 					return accumulator;
 				},
 				[]
 			);
+			items.push( ...stretchVariations );
 
 			// Ensure core blocks are prioritized in the returned results,
 			// because third party blocks can be registered earlier than
@@ -3210,25 +3235,5 @@ export function __unstableGetTemporarilyEditingAsBlocks( state ) {
 			version: '6.7',
 		}
 	);
-	return getTemporarilyEditingAsBlocks( state );
-}
-
-/**
- * DO-NOT-USE in production.
- * This selector is created for internal/experimental only usage and may be
- * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
- *
- * @deprecated
- *
- * @param {Object} state Global application state.
- */
-export function __unstableGetTemporarilyEditingFocusModeToRevert( state ) {
-	deprecated(
-		"wp.data.select( 'core/block-editor' ).__unstableGetTemporarilyEditingFocusModeToRevert",
-		{
-			since: '6.5',
-			version: '6.7',
-		}
-	);
-	return getTemporarilyEditingFocusModeToRevert( state );
+	return getEditedContentOnlySection( state );
 }

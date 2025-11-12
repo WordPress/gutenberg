@@ -1,9 +1,6 @@
 /**
  * WordPress dependencies
  */
-// The font library modal is pre-existent in Gutenberg
-// It needs to be refactored to move all the API calls to core-data.
-// eslint-disable-next-line no-restricted-imports
 import apiFetch from '@wordpress/api-fetch';
 
 /**
