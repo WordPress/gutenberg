@@ -3,7 +3,7 @@
  */
 import clsx from 'clsx';
 import {
-	format,
+	format as formatDateFns,
 	isValid as isValidDate,
 	subMonths,
 	subDays,
@@ -148,7 +148,9 @@ const formatDate = ( date?: Date | string ): string => {
 	if ( ! date ) {
 		return '';
 	}
-	return typeof date === 'string' ? date : format( date, 'yyyy-MM-dd' );
+	return typeof date === 'string'
+		? date
+		: formatDateFns( date, 'yyyy-MM-dd' );
 };
 
 function ValidatedDateControl< Item >( {
@@ -258,15 +260,14 @@ function CalendarDateControl< Item >( {
 	hideLabelFromVision,
 	validity,
 }: DataFormControlProps< Item > ) {
-	const { id, type, label, setValue, getValue, isValid, displayFormat } =
-		field;
+	const { id, type, label, setValue, getValue, isValid, format } = field;
 	const [ selectedPresetId, setSelectedPresetId ] = useState< string | null >(
 		null
 	);
 
 	let weekStartsOn;
 	if ( type === 'date' ) {
-		weekStartsOn = weekStartsOnToNumber( displayFormat.weekStartsOn );
+		weekStartsOn = weekStartsOnToNumber( format.weekStartsOn );
 	}
 
 	const fieldValue = getValue( { item: data } );
@@ -288,7 +289,7 @@ function CalendarDateControl< Item >( {
 	const onSelectDate = useCallback(
 		( newDate: Date | undefined | null ) => {
 			const dateValue = newDate
-				? format( newDate, 'yyyy-MM-dd' )
+				? formatDateFns( newDate, 'yyyy-MM-dd' )
 				: undefined;
 			onChangeCallback( dateValue );
 			setSelectedPresetId( null );
@@ -417,7 +418,7 @@ function CalendarDateRangeControl< Item >( {
 	hideLabelFromVision,
 	validity,
 }: DataFormControlProps< Item > ) {
-	const { id, type, label, getValue, setValue, displayFormat } = field;
+	const { id, type, label, getValue, setValue, format } = field;
 	let value: DateRange;
 	const fieldValue = getValue( { item: data } );
 	if (
@@ -430,7 +431,7 @@ function CalendarDateRangeControl< Item >( {
 
 	let weekStartsOn;
 	if ( type === 'date' ) {
-		weekStartsOn = weekStartsOnToNumber( displayFormat.weekStartsOn );
+		weekStartsOn = weekStartsOnToNumber( format.weekStartsOn );
 	}
 
 	const onChangeCallback = useCallback(

@@ -312,7 +312,7 @@ export type Field< Item > = {
 	/**
 	 * Display format configuration for fields.
 	 */
-	displayFormat?: DisplayFormatDate;
+	format?: FormatDate;
 };
 
 /**
@@ -323,7 +323,7 @@ export type Field< Item > = {
  *
  * If not provided, defaults to WordPress date format settings.
  */
-type DisplayFormatDate = {
+type FormatDate = {
 	date?: string;
 	weekStartsOn?:
 		| 'sunday'
@@ -353,12 +353,12 @@ type NormalizedFieldBase< Item > = Omit< Field< Item >, 'Edit' > & {
 
 export type NormalizedFieldDate< Item > = NormalizedFieldBase< Item > & {
 	type: 'date';
-	displayFormat: Required< DisplayFormatDate >;
+	format: Required< FormatDate >;
 };
 
 export type NormalizedFieldGeneric< Item > = NormalizedFieldBase< Item > & {
 	type?: Exclude< FieldType, 'date' >;
-	displayFormat: {};
+	format: {};
 };
 
 export type NormalizedField< Item > =

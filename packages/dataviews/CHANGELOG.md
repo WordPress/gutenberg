@@ -5,7 +5,7 @@
 ### Enhancements
 
 - Improve docs for Edit component. [#73202](https://github.com/WordPress/gutenberg/pull/73202)
-- Field API: introduce the `displayFormat` prop to format the `date` field type. [#72999](https://github.com/WordPress/gutenberg/pull/72999)
+- Field API: introduce the `format` prop to format the `date` field type. [#72999](https://github.com/WordPress/gutenberg/pull/72999)
 
 ## 10.3.0 (2025-11-12)
 

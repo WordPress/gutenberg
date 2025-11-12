@@ -334,7 +334,7 @@ describe( 'normalizeFields: default getValue', () => {
 		} );
 	} );
 
-	describe( 'displayFormat normalization', () => {
+	describe( 'format normalization', () => {
 		it( 'applies default format when not provided for date fields', () => {
 			const fields: Field< {} >[] = [
 				{
@@ -343,17 +343,13 @@ describe( 'normalizeFields: default getValue', () => {
 				},
 			];
 			const normalizedFields = normalizeFields( fields );
-			expect( normalizedFields[ 0 ].displayFormat ).toBeDefined();
-			expect( normalizedFields[ 0 ].displayFormat.date ).toBeDefined();
-			expect( typeof normalizedFields[ 0 ].displayFormat.date ).toBe(
+			expect( normalizedFields[ 0 ].format ).toBeDefined();
+			expect( normalizedFields[ 0 ].format.date ).toBeDefined();
+			expect( typeof normalizedFields[ 0 ].format.date ).toBe( 'string' );
+			expect( normalizedFields[ 0 ].format.weekStartsOn ).toBeDefined();
+			expect( typeof normalizedFields[ 0 ].format.weekStartsOn ).toBe(
 				'string'
 			);
-			expect(
-				normalizedFields[ 0 ].displayFormat.weekStartsOn
-			).toBeDefined();
-			expect(
-				typeof normalizedFields[ 0 ].displayFormat.weekStartsOn
-			).toBe( 'string' );
 		} );
 
 		it( 'preserves custom format when provided', () => {
@@ -361,20 +357,20 @@ describe( 'normalizeFields: default getValue', () => {
 				{
 					id: 'publishDate',
 					type: 'date',
-					displayFormat: {
+					format: {
 						date: 'F j, Y',
 						weekStartsOn: 'monday',
 					},
 				},
 			];
 			const normalizedFields = normalizeFields( fields );
-			expect( normalizedFields[ 0 ].displayFormat.date ).toBe( 'F j, Y' );
-			expect( normalizedFields[ 0 ].displayFormat.weekStartsOn ).toBe(
+			expect( normalizedFields[ 0 ].format.date ).toBe( 'F j, Y' );
+			expect( normalizedFields[ 0 ].format.weekStartsOn ).toBe(
 				'monday'
 			);
 		} );
 
-		it( 'adds empty displayFormat for non-date field types', () => {
+		it( 'adds empty format for non-date field types', () => {
 			const fields: Field< {} >[] = [
 				{
 					id: 'title',
@@ -386,8 +382,8 @@ describe( 'normalizeFields: default getValue', () => {
 				},
 			];
 			const normalizedFields = normalizeFields( fields );
-			expect( normalizedFields[ 0 ].displayFormat ).toEqual( {} );
-			expect( normalizedFields[ 1 ].displayFormat ).toEqual( {} );
+			expect( normalizedFields[ 0 ].format ).toEqual( {} );
+			expect( normalizedFields[ 1 ].format ).toEqual( {} );
 		} );
 	} );
 } );

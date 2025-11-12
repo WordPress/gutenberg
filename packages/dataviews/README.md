@@ -1675,7 +1675,7 @@ Example:
 }
 ```
 
-### `displayFormat`
+### `format`
 
 Display format configuration for fields. Currently supported for date fields. This configuration affects how the field is displayed in the `render` method, the `Edit` control, and filter controls.
 
@@ -1692,7 +1692,7 @@ Example:
 	id: 'publishDate',
 	type: 'date',
 	label: 'Publish Date',
-	displayFormat: {
+	format: {
 		date: 'F j, Y',
 		weekStartsOn: 'monday',
 	},

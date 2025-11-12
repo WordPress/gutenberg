@@ -48,7 +48,7 @@ export default {
 			return '';
 		}
 
-		// Not all fields have displayFormat, but date fields do.
+		// Not all fields have format, but date fields do.
 		//
 		// At runtime, this method will never be called for non-date fields.
 		// However, the type system does not know this, so we need to check it.
@@ -57,7 +57,7 @@ export default {
 			return '';
 		}
 
-		return dateI18n( field.displayFormat.date, value );
+		return dateI18n( field.format.date, value );
 	},
 	enableSorting: true,
 	filterBy: {

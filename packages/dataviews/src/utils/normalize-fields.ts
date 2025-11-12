@@ -219,15 +219,15 @@ export default function normalizeFields< Item >(
 			return {
 				...baseField,
 				type: 'date' as const,
-				displayFormat: {
+				format: {
 					date:
-						field.displayFormat?.date !== undefined &&
-						typeof field.displayFormat.date === 'string'
-							? field.displayFormat.date
+						field.format?.date !== undefined &&
+						typeof field.format.date === 'string'
+							? field.format.date
 							: getSettings().formats.date,
 					weekStartsOn:
-						field.displayFormat?.weekStartsOn !== undefined
-							? field.displayFormat.weekStartsOn
+						field.format?.weekStartsOn !== undefined
+							? field.format.weekStartsOn
 							: numberToWeekStartsOn(
 									getSettings().l10n.startOfWeek
 							  ),
@@ -238,7 +238,7 @@ export default function normalizeFields< Item >(
 		return {
 			...baseField,
 			type: field.type,
-			displayFormat: {},
+			format: {},
 		};
 	} );
 }

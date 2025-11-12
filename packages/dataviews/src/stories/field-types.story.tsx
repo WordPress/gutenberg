@@ -832,14 +832,14 @@ export const DateComponent = ( {
 	type,
 	Edit,
 	asyncElements,
-	displayFormatDate,
-	displayFormatWeekStartsOn,
+	formatDate,
+	formatWeekStartsOn,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
-	displayFormatDate?: string;
-	displayFormatWeekStartsOn?:
+	formatDate?: string;
+	formatWeekStartsOn?:
 		| 'sunday'
 		| 'monday'
 		| 'tuesday'
@@ -853,11 +853,8 @@ export const DateComponent = ( {
 			fields
 				.filter( ( field ) => field.type === 'date' )
 				.map( ( field ) => {
-					if (
-						displayFormatDate ||
-						displayFormatWeekStartsOn !== undefined
-					) {
-						const displayFormat: {
+					if ( formatDate || formatWeekStartsOn !== undefined ) {
+						const format: {
 							date?: string;
 							weekStartsOn?:
 								| 'sunday'
@@ -868,21 +865,20 @@ export const DateComponent = ( {
 								| 'friday'
 								| 'saturday';
 						} = {};
-						if ( displayFormatDate ) {
-							displayFormat.date = displayFormatDate;
+						if ( formatDate ) {
+							format.date = formatDate;
 						}
-						if ( displayFormatWeekStartsOn !== undefined ) {
-							displayFormat.weekStartsOn =
-								displayFormatWeekStartsOn;
+						if ( formatWeekStartsOn !== undefined ) {
+							format.weekStartsOn = formatWeekStartsOn;
 						}
 						return {
 							...field,
-							displayFormat,
+							format,
 						};
 					}
 					return field;
 				} ),
-		[ displayFormatDate, displayFormatWeekStartsOn ]
+		[ formatDate, formatWeekStartsOn ]
 	);
 
 	return (
@@ -896,16 +892,16 @@ export const DateComponent = ( {
 };
 DateComponent.storyName = 'date';
 DateComponent.args = {
-	displayFormatDate: '',
-	displayFormatWeekStartsOn: undefined,
+	formatDate: '',
+	formatWeekStartsOn: undefined,
 };
 DateComponent.argTypes = {
-	displayFormatDate: {
+	formatDate: {
 		control: 'text',
 		description:
 			'Custom PHP date format string (e.g., "F j, Y" for "November 6, 2010"). Leave empty to use WordPress default.',
 	},
-	displayFormatWeekStartsOn: {
+	formatWeekStartsOn: {
 		control: 'select',
 		options: {
 			Default: undefined,
