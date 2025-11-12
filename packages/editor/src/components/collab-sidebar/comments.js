@@ -381,9 +381,16 @@ export function Comments( {
 	};
 
 	const hasThreads = Array.isArray( threads ) && threads.length > 0;
-	// This should no longer happen since https://github.com/WordPress/gutenberg/pull/72872.
+	// A special case for `template-locked` mode - https://github.com/WordPress/gutenberg/pull/72646.
 	if ( ! hasThreads && ! isFloating ) {
-		return null;
+		return (
+			<AddComment
+				onSubmit={ onAddReply }
+				newNoteFormState={ newNoteFormState }
+				setNewNoteFormState={ setNewNoteFormState }
+				commentSidebarRef={ commentSidebarRef }
+			/>
+		);
 	}
 
 	return (
