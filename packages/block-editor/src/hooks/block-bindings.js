@@ -37,8 +37,6 @@ import { store as blockEditorStore } from '../store';
 
 const { Menu } = unlock( componentsPrivateApis );
 
-const EMPTY_ARRAY = [];
-
 /**
  * Get the normalized attribute type for block bindings.
  * Converts 'rich-text' to 'string' since rich-text is stored as string.
@@ -86,7 +84,7 @@ function BlockBindingsPanelMenuContent( { attribute, binding, sources } ) {
 		<Menu placement={ isMobile ? 'bottom-start' : 'left-start' }>
 			{ Object.entries( sources ).map( ( [ sourceKey, data ] ) => {
 				// Only show sources that have compatible data for this specific attribute.
-				const sourceDataItems = data?.filter(
+				const sourceDataItems = data.filter(
 					( item ) => item?.type === attributeType
 				);
 
@@ -197,7 +195,7 @@ function BlockBindingsAttribute( { attribute, binding, sources, blockName } ) {
 		const attributeType = getAttributeType( blockName, attribute );
 
 		const hasCompatibleSources = Object.values( sources ).some( ( _data ) =>
-			_data?.some( ( item ) => item?.type === attributeType )
+			_data.some( ( item ) => item.type === attributeType )
 		);
 
 		if ( ! hasCompatibleSources ) {
@@ -210,9 +208,6 @@ function BlockBindingsAttribute( { attribute, binding, sources, blockName } ) {
 		// If there's a binding but the source is not found, it's invalid.
 		isValid = false;
 		displayText = __( 'Source not registered' );
-		if ( Object.keys( sources ).length === 0 ) {
-			displayText = __( 'No sources available' );
-		}
 	} else {
 		displayText =
 			data?.find( ( item ) => fastDeepEqual( item.args, args ) )?.label ||
@@ -342,12 +337,12 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 						}
 					}
 
-					data[ sourceName ] = source.getFieldsList( {
+					const items = source.getFieldsList( {
 						select,
 						context,
 					} );
-					if ( data[ sourceName ].length === 0 ) {
-						data[ sourceName ] = EMPTY_ARRAY;
+					if ( items.length !== 0 ) {
+						data[ sourceName ] = items;
 					}
 				}
 			);
@@ -363,10 +358,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 
 	const { bindings } = metadata || {};
 
-	// Check if all sources have empty data arrays.
-	const hasCompatibleData = Object.values( sources ).some(
-		( data ) => data && data.length > 0
-	);
+	const hasCompatibleData = Object.keys( sources ).length > 0;
 
 	// Lock the UI when the user can't update bindings or there are no fields to connect to.
 	const readOnly = ! canUpdateBlockBindings || ! hasCompatibleData;
@@ -398,9 +390,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 						const hasCompatibleDataForAttribute = Object.values(
 							sources
 						).some( ( data ) =>
-							data?.some(
-								( item ) => item?.type === attributeType
-							)
+							data.some( ( item ) => item.type === attributeType )
 						);
 
 						const isAttributeReadOnly =
