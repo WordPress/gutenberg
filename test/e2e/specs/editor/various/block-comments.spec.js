@@ -709,6 +709,7 @@ test.describe( 'Block Comments', () => {
 				} );
 			const replyButton = thread.getByRole( 'button', {
 				name: 'Reply',
+				exact: true,
 			} );
 			const backToBlockButton = thread.getByRole( 'button', {
 				name: 'Back to block',
