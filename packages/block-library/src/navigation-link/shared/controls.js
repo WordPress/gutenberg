@@ -354,10 +354,9 @@ export function MissingEntityHelpText( { type, kind } ) {
 }
 
 function MissingEntityHelp( { id, type, kind } ) {
-	const helpText = MissingEntityHelpText( { type, kind } );
 	return (
 		<span id={ id } className="navigation-link-control__error-text">
-			{ helpText }
+			<MissingEntityHelpText type={ type } kind={ kind } />
 		</span>
 	);
 }
