@@ -252,7 +252,7 @@ test.describe( 'Quote', () => {
 		await editor.transformBlockTo( 'core/pullquote' );
 		expect( await editor.getEditedPostContent() ).toBe(
 			`<!-- wp:pullquote -->
-<figure class="wp-block-pullquote"><blockquote><p>one<br>two</p><cite>cite</cite></blockquote></figure>
+<figure class="wp-block-pullquote"><blockquote><p>one<br>two</p><p>cite</p></blockquote></figure>
 <!-- /wp:pullquote -->`
 		);
 	} );
@@ -317,7 +317,7 @@ test.describe( 'Quote', () => {
 			`<!-- wp:quote -->
 <blockquote class="wp-block-quote"><!-- wp:paragraph -->
 <p>1</p>
-<!-- /wp:paragraph --><cite>2</cite></blockquote>
+<!-- /wp:paragraph --><p>2</p></blockquote>
 <!-- /wp:quote -->`
 		);
 		// Move the cursor to the start of the first paragraph of the quoted block.
@@ -329,7 +329,7 @@ test.describe( 'Quote', () => {
 <!-- /wp:paragraph -->
 
 <!-- wp:quote -->
-<blockquote class="wp-block-quote"><cite>2</cite></blockquote>
+<blockquote class="wp-block-quote"><p>2</p></blockquote>
 <!-- /wp:quote -->`
 		);
 	} );

@@ -14,13 +14,16 @@
 		}
 
 		cite,
-		footer {
+		footer,
+		.wp-block-quote__citation {
 			font-size: 1.125em;
 			text-align: right;
 		}
 
 	}
-	> cite {
+	> cite,
+	.wp-block-quote__citation {
 		display: block;
+		font-size: 0.875rem;
 	}
 }

@@ -15,9 +15,7 @@ import {
 const block = 'Quote';
 const initialHtml = `
 <!-- wp:quote {"textAlign":"left","className":"is-style-large"} -->
-<blockquote class="wp-block-quote has-text-align-left is-style-large"><!-- wp:paragraph -->
-<p>"This will make running your own blog a viable alternative again."</p>
-<!-- /wp:paragraph --><cite>— <a href="https://twitter.com/azumbrunnen_/status/1019347243084800005">Adrian Zumbrunnen</a></cite></blockquote>
+<figure class="wp-block-pullquote"><blockquote><p>"This will make running your own blog a viable alternative again."</p><p>— <a href="https://twitter.com/azumbrunnen_/status/1019347243084800005">Adrian Zumbrunnen</a></p></blockquote></figure>
 <!-- /wp:quote -->`;
 
 const transformsWithInnerBlocks = [ 'Columns', 'Group' ];

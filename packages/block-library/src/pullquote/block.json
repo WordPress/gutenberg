@@ -16,7 +16,7 @@
 		"citation": {
 			"type": "rich-text",
 			"source": "rich-text",
-			"selector": "cite",
+			"selector": "cite, p",
 			"role": "content"
 		},
 		"textAlign": {

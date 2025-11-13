@@ -83,7 +83,7 @@ describe( 'Quote', () => {
 
 		<!-- wp:paragraph -->
 		<p>Again.</p>
-		<!-- /wp:paragraph --><cite>A <br>person</cite></blockquote>
+		<!-- /wp:paragraph --><p>A <br>person</p></blockquote>
 		<!-- /wp:quote -->
 
 		<!-- wp:paragraph -->

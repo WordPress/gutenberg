@@ -68,6 +68,58 @@ function multilineToInline( value ) {
 	return values.join( '<br>' );
 }
 
+const v6 = {
+	attributes: {
+		value: {
+			type: 'rich-text',
+			source: 'rich-text',
+			selector: 'blockquote',
+			multiline: 'p',
+			role: 'content',
+		},
+		citation: {
+			type: 'rich-text',
+			source: 'rich-text',
+			selector: 'cite',
+			role: 'content',
+		},
+		textAlign: {
+			type: 'string',
+		},
+	},
+	save( { attributes } ) {
+		const { textAlign, citation, value } = attributes;
+		const shouldShowCitation = ! RichText.isEmpty( citation );
+
+		return (
+			<figure
+				{ ...useBlockProps.save( {
+					className: clsx( {
+						[ `has-text-align-${ textAlign }` ]: textAlign,
+					} ),
+				} ) }
+			>
+				<blockquote>
+					<RichText.Content tagName="p" value={ value } />
+					{ shouldShowCitation && (
+						<RichText.Content
+							tagName="p"
+							className="wp-block-pullquote__citation"
+							value={ citation }
+						/>
+					) }
+				</blockquote>
+			</figure>
+		);
+	},
+	migrate( { value, ...attributes } ) {
+		return {
+			value: multilineToInline( value ),
+			...attributes,
+		};
+	},
+};
+
 const v5 = {
 	attributes: {
 		value: {
@@ -103,7 +155,11 @@ const v5 = {
 				<blockquote>
 					<RichText.Content value={ value } multiline />
 					{ shouldShowCitation && (
-						<RichText.Content tagName="cite" value={ citation } />
+						<RichText.Content
+							tagName="p"
+							className="wp-block-pullquote__citation"
+							value={ citation }
+						/>
 					) }
 				</blockquote>
 			</figure>
@@ -186,7 +242,11 @@ const v4 = {
 				>
 					<RichText.Content value={ value } multiline />
 					{ ! RichText.isEmpty( citation ) && (
-						<RichText.Content tagName="cite" value={ citation } />
+						<RichText.Content
+							tagName="p"
+							className="wp-block-pullquote__citation"
+							value={ citation }
+						/>
 					) }
 				</blockquote>
 			</figure>
@@ -324,7 +384,11 @@ const v3 = {
 				>
 					<RichText.Content value={ value } multiline />
 					{ ! RichText.isEmpty( citation ) && (
-						<RichText.Content tagName="cite" value={ citation } />
+						<RichText.Content
+							tagName="p"
+							className="wp-block-pullquote__citation"
+							value={ citation }
+						/>
 					) }
 				</blockquote>
 			</figure>
@@ -461,7 +525,11 @@ const v2 = {
 				>
 					<RichText.Content value={ value } multiline />
 					{ ! RichText.isEmpty( citation ) && (
-						<RichText.Content tagName="cite" value={ citation } />
+						<RichText.Content
+							tagName="p"
+							className="wp-block-pullquote__citation"
+							value={ citation }
+						/>
 					) }
 				</blockquote>
 			</figure>
@@ -526,7 +594,11 @@ const v1 = {
 			<blockquote>
 				<RichText.Content value={ value } multiline />
 				{ ! RichText.isEmpty( citation ) && (
-					<RichText.Content tagName="cite" value={ citation } />
+					<RichText.Content
+						tagName="p"
+						className="wp-block-pullquote__citation"
+						value={ citation }
+					/>
 				) }
 			</blockquote>
 		);
@@ -581,4 +653,4 @@ const v0 = {
  *
  * See block-deprecation.md
  */
-export default [ v5, v4, v3, v2, v1, v0 ];
+export default [ v6, v5, v4, v3, v2, v1, v0 ];
