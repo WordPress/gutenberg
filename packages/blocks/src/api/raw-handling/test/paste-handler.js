@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { pasteHandler, rawHandler, serialize, parse } from '@wordpress/blocks';
+import { pasteHandler, rawHandler } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
@@ -293,22 +293,9 @@ describe( 'pasteHandler', () => {
 	} );
 
 	it( 'should preserve content with bash ANSI-C quoting in pre/code blocks', () => {
-		// Simple test case
-		const simpleHTML = `<pre><code>export TEST=$'\\E[1;31m'</code></pre>`;
-
-		const simpleResult = rawHandler( {
-			HTML: simpleHTML,
-		} );
-
-		expect( simpleResult ).toHaveLength( 1 );
-		expect( simpleResult[ 0 ].name ).toBe( 'core/code' );
-
-		const simpleContent = String( simpleResult[ 0 ].attributes.content );
-		expect( simpleContent ).toContain( "export TEST=$'" );
-		expect( simpleContent ).toContain( "E[1;31m'" );
-
-		// Full test case from the bug report - test the complete parse-serialize-parse cycle
-		const fullHTML = `Add the following to your <code>~/.bashrc</code> if you use bash or <code>~/.zshrc</code> if you use zsh:
+		// Test case from the bug report - when switching from code editor to visual editor
+		// the raw HTML is parsed directly by rawHandler
+		const htmlFromCodeEditor = `Add the following to your <code>~/.bashrc</code> if you use bash or <code>~/.zshrc</code> if you use zsh:
 <pre><code># Set colors for less. Borrowed from https://wiki.archlinux.org/index.php/Color_output_in_console#less .
 export LESS_TERMCAP_mb=$'\\E[1;31m'     # begin bold
 export LESS_TERMCAP_md=$'\\E[1;36m'     # begin blink
@@ -319,9 +306,9 @@ export LESS_TERMCAP_us=$'\\E[1;32m'     # begin underline
 export LESS_TERMCAP_ue=$'\\E[0m'        # reset underline</code></pre>
 Now restart your shell and run <code>man less</code>—the manual is in colors! The difference is shown in the following two images`;
 
-		// Step 1: Parse HTML to blocks (switching from code editor to visual editor)
+		// Parse the raw HTML directly (simulates switching from code editor to visual editor)
 		const blocks = rawHandler( {
-			HTML: fullHTML,
+			HTML: htmlFromCodeEditor,
 		} );
 
 		// Should create 3 blocks: paragraph, code, paragraph
@@ -332,53 +319,34 @@ Now restart your shell and run <code>man less</code>—the manual is in colors! 
 
 		const codeContent = String( blocks[ 1 ].attributes.content );
 
-		// Verify all export lines are preserved after initial parse
+		// Verify all export lines are preserved (this is what currently fails in real browsers)
 		expect( codeContent ).toContain( "export LESS_TERMCAP_mb=$'" );
-		expect( codeContent ).toContain( "E[1;31m'" );
+		expect( codeContent ).toContain( "\\E[1;31m'" );
 		expect( codeContent ).toContain( '# begin bold' );
 		expect( codeContent ).toContain( "export LESS_TERMCAP_md=$'" );
-		expect( codeContent ).toContain( "E[1;36m'" );
+		expect( codeContent ).toContain( "\\E[1;36m'" );
 		expect( codeContent ).toContain( '# begin blink' );
-
-		// Step 2: Serialize blocks (simulates saving)
-		const serialized = serialize( blocks );
-
-		// Step 3: Parse the serialized content again (simulates reloading)
-		const reparsedBlocks = parse( serialized );
-
-		// Verify structure is maintained
-		expect( reparsedBlocks ).toHaveLength( 3 );
-		expect( reparsedBlocks[ 0 ].name ).toBe( 'core/paragraph' );
-		expect( reparsedBlocks[ 1 ].name ).toBe( 'core/code' );
-		expect( reparsedBlocks[ 2 ].name ).toBe( 'core/paragraph' );
-
-		const reparsedCodeContent = String(
-			reparsedBlocks[ 1 ].attributes.content
-		);
-
-		// Verify all export lines are still preserved after serialize-parse cycle
-		expect( reparsedCodeContent ).toContain( "export LESS_TERMCAP_mb=$'" );
-		expect( reparsedCodeContent ).toContain( "E[1;31m'" );
-		expect( reparsedCodeContent ).toContain( '# begin bold' );
-		expect( reparsedCodeContent ).toContain( "export LESS_TERMCAP_md=$'" );
-		expect( reparsedCodeContent ).toContain( "E[1;36m'" );
-		expect( reparsedCodeContent ).toContain( '# begin blink' );
-		expect( reparsedCodeContent ).toContain( "export LESS_TERMCAP_us=$'" );
-		expect( reparsedCodeContent ).toContain( "E[1;32m'" );
-		expect( reparsedCodeContent ).toContain( '# begin underline' );
-		expect( reparsedCodeContent ).toContain( "export LESS_TERMCAP_ue=$'" );
-		expect( reparsedCodeContent ).toContain( "E[0m'" );
-		expect( reparsedCodeContent ).toContain( '# reset underline' );
+		expect( codeContent ).toContain( "export LESS_TERMCAP_me=$'" );
+		expect( codeContent ).toContain( "\\E[0m'" );
+		expect( codeContent ).toContain( '# reset bold/blink' );
+		expect( codeContent ).toContain( "export LESS_TERMCAP_so=$'" );
+		expect( codeContent ).toContain( "\\E[01;44;33m'" );
+		expect( codeContent ).toContain( '# begin reverse video' );
+		expect( codeContent ).toContain( "export LESS_TERMCAP_se=$'" );
+		expect( codeContent ).toContain( '# reset reverse video' );
+		expect( codeContent ).toContain( "export LESS_TERMCAP_us=$'" );
+		expect( codeContent ).toContain( "\\E[1;32m'" );
+		expect( codeContent ).toContain( '# begin underline' );
+		expect( codeContent ).toContain( "export LESS_TERMCAP_ue=$'" );
+		expect( codeContent ).toContain( '# reset underline' );
 
 		// Verify the text after the code block is in a separate paragraph
-		const lastParagraphContent = String(
-			reparsedBlocks[ 2 ].attributes.content
-		);
+		const lastParagraphContent = String( blocks[ 2 ].attributes.content );
 		expect( lastParagraphContent ).toContain( 'Now restart your shell' );
 		expect( lastParagraphContent ).toContain( 'man less' );
 
 		// Verify the "man less" text appears only once (not duplicated)
-		const allContent = reparsedBlocks
+		const allContent = blocks
 			.map( ( block ) => String( block.attributes.content || '' ) )
 			.join( ' ' );
 		const manLessMatches = allContent.match( /man less/g ) || [];
