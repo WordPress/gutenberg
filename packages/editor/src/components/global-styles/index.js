@@ -32,16 +32,15 @@ function useServerData() {
 		const editorSettings = getEditorSettings();
 
 		const canUserUploadMedia = canUser( 'create', {
-			kind: 'root',
-			name: 'media',
+			kind: 'postType',
+			name: 'attachement',
 		} );
 
 		return {
-			styles: editorSettings?.styles || [],
-			__unstableResolvedAssets:
-				editorSettings?.__unstableResolvedAssets || {},
-			colors: editorSettings?.colors || [],
-			gradients: editorSettings?.gradients || [],
+			styles: editorSettings?.styles,
+			__unstableResolvedAssets: editorSettings?.__unstableResolvedAssets,
+			colors: editorSettings?.colors,
+			gradients: editorSettings?.gradients,
 			__experimentalDiscussionSettings:
 				editorSettings?.__experimentalDiscussionSettings,
 			mediaUploadHandler: canUserUploadMedia ? uploadMedia : undefined,
@@ -64,10 +63,10 @@ function useServerData() {
 			settings: {
 				color: {
 					palette: {
-						theme: colors,
+						theme: colors ?? [],
 					},
 					gradients: {
-						theme: gradients,
+						theme: gradients ?? [],
 					},
 					duotone: {
 						theme: [],
