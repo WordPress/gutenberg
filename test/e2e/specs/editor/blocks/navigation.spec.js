@@ -818,6 +818,67 @@ test.describe( 'Navigation block', () => {
 				// Check that the Label in the inspector sidebar is Cat
 				await expect( inspectorNavigationLabel ).toHaveValue( 'Cat' );
 			} );
+
+			await test.step( 'Creating a new category link should respect new block selection', async () => {
+				// Use the block inserter to add a new category link
+				await editor.canvas
+					.getByRole( 'button', { name: 'Add block' } )
+					.click();
+
+				// Verify the popover is visible (we want the invalid link click to have opened the popover)
+				await expect( linkPopover ).toBeVisible();
+				await expect(
+					linkPopover.getByRole( 'combobox', {
+						name: 'Search or type URL',
+					} )
+				).toBeFocused();
+
+				await linkPopover
+					.getByRole( 'button', { name: 'Add block' } )
+					.click();
+
+				const addBlockDialog = page.getByRole( 'dialog', {
+					name: 'Add block',
+				} );
+
+				await expect( addBlockDialog ).toBeVisible();
+
+				await expect(
+					addBlockDialog.getByRole( 'button', { name: 'Back' } )
+				).toBeFocused();
+
+				await addBlockDialog
+					.getByRole( 'option', { name: 'Custom Link' } )
+					.click();
+
+				await expect(
+					linkPopover.getByRole( 'combobox', {
+						name: 'Search or type URL',
+					} )
+				).toBeFocused();
+
+				await page.keyboard.type( 'Uncategorized' );
+
+				await expect(
+					linkPopover.getByRole( 'option', { name: 'Uncategorized' } )
+				).toBeVisible();
+
+				await pageUtils.pressKeys( 'ArrowDown' );
+				await page.keyboard.press( 'Enter' );
+
+				await expect(
+					linkPopover.getByRole( 'link', {
+						name: 'Uncategorized (opens in a new tab)',
+					} )
+				).toBeFocused();
+
+				await catLinkText.click();
+
+				// Verify the popover is closed
+				await expect( linkPopover ).toBeHidden();
+				// Check that the Label in the inspector sidebar is Cat
+				await expect( inspectorNavigationLabel ).toHaveValue( 'Cat' );
+			} );
 		} );
 	} );
 
