@@ -698,6 +698,7 @@ test.describe( 'Navigation block', () => {
 				dogLinkText,
 				linkPopover,
 				unavailableLinkText;
+
 			// Test setup step
 			await test.step( 'Test setup', async () => {
 				const nonExistentPageId = 99999;
@@ -732,7 +733,7 @@ test.describe( 'Navigation block', () => {
 					.getByRole( 'textbox', {
 						name: 'Navigation link text',
 					} )
-					.filter( { hasText: 'Cat' } );
+					.filter( { hasText: /^Cat$/ } );
 				await catLinkText.click();
 
 				const linkInput = page
@@ -758,13 +759,11 @@ test.describe( 'Navigation block', () => {
 				await pageUtils.pressKeys( 'primary+k' );
 				linkPopover = navigation.getLinkPopover();
 				await expect( linkPopover ).toBeVisible();
+				const catPopoverLink = navigation.getLinkControlLink( 'Cat' );
+				await expect( catPopoverLink ).toBeVisible();
 
 				// Check that the popover has focus on the Cat link
-				await expect(
-					linkPopover.getByRole( 'link', {
-						name: 'Cat (Opens in a new tab)',
-					} )
-				).toBeFocused();
+				await expect( catPopoverLink ).toBeFocused();
 
 				dogLinkText = editor.canvas
 					.getByRole( 'textbox', {
@@ -783,12 +782,11 @@ test.describe( 'Navigation block', () => {
 				await pageUtils.pressKeys( 'primary+k' );
 				await expect( linkPopover ).toBeVisible();
 
-				// Check that the popover has focus on the Dog link
-				await expect(
-					linkPopover.getByRole( 'link', {
-						name: 'Dog (Opens in a new tab)',
-					} )
-				).toBeFocused();
+				const dogPopoverLink = navigation.getLinkControlLink( 'Dog' );
+				await expect( dogPopoverLink ).toBeVisible();
+
+				// Check that the popover has focus on the Cat link
+				await expect( dogPopoverLink ).toBeFocused();
 
 				unavailableLinkText = editor.canvas
 					.locator( 'a' )
@@ -851,26 +849,7 @@ test.describe( 'Navigation block', () => {
 					.getByRole( 'option', { name: 'Custom Link' } )
 					.click();
 
-				await expect(
-					linkPopover.getByRole( 'combobox', {
-						name: 'Search or type URL',
-					} )
-				).toBeFocused();
-
-				await page.keyboard.type( 'Uncategorized' );
-
-				await expect(
-					linkPopover.getByRole( 'option', { name: 'Uncategorized' } )
-				).toBeVisible();
-
-				await pageUtils.pressKeys( 'ArrowDown' );
-				await page.keyboard.press( 'Enter' );
-
-				await expect(
-					linkPopover.getByRole( 'link', {
-						name: 'Uncategorized (opens in a new tab)',
-					} )
-				).toBeFocused();
+				await navigation.useLinkControlSearch( 'Uncategorized' );
 
 				await catLinkText.click();
 
@@ -1703,9 +1682,21 @@ class Navigation {
 	 * @param {string} label Text of page you want added. Must be a part of the pages added in the beforeAll in this test suite.
 	 */
 	async addPage( label ) {
-		const linkControlSearch = this.page.getByRole( 'combobox', {
-			name: 'Search or type URL',
-		} );
+		await this.useLinkControlSearch( label );
+
+		const linkControlLink = await this.getLinkControlLink( label );
+
+		await expect( linkControlLink ).toBeVisible();
+		await expect( linkControlLink ).toBeFocused();
+
+		await this.page.keyboard.press( 'Escape' );
+		await expect( this.getLinkControlSearch() ).toBeHidden();
+
+		await this.checkLabelFocus( label );
+	}
+
+	async useLinkControlSearch( label ) {
+		const linkControlSearch = this.getLinkControlSearch();
 
 		await expect( linkControlSearch ).toBeFocused();
 
@@ -1721,15 +1712,6 @@ class Navigation {
 		await this.pageUtils.pressKeys( 'ArrowDown' );
 
 		await this.page.keyboard.press( 'Enter' );
-
-		const linkControlLink = await this.getLinkControlLink( label );
-		await expect( linkControlLink ).toBeFocused();
-
-		await this.page.keyboard.press( 'Escape' );
-
-		await expect( linkControlSearch ).toBeHidden();
-
-		await this.checkLabelFocus( label );
 	}
 
 	/**
