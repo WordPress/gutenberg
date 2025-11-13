@@ -213,17 +213,36 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 	 */
 	const variations = useMemo( () => {
 		if ( blockName === 'core/paragraph' ) {
+			// Always hide options when active variation is stretchy, but
+			// ensure that there are no third-party variations before doing the
+			// same elsewhere.
+			if (
+				activeBlockVariation?.name === 'stretchy-paragraph' ||
+				unfilteredVariations.every( ( v ) =>
+					[ 'paragraph', 'stretchy-paragraph' ].includes( v.name )
+				)
+			) {
+				return [];
+			}
+			// If there are other variations, only hide the stretchy one.
 			return unfilteredVariations.filter(
-				( v ) =>
-					v.name !== 'paragraph' && v.name !== 'stretchy-paragraph'
+				( v ) => v.name !== 'stretchy-paragraph'
 			);
 		} else if ( blockName === 'core/heading' ) {
+			if (
+				activeBlockVariation?.name === 'stretchy-heading' ||
+				unfilteredVariations.every( ( v ) =>
+					[ 'heading', 'stretchy-heading' ].includes( v.name )
+				)
+			) {
+				return [];
+			}
 			return unfilteredVariations.filter(
-				( v ) => v.name !== 'heading' && v.name !== 'stretchy-heading'
+				( v ) => v.name !== 'stretchy-heading'
 			);
 		}
 		return unfilteredVariations;
-	}, [ unfilteredVariations ] );
+	}, [ activeBlockVariation?.name, blockName, unfilteredVariations ] );
 
 	const selectedValue = activeBlockVariation?.name;
 
