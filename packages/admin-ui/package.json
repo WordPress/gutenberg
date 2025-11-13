@@ -40,6 +40,8 @@
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/components": "file:../components",
 		"@wordpress/element": "file:../element",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/route": "file:../route",
 		"clsx": "^2.1.1"
 	},
 	"publishConfig": {

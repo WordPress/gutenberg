@@ -8,6 +8,7 @@ import clsx from 'clsx';
  */
 import Header from './header';
 import NavigableRegion from '../navigable-region';
+import Breadcrumbs from '../breadcrumbs';
 
 function Page( {
 	breadcrumbs,
@@ -51,5 +52,7 @@ function Page( {
 		</NavigableRegion>
 	);
 }
+
+Page.Breadcrumbs = Breadcrumbs;
 
 export default Page;
