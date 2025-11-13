@@ -214,9 +214,9 @@ export default function NavigationLinkEdit( {
 	const ref = useRef();
 	const linkUIref = useRef();
 	const prevUrl = usePrevious( url );
-	// A link is "new" only if it has no URL and no URL binding
-	// If it has a URL binding (synced link), it's not new even if the URL is empty (e.g., deleted page)
-	const isNewLink = useRef( ! url && ! metadata?.bindings?.url );
+	// A link is "new" only if it has an undefined label
+	// After the link is created, even if no label is provided, it's set to an empty string.
+	const isNewLink = useRef( label === undefined );
 
 	const {
 		isAtMaxNesting,
