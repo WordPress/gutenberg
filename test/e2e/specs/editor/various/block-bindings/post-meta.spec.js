@@ -12,7 +12,7 @@ test.describe( 'Post Meta source', () => {
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllPosts();
+		await requestUtils.deleteAllPosts( 'movie' );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
