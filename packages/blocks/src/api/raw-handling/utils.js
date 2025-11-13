@@ -125,34 +125,29 @@ export function isPlain( HTML ) {
 		return true;
 	}
 
-	try {
-		const doc = document.implementation.createHTMLDocument( '' );
-		doc.body.innerHTML = HTML;
+	const doc = document.implementation.createHTMLDocument( '' );
+	doc.body.innerHTML = HTML;
 
-		// Check if there's exactly one top-level element
-		if ( doc.body.children.length !== 1 ) {
-			return false;
-		}
-
-		const wrapper = doc.body.children.item( 0 );
-		const tagName = wrapper.tagName.toLowerCase();
-
-		// Only consider non-semantic wrapper tags
-		if ( tagName !== 'span' ) {
-			return false;
-		}
-
-		// Check if the wrapper contains only text nodes and <br> tags
-		// (no other semantic elements)
-		const hasSemanticChildren = Array.from(
-			wrapper.getElementsByTagName( '*' )
-		).some( ( el ) => el.tagName.toLowerCase() !== 'br' );
-
-		return ! hasSemanticChildren;
-	} catch ( e ) {
-		// If parsing fails, fall back to the original behavior
+	// Check if there's exactly one top-level element
+	if ( doc.body.children.length !== 1 ) {
 		return false;
 	}
+
+	const wrapper = doc.body.children.item( 0 );
+	const tagName = wrapper.tagName.toLowerCase();
+
+	// Only consider non-semantic wrapper tags
+	if ( tagName !== 'span' ) {
+		return false;
+	}
+
+	// Check if the wrapper contains only text nodes and <br> tags
+	// (no other semantic elements)
+	const hasSemanticChildren = Array.from(
+		wrapper.getElementsByTagName( '*' )
+	).some( ( el ) => el.tagName.toLowerCase() !== 'br' );
+
+	return ! hasSemanticChildren;
 }
 
 /**
