@@ -273,7 +273,8 @@ export default function NavigationLinkEdit( {
 		},
 		[ clientId, maxNestingLevel ]
 	);
-	const { getBlocks } = useSelect( blockEditorStore );
+	const { getBlocks, getSelectedBlockClientId } =
+		useSelect( blockEditorStore );
 
 	// URL binding logic
 	const {
@@ -592,9 +593,16 @@ export default function NavigationLinkEdit( {
 								if ( ! url && ! hasUrlBinding ) {
 									onReplace( [] );
 								} else if ( isNewLink.current ) {
-									// If we just created a new link, select it
-									selectBlock( clientId );
-									// Mark as no longer new so we don't re-select on subsequent popover closes
+									// If we just created a new link, select it ONLY if another block wasn't already selected
+									// When the user clicks another block, that block gets selected BEFORE onClose is called
+									// So we check: if this block is still selected, user closed via Escape; otherwise they clicked another block
+									if (
+										getSelectedBlockClientId() ===
+										parentBlockClientId
+									) {
+										selectBlock( clientId );
+									}
+									// Mark as no longer new
 									isNewLink.current = false;
 								}
 							} }
