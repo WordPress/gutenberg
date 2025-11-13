@@ -1,0 +1,11 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/fields/build-style/style.css" as fields;
+
+.routes-post-list__tabs-wrapper {
+	border-bottom: 1px solid $gray-100;
+	padding: 0 $grid-unit-60;
+	@container (max-width: 430px) {
+		padding: 0 $grid-unit-30;
+	}
+}

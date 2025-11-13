@@ -11,7 +11,7 @@ import {
 	TextareaControl,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useRef } from '@wordpress/element';
+import { useRef, useEffect, useState } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import { safeDecodeURI } from '@wordpress/url';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
@@ -72,19 +72,31 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 	const { label, url, description, rel, opensInNewTab } = attributes;
 	const lastURLRef = useRef( url );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+	const urlInputRef = useRef();
+	const shouldFocusURLInputRef = useRef( false );
 	const inputId = useInstanceId( Controls, 'link-input' );
 	const helpTextId = `${ inputId }__help`;
 
+	// Local state to control the input value
+	const [ inputValue, setInputValue ] = useState( url );
+
+	// Sync local state when url prop changes (e.g., from undo/redo or external updates)
+	useEffect( () => {
+		setInputValue( url );
+		lastURLRef.current = url;
+	}, [ url ] );
+
 	// Use the entity binding hook internally
-	const { hasUrlBinding, clearBinding } = useEntityBinding( {
-		clientId,
-		attributes,
-	} );
+	const { hasUrlBinding, isBoundEntityAvailable, clearBinding } =
+		useEntityBinding( {
+			clientId,
+			attributes,
+		} );
 
 	// Get direct store dispatch to bypass setBoundAttributes wrapper
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
-	const editBoundLink = () => {
+	const unsyncBoundLink = () => {
 		// Clear the binding first
 		clearBinding();
 
@@ -93,8 +105,21 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 		// setAttributes is actually setBoundAttributes, a wrapper function that
 		// processes attributes through the binding system.
 		// See: packages/block-editor/src/components/block-edit/edit.js
-		updateBlockAttributes( clientId, { url: '', id: undefined } );
+		updateBlockAttributes( clientId, {
+			url: lastURLRef.current, // set the lastURLRef as the new editable value so we avoid bugs from empty link states
+			id: undefined,
+		} );
 	};
+
+	useEffect( () => {
+		// Only want to focus the input if the url is not bound to an entity.
+		if ( ! hasUrlBinding && shouldFocusURLInputRef.current ) {
+			// focuses and highlights the url input value, giving the user
+			// the ability to delete the value quickly or edit it.
+			urlInputRef.current?.select();
+		}
+		shouldFocusURLInputRef.current = false;
+	}, [ hasUrlBinding ] );
 
 	return (
 		<ToolsPanel
@@ -135,56 +160,100 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 				isShownByDefault
 			>
 				<InputControl
+					ref={ urlInputRef }
 					__nextHasNoMarginBottom
 					__next40pxDefaultSize
 					id={ inputId }
 					label={ __( 'Link' ) }
-					value={ url ? safeDecodeURI( url ) : '' }
-					onChange={ ( urlValue ) => {
-						if ( hasUrlBinding ) {
-							return; // Prevent editing when URL is bound
+					value={ ( () => {
+						if ( hasUrlBinding && ! isBoundEntityAvailable ) {
+							return '';
 						}
-						setAttributes( {
-							url: encodeURI( safeDecodeURI( urlValue ) ),
-						} );
-					} }
+						return inputValue ? safeDecodeURI( inputValue ) : '';
+					} )() }
 					autoComplete="off"
 					type="url"
 					disabled={ hasUrlBinding }
+					aria-invalid={
+						hasUrlBinding && ! isBoundEntityAvailable
+							? 'true'
+							: undefined
+					}
+					aria-describedby={ helpTextId }
+					className={
+						hasUrlBinding && ! isBoundEntityAvailable
+							? 'navigation-link-control__input-with-error-suffix'
+							: undefined
+					}
+					onChange={ ( newValue ) => {
+						if ( isBoundEntityAvailable ) {
+							return;
+						}
+
+						// Defer updating the url attribute until onBlur to prevent the canvas from
+						// treating a temporary empty value as a committed value, which replaces the
+						// label with placeholder text.
+						setInputValue( newValue );
+					} }
 					onFocus={ () => {
-						if ( hasUrlBinding ) {
+						if ( isBoundEntityAvailable ) {
 							return;
 						}
 						lastURLRef.current = url;
 					} }
 					onBlur={ () => {
-						if ( hasUrlBinding ) {
+						if ( isBoundEntityAvailable ) {
 							return;
 						}
+
+						const finalValue = ! inputValue
+							? lastURLRef.current
+							: inputValue;
+
+						// Update local state immediately so input reflects the reverted value if the value was cleared
+						setInputValue( finalValue );
+
 						// Defer the updateAttributes call to ensure entity connection isn't severed by accident.
-						updateAttributes(
-							{ url: ! url ? lastURLRef.current : url },
-							setAttributes,
-							{ ...attributes, url: lastURLRef.current }
-						);
+						updateAttributes( { url: finalValue }, setAttributes, {
+							...attributes,
+							url: lastURLRef.current,
+						} );
 					} }
 					help={
-						hasUrlBinding && (
-							<BindingHelpText
+						hasUrlBinding && ! isBoundEntityAvailable ? (
+							<MissingEntityHelpText
+								id={ helpTextId }
 								type={ attributes.type }
 								kind={ attributes.kind }
 							/>
+						) : (
+							isBoundEntityAvailable && (
+								<BindingHelpText
+									type={ attributes.type }
+									kind={ attributes.kind }
+								/>
+							)
 						)
 					}
 					suffix={
 						hasUrlBinding && (
 							<Button
 								icon={ unlinkIcon }
-								onClick={ editBoundLink }
+								onClick={ () => {
+									unsyncBoundLink();
+									// Focus management to send focus to the URL input
+									// on next render after disabled state is removed.
+									shouldFocusURLInputRef.current = true;
+								} }
 								aria-describedby={ helpTextId }
 								showTooltip
 								label={ __( 'Unsync and edit' ) }
 								__next40pxDefaultSize
+								className={
+									hasUrlBinding && ! isBoundEntityAvailable
+										? 'navigation-link-control__error-suffix-button'
+										: undefined
+								}
 							/>
 						)
 					}
@@ -264,5 +333,34 @@ function BindingHelpText( { type, kind } ) {
 		/* translators: %s is the entity type (e.g., "page", "post", "category") */
 		__( 'Synced with the selected %s.' ),
 		entityType
+	);
+}
+
+/**
+ * Component to display error help text for missing entity bindings.
+ *
+ * @param {Object} props      - Component props
+ * @param {string} props.id   - ID for the help text element (for aria-describedby)
+ * @param {string} props.type - The entity type
+ * @param {string} props.kind - The entity kind
+ * @return {JSX.Element} Error help text component
+ */
+function MissingEntityHelpText( { id, type, kind } ) {
+	const entityType = getEntityTypeName( type, kind );
+	return (
+		<span
+			id={ id }
+			className="navigation-link-control__error-text"
+			role="alert"
+			aria-live="polite"
+		>
+			{ sprintf(
+				/* translators: %s is the entity type (e.g., "page", "post", "category") */
+				__(
+					'Synced %s is missing. Please update or remove this link.'
+				),
+				entityType
+			) }
+		</span>
 	);
 }

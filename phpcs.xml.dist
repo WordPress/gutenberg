@@ -90,7 +90,6 @@
 	<rule ref="Gutenberg.CodeAnalysis.GuardedFunctionAndClassNames">
 		<exclude-pattern>/phpunit/*</exclude-pattern>
 		<exclude-pattern>/packages/*</exclude-pattern>
-		<exclude-pattern>/bin/generate-gutenberg-php\.php$</exclude-pattern>
 		<properties>
 			<property name="functionsWhiteList" type="array">
 				<element value="/^_?gutenberg.+/"/>

@@ -32,7 +32,6 @@ import useCommands from '../commands';
 import BlockRemovalWarnings from '../block-removal-warnings';
 import StartPageOptions from '../start-page-options';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
-import ContentOnlySettingsMenu from '../block-settings-menu/content-only-settings-menu';
 import StartTemplateOptions from '../start-template-options';
 import EditorKeyboardShortcuts from '../global-keyboard-shortcuts';
 import PatternRenameModal from '../pattern-rename-modal';
@@ -220,10 +219,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		const defaultBlockContext = useMemo( () => {
 			const postContext = {};
 			// If it is a template, try to inherit the post type from the name.
-			if (
-				post.type === 'wp_template' ||
-				post.type === 'wp_registered_template'
-			) {
+			if ( post.type === 'wp_template' ) {
 				if ( post.slug === 'page' ) {
 					postContext.postType = 'page';
 				} else if ( post.slug === 'single' ) {
@@ -373,7 +369,6 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 								<>
 									<PatternsMenuItems />
 									<TemplatePartMenuItems />
-									<ContentOnlySettingsMenu />
 									{ mode === 'template-locked' && (
 										<DisableNonPageContentBlocks />
 									) }

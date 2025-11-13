@@ -1,0 +1,1029 @@
+{
+	"color": {
+		"$type": "color",
+		"primitive": {
+			"primary": {
+				"bgFill1": {
+					"$value": "#3858e9"
+				},
+				"fgFill": {
+					"$value": "#eff0f2"
+				},
+				"bgFill2": {
+					"$value": "#2e49da"
+				},
+				"surface2": {
+					"$value": "#f6f8fc"
+				},
+				"surface6": {
+					"$value": "#c7d3ef"
+				},
+				"surface5": {
+					"$value": "#dce3f5"
+				},
+				"surface4": {
+					"$value": "#e5ebf7"
+				},
+				"surface3": {
+					"$value": "#fff"
+				},
+				"fgSurface4": {
+					"$value": "#080071"
+				},
+				"fgSurface3": {
+					"$value": "#3858e9"
+				},
+				"fgSurface2": {
+					"$value": "#5881ff"
+				},
+				"fgSurface1": {
+					"$value": "#84a9ff"
+				},
+				"stroke3": {
+					"$value": "#3858e9"
+				},
+				"stroke4": {
+					"$value": "#2337c8"
+				},
+				"stroke2": {
+					"$value": "#6d83bf"
+				},
+				"stroke1": {
+					"$value": "#91a2cf"
+				},
+				"bgFillDark": {
+					"$value": "#1b1e26"
+				},
+				"fgFillDark": {
+					"$value": "#eff0f2"
+				},
+				"bgFillInverted2": {
+					"$value": "#1b1e26"
+				},
+				"bgFillInverted1": {
+					"$value": "#12009f"
+				},
+				"fgFillInverted": {
+					"$value": "#eff0f2"
+				},
+				"surface1": {
+					"$value": "#edf0fa"
+				}
+			},
+			"info": {
+				"bgFill1": {
+					"$value": "#0090ff"
+				},
+				"fgFill": {
+					"$value": "#1b1e23"
+				},
+				"bgFill2": {
+					"$value": "#0081ef"
+				},
+				"surface2": {
+					"$value": "#f5f9fd"
+				},
+				"surface6": {
+					"$value": "#bed6f1"
+				},
+				"surface5": {
+					"$value": "#d5e5f6"
+				},
+				"surface4": {
+					"$value": "#e0ebf8"
+				},
+				"surface3": {
+					"$value": "#fff"
+				},
+				"fgSurface4": {
+					"$value": "#001758"
+				},
+				"fgSurface3": {
+					"$value": "#006dd9"
+				},
+				"fgSurface2": {
+					"$value": "#008cfb"
+				},
+				"fgSurface1": {
+					"$value": "#53b1ff"
+				},
+				"stroke3": {
+					"$value": "#006dd9"
+				},
+				"stroke4": {
+					"$value": "#004eb8"
+				},
+				"stroke2": {
+					"$value": "#5d8fc6"
+				},
+				"stroke1": {
+					"$value": "#8aaed6"
+				},
+				"bgFillDark": {
+					"$value": "#1b1e23"
+				},
+				"fgFillDark": {
+					"$value": "#eff0f2"
+				},
+				"bgFillInverted2": {
+					"$value": "#1b1e23"
+				},
+				"bgFillInverted1": {
+					"$value": "#002675"
+				},
+				"fgFillInverted": {
+					"$value": "#eff0f2"
+				},
+				"surface1": {
+					"$value": "#eaf1fa"
+				}
+			},
+			"success": {
+				"bgFill1": {
+					"$value": "#4ab866"
+				},
+				"fgFill": {
+					"$value": "#1b1f1c"
+				},
+				"bgFill2": {
+					"$value": "#37a857"
+				},
+				"surface2": {
+					"$value": "#f0fcf2"
+				},
+				"surface6": {
+					"$value": "#7eea95"
+				},
+				"surface5": {
+					"$value": "#b7f2c1"
+				},
+				"surface4": {
+					"$value": "#cdf5d3"
+				},
+				"surface3": {
+					"$value": "#fff"
+				},
+				"fgSurface4": {
+					"$value": "#002b00"
+				},
+				"fgSurface3": {
+					"$value": "#008031"
+				},
+				"fgSurface2": {
+					"$value": "#2c9f4e"
+				},
+				"fgSurface1": {
+					"$value": "#54c16f"
+				},
+				"stroke3": {
+					"$value": "#008031"
+				},
+				"stroke4": {
+					"$value": "#006314"
+				},
+				"stroke2": {
+					"$value": "#61986b"
+				},
+				"stroke1": {
+					"$value": "#77ba84"
+				},
+				"bgFillDark": {
+					"$value": "#1b1f1c"
+				},
+				"fgFillDark": {
+					"$value": "#edf2ed"
+				},
+				"bgFillInverted2": {
+					"$value": "#1b1f1c"
+				},
+				"bgFillInverted1": {
+					"$value": "#003800"
+				},
+				"fgFillInverted": {
+					"$value": "#edf2ed"
+				},
+				"surface1": {
+					"$value": "#ddf8e1"
+				}
+			},
+			"warning": {
+				"bgFill1": {
+					"$value": "#f0b849"
+				},
+				"fgFill": {
+					"$value": "#1f1e1b"
+				},
+				"bgFill2": {
+					"$value": "#dea633"
+				},
+				"surface2": {
+					"$value": "#fdf7ee"
+				},
+				"surface6": {
+					"$value": "#f1ce90"
+				},
+				"surface5": {
+					"$value": "#f6e0bb"
+				},
+				"surface4": {
+					"$value": "#f8e9cd"
+				},
+				"surface3": {
+					"$value": "#fff"
+				},
+				"fgSurface4": {
+					"$value": "#2f1800"
+				},
+				"fgSurface3": {
+					"$value": "#976300"
+				},
+				"fgSurface2": {
+					"$value": "#b78100"
+				},
+				"fgSurface1": {
+					"$value": "#d9a22e"
+				},
+				"stroke3": {
+					"$value": "#976300"
+				},
+				"stroke4": {
+					"$value": "#754900"
+				},
+				"stroke2": {
+					"$value": "#9f8860"
+				},
+				"stroke1": {
+					"$value": "#c2a776"
+				},
+				"bgFillDark": {
+					"$value": "#1f1e1b"
+				},
+				"fgFillDark": {
+					"$value": "#f3f0e9"
+				},
+				"bgFillInverted2": {
+					"$value": "#1f1e1b"
+				},
+				"bgFillInverted1": {
+					"$value": "#432600"
+				},
+				"fgFillInverted": {
+					"$value": "#f3f0e9"
+				},
+				"surface1": {
+					"$value": "#faefdc"
+				}
+			},
+			"error": {
+				"bgFill1": {
+					"$value": "#cc1818"
+				},
+				"fgFill": {
+					"$value": "#f2efef"
+				},
+				"bgFill2": {
+					"$value": "#bc0001"
+				},
+				"surface2": {
+					"$value": "#fdf6f5"
+				},
+				"surface6": {
+					"$value": "#f5c9c2"
+				},
+				"surface5": {
+					"$value": "#f9dcd8"
+				},
+				"surface4": {
+					"$value": "#fae5e2"
+				},
+				"surface3": {
+					"$value": "#fff"
+				},
+				"fgSurface4": {
+					"$value": "#4a0000"
+				},
+				"fgSurface3": {
+					"$value": "#cc1818"
+				},
+				"fgSurface2": {
+					"$value": "#f84d41"
+				},
+				"fgSurface1": {
+					"$value": "#ff8373"
+				},
+				"stroke3": {
+					"$value": "#cc1818"
+				},
+				"stroke4": {
+					"$value": "#a70000"
+				},
+				"stroke2": {
+					"$value": "#ca675c"
+				},
+				"stroke1": {
+					"$value": "#dc8e83"
+				},
+				"bgFillDark": {
+					"$value": "#231c1b"
+				},
+				"fgFillDark": {
+					"$value": "#f2efef"
+				},
+				"bgFillInverted2": {
+					"$value": "#231c1b"
+				},
+				"bgFillInverted1": {
+					"$value": "#680000"
+				},
+				"fgFillInverted": {
+					"$value": "#f2efef"
+				},
+				"surface1": {
+					"$value": "#fcedea"
+				}
+			},
+			"bg": {
+				"surface2": {
+					"$value": "#f8f8f8"
+				},
+				"bgFill1": {
+					"$value": "#555"
+				},
+				"fgFill": {
+					"$value": "#f0f0f0"
+				},
+				"bgFill2": {
+					"$value": "#494949"
+				},
+				"surface6": {
+					"$value": "#d3d3d3"
+				},
+				"surface5": {
+					"$value": "#e3e3e3"
+				},
+				"surface4": {
+					"$value": "#eaeaea"
+				},
+				"surface3": {
+					"$value": "#fff"
+				},
+				"fgSurface4": {
+					"$value": "#1e1e1e"
+				},
+				"fgSurface3": {
+					"$value": "#6e6e6e"
+				},
+				"fgSurface2": {
+					"$value": "#8b8b8b"
+				},
+				"fgSurface1": {
+					"$value": "#ababab"
+				},
+				"stroke3": {
+					"$value": "#8b8b8b"
+				},
+				"stroke4": {
+					"$value": "#6d6d6d"
+				},
+				"stroke2": {
+					"$value": "#adadad"
+				},
+				"stroke1": {
+					"$value": "#cfcfcf"
+				},
+				"bgFillDark": {
+					"$value": "#1e1e1e"
+				},
+				"fgFillDark": {
+					"$value": "#f0f0f0"
+				},
+				"bgFillInverted2": {
+					"$value": "#1e1e1e"
+				},
+				"bgFillInverted1": {
+					"$value": "#2d2d2d"
+				},
+				"fgFillInverted": {
+					"$value": "#f0f0f0"
+				},
+				"surface1": {
+					"$value": "#f0f0f0"
+				}
+			},
+			"caution": {
+				"bgFill1": {
+					"$value": "#f0d149"
+				},
+				"fgFill": {
+					"$value": "#1f1e1b"
+				},
+				"bgFill2": {
+					"$value": "#ddbe30"
+				},
+				"surface2": {
+					"$value": "#fdf9e7"
+				},
+				"surface6": {
+					"$value": "#ecd367"
+				},
+				"surface5": {
+					"$value": "#f5e399"
+				},
+				"surface4": {
+					"$value": "#f8ebb5"
+				},
+				"surface3": {
+					"$value": "#fff"
+				},
+				"fgSurface4": {
+					"$value": "#291d00"
+				},
+				"fgSurface3": {
+					"$value": "#876b00"
+				},
+				"fgSurface2": {
+					"$value": "#a78900"
+				},
+				"fgSurface1": {
+					"$value": "#c9aa00"
+				},
+				"stroke3": {
+					"$value": "#876b00"
+				},
+				"stroke4": {
+					"$value": "#675000"
+				},
+				"stroke2": {
+					"$value": "#978c60"
+				},
+				"stroke1": {
+					"$value": "#b8ab75"
+				},
+				"bgFillDark": {
+					"$value": "#1f1e1b"
+				},
+				"fgFillDark": {
+					"$value": "#f6f1da"
+				},
+				"bgFillInverted2": {
+					"$value": "#1f1e1b"
+				},
+				"bgFillInverted1": {
+					"$value": "#3a2b00"
+				},
+				"fgFillInverted": {
+					"$value": "#f6f1da"
+				},
+				"surface1": {
+					"$value": "#faf1cd"
+				}
+			}
+		},
+		"semantic": {
+			"bg-surface": {
+				"neutral": {
+					"normal": {
+						"resting": {
+							"$value": "{color.primitive.bg.surface2}",
+							"$description": "Background color for surfaces with normal emphasis."
+						}
+					},
+					"strong": {
+						"resting": {
+							"$value": "{color.primitive.bg.surface3}",
+							"$description": "Background color for surfaces with strong emphasis."
+						}
+					},
+					"weak": {
+						"resting": {
+							"$value": "{color.primitive.bg.surface1}",
+							"$description": "Background color for surfaces with weak emphasis."
+						}
+					}
+				},
+				"brand": {
+					"normal": {
+						"resting": {
+							"$value": "{color.primitive.primary.surface1}",
+							"$description": "Background color for surfaces with brand tone and normal emphasis."
+						}
+					}
+				},
+				"success": {
+					"normal": {
+						"resting": {
+							"$value": "{color.primitive.success.surface4}",
+							"$description": "Background color for surfaces with success tone and normal emphasis."
+						}
+					},
+					"weak": {
+						"resting": {
+							"$value": "{color.primitive.success.surface2}",
+							"$description": "Background color for surfaces with success tone and weak emphasis."
+						}
+					}
+				},
+				"info": {
+					"normal": {
+						"resting": {
+							"$value": "{color.primitive.info.surface4}",
+							"$description": "Background color for surfaces with info tone and normal emphasis."
+						}
+					},
+					"weak": {
+						"resting": {
+							"$value": "{color.primitive.info.surface2}",
+							"$description": "Background color for surfaces with info tone and weak emphasis."
+						}
+					}
+				},
+				"warning": {
+					"normal": {
+						"resting": {
+							"$value": "{color.primitive.warning.surface4}",
+							"$description": "Background color for surfaces with warning tone and normal emphasis."
+						}
+					},
+					"weak": {
+						"resting": {
+							"$value": "{color.primitive.warning.surface2}",
+							"$description": "Background color for surfaces with warning tone and weak emphasis."
+						}
+					}
+				},
+				"caution": {
+					"normal": {
+						"resting": {
+							"$value": "{color.primitive.caution.surface4}",
+							"$description": "Background color for surfaces with caution tone and normal emphasis."
+						}
+					},
+					"weak": {
+						"resting": {
+							"$value": "{color.primitive.caution.surface2}",
+							"$description": "Background color for surfaces with caution tone and weak emphasis."
+						}
+					}
+				},
+				"error": {
+					"normal": {
+						"resting": {
+							"$value": "{color.primitive.error.surface4}",
+							"$description": "Background color for surfaces with error tone and normal emphasis."
+						}
+					},
+					"weak": {
+						"resting": {
+							"$value": "{color.primitive.error.surface2}",
+							"$description": "Background color for surfaces with error tone and weak emphasis."
+						}
+					}
+				}
+			},
+			"bg-interactive": {
+				"neutral": {
+					"normal": {
+						"resting": {
+							"$value": "transparent",
+							"$description": "Background color for interactive elements with neutral tone and normal emphasis."
+						},
+						"active": {
+							"$value": "{color.primitive.bg.surface4}",
+							"$description": "Background color for interactive elements with neutral tone and normal emphasis that are hovered, focused, or active."
+						},
+						"disabled": {
+							"$value": "{color.primitive.bg.surface5}",
+							"$description": "Background color for interactive elements with neutral tone and normal emphasis, in their disabled state."
+						}
+					},
+					"strong": {
+						"resting": {
+							"$value": "{color.primitive.bg.bgFillInverted1}",
+							"$description": "Background color for interactive elements with neutral tone and strong emphasis."
+						},
+						"active": {
+							"$value": "{color.primitive.bg.bgFillInverted2}",
+							"$description": "Background color for interactive elements with neutral tone and strong emphasis that are hovered, focused, or active."
+						},
+						"disabled": {
+							"$value": "{color.primitive.bg.surface6}",
+							"$description": "Background color for interactive elements with neutral tone and strong emphasis, in their disabled state."
+						}
+					},
+					"weak": {
+						"resting": {
+							"$value": "transparent",
+							"$description": "Background color for interactive elements with neutral tone and weak emphasis."
+						},
+						"active": {
+							"$value": "{color.primitive.bg.surface4}",
+							"$description": "Background color for interactive elements with neutral tone and weak emphasis that are hovered, focused, or active."
+						},
+						"disabled": {
+							"$value": "{color.primitive.bg.surface5}",
+							"$description": "Background color for interactive elements with neutral tone and weak emphasis, in their disabled state."
+						}
+					}
+				},
+				"brand": {
+					"normal": {
+						"resting": {
+							"$value": "transparent",
+							"$description": "Background color for interactive elements with brand tone and normal emphasis."
+						},
+						"active": {
+							"$value": "{color.primitive.primary.surface2}",
+							"$description": "Background color for interactive elements with brand tone and normal emphasis that are hovered, focused, or active."
+						},
+						"disabled": {
+							"$value": "{color.primitive.bg.surface5}",
+							"$description": "Background color for interactive elements with brand tone and normal emphasis, in their disabled state."
+						}
+					},
+					"strong": {
+						"resting": {
+							"$value": "{color.primitive.primary.bgFill1}",
+							"$description": "Background color for interactive elements with brand tone and strong emphasis."
+						},
+						"active": {
+							"$value": "{color.primitive.primary.bgFill2}",
+							"$description": "Background color for interactive elements with brand tone and strong emphasis that are hovered, focused, or active."
+						},
+						"disabled": {
+							"$value": "{color.primitive.bg.surface6}",
+							"$description": "Background color for interactive elements with brand tone and strong emphasis, in their disabled state."
+						}
+					},
+					"weak": {
+						"resting": {
+							"$value": "transparent",
+							"$description": "Background color for interactive elements with brand tone and weak emphasis."
+						},
+						"active": {
+							"$value": "{color.primitive.primary.surface4}",
+							"$description": "Background color for interactive elements with brand tone and weak emphasis that are hovered, focused, or active."
+						},
+						"disabled": {
+							"$value": "{color.primitive.bg.surface5}",
+							"$description": "Background color for interactive elements with brand tone and weak emphasis, in their disabled state."
+						}
+					}
+				}
+			},
+			"bg-track": {
+				"neutral": {
+					"weak": {
+						"resting": {
+							"$value": "{color.primitive.bg.stroke1}",
+							"$description": "Background color for tracks with a neutral tone and weak emphasis (eg. scrollbar track)."
+						}
+					},
+					"normal": {
+						"resting": {
+							"$value": "{color.primitive.bg.stroke2}",
+							"$description": "Background color for tracks with a neutral tone and normal emphasis (eg. slider or progressbar track)."
+						}
+					}
+				}
+			},
+			"bg-thumb": {
+				"neutral": {
+					"weak": {
+						"resting": {
+							"$value": "{color.primitive.bg.stroke3}",
+							"$description": "Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb)."
+						},
+						"active": {
+							"$value": "{color.primitive.bg.stroke4}",
+							"$description": "Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb) that are hovered, focused, or active."
+						}
+					}
+				},
+				"brand": {
+					"normal": {
+						"resting": {
+							"$value": "{color.primitive.primary.stroke3}",
+							"$description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track)."
+						},
+						"active": {
+							"$value": "{color.primitive.primary.stroke3}",
+							"$description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track) that are hovered, focused, or active."
+						},
+						"disabled": {
+							"$value": "{color.primitive.bg.stroke2}",
+							"$description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track), in their disabled state."
+						}
+					}
+				}
+			},
+			"fg-content": {
+				"neutral": {
+					"normal": {
+						"resting": {
+							"$value": "{color.primitive.bg.fgSurface4}",
+							"$description": "Foreground color for content like text with normal emphasis."
+						}
+					},
+					"weak": {
+						"resting": {
+							"$value": "{color.primitive.bg.fgSurface3}",
+							"$description": "Foreground color for content like text with weak emphasis."
+						}
+					}
+				},
+				"success": {
+					"normal": {
+						"resting": {
+							"$value": "{color.primitive.success.fgSurface4}",
+							"$description": "Foreground color for content like text with success tone and normal emphasis."
+						}
+					},
+					"weak": {
+						"resting": {
+							"$value": "{color.primitive.success.fgSurface3}",
+							"$description": "Foreground color for content like text with success tone and weak emphasis."
+						}
+					}
+				},
+				"info": {
+					"normal": {
+						"resting": {
+							"$value": "{color.primitive.info.fgSurface4}",
+							"$description": "Foreground color for content like text with info tone and normal emphasis."
+						}
+					},
+					"weak": {
+						"resting": {
+							"$value": "{color.primitive.info.fgSurface3}",
+							"$description": "Foreground color for content like text with info tone and weak emphasis."
+						}
+					}
+				},
+				"warning": {
+					"normal": {
+						"resting": {
+							"$value": "{color.primitive.warning.fgSurface4}",
+							"$description": "Foreground color for content like text with warning tone and normal emphasis."
+						}
+					},
+					"weak": {
+						"resting": {
+							"$value": "{color.primitive.warning.fgSurface3}",
+							"$description": "Foreground color for content like text with warning tone and weak emphasis."
+						}
+					}
+				},
+				"caution": {
+					"normal": {
+						"resting": {
+							"$value": "{color.primitive.caution.fgSurface4}",
+							"$description": "Foreground color for content like text with caution tone and normal emphasis."
+						}
+					},
+					"weak": {
+						"resting": {
+							"$value": "{color.primitive.caution.fgSurface3}",
+							"$description": "Foreground color for content like text with caution tone and weak emphasis."
+						}
+					}
+				},
+				"error": {
+					"normal": {
+						"resting": {
+							"$value": "{color.primitive.error.fgSurface4}",
+							"$description": "Foreground color for content like text with error tone and normal emphasis."
+						}
+					},
+					"weak": {
+						"resting": {
+							"$value": "{color.primitive.error.fgSurface3}",
+							"$description": "Foreground color for content like text with error tone and weak emphasis."
+						}
+					}
+				}
+			},
+			"fg-interactive": {
+				"neutral": {
+					"normal": {
+						"resting": {
+							"$value": "{color.primitive.bg.fgSurface4}",
+							"$description": "Foreground color for interactive elements with neutral tone and normal emphasis."
+						},
+						"active": {
+							"$value": "{color.primitive.bg.fgSurface4}",
+							"$description": "Foreground color for interactive elements with neutral tone and normal emphasis that are hovered, focused, or active."
+						},
+						"disabled": {
+							"$value": "{color.primitive.bg.fgSurface2}",
+							"$description": "Foreground color for interactive elements with neutral tone and normal emphasis, in their disabled state."
+						}
+					},
+					"strong": {
+						"resting": {
+							"$value": "{color.primitive.bg.fgFillInverted}",
+							"$description": "Foreground color for interactive elements with neutral tone and strong emphasis."
+						},
+						"active": {
+							"$value": "{color.primitive.bg.fgFillInverted}",
+							"$description": "Foreground color for interactive elements with neutral tone and strong emphasis that are hovered, focused, or active."
+						},
+						"disabled": {
+							"$value": "{color.primitive.bg.fgSurface3}",
+							"$description": "Foreground color for interactive elements with neutral tone and strong emphasis, in their disabled state."
+						}
+					},
+					"weak": {
+						"resting": {
+							"$value": "{color.primitive.bg.fgSurface3}",
+							"$description": "Foreground color for interactive elements with neutral tone and weak emphasis."
+						},
+						"disabled": {
+							"$value": "{color.primitive.bg.fgSurface2}",
+							"$description": "Foreground color for interactive elements with neutral tone and weak emphasis, in their disabled state."
+						}
+					}
+				},
+				"brand": {
+					"normal": {
+						"resting": {
+							"$value": "{color.primitive.primary.fgSurface3}",
+							"$description": "Foreground color for interactive elements with brand tone and normal emphasis."
+						},
+						"active": {
+							"$value": "{color.primitive.primary.fgSurface3}",
+							"$description": "Foreground color for interactive elements with brand tone and normal emphasis that are hovered, focused, or active."
+						},
+						"disabled": {
+							"$value": "{color.primitive.bg.fgSurface2}",
+							"$description": "Foreground color for interactive elements with brand tone and normal emphasis, in their disabled state."
+						}
+					},
+					"strong": {
+						"resting": {
+							"$value": "{color.primitive.primary.fgFill}",
+							"$description": "Foreground color for interactive elements with brand tone and strong emphasis."
+						},
+						"active": {
+							"$value": "{color.primitive.primary.fgFill}",
+							"$description": "Foreground color for interactive elements with brand tone and strong emphasis that are hovered, focused, or active."
+						},
+						"disabled": {
+							"$value": "{color.primitive.bg.fgSurface3}",
+							"$description": "Foreground color for interactive elements with brand tone and strong emphasis, in their disabled state."
+						}
+					}
+				}
+			},
+			"stroke-surface": {
+				"neutral": {
+					"normal": {
+						"resting": {
+							"$value": "{color.primitive.bg.stroke2}",
+							"$description": "Decorative stroke color used to define neutrally-toned surface boundaries with normal emphasis."
+						}
+					},
+					"weak": {
+						"resting": {
+							"$value": "{color.primitive.bg.stroke1}",
+							"$description": "Decorative stroke color used to define neutrally-toned surface boundaries with weak emphasis."
+						}
+					},
+					"strong": {
+						"resting": {
+							"$value": "{color.primitive.bg.stroke3}",
+							"$description": "Decorative stroke color used to define neutrally-toned surface boundaries with strong emphasis."
+						}
+					}
+				},
+				"brand": {
+					"normal": {
+						"resting": {
+							"$value": "{color.primitive.primary.stroke1}",
+							"$description": "Decorative stroke color used to define brand-toned surface boundaries with normal emphasis."
+						}
+					},
+					"strong": {
+						"resting": {
+							"$value": "{color.primitive.primary.stroke3}",
+							"$description": "Decorative stroke color used to define neutrally-toned surface boundaries with strong emphasis."
+						}
+					}
+				},
+				"success": {
+					"normal": {
+						"resting": {
+							"$value": "{color.primitive.success.stroke1}",
+							"$description": "Decorative stroke color used to define success-toned surface boundaries with normal emphasis."
+						}
+					},
+					"strong": {
+						"resting": {
+							"$value": "{color.primitive.success.stroke3}",
+							"$description": "Decorative stroke color used to define success-toned surface boundaries with strong emphasis."
+						}
+					}
+				},
+				"info": {
+					"normal": {
+						"resting": {
+							"$value": "{color.primitive.info.stroke1}",
+							"$description": "Decorative stroke color used to define info-toned surface boundaries with normal emphasis."
+						}
+					},
+					"strong": {
+						"resting": {
+							"$value": "{color.primitive.info.stroke3}",
+							"$description": "Decorative stroke color used to define info-toned surface boundaries with strong emphasis."
+						}
+					}
+				},
+				"warning": {
+					"normal": {
+						"resting": {
+							"$value": "{color.primitive.warning.stroke1}",
+							"$description": "Decorative stroke color used to define warning-toned surface boundaries with normal emphasis."
+						}
+					},
+					"strong": {
+						"resting": {
+							"$value": "{color.primitive.warning.stroke3}",
+							"$description": "Decorative stroke color used to define warning-toned surface boundaries with strong emphasis."
+						}
+					}
+				},
+				"error": {
+					"normal": {
+						"resting": {
+							"$value": "{color.primitive.error.stroke1}",
+							"$description": "Decorative stroke color used to define error-toned surface boundaries with normal emphasis."
+						}
+					},
+					"strong": {
+						"resting": {
+							"$value": "{color.primitive.error.stroke3}",
+							"$description": "Decorative stroke color used to define error-toned surface boundaries with strong emphasis."
+						}
+					}
+				}
+			},
+			"stroke-interactive": {
+				"neutral": {
+					"normal": {
+						"resting": {
+							"$value": "{color.primitive.bg.stroke3}",
+							"$description": "Accessible stroke color used for interactive neutrally-toned elements with normal emphasis."
+						},
+						"active": {
+							"$value": "{color.primitive.bg.stroke4}",
+							"$description": "Accessible stroke color used for interactive neutrally-toned elements with normal emphasis that are hovered, focused, or active."
+						},
+						"disabled": {
+							"$value": "{color.primitive.bg.stroke2}",
+							"$description": "Accessible stroke color used for interactive neutrally-toned elements with normal emphasis, in their disabled state."
+						}
+					},
+					"strong": {
+						"resting": {
+							"$value": "{color.primitive.bg.stroke4}",
+							"$description": "Accessible stroke color used for interactive neutrally-toned elements with strong emphasis."
+						}
+					}
+				},
+				"brand": {
+					"normal": {
+						"resting": {
+							"$value": "{color.primitive.primary.stroke3}",
+							"$description": "Accessible stroke color used for interactive brand-toned elements with normal emphasis."
+						},
+						"active": {
+							"$value": "{color.primitive.primary.stroke4}",
+							"$description": "Accessible stroke color used for interactive brand-toned elements with normal emphasis that are hovered, focused, or active."
+						},
+						"disabled": {
+							"$value": "{color.primitive.bg.stroke2}",
+							"$description": "Accessible stroke color used for interactive brand-toned elements with normal emphasis, in their disabled state."
+						}
+					}
+				},
+				"error": {
+					"strong": {
+						"resting": {
+							"$value": "{color.primitive.error.stroke3}",
+							"$description": "Accessible stroke color used for interactive error-toned elements with strong emphasis."
+						}
+					}
+				}
+			},
+			"stroke-focus": {
+				"brand": {
+					"normal": {
+						"resting": {
+							"$value": "{color.primitive.primary.stroke3}",
+							"$description": "Accessible stroke color applied to focus rings."
+						}
+					}
+				}
+			}
+		}
+	}
+}

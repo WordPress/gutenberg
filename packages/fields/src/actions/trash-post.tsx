@@ -23,11 +23,16 @@ import type { CoreDataError, PostWithPermissions } from '../types';
 
 const trashPost: Action< PostWithPermissions > = {
 	id: 'move-to-trash',
-	label: __( 'Move to trash' ),
+	label: __( 'Trash' ),
 	isPrimary: true,
 	icon: trash,
 	isEligible( item ) {
 		if ( item.type === 'wp_template_part' || item.type === 'wp_block' ) {
+			return false;
+		}
+
+		// Non-database template cannot be trashed.
+		if ( item.type === 'wp_template' && typeof item.id === 'string' ) {
 			return false;
 		}
 

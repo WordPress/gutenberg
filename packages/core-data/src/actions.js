@@ -19,7 +19,7 @@ import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
 import { STORE_NAME } from './name';
-import { LOCAL_EDITOR_ORIGIN, syncManager } from './sync';
+import { LOCAL_EDITOR_ORIGIN, getSyncManager } from './sync';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 
 /**
@@ -415,7 +415,7 @@ export const editEntityRecord =
 				const objectType = `${ kind }/${ name }`;
 				const objectId = recordId;
 
-				syncManager.update(
+				getSyncManager()?.update(
 					objectType,
 					objectId,
 					edit.edits,
@@ -525,8 +525,9 @@ export const saveEntityRecord =
 		if ( ! entityConfig ) {
 			return;
 		}
-		const entityIdKey = entityConfig.key || DEFAULT_ENTITY_KEY;
+		const entityIdKey = entityConfig.key ?? DEFAULT_ENTITY_KEY;
 		const recordId = record[ entityIdKey ];
+		const isNewRecord = !! entityIdKey && ! recordId;
 
 		const lock = await dispatch.__unstableAcquireStoreLock(
 			STORE_NAME,
@@ -580,11 +581,10 @@ export const saveEntityRecord =
 			}
 			try {
 				const path = `${ baseURL }${ recordId ? '/' + recordId : '' }`;
-				const persistedRecord = select.getRawEntityRecord(
-					kind,
-					name,
-					recordId
-				);
+				// Skip the raw values check when creating a new record; they don't exist yet.
+				const persistedRecord = ! isNewRecord
+					? select.getRawEntityRecord( kind, name, recordId )
+					: {};
 
 				if ( isAutosave ) {
 					// Most of this autosave logic is very specific to posts.

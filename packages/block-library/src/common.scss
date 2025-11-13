@@ -35,16 +35,17 @@
 }
 
 // Text alignments.
-.has-text-align-center {
+// The :root prefix increases CSS specificity from 0-1-0 to 0-2-0,
+// ensuring that block instance-level text alignment overrides take
+// precedence over global styles.
+:root .has-text-align-center {
 	text-align: center;
 }
-
-.has-text-align-left {
+:root .has-text-align-left {
 	/*rtl:ignore*/
 	text-align: left;
 }
-
-.has-text-align-right {
+:root .has-text-align-right {
 	/*rtl:ignore*/
 	text-align: right;
 }

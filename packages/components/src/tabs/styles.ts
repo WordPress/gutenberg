@@ -58,7 +58,7 @@ export const StyledTabList = styled( Ariakit.TabList )`
 			when scaling in the transform, see: https://stackoverflow.com/a/52159123 */
 	--antialiasing-factor: 100;
 	&[aria-orientation='horizontal'] {
-		--fade-width: 4rem;
+		--fade-width: 64px;
 		--fade-gradient-base: transparent 0%, black var( --fade-width );
 		--fade-gradient-composed: var( --fade-gradient-base ), black 60%,
 			transparent 50%;

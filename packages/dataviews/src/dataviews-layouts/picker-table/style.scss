@@ -1,0 +1,45 @@
+// Picker-specific table styles
+// The table picker mainly reuses the regular table styles from ../table/style.scss
+// Add any picker-specific overrides here if needed in the future.
+
+.dataviews-view-picker-table {
+	tbody:focus-visible {
+		// Only show one focus outline at a time. When focus is on a child element,
+		// hide the table's own focus outline.
+		&[aria-activedescendant] {
+			outline: none;
+		}
+
+		[data-active-item="true"] {
+			outline: 2px solid var(--wp-admin-theme-color);
+		}
+	}
+
+	.dataviews-selection-checkbox {
+		// Added specificity to override table styles.
+		.components-checkbox-control__input.components-checkbox-control__input {
+			// When the dataview is used as a picker, ensure the checkbox can't be clicked on.
+			// Only the row itself is clickable.
+			pointer-events: none;
+			opacity: 1;
+		}
+	}
+
+	// When used in picker context, ensure row selection works as expected
+	.dataviews-view-table__row {
+		cursor: pointer;
+
+		&.is-selected {
+			// Ensure selected rows are visually distinct
+			background-color: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+		}
+
+		&.is-hovered {
+			background-color: rgba(var(--wp-admin-theme-color--rgb), 0.08);
+		}
+
+		&.is-selected.is-hovered {
+			background-color: rgba(var(--wp-admin-theme-color--rgb), 0.12);
+		}
+	}
+}

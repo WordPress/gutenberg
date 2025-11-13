@@ -1,0 +1,26 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"checkJs": false
+	},
+	"references": [
+		{ "path": "../admin-ui" },
+		{ "path": "../components" },
+		{ "path": "../compose" },
+		{ "path": "../core-data" },
+		{ "path": "../data" },
+		{ "path": "../editor" },
+		{ "path": "../element" },
+		{ "path": "../html-entities" },
+		{ "path": "../i18n" },
+		{ "path": "../icons" },
+		{ "path": "../keycodes" },
+		{ "path": "../lazy-editor" },
+		{ "path": "../primitives" },
+		{ "path": "../private-apis" },
+		{ "path": "../route" },
+		{ "path": "../theme" },
+		{ "path": "../url" }
+	]
+}

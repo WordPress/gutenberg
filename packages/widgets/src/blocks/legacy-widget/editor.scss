@@ -150,7 +150,7 @@
 
 .interface-complementary-area .wp-block-legacy-widget-inspector-card__name {
 	margin: 0 0 5px;
-	font-weight: 500;
+	font-weight: $font-weight-medium;
 }
 
 // When wide widget is selected it opens in a popover but its container should still have a bit of height.

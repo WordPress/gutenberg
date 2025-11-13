@@ -391,9 +391,7 @@ export default function NavigationSubmenuEdit( {
 				/>
 			</InspectorControls>
 			<div { ...blockProps }>
-				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
 				<ParentElement className="wp-block-navigation-item__content">
-					{ /* eslint-enable */ }
 					<RichText
 						ref={ ref }
 						identifier="label"

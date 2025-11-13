@@ -133,19 +133,28 @@ export const registerPostTypeSchema =
 			.resolveSelect( coreStore )
 			.getCurrentTheme();
 
+		let canDuplicate =
+			! [ 'wp_block', 'wp_template_part' ].includes(
+				postTypeConfig.slug
+			) &&
+			canCreate &&
+			duplicatePost;
+
+		// @ts-ignore
+		if ( ! globalThis.IS_GUTENBERG_PLUGIN ) {
+			// Outside Gutenberg, disable duplication except for wp_template.
+			if ( 'wp_template' !== postTypeConfig.slug ) {
+				canDuplicate = undefined;
+			}
+		}
+
 		const actions = [
 			postTypeConfig.viewable ? viewPost : undefined,
 			!! postTypeConfig.supports?.revisions
 				? viewPostRevisions
 				: undefined,
 			// @ts-ignore
-			globalThis.IS_GUTENBERG_PLUGIN
-				? ! [ 'wp_block', 'wp_template_part' ].includes(
-						postTypeConfig.slug
-				  ) &&
-				  canCreate &&
-				  duplicatePost
-				: undefined,
+			canDuplicate,
 			postTypeConfig.slug === 'wp_template_part' &&
 			canCreate &&
 			currentTheme?.is_block_theme

@@ -798,12 +798,20 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			.getByRole( 'menuitemradio', { name: 'Align text center' } )
 			.click();
 
-		await expect
-			.poll( editor.getBlocks )
-			.toMatchObject( [
-				{ attributes: { align: 'center', content: '1' } },
-				{ attributes: { align: 'center', content: '2' } },
-			] );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				attributes: {
+					style: { typography: { textAlign: 'center' } },
+					content: '1',
+				},
+			},
+			{
+				attributes: {
+					style: { typography: { textAlign: 'center' } },
+					content: '2',
+				},
+			},
+		] );
 	} );
 
 	// Previously we would unexpectedly duplicate the block on Enter.

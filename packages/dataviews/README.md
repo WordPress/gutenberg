@@ -1,8 +1,9 @@
 # The `@wordpress/dataviews` package
 
-The DataViews package offers two React components and a few utilities to work with a list of data:
+The DataViews package offers three React components and a few utilities to work with a list of data:
 
 -   `DataViews`: to render the dataset using different types of layouts (table, grid, list) and interaction capabilities (search, filters, sorting, etc.).
+-   `DataViewsPicker`: to render the dataset optimized for selection or picking of items.
 -   `DataForm`: to edit the items of the dataset.
 
 ## Installation
@@ -572,6 +573,112 @@ const Example = () => {
 
 ### Properties
 
+The `DataViewsPicker` component accepts most of the same properties as `DataViews`, with some key differences noted below.
+
+#### `data`: `Object[]`
+
+Same as `DataViews`. A one-dimensional array of objects.
+
+#### `fields`: `Object[]`
+
+Same as `DataViews`. The fields describe the visible items for each record in the dataset. See "Fields API" for a description of every property.
+
+#### `view`: `Object`
+
+Same as `DataViews`. The view object configures how the dataset is visible to the user. Note that only the `pickerGrid` layout type is supported.
+
+#### `onChangeView`: `function`
+
+Same as `DataViews`. Callback executed when the view has changed.
+
+#### `actions`: `Object[]`
+
+A list of actions that can be performed on the dataset. See "Actions API" for more details.
+
+**Important differences from `DataViews`:**
+-   Only `callback` style actions are supported. `RenderModal` is unsupported.
+-   The `isEligible` callback for actions is unsupported.
+-   The `isPrimary` option is used to render a `primary` variant of `Button`.
+-   To implement multi-selection, ensure all actions have `supportsBulk: true`. For single selection use `supportsBulk: false`.
+
+#### `paginationInfo`: `Object`
+
+Same as `DataViews`. Contains `totalItems` and `totalPages` properties, and optionally `infiniteScrollHandler`.
+
+#### `search`: `boolean`
+
+Same as `DataViews`. Whether the search input is enabled. `true` by default.
+
+#### `searchLabel`: `string`
+
+Same as `DataViews`. What text to show in the search input. "Search" by default.
+
+#### `isLoading`: `boolean`
+
+Same as `DataViews`. Whether the data is loading. `false` by default.
+
+#### `defaultLayouts`: `Record< string, view >`
+
+Limits the available layouts. Currently only `pickerGrid` is supported for `DataViewsPicker`.
+
+Example:
+
+```js
+const defaultLayouts = {
+	pickerGrid: {
+		showMedia: true,
+	},
+};
+```
+
+#### `selection`: `string[]`
+
+**Required** for `DataViewsPicker`. The list of selected items' ids.
+
+Unlike `DataViews`, the picker component must be used as a controlled component, so this prop is required along with `onChangeSelection`.
+
+#### `onChangeSelection`: `function`
+
+**Required** for `DataViewsPicker`. Callback that signals the user selected one or more items. It receives the list of selected items' IDs as a parameter.
+
+#### `getItemId`: `function`
+
+Same as `DataViews`. A function that receives an item and returns a unique identifier for it. Optional, defaults to returning `item.id`.
+
+#### `itemListLabel`: `string`
+
+Optional. An accessible label for the list of items. This is added as an `aria-label` to the `listbox` element, and should be supplied if there's no heading element associated with the `DataViewsPicker` UI.
+
+Example:
+
+```js
+{
+	itemListLabel: 'Select a page';
+}
+```
+
+#### `config`: { perPageSizes: number[] }
+
+Same as `DataViews`. Optional. Pass an object with a list of `perPageSizes` to control the available item counts per page.
+
+#### `empty`: React node
+
+Same as `DataViews`. An element to display when the `data` prop is empty.
+
+#### `children`: React node
+
+Optional. Custom UI to render instead of the default picker layout. When provided, you can use the same subcomponents as `DataViews` for free composition.
+
+**Unsupported properties:**
+
+The following `DataViews` properties are **not supported** by `DataViewsPicker`:
+
+-   `isItemClickable`
+-   `renderItemLink`
+-   `onClickItem`
+-   `getItemLevel`
+-   `header`
+
 ## `DataForm`
 
 <div class="callout callout-info">At <a href="https://wordpress.github.io/gutenberg/">WordPress Gutenberg's Storybook</a> there's and <a href="https://wordpress.github.io/gutenberg/?path=/docs/dataviews-dataform--docs">example implementation of the DataForm component</a>.</div>
@@ -818,7 +925,7 @@ The user facing description of the action.
 
 ```js
 {
-	label: Move to Trash
+	label: Trash
 }
 ```
 
@@ -1195,7 +1302,7 @@ Example:
 
 React component that renders the control to edit the field.
 
--   Type: React component | `string`. If it's a string, it needs to be one of `array`, `checkbox`, `color`, `datetime`, `date`, `email`, `telephone`, `url`, `integer`, `number`, `password`, `radio`, `select`, `text`, `toggle`, `textarea`, `toggleGroup`.
+-   Type: `string` | `object` | React component.
 -   Required by DataForm. Optional if the field provided a `type`.
 -   Props:
     -   `data`: the item to be processed
@@ -1204,7 +1311,61 @@ React component that renders the control to edit the field.
     -   `hideLabelFromVision`: boolean representing if the label should be hidden
 -   Returns a React element to edit the field's value.
 
-Example:
+Fields that provide a `type` will have a default Edit control:
+
+```js
+// Edit is optional when field's type is present.
+// The field will use the default Edit function for text.
+{
+	type: 'text';
+}
+```
+
+Field authors can override the default Edit control by providing a string that maps to one of the bundled UI controls: `array`, `checkbox`, `color`, `date`, `datetime`, `email`, `integer`, `number`, `password`, `radio`, `select`, `telephone`, `text`, `textarea`, `toggle`, `toggleGroup`, or `url`.
+
+```js
+// Use one of the core controls.
+{
+	Edit: 'radio';
+}
+```
+
+
+```js
+// Edit can be provided even if field's type is present.
+// The field will use its own custom control.
+{
+	type: 'text',
+	Edit: 'radio'
+}
+```
+
+Additionally, some of the bundled Edit controls are configurable via a config object:
+
+- `textarea` configuration:
+
+```js
+{
+	Edit: {
+		control: 'textarea',
+		rows: 5
+	}
+}
+```
+
+- `text` configuration:
+
+```js
+{
+	Edit: {
+		control: 'text',
+		prefix: ReactComponent,
+		suffix: ReactComponent,
+	}
+}
+```
+
+Finally, the field author can always provide its own custom control:
 
 ```js
 // A custom control defined by the field.
@@ -1223,29 +1384,6 @@ Example:
 }
 ```
 
-```js
-// Use one of the core controls.
-{
-	Edit: 'radio';
-}
-```
-
-```js
-// Edit is optional when field's type is present.
-// The field will use the default Edit function for text.
-{
-	type: 'text';
-}
-```
-
-```js
-// Edit can be provided even if field's type is present.
-// The field will use its own custom control.
-{
-	type: 'text',
-	Edit: 'radio'
-}
-```
 
 ### `sort`
 
@@ -1610,6 +1748,7 @@ For example:
     -   A string (single field ID)
     -   An array of strings (multiple field IDs)
     -   An array of objects for per-field visibility control `[{ id: string, visibility: 'always' | 'when-collapsed' }]`
+-   `isCollapsible`: boolean. Optional. `true` by default. Specifies whether the card can be collapsed.
 
 Cards can be collapsed while visible, so you can control when summary fields appear:
 

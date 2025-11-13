@@ -10,7 +10,7 @@ import esbuild from 'esbuild';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
 const ROOT_DIR = path.resolve( __dirname, '../..' );
-const BUILD_DIR = path.join( ROOT_DIR, 'build' );
+const BUILD_DIR = path.join( ROOT_DIR, 'build', 'scripts' );
 const VENDORS_DIR = path.join( BUILD_DIR, 'vendors' );
 
 /**
@@ -23,19 +23,19 @@ async function copyReactUMDFiles() {
 	const filesToCopy = [
 		{
 			from: 'node_modules/react/umd/react.development.js',
-			to: 'build/vendors/react.js',
+			to: 'react.js',
 		},
 		{
 			from: 'node_modules/react/umd/react.production.min.js',
-			to: 'build/vendors/react.min.js',
+			to: 'react.min.js',
 		},
 		{
 			from: 'node_modules/react-dom/umd/react-dom.development.js',
-			to: 'build/vendors/react-dom.js',
+			to: 'react-dom.js',
 		},
 		{
 			from: 'node_modules/react-dom/umd/react-dom.production.min.js',
-			to: 'build/vendors/react-dom.min.js',
+			to: 'react-dom.min.js',
 		},
 	];
 
@@ -44,7 +44,7 @@ async function copyReactUMDFiles() {
 	await Promise.all(
 		filesToCopy.map( ( { from, to } ) => {
 			const source = path.join( ROOT_DIR, from );
-			const dest = path.join( ROOT_DIR, to );
+			const dest = path.join( VENDORS_DIR, to );
 			return copyFile( source, dest );
 		} )
 	);

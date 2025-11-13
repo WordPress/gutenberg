@@ -2,10 +2,48 @@
 
 ## Unreleased
 
+## 30.8.0 (2025-11-12)
+
+### Bug Fixes
+
+-   `Button`: Revert disabled primary button state to its previous one ([#73037](https://github.com/WordPress/gutenberg/pull/73037)).
+-   `TextareaControl`: Add `min-height` to the textarea element ([#72867](https://github.com/WordPress/gutenberg/pull/72867)).
+-   `Card`, `CardHeader`, `CardBody` and `CardFooter`: Add support for directional padding through object-based size prop, allowing independent control of padding for each side ([#72511](https://github.com/WordPress/gutenberg/pull/72511)).
+-   `CustomSelectControl`: Fix the options with the same name are shown as the selected option ([#72189](https://github.com/WordPress/gutenberg/pull/72189)).
+-   `NumberControl`: Fix crash when min prop is string and step prop contains decimal ([#73107](https://github.com/WordPress/gutenberg/pull/73107)).
+
+### Internal
+
+-   `Modal`: Add a classname to simplify full height content modal styling ([#73108](https://github.com/WordPress/gutenberg/pull/73108)).
+
+### Enhancements
+
+-   `ConfirmDialog`: Add `isBusy` prop to component. ([#73041](https://github.com/WordPress/gutenberg/pull/73041)).
+-   `ColorPicker`: Support pasting whole color values. ([#73166](https://github.com/WordPress/gutenberg/pull/73166)).
+
+## 30.7.0 (2025-10-29)
+
+### Bug Fixes
+
+-   `CardHeader`: Fix missing Flex props ([#71915](https://github.com/WordPress/gutenberg/pull/71915)).
+-   `CardFooter`: Fix missing Flex props ([#71915](https://github.com/WordPress/gutenberg/pull/71915)).
+
 ### Enhancements
 
 -   `Button`: Update font weight to `500` ([#70787](https://github.com/WordPress/gutenberg/pull/70787)).
 -   `TabPanel`: Update tab font weight ([#72455](https://github.com/WordPress/gutenberg/pull/72455)).
+-   Consistently use font-weight 499 instead of 500 ([#72473](https://github.com/WordPress/gutenberg/pull/72473)).
+-   `ComboboxControl`: Show reset button only when there is a value ([#72595](https://github.com/WordPress/gutenberg/pull/72595)).
+
+### Bug Fixes
+
+-   `Button`: Ensure that icons don't shrink ([#72474](https://github.com/WordPress/gutenberg/pull/72474)).
+-   `Popover`: Fix `onDialogClose` logic to only close the popover if the blur event targets the specific popover instance ([#72376](https://github.com/WordPress/gutenberg/pull/72376)).
+-   `Badge`: Add max-width for text truncation ([#72653](https://github.com/WordPress/gutenberg/pull/72653)).
+-   `Tabs`: Replace `rem` with `px` in tablist overflow fade ([#72669](https://github.com/WordPress/gutenberg/pull/72669)).
+-   `Modal`: Replace `rem` in heading text with a standard `px` value ([#72669](https://github.com/WordPress/gutenberg/pull/72669)).
+-   Validated form controls: Replace `rem` with `px` in error message ([#72669](https://github.com/WordPress/gutenberg/pull/72669)).
+-   `FocalPointPicker`: Fix label markup ([#70835](https://github.com/WordPress/gutenberg/pull/70835)).
 
 ## 30.6.0 (2025-10-17)
 
@@ -16,6 +54,7 @@
 -   `SearchControl`: Normalize styles ([#72072](https://github.com/WordPress/gutenberg/pull/72072)).
 -   `Badge`: Avoid propagating text-decoration styles from ancestors into the component ([#72097](https://github.com/WordPress/gutenberg/pull/72097), [#72302](https://github.com/WordPress/gutenberg/pull/72302)).
 -   `CheckboxControl`, `RadioControl`, `ToggleControl` (`FormToggle`): Ensure elements are focused when clicked in Safari ([#72115](https://github.com/WordPress/gutenberg/pull/72115)).
+-   `FontSizePicker`: Add `valueMode` prop to control how the `value` prop is interpreted (`'literal'` for size values, `'slug'` for font size slugs) ([#71703](https://github.com/WordPress/gutenberg/pull/71703))
 
 ### Bug Fixes
 
