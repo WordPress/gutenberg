@@ -224,14 +224,17 @@ export const SampleCombinations: StoryObj< typeof ColorGen > = {
 					value: background,
 				},
 				ramp: bgRamp.ramp,
+				warnings: bgRamp.warnings,
 			};
 
+			const primaryRamp = buildAccentRamp( primary, bgRamp );
 			const primaryRampObj = {
 				seed: {
 					name: 'bgFill1' as const,
 					value: primary,
 				},
-				ramp: buildAccentRamp( primary, bgRamp ).ramp,
+				ramp: primaryRamp.ramp,
+				warnings: primaryRamp.warnings,
 			};
 
 			return [ bgRampObj, primaryRampObj ];

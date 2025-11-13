@@ -44,19 +44,19 @@
 	},
 	"Color/Semantic/Background/Neutral/bgSur-neutral-weak": {
 		"value": {
-			".": "#f1f1f1"
+			".": "#f0f0f0"
 		},
 		"description": "Background color for surfaces with weak emphasis."
 	},
 	"Color/Semantic/Background/Brand/bgSur-brand": {
 		"value": {
-			".": "#edf1fa"
+			".": "#edf0fa"
 		},
 		"description": "Background color for surfaces with brand tone and normal emphasis."
 	},
 	"Color/Semantic/Background/Success/bgSur-success": {
 		"value": {
-			".": "#cef5d3"
+			".": "#cdf5d3"
 		},
 		"description": "Background color for surfaces with success tone and normal emphasis."
 	},
@@ -68,7 +68,7 @@
 	},
 	"Color/Semantic/Background/Info/bgSur-info": {
 		"value": {
-			".": "#e1ecf8"
+			".": "#e0ebf8"
 		},
 		"description": "Background color for surfaces with info tone and normal emphasis."
 	},
@@ -80,7 +80,7 @@
 	},
 	"Color/Semantic/Background/Warning/bgSur-warning": {
 		"value": {
-			".": "#f8e9ce"
+			".": "#f8e9cd"
 		},
 		"description": "Background color for surfaces with warning tone and normal emphasis."
 	},
@@ -92,7 +92,7 @@
 	},
 	"Color/Semantic/Background/Caution/bgSur-caution": {
 		"value": {
-			".": "#f8ebb6"
+			".": "#f8ebb5"
 		},
 		"description": "Background color for surfaces with caution tone and normal emphasis."
 	},
@@ -122,19 +122,19 @@
 	},
 	"Color/Semantic/Background/Neutral/bgInt-neutral-active": {
 		"value": {
-			".": "#ebebeb"
+			".": "#eaeaea"
 		},
 		"description": "Background color for interactive elements with neutral tone and normal emphasis that are hovered, focused, or active."
 	},
 	"Color/Semantic/Background/Neutral/bgInt-neutral-disabled": {
 		"value": {
-			".": "#e0e0e0"
+			".": "#e3e3e3"
 		},
 		"description": "Background color for interactive elements with neutral tone and normal emphasis, in their disabled state."
 	},
 	"Color/Semantic/Background/Neutral/bgInt-neutral-strong": {
 		"value": {
-			".": "#2f2f2f"
+			".": "#2d2d2d"
 		},
 		"description": "Background color for interactive elements with neutral tone and strong emphasis."
 	},
@@ -146,7 +146,7 @@
 	},
 	"Color/Semantic/Background/Neutral/bgInt-neutral-strong-disabled": {
 		"value": {
-			".": "#d0d0d0"
+			".": "#d3d3d3"
 		},
 		"description": "Background color for interactive elements with neutral tone and strong emphasis, in their disabled state."
 	},
@@ -158,13 +158,13 @@
 	},
 	"Color/Semantic/Background/Neutral/bgInt-neutral-weak-active": {
 		"value": {
-			".": "#ebebeb"
+			".": "#eaeaea"
 		},
 		"description": "Background color for interactive elements with neutral tone and weak emphasis that are hovered, focused, or active."
 	},
 	"Color/Semantic/Background/Neutral/bgInt-neutral-weak-disabled": {
 		"value": {
-			".": "#e0e0e0"
+			".": "#e3e3e3"
 		},
 		"description": "Background color for interactive elements with neutral tone and weak emphasis, in their disabled state."
 	},
@@ -182,7 +182,7 @@
 	},
 	"Color/Semantic/Background/Brand/bgInt-brand-disabled": {
 		"value": {
-			".": "#e0e0e0"
+			".": "#e3e3e3"
 		},
 		"description": "Background color for interactive elements with brand tone and normal emphasis, in their disabled state."
 	},
@@ -194,13 +194,13 @@
 	},
 	"Color/Semantic/Background/Brand/bgInt-brand-strong-active": {
 		"value": {
-			".": "#2c47d7"
+			".": "#2e49da"
 		},
 		"description": "Background color for interactive elements with brand tone and strong emphasis that are hovered, focused, or active."
 	},
 	"Color/Semantic/Background/Brand/bgInt-brand-strong-disabled": {
 		"value": {
-			".": "#d0d0d0"
+			".": "#d3d3d3"
 		},
 		"description": "Background color for interactive elements with brand tone and strong emphasis, in their disabled state."
 	},
@@ -212,37 +212,37 @@
 	},
 	"Color/Semantic/Background/Brand/bgInt-brand-weak-active": {
 		"value": {
-			".": "#e6ebf7"
+			".": "#e5ebf7"
 		},
 		"description": "Background color for interactive elements with brand tone and weak emphasis that are hovered, focused, or active."
 	},
 	"Color/Semantic/Background/Brand/bgInt-brand-weak-disabled": {
 		"value": {
-			".": "#e0e0e0"
+			".": "#e3e3e3"
 		},
 		"description": "Background color for interactive elements with brand tone and weak emphasis, in their disabled state."
 	},
 	"Color/Semantic/Background/Neutral/bgTra-neutral-weak": {
 		"value": {
-			".": "#d0d0d0"
+			".": "#cfcfcf"
 		},
 		"description": "Background color for tracks with a neutral tone and weak emphasis (eg. scrollbar track)."
 	},
 	"Color/Semantic/Background/Neutral/bgTra-neutral": {
 		"value": {
-			".": "#aeaeae"
+			".": "#adadad"
 		},
 		"description": "Background color for tracks with a neutral tone and normal emphasis (eg. slider or progressbar track)."
 	},
 	"Color/Semantic/Background/Neutral/bgThu-neutral-weak": {
 		"value": {
-			".": "#8a8a8a"
+			".": "#8b8b8b"
 		},
 		"description": "Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb)."
 	},
 	"Color/Semantic/Background/Neutral/bgThu-neutral-weak-active": {
 		"value": {
-			".": "#6b6b6b"
+			".": "#6d6d6d"
 		},
 		"description": "Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb) that are hovered, focused, or active."
 	},
@@ -260,7 +260,7 @@
 	},
 	"Color/Semantic/Background/Brand/bgThu-brand-disabled": {
 		"value": {
-			".": "#aeaeae"
+			".": "#adadad"
 		},
 		"description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track), in their disabled state."
 	},
@@ -272,7 +272,7 @@
 	},
 	"Color/Semantic/Foreground/Neutral/fgCon-neutral-weak": {
 		"value": {
-			".": "#6d6d6d"
+			".": "#6e6e6e"
 		},
 		"description": "Foreground color for content like text with weak emphasis."
 	},
@@ -320,7 +320,7 @@
 	},
 	"Color/Semantic/Foreground/Caution/fgCon-caution-weak": {
 		"value": {
-			".": "#876a00"
+			".": "#876b00"
 		},
 		"description": "Foreground color for content like text with caution tone and weak emphasis."
 	},
@@ -350,7 +350,7 @@
 	},
 	"Color/Semantic/Foreground/Neutral/fgInt-neutral-disabled": {
 		"value": {
-			".": "#8a8a8a"
+			".": "#8b8b8b"
 		},
 		"description": "Foreground color for interactive elements with neutral tone and normal emphasis, in their disabled state."
 	},
@@ -368,19 +368,19 @@
 	},
 	"Color/Semantic/Foreground/Neutral/fgInt-neutral-strong-disabled": {
 		"value": {
-			".": "#6d6d6d"
+			".": "#6e6e6e"
 		},
 		"description": "Foreground color for interactive elements with neutral tone and strong emphasis, in their disabled state."
 	},
 	"Color/Semantic/Foreground/Neutral/fgInt-neutral-weak": {
 		"value": {
-			".": "#6d6d6d"
+			".": "#6e6e6e"
 		},
 		"description": "Foreground color for interactive elements with neutral tone and weak emphasis."
 	},
 	"Color/Semantic/Foreground/Neutral/fgInt-neutral-weak-disabled": {
 		"value": {
-			".": "#8a8a8a"
+			".": "#8b8b8b"
 		},
 		"description": "Foreground color for interactive elements with neutral tone and weak emphasis, in their disabled state."
 	},
@@ -398,7 +398,7 @@
 	},
 	"Color/Semantic/Foreground/Brand/fgInt-brand-disabled": {
 		"value": {
-			".": "#8a8a8a"
+			".": "#8b8b8b"
 		},
 		"description": "Foreground color for interactive elements with brand tone and normal emphasis, in their disabled state."
 	},
@@ -416,31 +416,31 @@
 	},
 	"Color/Semantic/Foreground/Brand/fgInt-brand-strong-disabled": {
 		"value": {
-			".": "#6d6d6d"
+			".": "#6e6e6e"
 		},
 		"description": "Foreground color for interactive elements with brand tone and strong emphasis, in their disabled state."
 	},
 	"Color/Semantic/Stroke/Neutral/strokeSur-neutral": {
 		"value": {
-			".": "#aeaeae"
+			".": "#adadad"
 		},
 		"description": "Decorative stroke color used to define neutrally-toned surface boundaries with normal emphasis."
 	},
 	"Color/Semantic/Stroke/Neutral/strokeSur-neutral-weak": {
 		"value": {
-			".": "#d0d0d0"
+			".": "#cfcfcf"
 		},
 		"description": "Decorative stroke color used to define neutrally-toned surface boundaries with weak emphasis."
 	},
 	"Color/Semantic/Stroke/Neutral/strokeSur-neutral-strong": {
 		"value": {
-			".": "#8a8a8a"
+			".": "#8b8b8b"
 		},
 		"description": "Decorative stroke color used to define neutrally-toned surface boundaries with strong emphasis."
 	},
 	"Color/Semantic/Stroke/Brand/strokeSur-brand": {
 		"value": {
-			".": "#92a4d0"
+			".": "#91a2cf"
 		},
 		"description": "Decorative stroke color used to define brand-toned surface boundaries with normal emphasis."
 	},
@@ -452,7 +452,7 @@
 	},
 	"Color/Semantic/Stroke/Success/strokeSur-success": {
 		"value": {
-			".": "#78bb84"
+			".": "#77ba84"
 		},
 		"description": "Decorative stroke color used to define success-toned surface boundaries with normal emphasis."
 	},
@@ -464,7 +464,7 @@
 	},
 	"Color/Semantic/Stroke/Info/strokeSur-info": {
 		"value": {
-			".": "#8baed6"
+			".": "#8aaed6"
 		},
 		"description": "Decorative stroke color used to define info-toned surface boundaries with normal emphasis."
 	},
@@ -476,7 +476,7 @@
 	},
 	"Color/Semantic/Stroke/Warning/strokeSur-warning": {
 		"value": {
-			".": "#c3a877"
+			".": "#c2a776"
 		},
 		"description": "Decorative stroke color used to define warning-toned surface boundaries with normal emphasis."
 	},
@@ -488,7 +488,7 @@
 	},
 	"Color/Semantic/Stroke/Error/strokeSur-error": {
 		"value": {
-			".": "#dc9085"
+			".": "#dc8e83"
 		},
 		"description": "Decorative stroke color used to define error-toned surface boundaries with normal emphasis."
 	},
@@ -500,25 +500,25 @@
 	},
 	"Color/Semantic/Stroke/Neutral/strokeInt-neutral": {
 		"value": {
-			".": "#8a8a8a"
+			".": "#8b8b8b"
 		},
 		"description": "Accessible stroke color used for interactive neutrally-toned elements with normal emphasis."
 	},
 	"Color/Semantic/Stroke/Neutral/strokeInt-neutral-active": {
 		"value": {
-			".": "#6b6b6b"
+			".": "#6d6d6d"
 		},
 		"description": "Accessible stroke color used for interactive neutrally-toned elements with normal emphasis that are hovered, focused, or active."
 	},
 	"Color/Semantic/Stroke/Neutral/strokeInt-neutral-disabled": {
 		"value": {
-			".": "#aeaeae"
+			".": "#adadad"
 		},
 		"description": "Accessible stroke color used for interactive neutrally-toned elements with normal emphasis, in their disabled state."
 	},
 	"Color/Semantic/Stroke/Neutral/strokeInt-neutral-strong": {
 		"value": {
-			".": "#6b6b6b"
+			".": "#6d6d6d"
 		},
 		"description": "Accessible stroke color used for interactive neutrally-toned elements with strong emphasis."
 	},
@@ -530,13 +530,13 @@
 	},
 	"Color/Semantic/Stroke/Brand/strokeInt-brand-active": {
 		"value": {
-			".": "#2236c7"
+			".": "#2337c8"
 		},
 		"description": "Accessible stroke color used for interactive brand-toned elements with normal emphasis that are hovered, focused, or active."
 	},
 	"Color/Semantic/Stroke/Brand/strokeInt-brand-disabled": {
 		"value": {
-			".": "#aeaeae"
+			".": "#adadad"
 		},
 		"description": "Accessible stroke color used for interactive brand-toned elements with normal emphasis, in their disabled state."
 	},

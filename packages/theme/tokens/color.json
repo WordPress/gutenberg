@@ -10,19 +10,19 @@
 					"$value": "#eff0f2"
 				},
 				"bgFill2": {
-					"$value": "#2c47d7"
+					"$value": "#2e49da"
 				},
 				"surface2": {
 					"$value": "#f6f8fc"
 				},
 				"surface6": {
-					"$value": "#c4d0ee"
+					"$value": "#c7d3ef"
 				},
 				"surface5": {
-					"$value": "#d8e0f3"
+					"$value": "#dce3f5"
 				},
 				"surface4": {
-					"$value": "#e6ebf7"
+					"$value": "#e5ebf7"
 				},
 				"surface3": {
 					"$value": "#fff"
@@ -34,22 +34,22 @@
 					"$value": "#3858e9"
 				},
 				"fgSurface2": {
-					"$value": "#5780ff"
+					"$value": "#5881ff"
 				},
 				"fgSurface1": {
-					"$value": "#82a7ff"
+					"$value": "#84a9ff"
 				},
 				"stroke3": {
 					"$value": "#3858e9"
 				},
 				"stroke4": {
-					"$value": "#2236c7"
+					"$value": "#2337c8"
 				},
 				"stroke2": {
-					"$value": "#6f85c0"
+					"$value": "#6d83bf"
 				},
 				"stroke1": {
-					"$value": "#92a4d0"
+					"$value": "#91a2cf"
 				},
 				"bgFillDark": {
 					"$value": "#1b1e26"
@@ -61,13 +61,13 @@
 					"$value": "#1b1e26"
 				},
 				"bgFillInverted1": {
-					"$value": "#1401a5"
+					"$value": "#12009f"
 				},
 				"fgFillInverted": {
 					"$value": "#eff0f2"
 				},
 				"surface1": {
-					"$value": "#edf1fa"
+					"$value": "#edf0fa"
 				}
 			},
 			"info": {
@@ -78,19 +78,19 @@
 					"$value": "#1b1e23"
 				},
 				"bgFill2": {
-					"$value": "#007eec"
+					"$value": "#0081ef"
 				},
 				"surface2": {
 					"$value": "#f5f9fd"
 				},
 				"surface6": {
-					"$value": "#bad3f0"
+					"$value": "#bed6f1"
 				},
 				"surface5": {
-					"$value": "#d1e1f5"
+					"$value": "#d5e5f6"
 				},
 				"surface4": {
-					"$value": "#e1ecf8"
+					"$value": "#e0ebf8"
 				},
 				"surface3": {
 					"$value": "#fff"
@@ -102,22 +102,22 @@
 					"$value": "#006dd9"
 				},
 				"fgSurface2": {
-					"$value": "#008bfa"
+					"$value": "#008cfb"
 				},
 				"fgSurface1": {
-					"$value": "#4fb0ff"
+					"$value": "#53b1ff"
 				},
 				"stroke3": {
 					"$value": "#006dd9"
 				},
 				"stroke4": {
-					"$value": "#004bb5"
+					"$value": "#004eb8"
 				},
 				"stroke2": {
-					"$value": "#5d90c8"
+					"$value": "#5d8fc6"
 				},
 				"stroke1": {
-					"$value": "#8baed6"
+					"$value": "#8aaed6"
 				},
 				"bgFillDark": {
 					"$value": "#1b1e23"
@@ -129,13 +129,13 @@
 					"$value": "#1b1e23"
 				},
 				"bgFillInverted1": {
-					"$value": "#00297a"
+					"$value": "#002675"
 				},
 				"fgFillInverted": {
 					"$value": "#eff0f2"
 				},
 				"surface1": {
-					"$value": "#eaf2fa"
+					"$value": "#eaf1fa"
 				}
 			},
 			"success": {
@@ -146,19 +146,19 @@
 					"$value": "#1b1f1c"
 				},
 				"bgFill2": {
-					"$value": "#34a554"
+					"$value": "#37a857"
 				},
 				"surface2": {
 					"$value": "#f0fcf2"
 				},
 				"surface6": {
-					"$value": "#7be792"
+					"$value": "#7eea95"
 				},
 				"surface5": {
-					"$value": "#adf0b8"
+					"$value": "#b7f2c1"
 				},
 				"surface4": {
-					"$value": "#cef5d3"
+					"$value": "#cdf5d3"
 				},
 				"surface3": {
 					"$value": "#fff"
@@ -170,22 +170,22 @@
 					"$value": "#008031"
 				},
 				"fgSurface2": {
-					"$value": "#2b9e4e"
+					"$value": "#2c9f4e"
 				},
 				"fgSurface1": {
-					"$value": "#52c06d"
+					"$value": "#54c16f"
 				},
 				"stroke3": {
 					"$value": "#008031"
 				},
 				"stroke4": {
-					"$value": "#006113"
+					"$value": "#006314"
 				},
 				"stroke2": {
-					"$value": "#629a6c"
+					"$value": "#61986b"
 				},
 				"stroke1": {
-					"$value": "#78bb84"
+					"$value": "#77ba84"
 				},
 				"bgFillDark": {
 					"$value": "#1b1f1c"
@@ -197,13 +197,13 @@
 					"$value": "#1b1f1c"
 				},
 				"bgFillInverted1": {
-					"$value": "#003a00"
+					"$value": "#003800"
 				},
 				"fgFillInverted": {
 					"$value": "#edf2ed"
 				},
 				"surface1": {
-					"$value": "#def8e1"
+					"$value": "#ddf8e1"
 				}
 			},
 			"warning": {
@@ -214,19 +214,19 @@
 					"$value": "#1f1e1b"
 				},
 				"bgFill2": {
-					"$value": "#dba430"
+					"$value": "#dea633"
 				},
 				"surface2": {
 					"$value": "#fdf7ee"
 				},
 				"surface6": {
-					"$value": "#f0cb89"
+					"$value": "#f1ce90"
 				},
 				"surface5": {
-					"$value": "#f5ddb2"
+					"$value": "#f6e0bb"
 				},
 				"surface4": {
-					"$value": "#f8e9ce"
+					"$value": "#f8e9cd"
 				},
 				"surface3": {
 					"$value": "#fff"
@@ -238,22 +238,22 @@
 					"$value": "#976300"
 				},
 				"fgSurface2": {
-					"$value": "#b68000"
+					"$value": "#b78100"
 				},
 				"fgSurface1": {
-					"$value": "#d8a12b"
+					"$value": "#d9a22e"
 				},
 				"stroke3": {
 					"$value": "#976300"
 				},
 				"stroke4": {
-					"$value": "#734700"
+					"$value": "#754900"
 				},
 				"stroke2": {
-					"$value": "#a18a61"
+					"$value": "#9f8860"
 				},
 				"stroke1": {
-					"$value": "#c3a877"
+					"$value": "#c2a776"
 				},
 				"bgFillDark": {
 					"$value": "#1f1e1b"
@@ -265,13 +265,13 @@
 					"$value": "#1f1e1b"
 				},
 				"bgFillInverted1": {
-					"$value": "#462800"
+					"$value": "#432600"
 				},
 				"fgFillInverted": {
 					"$value": "#f3f0e9"
 				},
 				"surface1": {
-					"$value": "#faefdd"
+					"$value": "#faefdc"
 				}
 			},
 			"error": {
@@ -282,16 +282,16 @@
 					"$value": "#f2efef"
 				},
 				"bgFill2": {
-					"$value": "#b90000"
+					"$value": "#bc0001"
 				},
 				"surface2": {
 					"$value": "#fdf6f5"
 				},
 				"surface6": {
-					"$value": "#f5c5be"
+					"$value": "#f5c9c2"
 				},
 				"surface5": {
-					"$value": "#f8d8d3"
+					"$value": "#f9dcd8"
 				},
 				"surface4": {
 					"$value": "#fae5e2"
@@ -306,22 +306,22 @@
 					"$value": "#cc1818"
 				},
 				"fgSurface2": {
-					"$value": "#f74c40"
+					"$value": "#f84d41"
 				},
 				"fgSurface1": {
-					"$value": "#ff8171"
+					"$value": "#ff8373"
 				},
 				"stroke3": {
 					"$value": "#cc1818"
 				},
 				"stroke4": {
-					"$value": "#a40000"
+					"$value": "#a70000"
 				},
 				"stroke2": {
-					"$value": "#cd695d"
+					"$value": "#ca675c"
 				},
 				"stroke1": {
-					"$value": "#dc9085"
+					"$value": "#dc8e83"
 				},
 				"bgFillDark": {
 					"$value": "#231c1b"
@@ -333,13 +333,13 @@
 					"$value": "#231c1b"
 				},
 				"bgFillInverted1": {
-					"$value": "#6d0000"
+					"$value": "#680000"
 				},
 				"fgFillInverted": {
 					"$value": "#f2efef"
 				},
 				"surface1": {
-					"$value": "#fcedeb"
+					"$value": "#fcedea"
 				}
 			},
 			"bg": {
@@ -353,16 +353,16 @@
 					"$value": "#f0f0f0"
 				},
 				"bgFill2": {
-					"$value": "#474747"
+					"$value": "#494949"
 				},
 				"surface6": {
-					"$value": "#d0d0d0"
+					"$value": "#d3d3d3"
 				},
 				"surface5": {
-					"$value": "#e0e0e0"
+					"$value": "#e3e3e3"
 				},
 				"surface4": {
-					"$value": "#ebebeb"
+					"$value": "#eaeaea"
 				},
 				"surface3": {
 					"$value": "#fff"
@@ -371,25 +371,25 @@
 					"$value": "#1e1e1e"
 				},
 				"fgSurface3": {
-					"$value": "#6d6d6d"
+					"$value": "#6e6e6e"
 				},
 				"fgSurface2": {
-					"$value": "#8a8a8a"
+					"$value": "#8b8b8b"
 				},
 				"fgSurface1": {
-					"$value": "#aaa"
+					"$value": "#ababab"
 				},
 				"stroke3": {
-					"$value": "#8a8a8a"
+					"$value": "#8b8b8b"
 				},
 				"stroke4": {
-					"$value": "#6b6b6b"
+					"$value": "#6d6d6d"
 				},
 				"stroke2": {
-					"$value": "#aeaeae"
+					"$value": "#adadad"
 				},
 				"stroke1": {
-					"$value": "#d0d0d0"
+					"$value": "#cfcfcf"
 				},
 				"bgFillDark": {
 					"$value": "#1e1e1e"
@@ -401,13 +401,13 @@
 					"$value": "#1e1e1e"
 				},
 				"bgFillInverted1": {
-					"$value": "#2f2f2f"
+					"$value": "#2d2d2d"
 				},
 				"fgFillInverted": {
 					"$value": "#f0f0f0"
 				},
 				"surface1": {
-					"$value": "#f1f1f1"
+					"$value": "#f0f0f0"
 				}
 			},
 			"caution": {
@@ -418,19 +418,19 @@
 					"$value": "#1f1e1b"
 				},
 				"bgFill2": {
-					"$value": "#dabb2b"
+					"$value": "#ddbe30"
 				},
 				"surface2": {
 					"$value": "#fdf9e7"
 				},
 				"surface6": {
-					"$value": "#e7d071"
+					"$value": "#ecd367"
 				},
 				"surface5": {
-					"$value": "#f4e08c"
+					"$value": "#f5e399"
 				},
 				"surface4": {
-					"$value": "#f8ebb6"
+					"$value": "#f8ebb5"
 				},
 				"surface3": {
 					"$value": "#fff"
@@ -439,25 +439,25 @@
 					"$value": "#291d00"
 				},
 				"fgSurface3": {
-					"$value": "#876a00"
+					"$value": "#876b00"
 				},
 				"fgSurface2": {
-					"$value": "#a68800"
+					"$value": "#a78900"
 				},
 				"fgSurface1": {
-					"$value": "#c7a800"
+					"$value": "#c9aa00"
 				},
 				"stroke3": {
-					"$value": "#876a00"
+					"$value": "#876b00"
 				},
 				"stroke4": {
-					"$value": "#654e00"
+					"$value": "#675000"
 				},
 				"stroke2": {
-					"$value": "#998e61"
+					"$value": "#978c60"
 				},
 				"stroke1": {
-					"$value": "#b9ac76"
+					"$value": "#b8ab75"
 				},
 				"bgFillDark": {
 					"$value": "#1f1e1b"
@@ -469,7 +469,7 @@
 					"$value": "#1f1e1b"
 				},
 				"bgFillInverted1": {
-					"$value": "#3d2d00"
+					"$value": "#3a2b00"
 				},
 				"fgFillInverted": {
 					"$value": "#f6f1da"

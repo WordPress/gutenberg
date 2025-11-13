@@ -1302,7 +1302,7 @@ Example:
 
 React component that renders the control to edit the field.
 
--   Type: React component | `string`. If it's a string, it needs to be one of `array`, `checkbox`, `color`, `datetime`, `date`, `email`, `telephone`, `url`, `integer`, `number`, `password`, `radio`, `select`, `text`, `toggle`, `textarea`, `toggleGroup`.
+-   Type: `string` | `object` | React component.
 -   Required by DataForm. Optional if the field provided a `type`.
 -   Props:
     -   `data`: the item to be processed
@@ -1311,7 +1311,61 @@ React component that renders the control to edit the field.
     -   `hideLabelFromVision`: boolean representing if the label should be hidden
 -   Returns a React element to edit the field's value.
 
-Example:
+Fields that provide a `type` will have a default Edit control:
+
+```js
+// Edit is optional when field's type is present.
+// The field will use the default Edit function for text.
+{
+	type: 'text';
+}
+```
+
+Field authors can override the default Edit control by providing a string that maps to one of the bundled UI controls: `array`, `checkbox`, `color`, `date`, `datetime`, `email`, `integer`, `number`, `password`, `radio`, `select`, `telephone`, `text`, `textarea`, `toggle`, `toggleGroup`, or `url`.
+
+```js
+// Use one of the core controls.
+{
+	Edit: 'radio';
+}
+```
+
+
+```js
+// Edit can be provided even if field's type is present.
+// The field will use its own custom control.
+{
+	type: 'text',
+	Edit: 'radio'
+}
+```
+
+Additionally, some of the bundled Edit controls are configurable via a config object:
+
+- `textarea` configuration:
+
+```js
+{
+	Edit: {
+		control: 'textarea',
+		rows: 5
+	}
+}
+```
+
+- `text` configuration:
+
+```js
+{
+	Edit: {
+		control: 'text',
+		prefix: ReactComponent,
+		suffix: ReactComponent,
+	}
+}
+```
+
+Finally, the field author can always provide its own custom control:
 
 ```js
 // A custom control defined by the field.
@@ -1330,29 +1384,6 @@ Example:
 }
 ```
 
-```js
-// Use one of the core controls.
-{
-	Edit: 'radio';
-}
-```
-
-```js
-// Edit is optional when field's type is present.
-// The field will use the default Edit function for text.
-{
-	type: 'text';
-}
-```
-
-```js
-// Edit can be provided even if field's type is present.
-// The field will use its own custom control.
-{
-	type: 'text',
-	Edit: 'radio'
-}
-```
 
 ### `sort`
 

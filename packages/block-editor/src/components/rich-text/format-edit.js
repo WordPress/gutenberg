@@ -13,7 +13,14 @@ const DEFAULT_BLOCK_CONTEXT = {};
 
 export const usesContextKey = Symbol( 'usesContext' );
 
-function Edit( { onChange, onFocus, value, forwardedRef, settings } ) {
+function Edit( {
+	onChange,
+	onFocus,
+	value,
+	forwardedRef,
+	settings,
+	isVisible,
+} ) {
 	const {
 		name,
 		edit: EditFunction,
@@ -47,6 +54,7 @@ function Edit( { onChange, onFocus, value, forwardedRef, settings } ) {
 		<EditFunction
 			key={ name }
 			isActive={ isActive }
+			isVisible={ isVisible }
 			activeAttributes={ isActive ? activeFormat.attributes || {} : {} }
 			isObjectActive={ isObjectActive }
 			activeObjectAttributes={

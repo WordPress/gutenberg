@@ -3140,6 +3140,7 @@ export function getBlockEditingMode( state, clientId = '' ) {
  * requirement of being the default grouping block.
  * Additionally a block can only be ungrouped if it has inner blocks and can
  * be removed.
+ * Section blocks are not ungroupable.
  *
  * @param {Object} state    Global application state.
  * @param {string} clientId Client Id of the block. If not passed the selected block's client id will be used.
@@ -3152,6 +3153,12 @@ export const isUngroupable = createRegistrySelector(
 			if ( ! _clientId ) {
 				return false;
 			}
+
+			// Section blocks should not be ungroupable.
+			if ( isSectionBlock( state, _clientId ) ) {
+				return false;
+			}
+
 			const { getGroupingBlockName } = select( blocksStore );
 			const block = getBlock( state, _clientId );
 			const groupingBlockName = getGroupingBlockName();

@@ -112,7 +112,6 @@ interface BlockListProps {
 function BlockList( { filterValue }: BlockListProps ) {
 	const sortedBlockTypes = useSortedBlockTypes();
 	const debouncedSpeak = useDebounce( speak, 500 );
-	// @ts-expect-error - useSelect supports single argument calls
 	const { isMatchingSearchTerm } = useSelect( blocksStore );
 
 	const filteredBlockTypes = ! filterValue

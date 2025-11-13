@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 22.21.0 (2025-11-12)
+
 ### Enhancements
 
 - Disabled `import/no-unresolved`, `import/default`, and `import/named` checks for TypeScript files when TypeScript is installed, since these issues are [already checked by TypeScript](https://typescript-eslint.io/troubleshooting/typed-linting/performance/).
