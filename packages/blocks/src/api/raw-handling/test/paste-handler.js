@@ -287,4 +287,40 @@ describe( 'pasteHandler', () => {
 		expect( result.name ).toEqual( 'core/video' );
 		expect( result.isValid ).toBeTruthy();
 	} );
+
+	it( 'should preserve content with bash ANSI-C quoting in pre/code blocks', () => {
+		const HTML = `Add the following to your <code>~/.bashrc</code> if you use bash or <code>~/.zshrc</code> if you use zsh:
+<pre><code># Set colors for less. Borrowed from https://wiki.archlinux.org/index.php/Color_output_in_console#less .
+export LESS_TERMCAP_mb=$'\\E[1;31m'     # begin bold
+export LESS_TERMCAP_md=$'\\E[1;36m'     # begin blink
+export LESS_TERMCAP_me=$'\\E[0m'        # reset bold/blink
+export LESS_TERMCAP_so=$'\\E[01;44;33m' # begin reverse video
+export LESS_TERMCAP_se=$'\\E[0m'        # reset reverse video
+export LESS_TERMCAP_us=$'\\E[1;32m'     # begin underline
+export LESS_TERMCAP_ue=$'\\E[0m'        # reset underline</code></pre>
+Now restart your shell and run <code>man less</code>—the manual is in colors! The difference is shown in the following two images`;
+
+		const result = pasteHandler( {
+			HTML,
+			mode: 'AUTO',
+		} );
+
+		expect( console ).toHaveLogged();
+
+		// The content should be preserved correctly without duplication or mangling
+		const resultHTML =
+			typeof result === 'string'
+				? result
+				: result[ 0 ]?.attributes?.content || '';
+
+		// Check that the original content structure is preserved
+		expect( resultHTML ).toContain( "export LESS_TERMCAP_mb=$'\\E[1;31m'" );
+		expect( resultHTML ).toContain( "export LESS_TERMCAP_md=$'\\E[1;36m'" );
+		expect( resultHTML ).toContain( '# begin bold' );
+		expect( resultHTML ).toContain( '# begin blink' );
+
+		// Check that the content after </code></pre> is not duplicated
+		const manLessCount = ( resultHTML.match( /man less/g ) || [] ).length;
+		expect( manLessCount ).toBe( 1 );
+	} );
 } );
