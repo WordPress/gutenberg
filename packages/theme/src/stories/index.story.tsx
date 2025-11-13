@@ -198,10 +198,10 @@ export const WithPicker: StoryObj< typeof ThemeProvider > = {
 	},
 };
 
-const NestingDebug = ( { bg = '', primary = '' } ) => (
+const NestingDebug = ( { bg = '', primary = '', density = '' } ) => (
 	<div
 		style={ {
-			padding: '0.25rem',
+			padding: 'var(--wpds-dimension-padding-surface-small)',
 			color: 'var(--wpds-color-fg-content-neutral)',
 			backgroundColor: 'var(--wpds-color-bg-surface-neutral)',
 			display: 'flex',
@@ -210,8 +210,8 @@ const NestingDebug = ( { bg = '', primary = '' } ) => (
 			gap: '1rem',
 		} }
 	>
-		<pre>
-			bg: { bg } | primary: { primary }
+		<pre style={ { margin: 0 } }>
+			bg: { bg } | primary: { primary } | density: { density }
 		</pre>
 		<span
 			style={ {
@@ -245,19 +245,29 @@ export const NestingAndInheriting: StoryObj< typeof ThemeProvider > = {
 	render: () => {
 		return (
 			<ThemeProvider>
-				<NestingDebug bg="inherit (root)" primary="inherit (root)" />
+				<NestingDebug
+					bg="inherit (root)"
+					primary="inherit (root)"
+					density="inherit (root)"
+				/>
 				<div style={ { paddingInlineStart: '1rem' } }>
 					<ThemeProvider
 						color={ {
 							bg: '#1e1e1e',
 						} }
+						density="compact"
 					>
-						<NestingDebug bg="#1e1e1e" primary="inherit (root)" />
+						<NestingDebug
+							bg="#1e1e1e"
+							primary="inherit (root)"
+							density="compact"
+						/>
 						<div style={ { paddingInlineStart: '1rem' } }>
 							<ThemeProvider>
 								<NestingDebug
 									bg="inherit (#1e1e1e)"
 									primary="inherit (root)"
+									density="inherit (compact)"
 								/>
 								<div style={ { paddingInlineStart: '1rem' } }>
 									<ThemeProvider
@@ -266,6 +276,7 @@ export const NestingAndInheriting: StoryObj< typeof ThemeProvider > = {
 										<NestingDebug
 											bg="inherit (#1e1e1e)"
 											primary="hotpink"
+											density="inherit (compact)"
 										/>
 										<div
 											style={ {
@@ -278,6 +289,7 @@ export const NestingAndInheriting: StoryObj< typeof ThemeProvider > = {
 												<NestingDebug
 													bg="#f8f8f8"
 													primary="inherit (hotpink)"
+													density="inherit (compact)"
 												/>
 											</ThemeProvider>
 										</div>
