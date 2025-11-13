@@ -23,7 +23,6 @@ import { ModifyContentOnlySectionMenuItem } from '../content-lock';
 import { BlockRenameControl, useBlockRename } from '../block-rename';
 import { BlockVisibilityMenuItem } from '../block-visibility';
 import { EditPatternMenuItem } from './edit-pattern-menu-item';
-import { unlock } from '../../lock-unlock';
 
 const { Fill, Slot } = createSlotFill( 'BlockSettingsMenuControls' );
 
@@ -33,7 +32,6 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 		selectedClientIds,
 		isContentOnly,
 		canToggleSelectedBlocksVisibility,
-		isSectionBlock,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -42,9 +40,6 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 				getSelectedBlockClientIds,
 				getBlockEditingMode,
 			} = select( blockEditorStore );
-			const { isSectionBlock: _isSectionBlock } = unlock(
-				select( blockEditorStore )
-			);
 			const ids =
 				clientIds !== null ? clientIds : getSelectedBlockClientIds();
 			return {
@@ -57,8 +52,6 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 				).every( ( block ) =>
 					hasBlockSupport( block.name, 'blockVisibility', true )
 				),
-				isSectionBlock:
-					ids.length === 1 ? _isSectionBlock( ids[ 0 ] ) : false,
 			};
 		},
 		[ clientIds ]
@@ -79,16 +72,8 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 		useConvertToGroupButtonProps( selectedClientIds );
 	const { isGroupable, isUngroupable } = convertToGroupButtonProps;
 
-	// Don't show ungroup for section blocks when the experiment is enabled
-	// since we show "Unlock design" instead
-	const shouldShowUngroup =
-		isUngroupable &&
-		! (
-			isSectionBlock && window?.__experimentalContentOnlyPatternInsertion
-		);
-
 	const showConvertToGroupButton =
-		( isGroupable || shouldShowUngroup ) && ! isContentOnly;
+		( isGroupable || isUngroupable ) && ! isContentOnly;
 
 	return (
 		<Slot
@@ -112,7 +97,6 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 						{ showConvertToGroupButton && (
 							<ConvertToGroupButton
 								{ ...convertToGroupButtonProps }
-								isUngroupable={ shouldShowUngroup }
 								onClose={ fillProps?.onClose }
 							/>
 						) }
