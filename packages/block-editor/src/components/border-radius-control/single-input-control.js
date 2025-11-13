@@ -1,38 +1,14 @@
 /**
- * WordPress dependencies
- */
-import {
-	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
-	__experimentalUnitControl as UnitControl,
-	__experimentalHStack as HStack,
-	Icon,
-	Tooltip,
-	RangeControl,
-	Button,
-	CustomSelectControl,
-} from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
-import { settings } from '@wordpress/icons';
-
-/**
  * Internal dependencies
  */
-import {
-	getAllValue,
-	getCustomValueFromPreset,
-	getPresetValueFromControlValue,
-	getPresetValueFromCustomValue,
-	getSliderValueFromPreset,
-	isValuePreset,
-	convertPresetsToCustomValues,
-} from './utils';
+import PresetInputControl from '../preset-input-control';
+import { getPresetValueFromCustomValue } from '../preset-input-control/utils';
+import { getAllValue, convertPresetsToCustomValues } from './utils';
 import {
 	CORNERS,
 	ICONS,
 	MIN_BORDER_RADIUS_VALUE,
 	MAX_BORDER_RADIUS_VALUES,
-	RANGE_CONTROL_MAX_SIZE,
 } from './constants';
 
 export default function SingleInputControl( {
@@ -58,17 +34,6 @@ export default function SingleInputControl( {
 				[ corner ]: validatedValue,
 			} );
 		}
-	};
-
-	const onChangeValue = ( next ) => {
-		if ( ! onChange ) {
-			return;
-		}
-
-		// Filter out CSS-unit-only values to prevent invalid styles.
-		const isNumeric = ! isNaN( parseFloat( next ) );
-		const nextValue = isNumeric ? next : undefined;
-		changeCornerValue( nextValue );
 	};
 
 	const onChangeUnit = ( next ) => {
@@ -101,177 +66,48 @@ export default function SingleInputControl( {
 	if ( corner === 'all' ) {
 		const convertedValues = convertPresetsToCustomValues( values, presets );
 		const customValue = getAllValue( convertedValues );
-		value = getPresetValueFromCustomValue( customValue, presets );
+		value = getPresetValueFromCustomValue(
+			customValue,
+			presets,
+			'border-radius'
+		);
 	} else {
-		value = getPresetValueFromCustomValue( values[ corner ], presets );
+		value = getPresetValueFromCustomValue(
+			values[ corner ],
+			presets,
+			'border-radius'
+		);
 	}
-	const resolvedPresetValue = isValuePreset( value )
-		? getCustomValueFromPreset( value, presets )
-		: value;
-	const [ parsedQuantity, parsedUnit ] =
-		parseQuantityAndUnitFromRawValue( resolvedPresetValue );
-	const computedUnit = value
-		? parsedUnit
-		: selectedUnits[ corner ] || selectedUnits.flat || 'px';
-	const unitConfig =
-		units && units.find( ( item ) => item.value === computedUnit );
-	const step = unitConfig?.step || 1;
-	const [ showCustomValueControl, setShowCustomValueControl ] = useState(
-		value !== undefined && ! isValuePreset( value )
-	);
-	const showRangeControl = presets.length <= RANGE_CONTROL_MAX_SIZE;
-	const presetIndex = getSliderValueFromPreset( value, presets );
-	const rangeTooltip = ( newValue ) =>
-		value === undefined ? undefined : presets[ newValue ]?.name;
-	const marks = presets
-		.slice( 1, presets.length - 1 )
-		.map( ( _newValue, index ) => ( {
-			value: index + 1,
-			label: undefined,
-		} ) );
-	const hasPresets = marks.length > 0;
-	let options = [];
-	if ( ! showRangeControl ) {
-		options = [
-			...presets,
-			{
-				name: __( 'Custom' ),
-				slug: 'custom',
-				size: resolvedPresetValue,
-			},
-		].map( ( size, index ) => ( {
-			key: index,
-			name: size.name,
-		} ) );
-	}
+
+	// Determine the selected unit for this corner
+	const selectedUnit = selectedUnits[ corner ] || selectedUnits.flat || 'px';
+
+	// Build units array with max values from MAX_BORDER_RADIUS_VALUES
+	const unitsWithMax = units?.map( ( unit ) => ( {
+		...unit,
+		max: MAX_BORDER_RADIUS_VALUES[ unit.value ] ?? unit.max,
+	} ) );
+
 	const icon = ICONS[ corner ];
+	const ariaLabel = CORNERS[ corner ];
 
-	const handleSliderChange = ( next ) => {
-		const val =
-			next !== undefined ? `${ next }${ computedUnit }` : undefined;
-		changeCornerValue( val );
-	};
-
-	// Controls are wrapped in tooltips as visible labels aren't desired here.
-	// Tooltip rendering also requires the UnitControl to be wrapped. See:
-	// https://github.com/WordPress/gutenberg/pull/24966#issuecomment-685875026
 	return (
-		<HStack>
-			{ icon && (
-				<Icon
-					className="components-border-radius-control__icon"
-					icon={ icon }
-					size={ 24 }
-				/>
-			) }
-			{ ( ! hasPresets || showCustomValueControl ) && (
-				<div className="components-border-radius-control__input-controls-wrapper">
-					<Tooltip text={ CORNERS[ corner ] } placement="top">
-						<div className="components-border-radius-control__tooltip-wrapper">
-							<UnitControl
-								className="components-border-radius-control__unit-control"
-								aria-label={ CORNERS[ corner ] }
-								value={ [ parsedQuantity, computedUnit ].join(
-									''
-								) }
-								onChange={ onChangeValue }
-								onUnitChange={ onChangeUnit }
-								size="__unstable-large"
-								min={ MIN_BORDER_RADIUS_VALUE }
-								units={ units }
-							/>
-						</div>
-					</Tooltip>
-					<RangeControl
-						__next40pxDefaultSize
-						label={ __( 'Border radius' ) }
-						hideLabelFromVision
-						className="components-border-radius-control__range-control"
-						value={ parsedQuantity ?? '' }
-						min={ MIN_BORDER_RADIUS_VALUE }
-						max={ MAX_BORDER_RADIUS_VALUES[ computedUnit ] }
-						initialPosition={ 0 }
-						withInputField={ false }
-						onChange={ handleSliderChange }
-						step={ step }
-						__nextHasNoMarginBottom
-					/>
-				</div>
-			) }
-			{ hasPresets && showRangeControl && ! showCustomValueControl && (
-				<RangeControl
-					__next40pxDefaultSize
-					className="components-border-radius-control__range-control"
-					value={ presetIndex }
-					onChange={ ( newSize ) => {
-						changeCornerValue(
-							getPresetValueFromControlValue(
-								newSize,
-								'range',
-								presets
-							)
-						);
-					} }
-					withInputField={ false }
-					aria-valuenow={ presetIndex }
-					aria-valuetext={ presets[ presetIndex ]?.name }
-					renderTooltipContent={ rangeTooltip }
-					min={ 0 }
-					max={ presets.length - 1 }
-					marks={ marks }
-					label={ CORNERS[ corner ] }
-					hideLabelFromVision
-					__nextHasNoMarginBottom
-				/>
-			) }
-
-			{ ! showRangeControl && ! showCustomValueControl && (
-				<CustomSelectControl
-					className="components-border-radius-control__custom-select-control"
-					value={
-						options.find(
-							( option ) => option.key === presetIndex
-						) || options[ options.length - 1 ]
-					}
-					onChange={ ( selection ) => {
-						if (
-							selection.selectedItem.key ===
-							options.length - 1
-						) {
-							setShowCustomValueControl( true );
-						} else {
-							changeCornerValue(
-								getPresetValueFromControlValue(
-									selection.selectedItem.key,
-									'selectList',
-									presets
-								)
-							);
-						}
-					} }
-					options={ options }
-					label={ CORNERS[ corner ] }
-					hideLabelFromVision
-					size="__unstable-large"
-				/>
-			) }
-			{ hasPresets && (
-				<Button
-					label={
-						showCustomValueControl
-							? __( 'Use border radius preset' )
-							: __( 'Set custom border radius' )
-					}
-					icon={ settings }
-					onClick={ () => {
-						setShowCustomValueControl( ! showCustomValueControl );
-					} }
-					isPressed={ showCustomValueControl }
-					size="small"
-					className="components-border-radius-control__custom-toggle"
-					iconSize={ 24 }
-				/>
-			) }
-		</HStack>
+		<PresetInputControl
+			allowNegativeOnDrag={ false }
+			ariaLabel={ ariaLabel }
+			className="components-border-radius-control"
+			disableCustomValues={ false }
+			icon={ icon }
+			isMixed={ false }
+			minimumCustomValue={ MIN_BORDER_RADIUS_VALUE }
+			onChange={ changeCornerValue }
+			onUnitChange={ onChangeUnit }
+			presets={ presets }
+			presetType="border-radius"
+			selectedUnit={ selectedUnit }
+			showTooltip
+			units={ unitsWithMax }
+			value={ value }
+		/>
 	);
 }

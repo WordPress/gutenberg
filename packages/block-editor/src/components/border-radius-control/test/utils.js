@@ -1,47 +1,7 @@
 /**
  * Internal dependencies
  */
-import {
-	getAllUnit,
-	getAllValue,
-	hasMixedValues,
-	hasDefinedValues,
-	mode,
-	getPresetValueFromCustomValue,
-	getPresetValueFromControlValue,
-} from '../utils';
-
-const defaultUnitSelections = {
-	flat: undefined,
-	topLeft: '%',
-	topRight: 'rem',
-	bottomLeft: 'rem',
-	bottomRight: 'vw',
-};
-
-describe( 'getAllUnit', () => {
-	it( 'should return flat radius unit when selected', () => {
-		const selectedUnits = { ...defaultUnitSelections, flat: 'em' };
-		expect( getAllUnit( selectedUnits ) ).toBe( 'em' );
-	} );
-
-	it( 'should return most common corner unit', () => {
-		expect( getAllUnit( defaultUnitSelections ) ).toBe( 'rem' );
-	} );
-
-	it( 'should return a real unit when the most common is undefined', () => {
-		expect( getAllUnit( { bottomRight: '%' } ) ).toBe( '%' );
-	} );
-
-	it( 'should return most common corner unit when some are unselected', () => {
-		const selectedUnits = { ...defaultUnitSelections, topLeft: undefined };
-		expect( getAllUnit( selectedUnits ) ).toBe( 'rem' );
-	} );
-
-	it( 'should fallback to px when all values are undefined', () => {
-		expect( getAllUnit( {} ) ).toBe( 'px' );
-	} );
-} );
+import { getAllValue, hasMixedValues, hasDefinedValues, mode } from '../utils';
 
 describe( 'getAllValue', () => {
 	describe( 'when provided string based values', () => {
@@ -270,74 +230,5 @@ describe( 'mode', () => {
 	it( 'should return the most common real value', () => {
 		const values = [ undefined, 'a', undefined, undefined, undefined ];
 		expect( mode( values ) ).toBe( 'a' );
-	} );
-} );
-
-describe( 'getPresetValueFromCustomValue', () => {
-	const presets = [
-		{ name: 'None', slug: '0', size: 0 },
-		{ name: 'Small', slug: 'sm', size: '4px' },
-		{ name: 'Medium', slug: 'md', size: 'clamp(2px, 1vw, 8px)' },
-	];
-
-	it( 'should return "0" if value is "0"', () => {
-		expect( getPresetValueFromCustomValue( '0', presets ) ).toBe( '0' );
-	} );
-
-	it( 'should return preset reference if value matches a preset', () => {
-		expect( getPresetValueFromCustomValue( '4px', presets ) ).toBe(
-			'var:preset|border-radius|sm'
-		);
-		expect(
-			getPresetValueFromCustomValue( 'clamp(2px, 1vw, 8px)', presets )
-		).toBe( 'var:preset|border-radius|md' );
-	} );
-
-	it( 'should return value as-is if no matching preset', () => {
-		expect( getPresetValueFromCustomValue( '7px', presets ) ).toBe( '7px' );
-	} );
-
-	it( 'should return value as-is if already a preset reference', () => {
-		expect(
-			getPresetValueFromCustomValue(
-				'var:preset|border-radius|md',
-				presets
-			)
-		).toBe( 'var:preset|border-radius|md' );
-	} );
-
-	it( 'should return undefined if value is undefined', () => {
-		expect(
-			getPresetValueFromCustomValue( undefined, presets )
-		).toBeUndefined();
-	} );
-} );
-
-describe( 'getPresetValueFromControlValue', () => {
-	const presets = [
-		{ name: 'None', slug: '0', size: 0 },
-		{ name: 'Small', slug: 'sm', size: '4px' },
-		{ name: 'Medium', slug: 'md', size: 'clamp(2px, 1vw, 8px)' },
-	];
-
-	it( 'should return "0" if control value is 0 and not selectList', () => {
-		expect( getPresetValueFromControlValue( 0, 'slider', presets ) ).toBe(
-			'0'
-		);
-	} );
-
-	it( 'should return undefined if control value is 0 and controlType is selectList', () => {
-		expect(
-			getPresetValueFromControlValue( 0, 'selectList', presets )
-		).toBeUndefined();
-	} );
-
-	it( 'should return preset reference for other values', () => {
-		expect( getPresetValueFromControlValue( 1, 'slider', presets ) ).toBe(
-			'var:preset|border-radius|sm'
-		);
-		expect( getPresetValueFromControlValue( 2, 'slider', presets ) ).toBe(
-			'var:preset|border-radius|md'
-		);
 	} );
 } );

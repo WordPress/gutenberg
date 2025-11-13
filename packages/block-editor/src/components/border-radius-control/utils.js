@@ -4,6 +4,11 @@
 import { __experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue } from '@wordpress/components';
 
 /**
+ * Internal dependencies
+ */
+import { isValuePreset, getPresetSlug } from '../preset-input-control/utils';
+
+/**
  * Gets the (non-undefined) item with the highest occurrence within an array
  * Based in part on: https://stackoverflow.com/a/20762713
  *
@@ -25,23 +30,6 @@ export function mode( inputArray ) {
 				inputArray.filter( ( v ) => v === a ).length
 		)
 		.shift();
-}
-
-/**
- * Returns the most common CSS unit from the current CSS unit selections.
- *
- * - If a single flat border radius is set, its unit will be used
- * - If individual corner selections, the most common of those will be used
- * - Failing any unit selections a default of 'px' is returned.
- *
- * @param {Object} selectedUnits Unit selections for flat radius & each corner.
- * @return {string} Most common CSS unit from current selections. Default: `px`.
- */
-export function getAllUnit( selectedUnits = {} ) {
-	const { flat, ...cornerUnits } = selectedUnits;
-	return (
-		flat || mode( Object.values( cornerUnits ).filter( Boolean ) ) || 'px'
-	);
 }
 
 /**
@@ -139,137 +127,6 @@ export function hasDefinedValues( values ) {
 }
 
 /**
- * Checks is given value is a radius preset.
- *
- * @param {string} value Value to check
- *
- * @return {boolean} Return true if value is string in format var:preset|border-radius|.
- */
-export function isValuePreset( value ) {
-	if ( ! value?.includes ) {
-		return false;
-	}
-	return value === '0' || value.includes( 'var:preset|border-radius|' );
-}
-
-/**
- * Returns the slug section of the given preset string.
- *
- * @param {string} value Value to extract slug from.
- *
- * @return {string|undefined} The value slug from given preset.
- */
-export function getPresetSlug( value ) {
-	if ( ! value ) {
-		return;
-	}
-
-	if ( value === '0' || value === 'default' ) {
-		return value;
-	}
-
-	const slug = value.match( /var:preset\|border-radius\|(.+)/ );
-
-	return slug ? slug[ 1 ] : undefined;
-}
-
-/**
- * Converts radius preset value into a Range component value .
- *
- * @param {string} presetValue Value to convert to Range value.
- * @param {Array}  presets     Array of current radius preset value objects.
- *
- * @return {number} The int value for use in Range control.
- */
-export function getSliderValueFromPreset( presetValue, presets ) {
-	if ( presetValue === undefined ) {
-		return 0;
-	}
-	const slug =
-		parseFloat( presetValue, 10 ) === 0
-			? '0'
-			: getPresetSlug( presetValue );
-	const sliderValue = presets.findIndex( ( size ) => {
-		return String( size.slug ) === slug;
-	} );
-
-	// Returning NaN rather than undefined as undefined makes range control thumb sit in center
-	return sliderValue !== -1 ? sliderValue : NaN;
-}
-
-/**
- * Converts a preset into a custom value.
- *
- * @param {string} value   Value to convert
- * @param {Array}  presets Array of the current radius preset objects
- *
- * @return {string} Mapping of the radius preset to its equivalent custom value.
- */
-export function getCustomValueFromPreset( value, presets ) {
-	if ( ! isValuePreset( value ) ) {
-		return value;
-	}
-
-	const slug = parseFloat( value, 10 ) === 0 ? '0' : getPresetSlug( value );
-	const radiusSize = presets.find( ( size ) => String( size.slug ) === slug );
-
-	return radiusSize?.size;
-}
-
-/**
- * Converts a control value into a preset value.
- *
- * @param {number} controlValue to convert to preset value.
- * @param {string} controlType  Type of control
- * @param {Array}  presets      Array of current radius preset value objects.
- *
- * @return {string} The custom value for use in Range control.
- */
-export function getPresetValueFromControlValue(
-	controlValue,
-	controlType,
-	presets
-) {
-	const size = parseInt( controlValue, 10 );
-	if ( controlType === 'selectList' ) {
-		if ( size === 0 ) {
-			return undefined;
-		}
-	} else if ( size === 0 ) {
-		return '0';
-	}
-
-	return `var:preset|border-radius|${ presets[ controlValue ]?.slug }`;
-}
-
-/**
- * Converts a custom value to preset value if one can be found.
- *
- * Returns value as-is if no match is found.
- *
- * @param {string} value   Value to convert
- * @param {Array}  presets Array of the current border radius preset objects
- *
- * @return {string} The preset value if it can be found.
- */
-export function getPresetValueFromCustomValue( value, presets ) {
-	// Return value as-is if it is undefined or is already a preset, or '0';
-	if ( ! value || isValuePreset( value ) || value === '0' ) {
-		return value;
-	}
-
-	const spacingMatch = presets.find(
-		( size ) => String( size.size ) === String( value )
-	);
-
-	if ( spacingMatch?.slug ) {
-		return `var:preset|border-radius|${ spacingMatch.slug }`;
-	}
-
-	return value;
-}
-
-/**
  * Converts all preset values in a values object to their custom equivalents.
  *
  * @param {Object} values  Values object to convert
@@ -285,8 +142,11 @@ export function convertPresetsToCustomValues( values, presets ) {
 	const converted = {};
 	Object.keys( values ).forEach( ( key ) => {
 		const value = values[ key ];
-		if ( isValuePreset( value ) ) {
-			const customValue = getCustomValueFromPreset( value, presets );
+		if ( isValuePreset( value, 'border-radius' ) ) {
+			const customValue = presets.find(
+				( preset ) =>
+					preset.slug === getPresetSlug( value, 'border-radius' )
+			)?.size;
 			converted[ key ] = customValue !== undefined ? customValue : value;
 		} else {
 			converted[ key ] = value;
