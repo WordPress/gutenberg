@@ -88,7 +88,7 @@ export function useCardHeader( layout: NormalizedCardLayout ) {
 					{ children }
 				</div>
 				<Button
-					__next40pxDefaultSize
+					size="small"
 					variant="tertiary"
 					icon={ isOpen ? chevronUp : chevronDown }
 					aria-expanded={ isOpen }
