@@ -1,30 +1,37 @@
+type DayNumber = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+type DayString =
+	| 'sunday'
+	| 'monday'
+	| 'tuesday'
+	| 'wednesday'
+	| 'thursday'
+	| 'friday'
+	| 'saturday';
+const days: DayString[] = [
+	'sunday',
+	'monday',
+	'tuesday',
+	'wednesday',
+	'thursday',
+	'friday',
+	'saturday',
+];
+const DEFAULT_DAY_STRING = 'sunday';
+const DEFAULT_DAY_NUMBER = 0;
+
 /**
  * Converts a weekStartsOn string to a number (0-6).
  *
  * @param day - The day name ('sunday', 'monday', etc.)
  * @return The corresponding number (0 for Sunday, 1 for Monday, etc.)
  */
-export function weekStartsOnToNumber(
-	day:
-		| 'sunday'
-		| 'monday'
-		| 'tuesday'
-		| 'wednesday'
-		| 'thursday'
-		| 'friday'
-		| 'saturday'
-): 0 | 1 | 2 | 3 | 4 | 5 | 6 {
-	const mapping = {
-		sunday: 0,
-		monday: 1,
-		tuesday: 2,
-		wednesday: 3,
-		thursday: 4,
-		friday: 5,
-		saturday: 6,
-	} as const;
+export function weekStartsOnToNumber( day: DayString ): DayNumber {
+	const index = days.indexOf( day );
+	if ( index === -1 ) {
+		return DEFAULT_DAY_NUMBER;
+	}
 
-	return mapping[ day ];
+	return index as DayNumber;
 }
 
 /**
@@ -33,25 +40,11 @@ export function weekStartsOnToNumber(
  * @param day - The day number (0 for Sunday, 1 for Monday, etc.)
  * @return The corresponding day name ('sunday', 'monday', etc.)
  */
-export function numberToWeekStartsOn(
-	day: 0 | 1 | 2 | 3 | 4 | 5 | 6
-):
-	| 'sunday'
-	| 'monday'
-	| 'tuesday'
-	| 'wednesday'
-	| 'thursday'
-	| 'friday'
-	| 'saturday' {
-	const mapping = {
-		0: 'sunday',
-		1: 'monday',
-		2: 'tuesday',
-		3: 'wednesday',
-		4: 'thursday',
-		5: 'friday',
-		6: 'saturday',
-	} as const;
+export function numberToWeekStartsOn( day: DayNumber ): DayString {
+	const result = days[ day ];
+	if ( result === undefined ) {
+		return DEFAULT_DAY_STRING;
+	}
 
-	return mapping[ day ];
+	return result;
 }
