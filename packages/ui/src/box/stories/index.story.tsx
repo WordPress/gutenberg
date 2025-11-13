@@ -52,9 +52,3 @@ export const DirectionalPadding: Story = {
 		},
 	},
 };
-export const Compact: Story = {
-	...Default,
-	globals: {
-		density: 'compact',
-	},
-};
