@@ -9,7 +9,7 @@ import { _x } from '@wordpress/i18n';
  */
 import useContentOnlySectionEdit from '../../hooks/use-content-only-section-edit';
 
-export function EditPatternMenuItem( { clientId, onClose } ) {
+export function EditSectionMenuItem( { clientId, onClose } ) {
 	const {
 		isSectionBlock,
 		isEditingContentOnlySection,
@@ -33,7 +33,7 @@ export function EditPatternMenuItem( { clientId, onClose } ) {
 				onClose();
 			} }
 		>
-			{ _x( 'Edit pattern', 'Editing a pattern block in the Editor' ) }
+			{ _x( 'Edit section', 'Editing a section in the Editor' ) }
 		</MenuItem>
 	);
 }

@@ -37,8 +37,8 @@ export default function EditContents( { clientId } ) {
 				} }
 			>
 				{ editedContentOnlySection
-					? __( 'Exit pattern' )
-					: __( 'Edit pattern' ) }
+					? __( 'Exit section' )
+					: __( 'Edit section' ) }
 			</Button>
 		</VStack>
 	);
