@@ -28,7 +28,7 @@
 		"phpcompatibility/phpcompatibility-wp": "^2.1.3",
 		"wp-coding-standards/wpcs": "^3.0",
 		"sirbrillig/phpcs-variable-analysis": "^2.8",
-		"spatie/phpunit-watcher": "1.23.6",
+		"spatie/phpunit-watcher": "~1.22 || ~1.23 || ^1.24",
 		"yoast/phpunit-polyfills": "^1.1.0",
 		"gutenberg/gutenberg-coding-standards": "@dev"
 	},
