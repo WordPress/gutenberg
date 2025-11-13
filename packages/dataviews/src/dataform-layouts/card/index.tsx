@@ -38,15 +38,7 @@ const NonCollapsibleCardHeader = ( {
 	children: React.ReactNode;
 } ) => (
 	<OriginalCardHeader isBorderless { ...props }>
-		<div
-			style={ {
-				height: '24px', // This is to match the chevron's variant="small"
-				width: '100%',
-				display: 'flex',
-				justifyContent: 'space-between',
-				alignItems: 'center',
-			} }
-		>
+		<div className="dataforms-layouts-card__field-header-container dataforms-layouts-card__field-header-container-non-collapsible">
 			{ children }
 		</div>
 	</OriginalCardHeader>
@@ -71,20 +63,16 @@ export function useCardHeader( layout: NormalizedCardLayout ) {
 			<OriginalCardHeader
 				{ ...props }
 				onClick={ toggle }
+				className={ clsx(
+					'dataforms-layouts-card__field-header-collapsible',
+					props.className
+				) }
 				style={ {
-					cursor: 'pointer',
-					...props.style,
+					...props.style, // Kept for backward compatibility, use className instead
 				} }
 				isBorderless
 			>
-				<div
-					style={ {
-						width: '100%',
-						display: 'flex',
-						justifyContent: 'space-between',
-						alignItems: 'center',
-					} }
-				>
+				<div className="dataforms-layouts-card__field-header-container">
 					{ children }
 				</div>
 				<Button

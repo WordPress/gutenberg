@@ -10,6 +10,21 @@
 	&-open {
 		padding-bottom: 0;
 	}
+
+	&-container {
+		width: 100%;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	&-container-non-collapsible {
+		height: $button-size-small; // Match the chevron's variant="small"
+	}
+
+	&-collapsible {
+		cursor: pointer;
+	}
 }
 
 .dataforms-layouts-card__field {
