@@ -54,7 +54,10 @@ const sampleMediaItem: MediaItem = {
 	permalink_template: 'https://example.com/?attachment_id=123',
 	generated_slug: 'sample-image',
 	alt_text: 'A beautiful sample image',
-	caption: 'Sample caption for the image',
+	caption: {
+		raw: 'A caption for the image',
+		rendered: '<p>A caption for the image</p>\n',
+	},
 	description: {
 		raw: 'This is a detailed description of the sample image. It contains useful information about what the image depicts and its context.',
 		rendered:
@@ -62,7 +65,7 @@ const sampleMediaItem: MediaItem = {
 	},
 	mime_type: 'image/jpeg',
 	media_type: 'image',
-	post: 1,
+	post: null,
 	source_url: 'https://cldup.com/cXyG__fTLN.jpg',
 	media_details: {
 		file: 'sample-image.jpg',
@@ -134,7 +137,10 @@ const sampleMediaItemZip: MediaItem = {
 	permalink_template: 'http://localhost:8888/?attachment_id=101',
 	generated_slug: 'gutenberg-v22-0-0',
 	alt_text: '',
-	caption: '',
+	caption: {
+		raw: '',
+		rendered: '<p>gutenberg-v22-0-0</p>\n',
+	},
 	description: {
 		raw: '',
 		rendered: '',
