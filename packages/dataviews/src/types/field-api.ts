@@ -325,15 +325,17 @@ export type Field< Item > = {
  */
 type FormatDate = {
 	date?: string;
-	weekStartsOn?:
-		| 'sunday'
-		| 'monday'
-		| 'tuesday'
-		| 'wednesday'
-		| 'thursday'
-		| 'friday'
-		| 'saturday';
+	weekStartsOn?: DayString;
 };
+export type DayNumber = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+export type DayString =
+	| 'sunday'
+	| 'monday'
+	| 'tuesday'
+	| 'wednesday'
+	| 'thursday'
+	| 'friday'
+	| 'saturday';
 
 export type NormalizedField< Item > = Omit< Field< Item >, 'Edit' > & {
 	label: string;

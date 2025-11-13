@@ -13,6 +13,7 @@ import { getSettings } from '@wordpress/date';
  */
 import getFieldTypeDefinition from '../field-types';
 import type {
+	DayString,
 	DataViewRenderFieldProps,
 	Field,
 	FieldTypeDefinition,
@@ -26,7 +27,7 @@ import {
 	SINGLE_SELECTION_OPERATORS,
 } from '../constants';
 import hasElements from './has-elements';
-import { numberToWeekStartsOn } from './week-starts-on';
+import { numberToWeekStartsOn, DAYS_OF_WEEK } from './week-starts-on';
 
 const getValueFromId =
 	( id: string ) =>
@@ -188,22 +189,21 @@ export default function normalizeFields< Item >(
 
 		const filterBy = getFilterBy( field, fieldTypeDefinition );
 
-		const format =
-			field.type === 'date'
-				? {
-						date:
-							field.format?.date !== undefined &&
-							typeof field.format.date === 'string'
-								? field.format.date
-								: getSettings().formats.date,
-						weekStartsOn:
-							field.format?.weekStartsOn !== undefined
-								? field.format.weekStartsOn
-								: numberToWeekStartsOn(
-										getSettings().l10n.startOfWeek
-								  ),
-				  }
-				: {};
+		let format = {};
+		if ( field.type === 'date' ) {
+			format = {
+				date:
+					field.format?.date !== undefined &&
+					typeof field.format.date === 'string'
+						? field.format.date
+						: getSettings().formats.date,
+				weekStartsOn: DAYS_OF_WEEK.includes(
+					field.format?.weekStartsOn as DayString
+				)
+					? field?.format?.weekStartsOn
+					: numberToWeekStartsOn( getSettings().l10n.startOfWeek ),
+			};
+		}
 
 		return {
 			...field,

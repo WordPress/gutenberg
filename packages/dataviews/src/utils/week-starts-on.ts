@@ -1,13 +1,9 @@
-type DayNumber = 0 | 1 | 2 | 3 | 4 | 5 | 6;
-type DayString =
-	| 'sunday'
-	| 'monday'
-	| 'tuesday'
-	| 'wednesday'
-	| 'thursday'
-	| 'friday'
-	| 'saturday';
-const days: DayString[] = [
+/**
+ * Internal dependencies
+ */
+import type { DayNumber, DayString } from '../types/field-api';
+
+export const DAYS_OF_WEEK: DayString[] = [
 	'sunday',
 	'monday',
 	'tuesday',
@@ -26,7 +22,7 @@ const DEFAULT_DAY_NUMBER = 0;
  * @return The corresponding number (0 for Sunday, 1 for Monday, etc.)
  */
 export function weekStartsOnToNumber( day: DayString ): DayNumber {
-	const index = days.indexOf( day );
+	const index = DAYS_OF_WEEK.indexOf( day );
 	if ( index === -1 ) {
 		return DEFAULT_DAY_NUMBER;
 	}
@@ -41,7 +37,7 @@ export function weekStartsOnToNumber( day: DayString ): DayNumber {
  * @return The corresponding day name ('sunday', 'monday', etc.)
  */
 export function numberToWeekStartsOn( day: DayNumber ): DayString {
-	const result = days[ day ];
+	const result = DAYS_OF_WEEK[ day ];
 	if ( result === undefined ) {
 		return DEFAULT_DAY_STRING;
 	}
