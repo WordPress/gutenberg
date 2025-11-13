@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useState, useCallback } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 import {
 	ImageCropper as ImageCropperComponent,
 	useImageCropper,
@@ -19,14 +19,15 @@ import { Spinner } from '@wordpress/components';
 import { useResizeObserver } from '@wordpress/compose';
 
 /**
- * Internal dependencies
- * @param root0
- * @param root0.url
- * @param root0.width
- * @param root0.height
- * @param root0.naturalHeight
- * @param root0.naturalWidth
- * @param root0.borderProps
+ * ImageCropper component for editing images.
+ *
+ * @param {Object} props               Component props.
+ * @param {string} props.url           The image URL.
+ * @param {number} [props.width]       The display width of the image.
+ * @param {number} [props.height]      The display height of the image.
+ * @param {number} props.naturalHeight The natural height of the image.
+ * @param {number} props.naturalWidth  The natural width of the image.
+ * @param {Object} [props.borderProps] Border styling properties (className, style, etc.).
  */
 export default function ImageCropper( {
 	url,
@@ -40,7 +41,7 @@ export default function ImageCropper( {
 	const [ contentResizeListener, { width: clientWidth } ] =
 		useResizeObserver();
 
-		// This is clunky. I think we need a dedicated modal to reduce tool clutter and to be able to focus on the image.
+	// This is clunky. I think we need a dedicated modal to reduce tool clutter and to be able to focus on the image.
 	let editedHeight = height || ( clientWidth * naturalHeight ) / naturalWidth;
 
 	if ( cropperState.rotation % 180 === 90 ) {
