@@ -734,11 +734,13 @@ const CommentBoard = ( {
 	};
 
 	// Check if this is a resolution comment by checking metadata.
+	const hasUserContent =
+		thread?.content?.raw && String( thread.content.raw ).trim() !== '';
 	const isResolutionComment =
 		thread.type === 'note' &&
 		thread.meta &&
 		( thread.meta._wp_note_status === 'resolved' ||
-			thread.meta._wp_note_status === 'reopen' );
+			( thread.meta._wp_note_status === 'reopen' && ! hasUserContent ) );
 
 	const actions = [
 		{
@@ -769,10 +771,12 @@ const CommentBoard = ( {
 	];
 
 	const canResolve = thread.parent === 0;
-	const moreActions =
-		parent?.status !== 'approved'
-			? actions.filter( ( item ) => item.isEligible( thread ) )
-			: [];
+
+	let moreActions = [];
+
+	if ( ! isResolutionComment && parent?.status !== 'approved' ) {
+		moreActions = actions.filter( ( item ) => item.isEligible( thread ) );
+	}
 
 	return (
 		<VStack
