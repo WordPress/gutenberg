@@ -76,11 +76,13 @@ jobs:
 
   preview:
     needs: create-blueprint
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       pull-requests: write
-    uses: WordPress/action-wp-playground-pr-preview@v2
-    secrets: inherit
-    with:
-      mode: append-to-description
-      blueprint: ${{ needs.create-blueprint.outputs.blueprint }}
+    steps:
+      - name: Post Playground preview button
+        uses: WordPress/action-wp-playground-pr-preview@v2
+        with:
+          mode: append-to-description
+          blueprint: ${{ needs.create-blueprint.outputs.blueprint }}
