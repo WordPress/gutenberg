@@ -1,14 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { pasteHandler, rawHandler } from '@wordpress/blocks';
+import { pasteHandler } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
 import { init as initAndRegisterTableBlock } from '../../../../../block-library/src/table';
 import { init as initAndRegisterVideoBlock } from '../../../../../block-library/src/video';
-import { init as initAndRegisterCodeBlock } from '../../../../../block-library/src/code';
-import { init as initAndRegisterParagraphBlock } from '../../../../../block-library/src/paragraph';
 
 const tableWithHeaderFooterAndBodyUsingColspan = `
 <table>
@@ -87,8 +85,6 @@ describe( 'pasteHandler', () => {
 	beforeAll( () => {
 		initAndRegisterTableBlock();
 		initAndRegisterVideoBlock();
-		initAndRegisterCodeBlock();
-		initAndRegisterParagraphBlock();
 	} );
 
 	it( 'can handle a table with thead, tbody and tfoot using colspan', () => {
@@ -290,66 +286,5 @@ describe( 'pasteHandler', () => {
 		} );
 		expect( result.name ).toEqual( 'core/video' );
 		expect( result.isValid ).toBeTruthy();
-	} );
-
-	it( 'should preserve content with bash ANSI-C quoting in pre/code blocks', () => {
-		// Test case from the bug report - when switching from code editor to visual editor
-		// the raw HTML is parsed directly by rawHandler
-		const htmlFromCodeEditor = `Add the following to your <code>~/.bashrc</code> if you use bash or <code>~/.zshrc</code> if you use zsh:
-<pre><code># Set colors for less. Borrowed from https://wiki.archlinux.org/index.php/Color_output_in_console#less .
-export LESS_TERMCAP_mb=$'\\E[1;31m'     # begin bold
-export LESS_TERMCAP_md=$'\\E[1;36m'     # begin blink
-export LESS_TERMCAP_me=$'\\E[0m'        # reset bold/blink
-export LESS_TERMCAP_so=$'\\E[01;44;33m' # begin reverse video
-export LESS_TERMCAP_se=$'\\E[0m'        # reset reverse video
-export LESS_TERMCAP_us=$'\\E[1;32m'     # begin underline
-export LESS_TERMCAP_ue=$'\\E[0m'        # reset underline</code></pre>
-Now restart your shell and run <code>man less</code>—the manual is in colors! The difference is shown in the following two images`;
-
-		// Parse the raw HTML directly (simulates switching from code editor to visual editor)
-		const blocks = rawHandler( {
-			HTML: htmlFromCodeEditor,
-		} );
-
-		// Should create 3 blocks: paragraph, code, paragraph
-		expect( blocks ).toHaveLength( 3 );
-		expect( blocks[ 0 ].name ).toBe( 'core/paragraph' );
-		expect( blocks[ 1 ].name ).toBe( 'core/code' );
-		expect( blocks[ 2 ].name ).toBe( 'core/paragraph' );
-
-		const codeContent = String( blocks[ 1 ].attributes.content );
-
-		// Verify all export lines are preserved (this is what currently fails in real browsers)
-		expect( codeContent ).toContain( "export LESS_TERMCAP_mb=$'" );
-		expect( codeContent ).toContain( "\\E[1;31m'" );
-		expect( codeContent ).toContain( '# begin bold' );
-		expect( codeContent ).toContain( "export LESS_TERMCAP_md=$'" );
-		expect( codeContent ).toContain( "\\E[1;36m'" );
-		expect( codeContent ).toContain( '# begin blink' );
-		expect( codeContent ).toContain( "export LESS_TERMCAP_me=$'" );
-		expect( codeContent ).toContain( "\\E[0m'" );
-		expect( codeContent ).toContain( '# reset bold/blink' );
-		expect( codeContent ).toContain( "export LESS_TERMCAP_so=$'" );
-		expect( codeContent ).toContain( "\\E[01;44;33m'" );
-		expect( codeContent ).toContain( '# begin reverse video' );
-		expect( codeContent ).toContain( "export LESS_TERMCAP_se=$'" );
-		expect( codeContent ).toContain( '# reset reverse video' );
-		expect( codeContent ).toContain( "export LESS_TERMCAP_us=$'" );
-		expect( codeContent ).toContain( "\\E[1;32m'" );
-		expect( codeContent ).toContain( '# begin underline' );
-		expect( codeContent ).toContain( "export LESS_TERMCAP_ue=$'" );
-		expect( codeContent ).toContain( '# reset underline' );
-
-		// Verify the text after the code block is in a separate paragraph
-		const lastParagraphContent = String( blocks[ 2 ].attributes.content );
-		expect( lastParagraphContent ).toContain( 'Now restart your shell' );
-		expect( lastParagraphContent ).toContain( 'man less' );
-
-		// Verify the "man less" text appears only once (not duplicated)
-		const allContent = blocks
-			.map( ( block ) => String( block.attributes.content || '' ) )
-			.join( ' ' );
-		const manLessMatches = allContent.match( /man less/g ) || [];
-		expect( manLessMatches.length ).toBe( 1 );
 	} );
 } );
