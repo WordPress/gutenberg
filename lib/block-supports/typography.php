@@ -260,6 +260,7 @@ function gutenberg_render_typography_support( $block_content, $block ) {
 				$block_content = $processor->get_updated_html();
 			}
 		}
+		// fitText supersedes any other typography features
 		return $block_content;
 	}
 
