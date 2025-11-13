@@ -470,6 +470,7 @@ function Thread( {
 		selectedThread,
 		commentLastUpdated,
 	} );
+	const isKeyboardTabbingRef = useRef( false );
 
 	const onMouseEnter = () => {
 		debouncedToggleBlockHighlight( thread.blockClientId, true );
@@ -484,15 +485,31 @@ function Thread( {
 	};
 
 	const onBlur = ( event ) => {
-		// Don't close the thread if focus is moving to a dialog or within the thread.
-		// Check if the related target is within the current thread element or a dialog.
-		if (
-			! event.currentTarget.contains( event.relatedTarget ) &&
-			! event.relatedTarget?.closest( '[role="dialog"]' )
-		) {
-			toggleBlockHighlight( thread.blockClientId, false );
-			unselectThread();
+		const isNoteFocused = event.relatedTarget?.closest(
+			'.editor-collab-sidebar-panel__thread'
+		);
+		const isDialogFocused =
+			event.relatedTarget?.closest( '[role="dialog"]' );
+		const isTabbing = isKeyboardTabbingRef.current;
+
+		// When another note is clicked, do nothing because the current note is automatically closed.
+		if ( isNoteFocused && ! isTabbing ) {
+			return;
 		}
+		// When deleting a note, a dialog appears nut the note should not be closed.
+		if ( isDialogFocused ) {
+			return;
+		}
+		// When tabbing, do nothing if the focus is within the current note.
+		if (
+			isTabbing &&
+			event.currentTarget.contains( event.relatedTarget )
+		) {
+			return;
+		}
+
+		toggleBlockHighlight( thread.blockClientId, false );
+		unselectThread();
 	};
 
 	const handleCommentSelect = () => {
@@ -565,7 +582,18 @@ function Thread( {
 			onMouseLeave={ onMouseLeave }
 			onFocus={ onFocus }
 			onBlur={ onBlur }
-			onKeyDown={ onKeyDown }
+			onKeyUp={ ( event ) => {
+				if ( event.key === 'Tab' ) {
+					isKeyboardTabbingRef.current = false;
+				}
+			} }
+			onKeyDown={ ( event ) => {
+				if ( event.key === 'Tab' ) {
+					isKeyboardTabbingRef.current = true;
+				} else {
+					onKeyDown( event );
+				}
+			} }
 			tabIndex={ 0 }
 			role="treeitem"
 			aria-label={ ariaLabel }
