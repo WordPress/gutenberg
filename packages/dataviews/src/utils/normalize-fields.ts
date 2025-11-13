@@ -231,11 +231,15 @@ export default function normalizeFields< Item >(
 					typeof field.format.date === 'string'
 						? field.format.date
 						: getSettings().formats.date,
-				weekStartsOn: DAYS_OF_WEEK.includes(
-					field.format?.weekStartsOn as DayString
-				)
-					? field?.format?.weekStartsOn
-					: numberToWeekStartsOn( getSettings().l10n.startOfWeek ),
+				weekStartsOn:
+					field.format?.weekStartsOn !== undefined &&
+					DAYS_OF_WEEK.includes(
+						field.format?.weekStartsOn as DayString
+					)
+						? field.format.weekStartsOn
+						: numberToWeekStartsOn(
+								getSettings().l10n.startOfWeek
+						  ),
 			};
 
 			return {
