@@ -1,12 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { pasteHandler } from '@wordpress/blocks';
+import { pasteHandler, rawHandler } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
 import { init as initAndRegisterTableBlock } from '../../../../../block-library/src/table';
 import { init as initAndRegisterVideoBlock } from '../../../../../block-library/src/video';
+import { init as initAndRegisterCodeBlock } from '../../../../../block-library/src/code';
+import { init as initAndRegisterParagraphBlock } from '../../../../../block-library/src/paragraph';
 
 const tableWithHeaderFooterAndBodyUsingColspan = `
 <table>
@@ -85,6 +87,8 @@ describe( 'pasteHandler', () => {
 	beforeAll( () => {
 		initAndRegisterTableBlock();
 		initAndRegisterVideoBlock();
+		initAndRegisterCodeBlock();
+		initAndRegisterParagraphBlock();
 	} );
 
 	it( 'can handle a table with thead, tbody and tfoot using colspan', () => {
@@ -289,7 +293,22 @@ describe( 'pasteHandler', () => {
 	} );
 
 	it( 'should preserve content with bash ANSI-C quoting in pre/code blocks', () => {
-		const HTML = `Add the following to your <code>~/.bashrc</code> if you use bash or <code>~/.zshrc</code> if you use zsh:
+		// Simple test case
+		const simpleHTML = `<pre><code>export TEST=$'\\E[1;31m'</code></pre>`;
+
+		const simpleResult = rawHandler( {
+			HTML: simpleHTML,
+		} );
+
+		expect( simpleResult ).toHaveLength( 1 );
+		expect( simpleResult[ 0 ].name ).toBe( 'core/code' );
+
+		const simpleContent = String( simpleResult[ 0 ].attributes.content );
+		expect( simpleContent ).toContain( "export TEST=$'" );
+		expect( simpleContent ).toContain( "E[1;31m'" );
+
+		// Full test case from the bug report
+		const fullHTML = `Add the following to your <code>~/.bashrc</code> if you use bash or <code>~/.zshrc</code> if you use zsh:
 <pre><code># Set colors for less. Borrowed from https://wiki.archlinux.org/index.php/Color_output_in_console#less .
 export LESS_TERMCAP_mb=$'\\E[1;31m'     # begin bold
 export LESS_TERMCAP_md=$'\\E[1;36m'     # begin blink
@@ -300,27 +319,38 @@ export LESS_TERMCAP_us=$'\\E[1;32m'     # begin underline
 export LESS_TERMCAP_ue=$'\\E[0m'        # reset underline</code></pre>
 Now restart your shell and run <code>man less</code>—the manual is in colors! The difference is shown in the following two images`;
 
-		const result = pasteHandler( {
-			HTML,
-			mode: 'AUTO',
+		const fullResult = rawHandler( {
+			HTML: fullHTML,
 		} );
 
-		expect( console ).toHaveLogged();
+		// Should create 3 blocks: paragraph, code, paragraph
+		expect( fullResult ).toHaveLength( 3 );
+		expect( fullResult[ 0 ].name ).toBe( 'core/paragraph' );
+		expect( fullResult[ 1 ].name ).toBe( 'core/code' );
+		expect( fullResult[ 2 ].name ).toBe( 'core/paragraph' );
 
-		// The content should be preserved correctly without duplication or mangling
-		const resultHTML =
-			typeof result === 'string'
-				? result
-				: result[ 0 ]?.attributes?.content || '';
+		const fullContent = String( fullResult[ 1 ].attributes.content );
 
-		// Check that the original content structure is preserved
-		expect( resultHTML ).toContain( "export LESS_TERMCAP_mb=$'\\E[1;31m'" );
-		expect( resultHTML ).toContain( "export LESS_TERMCAP_md=$'\\E[1;36m'" );
-		expect( resultHTML ).toContain( '# begin bold' );
-		expect( resultHTML ).toContain( '# begin blink' );
+		// Verify all export lines are preserved
+		expect( fullContent ).toContain( "export LESS_TERMCAP_mb=$'" );
+		expect( fullContent ).toContain( "E[1;31m'" );
+		expect( fullContent ).toContain( '# begin bold' );
+		expect( fullContent ).toContain( "export LESS_TERMCAP_md=$'" );
+		expect( fullContent ).toContain( "E[1;36m'" );
+		expect( fullContent ).toContain( '# begin blink' );
 
-		// Check that the content after </code></pre> is not duplicated
-		const manLessCount = ( resultHTML.match( /man less/g ) || [] ).length;
-		expect( manLessCount ).toBe( 1 );
+		// Verify the text after the code block is in a separate paragraph
+		const lastParagraphContent = String(
+			fullResult[ 2 ].attributes.content
+		);
+		expect( lastParagraphContent ).toContain( 'Now restart your shell' );
+		expect( lastParagraphContent ).toContain( 'man less' );
+
+		// Verify the "man less" text appears only once (not duplicated)
+		const allContent = fullResult
+			.map( ( block ) => String( block.attributes.content || '' ) )
+			.join( ' ' );
+		const manLessMatches = allContent.match( /man less/g ) || [];
+		expect( manLessMatches.length ).toBe( 1 );
 	} );
 } );
