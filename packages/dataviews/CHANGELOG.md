@@ -20,6 +20,7 @@
 - DataViews: Add a contextual menu to the table layout header. [#73104](https://github.com/WordPress/gutenberg/pull/73104)
 - DataViewsPicker: Add table layout support. [#72914](https://github.com/WordPress/gutenberg/pull/72914)
 - DataForm: use envelope icon instead of atSymbol for email control component. [#73184](https://github.com/WordPress/gutenberg/pull/73184)
+- DataViews: Group DataViews actions based on primary actions and regular actions and adds a separator between the groups. [#72866](https://github.com/WordPress/gutenberg/pull/72866)
 
 ### Bug fixes
 
@@ -27,10 +28,6 @@
 - Fix: DataViews modal actions in list layout. [#72793](https://github.com/WordPress/gutenberg/pull/72793)
 - Fix: Incorrect aria-label in table layout when items are not clickable. [#73034](https://github.com/WordPress/gutenberg/pull/73034)
 - Fix: Table layout column spacing. [#72969](https://github.com/WordPress/gutenberg/pull/72969)
-
-### Enhancements
-
-- DataViews: Group DataViews actions based on primary actions and regular actions and adds a separator between the groups. [#72866](https://github.com/WordPress/gutenberg/pull/72866)
 
 ## 10.2.0 (2025-10-29)
 
