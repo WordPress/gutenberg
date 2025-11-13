@@ -130,10 +130,32 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 		}
 
 		/**
+		 * Checks that a CSS property and value pair is safe.
+		 *
+		 * Validates CSS declarations using safecss_filter_attr() on the full declaration string.
+		 * This is a temporary theme.json compatibility method.
+		 *
+		 * @param string $property_name  Property name in a CSS declaration, i.e. the `color` in `color: red`.
+		 * @param string $property_value Value in a CSS declaration, i.e. the `red` in `color: red`.
+		 * @return bool True if the declaration is safe, false otherwise.
+		 */
+		public static function is_safe( $property_name, $property_value ) {
+			// Empty values are not safe.
+			if ( '' === trim( $property_value ) ) {
+				return false;
+			}
+
+			// Check the full declaration string to catch XSS before any tag stripping.
+			$style_to_validate = $property_name . ': ' . $property_value;
+			$filtered          = safecss_filter_attr( $style_to_validate );
+			return ! empty( trim( $filtered ) );
+		}
+
+		/**
 		 * Filters and compiles the CSS declarations.
 		 *
-		 * @param bool   $should_prettify Whether to add spacing, new lines and indents.
-		 * @param number $indent_count    The number of tab indents to apply to the rule. Applies if `prettify` is `true`.
+		 * @param bool $should_prettify Whether to add spacing, new lines and indents.
+		 * @param int  $indent_count    The number of tab indents to apply to the rule. Applies if `prettify` is `true`.
 		 *
 		 * @return string The CSS declarations.
 		 */

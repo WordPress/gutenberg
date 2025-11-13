@@ -794,4 +794,77 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 
 		$this->assertSame( '.foo{@media (orientation: landscape){background-color:blue;}}.foo{@media (min-width > 1024px){background-color:cotton-blue;}}', $compiled_stylesheet );
 	}
+
+	/**
+	 * Tests that valid CSS declarations return true.
+	 *
+	 * @covers WP_Style_Engine_CSS_Declarations_Gutenberg::is_safe
+	 */
+	public function test_is_safe_css_declaration_valid_declarations() {
+		$this->assertTrue( WP_Style_Engine_CSS_Declarations_Gutenberg::is_safe( 'color', 'red' ) );
+		$this->assertTrue( WP_Style_Engine_CSS_Declarations_Gutenberg::is_safe( 'background-color', '#ffffff' ) );
+		$this->assertTrue( WP_Style_Engine_CSS_Declarations_Gutenberg::is_safe( 'font-size', '16px' ) );
+		$this->assertTrue( WP_Style_Engine_CSS_Declarations_Gutenberg::is_safe( 'margin', '10px 20px' ) );
+		$this->assertTrue( WP_Style_Engine_CSS_Declarations_Gutenberg::is_safe( 'border-radius', '5px' ) );
+		$this->assertTrue( WP_Style_Engine_CSS_Declarations_Gutenberg::is_safe( 'max-width', '100%' ) );
+	}
+
+	/**
+	 * Tests that invalid CSS declarations return false.
+	 *
+	 * @covers WP_Style_Engine_CSS_Declarations_Gutenberg::is_safe
+	 */
+	public function test_is_safe_css_declaration_invalid_declarations() {
+		// Invalid property names.
+		$this->assertFalse( WP_Style_Engine_CSS_Declarations_Gutenberg::is_safe( 'javascript:alert(1)', 'value' ) );
+		$this->assertFalse( WP_Style_Engine_CSS_Declarations_Gutenberg::is_safe( 'expression(evil)', 'value' ) );
+
+		// Invalid values.
+		$this->assertFalse( WP_Style_Engine_CSS_Declarations_Gutenberg::is_safe( 'color', 'javascript:alert(1)' ) );
+		$this->assertFalse( WP_Style_Engine_CSS_Declarations_Gutenberg::is_safe( 'background', 'expression(evil)' ) );
+	}
+
+	/**
+	 * Tests that HTML tags in values are stripped.
+	 *
+	 * @covers WP_Style_Engine_CSS_Declarations_Gutenberg::is_safe
+	 */
+	public function test_is_safe_css_declaration_strips_html_tags() {
+		// Values with script tags should be caught by safecss_filter_attr.
+		$this->assertFalse( WP_Style_Engine_CSS_Declarations_Gutenberg::is_safe( 'color', '<script>alert(1)</script>' ) );
+
+		// Empty values are not safe.
+		$this->assertFalse( WP_Style_Engine_CSS_Declarations_Gutenberg::is_safe( 'color', '' ) );
+
+		// Valid CSS values should pass.
+		$this->assertTrue( WP_Style_Engine_CSS_Declarations_Gutenberg::is_safe( 'color', 'red' ) );
+	}
+
+	/**
+	 * Tests that empty values return false.
+	 *
+	 * @covers WP_Style_Engine_CSS_Declarations_Gutenberg::is_safe
+	 */
+	public function test_is_safe_css_declaration_empty_values() {
+		$this->assertFalse( WP_Style_Engine_CSS_Declarations_Gutenberg::is_safe( 'color', '' ) );
+		$this->assertFalse( WP_Style_Engine_CSS_Declarations_Gutenberg::is_safe( 'font-size', '   ' ) );
+	}
+
+	/**
+	 * Tests edge cases for is_safe_css_declaration.
+	 *
+	 * @covers WP_Style_Engine_CSS_Declarations_Gutenberg::is_safe
+	 */
+	public function test_is_safe_css_declaration_edge_cases() {
+		// Zero value should be valid.
+		$this->assertTrue( WP_Style_Engine_CSS_Declarations_Gutenberg::is_safe( 'opacity', '0' ) );
+		$this->assertTrue( WP_Style_Engine_CSS_Declarations_Gutenberg::is_safe( 'z-index', '0' ) );
+
+		// CSS custom properties should be valid.
+		$this->assertTrue( WP_Style_Engine_CSS_Declarations_Gutenberg::is_safe( '--wp--preset--color--background', '#ffffff' ) );
+
+		// Complex CSS values should be valid.
+		$this->assertTrue( WP_Style_Engine_CSS_Declarations_Gutenberg::is_safe( 'background', 'linear-gradient(135deg, rgba(0,0,0) 0%, rgb(0,0,0) 100%)' ) );
+		$this->assertTrue( WP_Style_Engine_CSS_Declarations_Gutenberg::is_safe( 'font-size', 'clamp(14px, 0.875rem + ((1vw - 3.2px) * 0.156), 16px)' ) );
+	}
 }

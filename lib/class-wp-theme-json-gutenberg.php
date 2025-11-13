@@ -1741,7 +1741,7 @@ class WP_Theme_JSON_Gutenberg {
 								// Iterate over each of the styling rules and substitute non-string values such as `null` with the real `blockGap` value.
 								foreach ( $spacing_rule['rules'] as $css_property => $css_value ) {
 									$current_css_value = is_string( $css_value ) ? $css_value : $block_gap_value;
-									if ( static::is_safe_css_declaration( $css_property, $current_css_value ) ) {
+									if ( WP_Style_Engine_CSS_Declarations_Gutenberg::is_safe( $css_property, $current_css_value ) ) {
 										$declarations[] = array(
 											'name'  => $css_property,
 											'value' => $current_css_value,
@@ -1834,7 +1834,7 @@ class WP_Theme_JSON_Gutenberg {
 									continue;
 								}
 
-								if ( static::is_safe_css_declaration( $css_property, $css_value ) ) {
+								if ( WP_Style_Engine_CSS_Declarations_Gutenberg::is_safe( $css_property, $css_value ) ) {
 									$declarations[] = array(
 										'name'  => $css_property,
 										'value' => $css_value,
@@ -3105,9 +3105,9 @@ class WP_Theme_JSON_Gutenberg {
 		*/
 		if ( isset( $settings['layout']['contentSize'] ) || isset( $settings['layout']['wideSize'] ) ) {
 			$content_size = isset( $settings['layout']['contentSize'] ) ? $settings['layout']['contentSize'] : $settings['layout']['wideSize'];
-			$content_size = static::is_safe_css_declaration( 'max-width', $content_size ) ? $content_size : 'initial';
+			$content_size = WP_Style_Engine_CSS_Declarations_Gutenberg::is_safe( 'max-width', $content_size ) ? $content_size : 'initial';
 			$wide_size    = isset( $settings['layout']['wideSize'] ) ? $settings['layout']['wideSize'] : $settings['layout']['contentSize'];
-			$wide_size    = static::is_safe_css_declaration( 'max-width', $wide_size ) ? $wide_size : 'initial';
+			$wide_size    = WP_Style_Engine_CSS_Declarations_Gutenberg::is_safe( 'max-width', $wide_size ) ? $wide_size : 'initial';
 			$css         .= static::ROOT_CSS_PROPERTIES_SELECTOR . ' { --wp--style--global--content-size: ' . $content_size . ';';
 			$css         .= '--wp--style--global--wide-size: ' . $wide_size . '; }';
 		}
@@ -3742,7 +3742,7 @@ class WP_Theme_JSON_Gutenberg {
 
 						$preset_is_valid = true;
 						foreach ( $preset_metadata['properties'] as $property ) {
-							if ( ! static::is_safe_css_declaration( $property, $value ) ) {
+							if ( ! WP_Style_Engine_CSS_Declarations_Gutenberg::is_safe( $property, $value ) ) {
 								$preset_is_valid = false;
 								break;
 							}
@@ -3781,7 +3781,7 @@ class WP_Theme_JSON_Gutenberg {
 		$declarations = static::compute_style_properties( $input );
 
 		foreach ( $declarations as $declaration ) {
-			if ( static::is_safe_css_declaration( $declaration['name'], $declaration['value'] ) ) {
+			if ( WP_Style_Engine_CSS_Declarations_Gutenberg::is_safe( $declaration['name'], $declaration['value'] ) ) {
 				$path = static::PROPERTIES_METADATA[ $declaration['name'] ];
 
 				// Check the value isn't an array before adding so as to not
@@ -3803,15 +3803,17 @@ class WP_Theme_JSON_Gutenberg {
 	 * Checks that a declaration provided by the user is safe.
 	 *
 	 * @since 5.9.0
+	 * @deprecated Gutenberg 7.0.0 Use WP_Style_Engine_CSS_Declarations_Gutenberg::is_safe() instead.
 	 *
 	 * @param string $property_name  Property name in a CSS declaration, i.e. the `color` in `color: red`.
 	 * @param string $property_value Value in a CSS declaration, i.e. the `red` in `color: red`.
 	 * @return bool
 	 */
 	protected static function is_safe_css_declaration( $property_name, $property_value ) {
-		$style_to_validate = $property_name . ': ' . $property_value;
-		$filtered          = esc_html( safecss_filter_attr( $style_to_validate ) );
-		return ! empty( trim( $filtered ) );
+		_deprecated_function( __METHOD__, 'Gutenberg 7.0.0', 'WP_Style_Engine_CSS_Declarations_Gutenberg::is_safe()' );
+
+		// Delegate to Style Engine, which handles sanitization.
+		return WP_Style_Engine_CSS_Declarations_Gutenberg::is_safe( $property_name, $property_value );
 	}
 
 	/**
@@ -3826,13 +3828,13 @@ class WP_Theme_JSON_Gutenberg {
 	private static function remove_indirect_properties( $input, &$output ) {
 		foreach ( static::INDIRECT_PROPERTIES_METADATA as $property => $paths ) {
 			foreach ( $paths as $path ) {
-				$value = _wp_array_get( $input, $path );
-				if (
-					is_string( $value ) &&
-					static::is_safe_css_declaration( $property, $value )
-				) {
-					_wp_array_set( $output, $path, $value );
-				}
+			$value = _wp_array_get( $input, $path );
+			if (
+				is_string( $value ) &&
+				WP_Style_Engine_CSS_Declarations_Gutenberg::is_safe( $property, $value )
+			) {
+				_wp_array_set( $output, $path, $value );
+			}
 			}
 		}
 	}

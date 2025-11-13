@@ -677,5 +677,6 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 			$processor->add_rules( $css_rules );
 			return $processor->get_css( $options );
 		}
+
 	}
 }
