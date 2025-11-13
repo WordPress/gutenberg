@@ -83,39 +83,16 @@ export function getCustomValueFromPreset( value, spacingSizes ) {
 		return value;
 	}
 
-	const slug = getSpacingPresetSlug( value );
-	const spacingSize = spacingSizes.find(
-		( size ) => String( size.slug ) === slug
-	);
-
-	return spacingSize?.size;
-}
-
-/**
- * Converts a custom value to preset value if one can be found.
- *
- * Returns value as-is if no match is found.
- *
- * @param {string} value        Value to convert
- * @param {Array}  spacingSizes Array of the current spacing preset objects
- *
- * @return {string} The preset value if it can be found.
- */
-export function getPresetValueFromCustomValue( value, spacingSizes ) {
-	// Return value as-is if it is undefined or is already a preset, or '0';
-	if ( ! value || isValueSpacingPreset( value ) || value === '0' ) {
+	const slug = value.match( /var:preset\|spacing\|(.+)/ );
+	if ( ! slug ) {
 		return value;
 	}
 
-	const spacingMatch = spacingSizes.find(
-		( size ) => String( size.size ) === String( value )
+	const spacingSize = spacingSizes.find(
+		( size ) => String( size.slug ) === slug[ 1 ]
 	);
 
-	if ( spacingMatch?.slug ) {
-		return `var:preset|spacing|${ spacingMatch.slug }`;
-	}
-
-	return value;
+	return spacingSize?.size;
 }
 
 /**
@@ -137,51 +114,6 @@ export function getSpacingPresetCssVar( value ) {
 	}
 
 	return `var(--wp--preset--spacing--${ slug[ 1 ] })`;
-}
-
-/**
- * Returns the slug section of the given spacing preset string.
- *
- * @param {string} value Value to extract slug from.
- *
- * @return {string|undefined} The int value of the slug from given spacing preset.
- */
-export function getSpacingPresetSlug( value ) {
-	if ( ! value ) {
-		return;
-	}
-
-	if ( value === '0' || value === 'default' ) {
-		return value;
-	}
-
-	const slug = value.match( /var:preset\|spacing\|(.+)/ );
-
-	return slug ? slug[ 1 ] : undefined;
-}
-
-/**
- * Converts spacing preset value into a Range component value .
- *
- * @param {string} presetValue  Value to convert to Range value.
- * @param {Array}  spacingSizes Array of current spacing preset value objects.
- *
- * @return {number} The int value for use in Range control.
- */
-export function getSliderValueFromPreset( presetValue, spacingSizes ) {
-	if ( presetValue === undefined ) {
-		return 0;
-	}
-	const slug =
-		parseFloat( presetValue, 10 ) === 0
-			? '0'
-			: getSpacingPresetSlug( presetValue );
-	const sliderValue = spacingSizes.findIndex( ( spacingSize ) => {
-		return String( spacingSize.slug ) === slug;
-	} );
-
-	// Returning NaN rather than undefined as undefined makes range control thumb sit in center
-	return sliderValue !== -1 ? sliderValue : NaN;
 }
 
 /**

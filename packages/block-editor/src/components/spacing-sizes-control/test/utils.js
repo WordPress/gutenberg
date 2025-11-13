@@ -5,10 +5,7 @@ import {
 	ALL_SIDES,
 	getCustomValueFromPreset,
 	getInitialView,
-	getPresetValueFromCustomValue,
-	getSliderValueFromPreset,
 	getSpacingPresetCssVar,
-	getSpacingPresetSlug,
 	hasAxisSupport,
 	hasBalancedSidesSupport,
 	isValueSpacingPreset,
@@ -43,36 +40,6 @@ describe( 'getCustomValueFromPreset', () => {
 	} );
 } );
 
-describe( 'getPresetValueFromCustomValue', () => {
-	const spacingSizes = [
-		{ name: 'Default', slug: 'default', size: undefined },
-		{ name: 'Small', slug: 20, size: '8px' },
-	];
-	it( 'should return undefined even if an undefined value exist in spacing sizes as occurs if spacingSizes has > 7 entries', () => {
-		expect( getPresetValueFromCustomValue( undefined, spacingSizes ) ).toBe(
-			undefined
-		);
-	} );
-	it( 'should return original value if a string in spacing presets var format', () => {
-		expect(
-			getPresetValueFromCustomValue(
-				'var:preset|spacing|80',
-				spacingSizes
-			)
-		).toBe( 'var:preset|spacing|80' );
-	} );
-	it( 'should return value constructed from matching spacingSizes array entry if value matches sizes', () => {
-		expect( getPresetValueFromCustomValue( '8px', spacingSizes ) ).toBe(
-			'var:preset|spacing|20'
-		);
-	} );
-	it( 'should return values as-is if no matching preset in spacingSizes array', () => {
-		expect(
-			getPresetValueFromCustomValue( '1.125rem', spacingSizes )
-		).toBe( '1.125rem' );
-	} );
-} );
-
 describe( 'getSpacingPresetCssVar', () => {
 	it( 'should return original value if not a string in spacing presets var format', () => {
 		expect( getSpacingPresetCssVar( '20px' ) ).toBe( '20px' );
@@ -81,31 +48,6 @@ describe( 'getSpacingPresetCssVar', () => {
 		expect( getSpacingPresetCssVar( 'var:preset|spacing|20' ) ).toBe(
 			'var(--wp--preset--spacing--20)'
 		);
-	} );
-} );
-
-describe( 'getSpacingPresetSlug', () => {
-	it( 'should return original value if 0 or default', () => {
-		expect( getSpacingPresetSlug( '0' ) ).toBe( '0' );
-		expect( getSpacingPresetSlug( 'default' ) ).toBe( 'default' );
-	} );
-	it( 'should return the int value of the slug portion of a valid preset var', () => {
-		expect( getSpacingPresetSlug( 'var:preset|spacing|20' ) ).toBe( '20' );
-	} );
-} );
-
-describe( 'getSliderValueFromPreset', () => {
-	const spacingSizes = [
-		{ name: 'Small', slug: 20, size: '8px' },
-		{ name: 'Large', slug: 30, size: '24px' },
-	];
-	it( 'should return NaN if no matching preset found - NaN makes range control go to start', () => {
-		expect( getSliderValueFromPreset( '10px', spacingSizes ) ).toBe( NaN );
-	} );
-	it( 'should return the int value of the slug portion of a valid preset var', () => {
-		expect(
-			getSliderValueFromPreset( 'var:preset|spacing|30', spacingSizes )
-		).toBe( 1 );
 	} );
 } );
 
