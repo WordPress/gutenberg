@@ -18,17 +18,17 @@ test.describe( 'Post Meta source', () => {
 
 	test.describe( 'Movie CPT template', () => {
 		test.beforeEach( async ( { admin, editor, page } ) => {
-			// The 'single-movie' template doesn't exist yet, but will be created on the fly from the 'singular' template.
-			await admin.visitSiteEditor( {
-				postId: 'emptytheme//single-movie',
-				postType: 'wp_template',
-				canvas: 'edit',
-			} );
-			// Close the pattern suggestions dialog.
+			await admin.visitSiteEditor();
+			await page.click( 'role=button[name="Templates"]' );
+			await page.click( 'role=button[name="Add Template"i]' );
 			await page
-				.getByRole( 'dialog', { name: 'Choose a pattern' } )
-				.getByRole( 'button', { name: 'Close' } )
+				.getByRole( 'button', {
+					name: 'Single item: Movie',
+				} )
 				.click();
+			await page.getByRole( 'button', { name: 'For all items' } ).click();
+			await page.getByRole( 'option', { name: 'Fallback' } ).click();
+
 			await editor.openDocumentSettingsSidebar();
 		} );
 
