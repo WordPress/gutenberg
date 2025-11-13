@@ -169,7 +169,7 @@ declare module './base-entity-records' {
 			 * Meta fields.
 			 */
 			meta: ContextualField<
-				Record< string, unknown > | unknown[],
+				Record< string, unknown > | [],
 				'view' | 'edit',
 				C
 			>;
