@@ -10,13 +10,16 @@
 		{ "path": "../compose" },
 		{ "path": "../core-data" },
 		{ "path": "../data" },
+		{ "path": "../editor" },
 		{ "path": "../element" },
 		{ "path": "../html-entities" },
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
 		{ "path": "../keycodes" },
+		{ "path": "../lazy-editor" },
 		{ "path": "../primitives" },
 		{ "path": "../private-apis" },
+		{ "path": "../route" },
 		{ "path": "../theme" },
 		{ "path": "../url" }
 	]

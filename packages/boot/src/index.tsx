@@ -2,4 +2,4 @@
  * Internal dependencies
  */
 import './style.scss';
-export { init } from './components/app';
+export { init, initSinglePage } from './components/app';

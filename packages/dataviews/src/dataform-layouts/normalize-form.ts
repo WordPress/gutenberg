@@ -11,6 +11,7 @@ import type {
 	NormalizedPanelLayout,
 	NormalizedCardLayout,
 	NormalizedRowLayout,
+	NormalizedDetailsLayout,
 	NormalizedCardSummaryField,
 	CardSummaryField,
 } from '../types';
@@ -94,6 +95,11 @@ function normalizeLayout( layout?: Layout ): NormalizedLayout {
 			alignment: layout?.alignment ?? 'center',
 			styles: layout?.styles ?? {},
 		} satisfies NormalizedRowLayout;
+	} else if ( layout?.type === 'details' ) {
+		normalizedLayout = {
+			type: 'details',
+			summary: layout?.summary ?? '',
+		} satisfies NormalizedDetailsLayout;
 	}
 
 	return normalizedLayout;

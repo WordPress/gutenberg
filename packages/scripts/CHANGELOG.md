@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-## 31.0.0-next.0 (2025-11-05)
+## 31.0.0 (2025-11-12)
 
 ### Breaking Changes
 

@@ -201,6 +201,37 @@ This allows your packages to consume third-party dependencies as externals:
 
 If `handlePrefix` is omitted, it defaults to the namespace key (e.g., `"woo"` → `woo-cart`).
 
+### `wpPlugin.pages` (Experimental)
+
+Define admin pages that support routes. Each page gets generated PHP functions for route registration and can be extended by other plugins:
+
+```json
+{
+	"wpPlugin": {
+		"pages": ["my-admin-page"]
+	}
+}
+```
+
+This generates two page modes:
+- `build/pages/my-admin-page/page.php` - Full-page mode (takes over entire admin screen with custom sidebar)
+- `build/pages/my-admin-page/page-wp-admin.php` - WP-Admin mode (integrates within standard wp-admin interface)
+- `build/pages.php` - Loader for all pages
+
+Each mode provides route/menu registration functions and a render callback. Routes are automatically registered for both modes.
+
+**Registering a menu item for WP-Admin mode:**
+```php
+// Build URL with initial route via 'p' query parameter
+$url = admin_url( 'admin.php?page=my-admin-page-wp-admin&p=' . urlencode( '/my/route' ) );
+add_menu_page( 'Title', 'Menu', 'capability', $url, '', 'icon', 20 );
+```
+
+**Registering a menu item for full-page mode:**
+```php
+add_menu_page( 'Title', 'Menu', 'capability', 'my-admin-page', 'my_admin_page_render_page', 'icon', 20 );
+```
+
 ### Example: WordPress Core (Gutenberg)
 
 ```json
@@ -254,7 +285,7 @@ require_once plugin_dir_path( __FILE__ ) . 'build/index.php';
 
 ## Routes (Experimental)
 
-Routes provide a file-based routing system for WordPress admin pages. Create a `routes/` directory at your repository root with subdirectories for each route.
+Routes provide a file-based routing system for WordPress admin pages. Each route must be associated with a page defined in `wpPlugin.pages` (see above). Create a `routes/` directory at your repository root with subdirectories for each route.
 
 ### Structure
 
@@ -274,10 +305,13 @@ In `routes/{route-name}/package.json`:
 ```json
 {
 	"route": {
-		"path": "/"
+		"path": "/",
+		"page": "my-admin-page"
 	}
 }
 ```
+
+The `page` field must match one of the pages defined in `wpPlugin.pages` in your root `package.json`. This tells the build system which page this route belongs to. It can also map to an existing page registered by another plugin.
 
 ### Components
 

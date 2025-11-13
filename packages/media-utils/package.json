@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/media-utils",
-	"version": "5.34.1-next.2f1c7c01b.0",
+	"version": "5.35.0",
 	"description": "WordPress Media Upload Utils.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -44,6 +44,7 @@
 		"@wordpress/dataviews": "file:../dataviews",
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/icons": "file:../icons",
 		"@wordpress/private-apis": "file:../private-apis"
 	},
 	"publishConfig": {

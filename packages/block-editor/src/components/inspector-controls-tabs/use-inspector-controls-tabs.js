@@ -99,7 +99,11 @@ export default function useInspectorControlsTabs(
 		tabs.push( TAB_SETTINGS );
 	}
 
-	if ( isSectionBlock ? hasBlockStyles : hasStyleFills ) {
+	if (
+		hasBlockStyles ||
+		hasStyleFills ||
+		window?.__experimentalContentOnlyPatternInsertion
+	) {
 		tabs.push( TAB_STYLES );
 	}
 

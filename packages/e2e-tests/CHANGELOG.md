@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-## 9.0.0-next.0 (2025-11-05)
+## 9.0.0 (2025-11-12)
 
 ### Breaking Changes
 

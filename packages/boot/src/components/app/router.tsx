@@ -1,15 +1,6 @@
 /**
  * External dependencies
  */
-import {
-	createRouter,
-	createRootRoute,
-	createRoute,
-	RouterProvider,
-	createBrowserHistory,
-	type AnyRoute,
-} from '@tanstack/react-router';
-import { parseHref } from '@tanstack/history';
 import type { ComponentType } from 'react';
 
 /**
@@ -18,12 +9,26 @@ import type { ComponentType } from 'react';
 import { __ } from '@wordpress/i18n';
 import { lazy, useState, useEffect } from '@wordpress/element';
 import { Page } from '@wordpress/admin-ui';
+import {
+	privateApis as routePrivateApis,
+	type AnyRoute,
+} from '@wordpress/route';
 
 /**
  * Internal dependencies
  */
 import Root from '../root';
 import type { Route, RouteLoaderContext } from '../../store/types';
+import { unlock } from '../../lock-unlock';
+
+const {
+	createRouter,
+	createRootRoute,
+	createRoute,
+	RouterProvider,
+	createBrowserHistory,
+	parseHref,
+} = unlock( routePrivateApis );
 
 // Not found component
 function NotFoundComponent() {
@@ -90,6 +95,7 @@ async function createRouteFromDefinition(
 	let routeConfig: {
 		beforeLoad?: ( context: RouteLoaderContext ) => void | Promise< void >;
 		loader?: ( context: RouteLoaderContext ) => Promise< unknown >;
+		canvas?: ( context: RouteLoaderContext ) => Promise< any >;
 	} = {};
 
 	if ( route.route_module ) {
@@ -101,23 +107,34 @@ async function createRouteFromDefinition(
 		getParentRoute: () => parentRoute,
 		path: route.path,
 		beforeLoad: routeConfig.beforeLoad
-			? async ( opts: any ) => {
-					const context: RouteLoaderContext = {
+			? ( opts: any ) =>
+					routeConfig.beforeLoad!( {
 						params: opts.params || {},
 						search: opts.search || {},
-					};
-					await routeConfig.beforeLoad!( context );
-			  }
+					} )
 			: undefined,
-		loader: routeConfig.loader
-			? async ( opts: any ) => {
-					const context: RouteLoaderContext = {
-						params: opts.params || {},
-						search: opts.search || {},
-					};
-					return await routeConfig.loader!( context );
-			  }
-			: undefined,
+		loader: async ( opts: any ) => {
+			const context: RouteLoaderContext = {
+				params: opts.params || {},
+				search: opts.deps || {},
+			};
+
+			// Call both loader and canvas functions if they exist
+			const [ loaderData, canvasData ] = await Promise.all( [
+				routeConfig.loader
+					? routeConfig.loader( context )
+					: Promise.resolve( undefined ),
+				routeConfig.canvas
+					? routeConfig.canvas( context )
+					: Promise.resolve( undefined ),
+			] );
+
+			return {
+				...( loaderData as any ),
+				canvas: canvasData,
+			};
+		},
+		loaderDeps: ( opts: any ) => opts.search,
 		component: SurfacesModule,
 	} );
 }
@@ -125,12 +142,16 @@ async function createRouteFromDefinition(
 /**
  * Creates a route tree from route definitions.
  *
- * @param routes Routes definition.
+ * @param routes        Routes definition.
+ * @param rootComponent Root component to use for the router.
  * @return Router tree.
  */
-async function createRouteTree( routes: Route[] ) {
+async function createRouteTree(
+	routes: Route[],
+	rootComponent: ComponentType = Root
+) {
 	const rootRoute = createRootRoute( {
-		component: Root,
+		component: rootComponent as any,
 		context: () => ( {} ),
 	} );
 
@@ -151,7 +172,7 @@ function createPathHistory() {
 			const pathHref = `${ path }${ url.hash }`;
 			return parseHref( pathHref, window.history.state );
 		},
-		createHref: ( href ) => {
+		createHref: ( href: string ) => {
 			const searchParams = new URLSearchParams( window.location.search );
 			searchParams.set( 'p', href );
 			return `${ window.location.pathname }?${ searchParams }`;
@@ -161,9 +182,13 @@ function createPathHistory() {
 
 interface RouterProps {
 	routes: Route[];
+	rootComponent?: ComponentType;
 }
 
-export default function Router( { routes }: RouterProps ) {
+export default function Router( {
+	routes,
+	rootComponent = Root,
+}: RouterProps ) {
 	const [ router, setRouter ] = useState< any >( null );
 
 	useEffect( () => {
@@ -171,7 +196,7 @@ export default function Router( { routes }: RouterProps ) {
 
 		async function initializeRouter() {
 			const history = createPathHistory();
-			const routeTree = await createRouteTree( routes );
+			const routeTree = await createRouteTree( routes, rootComponent );
 
 			if ( ! cancelled ) {
 				const newRouter = createRouter( {
@@ -188,7 +213,7 @@ export default function Router( { routes }: RouterProps ) {
 		return () => {
 			cancelled = true;
 		};
-	}, [ routes ] );
+	}, [ routes, rootComponent ] );
 
 	if ( ! router ) {
 		return <div>Loading routes...</div>;

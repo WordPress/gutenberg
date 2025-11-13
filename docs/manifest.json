@@ -1446,6 +1446,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/asset-loader",
+		"slug": "packages-asset-loader",
+		"markdown_source": "../packages/asset-loader/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/autop",
 		"slug": "packages-autop",
 		"markdown_source": "../packages/autop/README.md",
@@ -1812,6 +1818,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/lazy-editor",
+		"slug": "packages-lazy-editor",
+		"markdown_source": "../packages/lazy-editor/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/lazy-import",
 		"slug": "packages-lazy-import",
 		"markdown_source": "../packages/lazy-import/README.md",
@@ -1944,6 +1956,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/route",
+		"slug": "packages-route",
+		"markdown_source": "../packages/route/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/router",
 		"slug": "packages-router",
 		"markdown_source": "../packages/router/README.md",
@@ -2001,6 +2019,12 @@
 		"title": "@wordpress/token-list",
 		"slug": "packages-token-list",
 		"markdown_source": "../packages/token-list/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/ui",
+		"slug": "packages-ui",
+		"markdown_source": "../packages/ui/README.md",
 		"parent": "packages"
 	},
 	{

@@ -39,7 +39,6 @@ const meta: Meta< typeof ThemeProvider > = {
 export default meta;
 
 function getCSSCustomPropsFromStylesheets() {
-	const primitiveProps: Record< string, string > = {};
 	const semanticProps: Record< string, string > = {};
 	const legacyProps: Record< string, string > = {};
 
@@ -58,15 +57,9 @@ function getCSSCustomPropsFromStylesheets() {
 								.trim();
 						}
 						if ( name.startsWith( '--wpds-color' ) ) {
-							if ( name.includes( 'private' ) ) {
-								primitiveProps[ name ] = ruleStyle
-									.getPropertyValue( name )
-									.trim();
-							} else {
-								semanticProps[ name ] = ruleStyle
-									.getPropertyValue( name )
-									.trim();
-							}
+							semanticProps[ name ] = ruleStyle
+								.getPropertyValue( name )
+								.trim();
 						}
 					}
 				}
@@ -79,7 +72,7 @@ function getCSSCustomPropsFromStylesheets() {
 		}
 	}
 
-	return { primitiveProps, semanticProps, legacyProps };
+	return { semanticProps, legacyProps };
 }
 
 const ColorTokenTable = ( {
@@ -126,11 +119,9 @@ const ColorTokenTable = ( {
 const DSTokensList = () => {
 	const [ props, setProps ] = useState< {
 		semanticProps: Record< string, string >;
-		primitiveProps: Record< string, string >;
 		legacyProps: Record< string, string >;
 	} >( {
 		semanticProps: {},
-		primitiveProps: {},
 		legacyProps: {},
 	} );
 
@@ -143,11 +134,6 @@ const DSTokensList = () => {
 			<h1>DS Color tokens</h1>
 			<h2>Semantic tokens (can be consumed directly)</h2>
 			<ColorTokenTable tokens={ props.semanticProps } />
-			<h2>Primitive tokens (should not be consumed directly)</h2>
-			<details>
-				<summary>Click to expand</summary>
-				<ColorTokenTable tokens={ props.primitiveProps } />
-			</details>
 			<h2>Legacy tokens (should not be consumed directly)</h2>
 			<details>
 				<summary>Click to expand</summary>

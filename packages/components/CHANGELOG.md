@@ -2,12 +2,24 @@
 
 ## Unreleased
 
-## 30.7.1-next.0 (2025-11-05)
+## 30.8.0 (2025-11-12)
 
 ### Bug Fixes
 
+-   `Button`: Revert disabled primary button state to its previous one ([#73037](https://github.com/WordPress/gutenberg/pull/73037)).
 -   `TextareaControl`: Add `min-height` to the textarea element ([#72867](https://github.com/WordPress/gutenberg/pull/72867)).
 -   `Card`, `CardHeader`, `CardBody` and `CardFooter`: Add support for directional padding through object-based size prop, allowing independent control of padding for each side ([#72511](https://github.com/WordPress/gutenberg/pull/72511)).
+-   `CustomSelectControl`: Fix the options with the same name are shown as the selected option ([#72189](https://github.com/WordPress/gutenberg/pull/72189)).
+-   `NumberControl`: Fix crash when min prop is string and step prop contains decimal ([#73107](https://github.com/WordPress/gutenberg/pull/73107)).
+
+### Internal
+
+-   `Modal`: Add a classname to simplify full height content modal styling ([#73108](https://github.com/WordPress/gutenberg/pull/73108)).
+
+### Enhancements
+
+-   `ConfirmDialog`: Add `isBusy` prop to component. ([#73041](https://github.com/WordPress/gutenberg/pull/73041)).
+-   `ColorPicker`: Support pasting whole color values. ([#73166](https://github.com/WordPress/gutenberg/pull/73166)).
 
 ## 30.7.0 (2025-10-29)
 
