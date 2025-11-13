@@ -127,9 +127,12 @@
 	// Hover styles only apply when bulk actions are available
 	&.has-bulk-actions {
 		tr {
-			&.is-hovered,
-			&.is-hovered .dataviews-view-table__actions-column--sticky {
-				background-color: #f8f8f8;
+			// Only apply hover background to non-selected rows
+			&:not(.is-selected) {
+				&.is-hovered,
+				&.is-hovered .dataviews-view-table__actions-column--sticky {
+					background-color: #f8f8f8;
+				}
 			}
 
 			&:focus-within,
