@@ -9,8 +9,25 @@ import {
 } from '@wordpress/interactivity';
 
 function createReadOnlyProxy( obj ) {
+	const arrayMutationMethods = new Set( [
+		'push',
+		'pop',
+		'shift',
+		'unshift',
+		'splice',
+		'sort',
+		'reverse',
+		'copyWithin',
+		'fill',
+	] );
+
 	return new Proxy( obj, {
 		get( target, prop ) {
+			// If accessing an array mutation method, return a no-op function.
+			if ( Array.isArray( target ) && arrayMutationMethods.has( prop ) ) {
+				return () => {};
+			}
+
 			const value = target[ prop ];
 			if ( typeof value === 'object' && value !== null ) {
 				return createReadOnlyProxy( value );
