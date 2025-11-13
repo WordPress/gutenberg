@@ -42,22 +42,59 @@ function BlockAttributeToolsPanelItem( {
 	attributeValues,
 } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const { selectBlock, toggleBlockSpotlight } = unlock(
+		useDispatch( blockEditorStore )
+	);
+	const { isBlockSelected } = useSelect( blockEditorStore );
 	const ControlComponent = controls[ control.type ];
 
 	if ( ! ControlComponent ) {
 		return null;
 	}
 
-	return (
-		<ControlComponent
-			clientId={ clientId }
-			control={ control }
-			blockType={ blockType }
-			attributeValues={ attributeValues }
-			updateAttributes={ ( attributes ) =>
-				updateBlockAttributes( clientId, attributes )
+	const isSelected = isBlockSelected( clientId );
+
+	const handleClick = () => {
+		// Navigate to block without changing focus (keeps focus in sidebar)
+		// Pass `null` as second parameter to prevent focusing the block
+		if ( ! isSelected ) {
+			selectBlock( clientId, null );
+			toggleBlockSpotlight( clientId, true );
+		}
+		// Don't prevent propagation so clicks can reach child elements (like input fields)
+	};
+
+	const handleFocusCapture = ( event ) => {
+		// Navigate to block when child controls receive focus (keyboard navigation)
+		// Only trigger if focus is actually on a child element, not the wrapper itself
+		if ( event.target !== event.currentTarget ) {
+			// Pass `null` as second parameter to prevent focusing the block
+			if ( ! isSelected ) {
+				selectBlock( clientId, null );
+				toggleBlockSpotlight( clientId, true );
 			}
-		/>
+		}
+	};
+
+	return (
+		// Keyboard navigation is handled via onFocusCapture when child controls receive focus.
+		// The wrapper itself is not focusable (no tabIndex) to avoid extra tab stops.
+		// eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events
+		<div
+			className="block-editor-content-only-controls__item-wrapper"
+			onClick={ handleClick }
+			onFocusCapture={ handleFocusCapture }
+		>
+			<ControlComponent
+				clientId={ clientId }
+				control={ control }
+				blockType={ blockType }
+				attributeValues={ attributeValues }
+				updateAttributes={ ( attributes ) =>
+					updateBlockAttributes( clientId, attributes )
+				}
+			/>
+		</div>
 	);
 }
 

@@ -33,3 +33,9 @@
 .block-editor-content-only-controls__drill-down-button {
 	width: 100%;
 }
+
+// So that the content-only controls receive the full width of the tools panel.
+.block-editor-content-only-controls__item-wrapper {
+	width: 100%;
+	grid-column: 1 / -1;
+}
