@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+- DataViews: Make sticky elements (table headers, footer, actions column) inherit background colors from parent container. This allows DataViews instances to seamlessly adapt to containers with custom background colors. [#73240](https://github.com/WordPress/gutenberg/pull/73240)
+
 ## 10.3.0 (2025-11-12)
 
 ### Enhancements
