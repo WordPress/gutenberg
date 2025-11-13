@@ -110,29 +110,31 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 			variant="unstyled"
 		>
 			<div className="editor-document-tools__left">
-				<CollaborationModeSlot>
-					{ ( fills ) =>
-						fills?.length ? (
-							<div className="editor-document-tools__collaboration-mode">
-								{ fills }
-							</div>
-						) : null
-					}
-				</CollaborationModeSlot>
 				{ ! isDistractionFree && (
-					<ToolbarButton
-						ref={ inserterSidebarToggleRef }
-						className="editor-document-tools__inserter-toggle"
-						variant="primary"
-						isPressed={ isInserterOpened }
-						onMouseDown={ preventDefault }
-						onClick={ toggleInserter }
-						disabled={ disableBlockTools }
-						icon={ plus }
-						label={ showIconLabels ? shortLabel : longLabel }
-						showTooltip={ ! showIconLabels }
-						aria-expanded={ isInserterOpened }
-					/>
+					<>
+						<CollaborationModeSlot>
+							{ ( fills ) =>
+								fills?.length ? (
+									<div className="editor-document-tools__collaboration-mode">
+										{ fills }
+									</div>
+								) : null
+							}
+						</CollaborationModeSlot>
+						<ToolbarButton
+							ref={ inserterSidebarToggleRef }
+							className="editor-document-tools__inserter-toggle"
+							variant="primary"
+							isPressed={ isInserterOpened }
+							onMouseDown={ preventDefault }
+							onClick={ toggleInserter }
+							disabled={ disableBlockTools }
+							icon={ plus }
+							label={ showIconLabels ? shortLabel : longLabel }
+							showTooltip={ ! showIconLabels }
+							aria-expanded={ isInserterOpened }
+						/>
+					</>
 				) }
 				{ ( isWideViewport || ! showIconLabels ) && (
 					<>
