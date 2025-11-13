@@ -15,7 +15,7 @@
 	}
 
 	&-container-non-collapsible {
-		height: $button-size-small; // Match the chevron's variant="small"
+		min-height: $button-size-small; // Match the chevron's variant="small"
 	}
 
 	&-collapsible {
