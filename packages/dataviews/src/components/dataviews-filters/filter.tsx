@@ -19,7 +19,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { useRef, createInterpolateElement } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
-import { dateI18n } from '@wordpress/date';
+import { dateI18n, getDate } from '@wordpress/date';
 
 const ENTER = 'Enter';
 const SPACE = ' ';
@@ -503,7 +503,7 @@ export default function Filter( {
 			try {
 				const dateValue = parseDateTime( label );
 				if ( dateValue !== null ) {
-					label = dateI18n( field.format.date, label );
+					label = dateI18n( field.format.date, getDate( label ) );
 				}
 			} catch ( e ) {
 				label = filterInView.value;

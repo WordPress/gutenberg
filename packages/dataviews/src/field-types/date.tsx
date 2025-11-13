@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { dateI18n } from '@wordpress/date';
+import { dateI18n, getDate } from '@wordpress/date';
 
 /**
  * Internal dependencies
@@ -57,7 +57,7 @@ export default {
 			return '';
 		}
 
-		return dateI18n( field.format.date, value );
+		return dateI18n( field.format.date, getDate( value ) );
 	},
 	enableSorting: true,
 	filterBy: {
