@@ -57,7 +57,6 @@ import {
 	useBlockElementRef,
 	useBlockElement,
 } from './components/block-list/use-block-props/use-block-refs';
-import { default as MediaUploadModal } from './components/media-upload-modal';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -111,5 +110,4 @@ lock( privateApis, {
 	essentialFormatKey,
 	useBlockElement,
 	useBlockElementRef,
-	MediaUploadModal,
 } );
