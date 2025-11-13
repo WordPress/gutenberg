@@ -94,7 +94,21 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 			$breadcrumb_items = array_merge( $breadcrumb_items, block_core_breadcrumbs_get_terms_breadcrumbs( $post_id, $post_type ) );
 		}
 		// Add current post title (not linked).
-		$breadcrumb_items[] = block_core_breadcrumbs_create_current_item( block_core_breadcrumbs_get_post_title( $post ), true );
+		$breadcrumb_items[] = block_core_breadcrumbs_create_current_item(
+			block_core_breadcrumbs_get_post_title( $post ),
+			true
+		);
+
+		// Handle paginated posts (using <!--nextpage--> or the Page Break block).
+		$post_page = (int) get_query_var( 'page' );
+		if ( $post_page > 1 ) {
+			// Append "Page X" as the current page.
+			$breadcrumb_items[] = block_core_breadcrumbs_create_current_item(
+				/* translators: %d: Current page number */
+				sprintf( esc_html__( 'Page %d', 'gutenberg' ), number_format_i18n( $post_page ) ),
+				true
+			);
+		}
 	}
 
 	// Remove last item if disabled.
@@ -236,7 +250,7 @@ function block_core_breadcrumbs_get_post_title( $post_id_or_object ) {
  *
  * @since 6.9.0
  *
- * @param int    $post_id   The post ID.
+ * @param int $post_id   The post ID.
  *
  * @return array Array of breadcrumb HTML items.
  */
