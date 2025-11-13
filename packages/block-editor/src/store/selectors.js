@@ -1740,7 +1740,20 @@ const canInsertBlockTypeUnmemoized = (
 			rootClientId
 		)
 	) {
-		return false;
+		// Allow inserting a Paragraph block anywhere that another Paragraph block already exists
+		// when in contentOnly mode.
+		if ( blockName === 'core/paragraph' ) {
+			const existingBlocks = getBlockOrder( state, rootClientId );
+			const hasParagraphBlock = existingBlocks.some(
+				( clientId ) =>
+					getBlockName( state, clientId ) === 'core/paragraph'
+			);
+			if ( ! hasParagraphBlock ) {
+				return false;
+			}
+		} else {
+			return false;
+		}
 	}
 
 	const parentName = getBlockName( state, rootClientId );
@@ -1913,7 +1926,24 @@ export function canRemoveBlock( state, clientId ) {
 			rootClientId
 		)
 	) {
-		return false;
+		// Allow removing a Paragraph block when other Paragraph blocks exist
+		// in contentOnly mode.
+		const blockName = getBlockName( state, clientId );
+		if (
+			rootBlockEditingMode === 'contentOnly' &&
+			blockName === 'core/paragraph'
+		) {
+			const existingBlocks = getBlockOrder( state, rootClientId );
+			const paragraphBlocks = existingBlocks.filter(
+				( id ) => getBlockName( state, id ) === 'core/paragraph'
+			);
+			// Allow removal if there are other paragraph blocks besides this one
+			if ( ! ( paragraphBlocks.length > 0 ) ) {
+				return false;
+			}
+		} else {
+			return false;
+		}
 	}
 
 	return rootBlockEditingMode !== 'disabled';
