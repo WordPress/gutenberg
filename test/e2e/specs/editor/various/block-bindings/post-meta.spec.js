@@ -17,19 +17,26 @@ test.describe( 'Post Meta source', () => {
 	} );
 
 	test.describe( 'Movie CPT template', () => {
-		test.beforeEach( async ( { admin, editor, page } ) => {
-			await admin.visitSiteEditor();
-			await page.click( 'role=button[name="Templates"]' );
-			await page.click( 'role=button[name="Add Template"i]' );
-			await page
-				.getByRole( 'button', {
-					name: 'Single item: Movie',
-				} )
-				.click();
-			await page.getByRole( 'button', { name: 'For all items' } ).click();
-			await page.getByRole( 'option', { name: 'Fallback' } ).click();
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.createTemplate( 'wp_template', {
+				slug: 'single-movie',
+				title: 'Single Movie',
+				content:
+					'<!-- wp:post-title /--><!-- wp:post-content {"layout":{"inherit":true}} /-->',
+			} );
+		} );
 
+		test.beforeEach( async ( { admin, editor } ) => {
+			await admin.visitSiteEditor( {
+				postId: 'emptytheme//single-movie',
+				postType: 'wp_template',
+				canvas: 'edit',
+			} );
 			await editor.openDocumentSettingsSidebar();
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllTemplates( 'wp_template' );
 		} );
 
 		test.describe( 'Block attributes values', () => {
