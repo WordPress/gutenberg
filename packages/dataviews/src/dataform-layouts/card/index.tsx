@@ -11,6 +11,7 @@ import {
 	Card,
 	CardBody,
 	CardHeader as OriginalCardHeader,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useCallback, useContext, useMemo, useState } from '@wordpress/element';
 import { chevronDown, chevronUp } from '@wordpress/icons';
@@ -194,20 +195,18 @@ export default function FormCardField< Item >( {
 		return (
 			<Card className="dataforms-layouts-card__field" size={ sizeCard }>
 				{ withHeader && (
-					<CardHeader
-						className={ clsx(
-							'dataforms-layouts-card__field-header',
-							{
-								'dataforms-layouts-card__field-header-open':
-									// Apply the class only when the field has a description.
-									// This ensures that padding between the header and the body is consistent.
-									isOpen && field.description,
-							}
-						) }
-					>
-						<span className="dataforms-layouts-card__field-header-label">
-							{ field.label }
-						</span>
+					<CardHeader className="dataforms-layouts-card__field-header">
+						<VStack>
+							<span className="dataforms-layouts-card__field-header-label">
+								{ field.label }
+							</span>
+							{ field.description && isOpen && (
+								<div className="dataforms-layouts-card__field-header-description">
+									{ field.description }
+								</div>
+							) }
+						</VStack>
+
 						{ visibleSummaryFields.length > 0 &&
 							layout.withHeader && (
 								<div className="dataforms-layouts-card__field-summary">
@@ -231,11 +230,6 @@ export default function FormCardField< Item >( {
 						size={ sizeCardBody }
 						className="dataforms-layouts-card__field-control"
 					>
-						{ field.description && (
-							<div className="dataforms-layouts-card__field-description">
-								{ field.description }
-							</div>
-						) }
 						<DataFormLayout
 							data={ data }
 							form={ form }
