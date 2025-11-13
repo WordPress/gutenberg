@@ -45,14 +45,11 @@ function BlockAttributeToolsPanelItem( {
 	const { selectBlock, toggleBlockSpotlight } = unlock(
 		useDispatch( blockEditorStore )
 	);
-	const { isBlockSelected } = useSelect( blockEditorStore );
+	const isSelected = useSelect(
+		( select ) => select( blockEditorStore ).isBlockSelected( clientId ),
+		[ clientId ]
+	);
 	const ControlComponent = controls[ control.type ];
-
-	if ( ! ControlComponent ) {
-		return null;
-	}
-
-	const isSelected = isBlockSelected( clientId );
 
 	const handleClick = () => {
 		// Navigate to block without changing focus (keeps focus in sidebar)
@@ -137,15 +134,17 @@ function BlockFields( { clientId } ) {
 			panelId={ clientId }
 			dropdownMenuProps={ popoverPlacementProps }
 		>
-			{ blockType?.fields?.map( ( field, index ) => (
-				<BlockAttributeToolsPanelItem
-					key={ `${ clientId }/${ index }` }
-					clientId={ clientId }
-					control={ field }
-					blockType={ blockType }
-					attributeValues={ attributes }
-				/>
-			) ) }
+			{ blockType?.fields
+				?.filter( ( field ) => controls[ field.type ] )
+				.map( ( field, index ) => (
+					<BlockAttributeToolsPanelItem
+						key={ `${ clientId }/${ index }` }
+						clientId={ clientId }
+						control={ field }
+						blockType={ blockType }
+						attributeValues={ attributes }
+					/>
+				) ) }
 		</ToolsPanel>
 	);
 }
