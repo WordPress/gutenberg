@@ -196,7 +196,8 @@ async function loadAssets(
 	scriptsData: Record< string, Script >,
 	inlineScripts: Record< 'before' | 'after', Record< string, InlineScript > >,
 	stylesData: Record< string, Style >,
-	inlineStyles: Record< 'before' | 'after', Record< string, InlineStyle > >
+	inlineStyles: Record< 'before' | 'after', Record< string, InlineStyle > >,
+	htmlTemplates?: string[]
 ): Promise< void > {
 	// Build dependency-ordered lists
 	const orderedStyles = buildDependencyOrderedList( stylesData );
@@ -250,6 +251,42 @@ async function loadAssets(
 	} )();
 
 	await Promise.all( [ Promise.all( stylePromises ), scriptsPromise ] );
+
+	// Inject HTML templates (e.g., wp.media templates) into the DOM
+	// Note: We can't use innerHTML for script tags, so we need to parse and create elements properly
+	if ( htmlTemplates && htmlTemplates.length > 0 ) {
+		htmlTemplates.forEach( ( templateHtml ) => {
+			// Extract the script tag attributes and content
+			const scriptMatch = templateHtml.match(
+				/<script([^>]*)>(.*?)<\/script>/is
+			);
+			if ( scriptMatch ) {
+				const attributes = scriptMatch[ 1 ];
+				const content = scriptMatch[ 2 ];
+
+				// Create a new script element
+				const script = document.createElement( 'script' );
+
+				// Extract and set the id attribute
+				const idMatch = attributes.match( /id=["']([^"']+)["']/ );
+				if ( idMatch ) {
+					script.id = idMatch[ 1 ];
+				}
+
+				// Extract and set the type attribute
+				const typeMatch = attributes.match( /type=["']([^"']+)["']/ );
+				if ( typeMatch ) {
+					script.type = typeMatch[ 1 ];
+				}
+
+				// Set the content
+				script.textContent = content;
+
+				// Append to body
+				document.body.appendChild( script );
+			}
+		} );
+	}
 }
 
 export default loadAssets;

@@ -40,13 +40,8 @@ type RampTableProps = {
 			name: keyof Ramp;
 			value: string;
 		};
-		ramp: Record<
-			keyof Ramp,
-			{
-				color: string;
-				warning: boolean;
-			}
-		>;
+		ramp: Record< keyof Ramp, string >;
+		warnings?: string[];
 	}[];
 };
 export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
@@ -72,26 +67,26 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 								padding: '8px 4px',
 								fontSize: 11,
 								fontWeight: 500,
-								color: ramps[ 0 ].ramp.fgSurface4.color,
+								color: ramps[ 0 ].ramp.fgSurface4,
 							} }
 						>
 							{ abbr }
 						</div>
 					) ) }
-					{ ramps.map( ( { seed, ramp }, i ) =>
+					{ ramps.map( ( { seed, ramp, warnings = [] }, i ) =>
 						RAMP_TOKENS_ORDER.map( ( { tokenName } ) => (
 							<div
 								key={ `${ seed }-${ i }-${ tokenName }` }
 								style={ {
 									marginBlockStart: i !== 0 ? 4 : 0,
-									backgroundColor: ramp[ tokenName ].color,
+									backgroundColor: ramp[ tokenName ],
 									display: 'grid',
 									gridTemplateRows: '20px 1fr',
 									placeItems: 'center',
 									height: tokenName === seed.name ? 60 : 40,
 									minWidth: 32,
 									fontSize: 14,
-									outline: ramp[ tokenName ].warning
+									outline: warnings.includes( tokenName )
 										? '2px solid red'
 										: '',
 									outlineOffset: '-2px',
@@ -111,8 +106,8 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 											fontWeight: 500,
 											color:
 												tokenName === 'surface2'
-													? ramp.fgSurface4.color
-													: ramp.fgFill.color,
+													? ramp.fgSurface4
+													: ramp.fgFill,
 										} }
 									>
 										SEED
@@ -139,32 +134,28 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 											<>
 												<span
 													style={ {
-														color: ramp.fgSurface1
-															.color,
+														color: ramp.fgSurface1,
 													} }
 												>
 													Aa
 												</span>
 												<span
 													style={ {
-														color: ramp.fgSurface2
-															.color,
+														color: ramp.fgSurface2,
 													} }
 												>
 													Aa
 												</span>
 												<span
 													style={ {
-														color: ramp.fgSurface3
-															.color,
+														color: ramp.fgSurface3,
 													} }
 												>
 													Aa
 												</span>
 												<span
 													style={ {
-														color: ramp.fgSurface4
-															.color,
+														color: ramp.fgSurface4,
 													} }
 												>
 													Aa
@@ -174,7 +165,7 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 										{ tokenName === 'bgFill1' ? (
 											<span
 												style={ {
-													color: ramp.fgFill.color,
+													color: ramp.fgFill,
 												} }
 											>
 												Aa
@@ -183,8 +174,7 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 										{ tokenName === 'bgFillInverted1' ? (
 											<span
 												style={ {
-													color: ramp.fgFillInverted
-														.color,
+													color: ramp.fgFillInverted,
 												} }
 											>
 												Aa
@@ -193,8 +183,7 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 										{ tokenName === 'bgFillDark' ? (
 											<span
 												style={ {
-													color: ramp.fgFillDark
-														.color,
+													color: ramp.fgFillDark,
 												} }
 											>
 												Aa

@@ -2,9 +2,12 @@
 
 ## Unreleased
 
+## 10.3.0 (2025-11-12)
+
 ### Enhancements
 
 - DataForm: Adjust padding bottom for DataForm cards when open. [#73207](https://github.com/WordPress/gutenberg/pull/73207)
+- Improve docs for Edit component. [#73202](https://github.com/WordPress/gutenberg/pull/73202)
 - DataForm: add new details layout. [#72355](https://github.com/WordPress/gutenberg/pull/72355)
 - DatViews list layout: remove link variant from primary actions's button. [#72920](https://github.com/WordPress/gutenberg/pull/72920)
 - DataForm: simplify form normalization. [#72848](https://github.com/WordPress/gutenberg/pull/72848)
@@ -13,6 +16,7 @@
 - DataViews: Simplify the view config properties section. [#73064](https://github.com/WordPress/gutenberg/pull/73064)
 - DataViews: Add a contextual menu to the table layout header. [#73104](https://github.com/WordPress/gutenberg/pull/73104)
 - DataViewsPicker: Add table layout support. [#72914](https://github.com/WordPress/gutenberg/pull/72914)
+- DataForm: use envelope icon instead of atSymbol for email control component. [#73184](https://github.com/WordPress/gutenberg/pull/73184)
 
 ### Bug fixes
 

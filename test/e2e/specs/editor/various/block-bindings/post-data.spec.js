@@ -19,10 +19,6 @@ test.describe( 'Post Data source', () => {
 		await requestUtils.deleteAllPosts();
 	} );
 
-	test.afterEach( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllPosts();
-	} );
-
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 		await requestUtils.deactivatePlugin( 'gutenberg-test-block-bindings' );

@@ -19,6 +19,7 @@
 		{ "path": "../lazy-editor" },
 		{ "path": "../primitives" },
 		{ "path": "../private-apis" },
+		{ "path": "../route" },
 		{ "path": "../theme" },
 		{ "path": "../url" }
 	]

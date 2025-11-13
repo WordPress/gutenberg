@@ -27,7 +27,7 @@ export const italic = {
 	tagName: 'em',
 	className: null,
 	[ essentialFormatKey ]: true,
-	edit( { isActive, value, onChange, onFocus } ) {
+	edit( { isActive, value, onChange, onFocus, isVisible = true } ) {
 		function onToggle() {
 			onChange( toggleFormat( value, { type: name, title } ) );
 		}
@@ -44,15 +44,17 @@ export const italic = {
 					character="i"
 					onUse={ onToggle }
 				/>
-				<RichTextToolbarButton
-					name="italic"
-					icon={ formatItalic }
-					title={ title }
-					onClick={ onClick }
-					isActive={ isActive }
-					shortcutType="primary"
-					shortcutCharacter="i"
-				/>
+				{ isVisible && (
+					<RichTextToolbarButton
+						name="italic"
+						icon={ formatItalic }
+						title={ title }
+						onClick={ onClick }
+						isActive={ isActive }
+						shortcutType="primary"
+						shortcutCharacter="i"
+					/>
+				) }
 				<__unstableRichTextInputEvent
 					inputType="formatItalic"
 					onInput={ onToggle }

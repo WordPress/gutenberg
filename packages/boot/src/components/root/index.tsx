@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { Outlet, useMatches } from '@tanstack/react-router';
 import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
+import { privateApis as routePrivateApis } from '@wordpress/route';
 // @ts-expect-error Commands is not typed properly.
 import { CommandMenu } from '@wordpress/commands';
 import { privateApis as themePrivateApis } from '@wordpress/theme';
@@ -22,6 +22,7 @@ import type { CanvasData } from '../../store/types';
 import './style.scss';
 
 const { ThemeProvider } = unlock( themePrivateApis );
+const { useMatches, Outlet } = unlock( routePrivateApis );
 
 export default function Root() {
 	const matches = useMatches();

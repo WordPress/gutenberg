@@ -5,7 +5,7 @@ import {
 	Icon,
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 } from '@wordpress/components';
-import { atSymbol } from '@wordpress/icons';
+import { envelope } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -31,7 +31,7 @@ export default function Email< Item >( {
 				type: 'email',
 				prefix: (
 					<InputControlPrefixWrapper variant="icon">
-						<Icon icon={ atSymbol } />
+						<Icon icon={ envelope } />
 					</InputControlPrefixWrapper>
 				),
 			} }

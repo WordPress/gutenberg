@@ -1,4 +1,8 @@
-# (Experimental) Upload Media
+# Upload Media
+
+<div class="callout callout-alert">
+This package is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+</div>
 
 This module is a media upload handler with a queue-like system that is implemented using a custom `@wordpress/data` store.
 

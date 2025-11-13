@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { Outlet, useMatches } from '@tanstack/react-router';
 import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
+import { privateApis as routePrivateApis } from '@wordpress/route';
 // @ts-expect-error Commands is not typed properly.
 import { CommandMenu } from '@wordpress/commands';
 import { privateApis as themePrivateApis } from '@wordpress/theme';
@@ -20,6 +20,7 @@ import { unlock } from '../../lock-unlock';
 import type { CanvasData } from '../../store/types';
 import './style.scss';
 
+const { useMatches, Outlet } = unlock( routePrivateApis );
 const { ThemeProvider } = unlock( themePrivateApis );
 
 /**

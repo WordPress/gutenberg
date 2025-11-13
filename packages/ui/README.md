@@ -1,4 +1,8 @@
-# (Experimental) UI
+# UI
+
+<div class="callout callout-alert">
+This package is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+</div>
 
 A package that provides React UI components for the WordPress Design System, built on themeable design tokens.
 

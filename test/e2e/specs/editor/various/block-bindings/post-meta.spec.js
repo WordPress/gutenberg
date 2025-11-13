@@ -11,11 +11,8 @@ test.describe( 'Post Meta source', () => {
 		await requestUtils.activatePlugin( 'gutenberg-test-block-bindings' );
 	} );
 
-	test.afterEach( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllPosts();
-	} );
-
 	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllPosts( 'movie' );
 		await requestUtils.deleteAllMedia();
 		await requestUtils.activateTheme( 'twentytwentyone' );
 		await requestUtils.deactivatePlugin( 'gutenberg-test-block-bindings' );

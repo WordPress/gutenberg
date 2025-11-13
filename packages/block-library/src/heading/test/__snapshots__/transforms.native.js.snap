@@ -32,12 +32,6 @@ exports[`Heading block transforms to Paragraph block 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
-exports[`Heading block transforms to Pullquote block 1`] = `
-"<!-- wp:pullquote -->
-<figure class="wp-block-pullquote"><blockquote><p>Example text</p></blockquote></figure>
-<!-- /wp:pullquote -->"
-`;
-
 exports[`Heading block transforms to Quote block 1`] = `
 "<!-- wp:quote -->
 <blockquote class="wp-block-quote"><!-- wp:heading -->

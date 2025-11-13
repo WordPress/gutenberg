@@ -398,6 +398,7 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 			wp_enqueue_style( 'wp-editor' );
 			wp_enqueue_style( 'wp-block-library' );
 			wp_enqueue_style( 'wp-format-library' );
+			wp_enqueue_media();
 
 			do_action( 'enqueue_block_editor_assets' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
@@ -419,10 +420,16 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 			do_action( "admin_print_footer_scripts-{$hook_suffix}" ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores, WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 			do_action( 'admin_print_footer_scripts' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 			do_action( "admin_footer-{$hook_suffix}" ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores, WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
-			ob_get_clean();
+			$html_output = ob_get_clean();
+			// Extract all script tags with type="text/html" (WordPress media templates use text/html, not text/template).
+			// Templates are already in html_output from the admin_footer hook.
+			$html_templates = array();
+			if ( preg_match_all( '/<script[^>]*type\s*=\s*["\']text\/html["\'][^>]*>.*?<\/script>/is', $html_output, $matches ) ) {
+				$html_templates = $matches[0];
+			}
 
 			// Process the captured assets.
-			return rest_ensure_response( $this->process_assets() );
+			return rest_ensure_response( $this->process_assets( $html_templates ) );
 		}
 
 		/**
@@ -430,9 +437,10 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 		 *
 		 * @since Gutenberg 5.8.0
 		 *
+		 * @param array $html_templates Optional. Array of HTML template strings.
 		 * @return array Structured asset data.
 		 */
-		private function process_assets() {
+		private function process_assets( $html_templates = array() ) {
 			global $wp_scripts, $wp_styles;
 
 			$styles_data    = array();
@@ -541,6 +549,7 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 				'styles'         => $styles_data,
 				'inline_scripts' => $inline_scripts,
 				'inline_styles'  => $inline_styles,
+				'html_templates' => $html_templates,
 			);
 		}
 

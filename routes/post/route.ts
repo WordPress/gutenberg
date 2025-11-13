@@ -1,14 +1,13 @@
 /**
+ * WordPress dependencies
+ */
+import { redirect } from '@wordpress/route';
+
+/**
  * Route configuration for post redirect.
  */
 export const route = {
-	beforeLoad: ( {
-		params,
-		redirect,
-	}: {
-		params: { type: string };
-		redirect: Function;
-	} ) => {
+	beforeLoad: ( { params }: { params: { type: string } } ) => {
 		throw redirect( {
 			throw: true,
 			to: '/types/$type/list/$slug',

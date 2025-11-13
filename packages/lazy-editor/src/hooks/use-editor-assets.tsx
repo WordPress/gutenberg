@@ -22,7 +22,8 @@ export async function loadEditorAssets() {
 			editorAssets.scripts || {},
 			editorAssets.inline_scripts || { before: {}, after: {} },
 			editorAssets.styles || {},
-			editorAssets.inline_styles || { before: {}, after: {} }
+			editorAssets.inline_styles || { before: {}, after: {} },
+			editorAssets.html_templates || []
 		);
 	};
 

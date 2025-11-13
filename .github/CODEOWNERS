@@ -89,7 +89,7 @@
 /packages/base-styles
 /packages/icons
 /packages/primitives
-/packages/dataviews                              @oandregal
+/packages/dataviews                              @oandregal @gigitux @ntsekouras 
 
 # Utilities
 /packages/a11y
