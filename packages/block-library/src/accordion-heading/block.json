@@ -9,8 +9,7 @@
 	"usesContext": [
 		"core/accordion-icon-position",
 		"core/accordion-show-icon",
-		"core/accordion-heading-level",
-		"clientId"
+		"core/accordion-heading-level"
 	],
 	"supports": {
 		"anchor": true,
