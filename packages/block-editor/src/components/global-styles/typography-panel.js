@@ -619,7 +619,7 @@ export default function TypographyPanel( {
 						<div>
 							<Notice status="warning" isDismissible={ false }>
 								{ __(
-									'Justified text can reduce readability, especially for users with visual or cognitive impairments. For better accessibility and legibility, consider using left-aligned text instead.'
+									'Justified text can reduce readability. For better accessibility, use left-aligned text instead.'
 								) }
 							</Notice>
 						</div>
