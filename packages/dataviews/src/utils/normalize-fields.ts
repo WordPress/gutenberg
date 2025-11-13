@@ -189,24 +189,22 @@ export default function normalizeFields< Item >(
 
 		const filterBy = getFilterBy( field, fieldTypeDefinition );
 
-		let format = {};
-		if ( field.type === 'date' ) {
-			format = {
-				date:
-					field.format?.date !== undefined &&
-					typeof field.format.date === 'string'
-						? field.format.date
-						: getSettings().formats.date,
-				weekStartsOn: DAYS_OF_WEEK.includes(
-					field.format?.weekStartsOn as DayString
-				)
-					? field?.format?.weekStartsOn
-					: numberToWeekStartsOn( getSettings().l10n.startOfWeek ),
-			};
-		}
+		/**
+		 * NormalizedField is a discriminated union type: the shape of the format property
+		 * depends on the type property. For example, for the 'date' type, the format
+		 * contains date or weekStartsOn — which are not valid for other types.
+		 *
+		 * Being type and format interdependent, we need to write the code
+		 * in a way that TypeScript is able to statically infer the types.
+		 * That's why we have a return branch for every item in the union type.
+		 *
+		 * See a longer explanation with examples at
+		 * https://github.com/WordPress/gutenberg/pull/72999#discussion_r2523145453
+		 */
+		const { type, ...fieldWithoutType } = field;
 
-		return {
-			...field,
+		const baseField = {
+			...fieldWithoutType,
 			label: field.label || field.id,
 			header: field.header || field.label || field.id,
 			getValue,
@@ -223,7 +221,30 @@ export default function normalizeFields< Item >(
 				true,
 			filterBy,
 			readOnly: field.readOnly ?? fieldTypeDefinition.readOnly ?? false,
-			format,
+			format: {},
 		};
+
+		if ( field.type === 'date' ) {
+			const format = {
+				date:
+					field.format?.date !== undefined &&
+					typeof field.format.date === 'string'
+						? field.format.date
+						: getSettings().formats.date,
+				weekStartsOn: DAYS_OF_WEEK.includes(
+					field.format?.weekStartsOn as DayString
+				)
+					? field?.format?.weekStartsOn
+					: numberToWeekStartsOn( getSettings().l10n.startOfWeek ),
+			};
+
+			return {
+				...baseField,
+				type: 'date',
+				format,
+			};
+		}
+
+		return { ...baseField, type: field.type, format: {} };
 	} );
 }

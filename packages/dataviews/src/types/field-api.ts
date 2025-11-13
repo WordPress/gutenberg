@@ -337,7 +337,7 @@ export type DayString =
 	| 'friday'
 	| 'saturday';
 
-export type NormalizedField< Item > = Omit< Field< Item >, 'Edit' > & {
+type NormalizedFieldBase< Item > = Omit< Field< Item >, 'Edit' > & {
 	label: string;
 	header: string | ReactElement;
 	getValue: ( args: { item: Item } ) => any;
@@ -351,8 +351,21 @@ export type NormalizedField< Item > = Omit< Field< Item >, 'Edit' > & {
 	enableSorting: boolean;
 	filterBy: NormalizedFilterByConfig | false;
 	readOnly: boolean;
-	format: {} | Required< FormatDate >;
 };
+
+type NormalizedFieldDate< Item > = NormalizedFieldBase< Item > & {
+	type: 'date';
+	format: Required< FormatDate >;
+};
+
+type NormalizedFieldGeneric< Item > = NormalizedFieldBase< Item > & {
+	type?: Exclude< FieldType, 'date' >;
+	format: {};
+};
+
+export type NormalizedField< Item > =
+	| NormalizedFieldGeneric< Item >
+	| NormalizedFieldDate< Item >;
 
 /**
  * A collection of dataview fields for a data type.
