@@ -40,7 +40,7 @@ const NonCollapsibleCardHeader = ( {
 	<OriginalCardHeader isBorderless { ...props }>
 		<div
 			style={ {
-				height: '40px', // This is to match the chevron's __next40pxDefaultSize
+				height: '24px', // This is to match the chevron's variant="small"
 				width: '100%',
 				display: 'flex',
 				justifyContent: 'space-between',
