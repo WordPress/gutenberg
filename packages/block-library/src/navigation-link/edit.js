@@ -8,9 +8,13 @@ import clsx from 'clsx';
  */
 import { createBlock } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
+import {
+	ToolbarButton,
+	ToolbarGroup,
+	VisuallyHidden,
+} from '@wordpress/components';
 import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	BlockControls,
 	InspectorControls,
@@ -26,13 +30,19 @@ import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
-import { useMergeRefs, usePrevious } from '@wordpress/compose';
+import { useMergeRefs, usePrevious, useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { getColors } from '../navigation/edit/utils';
-import { Controls, LinkUI, updateAttributes, useEntityBinding } from './shared';
+import {
+	Controls,
+	LinkUI,
+	updateAttributes,
+	useEntityBinding,
+	MissingEntityHelpText,
+} from './shared';
 
 const DEFAULT_BLOCK = { name: 'core/navigation-link' };
 const NESTING_BLOCK_NAMES = [
@@ -394,6 +404,12 @@ export default function NavigationLinkEdit( {
 		}
 	}
 
+	const instanceId = useInstanceId( NavigationLinkEdit );
+	const hasMissingEntity = hasUrlBinding && ! isBoundEntityAvailable;
+	const missingEntityDescriptionId = hasMissingEntity
+		? sprintf( 'navigation-link-edit-%d-desc', instanceId )
+		: undefined;
+
 	const blockProps = useBlockProps( {
 		ref: useMergeRefs( [ setPopoverAnchor, listItemRef ] ),
 		className: clsx( 'wp-block-navigation-item', {
@@ -407,6 +423,8 @@ export default function NavigationLinkEdit( {
 			[ getColorClassName( 'background-color', backgroundColor ) ]:
 				!! backgroundColor,
 		} ),
+		'aria-describedby': missingEntityDescriptionId,
+		'aria-invalid': hasMissingEntity,
 		style: {
 			color: ! textColor && customTextColor,
 			backgroundColor: ! backgroundColor && customBackgroundColor,
@@ -482,6 +500,11 @@ export default function NavigationLinkEdit( {
 				/>
 			</InspectorControls>
 			<div { ...blockProps }>
+				{ hasMissingEntity && (
+					<VisuallyHidden id={ missingEntityDescriptionId }>
+						<MissingEntityHelpText type={ type } kind={ kind } />
+					</VisuallyHidden>
+				) }
 				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
 				<a className={ classes }>
 					{ /* eslint-enable */ }
