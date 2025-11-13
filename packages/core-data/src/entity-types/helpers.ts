@@ -110,7 +110,7 @@ export type OmitNevers<
  * rendering to a page view. Similarly, plugins might modify
  * content or replace shortcodes.
  */
-export type RenderedText< C extends Context > = OmitNevers< {
+export interface RenderedText< C extends Context > {
 	/**
 	 * The source string which will be rendered on page views.
 	 */
@@ -119,7 +119,7 @@ export type RenderedText< C extends Context > = OmitNevers< {
 	 * The output of the raw source after processing and filtering on the server.
 	 */
 	rendered: string;
-} >;
+}
 
 /**
  * Updatable<EntityRecord> is a type describing Edited Entity Records. They are like

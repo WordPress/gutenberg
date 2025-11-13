@@ -3,7 +3,8 @@
 	"date": "2025-11-03T05:34:25",
 	"date_gmt": "2025-11-03T05:34:25",
 	"guid": {
-		"rendered": "http://localhost:8888/wp-content/uploads/2025/11/IMG_8141.jpeg"
+		"rendered": "http://localhost:8888/wp-content/uploads/2025/11/IMG_8141.jpeg",
+		"raw": "http://localhost:8888/wp-content/uploads/2025/11/IMG_8141.jpeg"
 	},
 	"modified": "2025-11-12T23:17:38",
 	"modified_gmt": "2025-11-12T23:17:38",
@@ -12,6 +13,7 @@
 	"type": "attachment",
 	"link": "http://localhost:8888/?attachment_id=71",
 	"title": {
+		"raw": "IMG_8141",
 		"rendered": "IMG_8141"
 	},
 	"author": 1,
@@ -20,6 +22,8 @@
 	"ping_status": "closed",
 	"template": "",
 	"meta": [],
+	"permalink_template": "http://localhost:8888/?attachment_id=71",
+	"generated_slug": "img_8141",
 	"class_list": [
 		"post-71",
 		"attachment",
@@ -28,9 +32,11 @@
 		"hentry"
 	],
 	"description": {
+		"raw": "",
 		"rendered": "<p class=\"attachment\"><a href='http://localhost:8888/wp-content/uploads/2025/11/IMG_8141-scaled.jpeg'><img loading=\"lazy\" decoding=\"async\" width=\"300\" height=\"225\" src=\"http://localhost:8888/wp-content/uploads/2025/11/IMG_8141-300x225.jpeg\" class=\"attachment-medium size-medium\" alt=\"\" srcset=\"http://localhost:8888/wp-content/uploads/2025/11/IMG_8141-300x225.jpeg 300w, http://localhost:8888/wp-content/uploads/2025/11/IMG_8141-1024x768.jpeg 1024w, http://localhost:8888/wp-content/uploads/2025/11/IMG_8141-768x576.jpeg 768w, http://localhost:8888/wp-content/uploads/2025/11/IMG_8141-1536x1152.jpeg 1536w, http://localhost:8888/wp-content/uploads/2025/11/IMG_8141-2048x1536.jpeg 2048w\" sizes=\"auto, (max-width: 300px) 100vw, 300px\" /></a></p>\n"
 	},
 	"caption": {
+		"raw": "A caption for the image",
 		"rendered": "<p>A caption for the image</p>\n"
 	},
 	"alt_text": "",
@@ -116,6 +122,7 @@
 	},
 	"post": 49,
 	"source_url": "http://localhost:8888/wp-content/uploads/2025/11/IMG_8141-scaled.jpeg",
+	"missing_image_sizes": [],
 	"_links": {
 		"self": [
 			{
@@ -145,6 +152,23 @@
 			{
 				"embeddable": true,
 				"href": "http://localhost:8888/wp-json/wp/v2/comments?post=71"
+			}
+		],
+		"wp:action-unfiltered-html": [
+			{
+				"href": "http://localhost:8888/wp-json/wp/v2/media/71"
+			}
+		],
+		"wp:action-assign-author": [
+			{
+				"href": "http://localhost:8888/wp-json/wp/v2/media/71"
+			}
+		],
+		"curies": [
+			{
+				"name": "wp",
+				"href": "https://api.w.org/{rel}",
+				"templated": true
 			}
 		]
 	}

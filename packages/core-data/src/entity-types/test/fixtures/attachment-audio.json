@@ -3,7 +3,8 @@
 	"date": "2025-11-12T23:02:13",
 	"date_gmt": "2025-11-12T23:02:13",
 	"guid": {
-		"rendered": "http://localhost:8888/wp-content/uploads/2025/11/sample.mp3"
+		"rendered": "http://localhost:8888/wp-content/uploads/2025/11/sample.mp3",
+		"raw": "http://localhost:8888/wp-content/uploads/2025/11/sample.mp3"
 	},
 	"modified": "2025-11-12T23:03:26",
 	"modified_gmt": "2025-11-12T23:03:26",
@@ -12,6 +13,7 @@
 	"type": "attachment",
 	"link": "http://localhost:8888/sample-audio/",
 	"title": {
+		"raw": "Sample Audio",
 		"rendered": "Sample Audio"
 	},
 	"author": 1,
@@ -20,6 +22,8 @@
 	"ping_status": "closed",
 	"template": "",
 	"meta": [],
+	"permalink_template": "http://localhost:8888/?attachment_id=125",
+	"generated_slug": "sample-audio",
 	"class_list": [
 		"post-125",
 		"attachment",
@@ -29,9 +33,11 @@
 		"hentry"
 	],
 	"description": {
-		"rendered": "<!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->\n<audio class=\"wp-audio-shortcode\" id=\"audio-125-1\" preload=\"none\" style=\"width: 100%;\" controls=\"controls\"><source type=\"audio/mpeg\" src=\"http://localhost:8888/wp-content/uploads/2025/11/sample.mp3?_=1\" /><a href=\"http://localhost:8888/wp-content/uploads/2025/11/sample.mp3\">http://localhost:8888/wp-content/uploads/2025/11/sample.mp3</a></audio>\n"
+		"raw": "Sample audio file",
+		"rendered": "<!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->\n<audio class=\"wp-audio-shortcode\" id=\"audio-125-1\" preload=\"none\" style=\"width: 100%;\" controls=\"controls\"><source type=\"audio/mpeg\" src=\"http://localhost:8888/wp-content/uploads/2025/11/sample.mp3?_=1\" /><a href=\"http://localhost:8888/wp-content/uploads/2025/11/sample.mp3\">http://localhost:8888/wp-content/uploads/2025/11/sample.mp3</a></audio>\n<p>Sample audio file</p>\n"
 	},
 	"caption": {
+		"raw": "",
 		"rendered": "<p>Sample audio file</p>\n"
 	},
 	"alt_text": "",
@@ -73,6 +79,7 @@
 	},
 	"post": null,
 	"source_url": "http://localhost:8888/wp-content/uploads/2025/11/sample.mp3",
+	"missing_image_sizes": [],
 	"_links": {
 		"self": [
 			{
@@ -84,7 +91,7 @@
 		],
 		"collection": [
 			{
-				"href": "http://localhost:8888/wp-json/wp/media"
+				"href": "http://localhost:8888/wp-json/wp/v2/media"
 			}
 		],
 		"about": [
@@ -108,6 +115,16 @@
 			{
 				"embeddable": true,
 				"href": "http://localhost:8888/wp-json/wp/v2/media/126"
+			}
+		],
+		"wp:action-unfiltered-html": [
+			{
+				"href": "http://localhost:8888/wp-json/wp/v2/media/125"
+			}
+		],
+		"wp:action-assign-author": [
+			{
+				"href": "http://localhost:8888/wp-json/wp/v2/media/125"
 			}
 		],
 		"curies": [

@@ -3,7 +3,8 @@
 	"date": "2025-11-06T05:11:23",
 	"date_gmt": "2025-11-06T05:11:23",
 	"guid": {
-		"rendered": "http://localhost:8888/wp-content/uploads/2025/11/sample-5s.mp4"
+		"rendered": "http://localhost:8888/wp-content/uploads/2025/11/sample-5s.mp4",
+		"raw": "http://localhost:8888/wp-content/uploads/2025/11/sample-5s.mp4"
 	},
 	"modified": "2025-11-06T05:11:23",
 	"modified_gmt": "2025-11-06T05:11:23",
@@ -12,6 +13,7 @@
 	"type": "attachment",
 	"link": "http://localhost:8888/sample-video/",
 	"title": {
+		"raw": "Sample Video",
 		"rendered": "Sample Video"
 	},
 	"author": 1,
@@ -20,6 +22,8 @@
 	"ping_status": "closed",
 	"template": "",
 	"meta": [],
+	"permalink_template": "http://localhost:8888/?attachment_id=93",
+	"generated_slug": "sample-video",
 	"class_list": [
 		"post-93",
 		"attachment",
@@ -28,9 +32,11 @@
 		"hentry"
 	],
 	"description": {
+		"raw": "",
 		"rendered": "<div style=\"width: 1920px;\" class=\"wp-video\"><!--[if lt IE 9]><script>document.createElement('video');</script><![endif]-->\n<video class=\"wp-video-shortcode\" id=\"video-93-1\" width=\"1920\" height=\"1080\" preload=\"metadata\" controls=\"controls\"><source type=\"video/mp4\" src=\"http://localhost:8888/wp-content/uploads/2025/11/sample-5s.mp4?_=1\" /><a href=\"http://localhost:8888/wp-content/uploads/2025/11/sample-5s.mp4\">http://localhost:8888/wp-content/uploads/2025/11/sample-5s.mp4</a></video></div>\n"
 	},
 	"caption": {
+		"raw": "",
 		"rendered": "<p>Sample video file</p>\n"
 	},
 	"alt_text": "",
@@ -62,6 +68,7 @@
 	},
 	"post": 75,
 	"source_url": "http://localhost:8888/wp-content/uploads/2025/11/sample-5s.mp4",
+	"missing_image_sizes": [],
 	"_links": {
 		"self": [
 			{
@@ -91,6 +98,23 @@
 			{
 				"embeddable": true,
 				"href": "http://localhost:8888/wp-json/wp/v2/comments?post=93"
+			}
+		],
+		"wp:action-unfiltered-html": [
+			{
+				"href": "http://localhost:8888/wp-json/wp/v2/media/93"
+			}
+		],
+		"wp:action-assign-author": [
+			{
+				"href": "http://localhost:8888/wp-json/wp/v2/media/93"
+			}
+		],
+		"curies": [
+			{
+				"name": "wp",
+				"href": "https://api.w.org/{rel}",
+				"templated": true
 			}
 		]
 	}
