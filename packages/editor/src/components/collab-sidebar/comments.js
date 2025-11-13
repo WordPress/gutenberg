@@ -496,7 +496,7 @@ function Thread( {
 		if ( isNoteFocused && ! isTabbing ) {
 			return;
 		}
-		// When deleting a note, a dialog appears nut the note should not be closed.
+		//  When deleting a note, a dialog appears, but the note should not be collapsed.
 		if ( isDialogFocused ) {
 			return;
 		}
