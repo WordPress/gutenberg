@@ -6,7 +6,6 @@
 import { spawn } from 'child_process';
 import { fileURLToPath } from 'url';
 import path from 'path';
-import fs from 'fs';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
 const ROOT_DIR = path.resolve( __dirname, '..' );
@@ -95,31 +94,12 @@ function execAsync( command, args = [], options = {} ) {
 }
 
 /**
- * Create and clean up a marker file to signal that the build is ready.
- * The marker file can be watched by other processes that depend on the build.
- */
-const readyMarkerFile = {
-	markerPath: path.join( ROOT_DIR, '.dev-ready' ),
-	create() {
-		fs.writeFileSync( this.markerPath, Date.now().toString() );
-	},
-	cleanup() {
-		if ( fs.existsSync( this.markerPath ) ) {
-			fs.unlinkSync( this.markerPath );
-		}
-	},
-};
-
-/**
  * Main dev orchestration function.
  */
 async function dev() {
 	console.log( '🔨 Starting development build...\n' );
 
 	const startTime = Date.now();
-
-	// Clean up marker file from previous runs
-	readyMarkerFile.cleanup();
 
 	try {
 		// Step 1: Clean packages
@@ -166,9 +146,6 @@ async function dev() {
 			) }s)\n`
 		);
 
-		// Write a marker file to signal that the build is ready
-		readyMarkerFile.create();
-
 		// Step 7: Start watch mode with both TypeScript and package builds
 		console.log( '👀 Starting watch mode...\n' );
 		console.log( '   - TypeScript compiler watching for type changes' );
@@ -191,7 +168,6 @@ async function dev() {
 			console.log( '\n\n👋 Stopping watch mode...' );
 			tscWatch.kill();
 			buildWatch.kill();
-			readyMarkerFile.cleanup();
 			process.exit( 0 );
 		};
 

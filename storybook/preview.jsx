@@ -18,6 +18,7 @@ import { WithMarginChecker } from './decorators/with-margin-checker';
 import { WithMaxWidthWrapper } from './decorators/with-max-width-wrapper';
 import { WithRTL } from './decorators/with-rtl';
 import { WithTheme } from './decorators/with-theme';
+import { WithDesignSystemTheme } from './decorators/with-design-system-theme';
 import badgesConfig from './badges';
 
 export const globalTypes = {
@@ -91,6 +92,8 @@ export const globalTypes = {
 			],
 		},
 	},
+	dsColorTheme: {},
+	dsDensity: {},
 };
 
 export const decorators = [
@@ -99,6 +102,7 @@ export const decorators = [
 	WithRTL,
 	WithMaxWidthWrapper,
 	WithTheme,
+	WithDesignSystemTheme,
 ];
 
 export const parameters = {
