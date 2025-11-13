@@ -3,7 +3,7 @@
  */
 import clsx from 'clsx';
 import {
-	format as formatDateFns,
+	format,
 	isValid as isValidDate,
 	subMonths,
 	subDays,
@@ -148,9 +148,7 @@ const formatDate = ( date?: Date | string ): string => {
 	if ( ! date ) {
 		return '';
 	}
-	return typeof date === 'string'
-		? date
-		: formatDateFns( date, 'yyyy-MM-dd' );
+	return typeof date === 'string' ? date : format( date, 'yyyy-MM-dd' );
 };
 
 function ValidatedDateControl< Item >( {
@@ -260,14 +258,22 @@ function CalendarDateControl< Item >( {
 	hideLabelFromVision,
 	validity,
 }: DataFormControlProps< Item > ) {
-	const { id, type, label, setValue, getValue, isValid, format } = field;
+	const {
+		id,
+		type,
+		label,
+		setValue,
+		getValue,
+		isValid,
+		format: fieldFormat,
+	} = field;
 	const [ selectedPresetId, setSelectedPresetId ] = useState< string | null >(
 		null
 	);
 
 	let weekStartsOn;
 	if ( type === 'date' ) {
-		weekStartsOn = weekStartsOnToNumber( format.weekStartsOn );
+		weekStartsOn = weekStartsOnToNumber( fieldFormat.weekStartsOn );
 	}
 
 	const fieldValue = getValue( { item: data } );
@@ -289,7 +295,7 @@ function CalendarDateControl< Item >( {
 	const onSelectDate = useCallback(
 		( newDate: Date | undefined | null ) => {
 			const dateValue = newDate
-				? formatDateFns( newDate, 'yyyy-MM-dd' )
+				? format( newDate, 'yyyy-MM-dd' )
 				: undefined;
 			onChangeCallback( dateValue );
 			setSelectedPresetId( null );
@@ -418,7 +424,7 @@ function CalendarDateRangeControl< Item >( {
 	hideLabelFromVision,
 	validity,
 }: DataFormControlProps< Item > ) {
-	const { id, type, label, getValue, setValue, format } = field;
+	const { id, type, label, getValue, setValue, format: fieldFormat } = field;
 	let value: DateRange;
 	const fieldValue = getValue( { item: data } );
 	if (
@@ -431,7 +437,7 @@ function CalendarDateRangeControl< Item >( {
 
 	let weekStartsOn;
 	if ( type === 'date' ) {
-		weekStartsOn = weekStartsOnToNumber( format.weekStartsOn );
+		weekStartsOn = weekStartsOnToNumber( fieldFormat.weekStartsOn );
 	}
 
 	const onChangeCallback = useCallback(
