@@ -151,27 +151,13 @@ export function autop( text: string, br: boolean = true ): string {
 	 * Replace pre tags with placeholders and bring them back after autop.
 	 */
 	if ( text.indexOf( '<pre' ) !== -1 ) {
-		const textParts = text.split( '</pre>' );
-		const lastText = textParts.pop();
-		text = '';
-
-		for ( let i = 0; i < textParts.length; i++ ) {
-			const textPart = textParts[ i ];
-			const start = textPart.indexOf( '<pre' );
-
-			// Malformed html?
-			if ( start === -1 ) {
-				text += textPart;
-				continue;
-			}
-
-			const name = '<pre wp-pre-tag-' + i + '></pre>';
-			preTags.push( [ name, textPart.substr( start ) + '</pre>' ] );
-
-			text += textPart.substr( 0, start ) + name;
-		}
-
-		text += lastText;
+		let preIndex = 0;
+		text = text.replace( /<pre[^>]*>[\s\S]*?<\/pre>/gi, ( match ) => {
+			const placeholder = '<pre wp-pre-tag-' + preIndex + '></pre>';
+			preTags.push( [ placeholder, match ] );
+			preIndex++;
+			return placeholder;
+		} );
 	}
 	// Change multiple <br>s into two line breaks, which will turn into paragraphs.
 	text = text.replace( /<br\s*\/?>\s*<br\s*\/?>/g, '\n\n' );
@@ -312,7 +298,8 @@ export function autop( text: string, br: boolean = true ): string {
 	// Replace placeholder <pre> tags with their original content.
 	preTags.forEach( ( preTag ) => {
 		const [ name, original ] = preTag;
-		text = text.replace( name, original );
+		// Use a function to avoid treating special replacement patterns like $' in the original content
+		text = text.replace( name, () => original );
 	} );
 
 	// Restore newlines in all elements.
