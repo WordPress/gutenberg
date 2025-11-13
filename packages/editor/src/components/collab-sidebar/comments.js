@@ -508,6 +508,9 @@ function Thread( {
 			return;
 		}
 
+		// Closes a note that has lost focus when any of the following conditions are met:
+		// - An element other than a note is clicked.
+		// - Focus was lost by tabbing.
 		toggleBlockHighlight( thread.blockClientId, false );
 		unselectThread();
 	};
