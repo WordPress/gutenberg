@@ -8,7 +8,7 @@
 /**
  * Renders the `core/breadcrumbs` block on the server.
  *
- * @since 6.9.0
+ * @since 7.0.0
  *
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
@@ -163,7 +163,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 /**
  * Checks if we're on a paginated view (page 2 or higher).
  *
- * @since 6.9.0
+ * @since 7.0.0
  *
  * @return bool True if paged > 1, false otherwise.
  */
@@ -175,7 +175,7 @@ function block_core_breadcrumbs_is_paged() {
 /**
  * Creates a "Page X" breadcrumb item for paginated views.
  *
- * @since 6.9.0
+ * @since 7.0.0
  * @param string $query_var Optional. Query variable to get current page number. Default 'paged'.
  * @return string The "Page X" breadcrumb HTML.
  */
@@ -191,7 +191,7 @@ function block_core_breadcrumbs_create_page_number_item( $query_var = 'paged' ) 
 /**
  * Creates a breadcrumb link item.
  *
- * @since 6.9.0
+ * @since 7.0.0
  *
  * @param string $url        The URL for the link (will be escaped).
  * @param string $text       The link text (will be escaped).
@@ -210,7 +210,7 @@ function block_core_breadcrumbs_create_link( $url, $text, $allow_html = false ) 
 /**
  * Creates a breadcrumb current page item.
  *
- * @since 6.9.0
+ * @since 7.0.0
  *
  * @param string $text       The text content (will be escaped).
  * @param bool   $allow_html Whether to allow HTML in the text. If true, uses wp_kses_post(), otherwise uses esc_html(). Default false.
@@ -230,7 +230,7 @@ function block_core_breadcrumbs_create_current_item( $text, $allow_html = false 
  * When paginated (is_paged is true), creates a link to page 1.
  * Otherwise, creates a span marked as the current page.
  *
- * @since 6.9.0
+ * @since 7.0.0
  *
  * @param string $text       The text content (will be escaped).
  * @param bool   $is_paged   Whether we're on a paginated view.
@@ -248,7 +248,7 @@ function block_core_breadcrumbs_create_item( $text, $is_paged = false, $allow_ht
 /**
  * Gets a post title with fallback for empty titles.
  *
- * @since 6.9.0
+ * @since 7.0.0
  *
  * @param int|WP_Post $post_id_or_object The post ID or post object.
  *
@@ -265,7 +265,7 @@ function block_core_breadcrumbs_get_post_title( $post_id_or_object ) {
 /**
  * Generates breadcrumb items from hierarchical post type ancestors.
  *
- * @since 6.9.0
+ * @since 7.0.0
  *
  * @param int $post_id   The post ID.
  *
@@ -291,7 +291,7 @@ function block_core_breadcrumbs_get_hierarchical_post_type_breadcrumbs( $post_id
  *
  * For hierarchical taxonomies, retrieves and formats ancestor terms as breadcrumb links.
  *
- * @since 6.9.0
+ * @since 7.0.0
  *
  * @param int    $term_id  The term ID.
  * @param string $taxonomy The taxonomy name.
@@ -325,7 +325,7 @@ function block_core_breadcrumbs_get_term_ancestors_items( $term_id, $taxonomy ) 
  * Handles taxonomy archives, post type archives, date archives, and author archives.
  * For hierarchical taxonomies, includes ancestor terms in the breadcrumb trail.
  *
- * @since 6.9.0
+ * @since 7.0.0
  *
  * @return array Array of breadcrumb HTML items.
  */
@@ -457,7 +457,7 @@ function block_core_breadcrumbs_get_archive_breadcrumbs() {
  * Finds the first publicly queryable taxonomy with terms assigned to the post
  * and generates breadcrumb links, including hierarchical term ancestors if applicable.
  *
- * @since 6.9.0
+ * @since 7.0.0
  *
  * @param int    $post_id   The post ID.
  * @param string $post_type The post type name.
@@ -479,21 +479,69 @@ function block_core_breadcrumbs_get_terms_breadcrumbs( $post_id, $post_type ) {
 		return array();
 	}
 
-	// Find the first taxonomy that has terms assigned to this post.
+	/**
+	 * Filters the preferred taxonomy and term for breadcrumbs on a per-post-type basis.
+	 *
+	 * Allows developers to specify which taxonomy and term should be used in breadcrumbs
+	 * when a post has multiple taxonomies or terms assigned.
+	 *
+	 * The preferred taxonomy must have terms assigned to the post, otherwise falls back to the first available taxonomy.
+	 *
+	 * The preferred term must exist and be assigned to the post. If the post has only one term, it's used regardless of preference.
+	 * If the preferred term is not found, falls back to the first term.
+	 *
+	 * @since 7.0.0
+	 *
+	 * @param array  $preferences {
+	 *     Array of breadcrumb preferences. Default empty array.
+	 *
+	 *     @type string $preferred_taxonomy Optional. Taxonomy slug to prefer for breadcrumbs.
+	 *     @type string $preferred_term     Optional. Term slug to prefer when post has multiple terms.
+	 * }
+	 * @param string $post_type   The post type slug.
+	 */
+	$preferences = apply_filters( 'block_core_breadcrumbs_post_type_preferences', array(), $post_type );
+
 	$taxonomy_name = null;
 	$terms         = array();
-	foreach ( $taxonomies as $taxonomy ) {
-		$post_terms = get_the_terms( $post_id, $taxonomy->name );
-		if ( ! empty( $post_terms ) && ! is_wp_error( $post_terms ) ) {
-			$taxonomy_name = $taxonomy->name;
-			$terms         = $post_terms;
-			break;
+
+	// Try preferred taxonomy first if specified.
+	if ( ! empty( $preferences['preferred_taxonomy'] ) ) {
+		$preferred_taxonomy = wp_list_filter( $taxonomies, array( 'name' => $preferences['preferred_taxonomy'] ) );
+		if ( ! empty( $preferred_taxonomy ) ) {
+			$preferred_taxonomy = reset( $preferred_taxonomy );
+			$post_terms         = get_the_terms( $post_id, $preferred_taxonomy->name );
+			if ( ! empty( $post_terms ) && ! is_wp_error( $post_terms ) ) {
+				$taxonomy_name = $preferred_taxonomy->name;
+				$terms         = $post_terms;
+			}
+		}
+	}
+
+	// If no preferred taxonomy or it didn't have terms, find the first taxonomy with terms.
+	if ( empty( $terms ) ) {
+		foreach ( $taxonomies as $taxonomy ) {
+			$post_terms = get_the_terms( $post_id, $taxonomy->name );
+			if ( ! empty( $post_terms ) && ! is_wp_error( $post_terms ) ) {
+				$taxonomy_name = $taxonomy->name;
+				$terms         = $post_terms;
+				break;
+			}
 		}
 	}
 
 	if ( ! empty( $terms ) ) {
-		// Use the first term (if multiple are assigned).
+		// Select which term to use.
 		$term = reset( $terms );
+
+		// Try preferred term if specified and post has multiple terms.
+		if ( ! empty( $preferences['preferred_term'] ) && count( $terms ) > 1 ) {
+			$preferred_term = wp_list_filter( $terms, array( 'slug' => $preferences['preferred_term'] ) );
+			if ( ! empty( $preferred_term ) ) {
+				$term = reset( $preferred_term );
+			}
+		}
+
 		// Add hierarchical term ancestors if applicable.
 		$breadcrumb_items   = array_merge(
 			$breadcrumb_items,
@@ -510,7 +558,7 @@ function block_core_breadcrumbs_get_terms_breadcrumbs( $post_id, $post_type ) {
 /**
  * Registers the `core/breadcrumbs` block on the server.
  *
- * @since 6.9.0
+ * @since 7.0.0
  */
 function register_block_core_breadcrumbs() {
 	register_block_type_from_metadata(
