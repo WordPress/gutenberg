@@ -17,9 +17,8 @@ import {
 	mediaDimensionsField,
 	mediaThumbnailField,
 	mimeTypeField,
-} from '../media-fields';
-
-import type { MediaItem } from '../media-fields/types';
+	type MediaItem,
+} from '../index';
 
 export default {
 	title: 'Fields/Media Fields',
@@ -192,7 +191,7 @@ const DataFormsComponent = ( { type }: { type: 'regular' | 'panel' } ) => {
 	const [ data, setData ] = useState< MediaItem >( sampleMediaItem );
 
 	const handleChange = ( updates: Partial< MediaItem > ) => {
-		setData( ( prev ) => ( { ...prev, ...updates } ) );
+		setData( ( prev: MediaItem ) => ( { ...prev, ...updates } ) );
 	};
 
 	// Form configuration for the media fields showcase.
@@ -217,7 +216,7 @@ const DataFormsComponent = ( { type }: { type: 'regular' | 'panel' } ) => {
 			<h2>Media Fields</h2>
 			<p>
 				This story demonstrates all the media fields from the
-				@wordpress/fields package within a DataForm.
+				@wordpress/media-fields package within a DataForm.
 			</p>
 
 			<DataForm
@@ -275,8 +274,8 @@ export const DataViewsPreview = () => {
 			<h2>Media Fields DataViews Preview</h2>
 			<p>
 				This story demonstrates all the media fields from the
-				@wordpress/fields package, rendered in a DataViews component,
-				allowing preview of view state and layout switching.
+				@wordpress/media-fields package, rendered in a DataViews
+				component, allowing preview of view state and layout switching.
 			</p>
 			<DataViews
 				data={ data }
