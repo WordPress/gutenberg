@@ -25,15 +25,20 @@ function isColorTransparent( color ) {
  * @param {string} clientId Block client ID.
  */
 export function useEventHandlers( { clientId, isSelected } ) {
-	const { getBlockRootClientId, isZoomOut, hasMultiSelection } = unlock(
-		useSelect( blockEditorStore )
-	);
+	const {
+		getBlockRootClientId,
+		isZoomOut,
+		hasMultiSelection,
+		isSectionBlock,
+		editedContentOnlySection,
+	} = unlock( useSelect( blockEditorStore ) );
 	const {
 		insertAfterBlock,
 		removeBlock,
 		resetZoomLevel,
 		startDraggingBlocks,
 		stopDraggingBlocks,
+		editContentOnlySection,
 	} = unlock( useDispatch( blockEditorStore ) );
 
 	return useRefEffect(
@@ -279,12 +284,30 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				ownerDocument.documentElement.classList.add( 'is-dragging' );
 			}
 
+			/**
+			 * Handles double-click events on section blocks to edit content only section.
+			 *
+			 * @param {MouseEvent} event Double-click event.
+			 */
+			function onDoubleClick( event ) {
+				// Check if this block is a section block and not already being edited
+				const isSection = isSectionBlock( clientId );
+				const isAlreadyEditing = editedContentOnlySection === clientId;
+
+				if ( isSection && ! isAlreadyEditing ) {
+					event.preventDefault();
+					editContentOnlySection( clientId );
+				}
+			}
+
 			node.addEventListener( 'keydown', onKeyDown );
 			node.addEventListener( 'dragstart', onDragStart );
+			node.addEventListener( 'dblclick', onDoubleClick );
 
 			return () => {
 				node.removeEventListener( 'keydown', onKeyDown );
 				node.removeEventListener( 'dragstart', onDragStart );
+				node.removeEventListener( 'dblclick', onDoubleClick );
 			};
 		},
 		[
@@ -298,6 +321,9 @@ export function useEventHandlers( { clientId, isSelected } ) {
 			hasMultiSelection,
 			startDraggingBlocks,
 			stopDraggingBlocks,
+			isSectionBlock,
+			editedContentOnlySection,
+			editContentOnlySection,
 		]
 	);
 }
