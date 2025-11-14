@@ -4,17 +4,68 @@ type Style = {
 	version?: string;
 	media?: string;
 };
-
 type InlineStyle = string | string[];
-
 type Script = {
 	src: string;
 	deps?: string[];
 	version?: string;
 	in_footer?: boolean;
 };
-
 type InlineScript = string | string[];
+type ScriptModules = Record< string, string >;
+
+/**
+ * Injects or extends the import map with new module entries.
+ *
+ * @param scriptModules - Object mapping module specifiers to URLs
+ */
+function injectImportMap( scriptModules: Record< string, string > ): void {
+	if ( ! scriptModules || Object.keys( scriptModules ).length === 0 ) {
+		return;
+	}
+
+	// Find the existing import map script element
+	const existingMapElement = document.querySelector< HTMLScriptElement >(
+		'script#wp-importmap[type=importmap]'
+	);
+
+	if ( existingMapElement ) {
+		try {
+			// Parse the existing import map
+			const existingMap = JSON.parse( existingMapElement.text );
+
+			// Ensure the imports object exists
+			if ( ! existingMap.imports ) {
+				existingMap.imports = {};
+			}
+
+			// Merge new imports with existing ones (new entries take precedence)
+			existingMap.imports = {
+				...existingMap.imports,
+				...scriptModules,
+			};
+
+			// Update the script element's content
+			existingMapElement.text = JSON.stringify( existingMap, null, 2 );
+		} catch ( error ) {
+			// eslint-disable-next-line no-console
+			console.error( 'Failed to parse or update import map:', error );
+		}
+	} else {
+		// If no import map exists, create a new one
+		const script = document.createElement( 'script' );
+		script.type = 'importmap';
+		script.id = 'wp-importmap';
+		script.text = JSON.stringify(
+			{
+				imports: scriptModules,
+			},
+			null,
+			2
+		);
+		document.head.appendChild( script );
+	}
+}
 
 function loadStylesheet( handle: string, styleData: Style ): Promise< void > {
 	return new Promise( ( resolve ) => {
@@ -197,8 +248,14 @@ async function loadAssets(
 	inlineScripts: Record< 'before' | 'after', Record< string, InlineScript > >,
 	stylesData: Record< string, Style >,
 	inlineStyles: Record< 'before' | 'after', Record< string, InlineStyle > >,
-	htmlTemplates?: string[]
+	htmlTemplates?: string[],
+	scriptModules?: ScriptModules
 ): Promise< void > {
+	// Inject import map first so script modules can be resolved
+	if ( scriptModules ) {
+		injectImportMap( scriptModules );
+	}
+
 	// Build dependency-ordered lists
 	const orderedStyles = buildDependencyOrderedList( stylesData );
 	const orderedScripts = buildDependencyOrderedList( scriptsData );

@@ -20,6 +20,18 @@ export function reducer( state: State = initialState, action: Action ): State {
 				},
 			};
 
+		case 'UPDATE_MENU_ITEM':
+			return {
+				...state,
+				menuItems: {
+					...state.menuItems,
+					[ action.id ]: {
+						...state.menuItems[ action.id ],
+						...action.updates,
+					},
+				},
+			};
+
 		case 'REGISTER_ROUTE':
 			return {
 				...state,

@@ -23,7 +23,12 @@
 		"scriptGlobal": "wp",
 		"packageNamespace": "wordpress",
 		"pages": [
-			"gutenberg-boot"
+			{
+				"id": "gutenberg-boot",
+				"init": [
+					"@wordpress/edit-site-init"
+				]
+			}
 		]
 	},
 	"config": {

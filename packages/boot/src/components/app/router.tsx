@@ -18,8 +18,9 @@ import {
  * Internal dependencies
  */
 import Root from '../root';
-import type { Route, RouteLoaderContext } from '../../store/types';
+import type { CanvasData, Route, RouteLoaderContext } from '../../store/types';
 import { unlock } from '../../lock-unlock';
+import Canvas from '../canvas';
 
 const {
 	createRouter,
@@ -28,6 +29,7 @@ const {
 	RouterProvider,
 	createBrowserHistory,
 	parseHref,
+	useMatches,
 } = unlock( routePrivateApis );
 
 // Not found component
@@ -44,10 +46,20 @@ function NotFoundComponent() {
 function RouteComponent( {
 	stage: Stage,
 	inspector: Inspector,
+	canvas: CustomCanvas,
 }: {
 	stage?: ComponentType;
 	inspector?: ComponentType;
+	canvas?: ComponentType;
 } ) {
+	// Get canvas data from the current route's loader
+	const matches = useMatches();
+	const currentMatch = matches[ matches.length - 1 ];
+	const canvasData = ( currentMatch?.loaderData as any )?.canvas as
+		| CanvasData
+		| null
+		| undefined;
+
 	return (
 		<>
 			{ Stage && (
@@ -58,6 +70,18 @@ function RouteComponent( {
 			{ Inspector && (
 				<div className="boot-layout__inspector">
 					<Inspector />
+				</div>
+			) }
+			{ /* Render custom canvas when canvas() returns null */ }
+			{ canvasData === null && CustomCanvas && (
+				<div className="boot-layout__canvas">
+					<CustomCanvas />
+				</div>
+			) }
+			{ /* Render default canvas when canvas() returns CanvasData */ }
+			{ canvasData && (
+				<div className="boot-layout__canvas">
+					<Canvas canvas={ canvasData } />
 				</div>
 			) }
 		</>
@@ -75,21 +99,21 @@ async function createRouteFromDefinition(
 	route: Route,
 	parentRoute: AnyRoute
 ) {
-	// Create lazy components for stage and inspector surfaces
-	const SurfacesModule = route.content_module
-		? lazy( async () => {
-				const module = await import( route.content_module! );
-				// Return a component that renders the surfaces
-				return {
-					default: () => (
-						<RouteComponent
-							stage={ module.stage }
-							inspector={ module.inspector }
-						/>
-					),
-				};
-		  } )
-		: () => null;
+	// Create lazy components for stage, inspector, and canvas surfaces
+	const SurfacesModule = lazy( async () => {
+		const module = route.content_module
+			? await import( route.content_module )
+			: {};
+		return {
+			default: () => (
+				<RouteComponent
+					stage={ module.stage }
+					inspector={ module.inspector }
+					canvas={ module.canvas }
+				/>
+			),
+		};
+	} );
 
 	// Load route module for lifecycle functions if specified
 	let routeConfig: {

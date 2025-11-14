@@ -34,4 +34,27 @@ export const settings = {
 	} ),
 };
 
+if ( window.__experimentalContentOnlyPatternInsertion ) {
+	settings.fields = [
+		{
+			label: __( 'Content' ),
+			type: 'RichText',
+			shownByDefault: true,
+			mapping: {
+				value: 'text',
+			},
+		},
+		{
+			label: __( 'Link' ),
+			type: 'Link',
+			shownByDefault: false,
+			mapping: {
+				href: 'url',
+				rel: 'rel',
+				target: 'linkTarget',
+			},
+		},
+	];
+}
+
 export const init = () => initBlock( { name, metadata, settings } );

@@ -93,6 +93,7 @@ const MediaReplaceFlow = ( {
 	handleUpload = true,
 	popoverProps,
 	renderToggle,
+	className,
 } ) => {
 	const { getSettings } = useSelect( blockEditorStore );
 	const errorNoticeID = `block-editor/media-replace-flow/error-notice/${ ++uniqueId }`;
@@ -169,6 +170,7 @@ const MediaReplaceFlow = ( {
 	return (
 		<Dropdown
 			popoverProps={ popoverProps }
+			className={ className }
 			contentClassName="block-editor-media-replace-flow__options"
 			renderToggle={ ( { isOpen, onToggle } ) => {
 				if ( renderToggle ) {

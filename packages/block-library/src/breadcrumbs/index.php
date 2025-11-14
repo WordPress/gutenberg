@@ -76,24 +76,47 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 			return '';
 		}
 
-		// Determine breadcrumb type for accurate rendering (matching JavaScript logic).
+		// For non-hierarchical post types with parents (e.g., attachments), build trail for the parent.
+		$post_parent = $post->post_parent;
+		$parent_post = null;
+		if ( ! is_post_type_hierarchical( $post_type ) && $post_parent ) {
+			$parent_post = get_post( $post_parent );
+			if ( $parent_post ) {
+				$post_id     = $parent_post->ID;
+				$post_type   = $parent_post->post_type;
+				$post_parent = $parent_post->post_parent;
+			}
+		}
+
+		// Determine breadcrumb type.
+		// Some non-hierarchical post types (e.g., attachments) can have parents.
+		// Use hierarchical breadcrumbs if a parent exists, otherwise use taxonomy breadcrumbs.
 		$show_terms = false;
-		if ( ! is_post_type_hierarchical( $post_type ) ) {
+		if ( ! is_post_type_hierarchical( $post_type ) && ! $post_parent ) {
 			$show_terms = true;
 		} elseif ( empty( get_object_taxonomies( $post_type, 'objects' ) ) ) {
-			// Hierarchical post type without taxonomies can only use ancestors.
 			$show_terms = false;
 		} else {
-			// For hierarchical post types with taxonomies, use the attribute.
 			$show_terms = $attributes['prefersTaxonomy'];
 		}
 
+		// Build breadcrumb trail.
 		if ( ! $show_terms ) {
 			$breadcrumb_items = array_merge( $breadcrumb_items, block_core_breadcrumbs_get_hierarchical_post_type_breadcrumbs( $post_id ) );
 		} else {
 			$breadcrumb_items = array_merge( $breadcrumb_items, block_core_breadcrumbs_get_terms_breadcrumbs( $post_id, $post_type ) );
 		}
-		// Add current post title (not linked).
+
+		// Add parent post title if applicable.
+		if ( $parent_post ) {
+			$breadcrumb_items[] = block_core_breadcrumbs_create_link(
+				get_permalink( $parent_post->ID ),
+				block_core_breadcrumbs_get_post_title( $parent_post ),
+				true
+			);
+		}
+
+		// Add current post title.
 		$breadcrumb_items[] = block_core_breadcrumbs_create_current_item( block_core_breadcrumbs_get_post_title( $post ), true );
 	}
 

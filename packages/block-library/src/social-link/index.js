@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { share as icon } from '@wordpress/icons';
 
 /**
@@ -20,5 +21,27 @@ export const settings = {
 	edit,
 	variations,
 };
+
+if ( window.__experimentalContentOnlyPatternInsertion ) {
+	settings.fields = [
+		{
+			label: __( 'Link' ),
+			type: 'Link',
+			shownByDefault: true,
+			mapping: {
+				href: 'url',
+				rel: 'rel',
+			},
+		},
+		{
+			label: __( 'Label' ),
+			type: 'RichText',
+			shownByDefault: false,
+			mapping: {
+				value: 'label',
+			},
+		},
+	];
+}
 
 export const init = () => initBlock( { name, metadata, settings } );
