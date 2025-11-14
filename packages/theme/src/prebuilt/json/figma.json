@@ -622,6 +622,38 @@
 		},
 		"description": "Large spacing for surfaces"
 	},
+	"Dimension/Semantic/gap-flow-x-small": {
+		"value": {
+			".": "8px",
+			"compact": "4px",
+			"comfortable": "12px"
+		},
+		"description": "Extra small gap for content flow"
+	},
+	"Dimension/Semantic/gap-flow-small": {
+		"value": {
+			".": "12px",
+			"compact": "8px",
+			"comfortable": "16px"
+		},
+		"description": "Small gap for content flow"
+	},
+	"Dimension/Semantic/gap-flow-medium": {
+		"value": {
+			".": "16px",
+			"compact": "12px",
+			"comfortable": "20px"
+		},
+		"description": "Medium gap for content flow"
+	},
+	"Dimension/Semantic/gap-flow-large": {
+		"value": {
+			".": "24px",
+			"compact": "16px",
+			"comfortable": "24px"
+		},
+		"description": "Large gap for content flow"
+	},
 	"Elevation/x-small": {
 		"value": {
 			".": "0 1px 1px 0 color(srgb 0 0 0 / 0.03), 0 1px 2px 0 color(srgb 0 0 0 / 0.02), 0 3px 3px 0 color(srgb 0 0 0 / 0.02), 0 4px 4px 0 color(srgb 0 0 0 / 0.01)"

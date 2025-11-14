@@ -92,7 +92,7 @@ export const Box = forwardRef< HTMLDivElement, BoxProps >( function Box(
 	},
 	ref
 ) {
-	const style: React.CSSProperties = {};
+	const style: React.CSSProperties = { ...props.style };
 
 	if ( backgroundColor ) {
 		style.backgroundColor = `var(--wpds-color-bg-${ target }-${ backgroundColor }, var(--wpds-color-bg-surface-${ backgroundColor }))`;
@@ -122,5 +122,9 @@ export const Box = forwardRef< HTMLDivElement, BoxProps >( function Box(
 		style.borderColor = `var(--wpds-color-stroke-${ target }-${ borderColor }, var(--wpds-color-stroke-surface-${ borderColor }))`;
 	}
 
-	return renderElement< 'div' >( render, { style, ...props }, ref );
+	return renderElement< 'div' >( {
+		render,
+		ref,
+		props: { ...props, style },
+	} );
 } );

@@ -103,6 +103,50 @@
 						}
 					}
 				}
+			},
+			"gap": {
+				"flow": {
+					"x-small": {
+						"$value": "{dimension.primitive.space.20}",
+						"$description": "Extra small gap for content flow",
+						"$extensions": {
+							"mode": {
+								"compact": "{dimension.primitive.space.10}",
+								"comfortable": "{dimension.primitive.space.30}"
+							}
+						}
+					},
+					"small": {
+						"$value": "{dimension.primitive.space.30}",
+						"$description": "Small gap for content flow",
+						"$extensions": {
+							"mode": {
+								"compact": "{dimension.primitive.space.20}",
+								"comfortable": "{dimension.primitive.space.40}"
+							}
+						}
+					},
+					"medium": {
+						"$value": "{dimension.primitive.space.40}",
+						"$description": "Medium gap for content flow",
+						"$extensions": {
+							"mode": {
+								"compact": "{dimension.primitive.space.30}",
+								"comfortable": "{dimension.primitive.space.50}"
+							}
+						}
+					},
+					"large": {
+						"$value": "{dimension.primitive.space.60}",
+						"$description": "Large gap for content flow",
+						"$extensions": {
+							"mode": {
+								"compact": "{dimension.primitive.space.40}",
+								"comfortable": "{dimension.primitive.space.60}"
+							}
+						}
+					}
+				}
 			}
 		}
 	}

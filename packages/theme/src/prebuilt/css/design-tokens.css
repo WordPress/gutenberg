@@ -100,6 +100,10 @@
 	--wpds-color-stroke-surface-warning: #d0b381; /* Decorative stroke color used to define warning-toned surface boundaries with normal emphasis. */
 	--wpds-color-stroke-surface-warning-strong: #926300; /* Decorative stroke color used to define warning-toned surface boundaries with strong emphasis. */
 	--wpds-dimension-base: 4px; /* Base dimension unit */
+	--wpds-dimension-gap-flow-large: 24px; /* Large gap for content flow */
+	--wpds-dimension-gap-flow-medium: 16px; /* Medium gap for content flow */
+	--wpds-dimension-gap-flow-small: 12px; /* Small gap for content flow */
+	--wpds-dimension-gap-flow-x-small: 8px; /* Extra small gap for content flow */
 	--wpds-dimension-padding-surface-2xs: 4px; /* 2x extra small spacing for surfaces */
 	--wpds-dimension-padding-surface-lg: 32px; /* Large spacing for surfaces */
 	--wpds-dimension-padding-surface-md: 24px; /* Medium spacing for surfaces */
@@ -134,6 +138,10 @@
 
 [data-wpds-theme-provider-id][data-wpds-density='default'] {
 	--wpds-dimension-base: 4px; /* Base dimension unit */
+	--wpds-dimension-gap-flow-large: 24px; /* Large gap for content flow */
+	--wpds-dimension-gap-flow-medium: 16px; /* Medium gap for content flow */
+	--wpds-dimension-gap-flow-small: 12px; /* Small gap for content flow */
+	--wpds-dimension-gap-flow-x-small: 8px; /* Extra small gap for content flow */
 	--wpds-dimension-padding-surface-2xs: 4px; /* 2x extra small spacing for surfaces */
 	--wpds-dimension-padding-surface-lg: 32px; /* Large spacing for surfaces */
 	--wpds-dimension-padding-surface-md: 24px; /* Medium spacing for surfaces */
@@ -142,6 +150,10 @@
 }
 
 [data-wpds-theme-provider-id][data-wpds-density='compact'] {
+	--wpds-dimension-gap-flow-large: 16px; /* Large gap for content flow */
+	--wpds-dimension-gap-flow-medium: 12px; /* Medium gap for content flow */
+	--wpds-dimension-gap-flow-small: 8px; /* Small gap for content flow */
+	--wpds-dimension-gap-flow-x-small: 4px; /* Extra small gap for content flow */
 	--wpds-dimension-padding-surface-2xs: 4px; /* 2x extra small spacing for surfaces */
 	--wpds-dimension-padding-surface-lg: 24px; /* Large spacing for surfaces */
 	--wpds-dimension-padding-surface-md: 20px; /* Medium spacing for surfaces */
@@ -150,6 +162,10 @@
 }
 
 [data-wpds-theme-provider-id][data-wpds-density='comfortable'] {
+	--wpds-dimension-gap-flow-large: 24px; /* Large gap for content flow */
+	--wpds-dimension-gap-flow-medium: 20px; /* Medium gap for content flow */
+	--wpds-dimension-gap-flow-small: 16px; /* Small gap for content flow */
+	--wpds-dimension-gap-flow-x-small: 12px; /* Extra small gap for content flow */
 	--wpds-dimension-padding-surface-2xs: 8px; /* 2x extra small spacing for surfaces */
 	--wpds-dimension-padding-surface-lg: 40px; /* Large spacing for surfaces */
 	--wpds-dimension-padding-surface-md: 32px; /* Medium spacing for surfaces */
