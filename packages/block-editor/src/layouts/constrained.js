@@ -89,7 +89,7 @@ export default {
 										: nextWidth;
 								onChange( {
 									...layout,
-									contentSize: nextWidth,
+									contentSize: nextWidth || undefined,
 								} );
 							} }
 							units={ units }
@@ -111,7 +111,7 @@ export default {
 										: nextWidth;
 								onChange( {
 									...layout,
-									wideSize: nextWidth,
+									wideSize: nextWidth || undefined,
 								} );
 							} }
 							units={ units }
