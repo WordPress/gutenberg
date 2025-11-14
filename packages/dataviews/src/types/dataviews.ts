@@ -257,11 +257,6 @@ export interface ViewTimeline extends ViewBase {
 
 	layout?: {
 		/**
-		 * The field to use as event field.
-		 */
-		eventField?: string;
-
-		/**
 		 * Whether to show the group field label.
 		 */
 		showGroupFieldLabel?: boolean;

@@ -42,7 +42,6 @@ function TimelineItem< Item >(
 		mediaField?: NormalizedField< Item >;
 		titleField?: NormalizedField< Item >;
 		descriptionField?: NormalizedField< Item >;
-		eventField?: NormalizedField< Item > | undefined;
 		otherFields: NormalizedField< Item >[];
 		posinset?: number;
 	}
@@ -54,7 +53,6 @@ function TimelineItem< Item >(
 		titleField,
 		mediaField,
 		descriptionField,
-		eventField,
 		otherFields,
 		posinset,
 		onClickItem,
@@ -236,22 +234,6 @@ function TimelineItem< Item >(
 							</div>
 						) }
 						<div className="dataviews-view-timeline__fields">
-							{ eventField && (
-								<div className="dataviews-view-timeline__field dataviews-view-timeline__field--date">
-									<VisuallyHidden
-										as="span"
-										className="dataviews-view-timeline__field-label"
-									>
-										{ eventField.label }
-									</VisuallyHidden>
-									<span className="dataviews-view-timeline__field-value">
-										<eventField.render
-											item={ item }
-											field={ eventField }
-										/>
-									</span>
-								</div>
-							) }
 							{ otherFields.map( ( field ) => (
 								<div
 									key={ field.id }

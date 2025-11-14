@@ -583,7 +583,7 @@ const TimelineComponent = ( {
 		page: 1,
 		perPage: 20,
 		filters: [],
-		fields: [ 'categories', 'orderNumber' ],
+		fields: [ 'datetime', 'categories', 'orderNumber' ],
 		titleField: 'title',
 		descriptionField: 'description',
 		mediaField: 'icon',
@@ -599,7 +599,6 @@ const TimelineComponent = ( {
 			  }
 			: undefined,
 		layout: {
-			eventField: 'datetime',
 			showGroupFieldLabel,
 			density,
 		},
