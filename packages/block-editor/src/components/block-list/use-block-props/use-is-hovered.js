@@ -19,8 +19,8 @@ function listener( event ) {
  * Adds `is-hovered` class when the block is hovered and in navigation or
  * outline mode.
  *
- * @param {Object}  options           Options object.
- * @param {boolean} options.isEnabled Whether to enable hover detection. Default true.
+ * @param {Object}  options                     Options object.
+ * @param {boolean} [options.isEnabled=true]     Whether to enable hover detection.
  *
  * @return {Function} Ref callback.
  */
