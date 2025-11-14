@@ -69,26 +69,32 @@ export default function EmbedPreview( {
 	// as far as the user is concerned. We're just catching the first click so that
 	// the block can be selected without interacting with the embed preview that the overlay covers.
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
-	const embedWrapper =
-		'wp-embed' === type ? (
-			<WpEmbedPreview html={ html } />
-		) : (
-			<div className="wp-block-embed__wrapper">
-				<SandBox
-					html={ html }
-					scripts={ scripts }
-					title={ iframeTitle }
-					type={ sandboxClassnames }
-					onFocus={ hideOverlay }
+	// YouTube requires referrer information and doesn't work in sandboxed contexts
+	// Use direct iframe rendering like wp-embed to preserve referrer
+	const useDirectIframe =
+		'wp-embed' === type ||
+		url.includes( 'youtube.com' ) ||
+		url.includes( 'youtu.be' );
+
+	const embedWrapper = useDirectIframe ? (
+		<WpEmbedPreview html={ html } />
+	) : (
+		<div className="wp-block-embed__wrapper">
+			<SandBox
+				html={ html }
+				scripts={ scripts }
+				title={ iframeTitle }
+				type={ sandboxClassnames }
+				onFocus={ hideOverlay }
+			/>
+			{ ! interactive && (
+				<div
+					className="block-library-embed__interactive-overlay"
+					onMouseUp={ hideOverlay }
 				/>
-				{ ! interactive && (
-					<div
-						className="block-library-embed__interactive-overlay"
-						onMouseUp={ hideOverlay }
-					/>
-				) }
-			</div>
-		);
+			) }
+		</div>
+	);
 	/* eslint-enable jsx-a11y/no-static-element-interactions */
 
 	return (
