@@ -28,7 +28,7 @@ import type {
 	Operator,
 } from '../../types';
 import DataViewsContext from '../../components/dataviews-context';
-import getHiddenFields from '../../utils/get-hidden-fields';
+import getHideableFields from '../../utils/get-hideable-fields';
 
 const { Menu } = unlock( componentsPrivateApis );
 
@@ -103,7 +103,9 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 		return header;
 	}
 
-	const hiddenFields = getHiddenFields( view, fields );
+	const hiddenFields = getHideableFields( view, fields ).filter(
+		( f ) => ! visibleFieldIds.includes( f.id )
+	);
 
 	return (
 		<Menu>

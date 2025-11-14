@@ -3,11 +3,10 @@
  */
 import type { NormalizedField, View } from '../types';
 
-export default function getHiddenFields< Item >(
+export default function getHideableFields< Item >(
 	view: View,
 	fields: NormalizedField< Item >[]
 ): NormalizedField< Item >[] {
-	const visibleFieldIds = view.fields || [];
 	const togglableFields = [
 		view?.titleField,
 		view?.mediaField,
@@ -15,7 +14,6 @@ export default function getHiddenFields< Item >(
 	].filter( Boolean );
 	return fields.filter(
 		( f ) =>
-			! visibleFieldIds.includes( f.id ) &&
 			! togglableFields.includes( f.id ) &&
 			f.type !== 'media' &&
 			f.enableHiding !== false
