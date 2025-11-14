@@ -24,7 +24,6 @@ function getBlockIconVariant( { select, clientIds } ) {
 		getBlockName,
 		getBlockAttributes,
 		getBlockParentsByBlockName,
-		isSectionBlock,
 		canRemoveBlocks,
 		getTemplateLock,
 		getBlockEditingMode,
@@ -40,8 +39,8 @@ function getBlockIconVariant( { select, clientIds } ) {
 	const blockName = isSingleBlock && getBlockName( clientIds[ 0 ] );
 	const hasBlockStyles =
 		isSingleBlock && !! getBlockStyles( blockName )?.length;
-	const isSectionInSelection = clientIds.some( ( id ) =>
-		isSectionBlock( id )
+	const hasPatternNameInSelection = clientIds.some(
+		( id ) => !! getBlockAttributes( id )?.metadata?.patternName
 	);
 	const hasPatternOverrides = clientIds.every( ( clientId ) =>
 		hasPatternOverridesDefaultBinding(
@@ -59,7 +58,7 @@ function getBlockIconVariant( { select, clientIds } ) {
 		getBlockEditingMode( clientIds[ 0 ] ) === 'default';
 	const _hideTransformsForSections =
 		window?.__experimentalContentOnlyPatternInsertion &&
-		isSectionInSelection;
+		hasPatternNameInSelection;
 	const _showBlockSwitcher =
 		! _hideTransformsForSections &&
 		isDefaultEditingMode &&

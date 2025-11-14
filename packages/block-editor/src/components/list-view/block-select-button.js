@@ -65,14 +65,15 @@ function ListViewBlockSelectButton(
 		canToggleBlockVisibility,
 		isBlockHidden,
 		isContentOnly,
-		isSectionBlock,
+		hasPatternName,
 	} = useSelect(
 		( select ) => {
-			const { getBlockName } = select( blockEditorStore );
-			const {
-				isBlockHidden: _isBlockHidden,
-				isSectionBlock: _isSectionBlock,
-			} = unlock( select( blockEditorStore ) );
+			const { getBlockName, getBlockAttributes } =
+				select( blockEditorStore );
+			const { isBlockHidden: _isBlockHidden } = unlock(
+				select( blockEditorStore )
+			);
+			const blockAttributes = getBlockAttributes( clientId );
 			return {
 				canToggleBlockVisibility: hasBlockSupport(
 					getBlockName( clientId ),
@@ -84,7 +85,7 @@ function ListViewBlockSelectButton(
 					select( blockEditorStore ).getBlockEditingMode(
 						clientId
 					) === 'contentOnly',
-				isSectionBlock: _isSectionBlock( clientId ),
+				hasPatternName: !! blockAttributes?.metadata?.patternName,
 			};
 		},
 		[ clientId ]
@@ -135,7 +136,7 @@ function ListViewBlockSelectButton(
 		>
 			<ListViewExpander onClick={ onToggleExpanded } />
 			<BlockIcon
-				icon={ isSectionBlock ? symbol : blockInformation?.icon }
+				icon={ hasPatternName ? symbol : blockInformation?.icon }
 				showColors
 				context="list-view"
 			/>
