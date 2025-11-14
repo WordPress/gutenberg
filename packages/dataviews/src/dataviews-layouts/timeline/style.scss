@@ -48,7 +48,7 @@
 			min-height: $grid-unit-30;
 			line-height: $grid-unit-30;
 			overflow: hidden;
-			font-weight: 600;
+			font-weight: $font-weight-medium;
 			font-size: $font-size-medium;
 			color: $gray-900;
 
@@ -56,8 +56,8 @@
 				cursor: pointer;
 
 				&:focus-visible {
-					outline: 2px solid var(--wp-admin-theme-color);
-					outline-offset: 2px;
+					outline: var(--wp-admin-border-width-focus) solid var(--wp-admin-theme-color);
+					outline-offset: var(--wp-admin-border-width-focus);
 					border-radius: $radius-small;
 				}
 			}

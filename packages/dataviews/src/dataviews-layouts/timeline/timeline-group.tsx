@@ -26,7 +26,7 @@ export default function TimelineGroup< Item >( {
 	// Determine if we should show the field label
 	const groupHeader = createInterpolateElement(
 		// translators: %s: The label of the field e.g. "Status".
-		sprintf( __( '%s: <groupName />' ), groupField.label ),
+		sprintf( __( '%s: <groupName />' ), groupField.label ).trim(),
 		{
 			groupName: (
 				<groupField.render
