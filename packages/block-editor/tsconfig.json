@@ -21,7 +21,6 @@
 		{ "path": "../hooks" },
 		{ "path": "../html-entities" },
 		{ "path": "../i18n" },
-		{ "path": "../image-cropper" },
 		{ "path": "../icons" },
 		{ "path": "../interactivity" },
 		{ "path": "../is-shallow-equal" },

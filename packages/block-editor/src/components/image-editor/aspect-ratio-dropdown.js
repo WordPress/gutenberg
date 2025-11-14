@@ -4,7 +4,6 @@
 import { check, aspectRatio as aspectRatioIcon } from '@wordpress/icons';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useImageCropper } from '@wordpress/image-cropper';
 
 /**
  * Internal dependencies
@@ -64,13 +63,8 @@ function presetRatioAsNumber( { ratio, ...rest } ) {
 }
 
 export default function AspectRatioDropdown( { toggleProps } ) {
-	const { cropperState, setCropperState, mediaSize } = useImageCropper();
-	const { isInProgress } = useImageEditingContext();
-	const { aspectRatio: aspect } = cropperState;
-	const setAspect = ( newAspect ) => {
-		setCropperState( { aspectRatio: newAspect } );
-	};
-	const defaultAspect = mediaSize?.naturalWidth / mediaSize?.naturalHeight;
+	const { isInProgress, aspect, setAspect, defaultAspect } =
+		useImageEditingContext();
 
 	const [ defaultRatios, themeRatios, showDefaultRatios ] = useSettings(
 		'dimensions.aspectRatios.default',

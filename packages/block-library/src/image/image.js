@@ -939,7 +939,7 @@ export default function Image( {
 			</>
 		);
 
-	if ( canEditImage && isEditingImage && !! url ) {
+	if ( canEditImage && isEditingImage ) {
 		img = (
 			<ImageWrapper href={ href }>
 				<ImageEditor

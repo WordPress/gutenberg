@@ -1,16 +1,8 @@
 /**
  * External dependencies
  */
+import Cropper from 'react-easy-crop';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
-import { useCallback } from '@wordpress/element';
-import {
-	ImageCropper as ImageCropperComponent,
-	useImageCropper,
-} from '@wordpress/image-cropper';
 
 /**
  * WordPress dependencies
@@ -19,16 +11,12 @@ import { Spinner } from '@wordpress/components';
 import { useResizeObserver } from '@wordpress/compose';
 
 /**
- * ImageCropper component for editing images.
- *
- * @param {Object} props               Component props.
- * @param {string} props.url           The image URL.
- * @param {number} [props.width]       The display width of the image.
- * @param {number} [props.height]      The display height of the image.
- * @param {number} props.naturalHeight The natural height of the image.
- * @param {number} props.naturalWidth  The natural width of the image.
- * @param {Object} [props.borderProps] Border styling properties (className, style, etc.).
+ * Internal dependencies
  */
+import { MIN_ZOOM, MAX_ZOOM } from './constants';
+
+import { useImageEditingContext } from './context';
+
 export default function ImageCropper( {
 	url,
 	width,
@@ -37,46 +25,24 @@ export default function ImageCropper( {
 	naturalWidth,
 	borderProps,
 } ) {
-	const { setResetState, cropperState } = useImageCropper();
+	const {
+		isInProgress,
+		editedUrl,
+		position,
+		zoom,
+		aspect,
+		setPosition,
+		setCrop,
+		setZoom,
+		rotation,
+	} = useImageEditingContext();
 	const [ contentResizeListener, { width: clientWidth } ] =
 		useResizeObserver();
 
-	// This is clunky. I think we need a dedicated modal to reduce tool clutter and to be able to focus on the image.
 	let editedHeight = height || ( clientWidth * naturalHeight ) / naturalWidth;
 
-	if ( cropperState.rotation % 180 === 90 ) {
+	if ( rotation % 180 === 90 ) {
 		editedHeight = ( clientWidth * naturalWidth ) / naturalHeight;
-	}
-
-	const handleOnload = useCallback(
-		( loadedMediaSize ) => {
-			// setEditedHeight( loadedMediaSize.height );
-			// setEditedWidth( loadedMediaSize.width );
-			const newResetState = {
-				aspectRatio:
-					loadedMediaSize.naturalWidth /
-					loadedMediaSize.naturalHeight,
-				crop: {
-					x: 0,
-					y: 0,
-					width: loadedMediaSize.naturalWidth,
-					height: loadedMediaSize.naturalHeight,
-				},
-				zoom: 1,
-				rotation: 0,
-				flip: {
-					horizontal: false,
-					vertical: false,
-				},
-			};
-
-			setResetState( newResetState );
-		},
-		[ setResetState ]
-	);
-
-	if ( ! url ) {
-		return <Spinner />;
 	}
 
 	const area = (
@@ -85,7 +51,7 @@ export default function ImageCropper( {
 				'wp-block-image__crop-area',
 				borderProps?.className,
 				{
-					// 'is-applying': isInProgress,
+					'is-applying': isInProgress,
 				}
 			) }
 			style={ {
@@ -94,8 +60,25 @@ export default function ImageCropper( {
 				height: editedHeight,
 			} }
 		>
-			<ImageCropperComponent src={ url } onLoad={ handleOnload } />
-			{ /* { isInProgress && <Spinner /> } */ }
+			<Cropper
+				image={ editedUrl || url }
+				disabled={ isInProgress }
+				minZoom={ MIN_ZOOM / 100 }
+				maxZoom={ MAX_ZOOM / 100 }
+				crop={ position }
+				zoom={ zoom / 100 }
+				aspect={ aspect }
+				onCropChange={ ( pos ) => {
+					setPosition( pos );
+				} }
+				onCropComplete={ ( newCropPercent ) => {
+					setCrop( newCropPercent );
+				} }
+				onZoomChange={ ( newZoom ) => {
+					setZoom( newZoom * 100 );
+				} }
+			/>
+			{ isInProgress && <Spinner /> }
 		</div>
 	);
 

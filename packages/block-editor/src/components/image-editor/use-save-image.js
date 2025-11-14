@@ -6,7 +6,6 @@ import { useCallback, useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-import { useImageCropper } from '@wordpress/image-cropper';
 
 /**
  * Internal dependencies
@@ -21,13 +20,13 @@ const messages = {
 };
 
 export default function useSaveImage( {
+	crop,
+	rotation,
 	url,
 	id,
 	onSaveImage,
 	onFinishEditing,
 } ) {
-	const { cropperState } = useImageCropper();
-	const { rotation, croppedArea: crop } = cropperState;
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
 	const [ isInProgress, setIsInProgress ] = useState( false );
