@@ -13,41 +13,13 @@ import { __experimentalVStack as VStack, Spinner } from '@wordpress/components';
  */
 import type { ViewTimelineProps } from '../../types';
 import getDataByGroup from '../utils/get-data-by-group';
-import TimelineItem from './timeline-item';
 import TimelineGroup from './timeline-group';
-import { isDefined } from './utils';
+import TimelineItems from './timeline-items';
 
 export default function ViewTimeline< Item >(
 	props: ViewTimelineProps< Item >
 ) {
-	const {
-		actions,
-		data,
-		fields,
-		getItemId,
-		isLoading,
-		view,
-		className,
-		empty,
-		onClickItem,
-		renderItemLink,
-		isItemClickable,
-	} = props;
-
-	// Determine which fields to display based on view configuration
-	const titleField = fields.find( ( field ) => field.id === view.titleField );
-	const mediaField = fields.find( ( field ) => field.id === view.mediaField );
-	const descriptionField = fields.find(
-		( field ) => field.id === view.descriptionField
-	);
-	const eventFieldId = view?.layout?.eventField ?? undefined;
-	const eventField = eventFieldId
-		? fields.find( ( field ) => field.id === eventFieldId )
-		: undefined;
-	const otherFields = ( view?.fields ?? [] )
-		.map( ( fieldId ) => fields.find( ( f ) => fieldId === f.id ) )
-		.filter( isDefined );
-	const eventIconSize = view?.layout?.eventIconSize ?? 'default';
+	const { empty, data, fields, isLoading, view, className } = props;
 
 	// Handle empty/loading states
 	const hasData = data?.length;
@@ -71,6 +43,8 @@ export default function ViewTimeline< Item >(
 		);
 	}
 
+	const wrapperClassName = clsx( 'dataviews-view-timeline', className );
+
 	// Check if data should be grouped
 	const groupField = view.groupByField
 		? fields.find( ( field ) => field.id === view.groupByField )
@@ -85,30 +59,23 @@ export default function ViewTimeline< Item >(
 	// Render grouped timeline
 	if ( hasData && groupField && dataByGroup ) {
 		return (
-			<VStack
-				spacing={ 2 }
-				className={ clsx( 'dataviews-view-timeline', className ) }
-			>
-				{ groupedEntries.map( ( [ groupName, groupItems ] ) => (
-					<TimelineGroup
-						key={ groupName }
-						groupName={ groupName }
-						groupItems={ groupItems }
-						view={ view }
-						actions={ actions }
-						getItemId={ getItemId }
-						titleField={ titleField }
-						mediaField={ mediaField }
-						descriptionField={ descriptionField }
-						eventField={ eventField }
-						eventIconSize={ eventIconSize }
-						groupField={ groupField }
-						otherFields={ otherFields }
-						onClickItem={ onClickItem }
-						renderItemLink={ renderItemLink }
-						isItemClickable={ isItemClickable }
-					/>
-				) ) }
+			<VStack spacing={ 2 } className={ wrapperClassName }>
+				{ groupedEntries.map(
+					( [ groupName, groupData ]: [ string, Item[] ] ) => (
+						<TimelineGroup< Item >
+							key={ groupName }
+							groupName={ groupName }
+							groupData={ groupData }
+							view={ view }
+							groupField={ groupField }
+						>
+							<TimelineItems< Item >
+								{ ...props }
+								data={ groupData }
+							/>
+						</TimelineGroup>
+					)
+				) }
 			</VStack>
 		);
 	}
@@ -117,34 +84,10 @@ export default function ViewTimeline< Item >(
 	return (
 		<>
 			<div
-				className={ clsx( 'dataviews-view-timeline', className ) }
+				className={ wrapperClassName }
 				role={ view.infiniteScrollEnabled ? 'feed' : undefined }
 			>
-				{ data.map( ( item, index ) => {
-					const id = getItemId( item );
-					return (
-						<TimelineItem
-							key={ id }
-							view={ view }
-							actions={ actions }
-							item={ item }
-							mediaField={ mediaField }
-							titleField={ titleField }
-							descriptionField={ descriptionField }
-							eventField={ eventField }
-							eventIconSize={ eventIconSize }
-							otherFields={ otherFields }
-							onClickItem={ onClickItem }
-							renderItemLink={ renderItemLink }
-							isItemClickable={ isItemClickable }
-							posinset={
-								view.infiniteScrollEnabled
-									? index + 1
-									: undefined
-							}
-						/>
-					);
-				} ) }
+				<TimelineItems< Item > { ...props } />
 			</div>
 			{ hasData && isLoading && (
 				<p className="dataviews-loading-more">

@@ -29,54 +29,40 @@ import {
 import DataViewsContext from '../../components/dataviews-context';
 import { ItemClickWrapper } from '../utils/item-click-wrapper';
 import type {
-	Action,
 	NormalizedField,
-	ViewTimeline,
 	ActionModal as ActionModalType,
+	ViewTimelineProps,
 } from '../../types';
-
-/**
- * External dependencies
- */
-import type { ReactElement, ComponentProps } from 'react';
 
 const { Menu } = unlock( componentsPrivateApis );
 
-interface TimelineItemProps< Item > {
-	view: ViewTimeline;
-	actions: Action< Item >[];
-	item: Item;
-	titleField?: NormalizedField< Item >;
-	mediaField?: NormalizedField< Item >;
-	descriptionField?: NormalizedField< Item >;
-	eventField?: NormalizedField< Item > | undefined;
-	eventIconSize?: 'default' | 'small' | 'medium';
-	otherFields: NormalizedField< Item >[];
-	posinset?: number;
-	onClickItem?: ( item: Item ) => void;
-	renderItemLink?: (
-		props: {
-			item: Item;
-		} & ComponentProps< 'a' >
-	) => ReactElement;
-	isItemClickable: ( item: Item ) => boolean;
-}
-
-function TimelineItem< Item >( {
-	view,
-	actions,
-	item,
-	titleField,
-	mediaField,
-	descriptionField,
-	eventField,
-	eventIconSize,
-	otherFields,
-	posinset,
-	onClickItem,
-	renderItemLink,
-	isItemClickable,
-}: TimelineItemProps< Item > ) {
+function TimelineItem< Item >(
+	props: ViewTimelineProps< Item > & {
+		item: Item;
+		mediaField?: NormalizedField< Item >;
+		titleField?: NormalizedField< Item >;
+		descriptionField?: NormalizedField< Item >;
+		eventField?: NormalizedField< Item > | undefined;
+		eventIconSize?: 'default' | 'small' | 'medium';
+		otherFields: NormalizedField< Item >[];
+		posinset?: number;
+	}
+) {
+	const {
+		view,
+		actions,
+		item,
+		titleField,
+		mediaField,
+		descriptionField,
+		eventField,
+		eventIconSize,
+		otherFields,
+		posinset,
+		onClickItem,
+		renderItemLink,
+		isItemClickable,
+	} = props;
 	const {
 		showTitle = true,
 		showMedia = true,
