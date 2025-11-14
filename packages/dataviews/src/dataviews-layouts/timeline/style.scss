@@ -123,8 +123,8 @@
 		&.is-compact {
 			width: $grid-unit-10;
 			.dataviews-view-timeline__event-type-icon {
-				width: $grid-unit-10;
-				height: $grid-unit-10;
+				width: calc($grid-unit-10 + 1px);
+				height: calc($grid-unit-10 + 1px);
 			}
 			&::before {
 				height: $grid-unit-20;
@@ -139,6 +139,17 @@
 			}
 			&::before {
 				height: $grid-unit-05;
+			}
+		}
+
+		&.is-comfortable,
+		&.is-balanced {
+			.dataviews-view-timeline__event-bullet {
+				width: calc($grid-unit-10 + 1px);
+				height: calc($grid-unit-10 + 1px);
+				position: relative;
+				top: 50%;
+				transform: translateY(-50%);
 			}
 		}
 	}

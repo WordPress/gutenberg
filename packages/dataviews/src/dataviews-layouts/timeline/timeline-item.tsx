@@ -123,6 +123,7 @@ function TimelineItem< Item >(
 						className={ clsx(
 							'dataviews-view-timeline__event-type',
 							density === 'compact' && 'is-compact',
+							density === 'balanced' && 'is-balanced',
 							density === 'comfortable' && 'is-comfortable'
 						) }
 					>
