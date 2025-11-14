@@ -6,51 +6,6 @@
 		"layout": {
 			"contentSize": "840px",
 			"wideSize": "1100px"
-		},
-		"typography": {
-			"fluid": {
-				"minFontSize": "12px",
-				"maxViewportWidth": "1000px",
-				"minViewportWidth": "800px"
-			},
-			"defaultFontSizes": false,
-			"fontSizes": [
-
-				{
-					"name": "Hugefluid",
-					"slug": "hugefluid",
-					"size": "23px",
-					"fluid": {
-						"min": "24px",
-						"max": "48px"
-					}
-				},
-				{
-					"name": "Giant",
-					"slug": "giant",
-					"size": "33px"
-				},
-				{
-					"name": "Display Small",
-					"slug": "display-small",
-					"size": "32px"
-				},
-				{
-					"name": "Display Large",
-					"slug": "display-large",
-					"size": "55px",
-					"fluid": {
-						"min": "32px",
-						"max": "50px"
-					}
-				},
-				{
-					"name": "Display Large Static",
-					"slug": "display-large-static",
-					"size": "48px",
-					"fluid": false
-				}
-			]
 		}
 	},
 	"customTemplates": [
