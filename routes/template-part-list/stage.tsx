@@ -21,10 +21,11 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useMemo, useCallback } from '@wordpress/element';
+import { useMemo, useCallback, useState } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import type { WpTemplatePart } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
+import { CreateTemplatePartModal } from '@wordpress/fields';
 
 /**
  * Internal dependencies
@@ -73,6 +74,9 @@ function TemplatePartList() {
 			} ),
 		[]
 	);
+
+	const [ showTemplatePartModal, setShowTemplatePartModal ] =
+		useState( false );
 
 	const defaultView: View = useMemo( () => {
 		return getDefaultView( postTypeObject, area );
@@ -258,11 +262,7 @@ function TemplatePartList() {
 					{ labels?.add_new_item && canCreateRecord && (
 						<Button
 							variant="primary"
-							onClick={ () => {
-								navigate( {
-									to: '/template-parts/new',
-								} );
-							} }
+							onClick={ () => setShowTemplatePartModal( true ) }
 							size="compact"
 						>
 							{ labels.add_new_item }
@@ -338,6 +338,22 @@ function TemplatePartList() {
 					/>
 				) }
 			/>
+			{ showTemplatePartModal && (
+				<CreateTemplatePartModal
+					closeModal={ () => setShowTemplatePartModal( false ) }
+					blocks={ [] }
+					onCreate={ ( templatePart ) => {
+						setShowTemplatePartModal( false );
+						navigate( {
+							to: `/types/wp_template_part/edit/${ encodeURIComponent(
+								templatePart.id
+							) }`,
+						} );
+					} }
+					onError={ () => setShowTemplatePartModal( false ) }
+					defaultArea={ area !== 'all' ? area : 'uncategorized' }
+				/>
+			) }
 		</Page>
 	);
 }
