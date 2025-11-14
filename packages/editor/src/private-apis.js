@@ -12,6 +12,7 @@ import EditorContentSlotFill from './components/editor-interface/content-slot-fi
 import BackButton from './components/header/back-button';
 import Editor from './components/editor';
 import { EditorPresence } from './components/editor-presence';
+import { CollaborationMode } from './components/collaboration-mode';
 import PluginPostExcerpt from './components/post-excerpt/plugin';
 import PostCardPanel from './components/post-card-panel';
 import PreferencesModal from './components/preferences-modal';
@@ -44,6 +45,7 @@ lock( privateApis, {
 	Editor,
 	EditorContentSlotFill,
 	EditorPresence,
+	CollaborationMode,
 	GlobalStylesProvider,
 	mergeBaseAndUserConfigs,
 	PluginPostExcerpt,
