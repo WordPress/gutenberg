@@ -1034,12 +1034,14 @@ export const orderEventFields: Field< OrderEvent >[] = [
 		render: ( { item } ) => (
 			<Icon icon={ eventTypeIcons[ item.type ] || pin } />
 		),
+		enableSorting: false,
 	},
 	{
 		label: 'Order',
 		id: 'orderNumber',
 		type: 'text',
 		enableHiding: true,
+		enableSorting: false,
 	},
 	{
 		label: 'Title',
@@ -1048,6 +1050,7 @@ export const orderEventFields: Field< OrderEvent >[] = [
 		enableHiding: true,
 		enableGlobalSearch: true,
 		getValue: ( { item } ) => item.name.title,
+		enableSorting: false,
 	},
 	{
 		label: 'Description',
@@ -1061,6 +1064,7 @@ export const orderEventFields: Field< OrderEvent >[] = [
 		id: 'date',
 		label: 'Date',
 		type: 'date',
+		enableSorting: false,
 		render: ( { item } ) => {
 			return (
 				<span>
@@ -1077,6 +1081,7 @@ export const orderEventFields: Field< OrderEvent >[] = [
 		id: 'time',
 		label: 'Time',
 		type: 'datetime',
+		enableSorting: false,
 		getValue: ( { item } ) => item.datetime,
 		render: ( { item } ) => {
 			return (
@@ -1094,6 +1099,7 @@ export const orderEventFields: Field< OrderEvent >[] = [
 		id: 'datetime',
 		label: 'Datetime',
 		type: 'datetime',
+		enableSorting: false,
 		render: ( { item } ) => {
 			return (
 				<span>
@@ -1115,6 +1121,7 @@ export const orderEventFields: Field< OrderEvent >[] = [
 		label: 'Type',
 		id: 'type',
 		enableHiding: false,
+		enableSorting: false,
 		elements: [
 			{ value: 'status', label: 'Status' },
 			{ value: 'payment', label: 'Payment' },
@@ -1163,6 +1170,7 @@ export const orderEventFields: Field< OrderEvent >[] = [
 		],
 		type: 'array',
 		enableGlobalSearch: true,
+		enableSorting: false,
 	},
 ];
 
