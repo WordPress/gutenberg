@@ -518,10 +518,10 @@ function Thread( {
 	const handleCommentSelect = () => {
 		setNewNoteFormState( 'closed' );
 		setSelectedThread( thread.id );
+		toggleBlockSpotlight( thread.blockClientId, true );
 		if ( !! thread.blockClientId ) {
 			// Pass `null` as the second parameter to prevent focusing the block.
 			selectBlock( thread.blockClientId, null );
-			toggleBlockSpotlight( thread.blockClientId, true );
 		}
 	};
 
