@@ -53,6 +53,7 @@ const sampleMediaItem: MediaItem = {
 	meta: {},
 	permalink_template: 'https://example.com/?attachment_id=123',
 	generated_slug: 'sample-image',
+	class_list: [ 'post-123', 'attachment' ],
 	alt_text: 'A beautiful sample image',
 	caption: {
 		raw: 'A caption for the image',
@@ -136,6 +137,7 @@ const sampleMediaItemZip: MediaItem = {
 	meta: {},
 	permalink_template: 'http://localhost:8888/?attachment_id=101',
 	generated_slug: 'gutenberg-v22-0-0',
+	class_list: [ 'post-101', 'attachment' ],
 	alt_text: '',
 	caption: {
 		raw: '',
