@@ -31,6 +31,38 @@
 			"import": "./build-module/index.js",
 			"require": "./build/index.js"
 		},
+		"./types": {
+			"types": "./build-types/types.d.ts",
+			"import": "./build-module/types.js",
+			"require": "./build/types.js"
+		},
+		"./build-types/types": {
+			"types": "./build-types/types.d.ts"
+		},
+		"./redux-store": {
+			"types": "./build-types/redux-store/index.d.ts",
+			"import": "./build-module/redux-store/index.js",
+			"require": "./build/redux-store/index.js"
+		},
+		"./redux-store/metadata/actions": {
+			"types": "./build-types/redux-store/metadata/actions.d.ts",
+			"import": "./build-module/redux-store/metadata/actions.js",
+			"require": "./build/redux-store/metadata/actions.js"
+		},
+		"./redux-store/metadata/selectors": {
+			"types": "./build-types/redux-store/metadata/selectors.d.ts",
+			"import": "./build-module/redux-store/metadata/selectors.js",
+			"require": "./build/redux-store/metadata/selectors.js"
+		},
+		"./build-types/redux-store": {
+			"types": "./build-types/redux-store/index.d.ts"
+		},
+		"./build-types/redux-store/metadata/actions": {
+			"types": "./build-types/redux-store/metadata/actions.d.ts"
+		},
+		"./build-types/redux-store/metadata/selectors": {
+			"types": "./build-types/redux-store/metadata/selectors.d.ts"
+		},
 		"./package.json": "./package.json"
 	},
 	"react-native": "src/index",
