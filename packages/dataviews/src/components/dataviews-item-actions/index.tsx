@@ -71,7 +71,7 @@ function ButtonTrigger< Item >( {
 	action,
 	onClick,
 	items,
-	variant = undefined,
+	variant,
 }: ActionTriggerProps< Item > ) {
 	const label =
 		typeof action.label === 'string' ? action.label : action.label( items );
@@ -285,7 +285,7 @@ export function PrimaryActions< Item >( {
 	item,
 	actions,
 	registry,
-	buttonVariant = undefined,
+	buttonVariant,
 }: PrimaryActionsProps< Item > ) {
 	const [ activeModalAction, setActiveModalAction ] = useState( null as any );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
