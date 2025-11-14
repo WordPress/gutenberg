@@ -116,7 +116,7 @@
 	}
 
 	[cmdk-root] > [cmdk-list] {
-		max-height: 368px; // Specific to not have commands overflow oddly.
+		max-height: $palette-max-height; // Specific to not have commands overflow oddly.
 		overflow: auto;
 
 		// Ensures there is always padding bottom on the last group, when there are commands.
