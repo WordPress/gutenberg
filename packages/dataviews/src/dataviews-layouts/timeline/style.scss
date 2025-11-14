@@ -107,17 +107,8 @@
 		align-self: stretch;
 		gap: $grid-unit-05;
 		flex-direction: column;
-		width: $grid-unit-40;
 		flex-shrink: 0;
-
-		&::before {
-			content: "";
-			flex: 0 0 auto;
-			width: 1px;
-			margin: 0 auto;
-			background-color: $gray-300;
-			height: $grid-unit-05;
-		}
+		width: $grid-unit-30;
 
 		&::after {
 			content: "";
@@ -128,22 +119,20 @@
 		}
 
 		.dataviews-view-timeline__event-type-icon {
-			width: $grid-unit-40;
-			height: $grid-unit-40;
-		}
-
-		&.is-small {
 			width: $grid-unit-30;
-			.dataviews-view-timeline__event-type-icon {
-				width: $grid-unit-30;
-				height: $grid-unit-30;
-			}
-			&::before {
-				height: $grid-unit-10;
-			}
+			height: $grid-unit-30;
 		}
 
-		&.has-bullet {
+		&::before {
+			content: "";
+			flex: 0 0 auto;
+			width: 1px;
+			margin: 0 auto;
+			background-color: $gray-300;
+			height: $grid-unit-10;
+		}
+
+		&.is-compact {
 			width: $grid-unit-10;
 			.dataviews-view-timeline__event-type-icon {
 				width: $grid-unit-10;
@@ -151,6 +140,17 @@
 			}
 			&::before {
 				height: $grid-unit-20;
+			}
+		}
+
+		&.is-comfortable {
+			width: $grid-unit-40;
+			.dataviews-view-timeline__event-type-icon {
+				width: $grid-unit-40;
+				height: $grid-unit-40;
+			}
+			&::before {
+				height: $grid-unit-05;
 			}
 		}
 	}

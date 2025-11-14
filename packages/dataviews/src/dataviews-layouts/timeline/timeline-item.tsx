@@ -43,7 +43,6 @@ function TimelineItem< Item >(
 		titleField?: NormalizedField< Item >;
 		descriptionField?: NormalizedField< Item >;
 		eventField?: NormalizedField< Item > | undefined;
-		eventIconSize?: 'default' | 'small' | 'medium';
 		otherFields: NormalizedField< Item >[];
 		posinset?: number;
 	}
@@ -56,7 +55,6 @@ function TimelineItem< Item >(
 		mediaField,
 		descriptionField,
 		eventField,
-		eventIconSize,
 		otherFields,
 		posinset,
 		onClickItem,
@@ -92,13 +90,15 @@ function TimelineItem< Item >(
 		};
 	}, [ actions, item ] );
 
-	const mediaSize = eventIconSize === 'small' ? 24 : 32;
+	const density = view.layout?.density ?? 'balanced';
 	const mediaContent =
-		showMedia && mediaField?.render ? (
+		showMedia && density !== 'compact' && mediaField?.render ? (
 			<mediaField.render
 				item={ item }
 				field={ mediaField }
-				config={ { sizes: mediaSize + 'px' } }
+				config={ {
+					sizes: density === 'comfortable' ? '32px' : '24px',
+				} }
 			/>
 		) : null;
 
@@ -207,8 +207,8 @@ function TimelineItem< Item >(
 					<div
 						className={ clsx(
 							'dataviews-view-timeline__event-type',
-							eventIconSize === 'small' && 'is-small',
-							mediaContent ? 'has-media' : 'has-bullet'
+							density === 'compact' && 'is-compact',
+							density === 'comfortable' && 'is-comfortable'
 						) }
 					>
 						{ renderedMediaField }

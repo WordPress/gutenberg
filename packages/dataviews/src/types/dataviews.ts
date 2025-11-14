@@ -267,9 +267,9 @@ export interface ViewTimeline extends ViewBase {
 		showGroupFieldLabel?: boolean;
 
 		/**
-		 * The size of the event icon.
+		 * The density of the view.
 		 */
-		eventIconSize?: 'default' | 'small' | 'medium';
+		density?: Density;
 	};
 }
 

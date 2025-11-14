@@ -570,12 +570,12 @@ const TimelineComponent = ( {
 	showMedia = true,
 	showGroupFieldLabel = true,
 	grouping = true,
-	eventIconSize = 'default',
+	density = 'balanced',
 }: {
 	showMedia: boolean;
 	showGroupFieldLabel: boolean;
 	grouping: boolean;
-	eventIconSize: 'default' | 'small' | 'medium';
+	density: 'compact' | 'balanced' | 'comfortable';
 } ) => {
 	const [ view, setView ] = useState< View >( {
 		type: LAYOUT_TIMELINE,
@@ -601,7 +601,7 @@ const TimelineComponent = ( {
 		layout: {
 			eventField: 'datetime',
 			showGroupFieldLabel,
-			eventIconSize,
+			density,
 		},
 	} );
 	useEffect( () => {
@@ -618,11 +618,11 @@ const TimelineComponent = ( {
 				layout: {
 					...prevLayout,
 					showGroupFieldLabel,
-					eventIconSize,
+					density,
 				},
 			};
 		} );
-	}, [ showMedia, showGroupFieldLabel, grouping, eventIconSize ] );
+	}, [ showMedia, showGroupFieldLabel, grouping, density ] );
 
 	// Custom fields with render methods for date and datetime
 	const timelineFields: Field< OrderEvent >[] = orderEventFields.map(
@@ -715,7 +715,7 @@ export const Timeline = {
 		showMedia: true,
 		showGroupFieldLabel: false,
 		grouping: true,
-		eventIconSize: 'default',
+		density: 'balanced',
 	},
 	argTypes: {
 		showMedia: {
@@ -737,11 +737,11 @@ export const Timeline = {
 			defaultValue: true,
 			description: 'Whether items are grouped by date in the timeline',
 		},
-		eventIconSize: {
+		density: {
 			control: 'select',
-			options: [ 'default', 'small', 'medium' ],
-			defaultValue: 'default',
-			description: 'Size of the event icon in the timeline',
+			options: [ 'compact', 'balanced', 'comfortable' ],
+			defaultValue: 'balanced',
+			description: 'Density of the timeline',
 		},
 	},
 };
