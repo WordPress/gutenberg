@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+- DataViews table layout: make checkboxes permanently visible when bulk actions are available. [#73245](https://github.com/WordPress/gutenberg/pull/73245)
 - Improve docs for Edit component. [#73202](https://github.com/WordPress/gutenberg/pull/73202)
 - Field API: introduce the `format` prop to format the `date` field type. [#72999](https://github.com/WordPress/gutenberg/pull/72999)
 
