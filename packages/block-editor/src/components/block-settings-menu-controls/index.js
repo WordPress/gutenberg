@@ -96,7 +96,6 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 						{ showConvertToGroupButton && (
 							<ConvertToGroupButton
 								{ ...convertToGroupButtonProps }
-								isUngroupable={ shouldShowUngroup }
 								onClose={ fillProps?.onClose }
 							/>
 						) }
