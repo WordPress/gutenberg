@@ -118,7 +118,8 @@ export default function BreadcrumbEdit( {
 
 	// Try to determine breadcrumb type for more accurate previews.
 	let _showTerms;
-	// For non-hierarchical post types with a parent (e.g., attachments) use ancestor-based breadcrumbs.
+	// Some non-hierarchical post types (e.g., attachments) can have parents.
+	// Use hierarchical breadcrumbs if a parent exists, otherwise use taxonomy breadcrumbs.
 	if ( ! isPostTypeHierarchical && ! post?.parent ) {
 		_showTerms = true;
 	} else if ( ! postTypeHasTaxonomies ) {

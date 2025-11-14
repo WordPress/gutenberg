@@ -77,25 +77,24 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		}
 
 		// For non-hierarchical post types with parents (e.g., attachments), build trail for the parent.
-		$trail_post_id     = $post_id;
-		$trail_post_type   = $post_type;
-		$trail_post_parent = $post->post_parent;
-		$parent_post       = null;
-		if ( ! is_post_type_hierarchical( $post_type ) && $post->post_parent ) {
-			$parent_post = get_post( $post->post_parent );
+		$post_parent = $post->post_parent;
+		$parent_post = null;
+		if ( ! is_post_type_hierarchical( $post_type ) && $post_parent ) {
+			$parent_post = get_post( $post_parent );
 			if ( $parent_post ) {
-				// Use parent post for the breadcrumb trail.
-				$trail_post_id     = $parent_post->ID;
-				$trail_post_type   = $parent_post->post_type;
-				$trail_post_parent = $parent_post->post_parent;
+				$post_id     = $parent_post->ID;
+				$post_type   = $parent_post->post_type;
+				$post_parent = $parent_post->post_parent;
 			}
 		}
 
 		// Determine breadcrumb type.
+		// Some non-hierarchical post types (e.g., attachments) can have parents.
+		// Use hierarchical breadcrumbs if a parent exists, otherwise use taxonomy breadcrumbs.
 		$show_terms = false;
-		if ( ! is_post_type_hierarchical( $trail_post_type ) && ! $trail_post_parent ) {
+		if ( ! is_post_type_hierarchical( $post_type ) && ! $post_parent ) {
 			$show_terms = true;
-		} elseif ( empty( get_object_taxonomies( $trail_post_type, 'objects' ) ) ) {
+		} elseif ( empty( get_object_taxonomies( $post_type, 'objects' ) ) ) {
 			$show_terms = false;
 		} else {
 			$show_terms = $attributes['prefersTaxonomy'];
@@ -103,9 +102,9 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 
 		// Build breadcrumb trail.
 		if ( ! $show_terms ) {
-			$breadcrumb_items = array_merge( $breadcrumb_items, block_core_breadcrumbs_get_hierarchical_post_type_breadcrumbs( $trail_post_id ) );
+			$breadcrumb_items = array_merge( $breadcrumb_items, block_core_breadcrumbs_get_hierarchical_post_type_breadcrumbs( $post_id ) );
 		} else {
-			$breadcrumb_items = array_merge( $breadcrumb_items, block_core_breadcrumbs_get_terms_breadcrumbs( $trail_post_id, $trail_post_type ) );
+			$breadcrumb_items = array_merge( $breadcrumb_items, block_core_breadcrumbs_get_terms_breadcrumbs( $post_id, $post_type ) );
 		}
 
 		// Add parent post title if applicable.
