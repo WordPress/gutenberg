@@ -736,11 +736,16 @@ const CommentBoard = ( {
 	// Check if this is a resolution comment by checking metadata.
 	const hasUserContent =
 		thread?.content?.raw && String( thread.content.raw ).trim() !== '';
-	const isResolutionComment =
+	const isReopenComment =
 		thread.type === 'note' &&
 		thread.meta &&
-		( thread.meta._wp_note_status === 'resolved' ||
-			( thread.meta._wp_note_status === 'reopen' && ! hasUserContent ) );
+		thread.meta._wp_note_status === 'reopen';
+	const isResolvedComment =
+		thread.type === 'note' &&
+		thread.meta &&
+		thread.meta._wp_note_status === 'resolved';
+	const isResolutionComment =
+		isResolvedComment || ( isReopenComment && ! hasUserContent );
 
 	const actions = [
 		{
@@ -762,7 +767,7 @@ const CommentBoard = ( {
 		{
 			id: 'delete',
 			title: __( 'Delete' ),
-			isEligible: () => true,
+			isEligible: () => ! isReopenComment,
 			onClick: () => {
 				setActionState( 'delete' );
 				setShowConfirmDialog( true );
@@ -876,11 +881,11 @@ const CommentBoard = ( {
 						'editor-collab-sidebar-panel__user-comment',
 						{
 							'editor-collab-sidebar-panel__resolution-text':
-								isResolutionComment,
+								isResolvedComment || isReopenComment,
 						}
 					) }
 				>
-					{ isResolutionComment
+					{ isResolvedComment || isReopenComment
 						? ( () => {
 								const actionText =
 									thread.meta._wp_note_status === 'resolved'
