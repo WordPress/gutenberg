@@ -774,7 +774,6 @@ const CommentBoard = ( {
 			? actions.filter( ( item ) => item.isEligible( thread ) )
 			: [];
 
-	let deleteConfirmMessage = __(
 	const deleteConfirmMessage =
 		// When deleting a top level note, descendants will also be deleted.
 		thread.parent === 0
