@@ -30,7 +30,7 @@ import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
-import { useMergeRefs, usePrevious, useInstanceId } from '@wordpress/compose';
+import { useMergeRefs, useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -213,7 +213,6 @@ export default function NavigationLinkEdit( {
 	const itemLabelPlaceholder = __( 'Add label…' );
 	const ref = useRef();
 	const linkUIref = useRef();
-	const prevUrl = usePrevious( url );
 	// A link is "new" only if it has an undefined label
 	// After the link is created, even if no label is provided, it's set to an empty string.
 	const isNewLink = useRef( label === undefined );
@@ -336,20 +335,37 @@ export default function NavigationLinkEdit( {
 		transformToSubmenu,
 	] );
 
-	// If the LinkControl popover is open and the URL has changed, close the LinkControl and focus the label text.
+	// Handle link UI when a new link is created
 	useEffect( () => {
-		// We only want to do this when the URL has gone from nothing to a new URL AND the label looks like a URL
-		if (
-			! prevUrl &&
-			url &&
-			isLinkOpen &&
-			isURL( prependHTTP( label ) ) &&
-			/^.+\.[a-z]+/.test( label )
-		) {
+		// We know if a link was just created if:
+		// 1. isNewLink.current is true
+		// 2. url has a value
+		if ( ! isNewLink.current || ! url ) {
+			return;
+		}
+
+		// If the link UI is open, then focus has not resolved from the selectBlock in the onChange.
+		// We defer handling any UI updates until the focus has resolved and the link UI is closed.
+		if ( isLinkOpen ) {
+			return;
+		}
+
+		// Ensure this only runs once
+		isNewLink.current = false;
+
+		// We just created a link and the block is now selected.
+		// The LinkUI is closed due to the selectBlock from the onChange.
+		// If the label looks like a URL, focus and select the label text.
+		// Otherwise, reopen the link UI so the popover is visible in the preview state
+		if ( isURL( prependHTTP( label ) ) && /^.+\.[a-z]+/.test( label ) ) {
 			// Focus and select the label text.
 			selectLabelText();
+		} else {
+			// The link was just created and is now selected which closed the popover.
+			// Re-open the link UI so the popover is visible in the preview state
+			setIsLinkOpen( true );
 		}
-	}, [ prevUrl, url, isLinkOpen, label ] );
+	}, [ url, isLinkOpen, isNewLink, label ] );
 
 	/**
 	 * Focus the Link label text and select it.
@@ -592,18 +608,6 @@ export default function NavigationLinkEdit( {
 								// Don't remove if binding exists (even if entity is unavailable) so user can fix it.
 								if ( ! url && ! hasUrlBinding ) {
 									onReplace( [] );
-								} else if ( isNewLink.current ) {
-									// If we just created a new link, select it ONLY if another block wasn't already selected
-									// When the user clicks another block, that block gets selected BEFORE onClose is called
-									// So we check: if this block is still selected, user closed via Escape; otherwise they clicked another block
-									if (
-										getSelectedBlockClientId() ===
-										parentBlockClientId
-									) {
-										selectBlock( clientId );
-									}
-									// Mark as no longer new
-									isNewLink.current = false;
 								}
 							} }
 							anchor={ popoverAnchor }
@@ -625,6 +629,19 @@ export default function NavigationLinkEdit( {
 									createBinding( updatedAttributes );
 								} else {
 									clearBinding();
+								}
+
+								// If the link was just created, we want to select the block so the inspector controls
+								// are accurate.
+								if (
+									isNewLink.current &&
+									updatedAttributes.url &&
+									clientId !== getSelectedBlockClientId()
+								) {
+									// Note: selectBlock will close the link UI if it is open, so we handle that
+									// separately by re-opening the link UI in a useEffect.
+									// TODO: Prevent the link UI from being closed by selectBlock.
+									selectBlock( clientId );
 								}
 							} }
 						/>
