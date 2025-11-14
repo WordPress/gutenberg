@@ -84,22 +84,16 @@ function ContextScreens( { name, parentMenu = '' }: ContextScreensProps ) {
 		[ name ]
 	);
 
-	return (
-		<>
-			<GlobalStylesNavigationScreen
-				path={ parentMenu + '/colors/palette' }
-			>
-				<ScreenColorPalette name={ name } />
-			</GlobalStylesNavigationScreen>
+	if ( ! blockStyleVariations?.length ) {
+		return null;
+	}
 
-			{ !! blockStyleVariations?.length && (
-				<BlockStylesNavigationScreens
-					parentMenu={ parentMenu }
-					blockStyles={ blockStyleVariations }
-					blockName={ name || '' }
-				/>
-			) }
-		</>
+	return (
+		<BlockStylesNavigationScreens
+			parentMenu={ parentMenu }
+			blockStyles={ blockStyleVariations }
+			blockName={ name || '' }
+		/>
 	);
 }
 
