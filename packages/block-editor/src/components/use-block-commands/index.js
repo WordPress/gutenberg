@@ -26,7 +26,6 @@ import {
 import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
 import { cleanEmptyObject } from '../../hooks/utils';
-import { unlock } from '../../lock-unlock';
 
 const getTransformCommands = () =>
 	function useTransformCommands() {
@@ -139,27 +138,23 @@ const getTransformCommands = () =>
 
 const getQuickActionsCommands = () =>
 	function useQuickActionsCommands() {
-		const { clientIds, isUngroupable, isGroupable, isSectionBlock } =
-			useSelect( ( select ) => {
+		const { clientIds, isUngroupable, isGroupable } = useSelect(
+			( select ) => {
 				const {
 					getSelectedBlockClientIds,
 					isUngroupable: _isUngroupable,
 					isGroupable: _isGroupable,
 				} = select( blockEditorStore );
-				const { isSectionBlock: _isSectionBlock } = unlock(
-					select( blockEditorStore )
-				);
 				const selectedBlockClientIds = getSelectedBlockClientIds();
 
 				return {
 					clientIds: selectedBlockClientIds,
 					isUngroupable: _isUngroupable(),
 					isGroupable: _isGroupable(),
-					isSectionBlock:
-						selectedBlockClientIds.length === 1 &&
-						_isSectionBlock( selectedBlockClientIds[ 0 ] ),
 				};
-			}, [] );
+			},
+			[]
+		);
 		const {
 			canInsertBlockType,
 			getBlockRootClientId,
@@ -180,9 +175,6 @@ const getQuickActionsCommands = () =>
 			insertBeforeBlock,
 			updateBlockAttributes,
 		} = useDispatch( blockEditorStore );
-		const { editContentOnlySection } = unlock(
-			useDispatch( blockEditorStore )
-		);
 
 		const onGroup = () => {
 			if ( ! blocks.length ) {
@@ -211,13 +203,6 @@ const getQuickActionsCommands = () =>
 			}
 
 			replaceBlocks( clientIds, innerBlocks );
-		};
-
-		const onUnlockDesign = () => {
-			if ( clientIds.length !== 1 ) {
-				return;
-			}
-			editContentOnlySection( clientIds[ 0 ] );
 		};
 
 		if ( ! clientIds || clientIds.length < 1 ) {
@@ -290,15 +275,10 @@ const getQuickActionsCommands = () =>
 		}
 
 		if ( isUngroupable ) {
-			const shouldShowUnlockDesign =
-				isSectionBlock &&
-				!! window?.__experimentalContentOnlyPatternInsertion;
 			commands.push( {
-				name: shouldShowUnlockDesign ? 'unlock-design' : 'ungroup',
-				label: shouldShowUnlockDesign
-					? __( 'Edit pattern' )
-					: __( 'Ungroup' ),
-				callback: shouldShowUnlockDesign ? onUnlockDesign : onUngroup,
+				name: 'ungroup',
+				label: __( 'Ungroup' ),
+				callback: onUngroup,
 				icon: ungroup,
 			} );
 		}
