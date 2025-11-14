@@ -240,8 +240,6 @@ export function GlobalStylesUI( {
 						</GlobalStylesNavigationScreen>
 					) ) }
 
-					<ContextScreens />
-
 					{ blocks.map( ( block: BlockType ) => (
 						<ContextScreens
 							key={ 'screens-block-' + block.name }
