@@ -114,7 +114,6 @@ export function ViewTypeMenu() {
 
 function SortFieldControl() {
 	const { view, fields, onChangeView } = useContext( DataViewsContext );
-
 	const orderOptions = useMemo( () => {
 		const sortableFields = fields.filter(
 			( field ) => field.enableSorting !== false
@@ -325,12 +324,10 @@ export function DataviewsViewConfigDropdown() {
 				>
 					<VStack className="dataviews-view-config" spacing={ 6 }>
 						<SettingsSection title={ __( 'Appearance' ) }>
-							{ !! activeLayout?.supports?.sorting && (
-								<HStack expanded className="is-divided-in-two">
-									<SortFieldControl />
-									<SortDirectionControl />
-								</HStack>
-							) }
+							<HStack expanded className="is-divided-in-two">
+								<SortFieldControl />
+								<SortDirectionControl />
+							</HStack>
 							{ !! activeLayout?.viewConfigOptions && (
 								<activeLayout.viewConfigOptions />
 							) }

@@ -37,7 +37,6 @@ export const VIEW_LAYOUTS = [
 		component: ViewTable,
 		icon: blockTable,
 		viewConfigOptions: DensityPicker,
-		supports: { sorting: true },
 	},
 	{
 		type: LAYOUT_GRID,
@@ -45,21 +44,18 @@ export const VIEW_LAYOUTS = [
 		component: ViewGrid,
 		icon: category,
 		viewConfigOptions: PreviewSizePicker,
-		supports: { sorting: true },
 	},
 	{
 		type: LAYOUT_LIST,
 		label: __( 'List' ),
 		component: ViewList,
 		icon: isRTL() ? formatListBulletsRTL : formatListBullets,
-		supports: { sorting: true },
 	},
 	{
 		type: LAYOUT_TIMELINE,
 		label: __( 'Timeline' ),
 		component: ViewTimeline,
 		icon: scheduled,
-		supports: {},
 	},
 	{
 		type: LAYOUT_PICKER_GRID,
@@ -68,7 +64,6 @@ export const VIEW_LAYOUTS = [
 		icon: category,
 		viewConfigOptions: PreviewSizePicker,
 		isPicker: true,
-		supports: { sorting: true },
 	},
 	{
 		type: LAYOUT_PICKER_TABLE,
@@ -77,6 +72,5 @@ export const VIEW_LAYOUTS = [
 		icon: blockTable,
 		viewConfigOptions: DensityPicker,
 		isPicker: true,
-		supports: { sorting: true },
 	},
 ];
