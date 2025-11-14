@@ -1,7 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { home, styles, navigation, page, symbol } from '@wordpress/icons';
+import {
+	home,
+	styles,
+	navigation,
+	page,
+	symbol,
+	symbolFilled,
+} from '@wordpress/icons';
 import { dispatch } from '@wordpress/data';
 import { store as bootStore } from '@wordpress/boot';
 
@@ -16,6 +23,7 @@ export async function init() {
 		styles: { icon: styles },
 		navigation: { icon: navigation },
 		pages: { icon: page },
+		templateParts: { icon: symbolFilled },
 		patterns: { icon: symbol },
 	};
 

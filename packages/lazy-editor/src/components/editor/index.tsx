@@ -15,10 +15,10 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useStylesId } from './hooks/use-styles-id';
-import { useEditorSettings } from './hooks/use-editor-settings';
-import { useEditorAssets } from './hooks/use-editor-assets';
-import { unlock } from './lock-unlock';
+import { useStylesId } from '../../hooks/use-styles-id';
+import { useEditorSettings } from '../../hooks/use-editor-settings';
+import { useEditorAssets } from '../../hooks/use-editor-assets';
+import { unlock } from '../../lock-unlock';
 
 const { Editor: PrivateEditor, BackButton } = unlock( editorPrivateApis );
 

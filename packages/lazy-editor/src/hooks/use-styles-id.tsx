@@ -19,7 +19,7 @@ interface Template {
  * @param {string} [props.templateId] - The ID of the template to use.
  * @return The styles ID.
  */
-export function useStylesId( { templateId }: { templateId?: string } ) {
+export function useStylesId( { templateId }: { templateId?: string } = {} ) {
 	const { globalStylesId, stylesId } = useSelect(
 		( select ) => {
 			const coreDataSelect = select( coreStore );
