@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { more as icon } from '@wordpress/icons';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -34,5 +35,18 @@ export const settings = {
 	edit,
 	save,
 };
+
+if ( window.__experimentalContentOnlyPatternInsertion ) {
+	settings.fields = [
+		{
+			label: __( 'Content' ),
+			type: 'RichText',
+			shownByDefault: true,
+			mapping: {
+				value: 'customText',
+			},
+		},
+	];
+}
 
 export const init = () => initBlock( { name, metadata, settings } );

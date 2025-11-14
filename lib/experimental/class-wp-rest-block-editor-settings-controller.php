@@ -544,12 +544,31 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 				}
 			}
 
+			// Build an import map from registered script modules.
+			// the import map need to be dynamically extended in the frontend.
+			$script_modules = wp_script_modules();
+			$registered     = array();
+			$reflection     = new ReflectionClass( $script_modules );
+			$property       = $reflection->getProperty( 'registered' );
+			$property->setAccessible( true );
+			$registered = $property->getValue( $script_modules );
+			$import_map = array();
+			foreach ( $registered as $id => $module ) {
+				// Handle both array and object formats.
+				if ( is_array( $module ) && isset( $module['src'] ) ) {
+					$import_map[ $id ] = $module['src'];
+				} elseif ( is_object( $module ) && isset( $module->src ) ) {
+					$import_map[ $id ] = $module->src;
+				}
+			}
+
 			return array(
 				'scripts'        => $scripts_data,
 				'styles'         => $styles_data,
 				'inline_scripts' => $inline_scripts,
 				'inline_styles'  => $inline_styles,
 				'html_templates' => $html_templates,
+				'script_modules' => $import_map,
 			);
 		}
 
@@ -624,6 +643,11 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 					),
 					'inline_styles'  => array(
 						'description' => __( 'Inline styles for editor assets.', 'gutenberg' ),
+						'type'        => 'object',
+						'readonly'    => true,
+					),
+					'script_modules' => array(
+						'description' => __( 'Script modules to load into the import map.', 'gutenberg' ),
 						'type'        => 'object',
 						'readonly'    => true,
 					),

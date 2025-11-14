@@ -832,14 +832,53 @@ export const DateComponent = ( {
 	type,
 	Edit,
 	asyncElements,
+	formatDate,
+	formatWeekStartsOn,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
+	formatDate?: string;
+	formatWeekStartsOn?:
+		| 'sunday'
+		| 'monday'
+		| 'tuesday'
+		| 'wednesday'
+		| 'thursday'
+		| 'friday'
+		| 'saturday';
 } ) => {
 	const dateFields = useMemo(
-		() => fields.filter( ( field ) => field.type === 'date' ),
-		[]
+		() =>
+			fields
+				.filter( ( field ) => field.type === 'date' )
+				.map( ( field ) => {
+					if ( formatDate || formatWeekStartsOn !== undefined ) {
+						const format: {
+							date?: string;
+							weekStartsOn?:
+								| 'sunday'
+								| 'monday'
+								| 'tuesday'
+								| 'wednesday'
+								| 'thursday'
+								| 'friday'
+								| 'saturday';
+						} = {};
+						if ( formatDate ) {
+							format.date = formatDate;
+						}
+						if ( formatWeekStartsOn !== undefined ) {
+							format.weekStartsOn = formatWeekStartsOn;
+						}
+						return {
+							...field,
+							format,
+						};
+					}
+					return field;
+				} ),
+		[ formatDate, formatWeekStartsOn ]
 	);
 
 	return (
@@ -852,6 +891,32 @@ export const DateComponent = ( {
 	);
 };
 DateComponent.storyName = 'date';
+DateComponent.args = {
+	formatDate: '',
+	formatWeekStartsOn: undefined,
+};
+DateComponent.argTypes = {
+	formatDate: {
+		control: 'text',
+		description:
+			'Custom PHP date format string (e.g., "F j, Y" for "November 6, 2010"). Leave empty to use WordPress default.',
+	},
+	formatWeekStartsOn: {
+		control: 'select',
+		options: {
+			Default: undefined,
+			Sunday: 'sunday',
+			Monday: 'monday',
+			Tuesday: 'tuesday',
+			Wednesday: 'wednesday',
+			Thursday: 'thursday',
+			Friday: 'friday',
+			Saturday: 'saturday',
+		},
+		description:
+			'Day that the week starts on. Leave as Default to use WordPress default.',
+	},
+};
 
 export const EmailComponent = ( {
 	type,

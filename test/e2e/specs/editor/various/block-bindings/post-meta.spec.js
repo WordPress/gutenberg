@@ -5,9 +5,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Post Meta source', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme(
-			'gutenberg-test-themes/block-bindings'
-		);
+		await requestUtils.activateTheme( 'emptytheme' );
 		await requestUtils.activatePlugin( 'gutenberg-test-block-bindings' );
 	} );
 
@@ -19,13 +17,26 @@ test.describe( 'Post Meta source', () => {
 	} );
 
 	test.describe( 'Movie CPT template', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.createTemplate( 'wp_template', {
+				slug: 'single-movie',
+				title: 'Single Movie',
+				content:
+					'<!-- wp:post-title /--><!-- wp:post-content {"layout":{"inherit":true}} /-->',
+			} );
+		} );
+
 		test.beforeEach( async ( { admin, editor } ) => {
 			await admin.visitSiteEditor( {
-				postId: 'gutenberg-test-themes/block-bindings//single-movie',
+				postId: 'emptytheme//single-movie',
 				postType: 'wp_template',
 				canvas: 'edit',
 			} );
 			await editor.openDocumentSettingsSidebar();
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllTemplates( 'wp_template' );
 		} );
 
 		test.describe( 'Block attributes values', () => {
@@ -296,7 +307,7 @@ test.describe( 'Post Meta source', () => {
 	test.describe( 'Custom template', () => {
 		test.beforeEach( async ( { admin, editor } ) => {
 			await admin.visitSiteEditor( {
-				postId: 'gutenberg-test-themes/block-bindings//custom-template',
+				postId: 'emptytheme//custom-template',
 				postType: 'wp_template',
 				canvas: 'edit',
 			} );

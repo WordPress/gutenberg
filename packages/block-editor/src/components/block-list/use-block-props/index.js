@@ -100,6 +100,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		isEditingContentOnlySection,
 		defaultClassName,
 		isSectionBlock,
+		isWithinSectionBlock,
 		canMove,
 		isBlockHidden,
 	} = useContext( PrivateBlockContext );
@@ -108,13 +109,14 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
 	const ffDragRef = useFirefoxDraggableCompatibility();
+	const isHoverEnabled = ! isWithinSectionBlock;
 	const mergedRefs = useMergeRefs( [
 		props.ref,
 		useFocusFirstElement( { clientId, initialPosition } ),
 		useBlockRefProvider( clientId ),
 		useFocusHandler( clientId ),
 		useEventHandlers( { clientId, isSelected } ),
-		useIsHovered(),
+		useIsHovered( { isEnabled: isHoverEnabled } ),
 		useIntersectionObserver(),
 		useMovingAnimation( { triggerAnimationOnChange: index, clientId } ),
 		useDisabled( { isDisabled: ! hasOverlay } ),
