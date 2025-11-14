@@ -8,12 +8,11 @@ import { createInterpolateElement } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { NormalizedField, ViewTimeline } from '../../types';
+import type { NormalizedField } from '../../types';
 
 interface TimelineGroupProps< Item > {
 	groupName: string;
 	groupData: Item[];
-	view: ViewTimeline;
 	groupField: NormalizedField< Item >;
 	children: React.ReactNode;
 }
@@ -21,27 +20,21 @@ interface TimelineGroupProps< Item > {
 export default function TimelineGroup< Item >( {
 	groupName,
 	groupData,
-	view,
 	groupField,
 	children,
 }: TimelineGroupProps< Item > ) {
 	// Determine if we should show the field label
-	const showGroupFieldLabel = view.layout?.showGroupFieldLabel ?? true;
-	const groupHeader = showGroupFieldLabel ? (
-		createInterpolateElement(
-			// translators: %s: The label of the field e.g. "Status".
-			sprintf( __( '%s: <groupName />' ), groupField.label ),
-			{
-				groupName: (
-					<groupField.render
-						item={ groupData[ 0 ] }
-						field={ groupField }
-					/>
-				),
-			}
-		)
-	) : (
-		<groupField.render item={ groupData[ 0 ] } field={ groupField } />
+	const groupHeader = createInterpolateElement(
+		// translators: %s: The label of the field e.g. "Status".
+		sprintf( __( '%s: <groupName />' ), groupField.label ),
+		{
+			groupName: (
+				<groupField.render
+					item={ groupData[ 0 ] }
+					field={ groupField }
+				/>
+			),
+		}
 	);
 
 	return (

@@ -257,11 +257,6 @@ export interface ViewTimeline extends ViewBase {
 
 	layout?: {
 		/**
-		 * Whether to show the group field label.
-		 */
-		showGroupFieldLabel?: boolean;
-
-		/**
 		 * The density of the view.
 		 */
 		density?: Density;

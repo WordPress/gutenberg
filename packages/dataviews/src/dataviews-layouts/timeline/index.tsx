@@ -67,7 +67,6 @@ export default function ViewTimeline< Item >(
 							key={ groupName }
 							groupName={ groupName }
 							groupData={ groupData }
-							view={ view }
 							groupField={ groupField }
 						>
 							<TimelineItems< Item >

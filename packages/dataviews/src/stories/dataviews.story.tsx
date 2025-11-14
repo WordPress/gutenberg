@@ -568,12 +568,10 @@ export const InfiniteScroll = () => {
 
 const TimelineComponent = ( {
 	showMedia = true,
-	showGroupFieldLabel = true,
 	grouping = true,
 	density = 'balanced',
 }: {
 	showMedia: boolean;
-	showGroupFieldLabel: boolean;
 	grouping: boolean;
 	density: 'compact' | 'balanced' | 'comfortable';
 } ) => {
@@ -599,7 +597,6 @@ const TimelineComponent = ( {
 			  }
 			: undefined,
 		layout: {
-			showGroupFieldLabel,
 			density,
 		},
 	} );
@@ -616,12 +613,11 @@ const TimelineComponent = ( {
 				showMedia,
 				layout: {
 					...prevLayout,
-					showGroupFieldLabel,
 					density,
 				},
 			};
 		} );
-	}, [ showMedia, showGroupFieldLabel, grouping, density ] );
+	}, [ showMedia, grouping, density ] );
 
 	// Custom fields with render methods for date and datetime
 	const timelineFields: Field< OrderEvent >[] = orderEventFields.map(
@@ -712,7 +708,6 @@ export const Timeline = {
 	render: TimelineComponent,
 	args: {
 		showMedia: true,
-		showGroupFieldLabel: false,
 		grouping: true,
 		density: 'balanced',
 	},
@@ -722,13 +717,6 @@ export const Timeline = {
 			options: [ true, false ],
 			defaultValue: true,
 			description: 'Whether the icon is shown in the timeline',
-		},
-		showGroupFieldLabel: {
-			control: 'boolean',
-			options: [ true, false ],
-			defaultValue: false,
-			description:
-				'Whether the group field label is shown in the timeline',
 		},
 		grouping: {
 			control: 'boolean',
