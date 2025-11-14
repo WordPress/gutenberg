@@ -216,15 +216,17 @@ function TimelineItem< Item >(
 						alignment="flex-start"
 						className="dataviews-view-timeline__event-content"
 					>
-						<ItemClickWrapper
-							item={ item }
-							isItemClickable={ isItemClickable }
-							onClickItem={ onClickItem }
-							renderItemLink={ renderItemLink }
-							className="dataviews-view-timeline__event-title"
-						>
-							{ renderedTitleField }
-						</ItemClickWrapper>
+						{ renderedTitleField && (
+							<ItemClickWrapper
+								item={ item }
+								isItemClickable={ isItemClickable }
+								onClickItem={ onClickItem }
+								renderItemLink={ renderItemLink }
+								className="dataviews-view-timeline__event-title"
+							>
+								{ renderedTitleField }
+							</ItemClickWrapper>
+						) }
 						{ showDescription && descriptionField && (
 							<div className="dataviews-view-timeline__event-description">
 								<descriptionField.render

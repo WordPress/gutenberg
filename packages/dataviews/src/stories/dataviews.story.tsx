@@ -232,7 +232,7 @@ export const MinimalUI = {
 	argTypes: {
 		layout: {
 			control: 'select',
-			options: [ 'table', 'list', 'grid' ],
+			options: [ 'table', 'list', 'grid', 'timeline' ],
 			defaultValue: 'table',
 		},
 	},
