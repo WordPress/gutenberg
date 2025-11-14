@@ -324,7 +324,7 @@ async function executeServerAbility(
  */
 export async function executeAbility(
 	name: string,
-	input: AbilityInput = null
+	input?: AbilityInput
 ): Promise< AbilityOutput > {
 	const ability = await getAbility( name );
 	if ( ! ability ) {

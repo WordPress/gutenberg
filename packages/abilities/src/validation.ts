@@ -176,8 +176,9 @@ export function validateValueFromSchema(
 	}
 
 	try {
-		const validate = ajv.compile( args );
-		const valid = validate( value );
+		const { default: defaultValue, ...schemaWithoutDefault } = args;
+		const validate = ajv.compile( schemaWithoutDefault );
+		const valid = validate( value === undefined ? defaultValue : value );
 
 		if ( valid ) {
 			return true;
