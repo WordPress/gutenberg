@@ -13,6 +13,7 @@ import {
 	Modal,
 	TextHighlight,
 	__experimentalHStack as HStack,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import {
 	store as keyboardShortcutsStore,
@@ -21,8 +22,17 @@ import {
 import { Icon, search as inputIcon } from '@wordpress/icons';
 import { executeAbility, store as abilitiesStore } from '@wordpress/abilities';
 
-const EMPTY_ARRAY = [];
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../lock-unlock';
 
+const { withIgnoreIMEEvents } = unlock( componentsPrivateApis );
+
+/**
+ * Constants
+ */
+const EMPTY_ARRAY = [];
 const inputLabel = __( 'Run abilities and workflows' );
 
 function WorkflowInput( { isOpen, search, setSearch, abilities } ) {
@@ -100,7 +110,7 @@ export function WorkflowMenu() {
 	useShortcut(
 		'core/workflows',
 		/** @type {import('react').KeyboardEventHandler} */
-		( event ) => {
+		withIgnoreIMEEvents( ( event ) => {
 			// Bails to avoid obscuring the effect of the preceding handler(s).
 			if ( event.defaultPrevented ) {
 				return;
@@ -108,7 +118,7 @@ export function WorkflowMenu() {
 
 			event.preventDefault();
 			setIsOpen( ! isOpen );
-		},
+		} ),
 		{
 			bindGlobal: true,
 		}
@@ -151,19 +161,6 @@ export function WorkflowMenu() {
 		}
 	};
 
-	const onKeyDown = ( event ) => {
-		if (
-			// Ignore keydowns from IMEs
-			event.nativeEvent.isComposing ||
-			// Workaround for Mac Safari where the final Enter/Backspace of an IME composition
-			// is `isComposing=false`, even though it's technically still part of the composition.
-			// These can only be detected by keyCode.
-			event.keyCode === 229
-		) {
-			event.preventDefault();
-		}
-	};
-
 	const onContainerKeyDown = ( event ) => {
 		// Handle going back when viewing output
 		if (
@@ -192,9 +189,10 @@ export function WorkflowMenu() {
 		>
 			<div
 				className="workflows-workflow-menu__container"
-				onKeyDown={ onContainerKeyDown }
-				tabIndex={ -1 }
+				onKeyDown={ withIgnoreIMEEvents( onContainerKeyDown ) }
 				ref={ containerRef }
+				//  Tab index and role are needed here to escape the output mode.
+				tabIndex={ -1 }
 				role="presentation"
 			>
 				{ abilityOutput ? (
@@ -224,11 +222,7 @@ export function WorkflowMenu() {
 						</div>
 					</div>
 				) : (
-					<Command
-						label={ inputLabel }
-						onKeyDown={ onKeyDown }
-						shouldFilter={ false }
-					>
+					<Command label={ inputLabel } shouldFilter={ false }>
 						<HStack className="workflows-workflow-menu__header">
 							<Icon
 								className="workflows-workflow-menu__header-search-icon"
