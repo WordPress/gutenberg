@@ -87,6 +87,10 @@ Parent field for BasePost.
 
 Password field for BasePost.
 
+### Pattern
+
+Undocumented declaration.
+
 ### patternTitleField
 
 Title for the pattern entity.

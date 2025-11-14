@@ -21,23 +21,25 @@ import { useStylesId } from '../../hooks/use-styles-id';
 const { useStyle } = unlock( editorPrivateApis );
 
 function PreviewContent( {
-	item,
+	blocks,
+	content,
 	description,
 }: {
-	item: { blocks?: any[]; content: { raw: string } };
+	blocks?: any[];
+	content?: string;
 	description: string;
 } ) {
 	const descriptionId = useId();
 	const backgroundColor = useStyle( 'color.background' );
-	const blocks = useMemo( () => {
+	const actualBlocks = useMemo( () => {
 		return (
-			item.blocks ??
-			parse( item.content.raw, {
+			blocks ??
+			parse( content, {
 				__unstableSkipMigrationLogs: true,
 			} )
 		);
-	}, [ item?.content?.raw, item.blocks ] );
-	const isEmpty = ! blocks?.length;
+	}, [ content, blocks ] );
+	const isEmpty = ! actualBlocks?.length;
 
 	return (
 		<div
@@ -45,10 +47,10 @@ function PreviewContent( {
 			style={ { backgroundColor } }
 			aria-describedby={ !! description ? descriptionId : undefined }
 		>
-			{ isEmpty && __( 'Empty template part' ) }
+			{ isEmpty && __( 'Empty.' ) }
 			{ ! isEmpty && (
 				<BlockPreview.Async>
-					<BlockPreview blocks={ blocks } />
+					<BlockPreview blocks={ actualBlocks } />
 				</BlockPreview.Async>
 			) }
 			{ !! description && (
@@ -61,10 +63,12 @@ function PreviewContent( {
 }
 
 export function Preview( {
-	item,
+	blocks,
+	content,
 	description,
 }: {
-	item: { blocks?: any[]; content: { raw: string } };
+	blocks?: any[];
+	content?: string;
 	description: string;
 } ) {
 	// Resolve styles ID from template
@@ -87,7 +91,11 @@ export function Preview( {
 	}
 	return (
 		<BlockEditorProvider settings={ finalSettings }>
-			<PreviewContent item={ item } description={ description } />
+			<PreviewContent
+				blocks={ blocks }
+				content={ content }
+				description={ description }
+			/>
 		</BlockEditorProvider>
 	);
 }
