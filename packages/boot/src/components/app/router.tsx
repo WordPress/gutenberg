@@ -1,16 +1,6 @@
 /**
  * External dependencies
  */
-import {
-	createRouter,
-	createRootRoute,
-	createRoute,
-	RouterProvider,
-	createBrowserHistory,
-	type AnyRoute,
-	redirect,
-} from '@tanstack/react-router';
-import { parseHref } from '@tanstack/history';
 import type { ComponentType } from 'react';
 
 /**
@@ -19,12 +9,28 @@ import type { ComponentType } from 'react';
 import { __ } from '@wordpress/i18n';
 import { lazy, useState, useEffect } from '@wordpress/element';
 import { Page } from '@wordpress/admin-ui';
+import {
+	privateApis as routePrivateApis,
+	type AnyRoute,
+} from '@wordpress/route';
 
 /**
  * Internal dependencies
  */
 import Root from '../root';
-import type { Route, RouteLoaderContext } from '../../store/types';
+import type { CanvasData, Route, RouteLoaderContext } from '../../store/types';
+import { unlock } from '../../lock-unlock';
+import Canvas from '../canvas';
+
+const {
+	createRouter,
+	createRootRoute,
+	createRoute,
+	RouterProvider,
+	createBrowserHistory,
+	parseHref,
+	useMatches,
+} = unlock( routePrivateApis );
 
 // Not found component
 function NotFoundComponent() {
@@ -40,10 +46,20 @@ function NotFoundComponent() {
 function RouteComponent( {
 	stage: Stage,
 	inspector: Inspector,
+	canvas: CustomCanvas,
 }: {
 	stage?: ComponentType;
 	inspector?: ComponentType;
+	canvas?: ComponentType;
 } ) {
+	// Get canvas data from the current route's loader
+	const matches = useMatches();
+	const currentMatch = matches[ matches.length - 1 ];
+	const canvasData = ( currentMatch?.loaderData as any )?.canvas as
+		| CanvasData
+		| null
+		| undefined;
+
 	return (
 		<>
 			{ Stage && (
@@ -54,6 +70,18 @@ function RouteComponent( {
 			{ Inspector && (
 				<div className="boot-layout__inspector">
 					<Inspector />
+				</div>
+			) }
+			{ /* Render custom canvas when canvas() returns null */ }
+			{ canvasData === null && CustomCanvas && (
+				<div className="boot-layout__canvas">
+					<CustomCanvas />
+				</div>
+			) }
+			{ /* Render default canvas when canvas() returns CanvasData */ }
+			{ canvasData && (
+				<div className="boot-layout__canvas">
+					<Canvas canvas={ canvasData } />
 				</div>
 			) }
 		</>
@@ -71,27 +99,25 @@ async function createRouteFromDefinition(
 	route: Route,
 	parentRoute: AnyRoute
 ) {
-	// Create lazy components for stage and inspector surfaces
-	const SurfacesModule = route.content_module
-		? lazy( async () => {
-				const module = await import( route.content_module! );
-				// Return a component that renders the surfaces
-				return {
-					default: () => (
-						<RouteComponent
-							stage={ module.stage }
-							inspector={ module.inspector }
-						/>
-					),
-				};
-		  } )
-		: () => null;
+	// Create lazy components for stage, inspector, and canvas surfaces
+	const SurfacesModule = lazy( async () => {
+		const module = route.content_module
+			? await import( route.content_module )
+			: {};
+		return {
+			default: () => (
+				<RouteComponent
+					stage={ module.stage }
+					inspector={ module.inspector }
+					canvas={ module.canvas }
+				/>
+			),
+		};
+	} );
 
 	// Load route module for lifecycle functions if specified
 	let routeConfig: {
-		beforeLoad?: (
-			context: RouteLoaderContext & { redirect: Function }
-		) => void | Promise< void >;
+		beforeLoad?: ( context: RouteLoaderContext ) => void | Promise< void >;
 		loader?: ( context: RouteLoaderContext ) => Promise< unknown >;
 		canvas?: ( context: RouteLoaderContext ) => Promise< any >;
 	} = {};
@@ -109,7 +135,6 @@ async function createRouteFromDefinition(
 					routeConfig.beforeLoad!( {
 						params: opts.params || {},
 						search: opts.search || {},
-						redirect,
 					} )
 			: undefined,
 		loader: async ( opts: any ) => {
@@ -171,7 +196,7 @@ function createPathHistory() {
 			const pathHref = `${ path }${ url.hash }`;
 			return parseHref( pathHref, window.history.state );
 		},
-		createHref: ( href ) => {
+		createHref: ( href: string ) => {
 			const searchParams = new URLSearchParams( window.location.search );
 			searchParams.set( 'p', href );
 			return `${ window.location.pathname }?${ searchParams }`;

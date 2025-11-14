@@ -6,6 +6,7 @@ import {
 	__experimentalNumberControl as NumberControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	Notice,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useCallback, useMemo, useEffect } from '@wordpress/element';
@@ -609,9 +610,20 @@ export default function TypographyPanel( {
 					<TextAlignmentControl
 						value={ textAlign }
 						onChange={ setTextAlign }
+						options={ [ 'left', 'center', 'right', 'justify' ] }
 						size="__unstable-large"
 						__nextHasNoMarginBottom
 					/>
+
+					{ textAlign === 'justify' && (
+						<div>
+							<Notice status="warning" isDismissible={ false }>
+								{ __(
+									'Justified text can reduce readability. For better accessibility, use left-aligned text instead.'
+								) }
+							</Notice>
+						</div>
+					) }
 				</ToolsPanelItem>
 			) }
 		</Wrapper>

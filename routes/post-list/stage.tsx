@@ -1,17 +1,13 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
 import {
 	useParams,
 	useNavigate,
 	useSearch,
 	Link,
-	useRouter,
-} from '@tanstack/react-router';
-
-/**
- * WordPress dependencies
- */
+	useInvalidate,
+} from '@wordpress/route';
 import { useView } from '@wordpress/views';
 import { DataViews } from '@wordpress/dataviews';
 import { Page } from '@wordpress/admin-ui';
@@ -60,7 +56,7 @@ function getItemLevel( item: Post ) {
 }
 
 function PostList() {
-	const router = useRouter();
+	const invalidate = useInvalidate();
 	const { type: postType, slug = 'all' } = useParams( {
 		from: '/types/$type/list/$slug',
 	} );
@@ -110,7 +106,7 @@ function PostList() {
 
 	const onReset = () => {
 		resetToDefault();
-		router.invalidate();
+		invalidate();
 	};
 	const onChangeView = ( newView: View ) => {
 		updateView( newView );
@@ -118,7 +114,7 @@ function PostList() {
 			// The rendered surfaces depend on the view type,
 			// so we need to retrigger the router loader when switching the view type.
 			// try switching from list to table and vice versa.
-			router.invalidate();
+			invalidate();
 		}
 	};
 
@@ -179,10 +175,10 @@ function PostList() {
 				} );
 			} else {
 				// If no change in the url, the first item might have changed.
-				router.invalidate();
+				invalidate();
 			}
 		},
-		[ router, searchParams, navigate ]
+		[ invalidate, searchParams, navigate ]
 	);
 
 	const postTypeActions: Action< Post >[] = usePostActions( {

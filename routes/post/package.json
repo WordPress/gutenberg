@@ -7,6 +7,6 @@
 		"page": "gutenberg-boot"
 	},
 	"dependencies": {
-		"@tanstack/react-router": ">=1.120.5 <1.121.0"
+		"@wordpress/route": "file:../../packages/route"
 	}
 }

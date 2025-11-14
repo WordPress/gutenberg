@@ -26,5 +26,6 @@ add_action( 'admin_menu', 'gutenberg_register_boot_admin_page' );
 function gutenberg_boot_register_default_menu_items() {
 	register_gutenberg_boot_menu_item( 'home', __( 'Home', 'gutenberg' ), '/', '' );
 	register_gutenberg_boot_menu_item( 'posts', __( 'Posts', 'gutenberg' ), '/types/post', '' );
+	register_gutenberg_boot_menu_item( 'styles', __( 'Styles', 'gutenberg' ), '/styles', '' );
 }
 add_action( 'gutenberg-boot_init', 'gutenberg_boot_register_default_menu_items', 5 );

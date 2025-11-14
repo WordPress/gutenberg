@@ -147,41 +147,102 @@ function VariationsToggleGroupControl( {
 
 function __experimentalBlockVariationTransforms( { blockClientId } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-	const { activeBlockVariation, variations, isContentOnly, isSection } =
-		useSelect(
-			( select ) => {
-				const { getActiveBlockVariation, getBlockVariations } =
-					select( blocksStore );
+	const {
+		activeBlockVariation,
+		unfilteredVariations,
+		blockName,
+		isContentOnly,
+		isSection,
+	} = useSelect(
+		( select ) => {
+			const { getActiveBlockVariation, getBlockVariations } =
+				select( blocksStore );
 
-				const {
-					getBlockName,
-					getBlockAttributes,
-					getBlockEditingMode,
-					isSectionBlock,
-				} = unlock( select( blockEditorStore ) );
+			const {
+				getBlockName,
+				getBlockAttributes,
+				getBlockEditingMode,
+				isSectionBlock,
+			} = unlock( select( blockEditorStore ) );
 
-				const name = blockClientId && getBlockName( blockClientId );
+			const name = blockClientId && getBlockName( blockClientId );
 
-				const { hasContentRoleAttribute } = unlock(
-					select( blocksStore )
-				);
-				const isContentBlock = hasContentRoleAttribute( name );
+			const { hasContentRoleAttribute } = unlock( select( blocksStore ) );
+			const isContentBlock = hasContentRoleAttribute( name );
 
-				return {
-					activeBlockVariation: getActiveBlockVariation(
-						name,
-						getBlockAttributes( blockClientId ),
-						'transform'
-					),
-					variations: name && getBlockVariations( name, 'transform' ),
-					isContentOnly:
-						getBlockEditingMode( blockClientId ) ===
-							'contentOnly' && ! isContentBlock,
-					isSection: isSectionBlock( blockClientId ),
-				};
-			},
-			[ blockClientId ]
-		);
+			return {
+				activeBlockVariation: getActiveBlockVariation(
+					name,
+					getBlockAttributes( blockClientId ),
+					'transform'
+				),
+				unfilteredVariations:
+					name && getBlockVariations( name, 'transform' ),
+				blockName: name,
+				isContentOnly:
+					getBlockEditingMode( blockClientId ) === 'contentOnly' &&
+					! isContentBlock,
+				isSection: isSectionBlock( blockClientId ),
+			};
+		},
+		[ blockClientId ]
+	);
+
+	/*
+	 * Hack for WordPress 6.9
+	 *
+	 * The Stretchy blocks shipped in 6.9 were ultimately
+	 * implemented as block variations of the base types Paragraph
+	 * and Heading. See #73056 for discussion and trade-offs.
+	 *
+	 * The main drawback of this choice is that the Variations API
+	 * doesn't offer enough control over how prominent and how tied
+	 * to the base type a variation should be.
+	 *
+	 * In order to ship these new "blocks" with an acceptable UX,
+	 * we need two hacks until the Variations API is improved:
+	 *
+	 * - Don't show the variations switcher in the block inspector
+	 *   for Paragraph, Heading, Stretchy Paragraph and Stretchy
+	 *   Heading (implemented below). Transformations are still
+	 *   available in the block switcher.
+	 *
+	 * - Move the stretchy variations to the end of the core blocks
+	 *   list in the block inserter (implemented in
+	 *   getInserterItems in #73056).
+	 */
+	const variations = useMemo( () => {
+		if ( blockName === 'core/paragraph' ) {
+			// Always hide options when active variation is stretchy, but
+			// ensure that there are no third-party variations before doing the
+			// same elsewhere.
+			if (
+				activeBlockVariation?.name === 'stretchy-paragraph' ||
+				unfilteredVariations.every( ( v ) =>
+					[ 'paragraph', 'stretchy-paragraph' ].includes( v.name )
+				)
+			) {
+				return [];
+			}
+			// If there are other variations, only hide the stretchy one.
+			return unfilteredVariations.filter(
+				( v ) => v.name !== 'stretchy-paragraph'
+			);
+		} else if ( blockName === 'core/heading' ) {
+			if (
+				activeBlockVariation?.name === 'stretchy-heading' ||
+				unfilteredVariations.every( ( v ) =>
+					[ 'heading', 'stretchy-heading' ].includes( v.name )
+				)
+			) {
+				return [];
+			}
+			return unfilteredVariations.filter(
+				( v ) => v.name !== 'stretchy-heading'
+			);
+		}
+		return unfilteredVariations;
+	}, [ activeBlockVariation?.name, blockName, unfilteredVariations ] );
 
 	const selectedValue = activeBlockVariation?.name;
 

@@ -39,4 +39,17 @@ export const settings = {
 	},
 };
 
+if ( window.__experimentalContentOnlyPatternInsertion ) {
+	settings.fields = [
+		{
+			label: __( 'Content' ),
+			type: 'RichText',
+			shownByDefault: true,
+			mapping: {
+				value: 'content',
+			},
+		},
+	];
+}
+
 export const init = () => initBlock( { name, metadata, settings } );

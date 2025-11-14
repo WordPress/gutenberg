@@ -1273,8 +1273,8 @@ async function buildRoute( routeName ) {
 		}
 	}
 
-	// Build content.js if stage or inspector exists
-	if ( files.hasStage || files.hasInspector ) {
+	// Build content.js if stage, inspector, or canvas exists
+	if ( files.hasStage || files.hasInspector || files.hasCanvas ) {
 		// Create synthetic entry point
 		const syntheticEntry = generateContentEntryPoint( files );
 		const tempEntryPath = path.join( routeDir, '.content-entry.js' );

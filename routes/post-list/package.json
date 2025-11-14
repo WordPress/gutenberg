@@ -7,7 +7,6 @@
 		"page": "gutenberg-boot"
 	},
 	"dependencies": {
-		"@tanstack/react-router": ">=1.120.5 <1.121.0",
 		"@wordpress/admin-ui": "file:../../packages/admin-ui",
 		"@wordpress/block-editor": "file:../../packages/block-editor",
 		"@wordpress/components": "file:../../packages/components",
@@ -22,6 +21,7 @@
 		"@wordpress/i18n": "file:../../packages/i18n",
 		"@wordpress/icons": "file:../../packages/icons",
 		"@wordpress/keycodes": "file:../../packages/keycodes",
+		"@wordpress/route": "file:../../packages/route",
 		"@wordpress/notices": "file:../../packages/notices",
 		"@wordpress/private-apis": "file:../../packages/private-apis",
 		"@wordpress/views": "file:../../packages/views",

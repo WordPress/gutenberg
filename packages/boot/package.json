@@ -34,8 +34,6 @@
 	"wpScriptModuleExports": "./build-module/index.js",
 	"types": "build-types",
 	"dependencies": {
-		"@tanstack/history": "^1.133.28",
-		"@tanstack/react-router": "^1.120.5",
 		"@wordpress/admin-ui": "file:../admin-ui",
 		"@wordpress/commands": "file:../commands",
 		"@wordpress/components": "file:../components",
@@ -52,6 +50,7 @@
 		"@wordpress/lazy-editor": "file:../lazy-editor",
 		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/route": "file:../route",
 		"@wordpress/theme": "file:../theme",
 		"@wordpress/url": "file:../url",
 		"clsx": "^2.1.1"

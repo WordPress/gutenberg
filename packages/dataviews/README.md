@@ -1675,6 +1675,30 @@ Example:
 }
 ```
 
+### `format`
+
+Display format configuration for fields. Currently supported for date fields. This configuration affects how the field is displayed in the `render` method, the `Edit` control, and filter controls.
+
+-   Type: `object`.
+-   Optional.
+-   Properties:
+    -   `date`: The format string using PHP date format (e.g., 'F j, Y' for 'March 10, 2023'). Optional, defaults to WordPress "Date Format" setting.
+    -   `weekStartsOn`: Specifies the first day of the week for calendar controls. One of `'sunday'`, `'monday'`, `'tuesday'`, `'wednesday'`, `'thursday'`, `'friday'`, `'saturday'`. Optional, defaults to WordPress "Week Starts On" setting.
+
+Example:
+
+```js
+{
+	id: 'publishDate',
+	type: 'date',
+	label: 'Publish Date',
+	format: {
+		date: 'F j, Y',
+		weekStartsOn: 'monday',
+	},
+}
+```
+
 ## Form Field API
 
 ### `id`
