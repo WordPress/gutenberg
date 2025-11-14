@@ -1,14 +1,8 @@
 # Media Fields
 
-This package provides reusable field definitions for displaying and editing media attachment properties in WordPress DataViews.
+**This is an internal package** – not intended for external use.
 
-## Installation
-
-Install the module
-
-```bash
-npm install @wordpress/media-fields --save
-```
+This package provides reusable field definitions for displaying and editing media attachment properties in WordPress DataViews. It's used internally by the media-utils package and is not published to npm.
 
 ## Usage
 
@@ -55,7 +49,7 @@ export function MyMediaLibrary( { items } ) {
 
 ## Contributing to this package
 
-This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+This is an internal package that's part of the Gutenberg project. It is not published to npm and is only used within the Gutenberg repository itself.
 
 To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
 
