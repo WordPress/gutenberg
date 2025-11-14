@@ -284,13 +284,15 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				ownerDocument.documentElement.classList.add( 'is-dragging' );
 			}
 
+			node.addEventListener( 'keydown', onKeyDown );
+			node.addEventListener( 'dragstart', onDragStart );
+
 			/**
 			 * Handles double-click events on section blocks to edit content only section.
 			 *
 			 * @param {MouseEvent} event Double-click event.
 			 */
 			function onDoubleClick( event ) {
-				// Check if this block is a section block and not already being edited
 				const isSection = isSectionBlock( clientId );
 				const isAlreadyEditing = editedContentOnlySection === clientId;
 
@@ -300,14 +302,17 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				}
 			}
 
-			node.addEventListener( 'keydown', onKeyDown );
-			node.addEventListener( 'dragstart', onDragStart );
-			node.addEventListener( 'dblclick', onDoubleClick );
+			// Only add double-click listener if experimental flag is enabled
+			if ( window?.__experimentalContentOnlyPatternInsertion ) {
+				node.addEventListener( 'dblclick', onDoubleClick );
+			}
 
 			return () => {
 				node.removeEventListener( 'keydown', onKeyDown );
 				node.removeEventListener( 'dragstart', onDragStart );
-				node.removeEventListener( 'dblclick', onDoubleClick );
+				if ( window?.__experimentalContentOnlyPatternInsertion ) {
+					node.removeEventListener( 'dblclick', onDoubleClick );
+				}
 			};
 		},
 		[
