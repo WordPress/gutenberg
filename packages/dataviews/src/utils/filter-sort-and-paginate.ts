@@ -390,7 +390,7 @@ export default function filterSortAndPaginate< Item >(
 	const groupByFieldId = view.groupBy?.field || view.groupByField;
 	const groupByField = groupByFieldId
 		? _fields.find( ( field ) => {
-				return field.id === view.groupByField;
+				return field.id === groupByFieldId;
 		  } )
 		: null;
 	if ( sortByField || groupByField ) {
