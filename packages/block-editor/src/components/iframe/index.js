@@ -11,7 +11,6 @@ import {
 	createPortal,
 	forwardRef,
 	useMemo,
-	useEffect,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useMergeRefs, useRefEffect, useDisabled } from '@wordpress/compose';
@@ -255,7 +254,6 @@ function Iframe( {
 <html>
 	<head>
 		<meta charset="utf-8">
-		<base href="${ window.location.origin }">
 		<script>window.frameElement._load()</script>
 		<style>
 			html{
@@ -278,14 +276,8 @@ function Iframe( {
 	</body>
 </html>`;
 
-	const [ src, cleanup ] = useMemo( () => {
-		const _src = URL.createObjectURL(
-			new window.Blob( [ html ], { type: 'text/html' } )
-		);
-		return [ _src, () => URL.revokeObjectURL( _src ) ];
-	}, [ html ] );
-
-	useEffect( () => cleanup, [ cleanup ] );
+	// Use html directly for srcDoc instead of blob URL to preserve referrer in Safari
+	const srcDoc = useMemo( () => html, [ html ] );
 
 	// Make sure to not render the before and after focusable div elements in view
 	// mode. They're only needed to capture focus in edit mode.
@@ -304,10 +296,9 @@ function Iframe( {
 				} }
 				ref={ useMergeRefs( [ ref, setRef ] ) }
 				tabIndex={ tabIndex }
-				// Correct doctype is required to enable rendering in standards
-				// mode. Also preload the styles to avoid a flash of unstyled
-				// content.
-				src={ src }
+				// Using srcDoc instead of blob URL src to preserve referrer
+				// context in Safari, allowing YouTube embeds to work correctly.
+				srcDoc={ srcDoc }
 				title={ title }
 				onKeyDown={ ( event ) => {
 					if ( props.onKeyDown ) {
