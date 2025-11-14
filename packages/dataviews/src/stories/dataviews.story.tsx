@@ -47,7 +47,6 @@ import {
 	orderEventData,
 	orderEventFields,
 	orderEventActions,
-	type OrderEvent,
 } from './dataviews.fixtures';
 
 import './dataviews.style.css';
@@ -77,12 +76,7 @@ const defaultLayouts = {
 	[ LAYOUT_TABLE ]: {},
 	[ LAYOUT_GRID ]: {},
 	[ LAYOUT_LIST ]: {},
-	[ LAYOUT_TIMELINE ]: {
-		sort: {
-			field: 'datetime',
-			direction: 'asc' as const,
-		},
-	},
+	[ LAYOUT_TIMELINE ]: {},
 };
 
 export const Default = ( {
@@ -581,7 +575,7 @@ const TimelineComponent = ( {
 		page: 1,
 		perPage: 20,
 		filters: [],
-		fields: [ 'datetime', 'categories', 'orderNumber' ],
+		fields: [ 'time', 'categories', 'orderNumber' ],
 		titleField: 'title',
 		descriptionField: 'description',
 		mediaField: 'icon',
@@ -619,77 +613,17 @@ const TimelineComponent = ( {
 		} );
 	}, [ showMedia, grouping, density ] );
 
-	// Custom fields with render methods for date and datetime
-	const timelineFields: Field< OrderEvent >[] = orderEventFields.map(
-		( field ) => {
-			if ( field.id === 'date' ) {
-				return {
-					...field,
-					render: ( { item } ) => {
-						return (
-							<span>
-								{ new Date( item.date ).toLocaleDateString(
-									'en-US',
-									{
-										month: 'short',
-										day: 'numeric',
-										year: 'numeric',
-									}
-								) }
-							</span>
-						);
-					},
-				};
-			}
-			if ( field.id === 'datetime' ) {
-				return {
-					...field,
-					render: ( { item } ) => {
-						const dateObj = new Date( item.datetime );
-						// When grouping is off, show date and time
-						if ( ! grouping ) {
-							return (
-								<span>
-									{ dateObj.toLocaleDateString( 'en-US', {
-										month: 'short',
-										day: 'numeric',
-										year: 'numeric',
-									} ) }{ ' ' }
-									{ dateObj.toLocaleTimeString( 'en-US', {
-										hour: 'numeric',
-										minute: '2-digit',
-										hour12: true,
-									} ) }
-								</span>
-							);
-						}
-						// When grouping is on, show only time
-						return (
-							<span>
-								{ dateObj.toLocaleTimeString( 'en-US', {
-									hour: 'numeric',
-									minute: '2-digit',
-									hour12: true,
-								} ) }
-							</span>
-						);
-					},
-				};
-			}
-			return field;
-		}
-	);
-
 	const { data: shownData, paginationInfo } = useMemo( () => {
-		return filterSortAndPaginate( orderEventData, view, timelineFields );
-	}, [ view, timelineFields ] );
+		return filterSortAndPaginate( orderEventData, view, orderEventFields );
+	}, [ view ] );
+
 	return (
 		<DataViews
 			getItemId={ ( item ) => item.id.toString() }
 			paginationInfo={ paginationInfo }
 			data={ shownData }
 			view={ view }
-			fields={ timelineFields }
+			fields={ orderEventFields }
 			onChangeView={ setView }
 			actions={ orderEventActions }
 			defaultLayouts={ {

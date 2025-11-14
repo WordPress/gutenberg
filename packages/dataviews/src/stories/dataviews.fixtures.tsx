@@ -13,7 +13,7 @@ import {
 	starFilled,
 	check,
 	pin,
-	eye,
+	link,
 } from '@wordpress/icons';
 import {
 	Button,
@@ -1061,11 +1061,55 @@ export const orderEventFields: Field< OrderEvent >[] = [
 		id: 'date',
 		label: 'Date',
 		type: 'date',
+		render: ( { item } ) => {
+			return (
+				<span>
+					{ new Date( item.date ).toLocaleDateString( 'en-US', {
+						month: 'short',
+						day: 'numeric',
+						year: 'numeric',
+					} ) }
+				</span>
+			);
+		},
+	},
+	{
+		id: 'time',
+		label: 'Time',
+		type: 'datetime',
+		getValue: ( { item } ) => item.datetime,
+		render: ( { item } ) => {
+			return (
+				<span>
+					{ new Date( item.datetime ).toLocaleTimeString( 'en-US', {
+						hour: 'numeric',
+						minute: '2-digit',
+						hour12: true,
+					} ) }
+				</span>
+			);
+		},
 	},
 	{
 		id: 'datetime',
 		label: 'Datetime',
 		type: 'datetime',
+		render: ( { item } ) => {
+			return (
+				<span>
+					{ new Date( item.datetime ).toLocaleDateString( 'en-US', {
+						month: 'short',
+						day: 'numeric',
+						year: 'numeric',
+					} ) }{ ' ' }
+					{ new Date( item.datetime ).toLocaleTimeString( 'en-US', {
+						hour: 'numeric',
+						minute: '2-digit',
+						hour12: true,
+					} ) }
+				</span>
+			);
+		},
 	},
 	{
 		label: 'Type',
@@ -1127,7 +1171,7 @@ export const orderEventActions: Action< OrderEvent >[] = [
 		id: 'view-note',
 		label: 'View Item',
 		isPrimary: true,
-		icon: eye,
+		icon: link,
 		isEligible: ( item ) => item.type === 'note',
 		callback: ( items ) => {
 			const item = items[ 0 ];
