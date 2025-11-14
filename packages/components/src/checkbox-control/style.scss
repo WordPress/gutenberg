@@ -73,6 +73,23 @@
 	flex-shrink: 0;
 }
 
+.components-checkbox-control__input-container-area {
+	position: absolute;
+	inset: 0;
+	padding: 8px;
+	margin-left: -8px;
+	margin-top: -8px;
+	width: calc(var(--checkbox-input-size) + 16px);
+	height: calc(var(--checkbox-input-size) + 16px);
+	transition: cubic-bezier(0.075, 0.82, 0.165, 1) background-color 150ms;
+}
+
+.components-checkbox-control__input-container-area:hover {
+	cursor: pointer;
+	background-color: color-mix(in srgb, $components-color-accent 8%, $white);
+	border-radius: 50%;
+}
+
 svg.components-checkbox-control__checked,
 svg.components-checkbox-control__indeterminate {
 	--checkmark-size: var(--checkbox-input-size);
