@@ -13,6 +13,7 @@ import {
 	starFilled,
 	check,
 	pin,
+	eye,
 } from '@wordpress/icons';
 import {
 	Button,
@@ -1123,9 +1124,23 @@ export const orderEventFields: Field< OrderEvent >[] = [
 
 export const orderEventActions: Action< OrderEvent >[] = [
 	{
+		id: 'view-note',
+		label: 'View Item',
+		isPrimary: true,
+		icon: eye,
+		isEligible: ( item ) => item.type === 'note',
+		callback: ( items ) => {
+			const item = items[ 0 ];
+			// eslint-disable-next-line no-alert
+			alert(
+				`View item: "${ item.name.title }"\n\n${ item.name.description }`
+			);
+		},
+	},
+	{
 		id: 'delete-note',
 		label: 'Delete Note',
-		isPrimary: true,
+		isPrimary: false,
 		icon: trash,
 		isEligible: ( item ) => item.type === 'note',
 		callback: ( items ) => {

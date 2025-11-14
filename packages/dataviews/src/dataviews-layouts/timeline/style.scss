@@ -20,17 +20,6 @@
 			position: relative;
 			padding: 0;
 			box-sizing: border-box;
-
-			.dataviews-view-timeline__dropdown-cell {
-				position: relative;
-				z-index: 10;
-				min-width: 32px;
-
-				.components-button {
-					position: relative;
-					z-index: 1;
-				}
-			}
 		}
 	}
 
