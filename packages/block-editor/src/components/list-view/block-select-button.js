@@ -127,7 +127,8 @@ function ListViewBlockSelectButton(
 			aria-describedby={ ariaDescribedBy }
 			aria-expanded={ isExpanded }
 		>
-			{ isSectionBlock ? (
+			{ isSectionBlock &&
+			window?.__experimentalContentOnlyPatternInsertion ? (
 				<span
 					className="block-editor-list-view__expander"
 					aria-hidden="true"
