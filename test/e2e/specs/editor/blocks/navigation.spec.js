@@ -383,6 +383,8 @@ test.describe( 'Navigation block', () => {
 				await navigation.useBlockInserter();
 				await navigation.addCustomURL( 'https://example.com' );
 				await navigation.expectToHaveTextSelected( 'example.com' );
+				// The link UI should be closed when creating a custom link
+				await expect( navigation.getLinkPopover() ).toBeHidden();
 			} );
 
 			await test.step( 'we can open and close the preview with the keyboard and escape buttons from a top-level nav link with a url-like label using both the shortcut and toolbar', async () => {
