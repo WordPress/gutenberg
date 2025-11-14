@@ -1,12 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	renderToString,
-	useRef,
-	useState,
-	useEffect,
-} from '@wordpress/element';
+import { useRef, useState, useEffect, useMemo } from '@wordpress/element';
 import { useFocusableIframe, useMergeRefs } from '@wordpress/compose';
 
 /**
@@ -138,86 +133,7 @@ function SandBox( {
 	const [ width, setWidth ] = useState( 0 );
 	const [ height, setHeight ] = useState( 0 );
 
-	function isFrameAccessible() {
-		try {
-			return !! ref.current?.contentDocument?.body;
-		} catch ( e ) {
-			return false;
-		}
-	}
-
-	function trySandBox( forceRerender = false ) {
-		if ( ! isFrameAccessible() ) {
-			return;
-		}
-
-		const { contentDocument, ownerDocument } =
-			ref.current as HTMLIFrameElement & {
-				contentDocument: Document;
-			};
-
-		if (
-			! forceRerender &&
-			null !==
-				contentDocument?.body.getAttribute(
-					'data-resizable-iframe-connected'
-				)
-		) {
-			return;
-		}
-
-		// Put the html snippet into a html document, and then write it to the iframe's document
-		// we can use this in the future to inject custom styles or scripts.
-		// Scripts go into the body rather than the head, to support embedded content such as Instagram
-		// that expect the scripts to be part of the body.
-		const htmlDoc = (
-			<html
-				lang={ ownerDocument.documentElement.lang }
-				className={ type }
-			>
-				<head>
-					<title>{ title }</title>
-					<style dangerouslySetInnerHTML={ { __html: style } } />
-					{ styles.map( ( rules, i ) => (
-						<style
-							key={ i }
-							dangerouslySetInnerHTML={ { __html: rules } }
-						/>
-					) ) }
-				</head>
-				<body
-					data-resizable-iframe-connected="data-resizable-iframe-connected"
-					className={ type }
-				>
-					<div dangerouslySetInnerHTML={ { __html: html } } />
-					<script
-						type="text/javascript"
-						dangerouslySetInnerHTML={ {
-							__html: `(${ observeAndResizeJS.toString() })();`,
-						} }
-					/>
-					{ scripts.map( ( src ) => (
-						<script key={ src } src={ src } />
-					) ) }
-				</body>
-			</html>
-		);
-
-		// Writing the document like this makes it act in the same way as if it was
-		// loaded over the network, so DOM creation and mutation, script execution, etc.
-		// all work as expected.
-		contentDocument.open();
-		contentDocument.write( '<!DOCTYPE html>' + renderToString( htmlDoc ) );
-		contentDocument.close();
-	}
-
 	useEffect( () => {
-		trySandBox();
-
-		function tryNoForceSandBox() {
-			trySandBox( false );
-		}
-
 		function checkMessageForResize( event: MessageEvent ) {
 			const iframe = ref.current;
 
@@ -248,15 +164,10 @@ function SandBox( {
 		const iframe = ref.current;
 		const defaultView = iframe?.ownerDocument?.defaultView;
 
-		// This used to be registered using <iframe onLoad={} />, but it made the iframe blank
-		// after reordering the containing block. See these two issues for more details:
-		// https://github.com/WordPress/gutenberg/issues/6146
-		// https://github.com/facebook/react/issues/18752
-		iframe?.addEventListener( 'load', tryNoForceSandBox, false );
+		// Listen for resize messages from the iframe content (sent by observeAndResizeJS)
 		defaultView?.addEventListener( 'message', checkMessageForResize );
 
 		return () => {
-			iframe?.removeEventListener( 'load', tryNoForceSandBox, false );
 			defaultView?.removeEventListener(
 				'message',
 				checkMessageForResize
@@ -266,17 +177,27 @@ function SandBox( {
 		// See https://github.com/WordPress/gutenberg/pull/44378
 	}, [] );
 
-	useEffect( () => {
-		trySandBox();
-		// Passing `exhaustive-deps` will likely involve a more detailed refactor.
-		// See https://github.com/WordPress/gutenberg/pull/44378
-	}, [ title, styles, scripts ] );
-
-	useEffect( () => {
-		trySandBox( true );
-		// Passing `exhaustive-deps` will likely involve a more detailed refactor.
-		// See https://github.com/WordPress/gutenberg/pull/44378
-	}, [ html, type ] );
+	// Generate the HTML for srcdoc attribute
+	// Using srcdoc instead of document.write() preserves referrer information in Safari
+	const srcDocHtml = useMemo( () => {
+		const docLang =
+			typeof document !== 'undefined'
+				? document.documentElement.lang
+				: 'en';
+		return `<!DOCTYPE html>
+<html lang="${ docLang }" class="${ type || '' }">
+	<head>
+		<title>${ title }</title>
+		<style>${ style }</style>
+		${ styles.map( ( rules ) => `<style>${ rules }</style>` ).join( '' ) }
+	</head>
+	<body data-resizable-iframe-connected class="${ type || '' }">
+		<div>${ html }</div>
+		<script type="text/javascript">(${ observeAndResizeJS.toString() })();</script>
+		${ scripts.map( ( src ) => `<script src="${ src }"></script>` ).join( '' ) }
+	</body>
+</html>`;
+	}, [ html, title, type, styles, scripts ] );
 
 	return (
 		<iframe
@@ -284,6 +205,7 @@ function SandBox( {
 			title={ title }
 			tabIndex={ tabIndex }
 			className="components-sandbox"
+			srcDoc={ srcDocHtml }
 			sandbox="allow-scripts allow-same-origin allow-presentation"
 			onFocus={ onFocus }
 			width={ Math.ceil( width ) }
