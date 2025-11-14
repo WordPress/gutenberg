@@ -865,11 +865,24 @@ async function generatePagesPhp( pageData, replacements ) {
 			'_'
 		);
 
+		// Generate PHP code for init modules
+		const initModulesPhp =
+			page.initModules.length > 0
+				? page.initModules
+						.map(
+							( moduleId ) =>
+								`\t\t\t$boot_dependencies[] = array( 'import' => 'static', 'id' => '${ moduleId }' );`
+						)
+						.join( '\n' )
+				: '\t\t\t// No init modules configured';
+
 		const templateReplacements = {
 			...replacements,
 			'{{PAGE_SLUG}}': page.slug,
 			'{{PAGE_SLUG_UNDERSCORE}}': pageSlugUnderscore,
 			'{{PREFIX}}': prefixUnderscore,
+			'{{INIT_MODULES_PHP_ARRAY}}': initModulesPhp,
+			'{{INIT_MODULES_JSON}}': JSON.stringify( page.initModules ),
 		};
 
 		// Generate both page.php and page-wp-admin.php
@@ -1422,11 +1435,20 @@ async function buildAll() {
 		};
 	} );
 
-	const pageData = PAGES.map( ( pageSlug ) => {
-		const pageRoutes = routes.filter( ( r ) => r.page === pageSlug );
+	// Normalize PAGES config to support both string and object formats
+	const normalizedPages = PAGES.map( ( page ) => {
+		if ( typeof page === 'string' ) {
+			return { id: page, init: [] };
+		}
+		return { id: page.id, init: page.init || [] };
+	} );
+
+	const pageData = normalizedPages.map( ( page ) => {
+		const pageRoutes = routes.filter( ( r ) => r.page === page.id );
 		return {
-			slug: pageSlug,
+			slug: page.id,
 			routes: pageRoutes,
+			initModules: page.init,
 		};
 	} );
 
@@ -1450,12 +1472,14 @@ async function buildAll() {
 	console.log( '   ✔ Generated build/styles/index.php' );
 	console.log( '   ✔ Generated build/version.php' );
 	console.log( '   ✔ Generated build/routes.php' );
-	if ( PAGES.length > 0 ) {
+	if ( pageData.length > 0 ) {
 		console.log( '   ✔ Generated build/pages.php' );
-		for ( const page of PAGES ) {
-			console.log( `   ✔ Generated build/pages/${ page }/page.php` );
+		for ( const page of pageData ) {
 			console.log(
-				`   ✔ Generated build/pages/${ page }/page-wp-admin.php`
+				`   ✔ Generated build/pages/${ page.slug }/page.php`
+			);
+			console.log(
+				`   ✔ Generated build/pages/${ page.slug }/page-wp-admin.php`
 			);
 		}
 	}
