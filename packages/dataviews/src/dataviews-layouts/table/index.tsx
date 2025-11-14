@@ -362,8 +362,9 @@ function ViewTable< Item >( {
 		( field ) => field.id === view.descriptionField
 	);
 
-	const groupField = view.groupByField
-		? fields.find( ( f ) => f.id === view.groupByField )
+	const groupFieldId = view.groupBy?.field || view.groupByField;
+	const groupField = groupFieldId
+		? fields.find( ( f ) => f.id === groupFieldId )
 		: null;
 	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
 	const { showTitle = true, showMedia = true, showDescription = true } = view;

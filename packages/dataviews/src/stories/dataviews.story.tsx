@@ -422,7 +422,7 @@ export const GroupByLayout = () => {
 		titleField: 'title',
 		descriptionField: 'description',
 		mediaField: 'image',
-		groupByField: 'type',
+		groupBy: { field: 'type', direction: 'asc' },
 		layout: {
 			badgeFields: [ 'satellites' ],
 		},
@@ -592,8 +592,12 @@ const TimelineComponent = ( {
 			field: 'datetime',
 			direction: 'asc',
 		},
-		groupByField: grouping ? 'date' : undefined,
-		groupByFieldDirection: 'asc',
+		groupBy: grouping
+			? {
+					field: 'date',
+					direction: 'asc',
+			  }
+			: undefined,
 		layout: {
 			eventField: 'datetime',
 			showGroupFieldLabel,
@@ -607,7 +611,9 @@ const TimelineComponent = ( {
 			return {
 				...prevView,
 				type: LAYOUT_TIMELINE,
-				groupByField: grouping ? 'date' : undefined,
+				groupBy: grouping
+					? { field: 'date', direction: 'asc' }
+					: undefined,
 				showMedia,
 				layout: {
 					...prevLayout,
@@ -713,20 +719,20 @@ export const Timeline = {
 	},
 	argTypes: {
 		showMedia: {
-			control: 'select',
+			control: 'boolean',
 			options: [ true, false ],
 			defaultValue: true,
 			description: 'Whether the icon is shown in the timeline',
 		},
 		showGroupFieldLabel: {
-			control: 'select',
+			control: 'boolean',
 			options: [ true, false ],
 			defaultValue: false,
 			description:
 				'Whether the group field label is shown in the timeline',
 		},
 		grouping: {
-			control: 'select',
+			control: 'boolean',
 			options: [ true, false ],
 			defaultValue: true,
 			description: 'Whether items are grouped by date in the timeline',

@@ -522,8 +522,9 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 		);
 	}
 
-	const groupField = view.groupByField
-		? fields.find( ( field ) => field.id === view.groupByField )
+	const groupFieldId = view.groupBy?.field || view.groupByField;
+	const groupField = groupFieldId
+		? fields.find( ( field ) => field.id === groupFieldId )
 		: null;
 	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
 

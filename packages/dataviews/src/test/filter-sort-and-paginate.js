@@ -949,13 +949,12 @@ describe( 'sorting', () => {
 		expect( terrestrialItems[ 3 ].name.title ).toBe( 'Earth' );
 	} );
 
-	it( 'should sort by groupByField in descending order first, then by sort.field', () => {
+	it( 'should sort by groupBy.field in descending order first, then by sort.field', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
 				sort: { field: 'title', direction: 'desc' },
-				groupByField: 'type',
-				groupByFieldDirection: 'desc',
+				groupBy: { field: 'type', direction: 'desc' },
 			},
 			fields
 		);

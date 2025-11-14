@@ -213,8 +213,12 @@ Properties:
 -   `showMedia`: Whether the media should be shown in the UI. `true` by default.
 -   `showDescription`: Whether the description should be shown in the UI. `true` by default.
 -   `showLevels`: Whether to display the hierarchical levels for the data. `false` by default. See related `getItemLevel` DataView prop.
--   `groupByField`: The id of the field used for grouping the dataset. Supported by the `grid` and `table` layouts.
--   `groupByFieldDirection`: The direction to use for grouping the dataset. One of `asc` or `desc`. Default `asc`.
+-   `groupBy`:
+
+    -   `field`: the field used for grouping the dataset.
+    -   `direction`: the direction to use for sorting the groups, one of `asc` or `desc`. Default `asc`.
+
+-   `groupByField`: The id of the field used for grouping the dataset. Supported by the `grid` and `table` layouts. Ignored if `groupBy` is provided.
 -   `fields`: a list of remaining field `id` that are visible in the UI and the specific order in which they are displayed.
 -   `layout`: config that is specific to a particular layout type.
 

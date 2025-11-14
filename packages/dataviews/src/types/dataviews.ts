@@ -178,14 +178,24 @@ interface ViewBase {
 	showLevels?: boolean;
 
 	/**
-	 * The field to group by.
+	 * The field to group by. Ignored if `groupBy` is provided.
 	 */
 	groupByField?: string;
 
 	/**
-	 * The direction to use for sorting groups.
+	 * The grouping configuration.
 	 */
-	groupByFieldDirection?: SortDirection;
+	groupBy?: {
+		/**
+		 * The field to group by.
+		 */
+		field: string;
+
+		/**
+		 * The direction to sort by.
+		 */
+		direction: SortDirection;
+	};
 
 	/**
 	 * Whether infinite scroll is enabled.

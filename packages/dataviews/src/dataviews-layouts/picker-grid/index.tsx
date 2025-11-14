@@ -306,8 +306,9 @@ function ViewPickerGrid< Item >( {
 	 */
 	const size = '900px';
 
-	const groupField = view.groupByField
-		? fields.find( ( f ) => f.id === view.groupByField )
+	const groupFieldId = view.groupBy?.field || view.groupByField;
+	const groupField = groupFieldId
+		? fields.find( ( f ) => f.id === groupFieldId )
 		: null;
 	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
 
