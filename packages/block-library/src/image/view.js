@@ -71,7 +71,6 @@ const { state, actions, callbacks } = store(
 		state: {
 			selectedImageId: null,
 			selectedGalleryId: null,
-			currentImageId: null,
 			preloadTimers: new Map(),
 			preloadedImageIds: new Set(),
 			get galleryImages() {
@@ -129,9 +128,6 @@ const { state, actions, callbacks } = store(
 			get hasPreviousImage() {
 				return state.selectedImageIndex - 1 >= 0;
 			},
-			get currentImage() {
-				return state.metadata[ state.currentImageId ];
-			},
 			get overlayOpened() {
 				return state.selectedImageId !== null;
 			},
@@ -163,10 +159,10 @@ const { state, actions, callbacks } = store(
 					: getConfig().nextButtonText;
 			},
 			get enlargedSrc() {
-				return getImageSrc( state.currentImage );
+				return getImageSrc( state.selectedImage );
 			},
 			get enlargedSrcset() {
-				return getImageSrcset( state.currentImage );
+				return getImageSrcset( state.selectedImage );
 			},
 			get figureStyles() {
 				return (
