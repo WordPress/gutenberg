@@ -76,7 +76,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	// Plugin specific code.
 	require_once __DIR__ . '/class-wp-rest-global-styles-controller-gutenberg.php';
 	require_once __DIR__ . '/class-wp-rest-edit-site-export-controller-gutenberg.php';
-	require_once __DIR__ . '/class-wp-rest-icon-controller-gutenberg.php';
 	require_once __DIR__ . '/rest-api.php';
 
 	require_once __DIR__ . '/experimental/rest-api.php';
@@ -145,7 +144,6 @@ require __DIR__ . '/class-wp-theme-json-gutenberg.php';
 require __DIR__ . '/class-wp-theme-json-resolver-gutenberg.php';
 require __DIR__ . '/class-wp-theme-json-schema-gutenberg.php';
 require __DIR__ . '/class-wp-duotone-gutenberg.php';
-require __DIR__ . '/class-wp-icons-registry-gutenberg.php';
 require __DIR__ . '/blocks.php';
 require __DIR__ . '/block-editor-settings.php';
 require __DIR__ . '/client-assets.php';
@@ -198,4 +196,9 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-full-page-client-side-navigatio
 // Block patterns (only load when navigation overlays experiment is enabled).
 if ( gutenberg_is_experiment_enabled( 'gutenberg-customizable-navigation-overlays' ) ) {
 	require __DIR__ . '/experimental/overlay-patterns.php';
+}
+
+if ( gutenberg_is_experiment_enabled( 'gutenberg-svg-icon-registry' ) ) {
+	require __DIR__ . '/experimental/class-wp-icons-registry.php';
+	require __DIR__ . '/experimental/class-wp-rest-icon-controller.php';
 }
