@@ -620,11 +620,6 @@
 							"type": "boolean",
 							"default": true
 						},
-						"textShadow": {
-							"description": "Allow users to set custom text shadows.",
-							"type": "boolean",
-							"default": true
-						},
 						"writingMode": {
 							"description": "Allow users to set the writing mode.",
 							"type": "boolean",

@@ -2,7 +2,7 @@
 
 > This is the living specification for  **version 3** of `theme.json`. This version works with WordPress 6.6 or later, and the latest Gutenberg plugin.
 >
-> There are some related documents that you may be interested in: 
+> There are some related documents that you may be interested in:
 > - the [theme.json v1](/docs/reference-guides/theme-json-reference/theme-json-v1.md) specification,
 > - the [theme.json v2](/docs/reference-guides/theme-json-reference/theme-json-v2.md) specification, and
 > - the [reference to migrate from older theme.json versions](/docs/reference-guides/theme-json-reference/theme-json-migrations.md).
@@ -15,7 +15,7 @@ This documentation was generated from the JSON schema for theme.json.
 
 The latest schema for version 3, including all the latest changes from the Gutenberg plugin, is available at <code>https://schemas.wp.org/trunk/theme.json</code>.
 
-Theme.json schemas for each WordPress version are available at <code>https://schemas.wp.org/wp/{{version}}/theme.json</code>.  
+Theme.json schemas for each WordPress version are available at <code>https://schemas.wp.org/wp/{{version}}/theme.json</code>.
 For example, a schema for WordPress 5.8 is available at <code>https://schemas.wp.org/wp/5.8/theme.json</code>.
 
 See [Developing with theme.json](/docs/how-to-guides/themes/global-settings-and-styles.md#developing-with-themejson) for how to use the JSON schema in your editor.
@@ -193,7 +193,6 @@ Settings related to typography.
 | textAlign | Allow users to set the text align. | `boolean` | `true` |
 | textColumns | Allow users to set the number of text columns. | `boolean` | `false` |
 | textDecoration | Allow users to set custom text decorations. | `boolean` | `true` |
-| textShadow | Allow users to set custom text shadows. | `boolean` | `true` |
 | writingMode | Allow users to set the writing mode. | `boolean` | `false` |
 | textTransform | Allow users to set custom text transforms. | `boolean` | `true` |
 | dropCap | Enable drop cap. | `boolean` | `true` |

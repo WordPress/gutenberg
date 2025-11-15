@@ -468,7 +468,6 @@ class WP_Theme_JSON_Gutenberg {
 			'textAlign'        => null,
 			'textColumns'      => null,
 			'textDecoration'   => null,
-			'textShadow'       => null,
 			'textTransform'    => null,
 			'writingMode'      => null,
 		),

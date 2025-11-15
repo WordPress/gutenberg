@@ -22,7 +22,6 @@ import LetterSpacingControl from '../letter-spacing-control';
 import TextAlignmentControl from '../text-alignment-control';
 import TextTransformControl from '../text-transform-control';
 import TextDecorationControl from '../text-decoration-control';
-import TextShadowControl from '../text-shadow-control';
 import WritingModeControl from '../writing-mode-control';
 import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
@@ -42,7 +41,6 @@ export function useHasTypographyPanel( settings ) {
 	const hasTextAlign = useHasTextAlignmentControl( settings );
 	const hasTextTransform = useHasTextTransformControl( settings );
 	const hasTextDecoration = useHasTextDecorationControl( settings );
-	const hasTextShadow = useHasTextShadowControl( settings );
 	const hasWritingMode = useHasWritingModeControl( settings );
 	const hasTextColumns = useHasTextColumnsControl( settings );
 	const hasFontSize = useHasFontSizeControl( settings );
@@ -56,7 +54,6 @@ export function useHasTypographyPanel( settings ) {
 		hasTextTransform ||
 		hasFontSize ||
 		hasTextDecoration ||
-		hasTextShadow ||
 		hasWritingMode ||
 		hasTextColumns
 	);
@@ -110,10 +107,6 @@ function useHasTextAlignmentControl( settings ) {
 
 function useHasTextDecorationControl( settings ) {
 	return settings?.typography?.textDecoration;
-}
-
-function useHasTextShadowControl( settings ) {
-	return settings?.typography?.textShadow;
 }
 
 function useHasWritingModeControl( settings ) {
@@ -175,7 +168,6 @@ const DEFAULT_CONTROLS = {
 	textAlign: true,
 	textTransform: true,
 	textDecoration: true,
-	textShadow: true,
 	writingMode: true,
 	textColumns: true,
 };
@@ -411,21 +403,6 @@ export default function TypographyPanel( {
 	const hasWritingMode = () => !! value?.typography?.writingMode;
 	const resetWritingMode = () => setWritingMode( undefined );
 
-	// Text Shadow
-	const hasTextShadowControl = useHasTextShadowControl( settings );
-	const textShadow = decodeValue( inheritedValue?.typography?.textShadow );
-	const setTextShadow = ( newValue ) => {
-		onChange(
-			setImmutably(
-				value,
-				[ 'typography', 'textShadow' ],
-				newValue || undefined
-			)
-		);
-	};
-	const hasTextShadow = () => !! value?.typography?.textShadow;
-	const resetTextShadow = () => setTextShadow( undefined );
-
 	// Text Alignment
 	const hasTextAlignmentControl = useHasTextAlignmentControl( settings );
 
@@ -647,22 +624,6 @@ export default function TypographyPanel( {
 							</Notice>
 						</div>
 					) }
-				</ToolsPanelItem>
-			) }
-			{ hasTextShadowControl && (
-				<ToolsPanelItem
-					label={ __( 'Shadow' ) }
-					hasValue={ hasTextShadow }
-					onDeselect={ resetTextShadow }
-					isShownByDefault={ defaultControls.textShadow }
-					panelId={ panelId }
-				>
-					<TextShadowControl
-						value={ textShadow }
-						onChange={ setTextShadow }
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
-					/>
 				</ToolsPanelItem>
 			) }
 		</Wrapper>
