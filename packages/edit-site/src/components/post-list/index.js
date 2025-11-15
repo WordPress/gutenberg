@@ -10,7 +10,14 @@ import {
 import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect } from '@wordpress/data';
-import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
+import {
+	DataViews,
+	filterSortAndPaginate,
+	OPERATOR_ON,
+	OPERATOR_NOT_ON,
+	OPERATOR_BEFORE,
+	OPERATOR_AFTER,
+} from '@wordpress/dataviews';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { drawerRight } from '@wordpress/icons';
@@ -122,6 +129,25 @@ export default function PostList( { postType } ) {
 				filter.operator === OPERATOR_IS_NONE
 			) {
 				filters.author_exclude = filter.value;
+			}
+			if ( filter.field === 'date' ) {
+				if ( filter.operator === OPERATOR_BEFORE ) {
+					filters.before = filter.value;
+				} else if ( filter.operator === OPERATOR_AFTER ) {
+					filters.after = filter.value;
+				} else if ( filter.operator === OPERATOR_ON ) {
+					// For 'on' operator, we need to filter posts published on that specific date
+					// by setting both before and after to the same date
+					const date = new Date( filter.value );
+					const nextDay = new Date( date );
+					nextDay.setDate( date.getDate() + 1 );
+					filters.after = date.toISOString();
+					filters.before = nextDay.toISOString();
+				} else if ( filter.operator === OPERATOR_NOT_ON ) {
+					// For 'notOn' operator, we cannot directly express this in the REST API
+					// This would require client-side filtering, but for now we skip it
+					// as the REST API doesn't support "not equal" for dates
+				}
 			}
 		} );
 
