@@ -16,7 +16,7 @@ const dateField: Field< BasePost > = {
 	label: __( 'Date' ),
 	render: DateView,
 	filterBy: {
-		operators: [ 'on', 'notOn', 'before', 'after' ],
+		operators: [ 'on', 'before', 'after' ],
 	},
 };
 

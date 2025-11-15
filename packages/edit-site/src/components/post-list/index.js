@@ -14,7 +14,6 @@ import {
 	DataViews,
 	filterSortAndPaginate,
 	OPERATOR_ON,
-	OPERATOR_NOT_ON,
 	OPERATOR_BEFORE,
 	OPERATOR_AFTER,
 } from '@wordpress/dataviews';
@@ -143,10 +142,6 @@ export default function PostList( { postType } ) {
 					nextDay.setDate( date.getDate() + 1 );
 					filters.after = date.toISOString();
 					filters.before = nextDay.toISOString();
-				} else if ( filter.operator === OPERATOR_NOT_ON ) {
-					// For 'notOn' operator, we cannot directly express this in the REST API
-					// This would require client-side filtering, but for now we skip it
-					// as the REST API doesn't support "not equal" for dates
 				}
 			}
 		} );
