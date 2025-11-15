@@ -8,7 +8,7 @@ import type { ComponentProps, ReactElement } from 'react';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { Spinner } from '@wordpress/components';
+import { Spinner, Popover } from '@wordpress/components';
 import {
 	useContext,
 	useEffect,
@@ -36,10 +36,12 @@ import type {
 	ViewTable as ViewTableType,
 	ViewTableProps,
 } from '../../types';
-import type { SetSelection } from '../../private-types';
+import type { SetSelection } from '../../types/private';
 import ColumnHeaderMenu from './column-header-menu';
 import ColumnPrimary from './column-primary';
 import { useIsHorizontalScrollEnd } from './use-is-horizontal-scroll-end';
+import getDataByGroup from '../utils/get-data-by-group';
+import { PropertiesSection } from '../../components/dataviews-view-config/properties-section';
 
 interface TableColumnFieldProps< Item > {
 	fields: NormalizedField< Item >[];
@@ -295,6 +297,9 @@ function ViewTable< Item >( {
 	const [ nextHeaderMenuToFocus, setNextHeaderMenuToFocus ] =
 		useState< HTMLButtonElement >();
 	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
+	const [ contextMenuAnchor, setContextMenuAnchor ] = useState< {
+		getBoundingClientRect: () => DOMRect;
+	} | null >( null );
 
 	useEffect( () => {
 		if ( headerMenuToFocusRef.current ) {
@@ -328,6 +333,27 @@ function ViewTable< Item >( {
 		setNextHeaderMenuToFocus( fallback?.node );
 	};
 
+	const handleHeaderContextMenu = ( event: React.MouseEvent ) => {
+		event.preventDefault();
+		event.stopPropagation();
+		const virtualAnchor = {
+			getBoundingClientRect: () => ( {
+				x: event.clientX,
+				y: event.clientY,
+				top: event.clientY,
+				left: event.clientX,
+				right: event.clientX,
+				bottom: event.clientY,
+				width: 0,
+				height: 0,
+				toJSON: () => ( {} ),
+			} ),
+		};
+		window.requestAnimationFrame( () => {
+			setContextMenuAnchor( virtualAnchor );
+		} );
+	};
+
 	const hasData = !! data?.length;
 
 	const titleField = fields.find( ( field ) => field.id === view.titleField );
@@ -336,22 +362,10 @@ function ViewTable< Item >( {
 		( field ) => field.id === view.descriptionField
 	);
 
-	// Get group field if groupByField is specified
 	const groupField = view.groupByField
 		? fields.find( ( f ) => f.id === view.groupByField )
 		: null;
-
-	// Group data by groupByField if specified
-	const dataByGroup = groupField
-		? data.reduce( ( groups: Map< string, typeof data >, item ) => {
-				const groupName = groupField.getValue( { item } );
-				if ( ! groups.has( groupName ) ) {
-					groups.set( groupName, [] );
-				}
-				groups.get( groupName )?.push( item );
-				return groups;
-		  }, new Map< string, typeof data >() )
-		: null;
+	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
 	const { showTitle = true, showMedia = true, showDescription = true } = view;
 	const hasPrimaryColumn =
 		( titleField && showTitle ) ||
@@ -385,12 +399,39 @@ function ViewTable< Item >( {
 				aria-describedby={ tableNoticeId }
 				role={ isInfiniteScroll ? 'feed' : undefined }
 			>
-				<thead>
+				<colgroup>
+					{ hasBulkActions && (
+						<col className="dataviews-view-table__col-checkbox" />
+					) }
+					{ hasPrimaryColumn && (
+						<col className="dataviews-view-table__col-primary" />
+					) }
+					{ columns.map( ( column ) => (
+						<col
+							key={ `col-${ column }` }
+							className={ `dataviews-view-table__col-${ column }` }
+						/>
+					) ) }
+					{ !! actions?.length && (
+						<col className="dataviews-view-table__col-actions" />
+					) }
+				</colgroup>
+				{ contextMenuAnchor && (
+					<Popover
+						anchor={ contextMenuAnchor }
+						onClose={ () => setContextMenuAnchor( null ) }
+						placement="bottom-start"
+					>
+						<PropertiesSection showLabel={ false } />
+					</Popover>
+				) }
+				<thead onContextMenu={ handleHeaderContextMenu }>
 					<tr className="dataviews-view-table__row">
 						{ hasBulkActions && (
 							<th
 								className="dataviews-view-table__checkbox-column"
 								scope="col"
+								onContextMenu={ handleHeaderContextMenu }
 							>
 								<BulkSelectionCheckbox
 									selection={ selection }
@@ -578,7 +619,14 @@ function ViewTable< Item >( {
 				} ) }
 				id={ tableNoticeId }
 			>
-				{ ! hasData && <p>{ isLoading ? <Spinner /> : empty }</p> }
+				{ ! hasData &&
+					( isLoading ? (
+						<p>
+							<Spinner />
+						</p>
+					) : (
+						empty
+					) ) }
 				{ hasData && isLoading && (
 					<p className="dataviews-loading-more">
 						<Spinner />

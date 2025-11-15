@@ -5,15 +5,16 @@ import { isTextField } from '@wordpress/dom';
 import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
-import { createRoot } from '@wordpress/element';
-import { store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
-import BlockDraggableChip from '../../../components/block-draggable/draggable-chip';
+
+function isColorTransparent( color ) {
+	return ! color || color === 'transparent' || color === 'rgba(0, 0, 0, 0)';
+}
 
 /**
  * Adds block behaviour:
@@ -24,9 +25,9 @@ import BlockDraggableChip from '../../../components/block-draggable/draggable-ch
  * @param {string} clientId Block client ID.
  */
 export function useEventHandlers( { clientId, isSelected } ) {
-	const { getBlockType } = useSelect( blocksStore );
-	const { getBlockRootClientId, isZoomOut, hasMultiSelection, getBlockName } =
-		unlock( useSelect( blockEditorStore ) );
+	const { getBlockRootClientId, isZoomOut, hasMultiSelection } = unlock(
+		useSelect( blockEditorStore )
+	);
 	const {
 		insertAfterBlock,
 		removeBlock,
@@ -105,20 +106,6 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				const selection = defaultView.getSelection();
 				selection.removeAllRanges();
 
-				const domNode = document.createElement( 'div' );
-				const root = createRoot( domNode );
-				root.render(
-					<BlockDraggableChip
-						icon={ getBlockType( getBlockName( clientId ) ).icon }
-					/>
-				);
-				document.body.appendChild( domNode );
-				domNode.style.position = 'absolute';
-				domNode.style.top = '0';
-				domNode.style.left = '0';
-				domNode.style.zIndex = '1000';
-				domNode.style.pointerEvents = 'none';
-
 				// Setting the drag chip as the drag image actually works, but
 				// the behaviour is slightly different in every browser. In
 				// Safari, it animates, in Firefox it's slightly transparent...
@@ -134,31 +121,141 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				ownerDocument.body.appendChild( dragElement );
 				event.dataTransfer.setDragImage( dragElement, 0, 0 );
 
-				let offset = { x: 0, y: 0 };
+				const rect = node.getBoundingClientRect();
 
-				if ( document !== ownerDocument ) {
-					const frame = defaultView.frameElement;
-					if ( frame ) {
-						const rect = frame.getBoundingClientRect();
-						offset = { x: rect.left, y: rect.top };
+				const clone = node.cloneNode( true );
+				clone.style.visibility = 'hidden';
+				// Maybe remove the clone now that it's relative?
+				clone.style.display = 'none';
+
+				// Remove the id and leave it on the clone so that drop target
+				// calculations are correct.
+				const id = node.id;
+				node.id = null;
+
+				let _scale = 1;
+
+				{
+					let parentElement = node;
+					while ( ( parentElement = parentElement.parentElement ) ) {
+						const { scale } =
+							defaultView.getComputedStyle( parentElement );
+						if ( scale && scale !== 'none' ) {
+							_scale = parseFloat( scale );
+							break;
+						}
 					}
 				}
 
-				// chip handle offset
-				offset.x -= 58;
+				const inverted = 1 / _scale;
 
-				function over( e ) {
-					domNode.style.transform = `translate( ${
-						e.clientX + offset.x
-					}px, ${ e.clientY + offset.y }px )`;
+				node.after( clone );
+
+				const originalNodeProperties = {};
+				for ( const property of [
+					'transform',
+					'transformOrigin',
+					'transition',
+					'zIndex',
+					'position',
+					'top',
+					'left',
+					'pointerEvents',
+					'opacity',
+					'backgroundColor',
+				] ) {
+					originalNodeProperties[ property ] = node.style[ property ];
 				}
 
-				over( event );
+				// Get scroll position.
+				const originScrollTop = defaultView.scrollY;
+				const originScrollLeft = defaultView.scrollX;
+				const originClientX = event.clientX;
+				const originClientY = event.clientY;
+
+				// We can't use position fixed because it will behave different
+				// if the html element is scaled or transformed (position will
+				// no longer be relative to the viewport). The downside of
+				// relative is that we have to listen to scroll events. On the
+				// upside we don't have to clone to keep a space. Absolute
+				// positioning might be weird because it will be based on the
+				// positioned parent, but it might be worth a try.
+				node.style.position = 'relative';
+				node.style.top = `${ 0 }px`;
+				node.style.left = `${ 0 }px`;
+
+				const originX = event.clientX - rect.left;
+				const originY = event.clientY - rect.top;
+
+				// Scale everything to 200px.
+				const dragScale = rect.height > 200 ? 200 / rect.height : 1;
+
+				node.style.zIndex = '1000';
+				node.style.transformOrigin = `${ originX * inverted }px ${
+					originY * inverted
+				}px`;
+				node.style.transition = 'transform 0.2s ease-out';
+				node.style.transform = `scale(${ dragScale })`;
+				node.style.opacity = '0.9';
+
+				// If the block has no background color, use the parent's
+				// background color.
+				if (
+					isColorTransparent(
+						defaultView.getComputedStyle( node ).backgroundColor
+					)
+				) {
+					let bgColor = 'transparent';
+					let parentElement = node;
+					while ( ( parentElement = parentElement.parentElement ) ) {
+						const { backgroundColor } =
+							defaultView.getComputedStyle( parentElement );
+						if ( ! isColorTransparent( backgroundColor ) ) {
+							bgColor = backgroundColor;
+							break;
+						}
+					}
+
+					node.style.backgroundColor = bgColor;
+				}
+
+				let hasStarted = false;
+
+				function over( e ) {
+					if ( ! hasStarted ) {
+						hasStarted = true;
+						node.style.pointerEvents = 'none';
+					}
+					const scrollTop = defaultView.scrollY;
+					const scrollLeft = defaultView.scrollX;
+					node.style.top = `${
+						( e.clientY -
+							originClientY +
+							scrollTop -
+							originScrollTop ) *
+						inverted
+					}px`;
+					node.style.left = `${
+						( e.clientX -
+							originClientX +
+							scrollLeft -
+							originScrollLeft ) *
+						inverted
+					}px`;
+				}
 
 				function end() {
 					ownerDocument.removeEventListener( 'dragover', over );
 					ownerDocument.removeEventListener( 'dragend', end );
-					domNode.remove();
+					ownerDocument.removeEventListener( 'drop', end );
+					ownerDocument.removeEventListener( 'scroll', over );
+					for ( const [ property, value ] of Object.entries(
+						originalNodeProperties
+					) ) {
+						node.style[ property ] = value;
+					}
+					clone.remove();
+					node.id = id;
 					dragElement.remove();
 					stopDraggingBlocks();
 					document.body.classList.remove(
@@ -172,6 +269,7 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				ownerDocument.addEventListener( 'dragover', over );
 				ownerDocument.addEventListener( 'dragend', end );
 				ownerDocument.addEventListener( 'drop', end );
+				ownerDocument.addEventListener( 'scroll', over );
 
 				startDraggingBlocks( [ clientId ] );
 				// Important because it hides the block toolbar.

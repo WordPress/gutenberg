@@ -1,19 +1,24 @@
 /**
  * WordPress dependencies
  */
-import { atSymbol } from '@wordpress/icons';
+import {
+	Icon,
+	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
+} from '@wordpress/components';
+import { envelope } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import type { DataFormControlProps } from '../types';
-import ValidatedText from './utils/validated-text';
+import ValidatedText from './utils/validated-input';
 
 export default function Email< Item >( {
 	data,
 	field,
 	onChange,
 	hideLabelFromVision,
+	validity,
 }: DataFormControlProps< Item > ) {
 	return (
 		<ValidatedText
@@ -22,8 +27,13 @@ export default function Email< Item >( {
 				field,
 				onChange,
 				hideLabelFromVision,
+				validity,
 				type: 'email',
-				icon: atSymbol,
+				prefix: (
+					<InputControlPrefixWrapper variant="icon">
+						<Icon icon={ envelope } />
+					</InputControlPrefixWrapper>
+				),
 			} }
 		/>
 	);

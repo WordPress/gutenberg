@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { createSelector, createRegistrySelector } from '@wordpress/data';
-import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
+import {
+	hasBlockSupport,
+	privateApis as blocksPrivateApis,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -16,16 +19,16 @@ import {
 	getBlockName,
 	getTemplateLock,
 	getClientIdsWithDescendants,
-	isNavigationMode,
 	getBlockRootClientId,
+	getBlockAttributes,
 } from './selectors';
 import {
 	checkAllowListRecursive,
 	getAllPatternsDependants,
 	getInsertBlockTypeDependants,
 	getGrammar,
+	mapUserPattern,
 } from './utils';
-import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-tab/utils';
 import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
 import {
@@ -92,7 +95,7 @@ export const isBlockSubtreeDisabled = ( state, clientId ) => {
  * @param {string} rootClientId The client ID of the root container block.
  * @return {boolean} Whether the container allows insertion.
  */
-export function isContainerInsertableToInWriteMode(
+export function isContainerInsertableToInContentOnlyMode(
 	state,
 	blockName,
 	rootClientId
@@ -102,7 +105,7 @@ export function isContainerInsertableToInWriteMode(
 	const isContainerContentBlock = isContentBlock( rootBlockName );
 	const isRootBlockMain = getSectionRootClientId( state ) === rootClientId;
 
-	// In write mode, containers shouldn't be inserted into unless:
+	// In contentOnly mode, containers shouldn't be inserted into unless:
 	// 1. they are a section root;
 	// 2. they are a content block and the block to be inserted is also content.
 	return (
@@ -138,15 +141,11 @@ function getEnabledClientIdsTreeUnmemoized( state, rootClientId ) {
  *
  * @return {Object[]} Tree of block objects with only clientID and innerBlocks set.
  */
-export const getEnabledClientIdsTree = createRegistrySelector( ( select ) =>
+export const getEnabledClientIdsTree = createRegistrySelector( () =>
 	createSelector( getEnabledClientIdsTreeUnmemoized, ( state ) => [
 		state.blocks.order,
 		state.derivedBlockEditingModes,
-		state.derivedNavModeBlockEditingModes,
 		state.blockEditingModes,
-		state.settings.templateLock,
-		state.blockListSettings,
-		select( STORE_NAME ).__unstableGetEditorMode( state ),
 	] )
 );
 
@@ -350,26 +349,6 @@ export const hasAllowedPatterns = createRegistrySelector( ( select ) =>
 	)
 );
 
-function mapUserPattern(
-	userPattern,
-	__experimentalUserPatternCategories = []
-) {
-	return {
-		name: `core/block/${ userPattern.id }`,
-		id: userPattern.id,
-		type: INSERTER_PATTERN_TYPES.user,
-		title: userPattern.title.raw,
-		categories: userPattern.wp_pattern_category?.map( ( catId ) => {
-			const category = __experimentalUserPatternCategories.find(
-				( { id } ) => id === catId
-			);
-			return category ? category.slug : catId;
-		} ),
-		content: userPattern.content.raw,
-		syncStatus: userPattern.wp_pattern_sync_status,
-	};
-}
-
 export const getPatternBySlug = createRegistrySelector( ( select ) =>
 	createSelector(
 		( state, patternName ) => {
@@ -509,12 +488,15 @@ export const getContentLockingParent = ( state, clientId ) => {
  * @param {Object} state    Global application state.
  * @param {string} clientId Client Id of the block.
  *
- * @return {?string} Client ID of the ancestor block that is content locking the block.
+ * @return {?string} Client ID of the ancestor block that is a contentOnly section.
  */
 export const getParentSectionBlock = ( state, clientId ) => {
 	let current = clientId;
 	let result;
-	while ( ! result && ( current = state.blocks.parents.get( current ) ) ) {
+
+	// If sections are nested, return the top level section block.
+	// Don't return early.
+	while ( ( current = state.blocks.parents.get( current ) ) ) {
 		if ( isSectionBlock( state, current ) ) {
 			result = current;
 		}
@@ -523,14 +505,18 @@ export const getParentSectionBlock = ( state, clientId ) => {
 };
 
 /**
- * Retrieves the client ID is a content locking parent
+ * Returns whether the block is a contentOnly section.
  *
  * @param {Object} state    Global application state.
  * @param {string} clientId Client Id of the block.
  *
- * @return {boolean} Whether the block is a content locking parent.
+ * @return {boolean} Whether the block is a contentOnly section.
  */
 export function isSectionBlock( state, clientId ) {
+	if ( clientId === state.editedContentOnlySection ) {
+		return false;
+	}
+
 	const blockName = getBlockName( state, clientId );
 	if (
 		blockName === 'core/block' ||
@@ -539,39 +525,45 @@ export function isSectionBlock( state, clientId ) {
 		return true;
 	}
 
-	// Template parts become sections in navigation mode.
-	const _isNavigationMode = isNavigationMode( state );
-	if ( _isNavigationMode && blockName === 'core/template-part' ) {
+	const attributes = getBlockAttributes( state, clientId );
+	const isTemplatePart = blockName === 'core/template-part';
+	if (
+		( attributes?.metadata?.patternName || isTemplatePart ) &&
+		!! window?.__experimentalContentOnlyPatternInsertion
+	) {
+		return true;
+	}
+	return false;
+}
+
+/**
+ * Retrieves the client ID of the block that is a contentOnly section but is
+ * currently being temporarily edited (contentOnly is deactivated).
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {?string} The client ID of the block being temporarily edited.
+ */
+export function getEditedContentOnlySection( state ) {
+	return state.editedContentOnlySection;
+}
+
+export function isWithinEditedContentOnlySection( state, clientId ) {
+	if ( ! state.editedContentOnlySection ) {
+		return false;
+	}
+
+	if ( state.editedContentOnlySection === clientId ) {
 		return true;
 	}
 
-	const sectionRootClientId = getSectionRootClientId( state );
-	const sectionClientIds = getBlockOrder( state, sectionRootClientId );
-	return _isNavigationMode && sectionClientIds.includes( clientId );
-}
-
-/**
- * Retrieves the client ID of the block that is content locked but is
- * currently being temporarily edited as a non-locked block.
- *
- * @param {Object} state Global application state.
- *
- * @return {?string} The client ID of the block being temporarily edited as a non-locked block.
- */
-export function getTemporarilyEditingAsBlocks( state ) {
-	return state.temporarilyEditingAsBlocks;
-}
-
-/**
- * Returns the focus mode that should be reapplied when the user stops editing
- * a content locked blocks as a block without locking.
- *
- * @param {Object} state Global application state.
- *
- * @return {?string} The focus mode that should be re-set when temporarily editing as blocks stops.
- */
-export function getTemporarilyEditingFocusModeToRevert( state ) {
-	return state.temporarilyEditingFocusModeRevert;
+	let current = clientId;
+	while ( ( current = state.blocks.parents.get( current ) ) ) {
+		if ( state.editedContentOnlySection === current ) {
+			return true;
+		}
+	}
+	return false;
 }
 
 /**
@@ -696,4 +688,35 @@ export function getClosestAllowedInsertionPointForPattern(
  */
 export function getInsertionPoint( state ) {
 	return state.insertionPoint;
+}
+
+/**
+ * Returns true if the block is hidden, or false otherwise.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Client ID of the block.
+ *
+ * @return {boolean} Whether the block is hidden.
+ */
+export const isBlockHidden = ( state, clientId ) => {
+	const blockName = getBlockName( state, clientId );
+	if ( ! hasBlockSupport( state, blockName, 'blockVisibility', true ) ) {
+		return false;
+	}
+	const attributes = state.blocks.attributes.get( clientId );
+	return attributes?.metadata?.blockVisibility === false;
+};
+
+/**
+ * Returns true if there is a spotlighted block.
+ *
+ * The spotlight is also active when a contentOnly section is being edited, the selector
+ * also returns true if this is the case.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the block is currently spotlighted.
+ */
+export function hasBlockSpotlight( state ) {
+	return !! state.hasBlockSpotlight || !! state.editedContentOnlySection;
 }

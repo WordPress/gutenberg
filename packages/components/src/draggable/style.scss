@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/z-index" as *;
+
 body.is-dragging-components-draggable {
 	cursor: move;/* Fallback for IE/Edge < 14 */
 	cursor: grabbing !important;

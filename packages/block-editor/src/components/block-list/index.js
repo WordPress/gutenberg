@@ -15,9 +15,9 @@ import {
 import { useMergeRefs, useDebounce } from '@wordpress/compose';
 import {
 	createContext,
+	useEffect,
 	useMemo,
 	useCallback,
-	useEffect,
 } from '@wordpress/element';
 import { getDefaultBlockName } from '@wordpress/blocks';
 
@@ -43,19 +43,28 @@ export const IntersectionObserver = createContext();
 IntersectionObserver.displayName = 'IntersectionObserverContext';
 
 const pendingBlockVisibilityUpdatesPerRegistry = new WeakMap();
+const delayedBlockVisibilityDebounceOptions = {
+	trailing: true,
+};
 
 function Root( { className, ...settings } ) {
-	const { isOutlineMode, isFocusMode, temporarilyEditingAsBlocks } =
-		useSelect( ( select ) => {
-			const { getSettings, getTemporarilyEditingAsBlocks, isTyping } =
-				unlock( select( blockEditorStore ) );
+	const { isOutlineMode, isFocusMode, editedContentOnlySection } = useSelect(
+		( select ) => {
+			const {
+				getSettings,
+				isTyping,
+				hasBlockSpotlight,
+				getEditedContentOnlySection,
+			} = unlock( select( blockEditorStore ) );
 			const { outlineMode, focusMode } = getSettings();
 			return {
 				isOutlineMode: outlineMode && ! isTyping(),
-				isFocusMode: focusMode,
-				temporarilyEditingAsBlocks: getTemporarilyEditingAsBlocks(),
+				isFocusMode: focusMode || hasBlockSpotlight(),
+				editedContentOnlySection: getEditedContentOnlySection(),
 			};
-		}, [] );
+		},
+		[]
+	);
 	const registry = useRegistry();
 	const { setBlockVisibility } = useDispatch( blockEditorStore );
 
@@ -70,9 +79,7 @@ function Root( { className, ...settings } ) {
 			setBlockVisibility( updates );
 		}, [ registry ] ),
 		300,
-		{
-			trailing: true,
-		}
+		delayedBlockVisibilityDebounceOptions
 	);
 	const intersectionObserver = useMemo( () => {
 		const { IntersectionObserver: Observer } = window;
@@ -111,33 +118,41 @@ function Root( { className, ...settings } ) {
 	return (
 		<IntersectionObserver.Provider value={ intersectionObserver }>
 			<div { ...innerBlocksProps } />
-			{ !! temporarilyEditingAsBlocks && (
-				<StopEditingAsBlocksOnOutsideSelect
-					clientId={ temporarilyEditingAsBlocks }
+			{ !! editedContentOnlySection && (
+				<StopEditingContentOnlySectionOnOutsideSelect
+					clientId={ editedContentOnlySection }
 				/>
 			) }
 		</IntersectionObserver.Provider>
 	);
 }
 
-function StopEditingAsBlocksOnOutsideSelect( { clientId } ) {
-	const { stopEditingAsBlocks } = unlock( useDispatch( blockEditorStore ) );
+function StopEditingContentOnlySectionOnOutsideSelect( { clientId } ) {
+	const { stopEditingContentOnlySection } = unlock(
+		useDispatch( blockEditorStore )
+	);
 	const isBlockOrDescendantSelected = useSelect(
 		( select ) => {
-			const { isBlockSelected, hasSelectedInnerBlock } =
-				select( blockEditorStore );
+			const {
+				isBlockSelected,
+				hasSelectedInnerBlock,
+				getBlockSelectionStart,
+			} = select( blockEditorStore );
 			return (
+				! getBlockSelectionStart() ||
 				isBlockSelected( clientId ) ||
 				hasSelectedInnerBlock( clientId, true )
 			);
 		},
 		[ clientId ]
 	);
+
 	useEffect( () => {
 		if ( ! isBlockOrDescendantSelected ) {
-			stopEditingAsBlocks( clientId );
+			stopEditingContentOnlySection();
 		}
-	}, [ isBlockOrDescendantSelected, clientId, stopEditingAsBlocks ] );
+	}, [ isBlockOrDescendantSelected, stopEditingContentOnlySection ] );
+
 	return null;
 }
 
@@ -179,6 +194,8 @@ function Items( {
 				getTemplateLock,
 				getBlockEditingMode,
 				isSectionBlock,
+				isContainerInsertableToInContentOnlyMode,
+				getBlockName,
 				isZoomOut: _isZoomOut,
 				canInsertBlockType,
 			} = unlock( select( blockEditorStore ) );
@@ -215,7 +232,11 @@ function Items( {
 				visibleBlocks: __unstableGetVisibleBlocks(),
 				isZoomOut: _isZoomOut(),
 				shouldRenderAppender:
-					! isSectionBlock( rootClientId ) &&
+					( ! isSectionBlock( rootClientId ) ||
+						isContainerInsertableToInContentOnlyMode(
+							getBlockName( selectedBlockClientId ),
+							rootClientId
+						) ) &&
 					getBlockEditingMode( rootClientId ) !== 'disabled' &&
 					! getTemplateLock( rootClientId ) &&
 					hasAppender &&

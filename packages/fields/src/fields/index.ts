@@ -10,5 +10,7 @@ export { default as parentField } from './parent';
 export { default as passwordField } from './password';
 export { default as statusField } from './status';
 export { default as commentStatusField } from './comment-status';
+export { default as pingStatusField } from './ping-status';
+export { default as discussionField } from './discussion';
 export { default as dateField } from './date';
 export { default as authorField } from './author';

@@ -21,16 +21,19 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { debounce } from '@wordpress/compose';
-import { useMemo, useState } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { __, sprintf } from '@wordpress/i18n';
-import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { useMemo, useState } from '@wordpress/element';
+import { decodeEntities } from '@wordpress/html-entities';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import {
+	useDefaultAvatar,
+	useToolsPanelDropdownMenuProps,
+} from '../utils/hooks';
 
 const AUTHORS_QUERY = {
 	who: 'authors',
@@ -115,6 +118,7 @@ function PostAuthorEdit( {
 } ) {
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+	const defaultAvatar = useDefaultAvatar();
 
 	const { authorDetails, canAssignAuthor, supportsAuthor } = useSelect(
 		( select ) => {
@@ -323,12 +327,17 @@ function PostAuthorEdit( {
 			</BlockControls>
 
 			<div { ...blockProps }>
-				{ showAvatar && authorDetails?.avatar_urls && (
+				{ showAvatar && (
 					<div className="wp-block-post-author__avatar">
 						<img
 							width={ avatarSize }
-							src={ authorDetails.avatar_urls[ avatarSize ] }
-							alt={ authorDetails.name }
+							src={
+								authorDetails?.avatar_urls?.[ avatarSize ] ||
+								defaultAvatar
+							}
+							alt={
+								authorDetails?.name || __( 'Default Avatar' )
+							}
 						/>
 					</div>
 				) }

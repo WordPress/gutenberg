@@ -44,6 +44,7 @@ function render( { item, field }: DataViewRenderFieldProps< any > ) {
 const arrayFieldType: FieldTypeDefinition< any > = {
 	sort,
 	isValid: {
+		elements: true,
 		custom: ( item: any, field: NormalizedField< any > ) => {
 			const value = field.getValue( { item } );
 
@@ -59,14 +60,6 @@ const arrayFieldType: FieldTypeDefinition< any > = {
 				return __( 'Every value must be a string.' );
 			}
 
-			if ( field?.elements ) {
-				const validValues = field.elements.map( ( f ) => f.value );
-				if (
-					! value.every( ( v: any ) => validValues.includes( v ) )
-				) {
-					return __( 'Value must be one of the elements.' );
-				}
-			}
 			return null;
 		},
 	},

@@ -163,6 +163,9 @@ export const getHomePage = createRegistrySelector( ( select ) =>
 			return { postType: 'wp_template', postId: frontPageTemplateId };
 		},
 		( state ) => [
+			// Even though getDefaultTemplateId.shouldInvalidate returns true when root/site changes,
+			// it doesn't seem to invalidate this cache, I'm not sure why.
+			getEntityRecord( state, 'root', 'site' ),
 			getEntityRecord( state, 'root', '__unstableBase' ),
 			getDefaultTemplateId( state, {
 				slug: 'front-page',
@@ -265,3 +268,25 @@ export const getTemplateId = createRegistrySelector(
 		} );
 	}
 );
+
+/**
+ * Returns the editor settings.
+ *
+ * @param state Data state.
+ * @return Editor settings object or null if not loaded.
+ */
+export function getEditorSettings(
+	state: State
+): Record< string, any > | null {
+	return state.editorSettings;
+}
+
+/**
+ * Returns the editor assets.
+ *
+ * @param state Data state.
+ * @return Editor assets object or null if not loaded.
+ */
+export function getEditorAssets( state: State ): Record< string, any > | null {
+	return state.editorAssets;
+}

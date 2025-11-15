@@ -54,6 +54,7 @@ export function CheckboxControl(
 		help,
 		id: idProp,
 		onChange,
+		onClick,
 		...additionalProps
 	} = props;
 
@@ -118,6 +119,12 @@ export function CheckboxControl(
 						onChange={ onChangeValue }
 						checked={ checked }
 						aria-describedby={ !! help ? id + '__help' : undefined }
+						onClick={ ( event ) => {
+							// Compat code for Safari to ensure that the checkbox is focused when clicked.
+							event.currentTarget.focus();
+
+							onClick?.( event );
+						} }
 						{ ...additionalProps }
 					/>
 					{ showIndeterminateIcon ? (

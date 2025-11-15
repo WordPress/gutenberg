@@ -25,27 +25,64 @@ store( 'test/get-server-context', {
 				getContext().result = 'not modified ✅';
 			}
 		},
+		updateNonChanging() {
+			getContext().nonChanging = 'modified from client';
+		},
 	},
 	callbacks: {
 		updateServerContextParent() {
 			const ctx = getContext();
 			const { prop, newProp, nested, inherited } = getServerContext();
 			ctx.prop = prop;
-			ctx.newProp = newProp;
+			if ( newProp ) {
+				ctx.newProp = newProp;
+			}
 			ctx.nested.prop = nested.prop;
-			ctx.nested.newProp = nested.newProp;
+			if ( nested?.newProp ) {
+				ctx.nested.newProp = nested.newProp;
+			}
 			ctx.inherited.prop = inherited.prop;
-			ctx.inherited.newProp = inherited.newProp;
+			if ( inherited?.newProp ) {
+				ctx.inherited.newProp = inherited.newProp;
+			}
 		},
 		updateServerContextChild() {
 			const ctx = getContext();
 			const { prop, newProp, nested, inherited } = getServerContext();
 			ctx.prop = prop;
-			ctx.newProp = newProp;
+			if ( newProp ) {
+				ctx.newProp = newProp;
+			}
 			ctx.nested.prop = nested.prop;
-			ctx.nested.newProp = nested.newProp;
+			if ( nested?.newProp ) {
+				ctx.nested.newProp = nested.newProp;
+			}
 			ctx.inherited.prop = inherited.prop;
-			ctx.inherited.newProp = inherited.newProp;
+			if ( inherited?.newProp ) {
+				ctx.inherited.newProp = inherited.newProp;
+			}
+		},
+		updateNonChanging() {
+			// This property never changes in the server, but it changes in the
+			// client so every time there's a navigation, we need to overwrite
+			// it.
+			const ctx = getContext();
+			const { nonChanging } = getServerContext();
+			ctx.nonChanging = nonChanging;
+		},
+		updateOnlyInMain() {
+			// This property only exists in the main page, so we need to clear
+			// it when navigating to a page that doesn't have it.
+			const ctx = getContext();
+			const { onlyInMain } = getServerContext();
+			ctx.onlyInMain = onlyInMain;
+		},
+		updateOnlyInModified() {
+			// This property only exists in the modified page, so we need to clear
+			// it when navigating to a page that doesn't have it.
+			const ctx = getContext();
+			const { onlyInModified } = getServerContext();
+			ctx.onlyInModified = onlyInModified;
 		},
 	},
 } );

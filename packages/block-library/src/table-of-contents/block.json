@@ -22,9 +22,14 @@
 		},
 		"maxLevel": {
 			"type": "number"
+		},
+		"ordered": {
+			"type": "boolean",
+			"default": true
 		}
 	},
 	"supports": {
+		"ariaLabel": true,
 		"html": false,
 		"color": {
 			"text": true,

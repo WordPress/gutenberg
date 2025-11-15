@@ -149,7 +149,7 @@ Unlike in [PHP code in the /lib directory](https://github.com/WordPress/gutenber
 
 There are times, however, when blocks may need to use Gutenberg functions even when a Core-equivalent exists, for example, where a Gutenberg function relies on code that is only available in the plugin.
 
-In such cases, you can use the corresponding Core `wp_` function in the block PHP code, and add its name to [a list of prefixed functions in the Webpack configuration file](https://github.com/WordPress/gutenberg/blob/trunk/tools/webpack/blocks.js#L30).
+In such cases, you can use the corresponding Core `wp_` function in the block PHP code, and add its name to a list of prefixed functions in the package.json.
 
 At build time, Webpack will search for `wp_` functions in that list and replace them with their `gutenberg_` equivalents. This process ensures that the plugin calls the `gutenberg_` functions, but the block will still call the Core `wp_` function when updates are back ported.
 

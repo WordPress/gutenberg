@@ -32,9 +32,10 @@ import type {
 	ViewPickerGrid as ViewPickerGridType,
 	ViewPickerGridProps,
 } from '../../types';
-import type { SetSelection } from '../../private-types';
+import type { SetSelection } from '../../types/private';
 import { GridItems } from '../utils/grid-items';
 const { Badge } = unlock( componentsPrivateApis );
+import getDataByGroup from '../utils/get-data-by-group';
 
 interface GridItemProps< Item > {
 	view: ViewPickerGridType;
@@ -88,6 +89,11 @@ function GridItem< Item >( {
 
 	return (
 		<Composite.Item
+			aria-label={
+				titleField
+					? titleField.getValue( { item } ) || __( '(no title)' )
+					: undefined
+			}
 			key={ id }
 			render={ ( { children, ...props } ) => (
 				<VStack spacing={ 0 } children={ children } { ...props } />
@@ -129,14 +135,16 @@ function GridItem< Item >( {
 					tabIndex={ -1 }
 				/>
 			) }
-			<HStack
-				justify="space-between"
-				className="dataviews-view-picker-grid__title-actions"
-			>
-				<div className="dataviews-view-picker-grid__title-field dataviews-title-field">
-					{ renderedTitleField }
-				</div>
-			</HStack>
+			{ showTitle && (
+				<HStack
+					justify="space-between"
+					className="dataviews-view-picker-grid__title-actions"
+				>
+					<div className="dataviews-view-picker-grid__title-field dataviews-title-field">
+						{ renderedTitleField }
+					</div>
+				</HStack>
+			) }
 			<VStack spacing={ 1 }>
 				{ showDescription && descriptionField?.render && (
 					<descriptionField.render
@@ -301,18 +309,7 @@ function ViewPickerGrid< Item >( {
 	const groupField = view.groupByField
 		? fields.find( ( f ) => f.id === view.groupByField )
 		: null;
-
-	// Group data by groupByField if specified
-	const dataByGroup = groupField
-		? data.reduce( ( groups: Map< string, typeof data >, item ) => {
-				const groupName = groupField.getValue( { item } );
-				if ( ! groups.has( groupName ) ) {
-					groups.set( groupName, [] );
-				}
-				groups.get( groupName )?.push( item );
-				return groups;
-		  }, new Map< string, typeof data >() )
-		: null;
+	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
 
 	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
 
@@ -474,7 +471,13 @@ function ViewPickerGrid< Item >( {
 							'dataviews-no-results': ! isLoading,
 						} ) }
 					>
-						<p>{ isLoading ? <Spinner /> : empty }</p>
+						{ isLoading ? (
+							<p>
+								<Spinner />
+							</p>
+						) : (
+							empty
+						) }
 					</div>
 				)
 			}

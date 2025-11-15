@@ -2,9 +2,16 @@
 
 ## Unreleased
 
-### Enhancement
+## 15.8.0 (2025-11-12)
 
--  `TextShadowControl`: Add support for text shadow styles in the block editor.
+## 15.7.0 (2025-10-29)
+
+## 15.6.0 (2025-10-17)
+
+## 15.5.0 (2025-10-01)
+
+## 15.4.0 (2025-09-17)
+
 ## 15.3.0 (2025-09-03)
 
 ## 15.2.0 (2025-08-20)

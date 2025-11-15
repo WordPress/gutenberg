@@ -44,7 +44,7 @@ test.describe( 'Site editor url navigation', () => {
 			.click();
 		await page.getByRole( 'option', { name: 'Demo' } ).click();
 		await expect( page ).toHaveURL(
-			'/wp-admin/site-editor.php?p=%2Fwp_template%2Femptytheme%2F%2Fsingle-post-demo&canvas=edit'
+			/wp-admin\/site-editor\.php\?p=%2Fwp_template%2F\d+&canvas=edit/
 		);
 	} );
 
@@ -79,7 +79,7 @@ test.describe( 'Site editor url navigation', () => {
 		await navigation.getByRole( 'button', { name: 'General' } ).click();
 		await page
 			.getByRole( 'region', {
-				name: 'Patterns content',
+				name: 'General',
 			} )
 			.getByText( 'header', { exact: true } )
 			.click();

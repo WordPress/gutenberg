@@ -7,11 +7,11 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import type { BasePost } from '../../types';
+import type { BasePostWithEmbeddedFeaturedMedia } from '../../types';
 import { FeaturedImageEdit } from './featured-image-edit';
 import { FeaturedImageView } from './featured-image-view';
 
-const featuredImageField: Field< BasePost > = {
+const featuredImageField: Field< BasePostWithEmbeddedFeaturedMedia > = {
 	id: 'featured_media',
 	type: 'media',
 	label: __( 'Featured Image' ),
@@ -22,6 +22,6 @@ const featuredImageField: Field< BasePost > = {
 };
 
 /**
- * Featured Image field for BasePost.
+ * Featured Image field for BasePostWithEmbeddedFeaturedMedia.
  */
 export default featuredImageField;

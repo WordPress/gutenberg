@@ -19,6 +19,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { useRef, createInterpolateElement } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
+import { dateI18n, getDate } from '@wordpress/date';
 
 const ENTER = 'Enter';
 const SPACE = ' ';
@@ -55,12 +56,14 @@ import {
 } from '../../constants';
 import type {
 	Filter,
+	NormalizedField,
 	NormalizedFilter,
 	Operator,
 	Option,
 	View,
-	NormalizedField,
 } from '../../types';
+import useElements from '../../hooks/use-elements';
+import parseDateTime from '../../field-types/utils/parse-date-time';
 
 interface FilterTextProps {
 	activeElements: Option[];
@@ -480,18 +483,46 @@ export default function Filter( {
 
 	let activeElements: Option[] = [];
 
-	if ( filter.elements.length > 0 ) {
-		activeElements = filter.elements.filter( ( element ) => {
+	const { elements } = useElements( {
+		elements: filter.elements,
+		getElements: filter.getElements,
+	} );
+
+	if ( elements.length > 0 ) {
+		activeElements = elements.filter( ( element ) => {
 			if ( filter.singleSelection ) {
 				return element.value === filterInView?.value;
 			}
 			return filterInView?.value?.includes( element.value );
 		} );
 	} else if ( filterInView?.value !== undefined ) {
+		const field = fields.find( ( f ) => f.id === filter.field );
+		let label = filterInView.value;
+
+		if ( field?.type === 'date' && typeof label === 'string' ) {
+			try {
+				const dateValue = parseDateTime( label );
+				if ( dateValue !== null ) {
+					label = dateI18n( field.format.date, getDate( label ) );
+				}
+			} catch ( e ) {
+				label = filterInView.value;
+			}
+		} else if ( field?.type === 'datetime' && typeof label === 'string' ) {
+			try {
+				const dateValue = parseDateTime( label );
+				if ( dateValue !== null ) {
+					label = dateValue.toLocaleString();
+				}
+			} catch ( e ) {
+				label = filterInView.value;
+			}
+		}
+
 		activeElements = [
 			{
 				value: filterInView.value,
-				label: filterInView.value,
+				label,
 			},
 		];
 	}
@@ -594,12 +625,12 @@ export default function Filter( {
 				return (
 					<VStack spacing={ 0 } justify="flex-start">
 						<OperatorSelector { ...commonProps } />
-						{ commonProps.filter.elements.length > 0 ? (
+						{ commonProps.filter.hasElements ? (
 							<SearchWidget
 								{ ...commonProps }
 								filter={ {
 									...commonProps.filter,
-									elements: commonProps.filter.elements,
+									elements,
 								} }
 							/>
 						) : (

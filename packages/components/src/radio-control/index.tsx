@@ -65,6 +65,7 @@ export function RadioControl(
 		selected,
 		help,
 		onChange,
+		onClick,
 		hideLabelFromVision,
 		options = [],
 		id: preferredId,
@@ -121,6 +122,12 @@ export function RadioControl(
 									? generateOptionDescriptionId( id, index )
 									: undefined
 							}
+							onClick={ ( event ) => {
+								// Compat code for Safari to ensure that the radio is focused when clicked.
+								event.currentTarget.focus();
+
+								onClick?.( event );
+							} }
 							{ ...additionalProps }
 						/>
 						<label

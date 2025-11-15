@@ -40,7 +40,7 @@ export function getHrefAndDestination(
 		case LINK_DESTINATION_MEDIA_WP_CORE:
 		case LINK_DESTINATION_MEDIA:
 			return {
-				href: image?.source_url || image?.url, // eslint-disable-line camelcase
+				href: image?.source_url || image?.url,
 				linkDestination: IMAGE_LINK_DESTINATION_MEDIA,
 				lightbox: lightboxSetting?.enabled
 					? { ...attributes?.lightbox, enabled: false }

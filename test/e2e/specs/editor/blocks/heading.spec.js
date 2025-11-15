@@ -333,7 +333,11 @@ test.describe( 'Heading', () => {
 				name: 'core/paragraph',
 				attributes: {
 					content: 'Heading',
-					align: 'center',
+					style: {
+						typography: {
+							textAlign: 'center',
+						},
+					},
 				},
 			},
 		] );
@@ -414,7 +418,7 @@ test.describe( 'Heading', () => {
 				await editor.insertBlock( {
 					name: 'core/paragraph',
 					attributes: {
-						align: 'right',
+						style: { typography: { textAlign: 'right' } },
 						content: 'initial content',
 					},
 				} );
@@ -510,7 +514,9 @@ test.describe( 'Heading', () => {
 				await editor.transformBlockTo( 'core/paragraph' );
 				const paragraphBlock = ( await editor.getBlocks() )[ 0 ];
 				expect( paragraphBlock.name ).toBe( 'core/paragraph' );
-				expect( paragraphBlock.attributes.align ).toBe( 'right' );
+				expect(
+					paragraphBlock.attributes.style.typography.textAlign
+				).toBe( 'right' );
 			} );
 
 			test( 'should preserve the metadata attribute', async ( {

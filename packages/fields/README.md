@@ -47,6 +47,10 @@ Date field for BasePost.
 
 Delete action for Templates, Patterns and Template Parts.
 
+### discussionField
+
+Discussion field for BasePost with custom render logic.
+
 ### duplicatePattern
 
 Duplicate action for Pattern.
@@ -65,7 +69,7 @@ Export action as JSON for Pattern.
 
 ### featuredImageField
 
-Featured Image field for BasePost.
+Featured Image field for BasePostWithEmbeddedFeaturedMedia.
 
 ### orderField
 
@@ -90,6 +94,10 @@ Title for the pattern entity.
 ### permanentlyDeletePost
 
 Delete action for PostWithPermissions.
+
+### pingStatusField
+
+Ping status field for BasePost.
 
 ### PostType
 

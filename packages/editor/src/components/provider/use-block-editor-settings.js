@@ -40,6 +40,7 @@ function __experimentalReusableBlocksSelect( select ) {
 }
 
 const BLOCK_EDITOR_SETTINGS = [
+	'__experimentalBlockBindingsSupportedAttributes',
 	'__experimentalBlockDirectory',
 	'__experimentalDiscussionSettings',
 	'__experimentalFeatures',
@@ -95,6 +96,7 @@ const {
 	reusableBlocksSelectKey,
 	sectionRootClientIdKey,
 	mediaEditKey,
+	getMediaSelectKey,
 } = unlock( privateApis );
 
 /**
@@ -292,6 +294,13 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			hasFixedToolbar,
 			isDistractionFree,
 			keepCaretInsideBlock,
+			[ getMediaSelectKey ]: ( select, attachmentId ) => {
+				return select( coreStore ).getEntityRecord(
+					'postType',
+					'attachment',
+					attachmentId
+				);
+			},
 			[ mediaEditKey ]: hasUploadPermissions
 				? editMediaEntity
 				: undefined,

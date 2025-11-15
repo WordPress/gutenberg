@@ -77,12 +77,7 @@ const SiteLogo = ( {
 
 	// Check if we're in contentOnly mode
 	const blockEditingMode = useBlockEditingMode();
-	const isNavigationMode = useSelect(
-		( select ) => select( blockEditorStore ).isNavigationMode(),
-		[]
-	);
 	const isContentOnlyMode = blockEditingMode === 'contentOnly';
-	const isContentOnlyWriteMode = isNavigationMode && isContentOnlyMode;
 
 	const { imageEditing, maxWidth, title } = useSelect( ( select ) => {
 		const settings = select( blockEditorStore ).getSettings();
@@ -138,12 +133,8 @@ const SiteLogo = ( {
 	);
 
 	let imgWrapper = img;
-
-	// Disable reason: Image itself is not meant to be interactive, but
-	// should direct focus to block.
 	if ( isLink ) {
 		imgWrapper = (
-			/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 			<a
 				href={ siteUrl }
 				className="custom-logo-link"
@@ -153,7 +144,6 @@ const SiteLogo = ( {
 			>
 				{ img }
 			</a>
-			/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 		);
 	}
 
@@ -217,7 +207,7 @@ const SiteLogo = ( {
 		logoId && naturalWidth && naturalHeight && imageEditing;
 
 	// Hide crop and dimensions editing in write mode
-	const shouldShowCropAndDimensions = ! isContentOnlyWriteMode;
+	const shouldShowCropAndDimensions = ! isContentOnlyMode;
 
 	let imgEdit;
 	if ( canEditImage && isEditingImage ) {

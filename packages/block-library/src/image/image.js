@@ -625,7 +625,7 @@ export default function Image( {
 		lockAltControlsMessage,
 		lockTitleControls = false,
 		lockTitleControlsMessage,
-		lockCaption = false,
+		hideCaptionControls = false,
 	} = useSelect(
 		( select ) => {
 			if ( ! isSingleSelected ) {
@@ -635,6 +635,7 @@ export default function Image( {
 				url: urlBinding,
 				alt: altBinding,
 				title: titleBinding,
+				caption: captionBinding,
 			} = metadata?.bindings || {};
 			const hasParentPattern = !! context[ 'pattern/overrides' ];
 			const urlBindingSource = getBlockBindingsSource(
@@ -658,10 +659,7 @@ export default function Image( {
 					// Disable editing the link of the URL if the image is inside a pattern instance.
 					// This is a temporary solution until we support overriding the link on the frontend.
 					hasParentPattern || arePatternOverridesEnabled,
-				lockCaption:
-					// Disable editing the caption if the image is inside a pattern instance.
-					// This is a temporary solution until we support overriding the caption on the frontend.
-					hasParentPattern,
+				hideCaptionControls: !! captionBinding,
 				lockAltControls:
 					!! altBinding &&
 					! altBindingSource?.canUserEditValue?.( {
@@ -913,9 +911,6 @@ export default function Image( {
 				<Spinner />
 			</Placeholder>
 		) : (
-			// Disable reason: Image itself is not meant to be interactive, but
-			// should direct focus to block.
-			/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 			<>
 				<img
 					src={ temporaryURL || url }
@@ -942,7 +937,6 @@ export default function Image( {
 				/>
 				{ temporaryURL && <Spinner /> }
 			</>
-			/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 		);
 
 	if ( canEditImage && isEditingImage ) {
@@ -1147,10 +1141,9 @@ export default function Image( {
 				label={ __( 'Image caption text' ) }
 				showToolbarButton={
 					isSingleSelected &&
-					hasNonContentControls &&
-					! arePatternOverridesEnabled
+					( hasNonContentControls || isContentOnlyMode ) &&
+					! hideCaptionControls
 				}
-				readOnly={ lockCaption }
 			/>
 		</>
 	);

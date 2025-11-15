@@ -2,7 +2,7 @@
 /**
  * Unit tests covering WP_REST_Global_Styles_Controller_Gutenberg functionality.
  *
- * @package Gutenberg
+ * @package gutenberg
  *
  * @covers WP_REST_Global_Styles_Controller_Gutenberg
  */

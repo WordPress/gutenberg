@@ -2,13 +2,14 @@
  * WordPress dependencies
  */
 import { privateApis } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import type { DataFormControlProps } from '../types';
 import { unlock } from '../lock-unlock';
+import getCustomValidity from './utils/get-custom-validity';
 
 const { ValidatedToggleControl } = unlock( privateApis );
 
@@ -17,46 +18,26 @@ export default function Toggle< Item >( {
 	onChange,
 	data,
 	hideLabelFromVision,
+	validity,
 }: DataFormControlProps< Item > ) {
-	const { id, getValue, label, description } = field;
-	const [ customValidity, setCustomValidity ] =
-		useState<
-			React.ComponentProps<
-				typeof ValidatedToggleControl
-			>[ 'customValidity' ]
-		>( undefined );
+	const { label, description, getValue, setValue, isValid } = field;
+
+	const onChangeControl = useCallback( () => {
+		onChange(
+			setValue( { item: data, value: ! getValue( { item: data } ) } )
+		);
+	}, [ onChange, setValue, data, getValue ] );
 
 	return (
 		<ValidatedToggleControl
-			required={ !! field.isValid.required }
-			onValidate={ ( newValue: any ) => {
-				const message = field.isValid?.custom?.(
-					{
-						...data,
-						[ id ]: newValue,
-					},
-					field
-				);
-
-				if ( message ) {
-					setCustomValidity( {
-						type: 'invalid',
-						message,
-					} );
-					return;
-				}
-
-				setCustomValidity( undefined );
-			} }
-			customValidity={ customValidity }
+			required={ !! isValid.required }
+			customValidity={ getCustomValidity( isValid, validity ) }
 			hidden={ hideLabelFromVision }
 			__nextHasNoMarginBottom
 			label={ label }
 			help={ description }
 			checked={ getValue( { item: data } ) }
-			onChange={ () =>
-				onChange( { [ id ]: ! getValue( { item: data } ) } )
-			}
+			onChange={ onChangeControl }
 		/>
 	);
 }

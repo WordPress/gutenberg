@@ -54,7 +54,7 @@ test.describe( 'Templates', () => {
 		await page
 			.getByRole( 'button', { name: 'Reset search', exact: true } )
 			.click();
-		await expect( titles ).toHaveCount( 6 );
+		await expect( titles ).toHaveCount( 5 );
 
 		// Filter by author.
 		await page.getByRole( 'button', { name: 'Add filter' } ).click();

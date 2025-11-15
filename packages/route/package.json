@@ -1,0 +1,49 @@
+{
+	"name": "@wordpress/route",
+	"version": "0.1.0",
+	"description": "Routing utilities for WordPress admin interfaces.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"routing"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/route/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/route"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.js",
+			"default": "./build/index.js"
+		},
+		"./package.json": "./package.json"
+	},
+	"react-native": "src/index",
+	"wpScriptModuleExports": "./build-module/index.js",
+	"types": "build-types",
+	"sideEffects": false,
+	"dependencies": {
+		"@tanstack/history": "^1.133.28",
+		"@tanstack/react-router": "^1.120.5",
+		"@wordpress/private-apis": "file:../private-apis"
+	},
+	"peerDependencies": {
+		"react": "^18.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

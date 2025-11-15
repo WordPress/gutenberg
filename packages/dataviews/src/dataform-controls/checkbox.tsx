@@ -2,13 +2,14 @@
  * WordPress dependencies
  */
 import { privateApis } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import type { DataFormControlProps } from '../types';
 import { unlock } from '../lock-unlock';
+import getCustomValidity from './utils/get-custom-validity';
 
 const { ValidatedCheckboxControl } = unlock( privateApis );
 
@@ -17,45 +18,25 @@ export default function Checkbox< Item >( {
 	onChange,
 	data,
 	hideLabelFromVision,
+	validity,
 }: DataFormControlProps< Item > ) {
-	const { id, getValue, label, description } = field;
-	const [ customValidity, setCustomValidity ] =
-		useState<
-			React.ComponentProps<
-				typeof ValidatedCheckboxControl
-			>[ 'customValidity' ]
-		>( undefined );
+	const { getValue, setValue, label, description, isValid } = field;
+
+	const onChangeControl = useCallback( () => {
+		onChange(
+			setValue( { item: data, value: ! getValue( { item: data } ) } )
+		);
+	}, [ data, getValue, onChange, setValue ] );
 
 	return (
 		<ValidatedCheckboxControl
 			required={ !! field.isValid?.required }
-			onValidate={ ( newValue: any ) => {
-				const message = field.isValid?.custom?.(
-					{
-						...data,
-						[ id ]: newValue,
-					},
-					field
-				);
-
-				if ( message ) {
-					setCustomValidity( {
-						type: 'invalid',
-						message,
-					} );
-					return;
-				}
-
-				setCustomValidity( undefined );
-			} }
-			customValidity={ customValidity }
+			customValidity={ getCustomValidity( isValid, validity ) }
 			hidden={ hideLabelFromVision }
 			label={ label }
 			help={ description }
 			checked={ getValue( { item: data } ) }
-			onChange={ () =>
-				onChange( { [ id ]: ! getValue( { item: data } ) } )
-			}
+			onChange={ onChangeControl }
 		/>
 	);
 }

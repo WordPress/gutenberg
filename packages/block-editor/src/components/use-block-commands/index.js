@@ -16,6 +16,8 @@ import {
 	plus as add,
 	group,
 	ungroup,
+	seen,
+	unseen,
 } from '@wordpress/icons';
 
 /**
@@ -23,6 +25,7 @@ import {
  */
 import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
+import { cleanEmptyObject } from '../../hooks/utils';
 
 const getTransformCommands = () =>
 	function useTransformCommands() {
@@ -157,6 +160,7 @@ const getQuickActionsCommands = () =>
 			getBlockRootClientId,
 			getBlocksByClientId,
 			canRemoveBlocks,
+			getBlockName,
 		} = useSelect( blockEditorStore );
 		const { getDefaultBlockName, getGroupingBlockName } =
 			useSelect( blocksStore );
@@ -169,6 +173,7 @@ const getQuickActionsCommands = () =>
 			duplicateBlocks,
 			insertAfterBlock,
 			insertBeforeBlock,
+			updateBlockAttributes,
 		} = useDispatch( blockEditorStore );
 
 		const onGroup = () => {
@@ -217,6 +222,10 @@ const getQuickActionsCommands = () =>
 			);
 		} );
 		const canRemove = canRemoveBlocks( clientIds );
+
+		const canToggleBlockVisibility = blocks.every( ( { clientId } ) =>
+			hasBlockSupport( getBlockName( clientId ), 'blockVisibility', true )
+		);
 
 		const commands = [];
 
@@ -280,6 +289,37 @@ const getQuickActionsCommands = () =>
 				label: __( 'Delete' ),
 				callback: () => removeBlocks( clientIds, true ),
 				icon: remove,
+			} );
+		}
+
+		if ( canToggleBlockVisibility ) {
+			const hasHiddenBlock = blocks.some(
+				( block ) =>
+					block.attributes.metadata?.blockVisibility === false
+			);
+
+			commands.push( {
+				name: 'core/toggle-block-visibility',
+				label: hasHiddenBlock ? __( 'Show' ) : __( 'Hide' ),
+				callback: () => {
+					const attributesByClientId = Object.fromEntries(
+						blocks?.map( ( { clientId, attributes } ) => [
+							clientId,
+							{
+								metadata: cleanEmptyObject( {
+									...attributes?.metadata,
+									blockVisibility: hasHiddenBlock
+										? undefined
+										: false,
+								} ),
+							},
+						] )
+					);
+					updateBlockAttributes( clientIds, attributesByClientId, {
+						uniqueByBlock: true,
+					} );
+				},
+				icon: hasHiddenBlock ? seen : unseen,
 			} );
 		}
 

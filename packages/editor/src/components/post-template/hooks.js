@@ -57,6 +57,8 @@ function useTemplates( postType ) {
 			select( coreStore ).getEntityRecords( 'postType', 'wp_template', {
 				per_page: -1,
 				post_type: postType,
+				// We look at the combined templates for now (old endpoint)
+				// because posts only accept slugs for templates, not IDs.
 			} ),
 		[ postType ]
 	);
@@ -71,7 +73,7 @@ export function useAvailableTemplates( postType ) {
 			allowSwitchingTemplate &&
 			templates?.filter(
 				( template ) =>
-					template.is_custom &&
+					( template.is_custom || template.type === 'wp_template' ) &&
 					template.slug !== currentTemplateSlug &&
 					!! template.content.raw // Skip empty templates.
 			),

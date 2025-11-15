@@ -11,13 +11,14 @@ import {
 	privateApis,
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 } from '@wordpress/components';
-import { useCallback, useState } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import type { DataFormControlProps } from '../types';
 import { unlock } from '../lock-unlock';
+import getCustomValidity from './utils/get-custom-validity';
 
 const { ValidatedInputControl, Picker } = unlock( privateApis );
 
@@ -74,53 +75,29 @@ export default function Color< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	validity,
 }: DataFormControlProps< Item > ) {
-	const { id, label, placeholder, description } = field;
+	const { label, placeholder, description, setValue, isValid } = field;
 	const value = field.getValue( { item: data } ) || '';
-	const [ customValidity, setCustomValidity ] =
-		useState<
-			React.ComponentProps<
-				typeof ValidatedInputControl
-			>[ 'customValidity' ]
-		>( undefined );
 
 	const handleColorChange = useCallback(
 		( colorObject: any ) => {
-			onChange( { [ id ]: colorObject.toHex() } );
+			onChange( setValue( { item: data, value: colorObject.toHex() } ) );
 		},
-		[ id, onChange ]
+		[ data, onChange, setValue ]
 	);
 
 	const handleInputChange = useCallback(
 		( newValue: string | undefined ) => {
-			onChange( { [ id ]: newValue || '' } );
+			onChange( setValue( { item: data, value: newValue || '' } ) );
 		},
-		[ id, onChange ]
+		[ data, onChange, setValue ]
 	);
 
 	return (
 		<ValidatedInputControl
 			required={ !! field.isValid?.required }
-			onValidate={ ( newValue: any ) => {
-				const message = field.isValid?.custom?.(
-					{
-						...data,
-						[ id ]: newValue,
-					},
-					field
-				);
-
-				if ( message ) {
-					setCustomValidity( {
-						type: 'invalid',
-						message,
-					} );
-					return;
-				}
-
-				setCustomValidity( undefined );
-			} }
-			customValidity={ customValidity }
+			customValidity={ getCustomValidity( isValid, validity ) }
 			label={ label }
 			placeholder={ placeholder }
 			value={ value }

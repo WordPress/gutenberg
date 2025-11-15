@@ -24,6 +24,13 @@
 		"npm": ">=8.19.2"
 	},
 	"main": "build/index.js",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"require": "./build/index.js"
+		},
+		"./package.json": "./package.json"
+	},
 	"types": "build-types",
 	"dependencies": {
 		"@actions/core": "^1.8.0",

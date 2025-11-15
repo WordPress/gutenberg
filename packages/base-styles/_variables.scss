@@ -37,7 +37,7 @@ $font-line-height-2x-large: 40px;
 
 // Weights
 $font-weight-regular: 400;
-$font-weight-medium: 500;
+$font-weight-medium: 499; // ensures fallback to 400 (instead of 600)
 
 // Families
 $font-family-headings: -apple-system, "system-ui", "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;

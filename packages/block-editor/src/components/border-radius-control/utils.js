@@ -60,9 +60,13 @@ export function getAllValue( values = {} ) {
 		return values;
 	}
 
-	const parsedQuantitiesAndUnits = Object.values( values ).map( ( value ) =>
-		parseQuantityAndUnitFromRawValue( value )
-	);
+	const parsedQuantitiesAndUnits = Object.values( values ).map( ( value ) => {
+		const newValue = parseQuantityAndUnitFromRawValue( value );
+		if ( typeof value === 'string' && newValue[ 0 ] === undefined ) {
+			return [ value, '' ];
+		}
+		return newValue;
+	} );
 
 	const allValues = parsedQuantitiesAndUnits.map(
 		( value ) => value[ 0 ] ?? ''
@@ -234,6 +238,7 @@ export function getPresetValueFromControlValue(
 	} else if ( size === 0 ) {
 		return '0';
 	}
+
 	return `var:preset|border-radius|${ presets[ controlValue ]?.slug }`;
 }
 

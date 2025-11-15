@@ -22,11 +22,11 @@ import { useCallback, useContext, useMemo } from '@wordpress/element';
 import BlockContext from '../block-context';
 import isURLLike from '../link-control/is-url-like';
 import {
-	canBindAttribute,
 	hasPatternOverridesDefaultBinding,
 	replacePatternOverridesDefaultBinding,
 } from '../../utils/block-bindings';
 import { unlock } from '../../lock-unlock';
+import { PrivateBlockContext } from '../block-list/private-block-context';
 
 /**
  * Default value used for blocks which do not define their own context needs,
@@ -66,6 +66,7 @@ const EditWithGeneratedProps = ( props ) => {
 			unlock( select( blocksStore ) ).getAllBlockBindingsSources(),
 		[]
 	);
+	const { bindableAttributes } = useContext( PrivateBlockContext );
 
 	const { blockBindings, context, hasPatternOverrides } = useMemo( () => {
 		// Assign context values using the block type's declared context needs.
@@ -90,8 +91,8 @@ const EditWithGeneratedProps = ( props ) => {
 		}
 		return {
 			blockBindings: replacePatternOverridesDefaultBinding(
-				name,
-				attributes?.metadata?.bindings
+				attributes?.metadata?.bindings,
+				bindableAttributes
 			),
 			context: computedContext,
 			hasPatternOverrides: hasPatternOverridesDefaultBinding(
@@ -120,7 +121,10 @@ const EditWithGeneratedProps = ( props ) => {
 			) ) {
 				const { source: sourceName, args: sourceArgs } = binding;
 				const source = registeredSources[ sourceName ];
-				if ( ! source || ! canBindAttribute( name, attributeName ) ) {
+				if (
+					! source ||
+					! bindableAttributes?.includes( attributeName )
+				) {
 					continue;
 				}
 
@@ -172,6 +176,7 @@ const EditWithGeneratedProps = ( props ) => {
 		},
 		[
 			attributes,
+			bindableAttributes,
 			blockBindings,
 			clientId,
 			context,
@@ -197,7 +202,7 @@ const EditWithGeneratedProps = ( props ) => {
 				) ) {
 					if (
 						! blockBindings[ attributeName ] ||
-						! canBindAttribute( name, attributeName )
+						! bindableAttributes?.includes( attributeName )
 					) {
 						continue;
 					}
@@ -250,6 +255,7 @@ const EditWithGeneratedProps = ( props ) => {
 			} );
 		},
 		[
+			bindableAttributes,
 			blockBindings,
 			clientId,
 			context,

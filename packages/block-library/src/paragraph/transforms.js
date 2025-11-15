@@ -30,7 +30,13 @@ const transforms = {
 					textAlign === 'center' ||
 					textAlign === 'right'
 				) {
-					attributes.align = textAlign;
+					attributes.style = {
+						...attributes.style,
+						typography: {
+							...attributes.style?.typography,
+							textAlign,
+						},
+					};
 				}
 
 				return createBlock( name, attributes );

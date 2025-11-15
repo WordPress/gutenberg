@@ -9,6 +9,7 @@ import {
 } from '@wordpress/compose';
 import { isRTL } from '@wordpress/i18n';
 import {
+	hasBlockSupport,
 	isUnmodifiedDefaultBlock as getIsUnmodifiedDefaultBlock,
 	store as blocksStore,
 } from '@wordpress/blocks';
@@ -410,7 +411,19 @@ export default function useBlockDropZone( {
 					return;
 				}
 
-				const blocks = getBlocks( targetRootClientId );
+				const blocks = getBlocks( targetRootClientId )
+					// Filter out blocks that are hidden
+					.filter( ( block ) => {
+						return ! (
+							hasBlockSupport(
+								block.name,
+								'blockVisibility',
+								true
+							) &&
+							block.attributes?.metadata?.blockVisibility ===
+								false
+						);
+					} );
 
 				// The block list is empty, don't show the insertion point but still allow dropping.
 				if ( blocks.length === 0 ) {

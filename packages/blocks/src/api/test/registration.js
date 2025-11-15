@@ -1,5 +1,3 @@
-/* eslint-disable react/forbid-elements */
-
 /**
  * WordPress dependencies
  */
@@ -463,49 +461,6 @@ describe( 'blocks', () => {
 					{ name: 'bar', label: 'Bar' },
 				],
 				blockHooks: {},
-			} );
-		} );
-
-		// This test can be removed once the polyfill for blockHooks gets removed.
-		it( 'should polyfill blockHooks using metadata on the client when not set on the server', () => {
-			const blockName = 'tests/hooked-block';
-			unstable__bootstrapServerSideBlockDefinitions( {
-				[ blockName ]: {
-					category: 'widgets',
-				},
-			} );
-
-			const blockType = {
-				title: 'block title',
-			};
-			registerBlockType(
-				{
-					name: blockName,
-					blockHooks: {
-						'tests/block': 'firstChild',
-					},
-					category: 'ignored',
-				},
-				blockType
-			);
-			expect( getBlockType( blockName ) ).toEqual( {
-				apiVersion: 1,
-				name: blockName,
-				save: expect.any( Function ),
-				title: 'block title',
-				category: 'widgets',
-				icon: { src: BLOCK_ICON_DEFAULT },
-				attributes: {},
-				providesContext: {},
-				usesContext: [],
-				keywords: [],
-				selectors: {},
-				supports: {},
-				styles: [],
-				variations: [],
-				blockHooks: {
-					'tests/block': 'firstChild',
-				},
 			} );
 		} );
 
@@ -1738,9 +1693,6 @@ describe( 'blocks', () => {
 				getValues: () => 'value',
 				setValues: () => 'new values',
 				canUserEditValue: () => true,
-				getFieldsList: () => {
-					return { field: 'value' };
-				},
 			};
 			registerBlockBindingsSource( {
 				name: 'core/valid-source',
@@ -1801,5 +1753,3 @@ describe( 'blocks', () => {
 		} );
 	} );
 } );
-
-/* eslint-enable react/forbid-elements */

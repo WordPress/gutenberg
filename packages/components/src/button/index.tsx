@@ -161,6 +161,7 @@ export function UnforwardedButton(
 		'is-destructive': isDestructive,
 		'has-text': !! icon && ( hasChildren || text ),
 		'has-icon': !! icon,
+		'has-icon-right': iconPosition === 'right',
 	} );
 
 	const trulyDisabled = disabled && ! accessibleWhenDisabled;

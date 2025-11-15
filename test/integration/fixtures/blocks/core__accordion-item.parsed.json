@@ -1,0 +1,46 @@
+[
+	{
+		"blockName": "core/accordion-item",
+		"attrs": {},
+		"innerBlocks": [
+			{
+				"blockName": "core/accordion-heading",
+				"attrs": {},
+				"innerBlocks": [],
+				"innerHTML": "\n\t<h3 class=\"wp-block-accordion-heading\">\n\t\t<button class=\"wp-block-accordion-heading__toggle\"><span class=\"wp-block-accordion-heading__toggle-title\">Accordion Title</span><span class=\"wp-block-accordion-heading__toggle-icon\" aria-hidden=\"true\">+</span></button>\n\t</h3>\n\t",
+				"innerContent": [
+					"\n\t<h3 class=\"wp-block-accordion-heading\">\n\t\t<button class=\"wp-block-accordion-heading__toggle\"><span class=\"wp-block-accordion-heading__toggle-title\">Accordion Title</span><span class=\"wp-block-accordion-heading__toggle-icon\" aria-hidden=\"true\">+</span></button>\n\t</h3>\n\t"
+				]
+			},
+			{
+				"blockName": "core/accordion-panel",
+				"attrs": {},
+				"innerBlocks": [
+					{
+						"blockName": "core/paragraph",
+						"attrs": {},
+						"innerBlocks": [],
+						"innerHTML": "\n\t\t<p>Accordion  Panel Content</p>\n\t\t",
+						"innerContent": [
+							"\n\t\t<p>Accordion  Panel Content</p>\n\t\t"
+						]
+					}
+				],
+				"innerHTML": "\n\t<div role=\"region\" class=\"wp-block-accordion-panel\">\n\t\t\n\t</div>\n\t",
+				"innerContent": [
+					"\n\t<div role=\"region\" class=\"wp-block-accordion-panel\">\n\t\t",
+					null,
+					"\n\t</div>\n\t"
+				]
+			}
+		],
+		"innerHTML": "\n<div class=\"wp-block-accordion-item\">\n\t\n\t\n</div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-accordion-item\">\n\t",
+			null,
+			"\n\t",
+			null,
+			"\n</div>\n"
+		]
+	}
+]

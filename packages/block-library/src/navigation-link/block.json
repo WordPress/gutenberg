@@ -14,7 +14,8 @@
 	"textdomain": "default",
 	"attributes": {
 		"label": {
-			"type": "string"
+			"type": "string",
+			"role": "content"
 		},
 		"type": {
 			"type": "string"
@@ -33,7 +34,8 @@
 			"default": false
 		},
 		"url": {
-			"type": "string"
+			"type": "string",
+			"role": "content"
 		},
 		"title": {
 			"type": "string"
