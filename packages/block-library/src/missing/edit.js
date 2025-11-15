@@ -59,7 +59,11 @@ export default function MissingEdit( { attributes, clientId } ) {
 		</Button>
 	);
 
-	if ( hasContent && ! hasFreeformBlock && ! originalName ) {
+	if (
+		hasContent &&
+		! hasFreeformBlock &&
+		( ! originalName || originalName === 'core/freeform' )
+	) {
 		if ( hasHTMLBlock ) {
 			messageHTML = __(
 				'It appears you are trying to use the deprecated Classic block. You can leave this block intact, convert its content to a Custom HTML block, or remove it entirely. Alternatively, you can refresh the page to use the Classic block.'

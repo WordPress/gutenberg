@@ -8,9 +8,13 @@ import clsx from 'clsx';
  */
 import { createBlock } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
+import {
+	ToolbarButton,
+	ToolbarGroup,
+	VisuallyHidden,
+} from '@wordpress/components';
 import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	BlockControls,
 	InspectorControls,
@@ -26,13 +30,19 @@ import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
-import { useMergeRefs, usePrevious } from '@wordpress/compose';
+import { useMergeRefs, usePrevious, useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { getColors } from '../navigation/edit/utils';
-import { Controls, LinkUI, updateAttributes, useEntityBinding } from './shared';
+import {
+	Controls,
+	LinkUI,
+	updateAttributes,
+	useEntityBinding,
+	MissingEntityHelpText,
+} from './shared';
 
 const DEFAULT_BLOCK = { name: 'core/navigation-link' };
 const NESTING_BLOCK_NAMES = [
@@ -97,21 +107,35 @@ const useIsInvalidLink = ( kind, type, id, enabled ) => {
 	const hasId = Number.isInteger( id );
 	const blockEditingMode = useBlockEditingMode();
 
-	const postStatus = useSelect(
+	const { postStatus, isDeleted } = useSelect(
 		( select ) => {
 			if ( ! isPostType ) {
-				return null;
+				return { postStatus: null, isDeleted: false };
 			}
 
 			// Fetching the posts status is an "expensive" operation. Especially for sites with large navigations.
 			// When the block is rendered in a template or other disabled contexts we can skip this check in order
 			// to avoid all these additional requests that don't really add any value in that mode.
 			if ( blockEditingMode === 'disabled' || ! enabled ) {
-				return null;
+				return { postStatus: null, isDeleted: false };
 			}
 
-			const { getEntityRecord } = select( coreStore );
-			return getEntityRecord( 'postType', type, id )?.status;
+			const { getEntityRecord, hasFinishedResolution } =
+				select( coreStore );
+			const entityRecord = getEntityRecord( 'postType', type, id );
+			const hasResolved = hasFinishedResolution( 'getEntityRecord', [
+				'postType',
+				type,
+				id,
+			] );
+
+			// If resolution has finished and entityRecord is undefined, the entity was deleted.
+			const deleted = hasResolved && entityRecord === undefined;
+
+			return {
+				postStatus: entityRecord?.status,
+				isDeleted: deleted,
+			};
 		},
 		[ isPostType, blockEditingMode, enabled, type, id ]
 	);
@@ -121,11 +145,13 @@ const useIsInvalidLink = ( kind, type, id, enabled ) => {
 	// 2. It has an id.
 	// 3. It's neither null, nor undefined, as valid items might be either of those while loading.
 	// If those conditions are met, check if
-	// 1. The post status is published.
-	// 2. The Navigation Link item has no label.
+	// 1. The post status is trash (trashed).
+	// 2. The entity doesn't exist (deleted).
 	// If either of those is true, invalidate.
 	const isInvalid =
-		isPostType && hasId && postStatus && 'trash' === postStatus;
+		isPostType &&
+		hasId &&
+		( isDeleted || ( postStatus && 'trash' === postStatus ) );
 	const isDraft = 'draft' === postStatus;
 
 	return [ isInvalid, isDraft ];
@@ -248,7 +274,12 @@ export default function NavigationLinkEdit( {
 	const { getBlocks } = useSelect( blockEditorStore );
 
 	// URL binding logic
-	const { clearBinding, createBinding } = useEntityBinding( {
+	const {
+		clearBinding,
+		createBinding,
+		hasUrlBinding,
+		isBoundEntityAvailable,
+	} = useEntityBinding( {
 		clientId,
 		attributes,
 	} );
@@ -373,6 +404,12 @@ export default function NavigationLinkEdit( {
 		}
 	}
 
+	const instanceId = useInstanceId( NavigationLinkEdit );
+	const hasMissingEntity = hasUrlBinding && ! isBoundEntityAvailable;
+	const missingEntityDescriptionId = hasMissingEntity
+		? sprintf( 'navigation-link-edit-%d-desc', instanceId )
+		: undefined;
+
 	const blockProps = useBlockProps( {
 		ref: useMergeRefs( [ setPopoverAnchor, listItemRef ] ),
 		className: clsx( 'wp-block-navigation-item', {
@@ -386,6 +423,8 @@ export default function NavigationLinkEdit( {
 			[ getColorClassName( 'background-color', backgroundColor ) ]:
 				!! backgroundColor,
 		} ),
+		'aria-describedby': missingEntityDescriptionId,
+		'aria-invalid': hasMissingEntity,
 		style: {
 			color: ! textColor && customTextColor,
 			backgroundColor: ! backgroundColor && customBackgroundColor,
@@ -405,14 +444,23 @@ export default function NavigationLinkEdit( {
 		}
 	);
 
-	if ( ! url || isInvalid || isDraft ) {
+	if (
+		! url ||
+		isInvalid ||
+		isDraft ||
+		( hasUrlBinding && ! isBoundEntityAvailable )
+	) {
 		blockProps.onClick = () => {
 			setIsLinkOpen( true );
 		};
 	}
 
 	const classes = clsx( 'wp-block-navigation-item__content', {
-		'wp-block-navigation-link__placeholder': ! url || isInvalid || isDraft,
+		'wp-block-navigation-link__placeholder':
+			! url ||
+			isInvalid ||
+			isDraft ||
+			( hasUrlBinding && ! isBoundEntityAvailable ),
 	} );
 
 	const missingText = getMissingText( type );
@@ -452,6 +500,11 @@ export default function NavigationLinkEdit( {
 				/>
 			</InspectorControls>
 			<div { ...blockProps }>
+				{ hasMissingEntity && (
+					<VisuallyHidden id={ missingEntityDescriptionId }>
+						<MissingEntityHelpText type={ type } kind={ kind } />
+					</VisuallyHidden>
+				) }
 				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
 				<a className={ classes }>
 					{ /* eslint-enable */ }
@@ -531,9 +584,10 @@ export default function NavigationLinkEdit( {
 							link={ attributes }
 							onClose={ () => {
 								setIsLinkOpen( false );
-								// If there is no link then remove the auto-inserted block.
+								// If there is no link and no binding, remove the auto-inserted block.
 								// This avoids empty blocks which can provided a poor UX.
-								if ( ! url ) {
+								// Don't remove if binding exists (even if entity is unavailable) so user can fix it.
+								if ( ! url && ! hasUrlBinding ) {
 									onReplace( [] );
 								} else if ( isNewLink.current ) {
 									// If we just created a new link, select it
@@ -543,7 +597,10 @@ export default function NavigationLinkEdit( {
 							anchor={ popoverAnchor }
 							onRemove={ removeLink }
 							onChange={ ( updatedValue ) => {
-								const { isEntityLink } = updateAttributes(
+								const {
+									isEntityLink,
+									attributes: updatedAttributes,
+								} = updateAttributes(
 									updatedValue,
 									setAttributes,
 									attributes
@@ -553,7 +610,7 @@ export default function NavigationLinkEdit( {
 								// Only create bindings for entity links (posts, pages, taxonomies)
 								// Never create bindings for custom links (manual URLs)
 								if ( isEntityLink ) {
-									createBinding();
+									createBinding( updatedAttributes );
 								} else {
 									clearBinding();
 								}

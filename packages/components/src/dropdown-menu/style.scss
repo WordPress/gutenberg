@@ -18,6 +18,7 @@
 		outline: none;
 		cursor: pointer;
 		white-space: nowrap;
+		font-weight: $font-weight-regular;
 
 		&.has-separator {
 			margin-top: 6px;

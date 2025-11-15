@@ -10,8 +10,8 @@
 
 /**
  * @typedef SemanticElementDefinition
- * @property {string[]}      [attributes] Content attributes
- * @property {ContentSchema} [children]   Content attributes
+ * @property {string[]}          [attributes] Content attributes
+ * @property {ContentSchema|'*'} [children]   Content attributes
  */
 
 /**
@@ -123,6 +123,10 @@ const embeddedContentSchema = {
 			'width',
 			'height',
 		],
+	},
+	math: {
+		attributes: [ 'display', 'xmlns' ],
+		children: '*',
 	},
 };
 

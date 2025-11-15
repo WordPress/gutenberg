@@ -49,15 +49,15 @@ const { actions } = store(
 				const ctx = getContext();
 				ctx.isSearchInputVisible = false;
 			},
-			handleSearchKeydown( event ) {
+			handleSearchKeydown: withSyncEvent( ( event ) => {
 				const { ref } = getElement();
 				// If Escape close the menu.
 				if ( event?.key === 'Escape' ) {
 					actions.closeSearchInput();
 					ref.querySelector( 'button' ).focus();
 				}
-			},
-			handleSearchFocusout( event ) {
+			} ),
+			handleSearchFocusout: withSyncEvent( ( event ) => {
 				const { ref } = getElement();
 				// If focus is outside search form, and in the document, close menu
 				// event.target === The element losing focus
@@ -70,7 +70,7 @@ const { actions } = store(
 				) {
 					actions.closeSearchInput();
 				}
-			},
+			} ),
 		},
 	},
 	{ lock: true }

@@ -98,6 +98,8 @@ const objToIterable = new WeakMap< object, Signal< number > >();
  */
 let peeking = false;
 
+export const PENDING_GETTER = Symbol( 'PENDING_GETTER' );
+
 /**
  * Handlers for reactive objects and arrays in the state.
  */
@@ -121,6 +123,10 @@ const stateHandlers: ProxyHandler< object > = {
 		const desc = Object.getOwnPropertyDescriptor( target, key );
 		const prop = getPropSignal( receiver, key, desc );
 		const result = prop.getComputed().value;
+
+		if ( result === PENDING_GETTER ) {
+			throw PENDING_GETTER;
+		}
 
 		/*
 		 * Check if the property is a synchronous function. If it is, set the

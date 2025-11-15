@@ -24,6 +24,7 @@ import type {
 	NormalizedField,
 	SortDirection,
 	ViewTable as ViewTableType,
+	ViewPickerTable as ViewPickerTableType,
 	Operator,
 } from '../../types';
 
@@ -31,9 +32,9 @@ const { Menu } = unlock( componentsPrivateApis );
 
 interface HeaderMenuProps< Item > {
 	fieldId: string;
-	view: ViewTableType;
+	view: ViewTableType | ViewPickerTableType;
 	fields: NormalizedField< Item >[];
-	onChangeView: ( view: ViewTableType ) => void;
+	onChangeView: ( view: ViewTableType | ViewPickerTableType ) => void;
 	onHide: ( field: NormalizedField< Item > ) => void;
 	setOpenedFilter: ( fieldId: string ) => void;
 	canMove?: boolean;
@@ -90,7 +91,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 	// 4. The filter is not primary (if it is, it is already visible).
 	canAddFilter =
 		! view.filters?.some( ( _filter ) => fieldId === _filter.field ) &&
-		!! ( field.elements?.length || field.Edit ) &&
+		!! ( field.hasElements || field.Edit ) &&
 		field.filterBy !== false &&
 		! field.filterBy?.isPrimary;
 

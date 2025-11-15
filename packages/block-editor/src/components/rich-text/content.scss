@@ -47,3 +47,8 @@ figcaption.block-editor-rich-text__editable [data-rich-text-placeholder]::before
 		padding: 0 2px;
 	}
 }
+
+// Hide selection within non-editable elements, we draw our own boundaries.
+.rich-text [contenteditable="false"]::selection {
+	background-color: transparent;
+}

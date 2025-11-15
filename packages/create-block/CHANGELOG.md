@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 4.78.0 (2025-11-12)
+
+## 4.77.0 (2025-10-29)
+
+## 4.76.0 (2025-10-17)
+
 ## Enhancement 
 - Enable `alias` package installation ([#72079](https://github.com/WordPress/gutenberg/pull/72079)).
 

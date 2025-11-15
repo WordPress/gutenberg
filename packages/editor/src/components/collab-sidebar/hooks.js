@@ -50,10 +50,10 @@ export function useBlockComments( postId ) {
 		post: postId,
 		type: 'note',
 		status: 'all',
-		per_page: 100,
+		per_page: -1,
 	};
 
-	const { records: threads, totalPages } = useEntityRecords(
+	const { records: threads } = useEntityRecords(
 		'root',
 		'comment',
 		queryArgs,
@@ -70,6 +70,10 @@ export function useBlockComments( postId ) {
 
 	// Process comments to build the tree structure.
 	const { resultComments, unresolvedSortedThreads } = useMemo( () => {
+		if ( ! threads || threads.length === 0 ) {
+			return { resultComments: [], unresolvedSortedThreads: [] };
+		}
+
 		const blocksWithComments = clientIds.reduce( ( results, clientId ) => {
 			const commentId = getBlockAttributes( clientId )?.metadata?.noteId;
 			if ( commentId ) {
@@ -82,10 +86,8 @@ export function useBlockComments( postId ) {
 		const compare = {};
 		const result = [];
 
-		const allComments = threads ?? [];
-
 		// Initialize each object with an empty `reply` array and map blockClientId.
-		allComments.forEach( ( item ) => {
+		threads.forEach( ( item ) => {
 			const itemBlock = Object.keys( blocksWithComments ).find(
 				( key ) => blocksWithComments[ key ] === item.id
 			);
@@ -98,7 +100,7 @@ export function useBlockComments( postId ) {
 		} );
 
 		// Iterate over the data to build the tree structure.
-		allComments.forEach( ( item ) => {
+		threads.forEach( ( item ) => {
 			if ( item.parent === 0 ) {
 				// If parent is 0, it's a root item, push it to the result array.
 				result.push( compare[ item.id ] );
@@ -121,6 +123,11 @@ export function useBlockComments( postId ) {
 			updatedResult.map( ( thread ) => [ String( thread.id ), thread ] )
 		);
 
+		// Prepare sets to determine which threads are linked to existing blocks.
+		const mappedIds = new Set(
+			Object.values( blocksWithComments ).map( ( id ) => String( id ) )
+		);
+
 		// Get comments by block order, first unresolved, then resolved.
 		const unresolvedSortedComments = Object.values( blocksWithComments )
 			.map( ( commentId ) => threadIdMap.get( String( commentId ) ) )
@@ -135,10 +142,15 @@ export function useBlockComments( postId ) {
 					thread !== undefined && thread.status === 'approved'
 			);
 
-		// Combine unresolved comments in block order with resolved comments at the end.
+		// Append orphaned notes (whose related block was deleted or missing).
+		const orphanedComments = updatedResult.filter(
+			( thread ) => ! mappedIds.has( String( thread.id ) )
+		);
+
 		const allSortedComments = [
 			...unresolvedSortedComments,
 			...resolvedSortedComments,
+			...orphanedComments,
 		];
 
 		return {
@@ -150,7 +162,6 @@ export function useBlockComments( postId ) {
 	return {
 		resultComments,
 		unresolvedSortedThreads,
-		totalPages,
 		reflowComments,
 		commentLastUpdated,
 	};
@@ -329,17 +340,24 @@ export function useEnableFloatingSidebar( enabled = false ) {
 			return;
 		}
 
-		return registry.subscribe( () => {
-			const activeSidebar = registry
-				.select( interfaceStore )
-				.getActiveComplementaryArea( 'core' );
+		const { getActiveComplementaryArea } =
+			registry.select( interfaceStore );
+		const { disableComplementaryArea, enableComplementaryArea } =
+			registry.dispatch( interfaceStore );
 
-			if ( ! activeSidebar ) {
-				registry
-					.dispatch( interfaceStore )
-					.enableComplementaryArea( 'core', collabSidebarName );
+		const unsubscribe = registry.subscribe( () => {
+			// Return `null` to indicate the user hid the complementary area.
+			if ( getActiveComplementaryArea( 'core' ) === null ) {
+				enableComplementaryArea( 'core', collabSidebarName );
 			}
 		} );
+
+		return () => {
+			unsubscribe();
+			if ( getActiveComplementaryArea( 'core' ) === collabSidebarName ) {
+				disableComplementaryArea( 'core', collabSidebarName );
+			}
+		};
 	}, [ enabled, registry ] );
 }
 
@@ -382,7 +400,7 @@ export function useFloatingThread( {
 		if ( blockRef.current ) {
 			refs.setReference( blockRef.current );
 		}
-	}, [ blockRef, refs ] );
+	}, [ blockRef, refs, commentLastUpdated ] );
 
 	// Track thread heights.
 	useEffect( () => {

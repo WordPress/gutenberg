@@ -380,7 +380,13 @@ test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
 	} ) => {
 		const emptyAlignedParagraph = {
 			name: 'core/paragraph',
-			attributes: { content: '', align: 'center', dropCap: false },
+			attributes: {
+				content: '',
+				style: {
+					typography: { textAlign: 'center' },
+				},
+				dropCap: false,
+			},
 			innerBlocks: [],
 		};
 		const emptyAlignedHeading = {

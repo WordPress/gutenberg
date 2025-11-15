@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { dateI18n, getDate, getSettings } from '@wordpress/date';
+import { dateI18n, getDate } from '@wordpress/date';
 
 /**
  * Internal dependencies
@@ -11,7 +11,7 @@ import type {
 	SortDirection,
 	FieldTypeDefinition,
 } from '../types';
-import renderFromElements from './utils/render-from-elements';
+import RenderFromElements from './utils/render-from-elements';
 import {
 	OPERATOR_ON,
 	OPERATOR_NOT_ON,
@@ -23,9 +23,6 @@ import {
 	OPERATOR_OVER,
 	OPERATOR_BETWEEN,
 } from '../constants';
-
-const getFormattedDate = ( dateToDisplay: string | null ) =>
-	dateI18n( getSettings().formats.date, getDate( dateToDisplay ) );
 
 function sort( a: any, b: any, direction: SortDirection ) {
 	const timeA = new Date( a ).getTime();
@@ -42,8 +39,8 @@ export default {
 		custom: () => null,
 	},
 	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
-		if ( field.elements ) {
-			return renderFromElements( { item, field } );
+		if ( field.hasElements ) {
+			return <RenderFromElements item={ item } field={ field } />;
 		}
 
 		const value = field.getValue( { item } );
@@ -51,7 +48,16 @@ export default {
 			return '';
 		}
 
-		return getFormattedDate( value );
+		// Not all fields have format, but date fields do.
+		//
+		// At runtime, this method will never be called for non-date fields.
+		// However, the type system does not know this, so we need to check it.
+		// There's an opportunity here to improve the type system.
+		if ( field.type !== 'date' ) {
+			return '';
+		}
+
+		return dateI18n( field.format.date, getDate( value ) );
 	},
 	enableSorting: true,
 	filterBy: {

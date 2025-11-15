@@ -20,7 +20,7 @@ import { default as password } from './password';
 import { default as telephone } from './telephone';
 import { default as color } from './color';
 import { default as url } from './url';
-import renderFromElements from './utils/render-from-elements';
+import RenderFromElements from './utils/render-from-elements';
 import { ALL_OPERATORS, OPERATOR_IS, OPERATOR_IS_NOT } from '../constants';
 
 /**
@@ -102,9 +102,11 @@ export default function getFieldTypeDefinition< Item >(
 		},
 		Edit: null,
 		render: ( { item, field }: DataViewRenderFieldProps< Item > ) => {
-			return field.elements
-				? renderFromElements( { item, field } )
-				: field.getValue( { item } );
+			return field.hasElements ? (
+				<RenderFromElements item={ item } field={ field } />
+			) : (
+				field.getValue( { item } )
+			);
 		},
 		enableSorting: true,
 		filterBy: {

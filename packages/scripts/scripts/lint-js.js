@@ -49,7 +49,7 @@ const defaultIgnoreArgs = ! hasIgnoredFiles
 
 const defaultExtArgs = hasArgInCLI( '--ext' )
 	? []
-	: [ '--ext', 'js,jsx,ts,tsx' ];
+	: [ '--ext', 'js,cjs,mjs,jsx,ts,cts,mts,tsx' ];
 
 const result = spawn(
 	resolveBin( 'eslint' ),

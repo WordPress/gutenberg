@@ -15,13 +15,14 @@
 	text-decoration: none;
 	font-family: inherit;
 	font-size: $default-font-size;
+	font-weight: $font-weight-medium;
 	margin: 0;
 	border: 0;
 	cursor: pointer;
 	-webkit-appearance: none;
 	background: none;
 
-	@media not (prefers-reduced-motion) {
+	@media not ( prefers-reduced-motion ) {
 		transition: box-shadow 0.1s linear;
 	}
 
@@ -85,9 +86,9 @@
 		&[aria-disabled="true"]:enabled, // This catches a situation where a Button is aria-disabled, but not disabled.
 		&[aria-disabled="true"]:active:enabled {
 			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
-			color: $components-color-foreground-inverted;
-			background: $components-color-gray-300;
-			border-color: $components-color-gray-300;
+			color: rgba($white, 0.4);
+			background: $components-color-accent;
+			border-color: $components-color-accent;
 			outline: none;
 
 			&:focus:enabled {
@@ -251,6 +252,7 @@
 		background: none;
 		outline: none;
 		text-align: left;
+		font-weight: $font-weight-regular;
 		color: $components-color-accent;
 		text-decoration: underline;
 
@@ -385,6 +387,7 @@
 	svg {
 		fill: currentColor;
 		outline: none;
+		flex-shrink: 0;
 
 		// Optimize for high contrast modes.
 		// See also https://blogs.windows.com/msedgedev/2020/09/17/styling-for-windows-high-contrast-with-new-standards-for-forced-colors/.

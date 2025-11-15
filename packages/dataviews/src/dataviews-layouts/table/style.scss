@@ -47,7 +47,6 @@
 
 		&.dataviews-view-table__checkbox-column {
 			padding-right: 0;
-			width: 1%;
 
 			.dataviews-view-table__cell-content-wrapper {
 				max-width: auto;
@@ -157,7 +156,7 @@
 			padding-left: $grid-unit-15;
 			font-size: 11px;
 			text-transform: uppercase;
-			font-weight: 500;
+			font-weight: $font-weight-medium;
 
 			&:has(.dataviews-view-table-header-button):not(:first-child) {
 				padding-left: $grid-unit-05;
@@ -172,6 +171,7 @@
 			min-height: $grid-unit-40;
 			display: flex;
 			align-items: center;
+			white-space: nowrap;
 
 			&.dataviews-view-table__cell-align-end {
 				justify-content: flex-end;
@@ -190,7 +190,7 @@
 		padding: $grid-unit-05 $grid-unit-10;
 		font-size: 11px;
 		text-transform: uppercase;
-		font-weight: 500;
+		font-weight: $font-weight-medium;
 
 		&:not(:hover) {
 			color: $gray-900;
@@ -210,9 +210,8 @@
 	}
 
 	.dataviews-view-table__actions-column {
-		width: 1%;
-		max-width: inherit;
-		min-width: inherit;
+		width: auto;
+		white-space: nowrap;
 	}
 
 	&:has(tr.is-selected) {
@@ -313,4 +312,9 @@
 		padding: $grid-unit-15 $grid-unit-60;
 		color: $gray-900;
 	}
+}
+
+/* Column width intents via colgroup: make non-primary columns shrink-to-fit */
+.dataviews-view-table col[class^="dataviews-view-table__col-"]:not(.dataviews-view-table__col-primary) {
+	width: 1%;
 }

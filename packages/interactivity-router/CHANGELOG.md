@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 2.35.0 (2025-11-12)
+
+## 2.34.0 (2025-10-29)
+
+## 2.33.0 (2025-10-17)
+
 ## 2.32.0 (2025-10-01)
 
 -   Update router regions inside elements with `data-wp-interactive`. ([#71635](https://github.com/WordPress/gutenberg/pull/71635))

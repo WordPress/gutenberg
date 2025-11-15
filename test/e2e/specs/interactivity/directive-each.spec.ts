@@ -553,4 +553,152 @@ test.describe( 'data-wp-each', () => {
 		const element = page.getByTestId( 'each-with-multiple-directives' );
 		await expect( element ).not.toContainText( 'array' );
 	} );
+
+	test.describe( 'with item from derived state and the whole list replaced', () => {
+		test.beforeEach( async ( { page } ) => {
+			const elements = page
+				.getByTestId( 'item from derived state' )
+				.getByTestId( 'item' );
+
+			// These tags are included to check that the elements are not unmounted
+			// and mounted again. If an element remounts, its tag should be missing.
+			await elements.evaluateAll( ( refs ) =>
+				refs.forEach( ( ref, index ) => {
+					if ( ref instanceof HTMLElement ) {
+						ref.dataset.tag = `${ index }`;
+					}
+				} )
+			);
+
+			// The list is also replaced by a clone, to ensure elements are
+			// still subscribed to the correct signals.
+			await page
+				.getByTestId( 'item from derived state' )
+				.getByTestId( 'replace-all' )
+				.click();
+		} );
+
+		test( 'should preserve elements on deletion', async ( { page } ) => {
+			const elements = page
+				.getByTestId( 'item from derived state' )
+				.getByTestId( 'item' );
+
+			await expect( elements ).toHaveText( [
+				'A Game of Thrones',
+				'A Clash of Kings',
+				'A Storm of Swords',
+			] );
+
+			// An item is removed when clicked.
+			await elements.first().click();
+
+			await expect( elements ).toHaveText( [
+				'A Clash of Kings',
+				'A Storm of Swords',
+			] );
+
+			// Get the tags. They should not have disappeared.
+			const [ acok, asos ] = await elements.all();
+			await expect( acok ).toHaveAttribute( 'data-tag', '1' );
+			await expect( asos ).toHaveAttribute( 'data-tag', '2' );
+		} );
+
+		test( 'should preserve elements on reordering', async ( { page } ) => {
+			const elements = page
+				.getByTestId( 'item from derived state' )
+				.getByTestId( 'item' );
+
+			await page
+				.getByTestId( 'item from derived state' )
+				.getByTestId( 'rotate' )
+				.click();
+
+			await expect( elements ).toHaveText( [
+				'A Storm of Swords',
+				'A Game of Thrones',
+				'A Clash of Kings',
+			] );
+
+			// Get the tags. They should not have disappeared or changed.
+			const [ asos, agot, acok ] = await elements.all();
+			await expect( asos ).toHaveAttribute( 'data-tag', '2' );
+			await expect( agot ).toHaveAttribute( 'data-tag', '0' );
+			await expect( acok ).toHaveAttribute( 'data-tag', '1' );
+		} );
+
+		test( 'should preserve elements on addition', async ( { page } ) => {
+			const elements = page
+				.getByTestId( 'item from derived state' )
+				.getByTestId( 'item' );
+
+			await page
+				.getByTestId( 'item from derived state' )
+				.getByTestId( 'add' )
+				.click();
+
+			await expect( elements ).toHaveText( [
+				'A Feast for Crows',
+				'A Game of Thrones',
+				'A Clash of Kings',
+				'A Storm of Swords',
+			] );
+
+			// Get the tags. They should not have disappeared or changed,
+			// except for the newly created element.
+			const [ affc, agot, acok, asos ] = await elements.all();
+			await expect( affc ).not.toHaveAttribute( 'data-tag' );
+			await expect( agot ).toHaveAttribute( 'data-tag', '0' );
+			await expect( acok ).toHaveAttribute( 'data-tag', '1' );
+			await expect( asos ).toHaveAttribute( 'data-tag', '2' );
+		} );
+
+		test( 'should preserve elements on replacement', async ( { page } ) => {
+			const elements = page
+				.getByTestId( 'item from derived state' )
+				.getByTestId( 'item' );
+
+			await page
+				.getByTestId( 'item from derived state' )
+				.getByTestId( 'replace' )
+				.click();
+
+			await expect( elements ).toHaveText( [
+				'A Feast for Crows',
+				'A Clash of Kings',
+				'A Storm of Swords',
+			] );
+
+			// Get the tags. They should not have disappeared or changed,
+			// except for the newly created element.
+			const [ affc, acok, asos ] = await elements.all();
+			await expect( affc ).not.toHaveAttribute( 'data-tag' );
+			await expect( acok ).toHaveAttribute( 'data-tag', '1' );
+			await expect( asos ).toHaveAttribute( 'data-tag', '2' );
+		} );
+
+		test( 'should preserve elements on modification', async ( {
+			page,
+		} ) => {
+			const elements = page
+				.getByTestId( 'item from derived state' )
+				.getByTestId( 'item' );
+
+			await page
+				.getByTestId( 'item from derived state' )
+				.getByTestId( 'modify' )
+				.click();
+
+			await expect( elements ).toHaveText( [
+				'A GAME OF THRONES',
+				'A Clash of Kings',
+				'A Storm of Swords',
+			] );
+
+			// Get the tags. They should not have disappeared or changed.
+			const [ agot, acok, asos ] = await elements.all();
+			await expect( agot ).toHaveAttribute( 'data-tag', '0' );
+			await expect( acok ).toHaveAttribute( 'data-tag', '1' );
+			await expect( asos ).toHaveAttribute( 'data-tag', '2' );
+		} );
+	} );
 } );

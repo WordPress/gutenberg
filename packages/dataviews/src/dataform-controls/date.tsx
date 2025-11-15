@@ -51,6 +51,7 @@ import type {
 	NormalizedField,
 } from '../types';
 import getCustomValidity from './utils/get-custom-validity';
+import { weekStartsOnToNumber } from '../utils/week-starts-on';
 
 const { DateCalendar, DateRangeCalendar } = unlock( componentsPrivateApis );
 
@@ -257,10 +258,23 @@ function CalendarDateControl< Item >( {
 	hideLabelFromVision,
 	validity,
 }: DataFormControlProps< Item > ) {
-	const { id, label, setValue, getValue, isValid } = field;
+	const {
+		id,
+		type,
+		label,
+		setValue,
+		getValue,
+		isValid,
+		format: fieldFormat,
+	} = field;
 	const [ selectedPresetId, setSelectedPresetId ] = useState< string | null >(
 		null
 	);
+
+	let weekStartsOn;
+	if ( type === 'date' ) {
+		weekStartsOn = weekStartsOnToNumber( fieldFormat.weekStartsOn );
+	}
 
 	const fieldValue = getValue( { item: data } );
 	const value = typeof fieldValue === 'string' ? fieldValue : undefined;
@@ -320,7 +334,6 @@ function CalendarDateControl< Item >( {
 
 	const {
 		timezone: { string: timezoneString },
-		l10n: { startOfWeek },
 	} = getSettings();
 
 	const displayLabel = isValid?.required
@@ -396,7 +409,7 @@ function CalendarDateControl< Item >( {
 						month={ calendarMonth }
 						onMonthChange={ setCalendarMonth }
 						timeZone={ timezoneString || undefined }
-						weekStartsOn={ startOfWeek }
+						weekStartsOn={ weekStartsOn }
 					/>
 				</VStack>
 			</BaseControl>
@@ -411,7 +424,7 @@ function CalendarDateRangeControl< Item >( {
 	hideLabelFromVision,
 	validity,
 }: DataFormControlProps< Item > ) {
-	const { id, label, getValue, setValue } = field;
+	const { id, type, label, getValue, setValue, format: fieldFormat } = field;
 	let value: DateRange;
 	const fieldValue = getValue( { item: data } );
 	if (
@@ -420,6 +433,11 @@ function CalendarDateRangeControl< Item >( {
 		fieldValue.every( ( date ) => typeof date === 'string' )
 	) {
 		value = fieldValue as DateRange;
+	}
+
+	let weekStartsOn;
+	if ( type === 'date' ) {
+		weekStartsOn = weekStartsOnToNumber( fieldFormat.weekStartsOn );
 	}
 
 	const onChangeCallback = useCallback(
@@ -521,7 +539,7 @@ function CalendarDateRangeControl< Item >( {
 		[ value, updateDateRange ]
 	);
 
-	const { timezone, l10n } = getSettings();
+	const { timezone } = getSettings();
 
 	const displayLabel = field.isValid?.required
 		? `${ label } (${ __( 'Required' ) })`
@@ -609,7 +627,7 @@ function CalendarDateRangeControl< Item >( {
 						month={ calendarMonth }
 						onMonthChange={ setCalendarMonth }
 						timeZone={ timezone.string || undefined }
-						weekStartsOn={ l10n.startOfWeek }
+						weekStartsOn={ weekStartsOn }
 					/>
 				</VStack>
 			</BaseControl>

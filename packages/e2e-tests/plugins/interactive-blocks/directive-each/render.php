@@ -213,6 +213,38 @@
 		<p data-testid="item" data-wp-each-child>banana</p>
 		<p data-testid="item" data-wp-each-child>cherimoya</p>
 	</div>
+
+	<div data-testid="item from derived state">
+		<button
+			data-testid="rotate" data-wp-on--click="actions.rotateBooks"
+		>Rotate</button>
+		<button
+			data-testid="add" data-wp-on--click="actions.addBook"
+		>Add</button>
+		<button
+			data-testid="replace" data-wp-on--click="actions.replaceBook"
+		>Replace</button>
+		<button
+			data-testid="modify" data-wp-on--click="actions.modifyBook"
+		>Modify</button>
+		<button
+			data-testid="replace-all" data-wp-on--click="actions.replaceAllBooks"
+		>Replace All</button>
+		<template
+			data-wp-each--book-item="state.books"
+			data-wp-each-key="state.bookItem.isbn"
+		>
+			<p
+				data-testid="item"
+				data-wp-text="state.bookItem.title"
+				data-wp-on--click="actions.removeBookUsingDerivedState"
+			></p>
+		</template>
+		<!-- SSRed elements; they should be removed on hydration -->
+		<p data-testid="item" data-wp-each-child>A Game of Thrones</p>
+		<p data-testid="item" data-wp-each-child>A Clash of Kings</p>
+		<p data-testid="item" data-wp-each-child>A Storm of Swords</p>
+	</div>
 </div>
 
 <hr>

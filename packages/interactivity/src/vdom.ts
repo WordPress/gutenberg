@@ -217,7 +217,11 @@ export function toVdom( root: Node ): ComponentChild {
 			}
 		}
 
-		if ( localName === 'template' ) {
+		if ( props.__directives?.[ 'each-child' ] ) {
+			props.dangerouslySetInnerHTML = {
+				__html: elementNode.innerHTML,
+			};
+		} else if ( localName === 'template' ) {
 			props.content = [
 				...( elementNode as HTMLTemplateElement ).content.childNodes,
 			].map( ( childNode ) => toVdom( childNode ) );

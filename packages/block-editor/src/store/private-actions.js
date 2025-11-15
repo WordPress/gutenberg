@@ -6,12 +6,6 @@ import deprecated from '@wordpress/deprecated';
 import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
 
-/**
- * Internal dependencies
- */
-import { store as blockEditorStore } from './index';
-import { unlock } from '../lock-unlock';
-
 const castArray = ( maybeArray ) =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
 
@@ -325,29 +319,6 @@ export function setLastFocus( lastFocus = null ) {
 }
 
 /**
- * Action that stops temporarily editing as blocks.
- *
- * @param {string} clientId The block's clientId.
- */
-export function stopEditingAsBlocks( clientId ) {
-	return ( { select, dispatch, registry } ) => {
-		const focusModeToRevert = unlock(
-			registry.select( blockEditorStore )
-		).getTemporarilyEditingFocusModeToRevert();
-		dispatch.__unstableMarkNextChangeAsNotPersistent();
-		dispatch.updateBlockAttributes( clientId, {
-			templateLock: 'contentOnly',
-		} );
-		dispatch.updateBlockListSettings( clientId, {
-			...select.getBlockListSettings( clientId ),
-			templateLock: 'contentOnly',
-		} );
-		dispatch.updateSettings( { focusMode: focusModeToRevert } );
-		dispatch.__unstableSetTemporarilyEditingAsBlocks();
-	};
-}
-
-/**
  * Returns an action object used in signalling that the user has begun to drag.
  *
  * @return {Object} Action object.
@@ -396,29 +367,25 @@ export function setInsertionPoint( value ) {
 }
 
 /**
- * Temporarily modify/unlock the content-only block for editions.
+ * Mark a contentOnly section as being edited.
  *
  * @param {string} clientId The client id of the block.
  */
-export const modifyContentLockBlock =
-	( clientId ) =>
-	( { select, dispatch } ) => {
-		dispatch.selectBlock( clientId );
-		dispatch.__unstableMarkNextChangeAsNotPersistent();
-		dispatch.updateBlockAttributes( clientId, {
-			templateLock: undefined,
-		} );
-		dispatch.updateBlockListSettings( clientId, {
-			...select.getBlockListSettings( clientId ),
-			templateLock: false,
-		} );
-		const focusModeToRevert = select.getSettings().focusMode;
-		dispatch.updateSettings( { focusMode: true } );
-		dispatch.__unstableSetTemporarilyEditingAsBlocks(
-			clientId,
-			focusModeToRevert
-		);
+export function editContentOnlySection( clientId ) {
+	return {
+		type: 'EDIT_CONTENT_ONLY_SECTION',
+		clientId,
 	};
+}
+
+/**
+ * Action that stops editing a contentOnly section.
+ */
+export function stopEditingContentOnlySection() {
+	return {
+		type: 'EDIT_CONTENT_ONLY_SECTION',
+	};
+}
 
 /**
  * Sets the zoom level.

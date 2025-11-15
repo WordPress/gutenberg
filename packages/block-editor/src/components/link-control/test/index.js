@@ -1518,16 +1518,17 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 			await user.click( createButton );
 
-			searchInput = screen.getByRole( 'combobox', {
-				name: 'Search or type URL',
-			} );
-
-			const errorNotice = screen.getAllByText(
+			// Wait for the error message to appear after the async operation fails
+			const errorNotice = await screen.findByText(
 				'API response returned invalid entity.'
-			)[ 1 ];
+			);
 
 			// Catch the error in the test to avoid test failures.
 			expect( throwsError ).toThrow( Error );
+
+			searchInput = screen.getByRole( 'combobox', {
+				name: 'Search or type URL',
+			} );
 
 			// Check human readable error notice is perceivable.
 			expect( errorNotice ).toBeVisible();

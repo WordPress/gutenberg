@@ -99,7 +99,7 @@ export default function PostList( { postType } ) {
 		[ path, history ]
 	);
 
-	const { isLoading: isLoadingFields, fields: fields } = usePostFields( {
+	const fields = usePostFields( {
 		postType,
 	} );
 
@@ -151,7 +151,7 @@ export default function PostList( { postType } ) {
 
 	// The REST API sort the authors by ID, but we want to sort them by name.
 	const data = useMemo( () => {
-		if ( ! isLoadingFields && view?.sort?.field === 'author' ) {
+		if ( view?.sort?.field === 'author' ) {
 			return filterSortAndPaginate(
 				records,
 				{ sort: { ...view.sort } },
@@ -160,7 +160,7 @@ export default function PostList( { postType } ) {
 		}
 
 		return records;
-	}, [ records, fields, isLoadingFields, view?.sort ] );
+	}, [ records, fields, view?.sort ] );
 
 	const ids = data?.map( ( record ) => getItemId( record ) ) ?? [];
 	const prevIds = usePrevious( ids ) ?? [];
@@ -261,7 +261,7 @@ export default function PostList( { postType } ) {
 				fields={ fields }
 				actions={ actions }
 				data={ data || EMPTY_ARRAY }
-				isLoading={ isLoadingData || isLoadingFields }
+				isLoading={ isLoadingData }
 				view={ view }
 				onChangeView={ onChangeView }
 				selection={ selection }
