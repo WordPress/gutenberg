@@ -42,11 +42,11 @@
 	--wpds-color-bg-surface-warning-weak: #fdf7ee; /* Background color for surfaces with warning tone and weak emphasis. */
 	--wpds-color-bg-thumb-brand: #3858e9; /* Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track). */
 	--wpds-color-bg-thumb-brand-active: #3858e9; /* Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track) that are hovered, focused, or active. */
-	--wpds-color-bg-thumb-brand-disabled: #acacac; /* Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track), in their disabled state. */
+	--wpds-color-bg-thumb-brand-disabled: #d8d8d8; /* Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track), in their disabled state. */
 	--wpds-color-bg-thumb-neutral-weak: #8a8a8a; /* Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb). */
 	--wpds-color-bg-thumb-neutral-weak-active: #6c6c6c; /* Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb) that are hovered, focused, or active. */
-	--wpds-color-bg-track-neutral: #acacac; /* Background color for tracks with a neutral tone and normal emphasis (eg. slider or progressbar track). */
-	--wpds-color-bg-track-neutral-weak: #cfcfcf; /* Background color for tracks with a neutral tone and weak emphasis (eg. scrollbar track). */
+	--wpds-color-bg-track-neutral: #d8d8d8; /* Background color for tracks with a neutral tone and normal emphasis (eg. slider or progressbar track). */
+	--wpds-color-bg-track-neutral-weak: #e0e0e0; /* Background color for tracks with a neutral tone and weak emphasis (eg. scrollbar track). */
 	--wpds-color-fg-content-caution: #281d00; /* Foreground color for content like text with caution tone and normal emphasis. */
 	--wpds-color-fg-content-caution-weak: #836b00; /* Foreground color for content like text with caution tone and weak emphasis. */
 	--wpds-color-fg-content-error: #470000; /* Foreground color for content like text with error tone and normal emphasis. */
@@ -76,24 +76,24 @@
 	--wpds-color-stroke-focus-brand: #3858e9; /* Accessible stroke color applied to focus rings. */
 	--wpds-color-stroke-interactive-brand: #3858e9; /* Accessible stroke color used for interactive brand-toned elements with normal emphasis. */
 	--wpds-color-stroke-interactive-brand-active: #2337c8; /* Accessible stroke color used for interactive brand-toned elements with normal emphasis that are hovered, focused, or active. */
-	--wpds-color-stroke-interactive-brand-disabled: #acacac; /* Accessible stroke color used for interactive brand-toned elements with normal emphasis, in their disabled state. */
+	--wpds-color-stroke-interactive-brand-disabled: #d8d8d8; /* Accessible stroke color used for interactive brand-toned elements with normal emphasis, in their disabled state. */
 	--wpds-color-stroke-interactive-error-strong: #cc1818; /* Accessible stroke color used for interactive error-toned elements with strong emphasis. */
 	--wpds-color-stroke-interactive-neutral: #8a8a8a; /* Accessible stroke color used for interactive neutrally-toned elements with normal emphasis. */
 	--wpds-color-stroke-interactive-neutral-active: #6c6c6c; /* Accessible stroke color used for interactive neutrally-toned elements with normal emphasis that are hovered, focused, or active. */
-	--wpds-color-stroke-interactive-neutral-disabled: #acacac; /* Accessible stroke color used for interactive neutrally-toned elements with normal emphasis, in their disabled state. */
+	--wpds-color-stroke-interactive-neutral-disabled: #d8d8d8; /* Accessible stroke color used for interactive neutrally-toned elements with normal emphasis, in their disabled state. */
 	--wpds-color-stroke-interactive-neutral-strong: #6c6c6c; /* Accessible stroke color used for interactive neutrally-toned elements with strong emphasis. */
-	--wpds-color-stroke-surface-brand: #91a2cf; /* Decorative stroke color used to define brand-toned surface boundaries with normal emphasis. */
+	--wpds-color-stroke-surface-brand: #a2b1d6; /* Decorative stroke color used to define brand-toned surface boundaries with normal emphasis. */
 	--wpds-color-stroke-surface-brand-strong: #3858e9; /* Decorative stroke color used to define neutrally-toned surface boundaries with strong emphasis. */
-	--wpds-color-stroke-surface-error: #dc8e84; /* Decorative stroke color used to define error-toned surface boundaries with normal emphasis. */
+	--wpds-color-stroke-surface-error: #e1a198; /* Decorative stroke color used to define error-toned surface boundaries with normal emphasis. */
 	--wpds-color-stroke-surface-error-strong: #cc1818; /* Decorative stroke color used to define error-toned surface boundaries with strong emphasis. */
-	--wpds-color-stroke-surface-info: #8aadd5; /* Decorative stroke color used to define info-toned surface boundaries with normal emphasis. */
+	--wpds-color-stroke-surface-info: #9fbcdd; /* Decorative stroke color used to define info-toned surface boundaries with normal emphasis. */
 	--wpds-color-stroke-surface-info-strong: #006bd7; /* Decorative stroke color used to define info-toned surface boundaries with strong emphasis. */
-	--wpds-color-stroke-surface-neutral: #acacac; /* Decorative stroke color used to define neutrally-toned surface boundaries with normal emphasis. */
+	--wpds-color-stroke-surface-neutral: #d8d8d8; /* Decorative stroke color used to define neutrally-toned surface boundaries with normal emphasis. */
 	--wpds-color-stroke-surface-neutral-strong: #8a8a8a; /* Decorative stroke color used to define neutrally-toned surface boundaries with strong emphasis. */
-	--wpds-color-stroke-surface-neutral-weak: #cfcfcf; /* Decorative stroke color used to define neutrally-toned surface boundaries with weak emphasis. */
-	--wpds-color-stroke-surface-success: #77b983; /* Decorative stroke color used to define success-toned surface boundaries with normal emphasis. */
+	--wpds-color-stroke-surface-neutral-weak: #e0e0e0; /* Decorative stroke color used to define neutrally-toned surface boundaries with weak emphasis. */
+	--wpds-color-stroke-surface-success: #82c98f; /* Decorative stroke color used to define success-toned surface boundaries with normal emphasis. */
 	--wpds-color-stroke-surface-success-strong: #007f30; /* Decorative stroke color used to define success-toned surface boundaries with strong emphasis. */
-	--wpds-color-stroke-surface-warning: #c2a676; /* Decorative stroke color used to define warning-toned surface boundaries with normal emphasis. */
+	--wpds-color-stroke-surface-warning: #d2b581; /* Decorative stroke color used to define warning-toned surface boundaries with normal emphasis. */
 	--wpds-color-stroke-surface-warning-strong: #936400; /* Decorative stroke color used to define warning-toned surface boundaries with strong emphasis. */
 	--wpds-dimension-base: 4px; /* Base dimension unit */
 	--wpds-dimension-padding-surface-large: 24px; /* Large spacing for surfaces */

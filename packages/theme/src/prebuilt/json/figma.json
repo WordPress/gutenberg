@@ -224,13 +224,13 @@
 	},
 	"Color/Semantic/Background/Neutral/bgTra-neutral-weak": {
 		"value": {
-			".": "#cfcfcf"
+			".": "#e0e0e0"
 		},
 		"description": "Background color for tracks with a neutral tone and weak emphasis (eg. scrollbar track)."
 	},
 	"Color/Semantic/Background/Neutral/bgTra-neutral": {
 		"value": {
-			".": "#acacac"
+			".": "#d8d8d8"
 		},
 		"description": "Background color for tracks with a neutral tone and normal emphasis (eg. slider or progressbar track)."
 	},
@@ -260,7 +260,7 @@
 	},
 	"Color/Semantic/Background/Brand/bgThu-brand-disabled": {
 		"value": {
-			".": "#acacac"
+			".": "#d8d8d8"
 		},
 		"description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track), in their disabled state."
 	},
@@ -422,13 +422,13 @@
 	},
 	"Color/Semantic/Stroke/Neutral/strokeSur-neutral": {
 		"value": {
-			".": "#acacac"
+			".": "#d8d8d8"
 		},
 		"description": "Decorative stroke color used to define neutrally-toned surface boundaries with normal emphasis."
 	},
 	"Color/Semantic/Stroke/Neutral/strokeSur-neutral-weak": {
 		"value": {
-			".": "#cfcfcf"
+			".": "#e0e0e0"
 		},
 		"description": "Decorative stroke color used to define neutrally-toned surface boundaries with weak emphasis."
 	},
@@ -440,7 +440,7 @@
 	},
 	"Color/Semantic/Stroke/Brand/strokeSur-brand": {
 		"value": {
-			".": "#91a2cf"
+			".": "#a2b1d6"
 		},
 		"description": "Decorative stroke color used to define brand-toned surface boundaries with normal emphasis."
 	},
@@ -452,7 +452,7 @@
 	},
 	"Color/Semantic/Stroke/Success/strokeSur-success": {
 		"value": {
-			".": "#77b983"
+			".": "#82c98f"
 		},
 		"description": "Decorative stroke color used to define success-toned surface boundaries with normal emphasis."
 	},
@@ -464,7 +464,7 @@
 	},
 	"Color/Semantic/Stroke/Info/strokeSur-info": {
 		"value": {
-			".": "#8aadd5"
+			".": "#9fbcdd"
 		},
 		"description": "Decorative stroke color used to define info-toned surface boundaries with normal emphasis."
 	},
@@ -476,7 +476,7 @@
 	},
 	"Color/Semantic/Stroke/Warning/strokeSur-warning": {
 		"value": {
-			".": "#c2a676"
+			".": "#d2b581"
 		},
 		"description": "Decorative stroke color used to define warning-toned surface boundaries with normal emphasis."
 	},
@@ -488,7 +488,7 @@
 	},
 	"Color/Semantic/Stroke/Error/strokeSur-error": {
 		"value": {
-			".": "#dc8e84"
+			".": "#e1a198"
 		},
 		"description": "Decorative stroke color used to define error-toned surface boundaries with normal emphasis."
 	},
@@ -512,7 +512,7 @@
 	},
 	"Color/Semantic/Stroke/Neutral/strokeInt-neutral-disabled": {
 		"value": {
-			".": "#acacac"
+			".": "#d8d8d8"
 		},
 		"description": "Accessible stroke color used for interactive neutrally-toned elements with normal emphasis, in their disabled state."
 	},
@@ -536,7 +536,7 @@
 	},
 	"Color/Semantic/Stroke/Brand/strokeInt-brand-disabled": {
 		"value": {
-			".": "#acacac"
+			".": "#d8d8d8"
 		},
 		"description": "Accessible stroke color used for interactive brand-toned elements with normal emphasis, in their disabled state."
 	},
