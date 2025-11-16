@@ -143,11 +143,14 @@ export function isPlain( HTML ) {
 
 	// Check if the wrapper contains only text nodes and <br> tags
 	// (no other semantic elements)
-	const hasSemanticChildren = Array.from(
-		wrapper.getElementsByTagName( '*' )
-	).some( ( el ) => el.tagName.toLowerCase() !== 'br' );
-
-	return ! hasSemanticChildren;
+	const descendants = element.getElementsByTagName( '*' );
+	for ( let i = 0; i < descendants.length; i++ ) {
+		if ( descendants.item( i ).tagName !== 'BR' ) {
+			return false;
+		}
+	}
+	
+	return true;
 }
 
 /**
