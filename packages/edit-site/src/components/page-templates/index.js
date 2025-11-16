@@ -224,14 +224,12 @@ export default function PageTemplates() {
 			activeField,
 			slugField,
 		];
-
 		if ( activeView === 'user' ) {
 			_fields.push( themeField );
 			if ( dateField ) {
 				_fields.push( dateField );
 			}
 		}
-
 		const elements = [];
 		for ( const author in users ) {
 			elements.push( {
@@ -239,12 +237,10 @@ export default function PageTemplates() {
 				label: users[ author ]?.name ?? author,
 			} );
 		}
-
 		_fields.push( {
 			...authorField,
 			elements,
 		} );
-
 		return _fields;
 	}, [ users, activeView, themeField, dateField ] );
 

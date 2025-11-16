@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "22.0.0",
+	"version": "22.1.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -23,7 +23,12 @@
 		"scriptGlobal": "wp",
 		"packageNamespace": "wordpress",
 		"pages": [
-			"gutenberg-boot"
+			{
+				"id": "gutenberg-boot",
+				"init": [
+					"@wordpress/edit-site-init"
+				]
+			}
 		]
 	},
 	"config": {
@@ -88,7 +93,7 @@
 		"@types/sprintf-js": "1.1.2",
 		"@types/uuid": "8.3.1",
 		"@wordpress/build": "file:./packages/wp-build",
-		"ajv": "8.7.1",
+		"ajv": "8.17.1",
 		"appium": "2.0.0",
 		"babel-jest": "29.7.0",
 		"babel-loader": "9.2.1",
@@ -174,7 +179,7 @@
 		"storybook": "8.4.7",
 		"storybook-source-link": "2.0.9",
 		"style-loader": "3.2.1",
-		"stylelint-plugin-logical-css": "1.2.3",
+		"stylelint-plugin-logical-css": "^1.2.3",
 		"terser": "5.32.0",
 		"terser-webpack-plugin": "5.3.10",
 		"typescript": "5.9.3",

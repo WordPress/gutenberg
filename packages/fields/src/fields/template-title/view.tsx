@@ -15,7 +15,7 @@ export default function TemplateTitleView( { item }: { item: Template } ) {
 	const isLocked = ! item.is_custom;
 
 	return (
-		<BaseTitleView item={ item }>
+		<BaseTitleView item={ item } className="fields-field__template-title">
 			{ isLocked && (
 				<Tooltip
 					placement="top"
