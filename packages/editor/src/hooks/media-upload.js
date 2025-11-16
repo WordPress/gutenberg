@@ -3,6 +3,7 @@
  */
 import { Component } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
+import deprecated from '@wordpress/deprecated';
 import {
 	MediaUpload,
 	privateApis as mediaUtilsPrivateApis,
@@ -79,6 +80,11 @@ if ( window.__experimentalDataViewsMediaModal ) {
 		'editor.MediaUpload',
 		'core/editor/components/media-upload',
 		() => {
+			deprecated( 'Extending MediaUpload as a class component', {
+				since: '19.9',
+				version: '7.0',
+				hint: 'MediaUpload will become a function component in WordPress 7.0. Please update any custom implementations to use function components instead.',
+			} );
 			return MediaUploadModalWrapper;
 		}
 	);
