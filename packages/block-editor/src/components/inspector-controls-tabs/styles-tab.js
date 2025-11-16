@@ -3,6 +3,7 @@
  */
 import { PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -10,12 +11,61 @@ import { __ } from '@wordpress/i18n';
 import BlockStyles from '../block-styles';
 import InspectorControls from '../inspector-controls';
 import { useBorderPanelLabel } from '../../hooks/border';
+import { useBlockSettings } from '../../hooks/utils';
+import { store as blockEditorStore } from '../../store';
+import { ColorEdit } from '../../hooks/color';
+import { ColorToolsPanel } from '../global-styles/color-panel';
+
+function SectionBlockColorControls( {
+	blockName,
+	clientId,
+	contentClientIds,
+} ) {
+	const settings = useBlockSettings( blockName );
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+
+	const { hasButton, hasHeading } = useSelect(
+		( select ) => {
+			const blockNames =
+				select( blockEditorStore ).getBlockNamesByClientId(
+					contentClientIds
+				);
+			return {
+				hasButton: blockNames.includes( 'core/button' ),
+				hasHeading: blockNames.includes( 'core/heading' ),
+			};
+		},
+		[ contentClientIds ]
+	);
+
+	const setAttributes = ( newAttributes ) => {
+		updateBlockAttributes( clientId, newAttributes );
+	};
+
+	return (
+		<ColorEdit
+			clientId={ clientId }
+			name={ blockName }
+			settings={ settings }
+			setAttributes={ setAttributes }
+			asWrapper={ ColorToolsPanel }
+			label={ __( 'Color' ) }
+			defaultControls={ {
+				text: true,
+				background: true,
+				button: hasButton,
+				heading: hasHeading,
+			} }
+		/>
+	);
+}
 
 const StylesTab = ( {
 	blockName,
 	clientId,
 	hasBlockStyles,
 	isSectionBlock,
+	contentClientIds,
 } ) => {
 	const borderPanelLabel = useBorderPanelLabel( { blockName } );
 
@@ -28,6 +78,14 @@ const StylesTab = ( {
 					</PanelBody>
 				</div>
 			) }
+			{ isSectionBlock &&
+				window?.__experimentalContentOnlyPatternInsertion && (
+					<SectionBlockColorControls
+						blockName={ blockName }
+						clientId={ clientId }
+						contentClientIds={ contentClientIds }
+					/>
+				) }
 			{ ! isSectionBlock && (
 				<>
 					<InspectorControls.Slot

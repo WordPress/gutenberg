@@ -12,42 +12,51 @@ import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 // The implementation of content locking is mainly in this file, although the mechanism
-// to stop temporarily editing as blocks when an outside block is selected is on component StopEditingAsBlocksOnOutsideSelect
-// at block-editor/src/components/block-list/index.js.
+// to stop editing a content only section when an outside block is selected is in the component
+// `StopEditingContentOnlySectionOnOutsideSelect` at block-editor/src/components/block-list/index.js.
 // Besides the components on this file and the file referenced above the implementation
 // also includes artifacts on the store (actions, reducers, and selector).
 
-export function ModifyContentLockMenuItem( { clientId, onClose } ) {
-	const { templateLock, isLockedByParent, isEditingAsBlocks } = useSelect(
-		( select ) => {
-			const {
-				getContentLockingParent,
-				getTemplateLock,
-				getTemporarilyEditingAsBlocks,
-			} = unlock( select( blockEditorStore ) );
-			return {
-				templateLock: getTemplateLock( clientId ),
-				isLockedByParent: !! getContentLockingParent( clientId ),
-				isEditingAsBlocks: getTemporarilyEditingAsBlocks() === clientId,
-			};
-		},
-		[ clientId ]
-	);
+export function ModifyContentOnlySectionMenuItem( { clientId, onClose } ) {
+	const { templateLock, isLockedByParent, isEditingContentOnlySection } =
+		useSelect(
+			( select ) => {
+				const {
+					getContentLockingParent,
+					getTemplateLock,
+					getEditedContentOnlySection,
+				} = unlock( select( blockEditorStore ) );
+				return {
+					templateLock: getTemplateLock( clientId ),
+					isLockedByParent: !! getContentLockingParent( clientId ),
+					isEditingContentOnlySection:
+						getEditedContentOnlySection() === clientId,
+				};
+			},
+			[ clientId ]
+		);
 	const blockEditorActions = useDispatch( blockEditorStore );
 	const isContentLocked =
 		! isLockedByParent && templateLock === 'contentOnly';
-	if ( ! isContentLocked && ! isEditingAsBlocks ) {
+
+	// Hide the Modify button when the content only pattern insertion experiment is active.
+	// This is replaced by an alternative UI in the experiment.
+	if (
+		window?.__experimentalContentOnlyPatternInsertion ||
+		( ! isContentLocked && ! isEditingContentOnlySection )
+	) {
 		return null;
 	}
 
-	const { modifyContentLockBlock } = unlock( blockEditorActions );
-	const showStartEditingAsBlocks = ! isEditingAsBlocks && isContentLocked;
+	const { editContentOnlySection } = unlock( blockEditorActions );
+	const showContentOnlyModifyButton =
+		! isEditingContentOnlySection && isContentLocked;
 
 	return (
-		showStartEditingAsBlocks && (
+		showContentOnlyModifyButton && (
 			<MenuItem
 				onClick={ () => {
-					modifyContentLockBlock( clientId );
+					editContentOnlySection( clientId );
 					onClose();
 				} }
 			>

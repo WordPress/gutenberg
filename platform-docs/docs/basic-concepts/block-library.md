@@ -94,7 +94,6 @@ In addition to these two default blocks, here's a non-exhaustive list of blocks 
  - **File block**: `file`
  - **Code block**: `code`
  - **Preformatted block**: `preformatted`
- - **Pullquote block**: `pullquote`
  - **Table block**: `table`
  - **Verse block**: `verse`
  - **Separator block**: `separator`

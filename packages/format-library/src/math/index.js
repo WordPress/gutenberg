@@ -42,16 +42,18 @@ function InlineUI( {
 
 	// Update the math object in real-time as the user types
 	const handleLatexChange = ( newLatex ) => {
-		let mathML;
+		let mathML = '';
 
 		setLatex( newLatex );
 
-		try {
-			mathML = latexToMathML( newLatex, { displayMode: false } );
-			setError( null );
-		} catch ( err ) {
-			setError( err.message );
-			return;
+		if ( newLatex ) {
+			try {
+				mathML = latexToMathML( newLatex, { displayMode: false } );
+				setError( null );
+			} catch ( err ) {
+				setError( err.message );
+				return;
+			}
 		}
 
 		const newReplacements = value.replacements.slice();
@@ -88,6 +90,7 @@ function InlineUI( {
 						onChange={ handleLatexChange }
 						placeholder={ __( 'e.g., x^2, \\frac{a}{b}' ) }
 						autoComplete="off"
+						className="block-editor-format-toolbar__math-input"
 					/>
 					{ error && (
 						<>

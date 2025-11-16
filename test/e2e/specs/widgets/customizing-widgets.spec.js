@@ -582,10 +582,13 @@ test.describe( 'Widgets Customizer', () => {
 		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
 
 		await widgetsCustomizerPage.addBlock( 'Custom HTML' );
-		const HTMLBlockTextarea = page.locator(
-			'role=document[name="Block: Custom HTML"i] >> role=textbox[name="HTML"i]'
-		);
-		await HTMLBlockTextarea.type( 'hello' );
+		await page.getByRole( 'button', { name: 'Edit HTML' } ).click();
+		await page.getByRole( 'dialog' ).getByRole( 'textbox' ).click();
+		await page.keyboard.type( 'hello' );
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'button', { name: 'Update' } )
+			.click();
 
 		// Click Publish
 		await Promise.all( [
@@ -596,8 +599,13 @@ test.describe( 'Widgets Customizer', () => {
 		// reload
 		await widgetsCustomizerPage.visitCustomizerPage();
 		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
-
-		await expect( HTMLBlockTextarea ).toHaveText( 'hello' );
+		await page
+			.locator( 'role=document[name="Block: Custom HTML"i]' )
+			.click();
+		await page.getByRole( 'button', { name: 'Edit' } ).click();
+		await expect(
+			page.getByRole( 'dialog' ).getByRole( 'textbox' )
+		).toHaveText( 'hello' );
 	} );
 } );
 

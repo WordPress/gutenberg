@@ -50,6 +50,8 @@ export interface State {
 	userPatternCategories: Array< UserPatternCategory >;
 	defaultTemplates: Record< string, string >;
 	registeredPostMeta: Record< string, Object >;
+	editorSettings: Record< string, any > | null;
+	editorAssets: Record< string, any > | null;
 }
 
 type EntityRecordKey = string | number;

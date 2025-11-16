@@ -152,6 +152,18 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
+		'gutenberg-dataviews-media-modal',
+		__( 'Data Views: new media modal', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enables a new media modal experience powered by Data Views for improved media library management.', 'gutenberg' ),
+			'id'    => 'gutenberg-dataviews-media-modal',
+		)
+	);
+
+	add_settings_field(
 		'gutenberg-full-page-client-side-navigation',
 		__( 'Interactivity API: Full-page client-side navigation', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
@@ -172,6 +184,18 @@ function gutenberg_initialize_experiments_settings() {
 		array(
 			'label' => __( 'When patterns are inserted, default to a simplified content only mode for editing pattern content.', 'gutenberg' ),
 			'id'    => 'gutenberg-content-only-pattern-insertion',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-workflow-palette',
+		__( 'Workflow Palette', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enables the Workflow Palette for running workflows composed of abilities, from a unified interface.', 'gutenberg' ),
+			'id'    => 'gutenberg-workflow-palette',
 		)
 	);
 

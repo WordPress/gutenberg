@@ -9,27 +9,19 @@ import {
 /**
  * Internal dependencies
  */
-import type { Layout, RowLayout } from '../types';
+import type { NormalizedLayout, NormalizedRowLayout } from '../types';
 import FormRegularField from './regular';
 import FormPanelField from './panel';
 import FormCardField from './card';
 import FormRowField from './row';
+import FormDetailsField from './details';
 
 const FORM_FIELD_LAYOUTS = [
 	{
 		type: 'regular',
 		component: FormRegularField,
-		wrapper: ( {
-			children,
-			layout,
-		}: {
-			children: React.ReactNode;
-			layout: Layout;
-		} ) => (
-			<VStack
-				className="dataforms-layouts__wrapper"
-				spacing={ ( layout as any )?.spacing ?? 4 }
-			>
+		wrapper: ( { children }: { children: React.ReactNode } ) => (
+			<VStack className="dataforms-layouts__wrapper" spacing={ 4 }>
 				{ children }
 			</VStack>
 		),
@@ -46,17 +38,8 @@ const FORM_FIELD_LAYOUTS = [
 	{
 		type: 'card',
 		component: FormCardField,
-		wrapper: ( {
-			children,
-			layout,
-		}: {
-			children: React.ReactNode;
-			layout: Layout;
-		} ) => (
-			<VStack
-				className="dataforms-layouts__wrapper"
-				spacing={ ( layout as any )?.spacing ?? 6 }
-			>
+		wrapper: ( { children }: { children: React.ReactNode } ) => (
+			<VStack className="dataforms-layouts__wrapper" spacing={ 6 }>
 				{ children }
 			</VStack>
 		),
@@ -69,19 +52,25 @@ const FORM_FIELD_LAYOUTS = [
 			layout,
 		}: {
 			children: React.ReactNode;
-			layout: Layout;
+			layout: NormalizedLayout;
 		} ) => (
 			<VStack className="dataforms-layouts__wrapper" spacing={ 4 }>
 				<div className="dataforms-layouts-row__field">
 					<HStack
 						spacing={ 4 }
-						alignment={ ( layout as RowLayout ).alignment }
+						alignment={
+							( layout as NormalizedRowLayout ).alignment
+						}
 					>
 						{ children }
 					</HStack>
 				</div>
 			</VStack>
 		),
+	},
+	{
+		type: 'details',
+		component: FormDetailsField,
 	},
 ];
 

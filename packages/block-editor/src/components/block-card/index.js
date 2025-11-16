@@ -8,6 +8,7 @@ import clsx from 'clsx';
  */
 import {
 	Button,
+	Icon,
 	__experimentalText as Text,
 	__experimentalVStack as VStack,
 	privateApis as componentsPrivateApis,
@@ -15,7 +16,12 @@ import {
 import { useDispatch, useSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { __, isRTL } from '@wordpress/i18n';
-import { chevronLeft, chevronRight } from '@wordpress/icons';
+import {
+	chevronLeft,
+	chevronRight,
+	arrowRight,
+	arrowLeft,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -25,6 +31,22 @@ import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
 
 const { Badge } = unlock( componentsPrivateApis );
+
+function OptionalParentSelectButton( { children, onClick } ) {
+	if ( ! onClick ) {
+		return children;
+	}
+
+	return (
+		<Button
+			__next40pxDefaultSize
+			className="block-editor-block-card__parent-select-button"
+			onClick={ onClick }
+		>
+			{ children }
+		</Button>
+	);
+}
 
 /**
  * A card component that displays block information including title, icon, and description.
@@ -54,6 +76,9 @@ const { Badge } = unlock( componentsPrivateApis );
  * @param {string}        [props.className]             Additional classes to apply to the card.
  * @param {string}        [props.name]                  Custom block name to display before the title.
  * @param {string}        [props.allowParentNavigation] Show a back arrow to the parent block in some situations.
+ * @param {string}        [props.parentClientId]        The parent clientId, if this card is for a parent block.
+ * @param {string}        [props.isChild]               Whether the block card is for a child block, in which case, indent the block using an arrow.
+ * @param {string}        [props.clientId]              Whether the block card is for a child block, in which case, indent the block using an arrow.
  * @param {Element}       [props.children]              Children.
  * @return {Element}                        Block card component.
  */
@@ -65,7 +90,10 @@ function BlockCard( {
 	className,
 	name,
 	allowParentNavigation,
+	parentClientId,
+	isChild,
 	children,
+	clientId,
 } ) {
 	if ( blockType ) {
 		deprecated( '`blockType` property in `BlockCard component`', {
@@ -77,56 +105,85 @@ function BlockCard( {
 
 	const parentNavBlockClientId = useSelect(
 		( select ) => {
-			if ( ! allowParentNavigation ) {
+			if ( parentClientId || isChild || ! allowParentNavigation ) {
 				return;
 			}
-			const { getSelectedBlockClientId, getBlockParentsByBlockName } =
-				select( blockEditorStore );
-
-			const _selectedBlockClientId = getSelectedBlockClientId();
+			const { getBlockParentsByBlockName } = select( blockEditorStore );
 
 			return getBlockParentsByBlockName(
-				_selectedBlockClientId,
+				clientId,
 				'core/navigation',
 				true
 			)[ 0 ];
 		},
-		[ allowParentNavigation ]
+		[ clientId, allowParentNavigation, isChild, parentClientId ]
 	);
 
 	const { selectBlock } = useDispatch( blockEditorStore );
 
+	const TitleElement = parentClientId ? 'div' : 'h2';
+
 	return (
-		<div className={ clsx( 'block-editor-block-card', className ) }>
-			{ allowParentNavigation &&
-				parentNavBlockClientId && ( // This is only used by the Navigation block for now. It's not ideal having Navigation block specific code here.
-					<Button
-						onClick={ () => selectBlock( parentNavBlockClientId ) }
-						label={ __( 'Go to parent Navigation block' ) }
-						style={
-							// TODO: This style override is also used in ToolsPanelHeader.
-							// It should be supported out-of-the-box by Button.
-							{ minWidth: 24, padding: 0 }
-						}
-						icon={ isRTL() ? chevronRight : chevronLeft }
-						size="small"
-					/>
-				) }
-			<BlockIcon icon={ icon } showColors />
-			<VStack spacing={ 1 }>
-				<h2 className="block-editor-block-card__title">
-					<span className="block-editor-block-card__name">
-						{ !! name?.length ? name : title }
-					</span>
-					{ !! name?.length && <Badge>{ title }</Badge> }
-				</h2>
-				{ description && (
-					<Text className="block-editor-block-card__description">
-						{ description }
-					</Text>
-				) }
-				{ children }
-			</VStack>
+		<div
+			className={ clsx(
+				'block-editor-block-card',
+				{
+					'is-parent': parentClientId,
+					'is-child': isChild,
+				},
+				className
+			) }
+		>
+			{ parentNavBlockClientId && ( // This is only used by the Navigation block for now. It's not ideal having Navigation block specific code here.
+				<Button
+					onClick={ () => selectBlock( parentNavBlockClientId ) }
+					label={
+						parentNavBlockClientId
+							? __( 'Go to parent Navigation block' )
+							: // TODO - improve copy, not sure that we should use the term 'section'
+							  __( 'Go to parent section' )
+					}
+					style={
+						// TODO: This style override is also used in ToolsPanelHeader.
+						// It should be supported out-of-the-box by Button.
+						{ minWidth: 24, padding: 0 }
+					}
+					icon={ isRTL() ? chevronRight : chevronLeft }
+					size="small"
+				/>
+			) }
+			{ isChild && (
+				<span className="block-editor-block-card__child-indicator-icon">
+					<Icon icon={ isRTL() ? arrowLeft : arrowRight } />
+				</span>
+			) }
+			<OptionalParentSelectButton
+				onClick={
+					parentClientId
+						? () => {
+								selectBlock( parentClientId );
+						  }
+						: undefined
+				}
+			>
+				<BlockIcon icon={ icon } showColors />
+				<VStack spacing={ 1 }>
+					<TitleElement className="block-editor-block-card__title">
+						<span className="block-editor-block-card__name">
+							{ !! name?.length ? name : title }
+						</span>
+						{ ! parentClientId && ! isChild && !! name?.length && (
+							<Badge>{ title }</Badge>
+						) }
+					</TitleElement>
+					{ ! parentClientId && ! isChild && description && (
+						<Text className="block-editor-block-card__description">
+							{ description }
+						</Text>
+					) }
+					{ children }
+				</VStack>
+			</OptionalParentSelectButton>
 		</div>
 	);
 }

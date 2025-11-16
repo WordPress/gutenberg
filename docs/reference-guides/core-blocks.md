@@ -10,7 +10,7 @@ This page lists the blocks included in the block-library package.
 
 ## Accordion
 
-Displays a group of accordion headings and associated expandable content. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion))
+Displays a foldable layout that groups content in collapsible sections. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion))
 
 -	**Name:** core/accordion
 -	**Category:** design
@@ -20,7 +20,7 @@ Displays a group of accordion headings and associated expandable content. ([Sour
 
 ## Accordion Heading
 
-Displays an accordion heading. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion-heading))
+Displays a heading that toggles the accordion panel. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion-heading))
 
 -	**Name:** core/accordion-heading
 -	**Category:** design
@@ -30,7 +30,7 @@ Displays an accordion heading. ([Source](https://github.com/WordPress/gutenberg/
 
 ## Accordion Item
 
-Displays a section of content in an accordion, including a heading and expandable content. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion-item))
+Wraps the heading and panel in one unit. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion-item))
 
 -	**Name:** core/accordion-item
 -	**Category:** design
@@ -41,7 +41,7 @@ Displays a section of content in an accordion, including a heading and expandabl
 
 ## Accordion Panel
 
-Displays an accordion panel. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion-panel))
+Contains the hidden or revealed content beneath the heading. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion-panel))
 
 -	**Name:** core/accordion-panel
 -	**Category:** design
@@ -93,7 +93,7 @@ Display a breadcrumb trail for hierarchical post types or based on taxonomy term
 -	**Experimental:** true
 -	**Category:** theme
 -	**Supports:** color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** separator, showHomeLink, type
+-	**Attributes:** prefersTaxonomy, separator, showHomeLink, showLastItem, showOnHomePage
 
 ## Button
 
@@ -382,7 +382,7 @@ Use the classic WordPress editor. ([Source](https://github.com/WordPress/gutenbe
 
 -	**Name:** core/freeform
 -	**Category:** text
--	**Supports:** ~~className~~, ~~customClassName~~, ~~reusable~~
+-	**Supports:** ~~blockVisibility~~, ~~className~~, ~~customClassName~~, ~~html~~, ~~lock~~, ~~renaming~~, ~~reusable~~
 -	**Attributes:** content
 
 ## Gallery
@@ -448,7 +448,7 @@ Display a list of your most recent comments. ([Source](https://github.com/WordPr
 -	**Name:** core/latest-comments
 -	**Category:** widgets
 -	**Supports:** align, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** commentsToShow, displayAvatar, displayDate, displayExcerpt
+-	**Attributes:** commentsToShow, displayAvatar, displayContent, displayDate
 
 ## Latest Posts
 
@@ -495,6 +495,7 @@ Display mathematical notation using LaTeX. ([Source](https://github.com/WordPres
 
 -	**Name:** core/math
 -	**Category:** text
+-	**Supports:** ~~html~~
 -	**Attributes:** latex, mathML
 
 ## Media & Text
@@ -512,7 +513,7 @@ Your site doesn’t include support for this block. ([Source](https://github.com
 
 -	**Name:** core/missing
 -	**Category:** text
--	**Supports:** interactivity (clientNavigation), ~~className~~, ~~customClassName~~, ~~html~~, ~~inserter~~, ~~reusable~~
+-	**Supports:** interactivity (clientNavigation), ~~blockVisibility~~, ~~className~~, ~~customClassName~~, ~~html~~, ~~inserter~~, ~~lock~~, ~~renaming~~, ~~reusable~~
 -	**Attributes:** originalContent, originalName, originalUndelimitedContent
 
 ## More
@@ -590,8 +591,8 @@ Start with the basic building block of all narrative. ([Source](https://github.c
 
 -	**Name:** core/paragraph
 -	**Category:** text
--	**Supports:** __unstablePasteTextInline, anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fitText, fontSize, lineHeight), ~~className~~
--	**Attributes:** align, content, direction, dropCap, placeholder
+-	**Supports:** __unstablePasteTextInline, anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fitText, fontSize, lineHeight, textAlign), ~~className~~
+-	**Attributes:** content, direction, dropCap, placeholder
 
 ## Pattern Placeholder
 
@@ -678,7 +679,7 @@ Displays the contents of a post or page. ([Source](https://github.com/WordPress/
 
 ## Date
 
-Display the publish date for an entry such as a post or page. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-date))
+Display a custom date. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-date))
 
 -	**Name:** core/post-date
 -	**Category:** theme
@@ -757,13 +758,13 @@ Add text that respects your spacing and tabs, and also allows styling. ([Source]
 -	**Supports:** anchor, color (background, gradients, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight)
 -	**Attributes:** content
 
-## Pullquote
+## Pullquote (deprecated)
 
-Give special visual emphasis to a quote from your text. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/pullquote))
+This block is deprecated. Please use the Quote block instead. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/pullquote))
 
 -	**Name:** core/pullquote
 -	**Category:** text
--	**Supports:** align (full, left, right, wide), anchor, background (backgroundImage, backgroundSize), color (background, gradients, link, text), dimensions (minHeight), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight)
+-	**Supports:** align (full, left, right, wide), anchor, background (backgroundImage, backgroundSize), color (background, gradients, link, text), dimensions (minHeight), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~inserter~~
 -	**Attributes:** citation, textAlign, value
 
 ## Query Loop
@@ -954,6 +955,17 @@ Add white space between blocks and customize its height. ([Source](https://githu
 -	**Supports:** anchor, interactivity (clientNavigation), spacing (margin)
 -	**Attributes:** height, width
 
+## Tab
+
+Content for a tab in a tabbed interface. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tab))
+
+-	**Name:** core/tab
+-	**Experimental:** true
+-	**Category:** design
+-	**Parent:** core/tabs
+-	**Supports:** anchor, layout (allowJustification, allowOrientation, allowSizingOnChildren, allowSwitching, allowVerticalAlignment, ~~allowInheriting~~), spacing (blockGap, padding, ~~margin~~), typography (fontSize), ~~html~~, ~~reusable~~
+-	**Attributes:** label
+
 ## Table
 
 Create structured content in rows and columns to display information. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/table))
@@ -972,6 +984,17 @@ Summarize your post with a list of headings. Add HTML anchors to Heading blocks 
 -	**Category:** design
 -	**Supports:** ariaLabel, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** headings, maxLevel, onlyIncludeCurrentPage, ordered
+
+## Tabs
+
+Display content in a tabbed interface to help users navigate detailed content with ease. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tabs))
+
+-	**Name:** core/tabs
+-	**Experimental:** true
+-	**Category:** design
+-	**Allowed Blocks:** core/tab
+-	**Supports:** align, color (~~background~~, ~~text~~), interactivity, spacing (blockGap, margin, ~~padding~~), typography (fontSize), ~~html~~
+-	**Attributes:** activeTabIndex, customTabActiveColor, customTabActiveTextColor, customTabHoverColor, customTabHoverTextColor, customTabInactiveColor, customTabTextColor, orientation, tabActiveColor, tabActiveTextColor, tabHoverColor, tabHoverTextColor, tabInactiveColor, tabTextColor, tabsId
 
 ## Tag Cloud
 
@@ -1016,7 +1039,7 @@ Displays the name of a taxonomy term. ([Source](https://github.com/WordPress/gut
 -	**Name:** core/term-name
 -	**Category:** theme
 -	**Supports:** align (full, wide), color (background, gradients, link, text), interactivity (clientNavigation), spacing (padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** isLink, level, textAlign
+-	**Attributes:** isLink, level, levelOptions, textAlign
 
 ## Term Template
 

@@ -58,8 +58,10 @@ describe( 'useFormValidity', () => {
 			expect( validity ).toEqual( undefined );
 			expect( isValid ).toBe( true );
 		} );
+	} );
 
-		it( 'with children are checked for validity', () => {
+	describe( 'form fields', () => {
+		it( 'defined as strings are checked for validity', () => {
 			const item = { id: 1, order: undefined };
 			const fields: Field< {} >[] = [
 				{
@@ -71,7 +73,7 @@ describe( 'useFormValidity', () => {
 				},
 			];
 			const form = {
-				fields: [ { id: 'combinedField', children: [ 'order' ] } ],
+				fields: [ 'order' ],
 			};
 			const {
 				result: {
@@ -79,18 +81,14 @@ describe( 'useFormValidity', () => {
 				},
 			} = renderHook( () => useFormValidity( item, fields, form ) );
 			expect( validity ).toEqual( {
-				combinedField: {
-					children: {
-						order: {
-							required: { type: 'invalid' },
-						},
-					},
+				order: {
+					required: { type: 'invalid' },
 				},
 			} );
 			expect( isValid ).toBe( false );
 		} );
 
-		it( 'without children but defined as objects are checked for validity', () => {
+		it( 'defined as objects are checked for validity', () => {
 			const item = { id: 1, order: undefined };
 			const fields: Field< {} >[] = [
 				{
@@ -116,38 +114,78 @@ describe( 'useFormValidity', () => {
 			} );
 			expect( isValid ).toBe( false );
 		} );
-	} );
 
-	describe( 'isValid.required', () => {
-		const REQUIRED_MESSAGE = {
-			required: { type: 'invalid' },
-		};
-
-		it( 'is valid when validity object only contains type:valid messages', async () => {
-			const item = { id: 1, title: 'Valid Title', status: 'published' };
-			const fields: Field< {} >[] = [
+		it( 'with children are checked for validity', async () => {
+			type TestValidity = {
+				id: number;
+				field1?: number;
+				field2?: number;
+				field3?: number;
+				field4?: number;
+			};
+			const item: TestValidity = {
+				id: 1,
+				field1: 2,
+				field2: 3,
+				field3: undefined,
+				field4: undefined,
+			};
+			const fields: Field< TestValidity >[] = [
 				{
-					id: 'title',
-					type: 'text',
+					id: 'field1',
+					type: 'integer',
+					elements: [ { value: 1, label: 'One' } ],
 					isValid: {
-						custom: async () =>
-							await new Promise( ( resolve ) =>
-								setTimeout( resolve, 5 )
-							).then( () => null ),
+						elements: true,
 					},
 				},
 				{
-					id: 'status',
-					type: 'text',
+					id: 'field2',
+					type: 'integer',
+					getElements: async () =>
+						await new Promise( ( resolve ) => {
+							setTimeout( resolve, 5 );
+						} ).then( () => [ { value: 2, label: 'Two' } ] ),
+					isValid: {
+						elements: true,
+					},
+				},
+				{
+					id: 'field3',
+					type: 'integer',
+					isValid: {
+						required: true,
+					},
+				},
+				{
+					id: 'field4',
+					type: 'integer',
 					isValid: {
 						custom: async () =>
 							await new Promise( ( resolve ) =>
 								setTimeout( resolve, 5 )
-							).then( () => null ),
+							).then( () => 'Field is invalid.' ),
 					},
 				},
 			];
-			const form = { fields: [ 'title', 'status' ] };
+			const form = {
+				fields: [
+					'field1',
+					{
+						id: 'combined1',
+						children: [
+							'field2',
+							{
+								id: 'combined2',
+								children: [
+									'field3',
+									{ id: 'combined3', children: [ 'field4' ] },
+								],
+							},
+						],
+					},
+				],
+			};
 			const { result } = renderHook( () =>
 				useFormValidity( item, fields, form )
 			);
@@ -155,17 +193,52 @@ describe( 'useFormValidity', () => {
 			await waitFor( () => {
 				expect( result.current ).toEqual( {
 					validity: {
-						title: {
-							custom: { type: 'valid', message: 'Valid' },
+						combined1: {
+							children: {
+								combined2: {
+									children: {
+										combined3: {
+											children: {
+												field4: {
+													custom: {
+														type: 'invalid',
+														message:
+															'Field is invalid.',
+													},
+												},
+											},
+										},
+										field3: {
+											required: { type: 'invalid' },
+										},
+									},
+								},
+								field2: {
+									elements: {
+										type: 'invalid',
+										message:
+											'Value must be one of the elements.',
+									},
+								},
+							},
 						},
-						status: {
-							custom: { type: 'valid', message: 'Valid' },
+						field1: {
+							elements: {
+								type: 'invalid',
+								message: 'Value must be one of the elements.',
+							},
 						},
 					},
-					isValid: true,
+					isValid: false,
 				} );
 			} );
 		} );
+	} );
+
+	describe( 'isValid.required', () => {
+		const REQUIRED_MESSAGE = {
+			required: { type: 'invalid' },
+		};
 
 		it( 'array is invalid when required but empty', () => {
 			const item = { id: 1, tags: [] };
@@ -541,6 +614,218 @@ describe( 'useFormValidity', () => {
 				},
 			} );
 			expect( isValid ).toBe( false );
+		} );
+
+		describe( 'async', () => {
+			it( 'is valid when validity object only contains type:valid messages', async () => {
+				const item = {
+					id: 1,
+					title: 'Valid Title',
+					status: 'published',
+				};
+				const fields: Field< {} >[] = [
+					{
+						id: 'title',
+						type: 'text',
+						isValid: {
+							custom: async () =>
+								await new Promise( ( resolve ) =>
+									setTimeout( resolve, 5 )
+								).then( () => null ),
+						},
+					},
+					{
+						id: 'status',
+						type: 'text',
+						isValid: {
+							custom: async () =>
+								await new Promise( ( resolve ) =>
+									setTimeout( resolve, 5 )
+								).then( () => null ),
+						},
+					},
+				];
+				const form = { fields: [ 'title', 'status' ] };
+				const { result } = renderHook( () =>
+					useFormValidity( item, fields, form )
+				);
+
+				await waitFor( () => {
+					expect( result.current ).toEqual( {
+						validity: {
+							title: {
+								custom: { type: 'valid', message: 'Valid' },
+							},
+							status: {
+								custom: { type: 'valid', message: 'Valid' },
+							},
+						},
+						isValid: true,
+					} );
+				} );
+			} );
+
+			it( 'is invalid and message is "Validating…" when promise is in flight', async () => {
+				const item = {
+					id: 1,
+					title: 'Invalid Title',
+					status: 'published',
+				};
+				const fields: Field< {} >[] = [
+					{
+						id: 'title',
+						type: 'text',
+						isValid: {
+							// This promise is never resolved.
+							// Serves to test in flight behavior of validation.
+							custom: async () => await new Promise( () => {} ),
+						},
+					},
+				];
+				const form = { fields: [ 'title' ] };
+				const { result } = renderHook( () =>
+					useFormValidity( item, fields, form )
+				);
+
+				await waitFor( () => {
+					expect( result.current ).toEqual( {
+						validity: {
+							title: {
+								custom: {
+									type: 'validating',
+									message: 'Validating…',
+								},
+							},
+						},
+						isValid: false,
+					} );
+				} );
+			} );
+
+			it( 'is invalid when validity object contains at least one type:invalid message', async () => {
+				const item = {
+					id: 1,
+					title: 'Invalid Title',
+					status: 'published',
+				};
+				const fields: Field< {} >[] = [
+					{
+						id: 'title',
+						type: 'text',
+						isValid: {
+							custom: async () =>
+								await new Promise( ( resolve ) =>
+									setTimeout( resolve, 5 )
+								).then( () => 'Title is invalid.' ),
+						},
+					},
+				];
+				const form = { fields: [ 'title' ] };
+				const { result } = renderHook( () =>
+					useFormValidity( item, fields, form )
+				);
+
+				await waitFor( () => {
+					expect( result.current ).toEqual( {
+						validity: {
+							title: {
+								custom: {
+									type: 'invalid',
+									message: 'Title is invalid.',
+								},
+							},
+						},
+						isValid: false,
+					} );
+				} );
+			} );
+
+			it( 'is invalid when custom returns anything other than null or a string', async () => {
+				const item = {
+					id: 1,
+					title: 'Invalid Title',
+					status: 'published',
+				};
+				const fields: Field< {} >[] = [
+					{
+						id: 'title',
+						type: 'text',
+						isValid: {
+							// @ts-ignore returns wrong type for testing purposes
+							custom: async () =>
+								await new Promise( ( resolve ) =>
+									setTimeout( resolve, 5 )
+								).then( () => 3 ),
+						},
+					},
+				];
+				const form = { fields: [ 'title' ] };
+				const { result } = renderHook( () =>
+					useFormValidity( item, fields, form )
+				);
+
+				await waitFor( () => {
+					expect( result.current ).toEqual( {
+						validity: {
+							title: {
+								custom: {
+									type: 'invalid',
+									message:
+										'Validation could not be processed.',
+								},
+							},
+						},
+						isValid: false,
+					} );
+				} );
+			} );
+
+			it( 'is invalid when promise was rejected', async () => {
+				const item = {
+					id: 1,
+					title: 'Invalid Title',
+					status: 'published',
+				};
+				const fields: Field< {} >[] = [
+					{
+						id: 'title',
+						type: 'text',
+						isValid: {
+							custom: async () =>
+								await new Promise( ( resolve, reject ) =>
+									setTimeout(
+										() =>
+											reject(
+												new Error(
+													'Validation did not complete successfully.'
+												)
+											),
+										5
+									)
+								),
+						},
+					},
+				];
+				const form = { fields: [ 'title' ] };
+				const { result } = renderHook( () =>
+					useFormValidity( item, fields, form )
+				);
+
+				await waitFor( () => {
+					expect( result.current ).toEqual( {
+						validity: {
+							title: {
+								custom: {
+									type: 'invalid',
+									message:
+										'Validation did not complete successfully.',
+								},
+							},
+						},
+						isValid: false,
+					} );
+				} );
+			} );
 		} );
 	} );
 } );

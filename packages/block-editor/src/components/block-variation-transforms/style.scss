@@ -1,49 +1,19 @@
 @use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/base-styles/colors" as *;
 
-.block-editor-block-variation-transforms:where(fieldset) {
-	// Reset `fieldset` browser defaults.
-	border: 0;
-	padding: 0;
-	margin: 0;
-}
-
 .block-editor-block-variation-transforms {
 	box-sizing: border-box;
 	padding: 0 $grid-unit-20 $grid-unit-20 52px;
-	width: 100%;
 
-	.components-dropdown-menu__toggle {
-		border: $border-width solid $gray-700;
-		border-radius: $radius-small;
-		min-height: 30px;
-		width: 100%;
-		position: relative;
-		text-align: left;
-		justify-content: left;
-		padding: 6px 12px;
-
-		// For all button sizes allow sufficient space for the
-		// dropdown "arrow" icon to display.
-		&.components-dropdown-menu__toggle {
-			padding-right: $icon-size;
-		}
-
-		&:focus:not(:disabled) {
-			border-color: var(--wp-admin-theme-color);
-			box-shadow: 0 0 0 calc(var(--wp-admin-border-width-focus) - #{ $border-width }) var(--wp-admin-theme-color);
-		}
-
-		svg {
-			height: 100%;
-			padding: 0;
-			position: absolute;
-			right: 0;
-			top: 0;
-		}
+	&:where(fieldset) {
+		// Reset `fieldset` browser defaults.
+		border: 0;
+		padding: 0;
+		margin: 0;
 	}
 }
 
-.block-editor-block-variation-transforms__popover .components-popover__content {
-	min-width: 230px;
+.block-editor-block-variation-transforms__button {
+	width: 100%;
+	justify-content: center;
 }

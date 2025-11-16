@@ -11,9 +11,6 @@ test.describe( 'Registered sources', () => {
 	let imagePlaceholderSrc;
 	let testingImgSrc;
 	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme(
-			'gutenberg-test-themes/block-bindings'
-		);
 		await requestUtils.activatePlugin( 'gutenberg-test-block-bindings' );
 		await requestUtils.deleteAllMedia();
 		const placeholderMedia = await requestUtils.uploadMedia(
@@ -40,7 +37,6 @@ test.describe( 'Registered sources', () => {
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
-		await requestUtils.activateTheme( 'twentytwentyone' );
 		await requestUtils.deactivatePlugin( 'gutenberg-test-block-bindings' );
 	} );
 
@@ -1280,95 +1276,6 @@ test.describe( 'Registered sources', () => {
 			name: 'content',
 		} );
 		await expect( contentButton ).toContainText( 'Source not registered' );
-	} );
-
-	test.describe( 'Modal source', () => {
-		test( 'should open modal and allow field selection', async ( {
-			editor,
-			page,
-		} ) => {
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-			} );
-
-			// Open the bindings panel
-			await page.getByLabel( 'Attributes options' ).click();
-			await page
-				.getByRole( 'menuitemcheckbox', {
-					name: 'Show content',
-				} )
-				.click();
-
-			// Click on the content binding button
-			await page
-				.getByRole( 'button', {
-					name: 'content',
-				} )
-				.click();
-
-			// Click on the modal source
-			await page
-				.getByRole( 'menuitem', {
-					name: 'Modal Source',
-				} )
-				.click();
-
-			// Modal should be visible
-			const modal = page.getByRole( 'dialog' );
-			await expect( modal ).toBeVisible();
-
-			// Check modal content
-			await expect( modal ).toContainText(
-				'Select a field from the modal'
-			);
-			await expect( modal ).toContainText(
-				'This is a modal interface for selecting fields.'
-			);
-
-			// Click on a field button in the modal
-			const fieldButton = modal.getByRole( 'button', {
-				name: 'Text Field Label',
-			} );
-			await expect( fieldButton ).toBeVisible();
-			await fieldButton.click();
-
-			// Modal should close and binding should be applied
-			await expect( modal ).toBeHidden();
-
-			// Check that the paragraph shows the bound value
-			const paragraphBlock = editor.canvas.getByRole( 'document', {
-				name: 'Block: Paragraph',
-			} );
-			await expect( paragraphBlock ).toHaveText( 'Text Field Value' );
-		} );
-
-		test( 'should show modal source in attributes panel', async ( {
-			editor,
-			page,
-		} ) => {
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: {
-					content: 'fallback content',
-					metadata: {
-						bindings: {
-							content: {
-								source: 'testing/modal-source',
-								args: {
-									key: 'text_field',
-								},
-							},
-						},
-					},
-				},
-			} );
-
-			// Check that the binding shows the modal source label
-			const contentButton = page.getByRole( 'button', {
-				name: 'content',
-			} );
-			await expect( contentButton ).toContainText( 'Text Field Label' );
-		} );
 	} );
 
 	test.describe( 'Source compatibility filtering', () => {

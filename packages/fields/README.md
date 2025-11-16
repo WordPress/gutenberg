@@ -36,8 +36,8 @@ A React component that renders a modal for creating a template part. The modal d
 
 _Parameters_
 
--   _props_ `Object`: The component props.
--   _props.modalTitle_ `{ modalTitle: string; } & CreateTemplatePartModalContentsProps[ 'modalTitle' ]`:
+-   _props_ `{ modalTitle?: string; } & CreateTemplatePartModalContentsProps`: The component props.
+-   _props.modalTitle_ `{ modalTitle?: string; } & CreateTemplatePartModalContentsProps[ 'modalTitle' ]`:
 
 ### dateField
 

@@ -14,6 +14,7 @@
 	flex-direction: column;
 	font-size: $default-font-size;
 	line-height: $default-line-height;
+	background-color: inherit;
 }
 
 .dataviews__view-actions,
@@ -23,6 +24,7 @@
 	flex-shrink: 0;
 	position: sticky;
 	left: 0;
+	background-color: inherit;
 
 	@media not (prefers-reduced-motion) {
 		transition: padding ease-out 0.1s;
