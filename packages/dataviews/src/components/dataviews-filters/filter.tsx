@@ -19,6 +19,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { useRef, createInterpolateElement } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
+import { dateI18n, getDate } from '@wordpress/date';
 
 const ENTER = 'Enter';
 const SPACE = ' ';
@@ -498,7 +499,16 @@ export default function Filter( {
 		const field = fields.find( ( f ) => f.id === filter.field );
 		let label = filterInView.value;
 
-		if ( field?.type === 'datetime' && typeof label === 'string' ) {
+		if ( field?.type === 'date' && typeof label === 'string' ) {
+			try {
+				const dateValue = parseDateTime( label );
+				if ( dateValue !== null ) {
+					label = dateI18n( field.format.date, getDate( label ) );
+				}
+			} catch ( e ) {
+				label = filterInView.value;
+			}
+		} else if ( field?.type === 'datetime' && typeof label === 'string' ) {
 			try {
 				const dateValue = parseDateTime( label );
 				if ( dateValue !== null ) {

@@ -774,6 +774,14 @@ const CommentBoard = ( {
 			? actions.filter( ( item ) => item.isEligible( thread ) )
 			: [];
 
+	const deleteConfirmMessage =
+		// When deleting a top level note, descendants will also be deleted.
+		thread.parent === 0
+			? __(
+					"Are you sure you want to delete this note? This will also delete all of this note's replies."
+			  )
+			: __( 'Are you sure you want to delete this reply?' );
+
 	return (
 		<VStack
 			spacing="2"
@@ -909,9 +917,7 @@ const CommentBoard = ( {
 					onCancel={ handleCancel }
 					confirmButtonText={ __( 'Delete' ) }
 				>
-					{ __(
-						"Are you sure you want to delete this note? This will also delete all of this note's replies."
-					) }
+					{ deleteConfirmMessage }
 				</ConfirmDialog>
 			) }
 		</VStack>

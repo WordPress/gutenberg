@@ -50,4 +50,33 @@ export const settings = {
 	deprecated,
 };
 
+if ( window.__experimentalContentOnlyPatternInsertion ) {
+	settings.fields = [
+		{
+			label: __( 'Media' ),
+			type: 'Media',
+			shownByDefault: true,
+			mapping: {
+				id: 'mediaId',
+				type: 'mediaType',
+				src: 'mediaUrl',
+			},
+			args: {
+				allowedTypes: [ 'image', 'video' ],
+				multiple: false,
+			},
+		},
+		{
+			label: __( 'Link' ),
+			type: 'Link',
+			shownByDefault: false,
+			mapping: {
+				href: 'href',
+				rel: 'rel',
+				target: 'linkTarget',
+			},
+		},
+	];
+}
+
 export const init = () => initBlock( { name, metadata, settings } );

@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { audio as icon } from '@wordpress/icons';
 
 /**
@@ -30,5 +31,31 @@ export const settings = {
 	edit,
 	save,
 };
+
+if ( window.__experimentalContentOnlyPatternInsertion ) {
+	settings.fields = [
+		{
+			label: __( 'Audio' ),
+			type: 'Media',
+			shownByDefault: true,
+			mapping: {
+				id: 'id',
+				src: 'src',
+			},
+			args: {
+				allowedTypes: [ 'audio' ],
+				multiple: false,
+			},
+		},
+		{
+			label: __( 'Caption' ),
+			type: 'RichText',
+			shownByDefault: false,
+			mapping: {
+				value: 'caption',
+			},
+		},
+	];
+}
 
 export const init = () => initBlock( { name, metadata, settings } );

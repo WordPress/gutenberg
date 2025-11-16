@@ -98,10 +98,13 @@ export function useEntityBinding( { clientId, attributes } ) {
 
 			// Use the correct entity type based on kind.
 			const entityType = isTaxonomy ? 'taxonomy' : 'postType';
-			const entityRecord = getEntityRecord( entityType, type, id );
+			// Convert 'tag' back to 'post_tag' for the API call
+			// (it was converted from 'post_tag' to 'tag' for storage in updateAttributes)
+			const typeForAPI = type === 'tag' ? 'post_tag' : type;
+			const entityRecord = getEntityRecord( entityType, typeForAPI, id );
 			const hasResolved = hasFinishedResolution( 'getEntityRecord', [
 				entityType,
-				type,
+				typeForAPI,
 				id,
 			] );
 
