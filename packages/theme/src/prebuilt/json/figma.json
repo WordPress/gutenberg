@@ -278,55 +278,55 @@
 	},
 	"Color/Semantic/Foreground/Success/fgCon-success": {
 		"value": {
-			".": "#002b00"
+			".": "#002900"
 		},
 		"description": "Foreground color for content like text with success tone and normal emphasis."
 	},
 	"Color/Semantic/Foreground/Success/fgCon-success-weak": {
 		"value": {
-			".": "#008031"
+			".": "#008030"
 		},
 		"description": "Foreground color for content like text with success tone and weak emphasis."
 	},
 	"Color/Semantic/Foreground/Info/fgCon-info": {
 		"value": {
-			".": "#001758"
+			".": "#001b4f"
 		},
 		"description": "Foreground color for content like text with info tone and normal emphasis."
 	},
 	"Color/Semantic/Foreground/Info/fgCon-info-weak": {
 		"value": {
-			".": "#006dd9"
+			".": "#006bd7"
 		},
 		"description": "Foreground color for content like text with info tone and weak emphasis."
 	},
 	"Color/Semantic/Foreground/Warning/fgCon-warning": {
 		"value": {
-			".": "#2f1800"
+			".": "#2e1900"
 		},
 		"description": "Foreground color for content like text with warning tone and normal emphasis."
 	},
 	"Color/Semantic/Foreground/Warning/fgCon-warning-weak": {
 		"value": {
-			".": "#976300"
+			".": "#946400"
 		},
 		"description": "Foreground color for content like text with warning tone and weak emphasis."
 	},
 	"Color/Semantic/Foreground/Caution/fgCon-caution": {
 		"value": {
-			".": "#291d00"
+			".": "#281d00"
 		},
 		"description": "Foreground color for content like text with caution tone and normal emphasis."
 	},
 	"Color/Semantic/Foreground/Caution/fgCon-caution-weak": {
 		"value": {
-			".": "#876b00"
+			".": "#846c00"
 		},
 		"description": "Foreground color for content like text with caution tone and weak emphasis."
 	},
 	"Color/Semantic/Foreground/Error/fgCon-error": {
 		"value": {
-			".": "#4a0000"
+			".": "#470000"
 		},
 		"description": "Foreground color for content like text with error tone and normal emphasis."
 	},
@@ -452,13 +452,13 @@
 	},
 	"Color/Semantic/Stroke/Success/strokeSur-success": {
 		"value": {
-			".": "#77ba84"
+			".": "#77ba83"
 		},
 		"description": "Decorative stroke color used to define success-toned surface boundaries with normal emphasis."
 	},
 	"Color/Semantic/Stroke/Success/strokeSur-success-strong": {
 		"value": {
-			".": "#008031"
+			".": "#008030"
 		},
 		"description": "Decorative stroke color used to define success-toned surface boundaries with strong emphasis."
 	},
@@ -470,7 +470,7 @@
 	},
 	"Color/Semantic/Stroke/Info/strokeSur-info-strong": {
 		"value": {
-			".": "#006dd9"
+			".": "#006bd7"
 		},
 		"description": "Decorative stroke color used to define info-toned surface boundaries with strong emphasis."
 	},
@@ -482,7 +482,7 @@
 	},
 	"Color/Semantic/Stroke/Warning/strokeSur-warning-strong": {
 		"value": {
-			".": "#976300"
+			".": "#946400"
 		},
 		"description": "Decorative stroke color used to define warning-toned surface boundaries with strong emphasis."
 	},
