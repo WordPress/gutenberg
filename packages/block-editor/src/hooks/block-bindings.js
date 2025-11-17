@@ -341,7 +341,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 						select,
 						context,
 					} );
-					if ( items.length !== 0 ) {
+					if ( items?.length ) {
 						data[ sourceName ] = items;
 					}
 				}
