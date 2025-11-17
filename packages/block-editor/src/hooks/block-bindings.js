@@ -331,7 +331,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 					}
 
 					const context = {};
-					if ( source?.usesContext?.length ) {
+					if ( source.usesContext?.length ) {
 						for ( const key of source.usesContext ) {
 							context[ key ] = blockContext[ key ];
 						}
