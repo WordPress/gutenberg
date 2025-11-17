@@ -698,8 +698,8 @@ function Navigation( {
 						<ToggleGroupControl
 							__next40pxDefaultSize
 							__nextHasNoMarginBottom
-							label={ __( 'Overlay Menu' ) }
-							aria-label={ __( 'Configure overlay menu' ) }
+							label={ __( 'Overlay Visibility' ) }
+							aria-label={ __( 'Configure overlay visibility' ) }
 							value={ overlayMenu }
 							help={ __(
 								'Collapses the navigation options in a menu icon opening an overlay.'

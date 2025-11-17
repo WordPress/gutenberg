@@ -29,7 +29,7 @@ export default function OverlaySelector( { value, onChange } ) {
 		templateParts?.filter( ( part ) => part.area === 'overlay' ) || [];
 
 	const options = [
-		{ label: __( 'None' ), value: '' },
+		{ label: __( 'Default' ), value: '' },
 		...overlayParts.map( ( part ) => ( {
 			label: part.title?.rendered || part.slug || __( 'Untitled' ),
 			value: part.id,
