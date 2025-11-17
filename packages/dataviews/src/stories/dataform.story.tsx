@@ -553,10 +553,12 @@ const ValidationComponent = ( {
 	required,
 	elements,
 	custom,
+	pattern,
 }: {
 	required: boolean;
 	elements: 'sync' | 'async' | 'none';
 	custom: 'sync' | 'async' | 'none';
+	pattern: boolean;
 } ) => {
 	type ValidatedItem = {
 		text: string;
@@ -607,11 +609,6 @@ const ValidationComponent = ( {
 		date: undefined,
 		dateRange: undefined,
 		datetime: undefined,
-		username: 'john_doe_123',
-		zipcode: '12345',
-		phonePattern: '+1-555-123-4567',
-		emailPattern: 'user@company.com',
-		urlPattern: 'https://github.com/wordpress/gutenberg',
 	} );
 
 	// Cache for getElements functions - ensures promises are only created once
@@ -922,33 +919,15 @@ const ValidationComponent = ( {
 				id: 'text',
 				type: 'text',
 				label: 'Text',
+				placeholder: pattern ? 'user_name123' : undefined,
+				description: pattern
+					? 'Must contain only letters, numbers, and underscores'
+					: undefined,
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customTextRule ),
-				},
-			},
-			{
-				id: 'username',
-				type: 'text',
-				label: 'Username (pattern: alphanumeric + underscore)',
-				placeholder: 'user_name123',
-				description:
-					'Must contain only letters, numbers, and underscores',
-				isValid: {
-					required,
-					pattern: /^[a-zA-Z0-9_]+$/,
-				},
-			},
-			{
-				id: 'zipcode',
-				type: 'text',
-				label: 'Zip Code (pattern: 5 digits)',
-				placeholder: '12345',
-				description: 'Must be exactly 5 digits',
-				isValid: {
-					required,
-					pattern: '[0-9]{5}',
+					pattern: pattern ? /^[a-zA-Z0-9_]+$/ : undefined,
 				},
 			},
 			{
@@ -1007,63 +986,49 @@ const ValidationComponent = ( {
 				id: 'email',
 				type: 'email',
 				label: 'e-mail',
+				placeholder: pattern ? 'user@company.com' : undefined,
+				description: pattern
+					? 'Email must be from @company.com domain'
+					: undefined,
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customEmailRule ),
-				},
-			},
-			{
-				id: 'emailPattern',
-				type: 'email',
-				label: 'Email (pattern: must end with @company.com)',
-				placeholder: 'user@company.com',
-				description: 'Email must be from @company.com domain',
-				isValid: {
-					required,
-					pattern: /^[a-zA-Z0-9]+@company\.com$/,
+					pattern: pattern
+						? /^[a-zA-Z0-9]+@company\.com$/
+						: undefined,
 				},
 			},
 			{
 				id: 'telephone',
 				type: 'telephone',
 				label: 'telephone',
+				placeholder: pattern ? '+1-555-123-4567' : undefined,
+				description: pattern
+					? 'US phone format with country code'
+					: undefined,
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customTelephoneRule ),
-				},
-			},
-			{
-				id: 'phonePattern',
-				type: 'telephone',
-				label: 'Phone (pattern: +1-XXX-XXX-XXXX)',
-				placeholder: '+1-555-123-4567',
-				description: 'US phone format with country code',
-				isValid: {
-					required,
-					pattern: /^\+1-\d{3}-\d{3}-\d{4}$/,
+					pattern: pattern ? /^\+1-\d{3}-\d{3}-\d{4}$/ : undefined,
 				},
 			},
 			{
 				id: 'url',
 				type: 'url',
 				label: 'URL',
+				placeholder: pattern
+					? 'https://github.com/user/repo'
+					: undefined,
+				description: pattern
+					? 'Must be a GitHub repository URL'
+					: undefined,
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customUrlRule ),
-				},
-			},
-			{
-				id: 'urlPattern',
-				type: 'url',
-				label: 'URL (pattern: must be GitHub repo)',
-				placeholder: 'https://github.com/user/repo',
-				description: 'Must be a GitHub repository URL',
-				isValid: {
-					required,
-					pattern: /^https:\/\/github\.com\/.*/,
+					pattern: pattern ? /^https:\/\/github\.com\/.*/ : undefined,
 				},
 			},
 			{
@@ -1146,10 +1111,14 @@ const ValidationComponent = ( {
 				id: 'password',
 				type: 'password',
 				label: 'Password',
+				description: pattern
+					? 'Must have 8 numbers or letters'
+					: undefined,
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customPasswordRule ),
+					pattern: pattern ? /^[0-9a-zA-Z]{8}$/ : undefined,
 				},
 			},
 			{
@@ -1224,8 +1193,6 @@ const ValidationComponent = ( {
 		() => ( {
 			fields: [
 				'text',
-				'username',
-				'zipcode',
 				{ id: 'customEdit' },
 				{
 					id: 'level1Integer',
@@ -1248,7 +1215,6 @@ const ValidationComponent = ( {
 						},
 					],
 				},
-				'emailPattern',
 				{
 					id: 'level1Telephone',
 					children: [
@@ -1268,9 +1234,7 @@ const ValidationComponent = ( {
 						},
 					],
 				},
-				'phonePattern',
 				'url',
-				'urlPattern',
 				'color',
 				'password',
 				'textarea',
@@ -2155,11 +2119,17 @@ export const Validation = {
 			description: 'Whether or not the custom validation rule is active.',
 			options: [ 'sync', 'async', 'none' ],
 		},
+		pattern: {
+			control: { type: 'boolean' },
+			description:
+				'Whether or not the pattern validation rule is active.',
+		},
 	},
 	args: {
 		required: true,
 		elements: 'sync',
 		custom: 'sync',
+		pattern: false,
 	},
 };
 
