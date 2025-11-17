@@ -9,6 +9,7 @@
 - Improve docs for Edit component. [#73202](https://github.com/WordPress/gutenberg/pull/73202)
 - Field API: introduce the `format` prop to format the `date` field type. [#72999](https://github.com/WordPress/gutenberg/pull/72999)
 - DataForm Panel Layout: Update modal button to use isValid and disable based on validation output. [#73339](https://github.com/WordPress/gutenberg/pull/73339)
+- DataForm Panel Layout: Fix Tags fields issue related to deepMerge. [#73344](https://github.com/WordPress/gutenberg/pull/73344)
 
 ## 10.3.0 (2025-11-12)
 
