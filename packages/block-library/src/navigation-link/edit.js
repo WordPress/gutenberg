@@ -216,6 +216,8 @@ export default function NavigationLinkEdit( {
 	// A link is "new" only if it has an undefined label
 	// After the link is created, even if no label is provided, it's set to an empty string.
 	const isNewLink = useRef( label === undefined );
+	// Track whether we should focus the submenu appender when closing the link UI
+	const shouldSelectSubmenuAppenderOnClose = useRef( false );
 
 	const {
 		isAtMaxNesting,
@@ -224,6 +226,7 @@ export default function NavigationLinkEdit( {
 		hasChildren,
 		validateLinkStatus,
 		parentBlockClientId,
+		isSubmenu,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -268,12 +271,12 @@ export default function NavigationLinkEdit( {
 				hasChildren: !! getBlockCount( clientId ),
 				validateLinkStatus: enableLinkStatusValidation,
 				parentBlockClientId: parentBlockId,
+				isSubmenu: parentBlockName === 'core/navigation-submenu',
 			};
 		},
 		[ clientId, maxNestingLevel ]
 	);
-	const { getBlocks, getSelectedBlockClientId } =
-		useSelect( blockEditorStore );
+	const { getBlocks } = useSelect( blockEditorStore );
 
 	// URL binding logic
 	const {
@@ -344,26 +347,37 @@ export default function NavigationLinkEdit( {
 			return;
 		}
 
-		// If the link UI is open, then focus has not resolved from the selectBlock in the onChange.
-		// We defer handling any UI updates until the focus has resolved and the link UI is closed.
-		if ( isLinkOpen ) {
-			return;
-		}
-
 		// Ensure this only runs once
 		isNewLink.current = false;
 
 		// We just created a link and the block is now selected.
-		// The LinkUI is closed due to the selectBlock from the onChange.
 		// If the label looks like a URL, focus and select the label text.
-		// Otherwise, reopen the link UI so the popover is visible in the preview state
-		if ( isURL( prependHTTP( label ) ) && /^.+\.[a-z]+/.test( label ) ) {
+		if (
+			isURL( prependHTTP( label ) ) &&
+			/^.+\.[a-z]+/.test( label ) &&
+			isLinkOpen
+		) {
 			// Focus and select the label text.
 			selectLabelText();
 		} else {
-			// The link was just created and is now selected which closed the popover.
-			// Re-open the link UI so the popover is visible in the preview state
-			setIsLinkOpen( true );
+			// If the link was just created, we want to select the block so the inspector controls
+			// are accurate.
+			selectBlock( clientId, null );
+
+			// Edge case: When the created link is the first child of a submenu, the focus will have
+			// originated from the add submenu toolbar button. In this case, we need to return focus
+			// to the submenu appender if the user closes the link ui using the keyboard.
+			// Check if this is the first and only child of a newly created submenu
+			if ( isSubmenu ) {
+				const parentBlocks = getBlocks( parentBlockClientId );
+				// Only set the flag if this is the only child (meaning new submenu)
+				if (
+					parentBlocks.length === 1 &&
+					parentBlocks[ 0 ].clientId === clientId
+				) {
+					shouldSelectSubmenuAppenderOnClose.current = true;
+				}
+			}
 		}
 	}, [ url, isLinkOpen, isNewLink, label ] );
 
@@ -608,6 +622,27 @@ export default function NavigationLinkEdit( {
 								// Don't remove if binding exists (even if entity is unavailable) so user can fix it.
 								if ( ! url && ! hasUrlBinding ) {
 									onReplace( [] );
+									return;
+								}
+
+								// Edge case: If this is the first child of a new submenu, focus the submenu's appender
+								if (
+									shouldSelectSubmenuAppenderOnClose.current
+								) {
+									shouldSelectSubmenuAppenderOnClose.current = false;
+
+									// The appender is the next sibling in the DOM after the current block
+									if (
+										listItemRef.current?.nextElementSibling
+									) {
+										const appenderButton =
+											listItemRef.current.nextElementSibling.querySelector(
+												'.block-editor-button-block-appender'
+											);
+										if ( appenderButton ) {
+											appenderButton.focus();
+										}
+									}
 								}
 							} }
 							anchor={ popoverAnchor }
@@ -629,19 +664,6 @@ export default function NavigationLinkEdit( {
 									createBinding( updatedAttributes );
 								} else {
 									clearBinding();
-								}
-
-								// If the link was just created, we want to select the block so the inspector controls
-								// are accurate.
-								if (
-									isNewLink.current &&
-									updatedAttributes.url &&
-									clientId !== getSelectedBlockClientId()
-								) {
-									// Note: selectBlock will close the link UI if it is open, so we handle that
-									// separately by re-opening the link UI in a useEffect.
-									// TODO: Prevent the link UI from being closed by selectBlock.
-									selectBlock( clientId );
 								}
 							} }
 						/>

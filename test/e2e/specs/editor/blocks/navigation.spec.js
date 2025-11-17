@@ -355,6 +355,7 @@ test.describe( 'Navigation block', () => {
 				await pageUtils.pressKeys( 'ArrowDown' );
 				await navigation.useBlockInserter();
 				await navigation.addPage( 'Cat' );
+				await pageUtils.pressKeys( 'ArrowLeft', { times: 2 } );
 			} );
 
 			await test.step( 'can use the shortcut to open the preview with the keyboard and escape keypress sends focus back to the navigation link block', async () => {
@@ -424,7 +425,9 @@ test.describe( 'Navigation block', () => {
 				// TODO: Use Enter after that bug is resolved
 				await navigation.useLinkShortcut();
 
-				await navigation.addPage( 'Dog' );
+				await navigation.addSubmenuPage( 'Dog' );
+				await pageUtils.pressKeys( 'ArrowUp' );
+				await pageUtils.pressKeys( 'ArrowRight' );
 			} );
 
 			await test.step( 'can use the shortcut to open the preview with the keyboard and escape keypress sends focus back to the navigation link block in the submenu', async () => {
@@ -537,8 +540,6 @@ test.describe( 'Navigation block', () => {
 			await pageUtils.pressKeys( 'ArrowDown' );
 			await navigation.useBlockInserter();
 			await navigation.addPage( 'Cat' );
-			await pageUtils.pressKeys( 'ArrowDown' );
-			await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
 			await navigation.useBlockInserter();
 			await navigation.addCustomURL( 'https://example.com' );
 			await navigation.expectToHaveTextSelected( 'example.com' );
@@ -554,8 +555,6 @@ test.describe( 'Navigation block', () => {
 			// TODO: Use Enter after that bug is resolved
 			await navigation.useLinkShortcut();
 			await navigation.addPage( 'Dog' );
-			await page.keyboard.press( 'End' );
-			await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
 			await navigation.useBlockInserter();
 			await navigation.addCustomURL( 'https://wordpress.org' );
 			await navigation.expectToHaveTextSelected( 'wordpress.org' );
@@ -1026,6 +1025,7 @@ test.describe( 'Navigation block', () => {
 				await pageUtils.pressKeys( 'ArrowDown' );
 				await navigation.useBlockInserter();
 				await navigation.addPage( 'Test Page 1' );
+				await pageUtils.pressKeys( 'ArrowLeft', { times: 2 } );
 			} );
 
 			await test.step( 'Verify bound link displays correctly in Link UI popover', async () => {
@@ -1630,6 +1630,12 @@ class Navigation {
 		return this.getNavBlock().getByLabel( 'Add block' ).first();
 	}
 
+	getSubmenuBlockInserter() {
+		return this.editor.canvas
+			.getByRole( 'document', { name: 'Block: Submenu' } )
+			.getByLabel( 'Add block' );
+	}
+
 	getLinkControlSearch() {
 		return this.page.getByRole( 'combobox', {
 			name: 'Search or type URL',
@@ -1681,9 +1687,10 @@ class Navigation {
 	 * Usage:
 	 * - Open the new link control however you'd like (block appender, command+k on Add link label...)
 	 *
-	 * @param {string} label Text of page you want added. Must be a part of the pages added in the beforeAll in this test suite.
+	 * @param {string}  label   Text of page you want added. Must be a part of the pages added in the beforeAll in this test suite.
+	 * @param {boolean} submenu Whether the page is being added to a submenu.
 	 */
-	async addPage( label ) {
+	async addPage( label, submenu = false ) {
 		await this.useLinkControlSearch( label );
 
 		const linkControlLink = await this.getLinkControlLink( label );
@@ -1694,7 +1701,17 @@ class Navigation {
 		await this.page.keyboard.press( 'Escape' );
 		await expect( this.getLinkControlSearch() ).toBeHidden();
 
-		await this.checkLabelFocus( label );
+		// Check appender has focus
+		if ( submenu ) {
+			// chec for the submenu appender
+			await expect( this.getSubmenuBlockInserter() ).toBeFocused();
+		} else {
+			await expect( this.getNavBlockInserter() ).toBeFocused();
+		}
+	}
+
+	async addSubmenuPage( label ) {
+		await this.addPage( label, true );
 	}
 
 	async useLinkControlSearch( label ) {
