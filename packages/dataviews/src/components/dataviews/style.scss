@@ -103,7 +103,7 @@
 }
 
 /**
- * When DataViews are placed within cards, apply a consistent 10px top padding.
+ * When DataViews are placed within cards, apply a consistent top padding.
  */
 .components-card__body:has(> .dataviews-wrapper),
 .components-card__body:has(> .dataviews-picker-wrapper) {
@@ -112,7 +112,7 @@
 }
 
 /**
- * When DataViews are placed within modals, apply a consistent 10px top padding.
+ * When DataViews are placed within modals, apply a consistent padding to match the header.
  */
 .components-modal__content:has(.components-modal__children-container > .dataviews-wrapper:first-child),
 .components-modal__content:has(.components-modal__children-container > .dataviews-picker-wrapper:first-child) {
