@@ -227,4 +227,35 @@ describe( 'getBlockContentSchema', () => {
 			output
 		);
 	} );
+
+	it( 'should handle attributes merging without anchor supports', () => {
+		const transforms = deepFreeze( [
+			{
+				blockName: 'test/a',
+				type: 'raw',
+				selector: 'p',
+				schema: {
+					p: {},
+				},
+			},
+			{
+				blockName: 'test/b',
+				type: 'raw',
+				selector: 'p',
+				schema: {
+					p: {
+						attributes: [ 'data-test-attribute' ],
+					},
+				},
+			},
+		] );
+		const output = {
+			p: {
+				attributes: [ 'data-test-attribute' ],
+			},
+		};
+		expect( getBlockContentSchemaFromTransforms( transforms ) ).toEqual(
+			output
+		);
+	} );
 } );
