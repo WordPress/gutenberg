@@ -140,7 +140,7 @@ describe( 'post-data bindings', () => {
 							args: { field: 'link' },
 						},
 					},
-					clientId: 'client-1',
+					clientId: '123abc456',
 				} );
 
 				expect( values.url ).toBe( 'https://example.com/page' );
