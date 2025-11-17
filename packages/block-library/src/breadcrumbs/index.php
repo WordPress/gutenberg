@@ -184,7 +184,7 @@ function block_core_breadcrumbs_create_page_number_item( $query_var = 'paged' ) 
 
 	return block_core_breadcrumbs_create_current_item(
 		/* translators: %s: page number */
-		sprintf( __( 'Page %s', 'gutenberg' ), number_format_i18n( $paged ) )
+		sprintf( __( 'Page %s' ), number_format_i18n( $paged ) )
 	);
 }
 
