@@ -1,6 +1,6 @@
 # The `@wordpress/dataviews` package
 
-The DataViews package offers three React components and a few utilities to work with a list of data:
+This package offers three React components and a few utilities to work with a list of data:
 
 -   `DataViews`: to render the dataset using different types of layouts (table, grid, list) and interaction capabilities (search, filters, sorting, etc.).
 -   `DataViewsPicker`: to render the dataset optimized for selection or picking of items.
@@ -18,17 +18,19 @@ npm install @wordpress/dataviews --save
 
 <div class="callout callout-info">At <a href="https://wordpress.github.io/gutenberg/">WordPress Gutenberg's Storybook</a> there's an <a href="https://wordpress.github.io/gutenberg/?path=/docs/dataviews-dataviews--docs">example implementation of the Dataviews component</a>.</div>
 
-**Important note** If you're trying to use the `DataViews` component in a WordPress plugin or theme and you're building your scripts using the `@wordpress/scripts` package, you need to import the components from `@wordpress/dataviews/wp` instead of `@wordpress/dataviews`.
-
 ### Usage
 
 The `DataViews` component receives data and some other configuration to render the dataset. It'll call the `onChangeView` callback every time the user has interacted with the dataset in some way (sorted, filtered, changed layout, etc.):
 
 ![DataViews flow](https://developer.wordpress.org/files/2024/09/368600071-20aa078f-7c3d-406d-8dd0-8b764addd22a.png 'DataViews flow')
 
+<div class="callout callout-info">If you're trying to use the DataViews component in a WordPress plugin or theme and you are building your scripts using the `@wordpress/scripts` package, you need to import the components from `@wordpress/dataviews/wp` instead of `@wordpress/dataviews`.</div>
+
 Example:
 
 ```jsx
+import { DataViews } from '@wordpress/dataviews';
+
 const Example = () => {
 	const onChangeView = () => {
 		/* React to user changes. */
