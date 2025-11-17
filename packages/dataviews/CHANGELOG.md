@@ -10,6 +10,7 @@
 
 - Fix: DataViews modal actions in list layout. [#72793](https://github.com/WordPress/gutenberg/pull/72793)
 - Fix: Table layout column spacing. [#72969](https://github.com/WordPress/gutenberg/pull/72969)
+- Fix: ensure primary actions are not wrapped in the list layout. [#73333](https://github.com/WordPress/gutenberg/pull/73333)
 
 ## 10.2.0 (2025-10-29)
 
