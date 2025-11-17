@@ -29,6 +29,7 @@ import {
 	BlockControls,
 } from '@wordpress/block-editor';
 import { EntityProvider, store as coreStore } from '@wordpress/core-data';
+import { store as editorStore } from '@wordpress/editor';
 
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
@@ -81,6 +82,8 @@ import AccessibleMenuDescription from './accessible-menu-description';
 import OverlaySelector from './overlay-selector';
 import { unlock } from '../../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
+
+const TEMPLATE_PART_POST_TYPE = 'wp_template_part';
 import { DEFAULT_BLOCK } from '../constants';
 
 /**
@@ -264,7 +267,7 @@ function Navigation( {
 } ) {
 	const {
 		openSubmenusOnClick,
-		overlayMenu,
+		overlayMenu: savedOverlayMenu,
 		showSubmenuIcon,
 		templateLock,
 		layout: {
@@ -274,8 +277,36 @@ function Navigation( {
 		} = {},
 		hasIcon,
 		icon = 'handle',
-		overlayTemplatePartId,
+		overlayTemplatePartId: savedOverlayTemplatePartId,
 	} = attributes;
+
+	// Check if we're inside an overlay template part
+	const isInOverlayTemplatePart = useSelect( ( select ) => {
+		const { getCurrentPostType, getCurrentPostId } = unlock(
+			select( editorStore )
+		);
+		const { getEditedEntityRecord } = select( coreStore );
+		const postType = getCurrentPostType();
+		const postId = getCurrentPostId();
+
+		if ( postType !== TEMPLATE_PART_POST_TYPE || ! postId ) {
+			return false;
+		}
+
+		const templatePart = getEditedEntityRecord(
+			'postType',
+			TEMPLATE_PART_POST_TYPE,
+			postId
+		);
+
+		return templatePart?.area === 'overlay';
+	}, [] );
+
+	// Ignore overlay attributes if we're inside an overlay template part
+	const overlayMenu = isInOverlayTemplatePart ? 'never' : savedOverlayMenu;
+	const overlayTemplatePartId = isInOverlayTemplatePart
+		? undefined
+		: savedOverlayTemplatePartId;
 
 	const ref = attributes.ref;
 
@@ -646,94 +677,102 @@ function Navigation( {
 
 	const stylingInspectorControls = (
 		<>
-			<InspectorControls>
-				<PanelBody title={ __( 'Overlay' ) } initialOpen={ true }>
-					<VStack spacing={ 4 }>
-						{ isResponsive && (
-							<>
-								<Button
-									__next40pxDefaultSize
-									className={ overlayMenuPreviewClasses }
-									onClick={ () => {
-										setOverlayMenuPreview(
-											! overlayMenuPreview
-										);
-									} }
-									aria-label={ __( 'Overlay menu controls' ) }
-									aria-controls={ overlayMenuPreviewId }
-									aria-expanded={ overlayMenuPreview }
-								>
-									{ hasIcon && (
-										<>
-											<OverlayMenuIcon icon={ icon } />
-											<Icon icon={ close } />
-										</>
-									) }
-									{ ! hasIcon && (
-										<>
-											<span>{ __( 'Menu' ) }</span>
-											<span>{ __( 'Close' ) }</span>
-										</>
-									) }
-								</Button>
-								{ overlayMenuPreview && (
-									<VStack
-										id={ overlayMenuPreviewId }
-										spacing={ 4 }
-										style={ {
-											gridColumn: 'span 2',
+			{ ! isInOverlayTemplatePart && (
+				<InspectorControls>
+					<PanelBody title={ __( 'Overlay' ) } initialOpen={ true }>
+						<VStack spacing={ 4 }>
+							{ isResponsive && (
+								<>
+									<Button
+										__next40pxDefaultSize
+										className={ overlayMenuPreviewClasses }
+										onClick={ () => {
+											setOverlayMenuPreview(
+												! overlayMenuPreview
+											);
 										} }
+										aria-label={ __(
+											'Overlay menu controls'
+										) }
+										aria-controls={ overlayMenuPreviewId }
+										aria-expanded={ overlayMenuPreview }
 									>
-										<OverlayMenuPreview
-											setAttributes={ setAttributes }
-											hasIcon={ hasIcon }
-											icon={ icon }
-											hidden={ ! overlayMenuPreview }
-										/>
-									</VStack>
-								) }
-							</>
-						) }
-
-						<ToggleGroupControl
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
-							label={ __( 'Overlay Visibility' ) }
-							aria-label={ __( 'Configure overlay visibility' ) }
-							value={ overlayMenu }
-							help={ __(
-								'Collapses the navigation options in a menu icon opening an overlay.'
+										{ hasIcon && (
+											<>
+												<OverlayMenuIcon
+													icon={ icon }
+												/>
+												<Icon icon={ close } />
+											</>
+										) }
+										{ ! hasIcon && (
+											<>
+												<span>{ __( 'Menu' ) }</span>
+												<span>{ __( 'Close' ) }</span>
+											</>
+										) }
+									</Button>
+									{ overlayMenuPreview && (
+										<VStack
+											id={ overlayMenuPreviewId }
+											spacing={ 4 }
+											style={ {
+												gridColumn: 'span 2',
+											} }
+										>
+											<OverlayMenuPreview
+												setAttributes={ setAttributes }
+												hasIcon={ hasIcon }
+												icon={ icon }
+												hidden={ ! overlayMenuPreview }
+											/>
+										</VStack>
+									) }
+								</>
 							) }
-							onChange={ ( value ) =>
-								setAttributes( { overlayMenu: value } )
-							}
-							isBlock
-						>
-							<ToggleGroupControlOption
-								value="never"
-								label={ __( 'Off' ) }
-							/>
-							<ToggleGroupControlOption
-								value="mobile"
-								label={ __( 'Mobile' ) }
-							/>
-							<ToggleGroupControlOption
-								value="always"
-								label={ __( 'Always' ) }
-							/>
-						</ToggleGroupControl>
 
-						<OverlaySelector
-							value={ overlayTemplatePartId }
-							onChange={ ( newValue ) => {
-								setAttributes( {
-									overlayTemplatePartId: newValue,
-								} );
-							} }
-						/>
-					</VStack>
-				</PanelBody>
-			</InspectorControls>
+							<ToggleGroupControl
+								__next40pxDefaultSize
+								__nextHasNoMarginBottom
+								label={ __( 'Overlay Visibility' ) }
+								aria-label={ __(
+									'Configure overlay visibility'
+								) }
+								value={ overlayMenu }
+								help={ __(
+									'Collapses the navigation options in a menu icon opening an overlay.'
+								) }
+								onChange={ ( value ) =>
+									setAttributes( { overlayMenu: value } )
+								}
+								isBlock
+							>
+								<ToggleGroupControlOption
+									value="never"
+									label={ __( 'Off' ) }
+								/>
+								<ToggleGroupControlOption
+									value="mobile"
+									label={ __( 'Mobile' ) }
+								/>
+								<ToggleGroupControlOption
+									value="always"
+									label={ __( 'Always' ) }
+								/>
+							</ToggleGroupControl>
+
+							<OverlaySelector
+								value={ overlayTemplatePartId }
+								onChange={ ( newValue ) => {
+									setAttributes( {
+										overlayTemplatePartId: newValue,
+									} );
+								} }
+							/>
+						</VStack>
+					</PanelBody>
+				</InspectorControls>
+			) }
 			<InspectorControls>
 				{ hasSubmenuIndicatorSetting && (
 					<ToolsPanel
