@@ -55,7 +55,7 @@ function ModalContent< Item >( {
 		[ field ]
 	);
 
-	const { validity } = useFormValidity(
+	const { validity, isValid } = useFormValidity(
 		modalData,
 		fields as Field< any >[],
 		form
@@ -109,6 +109,8 @@ function ModalContent< Item >( {
 				</Button>
 				<Button
 					variant="primary"
+					disabled={ ! isValid }
+					accessibleWhenDisabled
 					onClick={ onApply }
 					__next40pxDefaultSize
 				>

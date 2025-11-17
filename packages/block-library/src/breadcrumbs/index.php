@@ -107,17 +107,24 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 			$breadcrumb_items = array_merge( $breadcrumb_items, block_core_breadcrumbs_get_terms_breadcrumbs( $post_id, $post_type ) );
 		}
 
-		// Add parent post title if applicable.
-		if ( $parent_post ) {
+		// Add post title: linked when viewing a paginated page, plain text otherwise.
+		$is_paged = (int) get_query_var( 'page' ) > 1;
+		$title    = block_core_breadcrumbs_get_post_title( $post );
+
+		if ( $is_paged ) {
 			$breadcrumb_items[] = block_core_breadcrumbs_create_link(
-				get_permalink( $parent_post->ID ),
-				block_core_breadcrumbs_get_post_title( $parent_post ),
+				get_permalink( $post ),
+				$title,
+				true
+			);
+
+			$breadcrumb_items[] = block_core_breadcrumbs_create_page_number_item( 'page' );
+		} else {
+			$breadcrumb_items[] = block_core_breadcrumbs_create_current_item(
+				$title,
 				true
 			);
 		}
-
-		// Add current post title.
-		$breadcrumb_items[] = block_core_breadcrumbs_create_current_item( block_core_breadcrumbs_get_post_title( $post ), true );
 	}
 
 	// Remove last item if disabled.
@@ -169,11 +176,12 @@ function block_core_breadcrumbs_is_paged() {
  * Creates a "Page X" breadcrumb item for paginated views.
  *
  * @since 6.9.0
- *
+ * @param string $query_var Optional. Query variable to get current page number. Default 'paged'.
  * @return string The "Page X" breadcrumb HTML.
  */
-function block_core_breadcrumbs_create_page_number_item() {
-	$paged = (int) get_query_var( 'paged' );
+function block_core_breadcrumbs_create_page_number_item( $query_var = 'paged' ) {
+	$paged = (int) get_query_var( $query_var );
+
 	return block_core_breadcrumbs_create_current_item(
 		/* translators: %s: page number */
 		sprintf( __( 'Page %s' ), number_format_i18n( $paged ) )
@@ -259,7 +267,7 @@ function block_core_breadcrumbs_get_post_title( $post_id_or_object ) {
  *
  * @since 6.9.0
  *
- * @param int    $post_id   The post ID.
+ * @param int $post_id   The post ID.
  *
  * @return array Array of breadcrumb HTML items.
  */
