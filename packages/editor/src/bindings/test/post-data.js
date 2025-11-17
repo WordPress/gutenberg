@@ -11,8 +11,9 @@ import postDataBindings from '../post-data';
 describe( 'post-data bindings', () => {
 	describe( 'getValues', () => {
 		describe( 'for regular blocks using block context', () => {
-			it( 'should return entity field values when they exist', () => {
-				const select = ( store ) => {
+			let select;
+			beforeAll( () => {
+				select = ( store ) => {
 					if ( store === blockEditorStore ) {
 						return {
 							getBlockName: () => 'core/post-date',
@@ -20,14 +21,20 @@ describe( 'post-data bindings', () => {
 						};
 					}
 					return {
-						getEditedEntityRecord: () => ( {
-							date: '2024-03-02 00:00:00',
-							modified: '2025-06-07 00:00:00',
-							link: 'https://example.com/post',
-						} ),
+						getEditedEntityRecord: ( kind, name, recordId ) =>
+							name === 'post' && recordId === 123
+								? {
+										date: '2024-03-02 00:00:00',
+										modified: '2025-06-07 00:00:00',
+										link: 'https://example.com/post',
+										unknown: 'Unknown field value',
+								  }
+								: {},
 					};
 				};
+			} );
 
+			it( 'should return entity field values when they exist', () => {
 				const values = postDataBindings.getValues( {
 					select,
 					context: { postId: 123, postType: 'post' },
@@ -56,21 +63,9 @@ describe( 'post-data bindings', () => {
 			} );
 
 			it( 'should fall back to field labels when entity value does not exist', () => {
-				const select = ( store ) => {
-					if ( store === blockEditorStore ) {
-						return {
-							getBlockName: () => 'core/post-date',
-							getBlockAttributes: () => ( {} ),
-						};
-					}
-					return {
-						getEditedEntityRecord: () => ( {} ),
-					};
-				};
-
 				const values = postDataBindings.getValues( {
 					select,
-					context: { postId: 123, postType: 'post' },
+					context: { postId: 456, postType: 'post' },
 					bindings: {
 						datetime: {
 							source: 'core/post-date',
@@ -85,7 +80,7 @@ describe( 'post-data bindings', () => {
 							args: { field: 'link' },
 						},
 					},
-					clientId: 'client-1',
+					clientId: '123abc456',
 				} );
 
 				expect( values ).toStrictEqual( {
@@ -96,30 +91,16 @@ describe( 'post-data bindings', () => {
 			} );
 
 			it( 'should return empty object for unknown fields', () => {
-				const select = ( store ) => {
-					if ( store === blockEditorStore ) {
-						return {
-							getBlockName: () => 'core/post-date',
-							getBlockAttributes: () => ( {} ),
-						};
-					}
-					return {
-						getEditedEntityRecord: () => ( {
-							title: 'Post Title',
-						} ),
-					};
-				};
-
 				const values = postDataBindings.getValues( {
 					select,
 					context: { postId: 123, postType: 'post' },
 					bindings: {
 						content: {
 							source: 'core/post-date',
-							args: { field: 'title' },
+							args: { field: 'unknown' },
 						},
 					},
-					clientId: 'client-1',
+					clientId: '123abc456',
 				} );
 
 				expect( values.content ).toEqual( {} );
