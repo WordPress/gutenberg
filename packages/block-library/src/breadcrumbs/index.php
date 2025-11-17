@@ -268,7 +268,7 @@ function block_core_breadcrumbs_get_post_title( $post_id_or_object ) {
  * Returns the post type archive link item if the post type has archive enabled,
  * otherwise returns null.
  *
- * @since 6.9.0
+ * @since 7.0.0
  *
  * @param string $post_type The post type name.
  *
