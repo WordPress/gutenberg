@@ -217,7 +217,7 @@ describe( 'createInterpolateElement', () => {
 		expect( container ).toContainHTML( '<strong>string!</strong>' );
 		expect( container ).not.toContainHTML( '<em>' );
 	} );
-	it( 'handles parsing emojii correctly', () => {
+	it( 'handles parsing emoji correctly', () => {
 		const testString = '👳‍♀️<icon>🚨🤷‍♂️⛈️fully</icon> here';
 		const expectedElement = createElement(
 			Fragment,

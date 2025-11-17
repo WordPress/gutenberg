@@ -61,7 +61,7 @@ const InserterDraggableBlocks = ( {
 					const type = `wp-block:${ block.name }`;
 					// This will fill in the dataTransfer.types array so that
 					// the drop zone can check if the draggable is eligible.
-					// Unfortuantely, on drag start, we don't have access to the
+					// Unfortunately, on drag start, we don't have access to the
 					// actual data, only the data keys/types.
 					event.dataTransfer.items.add( '', type );
 				}

@@ -95,7 +95,7 @@ function createFlusher( compute: () => void, notify: () => void ): Flusher {
 /**
  * Custom hook that executes a callback function whenever a signal is triggered.
  * Version of `useSignalEffect` with a `useEffect`-like execution. This hook
- * implementation comes from this PR, but we added short-cirtuiting to avoid
+ * implementation comes from this PR, but we added short-circuiting to avoid
  * infinite loops: https://github.com/preactjs/signals/pull/290
  *
  * @param callback The callback function to be executed.
