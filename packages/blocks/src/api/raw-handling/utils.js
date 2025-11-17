@@ -34,14 +34,14 @@ export function getBlockContentSchemaFromTransforms( transforms, context ) {
 				if ( hasAnchorSupport ) {
 					attributes = [ ...attributes, 'id' ];
 				}
-				return [
-					key,
-					{
-						...value,
-						attributes,
-						isMatch: isMatch ? isMatch : undefined,
-					},
-				];
+				const result = {
+					...value,
+					attributes,
+				};
+				if ( isMatch ) {
+					result.isMatch = isMatch;
+				}
+				return [ key, result ];
 			} )
 		);
 	} );
@@ -53,10 +53,21 @@ export function getBlockContentSchemaFromTransforms( transforms, context ) {
 					return '*';
 				}
 
-				return { ...objValue, ...srcValue };
+				// Children is an object of tag schemas, so we need to merge them recursively
+				const merged = { ...objValue };
+				for ( const childKey in srcValue ) {
+					merged[ childKey ] = merged[ childKey ]
+						? mergeTagNameSchemas(
+								merged[ childKey ],
+								srcValue[ childKey ]
+						  )
+						: srcValue[ childKey ];
+				}
+				return merged;
 			}
 			case 'attributes':
-			case 'require': {
+			case 'require':
+			case 'classes': {
 				return [ ...( objValue || [] ), ...( srcValue || [] ) ];
 			}
 			case 'isMatch': {
@@ -78,9 +89,19 @@ export function getBlockContentSchemaFromTransforms( transforms, context ) {
 	// isMatch properties.
 	function mergeTagNameSchemas( a, b ) {
 		for ( const key in b ) {
-			a[ key ] = a[ key ]
-				? mergeTagNameSchemaProperties( a[ key ], b[ key ], key )
-				: { ...b[ key ] };
+			if ( a[ key ] ) {
+				a[ key ] = mergeTagNameSchemaProperties(
+					a[ key ],
+					b[ key ],
+					key
+				);
+			} else if ( Array.isArray( b[ key ] ) ) {
+				a[ key ] = [ ...b[ key ] ];
+			} else if ( typeof b[ key ] === 'object' && b[ key ] !== null ) {
+				a[ key ] = { ...b[ key ] };
+			} else {
+				a[ key ] = b[ key ];
+			}
 		}
 		return a;
 	}
