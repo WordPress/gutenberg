@@ -86,7 +86,7 @@
 			"enum": [ "all", "insert", "contentOnly", false ]
 		},
 		"overlayTemplatePartId": {
-			"type": "number"
+			"type": "string"
 		}
 	},
 	"providesContext": {
