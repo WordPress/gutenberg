@@ -9,6 +9,10 @@
 - Improve docs for Edit component. [#73202](https://github.com/WordPress/gutenberg/pull/73202)
 - Field API: introduce the `format` prop to format the `date` field type. [#72999](https://github.com/WordPress/gutenberg/pull/72999)
 
+### Bug fixes
+
+- Fix: ensure primary actions are not wrapped in the list layout. [#73333](https://github.com/WordPress/gutenberg/pull/73333)
+
 ## 10.3.0 (2025-11-12)
 
 ### Enhancements
