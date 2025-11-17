@@ -49,6 +49,7 @@ function UnforwardedUnitControl(
 		isResetValueOnUnitChange = false,
 		isUnitSelectTabbable = true,
 		label,
+		maxUnitWidth = 48,
 		onChange: onChangeProp,
 		onUnitChange,
 		size = 'default',
@@ -205,6 +206,7 @@ function UnforwardedUnitControl(
 			}
 			unit={ unit }
 			units={ units }
+			maxUnitWidth={ maxUnitWidth }
 			onFocus={ onFocusProp }
 			onBlur={ unitControlProps.onBlur }
 		/>

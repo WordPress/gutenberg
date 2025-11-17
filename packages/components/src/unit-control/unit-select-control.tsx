@@ -21,6 +21,7 @@ function UnitSelectControl(
 	{
 		className,
 		isUnitSelectTabbable: isTabbable = true,
+		maxUnitWidth = 48,
 		onChange,
 		size = 'default',
 		unit = 'px',
@@ -33,6 +34,7 @@ function UnitSelectControl(
 		return (
 			<UnitLabel
 				className="components-unit-control__unit-label"
+				maxUnitWidth={ maxUnitWidth }
 				selectSize={ size }
 			>
 				{ unit }
@@ -53,6 +55,7 @@ function UnitSelectControl(
 		<UnitSelect
 			ref={ ref }
 			className={ classes }
+			maxUnitWidth={ maxUnitWidth }
 			onChange={ handleOnChange }
 			selectSize={ size }
 			tabIndex={ isTabbable ? undefined : -1 }

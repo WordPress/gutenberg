@@ -16,6 +16,7 @@ import { space } from '../../utils/space';
 // `size` HTML attribute of the `select` element.
 type SelectProps = {
 	selectSize: SelectSize;
+	maxUnitWidth?: number;
 };
 
 // TODO: Resolve need to use &&& to increase specificity
@@ -34,7 +35,7 @@ export const ValueInput = styled( NumberControl )`
 	}
 `;
 
-const baseUnitLabelStyles = ( { selectSize }: SelectProps ) => {
+const baseUnitLabelStyles = ( { selectSize, maxUnitWidth }: SelectProps ) => {
 	const sizes = {
 		small: css`
 			box-sizing: border-box;
@@ -53,7 +54,9 @@ const baseUnitLabelStyles = ( { selectSize }: SelectProps ) => {
 		default: css`
 			box-sizing: border-box;
 			min-width: 24px;
-			max-width: 48px;
+			${ maxUnitWidth
+				? `max-width: ${ maxUnitWidth.toString() }px;`
+				: `max-width: 48px;` }
 			height: 24px;
 			margin-inline-end: ${ space( 2 ) };
 			padding: ${ space( 1 ) };
