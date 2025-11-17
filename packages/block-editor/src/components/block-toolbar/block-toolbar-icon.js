@@ -13,17 +13,13 @@ import { store as preferencesStore } from '@wordpress/preferences';
  */
 import BlockSwitcher from '../block-switcher';
 import BlockIcon from '../block-icon';
-import PatternOverridesDropdown from './pattern-overrides-dropdown';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import { store as blockEditorStore } from '../../store';
-import { hasPatternOverridesDefaultBinding } from '../../utils/block-bindings';
 import { unlock } from '../../lock-unlock';
 
 function getBlockIconVariant( { select, clientIds } ) {
 	const {
 		getBlockName,
-		getBlockAttributes,
-		getBlockParentsByBlockName,
 		isSectionBlock,
 		canRemoveBlocks,
 		getTemplateLock,
@@ -43,35 +39,21 @@ function getBlockIconVariant( { select, clientIds } ) {
 	const isSectionInSelection = clientIds.some( ( id ) =>
 		isSectionBlock( id )
 	);
-	const hasPatternOverrides = clientIds.every( ( clientId ) =>
-		hasPatternOverridesDefaultBinding(
-			getBlockAttributes( clientId )?.metadata?.bindings
-		)
-	);
-	const hasParentPattern = clientIds.every(
-		( clientId ) =>
-			getBlockParentsByBlockName( clientId, 'core/block', true ).length >
-			0
-	);
 	const canRemove = canRemoveBlocks( clientIds );
 
 	const isDefaultEditingMode =
 		getBlockEditingMode( clientIds[ 0 ] ) === 'default';
-	const _hideTransformsForSections =
+	const hideTransformsForSections =
 		window?.__experimentalContentOnlyPatternInsertion &&
 		isSectionInSelection;
-	const _showBlockSwitcher =
-		! _hideTransformsForSections &&
+	const showBlockSwitcher =
+		! hideTransformsForSections &&
 		isDefaultEditingMode &&
 		( hasBlockStyles || canRemove ) &&
 		! hasTemplateLock;
 
-	const _showPatternOverrides = hasPatternOverrides && hasParentPattern;
-
-	if ( _showBlockSwitcher ) {
+	if ( showBlockSwitcher ) {
 		return 'switcher';
-	} else if ( _showPatternOverrides ) {
-		return 'pattern-overrides';
 	}
 
 	return 'default';
@@ -83,13 +65,13 @@ function getBlockIcon( { select, clientIds } ) {
 	);
 	const { getActiveBlockVariation } = select( blocksStore );
 
-	const _isSingleBlock = clientIds.length === 1;
+	const isSingleBlock = clientIds.length === 1;
 	const firstClientId = clientIds[ 0 ];
 
 	const blockName = getBlockName( firstClientId );
 	const blockType = getBlockType( blockName );
 
-	if ( _isSingleBlock ) {
+	if ( isSingleBlock ) {
 		const match = getActiveBlockVariation(
 			blockName,
 			getBlockAttributes( firstClientId )
@@ -147,17 +129,6 @@ export default function BlockToolbarIcon( { clientIds, isSynced } ) {
 			>
 				{ BlockIconElement }
 			</BlockSwitcher>
-		);
-	}
-
-	if ( variant === 'pattern-overrides' ) {
-		return (
-			<PatternOverridesDropdown
-				icon={ BlockIconElement }
-				clientIds={ clientIds }
-				blockTitle={ blockTitle }
-				label={ label }
-			/>
 		);
 	}
 
