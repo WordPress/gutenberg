@@ -189,7 +189,8 @@ jobs:
                 wordpress: ['', 'previous major version']
                 exclude:
                     # On PRs: Only test PHP 8.3, single-site, latest WP
-                    # TEMP: PHP 7.2 enabled for testing the Composer fix - do not merge
+                    - event: 'pull_request'
+                      php: '7.2'
                     - event: 'pull_request'
                       php: '7.3'
                     - event: 'pull_request'
