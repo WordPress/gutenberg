@@ -224,11 +224,6 @@
 	font-weight: $font-weight-medium;
 	color: $gray-900;
 	margin: 0 0 $grid-unit-10 0;
-	padding: 0 $grid-unit-60;
+	padding: 0 $grid-unit-30;
 	container-type: inline-size;
-
-	@container (max-width: 430px) {
-		padding-left: $grid-unit-30;
-		padding-right: $grid-unit-30;
-	}
 }
