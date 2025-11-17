@@ -117,6 +117,7 @@ function VisualEditor( {
 		isPreview,
 		styles,
 		canvasMinHeight,
+		isOverlayTemplatePart,
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostId,
@@ -150,6 +151,20 @@ function VisualEditor( {
 			  )
 			: undefined;
 
+		// Check if we're editing an overlay template part
+		let _isOverlayTemplatePart = false;
+		if ( postTypeSlug === TEMPLATE_PART_POST_TYPE ) {
+			const currentPostId = getCurrentPostId();
+			const templatePart = currentPostId
+				? getEditedEntityRecord(
+						'postType',
+						TEMPLATE_PART_POST_TYPE,
+						currentPostId
+				  )
+				: null;
+			_isOverlayTemplatePart = templatePart?.area === 'overlay';
+		}
+
 		return {
 			renderingMode: _renderingMode,
 			postContentAttributes: editorSettings.postContentAttributes,
@@ -168,6 +183,7 @@ function VisualEditor( {
 			isPreview: editorSettings.isPreviewMode,
 			styles: editorSettings.styles,
 			canvasMinHeight: getCanvasMinHeight(),
+			isOverlayTemplatePart: _isOverlayTemplatePart,
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
@@ -357,6 +373,11 @@ function VisualEditor( {
 	);
 
 	const iframeStyles = useMemo( () => {
+		// Full-height styles for overlay template parts
+		const overlayFullHeightCSS = isOverlayTemplatePart
+			? `.block-editor-iframe__html{height:100vh;overflow:hidden;}.block-editor-iframe__body{height:100vh;min-height:100vh;display:flex;flex-direction:column;}.is-root-container{min-height:100vh;height:100%;flex:1;display:flex;flex-direction:column;}`
+			: '';
+
 		return [
 			...( styles ?? [] ),
 			{
@@ -377,12 +398,19 @@ function VisualEditor( {
 					enableResizing
 						? `.block-editor-iframe__html{background:var(--wp-editor-canvas-background);display:flex;align-items:center;justify-content:center;min-height:100vh;}.block-editor-iframe__body{width:100%;}`
 						: ''
-				}`,
+				}
+				${ overlayFullHeightCSS }`,
 				// The CSS above centers the body content vertically when resizing is enabled and applies a background
 				// color to the iframe HTML element to match the background color of the editor canvas.
 			},
 		];
-	}, [ styles, enableResizing, calculatedMinHeight, paddingStyle ] );
+	}, [
+		styles,
+		enableResizing,
+		calculatedMinHeight,
+		paddingStyle,
+		isOverlayTemplatePart,
+	] );
 
 	const typewriterRef = useTypewriter();
 	contentRef = useMergeRefs( [
@@ -411,6 +439,7 @@ function VisualEditor( {
 					'has-padding': isFocusedEntity || enableResizing,
 					'is-resizable': enableResizing,
 					'is-iframed': ! disableIframe,
+					'is-overlay-template-part': isOverlayTemplatePart,
 				}
 			) }
 		>

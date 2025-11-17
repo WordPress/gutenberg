@@ -77,6 +77,7 @@ import MenuInspectorControls from './menu-inspector-controls';
 import DeletedNavigationWarning from './deleted-navigation-warning';
 import AccessibleDescription from './accessible-description';
 import AccessibleMenuDescription from './accessible-menu-description';
+import OverlaySelector from './overlay-selector';
 import { unlock } from '../../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { DEFAULT_BLOCK } from '../constants';
@@ -272,6 +273,7 @@ function Navigation( {
 		} = {},
 		hasIcon,
 		icon = 'handle',
+		overlayTemplatePartId,
 	} = attributes;
 
 	const ref = attributes.ref;
@@ -739,6 +741,26 @@ function Navigation( {
 									label={ __( 'Always' ) }
 								/>
 							</ToggleGroupControl>
+						</ToolsPanelItem>
+
+						<ToolsPanelItem
+							hasValue={ () => !! overlayTemplatePartId }
+							label={ __( 'Overlay Template Part' ) }
+							onDeselect={ () =>
+								setAttributes( {
+									overlayTemplatePartId: undefined,
+								} )
+							}
+							isShownByDefault
+						>
+							<OverlaySelector
+								value={ overlayTemplatePartId }
+								onChange={ ( newValue ) => {
+									setAttributes( {
+										overlayTemplatePartId: newValue,
+									} );
+								} }
+							/>
 						</ToolsPanelItem>
 
 						{ hasSubmenus && (

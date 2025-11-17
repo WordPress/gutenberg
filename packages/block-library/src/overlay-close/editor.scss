@@ -1,0 +1,17 @@
+.wp-block-overlay-close {
+	.wp-block-overlay-close__button {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0.5rem;
+		background: transparent;
+		border: none;
+		cursor: pointer;
+		color: currentColor;
+
+		&:hover {
+			opacity: 0.8;
+		}
+	}
+}
+
