@@ -602,8 +602,9 @@ describe( 'term-data bindings', () => {
 	} );
 
 	describe( 'getFieldsList', () => {
-		it( 'should return the list of available term data fields when term data exists', () => {
-			const select = ( store ) => {
+		let select;
+		beforeAll( () => {
+			select = ( store ) => {
 				if ( store === blockEditorStore ) {
 					return {
 						getSelectedBlockClientId: () => '123abc456',
@@ -634,7 +635,9 @@ describe( 'term-data bindings', () => {
 					};
 				}
 			};
+		} );
 
+		it( 'should return the list of available term data fields when term data exists', () => {
 			const fields = termDataBindings.getFieldsList( {
 				select,
 				context: { taxonomy: 'category', termId: 123 },
@@ -680,21 +683,6 @@ describe( 'term-data bindings', () => {
 		} );
 
 		it( 'should return empty array when no term data is available', () => {
-			const select = ( store ) => {
-				if ( store === blockEditorStore ) {
-					return {
-						getSelectedBlockClientId: () => '123abc456',
-						getBlockName: () => 'core/paragraph',
-						getBlockAttributes: () => ( {} ),
-					};
-				}
-				if ( store === coreDataStore ) {
-					return {
-						getEntityRecord: () => null,
-					};
-				}
-			};
-
 			const fields = termDataBindings.getFieldsList( {
 				select,
 				context: {},
@@ -704,21 +692,6 @@ describe( 'term-data bindings', () => {
 		} );
 
 		it( 'should return fields when using termData from context', () => {
-			const select = ( store ) => {
-				if ( store === blockEditorStore ) {
-					return {
-						getSelectedBlockClientId: () => '123abc456',
-						getBlockName: () => 'core/paragraph',
-						getBlockAttributes: () => ( {} ),
-					};
-				}
-				if ( store === coreDataStore ) {
-					return {
-						getEntityRecord: () => null,
-					};
-				}
-			};
-
 			const fields = termDataBindings.getFieldsList( {
 				select,
 				context: {
