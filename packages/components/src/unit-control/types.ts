@@ -66,6 +66,13 @@ export type UnitSelectControlProps = {
 	 * @default CSS_UNITS
 	 */
 	units?: WPUnitControlUnit[];
+	/**
+	 * Maximum width for the unit select control. If not specified, will use
+	 * default width of 48px.
+	 *
+	 * @default 48
+	 */
+	maxUnitWidth?: number;
 };
 
 export type UnitControlProps = Pick< InputControlProps, 'size' > &

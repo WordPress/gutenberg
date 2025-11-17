@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `UnitControl`: Add maxUnitWidth Prop to customize max width for suffix (units). ([#73336](https://github.com/WordPress/gutenberg/pull/73336)).
+
 ## 30.8.0 (2025-11-12)
 
 ### Bug Fixes
