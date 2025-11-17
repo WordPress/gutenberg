@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+- Documentation: surface better the `type` property in the documentation. [#73349](https://github.com/WordPress/gutenberg/pull/73349)
 - DataViews: Make sticky elements (table headers, footer, actions column) inherit background colors from parent container. This allows DataViews instances to seamlessly adapt to containers with custom background colors. [#73240](https://github.com/WordPress/gutenberg/pull/73240)
 - DataViews table layout: only apply hover styles when bulk actions are available. [#73248](https://github.com/WordPress/gutenberg/pull/73248)
 - Improve docs for Edit component. [#73202](https://github.com/WordPress/gutenberg/pull/73202)
