@@ -50,6 +50,7 @@ Alternatively, you can opt-in to only the more granular rulesets offered by the 
 -   `i18n` – rules for internationalization.
 -   `jsdoc` – rules for JSDoc comments.
 -   `jsx-a11y` – rules for accessibility in JSX.
+-   `package-json-lint` – rules for linting package.json via [@wordpress/npm-package-json-lint-config](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-npm-package-json-lint-config/)
 -   `react` – rules for React components.
 -   `test-e2e` – rules for end-to-end tests written in Puppeteer.
 -   `test-unit`– rules for unit tests written in Jest.
