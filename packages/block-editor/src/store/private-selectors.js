@@ -526,9 +526,8 @@ export function isSectionBlock( state, clientId ) {
 	}
 
 	const attributes = getBlockAttributes( state, clientId );
-	const isTemplatePart = blockName === 'core/template-part';
 	if (
-		( attributes?.metadata?.patternName || isTemplatePart ) &&
+		attributes?.metadata?.patternName &&
 		!! window?.__experimentalContentOnlyPatternInsertion
 	) {
 		return true;
