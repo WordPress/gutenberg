@@ -43,6 +43,7 @@ import {
 	Notice,
 	ToolbarButton,
 	ToolbarGroup,
+	PanelBody,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
@@ -646,20 +647,8 @@ function Navigation( {
 	const stylingInspectorControls = (
 		<>
 			<InspectorControls>
-				{ hasSubmenuIndicatorSetting && (
-					<ToolsPanel
-						label={ __( 'Display' ) }
-						resetAll={ () => {
-							setAttributes( {
-								showSubmenuIcon: true,
-								openSubmenusOnClick: false,
-								overlayMenu: 'mobile',
-								hasIcon: true,
-								icon: 'handle',
-							} );
-						} }
-						dropdownMenuProps={ dropdownMenuProps }
-					>
+				<PanelBody title={ __( 'Overlay' ) } initialOpen={ true }>
+					<VStack spacing={ 4 }>
 						{ isResponsive && (
 							<>
 								<Button
@@ -706,63 +695,59 @@ function Navigation( {
 							</>
 						) }
 
-						<ToolsPanelItem
-							hasValue={ () => overlayMenu !== 'mobile' }
+						<ToggleGroupControl
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
 							label={ __( 'Overlay Menu' ) }
-							onDeselect={ () =>
-								setAttributes( { overlayMenu: 'mobile' } )
+							aria-label={ __( 'Configure overlay menu' ) }
+							value={ overlayMenu }
+							help={ __(
+								'Collapses the navigation options in a menu icon opening an overlay.'
+							) }
+							onChange={ ( value ) =>
+								setAttributes( { overlayMenu: value } )
 							}
-							isShownByDefault
+							isBlock
 						>
-							<ToggleGroupControl
-								__next40pxDefaultSize
-								__nextHasNoMarginBottom
-								label={ __( 'Overlay Menu' ) }
-								aria-label={ __( 'Configure overlay menu' ) }
-								value={ overlayMenu }
-								help={ __(
-									'Collapses the navigation options in a menu icon opening an overlay.'
-								) }
-								onChange={ ( value ) =>
-									setAttributes( { overlayMenu: value } )
-								}
-								isBlock
-							>
-								<ToggleGroupControlOption
-									value="never"
-									label={ __( 'Off' ) }
-								/>
-								<ToggleGroupControlOption
-									value="mobile"
-									label={ __( 'Mobile' ) }
-								/>
-								<ToggleGroupControlOption
-									value="always"
-									label={ __( 'Always' ) }
-								/>
-							</ToggleGroupControl>
-						</ToolsPanelItem>
-
-						<ToolsPanelItem
-							hasValue={ () => !! overlayTemplatePartId }
-							label={ __( 'Overlay Template Part' ) }
-							onDeselect={ () =>
-								setAttributes( {
-									overlayTemplatePartId: undefined,
-								} )
-							}
-							isShownByDefault
-						>
-							<OverlaySelector
-								value={ overlayTemplatePartId }
-								onChange={ ( newValue ) => {
-									setAttributes( {
-										overlayTemplatePartId: newValue,
-									} );
-								} }
+							<ToggleGroupControlOption
+								value="never"
+								label={ __( 'Off' ) }
 							/>
-						</ToolsPanelItem>
+							<ToggleGroupControlOption
+								value="mobile"
+								label={ __( 'Mobile' ) }
+							/>
+							<ToggleGroupControlOption
+								value="always"
+								label={ __( 'Always' ) }
+							/>
+						</ToggleGroupControl>
 
+						<OverlaySelector
+							value={ overlayTemplatePartId }
+							onChange={ ( newValue ) => {
+								setAttributes( {
+									overlayTemplatePartId: newValue,
+								} );
+							} }
+						/>
+					</VStack>
+				</PanelBody>
+			</InspectorControls>
+			<InspectorControls>
+				{ hasSubmenuIndicatorSetting && (
+					<ToolsPanel
+						label={ __( 'Display' ) }
+						resetAll={ () => {
+							setAttributes( {
+								showSubmenuIcon: true,
+								openSubmenusOnClick: false,
+								hasIcon: true,
+								icon: 'handle',
+							} );
+						} }
+						dropdownMenuProps={ dropdownMenuProps }
+					>
 						{ hasSubmenus && (
 							<>
 								<h3 className="wp-block-navigation__submenu-header">

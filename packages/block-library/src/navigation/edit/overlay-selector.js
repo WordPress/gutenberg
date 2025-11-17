@@ -46,16 +46,19 @@ export default function OverlaySelector( { value, onChange } ) {
 	};
 
 	return (
-		<VStack spacing={ 4 }>
+		<VStack spacing={ 1 }>
 			<SelectControl
 				__nextHasNoMarginBottom
 				__next40pxDefaultSize
-				label={ __( 'Overlay Template Part' ) }
+				label={ __( 'Overlay Template' ) }
 				value={ value || '' }
 				options={ options }
 				onChange={ ( newValue ) => {
 					onChange( newValue === '' ? undefined : newValue );
 				} }
+				help={ __(
+					'Select a template part to use as the custom overlay or create a new one.'
+				) }
 			/>
 			<Button
 				__next40pxDefaultSize
