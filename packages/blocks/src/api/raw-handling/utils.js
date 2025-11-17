@@ -53,12 +53,15 @@ export function getBlockContentSchemaFromTransforms( transforms, context ) {
 					return '*';
 				}
 
-				return { ...objValue, ...srcValue };
+				return mergeSchemas( { ...objValue }, srcValue );
 			}
+
 			case 'attributes':
+			case 'classes':
 			case 'require': {
 				return [ ...( objValue || [] ), ...( srcValue || [] ) ];
 			}
+
 			case 'isMatch': {
 				// If one of the values being merge is undefined (matches everything),
 				// the result of the merge will be undefined.
@@ -78,9 +81,19 @@ export function getBlockContentSchemaFromTransforms( transforms, context ) {
 	// isMatch properties.
 	function mergeTagNameSchemas( a, b ) {
 		for ( const key in b ) {
-			a[ key ] = a[ key ]
-				? mergeTagNameSchemaProperties( a[ key ], b[ key ], key )
-				: { ...b[ key ] };
+			const bValue = b[ key ];
+
+			if ( a[ key ] ) {
+				a[ key ] = mergeTagNameSchemaProperties(
+					a[ key ],
+					bValue,
+					key
+				);
+			} else {
+				a[ key ] = Array.isArray( bValue )
+					? [ ...bValue ]
+					: { ...bValue };
+			}
 		}
 		return a;
 	}
