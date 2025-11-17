@@ -733,25 +733,18 @@ const CommentBoard = ( {
 		actionButtonRef.current?.focus();
 	};
 
-	// Check if this is a resolution comment by checking metadata.
-	const hasUserContent =
-		thread?.content?.raw && String( thread.content.raw ).trim() !== '';
-	const isReopenComment =
-		thread.type === 'note' &&
-		thread.meta &&
-		thread.meta._wp_note_status === 'reopen';
-	const isResolvedComment =
-		thread.type === 'note' &&
-		thread.meta &&
-		thread.meta._wp_note_status === 'resolved';
-	const isResolutionComment =
-		isResolvedComment || ( isReopenComment && ! hasUserContent );
+	const isParentComment = thread.parent === 0;
+	const hasResolved =
+		thread.status === 'approved' || parent?.status === 'approved';
+	const isReopenComment = thread.meta?._wp_note_status === 'reopen';
+	const isResolvedComment = thread.meta?._wp_note_status === 'resolved';
+	const isResolutionComment = isReopenComment || isResolvedComment;
 
 	const actions = [
 		{
 			id: 'edit',
 			title: __( 'Edit' ),
-			isEligible: ( { status } ) => status !== 'approved',
+			isEligible: () => ! isResolvedComment && ! hasResolved,
 			onClick: () => {
 				setActionState( 'edit' );
 			},
@@ -759,7 +752,7 @@ const CommentBoard = ( {
 		{
 			id: 'reopen',
 			title: _x( 'Reopen', 'Reopen note' ),
-			isEligible: ( { status } ) => status === 'approved',
+			isEligible: () => isParentComment && hasResolved,
 			onClick: () => {
 				onEdit( { id: thread.id, status: 'hold' } );
 			},
@@ -767,7 +760,8 @@ const CommentBoard = ( {
 		{
 			id: 'delete',
 			title: __( 'Delete' ),
-			isEligible: () => ! isReopenComment,
+			isEligible: () =>
+				isParentComment || ( ! isResolutionComment && ! hasResolved ),
 			onClick: () => {
 				setActionState( 'delete' );
 				setShowConfirmDialog( true );
@@ -776,12 +770,7 @@ const CommentBoard = ( {
 	];
 
 	const canResolve = thread.parent === 0;
-
-	let moreActions = [];
-
-	if ( ! isResolutionComment && parent?.status !== 'approved' ) {
-		moreActions = actions.filter( ( item ) => item.isEligible( thread ) );
-	}
+	const moreActions = actions.filter( ( item ) => item.isEligible() );
 
 	return (
 		<VStack
@@ -881,11 +870,11 @@ const CommentBoard = ( {
 						'editor-collab-sidebar-panel__user-comment',
 						{
 							'editor-collab-sidebar-panel__resolution-text':
-								isResolvedComment || isReopenComment,
+								isResolutionComment,
 						}
 					) }
 				>
-					{ isResolvedComment || isReopenComment
+					{ isResolutionComment
 						? ( () => {
 								const actionText =
 									thread.meta._wp_note_status === 'resolved'
