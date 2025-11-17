@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import deepMerge from 'deepmerge';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -41,7 +46,9 @@ function ModalContent< Item >( {
 	const { fields } = useContext( DataFormContext );
 	const [ changes, setChanges ] = useState< Partial< Item > >( {} );
 	const modalData = useMemo( () => {
-		return { ...data, ...changes };
+		return deepMerge( data, changes, {
+			arrayMerge: ( target, source ) => source,
+		} );
 	}, [ data, changes ] );
 
 	const form: NormalizedForm = useMemo(
@@ -67,7 +74,11 @@ function ModalContent< Item >( {
 	};
 
 	const handleOnChange = ( newValue: Partial< Item > ) => {
-		setChanges( ( prev ) => ( { ...prev, ...newValue } ) );
+		setChanges( ( prev ) =>
+			deepMerge( prev, newValue, {
+				arrayMerge: ( target, source ) => source,
+			} )
+		);
 	};
 
 	return (
