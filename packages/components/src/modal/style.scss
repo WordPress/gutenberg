@@ -111,6 +111,10 @@
 		// When full screen, set explicit heights so contents can be scrollable.
 		.components-modal__content {
 			height: calc(100% - #{$header-height + $grid-unit-10}); // Subtract header height
+
+			&.hide-header {
+				height: 100%;
+			}
 		}
 		.components-modal__children-container {
 			height: 100%;
