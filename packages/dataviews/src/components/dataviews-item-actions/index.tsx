@@ -29,7 +29,7 @@ const { Menu, kebabCase } = unlock( componentsPrivateApis );
 export interface ActionTriggerProps< Item > {
 	action: Action< Item >;
 	onClick: MouseEventHandler;
-	isBusy?: boolean;
+	isBusy: boolean;
 	items: Item[];
 }
 
@@ -44,6 +44,8 @@ interface ActionsMenuGroupProps< Item > {
 	item: Item;
 	registry: ReturnType< typeof useRegistry >;
 	setActiveModalAction: ( action: ActionModalType< Item > | null ) => void;
+	actionInProgress: string | null;
+	setActionInProgress: ( actionId: string | null ) => void;
 }
 
 interface ItemActionsProps< Item > {
@@ -57,25 +59,31 @@ interface CompactItemActionsProps< Item > {
 	actions: Action< Item >[];
 	isSmall?: boolean;
 	registry: ReturnType< typeof useRegistry >;
+	actionInProgress: string | null;
+	setActionInProgress: ( actionId: string | null ) => void;
 }
 
 interface PrimaryActionsProps< Item > {
 	item: Item;
 	actions: Action< Item >[];
 	registry: ReturnType< typeof useRegistry >;
+	actionInProgress: string | null;
+	setActionInProgress: ( actionId: string | null ) => void;
 }
 
 function ButtonTrigger< Item >( {
 	action,
 	onClick,
 	items,
+	isBusy,
 }: ActionTriggerProps< Item > ) {
 	const label =
 		typeof action.label === 'string' ? action.label : action.label( items );
 	return (
 		<Button
-			disabled={ !! action.disabled }
 			accessibleWhenDisabled
+			disabled={ !! action.disabled || isBusy }
+			isBusy={ isBusy }
 			size="compact"
 			onClick={ onClick }
 		>
@@ -88,11 +96,12 @@ function MenuItemTrigger< Item >( {
 	action,
 	onClick,
 	items,
+	isBusy,
 }: ActionTriggerProps< Item > ) {
 	const label =
 		typeof action.label === 'string' ? action.label : action.label( items );
 	return (
-		<Menu.Item disabled={ action.disabled } onClick={ onClick }>
+		<Menu.Item disabled={ action.disabled || isBusy } onClick={ onClick }>
 			<Menu.ItemLabel>{ label }</Menu.ItemLabel>
 		</Menu.Item>
 	);
@@ -131,6 +140,8 @@ export function ActionsMenuGroup< Item >( {
 	item,
 	registry,
 	setActiveModalAction,
+	actionInProgress,
+	setActionInProgress,
 }: ActionsMenuGroupProps< Item > ) {
 	const { primaryActions, regularActions } = useMemo( () => {
 		return actions.reduce(
@@ -181,6 +192,9 @@ export default function ItemActions< Item >( {
 	isCompact,
 }: ItemActionsProps< Item > ) {
 	const registry = useRegistry();
+	const [ actionInProgress, setActionInProgress ] = useState< string | null >(
+		null
+	);
 	const { primaryActions, eligibleActions } = useMemo( () => {
 		// If an action is eligible for all items, doesn't need
 		// to provide the `isEligible` function.
@@ -203,6 +217,8 @@ export default function ItemActions< Item >( {
 				actions={ eligibleActions }
 				isSmall
 				registry={ registry }
+				actionInProgress={ actionInProgress }
+				setActionInProgress={ setActionInProgress }
 			/>
 		);
 	}
@@ -221,12 +237,16 @@ export default function ItemActions< Item >( {
 				item={ item }
 				actions={ primaryActions }
 				registry={ registry }
+				actionInProgress={ actionInProgress }
+				setActionInProgress={ setActionInProgress }
 			/>
 			{ primaryActions.length < eligibleActions.length && (
 				<CompactItemActions
 					item={ item }
 					actions={ eligibleActions }
 					registry={ registry }
+					actionInProgress={ actionInProgress }
+					setActionInProgress={ setActionInProgress }
 				/>
 			) }
 		</HStack>
@@ -238,6 +258,8 @@ function CompactItemActions< Item >( {
 	actions,
 	isSmall,
 	registry,
+	actionInProgress,
+	setActionInProgress,
 }: CompactItemActionsProps< Item > ) {
 	const [ activeModalAction, setActiveModalAction ] = useState(
 		null as ActionModalType< Item > | null
@@ -263,6 +285,8 @@ function CompactItemActions< Item >( {
 						item={ item }
 						registry={ registry }
 						setActiveModalAction={ setActiveModalAction }
+						actionInProgress={ actionInProgress }
+						setActionInProgress={ setActionInProgress }
 					/>
 				</Menu.Popover>
 			</Menu>
@@ -281,6 +305,8 @@ function PrimaryActions< Item >( {
 	item,
 	actions,
 	registry,
+	actionInProgress,
+	setActionInProgress,
 }: PrimaryActionsProps< Item > ) {
 	const [ activeModalAction, setActiveModalAction ] = useState( null as any );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
@@ -298,13 +324,16 @@ function PrimaryActions< Item >( {
 				<ButtonTrigger
 					key={ action.id }
 					action={ action }
-					onClick={ () => {
+					onClick={ async () => {
 						if ( 'RenderModal' in action ) {
 							setActiveModalAction( action );
 							return;
 						}
-						action.callback( [ item ], { registry } );
+						setActionInProgress( action.id );
+						await action.callback( [ item ], { registry } );
+						setActionInProgress( null );
 					} }
+					isBusy={ actionInProgress === action.id }
 					items={ [ item ] }
 				/>
 			) ) }

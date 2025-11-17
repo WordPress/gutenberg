@@ -171,6 +171,9 @@ function ListItem< Item >( {
 	const [ activeModalAction, setActiveModalAction ] = useState(
 		null as ActionModalType< Item > | null
 	);
+	const [ actionInProgress, setActionInProgress ] = useState< string | null >(
+		null
+	);
 	const handleHover: React.MouseEventHandler = ( { type } ) => {
 		const isHover = type === 'mouseenter';
 		setIsHovered( isHover );
@@ -259,6 +262,8 @@ function ListItem< Item >( {
 								item={ item }
 								registry={ registry }
 								setActiveModalAction={ setActiveModalAction }
+								actionInProgress={ actionInProgress }
+								setActionInProgress={ setActionInProgress }
 							/>
 						</Menu.Popover>
 					</Menu>

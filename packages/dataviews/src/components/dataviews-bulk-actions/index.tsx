@@ -46,6 +46,7 @@ function ActionWithModal< Item >( {
 			setIsModalOpen( true );
 		},
 		items,
+		isBusy: false,
 	};
 	return (
 		<>
