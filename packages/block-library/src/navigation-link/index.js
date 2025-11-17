@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { _x } from '@wordpress/i18n';
+import { _x, __ } from '@wordpress/i18n';
 import { customLink as linkIcon } from '@wordpress/icons';
 import { InnerBlocks } from '@wordpress/block-editor';
 import { addFilter } from '@wordpress/hooks';
@@ -88,6 +88,29 @@ export const settings = {
 	],
 	transforms,
 };
+
+if ( window.__experimentalContentOnlyPatternInsertion ) {
+	settings.fields = [
+		{
+			label: __( 'Label' ),
+			type: 'RichText',
+			shownByDefault: true,
+			mapping: {
+				value: 'label',
+			},
+		},
+		{
+			label: __( 'Link' ),
+			type: 'Link',
+			shownByDefault: false,
+			mapping: {
+				href: 'url',
+				rel: 'rel',
+				// TODO - opens in new tab? id?
+			},
+		},
+	];
+}
 
 export const init = () => {
 	addFilter(

@@ -312,7 +312,8 @@ export function autop( text: string, br: boolean = true ): string {
 	// Replace placeholder <pre> tags with their original content.
 	preTags.forEach( ( preTag ) => {
 		const [ name, original ] = preTag;
-		text = text.replace( name, original );
+		// Use a function to avoid treating special replacement patterns like $' in the original content
+		text = text.replace( name, () => original );
 	} );
 
 	// Restore newlines in all elements.

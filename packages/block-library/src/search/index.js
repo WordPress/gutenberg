@@ -26,4 +26,33 @@ export const settings = {
 	edit,
 };
 
+if ( window.__experimentalContentOnlyPatternInsertion ) {
+	settings.fields = [
+		{
+			label: __( 'Label' ),
+			type: 'RichText',
+			shownByDefault: true,
+			mapping: {
+				value: 'label',
+			},
+		},
+		{
+			label: __( 'Button text' ),
+			type: 'RichText',
+			shownByDefault: false,
+			mapping: {
+				value: 'buttonText',
+			},
+		},
+		{
+			label: __( 'Placeholder' ),
+			type: 'RichText',
+			shownByDefault: false,
+			mapping: {
+				value: 'placeholder',
+			},
+		},
+	];
+}
+
 export const init = () => initBlock( { name, metadata, settings } );

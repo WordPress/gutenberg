@@ -105,6 +105,7 @@
 	"supports": {
 		"align": [ "wide", "full" ],
 		"ariaLabel": true,
+		"contentRole": true,
 		"html": false,
 		"inserter": true,
 		"typography": {
@@ -138,8 +139,7 @@
 			}
 		},
 		"interactivity": true,
-		"renaming": false,
-		"contentRole": true
+		"renaming": false
 	},
 	"editorStyle": "wp-block-navigation-editor",
 	"style": "wp-block-navigation"

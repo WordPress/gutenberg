@@ -1,6 +1,6 @@
 # The `@wordpress/dataviews` package
 
-The DataViews package offers three React components and a few utilities to work with a list of data:
+This package offers three React components and a few utilities to work with a list of data:
 
 -   `DataViews`: to render the dataset using different types of layouts (table, grid, list) and interaction capabilities (search, filters, sorting, etc.).
 -   `DataViewsPicker`: to render the dataset optimized for selection or picking of items.
@@ -18,17 +18,19 @@ npm install @wordpress/dataviews --save
 
 <div class="callout callout-info">At <a href="https://wordpress.github.io/gutenberg/">WordPress Gutenberg's Storybook</a> there's an <a href="https://wordpress.github.io/gutenberg/?path=/docs/dataviews-dataviews--docs">example implementation of the Dataviews component</a>.</div>
 
-**Important note** If you're trying to use the `DataViews` component in a WordPress plugin or theme and you're building your scripts using the `@wordpress/scripts` package, you need to import the components from `@wordpress/dataviews/wp` instead of `@wordpress/dataviews`.
-
 ### Usage
 
 The `DataViews` component receives data and some other configuration to render the dataset. It'll call the `onChangeView` callback every time the user has interacted with the dataset in some way (sorted, filtered, changed layout, etc.):
 
 ![DataViews flow](https://developer.wordpress.org/files/2024/09/368600071-20aa078f-7c3d-406d-8dd0-8b764addd22a.png 'DataViews flow')
 
+<div class="callout callout-info">If you're trying to use the DataViews component in a WordPress plugin or theme and you are building your scripts using the `@wordpress/scripts` package, you need to import the components from `@wordpress/dataviews/wp` instead of `@wordpress/dataviews`.</div>
+
 Example:
 
 ```jsx
+import { DataViews } from '@wordpress/dataviews';
+
 const Example = () => {
 	const onChangeView = () => {
 		/* React to user changes. */
@@ -117,29 +119,32 @@ const STATUSES = [
 	{ value: 'publish', label: __( 'Published' ) },
 	{ value: 'trash', label: __( 'Trash' ) },
 ];
+const AUTHORS = [
+	{ value: 1, label: 'Admin' },
+	{ value: 2, label: 'User' },
+];
+
 const fields = [
 	{
 		id: 'title',
+		type: 'text',
 		label: 'Title',
 		enableHiding: false,
 	},
 	{
 		id: 'date',
+		type: 'date',
 		label: 'Date',
-		render: ( { item } ) => {
-			return <time>{ getFormattedDate( item.date ) }</time>;
-		},
 	},
 	{
 		id: 'author',
+		type: 'integer',
 		label: 'Author',
 		render: ( { item } ) => {
-			return <a href="...">{ item.author }</a>;
+			return AUTHORS.find( ( { value } ) => value === item.author )?.label ??
+			item.author,
 		},
-		elements: [
-			{ value: 1, label: 'Admin' },
-			{ value: 2, label: 'User' },
-		],
+		elements: AUTHORS,
 		filterBy: {
 			operators: [ 'is', 'isNot' ],
 		},
@@ -147,6 +152,7 @@ const fields = [
 	},
 	{
 		id: 'status',
+		type: 'text',
 		label: 'Status',
 		getValue: ( { item } ) =>
 			STATUSES.find( ( { value } ) => value === item.status )?.label ??
@@ -198,10 +204,8 @@ Properties:
 -   `perPage`: number of records to show per page.
 -   `page`: the page that is visible.
 -   `sort`:
-
     -   `field`: the field used for sorting the dataset.
     -   `direction`: the direction to use for sorting, one of `asc` or `desc`.
-
 -   `titleField`: The id of the field representing the title of the record.
 -   `mediaField`: The id of the field representing the media of the record.
 -   `descriptionField`: The id of the field representing the description of the record.
@@ -728,7 +732,7 @@ const fields = [
 	},
 	{
 		id: 'author',
-		type: 'text'
+		type: 'text',
 		label: 'Author',
 		elements: [
 			{ value: 1, label: 'Admin' },
@@ -1103,7 +1107,7 @@ Example:
 
 ```js
 {
-	id: 'field_id';
+	id: 'title',
 }
 ```
 
@@ -1111,16 +1115,16 @@ Example:
 
 Field type. One of `text`, `integer`, `number`, `datetime`, `date`, `media`, `boolean`, `email`, `password`, `telephone`, `color`, `url`, `array`.
 
-If a field declares a `type`, it gets default implementations for the `sort`, `isValid`, and `Edit` functions if no other values are specified.
-
 -   Type: `string`.
 -   Optional.
+-   By declaring a type, the field gets a default implementation for all the necessary functions (sorting, render, editing, etc.).
 
 Example:
 
 ```js
 {
-	type: 'text';
+	id: 'title',
+	type: 'text',
 }
 ```
 
@@ -1136,27 +1140,32 @@ Example:
 
 ```js
 {
-	label: 'Title';
+	id: 'title',
+	type: 'text',
+	label: 'Title',
 }
 ```
 
 ### `header`
 
-React component used by the layouts to display the field name — useful to add icons, etc. It's complementary to the `label` property.
+React element used by some layouts (table, grid) to display the field name — useful to add icons, etc.
 
--   Type: React component.
+-   Type: React element.
 -   Optional.
 -   Defaults to the `label` value.
--   Props: none.
--   Returns a React element that represents the field's name.
 
 Example:
 
 ```js
 {
-	header: () => {
-		/* Returns a react element. */
-	};
+	id: 'title',
+	type: 'text',
+	header: (
+		<HStack spacing={ 1 } justify="start">
+			<Icon icon={ icon } />
+			<span>Title</span>
+		</HStack>
+	),
 }
 ```
 
@@ -1201,6 +1210,7 @@ const item = {
 // Field definition
 {
 	id: 'title',
+	type: 'text',
 	label: 'Title'
 	// getValue: automatically becomes ( { item } ) => item.title
 	// setValue: automatically becomes ( { value } ) => ( { title: value } )
@@ -1225,6 +1235,7 @@ const item = {
 // Field definition - using dot notation (automatic)
 {
 	id: 'user.profile.name',
+	type: 'text',
 	label: 'User Name'
 	// getValue: automatically becomes ( { item } ) => item.user.profile.name
 	// setValue: automatically becomes ( { value } ) => ( { user: { profile: { name: value } } } )
@@ -1233,6 +1244,7 @@ const item = {
 // Alternative - using simple ID with custom functions
 {
 	id: 'userName',
+	type: 'text',
 	label: 'User Name',
 	getValue: ( { item } ) => item.user.profile.name,
 	setValue: ( { value } ) => ( {
@@ -1260,6 +1272,7 @@ const item = {
 // Field definition - transform boolean to string options
 {
 	id: 'notifications',
+	type: 'boolean',
 	label: 'Notifications',
 	Edit: 'radio',
 	elements: [
@@ -1278,21 +1291,25 @@ const item = {
 
 ### `render`
 
-React component that renders the field. This is used by the layouts.
+React component that renders the field.
 
 -   Type: React component.
 -   Optional.
--   Defaults to `getValue`.
+-   The field `type` provides a default render based on `getValue` and `elements` (if provided).
 -   Props
     -   `item` value to be processed.
+    -   `field` the own field config. Useful to access `getValue`, `elements`, etc.
     -   `config` object containing configuration options for the field. It's optional. So far, the only object property available is `sizes`: in fields that are set to be the media field, layouts can pass down the expected size reserved for them so that the field can react accordingly.
 -   Returns a React element that represents the field's value.
 
-Example:
+Example of a custom render function:
 
 ```js
 {
-	render: ( { item } ) => {
+	id: 'title',
+	type: 'text',
+	label: 'Title',
+	render: ( { item, field, config } ) => {
 		/* React element to be displayed. */
 	};
 }
@@ -1303,40 +1320,27 @@ Example:
 React component that renders the control to edit the field.
 
 -   Type: `string` | `object` | React component.
--   Required by DataForm. Optional if the field provided a `type`.
--   Props:
-    -   `data`: the item to be processed
-    -   `field`: the field definition
-    -   `onChange`: the callback with the updates
-    -   `hideLabelFromVision`: boolean representing if the label should be hidden
--   Returns a React element to edit the field's value.
+-   Optional.
+-   The field `type` provides a default implementation.
 
 Fields that provide a `type` will have a default Edit control:
 
 ```js
-// Edit is optional when field's type is present.
-// The field will use the default Edit function for text.
 {
-	type: 'text';
+	id: 'categories',
+	type: 'text',
+	label: 'Categories',
 }
 ```
 
 Field authors can override the default Edit control by providing a string that maps to one of the bundled UI controls: `array`, `checkbox`, `color`, `date`, `datetime`, `email`, `integer`, `number`, `password`, `radio`, `select`, `telephone`, `text`, `textarea`, `toggle`, `toggleGroup`, or `url`.
 
 ```js
-// Use one of the core controls.
 {
-	Edit: 'radio';
-}
-```
-
-
-```js
-// Edit can be provided even if field's type is present.
-// The field will use its own custom control.
-{
+	id: 'categories',
 	type: 'text',
-	Edit: 'radio'
+	label: 'Categories',
+	Edit: 'radio',
 }
 ```
 
@@ -1346,6 +1350,9 @@ Additionally, some of the bundled Edit controls are configurable via a config ob
 
 ```js
 {
+	id: 'description',
+	type: 'text',
+	label: 'Description',
 	Edit: {
 		control: 'textarea',
 		rows: 5
@@ -1357,6 +1364,9 @@ Additionally, some of the bundled Edit controls are configurable via a config ob
 
 ```js
 {
+	id: 'title',
+	type: 'text',
+	label: 'Title',
 	Edit: {
 		control: 'text',
 		prefix: ReactComponent,
@@ -1365,12 +1375,31 @@ Additionally, some of the bundled Edit controls are configurable via a config ob
 }
 ```
 
-Finally, the field author can always provide its own custom control:
+Finally, the field author can always provide its own custom `Edit` control. It receives the following props:
+
+-   `data`: the item to be processed
+-   `field`: the field definition
+-   `onChange`: the callback with the updates
+-   `hideLabelFromVision`: boolean representing if the label should be hidden
+-   `validity`: object representing the validity of the field's value (see validity section)
+-   `config`: object representing extra config for the component:
+    -   `prefix`: a React component to be rendered as a prefix
+    -   `suffix`: a React component to be rendered as a suffix
+    -   `rows`: the number of rows to display (e.g., in the text area component)
 
 ```js
-// A custom control defined by the field.
 {
-	Edit: ( { data, field, onChange, hideLabelFromVision } ) => {
+	id: 'time',
+	type: 'datetime',
+	label: 'Time of day',
+	Edit: ( {
+		data,
+		field,
+		onChange,
+		hideLabelFromVision,
+		validity,
+		config,
+	} ) => {
 		const value = field.getValue( { item: data } );
 
 		return (
@@ -1391,43 +1420,38 @@ Function to sort the records.
 
 -   Type: `function`.
 -   Optional.
--   Args
-    -   `a`: the first item to compare
-    -   `b`: the second item to compare
-    -   `direction`: either `asc` (ascending) or `desc` (descending)
--   Returns a number where:
-    -   a negative value indicates that `a` should come before `b`
-    -   a positive value indicates that `a` should come after `b`
-    -   0 indicates that `a` and `b` are considered equal
 
-Example:
+When the field declares a type, it gets a default sort function:
 
 ```js
-// A custom sort function defined by the field.
 {
+	id: 'title',
+	type: 'text',
+	label: 'Title',
+}
+```
+
+The default sorting can be overriden by providing a custom sort function. It takes the following arguments:
+
+  -   `a`: the first item to compare
+  -   `b`: the second item to compare
+  -   `direction`: either `asc` (ascending) or `desc` (descending)
+
+It should return a number where:
+
+-   a negative value indicates that `a` should come before `b`
+-   a positive value indicates that `a` should come after `b`
+-   0 indicates that `a` and `b` are considered equal
+
+```js
+{
+	id: 'title',
+	type: 'text',
+	label: 'Title',
 	sort: ( a, b, direction ) => {
 		return direction === 'asc'
 			? a.localeCompare( b )
 			: b.localeCompare( a );
-	};
-}
-```
-
-```js
-// If field type is provided,
-// the field gets a default sort function.
-{
-	type: 'number';
-}
-```
-
-```js
-// Even if a field type is provided,
-// fields can override the default sort function assigned for that type.
-{
-	type: 'number';
-	sort: ( a, b, direction ) => {
-		/* Custom sort */
 	};
 }
 ```
@@ -1437,41 +1461,34 @@ Example:
 Object that contains the validation rules for the field. If a rule is not met, the control will be marked as invalid and a message will be displayed.
 
 -   `required`: boolean indicating whether the field is required or not. Disabled by default.
--   `elements`: boolean restricting selection to the provided list of elements only. Enabled by default. The `array` Edit control uses it to restrict the input values as well.
+-   `elements`: boolean restricting selection to the provided list of elements only. Enabled by default. The `array` Edit control uses it to restrict the input values.
 -   `custom`: a function that validates a field's value. If the value is invalid, the function should return a string explaining why the value is invalid. Otherwise, the function must return null.
 
-Example:
+Fields that define a type come with default validation for the type. For example, the `integer` type ensures that the value is a valid integer:
 
 ```js
 {
+	id: 'itemsSold',
+	type: 'integer',
+	label: 'Items sold',
+}
+```
+
+The validation rules can be overriden by the field author. For example, to set the field as required, or to provide a custom validation so that only even numbers are valid:
+
+```js
+{
+	id: 'itemsSold',
+	type: 'integer',
+	label: 'Items sold',
 	isValid: {
+		required: true,
 		custom: ( item: Item, field: NormalizedField<Item> ) => {
-			if ( /* item value is invalid */) {
-				return 'Reason why item value is invalid';
+			if ( field.getValue({ item }) % 2 !== 0 ) {
+				return 'Integer must be an even number.';
 			}
 
 			return null;
-		}
-	}
-}
-```
-
-Note that fields that define a type (e.g., `integer`) come with default validation for the type. For example, the `integer` type if the value is a valid integer:
-
-```js
-{
-	type: 'integer',
-}
-```
-
-However, this can be overriden by the field author:
-
-```js
-{
-	type: 'integer',
-	isValid: {
-		custom: ( item: Item, field: NormalizedField<Item> ) => {
-			/* Your custom validation logic. */
 		}
 	}
 }
@@ -1481,6 +1498,9 @@ Fields that define their own Edit component have access to the validation rules 
 
 ```js
 {
+	id: 'itemsSold',
+	type: 'integer',
+	label: 'Items sold',
 	Edit: ( { field } ) => {
 		return <input required={ !! field.isValid.required } />;
 	};
@@ -1497,15 +1517,28 @@ Function that indicates if the field should be visible.
     -   `item`: the data to be processed
 -   Returns a `boolean` indicating if the field should be visible (`true`) or not (`false`).
 
-Example:
+This can be useful to hide fields based on the state of other fields. For example, a `staticHomepage` field can be hidden depending on the value of the `homepageDisplay` field:
 
 ```js
-// Custom isVisible function.
 {
-	isVisible: ( item ) => {
-		/* Custom implementation. */
-	};
-}
+	id: 'homepageDisplay',
+	type: 'text',
+	label: 'Homepage display',
+	elements: [
+		{ value: 'latest', label: 'Latest post' },
+		{ value: 'static', label: 'Static page' },
+	],
+},
+{
+	id: 'staticHomepage',
+	type: 'text',
+	label: 'Static homepage',
+	elements: [
+		{ value: 'welcome', label: 'Welcome to my website' },
+		{ value: 'about', label: 'About' },
+	],
+	isVisible: ( item ) => item.homepageDisplay === 'static',
+},
 ```
 
 ### `enableSorting`
@@ -1516,11 +1549,14 @@ Boolean indicating if the field is sortable.
 -   Optional.
 -   Defaults to `true`.
 
-Example:
+Example to disable sorting by a field:
 
 ```js
 {
-	enableSorting: true;
+	id: 'title',
+	type: 'text',
+	label: 'Title',
+	enableSorting: false,
 }
 ```
 
@@ -1532,11 +1568,14 @@ Boolean indicating if the field can be hidden.
 -   Optional.
 -   Defaults to `true`.
 
-Example:
+Example to disable hiding of a field:
 
 ```js
 {
-	enableHiding: true;
+	id: 'title',
+	type: 'text',
+	label: 'Title',
+	enableHiding: false,
 }
 ```
 
@@ -1548,17 +1587,20 @@ Boolean indicating if the field is searchable.
 -   Optional.
 -   Defaults to `false`.
 
-Example:
+Example to enable global search for a field:
 
 ```js
 {
-	enableGlobalSearch: true;
+	id: 'title',
+	type: 'text',
+	label: 'Title',
+	enableGlobalSearch: true,
 }
 ```
 
 ### `elements`
 
-List of valid values for a field. If provided, the field's filter will use these as predefined options instead of using the field's `Edit` function for user input (unless `filterBy` is set to `false`, see below).
+List of valid values for a field. If provided, the field's filter will use these as predefined options to chose from.
 
 -   Type: `array` of objects.
 -   Optional.
@@ -1571,6 +1613,9 @@ Example:
 
 ```js
 {
+	id: 'selectedProduct',
+	type: 'integer',
+	label: 'Selected product',
 	elements: [
 		{ value: '1', label: 'Product A' },
 		{ value: '2', label: 'Product B' },
@@ -1588,6 +1633,9 @@ Note this function may be called many times in the lifetime of the DataViews/Dat
 
 ```js
 {
+	id: 'selectedProduct',
+	type: 'integer',
+	label: 'Selected product',
 	getElements: () => {
 		return Promise.resolve( [
 			{ value: '1', label: 'Product A' },
@@ -1601,7 +1649,7 @@ Note this function may be called many times in the lifetime of the DataViews/Dat
 
 ### `filterBy`
 
-Configuration of the filters. By default, fields have filtering enabled using the field's `Edit` function for user input. When `elements` are provided, the filter will use those as predefined options instead. Set to `false` to opt the field out of filtering entirely.
+Configuration of the filters.  Set to `false` to opt the field out of filtering entirely.
 
 -   Type: `object` | `boolean`.
 -   Optional.
@@ -1610,7 +1658,95 @@ Configuration of the filters. By default, fields have filtering enabled using th
     -   `operators`: the list of operators supported by the field. See "operators" below. A filter will support the `isAny` and `isNone` multi-selection operators by default.
     -   `isPrimary`: boolean, optional. Indicates if the filter is primary. A primary filter is always visible and is not listed in the "Add filter" component, except for the list layout where it behaves like a secondary filter.
 
-Operators:
+By default, fields have filtering enabled by using the field's `Edit` function:
+
+```js
+{
+	id: 'product',
+	type: 'text',
+	label: 'Product',
+}
+```
+
+If the field provides `elements`, the filter will use those as predefined options instead:
+
+```js
+{
+	id: 'product',
+	type: 'text',
+	label: 'Title',
+	elements: [
+		{ value: 'a', label: 'Product A' },
+		{ value: 'b', label: 'Product B' },
+		{ value: 'c', label: 'Product C' },
+		{ value: 'd', label: 'Product D' },
+	]
+}
+```
+
+A field can opt-out of filtering by setting `filterBy` to `false`:
+
+```js
+{
+	id: 'product',
+	type: 'text',
+	label: 'Product',
+	filterBy: false;
+}
+```
+
+Fields can declare its filter as primary, which means it'll always be visible and can't be removed by the user:
+
+```js
+{
+	id: 'title',
+	type: 'text',
+	label: 'Title',
+	filterBy: {
+		isPrimary: true;
+	}
+}
+```
+
+Filters come with default operators per field type, but this is configurable by the field. For example, a field can enable only single-selection operators for the filter:
+
+```js
+{
+	id: 'product',
+	type: 'text',
+	label: 'Product',
+	elements: [
+		{ value: 'a', label: 'Product A' },
+		{ value: 'b', label: 'Product B' },
+		{ value: 'c', label: 'Product C' },
+		{ value: 'd', label: 'Product D' },
+	],
+	filterBy: {
+		operators: [ `is`, `isNot` ];
+	}
+}
+```
+
+Or multi-selection operators:
+
+```js
+{
+	id: 'product',
+	type: 'text',
+	label: 'Product',
+	elements: [
+		{ value: 'a', label: 'Product A' },
+		{ value: 'b', label: 'Product B' },
+		{ value: 'c', label: 'Product C' },
+		{ value: 'd', label: 'Product D' },
+	],
+	filterBy: {
+		operators: [ `isAny`, `isNone`, `isAll`, `isNotAll` ];
+	}
+}
+```
+
+The next table lists all available operators:
 
 | Operator             | Selection      | Description                                                                                          | Example                                            |
 | -------------------- | -------------- | ---------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
@@ -1639,41 +1775,7 @@ Operators:
 
 `is`, `isNot`, `on`, `notOn`, `lessThan`, `greaterThan`, `lessThanOrEqual`, `greaterThanOrEqual`, `before`, `after`, `beforeInc`, `afterInc`, `contains`, `notContains`, and `startsWith` are single-selection operators, while `isAny`, `isNone`, `isAll`, and `isNotAll` are multi-selection. `between` is a special operator that requires two values and it's not supported for preset layout. A filter with no operators declared will support the `isAny` and `isNone` multi-selection operators by default. A filter cannot mix single-selection & multi-selection operators; if a single-selection operator is present in the list of valid operators, the multi-selection ones will be discarded, and the filter won't allow selecting more than one item.
 
-Example:
 
-```js
-// Set a filter as primary.
-{
-	filterBy: {
-		isPrimary: true;
-	}
-}
-```
-
-```js
-// Configure a filter as single-selection.
-{
-	filterBy: {
-		operators: [ `is`, `isNot` ];
-	}
-}
-```
-
-```js
-// Configure a filter as multi-selection with all the options.
-{
-	filterBy: {
-		operators: [ `isAny`, `isNone`, `isAll`, `isNotAll` ];
-	}
-}
-```
-
-```js
-// Opt out of filtering entirely.
-{
-	filterBy: false;
-}
-```
 
 ### `format`
 

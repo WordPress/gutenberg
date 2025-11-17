@@ -23,7 +23,8 @@ export async function loadEditorAssets() {
 			editorAssets.inline_scripts || { before: {}, after: {} },
 			editorAssets.styles || {},
 			editorAssets.inline_styles || { before: {}, after: {} },
-			editorAssets.html_templates || []
+			editorAssets.html_templates || [],
+			editorAssets.script_modules || {}
 		);
 	};
 
