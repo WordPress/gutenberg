@@ -7,7 +7,11 @@ import fastDeepEqual from 'fast-deep-equal/es6';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { getBlockBindingsSources, getBlockType } from '@wordpress/blocks';
+import {
+	getBlockBindingsSource,
+	getBlockType,
+	store as blockStore,
+} from '@wordpress/blocks';
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
@@ -32,8 +36,6 @@ import { useBlockEditContext } from '../components/block-edit';
 import { store as blockEditorStore } from '../store';
 
 const { Menu } = unlock( componentsPrivateApis );
-
-const EMPTY_OBJECT = {};
 
 /**
  * Get the normalized attribute type for block bindings.
@@ -80,10 +82,10 @@ function BlockBindingsPanelMenuContent( { attribute, binding, sources } ) {
 	);
 	return (
 		<Menu placement={ isMobile ? 'bottom-start' : 'left-start' }>
-			{ Object.entries( sources ).map( ( [ sourceKey, source ] ) => {
+			{ Object.entries( sources ).map( ( [ sourceKey, data ] ) => {
 				// Only show sources that have compatible data for this specific attribute.
-				const sourceDataItems = source.data?.filter(
-					( item ) => item?.type === attributeType
+				const sourceDataItems = data.filter(
+					( item ) => item.type === attributeType
 				);
 
 				const noItemsAvailable =
@@ -92,6 +94,8 @@ function BlockBindingsPanelMenuContent( { attribute, binding, sources } ) {
 				if ( noItemsAvailable ) {
 					return null;
 				}
+
+				const source = getBlockBindingsSource( sourceKey );
 
 				return (
 					<Menu
@@ -106,7 +110,7 @@ function BlockBindingsPanelMenuContent( { attribute, binding, sources } ) {
 								{ sourceDataItems.map( ( item ) => {
 									const itemBindings = {
 										source: sourceKey,
-										args: item?.args || {
+										args: item.args || {
 											key: item.key,
 										},
 									};
@@ -160,7 +164,7 @@ function BlockBindingsPanelMenuContent( { attribute, binding, sources } ) {
 											}
 										>
 											<Menu.ItemLabel>
-												{ item?.label }
+												{ item.label }
 											</Menu.ItemLabel>
 											<Menu.ItemHelpText>
 												{ values[ attribute ] }
@@ -179,7 +183,8 @@ function BlockBindingsPanelMenuContent( { attribute, binding, sources } ) {
 
 function BlockBindingsAttribute( { attribute, binding, sources, blockName } ) {
 	const { source: sourceName, args } = binding || {};
-	const source = sources?.[ sourceName ];
+	const data = sources?.[ sourceName ];
+	const source = getBlockBindingsSource( sourceName );
 
 	let displayText;
 	let isValid = true;
@@ -189,8 +194,8 @@ function BlockBindingsAttribute( { attribute, binding, sources, blockName } ) {
 		// Check if there are any compatible sources for this attribute type.
 		const attributeType = getAttributeType( blockName, attribute );
 
-		const hasCompatibleSources = Object.values( sources ).some( ( src ) =>
-			src.data?.some( ( item ) => item?.type === attributeType )
+		const hasCompatibleSources = Object.values( sources ).some( ( items ) =>
+			items.some( ( item ) => item.type === attributeType )
 		);
 
 		if ( ! hasCompatibleSources ) {
@@ -203,14 +208,10 @@ function BlockBindingsAttribute( { attribute, binding, sources, blockName } ) {
 		// If there's a binding but the source is not found, it's invalid.
 		isValid = false;
 		displayText = __( 'Source not registered' );
-		if ( Object.keys( sources ).length === 0 ) {
-			displayText = __( 'No sources available' );
-		}
 	} else {
 		displayText =
-			source.data?.find( ( item ) => fastDeepEqual( item.args, args ) )
-				?.label ||
-			source.label ||
+			data?.find( ( item ) => fastDeepEqual( item.args, args ) )?.label ||
+			source?.label ||
 			sourceName;
 	}
 
@@ -299,68 +300,57 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 
 	// Use useSelect to ensure sources are updated whenever there are updates in block context
 	// or when underlying data changes.
-	// Still needs a fix regarding _sources scope.
-	const _sources = {};
-	const { sources, canUpdateBlockBindings, bindableAttributes } = useSelect(
+	const { canUpdateBlockBindings, bindableAttributes } = useSelect(
 		( select ) => {
 			const { __experimentalBlockBindingsSupportedAttributes } =
 				select( blockEditorStore ).getSettings();
-			const _bindableAttributes =
-				__experimentalBlockBindingsSupportedAttributes?.[ blockName ];
-			if ( ! _bindableAttributes || _bindableAttributes.length === 0 ) {
-				return EMPTY_OBJECT;
-			}
-
-			const registeredSources = getBlockBindingsSources();
-			Object.entries( registeredSources ).forEach(
-				( [
-					sourceName,
-					{ getFieldsList, usesContext, label, getValues },
-				] ) => {
-					// Populate context.
-					const context = {};
-					if ( usesContext?.length ) {
-						for ( const key of usesContext ) {
-							context[ key ] = blockContext[ key ];
-						}
-					}
-					if ( getFieldsList ) {
-						const fieldsListResult = getFieldsList( {
-							select,
-							context,
-						} );
-						_sources[ sourceName ] = {
-							data: fieldsListResult || [],
-							label,
-							getValues,
-						};
-					} else {
-						/*
-						 * Include sources without getFieldsList if they are already used in a binding.
-						 * This allows them to be displayed in read-only mode.
-						 */
-						_sources[ sourceName ] = {
-							data: [],
-							label,
-							getValues,
-						};
-					}
-				}
-			);
 
 			return {
-				sources:
-					Object.values( _sources ).length > 0
-						? _sources
-						: EMPTY_OBJECT,
 				canUpdateBlockBindings:
 					select( blockEditorStore ).getSettings()
 						.canUpdateBlockBindings,
-				bindableAttributes: _bindableAttributes,
+				bindableAttributes:
+					__experimentalBlockBindingsSupportedAttributes?.[
+						blockName
+					],
 			};
 		},
-		[ blockContext, blockName ]
+		[ blockName ]
 	);
+
+	const sources = useSelect(
+		( select ) => {
+			const { getAllBlockBindingsSources } = unlock(
+				select( blockStore )
+			);
+			const data = {};
+			Object.entries( getAllBlockBindingsSources() ).forEach(
+				( [ sourceName, source ] ) => {
+					if ( ! source.getFieldsList ) {
+						return;
+					}
+
+					const context = {};
+					if ( source.usesContext?.length ) {
+						for ( const key of source.usesContext ) {
+							context[ key ] = blockContext[ key ];
+						}
+					}
+
+					const items = source.getFieldsList( {
+						select,
+						context,
+					} );
+					if ( items?.length ) {
+						data[ sourceName ] = items;
+					}
+				}
+			);
+			return data;
+		},
+		[ blockContext ]
+	);
+
 	// Return early if there are no bindable attributes.
 	if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
 		return null;
@@ -368,10 +358,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 
 	const { bindings } = metadata || {};
 
-	// Check if all sources have empty data arrays.
-	const hasCompatibleData = Object.values( sources ).some(
-		( source ) => source.data && source.data.length > 0
-	);
+	const hasCompatibleData = Object.keys( sources ).length > 0;
 
 	// Lock the UI when the user can't update bindings or there are no fields to connect to.
 	const readOnly = ! canUpdateBlockBindings || ! hasCompatibleData;
@@ -402,10 +389,8 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 
 						const hasCompatibleDataForAttribute = Object.values(
 							sources
-						).some( ( source ) =>
-							source.data?.some(
-								( item ) => item?.type === attributeType
-							)
+						).some( ( data ) =>
+							data.some( ( item ) => item.type === attributeType )
 						);
 
 						const isAttributeReadOnly =
