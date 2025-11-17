@@ -37,7 +37,7 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 		isItemClickable,
 		renderItemLink,
 		defaultLayouts,
-		empty = <p>{ __( 'No results.' ) }</p>,
+		empty = <p>{ __( 'No results found.' ) }</p>,
 	} = useContext( DataViewsContext );
 
 	const ViewComponent = VIEW_LAYOUTS.find(

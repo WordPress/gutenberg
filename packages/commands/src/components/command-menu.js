@@ -274,7 +274,7 @@ export function CommandMenu() {
 					<Command.List label={ __( 'Command suggestions' ) }>
 						{ search && ! isLoading && (
 							<Command.Empty>
-								{ __( 'No results.' ) }
+								{ __( 'No results found.' ) }
 							</Command.Empty>
 						) }
 						<CommandMenuGroup

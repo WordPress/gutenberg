@@ -54,7 +54,7 @@ test.describe( 'Comments', () => {
 			editor.canvas.locator(
 				'role=document[name="Block: Comment Template"i]'
 			)
-		).toContainText( 'No results.' );
+		).toContainText( 'No results found.' );
 	} );
 
 	test( 'Pagination links are working as expected', async ( {

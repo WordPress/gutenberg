@@ -609,7 +609,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 						),
 						matchingSuggestions.length
 				  )
-				: __( 'No results.' );
+				: __( 'No results found.' );
 
 			debouncedSpeak( message, 'assertive' );
 		}

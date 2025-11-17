@@ -208,7 +208,7 @@ class URLInput extends Component {
 					);
 				} else {
 					this.props.debouncedSpeak(
-						__( 'No results.' ),
+						__( 'No results found.' ),
 						'assertive'
 					);
 				}

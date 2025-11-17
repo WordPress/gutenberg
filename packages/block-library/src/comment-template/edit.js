@@ -300,7 +300,7 @@ export default function CommentTemplateEdit( {
 	}
 
 	if ( ! commentTree.length ) {
-		return <p { ...blockProps }>{ __( 'No results.' ) }</p>;
+		return <p { ...blockProps }>{ __( 'No results found.' ) }</p>;
 	}
 
 	return (

@@ -2181,10 +2181,9 @@ describe( 'FormTokenField', () => {
 			await user.type( input, 'cat' );
 
 			await waitFor( () =>
-				expect( screen.getByText( 'No results.' ) ).toHaveAttribute(
-					'aria-live',
-					'assertive'
-				)
+				expect(
+					screen.getByText( 'No results found.' )
+				).toHaveAttribute( 'aria-live', 'assertive' )
 			);
 
 			// "Donkey" and "Dog" matching

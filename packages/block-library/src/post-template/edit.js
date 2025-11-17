@@ -282,7 +282,7 @@ export default function PostTemplateEdit( {
 	}
 
 	if ( ! posts.length ) {
-		return <p { ...blockProps }> { __( 'No results.' ) }</p>;
+		return <p { ...blockProps }> { __( 'No results found.' ) }</p>;
 	}
 
 	const setDisplayLayout = ( newDisplayLayout ) =>
