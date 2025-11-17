@@ -27,6 +27,8 @@ export default function ResponsiveWrapper( {
 	overlayTextColor,
 	hasIcon,
 	icon,
+	overlayTemplatePartId,
+	onNavigateToEntityRecord,
 } ) {
 	if ( ! isResponsive ) {
 		return children;
@@ -75,6 +77,18 @@ export default function ResponsiveWrapper( {
 		} ),
 	};
 
+	const handleOpenClick = () => {
+		// If there's a custom overlay template part, navigate to it
+		if ( overlayTemplatePartId && onNavigateToEntityRecord && ! isOpen ) {
+			onNavigateToEntityRecord( {
+				postId: overlayTemplatePartId,
+				postType: 'wp_template_part',
+			} );
+		} else {
+			onToggle( true );
+		}
+	};
+
 	return (
 		<>
 			{ ! isOpen && (
@@ -83,7 +97,7 @@ export default function ResponsiveWrapper( {
 					aria-haspopup="true"
 					aria-label={ hasIcon && __( 'Open menu' ) }
 					className={ openButtonClasses }
-					onClick={ () => onToggle( true ) }
+					onClick={ handleOpenClick }
 				>
 					{ hasIcon && <OverlayMenuIcon icon={ icon } /> }
 					{ ! hasIcon && __( 'Menu' ) }

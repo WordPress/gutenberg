@@ -675,6 +675,13 @@ function Navigation( {
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
+	// Get navigation function for overlay template parts
+	const onNavigateToEntityRecord = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings().onNavigateToEntityRecord,
+		[]
+	);
+
 	const stylingInspectorControls = (
 		<>
 			{ ! isInOverlayTemplatePart && (
@@ -926,6 +933,8 @@ function Navigation( {
 					isHiddenByDefault={ isHiddenByDefault }
 					overlayBackgroundColor={ overlayBackgroundColor }
 					overlayTextColor={ overlayTextColor }
+					overlayTemplatePartId={ overlayTemplatePartId }
+					onNavigateToEntityRecord={ onNavigateToEntityRecord }
 				>
 					<UnsavedInnerBlocks
 						createNavigationMenu={ createNavigationMenu }
@@ -1088,6 +1097,10 @@ function Navigation( {
 									overlayBackgroundColor
 								}
 								overlayTextColor={ overlayTextColor }
+								overlayTemplatePartId={ overlayTemplatePartId }
+								onNavigateToEntityRecord={
+									onNavigateToEntityRecord
+								}
 							>
 								{ isEntityAvailable && (
 									<NavigationInnerBlocks
