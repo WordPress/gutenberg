@@ -20,6 +20,7 @@ import {
 	useShortcut,
 } from '@wordpress/keyboard-shortcuts';
 import { Icon, search as inputIcon } from '@wordpress/icons';
+import { executeAbility, store as abilitiesStore } from '@wordpress/abilities';
 
 /**
  * Internal dependencies
@@ -69,25 +70,11 @@ export function WorkflowMenu() {
 	const [ abilityOutput, setAbilityOutput ] = useState( null );
 	const [ isExecuting, setIsExecuting ] = useState( false );
 	const containerRef = useRef();
-	const [ abilitiesModule, setAbilitiesModule ] = useState( null );
 
-	// Dynamically load the abilities script module
-	useEffect( () => {
-		import( '@wordpress/abilities' ).then( ( module ) => {
-			setAbilitiesModule( module );
-		} );
+	const abilities = useSelect( ( select ) => {
+		const allAbilities = select( abilitiesStore ).getAbilities();
+		return allAbilities || EMPTY_ARRAY;
 	}, [] );
-
-	const abilities = useSelect(
-		( select ) => {
-			if ( ! abilitiesModule ) {
-				return EMPTY_ARRAY;
-			}
-			const allAbilities = select( abilitiesModule.store ).getAbilities();
-			return allAbilities || EMPTY_ARRAY;
-		},
-		[ abilitiesModule ]
-	);
 
 	const filteredAbilities = useMemo( () => {
 		if ( ! search ) {
@@ -151,12 +138,9 @@ export function WorkflowMenu() {
 	};
 
 	const handleExecuteAbility = async ( ability ) => {
-		if ( ! abilitiesModule ) {
-			return;
-		}
 		setIsExecuting( true );
 		try {
-			const result = await abilitiesModule.executeAbility( ability.name );
+			const result = await executeAbility( ability.name );
 			setAbilityOutput( {
 				name: ability.name,
 				label: ability?.label || ability.name,
