@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useLayoutEffect, useRef } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { useRegistry } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -12,8 +12,7 @@ import { store as blockEditorStore } from '../../store';
 export function useMarkPersistent( { html, value } ) {
 	const previousTextRef = useRef();
 	const hasActiveFormats = !! value.activeFormats?.length;
-	const { __unstableMarkLastChangeAsPersistent } =
-		useDispatch( blockEditorStore );
+	const registry = useRegistry();
 
 	// Must be set synchronously to make sure it applies to the last change.
 	useLayoutEffect( () => {
@@ -22,6 +21,9 @@ export function useMarkPersistent( { html, value } ) {
 			previousTextRef.current = value.text;
 			return;
 		}
+
+		const { __unstableMarkLastChangeAsPersistent } =
+			registry.dispatch( blockEditorStore );
 
 		// Text input, so don't create an undo level for every character.
 		// Create an undo level after 1 second of no input.
@@ -35,6 +37,10 @@ export function useMarkPersistent( { html, value } ) {
 			};
 		}
 
-		__unstableMarkLastChangeAsPersistent();
-	}, [ html, hasActiveFormats ] );
+		if (
+			registry.select( blockEditorStore ).isLastBlockChangePersistent()
+		) {
+			__unstableMarkLastChangeAsPersistent();
+		}
+	}, [ html, hasActiveFormats, registry ] );
 }
