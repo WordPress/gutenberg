@@ -2,14 +2,27 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { SelectControl } from '@wordpress/components';
+import {
+	SelectControl,
+	Button,
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
+import { pencil } from '@wordpress/icons';
 import { useEntityRecords } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 export default function OverlaySelector( { value, onChange } ) {
 	const { records: templateParts } = useEntityRecords(
 		'postType',
 		'wp_template_part',
 		{ per_page: -1 }
+	);
+
+	const onNavigateToEntityRecord = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings().onNavigateToEntityRecord,
+		[]
 	);
 
 	const overlayParts =
@@ -23,16 +36,37 @@ export default function OverlaySelector( { value, onChange } ) {
 		} ) ),
 	];
 
+	const handleEditClick = () => {
+		if ( value && onNavigateToEntityRecord ) {
+			onNavigateToEntityRecord( {
+				postId: value,
+				postType: 'wp_template_part',
+			} );
+		}
+	};
+
 	return (
-		<SelectControl
-			__nextHasNoMarginBottom
-			__next40pxDefaultSize
-			label={ __( 'Overlay Template Part' ) }
-			value={ value || '' }
-			options={ options }
-			onChange={ ( newValue ) => {
-				onChange( newValue === '' ? undefined : newValue );
-			} }
-		/>
+		<VStack spacing={ 4 }>
+			<SelectControl
+				__nextHasNoMarginBottom
+				__next40pxDefaultSize
+				label={ __( 'Overlay Template Part' ) }
+				value={ value || '' }
+				options={ options }
+				onChange={ ( newValue ) => {
+					onChange( newValue === '' ? undefined : newValue );
+				} }
+			/>
+			<Button
+				__next40pxDefaultSize
+				variant="secondary"
+				icon={ pencil }
+				onClick={ handleEditClick }
+				disabled={ ! value || ! onNavigateToEntityRecord }
+				style={ { maxWidth: 'fit-content' } }
+			>
+				{ __( 'Edit Overlay' ) }
+			</Button>
+		</VStack>
 	);
 }
