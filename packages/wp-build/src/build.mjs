@@ -362,7 +362,7 @@ async function bundlePackage( packageName ) {
 		);
 
 		builtScripts.push( {
-			handle: `wp-${ packageName }`,
+			handle: `${ HANDLE_PREFIX }-${ packageName }`,
 			path: `${ packageName }/index`,
 			asset: `${ packageName }/index.min.asset.php`,
 		} );
@@ -594,7 +594,7 @@ async function bundlePackage( packageName ) {
 		const styleDeps = await inferStyleDependencies( scriptDependencies );
 
 		builtStyles.push( {
-			handle: `wp-${ packageName }`,
+			handle: `${ HANDLE_PREFIX }-${ packageName }`,
 			path: `${ packageName }/style`,
 			dependencies: styleDeps,
 		} );
