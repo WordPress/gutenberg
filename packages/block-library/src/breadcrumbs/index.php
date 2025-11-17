@@ -276,10 +276,7 @@ function block_core_breadcrumbs_get_post_title( $post_id_or_object ) {
  */
 function block_core_breadcrumbs_get_post_type_archive_item( $post_type ) {
 	$post_type_object = get_post_type_object( $post_type );
-	if ( ! $post_type_object || ! $post_type_object->has_archive ) {
-		return null;
-	}
-	$archive_link = get_post_type_archive_link( $post_type );
+	$archive_link     = get_post_type_archive_link( $post_type );
 	if ( ! $archive_link ) {
 		return null;
 	}
