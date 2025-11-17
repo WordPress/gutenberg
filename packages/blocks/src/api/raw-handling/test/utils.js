@@ -128,7 +128,9 @@ describe( 'getBlockContentSchema', () => {
 						children: {
 							sub: {},
 							sup: {},
-							strong: {},
+							strong: {
+								classes: [ 'test-class' ],
+							},
 						},
 					},
 				},
@@ -146,7 +148,9 @@ describe( 'getBlockContentSchema', () => {
 		const output = {
 			pre: {
 				children: {
-					strong: {},
+					strong: {
+						classes: [ 'test-class' ],
+					},
 					em: {},
 					sub: {},
 					sup: {},
@@ -185,6 +189,38 @@ describe( 'getBlockContentSchema', () => {
 			pre: {
 				children: myContentSchema,
 				attributes: [ 'data-chicken', 'data-ribs' ],
+			},
+		};
+		expect( getBlockContentSchemaFromTransforms( transforms ) ).toEqual(
+			output
+		);
+	} );
+
+	it( 'should handle classes merging', () => {
+		const transforms = deepFreeze( [
+			{
+				blockName: 'core/paragraph',
+				type: 'raw',
+				selector: 'p',
+				schema: {
+					p: {},
+				},
+			},
+			{
+				blockName: 'test/block',
+				type: 'raw',
+				selector: 'p',
+				schema: {
+					p: {
+						classes: [ 'test-class' ],
+					},
+				},
+			},
+		] );
+		const output = {
+			p: {
+				attributes: [ 'id' ],
+				classes: [ 'test-class' ],
 			},
 		};
 		expect( getBlockContentSchemaFromTransforms( transforms ) ).toEqual(
