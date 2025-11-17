@@ -480,40 +480,41 @@ function block_core_breadcrumbs_get_terms_breadcrumbs( $post_id, $post_type ) {
 	}
 
 	/**
-	 * Filters the preferred taxonomy and term for breadcrumbs on a per-post-type basis.
+	 * Filters breadcrumb settings on a per-post-type basis.
 	 *
-	 * Allows developers to specify which taxonomy and term should be used in breadcrumbs
-	 * when a post has multiple taxonomies or terms assigned.
-	 *
-	 * The preferred taxonomy must have terms assigned to the post, otherwise falls back to the first available taxonomy.
-	 *
-	 * The preferred term must exist and be assigned to the post. If the post has only one term, it's used regardless of preference.
-	 * If the preferred term is not found, falls back to the first term.
+	 * Allow developers to customize breadcrumb behavior for specific post types.
 	 *
 	 * @since 7.0.0
 	 *
-	 * @param array  $preferences {
-	 *     Array of breadcrumb preferences. Default empty array.
+	 * @param array  $settings {
+	 *     Array of breadcrumb settings. Default empty array.
 	 *
-	 *     @type string $preferred_taxonomy Optional. Taxonomy slug to prefer for breadcrumbs.
-	 *     @type string $preferred_term     Optional. Term slug to prefer when post has multiple terms.
+	 *     @type string $taxonomy Optional. Taxonomy slug to use for breadcrumbs.
+	 *                            The taxonomy must be registered for the post type and have
+	 *                            terms assigned to the post. If not found or has no terms,
+	 *                            fall back to the first available taxonomy with terms.
+	 *     @type string $term     Optional. Term slug to use when the post has multiple terms
+	 *                            in the selected taxonomy. If the term is not found or not
+	 *                            assigned to the post, fall back to the first term. If the
+	 *                            post has only one term, that term is used regardless.
 	 * }
-	 * @param string $post_type   The post type slug.
+	 * @param string $post_type The post type slug.
 	 */
-	$preferences = apply_filters( 'block_core_breadcrumbs_post_type_preferences', array(), $post_type );
+	$settings = apply_filters( 'block_core_breadcrumbs_post_type_settings', array(), $post_type );
 
 	$taxonomy_name = null;
 	$terms         = array();
 
 	// Try preferred taxonomy first if specified.
-	if ( ! empty( $preferences['preferred_taxonomy'] ) ) {
-		$preferred_taxonomy = wp_list_filter( $taxonomies, array( 'name' => $preferences['preferred_taxonomy'] ) );
-		if ( ! empty( $preferred_taxonomy ) ) {
-			$preferred_taxonomy = reset( $preferred_taxonomy );
-			$post_terms         = get_the_terms( $post_id, $preferred_taxonomy->name );
-			if ( ! empty( $post_terms ) && ! is_wp_error( $post_terms ) ) {
-				$taxonomy_name = $preferred_taxonomy->name;
-				$terms         = $post_terms;
+	if ( ! empty( $settings['taxonomy'] ) ) {
+		foreach ( $taxonomies as $taxonomy ) {
+			if ( $taxonomy->name === $settings['taxonomy'] ) {
+				$post_terms = get_the_terms( $post_id, $taxonomy->name );
+				if ( ! empty( $post_terms ) && ! is_wp_error( $post_terms ) ) {
+					$taxonomy_name = $taxonomy->name;
+					$terms         = $post_terms;
+				}
+				break;
 			}
 		}
 	}
@@ -535,10 +536,12 @@ function block_core_breadcrumbs_get_terms_breadcrumbs( $post_id, $post_type ) {
 		$term = reset( $terms );
 
 		// Try preferred term if specified and post has multiple terms.
-		if ( ! empty( $preferences['preferred_term'] ) && count( $terms ) > 1 ) {
-			$preferred_term = wp_list_filter( $terms, array( 'slug' => $preferences['preferred_term'] ) );
-			if ( ! empty( $preferred_term ) ) {
-				$term = reset( $preferred_term );
+		if ( ! empty( $settings['term'] ) && count( $terms ) > 1 ) {
+			foreach ( $terms as $candidate_term ) {
+				if ( $candidate_term->slug === $settings['term'] ) {
+					$term = $candidate_term;
+					break;
+				}
 			}
 		}
 
