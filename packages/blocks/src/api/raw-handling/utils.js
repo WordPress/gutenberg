@@ -34,14 +34,14 @@ export function getBlockContentSchemaFromTransforms( transforms, context ) {
 				if ( hasAnchorSupport ) {
 					attributes = [ ...attributes, 'id' ];
 				}
-				const result = {
-					...value,
-					attributes,
-				};
-				if ( isMatch ) {
-					result.isMatch = isMatch;
-				}
-				return [ key, result ];
+				return [
+					key,
+					{
+						...value,
+						attributes,
+						isMatch: isMatch ? isMatch : undefined,
+					},
+				];
 			} )
 		);
 	} );
@@ -66,8 +66,8 @@ export function getBlockContentSchemaFromTransforms( transforms, context ) {
 				return merged;
 			}
 			case 'attributes':
-			case 'require':
-			case 'classes': {
+			case 'classes':
+			case 'require': {
 				return [ ...( objValue || [] ), ...( srcValue || [] ) ];
 			}
 			case 'isMatch': {

@@ -221,6 +221,7 @@ describe( 'getBlockContentSchema', () => {
 			p: {
 				attributes: [ 'id' ],
 				classes: [ 'test-class' ],
+				isMatch: undefined,
 			},
 		};
 		expect( getBlockContentSchemaFromTransforms( transforms ) ).toEqual(
