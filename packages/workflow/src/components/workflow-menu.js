@@ -248,7 +248,7 @@ export function WorkflowMenu() {
 								search &&
 								filteredAbilities.length === 0 && (
 									<Command.Empty>
-										{ __( 'No results found.' ) }
+										{ __( 'No results.' ) }
 									</Command.Empty>
 								) }
 							{ ! isExecuting && filteredAbilities.length > 0 && (

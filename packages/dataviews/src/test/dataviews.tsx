@@ -166,7 +166,7 @@ jest.mock( '@wordpress/compose', () => {
 describe( 'DataViews component', () => {
 	it( 'should show "No results" if data is empty', () => {
 		render( <DataViewWrapper data={ [] } /> );
-		expect( screen.getByText( 'No results' ) ).toBeInTheDocument();
+		expect( screen.getByText( 'No results.' ) ).toBeInTheDocument();
 	} );
 
 	it( 'should filter results by "search" text, if field has enableGlobalSearch set to true', async () => {

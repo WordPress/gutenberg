@@ -144,7 +144,7 @@ test.describe( 'Block Directory', () => {
 		 * fulfilling the first assertion.
 		 * Waiting for these two elements ensures that the request was dispatched.
 		 */
-		await expect( blockLibrary ).toContainText( 'No results found.' );
+		await expect( blockLibrary ).toContainText( 'No results.' );
 		await expect( blockLibrary ).toContainText(
 			'Interested in creating your own block?'
 		);

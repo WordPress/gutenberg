@@ -96,7 +96,7 @@ export default function TemplatePartSelectionModal( {
 
 			{ ! hasTemplateParts && ! hasBlockPatterns && (
 				<HStack alignment="center">
-					<p>{ __( 'No results found.' ) }</p>
+					<p>{ __( 'No results.' ) }</p>
 				</HStack>
 			) }
 		</div>

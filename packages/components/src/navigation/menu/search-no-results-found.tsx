@@ -28,7 +28,7 @@ export default function NavigationSearchNoResultsFound( {
 
 	return (
 		<ItemBaseUI>
-			<ItemUI>{ __( 'No results found.' ) } </ItemUI>
+			<ItemUI>{ __( 'No results.' ) } </ItemUI>
 		</ItemBaseUI>
 	);
 }

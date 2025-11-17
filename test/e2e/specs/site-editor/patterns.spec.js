@@ -40,7 +40,7 @@ test.describe( 'Patterns', () => {
 				level: 1,
 			} )
 		).toBeVisible();
-		await expect( patterns.content ).toContainText( 'No results' );
+		await expect( patterns.content ).toContainText( 'No results.' );
 
 		await patterns.content
 			.getByRole( 'button', { name: 'add pattern' } )
@@ -161,7 +161,7 @@ test.describe( 'Patterns', () => {
 		);
 
 		await searchBox.fill( 'no match' );
-		await expect( patterns.content ).toContainText( 'No results' );
+		await expect( patterns.content ).toContainText( 'No results.' );
 
 		await patterns.content
 			.getByRole( 'button', { name: 'Reset search', exact: true } )
