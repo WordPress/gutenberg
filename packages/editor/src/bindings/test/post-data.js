@@ -16,7 +16,10 @@ describe( 'post-data bindings', () => {
 				select = ( store ) => {
 					if ( store === blockEditorStore ) {
 						return {
-							getBlockName: () => 'core/post-date',
+							getBlockName: ( clientId ) =>
+								clientId === '123abc456'
+									? 'core/post-date'
+									: undefined,
 							getBlockAttributes: () => ( {} ),
 						};
 					}
