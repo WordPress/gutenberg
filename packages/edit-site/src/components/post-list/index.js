@@ -130,6 +130,10 @@ export default function PostList( { postType } ) {
 				filters.author_exclude = filter.value;
 			}
 			if ( filter.field === 'date' ) {
+				// Skip if no value is set yet
+				if ( ! filter.value ) {
+					return;
+				}
 				if ( filter.operator === OPERATOR_BEFORE ) {
 					filters.before = filter.value;
 				} else if ( filter.operator === OPERATOR_AFTER ) {
