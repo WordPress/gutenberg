@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   Fixed an issue where the `Guide` component’s close button became invisible on hover when used on light backgrounds. The component's close button now relies on the default button hover effect, and the custom hover color is applied only within `welcome-guide` implementations to maintain consistency. ([#73220](https://github.com/WordPress/gutenberg/pull/73220))
+-   Updated the copy for no results to `No Results Found.` throughout for consistently throughout both Gutenberg and WordPress-Develop. ([#73370](https://github.com/WordPress/gutenberg/pull/73370))
 
 ## 30.8.0 (2025-11-12)
 
