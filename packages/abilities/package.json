@@ -32,7 +32,6 @@
 	],
 	"main": "build/index.js",
 	"module": "build-module/index.js",
-	"react-native": "src/index",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
