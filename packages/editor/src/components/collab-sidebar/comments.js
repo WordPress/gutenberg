@@ -733,35 +733,35 @@ const CommentBoard = ( {
 		actionButtonRef.current?.focus();
 	};
 
-	const isParentComment = thread.parent === 0;
-	const hasResolved =
-		thread.status === 'approved' || parent?.status === 'approved';
-	const isReopenComment = thread.meta?._wp_note_status === 'reopen';
-	const isResolvedComment = thread.meta?._wp_note_status === 'resolved';
-	const isResolutionComment = isReopenComment || isResolvedComment;
+	const isParent = thread.parent === 0;
+	const metaStatus = thread.meta?._wp_note_status;
+	const isResolvedComment = metaStatus === 'resolved';
+	const isReopenComment = metaStatus === 'reopen';
+	const isResolutionComment = isResolvedComment || isReopenComment;
+
+	const hasResolved = ( status ) =>
+		status === 'approved' || parent?.status === 'approved';
 
 	const actions = [
 		{
 			id: 'edit',
 			title: __( 'Edit' ),
-			isEligible: () => ! isResolvedComment && ! hasResolved,
-			onClick: () => {
-				setActionState( 'edit' );
-			},
+			isEligible: ( { status } ) =>
+				! isResolvedComment && ! hasResolved( status ),
+			onClick: () => setActionState( 'edit' ),
 		},
 		{
 			id: 'reopen',
 			title: _x( 'Reopen', 'Reopen note' ),
-			isEligible: () => isParentComment && hasResolved,
-			onClick: () => {
-				onEdit( { id: thread.id, status: 'hold' } );
-			},
+			isEligible: ( { status } ) => isParent && hasResolved( status ),
+			onClick: () => onEdit( { id: thread.id, status: 'hold' } ),
 		},
 		{
 			id: 'delete',
 			title: __( 'Delete' ),
-			isEligible: () =>
-				isParentComment || ( ! isResolutionComment && ! hasResolved ),
+			isEligible: ( { status } ) =>
+				isParent ||
+				( ! isResolutionComment && ! hasResolved( status ) ),
 			onClick: () => {
 				setActionState( 'delete' );
 				setShowConfirmDialog( true );
@@ -770,7 +770,7 @@ const CommentBoard = ( {
 	];
 
 	const canResolve = thread.parent === 0;
-	const moreActions = actions.filter( ( item ) => item.isEligible() );
+	const moreActions = actions.filter( ( item ) => item.isEligible( thread ) );
 
 	return (
 		<VStack
@@ -870,7 +870,8 @@ const CommentBoard = ( {
 						'editor-collab-sidebar-panel__user-comment',
 						{
 							'editor-collab-sidebar-panel__resolution-text':
-								isResolutionComment,
+								metaStatus === 'resolved' ||
+								metaStatus === 'reopen',
 						}
 					) }
 				>
