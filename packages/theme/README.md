@@ -13,12 +13,80 @@ A theming package that's part of the WordPress Design System. It has two parts:
 
 In the **[Design Tokens Reference](docs/ds-tokens.md)** document there is a complete reference of all available design tokens including colors, spacing, typography, and more.
 
-### Color Tokens
+### Architecture
 
-The design system defines color tokens using the following naming scheme:
+Internally, the design system uses a tiered token architecture:
+
+- **Primitive tokens**: Raw values like hex colors or pixel dimensions which are what the browsers eventually interpret. These live in the `/tokens` directory as JSON source files and are an internal implementation detail.
+- **Semantic tokens**: Purpose-driven tokens with meaningful names that reference primitives and describe their intended use. These are what get exported as CSS custom properties.
+
+This separation allows the design system to maintain consistency while providing flexibility, since primitive values can be updated without changing the semantic token names that developers use in their code.
+
+### Design Tokens
+
+Design tokens are the visual design atoms of a design system. They are named entities that store visual design attributes like colors, spacing, typography, and shadows. They serve as a single source of truth that bridges design and development, ensuring consistency across platforms and making it easy to maintain and evolve the visual language of an application.
+
+Rather than hardcoding values like `#3858e9` or `16px` throughout your code, tokens provide semantic names like `--wpds-color-bg-interactive-brand-strong` or `--wpds-dimension-padding-surface-md` that describe the purpose and context of the value. This makes code more maintainable and allows the design system to evolve. When a token's value changes, all components using that token automatically reflect the update.
+
+#### Structure
+
+The design system follows the [Design Tokens Community Group (DTCG)](https://design-tokens.github.io/community-group/format/) specification and organizes tokens into distinct types based on what kind of visual property they represent. Token definitions are stored as JSON files in the `/tokens` directory:
+
+| File              | Description                                                                                                                      |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `color.json`      | Color palettes including primitive color ramps and semantic color tokens for backgrounds, foregrounds, strokes, and focus states |
+| `dimension.json`  | Spacing scale and semantic spacing tokens for padding, margins, and sizing                                                       |
+| `typography.json` | Font family stacks, font sizes, and line heights                                                                                 |
+| `border.json`     | Border radius and width values                                                                                                   |
+| `elevation.json`  | Shadow definitions for creating depth and layering                                                                               |
+
+Each JSON file contains both primitive and semantic token definitions in a hierarchical structure. These files are the source of truth for the design system and are processed during the build step to generate CSS custom properties and other output formats in `/src/prebuilt`.
+
+#### General Token Naming
+
+Most semantic tokens follow a pattern:
 
 ```
---wpds-<element>-<tone>[-<emphasis>][-<state>]
+--wpds-<type>-<property>-<target>[-<modifier>]
+```
+
+**Type** indicates what kind of value it represents, usually mapping to a DTCG token type.
+
+| Value                | Description                                                                    |
+| -------------------- | ------------------------------------------------------------------------------ |
+| `dimension`          | Spacing, sizing, and other measurable lengths (e.g., padding, margins, widths) |
+| `border`             | Border properties like radius and width                                        |
+| `elevation`          | Shadow definitions for layering and depth                                      |
+| `font`               | Typography properties like family, size, and line-height                       |
+
+**Property** is the specific design property being defined.
+
+| Value                | Description                        |
+| -------------------- | ---------------------------------- |
+| `padding`            | Internal spacing within an element |
+| `radius`             | Border radius for rounded corners  |
+| `size`               | Font size or element dimensions    |
+
+**Target** is the component or element type the token applies to.
+
+| Value                | Description                                             |
+| -------------------- | ------------------------------------------------------- |
+| `surface`            | Container or layout backgrounds                         |
+| `interactive`        | Interactive elements like buttons, inputs, and controls |
+| `focus`              | Focus indicators and rings                              |
+
+**Modifier** is an optional size or intensity modifier.
+
+| Value                         | Description          |
+| ----------------------------- | -------------------- |
+| `2xs`, `sm`, `md`, `lg`, `xl` | Size scale modifiers |
+
+#### Color Tokens
+
+Color tokens extend the general token naming scheme with additional structure:
+
+```
+--wpds-color-<element>-<tone>[-<emphasis>][-<state>]
 ```
 
 **Element** specifies what the color is applied to.
