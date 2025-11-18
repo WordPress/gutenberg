@@ -14,6 +14,10 @@
 
 - Fix: ensure primary actions are not wrapped in the list layout. [#73333](https://github.com/WordPress/gutenberg/pull/73333)
 
+### Internal
+
+- Remove "react" and "react-dom" from peer dependencies. [#73391](https://github.com/WordPress/gutenberg/pull/73391)
+
 ## 10.3.0 (2025-11-12)
 
 ### Enhancements
