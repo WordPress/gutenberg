@@ -37,7 +37,7 @@ describe( 'post-data bindings', () => {
 				};
 			} );
 
-			it( 'should return entity field values when they exist', () => {
+			it( 'should return entity field values when they exist, and to field name for unknown fields', () => {
 				const values = postDataBindings.getValues( {
 					select,
 					context: { postId: 123, postType: 'post' },
@@ -54,6 +54,10 @@ describe( 'post-data bindings', () => {
 							source: 'core/post-date',
 							args: { field: 'link' },
 						},
+						content: {
+							source: 'core/post-date',
+							args: { field: 'unknown' },
+						},
 					},
 					clientId: '123abc456',
 				} );
@@ -62,6 +66,7 @@ describe( 'post-data bindings', () => {
 					datetime: '2024-03-02 00:00:00',
 					modified: '2025-06-07 00:00:00',
 					url: 'https://example.com/post',
+					content: 'unknown',
 				} );
 			} );
 
@@ -96,22 +101,6 @@ describe( 'post-data bindings', () => {
 					url: 'Post Link',
 					content: 'unknown',
 				} );
-			} );
-
-			it( 'should return field name for unknown fields when the entity does exist', () => {
-				const values = postDataBindings.getValues( {
-					select,
-					context: { postId: 123, postType: 'post' },
-					bindings: {
-						content: {
-							source: 'core/post-date',
-							args: { field: 'unknown' },
-						},
-					},
-					clientId: '123abc456',
-				} );
-
-				expect( values.content ).toEqual( 'unknown' );
 			} );
 		} );
 
