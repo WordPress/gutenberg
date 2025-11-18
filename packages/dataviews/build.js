@@ -7,6 +7,13 @@ const esbuild = require( 'esbuild' );
 const wpExternals = {
 	name: 'wordpress-externals',
 	setup( build ) {
+		// Don't bundle JSX runtime - let it be resolved externally
+		build.onResolve(
+			{ filter: /^@wordpress\/element\/(jsx-runtime|jsx-dev-runtime)$/ },
+			( args ) => {
+				return { path: args.path, external: true };
+			}
+		);
 		build.onResolve(
 			{ filter: /^@wordpress\/(data|hooks|i18n|date)(\/|$)/ },
 			( args ) => {
@@ -35,6 +42,7 @@ esbuild.build( {
 	outdir: 'build-wp',
 	plugins: [ wpExternals ],
 	jsx: 'automatic',
+	jsxImportSource: '@wordpress/element',
 	logLevel: 'info',
 	format: 'esm',
 } );

@@ -994,6 +994,15 @@ async function transpilePackage( packageName ) {
 	const emotionPlugin = babel( {
 		filter: /\.[jt]sx?$/,
 		config: {
+			presets: [
+				[
+					'@babel/preset-react',
+					{
+						runtime: 'automatic',
+						importSource: '@wordpress/element',
+					},
+				],
+			],
 			plugins: [ '@emotion/babel-plugin' ],
 		},
 	} );
@@ -1035,7 +1044,7 @@ async function transpilePackage( packageName ) {
 				sourcemap: true,
 				target,
 				jsx: 'automatic',
-				jsxImportSource: 'react',
+				jsxImportSource: '@wordpress/element',
 				loader: {
 					'.js': 'jsx',
 				},
@@ -1067,7 +1076,7 @@ async function transpilePackage( packageName ) {
 				sourcemap: true,
 				target,
 				jsx: 'automatic',
-				jsxImportSource: 'react',
+				jsxImportSource: '@wordpress/element',
 				loader: {
 					'.js': 'jsx',
 				},
