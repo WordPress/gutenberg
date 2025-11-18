@@ -682,12 +682,27 @@ function Navigation( {
 		[]
 	);
 
+	// Check if the experiment is enabled
+	const isExperimentEnabled =
+		typeof window !== 'undefined' &&
+		window.__experimentalNavigationOverlays;
+
 	const stylingInspectorControls = (
 		<>
 			{ ! isInOverlayTemplatePart && (
 				<InspectorControls>
 					<PanelBody title={ __( 'Overlay' ) } initialOpen={ true }>
 						<VStack spacing={ 4 }>
+							{ ! isExperimentEnabled && (
+								<Notice
+									status="warning"
+									isDismissible={ false }
+								>
+									{ __(
+										'Please enable the "Customizable Navigation Overlays" experiment in Gutenberg settings to test this feature.'
+									) }
+								</Notice>
+							) }
 							{ isResponsive && (
 								<>
 									<Button
