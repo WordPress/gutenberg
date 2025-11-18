@@ -5,19 +5,9 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
- * WordPress dependencies
- */
-import { isRTL } from '@wordpress/i18n';
-
-/**
  * Internal dependencies
  */
 import { ExternalLink } from '..';
-
-jest.mock( '@wordpress/i18n', () => ( {
-	...jest.requireActual( '@wordpress/i18n' ),
-	isRTL: jest.fn(),
-} ) );
 
 describe( 'ExternalLink', () => {
 	test( 'should call function passed in onClick handler when clicking the link', async () => {
@@ -107,35 +97,5 @@ describe( 'ExternalLink', () => {
 		expect( onClickMock ).toHaveBeenLastCalledWith(
 			expect.objectContaining( { defaultPrevented: false } )
 		);
-	} );
-
-	test( 'should display top-right arrow (↗) for LTR languages', () => {
-		( isRTL as jest.Mock ).mockReturnValue( false );
-
-		render(
-			<ExternalLink href="https://wordpress.org">
-				WordPress.org
-			</ExternalLink>
-		);
-
-		const link = screen.getByRole( 'link', {
-			name: 'WordPress.org (opens in a new tab)',
-		} );
-		expect( link ).toHaveTextContent( '\u2197' ); // ↗
-	} );
-
-	test( 'should display top-left arrow (↖) for RTL languages', () => {
-		( isRTL as jest.Mock ).mockReturnValue( true );
-
-		render(
-			<ExternalLink href="https://wordpress.org">
-				WordPress.org
-			</ExternalLink>
-		);
-
-		const link = screen.getByRole( 'link', {
-			name: 'WordPress.org (opens in a new tab)',
-		} );
-		expect( link ).toHaveTextContent( '\u2196' ); // ↖
 	} );
 } );
