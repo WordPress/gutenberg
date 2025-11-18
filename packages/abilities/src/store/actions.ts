@@ -179,12 +179,15 @@ export function registerAbilityCategory(
 				'The category properties should provide a valid `meta` object.'
 			);
 		}
-
+		const meta = args.meta || {};
+		if ( ! meta._serverRegistered ) {
+			meta._clientRegistered = true;
+		}
 		const category: AbilityCategory = {
 			slug,
 			label: args.label,
 			description: args.description,
-			meta: args.meta || {},
+			meta,
 		};
 
 		dispatch( {
