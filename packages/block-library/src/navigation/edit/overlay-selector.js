@@ -6,6 +6,7 @@ import { useState, useMemo } from '@wordpress/element';
 import {
 	SelectControl,
 	Button,
+	Tooltip,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { pencil } from '@wordpress/icons';
@@ -172,39 +173,41 @@ export default function OverlaySelector( { value, onChange } ) {
 				previewBlocks &&
 				previewBlocks.length > 0 && (
 					<div className="block-editor-block-patterns-list__list-item">
-						<div
-							className="block-editor-block-patterns-list__item"
-							onClick={
-								onNavigateToEntityRecord
-									? handleEditClick
-									: undefined
-							}
-							style={ {
-								cursor: onNavigateToEntityRecord
-									? 'pointer'
-									: 'default',
-							} }
-							role="button"
-							tabIndex={ onNavigateToEntityRecord ? 0 : -1 }
-							onKeyDown={ ( event ) => {
-								if (
-									( event.key === 'Enter' ||
-										event.key === ' ' ) &&
+						<Tooltip text={ __( 'Edit Overlay' ) }>
+							<div
+								className="block-editor-block-patterns-list__item"
+								onClick={
 									onNavigateToEntityRecord
-								) {
-									event.preventDefault();
-									handleEditClick();
+										? handleEditClick
+										: undefined
 								}
-							} }
-							aria-label={ __( 'Edit overlay' ) }
-						>
-							<BlockPreview.Async>
-								<BlockPreview
-									blocks={ previewBlocks }
-									viewportWidth={ 500 }
-								/>
-							</BlockPreview.Async>
-						</div>
+								style={ {
+									cursor: onNavigateToEntityRecord
+										? 'pointer'
+										: 'default',
+								} }
+								role="button"
+								tabIndex={ onNavigateToEntityRecord ? 0 : -1 }
+								onKeyDown={ ( event ) => {
+									if (
+										( event.key === 'Enter' ||
+											event.key === ' ' ) &&
+										onNavigateToEntityRecord
+									) {
+										event.preventDefault();
+										handleEditClick();
+									}
+								} }
+								aria-label={ __( 'Edit overlay' ) }
+							>
+								<BlockPreview.Async>
+									<BlockPreview
+										blocks={ previewBlocks }
+										viewportWidth={ 480 }
+									/>
+								</BlockPreview.Async>
+							</div>
+						</Tooltip>
 					</div>
 				) }
 			<SelectControl
