@@ -32,7 +32,7 @@ describe( 'post-data bindings', () => {
 										link: 'https://example.com/post',
 										unknown: 'Unknown field value',
 								  }
-								: {},
+								: false,
 					};
 				};
 			} );
