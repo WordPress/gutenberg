@@ -13,7 +13,6 @@ import { useSelect } from '@wordpress/data';
 import {
 	DataViews,
 	filterSortAndPaginate,
-	OPERATOR_ON,
 	OPERATOR_BEFORE,
 	OPERATOR_AFTER,
 } from '@wordpress/dataviews';
@@ -138,14 +137,6 @@ export default function PostList( { postType } ) {
 					filters.before = filter.value;
 				} else if ( filter.operator === OPERATOR_AFTER ) {
 					filters.after = filter.value;
-				} else if ( filter.operator === OPERATOR_ON ) {
-					// For 'on' operator, we need to filter posts published on that specific date
-					// by setting both before and after to the same date
-					const date = new Date( filter.value );
-					const nextDay = new Date( date );
-					nextDay.setDate( date.getDate() + 1 );
-					filters.after = date.toISOString();
-					filters.before = nextDay.toISOString();
 				}
 			}
 		} );
