@@ -59,92 +59,54 @@ function createDataFields( termDataValues, idValue ) {
 }
 
 /**
- * Gets a list of term data fields with their values and labels
- * to be consumed in the needed callbacks.
- * If the value is not available based on context, like in templates,
- * it falls back to the default value, label, or key.
- *
- * @param {Object} select   The select function from the data store.
- * @param {Object} context  The context provided.
- * @param {string} clientId The block client ID used to read attributes.
- * @return {Object} List of term data fields with their value and label.
- *
- * @example
- * ```js
- * {
- *     name: {
- *         label: 'Term Name',
- *         value: 'Category Name',
- *     },
- *     count: {
- *         label: 'Term Count',
- *         value: 5,
- *     },
- *     ...
- * }
- * ```
- */
-function getTermDataFields( select, context, clientId ) {
-	const { getEntityRecord } = select( coreDataStore );
-	const { getBlockAttributes, getBlockName } = select( blockEditorStore );
-
-	let termDataValues, dataFields;
-
-	/*
-	 * BACKWARDS COMPATIBILITY: Hardcoded exception for navigation blocks.
-	 * Required for WordPress 6.9+ navigation blocks. DO NOT REMOVE.
-	 */
-	const blockName = getBlockName?.( clientId );
-	const isNavigationBlock = NAVIGATION_BLOCK_TYPES.includes( blockName );
-
-	let termId, taxonomy;
-
-	if ( isNavigationBlock ) {
-		// Navigation blocks: read from block attributes
-		const blockAttributes = getBlockAttributes?.( clientId );
-		termId = blockAttributes?.id;
-		const typeFromAttributes = blockAttributes?.type;
-		taxonomy =
-			typeFromAttributes === 'tag' ? 'post_tag' : typeFromAttributes;
-	} else {
-		// All other blocks: use context
-		termId = context?.termId;
-		taxonomy = context?.taxonomy;
-	}
-
-	if ( taxonomy && termId ) {
-		termDataValues = getEntityRecord( 'taxonomy', taxonomy, termId );
-
-		if ( ! termDataValues && context?.termData ) {
-			termDataValues = context.termData;
-		}
-
-		if ( termDataValues ) {
-			dataFields = createDataFields( termDataValues, termId );
-		}
-	} else if ( context?.termData ) {
-		termDataValues = context.termData;
-		dataFields = createDataFields(
-			termDataValues,
-			termDataValues?.term_id
-		);
-	}
-
-	if ( ! dataFields || ! Object.keys( dataFields ).length ) {
-		return null;
-	}
-
-	return dataFields;
-}
-
-/**
  * @type {WPBlockBindingsSource}
  */
 export default {
 	name: 'core/term-data',
 	usesContext: [ 'taxonomy', 'termId', 'termData' ],
 	getValues( { select, context, bindings, clientId } ) {
-		const dataFields = getTermDataFields( select, context, clientId );
+		/*
+		 * BACKWARDS COMPATIBILITY: Hardcoded exception for navigation blocks.
+		 * Required for WordPress 6.9+ navigation blocks. DO NOT REMOVE.
+		 */
+		const { getBlockAttributes, getBlockName } = select( blockEditorStore );
+		const blockName = getBlockName?.( clientId );
+		const isNavigationBlock = NAVIGATION_BLOCK_TYPES.includes( blockName );
+
+		let termId, taxonomy;
+
+		if ( isNavigationBlock ) {
+			// Navigation blocks: read from block attributes
+			const blockAttributes = getBlockAttributes?.( clientId );
+			termId = blockAttributes?.id;
+			const typeFromAttributes = blockAttributes?.type;
+			taxonomy =
+				typeFromAttributes === 'tag' ? 'post_tag' : typeFromAttributes;
+		} else {
+			// All other blocks: use context
+			termId = context?.termId;
+			taxonomy = context?.taxonomy;
+		}
+
+		// Get the term data from core-data store
+		const { getEntityRecord } = select( coreDataStore );
+		let termDataValues;
+
+		if ( taxonomy && termId ) {
+			termDataValues = getEntityRecord( 'taxonomy', taxonomy, termId );
+
+			if ( ! termDataValues && context?.termData ) {
+				termDataValues = context.termData;
+			}
+		} else if ( context?.termData ) {
+			termDataValues = context.termData;
+			termId = termDataValues?.term_id;
+		}
+
+		// Build the return values
+		const dataFields = termDataValues
+			? createDataFields( termDataValues, termId )
+			: null;
 
 		const newValues = {};
 		for ( const [ attributeName, source ] of Object.entries( bindings ) ) {
@@ -154,6 +116,7 @@ export default {
 				dataFields?.[ fieldKey ] || {};
 			newValues[ attributeName ] = fieldValue ?? fieldLabel ?? fieldKey;
 		}
+
 		return newValues;
 	},
 	// eslint-disable-next-line no-unused-vars
@@ -184,9 +147,20 @@ export default {
 			return false;
 		}
 
-		const fieldValue = getTermDataFields( select, context, undefined )?.[
-			args.field
-		]?.value;
+		const { getEntityRecord } = select( coreDataStore );
+		const termDataValues = getEntityRecord(
+			'taxonomy',
+			context.taxonomy,
+			context.termId
+		);
+
+		if ( ! termDataValues ) {
+			return false;
+		}
+
+		const dataFields = createDataFields( termDataValues, context.termId );
+		const fieldValue = dataFields?.[ args.field ]?.value;
+
 		// Empty string or `false` could be a valid value, so we need to check if the field value is undefined.
 		if ( fieldValue === undefined ) {
 			return false;
@@ -195,12 +169,23 @@ export default {
 		return false;
 	},
 	getFieldsList( { select, context } ) {
-		const clientId = select( blockEditorStore ).getSelectedBlockClientId();
-		const termDataFields = getTermDataFields( select, context, clientId );
-		if ( ! termDataFields ) {
+		// For non-navigation blocks, use context values
+		const termId = context?.termId;
+		const taxonomy = context?.taxonomy;
+
+		if ( ! taxonomy || ! termId ) {
 			return [];
 		}
-		return Object.entries( termDataFields ).map( ( [ key, field ] ) => ( {
+
+		const { getEntityRecord } = select( coreDataStore );
+		const termDataValues = getEntityRecord( 'taxonomy', taxonomy, termId );
+
+		if ( ! termDataValues ) {
+			return [];
+		}
+
+		const dataFields = createDataFields( termDataValues, termId );
+		return Object.entries( dataFields ).map( ( [ key, field ] ) => ( {
 			label: field.label,
 			type: field.type,
 			args: { field: key },
