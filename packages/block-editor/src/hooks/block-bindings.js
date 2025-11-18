@@ -114,13 +114,17 @@ function BlockBindingsPanelMenuContent( { attribute, binding, sources } ) {
 											key: item.key,
 										},
 									};
-									const values = source.getValues( {
-										select,
-										context: blockContext,
-										bindings: {
-											[ attribute ]: itemBindings,
-										},
-									} );
+									let values = {};
+									try {
+										values = source.getValues( {
+											select,
+											context: blockContext,
+											bindings: {
+												[ attribute ]: itemBindings,
+											},
+										} );
+									} catch ( e ) {}
+
 									return (
 										<Menu.CheckboxItem
 											key={
