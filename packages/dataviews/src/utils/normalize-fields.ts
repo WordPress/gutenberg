@@ -13,6 +13,7 @@ import type {
 	FieldTypeDefinition,
 	NormalizedFilterByConfig,
 	NormalizedField,
+	FormatDate,
 } from '../types';
 import { getControl } from '../dataform-controls';
 import {
@@ -218,7 +219,9 @@ export default function normalizeFields< Item >(
 		};
 
 		if ( field.type === 'date' ) {
-			const format = fieldTypeDefinition.getFormat( field );
+			const format = fieldTypeDefinition.getFormat(
+				field
+			) as Required< FormatDate >;
 
 			return {
 				...baseField,
@@ -227,6 +230,9 @@ export default function normalizeFields< Item >(
 			};
 		}
 
-		return { ...baseField, type: field.type, format: {} };
+		return {
+			...baseField,
+			type: field.type,
+		};
 	} );
 }

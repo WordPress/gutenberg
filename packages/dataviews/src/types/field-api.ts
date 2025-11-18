@@ -327,7 +327,7 @@ export type NormalizedFormat = Required< FormatDate > | {};
  *
  * If not provided, defaults to WordPress date format settings.
  */
-type FormatDate = {
+export type FormatDate = {
 	date?: string;
 	weekStartsOn?: DayString;
 };
