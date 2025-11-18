@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { store as blocksStore } from '@wordpress/blocks';
+import {
+	store as blocksStore,
+	privateApis as blocksPrivateApis,
+} from '@wordpress/blocks';
 import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalHStack as HStack,
@@ -21,6 +24,7 @@ import BlockIcon from '../block-icon';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { useInspectorPopoverPlacement } from './use-inspector-popover-placement';
+const { fieldsKey } = unlock( blocksPrivateApis );
 
 // controls
 import PlainText from './plain-text';
@@ -83,7 +87,7 @@ function BlockFields( { clientId } ) {
 	const blockInformation = useBlockDisplayInformation( clientId );
 	const popoverPlacementProps = useInspectorPopoverPlacement();
 
-	if ( ! blockType?.fields?.length ) {
+	if ( ! blockType?.[ fieldsKey ]?.length ) {
 		// TODO - we might still want to show a placeholder for blocks with no fields.
 		// for example, a way to select the block.
 		return null;
@@ -100,7 +104,7 @@ function BlockFields( { clientId } ) {
 			panelId={ clientId }
 			dropdownMenuProps={ popoverPlacementProps }
 		>
-			{ blockType?.fields?.map( ( field, index ) => (
+			{ blockType?.[ fieldsKey ]?.map( ( field, index ) => (
 				<BlockAttributeToolsPanelItem
 					key={ `${ clientId }/${ index }` }
 					clientId={ clientId }

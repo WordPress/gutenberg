@@ -176,5 +176,8 @@ export {
 	__EXPERIMENTAL_PATHS_WITH_OVERRIDE,
 } from './constants';
 
+// Allows blocks to declare a `settings.fields` property.
+const fieldsKey = Symbol( 'fields' );
+
 export const privateApis = {};
-lock( privateApis, { isContentBlock } );
+lock( privateApis, { isContentBlock, fieldsKey } );

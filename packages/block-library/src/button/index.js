@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { button as icon } from '@wordpress/icons';
+import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -12,6 +13,9 @@ import deprecated from './deprecated';
 import edit from './edit';
 import metadata from './block.json';
 import save from './save';
+import { unlock } from '../lock-unlock';
+
+const { fieldsKey } = unlock( blocksPrivateApis );
 
 const { name } = metadata;
 
@@ -35,7 +39,7 @@ export const settings = {
 };
 
 if ( window.__experimentalContentOnlyPatternInsertion ) {
-	settings.fields = [
+	settings[ fieldsKey ] = [
 		{
 			label: __( 'Content' ),
 			type: 'RichText',
