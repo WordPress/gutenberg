@@ -8,9 +8,10 @@ import { __ } from '@wordpress/i18n';
  */
 import type {
 	DataViewRenderFieldProps,
-	SortDirection,
-	NormalizedField,
 	FieldTypeDefinition,
+	NormalizedField,
+	NormalizedFormat,
+	SortDirection,
 } from '../types';
 import {
 	OPERATOR_IS,
@@ -62,6 +63,7 @@ export default {
 
 		return null;
 	},
+	getFormat: (): NormalizedFormat => ( {} ),
 	enableSorting: true,
 	filterBy: {
 		defaultOperators: [

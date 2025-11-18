@@ -1,15 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { dateI18n, getDate } from '@wordpress/date';
+import { dateI18n, getDate, getSettings } from '@wordpress/date';
 
 /**
  * Internal dependencies
  */
 import type {
 	DataViewRenderFieldProps,
-	SortDirection,
+	DayString,
+	Field,
 	FieldTypeDefinition,
+	NormalizedFormat,
+	SortDirection,
 } from '../types';
 import RenderFromElements from './utils/render-from-elements';
 import {
@@ -23,6 +26,7 @@ import {
 	OPERATOR_OVER,
 	OPERATOR_BETWEEN,
 } from '../constants';
+import { DAYS_OF_WEEK, numberToWeekStartsOn } from '../utils/week-starts-on';
 
 function sort( a: any, b: any, direction: SortDirection ) {
 	const timeA = new Date( a ).getTime();
@@ -60,6 +64,20 @@ export default {
 		return dateI18n( field.format.date, getDate( value ) );
 	},
 	enableSorting: true,
+	getFormat: ( field: Field< any > ): NormalizedFormat => {
+		return {
+			date:
+				field.format?.date !== undefined &&
+				typeof field.format.date === 'string'
+					? field.format.date
+					: getSettings().formats.date,
+			weekStartsOn:
+				field.format?.weekStartsOn !== undefined &&
+				DAYS_OF_WEEK.includes( field.format?.weekStartsOn as DayString )
+					? field.format.weekStartsOn
+					: numberToWeekStartsOn( getSettings().l10n.startOfWeek ),
+		};
+	},
 	filterBy: {
 		defaultOperators: [
 			OPERATOR_ON,

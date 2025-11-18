@@ -3,8 +3,9 @@
  */
 import type {
 	DataViewRenderFieldProps,
-	SortDirection,
 	FieldTypeDefinition,
+	NormalizedFormat,
+	SortDirection,
 } from '../types';
 import RenderFromElements from './utils/render-from-elements';
 import parseDateTime from './utils/parse-date-time';
@@ -50,6 +51,7 @@ export default {
 			return null;
 		}
 	},
+	getFormat: (): NormalizedFormat => ( {} ),
 	enableSorting: true,
 	filterBy: {
 		defaultOperators: [

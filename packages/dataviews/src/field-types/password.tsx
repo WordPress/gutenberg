@@ -3,8 +3,9 @@
  */
 import type {
 	DataViewRenderFieldProps,
-	SortDirection,
 	FieldTypeDefinition,
+	SortDirection,
+	NormalizedFormat,
 } from '../types';
 import RenderFromElements from './utils/render-from-elements';
 
@@ -28,6 +29,7 @@ export default {
 			'••••••••'
 		);
 	},
+	getFormat: (): NormalizedFormat => ( {} ),
 	enableSorting: false,
 	filterBy: false,
 } satisfies FieldTypeDefinition< any >;

@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import type { FieldTypeDefinition } from '../types';
+import type { FieldTypeDefinition, NormalizedFormat } from '../types';
 
 function sort() {
 	return 0;
@@ -15,6 +15,7 @@ export default {
 	},
 	Edit: null,
 	render: () => null,
+	getFormat: (): NormalizedFormat => ( {} ),
 	enableSorting: false,
 	filterBy: false,
 } satisfies FieldTypeDefinition< any >;

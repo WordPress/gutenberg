@@ -13,9 +13,10 @@ import { __ } from '@wordpress/i18n';
  */
 import type {
 	DataViewRenderFieldProps,
-	SortDirection,
-	NormalizedField,
 	FieldTypeDefinition,
+	NormalizedField,
+	NormalizedFormat,
+	SortDirection,
 } from '../types';
 import RenderFromElements from './utils/render-from-elements';
 import {
@@ -101,6 +102,7 @@ export default {
 			</div>
 		);
 	},
+	getFormat: (): NormalizedFormat => ( {} ),
 	enableSorting: true,
 	filterBy: {
 		defaultOperators: [ OPERATOR_IS_ANY, OPERATOR_IS_NONE ],

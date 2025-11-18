@@ -136,6 +136,8 @@ export type FieldTypeDefinition< Item > = {
 	 */
 	filterBy: FilterConfigForType | false;
 
+	getFormat: ( field: Field< Item > ) => NormalizedFormat;
+
 	/**
 	 * Whether the field is readOnly.
 	 * If `true`, the value will be rendered using the `render` callback.
@@ -314,6 +316,8 @@ export type Field< Item > = {
 	 */
 	format?: FormatDate;
 };
+
+export type NormalizedFormat = Required< FormatDate > | {};
 
 /**
  * Format for date fields:

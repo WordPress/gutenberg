@@ -5,6 +5,7 @@ import type {
 	DataViewRenderFieldProps,
 	FieldType,
 	FieldTypeDefinition,
+	NormalizedFormat,
 	SortDirection,
 } from '../types';
 import { default as email } from './email';
@@ -108,6 +109,7 @@ export default function getFieldTypeDefinition< Item >(
 				field.getValue( { item } )
 			);
 		},
+		getFormat: (): NormalizedFormat => ( {} ),
 		enableSorting: true,
 		filterBy: {
 			defaultOperators: [ OPERATOR_IS, OPERATOR_IS_NOT ],
