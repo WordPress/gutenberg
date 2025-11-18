@@ -31,6 +31,16 @@
 			"import": "./build-module/index.js",
 			"require": "./build/index.js"
 		},
+		"./jsx-runtime": {
+			"types": "./build-types/jsx-runtime.d.ts",
+			"import": "./build-module/jsx-runtime.js",
+			"require": "./build/jsx-runtime.js"
+		},
+		"./jsx-dev-runtime": {
+			"types": "./build-types/jsx-dev-runtime.d.ts",
+			"import": "./build-module/jsx-dev-runtime.js",
+			"require": "./build/jsx-dev-runtime.js"
+		},
 		"./package.json": "./package.json"
 	},
 	"react-native": "src/index",
