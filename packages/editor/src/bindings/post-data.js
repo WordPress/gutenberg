@@ -85,7 +85,7 @@ export default {
 		const newValues = {};
 		for ( const [ attributeName, binding ] of Object.entries( bindings ) ) {
 			if ( ! allowedFields.includes( binding.args.field ) ) {
-				newValues[ attributeName ] = {};
+				newValues[ attributeName ] = binding.args.field;
 				continue;
 			}
 

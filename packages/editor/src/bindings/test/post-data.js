@@ -93,7 +93,7 @@ describe( 'post-data bindings', () => {
 				} );
 			} );
 
-			it( 'should return empty object for unknown fields', () => {
+			it( 'should return field name for unknown fields', () => {
 				const values = postDataBindings.getValues( {
 					select,
 					context: { postId: 123, postType: 'post' },
@@ -106,7 +106,7 @@ describe( 'post-data bindings', () => {
 					clientId: '123abc456',
 				} );
 
-				expect( values.content ).toEqual( {} );
+				expect( values.content ).toEqual( 'unknown' );
 			} );
 		} );
 
