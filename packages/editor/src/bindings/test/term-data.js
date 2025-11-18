@@ -108,11 +108,19 @@ describe( 'term-data bindings', () => {
 						termId: 456,
 					},
 					bindings: {
-						content: {
+						id: {
+							source: 'core/term-data',
+							args: { field: 'id' },
+						},
+						name: {
 							source: 'core/term-data',
 							args: { field: 'name' },
 						},
-						url: {
+						slug: {
+							source: 'core/term-data',
+							args: { field: 'slug' },
+						},
+						link: {
 							source: 'core/term-data',
 							args: { field: 'link' },
 						},
@@ -120,14 +128,26 @@ describe( 'term-data bindings', () => {
 							source: 'core/term-data',
 							args: { field: 'description' },
 						},
+						parent: {
+							source: 'core/term-data',
+							args: { field: 'parent' },
+						},
+						count: {
+							source: 'core/term-data',
+							args: { field: 'count' },
+						},
 					},
 					clientId: '123abc456',
 				} );
 
 				expect( values ).toStrictEqual( {
-					content: 'name',
-					url: 'link',
+					id: 'id',
+					name: 'name',
+					slug: 'slug',
+					link: 'link',
 					description: 'description',
+					parent: 'parent',
+					count: 'count',
 				} );
 			} );
 
