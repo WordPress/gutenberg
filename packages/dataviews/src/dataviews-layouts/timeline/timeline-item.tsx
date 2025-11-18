@@ -100,101 +100,108 @@ function TimelineItem< Item >(
 			<titleField.render item={ item } field={ titleField } />
 		) : null;
 
+	const verticalSpacing = useMemo( () => {
+		switch ( density ) {
+			case 'compact':
+				return '1';
+			case 'comfortable':
+				return '3';
+			default:
+				return '2';
+		}
+	}, [ density ] );
+
 	return (
-		<>
-			<div
-				ref={ itemRef }
-				role={ infiniteScrollEnabled ? 'article' : undefined }
-				aria-posinset={ posinset }
-				aria-setsize={
-					infiniteScrollEnabled
-						? paginationInfo.totalItems
-						: undefined
-				}
-				className="dataviews-view-timeline__item"
+		<div
+			ref={ itemRef }
+			role={ infiniteScrollEnabled ? 'article' : undefined }
+			aria-posinset={ posinset }
+			aria-setsize={
+				infiniteScrollEnabled ? paginationInfo.totalItems : undefined
+			}
+			className="dataviews-view-timeline__item"
+		>
+			<HStack
+				spacing={ 3 }
+				justify="start"
+				alignment="flex-start"
+				className="dataviews-view-timeline__row"
 			>
-				<HStack
-					spacing={ 3 }
-					justify="start"
-					alignment="flex-start"
-					className="dataviews-view-timeline__row"
+				<div
+					className={ clsx(
+						'dataviews-view-timeline__event-type',
+						density === 'compact' && 'is-compact',
+						density === 'balanced' && 'is-balanced',
+						density === 'comfortable' && 'is-comfortable'
+					) }
 				>
-					<div
-						className={ clsx(
-							'dataviews-view-timeline__event-type',
-							density === 'compact' && 'is-compact',
-							density === 'balanced' && 'is-balanced',
-							density === 'comfortable' && 'is-comfortable'
-						) }
-					>
-						{ renderedMediaField }
-					</div>
-					<VStack
-						spacing={ 0 }
-						alignment="flex-start"
-						className="dataviews-view-timeline__event-content"
-					>
-						{ renderedTitleField && (
-							<ItemClickWrapper
+					{ renderedMediaField }
+				</div>
+				<VStack
+					spacing={ verticalSpacing }
+					alignment="flex-start"
+					className="dataviews-view-timeline__event-content"
+				>
+					{ renderedTitleField && (
+						<ItemClickWrapper
+							item={ item }
+							isItemClickable={ isItemClickable }
+							onClickItem={ onClickItem }
+							renderItemLink={ renderItemLink }
+							className="dataviews-view-timeline__event-title"
+						>
+							{ renderedTitleField }
+						</ItemClickWrapper>
+					) }
+					{ showDescription && descriptionField && (
+						<div className="dataviews-view-timeline__event-description">
+							<descriptionField.render
 								item={ item }
-								isItemClickable={ isItemClickable }
-								onClickItem={ onClickItem }
-								renderItemLink={ renderItemLink }
-								className="dataviews-view-timeline__event-title"
-							>
-								{ renderedTitleField }
-							</ItemClickWrapper>
-						) }
-						{ showDescription && descriptionField && (
-							<div className="dataviews-view-timeline__event-description">
-								<descriptionField.render
-									item={ item }
-									field={ descriptionField }
-								/>
-							</div>
-						) }
-						<div className="dataviews-view-timeline__fields">
-							{ otherFields.map( ( field ) => (
-								<div
-									key={ field.id }
-									className="dataviews-view-timeline__field"
-								>
-									<VisuallyHidden
-										as="span"
-										className="dataviews-view-timeline__field-label"
-									>
-										{ field.label }
-									</VisuallyHidden>
-									<span className="dataviews-view-timeline__field-value">
-										<field.render
-											item={ item }
-											field={ field }
-										/>
-									</span>
-								</div>
-							) ) }
-						</div>
-						{ !! primaryActions?.length && (
-							<PrimaryActions
-								item={ item }
-								actions={ primaryActions }
-								registry={ registry }
-								buttonVariant="secondary"
-							/>
-						) }
-					</VStack>
-					{ primaryActions.length < eligibleActions.length && (
-						<div className="dataviews-view-timeline__item-actions">
-							<ItemActions
-								item={ item }
-								actions={ eligibleActions }
-								isCompact
+								field={ descriptionField }
 							/>
 						</div>
 					) }
-				</HStack>
-			</div>
-		</>
+					<div className="dataviews-view-timeline__fields">
+						{ otherFields.map( ( field ) => (
+							<div
+								key={ field.id }
+								className="dataviews-view-timeline__field"
+							>
+								<VisuallyHidden
+									as="span"
+									className="dataviews-view-timeline__field-label"
+								>
+									{ field.label }
+								</VisuallyHidden>
+								<span className="dataviews-view-timeline__field-value">
+									<field.render
+										item={ item }
+										field={ field }
+									/>
+								</span>
+							</div>
+						) ) }
+					</div>
+					{ !! primaryActions?.length && (
+						<PrimaryActions
+							item={ item }
+							actions={ primaryActions }
+							registry={ registry }
+							buttonVariant="secondary"
+						/>
+					) }
+				</VStack>
+				{ primaryActions.length < eligibleActions.length && (
+					<div className="dataviews-view-timeline__item-actions">
+						<ItemActions
+							item={ item }
+							actions={ eligibleActions }
+							isCompact
+						/>
+					</div>
+				) }
+			</HStack>
+		</div>
 	);
 }
 

@@ -26,7 +26,6 @@
 	.dataviews-view-timeline__event-content {
 		padding: $grid-unit-15 0;
 		flex-grow: 1;
-		gap: $grid-unit-10;
 
 		.dataviews-view-timeline__event-title {
 			position: relative;
@@ -36,7 +35,6 @@
 			min-height: $grid-unit-30;
 			line-height: $grid-unit-30;
 			overflow: hidden;
-			font-weight: $font-weight-medium;
 			font-size: $font-size-medium;
 			color: $gray-900;
 
@@ -154,10 +152,19 @@
 		}
 	}
 
-	.dataviews-view-timeline__item:first-of-type {
+	.dataviews-view-timeline__item:first-child {
 		.dataviews-view-timeline__event-type {
 			&::before {
 				visibility: hidden;
+			}
+		}
+	}
+
+	.dataviews-view-timeline__group:last-of-type > .dataviews-view-timeline__item:last-of-type,
+	& > .dataviews-view-timeline__item:last-child {
+		.dataviews-view-timeline__event-type {
+			&::after {
+				background: linear-gradient(to bottom, $gray-300 0%, rgba($gray-300, 0.2) 60%, rgba($gray-300, 0) 100%);
 			}
 		}
 	}

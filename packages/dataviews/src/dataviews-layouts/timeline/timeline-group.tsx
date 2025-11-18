@@ -38,7 +38,11 @@ export default function TimelineGroup< Item >( {
 	);
 
 	return (
-		<VStack key={ groupName } spacing={ 0 }>
+		<VStack
+			key={ groupName }
+			spacing={ 0 }
+			className="dataviews-view-timeline__group"
+		>
 			<h3 className="dataviews-view-timeline__group-header">
 				{ groupHeader }
 			</h3>
