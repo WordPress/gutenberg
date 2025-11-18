@@ -525,8 +525,9 @@ export const saveEntityRecord =
 		if ( ! entityConfig ) {
 			return;
 		}
-		const entityIdKey = entityConfig.key || DEFAULT_ENTITY_KEY;
+		const entityIdKey = entityConfig.key ?? DEFAULT_ENTITY_KEY;
 		const recordId = record[ entityIdKey ];
+		const isNewRecord = !! entityIdKey && ! recordId;
 
 		const lock = await dispatch.__unstableAcquireStoreLock(
 			STORE_NAME,
@@ -580,11 +581,10 @@ export const saveEntityRecord =
 			}
 			try {
 				const path = `${ baseURL }${ recordId ? '/' + recordId : '' }`;
-				const persistedRecord = select.getRawEntityRecord(
-					kind,
-					name,
-					recordId
-				);
+				// Skip the raw values check when creating a new record; they don't exist yet.
+				const persistedRecord = ! isNewRecord
+					? select.getRawEntityRecord( kind, name, recordId )
+					: {};
 
 				if ( isAutosave ) {
 					// Most of this autosave logic is very specific to posts.

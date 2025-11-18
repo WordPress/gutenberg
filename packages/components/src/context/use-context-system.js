@@ -33,14 +33,12 @@ export function useContextSystem( props, namespace ) {
 
 	const contextProps = contextSystemProps?.[ namespace ] || {};
 
-	/* eslint-disable jsdoc/no-undefined-types */
 	/** @type {ConnectedProps<P>} */
 	// @ts-ignore We fill in the missing properties below
 	const finalComponentProps = {
 		...getConnectedNamespace(),
 		...getNamespace( namespace ),
 	};
-	/* eslint-enable jsdoc/no-undefined-types */
 
 	const { _overrides: overrideProps, ...otherContextProps } = contextProps;
 

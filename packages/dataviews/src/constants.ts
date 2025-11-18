@@ -186,3 +186,4 @@ export const LAYOUT_LIST = 'list';
 
 // Picker view layouts.
 export const LAYOUT_PICKER_GRID = 'pickerGrid';
+export const LAYOUT_PICKER_TABLE = 'pickerTable';

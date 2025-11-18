@@ -219,10 +219,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		const defaultBlockContext = useMemo( () => {
 			const postContext = {};
 			// If it is a template, try to inherit the post type from the name.
-			if (
-				post.type === 'wp_template' ||
-				post.type === 'wp_registered_template'
-			) {
+			if ( post.type === 'wp_template' ) {
 				if ( post.slug === 'page' ) {
 					postContext.postType = 'page';
 				} else if ( post.slug === 'single' ) {

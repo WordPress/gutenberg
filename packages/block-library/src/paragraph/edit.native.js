@@ -29,7 +29,8 @@ function ParagraphBlock( {
 		return !! select( blockEditorStore ).getSettings().isRTL;
 	}, [] );
 
-	const { align, content, placeholder } = attributes;
+	const { content, placeholder, style: attributesStyle } = attributes;
+	const textAlign = attributesStyle?.typography?.textAlign;
 
 	const styles = {
 		...( style?.baseColors && {
@@ -40,9 +41,20 @@ function ParagraphBlock( {
 		...style,
 	};
 
-	const onAlignmentChange = useCallback( ( nextAlign ) => {
-		setAttributes( { align: nextAlign } );
-	}, [] );
+	const onAlignmentChange = useCallback(
+		( nextAlign ) => {
+			setAttributes( {
+				style: {
+					...attributesStyle,
+					typography: {
+						...attributesStyle?.typography,
+						textAlign: nextAlign,
+					},
+				},
+			} );
+		},
+		[ attributesStyle, setAttributes ]
+	);
 
 	const parentTextAlignment = allowedParentBlockAlignments.includes(
 		parentBlockAlignment
@@ -50,13 +62,13 @@ function ParagraphBlock( {
 		? parentBlockAlignment
 		: undefined;
 
-	const textAlignment = align || parentTextAlignment;
+	const textAlignment = textAlign || parentTextAlignment;
 
 	return (
 		<>
 			<BlockControls group="block">
 				<AlignmentControl
-					value={ align }
+					value={ textAlign }
 					isRTL={ isRTL }
 					onChange={ onAlignmentChange }
 				/>

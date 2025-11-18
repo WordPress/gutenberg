@@ -35,8 +35,11 @@ const stories = [
 	'../packages/components/src/**/stories/*.mdx',
 	'../packages/icons/src/**/stories/*.story.@(js|tsx|mdx)',
 	'../packages/edit-site/src/**/stories/*.story.@(js|tsx|mdx)',
+	'../packages/global-styles-ui/src/**/stories/*.story.@(js|tsx|mdx)',
 	'../packages/dataviews/src/**/stories/*.story.@(js|tsx|mdx)',
 	'../packages/fields/src/**/stories/*.story.@(js|tsx|mdx)',
+	'../packages/theme/src/**/stories/*.story.@(tsx|mdx)',
+	'../packages/ui/src/**/stories/*.story.@(ts|tsx)',
 ].filter( Boolean );
 
 module.exports = {

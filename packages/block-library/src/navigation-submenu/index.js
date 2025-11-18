@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { page, addSubmenu } from '@wordpress/icons';
-import { _x } from '@wordpress/i18n';
+import { _x, __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -47,5 +47,28 @@ export const settings = {
 	save,
 	transforms,
 };
+
+if ( window.__experimentalContentOnlyPatternInsertion ) {
+	settings.fields = [
+		{
+			label: __( 'Label' ),
+			type: 'RichText',
+			shownByDefault: true,
+			mapping: {
+				value: 'label',
+			},
+		},
+		{
+			label: __( 'Link' ),
+			type: 'Link',
+			shownByDefault: false,
+			mapping: {
+				href: 'url',
+				rel: 'rel',
+				// TODO - opens in new tab? id?
+			},
+		},
+	];
+}
 
 export const init = () => initBlock( { name, metadata, settings } );

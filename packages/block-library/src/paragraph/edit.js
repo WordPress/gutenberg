@@ -13,7 +13,6 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import {
-	AlignmentControl,
 	BlockControls,
 	InspectorControls,
 	RichText,
@@ -58,10 +57,11 @@ function DropCapControl( { clientId, attributes, setAttributes, name } ) {
 		return null;
 	}
 
-	const { align, dropCap } = attributes;
+	const { style, dropCap } = attributes;
+	const textAlign = style?.typography?.textAlign;
 
 	let helpText;
-	if ( hasDropCapDisabled( align ) ) {
+	if ( hasDropCapDisabled( textAlign ) ) {
 		helpText = __( 'Not available for aligned text.' );
 	} else if ( dropCap ) {
 		helpText = __( 'Showing large initial letter.' );
@@ -91,7 +91,7 @@ function DropCapControl( { clientId, attributes, setAttributes, name } ) {
 					checked={ !! dropCap }
 					onChange={ () => setAttributes( { dropCap: ! dropCap } ) }
 					help={ helpText }
-					disabled={ hasDropCapDisabled( align ) }
+					disabled={ hasDropCapDisabled( textAlign ) }
 				/>
 			</ToolsPanelItem>
 		</InspectorControls>
@@ -108,12 +108,12 @@ function ParagraphBlock( {
 	isSelected: isSingleSelected,
 	name,
 } ) {
-	const { align, content, direction, dropCap, placeholder } = attributes;
+	const { content, direction, dropCap, placeholder, style } = attributes;
+	const textAlign = style?.typography?.textAlign;
 	const blockProps = useBlockProps( {
 		ref: useOnEnter( { clientId, content } ),
 		className: clsx( {
-			'has-drop-cap': hasDropCapDisabled( align ) ? false : dropCap,
-			[ `has-text-align-${ align }` ]: align,
+			'has-drop-cap': hasDropCapDisabled( textAlign ) ? false : dropCap,
 		} ),
 		style: { direction },
 	} );
@@ -123,17 +123,6 @@ function ParagraphBlock( {
 		<>
 			{ blockEditingMode === 'default' && (
 				<BlockControls group="block">
-					<AlignmentControl
-						value={ align }
-						onChange={ ( newAlign ) =>
-							setAttributes( {
-								align: newAlign,
-								dropCap: hasDropCapDisabled( newAlign )
-									? false
-									: dropCap,
-							} )
-						}
-					/>
 					<ParagraphRTLControl
 						direction={ direction }
 						setDirection={ ( newDirection ) =>

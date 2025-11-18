@@ -55,6 +55,7 @@ const MediaReplaceFlow = ( {
 	handleUpload = true,
 	popoverProps,
 	renderToggle,
+	className,
 } ) => {
 	const { getSettings } = useSelect( blockEditorStore );
 	const errorNoticeID = `block-editor/media-replace-flow/error-notice/${ ++uniqueId }`;
@@ -131,6 +132,7 @@ const MediaReplaceFlow = ( {
 	return (
 		<Dropdown
 			popoverProps={ popoverProps }
+			className={ className }
 			contentClassName="block-editor-media-replace-flow__options"
 			renderToggle={ ( { isOpen, onToggle } ) => {
 				if ( renderToggle ) {
@@ -219,7 +221,6 @@ const MediaReplaceFlow = ( {
 							: children }
 					</NavigableMenu>
 					{ onSelectURL && (
-						// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
 						<form className="block-editor-media-flow__url-input">
 							<span className="block-editor-media-replace-flow__image-url-label">
 								{ __( 'Current media URL:' ) }

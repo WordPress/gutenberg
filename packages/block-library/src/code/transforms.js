@@ -22,6 +22,7 @@ const transforms = {
 			transform: ( attributes ) => {
 				const { content } = attributes;
 				return createBlock( 'core/code', {
+					...attributes,
 					...getTransformedAttributes( attributes, 'core/code' ),
 					content,
 				} );
@@ -33,6 +34,7 @@ const transforms = {
 			transform: ( attributes ) => {
 				const { content: text } = attributes;
 				return createBlock( 'core/code', {
+					...attributes,
 					...getTransformedAttributes( attributes, 'core/code' ),
 					// The HTML is plain text (with plain line breaks), so
 					// convert it to rich text.

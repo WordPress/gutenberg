@@ -378,7 +378,11 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 			);
 		}
 
-		$prepared_comment['comment_approved'] = wp_allow_comment( $prepared_comment, true );
+		// Don't check for duplicates or flooding for notes.
+		$prepared_comment['comment_approved'] =
+			'note' === $prepared_comment['comment_type'] ?
+			'1' :
+			wp_allow_comment( $prepared_comment, true );
 
 		if ( is_wp_error( $prepared_comment['comment_approved'] ) ) {
 			$error_code    = $prepared_comment['comment_approved']->get_error_code();
@@ -512,6 +516,37 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 	}
 
 	/**
+	 * Prepares links for the request.
+	 *
+	 * @since 4.7.0
+	 *
+	 * @param WP_Comment $comment Comment object.
+	 * @return array Links for the given comment.
+	 */
+	protected function prepare_links( $comment ) {
+		$links = parent::prepare_links( $comment );
+
+		// Embedding children for notes requires `type` and `status` inheritance.
+		// Note: This is only relevant change for the backport.
+		if ( isset( $links['children'] ) && 'note' === $comment->comment_type ) {
+			$args = array(
+				'parent' => $comment->comment_ID,
+				'type'   => $comment->comment_type,
+				'status' => 'all',
+			);
+
+			$rest_url = add_query_arg( $args, rest_url( $this->namespace . '/' . $this->rest_base ) );
+
+			$links['children'] = array(
+				'href'       => $rest_url,
+				'embeddable' => true,
+			);
+		}
+
+		return $links;
+	}
+
+	/**
 	 * Override the schema to change `type` property.
 	 *
 	 * @return array
@@ -537,6 +572,10 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 	 * @return bool True if the content is allowed, false otherwise.
 	 */
 	protected function check_is_comment_content_allowed( $prepared_comment ) {
+		if ( ! isset( $prepared_comment['comment_content'] ) ) {
+			return true;
+		}
+
 		$check = wp_parse_args(
 			$prepared_comment,
 			array(

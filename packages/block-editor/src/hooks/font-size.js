@@ -92,13 +92,21 @@ function addSaveProps( props, blockNameOrType, attributes ) {
  */
 export function FontSizeEdit( props ) {
 	const {
-		attributes: { fontSize, style },
+		attributes: { fontSize, style, fitText },
 		setAttributes,
 	} = props;
+
 	const [ fontSizes ] = useSettings( 'typography.fontSizes' );
 
-	const onChange = ( value ) => {
-		const fontSizeSlug = getFontSizeObjectByValue( fontSizes, value ).slug;
+	// Hide font size UI when fitText is enabled
+	if ( fitText ) {
+		return null;
+	}
+	const onChange = ( value, selectedItem ) => {
+		// Use the selectedItem's slug if available, otherwise fall back to finding by value
+		const fontSizeSlug =
+			selectedItem?.slug ||
+			getFontSizeObjectByValue( fontSizes, value ).slug;
 
 		setAttributes( {
 			style: cleanEmptyObject( {
@@ -124,7 +132,8 @@ export function FontSizeEdit( props ) {
 	return (
 		<FontSizePicker
 			onChange={ onChange }
-			value={ fontSizeValue }
+			value={ fontSize || fontSizeValue }
+			valueMode={ fontSize ? 'slug' : 'literal' }
 			withReset={ false }
 			withSlider
 			size="__unstable-large"
@@ -207,7 +216,7 @@ function useBlockProps( { name, fontSize, style } ) {
 export default {
 	useBlockProps,
 	addSaveProps,
-	attributeKeys: [ 'fontSize', 'style' ],
+	attributeKeys: [ 'fontSize', 'style', 'fitText' ],
 	hasSupport( name ) {
 		return hasBlockSupport( name, FONT_SIZE_SUPPORT_KEY );
 	},

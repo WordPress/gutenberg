@@ -68,7 +68,6 @@ import WelcomeGuide from '../welcome-guide';
 import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import useEditPostCommands from '../../commands/use-commands';
-import { usePaddingAppender } from './use-padding-appender';
 import { useShouldIframe } from './use-should-iframe';
 import useNavigateToEntityRecord from '../../hooks/use-navigate-to-entity-record';
 import { useMetaBoxInitialization } from '../meta-boxes/use-meta-box-initialization';
@@ -81,41 +80,37 @@ const DESIGN_POST_TYPES = [
 	'wp_template_part',
 	'wp_block',
 	'wp_navigation',
-	'wp_registered_template',
 ];
 
-function useEditorStyles( ...additionalStyles ) {
-	const { hasThemeStyleSupport, editorSettings } = useSelect( ( select ) => {
+function useEditorStyles( settings ) {
+	const { hasThemeStyleSupport } = useSelect( ( select ) => {
 		return {
 			hasThemeStyleSupport:
 				select( editPostStore ).isFeatureActive( 'themeStyles' ),
-			editorSettings: select( editorStore ).getEditorSettings(),
 		};
 	}, [] );
-
-	const addedStyles = additionalStyles.join( '\n' );
 
 	// Compute the default styles.
 	return useMemo( () => {
 		const presetStyles =
-			editorSettings.styles?.filter(
+			settings.styles?.filter(
 				( style ) =>
 					style.__unstableType && style.__unstableType !== 'theme'
 			) ?? [];
 
 		const defaultEditorStyles = [
-			...( editorSettings?.defaultEditorStyles ?? [] ),
+			...( settings?.defaultEditorStyles ?? [] ),
 			...presetStyles,
 		];
 
 		// Has theme styles if the theme supports them and if some styles were not preset styles (in which case they're theme styles).
 		const hasThemeStyles =
 			hasThemeStyleSupport &&
-			presetStyles.length !== ( editorSettings.styles?.length ?? 0 );
+			presetStyles.length !== ( settings.styles?.length ?? 0 );
 
 		// If theme styles are not present or displayed, ensure that
 		// base layout styles are still present in the editor.
-		if ( ! editorSettings.disableLayoutStyles && ! hasThemeStyles ) {
+		if ( ! settings.disableLayoutStyles && ! hasThemeStyles ) {
 			defaultEditorStyles.push( {
 				css: getLayoutStyles( {
 					style: {},
@@ -127,21 +122,12 @@ function useEditorStyles( ...additionalStyles ) {
 			} );
 		}
 
-		const baseStyles = hasThemeStyles
-			? editorSettings.styles ?? []
-			: defaultEditorStyles;
-
-		if ( addedStyles ) {
-			return [ ...baseStyles, { css: addedStyles } ];
-		}
-
-		return baseStyles;
+		return hasThemeStyles ? settings.styles ?? [] : defaultEditorStyles;
 	}, [
-		editorSettings.defaultEditorStyles,
-		editorSettings.disableLayoutStyles,
-		editorSettings.styles,
+		settings.defaultEditorStyles,
+		settings.disableLayoutStyles,
+		settings.styles,
 		hasThemeStyleSupport,
-		addedStyles,
 	] );
 }
 
@@ -443,7 +429,6 @@ function Layout( {
 		showMetaBoxes,
 		isWelcomeGuideVisible,
 		templateId,
-		enablePaddingAppender,
 		isDevicePreview,
 	} = useSelect(
 		( select ) => {
@@ -463,13 +448,8 @@ function Layout( {
 			const { getBlockSelectionStart, isZoomOut } = unlock(
 				select( blockEditorStore )
 			);
-			const {
-				getEditorMode,
-				getRenderingMode,
-				getDefaultRenderingMode,
-				getDeviceType,
-			} = unlock( select( editorStore ) );
-			const isRenderingPostOnly = getRenderingMode() === 'post-only';
+			const { getEditorMode, getDefaultRenderingMode, getDeviceType } =
+				unlock( select( editorStore ) );
 			const isNotDesignPostType =
 				! DESIGN_POST_TYPES.includes( currentPostType );
 			const isDirectlyEditingPattern =
@@ -500,8 +480,6 @@ function Layout( {
 					! isEditingTemplate
 						? _templateId
 						: null,
-				enablePaddingAppender:
-					! isZoomOut() && isRenderingPostOnly && isNotDesignPostType,
 				isDevicePreview: getDeviceType() !== 'Desktop',
 			};
 		},
@@ -516,25 +494,27 @@ function Layout( {
 
 	useMetaBoxInitialization( hasActiveMetaboxes && hasResolvedMode );
 
-	const [ paddingAppenderRef, paddingStyle ] = usePaddingAppender(
-		enablePaddingAppender
-	);
-
 	// Set the right context for the command palette
 	const commandContext = hasBlockSelected
 		? 'block-selection-edit'
 		: 'entity-edit';
 	useCommandContext( commandContext );
+	const styles = useEditorStyles( settings );
 	const editorSettings = useMemo(
 		() => ( {
 			...settings,
+			styles,
 			onNavigateToEntityRecord,
 			onNavigateToPreviousEntityRecord,
 			defaultRenderingMode: 'post-only',
 		} ),
-		[ settings, onNavigateToEntityRecord, onNavigateToPreviousEntityRecord ]
+		[
+			settings,
+			styles,
+			onNavigateToEntityRecord,
+			onNavigateToPreviousEntityRecord,
+		]
 	);
-	const styles = useEditorStyles( paddingStyle );
 
 	// We need to add the show-icon-labels class to the body element so it is applied to modals.
 	if ( showIconLabels ) {
@@ -641,9 +621,7 @@ function Layout( {
 						postId={ currentPostId }
 						templateId={ templateId }
 						className={ className }
-						styles={ styles }
 						forceIsDirty={ hasActiveMetaboxes }
-						contentRef={ paddingAppenderRef }
 						disableIframe={ ! shouldIframe }
 						// We should auto-focus the canvas (title) on load.
 						// eslint-disable-next-line jsx-a11y/no-autofocus
@@ -673,7 +651,9 @@ function Layout( {
 						<EditPostKeyboardShortcuts />
 						<EditorKeyboardShortcutsRegister />
 						<BlockKeyboardShortcuts />
-						<InitPatternModal />
+						{ currentPostType === 'wp_block' && (
+							<InitPatternModal />
+						) }
 						<PluginArea onError={ onPluginAreaError } />
 						<PostEditorMoreMenu />
 						{ backButton }

@@ -1,19 +1,22 @@
 /**
  * External dependencies
  */
-import Color from 'colorjs.io';
+import { to, OKLCH } from 'colorjs.io/fn';
 
 /**
  * Internal dependencies
  */
+import './register-color-spaces';
 import type { Ramp } from './types';
 
-export const WHITE = new Color( '#fff' ).to( 'oklch' );
-export const BLACK = new Color( '#000' ).to( 'oklch' );
+export const WHITE = to( 'white', OKLCH );
+export const BLACK = to( 'black', OKLCH );
 
-// Margin added to target contrasts to counter for algorithm approximations
-// and rounding errors.
-export const UNIVERSAL_CONTRAST_TOPUP = 0.05;
+// Margin added to target contrasts to counter for algorithm approximations and rounding errors.
+// - the `CONTRAST_EPSILON` value is 0.004, so the real contrast can be lower by this amount.
+// - the max contrast between adjacent RGB values is 1.016, so 0.016 is the maximum total rounding error between two values.
+// - the sum is 0.02: the margin we add to ensure that the target contrast is met after all the rounding.
+export const UNIVERSAL_CONTRAST_TOPUP = 0.02;
 
 // When enabling "lighter direction" bias, this is the amount by which
 // black text contrast needs to be greater than white text contrast.
@@ -32,10 +35,10 @@ export const ACCENT_SCALE_BASE_LIGHTNESS_THRESHOLDS = {
 	darker: { min: 0.75, max: 0.98 },
 } as const;
 
-// Minimum lightness difference noticed by the algorithm.
-export const LIGHTNESS_EPSILON = 1e-3;
+// Contrast precision we aim for. Approximately 1/256, resolution of an 8-bit number.
+export const CONTRAST_EPSILON = 4e-3;
 
-export const MAX_BISECTION_ITERATIONS = 25;
+export const MAX_BISECTION_ITERATIONS = 10;
 
 export const CONTRAST_COMBINATIONS: {
 	bgs: ( keyof Ramp )[];
@@ -80,6 +83,7 @@ export const DEFAULT_SEED_COLORS = {
 	primary: '#3858e9',
 	info: '#0090ff',
 	success: '#4ab866',
+	caution: '#f0d149',
 	warning: '#f0b849',
 	error: '#cc1818',
 };

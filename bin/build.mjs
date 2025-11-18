@@ -123,7 +123,7 @@ async function build() {
 
 		// Step 7: Build packages
 		console.log( '\n📦 Building packages (production mode)...' );
-		await exec( 'node', [ './bin/packages/build.mjs' ], {
+		await exec( 'wp-build', [], {
 			env: { ...process.env, NODE_ENV: 'production' },
 		} );
 

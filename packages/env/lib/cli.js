@@ -76,7 +76,6 @@ const withSpinner =
 					spinner.fail(
 						typeof error === 'string' ? error : error.message
 					);
-					// Disable reason: Using console.error() means we get a stack trace.
 					console.error( error );
 					process.exit( 1 );
 				} else {

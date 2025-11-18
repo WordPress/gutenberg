@@ -145,6 +145,6 @@ addFilter(
 
 addFilter(
 	'blocks.switchToBlockType.transformedBlock',
-	'core/color/addTransforms',
+	'core/customClassName/addTransforms',
 	addTransforms
 );

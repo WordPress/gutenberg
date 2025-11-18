@@ -269,7 +269,33 @@ export interface ViewPickerGrid extends ViewBase {
 	};
 }
 
-export type View = ViewList | ViewGrid | ViewTable | ViewPickerGrid;
+export interface ViewPickerTable extends ViewBase {
+	type: 'pickerTable';
+
+	layout?: {
+		/**
+		 * The styles for the columns.
+		 */
+		styles?: Record< string, ColumnStyle >;
+
+		/**
+		 * The density of the view.
+		 */
+		density?: Density;
+
+		/**
+		 * Whether the view allows column moving.
+		 */
+		enableMoving?: boolean;
+	};
+}
+
+export type View =
+	| ViewList
+	| ViewGrid
+	| ViewTable
+	| ViewPickerGrid
+	| ViewPickerTable;
 
 interface ActionBase< Item > {
 	/**
@@ -428,16 +454,24 @@ export interface ViewPickerGridProps< Item >
 	view: ViewPickerGrid;
 }
 
+export interface ViewPickerTableProps< Item >
+	extends Omit< ViewPickerBaseProps< Item >, 'view' > {
+	view: ViewPickerTable;
+}
+
 export type ViewProps< Item > =
 	| ViewTableProps< Item >
 	| ViewGridProps< Item >
 	| ViewListProps< Item >;
 
-export type ViewPickerProps< Item > = ViewPickerGridProps< Item >;
+export type ViewPickerProps< Item > =
+	| ViewPickerGridProps< Item >
+	| ViewPickerTableProps< Item >;
 
 export interface SupportedLayouts {
 	list?: Omit< ViewList, 'type' >;
 	grid?: Omit< ViewGrid, 'type' >;
 	table?: Omit< ViewTable, 'type' >;
 	pickerGrid?: Omit< ViewPickerGrid, 'type' >;
+	pickerTable?: Omit< ViewPickerTable, 'type' >;
 }

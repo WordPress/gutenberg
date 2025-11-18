@@ -1,0 +1,75 @@
+{
+	"dimension": {
+		"$type": "dimension",
+		"primitive": {
+			"space": {
+				"0": {
+					"$value": { "value": 0, "unit": "px" },
+					"$description": "Empty space"
+				},
+				"10": {
+					"$value": { "value": 4, "unit": "px" },
+					"$description": "1x base spacing"
+				},
+				"20": {
+					"$value": { "value": 8, "unit": "px" },
+					"$description": "2x base spacing"
+				},
+				"30": {
+					"$value": { "value": 12, "unit": "px" },
+					"$description": "3x base spacing"
+				},
+				"40": {
+					"$value": { "value": 16, "unit": "px" },
+					"$description": "4x base spacing"
+				},
+				"50": {
+					"$value": { "value": 20, "unit": "px" },
+					"$description": "5x base spacing"
+				},
+				"60": {
+					"$value": { "value": 24, "unit": "px" },
+					"$description": "6x base spacing"
+				},
+				"70": {
+					"$value": { "value": 32, "unit": "px" },
+					"$description": "8x base spacing"
+				},
+				"80": {
+					"$value": { "value": 40, "unit": "px" },
+					"$description": "10x base spacing"
+				},
+				"90": {
+					"$value": { "value": 48, "unit": "px" },
+					"$description": "12x base spacing"
+				}
+			}
+		},
+		"semantic": {
+			"base": {
+				"$value": "{dimension.primitive.space.10}",
+				"$description": "Base dimension unit"
+			},
+			"padding": {
+				"surface": {
+					"x-small": {
+						"$value": "{dimension.primitive.space.20}",
+						"$description": "Extra small spacing for surfaces"
+					},
+					"small": {
+						"$value": "{dimension.primitive.space.30}",
+						"$description": "Small spacing for surfaces"
+					},
+					"medium": {
+						"$value": "{dimension.primitive.space.40}",
+						"$description": "Medium spacing for surfaces"
+					},
+					"large": {
+						"$value": "{dimension.primitive.space.60}",
+						"$description": "Large spacing for surfaces"
+					}
+				}
+			}
+		}
+	}
+}

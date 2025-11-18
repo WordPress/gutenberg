@@ -143,3 +143,10 @@
 		text-transform: uppercase;
 	}
 }
+
+/**
+ * Error text styling for missing entity help text.
+ */
+.navigation-link-control__error-text {
+	color: $alert-red;
+}

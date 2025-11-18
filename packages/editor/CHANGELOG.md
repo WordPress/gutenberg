@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Internal
+
+-   Applied the `welcome-guide` close-button hover color locally to maintain consistent styling after changes to the shared `Guide` component.
+
+## 14.35.0 (2025-11-12)
+
+## 14.34.0 (2025-10-29)
+
 ## 14.33.0 (2025-10-17)
 
 ## 14.32.0 (2025-10-01)

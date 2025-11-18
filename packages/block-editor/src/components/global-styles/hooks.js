@@ -1,135 +1,15 @@
 /**
- * External dependencies
- */
-import fastDeepEqual from 'fast-deep-equal/es6';
-
-/**
  * WordPress dependencies
  */
-import { useContext, useCallback, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 import { _x } from '@wordpress/i18n';
-import {
-	getSetting,
-	getStyle,
-	getPresetVariableFromValue,
-} from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
  */
-import { setImmutably } from '../../utils/object';
-import { GlobalStylesContext } from './context';
 import { unlock } from '../../lock-unlock';
-
-const EMPTY_CONFIG = { settings: {}, styles: {} };
-
-export const useGlobalStylesReset = () => {
-	const { user, setUserConfig } = useContext( GlobalStylesContext );
-	const config = {
-		settings: user.settings,
-		styles: user.styles,
-	};
-	const canReset = !! config && ! fastDeepEqual( config, EMPTY_CONFIG );
-	return [
-		canReset,
-		useCallback( () => setUserConfig( EMPTY_CONFIG ), [ setUserConfig ] ),
-	];
-};
-
-export function useGlobalSetting( propertyPath, blockName, source = 'all' ) {
-	const { setUserConfig, ...configs } = useContext( GlobalStylesContext );
-	const appendedBlockPath = blockName ? '.blocks.' + blockName : '';
-	const appendedPropertyPath = propertyPath ? '.' + propertyPath : '';
-	const contextualPath = `settings${ appendedBlockPath }${ appendedPropertyPath }`;
-	const sourceKey = source === 'all' ? 'merged' : source;
-
-	const settingValue = useMemo( () => {
-		const configToUse = configs[ sourceKey ];
-		if ( ! configToUse ) {
-			throw 'Unsupported source';
-		}
-
-		// Use engine's getSetting instead of duplicating logic
-		return getSetting( configToUse, propertyPath, blockName );
-	}, [ configs, sourceKey, propertyPath, blockName ] );
-
-	const setSetting = ( newValue ) => {
-		setUserConfig( ( currentConfig ) =>
-			setImmutably( currentConfig, contextualPath.split( '.' ), newValue )
-		);
-	};
-	return [ settingValue, setSetting ];
-}
-
-export function useGlobalStyle(
-	path,
-	blockName,
-	source = 'all',
-	{ shouldDecodeEncode = true } = {}
-) {
-	const {
-		merged: mergedConfig,
-		base: baseConfig,
-		user: userConfig,
-		setUserConfig,
-	} = useContext( GlobalStylesContext );
-	const appendedPath = path ? '.' + path : '';
-	const finalPath = ! blockName
-		? `styles${ appendedPath }`
-		: `styles.blocks.${ blockName }${ appendedPath }`;
-
-	const setStyle = ( newValue ) => {
-		setUserConfig( ( currentConfig ) =>
-			setImmutably(
-				currentConfig,
-				finalPath.split( '.' ),
-				shouldDecodeEncode
-					? getPresetVariableFromValue(
-							mergedConfig.settings,
-							blockName,
-							path,
-							newValue
-					  )
-					: newValue
-			)
-		);
-	};
-
-	let result;
-	// Use engine's getStyle instead of duplicating logic
-	switch ( source ) {
-		case 'all':
-			result = getStyle(
-				mergedConfig,
-				path,
-				blockName,
-				shouldDecodeEncode
-			);
-			break;
-		case 'user':
-			result = getStyle(
-				userConfig,
-				path,
-				blockName,
-				shouldDecodeEncode
-			);
-			break;
-		case 'base':
-			result = getStyle(
-				baseConfig,
-				path,
-				blockName,
-				shouldDecodeEncode
-			);
-			break;
-		default:
-			throw 'Unsupported source';
-	}
-
-	return [ result, setStyle ];
-}
 
 /**
  * React hook that overrides a global settings object with block and element specific settings.

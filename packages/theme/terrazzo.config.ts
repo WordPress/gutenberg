@@ -4,34 +4,40 @@
 import { defineConfig } from '@terrazzo/cli';
 import pluginCSS from '@terrazzo/plugin-css';
 import { makeCSSVar } from '@terrazzo/token-tools/css';
+
 /**
  * Internal dependencies
  */
 import pluginFigmaDsTokenManager from './bin/terrazzo-plugin-figma-ds-token-manager/index';
 import pluginKnownWpdsCssVariables from './bin/terrazzo-plugin-known-wpds-css-variables/index';
 import pluginDsTokenDocs from './bin/terrazzo-plugin-ds-tokens-docs/index';
+import inlineAliasValues from './bin/terrazzo-plugin-inline-alias-values/index';
+import { publicTokenId } from './src/token-id.ts';
 
 export default defineConfig( {
 	tokens: [
 		'./tokens/border.json',
 		'./tokens/color.json',
+		'./tokens/dimension.json',
 		'./tokens/elevation.json',
-		'./tokens/spacing.json',
 		'./tokens/typography.json',
 	],
 	outDir: './src/prebuilt',
 
 	plugins: [
+		inlineAliasValues( {
+			pattern: /^color\.primitive\./,
+			filename: 'ts/color-tokens.ts',
+			tokenId: ( tokenId ) =>
+				publicTokenId( tokenId )
+					.replace( /^color\./, '' )
+					.replace( /\./g, '-' ),
+		} ),
+		inlineAliasValues( { pattern: /^dimension\.primitive\./ } ),
 		pluginCSS( {
 			filename: 'css/design-tokens.css',
 			variableName: ( token ) =>
-				makeCSSVar(
-					`wpds.${ token.id
-						.replace( /normal/g, '' )
-						.replace( /resting/g, '' )
-						.replace( /primitive/g, 'private' )
-						.replace( /semantic/g, '' ) }`
-				),
+				makeCSSVar( `wpds.${ publicTokenId( token.id ) }` ),
 			baseSelector: ':root',
 			modeSelectors: [
 				{
@@ -47,10 +53,7 @@ export default defineConfig( {
 			filename: 'json/figma.json',
 		} ),
 		pluginKnownWpdsCssVariables( {
-			exports: [
-				{ filename: 'js/design-tokens.js', modes: false },
-				{ filename: 'ts/design-tokens.ts', modes: true },
-			],
+			filename: 'js/design-tokens.js',
 		} ),
 		pluginDsTokenDocs( {
 			filename: '../../docs/ds-tokens.md',

@@ -173,19 +173,25 @@ jobs:
                         \`\`\`
                         # Checkout the ${targetBranch} branch instead of trunk.
                         git checkout ${targetBranch}
+
                         # Create a new branch for your PR.
                         git checkout -b my-branch
+
                         # Cherry-pick the commit.
                         git cherry-pick ${commitSha}
+
                         # Check which files have conflicts.
                         git status
+
                         # Resolve the conflict...
                         # Add the resolved files to the staging area.
                         git status
                         git add .
                         git cherry-pick --continue
+
                         # Push the branch to the repository
                         git push origin my-branch
+
                         # Create a PR and set the base to the ${targetBranch} branch.
                         # See https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/changing-the-base-branch-of-a-pull-request.
                         \`\`\`

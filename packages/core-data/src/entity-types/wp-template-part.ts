@@ -57,6 +57,11 @@ declare module './base-entity-records' {
 				'view' | 'edit',
 				C
 			>;
+			blocks: ContextualField<
+				Array< Record< string, any > > | undefined,
+				'edit',
+				C
+			>;
 			/**
 			 * Title of template.
 			 */
