@@ -7,9 +7,9 @@ import { get, OKLCH, type ColorTypes } from 'colorjs.io/fn';
  * Internal dependencies
  */
 import './register-color-spaces';
-import { clampToGamut, solveWithBisect } from './utils';
+import { solveWithBisect } from './utils';
 import { WHITE, BLACK, CONTRAST_EPSILON } from './constants';
-import { getContrast } from './color-utils';
+import { clampToGamut, getContrast } from './color-utils';
 import { type TaperChromaOptions, taperChroma } from './taper-chroma';
 
 /**

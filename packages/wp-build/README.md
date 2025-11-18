@@ -203,15 +203,29 @@ If `handlePrefix` is omitted, it defaults to the namespace key (e.g., `"woo"` �
 
 ### `wpPlugin.pages` (Experimental)
 
-Define admin pages that support routes. Each page gets generated PHP functions for route registration and can be extended by other plugins:
+Define admin pages that support routes. Each page gets generated PHP functions for route registration and can be extended by other plugins.
+
+Pages can be defined as simple strings or as objects with initialization modules:
 
 ```json
 {
 	"wpPlugin": {
-		"pages": ["my-admin-page"]
+		"pages": [
+			"my-admin-page",
+			{
+				"id": "my-other-page",
+				"init": ["@my-plugin/my-page-init"]
+			}
+		]
 	}
 }
 ```
+
+**Page Configuration:**
+- **String format**: `"my-admin-page"` - Simple page with no init modules
+- **Object format**: `{ "id": "page-slug", "init": ["@scope/package"] }` - Page with init modules
+
+**Generated Files:**
 
 This generates two page modes:
 - `build/pages/my-admin-page/page.php` - Full-page mode (takes over entire admin screen with custom sidebar)
@@ -231,6 +245,45 @@ add_menu_page( 'Title', 'Menu', 'capability', $url, '', 'icon', 20 );
 ```php
 add_menu_page( 'Title', 'Menu', 'capability', 'my-admin-page', 'my_admin_page_render_page', 'icon', 20 );
 ```
+
+**Init Modules:**
+Init modules are JavaScript packages that execute during page initialization, before routes are registered and the app renders. They're ideal for:
+- Adding icons to menu items (icons can't be passed from PHP)
+- Registering command palette entries
+
+**Creating an Init Module:**
+
+In `packages/my-page-init/package.json`:
+```json
+{
+	"name": "@my-plugin/my-page-init",
+	"wpScriptModuleExports": "./build-module/index.js",
+	"dependencies": {
+		"@wordpress/boot": "file:../boot",
+		"@wordpress/data": "file:../data",
+		"@wordpress/icons": "file:../icons"
+	}
+}
+```
+
+In `packages/my-page-init/src/index.ts`:
+```typescript
+import { home, styles } from '@wordpress/icons';
+import { dispatch } from '@wordpress/data';
+import { store as bootStore } from '@wordpress/boot';
+
+/**
+ * Initialize page - this function is mandatory.
+ * All init modules must export an 'init' function.
+ */
+export async function init() {
+	// Add icons to menu items
+	dispatch( bootStore ).updateMenuItem( 'home', { icon: home } );
+	dispatch( bootStore ).updateMenuItem( 'styles', { icon: styles } );
+}
+```
+
+The `init()` function is **mandatory** - all init modules must export this named function. Init modules are loaded as static dependencies and executed sequentially before the boot system registers menu items and routes.
 
 ### Example: WordPress Core (Gutenberg)
 
@@ -295,7 +348,8 @@ routes/
     package.json    # Route configuration
     stage.tsx       # Main content component
     inspector.tsx   # Optional sidebar component
-    route.tsx       # Optional lifecycle hooks (beforeLoad, loader)
+    canvas.tsx      # Optional custom canvas component
+    route.tsx       # Optional lifecycle hooks (beforeLoad, loader, canvas)
 ```
 
 ### Route Configuration
@@ -325,6 +379,13 @@ export const stage = () => <div>Content</div>;
 export const inspector = () => <div>Inspector</div>;
 ```
 
+**canvas.tsx** - Custom canvas component (optional):
+```tsx
+export const canvas = () => <div>Custom Canvas</div>;
+```
+
+The canvas is a full-screen area typically used for editor previews. You can provide a custom canvas component that will be conditionally rendered based on the `canvas()` function's return value in `route.tsx`.
+
 **route.tsx** - Lifecycle hooks (optional):
 ```tsx
 export const route = {
@@ -333,14 +394,33 @@ export const route = {
 	},
 	loader: ({ params, search }) => {
 		// Data preloading
+	},
+	canvas: ({ params, search }) => {
+		// Return CanvasData to use default canvas (editor)
+		return {
+			postType: 'post',
+			postId: '123',
+			isPreview: true
+		};
+
+		// Return null to use custom canvas.tsx component
+		// return null;
+
+		// Return undefined to show no canvas
+		// return undefined;
 	}
 };
 ```
 
+The `canvas()` function controls which canvas is rendered:
+- Returns `CanvasData` object (`{ postType, postId, isPreview? }`) → Renders the default WordPress editor canvas
+- Returns `null` → Renders the custom canvas component from `canvas.tsx` (if provided)
+- Returns `undefined` or is omitted → No canvas is rendered
+
 ### Build Output
 
 The build system generates:
-- `build/routes/{route-name}/content.js` - Bundled stage/inspector components
+- `build/routes/{route-name}/content.js` - Bundled stage/inspector/canvas components
 - `build/routes/{route-name}/route.js` - Bundled lifecycle hooks (if present)
 - `build/routes/index.php` - Route registry data
 - `build/routes.php` - Route registration logic

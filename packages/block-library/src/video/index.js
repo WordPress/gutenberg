@@ -33,4 +33,32 @@ export const settings = {
 	save,
 };
 
+if ( window.__experimentalContentOnlyPatternInsertion ) {
+	settings.fields = [
+		{
+			label: __( 'Video' ),
+			type: 'Media',
+			shownByDefault: true,
+			mapping: {
+				id: 'id',
+				src: 'src',
+				caption: 'caption',
+				poster: 'poster',
+			},
+			args: {
+				allowedTypes: [ 'video' ],
+				multiple: false,
+			},
+		},
+		{
+			label: __( 'Caption' ),
+			type: 'RichText',
+			shownByDefault: false,
+			mapping: {
+				value: 'caption',
+			},
+		},
+	];
+}
+
 export const init = () => initBlock( { name, metadata, settings } );

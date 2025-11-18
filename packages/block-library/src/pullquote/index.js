@@ -36,4 +36,25 @@ export const settings = {
 	deprecated,
 };
 
+if ( window.__experimentalContentOnlyPatternInsertion ) {
+	settings.fields = [
+		{
+			label: __( 'Content' ),
+			type: 'RichText',
+			shownByDefault: true,
+			mapping: {
+				value: 'value',
+			},
+		},
+		{
+			label: __( 'Citation' ),
+			type: 'RichText',
+			shownByDefault: false,
+			mapping: {
+				value: 'citation',
+			},
+		},
+	];
+}
+
 export const init = () => initBlock( { name, metadata, settings } );

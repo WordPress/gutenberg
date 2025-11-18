@@ -15,10 +15,9 @@ import {
  * Internal dependencies
  */
 import './register-color-spaces';
-import { getContrast, getColorString } from './color-utils';
+import { clampToGamut, getContrast, getColorString } from './color-utils';
 import { findColorMeetingRequirements } from './find-color-with-constraints';
 import {
-	clampToGamut,
 	sortByDependency,
 	computeBetterFgColorDirection,
 	adjustContrastTarget,

@@ -394,6 +394,7 @@ function ViewTable< Item >( {
 						[ 'compact', 'comfortable' ].includes(
 							view.layout.density
 						),
+					'has-bulk-actions': hasBulkActions,
 				} ) }
 				aria-busy={ isLoading }
 				aria-describedby={ tableNoticeId }

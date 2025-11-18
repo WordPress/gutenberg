@@ -7,7 +7,7 @@ import type { ComponentType } from 'react';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { lazy, useState, useEffect } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { Page } from '@wordpress/admin-ui';
 import {
 	privateApis as routePrivateApis,
@@ -18,16 +18,19 @@ import {
  * Internal dependencies
  */
 import Root from '../root';
-import type { Route, RouteLoaderContext } from '../../store/types';
+import type { CanvasData, Route, RouteLoaderContext } from '../../store/types';
 import { unlock } from '../../lock-unlock';
+import Canvas from '../canvas';
 
 const {
+	createLazyRoute,
 	createRouter,
 	createRootRoute,
 	createRoute,
 	RouterProvider,
 	createBrowserHistory,
 	parseHref,
+	useMatches,
 } = unlock( routePrivateApis );
 
 // Not found component
@@ -44,10 +47,20 @@ function NotFoundComponent() {
 function RouteComponent( {
 	stage: Stage,
 	inspector: Inspector,
+	canvas: CustomCanvas,
 }: {
 	stage?: ComponentType;
 	inspector?: ComponentType;
+	canvas?: ComponentType;
 } ) {
+	// Get canvas data from the current route's loader
+	const matches = useMatches();
+	const currentMatch = matches[ matches.length - 1 ];
+	const canvasData = ( currentMatch?.loaderData as any )?.canvas as
+		| CanvasData
+		| null
+		| undefined;
+
 	return (
 		<>
 			{ Stage && (
@@ -58,6 +71,18 @@ function RouteComponent( {
 			{ Inspector && (
 				<div className="boot-layout__inspector">
 					<Inspector />
+				</div>
+			) }
+			{ /* Render custom canvas when canvas() returns null */ }
+			{ canvasData === null && CustomCanvas && (
+				<div className="boot-layout__canvas">
+					<CustomCanvas />
+				</div>
+			) }
+			{ /* Render default canvas when canvas() returns CanvasData */ }
+			{ canvasData && (
+				<div className="boot-layout__canvas">
+					<Canvas canvas={ canvasData } />
 				</div>
 			) }
 		</>
@@ -75,22 +100,6 @@ async function createRouteFromDefinition(
 	route: Route,
 	parentRoute: AnyRoute
 ) {
-	// Create lazy components for stage and inspector surfaces
-	const SurfacesModule = route.content_module
-		? lazy( async () => {
-				const module = await import( route.content_module! );
-				// Return a component that renders the surfaces
-				return {
-					default: () => (
-						<RouteComponent
-							stage={ module.stage }
-							inspector={ module.inspector }
-						/>
-					),
-				};
-		  } )
-		: () => null;
-
 	// Load route module for lifecycle functions if specified
 	let routeConfig: {
 		beforeLoad?: ( context: RouteLoaderContext ) => void | Promise< void >;
@@ -103,7 +112,8 @@ async function createRouteFromDefinition(
 		routeConfig = module.route || {};
 	}
 
-	return createRoute( {
+	// Create route without component initially
+	let tanstackRoute = createRoute( {
 		getParentRoute: () => parentRoute,
 		path: route.path,
 		beforeLoad: routeConfig.beforeLoad
@@ -135,8 +145,28 @@ async function createRouteFromDefinition(
 			};
 		},
 		loaderDeps: ( opts: any ) => opts.search,
-		component: SurfacesModule,
 	} );
+
+	// Chain .lazy() to preload content module on intent
+	tanstackRoute = tanstackRoute.lazy( async () => {
+		const module = route.content_module
+			? await import( route.content_module )
+			: {};
+
+		return createLazyRoute( route.path )( {
+			component: function Component() {
+				return (
+					<RouteComponent
+						stage={ module.stage }
+						inspector={ module.inspector }
+						canvas={ module.canvas }
+					/>
+				);
+			},
+		} );
+	} );
+
+	return tanstackRoute;
 }
 
 /**
@@ -202,6 +232,7 @@ export default function Router( {
 				const newRouter = createRouter( {
 					history,
 					routeTree,
+					defaultPreload: 'intent',
 					defaultNotFoundComponent: NotFoundComponent,
 				} );
 				setRouter( newRouter );

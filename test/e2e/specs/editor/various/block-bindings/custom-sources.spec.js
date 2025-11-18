@@ -11,9 +11,6 @@ test.describe( 'Registered sources', () => {
 	let imagePlaceholderSrc;
 	let testingImgSrc;
 	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme(
-			'gutenberg-test-themes/block-bindings'
-		);
 		await requestUtils.activatePlugin( 'gutenberg-test-block-bindings' );
 		await requestUtils.deleteAllMedia();
 		const placeholderMedia = await requestUtils.uploadMedia(
@@ -40,7 +37,6 @@ test.describe( 'Registered sources', () => {
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
-		await requestUtils.activateTheme( 'twentytwentyone' );
 		await requestUtils.deactivatePlugin( 'gutenberg-test-block-bindings' );
 	} );
 

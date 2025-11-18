@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/lazy-editor",
-	"version": "1.1.1-next.16d95556a.0",
+	"version": "1.1.0",
 	"description": "Lazy-loading editor component with automatic asset and settings management.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -39,13 +39,16 @@
 	"types": "build-types",
 	"dependencies": {
 		"@wordpress/asset-loader": "file:../asset-loader",
+		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/block-editor": "file:../block-editor",
+		"@wordpress/blocks": "file:../blocks",
 		"@wordpress/components": "file:../components",
 		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/data": "file:../data",
 		"@wordpress/editor": "file:../editor",
 		"@wordpress/element": "file:../element",
 		"@wordpress/global-styles-engine": "file:../global-styles-engine",
+		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/private-apis": "file:../private-apis"
 	},
 	"publishConfig": {

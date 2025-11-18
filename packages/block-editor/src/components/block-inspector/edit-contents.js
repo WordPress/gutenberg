@@ -2,40 +2,21 @@
  * WordPress dependencies
  */
 import { Button, __experimentalVStack as VStack } from '@wordpress/components';
-import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { store as blockEditorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
+import useContentOnlySectionEdit from '../../hooks/use-content-only-section-edit';
 
 export default function EditContents( { clientId } ) {
-	const { editContentOnlySection, stopEditingContentOnlySection } = unlock(
-		useDispatch( blockEditorStore )
-	);
-	const { isWithinSection, isWithinEditedSection, editedContentOnlySection } =
-		useSelect(
-			( select ) => {
-				const {
-					isSectionBlock,
-					getParentSectionBlock,
-					getEditedContentOnlySection,
-					isWithinEditedContentOnlySection,
-				} = unlock( select( blockEditorStore ) );
-
-				return {
-					isWithinSection:
-						isSectionBlock( clientId ) ||
-						!! getParentSectionBlock( clientId ),
-					isWithinEditedSection:
-						isWithinEditedContentOnlySection( clientId ),
-					editedContentOnlySection: getEditedContentOnlySection(),
-				};
-			},
-			[ clientId ]
-		);
+	const {
+		isWithinSection,
+		isWithinEditedSection,
+		editedContentOnlySection,
+		editContentOnlySection,
+		stopEditingContentOnlySection,
+	} = useContentOnlySectionEdit( clientId );
 
 	if ( ! isWithinSection && ! isWithinEditedSection ) {
 		return null;
@@ -56,8 +37,8 @@ export default function EditContents( { clientId } ) {
 				} }
 			>
 				{ editedContentOnlySection
-					? __( 'Exit pattern' )
-					: __( 'Edit pattern' ) }
+					? __( 'Exit section' )
+					: __( 'Edit section' ) }
 			</Button>
 		</VStack>
 	);

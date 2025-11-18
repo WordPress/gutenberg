@@ -206,7 +206,7 @@ function Edit( {
 					aria-expanded={ addingLink }
 				/>
 			) }
-			{ addingLink && (
+			{ isVisible && addingLink && (
 				<InlineLinkUI
 					stopAddingLink={ stopAddingLink }
 					onFocusOutside={ onFocusOutside }

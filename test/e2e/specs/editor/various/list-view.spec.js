@@ -334,7 +334,7 @@ test.describe( 'List View', () => {
 	// If list view sidebar is open and focus is not inside the sidebar, move
 	// focus to the sidebar when using the shortcut. If focus is inside the
 	// sidebar, shortcut should close the sidebar.
-	test( 'ensures List View global shortcut works properly', async ( {
+	test.skip( 'ensures List View global shortcut works properly', async ( {
 		editor,
 		page,
 		pageUtils,

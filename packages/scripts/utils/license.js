@@ -309,7 +309,7 @@ function checkDepLicense( path, licenses ) {
  * @param {Object}  deps    The dependencies tree.
  * @param {Options} options
  */
-function checkDepsInTree( deps, options ) {
+function checkDeps( deps, options ) {
 	const licenses = getLicenses( options.gpl2 );
 
 	for ( const key in deps ) {
@@ -341,10 +341,6 @@ function checkDepsInTree( deps, options ) {
 		} else {
 			checkDepLicense( dep.path, licenses );
 		}
-
-		if ( dep.hasOwnProperty( 'dependencies' ) ) {
-			checkDepsInTree( dep.dependencies, options );
-		}
 	}
 }
 
@@ -373,5 +369,6 @@ function detectTypeFromLicenseFiles( path ) {
 module.exports = {
 	detectTypeFromLicenseText,
 	checkAllCompatible,
-	checkDepsInTree,
+	checkDeps,
+	getLicenses,
 };
