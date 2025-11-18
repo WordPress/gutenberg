@@ -440,6 +440,9 @@ module.exports = {
 				'jsdoc/valid-types': 'off',
 			},
 		},
+		// Progressively opting in to stricter rules for enforcing file
+		// extensions matching the presence of JSX syntax. This should be
+		// expanded and eventually enforced on all files.
 		{
 			files: [
 				'**/@(storybook|stories)/**',
@@ -450,6 +453,14 @@ module.exports = {
 					'error',
 					{ extensions: [ '.jsx', '.tsx' ] },
 				],
+			},
+		},
+		{
+			files: [
+				'**/@(storybook|stories)/**',
+				'packages/components/src/**/*.tsx',
+			],
+			rules: {
 				// Useful to add story descriptions via JSDoc without specifying params,
 				// or in TypeScript files where params are likely already documented outside of the JSDoc.
 				'jsdoc/require-param': 'off',
