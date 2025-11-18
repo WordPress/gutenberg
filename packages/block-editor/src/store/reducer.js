@@ -2305,9 +2305,6 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 	const contentOnlyParents = [
 		...contentOnlyTemplateLockedClientIds,
 		...unsyncedPatternClientIds,
-		...( window?.__experimentalContentOnlyPatternInsertion
-			? templatePartClientIds
-			: [] ),
 	];
 
 	traverseBlockTree( state, treeClientId, ( block ) => {

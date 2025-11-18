@@ -1,0 +1,9 @@
+{
+	"route": {
+		"path": "/navigation",
+		"page": "gutenberg-boot"
+	},
+	"dependencies": {
+		"@wordpress/route": "file:../../packages/route"
+	}
+}

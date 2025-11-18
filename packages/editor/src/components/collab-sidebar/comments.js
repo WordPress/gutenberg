@@ -66,6 +66,9 @@ export function Comments( {
 	const [ blockRefs, setBlockRefs ] = useState( {} );
 
 	const { setCanvasMinHeight } = unlock( useDispatch( editorStore ) );
+	const { selectBlock, toggleBlockSpotlight } = unlock(
+		useDispatch( blockEditorStore )
+	);
 	const { blockCommentId, selectedBlockClientId, orderedBlockIds } =
 		useSelect( ( select ) => {
 			const {
@@ -310,10 +313,84 @@ export function Comments( {
 		setCanvasMinHeight,
 	] );
 
+	const handleThreadNavigation = ( event, thread, isSelected ) => {
+		if ( event.defaultPrevented ) {
+			return;
+		}
+
+		const currentIndex = threads.findIndex( ( t ) => t.id === thread.id );
+
+		if (
+			( event.key === 'Enter' || event.key === 'ArrowRight' ) &&
+			event.currentTarget === event.target &&
+			! isSelected
+		) {
+			// Expand thread.
+			setNewNoteFormState( 'closed' );
+			setSelectedThread( thread.id );
+			if ( !! thread.blockClientId ) {
+				// Pass `null` as the second parameter to prevent focusing the block.
+				selectBlock( thread.blockClientId, null );
+				toggleBlockSpotlight( thread.blockClientId, true );
+			}
+		} else if (
+			( ( event.key === 'Enter' || event.key === 'ArrowLeft' ) &&
+				event.currentTarget === event.target &&
+				isSelected ) ||
+			event.key === 'Escape'
+		) {
+			// Collapse thread.
+			setSelectedThread( null );
+			setNewNoteFormState( 'closed' );
+			if ( thread.blockClientId ) {
+				toggleBlockSpotlight( thread.blockClientId, false );
+			}
+			focusCommentThread( thread.id, commentSidebarRef.current );
+		} else if (
+			event.key === 'ArrowDown' &&
+			currentIndex < threads.length - 1 &&
+			event.currentTarget === event.target
+		) {
+			// Move to the next thread.
+			const nextThread = threads[ currentIndex + 1 ];
+			focusCommentThread( nextThread.id, commentSidebarRef.current );
+		} else if (
+			event.key === 'ArrowUp' &&
+			currentIndex > 0 &&
+			event.currentTarget === event.target
+		) {
+			// Move to the previous thread.
+			const prevThread = threads[ currentIndex - 1 ];
+			focusCommentThread( prevThread.id, commentSidebarRef.current );
+		} else if (
+			event.key === 'Home' &&
+			event.currentTarget === event.target
+		) {
+			// Move to the first thread.
+			focusCommentThread( threads[ 0 ].id, commentSidebarRef.current );
+		} else if (
+			event.key === 'End' &&
+			event.currentTarget === event.target
+		) {
+			// Move to the last thread.
+			focusCommentThread(
+				threads[ threads.length - 1 ].id,
+				commentSidebarRef.current
+			);
+		}
+	};
+
 	const hasThreads = Array.isArray( threads ) && threads.length > 0;
-	// This should no longer happen since https://github.com/WordPress/gutenberg/pull/72872.
+	// A special case for `template-locked` mode - https://github.com/WordPress/gutenberg/pull/72646.
 	if ( ! hasThreads && ! isFloating ) {
-		return null;
+		return (
+			<AddComment
+				onSubmit={ onAddReply }
+				newNoteFormState={ newNoteFormState }
+				setNewNoteFormState={ setNewNoteFormState }
+				commentSidebarRef={ commentSidebarRef }
+			/>
+		);
 	}
 
 	return (
@@ -345,6 +422,13 @@ export function Comments( {
 					selectedThread={ selectedThread }
 					commentLastUpdated={ commentLastUpdated }
 					newNoteFormState={ newNoteFormState }
+					onKeyDown={ ( event ) =>
+						handleThreadNavigation(
+							event,
+							thread,
+							selectedThread === thread.id
+						)
+					}
 				/>
 			) ) }
 		</>
@@ -368,6 +452,7 @@ function Thread( {
 	selectedThread,
 	commentLastUpdated,
 	newNoteFormState,
+	onKeyDown,
 } ) {
 	const { toggleBlockHighlight, selectBlock, toggleBlockSpotlight } = unlock(
 		useDispatch( blockEditorStore )
@@ -385,6 +470,7 @@ function Thread( {
 		selectedThread,
 		commentLastUpdated,
 	} );
+	const isKeyboardTabbingRef = useRef( false );
 
 	const onMouseEnter = () => {
 		debouncedToggleBlockHighlight( thread.blockClientId, true );
@@ -394,13 +480,48 @@ function Thread( {
 		debouncedToggleBlockHighlight( thread.blockClientId, false );
 	};
 
+	const onFocus = () => {
+		toggleBlockHighlight( thread.blockClientId, true );
+	};
+
+	const onBlur = ( event ) => {
+		const isNoteFocused = event.relatedTarget?.closest(
+			'.editor-collab-sidebar-panel__thread'
+		);
+		const isDialogFocused =
+			event.relatedTarget?.closest( '[role="dialog"]' );
+		const isTabbing = isKeyboardTabbingRef.current;
+
+		// When another note is clicked, do nothing because the current note is automatically closed.
+		if ( isNoteFocused && ! isTabbing ) {
+			return;
+		}
+		// When deleting a note, a dialog appears, but the note should not be collapsed.
+		if ( isDialogFocused ) {
+			return;
+		}
+		// When tabbing, do nothing if the focus is within the current note.
+		if (
+			isTabbing &&
+			event.currentTarget.contains( event.relatedTarget )
+		) {
+			return;
+		}
+
+		// Closes a note that has lost focus when any of the following conditions are met:
+		// - An element other than a note is clicked.
+		// - Focus was lost by tabbing.
+		toggleBlockHighlight( thread.blockClientId, false );
+		unselectThread();
+	};
+
 	const handleCommentSelect = () => {
 		setNewNoteFormState( 'closed' );
 		setSelectedThread( thread.id );
+		toggleBlockSpotlight( thread.blockClientId, true );
 		if ( !! thread.blockClientId ) {
 			// Pass `null` as the second parameter to prevent focusing the block.
 			selectBlock( thread.blockClientId, null );
-			toggleBlockSpotlight( thread.blockClientId, true );
 		}
 	};
 
@@ -462,27 +583,18 @@ function Thread( {
 			onClick={ handleCommentSelect }
 			onMouseEnter={ onMouseEnter }
 			onMouseLeave={ onMouseLeave }
-			onFocus={ onMouseEnter }
-			onBlur={ onMouseLeave }
+			onFocus={ onFocus }
+			onBlur={ onBlur }
+			onKeyUp={ ( event ) => {
+				if ( event.key === 'Tab' ) {
+					isKeyboardTabbingRef.current = false;
+				}
+			} }
 			onKeyDown={ ( event ) => {
-				if ( event.defaultPrevented ) {
-					return;
-				}
-				// Expand or Collapse thread.
-				if (
-					event.key === 'Enter' &&
-					event.currentTarget === event.target
-				) {
-					if ( isSelected ) {
-						unselectThread();
-					} else {
-						handleCommentSelect();
-					}
-				}
-				// Collapse thread and focus the thread.
-				if ( event.key === 'Escape' ) {
-					unselectThread();
-					focusCommentThread( thread.id, commentSidebarRef.current );
+				if ( event.key === 'Tab' ) {
+					isKeyboardTabbingRef.current = true;
+				} else {
+					onKeyDown( event );
 				}
 			} }
 			tabIndex={ 0 }
@@ -504,7 +616,7 @@ function Thread( {
 					);
 				} }
 			>
-				{ __( 'Add new note' ) }
+				{ __( 'Add new reply' ) }
 			</Button>
 			{ ! thread.blockClientId && (
 				<Text as="p" weight={ 500 } variant="muted">
@@ -709,6 +821,14 @@ const CommentBoard = ( {
 			? actions.filter( ( item ) => item.isEligible( thread ) )
 			: [];
 
+	const deleteConfirmMessage =
+		// When deleting a top level note, descendants will also be deleted.
+		thread.parent === 0
+			? __(
+					"Are you sure you want to delete this note? This will also delete all of this note's replies."
+			  )
+			: __( 'Are you sure you want to delete this reply?' );
+
 	return (
 		<VStack
 			spacing="2"
@@ -763,7 +883,12 @@ const CommentBoard = ( {
 										/>
 									}
 								/>
-								<Menu.Popover>
+								<Menu.Popover
+									// The menu popover is rendered in a portal, which causes focus to be
+									// lost and the note to be collapsed unintentionally. To prevent this,
+									// the popover should be rendered as an inline.
+									modal={ false }
+								>
 									{ moreActions.map( ( action ) => (
 										<Menu.Item
 											key={ action.id }
@@ -844,9 +969,7 @@ const CommentBoard = ( {
 					onCancel={ handleCancel }
 					confirmButtonText={ __( 'Delete' ) }
 				>
-					{ __(
-						"Are you sure you want to delete this note? This will also delete all of this note's replies."
-					) }
+					{ deleteConfirmMessage }
 				</ConfirmDialog>
 			) }
 		</VStack>

@@ -88,6 +88,7 @@ export function ViewTypeMenu() {
 									case 'grid':
 									case 'table':
 									case 'pickerGrid':
+									case 'pickerTable':
 										const viewWithoutLayout = { ...view };
 										if ( 'layout' in viewWithoutLayout ) {
 											delete viewWithoutLayout.layout;

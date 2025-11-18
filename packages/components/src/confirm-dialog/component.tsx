@@ -29,6 +29,7 @@ const UnconnectedConfirmDialog = (
 		children,
 		confirmButtonText,
 		cancelButtonText,
+		isBusy,
 		...otherProps
 	} = useContextSystem( props, 'ConfirmDialog' );
 
@@ -100,6 +101,8 @@ const UnconnectedConfirmDialog = (
 								ref={ cancelButtonRef }
 								variant="tertiary"
 								onClick={ handleEvent( onCancel ) }
+								accessibleWhenDisabled
+								disabled={ isBusy }
 							>
 								{ cancelLabel }
 							</Button>
@@ -108,6 +111,9 @@ const UnconnectedConfirmDialog = (
 								ref={ confirmButtonRef }
 								variant="primary"
 								onClick={ handleEvent( onConfirm ) }
+								accessibleWhenDisabled
+								disabled={ isBusy }
+								isBusy={ isBusy }
 							>
 								{ confirmLabel }
 							</Button>

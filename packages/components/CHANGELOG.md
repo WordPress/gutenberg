@@ -4,6 +4,12 @@
 
 ### Bug Fixes
 
+-   Fixed an issue where the `Guide` component’s close button became invisible on hover when used on light backgrounds. The component's close button now relies on the default button hover effect, and the custom hover color is applied only within `welcome-guide` implementations to maintain consistency. ([#73220](https://github.com/WordPress/gutenberg/pull/73220))
+
+## 30.8.0 (2025-11-12)
+
+### Bug Fixes
+
 -   `Button`: Revert disabled primary button state to its previous one ([#73037](https://github.com/WordPress/gutenberg/pull/73037)).
 -   `TextareaControl`: Add `min-height` to the textarea element ([#72867](https://github.com/WordPress/gutenberg/pull/72867)).
 -   `Card`, `CardHeader`, `CardBody` and `CardFooter`: Add support for directional padding through object-based size prop, allowing independent control of padding for each side ([#72511](https://github.com/WordPress/gutenberg/pull/72511)).
@@ -13,6 +19,11 @@
 ### Internal
 
 -   `Modal`: Add a classname to simplify full height content modal styling ([#73108](https://github.com/WordPress/gutenberg/pull/73108)).
+
+### Enhancements
+
+-   `ConfirmDialog`: Add `isBusy` prop to component. ([#73041](https://github.com/WordPress/gutenberg/pull/73041)).
+-   `ColorPicker`: Support pasting whole color values. ([#73166](https://github.com/WordPress/gutenberg/pull/73166)).
 
 ## 30.7.0 (2025-10-29)
 

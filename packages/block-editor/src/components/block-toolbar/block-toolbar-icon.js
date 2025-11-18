@@ -4,7 +4,7 @@
 import { ToolbarButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { copy } from '@wordpress/icons';
+import { copy, symbol } from '@wordpress/icons';
 import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 import { store as preferencesStore } from '@wordpress/preferences';
 
@@ -24,7 +24,6 @@ function getBlockIconVariant( { select, clientIds } ) {
 		getBlockName,
 		getBlockAttributes,
 		getBlockParentsByBlockName,
-		isSectionBlock,
 		canRemoveBlocks,
 		getTemplateLock,
 		getBlockEditingMode,
@@ -40,8 +39,8 @@ function getBlockIconVariant( { select, clientIds } ) {
 	const blockName = isSingleBlock && getBlockName( clientIds[ 0 ] );
 	const hasBlockStyles =
 		isSingleBlock && !! getBlockStyles( blockName )?.length;
-	const isSectionInSelection = clientIds.some( ( id ) =>
-		isSectionBlock( id )
+	const hasPatternNameInSelection = clientIds.some(
+		( id ) => !! getBlockAttributes( id )?.metadata?.patternName
 	);
 	const hasPatternOverrides = clientIds.every( ( clientId ) =>
 		hasPatternOverridesDefaultBinding(
@@ -59,7 +58,7 @@ function getBlockIconVariant( { select, clientIds } ) {
 		getBlockEditingMode( clientIds[ 0 ] ) === 'default';
 	const _hideTransformsForSections =
 		window?.__experimentalContentOnlyPatternInsertion &&
-		isSectionInSelection;
+		hasPatternNameInSelection;
 	const _showBlockSwitcher =
 		! _hideTransformsForSections &&
 		isDefaultEditingMode &&
@@ -81,19 +80,24 @@ function getBlockIcon( { select, clientIds } ) {
 	const { getBlockName, getBlockAttributes } = unlock(
 		select( blockEditorStore )
 	);
-	const { getActiveBlockVariation } = select( blocksStore );
 
 	const _isSingleBlock = clientIds.length === 1;
 	const firstClientId = clientIds[ 0 ];
+	const blockAttributes = getBlockAttributes( firstClientId );
+	if (
+		_isSingleBlock &&
+		blockAttributes?.metadata?.patternName &&
+		window?.__experimentalContentOnlyPatternInsertion
+	) {
+		return symbol;
+	}
 
 	const blockName = getBlockName( firstClientId );
 	const blockType = getBlockType( blockName );
 
 	if ( _isSingleBlock ) {
-		const match = getActiveBlockVariation(
-			blockName,
-			getBlockAttributes( firstClientId )
-		);
+		const { getActiveBlockVariation } = select( blocksStore );
+		const match = getActiveBlockVariation( blockName, blockAttributes );
 		return match?.icon || blockType?.icon;
 	}
 

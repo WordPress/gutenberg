@@ -13,6 +13,7 @@ import edit from './edit';
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
+import variations from './variations';
 
 const { name } = metadata;
 
@@ -54,6 +55,20 @@ export const settings = {
 	},
 	edit,
 	save,
+	variations,
 };
+
+if ( window.__experimentalContentOnlyPatternInsertion ) {
+	settings.fields = [
+		{
+			label: __( 'Content' ),
+			type: 'RichText',
+			shownByDefault: true,
+			mapping: {
+				value: 'content',
+			},
+		},
+	];
+}
 
 export const init = () => initBlock( { name, metadata, settings } );

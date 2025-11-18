@@ -17,7 +17,8 @@ const transforms = {
 			blocks: [ 'core/paragraph' ],
 			transform: ( attributes ) =>
 				attributes.map( ( _attributes ) => {
-					const { content, anchor, align: textAlign } = _attributes;
+					const { content, anchor, style } = _attributes;
+					const textAlign = style?.typography?.textAlign;
 					return createBlock( 'core/heading', {
 						...getTransformedAttributes(
 							_attributes,
@@ -92,7 +93,7 @@ const transforms = {
 			blocks: [ 'core/paragraph' ],
 			transform: ( attributes ) =>
 				attributes.map( ( _attributes ) => {
-					const { content, textAlign: align } = _attributes;
+					const { content, textAlign } = _attributes;
 					return createBlock( 'core/paragraph', {
 						...getTransformedAttributes(
 							_attributes,
@@ -102,7 +103,13 @@ const transforms = {
 							} )
 						),
 						content,
-						align,
+						...( textAlign && {
+							style: {
+								typography: {
+									textAlign,
+								},
+							},
+						} ),
 					} );
 				} ),
 		},

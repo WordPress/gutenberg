@@ -62,7 +62,7 @@ export const setupEditor =
 		}
 		if (
 			edits &&
-			Object.values( edits ).some(
+			Object.entries( edits ).some(
 				( [ key, edit ] ) =>
 					edit !== ( post[ key ]?.raw ?? post[ key ] )
 			)

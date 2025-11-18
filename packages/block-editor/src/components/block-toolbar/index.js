@@ -68,6 +68,7 @@ export function PrivateBlockToolbar( {
 		shouldShowVisualToolbar,
 		showParentSelector,
 		isUsingBindings,
+		isSectionContainer,
 		hasContentOnlyLocking,
 		showShuffleButton,
 		showSlots,
@@ -117,11 +118,13 @@ export function PrivateBlockToolbar( {
 
 		const _isZoomOut = isZoomOut();
 
+		const _isSectionBlock = isSectionBlock( selectedBlockClientId );
+
 		// The switch style button appears more prominently with the
 		// content only pattern experiment.
 		const _showSwitchSectionStyleButton =
 			window?.__experimentalContentOnlyPatternInsertion &&
-			( _isZoomOut || isSectionBlock( selectedBlockClientId ) );
+			( _isZoomOut || _isSectionBlock );
 
 		return {
 			blockClientId: selectedBlockClientId,
@@ -142,6 +145,7 @@ export function PrivateBlockToolbar( {
 				) &&
 				selectedBlockClientIds.length === 1,
 			isUsingBindings: _isUsingBindings,
+			isSectionContainer: _isSectionBlock,
 			hasContentOnlyLocking: _hasTemplateLock,
 			showShuffleButton: _isZoomOut,
 			showSlots: ! _isZoomOut,
@@ -240,19 +244,23 @@ export function PrivateBlockToolbar( {
 				) }
 				{ shouldShowVisualToolbar && showSlots && (
 					<>
-						<BlockControls.Slot
-							group="parent"
-							className="block-editor-block-toolbar__slot"
-						/>
-						<BlockControls.Slot
-							group="block"
-							className="block-editor-block-toolbar__slot"
-						/>
-						<BlockControls.Slot className="block-editor-block-toolbar__slot" />
-						<BlockControls.Slot
-							group="inline"
-							className="block-editor-block-toolbar__slot"
-						/>
+						{ ! isSectionContainer && (
+							<>
+								<BlockControls.Slot
+									group="parent"
+									className="block-editor-block-toolbar__slot"
+								/>
+								<BlockControls.Slot
+									group="block"
+									className="block-editor-block-toolbar__slot"
+								/>
+								<BlockControls.Slot className="block-editor-block-toolbar__slot" />
+								<BlockControls.Slot
+									group="inline"
+									className="block-editor-block-toolbar__slot"
+								/>
+							</>
+						) }
 						<BlockControls.Slot
 							group="other"
 							className="block-editor-block-toolbar__slot"

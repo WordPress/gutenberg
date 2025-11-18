@@ -52,4 +52,27 @@ export const settings = {
 	variations,
 };
 
+if ( window.__experimentalContentOnlyPatternInsertion ) {
+	settings.fields = [
+		{
+			label: __( 'Background' ),
+			type: 'Media',
+			shownByDefault: true,
+			mapping: {
+				type: 'backgroundType',
+				id: 'id',
+				src: 'url',
+				alt: 'alt',
+				featuredImage: 'useFeaturedImage',
+			},
+			args: {
+				// TODO - How to support custom gradient?
+				// Build it into Media, or use a custom control?
+				allowedTypes: [ 'image', 'video' ],
+				multiple: false,
+			},
+		},
+	];
+}
+
 export const init = () => initBlock( { name, metadata, settings } );

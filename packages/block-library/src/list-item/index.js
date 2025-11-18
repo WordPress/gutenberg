@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { listItem as icon } from '@wordpress/icons';
 import { privateApis } from '@wordpress/block-editor';
 
@@ -31,5 +32,18 @@ export const settings = {
 	transforms,
 	[ unlock( privateApis ).requiresWrapperOnCopy ]: true,
 };
+
+if ( window.__experimentalContentOnlyPatternInsertion ) {
+	settings.fields = [
+		{
+			label: __( 'Content' ),
+			type: 'RichText',
+			shownByDefault: true,
+			mapping: {
+				value: 'content',
+			},
+		},
+	];
+}
 
 export const init = () => initBlock( { name, metadata, settings } );

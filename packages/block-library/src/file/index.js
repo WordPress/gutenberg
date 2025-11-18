@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { _x } from '@wordpress/i18n';
+import { _x, __ } from '@wordpress/i18n';
 import { file as icon } from '@wordpress/icons';
 
 /**
@@ -31,5 +31,39 @@ export const settings = {
 	edit,
 	save,
 };
+
+if ( window.__experimentalContentOnlyPatternInsertion ) {
+	settings.fields = [
+		{
+			label: __( 'File' ),
+			type: 'Media',
+			shownByDefault: true,
+			mapping: {
+				id: 'id',
+				src: 'href',
+			},
+			args: {
+				allowedTypes: [],
+				multiple: false,
+			},
+		},
+		{
+			label: __( 'Filename' ),
+			type: 'RichText',
+			shownByDefault: false,
+			mapping: {
+				value: 'fileName',
+			},
+		},
+		{
+			label: __( 'Button Text' ),
+			type: 'RichText',
+			shownByDefault: false,
+			mapping: {
+				value: 'downloadButtonText',
+			},
+		},
+	];
+}
 
 export const init = () => initBlock( { name, metadata, settings } );

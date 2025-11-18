@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/boot",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"description": "Minimal boot package for WordPress admin pages.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -34,8 +34,6 @@
 	"wpScriptModuleExports": "./build-module/index.js",
 	"types": "build-types",
 	"dependencies": {
-		"@tanstack/history": "^1.133.28",
-		"@tanstack/react-router": "^1.120.5",
 		"@wordpress/admin-ui": "file:../admin-ui",
 		"@wordpress/commands": "file:../commands",
 		"@wordpress/components": "file:../components",
@@ -47,10 +45,12 @@
 		"@wordpress/html-entities": "file:../html-entities",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
+		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/lazy-editor": "file:../lazy-editor",
 		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/route": "file:../route",
 		"@wordpress/theme": "file:../theme",
 		"@wordpress/url": "file:../url",
 		"clsx": "^2.1.1"

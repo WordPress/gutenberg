@@ -308,9 +308,36 @@ export type Field< Item > = {
 	 * Used for editing operations to update field values.
 	 */
 	setValue?: ( args: { item: Item; value: any } ) => DeepPartial< Item >;
+
+	/**
+	 * Display format configuration for fields.
+	 */
+	format?: FormatDate;
 };
 
-export type NormalizedField< Item > = Omit< Field< Item >, 'Edit' > & {
+/**
+ * Format for date fields:
+ *
+ * - date: the format string (e.g., 'F j, Y' for WordPress default format like 'March 10, 2023')
+ * - weekStartsOn: to specify the first day of the week ('sunday', 'monday', etc.).
+ *
+ * If not provided, defaults to WordPress date format settings.
+ */
+type FormatDate = {
+	date?: string;
+	weekStartsOn?: DayString;
+};
+export type DayNumber = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+export type DayString =
+	| 'sunday'
+	| 'monday'
+	| 'tuesday'
+	| 'wednesday'
+	| 'thursday'
+	| 'friday'
+	| 'saturday';
+
+type NormalizedFieldBase< Item > = Omit< Field< Item >, 'Edit' > & {
 	label: string;
 	header: string | ReactElement;
 	getValue: ( args: { item: Item } ) => any;
@@ -325,6 +352,20 @@ export type NormalizedField< Item > = Omit< Field< Item >, 'Edit' > & {
 	filterBy: NormalizedFilterByConfig | false;
 	readOnly: boolean;
 };
+
+type NormalizedFieldDate< Item > = NormalizedFieldBase< Item > & {
+	type: 'date';
+	format: Required< FormatDate >;
+};
+
+type NormalizedFieldGeneric< Item > = NormalizedFieldBase< Item > & {
+	type?: Exclude< FieldType, 'date' >;
+	format: {};
+};
+
+export type NormalizedField< Item > =
+	| NormalizedFieldGeneric< Item >
+	| NormalizedFieldDate< Item >;
 
 /**
  * A collection of dataview fields for a data type.

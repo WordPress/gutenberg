@@ -37,7 +37,7 @@ const packagePathCache = new Map();
 
 // Create a new type that extends PackageJson with an optional "route" property
 /**
- * @typedef {PackageJson & { route: { path: string } }} RoutePackageJson
+ * @typedef {PackageJson & { route: { path: string; page?: string } }} RoutePackageJson
  */
 
 /**

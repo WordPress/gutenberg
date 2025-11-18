@@ -4,6 +4,20 @@
 
 ### Enhancements
 
+- Documentation: surface better the `type` property in the documentation. [#73349](https://github.com/WordPress/gutenberg/pull/73349)
+- DataViews: Make sticky elements (table headers, footer, actions column) inherit background colors from parent container. This allows DataViews instances to seamlessly adapt to containers with custom background colors. [#73240](https://github.com/WordPress/gutenberg/pull/73240)
+- DataViews table layout: only apply hover styles when bulk actions are available. [#73248](https://github.com/WordPress/gutenberg/pull/73248)
+- Improve docs for Edit component. [#73202](https://github.com/WordPress/gutenberg/pull/73202)
+- Field API: introduce the `format` prop to format the `date` field type. [#72999](https://github.com/WordPress/gutenberg/pull/72999)
+
+### Bug fixes
+
+- Fix: ensure primary actions are not wrapped in the list layout. [#73333](https://github.com/WordPress/gutenberg/pull/73333)
+
+## 10.3.0 (2025-11-12)
+
+### Enhancements
+
 - DataForm: add new details layout. [#72355](https://github.com/WordPress/gutenberg/pull/72355)
 - DatViews list layout: remove link variant from primary actions's button. [#72920](https://github.com/WordPress/gutenberg/pull/72920)
 - DataForm: simplify form normalization. [#72848](https://github.com/WordPress/gutenberg/pull/72848)
@@ -11,6 +25,8 @@
 - DataForm: make the card layout borderless. [#72514](https://github.com/WordPress/gutenberg/pull/72514)
 - DataViews: Simplify the view config properties section. [#73064](https://github.com/WordPress/gutenberg/pull/73064)
 - DataViews: Add a contextual menu to the table layout header. [#73104](https://github.com/WordPress/gutenberg/pull/73104)
+- DataViewsPicker: Add table layout support. [#72914](https://github.com/WordPress/gutenberg/pull/72914)
+- DataForm: use envelope icon instead of atSymbol for email control component. [#73184](https://github.com/WordPress/gutenberg/pull/73184)
 - DataViews: Group DataViews actions based on primary actions and regular actions and adds a separator between the groups. [#72866](https://github.com/WordPress/gutenberg/pull/72866)
 
 ### Bug fixes

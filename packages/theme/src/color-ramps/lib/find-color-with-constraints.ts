@@ -13,6 +13,17 @@ import { getContrast } from './color-utils';
 import { type TaperChromaOptions, taperChroma } from './taper-chroma';
 
 /**
+ * Difference of contrast values that grows linearly with the Y luminance.
+ * We get more precise linear interpolations when we use this.
+ * @param c1 First contrast.
+ * @param c2 Second contrast.
+ * @return Difference of logarithms.
+ */
+function cdiff( c1: number, c2: number ) {
+	return Math.log( c1 / c2 );
+}
+
+/**
  * Solve for L such that:
  *  - the L applied to the seed meets the contrast target against the reference
  *  - the search is performed in one direction (ie lighter / darker)
@@ -88,7 +99,7 @@ export function findColorMeetingRequirements(
 		const colorWithExactL = getColorForL( lightnessConstraint.value );
 		const exactLContrast = getContrast( reference, colorWithExactL );
 		const exactLContrastMeetsTarget =
-			exactLContrast >= target - CONTRAST_EPSILON;
+			cdiff( exactLContrast, target ) >= -CONTRAST_EPSILON;
 
 		// If the L constraint is of "force" type, apply it even when it doesn't
 		// meet the contrast target.
@@ -101,20 +112,20 @@ export function findColorMeetingRequirements(
 				reached: exactLContrastMeetsTarget,
 				achieved: exactLContrast,
 				deficit: exactLContrastMeetsTarget
-					? exactLContrast - highestContrast
-					: target - exactLContrast,
+					? cdiff( exactLContrast, highestContrast )
+					: cdiff( target, exactLContrast ),
 			};
 		}
 	}
 
 	// If even the most contrasting color can't reach the target, the target is unreachable.
-	// On the othe hand, if the contrast is very close to the target, we consider it reached.
-	if ( highestContrast <= target + CONTRAST_EPSILON ) {
+	// On the other hand, if the contrast is very close to the target, we consider it reached.
+	if ( cdiff( highestContrast, target ) <= CONTRAST_EPSILON ) {
 		return {
 			color: mostContrastingColor,
-			reached: highestContrast >= target - CONTRAST_EPSILON,
+			reached: cdiff( highestContrast, target ) >= -CONTRAST_EPSILON,
 			achieved: highestContrast,
-			deficit: target - highestContrast,
+			deficit: cdiff( target, highestContrast ),
 		};
 	}
 
@@ -123,13 +134,13 @@ export function findColorMeetingRequirements(
 	// only when we know for sure the direction of the search.
 	// TODO: can we bring this back to seed.oklch.l ?
 	const lowerL = get( reference, [ OKLCH, 'l' ] );
-	const lowerContrast = 1 - target;
+	const lowerContrast = cdiff( 1, target );
 	const upperL = mostContrastingL;
-	const upperContrast = highestContrast - target;
+	const upperContrast = cdiff( highestContrast, target );
 
 	const bestColor = solveWithBisect(
 		getColorForL,
-		( c: ColorTypes ) => getContrast( reference, c ) - target,
+		( c: ColorTypes ) => cdiff( getContrast( reference, c ), target ),
 		lowerL,
 		lowerContrast,
 		upperL,
@@ -141,6 +152,6 @@ export function findColorMeetingRequirements(
 		reached: true,
 		achieved: target,
 		// Negative number that specifies how much room we have.
-		deficit: target - highestContrast,
+		deficit: cdiff( target, highestContrast ),
 	};
 }

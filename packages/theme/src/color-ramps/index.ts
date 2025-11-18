@@ -44,7 +44,7 @@ function getBgRampInfo( ramp: InternalRampResult ): {
 		pinLightness: {
 			stepName: STEP_TO_PIN,
 			value: clampAccentScaleReferenceLightness(
-				get( parse( ramp.ramp[ STEP_TO_PIN ].color ), [ OKLCH, 'l' ] ),
+				get( parse( ramp.ramp[ STEP_TO_PIN ] ), [ OKLCH, 'l' ] ),
 				ramp.direction
 			),
 		},
@@ -96,8 +96,8 @@ export function checkAccessibleCombinations( {
 		CONTRAST_COMBINATIONS.forEach( ( { bgs, fgs, target } ) => {
 			for ( const bg of bgs ) {
 				for ( const fg of fgs ) {
-					const bgColor = parse( ramp.ramp[ bg ].color );
-					const fgColor = parse( ramp.ramp[ fg ].color );
+					const bgColor = parse( ramp.ramp[ bg ] );
+					const fgColor = parse( ramp.ramp[ fg ] );
 					if ( getContrast( bgColor, fgColor ) < target ) {
 						unmetTargets.push( {
 							bgName: bg,
@@ -116,8 +116,8 @@ export function checkAccessibleCombinations( {
 		CONTRAST_COMBINATIONS.forEach( ( { bgs, fgs, target } ) => {
 			for ( const bg of bgs ) {
 				for ( const fg of fgs ) {
-					const bgColor = parse( bgRamp.ramp[ bg ].color );
-					const fgColor = parse( ramp.ramp[ fg ].color );
+					const bgColor = parse( bgRamp.ramp[ bg ] );
+					const fgColor = parse( ramp.ramp[ fg ] );
 					if ( getContrast( bgColor, fgColor ) < target ) {
 						unmetTargets.push( {
 							bgName: bg,
