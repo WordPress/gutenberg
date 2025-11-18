@@ -86,12 +86,12 @@ export default {
 		);
 		const newValues = {};
 		for ( const [ attributeName, binding ] of Object.entries( bindings ) ) {
-			if ( ! allowedFields.includes( binding.args.field ) ) {
+			if ( allowedFields.includes( binding.args.field ) ) {
+				newValues[ attributeName ] =
+					entityDataValues[ binding.args.field ];
+			} else {
 				newValues[ attributeName ] = binding.args.field;
-				continue;
 			}
-
-			newValues[ attributeName ] = entityDataValues[ binding.args.field ];
 		}
 		return newValues;
 	},
