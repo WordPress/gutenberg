@@ -5,7 +5,6 @@
  * @package gutenberg
  */
 
-
 /**
  * Core class used to access block patterns via the REST API.
  *
