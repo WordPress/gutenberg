@@ -470,6 +470,7 @@ function Thread( {
 		selectedThread,
 		commentLastUpdated,
 	} );
+	const isKeyboardTabbingRef = useRef( false );
 
 	const onMouseEnter = () => {
 		debouncedToggleBlockHighlight( thread.blockClientId, true );
@@ -479,13 +480,48 @@ function Thread( {
 		debouncedToggleBlockHighlight( thread.blockClientId, false );
 	};
 
+	const onFocus = () => {
+		toggleBlockHighlight( thread.blockClientId, true );
+	};
+
+	const onBlur = ( event ) => {
+		const isNoteFocused = event.relatedTarget?.closest(
+			'.editor-collab-sidebar-panel__thread'
+		);
+		const isDialogFocused =
+			event.relatedTarget?.closest( '[role="dialog"]' );
+		const isTabbing = isKeyboardTabbingRef.current;
+
+		// When another note is clicked, do nothing because the current note is automatically closed.
+		if ( isNoteFocused && ! isTabbing ) {
+			return;
+		}
+		// When deleting a note, a dialog appears, but the note should not be collapsed.
+		if ( isDialogFocused ) {
+			return;
+		}
+		// When tabbing, do nothing if the focus is within the current note.
+		if (
+			isTabbing &&
+			event.currentTarget.contains( event.relatedTarget )
+		) {
+			return;
+		}
+
+		// Closes a note that has lost focus when any of the following conditions are met:
+		// - An element other than a note is clicked.
+		// - Focus was lost by tabbing.
+		toggleBlockHighlight( thread.blockClientId, false );
+		unselectThread();
+	};
+
 	const handleCommentSelect = () => {
 		setNewNoteFormState( 'closed' );
 		setSelectedThread( thread.id );
+		toggleBlockSpotlight( thread.blockClientId, true );
 		if ( !! thread.blockClientId ) {
 			// Pass `null` as the second parameter to prevent focusing the block.
 			selectBlock( thread.blockClientId, null );
-			toggleBlockSpotlight( thread.blockClientId, true );
 		}
 	};
 
@@ -547,9 +583,20 @@ function Thread( {
 			onClick={ handleCommentSelect }
 			onMouseEnter={ onMouseEnter }
 			onMouseLeave={ onMouseLeave }
-			onFocus={ onMouseEnter }
-			onBlur={ onMouseLeave }
-			onKeyDown={ onKeyDown }
+			onFocus={ onFocus }
+			onBlur={ onBlur }
+			onKeyUp={ ( event ) => {
+				if ( event.key === 'Tab' ) {
+					isKeyboardTabbingRef.current = false;
+				}
+			} }
+			onKeyDown={ ( event ) => {
+				if ( event.key === 'Tab' ) {
+					isKeyboardTabbingRef.current = true;
+				} else {
+					onKeyDown( event );
+				}
+			} }
 			tabIndex={ 0 }
 			role="treeitem"
 			aria-label={ ariaLabel }
@@ -836,7 +883,12 @@ const CommentBoard = ( {
 										/>
 									}
 								/>
-								<Menu.Popover>
+								<Menu.Popover
+									// The menu popover is rendered in a portal, which causes focus to be
+									// lost and the note to be collapsed unintentionally. To prevent this,
+									// the popover should be rendered as an inline.
+									modal={ false }
+								>
 									{ moreActions.map( ( action ) => (
 										<Menu.Item
 											key={ action.id }

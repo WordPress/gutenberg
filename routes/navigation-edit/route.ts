@@ -14,10 +14,12 @@ export const route = {
 			id: string;
 		};
 	} ) => {
+		const postId = parseInt( params.id );
 		return {
 			postType: NAVIGATION_POST_TYPE,
-			postId: parseInt( params.id ),
+			postId,
 			isPreview: true,
+			editLink: `/types/wp_navigation/edit/${ postId }`,
 		};
 	},
 	loader: async ( {

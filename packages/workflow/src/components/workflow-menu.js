@@ -25,6 +25,7 @@ import { executeAbility, store as abilitiesStore } from '@wordpress/abilities';
 /**
  * Internal dependencies
  */
+import './workflow-menu.scss';
 import { unlock } from '../lock-unlock';
 
 const { withIgnoreIMEEvents } = unlock( componentsPrivateApis );

@@ -243,12 +243,6 @@ jobs:
                   ini-file: development
                   coverage: none
 
-            # Ensure that Composer installs the correct versions of packages.
-            - name: Override PHP version in composer.json
-              env:
-                  VERSION: ${{ matrix.php }}
-              run: composer config platform.php "$VERSION"
-
             # Since Composer dependencies are installed using `composer update` and no lock file is in version control,
             # passing a custom cache suffix ensures that the cache is flushed at least once per week.
             - name: Install Composer dependencies

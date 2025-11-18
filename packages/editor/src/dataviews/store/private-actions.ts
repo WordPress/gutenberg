@@ -40,8 +40,15 @@ import {
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import { DESIGN_POST_TYPES } from '../../store/constants';
 import postPreviewField from '../fields/content-preview';
 import { unlock } from '../../lock-unlock';
+
+declare global {
+	interface Window {
+		__experimentalTemplateActivate?: boolean;
+	}
+}
 
 export function registerEntityAction< Item >(
 	kind: string,
@@ -148,6 +155,15 @@ export const registerPostTypeSchema =
 			}
 		}
 
+		// When template activation experiment is disabled, templates cannot be duplicated.
+		// @ts-ignore
+		if (
+			postTypeConfig.slug === 'wp_template' &&
+			! window?.__experimentalTemplateActivate
+		) {
+			canDuplicate = undefined;
+		}
+
 		const actions = [
 			postTypeConfig.viewable ? viewPost : undefined,
 			!! postTypeConfig.supports?.revisions
@@ -181,7 +197,7 @@ export const registerPostTypeSchema =
 				featuredImageField,
 			postTypeConfig.supports?.author && authorField,
 			statusField,
-			dateField,
+			! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) && dateField,
 			slugField,
 			postTypeConfig.supports?.[ 'page-attributes' ] && parentField,
 			postTypeConfig.supports?.comments && commentStatusField,

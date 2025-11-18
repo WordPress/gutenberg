@@ -4,6 +4,7 @@
 import { parseHref } from '@tanstack/history';
 import {
 	createBrowserHistory,
+	createLazyRoute,
 	createLink,
 	createRootRoute,
 	createRoute,
@@ -32,6 +33,7 @@ export const privateApis = {};
 lock( privateApis, {
 	// Router creation and setup
 	createBrowserHistory,
+	createLazyRoute,
 	createRouter,
 	createRootRoute,
 	createRoute,

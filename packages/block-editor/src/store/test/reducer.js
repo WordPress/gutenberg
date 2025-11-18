@@ -4540,16 +4540,11 @@ describe( 'state', () => {
 					);
 				} );
 
-				it( 'returns the expected block editing modes for synced patterns', () => {
+				it( 'returns the expected block editing modes for template parts', () => {
+					// Currently, template parts are not considered sections, so
+					// child blocks are not set to contentOnly.
 					expect( initialState.derivedBlockEditingModes ).toEqual(
-						new Map(
-							Object.entries( {
-								'template-part-paragraph': 'contentOnly',
-								'template-part-group': 'disabled',
-								'template-part-grouped-paragraph':
-									'contentOnly',
-							} )
-						)
+						new Map()
 					);
 				} );
 
@@ -4573,7 +4568,7 @@ describe( 'state', () => {
 					expect( derivedBlockEditingModes ).toEqual( new Map() );
 				} );
 
-				it( 'allows explicitly set blockEditingModes to override the template part editing modes', () => {
+				it( 'does not set contentOnly mode for children of template parts', () => {
 					const { derivedBlockEditingModes } = dispatchActions(
 						[
 							{
@@ -4587,13 +4582,8 @@ describe( 'state', () => {
 					);
 
 					expect( derivedBlockEditingModes ).toEqual(
-						new Map(
-							Object.entries( {
-								'template-part-paragraph': 'contentOnly',
-								'template-part-group': 'disabled',
-								// template-part-grouped-paragraph already has an explicit mode, so isn't set as a derived mode.
-							} )
-						)
+						// template-part-grouped-paragraph already has an explicit mode, so isn't set as a derived mode.
+						new Map()
 					);
 				} );
 			} );
