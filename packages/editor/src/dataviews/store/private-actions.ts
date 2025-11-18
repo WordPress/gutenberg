@@ -181,7 +181,9 @@ export const registerPostTypeSchema =
 				featuredImageField,
 			postTypeConfig.supports?.author && authorField,
 			statusField,
-			dateField,
+			! [ 'wp_template', 'wp_template_part', 'wp_block' ].includes(
+				postTypeConfig.slug
+			) && dateField,
 			slugField,
 			postTypeConfig.supports?.[ 'page-attributes' ] && parentField,
 			postTypeConfig.supports?.comments && commentStatusField,
