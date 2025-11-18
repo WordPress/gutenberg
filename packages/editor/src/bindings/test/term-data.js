@@ -57,11 +57,19 @@ describe( 'term-data bindings', () => {
 						termId: 123,
 					},
 					bindings: {
-						content: {
+						id: {
+							source: 'core/term-data',
+							args: { field: 'id' },
+						},
+						name: {
 							source: 'core/term-data',
 							args: { field: 'name' },
 						},
-						url: {
+						slug: {
+							source: 'core/term-data',
+							args: { field: 'slug' },
+						},
+						link: {
 							source: 'core/term-data',
 							args: { field: 'link' },
 						},
@@ -69,44 +77,10 @@ describe( 'term-data bindings', () => {
 							source: 'core/term-data',
 							args: { field: 'description' },
 						},
-					},
-					clientId: '123abc456',
-				} );
-
-				expect( values ).toStrictEqual( {
-					content: 'Technology',
-					url: 'https://example.com/category/technology',
-					description: 'All about technology',
-				} );
-			} );
-
-			it( 'should return term ID from context when entity exists', () => {
-				const values = termDataBindings.getValues( {
-					select,
-					context: {
-						taxonomy: 'category',
-						termId: 123,
-					},
-					bindings: {
-						id: {
+						parent: {
 							source: 'core/term-data',
-							args: { field: 'id' },
+							args: { field: 'parent' },
 						},
-					},
-					clientId: '123abc456',
-				} );
-
-				expect( values.id ).toBe( 123 );
-			} );
-
-			it( 'should format count field with parentheses', () => {
-				const values = termDataBindings.getValues( {
-					select,
-					context: {
-						taxonomy: 'category',
-						termId: 123,
-					},
-					bindings: {
 						count: {
 							source: 'core/term-data',
 							args: { field: 'count' },
@@ -115,7 +89,15 @@ describe( 'term-data bindings', () => {
 					clientId: '123abc456',
 				} );
 
-				expect( values.count ).toBe( '(42)' );
+				expect( values ).toStrictEqual( {
+					id: 123,
+					name: 'Technology',
+					slug: 'technology',
+					link: 'https://example.com/category/technology',
+					description: 'All about technology',
+					parent: 0,
+					count: '(42)',
+				} );
 			} );
 
 			it( 'should fall back to field key when entity does not exist', () => {
