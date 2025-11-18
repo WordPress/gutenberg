@@ -143,10 +143,6 @@ export default {
 		if ( selectedBlock?.name !== 'core/post-date' ) {
 			return [];
 		}
-		// Exit early for navigation blocks (read-only)
-		if ( NAVIGATION_BLOCK_TYPES.includes( selectedBlock?.name ) ) {
-			return [];
-		}
 
 		return postDataFields;
 	},
