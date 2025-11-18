@@ -66,11 +66,36 @@ jobs:
           artifact-source-run-id: ${{ github.event.workflow_run.id }}
           artifacts-to-keep: '2'
 
+      - name: Generate Playground blueprint JSON
+        id: blueprint
+        run: |
+          node - <<'NODE' >> "$GITHUB_OUTPUT"
+          const url = process.env.ARTIFACT_URL;
+          if (!url) {
+            throw new Error('ARTIFACT_URL is required');
+          }
+
+          const blueprint = {
+            steps: [
+              {
+                step: 'installPlugin',
+                pluginZipFile: {
+                  resource: 'url',
+                  url,
+                },
+              },
+            ],
+          };
+
+          console.log(`blueprint=${JSON.stringify(blueprint)}`);
+          NODE
+        env:
+          ARTIFACT_URL: ${{ steps.expose.outputs.artifact-url }}
+
       - name: Post Playground preview button
         uses: WordPress/action-wp-playground-pr-preview@main
         with:
           mode: append-to-description
-          blueprint: >-
-            {"steps":[{"step":"installPlugin","pluginZipFile":{"resource":"url","url":"${{ steps.expose.outputs.artifact-url }}"}}]}
+          blueprint: ${{ steps.blueprint.outputs.blueprint }}
           pr-number: ${{ steps.pr-metadata.outputs.pr-number }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
