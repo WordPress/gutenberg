@@ -469,11 +469,16 @@ function ViewTable< Item >( {
 							return (
 								<th
 									key={ column }
+									className={ clsx( {
+										'dataviews-view-table__header-align-end':
+											align === 'end',
+										'dataviews-view-table__header-align-center':
+											align === 'center',
+									} ) }
 									style={ {
 										width,
 										maxWidth,
 										minWidth,
-										textAlign: align,
 									} }
 									aria-sort={
 										view.sort?.direction &&
