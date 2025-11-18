@@ -40,6 +40,7 @@ import {
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import { DESIGN_POST_TYPES } from '../../store/constants';
 import postPreviewField from '../fields/content-preview';
 import { unlock } from '../../lock-unlock';
 
@@ -181,9 +182,7 @@ export const registerPostTypeSchema =
 				featuredImageField,
 			postTypeConfig.supports?.author && authorField,
 			statusField,
-			! [ 'wp_template', 'wp_template_part', 'wp_block' ].includes(
-				postTypeConfig.slug
-			) && dateField,
+			! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) && dateField,
 			slugField,
 			postTypeConfig.supports?.[ 'page-attributes' ] && parentField,
 			postTypeConfig.supports?.comments && commentStatusField,
