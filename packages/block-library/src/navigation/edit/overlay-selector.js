@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 import {
 	SelectControl,
 	Button,
@@ -11,8 +11,11 @@ import {
 import { pencil } from '@wordpress/icons';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
-import { serialize } from '@wordpress/blocks';
+import {
+	store as blockEditorStore,
+	BlockPreview,
+} from '@wordpress/block-editor';
+import { serialize, parse } from '@wordpress/blocks';
 import { paramCase as kebabCase } from 'change-case';
 
 /**
@@ -120,8 +123,90 @@ export default function OverlaySelector( { value, onChange } ) {
 		}
 	};
 
+	// Get the selected template part entity
+	const selectedTemplatePart = useSelect(
+		( select ) => {
+			if ( ! value ) {
+				return null;
+			}
+			const { getEditedEntityRecord } = select( coreStore );
+			try {
+				return getEditedEntityRecord(
+					'postType',
+					'wp_template_part',
+					value
+				);
+			} catch {
+				return null;
+			}
+		},
+		[ value ]
+	);
+
+	// Parse template part content to blocks for preview
+	const previewBlocks = useMemo( () => {
+		if ( ! selectedTemplatePart ) {
+			return null;
+		}
+		// Content can be either a string directly or content.raw
+		const contentString =
+			selectedTemplatePart.content?.raw || selectedTemplatePart.content;
+		if ( ! contentString || typeof contentString !== 'string' ) {
+			return null;
+		}
+		try {
+			const blocks = parse( contentString );
+			// Filter out null blocks that parse can return
+			const validBlocks = blocks?.filter( Boolean ) || [];
+			return validBlocks.length > 0 ? validBlocks : null;
+		} catch ( error ) {
+			console.error( 'Error parsing blocks:', error );
+			return null;
+		}
+	}, [ selectedTemplatePart ] );
+
 	return (
 		<VStack spacing={ 1 }>
+			{ value &&
+				! isCreating &&
+				previewBlocks &&
+				previewBlocks.length > 0 && (
+					<div className="block-editor-block-patterns-list__list-item">
+						<div
+							className="block-editor-block-patterns-list__item"
+							onClick={
+								onNavigateToEntityRecord
+									? handleEditClick
+									: undefined
+							}
+							style={ {
+								cursor: onNavigateToEntityRecord
+									? 'pointer'
+									: 'default',
+							} }
+							role="button"
+							tabIndex={ onNavigateToEntityRecord ? 0 : -1 }
+							onKeyDown={ ( event ) => {
+								if (
+									( event.key === 'Enter' ||
+										event.key === ' ' ) &&
+									onNavigateToEntityRecord
+								) {
+									event.preventDefault();
+									handleEditClick();
+								}
+							} }
+							aria-label={ __( 'Edit overlay' ) }
+						>
+							<BlockPreview.Async>
+								<BlockPreview
+									blocks={ previewBlocks }
+									viewportWidth={ 500 }
+								/>
+							</BlockPreview.Async>
+						</div>
+					</div>
+				) }
 			<SelectControl
 				__nextHasNoMarginBottom
 				__next40pxDefaultSize
