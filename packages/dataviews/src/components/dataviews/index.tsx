@@ -194,22 +194,6 @@ function DataViews< Item >( {
 		}
 	}, [ hasPrimaryOrLockedFilters, isShowingFilter ] );
 
-	// Show filter panel when filters are added (but allow manual hiding).
-	const prevFiltersLengthRef = useRef( view.filters?.length || 0 );
-
-	useEffect( () => {
-		const currentFiltersLength = view.filters?.length || 0;
-
-		if (
-			currentFiltersLength > prevFiltersLengthRef.current &&
-			! isShowingFilter
-		) {
-			setIsShowingFilter( true );
-		}
-
-		prevFiltersLengthRef.current = currentFiltersLength;
-	}, [ view.filters, isShowingFilter ] );
-
 	// Attach scroll event listener for infinite scroll
 	useEffect( () => {
 		if ( ! view.infiniteScrollEnabled || ! containerRef.current ) {

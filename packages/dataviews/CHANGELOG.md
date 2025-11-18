@@ -13,6 +13,7 @@
 ### Bug fixes
 
 - Fix: ensure primary actions are not wrapped in the list layout. [#73333](https://github.com/WordPress/gutenberg/pull/73333)
+- Fix: DataViews consistently opens filter section on clicking Add Filter via column header. [#72998](https://github.com/WordPress/gutenberg/pull/72998)
 
 ## 10.3.0 (2025-11-12)
 
@@ -33,7 +34,6 @@
 
 - useFormValidity: make it work with any level of nesting in the form. [#72588](https://github.com/WordPress/gutenberg/pull/72588)
 - Fix: DataViews modal actions in list layout. [#72793](https://github.com/WordPress/gutenberg/pull/72793)
-- Fix: DataViews consistently opens filter section on clicking Add Filter via column header. [#72998](https://github.com/WordPress/gutenberg/pull/72998)
 - Fix: Incorrect aria-label in table layout when items are not clickable. [#73034](https://github.com/WordPress/gutenberg/pull/73034)
 - Fix: Table layout column spacing. [#72969](https://github.com/WordPress/gutenberg/pull/72969)
 
