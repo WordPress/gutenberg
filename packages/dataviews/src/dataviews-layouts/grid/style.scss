@@ -28,6 +28,7 @@
 			.dataviews-view-grid__row__gridcell {
 				outline: 0;
 				outline-style: solid;
+				border-radius: $radius-medium;
 
 				&[data-focus-visible] {
 					outline-color: var(--wp-admin-theme-color);
