@@ -15,11 +15,15 @@ test.describe( 'Block template registration', () => {
 		await requestUtils.activatePlugin(
 			'gutenberg-test-block-template-registration'
 		);
+		// Enable the template activation feature.
+		await requestUtils.setGutenbergExperiments( [ 'active_templates' ] );
 	} );
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deactivatePlugin(
 			'gutenberg-test-block-template-registration'
 		);
+		// Disable the template activation experiment.
+		await requestUtils.setGutenbergExperiments( [] );
 	} );
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllTemplates( 'wp_template' );

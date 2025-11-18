@@ -43,6 +43,12 @@ import { store as editorStore } from '../../store';
 import postPreviewField from '../fields/content-preview';
 import { unlock } from '../../lock-unlock';
 
+declare global {
+	interface Window {
+		__experimentalTemplateActivate?: boolean;
+	}
+}
+
 export function registerEntityAction< Item >(
 	kind: string,
 	name: string,
@@ -146,6 +152,15 @@ export const registerPostTypeSchema =
 			if ( 'wp_template' !== postTypeConfig.slug ) {
 				canDuplicate = undefined;
 			}
+		}
+
+		// When template activation experiment is disabled, templates cannot be duplicated.
+		// @ts-ignore
+		if (
+			postTypeConfig.slug === 'wp_template' &&
+			! window?.__experimentalTemplateActivate
+		) {
+			canDuplicate = undefined;
 		}
 
 		const actions = [
