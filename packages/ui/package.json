@@ -37,6 +37,7 @@
 		"@wordpress/private-apis": "file:../private-apis"
 	},
 	"devDependencies": {
+		"@types/react": "18.3.1",
 		"@wordpress/theme": "file:../theme"
 	},
 	"publishConfig": {
