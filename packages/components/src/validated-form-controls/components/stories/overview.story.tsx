@@ -328,11 +328,7 @@ export const ValidateInModal: StoryObj< typeof ValidatedInputControl > = {
 							} }
 						>
 							<VStack spacing={ 2 }>
-								<ValidatedInputControl
-									required
-									label="Text"
-									{ ...args }
-								/>
+								<ValidatedInputControl { ...args } />
 
 								<HStack justify="flex-end" spacing={ 2 }>
 									<Button
@@ -356,6 +352,10 @@ export const ValidateInModal: StoryObj< typeof ValidatedInputControl > = {
 				) }
 			</>
 		);
+	},
+	args: {
+		label: 'Text',
+		required: true,
 	},
 };
 
