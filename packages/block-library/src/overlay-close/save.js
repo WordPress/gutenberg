@@ -1,12 +1,32 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
-export default function OverlayCloseSave() {
+import {
+	useBlockProps,
+	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
+} from '@wordpress/block-editor';
+
+export default function OverlayCloseSave( { attributes, className } ) {
+	const colorProps = getColorClassesAndStyles( attributes );
+
 	return (
-		<div className="wp-block-overlay-close">
+		<div
+			{ ...useBlockProps.save( {
+				className: clsx( className, 'wp-block-overlay-close' ),
+			} ) }
+		>
 			<button
 				type="button"
-				className="wp-block-overlay-close__button"
+				className={ clsx(
+					'wp-block-overlay-close__button',
+					colorProps.className
+				) }
+				style={ colorProps.style }
 				aria-label="Close overlay"
 			>
 				<span className="wp-block-overlay-close__icon">×</span>
