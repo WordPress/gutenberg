@@ -31,14 +31,7 @@ function transformTokenName( { id }: { id: string } ) {
 			// Capitalize first segment
 			.replace( /^(\w+)\./g, ( _, g1 ) => `${ titleCase( g1 ) }/` )
 			// Capitalize
-			.replace( /primitive\./g, '_Primitives/' )
 			.replace( /semantic\./g, 'Semantic/' )
-			.replace(
-				/(color\/_Primitives)\/(\w+)\.(.*)/gi,
-				( _, prefix, tone, rampStep ) => {
-					return `${ prefix }/${ titleCase( tone ) }/${ rampStep }`;
-				}
-			)
 			// Color-specific transformation for semantic tokens:
 			// - add extra folder (Background, Foreground, Stroke)
 			// - swap "tone" folder order, capitalize
