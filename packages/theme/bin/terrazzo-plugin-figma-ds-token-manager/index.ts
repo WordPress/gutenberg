@@ -59,6 +59,24 @@ function transformTokenName( { id }: { id: string } ) {
 					) }.${ tone }.${ emphasisAndState }`;
 				}
 			)
+			// Generic transform for semantic tokens:
+			// - add extra folder (Padding)
+			// - limit name to 3 characters after prefix
+			// - keep last part of the token name with dots (eg no folders)
+			.replace(
+				/(Dimension\/Semantic)\/(\w+)\.(\w+)\.(.*)/g,
+				( _, prefix, property, target, modifier ) => {
+					let extraFolder = '';
+					let propertyName = property;
+					if ( /padding/.test( property ) ) {
+						extraFolder = 'Padding/';
+						propertyName = 'pad-' + target.slice( 0, 3 );
+					}
+					return `${ prefix }/${ extraFolder }${ kebabToCamel(
+						propertyName
+					) }.${ modifier }`;
+				}
+			)
 			// Remove default emphasis and state variants from variable name
 			.replace( /normal\./g, '' )
 			.replace( /resting/g, '' )
