@@ -42,10 +42,33 @@ module.exports = {
 			description: 'Validate package.json using npm-package-json-lint',
 		},
 		fixable: 'code',
-		schema: [],
+		schema: [
+			{
+				type: 'object',
+				properties: {
+					rules: {
+						type: 'object',
+					},
+				},
+				additionalProperties: false,
+			},
+		],
 	},
 	create( context ) {
+		const options = ( context.options && context.options[ 0 ] ) || {};
 		const filename = context.getFilename();
+
+		// Merge WordPress config with user overrides
+		let lintConfig = wpConfig;
+		if ( options.rules ) {
+			lintConfig = {
+				...wpConfig,
+				rules: {
+					...wpConfig.rules,
+					...options.rules,
+				},
+			};
+		}
 
 		if ( ! filename.endsWith( 'package.json' ) ) {
 			return {};
@@ -63,7 +86,7 @@ module.exports = {
 						cwd: process.cwd(),
 						packageJsonObject,
 						packageJsonFilePath: filename,
-						config: wpConfig,
+						config: lintConfig,
 					} );
 
 					const results = linter.lint();
@@ -109,7 +132,9 @@ module.exports = {
 						// Property reordering
 						if ( needsPropertyReorder ) {
 							const propertyOrder =
-								wpConfig.rules[ 'prefer-property-order' ][ 1 ];
+								lintConfig.rules[
+									'prefer-property-order'
+								][ 1 ];
 							const originalKeys =
 								Object.keys( packageJsonObject );
 

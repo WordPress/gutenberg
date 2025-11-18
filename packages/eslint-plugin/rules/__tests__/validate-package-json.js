@@ -63,6 +63,65 @@ ruleTester.run( 'validate-package-json', rule, {
 `,
 			filename: 'package.json',
 		},
+		{
+			// With rule overrides - disable valid-values-license
+			code: `{
+	"name": "@wordpress/test-package",
+	"version": "1.0.0",
+	"description": "A test package",
+	"author": "WordPress Contributors",
+	"license": "MIT",
+	"keywords": [
+		"wordpress"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	}
+}
+`,
+			filename: 'package.json',
+			options: [
+				{
+					rules: {
+						'valid-values-license': 'off',
+					},
+				},
+			],
+		},
+		{
+			// With rule overrides - disable require-homepage
+			code: `{
+	"name": "@wordpress/test-package",
+	"version": "1.0.0",
+	"description": "A test package",
+	"author": "WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress"
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	}
+}
+`,
+			filename: 'package.json',
+			options: [
+				{
+					rules: {
+						'require-homepage': 'off',
+					},
+				},
+			],
+		},
 	],
 	invalid: [
 		{
