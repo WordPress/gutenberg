@@ -768,14 +768,26 @@ function Navigation( {
 								/>
 							</ToggleGroupControl>
 
-							<OverlaySelector
-								value={ overlayTemplatePartId }
-								onChange={ ( newValue ) => {
-									setAttributes( {
-										overlayTemplatePartId: newValue,
-									} );
-								} }
-							/>
+							{ /*
+							 * Hide custom overlay controls when overlay visibility is "Off".
+							 * Attributes are preserved (not modified) so that if the user
+							 * toggles back to "Mobile" or "Always", their configured overlay
+							 * will still be available.
+							 *
+							 * Note: PHP rendering code will need to account for this situation
+							 * and should not render custom overlays when overlayMenu is "never",
+							 * even if overlayTemplatePartId is set.
+							 */ }
+							{ overlayMenu !== 'never' && (
+								<OverlaySelector
+									value={ overlayTemplatePartId }
+									onChange={ ( newValue ) => {
+										setAttributes( {
+											overlayTemplatePartId: newValue,
+										} );
+									} }
+								/>
+							) }
 						</VStack>
 					</PanelBody>
 				</InspectorControls>
