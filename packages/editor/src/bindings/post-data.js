@@ -74,6 +74,8 @@ export default {
 				);
 				if ( postDataField ) {
 					newValues[ attributeName ] = postDataField.label;
+				} else {
+					newValues[ attributeName ] = binding.args.field;
 				}
 			}
 			return newValues;

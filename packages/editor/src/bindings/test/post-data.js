@@ -65,7 +65,7 @@ describe( 'post-data bindings', () => {
 				} );
 			} );
 
-			it( 'should fall back to field labels when entity value does not exist', () => {
+			it( 'should fall back to field labels when entity value does not exist, and to field name for unknown fields', () => {
 				const values = postDataBindings.getValues( {
 					select,
 					context: { postId: 456, postType: 'post' },
@@ -82,6 +82,10 @@ describe( 'post-data bindings', () => {
 							source: 'core/post-date',
 							args: { field: 'link' },
 						},
+						content: {
+							source: 'core/post-date',
+							args: { field: 'unknown' },
+						},
 					},
 					clientId: '123abc456',
 				} );
@@ -90,10 +94,11 @@ describe( 'post-data bindings', () => {
 					datetime: 'Post Date',
 					modified: 'Post Modified Date',
 					url: 'Post Link',
+					content: 'unknown',
 				} );
 			} );
 
-			it( 'should return field name for unknown fields', () => {
+			it( 'should return field name for unknown fields when the entity does exist', () => {
 				const values = postDataBindings.getValues( {
 					select,
 					context: { postId: 123, postType: 'post' },
