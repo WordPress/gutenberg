@@ -27,16 +27,16 @@ export const Default: Story = {
 		children: 'Box',
 		backgroundColor: 'info',
 		color: 'info',
-		padding: 'small',
+		padding: 'sm',
 	},
 	argTypes: {
 		p: {
 			control: 'select',
-			options: [ 'x-small', 'small', 'medium', 'large', 1, 2, 3, 4 ],
+			options: [ '2xs', 'xs', 'sm', 'md', 'lg', 1, 2, 3, 4 ],
 		},
 		padding: {
 			control: 'select',
-			options: [ 'x-small', 'small', 'medium', 'large', 1, 2, 3, 4 ],
+			options: [ '2xs', 'xs', 'sm', 'md', 'lg', 1, 2, 3, 4 ],
 		},
 	},
 };
@@ -46,9 +46,9 @@ export const DirectionalPadding: Story = {
 	args: {
 		...Default.args,
 		padding: {
-			blockStart: 'small',
-			inline: 'medium',
-			blockEnd: 'large',
+			blockStart: 'sm',
+			inline: 'md',
+			blockEnd: 'lg',
 		},
 	},
 };
