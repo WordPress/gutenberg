@@ -1183,6 +1183,9 @@ export const orderEventFields: Field< OrderEvent >[] = [
 		enableGlobalSearch: true,
 		getValue: ( { item } ) => item.name.title,
 		enableSorting: false,
+		filterBy: {
+			operators: [ 'contains', 'notContains', 'startsWith' ],
+		},
 	},
 	{
 		label: 'Description',
@@ -1191,6 +1194,9 @@ export const orderEventFields: Field< OrderEvent >[] = [
 		enableSorting: false,
 		enableGlobalSearch: true,
 		getValue: ( { item } ) => item.name.description,
+		filterBy: {
+			operators: [ 'contains', 'notContains', 'startsWith' ],
+		},
 	},
 	{
 		id: 'date',
