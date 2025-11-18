@@ -7,7 +7,7 @@ import type { ComponentType } from 'react';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { lazy, useState, useEffect } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { Page } from '@wordpress/admin-ui';
 import {
 	privateApis as routePrivateApis,
@@ -23,6 +23,7 @@ import { unlock } from '../../lock-unlock';
 import Canvas from '../canvas';
 
 const {
+	createLazyRoute,
 	createRouter,
 	createRootRoute,
 	createRoute,
@@ -99,22 +100,6 @@ async function createRouteFromDefinition(
 	route: Route,
 	parentRoute: AnyRoute
 ) {
-	// Create lazy components for stage, inspector, and canvas surfaces
-	const SurfacesModule = lazy( async () => {
-		const module = route.content_module
-			? await import( route.content_module )
-			: {};
-		return {
-			default: () => (
-				<RouteComponent
-					stage={ module.stage }
-					inspector={ module.inspector }
-					canvas={ module.canvas }
-				/>
-			),
-		};
-	} );
-
 	// Load route module for lifecycle functions if specified
 	let routeConfig: {
 		beforeLoad?: ( context: RouteLoaderContext ) => void | Promise< void >;
@@ -127,7 +112,8 @@ async function createRouteFromDefinition(
 		routeConfig = module.route || {};
 	}
 
-	return createRoute( {
+	// Create route without component initially
+	let tanstackRoute = createRoute( {
 		getParentRoute: () => parentRoute,
 		path: route.path,
 		beforeLoad: routeConfig.beforeLoad
@@ -159,8 +145,28 @@ async function createRouteFromDefinition(
 			};
 		},
 		loaderDeps: ( opts: any ) => opts.search,
-		component: SurfacesModule,
 	} );
+
+	// Chain .lazy() to preload content module on intent
+	tanstackRoute = tanstackRoute.lazy( async () => {
+		const module = route.content_module
+			? await import( route.content_module )
+			: {};
+
+		return createLazyRoute( route.path )( {
+			component: function Component() {
+				return (
+					<RouteComponent
+						stage={ module.stage }
+						inspector={ module.inspector }
+						canvas={ module.canvas }
+					/>
+				);
+			},
+		} );
+	} );
+
+	return tanstackRoute;
 }
 
 /**
@@ -226,6 +232,7 @@ export default function Router( {
 				const newRouter = createRouter( {
 					history,
 					routeTree,
+					defaultPreload: 'intent',
 					defaultNotFoundComponent: NotFoundComponent,
 				} );
 				setRouter( newRouter );
