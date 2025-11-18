@@ -74,14 +74,29 @@ function BlockFields( { clientId } ) {
 
 	// Build DataForm fields with proper structure
 	const dataFormFields = useMemo( () => {
-		return blockTypeFields?.map( ( fieldDef ) => {
+		if ( ! blockTypeFields?.length ) {
+			return [];
+		}
+
+		return blockTypeFields.map( ( fieldDef ) => {
 			const ControlComponent = CONTROLS[ fieldDef.type ];
+
+			const defaultValues = {};
+			if ( fieldDef.mapping && blockType?.attributes ) {
+				Object.entries( fieldDef.mapping ).forEach(
+					( [ key, attrKey ] ) => {
+						defaultValues[ key ] =
+							blockType.attributes[ attrKey ]?.defaultValue ??
+							undefined;
+					}
+				);
+			}
 
 			const field = {
 				id: fieldDef.id,
 				label: fieldDef.label,
 				type: fieldDef.type, // Use the field's type; DataForm will use built-in or custom Edit
-				config: fieldDef.args || {},
+				config: { ...fieldDef.args, defaultValues },
 				hideLabelFromVision: fieldDef.id === 'content',
 				// getValue and setValue handle the mapping to block attributes
 				getValue: ( { item } ) => {
@@ -104,10 +119,13 @@ function BlockFields( { clientId } ) {
 						const updates = {};
 						Object.entries( fieldDef.mapping ).forEach(
 							( [ key, attrKey ] ) => {
-								updates[ attrKey ] =
-									value[ key ] !== undefined
-										? value[ key ]
-										: item[ attrKey ];
+								// If key is explicitly in value, use it (even if undefined to allow clearing)
+								// Otherwise, preserve the old value
+								if ( key in value ) {
+									updates[ attrKey ] = value[ key ];
+								} else {
+									updates[ attrKey ] = item[ attrKey ];
+								}
 							}
 						);
 						return updates;
@@ -120,11 +138,20 @@ function BlockFields( { clientId } ) {
 			// Only add custom Edit component if one exists for this type
 			if ( ControlComponent ) {
 				field.Edit = ControlComponent;
+				// Pass clientId and updateBlockAttributes to custom Edit components
+				field.clientId = clientId;
+				field.updateBlockAttributes = updateBlockAttributes;
+				field.fieldDef = fieldDef;
 			}
 
 			return field;
 		} );
-	}, [ blockTypeFields ] );
+	}, [
+		blockTypeFields,
+		blockType?.attributes,
+		clientId,
+		updateBlockAttributes,
+	] );
 
 	// Build form config showing only visible fields
 	const form = useMemo(
@@ -171,7 +198,26 @@ function BlockFields( { clientId } ) {
 				fields={ dataFormFields }
 				form={ form }
 				onChange={ ( changes ) => {
-					updateBlockAttributes( clientId, changes );
+					// Map field values to block attributes using field.setValue
+					const mappedChanges = {};
+					Object.entries( changes ).forEach(
+						( [ fieldId, fieldValue ] ) => {
+							const field = dataFormFields.find(
+								( f ) => f.id === fieldId
+							);
+							if ( field && field.setValue ) {
+								const updates = field.setValue( {
+									item: attributes,
+									value: fieldValue,
+								} );
+								Object.assign( mappedChanges, updates );
+							} else {
+								// For fields without setValue, use the value directly
+								mappedChanges[ fieldId ] = fieldValue;
+							}
+						}
+					);
+					updateBlockAttributes( clientId, mappedChanges );
 				} }
 			/>
 		</div>

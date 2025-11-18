@@ -83,12 +83,27 @@ function MediaThumbnail( { data, field, attachment } ) {
 	return <Icon icon={ mediaIcon } size={ 24 } />;
 }
 
-export default function Media( { data, field, onChange, config } ) {
+export default function Media( { data, field } ) {
 	const { popoverProps } = useInspectorPopoverPlacement( {
 		isControl: true,
 	} );
 	const value = field.getValue( { item: data } );
-	const { allowedTypes = [], multiple = false } = config || {};
+	const config = field.config || {};
+	const { allowedTypes = [], multiple = false } = config;
+
+	// For custom Edit components, we need to call updateBlockAttributes directly
+	const { clientId, updateBlockAttributes } = field;
+	const updateAttributes = ( newFieldValue ) => {
+		const mappedChanges = field.setValue( {
+			item: data,
+			value: newFieldValue,
+		} );
+		updateBlockAttributes( clientId, mappedChanges );
+	};
+
+	// Check if featured image is supported by checking if it's in the value
+	// Cover block uses 'featuredImage' as the field property name
+	const hasFeaturedImageSupport = 'featuredImage' in value;
 
 	const id = value?.id;
 	const src = value?.src || value?.url;
@@ -138,30 +153,52 @@ export default function Media( { data, field, onChange, config } ) {
 				multiple={ multiple }
 				popoverProps={ popoverProps }
 				onReset={ () => {
-					onChange( field.setValue( { item: data, value: {} } ) );
+					// Reset to empty/cleared values
+					const resetValue = {
+						id: undefined,
+						src: undefined,
+						url: undefined,
+						caption: '',
+						alt: '',
+					};
+					// Merge with existing value to preserve other field properties
+					updateAttributes( { ...value, ...resetValue } );
 				} }
-				useFeaturedImage={ !! value?.useFeaturedImage }
-				onToggleFeaturedImage={ () => {
-					onChange(
-						field.setValue( {
-							item: data,
-							value: {
-								...value,
-								useFeaturedImage: ! value?.useFeaturedImage,
-							},
-						} )
-					);
-				} }
+				{ ...( hasFeaturedImageSupport && {
+					useFeaturedImage: !! value?.featuredImage,
+					onToggleFeaturedImage: () => {
+						updateAttributes( {
+							...value,
+							featuredImage: ! value?.featuredImage,
+						} );
+					},
+				} ) }
 				onSelect={ ( selectedMedia ) => {
 					if ( selectedMedia.id && selectedMedia.url ) {
+						// Determine mediaType from MIME type, not from object type
+						let mediaType = 'image'; // default
+						if ( selectedMedia.mime_type ) {
+							if (
+								selectedMedia.mime_type.startsWith( 'video/' )
+							) {
+								mediaType = 'video';
+							} else if (
+								selectedMedia.mime_type.startsWith( 'audio/' )
+							) {
+								mediaType = 'audio';
+							}
+						}
+
 						const newValue = {
 							id: selectedMedia.id,
 							src: selectedMedia.url,
 							url: selectedMedia.url,
+							type: mediaType,
 						};
 
-						if ( selectedMedia.type ) {
-							newValue.type = selectedMedia.type;
+						// Capture mediaLink
+						if ( selectedMedia.link ) {
+							newValue.link = selectedMedia.link;
 						}
 
 						if ( ! value?.caption && selectedMedia.caption ) {
@@ -174,9 +211,9 @@ export default function Media( { data, field, onChange, config } ) {
 							newValue.poster = selectedMedia.poster;
 						}
 
-						onChange(
-							field.setValue( { item: data, value: newValue } )
-						);
+						// Merge with existing value to preserve other field properties
+						const finalValue = { ...value, ...newValue };
+						updateAttributes( finalValue );
 					}
 				} }
 				renderToggle={ ( buttonProps ) => (

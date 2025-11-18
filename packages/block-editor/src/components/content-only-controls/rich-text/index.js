@@ -22,12 +22,18 @@ import { keyboardShortcutContext, inputEventContext } from '../../rich-text';
 export default function RichTextControl( {
 	data,
 	field,
-	onChange,
 	hideLabelFromVision,
-	config,
 } ) {
 	const registry = useRegistry();
 	const attrValue = field.getValue( { item: data } );
+	const config = field.config || {};
+
+	// For custom Edit components, we need to call updateBlockAttributes directly
+	const { clientId, updateBlockAttributes } = field;
+	const updateAttributes = ( html ) => {
+		const mappedChanges = field.setValue( { item: data, value: html } );
+		updateBlockAttributes( clientId, mappedChanges );
+	};
 	const [ selection, setSelection ] = useState( {
 		start: undefined,
 		end: undefined,
@@ -98,7 +104,7 @@ export default function RichTextControl( {
 	} = useRichText( {
 		value: attrValue,
 		onChange( html, { __unstableFormats, __unstableText } ) {
-			onChange( field.setValue( { item: data, value: html } ) );
+			updateAttributes( html );
 			Object.values( changeHandlers ).forEach( ( changeHandler ) => {
 				changeHandler( __unstableFormats, __unstableText );
 			} );

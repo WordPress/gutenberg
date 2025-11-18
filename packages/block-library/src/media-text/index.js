@@ -65,6 +65,7 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 				id: 'mediaId',
 				type: 'mediaType',
 				src: 'mediaUrl',
+				link: 'mediaLink',
 			},
 			args: {
 				allowedTypes: [ 'image', 'video' ],

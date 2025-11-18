@@ -67,11 +67,18 @@ export function getUpdatedLinkAttributes( {
 	};
 }
 
-export default function Link( { data, field, onChange } ) {
+export default function Link( { data, field } ) {
 	const [ isLinkControlOpen, setIsLinkControlOpen ] = useState( false );
 	const { popoverProps } = useInspectorPopoverPlacement( {
 		isControl: true,
 	} );
+
+	// For custom Edit components, we need to call updateBlockAttributes directly
+	const { clientId, updateBlockAttributes } = field;
+	const updateAttributes = ( newValue ) => {
+		const mappedChanges = field.setValue( { item: data, value: newValue } );
+		updateBlockAttributes( clientId, mappedChanges );
+	};
 
 	const value = field.getValue( { item: data } );
 	const href = value?.href || value?.url;
@@ -140,24 +147,17 @@ export default function Link( { data, field, onChange } ) {
 								...newValues,
 							} );
 
-							onChange(
-								field.setValue( {
-									item: data,
-									value: {
-										...value,
-										href: updatedAttrs.url,
-										url: updatedAttrs.url,
-										rel: updatedAttrs.rel,
-										target: updatedAttrs.linkTarget,
-										linkTarget: updatedAttrs.linkTarget,
-									},
-								} )
-							);
+							updateAttributes( {
+								...value,
+								href: updatedAttrs.url,
+								url: updatedAttrs.url,
+								rel: updatedAttrs.rel,
+								target: updatedAttrs.linkTarget,
+								linkTarget: updatedAttrs.linkTarget,
+							} );
 						} }
 						onRemove={ () => {
-							onChange(
-								field.setValue( { item: data, value: {} } )
-							);
+							updateAttributes( {} );
 						} }
 					/>
 				</Popover>
