@@ -55,16 +55,15 @@ export const settings = {
 if ( window.__experimentalContentOnlyPatternInsertion ) {
 	settings[ fieldsKey ] = [
 		{
+			id: 'label',
 			label: __( 'Label' ),
-			type: 'RichText',
+			type: 'richtext',
 			shownByDefault: true,
-			mapping: {
-				value: 'label',
-			},
 		},
 		{
+			id: 'link',
 			label: __( 'Link' ),
-			type: 'Link',
+			type: 'link',
 			shownByDefault: false,
 			mapping: {
 				href: 'url',

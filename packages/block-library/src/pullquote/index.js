@@ -43,20 +43,16 @@ export const settings = {
 if ( window.__experimentalContentOnlyPatternInsertion ) {
 	settings[ fieldsKey ] = [
 		{
+			id: 'value',
 			label: __( 'Content' ),
-			type: 'RichText',
+			type: 'richtext',
 			shownByDefault: true,
-			mapping: {
-				value: 'value',
-			},
 		},
 		{
+			id: 'citation',
 			label: __( 'Citation' ),
-			type: 'RichText',
+			type: 'richtext',
 			shownByDefault: false,
-			mapping: {
-				value: 'citation',
-			},
 		},
 	];
 }

@@ -4,11 +4,9 @@
 import {
 	Button,
 	Icon,
-	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalGrid as Grid,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	audio as audioIcon,
@@ -26,9 +24,10 @@ import { useInspectorPopoverPlacement } from '../use-inspector-popover-placement
 import { getMediaSelectKey } from '../../../store/private-keys';
 import { store as blockEditorStore } from '../../../store';
 
-function MediaThumbnail( { control, attributeValues, attachment } ) {
-	const { allowedTypes, multiple } = control.args;
-	const mapping = control.mapping;
+function MediaThumbnail( { data, field, attachment } ) {
+	const config = field.config || {};
+	const { allowedTypes = [], multiple = false } = config;
+
 	if ( multiple ) {
 		return 'todo multiple';
 	}
@@ -50,20 +49,8 @@ function MediaThumbnail( { control, attributeValues, attachment } ) {
 	}
 
 	if ( allowedTypes.length === 1 ) {
-		let src;
-		if (
-			allowedTypes[ 0 ] === 'image' &&
-			mapping.src &&
-			attributeValues[ mapping.src ]
-		) {
-			src = attributeValues[ mapping.src ];
-		} else if (
-			allowedTypes[ 0 ] === 'video' &&
-			mapping.poster &&
-			attributeValues[ mapping.poster ]
-		) {
-			src = attributeValues[ mapping.poster ];
-		}
+		const value = field.getValue( { item: data } );
+		const src = value?.src || value?.url;
 
 		if ( src ) {
 			return (
@@ -96,29 +83,15 @@ function MediaThumbnail( { control, attributeValues, attachment } ) {
 	return <Icon icon={ mediaIcon } size={ 24 } />;
 }
 
-export default function Media( {
-	clientId,
-	control,
-	blockType,
-	attributeValues,
-	updateAttributes,
-} ) {
+export default function Media( { data, field, onChange, config } ) {
 	const { popoverProps } = useInspectorPopoverPlacement( {
 		isControl: true,
 	} );
-	const typeKey = control.mapping.type;
-	const idKey = control.mapping.id;
-	const srcKey = control.mapping.src;
-	const captionKey = control.mapping.caption;
-	const altKey = control.mapping.alt;
-	const posterKey = control.mapping.poster;
-	const featuredImageKey = control.mapping.featuredImage;
+	const value = field.getValue( { item: data } );
+	const { allowedTypes = [], multiple = false } = config || {};
 
-	const id = attributeValues[ idKey ];
-	const src = attributeValues[ srcKey ];
-	const caption = attributeValues[ captionKey ];
-	const alt = attributeValues[ altKey ];
-	const useFeaturedImage = attributeValues[ featuredImageKey ];
+	const id = value?.id;
+	const src = value?.src || value?.url;
 
 	const attachment = useSelect(
 		( select ) => {
@@ -140,8 +113,8 @@ export default function Media( {
 
 	// TODO - pluralize when multiple.
 	let chooseItemLabel;
-	if ( control.args.allowedTypes.length === 1 ) {
-		const allowedType = control.args.allowedTypes[ 0 ];
+	if ( allowedTypes.length === 1 ) {
+		const allowedType = allowedTypes[ 0 ];
 		if ( allowedType === 'image' ) {
 			chooseItemLabel = __( 'Choose an image…' );
 		} else if ( allowedType === 'video' ) {
@@ -155,131 +128,105 @@ export default function Media( {
 		chooseItemLabel = __( 'Choose a media item…' );
 	}
 
-	const defaultValues = useMemo( () => {
-		return Object.fromEntries(
-			Object.entries( control.mapping ).map( ( [ , attributeKey ] ) => {
-				return [
-					attributeKey,
-					blockType.attributes[ attributeKey ]?.defaultValue ??
-						undefined,
-				];
-			} )
-		);
-	}, [ blockType.attributes, control.mapping ] );
-
 	return (
 		<MediaUploadCheck>
-			<ToolsPanelItem
-				panelId={ clientId }
-				label={ control.label }
-				hasValue={ () => !! src }
-				onDeselect={ () => {
-					updateAttributes( defaultValues );
+			<MediaReplaceFlow
+				className="block-editor-content-only-controls__media-replace-flow"
+				allowedTypes={ allowedTypes }
+				mediaId={ id }
+				mediaURL={ src }
+				multiple={ multiple }
+				popoverProps={ popoverProps }
+				onReset={ () => {
+					onChange( field.setValue( { item: data, value: {} } ) );
 				} }
-				isShownByDefault={ control.shownByDefault }
-			>
-				<MediaReplaceFlow
-					className="block-editor-content-only-controls__media-replace-flow"
-					allowedTypes={ control.args.allowedTypes }
-					mediaId={ id }
-					mediaURL={ src }
-					multiple={ control.args.multiple }
-					popoverProps={ popoverProps }
-					onReset={ () => {
-						updateAttributes( defaultValues );
-					} }
-					useFeaturedImage={ !! useFeaturedImage }
-					onToggleFeaturedImage={
-						!! featuredImageKey &&
-						( () => {
-							updateAttributes( {
-								...defaultValues,
-								[ featuredImageKey ]: ! useFeaturedImage,
-							} );
+				useFeaturedImage={ !! value?.useFeaturedImage }
+				onToggleFeaturedImage={ () => {
+					onChange(
+						field.setValue( {
+							item: data,
+							value: {
+								...value,
+								useFeaturedImage: ! value?.useFeaturedImage,
+							},
 						} )
-					}
-					onSelect={ ( selectedMedia ) => {
-						if ( selectedMedia.id && selectedMedia.url ) {
-							const optionalAttributes = {};
+					);
+				} }
+				onSelect={ ( selectedMedia ) => {
+					if ( selectedMedia.id && selectedMedia.url ) {
+						const newValue = {
+							id: selectedMedia.id,
+							src: selectedMedia.url,
+							url: selectedMedia.url,
+						};
 
-							if ( typeKey && selectedMedia.type ) {
-								optionalAttributes[ typeKey ] =
-									selectedMedia.type;
-							}
-
-							if (
-								captionKey &&
-								! caption &&
-								selectedMedia.caption
-							) {
-								optionalAttributes[ captionKey ] =
-									selectedMedia.caption;
-							}
-							if ( altKey && ! alt && selectedMedia.alt ) {
-								optionalAttributes[ altKey ] =
-									selectedMedia.alt;
-							}
-							if ( posterKey && selectedMedia.poster ) {
-								optionalAttributes[ posterKey ] =
-									selectedMedia.poster;
-							}
-
-							updateAttributes( {
-								[ idKey ]: selectedMedia.id,
-								[ srcKey ]: selectedMedia.url,
-								...optionalAttributes,
-							} );
+						if ( selectedMedia.type ) {
+							newValue.type = selectedMedia.type;
 						}
-					} }
-					renderToggle={ ( buttonProps ) => (
-						<Button
-							__next40pxDefaultSize
-							className="block-editor-content-only-controls__media"
-							{ ...buttonProps }
+
+						if ( ! value?.caption && selectedMedia.caption ) {
+							newValue.caption = selectedMedia.caption;
+						}
+						if ( ! value?.alt && selectedMedia.alt ) {
+							newValue.alt = selectedMedia.alt;
+						}
+						if ( selectedMedia.poster ) {
+							newValue.poster = selectedMedia.poster;
+						}
+
+						onChange(
+							field.setValue( { item: data, value: newValue } )
+						);
+					}
+				} }
+				renderToggle={ ( buttonProps ) => (
+					<Button
+						__next40pxDefaultSize
+						className="block-editor-content-only-controls__media"
+						{ ...buttonProps }
+					>
+						<Grid
+							rowGap={ 0 }
+							columnGap={ 8 }
+							templateColumns="24px 1fr"
+							className="block-editor-content-only-controls__media-row"
 						>
-							<Grid
-								rowGap={ 0 }
-								columnGap={ 8 }
-								templateColumns="24px 1fr"
-								className="block-editor-content-only-controls__media-row"
-							>
-								{ src && (
-									<>
-										<MediaThumbnail
-											attachment={ attachment }
-											control={ control }
-											attributeValues={ attributeValues }
-										/>
-										<span className="block-editor-content-only-controls__media-title">
-											{
-												// TODO - truncate long titles or url smartly (e.g. show filename).
-												attachment?.title?.raw &&
-												attachment?.title?.raw !== ''
-													? attachment?.title?.raw
-													: src
-											}
-										</span>
-									</>
-								) }
-								{ ! src && (
-									<>
-										<span
-											className="block-editor-content-only-controls__media-placeholder"
-											style={ {
-												width: '24px',
-												height: '24px',
-											} }
-										/>
-										<span className="block-editor-content-only-controls__media-title">
-											{ chooseItemLabel }
-										</span>
-									</>
-								) }
-							</Grid>
-						</Button>
-					) }
-				/>
-			</ToolsPanelItem>
+							{ src && (
+								<>
+									<MediaThumbnail
+										attachment={ attachment }
+										field={ field }
+										data={ data }
+									/>
+									<span className="block-editor-content-only-controls__media-title">
+										{
+											// TODO - truncate long titles or url smartly (e.g. show filename).
+											attachment?.title?.raw &&
+											attachment?.title?.raw !== ''
+												? attachment?.title?.raw
+												: src
+										}
+									</span>
+								</>
+							) }
+							{ ! src && (
+								<>
+									<span
+										className="block-editor-content-only-controls__media-placeholder"
+										style={ {
+											width: '24px',
+											height: '24px',
+										} }
+									/>
+									<span className="block-editor-content-only-controls__media-title">
+										{ chooseItemLabel }
+									</span>
+								</>
+							) }
+						</Grid>
+					</Button>
+				) }
+			/>
 		</MediaUploadCheck>
 	);
 }

@@ -33,3 +33,12 @@
 .block-editor-content-only-controls__drill-down-button {
 	width: 100%;
 }
+
+.block-editor-content-only-controls__fields-container {
+	padding: 0 $grid-unit-20;
+}
+
+.block-editor-content-only-controls__fields-header {
+	padding: $grid-unit-10 0;
+	margin-bottom: $grid-unit-05;
+}

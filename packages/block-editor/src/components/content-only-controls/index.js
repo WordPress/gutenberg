@@ -6,7 +6,6 @@ import {
 	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
 import {
-	__experimentalToolsPanel as ToolsPanel,
 	__experimentalHStack as HStack,
 	Icon,
 	Navigator,
@@ -14,6 +13,8 @@ import {
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { arrowLeft, arrowRight } from '@wordpress/icons';
+import { DataForm } from '@wordpress/dataviews';
+import { useState, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -23,47 +24,19 @@ import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import useBlockDisplayInformation from '../use-block-display-information';
-import { useInspectorPopoverPlacement } from './use-inspector-popover-placement';
 const { fieldsKey } = unlock( blocksPrivateApis );
+import FieldsDropdownMenu from './fields-dropdown-menu';
 
 // controls
-import PlainText from './plain-text';
 import RichText from './rich-text';
 import Media from './media';
 import Link from './link';
 
-const controls = {
-	PlainText,
-	RichText,
-	Media,
-	Link,
+const CONTROLS = {
+	richtext: RichText,
+	media: Media,
+	link: Link,
 };
-
-function BlockAttributeToolsPanelItem( {
-	clientId,
-	control,
-	blockType,
-	attributeValues,
-} ) {
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-	const ControlComponent = controls[ control.type ];
-
-	if ( ! ControlComponent ) {
-		return null;
-	}
-
-	return (
-		<ControlComponent
-			clientId={ clientId }
-			control={ control }
-			blockType={ blockType }
-			attributeValues={ attributeValues }
-			updateAttributes={ ( attributes ) =>
-				updateBlockAttributes( clientId, attributes )
-			}
-		/>
-	);
-}
 
 function BlockFields( { clientId } ) {
 	const { attributes, blockType } = useSelect(
@@ -80,40 +53,128 @@ function BlockFields( { clientId } ) {
 		[ clientId ]
 	);
 
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const blockTitle = useBlockDisplayTitle( {
 		clientId,
 		context: 'list-view',
 	} );
 	const blockInformation = useBlockDisplayInformation( clientId );
-	const popoverPlacementProps = useInspectorPopoverPlacement();
 
-	if ( ! blockType?.[ fieldsKey ]?.length ) {
+	const blockTypeFields = blockType?.[ fieldsKey ];
+
+	// Track visible fields
+	const [ visibleFields, setVisibleFields ] = useState( () => {
+		// Show fields that have shownByDefault: true by default
+		return (
+			blockTypeFields
+				?.filter( ( field ) => field.shownByDefault )
+				.map( ( field ) => field.id ) || []
+		);
+	} );
+
+	// Build DataForm fields with proper structure
+	const dataFormFields = useMemo( () => {
+		return blockTypeFields?.map( ( fieldDef ) => {
+			const ControlComponent = CONTROLS[ fieldDef.type ];
+
+			const field = {
+				id: fieldDef.id,
+				label: fieldDef.label,
+				type: fieldDef.type, // Use the field's type; DataForm will use built-in or custom Edit
+				config: fieldDef.args || {},
+				hideLabelFromVision: fieldDef.id === 'content',
+				// getValue and setValue handle the mapping to block attributes
+				getValue: ( { item } ) => {
+					if ( fieldDef.mapping ) {
+						// For complex mappings, return an object with all mapped properties
+						const value = {};
+						Object.entries( fieldDef.mapping ).forEach(
+							( [ key, attrKey ] ) => {
+								value[ key ] = item[ attrKey ];
+							}
+						);
+						return value;
+					}
+					// For simple id-based fields, use the id as the attribute key
+					return item[ fieldDef.id ];
+				},
+				setValue: ( { item, value } ) => {
+					if ( fieldDef.mapping ) {
+						// Build an object with all mapped attributes
+						const updates = {};
+						Object.entries( fieldDef.mapping ).forEach(
+							( [ key, attrKey ] ) => {
+								updates[ attrKey ] =
+									value[ key ] !== undefined
+										? value[ key ]
+										: item[ attrKey ];
+							}
+						);
+						return updates;
+					}
+					// For simple id-based fields, use the id as the attribute key
+					return { [ fieldDef.id ]: value };
+				},
+			};
+
+			// Only add custom Edit component if one exists for this type
+			if ( ControlComponent ) {
+				field.Edit = ControlComponent;
+			}
+
+			return field;
+		} );
+	}, [ blockTypeFields ] );
+
+	// Build form config showing only visible fields
+	const form = useMemo(
+		() => ( {
+			fields: dataFormFields
+				.filter( ( field ) => visibleFields.includes( field.id ) )
+				.map( ( field ) => field.id ),
+		} ),
+		[ dataFormFields, visibleFields ]
+	);
+
+	const handleToggleField = ( fieldId ) => {
+		setVisibleFields( ( prev ) => {
+			if ( prev.includes( fieldId ) ) {
+				return prev.filter( ( id ) => id !== fieldId );
+			}
+			return [ ...prev, fieldId ];
+		} );
+	};
+
+	if ( ! blockTypeFields?.length ) {
 		// TODO - we might still want to show a placeholder for blocks with no fields.
 		// for example, a way to select the block.
 		return null;
 	}
 
 	return (
-		<ToolsPanel
-			label={
-				<HStack spacing={ 1 }>
-					<BlockIcon icon={ blockInformation?.icon } />
-					<div>{ blockTitle }</div>
+		<div className="block-editor-content-only-controls__fields-container">
+			<div className="block-editor-content-only-controls__fields-header">
+				<HStack spacing={ 1 } justify="space-between" expanded>
+					<HStack spacing={ 1 } justify="flex-start">
+						<BlockIcon icon={ blockInformation?.icon } />
+						<div>{ blockTitle }</div>
+					</HStack>
+					<FieldsDropdownMenu
+						fields={ dataFormFields }
+						visibleFields={ visibleFields }
+						onToggleField={ handleToggleField }
+					/>
 				</HStack>
-			}
-			panelId={ clientId }
-			dropdownMenuProps={ popoverPlacementProps }
-		>
-			{ blockType?.[ fieldsKey ]?.map( ( field, index ) => (
-				<BlockAttributeToolsPanelItem
-					key={ `${ clientId }/${ index }` }
-					clientId={ clientId }
-					control={ field }
-					blockType={ blockType }
-					attributeValues={ attributes }
-				/>
-			) ) }
-		</ToolsPanel>
+			</div>
+			<DataForm
+				data={ attributes }
+				fields={ dataFormFields }
+				form={ form }
+				onChange={ ( changes ) => {
+					updateBlockAttributes( clientId, changes );
+				} }
+			/>
+		</div>
 	);
 }
 

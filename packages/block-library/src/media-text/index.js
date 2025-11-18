@@ -57,8 +57,9 @@ export const settings = {
 if ( window.__experimentalContentOnlyPatternInsertion ) {
 	settings[ fieldsKey ] = [
 		{
+			id: 'media',
 			label: __( 'Media' ),
-			type: 'Media',
+			type: 'media',
 			shownByDefault: true,
 			mapping: {
 				id: 'mediaId',
@@ -71,8 +72,9 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 			},
 		},
 		{
+			id: 'link',
 			label: __( 'Link' ),
-			type: 'Link',
+			type: 'link',
 			shownByDefault: false,
 			mapping: {
 				href: 'href',

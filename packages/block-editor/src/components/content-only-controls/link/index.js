@@ -4,7 +4,6 @@
 import {
 	Button,
 	Icon,
-	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalGrid as Grid,
 	Popover,
 } from '@wordpress/components';
@@ -68,35 +67,16 @@ export function getUpdatedLinkAttributes( {
 	};
 }
 
-export default function Link( {
-	clientId,
-	control,
-	blockType,
-	attributeValues,
-	updateAttributes,
-} ) {
+export default function Link( { data, field, onChange } ) {
 	const [ isLinkControlOpen, setIsLinkControlOpen ] = useState( false );
 	const { popoverProps } = useInspectorPopoverPlacement( {
 		isControl: true,
 	} );
-	const hrefKey = control.mapping.href;
-	const relKey = control.mapping.rel;
-	const targetKey = control.mapping.target;
-	const destinationKey = control.mapping.destination;
 
-	const href = attributeValues[ hrefKey ];
-	const rel = attributeValues[ relKey ];
-	const target = attributeValues[ targetKey ];
-	const destination = attributeValues[ destinationKey ];
-
-	const hrefDefaultValue =
-		blockType.attributes[ href ]?.defaultValue ?? undefined;
-	const relDefaultValue =
-		blockType.attributes[ rel ]?.defaultValue ?? undefined;
-	const targetDefaultValue =
-		blockType.attributes[ target ]?.defaultValue ?? undefined;
-	const destinationDefaultValue =
-		blockType.attributes[ destination ]?.defaultValue ?? undefined;
+	const value = field.getValue( { item: data } );
+	const href = value?.href || value?.url;
+	const rel = value?.rel || '';
+	const target = value?.target || value?.linkTarget;
 
 	const opensInNewTab = target === NEW_TAB_TARGET;
 	const nofollow = rel === NOFOLLOW_REL;
@@ -109,20 +89,7 @@ export default function Link( {
 	);
 
 	return (
-		<ToolsPanelItem
-			panelId={ clientId }
-			label={ control.label }
-			hasValue={ () => !! href }
-			onDeselect={ () => {
-				updateAttributes( {
-					[ hrefKey ]: hrefDefaultValue,
-					[ relKey ]: relDefaultValue,
-					[ targetKey ]: targetDefaultValue,
-					[ destinationKey ]: destinationDefaultValue,
-				} );
-			} }
-			isShownByDefault={ control.shownByDefault }
-		>
+		<>
 			<Button
 				__next40pxDefaultSize
 				className="block-editor-content-only-controls__link"
@@ -173,23 +140,28 @@ export default function Link( {
 								...newValues,
 							} );
 
-							updateAttributes( {
-								[ hrefKey ]: updatedAttrs.url,
-								[ relKey ]: updatedAttrs.rel,
-								[ targetKey ]: updatedAttrs.linkTarget,
-							} );
+							onChange(
+								field.setValue( {
+									item: data,
+									value: {
+										...value,
+										href: updatedAttrs.url,
+										url: updatedAttrs.url,
+										rel: updatedAttrs.rel,
+										target: updatedAttrs.linkTarget,
+										linkTarget: updatedAttrs.linkTarget,
+									},
+								} )
+							);
 						} }
 						onRemove={ () => {
-							updateAttributes( {
-								[ hrefKey ]: hrefDefaultValue,
-								[ relKey ]: relDefaultValue,
-								[ targetKey ]: targetDefaultValue,
-								[ destinationKey ]: destinationDefaultValue,
-							} );
+							onChange(
+								field.setValue( { item: data, value: {} } )
+							);
 						} }
 					/>
 				</Popover>
 			) }
-		</ToolsPanelItem>
+		</>
 	);
 }
