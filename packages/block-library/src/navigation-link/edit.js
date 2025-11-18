@@ -367,10 +367,11 @@ export default function NavigationLinkEdit( {
 			// Edge case: When the created link is the first child of a submenu, the focus will have
 			// originated from the add submenu toolbar button. In this case, we need to return focus
 			// to the submenu appender if the user closes the link ui using the keyboard.
-			// Check if this is the first and only child of a newly created submenu
+			// Check if this is the first and only child of a newly created submenu.
 			if ( isSubmenu ) {
 				const parentBlocks = getBlocks( parentBlockClientId );
-				// Only set the flag if this is the only child (meaning new submenu)
+				// If this is the only child, then this is a new submenu.
+				// Set the flag to select the submenu appender when the link ui is closed.
 				if (
 					parentBlocks.length === 1 &&
 					parentBlocks[ 0 ].clientId === clientId
