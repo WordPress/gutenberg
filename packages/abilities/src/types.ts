@@ -70,6 +70,13 @@ export interface Ability {
 	callback?: AbilityCallback;
 
 	/**
+	 * Server callback function for server-side abilities.
+	 * Used to execute abilities that run on the server.
+	 * The core-abilities package provides implementations for WordPress REST API.
+	 */
+	serverCallback?: AbilityCallback;
+
+	/**
 	 * Client Permission callback for abilities.
 	 * Called before executing the ability to check if it's allowed.
 	 * If it returns false, the ability execution will be denied.

@@ -2,8 +2,6 @@
  * WordPress dependencies
  */
 import { dispatch, resolveSelect } from '@wordpress/data';
-import apiFetch from '@wordpress/api-fetch';
-import { addQueryArgs } from '@wordpress/url';
 import { sprintf } from '@wordpress/i18n';
 
 /**
@@ -267,43 +265,23 @@ async function executeClientAbility(
  * @param ability The ability to execute.
  * @param input   Input parameters for the ability.
  * @return Promise resolving to the ability execution result.
- * @throws Error if the API call fails.
+ * @throws Error if the ability has no serverCallback.
  */
 async function executeServerAbility(
 	ability: Ability,
 	input: AbilityInput
 ): Promise< AbilityOutput > {
-	let method = 'POST';
-	if ( !! ability.meta?.annotations?.readonly ) {
-		method = 'GET';
-	} else if (
-		!! ability.meta?.annotations?.destructive &&
-		!! ability.meta?.annotations?.idempotent
-	) {
-		method = 'DELETE';
+	if ( ! ability.serverCallback ) {
+		throw new Error(
+			sprintf(
+				'Server ability "%s" is missing serverCallback. Please ensure the appropriate server integration package (e.g. @wordpress/core-abilities) is loaded.',
+				ability.name
+			)
+		);
 	}
 
-	let path = `/wp-abilities/v1/abilities/${ ability.name }/run`;
-	const options: {
-		method: string;
-		data?: { input: AbilityInput };
-	} = {
-		method,
-	};
-
-	if ( [ 'GET', 'DELETE' ].includes( method ) && input !== null ) {
-		// For GET and DELETE requests, pass the input directly.
-		path = addQueryArgs( path, { input } );
-	} else if ( method === 'POST' && input !== null ) {
-		options.data = { input };
-	}
-
-	// Note: Input and output validation happens on the server side for these abilities.
 	try {
-		return await apiFetch< AbilityOutput >( {
-			path,
-			...options,
-		} );
+		return await ability.serverCallback( input );
 	} catch ( error ) {
 		// eslint-disable-next-line no-console
 		console.error( `Error executing ability ${ ability.name }:`, error );
