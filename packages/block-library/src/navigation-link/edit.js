@@ -478,23 +478,20 @@ export default function NavigationLinkEdit( {
 		}
 	);
 
-	if (
+	const needsValidLink =
 		( ! url && ! ( hasUrlBinding && isBoundEntityAvailable ) ) ||
 		isInvalid ||
 		isDraft ||
-		( hasUrlBinding && ! isBoundEntityAvailable )
-	) {
+		( hasUrlBinding && ! isBoundEntityAvailable );
+
+	if ( needsValidLink ) {
 		blockProps.onClick = () => {
 			setIsLinkOpen( true );
 		};
 	}
 
 	const classes = clsx( 'wp-block-navigation-item__content', {
-		'wp-block-navigation-link__placeholder':
-			( ! url && ! ( hasUrlBinding && isBoundEntityAvailable ) ) ||
-			isInvalid ||
-			isDraft ||
-			( hasUrlBinding && ! isBoundEntityAvailable ),
+		'wp-block-navigation-link__placeholder': needsValidLink,
 	} );
 
 	const missingText = getMissingText( type );
