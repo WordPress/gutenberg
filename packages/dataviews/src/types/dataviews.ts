@@ -178,11 +178,6 @@ interface ViewBase {
 	showLevels?: boolean;
 
 	/**
-	 * The field to group by. Ignored if `groupBy` is provided.
-	 */
-	groupByField?: string;
-
-	/**
 	 * The grouping configuration.
 	 */
 	groupBy?: {

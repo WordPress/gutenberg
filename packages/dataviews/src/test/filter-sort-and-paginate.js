@@ -900,12 +900,12 @@ describe( 'filters', () => {
 } );
 
 describe( 'sorting', () => {
-	it( 'should sort by groupByField first, then by sort.field', () => {
+	it( 'should sort by groupBy.field first, then by sort.field', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
 				sort: { field: 'title', direction: 'desc' },
-				groupByField: 'type',
+				groupBy: { field: 'type', direction: 'asc' },
 			},
 			fields
 		);
@@ -1114,11 +1114,11 @@ describe( 'sorting', () => {
 		expect( result[ 1 ].name.title ).toBe( 'Neptune' );
 	} );
 
-	it( 'should sort only by groupByField when sort is not specified', () => {
+	it( 'should sort only by groupBy.field when sort is not specified', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
-				groupByField: 'type',
+				groupBy: { field: 'type', direction: 'asc' },
 			},
 			fields
 		);

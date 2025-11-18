@@ -15,6 +15,10 @@
 
 - Fix: ensure primary actions are not wrapped in the list layout. [#73333](https://github.com/WordPress/gutenberg/pull/73333)
 
+### Breaking changes
+
+- DataViews: rename `groupByField` to `groupBy.field` to allow control over both the field and the direction of the grouping. [#73350](https://github.com/WordPress/gutenberg/pull/73350)
+
 ## 10.3.0 (2025-11-12)
 
 ### Enhancements

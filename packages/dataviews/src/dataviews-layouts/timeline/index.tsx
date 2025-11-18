@@ -46,9 +46,8 @@ export default function ViewTimeline< Item >(
 	const wrapperClassName = clsx( 'dataviews-view-timeline', className );
 
 	// Check if data should be grouped
-	const groupFieldId = view.groupBy?.field || view.groupByField;
-	const groupField = groupFieldId
-		? fields.find( ( field ) => field.id === groupFieldId )
+	const groupField = view.groupBy?.field
+		? fields.find( ( field ) => field.id === view.groupBy?.field )
 		: null;
 	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
 

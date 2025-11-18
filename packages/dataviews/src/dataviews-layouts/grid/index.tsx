@@ -336,9 +336,8 @@ function ViewGrid< Item >( {
 	 */
 	const size = '900px';
 
-	const groupFieldId = view.groupBy?.field || view.groupByField;
-	const groupField = groupFieldId
-		? fields.find( ( f ) => f.id === groupFieldId )
+	const groupField = view.groupBy?.field
+		? fields.find( ( f ) => f.id === view.groupBy?.field )
 		: null;
 	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
 	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;

@@ -218,7 +218,6 @@ Properties:
     -   `field`: the field used for grouping the dataset.
     -   `direction`: the direction to use for sorting the groups, one of `asc` or `desc`. Default `asc`.
 
--   `groupByField`: The id of the field used for grouping the dataset. Supported by the `grid` and `table` layouts. Ignored if `groupBy` is provided.
 -   `fields`: a list of remaining field `id` that are visible in the UI and the specific order in which they are displayed.
 -   `layout`: config that is specific to a particular layout type.
 
