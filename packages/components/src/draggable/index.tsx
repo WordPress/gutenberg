@@ -82,9 +82,15 @@ export function Draggable( {
 		event.preventDefault();
 		cleanupRef.current();
 
-		// Blur the drag handle to clear the :active state.
+		// Clear the :active state by temporarily removing and re-adding the element.
 		if ( event.target instanceof HTMLElement ) {
-			event.target.blur();
+			const element = event.target;
+			const parent = element.parentNode;
+			if ( parent ) {
+				const nextSibling = element.nextSibling;
+				parent.removeChild( element );
+				parent.insertBefore( element, nextSibling );
+			}
 		}
 
 		if ( onDragEnd ) {
@@ -191,6 +197,8 @@ export function Draggable( {
 		let cursorTop = event.clientY;
 
 		function over( e: DragEvent ) {
+			e.preventDefault();
+
 			// Skip doing any work if mouse has not moved.
 			if ( cursorLeft === e.clientX && cursorTop === e.clientY ) {
 				return;
