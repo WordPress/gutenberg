@@ -65,3 +65,26 @@ function gutenberg_parse_pattern_blocks_in_block_templates( $query_result, $quer
 }
 
 add_filter( 'get_block_templates', 'gutenberg_parse_pattern_blocks_in_block_templates', 10, 3 );
+
+/**
+ * Registers the 'overlay' template part area when the experiment is enabled.
+ *
+ * @param array $areas Array of template part area definitions.
+ * @return array Modified array of template part area definitions.
+ */
+function gutenberg_register_overlay_template_part_area( $areas ) {
+	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-customizable-navigation-overlays' ) ) {
+		return $areas;
+	}
+
+	$areas[] = array(
+		'area'        => 'overlay',
+		'label'       => __( 'Overlay', 'gutenberg' ),
+		'description' => __( 'Custom overlay area for navigation overlays.', 'gutenberg' ),
+		'icon'        => 'overlay',
+		'area_tag'    => 'div',
+	);
+
+	return $areas;
+}
+add_filter( 'default_wp_template_part_areas', 'gutenberg_register_overlay_template_part_area' );
