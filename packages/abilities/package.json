@@ -41,8 +41,7 @@
 		"./package.json": "./package.json"
 	},
 	"wpScriptModuleExports": {
-		".": "./build-module/index.js",
-		"./loader": "./build-module/loader.js"
+		".": "./build-module/index.js"
 	},
 	"types": "build-types",
 	"dependencies": {
