@@ -2,54 +2,23 @@
  * WordPress dependencies
  */
 import { sprintf } from '@wordpress/i18n';
-import { resolveSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import type { Ability, AbilityCategory, AbilityCategoryArgs } from '../types';
 import {
-	RECEIVE_ABILITIES,
 	REGISTER_ABILITY,
 	UNREGISTER_ABILITY,
-	RECEIVE_CATEGORIES,
 	REGISTER_ABILITY_CATEGORY,
 	UNREGISTER_ABILITY_CATEGORY,
-	STORE_NAME,
 } from './constants';
-
-/**
- * Returns an action object used to receive abilities into the store.
- *
- * @param abilities Array of abilities to store.
- * @return Action object.
- */
-export function receiveAbilities( abilities: Ability[] ) {
-	return {
-		type: RECEIVE_ABILITIES,
-		abilities,
-	};
-}
-
-/**
- * Returns an action object used to receive categories into the store.
- *
- * @param categories Array of categories to store.
- * @return Action object.
- */
-export function receiveCategories( categories: AbilityCategory[] ) {
-	return {
-		type: RECEIVE_CATEGORIES,
-		categories,
-	};
-}
 
 /**
  * Registers an ability in the store.
  *
  * This action validates the ability before registration. If validation fails,
- * an error will be thrown. Categories will be automatically fetched from the
- * REST API if they haven't been loaded yet.
+ * an error will be thrown.
  *
  * @param  ability The ability to register.
  * @return Action object or function.
@@ -57,7 +26,7 @@ export function receiveCategories( categories: AbilityCategory[] ) {
  */
 export function registerAbility( ability: Ability ) {
 	// @ts-expect-error - registry types are not yet available
-	return async ( { select, dispatch } ) => {
+	return ( { select, dispatch } ) => {
 		if ( ! ability.name ) {
 			throw new Error( 'Ability name is required' );
 		}
@@ -98,9 +67,8 @@ export function registerAbility( ability: Ability ) {
 			);
 		}
 
-		// Ensure categories are loaded before validating
-		const categories =
-			await resolveSelect( STORE_NAME ).getAbilityCategories();
+		// Check that the category exists
+		const categories = select.getAbilityCategories();
 		const existingCategory = categories.find(
 			( cat: AbilityCategory ) => cat.slug === ability.category
 		);
@@ -157,8 +125,7 @@ export function unregisterAbility( name: string ) {
  * Registers a client-side ability category in the store.
  *
  * This action validates the category before registration. If validation fails,
- * an error will be thrown. Categories will be automatically fetched from the
- * REST API if they haven't been loaded yet to check for duplicates.
+ * an error will be thrown.
  *
  * @param  slug The unique category slug identifier.
  * @param  args Category arguments (label, description, optional meta).
@@ -170,7 +137,7 @@ export function registerAbilityCategory(
 	args: AbilityCategoryArgs
 ) {
 	// @ts-expect-error - registry types are not yet available
-	return async ( { select, dispatch } ) => {
+	return ( { select, dispatch } ) => {
 		if ( ! slug ) {
 			throw new Error( 'Category slug is required' );
 		}
@@ -182,8 +149,7 @@ export function registerAbilityCategory(
 			);
 		}
 
-		// Ensure categories are loaded before checking for duplicates
-		await resolveSelect( STORE_NAME ).getAbilityCategories();
+		// Check for duplicates
 		const existingCategory = select.getAbilityCategory( slug );
 		if ( existingCategory ) {
 			throw new Error(

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { dispatch, resolveSelect } from '@wordpress/data';
+import { dispatch, select } from '@wordpress/data';
 import { sprintf } from '@wordpress/i18n';
 
 /**
@@ -22,43 +22,41 @@ import { validateValueFromSchema } from './validation';
  * Get all available abilities with optional filtering.
  *
  * @param args Optional query arguments to filter. Defaults to empty object.
- * @return Promise resolving to array of abilities.
+ * @return Array of abilities.
  */
-export async function getAbilities(
-	args: AbilitiesQueryArgs = {}
-): Promise< Ability[] > {
-	return await resolveSelect( store ).getAbilities( args );
+export function getAbilities( args: AbilitiesQueryArgs = {} ): Ability[] {
+	return select( store ).getAbilities( args );
 }
 
 /**
  * Get a specific ability by name.
  *
  * @param name The ability name.
- * @return Promise resolving to the ability or null if not found.
+ * @return The ability or undefined if not found.
  */
-export async function getAbility( name: string ): Promise< Ability | null > {
-	return await resolveSelect( store ).getAbility( name );
+export function getAbility( name: string ): Ability | undefined {
+	return select( store ).getAbility( name );
 }
 
 /**
  * Get all available ability categories.
  *
- * @return Promise resolving to array of categories.
+ * @return Array of categories.
  */
-export async function getAbilityCategories(): Promise< AbilityCategory[] > {
-	return await resolveSelect( store ).getAbilityCategories();
+export function getAbilityCategories(): AbilityCategory[] {
+	return select( store ).getAbilityCategories();
 }
 
 /**
  * Get a specific ability category by slug.
  *
  * @param slug The category slug.
- * @return Promise resolving to the category or null if not found.
+ * @return The category or undefined if not found.
  */
-export async function getAbilityCategory(
+export function getAbilityCategory(
 	slug: string
-): Promise< AbilityCategory | null > {
-	return await resolveSelect( store ).getAbilityCategory( slug );
+): AbilityCategory | undefined {
+	return select( store ).getAbilityCategory( slug );
 }
 
 /**
@@ -68,17 +66,14 @@ export async function getAbilityCategory(
  * a callback function. The ability will be validated by the store action,
  * and an error will be thrown if validation fails.
  *
- * Categories will be automatically fetched from the REST API if they
- * haven't been loaded yet, so you don't need to call getAbilityCategories()
- * before registering abilities.
+ * The category must already be registered before registering abilities.
  *
  * @param  ability The ability definition including callback.
- * @return Promise that resolves when registration is complete.
  * @throws {Error} If the ability fails validation.
  *
  * @example
  * ```js
- * await registerAbility({
+ * registerAbility({
  *   name: 'my-plugin/navigate',
  *   label: 'Navigate to URL',
  *   description: 'Navigates to a URL within WordPress admin',
@@ -97,9 +92,8 @@ export async function getAbilityCategory(
  * });
  * ```
  */
-export async function registerAbility( ability: Ability ): Promise< void > {
-	console.log( 'Registering ability:', ability );
-	await dispatch( store ).registerAbility( ability );
+export function registerAbility( ability: Ability ): void {
+	dispatch( store ).registerAbility( ability );
 }
 
 /**
@@ -122,24 +116,20 @@ export function unregisterAbility( name: string ): void {
  * This is useful when registering client-side abilities that introduce new
  * categories not defined by the server.
  *
- * Categories will be automatically fetched from the REST API if they haven't been
- * loaded yet to check for duplicates against server-side categories.
- *
  * @param  slug Category slug (lowercase alphanumeric with dashes only).
  * @param  args Category arguments (label, description, optional meta).
- * @return Promise that resolves when registration is complete.
  * @throws {Error} If the category fails validation.
  *
  * @example
  * ```js
  * // Register a new category for block editor abilities
- * await registerAbilityCategory('block-editor', {
+ * registerAbilityCategory('block-editor', {
  *   label: 'Block Editor',
  *   description: 'Abilities for interacting with the WordPress block editor'
  * });
  *
  * // Then register abilities using this category
- * await registerAbility({
+ * registerAbility({
  *   name: 'my-plugin/insert-block',
  *   label: 'Insert Block',
  *   description: 'Inserts a block into the editor',
@@ -151,11 +141,11 @@ export function unregisterAbility( name: string ): void {
  * });
  * ```
  */
-export async function registerAbilityCategory(
+export function registerAbilityCategory(
 	slug: string,
 	args: AbilityCategoryArgs
-): Promise< void > {
-	await dispatch( store ).registerAbilityCategory( slug, args );
+): void {
+	dispatch( store ).registerAbilityCategory( slug, args );
 }
 
 /**
@@ -305,8 +295,7 @@ export async function executeAbility(
 	name: string,
 	input?: AbilityInput
 ): Promise< AbilityOutput > {
-	const ability = await getAbility( name );
-	console.log( 'Executing ability:', ability );
+	const ability = getAbility( name );
 	if ( ! ability ) {
 		throw new Error( sprintf( 'Ability not found: %s', name ) );
 	}

@@ -8,10 +8,8 @@ import { combineReducers } from '@wordpress/data';
  */
 import type { Ability, AbilityCategory } from '../types';
 import {
-	RECEIVE_ABILITIES,
 	REGISTER_ABILITY,
 	UNREGISTER_ABILITY,
-	RECEIVE_CATEGORIES,
 	REGISTER_ABILITY_CATEGORY,
 	UNREGISTER_ABILITY_CATEGORY,
 } from './constants';
@@ -103,16 +101,6 @@ function abilitiesByName(
 	action: AbilitiesAction
 ): Record< string, Ability > {
 	switch ( action.type ) {
-		case RECEIVE_ABILITIES: {
-			if ( ! action.abilities ) {
-				return state;
-			}
-			const newState: Record< string, Ability > = {};
-			action.abilities.forEach( ( ability ) => {
-				newState[ ability.name ] = sanitizeAbility( ability );
-			} );
-			return newState;
-		}
 		case REGISTER_ABILITY: {
 			if ( ! action.ability ) {
 				return state;
@@ -148,16 +136,6 @@ function categoriesBySlug(
 	action: AbilitiesAction
 ): Record< string, AbilityCategory > {
 	switch ( action.type ) {
-		case RECEIVE_CATEGORIES: {
-			if ( ! action.categories ) {
-				return state;
-			}
-			const newState: Record< string, AbilityCategory > = {};
-			action.categories.forEach( ( category ) => {
-				newState[ category.slug ] = sanitizeCategory( category );
-			} );
-			return newState;
-		}
 		case REGISTER_ABILITY_CATEGORY: {
 			if ( ! action.category ) {
 				return state;

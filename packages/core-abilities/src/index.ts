@@ -66,7 +66,7 @@ async function initializeCategories(): Promise< void > {
 				context: 'edit',
 			} ),
 		} );
-		console.log( 'Fetched ability categories:', categories );
+
 		if ( categories && Array.isArray( categories ) ) {
 			for ( const category of categories ) {
 				const meta =
@@ -100,11 +100,11 @@ async function initializeAbilities(): Promise< void > {
 				context: 'edit',
 			} ),
 		} );
-		console.log( 'Fetched abilities:', abilities );
+
 		if ( abilities && Array.isArray( abilities ) ) {
 			for ( const ability of abilities ) {
 				// Register the ability with a serverCallback
-				await registerAbility( {
+				registerAbility( {
 					...ability,
 					serverCallback: createServerCallback( ability ),
 				} );
