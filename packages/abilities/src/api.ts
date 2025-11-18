@@ -98,6 +98,7 @@ export async function getAbilityCategory(
  * ```
  */
 export async function registerAbility( ability: Ability ): Promise< void > {
+	console.log( 'Registering ability:', ability );
 	await dispatch( store ).registerAbility( ability );
 }
 
@@ -305,6 +306,7 @@ export async function executeAbility(
 	input?: AbilityInput
 ): Promise< AbilityOutput > {
 	const ability = await getAbility( name );
+	console.log( 'Executing ability:', ability );
 	if ( ! ability ) {
 		throw new Error( sprintf( 'Ability not found: %s', name ) );
 	}
