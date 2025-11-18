@@ -26,6 +26,23 @@ The `package-json-lint` preset automatically enables this rule for `package.json
 }
 ```
 
+**Note:** When using this preset alongside other presets (like `recommended` or `recommended-with-formatting`), you need to configure the JSON parser in an override to prevent conflicts:
+
+```json
+{
+	"extends": [
+		"plugin:@wordpress/eslint-plugin/recommended-with-formatting",
+		"plugin:@wordpress/eslint-plugin/package-json-lint"
+	],
+	"overrides": [
+		{
+			"files": ["package.json"],
+			"parser": "jsonc-eslint-parser"
+		}
+	]
+}
+```
+
 ### Rule Options
 
 You can override specific npm-package-json-lint rules using the `rules` option:
@@ -35,6 +52,7 @@ You can override specific npm-package-json-lint rules using the `rules` option:
 	"overrides": [
 		{
 			"files": ["package.json"],
+			"parser": "jsonc-eslint-parser",
 			"rules": {
 				"@wordpress/validate-package-json": [
 					"error",
@@ -49,32 +67,6 @@ You can override specific npm-package-json-lint rules using the `rules` option:
 		}
 	]
 }
-```
-
-### Flat Config (ESLint 9+)
-
-```javascript
-export default [
-	{
-		files: ['package.json'],
-		languageOptions: {
-			parser: jsoncParser,
-		},
-		plugins: {
-			'@wordpress': wordpress,
-		},
-		rules: {
-			'@wordpress/validate-package-json': [
-				'error',
-				{
-					rules: {
-						'valid-values-license': 'off',
-					},
-				},
-			],
-		},
-	},
-];
 ```
 
 ## Examples
@@ -132,6 +124,7 @@ To disable specific checks for your project:
 	"overrides": [
 		{
 			"files": ["package.json"],
+			"parser": "jsonc-eslint-parser",
 			"rules": {
 				"@wordpress/validate-package-json": [
 					"error",
