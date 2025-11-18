@@ -38,6 +38,9 @@ const imageSizes = [
 	},
 ];
 
+// Default preview size is the third smallest image size if no preview size is set.
+const DEFAULT_PREVIEW_SIZE = imageSizes[ 2 ].value;
+
 /**
  * Calculate the number of grid columns based on container width and preview size.
  * This matches how CSS grid auto-fill works: repeat(auto-fill, minmax(previewSize, 1fr)).
@@ -48,8 +51,7 @@ export function useGridColumns() {
 	return useMemo( () => {
 		const containerWidth = context.containerWidth;
 		const gap = 32; // This is the value of the grid gap in CSS.
-		// Default to the third smallest size if no preview size is set.
-		const previewSize = view.layout?.previewSize ?? 230;
+		const previewSize = view.layout?.previewSize ?? DEFAULT_PREVIEW_SIZE;
 		const columns = Math.floor(
 			( containerWidth + gap ) / ( previewSize + gap )
 		);
@@ -65,7 +67,7 @@ export default function PreviewSizePicker() {
 		return context.containerWidth >= size.breakpoint;
 	} );
 
-	const layoutPreviewSize = view.layout?.previewSize ?? 230; // Default to the third smallest size if no preview size is set.
+	const layoutPreviewSize = view.layout?.previewSize ?? DEFAULT_PREVIEW_SIZE;
 	// If the container has resized and the set preview size is no longer available,
 	// we reset it to the next smallest size, or the smallest available size.
 	const previewSizeToUse =
