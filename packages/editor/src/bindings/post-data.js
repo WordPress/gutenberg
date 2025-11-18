@@ -40,14 +40,14 @@ export default {
 		 * Required for WordPress 6.9+ navigation blocks. DO NOT REMOVE.
 		 */
 		const { getBlockAttributes, getBlockName } = select( blockEditorStore );
-		const blockName = getBlockName?.( clientId );
+		const blockName = getBlockName( clientId );
 		const isNavigationBlock = NAVIGATION_BLOCK_TYPES.includes( blockName );
 
 		let postId, postType;
 
 		if ( isNavigationBlock ) {
 			// Navigation blocks: read from block attributes
-			const blockAttributes = getBlockAttributes?.( clientId );
+			const blockAttributes = getBlockAttributes( clientId );
 			postId = blockAttributes?.id;
 			postType = blockAttributes?.type;
 		} else {
@@ -98,7 +98,7 @@ export default {
 	setValues( { dispatch, context, bindings, clientId, select } ) {
 		const { getBlockName } = select( blockEditorStore );
 
-		const blockName = getBlockName?.( clientId );
+		const blockName = getBlockName( clientId );
 
 		// Navigaton block types are read-only.
 		// See https://github.com/WordPress/gutenberg/pull/72165.
@@ -121,7 +121,7 @@ export default {
 		const { getBlockName, getSelectedBlockClientId } =
 			select( blockEditorStore );
 		const clientId = getSelectedBlockClientId();
-		const blockName = getBlockName?.( clientId );
+		const blockName = getBlockName( clientId );
 
 		// Navigaton block types are read-only.
 		// See https://github.com/WordPress/gutenberg/pull/72165.
