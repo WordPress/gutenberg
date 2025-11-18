@@ -2,7 +2,7 @@
 
 // Migrate existing "edited" templates. By existing, it means that the template
 // is active.
-function gutenberg_migrate_existing_templates() {
+function gutenberg_get_migrated_active_templates() {
 	// Query all templates in the database. See `get_block_templates`.
 	$wp_query_args = array(
 		'post_status'         => 'publish',

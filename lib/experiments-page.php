@@ -22,10 +22,12 @@ if ( ! function_exists( 'the_gutenberg_experiments' ) ) {
 		<form method="post" action="options.php">
 			<?php settings_fields( 'gutenberg-experiments' ); ?>
 			<?php do_settings_sections( 'gutenberg-experiments' ); ?>
+			<!-- We use a separate table for the template activation experiment because the option is managed separately. -->
 			<table class="form-table">
 				<tr>
 					<th scope="row">
 						<label for="active_templates"><?php echo __( 'Template Activation', 'gutenberg' ); ?></label>
+						<br><a href="https://github.com/WordPress/gutenberg/issues/66950" target="_blank"><?php echo __( 'Learn more', 'gutenberg' ); ?></a>
 					</th>
 					<td>
 						<label for="active_templates">
@@ -284,7 +286,7 @@ function gutenberg_handle_template_activate_setting_submission() {
 	}
 
 	if ( isset( $_POST['active_templates'] ) && '1' === $_POST['active_templates'] ) {
-		update_option( 'active_templates', gutenberg_migrate_existing_templates() );
+		update_option( 'active_templates', gutenberg_get_migrated_active_templates() );
 	} else {
 		delete_option( 'active_templates' );
 	}
