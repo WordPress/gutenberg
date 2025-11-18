@@ -35,10 +35,6 @@ const postDataFields = [
 export default {
 	name: 'core/post-data',
 	getValues( { select, context, bindings, clientId } ) {
-		const allowedFields = postDataFields.map(
-			( field ) => field.args.field
-		);
-
 		/*
 		 * BACKWARDS COMPATIBILITY: Hardcoded exception for navigation blocks.
 		 * Required for WordPress 6.9+ navigation blocks. DO NOT REMOVE.
@@ -67,6 +63,25 @@ export default {
 			postId
 		);
 
+		// If there's no data for the entity, we return field labels instead.
+		if ( ! entityDataValues ) {
+			const newValues = {};
+			for ( const [ attributeName, binding ] of Object.entries(
+				bindings
+			) ) {
+				const postDataField = postDataFields.find(
+					( field ) => field.args.field === binding.args.field
+				);
+				if ( postDataField ) {
+					newValues[ attributeName ] = postDataField.label;
+				}
+			}
+			return newValues;
+		}
+
+		const allowedFields = postDataFields.map(
+			( field ) => field.args.field
+		);
 		const newValues = {};
 		for ( const [ attributeName, binding ] of Object.entries( bindings ) ) {
 			if ( ! allowedFields.includes( binding.args.field ) ) {
@@ -74,11 +89,7 @@ export default {
 				continue;
 			}
 
-			newValues[ attributeName ] =
-				entityDataValues?.[ binding.args.field ] ??
-				postDataFields.find(
-					( field ) => field.args.field === binding.args.field
-				).label;
+			newValues[ attributeName ] = entityDataValues[ binding.args.field ];
 		}
 		return newValues;
 	},
