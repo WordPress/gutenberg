@@ -6,7 +6,12 @@
 	"category": "design",
 	"description": "A close button for navigation overlays.",
 	"textdomain": "default",
-	"attributes": {},
+	"attributes": {
+		"displayMode": {
+			"type": "string",
+			"default": "icon"
+		}
+	},
 	"supports": {
 		"html": false,
 		"anchor": true,

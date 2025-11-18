@@ -12,7 +12,11 @@ import {
 } from '@wordpress/block-editor';
 
 export default function OverlayCloseSave( { attributes, className } ) {
+	const { displayMode = 'icon' } = attributes;
 	const colorProps = getColorClassesAndStyles( attributes );
+
+	const showIcon = displayMode === 'icon' || displayMode === 'both';
+	const showText = displayMode === 'text' || displayMode === 'both';
 
 	return (
 		<div
@@ -29,8 +33,12 @@ export default function OverlayCloseSave( { attributes, className } ) {
 				style={ colorProps.style }
 				aria-label="Close overlay"
 			>
-				<span className="wp-block-overlay-close__icon">×</span>
-				<span className="wp-block-overlay-close__text">Close</span>
+				{ showIcon && (
+					<span className="wp-block-overlay-close__icon">×</span>
+				) }
+				{ showText && (
+					<span className="wp-block-overlay-close__text">Close</span>
+				) }
 			</button>
 		</div>
 	);
