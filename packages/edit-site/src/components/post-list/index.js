@@ -10,12 +10,7 @@ import {
 import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect } from '@wordpress/data';
-import {
-	DataViews,
-	filterSortAndPaginate,
-	OPERATOR_BEFORE,
-	OPERATOR_AFTER,
-} from '@wordpress/dataviews';
+import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { drawerRight } from '@wordpress/icons';
@@ -29,6 +24,8 @@ import { useView } from '@wordpress/views';
 import {
 	OPERATOR_IS_ANY,
 	OPERATOR_IS_NONE,
+	OPERATOR_BEFORE,
+	OPERATOR_AFTER,
 	LAYOUT_LIST,
 } from '../../utils/constants';
 
