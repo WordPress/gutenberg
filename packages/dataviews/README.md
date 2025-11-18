@@ -630,11 +630,9 @@ Example:
 ```js
 const defaultLayouts = {
 	pickerGrid: {
-		showMedia: true,
+		showTitle: false,
 	},
-	pickerTable: {
-		showMedia: false,
-	},
+	pickerTable: {},
 };
 ```
 
