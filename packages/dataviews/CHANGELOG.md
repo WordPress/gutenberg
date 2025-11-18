@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 10.4.0-next.0 (2025-11-18)
+
 ### Enhancements
 
 - Documentation: surface better the `type` property in the documentation. [#73349](https://github.com/WordPress/gutenberg/pull/73349)

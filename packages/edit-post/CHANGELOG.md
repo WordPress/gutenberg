@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 8.35.1-next.0 (2025-11-18)
+
 ### Internal
 
 -   Adjusted `welcome-guide` styles to define the close-button hover state internally after refactoring in the shared `Guide` component.

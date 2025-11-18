@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.35.1-next.0 (2025-11-18)
+
 ### Internal
 
 -   Updated `welcome-guide` styles to apply the close-button hover color locally, following changes to the shared `Guide` component.
