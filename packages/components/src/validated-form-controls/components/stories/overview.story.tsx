@@ -18,6 +18,9 @@ import { formDecorator } from './story-utils';
 import type { ControlWithError } from '../../control-with-error';
 import Dropdown from '../../../dropdown';
 import { Button } from '../../../button';
+import Modal from '../../../modal';
+import { HStack } from '../../../h-stack';
+import { VStack } from '../../../v-stack';
 
 const meta: Meta< typeof ControlWithError > = {
 	title: 'Components/Selection & Input/Validated Form Controls/Overview',
@@ -294,6 +297,69 @@ const AsyncValidationWithTest: StoryObj< typeof ValidatedInputControl > = {
 };
 
 /**
+ * A `form` wrapper and `type="submit"` button can be used to force validation when
+ * the user tries to commit their changes, while still allowing the modal to be closed.
+ * Optionally, the `shouldCloseOnClickOutside` prop on `Modal` can be disabled
+ * to force users to more explicitly signal whether they are trying to
+ * "submit close" or "cancel close" the dialog.
+ */
+export const ValidateInModal: StoryObj< typeof ValidatedInputControl > = {
+	render: function Template( { ...args } ) {
+		const [ isOpen, setIsOpen ] = useState( false );
+		return (
+			<>
+				<Button
+					variant="secondary"
+					__next40pxDefaultSize
+					onClick={ () => setIsOpen( true ) }
+				>
+					Open in modal
+				</Button>
+				{ isOpen && (
+					<Modal
+						title="Dialog title"
+						onRequestClose={ () => setIsOpen( false ) }
+						shouldCloseOnClickOutside={ false }
+					>
+						<form
+							onSubmit={ ( event ) => {
+								event.preventDefault();
+								setIsOpen( false );
+							} }
+						>
+							<VStack spacing={ 2 }>
+								<ValidatedInputControl
+									required
+									label="Text"
+									{ ...args }
+								/>
+
+								<HStack justify="flex-end" spacing={ 2 }>
+									<Button
+										variant="tertiary"
+										__next40pxDefaultSize
+										onClick={ () => setIsOpen( false ) }
+									>
+										Cancel
+									</Button>
+									<Button
+										variant="primary"
+										__next40pxDefaultSize
+										type="submit"
+									>
+										Save
+									</Button>
+								</HStack>
+							</VStack>
+						</form>
+					</Modal>
+				) }
+			</>
+		);
+	},
+};
+
+/**
  * [Form methods](https://developer.mozilla.org/en-US/docs/Web/API/HTMLFormElement#instance_methods) like
  * `reportValidity()` can be used to validate the fields when a popover is about to be closed,
  * and prevent the closing of the popover when invalid.
@@ -313,7 +379,7 @@ export const ValidateOnPopoverClose: StoryObj< typeof ValidatedInputControl > =
 
 			return (
 				<Dropdown
-					popoverProps={ { placement: 'right' } }
+					popoverProps={ { placement: 'bottom-start' } }
 					open={ isOpen }
 					onToggle={ ( willOpen ) => {
 						if ( ! willOpen ) {
@@ -350,7 +416,7 @@ export const ValidateOnPopoverClose: StoryObj< typeof ValidatedInputControl > =
 						return (
 							<Button
 								__next40pxDefaultSize
-								variant="primary"
+								variant="secondary"
 								onClick={ () => setIsOpen( ! isOpen ) }
 								aria-expanded={ isOpen }
 							>
