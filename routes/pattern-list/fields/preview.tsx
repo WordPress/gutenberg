@@ -3,16 +3,18 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Preview } from '@wordpress/lazy-editor';
-import type { WpTemplatePart } from '@wordpress/core-data';
 
-function PreviewField( { item }: { item: WpTemplatePart } ) {
-	const description = item.description;
+/**
+ * Internal dependencies
+ */
+import type { NormalizedPattern } from '../use-patterns';
 
+function PreviewField( { item }: { item: NormalizedPattern } ) {
 	return (
 		<Preview
-			content={ item?.content?.raw }
 			blocks={ item.blocks }
-			description={ description }
+			content={ item.content }
+			description={ item.description }
 		/>
 	);
 }

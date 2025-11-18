@@ -196,17 +196,26 @@ function momentTimezoneAliasPlugin() {
 			const { createRequire } = await import( 'module' );
 			const require = createRequire( import.meta.url );
 
-			const preBuiltBundlePath = require.resolve(
-				'moment-timezone/builds/moment-timezone-with-data-1970-2030'
-			);
-			const momentTimezoneUtilsPath = require.resolve(
-				'moment-timezone/moment-timezone-utils.js'
-			);
+			// Cached paths - resolved lazily on first use
+			let preBuiltBundlePath;
+			let momentTimezoneUtilsPath;
+			const resolvePaths = () => {
+				if ( preBuiltBundlePath ) {
+					return;
+				}
+				preBuiltBundlePath = require.resolve(
+					'moment-timezone/builds/moment-timezone-with-data-1970-2030'
+				);
+				momentTimezoneUtilsPath = require.resolve(
+					'moment-timezone/moment-timezone-utils.js'
+				);
+			};
 
 			// Redirect main moment-timezone files to pre-built bundle
 			build.onResolve(
 				{ filter: /^moment-timezone\/moment-timezone$/ },
 				() => {
+					resolvePaths();
 					return { path: preBuiltBundlePath };
 				}
 			);
@@ -217,6 +226,7 @@ function momentTimezoneAliasPlugin() {
 			build.onResolve(
 				{ filter: /^moment-timezone\/moment-timezone-utils$/ },
 				() => {
+					resolvePaths();
 					return { path: momentTimezoneUtilsPath };
 				}
 			);
@@ -228,6 +238,7 @@ function momentTimezoneAliasPlugin() {
 					args.importer &&
 					args.importer.includes( 'moment-timezone-utils' )
 				) {
+					resolvePaths();
 					return { path: preBuiltBundlePath };
 				}
 			} );
@@ -351,7 +362,7 @@ async function bundlePackage( packageName ) {
 		);
 
 		builtScripts.push( {
-			handle: `wp-${ packageName }`,
+			handle: `${ HANDLE_PREFIX }-${ packageName }`,
 			path: `${ packageName }/index`,
 			asset: `${ packageName }/index.min.asset.php`,
 		} );
@@ -583,7 +594,7 @@ async function bundlePackage( packageName ) {
 		const styleDeps = await inferStyleDependencies( scriptDependencies );
 
 		builtStyles.push( {
-			handle: `wp-${ packageName }`,
+			handle: `${ HANDLE_PREFIX }-${ packageName }`,
 			path: `${ packageName }/style`,
 			dependencies: styleDeps,
 		} );

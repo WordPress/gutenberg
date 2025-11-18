@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState, useMemo } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import {
 	Modal,
@@ -40,31 +40,16 @@ export default function HTMLEditModal( {
 	const [ isFullscreen, setIsFullscreen ] = useState( false );
 
 	// Check if user has permission to save scripts and get editor styles
-	const { canUserUseUnfilteredHTML, editorStyles } = useSelect(
-		( select ) => {
-			const settings = select( blockEditorStore ).getSettings();
-			return {
-				canUserUseUnfilteredHTML:
-					settings.__experimentalCanUserUseUnfilteredHTML,
-				editorStyles: settings.styles,
-			};
-		},
-		[]
-	);
+	const { canUserUseUnfilteredHTML } = useSelect( ( select ) => {
+		const settings = select( blockEditorStore ).getSettings();
+		return {
+			canUserUseUnfilteredHTML:
+				settings.__experimentalCanUserUseUnfilteredHTML,
+		};
+	}, [] );
 
 	// Show JS tab if user has permission OR if block contains JavaScript
 	const shouldShowJsTab = canUserUseUnfilteredHTML || js.trim() !== '';
-
-	// Combine all editor styles to inject into modal
-	const styleContent = useMemo( () => {
-		if ( ! editorStyles ) {
-			return '';
-		}
-		return editorStyles
-			.filter( ( style ) => style.css )
-			.map( ( style ) => style.css )
-			.join( '\n' );
-	}, [ editorStyles ] );
 
 	if ( ! isOpen ) {
 		return null;
@@ -131,11 +116,6 @@ export default function HTMLEditModal( {
 				isFullScreen={ isFullscreen }
 				__experimentalHideHeader
 			>
-				{ styleContent && (
-					<style
-						dangerouslySetInnerHTML={ { __html: styleContent } }
-					/>
-				) }
 				<Tabs orientation="horizontal" defaultTabId="html">
 					<VStack spacing={ 4 } style={ { height: '100%' } }>
 						<HStack justify="space-between">
