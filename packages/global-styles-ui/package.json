@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/global-styles-ui",
-	"version": "1.2.0",
+	"version": "1.2.1-next.dc3f6d3c1.0",
 	"description": "Global Styles UI components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
