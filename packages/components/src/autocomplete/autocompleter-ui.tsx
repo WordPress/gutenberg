@@ -11,6 +11,7 @@ import {
 	useRef,
 	useEffect,
 	useState,
+	createPortal,
 } from '@wordpress/element';
 import { useAnchor } from '@wordpress/rich-text';
 import { useDebounce, useMergeRefs, useRefEffect } from '@wordpress/compose';
@@ -24,7 +25,6 @@ import getDefaultUseItems from './get-default-use-items';
 import Button from '../button';
 import Popover from '../popover';
 import { VisuallyHidden } from '../visually-hidden';
-import { createPortal } from 'react-dom';
 import type { AutocompleterUIProps, KeyedOption, WPCompleter } from './types';
 
 type ListBoxProps = {
