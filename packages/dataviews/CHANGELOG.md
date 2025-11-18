@@ -10,6 +10,7 @@
 - DataViews table layout: only apply hover styles when bulk actions are available. [#73248](https://github.com/WordPress/gutenberg/pull/73248)
 - Improve docs for Edit component. [#73202](https://github.com/WordPress/gutenberg/pull/73202)
 - Field API: introduce the `format` prop to format the `date` field type. [#72999](https://github.com/WordPress/gutenberg/pull/72999)
+- DataViews table layout: fix table header spacing when using non-default column alignment. [#73398](https://github.com/WordPress/gutenberg/pull/73398)
 
 ### Bug fixes
 
