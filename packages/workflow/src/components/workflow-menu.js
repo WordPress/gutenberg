@@ -21,6 +21,7 @@ import {
 } from '@wordpress/keyboard-shortcuts';
 import { Icon, search as inputIcon } from '@wordpress/icons';
 import { executeAbility, store as abilitiesStore } from '@wordpress/abilities';
+import './workflow-menu.scss';
 
 /**
  * Internal dependencies
