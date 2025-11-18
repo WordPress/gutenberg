@@ -1,15 +1,15 @@
 /**
  * Internal dependencies
  */
-import TimelineItem from './timeline-item';
-import type { ViewTimelineProps } from '../../types';
+import ActivityItem from './activity-item';
+import type { ViewActivityProps } from '../../types';
 
 function isDefined< T >( item: T | undefined ): item is T {
 	return !! item;
 }
 
-export default function TimelineItems< Item >(
-	props: ViewTimelineProps< Item >
+export default function ActivityItems< Item >(
+	props: ViewActivityProps< Item >
 ) {
 	const { data, fields, getItemId, view } = props;
 
@@ -25,7 +25,7 @@ export default function TimelineItems< Item >(
 
 	return data.map( ( item, index ) => {
 		return (
-			<TimelineItem
+			<ActivityItem
 				{ ...props }
 				key={ getItemId( item ) }
 				item={ item }

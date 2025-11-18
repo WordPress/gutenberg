@@ -11,13 +11,13 @@ import { __experimentalVStack as VStack, Spinner } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import type { ViewTimelineProps } from '../../types';
+import type { ViewActivityProps } from '../../types';
 import getDataByGroup from '../utils/get-data-by-group';
-import TimelineGroup from './timeline-group';
-import TimelineItems from './timeline-items';
+import ActivityGroup from './activity-group';
+import ActivityItems from './activity-items';
 
-export default function ViewTimeline< Item >(
-	props: ViewTimelineProps< Item >
+export default function ViewActivity< Item >(
+	props: ViewActivityProps< Item >
 ) {
 	const { empty, data, fields, isLoading, view, className } = props;
 
@@ -43,7 +43,7 @@ export default function ViewTimeline< Item >(
 		);
 	}
 
-	const wrapperClassName = clsx( 'dataviews-view-timeline', className );
+	const wrapperClassName = clsx( 'dataviews-view-activity', className );
 
 	// Check if data should be grouped
 	const groupField = view.groupBy?.field
@@ -56,37 +56,37 @@ export default function ViewTimeline< Item >(
 		? Array.from( dataByGroup.entries() )
 		: [];
 
-	// Render grouped timeline
+	// Render grouped activity
 	if ( hasData && groupField && dataByGroup ) {
 		return (
 			<VStack spacing={ 2 } className={ wrapperClassName }>
 				{ groupedEntries.map(
 					( [ groupName, groupData ]: [ string, Item[] ] ) => (
-						<TimelineGroup< Item >
+						<ActivityGroup< Item >
 							key={ groupName }
 							groupName={ groupName }
 							groupData={ groupData }
 							groupField={ groupField }
 						>
-							<TimelineItems< Item >
+							<ActivityItems< Item >
 								{ ...props }
 								data={ groupData }
 							/>
-						</TimelineGroup>
+						</ActivityGroup>
 					)
 				) }
 			</VStack>
 		);
 	}
 
-	// Render flat timeline (no grouping)
+	// Render flat activity (no grouping)
 	return (
 		<>
 			<div
 				className={ wrapperClassName }
 				role={ view.infiniteScrollEnabled ? 'feed' : undefined }
 			>
-				<TimelineItems< Item > { ...props } />
+				<ActivityItems< Item > { ...props } />
 			</div>
 			{ hasData && isLoading && (
 				<p className="dataviews-loading-more">

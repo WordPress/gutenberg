@@ -16,14 +16,14 @@ import {
 import ViewTable from './table';
 import ViewGrid from './grid';
 import ViewList from './list';
-import ViewTimeline from './timeline';
+import ViewActivity from './activity';
 import ViewPickerGrid from './picker-grid';
 import ViewPickerTable from './picker-table';
 import {
 	LAYOUT_GRID,
 	LAYOUT_LIST,
 	LAYOUT_TABLE,
-	LAYOUT_TIMELINE,
+	LAYOUT_ACTIVITY,
 	LAYOUT_PICKER_GRID,
 	LAYOUT_PICKER_TABLE,
 } from '../constants';
@@ -52,9 +52,9 @@ export const VIEW_LAYOUTS = [
 		icon: isRTL() ? formatListBulletsRTL : formatListBullets,
 	},
 	{
-		type: LAYOUT_TIMELINE,
-		label: __( 'Timeline' ),
-		component: ViewTimeline,
+		type: LAYOUT_ACTIVITY,
+		label: __( 'Activity' ),
+		component: ViewActivity,
 		icon: scheduled,
 		viewConfigOptions: DensityPicker,
 	},

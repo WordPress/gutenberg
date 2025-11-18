@@ -247,8 +247,8 @@ export interface ViewList extends ViewBase {
 	type: 'list';
 }
 
-export interface ViewTimeline extends ViewBase {
-	type: 'timeline';
+export interface ViewActivity extends ViewBase {
+	type: 'activity';
 
 	layout?: {
 		/**
@@ -317,7 +317,7 @@ export type View =
 	| ViewTable
 	| ViewPickerGrid
 	| ViewPickerTable
-	| ViewTimeline;
+	| ViewActivity;
 
 interface ActionBase< Item > {
 	/**
@@ -467,8 +467,8 @@ export interface ViewListProps< Item > extends ViewBaseProps< Item > {
 	view: ViewList;
 }
 
-export interface ViewTimelineProps< Item > extends ViewBaseProps< Item > {
-	view: ViewTimeline;
+export interface ViewActivityProps< Item > extends ViewBaseProps< Item > {
+	view: ViewActivity;
 }
 
 export interface ViewGridProps< Item > extends ViewBaseProps< Item > {
@@ -489,7 +489,7 @@ export type ViewProps< Item > =
 	| ViewTableProps< Item >
 	| ViewGridProps< Item >
 	| ViewListProps< Item >
-	| ViewTimelineProps< Item >;
+	| ViewActivityProps< Item >;
 
 export type ViewPickerProps< Item > =
 	| ViewPickerGridProps< Item >
@@ -499,7 +499,7 @@ export interface SupportedLayouts {
 	list?: Omit< ViewList, 'type' >;
 	grid?: Omit< ViewGrid, 'type' >;
 	table?: Omit< ViewTable, 'type' >;
-	timeline?: Omit< ViewTimeline, 'type' >;
+	activity?: Omit< ViewActivity, 'type' >;
 	pickerGrid?: Omit< ViewPickerGrid, 'type' >;
 	pickerTable?: Omit< ViewPickerTable, 'type' >;
 }

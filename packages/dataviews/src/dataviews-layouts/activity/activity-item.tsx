@@ -22,10 +22,10 @@ import ItemActions, {
 } from '../../components/dataviews-item-actions';
 import DataViewsContext from '../../components/dataviews-context';
 import { ItemClickWrapper } from '../utils/item-click-wrapper';
-import type { NormalizedField, ViewTimelineProps } from '../../types';
+import type { NormalizedField, ViewActivityProps } from '../../types';
 
-function TimelineItem< Item >(
-	props: ViewTimelineProps< Item > & {
+function ActivityItem< Item >(
+	props: ViewActivityProps< Item > & {
 		item: Item;
 		mediaField?: NormalizedField< Item >;
 		titleField?: NormalizedField< Item >;
@@ -85,10 +85,10 @@ function TimelineItem< Item >(
 		) : null;
 
 	const renderedMediaField = (
-		<div className="dataviews-view-timeline__event-type-icon">
+		<div className="dataviews-view-activity__item-type-icon">
 			{ mediaContent || (
 				<span
-					className="dataviews-view-timeline__event-bullet"
+					className="dataviews-view-activity__item-bullet"
 					aria-hidden="true"
 				/>
 			) }
@@ -102,8 +102,6 @@ function TimelineItem< Item >(
 
 	const verticalSpacing = useMemo( () => {
 		switch ( density ) {
-			case 'compact':
-				return '1';
 			case 'comfortable':
 				return '3';
 			default:
@@ -119,28 +117,25 @@ function TimelineItem< Item >(
 			aria-setsize={
 				infiniteScrollEnabled ? paginationInfo.totalItems : undefined
 			}
-			className="dataviews-view-timeline__item"
+			className={ clsx(
+				'dataviews-view-activity__item',
+				density === 'compact' && 'is-compact',
+				density === 'balanced' && 'is-balanced',
+				density === 'comfortable' && 'is-comfortable'
+			) }
 		>
-			<HStack
-				spacing={ 3 }
-				justify="start"
-				alignment="flex-start"
-				className="dataviews-view-timeline__row"
-			>
-				<div
-					className={ clsx(
-						'dataviews-view-timeline__event-type',
-						density === 'compact' && 'is-compact',
-						density === 'balanced' && 'is-balanced',
-						density === 'comfortable' && 'is-comfortable'
-					) }
+			<HStack spacing={ 4 } justify="start" alignment="flex-start">
+				<VStack
+					spacing={ 1 }
+					alignment="center"
+					className="dataviews-view-activity__item-type"
 				>
 					{ renderedMediaField }
-				</div>
+				</VStack>
 				<VStack
 					spacing={ verticalSpacing }
 					alignment="flex-start"
-					className="dataviews-view-timeline__event-content"
+					className="dataviews-view-activity__item-content"
 				>
 					{ renderedTitleField && (
 						<ItemClickWrapper
@@ -148,32 +143,32 @@ function TimelineItem< Item >(
 							isItemClickable={ isItemClickable }
 							onClickItem={ onClickItem }
 							renderItemLink={ renderItemLink }
-							className="dataviews-view-timeline__event-title"
+							className="dataviews-view-activity__item-title"
 						>
 							{ renderedTitleField }
 						</ItemClickWrapper>
 					) }
 					{ showDescription && descriptionField && (
-						<div className="dataviews-view-timeline__event-description">
+						<div className="dataviews-view-activity__item-description">
 							<descriptionField.render
 								item={ item }
 								field={ descriptionField }
 							/>
 						</div>
 					) }
-					<div className="dataviews-view-timeline__fields">
+					<div className="dataviews-view-activity__item-fields">
 						{ otherFields.map( ( field ) => (
 							<div
 								key={ field.id }
-								className="dataviews-view-timeline__field"
+								className="dataviews-view-activity__item-field"
 							>
 								<VisuallyHidden
 									as="span"
-									className="dataviews-view-timeline__field-label"
+									className="dataviews-view-activity__item-field-label"
 								>
 									{ field.label }
 								</VisuallyHidden>
-								<span className="dataviews-view-timeline__field-value">
+								<span className="dataviews-view-activity__item-field-value">
 									<field.render
 										item={ item }
 										field={ field }
@@ -192,7 +187,7 @@ function TimelineItem< Item >(
 					) }
 				</VStack>
 				{ primaryActions.length < eligibleActions.length && (
-					<div className="dataviews-view-timeline__item-actions">
+					<div className="dataviews-view-activity__item-actions">
 						<ItemActions
 							item={ item }
 							actions={ eligibleActions }
@@ -205,4 +200,4 @@ function TimelineItem< Item >(
 	);
 }
 
-export default TimelineItem;
+export default ActivityItem;

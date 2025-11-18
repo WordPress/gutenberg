@@ -34,7 +34,7 @@ import {
 	LAYOUT_GRID,
 	LAYOUT_LIST,
 	LAYOUT_TABLE,
-	LAYOUT_TIMELINE,
+	LAYOUT_ACTIVITY,
 } from '../constants';
 import filterSortAndPaginate from '../utils/filter-sort-and-paginate';
 import type { Field, View } from '../types';
@@ -76,7 +76,7 @@ const defaultLayouts = {
 	[ LAYOUT_TABLE ]: {},
 	[ LAYOUT_GRID ]: {},
 	[ LAYOUT_LIST ]: {},
-	[ LAYOUT_TIMELINE ]: {},
+	[ LAYOUT_ACTIVITY ]: {},
 };
 
 export const Default = ( {
@@ -226,7 +226,7 @@ export const MinimalUI = {
 	argTypes: {
 		layout: {
 			control: 'select',
-			options: [ 'table', 'list', 'grid', 'timeline' ],
+			options: [ 'table', 'list', 'grid', 'activity' ],
 			defaultValue: 'table',
 		},
 	},
@@ -560,7 +560,7 @@ export const InfiniteScroll = () => {
 	);
 };
 
-const TimelineComponent = ( {
+const ActivityComponent = ( {
 	showMedia = true,
 	grouping = true,
 }: {
@@ -568,7 +568,7 @@ const TimelineComponent = ( {
 	grouping: boolean;
 } ) => {
 	const [ view, setView ] = useState< View >( {
-		type: LAYOUT_TIMELINE,
+		type: LAYOUT_ACTIVITY,
 		search: '',
 		page: 1,
 		perPage: 20,
@@ -615,7 +615,7 @@ const TimelineComponent = ( {
 			onChangeView={ setView }
 			actions={ orderEventActions }
 			defaultLayouts={ {
-				[ LAYOUT_TIMELINE ]: {
+				[ LAYOUT_ACTIVITY ]: {
 					sort: {
 						field: 'datetime',
 						direction: 'asc',
@@ -626,8 +626,8 @@ const TimelineComponent = ( {
 	);
 };
 
-export const Timeline = {
-	render: TimelineComponent,
+export const Activity = {
+	render: ActivityComponent,
 	args: {
 		showMedia: true,
 		grouping: true,
@@ -637,13 +637,14 @@ export const Timeline = {
 			control: 'boolean',
 			options: [ true, false ],
 			defaultValue: true,
-			description: 'Whether the icon is shown in the timeline',
+			description: 'Whether the icon is shown in the activity list',
 		},
 		grouping: {
 			control: 'boolean',
 			options: [ true, false ],
 			defaultValue: true,
-			description: 'Whether items are grouped by date in the timeline',
+			description:
+				'Whether items are grouped by date in the activity list',
 		},
 	},
 };

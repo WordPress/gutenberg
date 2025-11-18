@@ -9,7 +9,7 @@
 - DataViews table layout: only apply hover styles when bulk actions are available. [#73248](https://github.com/WordPress/gutenberg/pull/73248)
 - Improve docs for Edit component. [#73202](https://github.com/WordPress/gutenberg/pull/73202)
 - Field API: introduce the `format` prop to format the `date` field type. [#72999](https://github.com/WordPress/gutenberg/pull/72999)
-- DataViews: add support for timeline layout. [#72780](https://github.com/WordPress/gutenberg/pull/72780)
+- DataViews: add support for activity layout. [#72780](https://github.com/WordPress/gutenberg/pull/72780)
 
 ### Bug fixes
 

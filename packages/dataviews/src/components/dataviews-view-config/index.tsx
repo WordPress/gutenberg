@@ -89,7 +89,7 @@ export function ViewTypeMenu() {
 									case 'table':
 									case 'pickerGrid':
 									case 'pickerTable':
-									case 'timeline':
+									case 'activity':
 										const viewWithoutLayout = { ...view };
 										if ( 'layout' in viewWithoutLayout ) {
 											delete viewWithoutLayout.layout;
