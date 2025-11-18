@@ -563,11 +563,9 @@ export const InfiniteScroll = () => {
 const TimelineComponent = ( {
 	showMedia = true,
 	grouping = true,
-	density = 'balanced',
 }: {
 	showMedia: boolean;
 	grouping: boolean;
-	density: 'compact' | 'balanced' | 'comfortable';
 } ) => {
 	const [ view, setView ] = useState< View >( {
 		type: LAYOUT_TIMELINE,
@@ -590,28 +588,18 @@ const TimelineComponent = ( {
 					direction: 'asc',
 			  }
 			: undefined,
-		layout: {
-			density,
-		},
 	} );
 	useEffect( () => {
 		setView( ( prevView ) => {
-			const prevLayout =
-				prevView.type === LAYOUT_TIMELINE ? prevView.layout : {};
 			return {
 				...prevView,
-				type: LAYOUT_TIMELINE,
 				groupBy: grouping
 					? { field: 'date', direction: 'asc' }
 					: undefined,
 				showMedia,
-				layout: {
-					...prevLayout,
-					density,
-				},
 			};
 		} );
-	}, [ showMedia, grouping, density ] );
+	}, [ showMedia, grouping ] );
 
 	const { data: shownData, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( orderEventData, view, orderEventFields );
@@ -643,7 +631,6 @@ export const Timeline = {
 	args: {
 		showMedia: true,
 		grouping: true,
-		density: 'balanced',
 	},
 	argTypes: {
 		showMedia: {
@@ -657,12 +644,6 @@ export const Timeline = {
 			options: [ true, false ],
 			defaultValue: true,
 			description: 'Whether items are grouped by date in the timeline',
-		},
-		density: {
-			control: 'select',
-			options: [ 'compact', 'balanced', 'comfortable' ],
-			defaultValue: 'balanced',
-			description: 'Density of the timeline',
 		},
 	},
 };

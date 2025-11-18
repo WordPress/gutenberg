@@ -56,6 +56,7 @@ export const VIEW_LAYOUTS = [
 		label: __( 'Timeline' ),
 		component: ViewTimeline,
 		icon: scheduled,
+		viewConfigOptions: DensityPicker,
 	},
 	{
 		type: LAYOUT_PICKER_GRID,
