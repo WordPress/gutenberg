@@ -501,7 +501,7 @@ async function bundlePackage( packageName, options = {} ) {
 
 	if ( packageJson.wpCopyFiles ) {
 		const { files, transforms = {} } = packageJson.wpCopyFiles;
-		const sourceDir = path.join( packageDir, 'src' );
+		const packageSourceDir = path.join( packageDir, 'src' );
 		const outputDir = path.join( BUILD_DIR, 'scripts', packageName );
 
 		for ( const filePattern of files ) {
@@ -510,7 +510,10 @@ async function bundlePackage( packageName, options = {} ) {
 			);
 
 			for ( const sourceFile of matchedFiles ) {
-				const relativePath = path.relative( sourceDir, sourceFile );
+				const relativePath = path.relative(
+					packageSourceDir,
+					sourceFile
+				);
 				const destPath = path.join( outputDir, relativePath );
 				const destDir = path.dirname( destPath );
 
