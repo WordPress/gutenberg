@@ -53,9 +53,6 @@
 		"rememo": "^4.0.2",
 		"use-memo-one": "^1.1.1"
 	},
-	"peerDependencies": {
-		"react": "^18.0.0"
-	},
 	"publishConfig": {
 		"access": "public"
 	}

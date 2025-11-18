@@ -45,10 +45,6 @@
 		"@wordpress/url": "file:../url",
 		"uuid": "^9.0.1"
 	},
-	"peerDependencies": {
-		"react": "^18.0.0",
-		"react-dom": "^18.0.0"
-	},
 	"publishConfig": {
 		"access": "public"
 	}

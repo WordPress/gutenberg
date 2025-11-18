@@ -45,10 +45,6 @@
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"memize": "^2.0.1"
 	},
-	"peerDependencies": {
-		"react": "^18.0.0",
-		"react-dom": "^18.0.0"
-	},
 	"publishConfig": {
 		"access": "public"
 	}

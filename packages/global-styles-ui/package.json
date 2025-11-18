@@ -56,10 +56,6 @@
 		"clsx": "^2.1.0",
 		"colord": "^2.7.0"
 	},
-	"peerDependencies": {
-		"react": "^18.0.0",
-		"react-dom": "^18.0.0"
-	},
 	"publishConfig": {
 		"access": "public"
 	}

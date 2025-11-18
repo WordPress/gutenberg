@@ -49,10 +49,6 @@
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons"
 	},
-	"peerDependencies": {
-		"react": "^18.0.0",
-		"react-dom": "^18.0.0"
-	},
 	"publishConfig": {
 		"access": "public"
 	}

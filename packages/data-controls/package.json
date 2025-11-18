@@ -41,9 +41,6 @@
 		"@wordpress/data": "file:../data",
 		"@wordpress/deprecated": "file:../deprecated"
 	},
-	"peerDependencies": {
-		"react": "^18.0.0"
-	},
 	"publishConfig": {
 		"access": "public"
 	}

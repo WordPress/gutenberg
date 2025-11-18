@@ -40,9 +40,6 @@
 		"@tanstack/react-router": "^1.120.5",
 		"@wordpress/private-apis": "file:../private-apis"
 	},
-	"peerDependencies": {
-		"react": "^18.0.0"
-	},
 	"publishConfig": {
 		"access": "public"
 	}

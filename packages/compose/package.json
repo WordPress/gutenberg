@@ -52,9 +52,6 @@
 		"mousetrap": "^1.6.5",
 		"use-memo-one": "^1.1.1"
 	},
-	"peerDependencies": {
-		"react": "^18.0.0"
-	},
 	"publishConfig": {
 		"access": "public"
 	}
