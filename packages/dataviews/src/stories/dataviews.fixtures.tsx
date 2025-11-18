@@ -861,7 +861,7 @@ export const orderEventData: OrderEvent[] = [
 		categories: [ 'Review', 'Customer' ],
 		date: '2025-01-22',
 		datetime: '2025-01-22T19:45:33Z',
-		email: 'alice.wonderland@fictional-store.test',
+		email: 'buzz.lightyear@fictional-store.test',
 		orderNumber: '#2502',
 	},
 	{
@@ -874,7 +874,7 @@ export const orderEventData: OrderEvent[] = [
 		categories: [ 'Order', 'Status' ],
 		date: '2025-01-15',
 		datetime: '2025-01-15T09:23:15Z',
-		email: 'alice.wonderland@fictional-store.test',
+		email: 'buzz.lightyear@fictional-store.test',
 		orderNumber: '#2502',
 	},
 	{
@@ -887,7 +887,7 @@ export const orderEventData: OrderEvent[] = [
 		categories: [ 'Payment', 'Credit Card' ],
 		date: '2025-01-15',
 		datetime: '2025-01-15T09:23:47Z',
-		email: 'alice.wonderland@fictional-store.test',
+		email: 'buzz.lightyear@fictional-store.test',
 		orderNumber: '#2502',
 	},
 	{
@@ -895,13 +895,13 @@ export const orderEventData: OrderEvent[] = [
 		name: {
 			title: 'Order Confirmation Sent',
 			description:
-				'Order confirmation #1259 sent to alice.wonderland@fictional-store.test',
+				'Order confirmation #1259 sent to buzz.lightyear@fictional-store.test',
 		},
 		type: 'email',
 		categories: [ 'Email', 'Communication' ],
 		date: '2025-01-15',
 		datetime: '2025-01-15T09:24:02Z',
-		email: 'alice.wonderland@fictional-store.test',
+		email: 'buzz.lightyear@fictional-store.test',
 		orderNumber: '#2502',
 	},
 	{
@@ -942,7 +942,7 @@ export const orderEventData: OrderEvent[] = [
 		categories: [ 'Note', 'Customer' ],
 		date: '2025-01-16',
 		datetime: '2025-01-16T08:15:42Z',
-		email: 'alice.wonderland@fictional-store.test',
+		email: 'buzz.lightyear@fictional-store.test',
 		orderNumber: '#2502',
 	},
 	{
@@ -982,7 +982,7 @@ export const orderEventData: OrderEvent[] = [
 		categories: [ 'Shipping', 'Status' ],
 		date: '2025-01-18',
 		datetime: '2025-01-18T16:42:09Z',
-		email: 'alice.wonderland@fictional-store.test',
+		email: 'buzz.lightyear@fictional-store.test',
 		orderNumber: '#2502',
 	},
 	{
@@ -996,7 +996,7 @@ export const orderEventData: OrderEvent[] = [
 		categories: [ 'Email', 'Communication' ],
 		date: '2025-01-18',
 		datetime: '2025-01-18T16:42:25Z',
-		email: 'alice.wonderland@fictional-store.test',
+		email: 'buzz.lightyear@fictional-store.test',
 		orderNumber: '#2502',
 	},
 	{
@@ -1023,6 +1023,138 @@ export const orderEventData: OrderEvent[] = [
 		date: '2025-01-20',
 		datetime: '2025-01-20T14:32:51Z',
 		orderNumber: '#2502',
+	},
+	{
+		id: 14,
+		name: {
+			title: 'Order Created',
+			description: 'Order #2503 was created.',
+		},
+		type: 'status',
+		categories: [ 'Order', 'Status' ],
+		date: '2025-01-16',
+		datetime: '2025-01-16T10:15:30Z',
+		email: 'woody.pride@fictional-store.test',
+		orderNumber: '#2503',
+	},
+	{
+		id: 15,
+		name: {
+			title: 'Payment Received',
+			description: 'Payment through PayPal accepted.',
+		},
+		type: 'payment',
+		categories: [ 'Payment', 'PayPal' ],
+		date: '2025-01-16',
+		datetime: '2025-01-16T10:16:05Z',
+		email: 'woody.pride@fictional-store.test',
+		orderNumber: '#2503',
+	},
+	{
+		id: 16,
+		name: {
+			title: 'Order Confirmation Sent',
+			description:
+				'Order confirmation #1260 sent to woody.pride@fictional-store.test',
+		},
+		type: 'email',
+		categories: [ 'Email', 'Communication' ],
+		date: '2025-01-16',
+		datetime: '2025-01-16T10:16:18Z',
+		email: 'woody.pride@fictional-store.test',
+		orderNumber: '#2503',
+	},
+	{
+		id: 17,
+		name: {
+			title: 'Order Created',
+			description: 'Order #2501 was created.',
+		},
+		type: 'status',
+		categories: [ 'Order', 'Status' ],
+		date: '2025-01-14',
+		datetime: '2025-01-14T14:22:45Z',
+		email: 'rex.green@fictional-store.test',
+		orderNumber: '#2501',
+	},
+	{
+		id: 18,
+		name: {
+			title: 'Payment Received',
+			description: 'Payment through Stripe accepted.',
+		},
+		type: 'payment',
+		categories: [ 'Payment', 'Stripe' ],
+		date: '2025-01-14',
+		datetime: '2025-01-14T14:23:12Z',
+		email: 'rex.green@fictional-store.test',
+		orderNumber: '#2501',
+	},
+	{
+		id: 19,
+		name: {
+			title: 'Order Shipped',
+			description:
+				'Order has been shipped via FedEx Ground. Expected delivery: Jan 18, 2025',
+		},
+		type: 'shipping',
+		categories: [ 'Shipping', 'Status' ],
+		date: '2025-01-15',
+		datetime: '2025-01-15T11:30:00Z',
+		email: 'rex.green@fictional-store.test',
+		orderNumber: '#2501',
+	},
+	{
+		id: 20,
+		name: {
+			title: 'Order Delivered',
+			description: 'Order successfully delivered and signed for.',
+		},
+		type: 'status',
+		categories: [ 'Order', 'Status', 'Delivered' ],
+		date: '2025-01-18',
+		datetime: '2025-01-18T13:45:22Z',
+		orderNumber: '#2501',
+	},
+	{
+		id: 21,
+		name: {
+			title: 'Order Created',
+			description: 'Order #2504 was created.',
+		},
+		type: 'status',
+		categories: [ 'Order', 'Status' ],
+		date: '2025-01-17',
+		datetime: '2025-01-17T16:40:15Z',
+		email: 'jessie.cowgirl@fictional-store.test',
+		orderNumber: '#2504',
+	},
+	{
+		id: 22,
+		name: {
+			title: 'Payment Received',
+			description: 'Payment through Apple Pay accepted.',
+		},
+		type: 'payment',
+		categories: [ 'Payment', 'Apple Pay' ],
+		date: '2025-01-17',
+		datetime: '2025-01-17T16:40:42Z',
+		email: 'jessie.cowgirl@fictional-store.test',
+		orderNumber: '#2504',
+	},
+	{
+		id: 23,
+		name: {
+			title: 'Private Note Added',
+			description:
+				'Customer requested gift wrapping with a personalized note.',
+		},
+		type: 'note',
+		categories: [ 'Note', 'Internal' ],
+		date: '2025-01-17',
+		datetime: '2025-01-17T17:15:00Z',
+		email: 'store.admin@fictional-store.test',
+		orderNumber: '#2504',
 	},
 ];
 
@@ -1195,11 +1327,45 @@ export const orderEventActions: Action< OrderEvent >[] = [
 		isPrimary: false,
 		icon: trash,
 		isEligible: ( item ) => item.type === 'note',
-		callback: ( items ) => {
-			const item = items[ 0 ];
-			// eslint-disable-next-line no-alert
-			alert(
-				`Delete note: "${ item.name.title }"\n\n${ item.name.description }`
+		modalHeader: ( items ) =>
+			items.length > 1
+				? `Delete ${ items.length } items`
+				: `Delete ${ items[ 0 ].name.title }`,
+		modalFocusOnMount: 'firstContentElement',
+		supportsBulk: true,
+		RenderModal: ( { items, closeModal } ) => {
+			const label =
+				items.length > 1
+					? `Are you sure you want to delete ${ items.length } items?`
+					: `Are you sure you want to delete "${ items[ 0 ].name.title }"?`;
+			const onSubmit = () => {
+				const item = items[ 0 ];
+				// eslint-disable-next-line no-alert
+				alert(
+					`Delete note: "${ item.name.title }"\n\n${ item.name.description }`
+				);
+				closeModal?.();
+			};
+			return (
+				<VStack spacing="5">
+					<Text>{ label }</Text>
+					<HStack justify="right">
+						<Button
+							__next40pxDefaultSize
+							variant="tertiary"
+							onClick={ closeModal }
+						>
+							Cancel
+						</Button>
+						<Button
+							__next40pxDefaultSize
+							variant="primary"
+							onClick={ onSubmit }
+						>
+							Delete
+						</Button>
+					</HStack>
+				</VStack>
 			);
 		},
 	},
