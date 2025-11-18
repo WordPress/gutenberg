@@ -242,42 +242,17 @@
 }
 
 .editor-editor-interface.is-distraction-free {
-	.interface-interface-skeleton__header {
-		border-bottom: none;
-	}
-
 	.editor-header {
-		background-color: $white;
-		width: 100%;
-
-		@include break-medium {
-			box-shadow: 0 $border-width 0 0 rgba($color: #000, $alpha: 0.133); // 0.133 = $gray-200 but with alpha.
-			position: absolute;
-		}
-
-
 		// hide some parts
 		& > .edit-post-header__settings > .edit-post-header__post-preview-button {
 			visibility: hidden;
 		}
 
 		& > .editor-header__toolbar .editor-document-tools__document-overview-toggle,
-		& > .editor-header__settings > .editor-preview-dropdown,
 		& > .editor-header__settings > .interface-pinned-items,
 		& > .editor-header__settings > .editor-zoom-out-toggle {
 			display: none;
 		}
-
-	}
-
-	// We need ! important because we override inline styles
-	// set by the motion component.
-	.interface-interface-skeleton__header:focus-within {
-		opacity: 1 !important;
-		div {
-			transform: translateX(0) translateZ(0) !important;
-		}
-
 	}
 
 	.components-editor-notices__dismissible {

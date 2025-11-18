@@ -152,6 +152,32 @@ html.interface-interface-skeleton__html-container {
 	outline: 1px solid transparent; // Shown for Windows 10 High Contrast mode.
 }
 
+// Animated header styles
+.interface-interface-skeleton.has-animated-header {
+	.interface-interface-skeleton__header {
+		border-bottom: none;
+		box-shadow: none;
+	}
+
+	// Generic header content styles for animated state
+	.interface-interface-skeleton__header > * {
+		@include break-medium() {
+			box-shadow: 0 $border-width 0 0 rgba($color: #000, $alpha: 0.133);
+			position: absolute;
+			background-color: $white;
+			width: 100%;
+		}
+	}
+
+	// Focus-within override for motion styles
+	.interface-interface-skeleton__header:focus-within {
+		opacity: 1 !important;
+		div {
+			transform: translateX(0) translateZ(0) !important;
+		}
+	}
+}
+
 .interface-interface-skeleton__footer {
 	height: auto; // Keep the height flexible.
 	flex-shrink: 0;

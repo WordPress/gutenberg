@@ -18,6 +18,7 @@ import { useState, useCallback } from '@wordpress/element';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import { DESIGN_POST_TYPES } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
 import EditorNotices from '../editor-notices';
 import Header from '../header';
@@ -63,9 +64,16 @@ export default function EditorInterface( {
 		documentLabel,
 		stylesPath,
 		showStylebook,
+		renderingMode,
+		postType,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
-		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
+		const {
+			getEditorSettings,
+			getPostTypeLabel,
+			getRenderingMode,
+			getCurrentPostType,
+		} = select( editorStore );
 		const { getStylesPath, getShowStylebook } = unlock(
 			select( editorStore )
 		);
@@ -92,6 +100,8 @@ export default function EditorInterface( {
 				postTypeLabel || _x( 'Document', 'noun, breadcrumb' ),
 			stylesPath: getStylesPath(),
 			showStylebook: getShowStylebook(),
+			renderingMode: getRenderingMode(),
+			postType: getCurrentPostType(),
 		};
 	}, [] );
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -115,9 +125,17 @@ export default function EditorInterface( {
 		[ entitiesSavedStatesCallback ]
 	);
 
+	const isDesignPostType = DESIGN_POST_TYPES.includes( postType );
+	const shouldAnimateHeader =
+		isDistractionFree &&
+		renderingMode !== 'template-locked' &&
+		! isDesignPostType;
+	const noticesInHeader = isDistractionFree;
+
 	return (
 		<InterfaceSkeleton
-			isDistractionFree={ isDistractionFree }
+			shouldAnimateHeader={ shouldAnimateHeader }
+			noticesInHeader={ noticesInHeader }
 			className={ clsx( 'editor-editor-interface', className, {
 				'is-entity-save-view-open': !! entitiesSavedStatesCallback,
 				'is-distraction-free': isDistractionFree && ! isPreviewMode,

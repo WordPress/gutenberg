@@ -28,21 +28,22 @@ import {
 	TEMPLATE_PART_POST_TYPE,
 	PATTERN_POST_TYPE,
 	NAVIGATION_POST_TYPE,
+	DESIGN_POST_TYPES,
 } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
 
 const toolbarVariations = {
-	distractionFreeDisabled: { y: '-50px' },
-	distractionFreeHover: { y: 0 },
-	distractionFreeHidden: { y: '-50px' },
+	animatedDisabled: { y: '-50px' },
+	animatedHover: { y: 0 },
+	animatedHidden: { y: '-50px' },
 	visible: { y: 0 },
 	hidden: { y: 0 },
 };
 
 const backButtonVariations = {
-	distractionFreeDisabled: { x: '-100%' },
-	distractionFreeHover: { x: 0 },
-	distractionFreeHidden: { x: '-100%' },
+	animatedDisabled: { x: '-100%' },
+	animatedHover: { x: 0 },
+	animatedHidden: { x: '-100%' },
 	visible: { x: 0 },
 	hidden: { x: 0 },
 };
@@ -64,12 +65,14 @@ function Header( {
 		hasBlockSelection,
 		hasSectionRootClientId,
 		isStylesCanvasActive,
+		renderingMode,
 	} = useSelect( ( select ) => {
 		const { get: getPreference } = select( preferencesStore );
 		const {
 			getEditorMode,
 			getCurrentPostType,
 			isPublishSidebarOpened: _isPublishSidebarOpened,
+			getRenderingMode,
 		} = select( editorStore );
 		const { getStylesPath, getShowStylebook } = unlock(
 			select( editorStore )
@@ -89,6 +92,7 @@ function Header( {
 			isStylesCanvasActive:
 				!! getStylesPath()?.startsWith( '/revisions' ) ||
 				getShowStylebook(),
+			renderingMode: getRenderingMode(),
 		};
 	}, [] );
 
@@ -106,10 +110,17 @@ function Header( {
 	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
 		useState( true );
 
+	const isDesignPostType = DESIGN_POST_TYPES.includes( postType );
+	// In template-locked mode or design post types, we don't show the toolbar
+	const showsFixedToolbar =
+		hasFixedToolbar &&
+		renderingMode !== 'template-locked' &&
+		! isDesignPostType;
+
 	const hasCenter =
 		! isTooNarrowForDocumentBar &&
-		( ! hasFixedToolbar ||
-			( hasFixedToolbar &&
+		( ! showsFixedToolbar ||
+			( showsFixedToolbar &&
 				( ! hasBlockSelection || isBlockToolsCollapsed ) ) );
 	const hasBackButton = useHasBackButton();
 
@@ -136,7 +147,7 @@ function Header( {
 				<DocumentTools
 					disableBlockTools={ isStylesCanvasActive || isTextEditor }
 				/>
-				{ hasFixedToolbar && isLargeViewport && (
+				{ showsFixedToolbar && isLargeViewport && (
 					<CollapsibleBlockToolbar
 						isCollapsed={ isBlockToolsCollapsed }
 						onToggle={ setIsBlockToolsCollapsed }
