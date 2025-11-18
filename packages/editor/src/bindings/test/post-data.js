@@ -146,14 +146,18 @@ describe( 'post-data bindings', () => {
 	} );
 
 	describe( 'getFieldsList', () => {
-		it( 'should return the list of available post data fields when the Date block is selected', () => {
+		it( 'should return the list of available post data fields when a Navigation block with id and type attributes is selected', () => {
 			const select = () => ( {
-				getSelectedBlock: () => ( {
-					name: 'core/post-date',
+				getSelectedBlockClientId: () => '123abc456',
+				getBlockName: () => 'core/post-date',
+				getBlockAttributes: () => ( {
+					id: 123,
+					type: 'post',
 				} ),
 			} );
 
 			const fields = postDataBindings.getFieldsList( {
+				context: { postId: 123, postType: 'post' },
 				select,
 			} );
 
@@ -176,14 +180,60 @@ describe( 'post-data bindings', () => {
 			] );
 		} );
 
-		it( 'should return an empty array when any other block than the Date block is selected', () => {
+		it( 'should return the list of available post data fields when a non-Navigation block is selected, and postId and postType context is provided', () => {
 			const select = () => ( {
-				getSelectedBlock: () => ( {
-					name: 'core/paragraph',
+				getSelectedBlockClientId: () => '123abc456',
+				getBlockName: () => 'core/post-date',
+			} );
+
+			const fields = postDataBindings.getFieldsList( {
+				context: { postId: 123, postType: 'post' },
+				select,
+			} );
+
+			expect( fields ).toEqual( [
+				{
+					label: 'Post Date',
+					args: { field: 'date' },
+					type: 'string',
+				},
+				{
+					label: 'Post Modified Date',
+					args: { field: 'modified' },
+					type: 'string',
+				},
+				{
+					label: 'Post Link',
+					args: { field: 'link' },
+					type: 'string',
+				},
+			] );
+		} );
+
+		it( 'should return an empty array when a Navigation block is selected but no post id attribute is provided', () => {
+			const select = () => ( {
+				getSelectedBlockClientId: () => '123abc456',
+				getBlockName: () => 'core/navigation-link',
+				getBlockAttributes: () => ( {
+					type: 'post',
 				} ),
 			} );
 
 			const fields = postDataBindings.getFieldsList( {
+				select,
+			} );
+
+			expect( fields ).toEqual( [] );
+		} );
+
+		it( 'should return an empty array when a non-Navigation block is selected but no postId context is provided', () => {
+			const select = () => ( {
+				getSelectedBlockClientId: () => '123abc456',
+				getBlockName: () => 'core/paragraph',
+			} );
+
+			const fields = postDataBindings.getFieldsList( {
+				context: { postType: 'post' },
 				select,
 			} );
 

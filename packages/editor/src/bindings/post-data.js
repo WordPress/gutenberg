@@ -151,9 +151,25 @@ export default {
 
 		return true;
 	},
-	getFieldsList( { select } ) {
-		const selectedBlock = select( blockEditorStore ).getSelectedBlock();
-		if ( selectedBlock?.name !== 'core/post-date' ) {
+	getFieldsList( { context, select } ) {
+		const { getBlockAttributes, getBlockName, getSelectedBlockClientId } =
+			select( blockEditorStore );
+		const clientId = getSelectedBlockClientId();
+		const blockName = getBlockName( clientId );
+
+		if ( NAVIGATION_BLOCK_TYPES.includes( blockName ) ) {
+			// Navigation blocks: read from block attributes
+			const blockAttributes = getBlockAttributes( clientId );
+
+			if (
+				! blockAttributes ||
+				! blockAttributes.id ||
+				! blockAttributes.type
+			) {
+				return [];
+			}
+		} else if ( ! context || ! context.postId || ! context.postType ) {
+			// All other blocks: use context
 			return [];
 		}
 
