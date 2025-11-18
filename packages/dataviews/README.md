@@ -522,7 +522,7 @@ The component behaves differently to a regular `DataViews` component in the foll
 
 There are also a few differences in the implementation:
 
--   Currently only the `pickerGrid` layout is supported for `DataViewsPicker`. This layout is very similar to the regular `grid` layout.
+-   Only the `pickerGrid` and `pickerTable` layout types are supported for `DataViewsPicker`. These layouts are similar to the regular `grid` and `table` layouts respectively.
 -   The picker component is used as a 'controlled' component, so `selection` and `onChangeSelection` should be provided as props. This is so that implementers can access the full range of selected items across pages.
 -   An optional `itemListLabel` prop can be supplied to the `DataViewsPicker` component. This is added as an `aria-label` to the `listbox` element, and should be supplied if there's no heading element associated with the `DataViewsPicker` UI.
 -   The `isItemClickable`, `renderItemLink` and `onClickItem` prop are unsupported for `DataViewsPicker`.
@@ -589,7 +589,7 @@ Same as `DataViews`. The fields describe the visible items for each record in th
 
 #### `view`: `Object`
 
-Same as `DataViews`. The view object configures how the dataset is visible to the user. Note that only the `pickerGrid` layout type is supported.
+Same as `DataViews`. The view object configures how the dataset is visible to the user. Note that only the `pickerGrid` and `pickerTable` layout types are supported.
 
 #### `onChangeView`: `function`
 
@@ -623,7 +623,7 @@ Same as `DataViews`. Whether the data is loading. `false` by default.
 
 #### `defaultLayouts`: `Record< string, view >`
 
-Limits the available layouts. Currently only `pickerGrid` is supported for `DataViewsPicker`.
+Limits the available layouts. Only `pickerGrid` and `pickerTable` are supported for `DataViewsPicker`.
 
 Example:
 
@@ -631,6 +631,9 @@ Example:
 const defaultLayouts = {
 	pickerGrid: {
 		showMedia: true,
+	},
+	pickerTable: {
+		showMedia: false,
 	},
 };
 ```
