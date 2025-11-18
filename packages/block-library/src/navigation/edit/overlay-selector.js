@@ -166,6 +166,13 @@ export default function OverlaySelector( { value, onChange } ) {
 		}
 	}, [ selectedTemplatePart ] );
 
+	// Check if we can edit (value exists, template part exists, and navigation is available)
+	const canEdit =
+		value &&
+		selectedTemplatePart &&
+		onNavigateToEntityRecord &&
+		! isCreating;
+
 	return (
 		<VStack spacing={ 1 }>
 			{ value &&
@@ -177,22 +184,18 @@ export default function OverlaySelector( { value, onChange } ) {
 							<div
 								className="block-editor-block-patterns-list__item"
 								onClick={
-									onNavigateToEntityRecord
-										? handleEditClick
-										: undefined
+									canEdit ? handleEditClick : undefined
 								}
 								style={ {
-									cursor: onNavigateToEntityRecord
-										? 'pointer'
-										: 'default',
+									cursor: canEdit ? 'pointer' : 'default',
 								} }
 								role="button"
-								tabIndex={ onNavigateToEntityRecord ? 0 : -1 }
+								tabIndex={ canEdit ? 0 : -1 }
 								onKeyDown={ ( event ) => {
 									if (
 										( event.key === 'Enter' ||
 											event.key === ' ' ) &&
-										onNavigateToEntityRecord
+										canEdit
 									) {
 										event.preventDefault();
 										handleEditClick();
@@ -253,7 +256,7 @@ export default function OverlaySelector( { value, onChange } ) {
 				variant="secondary"
 				icon={ pencil }
 				onClick={ handleEditClick }
-				disabled={ ! value || ! onNavigateToEntityRecord || isCreating }
+				disabled={ ! canEdit }
 				style={ { maxWidth: 'fit-content' } }
 			>
 				{ __( 'Edit Overlay' ) }
