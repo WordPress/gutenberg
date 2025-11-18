@@ -49,7 +49,7 @@ class Tests_Resolve_Patterns_In_Templates extends WP_Test_REST_Controller_Testca
 			'test/nested-pattern',
 			array(
 				'title'       => 'Nested Pattern',
-				'content'     => '<!-- wp:group --><!-- wp:paragraph -->Nested content<!-- /wp:paragraph --><!-- wp:pattern {"slug":"test/single-root"} /--><!-- /wp:group -->',
+				'content'     => '<!-- wp:pattern {"slug":"test/single-root"} /--><!-- wp:pattern {"slug":"test/multiple-blocks"} /-->',
 				'description' => 'A nested pattern.',
 				'categories'  => array( 'featured' ),
 			)
