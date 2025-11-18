@@ -161,6 +161,10 @@ export default function Media( { data, field } ) {
 						caption: '',
 						alt: '',
 					};
+					// Turn off featured image when resetting
+					if ( hasFeaturedImageSupport ) {
+						resetValue.featuredImage = false;
+					}
 					// Merge with existing value to preserve other field properties
 					updateAttributes( { ...value, ...resetValue } );
 				} }
@@ -209,6 +213,11 @@ export default function Media( { data, field } ) {
 						}
 						if ( selectedMedia.poster ) {
 							newValue.poster = selectedMedia.poster;
+						}
+
+						// Turn off featured image when manually selecting media
+						if ( hasFeaturedImageSupport ) {
+							newValue.featuredImage = false;
 						}
 
 						// Merge with existing value to preserve other field properties
