@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+- DataViews: Improve dropdown menu responsiveness across all layouts (grid, list, table) with faster opening and closing animations, resulting in a more responsive user experience. [#73426](https://github.com/WordPress/gutenberg/pull/73426)
 - DataViews table layout: make checkboxes permanently visible when bulk actions are available. [#73245](https://github.com/WordPress/gutenberg/pull/73245)
 - Documentation: surface better the `type` property in the documentation. [#73349](https://github.com/WordPress/gutenberg/pull/73349)
 - DataViews: Make sticky elements (table headers, footer, actions column) inherit background colors from parent container. This allows DataViews instances to seamlessly adapt to containers with custom background colors. [#73240](https://github.com/WordPress/gutenberg/pull/73240)

@@ -41,7 +41,7 @@ export function AddFilterMenu( {
 	return (
 		<Menu>
 			<Menu.TriggerButton { ...triggerProps } />
-			<Menu.Popover>
+			<Menu.Popover modal={ false } portal>
 				{ inactiveFilters.map( ( filter ) => {
 					return (
 						<Menu.Item

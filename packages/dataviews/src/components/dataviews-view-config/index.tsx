@@ -65,7 +65,7 @@ export function ViewTypeMenu() {
 					/>
 				}
 			/>
-			<Menu.Popover>
+			<Menu.Popover modal={ false } portal>
 				{ availableLayouts.map( ( layout ) => {
 					const config = VIEW_LAYOUTS.find(
 						( v ) => v.type === layout
