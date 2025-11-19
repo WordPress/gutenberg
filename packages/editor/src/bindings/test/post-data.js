@@ -149,9 +149,7 @@ describe( 'post-data bindings', () => {
 		it( 'should return the list of available post data fields when the Date block is selected, and postId and postType are provided via context', () => {
 			const select = () => ( {
 				getSelectedBlock: () => ( {
-					getSelectedBlockClientId: () => '123abc456',
 					name: 'core/post-date',
-					getBlockName: () => 'core/paragraph',
 				} ),
 			} );
 
@@ -182,9 +180,7 @@ describe( 'post-data bindings', () => {
 		it( 'should return an empty array when the Date block is selected but no postId context is provided', () => {
 			const select = () => ( {
 				getSelectedBlock: () => ( {
-					getSelectedBlockClientId: () => '123abc456',
 					name: 'core/post-date',
-					getBlockName: () => 'core/paragraph',
 				} ),
 			} );
 
@@ -199,9 +195,7 @@ describe( 'post-data bindings', () => {
 		it( 'should return an empty array when any other block than the Date block is selected', () => {
 			const select = () => ( {
 				getSelectedBlock: () => ( {
-					getSelectedBlockClientId: () => '123abc456',
 					name: 'core/paragraph',
-					getBlockName: () => 'core/paragraph',
 				} ),
 			} );
 
