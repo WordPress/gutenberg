@@ -152,12 +152,8 @@ export default {
 		return true;
 	},
 	getFieldsList( { context, select } ) {
-		const { getBlockName, getSelectedBlockClientId } =
-			select( blockEditorStore );
-		const clientId = getSelectedBlockClientId();
-		const blockName = getBlockName( clientId );
-
-		if ( blockName !== 'core/post-date' ) {
+		const selectedBlock = select( blockEditorStore ).getSelectedBlock();
+		if ( selectedBlock?.name !== 'core/post-date' ) {
 			return [];
 		}
 
