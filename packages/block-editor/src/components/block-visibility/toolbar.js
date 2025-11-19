@@ -25,7 +25,7 @@ export default function BlockVisibilityToolbar( { clientIds } ) {
 				canToggleBlockVisibility: _blocks.every( ( { clientId } ) =>
 					hasBlockSupport(
 						getBlockName( clientId ),
-						'blockVisibility',
+						'visibility',
 						true
 					)
 				),
@@ -35,7 +35,7 @@ export default function BlockVisibilityToolbar( { clientIds } ) {
 	);
 
 	const hasHiddenBlock = blocks.some(
-		( block ) => block.attributes.metadata?.blockVisibility === false
+		( block ) => block.attributes.metadata?.visibility === false
 	);
 
 	const hasBlockVisibilityButtonShownRef = useRef( false );
@@ -63,7 +63,7 @@ export default function BlockVisibilityToolbar( { clientIds } ) {
 				{
 					metadata: cleanEmptyObject( {
 						...attributes?.metadata,
-						blockVisibility: hasHiddenBlock ? undefined : false,
+						visibility: hasHiddenBlock ? undefined : false,
 					} ),
 				},
 			] )

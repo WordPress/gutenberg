@@ -87,13 +87,13 @@ export function addTransforms( result, source, index, results ) {
 		preservedMetadata.name = sourceMetadata.name;
 	}
 
-	// Block visibility
+	// Visibility
 	if (
-		sourceMetadata.blockVisibility !== undefined &&
-		! result.attributes?.metadata?.blockVisibility &&
-		hasBlockSupport( result.name, 'blockVisibility', true )
+		sourceMetadata.visibility !== undefined &&
+		! result.attributes?.metadata?.visibility &&
+		hasBlockSupport( result.name, 'visibility', true )
 	) {
-		preservedMetadata.blockVisibility = sourceMetadata.blockVisibility;
+		preservedMetadata.visibility = sourceMetadata.visibility;
 	}
 
 	if ( Object.keys( preservedMetadata ).length > 0 ) {

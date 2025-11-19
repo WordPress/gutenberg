@@ -369,21 +369,19 @@ function ListViewBlock( {
 				setOpenedBlockSettingsMenu( undefined );
 				updateFocusAndSelection( newlySelectedBlocks[ 0 ], false );
 			}
-		} else if (
-			isMatch( 'core/block-editor/toggle-block-visibility', event )
-		) {
+		} else if ( isMatch( 'core/block-editor/toggle-visibility', event ) ) {
 			event.preventDefault();
 			const { blocksToUpdate } = getBlocksToUpdate();
 			const blocks = getBlocksByClientId( blocksToUpdate );
-			const canToggleBlockVisibility = blocks.every( ( blockToUpdate ) =>
-				hasBlockSupport( blockToUpdate.name, 'blockVisibility', true )
+			const canToggleVisibility = blocks.every( ( blockToUpdate ) =>
+				hasBlockSupport( blockToUpdate.name, 'visibility', true )
 			);
-			if ( ! canToggleBlockVisibility ) {
+			if ( ! canToggleVisibility ) {
 				return;
 			}
 			const hasHiddenBlock = blocks.some(
 				( blockToUpdate ) =>
-					blockToUpdate.attributes.metadata?.blockVisibility === false
+					blockToUpdate.attributes.metadata?.visibility === false
 			);
 			const attributesByClientId = Object.fromEntries(
 				blocks.map( ( { clientId: mapClientId, attributes } ) => [
@@ -391,7 +389,7 @@ function ListViewBlock( {
 					{
 						metadata: cleanEmptyObject( {
 							...attributes?.metadata,
-							blockVisibility: hasHiddenBlock ? undefined : false,
+							visibility: hasHiddenBlock ? undefined : false,
 						} ),
 					},
 				] )

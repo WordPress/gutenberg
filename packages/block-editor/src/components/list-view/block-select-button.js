@@ -77,7 +77,7 @@ function ListViewBlockSelectButton(
 			return {
 				canToggleBlockVisibility: hasBlockSupport(
 					getBlockName( clientId ),
-					'blockVisibility',
+					'visibility',
 					true
 				),
 				isBlockHidden: _isBlockHidden( clientId ),

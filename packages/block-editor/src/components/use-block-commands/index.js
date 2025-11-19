@@ -224,7 +224,7 @@ const getQuickActionsCommands = () =>
 		const canRemove = canRemoveBlocks( clientIds );
 
 		const canToggleBlockVisibility = blocks.every( ( { clientId } ) =>
-			hasBlockSupport( getBlockName( clientId ), 'blockVisibility', true )
+			hasBlockSupport( getBlockName( clientId ), 'visibility', true )
 		);
 
 		const commands = [];
@@ -294,12 +294,11 @@ const getQuickActionsCommands = () =>
 
 		if ( canToggleBlockVisibility ) {
 			const hasHiddenBlock = blocks.some(
-				( block ) =>
-					block.attributes.metadata?.blockVisibility === false
+				( block ) => block.attributes.metadata?.visibility === false
 			);
 
 			commands.push( {
-				name: 'core/toggle-block-visibility',
+				name: 'toggle-visibility',
 				label: hasHiddenBlock ? __( 'Show' ) : __( 'Hide' ),
 				callback: () => {
 					const attributesByClientId = Object.fromEntries(
@@ -308,7 +307,7 @@ const getQuickActionsCommands = () =>
 							{
 								metadata: cleanEmptyObject( {
 									...attributes?.metadata,
-									blockVisibility: hasHiddenBlock
+									visibility: hasHiddenBlock
 										? undefined
 										: false,
 								} ),

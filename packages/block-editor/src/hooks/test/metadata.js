@@ -224,7 +224,7 @@ describe( 'metadata', () => {
 			expect( transformed.attributes.metadata?.name ).toBeUndefined();
 		} );
 
-		it( 'should preserve block visibility metadata', () => {
+		it( 'should preserve visibility metadata', () => {
 			registerBlockType( 'core/bar', {
 				title: 'Bar',
 			} );
@@ -233,7 +233,7 @@ describe( 'metadata', () => {
 				{
 					name: 'core/foo',
 					attributes: {
-						metadata: { blockVisibility: false },
+						metadata: { visibility: false },
 					},
 					innerBlocks: [],
 				},
@@ -245,16 +245,14 @@ describe( 'metadata', () => {
 			};
 			const transformed = addTransforms( result, source, 0, [ result ] );
 
-			expect( transformed.attributes.metadata?.blockVisibility ).toBe(
-				false
-			);
+			expect( transformed.attributes.metadata?.visibility ).toBe( false );
 		} );
 
-		it( 'should not preserve block visibility metadata when target block does not support it', () => {
+		it( 'should not preserve visibility metadata when target block does not support it', () => {
 			registerBlockType( 'core/bar', {
 				title: 'Bar',
 				supports: {
-					blockVisibility: false,
+					visibility: false,
 				},
 			} );
 
@@ -262,7 +260,7 @@ describe( 'metadata', () => {
 				{
 					name: 'core/foo',
 					attributes: {
-						metadata: { blockVisibility: false },
+						metadata: { visibility: false },
 					},
 					innerBlocks: [],
 				},
@@ -275,7 +273,7 @@ describe( 'metadata', () => {
 			const transformed = addTransforms( result, source, 0, [ result ] );
 
 			expect(
-				transformed.attributes.metadata?.blockVisibility
+				transformed.attributes.metadata?.visibility
 			).toBeUndefined();
 		} );
 
@@ -287,7 +285,7 @@ describe( 'metadata', () => {
 						metadata: {
 							noteId: 1,
 							name: 'Custom Name',
-							blockVisibility: false,
+							visibility: false,
 						},
 					},
 					innerBlocks: [],
@@ -299,7 +297,7 @@ describe( 'metadata', () => {
 					metadata: {
 						noteId: 2,
 						name: 'Existing Name',
-						blockVisibility: true,
+						visibility: true,
 					},
 				},
 				innerBlocks: [],
@@ -309,7 +307,7 @@ describe( 'metadata', () => {
 			expect( transformed.attributes.metadata ).toEqual( {
 				noteId: 2,
 				name: 'Existing Name',
-				blockVisibility: true,
+				visibility: true,
 			} );
 		} );
 	} );

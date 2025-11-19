@@ -633,7 +633,7 @@ function BlockListBlockProvider( props ) {
 					? getBlockDefaultClassName( blockName )
 					: undefined,
 				blockTitle: blockType?.title,
-				isBlockHidden: attributes?.metadata?.blockVisibility === false,
+				isBlockHidden: attributes?.metadata?.visibility === false,
 				bindableAttributes,
 			};
 

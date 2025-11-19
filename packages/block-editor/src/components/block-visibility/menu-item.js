@@ -31,7 +31,7 @@ export default function BlockVisibilityMenuItem( { clientIds } ) {
 	}, [] );
 
 	const hasHiddenBlock = blocks.some(
-		( block ) => block.attributes.metadata?.blockVisibility === false
+		( block ) => block.attributes.metadata?.visibility === false
 	);
 
 	const toggleBlockVisibility = () => {
@@ -43,7 +43,7 @@ export default function BlockVisibilityMenuItem( { clientIds } ) {
 				{
 					metadata: cleanEmptyObject( {
 						...attributes?.metadata,
-						blockVisibility: isHiding ? false : undefined,
+						visibility: isHiding ? false : undefined,
 					} ),
 				},
 			] )
