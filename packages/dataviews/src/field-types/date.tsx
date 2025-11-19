@@ -67,16 +67,19 @@ function render( { item, field }: DataViewRenderFieldProps< any > ) {
 		return '';
 	}
 
-	// Not all fields have format, but date fields do.
+	// If the field type is date, we've already normalized the format,
+	// and so it's safe to tell TypeScript to trust us ("as Required<Format>").
 	//
-	// At runtime, this method will never be called for non-date fields.
-	// However, the type system does not know this, so we need to check it.
-	// There's an opportunity here to improve the type system.
+	// There're no runtime paths where this render function is called with a non-date field,
+	// but TypeScript is unable to infer this, hence the type assertion.
+	let format: Required< FormatDate >;
 	if ( field.type !== 'date' ) {
-		return '';
+		format = getFormat( field as Field< any > );
+	} else {
+		format = field.format as Required< FormatDate >;
 	}
 
-	return dateI18n( field.format.date, getDate( value ) );
+	return dateI18n( format.weekStartsOn, getDate( value ) );
 }
 
 export default function normalizeField< Item >(

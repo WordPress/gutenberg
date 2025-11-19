@@ -284,7 +284,7 @@ type NormalizedFieldBase< Item > = Omit< Field< Item >, 'Edit' > & {
 	format: {};
 };
 
-type NormalizedFieldDate< Item > = NormalizedFieldBase< Item > & {
+export type NormalizedFieldDate< Item > = NormalizedFieldBase< Item > & {
 	type: 'date';
 	format: Required< FormatDate >;
 };
