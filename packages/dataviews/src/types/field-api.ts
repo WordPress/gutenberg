@@ -37,21 +37,6 @@ export interface FilterByConfig {
 	isPrimary?: boolean;
 }
 
-export interface NormalizedFilterByConfig {
-	/**
-	 * The list of operators supported by the field.
-	 */
-	operators: Operator[];
-
-	/**
-	 * Whether it is a primary filter.
-	 *
-	 * A primary filter is always visible and is not listed in the "Add filter" component,
-	 * except for the list layout where it behaves like a secondary filter.
-	 */
-	isPrimary?: boolean;
-}
-
 export type Operator =
 	| 'is'
 	| 'isNot'
@@ -282,20 +267,11 @@ export type DayString =
 	| 'friday'
 	| 'saturday';
 
-type NormalizedFieldBase< Item > = Omit< Field< Item >, 'Edit' > & {
-	label: string;
-	header: string | ReactElement;
-	getValue: ( args: { item: Item } ) => any;
-	setValue: ( args: { item: Item; value: any } ) => DeepPartial< Item >;
-	render: ComponentType< DataViewRenderFieldProps< Item > >;
+type NormalizedFieldBase< Item > = Required< Field< Item > > & {
 	Edit: ComponentType< DataFormControlProps< Item > > | null;
+	filterBy: Required< FilterByConfig > | false;
+	format: {};
 	hasElements: boolean;
-	sort: ( a: Item, b: Item, direction: SortDirection ) => number;
-	isValid: Rules< Item >;
-	enableHiding: boolean;
-	enableSorting: boolean;
-	filterBy: NormalizedFilterByConfig | false;
-	readOnly: boolean;
 };
 
 type NormalizedFieldDate< Item > = NormalizedFieldBase< Item > & {
@@ -303,13 +279,8 @@ type NormalizedFieldDate< Item > = NormalizedFieldBase< Item > & {
 	format: Required< FormatDate >;
 };
 
-type NormalizedFieldGeneric< Item > = NormalizedFieldBase< Item > & {
-	type?: Exclude< FieldType, 'date' >;
-	format: {};
-};
-
 export type NormalizedField< Item > =
-	| NormalizedFieldGeneric< Item >
+	| NormalizedFieldBase< Item >
 	| NormalizedFieldDate< Item >;
 
 /**

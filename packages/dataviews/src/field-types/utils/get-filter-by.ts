@@ -1,13 +1,13 @@
 /**
  * Internal dependencies
  */
-import type { Field, Operator, NormalizedFilterByConfig } from '../../types';
+import type { Field, FilterByConfig, Operator } from '../../types';
 
 function getFilterBy< Item >(
 	field: Field< Item >,
 	defaultOperators: Operator[],
 	validOperators: Operator[]
-): NormalizedFilterByConfig | false {
+): Required< FilterByConfig > | false {
 	if ( field.filterBy === false ) {
 		return false;
 	}
@@ -42,6 +42,7 @@ function getFilterBy< Item >(
 	}
 
 	return {
+		isPrimary: false,
 		operators: defaultOperators,
 	};
 }
