@@ -105,7 +105,7 @@ describe( 'term-data bindings', () => {
 				} );
 			} );
 
-			it( 'should fall back to field key when entity does not exist', () => {
+			it( 'should fall back to field label when entity does not exist, and to field name for unknown fields', () => {
 				const values = termDataBindings.getValues( {
 					select,
 					context: {
@@ -141,18 +141,23 @@ describe( 'term-data bindings', () => {
 							source: 'core/term-data',
 							args: { field: 'count' },
 						},
+						content: {
+							source: 'core/term-data',
+							args: { field: 'unknown' },
+						},
 					},
 					clientId: '123abc456',
 				} );
 
 				expect( values ).toStrictEqual( {
-					id: 'id',
-					name: 'name',
-					slug: 'slug',
-					link: 'link',
-					description: 'description',
-					parent: 'parent',
-					count: 'count',
+					id: 'Term ID',
+					name: 'Name',
+					slug: 'Slug',
+					link: 'Link',
+					description: 'Description',
+					parent: 'Parent ID',
+					count: 'Count',
+					content: 'unknown',
 				} );
 			} );
 		} );
