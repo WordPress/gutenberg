@@ -267,11 +267,21 @@ export type DayString =
 	| 'friday'
 	| 'saturday';
 
-type NormalizedFieldBase< Item > = Required< Field< Item > > & {
+type NormalizedFieldBase< Item > = Omit< Field< Item >, 'Edit' > & {
+	label: string;
+	header: string | ReactElement;
+	getValue: ( args: { item: Item } ) => any;
+	setValue: ( args: { item: Item; value: any } ) => DeepPartial< Item >;
+	render: ComponentType< DataViewRenderFieldProps< Item > >;
 	Edit: ComponentType< DataFormControlProps< Item > > | null;
-	filterBy: Required< FilterByConfig > | false;
-	format: {};
 	hasElements: boolean;
+	sort: ( a: Item, b: Item, direction: SortDirection ) => number;
+	isValid: Rules< Item >;
+	enableHiding: boolean;
+	enableSorting: boolean;
+	filterBy: Required< FilterByConfig > | false;
+	readOnly: boolean;
+	format: {};
 };
 
 type NormalizedFieldDate< Item > = NormalizedFieldBase< Item > & {

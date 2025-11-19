@@ -73,7 +73,7 @@ export function createConfiguredControl( config: EditConfig ) {
 export function getControl< Item >(
 	field: Field< Item >,
 	fallback: string | null
-) {
+): ComponentType< DataFormControlProps< Item > > | null {
 	if ( typeof field.Edit === 'function' ) {
 		return field.Edit;
 	}
