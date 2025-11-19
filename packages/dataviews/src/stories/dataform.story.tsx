@@ -922,7 +922,7 @@ const ValidationComponent = ( {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customTextRule ),
-					pattern: pattern ? /^[a-zA-Z0-9_]+$/ : undefined,
+					pattern: pattern ? '^[a-zA-Z0-9_]+$' : undefined,
 				},
 			},
 			{
@@ -989,9 +989,7 @@ const ValidationComponent = ( {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customEmailRule ),
-					pattern: pattern
-						? /^[a-zA-Z0-9]+@company\.com$/
-						: undefined,
+					pattern: pattern ? '^[a-zA-Z0-9]+@company.com$' : undefined,
 				},
 			},
 			{
@@ -1006,7 +1004,9 @@ const ValidationComponent = ( {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customTelephoneRule ),
-					pattern: pattern ? /^\+1-\d{3}-\d{3}-\d{4}$/ : undefined,
+					pattern: pattern
+						? '^\\+1-\\d{3}-\\d{3}-\\d{4}$'
+						: undefined,
 				},
 			},
 			{
@@ -1023,7 +1023,9 @@ const ValidationComponent = ( {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customUrlRule ),
-					pattern: pattern ? /^https:\/\/github\.com\/.*/ : undefined,
+					pattern: pattern
+						? '^https:\\/\\/github\\.com\\/.*'
+						: undefined,
 				},
 			},
 			{
@@ -1113,7 +1115,7 @@ const ValidationComponent = ( {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customPasswordRule ),
-					pattern: pattern ? /^[0-9a-zA-Z]{8}$/ : undefined,
+					pattern: pattern ? '^[0-9a-zA-Z]{8}$' : undefined,
 				},
 			},
 			{
