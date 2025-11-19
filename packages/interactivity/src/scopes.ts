@@ -7,8 +7,7 @@ import type { h as createElement, RefObject } from 'preact';
  * Internal dependencies
  */
 import { getNamespace } from './namespaces';
-import { deepReadOnly, navigationSignal } from './utils';
-import type { DeepReadonly } from './utils';
+import { deepReadOnly, navigationSignal, deepClone } from './utils';
 import type { Evaluate } from './hooks';
 
 export interface Scope {
@@ -113,13 +112,9 @@ export const getElement = () => {
  */
 export function getServerContext(
 	namespace?: string
-): DeepReadonly< Record< string, unknown > >;
-export function getServerContext< T extends object >(
-	namespace?: string
-): DeepReadonly< T >;
-export function getServerContext< T extends object >(
-	namespace?: string
-): DeepReadonly< T > {
+): Record< string, unknown >;
+export function getServerContext< T extends object >( namespace?: string ): T;
+export function getServerContext< T extends object >( namespace?: string ): T {
 	const scope = getScope();
 
 	if ( globalThis.SCRIPT_DEBUG ) {
@@ -132,6 +127,6 @@ export function getServerContext< T extends object >(
 	// to prevent the JavaScript minifier from removing this line.
 	getServerContext.subscribe = navigationSignal.value;
 
-	return scope.serverContext[ namespace || getNamespace() ];
+	return deepClone( scope.serverContext[ namespace || getNamespace() ] );
 }
 getServerContext.subscribe = 0;

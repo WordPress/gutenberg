@@ -379,7 +379,6 @@ describe( 'Interactivity API types', () => {
 			// eslint-disable-next-line no-unused-expressions
 			() => {
 				const state = getServerState();
-				// @ts-expect-error
 				state.nonModifiable = 'error';
 				state.nonExistent satisfies any;
 			};
@@ -397,9 +396,7 @@ describe( 'Interactivity API types', () => {
 				const state = getServerState< State >();
 				// @ts-expect-error
 				state.nonExistent = 'error';
-				// @ts-expect-error
 				state.foo = 'error';
-				// @ts-expect-error
 				state.bar.baz = 1;
 				state.foo satisfies string;
 				state.bar.baz satisfies number;
@@ -412,7 +409,6 @@ describe( 'Interactivity API types', () => {
 			// eslint-disable-next-line no-unused-expressions
 			() => {
 				const context = getServerContext();
-				// @ts-expect-error
 				context.nonModifiable = 'error';
 				context.nonExistent satisfies any;
 			};
@@ -430,9 +426,7 @@ describe( 'Interactivity API types', () => {
 				const context = getServerContext< Context >();
 				// @ts-expect-error
 				context.nonExistent = 'error';
-				// @ts-expect-error
 				context.foo = 'error';
-				// @ts-expect-error
 				context.bar.baz = 1;
 				context.foo satisfies string;
 				context.bar.baz satisfies number;

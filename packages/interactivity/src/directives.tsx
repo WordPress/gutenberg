@@ -23,7 +23,6 @@ import {
 	warn,
 	splitTask,
 	isPlainObject,
-	deepReadOnly,
 	deepClone,
 } from './utils';
 import {
@@ -403,9 +402,9 @@ export default () => {
 					false
 				);
 
-				// Sets the server context for that namespace to a deep
-				// read-only.
-				server[ namespace ] = deepReadOnly( value );
+				// Replaces the server context for that namespace with the
+				// current value.
+				server[ namespace ] = value;
 
 				// Registers the namespace.
 				namespaces.add( namespace );
