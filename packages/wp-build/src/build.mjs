@@ -3,7 +3,14 @@
 /**
  * External dependencies
  */
-import { readFile, writeFile, copyFile, mkdir, unlink, stat } from 'fs/promises';
+import {
+	readFile,
+	writeFile,
+	copyFile,
+	mkdir,
+	unlink,
+	stat,
+} from 'fs/promises';
 import path from 'path';
 import { parseArgs } from 'node:util';
 import esbuild from 'esbuild';
