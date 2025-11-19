@@ -548,76 +548,157 @@ describe( 'term-data bindings', () => {
 	} );
 
 	describe( 'getFieldsList', () => {
-		let select;
-		beforeAll( () => {
-			select = ( store ) => {
-				if ( store === blockEditorStore ) {
-					return {
-						getSelectedBlockClientId: () => '123abc456',
-						getBlockName: () => 'core/paragraph',
-						getBlockAttributes: () => ( {} ),
-					};
-				}
-				if ( store === coreDataStore ) {
-					return {
-						getEntityRecord: ( kind, taxonomy, termId ) => {
-							if (
-								kind === 'taxonomy' &&
-								taxonomy === 'category' &&
-								termId === 123
-							) {
-								return {
-									id: 123,
-									name: 'Technology',
-									slug: 'technology',
-									link: 'https://example.com/category/technology',
-									description: 'All about technology',
-									parent: 0,
-									count: 42,
-								};
-							}
-							return null;
+		describe( 'when a Navigation block is selected', () => {
+			it( 'should return the list of available term data fields if id and type attributes are present', () => {
+				const select = ( store ) => {
+					if ( store === blockEditorStore ) {
+						return {
+							getSelectedBlockClientId: () => '123abc456',
+							getBlockName: () => 'core/navigation-link',
+							getBlockAttributes: () => ( {
+								id: 123,
+								type: 'category',
+							} ),
+						};
+					}
+					if ( store === coreDataStore ) {
+						return {
+							getEntityRecord: ( kind, taxonomy, termId ) => {
+								if (
+									kind === 'taxonomy' &&
+									taxonomy === 'category' &&
+									termId === 123
+								) {
+									return {
+										id: 123,
+										name: 'Technology',
+										slug: 'technology',
+										link: 'https://example.com/category/technology',
+										description: 'All about technology',
+										parent: 0,
+										count: 42,
+									};
+								}
+								return null;
+							},
+						};
+					}
+				};
+				const fields = termDataBindings.getFieldsList( { select } );
+
+				expect( fields ).toEqual( termDataFields );
+			} );
+
+			it( 'should return an empty array if id or type attributes are missing', () => {
+				const select = ( store ) => {
+					if ( store === blockEditorStore ) {
+						return {
+							getSelectedBlockClientId: () => '123abc456',
+							getBlockName: () => 'core/navigation-link',
+							getBlockAttributes: () => ( { type: 'category' } ),
+						};
+					}
+					if ( store === coreDataStore ) {
+						return {
+							getEntityRecord: ( kind, taxonomy, termId ) => {
+								if (
+									kind === 'taxonomy' &&
+									taxonomy === 'category' &&
+									termId === 123
+								) {
+									return {
+										id: 123,
+										name: 'Technology',
+										slug: 'technology',
+										link: 'https://example.com/category/technology',
+										description: 'All about technology',
+										parent: 0,
+										count: 42,
+									};
+								}
+								return null;
+							},
+						};
+					}
+				};
+				const fields = termDataBindings.getFieldsList( { select } );
+
+				expect( fields ).toEqual( [] );
+			} );
+		} );
+
+		describe( 'when a non-Navigation block is selected', () => {
+			let select;
+			beforeAll( () => {
+				select = ( store ) => {
+					if ( store === blockEditorStore ) {
+						return {
+							getSelectedBlockClientId: () => '123abc456',
+							getBlockName: () => 'core/paragraph',
+							getBlockAttributes: () => ( {} ),
+						};
+					}
+					if ( store === coreDataStore ) {
+						return {
+							getEntityRecord: ( kind, taxonomy, termId ) => {
+								if (
+									kind === 'taxonomy' &&
+									taxonomy === 'category' &&
+									termId === 123
+								) {
+									return {
+										id: 123,
+										name: 'Technology',
+										slug: 'technology',
+										link: 'https://example.com/category/technology',
+										description: 'All about technology',
+										parent: 0,
+										count: 42,
+									};
+								}
+								return null;
+							},
+						};
+					}
+				};
+			} );
+
+			it( 'should return the list of available term data fields when taxonomy and termId are provided by context', () => {
+				const fields = termDataBindings.getFieldsList( {
+					select,
+					context: { taxonomy: 'category', termId: 123 },
+				} );
+
+				expect( fields ).toEqual( termDataFields );
+			} );
+
+			it( 'should return empty array when neither termId nor termData is provided from context', () => {
+				const fields = termDataBindings.getFieldsList( {
+					select,
+					context: { taxonomy: 'category' },
+				} );
+
+				expect( fields ).toEqual( [] );
+			} );
+
+			it( 'should return fields when using termData from context', () => {
+				const fields = termDataBindings.getFieldsList( {
+					select,
+					context: {
+						termData: {
+							term_id: 456,
+							name: 'Design',
+							slug: 'design',
+							link: 'https://example.com/category/design',
+							description: 'Design resources',
+							parent: 0,
+							count: 15,
 						},
-					};
-				}
-			};
-		} );
-
-		it( 'should return the list of available term data fields when taxonomy and termId are provided by context', () => {
-			const fields = termDataBindings.getFieldsList( {
-				select,
-				context: { taxonomy: 'category', termId: 123 },
-			} );
-
-			expect( fields ).toEqual( termDataFields );
-		} );
-
-		it( 'should return empty array when neither termId nor termData is provided from context', () => {
-			const fields = termDataBindings.getFieldsList( {
-				select,
-				context: { taxonomy: 'category' },
-			} );
-
-			expect( fields ).toEqual( [] );
-		} );
-
-		it( 'should return fields when using termData from context', () => {
-			const fields = termDataBindings.getFieldsList( {
-				select,
-				context: {
-					termData: {
-						term_id: 456,
-						name: 'Design',
-						slug: 'design',
-						link: 'https://example.com/category/design',
-						description: 'Design resources',
-						parent: 0,
-						count: 15,
 					},
-				},
-			} );
+				} );
 
-			expect( fields ).toEqual( termDataFields );
+				expect( fields ).toEqual( termDataFields );
+			} );
 		} );
 	} );
 } );

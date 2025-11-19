@@ -148,7 +148,24 @@ export default {
 
 		return false;
 	},
-	getFieldsList( { context } ) {
+	getFieldsList( { context, select } ) {
+		const { getBlockAttributes, getBlockName, getSelectedBlockClientId } =
+			select( blockEditorStore );
+		const clientId = getSelectedBlockClientId();
+		const blockName = getBlockName( clientId );
+
+		if ( NAVIGATION_BLOCK_TYPES.includes( blockName ) ) {
+			// Navigation blocks: read from block attributes
+			const blockAttributes = getBlockAttributes( clientId );
+			if (
+				! blockAttributes ||
+				! blockAttributes.id ||
+				! blockAttributes.type
+			) {
+				return [];
+			}
+		}
+
 		if ( ! context ) {
 			return termDataFields;
 		}
