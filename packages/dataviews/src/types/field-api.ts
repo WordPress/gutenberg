@@ -79,7 +79,7 @@ export type FieldType =
 export type Rules< Item > = {
 	required?: boolean;
 	elements?: boolean;
-	pattern?: string | RegExp;
+	pattern?: string;
 	custom?:
 		| ( ( item: Item, field: NormalizedField< Item > ) => null | string )
 		| ( (

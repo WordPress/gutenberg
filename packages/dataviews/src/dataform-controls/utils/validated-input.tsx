@@ -54,15 +54,6 @@ export default function ValidatedText< Item >( {
 		[ data, setValue, onChange ]
 	);
 
-	// Convert pattern to string if it's a RegExp
-	let pattern;
-	if ( isValid?.pattern ) {
-		pattern =
-			isValid.pattern instanceof RegExp
-				? isValid.pattern.source
-				: isValid.pattern;
-	}
-
 	return (
 		<ValidatedInputControl
 			required={ !! isValid?.required }
@@ -76,7 +67,7 @@ export default function ValidatedText< Item >( {
 			type={ type }
 			prefix={ prefix }
 			suffix={ suffix }
-			pattern={ pattern }
+			pattern={ isValid?.pattern }
 			__next40pxDefaultSize
 		/>
 	);
