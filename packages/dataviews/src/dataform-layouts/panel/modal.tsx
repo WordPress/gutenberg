@@ -76,7 +76,7 @@ function ModalContent< Item >( {
 		setChanges( ( prev ) => deepMerge( prev, newValue ) );
 	};
 
-	const focusOnMountRef = useFocusOnMount( 'firstElement' );
+	const focusOnMountRef = useFocusOnMount( 'firstInputElement' );
 
 	return (
 		<Modal

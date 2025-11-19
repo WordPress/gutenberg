@@ -75,7 +75,7 @@ function DropdownContent< Item >( {
 	onChange: ( value: any ) => void;
 	validity: FormValidity;
 } ) {
-	const focusOnMountRef = useFocusOnMount( 'firstElement' );
+	const focusOnMountRef = useFocusOnMount( 'firstInputElement' );
 
 	return (
 		<>

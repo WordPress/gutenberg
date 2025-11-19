@@ -12,7 +12,7 @@ import useRefEffect from '../use-ref-effect';
 /**
  * Hook used to focus the first tabbable element on mount.
  *
- * @param {boolean | 'firstElement'} focusOnMount Focus on mount mode.
+ * @param {boolean | 'firstElement' | 'firstInputElement'} focusOnMount Focus on mount mode.
  * @return {import('react').RefCallback<HTMLElement>} Ref callback.
  *
  * @example
@@ -64,12 +64,31 @@ export default function useFocusOnMount( focusOnMount = 'firstElement' ) {
 			return;
 		}
 
-		if ( focusOnMountRef.current !== 'firstElement' ) {
+		if (
+			focusOnMountRef.current !== 'firstElement' &&
+			focusOnMountRef.current !== 'firstInputElement'
+		) {
 			setFocus( node );
 			return;
 		}
 
 		timerIdRef.current = setTimeout( () => {
+			// For 'firstInputElement' mode, try to find a form input element first
+			if ( focusOnMountRef.current === 'firstInputElement' ) {
+				let formInput = null;
+				if ( node instanceof Element ) {
+					formInput = node.querySelector(
+						'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled])'
+					);
+				}
+
+				if ( formInput ) {
+					setFocus( formInput );
+					return;
+				}
+			}
+
+			// Fallback to the first tabbable element
 			const firstTabbable = focus.tabbable.find( node )[ 0 ];
 			if ( firstTabbable ) {
 				setFocus( firstTabbable );
