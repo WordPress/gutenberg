@@ -11,7 +11,7 @@ const NAVIGATION_BLOCK_TYPES = [
 	'core/navigation-submenu',
 ];
 
-const termDataFields = [
+export const termDataFields = [
 	{
 		label: __( 'Term ID' ),
 		args: { field: 'id' },

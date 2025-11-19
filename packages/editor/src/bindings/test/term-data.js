@@ -7,7 +7,7 @@ import { store as coreDataStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import termDataBindings from '../term-data';
+import { default as termDataBindings, termDataFields } from '../term-data';
 
 describe( 'term-data bindings', () => {
 	describe( 'getValues', () => {
@@ -589,43 +589,7 @@ describe( 'term-data bindings', () => {
 				context: { taxonomy: 'category', termId: 123 },
 			} );
 
-			expect( fields ).toEqual( [
-				{
-					label: 'Term ID',
-					type: 'string',
-					args: { field: 'id' },
-				},
-				{
-					label: 'Name',
-					type: 'string',
-					args: { field: 'name' },
-				},
-				{
-					label: 'Slug',
-					type: 'string',
-					args: { field: 'slug' },
-				},
-				{
-					label: 'Link',
-					type: 'string',
-					args: { field: 'link' },
-				},
-				{
-					label: 'Description',
-					type: 'string',
-					args: { field: 'description' },
-				},
-				{
-					label: 'Parent ID',
-					type: 'string',
-					args: { field: 'parent' },
-				},
-				{
-					label: 'Count',
-					type: 'string',
-					args: { field: 'count' },
-				},
-			] );
+			expect( fields ).toEqual( termDataFields );
 		} );
 
 		it( 'should return empty array when neither termId nor termData is provided from context', () => {
@@ -653,43 +617,7 @@ describe( 'term-data bindings', () => {
 				},
 			} );
 
-			expect( fields ).toEqual( [
-				{
-					label: 'Term ID',
-					type: 'string',
-					args: { field: 'id' },
-				},
-				{
-					label: 'Name',
-					type: 'string',
-					args: { field: 'name' },
-				},
-				{
-					label: 'Slug',
-					type: 'string',
-					args: { field: 'slug' },
-				},
-				{
-					label: 'Link',
-					type: 'string',
-					args: { field: 'link' },
-				},
-				{
-					label: 'Description',
-					type: 'string',
-					args: { field: 'description' },
-				},
-				{
-					label: 'Parent ID',
-					type: 'string',
-					args: { field: 'parent' },
-				},
-				{
-					label: 'Count',
-					type: 'string',
-					args: { field: 'count' },
-				},
-			] );
+			expect( fields ).toEqual( termDataFields );
 		} );
 	} );
 } );
