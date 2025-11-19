@@ -201,7 +201,7 @@ export const WithPicker: StoryObj< typeof ThemeProvider > = {
 const NestingDebug = ( { bg = '', primary = '', density = '' } ) => (
 	<div
 		style={ {
-			padding: 'var(--wpds-dimension-padding-surface-small)',
+			padding: 'var(--wpds-dimension-padding-surface-sm)',
 			color: 'var(--wpds-color-fg-content-neutral)',
 			backgroundColor: 'var(--wpds-color-bg-surface-neutral)',
 			display: 'flex',
