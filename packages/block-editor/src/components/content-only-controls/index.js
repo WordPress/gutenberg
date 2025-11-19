@@ -9,6 +9,7 @@ import {
 	__experimentalHStack as HStack,
 	Icon,
 	Navigator,
+	useNavigator,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -25,6 +26,7 @@ import BlockIcon from '../block-icon';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { PrivateListView } from '../list-view';
+import InspectorControls from '../inspector-controls';
 const { fieldsKey } = unlock( blocksPrivateApis );
 import FieldsDropdownMenu from './fields-dropdown-menu';
 
@@ -174,12 +176,31 @@ function denormalizeLinkValue( value, fieldDef ) {
 	return result;
 }
 
+function ContentOnlyBackButton() {
+	return (
+		<div className="block-editor-content-only-controls__button-panel">
+			<Navigator.BackButton className="block-editor-content-only-controls__back-button">
+				<HStack expanded spacing={ 1 } justify="flex-start">
+					<Icon icon={ arrowLeft } />
+					<div>{ __( 'Back' ) }</div>
+				</HStack>
+			</Navigator.BackButton>
+		</div>
+	);
+}
+
 function NavigationListView( { clientId } ) {
 	const blockTitle = useBlockDisplayTitle( {
 		clientId,
 		context: 'list-view',
 	} );
 	const blockInformation = useBlockDisplayInformation( clientId );
+	const { goTo } = useNavigator();
+
+	const handleSelect = ( block ) => {
+		goTo( `/${ clientId }/${ block.clientId }` );
+	};
+
 	return (
 		<ToolsPanel
 			label={
@@ -196,6 +217,7 @@ function NavigationListView( { clientId } ) {
 					rootClientId={ clientId }
 					isExpanded
 					showAppender
+					onSelect={ handleSelect }
 				/>
 			</div>
 		</ToolsPanel>
@@ -466,14 +488,7 @@ function ContentOnlyControlsScreen( {
 	if ( isNavigationBlock && isNested ) {
 		return (
 			<>
-				<div className="block-editor-content-only-controls__button-panel">
-					<Navigator.BackButton className="block-editor-content-only-controls__back-button">
-						<HStack expanded spacing={ 1 } justify="flex-start">
-							<Icon icon={ arrowLeft } />
-							<div>{ __( 'Back' ) }</div>
-						</HStack>
-					</Navigator.BackButton>
-				</div>
+				<ContentOnlyBackButton />
 				<NavigationListView clientId={ rootClientId } />
 			</>
 		);
@@ -481,16 +496,7 @@ function ContentOnlyControlsScreen( {
 
 	return (
 		<>
-			{ isNested && (
-				<div className="block-editor-content-only-controls__button-panel">
-					<Navigator.BackButton className="block-editor-content-only-controls__back-button">
-						<HStack expanded spacing={ 1 } justify="flex-start">
-							<Icon icon={ arrowLeft } />
-							<div>{ __( 'Back' ) }</div>
-						</HStack>
-					</Navigator.BackButton>
-				</div>
-			) }
+			{ isNested && <ContentOnlyBackButton /> }
 			{ isRootContentBlock && <BlockFields clientId={ rootClientId } /> }
 			{ contentClientIds.map( ( clientId ) => {
 				if ( parentClientIds?.[ clientId ] ) {
@@ -509,113 +515,124 @@ function ContentOnlyControlsScreen( {
 }
 
 export default function ContentOnlyControls( { rootClientId } ) {
-	const { updatedRootClientId, nestedContentClientIds, contentClientIds } =
-		useSelect(
-			( select ) => {
-				const {
-					getClientIdsOfDescendants,
-					getBlockEditingMode,
-					getBlockName,
-				} = select( blockEditorStore );
+	const {
+		updatedRootClientId,
+		nestedContentClientIds,
+		contentClientIds,
+		navigationBlockIds,
+	} = useSelect(
+		( select ) => {
+			const {
+				getClientIdsOfDescendants,
+				getBlockEditingMode,
+				getBlockName,
+			} = select( blockEditorStore );
 
-				// _nestedContentClientIds is for content blocks within 'drilldowns'.
-				// It's an object where the key is the parent clientId, and the element is
-				// an array of child clientIds whose controls are shown within the drilldown.
-				const _nestedContentClientIds = {};
+			// _nestedContentClientIds is for content blocks within 'drilldowns'.
+			// It's an object where the key is the parent clientId, and the element is
+			// an array of child clientIds whose controls are shown within the drilldown.
+			const _nestedContentClientIds = {};
 
-				// _contentClientIds is the list of contentClientIds for blocks being
-				// shown at the root level. Includes parent blocks that might have a drilldown,
-				// but not the children of those blocks.
-				const _contentClientIds = [];
+			// _contentClientIds is the list of contentClientIds for blocks being
+			// shown at the root level. Includes parent blocks that might have a drilldown,
+			// but not the children of those blocks.
+			const _contentClientIds = [];
 
-				// An array of all nested client ids. Used for ensuring blocks within drilldowns
-				// don't appear at the root level.
-				let allNestedClientIds = [];
+			// An array of all nested client ids. Used for ensuring blocks within drilldowns
+			// don't appear at the root level.
+			let allNestedClientIds = [];
 
-				// A flattened list of all content clientIds to arrange into the
-				// groups above.
-				const allDescendants =
-					getClientIdsOfDescendants( rootClientId );
+			// A flattened list of all content clientIds to arrange into the
+			// groups above.
+			const allDescendants = getClientIdsOfDescendants( rootClientId );
 
-				// Exclude Navigation block children (but not the navigation block itself)
-				// Navigation blocks will show their own list view controls
-				const navigationChildren = new Set();
+			// Exclude Navigation block children (but not the navigation block itself)
+			// Navigation blocks will show their own list view controls
+			const navigationChildren = new Set();
 
-				// Check if root is a navigation block
-				if ( getBlockName( rootClientId ) === 'core/navigation' ) {
-					allDescendants.forEach( ( childId ) =>
+			// Check if root is a navigation block
+			if ( getBlockName( rootClientId ) === 'core/navigation' ) {
+				allDescendants.forEach( ( childId ) =>
+					navigationChildren.add( childId )
+				);
+			}
+
+			// Check for navigation blocks within descendants and exclude only their children
+			allDescendants.forEach( ( clientId ) => {
+				if ( getBlockName( clientId ) === 'core/navigation' ) {
+					// Don't exclude the navigation block itself, only its children
+					const navChildren = getClientIdsOfDescendants( clientId );
+					navChildren.forEach( ( childId ) =>
 						navigationChildren.add( childId )
 					);
 				}
+			} );
 
-				// Check for navigation blocks within descendants and exclude only their children
-				allDescendants.forEach( ( clientId ) => {
-					if ( getBlockName( clientId ) === 'core/navigation' ) {
-						// Don't exclude the navigation block itself, only its children
-						const navChildren =
-							getClientIdsOfDescendants( clientId );
-						navChildren.forEach( ( childId ) =>
-							navigationChildren.add( childId )
-						);
-					}
-				} );
+			const allContentClientIds = allDescendants.filter(
+				( clientId ) =>
+					getBlockEditingMode( clientId ) === 'contentOnly' &&
+					! navigationChildren.has( clientId )
+			);
 
-				const allContentClientIds = allDescendants.filter(
-					( clientId ) =>
-						getBlockEditingMode( clientId ) === 'contentOnly' &&
-						! navigationChildren.has( clientId )
+			for ( const clientId of allContentClientIds ) {
+				const childClientIds = getClientIdsOfDescendants(
+					clientId
+				).filter(
+					( childClientId ) =>
+						getBlockEditingMode( childClientId ) === 'contentOnly'
 				);
 
-				for ( const clientId of allContentClientIds ) {
-					const childClientIds = getClientIdsOfDescendants(
-						clientId
-					).filter(
-						( childClientId ) =>
-							getBlockEditingMode( childClientId ) ===
-							'contentOnly'
-					);
-
-					// If there's more than one child block, use a drilldown.
-					// For navigation blocks, we'll show the NavigationListView in the drilldown.
-					if (
-						childClientIds.length > 1 &&
-						! allNestedClientIds.includes( clientId )
-					) {
-						_nestedContentClientIds[ clientId ] = childClientIds;
-						allNestedClientIds = [
-							allNestedClientIds,
-							...childClientIds,
-						];
-					}
-
-					if ( ! allNestedClientIds.includes( clientId ) ) {
-						_contentClientIds.push( clientId );
-					}
-				}
-
-				// Avoid showing only one drilldown block at the root.
+				// If there's more than one child block, use a drilldown.
+				// For navigation blocks, we'll show the NavigationListView in the drilldown.
 				if (
-					_contentClientIds.length === 1 &&
-					Object.keys( _nestedContentClientIds ).length === 1
+					childClientIds.length > 1 &&
+					! allNestedClientIds.includes( clientId )
 				) {
-					const onlyParentClientId = Object.keys(
-						_nestedContentClientIds
-					)[ 0 ];
-					return {
-						updatedRootClientId: onlyParentClientId,
-						contentClientIds:
-							_nestedContentClientIds[ onlyParentClientId ],
-						nestedContentClientIds: {},
-					};
+					_nestedContentClientIds[ clientId ] = childClientIds;
+					allNestedClientIds = [
+						allNestedClientIds,
+						...childClientIds,
+					];
 				}
 
+				if ( ! allNestedClientIds.includes( clientId ) ) {
+					_contentClientIds.push( clientId );
+				}
+			}
+
+			// Identify which parent blocks are navigation blocks
+			const _navigationBlockIds = new Set();
+			Object.keys( _nestedContentClientIds ).forEach( ( parentId ) => {
+				if ( getBlockName( parentId ) === 'core/navigation' ) {
+					_navigationBlockIds.add( parentId );
+				}
+			} );
+
+			// Avoid showing only one drilldown block at the root.
+			if (
+				_contentClientIds.length === 1 &&
+				Object.keys( _nestedContentClientIds ).length === 1
+			) {
+				const onlyParentClientId = Object.keys(
+					_nestedContentClientIds
+				)[ 0 ];
 				return {
-					nestedContentClientIds: _nestedContentClientIds,
-					contentClientIds: _contentClientIds,
+					updatedRootClientId: onlyParentClientId,
+					contentClientIds:
+						_nestedContentClientIds[ onlyParentClientId ],
+					nestedContentClientIds: {},
+					navigationBlockIds: _navigationBlockIds,
 				};
-			},
-			[ rootClientId ]
-		);
+			}
+
+			return {
+				nestedContentClientIds: _nestedContentClientIds,
+				contentClientIds: _contentClientIds,
+				navigationBlockIds: _navigationBlockIds,
+			};
+		},
+		[ rootClientId ]
+	);
 
 	return (
 		<Navigator initialPath="/">
@@ -642,6 +659,23 @@ export default function ContentOnlyControls( { rootClientId } ) {
 					/>
 				</Navigator.Screen>
 			) ) }
+			{ /* Create screens for navigation children to show their inspectors */ }
+			{ Array.from( navigationBlockIds ).flatMap( ( parentId ) =>
+				nestedContentClientIds[ parentId ].map( ( childId ) => (
+					<Navigator.Screen
+						key={ `inspector-${ childId }` }
+						path={ `/${ parentId }/${ childId }` }
+						className="block-editor-content-only-controls__screen"
+					>
+						<div className="block-editor-content-only-controls__block-inspector">
+							<ContentOnlyBackButton />
+							<div className="block-editor-block-inspector">
+								<InspectorControls.Slot />
+							</div>
+						</div>
+					</Navigator.Screen>
+				) )
+			) }
 		</Navigator>
 	);
 }
