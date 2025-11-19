@@ -1560,6 +1560,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/core-abilities",
+		"slug": "packages-core-abilities",
+		"markdown_source": "../packages/core-abilities/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/core-commands",
 		"slug": "packages-core-commands",
 		"markdown_source": "../packages/core-commands/README.md",
