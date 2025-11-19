@@ -67,14 +67,12 @@ export function getUpdatedLinkAttributes( {
 	};
 }
 
-export default function Link( { data, field } ) {
+export default function Link( { data, field, config = {} } ) {
 	const [ isLinkControlOpen, setIsLinkControlOpen ] = useState( false );
 	const { popoverProps } = useInspectorPopoverPlacement( {
 		isControl: true,
 	} );
-
-	// For custom Edit components, we need to call updateBlockAttributes directly
-	const { clientId, updateBlockAttributes, fieldDef } = field;
+	const { clientId, updateBlockAttributes, fieldDef } = config;
 	const updateAttributes = ( newValue ) => {
 		const mappedChanges = field.setValue( { item: data, value: newValue } );
 		updateBlockAttributes( clientId, mappedChanges );

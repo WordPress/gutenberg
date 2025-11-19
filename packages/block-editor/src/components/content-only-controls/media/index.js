@@ -83,16 +83,13 @@ function MediaThumbnail( { data, field, attachment } ) {
 	return <Icon icon={ mediaIcon } size={ 24 } />;
 }
 
-export default function Media( { data, field } ) {
+export default function Media( { data, field, config = {} } ) {
 	const { popoverProps } = useInspectorPopoverPlacement( {
 		isControl: true,
 	} );
 	const value = field.getValue( { item: data } );
-	const config = field.config || {};
-	const { allowedTypes = [], multiple = false } = config;
-
-	// For custom Edit components, we need to call updateBlockAttributes directly
-	const { clientId, updateBlockAttributes, fieldDef } = field;
+	const { allowedTypes = [], multiple = false } = field.config || {};
+	const { clientId, updateBlockAttributes, fieldDef } = config;
 	const updateAttributes = ( newFieldValue ) => {
 		const mappedChanges = field.setValue( {
 			item: data,

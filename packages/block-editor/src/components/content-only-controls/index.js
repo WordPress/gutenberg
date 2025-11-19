@@ -39,6 +39,27 @@ const CONTROLS = {
 };
 
 /**
+ * Creates a configured control component that wraps a custom control
+ * and passes configuration as props.
+ *
+ * @param {Object} config         - The control configuration
+ * @param {string} config.control - The control type (key in CONTROLS map)
+ * @return {Function} A wrapped control component
+ */
+function createConfiguredControl( config ) {
+	const { control, ...controlConfig } = config;
+	const ControlComponent = CONTROLS[ control ];
+
+	if ( ! ControlComponent ) {
+		throw new Error( `Control type "${ control }" not found` );
+	}
+
+	return function ConfiguredControl( props ) {
+		return <ControlComponent { ...props } config={ controlConfig } />;
+	};
+}
+
+/**
  * Normalize a media value to a canonical structure.
  * Ensures all expected properties exist, even if not in the mapping.
  *
@@ -244,11 +265,13 @@ function BlockFields( { clientId } ) {
 
 			// Only add custom Edit component if one exists for this type
 			if ( ControlComponent ) {
-				field.Edit = ControlComponent;
-				// Pass clientId and updateBlockAttributes to custom Edit components
-				field.clientId = clientId;
-				field.updateBlockAttributes = updateBlockAttributes;
-				field.fieldDef = fieldDef;
+				// Use EditConfig pattern: Edit is an object with control type and config props
+				field.Edit = createConfiguredControl( {
+					control: fieldDef.type,
+					clientId,
+					updateBlockAttributes,
+					fieldDef,
+				} );
 			}
 
 			return field;

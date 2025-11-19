@@ -23,13 +23,12 @@ export default function RichTextControl( {
 	data,
 	field,
 	hideLabelFromVision,
+	config = {},
 } ) {
 	const registry = useRegistry();
 	const attrValue = field.getValue( { item: data } );
-	const config = field.config || {};
-
-	// For custom Edit components, we need to call updateBlockAttributes directly
-	const { clientId, updateBlockAttributes } = field;
+	const fieldConfig = field.config || {};
+	const { clientId, updateBlockAttributes } = config;
 	const updateAttributes = ( html ) => {
 		const mappedChanges = field.setValue( { item: data, value: html } );
 		updateBlockAttributes( clientId, mappedChanges );
@@ -44,8 +43,8 @@ export default function RichTextControl( {
 	const keyboardShortcuts = useRef( new Set() );
 
 	const adjustedAllowedFormats = getAllowedFormats( {
-		allowedFormats: config?.allowedFormats,
-		disableFormats: config?.disableFormats,
+		allowedFormats: fieldConfig?.allowedFormats,
+		disableFormats: fieldConfig?.disableFormats,
 	} );
 
 	const {
@@ -58,7 +57,7 @@ export default function RichTextControl( {
 		clientId: undefined,
 		identifier: field.id,
 		allowedFormats: adjustedAllowedFormats,
-		withoutInteractiveFormatting: config?.withoutInteractiveFormatting,
+		withoutInteractiveFormatting: fieldConfig?.withoutInteractiveFormatting,
 		disableNoneEssentialFormatting: true,
 	} );
 
@@ -113,9 +112,9 @@ export default function RichTextControl( {
 		selectionEnd: selection.end,
 		onSelectionChange: ( start, end ) => setSelection( { start, end } ),
 		__unstableIsSelected: isSelected,
-		preserveWhiteSpace: !! config?.preserveWhiteSpace,
-		placeholder: config?.placeholder,
-		__unstableDisableFormats: config?.disableFormats,
+		preserveWhiteSpace: !! fieldConfig?.preserveWhiteSpace,
+		placeholder: fieldConfig?.placeholder,
+		__unstableDisableFormats: fieldConfig?.disableFormats,
 		__unstableDependencies: dependencies,
 		__unstableAfterParse: addEditorOnlyFormats,
 		__unstableBeforeSerialize: removeEditorOnlyFormats,
@@ -149,7 +148,7 @@ export default function RichTextControl( {
 				<div
 					className="block-editor-content-only-controls__rich-text"
 					role="textbox"
-					aria-multiline={ ! config?.disableLineBreaks }
+					aria-multiline={ ! fieldConfig?.disableLineBreaks }
 					ref={ useMergeRefs( [
 						richTextRef,
 						useEventListeners( {
@@ -159,11 +158,11 @@ export default function RichTextControl( {
 							formatTypes,
 							selectionChange: setSelection,
 							isSelected,
-							disableFormats: config?.disableFormats,
+							disableFormats: fieldConfig?.disableFormats,
 							value,
 							tagName: 'div',
 							removeEditorOnlyFormats,
-							disableLineBreaks: config?.disableLineBreaks,
+							disableLineBreaks: fieldConfig?.disableLineBreaks,
 							keyboardShortcuts,
 							inputEvents,
 						} ),
