@@ -353,11 +353,7 @@ export default function CompositeGrid< Item >( {
 	return (
 		<Composite
 			role={ isInfiniteScroll ? 'feed' : 'grid' }
-			className={ clsx(
-				'dataviews-view-grid',
-				'dataviews-view-grid__content',
-				className
-			) }
+			className={ clsx( 'dataviews-view-grid', className ) }
 			focusWrap
 			aria-busy={ isLoading }
 			aria-rowcount={ isInfiniteScroll ? undefined : totalRows }
