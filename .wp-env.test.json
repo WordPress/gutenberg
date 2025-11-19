@@ -3,14 +3,13 @@
 	"testsEnvironment": false,
 	"port": 8889,
 	"core": "WordPress/WordPress",
-	"plugins": [ "." ],
+	"plugins": [],
 	"themes": [ "./test/emptytheme" ],
 	"config": {
 		"WP_DEBUG": false,
 		"SCRIPT_DEBUG": false
 	},
 	"mappings": {
-		"wp-content/plugins/gutenberg": ".",
 		"wp-content/mu-plugins": "./packages/e2e-tests/mu-plugins",
 		"wp-content/plugins/gutenberg-test-plugins": "./packages/e2e-tests/plugins",
 		"wp-content/themes/gutenberg-test-themes": "./test/gutenberg-test-themes",
