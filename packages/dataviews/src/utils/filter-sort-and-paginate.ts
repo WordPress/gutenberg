@@ -36,7 +36,7 @@ import {
 	OPERATOR_IN_THE_PAST,
 	OPERATOR_OVER,
 } from '../constants';
-import normalizeFields from './normalize-fields';
+import normalizeFields from '../field-types/utils/normalize-fields';
 import type { Field, View } from '../types';
 
 function normalizeSearchInput( input = '' ) {

@@ -51,7 +51,7 @@ import type {
 	NormalizedField,
 } from '../types';
 import getCustomValidity from './utils/get-custom-validity';
-import { weekStartsOnToNumber } from '../utils/week-starts-on';
+import { weekStartsOnToNumber } from '../field-types/utils/week-starts-on';
 
 const { DateCalendar, DateRangeCalendar } = unlock( componentsPrivateApis );
 
