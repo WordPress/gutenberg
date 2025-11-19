@@ -852,6 +852,19 @@ test.describe( 'Navigation block', () => {
 
 				await navigation.useLinkControlSearch( 'Uncategorized' );
 
+				// expect the sidebar to show 'Uncategorized' as the label
+				await expect( inspectorNavigationLabel ).toHaveValue(
+					'Uncategorized'
+				);
+
+				await expect(
+					navigation.getLinkControlLink( 'Uncategorized' )
+				).toBeVisible();
+
+				await expect(
+					navigation.getLinkControlLink( 'Uncategorized' )
+				).toBeFocused();
+
 				await catLinkText.click();
 
 				// Verify the popover is closed
