@@ -5,7 +5,7 @@
 /**
  * Internal dependencies
  */
-import getFieldTypeDefinition from '..';
+import getNormalizeFieldFunction from '..';
 import type { Field, NormalizedField } from '../../types';
 
 /**
@@ -18,7 +18,7 @@ export default function normalizeFields< Item >(
 	fields: Field< Item >[]
 ): NormalizedField< Item >[] {
 	return fields.map( ( field ) => {
-		const normalize = getFieldTypeDefinition< Item >( field.type );
+		const normalize = getNormalizeFieldFunction< Item >( field.type );
 
 		return normalize( field );
 	} );

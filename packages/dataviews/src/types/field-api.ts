@@ -52,18 +52,6 @@ export interface NormalizedFilterByConfig {
 	isPrimary?: boolean;
 }
 
-interface FilterConfigForType {
-	/**
-	 * What operators are used by default.
-	 */
-	defaultOperators: Operator[];
-
-	/**
-	 * What operators are supported by the field.
-	 */
-	validOperators: Operator[];
-}
-
 export type Operator =
 	| 'is'
 	| 'isNot'
@@ -102,53 +90,6 @@ export type FieldType =
 	| 'color'
 	| 'url'
 	| 'array';
-
-/**
- * An abstract interface for Field based on the field type.
- */
-export type FieldTypeDefinition< Item > = {
-	/**
-	 * Callback used to sort the field.
-	 */
-	sort: ( a: Item, b: Item, direction: SortDirection ) => number;
-
-	/**
-	 * Callback used to validate the field.
-	 */
-	isValid: Rules< Item >;
-
-	/**
-	 * Callback used to render an edit control for the field or control name.
-	 */
-	Edit:
-		| ComponentType< DataFormControlProps< Item > >
-		| string
-		| EditConfig
-		| null;
-
-	/**
-	 * Callback used to render the field.
-	 */
-	render: ComponentType< DataViewRenderFieldProps< Item > >;
-
-	/**
-	 * The filter config for the field.
-	 */
-	filterBy: FilterConfigForType | false;
-
-	getFormat: ( field: Field< Item > ) => NormalizedFormat;
-
-	/**
-	 * Whether the field is readOnly.
-	 * If `true`, the value will be rendered using the `render` callback.
-	 */
-	readOnly?: boolean;
-
-	/**
-	 * Whether the field is sortable.
-	 */
-	enableSorting: boolean;
-};
 
 export type Rules< Item > = {
 	required?: boolean;

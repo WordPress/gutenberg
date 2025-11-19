@@ -100,7 +100,7 @@ function normalizeField< Item >(
  *
  * @return A field type definition.
  */
-export default function getFieldTypeDefinition< Item >(
+export default function getNormalizeFieldFunction< Item >(
 	type?: FieldType
 ): ( field: Field< Item > ) => NormalizedField< Item > {
 	if ( 'email' === type ) {
