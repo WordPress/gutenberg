@@ -79,7 +79,7 @@ const ThemeTool = () => {
 				</>
 			}
 		>
-			<IconButton key="density" title="Design System Density" active>
+			<IconButton title="Design System Theme" active>
 				<MirrorIcon />
 				Theme
 			</IconButton>
