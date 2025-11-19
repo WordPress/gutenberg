@@ -77,7 +77,10 @@ export default function useFocusOnMount( focusOnMount = 'firstElement' ) {
 			if ( focusOnMountRef.current === 'firstInputElement' ) {
 				/** @type {HTMLElement | null} */
 				let formInput = null;
-				if ( node instanceof Element ) {
+				if (
+					typeof window !== 'undefined' &&
+					node instanceof window.Element
+				) {
 					formInput = node.querySelector(
 						'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled])'
 					);
