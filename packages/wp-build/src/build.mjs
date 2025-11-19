@@ -283,24 +283,38 @@ async function ensureFullySpecifiedImports( outputPath ) {
 		let modified = false;
 		const imports = [];
 
-		// Walk the AST to find all import/export declarations
+		// Helper function to process source nodes from both import and export declarations
+		const processSourceNode = ( sourceNode ) => {
+			if ( ! sourceNode || ! sourceNode.value ) {
+				return;
+			}
+
+			// Only process relative imports
+			if ( /^\.\.?\//.test( sourceNode.value ) ) {
+				// Get string content position (excludes quotes)
+				// sourceNode.start includes the quote, so add 1 to get the content start
+				const contentStart = sourceNode.start + 1;
+				const contentEnd = sourceNode.end - 1;
+				imports.push( {
+					original: sourceNode.value,
+					start: contentStart,
+					end: contentEnd,
+				} );
+			}
+		};
+
+		// Walk the AST to find all import/export declarations with source paths
 		traverse.default( ast, {
 			ImportDeclaration( nodePath ) {
-				const node = nodePath.node;
-				const sourceNode = node.source;
-
-				// Only process relative imports
-				if ( sourceNode.value && /^\.\.?\//.test( sourceNode.value ) ) {
-					// Get string content position (excludes quotes)
-					// sourceNode.start includes the quote, so add 1 to get the content start
-					const contentStart = sourceNode.start + 1;
-					const contentEnd = sourceNode.end - 1;
-					imports.push( {
-						original: sourceNode.value,
-						start: contentStart,
-						end: contentEnd,
-					} );
-				}
+				processSourceNode( nodePath.node.source );
+			},
+			ExportNamedDeclaration( nodePath ) {
+				// export { foo } from './module' or export { foo as bar } from './module'
+				processSourceNode( nodePath.node.source );
+			},
+			ExportAllDeclaration( nodePath ) {
+				// export * from './module' or export * as ns from './module'
+				processSourceNode( nodePath.node.source );
 			},
 		} );
 
