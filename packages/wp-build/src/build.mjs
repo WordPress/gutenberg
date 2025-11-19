@@ -18,6 +18,8 @@ import cssnano from 'cssnano';
 import babel from 'esbuild-plugin-babel';
 import { camelCase } from 'change-case';
 import fs from 'node:fs';
+import * as babelParser from '@babel/parser';
+import traverse from '@babel/traverse';
 
 /**
  * Internal dependencies
@@ -249,6 +251,7 @@ function momentTimezoneAliasPlugin() {
 
 /**
  * Post-process ESM output files to ensure fully specified relative import paths.
+ * Uses Babel AST parser to deterministically identify and update import statements.
  * Adds .js extensions or /index.js for directory imports as required by ESM spec.
  *
  * @param {string} outputPath Path to the output file to process.
@@ -264,61 +267,97 @@ async function ensureFullySpecifiedImports( outputPath ) {
 		const source = await readFile( outputPath, 'utf8' );
 		const outputDir = path.dirname( outputPath );
 
-		// Regex to match import/export statements with relative paths that lack extensions
-		// Matched:
-		//   from './path'        (no extension)
-		//   from './path.js'     (with extension)
-		//   from "../dir"        (directory)
-		const importRegex = /\bfrom\s+(['"`])(\.\.?\/)([^'"`;]+)\1/g;
+		// Parse source code into an AST
+		let ast;
+		try {
+			ast = babelParser.parse( source, {
+				sourceType: 'module',
+				allowImportExportEverywhere: true,
+				plugins: [ 'jsx', 'typescript' ],
+			} );
+		} catch ( parseError ) {
+			// If parsing fails, silently skip (file might be non-ES modules or invalid)
+			return;
+		}
 
-		const updated = source.replace(
-			importRegex,
-			( match, quote, relativePath, modulePath ) => {
-				// Skip if already has a file extension
-				if ( /\.[a-z]+$/i.test( modulePath ) ) {
-					return match;
+		let modified = false;
+		const imports = [];
+
+		// Walk the AST to find all import/export declarations
+		traverse.default( ast, {
+			ImportDeclaration( nodePath ) {
+				const node = nodePath.node;
+				const sourceNode = node.source;
+
+				// Only process relative imports
+				if ( sourceNode.value && /^\.\.?\//.test( sourceNode.value ) ) {
+					// Get string content position (excludes quotes)
+					// sourceNode.start includes the quote, so add 1 to get the content start
+					const contentStart = sourceNode.start + 1;
+					const contentEnd = sourceNode.end - 1;
+					imports.push( {
+						original: sourceNode.value,
+						start: contentStart,
+						end: contentEnd,
+					} );
 				}
+			},
+		} );
 
-				// Resolve the full path
-				const fullPath = path.resolve(
-					outputDir,
-					relativePath,
-					modulePath
-				);
+		// Process imports in reverse order to maintain correct positions
+		let updated = source;
+		for ( let i = imports.length - 1; i >= 0; i-- ) {
+			const imp = imports[ i ];
 
-				// Check if it's a directory with index.js
-				try {
-					const stat = fs.statSync( fullPath );
-					if ( stat.isDirectory() ) {
-						const indexPath = path.join( fullPath, 'index.js' );
-						if ( fs.statSync( indexPath ).isFile() ) {
-							// Directory with index.js - add /index.js
-							return `from ${ quote }${ relativePath }${ modulePath }/index.js${ quote }`;
-						}
-					}
-				} catch ( error ) {
-					// Path doesn't exist as directory - expected, continue to next check
-					// (ENOENT errors are normal when path doesn't exist)
-				}
-
-				// Check if it's a .js file
-				try {
-					const stat = fs.statSync( `${ fullPath }.js` );
-					if ( stat.isFile() ) {
-						// File exists, add .js extension
-						return `from ${ quote }${ relativePath }${ modulePath }.js${ quote }`;
-					}
-				} catch ( error ) {
-					// File doesn't exist with .js extension - expected, will return original import
-					// (ENOENT errors are normal when file doesn't exist)
-				}
-
-				// Return original import if nothing matched
-				return match;
+			// Skip if already has file extension
+			if ( /\.[a-z]+$/i.test( imp.original ) ) {
+				continue;
 			}
-		);
 
-		if ( updated !== source ) {
+			// Resolve the full path
+			const fullPath = path.resolve( outputDir, imp.original );
+
+			let newPath = null;
+
+			// Check if it's a directory with index.js
+			try {
+				const stat = fs.statSync( fullPath );
+				if ( stat.isDirectory() ) {
+					const indexPath = path.join( fullPath, 'index.js' );
+					try {
+						fs.statSync( indexPath );
+						// Directory with index.js - add /index.js
+						newPath = `${ imp.original }/index.js`;
+					} catch {
+						// index.js doesn't exist, skip this import
+					}
+				}
+			} catch {
+				// Path doesn't exist as directory, try as .js file
+			}
+
+			// Check if it's a .js file (if not already set as directory)
+			if ( ! newPath ) {
+				try {
+					fs.statSync( `${ fullPath }.js` );
+					// File exists, add .js extension
+					newPath = `${ imp.original }.js`;
+				} catch {
+					// File doesn't exist with .js extension, skip this import
+				}
+			}
+
+			// Update source if we found a valid path
+			if ( newPath ) {
+				updated =
+					updated.slice( 0, imp.start ) +
+					newPath +
+					updated.slice( imp.end );
+				modified = true;
+			}
+		}
+
+		if ( modified ) {
 			await writeFile( outputPath, updated, 'utf8' );
 		}
 	} catch ( error ) {
@@ -667,7 +706,7 @@ async function bundlePackage( packageName, options = {} ) {
 			packageName
 		);
 		const jsFiles = await glob(
-			normalizePath( path.join( rootBuildModuleDir, '*.js' ) )
+			normalizePath( path.join( rootBuildModuleDir, '**/*.js' ) )
 		);
 		await Promise.all(
 			jsFiles.map( ( file ) => ensureFullySpecifiedImports( file ) )
