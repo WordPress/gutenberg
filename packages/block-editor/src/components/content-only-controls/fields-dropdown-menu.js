@@ -17,7 +17,7 @@ export default function FieldsDropdownMenu( {
 	return (
 		<DropdownMenu
 			icon={ moreVertical }
-			label={ __( 'Fields visibility' ) }
+			label={ __( 'Options' ) }
 			popoverProps={ { placement: 'bottom-end' } }
 		>
 			{ ( { onClose } ) => (
