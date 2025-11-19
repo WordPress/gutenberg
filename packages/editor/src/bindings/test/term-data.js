@@ -675,10 +675,10 @@ describe( 'term-data bindings', () => {
 			] );
 		} );
 
-		it( 'should return empty array when no term data is available', () => {
+		it( 'should return empty array when neither termId nor termData is provided from context', () => {
 			const fields = termDataBindings.getFieldsList( {
 				select,
-				context: {},
+				context: { taxonomy: 'category' },
 			} );
 
 			expect( fields ).toEqual( [] );
