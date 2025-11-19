@@ -24,6 +24,7 @@ import {
 	splitTask,
 	isPlainObject,
 	deepReadOnly,
+	deepClone,
 } from './utils';
 import {
 	directive,
@@ -68,27 +69,6 @@ const warnWithSyncEvent = ( wrongPrefix: string, rightPrefix: string ) => {
 		);
 	}
 };
-
-/**
- * Recursively clones the passed object.
- *
- * @param source Source object.
- * @return Cloned object.
- */
-function deepClone< T >( source: T ): T {
-	if ( isPlainObject( source ) ) {
-		return Object.fromEntries(
-			Object.entries( source as object ).map( ( [ key, value ] ) => [
-				key,
-				deepClone( value ),
-			] )
-		) as T;
-	}
-	if ( Array.isArray( source ) ) {
-		return source.map( ( i ) => deepClone( i ) ) as T;
-	}
-	return source;
-}
 
 /**
  * Wraps event object to warn about access of synchronous properties and methods.
