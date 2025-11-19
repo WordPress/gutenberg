@@ -92,7 +92,7 @@ addons.register( ADDON_ID, () => {
 		type: types.TOOL,
 		title: 'Design System Theme',
 		match: ( { storyId, viewMode } ) =>
-			!! storyId?.startsWith( 'design-system-' ) &&
+			!! storyId?.startsWith( 'design-system-components-' ) &&
 			( [ 'story', 'docs' ] as any[] ).includes( viewMode ),
 		render: ThemeTool,
 	} );

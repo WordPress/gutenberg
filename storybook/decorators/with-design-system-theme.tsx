@@ -27,8 +27,10 @@ export function WithDesignSystemTheme(
 	Story: React.ComponentType< any >,
 	context: StoryContext
 ) {
-	const isDesignSystemStory = context.id?.startsWith( 'design-system-' );
-	if ( ! isDesignSystemStory ) {
+	const isDesignSystemComponentsStory = context.id?.startsWith(
+		'design-system-components-'
+	);
+	if ( ! isDesignSystemComponentsStory ) {
 		return <Story { ...context } />;
 	}
 
