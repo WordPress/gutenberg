@@ -152,24 +152,16 @@ export default {
 		return true;
 	},
 	getFieldsList( { context, select } ) {
-		const { getBlockAttributes, getBlockName, getSelectedBlockClientId } =
+		const { getBlockName, getSelectedBlockClientId } =
 			select( blockEditorStore );
 		const clientId = getSelectedBlockClientId();
 		const blockName = getBlockName( clientId );
 
-		if ( NAVIGATION_BLOCK_TYPES.includes( blockName ) ) {
-			// Navigation blocks: read from block attributes
-			const blockAttributes = getBlockAttributes( clientId );
+		if ( blockName !== 'core/post-date' ) {
+			return [];
+		}
 
-			if (
-				! blockAttributes ||
-				! blockAttributes.id ||
-				! blockAttributes.type
-			) {
-				return [];
-			}
-		} else if ( ! context || ! context.postId || ! context.postType ) {
-			// All other blocks: use context
+		if ( ! context || ! context.postId || ! context.postType ) {
 			return [];
 		}
 
