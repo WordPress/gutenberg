@@ -44,10 +44,6 @@
 }
 
 .block-editor-content-only-controls__navigation-list-view {
-	// Remove padding to let list view fill the space
-	margin: 0;
-	padding: 0;
-
 	// Ensure the list view takes full width
-	width: 100%;
+	grid-column: 1/-1;
 }
