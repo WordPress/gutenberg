@@ -54,7 +54,7 @@ export default function RichTextControl( {
 		changeHandlers,
 		dependencies,
 	} = useFormatTypes( {
-		clientId: undefined,
+		clientId,
 		identifier: field.id,
 		allowedFormats: adjustedAllowedFormats,
 		withoutInteractiveFormatting: fieldConfig?.withoutInteractiveFormatting,
