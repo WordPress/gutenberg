@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `Menu`: Improve menu opening and closing animations by reducing duration from 400ms to 200ms for opening and 200ms to 100ms for closing, resulting in a more responsive user experience. [#73426](https://github.com/WordPress/gutenberg/pull/73426)
+
 ### Bug Fixes
 
 -   `ExternalLink`: Fix arrow direction for RTL languages. The external link arrow now correctly points to the top-left (↖) instead of top-right (↗) in RTL layouts. ([#73400](https://github.com/WordPress/gutenberg/pull/73400))

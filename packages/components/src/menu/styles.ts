@@ -18,8 +18,8 @@ const ANIMATION_PARAMS = {
 	SCALE_AMOUNT_OUTER: 0.82,
 	SCALE_AMOUNT_CONTENT: 0.9,
 	DURATION: {
-		IN: '400ms',
-		OUT: '200ms',
+		IN: '200ms',
+		OUT: '100ms',
 	},
 	EASING: 'cubic-bezier(0.33, 0, 0, 1)',
 };
