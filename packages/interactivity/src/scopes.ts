@@ -85,8 +85,8 @@ export const getElement = () => {
 /**
  * Gets the context defined and updated from the server.
  *
- * The object returned is read-only, and includes the context defined in PHP
- * with `data-wp-context` directives, including the corresponding inherited
+ * The object returned is a deep clone of the context defined in PHP with
+ * `data-wp-context` directives, including the corresponding inherited
  * properties. When `actions.navigate()` is called, this object is updated to
  * reflect the changes in the new visited page, without affecting the context
  * returned by `getContext()`. Directives can subscribe to those changes to

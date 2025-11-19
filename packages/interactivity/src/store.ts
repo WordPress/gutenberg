@@ -24,7 +24,7 @@ export const getConfig = ( namespace?: string ) =>
 /**
  * Gets the state defined and updated from the server.
  *
- * The object returned is read-only, and includes the state defined in PHP with
+ * The object returned is a deep clone of the state defined in PHP with
  * `wp_interactivity_state()`. When using `actions.navigate()`, this object is
  * updated to reflect the changes in its properties, without affecting the state
  * returned by `store()`. Directives can subscribe to those changes to update
