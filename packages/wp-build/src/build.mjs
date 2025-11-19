@@ -256,13 +256,13 @@ function momentTimezoneAliasPlugin() {
  */
 async function ensureFullySpecifiedImports( outputPath ) {
 	try {
-		const source = await readFile( outputPath, 'utf8' );
-		const outputDir = path.dirname( outputPath );
-
 		// Only process .js files
 		if ( ! outputPath.endsWith( '.js' ) ) {
 			return;
 		}
+
+		const source = await readFile( outputPath, 'utf8' );
+		const outputDir = path.dirname( outputPath );
 
 		// Regex to match import/export statements with relative paths that lack extensions
 		// Matched:
