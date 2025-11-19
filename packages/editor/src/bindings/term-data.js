@@ -148,7 +148,15 @@ export default {
 
 		return false;
 	},
-	getFieldsList() {
-		return termDataFields;
+	getFieldsList( { context } ) {
+		if ( ! context ) {
+			return termDataFields;
+		}
+
+		if ( ( context.taxonomy && context.termId ) || context.termData ) {
+			return termDataFields;
+		}
+
+		return [];
 	},
 };
