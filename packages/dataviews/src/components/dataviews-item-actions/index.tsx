@@ -261,7 +261,7 @@ function CompactItemActions< Item >( {
 						/>
 					}
 				/>
-				<Menu.Popover modal={ false }>
+				<Menu.Popover modal={ false } portal preventBodyScroll>
 					<ActionsMenuGroup
 						actions={ actions }
 						item={ item }

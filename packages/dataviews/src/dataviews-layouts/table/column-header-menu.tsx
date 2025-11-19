@@ -118,7 +118,12 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 					</span>
 				) }
 			</Menu.TriggerButton>
-			<Menu.Popover style={ { minWidth: '240px' } } modal={ false }>
+			<Menu.Popover
+				style={ { minWidth: '240px' } }
+				modal={ false }
+				portal
+				preventBodyScroll
+			>
 				<WithMenuSeparators>
 					{ isSortable && (
 						<Menu.Group>

@@ -253,7 +253,7 @@ function ListItem< Item >( {
 								/>
 							}
 						/>
-						<Menu.Popover modal={ false }>
+						<Menu.Popover modal={ false } portal preventBodyScroll>
 							<ActionsMenuGroup
 								actions={ eligibleActions }
 								item={ item }
