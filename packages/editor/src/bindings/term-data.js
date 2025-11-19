@@ -44,7 +44,7 @@ const termDataFields = [
 	},
 	{
 		label: __( 'Count' ),
-		args: { field: 'count' }, // TODO: Fallback to zero
+		args: { field: 'count' },
 		type: 'string',
 	},
 ];
