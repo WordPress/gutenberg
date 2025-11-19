@@ -122,7 +122,6 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 				style={ { minWidth: '240px' } }
 				modal={ false }
 				portal
-				preventBodyScroll
 			>
 				<WithMenuSeparators>
 					{ isSortable && (
