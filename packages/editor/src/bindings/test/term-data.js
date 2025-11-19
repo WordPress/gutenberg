@@ -10,6 +10,25 @@ import { store as coreDataStore } from '@wordpress/core-data';
 import { default as termDataBindings, termDataFields } from '../term-data';
 
 describe( 'term-data bindings', () => {
+	const getEntityRecordMock = ( kind, taxonomy, termId ) => {
+		if (
+			kind === 'taxonomy' &&
+			taxonomy === 'category' &&
+			termId === 123
+		) {
+			return {
+				id: 123,
+				name: 'Technology',
+				slug: 'technology',
+				link: 'https://example.com/category/technology',
+				description: 'All about technology',
+				parent: 0,
+				count: 42,
+			};
+		}
+		return undefined;
+	};
+
 	describe( 'getValues', () => {
 		describe( 'for regular blocks using block context', () => {
 			let select;
@@ -26,24 +45,7 @@ describe( 'term-data bindings', () => {
 					}
 					if ( store === coreDataStore ) {
 						return {
-							getEntityRecord: ( kind, taxonomy, termId ) => {
-								if (
-									kind === 'taxonomy' &&
-									taxonomy === 'category' &&
-									termId === 123
-								) {
-									return {
-										id: 123,
-										name: 'Technology',
-										slug: 'technology',
-										link: 'https://example.com/category/technology',
-										description: 'All about technology',
-										parent: 0,
-										count: 42,
-									};
-								}
-								return undefined;
-							},
+							getEntityRecord: getEntityRecordMock,
 						};
 					}
 				};
@@ -563,24 +565,7 @@ describe( 'term-data bindings', () => {
 					}
 					if ( store === coreDataStore ) {
 						return {
-							getEntityRecord: ( kind, taxonomy, termId ) => {
-								if (
-									kind === 'taxonomy' &&
-									taxonomy === 'category' &&
-									termId === 123
-								) {
-									return {
-										id: 123,
-										name: 'Technology',
-										slug: 'technology',
-										link: 'https://example.com/category/technology',
-										description: 'All about technology',
-										parent: 0,
-										count: 42,
-									};
-								}
-								return null;
-							},
+							getEntityRecord: getEntityRecordMock,
 						};
 					}
 				};
@@ -600,24 +585,7 @@ describe( 'term-data bindings', () => {
 					}
 					if ( store === coreDataStore ) {
 						return {
-							getEntityRecord: ( kind, taxonomy, termId ) => {
-								if (
-									kind === 'taxonomy' &&
-									taxonomy === 'category' &&
-									termId === 123
-								) {
-									return {
-										id: 123,
-										name: 'Technology',
-										slug: 'technology',
-										link: 'https://example.com/category/technology',
-										description: 'All about technology',
-										parent: 0,
-										count: 42,
-									};
-								}
-								return null;
-							},
+							getEntityRecord: getEntityRecordMock,
 						};
 					}
 				};
@@ -640,24 +608,7 @@ describe( 'term-data bindings', () => {
 					}
 					if ( store === coreDataStore ) {
 						return {
-							getEntityRecord: ( kind, taxonomy, termId ) => {
-								if (
-									kind === 'taxonomy' &&
-									taxonomy === 'category' &&
-									termId === 123
-								) {
-									return {
-										id: 123,
-										name: 'Technology',
-										slug: 'technology',
-										link: 'https://example.com/category/technology',
-										description: 'All about technology',
-										parent: 0,
-										count: 42,
-									};
-								}
-								return null;
-							},
+							getEntityRecord: getEntityRecordMock,
 						};
 					}
 				};
