@@ -273,11 +273,12 @@ export const NestingAndInheriting: StoryObj< typeof ThemeProvider > = {
 								<div style={ { paddingInlineStart: '1rem' } }>
 									<ThemeProvider
 										color={ { primary: 'hotpink' } }
+										density="default"
 									>
 										<NestingDebug
 											bg="inherit (#1e1e1e)"
 											primary="hotpink"
-											density="inherit (compact)"
+											density="default"
 										/>
 										<div
 											style={ {
@@ -290,7 +291,7 @@ export const NestingAndInheriting: StoryObj< typeof ThemeProvider > = {
 												<NestingDebug
 													bg="#f8f8f8"
 													primary="inherit (hotpink)"
-													density="inherit (compact)"
+													density="inherit (default)"
 												/>
 											</ThemeProvider>
 										</div>

@@ -128,6 +128,15 @@
 	--wpds-font-size-x-small: 11px; /* Extra small font size */
 }
 
+[data-wpds-theme-provider-id][data-wpds-density='default'] {
+	--wpds-dimension-base: 4px; /* Base dimension unit */
+	--wpds-dimension-padding-surface-2xs: 4px; /* 2x extra small spacing for surfaces */
+	--wpds-dimension-padding-surface-lg: 32px; /* Large spacing for surfaces */
+	--wpds-dimension-padding-surface-md: 24px; /* Medium spacing for surfaces */
+	--wpds-dimension-padding-surface-sm: 16px; /* Small spacing for surfaces */
+	--wpds-dimension-padding-surface-xs: 8px; /* Extra small spacing for surfaces */
+}
+
 [data-wpds-theme-provider-id][data-wpds-density='compact'] {
 	--wpds-dimension-padding-surface-2xs: 4px; /* 2x extra small spacing for surfaces */
 	--wpds-dimension-padding-surface-lg: 24px; /* Large spacing for surfaces */
