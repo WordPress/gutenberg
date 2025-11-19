@@ -46,7 +46,7 @@ interface ImageCropperProps {
 -   `useImageCropper` - Provides access to all cropper state and methods.
 
 ```tsx
-import { useImageCropper } from '@automattic/image-cropper';
+import { useImageCropper } from '@wordpress/image-cropper';
 
 const {
 	// Unified state object
@@ -77,7 +77,7 @@ const {
 -   `normalizeRotation` - Utility function to normalize rotation values to 0-360 degrees
 
 ```tsx
-import { normalizeRotation } from '@automattic/image-cropper';
+import { normalizeRotation } from '@wordpress/image-cropper';
 
 const normalized = normalizeRotation( -90 ); // Returns 270
 const normalized2 = normalizeRotation( 450 ); // Returns 90
@@ -94,7 +94,7 @@ import {
 	ImageCropper,
 	ImageCropperProvider,
 	useImageCropper,
-} from '@automattic/image-cropper';
+} from '@wordpress/image-cropper';
 
 function ImageEditor() {
 	return (

@@ -12,7 +12,7 @@ import { useCallback } from '@wordpress/element';
  * Internal dependencies
  */
 import { useImageCropper } from '../../provider';
-import type { Area, ImageCropperProps, MediaSize } from '../../types';
+import type { Area, ImageCropperProps, MediaSize, Point } from '../../types';
 import { MIN_ZOOM, MAX_ZOOM } from '../../constants';
 
 export default function ImageCropper( {
@@ -25,11 +25,11 @@ export default function ImageCropper( {
 	const { cropperState, setCropperState } = useImageCropper();
 	const { crop, zoom, rotation, aspectRatio, flip } = cropperState;
 
-	const setCrop = ( newCrop: any ) => setCropperState( { crop: newCrop } );
+	const setCrop = ( newCrop: Point ) => setCropperState( { crop: newCrop } );
 	const setZoom = ( newZoom: number ) => setCropperState( { zoom: newZoom } );
 	const setRotation = ( newRotation: number ) =>
 		setCropperState( { rotation: newRotation } );
-	const setMediaSize = ( newMediaSize: any ) =>
+	const setMediaSize = ( newMediaSize: MediaSize ) =>
 		setCropperState( { mediaSize: newMediaSize } );
 
 	/**
