@@ -206,17 +206,13 @@ function block_core_breadcrumbs_create_page_number_item( $query_var = 'paged' ) 
  *
  * @param string $text       The text content.
  * @param bool   $is_paged   Whether we're on a paginated view.
- * @param bool   $allow_html Whether to allow HTML in the text. If true, uses wp_kses_post(), otherwise uses esc_html(). Default false.
  *
  * @return array The breadcrumb item data.
  */
-function block_core_breadcrumbs_create_item( $text, $is_paged = false, $allow_html = false ) {
+function block_core_breadcrumbs_create_item( $text, $is_paged = false ) {
 	$item = array( 'label' => $text );
 	if ( $is_paged ) {
 		$item['url'] = get_pagenum_link( 1 );
-	}
-	if ( $allow_html ) {
-		$item['allow_html'] = true;
 	}
 	return $item;
 }
