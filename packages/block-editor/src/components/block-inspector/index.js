@@ -154,25 +154,32 @@ function BlockInspector() {
 				selectedBlockClientId
 			);
 
-			// Temporary workaround for issue #71991
-			// Exclude Navigation block children from Content sidebar until proper
-			// drill-down experience is implemented (see #65699)
-			// This prevents a poor UX where all Nav block sub-items are shown
-			// when the parent block is in contentOnly mode.
-			// Build a Set of all navigation block descendants for efficient lookup
-			const navigationDescendants = new Set();
+			// Exclude Navigation block children (but not the navigation block itself)
+			// Navigation blocks will show their own list view controls
+			const navigationChildren = new Set();
+
+			// Check if the selected block itself is a navigation block
+			if ( getBlockName( selectedBlockClientId ) === 'core/navigation' ) {
+				// If the selected block is navigation, exclude all its descendants
+				descendants.forEach( ( childId ) =>
+					navigationChildren.add( childId )
+				);
+			}
+
+			// Check for navigation blocks within descendants and exclude only their children
 			descendants.forEach( ( clientId ) => {
 				if ( getBlockName( clientId ) === 'core/navigation' ) {
+					// Don't exclude the navigation block itself, only its children
 					const navChildren = getClientIdsOfDescendants( clientId );
 					navChildren.forEach( ( childId ) =>
-						navigationDescendants.add( childId )
+						navigationChildren.add( childId )
 					);
 				}
 			} );
 
 			return descendants.filter( ( current ) => {
 				// Exclude navigation block children
-				if ( navigationDescendants.has( current ) ) {
+				if ( navigationChildren.has( current ) ) {
 					return false;
 				}
 

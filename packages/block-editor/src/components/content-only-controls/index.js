@@ -24,6 +24,7 @@ import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import useBlockDisplayInformation from '../use-block-display-information';
+import { PrivateListView } from '../list-view';
 const { fieldsKey } = unlock( blocksPrivateApis );
 import FieldsDropdownMenu from './fields-dropdown-menu';
 
@@ -171,6 +172,34 @@ function denormalizeLinkValue( value, fieldDef ) {
 		}
 	} );
 	return result;
+}
+
+function NavigationListView( { clientId } ) {
+	const blockTitle = useBlockDisplayTitle( {
+		clientId,
+		context: 'list-view',
+	} );
+	const blockInformation = useBlockDisplayInformation( clientId );
+	return (
+		<ToolsPanel
+			label={
+				<HStack spacing={ 1 }>
+					<BlockIcon icon={ blockInformation?.icon } />
+					<div>{ blockTitle }</div>
+				</HStack>
+			}
+			panelId={ clientId }
+			resetAll={ () => {} }
+		>
+			<div className="block-editor-content-only-controls__navigation-list-view">
+				<PrivateListView
+					rootClientId={ clientId }
+					isExpanded
+					showAppender
+				/>
+			</div>
+		</ToolsPanel>
+	);
 }
 
 function BlockFields( { clientId } ) {
@@ -416,18 +445,38 @@ function ContentOnlyControlsScreen( {
 	parentClientIds,
 	isNested,
 } ) {
-	const isRootContentBlock = useSelect(
+	const { isRootContentBlock, isNavigationBlock } = useSelect(
 		( select ) => {
 			const { getBlockName } = select( blockEditorStore );
 			const blockName = getBlockName( rootClientId );
 			const { hasContentRoleAttribute } = unlock( select( blocksStore ) );
-			return hasContentRoleAttribute( blockName );
+			return {
+				isRootContentBlock: hasContentRoleAttribute( blockName ),
+				isNavigationBlock: blockName === 'core/navigation',
+			};
 		},
 		[ rootClientId ]
 	);
 
 	if ( ! isRootContentBlock && ! contentClientIds.length ) {
 		return null;
+	}
+
+	// Special case: If this is a navigation block drilldown, show the NavigationListView
+	if ( isNavigationBlock && isNested ) {
+		return (
+			<>
+				<div className="block-editor-content-only-controls__button-panel">
+					<Navigator.BackButton className="block-editor-content-only-controls__back-button">
+						<HStack expanded spacing={ 1 } justify="flex-start">
+							<Icon icon={ arrowLeft } />
+							<div>{ __( 'Back' ) }</div>
+						</HStack>
+					</Navigator.BackButton>
+				</div>
+				<NavigationListView clientId={ rootClientId } />
+			</>
+		);
 	}
 
 	return (
@@ -463,8 +512,11 @@ export default function ContentOnlyControls( { rootClientId } ) {
 	const { updatedRootClientId, nestedContentClientIds, contentClientIds } =
 		useSelect(
 			( select ) => {
-				const { getClientIdsOfDescendants, getBlockEditingMode } =
-					select( blockEditorStore );
+				const {
+					getClientIdsOfDescendants,
+					getBlockEditingMode,
+					getBlockName,
+				} = select( blockEditorStore );
 
 				// _nestedContentClientIds is for content blocks within 'drilldowns'.
 				// It's an object where the key is the parent clientId, and the element is
@@ -482,11 +534,36 @@ export default function ContentOnlyControls( { rootClientId } ) {
 
 				// A flattened list of all content clientIds to arrange into the
 				// groups above.
-				const allContentClientIds = getClientIdsOfDescendants(
-					rootClientId
-				).filter(
+				const allDescendants =
+					getClientIdsOfDescendants( rootClientId );
+
+				// Exclude Navigation block children (but not the navigation block itself)
+				// Navigation blocks will show their own list view controls
+				const navigationChildren = new Set();
+
+				// Check if root is a navigation block
+				if ( getBlockName( rootClientId ) === 'core/navigation' ) {
+					allDescendants.forEach( ( childId ) =>
+						navigationChildren.add( childId )
+					);
+				}
+
+				// Check for navigation blocks within descendants and exclude only their children
+				allDescendants.forEach( ( clientId ) => {
+					if ( getBlockName( clientId ) === 'core/navigation' ) {
+						// Don't exclude the navigation block itself, only its children
+						const navChildren =
+							getClientIdsOfDescendants( clientId );
+						navChildren.forEach( ( childId ) =>
+							navigationChildren.add( childId )
+						);
+					}
+				} );
+
+				const allContentClientIds = allDescendants.filter(
 					( clientId ) =>
-						getBlockEditingMode( clientId ) === 'contentOnly'
+						getBlockEditingMode( clientId ) === 'contentOnly' &&
+						! navigationChildren.has( clientId )
 				);
 
 				for ( const clientId of allContentClientIds ) {
@@ -499,6 +576,7 @@ export default function ContentOnlyControls( { rootClientId } ) {
 					);
 
 					// If there's more than one child block, use a drilldown.
+					// For navigation blocks, we'll show the NavigationListView in the drilldown.
 					if (
 						childClientIds.length > 1 &&
 						! allNestedClientIds.includes( clientId )
