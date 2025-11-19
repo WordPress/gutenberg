@@ -581,11 +581,6 @@ const ValidationComponent = ( {
 		date?: string;
 		dateRange?: string;
 		datetime?: string;
-		username?: string;
-		zipcode?: string;
-		phonePattern?: string;
-		emailPattern?: string;
-		urlPattern?: string;
 	};
 
 	const [ post, setPost ] = useState< ValidatedItem >( {
