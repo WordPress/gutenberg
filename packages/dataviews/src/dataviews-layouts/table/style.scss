@@ -230,6 +230,10 @@
 				&:has(.dataviews-view-table-header-button):not(:first-child) {
 					padding-left: 0;
 				}
+
+				&:has(.dataviews-view-table-header-button):not(:last-child) {
+					padding-right: 0;
+				}
 			}
 		}
 		td,
