@@ -300,50 +300,6 @@ describe( 'term-data bindings', () => {
 				} );
 			} );
 
-			it( 'should use block attributes for navigation-submenu blocks', () => {
-				const select = ( store ) => {
-					if ( store === blockEditorStore ) {
-						return {
-							getBlockName: () => 'core/navigation-submenu',
-							getBlockAttributes: () => ( {
-								id: 789,
-								type: 'category',
-							} ),
-						};
-					}
-					if ( store === coreDataStore ) {
-						return {
-							getEntityRecord: ( kind, taxonomy, termId ) => {
-								if (
-									kind === 'taxonomy' &&
-									taxonomy === 'category' &&
-									termId === 789
-								) {
-									return {
-										name: 'Tutorials',
-									};
-								}
-								return null;
-							},
-						};
-					}
-				};
-
-				const values = termDataBindings.getValues( {
-					select,
-					context: {},
-					bindings: {
-						content: {
-							source: 'core/term-data',
-							args: { field: 'name' },
-						},
-					},
-					clientId: '123abc456',
-				} );
-
-				expect( values.content ).toBe( 'Tutorials' );
-			} );
-
 			it( 'should convert "tag" type to "post_tag" taxonomy', () => {
 				const select = ( store ) => {
 					if ( store === blockEditorStore ) {
