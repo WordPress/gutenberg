@@ -14,6 +14,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useContext, useState, useMemo } from '@wordpress/element';
+import { useFocusOnMount } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -29,7 +30,6 @@ import { DEFAULT_LAYOUT } from '../normalize-form';
 import SummaryButton from './summary-button';
 import useFormValidity from '../../hooks/use-form-validity';
 import DataFormContext from '../../components/dataform-context';
-import useFocusOnFormInput from './use-focus-on-form-input';
 
 function ModalContent< Item >( {
 	data,
@@ -76,7 +76,7 @@ function ModalContent< Item >( {
 		setChanges( ( prev ) => deepMerge( prev, newValue ) );
 	};
 
-	const focusOnMountRef = useFocusOnFormInput();
+	const focusOnMountRef = useFocusOnMount( 'firstElement' );
 
 	return (
 		<Modal

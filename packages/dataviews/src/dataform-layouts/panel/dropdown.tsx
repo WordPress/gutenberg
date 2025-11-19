@@ -12,6 +12,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
+import { useFocusOnMount } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -26,7 +27,6 @@ import type {
 import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
 import SummaryButton from './summary-button';
-import useFocusOnFormInput from './use-focus-on-form-input';
 
 function DropdownHeader( {
 	title,
@@ -75,7 +75,7 @@ function DropdownContent< Item >( {
 	onChange: ( value: any ) => void;
 	validity: FormValidity;
 } ) {
-	const focusOnMountRef = useFocusOnFormInput();
+	const focusOnMountRef = useFocusOnMount( 'firstElement' );
 
 	return (
 		<>
