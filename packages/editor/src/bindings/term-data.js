@@ -106,6 +106,10 @@ export default {
 			} else if ( ! termDataValues ) {
 				// If the term data does not exist, return the field label.
 				newValues[ attributeName ] = termDataField.label;
+			} else if ( binding.args.field === 'count' ) {
+				// Return the term count value in parentheses.
+				newValues[ attributeName ] =
+					'(' + termDataValues[ binding.args.field ] + ')';
 			} else {
 				// If the term data exists, return the term data value.
 				newValues[ attributeName ] =
