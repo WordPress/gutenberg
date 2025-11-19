@@ -630,7 +630,7 @@ describe( 'term-data bindings', () => {
 			};
 		} );
 
-		it( 'should return the list of available term data fields when term data exists', () => {
+		it( 'should return the list of available term data fields when taxonomy and termId are provided by context', () => {
 			const fields = termDataBindings.getFieldsList( {
 				select,
 				context: { taxonomy: 'category', termId: 123 },
