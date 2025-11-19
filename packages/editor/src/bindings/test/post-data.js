@@ -37,7 +37,7 @@ describe( 'post-data bindings', () => {
 				};
 			} );
 
-			it( 'should return entity field values when they exist, and to field name for unknown fields', () => {
+			it( 'should return entity field values when they exist, and field name for unknown fields', () => {
 				const values = postDataBindings.getValues( {
 					select,
 					context: { postId: 123, postType: 'post' },
