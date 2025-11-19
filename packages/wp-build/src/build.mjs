@@ -3,7 +3,7 @@
 /**
  * External dependencies
  */
-import { readFile, writeFile, copyFile, mkdir, unlink } from 'fs/promises';
+import { readFile, writeFile, copyFile, mkdir, unlink, stat } from 'fs/promises';
 import path from 'path';
 import { parseArgs } from 'node:util';
 import esbuild from 'esbuild';
@@ -17,7 +17,6 @@ import rtlcss from 'rtlcss';
 import cssnano from 'cssnano';
 import babel from 'esbuild-plugin-babel';
 import { camelCase } from 'change-case';
-import fs from 'node:fs';
 import * as babelParser from '@babel/parser';
 import traverse from '@babel/traverse';
 
@@ -335,11 +334,11 @@ async function ensureFullySpecifiedImports( outputPath ) {
 
 			// Check if it's a directory with index.js
 			try {
-				const stat = fs.statSync( fullPath );
-				if ( stat.isDirectory() ) {
+				const stats = await stat( fullPath );
+				if ( stats.isDirectory() ) {
 					const indexPath = path.join( fullPath, 'index.js' );
 					try {
-						fs.statSync( indexPath );
+						await stat( indexPath );
 						// Directory with index.js - add /index.js
 						newPath = `${ imp.original }/index.js`;
 					} catch {
@@ -353,7 +352,7 @@ async function ensureFullySpecifiedImports( outputPath ) {
 			// Check if it's a .js file (if not already set as directory)
 			if ( ! newPath ) {
 				try {
-					fs.statSync( `${ fullPath }.js` );
+					await stat( `${ fullPath }.js` );
 					// File exists, add .js extension
 					newPath = `${ imp.original }.js`;
 				} catch {
