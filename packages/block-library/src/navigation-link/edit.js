@@ -214,7 +214,7 @@ export default function NavigationLinkEdit( {
 	const ref = useRef();
 	const linkUIref = useRef();
 	const prevUrl = usePrevious( url );
-	const isNewLink = useRef( ! url );
+	const isNewLink = useRef( ! url && ! metadata?.bindings?.url );
 
 	const {
 		isAtMaxNesting,

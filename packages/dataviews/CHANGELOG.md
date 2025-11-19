@@ -11,10 +11,15 @@
 - Improve docs for Edit component. [#73202](https://github.com/WordPress/gutenberg/pull/73202)
 - Field API: introduce the `format` prop to format the `date` field type. [#72999](https://github.com/WordPress/gutenberg/pull/72999)
 - DataViews table layout: fix table header spacing when using non-default column alignment. [#73398](https://github.com/WordPress/gutenberg/pull/73398)
+- DataViews: add support for activity layout. [#72780](https://github.com/WordPress/gutenberg/pull/72780)
 
 ### Bug fixes
 
 - Fix: ensure primary actions are not wrapped in the list layout. [#73333](https://github.com/WordPress/gutenberg/pull/73333)
+
+### Breaking changes
+
+- DataViews: rename `groupByField` to `groupBy.field` to allow control over both the field and the direction of the grouping. [#72780](https://github.com/WordPress/gutenberg/pull/72780)
 
 ## 10.3.0 (2025-11-12)
 

@@ -317,9 +317,10 @@ export const deleteEntityRecord =
 			if (
 				kind === 'postType' &&
 				name === 'wp_template' &&
-				recordId &&
-				typeof recordId === 'string' &&
-				! /^\d+$/.test( recordId )
+				( ( recordId &&
+					typeof recordId === 'string' &&
+					! /^\d+$/.test( recordId ) ) ||
+					! window?.__experimentalTemplateActivate )
 			) {
 				baseURL =
 					baseURL.slice( 0, baseURL.lastIndexOf( '/' ) ) +
@@ -571,9 +572,10 @@ export const saveEntityRecord =
 			if (
 				kind === 'postType' &&
 				name === 'wp_template' &&
-				recordId &&
-				typeof recordId === 'string' &&
-				! /^\d+$/.test( recordId )
+				( ( recordId &&
+					typeof recordId === 'string' &&
+					! /^\d+$/.test( recordId ) ) ||
+					! window?.__experimentalTemplateActivate )
 			) {
 				baseURL =
 					baseURL.slice( 0, baseURL.lastIndexOf( '/' ) ) +

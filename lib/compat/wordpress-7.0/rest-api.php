@@ -65,3 +65,12 @@ function gutenberg_parse_pattern_blocks_in_block_templates( $query_result, $quer
 }
 
 add_filter( 'get_block_templates', 'gutenberg_parse_pattern_blocks_in_block_templates', 10, 3 );
+
+/**
+ * Registers the Block Patterns REST API routes.
+ */
+function gutenberg_register_block_patterns_controller_endpoints() {
+	$block_patterns_controller = new Gutenberg_REST_Block_Patterns_Controller_7_0();
+	$block_patterns_controller->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_block_patterns_controller_endpoints' );

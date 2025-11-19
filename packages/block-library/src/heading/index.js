@@ -3,6 +3,7 @@
  */
 import { heading as icon } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
+import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -14,6 +15,9 @@ import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
 import variations from './variations';
+import { unlock } from '../lock-unlock';
+
+const { fieldsKey } = unlock( blocksPrivateApis );
 
 const { name } = metadata;
 
@@ -70,7 +74,7 @@ export const settings = {
 };
 
 if ( window.__experimentalContentOnlyPatternInsertion ) {
-	settings.fields = [
+	settings[ fieldsKey ] = [
 		{
 			label: __( 'Content' ),
 			type: 'RichText',
