@@ -187,7 +187,6 @@ function LinkControl( {
 	const wrapperNode = useRef();
 	const textInputRef = useRef();
 	const searchInputRef = useRef();
-	const isEndingEditWithFocusRef = useRef( false );
 
 	const settingsKeys = settings.map( ( { id } ) => id );
 
@@ -244,8 +243,6 @@ function LinkControl( {
 			wrapperNode.current;
 
 		nextFocusTarget.focus();
-
-		isEndingEditWithFocusRef.current = false;
 	}, [ isEditingLink, isCreatingPage ] );
 
 	// The component mounting reference is maintained separately
@@ -261,14 +258,9 @@ function LinkControl( {
 	const hasLinkValue = value?.url?.trim()?.length > 0;
 
 	/**
-	 * Cancels editing state and marks that focus may need to be restored after
-	 * the next render, if focus was within the wrapper when editing finished.
+	 * Cancels editing state.
 	 */
 	const stopEditing = () => {
-		isEndingEditWithFocusRef.current = !! wrapperNode.current?.contains(
-			wrapperNode.current.ownerDocument.activeElement
-		);
-
 		setIsEditingLink( false );
 	};
 
