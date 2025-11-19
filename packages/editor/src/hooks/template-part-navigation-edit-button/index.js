@@ -9,11 +9,7 @@ import {
 	BlockControls,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import {
-	ToolbarButton,
-	ToolbarGroup,
-	__experimentalDivider as Divider,
-} from '@wordpress/components';
+import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
 
@@ -97,14 +93,7 @@ function TemplatePartNavigationEditButton( { clientId } ) {
 
 	return (
 		<BlockControls group="other">
-			<ToolbarGroup>
-				{ /*
-				 * Add a vertical divider to visually separate the "Edit navigation"
-				 * button from the template part's "Edit" button. Both buttons share
-				 * the same toolbar group ("other"), so without this divider they
-				 * would appear directly adjacent with no visual separation.
-				 */ }
-				<Divider orientation="vertical" marginEnd={ 3 } />
+			<ToolbarGroup className="wp-block-template-part__navigation-edit-button">
 				<ToolbarButton
 					label={ __( 'Edit navigation' ) }
 					onClick={ onEditNavigation }
