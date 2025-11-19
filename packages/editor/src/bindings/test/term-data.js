@@ -247,7 +247,7 @@ describe( 'term-data bindings', () => {
 		} );
 
 		describe( 'for navigation blocks using block attributes', () => {
-			it( 'should use block attributes for navigation-link blocks', () => {
+			it( 'should use block attributes instead of context', () => {
 				const select = ( store ) => {
 					if ( store === blockEditorStore ) {
 						return {
@@ -280,10 +280,7 @@ describe( 'term-data bindings', () => {
 
 				const values = termDataBindings.getValues( {
 					select,
-					context: {
-						taxonomy: 'post_tag',
-						termId: 999,
-					},
+					context: {},
 					bindings: {
 						content: {
 							source: 'core/term-data',
