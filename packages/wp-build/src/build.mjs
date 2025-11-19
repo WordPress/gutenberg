@@ -17,6 +17,7 @@ import rtlcss from 'rtlcss';
 import cssnano from 'cssnano';
 import babel from 'esbuild-plugin-babel';
 import { camelCase } from 'change-case';
+import fs from 'node:fs';
 
 /**
  * Internal dependencies
@@ -244,6 +245,87 @@ function momentTimezoneAliasPlugin() {
 			} );
 		},
 	};
+}
+
+/**
+ * Post-process ESM output files to ensure fully specified relative import paths.
+ * Adds .js extensions or /index.js for directory imports as required by ESM spec.
+ *
+ * @param {string} outputPath Path to the output file to process.
+ * @return {Promise<void>}
+ */
+async function ensureFullySpecifiedImports( outputPath ) {
+	try {
+		const source = await readFile( outputPath, 'utf8' );
+		const outputDir = path.dirname( outputPath );
+
+		// Only process .js files
+		if ( ! outputPath.endsWith( '.js' ) ) {
+			return;
+		}
+
+		// Regex to match import/export statements with relative paths that lack extensions
+		// Matched:
+		//   from './path'        (no extension)
+		//   from './path.js'     (with extension)
+		//   from "../dir"        (directory)
+		const importRegex = /\bfrom\s+(['"`])(\.\.?\/)([^'"`;]+)\1/g;
+
+		const updated = source.replace(
+			importRegex,
+			( match, quote, relativePath, modulePath ) => {
+				// Skip if already has a file extension
+				if ( /\.[a-z]+$/i.test( modulePath ) ) {
+					return match;
+				}
+
+				// Resolve the full path
+				const fullPath = path.resolve(
+					outputDir,
+					relativePath,
+					modulePath
+				);
+
+				// Check if it's a directory with index.js
+				try {
+					const stat = fs.statSync( fullPath );
+					if ( stat.isDirectory() ) {
+						const indexPath = path.join( fullPath, 'index.js' );
+						if ( fs.statSync( indexPath ).isFile() ) {
+							// Directory with index.js - add /index.js
+							return `from ${ quote }${ relativePath }${ modulePath }/index.js${ quote }`;
+						}
+					}
+				} catch ( error ) {
+					// Path doesn't exist as directory - expected, continue to next check
+					// (ENOENT errors are normal when path doesn't exist)
+				}
+
+				// Check if it's a .js file
+				try {
+					const stat = fs.statSync( `${ fullPath }.js` );
+					if ( stat.isFile() ) {
+						// File exists, add .js extension
+						return `from ${ quote }${ relativePath }${ modulePath }.js${ quote }`;
+					}
+				} catch ( error ) {
+					// File doesn't exist with .js extension - expected, will return original import
+					// (ENOENT errors are normal when file doesn't exist)
+				}
+
+				// Return original import if nothing matched
+				return match;
+			}
+		);
+
+		if ( updated !== source ) {
+			await writeFile( outputPath, updated, 'utf8' );
+		}
+	} catch ( error ) {
+		console.warn(
+			`⚠️  Failed to process ESM imports in ${ outputPath }: ${ error.message }`
+		);
+	}
 }
 
 /**
@@ -576,6 +658,21 @@ async function bundlePackage( packageName, options = {} ) {
 	}
 
 	await Promise.all( builds );
+
+	// Post-process bundled ESM modules to ensure fully specified imports
+	if ( packageJson.wpScriptModuleExports ) {
+		const rootBuildModuleDir = path.join(
+			BUILD_DIR,
+			'modules',
+			packageName
+		);
+		const jsFiles = await glob(
+			normalizePath( path.join( rootBuildModuleDir, '*.js' ) )
+		);
+		await Promise.all(
+			jsFiles.map( ( file ) => ensureFullySpecifiedImports( file ) )
+		);
+	}
 
 	// Collect style metadata after builds complete (so asset files exist)
 	// Only register the main style.css file - complex cases handled manually in lib/client-assets.php
@@ -1089,6 +1186,16 @@ async function transpilePackage( packageName ) {
 
 	await Promise.all( builds );
 
+	// Post-process ESM build-module files to ensure fully specified imports
+	if ( packageJson.module ) {
+		const jsFiles = await glob(
+			normalizePath( path.join( buildModuleDir, '**/*.js' ) )
+		);
+		await Promise.all(
+			jsFiles.map( ( file ) => ensureFullySpecifiedImports( file ) )
+		);
+	}
+
 	await compileStyles( packageName );
 
 	return Date.now() - startTime;
@@ -1348,6 +1455,14 @@ async function buildRoute( routeName ) {
 
 		await unlink( tempEntryPath );
 	}
+
+	// Post-process route ESM files to ensure fully specified imports
+	const routeJsFiles = await glob(
+		normalizePath( path.join( outputDir, '*.js' ) )
+	);
+	await Promise.all(
+		routeJsFiles.map( ( file ) => ensureFullySpecifiedImports( file ) )
+	);
 
 	return Date.now() - startTime;
 }
