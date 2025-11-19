@@ -158,14 +158,6 @@ function BlockInspector() {
 			// Navigation blocks will show their own list view controls
 			const navigationChildren = new Set();
 
-			// Check if the selected block itself is a navigation block
-			if ( getBlockName( selectedBlockClientId ) === 'core/navigation' ) {
-				// If the selected block is navigation, exclude all its descendants
-				descendants.forEach( ( childId ) =>
-					navigationChildren.add( childId )
-				);
-			}
-
 			// Check for navigation blocks within descendants and exclude only their children
 			descendants.forEach( ( clientId ) => {
 				if ( getBlockName( clientId ) === 'core/navigation' ) {
