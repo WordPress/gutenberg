@@ -50,13 +50,13 @@ const FORM_CONTROLS: FormControls = {
 	toggleGroup,
 };
 
-export function isEditConfig( value: any ): value is EditConfig {
+function isEditConfig( value: any ): value is EditConfig {
 	return (
 		value && typeof value === 'object' && typeof value.control === 'string'
 	);
 }
 
-export function createConfiguredControl( config: EditConfig ) {
+function createConfiguredControl( config: EditConfig ) {
 	const { control, ...controlConfig } = config;
 	const BaseControlType = getControlByType( control );
 	if ( BaseControlType === null ) {
