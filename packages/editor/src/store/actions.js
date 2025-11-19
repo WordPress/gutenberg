@@ -274,6 +274,8 @@ export const savePost =
 		dispatch( { type: 'REQUEST_POST_UPDATE_FINISH', options } );
 
 		if (
+			typeof window !== 'undefined' &&
+			window.__experimentalTemplateActivate &&
 			! options.isAutosave &&
 			previousRecord.type === 'wp_template' &&
 			( typeof previousRecord.id === 'number' ||

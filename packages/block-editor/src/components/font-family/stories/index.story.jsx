@@ -49,7 +49,6 @@ export const Default = {
 				slug: 'system-font',
 			},
 		],
-		__nextHasNoMarginBottom: true,
 		__next40pxDefaultSize: true,
 	},
 };

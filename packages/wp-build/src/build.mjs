@@ -289,15 +289,23 @@ function resolveEntryPoint( packageDir, packageJson ) {
  * Bundle a package for WordPress using esbuild.
  *
  * @param {string} packageName Package name.
+ * @param {Object} options     Optional bundling options.
  * @return {Promise<boolean>} True if the package was bundled, false otherwise.
  */
-async function bundlePackage( packageName ) {
+async function bundlePackage( packageName, options = {} ) {
+	const {
+		sourceDir = PACKAGES_DIR,
+		handlePrefix = HANDLE_PREFIX,
+		scriptGlobal = SCRIPT_GLOBAL,
+		packageNamespace = PACKAGE_NAMESPACE,
+	} = options;
+
 	const builtModules = [];
 	const builtScripts = [];
 	const builtStyles = [];
-	const packageDir = path.join( PACKAGES_DIR, packageName );
+	const packageDir = path.join( sourceDir, packageName );
 	const packageJson = getPackageInfoFromFile(
-		path.join( PACKAGES_DIR, packageName, 'package.json' )
+		path.join( sourceDir, packageName, 'package.json' )
 	);
 
 	const builds = [];
@@ -310,12 +318,12 @@ async function bundlePackage( packageName ) {
 		// Check if package matches the namespace and should expose a global
 		const packageFullName = packageJson.name;
 		const matchesNamespace = packageFullName.startsWith(
-			`@${ PACKAGE_NAMESPACE }/`
+			`@${ packageNamespace }/`
 		);
-		const shouldExposeGlobal = matchesNamespace && SCRIPT_GLOBAL !== false;
+		const shouldExposeGlobal = matchesNamespace && scriptGlobal !== false;
 
 		const globalName = shouldExposeGlobal
-			? `${ SCRIPT_GLOBAL }.${ camelCase( packageName ) }`
+			? `${ scriptGlobal }.${ camelCase( packageName ) }`
 			: undefined;
 
 		const baseConfig = {
@@ -362,7 +370,7 @@ async function bundlePackage( packageName ) {
 		);
 
 		builtScripts.push( {
-			handle: `${ HANDLE_PREFIX }-${ packageName }`,
+			handle: `${ handlePrefix }-${ packageName }`,
 			path: `${ packageName }/index`,
 			asset: `${ packageName }/index.min.asset.php`,
 		} );
@@ -493,7 +501,7 @@ async function bundlePackage( packageName ) {
 
 	if ( packageJson.wpCopyFiles ) {
 		const { files, transforms = {} } = packageJson.wpCopyFiles;
-		const sourceDir = path.join( packageDir, 'src' );
+		const packageSourceDir = path.join( packageDir, 'src' );
 		const outputDir = path.join( BUILD_DIR, 'scripts', packageName );
 
 		for ( const filePattern of files ) {
@@ -502,7 +510,10 @@ async function bundlePackage( packageName ) {
 			);
 
 			for ( const sourceFile of matchedFiles ) {
-				const relativePath = path.relative( sourceDir, sourceFile );
+				const relativePath = path.relative(
+					packageSourceDir,
+					sourceFile
+				);
 				const destPath = path.join( outputDir, relativePath );
 				const destDir = path.dirname( destPath );
 
@@ -594,7 +605,7 @@ async function bundlePackage( packageName ) {
 		const styleDeps = await inferStyleDependencies( scriptDependencies );
 
 		builtStyles.push( {
-			handle: `${ HANDLE_PREFIX }-${ packageName }`,
+			handle: `${ handlePrefix }-${ packageName }`,
 			path: `${ packageName }/style`,
 			dependencies: styleDeps,
 		} );
@@ -1462,6 +1473,51 @@ async function buildAll() {
 			initModules: page.init,
 		};
 	} );
+
+	// Bundle boot, route, and theme packages from node_modules when pages exist
+	if ( pageData.length > 0 ) {
+		try {
+			const { createRequire } = await import( 'module' );
+			const require = createRequire( import.meta.url );
+
+			// Resolve the @wordpress packages directory from node_modules
+			const bootPackageJson = require.resolve(
+				'@wordpress/boot/package.json',
+				{ paths: [ ROOT_DIR ] }
+			);
+			const wordpressPackagesDir = path.dirname(
+				path.dirname( bootPackageJson )
+			);
+
+			// Bundle boot, route, theme, and private-apis packages
+			const externalPackages = [
+				'boot',
+				'route',
+				'theme',
+				'private-apis',
+			];
+			for ( const pkgName of externalPackages ) {
+				const result = await bundlePackage( pkgName, {
+					sourceDir: wordpressPackagesDir,
+					handlePrefix: 'wp',
+					scriptGlobal: 'wp',
+					packageNamespace: 'wordpress',
+				} );
+
+				if ( result && result.modules ) {
+					modules.push( ...result.modules );
+				}
+				if ( result && result.scripts ) {
+					scripts.push( ...result.scripts );
+				}
+			}
+		} catch ( error ) {
+			console.warn(
+				'\n⚠️  Warning: Could not bundle WordPress packages for pages:',
+				error.message
+			);
+		}
+	}
 
 	console.log( '\n📄 Generating PHP registration files...\n' );
 	const phpReplacements = await getPhpReplacements( ROOT_DIR );

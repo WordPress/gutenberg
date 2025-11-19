@@ -32,8 +32,17 @@
 	],
 	"main": "build/index.js",
 	"module": "build-module/index.js",
-	"react-native": "src/index",
-	"wpScript": true,
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.js",
+			"require": "./build/index.js"
+		},
+		"./package.json": "./package.json"
+	},
+	"wpScriptModuleExports": {
+		".": "./build-module/index.js"
+	},
 	"types": "build-types",
 	"dependencies": {
 		"@wordpress/api-fetch": "file:../api-fetch",

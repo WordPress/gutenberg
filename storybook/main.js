@@ -28,16 +28,16 @@ const scssLoaders = ( { isLazy } ) => [
 ];
 
 const stories = [
-	process.env.NODE_ENV !== 'test' && './stories/**/*.story.@(js|tsx)',
+	process.env.NODE_ENV !== 'test' && './stories/**/*.story.@(jsx|tsx)',
 	process.env.NODE_ENV !== 'test' && './stories/**/*.mdx',
-	'../packages/block-editor/src/**/stories/*.story.@(js|tsx|mdx)',
-	'../packages/components/src/**/stories/*.story.@(js|tsx)',
+	'../packages/block-editor/src/**/stories/*.story.@(js|jsx|tsx|mdx)',
+	'../packages/components/src/**/stories/*.story.@(jsx|tsx)',
 	'../packages/components/src/**/stories/*.mdx',
-	'../packages/icons/src/**/stories/*.story.@(js|tsx|mdx)',
-	'../packages/edit-site/src/**/stories/*.story.@(js|tsx|mdx)',
-	'../packages/global-styles-ui/src/**/stories/*.story.@(js|tsx|mdx)',
-	'../packages/dataviews/src/**/stories/*.story.@(js|tsx|mdx)',
-	'../packages/fields/src/**/stories/*.story.@(js|tsx|mdx)',
+	'../packages/icons/src/**/stories/*.story.@(jsx|tsx|mdx)',
+	'../packages/edit-site/src/**/stories/*.story.@(jsx|tsx|mdx)',
+	'../packages/global-styles-ui/src/**/stories/*.story.@(jsx|tsx|mdx)',
+	'../packages/dataviews/src/**/stories/*.story.@(jsx|tsx|mdx)',
+	'../packages/fields/src/**/stories/*.story.@(jsx|tsx|mdx)',
 	'../packages/theme/src/**/stories/*.story.@(tsx|mdx)',
 	'../packages/ui/src/**/stories/*.story.@(ts|tsx)',
 ].filter( Boolean );

@@ -21,7 +21,12 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 
 import { unlock } from '../lock-unlock';
-import { getItemTitle, isTemplatePart } from './utils';
+import {
+	getItemTitle,
+	isTemplateRemovable,
+	isTemplate,
+	isTemplatePart,
+} from './utils';
 import type { CoreDataError, PostWithPermissions } from '../types';
 
 // Patterns.
@@ -37,18 +42,32 @@ const renamePost: Action< PostWithPermissions > = {
 		}
 
 		// Non-database template cannot be edited.
-		if ( post.type === 'wp_template' && typeof post.id === 'string' ) {
+		if (
+			post.type === 'wp_template' &&
+			typeof post.id === 'string' &&
+			window?.__experimentalTemplateActivate
+		) {
 			return false;
 		}
 
+		const specialChecks = [ 'wp_template', 'wp_template_part' ];
+
+		if ( ! window?.__experimentalTemplateActivate ) {
+			specialChecks.push( 'wp_template' );
+		}
+
 		// Templates, template parts and patterns have special checks for renaming.
-		if (
-			! [
-				'wp_template_part',
-				...Object.values( PATTERN_TYPES ),
-			].includes( post.type )
-		) {
+		if ( ! specialChecks.includes( post.type ) ) {
 			return post.permissions?.update;
+		}
+
+		// In the case of templates, we can only rename custom templates.
+		if ( isTemplate( post ) && ! window?.__experimentalTemplateActivate ) {
+			return (
+				isTemplateRemovable( post ) &&
+				post.is_custom &&
+				post.permissions?.update
+			);
 		}
 
 		if ( isTemplatePart( post ) ) {

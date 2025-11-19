@@ -213,7 +213,11 @@ Properties:
 -   `showMedia`: Whether the media should be shown in the UI. `true` by default.
 -   `showDescription`: Whether the description should be shown in the UI. `true` by default.
 -   `showLevels`: Whether to display the hierarchical levels for the data. `false` by default. See related `getItemLevel` DataView prop.
--   `groupByField`: The id of the field used for grouping the dataset. Supported by the `grid` and `table` layouts.
+-   `groupBy`:
+
+    -   `field`: the field used for grouping the dataset.
+    -   `direction`: the direction to use for sorting the groups, one of `asc` or `desc`. Default `asc`.
+
 -   `fields`: a list of remaining field `id` that are visible in the UI and the specific order in which they are displayed.
 -   `layout`: config that is specific to a particular layout type.
 
@@ -600,6 +604,7 @@ Same as `DataViews`. Callback executed when the view has changed.
 A list of actions that can be performed on the dataset. See "Actions API" for more details.
 
 **Important differences from `DataViews`:**
+
 -   Only `callback` style actions are supported. `RenderModal` is unsupported.
 -   The `isEligible` callback for actions is unsupported.
 -   The `isPrimary` option is used to render a `primary` variant of `Button`.
@@ -1856,6 +1861,7 @@ When no summary fields are explicitly configured, the panel automatically determ
 4. If no field definition is found, return empty summary fields
 
 For example:
+
 ```js
 {
 	id: 'field_id',

@@ -5,6 +5,7 @@ import { _x, __ } from '@wordpress/i18n';
 import { customLink as linkIcon } from '@wordpress/icons';
 import { InnerBlocks } from '@wordpress/block-editor';
 import { addFilter } from '@wordpress/hooks';
+import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -15,6 +16,9 @@ import edit from './edit';
 import save from './save';
 import { enhanceNavigationLinkVariations } from './hooks';
 import transforms from './transforms';
+import { unlock } from '../lock-unlock';
+
+const { fieldsKey } = unlock( blocksPrivateApis );
 
 const { name } = metadata;
 
@@ -90,7 +94,7 @@ export const settings = {
 };
 
 if ( window.__experimentalContentOnlyPatternInsertion ) {
-	settings.fields = [
+	settings[ fieldsKey ] = [
 		{
 			label: __( 'Label' ),
 			type: 'RichText',
