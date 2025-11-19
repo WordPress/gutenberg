@@ -75,6 +75,7 @@ export default function useFocusOnMount( focusOnMount = 'firstElement' ) {
 		timerIdRef.current = setTimeout( () => {
 			// For 'firstInputElement' mode, try to find a form input element first
 			if ( focusOnMountRef.current === 'firstInputElement' ) {
+				/** @type {HTMLElement | null} */
 				let formInput = null;
 				if ( node instanceof Element ) {
 					formInput = node.querySelector(
