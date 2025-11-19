@@ -5,32 +5,27 @@
 	// Add a vertical divider before the button to visually separate it
 	// from the template part's "Edit" button.
 	&::before {
-		border: 0;
-		margin: 0;
 		display: inline;
-		border-right: 1px solid currentColor;
-		height: auto;
 		width: 0;
-		margin-right: calc(4px * 3);
+		height: auto;
+		border-right: 1px solid currentColor;
+		margin-right: $grid-unit-15;
 		content: "";
 	}
 
 	// In top toolbar mode, match the divider styling used in the collapsible block toolbar.
 	.editor-collapsible-block-toolbar & {
 		position: relative;
-		margin-left: 6px;
+		margin-left: 0.75 * $grid-unit;
 		padding-right: 0;
 
 		&::before {
-			width: $border-width;
 			height: $grid-unit-30;
-			background-color: $gray-300;
-			border-right: 0;
+			border-right: $border-width solid $gray-300;
 			top: $grid-unit-05;
 			position: absolute;
 			left: -$border-width;
 			right: auto;
-			// margin-right: 0;
 		}
 	}
 }
