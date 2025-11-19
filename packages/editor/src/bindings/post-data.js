@@ -63,34 +63,22 @@ export default {
 			postId
 		);
 
-		// If there's no data for the entity, we return field labels instead.
-		if ( ! entityDataValues ) {
-			const newValues = {};
-			for ( const [ attributeName, binding ] of Object.entries(
-				bindings
-			) ) {
-				const postDataField = postDataFields.find(
-					( field ) => field.args.field === binding.args.field
-				);
-				if ( postDataField ) {
-					newValues[ attributeName ] = postDataField.label;
-				} else {
-					newValues[ attributeName ] = binding.args.field;
-				}
-			}
-			return newValues;
-		}
-
-		const allowedFields = postDataFields.map(
-			( field ) => field.args.field
-		);
 		const newValues = {};
 		for ( const [ attributeName, binding ] of Object.entries( bindings ) ) {
-			if ( allowedFields.includes( binding.args.field ) ) {
+			const postDataField = postDataFields.find(
+				( field ) => field.args.field === binding.args.field
+			);
+
+			if ( ! postDataField ) {
+				// If the field is unknown, return the field name.
+				newValues[ attributeName ] = binding.args.field;
+			} else if ( ! entityDataValues ) {
+				// If the entity data does not exist, return the field label.
+				newValues[ attributeName ] = postDataField.label;
+			} else {
+				// If the entity data exists, return the entity value.
 				newValues[ attributeName ] =
 					entityDataValues[ binding.args.field ];
-			} else {
-				newValues[ attributeName ] = binding.args.field;
 			}
 		}
 		return newValues;
