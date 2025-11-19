@@ -92,7 +92,7 @@ export default function Media( { data, field } ) {
 	const { allowedTypes = [], multiple = false } = config;
 
 	// For custom Edit components, we need to call updateBlockAttributes directly
-	const { clientId, updateBlockAttributes } = field;
+	const { clientId, updateBlockAttributes, fieldDef } = field;
 	const updateAttributes = ( newFieldValue ) => {
 		const mappedChanges = field.setValue( {
 			item: data,
@@ -101,9 +101,9 @@ export default function Media( { data, field } ) {
 		updateBlockAttributes( clientId, mappedChanges );
 	};
 
-	// Check if featured image is supported by checking if it's in the value
-	// Cover block uses 'featuredImage' as the field property name
-	const hasFeaturedImageSupport = 'featuredImage' in value;
+	// Check if featured image is supported by checking if it's in the mapping
+	const hasFeaturedImageSupport =
+		fieldDef?.mapping && 'featuredImage' in fieldDef.mapping;
 
 	const id = value?.id;
 	const src = value?.src || value?.url;
@@ -153,7 +153,7 @@ export default function Media( { data, field } ) {
 				multiple={ multiple }
 				popoverProps={ popoverProps }
 				onReset={ () => {
-					// Reset to empty/cleared values
+					// Build reset value dynamically based on mapping
 					const resetValue = {
 						id: undefined,
 						src: undefined,
@@ -161,10 +161,12 @@ export default function Media( { data, field } ) {
 						caption: '',
 						alt: '',
 					};
-					// Turn off featured image when resetting
+
+					// Turn off featured image when resetting (only if it's in the mapping)
 					if ( hasFeaturedImageSupport ) {
 						resetValue.featuredImage = false;
 					}
+
 					// Merge with existing value to preserve other field properties
 					updateAttributes( { ...value, ...resetValue } );
 				} }
@@ -193,26 +195,47 @@ export default function Media( { data, field } ) {
 							}
 						}
 
-						const newValue = {
-							id: selectedMedia.id,
-							src: selectedMedia.url,
-							url: selectedMedia.url,
-							type: mediaType,
-						};
+						// Build new value dynamically based on what's in the mapping
+						const newValue = {};
 
-						// Capture mediaLink
-						if ( selectedMedia.link ) {
-							newValue.link = selectedMedia.link;
-						}
-
-						if ( ! value?.caption && selectedMedia.caption ) {
-							newValue.caption = selectedMedia.caption;
-						}
-						if ( ! value?.alt && selectedMedia.alt ) {
-							newValue.alt = selectedMedia.alt;
-						}
-						if ( selectedMedia.poster ) {
-							newValue.poster = selectedMedia.poster;
+						// Iterate over mapping keys and set values for supported properties
+						if ( fieldDef?.mapping ) {
+							Object.keys( fieldDef.mapping ).forEach(
+								( key ) => {
+									if ( key === 'id' ) {
+										newValue[ key ] = selectedMedia.id;
+									} else if (
+										key === 'src' ||
+										key === 'url'
+									) {
+										newValue[ key ] = selectedMedia.url;
+									} else if ( key === 'type' ) {
+										newValue[ key ] = mediaType;
+									} else if (
+										key === 'link' &&
+										selectedMedia.link
+									) {
+										newValue[ key ] = selectedMedia.link;
+									} else if (
+										key === 'caption' &&
+										! value?.caption &&
+										selectedMedia.caption
+									) {
+										newValue[ key ] = selectedMedia.caption;
+									} else if (
+										key === 'alt' &&
+										! value?.alt &&
+										selectedMedia.alt
+									) {
+										newValue[ key ] = selectedMedia.alt;
+									} else if (
+										key === 'poster' &&
+										selectedMedia.poster
+									) {
+										newValue[ key ] = selectedMedia.poster;
+									}
+								}
+							);
 						}
 
 						// Turn off featured image when manually selecting media

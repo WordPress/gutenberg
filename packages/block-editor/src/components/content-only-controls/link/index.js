@@ -74,7 +74,7 @@ export default function Link( { data, field } ) {
 	} );
 
 	// For custom Edit components, we need to call updateBlockAttributes directly
-	const { clientId, updateBlockAttributes } = field;
+	const { clientId, updateBlockAttributes, fieldDef } = field;
 	const updateAttributes = ( newValue ) => {
 		const mappedChanges = field.setValue( { item: data, value: newValue } );
 		updateBlockAttributes( clientId, mappedChanges );
@@ -147,17 +147,52 @@ export default function Link( { data, field } ) {
 								...newValues,
 							} );
 
-							updateAttributes( {
-								...value,
-								href: updatedAttrs.url,
-								url: updatedAttrs.url,
-								rel: updatedAttrs.rel,
-								target: updatedAttrs.linkTarget,
-								linkTarget: updatedAttrs.linkTarget,
-							} );
+							// Build update object dynamically based on what's in the mapping
+							const updateValue = { ...value };
+
+							if ( fieldDef?.mapping ) {
+								Object.keys( fieldDef.mapping ).forEach(
+									( key ) => {
+										if ( key === 'href' || key === 'url' ) {
+											updateValue[ key ] =
+												updatedAttrs.url;
+										} else if ( key === 'rel' ) {
+											updateValue[ key ] =
+												updatedAttrs.rel;
+										} else if (
+											key === 'target' ||
+											key === 'linkTarget'
+										) {
+											updateValue[ key ] =
+												updatedAttrs.linkTarget;
+										}
+									}
+								);
+							}
+
+							updateAttributes( updateValue );
 						} }
 						onRemove={ () => {
-							updateAttributes( {} );
+							// Remove all link-related properties based on what's in the mapping
+							const removeValue = {};
+
+							if ( fieldDef?.mapping ) {
+								Object.keys( fieldDef.mapping ).forEach(
+									( key ) => {
+										if (
+											key === 'href' ||
+											key === 'url' ||
+											key === 'rel' ||
+											key === 'target' ||
+											key === 'linkTarget'
+										) {
+											removeValue[ key ] = undefined;
+										}
+									}
+								);
+							}
+
+							updateAttributes( removeValue );
 						} }
 					/>
 				</Popover>

@@ -38,6 +38,88 @@ const CONTROLS = {
 	link: Link,
 };
 
+/**
+ * Normalize a media value to a canonical structure.
+ * Ensures all expected properties exist, even if not in the mapping.
+ *
+ * @param {Object} value - The mapped value from the block attributes
+ * @return {Object} Normalized media value with all properties
+ */
+function normalizeMediaValue( value ) {
+	return {
+		id: value?.id ?? null,
+		src: value?.src ?? '',
+		url: value?.url ?? value?.src ?? '', // url falls back to src
+		caption: value?.caption ?? '',
+		alt: value?.alt ?? '',
+		type: value?.type ?? 'image',
+		poster: value?.poster ?? '',
+		featuredImage: value?.featuredImage ?? false,
+		link: value?.link ?? '',
+	};
+}
+
+/**
+ * Denormalize a media value from canonical structure back to mapped keys.
+ * Only includes properties that are present in the field's mapping.
+ *
+ * @param {Object} value    - The normalized media value
+ * @param {Object} fieldDef - The field definition containing the mapping
+ * @return {Object} Value with only mapped properties
+ */
+function denormalizeMediaValue( value, fieldDef ) {
+	if ( ! fieldDef.mapping ) {
+		return value;
+	}
+
+	const result = {};
+	Object.entries( fieldDef.mapping ).forEach( ( [ key ] ) => {
+		if ( key in value ) {
+			result[ key ] = value[ key ];
+		}
+	} );
+	return result;
+}
+
+/**
+ * Normalize a link value to a canonical structure.
+ * Ensures all expected properties exist, even if not in the mapping.
+ *
+ * @param {Object} value - The mapped value from the block attributes
+ * @return {Object} Normalized link value with all properties
+ */
+function normalizeLinkValue( value ) {
+	return {
+		href: value?.href ?? value?.url ?? '',
+		url: value?.url ?? value?.href ?? '', // url falls back to href
+		rel: value?.rel ?? '',
+		target: value?.target ?? value?.linkTarget ?? '',
+		linkTarget: value?.linkTarget ?? value?.target ?? '',
+	};
+}
+
+/**
+ * Denormalize a link value from canonical structure back to mapped keys.
+ * Only includes properties that are present in the field's mapping.
+ *
+ * @param {Object} value    - The normalized link value
+ * @param {Object} fieldDef - The field definition containing the mapping
+ * @return {Object} Value with only mapped properties
+ */
+function denormalizeLinkValue( value, fieldDef ) {
+	if ( ! fieldDef.mapping ) {
+		return value;
+	}
+
+	const result = {};
+	Object.entries( fieldDef.mapping ).forEach( ( [ key ] ) => {
+		if ( key in value ) {
+			result[ key ] = value[ key ];
+		}
+	} );
+	return result;
+}
+
 function BlockFields( { clientId } ) {
 	const { attributes, blockType } = useSelect(
 		( select ) => {
@@ -101,28 +183,53 @@ function BlockFields( { clientId } ) {
 				// getValue and setValue handle the mapping to block attributes
 				getValue: ( { item } ) => {
 					if ( fieldDef.mapping ) {
-						// For complex mappings, return an object with all mapped properties
-						const value = {};
+						// Extract mapped properties from the block attributes
+						const mappedValue = {};
 						Object.entries( fieldDef.mapping ).forEach(
 							( [ key, attrKey ] ) => {
-								value[ key ] = item[ attrKey ];
+								mappedValue[ key ] = item[ attrKey ];
 							}
 						);
-						return value;
+
+						// Normalize to canonical structure based on field type
+						if ( fieldDef.type === 'media' ) {
+							return normalizeMediaValue( mappedValue, fieldDef );
+						}
+						if ( fieldDef.type === 'link' ) {
+							return normalizeLinkValue( mappedValue, fieldDef );
+						}
+
+						// For other types, return as-is
+						return mappedValue;
 					}
 					// For simple id-based fields, use the id as the attribute key
 					return item[ fieldDef.id ];
 				},
 				setValue: ( { item, value } ) => {
 					if ( fieldDef.mapping ) {
+						// Denormalize from canonical structure back to mapped keys
+						let denormalizedValue = value;
+						if ( fieldDef.type === 'media' ) {
+							denormalizedValue = denormalizeMediaValue(
+								value,
+								fieldDef
+							);
+						} else if ( fieldDef.type === 'link' ) {
+							denormalizedValue = denormalizeLinkValue(
+								value,
+								fieldDef
+							);
+						}
+
 						// Build an object with all mapped attributes
 						const updates = {};
 						Object.entries( fieldDef.mapping ).forEach(
 							( [ key, attrKey ] ) => {
 								// If key is explicitly in value, use it (even if undefined to allow clearing)
 								// Otherwise, preserve the old value
-								if ( key in value ) {
-									updates[ attrKey ] = value[ key ];
+								if ( key in denormalizedValue ) {
+									updates[ attrKey ] =
+										denormalizedValue[ key ];
 								} else {
 									updates[ attrKey ] = item[ attrKey ];
 								}
