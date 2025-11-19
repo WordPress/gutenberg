@@ -288,8 +288,11 @@ async function ensureFullySpecifiedImports( outputPath ) {
 				return;
 			}
 
-			// Only process relative imports
-			if ( /^\.\.?\//.test( sourceNode.value ) ) {
+			// Only process relative imports (including '.', '..', './path', '../path')
+			// The pattern matches:
+			//   . or .. - current/parent directory (less common but valid ESM)
+			//   ./ or ../ - explicit relative path prefix
+			if ( /^\.\.?(?:\/|$)/.test( sourceNode.value ) ) {
 				// Get string content position (excludes quotes)
 				// sourceNode.start includes the quote, so add 1 to get the content start
 				const contentStart = sourceNode.start + 1;
@@ -327,8 +330,10 @@ async function ensureFullySpecifiedImports( outputPath ) {
 				continue;
 			}
 
-			// Resolve the full path
-			const fullPath = path.resolve( outputDir, imp.original );
+			// Normalize edge cases: '.' and '..' should become './' and '../'
+			// This ensures they resolve correctly and can be treated uniformly
+			const normalizedPath = imp.original.replace( /^(\.)($|\/)/, '$1/' );
+			const fullPath = path.resolve( outputDir, normalizedPath );
 
 			let newPath = null;
 
@@ -340,7 +345,7 @@ async function ensureFullySpecifiedImports( outputPath ) {
 					try {
 						await stat( indexPath );
 						// Directory with index.js - add /index.js
-						newPath = `${ imp.original }/index.js`;
+						newPath = `${ normalizedPath }/index.js`;
 					} catch {
 						// index.js doesn't exist, skip this import
 					}
@@ -354,7 +359,7 @@ async function ensureFullySpecifiedImports( outputPath ) {
 				try {
 					await stat( `${ fullPath }.js` );
 					// File exists, add .js extension
-					newPath = `${ imp.original }.js`;
+					newPath = `${ normalizedPath }.js`;
 				} catch {
 					// File doesn't exist with .js extension, skip this import
 				}
