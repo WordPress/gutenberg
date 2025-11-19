@@ -340,10 +340,11 @@ export default function NavigationLinkEdit( {
 
 	// Handle link UI when a new link is created
 	useEffect( () => {
-		// We know if a link was just created if:
+		// We know if a link was just created from our link UI if
 		// 1. isNewLink.current is true
 		// 2. url has a value
-		if ( ! isNewLink.current || ! url ) {
+		// 3. isLinkOpen is true
+		if ( ! isNewLink.current || ! url || ! isLinkOpen ) {
 			return;
 		}
 
@@ -352,11 +353,7 @@ export default function NavigationLinkEdit( {
 
 		// We just created a link and the block is now selected.
 		// If the label looks like a URL, focus and select the label text.
-		if (
-			isURL( prependHTTP( label ) ) &&
-			/^.+\.[a-z]+/.test( label ) &&
-			isLinkOpen
-		) {
+		if ( isURL( prependHTTP( label ) ) && /^.+\.[a-z]+/.test( label ) ) {
 			// Focus and select the label text.
 			selectLabelText();
 		} else {
