@@ -149,7 +149,7 @@ describe( 'post-data bindings', () => {
 		it( 'should return the list of available post data fields when a Navigation block with id and type attributes is selected', () => {
 			const select = () => ( {
 				getSelectedBlockClientId: () => '123abc456',
-				getBlockName: () => 'core/post-date',
+				getBlockName: () => 'core/navigation-link',
 				getBlockAttributes: () => ( {
 					id: 123,
 					type: 'post',
@@ -157,7 +157,6 @@ describe( 'post-data bindings', () => {
 			} );
 
 			const fields = postDataBindings.getFieldsList( {
-				context: { postId: 123, postType: 'post' },
 				select,
 			} );
 
