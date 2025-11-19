@@ -56,10 +56,6 @@ export default {
 	name: 'core/term-data',
 	usesContext: [ 'taxonomy', 'termId', 'termData' ],
 	getValues( { select, context, bindings, clientId } ) {
-		const allowedFields = termDataFields.map(
-			( field ) => field.args.field
-		);
-
 		/*
 		 * BACKWARDS COMPATIBILITY: Hardcoded exception for navigation blocks.
 		 * Required for WordPress 6.9+ navigation blocks. DO NOT REMOVE.
@@ -100,16 +96,21 @@ export default {
 
 		const newValues = {};
 		for ( const [ attributeName, binding ] of Object.entries( bindings ) ) {
-			if ( ! allowedFields.includes( binding.args.field ) ) {
-				newValues[ attributeName ] = binding.args.field;
-				continue;
-			}
+			const termDataField = termDataFields.find(
+				( field ) => field.args.field === binding.args.field
+			);
 
-			newValues[ attributeName ] =
-				termDataValues?.[ binding.args.field ] ??
-				termDataFields.find(
-					( field ) => field.args.field === binding.args.field
-				).label;
+			if ( ! termDataField ) {
+				// If the field is unknown, return the field name.
+				newValues[ attributeName ] = binding.args.field;
+			} else if ( ! termDataValues ) {
+				// If the term data does not exist, return the field label.
+				newValues[ attributeName ] = termDataField.label;
+			} else {
+				// If the term data exists, return the term data value.
+				newValues[ attributeName ] =
+					termDataValues[ binding.args.field ];
+			}
 		}
 		return newValues;
 	},
