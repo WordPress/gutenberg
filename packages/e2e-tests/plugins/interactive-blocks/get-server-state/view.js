@@ -18,12 +18,11 @@ const { state } = store( 'test/get-server-state', {
 			yield actions.navigate( e.target.href );
 		} ),
 		attemptModification() {
-			try {
-				getServerState().prop = 'updated from client';
-				getContext().result = 'unexpectedly modified ❌';
-			} catch ( e ) {
-				getContext().result = 'not modified ✅';
-			}
+			getServerState().prop = 'updated from client';
+			getContext().result =
+				getServerState().prop === 'updated from client'
+					? 'unexpectedly modified ❌'
+					: 'not modified ✅';
 		},
 		updateNonChanging() {
 			state.nonChanging = 'modified from client';
