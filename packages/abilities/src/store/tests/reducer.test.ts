@@ -17,7 +17,6 @@ describe( 'Store Reducer', () => {
 	describe( 'abilitiesByName', () => {
 		const defaultState = {};
 
-
 		describe( 'REGISTER_ABILITY', () => {
 			it( 'should add ability to the state', () => {
 				const ability = {

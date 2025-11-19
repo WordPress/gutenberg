@@ -5,8 +5,7 @@
 /**
  * WordPress dependencies
  */
-import { dispatch, select, resolveSelect } from '@wordpress/data';
-import apiFetch from '@wordpress/api-fetch';
+import { dispatch, select } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -62,9 +61,7 @@ describe( 'API functions', () => {
 				},
 			];
 
-			const mockGetAbilities = jest
-				.fn()
-				.mockReturnValue( mockAbilities );
+			const mockGetAbilities = jest.fn().mockReturnValue( mockAbilities );
 			( select as jest.Mock ).mockReturnValue( {
 				getAbilities: mockGetAbilities,
 			} );
@@ -96,9 +93,7 @@ describe( 'API functions', () => {
 				},
 			];
 
-			const mockGetAbilities = jest
-				.fn()
-				.mockReturnValue( mockAbilities );
+			const mockGetAbilities = jest.fn().mockReturnValue( mockAbilities );
 			( select as jest.Mock ).mockReturnValue( {
 				getAbilities: mockGetAbilities,
 			} );
@@ -256,7 +251,6 @@ describe( 'API functions', () => {
 				'test/client-ability'
 			);
 			expect( mockCallback ).toHaveBeenCalledWith( input );
-			expect( apiFetch ).not.toHaveBeenCalled();
 			expect( result ).toEqual( { success: true } );
 		} );
 

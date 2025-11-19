@@ -24,7 +24,6 @@ import type {
 } from '../../types';
 
 describe( 'Store Actions', () => {
-
 	describe( 'registerAbility', () => {
 		let mockSelect: any;
 		let mockDispatch: jest.Mock;
@@ -195,9 +194,7 @@ describe( 'Store Actions', () => {
 
 			expect( () =>
 				action( { select: mockSelect, dispatch: mockDispatch } )
-			).toThrow(
-				'Ability "test/ability" must have a description'
-			);
+			).toThrow( 'Ability "test/ability" must have a description' );
 			expect( mockDispatch ).not.toHaveBeenCalled();
 		} );
 
@@ -696,9 +693,7 @@ describe( 'Store Actions', () => {
 
 			expect( () =>
 				action( { select: mockSelect, dispatch: mockDispatch } )
-			).toThrow(
-				'Category "test-category" is already registered.'
-			);
+			).toThrow( 'Category "test-category" is already registered.' );
 			expect( mockDispatch ).not.toHaveBeenCalled();
 		} );
 
