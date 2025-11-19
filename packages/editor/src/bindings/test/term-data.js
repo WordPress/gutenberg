@@ -49,7 +49,7 @@ describe( 'term-data bindings', () => {
 				};
 			} );
 
-			it( 'should return entity field values when they exist', () => {
+			it( 'should return entity field values when they exist, and field name for unknown fields', () => {
 				const values = termDataBindings.getValues( {
 					select,
 					context: {
@@ -85,6 +85,10 @@ describe( 'term-data bindings', () => {
 							source: 'core/term-data',
 							args: { field: 'count' },
 						},
+						content: {
+							source: 'core/term-data',
+							args: { field: 'unknown' },
+						},
 					},
 					clientId: '123abc456',
 				} );
@@ -97,6 +101,7 @@ describe( 'term-data bindings', () => {
 					description: 'All about technology',
 					parent: 0,
 					count: '(42)',
+					content: 'unknown',
 				} );
 			} );
 
@@ -149,25 +154,6 @@ describe( 'term-data bindings', () => {
 					parent: 'parent',
 					count: 'count',
 				} );
-			} );
-
-			it( 'should fall back to field key for unknown fields', () => {
-				const values = termDataBindings.getValues( {
-					select,
-					context: {
-						taxonomy: 'category',
-						termId: 123,
-					},
-					bindings: {
-						content: {
-							source: 'core/term-data',
-							args: { field: 'unknown' },
-						},
-					},
-					clientId: '123abc456',
-				} );
-
-				expect( values.content ).toBe( 'unknown' );
 			} );
 		} );
 
