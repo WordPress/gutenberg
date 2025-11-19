@@ -42,7 +42,7 @@ describe( 'term-data bindings', () => {
 										count: 42,
 									};
 								}
-								return null;
+								return undefined;
 							},
 						};
 					}
