@@ -97,15 +97,15 @@ export default class InteractivityUtils {
 
 	async activatePlugins() {
 		await this.requestUtils.activateTheme( 'emptytheme' );
-		await this.requestUtils.activatePlugin(
-			'gutenberg-test-interactive-blocks'
-		);
+		// await this.requestUtils.activatePlugin(
+		// 	'gutenberg-test-interactive-blocks'
+		// );
 	}
 
 	async deactivatePlugins() {
 		await this.requestUtils.activateTheme( 'twentytwentyone' );
-		await this.requestUtils.deactivatePlugin(
-			'gutenberg-test-interactive-blocks'
-		);
+		// await this.requestUtils.deactivatePlugin(
+		// 	'gutenberg-test-interactive-blocks'
+		// );
 	}
 }
