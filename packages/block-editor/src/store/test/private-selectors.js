@@ -843,7 +843,7 @@ describe( 'private selectors', () => {
 			expect( isRemoveLockedBlock( state, 'block-1' ) ).toBe( false );
 		} );
 
-		it( 'should prioritize templateLock "all" over block lock', () => {
+		it( 'should prioritize templateLock over a block lock of `false`', () => {
 			const state = createState( 'all', { remove: false } );
 			expect( isRemoveLockedBlock( state, 'block-1' ) ).toBe( true );
 		} );
