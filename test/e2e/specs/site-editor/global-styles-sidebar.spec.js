@@ -40,10 +40,5 @@ test.describe( 'Global styles sidebar', () => {
 		await expect(
 			page.getByRole( 'button', { name: 'Heading', exact: true } )
 		).toBeVisible();
-		await expect(
-			page.getByRole( 'button', {
-				name: 'Table of Contents',
-			} )
-		).toBeVisible();
 	} );
 } );

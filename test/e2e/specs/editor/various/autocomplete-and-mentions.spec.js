@@ -549,6 +549,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 	test( 'should allow speaking number of initial results', async ( {
 		page,
 		editor,
+		isGutenbergPluginActive,
 	} ) => {
 		await editor.canvas
 			.locator( 'role=button[name="Add default block"i]' )
@@ -571,7 +572,10 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		// Get the assertive live region screen reader announcement.
 		await expect(
 			page.getByText(
-				'3 results found, use up and down arrow keys to navigate.'
+				`${
+					// Minus the Table of Contents block.
+					isGutenbergPluginActive ? '3' : '2'
+				} results found, use up and down arrow keys to navigate.`
 			)
 		).toBeVisible();
 	} );

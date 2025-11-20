@@ -291,9 +291,15 @@ test.describe( 'Page List', () => {
 		};
 
 		test.beforeAll( async ( { requestUtils } ) => {
-			await requestUtils.setGutenbergExperiments( [
-				'gutenberg-quick-edit-dataviews',
-			] );
+			const experimentsAvailable =
+				await requestUtils.setGutenbergExperiments( [
+					'gutenberg-quick-edit-dataviews',
+				] );
+			// eslint-disable-next-line playwright/no-skipped-test
+			test.skip(
+				! experimentsAvailable,
+				'Gutenberg experiments not available (plugin may not be active)'
+			);
 		} );
 
 		test.beforeEach( async ( { admin, page } ) => {
