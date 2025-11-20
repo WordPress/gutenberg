@@ -793,7 +793,7 @@ export function isRemoveLockedBlock( state, clientId ) {
 	// While `contentOnly` templateLock does sometimes prevent removal, a user can't modify
 	// this, so don't include it in this function. See the `canRemoveBlock` selector
 	// as an alternative.
-	if ( templateLock === 'all' ) {
+	if ( templateLock === 'all' || templateLock === 'insert' ) {
 		return true;
 	}
 

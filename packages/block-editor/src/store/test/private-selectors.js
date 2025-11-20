@@ -823,6 +823,11 @@ describe( 'private selectors', () => {
 			expect( isRemoveLockedBlock( state, 'block-1' ) ).toBe( true );
 		} );
 
+		it( 'should return true when parent has templateLock set to "insert"', () => {
+			const state = createState( 'insert', null );
+			expect( isRemoveLockedBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
 		it( 'should return false when parent has templateLock set to "contentOnly"', () => {
 			const state = createState( 'contentOnly', null );
 			expect( isRemoveLockedBlock( state, 'block-1' ) ).toBe( false );
