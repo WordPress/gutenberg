@@ -3870,7 +3870,73 @@ class WP_Theme_JSON_Gutenberg {
 		// Ensure indirect properties not included in any `PRESETS_METADATA` value are allowed.
 		static::remove_indirect_properties( $input, $output );
 
+		// Preserve all valid settings that aren't presets or indirect properties.
+		static::preserve_valid_settings( $input, $output );
+
 		return $output;
+	}
+
+	/**
+	 * Preserves valid settings from VALID_SETTINGS that aren't presets or indirect CSS properties.
+	 *
+	 * @since 7.0.0
+	 *
+	 * @param array $input  Node to process.
+	 * @param array $output The processed node. Passed by reference.
+	 */
+	private static function preserve_valid_settings( $input, &$output ) {
+		// Get preset paths to exclude them.
+		$preset_paths = array();
+		foreach ( static::PRESETS_METADATA as $preset_metadata ) {
+			$preset_paths[] = $preset_metadata['path'];
+		}
+
+		// Get indirect property paths to exclude them.
+		$indirect_paths = array();
+		foreach ( static::INDIRECT_PROPERTIES_METADATA as $paths ) {
+			foreach ( $paths as $path ) {
+				$indirect_paths[] = $path;
+			}
+		}
+
+		// Preserve all valid settings.
+		foreach ( static::VALID_SETTINGS as $key => $valid_setting ) {
+			// Skip if this is a preset.
+			if ( in_array( array( $key ), $preset_paths, true ) ) {
+				continue;
+			}
+
+			if ( null === $valid_setting ) {
+				// Simple setting (e.g., appearanceTools, custom).
+				// For 'custom', allow arrays; for others, only scalars.
+				if ( isset( $input[ $key ] ) ) {
+					if ( 'custom' === $key && is_array( $input[ $key ] ) ) {
+						$output[ $key ] = $input[ $key ];
+					} elseif ( is_scalar( $input[ $key ] ) ) {
+						$output[ $key ] = $input[ $key ];
+					}
+				}
+			} elseif ( is_array( $valid_setting ) && isset( $input[ $key ] ) && is_array( $input[ $key ] ) ) {
+				// Nested setting (e.g., lightbox, layout).
+				$nested_output = isset( $output[ $key ] ) ? $output[ $key ] : array();
+				foreach ( $valid_setting as $nested_key => $nested_valid ) {
+					$nested_path = array( $key, $nested_key );
+					// Skip if this nested path is a preset or indirect property.
+					if ( in_array( $nested_path, $preset_paths, true ) || in_array( $nested_path, $indirect_paths, true ) ) {
+						continue;
+					}
+					if ( isset( $input[ $key ][ $nested_key ] ) ) {
+						// Allow scalars and arrays (e.g., spacing.units).
+						if ( is_scalar( $input[ $key ][ $nested_key ] ) || is_array( $input[ $key ][ $nested_key ] ) ) {
+							$nested_output[ $nested_key ] = $input[ $key ][ $nested_key ];
+						}
+					}
+				}
+				if ( ! empty( $nested_output ) ) {
+					$output[ $key ] = $nested_output;
+				}
+			}
+		}
 	}
 
 	/**
