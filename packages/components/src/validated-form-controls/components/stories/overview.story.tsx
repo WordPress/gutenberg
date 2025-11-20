@@ -298,10 +298,10 @@ const AsyncValidationWithTest: StoryObj< typeof ValidatedInputControl > = {
 
 /**
  * A `form` wrapper and `type="submit"` button can be used to force validation when
- * the user tries to commit their changes, while still allowing the modal to be closed.
- * Optionally, the `shouldCloseOnClickOutside` prop on `Modal` can be disabled
- * to force users to more explicitly signal whether they are trying to
- * "submit close" or "cancel close" the dialog.
+ * the user tries to commit their changes, while still allowing the modal to be closed by canceling.
+ * Optionally, the `shouldCloseOnClickOutside`, `isDismissible`, and `shouldCloseOnEsc` props
+ * on `Modal` can be disabled to force users to more explicitly signal whether they are trying to
+ * "submit close" or "cancel close" the dialog, as well as preventing data loss on accidental closures.
  */
 export const ValidateInModal: StoryObj< typeof ValidatedInputControl > = {
 	render: function Template( { ...args } ) {
@@ -320,6 +320,7 @@ export const ValidateInModal: StoryObj< typeof ValidatedInputControl > = {
 						title="Dialog title"
 						onRequestClose={ () => setIsOpen( false ) }
 						shouldCloseOnClickOutside={ false }
+						isDismissible={ false }
 					>
 						<form
 							onSubmit={ ( event ) => {
