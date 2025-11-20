@@ -26,23 +26,6 @@ import getValueFromId from './utils/get-value-from-id';
 import setValueFromId from './utils/set-value-from-id';
 import getFilterBy from './utils/get-filter-by';
 
-// Sort arrays by length, then alphabetically by joined string
-function sort( valueA: any, valueB: any, direction: SortDirection ) {
-	const arrA = Array.isArray( valueA ) ? valueA : [];
-	const arrB = Array.isArray( valueB ) ? valueB : [];
-	if ( arrA.length !== arrB.length ) {
-		return direction === 'asc'
-			? arrA.length - arrB.length
-			: arrB.length - arrA.length;
-	}
-
-	const joinedA = arrA.join( ',' );
-	const joinedB = arrB.join( ',' );
-	return direction === 'asc'
-		? joinedA.localeCompare( joinedB )
-		: joinedB.localeCompare( joinedA );
-}
-
 function render( { item, field }: DataViewRenderFieldProps< any > ) {
 	const value = field.getValue( { item } ) || [];
 	return value.join( ', ' );
@@ -61,6 +44,25 @@ export default function normalizeField< Item >(
 ): NormalizedField< Item > {
 	const getValue = field.getValue || getValueFromId( field.id );
 	const setValue = field.setValue || setValueFromId( field.id );
+
+	const sort = ( a: any, b: any, direction: SortDirection ) => {
+		// Sort arrays by length, then alphabetically by joined string
+		const valueA = getValue( a );
+		const valueB = getValue( b );
+		const arrA = Array.isArray( valueA ) ? valueA : [];
+		const arrB = Array.isArray( valueB ) ? valueB : [];
+		if ( arrA.length !== arrB.length ) {
+			return direction === 'asc'
+				? arrA.length - arrB.length
+				: arrB.length - arrA.length;
+		}
+
+		const joinedA = arrA.join( ',' );
+		const joinedB = arrB.join( ',' );
+		return direction === 'asc'
+			? joinedA.localeCompare( joinedB )
+			: joinedB.localeCompare( joinedA );
+	};
 
 	const isValid: Rules< Item > = {
 		elements: true,

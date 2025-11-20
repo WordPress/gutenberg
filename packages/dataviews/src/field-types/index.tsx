@@ -42,13 +42,16 @@ function normalizeField< Item >(
 	};
 
 	const sort = ( a: any, b: any, direction: SortDirection ) => {
-		if ( typeof a === 'number' && typeof b === 'number' ) {
-			return direction === 'asc' ? a - b : b - a;
+		const valueA = getValue( { item: a } );
+		const valueB = getValue( { item: b } );
+
+		if ( typeof valueA === 'number' && typeof valueB === 'number' ) {
+			return direction === 'asc' ? valueA - valueB : valueB - valueA;
 		}
 
 		return direction === 'asc'
-			? a.localeCompare( b )
-			: b.localeCompare( a );
+			? valueA.localeCompare( valueB )
+			: valueB.localeCompare( valueA );
 	};
 
 	const render = ( {

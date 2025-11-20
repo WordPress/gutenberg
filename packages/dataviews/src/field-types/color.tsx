@@ -32,34 +32,6 @@ import getValueFromId from './utils/get-value-from-id';
 import setValueFromId from './utils/set-value-from-id';
 import getFilterBy from './utils/get-filter-by';
 
-function sort( valueA: any, valueB: any, direction: SortDirection ) {
-	// Convert colors to HSL for better sorting
-	const colorA = colord( valueA );
-	const colorB = colord( valueB );
-
-	if ( ! colorA.isValid() && ! colorB.isValid() ) {
-		return 0;
-	}
-	if ( ! colorA.isValid() ) {
-		return direction === 'asc' ? 1 : -1;
-	}
-	if ( ! colorB.isValid() ) {
-		return direction === 'asc' ? -1 : 1;
-	}
-
-	// Sort by hue, then saturation, then lightness
-	const hslA = colorA.toHsl();
-	const hslB = colorB.toHsl();
-
-	if ( hslA.h !== hslB.h ) {
-		return direction === 'asc' ? hslA.h - hslB.h : hslB.h - hslA.h;
-	}
-	if ( hslA.s !== hslB.s ) {
-		return direction === 'asc' ? hslA.s - hslB.s : hslB.s - hslA.s;
-	}
-	return direction === 'asc' ? hslA.l - hslB.l : hslB.l - hslA.l;
-}
-
 function render( { item, field }: DataViewRenderFieldProps< any > ) {
 	if ( field.hasElements ) {
 		return <RenderFromElements item={ item } field={ field } />;
@@ -94,6 +66,35 @@ export default function normalizeField< Item >(
 ): NormalizedField< Item > {
 	const getValue = field.getValue || getValueFromId( field.id );
 	const setValue = field.setValue || setValueFromId( field.id );
+
+	const sort = ( valueA: any, valueB: any, direction: SortDirection ) => {
+		// Convert colors to HSL for better sorting
+		const colorA = colord( valueA );
+		const colorB = colord( valueB );
+
+		if ( ! colorA.isValid() && ! colorB.isValid() ) {
+			return 0;
+		}
+		if ( ! colorA.isValid() ) {
+			return direction === 'asc' ? 1 : -1;
+		}
+		if ( ! colorB.isValid() ) {
+			return direction === 'asc' ? -1 : 1;
+		}
+
+		// Sort by hue, then saturation, then lightness
+		const hslA = colorA.toHsl();
+		const hslB = colorB.toHsl();
+
+		if ( hslA.h !== hslB.h ) {
+			return direction === 'asc' ? hslA.h - hslB.h : hslB.h - hslA.h;
+		}
+		if ( hslA.s !== hslB.s ) {
+			return direction === 'asc' ? hslA.s - hslB.s : hslB.s - hslA.s;
+		}
+		return direction === 'asc' ? hslA.l - hslB.l : hslB.l - hslA.l;
+	};
+
 	const isValid: Rules< Item > = {
 		elements: true,
 		custom: ( item: any, normalizedField ) => {

@@ -32,12 +32,6 @@ import getValueFromId from './utils/get-value-from-id';
 import setValueFromId from './utils/set-value-from-id';
 import getFilterBy from './utils/get-filter-by';
 
-function sort( valueA: any, valueB: any, direction: SortDirection ) {
-	return direction === 'asc'
-		? valueA.localeCompare( valueB )
-		: valueB.localeCompare( valueA );
-}
-
 // Email validation regex based on HTML5 spec
 // https://html.spec.whatwg.org/multipage/input.html#valid-e-mail-address
 const emailRegex =
@@ -56,6 +50,15 @@ export default function normalizeField< Item >(
 ): NormalizedField< Item > {
 	const getValue = field.getValue || getValueFromId( field.id );
 	const setValue = field.setValue || setValueFromId( field.id );
+
+	const sort = ( a: any, b: any, direction: SortDirection ) => {
+		const valueA = getValue( { item: a } );
+		const valueB = getValue( { item: b } );
+		return direction === 'asc'
+			? valueA.localeCompare( valueB )
+			: valueB.localeCompare( valueA );
+	};
+
 	const isValid: Rules< Item > = {
 		elements: true,
 		custom: ( item: any, normalizedField ) => {

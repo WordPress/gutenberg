@@ -34,10 +34,6 @@ import getValueFromId from './utils/get-value-from-id';
 import setValueFromId from './utils/set-value-from-id';
 import getFilterBy from './utils/get-filter-by';
 
-function sort( a: any, b: any, direction: SortDirection ) {
-	return direction === 'asc' ? a - b : b - a;
-}
-
 function render( { item, field }: DataViewRenderFieldProps< any > ) {
 	return field.hasElements ? (
 		<RenderFromElements item={ item } field={ field } />
@@ -64,6 +60,12 @@ export default function normalizeField< Item >(
 
 			return null;
 		},
+	};
+
+	const sort = ( a: Item, b: Item, direction: SortDirection ) => {
+		const valueA = getValue( { item: a } );
+		const valueB = getValue( { item: b } );
+		return direction === 'asc' ? valueA - valueB : valueB - valueA;
 	};
 
 	const defaultOperators: Operator[] = [

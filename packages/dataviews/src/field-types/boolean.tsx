@@ -22,23 +22,6 @@ import getValueFromId from './utils/get-value-from-id';
 import setValueFromId from './utils/set-value-from-id';
 import getFilterBy from './utils/get-filter-by';
 
-function sort( a: any, b: any, direction: SortDirection ) {
-	const boolA = Boolean( a );
-	const boolB = Boolean( b );
-
-	if ( boolA === boolB ) {
-		return 0;
-	}
-
-	// In ascending order, false comes before true
-	if ( direction === 'asc' ) {
-		return boolA ? 1 : -1;
-	}
-
-	// In descending order, true comes before false
-	return boolA ? -1 : 1;
-}
-
 function render( { item, field }: DataViewRenderFieldProps< any > ) {
 	if ( field.hasElements ) {
 		return <RenderFromElements item={ item } field={ field } />;
@@ -60,6 +43,26 @@ export default function normalizeField< Item >(
 ): NormalizedField< Item > {
 	const getValue = field.getValue || getValueFromId( field.id );
 	const setValue = field.setValue || setValueFromId( field.id );
+
+	const sort = ( a: any, b: any, direction: SortDirection ) => {
+		const valueA = getValue( { item: a } );
+		const valueB = getValue( { item: b } );
+		const boolA = Boolean( valueA );
+		const boolB = Boolean( valueB );
+
+		if ( boolA === boolB ) {
+			return 0;
+		}
+
+		// In ascending order, false comes before true
+		if ( direction === 'asc' ) {
+			return boolA ? 1 : -1;
+		}
+
+		// In descending order, true comes before false
+		return boolA ? -1 : 1;
+	};
+
 	const isValid: Rules< Item > = {
 		elements: true,
 		custom: ( item: any, normalizedField ) => {

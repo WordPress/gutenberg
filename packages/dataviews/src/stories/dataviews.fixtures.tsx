@@ -1425,6 +1425,7 @@ export const fields: Field< SpaceObject >[] = [
 	},
 	{
 		label: 'Type',
+		// type: 'text',
 		id: 'type',
 		enableHiding: false,
 		elements: [

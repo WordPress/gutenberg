@@ -35,13 +35,6 @@ import getValueFromId from './utils/get-value-from-id';
 import setValueFromId from './utils/set-value-from-id';
 import getFilterBy from './utils/get-filter-by';
 
-function sort( a: any, b: any, direction: SortDirection ) {
-	const timeA = new Date( a ).getTime();
-	const timeB = new Date( b ).getTime();
-
-	return direction === 'asc' ? timeA - timeB : timeB - timeA;
-}
-
 function getFormat( field: Field< any > ): Required< FormatDate > {
 	return {
 		date:
@@ -90,6 +83,15 @@ export default function normalizeField< Item >(
 	const isValid: Rules< Item > = {
 		elements: true,
 		custom: () => null,
+	};
+
+	const sort = ( a: Item, b: Item, direction: SortDirection ) => {
+		const valueA = getValue( { item: a } );
+		const valueB = getValue( { item: b } );
+		const timeA = new Date( valueA ).getTime();
+		const timeB = new Date( valueB ).getTime();
+
+		return direction === 'asc' ? timeA - timeB : timeB - timeA;
 	};
 
 	const defaultOperators: Operator[] = [
