@@ -274,8 +274,8 @@ export default function TemplatePartEdit( {
 							>
 								{ window?.__experimentalContentOnlyPatternInsertion &&
 								editedContentOnlySection === clientId
-									? __( 'Exit' )
-									: __( 'Edit' ) }
+									? __( 'Exit section' )
+									: __( 'Edit section' ) }
 							</ToolbarButton>
 						</BlockControls>
 					) }
