@@ -5,12 +5,12 @@ Snapshot Diff:
 - Received styles
 + Base styles
 
-@@ -3,8 +3,9 @@
-      "color": "var(--wp-components-color-foreground, #1e1e1e)",
-      "font-size": "calc((13 / 13) * 13px)",
-      "font-weight": "normal",
-      "line-height": "1.4",
-      "margin": "0",
+@@ -7,8 +7,9 @@
+      "margin": "0px",
+      "margin-bottom": "0px",
+      "margin-left": "0px",
+      "margin-right": "0px",
+      "margin-top": "0px",
 +     "text-align": "center",
       "text-wrap": "pretty",
     },

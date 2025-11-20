@@ -32,13 +32,13 @@ Snapshot Diff:
     Object {
       "color": "var(--wp-components-color-foreground, #1e1e1e)",
       "display": "block",
--     "font-size": "calc(1.25 * 13px)",
-+     "font-size": "calc(1.95 * 13px)",
+-     "font-size": "calc(16.25px)",
++     "font-size": "calc(25.35px)",
       "font-weight": "600",
       "line-height": "1.4",
-      "margin": "0",
-      "text-wrap": "pretty",
-    },
+      "margin": "0px",
+      "margin-bottom": "0px",
+      "margin-left": "0px",
 `;
 
 exports[`props should render level as a string 1`] = `
@@ -51,11 +51,11 @@ Snapshot Diff:
     Object {
       "color": "var(--wp-components-color-foreground, #1e1e1e)",
       "display": "block",
--     "font-size": "calc(1.25 * 13px)",
-+     "font-size": "calc(1.95 * 13px)",
+-     "font-size": "calc(16.25px)",
++     "font-size": "calc(25.35px)",
       "font-weight": "600",
       "line-height": "1.4",
-      "margin": "0",
-      "text-wrap": "pretty",
-    },
+      "margin": "0px",
+      "margin-bottom": "0px",
+      "margin-left": "0px",
 `;

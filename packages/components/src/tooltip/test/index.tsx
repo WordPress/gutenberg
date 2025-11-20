@@ -381,7 +381,7 @@ describe( 'Tooltip', () => {
 			await waitFor( () =>
 				expect(
 					screen.getByRole( 'tooltip', {
-						name: 'tooltip text shortcut text',
+						name: 'tooltip textshortcut text',
 					} )
 				).toBeVisible()
 			);
@@ -409,13 +409,13 @@ describe( 'Tooltip', () => {
 			await waitFor( () =>
 				expect(
 					screen.getByRole( 'tooltip', {
-						name: 'tooltip text Control + Shift + Comma',
+						name: 'tooltip textControl + Shift + Comma',
 					} )
 				).toBeVisible()
 			);
 			expect(
 				screen.getByRole( 'tooltip', {
-					name: 'tooltip text Control + Shift + Comma',
+					name: 'tooltip textControl + Shift + Comma',
 				} )
 			).toHaveTextContent( /⇧⌘,/i );
 

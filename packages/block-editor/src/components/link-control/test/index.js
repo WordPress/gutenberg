@@ -1560,7 +1560,7 @@ describe( 'Selecting links', () => {
 			name: 'Manage link',
 		} );
 		const currentLinkAnchor = screen.getByRole( 'link', {
-			name: `${ selectedLink.title } (opens in a new tab)`,
+			name: `${ selectedLink.title }(opens in a new tab)`,
 		} );
 
 		expect( currentLink ).toBeVisible();
@@ -1661,7 +1661,7 @@ describe( 'Selecting links', () => {
 				await user.click( firstSearchSuggestion );
 
 				const currentLinkAnchor = screen.getByRole( 'link', {
-					name: `${ selectedLink.title } (opens in a new tab)`,
+					name: `${ selectedLink.title }(opens in a new tab)`,
 				} );
 
 				// Check that this suggestion is now shown as selected.
@@ -1770,7 +1770,7 @@ describe( 'Selecting links', () => {
 					name: 'Manage link',
 				} );
 				const currentLinkAnchor = screen.getByRole( 'link', {
-					name: `${ selectedLink.title } (opens in a new tab)`,
+					name: `${ selectedLink.title }(opens in a new tab)`,
 				} );
 
 				// Make sure focus is retained after submission.
@@ -2735,7 +2735,7 @@ describe( 'Entity handling', () => {
 
 		// Click on a different entity suggestion
 		const differentSuggestion = screen.getByRole( 'option', {
-			name: 'Different Page /different-page Page',
+			name: 'Different Page/different-pagePage',
 		} );
 		await user.click( differentSuggestion );
 

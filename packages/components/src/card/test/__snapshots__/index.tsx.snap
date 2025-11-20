@@ -121,10 +121,10 @@ Snapshot Diff:
 @@ -1,9 +1,8 @@
   Array [
     Object {
-      "background-color": "#fff",
--     "border-radius": "calc(8px - 1px)",
+      "background-color": "rgb(255, 255, 255)",
+-     "border-radius": "calc(7px)",
       "box-shadow": "0 0 0 1px rgba(0, 0, 0, 0.1)",
-      "color": "#1e1e1e",
+      "color": "rgb(30, 30, 30)",
       "outline": "none",
       "position": "relative",
     },

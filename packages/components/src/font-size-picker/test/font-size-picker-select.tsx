@@ -130,7 +130,7 @@ describe( 'FontSizePickerSelect', () => {
 				screen.getByRole( 'combobox', { name: 'Font size' } )
 			);
 			await user.click(
-				screen.getByRole( 'option', { name: 'Small 12px' } )
+				screen.getByRole( 'option', { name: 'Small12px' } )
 			);
 			expect( onChange ).toHaveBeenCalledWith( '12px', fontSizes[ 0 ] );
 		} );

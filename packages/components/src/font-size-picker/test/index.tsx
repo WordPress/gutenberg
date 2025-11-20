@@ -133,12 +133,12 @@ describe( 'FontSizePicker', () => {
 			const options = screen.getAllByRole( 'option' );
 			expect( options ).toHaveLength( 7 );
 			expect( options[ 0 ] ).toHaveAccessibleName( 'Default' );
-			expect( options[ 1 ] ).toHaveAccessibleName( 'Tiny 8px' );
-			expect( options[ 2 ] ).toHaveAccessibleName( 'Small 12px' );
-			expect( options[ 3 ] ).toHaveAccessibleName( 'Medium 16px' );
-			expect( options[ 4 ] ).toHaveAccessibleName( 'Large 20px' );
-			expect( options[ 5 ] ).toHaveAccessibleName( 'Extra Large 30px' );
-			expect( options[ 6 ] ).toHaveAccessibleName( 'xx-large 40px' );
+			expect( options[ 1 ] ).toHaveAccessibleName( 'Tiny8px' );
+			expect( options[ 2 ] ).toHaveAccessibleName( 'Small12px' );
+			expect( options[ 3 ] ).toHaveAccessibleName( 'Medium16px' );
+			expect( options[ 4 ] ).toHaveAccessibleName( 'Large20px' );
+			expect( options[ 5 ] ).toHaveAccessibleName( 'Extra Large30px' );
+			expect( options[ 6 ] ).toHaveAccessibleName( 'xx-large40px' );
 		} );
 
 		test.each( [
@@ -148,7 +148,7 @@ describe( 'FontSizePicker', () => {
 				expectedArguments: [ undefined, undefined ],
 			},
 			{
-				option: 'Tiny 8px',
+				option: 'Tiny8px',
 				value: undefined,
 				expectedArguments: [ '8px', fontSizes[ 0 ] ],
 			},
@@ -221,12 +221,12 @@ describe( 'FontSizePicker', () => {
 			const options = screen.getAllByRole( 'option' );
 			expect( options ).toHaveLength( 7 );
 			expect( options[ 0 ] ).toHaveAccessibleName( 'Default' );
-			expect( options[ 1 ] ).toHaveAccessibleName( 'Tiny 8px' );
-			expect( options[ 2 ] ).toHaveAccessibleName( 'Small 1em' );
-			expect( options[ 3 ] ).toHaveAccessibleName( 'Medium 2rem' );
+			expect( options[ 1 ] ).toHaveAccessibleName( 'Tiny8px' );
+			expect( options[ 2 ] ).toHaveAccessibleName( 'Small1em' );
+			expect( options[ 3 ] ).toHaveAccessibleName( 'Medium2rem' );
 			expect( options[ 4 ] ).toHaveAccessibleName( 'Large' );
-			expect( options[ 5 ] ).toHaveAccessibleName( 'Extra Large 30px' );
-			expect( options[ 6 ] ).toHaveAccessibleName( 'xx-large 40px' );
+			expect( options[ 5 ] ).toHaveAccessibleName( 'Extra Large30px' );
+			expect( options[ 6 ] ).toHaveAccessibleName( 'xx-large40px' );
 		} );
 
 		test.each( [
@@ -252,17 +252,17 @@ describe( 'FontSizePicker', () => {
 				expectedArguments: [ undefined, undefined ],
 			},
 			{
-				option: 'Tiny 8px',
+				option: 'Tiny8px',
 				value: undefined,
 				expectedArguments: [ '8px', fontSizes[ 0 ] ],
 			},
 			{
-				option: 'Small 1em',
+				option: 'Small1em',
 				value: '8px',
 				expectedArguments: [ '1em', fontSizes[ 1 ] ],
 			},
 			{
-				option: 'Medium 2rem',
+				option: 'Medium2rem',
 				value: '8px',
 				expectedArguments: [ '2rem', fontSizes[ 2 ] ],
 			},
@@ -868,7 +868,7 @@ describe( 'FontSizePicker', () => {
 					screen.getByRole( 'combobox', { name: 'Font size' } )
 				);
 				await user.click(
-					screen.getByRole( 'option', { name: 'Medium 16px' } )
+					screen.getByRole( 'option', { name: 'Medium16px' } )
 				);
 				expect( onChange ).toHaveBeenCalledWith(
 					'16px',
@@ -906,7 +906,7 @@ describe( 'FontSizePicker', () => {
 					screen.getByRole( 'combobox', { name: 'Font size' } )
 				);
 				await user.click(
-					screen.getByRole( 'option', { name: 'Large 20px' } )
+					screen.getByRole( 'option', { name: 'Large20px' } )
 				);
 				expect( onChange ).toHaveBeenCalledWith(
 					'20px',
@@ -1053,7 +1053,7 @@ describe( 'FontSizePicker', () => {
 				screen.getByRole( 'combobox', { name: 'Font size' } )
 			);
 			await user.click(
-				screen.getByRole( 'option', { name: 'Small 12px' } )
+				screen.getByRole( 'option', { name: 'Small12px' } )
 			);
 			expect( onChange ).toHaveBeenCalledWith( '12px', fontSizes[ 0 ] );
 		} );
