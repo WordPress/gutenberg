@@ -90,11 +90,15 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 	}, [ url ] );
 
 	// Use the entity binding hook internally
-	const { hasUrlBinding, isBoundEntityAvailable, clearBinding } =
-		useEntityBinding( {
-			clientId,
-			attributes,
-		} );
+	const {
+		hasUrlBinding,
+		isBoundEntityAvailable,
+		clearBinding,
+		createBinding,
+	} = useEntityBinding( {
+		clientId,
+		attributes,
+	} );
 
 	// Get direct store dispatch to bypass setBoundAttributes wrapper
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
@@ -273,12 +277,29 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 					<EntitySearch
 						label={ __( 'Link' ) }
 						value={ url }
-						onChange={ ( newUrl ) => {
+						onChange={ ( newUrl, suggestion ) => {
+							// If we have suggestion data (entity selected from search),
+							// pass the entity information to enable binding
+							const attrs = suggestion
+								? {
+										url: newUrl,
+										id: suggestion.id,
+										kind: suggestion.kind,
+										type: suggestion.type,
+										title: suggestion.title,
+								  }
+								: { url: newUrl };
+
 							updateAttributes(
-								{ url: newUrl },
+								attrs,
 								setAttributes,
 								attributes
 							);
+
+							// Create entity binding if we have entity data
+							if ( suggestion ) {
+								createBinding( attrs );
+							}
 						} }
 					/>
 				) }

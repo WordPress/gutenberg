@@ -181,7 +181,19 @@ export function EntitySearch( {
 					onChange={ ( newValue ) => {
 						// Clear search term when user selects an option
 						setSearchTerm( '' );
-						onChange( newValue );
+
+						// Find the selected option to get the full suggestion data
+						const selectedOption = options.find(
+							( opt ) => opt.value === newValue
+						);
+
+						// If we have suggestion data, pass it along with the URL
+						// This enables entity binding in navigation links
+						if ( selectedOption?.suggestion ) {
+							onChange( newValue, selectedOption.suggestion );
+						} else {
+							onChange( newValue );
+						}
 					} }
 					isLoading={ isLoading }
 					hideLabelFromVision
