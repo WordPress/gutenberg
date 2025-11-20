@@ -5,11 +5,18 @@ import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { moreVertical, check } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import { useInspectorPopoverPlacement } from './use-inspector-popover-placement';
+
 export default function FieldsDropdownMenu( {
 	fields,
 	visibleFields,
 	onToggleField,
 } ) {
+	const { popoverProps } = useInspectorPopoverPlacement();
+
 	if ( ! fields || fields.length === 0 ) {
 		return null;
 	}
@@ -18,7 +25,7 @@ export default function FieldsDropdownMenu( {
 		<DropdownMenu
 			icon={ moreVertical }
 			label={ __( 'Options' ) }
-			popoverProps={ { placement: 'bottom-end' } }
+			popoverProps={ popoverProps }
 		>
 			{ ( { onClose } ) => (
 				<MenuGroup label={ __( 'Show / Hide' ) }>
