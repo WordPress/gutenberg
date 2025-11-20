@@ -12,4 +12,9 @@ export type ExternalLinkProps = {
 	 * The URL of the external resource.
 	 */
 	href: string;
+
+	/**
+	 * Render the link without the external link icon (↗ or ↖).
+	 */
+	withoutIcon?: boolean;
 };

@@ -23,7 +23,14 @@ function UnforwardedExternalLink(
 	>,
 	ref: ForwardedRef< HTMLAnchorElement >
 ) {
-	const { href, children, className, rel = '', ...additionalProps } = props;
+	const {
+		href,
+		children,
+		className,
+		rel = '',
+		withoutIcon,
+		...additionalProps
+	} = props;
 	const optimizedRel = [
 		...new Set(
 			[
@@ -66,15 +73,17 @@ function UnforwardedExternalLink(
 			<span className="components-external-link__contents">
 				{ children }
 			</span>
-			<span
-				className="components-external-link__icon"
-				aria-label={
-					/* translators: accessibility text */
-					__( '(opens in a new tab)' )
-				}
-			>
-				{ isRTL() ? '\u2196' : '\u2197' }
-			</span>
+			{ ! withoutIcon && (
+				<span
+					className="components-external-link__icon"
+					aria-label={
+						/* translators: accessibility text */
+						__( '(opens in a new tab)' )
+					}
+				>
+					{ isRTL() ? '\u2196' : '\u2197' }
+				</span>
+			) }
 		</a>
 		/* eslint-enable react/jsx-no-target-blank */
 	);

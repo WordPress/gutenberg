@@ -25,11 +25,25 @@ const meta: Meta< typeof ExternalLink > = {
 export default meta;
 
 const Template: StoryFn< typeof ExternalLink > = ( { ...args } ) => {
-	return <ExternalLink { ...args } />;
+	return (
+		<p>
+			Link to <ExternalLink { ...args } /> in a new tab
+		</p>
+	);
 };
 
 export const Default: StoryFn< typeof ExternalLink > = Template.bind( {} );
 Default.args = {
 	children: 'WordPress',
 	href: 'https://wordpress.org',
+	withoutIcon: false,
+};
+
+/**
+ * Link without icon
+ */
+export const WithoutIcon = Template.bind( {} );
+WithoutIcon.args = {
+	...Default.args,
+	withoutIcon: true,
 };
