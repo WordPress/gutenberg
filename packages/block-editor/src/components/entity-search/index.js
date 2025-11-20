@@ -206,9 +206,13 @@ export const EntitySearch = forwardRef(
 
 		// Handle blur to commit typed value
 		const handleBlur = () => {
+			// Get the actual input value directly from DOM to avoid debounce issues
+			const input = inputRef.current?.querySelector( 'input' );
+			const currentInputValue = input?.value || '';
+
 			// If user typed something that hasn't been committed, commit it
-			if ( searchTerm && searchTerm !== value ) {
-				onChange( searchTerm );
+			if ( currentInputValue && currentInputValue !== value ) {
+				onChange( currentInputValue );
 			}
 		};
 
