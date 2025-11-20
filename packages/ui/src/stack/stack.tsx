@@ -46,7 +46,7 @@ export function getNormalizedGap(
 	}
 
 	if ( TOKEN_NAMES.has( gap as TokenName ) ) {
-		return `var(--wpds-dimension-gap-flow-${ gap })`;
+		return `var(--wpds-dimension-gap-${ gap })`;
 	}
 
 	return String( gap );

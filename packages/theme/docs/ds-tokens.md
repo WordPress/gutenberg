@@ -123,10 +123,10 @@ Do not edit directly.
 | `--wpds-dimension-padding-surface-sm`  | Small spacing for surfaces          |
 | `--wpds-dimension-padding-surface-md`  | Medium spacing for surfaces         |
 | `--wpds-dimension-padding-surface-lg`  | Large spacing for surfaces          |
-| `--wpds-dimension-gap-flow-x-small`    | Extra small gap for content flow    |
-| `--wpds-dimension-gap-flow-small`      | Small gap for content flow          |
-| `--wpds-dimension-gap-flow-medium`     | Medium gap for content flow         |
-| `--wpds-dimension-gap-flow-large`      | Large gap for content flow          |
+| `--wpds-dimension-gap-x-small`         | Extra small gap for content flow    |
+| `--wpds-dimension-gap-small`           | Small gap for content flow          |
+| `--wpds-dimension-gap-medium`          | Medium gap for content flow         |
+| `--wpds-dimension-gap-large`           | Large gap for content flow          |
 
 ### Elevation
 
