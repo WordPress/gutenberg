@@ -554,11 +554,13 @@ const ValidationComponent = ( {
 	elements,
 	custom,
 	pattern,
+	minMax,
 }: {
 	required: boolean;
 	elements: 'sync' | 'async' | 'none';
 	custom: 'sync' | 'async' | 'none';
 	pattern: boolean;
+	minMax: boolean;
 } ) => {
 	type ValidatedItem = {
 		text: string;
@@ -914,15 +916,27 @@ const ValidationComponent = ( {
 				id: 'text',
 				type: 'text',
 				label: 'Text',
-				placeholder: pattern ? 'user_name123' : undefined,
-				description: pattern
+				placeholder: pattern && minMax
+					? 'user_name (5-20 chars, alphanumeric+underscore)'
+					: pattern
+					? 'user_name (alphanumeric+underscore)'
+					: minMax
+					? 'Min 5, max 20 characters'
+					: undefined,
+				description: pattern && minMax
+					? 'Letters, numbers, underscores only AND 5-20 characters'
+					: pattern
 					? 'Must contain only letters, numbers, and underscores'
+					: minMax
+					? 'Must be between 5 and 20 characters'
 					: undefined,
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customTextRule ),
 					pattern: pattern ? '^[a-zA-Z0-9_]+$' : undefined,
+					minLength: minMax ? 5 : undefined,
+					maxLength: minMax ? 20 : undefined,
 				},
 			},
 			{
@@ -971,34 +985,64 @@ const ValidationComponent = ( {
 				type: 'text',
 				Edit: 'textarea',
 				label: 'Textarea',
+				placeholder: minMax ? 'Min 10, max 200 characters' : undefined,
+				description: minMax
+					? 'Must be between 10 and 200 characters'
+					: undefined,
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customTextareaRule ),
+					minLength: minMax ? 10 : undefined,
+					maxLength: minMax ? 200 : undefined,
 				},
 			},
 			{
 				id: 'email',
 				type: 'email',
 				label: 'e-mail',
-				placeholder: pattern ? 'user@company.com' : undefined,
-				description: pattern
+				placeholder: pattern && minMax
+					? 'user@company.com (10-50 chars)'
+					: pattern
+					? 'user@company.com'
+					: minMax
+					? 'Min 10, max 50 characters'
+					: undefined,
+				description: pattern && minMax
+					? 'Must be @company.com domain AND 10-50 characters'
+					: pattern
 					? 'Email must be from @company.com domain'
+					: minMax
+					? 'Must be between 10 and 50 characters'
 					: undefined,
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customEmailRule ),
-					pattern: pattern ? '^[a-zA-Z0-9]+@company.com$' : undefined,
+					pattern: pattern
+						? '^[a-zA-Z0-9._%+-]+@company\\.com$'
+						: undefined,
+					minLength: minMax ? 10 : undefined,
+					maxLength: minMax ? 50 : undefined,
 				},
 			},
 			{
 				id: 'telephone',
 				type: 'telephone',
 				label: 'telephone',
-				placeholder: pattern ? '+1-555-123-4567' : undefined,
-				description: pattern
+				placeholder: pattern && minMax
+					? '+1-555-123-4567 (10-20 chars)'
+					: pattern
+					? '+1-555-123-4567'
+					: minMax
+					? 'Min 10, max 20 characters'
+					: undefined,
+				description: pattern && minMax
+					? 'US format +1-XXX-XXX-XXXX AND 10-20 characters'
+					: pattern
 					? 'US phone format with country code'
+					: minMax
+					? 'Must be between 10 and 20 characters'
 					: undefined,
 				isValid: {
 					required,
@@ -1007,25 +1051,37 @@ const ValidationComponent = ( {
 					pattern: pattern
 						? '^\\+1-\\d{3}-\\d{3}-\\d{4}$'
 						: undefined,
+					minLength: minMax ? 10 : undefined,
+					maxLength: minMax ? 20 : undefined,
 				},
 			},
 			{
 				id: 'url',
 				type: 'url',
 				label: 'URL',
-				placeholder: pattern
+				placeholder: pattern && minMax
+					? 'https://github.com/user/repo (20-100 chars)'
+					: pattern
 					? 'https://github.com/user/repo'
+					: minMax
+					? 'Min 20, max 100 characters'
 					: undefined,
-				description: pattern
+				description: pattern && minMax
+					? 'GitHub repository URL AND 20-100 characters'
+					: pattern
 					? 'Must be a GitHub repository URL'
+					: minMax
+					? 'Must be between 20 and 100 characters'
 					: undefined,
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customUrlRule ),
 					pattern: pattern
-						? '^https:\\/\\/github\\.com\\/.*'
+						? '^https:\\/\\/github\\.com\\/.+\\/.+$'
 						: undefined,
+					minLength: minMax ? 20 : undefined,
+					maxLength: minMax ? 100 : undefined,
 				},
 			},
 			{
@@ -1042,20 +1098,28 @@ const ValidationComponent = ( {
 				id: 'integer',
 				type: 'integer',
 				label: 'Integer',
+				placeholder: minMax ? 'Min 0, max 100' : undefined,
+				description: minMax ? 'Must be between 0 and 100' : undefined,
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customIntegerRule ),
+					min: minMax ? 0 : undefined,
+					max: minMax ? 100 : undefined,
 				},
 			},
 			{
 				id: 'number',
 				type: 'number',
 				label: 'Number',
+				placeholder: minMax ? 'Min 0, max 100' : undefined,
+				description: minMax ? 'Must be between 0 and 100' : undefined,
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customNumberRule ),
+					min: minMax ? 0 : undefined,
+					max: minMax ? 100 : undefined,
 				},
 			},
 			{
@@ -1108,14 +1172,27 @@ const ValidationComponent = ( {
 				id: 'password',
 				type: 'password',
 				label: 'Password',
-				description: pattern
-					? 'Must have 8 numbers or letters'
+				placeholder: pattern && minMax
+					? 'abc12345 (8-20 chars alphanumeric)'
+					: pattern
+					? 'Must be 8+ alphanumeric'
+					: minMax
+					? 'Min 8, max 20 characters'
+					: undefined,
+				description: pattern && minMax
+					? '8+ alphanumeric chars AND 8-20 characters'
+					: pattern
+					? 'Must contain only letters and numbers (8+ chars)'
+					: minMax
+					? 'Must be between 8 and 20 characters'
 					: undefined,
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customPasswordRule ),
-					pattern: pattern ? '^[0-9a-zA-Z]{8}$' : undefined,
+					pattern: pattern ? '^[a-zA-Z0-9]{8,}$' : undefined,
+					minLength: minMax ? 8 : undefined,
+					maxLength: minMax ? 20 : undefined,
 				},
 			},
 			{
@@ -1184,7 +1261,7 @@ const ValidationComponent = ( {
 				},
 			},
 		];
-	}, [ elements, custom, required, getElements ] );
+	}, [ elements, custom, required, pattern, minMax, getElements ] );
 
 	const form = useMemo(
 		() => ( {
@@ -2121,12 +2198,18 @@ export const Validation = {
 			description:
 				'Whether or not the pattern validation rule is active.',
 		},
+		minMax: {
+			control: { type: 'boolean' },
+			description:
+				'Whether or not the min/max validation rule is active.',
+		},
 	},
 	args: {
 		required: true,
 		elements: 'sync',
 		custom: 'sync',
 		pattern: false,
+		minMax: false,
 	},
 };
 
