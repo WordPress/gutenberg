@@ -182,6 +182,11 @@
 		border: none;
 		box-shadow: none;
 	}
+
+	video.wp-block-cover__video-background:focus {
+		outline: 2px solid currentColor;
+		outline-offset: -2px;
+	}
 }
 
 .wp-block-cover-image,
