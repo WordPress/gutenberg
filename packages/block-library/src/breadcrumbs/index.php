@@ -103,7 +103,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		// Add post type archive link if applicable.
 		$post_type_object = get_post_type_object( $post_type );
 		$archive_link     = get_post_type_archive_link( $post_type );
-		if ( $archive_link && ( ( $attributes['showHomeLink'] && home_url() !== $archive_link ) || ! $attributes['showHomeLink'] ) ) {
+		if ( $archive_link && untrailingslashit( home_url() ) !== untrailingslashit( $archive_link ) ) {
 			$breadcrumb_items[] = array(
 				'label' => $post_type_object->labels->archives,
 				'url'   => $archive_link,
