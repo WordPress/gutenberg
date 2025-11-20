@@ -335,7 +335,7 @@ class WP_Theme_JSON_Gutenberg {
 	);
 
 	/**
-	 * Safe settings that can be preserved without CSS validation.
+	 * Safe settings that should be preserved by ::remove_insecure_settings().
 	 *
 	 * These are non-preset, non-CSS settings that control behavior rather than styling.
 	 * Each entry defines the setting path and its expected type for validation.
@@ -3890,21 +3890,6 @@ class WP_Theme_JSON_Gutenberg {
 		static::remove_indirect_properties( $input, $output );
 
 		// Preserve all valid settings that aren't presets or indirect properties.
-		static::preserve_valid_settings( $input, $output );
-
-		return $output;
-	}
-
-	/**
-	 * Preserves valid settings from VALID_SETTINGS that aren't presets or indirect CSS properties.
-	 *
-	 * @since 7.0.0
-	 *
-	 * @param array $input  Node to process.
-	 * @param array $output The processed node. Passed by reference.
-	 */
-	private static function preserve_valid_settings( $input, &$output ) {
-		// Iterate through safe settings and preserve them with type validation.
 		foreach ( static::SAFE_SETTINGS as $safe_setting ) {
 			$path = $safe_setting['path'];
 			$type = $safe_setting['type'];
@@ -3930,6 +3915,8 @@ class WP_Theme_JSON_Gutenberg {
 				_wp_array_set( $output, $path, $value );
 			}
 		}
+
+		return $output;
 	}
 
 	/**
