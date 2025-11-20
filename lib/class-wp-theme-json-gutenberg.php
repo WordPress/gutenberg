@@ -2991,7 +2991,7 @@ class WP_Theme_JSON_Gutenberg {
 				$style_variation_declarations[ $style_variation['selector'] ] = static::compute_style_properties( $style_variation_node, $settings, null, $this->theme_json );
 
 				// Process pseudo-selectors for this variation (e.g., :hover, :focus).
-				$block_name                    = isset( $block_metadata['name'] ) ? $block_metadata['name'] : ( in_array( 'blocks', $block_metadata['path'], true ) && count( $block_metadata['path'] ) >= 3 ? $block_metadata['path'][2] : null );
+				$block_name                    = isset( $block_metadata['name'] ) ? $block_metadata['name'] : ( in_array( 'blocks', $block_metadata['path'], true ) && count( $block_metadata['path'] ) >= 3 ? get_block_name_from_metadata_path( $block_metadata ) : null );
 				$variation_pseudo_declarations = static::process_pseudo_selectors( $style_variation_node, $style_variation['selector'], $settings, $block_name );
 				$style_variation_declarations  = array_merge( $style_variation_declarations, $variation_pseudo_declarations );
 
@@ -3025,7 +3025,7 @@ class WP_Theme_JSON_Gutenberg {
 		$is_processing_block_pseudo = false;
 		$block_pseudo_selector      = null;
 		if ( in_array( 'blocks', $block_metadata['path'], true ) && count( $block_metadata['path'] ) >= 4 ) {
-			$block_name        = $block_metadata['path'][2]; // 'core/button'
+			$block_name        = static::get_block_name_from_metadata_path( $block_metadata ); // 'core/button'
 			$last_path_element = $block_metadata['path'][ count( $block_metadata['path'] ) - 1 ]; // ':hover'
 
 			if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block_name ] ) &&
@@ -3067,7 +3067,7 @@ class WP_Theme_JSON_Gutenberg {
 		} elseif ( $is_processing_block_pseudo ) {
 			// Process block pseudo-selector styles.
 			// For block pseudo-selectors, we need to get the block data first, then access the pseudo-selector.
-			$block_name  = $block_metadata['path'][2]; // 'core/button'
+			$block_name  = static::get_block_name_from_metadata_path( $block_metadata ); // 'core/button'
 			$block_data  = _wp_array_get( $this->theme_json, array( 'styles', 'blocks', $block_name ), array() );
 			$pseudo_data = isset( $block_data[ $block_pseudo_selector ] ) ? $block_data[ $block_pseudo_selector ] : array();
 
@@ -4723,4 +4723,19 @@ class WP_Theme_JSON_Gutenberg {
 
 		return $valid_variations;
 	}
+
+	/**
+	 * Extracts the block name from the block metadata path.
+	 *
+	 * @since 7.0
+	 *
+	 * @param array $block_metadata Block metadata.
+	 * @return string|null The block name or null if not found.
+	 */
+	private static function get_block_name_from_metadata_path( $block_metadata ) {
+		if ( isset( $block_metadata['path'] ) ) {
+			return $block_metadata['path'][2];
+		}
+	}
+
 }
