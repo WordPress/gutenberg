@@ -103,11 +103,16 @@ export const processBlockType =
 			),
 		};
 
-		// Ensure attributes is always an object, never null or undefined.
+		// Temporary fix to allow block authors time to fix blocks that register attributes as null or undefined.
 		if (
 			! blockType.attributes ||
 			typeof blockType.attributes !== 'object'
 		) {
+			warning(
+				'The block "' +
+					name +
+					'" must not register attributes as null or undefined. Use an empty object (`attributes: {}`) or exclude the attributes key. In the next Gutenberg release, passing null or undefined for attributes will cause the block editor to crash.'
+			);
 			blockType.attributes = {};
 		}
 
