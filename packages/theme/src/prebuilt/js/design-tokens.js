@@ -106,6 +106,7 @@ export default [
 	'--wpds-dimension-padding-surface-sm',
 	'--wpds-dimension-padding-surface-md',
 	'--wpds-dimension-padding-surface-lg',
+	'--wpds-dimension-gap-2xs',
 	'--wpds-dimension-gap-xs',
 	'--wpds-dimension-gap-sm',
 	'--wpds-dimension-gap-md',

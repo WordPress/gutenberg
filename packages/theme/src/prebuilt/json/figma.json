@@ -622,6 +622,14 @@
 		},
 		"description": "Large spacing for surfaces"
 	},
+	"Dimension/Semantic/gap-2xs": {
+		"value": {
+			".": "4px",
+			"compact": "4px",
+			"comfortable": "8px"
+		},
+		"description": "2x extra small gap for content flow"
+	},
 	"Dimension/Semantic/gap-xs": {
 		"value": {
 			".": "8px",

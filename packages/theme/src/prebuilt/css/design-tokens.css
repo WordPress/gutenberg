@@ -100,6 +100,7 @@
 	--wpds-color-stroke-surface-warning: #d0b381; /* Decorative stroke color used to define warning-toned surface boundaries with normal emphasis. */
 	--wpds-color-stroke-surface-warning-strong: #926300; /* Decorative stroke color used to define warning-toned surface boundaries with strong emphasis. */
 	--wpds-dimension-base: 4px; /* Base dimension unit */
+	--wpds-dimension-gap-2xs: 4px; /* 2x extra small gap for content flow */
 	--wpds-dimension-gap-lg: 24px; /* Large gap for content flow */
 	--wpds-dimension-gap-md: 16px; /* Medium gap for content flow */
 	--wpds-dimension-gap-sm: 12px; /* Small gap for content flow */
@@ -138,6 +139,7 @@
 
 [data-wpds-theme-provider-id][data-wpds-density='default'] {
 	--wpds-dimension-base: 4px; /* Base dimension unit */
+	--wpds-dimension-gap-2xs: 4px; /* 2x extra small gap for content flow */
 	--wpds-dimension-gap-lg: 24px; /* Large gap for content flow */
 	--wpds-dimension-gap-md: 16px; /* Medium gap for content flow */
 	--wpds-dimension-gap-sm: 12px; /* Small gap for content flow */
@@ -150,6 +152,7 @@
 }
 
 [data-wpds-theme-provider-id][data-wpds-density='compact'] {
+	--wpds-dimension-gap-2xs: 4px; /* 2x extra small gap for content flow */
 	--wpds-dimension-gap-lg: 16px; /* Large gap for content flow */
 	--wpds-dimension-gap-md: 12px; /* Medium gap for content flow */
 	--wpds-dimension-gap-sm: 8px; /* Small gap for content flow */
@@ -162,6 +165,7 @@
 }
 
 [data-wpds-theme-provider-id][data-wpds-density='comfortable'] {
+	--wpds-dimension-gap-2xs: 8px; /* 2x extra small gap for content flow */
 	--wpds-dimension-gap-lg: 24px; /* Large gap for content flow */
 	--wpds-dimension-gap-md: 20px; /* Medium gap for content flow */
 	--wpds-dimension-gap-sm: 16px; /* Small gap for content flow */

@@ -105,6 +105,16 @@
 				}
 			},
 			"gap": {
+				"2xs": {
+					"$value": "{dimension.primitive.space.10}",
+					"$description": "2x extra small gap for content flow",
+					"$extensions": {
+						"mode": {
+							"compact": "{dimension.primitive.space.10}",
+							"comfortable": "{dimension.primitive.space.20}"
+						}
+					}
+				},
 				"xs": {
 					"$value": "{dimension.primitive.space.20}",
 					"$description": "Extra small gap for content flow",

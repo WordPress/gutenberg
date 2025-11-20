@@ -48,10 +48,10 @@ export const Default: Story = {
 			control: {
 				type: 'select',
 			},
-			options: [ 0, 1, 2, 3, 4, 'xs', 'sm', 'md', 'lg' ],
+			options: [ 0, 1, 2, 3, 4, '2xs', 'xs', 'sm', 'md', 'lg' ],
 			table: {
 				type: {
-					summary: 'number | "xs" | "sm" | "md" | "lg"',
+					summary: 'number | "2xs" | "xs" | "sm" | "md" | "lg"',
 				},
 			},
 		},
