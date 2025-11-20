@@ -65,16 +65,16 @@
 
 		td:first-child,
 		th:first-child {
-			padding-left: var(--dataviews-padding-x, #{$grid-unit-60});
+			padding-inline-start: var(--dataviews-padding-inline-start, #{$grid-unit-60});
 
 			.dataviews-view-table-header-button {
-				margin-left: - #{$grid-unit-10};
+				margin-inline-start: - #{$grid-unit-10};
 			}
 		}
 
 		td:last-child,
 		th:last-child {
-			padding-right: var(--dataviews-padding-x, #{$grid-unit-60});
+			padding-inline-end: var(--dataviews-padding-inline-end, #{$grid-unit-60});
 		}
 
 		&:last-child {
@@ -253,12 +253,12 @@
 @container (max-width: 430px) {
 	.dataviews-view-table tr td:first-child,
 	.dataviews-view-table tr th:first-child {
-		padding-left: var(--dataviews-padding-x, #{$grid-unit-30});
+		padding-inline-start: var(--dataviews-padding-inline-start, #{$grid-unit-30});
 	}
 
 	.dataviews-view-table tr td:last-child,
 	.dataviews-view-table tr th:last-child {
-		padding-right: var(--dataviews-padding-x, #{$grid-unit-30});
+		padding-inline-end: var(--dataviews-padding-inline-end, #{$grid-unit-30});
 	}
 }
 

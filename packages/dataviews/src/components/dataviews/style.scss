@@ -14,15 +14,26 @@
 	flex-direction: column;
 	font-size: $default-font-size;
 	line-height: $default-line-height;
+	background-color: inherit;
+	--dataviews-padding-inline-start: #{$grid-unit-60};
+	--dataviews-padding-inline-end: #{$grid-unit-60};
+
+	@container (max-width: 430px) {
+		--dataviews-padding-inline-start: #{$grid-unit-30};
+		--dataviews-padding-inline-end: #{$grid-unit-30};
+	}
 }
 
 .dataviews__view-actions,
 .dataviews-filters__container {
 	box-sizing: border-box;
-	padding: $grid-unit-20 var(--dataviews-padding-x, #{$grid-unit-60});
+	padding-block: $grid-unit-20;
+	padding-inline-start: var(--dataviews-padding-inline-start);
+	padding-inline-end: var(--dataviews-padding-inline-end);
 	flex-shrink: 0;
 	position: sticky;
 	left: 0;
+	background-color: inherit;
 
 	@media not (prefers-reduced-motion) {
 		transition: padding ease-out 0.1s;
@@ -31,7 +42,9 @@
 
 .dataviews-no-results,
 .dataviews-loading {
-	padding: 0 var(--dataviews-padding-x, #{$grid-unit-60});
+	padding-block: 0;
+	padding-inline-start: var(--dataviews-padding-inline-start);
+	padding-inline-end: var(--dataviews-padding-inline-end);
 	flex-grow: 1;
 	display: flex;
 	align-items: center;
@@ -49,13 +62,15 @@
 @container (max-width: 430px) {
 	.dataviews__view-actions,
 	.dataviews-filters__container {
-		padding: $grid-unit-15 var(--dataviews-padding-x, #{$grid-unit-30});
+		padding-block: $grid-unit-15;
+		padding-inline-start: var(--dataviews-padding-inline-start);
+		padding-inline-end: var(--dataviews-padding-inline-end);
 	}
 
 	.dataviews-no-results,
 	.dataviews-loading {
-		padding-left: var(--dataviews-padding-x, #{$grid-unit-30});
-		padding-right: var(--dataviews-padding-x, #{$grid-unit-30});
+		padding-inline-start: var(--dataviews-padding-inline-start);
+		padding-inline-end: var(--dataviews-padding-inline-end);
 	}
 }
 
@@ -120,7 +135,8 @@
 	.dataviews-view-grid,
 	.dataviews-loading,
 	.dataviews-no-results {
-		padding-inline: $grid-unit-30;
+		padding-inline-start: $grid-unit-30;
+		padding-inline-end: $grid-unit-30;
 	}
 
 	.dataviews-view-table tr td:first-child,

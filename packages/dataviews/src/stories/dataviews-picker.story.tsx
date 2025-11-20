@@ -17,9 +17,10 @@ import {
  * Internal dependencies
  */
 import DataViewsPicker from '../components/dataviews-picker/index';
-import { LAYOUT_PICKER_GRID } from '../constants';
+import { LAYOUT_PICKER_GRID, LAYOUT_PICKER_TABLE } from '../constants';
 import filterSortAndPaginate from '../utils/filter-sort-and-paginate';
 import type { ActionButton, View } from '../types';
+import type { PaddingOptions } from '../components/dataviews-picker/types';
 import { data, fields, type SpaceObject } from './dataviews.fixtures';
 
 const meta = {
@@ -62,7 +63,7 @@ interface PickerContentProps {
 	infiniteScrollEnabled: boolean;
 	actions?: ActionButton< SpaceObject >[];
 	selection?: string[];
-	paddingX?: string | number;
+	padding?: PaddingOptions;
 }
 
 const DataViewsPickerContent = ( {
@@ -72,7 +73,7 @@ const DataViewsPickerContent = ( {
 	infiniteScrollEnabled,
 	actions: customActions,
 	selection: customSelection,
-	paddingX,
+	padding: customPadding,
 }: PickerContentProps ) => {
 	const [ view, setView ] = useState< View >( {
 		type: LAYOUT_PICKER_GRID,
@@ -83,7 +84,7 @@ const DataViewsPickerContent = ( {
 		page: 1,
 		perPage: 10,
 		filters: [],
-		groupByField: isGrouped ? 'type' : undefined,
+		groupBy: isGrouped ? { field: 'type', direction: 'asc' } : undefined,
 		infiniteScrollEnabled,
 	} );
 	const { data: shownData, paginationInfo: normalPaginationInfo } =
@@ -173,8 +174,9 @@ const DataViewsPickerContent = ( {
 				itemListLabel="Galactic Bodies"
 				defaultLayouts={ {
 					[ LAYOUT_PICKER_GRID ]: {},
+					[ LAYOUT_PICKER_TABLE ]: { perPage: 20 },
 				} }
-				paddingX={ paddingX }
+				padding={ customPadding }
 			/>
 		</>
 	);
@@ -284,7 +286,7 @@ export const WithModal = ( {
 						selection={ selectedItems.map( ( item ) =>
 							String( item.id )
 						) }
-						paddingX={ 32 }
+						padding="large"
 					/>
 				</Modal>
 			) }
@@ -337,7 +339,7 @@ function useInfiniteScroll( {
 			...view,
 			page: currentPage + 1,
 		} );
-	}, [ isLoadingMore, currentPage, totalPages, view ] );
+	}, [ isLoadingMore, currentPage, totalPages, view, setView ] );
 
 	// Initialize data on first load or when view changes significantly
 	useEffect( () => {
@@ -361,6 +363,8 @@ function useInfiniteScroll( {
 		view.perPage,
 		currentPage,
 		view.infiniteScrollEnabled,
+		shownData,
+		getItemId,
 	] );
 
 	const paginationInfo = {

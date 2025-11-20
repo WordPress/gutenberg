@@ -33,6 +33,8 @@ import DataViewsViewConfig, {
 import normalizeFields from '../../field-types/utils/normalize-fields';
 import type { Action, Field, View, SupportedLayouts } from '../../types';
 import type { SelectionOrUpdater } from '../../types/private';
+import type { PaddingOptions } from '../dataviews-picker/types';
+import { getPaddingBySizeStyles } from '../dataviews-picker/get-padding-by-size';
 type ItemWithId = { id: string };
 
 type DataViewsProps< Item > = {
@@ -66,7 +68,11 @@ type DataViewsProps< Item > = {
 		perPageSizes: number[];
 	};
 	empty?: ReactNode;
-	paddingX?: string | number;
+	/**
+	 * Determines the amount of padding within the component.
+	 * When not provided, the default SCSS padding values are used.
+	 */
+	padding?: PaddingOptions;
 } & ( Item extends ItemWithId
 	? { getItemId?: ( item: Item ) => string }
 	: { getItemId: ( item: Item ) => string } );
@@ -143,7 +149,7 @@ function DataViews< Item >( {
 	children,
 	config = { perPageSizes: [ 10, 20, 50, 100 ] },
 	empty,
-	paddingX,
+	padding,
 }: DataViewsProps< Item > ) {
 	const { infiniteScrollHandler } = paginationInfo;
 	const containerRef = useRef< HTMLDivElement | null >( null );
@@ -238,6 +244,11 @@ function DataViews< Item >( {
 		[ defaultLayoutsProperty ]
 	);
 
+	const paddingStyles = useMemo(
+		() => getPaddingBySizeStyles( padding ),
+		[ padding ]
+	);
+
 	if ( ! defaultLayouts[ view.type ] ) {
 		return null;
 	}
@@ -275,16 +286,7 @@ function DataViews< Item >( {
 		>
 			<div
 				className="dataviews-wrapper"
-				style={
-					paddingX !== undefined
-						? ( {
-								'--dataviews-padding-x':
-									typeof paddingX === 'number'
-										? `${ paddingX }px`
-										: paddingX,
-						  } as React.CSSProperties )
-						: undefined
-				}
+				style={ paddingStyles as React.CSSProperties }
 				ref={ containerRef }
 			>
 				{ children ?? (

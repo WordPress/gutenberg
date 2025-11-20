@@ -183,11 +183,13 @@
 	font-weight: $font-weight-medium;
 	color: $gray-900;
 	margin: 0 0 $grid-unit-10 0;
-	padding: 0 var(--dataviews-padding-x, #{$grid-unit-60});
+	padding-block: 0;
+	padding-inline-start: var(--dataviews-padding-inline-start, #{$grid-unit-60});
+	padding-inline-end: var(--dataviews-padding-inline-end, #{$grid-unit-60});
 	container-type: inline-size;
 
 	@container (max-width: 430px) {
-		padding-left: var(--dataviews-padding-x, #{$grid-unit-30});
-		padding-right: var(--dataviews-padding-x, #{$grid-unit-30});
+		padding-inline-start: var(--dataviews-padding-inline-start, #{$grid-unit-30});
+		padding-inline-end: var(--dataviews-padding-inline-end, #{$grid-unit-30});
 	}
 }
