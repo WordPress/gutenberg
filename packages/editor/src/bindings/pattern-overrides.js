@@ -33,7 +33,10 @@ export default {
 		// If the pattern source is being edited (editedContentOnlySection), skip
 		// returning the override values and instead return the original pattern's
 		// attribute values instead.
-		if ( editedContentOnlySection === patternClientId ) {
+		if (
+			! patternClientId ||
+			editedContentOnlySection === patternClientId
+		) {
 			return currentBlockAttributes;
 		}
 
