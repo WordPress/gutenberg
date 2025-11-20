@@ -17,7 +17,10 @@ import { safeDecodeURI } from '@wordpress/url';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { linkOff as unlinkIcon } from '@wordpress/icons';
 import { useDispatch } from '@wordpress/data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	store as blockEditorStore,
+	EntitySearch,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -159,105 +162,126 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 				onDeselect={ () => setAttributes( { url: '' } ) }
 				isShownByDefault
 			>
-				<InputControl
-					ref={ urlInputRef }
-					__nextHasNoMarginBottom
-					__next40pxDefaultSize
-					id={ inputId }
-					label={ __( 'Link' ) }
-					value={ ( () => {
-						if ( hasUrlBinding && ! isBoundEntityAvailable ) {
-							return '';
+				{ hasUrlBinding ? (
+					<InputControl
+						ref={ urlInputRef }
+						__nextHasNoMarginBottom
+						__next40pxDefaultSize
+						id={ inputId }
+						label={ __( 'Link' ) }
+						value={ ( () => {
+							if ( hasUrlBinding && ! isBoundEntityAvailable ) {
+								return '';
+							}
+							return inputValue
+								? safeDecodeURI( inputValue )
+								: '';
+						} )() }
+						autoComplete="off"
+						type="url"
+						disabled={ hasUrlBinding }
+						aria-invalid={
+							hasUrlBinding && ! isBoundEntityAvailable
+								? 'true'
+								: undefined
 						}
-						return inputValue ? safeDecodeURI( inputValue ) : '';
-					} )() }
-					autoComplete="off"
-					type="url"
-					disabled={ hasUrlBinding }
-					aria-invalid={
-						hasUrlBinding && ! isBoundEntityAvailable
-							? 'true'
-							: undefined
-					}
-					aria-describedby={ helpTextId }
-					className={
-						hasUrlBinding && ! isBoundEntityAvailable
-							? 'navigation-link-control__input-with-error-suffix'
-							: undefined
-					}
-					onChange={ ( newValue ) => {
-						if ( isBoundEntityAvailable ) {
-							return;
+						aria-describedby={ helpTextId }
+						className={
+							hasUrlBinding && ! isBoundEntityAvailable
+								? 'navigation-link-control__input-with-error-suffix'
+								: undefined
 						}
+						onChange={ ( newValue ) => {
+							if ( isBoundEntityAvailable ) {
+								return;
+							}
 
-						// Defer updating the url attribute until onBlur to prevent the canvas from
-						// treating a temporary empty value as a committed value, which replaces the
-						// label with placeholder text.
-						setInputValue( newValue );
-					} }
-					onFocus={ () => {
-						if ( isBoundEntityAvailable ) {
-							return;
-						}
-						lastURLRef.current = url;
-					} }
-					onBlur={ () => {
-						if ( isBoundEntityAvailable ) {
-							return;
-						}
+							// Defer updating the url attribute until onBlur to prevent the canvas from
+							// treating a temporary empty value as a committed value, which replaces the
+							// label with placeholder text.
+							setInputValue( newValue );
+						} }
+						onFocus={ () => {
+							if ( isBoundEntityAvailable ) {
+								return;
+							}
+							lastURLRef.current = url;
+						} }
+						onBlur={ () => {
+							if ( isBoundEntityAvailable ) {
+								return;
+							}
 
-						const finalValue = ! inputValue
-							? lastURLRef.current
-							: inputValue;
+							const finalValue = ! inputValue
+								? lastURLRef.current
+								: inputValue;
 
-						// Update local state immediately so input reflects the reverted value if the value was cleared
-						setInputValue( finalValue );
+							// Update local state immediately so input reflects the reverted value if the value was cleared
+							setInputValue( finalValue );
 
-						// Defer the updateAttributes call to ensure entity connection isn't severed by accident.
-						updateAttributes( { url: finalValue }, setAttributes, {
-							...attributes,
-							url: lastURLRef.current,
-						} );
-					} }
-					help={
-						hasUrlBinding && ! isBoundEntityAvailable ? (
-							<MissingEntityHelp
-								id={ helpTextId }
-								type={ attributes.type }
-								kind={ attributes.kind }
-							/>
-						) : (
-							isBoundEntityAvailable && (
-								<BindingHelpText
+							// Defer the updateAttributes call to ensure entity connection isn't severed by accident.
+							updateAttributes(
+								{ url: finalValue },
+								setAttributes,
+								{
+									...attributes,
+									url: lastURLRef.current,
+								}
+							);
+						} }
+						help={
+							hasUrlBinding && ! isBoundEntityAvailable ? (
+								<MissingEntityHelp
+									id={ helpTextId }
 									type={ attributes.type }
 									kind={ attributes.kind }
 								/>
+							) : (
+								isBoundEntityAvailable && (
+									<BindingHelpText
+										type={ attributes.type }
+										kind={ attributes.kind }
+									/>
+								)
 							)
-						)
-					}
-					suffix={
-						hasUrlBinding && (
-							<Button
-								icon={ unlinkIcon }
-								onClick={ () => {
-									unsyncBoundLink();
-									// Focus management to send focus to the URL input
-									// on next render after disabled state is removed.
-									shouldFocusURLInputRef.current = true;
-								} }
-								aria-describedby={ helpTextId }
-								showTooltip
-								label={ __( 'Unsync and edit' ) }
-								__next40pxDefaultSize
-								className={
-									hasUrlBinding && ! isBoundEntityAvailable
-										? 'navigation-link-control__error-suffix-button'
-										: undefined
-								}
-							/>
-						)
-					}
-				/>
+						}
+						suffix={
+							hasUrlBinding && (
+								<Button
+									icon={ unlinkIcon }
+									onClick={ () => {
+										unsyncBoundLink();
+										// Focus management to send focus to the URL input
+										// on next render after disabled state is removed.
+										shouldFocusURLInputRef.current = true;
+									} }
+									aria-describedby={ helpTextId }
+									showTooltip
+									label={ __( 'Unsync and edit' ) }
+									__next40pxDefaultSize
+									className={
+										hasUrlBinding &&
+										! isBoundEntityAvailable
+											? 'navigation-link-control__error-suffix-button'
+											: undefined
+									}
+								/>
+							)
+						}
+					/>
+				) : (
+					<EntitySearch
+						label={ __( 'Link' ) }
+						value={ url }
+						onChange={ ( newUrl ) => {
+							updateAttributes(
+								{ url: newUrl },
+								setAttributes,
+								attributes
+							);
+						} }
+					/>
+				) }
 			</ToolsPanelItem>
 
 			<ToolsPanelItem
