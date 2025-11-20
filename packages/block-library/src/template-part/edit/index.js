@@ -41,6 +41,16 @@ import {
 } from './utils/hooks';
 import { unlock } from '../../lock-unlock';
 
+function getTemplatePartEditButtonTitle( clientId, editedContentOnlySection ) {
+	if ( ! window?.__experimentalContentOnlyPatternInsertion ) {
+		return __( 'Edit' );
+	}
+
+	return editedContentOnlySection === clientId
+		? __( 'Exit section' )
+		: __( 'Edit section' );
+}
+
 function ReplaceButton( {
 	isEntityAvailable,
 	area,
@@ -272,10 +282,10 @@ export default function TemplatePartEdit( {
 									} );
 								} }
 							>
-								{ window?.__experimentalContentOnlyPatternInsertion &&
-								editedContentOnlySection === clientId
-									? __( 'Exit section' )
-									: __( 'Edit section' ) }
+								{ getTemplatePartEditButtonTitle(
+									clientId,
+									editedContentOnlySection
+								) }
 							</ToolbarButton>
 						</BlockControls>
 					) }
