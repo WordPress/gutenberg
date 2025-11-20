@@ -3065,8 +3065,8 @@ class WP_Theme_JSON_Gutenberg {
 		) {
 			$declarations = static::compute_style_properties( $node[ $pseudo_selector ], $settings, null, $this->theme_json, $selector, $use_root_padding );
 		} elseif ( $is_processing_block_pseudo ) {
-			// Process block pseudo-selector styles
-			// For block pseudo-selectors, we need to get the block data first, then access the pseudo-selector
+			// Process block pseudo-selector styles.
+			// For block pseudo-selectors, we need to get the block data first, then access the pseudo-selector.
 			$block_name  = $block_metadata['path'][2]; // 'core/button'
 			$block_data  = _wp_array_get( $this->theme_json, array( 'styles', 'blocks', $block_name ), array() );
 			$pseudo_data = isset( $block_data[ $block_pseudo_selector ] ) ? $block_data[ $block_pseudo_selector ] : array();
