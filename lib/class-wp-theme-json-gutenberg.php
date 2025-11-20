@@ -3885,24 +3885,30 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param array $output The processed node. Passed by reference.
 	 */
 	private static function preserve_valid_settings( $input, &$output ) {
-		// Get preset paths to exclude them.
-		$preset_paths = array();
-		foreach ( static::PRESETS_METADATA as $preset_metadata ) {
-			$preset_paths[] = $preset_metadata['path'];
-		}
+		static $preset_path_map   = null;
+		static $indirect_path_map = null;
 
-		// Get indirect property paths to exclude them.
-		$indirect_paths = array();
-		foreach ( static::INDIRECT_PROPERTIES_METADATA as $paths ) {
-			foreach ( $paths as $path ) {
-				$indirect_paths[] = $path;
+		// Build path maps once on first call for O(1) lookups.
+		if ( null === $preset_path_map ) {
+			$preset_path_map = array();
+			foreach ( static::PRESETS_METADATA as $preset_metadata ) {
+				$path_key                      = implode( '.', $preset_metadata['path'] );
+				$preset_path_map[ $path_key ] = true;
+			}
+
+			$indirect_path_map = array();
+			foreach ( static::INDIRECT_PROPERTIES_METADATA as $paths ) {
+				foreach ( $paths as $path ) {
+					$path_key                        = implode( '.', $path );
+					$indirect_path_map[ $path_key ] = true;
+				}
 			}
 		}
 
 		// Preserve all valid settings.
 		foreach ( static::VALID_SETTINGS as $key => $valid_setting ) {
-			// Skip if this is a preset.
-			if ( in_array( array( $key ), $preset_paths, true ) ) {
+			// Skip if this is a preset (O(1) lookup).
+			if ( isset( $preset_path_map[ $key ] ) ) {
 				continue;
 			}
 
@@ -3920,11 +3926,13 @@ class WP_Theme_JSON_Gutenberg {
 				// Nested setting (e.g., lightbox, layout).
 				$nested_output = isset( $output[ $key ] ) ? $output[ $key ] : array();
 				foreach ( $valid_setting as $nested_key => $nested_valid ) {
-					$nested_path = array( $key, $nested_key );
-					// Skip if this nested path is a preset or indirect property.
-					if ( in_array( $nested_path, $preset_paths, true ) || in_array( $nested_path, $indirect_paths, true ) ) {
+					$nested_path_key = $key . '.' . $nested_key;
+
+					// Skip if preset or indirect property (O(1) lookup).
+					if ( isset( $preset_path_map[ $nested_path_key ] ) || isset( $indirect_path_map[ $nested_path_key ] ) ) {
 						continue;
 					}
+
 					if ( isset( $input[ $key ][ $nested_key ] ) ) {
 						// Allow scalars and arrays (e.g., spacing.units).
 						if ( is_scalar( $input[ $key ][ $nested_key ] ) || is_array( $input[ $key ][ $nested_key ] ) ) {
