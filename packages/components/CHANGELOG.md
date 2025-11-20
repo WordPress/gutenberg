@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `ExternalLink`: Add `withoutIcon` prop to component to allow rendering the link without the external icon (↗ or ↖). ([#73459](https://github.com/WordPress/gutenberg/pull/73459)).
+
 ### Bug Fixes
 
 -   `ExternalLink`: Fix arrow direction for RTL languages. The external link arrow now correctly points to the top-left (↖) instead of top-right (↗) in RTL layouts. ([#73400](https://github.com/WordPress/gutenberg/pull/73400))
