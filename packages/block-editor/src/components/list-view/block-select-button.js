@@ -61,36 +61,28 @@ function ListViewBlockSelectButton(
 		context: 'list-view',
 	} );
 	const { isLocked } = useBlockLock( clientId );
-	const {
-		canToggleBlockVisibility,
-		isBlockHidden,
-		isContentOnly,
-		hasPatternName,
-	} = useSelect(
-		( select ) => {
-			const { getBlockName, getBlockAttributes } =
-				select( blockEditorStore );
-			const { isBlockHidden: _isBlockHidden } = unlock(
-				select( blockEditorStore )
-			);
-			const blockAttributes = getBlockAttributes( clientId );
-			return {
-				canToggleBlockVisibility: hasBlockSupport(
-					getBlockName( clientId ),
-					'blockVisibility',
-					true
-				),
-				isBlockHidden: _isBlockHidden( clientId ),
-				isContentOnly:
-					select( blockEditorStore ).getBlockEditingMode(
-						clientId
-					) === 'contentOnly',
-				hasPatternName: !! blockAttributes?.metadata?.patternName,
-			};
-		},
-		[ clientId ]
-	);
-	const shouldShowLockIcon = isLocked && ! isContentOnly;
+	const { canToggleBlockVisibility, isBlockHidden, hasPatternName } =
+		useSelect(
+			( select ) => {
+				const { getBlockName, getBlockAttributes } =
+					select( blockEditorStore );
+				const { isBlockHidden: _isBlockHidden } = unlock(
+					select( blockEditorStore )
+				);
+				const blockAttributes = getBlockAttributes( clientId );
+				return {
+					canToggleBlockVisibility: hasBlockSupport(
+						getBlockName( clientId ),
+						'blockVisibility',
+						true
+					),
+					isBlockHidden: _isBlockHidden( clientId ),
+					hasPatternName: !! blockAttributes?.metadata?.patternName,
+				};
+			},
+			[ clientId ]
+		);
+	const shouldShowLockIcon = isLocked;
 	const shouldShowBlockVisibilityIcon =
 		canToggleBlockVisibility && isBlockHidden;
 	const isSticky = blockInformation?.positionType === 'sticky';
