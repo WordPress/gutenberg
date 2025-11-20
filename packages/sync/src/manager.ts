@@ -200,9 +200,11 @@ export function createSyncManager(): SyncManager {
 				syncConfig.applyChangesToCRDTDoc( ydoc, record );
 			}, LOCAL_SYNC_MANAGER_ORIGIN );
 
-			const meta = createEntityMeta( objectType, objectId );
-			handlers.editRecord( { meta } );
-			handlers.saveRecord();
+			// If the entity support CRDT persistence, trigger a save. The entity
+			// will call `createEntityMeta` via its pre-persist hook.
+			if ( syncConfig.supports?.crdtPersistence ) {
+				handlers.saveRecord();
+			}
 		}
 	}
 
@@ -366,7 +368,7 @@ export function createSyncManager(): SyncManager {
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
 
-		if ( ! entityState?.syncConfig.supports?.crdtPersistence ) {
+		if ( ! entityState ) {
 			return {};
 		}
 

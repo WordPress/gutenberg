@@ -22,7 +22,6 @@ import {
 	CRDT_RECORD_METADATA_MAP_KEY as RECORD_METADATA_MAP_KEY,
 	CRDT_RECORD_METADATA_SAVED_AT_KEY as SAVED_AT_KEY,
 	CRDT_RECORD_METADATA_SAVED_BY_KEY as SAVED_BY_KEY,
-	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 } from '../config';
 import { createPersistedCRDTDoc } from '../persistence';
 import { getProviderCreators } from '../providers';
@@ -48,6 +47,9 @@ describe( 'SyncManager', () => {
 	let mockRecord: ObjectData;
 	let mockSyncConfig: jest.MockedObject< SyncConfig >;
 
+	// Capture the Y.Doc from provider creator
+	let capturedDoc: Y.Doc | null = null;
+
 	beforeEach( () => {
 		// Reset all mocks
 		jest.clearAllMocks();
@@ -60,8 +62,15 @@ describe( 'SyncManager', () => {
 		mockProviderResult = {
 			destroy: jest.fn(),
 		};
-		mockProviderCreator = jest.fn( () =>
-			Promise.resolve( mockProviderResult )
+		mockProviderCreator = jest.fn(
+			async (
+				_objectType: string,
+				_objectId: string | null,
+				ydoc: Y.Doc
+			) => {
+				capturedDoc = ydoc;
+				return mockProviderResult;
+			}
 		);
 		mockGetProviderCreators.mockReturnValue( [ mockProviderCreator ] );
 
@@ -285,13 +294,6 @@ describe( 'SyncManager', () => {
 				).not.toHaveBeenCalled();
 
 				// Verify a save operation occurred.
-				expect( mockHandlers.editRecord ).toHaveBeenCalledTimes( 1 );
-				expect( mockHandlers.editRecord ).toHaveBeenCalledWith( {
-					meta: {
-						[ WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]:
-							expect.any( String ),
-					},
-				} );
 				expect( mockHandlers.saveRecord ).toHaveBeenCalledTimes( 1 );
 			} );
 
@@ -378,13 +380,6 @@ describe( 'SyncManager', () => {
 				).toHaveBeenCalledWith( expect.any( Y.Doc ), record );
 
 				// Verify a save operation occurred.
-				expect( mockHandlers.editRecord ).toHaveBeenCalledTimes( 1 );
-				expect( mockHandlers.editRecord ).toHaveBeenCalledWith( {
-					meta: {
-						[ WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]:
-							expect.any( String ),
-					},
-				} );
 				expect( mockHandlers.saveRecord ).toHaveBeenCalledTimes( 1 );
 			} );
 
@@ -426,12 +421,9 @@ describe( 'SyncManager', () => {
 					mockSyncConfig.getChangesFromCRDTDoc
 				).not.toHaveBeenCalled();
 
-				// Verify a save operation occurred.
-				expect( mockHandlers.editRecord ).toHaveBeenCalledTimes( 1 );
-				expect( mockHandlers.editRecord ).toHaveBeenCalledWith( {
-					meta: {},
-				} );
-				expect( mockHandlers.saveRecord ).toHaveBeenCalledTimes( 1 );
+				// Verify that meta was not added and no save operation occurred.
+				expect( mockHandlers.editRecord ).not.toHaveBeenCalled();
+				expect( mockHandlers.saveRecord ).not.toHaveBeenCalled();
 			} );
 		} );
 	} );
@@ -524,19 +516,6 @@ describe( 'SyncManager', () => {
 
 	describe( 'update', () => {
 		it( 'updates CRDT document with local changes', async () => {
-			// Capture the Y.Doc from provider creator
-			let capturedDoc: Y.Doc | null = null;
-			mockProviderCreator.mockImplementation(
-				async (
-					_objectType: string,
-					_objectId: string,
-					ydoc: Y.Doc
-				) => {
-					capturedDoc = ydoc;
-					return mockProviderResult;
-				}
-			);
-
 			const manager = createSyncManager();
 
 			await manager.load(
@@ -577,19 +556,6 @@ describe( 'SyncManager', () => {
 		} );
 
 		it( 'applies changes with specified origin', async () => {
-			// Capture the Y.Doc from provider creator
-			let capturedDoc: Y.Doc | null = null;
-			mockProviderCreator.mockImplementation(
-				async (
-					_objectType: string,
-					_objectId: string,
-					ydoc: Y.Doc
-				) => {
-					capturedDoc = ydoc;
-					return mockProviderResult;
-				}
-			);
-
 			const manager = createSyncManager();
 
 			await manager.load(
@@ -621,19 +587,6 @@ describe( 'SyncManager', () => {
 		} );
 
 		it( 'updates the record metadata when the update is associated with a save', async () => {
-			// Capture the Y.Doc from provider creator.
-			let capturedDoc: Y.Doc | null = null;
-			mockProviderCreator.mockImplementation(
-				async (
-					_objectType: string,
-					_objectId: string,
-					ydoc: Y.Doc
-				) => {
-					capturedDoc = ydoc;
-					return mockProviderResult;
-				}
-			);
-
 			const manager = createSyncManager();
 
 			await manager.load(
@@ -669,19 +622,6 @@ describe( 'SyncManager', () => {
 
 	describe( 'CRDT doc observation', () => {
 		it( 'edits the local entity record when remote updates arrive', async () => {
-			// Capture the Y.Doc from provider creator.
-			let capturedDoc: Y.Doc | null = null;
-			mockProviderCreator.mockImplementation(
-				async (
-					_objectType: string,
-					_objectId: string,
-					ydoc: Y.Doc
-				) => {
-					capturedDoc = ydoc;
-					return mockProviderResult;
-				}
-			);
-
 			const manager = createSyncManager();
 
 			await manager.load(
@@ -718,19 +658,6 @@ describe( 'SyncManager', () => {
 		} );
 
 		it( 'does not edit the local record for local transactions', async () => {
-			// Capture the Y.Doc from provider creator.
-			let capturedDoc: Y.Doc | null = null;
-			mockProviderCreator.mockImplementation(
-				async (
-					_objectType: string,
-					_objectId: string,
-					ydoc: Y.Doc
-				) => {
-					capturedDoc = ydoc;
-					return mockProviderResult;
-				}
-			);
-
 			const manager = createSyncManager();
 
 			await manager.load(
