@@ -22,7 +22,6 @@ import {
 	CRDT_RECORD_METADATA_MAP_KEY as RECORD_METADATA_MAP_KEY,
 	CRDT_RECORD_METADATA_SAVED_AT_KEY as SAVED_AT_KEY,
 	CRDT_RECORD_METADATA_SAVED_BY_KEY as SAVED_BY_KEY,
-	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 } from '../config';
 import { createPersistedCRDTDoc } from '../persistence';
 import { getProviderCreators } from '../providers';
@@ -304,13 +303,6 @@ describe( 'SyncManager', () => {
 				).not.toHaveBeenCalled();
 
 				// Verify a save operation occurred.
-				expect( mockHandlers.editRecord ).toHaveBeenCalledTimes( 1 );
-				expect( mockHandlers.editRecord ).toHaveBeenCalledWith( {
-					meta: {
-						[ WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]:
-							expect.any( String ),
-					},
-				} );
 				expect( mockHandlers.saveRecord ).toHaveBeenCalledTimes( 1 );
 			} );
 
@@ -397,13 +389,6 @@ describe( 'SyncManager', () => {
 				).toHaveBeenCalledWith( expect.any( Y.Doc ), record );
 
 				// Verify a save operation occurred.
-				expect( mockHandlers.editRecord ).toHaveBeenCalledTimes( 1 );
-				expect( mockHandlers.editRecord ).toHaveBeenCalledWith( {
-					meta: {
-						[ WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]:
-							expect.any( String ),
-					},
-				} );
 				expect( mockHandlers.saveRecord ).toHaveBeenCalledTimes( 1 );
 			} );
 
@@ -445,12 +430,9 @@ describe( 'SyncManager', () => {
 					mockSyncConfig.getChangesFromCRDTDoc
 				).not.toHaveBeenCalled();
 
-				// Verify a save operation occurred.
-				expect( mockHandlers.editRecord ).toHaveBeenCalledTimes( 1 );
-				expect( mockHandlers.editRecord ).toHaveBeenCalledWith( {
-					meta: {},
-				} );
-				expect( mockHandlers.saveRecord ).toHaveBeenCalledTimes( 1 );
+				// Verify that meta was not added and no save operation occurred.
+				expect( mockHandlers.editRecord ).not.toHaveBeenCalled();
+				expect( mockHandlers.saveRecord ).not.toHaveBeenCalled();
 			} );
 		} );
 	} );
