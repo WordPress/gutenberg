@@ -104,8 +104,15 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		$post_type_object = get_post_type_object( $post_type );
 		$archive_link     = get_post_type_archive_link( $post_type );
 		if ( $archive_link && untrailingslashit( home_url() ) !== untrailingslashit( $archive_link ) ) {
+			$label = $post_type_object->labels->archives;
+			if ( 'post' === $post_type ) {
+				$page_for_posts = get_option( 'page_for_posts' );
+				if ( $page_for_posts ) {
+					$label = block_core_breadcrumbs_get_post_title( $page_for_posts );
+				}
+			}
 			$breadcrumb_items[] = array(
-				'label' => $post_type_object->labels->archives,
+				'label' => $label,
 				'url'   => $archive_link,
 			);
 		}
