@@ -3,6 +3,11 @@
  */
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../lock-unlock';
+
 const CONTENT = 'content';
 
 /**
@@ -12,8 +17,25 @@ export default {
 	name: 'core/pattern-overrides',
 	getValues( { select, clientId, context, bindings } ) {
 		const patternOverridesContent = context[ 'pattern/overrides' ];
-		const { getBlockAttributes } = select( blockEditorStore );
+		const {
+			getBlockAttributes,
+			getBlockParentsByBlockName,
+			getEditedContentOnlySection,
+		} = unlock( select( blockEditorStore ) );
+		const editedContentOnlySection = getEditedContentOnlySection();
+		const [ patternClientId ] = getBlockParentsByBlockName(
+			clientId,
+			'core/block',
+			true
+		);
 		const currentBlockAttributes = getBlockAttributes( clientId );
+
+		// If the pattern source is being edited (editedContentOnlySection), skip
+		// returning the override values and instead return the original pattern's
+		// attribute values instead.
+		if ( editedContentOnlySection === patternClientId ) {
+			return currentBlockAttributes;
+		}
 
 		const overridesValues = {};
 		for ( const attributeName of Object.keys( bindings ) ) {
@@ -36,14 +58,18 @@ export default {
 		return overridesValues;
 	},
 	setValues( { select, dispatch, clientId, bindings } ) {
-		const { getBlockAttributes, getBlockParentsByBlockName, getBlocks } =
-			select( blockEditorStore );
+		const {
+			getBlockAttributes,
+			getBlockParentsByBlockName,
+			getEditedContentOnlySection,
+		} = unlock( select( blockEditorStore ) );
 		const currentBlockAttributes = getBlockAttributes( clientId );
 		const blockName = currentBlockAttributes?.metadata?.name;
 		if ( ! blockName ) {
 			return;
 		}
 
+		const editedContentOnlySection = getEditedContentOnlySection();
 		const [ patternClientId ] = getBlockParentsByBlockName(
 			clientId,
 			'core/block',
@@ -59,23 +85,20 @@ export default {
 			{}
 		);
 
-		// If there is no pattern client ID, sync blocks with the same name and same attributes.
-		if ( ! patternClientId ) {
-			const syncBlocksWithSameName = ( blocks ) => {
-				for ( const block of blocks ) {
-					if ( block.attributes?.metadata?.name === blockName ) {
-						dispatch( blockEditorStore ).updateBlockAttributes(
-							block.clientId,
-							attributes
-						);
-					}
-					syncBlocksWithSameName( block.innerBlocks );
-				}
-			};
+		// If there is no pattern client ID, or the pattern source is being edited
+		// (editedContentOnlySection), skip updating the binding and update the block itself.
+		if (
+			! patternClientId ||
+			editedContentOnlySection === patternClientId
+		) {
+			dispatch( blockEditorStore ).updateBlockAttributes(
+				clientId,
+				attributes
+			);
 
-			syncBlocksWithSameName( getBlocks() );
 			return;
 		}
+
 		const currentBindingValue =
 			getBlockAttributes( patternClientId )?.[ CONTENT ];
 
