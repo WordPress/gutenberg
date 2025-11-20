@@ -335,6 +335,27 @@ class WP_Theme_JSON_Gutenberg {
 	);
 
 	/**
+	 * Safe settings that can be preserved without CSS validation.
+	 *
+	 * These are non-preset, non-CSS settings that control behavior rather than styling.
+	 * Each entry defines the setting path and its expected type for validation.
+	 *
+	 * Types: 'boolean', 'string', 'array' (for custom properties)
+	 *
+	 * @since 7.0.0
+	 */
+	const SAFE_SETTINGS = array(
+		array(
+			'path' => array( 'lightbox', 'allowEditing' ),
+			'type' => 'boolean',
+		),
+		array(
+			'path' => array( 'lightbox', 'enabled' ),
+			'type' => 'boolean',
+		),
+	);
+
+	/**
 	 * Protected style properties.
 	 *
 	 * These style properties are only rendered if a setting enables it
@@ -3885,64 +3906,30 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param array $output The processed node. Passed by reference.
 	 */
 	private static function preserve_valid_settings( $input, &$output ) {
-		static $preset_path_map   = null;
-		static $indirect_path_map = null;
+		// Iterate through safe settings and preserve them with type validation.
+		foreach ( static::SAFE_SETTINGS as $safe_setting ) {
+			$path = $safe_setting['path'];
+			$type = $safe_setting['type'];
 
-		// Build path maps once on first call for O(1) lookups.
-		if ( null === $preset_path_map ) {
-			$preset_path_map = array();
-			foreach ( static::PRESETS_METADATA as $preset_metadata ) {
-				$path_key                     = implode( '.', $preset_metadata['path'] );
-				$preset_path_map[ $path_key ] = true;
-			}
+			// Extract the value from input using the path.
+			$value = _wp_array_get( $input, $path, null );
 
-			$indirect_path_map = array();
-			foreach ( static::INDIRECT_PROPERTIES_METADATA as $paths ) {
-				foreach ( $paths as $path ) {
-					$path_key                       = implode( '.', $path );
-					$indirect_path_map[ $path_key ] = true;
-				}
-			}
-		}
-
-		// Preserve all valid settings.
-		foreach ( static::VALID_SETTINGS as $key => $valid_setting ) {
-			// Skip if this is a preset.
-			if ( isset( $preset_path_map[ $key ] ) ) {
+			// Skip if the setting is not present in the input.
+			if ( null === $value ) {
 				continue;
 			}
 
-			if ( null === $valid_setting ) {
-				// Simple setting (e.g., appearanceTools, custom).
-				// For 'custom', allow arrays; for others, only scalars.
-				if ( isset( $input[ $key ] ) ) {
-					if ( 'custom' === $key && is_array( $input[ $key ] ) ) {
-						$output[ $key ] = $input[ $key ];
-					} elseif ( is_scalar( $input[ $key ] ) ) {
-						$output[ $key ] = $input[ $key ];
-					}
-				}
-			} elseif ( is_array( $valid_setting ) && isset( $input[ $key ] ) && is_array( $input[ $key ] ) ) {
-				// Nested setting (e.g., lightbox, layout).
-				$nested_output = $output[ $key ] ?? array();
-				foreach ( $valid_setting as $nested_key => $nested_valid ) {
-					$nested_path_key = $key . '.' . $nested_key;
+			// Validate the type.
+			$is_valid_type = false;
+			switch ( $type ) {
+				case 'boolean':
+					$is_valid_type = is_bool( $value );
+					break;
+			}
 
-					// Skip if preset or indirect property.
-					if ( isset( $preset_path_map[ $nested_path_key ] ) || isset( $indirect_path_map[ $nested_path_key ] ) ) {
-						continue;
-					}
-
-					if ( isset( $input[ $key ][ $nested_key ] ) ) {
-						// Allow scalars and arrays (e.g., spacing.units).
-						if ( is_scalar( $input[ $key ][ $nested_key ] ) || is_array( $input[ $key ][ $nested_key ] ) ) {
-							$nested_output[ $nested_key ] = $input[ $key ][ $nested_key ];
-						}
-					}
-				}
-				if ( ! empty( $nested_output ) ) {
-					$output[ $key ] = $nested_output;
-				}
+			// If the type is valid, set it in the output using the path.
+			if ( $is_valid_type ) {
+				_wp_array_set( $output, $path, $value );
 			}
 		}
 	}

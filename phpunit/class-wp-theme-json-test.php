@@ -2692,8 +2692,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$expected = array(
 			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 			'settings' => array(
-				'color'   => array(
-					'custom'  => true,
+				'color'  => array(
 					'palette' => array(
 						'custom' => array(
 							array(
@@ -2714,13 +2713,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'spacing' => array(
-					'padding' => false,
-				),
-				'blocks'  => array(
+				'blocks' => array(
 					'core/group' => array(
-						'color'   => array(
-							'custom'  => true,
+						'color' => array(
 							'palette' => array(
 								'custom' => array(
 									array(
@@ -2741,140 +2736,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 								),
 							),
 						),
-						'spacing' => array(
-							'padding' => false,
-						),
 					),
-				),
-			),
-		);
-		$this->assertEqualSetsWithIndex( $expected, $actual );
-	}
-
-	public function test_remove_insecure_properties_preserves_valid_block_settings() {
-		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
-			array(
-				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-				'settings' => array(
-					'blocks' => array(
-						'core/image' => array(
-							'lightbox'   => array(
-								'enabled'      => true,
-								'allowEditing' => false,
-							),
-							'layout'     => array(
-								'allowEditing' => true,
-								'allowCustomContentAndWideSize' => false,
-							),
-							'position'   => array(
-								'fixed'  => true,
-								'sticky' => false,
-							),
-							'color'      => array(
-								'background' => true,
-								'text'       => false,
-							),
-							'spacing'    => array(
-								'margin'  => true,
-								'padding' => false,
-								'units'   => array( 'px', 'em' ),
-							),
-							'typography' => array(
-								'fontStyle'  => true,
-								'fontWeight' => false,
-								'textAlign'  => true,
-							),
-						),
-					),
-				),
-			),
-			'custom'
-		);
-
-		$expected = array(
-			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-			'settings' => array(
-				'blocks' => array(
-					'core/image' => array(
-						'lightbox'   => array(
-							'enabled'      => true,
-							'allowEditing' => false,
-						),
-						'layout'     => array(
-							'allowEditing' => true,
-							'allowCustomContentAndWideSize' => false,
-						),
-						'position'   => array(
-							'fixed'  => true,
-							'sticky' => false,
-						),
-						'color'      => array(
-							'background' => true,
-							'text'       => false,
-						),
-						'spacing'    => array(
-							'margin'  => true,
-							'padding' => false,
-							'units'   => array( 'px', 'em' ),
-						),
-						'typography' => array(
-							'fontStyle'  => true,
-							'fontWeight' => false,
-							'textAlign'  => true,
-						),
-					),
-				),
-			),
-		);
-		$this->assertEqualSetsWithIndex( $expected, $actual );
-	}
-
-	public function test_remove_insecure_properties_preserves_valid_top_level_settings() {
-		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
-			array(
-				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-				'settings' => array(
-					'appearanceTools'               => true,
-					'useRootPaddingAwareAlignments' => false,
-					'lightbox'                      => array(
-						'enabled'      => true,
-						'allowEditing' => false,
-					),
-					'layout'                        => array(
-						'allowEditing'                  => true,
-						'allowCustomContentAndWideSize' => false,
-					),
-					'position'                      => array(
-						'fixed'  => true,
-						'sticky' => false,
-					),
-					'custom'                        => array(
-						'someCustomProperty' => 'value',
-					),
-				),
-			),
-			'custom'
-		);
-
-		$expected = array(
-			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-			'settings' => array(
-				'appearanceTools'               => true,
-				'useRootPaddingAwareAlignments' => false,
-				'lightbox'                      => array(
-					'enabled'      => true,
-					'allowEditing' => false,
-				),
-				'layout'                        => array(
-					'allowEditing'                  => true,
-					'allowCustomContentAndWideSize' => false,
-				),
-				'position'                      => array(
-					'fixed'  => true,
-					'sticky' => false,
-				),
-				'custom'                        => array(
-					'someCustomProperty' => 'value',
 				),
 			),
 		);
@@ -3098,6 +2960,43 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertSameSetsWithIndex( $expected, $actual );
+	}
+
+	/**
+	 * @covers WP_Theme_JSON_Gutenberg::remove_insecure_properties
+	 */
+	public function test_remove_insecure_properties_should_allow_safe_settings() {
+		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'blocks'                        => array(
+						'core/image' => array(
+							'lightbox' => array(
+								'enabled'      => false,
+								'allowEditing' => true,
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected = array(
+			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'settings' => array(
+				'blocks'                        => array(
+					'core/image' => array(
+						'lightbox' => array(
+							'enabled'      => false,
+							'allowEditing' => true,
+						),
+					),
+				),
+			),
+		);
+
+		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
 
 
