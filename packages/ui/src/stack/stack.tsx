@@ -18,17 +18,12 @@ import styles from './style.module.css';
 /**
  * Design tokens for gap spacing.
  */
-type TokenName = 'x-small' | 'small' | 'medium' | 'large';
+type TokenName = 'xs' | 'sm' | 'md' | 'lg';
 
 /**
  * Set of token names for gap spacing.
  */
-const TOKEN_NAMES = new Set< TokenName >( [
-	'x-small',
-	'small',
-	'medium',
-	'large',
-] );
+const TOKEN_NAMES = new Set< TokenName >( [ 'xs', 'sm', 'md', 'lg' ] );
 
 /**
  * Normalizes the gap value. When given a positive number, it will be converted

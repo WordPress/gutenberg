@@ -622,7 +622,7 @@
 		},
 		"description": "Large spacing for surfaces"
 	},
-	"Dimension/Semantic/gap-x-small": {
+	"Dimension/Semantic/gap-xs": {
 		"value": {
 			".": "8px",
 			"compact": "4px",
@@ -630,7 +630,7 @@
 		},
 		"description": "Extra small gap for content flow"
 	},
-	"Dimension/Semantic/gap-small": {
+	"Dimension/Semantic/gap-sm": {
 		"value": {
 			".": "12px",
 			"compact": "8px",
@@ -638,7 +638,7 @@
 		},
 		"description": "Small gap for content flow"
 	},
-	"Dimension/Semantic/gap-medium": {
+	"Dimension/Semantic/gap-md": {
 		"value": {
 			".": "16px",
 			"compact": "12px",
@@ -646,7 +646,7 @@
 		},
 		"description": "Medium gap for content flow"
 	},
-	"Dimension/Semantic/gap-large": {
+	"Dimension/Semantic/gap-lg": {
 		"value": {
 			".": "24px",
 			"compact": "16px",

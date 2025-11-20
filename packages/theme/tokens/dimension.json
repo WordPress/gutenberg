@@ -105,7 +105,7 @@
 				}
 			},
 			"gap": {
-				"x-small": {
+				"xs": {
 					"$value": "{dimension.primitive.space.20}",
 					"$description": "Extra small gap for content flow",
 					"$extensions": {
@@ -115,7 +115,7 @@
 						}
 					}
 				},
-				"small": {
+				"sm": {
 					"$value": "{dimension.primitive.space.30}",
 					"$description": "Small gap for content flow",
 					"$extensions": {
@@ -125,7 +125,7 @@
 						}
 					}
 				},
-				"medium": {
+				"md": {
 					"$value": "{dimension.primitive.space.40}",
 					"$description": "Medium gap for content flow",
 					"$extensions": {
@@ -135,7 +135,7 @@
 						}
 					}
 				},
-				"large": {
+				"lg": {
 					"$value": "{dimension.primitive.space.60}",
 					"$description": "Large gap for content flow",
 					"$extensions": {

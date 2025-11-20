@@ -16,13 +16,13 @@ const meta: Meta< typeof Stack > = {
 };
 export default meta;
 
-const DemoBox = ( { variant }: { variant?: 'large' } ) => (
+const DemoBox = ( { variant }: { variant?: 'lg' } ) => (
 	<Box
 		backgroundColor="brand"
 		padding="sm"
 		style={ {
-			width: variant === 'large' ? '150px' : '100px',
-			height: variant === 'large' ? '150px' : '100px',
+			width: variant === 'lg' ? '150px' : '100px',
+			height: variant === 'lg' ? '150px' : '100px',
 		} }
 	/>
 );
@@ -31,14 +31,14 @@ type Story = StoryObj< typeof Stack >;
 
 export const Default: Story = {
 	args: {
-		gap: 'small',
+		gap: 'sm',
 		children: (
 			<>
 				<DemoBox />
-				<DemoBox variant="large" />
+				<DemoBox variant="lg" />
 				<DemoBox />
 				<DemoBox />
-				<DemoBox variant="large" />
+				<DemoBox variant="lg" />
 				<DemoBox />
 			</>
 		),
@@ -48,11 +48,10 @@ export const Default: Story = {
 			control: {
 				type: 'select',
 			},
-			options: [ 0, 1, 2, 3, 4, 'x-small', 'small', 'medium', 'large' ],
+			options: [ 0, 1, 2, 3, 4, 'xs', 'sm', 'md', 'lg' ],
 			table: {
 				type: {
-					summary:
-						'number | "x-small" | "small" | "medium" | "large"',
+					summary: 'number | "xs" | "sm" | "md" | "lg"',
 				},
 			},
 		},
@@ -111,17 +110,17 @@ export const Nested: Story = {
 		justify: 'center',
 		children: (
 			<>
-				<DemoBox variant="large" />
-				<Stack gap="medium">
+				<DemoBox variant="lg" />
+				<Stack gap="md">
 					<DemoBox />
 					<DemoBox />
 				</Stack>
-				<DemoBox variant="large" />
+				<DemoBox variant="lg" />
 				<Stack gap={ 0 } direction="column">
 					<DemoBox />
 					<DemoBox />
 				</Stack>
-				<DemoBox variant="large" />
+				<DemoBox variant="lg" />
 			</>
 		),
 	},

@@ -21,9 +21,9 @@ describe( 'getNormalizedGap', () => {
 	} );
 
 	it( 'should return the CSS variable reference to a token value', () => {
-		const result = getNormalizedGap( 'medium' );
+		const result = getNormalizedGap( 'md' );
 
-		expect( result ).toBe( 'var(--wpds-dimension-gap-medium)' );
+		expect( result ).toBe( 'var(--wpds-dimension-gap-md)' );
 	} );
 
 	it( 'should return the gap as a literal value when the gap is a string', () => {
