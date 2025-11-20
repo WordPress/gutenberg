@@ -272,7 +272,7 @@ function CalendarDateControl< Item >( {
 		null
 	);
 
-	let weekStartsOn;
+	let weekStartsOn = getSettings().l10n.startOfWeek;
 	if ( type === 'date' ) {
 		// If the field type is date, we've already normalized the format,
 		// and so it's safe to tell TypeScript to trust us ("as Required<Format>").
