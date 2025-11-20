@@ -608,9 +608,9 @@ export const InfiniteScroll = () => {
 					scrollDirection === 'up'
 						? [ ...newRecords, ...prev ]
 						: [ ...prev, ...newRecords ];
-				// Check whether we have more than 2 pages of data loaded and if so,
+				// Check whether we have more than 3 pages of data loaded and if so,
 				// trim some off the end we're scrolling away from.
-				if ( orderedRecords.length > 12 ) {
+				if ( orderedRecords.length > 18 ) {
 					orderedRecords =
 						scrollDirection === 'up'
 							? orderedRecords.filter(
@@ -638,7 +638,6 @@ export const InfiniteScroll = () => {
 		view.perPage,
 		currentPage,
 		view.infiniteScrollEnabled,
-		shownData,
 		allLoadedRecords.length,
 		scrollDirection,
 		visibleEntries,
