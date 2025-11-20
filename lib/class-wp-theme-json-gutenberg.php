@@ -3892,14 +3892,14 @@ class WP_Theme_JSON_Gutenberg {
 		if ( null === $preset_path_map ) {
 			$preset_path_map = array();
 			foreach ( static::PRESETS_METADATA as $preset_metadata ) {
-				$path_key                      = implode( '.', $preset_metadata['path'] );
+				$path_key                     = implode( '.', $preset_metadata['path'] );
 				$preset_path_map[ $path_key ] = true;
 			}
 
 			$indirect_path_map = array();
 			foreach ( static::INDIRECT_PROPERTIES_METADATA as $paths ) {
 				foreach ( $paths as $path ) {
-					$path_key                        = implode( '.', $path );
+					$path_key                       = implode( '.', $path );
 					$indirect_path_map[ $path_key ] = true;
 				}
 			}
@@ -3907,7 +3907,7 @@ class WP_Theme_JSON_Gutenberg {
 
 		// Preserve all valid settings.
 		foreach ( static::VALID_SETTINGS as $key => $valid_setting ) {
-			// Skip if this is a preset (O(1) lookup).
+			// Skip if this is a preset.
 			if ( isset( $preset_path_map[ $key ] ) ) {
 				continue;
 			}
@@ -3928,7 +3928,7 @@ class WP_Theme_JSON_Gutenberg {
 				foreach ( $valid_setting as $nested_key => $nested_valid ) {
 					$nested_path_key = $key . '.' . $nested_key;
 
-					// Skip if preset or indirect property (O(1) lookup).
+					// Skip if preset or indirect property.
 					if ( isset( $preset_path_map[ $nested_path_key ] ) || isset( $indirect_path_map[ $nested_path_key ] ) ) {
 						continue;
 					}

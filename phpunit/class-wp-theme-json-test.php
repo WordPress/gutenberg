@@ -2758,23 +2758,23 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'settings' => array(
 					'blocks' => array(
 						'core/image' => array(
-							'lightbox' => array(
+							'lightbox'   => array(
 								'enabled'      => true,
 								'allowEditing' => false,
 							),
-							'layout'   => array(
-								'allowEditing'                  => true,
+							'layout'     => array(
+								'allowEditing' => true,
 								'allowCustomContentAndWideSize' => false,
 							),
-							'position' => array(
+							'position'   => array(
 								'fixed'  => true,
 								'sticky' => false,
 							),
-							'color'    => array(
+							'color'      => array(
 								'background' => true,
 								'text'       => false,
 							),
-							'spacing'  => array(
+							'spacing'    => array(
 								'margin'  => true,
 								'padding' => false,
 								'units'   => array( 'px', 'em' ),
@@ -2796,23 +2796,23 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			'settings' => array(
 				'blocks' => array(
 					'core/image' => array(
-						'lightbox' => array(
+						'lightbox'   => array(
 							'enabled'      => true,
 							'allowEditing' => false,
 						),
-						'layout'   => array(
-							'allowEditing'                  => true,
+						'layout'     => array(
+							'allowEditing' => true,
 							'allowCustomContentAndWideSize' => false,
 						),
-						'position' => array(
+						'position'   => array(
 							'fixed'  => true,
 							'sticky' => false,
 						),
-						'color'    => array(
+						'color'      => array(
 							'background' => true,
 							'text'       => false,
 						),
-						'spacing'  => array(
+						'spacing'    => array(
 							'margin'  => true,
 							'padding' => false,
 							'units'   => array( 'px', 'em' ),
