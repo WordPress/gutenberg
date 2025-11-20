@@ -2,12 +2,12 @@ import {
 	Button,
 	Popover,
 	Icon,
-	DropdownMenu,
-	IconButton,
 } from '@wordpress/components';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { chevronDown, pencil, seen } from '@wordpress/icons';
+import { store as editorStore } from '../../store';
 
 const MODES = [
 	{
@@ -31,15 +31,17 @@ const MODES = [
 export function EditorMode() {
 	const [ isPopoverVisible, setIsPopoverVisible ] = useState( false );
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
-	const [ selectedMode, setSelectedMode ] = useState( 'edit' );
 
-	// ToDo: Read this from the store instead.
-	//const selectedMode = 'edit';
+	const selectedMode = useSelect(
+		select => select( editorStore ).getCollaboratorMode()
+	);
+
+	const { setCollaboratorMode } = useDispatch( editorStore );
 
 	const currentMode = MODES.find( ( mode ) => mode.value === selectedMode );
 
 	const handleModeSelect = ( mode ) => {
-		setSelectedMode( mode );
+		setCollaboratorMode( mode );
 		setIsPopoverVisible( false );
 	};
 

@@ -247,6 +247,15 @@ export function postAutosavingLock( state = {}, action ) {
 	return state;
 }
 
+export function collaboratorMode( state = 'edit', action ) {
+	switch ( action.type ) {
+		case 'SET_COLLABORATOR_MODE':
+			return action.collaboratorMode;
+	}
+
+	return state;
+}
+
 /**
  * Reducer returning the post editor setting.
  *

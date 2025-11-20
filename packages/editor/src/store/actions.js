@@ -629,6 +629,13 @@ export function updateEditorSettings( settings ) {
 	};
 }
 
+export function setCollaboratorMode( collaboratorMode ) {
+	return {
+		type: 'SET_COLLABORATOR_MODE',
+		collaboratorMode,
+	};
+}
+
 /**
  * Returns an action used to set the rendering mode of the post editor. We support multiple rendering modes:
  *

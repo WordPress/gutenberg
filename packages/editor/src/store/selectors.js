@@ -1357,6 +1357,10 @@ export const getDeviceType = createRegistrySelector(
 	}
 );
 
+export function getCollaboratorMode( state ) {
+	return state.collaboratorMode ? state.collaboratorMode : 'edit';
+}
+
 /**
  * Returns true if the list view is opened.
  *
