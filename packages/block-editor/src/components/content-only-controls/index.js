@@ -9,6 +9,7 @@ import {
 	__experimentalHStack as HStack,
 	Icon,
 	Navigator,
+	__experimentalToolsPanel as ToolsPanel,
 	useNavigator,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
