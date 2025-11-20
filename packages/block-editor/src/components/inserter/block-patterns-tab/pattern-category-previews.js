@@ -166,7 +166,7 @@ export function PatternCategoryPreviews( {
 						variant="muted"
 						className="block-editor-inserter__patterns-category-no-results"
 					>
-						{ __( 'No results found' ) }
+						{ __( 'No results found.' ) }
 					</Text>
 				) }
 			</VStack>

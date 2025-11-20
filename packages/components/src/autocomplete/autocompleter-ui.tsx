@@ -159,7 +159,7 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
 					);
 				}
 			} else {
-				debouncedSpeak( __( 'No results.' ), 'assertive' );
+				debouncedSpeak( __( 'No results found.' ), 'assertive' );
 			}
 		}
 

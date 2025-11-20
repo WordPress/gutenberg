@@ -17,6 +17,7 @@
 ### Bug fixes
 
 - Fix: ensure primary actions are not wrapped in the list layout. [#73333](https://github.com/WordPress/gutenberg/pull/73333)
+- Fix: updated the copy for no results to `No Results Found.` throughout for consistently throughout both Gutenberg and WordPress-Develop. ([#73370](https://github.com/WordPress/gutenberg/pull/73370))
 
 ### Breaking changes
 

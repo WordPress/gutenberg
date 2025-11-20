@@ -321,7 +321,7 @@ function ComboboxList( { view, filter, onChangeView }: SearchWidgetProps ) {
 						</Ariakit.ComboboxItem>
 					);
 				} ) }
-				{ ! matches.length && <p>{ __( 'No results found' ) }</p> }
+				{ ! matches.length && <p>{ __( 'No results found.' ) }</p> }
 			</Ariakit.ComboboxList>
 		</Ariakit.ComboboxProvider>
 	);
