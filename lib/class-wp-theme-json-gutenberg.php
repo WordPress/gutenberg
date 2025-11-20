@@ -1039,7 +1039,7 @@ class WP_Theme_JSON_Gutenberg {
 			$schema_styles_blocks[ $block ]             = $styles_non_top_level;
 			$schema_styles_blocks[ $block ]['elements'] = $schema_styles_elements;
 
-			// Add pseudo-selectors for blocks that support them
+			// Add pseudo-selectors for blocks that support them.
 			if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] ) ) {
 				foreach ( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] as $pseudo_selector ) {
 					$schema_styles_blocks[ $block ][ $pseudo_selector ] = $styles_non_top_level;
