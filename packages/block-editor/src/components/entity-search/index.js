@@ -2,7 +2,14 @@
  * WordPress dependencies
  */
 import { ComboboxControl, Icon } from '@wordpress/components';
-import { useState, useMemo, useEffect } from '@wordpress/element';
+import {
+	useState,
+	useMemo,
+	useEffect,
+	useRef,
+	forwardRef,
+	useImperativeHandle,
+} from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { debounce } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
@@ -56,225 +63,242 @@ function getEntityIcon( type ) {
  *                                          Defaults to showing the URL
  * @return {JSX.Element} The EntitySearch component
  */
-export function EntitySearch( {
-	label,
-	value,
-	onChange,
-	help,
-	suggestionsQuery = {},
-	getDisplayValue = ( suggestion ) => suggestion?.url || '',
-} ) {
-	const [ searchTerm, setSearchTerm ] = useState( '' );
-	const [ suggestions, setSuggestions ] = useState( [] );
-	const [ isLoading, setIsLoading ] = useState( false );
+export const EntitySearch = forwardRef(
+	(
+		{
+			label,
+			value,
+			onChange,
+			help,
+			suggestionsQuery = {},
+			getDisplayValue = ( suggestion ) => suggestion?.url || '',
+		},
+		ref
+	) => {
+		const [ searchTerm, setSearchTerm ] = useState( '' );
+		const [ suggestions, setSuggestions ] = useState( [] );
+		const [ isLoading, setIsLoading ] = useState( false );
+		const inputRef = useRef( null );
 
-	// Get the fetchLinkSuggestions function from block editor settings
-	const fetchLinkSuggestions = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return getSettings().__experimentalFetchLinkSuggestions;
-	}, [] );
-
-	// Destructure suggestionsQuery to track actual values instead of object reference
-	const { type, subtype } = suggestionsQuery;
-
-	// Memoize search options to prevent infinite loops from object references
-	const searchOptions = useMemo(
-		() => ( {
-			perPage: 20,
-			type,
-			subtype,
-		} ),
-		[ type, subtype ]
-	);
-
-	// Fetch suggestions only when user has typed something
-	useEffect( () => {
-		// Only fetch if there's a search term
-		if ( ! searchTerm || ! fetchLinkSuggestions ) {
-			setSuggestions( [] );
-			setIsLoading( false );
-			return;
-		}
-
-		setIsLoading( true );
-
-		fetchLinkSuggestions( searchTerm, searchOptions )
-			.then( ( results ) => {
-				setSuggestions( results || [] );
-				setIsLoading( false );
-			} )
-			.catch( () => {
-				setSuggestions( [] );
-				setIsLoading( false );
-			} );
-	}, [ searchTerm, fetchLinkSuggestions, searchOptions ] );
-
-	// Transform suggestions into combobox options
-	const options = useMemo( () => {
-		// Build options from search results
-		const opts = suggestions.map( ( suggestion ) => ( {
-			value: suggestion.url,
-			label: getDisplayValue( suggestion ),
-			suggestion,
+		// Expose select method to parent component
+		useImperativeHandle( ref, () => ( {
+			select: () => {
+				const input = inputRef.current?.querySelector( 'input' );
+				if ( input ) {
+					input.focus();
+					input.select();
+				}
+			},
 		} ) );
 
-		// Add current value as first option when input is empty or matches search
-		if ( value ) {
-			const valueMatchesSearch =
-				! searchTerm ||
-				value.toLowerCase().includes( searchTerm.toLowerCase() );
+		// Get the fetchLinkSuggestions function from block editor settings
+		const fetchLinkSuggestions = useSelect( ( select ) => {
+			const { getSettings } = select( blockEditorStore );
+			return getSettings().__experimentalFetchLinkSuggestions;
+		}, [] );
 
-			// Check if value is already in suggestions to avoid duplicate keys
-			const alreadyInSuggestions = opts.some(
-				( opt ) => opt.value === value
-			);
+		// Destructure suggestionsQuery to track actual values instead of object reference
+		const { type, subtype } = suggestionsQuery;
 
-			if ( valueMatchesSearch && ! alreadyInSuggestions ) {
-				// Add current value at the beginning
-				opts.unshift( {
-					value,
-					label: value,
-					isCurrentValue: true,
-				} );
+		// Memoize search options to prevent infinite loops from object references
+		const searchOptions = useMemo(
+			() => ( {
+				perPage: 20,
+				type,
+				subtype,
+			} ),
+			[ type, subtype ]
+		);
+
+		// Fetch suggestions only when user has typed something
+		useEffect( () => {
+			// Only fetch if there's a search term
+			if ( ! searchTerm || ! fetchLinkSuggestions ) {
+				setSuggestions( [] );
+				setIsLoading( false );
+				return;
 			}
-		}
 
-		// Add freeform option for typed values (when user is actively typing)
-		// This allows Enter/blur to commit whatever the user typed
-		if ( searchTerm ) {
-			// Don't add if it duplicates any existing option
-			const alreadyExists = opts.some(
-				( opt ) => opt.value === searchTerm
-			);
-			if ( ! alreadyExists ) {
-				opts.push( {
-					value: searchTerm,
-					label: searchTerm,
-					isFreeformOption: true,
+			setIsLoading( true );
+
+			fetchLinkSuggestions( searchTerm, searchOptions )
+				.then( ( results ) => {
+					setSuggestions( results || [] );
+					setIsLoading( false );
+				} )
+				.catch( () => {
+					setSuggestions( [] );
+					setIsLoading( false );
 				} );
+		}, [ searchTerm, fetchLinkSuggestions, searchOptions ] );
+
+		// Transform suggestions into combobox options
+		const options = useMemo( () => {
+			// Build options from search results
+			const opts = suggestions.map( ( suggestion ) => ( {
+				value: suggestion.url,
+				label: getDisplayValue( suggestion ),
+				suggestion,
+			} ) );
+
+			// Add current value as first option when input is empty or matches search
+			if ( value ) {
+				const valueMatchesSearch =
+					! searchTerm ||
+					value.toLowerCase().includes( searchTerm.toLowerCase() );
+
+				// Check if value is already in suggestions to avoid duplicate keys
+				const alreadyInSuggestions = opts.some(
+					( opt ) => opt.value === value
+				);
+
+				if ( valueMatchesSearch && ! alreadyInSuggestions ) {
+					// Add current value at the beginning
+					opts.unshift( {
+						value,
+						label: value,
+						isCurrentValue: true,
+					} );
+				}
 			}
-		}
 
-		return opts;
-	}, [ suggestions, getDisplayValue, searchTerm, value ] );
+			// Add freeform option for typed values (when user is actively typing)
+			// This allows Enter/blur to commit whatever the user typed
+			if ( searchTerm ) {
+				// Don't add if it duplicates any existing option
+				const alreadyExists = opts.some(
+					( opt ) => opt.value === searchTerm
+				);
+				if ( ! alreadyExists ) {
+					opts.push( {
+						value: searchTerm,
+						label: searchTerm,
+						isFreeformOption: true,
+					} );
+				}
+			}
 
-	// Debounced search term setter
-	const debouncedSetSearchTerm = useMemo(
-		() =>
-			debounce( ( inputValue ) => {
-				setSearchTerm( inputValue );
-			}, 300 ),
-		[]
-	);
+			return opts;
+		}, [ suggestions, getDisplayValue, searchTerm, value ] );
 
-	// Handle search input changes (NOT debounced for ignore check)
-	const handleFilterValueChange = ( inputValue ) => {
-		// Don't search if input is empty
-		// ComboboxControl clears the input on focus - this is intentional
-		// Just show the current value in options and let user type or select
-		if ( inputValue === '' ) {
-			setSearchTerm( '' );
-			return;
-		}
+		// Debounced search term setter
+		const debouncedSetSearchTerm = useMemo(
+			() =>
+				debounce( ( inputValue ) => {
+					setSearchTerm( inputValue );
+				}, 300 ),
+			[]
+		);
 
-		// Debounce the actual search
-		debouncedSetSearchTerm( inputValue );
-	};
+		// Handle search input changes (NOT debounced for ignore check)
+		const handleFilterValueChange = ( inputValue ) => {
+			// Don't search if input is empty
+			// ComboboxControl clears the input on focus - this is intentional
+			// Just show the current value in options and let user type or select
+			if ( inputValue === '' ) {
+				setSearchTerm( '' );
+				return;
+			}
 
-	// Handle blur to commit typed value
-	const handleBlur = () => {
-		// If user typed something that hasn't been committed, commit it
-		if ( searchTerm && searchTerm !== value ) {
-			onChange( searchTerm );
-		}
-	};
+			// Debounce the actual search
+			debouncedSetSearchTerm( inputValue );
+		};
 
-	return (
-		<>
-			<style>
-				{ `
+		// Handle blur to commit typed value
+		const handleBlur = () => {
+			// If user typed something that hasn't been committed, commit it
+			if ( searchTerm && searchTerm !== value ) {
+				onChange( searchTerm );
+			}
+		};
+
+		return (
+			<>
+				<style>
+					{ `
 					.components-form-token-field__suggestion:has([data-freeform-option]) {
 						display: none !important;
 					}
 				` }
-			</style>
-			<div onBlur={ handleBlur }>
-				<ComboboxControl
-					__nextHasNoMarginBottom
-					__next40pxDefaultSize
-					label={ label }
-					help={ help }
-					value={ value }
-					options={ options }
-					onFilterValueChange={ handleFilterValueChange }
-					onChange={ ( newValue ) => {
-						// Clear search term when user selects an option
-						setSearchTerm( '' );
+				</style>
+				<div ref={ inputRef } onBlur={ handleBlur }>
+					<ComboboxControl
+						__nextHasNoMarginBottom
+						__next40pxDefaultSize
+						label={ label }
+						help={ help }
+						value={ value }
+						options={ options }
+						onFilterValueChange={ handleFilterValueChange }
+						onChange={ ( newValue ) => {
+							// Clear search term when user selects an option
+							setSearchTerm( '' );
 
-						// Find the selected option to get the full suggestion data
-						const selectedOption = options.find(
-							( opt ) => opt.value === newValue
-						);
+							// Find the selected option to get the full suggestion data
+							const selectedOption = options.find(
+								( opt ) => opt.value === newValue
+							);
 
-						// If we have suggestion data, pass it along with the URL
-						// This enables entity binding in navigation links
-						if ( selectedOption?.suggestion ) {
-							onChange( newValue, selectedOption.suggestion );
-						} else {
-							onChange( newValue );
-						}
-					} }
-					isLoading={ isLoading }
-					hideLabelFromVision
-					expandOnFocus={ false }
-					placeholder={ __( 'Search or type URL' ) }
-					__experimentalRenderItem={ ( { item } ) => {
-						// Hide the freeform option visually using CSS :has() selector
-						if ( item.isFreeformOption ) {
-							return <div data-freeform-option="true" />;
-						}
+							// If we have suggestion data, pass it along with the URL
+							// This enables entity binding in navigation links
+							if ( selectedOption?.suggestion ) {
+								onChange( newValue, selectedOption.suggestion );
+							} else {
+								onChange( newValue );
+							}
+						} }
+						isLoading={ isLoading }
+						hideLabelFromVision
+						expandOnFocus={ false }
+						placeholder={ __( 'Search or type URL' ) }
+						__experimentalRenderItem={ ( { item } ) => {
+							// Hide the freeform option visually using CSS :has() selector
+							if ( item.isFreeformOption ) {
+								return <div data-freeform-option="true" />;
+							}
 
-						// Only show rich rendering for actual search results
-						const { suggestion } = item;
-						if ( ! suggestion ) {
-							return <div>{ item.label }</div>;
-						}
+							// Only show rich rendering for actual search results
+							const { suggestion } = item;
+							if ( ! suggestion ) {
+								return <div>{ item.label }</div>;
+							}
 
-						const icon = getEntityIcon( suggestion?.type );
-						const displayURL = filterURLForDisplay(
-							suggestion?.url
-						);
+							const icon = getEntityIcon( suggestion?.type );
+							const displayURL = filterURLForDisplay(
+								suggestion?.url
+							);
 
-						return (
-							<div
-								style={ {
-									display: 'flex',
-									alignItems: 'flex-start',
-									gap: '8px',
-									width: '100%',
-								} }
-							>
-								<Icon
-									icon={ icon }
-									style={ { marginTop: '2px' } }
-								/>
-								<div style={ { flex: 1, minWidth: 0 } }>
-									<div>{ suggestion?.title }</div>
-									<div
-										style={ {
-											fontSize: '12px',
-											color: '#757575',
-											marginTop: '2px',
-										} }
-									>
-										{ displayURL }
+							return (
+								<div
+									style={ {
+										display: 'flex',
+										alignItems: 'flex-start',
+										gap: '8px',
+										width: '100%',
+									} }
+								>
+									<Icon
+										icon={ icon }
+										style={ { marginTop: '2px' } }
+									/>
+									<div style={ { flex: 1, minWidth: 0 } }>
+										<div>{ suggestion?.title }</div>
+										<div
+											style={ {
+												fontSize: '12px',
+												color: '#757575',
+												marginTop: '2px',
+											} }
+										>
+											{ displayURL }
+										</div>
 									</div>
 								</div>
-							</div>
-						);
-					} }
-				/>
-			</div>
-		</>
-	);
-}
+							);
+						} }
+					/>
+				</div>
+			</>
+		);
+	}
+);

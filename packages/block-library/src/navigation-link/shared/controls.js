@@ -76,7 +76,9 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 	const lastURLRef = useRef( url );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const urlInputRef = useRef();
+	const unsyncButtonRef = useRef();
 	const shouldFocusURLInputRef = useRef( false );
+	const shouldFocusUnsyncButtonRef = useRef( false );
 	const inputId = useInstanceId( Controls, 'link-input' );
 	const helpTextId = `${ inputId }__help`;
 
@@ -119,13 +121,19 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 	};
 
 	useEffect( () => {
-		// Only want to focus the input if the url is not bound to an entity.
+		// Focus the input when unsyncing (binding removed)
 		if ( ! hasUrlBinding && shouldFocusURLInputRef.current ) {
 			// focuses and highlights the url input value, giving the user
 			// the ability to delete the value quickly or edit it.
 			urlInputRef.current?.select();
+			shouldFocusURLInputRef.current = false;
 		}
-		shouldFocusURLInputRef.current = false;
+
+		// Focus the unsync button when binding is created
+		if ( hasUrlBinding && shouldFocusUnsyncButtonRef.current ) {
+			unsyncButtonRef.current?.focus();
+			shouldFocusUnsyncButtonRef.current = false;
+		}
 	}, [ hasUrlBinding ] );
 
 	return (
@@ -252,6 +260,7 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 						suffix={
 							hasUrlBinding && (
 								<Button
+									ref={ unsyncButtonRef }
 									icon={ unlinkIcon }
 									onClick={ () => {
 										unsyncBoundLink();
@@ -275,6 +284,7 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 					/>
 				) : (
 					<EntitySearch
+						ref={ urlInputRef }
 						label={ __( 'Link' ) }
 						value={ url }
 						onChange={ ( newUrl, suggestion ) => {
@@ -299,6 +309,8 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 							// Create entity binding if we have entity data
 							if ( suggestion ) {
 								createBinding( attrs );
+								// Focus the unsync button after binding is created
+								shouldFocusUnsyncButtonRef.current = true;
 							}
 						} }
 					/>
