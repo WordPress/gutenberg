@@ -257,23 +257,6 @@ export function registerBlockType( blockNameOrMetadata, settings ) {
 		return;
 	}
 
-	// Warn if attributes is explicitly set to undefined or null in metadata or settings.
-	if (
-		( isObject( blockNameOrMetadata ) &&
-			'attributes' in blockNameOrMetadata &&
-			( blockNameOrMetadata.attributes === null ||
-				blockNameOrMetadata.attributes === undefined ) ) ||
-		( 'attributes' in settings &&
-			( settings.attributes === null ||
-				settings.attributes === undefined ) )
-	) {
-		warning(
-			'The block "' +
-				name +
-				'" must not register attributes as null or undefined. Use an empty object or exclude the attributes key.'
-		);
-	}
-
 	const { addBootstrappedBlockType, addUnprocessedBlockType } = unlock(
 		dispatch( blocksStore )
 	);

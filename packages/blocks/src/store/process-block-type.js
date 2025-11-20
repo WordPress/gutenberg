@@ -103,6 +103,14 @@ export const processBlockType =
 			),
 		};
 
+		// Ensure attributes is always an object, never null or undefined.
+		if (
+			! blockType.attributes ||
+			typeof blockType.attributes !== 'object'
+		) {
+			blockType.attributes = {};
+		}
+
 		const settings = applyFilters(
 			'blocks.registerBlockType',
 			blockType,
