@@ -47,6 +47,9 @@ describe( 'SyncManager', () => {
 	let mockRecord: ObjectData;
 	let mockSyncConfig: jest.MockedObject< SyncConfig >;
 
+	// Capture the Y.Doc from provider creator
+	let capturedDoc: Y.Doc | null = null;
+
 	beforeEach( () => {
 		// Reset all mocks
 		jest.clearAllMocks();
@@ -59,8 +62,15 @@ describe( 'SyncManager', () => {
 		mockProviderResult = {
 			destroy: jest.fn(),
 		};
-		mockProviderCreator = jest.fn( () =>
-			Promise.resolve( mockProviderResult )
+		mockProviderCreator = jest.fn(
+			async (
+				_objectType: string,
+				_objectId: string | null,
+				ydoc: Y.Doc
+			) => {
+				capturedDoc = ydoc;
+				return mockProviderResult;
+			}
 		);
 		mockGetProviderCreators.mockReturnValue( [ mockProviderCreator ] );
 
@@ -90,6 +100,7 @@ describe( 'SyncManager', () => {
 			getEditedRecord: jest.fn( async () =>
 				Promise.resolve( mockRecord )
 			),
+			refetchRecord: jest.fn( async () => Promise.resolve() ),
 			saveRecord: jest.fn( async () => Promise.resolve() ),
 		};
 	} );
@@ -525,19 +536,6 @@ describe( 'SyncManager', () => {
 
 	describe( 'update', () => {
 		it( 'updates CRDT document with local changes', async () => {
-			// Capture the Y.Doc from provider creator
-			let capturedDoc: Y.Doc | null = null;
-			mockProviderCreator.mockImplementation(
-				async (
-					_objectType: string,
-					_objectId: string,
-					ydoc: Y.Doc
-				) => {
-					capturedDoc = ydoc;
-					return mockProviderResult;
-				}
-			);
-
 			const manager = createSyncManager();
 
 			await manager.load(
@@ -578,19 +576,6 @@ describe( 'SyncManager', () => {
 		} );
 
 		it( 'applies changes with specified origin', async () => {
-			// Capture the Y.Doc from provider creator
-			let capturedDoc: Y.Doc | null = null;
-			mockProviderCreator.mockImplementation(
-				async (
-					_objectType: string,
-					_objectId: string,
-					ydoc: Y.Doc
-				) => {
-					capturedDoc = ydoc;
-					return mockProviderResult;
-				}
-			);
-
 			const manager = createSyncManager();
 
 			await manager.load(
@@ -622,19 +607,6 @@ describe( 'SyncManager', () => {
 		} );
 
 		it( 'updates the record metadata when the update is associated with a save', async () => {
-			// Capture the Y.Doc from provider creator.
-			let capturedDoc: Y.Doc | null = null;
-			mockProviderCreator.mockImplementation(
-				async (
-					_objectType: string,
-					_objectId: string,
-					ydoc: Y.Doc
-				) => {
-					capturedDoc = ydoc;
-					return mockProviderResult;
-				}
-			);
-
 			const manager = createSyncManager();
 
 			await manager.load(
@@ -670,19 +642,6 @@ describe( 'SyncManager', () => {
 
 	describe( 'CRDT doc observation', () => {
 		it( 'edits the local entity record when remote updates arrive', async () => {
-			// Capture the Y.Doc from provider creator.
-			let capturedDoc: Y.Doc | null = null;
-			mockProviderCreator.mockImplementation(
-				async (
-					_objectType: string,
-					_objectId: string,
-					ydoc: Y.Doc
-				) => {
-					capturedDoc = ydoc;
-					return mockProviderResult;
-				}
-			);
-
 			const manager = createSyncManager();
 
 			await manager.load(
@@ -719,19 +678,6 @@ describe( 'SyncManager', () => {
 		} );
 
 		it( 'does not edit the local record for local transactions', async () => {
-			// Capture the Y.Doc from provider creator.
-			let capturedDoc: Y.Doc | null = null;
-			mockProviderCreator.mockImplementation(
-				async (
-					_objectType: string,
-					_objectId: string,
-					ydoc: Y.Doc
-				) => {
-					capturedDoc = ydoc;
-					return mockProviderResult;
-				}
-			);
-
 			const manager = createSyncManager();
 
 			await manager.load(
