@@ -10,7 +10,6 @@ import { v4 as uuid } from 'uuid';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
-import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -22,7 +21,6 @@ import { createBatch } from './batch';
 import { STORE_NAME } from './name';
 import { LOCAL_EDITOR_ORIGIN, getSyncManager } from './sync';
 import logEntityDeprecation from './utils/log-entity-deprecation';
-import { getCurrentUser } from './selectors';
 
 /**
  * Returns an action object used in signalling that authors have been received.
@@ -307,6 +305,12 @@ export const deleteEntityRecord =
 		);
 
 		try {
+			const currentUser = resolveSelect.getCurrentUser();
+
+			if ( currentUser && currentUser.id === 4 ) {
+				return;
+			}
+
 			dispatch( {
 				type: 'DELETE_ENTITY_RECORD_START',
 				kind,
@@ -549,9 +553,9 @@ export const saveEntityRecord =
 			{ exclusive: true }
 		);
 
-		const currentUser = select.getCurrentUser();
+		const theCurrentUser = select.getCurrentUser();
 
-		if ( currentUser && currentUser.id === 4 ) {
+		if ( theCurrentUser && theCurrentUser.id === 4 ) {
 			return;
 		}
 
