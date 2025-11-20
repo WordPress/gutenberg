@@ -340,8 +340,6 @@ class WP_Theme_JSON_Gutenberg {
 	 * These are non-preset, non-CSS settings that control behavior rather than styling.
 	 * Each entry defines the setting path and its expected type for validation.
 	 *
-	 * Types: 'boolean', 'string', 'array' (for custom properties)
-	 *
 	 * @since 7.0.0
 	 */
 	const SAFE_SETTINGS = array(
