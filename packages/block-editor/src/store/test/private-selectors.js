@@ -687,7 +687,7 @@ describe( 'private selectors', () => {
 	} );
 
 	describe( 'isEditLockedBlock', () => {
-		it( 'should return false when block has no lock attribute', () => {
+		it( 'returns false when block has no lock attribute', () => {
 			const state = {
 				blocks: {
 					byClientId: new Map( [
@@ -699,7 +699,7 @@ describe( 'private selectors', () => {
 			expect( isEditLockedBlock( state, 'block-1' ) ).toBe( false );
 		} );
 
-		it( 'should return false when block has lock attribute but edit is false', () => {
+		it( 'returns false when block has lock attribute but edit is false', () => {
 			const state = {
 				blocks: {
 					byClientId: new Map( [
@@ -713,7 +713,7 @@ describe( 'private selectors', () => {
 			expect( isEditLockedBlock( state, 'block-1' ) ).toBe( false );
 		} );
 
-		it( 'should return true when block has lock attribute with edit set to true', () => {
+		it( 'returns true when block has lock attribute with edit set to true', () => {
 			const state = {
 				blocks: {
 					byClientId: new Map( [
@@ -727,7 +727,7 @@ describe( 'private selectors', () => {
 			expect( isEditLockedBlock( state, 'block-1' ) ).toBe( true );
 		} );
 
-		it( 'should return false when block has no attributes', () => {
+		it( 'returns false when block has no attributes', () => {
 			const state = {
 				blocks: {
 					byClientId: new Map(),
@@ -760,34 +760,34 @@ describe( 'private selectors', () => {
 			},
 		} );
 
-		it( 'should return false when block has no lock and no templateLock', () => {
+		it( 'returns false when block has no lock and no templateLock', () => {
 			const state = createState( null, null );
 			expect( isMoveLockedBlock( state, 'block-1' ) ).toBe( false );
 		} );
 
-		it( 'should return true when parent has templateLock set to "all"', () => {
+		it( 'returns true when parent has templateLock set to "all"', () => {
 			const state = createState( 'all', null );
 			expect( isMoveLockedBlock( state, 'block-1' ) ).toBe( true );
 		} );
 
-		it( 'should return false when parent has templateLock set to "contentOnly"', () => {
+		it( 'returns false when parent has templateLock set to "contentOnly"', () => {
 			const state = createState( 'contentOnly', null );
 			expect( isMoveLockedBlock( state, 'block-1' ) ).toBe( false );
 		} );
 
-		it( 'should return true when block has lock.move set to true', () => {
+		it( 'returns true when block has lock.move set to true', () => {
 			const state = createState( null, { move: true } );
 			expect( isMoveLockedBlock( state, 'block-1' ) ).toBe( true );
 		} );
 
-		it( 'should return false when block has lock.move set to false', () => {
+		it( 'returns false when block has lock.move set to false', () => {
 			const state = createState( null, { move: false } );
 			expect( isMoveLockedBlock( state, 'block-1' ) ).toBe( false );
 		} );
 
-		it( 'should prioritize templateLock "all" over block lock', () => {
+		it( 'prioritizes block lock over template lock', () => {
 			const state = createState( 'all', { move: false } );
-			expect( isMoveLockedBlock( state, 'block-1' ) ).toBe( true );
+			expect( isMoveLockedBlock( state, 'block-1' ) ).toBe( false );
 		} );
 	} );
 
@@ -813,39 +813,39 @@ describe( 'private selectors', () => {
 			},
 		} );
 
-		it( 'should return false when block has no lock and no templateLock', () => {
+		it( 'returns false when block has no lock and no templateLock', () => {
 			const state = createState( null, null );
 			expect( isRemoveLockedBlock( state, 'block-1' ) ).toBe( false );
 		} );
 
-		it( 'should return true when parent has templateLock set to "all"', () => {
+		it( 'returns true when parent has templateLock set to "all"', () => {
 			const state = createState( 'all', null );
 			expect( isRemoveLockedBlock( state, 'block-1' ) ).toBe( true );
 		} );
 
-		it( 'should return true when parent has templateLock set to "insert"', () => {
+		it( 'returns true when parent has templateLock set to "insert"', () => {
 			const state = createState( 'insert', null );
 			expect( isRemoveLockedBlock( state, 'block-1' ) ).toBe( true );
 		} );
 
-		it( 'should return false when parent has templateLock set to "contentOnly"', () => {
+		it( 'returns false when parent has templateLock set to "contentOnly"', () => {
 			const state = createState( 'contentOnly', null );
 			expect( isRemoveLockedBlock( state, 'block-1' ) ).toBe( false );
 		} );
 
-		it( 'should return true when block has lock.remove set to true', () => {
+		it( 'returns true when block has lock.remove set to true', () => {
 			const state = createState( null, { remove: true } );
 			expect( isRemoveLockedBlock( state, 'block-1' ) ).toBe( true );
 		} );
 
-		it( 'should return false when block has lock.remove set to false', () => {
+		it( 'returns false when block has lock.remove set to false', () => {
 			const state = createState( null, { remove: false } );
 			expect( isRemoveLockedBlock( state, 'block-1' ) ).toBe( false );
 		} );
 
-		it( 'should prioritize templateLock over a block lock of `false`', () => {
+		it( 'prioritizes block lock over template lock', () => {
 			const state = createState( 'all', { remove: false } );
-			expect( isRemoveLockedBlock( state, 'block-1' ) ).toBe( true );
+			expect( isRemoveLockedBlock( state, 'block-1' ) ).toBe( false );
 		} );
 	} );
 
@@ -871,32 +871,32 @@ describe( 'private selectors', () => {
 			},
 		} );
 
-		it( 'should return false when block is not locked in any way', () => {
+		it( 'returns false when block is not locked in any way', () => {
 			const state = createState( null, null );
 			expect( isLockedBlock( state, 'block-1' ) ).toBe( false );
 		} );
 
-		it( 'should return true when block has lock.edit set to true', () => {
+		it( 'returns true when block has lock.edit set to true', () => {
 			const state = createState( null, { edit: true } );
 			expect( isLockedBlock( state, 'block-1' ) ).toBe( true );
 		} );
 
-		it( 'should return true when block has lock.move set to true', () => {
+		it( 'returns true when block has lock.move set to true', () => {
 			const state = createState( null, { move: true } );
 			expect( isLockedBlock( state, 'block-1' ) ).toBe( true );
 		} );
 
-		it( 'should return true when block has lock.remove set to true', () => {
+		it( 'returns true when block has lock.remove set to true', () => {
 			const state = createState( null, { remove: true } );
 			expect( isLockedBlock( state, 'block-1' ) ).toBe( true );
 		} );
 
-		it( 'should return true when parent has templateLock set to "all"', () => {
+		it( 'returns true when parent has templateLock set to "all"', () => {
 			const state = createState( 'all', null );
 			expect( isLockedBlock( state, 'block-1' ) ).toBe( true );
 		} );
 
-		it( 'should return true when block has multiple locks', () => {
+		it( 'returns true when block has multiple locks', () => {
 			const state = createState( null, {
 				edit: true,
 				move: true,
@@ -905,7 +905,7 @@ describe( 'private selectors', () => {
 			expect( isLockedBlock( state, 'block-1' ) ).toBe( true );
 		} );
 
-		it( 'should return true when only one lock type is active', () => {
+		it( 'returns true when only one lock type is active', () => {
 			const state = createState( null, {
 				edit: false,
 				move: true,
@@ -914,7 +914,7 @@ describe( 'private selectors', () => {
 			expect( isLockedBlock( state, 'block-1' ) ).toBe( true );
 		} );
 
-		it( 'should return false when all lock types are explicitly false', () => {
+		it( 'returns false when all lock types are explicitly false', () => {
 			const state = createState( null, {
 				edit: false,
 				move: false,

@@ -757,18 +757,20 @@ export function isEditLockedBlock( state, clientId ) {
  * @return {boolean} Whether the block is currently locked.
  */
 export function isMoveLockedBlock( state, clientId ) {
+	const attributes = getBlockAttributes( state, clientId );
+	// If a block explicitly has `move` set to `false`, it turns off
+	// any locking that might be inherited from a parent.
+	if ( attributes?.lock?.move !== undefined ) {
+		return !! attributes?.lock?.move;
+	}
+
 	const rootClientId = getBlockRootClientId( state, clientId );
 	const templateLock = getTemplateLock( state, rootClientId );
 
 	// While `contentOnly` templateLock does sometimes prevent moving, a user can't modify
 	// this, so don't include it in this function. See the `canMoveBlock` selector
 	// as an alternative.
-	if ( templateLock === 'all' ) {
-		return true;
-	}
-
-	const attributes = getBlockAttributes( state, clientId );
-	return !! attributes?.lock?.move;
+	return templateLock === 'all';
 }
 
 /**
@@ -787,18 +789,18 @@ export function isMoveLockedBlock( state, clientId ) {
  * @return {boolean} Whether the block is currently locked.
  */
 export function isRemoveLockedBlock( state, clientId ) {
+	const attributes = getBlockAttributes( state, clientId );
+	if ( attributes?.lock?.remove !== undefined ) {
+		return !! attributes?.lock?.remove;
+	}
+
 	const rootClientId = getBlockRootClientId( state, clientId );
 	const templateLock = getTemplateLock( state, rootClientId );
 
 	// While `contentOnly` templateLock does sometimes prevent removal, a user can't modify
 	// this, so don't include it in this function. See the `canRemoveBlock` selector
 	// as an alternative.
-	if ( templateLock === 'all' || templateLock === 'insert' ) {
-		return true;
-	}
-
-	const attributes = getBlockAttributes( state, clientId );
-	return !! attributes?.lock?.remove;
+	return templateLock === 'all' || templateLock === 'insert';
 }
 
 /**
