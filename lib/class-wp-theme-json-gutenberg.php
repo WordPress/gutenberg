@@ -593,7 +593,7 @@ class WP_Theme_JSON_Gutenberg {
 	/**
 	 * The valid pseudo-selectors that can be used for blocks.
 	 *
-	 * @since 6.1.0
+	 * @since 7.0.0
 	 * @var array
 	 */
 	const VALID_BLOCK_PSEUDO_SELECTORS = array(
