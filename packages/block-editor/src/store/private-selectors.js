@@ -719,3 +719,107 @@ export const isBlockHidden = ( state, clientId ) => {
 export function hasBlockSpotlight( state ) {
 	return !! state.hasBlockSpotlight || !! state.editedContentOnlySection;
 }
+
+/**
+ * Returns whether a block is locked to prevent editing.
+ *
+ * This selector only reasons about block lock, not associated features
+ * like `blockEditingMode` that might prevent user modifications to a block.
+ * Currently there's also no way to prevent editing via `templateLock`.
+ *
+ * This distinction is important as this selector specifically drives the block lock UI
+ * that a user interacts with. `blockEditingModes` aren't included as a user can't change
+ * them.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId ClientId of the block.
+ *
+ * @return {boolean} Whether the block is currently locked.
+ */
+export function isEditLockedBlock( state, clientId ) {
+	const attributes = getBlockAttributes( state, clientId );
+	return !! attributes?.lock?.edit;
+}
+
+/**
+ * Returns whether a block is locked to prevent moving.
+ *
+ * This selector only reasons about templateLock and block lock, not associated features
+ * like `blockEditingMode` that might prevent user modifications to a block.
+ *
+ * This distinction is important as this selector specifically drives the block lock UI
+ * that a user interacts with. `blockEditingModes` are excluded as a user can't change
+ * them.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId ClientId of the block.
+ *
+ * @return {boolean} Whether the block is currently locked.
+ */
+export function isMoveLockedBlock( state, clientId ) {
+	const rootClientId = getBlockRootClientId( state, clientId );
+	const templateLock = getTemplateLock( state, rootClientId );
+
+	// While `contentOnly` templateLock does sometimes prevent moving, a user can't modify
+	// this, so don't include it in this function. See the `canMoveBlock` selector
+	// as an alternative.
+	if ( templateLock === 'all' ) {
+		return true;
+	}
+
+	const attributes = getBlockAttributes( state, clientId );
+	return !! attributes?.lock?.move;
+}
+
+/**
+ * Returns whether a block is locked to prevent removal.
+ *
+ * This selector only reasons about templateLock and block lock, not associated features
+ * like `blockEditingMode` that might prevent user modifications to a block.
+ *
+ * This distinction is important as this selector specifically drives the block lock UI
+ * that a user interacts with. `blockEditingModes` are excluded as a user can't change
+ * them.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId ClientId of the block.
+ *
+ * @return {boolean} Whether the block is currently locked.
+ */
+export function isRemoveLockedBlock( state, clientId ) {
+	const rootClientId = getBlockRootClientId( state, clientId );
+	const templateLock = getTemplateLock( state, rootClientId );
+
+	// While `contentOnly` templateLock does sometimes prevent removal, a user can't modify
+	// this, so don't include it in this function. See the `canRemoveBlock` selector
+	// as an alternative.
+	if ( templateLock === 'all' ) {
+		return true;
+	}
+
+	const attributes = getBlockAttributes( state, clientId );
+	return !! attributes?.lock?.remove;
+}
+
+/**
+ * Returns whether a block is locked.
+ *
+ * This selector only reasons about templateLock and block lock, not associated features
+ * like `blockEditingMode` that might prevent user modifications to a block.
+ *
+ * This distinction is important as this selector specifically drives the block lock UI
+ * that a user interacts with. `blockEditingModes` are excluded as a user can't change
+ * them.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId ClientId of the block.
+ *
+ * @return {boolean} Whether the block is currently locked.
+ */
+export function isLockedBlock( state, clientId ) {
+	return (
+		isEditLockedBlock( state, clientId ) ||
+		isMoveLockedBlock( state, clientId ) ||
+		isRemoveLockedBlock( state, clientId )
+	);
+}
