@@ -3,6 +3,7 @@
  */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import timezoneMock from 'timezone-mock';
 
 /**
  * WordPress dependencies
@@ -31,6 +32,7 @@ describe( 'DateTimePicker', () => {
 
 	afterEach( () => {
 		jest.restoreAllMocks();
+		timezoneMock.unregister();
 	} );
 
 	afterAll( () => {
@@ -41,9 +43,7 @@ describe( 'DateTimePicker', () => {
 		const user = userEvent.setup();
 		const onChange = jest.fn();
 
-		jest.spyOn( Date.prototype, 'getTimezoneOffset' ).mockImplementation(
-			() => 300
-		);
+		timezoneMock.register( 'US/Eastern' );
 
 		const { rerender } = render(
 			<DateTimePicker
@@ -77,111 +77,102 @@ describe( 'DateTimePicker', () => {
 	} );
 
 	describe( 'timezone differences between browser and site', () => {
-		it( 'should not shift to previous day when browser is behind site timezone', async () => {
-			const user = userEvent.setup();
-			const onChange = jest.fn();
+		describe.each( [
+			{
+				direction: 'browser behind site',
+				timezone: 'US/Pacific' as const,
+				time: '21:00:00', // Evening: shifts to next day UTC
+			},
+			{
+				direction: 'browser ahead of site',
+				timezone: 'Australia/Adelaide' as const,
+				time: '00:00:00', // Midnight: shifts to previous day UTC
+			},
+		] )( '$direction', ( { timezone, time } ) => {
+			describe.each( [
+				{
+					period: 'DST start',
+					initialDate: `2025-03-10T${ time }`,
+					initialButton: 'March 10, 2025. Selected',
+					clickButton: 'March 11, 2025',
+					expectedDay: 11,
+					expectedDate: `2025-03-11T${ time }`,
+					selectedButton: 'March 11, 2025. Selected',
+					wrongMonthButton: 'February 28, 2025',
+				},
+				{
+					period: 'DST end',
+					initialDate: `2025-11-01T${ time }`,
+					initialButton: 'November 1, 2025. Selected',
+					clickButton: 'November 2, 2025',
+					expectedDay: 2,
+					expectedDate: `2025-11-02T${ time }`,
+					selectedButton: 'November 2, 2025. Selected',
+					wrongMonthButton: 'October 31, 2025',
+				},
+			] )(
+				'$period',
+				( {
+					initialDate,
+					initialButton,
+					clickButton,
+					expectedDay,
+					expectedDate,
+					selectedButton,
+					wrongMonthButton,
+				} ) => {
+					it( 'should display and select dates correctly', async () => {
+						const user = userEvent.setup();
+						const onChange = jest.fn();
 
-			// Browser in GMT (UTC+0), site in EST (UTC-5)
-			// Nov 1 00:00 GMT would be Oct 31 19:00 EST if converted
-			jest.spyOn(
-				Date.prototype,
-				'getTimezoneOffset'
-			).mockImplementation( () => 0 );
+						timezoneMock.register( timezone );
 
-			const { rerender } = render(
-				<DateTimePicker
-					currentDate="2025-11-01T00:00:00"
-					onChange={ onChange }
-				/>
+						const { rerender } = render(
+							<DateTimePicker
+								currentDate={ initialDate }
+								onChange={ onChange }
+							/>
+						);
+
+						// Calendar should not show dates from wrong month
+						expect(
+							screen.queryByRole( 'button', {
+								name: wrongMonthButton,
+							} )
+						).not.toBeInTheDocument();
+
+						// Should show correct initial date as selected
+						expect(
+							screen.getByRole( 'button', {
+								name: initialButton,
+							} )
+						).toBeInTheDocument();
+
+						onChange.mockImplementation( ( newDate ) => {
+							rerender(
+								<DateTimePicker
+									currentDate={ newDate }
+									onChange={ onChange }
+								/>
+							);
+						} );
+
+						await user.click(
+							screen.getByRole( 'button', { name: clickButton } )
+						);
+
+						expect( screen.getByLabelText( 'Day' ) ).toHaveValue(
+							expectedDay
+						);
+						expect( onChange ).toHaveBeenCalledWith( expectedDate );
+						expect(
+							screen.getByRole( 'button', {
+								name: selectedButton,
+							} )
+						).toBeInTheDocument();
+					} );
+				}
 			);
-
-			// Calendar should only show dates from November, not October
-			expect(
-				screen.queryByRole( 'button', { name: 'October 31, 2025' } )
-			).not.toBeInTheDocument();
-
-			// Should show Nov 1 as selected, not Oct 31
-			expect(
-				screen.getByRole( 'button', {
-					name: 'November 1, 2025. Selected',
-				} )
-			).toBeInTheDocument();
-
-			onChange.mockImplementation( ( newDate ) => {
-				rerender(
-					<DateTimePicker
-						currentDate={ newDate }
-						onChange={ onChange }
-					/>
-				);
-			} );
-
-			await user.click(
-				screen.getByRole( 'button', { name: 'November 2, 2025' } )
-			);
-
-			expect( screen.getByLabelText( 'Day' ) ).toHaveValue( 2 );
-			expect( onChange ).toHaveBeenCalledWith( '2025-11-02T00:00:00' );
-			expect(
-				screen.getByRole( 'button', {
-					name: 'November 2, 2025. Selected',
-				} )
-			).toBeInTheDocument();
-		} );
-
-		it( 'should not shift to next day when browser is ahead of site timezone', async () => {
-			const user = userEvent.setup();
-			const onChange = jest.fn();
-
-			// Browser in Tokyo (UTC+9), site in EST (UTC-5)
-			// If incorrectly handled, March 10 00:00 could display as March 9
-			jest.spyOn(
-				Date.prototype,
-				'getTimezoneOffset'
-			).mockImplementation( () => -540 );
-
-			const { rerender } = render(
-				<DateTimePicker
-					currentDate="2025-03-10T00:00:00"
-					onChange={ onChange }
-				/>
-			);
-
-			// Calendar should only show dates from March, not February or April
-			expect(
-				screen.queryByRole( 'button', { name: 'February 28, 2025' } )
-			).not.toBeInTheDocument();
-			expect(
-				screen.queryByRole( 'button', { name: 'April 1, 2025' } )
-			).not.toBeInTheDocument();
-
-			// Should show March 10 as selected, not shifted to March 9
-			expect(
-				screen.getByRole( 'button', {
-					name: 'March 10, 2025. Selected',
-				} )
-			).toBeInTheDocument();
-
-			onChange.mockImplementation( ( newDate ) => {
-				rerender(
-					<DateTimePicker
-						currentDate={ newDate }
-						onChange={ onChange }
-					/>
-				);
-			} );
-
-			await user.click(
-				screen.getByRole( 'button', { name: 'March 15, 2025' } )
-			);
-
-			expect( screen.getByLabelText( 'Day' ) ).toHaveValue( 15 );
-			expect( onChange ).toHaveBeenCalledWith( '2025-03-15T00:00:00' );
-			expect(
-				screen.getByRole( 'button', {
-					name: 'March 15, 2025. Selected',
-				} )
-			).toBeInTheDocument();
 		} );
 	} );
 
@@ -189,9 +180,7 @@ describe( 'DateTimePicker', () => {
 		const user = userEvent.setup();
 		const onChange = jest.fn();
 
-		jest.spyOn( Date.prototype, 'getTimezoneOffset' ).mockImplementation(
-			() => 0
-		);
+		timezoneMock.register( 'UTC' );
 
 		render(
 			<DateTimePicker
