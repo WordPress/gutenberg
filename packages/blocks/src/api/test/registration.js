@@ -320,39 +320,29 @@ describe( 'blocks', () => {
 			expect( blockType.attributes ).toEqual( {} );
 		} );
 
-		it( 'should warn and default to empty object when attributes is undefined', () => {
-			registerBlockType( 'core/test-block-undefined-attributes', {
-				title: 'block title',
-				category: 'text',
-				save: noop,
-				attributes: undefined,
-			} );
+		it.each( [
+			[ 'undefined', undefined ],
+			[ 'null', null ],
+		] )(
+			'should warn and default to empty object when attributes is %s',
+			( _label, value ) => {
+				registerBlockType( 'core/test-block-null-attributes', {
+					title: 'block title',
+					category: 'text',
+					save: noop,
+					attributes: value,
+				} );
 
-			expect( console ).toHaveWarnedWith(
-				'The block "core/test-block-undefined-attributes" must not register attributes as `null` or `undefined`. Use an empty object (`attributes: {}`) or exclude the `attributes` key. In the next Gutenberg release, passing `null` or `undefined` for `attributes` will cause the block editor to crash.'
-			);
+				expect( console ).toHaveWarnedWith(
+					'The block "core/test-block-null-attributes" must not register attributes as `null` or `undefined`. Use an empty object (`attributes: {}`) or exclude the `attributes` key. In the next Gutenberg release, passing `null` or `undefined` for `attributes` will cause the block editor to crash.'
+				);
 
-			const blockType = getBlockType(
-				'core/test-block-undefined-attributes'
-			);
-			expect( blockType.attributes ).toEqual( {} );
-		} );
-
-		it( 'should warn and default to empty object when attributes is null', () => {
-			registerBlockType( 'core/test-block-null-attributes', {
-				title: 'block title',
-				category: 'text',
-				save: noop,
-				attributes: null,
-			} );
-
-			expect( console ).toHaveWarnedWith(
-				'The block "core/test-block-null-attributes" must not register attributes as `null` or `undefined`. Use an empty object (`attributes: {}`) or exclude the `attributes` key. In the next Gutenberg release, passing `null` or `undefined` for `attributes` will cause the block editor to crash.'
-			);
-
-			const blockType = getBlockType( 'core/test-block-null-attributes' );
-			expect( blockType.attributes ).toEqual( {} );
-		} );
+				const blockType = getBlockType(
+					'core/test-block-null-attributes'
+				);
+				expect( blockType.attributes ).toEqual( {} );
+			}
+		);
 
 		it( 'should default to browser-initialized global attributes', () => {
 			const attributes = { ok: { type: 'boolean' } };
