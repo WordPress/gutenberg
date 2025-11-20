@@ -3924,7 +3924,7 @@ class WP_Theme_JSON_Gutenberg {
 				}
 			} elseif ( is_array( $valid_setting ) && isset( $input[ $key ] ) && is_array( $input[ $key ] ) ) {
 				// Nested setting (e.g., lightbox, layout).
-				$nested_output = isset( $output[ $key ] ) ? $output[ $key ] : array();
+				$nested_output = $output[ $key ] ?? array();
 				foreach ( $valid_setting as $nested_key => $nested_valid ) {
 					$nested_path_key = $key . '.' . $nested_key;
 
