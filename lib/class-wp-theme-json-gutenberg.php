@@ -335,16 +335,17 @@ class WP_Theme_JSON_Gutenberg {
 	);
 
 	/**
-	 * Settings that are safe to allow under KSES.
+	 * Boolean settings that are safe to allow under KSES.
 	 *
-	 * These settings are scalar or boolean values that don't require CSS validation.
-	 * They control behavior rather than CSS generation capabilities.
+	 * These are boolean settings that control UI behavior and don't enable
+	 * CSS generation capabilities. They are safe to preserve even when KSES
+	 * filtering is active because they don't allow arbitrary CSS input.
 	 *
-	 * Each element is an array path to the safe setting in theme.json settings.
+	 * Each element is an array path to the boolean setting in theme.json settings.
 	 *
 	 * @since 6.8.0
 	 */
-	const SAFE_SETTINGS = array(
+	const BOOLEAN_SETTINGS = array(
 		array( 'appearanceTools' ),
 		array( 'useRootPaddingAwareAlignments' ),
 		array( 'layout', 'allowEditing' ),
@@ -3782,10 +3783,10 @@ class WP_Theme_JSON_Gutenberg {
 		// Ensure indirect properties not included in any `PRESETS_METADATA` value are allowed.
 		static::remove_indirect_properties( $input, $output );
 
-		// Ensure safe settings are allowed.
-		foreach ( static::SAFE_SETTINGS as $path ) {
+		// Ensure boolean settings are allowed.
+		foreach ( static::BOOLEAN_SETTINGS as $path ) {
 			$value = _wp_array_get( $input, $path, null );
-			if ( null !== $value ) {
+			if ( null !== $value && is_bool( $value ) ) {
 				_wp_array_set( $output, $path, $value );
 			}
 		}
