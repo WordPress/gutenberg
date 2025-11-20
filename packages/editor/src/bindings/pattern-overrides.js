@@ -35,7 +35,8 @@ export default {
 		// attribute values instead.
 		if (
 			! patternClientId ||
-			editedContentOnlySection === patternClientId
+			( editedContentOnlySection &&
+				editedContentOnlySection === patternClientId )
 		) {
 			return currentBlockAttributes;
 		}
@@ -92,7 +93,8 @@ export default {
 		// (editedContentOnlySection), skip updating the binding and update the block itself.
 		if (
 			! patternClientId ||
-			editedContentOnlySection === patternClientId
+			( editedContentOnlySection &&
+				editedContentOnlySection === patternClientId )
 		) {
 			dispatch( blockEditorStore ).updateBlockAttributes(
 				clientId,
