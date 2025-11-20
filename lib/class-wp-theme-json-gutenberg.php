@@ -1070,7 +1070,7 @@ class WP_Theme_JSON_Gutenberg {
 				foreach ( $style_variation_names as $variation_name ) {
 					$variation_schema = $block_style_variation_styles;
 
-					// Add pseudo-selectors to variations for blocks that support them
+					// Add pseudo-selectors to variations for blocks that support them.
 					if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] ) ) {
 						foreach ( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] as $pseudo_selector ) {
 							$variation_schema[ $pseudo_selector ] = $styles_non_top_level;
