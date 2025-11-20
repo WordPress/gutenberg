@@ -61,16 +61,16 @@ function createConfiguredControl( config ) {
 
 /**
  * Normalize a media value to a canonical structure.
- * Ensures all expected properties exist, even if not in the mapping.
+ * Uses standard Gutenberg attribute names for media (e.g., "url" for images).
+ * Accepts either name as input but normalizes to the canonical form.
  *
  * @param {Object} value - The mapped value from the block attributes
- * @return {Object} Normalized media value with all properties
+ * @return {Object} Normalized media value with canonical properties
  */
 function normalizeMediaValue( value ) {
 	return {
 		id: value?.id ?? null,
-		src: value?.src ?? '',
-		url: value?.url ?? value?.src ?? '', // url falls back to src
+		url: value?.url ?? value?.src ?? '', // accepts src as fallback for HTML native elements
 		caption: value?.caption ?? '',
 		alt: value?.alt ?? '',
 		type: value?.type ?? 'image',
@@ -104,18 +104,17 @@ function denormalizeMediaValue( value, fieldDef ) {
 
 /**
  * Normalize a link value to a canonical structure.
- * Ensures all expected properties exist, even if not in the mapping.
+ * Uses standard Gutenberg attribute names: "url" and "linkTarget".
+ * Accepts either name as input but normalizes to the canonical form.
  *
  * @param {Object} value - The mapped value from the block attributes
- * @return {Object} Normalized link value with all properties
+ * @return {Object} Normalized link value with canonical properties
  */
 function normalizeLinkValue( value ) {
 	return {
-		href: value?.href ?? value?.url ?? '',
-		url: value?.url ?? value?.href ?? '', // url falls back to href
+		url: value?.url ?? value?.href ?? '', // accepts href as fallback
 		rel: value?.rel ?? '',
-		target: value?.target ?? value?.linkTarget ?? '',
-		linkTarget: value?.linkTarget ?? value?.target ?? '',
+		linkTarget: value?.linkTarget ?? value?.target ?? '', // accepts target as fallback
 	};
 }
 

@@ -50,16 +50,16 @@ function MediaThumbnail( { data, field, attachment } ) {
 
 	if ( allowedTypes.length === 1 ) {
 		const value = field.getValue( { item: data } );
-		const src = value?.src || value?.url;
+		const url = value?.url;
 
-		if ( src ) {
+		if ( url ) {
 			return (
 				<img
 					className="block-editor-content-only-controls__media-thumbnail"
 					alt=""
 					width={ 24 }
 					height={ 24 }
-					src={ src }
+					src={ url }
 				/>
 			);
 		}
@@ -103,7 +103,7 @@ export default function Media( { data, field, config = {} } ) {
 		fieldDef?.mapping && 'featuredImage' in fieldDef.mapping;
 
 	const id = value?.id;
-	const src = value?.src || value?.url;
+	const url = value?.url;
 
 	const attachment = useSelect(
 		( select ) => {
@@ -146,18 +146,26 @@ export default function Media( { data, field, config = {} } ) {
 				className="block-editor-content-only-controls__media-replace-flow"
 				allowedTypes={ allowedTypes }
 				mediaId={ id }
-				mediaURL={ src }
+				mediaURL={ url }
 				multiple={ multiple }
 				popoverProps={ popoverProps }
 				onReset={ () => {
 					// Build reset value dynamically based on mapping
-					const resetValue = {
-						id: undefined,
-						src: undefined,
-						url: undefined,
-						caption: '',
-						alt: '',
-					};
+					const resetValue = {};
+
+					if ( fieldDef?.mapping ) {
+						Object.keys( fieldDef.mapping ).forEach( ( key ) => {
+							if (
+								key === 'id' ||
+								key === 'src' ||
+								key === 'url'
+							) {
+								resetValue[ key ] = undefined;
+							} else if ( key === 'caption' || key === 'alt' ) {
+								resetValue[ key ] = '';
+							}
+						} );
+					}
 
 					// Turn off featured image when resetting (only if it's in the mapping)
 					if ( hasFeaturedImageSupport ) {
@@ -257,7 +265,7 @@ export default function Media( { data, field, config = {} } ) {
 							templateColumns="24px 1fr"
 							className="block-editor-content-only-controls__media-row"
 						>
-							{ src && (
+							{ url && (
 								<>
 									<MediaThumbnail
 										attachment={ attachment }
@@ -270,12 +278,12 @@ export default function Media( { data, field, config = {} } ) {
 											attachment?.title?.raw &&
 											attachment?.title?.raw !== ''
 												? attachment?.title?.raw
-												: src
+												: url
 										}
 									</span>
 								</>
 							) }
-							{ ! src && (
+							{ ! url && (
 								<>
 									<span
 										className="block-editor-content-only-controls__media-placeholder"
