@@ -1,5 +1,4 @@
 const { registerBlockBindingsSource } = wp.blocks;
-const { createElement: el } = wp.element;
 const { fieldsList } = window.testingBindings || {};
 
 const getValues = ( { bindings } ) => {
