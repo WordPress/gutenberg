@@ -126,18 +126,8 @@
 					}
 				},
 				"sm": {
-					"$value": "{dimension.primitive.space.30}",
-					"$description": "Small gap",
-					"$extensions": {
-						"mode": {
-							"compact": "{dimension.primitive.space.20}",
-							"comfortable": "{dimension.primitive.space.40}"
-						}
-					}
-				},
-				"md": {
 					"$value": "{dimension.primitive.space.40}",
-					"$description": "Medium gap",
+					"$description": "Small gap",
 					"$extensions": {
 						"mode": {
 							"compact": "{dimension.primitive.space.30}",
@@ -145,13 +135,23 @@
 						}
 					}
 				},
-				"lg": {
+				"md": {
 					"$value": "{dimension.primitive.space.60}",
+					"$description": "Medium gap",
+					"$extensions": {
+						"mode": {
+							"compact": "{dimension.primitive.space.50}",
+							"comfortable": "{dimension.primitive.space.70}"
+						}
+					}
+				},
+				"lg": {
+					"$value": "{dimension.primitive.space.70}",
 					"$description": "Large gap",
 					"$extensions": {
 						"mode": {
-							"compact": "{dimension.primitive.space.40}",
-							"comfortable": "{dimension.primitive.space.60}"
+							"compact": "{dimension.primitive.space.60}",
+							"comfortable": "{dimension.primitive.space.80}"
 						}
 					}
 				}

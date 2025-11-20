@@ -640,25 +640,25 @@
 	},
 	"Dimension/Semantic/gap-sm": {
 		"value": {
-			".": "12px",
-			"compact": "8px",
-			"comfortable": "16px"
+			".": "16px",
+			"compact": "12px",
+			"comfortable": "20px"
 		},
 		"description": "Small gap"
 	},
 	"Dimension/Semantic/gap-md": {
 		"value": {
-			".": "16px",
-			"compact": "12px",
-			"comfortable": "20px"
+			".": "24px",
+			"compact": "20px",
+			"comfortable": "32px"
 		},
 		"description": "Medium gap"
 	},
 	"Dimension/Semantic/gap-lg": {
 		"value": {
-			".": "24px",
-			"compact": "16px",
-			"comfortable": "24px"
+			".": "32px",
+			"compact": "24px",
+			"comfortable": "40px"
 		},
 		"description": "Large gap"
 	},
