@@ -30,6 +30,7 @@ import { PrivateListView } from '../list-view';
 import InspectorControls from '../inspector-controls';
 const { fieldsKey } = unlock( blocksPrivateApis );
 import FieldsDropdownMenu from './fields-dropdown-menu';
+import LeafMoreMenu from './leaf-more-menu';
 
 // controls
 import RichText from './rich-text';
@@ -219,6 +220,7 @@ function NavigationListView( { clientId } ) {
 					isExpanded
 					showAppender
 					onSelect={ handleSelect }
+					blockSettingsMenu={ LeafMoreMenu }
 				/>
 			</div>
 		</ToolsPanel>
