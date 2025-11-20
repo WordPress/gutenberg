@@ -8,7 +8,20 @@ test.describe( 'New editor state', () => {
 		page,
 		admin,
 		editor,
+		requestUtils,
 	} ) => {
+		const plugins = await requestUtils.rest( { path: '/wp/v2/plugins' } );
+		const gutenberg = plugins.find(
+			( p ) => p.plugin === 'gutenberg/gutenberg'
+		);
+		const isGutenbergPluginActive = gutenberg?.status === 'active';
+
+		// eslint-disable-next-line playwright/no-skipped-test
+		test.skip(
+			! isGutenbergPluginActive,
+			'This test requires Gutenberg plugin to be active'
+		);
+
 		await admin.visitAdminPage( 'post-new.php', 'gutenberg-demo' );
 		await editor.setPreferences( 'core/edit-site', {
 			welcomeGuide: false,
