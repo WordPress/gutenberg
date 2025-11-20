@@ -103,7 +103,7 @@ export const processBlockType =
 			),
 		};
 
-		// Temporary fix to allow block authors time to fix blocks that register attributes as null or undefined.
+		// If the block is registering attributes as null or undefined, warn and default to empty object.
 		if (
 			! blockType.attributes ||
 			typeof blockType.attributes !== 'object'
@@ -111,7 +111,7 @@ export const processBlockType =
 			warning(
 				'The block "' +
 					name +
-					'" must not register attributes as `null` or `undefined`. Use an empty object (`attributes: {}`) or exclude the `attributes` key. In the next Gutenberg release, passing `null` or `undefined` for `attributes` will cause the block editor to crash.'
+					'" is registering attributes as `null` or `undefined`. Use an empty object (`attributes: {}`) or exclude the `attributes` key.'
 			);
 			blockType.attributes = {};
 		}

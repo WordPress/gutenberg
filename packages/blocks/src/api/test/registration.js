@@ -334,7 +334,7 @@ describe( 'blocks', () => {
 				} );
 
 				expect( console ).toHaveWarnedWith(
-					'The block "core/test-block-null-attributes" must not register attributes as `null` or `undefined`. Use an empty object (`attributes: {}`) or exclude the `attributes` key. In the next Gutenberg release, passing `null` or `undefined` for `attributes` will cause the block editor to crash.'
+					'The block "core/test-block-null-attributes" is registering attributes as `null` or `undefined`. Use an empty object (`attributes: {}`) or exclude the `attributes` key.'
 				);
 
 				const blockType = getBlockType(
