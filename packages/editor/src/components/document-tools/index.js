@@ -23,7 +23,7 @@ import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 import EditorHistoryRedo from '../editor-history/redo';
 import EditorHistoryUndo from '../editor-history/undo';
-import { EditorMode } from '../editor-mode';
+import { Slot as CollaborationModeSlot } from '../collaboration-mode';
 
 function DocumentTools( { className, disableBlockTools = false } ) {
 	const { setIsInserterOpened, setIsListViewOpened } =
@@ -112,7 +112,15 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 			<div className="editor-document-tools__left">
 				{ ! isDistractionFree && (
 					<>
-						<EditorMode />
+						<CollaborationModeSlot>
+							{ ( fills ) =>
+								fills?.length ? (
+									<div className="editor-document-tools__collaboration-mode">
+										{ fills }
+									</div>
+								) : null
+							}
+						</CollaborationModeSlot>
 						<ToolbarButton
 							ref={ inserterSidebarToggleRef }
 							className="editor-document-tools__inserter-toggle"

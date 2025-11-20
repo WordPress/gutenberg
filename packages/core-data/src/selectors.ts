@@ -50,6 +50,7 @@ export interface State {
 	userPatternCategories: Array< UserPatternCategory >;
 	defaultTemplates: Record< string, string >;
 	registeredPostMeta: Record< string, Object >;
+	collaboratorMode: CollaboratorMode;
 }
 
 type EntityRecordKey = string | number;
@@ -101,6 +102,8 @@ type TemplateQuery = {
 	is_custom?: boolean;
 	ignore_empty?: boolean;
 };
+
+type CollaboratorMode = 'view' | 'edit';
 
 export interface UserPatternCategory {
 	id: number;
@@ -188,6 +191,17 @@ export function getAuthors(
  */
 export function getCurrentUser( state: State ): ET.User< 'view' > {
 	return state.currentUser;
+}
+
+/**
+ * Returns the current collaborator mode.
+ *
+ * @param state Data state.
+ *
+ * @return {'view' | 'edit'} Collaborator mode.
+ */
+export function getCollaboratorMode( state: State ): CollaboratorMode {
+	return state.collaboratorMode;
 }
 
 /**

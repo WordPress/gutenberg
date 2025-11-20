@@ -59,6 +59,20 @@ export function receiveCurrentUser( currentUser ) {
 }
 
 /**
+ * Returns an action object used in signalling that the collaborator mode has been set.
+ *
+ * @param {'view' | 'edit'} collaboratorMode The collaborator mode.
+ *
+ * @return {Object} Action object.
+ */
+export function setCollaboratorMode( collaboratorMode ) {
+	return {
+		type: 'SET_COLLABORATOR_MODE',
+		collaboratorMode,
+	};
+}
+
+/**
  * Returns an action object used in adding new entities.
  *
  * @param {Array} entities Entities received.

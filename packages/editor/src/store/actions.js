@@ -615,7 +615,7 @@ export const resetEditorBlocks =
 		dispatch.editPost( edits );
 	};
 
-/*
+/**
  * Returns an action object used in signalling that the post editor settings have been updated.
  *
  * @param {Object} settings Updated settings
@@ -626,13 +626,6 @@ export function updateEditorSettings( settings ) {
 	return {
 		type: 'UPDATE_EDITOR_SETTINGS',
 		settings,
-	};
-}
-
-export function setCollaboratorMode( collaboratorMode ) {
-	return {
-		type: 'SET_COLLABORATOR_MODE',
-		collaboratorMode,
 	};
 }
 
