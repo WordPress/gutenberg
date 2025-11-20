@@ -106,7 +106,13 @@ test.describe( 'Server-side rendered block', () => {
 } );
 
 test.describe( 'PHP-only auto-register blocks', () => {
-	test.beforeAll( async ( { requestUtils } ) => {
+	test.beforeAll( async ( { requestUtils, isGutenbergPluginActive } ) => {
+		// eslint-disable-next-line playwright/no-skipped-test
+		test.skip(
+			! isGutenbergPluginActive,
+			'This test suite requires Gutenberg plugin to be active'
+		);
+
 		await requestUtils.activatePlugin(
 			'gutenberg-test-server-side-rendered-block'
 		);
