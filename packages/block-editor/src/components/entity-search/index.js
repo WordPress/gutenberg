@@ -118,13 +118,42 @@ export function EntitySearch( {
 			suggestion,
 		} ) );
 
-		// Always add a hidden freeform option that accepts any typed value
+		// Add current value as first option when input is empty or matches search
+		if ( value ) {
+			const valueMatchesSearch =
+				! searchTerm ||
+				value.toLowerCase().includes( searchTerm.toLowerCase() );
+
+			// Check if value is already in suggestions to avoid duplicate keys
+			const alreadyInSuggestions = opts.some(
+				( opt ) => opt.value === value
+			);
+
+			if ( valueMatchesSearch && ! alreadyInSuggestions ) {
+				// Add current value at the beginning
+				opts.unshift( {
+					value,
+					label: value,
+					isCurrentValue: true,
+				} );
+			}
+		}
+
+		// Add freeform option for typed values (when user is actively typing)
 		// This allows Enter/blur to commit whatever the user typed
-		opts.push( {
-			value: searchTerm || value || '',
-			label: searchTerm || value || '',
-			isFreeformOption: true,
-		} );
+		if ( searchTerm ) {
+			// Don't add if it duplicates any existing option
+			const alreadyExists = opts.some(
+				( opt ) => opt.value === searchTerm
+			);
+			if ( ! alreadyExists ) {
+				opts.push( {
+					value: searchTerm,
+					label: searchTerm,
+					isFreeformOption: true,
+				} );
+			}
+		}
 
 		return opts;
 	}, [ suggestions, getDisplayValue, searchTerm, value ] );
