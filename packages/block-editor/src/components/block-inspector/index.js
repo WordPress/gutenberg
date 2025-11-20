@@ -154,24 +154,25 @@ function BlockInspector() {
 				selectedBlockClientId
 			);
 
-			// Exclude Navigation block children (but not the navigation block itself)
-			// Navigation blocks will show their own list view controls
-			const navigationChildren = new Set();
-
-			// Check for navigation blocks within descendants and exclude only their children
+			// Temporary workaround for issue #71991
+			// Exclude Navigation block children from Content sidebar until proper
+			// drill-down experience is implemented (see #65699)
+			// This prevents a poor UX where all Nav block sub-items are shown
+			// when the parent block is in contentOnly mode.
+			// Build a Set of all navigation block descendants for efficient lookup
+			const navigationDescendants = new Set();
 			descendants.forEach( ( clientId ) => {
 				if ( getBlockName( clientId ) === 'core/navigation' ) {
-					// Don't exclude the navigation block itself, only its children
 					const navChildren = getClientIdsOfDescendants( clientId );
 					navChildren.forEach( ( childId ) =>
-						navigationChildren.add( childId )
+						navigationDescendants.add( childId )
 					);
 				}
 			} );
 
 			return descendants.filter( ( current ) => {
 				// Exclude navigation block children
-				if ( navigationChildren.has( current ) ) {
+				if ( navigationDescendants.has( current ) ) {
 					return false;
 				}
 
@@ -387,4 +388,3 @@ const BlockInspectorSingleBlock = ( {
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-inspector/README.md
  */
 export default BlockInspector;
-export { BlockInspectorSingleBlock };
