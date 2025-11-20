@@ -4,7 +4,10 @@
 import { addFilter } from '@wordpress/hooks';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { useBlockEditingMode } from '@wordpress/block-editor';
+import {
+	useBlockEditingMode,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { getBlockBindingsSource } from '@wordpress/blocks';
 
@@ -58,6 +61,15 @@ function ControlsWithStoreSubscription( props ) {
 		( select ) => {
 			const { getCurrentPostType, getEditedPostAttribute } =
 				select( editorStore );
+			const { getBlockParentsByBlockName, getEditedContentOnlySection } =
+				unlock( select( blockEditorStore ) );
+
+			const editedContentOnlySection = getEditedContentOnlySection();
+			const [ patternClientId ] = getBlockParentsByBlockName(
+				props.clientId,
+				'core/block',
+				true
+			);
 
 			return {
 				// For editing link to the site editor if the theme and user permissions support it.
@@ -65,14 +77,16 @@ function ControlsWithStoreSubscription( props ) {
 					'core/pattern-overrides'
 				),
 				isEditingSyncedPattern:
-					getCurrentPostType() === PATTERN_TYPES.user &&
-					getEditedPostAttribute( 'meta' )?.wp_pattern_sync_status !==
-						PATTERN_SYNC_TYPES.unsynced &&
-					getEditedPostAttribute( 'wp_pattern_sync_status' ) !==
-						PATTERN_SYNC_TYPES.unsynced,
+					editedContentOnlySection === patternClientId ||
+					( getCurrentPostType() === PATTERN_TYPES.user &&
+						getEditedPostAttribute( 'meta' )
+							?.wp_pattern_sync_status !==
+							PATTERN_SYNC_TYPES.unsynced &&
+						getEditedPostAttribute( 'wp_pattern_sync_status' ) !==
+							PATTERN_SYNC_TYPES.unsynced ),
 			};
 		},
-		[]
+		[ props.clientId ]
 	);
 
 	const bindings = props.attributes.metadata?.bindings;
