@@ -20,7 +20,10 @@ test.describe( 'Global styles sidebar', () => {
 		} );
 	} );
 
-	test( 'should filter blocks list results', async ( { page } ) => {
+	test( 'should filter blocks list results', async ( {
+		page,
+		isGutenbergPluginActive,
+	} ) => {
 		// Navigate to Styles -> Blocks.
 		await page
 			.getByRole( 'region', { name: 'Editor top bar' } )
@@ -43,5 +46,12 @@ test.describe( 'Global styles sidebar', () => {
 		await expect(
 			page.getByRole( 'button', { name: 'Accordion Item' } )
 		).toBeVisible();
+		if ( isGutenbergPluginActive ) {
+			await expect(
+				page.getByRole( 'button', {
+					name: 'Table of Contents',
+				} )
+			).toBeVisible();
+		}
 	} );
 } );
