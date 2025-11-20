@@ -1002,18 +1002,18 @@ const ValidationComponent = ( {
 				type: 'email',
 				label: 'e-mail',
 				placeholder: pattern && minMax
-					? 'user@company.com (10-50 chars)'
+					? 'user@company.com (5-100 chars)'
 					: pattern
 					? 'user@company.com'
 					: minMax
-					? 'Min 10, max 50 characters'
+					? 'Min 5, max 100 characters'
 					: undefined,
 				description: pattern && minMax
-					? 'Must be @company.com domain AND 10-50 characters'
+					? 'Must be @company.com domain AND 5-100 characters'
 					: pattern
 					? 'Email must be from @company.com domain'
 					: minMax
-					? 'Must be between 10 and 50 characters'
+					? 'Must be between 5 and 100 characters'
 					: undefined,
 				isValid: {
 					required,
@@ -1022,8 +1022,8 @@ const ValidationComponent = ( {
 					pattern: pattern
 						? '^[a-zA-Z0-9._%+-]+@company\\.com$'
 						: undefined,
-					minLength: minMax ? 10 : undefined,
-					maxLength: minMax ? 50 : undefined,
+					minLength: minMax ? 5 : undefined,
+					maxLength: minMax ? 100 : undefined,
 				},
 			},
 			{
@@ -1060,18 +1060,18 @@ const ValidationComponent = ( {
 				type: 'url',
 				label: 'URL',
 				placeholder: pattern && minMax
-					? 'https://github.com/user/repo (20-100 chars)'
+					? 'https://github.com/user/repo (10-255 chars)'
 					: pattern
 					? 'https://github.com/user/repo'
 					: minMax
-					? 'Min 20, max 100 characters'
+					? 'Min 10, max 255 characters'
 					: undefined,
 				description: pattern && minMax
-					? 'GitHub repository URL AND 20-100 characters'
+					? 'GitHub repository URL AND 10-255 characters'
 					: pattern
 					? 'Must be a GitHub repository URL'
 					: minMax
-					? 'Must be between 20 and 100 characters'
+					? 'Must be between 10 and 255 characters'
 					: undefined,
 				isValid: {
 					required,
@@ -1080,8 +1080,8 @@ const ValidationComponent = ( {
 					pattern: pattern
 						? '^https:\\/\\/github\\.com\\/.+\\/.+$'
 						: undefined,
-					minLength: minMax ? 20 : undefined,
-					maxLength: minMax ? 100 : undefined,
+					minLength: minMax ? 10 : undefined,
+					maxLength: minMax ? 255 : undefined,
 				},
 			},
 			{
