@@ -61,23 +61,39 @@ function createConfiguredControl( config ) {
 
 /**
  * Normalize a media value to a canonical structure.
- * Uses standard Gutenberg attribute names for media (e.g., "url" for images).
- * Accepts either name as input but normalizes to the canonical form.
+ * Only includes properties that are present in the field's mapping (if provided).
  *
- * @param {Object} value - The mapped value from the block attributes
+ * @param {Object} value    - The mapped value from the block attributes (with canonical keys)
+ * @param {Object} fieldDef - Optional field definition containing the mapping
  * @return {Object} Normalized media value with canonical properties
  */
-function normalizeMediaValue( value ) {
-	return {
-		id: value?.id ?? null,
-		url: value?.url ?? value?.src ?? '', // accepts src as fallback for HTML native elements
-		caption: value?.caption ?? '',
-		alt: value?.alt ?? '',
-		type: value?.type ?? 'image',
-		poster: value?.poster ?? '',
-		featuredImage: value?.featuredImage ?? false,
-		link: value?.link ?? '',
+function normalizeMediaValue( value, fieldDef ) {
+	const defaults = {
+		id: null,
+		url: '',
+		caption: '',
+		alt: '',
+		type: 'image',
+		poster: '',
+		featuredImage: false,
+		link: '',
 	};
+
+	const result = {};
+
+	// If there's a mapping, only include properties that are in it
+	if ( fieldDef?.mapping ) {
+		Object.keys( fieldDef.mapping ).forEach( ( key ) => {
+			result[ key ] = value?.[ key ] ?? defaults[ key ] ?? '';
+		} );
+		return result;
+	}
+
+	// Without mapping, include all default properties
+	Object.keys( defaults ).forEach( ( key ) => {
+		result[ key ] = value?.[ key ] ?? defaults[ key ];
+	} );
+	return result;
 }
 
 /**
@@ -104,18 +120,35 @@ function denormalizeMediaValue( value, fieldDef ) {
 
 /**
  * Normalize a link value to a canonical structure.
- * Uses standard Gutenberg attribute names: "url" and "linkTarget".
- * Accepts either name as input but normalizes to the canonical form.
+ * Only includes properties that are present in the field's mapping (if provided).
  *
- * @param {Object} value - The mapped value from the block attributes
+ * @param {Object} value    - The mapped value from the block attributes (with canonical keys)
+ * @param {Object} fieldDef - Optional field definition containing the mapping
  * @return {Object} Normalized link value with canonical properties
  */
-function normalizeLinkValue( value ) {
-	return {
-		url: value?.url ?? value?.href ?? '', // accepts href as fallback
-		rel: value?.rel ?? '',
-		linkTarget: value?.linkTarget ?? value?.target ?? '', // accepts target as fallback
+function normalizeLinkValue( value, fieldDef ) {
+	const defaults = {
+		url: '',
+		rel: '',
+		linkTarget: '',
+		destination: '',
 	};
+
+	const result = {};
+
+	// If there's a mapping, only include properties that are in it
+	if ( fieldDef?.mapping ) {
+		Object.keys( fieldDef.mapping ).forEach( ( key ) => {
+			result[ key ] = value?.[ key ] ?? defaults[ key ] ?? '';
+		} );
+		return result;
+	}
+
+	// Without mapping, include all default properties
+	Object.keys( defaults ).forEach( ( key ) => {
+		result[ key ] = value?.[ key ] ?? defaults[ key ];
+	} );
+	return result;
 }
 
 /**

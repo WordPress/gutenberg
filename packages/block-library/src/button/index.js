@@ -52,9 +52,9 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 			type: 'link',
 			shownByDefault: false,
 			mapping: {
-				href: 'url',
+				url: 'url',
 				rel: 'rel',
-				target: 'linkTarget',
+				linkTarget: 'linkTarget',
 			},
 		},
 	];

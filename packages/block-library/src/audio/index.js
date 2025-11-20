@@ -45,7 +45,7 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 			shownByDefault: true,
 			mapping: {
 				id: 'id',
-				src: 'src',
+				url: 'src',
 			},
 			args: {
 				allowedTypes: [ 'audio' ],

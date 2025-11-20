@@ -66,7 +66,7 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 			mapping: {
 				type: 'backgroundType',
 				id: 'id',
-				src: 'url',
+				url: 'url',
 				alt: 'alt',
 				featuredImage: 'useFeaturedImage',
 			},

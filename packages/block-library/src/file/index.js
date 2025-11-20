@@ -45,7 +45,7 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 			shownByDefault: true,
 			mapping: {
 				id: 'id',
-				src: 'href',
+				url: 'href',
 			},
 			args: {
 				allowedTypes: [],

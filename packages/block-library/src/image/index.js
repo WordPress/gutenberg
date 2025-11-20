@@ -75,7 +75,7 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 			shownByDefault: true,
 			mapping: {
 				id: 'id',
-				src: 'url',
+				url: 'url',
 				caption: 'caption',
 				alt: 'alt',
 			},
@@ -90,9 +90,9 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 			type: 'link',
 			shownByDefault: false,
 			mapping: {
-				href: 'href',
+				url: 'href',
 				rel: 'rel',
-				target: 'linkTarget',
+				linkTarget: 'linkTarget',
 				destination: 'linkDestination',
 			},
 		},

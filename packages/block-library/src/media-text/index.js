@@ -64,7 +64,7 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 			mapping: {
 				id: 'mediaId',
 				type: 'mediaType',
-				src: 'mediaUrl',
+				url: 'mediaUrl',
 				link: 'mediaLink',
 			},
 			args: {
@@ -78,9 +78,9 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 			type: 'link',
 			shownByDefault: false,
 			mapping: {
-				href: 'href',
+				url: 'href',
 				rel: 'rel',
-				target: 'linkTarget',
+				linkTarget: 'linkTarget',
 			},
 		},
 	];
