@@ -4737,5 +4737,4 @@ class WP_Theme_JSON_Gutenberg {
 			return $block_metadata['path'][2];
 		}
 	}
-
 }
