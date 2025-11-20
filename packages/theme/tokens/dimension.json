@@ -107,7 +107,7 @@
 			"gap": {
 				"2xs": {
 					"$value": "{dimension.primitive.space.10}",
-					"$description": "2x extra small gap for content flow",
+					"$description": "2x extra small gap",
 					"$extensions": {
 						"mode": {
 							"compact": "{dimension.primitive.space.10}",
@@ -117,7 +117,7 @@
 				},
 				"xs": {
 					"$value": "{dimension.primitive.space.20}",
-					"$description": "Extra small gap for content flow",
+					"$description": "Extra small gap",
 					"$extensions": {
 						"mode": {
 							"compact": "{dimension.primitive.space.10}",
@@ -127,7 +127,7 @@
 				},
 				"sm": {
 					"$value": "{dimension.primitive.space.30}",
-					"$description": "Small gap for content flow",
+					"$description": "Small gap",
 					"$extensions": {
 						"mode": {
 							"compact": "{dimension.primitive.space.20}",
@@ -137,7 +137,7 @@
 				},
 				"md": {
 					"$value": "{dimension.primitive.space.40}",
-					"$description": "Medium gap for content flow",
+					"$description": "Medium gap",
 					"$extensions": {
 						"mode": {
 							"compact": "{dimension.primitive.space.30}",
@@ -147,7 +147,7 @@
 				},
 				"lg": {
 					"$value": "{dimension.primitive.space.60}",
-					"$description": "Large gap for content flow",
+					"$description": "Large gap",
 					"$extensions": {
 						"mode": {
 							"compact": "{dimension.primitive.space.40}",

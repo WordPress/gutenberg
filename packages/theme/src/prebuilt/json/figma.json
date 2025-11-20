@@ -628,7 +628,7 @@
 			"compact": "4px",
 			"comfortable": "8px"
 		},
-		"description": "2x extra small gap for content flow"
+		"description": "2x extra small gap"
 	},
 	"Dimension/Semantic/gap-xs": {
 		"value": {
@@ -636,7 +636,7 @@
 			"compact": "4px",
 			"comfortable": "12px"
 		},
-		"description": "Extra small gap for content flow"
+		"description": "Extra small gap"
 	},
 	"Dimension/Semantic/gap-sm": {
 		"value": {
@@ -644,7 +644,7 @@
 			"compact": "8px",
 			"comfortable": "16px"
 		},
-		"description": "Small gap for content flow"
+		"description": "Small gap"
 	},
 	"Dimension/Semantic/gap-md": {
 		"value": {
@@ -652,7 +652,7 @@
 			"compact": "12px",
 			"comfortable": "20px"
 		},
-		"description": "Medium gap for content flow"
+		"description": "Medium gap"
 	},
 	"Dimension/Semantic/gap-lg": {
 		"value": {
@@ -660,7 +660,7 @@
 			"compact": "16px",
 			"comfortable": "24px"
 		},
-		"description": "Large gap for content flow"
+		"description": "Large gap"
 	},
 	"Elevation/x-small": {
 		"value": {
