@@ -201,7 +201,14 @@ export function getCurrentUser( state: State ): ET.User< 'view' > {
  * @return {'view' | 'edit'} Collaborator mode.
  */
 export function getCollaboratorMode( state: State ): CollaboratorMode {
-	return state.collaboratorMode;
+	if ( window.__experimentalEnableSync ) {
+		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+			return state.collaboratorMode;
+		}
+	}
+
+	// Default to edit mode if sync is not enabled, or if it is not a Gutenberg plugin.
+	return 'edit';
 }
 
 /**
