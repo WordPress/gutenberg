@@ -20,10 +20,10 @@
 .dataviews__view-actions,
 .dataviews-filters__container {
 	box-sizing: border-box;
-	padding-block-start: var(--dataviews-padding-block-start, #{$grid-unit-20});
+	padding-block-start: var(--wp-dataviews-padding-block-start, #{$grid-unit-20});
 	padding-block-end: $grid-unit-20;
-	padding-inline-start: var(--dataviews-padding-inline-start, #{$grid-unit-60});
-	padding-inline-end: var(--dataviews-padding-inline-end, #{$grid-unit-60});
+	padding-inline-start: var(--wp-dataviews-padding-inline-start, #{$grid-unit-60});
+	padding-inline-end: var(--wp-dataviews-padding-inline-end, #{$grid-unit-60});
 	flex-shrink: 0;
 	position: sticky;
 	left: 0;
@@ -37,8 +37,8 @@
 .dataviews-no-results,
 .dataviews-loading {
 	padding-block: 0;
-	padding-inline-start: var(--dataviews-padding-inline-start, #{$grid-unit-60});
-	padding-inline-end: var(--dataviews-padding-inline-end, #{$grid-unit-60});
+	padding-inline-start: var(--wp-dataviews-padding-inline-start, #{$grid-unit-60});
+	padding-inline-end: var(--wp-dataviews-padding-inline-end, #{$grid-unit-60});
 	flex-grow: 1;
 	display: flex;
 	align-items: center;
@@ -56,17 +56,17 @@
 @container (max-width: 430px) {
 	.dataviews__view-actions,
 	.dataviews-filters__container {
-		padding-block-start: var(--dataviews-padding-block-start, #{$grid-unit-15});
+		padding-block-start: var(--wp-dataviews-padding-block-start, #{$grid-unit-15});
 		padding-block-end: $grid-unit-15;
-		padding-inline-start: var(--dataviews-padding-inline-start, #{$grid-unit-30});
-		padding-inline-end: var(--dataviews-padding-inline-end, #{$grid-unit-30});
+		padding-inline-start: var(--wp-dataviews-padding-inline-start, #{$grid-unit-30});
+		padding-inline-end: var(--wp-dataviews-padding-inline-end, #{$grid-unit-30});
 	}
 
 	.dataviews-no-results,
 	.dataviews-loading {
 		padding-block: 0;
-		padding-inline-start: var(--dataviews-padding-inline-start, #{$grid-unit-30});
-		padding-inline-end: var(--dataviews-padding-inline-end, #{$grid-unit-30});
+		padding-inline-start: var(--wp-dataviews-padding-inline-start, #{$grid-unit-30});
+		padding-inline-end: var(--wp-dataviews-padding-inline-end, #{$grid-unit-30});
 	}
 }
 

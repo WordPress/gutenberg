@@ -9,7 +9,7 @@ import type {
 
 /**
  * Maps padding size tokens to CSS values.
- * Aligned with the Box component's spacing scale (space function with 4px base):
+ * Aligned with the Card component's spacing scale (space function with 4px base):
  * - x-small: space(2) = 8px
  * - small: space(4) = 16px
  * - medium: space(6) = 24px
@@ -52,10 +52,10 @@ export function getPaddingBySizeStyles(
 	// Handle string-based sizes (single value applied to all directional variants)
 	if ( typeof padding === 'string' ) {
 		const value = getSinglePaddingValue( padding );
-		styles[ '--dataviews-padding-block-start' ] = value;
-		styles[ '--dataviews-padding-block-end' ] = value;
-		styles[ '--dataviews-padding-inline-start' ] = value;
-		styles[ '--dataviews-padding-inline-end' ] = value;
+		styles[ '--wp-dataviews-padding-block-start' ] = value;
+		styles[ '--wp-dataviews-padding-block-end' ] = value;
+		styles[ '--wp-dataviews-padding-inline-start' ] = value;
+		styles[ '--wp-dataviews-padding-inline-end' ] = value;
 		return styles;
 	}
 
@@ -71,40 +71,40 @@ export function getPaddingBySizeStyles(
 	if ( block !== undefined ) {
 		const value = getSinglePaddingValue( block );
 		if ( blockStart === undefined ) {
-			styles[ '--dataviews-padding-block-start' ] = value;
+			styles[ '--wp-dataviews-padding-block-start' ] = value;
 		}
 		if ( blockEnd === undefined ) {
-			styles[ '--dataviews-padding-block-end' ] = value;
+			styles[ '--wp-dataviews-padding-block-end' ] = value;
 		}
 	}
 
 	if ( blockStart !== undefined ) {
-		styles[ '--dataviews-padding-block-start' ] =
+		styles[ '--wp-dataviews-padding-block-start' ] =
 			getSinglePaddingValue( blockStart );
 	}
 
 	if ( blockEnd !== undefined ) {
-		styles[ '--dataviews-padding-block-end' ] =
+		styles[ '--wp-dataviews-padding-block-end' ] =
 			getSinglePaddingValue( blockEnd );
 	}
 
 	if ( inline !== undefined ) {
 		const value = getSinglePaddingValue( inline );
 		if ( inlineStart === undefined ) {
-			styles[ '--dataviews-padding-inline-start' ] = value;
+			styles[ '--wp-dataviews-padding-inline-start' ] = value;
 		}
 		if ( inlineEnd === undefined ) {
-			styles[ '--dataviews-padding-inline-end' ] = value;
+			styles[ '--wp-dataviews-padding-inline-end' ] = value;
 		}
 	}
 
 	if ( inlineStart !== undefined ) {
-		styles[ '--dataviews-padding-inline-start' ] =
+		styles[ '--wp-dataviews-padding-inline-start' ] =
 			getSinglePaddingValue( inlineStart );
 	}
 
 	if ( inlineEnd !== undefined ) {
-		styles[ '--dataviews-padding-inline-end' ] =
+		styles[ '--wp-dataviews-padding-inline-end' ] =
 			getSinglePaddingValue( inlineEnd );
 	}
 

@@ -7,8 +7,8 @@
 	grid-template-rows: max-content;
 	grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
 	padding-block-start: 0;
-	padding-inline-start: var(--dataviews-padding-inline-start, #{$grid-unit-60});
-	padding-inline-end: var(--dataviews-padding-inline-end, #{$grid-unit-60});
+	padding-inline-start: var(--wp-dataviews-padding-inline-start, #{$grid-unit-60});
+	padding-inline-end: var(--wp-dataviews-padding-inline-end, #{$grid-unit-60});
 	padding-block-end: $grid-unit-30;
 	container-type: inline-size;
 	/**
@@ -16,8 +16,8 @@
 		* the sidebar width. This was done to match the existing styles we had.
 		*/
 	@container (max-width: 430px) {
-		padding-inline-start: var(--dataviews-padding-inline-start, #{$grid-unit-30});
-		padding-inline-end: var(--dataviews-padding-inline-end, #{$grid-unit-30});
+		padding-inline-start: var(--wp-dataviews-padding-inline-start, #{$grid-unit-30});
+		padding-inline-end: var(--wp-dataviews-padding-inline-end, #{$grid-unit-30});
 	}
 
 	@media not (prefers-reduced-motion) {

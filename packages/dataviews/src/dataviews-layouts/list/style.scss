@@ -16,8 +16,8 @@ div.dataviews-view-list {
 		.dataviews-view-list__item-wrapper {
 			position: relative;
 			padding-block: $grid-unit-20;
-			padding-inline-start: var(--dataviews-padding-inline-start, #{$grid-unit-30});
-			padding-inline-end: var(--dataviews-padding-inline-end, #{$grid-unit-30});
+			padding-inline-start: var(--wp-dataviews-padding-inline-start, #{$grid-unit-30});
+			padding-inline-end: var(--wp-dataviews-padding-inline-end, #{$grid-unit-30});
 			box-sizing: border-box;
 		}
 
@@ -209,6 +209,6 @@ div.dataviews-view-list {
 	color: $gray-900;
 	margin: 0 0 $grid-unit-10 0;
 	padding-block: 0;
-	padding-inline-start: var(--dataviews-padding-inline-start, #{$grid-unit-30});
-	padding-inline-end: var(--dataviews-padding-inline-end, #{$grid-unit-30});
+	padding-inline-start: var(--wp-dataviews-padding-inline-start, #{$grid-unit-30});
+	padding-inline-end: var(--wp-dataviews-padding-inline-end, #{$grid-unit-30});
 }
