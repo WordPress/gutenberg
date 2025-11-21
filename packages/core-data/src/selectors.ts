@@ -196,7 +196,7 @@ export function getCurrentUser( state: State ): ET.User< 'view' > {
 /**
  * Returns the current collaborator mode.
  *
- * @param state Data state.
+ * @param  state Data state.
  *
  * @return {'view' | 'edit'} Collaborator mode.
  */

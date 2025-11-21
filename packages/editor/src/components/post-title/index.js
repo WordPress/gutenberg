@@ -19,6 +19,7 @@ import {
 } from '@wordpress/rich-text';
 import { useMergeRefs } from '@wordpress/compose';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
+import { store as coreDataStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -36,6 +37,10 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 		return {
 			placeholder: titlePlaceholder,
 		};
+	}, [] );
+
+	const collaboratorMode = useSelect( ( select ) => {
+		return select( coreDataStore ).getCollaboratorMode();
 	}, [] );
 
 	const [ isSelected, setIsSelected ] = useState( false );
@@ -173,11 +178,12 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 		/* eslint-disable jsx-a11y/heading-has-content, jsx-a11y/no-noninteractive-element-to-interactive-role */
 		<h1
 			ref={ useMergeRefs( [ richTextRef, focusRef ] ) }
-			contentEditable
+			contentEditable={ collaboratorMode === 'edit' }
 			className={ className }
 			aria-label={ decodedPlaceholder }
 			role="textbox"
 			aria-multiline="true"
+			readOnly={ collaboratorMode === 'view' }
 			onFocus={ onSelect }
 			onBlur={ onUnselect }
 			onKeyDown={ onKeyDown }
