@@ -54,6 +54,18 @@ const storyArgTypes = {
 		description:
 			'Whether the infinite scroll is enabled. Enabling this disables the "Is grouped" option',
 	},
+	padding: {
+		control: 'select',
+		options: [
+			'x-small',
+			'small',
+			'medium',
+			'large',
+			'extra-large',
+			'none',
+		],
+		description: 'Determines the amount of padding within the component',
+	},
 };
 
 interface PickerContentProps {
@@ -187,17 +199,20 @@ export const Default = ( {
 	isMultiselectable,
 	isGrouped,
 	infiniteScrollEnabled,
+	padding,
 }: {
 	perPageSizes: number[];
 	isMultiselectable: boolean;
 	isGrouped: boolean;
 	infiniteScrollEnabled: boolean;
+	padding?: PaddingOptions;
 } ) => (
 	<DataViewsPickerContent
 		perPageSizes={ perPageSizes }
 		isMultiselectable={ isMultiselectable }
 		isGrouped={ isGrouped }
 		infiniteScrollEnabled={ infiniteScrollEnabled }
+		padding={ padding }
 	/>
 );
 
@@ -209,11 +224,13 @@ export const WithModal = ( {
 	isMultiselectable,
 	isGrouped,
 	infiniteScrollEnabled,
+	padding,
 }: {
 	perPageSizes: number[];
 	isMultiselectable: boolean;
 	isGrouped: boolean;
 	infiniteScrollEnabled: boolean;
+	padding?: PaddingOptions;
 } ) => {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const [ selectedItems, setSelectedItems ] = useState< SpaceObject[] >( [] );
@@ -241,11 +258,6 @@ export const WithModal = ( {
 
 	return (
 		<>
-			<style>{ `
-				.dataviews-picker-modal .components-modal__content {
-					padding: 0;
-				}
-			` }</style>
 			<HStack justify="left">
 				<Button
 					variant="primary"
@@ -286,7 +298,7 @@ export const WithModal = ( {
 						selection={ selectedItems.map( ( item ) =>
 							String( item.id )
 						) }
-						padding="large"
+						padding={ padding }
 					/>
 				</Modal>
 			) }
@@ -294,7 +306,7 @@ export const WithModal = ( {
 	);
 };
 
-WithModal.args = storyArgs;
+WithModal.args = { ...storyArgs, padding: 'large' };
 WithModal.argTypes = storyArgTypes;
 
 function useInfiniteScroll( {

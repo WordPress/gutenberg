@@ -38,6 +38,7 @@ import {
 } from '../constants';
 import filterSortAndPaginate from '../utils/filter-sort-and-paginate';
 import type { Field, View } from '../types';
+import type { PaddingOptions } from '../components/dataviews-picker/types';
 import {
 	DEFAULT_VIEW,
 	actions,
@@ -82,6 +83,11 @@ const defaultLayouts = {
 export const Default = ( {
 	perPageSizes = [ 10, 25, 50, 100 ],
 	hasClickableItems = true,
+	padding,
+}: {
+	perPageSizes: number[];
+	hasClickableItems: boolean;
+	padding?: PaddingOptions;
 } ) => {
 	const [ view, setView ] = useState< View >( {
 		...DEFAULT_VIEW,
@@ -115,6 +121,7 @@ export const Default = ( {
 			isItemClickable={ () => hasClickableItems }
 			defaultLayouts={ defaultLayouts }
 			config={ { perPageSizes } }
+			padding={ padding }
 		/>
 	);
 };
@@ -132,6 +139,18 @@ Default.argTypes = {
 	hasClickableItems: {
 		control: 'boolean',
 		description: 'Are the items clickable',
+	},
+	padding: {
+		control: 'select',
+		options: [
+			'x-small',
+			'small',
+			'medium',
+			'large',
+			'extra-large',
+			'none',
+		],
+		description: 'Determines the amount of padding within the component',
 	},
 };
 
