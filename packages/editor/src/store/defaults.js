@@ -29,5 +29,5 @@ export const EDITOR_SETTINGS_DEFAULTS = {
 	codeEditingEnabled: true,
 	fontLibraryEnabled: true,
 	enableCustomFields: undefined,
-	defaultRenderingMode: 'post-only'
+	defaultRenderingMode: 'post-only',
 };

@@ -319,10 +319,17 @@ export const deleteEntityRecord =
 		);
 
 		try {
-			const collaboratorMode = resolveSelect.getCollaboratorMode();
+			if (
+				window.__experimentalEnableSync &&
+				entityConfig.syncConfig
+			) {
+				if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+					const collaboratorMode = resolveSelect.getCollaboratorMode();
 
-			if ( collaboratorMode === 'view' ) {
-				return;
+					if ( collaboratorMode === 'view' ) {
+						return;
+					}
+				}
 			}
 
 			dispatch( {
@@ -413,13 +420,20 @@ export const editEntityRecord =
 			recordId
 		);
 
-		const collaboratorMode = select.getCollaboratorMode();
+		if (
+			window.__experimentalEnableSync &&
+			entityConfig.syncConfig
+		) {
+			if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+				const collaboratorMode = select.getCollaboratorMode();
 
-		if ( collaboratorMode === 'view' && edits ) {
-			if ( 'selection' in edits ) {
-				edits = { selection: edits.selection };
-			} else {
-				edits = {};
+				if ( collaboratorMode === 'view' && edits ) {
+					if ( 'selection' in edits ) {
+						edits = { selection: edits.selection };
+					} else {
+						edits = {};
+					}
+				}
 			}
 		}
 
@@ -567,10 +581,17 @@ export const saveEntityRecord =
 			{ exclusive: true }
 		);
 
-		const theCurrentUser = select.getCurrentUser();
+		if (
+			window.__experimentalEnableSync &&
+			entityConfig.syncConfig
+		) {
+			if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+				const collaboratorMode = select.getCollaboratorMode();
 
-		if ( theCurrentUser && theCurrentUser.id === 4 ) {
-			return;
+				if ( collaboratorMode === 'view' ) {
+					return;
+				}
+			}
 		}
 
 		try {
