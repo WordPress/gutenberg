@@ -1,0 +1,22 @@
+.entity-search {
+	svg {
+		fill: currentColor;
+	}
+
+	&.is-freeform {
+		// Hide the empty (no results found) state when in freeform mode
+		.is-empty {
+			display: none;
+		}
+	}
+
+	// Hide the current value from dropdown
+	.entity-search__current-value-hidden {
+		display: none !important;
+	}
+}
+
+// Target the parent li of the hidden item
+.entity-search .components-form-token-field__suggestion:has(.entity-search__current-value-hidden) {
+	display: none !important;
+}
