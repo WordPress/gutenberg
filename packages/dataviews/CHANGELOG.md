@@ -13,7 +13,7 @@
 - Documentation: improve Edit component. [#73202](https://github.com/WordPress/gutenberg/pull/73202)
 - Documentation: surface better the `type` property in the documentation. [#73349](https://github.com/WordPress/gutenberg/pull/73349)
 - Documentation: improve DataView's `layout` prop. [#73470](https://github.com/WordPress/gutenberg/pull/73470)
-- DataForm Panel Layout: Focus the first input element when the panel opens. [#73339](https://github.com/WordPress/gutenberg/pull/72322)
+- DataForm Panel Layout: Focus the first input element when the panel opens. [#72322](https://github.com/WordPress/gutenberg/pull/72322)
 
 ### Bug fixes
 
