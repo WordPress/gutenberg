@@ -150,3 +150,38 @@
 .navigation-link-control__error-text {
 	color: $alert-red;
 }
+
+/**
+ * Search input styling for inspector controls.
+ * Remove margins from LinkControl styles that don't apply in inspector.
+ * Target the correct container based on HTML structure.
+ */
+.components-tools-panel-item .block-editor-link-control__search-input-container {
+	margin: 0;
+	min-width: 0;
+
+	// Style the input itself
+	.navigation-link-control__search-input {
+		margin: 0;
+		min-width: 0;
+	}
+
+	// Style the suggestions dropdown (sibling to input)
+	.block-editor-link-control__search-results-wrapper {
+		// Add spacing between input and dropdown
+		margin: $grid-unit-20 0 0;
+		padding: 0;
+	}
+
+	// Style the suggestions container
+	.block-editor-link-control__search-results {
+		// Add border around options
+		border: $border-width solid $gray-300;
+		border-radius: $radius-block-ui;
+		// Match the width of the input
+		box-sizing: border-box;
+		// Ensure proper background
+		background: $white;
+	}
+}
+
