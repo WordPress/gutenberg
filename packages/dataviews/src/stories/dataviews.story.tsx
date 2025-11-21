@@ -129,6 +129,7 @@ export const Default = ( {
 Default.args = {
 	perPageSizes: [ 10, 25, 50, 100 ],
 	hasClickableItems: true,
+	padding: undefined,
 };
 
 Default.argTypes = {
@@ -143,6 +144,7 @@ Default.argTypes = {
 	padding: {
 		control: 'select',
 		options: [
+			'default',
 			'x-small',
 			'small',
 			'medium',
@@ -150,6 +152,15 @@ Default.argTypes = {
 			'extra-large',
 			'none',
 		],
+		mapping: {
+			default: undefined,
+			'x-small': 'x-small',
+			small: 'small',
+			medium: 'medium',
+			large: 'large',
+			'extra-large': 'extra-large',
+			none: 'none',
+		},
 		description: 'Determines the amount of padding within the component',
 	},
 };

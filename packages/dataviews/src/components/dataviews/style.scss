@@ -27,7 +27,8 @@
 .dataviews__view-actions,
 .dataviews-filters__container {
 	box-sizing: border-box;
-	padding-block: $grid-unit-20;
+	padding-block-start: var(--dataviews-padding-block-start, #{$grid-unit-20});
+	padding-block-end: $grid-unit-20;
 	padding-inline-start: var(--dataviews-padding-inline-start);
 	padding-inline-end: var(--dataviews-padding-inline-end);
 	flex-shrink: 0;
@@ -62,13 +63,15 @@
 @container (max-width: 430px) {
 	.dataviews__view-actions,
 	.dataviews-filters__container {
-		padding-block: $grid-unit-15;
+		padding-block-start: var(--dataviews-padding-block-start, #{$grid-unit-15});
+		padding-block-end: $grid-unit-15;
 		padding-inline-start: var(--dataviews-padding-inline-start);
 		padding-inline-end: var(--dataviews-padding-inline-end);
 	}
 
 	.dataviews-no-results,
 	.dataviews-loading {
+		padding-block: 0;
 		padding-inline-start: var(--dataviews-padding-inline-start);
 		padding-inline-end: var(--dataviews-padding-inline-end);
 	}

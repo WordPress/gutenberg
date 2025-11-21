@@ -7,7 +7,8 @@
 	bottom: 0;
 	left: 0;
 	background-color: $white;
-	padding-block: $grid-unit-15;
+	padding-block-start: $grid-unit-15;
+	padding-block-end: var(--dataviews-padding-block-end, #{$grid-unit-15});
 	padding-inline-start: var(--dataviews-padding-inline-start);
 	padding-inline-end: var(--dataviews-padding-inline-end);
 	border-top: $border-width solid $gray-100;
@@ -22,7 +23,8 @@
 
 @container (max-width: 430px) {
 	.dataviews-footer {
-		padding-block: $grid-unit-15;
+		padding-block-start: $grid-unit-15;
+		padding-block-end: var(--dataviews-padding-block-end, #{$grid-unit-15});
 		padding-inline-start: var(--dataviews-padding-inline-start);
 		padding-inline-end: var(--dataviews-padding-inline-end);
 	}
