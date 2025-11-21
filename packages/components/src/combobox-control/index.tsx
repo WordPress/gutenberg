@@ -252,7 +252,9 @@ function ComboboxControl( props: ComboboxControlProps ) {
 	};
 
 	const onClick = () => {
-		setIsExpanded( true );
+		if ( expandOnFocus ) {
+			setIsExpanded( true );
+		}
 	};
 
 	const onFocusOutside = () => {
