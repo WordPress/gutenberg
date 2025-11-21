@@ -11,6 +11,7 @@
 - DataViews table layout: only apply hover styles when bulk actions are available. [#73248](https://github.com/WordPress/gutenberg/pull/73248)
 - DataViews: add support for activity layout. [#72780](https://github.com/WordPress/gutenberg/pull/72780)
 - DataViews: Add grid keyboard navigation. [#72997](https://github.com/WordPress/gutenberg/pull/72997)
+- DataViews: Introduce CSS var to enable users to apply a different background color to DataViews containers. [#73390](https://github.com/WordPress/gutenberg/pull/73390)
 - Field API: introduce the `format` prop to format the `date` field type. [#72999](https://github.com/WordPress/gutenberg/pull/72999)
 - Field API: fix display format for date. [#73538](https://github.com/WordPress/gutenberg/pull/73538)
 - Documentation: improve Edit component. [#73202](https://github.com/WordPress/gutenberg/pull/73202)
