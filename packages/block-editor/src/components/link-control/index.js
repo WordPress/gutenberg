@@ -36,6 +36,7 @@ import useCreatePage from './use-create-page';
 import useInternalValue from './use-internal-value';
 import { ViewerFill } from './viewer-slot';
 import { DEFAULT_LINK_SETTINGS } from './constants';
+import isURLLike from './is-url-like';
 
 /**
  * Default properties associated with a link control value.
@@ -149,6 +150,7 @@ function LinkControl( {
 	}
 
 	const [ settingsOpen, setSettingsOpen ] = useState( false );
+	const [ customValidity, setCustomValidity ] = useState( undefined );
 
 	const { advancedSettingsPreference } = useSelect( ( select ) => {
 		const prefsStore = select( preferencesStore );
@@ -301,10 +303,37 @@ function LinkControl( {
 			title: internalControlValue?.title || updatedValue?.title,
 		} );
 
+		// Reset validation state when a suggestion is selected
+		setCustomValidity( undefined );
+
 		stopEditing();
 	};
 
-	const handleSubmit = () => {
+	// Centralized validation function
+	const validateAndSetValidity = ( allowEmpty = false ) => {
+		if ( currentInputIsEmpty ) {
+			if ( allowEmpty ) {
+				setCustomValidity( undefined );
+				return true;
+			}
+			return false;
+		}
+
+		const trimmedValue = currentUrlInputValue.trim();
+		if ( trimmedValue && ! isURLLike( trimmedValue ) ) {
+			setCustomValidity( {
+				type: 'invalid',
+				message: __( 'Please enter a valid URL.' ),
+			} );
+			return false;
+		}
+
+		setCustomValidity( undefined );
+		return true;
+	};
+
+	// Centralized submission function
+	const submitUrlValue = () => {
 		if ( valueHasChanges ) {
 			// Submit the original value with new stored values applied
 			// on top. URL is a special case as it may also be a prop.
@@ -315,6 +344,39 @@ function LinkControl( {
 			} );
 		}
 		stopEditing();
+		setCustomValidity( undefined );
+	};
+
+	// Handle submission from URLInput (Enter key or submit button)
+	// Validates before calling handleSelectSuggestion when there's no actual suggestion
+	const handleURLInputSubmit = ( suggestion, event ) => {
+		// If there's a real suggestion (has id, type, or other suggestion properties),
+		// it was selected from the dropdown - no validation needed
+		if ( suggestion && ( suggestion.id || suggestion.type ) ) {
+			// Real suggestion selected - no validation needed
+			handleSelectSuggestion( suggestion );
+			return;
+		}
+
+		// No suggestion - this is a manually entered URL
+		// Validate before submitting (empty values not allowed via Enter)
+		if ( ! validateAndSetValidity( false ) ) {
+			event?.preventDefault();
+			return;
+		}
+
+		// Validation passed - proceed with submission
+		handleSelectSuggestion( suggestion || { url: currentUrlInputValue } );
+	};
+
+	const handleSubmit = () => {
+		// Validate URL before submitting (empty values allowed for button submit)
+		if ( ! validateAndSetValidity( true ) ) {
+			return;
+		}
+
+		// Validation passed - proceed with submission
+		submitUrlValue();
 	};
 
 	const handleSubmitWithEnter = ( event ) => {
@@ -339,6 +401,9 @@ function LinkControl( {
 
 		// Ensure that any unsubmitted input changes are reset.
 		resetInternalValues();
+
+		// Reset validation state
+		setCustomValidity( undefined );
 
 		if ( hasLinkValue ) {
 			// If there is a link then exist editing mode and show preview.
@@ -388,6 +453,12 @@ function LinkControl( {
 
 	const currentInputIsEmpty = ! currentUrlInputValue?.trim()?.length;
 
+	// Reset validation state when the URL value changes
+	useEffect( () => {
+		setCustomValidity( undefined );
+	}, [ currentUrlInputValue ] );
+
+	const isUrlValid = ! customValidity;
 	const shownUnlinkControl =
 		onRemove && value && ! isEditingLink && ! isCreatingPage;
 
@@ -399,7 +470,7 @@ function LinkControl( {
 	const showTextControl = hasLinkValue && hasTextControl;
 
 	const isEditing = ( isEditingLink || ! value ) && ! isCreatingPage;
-	const isDisabled = ! valueHasChanges || currentInputIsEmpty;
+	const isDisabled = ! valueHasChanges || currentInputIsEmpty || ! isUrlValid;
 	const showSettings = !! settings?.length && isEditingLink && hasLinkValue;
 
 	const previewValue = useMemo( () => {
@@ -462,6 +533,7 @@ function LinkControl( {
 							onCreateSuggestion={ createPage }
 							onChange={ setInternalURLInputValue }
 							onSelect={ handleSelectSuggestion }
+							onSubmit={ handleURLInputSubmit }
 							showInitialSuggestions={ showInitialSuggestions }
 							allowDirectEntry={ ! noDirectEntry }
 							showSuggestions={ showSuggestions }
@@ -472,6 +544,7 @@ function LinkControl( {
 							}
 							hideLabelFromVision={ ! showTextControl }
 							isEntity={ isEntity }
+							customValidity={ customValidity }
 							suffix={
 								<SearchSuffixControl
 									isEntity={ isEntity }

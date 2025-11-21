@@ -494,10 +494,8 @@ class URLInput extends Component {
 		const useValidatedControl = onValidate || customValidity;
 		const validationProps = useValidatedControl
 			? {
-					onValidate: onValidate
-						? () => onValidate( this.valueRef.current )
-						: undefined,
-					customValidity,
+					...( onValidate && { onValidate } ),
+					...( customValidity && { customValidity } ),
 			  }
 			: {};
 
