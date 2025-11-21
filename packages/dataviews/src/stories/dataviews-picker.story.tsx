@@ -298,7 +298,6 @@ export const WithModal = ( {
 					onRequestClose={ () => setIsModalOpen( false ) }
 					isFullScreen={ false }
 					size="fill"
-					className="dataviews-picker-modal"
 				>
 					<DataViewsPickerContent
 						perPageSizes={ perPageSizes }
