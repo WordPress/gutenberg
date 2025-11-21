@@ -340,9 +340,12 @@ class WP_Theme_JSON_Gutenberg {
 	 * These are non-preset, non-CSS settings that control behavior rather than styling.
 	 * Each entry defines the setting path and its expected type for validation.
 	 *
+	 * The constant is deliberately private to prevent external usage by plugins.
+	 * Like the class itself, it is intended for internal core usage.
+	 *
 	 * @since 7.0.0
 	 */
-	const SAFE_SETTINGS = array(
+	private const SAFE_SETTINGS = array(
 		array(
 			'path' => array( 'lightbox', 'allowEditing' ),
 			'type' => 'boolean',

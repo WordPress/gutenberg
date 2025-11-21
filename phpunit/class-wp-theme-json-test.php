@@ -2972,10 +2972,11 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'settings' => array(
 					'blocks' => array(
 						'core/image' => array(
-							'lightbox' => array(
+							'lightbox'    => array(
 								'enabled'      => false,
 								'allowEditing' => true,
 							),
+							'unsupported' => 'value',
 						),
 					),
 				),
@@ -3002,30 +3003,37 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	/**
 	 * @covers WP_Theme_JSON_Gutenberg::remove_insecure_properties
 	 */
-	public function test_safe_settings_paths_should_exist_in_valid_settings() {
-		// Verify all paths in SAFE_SETTINGS exist in VALID_SETTINGS.
-		foreach ( WP_Theme_JSON_Gutenberg::SAFE_SETTINGS as $safe_setting ) {
-			$path = $safe_setting['path'];
-			$data = WP_Theme_JSON_Gutenberg::VALID_SETTINGS;
+	public function test_remove_insecure_properties_should_not_allow_unsafe_settings() {
+		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'blocks' => array(
+						'core/image' => array(
+							'lightbox' => array(
+								'enabled'      => 'false',
+								'allowEditing' => true,
+							),
+						),
+					),
+				),
+			)
+		);
 
-			// Check if path exists by traversing the nested structure.
-			$exists = true;
-			foreach ( $path as $key ) {
-				if ( ! is_array( $data ) || ! array_key_exists( $key, $data ) ) {
-					$exists = false;
-					break;
-				}
-				$data = $data[ $key ];
-			}
+		$expected = array(
+			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'settings' => array(
+				'blocks' => array(
+					'core/image' => array(
+						'lightbox' => array(
+							'allowEditing' => true,
+						),
+					),
+				),
+			),
+		);
 
-			$this->assertTrue(
-				$exists,
-				sprintf(
-					'Path %s from SAFE_SETTINGS should exist in VALID_SETTINGS',
-					implode( '.', $path )
-				)
-			);
-		}
+		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
 
 	public function test_remove_invalid_element_pseudo_selectors() {
