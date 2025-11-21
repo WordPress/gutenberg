@@ -102,7 +102,47 @@ export default function ReusableBlockEditRecursionWrapper( props ) {
 	);
 }
 
+function getPatternEditButtonTitle( clientId, editedContentOnlySection ) {
+	if ( ! window?.__experimentalContentOnlyPatternInsertion ) {
+		return __( 'Edit original' );
+	}
+
+	return editedContentOnlySection === clientId
+		? __( 'Exit section' )
+		: __( 'Edit section' );
+}
+
+function getPatternEditHandler( {
+	clientId,
+	editedContentOnlySection,
+	ref,
+	editContentOnlySection,
+	stopEditingContentOnlySection,
+	onNavigateToEntityRecord,
+} ) {
+	if ( ! window?.__experimentalContentOnlyPatternInsertion ) {
+		return onNavigateToEntityRecord
+			? () => {
+					onNavigateToEntityRecord( {
+						postId: ref,
+						postType: 'wp_block',
+					} );
+			  }
+			: undefined;
+	}
+
+	return () => {
+		if ( editedContentOnlySection !== clientId ) {
+			editContentOnlySection( clientId );
+		} else {
+			stopEditingContentOnlySection();
+		}
+	};
+}
+
 function ReusableBlockControl( {
+	clientId,
+	editedContentOnlySection,
 	recordId,
 	canOverrideBlocks,
 	hasContent,
@@ -125,7 +165,10 @@ function ReusableBlockControl( {
 				<BlockControls group="other">
 					<ToolbarGroup>
 						<ToolbarButton onClick={ handleEditOriginal }>
-							{ __( 'Edit original' ) }
+							{ getPatternEditButtonTitle(
+								clientId,
+								editedContentOnlySection
+							) }
 						</ToolbarButton>
 					</ToolbarGroup>
 				</BlockControls>
@@ -148,6 +191,7 @@ function ReusableBlockControl( {
 }
 
 function ReusableBlockEdit( {
+	clientId,
 	name,
 	attributes: { ref, content },
 	__unstableParentLayout: parentLayout,
@@ -167,23 +211,29 @@ function ReusableBlockEdit( {
 	);
 	const isMissing = hasResolved && ! record;
 
-	const { __unstableMarkLastChangeAsPersistent } =
-		useDispatch( blockEditorStore );
+	const {
+		__unstableMarkLastChangeAsPersistent,
+		editContentOnlySection,
+		stopEditingContentOnlySection,
+	} = unlock( useDispatch( blockEditorStore ) );
 
-	const { onNavigateToEntityRecord, hasPatternOverridesSource } = useSelect(
-		( select ) => {
-			const { getSettings } = select( blockEditorStore );
-			// For editing link to the site editor if the theme and user permissions support it.
-			return {
-				onNavigateToEntityRecord:
-					getSettings().onNavigateToEntityRecord,
-				hasPatternOverridesSource: !! getBlockBindingsSource(
-					'core/pattern-overrides'
-				),
-			};
-		},
-		[]
-	);
+	const {
+		onNavigateToEntityRecord,
+		hasPatternOverridesSource,
+		editedContentOnlySection,
+	} = useSelect( ( select ) => {
+		const { getSettings, getEditedContentOnlySection } = unlock(
+			select( blockEditorStore )
+		);
+		// For editing link to the site editor if the theme and user permissions support it.
+		return {
+			onNavigateToEntityRecord: getSettings().onNavigateToEntityRecord,
+			hasPatternOverridesSource: !! getBlockBindingsSource(
+				'core/pattern-overrides'
+			),
+			editedContentOnlySection: getEditedContentOnlySection(),
+		};
+	}, [] );
 
 	const canOverrideBlocks = useMemo(
 		() => hasPatternOverridesSource && hasOverridableBlocks( blocks ),
@@ -210,13 +260,6 @@ function ReusableBlockEdit( {
 			? undefined
 			: InnerBlocks.ButtonBlockAppender,
 	} );
-
-	const handleEditOriginal = () => {
-		onNavigateToEntityRecord( {
-			postId: ref,
-			postType: 'wp_block',
-		} );
-	};
 
 	const resetContent = () => {
 		if ( content ) {
@@ -248,14 +291,19 @@ function ReusableBlockEdit( {
 		<>
 			{ hasResolved && ! isMissing && (
 				<ReusableBlockControl
+					clientId={ clientId }
+					editedContentOnlySection={ editedContentOnlySection }
 					recordId={ ref }
 					canOverrideBlocks={ canOverrideBlocks }
 					hasContent={ !! content }
-					handleEditOriginal={
-						onNavigateToEntityRecord
-							? handleEditOriginal
-							: undefined
-					}
+					handleEditOriginal={ getPatternEditHandler( {
+						clientId,
+						editedContentOnlySection,
+						ref,
+						editContentOnlySection,
+						stopEditingContentOnlySection,
+						onNavigateToEntityRecord,
+					} ) }
 					resetContent={ resetContent }
 				/>
 			) }
