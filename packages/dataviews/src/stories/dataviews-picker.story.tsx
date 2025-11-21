@@ -269,6 +269,15 @@ export const WithModal = ( {
 
 	return (
 		<>
+			{ isModalOpen && (
+				// TODO: Remove this temporary style when https://github.com/WordPress/gutenberg/pull/73390 lands.
+				// This works around a bug where the sticky footer is transparent if no background color is set.
+				<style>{ `
+					.components-modal__children-container {
+						background-color: white;
+					}
+				` }</style>
+			) }
 			<HStack justify="left">
 				<Button
 					variant="primary"
@@ -316,7 +325,7 @@ export const WithModal = ( {
 	);
 };
 
-WithModal.args = { ...storyArgs, padding: 'large' };
+WithModal.args = { ...storyArgs, padding: 'none' };
 WithModal.argTypes = storyArgTypes;
 
 function useInfiniteScroll( {
