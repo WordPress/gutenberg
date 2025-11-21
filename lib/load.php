@@ -50,9 +50,12 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	// WordPress 6.8 compat.
 	require __DIR__ . '/compat/wordpress-6.8/rest-api.php';
 
+	// WordPress 7.0 compat - templates only (required here so 6.9 controllers that deal with template activation can inherit from it)
+	require __DIR__ . '/compat/wordpress-7.0/class-gutenberg-rest-templates-controller-7-0.php';
+	require __DIR__ . '/compat/wordpress-7.0/class-gutenberg-rest-registered-templates-controller.php';
+
 	// WordPress 6.9 compat.
 	require __DIR__ . '/compat/wordpress-6.9/class-gutenberg-rest-attachments-controller-6-9.php';
-	require __DIR__ . '/compat/wordpress-6.9/class-gutenberg-rest-static-templates-controller.php';
 	require __DIR__ . '/compat/wordpress-6.9/template-activate.php';
 	require __DIR__ . '/compat/wordpress-6.9/block-bindings.php';
 	require __DIR__ . '/compat/wordpress-6.9/post-data-block-bindings.php';

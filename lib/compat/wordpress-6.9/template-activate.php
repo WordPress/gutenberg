@@ -116,7 +116,7 @@ function gutenberg_maintain_templates_routes() {
 	$revisions_controller->register_routes();
 	$controller->register_routes();
 
-	$registered_template_controller = new Gutenberg_REST_Static_Templates_Controller();
+	$registered_template_controller = new Gutenberg_REST_Registered_Templates_Controller();
 	$registered_template_controller->register_routes();
 
 	// Add the same field as wp_registered_template.

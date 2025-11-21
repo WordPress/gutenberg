@@ -1,6 +1,12 @@
 <?php
-
-class Gutenberg_REST_Static_Templates_Controller extends WP_REST_Templates_Controller {
+/**
+ * Note:
+ *
+ * Moved from lib/compat/wordpress-6.9/template-activate.php to here as it needs to inherit from Gutenberg_REST_Templates_Controller_7_0.
+ *
+ * @see Gutenberg_REST_Templates_Controller_7_0
+ */
+class Gutenberg_REST_Registered_Templates_Controller extends Gutenberg_REST_Templates_Controller_7_0 {
 	public function __construct() {
 		$this->rest_base = 'registered-templates';
 		$this->namespace = 'wp/v2';
@@ -19,7 +25,12 @@ class Gutenberg_REST_Static_Templates_Controller extends WP_REST_Templates_Contr
 					'args'                => $this->get_collection_params(),
 				),
 				'schema' => array( $this, 'get_public_item_schema' ),
-			)
+			),
+			/*
+			 * $override is set to true to ensure Gutenberg's route takes precedence
+			 * over WordPress Core's automatic registration.
+			 */
+			true
 		);
 
 		// Lists/updates a single template based on the given id.
@@ -54,7 +65,12 @@ class Gutenberg_REST_Static_Templates_Controller extends WP_REST_Templates_Contr
 					),
 				),
 				'schema' => array( $this, 'get_public_item_schema' ),
-			)
+			),
+			/*
+			 * $override is set to true to ensure Gutenberg's route takes precedence
+			 * over WordPress Core's automatic registration.
+			 */
+			true
 		);
 	}
 
