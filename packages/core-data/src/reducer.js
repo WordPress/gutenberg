@@ -650,6 +650,7 @@ export default combineReducers( {
 	currentTheme,
 	currentGlobalStylesId,
 	currentUser,
+	collaboratorMode,
 	themeGlobalStyleVariations,
 	themeBaseGlobalStyles,
 	themeGlobalStyleRevisions,

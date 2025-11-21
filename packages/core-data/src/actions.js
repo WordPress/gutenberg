@@ -319,9 +319,9 @@ export const deleteEntityRecord =
 		);
 
 		try {
-			const currentUser = resolveSelect.getCurrentUser();
+			const collaboratorMode = resolveSelect.getCollaboratorMode();
 
-			if ( currentUser && currentUser.id === 4 ) {
+			if ( collaboratorMode === 'view' ) {
 				return;
 			}
 
@@ -413,9 +413,9 @@ export const editEntityRecord =
 			recordId
 		);
 
-		const currentUser = select.getCurrentUser();
+		const collaboratorMode = select.getCollaboratorMode();
 
-		if ( currentUser && currentUser.id === 4 && edits ) {
+		if ( collaboratorMode === 'view' && edits ) {
 			if ( 'selection' in edits ) {
 				edits = { selection: edits.selection };
 			} else {
