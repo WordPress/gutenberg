@@ -87,23 +87,23 @@ function ModalContent< Item >( {
 			size="medium"
 		>
 			<div ref={ focusOnMountRef }>
-			<DataFormLayout
-				data={ modalData }
-				form={ form }
-				onChange={ handleOnChange }
-				validity={ validity }
-			>
-				{ ( FieldLayout, childField, childFieldValidity ) => (
-					<FieldLayout
-						key={ childField.id }
-						data={ modalData }
-						field={ childField }
-						onChange={ handleOnChange }
-						hideLabelFromVision={ form.fields.length < 2 }
-						validity={ childFieldValidity }
-					/>
-				) }
-			</DataFormLayout>
+				<DataFormLayout
+					data={ modalData }
+					form={ form }
+					onChange={ handleOnChange }
+					validity={ validity }
+				>
+					{ ( FieldLayout, childField, childFieldValidity ) => (
+						<FieldLayout
+							key={ childField.id }
+							data={ modalData }
+							field={ childField }
+							onChange={ handleOnChange }
+							hideLabelFromVision={ form.fields.length < 2 }
+							validity={ childFieldValidity }
+						/>
+					) }
+				</DataFormLayout>
 			</div>
 			<HStack
 				className="dataforms-layouts-panel__modal-footer"
