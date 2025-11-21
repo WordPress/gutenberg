@@ -20,7 +20,7 @@ import DataViewsPicker from '../components/dataviews-picker/index';
 import { LAYOUT_PICKER_GRID, LAYOUT_PICKER_TABLE } from '../constants';
 import filterSortAndPaginate from '../utils/filter-sort-and-paginate';
 import type { ActionButton, View } from '../types';
-import type { PaddingOptions } from '../components/dataviews-picker/types';
+import type { PaddingOptions } from '../types/private';
 import { data, fields, type SpaceObject } from './dataviews.fixtures';
 
 const meta = {

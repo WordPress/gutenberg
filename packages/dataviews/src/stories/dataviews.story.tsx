@@ -38,7 +38,7 @@ import {
 } from '../constants';
 import filterSortAndPaginate from '../utils/filter-sort-and-paginate';
 import type { Field, View } from '../types';
-import type { PaddingOptions } from '../components/dataviews-picker/types';
+import type { PaddingOptions } from '../types/private';
 import {
 	DEFAULT_VIEW,
 	actions,

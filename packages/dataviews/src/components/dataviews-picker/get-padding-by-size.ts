@@ -1,7 +1,11 @@
 /**
  * Internal dependencies
  */
-import type { PaddingSize, PaddingOptions, DimensionVariant } from './types';
+import type {
+	PaddingSize,
+	PaddingOptions,
+	DimensionVariant,
+} from '../../types/private';
 
 /**
  * Maps padding size tokens to CSS values.

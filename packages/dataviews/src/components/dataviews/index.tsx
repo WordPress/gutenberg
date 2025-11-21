@@ -32,8 +32,7 @@ import DataViewsViewConfig, {
 } from '../dataviews-view-config';
 import normalizeFields from '../../field-types/utils/normalize-fields';
 import type { Action, Field, View, SupportedLayouts } from '../../types';
-import type { SelectionOrUpdater } from '../../types/private';
-import type { PaddingOptions } from '../dataviews-picker/types';
+import type { SelectionOrUpdater, PaddingOptions } from '../../types/private';
 import { getPaddingBySizeStyles } from '../dataviews-picker/get-padding-by-size';
 type ItemWithId = { id: string };
 
