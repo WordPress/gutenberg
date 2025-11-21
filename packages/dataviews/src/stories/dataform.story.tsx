@@ -1034,13 +1034,13 @@ const ValidationComponent = ( {
 				label: 'e-mail',
 				placeholder: getValidationPlaceholder(
 					'user@company.com',
-					'Min 5, max 100 characters',
-					'user@company.com (5-100 chars)'
+					'Min 15, max 100 characters',
+					'user@company.com (15-100 chars)'
 				),
 				description: getValidationDescription(
 					'Email must be from @company.com domain',
-					'Must be between 5 and 100 characters',
-					'Must be @company.com domain AND 5-100 characters'
+					'Must be between 15 and 100 characters',
+					'Must be @company.com domain AND 15-100 characters'
 				),
 				isValid: {
 					required,
@@ -1049,7 +1049,7 @@ const ValidationComponent = ( {
 					pattern: pattern
 						? '^[a-zA-Z0-9._%+-]+@company\\.com$'
 						: undefined,
-					minLength: minMax ? 5 : undefined,
+					minLength: minMax ? 15 : undefined,
 					maxLength: minMax ? 100 : undefined,
 				},
 			},
@@ -1065,15 +1065,13 @@ const ValidationComponent = ( {
 				description: getValidationDescription(
 					'US phone format with country code',
 					'Must be between 10 and 20 characters',
-					'US format +1-XXX-XXX-XXXX AND 10-20 characters'
+					'US format +1-XXX... AND 10-20 characters'
 				),
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customTelephoneRule ),
-					pattern: pattern
-						? '^\\+1-\\d{3}-\\d{3}-\\d{4}$'
-						: undefined,
+					pattern: pattern ? '^\\+1-\\d{3}-[0-9-]*$' : undefined,
 					minLength: minMax ? 10 : undefined,
 					maxLength: minMax ? 20 : undefined,
 				},
@@ -1084,22 +1082,22 @@ const ValidationComponent = ( {
 				label: 'URL',
 				placeholder: getValidationPlaceholder(
 					'https://github.com/user/repo',
-					'Min 10, max 255 characters',
+					'Min 25, max 255 characters',
 					'https://github.com/user/repo (10-255 chars)'
 				),
 				description: getValidationDescription(
 					'Must be a GitHub repository URL',
-					'Must be between 10 and 255 characters',
-					'GitHub repository URL AND 10-255 characters'
+					'Must be between 25 and 255 characters',
+					'GitHub repository URL AND 25-255 characters'
 				),
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customUrlRule ),
 					pattern: pattern
-						? '^https:\\/\\/github\\.com\\/.+\\/.+$'
+						? '^https:\\/\\/github\\.com\\/.+$'
 						: undefined,
-					minLength: minMax ? 10 : undefined,
+					minLength: minMax ? 25 : undefined,
 					maxLength: minMax ? 255 : undefined,
 				},
 			},
@@ -1117,8 +1115,8 @@ const ValidationComponent = ( {
 				id: 'integer',
 				type: 'integer',
 				label: 'Integer',
-				placeholder: minMax ? 'Min 0, max 100' : undefined,
-				description: minMax ? 'Must be between 0 and 100' : undefined,
+				placeholder: minMax ? 'Min 10, max 100' : undefined,
+				description: minMax ? 'Must be between 10 and 100' : undefined,
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
@@ -1131,13 +1129,13 @@ const ValidationComponent = ( {
 				id: 'number',
 				type: 'number',
 				label: 'Number',
-				placeholder: minMax ? 'Min 0, max 100' : undefined,
+				placeholder: minMax ? 'Min 10, max 100' : undefined,
 				description: minMax ? 'Must be between 0 and 100' : undefined,
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customNumberRule ),
-					min: minMax ? 0 : undefined,
+					min: minMax ? 10 : undefined,
 					max: minMax ? 100 : undefined,
 				},
 			},
@@ -1193,20 +1191,20 @@ const ValidationComponent = ( {
 				label: 'Password',
 				placeholder: getValidationPlaceholder(
 					'Must be 8+ alphanumeric',
-					'Min 8, max 20 characters',
-					'abc12345 (8-20 chars alphanumeric)'
+					'Min 10, max 20 characters',
+					'abc12345 (10-20 chars alphanumeric)'
 				),
 				description: getValidationDescription(
 					'Must contain only letters and numbers (8+ chars)',
-					'Must be between 8 and 20 characters',
-					'8+ alphanumeric chars AND 8-20 characters'
+					'Must be between 10 and 20 characters',
+					'alphanumeric chars AND 10-20 characters'
 				),
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customPasswordRule ),
 					pattern: pattern ? '^[a-zA-Z0-9]{8,}$' : undefined,
-					minLength: minMax ? 8 : undefined,
+					minLength: minMax ? 10 : undefined,
 					maxLength: minMax ? 20 : undefined,
 				},
 			},
