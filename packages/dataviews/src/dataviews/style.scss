@@ -87,7 +87,8 @@
 	white-space: nowrap;
 	width: 100%;
 
-	a {
+	a,
+	&:is(a) {
 		text-decoration: none;
 		text-overflow: ellipsis;
 		white-space: nowrap;
