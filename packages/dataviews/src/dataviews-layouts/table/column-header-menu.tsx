@@ -259,7 +259,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 									</Menu.ItemLabel>
 								</Menu.Item>
 							) }
-							{ canInsertLeft && (
+							{ canInsertLeft && !! hiddenFields.length && (
 								<Menu>
 									<Menu.SubmenuTriggerItem>
 										<Menu.ItemLabel>
@@ -294,7 +294,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 									</Menu.Popover>
 								</Menu>
 							) }
-							{ canInsertRight && (
+							{ canInsertRight && !! hiddenFields.length && (
 								<Menu>
 									<Menu.SubmenuTriggerItem>
 										<Menu.ItemLabel>
