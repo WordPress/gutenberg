@@ -113,6 +113,10 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 	// Local state to control the input value
 	const [ inputValue, setInputValue ] = useState( url );
 
+	// Track focus state to control suggestion visibility
+	const [ isInputFocused, setIsInputFocused ] = useState( false );
+	const blurTimeoutRef = useRef();
+
 	// Sync local state when url prop changes (e.g., from undo/redo or external updates)
 	useEffect( () => {
 		setInputValue( url );
@@ -169,6 +173,15 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 		shouldFocusUnsyncButtonRef.current = false;
 	}, [ hasUrlBinding ] );
 
+	// Cleanup blur timeout on unmount
+	useEffect( () => {
+		return () => {
+			if ( blurTimeoutRef.current ) {
+				clearTimeout( blurTimeoutRef.current );
+			}
+		};
+	}, [] );
+
 	return (
 		<ToolsPanel
 			label={ __( 'Settings' ) }
@@ -208,79 +221,110 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 				onDeselect={ () => setAttributes( { url: '' } ) }
 				isShownByDefault
 			>
-				<LinkControlSearchInput
-					className="navigation-link-control__search-input"
-					value={ inputValue ? safeDecodeURI( inputValue ) : '' }
-					currentLink={ {
-						url,
-						title: label && stripHTML( label ),
-						kind: attributes.kind,
-						type: attributes.type,
-						id: attributes.id,
-					} }
-					suggestionsQuery={ getSuggestionsQuery(
-						attributes.type,
-						attributes.kind
-					) }
-					onChange={ ( newValue ) => {
-						// Update local input state when typing
-						setInputValue( newValue );
-					} }
-					onSelect={ ( suggestion ) => {
-						// When a suggestion is selected (or Enter pressed)
-						if ( suggestion ) {
-							const attrs = {
-								url: suggestion.url,
-								kind: suggestion.kind,
-								type: suggestion.type,
-								id: suggestion.id,
-								title: suggestion.title,
-							};
-							updateAttributes(
-								attrs,
-								setAttributes,
-								attributes
-							);
-							// Create entity binding if we have entity data
-							if ( suggestion.id ) {
-								createBinding( attrs );
-								shouldFocusUnsyncButtonRef.current = true;
-							}
-						} else if ( inputValue ) {
-							// Freeform URL entry
-							updateAttributes(
-								{ url: inputValue },
-								setAttributes,
-								attributes
-							);
+				<div
+					onFocus={ () => {
+						// Clear any pending blur timeout
+						if ( blurTimeoutRef.current ) {
+							clearTimeout( blurTimeoutRef.current );
 						}
+						setIsInputFocused( true );
 					} }
-					allowDirectEntry={ ! hasUrlBinding }
-					showSuggestions
-					showInitialSuggestions
-					isEntity={ hasUrlBinding }
-					suffix={
-						hasUrlBinding && (
-							<Button
-								ref={ unsyncButtonRef }
-								icon={ unlinkIcon }
-								onClick={ () => {
-									unsyncBoundLink();
-									shouldFocusURLInputRef.current = true;
-								} }
-								aria-describedby={ helpTextId }
-								showTooltip
-								label={ __( 'Unsync and edit' ) }
-								__next40pxDefaultSize
-								className={
-									hasUrlBinding && ! isBoundEntityAvailable
-										? 'navigation-link-control__error-suffix-button'
-										: undefined
+					onBlur={ () => {
+						// Delay hiding suggestions to allow clicking on them
+						blurTimeoutRef.current = setTimeout( () => {
+							setIsInputFocused( false );
+						}, 150 );
+					} }
+				>
+					<LinkControlSearchInput
+						className="navigation-link-control__search-input"
+						value={ inputValue ? safeDecodeURI( inputValue ) : '' }
+						currentLink={
+							// When not focused, set currentLink.url to match the decoded value
+							// to trigger disableSuggestions in URLInput
+							! isInputFocused
+								? {
+										url: inputValue
+											? safeDecodeURI( inputValue )
+											: '',
+										title: label && stripHTML( label ),
+										kind: attributes.kind,
+										type: attributes.type,
+										id: attributes.id,
+								  }
+								: {
+										url,
+										title: label && stripHTML( label ),
+										kind: attributes.kind,
+										type: attributes.type,
+										id: attributes.id,
+								  }
+						}
+						suggestionsQuery={ getSuggestionsQuery(
+							attributes.type,
+							attributes.kind
+						) }
+						onChange={ ( newValue ) => {
+							// Update local input state when typing
+							setInputValue( newValue );
+						} }
+						onSelect={ ( suggestion ) => {
+							// When a suggestion is selected (or Enter pressed)
+							if ( suggestion ) {
+								const attrs = {
+									url: suggestion.url,
+									kind: suggestion.kind,
+									type: suggestion.type,
+									id: suggestion.id,
+									title: suggestion.title,
+								};
+								updateAttributes(
+									attrs,
+									setAttributes,
+									attributes
+								);
+								// Create entity binding if we have entity data
+								if ( suggestion.id ) {
+									createBinding( attrs );
+									shouldFocusUnsyncButtonRef.current = true;
 								}
-							/>
-						)
-					}
-				/>
+							} else if ( inputValue ) {
+								// Freeform URL entry
+								updateAttributes(
+									{ url: inputValue },
+									setAttributes,
+									attributes
+								);
+							}
+						} }
+						allowDirectEntry={ ! hasUrlBinding }
+						showSuggestions={ isInputFocused }
+						showInitialSuggestions={ isInputFocused }
+						isEntity={ hasUrlBinding }
+						suffix={
+							hasUrlBinding && (
+								<Button
+									ref={ unsyncButtonRef }
+									icon={ unlinkIcon }
+									onClick={ () => {
+										unsyncBoundLink();
+										shouldFocusURLInputRef.current = true;
+									} }
+									aria-describedby={ helpTextId }
+									showTooltip
+									label={ __( 'Unsync and edit' ) }
+									__next40pxDefaultSize
+									className={
+										hasUrlBinding &&
+										! isBoundEntityAvailable
+											? 'navigation-link-control__error-suffix-button'
+											: undefined
+									}
+								/>
+							)
+						}
+					/>
+				</div>
 				{ hasUrlBinding && ! isBoundEntityAvailable && (
 					<p id={ helpTextId }>
 						<MissingEntityHelpText
