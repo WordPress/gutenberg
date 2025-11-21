@@ -174,8 +174,21 @@ export const EntitySearch = forwardRef(
 				} );
 			}
 
+			// Add current search term as a freeform option if it's not in suggestions
+			// This ensures typed text is available immediately for blur/selection
+			if (
+				searchTerm &&
+				searchTerm !== value &&
+				! opts.some( ( opt ) => opt.value === searchTerm )
+			) {
+				opts.unshift( {
+					value: searchTerm,
+					label: searchTerm,
+					isCurrentValue: true,
+				} );
+			}
 			return opts;
-		}, [ suggestions, getDisplayValue, value ] );
+		}, [ suggestions, getDisplayValue, value, searchTerm ] );
 
 		// Handle search input changes - sets search term immediately
 		const handleFilterValueChange = ( inputValue ) => {
