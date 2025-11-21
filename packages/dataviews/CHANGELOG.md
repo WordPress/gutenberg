@@ -24,6 +24,7 @@
 - DataForm: Pattern validation is now supported on all fields that browsers support it in. [#73156](https://github.com/WordPress/gutenberg/pull/73156)
 - Documentation: improve operators docs. [#73523](https://github.com/WordPress/gutenberg/pull/73523)
 - DataViews table layout: fix table header spacing when using non-default column alignment. [#73398](https://github.com/WordPress/gutenberg/pull/73398)
+- DataForm: Min/Max validation is now supported on all fields that browsers support it in. [#73465](https://github.com/WordPress/gutenberg/pull/73465)
 
 ### Bug fixes
 
