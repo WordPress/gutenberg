@@ -299,7 +299,7 @@ const getQuickActionsCommands = () =>
 			);
 
 			commands.push( {
-				name: 'toggle-block-visibility',
+				name: 'core/toggle-block-visibility',
 				label: hasHiddenBlock ? __( 'Show' ) : __( 'Hide' ),
 				callback: () => {
 					const attributesByClientId = Object.fromEntries(
