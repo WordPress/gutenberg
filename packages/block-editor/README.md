@@ -388,16 +388,16 @@ Undocumented declaration.
 
 EntitySearch component - A combobox for searching and selecting entities.
 
-Provides a searchable dropdown that fetches posts, pages, taxonomies, and other entities from the site as the user types. Uses the WordPress search API to search across all post types (including custom) and taxonomies.
+Provides a searchable dropdown that fetches posts, pages, taxonomies, and other entities from the site as the user types.
 
 _Parameters_
 
 -   _props_ `Object`: - Component props
 -   _props.label_ `string`: - Label for the control
 -   _props.value_ `string`: - Current selected URL value
+-   _props.onSearch_ `Function`: - Function to fetch suggestions, receives searchTerm and should return a Promise - Called with empty string for initial suggestions
 -   _props.onChange_ `Function`: - Callback when selection changes, receives (url, suggestion) - suggestion is the selected entity data when choosing from options, - or null when typing freeform input
 -   _props.help_ `string`: - Optional help text
--   _props.suggestionsQuery_ `Object`: - Query parameters to filter search results - type: 'post' | 'term' | 'attachment' | 'post-format' - subtype: specific post type or taxonomy slug (e.g., 'page', 'post', 'category', 'post_tag')
 -   _props.getDisplayValue_ `Function`: - Function to determine what to display in the input field Receives the suggestion object, should return a string Defaults to showing the URL
 -   _props.allowFreeform_ `boolean`: - Whether to allow freeform input (not from options) on blur Defaults to true. When false, only values selected from options will be committed
 

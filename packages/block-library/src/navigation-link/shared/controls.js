@@ -16,7 +16,7 @@ import { useInstanceId } from '@wordpress/compose';
 import { safeDecodeURI } from '@wordpress/url';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { linkOff as unlinkIcon } from '@wordpress/icons';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	store as blockEditorStore,
 	EntitySearch,
@@ -101,6 +101,22 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 		clientId,
 		attributes,
 	} );
+
+	// Get fetchLinkSuggestions from block editor settings
+	const fetchLinkSuggestions = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return getSettings().__experimentalFetchLinkSuggestions;
+	}, [] );
+
+	// Search function for EntitySearch
+	const handleSearch = ( searchTerm ) => {
+		if ( ! fetchLinkSuggestions ) {
+			return Promise.resolve( [] );
+		}
+		return fetchLinkSuggestions( searchTerm, {
+			isInitialSuggestions: ! searchTerm,
+		} );
+	};
 
 	// Get direct store dispatch to bypass setBoundAttributes wrapper
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
@@ -287,6 +303,7 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 						ref={ urlInputRef }
 						label={ __( 'Link' ) }
 						value={ url }
+						onSearch={ handleSearch }
 						onChange={ ( newUrl, suggestion ) => {
 							// If we have suggestion data (entity selected from search),
 							// pass the entity information to enable binding

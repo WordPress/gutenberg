@@ -21,7 +21,6 @@ import {
 	forwardRef,
 	useImperativeHandle,
 } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
 import { debounce } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { page, postList, category, tag } from '@wordpress/icons';
@@ -30,7 +29,6 @@ import { filterURLForDisplay } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import { store as blockEditorStore } from '../../store';
 import './style.scss';
 
 /**
@@ -81,24 +79,22 @@ function getEntityTypeLabel( type ) {
  * EntitySearch component - A combobox for searching and selecting entities.
  *
  * Provides a searchable dropdown that fetches posts, pages, taxonomies, and other
- * entities from the site as the user types. Uses the WordPress search API to search
- * across all post types (including custom) and taxonomies.
+ * entities from the site as the user types.
  *
- * @param {Object}   props                  - Component props
- * @param {string}   props.label            - Label for the control
- * @param {string}   props.value            - Current selected URL value
- * @param {Function} props.onChange         - Callback when selection changes, receives (url, suggestion)
- *                                          - suggestion is the selected entity data when choosing from options,
- *                                          - or null when typing freeform input
- * @param {string}   props.help             - Optional help text
- * @param {Object}   props.suggestionsQuery - Query parameters to filter search results
- *                                          - type: 'post' | 'term' | 'attachment' | 'post-format'
- *                                          - subtype: specific post type or taxonomy slug (e.g., 'page', 'post', 'category', 'post_tag')
- * @param {Function} props.getDisplayValue  - Function to determine what to display in the input field
- *                                          Receives the suggestion object, should return a string
- *                                          Defaults to showing the URL
- * @param {boolean}  props.allowFreeform    - Whether to allow freeform input (not from options) on blur
- *                                          Defaults to true. When false, only values selected from options will be committed
+ * @param {Object}   props                 - Component props
+ * @param {string}   props.label           - Label for the control
+ * @param {string}   props.value           - Current selected URL value
+ * @param {Function} props.onSearch        - Function to fetch suggestions, receives searchTerm and should return a Promise
+ *                                         - Called with empty string for initial suggestions
+ * @param {Function} props.onChange        - Callback when selection changes, receives (url, suggestion)
+ *                                         - suggestion is the selected entity data when choosing from options,
+ *                                         - or null when typing freeform input
+ * @param {string}   props.help            - Optional help text
+ * @param {Function} props.getDisplayValue - Function to determine what to display in the input field
+ *                                         Receives the suggestion object, should return a string
+ *                                         Defaults to showing the URL
+ * @param {boolean}  props.allowFreeform   - Whether to allow freeform input (not from options) on blur
+ *                                         Defaults to true. When false, only values selected from options will be committed
  * @return {JSX.Element} The EntitySearch component
  */
 export const EntitySearch = forwardRef(
@@ -106,9 +102,9 @@ export const EntitySearch = forwardRef(
 		{
 			label,
 			value,
+			onSearch,
 			onChange,
 			help,
-			suggestionsQuery = {},
 			getDisplayValue = ( suggestion ) => suggestion?.url || '',
 			allowFreeform = true,
 		},
@@ -130,37 +126,18 @@ export const EntitySearch = forwardRef(
 			},
 		} ) );
 
-		// Get the fetchLinkSuggestions function from block editor settings
-		const fetchLinkSuggestions = useSelect( ( select ) => {
-			const { getSettings } = select( blockEditorStore );
-			return getSettings().__experimentalFetchLinkSuggestions;
-		}, [] );
-
-		// Destructure suggestionsQuery to track actual values instead of object reference
-		const { type, subtype } = suggestionsQuery;
-
-		// Memoize search options to prevent infinite loops from object references
-		const searchOptions = useMemo(
-			() => ( {
-				perPage: 20,
-				type,
-				subtype,
-			} ),
-			[ type, subtype ]
-		);
-
 		// Create debounced fetch function
 		const debouncedFetch = useMemo(
 			() =>
 				debounce( ( term ) => {
-					if ( ! term || ! fetchLinkSuggestions ) {
+					if ( ! onSearch ) {
 						setSuggestions( [] );
 						setIsLoading( false );
 						return;
 					}
 
 					setIsLoading( true );
-					fetchLinkSuggestions( term, searchOptions )
+					onSearch( term )
 						.then( ( results ) => {
 							setSuggestions( results || [] );
 							setIsLoading( false );
@@ -170,17 +147,11 @@ export const EntitySearch = forwardRef(
 							setIsLoading( false );
 						} );
 				}, 300 ),
-			[ fetchLinkSuggestions, searchOptions ]
+			[ onSearch ]
 		);
 
 		// Trigger fetch when searchTerm changes
 		useEffect( () => {
-			if ( ! searchTerm ) {
-				setSuggestions( [] );
-				setIsLoading( false );
-				debouncedFetch.cancel(); // Cancel any pending debounced calls
-				return;
-			}
 			debouncedFetch( searchTerm );
 		}, [ searchTerm, debouncedFetch ] );
 
@@ -232,7 +203,6 @@ export const EntitySearch = forwardRef(
 					// Freeform input - pass null for suggestion to indicate it's not from options
 					onChange( currentInputValue, null );
 				}
-				// If !allowFreeform and not in options, don't commit (revert to previous value)
 			}
 		};
 
@@ -313,7 +283,7 @@ export const EntitySearch = forwardRef(
 						);
 
 						return (
-							<Flex gap={ 2 } justify="space-between">
+							<Flex gap={ 2 }>
 								<FlexItem>
 									<Icon icon={ icon } />
 								</FlexItem>
