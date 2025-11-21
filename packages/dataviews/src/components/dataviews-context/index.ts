@@ -7,6 +7,7 @@ import type { ComponentProps, ReactElement, ReactNode } from 'react';
  * WordPress dependencies
  */
 import { createContext, createRef } from '@wordpress/element';
+import { _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -54,7 +55,10 @@ type DataViewsContextType< Item > = {
 	filters: NormalizedFilter[];
 	isShowingFilter: boolean;
 	setIsShowingFilter: ( value: boolean ) => void;
-	config: { perPageSizes: number[] };
+	config: {
+		perPageSizes: number[];
+		labels: { singular: string; plural: string };
+	};
 	empty?: ReactNode;
 	hasInfiniteScrollHandler: boolean;
 	itemListLabel?: string;
@@ -86,6 +90,10 @@ const DataViewsContext = createContext< DataViewsContextType< any > >( {
 	hasInfiniteScrollHandler: false,
 	config: {
 		perPageSizes: [],
+		labels: {
+			singular: _x( 'Item', 'singular label' ),
+			plural: _x( 'Items', 'plural label' ),
+		},
 	},
 } );
 

@@ -225,34 +225,33 @@ Properties:
 
 | Props / Layout | `table` | `pickerTable` | `grid` | `pickerGrid` | `list` | `activity` |
 | -------------- | ------- | ------------- | ------ | ------------ | ------ | ---------- |
-| `density`      | ✓       | ✓             |        |	             |        | ✓          |
-| `enableMoving` | ✓       | ✓             |        |	             |        |            |
-| `styles`       | ✓       | ✓             |        |	             |        |            |
+| `density`      | ✓       | ✓             |        |              |        | ✓          |
+| `enableMoving` | ✓       | ✓             |        |              |        |            |
+| `styles`       | ✓       | ✓             |        |              |        |            |
 | `badgeFields`  |         |               | ✓      | ✓            |        |            |
 | `previewSize`  |         |               | ✓      | ✓            |        |            |
 
 `table` and `pickerTable` layouts:
 
-- `density`: one of `comfortable`, `balanced`, or `compact`. Configures the size and spacing of the layout.
-- `enableMoving`: whether the table columns should display moving controls.
-- `styles`: additional `width`, `maxWidth`, `minWidth`, `align` styles for each field column.
+-   `density`: one of `comfortable`, `balanced`, or `compact`. Configures the size and spacing of the layout.
+-   `enableMoving`: whether the table columns should display moving controls.
+-   `styles`: additional `width`, `maxWidth`, `minWidth`, `align` styles for each field column.
 
 **For column alignment (`align` property), follow these guidelines:**
 Right-align whenever the cell value is fundamentally quantitative—numbers, decimals, currency, percentages—so that digits and decimal points line up, aiding comparison and calculation. Otherwise, default to left-alignment for all other types (text, codes, labels, dates).
 
 `grid` and `pickerGrid` layout:
 
-- `badgeFields`: a list of field's `id` to render without label and styled as badges.
-- `previewSize`: a `number` representing the size of the preview.
+-   `badgeFields`: a list of field's `id` to render without label and styled as badges.
+-   `previewSize`: a `number` representing the size of the preview.
 
 `list` layout:
 
-- None
+-   None
 
 `activity` layout:
 
-- `density`: one of `comfortable`, `balanced`, or `compact`. Configures the size and spacing of the layout.
-
+-   `density`: one of `comfortable`, `balanced`, or `compact`. Configures the size and spacing of the layout.
 
 #### `onChangeView`: `function`
 
@@ -451,9 +450,14 @@ The component receives the following props:
 
 React component to be rendered next to the view config button.
 
-#### `config`: { perPageSizes: number[] }
+#### `config`: { perPageSizes: number[], labels: { singular: string, plural: string } }
 
 Optional. Pass an object with a list of `perPageSizes` to control the available item counts per page (defaults to `[10, 20, 50, 100]`). `perPageSizes` needs to have a minimum of 2 items and a maximum of 6, otherwise the UI component won't be displayed.
+
+The `labels` object is used to control the labels for the item count in the bulk actions footer. It contains two properties:
+
+-   `singular`: the singular label for the item. Defaults to `Item`.
+-   `plural`: the plural label for the item. Defaults to `Items`.
 
 #### `empty`: React node
 
@@ -690,9 +694,14 @@ Example:
 }
 ```
 
-#### `config`: { perPageSizes: number[] }
+#### `config`: { perPageSizes: number[], labels: { singular: string, plural: string } }
 
 Same as `DataViews`. Optional. Pass an object with a list of `perPageSizes` to control the available item counts per page.
+
+The `labels` object is used to control the labels for the item count in the bulk actions footer. It contains two properties:
+
+-   `singular`: the singular label for the item. Defaults to `Item`.
+-   `plural`: the plural label for the item. Defaults to `Items`.
 
 #### `empty`: React node
 
@@ -847,29 +856,29 @@ For example:
 
 ```json
 {
-  "title": {
-    "required": {
-      "type": "invalid"
-    }
-  },
-  "author": {
-    "elements": {
-      "type": "invalid",
-      "message": "Value must be one of the elements."
-    }
-  },
-  "publisher": {
-    "custom": {
-      "type": "validating",
-      "message": "Validating..."
-    }
-  },
-  "isbn": {
-    "custom": {
-      "type": "valid",
-      "message": "Valid."
-    }
-  }
+	"title": {
+		"required": {
+			"type": "invalid"
+		}
+	},
+	"author": {
+		"elements": {
+			"type": "invalid",
+			"message": "Value must be one of the elements."
+		}
+	},
+	"publisher": {
+		"custom": {
+			"type": "validating",
+			"message": "Validating..."
+		}
+	},
+	"isbn": {
+		"custom": {
+			"type": "valid",
+			"message": "Valid."
+		}
+	}
 }
 ```
 
@@ -879,11 +888,11 @@ The `message` is the text to be displayed in the UI controls. The message for th
 
 The `type` can be:
 
-- `validating`: when the value is being validated (e.g., custom async rule)
-- `invalid`: when the value is invalid according to the rule
-- `valid`: when the value _became_ valid after having been invalid (e.g., custom async rule)
+-   `validating`: when the value is being validated (e.g., custom async rule)
+-   `invalid`: when the value is invalid according to the rule
+-   `valid`: when the value _became_ valid after having been invalid (e.g., custom async rule)
 
-Note the `valid` status. This is useful for displaying a "Valid." message when the field transitions from invalid to valid.  The `useFormValidity` hook implements this only for the custom async validation.
+Note the `valid` status. This is useful for displaying a "Valid." message when the field transitions from invalid to valid. The `useFormValidity` hook implements this only for the custom async validation.
 
 ## Utilities
 
@@ -958,7 +967,7 @@ The user facing description of the action.
 
 ```js
 {
-	label: Trash
+	label: Trash;
 }
 ```
 
@@ -1375,7 +1384,7 @@ Field authors can override the default Edit control by providing a string that m
 
 Additionally, some of the bundled Edit controls are configurable via a config object:
 
-- `textarea` configuration:
+-   `textarea` configuration:
 
 ```js
 {
@@ -1389,7 +1398,7 @@ Additionally, some of the bundled Edit controls are configurable via a config ob
 }
 ```
 
-- `text` configuration:
+-   `text` configuration:
 
 ```js
 {
@@ -1442,7 +1451,6 @@ Finally, the field author can always provide its own custom `Edit` control. It r
 }
 ```
 
-
 ### `sort`
 
 Function to sort the records.
@@ -1462,9 +1470,9 @@ When the field declares a type, it gets a default sort function:
 
 The default sorting can be overriden by providing a custom sort function. It takes the following arguments:
 
-  -   `a`: the first item to compare
-  -   `b`: the second item to compare
-  -   `direction`: either `asc` (ascending) or `desc` (descending)
+-   `a`: the first item to compare
+-   `b`: the second item to compare
+-   `direction`: either `asc` (ascending) or `desc` (descending)
 
 It should return a number where:
 
@@ -1678,7 +1686,7 @@ Note this function may be called many times in the lifetime of the DataViews/Dat
 
 ### `filterBy`
 
-Configuration of the filters.  Set to `false` to opt the field out of filtering entirely.
+Configuration of the filters. Set to `false` to opt the field out of filtering entirely.
 
 -   Type: `object` | `boolean`.
 -   Optional.
@@ -1804,8 +1812,6 @@ The next table lists all available operators:
 
 `is`, `isNot`, `on`, `notOn`, `lessThan`, `greaterThan`, `lessThanOrEqual`, `greaterThanOrEqual`, `before`, `after`, `beforeInc`, `afterInc`, `contains`, `notContains`, and `startsWith` are single-selection operators, while `isAny`, `isNone`, `isAll`, and `isNotAll` are multi-selection. `between` is a special operator that requires two values and it's not supported for preset layout. A filter with no operators declared will support the `isAny` and `isNone` multi-selection operators by default. A filter cannot mix single-selection & multi-selection operators; if a single-selection operator is present in the list of valid operators, the multi-selection ones will be discarded, and the filter won't allow selecting more than one item.
 
-
-
 ### `format`
 
 Display format configuration for fields. Currently supported for date fields. This configuration affects how the field is displayed in the `render` method, the `Edit` control, and filter controls.
@@ -1870,11 +1876,10 @@ For example:
 
 #### Panel
 
-- `type`: `panel`. Required.
-- `labelPosition`: one of `side`, `top`, or `none`. Optional. `top` by default.
-- `summary`: Summary field configuration. Optional. Specifies which field(s) to display in the panel header. Can be:
-   	- A string (single field ID)
-    - An array of strings (multiple field IDs)
+-   `type`: `panel`. Required.
+-   `labelPosition`: one of `side`, `top`, or `none`. Optional. `top` by default.
+-   `summary`: Summary field configuration. Optional. Specifies which field(s) to display in the panel header. Can be: - A string (single field ID)
+    -   An array of strings (multiple field IDs)
 
 When no summary fields are explicitly configured, the panel automatically determines which fields to display using this priority:
 

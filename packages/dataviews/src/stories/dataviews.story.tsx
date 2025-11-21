@@ -114,7 +114,13 @@ export const Default = ( {
 			) }
 			isItemClickable={ () => hasClickableItems }
 			defaultLayouts={ defaultLayouts }
-			config={ { perPageSizes } }
+			config={ {
+				perPageSizes,
+				labels: {
+					singular: 'Galactic Body',
+					plural: 'Galactic Bodies',
+				},
+			} }
 		/>
 	);
 };

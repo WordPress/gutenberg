@@ -9,6 +9,7 @@ import type { ReactNode } from 'react';
 import { __experimentalHStack as HStack } from '@wordpress/components';
 import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { useResizeObserver, throttle } from '@wordpress/compose';
+import { _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -60,6 +61,7 @@ type DataViewsPickerProps< Item > = {
 	children?: ReactNode;
 	config?: {
 		perPageSizes: number[];
+		labels: { singular: string; plural: string };
 	};
 	itemListLabel?: string;
 	empty?: ReactNode;
@@ -125,7 +127,13 @@ function DataViewsPicker< Item >( {
 	selection,
 	onChangeSelection,
 	children,
-	config = { perPageSizes: [ 10, 20, 50, 100 ] },
+	config = {
+		perPageSizes: [ 10, 20, 50, 100 ],
+		labels: {
+			singular: _x( 'Item', 'singular label' ),
+			plural: _x( 'Items', 'plural label' ),
+		},
+	},
 	itemListLabel,
 	empty,
 }: DataViewsPickerProps< Item > ) {

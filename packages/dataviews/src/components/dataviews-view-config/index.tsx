@@ -21,7 +21,7 @@ import {
 	__experimentalText as Text,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { __, _x } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { memo, useContext, useMemo } from '@wordpress/element';
 import { cog } from '@wordpress/icons';
 import warning from '@wordpress/warning';
@@ -217,12 +217,18 @@ function ItemsPerPageControl() {
 		return null;
 	}
 
+	const pluralLabel = config.labels.plural;
+
 	return (
 		<ToggleGroupControl
 			__nextHasNoMarginBottom
 			__next40pxDefaultSize
 			isBlock
-			label={ __( 'Items per page' ) }
+			label={ sprintf(
+				/* translators: %s: collection plural label. e.g.: "Posts per page". */
+				__( '%s per page' ),
+				pluralLabel
+			) }
 			value={ view.perPage || 10 }
 			disabled={ ! view?.sort?.field }
 			onChange={ ( newItemsPerPage ) => {
