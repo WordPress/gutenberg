@@ -140,6 +140,12 @@ export const EntitySearch = forwardRef(
 						return;
 					}
 
+					// Only search if term is empty (initial suggestions) or has 2+ characters
+					if ( term.length === 1 ) {
+						// Don't search with single character, keep showing previous results
+						return;
+					}
+
 					setIsLoading( true );
 					onSearch( term )
 						.then( ( results ) => {
@@ -275,7 +281,6 @@ export const EntitySearch = forwardRef(
 						}
 					} }
 					isLoading={ isLoading }
-					hideLabelFromVision
 					expandOnFocus={ false }
 					placeholder={ __( 'Search or type URL' ) }
 					__experimentalRenderItem={ ( { item } ) => {
