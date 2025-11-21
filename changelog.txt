@@ -1,5 +1,27 @@
 == Changelog ==
 
+= 22.1.1 =
+
+
+## Changelog
+
+### Bug Fixes
+
+- Add temporary fix for broken editor when passing attributes as undefined or null and add warning for block authors. ([73149](https://github.com/WordPress/gutenberg/pull/73149))
+
+#### Block Library
+- Move the Edit Navigation button to the last item in the block toolbar. ([73436](https://github.com/WordPress/gutenberg/pull/73436))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@jeryj @scruffian
+
+
 = 22.1.0 =
 
 ## Changelog
