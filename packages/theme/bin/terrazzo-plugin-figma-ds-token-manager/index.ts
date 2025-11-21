@@ -35,33 +35,27 @@ function transformTokenName( { id }: { id: string } ) {
 			// Color-specific transformation for semantic tokens:
 			// - add extra folder (Background, Foreground, Stroke)
 			// - swap "tone" folder order, capitalize
-			// - limit bg-* to 6 characters
 			// - keep last part of the token name with dots (eg no folders)
 			.replace(
 				/(Color)\/([\w,\-]+)\.(\w+)\.(.*)/g,
 				( _, prefix, element, tone, emphasisAndState ) => {
 					let extraFolder = '';
-					let elementName = element;
 					if ( /bg/.test( element ) ) {
 						extraFolder = 'Background/';
-						elementName = element.slice( 0, 6 );
 					} else if ( /fg/.test( element ) ) {
 						extraFolder = 'Foreground/';
-						elementName = element.slice( 0, 6 );
 					} else if ( /stroke/.test( element ) ) {
 						extraFolder = 'Stroke/';
-						elementName = element.slice( 0, 10 );
 					}
 					return `${ prefix }/${ extraFolder }${ titleCase(
 						tone
 					) }/${ kebabToCamel(
-						elementName
+						element
 					) }.${ tone }.${ emphasisAndState }`;
 				}
 			)
 			// Generic transform for semantic tokens:
 			// - add extra folder (Padding)
-			// - limit name to 3 characters after prefix
 			// - keep last part of the token name with dots (eg no folders)
 			.replace(
 				/(Dimension)\/(\w+)\.(\w+)\.(.*)/g,
@@ -70,7 +64,7 @@ function transformTokenName( { id }: { id: string } ) {
 					let propertyName = property;
 					if ( /padding/.test( property ) ) {
 						extraFolder = 'Padding/';
-						propertyName = 'pad-' + target.slice( 0, 3 );
+						propertyName = 'pad-' + target;
 					}
 					return `${ prefix }/${ extraFolder }${ kebabToCamel(
 						propertyName
