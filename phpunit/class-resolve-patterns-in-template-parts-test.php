@@ -34,6 +34,12 @@ class Tests_Resolve_Patterns_In_Template_Parts extends WP_Test_REST_Controller_T
 	public function set_up() {
 		parent::set_up();
 
+		// Enable the gutenberg-content-only-pattern-insertion experiment.
+		if ( ! isset( $GLOBALS['wp_tests_options']['gutenberg-experiments'] ) ) {
+			$GLOBALS['wp_tests_options']['gutenberg-experiments'] = array();
+		}
+		$GLOBALS['wp_tests_options']['gutenberg-experiments']['gutenberg-content-only-pattern-insertion'] = 1;
+
 		// Register test patterns.
 		register_block_pattern(
 			'test/single-root',
@@ -72,6 +78,9 @@ class Tests_Resolve_Patterns_In_Template_Parts extends WP_Test_REST_Controller_T
 	 * Tear down after each test.
 	 */
 	public function tear_down() {
+		// Disable the gutenberg-content-only-pattern-insertion experiment.
+		$GLOBALS['wp_tests_options']['gutenberg-experiments']['gutenberg-content-only-pattern-insertion'] = 0;
+
 		unregister_block_pattern( 'test/single-root' );
 		unregister_block_pattern( 'test/nested-pattern' );
 		unregister_block_pattern( 'test/multiple-blocks' );
@@ -155,6 +164,7 @@ class Tests_Resolve_Patterns_In_Template_Parts extends WP_Test_REST_Controller_T
 	 */
 	public function test_get_template_part_resolves_pattern_blocks() {
 		wp_set_current_user( self::$admin_id );
+		$this->assertTrue( gutenberg_is_experiment_enabled( 'gutenberg-content-only-pattern-insertion' ), 'The gutenberg-content-only-pattern-insertion experiment should be enabled.' );
 
 		// Create a template part with a pattern block as a post.
 		$current_theme = get_stylesheet();
@@ -228,6 +238,7 @@ class Tests_Resolve_Patterns_In_Template_Parts extends WP_Test_REST_Controller_T
 	 */
 	public function test_get_template_parts_resolves_pattern_blocks() {
 		wp_set_current_user( self::$admin_id );
+		$this->assertTrue( gutenberg_is_experiment_enabled( 'gutenberg-content-only-pattern-insertion' ), 'The gutenberg-content-only-pattern-insertion experiment should be enabled.' );
 
 		// Create template parts with pattern blocks as posts.
 		$current_theme = get_stylesheet();

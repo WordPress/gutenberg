@@ -33,6 +33,12 @@ class Tests_Resolve_Patterns_In_Patterns extends WP_Test_REST_Controller_Testcas
 	public function set_up() {
 		parent::set_up();
 
+		// Enable the gutenberg-content-only-pattern-insertion experiment.
+		if ( ! isset( $GLOBALS['wp_tests_options']['gutenberg-experiments'] ) ) {
+			$GLOBALS['wp_tests_options']['gutenberg-experiments'] = array();
+		}
+		$GLOBALS['wp_tests_options']['gutenberg-experiments']['gutenberg-content-only-pattern-insertion'] = 1;
+
 		// Register test patterns.
 		register_block_pattern(
 			'test/single-block-pattern-1',
@@ -68,6 +74,9 @@ class Tests_Resolve_Patterns_In_Patterns extends WP_Test_REST_Controller_Testcas
 	 * Tear down after each test.
 	 */
 	public function tear_down() {
+		// Disable the gutenberg-content-only-pattern-insertion experiment.
+		$GLOBALS['wp_tests_options']['gutenberg-experiments']['gutenberg-content-only-pattern-insertion'] = 0;
+
 		unregister_block_pattern( 'test/sibling-patterns' );
 		unregister_block_pattern( 'test/single-block-pattern-1' );
 		unregister_block_pattern( 'test/single-block-pattern-2' );
@@ -143,6 +152,7 @@ class Tests_Resolve_Patterns_In_Patterns extends WP_Test_REST_Controller_Testcas
 	 */
 	public function test_get_patterns_resolves_sibling_patterns() {
 		wp_set_current_user( self::$admin_id );
+		$this->assertTrue( gutenberg_is_experiment_enabled( 'gutenberg-content-only-pattern-insertion' ), 'The gutenberg-content-only-pattern-insertion experiment should be enabled.' );
 
 		// Get patterns via REST API.
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/block-patterns/patterns' );

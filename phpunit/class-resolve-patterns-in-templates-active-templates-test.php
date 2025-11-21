@@ -37,6 +37,12 @@ class Tests_Resolve_Patterns_In_Templates_Active_Templates extends WP_Test_REST_
 		// Enable the active_templates experiment.
 		update_option( 'active_templates', array() );
 
+		// Enable the gutenberg-content-only-pattern-insertion experiment.
+		if ( ! isset( $GLOBALS['wp_tests_options']['gutenberg-experiments'] ) ) {
+			$GLOBALS['wp_tests_options']['gutenberg-experiments'] = array();
+		}
+		$GLOBALS['wp_tests_options']['gutenberg-experiments']['gutenberg-content-only-pattern-insertion'] = 1;
+
 		// Register test patterns.
 		register_block_pattern(
 			'test/single-root',
@@ -77,6 +83,9 @@ class Tests_Resolve_Patterns_In_Templates_Active_Templates extends WP_Test_REST_
 	public function tear_down() {
 		// Disable the active_templates experiment.
 		delete_option( 'active_templates' );
+
+		// Disable the gutenberg-content-only-pattern-insertion experiment.
+		$GLOBALS['wp_tests_options']['gutenberg-experiments']['gutenberg-content-only-pattern-insertion'] = 0;
 
 		unregister_block_pattern( 'test/single-root' );
 		unregister_block_pattern( 'test/nested-pattern' );
@@ -161,7 +170,8 @@ class Tests_Resolve_Patterns_In_Templates_Active_Templates extends WP_Test_REST_
 	 */
 	public function test_get_template_resolves_pattern_blocks() {
 		wp_set_current_user( self::$admin_id );
-		$this->assertTrue( gutenberg_is_experiment_enabled( 'active_templates' ) );
+		$this->assertTrue( gutenberg_is_experiment_enabled( 'active_templates' ), 'The active_templates experiment should be enabled.' );
+		$this->assertTrue( gutenberg_is_experiment_enabled( 'gutenberg-content-only-pattern-insertion' ), 'The gutenberg-content-only-pattern-insertion experiment should be enabled.' );
 
 		// Register a template with a pattern block.
 		$template_name = 'test-plugin//test-template-with-pattern';
@@ -221,7 +231,8 @@ class Tests_Resolve_Patterns_In_Templates_Active_Templates extends WP_Test_REST_
 	 */
 	public function test_get_templates_resolves_pattern_blocks() {
 		wp_set_current_user( self::$admin_id );
-		$this->assertTrue( gutenberg_is_experiment_enabled( 'active_templates' ) );
+		$this->assertTrue( gutenberg_is_experiment_enabled( 'active_templates' ), 'The active_templates experiment should be enabled.' );
+		$this->assertTrue( gutenberg_is_experiment_enabled( 'gutenberg-content-only-pattern-insertion' ), 'The gutenberg-content-only-pattern-insertion experiment should be enabled.' );
 
 		// Register templates with pattern blocks.
 		$template_name_1 = 'test-plugin//test-template-1';
