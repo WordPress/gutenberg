@@ -64,15 +64,20 @@ export default function MissingEdit( { attributes, clientId } ) {
 		! hasFreeformBlock &&
 		( ! originalName || originalName === 'core/freeform' )
 	) {
+		const refreshMessage = __(
+			'Alternatively, if you have unsaved changes, you can save them and refresh to use the Classic block.'
+		);
 		if ( hasHTMLBlock ) {
 			messageHTML = __(
-				'It appears you are trying to use the deprecated Classic block. You can leave this block intact, convert its content to a Custom HTML block, or remove it entirely. Alternatively, you can refresh the page to use the Classic block.'
+				'It appears you are trying to use the deprecated Classic block. You can leave this block intact, convert its content to a Custom HTML block, or remove it entirely.'
 			);
+			messageHTML += refreshMessage;
 			actions.push( convertToHtmlButton );
 		} else {
 			messageHTML = __(
-				'It appears you are trying to use the deprecated Classic block. You can leave this block intact, or remove it entirely. Alternatively, you can refresh the page to use the Classic block.'
+				'It appears you are trying to use the deprecated Classic block. You can leave this block intact, or remove it entirely.'
 			);
+			messageHTML += refreshMessage;
 		}
 	} else if ( hasContent && hasHTMLBlock ) {
 		messageHTML = sprintf(
