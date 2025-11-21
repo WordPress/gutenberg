@@ -307,6 +307,13 @@ function TemplatePartList() {
 				defaultLayouts={ DEFAULT_LAYOUTS }
 				getItemId={ getItemId }
 				selection={ selection }
+				config={ {
+					perPageSizes: [ 10, 20, 50, 100 ],
+					labels: {
+						singular: labels?.singular ?? __( 'Template Part' ),
+						plural: labels?.plural ?? __( 'Template Parts' ),
+					},
+				} }
 				onChangeSelection={ ( items: string[] ) => {
 					navigate( {
 						search: {
