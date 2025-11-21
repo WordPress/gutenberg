@@ -714,7 +714,7 @@ export const isBlockHidden = ( state, clientId ) => {
 		return false;
 	}
 	const attributes = state.blocks.attributes.get( clientId );
-	return attributes?.metadata?.visibility === false;
+	return attributes?.metadata?.blockVisibility === false;
 };
 
 /**

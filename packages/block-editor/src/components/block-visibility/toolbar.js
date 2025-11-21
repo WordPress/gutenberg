@@ -35,7 +35,7 @@ export default function BlockVisibilityToolbar( { clientIds } ) {
 	);
 
 	const hasHiddenBlock = blocks.some(
-		( block ) => block.attributes.metadata?.visibility === false
+		( block ) => block.attributes.metadata?.blockVisibility === false
 	);
 
 	const hasBlockVisibilityButtonShownRef = useRef( false );
@@ -63,7 +63,7 @@ export default function BlockVisibilityToolbar( { clientIds } ) {
 				{
 					metadata: cleanEmptyObject( {
 						...attributes?.metadata,
-						visibility: hasHiddenBlock ? undefined : false,
+						blockVisibility: hasHiddenBlock ? undefined : false,
 					} ),
 				},
 			] )

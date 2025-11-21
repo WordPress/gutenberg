@@ -416,7 +416,8 @@ export default function useBlockDropZone( {
 					.filter( ( block ) => {
 						return ! (
 							hasBlockSupport( block.name, 'visibility', true ) &&
-							block.attributes?.metadata?.visibility === false
+							block.attributes?.metadata?.blockVisibility ===
+								false
 						);
 					} );
 

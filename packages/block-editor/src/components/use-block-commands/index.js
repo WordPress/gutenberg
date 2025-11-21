@@ -294,11 +294,12 @@ const getQuickActionsCommands = () =>
 
 		if ( canToggleBlockVisibility ) {
 			const hasHiddenBlock = blocks.some(
-				( block ) => block.attributes.metadata?.visibility === false
+				( block ) =>
+					block.attributes.metadata?.blockVisibility === false
 			);
 
 			commands.push( {
-				name: 'toggle-visibility',
+				name: 'toggle-block-visibility',
 				label: hasHiddenBlock ? __( 'Show' ) : __( 'Hide' ),
 				callback: () => {
 					const attributesByClientId = Object.fromEntries(
@@ -307,7 +308,7 @@ const getQuickActionsCommands = () =>
 							{
 								metadata: cleanEmptyObject( {
 									...attributes?.metadata,
-									visibility: hasHiddenBlock
+									blockVisibility: hasHiddenBlock
 										? undefined
 										: false,
 								} ),

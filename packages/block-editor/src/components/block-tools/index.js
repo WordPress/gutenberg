@@ -209,7 +209,9 @@ export default function BlockTools( {
 				replaceBlocks( clientIds, newBlocks );
 				speak( __( 'Selected blocks are grouped.' ) );
 			}
-		} else if ( isMatch( 'core/block-editor/toggle-visibility', event ) ) {
+		} else if (
+			isMatch( 'core/block-editor/toggle-block-visibility', event )
+		) {
 			const clientIds = getSelectedBlockClientIds();
 			if ( clientIds.length ) {
 				event.preventDefault();
@@ -225,7 +227,8 @@ export default function BlockTools( {
 					return;
 				}
 				const hasHiddenBlock = blocks.some(
-					( block ) => block.attributes.metadata?.visibility === false
+					( block ) =>
+						block.attributes.metadata?.blockVisibility === false
 				);
 				const attributesByClientId = Object.fromEntries(
 					blocks.map( ( { clientId: mapClientId, attributes } ) => [
@@ -233,7 +236,9 @@ export default function BlockTools( {
 						{
 							metadata: cleanEmptyObject( {
 								...attributes?.metadata,
-								visibility: hasHiddenBlock ? undefined : false,
+								blockVisibility: hasHiddenBlock
+									? undefined
+									: false,
 							} ),
 						},
 					] )

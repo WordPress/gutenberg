@@ -208,7 +208,7 @@ function KeyboardShortcutsRegister() {
 		} );
 
 		registerShortcut( {
-			name: 'core/block-editor/toggle-visibility',
+			name: 'core/block-editor/toggle-block-visibility',
 			category: 'block',
 			description: __( 'Show or hide the selected block(s).' ),
 			keyCombination: {
