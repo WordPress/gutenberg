@@ -16,7 +16,7 @@ import save from './save';
 import transforms from './transforms';
 import { unlock } from '../lock-unlock';
 
-const { fieldsKey } = unlock( blocksPrivateApis );
+const { fieldsKey, formKey } = unlock( blocksPrivateApis );
 
 const { name } = metadata;
 
@@ -72,7 +72,6 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 			id: 'image',
 			label: __( 'Image' ),
 			type: 'media',
-			shownByDefault: true,
 			mapping: {
 				id: 'id',
 				url: 'url',
@@ -88,7 +87,6 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 			id: 'link',
 			label: __( 'Link' ),
 			type: 'link',
-			shownByDefault: false,
 			mapping: {
 				url: 'href',
 				rel: 'rel',
@@ -100,15 +98,16 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 			id: 'caption',
 			label: __( 'Caption' ),
 			type: 'richtext',
-			shownByDefault: false,
 		},
 		{
 			id: 'alt',
 			label: __( 'Alt text' ),
 			type: 'text',
-			shownByDefault: false,
 		},
 	];
+	settings[ formKey ] = {
+		fields: [ 'image' ],
+	};
 }
 
 export const init = () => initBlock( { name, metadata, settings } );

@@ -18,7 +18,7 @@ import { enhanceNavigationLinkVariations } from './hooks';
 import transforms from './transforms';
 import { unlock } from '../lock-unlock';
 
-const { fieldsKey } = unlock( blocksPrivateApis );
+const { fieldsKey, formKey } = unlock( blocksPrivateApis );
 
 const { name } = metadata;
 
@@ -99,13 +99,11 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 			id: 'label',
 			label: __( 'Label' ),
 			type: 'richtext',
-			shownByDefault: true,
 		},
 		{
 			id: 'link',
 			label: __( 'Link' ),
 			type: 'link',
-			shownByDefault: false,
 			mapping: {
 				href: 'url',
 				rel: 'rel',
@@ -113,6 +111,9 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 			},
 		},
 	];
+	settings[ formKey ] = {
+		fields: [ 'label' ],
+	};
 }
 
 export const init = () => {

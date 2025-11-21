@@ -17,7 +17,7 @@ import transforms from './transforms';
 import variations from './variations';
 import { unlock } from '../lock-unlock';
 
-const { fieldsKey } = unlock( blocksPrivateApis );
+const { fieldsKey, formKey } = unlock( blocksPrivateApis );
 
 const { name } = metadata;
 
@@ -68,9 +68,11 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 			id: 'content',
 			label: __( 'Content' ),
 			type: 'richtext',
-			shownByDefault: true,
 		},
 	];
+	settings[ formKey ] = {
+		fields: [ 'content' ],
+	};
 }
 
 export const init = () => initBlock( { name, metadata, settings } );
