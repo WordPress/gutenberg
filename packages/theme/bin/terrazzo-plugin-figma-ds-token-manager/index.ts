@@ -31,14 +31,14 @@ function transformTokenName( { id }: { id: string } ) {
 			// Capitalize first segment
 			.replace( /^(\w+)\./g, ( _, g1 ) => `${ titleCase( g1 ) }/` )
 			// Capitalize
-			.replace( /semantic\./g, 'Semantic/' )
+			.replace( /semantic\./g, '' )
 			// Color-specific transformation for semantic tokens:
 			// - add extra folder (Background, Foreground, Stroke)
 			// - swap "tone" folder order, capitalize
 			// - limit bg-* to 6 characters
 			// - keep last part of the token name with dots (eg no folders)
 			.replace(
-				/(color\/Semantic)\/([\w,\-]+)\.(\w+)\.(.*)/gi,
+				/(Color)\/([\w,\-]+)\.(\w+)\.(.*)/g,
 				( _, prefix, element, tone, emphasisAndState ) => {
 					let extraFolder = '';
 					let elementName = element;
@@ -64,7 +64,7 @@ function transformTokenName( { id }: { id: string } ) {
 			// - limit name to 3 characters after prefix
 			// - keep last part of the token name with dots (eg no folders)
 			.replace(
-				/(Dimension\/Semantic)\/(\w+)\.(\w+)\.(.*)/g,
+				/(Dimension)\/(\w+)\.(\w+)\.(.*)/g,
 				( _, prefix, property, target, modifier ) => {
 					let extraFolder = '';
 					let propertyName = property;
