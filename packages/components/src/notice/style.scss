@@ -42,14 +42,13 @@
 	display: flex;
 	flex-wrap: wrap;
 	gap: $grid-unit-15;
+	margin-top: $grid-unit-15;
 }
 
 .components-notice__action.components-button {
 	&.is-secondary {
 		vertical-align: initial;
 	}
-
-	margin-top: $grid-unit-15;
 }
 
 .components-notice__dismiss {
