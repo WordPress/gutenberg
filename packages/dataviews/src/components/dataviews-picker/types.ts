@@ -1,13 +1,13 @@
 /**
  * Size token for padding.
- * Aligned with the Card component's spacing scale (4px base grid).
+ * Aligned with the Box component's spacing scale (4px base grid).
  */
 export type PaddingSize =
 	| 'x-small'
 	| 'small'
 	| 'medium'
 	| 'large'
-	| 'extra-large'
+	| 'x-large'
 	| 'none';
 
 /**

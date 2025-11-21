@@ -6,7 +6,7 @@
 	position: sticky;
 	bottom: 0;
 	left: 0;
-	background-color: $white;
+	background-color: inherit;
 	padding-block-start: $grid-unit-15;
 	padding-block-end: var(--dataviews-padding-block-end, #{$grid-unit-15});
 	padding-inline-start: var(--dataviews-padding-inline-start);

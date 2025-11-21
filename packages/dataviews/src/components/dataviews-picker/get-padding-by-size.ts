@@ -5,19 +5,19 @@ import type { PaddingSize, PaddingOptions, DimensionVariant } from './types';
 
 /**
  * Maps padding size tokens to CSS values.
- * Aligned with the Card component's spacing scale (space function with 4px base):
+ * Aligned with the Box component's spacing scale (space function with 4px base):
  * - x-small: space(2) = 8px
  * - small: space(4) = 16px
  * - medium: space(6) = 24px
  * - large: space(8) = 32px
- * - extra-large: space(12) = 48px
+ * - x-large: space(12) = 48px
  */
 const paddingValuesBySize: Record< PaddingSize, string > = {
 	'x-small': '8px',
 	small: '16px',
 	medium: '24px',
 	large: '32px',
-	'extra-large': '48px',
+	'x-large': '48px',
 	none: '0',
 };
 

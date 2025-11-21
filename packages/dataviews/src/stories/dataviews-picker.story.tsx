@@ -62,7 +62,7 @@ const storyArgTypes = {
 			'small',
 			'medium',
 			'large',
-			'extra-large',
+			'x-large',
 			'none',
 		],
 		mapping: {
@@ -71,7 +71,7 @@ const storyArgTypes = {
 			small: 'small',
 			medium: 'medium',
 			large: 'large',
-			'extra-large': 'extra-large',
+			'x-large': 'x-large',
 			none: 'none',
 		},
 		description: 'Determines the amount of padding within the component',
