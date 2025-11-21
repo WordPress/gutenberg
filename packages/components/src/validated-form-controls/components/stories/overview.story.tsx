@@ -9,6 +9,7 @@ import { expect, userEvent, waitFor, within } from '@storybook/test';
  */
 import { useRef, useCallback, useState } from '@wordpress/element';
 import { debounce } from '@wordpress/compose';
+import { create } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -20,6 +21,7 @@ import Dropdown from '../../../dropdown';
 import { Button } from '../../../button';
 import Modal from '../../../modal';
 import { HStack } from '../../../h-stack';
+import { CheckboxControl } from '../../../checkbox-control';
 import { VStack } from '../../../v-stack';
 
 const meta: Meta< typeof ControlWithError > = {
@@ -437,3 +439,154 @@ export const ValidateOnPopoverClose: StoryObj< typeof ValidatedInputControl > =
 			},
 		},
 	};
+
+/**
+ * Sometimes, a field's validity may depend on the state of other fields.
+ *
+ * In this example, the text field must start with "http" if the checkbox is checked.
+ * Validator logic should be added to both fields.
+ */
+export const ValidateWithOtherFieldState: StoryObj<
+	typeof ValidatedInputControl
+> = {
+	decorators: formDecorator,
+	render: function Template( { ...args } ) {
+		const [ text, setText ] = useState( '' );
+		const [ isHttp, setIsHttp ] = useState( false );
+		const [ customValidity, setCustomValidity ] =
+			useState<
+				React.ComponentProps<
+					typeof ValidatedInputControl
+				>[ 'customValidity' ]
+			>( undefined );
+
+		return (
+			<>
+				<ValidatedInputControl
+					{ ...args }
+					value={ text }
+					onChange={ ( newValue ) => {
+						setText( newValue ?? '' );
+					} }
+					onValidate={ ( value ) => {
+						if ( isHttp && value && ! value.startsWith( 'http' ) ) {
+							setCustomValidity( {
+								type: 'invalid',
+								message: 'Text must start with "http".',
+							} );
+						} else {
+							setCustomValidity( undefined );
+						}
+					} }
+					customValidity={ customValidity }
+				/>
+				<CheckboxControl
+					__nextHasNoMarginBottom
+					label="Text starts with HTTP"
+					checked={ isHttp }
+					onChange={ ( value ) => {
+						setIsHttp( value );
+
+						if (
+							value === true &&
+							text &&
+							! text.startsWith( 'http' )
+						) {
+							setCustomValidity( {
+								type: 'invalid',
+								message: 'Text must start with "http".',
+							} );
+						} else {
+							setCustomValidity( undefined );
+						}
+					} }
+				/>
+			</>
+		);
+	},
+	args: {
+		label: 'Text',
+	},
+};
+
+/**
+ * When a field's validity can only be determined after the submit button is clicked,
+ * `customValidity` can be set within the form's `onSubmit` handler.
+ *
+ * In this example, the text field must start with "http" if the submit button is clicked,
+ * but can be any string if the "Create new page" button is clicked.
+ */
+export const ValidateOnSubmit: StoryObj< typeof ValidatedInputControl > = {
+	render: function Template( { ...args } ) {
+		const [ text, setText ] = useState( '' );
+		const [ customValidity, setCustomValidity ] =
+			useState<
+				React.ComponentProps<
+					typeof ValidatedInputControl
+				>[ 'customValidity' ]
+			>( undefined );
+
+		return (
+			<form
+				onSubmit={ ( event ) => {
+					event.preventDefault();
+
+					if ( text && ! text.startsWith( 'http' ) ) {
+						setCustomValidity( {
+							type: 'invalid',
+							message: 'Text must start with "http".',
+						} );
+						return;
+					}
+					// eslint-disable-next-line no-alert
+					alert( 'Form submitted!' );
+				} }
+			>
+				<VStack style={ { width: 300 } }>
+					<ValidatedInputControl
+						{ ...args }
+						value={ text }
+						onChange={ ( newValue ) => {
+							setText( newValue ?? '' );
+						} }
+						onValidate={ ( value ) => {
+							if (
+								customValidity?.type === 'invalid' &&
+								value &&
+								! value.startsWith( 'http' )
+							) {
+								setCustomValidity( {
+									type: 'invalid',
+									message: 'Text must start with "http".',
+								} );
+							} else {
+								setCustomValidity( undefined );
+							}
+						} }
+						customValidity={ customValidity }
+					/>
+					<Button
+						variant="secondary"
+						__next40pxDefaultSize
+						icon={ create }
+						// eslint-disable-next-line no-alert
+						onClick={ () => alert( 'Created new page!' ) }
+					>
+						Create new page
+					</Button>
+				</VStack>
+				<Button
+					style={ { marginTop: 16 } }
+					type="submit"
+					variant="primary"
+					__next40pxDefaultSize
+				>
+					Submit
+				</Button>
+			</form>
+		);
+	},
+	args: {
+		label: 'Link to',
+	},
+};
