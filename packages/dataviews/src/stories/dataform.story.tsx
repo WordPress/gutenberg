@@ -911,25 +911,56 @@ const ValidationComponent = ( {
 			return undefined;
 		};
 
+		// Helper functions to avoid nested ternary expressions
+		const getValidationPlaceholder = (
+			basePattern: string,
+			baseMinMax: string,
+			bothPattern: string
+		) => {
+			if ( pattern && minMax ) {
+				return bothPattern;
+			}
+			if ( pattern ) {
+				return basePattern;
+			}
+			if ( minMax ) {
+				return baseMinMax;
+			}
+			return undefined;
+		};
+
+		const getValidationDescription = (
+			patternDesc: string,
+			minMaxDesc: string,
+			bothDesc: string
+		) => {
+			if ( pattern && minMax ) {
+				return bothDesc;
+			}
+			if ( pattern ) {
+				return patternDesc;
+			}
+			if ( minMax ) {
+				return minMaxDesc;
+			}
+			return undefined;
+		};
+
 		return [
 			{
 				id: 'text',
 				type: 'text',
 				label: 'Text',
-				placeholder: pattern && minMax
-					? 'user_name (5-20 chars, alphanumeric+underscore)'
-					: pattern
-					? 'user_name (alphanumeric+underscore)'
-					: minMax
-					? 'Min 5, max 20 characters'
-					: undefined,
-				description: pattern && minMax
-					? 'Letters, numbers, underscores only AND 5-20 characters'
-					: pattern
-					? 'Must contain only letters, numbers, and underscores'
-					: minMax
-					? 'Must be between 5 and 20 characters'
-					: undefined,
+				placeholder: getValidationPlaceholder(
+					'user_name (alphanumeric+underscore)',
+					'Min 5, max 20 characters',
+					'user_name (5-20 chars, alphanumeric+underscore)'
+				),
+				description: getValidationDescription(
+					'Must contain only letters, numbers, and underscores',
+					'Must be between 5 and 20 characters',
+					'Letters, numbers, underscores only AND 5-20 characters'
+				),
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
@@ -1001,20 +1032,16 @@ const ValidationComponent = ( {
 				id: 'email',
 				type: 'email',
 				label: 'e-mail',
-				placeholder: pattern && minMax
-					? 'user@company.com (5-100 chars)'
-					: pattern
-					? 'user@company.com'
-					: minMax
-					? 'Min 5, max 100 characters'
-					: undefined,
-				description: pattern && minMax
-					? 'Must be @company.com domain AND 5-100 characters'
-					: pattern
-					? 'Email must be from @company.com domain'
-					: minMax
-					? 'Must be between 5 and 100 characters'
-					: undefined,
+				placeholder: getValidationPlaceholder(
+					'user@company.com',
+					'Min 5, max 100 characters',
+					'user@company.com (5-100 chars)'
+				),
+				description: getValidationDescription(
+					'Email must be from @company.com domain',
+					'Must be between 5 and 100 characters',
+					'Must be @company.com domain AND 5-100 characters'
+				),
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
@@ -1030,20 +1057,16 @@ const ValidationComponent = ( {
 				id: 'telephone',
 				type: 'telephone',
 				label: 'telephone',
-				placeholder: pattern && minMax
-					? '+1-555-123-4567 (10-20 chars)'
-					: pattern
-					? '+1-555-123-4567'
-					: minMax
-					? 'Min 10, max 20 characters'
-					: undefined,
-				description: pattern && minMax
-					? 'US format +1-XXX-XXX-XXXX AND 10-20 characters'
-					: pattern
-					? 'US phone format with country code'
-					: minMax
-					? 'Must be between 10 and 20 characters'
-					: undefined,
+				placeholder: getValidationPlaceholder(
+					'+1-555-123-4567',
+					'Min 10, max 20 characters',
+					'+1-555-123-4567 (10-20 chars)'
+				),
+				description: getValidationDescription(
+					'US phone format with country code',
+					'Must be between 10 and 20 characters',
+					'US format +1-XXX-XXX-XXXX AND 10-20 characters'
+				),
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
@@ -1059,20 +1082,16 @@ const ValidationComponent = ( {
 				id: 'url',
 				type: 'url',
 				label: 'URL',
-				placeholder: pattern && minMax
-					? 'https://github.com/user/repo (10-255 chars)'
-					: pattern
-					? 'https://github.com/user/repo'
-					: minMax
-					? 'Min 10, max 255 characters'
-					: undefined,
-				description: pattern && minMax
-					? 'GitHub repository URL AND 10-255 characters'
-					: pattern
-					? 'Must be a GitHub repository URL'
-					: minMax
-					? 'Must be between 10 and 255 characters'
-					: undefined,
+				placeholder: getValidationPlaceholder(
+					'https://github.com/user/repo',
+					'Min 10, max 255 characters',
+					'https://github.com/user/repo (10-255 chars)'
+				),
+				description: getValidationDescription(
+					'Must be a GitHub repository URL',
+					'Must be between 10 and 255 characters',
+					'GitHub repository URL AND 10-255 characters'
+				),
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
@@ -1172,20 +1191,16 @@ const ValidationComponent = ( {
 				id: 'password',
 				type: 'password',
 				label: 'Password',
-				placeholder: pattern && minMax
-					? 'abc12345 (8-20 chars alphanumeric)'
-					: pattern
-					? 'Must be 8+ alphanumeric'
-					: minMax
-					? 'Min 8, max 20 characters'
-					: undefined,
-				description: pattern && minMax
-					? '8+ alphanumeric chars AND 8-20 characters'
-					: pattern
-					? 'Must contain only letters and numbers (8+ chars)'
-					: minMax
-					? 'Must be between 8 and 20 characters'
-					: undefined,
+				placeholder: getValidationPlaceholder(
+					'Must be 8+ alphanumeric',
+					'Min 8, max 20 characters',
+					'abc12345 (8-20 chars alphanumeric)'
+				),
+				description: getValidationDescription(
+					'Must contain only letters and numbers (8+ chars)',
+					'Must be between 8 and 20 characters',
+					'8+ alphanumeric chars AND 8-20 characters'
+				),
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
