@@ -11,7 +11,7 @@ import {
 	TextareaControl,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useRef, useEffect, useState } from '@wordpress/element';
+import { useRef, useEffect, useState, useCallback } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import { safeDecodeURI } from '@wordpress/url';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
@@ -108,15 +108,40 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 		return getSettings().__experimentalFetchLinkSuggestions;
 	}, [] );
 
-	// Search function for EntitySearch
-	const handleSearch = ( searchTerm ) => {
-		if ( ! fetchLinkSuggestions ) {
-			return Promise.resolve( [] );
-		}
-		return fetchLinkSuggestions( searchTerm, {
-			isInitialSuggestions: ! searchTerm,
-		} );
-	};
+	// Search function for EntitySearch - contextual based on current link type
+	const handleSearch = useCallback(
+		( searchTerm ) => {
+			if ( ! fetchLinkSuggestions ) {
+				return Promise.resolve( [] );
+			}
+
+			// Build query based on current link's entity type
+			const suggestionsQuery = {};
+
+			// If link is bound to an entity, search the same type
+			if ( attributes.kind && attributes.type ) {
+				if ( attributes.kind === 'post-type' ) {
+					suggestionsQuery.type = 'post';
+					suggestionsQuery.subtype = attributes.type; // 'post', 'page', etc.
+				} else if ( attributes.kind === 'taxonomy' ) {
+					suggestionsQuery.type = 'term';
+					// Map attribute type to taxonomy slug (e.g., 'tag' -> 'post_tag')
+					const taxonomyMap = {
+						tag: 'post_tag',
+					};
+					suggestionsQuery.subtype =
+						taxonomyMap[ attributes.type ] || attributes.type;
+				}
+			}
+			// If no entity binding, search all post types (default behavior)
+
+			return fetchLinkSuggestions( searchTerm, {
+				...suggestionsQuery,
+				isInitialSuggestions: ! searchTerm,
+			} );
+		},
+		[ fetchLinkSuggestions, attributes.kind, attributes.type ]
+	);
 
 	// Get direct store dispatch to bypass setBoundAttributes wrapper
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
@@ -304,6 +329,13 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 						label={ __( 'Link' ) }
 						value={ url }
 						onSearch={ handleSearch }
+						getDisplayValue={ ( suggestion ) => {
+							const title = suggestion?.title || '';
+							const suggestionUrl = suggestion?.url || '';
+							return title && suggestionUrl
+								? `${ title } ${ suggestionUrl }`
+								: title || suggestionUrl;
+						} }
 						onChange={ ( newUrl, suggestion ) => {
 							// If we have suggestion data (entity selected from search),
 							// pass the entity information to enable binding

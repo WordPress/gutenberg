@@ -126,6 +126,9 @@ export const EntitySearch = forwardRef(
 			},
 		} ) );
 
+		// Debug logging for state changes
+		useEffect( () => {}, [ value, searchTerm, suggestions ] );
+
 		// Create debounced fetch function
 		const debouncedFetch = useMemo(
 			() =>
@@ -164,14 +167,32 @@ export const EntitySearch = forwardRef(
 				suggestion,
 			} ) );
 
-			// Add current value if it exists and isn't already in suggestions
-			// This is needed for ComboboxControl to display the current value
-			if ( value && ! opts.some( ( opt ) => opt.value === value ) ) {
-				opts.unshift( {
-					value,
-					label: value,
-					isCurrentValue: true,
-				} );
+			// If the current value matches a suggestion, override its label when not searching
+			// This ensures that when editing a plain URL (e.g., after unsyncing), we show just the URL
+			// But when searching, keep the full label with title for ComboboxControl filtering
+			if ( value ) {
+				const matchingOptionIndex = opts.findIndex(
+					( opt ) => opt.value === value
+				);
+				if ( matchingOptionIndex !== -1 ) {
+					// Only override label to URL-only if not actively searching
+					if ( ! searchTerm ) {
+						opts[ matchingOptionIndex ] = {
+							...opts[ matchingOptionIndex ],
+							label: value,
+							isCurrentValue: true,
+						};
+					}
+					// When searching, keep the full label and don't mark as isCurrentValue
+					// so it shows in the dropdown and can be filtered by ComboboxControl
+				} else {
+					// Add current value if it doesn't exist in suggestions
+					opts.unshift( {
+						value,
+						label: value,
+						isCurrentValue: true,
+					} );
+				}
 			}
 
 			// Add current search term as a freeform option if it's not in suggestions
