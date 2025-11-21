@@ -319,12 +319,10 @@ export const deleteEntityRecord =
 		);
 
 		try {
-			if (
-				window.__experimentalEnableSync &&
-				entityConfig.syncConfig
-			) {
+			if ( window.__experimentalEnableSync && entityConfig.syncConfig ) {
 				if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-					const collaboratorMode = resolveSelect.getCollaboratorMode();
+					const collaboratorMode =
+						resolveSelect.getCollaboratorMode();
 
 					if ( collaboratorMode === 'view' ) {
 						return;
@@ -420,10 +418,7 @@ export const editEntityRecord =
 			recordId
 		);
 
-		if (
-			window.__experimentalEnableSync &&
-			entityConfig.syncConfig
-		) {
+		if ( window.__experimentalEnableSync && entityConfig.syncConfig ) {
 			if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 				const collaboratorMode = select.getCollaboratorMode();
 
@@ -581,10 +576,7 @@ export const saveEntityRecord =
 			{ exclusive: true }
 		);
 
-		if (
-			window.__experimentalEnableSync &&
-			entityConfig.syncConfig
-		) {
+		if ( window.__experimentalEnableSync && entityConfig.syncConfig ) {
 			if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 				const collaboratorMode = select.getCollaboratorMode();
 
