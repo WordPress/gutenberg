@@ -163,6 +163,7 @@ const DataViewsPickerContent = ( {
 		setView,
 		data: shownData,
 		getItemId: ( item ) => item.id.toString(),
+		totalDataLength: shownData.length,
 	} );
 
 	return (
@@ -324,11 +325,13 @@ function useInfiniteScroll( {
 	setView,
 	data: shownData,
 	getItemId,
+	totalDataLength,
 }: {
 	view: View;
 	setView: ( view: View ) => void;
 	data: SpaceObject[];
 	getItemId: ( item: SpaceObject ) => string;
+	totalDataLength: number;
 } ): {
 	data: SpaceObject[];
 	paginationInfo: {
@@ -345,8 +348,8 @@ function useInfiniteScroll( {
 	);
 	const [ isLoadingMore, setIsLoadingMore ] = useState( false );
 
-	const totalItems = data.length;
-	const totalPages = Math.ceil( totalItems / 6 ); // perPage is 6.
+	const totalItems = totalDataLength;
+	const totalPages = Math.ceil( totalItems / ( view.perPage || 10 ) );
 	const currentPage = view.page || 1;
 	const hasMoreData = currentPage < totalPages;
 
@@ -385,8 +388,6 @@ function useInfiniteScroll( {
 		view.perPage,
 		currentPage,
 		view.infiniteScrollEnabled,
-		shownData,
-		getItemId,
 	] );
 
 	const paginationInfo = {
