@@ -269,13 +269,13 @@ function DataViews< Item >( {
 			// Check if user has scrolled near the bottom
 			if (
 				scrollDirection === 'down' &&
-				scrollTop + clientHeight >= scrollHeight - 100
+				scrollTop + clientHeight >= scrollHeight - 300
 			) {
 				infiniteScrollHandler?.( 'down' );
 			}
 
 			// Check if user has scrolled near the top
-			if ( scrollDirection === 'up' && scrollTop <= 100 ) {
+			if ( scrollDirection === 'up' && scrollTop <= 300 ) {
 				infiniteScrollHandler?.( 'up' );
 			}
 		}, 100 ); // Throttle to 100ms

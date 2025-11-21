@@ -11,6 +11,7 @@ import {
 	useMemo,
 	useCallback,
 	useEffect,
+	useRef,
 	createInterpolateElement,
 } from '@wordpress/element';
 import {
@@ -532,15 +533,20 @@ export const InfiniteScroll = () => {
 	}, [ view ] );
 
 	// Custom pagination handler that simulates server-side pagination
-	const [ allLoadedRecords, setAllLoadedRecords ] = useState< SpaceObject[] >(
-		[]
-	);
+	const [ allLoadedRecords, setAllLoadedRecords ] = useState<
+		( SpaceObject | null )[]
+	>( [] );
 	const [ isLoadingMore, setIsLoadingMore ] = useState( false );
 	const [ scrollDirection, setScrollDirection ] = useState<
 		'up' | 'down' | undefined
 	>( undefined );
 
 	const [ visibleEntries, setVisibleEntries ] = useState< number[] >( [] );
+
+	// Track the range of data we've loaded to maintain placeholders
+	const loadedRangeRef = useRef< { min: number; max: number } | null >(
+		null
+	);
 
 	const totalItems = data.length;
 	const totalPages = Math.ceil( totalItems / 6 ); // perPage is 6.
@@ -595,39 +601,101 @@ export const InfiniteScroll = () => {
 			( currentPage === 1 && ! allLoadedRecords.length ) ||
 			! view.infiniteScrollEnabled
 		) {
-			// First page - replace all data
-			setAllLoadedRecords( shownData );
+			// First page - replace all data and initialize range
+			const records = shownData.map( ( record ) => ( {
+				...record,
+				position: record.id,
+			} ) );
+			setAllLoadedRecords( records );
+
+			if ( records.length > 0 ) {
+				loadedRangeRef.current = {
+					min: Math.min( ...records.map( ( r ) => r.id ) ),
+					max: Math.max( ...records.map( ( r ) => r.id ) ),
+				};
+			}
 		} else {
-			// Subsequent pages - load more data
+			// Subsequent pages - load more data with placeholders
 			setAllLoadedRecords( ( prev ) => {
-				const existingIds = new Set( prev.map( getItemId ) );
-				const newRecords = shownData.filter(
-					( record ) => ! existingIds.has( getItemId( record ) )
+				const existingIds = new Set(
+					prev
+						.filter(
+							( item ): item is SpaceObject => item !== null
+						)
+						.map( getItemId )
 				);
-				let orderedRecords =
+				const newRecords = shownData
+					.filter(
+						( record ) => ! existingIds.has( getItemId( record ) )
+					)
+					.map( ( record ) => ( {
+						...record,
+						position: record.id,
+					} ) );
+
+				if ( newRecords.length === 0 ) {
+					return prev;
+				}
+
+				// Update the loaded range
+				const allRecords =
 					scrollDirection === 'up'
 						? [ ...newRecords, ...prev ]
 						: [ ...prev, ...newRecords ];
-				// Check whether we have more than 3 pages of data loaded and if so,
-				// trim some off the end we're scrolling away from.
-				if ( orderedRecords.length > 18 ) {
-					orderedRecords =
-						scrollDirection === 'up'
-							? orderedRecords.filter(
-									( record ) =>
-										record.id <
-										visibleEntries[
-											visibleEntries.length - 1
-										]?.valueOf() +
-											2
-							  )
-							: orderedRecords.filter(
-									( record ) =>
-										record.id >
-										visibleEntries[ 0 ]?.valueOf() - 2
-							  );
+
+				const allIds = allRecords
+					.filter( ( r ): r is SpaceObject => r !== null )
+					.map( ( r ) => r.id );
+				const newMin = Math.min( ...allIds );
+				const newMax = Math.max( ...allIds );
+
+				loadedRangeRef.current = {
+					min: newMin,
+					max: newMax,
+				};
+
+				// Create array with placeholders to maintain positions
+				const result: ( SpaceObject | null )[] = [];
+				for ( let id = newMin; id <= newMax; id++ ) {
+					const record = allRecords.find(
+						( r ) => r !== null && r.id === id
+					);
+					result.push( record || null );
 				}
-				return orderedRecords;
+
+				// Filter to keep only records that should remain visible
+				// Keep items within a certain range of visible entries
+				if ( visibleEntries.length > 0 ) {
+					const visibleMin = Math.min( ...visibleEntries );
+					const visibleMax = Math.max( ...visibleEntries );
+					const buffer = 3;
+
+					return result
+						.map( ( record, index ) => {
+							const itemId = newMin + index;
+							// Keep records that are null (placeholders) or within the visible range
+							if ( record === null ) {
+								return record;
+							}
+							// Keep items within buffer range of visible items
+							if (
+								itemId >= visibleMin - buffer &&
+								itemId <= visibleMax + buffer
+							) {
+								return record;
+							}
+							// Replace with placeholder if outside buffer
+							return null;
+						} )
+						.filter(
+							( record, index ) =>
+								record !== null ||
+								( newMin + index >= visibleMin - buffer &&
+									newMin + index <= visibleMax + buffer )
+						);
+				}
+
+				return result.filter( ( r ) => r !== null );
 			} );
 		}
 		setIsLoadingMore( false );
@@ -650,6 +718,11 @@ export const InfiniteScroll = () => {
 		setVisibleEntries,
 	};
 
+	// Filter out null placeholders for display
+	const displayData = allLoadedRecords.filter(
+		( record ): record is SpaceObject => record !== null
+	);
+
 	return (
 		<>
 			<style>{ `
@@ -667,7 +740,7 @@ export const InfiniteScroll = () => {
 					display: 'block',
 				} }
 			>
-				{ __( 'Infinite Scroll Demo' ) }: { allLoadedRecords.length } of{ ' ' }
+				{ __( 'Infinite Scroll Demo' ) }: { displayData.length } of{ ' ' }
 				{ totalItems } items loaded.
 				{ isLoadingMore && __( 'Loading more…' ) }
 				{ ! hasMoreData && __( 'All items loaded!' ) }
@@ -675,7 +748,7 @@ export const InfiniteScroll = () => {
 			<DataViews
 				getItemId={ ( item ) => item.id.toString() }
 				paginationInfo={ paginationInfo }
-				data={ allLoadedRecords }
+				data={ displayData }
 				view={ view }
 				fields={ fields }
 				onChangeView={ setView }
