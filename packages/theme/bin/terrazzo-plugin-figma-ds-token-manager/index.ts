@@ -17,6 +17,16 @@ import {
 import '../../src/color-ramps/lib/register-color-spaces';
 import { FORMAT_JSON_ID } from './lib';
 
+const TONES = new Set( [
+	'neutral',
+	'brand',
+	'success',
+	'info',
+	'warning',
+	'caution',
+	'error',
+] );
+
 function titleCase( str: string ) {
 	return str[ 0 ].toUpperCase() + str.slice( 1 );
 }
@@ -32,40 +42,42 @@ function transformTokenName( { id }: { id: string } ) {
 			.replace( /^(\w+)\./g, ( _, g1 ) => `${ titleCase( g1 ) }/` )
 			// Capitalize
 			.replace( /semantic\./g, '' )
-			// Color-specific transformation for semantic tokens:
-			// - add extra folder (Background, Foreground, Stroke)
-			// - swap "tone" folder order, capitalize
-			// - keep last part of the token name with dots (eg no folders)
+			// Transform tokens:
+			// - Add extra folder matching top-level grouping
+			// - Prefix property name with the abbreviated top-level grouping
+			// - Shift color tones to extra folder
+			// - Keep last part of the token name with dots (eg no folders)
 			.replace(
-				/(Color)\/([\w,\-]+)\.(\w+)\.(.*)/g,
-				( _, prefix, element, tone, emphasisAndState ) => {
-					let extraFolder = '';
-					if ( /bg/.test( element ) ) {
-						extraFolder = 'Background/';
-					} else if ( /fg/.test( element ) ) {
-						extraFolder = 'Foreground/';
-					} else if ( /stroke/.test( element ) ) {
-						extraFolder = 'Stroke/';
-					}
-					return `${ prefix }/${ extraFolder }${ titleCase(
-						tone
-					) }/${ kebabToCamel(
-						element
-					) }.${ tone }.${ emphasisAndState }`;
-				}
-			)
-			// Generic transform for semantic tokens:
-			// - add extra folder (Padding)
-			// - keep last part of the token name with dots (eg no folders)
-			.replace(
-				/(Dimension)\/(\w+)\.(\w+)\.(.*)/g,
+				/(Dimension|Color)\/(\w+)\.(\w+)\.(.*)/g,
 				( _, prefix, property, target, modifier ) => {
 					let extraFolder = '';
 					let propertyName = property;
-					if ( /padding/.test( property ) ) {
-						extraFolder = 'Padding/';
-						propertyName = 'pad-' + target;
+
+					switch ( property ) {
+						case 'bg':
+							extraFolder = 'Background/';
+							propertyName = 'bg-' + target;
+							break;
+						case 'fg':
+							extraFolder = 'Foreground/';
+							propertyName = 'fg-' + target;
+							break;
+						case 'stroke':
+							extraFolder = 'Stroke/';
+							propertyName = 'stroke-' + target;
+							break;
+						case 'padding':
+							extraFolder = 'Padding/';
+							propertyName = 'pad-' + target;
+							break;
 					}
+
+					const [ tone, ...remaining ] = modifier.split( '.' );
+					if ( tone && TONES.has( tone ) ) {
+						extraFolder = extraFolder + titleCase( tone ) + '/';
+						modifier = remaining.join( '.' );
+					}
+
 					return `${ prefix }/${ extraFolder }${ kebabToCamel(
 						propertyName
 					) }.${ modifier }`;

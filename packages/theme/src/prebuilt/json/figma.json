@@ -30,523 +30,523 @@
 		},
 		"description": "Border width for focus ring"
 	},
-	"Color/Background/Neutral/bgSurface-neutral": {
+	"Color/Background/Neutral/bgSurface": {
 		"value": {
 			".": "#f8f8f8"
 		},
 		"description": "Background color for surfaces with normal emphasis."
 	},
-	"Color/Background/Neutral/bgSurface-neutral-strong": {
+	"Color/Background/Neutral/bgSurface-strong": {
 		"value": {
 			".": "#fff"
 		},
 		"description": "Background color for surfaces with strong emphasis."
 	},
-	"Color/Background/Neutral/bgSurface-neutral-weak": {
+	"Color/Background/Neutral/bgSurface-weak": {
 		"value": {
 			".": "#f0f0f0"
 		},
 		"description": "Background color for surfaces with weak emphasis."
 	},
-	"Color/Background/Brand/bgSurface-brand": {
+	"Color/Background/Brand/bgSurface": {
 		"value": {
 			".": "#ecf0f9"
 		},
 		"description": "Background color for surfaces with brand tone and normal emphasis."
 	},
-	"Color/Background/Success/bgSurface-success": {
+	"Color/Background/Success/bgSurface": {
 		"value": {
 			".": "#cbf5d1"
 		},
 		"description": "Background color for surfaces with success tone and normal emphasis."
 	},
-	"Color/Background/Success/bgSurface-success-weak": {
+	"Color/Background/Success/bgSurface-weak": {
 		"value": {
 			".": "#f0fcf2"
 		},
 		"description": "Background color for surfaces with success tone and weak emphasis."
 	},
-	"Color/Background/Info/bgSurface-info": {
+	"Color/Background/Info/bgSurface": {
 		"value": {
 			".": "#dfebf8"
 		},
 		"description": "Background color for surfaces with info tone and normal emphasis."
 	},
-	"Color/Background/Info/bgSurface-info-weak": {
+	"Color/Background/Info/bgSurface-weak": {
 		"value": {
 			".": "#f5f9fd"
 		},
 		"description": "Background color for surfaces with info tone and weak emphasis."
 	},
-	"Color/Background/Warning/bgSurface-warning": {
+	"Color/Background/Warning/bgSurface": {
 		"value": {
 			".": "#f8e8cc"
 		},
 		"description": "Background color for surfaces with warning tone and normal emphasis."
 	},
-	"Color/Background/Warning/bgSurface-warning-weak": {
+	"Color/Background/Warning/bgSurface-weak": {
 		"value": {
 			".": "#fdf7ee"
 		},
 		"description": "Background color for surfaces with warning tone and weak emphasis."
 	},
-	"Color/Background/Caution/bgSurface-caution": {
+	"Color/Background/Caution/bgSurface": {
 		"value": {
 			".": "#f7eab3"
 		},
 		"description": "Background color for surfaces with caution tone and normal emphasis."
 	},
-	"Color/Background/Caution/bgSurface-caution-weak": {
+	"Color/Background/Caution/bgSurface-weak": {
 		"value": {
 			".": "#fdf9e7"
 		},
 		"description": "Background color for surfaces with caution tone and weak emphasis."
 	},
-	"Color/Background/Error/bgSurface-error": {
+	"Color/Background/Error/bgSurface": {
 		"value": {
 			".": "#fae4e1"
 		},
 		"description": "Background color for surfaces with error tone and normal emphasis."
 	},
-	"Color/Background/Error/bgSurface-error-weak": {
+	"Color/Background/Error/bgSurface-weak": {
 		"value": {
 			".": "#fdf6f5"
 		},
 		"description": "Background color for surfaces with error tone and weak emphasis."
 	},
-	"Color/Background/Neutral/bgInteractive-neutral": {
+	"Color/Background/Neutral/bgInteractive": {
 		"value": {
 			".": "#0000"
 		},
 		"description": "Background color for interactive elements with neutral tone and normal emphasis."
 	},
-	"Color/Background/Neutral/bgInteractive-neutral-active": {
+	"Color/Background/Neutral/bgInteractive-active": {
 		"value": {
 			".": "#eaeaea"
 		},
 		"description": "Background color for interactive elements with neutral tone and normal emphasis that are hovered, focused, or active."
 	},
-	"Color/Background/Neutral/bgInteractive-neutral-disabled": {
+	"Color/Background/Neutral/bgInteractive-disabled": {
 		"value": {
 			".": "#e2e2e2"
 		},
 		"description": "Background color for interactive elements with neutral tone and normal emphasis, in their disabled state."
 	},
-	"Color/Background/Neutral/bgInteractive-neutral-strong": {
+	"Color/Background/Neutral/bgInteractive-strong": {
 		"value": {
 			".": "#2d2d2d"
 		},
 		"description": "Background color for interactive elements with neutral tone and strong emphasis."
 	},
-	"Color/Background/Neutral/bgInteractive-neutral-strong-active": {
+	"Color/Background/Neutral/bgInteractive-strong-active": {
 		"value": {
 			".": "#1e1e1e"
 		},
 		"description": "Background color for interactive elements with neutral tone and strong emphasis that are hovered, focused, or active."
 	},
-	"Color/Background/Neutral/bgInteractive-neutral-strong-disabled": {
+	"Color/Background/Neutral/bgInteractive-strong-disabled": {
 		"value": {
 			".": "#d2d2d2"
 		},
 		"description": "Background color for interactive elements with neutral tone and strong emphasis, in their disabled state."
 	},
-	"Color/Background/Neutral/bgInteractive-neutral-weak": {
+	"Color/Background/Neutral/bgInteractive-weak": {
 		"value": {
 			".": "#0000"
 		},
 		"description": "Background color for interactive elements with neutral tone and weak emphasis."
 	},
-	"Color/Background/Neutral/bgInteractive-neutral-weak-active": {
+	"Color/Background/Neutral/bgInteractive-weak-active": {
 		"value": {
 			".": "#eaeaea"
 		},
 		"description": "Background color for interactive elements with neutral tone and weak emphasis that are hovered, focused, or active."
 	},
-	"Color/Background/Neutral/bgInteractive-neutral-weak-disabled": {
+	"Color/Background/Neutral/bgInteractive-weak-disabled": {
 		"value": {
 			".": "#e2e2e2"
 		},
 		"description": "Background color for interactive elements with neutral tone and weak emphasis, in their disabled state."
 	},
-	"Color/Background/Brand/bgInteractive-brand": {
+	"Color/Background/Brand/bgInteractive": {
 		"value": {
 			".": "#0000"
 		},
 		"description": "Background color for interactive elements with brand tone and normal emphasis."
 	},
-	"Color/Background/Brand/bgInteractive-brand-active": {
+	"Color/Background/Brand/bgInteractive-active": {
 		"value": {
 			".": "#f6f8fc"
 		},
 		"description": "Background color for interactive elements with brand tone and normal emphasis that are hovered, focused, or active."
 	},
-	"Color/Background/Brand/bgInteractive-brand-disabled": {
+	"Color/Background/Brand/bgInteractive-disabled": {
 		"value": {
 			".": "#e2e2e2"
 		},
 		"description": "Background color for interactive elements with brand tone and normal emphasis, in their disabled state."
 	},
-	"Color/Background/Brand/bgInteractive-brand-strong": {
+	"Color/Background/Brand/bgInteractive-strong": {
 		"value": {
 			".": "#3858e9"
 		},
 		"description": "Background color for interactive elements with brand tone and strong emphasis."
 	},
-	"Color/Background/Brand/bgInteractive-brand-strong-active": {
+	"Color/Background/Brand/bgInteractive-strong-active": {
 		"value": {
 			".": "#2e49d9"
 		},
 		"description": "Background color for interactive elements with brand tone and strong emphasis that are hovered, focused, or active."
 	},
-	"Color/Background/Brand/bgInteractive-brand-strong-disabled": {
+	"Color/Background/Brand/bgInteractive-strong-disabled": {
 		"value": {
 			".": "#d2d2d2"
 		},
 		"description": "Background color for interactive elements with brand tone and strong emphasis, in their disabled state."
 	},
-	"Color/Background/Brand/bgInteractive-brand-weak": {
+	"Color/Background/Brand/bgInteractive-weak": {
 		"value": {
 			".": "#0000"
 		},
 		"description": "Background color for interactive elements with brand tone and weak emphasis."
 	},
-	"Color/Background/Brand/bgInteractive-brand-weak-active": {
+	"Color/Background/Brand/bgInteractive-weak-active": {
 		"value": {
 			".": "#e4eaf7"
 		},
 		"description": "Background color for interactive elements with brand tone and weak emphasis that are hovered, focused, or active."
 	},
-	"Color/Background/Brand/bgInteractive-brand-weak-disabled": {
+	"Color/Background/Brand/bgInteractive-weak-disabled": {
 		"value": {
 			".": "#e2e2e2"
 		},
 		"description": "Background color for interactive elements with brand tone and weak emphasis, in their disabled state."
 	},
-	"Color/Background/Neutral/bgTrack-neutral-weak": {
+	"Color/Background/Neutral/bgTrack-weak": {
 		"value": {
 			".": "#e0e0e0"
 		},
 		"description": "Background color for tracks with a neutral tone and weak emphasis (eg. scrollbar track)."
 	},
-	"Color/Background/Neutral/bgTrack-neutral": {
+	"Color/Background/Neutral/bgTrack": {
 		"value": {
 			".": "#d8d8d8"
 		},
 		"description": "Background color for tracks with a neutral tone and normal emphasis (eg. slider or progressbar track)."
 	},
-	"Color/Background/Neutral/bgThumb-neutral-weak": {
+	"Color/Background/Neutral/bgThumb-weak": {
 		"value": {
 			".": "#8a8a8a"
 		},
 		"description": "Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb)."
 	},
-	"Color/Background/Neutral/bgThumb-neutral-weak-active": {
+	"Color/Background/Neutral/bgThumb-weak-active": {
 		"value": {
 			".": "#6c6c6c"
 		},
 		"description": "Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb) that are hovered, focused, or active."
 	},
-	"Color/Background/Brand/bgThumb-brand": {
+	"Color/Background/Brand/bgThumb": {
 		"value": {
 			".": "#3858e9"
 		},
 		"description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track)."
 	},
-	"Color/Background/Brand/bgThumb-brand-active": {
+	"Color/Background/Brand/bgThumb-active": {
 		"value": {
 			".": "#3858e9"
 		},
 		"description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track) that are hovered, focused, or active."
 	},
-	"Color/Background/Brand/bgThumb-brand-disabled": {
+	"Color/Background/Brand/bgThumb-disabled": {
 		"value": {
 			".": "#d8d8d8"
 		},
 		"description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track), in their disabled state."
 	},
-	"Color/Foreground/Neutral/fgContent-neutral": {
+	"Color/Foreground/Neutral/fgContent": {
 		"value": {
 			".": "#1e1e1e"
 		},
 		"description": "Foreground color for content like text with normal emphasis."
 	},
-	"Color/Foreground/Neutral/fgContent-neutral-weak": {
+	"Color/Foreground/Neutral/fgContent-weak": {
 		"value": {
 			".": "#6d6d6d"
 		},
 		"description": "Foreground color for content like text with weak emphasis."
 	},
-	"Color/Foreground/Success/fgContent-success": {
+	"Color/Foreground/Success/fgContent": {
 		"value": {
 			".": "#002900"
 		},
 		"description": "Foreground color for content like text with success tone and normal emphasis."
 	},
-	"Color/Foreground/Success/fgContent-success-weak": {
+	"Color/Foreground/Success/fgContent-weak": {
 		"value": {
 			".": "#007f30"
 		},
 		"description": "Foreground color for content like text with success tone and weak emphasis."
 	},
-	"Color/Foreground/Info/fgContent-info": {
+	"Color/Foreground/Info/fgContent": {
 		"value": {
 			".": "#001b4f"
 		},
 		"description": "Foreground color for content like text with info tone and normal emphasis."
 	},
-	"Color/Foreground/Info/fgContent-info-weak": {
+	"Color/Foreground/Info/fgContent-weak": {
 		"value": {
 			".": "#006bd7"
 		},
 		"description": "Foreground color for content like text with info tone and weak emphasis."
 	},
-	"Color/Foreground/Warning/fgContent-warning": {
+	"Color/Foreground/Warning/fgContent": {
 		"value": {
 			".": "#2e1900"
 		},
 		"description": "Foreground color for content like text with warning tone and normal emphasis."
 	},
-	"Color/Foreground/Warning/fgContent-warning-weak": {
+	"Color/Foreground/Warning/fgContent-weak": {
 		"value": {
 			".": "#936400"
 		},
 		"description": "Foreground color for content like text with warning tone and weak emphasis."
 	},
-	"Color/Foreground/Caution/fgContent-caution": {
+	"Color/Foreground/Caution/fgContent": {
 		"value": {
 			".": "#281d00"
 		},
 		"description": "Foreground color for content like text with caution tone and normal emphasis."
 	},
-	"Color/Foreground/Caution/fgContent-caution-weak": {
+	"Color/Foreground/Caution/fgContent-weak": {
 		"value": {
 			".": "#836b00"
 		},
 		"description": "Foreground color for content like text with caution tone and weak emphasis."
 	},
-	"Color/Foreground/Error/fgContent-error": {
+	"Color/Foreground/Error/fgContent": {
 		"value": {
 			".": "#470000"
 		},
 		"description": "Foreground color for content like text with error tone and normal emphasis."
 	},
-	"Color/Foreground/Error/fgContent-error-weak": {
+	"Color/Foreground/Error/fgContent-weak": {
 		"value": {
 			".": "#cc1818"
 		},
 		"description": "Foreground color for content like text with error tone and weak emphasis."
 	},
-	"Color/Foreground/Neutral/fgInteractive-neutral": {
+	"Color/Foreground/Neutral/fgInteractive": {
 		"value": {
 			".": "#1e1e1e"
 		},
 		"description": "Foreground color for interactive elements with neutral tone and normal emphasis."
 	},
-	"Color/Foreground/Neutral/fgInteractive-neutral-active": {
+	"Color/Foreground/Neutral/fgInteractive-active": {
 		"value": {
 			".": "#1e1e1e"
 		},
 		"description": "Foreground color for interactive elements with neutral tone and normal emphasis that are hovered, focused, or active."
 	},
-	"Color/Foreground/Neutral/fgInteractive-neutral-disabled": {
+	"Color/Foreground/Neutral/fgInteractive-disabled": {
 		"value": {
 			".": "#8a8a8a"
 		},
 		"description": "Foreground color for interactive elements with neutral tone and normal emphasis, in their disabled state."
 	},
-	"Color/Foreground/Neutral/fgInteractive-neutral-strong": {
+	"Color/Foreground/Neutral/fgInteractive-strong": {
 		"value": {
 			".": "#f0f0f0"
 		},
 		"description": "Foreground color for interactive elements with neutral tone and strong emphasis."
 	},
-	"Color/Foreground/Neutral/fgInteractive-neutral-strong-active": {
+	"Color/Foreground/Neutral/fgInteractive-strong-active": {
 		"value": {
 			".": "#f0f0f0"
 		},
 		"description": "Foreground color for interactive elements with neutral tone and strong emphasis that are hovered, focused, or active."
 	},
-	"Color/Foreground/Neutral/fgInteractive-neutral-strong-disabled": {
+	"Color/Foreground/Neutral/fgInteractive-strong-disabled": {
 		"value": {
 			".": "#6d6d6d"
 		},
 		"description": "Foreground color for interactive elements with neutral tone and strong emphasis, in their disabled state."
 	},
-	"Color/Foreground/Neutral/fgInteractive-neutral-weak": {
+	"Color/Foreground/Neutral/fgInteractive-weak": {
 		"value": {
 			".": "#6d6d6d"
 		},
 		"description": "Foreground color for interactive elements with neutral tone and weak emphasis."
 	},
-	"Color/Foreground/Neutral/fgInteractive-neutral-weak-disabled": {
+	"Color/Foreground/Neutral/fgInteractive-weak-disabled": {
 		"value": {
 			".": "#8a8a8a"
 		},
 		"description": "Foreground color for interactive elements with neutral tone and weak emphasis, in their disabled state."
 	},
-	"Color/Foreground/Brand/fgInteractive-brand": {
+	"Color/Foreground/Brand/fgInteractive": {
 		"value": {
 			".": "#3858e9"
 		},
 		"description": "Foreground color for interactive elements with brand tone and normal emphasis."
 	},
-	"Color/Foreground/Brand/fgInteractive-brand-active": {
+	"Color/Foreground/Brand/fgInteractive-active": {
 		"value": {
 			".": "#3858e9"
 		},
 		"description": "Foreground color for interactive elements with brand tone and normal emphasis that are hovered, focused, or active."
 	},
-	"Color/Foreground/Brand/fgInteractive-brand-disabled": {
+	"Color/Foreground/Brand/fgInteractive-disabled": {
 		"value": {
 			".": "#8a8a8a"
 		},
 		"description": "Foreground color for interactive elements with brand tone and normal emphasis, in their disabled state."
 	},
-	"Color/Foreground/Brand/fgInteractive-brand-strong": {
+	"Color/Foreground/Brand/fgInteractive-strong": {
 		"value": {
 			".": "#eff0f2"
 		},
 		"description": "Foreground color for interactive elements with brand tone and strong emphasis."
 	},
-	"Color/Foreground/Brand/fgInteractive-brand-strong-active": {
+	"Color/Foreground/Brand/fgInteractive-strong-active": {
 		"value": {
 			".": "#eff0f2"
 		},
 		"description": "Foreground color for interactive elements with brand tone and strong emphasis that are hovered, focused, or active."
 	},
-	"Color/Foreground/Brand/fgInteractive-brand-strong-disabled": {
+	"Color/Foreground/Brand/fgInteractive-strong-disabled": {
 		"value": {
 			".": "#6d6d6d"
 		},
 		"description": "Foreground color for interactive elements with brand tone and strong emphasis, in their disabled state."
 	},
-	"Color/Stroke/Neutral/strokeSurface-neutral": {
+	"Color/Stroke/Neutral/strokeSurface": {
 		"value": {
 			".": "#d8d8d8"
 		},
 		"description": "Decorative stroke color used to define neutrally-toned surface boundaries with normal emphasis."
 	},
-	"Color/Stroke/Neutral/strokeSurface-neutral-weak": {
+	"Color/Stroke/Neutral/strokeSurface-weak": {
 		"value": {
 			".": "#e0e0e0"
 		},
 		"description": "Decorative stroke color used to define neutrally-toned surface boundaries with weak emphasis."
 	},
-	"Color/Stroke/Neutral/strokeSurface-neutral-strong": {
+	"Color/Stroke/Neutral/strokeSurface-strong": {
 		"value": {
 			".": "#8a8a8a"
 		},
 		"description": "Decorative stroke color used to define neutrally-toned surface boundaries with strong emphasis."
 	},
-	"Color/Stroke/Brand/strokeSurface-brand": {
+	"Color/Stroke/Brand/strokeSurface": {
 		"value": {
 			".": "#a2b1d6"
 		},
 		"description": "Decorative stroke color used to define brand-toned surface boundaries with normal emphasis."
 	},
-	"Color/Stroke/Brand/strokeSurface-brand-strong": {
+	"Color/Stroke/Brand/strokeSurface-strong": {
 		"value": {
 			".": "#3858e9"
 		},
 		"description": "Decorative stroke color used to define neutrally-toned surface boundaries with strong emphasis."
 	},
-	"Color/Stroke/Success/strokeSurface-success": {
+	"Color/Stroke/Success/strokeSurface": {
 		"value": {
 			".": "#82c98f"
 		},
 		"description": "Decorative stroke color used to define success-toned surface boundaries with normal emphasis."
 	},
-	"Color/Stroke/Success/strokeSurface-success-strong": {
+	"Color/Stroke/Success/strokeSurface-strong": {
 		"value": {
 			".": "#007f30"
 		},
 		"description": "Decorative stroke color used to define success-toned surface boundaries with strong emphasis."
 	},
-	"Color/Stroke/Info/strokeSurface-info": {
+	"Color/Stroke/Info/strokeSurface": {
 		"value": {
 			".": "#9fbcdd"
 		},
 		"description": "Decorative stroke color used to define info-toned surface boundaries with normal emphasis."
 	},
-	"Color/Stroke/Info/strokeSurface-info-strong": {
+	"Color/Stroke/Info/strokeSurface-strong": {
 		"value": {
 			".": "#006bd7"
 		},
 		"description": "Decorative stroke color used to define info-toned surface boundaries with strong emphasis."
 	},
-	"Color/Stroke/Warning/strokeSurface-warning": {
+	"Color/Stroke/Warning/strokeSurface": {
 		"value": {
 			".": "#d2b581"
 		},
 		"description": "Decorative stroke color used to define warning-toned surface boundaries with normal emphasis."
 	},
-	"Color/Stroke/Warning/strokeSurface-warning-strong": {
+	"Color/Stroke/Warning/strokeSurface-strong": {
 		"value": {
 			".": "#936400"
 		},
 		"description": "Decorative stroke color used to define warning-toned surface boundaries with strong emphasis."
 	},
-	"Color/Stroke/Error/strokeSurface-error": {
+	"Color/Stroke/Error/strokeSurface": {
 		"value": {
 			".": "#e1a198"
 		},
 		"description": "Decorative stroke color used to define error-toned surface boundaries with normal emphasis."
 	},
-	"Color/Stroke/Error/strokeSurface-error-strong": {
+	"Color/Stroke/Error/strokeSurface-strong": {
 		"value": {
 			".": "#cc1818"
 		},
 		"description": "Decorative stroke color used to define error-toned surface boundaries with strong emphasis."
 	},
-	"Color/Stroke/Neutral/strokeInteractive-neutral": {
+	"Color/Stroke/Neutral/strokeInteractive": {
 		"value": {
 			".": "#8a8a8a"
 		},
 		"description": "Accessible stroke color used for interactive neutrally-toned elements with normal emphasis."
 	},
-	"Color/Stroke/Neutral/strokeInteractive-neutral-active": {
+	"Color/Stroke/Neutral/strokeInteractive-active": {
 		"value": {
 			".": "#6c6c6c"
 		},
 		"description": "Accessible stroke color used for interactive neutrally-toned elements with normal emphasis that are hovered, focused, or active."
 	},
-	"Color/Stroke/Neutral/strokeInteractive-neutral-disabled": {
+	"Color/Stroke/Neutral/strokeInteractive-disabled": {
 		"value": {
 			".": "#d8d8d8"
 		},
 		"description": "Accessible stroke color used for interactive neutrally-toned elements with normal emphasis, in their disabled state."
 	},
-	"Color/Stroke/Neutral/strokeInteractive-neutral-strong": {
+	"Color/Stroke/Neutral/strokeInteractive-strong": {
 		"value": {
 			".": "#6c6c6c"
 		},
 		"description": "Accessible stroke color used for interactive neutrally-toned elements with strong emphasis."
 	},
-	"Color/Stroke/Brand/strokeInteractive-brand": {
+	"Color/Stroke/Brand/strokeInteractive": {
 		"value": {
 			".": "#3858e9"
 		},
 		"description": "Accessible stroke color used for interactive brand-toned elements with normal emphasis."
 	},
-	"Color/Stroke/Brand/strokeInteractive-brand-active": {
+	"Color/Stroke/Brand/strokeInteractive-active": {
 		"value": {
 			".": "#2337c8"
 		},
 		"description": "Accessible stroke color used for interactive brand-toned elements with normal emphasis that are hovered, focused, or active."
 	},
-	"Color/Stroke/Brand/strokeInteractive-brand-disabled": {
+	"Color/Stroke/Brand/strokeInteractive-disabled": {
 		"value": {
 			".": "#d8d8d8"
 		},
 		"description": "Accessible stroke color used for interactive brand-toned elements with normal emphasis, in their disabled state."
 	},
-	"Color/Stroke/Error/strokeInteractive-error-strong": {
+	"Color/Stroke/Error/strokeInteractive-strong": {
 		"value": {
 			".": "#cc1818"
 		},
 		"description": "Accessible stroke color used for interactive error-toned elements with strong emphasis."
 	},
-	"Color/Stroke/Brand/strokeFocus-brand": {
+	"Color/Stroke/Brand/strokeFocus": {
 		"value": {
 			".": "#3858e9"
 		},
