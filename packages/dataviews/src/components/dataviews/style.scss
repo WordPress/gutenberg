@@ -15,13 +15,6 @@
 	font-size: $default-font-size;
 	line-height: $default-line-height;
 	background-color: inherit;
-	--dataviews-padding-inline-start: #{$grid-unit-60};
-	--dataviews-padding-inline-end: #{$grid-unit-60};
-
-	@container (max-width: 430px) {
-		--dataviews-padding-inline-start: #{$grid-unit-30};
-		--dataviews-padding-inline-end: #{$grid-unit-30};
-	}
 }
 
 .dataviews__view-actions,
@@ -29,8 +22,8 @@
 	box-sizing: border-box;
 	padding-block-start: var(--dataviews-padding-block-start, #{$grid-unit-20});
 	padding-block-end: $grid-unit-20;
-	padding-inline-start: var(--dataviews-padding-inline-start);
-	padding-inline-end: var(--dataviews-padding-inline-end);
+	padding-inline-start: var(--dataviews-padding-inline-start, #{$grid-unit-60});
+	padding-inline-end: var(--dataviews-padding-inline-end, #{$grid-unit-60});
 	flex-shrink: 0;
 	position: sticky;
 	left: 0;
@@ -44,8 +37,8 @@
 .dataviews-no-results,
 .dataviews-loading {
 	padding-block: 0;
-	padding-inline-start: var(--dataviews-padding-inline-start);
-	padding-inline-end: var(--dataviews-padding-inline-end);
+	padding-inline-start: var(--dataviews-padding-inline-start, #{$grid-unit-60});
+	padding-inline-end: var(--dataviews-padding-inline-end, #{$grid-unit-60});
 	flex-grow: 1;
 	display: flex;
 	align-items: center;
@@ -65,15 +58,15 @@
 	.dataviews-filters__container {
 		padding-block-start: var(--dataviews-padding-block-start, #{$grid-unit-15});
 		padding-block-end: $grid-unit-15;
-		padding-inline-start: var(--dataviews-padding-inline-start);
-		padding-inline-end: var(--dataviews-padding-inline-end);
+		padding-inline-start: var(--dataviews-padding-inline-start, #{$grid-unit-30});
+		padding-inline-end: var(--dataviews-padding-inline-end, #{$grid-unit-30});
 	}
 
 	.dataviews-no-results,
 	.dataviews-loading {
 		padding-block: 0;
-		padding-inline-start: var(--dataviews-padding-inline-start);
-		padding-inline-end: var(--dataviews-padding-inline-end);
+		padding-inline-start: var(--dataviews-padding-inline-start, #{$grid-unit-30});
+		padding-inline-end: var(--dataviews-padding-inline-end, #{$grid-unit-30});
 	}
 }
 

@@ -9,8 +9,8 @@
 	background-color: inherit;
 	padding-block-start: $grid-unit-15;
 	padding-block-end: var(--dataviews-padding-block-end, #{$grid-unit-15});
-	padding-inline-start: var(--dataviews-padding-inline-start);
-	padding-inline-end: var(--dataviews-padding-inline-end);
+	padding-inline-start: var(--dataviews-padding-inline-start, #{$grid-unit-60});
+	padding-inline-end: var(--dataviews-padding-inline-end, #{$grid-unit-60});
 	border-top: $border-width solid $gray-100;
 	flex-shrink: 0;
 
@@ -25,8 +25,8 @@
 	.dataviews-footer {
 		padding-block-start: $grid-unit-15;
 		padding-block-end: var(--dataviews-padding-block-end, #{$grid-unit-15});
-		padding-inline-start: var(--dataviews-padding-inline-start);
-		padding-inline-end: var(--dataviews-padding-inline-end);
+		padding-inline-start: var(--dataviews-padding-inline-start, #{$grid-unit-30});
+		padding-inline-end: var(--dataviews-padding-inline-end, #{$grid-unit-30});
 	}
 }
 
