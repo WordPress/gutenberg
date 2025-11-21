@@ -56,7 +56,7 @@ describe( 'DateTimePicker', () => {
 			screen.getByRole( 'button', {
 				name: 'November 15, 2025. Selected',
 			} )
-		).toBeInTheDocument();
+		).toBeVisible();
 
 		onChange.mockImplementation( ( newDate ) => {
 			rerender(
@@ -73,7 +73,7 @@ describe( 'DateTimePicker', () => {
 			screen.getByRole( 'button', {
 				name: 'November 20, 2025. Selected',
 			} )
-		).toBeInTheDocument();
+		).toBeVisible();
 	} );
 
 	describe( 'timezone differences between browser and site', () => {
@@ -154,7 +154,7 @@ describe( 'DateTimePicker', () => {
 							screen.getByRole( 'button', {
 								name: initialButton,
 							} )
-						).toBeInTheDocument();
+						).toBeVisible();
 
 						onChange.mockImplementation( ( newDate ) => {
 							rerender(
@@ -177,7 +177,7 @@ describe( 'DateTimePicker', () => {
 							screen.getByRole( 'button', {
 								name: selectedButton,
 							} )
-						).toBeInTheDocument();
+						).toBeVisible();
 					} );
 				}
 			);
