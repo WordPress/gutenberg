@@ -60,6 +60,8 @@ const LinkControlSearchInput = forwardRef(
 			: noopSearchHandler;
 
 		const [ focusedSuggestion, setFocusedSuggestion ] = useState();
+		// Validation state for testing
+		const [ customValidity, setCustomValidity ] = useState( undefined );
 
 		/**
 		 * Handles the user moving between different suggestions. Does not handle
@@ -71,6 +73,36 @@ const LinkControlSearchInput = forwardRef(
 		const onInputChange = ( selection, suggestion ) => {
 			onChange( selection );
 			setFocusedSuggestion( suggestion );
+		};
+
+		/**
+		 * Validation handler for URL input.
+		 * Validates that manually entered URLs start with http:// or https://
+		 * Only validates when there's a value and no suggestion is selected.
+		 *
+		 * @param {string} urlValue The current URL value to validate.
+		 */
+		const handleValidate = ( urlValue ) => {
+			// Don't validate empty values or when a suggestion is selected
+			if ( ! urlValue || focusedSuggestion ) {
+				setCustomValidity( undefined );
+				return;
+			}
+
+			// Validate that URLs start with http:// or https://
+			const trimmedValue = urlValue.trim();
+			if (
+				trimmedValue &&
+				! trimmedValue.startsWith( 'http://' ) &&
+				! trimmedValue.startsWith( 'https://' )
+			) {
+				setCustomValidity( {
+					type: 'invalid',
+					message: __( 'URL must start with http:// or https://' ),
+				} );
+			} else {
+				setCustomValidity( undefined );
+			}
 		};
 
 		const handleRenderSuggestions = ( props ) =>
@@ -88,6 +120,9 @@ const LinkControlSearchInput = forwardRef(
 			} );
 
 		const onSuggestionSelected = async ( selectedSuggestion ) => {
+			// Clear validation when a suggestion is selected
+			setCustomValidity( undefined );
+
 			let suggestion = selectedSuggestion;
 			if ( CREATE_TYPE === selectedSuggestion.type ) {
 				// Create a new page and call onSelect with the output from the onCreateSuggestion callback.
@@ -146,6 +181,8 @@ const LinkControlSearchInput = forwardRef(
 					__experimentalShowInitialSuggestions={
 						showInitialSuggestions
 					}
+					onValidate={ handleValidate }
+					customValidity={ customValidity }
 					onSubmit={ ( suggestion, event ) => {
 						const hasSuggestion = suggestion || focusedSuggestion;
 

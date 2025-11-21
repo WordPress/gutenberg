@@ -16,6 +16,7 @@ import {
 	Spinner,
 	withSpokenMessages,
 	Popover,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import {
 	compose,
@@ -30,6 +31,9 @@ import { isURL } from '@wordpress/url';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { ValidatedInputControl } = unlock( componentsPrivateApis );
 
 /**
  * Whether the argument is a function.
@@ -57,6 +61,8 @@ class URLInput extends Component {
 			this.updateSuggestions.bind( this ),
 			200
 		);
+		// Track current value for validation
+		this.valueRef = { current: props.value || '' };
 
 		this.suggestionNodes = [];
 
@@ -76,6 +82,11 @@ class URLInput extends Component {
 		const { showSuggestions, selectedSuggestion } = this.state;
 		const { value, __experimentalShowInitialSuggestions = false } =
 			this.props;
+
+		// Sync valueRef when props.value changes
+		if ( prevProps.value !== value ) {
+			this.valueRef.current = value || '';
+		}
 
 		// Only have to worry about scrolling selected suggestion into view
 		// when already expanded.
@@ -236,6 +247,8 @@ class URLInput extends Component {
 	}
 
 	onChange( newValue ) {
+		// Track current value for validation
+		this.valueRef.current = newValue || '';
 		this.props.onChange( newValue );
 	}
 
@@ -364,6 +377,8 @@ class URLInput extends Component {
 	}
 
 	selectLink( suggestion ) {
+		// Update valueRef for validation
+		this.valueRef.current = suggestion.url || '';
 		this.props.onChange( suggestion.url, suggestion );
 		this.setState( {
 			selectedSuggestion: null,
@@ -426,6 +441,8 @@ class URLInput extends Component {
 			hideLabelFromVision = false,
 			help = null,
 			disabled = false,
+			onValidate,
+			customValidity,
 		} = this.props;
 
 		const {
@@ -473,13 +490,32 @@ class URLInput extends Component {
 			help,
 		};
 
+		// Use ValidatedInputControl if validation props are provided
+		const useValidatedControl = onValidate || customValidity;
+		const validationProps = useValidatedControl
+			? {
+					onValidate: onValidate
+						? () => onValidate( this.valueRef.current )
+						: undefined,
+					customValidity,
+			  }
+			: {};
+
 		if ( renderControl ) {
 			return renderControl( controlProps, inputProps, loading );
 		}
 
+		const InputComponent = useValidatedControl
+			? ValidatedInputControl
+			: InputControl;
+
 		return (
-			<BaseControl { ...controlProps }>
-				<InputControl { ...inputProps } __next40pxDefaultSize />
+			<BaseControl __nextHasNoMarginBottom { ...controlProps }>
+				<InputComponent
+					{ ...inputProps }
+					{ ...validationProps }
+					__next40pxDefaultSize
+				/>
 				{ loading && <Spinner /> }
 			</BaseControl>
 		);
