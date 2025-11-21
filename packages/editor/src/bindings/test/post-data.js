@@ -32,12 +32,12 @@ describe( 'post-data bindings', () => {
 										link: 'https://example.com/post',
 										unknown: 'Unknown field value',
 								  }
-								: {},
+								: false,
 					};
 				};
 			} );
 
-			it( 'should return entity field values when they exist', () => {
+			it( 'should return entity field values when they exist, and field name for unknown fields', () => {
 				const values = postDataBindings.getValues( {
 					select,
 					context: { postId: 123, postType: 'post' },
@@ -54,6 +54,10 @@ describe( 'post-data bindings', () => {
 							source: 'core/post-date',
 							args: { field: 'link' },
 						},
+						content: {
+							source: 'core/post-date',
+							args: { field: 'unknown' },
+						},
 					},
 					clientId: '123abc456',
 				} );
@@ -62,10 +66,11 @@ describe( 'post-data bindings', () => {
 					datetime: '2024-03-02 00:00:00',
 					modified: '2025-06-07 00:00:00',
 					url: 'https://example.com/post',
+					content: 'unknown',
 				} );
 			} );
 
-			it( 'should fall back to field labels when entity value does not exist', () => {
+			it( 'should fall back to field labels when entity value does not exist, and to field name for unknown fields', () => {
 				const values = postDataBindings.getValues( {
 					select,
 					context: { postId: 456, postType: 'post' },
@@ -82,22 +87,6 @@ describe( 'post-data bindings', () => {
 							source: 'core/post-date',
 							args: { field: 'link' },
 						},
-					},
-					clientId: '123abc456',
-				} );
-
-				expect( values ).toStrictEqual( {
-					datetime: 'Post Date',
-					modified: 'Post Modified Date',
-					url: 'Post Link',
-				} );
-			} );
-
-			it( 'should return empty object for unknown fields', () => {
-				const values = postDataBindings.getValues( {
-					select,
-					context: { postId: 123, postType: 'post' },
-					bindings: {
 						content: {
 							source: 'core/post-date',
 							args: { field: 'unknown' },
@@ -106,7 +95,12 @@ describe( 'post-data bindings', () => {
 					clientId: '123abc456',
 				} );
 
-				expect( values.content ).toEqual( {} );
+				expect( values ).toStrictEqual( {
+					datetime: 'Post Date',
+					modified: 'Post Modified Date',
+					url: 'Post Link',
+					content: 'unknown',
+				} );
 			} );
 		} );
 
@@ -152,7 +146,7 @@ describe( 'post-data bindings', () => {
 	} );
 
 	describe( 'getFieldsList', () => {
-		it( 'should return the list of available post data fields when the Date block is selected', () => {
+		it( 'should return the list of available post data fields when the Date block is selected, and postId and postType are provided via context', () => {
 			const select = () => ( {
 				getSelectedBlock: () => ( {
 					name: 'core/post-date',
@@ -160,6 +154,7 @@ describe( 'post-data bindings', () => {
 			} );
 
 			const fields = postDataBindings.getFieldsList( {
+				context: { postId: 123, postType: 'post' },
 				select,
 			} );
 
@@ -182,6 +177,21 @@ describe( 'post-data bindings', () => {
 			] );
 		} );
 
+		it( 'should return an empty array when the Date block is selected but no postId context is provided', () => {
+			const select = () => ( {
+				getSelectedBlock: () => ( {
+					name: 'core/post-date',
+				} ),
+			} );
+
+			const fields = postDataBindings.getFieldsList( {
+				context: { postType: 'post' },
+				select,
+			} );
+
+			expect( fields ).toEqual( [] );
+		} );
+
 		it( 'should return an empty array when any other block than the Date block is selected', () => {
 			const select = () => ( {
 				getSelectedBlock: () => ( {
@@ -190,6 +200,7 @@ describe( 'post-data bindings', () => {
 			} );
 
 			const fields = postDataBindings.getFieldsList( {
+				context: { postId: 123, postType: 'post' },
 				select,
 			} );
 

@@ -37,33 +37,6 @@ export interface FilterByConfig {
 	isPrimary?: boolean;
 }
 
-export interface NormalizedFilterByConfig {
-	/**
-	 * The list of operators supported by the field.
-	 */
-	operators: Operator[];
-
-	/**
-	 * Whether it is a primary filter.
-	 *
-	 * A primary filter is always visible and is not listed in the "Add filter" component,
-	 * except for the list layout where it behaves like a secondary filter.
-	 */
-	isPrimary?: boolean;
-}
-
-interface FilterConfigForType {
-	/**
-	 * What operators are used by default.
-	 */
-	defaultOperators: Operator[];
-
-	/**
-	 * What operators are supported by the field.
-	 */
-	validOperators: Operator[];
-}
-
 export type Operator =
 	| 'is'
 	| 'isNot'
@@ -102,51 +75,6 @@ export type FieldType =
 	| 'color'
 	| 'url'
 	| 'array';
-
-/**
- * An abstract interface for Field based on the field type.
- */
-export type FieldTypeDefinition< Item > = {
-	/**
-	 * Callback used to sort the field.
-	 */
-	sort: ( a: Item, b: Item, direction: SortDirection ) => number;
-
-	/**
-	 * Callback used to validate the field.
-	 */
-	isValid: Rules< Item >;
-
-	/**
-	 * Callback used to render an edit control for the field or control name.
-	 */
-	Edit:
-		| ComponentType< DataFormControlProps< Item > >
-		| string
-		| EditConfig
-		| null;
-
-	/**
-	 * Callback used to render the field.
-	 */
-	render: ComponentType< DataViewRenderFieldProps< Item > >;
-
-	/**
-	 * The filter config for the field.
-	 */
-	filterBy: FilterConfigForType | false;
-
-	/**
-	 * Whether the field is readOnly.
-	 * If `true`, the value will be rendered using the `render` callback.
-	 */
-	readOnly?: boolean;
-
-	/**
-	 * Whether the field is sortable.
-	 */
-	enableSorting: boolean;
-};
 
 export type Rules< Item > = {
 	required?: boolean;
@@ -315,6 +243,8 @@ export type Field< Item > = {
 	format?: FormatDate;
 };
 
+export type NormalizedFormat = Required< FormatDate > | {};
+
 /**
  * Format for date fields:
  *
@@ -323,7 +253,7 @@ export type Field< Item > = {
  *
  * If not provided, defaults to WordPress date format settings.
  */
-type FormatDate = {
+export type FormatDate = {
 	date?: string;
 	weekStartsOn?: DayString;
 };
@@ -349,22 +279,18 @@ type NormalizedFieldBase< Item > = Omit< Field< Item >, 'Edit' > & {
 	isValid: Rules< Item >;
 	enableHiding: boolean;
 	enableSorting: boolean;
-	filterBy: NormalizedFilterByConfig | false;
+	filterBy: Required< FilterByConfig > | false;
 	readOnly: boolean;
+	format: {};
 };
 
-type NormalizedFieldDate< Item > = NormalizedFieldBase< Item > & {
+export type NormalizedFieldDate< Item > = NormalizedFieldBase< Item > & {
 	type: 'date';
 	format: Required< FormatDate >;
 };
 
-type NormalizedFieldGeneric< Item > = NormalizedFieldBase< Item > & {
-	type?: Exclude< FieldType, 'date' >;
-	format: {};
-};
-
 export type NormalizedField< Item > =
-	| NormalizedFieldGeneric< Item >
+	| NormalizedFieldBase< Item >
 	| NormalizedFieldDate< Item >;
 
 /**

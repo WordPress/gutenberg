@@ -13,7 +13,7 @@ import {
 	Icon,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { forwardRef, Children, Fragment } from '@wordpress/element';
+import { forwardRef, Children, Fragment, useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -27,6 +27,7 @@ import type {
 	ViewPickerTable as ViewPickerTableType,
 	Operator,
 } from '../../types';
+import DataViewsContext from '../../components/dataviews-context';
 
 const { Menu } = unlock( componentsPrivateApis );
 
@@ -71,6 +72,8 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 	let canAddFilter = false;
 	let operators: Operator[] = [];
 	const field = fields.find( ( f ) => f.id === fieldId );
+
+	const { setIsShowingFilter } = useContext( DataViewsContext );
 
 	if ( ! field ) {
 		// No combined or regular field found.
@@ -168,6 +171,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 								prefix={ <Icon icon={ funnel } /> }
 								onClick={ () => {
 									setOpenedFilter( fieldId );
+									setIsShowingFilter( true );
 									onChangeView( {
 										...view,
 										page: 1,

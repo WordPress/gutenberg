@@ -558,27 +558,43 @@
 		},
 		"description": "Base dimension unit"
 	},
-	"Dimension/Semantic/padding-surface-x-small": {
+	"Dimension/Semantic/padding-surface-2xs": {
 		"value": {
-			".": "8px"
+			".": "4px",
+			"compact": "4px",
+			"comfortable": "8px"
+		},
+		"description": "2x extra small spacing for surfaces"
+	},
+	"Dimension/Semantic/padding-surface-xs": {
+		"value": {
+			".": "8px",
+			"compact": "4px",
+			"comfortable": "12px"
 		},
 		"description": "Extra small spacing for surfaces"
 	},
-	"Dimension/Semantic/padding-surface-small": {
+	"Dimension/Semantic/padding-surface-sm": {
 		"value": {
-			".": "12px"
+			".": "16px",
+			"compact": "12px",
+			"comfortable": "20px"
 		},
 		"description": "Small spacing for surfaces"
 	},
-	"Dimension/Semantic/padding-surface-medium": {
+	"Dimension/Semantic/padding-surface-md": {
 		"value": {
-			".": "16px"
+			".": "24px",
+			"compact": "20px",
+			"comfortable": "32px"
 		},
 		"description": "Medium spacing for surfaces"
 	},
-	"Dimension/Semantic/padding-surface-large": {
+	"Dimension/Semantic/padding-surface-lg": {
 		"value": {
-			".": "24px"
+			".": "32px",
+			"compact": "24px",
+			"comfortable": "40px"
 		},
 		"description": "Large spacing for surfaces"
 	},

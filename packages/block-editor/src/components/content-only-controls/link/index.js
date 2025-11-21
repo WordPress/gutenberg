@@ -4,7 +4,6 @@
 import {
 	Button,
 	Icon,
-	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalGrid as Grid,
 	Popover,
 } from '@wordpress/components';
@@ -68,35 +67,21 @@ export function getUpdatedLinkAttributes( {
 	};
 }
 
-export default function Link( {
-	clientId,
-	control,
-	blockType,
-	attributeValues,
-	updateAttributes,
-} ) {
+export default function Link( { data, field, config = {} } ) {
 	const [ isLinkControlOpen, setIsLinkControlOpen ] = useState( false );
 	const { popoverProps } = useInspectorPopoverPlacement( {
 		isControl: true,
 	} );
-	const hrefKey = control.mapping.href;
-	const relKey = control.mapping.rel;
-	const targetKey = control.mapping.target;
-	const destinationKey = control.mapping.destination;
+	const { clientId, updateBlockAttributes, fieldDef } = config;
+	const updateAttributes = ( newValue ) => {
+		const mappedChanges = field.setValue( { item: data, value: newValue } );
+		updateBlockAttributes( clientId, mappedChanges );
+	};
 
-	const href = attributeValues[ hrefKey ];
-	const rel = attributeValues[ relKey ];
-	const target = attributeValues[ targetKey ];
-	const destination = attributeValues[ destinationKey ];
-
-	const hrefDefaultValue =
-		blockType.attributes[ href ]?.defaultValue ?? undefined;
-	const relDefaultValue =
-		blockType.attributes[ rel ]?.defaultValue ?? undefined;
-	const targetDefaultValue =
-		blockType.attributes[ target ]?.defaultValue ?? undefined;
-	const destinationDefaultValue =
-		blockType.attributes[ destination ]?.defaultValue ?? undefined;
+	const value = field.getValue( { item: data } );
+	const url = value?.url;
+	const rel = value?.rel || '';
+	const target = value?.linkTarget;
 
 	const opensInNewTab = target === NEW_TAB_TARGET;
 	const nofollow = rel === NOFOLLOW_REL;
@@ -104,25 +89,12 @@ export default function Link( {
 	// Memoize link value to avoid overriding the LinkControl's internal state.
 	// This is a temporary fix. See https://github.com/WordPress/gutenberg/issues/51256.
 	const linkValue = useMemo(
-		() => ( { url: href, opensInNewTab, nofollow } ),
-		[ href, opensInNewTab, nofollow ]
+		() => ( { url, opensInNewTab, nofollow } ),
+		[ url, opensInNewTab, nofollow ]
 	);
 
 	return (
-		<ToolsPanelItem
-			panelId={ clientId }
-			label={ control.label }
-			hasValue={ () => !! href }
-			onDeselect={ () => {
-				updateAttributes( {
-					[ hrefKey ]: hrefDefaultValue,
-					[ relKey ]: relDefaultValue,
-					[ targetKey ]: targetDefaultValue,
-					[ destinationKey ]: destinationDefaultValue,
-				} );
-			} }
-			isShownByDefault={ control.shownByDefault }
-		>
+		<>
 			<Button
 				__next40pxDefaultSize
 				className="block-editor-content-only-controls__link"
@@ -136,15 +108,15 @@ export default function Link( {
 					templateColumns="24px 1fr"
 					className="block-editor-content-only-controls__link-row"
 				>
-					{ href && (
+					{ url && (
 						<>
 							<Icon icon={ link } size={ 24 } />
 							<span className="block-editor-content-only-controls__link-title">
-								{ href }
+								{ url }
 							</span>
 						</>
 					) }
-					{ ! href && (
+					{ ! url && (
 						<>
 							<Icon
 								icon={ link }
@@ -173,23 +145,56 @@ export default function Link( {
 								...newValues,
 							} );
 
-							updateAttributes( {
-								[ hrefKey ]: updatedAttrs.url,
-								[ relKey ]: updatedAttrs.rel,
-								[ targetKey ]: updatedAttrs.linkTarget,
-							} );
+							// Build update object dynamically based on what's in the mapping
+							const updateValue = { ...value };
+
+							if ( fieldDef?.mapping ) {
+								Object.keys( fieldDef.mapping ).forEach(
+									( key ) => {
+										if ( key === 'href' || key === 'url' ) {
+											updateValue[ key ] =
+												updatedAttrs.url;
+										} else if ( key === 'rel' ) {
+											updateValue[ key ] =
+												updatedAttrs.rel;
+										} else if (
+											key === 'target' ||
+											key === 'linkTarget'
+										) {
+											updateValue[ key ] =
+												updatedAttrs.linkTarget;
+										}
+									}
+								);
+							}
+
+							updateAttributes( updateValue );
 						} }
 						onRemove={ () => {
-							updateAttributes( {
-								[ hrefKey ]: hrefDefaultValue,
-								[ relKey ]: relDefaultValue,
-								[ targetKey ]: targetDefaultValue,
-								[ destinationKey ]: destinationDefaultValue,
-							} );
+							// Remove all link-related properties based on what's in the mapping
+							const removeValue = {};
+
+							if ( fieldDef?.mapping ) {
+								Object.keys( fieldDef.mapping ).forEach(
+									( key ) => {
+										if (
+											key === 'href' ||
+											key === 'url' ||
+											key === 'rel' ||
+											key === 'target' ||
+											key === 'linkTarget'
+										) {
+											removeValue[ key ] = undefined;
+										}
+									}
+								);
+							}
+
+							updateAttributes( removeValue );
 						} }
 					/>
 				</Popover>
 			) }
-		</ToolsPanelItem>
+		</>
 	);
 }

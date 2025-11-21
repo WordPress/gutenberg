@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import normalizeFields from '../utils/normalize-fields';
+import normalizeFields from '../field-types/utils/normalize-fields';
 import type { Field } from '../types';
 
 describe( 'normalizeFields: default getValue', () => {
@@ -165,7 +165,10 @@ describe( 'normalizeFields: default getValue', () => {
 			];
 			const normalizedFields = normalizeFields( fields );
 			const result = normalizedFields[ 0 ].filterBy;
-			expect( result ).toStrictEqual( { operators: [ 'is', 'isNot' ] } );
+			expect( result ).toStrictEqual( {
+				isPrimary: false,
+				operators: [ 'is', 'isNot' ],
+			} );
 		} );
 		it( 'returns the default field type definition if undefined for untyped field (for primary filters)', () => {
 			const fields: Field< {} >[] = [
@@ -194,6 +197,7 @@ describe( 'normalizeFields: default getValue', () => {
 			const normalizedFields = normalizeFields( fields );
 			const result = normalizedFields[ 0 ].filterBy;
 			expect( result ).toStrictEqual( {
+				isPrimary: false,
 				operators: [
 					'is',
 					'isNot',
@@ -216,6 +220,7 @@ describe( 'normalizeFields: default getValue', () => {
 			const normalizedFields = normalizeFields( fields );
 			const result = normalizedFields[ 0 ].filterBy;
 			expect( result ).toStrictEqual( {
+				isPrimary: false,
 				operators: [
 					'is',
 					'isNot',

@@ -68,12 +68,10 @@ export const settings = {
 if ( window.__experimentalContentOnlyPatternInsertion ) {
 	settings[ fieldsKey ] = [
 		{
+			id: 'summary',
 			label: __( 'Summary' ),
-			type: 'RichText',
+			type: 'richtext',
 			shownByDefault: true,
-			mapping: {
-				value: 'summary',
-			},
 		},
 	];
 }

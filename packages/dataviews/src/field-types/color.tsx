@@ -13,9 +13,11 @@ import { __ } from '@wordpress/i18n';
  */
 import type {
 	DataViewRenderFieldProps,
-	SortDirection,
+	Field,
 	NormalizedField,
-	FieldTypeDefinition,
+	Operator,
+	Rules,
+	SortDirection,
 } from '../types';
 import RenderFromElements from './utils/render-from-elements';
 import {
@@ -24,41 +26,79 @@ import {
 	OPERATOR_IS_NONE,
 	OPERATOR_IS_NOT,
 } from '../constants';
+import { getControl } from '../dataform-controls';
+import hasElements from './utils/has-elements';
+import getValueFromId from './utils/get-value-from-id';
+import setValueFromId from './utils/set-value-from-id';
+import getFilterBy from './utils/get-filter-by';
 
-function sort( valueA: any, valueB: any, direction: SortDirection ) {
-	// Convert colors to HSL for better sorting
-	const colorA = colord( valueA );
-	const colorB = colord( valueB );
-
-	if ( ! colorA.isValid() && ! colorB.isValid() ) {
-		return 0;
-	}
-	if ( ! colorA.isValid() ) {
-		return direction === 'asc' ? 1 : -1;
-	}
-	if ( ! colorB.isValid() ) {
-		return direction === 'asc' ? -1 : 1;
+function render( { item, field }: DataViewRenderFieldProps< any > ) {
+	if ( field.hasElements ) {
+		return <RenderFromElements item={ item } field={ field } />;
 	}
 
-	// Sort by hue, then saturation, then lightness
-	const hslA = colorA.toHsl();
-	const hslB = colorB.toHsl();
+	const value = field.getValue( { item } );
 
-	if ( hslA.h !== hslB.h ) {
-		return direction === 'asc' ? hslA.h - hslB.h : hslB.h - hslA.h;
+	if ( ! value || ! colord( value ).isValid() ) {
+		return value;
 	}
-	if ( hslA.s !== hslB.s ) {
-		return direction === 'asc' ? hslA.s - hslB.s : hslB.s - hslA.s;
-	}
-	return direction === 'asc' ? hslA.l - hslB.l : hslB.l - hslA.l;
+
+	// Render color with visual preview
+	return (
+		<div style={ { display: 'flex', alignItems: 'center', gap: '8px' } }>
+			<div
+				style={ {
+					width: '16px',
+					height: '16px',
+					borderRadius: '50%',
+					backgroundColor: value,
+					border: '1px solid #ddd',
+					flexShrink: 0,
+				} }
+			/>
+			<span>{ value }</span>
+		</div>
+	);
 }
 
-export default {
-	sort,
-	isValid: {
+export default function normalizeField< Item >(
+	field: Field< Item >
+): NormalizedField< Item > {
+	const getValue = field.getValue || getValueFromId( field.id );
+	const setValue = field.setValue || setValueFromId( field.id );
+
+	const sort = ( valueA: any, valueB: any, direction: SortDirection ) => {
+		// Convert colors to HSL for better sorting
+		const colorA = colord( valueA );
+		const colorB = colord( valueB );
+
+		if ( ! colorA.isValid() && ! colorB.isValid() ) {
+			return 0;
+		}
+		if ( ! colorA.isValid() ) {
+			return direction === 'asc' ? 1 : -1;
+		}
+		if ( ! colorB.isValid() ) {
+			return direction === 'asc' ? -1 : 1;
+		}
+
+		// Sort by hue, then saturation, then lightness
+		const hslA = colorA.toHsl();
+		const hslB = colorB.toHsl();
+
+		if ( hslA.h !== hslB.h ) {
+			return direction === 'asc' ? hslA.h - hslB.h : hslB.h - hslA.h;
+		}
+		if ( hslA.s !== hslB.s ) {
+			return direction === 'asc' ? hslA.s - hslB.s : hslB.s - hslA.s;
+		}
+		return direction === 'asc' ? hslA.l - hslB.l : hslB.l - hslA.l;
+	};
+
+	const isValid: Rules< Item > = {
 		elements: true,
-		custom: ( item: any, field: NormalizedField< any > ) => {
-			const value = field.getValue( { item } );
+		custom: ( item: any, normalizedField ) => {
+			const value = normalizedField.getValue( { item } );
 
 			if (
 				! [ undefined, '', null ].includes( value ) &&
@@ -69,41 +109,42 @@ export default {
 
 			return null;
 		},
-	},
-	Edit: 'color',
-	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
-		if ( field.hasElements ) {
-			return <RenderFromElements item={ item } field={ field } />;
-		}
+	};
 
-		const value = field.getValue( { item } );
+	const defaultOperators: Operator[] = [ OPERATOR_IS_ANY, OPERATOR_IS_NONE ];
 
-		if ( ! value || ! colord( value ).isValid() ) {
-			return value;
-		}
+	const validOperators: Operator[] = [
+		OPERATOR_IS,
+		OPERATOR_IS_NOT,
+		OPERATOR_IS_ANY,
+		OPERATOR_IS_NONE,
+	];
 
-		// Render color with visual preview
-		return (
-			<div
-				style={ { display: 'flex', alignItems: 'center', gap: '8px' } }
-			>
-				<div
-					style={ {
-						width: '16px',
-						height: '16px',
-						borderRadius: '50%',
-						backgroundColor: value,
-						border: '1px solid #ddd',
-						flexShrink: 0,
-					} }
-				/>
-				<span>{ value }</span>
-			</div>
-		);
-	},
-	enableSorting: true,
-	filterBy: {
-		defaultOperators: [ OPERATOR_IS_ANY, OPERATOR_IS_NONE ],
-		validOperators: [ OPERATOR_IS, OPERATOR_IS_NOT ],
-	},
-} satisfies FieldTypeDefinition< any >;
+	return {
+		id: field.id,
+		type: 'color',
+		label: field.label || field.id,
+		header: field.header || field.label || field.id,
+		description: field.description,
+		placeholder: field.placeholder,
+		getValue,
+		setValue,
+		elements: field.elements,
+		getElements: field.getElements,
+		hasElements: hasElements( field ),
+		render: field.render ?? render,
+		Edit: getControl( field, 'color' ),
+		sort: field.sort ?? sort,
+		isValid: {
+			...isValid,
+			...field.isValid,
+		},
+		isVisible: field.isVisible,
+		enableSorting: field.enableSorting ?? true,
+		enableGlobalSearch: field.enableGlobalSearch ?? false,
+		enableHiding: field.enableHiding ?? true,
+		readOnly: field.readOnly ?? false,
+		filterBy: getFilterBy( field, defaultOperators, validOperators ),
+		format: {},
+	};
+}

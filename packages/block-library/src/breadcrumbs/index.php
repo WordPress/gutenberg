@@ -100,9 +100,25 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 			$show_terms = $attributes['prefersTaxonomy'];
 		}
 
-		// Build breadcrumb trail.
+		// Add post type archive link if applicable.
+		$post_type_object = get_post_type_object( $post_type );
+		$archive_link     = get_post_type_archive_link( $post_type );
+		if ( $archive_link && untrailingslashit( home_url() ) !== untrailingslashit( $archive_link ) ) {
+			$label = $post_type_object->labels->archives;
+			if ( 'post' === $post_type ) {
+				$page_for_posts = get_option( 'page_for_posts' );
+				if ( $page_for_posts ) {
+					$label = block_core_breadcrumbs_get_post_title( $page_for_posts );
+				}
+			}
+			$breadcrumb_items[] = array(
+				'label' => $label,
+				'url'   => $archive_link,
+			);
+		}
+		// Build breadcrumb trail based on hierarchical structure or taxonomy terms.
 		if ( ! $show_terms ) {
-			$breadcrumb_items = array_merge( $breadcrumb_items, block_core_breadcrumbs_get_hierarchical_post_type_breadcrumbs( $post_id, $post_type ) );
+			$breadcrumb_items = array_merge( $breadcrumb_items, block_core_breadcrumbs_get_hierarchical_post_type_breadcrumbs( $post_id ) );
 		} else {
 			$breadcrumb_items = array_merge( $breadcrumb_items, block_core_breadcrumbs_get_terms_breadcrumbs( $post_id, $post_type ) );
 		}
@@ -235,49 +251,18 @@ function block_core_breadcrumbs_get_post_title( $post_id_or_object ) {
 }
 
 /**
- * Generates post type archive breadcrumb item.
- *
- * Returns the post type archive link item if the post type has archive enabled,
- * otherwise returns null.
- *
- * @since 7.0.0
- *
- * @param string $post_type The post type name.
- *
- * @return array|null The archive breadcrumb item data, or null if not available.
- */
-function block_core_breadcrumbs_get_post_type_archive_item( $post_type ) {
-	$post_type_object = get_post_type_object( $post_type );
-	$archive_link     = get_post_type_archive_link( $post_type );
-	if ( ! $archive_link ) {
-		return null;
-	}
-	return array(
-		'label' => $post_type_object->labels->archives,
-		'url'   => $archive_link,
-	);
-}
-
-/**
  * Generates breadcrumb items from hierarchical post type ancestors.
  *
  * @since 7.0.0
  *
  * @param int    $post_id   The post ID.
- * @param string $post_type The post type name.
  *
  * @return array Array of breadcrumb item data.
  */
-function block_core_breadcrumbs_get_hierarchical_post_type_breadcrumbs( $post_id, $post_type ) {
+function block_core_breadcrumbs_get_hierarchical_post_type_breadcrumbs( $post_id ) {
 	$breadcrumb_items = array();
-
-	$archive_item = block_core_breadcrumbs_get_post_type_archive_item( $post_type );
-	if ( $archive_item ) {
-		$breadcrumb_items[] = $archive_item;
-	}
-
-	$ancestors = get_post_ancestors( $post_id );
-	$ancestors = array_reverse( $ancestors );
+	$ancestors        = get_post_ancestors( $post_id );
+	$ancestors        = array_reverse( $ancestors );
 
 	foreach ( $ancestors as $ancestor_id ) {
 		$breadcrumb_items[] = array(
@@ -469,11 +454,6 @@ function block_core_breadcrumbs_get_archive_breadcrumbs() {
  */
 function block_core_breadcrumbs_get_terms_breadcrumbs( $post_id, $post_type ) {
 	$breadcrumb_items = array();
-
-	$archive_item = block_core_breadcrumbs_get_post_type_archive_item( $post_type );
-	if ( $archive_item ) {
-		$breadcrumb_items[] = $archive_item;
-	}
 
 	// Get public taxonomies for this post type.
 	$taxonomies = wp_filter_object_list(

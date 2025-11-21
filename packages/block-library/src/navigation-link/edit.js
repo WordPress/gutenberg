@@ -30,7 +30,7 @@ import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
-import { useMergeRefs, usePrevious, useInstanceId } from '@wordpress/compose';
+import { useMergeRefs, useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -213,8 +213,11 @@ export default function NavigationLinkEdit( {
 	const itemLabelPlaceholder = __( 'Add label…' );
 	const ref = useRef();
 	const linkUIref = useRef();
-	const prevUrl = usePrevious( url );
-	const isNewLink = useRef( ! url && ! metadata?.bindings?.url );
+	// A link is "new" only if it has an undefined label
+	// After the link is created, even if no label is provided, it's set to an empty string.
+	const isNewLink = useRef( label === undefined );
+	// Track whether we should focus the submenu appender when closing the link UI
+	const shouldSelectSubmenuAppenderOnClose = useRef( false );
 
 	const {
 		isAtMaxNesting,
@@ -223,6 +226,7 @@ export default function NavigationLinkEdit( {
 		hasChildren,
 		validateLinkStatus,
 		parentBlockClientId,
+		isSubmenu,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -267,6 +271,7 @@ export default function NavigationLinkEdit( {
 				hasChildren: !! getBlockCount( clientId ),
 				validateLinkStatus: enableLinkStatusValidation,
 				parentBlockClientId: parentBlockId,
+				isSubmenu: parentBlockName === 'core/navigation-submenu',
 			};
 		},
 		[ clientId, maxNestingLevel ]
@@ -314,7 +319,7 @@ export default function NavigationLinkEdit( {
 	// If we leave focus on this block, then when we close the link without creating a link, focus will
 	// be lost during the new block selection process.
 	useEffect( () => {
-		if ( isNewLink.current && isSelected && ! url ) {
+		if ( isNewLink.current && isSelected ) {
 			selectBlock( parentBlockClientId );
 		}
 	}, [] ); // eslint-disable-line react-hooks/exhaustive-deps
@@ -333,20 +338,46 @@ export default function NavigationLinkEdit( {
 		transformToSubmenu,
 	] );
 
-	// If the LinkControl popover is open and the URL has changed, close the LinkControl and focus the label text.
+	// Handle link UI when a new link is created
 	useEffect( () => {
-		// We only want to do this when the URL has gone from nothing to a new URL AND the label looks like a URL
-		if (
-			! prevUrl &&
-			url &&
-			isLinkOpen &&
-			isURL( prependHTTP( label ) ) &&
-			/^.+\.[a-z]+/.test( label )
-		) {
+		// We know if a link was just created from our link UI if
+		// 1. isNewLink.current is true
+		// 2. url has a value
+		// 3. isLinkOpen is true
+		if ( ! isNewLink.current || ! url || ! isLinkOpen ) {
+			return;
+		}
+
+		// Ensure this only runs once
+		isNewLink.current = false;
+
+		// We just created a link and the block is now selected.
+		// If the label looks like a URL, focus and select the label text.
+		if ( isURL( prependHTTP( label ) ) && /^.+\.[a-z]+/.test( label ) ) {
 			// Focus and select the label text.
 			selectLabelText();
+		} else {
+			// If the link was just created, we want to select the block so the inspector controls
+			// are accurate.
+			selectBlock( clientId, null );
+
+			// Edge case: When the created link is the first child of a submenu, the focus will have
+			// originated from the add submenu toolbar button. In this case, we need to return focus
+			// to the submenu appender if the user closes the link ui using the keyboard.
+			// Check if this is the first and only child of a newly created submenu.
+			if ( isSubmenu ) {
+				const parentBlocks = getBlocks( parentBlockClientId );
+				// If this is the only child, then this is a new submenu.
+				// Set the flag to select the submenu appender when the link ui is closed.
+				if (
+					parentBlocks.length === 1 &&
+					parentBlocks[ 0 ].clientId === clientId
+				) {
+					shouldSelectSubmenuAppenderOnClose.current = true;
+				}
+			}
 		}
-	}, [ prevUrl, url, isLinkOpen, label ] );
+	}, [ url, isLinkOpen, isNewLink, label ] );
 
 	/**
 	 * Focus the Link label text and select it.
@@ -444,23 +475,20 @@ export default function NavigationLinkEdit( {
 		}
 	);
 
-	if (
-		! url ||
+	const needsValidLink =
+		( ! url && ! ( hasUrlBinding && isBoundEntityAvailable ) ) ||
 		isInvalid ||
 		isDraft ||
-		( hasUrlBinding && ! isBoundEntityAvailable )
-	) {
+		( hasUrlBinding && ! isBoundEntityAvailable );
+
+	if ( needsValidLink ) {
 		blockProps.onClick = () => {
 			setIsLinkOpen( true );
 		};
 	}
 
 	const classes = clsx( 'wp-block-navigation-item__content', {
-		'wp-block-navigation-link__placeholder':
-			! url ||
-			isInvalid ||
-			isDraft ||
-			( hasUrlBinding && ! isBoundEntityAvailable ),
+		'wp-block-navigation-link__placeholder': needsValidLink,
 	} );
 
 	const missingText = getMissingText( type );
@@ -589,9 +617,27 @@ export default function NavigationLinkEdit( {
 								// Don't remove if binding exists (even if entity is unavailable) so user can fix it.
 								if ( ! url && ! hasUrlBinding ) {
 									onReplace( [] );
-								} else if ( isNewLink.current ) {
-									// If we just created a new link, select it
-									selectBlock( clientId );
+									return;
+								}
+
+								// Edge case: If this is the first child of a new submenu, focus the submenu's appender
+								if (
+									shouldSelectSubmenuAppenderOnClose.current
+								) {
+									shouldSelectSubmenuAppenderOnClose.current = false;
+
+									// The appender is the next sibling in the DOM after the current block
+									if (
+										listItemRef.current?.nextElementSibling
+									) {
+										const appenderButton =
+											listItemRef.current.nextElementSibling.querySelector(
+												'.block-editor-button-block-appender'
+											);
+										if ( appenderButton ) {
+											appenderButton.focus();
+										}
+									}
 								}
 							} }
 							anchor={ popoverAnchor }

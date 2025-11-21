@@ -62,6 +62,7 @@ module.exports = {
 		'@storybook/addon-webpack5-compiler-babel',
 		'storybook-source-link',
 		'@geometricpanda/storybook-addon-badges',
+		'./addons/design-system-theme/register',
 	],
 	framework: {
 		name: '@storybook/react-webpack5',

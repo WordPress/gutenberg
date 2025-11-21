@@ -33,28 +33,22 @@ export const settings = {
 if ( window.__experimentalContentOnlyPatternInsertion ) {
 	settings[ fieldsKey ] = [
 		{
+			id: 'label',
 			label: __( 'Label' ),
-			type: 'RichText',
+			type: 'richtext',
 			shownByDefault: true,
-			mapping: {
-				value: 'label',
-			},
 		},
 		{
+			id: 'buttonText',
 			label: __( 'Button text' ),
-			type: 'RichText',
+			type: 'richtext',
 			shownByDefault: false,
-			mapping: {
-				value: 'buttonText',
-			},
 		},
 		{
+			id: 'placeholder',
 			label: __( 'Placeholder' ),
-			type: 'RichText',
+			type: 'richtext',
 			shownByDefault: false,
-			mapping: {
-				value: 'placeholder',
-			},
 		},
 	];
 }

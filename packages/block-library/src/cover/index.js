@@ -59,13 +59,14 @@ export const settings = {
 if ( window.__experimentalContentOnlyPatternInsertion ) {
 	settings[ fieldsKey ] = [
 		{
+			id: 'background',
 			label: __( 'Background' ),
-			type: 'Media',
+			type: 'media',
 			shownByDefault: true,
 			mapping: {
 				type: 'backgroundType',
 				id: 'id',
-				src: 'url',
+				url: 'url',
 				alt: 'alt',
 				featuredImage: 'useFeaturedImage',
 			},

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { type Plugin } from '@terrazzo/parser';
+import { type Plugin, type TokenNormalized } from '@terrazzo/parser';
 
 interface InlineAliasValuesOptions {
 	/**
@@ -40,25 +40,54 @@ export default function inlineAliasValues( {
 	return {
 		name: '@wordpress/terrazzo-plugin-inline-alias-values',
 		async transform( { tokens } ) {
-			Object.keys( tokens )
-				.filter( ( id ) => pattern.test( id ) )
-				.forEach( ( id ) => {
-					const token = tokens[ id ];
+			// Map of primitive token ID -> array of references to inline
+			const inlineMap: Record< string, TokenNormalized[] > = {};
+
+			// Single pass: identify primitives and collect references
+			for ( const [ id, token ] of Object.entries( tokens ) ) {
+				const shouldInline = pattern.test( id );
+
+				if ( shouldInline ) {
+					// Track this token for inlining
+					inlineMap[ id ] = [];
+
+					// Track aliased tokens for output file
 					if ( token.aliasedBy ) {
 						aliasedBy[ tokenId( id ) ] =
 							token.aliasedBy.map( tokenId );
-
-						for ( const aliasedId of token.aliasedBy ) {
-							Object.assign( tokens[ aliasedId ], {
-								$value: token.$value,
-								mode: token.mode,
-								originalValue: token.originalValue,
-							} );
-						}
 					}
+				}
 
-					delete tokens[ id ];
-				} );
+				// Check if this token's main value references a primitive
+				if ( token.aliasOf && pattern.test( token.aliasOf ) ) {
+					inlineMap[ token.aliasOf ] ??= [];
+					inlineMap[ token.aliasOf ].push( token );
+				}
+
+				// Check if any mode values reference a primitive
+				for ( const modeValue of Object.values( token.mode ) ) {
+					const { aliasOf } = modeValue;
+					if ( aliasOf && pattern.test( aliasOf ) ) {
+						const primitiveId = aliasOf;
+						inlineMap[ primitiveId ] ??= [];
+						inlineMap[ primitiveId ].push( modeValue );
+					}
+				}
+			}
+
+			// Inline values and delete primitives
+			for ( const [ id, references ] of Object.entries( inlineMap ) ) {
+				const token = tokens[ id ];
+
+				for ( const target of references ) {
+					target.$value = token.$value;
+					target.originalValue = token.originalValue;
+					delete target.aliasOf;
+					delete target.aliasChain;
+				}
+
+				delete tokens[ id ];
+			}
 		},
 		async build( { outputFile } ) {
 			if ( ! filename ) {
