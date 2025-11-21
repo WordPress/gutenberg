@@ -60,51 +60,6 @@ function DropdownHeader( {
 	);
 }
 
-function DropdownContent< Item >( {
-	onClose,
-	fieldLabel,
-	data,
-	form,
-	onChange,
-	validity,
-}: {
-	onClose: () => void;
-	fieldLabel?: string;
-	data: Item;
-	form: NormalizedForm;
-	onChange: ( value: any ) => void;
-	validity: FormValidity;
-} ) {
-	const focusOnMountRef = useFocusOnMount( 'firstInputElement' );
-
-	return (
-		<>
-			<DropdownHeader title={ fieldLabel } onClose={ onClose } />
-			<div ref={ focusOnMountRef }>
-				<DataFormLayout
-					data={ data }
-					form={ form }
-					onChange={ onChange }
-					validity={ validity }
-				>
-					{ ( FieldLayout, childField, childFieldValidity ) => (
-						<FieldLayout
-							key={ childField.id }
-							data={ data }
-							field={ childField }
-							onChange={ onChange }
-							hideLabelFromVision={
-								( form?.fields ?? [] ).length < 2
-							}
-							validity={ childFieldValidity }
-						/>
-					) }
-				</DataFormLayout>
-			</div>
-		</>
-	);
-}
-
 function PanelDropdown< Item >( {
 	data,
 	field,
@@ -161,6 +116,8 @@ function PanelDropdown< Item >( {
 		[ popoverAnchor ]
 	);
 
+	const focusOnMountRef = useFocusOnMount( 'firstInputElement' );
+
 	return (
 		<Dropdown
 			contentClassName="dataforms-layouts-panel__field-dropdown"
@@ -183,14 +140,34 @@ function PanelDropdown< Item >( {
 				/>
 			) }
 			renderContent={ ( { onClose } ) => (
-				<DropdownContent
-					onClose={ onClose }
-					fieldLabel={ fieldLabel }
-					data={ data }
-					form={ form }
-					onChange={ onChange }
-					validity={ formValidity }
-				/>
+				<>
+					<DropdownHeader title={ fieldLabel } onClose={ onClose } />
+					<div ref={ focusOnMountRef }>
+						<DataFormLayout
+							data={ data }
+							form={ form }
+							onChange={ onChange }
+							validity={ formValidity }
+						>
+							{ (
+								FieldLayout,
+								childField,
+								childFieldValidity
+							) => (
+								<FieldLayout
+									key={ childField.id }
+									data={ data }
+									field={ childField }
+									onChange={ onChange }
+									hideLabelFromVision={
+										( form?.fields ?? [] ).length < 2
+									}
+									validity={ childFieldValidity }
+								/>
+							) }
+						</DataFormLayout>
+					</div>
+				</>
 			) }
 		/>
 	);
