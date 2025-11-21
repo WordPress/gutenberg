@@ -44,27 +44,24 @@ function transformTokenName( { id }: { id: string } ) {
 			.replace( /semantic\./g, '' )
 			// Transform tokens:
 			// - Add extra folder matching top-level grouping
-			// - Prefix property name with the abbreviated top-level grouping
+			// - Prefix property name with top-level grouping
 			// - Shift color tones to extra folder
 			// - Keep last part of the token name with dots (eg no folders)
 			.replace(
 				/(Dimension|Color)\/(\w+)\.(\w+)\.(.*)/g,
 				( _, prefix, property, target, modifier ) => {
 					let extraFolder = '';
-					let propertyName = property;
+					let propertyName = property + '-' + target;
 
 					switch ( property ) {
 						case 'bg':
 							extraFolder = 'Background/';
-							propertyName = 'bg-' + target;
 							break;
 						case 'fg':
 							extraFolder = 'Foreground/';
-							propertyName = 'fg-' + target;
 							break;
 						case 'stroke':
 							extraFolder = 'Stroke/';
-							propertyName = 'stroke-' + target;
 							break;
 						case 'padding':
 							extraFolder = 'Padding/';
