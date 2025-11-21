@@ -310,12 +310,8 @@ function LinkControl( {
 	};
 
 	// Centralized validation function
-	const validateAndSetValidity = ( allowEmpty = false ) => {
+	const validateAndSetValidity = () => {
 		if ( currentInputIsEmpty ) {
-			if ( allowEmpty ) {
-				setCustomValidity( undefined );
-				return true;
-			}
 			return false;
 		}
 
@@ -359,8 +355,8 @@ function LinkControl( {
 		}
 
 		// No suggestion - this is a manually entered URL
-		// Validate before submitting (empty values not allowed via Enter)
-		if ( ! validateAndSetValidity( false ) ) {
+		// Validate before submitting
+		if ( ! validateAndSetValidity() ) {
 			event?.preventDefault();
 			return;
 		}
@@ -370,8 +366,8 @@ function LinkControl( {
 	};
 
 	const handleSubmit = () => {
-		// Validate URL before submitting (empty values allowed for button submit)
-		if ( ! validateAndSetValidity( true ) ) {
+		// Validate URL before submitting
+		if ( ! validateAndSetValidity() ) {
 			return;
 		}
 
