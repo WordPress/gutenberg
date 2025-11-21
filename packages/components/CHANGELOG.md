@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   `Notice`: Fix notice component spacing issue. ([#69430](https://github.com/WordPress/gutenberg/pull/69430))
+-   `Notice`: Fix notice component spacing issue when actions are present. ([#69430](https://github.com/WordPress/gutenberg/pull/69430))
 
 ## 30.9.0 (2025-11-26)
 
