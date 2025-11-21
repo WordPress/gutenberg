@@ -84,6 +84,14 @@ describe( 'DateTimePicker', () => {
 				time: '21:00:00', // Evening: shifts to next day UTC
 			},
 			{
+				// Test a scenario where local time is UTC time, to verify that
+				// using gmdateI18n (UTC) for formatting works correctly when
+				// the browser's timezone already has no offset from UTC.
+				direction: 'browser matches UTC (zero offset)',
+				timezone: 'UTC' as const,
+				time: '00:00:00',
+			},
+			{
 				direction: 'browser ahead of site',
 				timezone: 'Australia/Adelaide' as const,
 				time: '00:00:00', // Midnight: shifts to previous day UTC
