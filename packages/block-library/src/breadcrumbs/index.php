@@ -17,15 +17,20 @@
  * @return string Returns the post breadcrumb for hierarchical post types.
  */
 function render_block_core_breadcrumbs( $attributes, $content, $block ) {
-	$is_home_or_front_page = is_home() || is_front_page();
-	if ( ! $attributes['showOnHomePage'] && $is_home_or_front_page ) {
+	$is_front_page = is_front_page();
+
+	if ( ! $attributes['showOnHomePage'] && $is_front_page ) {
 		return '';
 	}
 
+	$is_home          = is_home();
+	$page_for_posts   = get_option( 'page_for_posts' );
 	$breadcrumb_items = array();
 
-	if ( $attributes['showHomeLink'] ) {
-		if ( ! $is_home_or_front_page ) {
+	if ( $attributes['showHomeItem'] ) {
+		// We make `home` a link if not on front page, or if front page
+		// is set to a custom page and is paged.
+		if ( ! $is_front_page || ( 'page' === get_option( 'show_on_front' ) && (int) get_query_var( 'page' ) > 1 ) ) {
 			$breadcrumb_items[] = array(
 				'label' => __( 'Home' ),
 				'url'   => home_url( '/' ),
@@ -35,11 +40,21 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		}
 	}
 
-	// Handle home and front page.
-	if ( $is_home_or_front_page ) {
-		// This check is explicitly nested in order not to execute the `else` branch.
+	// Handle home.
+	if ( $is_home ) {
+		// These checks are explicitly nested in order not to execute the `else` branch.
+		if ( $page_for_posts ) {
+			$breadcrumb_items[] = block_core_breadcrumbs_create_item( block_core_breadcrumbs_get_post_title( $page_for_posts ), block_core_breadcrumbs_is_paged() );
+		}
 		if ( block_core_breadcrumbs_is_paged() ) {
 			$breadcrumb_items[] = block_core_breadcrumbs_create_page_number_item();
+		}
+	} elseif ( $is_front_page ) {
+		// Handle front page.
+		// This check is explicitly nested in order not to execute the `else` branch.
+		// If front page is set to custom page and is paged, add the page number.
+		if ( (int) get_query_var( 'page' ) > 1 ) {
+			$breadcrumb_items[] = block_core_breadcrumbs_create_page_number_item( 'page' );
 		}
 	} elseif ( is_search() ) {
 		// Handle search results.
@@ -105,11 +120,8 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		$archive_link     = get_post_type_archive_link( $post_type );
 		if ( $archive_link && untrailingslashit( home_url() ) !== untrailingslashit( $archive_link ) ) {
 			$label = $post_type_object->labels->archives;
-			if ( 'post' === $post_type ) {
-				$page_for_posts = get_option( 'page_for_posts' );
-				if ( $page_for_posts ) {
-					$label = block_core_breadcrumbs_get_post_title( $page_for_posts );
-				}
+			if ( 'post' === $post_type && $page_for_posts ) {
+				$label = block_core_breadcrumbs_get_post_title( $page_for_posts );
 			}
 			$breadcrumb_items[] = array(
 				'label' => $label,
@@ -143,8 +155,8 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		}
 	}
 
-	// Remove last item if disabled.
-	if ( ! $attributes['showLastItem'] && ! empty( $breadcrumb_items ) ) {
+	// Remove current item if disabled.
+	if ( ! $attributes['showCurrentItem'] && ! empty( $breadcrumb_items ) ) {
 		array_pop( $breadcrumb_items );
 	}
 
