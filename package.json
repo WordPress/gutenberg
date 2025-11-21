@@ -191,7 +191,7 @@
 		"webpack-bundle-analyzer": "4.9.1"
 	},
 	"overrides": {
-		"jsdom": "27.2.0"
+		"jsdom": "26.1.0"
 	},
 	"scripts": {
 		"build": "node ./bin/build.mjs",
