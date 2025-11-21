@@ -336,6 +336,9 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 								? `${ title } ${ suggestionUrl }`
 								: title || suggestionUrl;
 						} }
+						shouldShowType={
+							! ( attributes.kind && attributes.type )
+						}
 						onChange={ ( newUrl, suggestion ) => {
 							// If we have suggestion data (entity selected from search),
 							// pass the entity information to enable binding

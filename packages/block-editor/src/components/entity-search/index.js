@@ -107,6 +107,7 @@ export const EntitySearch = forwardRef(
 			help,
 			getDisplayValue = ( suggestion ) => suggestion?.url || '',
 			allowFreeform = true,
+			shouldShowType = true,
 		},
 		ref
 	) => {
@@ -327,9 +328,11 @@ export const EntitySearch = forwardRef(
 										{ displayURL }
 									</div>
 								</FlexBlock>
-								<FlexItem className="entity-search__type">
-									{ typeLabel }
-								</FlexItem>
+								{ shouldShowType && (
+									<FlexItem className="entity-search__type">
+										{ typeLabel }
+									</FlexItem>
+								) }
 							</Flex>
 						);
 					} }

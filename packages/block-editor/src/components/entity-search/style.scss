@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
 .entity-search {
 	svg {
 		fill: currentColor;
@@ -13,6 +16,25 @@
 	// Hide the current value from dropdown
 	.entity-search__current-value-hidden {
 		display: none !important;
+	}
+
+	// Style for the URL display (smaller, gray)
+	.entity-search__url,
+	.entity-search__type {
+		color: $gray-700;
+		font-size: $helptext-font-size;
+	}
+
+	.entity-search__type {
+		white-space: nowrap;
+	}
+
+	// When item is selected or hovered, make URL and type white
+	[role="option"][aria-selected="true"] {
+		.entity-search__url,
+		.entity-search__type {
+			color: $white;
+		}
 	}
 }
 
