@@ -304,6 +304,10 @@ export type FieldValidity = {
 		type: 'valid' | 'invalid' | 'validating';
 		message?: string;
 	};
+	pattern?: {
+		type: 'valid' | 'invalid' | 'validating';
+		message: string;
+	};
 	elements?: {
 		type: 'valid' | 'invalid' | 'validating';
 		message: string;
