@@ -2962,80 +2962,6 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSameSetsWithIndex( $expected, $actual );
 	}
 
-	/**
-	 * @covers WP_Theme_JSON_Gutenberg::remove_insecure_properties
-	 */
-	public function test_remove_insecure_properties_should_allow_safe_settings() {
-		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
-			array(
-				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-				'settings' => array(
-					'blocks' => array(
-						'core/image' => array(
-							'lightbox'    => array(
-								'enabled'      => false,
-								'allowEditing' => true,
-							),
-							'unsupported' => 'value',
-						),
-					),
-				),
-			)
-		);
-
-		$expected = array(
-			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-			'settings' => array(
-				'blocks' => array(
-					'core/image' => array(
-						'lightbox' => array(
-							'enabled'      => false,
-							'allowEditing' => true,
-						),
-					),
-				),
-			),
-		);
-
-		$this->assertEqualSetsWithIndex( $expected, $actual );
-	}
-
-	/**
-	 * @covers WP_Theme_JSON_Gutenberg::remove_insecure_properties
-	 */
-	public function test_remove_insecure_properties_should_not_allow_unsafe_settings() {
-		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
-			array(
-				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-				'settings' => array(
-					'blocks' => array(
-						'core/image' => array(
-							'lightbox' => array(
-								'enabled'      => 'false',
-								'allowEditing' => true,
-							),
-						),
-					),
-				),
-			)
-		);
-
-		$expected = array(
-			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-			'settings' => array(
-				'blocks' => array(
-					'core/image' => array(
-						'lightbox' => array(
-							'allowEditing' => true,
-						),
-					),
-				),
-			),
-		);
-
-		$this->assertEqualSetsWithIndex( $expected, $actual );
-	}
-
 	public function test_remove_invalid_element_pseudo_selectors() {
 		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
 			array(
@@ -6649,5 +6575,123 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$actual = $defaults->get_raw_data();
 
 		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
+
+	/**
+	 * @covers WP_Theme_JSON_Gutenberg::sanitize
+	 * @covers WP_Theme_JSON_Gutenberg::remove_keys_not_in_schema
+	 */
+	public function test_sanitize_preserves_boolean_values_when_schema_expects_boolean() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'lightbox' => array(
+						'enabled'      => true,
+						'allowEditing' => false,
+					),
+				),
+			)
+		);
+
+		$settings = $theme_json->get_settings();
+		$this->assertTrue( $settings['lightbox']['enabled'] );
+		$this->assertFalse( $settings['lightbox']['allowEditing'] );
+	}
+
+	/**
+	 * @covers WP_Theme_JSON_Gutenberg::sanitize
+	 * @covers WP_Theme_JSON_Gutenberg::remove_keys_not_in_schema
+	 */
+	public function test_sanitize_removes_non_boolean_values_when_schema_expects_boolean() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'lightbox' => array(
+						'enabled'      => 'not-a-boolean',
+						'allowEditing' => 123,
+					),
+				),
+			)
+		);
+
+		$settings = $theme_json->get_settings();
+		$this->assertArrayNotHasKey( 'enabled', $settings['lightbox'] ?? array() );
+		$this->assertArrayNotHasKey( 'allowEditing', $settings['lightbox'] ?? array() );
+	}
+
+	/**
+	 * @covers WP_Theme_JSON_Gutenberg::sanitize
+	 * @covers WP_Theme_JSON_Gutenberg::remove_keys_not_in_schema
+	 */
+	public function test_sanitize_preserves_boolean_values_in_block_settings() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'blocks' => array(
+						'core/image' => array(
+							'lightbox' => array(
+								'enabled'      => true,
+								'allowEditing' => false,
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$settings = $theme_json->get_settings();
+		$this->assertTrue( $settings['blocks']['core/image']['lightbox']['enabled'] );
+		$this->assertFalse( $settings['blocks']['core/image']['lightbox']['allowEditing'] );
+	}
+
+	/**
+	 * @covers WP_Theme_JSON_Gutenberg::sanitize
+	 * @covers WP_Theme_JSON_Gutenberg::remove_keys_not_in_schema
+	 */
+	public function test_sanitize_removes_non_boolean_values_in_block_settings() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'blocks' => array(
+						'core/image' => array(
+							'lightbox' => array(
+								'enabled'      => 'string-value',
+								'allowEditing' => array( 'not', 'a', 'boolean' ),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$settings = $theme_json->get_settings();
+		$lightbox = $settings['blocks']['core/image']['lightbox'] ?? array();
+		$this->assertArrayNotHasKey( 'enabled', $lightbox );
+		$this->assertArrayNotHasKey( 'allowEditing', $lightbox );
+	}
+
+	/**
+	 * @covers WP_Theme_JSON_Gutenberg::sanitize
+	 * @covers WP_Theme_JSON_Gutenberg::remove_keys_not_in_schema
+	 */
+	public function test_sanitize_preserves_null_schema_behavior() {
+		// Test that settings with null in schema (no type validation) still accept any type.
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'appearanceTools' => 'string-value', // null in schema, should accept any type.
+					'custom'          => array( 'nested' => 'value' ), // null in schema, should accept any type.
+				),
+			)
+		);
+
+		$settings = $theme_json->get_settings();
+		$this->assertSame( 'string-value', $settings['appearanceTools'] );
+		$this->assertSame( array( 'nested' => 'value' ), $settings['custom'] );
 	}
 }

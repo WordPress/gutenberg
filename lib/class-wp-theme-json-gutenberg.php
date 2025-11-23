@@ -334,27 +334,6 @@ class WP_Theme_JSON_Gutenberg {
 		),
 	);
 
-	/**
-	 * Safe settings that should be preserved by ::remove_insecure_settings().
-	 *
-	 * These are non-preset, non-CSS settings that control behavior rather than styling.
-	 * Each entry defines the setting path and its expected type for validation.
-	 *
-	 * The constant is deliberately private to prevent external usage by plugins.
-	 * Like the class itself, it is intended for internal core usage.
-	 *
-	 * @since 7.0.0
-	 */
-	private const SAFE_SETTINGS = array(
-		array(
-			'path' => array( 'lightbox', 'allowEditing' ),
-			'type' => 'boolean',
-		),
-		array(
-			'path' => array( 'lightbox', 'enabled' ),
-			'type' => 'boolean',
-		),
-	);
 
 	/**
 	 * Protected style properties.
@@ -407,6 +386,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.3.0 Removed `layout.definitions`. Added `typography.writingMode`.
 	 * @since 6.4.0 Added `layout.allowEditing`.
 	 * @since 6.4.0 Added `lightbox`.
+	 * @since 7.0.0 Added type markers to the schema for boolean values.
 	 * @var array
 	 */
 	const VALID_SETTINGS = array(
@@ -454,8 +434,8 @@ class WP_Theme_JSON_Gutenberg {
 			'allowCustomContentAndWideSize' => null,
 		),
 		'lightbox'                      => array(
-			'enabled'      => null,
-			'allowEditing' => null,
+			'enabled'      => true,
+			'allowEditing' => true,
 		),
 		'position'                      => array(
 			'fixed'  => null,
@@ -1319,6 +1299,17 @@ class WP_Theme_JSON_Gutenberg {
 			// Remove keys not in the schema or with null/empty values.
 			if ( ! array_key_exists( $key, $schema ) ) {
 				unset( $tree[ $key ] );
+				continue;
+			}
+
+			// Validate type if schema specifies a boolean marker.
+			if ( is_bool( $schema[ $key ] ) ) {
+				// Schema expects a boolean value - validate the input matches.
+				if ( ! is_bool( $value ) ) {
+					unset( $tree[ $key ] );
+					continue;
+				}
+				// Type matches, keep the value and continue to next key.
 				continue;
 			}
 
@@ -3834,6 +3825,35 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
+	 * Preserves valid typed settings from input to output based on type markers in schema.
+	 *
+	 * Recursively iterates through the schema and validates/preserves settings
+	 * that have type markers (e.g., boolean) in VALID_SETTINGS.
+	 *
+	 * @since 7.0.0
+	 *
+	 * @param array $input  Input settings to process.
+	 * @param array $output Output settings array (passed by reference).
+	 * @param array $schema Schema to validate against (typically VALID_SETTINGS).
+	 * @param array $path   Current path in the schema (for recursive calls).
+	 */
+	private static function preserve_valid_typed_settings( $input, &$output, $schema, $path = array() ) {
+		foreach ( $schema as $key => $schema_value ) {
+			$current_path = array_merge( $path, array( $key ) );
+
+			// Validate boolean type markers.
+			if ( is_bool( $schema_value ) ) {
+				$value = _wp_array_get( $input, $current_path, null );
+				if ( null !== $value && is_bool( $value ) ) {
+					_wp_array_set( $output, $current_path, $value ); // Preserve boolean value.
+				}
+			} elseif ( is_array( $schema_value ) ) {
+				static::preserve_valid_typed_settings( $input, $output, $schema_value, $current_path ); // Recurse into nested structure.
+			}
+		}
+	}
+
+	/**
 	 * Processes a setting node and returns the same node
 	 * without the insecure settings.
 	 *
@@ -3892,32 +3912,8 @@ class WP_Theme_JSON_Gutenberg {
 		// Ensure indirect properties not included in any `PRESETS_METADATA` value are allowed.
 		static::remove_indirect_properties( $input, $output );
 
-		// Preserve all valid settings that aren't presets or indirect properties.
-		foreach ( static::SAFE_SETTINGS as $safe_setting ) {
-			$path = $safe_setting['path'];
-			$type = $safe_setting['type'];
-
-			// Extract the value from input using the path.
-			$value = _wp_array_get( $input, $path, null );
-
-			// Skip if the setting is not present in the input.
-			if ( null === $value ) {
-				continue;
-			}
-
-			// Validate the type.
-			$is_valid_type = false;
-			switch ( $type ) {
-				case 'boolean':
-					$is_valid_type = is_bool( $value );
-					break;
-			}
-
-			// If the type is valid, set it in the output using the path.
-			if ( $is_valid_type ) {
-				_wp_array_set( $output, $path, $value );
-			}
-		}
+		// Preserve all valid settings that have type markers in VALID_SETTINGS.
+		static::preserve_valid_typed_settings( $input, $output, static::VALID_SETTINGS );
 
 		return $output;
 	}
