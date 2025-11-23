@@ -53,12 +53,8 @@ class Gutenberg_REST_Block_Patterns_Controller_7_0 extends WP_REST_Block_Pattern
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function prepare_item_for_response( $item, $request ) {
-		$blocks = parse_blocks( $item['content'] );
-		if ( gutenberg_is_experiment_enabled( 'gutenberg-content-only-pattern-insertion' ) ) {
-			$blocks = gutenberg_resolve_pattern_blocks( $blocks );
-		} else {
-			$blocks = resolve_pattern_blocks( $blocks );
-		}
+		$blocks          = parse_blocks( $item['content'] );
+		$blocks          = gutenberg_resolve_pattern_blocks( $blocks );
 		$item['content'] = serialize_blocks( $blocks );
 
 		$fields = $this->get_fields_for_response( $request );
