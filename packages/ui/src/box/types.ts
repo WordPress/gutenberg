@@ -73,6 +73,11 @@ export interface BoxProps extends ComponentProps< 'div' > {
 	borderRadius?: Exclude< SizeToken, '2xs' >;
 
 	/**
+	 * The surface border width design token.
+	 */
+	borderWidth?: Exclude< SizeToken, '2xs' >;
+
+	/**
 	 * The content to be rendered inside the component.
 	 */
 	children?: React.ReactNode;

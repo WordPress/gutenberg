@@ -85,6 +85,7 @@ export const Box = forwardRef< HTMLDivElement, BoxProps >( function Box(
 		color,
 		padding,
 		borderRadius,
+		borderWidth,
 		render = DEFAULT_RENDER,
 		...props
 	},
@@ -109,6 +110,10 @@ export const Box = forwardRef< HTMLDivElement, BoxProps >( function Box(
 
 	if ( borderRadius ) {
 		style.borderRadius = `var(--wpds-border-radius-${ target }-${ borderRadius }, var(--wpds-border-radius-surface-${ borderRadius }))`;
+	}
+
+	if ( borderWidth ) {
+		style.borderWidth = `var(--wpds-border-width-${ target }-${ borderWidth }, var(--wpds-border-width-surface-${ borderWidth }))`;
 	}
 
 	return renderElement< 'div' >( render, { style, ...props }, ref );

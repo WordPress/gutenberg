@@ -23,6 +23,30 @@
 		},
 		"description": "Large radius for surfaces"
 	},
+	"Border/width-surface-xs": {
+		"value": {
+			".": "1px"
+		},
+		"description": "Extra small width for surfaces"
+	},
+	"Border/width-surface-sm": {
+		"value": {
+			".": "2px"
+		},
+		"description": "Small width for surfaces"
+	},
+	"Border/width-surface-md": {
+		"value": {
+			".": "4px"
+		},
+		"description": "Medium width for surfaces"
+	},
+	"Border/width-surface-lg": {
+		"value": {
+			".": "8px"
+		},
+		"description": "Large width for surfaces"
+	},
 	"Border/width-interactive-focus": {
 		"value": {
 			".": "2px",
