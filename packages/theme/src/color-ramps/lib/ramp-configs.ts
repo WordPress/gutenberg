@@ -142,7 +142,7 @@ export const BG_RAMP_CONFIG: RampConfig = {
 		contrast: {
 			reference: 'stroke3',
 			followDirection: 'opposite',
-			target: 2.2,
+			target: 2.6,
 		},
 		taperChromaOptions: STROKE_TAPER_CHROMA,
 	},
@@ -150,7 +150,7 @@ export const BG_RAMP_CONFIG: RampConfig = {
 		contrast: {
 			reference: 'stroke3',
 			followDirection: 'opposite',
-			target: 1.5,
+			target: 2.4,
 		},
 		taperChromaOptions: STROKE_TAPER_CHROMA,
 	},

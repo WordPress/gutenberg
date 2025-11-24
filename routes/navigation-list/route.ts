@@ -35,12 +35,15 @@ export const route = {
 			return { postType: NAVIGATION_POST_TYPE, isPreview: true };
 		}
 
+		const postId = search.ids
+			? parseInt( search.ids[ 0 ] )
+			: firstNavigation.id;
+
 		return {
 			postType: NAVIGATION_POST_TYPE,
-			postId: search.ids
-				? parseInt( search.ids[ 0 ] )
-				: firstNavigation.id,
+			postId,
 			isPreview: true,
+			editLink: `/types/wp_navigation/edit/${ postId }`,
 		};
 	},
 	loader: async () => {

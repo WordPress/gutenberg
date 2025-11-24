@@ -4,11 +4,9 @@
 import {
 	Button,
 	Icon,
-	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalGrid as Grid,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	audio as audioIcon,
@@ -26,9 +24,10 @@ import { useInspectorPopoverPlacement } from '../use-inspector-popover-placement
 import { getMediaSelectKey } from '../../../store/private-keys';
 import { store as blockEditorStore } from '../../../store';
 
-function MediaThumbnail( { control, attributeValues, attachment } ) {
-	const { allowedTypes, multiple } = control.args;
-	const mapping = control.mapping;
+function MediaThumbnail( { data, field, attachment } ) {
+	const config = field.config || {};
+	const { allowedTypes = [], multiple = false } = config;
+
 	if ( multiple ) {
 		return 'todo multiple';
 	}
@@ -50,29 +49,17 @@ function MediaThumbnail( { control, attributeValues, attachment } ) {
 	}
 
 	if ( allowedTypes.length === 1 ) {
-		let src;
-		if (
-			allowedTypes[ 0 ] === 'image' &&
-			mapping.src &&
-			attributeValues[ mapping.src ]
-		) {
-			src = attributeValues[ mapping.src ];
-		} else if (
-			allowedTypes[ 0 ] === 'video' &&
-			mapping.poster &&
-			attributeValues[ mapping.poster ]
-		) {
-			src = attributeValues[ mapping.poster ];
-		}
+		const value = field.getValue( { item: data } );
+		const url = value?.url;
 
-		if ( src ) {
+		if ( url ) {
 			return (
 				<img
 					className="block-editor-content-only-controls__media-thumbnail"
 					alt=""
 					width={ 24 }
 					height={ 24 }
-					src={ src }
+					src={ url }
 				/>
 			);
 		}
@@ -96,29 +83,27 @@ function MediaThumbnail( { control, attributeValues, attachment } ) {
 	return <Icon icon={ mediaIcon } size={ 24 } />;
 }
 
-export default function Media( {
-	clientId,
-	control,
-	blockType,
-	attributeValues,
-	updateAttributes,
-} ) {
+export default function Media( { data, field, config = {} } ) {
 	const { popoverProps } = useInspectorPopoverPlacement( {
 		isControl: true,
 	} );
-	const typeKey = control.mapping.type;
-	const idKey = control.mapping.id;
-	const srcKey = control.mapping.src;
-	const captionKey = control.mapping.caption;
-	const altKey = control.mapping.alt;
-	const posterKey = control.mapping.poster;
-	const featuredImageKey = control.mapping.featuredImage;
+	const value = field.getValue( { item: data } );
+	const { allowedTypes = [], multiple = false } = field.config || {};
+	const { clientId, updateBlockAttributes, fieldDef } = config;
+	const updateAttributes = ( newFieldValue ) => {
+		const mappedChanges = field.setValue( {
+			item: data,
+			value: newFieldValue,
+		} );
+		updateBlockAttributes( clientId, mappedChanges );
+	};
 
-	const id = attributeValues[ idKey ];
-	const src = attributeValues[ srcKey ];
-	const caption = attributeValues[ captionKey ];
-	const alt = attributeValues[ altKey ];
-	const useFeaturedImage = attributeValues[ featuredImageKey ];
+	// Check if featured image is supported by checking if it's in the mapping
+	const hasFeaturedImageSupport =
+		fieldDef?.mapping && 'featuredImage' in fieldDef.mapping;
+
+	const id = value?.id;
+	const url = value?.url;
 
 	const attachment = useSelect(
 		( select ) => {
@@ -140,8 +125,8 @@ export default function Media( {
 
 	// TODO - pluralize when multiple.
 	let chooseItemLabel;
-	if ( control.args.allowedTypes.length === 1 ) {
-		const allowedType = control.args.allowedTypes[ 0 ];
+	if ( allowedTypes.length === 1 ) {
+		const allowedType = allowedTypes[ 0 ];
 		if ( allowedType === 'image' ) {
 			chooseItemLabel = __( 'Choose an image…' );
 		} else if ( allowedType === 'video' ) {
@@ -155,131 +140,167 @@ export default function Media( {
 		chooseItemLabel = __( 'Choose a media item…' );
 	}
 
-	const defaultValues = useMemo( () => {
-		return Object.fromEntries(
-			Object.entries( control.mapping ).map( ( [ , attributeKey ] ) => {
-				return [
-					attributeKey,
-					blockType.attributes[ attributeKey ]?.defaultValue ??
-						undefined,
-				];
-			} )
-		);
-	}, [ blockType.attributes, control.mapping ] );
-
 	return (
 		<MediaUploadCheck>
-			<ToolsPanelItem
-				panelId={ clientId }
-				label={ control.label }
-				hasValue={ () => !! src }
-				onDeselect={ () => {
-					updateAttributes( defaultValues );
-				} }
-				isShownByDefault={ control.shownByDefault }
-			>
-				<MediaReplaceFlow
-					className="block-editor-content-only-controls__media-replace-flow"
-					allowedTypes={ control.args.allowedTypes }
-					mediaId={ id }
-					mediaURL={ src }
-					multiple={ control.args.multiple }
-					popoverProps={ popoverProps }
-					onReset={ () => {
-						updateAttributes( defaultValues );
-					} }
-					useFeaturedImage={ !! useFeaturedImage }
-					onToggleFeaturedImage={
-						!! featuredImageKey &&
-						( () => {
-							updateAttributes( {
-								...defaultValues,
-								[ featuredImageKey ]: ! useFeaturedImage,
-							} );
-						} )
-					}
-					onSelect={ ( selectedMedia ) => {
-						if ( selectedMedia.id && selectedMedia.url ) {
-							const optionalAttributes = {};
+			<MediaReplaceFlow
+				className="block-editor-content-only-controls__media-replace-flow"
+				allowedTypes={ allowedTypes }
+				mediaId={ id }
+				mediaURL={ url }
+				multiple={ multiple }
+				popoverProps={ popoverProps }
+				onReset={ () => {
+					// Build reset value dynamically based on mapping
+					const resetValue = {};
 
-							if ( typeKey && selectedMedia.type ) {
-								optionalAttributes[ typeKey ] =
-									selectedMedia.type;
-							}
-
+					if ( fieldDef?.mapping ) {
+						Object.keys( fieldDef.mapping ).forEach( ( key ) => {
 							if (
-								captionKey &&
-								! caption &&
-								selectedMedia.caption
+								key === 'id' ||
+								key === 'src' ||
+								key === 'url'
 							) {
-								optionalAttributes[ captionKey ] =
-									selectedMedia.caption;
+								resetValue[ key ] = undefined;
+							} else if ( key === 'caption' || key === 'alt' ) {
+								resetValue[ key ] = '';
 							}
-							if ( altKey && ! alt && selectedMedia.alt ) {
-								optionalAttributes[ altKey ] =
-									selectedMedia.alt;
-							}
-							if ( posterKey && selectedMedia.poster ) {
-								optionalAttributes[ posterKey ] =
-									selectedMedia.poster;
-							}
+						} );
+					}
 
-							updateAttributes( {
-								[ idKey ]: selectedMedia.id,
-								[ srcKey ]: selectedMedia.url,
-								...optionalAttributes,
-							} );
+					// Turn off featured image when resetting (only if it's in the mapping)
+					if ( hasFeaturedImageSupport ) {
+						resetValue.featuredImage = false;
+					}
+
+					// Merge with existing value to preserve other field properties
+					updateAttributes( { ...value, ...resetValue } );
+				} }
+				{ ...( hasFeaturedImageSupport && {
+					useFeaturedImage: !! value?.featuredImage,
+					onToggleFeaturedImage: () => {
+						updateAttributes( {
+							...value,
+							featuredImage: ! value?.featuredImage,
+						} );
+					},
+				} ) }
+				onSelect={ ( selectedMedia ) => {
+					if ( selectedMedia.id && selectedMedia.url ) {
+						// Determine mediaType from MIME type, not from object type
+						let mediaType = 'image'; // default
+						if ( selectedMedia.mime_type ) {
+							if (
+								selectedMedia.mime_type.startsWith( 'video/' )
+							) {
+								mediaType = 'video';
+							} else if (
+								selectedMedia.mime_type.startsWith( 'audio/' )
+							) {
+								mediaType = 'audio';
+							}
 						}
-					} }
-					renderToggle={ ( buttonProps ) => (
-						<Button
-							__next40pxDefaultSize
-							className="block-editor-content-only-controls__media"
-							{ ...buttonProps }
+
+						// Build new value dynamically based on what's in the mapping
+						const newValue = {};
+
+						// Iterate over mapping keys and set values for supported properties
+						if ( fieldDef?.mapping ) {
+							Object.keys( fieldDef.mapping ).forEach(
+								( key ) => {
+									if ( key === 'id' ) {
+										newValue[ key ] = selectedMedia.id;
+									} else if (
+										key === 'src' ||
+										key === 'url'
+									) {
+										newValue[ key ] = selectedMedia.url;
+									} else if ( key === 'type' ) {
+										newValue[ key ] = mediaType;
+									} else if (
+										key === 'link' &&
+										selectedMedia.link
+									) {
+										newValue[ key ] = selectedMedia.link;
+									} else if (
+										key === 'caption' &&
+										! value?.caption &&
+										selectedMedia.caption
+									) {
+										newValue[ key ] = selectedMedia.caption;
+									} else if (
+										key === 'alt' &&
+										! value?.alt &&
+										selectedMedia.alt
+									) {
+										newValue[ key ] = selectedMedia.alt;
+									} else if (
+										key === 'poster' &&
+										selectedMedia.poster
+									) {
+										newValue[ key ] = selectedMedia.poster;
+									}
+								}
+							);
+						}
+
+						// Turn off featured image when manually selecting media
+						if ( hasFeaturedImageSupport ) {
+							newValue.featuredImage = false;
+						}
+
+						// Merge with existing value to preserve other field properties
+						const finalValue = { ...value, ...newValue };
+						updateAttributes( finalValue );
+					}
+				} }
+				renderToggle={ ( buttonProps ) => (
+					<Button
+						__next40pxDefaultSize
+						className="block-editor-content-only-controls__media"
+						{ ...buttonProps }
+					>
+						<Grid
+							rowGap={ 0 }
+							columnGap={ 8 }
+							templateColumns="24px 1fr"
+							className="block-editor-content-only-controls__media-row"
 						>
-							<Grid
-								rowGap={ 0 }
-								columnGap={ 8 }
-								templateColumns="24px 1fr"
-								className="block-editor-content-only-controls__media-row"
-							>
-								{ src && (
-									<>
-										<MediaThumbnail
-											attachment={ attachment }
-											control={ control }
-											attributeValues={ attributeValues }
-										/>
-										<span className="block-editor-content-only-controls__media-title">
-											{
-												// TODO - truncate long titles or url smartly (e.g. show filename).
-												attachment?.title?.raw &&
-												attachment?.title?.raw !== ''
-													? attachment?.title?.raw
-													: src
-											}
-										</span>
-									</>
-								) }
-								{ ! src && (
-									<>
-										<span
-											className="block-editor-content-only-controls__media-placeholder"
-											style={ {
-												width: '24px',
-												height: '24px',
-											} }
-										/>
-										<span className="block-editor-content-only-controls__media-title">
-											{ chooseItemLabel }
-										</span>
-									</>
-								) }
-							</Grid>
-						</Button>
-					) }
-				/>
-			</ToolsPanelItem>
+							{ url && (
+								<>
+									<MediaThumbnail
+										attachment={ attachment }
+										field={ field }
+										data={ data }
+									/>
+									<span className="block-editor-content-only-controls__media-title">
+										{
+											// TODO - truncate long titles or url smartly (e.g. show filename).
+											attachment?.title?.raw &&
+											attachment?.title?.raw !== ''
+												? attachment?.title?.raw
+												: url
+										}
+									</span>
+								</>
+							) }
+							{ ! url && (
+								<>
+									<span
+										className="block-editor-content-only-controls__media-placeholder"
+										style={ {
+											width: '24px',
+											height: '24px',
+										} }
+									/>
+									<span className="block-editor-content-only-controls__media-title">
+										{ chooseItemLabel }
+									</span>
+								</>
+							) }
+						</Grid>
+					</Button>
+				) }
+			/>
 		</MediaUploadCheck>
 	);
 }

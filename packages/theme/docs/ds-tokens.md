@@ -111,13 +111,14 @@ Do not edit directly.
 
 ### Dimension
 
-| Variable name                              | Description                      |
-| ------------------------------------------ | -------------------------------- |
-| `--wpds-dimension-base`                    | Base dimension unit              |
-| `--wpds-dimension-padding-surface-x-small` | Extra small spacing for surfaces |
-| `--wpds-dimension-padding-surface-small`   | Small spacing for surfaces       |
-| `--wpds-dimension-padding-surface-medium`  | Medium spacing for surfaces      |
-| `--wpds-dimension-padding-surface-large`   | Large spacing for surfaces       |
+| Variable name                          | Description                         |
+| -------------------------------------- | ----------------------------------- |
+| `--wpds-dimension-base`                | Base dimension unit                 |
+| `--wpds-dimension-padding-surface-2xs` | 2x extra small spacing for surfaces |
+| `--wpds-dimension-padding-surface-xs`  | Extra small spacing for surfaces    |
+| `--wpds-dimension-padding-surface-sm`  | Small spacing for surfaces          |
+| `--wpds-dimension-padding-surface-md`  | Medium spacing for surfaces         |
+| `--wpds-dimension-padding-surface-lg`  | Large spacing for surfaces          |
 
 ### Elevation
 

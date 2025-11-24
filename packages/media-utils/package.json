@@ -47,6 +47,9 @@
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/private-apis": "file:../private-apis"
 	},
+	"peerDependencies": {
+		"react": "^18.0.0"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

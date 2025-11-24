@@ -3,9 +3,11 @@
  */
 import {
 	to,
+	toGamut,
 	serialize,
 	contrastWCAG21,
 	sRGB,
+	OKLCH,
 	type ColorTypes,
 } from 'colorjs.io/fn';
 
@@ -31,4 +33,13 @@ export function getColorString( color: ColorTypes ): string {
  */
 export function getContrast( colorA: ColorTypes, colorB: ColorTypes ): number {
 	return contrastWCAG21( colorA, colorB );
+}
+
+/**
+ * Make sure that a color is valid in the sRGB gamut and convert it to OKLCH.
+ * @param c
+ */
+export function clampToGamut( c: ColorTypes ) {
+	// map into sRGB using CSS OKLCH method
+	return to( toGamut( c, { space: sRGB, method: 'css' } ), OKLCH );
 }

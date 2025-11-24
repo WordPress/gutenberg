@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { image as icon } from '@wordpress/icons';
+import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -13,6 +14,9 @@ import edit from './edit';
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
+import { unlock } from '../lock-unlock';
+
+const { fieldsKey } = unlock( blocksPrivateApis );
 
 const { name } = metadata;
 
@@ -63,14 +67,15 @@ export const settings = {
 };
 
 if ( window.__experimentalContentOnlyPatternInsertion ) {
-	settings.fields = [
+	settings[ fieldsKey ] = [
 		{
+			id: 'image',
 			label: __( 'Image' ),
-			type: 'Media',
+			type: 'media',
 			shownByDefault: true,
 			mapping: {
 				id: 'id',
-				src: 'url',
+				url: 'url',
 				caption: 'caption',
 				alt: 'alt',
 			},
@@ -80,31 +85,28 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 			},
 		},
 		{
+			id: 'link',
 			label: __( 'Link' ),
-			type: 'Link',
+			type: 'link',
 			shownByDefault: false,
 			mapping: {
-				href: 'href',
+				url: 'href',
 				rel: 'rel',
-				target: 'linkTarget',
+				linkTarget: 'linkTarget',
 				destination: 'linkDestination',
 			},
 		},
 		{
+			id: 'caption',
 			label: __( 'Caption' ),
-			type: 'RichText',
+			type: 'richtext',
 			shownByDefault: false,
-			mapping: {
-				value: 'caption',
-			},
 		},
 		{
+			id: 'alt',
 			label: __( 'Alt text' ),
-			type: 'PlainText',
+			type: 'text',
 			shownByDefault: false,
-			mapping: {
-				value: 'alt',
-			},
 		},
 	];
 }

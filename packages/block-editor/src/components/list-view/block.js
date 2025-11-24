@@ -80,7 +80,7 @@ function ListViewBlock( {
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ settingsAnchorRect, setSettingsAnchorRect ] = useState();
 
-	const { isLocked, canEdit, canMove } = useBlockLock( clientId );
+	const { isLocked } = useBlockLock( clientId );
 
 	const isFirstSelectedBlock =
 		isSelected && selectedClientIds[ 0 ] === clientId;
@@ -112,6 +112,8 @@ function ListViewBlock( {
 		getBlockOrder,
 		getBlockParents,
 		getBlocksByClientId,
+		canEditBlock,
+		canMoveBlock,
 		canRemoveBlocks,
 		isGroupable,
 	} = useSelect( blockEditorStore );
@@ -553,7 +555,7 @@ function ListViewBlock( {
 		'is-dragging': isDragged,
 		'has-single-cell': ! showBlockActions,
 		'is-synced': blockInformation?.isSynced,
-		'is-draggable': canMove,
+		'is-draggable': canMoveBlock,
 		'is-displacement-normal': displacement === 'normal',
 		'is-displacement-up': displacement === 'up',
 		'is-displacement-down': displacement === 'down',
@@ -588,7 +590,7 @@ function ListViewBlock( {
 			path={ path }
 			id={ `list-view-${ listViewInstanceId }-block-${ clientId }` }
 			data-block={ clientId }
-			data-expanded={ canEdit ? isExpanded : undefined }
+			data-expanded={ canEditBlock ? isExpanded : undefined }
 			ref={ rowRef }
 		>
 			<TreeGridCell
@@ -614,7 +616,7 @@ function ListViewBlock( {
 								currentlyEditingBlockInCanvas ? 0 : tabIndex
 							}
 							onFocus={ onFocus }
-							isExpanded={ canEdit ? isExpanded : undefined }
+							isExpanded={ canEditBlock ? isExpanded : undefined }
 							selectedClientIds={ selectedClientIds }
 							ariaDescribedBy={ descriptionId }
 						/>

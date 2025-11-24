@@ -6,7 +6,7 @@
 
 .block-editor-content-only-controls__screen {
 	&.components-navigator-screen {
-		padding: $grid-unit-10 0 0 0;
+		padding: $grid-unit-10 0 $grid-unit-20 0;
 	}
 
 	// Add border for the entire content controls and remove the similar border
@@ -32,4 +32,13 @@
 .block-editor-content-only-controls__back-button,
 .block-editor-content-only-controls__drill-down-button {
 	width: 100%;
+}
+
+.block-editor-content-only-controls__fields-container {
+	padding: 0 $grid-unit-20;
+}
+
+.block-editor-content-only-controls__fields-header {
+	padding: $grid-unit-10 0;
+	margin-bottom: $grid-unit-05;
 }

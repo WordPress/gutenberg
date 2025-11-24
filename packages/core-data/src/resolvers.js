@@ -118,9 +118,8 @@ export const getEntityRecord =
 			if (
 				kind === 'postType' &&
 				name === 'wp_template' &&
-				key &&
-				typeof key === 'string' &&
-				! /^\d+$/.test( key )
+				( ( key && typeof key === 'string' && ! /^\d+$/.test( key ) ) ||
+					! window?.__experimentalTemplateActivate )
 			) {
 				baseURL =
 					baseURL.slice( 0, baseURL.lastIndexOf( '/' ) ) +

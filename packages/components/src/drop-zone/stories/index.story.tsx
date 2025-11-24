@@ -7,6 +7,7 @@ import type { Meta, StoryFn } from '@storybook/react';
  * WordPress dependencies
  */
 import { upload, media } from '@wordpress/icons';
+import { fn } from '@storybook/test';
 
 /**
  * Internal dependencies
@@ -26,8 +27,12 @@ const meta: Meta< typeof DropZone > = {
 			mapping: ICONS,
 		},
 	},
+	args: {
+		onFilesDrop: fn(),
+		onHTMLDrop: fn(),
+		onDrop: fn(),
+	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},

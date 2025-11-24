@@ -25,15 +25,20 @@ function isColorTransparent( color ) {
  * @param {string} clientId Block client ID.
  */
 export function useEventHandlers( { clientId, isSelected } ) {
-	const { getBlockRootClientId, isZoomOut, hasMultiSelection } = unlock(
-		useSelect( blockEditorStore )
-	);
+	const {
+		getBlockRootClientId,
+		isZoomOut,
+		hasMultiSelection,
+		isSectionBlock,
+		editedContentOnlySection,
+	} = unlock( useSelect( blockEditorStore ) );
 	const {
 		insertAfterBlock,
 		removeBlock,
 		resetZoomLevel,
 		startDraggingBlocks,
 		stopDraggingBlocks,
+		editContentOnlySection,
 	} = unlock( useDispatch( blockEditorStore ) );
 
 	return useRefEffect(
@@ -282,9 +287,32 @@ export function useEventHandlers( { clientId, isSelected } ) {
 			node.addEventListener( 'keydown', onKeyDown );
 			node.addEventListener( 'dragstart', onDragStart );
 
+			/**
+			 * Handles double-click events on section blocks to edit content only section.
+			 *
+			 * @param {MouseEvent} event Double-click event.
+			 */
+			function onDoubleClick( event ) {
+				const isSection = isSectionBlock( clientId );
+				const isAlreadyEditing = editedContentOnlySection === clientId;
+
+				if ( isSection && ! isAlreadyEditing ) {
+					event.preventDefault();
+					editContentOnlySection( clientId );
+				}
+			}
+
+			// Only add double-click listener if experimental flag is enabled
+			if ( window?.__experimentalContentOnlyPatternInsertion ) {
+				node.addEventListener( 'dblclick', onDoubleClick );
+			}
+
 			return () => {
 				node.removeEventListener( 'keydown', onKeyDown );
 				node.removeEventListener( 'dragstart', onDragStart );
+				if ( window?.__experimentalContentOnlyPatternInsertion ) {
+					node.removeEventListener( 'dblclick', onDoubleClick );
+				}
 			};
 		},
 		[
@@ -298,6 +326,9 @@ export function useEventHandlers( { clientId, isSelected } ) {
 			hasMultiSelection,
 			startDraggingBlocks,
 			stopDraggingBlocks,
+			isSectionBlock,
+			editedContentOnlySection,
+			editContentOnlySection,
 		]
 	);
 }

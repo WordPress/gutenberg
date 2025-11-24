@@ -82,7 +82,7 @@ const DataViewsPickerContent = ( {
 		perPage: 10,
 		filters: [],
 		type: LAYOUT_PICKER_GRID,
-		groupByField: isGrouped ? 'type' : undefined,
+		groupBy: isGrouped ? { field: 'type', direction: 'asc' } : undefined,
 		infiniteScrollEnabled,
 	} );
 	const { data: shownData, paginationInfo: normalPaginationInfo } =
@@ -93,8 +93,10 @@ const DataViewsPickerContent = ( {
 	useEffect( () => {
 		setView( ( prevView ) => ( {
 			...prevView,
-			groupByField:
-				isGrouped && ! infiniteScrollEnabled ? 'type' : undefined,
+			groupBy:
+				isGrouped && ! infiniteScrollEnabled
+					? { field: 'type', direction: 'asc' }
+					: undefined,
 			infiniteScrollEnabled,
 		} ) );
 	}, [ isGrouped, infiniteScrollEnabled ] );
@@ -269,18 +271,16 @@ export const WithModal = ( {
 					isFullScreen={ false }
 					size="fill"
 				>
-					<div style={ { padding: '16px' } }>
-						<DataViewsPickerContent
-							perPageSizes={ perPageSizes }
-							isMultiselectable={ isMultiselectable }
-							isGrouped={ isGrouped }
-							infiniteScrollEnabled={ infiniteScrollEnabled }
-							actions={ modalActions }
-							selection={ selectedItems.map( ( item ) =>
-								String( item.id )
-							) }
-						/>
-					</div>
+					<DataViewsPickerContent
+						perPageSizes={ perPageSizes }
+						isMultiselectable={ isMultiselectable }
+						isGrouped={ isGrouped }
+						infiniteScrollEnabled={ infiniteScrollEnabled }
+						actions={ modalActions }
+						selection={ selectedItems.map( ( item ) =>
+							String( item.id )
+						) }
+					/>
 				</Modal>
 			) }
 		</>

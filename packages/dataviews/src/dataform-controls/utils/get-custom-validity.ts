@@ -14,6 +14,8 @@ export default function getCustomValidity< Item >(
 		customValidity = validity?.required?.message
 			? validity.required
 			: undefined;
+	} else if ( isValid?.pattern && validity?.pattern ) {
+		customValidity = validity.pattern;
 	} else if ( isValid?.elements && validity?.elements ) {
 		customValidity = validity.elements;
 	} else if ( validity?.custom ) {

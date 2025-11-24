@@ -21,9 +21,6 @@ import { useRef, createInterpolateElement } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
 import { dateI18n, getDate } from '@wordpress/date';
 
-const ENTER = 'Enter';
-const SPACE = ' ';
-
 /**
  * Internal dependencies
  */
@@ -57,6 +54,7 @@ import {
 import type {
 	Filter,
 	NormalizedField,
+	NormalizedFieldDate,
 	NormalizedFilter,
 	Operator,
 	Option,
@@ -64,6 +62,9 @@ import type {
 } from '../../types';
 import useElements from '../../hooks/use-elements';
 import parseDateTime from '../../field-types/utils/parse-date-time';
+
+const ENTER = 'Enter';
+const SPACE = ' ';
 
 interface FilterTextProps {
 	activeElements: Option[];
@@ -503,7 +504,10 @@ export default function Filter( {
 			try {
 				const dateValue = parseDateTime( label );
 				if ( dateValue !== null ) {
-					label = dateI18n( field.format.date, getDate( label ) );
+					label = dateI18n(
+						( field as NormalizedFieldDate< any > ).format.date,
+						getDate( label )
+					);
 				}
 			} catch ( e ) {
 				label = filterInView.value;

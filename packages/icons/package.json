@@ -40,6 +40,9 @@
 		"@wordpress/element": "file:../element",
 		"@wordpress/primitives": "file:../primitives"
 	},
+	"peerDependencies": {
+		"react": "^18.0.0"
+	},
 	"publishConfig": {
 		"access": "public"
 	},
