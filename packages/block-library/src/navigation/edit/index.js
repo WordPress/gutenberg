@@ -81,6 +81,8 @@ import DeletedNavigationWarning from './deleted-navigation-warning';
 import AccessibleDescription from './accessible-description';
 import AccessibleMenuDescription from './accessible-menu-description';
 import OverlaySelector from './overlay-selector';
+import OverlayToggleControl from './overlay-toggle-control';
+import './use-overlay-toggle-control'; // Register filter for overlay toggle control
 import { unlock } from '../../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 
@@ -1133,6 +1135,11 @@ function Navigation( {
 										<OverlayTemplatePartInnerBlocks
 											overlayTemplatePartId={
 												overlayTemplatePartId
+											}
+											onClose={ () =>
+												setResponsiveMenuVisibility(
+													false
+												)
 											}
 										/>
 									) : (

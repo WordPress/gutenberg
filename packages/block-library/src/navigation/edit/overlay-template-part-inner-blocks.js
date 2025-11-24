@@ -3,9 +3,11 @@
  */
 import { useEntityBlockEditor } from '@wordpress/core-data';
 import { useInnerBlocksProps } from '@wordpress/block-editor';
+import { OverlayToggleContext } from './use-overlay-toggle-control';
 
 export default function OverlayTemplatePartInnerBlocks( {
 	overlayTemplatePartId,
+	onClose,
 } ) {
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
@@ -25,5 +27,9 @@ export default function OverlayTemplatePartInnerBlocks( {
 		}
 	);
 
-	return <div { ...innerBlocksProps } />;
+	return (
+		<OverlayToggleContext.Provider value={ onClose }>
+			<div { ...innerBlocksProps } />
+		</OverlayToggleContext.Provider>
+	);
 }
