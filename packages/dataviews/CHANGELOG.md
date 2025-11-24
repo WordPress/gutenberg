@@ -17,6 +17,7 @@
 - Documentation: improve DataView's `layout` prop. [#73470](https://github.com/WordPress/gutenberg/pull/73470)
 - DataForm Panel Layout: Focus the first input element when the panel opens. [#72322](https://github.com/WordPress/gutenberg/pull/72322)
 - DataForm: Pattern validation is now supported on all fields that browsers support it in. [#73156](https://github.com/WordPress/gutenberg/pull/73156)
+- Documentation: improve operators docs. [#73523](https://github.com/WordPress/gutenberg/pull/73523)
 
 ### Bug fixes
 
