@@ -360,13 +360,15 @@ async function loadPostTypeEntities() {
 					 *
 					 * @param {import('@wordpress/sync').CRDTDoc}    crdtDoc
 					 * @param {import('@wordpress/sync').ObjectData} editedRecord
+					 * @param {import('@wordpress/sync').Origin}     origin
 					 * @return {Partial< import('@wordpress/sync').ObjectData >} Changes to record
 					 */
-					getChangesFromCRDTDoc: ( crdtDoc, editedRecord ) =>
+					getChangesFromCRDTDoc: ( crdtDoc, editedRecord, origin ) =>
 						getPostChangesFromCRDTDoc(
 							crdtDoc,
 							editedRecord,
-							postType
+							postType,
+							origin
 						),
 
 					/**
