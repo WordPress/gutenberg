@@ -1198,6 +1198,20 @@ Example:
 }
 ```
 
+### `description`
+
+A string describing the field's purpose or usage. Used to provide context in Edit mode, etc.
+
+-   Type: `string`.
+-   Optional.
+
+### `placeholder`
+
+A string used as a placeholder in Edit mode, etc.
+
+-   Type: `string`.
+-   Optional.
+
 ### `getValue` and `setValue`
 
 These functions control how field values are read from and written to your data structure.
@@ -1442,6 +1456,13 @@ Finally, the field author can always provide its own custom `Edit` control. It r
 }
 ```
 
+### `readOnly`
+
+Boolean indicating that the field is not editable. Fields that are not editable use the `render` function to display their value in Edit contexts.
+
+-   Type: `boolean`.
+-   Optional.
+-   Defaults to `false`.
 
 ### `sort`
 
