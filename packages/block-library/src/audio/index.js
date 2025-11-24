@@ -39,12 +39,13 @@ export const settings = {
 if ( window.__experimentalContentOnlyPatternInsertion ) {
 	settings[ fieldsKey ] = [
 		{
+			id: 'audio',
 			label: __( 'Audio' ),
-			type: 'Media',
+			type: 'media',
 			shownByDefault: true,
 			mapping: {
 				id: 'id',
-				src: 'src',
+				url: 'src',
 			},
 			args: {
 				allowedTypes: [ 'audio' ],
@@ -52,12 +53,10 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 			},
 		},
 		{
+			id: 'caption',
 			label: __( 'Caption' ),
-			type: 'RichText',
+			type: 'richtext',
 			shownByDefault: false,
-			mapping: {
-				value: 'caption',
-			},
 		},
 	];
 }

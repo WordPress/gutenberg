@@ -226,6 +226,8 @@ function Items( {
 				rootClientId === selectedBlockClientId
 			);
 
+			const templateLock = getTemplateLock( rootClientId );
+
 			return {
 				order: _order,
 				selectedBlocks: selectedBlockClientIds,
@@ -238,7 +240,7 @@ function Items( {
 							rootClientId
 						) ) &&
 					getBlockEditingMode( rootClientId ) !== 'disabled' &&
-					! getTemplateLock( rootClientId ) &&
+					( ! templateLock || templateLock === 'contentOnly' ) &&
 					hasAppender &&
 					! _isZoomOut() &&
 					( hasCustomAppender ||

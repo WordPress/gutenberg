@@ -57,13 +57,15 @@ export const settings = {
 if ( window.__experimentalContentOnlyPatternInsertion ) {
 	settings[ fieldsKey ] = [
 		{
+			id: 'media',
 			label: __( 'Media' ),
-			type: 'Media',
+			type: 'media',
 			shownByDefault: true,
 			mapping: {
 				id: 'mediaId',
 				type: 'mediaType',
-				src: 'mediaUrl',
+				url: 'mediaUrl',
+				link: 'mediaLink',
 			},
 			args: {
 				allowedTypes: [ 'image', 'video' ],
@@ -71,13 +73,14 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 			},
 		},
 		{
+			id: 'link',
 			label: __( 'Link' ),
-			type: 'Link',
+			type: 'link',
 			shownByDefault: false,
 			mapping: {
-				href: 'href',
+				url: 'href',
 				rel: 'rel',
-				target: 'linkTarget',
+				linkTarget: 'linkTarget',
 			},
 		},
 	];

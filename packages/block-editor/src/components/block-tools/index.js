@@ -219,7 +219,7 @@ export default function BlockTools( {
 				const canToggleBlockVisibility = blocks.every( ( block ) =>
 					hasBlockSupport(
 						getBlockName( block.clientId ),
-						'blockVisibility',
+						'visibility',
 						true
 					)
 				);

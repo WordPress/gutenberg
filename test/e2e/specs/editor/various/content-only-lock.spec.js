@@ -130,7 +130,7 @@ test.describe( 'Content-only lock', () => {
 		).not.toBeAttached();
 	} );
 
-	test( 'blocks within content-only locked container cannot be duplicated, inserted before/after, or moved', async ( {
+	test( 'content role blocks not within a `content` role container cannot be duplicated, inserted before/after, or moved', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -166,44 +166,12 @@ test.describe( 'Content-only lock', () => {
 				includeHidden: true,
 			} )
 			.filter( { hasText: 'First paragraph' } );
-		const firstListItem = editor.canvas
-			.getByRole( 'document', {
-				name: 'Block: List item',
-				includeHidden: true,
-			} )
-			.filter( { hasText: 'List item one' } );
-		const secondListItem = editor.canvas
-			.getByRole( 'document', {
-				name: 'Block: List item',
-				includeHidden: true,
-			} )
-			.filter( { hasText: 'List item two' } );
 
 		// Select the content-locked group block.
 		await editor.selectBlocks( groupBlock );
 		await test.step( 'Blocks cannot be inserted before/after or duplicated', async () => {
 			// Test paragraph.
 			await editor.selectBlocks( paragraph );
-			await editor.showBlockToolbar();
-
-			await expect(
-				page
-					.getByRole( 'toolbar', { name: 'Block tools' } )
-					.getByRole( 'button', { name: 'Options' } )
-			).toBeHidden();
-
-			// Test first list item.
-			await editor.selectBlocks( firstListItem );
-			await editor.showBlockToolbar();
-
-			await expect(
-				page
-					.getByRole( 'toolbar', { name: 'Block tools' } )
-					.getByRole( 'button', { name: 'Options' } )
-			).toBeHidden();
-
-			// Test second list item.
-			await editor.selectBlocks( secondListItem );
 			await editor.showBlockToolbar();
 
 			await expect(
@@ -229,7 +197,127 @@ test.describe( 'Content-only lock', () => {
 					.getByRole( 'toolbar', { name: 'Block tools' } )
 					.getByRole( 'button', { name: 'Move down' } )
 			).toBeHidden();
+		} );
+	} );
 
+	test( 'content role blocks that are within a `content` role container can be duplicated, inserted before/after, or moved', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Add content only locked block with paragraph and list
+		await pageUtils.pressKeys( 'secondary+M' );
+
+		await page.getByPlaceholder( 'Start writing with text or HTML' )
+			.fill( `<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:paragraph -->
+<p>First paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>List item one</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>List item two</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></div>
+<!-- /wp:group -->` );
+
+		await pageUtils.pressKeys( 'secondary+M' );
+
+		const groupBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Group',
+		} );
+		const firstListItem = editor.canvas
+			.getByRole( 'document', {
+				name: 'Block: List item',
+				includeHidden: true,
+			} )
+			.filter( { hasText: 'List item one' } );
+		const secondListItem = editor.canvas
+			.getByRole( 'document', {
+				name: 'Block: List item',
+				includeHidden: true,
+			} )
+			.filter( { hasText: 'List item two' } );
+
+		// Select the content-locked group block.
+		await editor.selectBlocks( groupBlock );
+		await test.step( 'Blocks can be inserted before/after or duplicated', async () => {
+			// Test first list item.
+			await editor.selectBlocks( firstListItem );
+			await editor.showBlockToolbar();
+
+			const firstOptionsButton = page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Options' } );
+
+			await expect( firstOptionsButton ).toBeVisible();
+
+			// Open the options menu.
+			await firstOptionsButton.click();
+
+			// Verify Insert Before, Insert After, and Duplicate menu items are present.
+			await expect(
+				page
+					.getByRole( 'menu', { name: 'Options' } )
+					.getByRole( 'menuitem', { name: 'Add before' } )
+			).toBeVisible();
+
+			await expect(
+				page
+					.getByRole( 'menu', { name: 'Options' } )
+					.getByRole( 'menuitem', { name: 'Add after' } )
+			).toBeVisible();
+
+			await expect(
+				page
+					.getByRole( 'menu', { name: 'Options' } )
+					.getByRole( 'menuitem', { name: 'Duplicate' } )
+			).toBeVisible();
+
+			// Close the menu.
+			await page.keyboard.press( 'Escape' );
+
+			// Test second list item.
+			await editor.selectBlocks( secondListItem );
+			await editor.showBlockToolbar();
+
+			const secondOptionsButton = page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Options' } );
+
+			await expect( secondOptionsButton ).toBeVisible();
+
+			// Open the options menu.
+			await secondOptionsButton.click();
+
+			// Verify Insert Before, Insert After, and Duplicate menu items are present.
+			await expect(
+				page
+					.getByRole( 'menu', { name: 'Options' } )
+					.getByRole( 'menuitem', { name: 'Add before' } )
+			).toBeVisible();
+
+			await expect(
+				page
+					.getByRole( 'menu', { name: 'Options' } )
+					.getByRole( 'menuitem', { name: 'Add after' } )
+			).toBeVisible();
+
+			await expect(
+				page
+					.getByRole( 'menu', { name: 'Options' } )
+					.getByRole( 'menuitem', { name: 'Duplicate' } )
+			).toBeVisible();
+
+			// Close the menu.
+			await page.keyboard.press( 'Escape' );
+		} );
+
+		await test.step( 'Blocks cannot be moved', async () => {
 			// Test first list item.
 			await editor.selectBlocks( firstListItem );
 			await editor.showBlockToolbar();
@@ -238,13 +326,13 @@ test.describe( 'Content-only lock', () => {
 				page
 					.getByRole( 'toolbar', { name: 'Block tools' } )
 					.getByRole( 'button', { name: 'Move up' } )
-			).toBeHidden();
+			).toBeVisible();
 
 			await expect(
 				page
 					.getByRole( 'toolbar', { name: 'Block tools' } )
 					.getByRole( 'button', { name: 'Move down' } )
-			).toBeHidden();
+			).toBeVisible();
 
 			// Test second list item.
 			await editor.selectBlocks( secondListItem );
@@ -254,13 +342,13 @@ test.describe( 'Content-only lock', () => {
 				page
 					.getByRole( 'toolbar', { name: 'Block tools' } )
 					.getByRole( 'button', { name: 'Move up' } )
-			).toBeHidden();
+			).toBeVisible();
 
 			await expect(
 				page
 					.getByRole( 'toolbar', { name: 'Block tools' } )
 					.getByRole( 'button', { name: 'Move down' } )
-			).toBeHidden();
+			).toBeVisible();
 		} );
 	} );
 } );

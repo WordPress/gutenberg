@@ -41,21 +41,20 @@ export const settings = {
 if ( window.__experimentalContentOnlyPatternInsertion ) {
 	settings[ fieldsKey ] = [
 		{
+			id: 'text',
 			label: __( 'Content' ),
-			type: 'RichText',
+			type: 'richtext',
 			shownByDefault: true,
-			mapping: {
-				value: 'text',
-			},
 		},
 		{
+			id: 'link',
 			label: __( 'Link' ),
-			type: 'Link',
+			type: 'link',
 			shownByDefault: false,
 			mapping: {
-				href: 'url',
+				url: 'url',
 				rel: 'rel',
-				target: 'linkTarget',
+				linkTarget: 'linkTarget',
 			},
 		},
 	];

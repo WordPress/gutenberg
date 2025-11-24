@@ -47,6 +47,7 @@ $child_ctx  = $attributes['childContext'] ?? false;
 	>
 		<div data-testid="prop" data-wp-text="context.prop"></div>
 		<div data-testid="nested.prop" data-wp-text="context.nested.prop"></div>
+		<div data-testid="objCopiedFromServer" data-wp-text="context.objCopiedFromServer.prop"></div>
 		<div data-testid="newProp" data-wp-text="context.newProp"></div>
 		<div data-testid="nested.newProp" data-wp-text="context.nested.newProp"></div>
 		<div data-testid="inherited.prop" data-wp-text="context.inherited.prop"></div>

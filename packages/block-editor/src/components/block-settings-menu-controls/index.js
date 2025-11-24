@@ -50,7 +50,7 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 				canToggleSelectedBlocksVisibility: getBlocksByClientId(
 					ids
 				).every( ( block ) =>
-					hasBlockSupport( block.name, 'blockVisibility', true )
+					hasBlockSupport( block.name, 'visibility', true )
 				),
 			};
 		},

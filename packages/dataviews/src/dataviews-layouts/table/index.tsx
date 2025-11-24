@@ -458,6 +458,10 @@ function ViewTable< Item >( {
 										onHide={ onHide }
 										setOpenedFilter={ setOpenedFilter }
 										canMove={ false }
+										canInsertLeft={ false }
+										canInsertRight={
+											view.layout?.enableMoving ?? true
+										}
 									/>
 								) }
 							</th>
@@ -466,6 +470,8 @@ function ViewTable< Item >( {
 							// Explicit picks the supported styles.
 							const { width, maxWidth, minWidth, align } =
 								view.layout?.styles?.[ column ] ?? {};
+							const canInsertOrMove =
+								view.layout?.enableMoving ?? true;
 							return (
 								<th
 									key={ column }
@@ -491,9 +497,9 @@ function ViewTable< Item >( {
 										onChangeView={ onChangeView }
 										onHide={ onHide }
 										setOpenedFilter={ setOpenedFilter }
-										canMove={
-											view.layout?.enableMoving ?? true
-										}
+										canMove={ canInsertOrMove }
+										canInsertLeft={ canInsertOrMove }
+										canInsertRight={ canInsertOrMove }
 									/>
 								</th>
 							);

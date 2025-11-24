@@ -2,6 +2,8 @@
  * External dependencies
  */
 import type { Meta, StoryFn } from '@storybook/react';
+import { fn } from '@storybook/test';
+
 /**
  * WordPress dependencies
  */
@@ -19,7 +21,9 @@ const meta: Meta< typeof GradientPicker > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
-		actions: { argTypesRegex: '^on.*' },
+	},
+	args: {
+		onChange: fn(),
 	},
 	argTypes: {
 		value: { control: false },

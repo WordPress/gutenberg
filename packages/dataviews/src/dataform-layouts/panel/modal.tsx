@@ -14,6 +14,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useContext, useState, useMemo } from '@wordpress/element';
+import { useFocusOnMount } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -75,6 +76,8 @@ function ModalContent< Item >( {
 		setChanges( ( prev ) => deepMerge( prev, newValue ) );
 	};
 
+	const focusOnMountRef = useFocusOnMount( 'firstInputElement' );
+
 	return (
 		<Modal
 			className="dataforms-layouts-panel__modal"
@@ -83,23 +86,25 @@ function ModalContent< Item >( {
 			title={ fieldLabel }
 			size="medium"
 		>
-			<DataFormLayout
-				data={ modalData }
-				form={ form }
-				onChange={ handleOnChange }
-				validity={ validity }
-			>
-				{ ( FieldLayout, childField, childFieldValidity ) => (
-					<FieldLayout
-						key={ childField.id }
-						data={ modalData }
-						field={ childField }
-						onChange={ handleOnChange }
-						hideLabelFromVision={ form.fields.length < 2 }
-						validity={ childFieldValidity }
-					/>
-				) }
-			</DataFormLayout>
+			<div ref={ focusOnMountRef }>
+				<DataFormLayout
+					data={ modalData }
+					form={ form }
+					onChange={ handleOnChange }
+					validity={ validity }
+				>
+					{ ( FieldLayout, childField, childFieldValidity ) => (
+						<FieldLayout
+							key={ childField.id }
+							data={ modalData }
+							field={ childField }
+							onChange={ handleOnChange }
+							hideLabelFromVision={ form.fields.length < 2 }
+							validity={ childFieldValidity }
+						/>
+					) }
+				</DataFormLayout>
+			</div>
 			<HStack
 				className="dataforms-layouts-panel__modal-footer"
 				spacing={ 3 }

@@ -40,12 +40,13 @@ export const settings = {
 if ( window.__experimentalContentOnlyPatternInsertion ) {
 	settings[ fieldsKey ] = [
 		{
+			id: 'video',
 			label: __( 'Video' ),
-			type: 'Media',
+			type: 'media',
 			shownByDefault: true,
 			mapping: {
 				id: 'id',
-				src: 'src',
+				url: 'src',
 				caption: 'caption',
 				poster: 'poster',
 			},
@@ -55,12 +56,10 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 			},
 		},
 		{
+			id: 'caption',
 			label: __( 'Caption' ),
-			type: 'RichText',
+			type: 'richtext',
 			shownByDefault: false,
-			mapping: {
-				value: 'caption',
-			},
 		},
 	];
 }

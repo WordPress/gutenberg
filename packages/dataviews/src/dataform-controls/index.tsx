@@ -6,12 +6,7 @@ import type { ComponentType } from 'react';
 /**
  * Internal dependencies
  */
-import type {
-	DataFormControlProps,
-	Field,
-	FieldTypeDefinition,
-	EditConfig,
-} from '../types';
+import type { DataFormControlProps, Field, EditConfig } from '../types';
 import checkbox from './checkbox';
 import datetime from './datetime';
 import date from './date';
@@ -29,7 +24,7 @@ import toggleGroup from './toggle-group';
 import array from './array';
 import color from './color';
 import password from './password';
-import hasElements from '../utils/has-elements';
+import hasElements from '../field-types/utils/has-elements';
 
 interface FormControls {
 	[ key: string ]: ComponentType< DataFormControlProps< any > >;
@@ -64,6 +59,9 @@ function isEditConfig( value: any ): value is EditConfig {
 function createConfiguredControl( config: EditConfig ) {
 	const { control, ...controlConfig } = config;
 	const BaseControlType = getControlByType( control );
+	if ( BaseControlType === null ) {
+		return null;
+	}
 
 	return function ConfiguredControl< Item >(
 		props: DataFormControlProps< Item >
@@ -74,8 +72,8 @@ function createConfiguredControl( config: EditConfig ) {
 
 export function getControl< Item >(
 	field: Field< Item >,
-	fieldTypeDefinition: FieldTypeDefinition< Item >
-) {
+	fallback: string | null
+): ComponentType< DataFormControlProps< Item > > | null {
 	if ( typeof field.Edit === 'function' ) {
 		return field.Edit;
 	}
@@ -92,15 +90,11 @@ export function getControl< Item >(
 		return getControlByType( 'select' );
 	}
 
-	if ( typeof fieldTypeDefinition.Edit === 'string' ) {
-		return getControlByType( fieldTypeDefinition.Edit );
+	if ( fallback === null ) {
+		return null;
 	}
 
-	if ( isEditConfig( fieldTypeDefinition.Edit ) ) {
-		return createConfiguredControl( fieldTypeDefinition.Edit );
-	}
-
-	return fieldTypeDefinition.Edit;
+	return getControlByType( fallback );
 }
 
 export function getControlByType( type: string ) {
@@ -108,5 +102,5 @@ export function getControlByType( type: string ) {
 		return FORM_CONTROLS[ type ];
 	}
 
-	throw 'Control ' + type + ' not found';
+	return null;
 }
