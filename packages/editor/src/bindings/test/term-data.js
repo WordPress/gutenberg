@@ -10,6 +10,41 @@ import { store as coreDataStore } from '@wordpress/core-data';
 import { default as termDataBindings, termDataFields } from '../term-data';
 
 describe( 'term-data bindings', () => {
+	const bindings = {
+		id: {
+			source: 'core/term-data',
+			args: { field: 'id' },
+		},
+		name: {
+			source: 'core/term-data',
+			args: { field: 'name' },
+		},
+		slug: {
+			source: 'core/term-data',
+			args: { field: 'slug' },
+		},
+		link: {
+			source: 'core/term-data',
+			args: { field: 'link' },
+		},
+		description: {
+			source: 'core/term-data',
+			args: { field: 'description' },
+		},
+		parent: {
+			source: 'core/term-data',
+			args: { field: 'parent' },
+		},
+		count: {
+			source: 'core/term-data',
+			args: { field: 'count' },
+		},
+		content: {
+			source: 'core/term-data',
+			args: { field: 'unknown' },
+		},
+	};
+
 	const getEntityRecordMock = ( kind, taxonomy, termId ) => {
 		if (
 			kind === 'taxonomy' &&
@@ -56,40 +91,7 @@ describe( 'term-data bindings', () => {
 							taxonomy: 'category',
 							termId: 123,
 						},
-						bindings: {
-							id: {
-								source: 'core/term-data',
-								args: { field: 'id' },
-							},
-							name: {
-								source: 'core/term-data',
-								args: { field: 'name' },
-							},
-							slug: {
-								source: 'core/term-data',
-								args: { field: 'slug' },
-							},
-							link: {
-								source: 'core/term-data',
-								args: { field: 'link' },
-							},
-							description: {
-								source: 'core/term-data',
-								args: { field: 'description' },
-							},
-							parent: {
-								source: 'core/term-data',
-								args: { field: 'parent' },
-							},
-							count: {
-								source: 'core/term-data',
-								args: { field: 'count' },
-							},
-							content: {
-								source: 'core/term-data',
-								args: { field: 'unknown' },
-							},
-						},
+						bindings,
 						clientId: '123abc456',
 					} );
 
@@ -112,40 +114,7 @@ describe( 'term-data bindings', () => {
 							taxonomy: 'category',
 							termId: 456,
 						},
-						bindings: {
-							id: {
-								source: 'core/term-data',
-								args: { field: 'id' },
-							},
-							name: {
-								source: 'core/term-data',
-								args: { field: 'name' },
-							},
-							slug: {
-								source: 'core/term-data',
-								args: { field: 'slug' },
-							},
-							link: {
-								source: 'core/term-data',
-								args: { field: 'link' },
-							},
-							description: {
-								source: 'core/term-data',
-								args: { field: 'description' },
-							},
-							parent: {
-								source: 'core/term-data',
-								args: { field: 'parent' },
-							},
-							count: {
-								source: 'core/term-data',
-								args: { field: 'count' },
-							},
-							content: {
-								source: 'core/term-data',
-								args: { field: 'unknown' },
-							},
-						},
+						bindings,
 						clientId: '123abc456',
 					} );
 
@@ -195,22 +164,19 @@ describe( 'term-data bindings', () => {
 							termId: 456,
 							termData,
 						},
-						bindings: {
-							content: {
-								source: 'core/term-data',
-								args: { field: 'name' },
-							},
-							url: {
-								source: 'core/term-data',
-								args: { field: 'link' },
-							},
-						},
+						bindings,
 						clientId: '123abc456',
 					} );
 
 					expect( values ).toStrictEqual( {
-						content: 'Design',
-						url: 'https://example.com/category/design',
+						id: 456,
+						name: 'Design',
+						slug: 'design',
+						link: 'https://example.com/category/design',
+						description: 'Design resources',
+						parent: 0,
+						count: '(15)',
+						content: 'unknown',
 					} );
 				} );
 
@@ -220,22 +186,19 @@ describe( 'term-data bindings', () => {
 						context: {
 							termData,
 						},
-						bindings: {
-							id: {
-								source: 'core/term-data',
-								args: { field: 'id' },
-							},
-							content: {
-								source: 'core/term-data',
-								args: { field: 'name' },
-							},
-						},
+						bindings,
 						clientId: '123abc456',
 					} );
 
 					expect( values ).toStrictEqual( {
 						id: 456,
-						content: 'Design',
+						name: 'Design',
+						slug: 'design',
+						link: 'https://example.com/category/design',
+						description: 'Design resources',
+						parent: 0,
+						count: '(15)',
+						content: 'unknown',
 					} );
 				} );
 			} );
@@ -248,7 +211,7 @@ describe( 'term-data bindings', () => {
 						return {
 							getBlockName: () => 'core/navigation-link',
 							getBlockAttributes: () => ( {
-								id: 456,
+								id: 789,
 								type: 'category',
 							} ),
 						};
@@ -259,12 +222,16 @@ describe( 'term-data bindings', () => {
 								if (
 									kind === 'taxonomy' &&
 									taxonomy === 'category' &&
-									termId === 456
+									termId === 789
 								) {
 									return {
-										id: 456,
+										id: 789,
 										name: 'Programming',
+										slug: 'programming',
 										link: 'https://example.com/category/programming',
+										description: 'Programming resources',
+										parent: 0,
+										count: 10,
 									};
 								}
 								return null;
@@ -276,22 +243,19 @@ describe( 'term-data bindings', () => {
 				const values = termDataBindings.getValues( {
 					select,
 					context: {},
-					bindings: {
-						content: {
-							source: 'core/term-data',
-							args: { field: 'name' },
-						},
-						url: {
-							source: 'core/term-data',
-							args: { field: 'link' },
-						},
-					},
+					bindings,
 					clientId: '123abc456',
 				} );
 
 				expect( values ).toStrictEqual( {
-					content: 'Programming',
-					url: 'https://example.com/category/programming',
+					id: 789,
+					name: 'Programming',
+					slug: 'programming',
+					link: 'https://example.com/category/programming',
+					description: 'Programming resources',
+					parent: 0,
+					count: '(10)',
+					content: 'unknown',
 				} );
 			} );
 
