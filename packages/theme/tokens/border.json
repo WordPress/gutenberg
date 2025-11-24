@@ -22,12 +22,14 @@
 			}
 		},
 		"width": {
-			"focus": {
-				"$value": { "value": 2, "unit": "px" },
-				"$description": "Border width for focus ring",
-				"$extensions": {
-					"mode": {
-						"high-dpi": { "value": 1.5, "unit": "px" }
+			"interactive": {
+				"focus": {
+					"$value": { "value": 2, "unit": "px" },
+					"$description": "Border width for focus ring",
+					"$extensions": {
+						"mode": {
+							"high-dpi": { "value": 1.5, "unit": "px" }
+						}
 					}
 				}
 			}

@@ -23,7 +23,7 @@
 		},
 		"description": "Large radius for surfaces"
 	},
-	"Border/width-focus": {
+	"Border/width-interactive-focus": {
 		"value": {
 			".": "2px",
 			"high-dpi": "1.5px"

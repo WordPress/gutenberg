@@ -8,7 +8,7 @@ export default [
 	'--wpds-border-radius-surface-sm',
 	'--wpds-border-radius-surface-md',
 	'--wpds-border-radius-surface-lg',
-	'--wpds-border-width-focus',
+	'--wpds-border-width-interactive-focus',
 	'--wpds-color-bg-surface-neutral',
 	'--wpds-color-bg-surface-neutral-strong',
 	'--wpds-color-bg-surface-neutral-weak',
