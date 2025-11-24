@@ -166,10 +166,11 @@ export default {
 			) {
 				return [];
 			}
+			return termDataFields;
 		}
 
 		if ( ! context ) {
-			return termDataFields;
+			return [];
 		}
 
 		if ( ( context.taxonomy && context.termId ) || context.termData ) {
