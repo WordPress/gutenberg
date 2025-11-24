@@ -964,14 +964,54 @@ async function transpilePackage( packageName ) {
 		);
 	}
 
-	const srcFiles = await glob(
-		normalizePath(
-			path.join( packageDir, `src/**/*.${ SOURCE_EXTENSIONS }` )
-		),
-		{
-			ignore: IGNORE_PATTERNS,
+	const cjsEntryPoints = new Set();
+	const moduleEntryPoints = new Set();
+
+	function addBuildPath( entryPoints, buildPath ) {
+		// Convert an exported path like `./build-module/something.js` to
+		// the corresponding source path like `./src/something.tsx`.
+		const srcPath = buildPath
+			.replace( /\/build-module\/|\/build\//, '/src/' )
+			.replace( /\.[^.]+$/, `.${ SOURCE_EXTENSIONS }` );
+		const srcPathNormalized = normalizePath(
+			path.join( packageDir, srcPath )
+		);
+		// Find the real source file, with one of the supported extensions, with `glob`.
+		const srcFiles = glob.sync( srcPathNormalized );
+		if ( srcFiles.length > 0 ) {
+			entryPoints.add( srcFiles[ 0 ] );
 		}
-	);
+	}
+
+	// Add the `.` exports as entrypoints, both CJS and ESM.
+	if ( packageJson.exports ) {
+		const rootExport = packageJson.exports[ '.' ];
+		if ( typeof rootExport === 'string' ) {
+			addBuildPath( cjsEntryPoints, rootExport );
+			addBuildPath( moduleEntryPoints, rootExport );
+		} else if ( typeof rootExport === 'object' ) {
+			const rootCjsExport = rootExport.require || rootExport.default;
+			if ( rootCjsExport ) {
+				addBuildPath( cjsEntryPoints, rootCjsExport );
+			}
+			const rootModuleExport = rootExport.import || rootExport.default;
+			if ( rootModuleExport ) {
+				addBuildPath( moduleEntryPoints, rootModuleExport );
+			}
+		}
+	}
+
+	// Add the `wpScriptModuleExports` exports as entrypoints, module only.
+	if ( packageJson.wpScriptModuleExports ) {
+		const exports =
+			typeof packageJson.wpScriptModuleExports === 'string'
+				? { '.': packageJson.wpScriptModuleExports }
+				: packageJson.wpScriptModuleExports;
+
+		for ( const exportPath of Object.values( exports ) ) {
+			addBuildPath( moduleEntryPoints, exportPath );
+		}
+	}
 
 	const assetFiles = await glob(
 		normalizePath(
@@ -1003,6 +1043,14 @@ async function transpilePackage( packageName ) {
 		setup( build ) {
 			// Externalize all non-CSS imports
 			build.onResolve( { filter: /.*/ }, ( args ) => {
+				// Skip non-package imports.
+				if (
+					args.path.startsWith( '.' ) ||
+					path.isAbsolute( args.path )
+				) {
+					return;
+				}
+
 				// Skip entry points
 				if ( args.kind === 'entry-point' ) {
 					return null;
@@ -1024,10 +1072,10 @@ async function transpilePackage( packageName ) {
 		...styleBundlingPlugins,
 	].filter( Boolean );
 
-	if ( packageJson.main ) {
+	if ( cjsEntryPoints.size > 0 ) {
 		builds.push(
 			esbuild.build( {
-				entryPoints: srcFiles,
+				entryPoints: Array.from( cjsEntryPoints ),
 				outdir: buildDir,
 				outbase: srcDir,
 				bundle: true,
@@ -1056,10 +1104,10 @@ async function transpilePackage( packageName ) {
 		}
 	}
 
-	if ( packageJson.module ) {
+	if ( moduleEntryPoints.size > 0 ) {
 		builds.push(
 			esbuild.build( {
-				entryPoints: srcFiles,
+				entryPoints: Array.from( moduleEntryPoints ),
 				outdir: buildModuleDir,
 				outbase: srcDir,
 				bundle: true,
