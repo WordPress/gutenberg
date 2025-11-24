@@ -3,7 +3,11 @@
  */
 import { createContext, useContext } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
-import { BlockControls } from '@wordpress/block-editor';
+import {
+	BlockControls,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
+import { useDispatch } from '@wordpress/data';
 import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
 import { close } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
@@ -19,20 +23,34 @@ addFilter(
 	'editor.BlockEdit',
 	'core/navigation/overlay-toggle-control',
 	( BlockEdit ) => ( props ) => {
-		const onClose = useOverlayToggle();
+		const overlayToggle = useOverlayToggle();
 		const { name } = props;
+		const { selectBlock } = useDispatch( blockEditorStore );
 
 		// Don't show the control on template-part blocks
 		const isTemplatePart = name === 'core/template-part';
 
+		// Handle close with navigation block selection
+		const handleClose = () => {
+			if ( overlayToggle ) {
+				const { onClose, navigationClientId } = overlayToggle;
+				if ( navigationClientId ) {
+					selectBlock( navigationClientId );
+				}
+				if ( onClose ) {
+					onClose();
+				}
+			}
+		};
+
 		return (
 			<>
-				{ onClose && ! isTemplatePart && (
+				{ overlayToggle && ! isTemplatePart && (
 					<BlockControls group="default">
 						<ToolbarGroup>
 							<ToolbarButton
 								icon={ close }
-								onClick={ onClose }
+								onClick={ handleClose }
 								label={ __( 'Close overlay' ) }
 							>
 								{ __( 'Close Overlay' ) }

@@ -29,6 +29,7 @@ function parseTemplatePartId( templatePartId ) {
 export default function OverlayTemplatePartInnerBlocks( {
 	overlayTemplatePartId,
 	onClose,
+	navigationClientId,
 } ) {
 	// Parse the template part ID to get theme and slug
 	const templatePartAttrs = useMemo( () => {
@@ -63,7 +64,9 @@ export default function OverlayTemplatePartInnerBlocks( {
 	}, [ templatePartAttrs ] );
 
 	return (
-		<OverlayToggleContext.Provider value={ onClose }>
+		<OverlayToggleContext.Provider
+			value={ onClose ? { onClose, navigationClientId } : null }
+		>
 			<div className="wp-block-navigation__container">
 				<InnerBlocks template={ template } templateLock={ false } />
 			</div>

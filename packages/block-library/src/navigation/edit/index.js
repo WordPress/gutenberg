@@ -1141,6 +1141,7 @@ function Navigation( {
 													false
 												)
 											}
+											navigationClientId={ clientId }
 										/>
 									) : (
 										<NavigationInnerBlocks
