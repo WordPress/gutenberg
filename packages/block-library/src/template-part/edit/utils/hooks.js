@@ -83,9 +83,24 @@ export function useAlternativeBlockPatterns( area, clientId ) {
 			const blockNameWithArea = area
 				? `core/template-part/${ area }`
 				: 'core/template-part';
-			const { getBlockRootClientId, getPatternsByBlockTypes } =
-				select( blockEditorStore );
+			const {
+				getBlockRootClientId,
+				getPatternsByBlockTypes,
+				__experimentalGetAllowedPatterns,
+			} = select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientId );
+
+			// For overlay, also check patterns without rootClientId restriction
+			// as patterns might not be available in the navigation block context
+			if ( area === 'overlay' ) {
+				const allPatterns =
+					__experimentalGetAllowedPatterns( clientId );
+				const overlayPatterns = allPatterns.filter( ( pattern ) =>
+					pattern?.blockTypes?.includes( blockNameWithArea )
+				);
+				return overlayPatterns;
+			}
+
 			return getPatternsByBlockTypes( blockNameWithArea, rootClientId );
 		},
 		[ area, clientId ]
