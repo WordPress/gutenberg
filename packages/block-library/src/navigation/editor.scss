@@ -547,6 +547,17 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 	}
 }
 
+// Set width and height to 100% for container elements when overlay is open.
+.wp-block-navigation__responsive-container.has-custom-overlay {
+	.wp-block-navigation__container,
+	.wp-block-navigation__container > .block-editor-inner-blocks,
+	.wp-block-navigation__container > .block-editor-inner-blocks > .block-editor-block-list__layout,
+	.wp-block-navigation__container > .block-editor-inner-blocks > .block-editor-block-list__layout > .block-editor-block-list__block {
+		width: 100% !important;
+		height: 100% !important;
+	}
+}
+
 
 @keyframes fadein {
 	0% {

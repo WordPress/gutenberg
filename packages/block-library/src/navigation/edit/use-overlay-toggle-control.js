@@ -14,16 +14,20 @@ export function useOverlayToggle() {
 	return useContext( OverlayToggleContext );
 }
 
-// Register filter to add overlay toggle control to all blocks
+// Register filter to add overlay toggle control to all blocks except template-part blocks
 addFilter(
 	'editor.BlockEdit',
 	'core/navigation/overlay-toggle-control',
 	( BlockEdit ) => ( props ) => {
 		const onClose = useOverlayToggle();
+		const { name } = props;
+
+		// Don't show the control on template-part blocks
+		const isTemplatePart = name === 'core/template-part';
 
 		return (
 			<>
-				{ onClose && (
+				{ onClose && ! isTemplatePart && (
 					<BlockControls group="default">
 						<ToolbarGroup>
 							<ToolbarButton
