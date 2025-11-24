@@ -90,8 +90,6 @@ export default function Edit( {
 				},
 			],
 		],
-		templateLock: 'all',
-		directInsert: true,
 		templateInsertUpdatesSelection: true,
 	} );
 

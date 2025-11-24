@@ -58,8 +58,7 @@
 	"attributes": {
 		"templateLock": {
 			"type": [ "string", "boolean" ],
-			"enum": [ "all", "insert", "contentOnly", false ],
-			"default": false
+			"enum": [ "all", "insert", "contentOnly", false ]
 		},
 		"openByDefault": {
 			"type": "boolean",
