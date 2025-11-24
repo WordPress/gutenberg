@@ -54,34 +54,13 @@ export interface BoxProps extends ComponentProps< 'div' > {
 
 	/**
 	 * The surface background design token for box background color.
-	 *
-	 * Shorthand for `backgroundColor`.
-	 */
-	bg?: BackgroundColor;
-
-	/**
-	 * The surface background design token for box background color.
 	 */
 	backgroundColor?: BackgroundColor;
 
 	/**
 	 * The surface foreground design token for box text color.
-	 *
-	 * Shorthand for `color`.
-	 */
-	fg?: ForegroundColor;
-
-	/**
-	 * The surface foreground design token for box text color.
 	 */
 	color?: ForegroundColor;
-
-	/**
-	 * The surface spacing design token or base unit multiplier for box padding.
-	 *
-	 * Shorthand for `padding`.
-	 */
-	p?: Size | DimensionVariant< Size >;
 
 	/**
 	 * The surface spacing design token or base unit multiplier for box padding.
