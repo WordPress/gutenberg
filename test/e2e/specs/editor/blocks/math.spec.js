@@ -51,13 +51,13 @@ test.describe( 'Math Block', () => {
 		// Test removing math block.
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'Tab' );
-		await page.keyboard.type( '1=' );
+		await page.keyboard.type( '&' );
 
 		expect( await editor.getBlocks() ).toMatchObject( [
 			{
 				name: 'core/math',
 				attributes: {
-					latex: '1=x^2',
+					latex: '&x^2',
 				},
 			},
 			{
@@ -67,6 +67,10 @@ test.describe( 'Math Block', () => {
 				},
 			},
 		] );
+
+		await expect( page.locator( '[aria-live="polite"]' ) ).toHaveText(
+			`Expected 'EOF', got '&' at position 1: &̲x^2`
+		);
 
 		// Can delete the math block.
 		await pageUtils.pressKeys( 'shift+Tab' );

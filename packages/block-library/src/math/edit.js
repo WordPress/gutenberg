@@ -14,6 +14,7 @@ import {
 } from '@wordpress/components';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -97,6 +98,7 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 										setError( null );
 									} catch ( err ) {
 										setError( err.message );
+										speak( err.message );
 									}
 									setAttributes( {
 										mathML: newMathML,
