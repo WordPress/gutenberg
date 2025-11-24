@@ -189,7 +189,7 @@ describe( 'term-data bindings', () => {
 						taxonomy: 'category',
 						termId: 123,
 						termData: {
-							term_id: 123,
+							id: 123,
 							name: 'Design',
 							slug: 'design',
 							link: 'https://example.com/category/design',
@@ -222,7 +222,7 @@ describe( 'term-data bindings', () => {
 					select,
 					context: {
 						termData: {
-							term_id: 789,
+							id: 789,
 							name: 'News',
 							slug: 'news',
 							link: 'https://example.com/category/news',
@@ -436,7 +436,7 @@ describe( 'term-data bindings', () => {
 					select,
 					context: {
 						termData: {
-							term_id: 456,
+							id: 456,
 							name: 'Design',
 							slug: 'design',
 							link: 'https://example.com/category/design',
