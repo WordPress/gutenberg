@@ -25,6 +25,8 @@ import clsx from 'clsx';
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
+const EMPTY_ARRAY = [];
+
 export default function Edit( {
 	attributes,
 	clientId,
@@ -97,6 +99,7 @@ export default function Edit( {
 		// This prevents an issue where in `contentOnly` mode, users can appender Accordion Headers and Panels
 		// because of the contentOnly content insertion feature.
 		renderAppender: false,
+		allowedBlocks: EMPTY_ARRAY,
 	} );
 
 	return (
