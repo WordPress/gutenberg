@@ -27,8 +27,6 @@ export default function ResponsiveWrapper( {
 	overlayTextColor,
 	hasIcon,
 	icon,
-	overlayTemplatePartId,
-	onNavigateToEntityRecord,
 } ) {
 	if ( ! isResponsive ) {
 		return children;
@@ -78,15 +76,7 @@ export default function ResponsiveWrapper( {
 	};
 
 	const handleOpenClick = () => {
-		// If there's a custom overlay template part, navigate to it
-		if ( overlayTemplatePartId && onNavigateToEntityRecord && ! isOpen ) {
-			onNavigateToEntityRecord( {
-				postId: overlayTemplatePartId,
-				postType: 'wp_template_part',
-			} );
-		} else {
-			onToggle( true );
-		}
+		onToggle( true );
 	};
 
 	return (

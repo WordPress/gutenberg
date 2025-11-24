@@ -60,6 +60,7 @@ import useNavigationEntities from '../use-navigation-entities';
 import Placeholder from './placeholder';
 import ResponsiveWrapper from './responsive-wrapper';
 import NavigationInnerBlocks from './inner-blocks';
+import OverlayTemplatePartInnerBlocks from './overlay-template-part-inner-blocks';
 import NavigationMenuNameControl from './navigation-menu-name-control';
 import UnsavedInnerBlocks from './unsaved-inner-blocks';
 import NavigationMenuDeleteControl from './navigation-menu-delete-control';
@@ -285,7 +286,6 @@ function Navigation( {
 		const { getCurrentPostType, getCurrentPostId } = unlock(
 			select( editorStore )
 		);
-		const { getEditedEntityRecord } = select( coreStore );
 		const postType = getCurrentPostType();
 		const postId = getCurrentPostId();
 
@@ -293,6 +293,7 @@ function Navigation( {
 			return false;
 		}
 
+		const { getEditedEntityRecord } = select( coreStore );
 		const templatePart = getEditedEntityRecord(
 			'postType',
 			TEMPLATE_PART_POST_TYPE,
@@ -691,7 +692,7 @@ function Navigation( {
 		<>
 			{ ! isInOverlayTemplatePart && (
 				<InspectorControls>
-					<PanelBody title={ __( 'Overlay' ) } initialOpen={ true }>
+					<PanelBody title={ __( 'Overlay' ) } initialOpen>
 						<VStack spacing={ 4 }>
 							{ ! isExperimentEnabled && (
 								<Notice
@@ -1124,21 +1125,25 @@ function Navigation( {
 									overlayBackgroundColor
 								}
 								overlayTextColor={ overlayTextColor }
-								overlayTemplatePartId={ overlayTemplatePartId }
-								onNavigateToEntityRecord={
-									onNavigateToEntityRecord
-								}
 							>
-								{ isEntityAvailable && (
-									<NavigationInnerBlocks
-										clientId={ clientId }
-										hasCustomPlaceholder={
-											!! CustomPlaceholder
-										}
-										templateLock={ templateLock }
-										orientation={ orientation }
-									/>
-								) }
+								{ isEntityAvailable &&
+									( overlayTemplatePartId &&
+									isResponsiveMenuOpen ? (
+										<OverlayTemplatePartInnerBlocks
+											overlayTemplatePartId={
+												overlayTemplatePartId
+											}
+										/>
+									) : (
+										<NavigationInnerBlocks
+											clientId={ clientId }
+											hasCustomPlaceholder={
+												!! CustomPlaceholder
+											}
+											templateLock={ templateLock }
+											orientation={ orientation }
+										/>
+									) ) }
 							</ResponsiveWrapper>
 						</>
 					) }
