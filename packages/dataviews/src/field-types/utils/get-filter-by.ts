@@ -13,17 +13,10 @@ function getFilterBy< Item >(
 	}
 
 	if ( typeof field.filterBy === 'object' ) {
-		let operators = field.filterBy.operators;
-
-		// Assign default values if no operator was provided.
-		if ( ! operators || ! Array.isArray( operators ) ) {
-			operators = defaultOperators;
-		}
-
-		// Make sure only valid operators are included.
-		operators = operators.filter( ( operator ) =>
-			validOperators.includes( operator )
-		);
+		const operators =
+			field.filterBy?.operators?.filter( ( op ) =>
+				validOperators.includes( op )
+			) ?? defaultOperators;
 
 		// If no operators are left at this point,
 		// the filters should be disabled.
@@ -37,6 +30,7 @@ function getFilterBy< Item >(
 		};
 	}
 
+	// The field hasn't defined any filterBy config.
 	if ( defaultOperators.length === 0 ) {
 		return false;
 	}
