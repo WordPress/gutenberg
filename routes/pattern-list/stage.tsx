@@ -332,6 +332,9 @@ function PatternList() {
 						},
 					} );
 				} }
+				isItemClickable={ ( item ) =>
+					item.type !== PATTERN_TYPES.theme
+				}
 				renderItemLink={ ( {
 					item,
 					...props
