@@ -244,8 +244,6 @@ export type Field< Item > = {
 	format?: FormatDate;
 };
 
-export type NormalizedFormat = Required< FormatDate > | {};
-
 /**
  * Format for date fields:
  *
