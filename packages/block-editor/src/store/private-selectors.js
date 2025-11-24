@@ -687,7 +687,7 @@ export function getInsertionPoint( state ) {
  */
 export const isBlockHidden = ( state, clientId ) => {
 	const blockName = getBlockName( state, clientId );
-	if ( ! hasBlockSupport( state, blockName, 'blockVisibility', true ) ) {
+	if ( ! hasBlockSupport( state, blockName, 'visibility', true ) ) {
 		return false;
 	}
 	const attributes = state.blocks.attributes.get( clientId );

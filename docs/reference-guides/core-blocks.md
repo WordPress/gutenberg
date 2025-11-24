@@ -25,7 +25,7 @@ Displays a heading that toggles the accordion panel. ([Source](https://github.co
 -	**Name:** core/accordion-heading
 -	**Category:** design
 -	**Parent:** core/accordion-item
--	**Supports:** anchor, color (background, gradients, text), interactivity, shadow, spacing (padding), typography (fontSize), ~~align~~, ~~blockVisibility~~, ~~lock~~
+-	**Supports:** anchor, color (background, gradients, text), interactivity, shadow, spacing (padding), typography (fontSize), ~~align~~, ~~lock~~, ~~visibility~~
 -	**Attributes:** iconPosition, level, openByDefault, showIcon, title
 
 ## Accordion Item
@@ -46,7 +46,7 @@ Contains the hidden or revealed content beneath the heading. ([Source](https://g
 -	**Name:** core/accordion-panel
 -	**Category:** design
 -	**Parent:** core/accordion-item
--	**Supports:** allowedBlocks, color (background, gradients, text), contentRole, interactivity, layout (~~allowEditing~~), shadow, spacing (blockGap, padding), typography (fontSize, lineHeight), ~~blockVisibility~~, ~~html~~, ~~lock~~
+-	**Supports:** allowedBlocks, color (background, gradients, text), contentRole, interactivity, layout (~~allowEditing~~), shadow, spacing (blockGap, padding), typography (fontSize, lineHeight), ~~html~~, ~~lock~~, ~~visibility~~
 -	**Attributes:** isSelected, openByDefault, templateLock
 
 ## Archives
@@ -382,7 +382,7 @@ Use the classic WordPress editor. ([Source](https://github.com/WordPress/gutenbe
 
 -	**Name:** core/freeform
 -	**Category:** text
--	**Supports:** ~~blockVisibility~~, ~~className~~, ~~customClassName~~, ~~html~~, ~~lock~~, ~~renaming~~, ~~reusable~~
+-	**Supports:** ~~className~~, ~~customClassName~~, ~~html~~, ~~lock~~, ~~renaming~~, ~~reusable~~, ~~visibility~~
 -	**Attributes:** content
 
 ## Gallery
@@ -513,7 +513,7 @@ Your site doesn’t include support for this block. ([Source](https://github.com
 
 -	**Name:** core/missing
 -	**Category:** text
--	**Supports:** interactivity (clientNavigation), ~~blockVisibility~~, ~~className~~, ~~customClassName~~, ~~html~~, ~~inserter~~, ~~lock~~, ~~renaming~~, ~~reusable~~
+-	**Supports:** interactivity (clientNavigation), ~~className~~, ~~customClassName~~, ~~html~~, ~~inserter~~, ~~lock~~, ~~renaming~~, ~~reusable~~, ~~visibility~~
 -	**Attributes:** originalContent, originalName, originalUndelimitedContent
 
 ## More
@@ -600,7 +600,7 @@ Show a block pattern. ([Source](https://github.com/WordPress/gutenberg/tree/trun
 
 -	**Name:** core/pattern
 -	**Category:** theme
--	**Supports:** interactivity (clientNavigation), ~~blockVisibility~~, ~~html~~, ~~inserter~~, ~~renaming~~
+-	**Supports:** interactivity (clientNavigation), ~~html~~, ~~inserter~~, ~~renaming~~, ~~visibility~~
 -	**Attributes:** slug
 
 ## Author

@@ -375,10 +375,10 @@ function ListViewBlock( {
 			event.preventDefault();
 			const { blocksToUpdate } = getBlocksToUpdate();
 			const blocks = getBlocksByClientId( blocksToUpdate );
-			const canToggleBlockVisibility = blocks.every( ( blockToUpdate ) =>
-				hasBlockSupport( blockToUpdate.name, 'blockVisibility', true )
+			const canToggleVisibility = blocks.every( ( blockToUpdate ) =>
+				hasBlockSupport( blockToUpdate.name, 'visibility', true )
 			);
-			if ( ! canToggleBlockVisibility ) {
+			if ( ! canToggleVisibility ) {
 				return;
 			}
 			const hasHiddenBlock = blocks.some(
