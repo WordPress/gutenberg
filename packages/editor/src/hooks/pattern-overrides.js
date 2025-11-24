@@ -71,13 +71,17 @@ function ControlsWithStoreSubscription( props ) {
 				true
 			);
 
+			const isEditingSyncedPatternInline =
+				!! editedContentOnlySection &&
+				editedContentOnlySection === patternClientId;
+
 			return {
 				// For editing link to the site editor if the theme and user permissions support it.
 				hasPatternOverridesSource: !! getBlockBindingsSource(
 					'core/pattern-overrides'
 				),
 				isEditingSyncedPattern:
-					editedContentOnlySection === patternClientId ||
+					isEditingSyncedPatternInline ||
 					( getCurrentPostType() === PATTERN_TYPES.user &&
 						getEditedPostAttribute( 'meta' )
 							?.wp_pattern_sync_status !==
