@@ -664,8 +664,7 @@ export function isClosedByToken( currentToken, nextToken ) {
 
 /**
  * Returns true if the given HTML strings are effectively equivalent, or
- * false otherwise. Invalid HTML is not considered equivalent, even if the
- * strings directly match.
+ * false otherwise.
  *
  * @param {string} actual   Actual HTML string.
  * @param {string} expected Expected HTML string.
