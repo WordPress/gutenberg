@@ -39,6 +39,11 @@ const { state } = store( 'test/get-server-state', {
 			if ( nested.newProp ) {
 				state.nested.newProp = nested?.newProp;
 			}
+			if ( state.objCopiedFromServer ) {
+				state.objCopiedFromServer.prop = nested?.prop;
+			} else {
+				state.objCopiedFromServer = nested;
+			}
 		},
 		updateNonChanging() {
 			// This property never changes in the server, but it changes in the
