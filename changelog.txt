@@ -1,5 +1,25 @@
 == Changelog ==
 
+= 22.1.2 =
+
+
+## Changelog
+
+### Experiments
+
+#### Templates API
+- Template Activation: Add more checks for active_templates. ([73519](https://github.com/WordPress/gutenberg/pull/73519))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@mikachan
+
+
 = 22.1.1 =
 
 
