@@ -106,59 +106,36 @@ function normalizeField< Item >(
 export default function getNormalizeFieldFunction< Item >(
 	type?: FieldType
 ): ( field: Field< Item > ) => NormalizedField< Item > {
-	if ( 'email' === type ) {
-		return email;
+	switch ( type ) {
+		case 'email':
+			return email;
+		case 'integer':
+			return integer;
+		case 'number':
+			return number;
+		case 'text':
+			return text;
+		case 'datetime':
+			return datetime;
+		case 'date':
+			return date;
+		case 'boolean':
+			return boolean;
+		case 'media':
+			return media;
+		case 'array':
+			return array;
+		case 'password':
+			return password;
+		case 'telephone':
+			return telephone;
+		case 'color':
+			return color;
+		case 'url':
+			return url;
+		default:
+			// This is a fallback for fields that don't provide a type.
+			// It can be removed when the field.type is mandatory.
+			return normalizeField;
 	}
-
-	if ( 'integer' === type ) {
-		return integer;
-	}
-
-	if ( 'number' === type ) {
-		return number;
-	}
-
-	if ( 'text' === type ) {
-		return text;
-	}
-
-	if ( 'datetime' === type ) {
-		return datetime;
-	}
-
-	if ( 'date' === type ) {
-		return date;
-	}
-
-	if ( 'boolean' === type ) {
-		return boolean;
-	}
-
-	if ( 'media' === type ) {
-		return media;
-	}
-
-	if ( 'array' === type ) {
-		return array;
-	}
-
-	if ( 'password' === type ) {
-		return password;
-	}
-
-	if ( 'telephone' === type ) {
-		return telephone;
-	}
-
-	if ( 'color' === type ) {
-		return color;
-	}
-
-	if ( 'url' === type ) {
-		return url;
-	}
-
-	// This is a fallback for fields that don't provide a type.
-	// It can be removed when the field.type is mandatory.
-	return normalizeField;
 }
