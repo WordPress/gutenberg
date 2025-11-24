@@ -102,7 +102,10 @@ export default {
 			if ( ! termDataField ) {
 				// If the field is unknown, return the field name.
 				newValues[ attributeName ] = binding.args.field;
-			} else if ( ! termDataValues ) {
+			} else if (
+				! termDataValues ||
+				termDataValues[ binding.args.field ] === undefined
+			) {
 				// If the term data does not exist, return the field label.
 				newValues[ attributeName ] = termDataField.label;
 			} else if ( binding.args.field === 'count' ) {

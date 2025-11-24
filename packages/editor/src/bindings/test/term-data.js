@@ -56,7 +56,6 @@ describe( 'term-data bindings', () => {
 				name: 'Technology',
 				slug: 'technology',
 				link: 'https://example.com/category/technology',
-				description: 'All about technology',
 				parent: 0,
 				count: 42,
 			};
@@ -84,7 +83,7 @@ describe( 'term-data bindings', () => {
 					}
 				};
 
-				it( 'should return entity field values when they exist, and field name for unknown fields', () => {
+				it( 'should return entity field values when they exist, fall back to field label, and to field name for unknown fields', () => {
 					const values = termDataBindings.getValues( {
 						select,
 						context: {
@@ -100,7 +99,7 @@ describe( 'term-data bindings', () => {
 						name: 'Technology',
 						slug: 'technology',
 						link: 'https://example.com/category/technology',
-						description: 'All about technology',
+						description: 'Description',
 						parent: 0,
 						count: '(42)',
 						content: 'unknown',
@@ -149,7 +148,6 @@ describe( 'term-data bindings', () => {
 				const termData = {
 					id: 456,
 					name: 'Design',
-					slug: 'design',
 					link: 'https://example.com/category/design',
 					description: 'Design resources',
 					parent: 0,
@@ -171,7 +169,7 @@ describe( 'term-data bindings', () => {
 					expect( values ).toStrictEqual( {
 						id: 456,
 						name: 'Design',
-						slug: 'design',
+						slug: 'Slug',
 						link: 'https://example.com/category/design',
 						description: 'Design resources',
 						parent: 0,
@@ -193,7 +191,7 @@ describe( 'term-data bindings', () => {
 					expect( values ).toStrictEqual( {
 						id: 456,
 						name: 'Design',
-						slug: 'design',
+						slug: 'Slug',
 						link: 'https://example.com/category/design',
 						description: 'Design resources',
 						parent: 0,
