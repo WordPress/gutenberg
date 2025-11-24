@@ -18,12 +18,11 @@ store( 'test/get-server-context', {
 			yield actions.navigate( e.target.href );
 		} ),
 		attemptModification() {
-			try {
-				getServerContext().prop = 'updated from client';
-				getContext().result = 'unexpectedly modified ❌';
-			} catch ( e ) {
-				getContext().result = 'not modified ✅';
-			}
+			getServerContext().prop = 'updated from client';
+			getContext().result =
+				getServerContext().prop === 'updated from client'
+					? 'unexpectedly modified ❌'
+					: 'not modified ✅';
 		},
 		updateNonChanging() {
 			getContext().nonChanging = 'modified from client';
@@ -60,6 +59,11 @@ store( 'test/get-server-context', {
 			ctx.inherited.prop = inherited.prop;
 			if ( inherited?.newProp ) {
 				ctx.inherited.newProp = inherited.newProp;
+			}
+			if ( ctx.objCopiedFromServer ) {
+				ctx.objCopiedFromServer.prop = nested?.prop;
+			} else {
+				ctx.objCopiedFromServer = nested;
 			}
 		},
 		updateNonChanging() {

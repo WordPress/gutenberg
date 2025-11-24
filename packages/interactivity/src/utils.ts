@@ -485,3 +485,24 @@ export function deepReadOnly< T extends object >(
 }
 
 export const navigationSignal = signal( 0 );
+
+/**
+ * Recursively clones the passed object.
+ *
+ * @param source Source object.
+ * @return Cloned object.
+ */
+export function deepClone< T >( source: T ): T {
+	if ( isPlainObject( source ) ) {
+		return Object.fromEntries(
+			Object.entries( source as object ).map( ( [ key, value ] ) => [
+				key,
+				deepClone( value ),
+			] )
+		) as T;
+	}
+	if ( Array.isArray( source ) ) {
+		return source.map( ( i ) => deepClone( i ) ) as T;
+	}
+	return source;
+}

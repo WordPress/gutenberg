@@ -107,11 +107,13 @@ test.describe( 'getServerContext()', () => {
 	test( 'should update modified props on navigation', async ( { page } ) => {
 		const prop = page.getByTestId( 'prop' );
 		const nestedProp = page.getByTestId( 'nested.prop' );
+		const objCopiedFromServer = page.getByTestId( 'objCopiedFromServer' );
 		const inheritedProp = page.getByTestId( 'inherited.prop' );
 
 		await expect( page ).toHaveTitle( /main/ );
 		await expect( prop ).toHaveText( 'child' );
 		await expect( nestedProp ).toHaveText( 'child' );
+		await expect( objCopiedFromServer ).toHaveText( 'child' );
 		await expect( inheritedProp ).toHaveText( 'parent' );
 
 		await page.getByTestId( 'modified' ).click();
@@ -119,6 +121,7 @@ test.describe( 'getServerContext()', () => {
 
 		await expect( prop ).toHaveText( 'childModified' );
 		await expect( nestedProp ).toHaveText( 'childModified' );
+		await expect( objCopiedFromServer ).toHaveText( 'childModified' );
 		await expect( inheritedProp ).toHaveText( 'parentModified' );
 
 		await page.goBack();
@@ -126,6 +129,7 @@ test.describe( 'getServerContext()', () => {
 
 		await expect( prop ).toHaveText( 'child' );
 		await expect( nestedProp ).toHaveText( 'child' );
+		await expect( objCopiedFromServer ).toHaveText( 'child' );
 		await expect( inheritedProp ).toHaveText( 'parent' );
 	} );
 
