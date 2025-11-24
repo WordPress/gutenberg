@@ -360,6 +360,13 @@ function PostList() {
 						} }
 					/>
 				) }
+				config={ {
+					perPageSizes: [ 10, 20, 50, 100 ],
+					labels: {
+						singular: labels?.singular ?? __( 'Post' ),
+						plural: labels?.plural ?? __( 'Posts' ),
+					},
+				} }
 			/>
 		</Page>
 	);

@@ -156,6 +156,10 @@ interface ToolbarContentProps< Item > {
 	data: Item[];
 	actions: Action< Item >[];
 	getItemId: ( item: Item ) => string;
+	labels: {
+		singular: string;
+		plural: string;
+	};
 }
 
 function ActionTrigger< Item >( {
@@ -245,23 +249,31 @@ function renderFooterContent< Item >(
 	selectedItems: Item[],
 	actionInProgress: string | null,
 	setActionInProgress: ( actionId: string | null ) => void,
-	onChangeSelection: SetSelection
+	onChangeSelection: SetSelection,
+	labels: {
+		singular: string;
+		plural: string;
+	}
 ) {
 	const message =
 		selectedItems.length > 0
 			? sprintf(
-					/* translators: %d: number of items. */
+					/* translators: %1$d: number of items, %2$s: singular label, %3$s: plural label. */
 					_n(
-						'%d Item selected',
-						'%d Items selected',
+						'%1$d %2$s selected',
+						'%1$d %3$s selected',
 						selectedItems.length
 					),
-					selectedItems.length
+					selectedItems.length,
+					labels.singular,
+					labels.plural
 			  )
 			: sprintf(
-					/* translators: %d: number of items. */
-					_n( '%d Item', '%d Items', data.length ),
-					data.length
+					/* translators: %1$d: number of items, %2$s: singular label, %3$s: plural label. */
+					_n( '%1$d %2$s', '%1$d %3$s', data.length ),
+					data.length,
+					labels.singular,
+					labels.plural
 			  );
 	return (
 		<HStack
@@ -320,6 +332,7 @@ function FooterContent< Item >( {
 	onChangeSelection,
 	data,
 	getItemId,
+	labels,
 }: ToolbarContentProps< Item > ) {
 	const [ actionInProgress, setActionInProgress ] = useState< string | null >(
 		null
@@ -374,7 +387,8 @@ function FooterContent< Item >( {
 			selectedItems,
 			actionInProgress,
 			setActionInProgress,
-			onChangeSelection
+			onChangeSelection,
+			labels
 		);
 	} else if ( ! footerContentRef.current ) {
 		footerContentRef.current = renderFooterContent(
@@ -386,7 +400,8 @@ function FooterContent< Item >( {
 			selectedItems,
 			actionInProgress,
 			setActionInProgress,
-			onChangeSelection
+			onChangeSelection,
+			labels
 		);
 	}
 	return footerContentRef.current;
@@ -399,6 +414,7 @@ export function BulkActionsFooter() {
 		actions = EMPTY_ARRAY,
 		onChangeSelection,
 		getItemId,
+		config,
 	} = useContext( DataViewsContext );
 	return (
 		<FooterContent
@@ -407,6 +423,7 @@ export function BulkActionsFooter() {
 			data={ data }
 			actions={ actions }
 			getItemId={ getItemId }
+			labels={ config.labels }
 		/>
 	);
 }

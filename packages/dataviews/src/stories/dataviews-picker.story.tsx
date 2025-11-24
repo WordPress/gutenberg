@@ -171,7 +171,13 @@ const DataViewsPickerContent = ( {
 				view={ view }
 				fields={ fields }
 				onChangeView={ setView }
-				config={ { perPageSizes } }
+				config={ {
+					perPageSizes,
+					labels: {
+						singular: 'Galactic Body',
+						plural: 'Galactic Bodies',
+					},
+				} }
 				itemListLabel="Galactic Bodies"
 				defaultLayouts={ {
 					[ LAYOUT_PICKER_GRID ]: {},

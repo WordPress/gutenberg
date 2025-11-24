@@ -170,6 +170,13 @@ function NavigationList() {
 					} }
 					getItemId={ getItemId }
 					selection={ selection }
+					config={ {
+						perPageSizes: [ 10, 20, 50, 100 ],
+						labels: {
+							singular: __( 'Navigation' ),
+							plural: __( 'Navigations' ),
+						},
+					} }
 					onChangeSelection={ ( items: string[] ) => {
 						navigate( {
 							search: {

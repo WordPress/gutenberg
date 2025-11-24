@@ -320,6 +320,13 @@ function PatternList() {
 				} }
 				defaultLayouts={ DEFAULT_LAYOUTS }
 				selection={ selection }
+				config={ {
+					perPageSizes: [ 10, 20, 50, 100 ],
+					labels: {
+						singular: labels?.singular ?? __( 'Pattern' ),
+						plural: labels?.plural ?? __( 'Patterns' ),
+					},
+				} }
 				onChangeSelection={ ( items: string[] ) => {
 					navigate( {
 						search: {

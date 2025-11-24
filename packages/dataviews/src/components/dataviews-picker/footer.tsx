@@ -138,6 +138,7 @@ export function DataViewsPickerFooter() {
 		onChangeSelection,
 		getItemId,
 		actions = EMPTY_ARRAY,
+		config,
 	} = useContext( DataViewsContext );
 
 	const selectionCount = selection.length;
@@ -146,18 +147,22 @@ export function DataViewsPickerFooter() {
 	const message =
 		selectionCount > 0
 			? sprintf(
-					/* translators: %d: number of items. */
+					/* translators: %1$d: number of items, %2$s: singular label, %3$s: plural label. */
 					_n(
-						'%d Item selected',
-						'%d Items selected',
+						'%1$d %2$s selected',
+						'%1$d %3$s selected',
 						selectionCount
 					),
-					selectionCount
+					selectionCount,
+					config.labels.singular,
+					config.labels.plural
 			  )
 			: sprintf(
-					/* translators: %d: number of items. */
-					_n( '%d Item', '%d Items', data.length ),
-					data.length
+					/* translators: %1$d: number of items, %2$s: singular label, %3$s: plural label. */
+					_n( '%1$d %2$s', '%1$d %3$s', data.length ),
+					data.length,
+					config.labels.singular,
+					config.labels.plural
 			  );
 
 	const selectedItems = useMemo(

@@ -9,7 +9,7 @@ import type { ReactNode, ComponentProps, ReactElement } from 'react';
 import { __experimentalHStack as HStack } from '@wordpress/components';
 import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { useResizeObserver, throttle } from '@wordpress/compose';
-
+import { _x } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
@@ -64,6 +64,7 @@ type DataViewsProps< Item > = {
 	children?: ReactNode;
 	config?: {
 		perPageSizes: number[];
+		labels: { singular: string; plural: string };
 	};
 	empty?: ReactNode;
 } & ( Item extends ItemWithId
@@ -140,7 +141,13 @@ function DataViews< Item >( {
 	isItemClickable = defaultIsItemClickable,
 	header,
 	children,
-	config = { perPageSizes: [ 10, 20, 50, 100 ] },
+	config = {
+		perPageSizes: [ 10, 20, 50, 100 ],
+		labels: {
+			singular: _x( 'Item', 'singular label' ),
+			plural: _x( 'Items', 'plural label' ),
+		},
+	},
 	empty,
 }: DataViewsProps< Item > ) {
 	const { infiniteScrollHandler } = paginationInfo;
