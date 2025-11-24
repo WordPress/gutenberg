@@ -222,6 +222,11 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 		cursor: grab;
 	}
 
+	// Dragging multi selected blocks is not supported yet.
+	&.is-multi-selected {
+		cursor: default;
+	}
+
 	&[contenteditable],
 	[contenteditable] {
 		cursor: text;
