@@ -79,6 +79,7 @@ export type FieldType =
 export type Rules< Item > = {
 	required?: boolean;
 	elements?: boolean;
+	pattern?: string;
 	custom?:
 		| ( ( item: Item, field: NormalizedField< Item > ) => null | string )
 		| ( (
@@ -302,6 +303,10 @@ export type FieldValidity = {
 	required?: {
 		type: 'valid' | 'invalid' | 'validating';
 		message?: string;
+	};
+	pattern?: {
+		type: 'valid' | 'invalid' | 'validating';
+		message: string;
 	};
 	elements?: {
 		type: 'valid' | 'invalid' | 'validating';

@@ -385,6 +385,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.3.0 Removed `layout.definitions`. Added `typography.writingMode`.
 	 * @since 6.4.0 Added `layout.allowEditing`.
 	 * @since 6.4.0 Added `lightbox`.
+	 * @since 7.0.0 Added type markers to the schema for boolean values.
 	 * @var array
 	 */
 	const VALID_SETTINGS = array(
@@ -432,8 +433,8 @@ class WP_Theme_JSON_Gutenberg {
 			'allowCustomContentAndWideSize' => null,
 		),
 		'lightbox'                      => array(
-			'enabled'      => null,
-			'allowEditing' => null,
+			'enabled'      => true,
+			'allowEditing' => true,
 		),
 		'position'                      => array(
 			'fixed'  => null,
@@ -1300,19 +1301,21 @@ class WP_Theme_JSON_Gutenberg {
 				continue;
 			}
 
-			// Check if the value is an array and requires further processing.
-			if ( is_array( $value ) && is_array( $schema[ $key ] ) ) {
-				// Determine if it is an associative or indexed array.
-				$schema_is_assoc = self::is_assoc( $value );
+			// Validate type if schema specifies a boolean marker.
+			if ( is_bool( $schema[ $key ] ) ) {
+				// Schema expects a boolean value - validate the input matches.
+				if ( ! is_bool( $value ) ) {
+					unset( $tree[ $key ] );
+					continue;
+				}
+				// Type matches, keep the value and continue to next key.
+				continue;
+			}
 
-				if ( $schema_is_assoc ) {
-					// If associative, process as a single object.
-					$tree[ $key ] = self::remove_keys_not_in_schema( $value, $schema[ $key ] );
-
-					if ( empty( $tree[ $key ] ) ) {
-						unset( $tree[ $key ] );
-					}
-				} else {
+			if ( is_array( $schema[ $key ] ) ) {
+				if ( ! is_array( $value ) ) {
+					unset( $tree[ $key ] );
+				} elseif ( wp_is_numeric_array( $value ) ) {
 					// If indexed, process each item in the array.
 					foreach ( $value as $item_key => $item_value ) {
 						if ( isset( $schema[ $key ][0] ) && is_array( $schema[ $key ][0] ) ) {
@@ -1322,27 +1325,18 @@ class WP_Theme_JSON_Gutenberg {
 							$tree[ $key ][ $item_key ] = $item_value;
 						}
 					}
+				} else {
+					// If associative, process as a single object.
+					$tree[ $key ] = self::remove_keys_not_in_schema( $value, $schema[ $key ] );
+
+					if ( empty( $tree[ $key ] ) ) {
+						unset( $tree[ $key ] );
+					}
 				}
-			} elseif ( is_array( $schema[ $key ] ) && ! is_array( $tree[ $key ] ) ) {
-				unset( $tree[ $key ] );
 			}
 		}
 
 		return $tree;
-	}
-
-	/**
-	 * Checks if the given array is associative.
-	 *
-	 * @since 6.5.0
-	 * @param array $data The array to check.
-	 * @return bool True if the array is associative, false otherwise.
-	 */
-	protected static function is_assoc( $data ) {
-		if ( array() === $data ) {
-			return false;
-		}
-		return array_keys( $data ) !== range( 0, count( $data ) - 1 );
 	}
 
 	/**
@@ -3812,6 +3806,35 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
+	 * Preserves valid typed settings from input to output based on type markers in schema.
+	 *
+	 * Recursively iterates through the schema and validates/preserves settings
+	 * that have type markers (e.g., boolean) in VALID_SETTINGS.
+	 *
+	 * @since 7.0.0
+	 *
+	 * @param array $input  Input settings to process.
+	 * @param array $output Output settings array (passed by reference).
+	 * @param array $schema Schema to validate against (typically VALID_SETTINGS).
+	 * @param array $path   Current path in the schema (for recursive calls).
+	 */
+	private static function preserve_valid_typed_settings( $input, &$output, $schema, $path = array() ) {
+		foreach ( $schema as $key => $schema_value ) {
+			$current_path = array_merge( $path, array( $key ) );
+
+			// Validate boolean type markers.
+			if ( is_bool( $schema_value ) ) {
+				$value = _wp_array_get( $input, $current_path, null );
+				if ( null !== $value && is_bool( $value ) ) {
+					_wp_array_set( $output, $current_path, $value ); // Preserve boolean value.
+				}
+			} elseif ( is_array( $schema_value ) ) {
+				static::preserve_valid_typed_settings( $input, $output, $schema_value, $current_path ); // Recurse into nested structure.
+			}
+		}
+	}
+
+	/**
 	 * Processes a setting node and returns the same node
 	 * without the insecure settings.
 	 *
@@ -3869,6 +3892,9 @@ class WP_Theme_JSON_Gutenberg {
 
 		// Ensure indirect properties not included in any `PRESETS_METADATA` value are allowed.
 		static::remove_indirect_properties( $input, $output );
+
+		// Preserve all valid settings that have type markers in VALID_SETTINGS.
+		static::preserve_valid_typed_settings( $input, $output, static::VALID_SETTINGS );
 
 		return $output;
 	}

@@ -2,6 +2,7 @@
  * External dependencies
  */
 import type { Meta, StoryObj } from '@storybook/react';
+import { fn } from '@storybook/test';
 
 /**
  * Internal dependencies
@@ -16,8 +17,10 @@ const meta: Meta< typeof ColorPicker > = {
 		as: { control: false },
 		color: { control: false },
 	},
+	args: {
+		onChange: fn(),
+	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: {
 			expanded: true,
 		},
