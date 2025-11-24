@@ -64,6 +64,7 @@ export function useRichText( {
 	const recordRef = useRef();
 
 	function setRecordFromProps() {
+		const previousRecord = recordRef.current;
 		_valueRef.current = value;
 		recordRef.current = value;
 		if ( ! ( value instanceof RichTextData ) ) {
@@ -88,6 +89,33 @@ export function useRichText( {
 		}
 		recordRef.current.start = selectionStart;
 		recordRef.current.end = selectionEnd;
+
+		// When the value is updated via props, the active formats are reset.
+		// We need to preserve them if the selection hasn't changed to avoid
+		// losing the active formats when the value is updated programmatically
+		// (e.g. by an annotation).
+		if (
+			previousRecord &&
+			previousRecord.activeFormats &&
+			previousRecord.start === selectionStart &&
+			previousRecord.end === selectionEnd
+		) {
+			// If the active formats are preserved, we need to make sure that
+			// any formats that are not allowed (e.g. because they are not
+			// in the allowedFormats list) are removed. This is because
+			// previousRecord.activeFormats may contain formats that are
+			// no longer valid.
+			//
+			// We also need to filter out formats that are not interactive,
+			// like annotations, because they should not be preserved.
+			recordRef.current.activeFormats =
+				previousRecord.activeFormats.filter( ( format ) => {
+					const formatType = registry
+						.select( 'core/rich-text' )
+						.getFormatType( format.type );
+					return formatType && formatType.interactive !== false;
+				} );
+		}
 	}
 
 	const hadSelectionUpdateRef = useRef( false );
