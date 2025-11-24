@@ -5,13 +5,6 @@
 ### Bug Fixes
 
 -   Return a deep-clone object from `getServerState` and `getServerContext` functions. ([#73437](https://github.com/WordPress/gutenberg/pull/73437))
-
-## 6.35.0 (2025-11-12)
-
-## 6.34.0 (2025-10-29)
-
-### Bug Fixes
-
 -   Fix derived state closures processing on client-side navigation. ([#72725](https://github.com/WordPress/gutenberg/pull/72725))
 
 ## 6.33.0 (2025-10-17)
