@@ -24,7 +24,12 @@ import { paramCase as kebabCase } from 'change-case';
  */
 import { createTemplatePartId } from '../../template-part/edit/utils/create-template-part-id';
 
-export default function OverlaySelector( { value, onChange } ) {
+export default function OverlaySelector( {
+	value,
+	onChange,
+	onToggleOverlay,
+	isOverlayOpen,
+} ) {
 	const [ isCreating, setIsCreating ] = useState( false );
 
 	const { records: templateParts } = useEntityRecords(
@@ -59,7 +64,10 @@ export default function OverlaySelector( { value, onChange } ) {
 	];
 
 	const handleEditClick = () => {
-		if ( value && onNavigateToEntityRecord ) {
+		if ( onToggleOverlay ) {
+			onToggleOverlay( ! isOverlayOpen );
+		} else if ( value && onNavigateToEntityRecord ) {
+			// Fallback to navigation if toggle not provided
 			onNavigateToEntityRecord( {
 				postId: value,
 				postType: 'wp_template_part',
@@ -256,10 +264,10 @@ export default function OverlaySelector( { value, onChange } ) {
 				variant="secondary"
 				icon={ pencil }
 				onClick={ handleEditClick }
-				disabled={ ! canEdit }
+				disabled={ ! canEdit && ! isOverlayOpen }
 				style={ { maxWidth: 'fit-content' } }
 			>
-				{ __( 'Edit Overlay' ) }
+				{ isOverlayOpen ? __( 'Close Overlay' ) : __( 'Edit Overlay' ) }
 			</Button>
 		</VStack>
 	);

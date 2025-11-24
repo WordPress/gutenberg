@@ -804,6 +804,10 @@ function Navigation( {
 											overlayTemplatePartId: newValue,
 										} );
 									} }
+									onToggleOverlay={
+										setResponsiveMenuVisibility
+									}
+									isOverlayOpen={ isResponsiveMenuOpen }
 								/>
 							) }
 						</VStack>
