@@ -5,8 +5,10 @@ import { __ } from '@wordpress/i18n';
 import {
 	useBlockProps,
 	useInnerBlocksProps,
+	InnerBlocks,
 	InspectorControls,
 	store as blockEditorStore,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
@@ -75,6 +77,8 @@ export default function Edit( {
 		} ),
 	} );
 
+	const blockEditingMode = useBlockEditingMode();
+
 	// Get heading level from context.
 	const headingLevel = context && context[ 'core/accordion-heading-level' ];
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
@@ -93,6 +97,13 @@ export default function Edit( {
 		templateLock: 'all',
 		directInsert: true,
 		templateInsertUpdatesSelection: true,
+		renderAppender:
+			// Hide the appender in contentOnly mode, this is required as `contentOnly` lock overrides the
+			// `templateLock: 'all'` set above. With the Accordion Item and Header/Panel blocks being content
+			// blocks, contentOnly mode would usually allow more blocks to be inserted.
+			blockEditingMode === 'contentOnly'
+				? false
+				: InnerBlocks.ButtonBlockAppender,
 	} );
 
 	return (
