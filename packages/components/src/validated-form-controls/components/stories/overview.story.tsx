@@ -506,6 +506,7 @@ export const ValidateWithOtherFieldState: StoryObj<
 	},
 	args: {
 		label: 'Text',
+		required: true,
 	},
 };
 
@@ -588,5 +589,6 @@ export const ValidateOnSubmit: StoryObj< typeof ValidatedInputControl > = {
 	},
 	args: {
 		label: 'Link to',
+		required: true,
 	},
 };
