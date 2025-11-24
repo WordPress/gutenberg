@@ -166,6 +166,16 @@ describe( 'term-data bindings', () => {
 
 		describe( 'when termData is provided in context', () => {
 			let select;
+
+			const termData = {
+				id: 456,
+				name: 'Design',
+				slug: 'design',
+				link: 'https://example.com/category/design',
+				description: 'Design resources',
+				parent: 0,
+				count: 15,
+			};
 			beforeAll( () => {
 				select = ( store ) => {
 					if ( store === blockEditorStore ) {
@@ -187,16 +197,8 @@ describe( 'term-data bindings', () => {
 					select,
 					context: {
 						taxonomy: 'category',
-						termId: 123,
-						termData: {
-							id: 123,
-							name: 'Design',
-							slug: 'design',
-							link: 'https://example.com/category/design',
-							description: 'Design resources',
-							parent: 0,
-							count: 15,
-						},
+						termId: 456,
+						termData,
 					},
 					bindings: {
 						content: {
@@ -221,12 +223,7 @@ describe( 'term-data bindings', () => {
 				const values = termDataBindings.getValues( {
 					select,
 					context: {
-						termData: {
-							id: 789,
-							name: 'News',
-							slug: 'news',
-							link: 'https://example.com/category/news',
-						},
+						termData,
 					},
 					bindings: {
 						id: {
@@ -242,8 +239,8 @@ describe( 'term-data bindings', () => {
 				} );
 
 				expect( values ).toStrictEqual( {
-					id: 789,
-					content: 'News',
+					id: 456,
+					content: 'Design',
 				} );
 			} );
 		} );
