@@ -180,14 +180,12 @@ export {
 // that we can use to generate UI controls for them via DataForm.
 const fieldsKey = Symbol( 'fields' );
 const formKey = Symbol( 'form' );
-const compositeParentKey = Symbol( 'compositeParent' );
-const compositeChildKey = Symbol( 'compositeChild' );
+const compositeKey = Symbol( 'composite' );
 
 export const privateApis = {};
 lock( privateApis, {
 	isContentBlock,
 	fieldsKey,
 	formKey,
-	compositeParentKey,
-	compositeChildKey,
+	compositeKey,
 } );

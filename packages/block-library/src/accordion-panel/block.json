@@ -53,7 +53,8 @@
 		"visibility": false,
 		"contentRole": true,
 		"allowedBlocks": true,
-		"lock": false
+		"lock": false,
+		"inserter": false
 	},
 	"attributes": {
 		"templateLock": {

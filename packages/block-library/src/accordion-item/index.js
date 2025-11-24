@@ -13,7 +13,7 @@ import initBlock from '../utils/init-block';
 import icon from './icon';
 import { unlock } from '../lock-unlock';
 
-const { compositeParentKey } = unlock( blocksPrivateApis );
+const { compositeKey } = unlock( blocksPrivateApis );
 
 const { name } = metadata;
 
@@ -23,7 +23,7 @@ export const settings = {
 	icon,
 	edit,
 	save,
-	[ compositeParentKey ]: true,
+	[ compositeKey ]: true,
 };
 
 export const init = () =>

@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
-
-/**
  * Internal dependencies
  */
 import edit from './edit';
@@ -12,9 +7,6 @@ import metadata from './block.json';
 import initBlock from '../utils/init-block';
 import icon from './icon';
 import deprecated from './deprecated';
-import { unlock } from '../lock-unlock';
-
-const { compositeChildKey } = unlock( blocksPrivateApis );
 
 const { name } = metadata;
 
@@ -25,7 +17,6 @@ export const settings = {
 	edit,
 	save,
 	deprecated,
-	[ compositeChildKey ]: true,
 };
 
 export const init = () =>

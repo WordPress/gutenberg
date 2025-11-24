@@ -58,7 +58,8 @@
 		},
 		"shadow": true,
 		"visibility": false,
-		"lock": false
+		"lock": false,
+		"inserter": false
 	},
 	"selectors": {
 		"typography": {
