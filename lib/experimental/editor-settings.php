@@ -43,6 +43,7 @@ function gutenberg_enable_experiments() {
 }
 
 add_action( 'admin_init', 'gutenberg_enable_experiments' );
+add_action( 'gutenberg-boot_init', 'gutenberg_enable_experiments' );
 
 /**
  * Sets a global JS variable used to trigger the availability of form & input blocks.
