@@ -60,6 +60,11 @@ store( 'test/get-server-context', {
 			if ( inherited?.newProp ) {
 				ctx.inherited.newProp = inherited.newProp;
 			}
+			if ( ctx.objCopiedFromServer ) {
+				ctx.objCopiedFromServer.prop = nested?.prop;
+			} else {
+				ctx.objCopiedFromServer = nested;
+			}
 		},
 		updateNonChanging() {
 			// This property never changes in the server, but it changes in the
