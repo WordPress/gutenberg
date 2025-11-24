@@ -1,27 +1,27 @@
 {
-	"Border/radius-x-small": {
+	"Border/radius-surface-xs": {
 		"value": {
 			".": "1px"
 		},
-		"description": "Extra small radius"
+		"description": "Extra small radius for surfaces"
 	},
-	"Border/radius-small": {
+	"Border/radius-surface-sm": {
 		"value": {
 			".": "2px"
 		},
-		"description": "Small radius"
+		"description": "Small radius for surfaces"
 	},
-	"Border/radius-medium": {
+	"Border/radius-surface-md": {
 		"value": {
 			".": "4px"
 		},
-		"description": "Medium radius"
+		"description": "Medium radius for surfaces"
 	},
-	"Border/radius-large": {
+	"Border/radius-surface-lg": {
 		"value": {
 			".": "8px"
 		},
-		"description": "Large radius"
+		"description": "Large radius for surfaces"
 	},
 	"Border/width-focus": {
 		"value": {

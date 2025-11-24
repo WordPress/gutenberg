@@ -68,6 +68,11 @@ export interface BoxProps extends ComponentProps< 'div' > {
 	padding?: Size | DimensionVariant< Size >;
 
 	/**
+	 * The surface border radius design token.
+	 */
+	borderRadius?: Exclude< SizeToken, '2xs' >;
+
+	/**
 	 * The content to be rendered inside the component.
 	 */
 	children?: React.ReactNode;
