@@ -342,6 +342,18 @@ export const routerRegions = new Map<
 	Signal< VNode | null | undefined >
 >();
 
+let isNavigationSignalPending = false;
+const scheduleNavigationInvalidation = () => {
+	if ( isNavigationSignalPending ) {
+		return;
+	}
+	isNavigationSignalPending = true;
+	queueMicrotask( () => {
+		navigationSignal.value = navigationSignal.peek() + 1;
+		isNavigationSignalPending = false;
+	} );
+};
+
 export default () => {
 	// data-wp-context---[unique-id]
 	directive(
@@ -1027,7 +1039,7 @@ export default () => {
 			// been evaluated and the value of the server context has changed.
 			useLayoutEffect( () => {
 				if ( vdom && typeof vdom.type !== 'string' ) {
-					navigationSignal.value = navigationSignal.peek() + 1;
+					scheduleNavigationInvalidation();
 				}
 			}, [ vdom ] );
 
