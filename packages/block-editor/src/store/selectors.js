@@ -45,7 +45,8 @@ import {
 	isContainerInsertableToInContentOnlyMode,
 } from './private-selectors';
 
-const { isContentBlock } = unlock( blocksPrivateApis );
+const { isContentBlock, compositeParentKey, compositeChildKey } =
+	unlock( blocksPrivateApis );
 
 /**
  * A block selection object.
@@ -1625,6 +1626,11 @@ const isBlockVisibleInTheInserter = (
 		return false;
 	}
 
+	const isCompositeChild = blockType[ compositeChildKey ];
+	if ( isCompositeChild ) {
+		return false;
+	}
+
 	const { allowedBlockTypes } = getSettings( state );
 
 	const isBlockAllowedInEditor = checkAllowList(
@@ -1739,8 +1745,11 @@ const canInsertBlockTypeUnmemoized = (
 	}
 
 	const parentName = getBlockName( state, rootClientId );
-
 	const parentBlockType = getBlockType( parentName );
+
+	if ( parentBlockType?.[ compositeParentKey ] ) {
+		return false;
+	}
 
 	// Look at the `blockType.allowedBlocks` field to determine whether this is an allowed child block.
 	const parentAllowedChildBlocks = parentBlockType?.allowedBlocks;
@@ -1876,6 +1885,12 @@ export function canRemoveBlock( state, clientId ) {
 		return ! attributes.lock.remove;
 	}
 
+	const blockName = getBlockName( state, clientId );
+	const blockType = getBlockType( blockName );
+	if ( blockType[ compositeChildKey ] ) {
+		return false;
+	}
+
 	const rootClientId = getBlockRootClientId( state, clientId );
 	const rootTemplateLock = getTemplateLock( state, rootClientId );
 	if ( rootTemplateLock && rootTemplateLock !== 'contentOnly' ) {
@@ -1885,9 +1900,7 @@ export function canRemoveBlock( state, clientId ) {
 	// It shouldn't be possible to move in a section block unless in
 	// some cases when the block is a content block.
 	const isBlockWithinSection = !! getParentSectionBlock( state, clientId );
-	const isContentRoleBlock = isContentBlock(
-		getBlockName( state, clientId )
-	);
+	const isContentRoleBlock = isContentBlock( blockName );
 	if ( isBlockWithinSection && ! isContentRoleBlock ) {
 		return false;
 	}
@@ -1899,7 +1912,7 @@ export function canRemoveBlock( state, clientId ) {
 		( isParentSectionBlock || rootBlockEditingMode === 'contentOnly' ) &&
 		! isContainerInsertableToInContentOnlyMode(
 			state,
-			getBlockName( state, clientId ),
+			blockName,
 			rootClientId
 		)
 	) {
@@ -1936,6 +1949,12 @@ export function canMoveBlock( state, clientId ) {
 	}
 	if ( attributes.lock?.move !== undefined ) {
 		return ! attributes.lock.move;
+	}
+
+	const blockName = getBlockName( state, clientId );
+	const blockType = getBlockType( blockName );
+	if ( blockType[ compositeChildKey ] ) {
+		return false;
 	}
 
 	const rootClientId = getBlockRootClientId( state, clientId );
