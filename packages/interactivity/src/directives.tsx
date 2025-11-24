@@ -10,7 +10,7 @@ import {
 	type VNode,
 	type RefObject,
 } from 'preact';
-import { useContext, useMemo, useRef } from 'preact/hooks';
+import { useContext, useLayoutEffect, useMemo, useRef } from 'preact/hooks';
 import { signal, type Signal } from '@preact/signals';
 
 /**
@@ -24,6 +24,7 @@ import {
 	splitTask,
 	isPlainObject,
 	deepClone,
+	navigationSignal,
 } from './utils';
 import {
 	directive,
@@ -1021,6 +1022,14 @@ export default () => {
 
 			// Get the content of this router region.
 			const vdom = routerRegions.get( regionId )!.value;
+
+			// Triggers an invalidation after the directive data-wp-context has
+			// been evaluated and the value of the server context has changed.
+			useLayoutEffect( () => {
+				if ( vdom && typeof vdom.type !== 'string' ) {
+					navigationSignal.value = navigationSignal.peek() + 1;
+				}
+			}, [ vdom ] );
 
 			if ( vdom && typeof vdom.type !== 'string' ) {
 				// The scope needs to be injected.
