@@ -31,216 +31,218 @@ describe( 'term-data bindings', () => {
 
 	describe( 'getValues', () => {
 		describe( 'for regular blocks using block context', () => {
-			let select;
-			beforeAll( () => {
-				select = ( store ) => {
-					if ( store === blockEditorStore ) {
-						return {
-							getBlockName: ( clientId ) =>
-								clientId === '123abc456'
-									? 'core/paragraph'
-									: undefined,
-							getBlockAttributes: () => ( {} ),
-						};
-					}
-					if ( store === coreDataStore ) {
-						return {
-							getEntityRecord: getEntityRecordMock,
-						};
-					}
-				};
-			} );
-
-			it( 'should return entity field values when they exist, and field name for unknown fields', () => {
-				const values = termDataBindings.getValues( {
-					select,
-					context: {
-						taxonomy: 'category',
-						termId: 123,
-					},
-					bindings: {
-						id: {
-							source: 'core/term-data',
-							args: { field: 'id' },
-						},
-						name: {
-							source: 'core/term-data',
-							args: { field: 'name' },
-						},
-						slug: {
-							source: 'core/term-data',
-							args: { field: 'slug' },
-						},
-						link: {
-							source: 'core/term-data',
-							args: { field: 'link' },
-						},
-						description: {
-							source: 'core/term-data',
-							args: { field: 'description' },
-						},
-						parent: {
-							source: 'core/term-data',
-							args: { field: 'parent' },
-						},
-						count: {
-							source: 'core/term-data',
-							args: { field: 'count' },
-						},
-						content: {
-							source: 'core/term-data',
-							args: { field: 'unknown' },
-						},
-					},
-					clientId: '123abc456',
+			describe( 'when termId and taxonomy are provided in context', () => {
+				let select;
+				beforeAll( () => {
+					select = ( store ) => {
+						if ( store === blockEditorStore ) {
+							return {
+								getBlockName: ( clientId ) =>
+									clientId === '123abc456'
+										? 'core/paragraph'
+										: undefined,
+								getBlockAttributes: () => ( {} ),
+							};
+						}
+						if ( store === coreDataStore ) {
+							return {
+								getEntityRecord: getEntityRecordMock,
+							};
+						}
+					};
 				} );
 
-				expect( values ).toStrictEqual( {
-					id: 123,
-					name: 'Technology',
-					slug: 'technology',
-					link: 'https://example.com/category/technology',
-					description: 'All about technology',
-					parent: 0,
-					count: '(42)',
-					content: 'unknown',
-				} );
-			} );
+				it( 'should return entity field values when they exist, and field name for unknown fields', () => {
+					const values = termDataBindings.getValues( {
+						select,
+						context: {
+							taxonomy: 'category',
+							termId: 123,
+						},
+						bindings: {
+							id: {
+								source: 'core/term-data',
+								args: { field: 'id' },
+							},
+							name: {
+								source: 'core/term-data',
+								args: { field: 'name' },
+							},
+							slug: {
+								source: 'core/term-data',
+								args: { field: 'slug' },
+							},
+							link: {
+								source: 'core/term-data',
+								args: { field: 'link' },
+							},
+							description: {
+								source: 'core/term-data',
+								args: { field: 'description' },
+							},
+							parent: {
+								source: 'core/term-data',
+								args: { field: 'parent' },
+							},
+							count: {
+								source: 'core/term-data',
+								args: { field: 'count' },
+							},
+							content: {
+								source: 'core/term-data',
+								args: { field: 'unknown' },
+							},
+						},
+						clientId: '123abc456',
+					} );
 
-			it( 'should fall back to field label when entity does not exist, and to field name for unknown fields', () => {
-				const values = termDataBindings.getValues( {
-					select,
-					context: {
-						taxonomy: 'category',
-						termId: 456,
-					},
-					bindings: {
-						id: {
-							source: 'core/term-data',
-							args: { field: 'id' },
-						},
-						name: {
-							source: 'core/term-data',
-							args: { field: 'name' },
-						},
-						slug: {
-							source: 'core/term-data',
-							args: { field: 'slug' },
-						},
-						link: {
-							source: 'core/term-data',
-							args: { field: 'link' },
-						},
-						description: {
-							source: 'core/term-data',
-							args: { field: 'description' },
-						},
-						parent: {
-							source: 'core/term-data',
-							args: { field: 'parent' },
-						},
-						count: {
-							source: 'core/term-data',
-							args: { field: 'count' },
-						},
-						content: {
-							source: 'core/term-data',
-							args: { field: 'unknown' },
-						},
-					},
-					clientId: '123abc456',
-				} );
-
-				expect( values ).toStrictEqual( {
-					id: 'Term ID',
-					name: 'Name',
-					slug: 'Slug',
-					link: 'Link',
-					description: 'Description',
-					parent: 'Parent ID',
-					count: 'Count',
-					content: 'unknown',
-				} );
-			} );
-		} );
-
-		describe( 'when termData is provided in context', () => {
-			let select;
-
-			const termData = {
-				id: 456,
-				name: 'Design',
-				slug: 'design',
-				link: 'https://example.com/category/design',
-				description: 'Design resources',
-				parent: 0,
-				count: 15,
-			};
-			beforeAll( () => {
-				select = ( store ) => {
-					if ( store === blockEditorStore ) {
-						return {
-							getBlockName: () => 'core/paragraph',
-							getBlockAttributes: () => ( {} ),
-						};
-					}
-					if ( store === coreDataStore ) {
-						return {
-							getEntityRecord: () => null,
-						};
-					}
-				};
-			} );
-
-			it( 'should use termData from context when entity record is not available', () => {
-				const values = termDataBindings.getValues( {
-					select,
-					context: {
-						taxonomy: 'category',
-						termId: 456,
-						termData,
-					},
-					bindings: {
-						content: {
-							source: 'core/term-data',
-							args: { field: 'name' },
-						},
-						url: {
-							source: 'core/term-data',
-							args: { field: 'link' },
-						},
-					},
-					clientId: '123abc456',
+					expect( values ).toStrictEqual( {
+						id: 123,
+						name: 'Technology',
+						slug: 'technology',
+						link: 'https://example.com/category/technology',
+						description: 'All about technology',
+						parent: 0,
+						count: '(42)',
+						content: 'unknown',
+					} );
 				} );
 
-				expect( values ).toStrictEqual( {
-					content: 'Design',
-					url: 'https://example.com/category/design',
+				it( 'should fall back to field label when entity does not exist, and to field name for unknown fields', () => {
+					const values = termDataBindings.getValues( {
+						select,
+						context: {
+							taxonomy: 'category',
+							termId: 456,
+						},
+						bindings: {
+							id: {
+								source: 'core/term-data',
+								args: { field: 'id' },
+							},
+							name: {
+								source: 'core/term-data',
+								args: { field: 'name' },
+							},
+							slug: {
+								source: 'core/term-data',
+								args: { field: 'slug' },
+							},
+							link: {
+								source: 'core/term-data',
+								args: { field: 'link' },
+							},
+							description: {
+								source: 'core/term-data',
+								args: { field: 'description' },
+							},
+							parent: {
+								source: 'core/term-data',
+								args: { field: 'parent' },
+							},
+							count: {
+								source: 'core/term-data',
+								args: { field: 'count' },
+							},
+							content: {
+								source: 'core/term-data',
+								args: { field: 'unknown' },
+							},
+						},
+						clientId: '123abc456',
+					} );
+
+					expect( values ).toStrictEqual( {
+						id: 'Term ID',
+						name: 'Name',
+						slug: 'Slug',
+						link: 'Link',
+						description: 'Description',
+						parent: 'Parent ID',
+						count: 'Count',
+						content: 'unknown',
+					} );
 				} );
 			} );
 
-			it( 'should use termData when taxonomy and termId are not provided', () => {
-				const values = termDataBindings.getValues( {
-					select,
-					context: {
-						termData,
-					},
-					bindings: {
-						id: {
-							source: 'core/term-data',
-							args: { field: 'id' },
-						},
-						content: {
-							source: 'core/term-data',
-							args: { field: 'name' },
-						},
-					},
-					clientId: '123abc456',
-				} );
+			describe( 'when termData is provided in context', () => {
+				let select;
 
-				expect( values ).toStrictEqual( {
+				const termData = {
 					id: 456,
-					content: 'Design',
+					name: 'Design',
+					slug: 'design',
+					link: 'https://example.com/category/design',
+					description: 'Design resources',
+					parent: 0,
+					count: 15,
+				};
+				beforeAll( () => {
+					select = ( store ) => {
+						if ( store === blockEditorStore ) {
+							return {
+								getBlockName: () => 'core/paragraph',
+								getBlockAttributes: () => ( {} ),
+							};
+						}
+						if ( store === coreDataStore ) {
+							return {
+								getEntityRecord: () => null,
+							};
+						}
+					};
+				} );
+
+				it( 'should use termData from context when entity record is not available', () => {
+					const values = termDataBindings.getValues( {
+						select,
+						context: {
+							taxonomy: 'category',
+							termId: 456,
+							termData,
+						},
+						bindings: {
+							content: {
+								source: 'core/term-data',
+								args: { field: 'name' },
+							},
+							url: {
+								source: 'core/term-data',
+								args: { field: 'link' },
+							},
+						},
+						clientId: '123abc456',
+					} );
+
+					expect( values ).toStrictEqual( {
+						content: 'Design',
+						url: 'https://example.com/category/design',
+					} );
+				} );
+
+				it( 'should use termData when taxonomy and termId are not provided', () => {
+					const values = termDataBindings.getValues( {
+						select,
+						context: {
+							termData,
+						},
+						bindings: {
+							id: {
+								source: 'core/term-data',
+								args: { field: 'id' },
+							},
+							content: {
+								source: 'core/term-data',
+								args: { field: 'name' },
+							},
+						},
+						clientId: '123abc456',
+					} );
+
+					expect( values ).toStrictEqual( {
+						id: 456,
+						content: 'Design',
+					} );
 				} );
 			} );
 		} );
