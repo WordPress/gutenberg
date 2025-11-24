@@ -1779,27 +1779,27 @@ The next table lists all available operators:
 
 | Operator             | Description                                                                                          | Example                                            |
 | -------------------- | ---------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
-| `afterInc`           | `AFTER (Inc)`. The item's field is after a given date, including the date.                           | Date is after 2024-01-01, including 2024-01-01     |
-| `after`              | `AFTER`. The item's field is after a given date.                                                     | Date is after 2024-01-01                           |
-| `beforeInc`          | `BEFORE (Inc)`. The item's field is before a given date, including the date.                         | Date is before 2024-01-01, including 2024-01-01    |
-| `before`             | `BEFORE`. The item's field is before a given date.                                                   | Date is before 2024-01-01                          |
-| `between`            | `BETWEEN`. The item's field is between two values.                                                   | Item count between (inc): 10-180                   |
+| `after`              | `AFTER`. The item's field is after a given date.                                                     | Date is after: 2024-01-01                          |
+| `afterInc`           | `AFTER (Inc)`. The item's field is after a given date, including the date.                           | Date is on or after: 2024-01-01                    |
+| `before`             | `BEFORE`. The item's field is before a given date.                                                   | Date is before: 2024-01-01                         |
+| `beforeInc`          | `BEFORE (Inc)`. The item's field is before a given date, including the date.                         | Date is on or before: 2024-01-01                   |
+| `between`            | `BETWEEN`. The item's field is between two values.                                                   | Count between (inc): 10 and 180                    |
 | `contains`           | `CONTAINS`. The item's field contains the given substring.                                           | Title contains: Mars                               |
-| `greaterThanOrEqual` | `GREATER THAN OR EQUAL TO`. The item's field is numerically greater than or equal to a single value. | Age is greater than or equal to 65                 |
-| `greaterThan`        | `GREATER THAN`. The item's field is numerically greater than a single value.                         | Age is greater than 65                             |
-| `inThePast`          | `IN THE PAST`. The item's field is within the last N units (days, weeks, months, or years) from now. | Orders placed in the past 7 days                   |
+| `greaterThan`        | `GREATER THAN`. The item's field is numerically greater than a single value.                         | Age is greater than: 65                            |
+| `greaterThanOrEqual` | `GREATER THAN OR EQUAL TO`. The item's field is numerically greater than or equal to a single value. | Age is greater than or equal to: 65                |
+| `inThePast`          | `IN THE PAST`. The item's field is within the last N units (days, weeks, months, or years) from now. | Orders in the past: 7 days                         |
 | `isAll`              | `AND`. The item's field has all of the values in the list.                                           | Category is all: Book, Review, Science Fiction     |
 | `isAny`              | `OR`. The item's field is present in a list of values.                                               | Author is any: Admin, Editor                       |
 | `isNone`             | `NOT OR`. The item's field is not present in a list of values.                                       | Author is none: Admin, Editor                      |
-| `isNotAll`           | `NOT AND`. The item's field doesn't have all of the values in the list.                              | Category is not all: Book, Review, Science Fiction |
 | `isNot`              | `NOT EQUAL TO`. The item's field is not equal to a single value.                                     | Author is not Admin                                |
-| `is`                 | `EQUAL TO`. The item's field is equal to a single value.                                             | Author is Admin                                    |
-| `lessThanOrEqual`    | `LESS THAN OR EQUAL TO`. The item's field is numerically less than or equal to a single value.       | Age is less than or equal to 18                    |
-| `lessThan`           | `LESS THAN`. The item's field is numerically less than a single value.                               | Age is less than 18                                |
+| `isNotAll`           | `NOT AND`. The item's field doesn't have all of the values in the list.                              | Category is not all: Book, Review, Science Fiction |
+| `is`                 | `EQUAL TO`. The item's field is equal to a single value.                                             | Author is: Admin                                   |
+| `lessThan`           | `LESS THAN`. The item's field is numerically less than a single value.                               | Age is less than: 18                               |
+| `lessThanOrEqual`    | `LESS THAN OR EQUAL TO`. The item's field is numerically less than or equal to a single value.       | Age is less than or equal to: 18                   |
 | `notContains`        | `NOT CONTAINS`. The item's field does not contain the given substring.                               | Description doesn't contain: photo                 |
-| `notOn`              | `NOT ON`. The item's field is not on a given date (date inequality using proper date parsing).       | Date is not on: 2024-01-01                         |
-| `on`                 | `ON`. The item's field is on a given date (date equality using proper date parsing).                 | Date is on: 2024-01-01                             |
-| `over`               | `OVER`. The item's field is older than N units (days, weeks, months, or years) from now.             | Orders placed over 7 days ago                      |
+| `notOn`              | `NOT ON`. The item's field is not on a given date (date inequality using proper date parsing).       | Date is not: 2024-01-01                            |
+| `on`                 | `ON`. The item's field is on a given date (date equality using proper date parsing).                 | Date is: 2024-01-01                                |
+| `over`               | `OVER`. The item's field is older than N units (days, weeks, months, or years) from now.             | Orders over: 7 days ago                            |
 | `startsWith`         | `STARTS WITH`. The item's field starts with the given substring.                                     | Title starts with: Mar                             |
 
 Some operators are single-selection: `is`, `isNot`, `on`, `notOn`, `lessThan`, `greaterThan`, `lessThanOrEqual`, `greaterThanOrEqual`, `before`, `after`, `beforeInc`, `afterInc`, `contains`, `notContains`, and `startsWith`. Others are multi-selection: `isAny`, `isNone`, `isAll`, and `isNotAll`. A filter cannot mix single-selection & multi-selection operators; if a single-selection operator is present in the list of valid operators, the multi-selection ones will be discarded, and the filter won't allow selecting more than one item.
