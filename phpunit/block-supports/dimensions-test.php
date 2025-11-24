@@ -214,4 +214,75 @@ class WP_Block_Supports_Dimensions_Test extends WP_UnitTestCase {
 
 		$this->assertSame( $expected, $actual );
 	}
+
+	public function test_height_style_is_applied() {
+		$this->test_block_name = 'test/height-style-is-applied';
+		register_block_type(
+			$this->test_block_name,
+			array(
+				'api_version' => 3,
+				'attributes'  => array(
+					'style' => array(
+						'type' => 'object',
+					),
+				),
+				'supports'    => array(
+					'dimensions' => array(
+						'height' => true,
+					),
+				),
+			)
+		);
+		$registry    = WP_Block_Type_Registry::get_instance();
+		$block_type  = $registry->get_registered( $this->test_block_name );
+		$block_attrs = array(
+			'style' => array(
+				'dimensions' => array(
+					'height' => '400px',
+				),
+			),
+		);
+
+		$actual   = gutenberg_apply_dimensions_support( $block_type, $block_attrs );
+		$expected = array(
+			'style' => 'height:400px;',
+		);
+
+		$this->assertSame( $expected, $actual );
+	}
+
+	public function test_height_with_individual_skipped_serialization_block_supports() {
+		$this->test_block_name = 'test/height-with-individual-skipped-serialization-block-supports';
+		register_block_type(
+			$this->test_block_name,
+			array(
+				'api_version' => 3,
+				'attributes'  => array(
+					'style' => array(
+						'type' => 'object',
+					),
+				),
+				'supports'    => array(
+					'dimensions' => array(
+						'height'                          => true,
+						'__experimentalSkipSerialization' => array( 'height' ),
+					),
+				),
+			)
+		);
+		$registry    = WP_Block_Type_Registry::get_instance();
+		$block_type  = $registry->get_registered( $this->test_block_name );
+		$block_attrs = array(
+			'style' => array(
+				'dimensions' => array(
+					'height' => '400px',
+				),
+			),
+		);
+
+		$actual   = gutenberg_apply_dimensions_support( $block_type, $block_attrs );
+		$expected = array();
+
+		$this->assertSame( $expected, $actual );
+	}
 }
