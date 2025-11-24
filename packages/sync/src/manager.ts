@@ -21,6 +21,7 @@ import type {
 	ObjectID,
 	ObjectData,
 	ObjectType,
+	Origin,
 	ProviderCreator,
 	RecordHandlers,
 	SyncConfig,
@@ -111,7 +112,7 @@ export function createSyncManager(): SyncManager {
 				return;
 			}
 
-			void updateEntityRecord( objectType, objectId );
+			void updateEntityRecord( objectType, objectId, transaction.origin );
 		};
 
 		const onRecordMetaUpdate = (
@@ -326,7 +327,11 @@ export function createSyncManager(): SyncManager {
 		// persisted document introduces any changes that are not present in the
 		// current record. If it has been invalidated, then we return true as a
 		// signal that we need to apply the entity record to the target document.
-		const changes = syncConfig.getChangesFromCRDTDoc( tempDoc, record );
+		const changes = syncConfig.getChangesFromCRDTDoc(
+			tempDoc,
+			record,
+			LOCAL_SYNC_MANAGER_ORIGIN
+		);
 
 		// Destroy the temporary document to prevent leaks.
 		tempDoc.destroy();
@@ -378,10 +383,12 @@ export function createSyncManager(): SyncManager {
 	 *
 	 * @param {ObjectType} objectType Object type of record to update.
 	 * @param {ObjectID}   objectId   Object ID of record to update.
+	 * @param {Origin}     origin     Origin of the transaction that triggered this update.
 	 */
 	async function updateEntityRecord(
 		objectType: ObjectType,
-		objectId: ObjectID
+		objectId: ObjectID,
+		origin: Origin
 	): Promise< void > {
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
@@ -396,7 +403,8 @@ export function createSyncManager(): SyncManager {
 		// them against the current edited entity record.
 		const changes = syncConfig.getChangesFromCRDTDoc(
 			ydoc,
-			await handlers.getEditedRecord()
+			await handlers.getEditedRecord(),
+			origin
 		);
 
 		if ( 0 === Object.keys( changes ).length ) {

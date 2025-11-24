@@ -240,7 +240,8 @@ describe( 'crdt', () => {
 			const changes = getPostChangesFromCRDTDoc(
 				doc,
 				editedRecord,
-				mockPostType
+				mockPostType,
+				'test-origin'
 			);
 
 			expect( changes.title ).toBe( 'CRDT Title' );
@@ -255,7 +256,8 @@ describe( 'crdt', () => {
 			const changes = getPostChangesFromCRDTDoc(
 				doc,
 				editedRecord,
-				mockPostType
+				mockPostType,
+				'test-origin'
 			);
 
 			expect( changes ).not.toHaveProperty( 'unsyncedProp' );
@@ -272,7 +274,8 @@ describe( 'crdt', () => {
 			const changes = getPostChangesFromCRDTDoc(
 				doc,
 				editedRecord,
-				mockPostType
+				mockPostType,
+				'test-origin'
 			);
 
 			expect( changes ).not.toHaveProperty( 'status' );
@@ -291,7 +294,8 @@ describe( 'crdt', () => {
 			const changesWithEmptyDate = getPostChangesFromCRDTDoc(
 				doc,
 				editedRecord,
-				mockPostType
+				mockPostType,
+				'test-origin'
 			);
 
 			expect( changesWithEmptyDate ).not.toHaveProperty( 'date' );
@@ -301,7 +305,8 @@ describe( 'crdt', () => {
 			const changesWithDefinedDate = getPostChangesFromCRDTDoc(
 				doc,
 				editedRecord,
-				mockPostType
+				mockPostType,
+				'test-origin'
 			);
 
 			expect( changesWithDefinedDate ).not.toHaveProperty( 'date' );
@@ -320,7 +325,8 @@ describe( 'crdt', () => {
 			const changesWithEmptyDate = getPostChangesFromCRDTDoc(
 				doc,
 				editedRecord,
-				mockPostType
+				mockPostType,
+				'test-origin'
 			);
 
 			expect( changesWithEmptyDate ).not.toHaveProperty( 'date' );
@@ -330,7 +336,8 @@ describe( 'crdt', () => {
 			const changesWithDefinedDate = getPostChangesFromCRDTDoc(
 				doc,
 				editedRecord,
-				mockPostType
+				mockPostType,
+				'test-origin'
 			);
 
 			expect( changesWithDefinedDate ).not.toHaveProperty( 'date' );
@@ -346,7 +353,8 @@ describe( 'crdt', () => {
 			const changes = getPostChangesFromCRDTDoc(
 				doc,
 				editedRecord,
-				mockPostType
+				mockPostType,
+				'test-origin'
 			);
 
 			expect( changes ).toHaveProperty( 'blocks' );
@@ -366,7 +374,8 @@ describe( 'crdt', () => {
 			const changes = getPostChangesFromCRDTDoc(
 				doc,
 				editedRecord,
-				mockPostType
+				mockPostType,
+				'test-origin'
 			);
 
 			expect( changes.meta ).toEqual( {
@@ -388,7 +397,8 @@ describe( 'crdt', () => {
 			const changes = getPostChangesFromCRDTDoc(
 				doc,
 				editedRecord,
-				mockPostType
+				mockPostType,
+				'test-origin'
 			);
 
 			expect( changes.meta ).toEqual( {
@@ -414,7 +424,8 @@ describe( 'crdt', () => {
 			const changes = getPostChangesFromCRDTDoc(
 				doc,
 				editedRecord,
-				mockPostType
+				mockPostType,
+				'test-origin'
 			);
 
 			expect( changes.meta ).toEqual( {

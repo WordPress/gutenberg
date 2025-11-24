@@ -141,16 +141,16 @@ export function createUndoManager(): SyncUndoManager {
 		}
 	}
 
-	yUndoManager.on( 'stack-item-added', ( event: StackItemEvent ) => {
-		updatePositionMeta( event );
-	} );
+	// yUndoManager.on( 'stack-item-added', ( event: StackItemEvent ) => {
+	// 	updatePositionMeta( event );
+	// } );
 
 	// stack-item-updated not necessary - we already have the starting position
 	// for the undo operation stored in stack-item-added
 
-	yUndoManager.on( 'stack-item-popped', ( event: StackItemEvent ) => {
-		restorePosition( event );
-	} );
+	// yUndoManager.on( 'stack-item-popped', ( event: StackItemEvent ) => {
+	// 	restorePosition( event );
+	// } );
 
 	return {
 		/**
@@ -222,6 +222,7 @@ export function createUndoManager(): SyncUndoManager {
 			}
 
 			// Perform the undo operation
+			// console.log( 'DEBUG: skipping yUndoManager.undo() call' );
 			yUndoManager.undo();
 
 			// Intentionally return an empty array, because the SyncProvider will update
@@ -238,6 +239,7 @@ export function createUndoManager(): SyncUndoManager {
 			}
 
 			// Perform the redo operation
+			// console.log( 'DEBUG: skipping yUndoManager.redo() call' );
 			yUndoManager.redo();
 
 			// Intentionally return an empty array, because the SyncProvider will update
