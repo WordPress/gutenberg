@@ -24,7 +24,6 @@ import {
 	splitTask,
 	isPlainObject,
 	deepClone,
-	navigationSignal,
 } from './utils';
 import {
 	directive,
@@ -34,7 +33,7 @@ import {
 	type DirectiveCallback,
 	type DirectiveEntry,
 } from './hooks';
-import { getScope } from './scopes';
+import { getScope, navigationContextSignal } from './scopes';
 import { proxifyState, proxifyContext, deepMerge } from './proxies';
 import { PENDING_GETTER } from './proxies/state';
 
@@ -1027,7 +1026,8 @@ export default () => {
 			// been evaluated and the value of the server context has changed.
 			useLayoutEffect( () => {
 				if ( vdom && typeof vdom.type !== 'string' ) {
-					navigationSignal.value = navigationSignal.peek() + 1;
+					navigationContextSignal.value =
+						navigationContextSignal.peek() + 1;
 				}
 			}, [ vdom ] );
 
