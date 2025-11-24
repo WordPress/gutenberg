@@ -391,7 +391,13 @@ export const ValidateOnPopoverClose: StoryObj< typeof ValidatedInputControl > =
 						}
 					} }
 					renderContent={ () => (
-						<form ref={ formRef }>
+						<form
+							ref={ formRef }
+							onSubmit={ ( event ) => {
+								event.preventDefault();
+								setIsOpen( false );
+							} }
+						>
 							<ValidatedInputControl
 								{ ...args }
 								value={ text }
