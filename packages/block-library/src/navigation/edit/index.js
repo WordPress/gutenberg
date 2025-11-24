@@ -1125,6 +1125,7 @@ function Navigation( {
 									overlayBackgroundColor
 								}
 								overlayTextColor={ overlayTextColor }
+								overlayTemplatePartId={ overlayTemplatePartId }
 							>
 								{ isEntityAvailable &&
 									( overlayTemplatePartId &&

@@ -27,6 +27,7 @@ export default function ResponsiveWrapper( {
 	overlayTextColor,
 	hasIcon,
 	icon,
+	overlayTemplatePartId,
 } ) {
 	if ( ! isResponsive ) {
 		return children;
@@ -48,6 +49,7 @@ export default function ResponsiveWrapper( {
 			) ]: !! overlayBackgroundColor?.slug,
 			'is-menu-open': isOpen,
 			'hidden-by-default': isHiddenByDefault,
+			'has-custom-overlay': overlayTemplatePartId,
 		}
 	);
 
@@ -104,17 +106,24 @@ export default function ResponsiveWrapper( {
 					tabIndex="-1"
 				>
 					<div { ...dialogProps }>
-						<Button
-							__next40pxDefaultSize
-							className="wp-block-navigation__responsive-container-close"
-							aria-label={ hasIcon && __( 'Close menu' ) }
-							onClick={ () => onToggle( false ) }
-						>
-							{ hasIcon && <Icon icon={ close } /> }
-							{ ! hasIcon && __( 'Close' ) }
-						</Button>
+						{ ! overlayTemplatePartId && (
+							<Button
+								__next40pxDefaultSize
+								className="wp-block-navigation__responsive-container-close"
+								aria-label={ hasIcon && __( 'Close menu' ) }
+								onClick={ () => onToggle( false ) }
+							>
+								{ hasIcon && <Icon icon={ close } /> }
+								{ ! hasIcon && __( 'Close' ) }
+							</Button>
+						) }
 						<div
-							className="wp-block-navigation__responsive-container-content"
+							className={ clsx(
+								'wp-block-navigation__responsive-container-content',
+								{
+									'has-custom-overlay': overlayTemplatePartId,
+								}
+							) }
 							id={ `${ modalId }-content` }
 						>
 							{ children }

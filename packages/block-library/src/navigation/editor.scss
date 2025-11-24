@@ -518,6 +518,36 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 	}
 }
 
+// Remove padding and margin when custom overlay is set.
+.wp-block-navigation__responsive-container.is-menu-open.has-custom-overlay {
+	padding: 0 !important;
+	margin: 0 !important;
+}
+
+.wp-block-navigation__responsive-container-content.has-custom-overlay {
+	padding: 0 !important;
+	margin: 0 !important;
+}
+
+// Set width and height to 100% for custom overlay elements.
+.wp-block-navigation__responsive-container.has-custom-overlay {
+	.wp-block-navigation__responsive-close,
+	.wp-block-navigation__responsive-dialog,
+	.wp-block-navigation__container,
+	.wp-block-navigation__responsive-container-content.has-custom-overlay {
+		width: 100% !important;
+		height: 100% !important;
+	}
+}
+
+// Force root level blocks inside custom overlay content to be 100% width.
+.wp-block-navigation__responsive-container-content .wp-block-navigation__container {
+	> .block-editor-block-list__block {
+		width: 100% !important;
+	}
+}
+
+
 @keyframes fadein {
 	0% {
 		opacity: 0;
