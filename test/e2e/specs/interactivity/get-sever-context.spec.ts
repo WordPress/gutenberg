@@ -259,4 +259,18 @@ test.describe( 'getServerContext()', () => {
 		await expect( prop ).toBeEmpty();
 		await expect( nestedProp ).toBeEmpty();
 	} );
+
+	test( 'should get server context using derived state getters', async ( {
+		page,
+	} ) => {
+		const serverProp = page.getByTestId( 'serverProp' );
+
+		await expect( page ).toHaveTitle( /main/ );
+		await expect( serverProp ).toHaveText( 'child' );
+
+		await page.getByTestId( 'modified' ).click();
+		await expect( page ).toHaveTitle( /modified/ );
+
+		await expect( serverProp ).toHaveText( 'childModified' );
+	} );
 } );
