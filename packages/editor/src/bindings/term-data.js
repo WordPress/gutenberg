@@ -56,6 +56,8 @@ export default {
 	name: 'core/term-data',
 	usesContext: [ 'taxonomy', 'termId', 'termData' ],
 	getValues( { select, context, bindings, clientId } ) {
+		const { getEntityRecord } = select( coreDataStore );
+
 		/*
 		 * BACKWARDS COMPATIBILITY: Hardcoded exception for navigation blocks.
 		 * Required for WordPress 6.9+ navigation blocks. DO NOT REMOVE.
@@ -64,34 +66,31 @@ export default {
 		const blockName = getBlockName( clientId );
 		const isNavigationBlock = NAVIGATION_BLOCK_TYPES.includes( blockName );
 
-		let termId, taxonomy, termDataValues;
+		let termDataValues;
 
 		if ( isNavigationBlock ) {
 			// Navigation blocks: read from block attributes
 			const blockAttributes = getBlockAttributes( clientId );
-			termId = blockAttributes?.id;
 			const typeFromAttributes = blockAttributes?.type;
-			taxonomy =
+			const taxonomy =
 				typeFromAttributes === 'tag' ? 'post_tag' : typeFromAttributes;
+			termDataValues = getEntityRecord(
+				'taxonomy',
+				taxonomy,
+				blockAttributes?.id
+			);
 		} else if ( context.termId && context.taxonomy ) {
 			// All other blocks: use context
-			termId = context.termId;
-			taxonomy = context.taxonomy;
-		} else if ( context.termData ) {
-			// Fallback to context termData if available
-			termId = context.termData.term_id;
-			taxonomy = context.termData.taxonomy;
-
-			termDataValues = context.termData; // TODO: Match field names. term_id -> id
+			termDataValues = getEntityRecord(
+				'taxonomy',
+				context.taxonomy,
+				context.termId
+			);
 		}
 
-		if ( taxonomy && termId && ! termDataValues ) {
-			const { getEntityRecord } = select( coreDataStore );
-			termDataValues = getEntityRecord( 'taxonomy', taxonomy, termId );
-
-			if ( ! termDataValues && context?.termData ) {
-				termDataValues = context.termData;
-			}
+		// Fall back to context termData if available.
+		if ( ! termDataValues && context?.termData && ! isNavigationBlock ) {
+			termDataValues = context.termData;
 		}
 
 		const newValues = {};
