@@ -42,11 +42,6 @@ function gutenberg_get_migrated_active_templates() {
 	return $active_templates;
 }
 
-// Only load template activation system if the experiment is enabled.
-if ( ! gutenberg_is_experiment_enabled( 'active_templates' ) ) {
-	return;
-}
-
 require_once __DIR__ . '/class-gutenberg-rest-old-templates-controller.php';
 
 // How does this work?
@@ -54,6 +49,10 @@ require_once __DIR__ . '/class-gutenberg-rest-old-templates-controller.php';
 //    a normal posts endpoint, modified slightly to allow auto-drafts.
 add_filter( 'register_post_type_args', 'gutenberg_modify_wp_template_post_type_args', 10, 2 );
 function gutenberg_modify_wp_template_post_type_args( $args, $post_type ) {
+	// Check active_templates experiment status.
+	if ( ! gutenberg_is_experiment_enabled( 'active_templates' ) ) {
+		return $args;
+	}
 	if ( 'wp_template' === $post_type ) {
 		$args['rest_base']                       = 'created-templates';
 		$args['rest_controller_class']           = 'WP_REST_Posts_Controller';
@@ -75,6 +74,10 @@ add_action( 'rest_api_init', 'gutenberg_maintain_templates_routes', 100 );
  * @global array $wp_post_types List of post types.
  */
 function gutenberg_maintain_templates_routes() {
+	// Check active_templates experiment status.
+	if ( ! gutenberg_is_experiment_enabled( 'active_templates' ) ) {
+		return;
+	}
 	// This should later be changed in core so we don't need initialize
 	// WP_REST_Templates_Controller with a post type.
 	global $wp_post_types;
@@ -185,6 +188,10 @@ function gutenberg_setup_static_template() {
 
 add_filter( 'pre_wp_unique_post_slug', 'gutenberg_allow_template_slugs_to_be_duplicated', 10, 5 );
 function gutenberg_allow_template_slugs_to_be_duplicated( $override, $slug, $post_id, $post_status, $post_type ) {
+	// Check active_templates experiment status.
+	if ( ! gutenberg_is_experiment_enabled( 'active_templates' ) ) {
+		return $override;
+	}
 	return 'wp_template' === $post_type ? $slug : $override;
 }
 
@@ -267,6 +274,10 @@ foreach ( $template_types as $template_type ) {
 }
 
 function gutenberg_get_template( $template, $type, $templates ) {
+	// Check active_templates experiment status.
+	if ( ! gutenberg_is_experiment_enabled( 'active_templates' ) ) {
+		return $template;
+	}
 	$template = locate_template( $templates );
 	return gutenberg_locate_block_template( $template, $type, $templates );
 }
@@ -444,6 +455,11 @@ function gutenberg_resolve_block_template( $template_type, $template_hierarchy, 
 function gutenberg_locate_block_template( $template, $type, array $templates ) {
 	global $_wp_current_template_content, $_wp_current_template_id;
 
+	// Check active_templates experiment status.
+	if ( ! gutenberg_is_experiment_enabled( 'active_templates' ) ) {
+		return $template;
+	}
+
 	if ( ! current_theme_supports( 'block-templates' ) ) {
 		return $template;
 	}
@@ -533,6 +549,10 @@ function gutenberg_locate_block_template( $template, $type, array $templates ) {
 remove_action( 'rest_pre_insert_wp_template', 'wp_assign_new_template_to_theme', 9 );
 add_action( 'rest_pre_insert_wp_template', 'gutenberg_set_active_template_theme', 9, 2 );
 function gutenberg_set_active_template_theme( $changes, $request ) {
+	// Check active_templates experiment status.
+	if ( ! gutenberg_is_experiment_enabled( 'active_templates' ) ) {
+		return $changes;
+	}
 	if ( str_starts_with( $request->get_route(), '/wp/v2/templates' ) ) {
 		return $changes;
 	}
@@ -549,6 +569,10 @@ function gutenberg_set_active_template_theme( $changes, $request ) {
 
 add_action( 'save_post_wp_template', 'gutenberg_maybe_update_active_templates' );
 function gutenberg_maybe_update_active_templates( $post_id ) {
+	// Check active_templates experiment status.
+	if ( ! gutenberg_is_experiment_enabled( 'active_templates' ) ) {
+		return;
+	}
 	$post                   = get_post( $post_id );
 	$is_inactive_by_default = get_post_meta( $post_id, 'is_inactive_by_default', true );
 	if ( $is_inactive_by_default ) {
@@ -565,6 +589,10 @@ add_action( 'pre_get_block_template', 'gutenberg_get_block_template', 10, 3 );
 // This function is a copy of core's, except for the marked section. //
 ///////////////////////////////////////////////////////////////////////
 function gutenberg_get_block_template( $output, $id, $template_type ) {
+	// Check active_templates experiment status.
+	if ( ! gutenberg_is_experiment_enabled( 'active_templates' ) ) {
+		return $output;
+	}
 	if ( 'wp_template' !== $template_type ) {
 		return $output;
 	}
@@ -648,6 +676,10 @@ add_action( 'pre_get_block_templates', 'gutenberg_get_block_templates', 10, 3 );
 // This function is a copy of core's, except for the marked section. //
 ///////////////////////////////////////////////////////////////////////
 function gutenberg_get_block_templates( $output, $query = array(), $template_type = 'wp_template' ) {
+	// Check active_templates experiment status.
+	if ( ! gutenberg_is_experiment_enabled( 'active_templates' ) ) {
+		return $output;
+	}
 	if ( 'wp_template' !== $template_type ) {
 		return $output;
 	}
