@@ -30,17 +30,30 @@ import getValueFromId from './utils/get-value-from-id';
 import setValueFromId from './utils/set-value-from-id';
 import getFilterBy from './utils/get-filter-by';
 
+const render = ( {
+	item,
+	field: normalizedField,
+}: DataViewRenderFieldProps< any > ) => {
+	return normalizedField.hasElements ? (
+		<RenderFromElements item={ item } field={ normalizedField } />
+	) : (
+		normalizedField.getValue( { item } )
+	);
+};
+
+const isValid = {
+	elements: true,
+	custom: () => null,
+};
+
+const defaultOperators: Operator[] = [ OPERATOR_IS, OPERATOR_IS_NOT ];
+const validOperators: Operator[] = ALL_OPERATORS;
+
 function normalizeField< Item >(
 	field: Field< Item >
 ): NormalizedField< Item > {
 	const getValue = field.getValue || getValueFromId( field.id );
 	const setValue = field.setValue || setValueFromId( field.id );
-
-	const isValid = {
-		elements: true,
-		custom: () => null,
-	};
-
 	const sort = ( a: any, b: any, direction: SortDirection ) => {
 		const valueA = getValue( { item: a } );
 		const valueB = getValue( { item: b } );
@@ -53,20 +66,6 @@ function normalizeField< Item >(
 			? valueA.localeCompare( valueB )
 			: valueB.localeCompare( valueA );
 	};
-
-	const render = ( {
-		item,
-		field: normalizedField,
-	}: DataViewRenderFieldProps< Item > ) => {
-		return normalizedField.hasElements ? (
-			<RenderFromElements item={ item } field={ normalizedField } />
-		) : (
-			normalizedField.getValue( { item } )
-		);
-	};
-
-	const defaultOperators: Operator[] = [ OPERATOR_IS, OPERATOR_IS_NOT ];
-	const validOperators: Operator[] = ALL_OPERATORS;
 
 	return {
 		id: field.id,

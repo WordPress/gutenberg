@@ -45,15 +45,37 @@ function render( { item, field }: DataViewRenderFieldProps< any > ) {
 	}
 }
 
+const isValid: Rules< any > = {
+	elements: true,
+	custom: () => null,
+};
+
+const defaultOperators: Operator[] = [
+	OPERATOR_ON,
+	OPERATOR_NOT_ON,
+	OPERATOR_BEFORE,
+	OPERATOR_AFTER,
+	OPERATOR_BEFORE_INC,
+	OPERATOR_AFTER_INC,
+	OPERATOR_IN_THE_PAST,
+	OPERATOR_OVER,
+];
+const validOperators: Operator[] = [
+	OPERATOR_ON,
+	OPERATOR_NOT_ON,
+	OPERATOR_BEFORE,
+	OPERATOR_AFTER,
+	OPERATOR_BEFORE_INC,
+	OPERATOR_AFTER_INC,
+	OPERATOR_IN_THE_PAST,
+	OPERATOR_OVER,
+];
+
 export default function normalizeField< Item >(
 	field: Field< Item >
 ): NormalizedField< Item > {
 	const getValue = field.getValue || getValueFromId( field.id );
 	const setValue = field.setValue || setValueFromId( field.id );
-	const isValid: Rules< Item > = {
-		elements: true,
-		custom: () => null,
-	};
 
 	const sort = ( a: Item, b: Item, direction: SortDirection ) => {
 		const valueA = getValue( { item: a } );
@@ -63,28 +85,6 @@ export default function normalizeField< Item >(
 
 		return direction === 'asc' ? timeA - timeB : timeB - timeA;
 	};
-
-	const defaultOperators: Operator[] = [
-		OPERATOR_ON,
-		OPERATOR_NOT_ON,
-		OPERATOR_BEFORE,
-		OPERATOR_AFTER,
-		OPERATOR_BEFORE_INC,
-		OPERATOR_AFTER_INC,
-		OPERATOR_IN_THE_PAST,
-		OPERATOR_OVER,
-	];
-
-	const validOperators: Operator[] = [
-		OPERATOR_ON,
-		OPERATOR_NOT_ON,
-		OPERATOR_BEFORE,
-		OPERATOR_AFTER,
-		OPERATOR_BEFORE_INC,
-		OPERATOR_AFTER_INC,
-		OPERATOR_IN_THE_PAST,
-		OPERATOR_OVER,
-	];
 
 	return {
 		id: field.id,

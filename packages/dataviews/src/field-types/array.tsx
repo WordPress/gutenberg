@@ -39,6 +39,27 @@ const validOperators: Operator[] = [
 	OPERATOR_IS_NOT_ALL,
 ];
 
+const isValid: Rules< any > = {
+	elements: true,
+	custom: ( item: any, normalizedField ) => {
+		const value = normalizedField.getValue( { item } );
+
+		if (
+			! [ undefined, '', null ].includes( value ) &&
+			! Array.isArray( value )
+		) {
+			return __( 'Value must be an array.' );
+		}
+
+		// Only allow strings for now. Can be extended to other types in the future.
+		if ( ! value.every( ( v: any ) => typeof v === 'string' ) ) {
+			return __( 'Every value must be a string.' );
+		}
+
+		return null;
+	},
+};
+
 export default function normalizeField< Item >(
 	field: Field< Item >
 ): NormalizedField< Item > {
@@ -62,27 +83,6 @@ export default function normalizeField< Item >(
 		return direction === 'asc'
 			? joinedA.localeCompare( joinedB )
 			: joinedB.localeCompare( joinedA );
-	};
-
-	const isValid: Rules< Item > = {
-		elements: true,
-		custom: ( item: any, normalizedField ) => {
-			const value = normalizedField.getValue( { item } );
-
-			if (
-				! [ undefined, '', null ].includes( value ) &&
-				! Array.isArray( value )
-			) {
-				return __( 'Value must be an array.' );
-			}
-
-			// Only allow strings for now. Can be extended to other types in the future.
-			if ( ! value.every( ( v: any ) => typeof v === 'string' ) ) {
-				return __( 'Every value must be a string.' );
-			}
-
-			return null;
-		},
 	};
 
 	return {

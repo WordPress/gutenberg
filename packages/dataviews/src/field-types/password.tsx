@@ -28,15 +28,16 @@ function render( { item, field }: DataViewRenderFieldProps< any > ) {
 	);
 }
 
+const isValid: Rules< any > = {
+	elements: true,
+	custom: () => null,
+};
+
 export default function normalizeField< Item >(
 	field: Field< Item >
 ): NormalizedField< Item > {
 	const getValue = field.getValue || getValueFromId( field.id );
 	const setValue = field.setValue || setValueFromId( field.id );
-	const isValid: Rules< Item > = {
-		elements: true,
-		custom: () => null,
-	};
 
 	return {
 		id: field.id,

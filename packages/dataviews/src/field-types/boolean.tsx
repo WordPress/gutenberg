@@ -38,6 +38,25 @@ function render( { item, field }: DataViewRenderFieldProps< any > ) {
 	return null;
 }
 
+const isValid: Rules< any > = {
+	elements: true,
+	custom: ( item: any, normalizedField ) => {
+		const value = normalizedField.getValue( { item } );
+
+		if (
+			! [ undefined, '', null ].includes( value ) &&
+			! [ true, false ].includes( value )
+		) {
+			return __( 'Value must be true, false, or undefined' );
+		}
+
+		return null;
+	},
+};
+
+const defaultOperators: Operator[] = [ OPERATOR_IS, OPERATOR_IS_NOT ];
+const validOperators: Operator[] = [ OPERATOR_IS, OPERATOR_IS_NOT ];
+
 export default function normalizeField< Item >(
 	field: Field< Item >
 ): NormalizedField< Item > {
@@ -62,26 +81,6 @@ export default function normalizeField< Item >(
 		// In descending order, true comes before false
 		return boolA ? -1 : 1;
 	};
-
-	const isValid: Rules< Item > = {
-		elements: true,
-		custom: ( item: any, normalizedField ) => {
-			const value = normalizedField.getValue( { item } );
-
-			if (
-				! [ undefined, '', null ].includes( value ) &&
-				! [ true, false ].includes( value )
-			) {
-				return __( 'Value must be true, false, or undefined' );
-			}
-
-			return null;
-		},
-	};
-
-	const defaultOperators: Operator[] = [ OPERATOR_IS, OPERATOR_IS_NOT ];
-
-	const validOperators: Operator[] = [ OPERATOR_IS, OPERATOR_IS_NOT ];
 
 	return {
 		id: field.id,

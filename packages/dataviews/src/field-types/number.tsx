@@ -51,55 +51,55 @@ function render( { item, field }: DataViewRenderFieldProps< any > ) {
 	return null;
 }
 
+const isValid: Rules< any > = {
+	elements: true,
+	custom: ( item: any, normalizedField ) => {
+		const value = normalizedField.getValue( { item } );
+
+		if ( ! isEmpty( value ) && ! Number.isFinite( value ) ) {
+			return __( 'Value must be a number.' );
+		}
+
+		return null;
+	},
+};
+
+const defaultOperators: Operator[] = [
+	OPERATOR_IS,
+	OPERATOR_IS_NOT,
+	OPERATOR_LESS_THAN,
+	OPERATOR_GREATER_THAN,
+	OPERATOR_LESS_THAN_OR_EQUAL,
+	OPERATOR_GREATER_THAN_OR_EQUAL,
+	OPERATOR_BETWEEN,
+];
+const validOperators: Operator[] = [
+	// Single-selection
+	OPERATOR_IS,
+	OPERATOR_IS_NOT,
+	OPERATOR_LESS_THAN,
+	OPERATOR_GREATER_THAN,
+	OPERATOR_LESS_THAN_OR_EQUAL,
+	OPERATOR_GREATER_THAN_OR_EQUAL,
+	OPERATOR_BETWEEN,
+	// Multiple-selection
+	OPERATOR_IS_ANY,
+	OPERATOR_IS_NONE,
+	OPERATOR_IS_ALL,
+	OPERATOR_IS_NOT_ALL,
+];
+
 export default function normalizeField< Item >(
 	field: Field< Item >
 ): NormalizedField< Item > {
 	const getValue = field.getValue || getValueFromId( field.id );
 	const setValue = field.setValue || setValueFromId( field.id );
-	const isValid: Rules< Item > = {
-		elements: true,
-		custom: ( item: any, normalizedField ) => {
-			const value = normalizedField.getValue( { item } );
-
-			if ( ! isEmpty( value ) && ! Number.isFinite( value ) ) {
-				return __( 'Value must be a number.' );
-			}
-
-			return null;
-		},
-	};
 
 	const sort = ( a: Item, b: Item, direction: SortDirection ) => {
 		const valueA = getValue( { item: a } );
 		const valueB = getValue( { item: b } );
 		return direction === 'asc' ? valueA - valueB : valueB - valueA;
 	};
-
-	const defaultOperators: Operator[] = [
-		OPERATOR_IS,
-		OPERATOR_IS_NOT,
-		OPERATOR_LESS_THAN,
-		OPERATOR_GREATER_THAN,
-		OPERATOR_LESS_THAN_OR_EQUAL,
-		OPERATOR_GREATER_THAN_OR_EQUAL,
-		OPERATOR_BETWEEN,
-	];
-
-	const validOperators: Operator[] = [
-		// Single-selection
-		OPERATOR_IS,
-		OPERATOR_IS_NOT,
-		OPERATOR_LESS_THAN,
-		OPERATOR_GREATER_THAN,
-		OPERATOR_LESS_THAN_OR_EQUAL,
-		OPERATOR_GREATER_THAN_OR_EQUAL,
-		OPERATOR_BETWEEN,
-		// Multiple-selection
-		OPERATOR_IS_ANY,
-		OPERATOR_IS_NONE,
-		OPERATOR_IS_ALL,
-		OPERATOR_IS_NOT_ALL,
-	];
 
 	return {
 		id: field.id,

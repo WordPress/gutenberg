@@ -35,15 +35,30 @@ function render( { item, field }: DataViewRenderFieldProps< any > ) {
 	);
 }
 
+const isValid: Rules< any > = {
+	elements: true,
+	custom: () => null,
+};
+
+const defaultOperators: Operator[] = [ OPERATOR_IS_ANY, OPERATOR_IS_NONE ];
+const validOperators: Operator[] = [
+	OPERATOR_IS,
+	OPERATOR_IS_NOT,
+	OPERATOR_CONTAINS,
+	OPERATOR_NOT_CONTAINS,
+	OPERATOR_STARTS_WITH,
+	// Multiple selection
+	OPERATOR_IS_ANY,
+	OPERATOR_IS_NONE,
+	OPERATOR_IS_ALL,
+	OPERATOR_IS_NOT_ALL,
+];
+
 export default function normalizeField< Item >(
 	field: Field< Item >
 ): NormalizedField< Item > {
 	const getValue = field.getValue || getValueFromId( field.id );
 	const setValue = field.setValue || setValueFromId( field.id );
-	const isValid: Rules< Item > = {
-		elements: true,
-		custom: () => null,
-	};
 
 	const sort = ( a: any, b: any, direction: SortDirection ) => {
 		const valueA = getValue( { item: a } );
@@ -52,21 +67,6 @@ export default function normalizeField< Item >(
 			? valueA.localeCompare( valueB )
 			: valueB.localeCompare( valueA );
 	};
-
-	const defaultOperators: Operator[] = [ OPERATOR_IS_ANY, OPERATOR_IS_NONE ];
-
-	const validOperators: Operator[] = [
-		OPERATOR_IS,
-		OPERATOR_IS_NOT,
-		OPERATOR_CONTAINS,
-		OPERATOR_NOT_CONTAINS,
-		OPERATOR_STARTS_WITH,
-		// Multiple selection
-		OPERATOR_IS_ANY,
-		OPERATOR_IS_NONE,
-		OPERATOR_IS_ALL,
-		OPERATOR_IS_NOT_ALL,
-	];
 
 	return {
 		id: field.id,
