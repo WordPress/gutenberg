@@ -298,10 +298,6 @@ function gutenberg_get_template( $template, $type, $templates ) {
  * @return WP_Block_Template|null template A template object, or null if none could be found.
  */
 function gutenberg_resolve_block_template( $template_type, $template_hierarchy, $fallback_template ) {
-	// Check active_templates experiment status.
-	if ( ! gutenberg_is_experiment_enabled( 'active_templates' ) ) {
-		return null;
-	}
 	if ( ! $template_type ) {
 		return null;
 	}
