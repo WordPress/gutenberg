@@ -40,6 +40,7 @@ import {
 	type YMapRecord,
 	type YMapWrap,
 } from './crdt-utils';
+import { BlockSelectionHistory } from './block-selection-history';
 
 // Changes that can be applied to a post entity record.
 export type PostChanges = Partial< Post > & {
@@ -248,6 +249,11 @@ export function applyPostChangesToCRDTDoc(
 			}
 		}
 	} );
+
+	if ( changes.selection ) {
+		const selectionHistory = getSelectionHistory( ydoc );
+		selectionHistory.updateSelection( changes.selection );
+	}
 }
 
 function defaultGetChangesFromCRDTDoc( crdtDoc: CRDTDoc ): ObjectData {
@@ -447,4 +453,23 @@ function updateMapValue< T extends YMapRecord, K extends keyof T >(
 	if ( haveValuesChanged< T[ K ] >( currentValue, newValue ) ) {
 		map.set( key, newValue );
 	}
+}
+
+// WeakMap to store BlockSelectionHistory instances per Y.Doc
+const selectionHistoryMap = new WeakMap< CRDTDoc, BlockSelectionHistory >();
+
+/**
+ * Get or create a BlockSelectionHistory instance for a given Y.Doc.
+ * @param ydoc The Y.Doc to get the selection history for
+ * @return The BlockSelectionHistory instance
+ */
+function getSelectionHistory( ydoc: CRDTDoc ): BlockSelectionHistory {
+	let history = selectionHistoryMap.get( ydoc );
+
+	if ( ! history ) {
+		history = new BlockSelectionHistory( ydoc );
+		selectionHistoryMap.set( ydoc, history );
+	}
+
+	return history;
 }
