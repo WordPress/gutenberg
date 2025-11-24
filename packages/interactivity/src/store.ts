@@ -4,8 +4,7 @@
 import { proxifyState, proxifyStore, deepMerge, peek } from './proxies';
 import { PENDING_GETTER } from './proxies/state';
 import { getNamespace } from './namespaces';
-import { isPlainObject, deepReadOnly, navigationSignal } from './utils';
-import type { DeepReadonly } from './utils';
+import { isPlainObject, navigationSignal, deepClone } from './utils';
 
 export const stores = new Map();
 const rawStores = new Map();
@@ -25,7 +24,7 @@ export const getConfig = ( namespace?: string ) =>
 /**
  * Gets the state defined and updated from the server.
  *
- * The object returned is read-only, and includes the state defined in PHP with
+ * The object returned is a deep clone of the state defined in PHP with
  * `wp_interactivity_state()`. When using `actions.navigate()`, this object is
  * updated to reflect the changes in its properties, without affecting the state
  * returned by `store()`. Directives can subscribe to those changes to update
@@ -48,24 +47,18 @@ export const getConfig = ( namespace?: string ) =>
  *                  the store where it is defined.
  * @return The server state for the given namespace.
  */
-export function getServerState(
-	namespace?: string
-): DeepReadonly< Record< string, unknown > >;
-export function getServerState< T extends object >(
-	namespace?: string
-): DeepReadonly< T >;
-export function getServerState< T extends object >(
-	namespace?: string
-): DeepReadonly< T > {
+export function getServerState( namespace?: string ): Record< string, unknown >;
+export function getServerState< T extends object >( namespace?: string ): T;
+export function getServerState< T extends object >( namespace?: string ): T {
 	const ns = namespace || getNamespace();
 	if ( ! serverStates.has( ns ) ) {
-		serverStates.set( ns, deepReadOnly( {} ) );
+		serverStates.set( ns, {} );
 	}
 	// Accesses the navigation signal to make this reactive. It assigns it to an
 	// arbitrary property (`subscribe`) to prevent the JavaScript minifier from
 	// removing this line.
 	getServerState.subscribe = navigationSignal.value;
-	return serverStates.get( ns ) as DeepReadonly< T >;
+	return deepClone( serverStates.get( ns ) ) as T;
 }
 getServerState.subscribe = 0;
 
@@ -295,7 +288,7 @@ export const populateServerData = ( data?: {
 		Object.entries( data!.state ).forEach( ( [ namespace, state ] ) => {
 			const st = store< any >( namespace, {}, { lock: universalUnlock } );
 			deepMerge( st.state, state, false );
-			serverStates.set( namespace, deepReadOnly( state! ) );
+			serverStates.set( namespace, state! );
 		} );
 	}
 	if ( isPlainObject( data?.config ) ) {
