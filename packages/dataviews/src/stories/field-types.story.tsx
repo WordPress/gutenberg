@@ -420,6 +420,7 @@ const fields: Field< DataType >[] = [
 				<img src={ item.media } alt="" style={ { width: '100%' } } />
 			);
 		},
+		readOnly: true,
 	},
 	{
 		id: 'mediaWithElements',
