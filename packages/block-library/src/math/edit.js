@@ -73,6 +73,8 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 					offset={ 8 }
 					anchor={ blockRef }
 					focusOnMount="firstContentElement"
+					__unstableSlotName="__unstable-block-tools-after"
+					constrainTabbing={ false }
 				>
 					<div style={ { padding: '4px', minWidth: '300px' } }>
 						<VStack spacing={ 1 }>
