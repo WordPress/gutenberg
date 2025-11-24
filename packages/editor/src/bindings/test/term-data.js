@@ -32,25 +32,22 @@ describe( 'term-data bindings', () => {
 	describe( 'getValues', () => {
 		describe( 'for regular blocks using block context', () => {
 			describe( 'when termId and taxonomy are provided in context', () => {
-				let select;
-				beforeAll( () => {
-					select = ( store ) => {
-						if ( store === blockEditorStore ) {
-							return {
-								getBlockName: ( clientId ) =>
-									clientId === '123abc456'
-										? 'core/paragraph'
-										: undefined,
-								getBlockAttributes: () => ( {} ),
-							};
-						}
-						if ( store === coreDataStore ) {
-							return {
-								getEntityRecord: getEntityRecordMock,
-							};
-						}
-					};
-				} );
+				const select = ( store ) => {
+					if ( store === blockEditorStore ) {
+						return {
+							getBlockName: ( clientId ) =>
+								clientId === '123abc456'
+									? 'core/paragraph'
+									: undefined,
+							getBlockAttributes: () => ( {} ),
+						};
+					}
+					if ( store === coreDataStore ) {
+						return {
+							getEntityRecord: getEntityRecordMock,
+						};
+					}
+				};
 
 				it( 'should return entity field values when they exist, and field name for unknown fields', () => {
 					const values = termDataBindings.getValues( {
@@ -166,7 +163,19 @@ describe( 'term-data bindings', () => {
 			} );
 
 			describe( 'when termData is provided in context', () => {
-				let select;
+				const select = ( store ) => {
+					if ( store === blockEditorStore ) {
+						return {
+							getBlockName: () => 'core/paragraph',
+							getBlockAttributes: () => ( {} ),
+						};
+					}
+					if ( store === coreDataStore ) {
+						return {
+							getEntityRecord: () => null,
+						};
+					}
+				};
 
 				const termData = {
 					id: 456,
@@ -177,21 +186,6 @@ describe( 'term-data bindings', () => {
 					parent: 0,
 					count: 15,
 				};
-				beforeAll( () => {
-					select = ( store ) => {
-						if ( store === blockEditorStore ) {
-							return {
-								getBlockName: () => 'core/paragraph',
-								getBlockAttributes: () => ( {} ),
-							};
-						}
-						if ( store === coreDataStore ) {
-							return {
-								getEntityRecord: () => null,
-							};
-						}
-					};
-				} );
 
 				it( 'should use termData from context when entity record is not available', () => {
 					const values = termDataBindings.getValues( {
@@ -394,23 +388,20 @@ describe( 'term-data bindings', () => {
 		} );
 
 		describe( 'when a non-Navigation block is selected', () => {
-			let select;
-			beforeAll( () => {
-				select = ( store ) => {
-					if ( store === blockEditorStore ) {
-						return {
-							getSelectedBlockClientId: () => '123abc456',
-							getBlockName: () => 'core/paragraph',
-							getBlockAttributes: () => ( {} ),
-						};
-					}
-					if ( store === coreDataStore ) {
-						return {
-							getEntityRecord: getEntityRecordMock,
-						};
-					}
-				};
-			} );
+			const select = ( store ) => {
+				if ( store === blockEditorStore ) {
+					return {
+						getSelectedBlockClientId: () => '123abc456',
+						getBlockName: () => 'core/paragraph',
+						getBlockAttributes: () => ( {} ),
+					};
+				}
+				if ( store === coreDataStore ) {
+					return {
+						getEntityRecord: getEntityRecordMock,
+					};
+				}
+			};
 
 			it( 'should return the list of available term data fields when taxonomy and termId are provided by context', () => {
 				const fields = termDataBindings.getFieldsList( {
