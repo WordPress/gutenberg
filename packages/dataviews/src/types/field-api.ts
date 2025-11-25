@@ -61,7 +61,7 @@ export type Operator =
 	| 'inThePast'
 	| 'over';
 
-export type Type =
+export type FieldTypeName =
 	| 'text'
 	| 'integer'
 	| 'number'
@@ -118,7 +118,7 @@ export type EditConfigText = {
  * Edit configuration for other control types (excluding 'text' and 'textarea').
  */
 export type EditConfigGeneric = {
-	control: Exclude< Type, 'text' | 'textarea' >;
+	control: Exclude< FieldTypeName, 'text' | 'textarea' >;
 };
 
 /**
@@ -137,7 +137,7 @@ export type Field< Item > = {
 	/**
 	 * Type of the fields.
 	 */
-	type?: Type;
+	type?: FieldTypeName;
 
 	/**
 	 * The unique identifier of the field.
