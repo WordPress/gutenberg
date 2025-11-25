@@ -3,19 +3,15 @@
  */
 import { renderHook } from '@testing-library/react';
 
-// Mock the hooks and stores BEFORE importing the module under test
-jest.mock( '@wordpress/data', () => ( {
-	useSelect: jest.fn(),
-} ) );
+/**
+ * WordPress dependencies
+ */
+import { createRegistry, RegistryProvider } from '@wordpress/data';
+import { createElement } from '@wordpress/element';
 
+// Only mock the internal hooks - let the real blocks store work
 jest.mock( '../../hooks', () => ( {
 	useStyle: jest.fn(),
-} ) );
-
-jest.mock( '@wordpress/blocks', () => ( {
-	store: {
-		name: 'core/blocks',
-	},
 } ) );
 
 jest.mock( '@wordpress/components', () => ( {
@@ -26,417 +22,183 @@ jest.mock( '@wordpress/components', () => ( {
  * Internal dependencies
  */
 import { useBlockVariations } from '../variations-panel';
+import { store as blocksStore } from '@wordpress/blocks';
 
 describe( 'useBlockVariations', () => {
-	const mockUseSelect = require( '@wordpress/data' ).useSelect;
 	const mockUseStyle = require( '../../hooks' ).useStyle;
-	const blocksStore = require( '@wordpress/blocks' ).store;
+	let registry;
 
 	beforeEach( () => {
+		// Create a fresh registry for each test
+		registry = createRegistry();
+		// Register the blocks store so we can dispatch actions
+		registry.register( blocksStore );
 		jest.clearAllMocks();
 	} );
 
+	function renderHookWithRegistry( hook, options = {} ) {
+		const Wrapper = ( { children } ) =>
+			createElement( RegistryProvider, { value: registry }, children );
+		return renderHook( hook, { wrapper: Wrapper, ...options } );
+	}
+
+	function registerBlockStyles( blockName, styles ) {
+		registry.dispatch( blocksStore ).addBlockStyles( blockName, styles );
+	}
+
 	it( 'should return block styles with source === "block"', () => {
-		const blockName = 'core/button';
 		const blockStyles = [
-			{
-				name: 'outline',
-				label: 'Outline',
-				source: 'block',
-			},
-			{
-				name: 'fill',
-				label: 'Fill',
-				source: 'block',
-			},
+			{ name: 'outline', label: 'Outline', source: 'block' },
+			{ name: 'fill', label: 'Fill', source: 'block' },
 		];
 
-		mockUseSelect.mockImplementation( ( mapSelect ) => {
-			const select = ( store ) => {
-				if ( store === blocksStore ) {
-					return {
-						getBlockStyles: jest
-							.fn()
-							.mockReturnValue( blockStyles ),
-					};
-				}
-				return {};
-			};
-			return mapSelect( select );
-		} );
-
+		registerBlockStyles( 'core/button', blockStyles );
 		mockUseStyle.mockReturnValue( [ {}, jest.fn() ] );
 
-		const { result } = renderHook( () => useBlockVariations( blockName ) );
+		const { result } = renderHookWithRegistry( () =>
+			useBlockVariations( 'core/button' )
+		);
 
 		expect( result.current ).toEqual( blockStyles );
-		expect( mockUseSelect ).toHaveBeenCalledWith( expect.any( Function ), [
-			blockName,
-		] );
-		expect( mockUseStyle ).toHaveBeenCalledWith( 'variations', blockName );
 	} );
 
 	it( 'should return block styles that match variation names', () => {
-		const blockName = 'core/button';
 		const blockStyles = [
-			{
-				name: 'outline',
-				label: 'Outline',
-				source: 'theme',
-			},
-			{
-				name: 'fill',
-				label: 'Fill',
-				source: 'theme',
-			},
+			{ name: 'outline', label: 'Outline', source: 'theme' },
+			{ name: 'fill', label: 'Fill', source: 'theme' },
 		];
-		const variations = {
-			outline: {},
-			fill: {},
-		};
+		const variations = { outline: {}, fill: {} };
 
-		mockUseSelect.mockImplementation( ( mapSelect ) => {
-			const select = ( store ) => {
-				if ( store === blocksStore ) {
-					return {
-						getBlockStyles: jest
-							.fn()
-							.mockReturnValue( blockStyles ),
-					};
-				}
-				return {};
-			};
-			return mapSelect( select );
-		} );
-
+		registerBlockStyles( 'core/button', blockStyles );
 		mockUseStyle.mockReturnValue( [ variations, jest.fn() ] );
 
-		const { result } = renderHook( () => useBlockVariations( blockName ) );
+		const { result } = renderHookWithRegistry( () =>
+			useBlockVariations( 'core/button' )
+		);
 
 		expect( result.current ).toEqual( blockStyles );
 	} );
 
 	it( 'should filter out block styles that do not match source or variation names', () => {
-		const blockName = 'core/button';
 		const blockStyles = [
-			{
-				name: 'outline',
-				label: 'Outline',
-				source: 'block',
-			},
-			{
-				name: 'fill',
-				label: 'Fill',
-				source: 'theme',
-			},
-			{
-				name: 'custom',
-				label: 'Custom',
-				source: 'theme',
-			},
+			{ name: 'outline', label: 'Outline', source: 'block' },
+			{ name: 'fill', label: 'Fill', source: 'theme' },
+			{ name: 'custom', label: 'Custom', source: 'theme' },
 		];
-		const variations = {
-			fill: {},
-		};
+		const variations = { fill: {} };
 
-		mockUseSelect.mockImplementation( ( mapSelect ) => {
-			const select = ( store ) => {
-				if ( store === blocksStore ) {
-					return {
-						getBlockStyles: jest
-							.fn()
-							.mockReturnValue( blockStyles ),
-					};
-				}
-				return {};
-			};
-			return mapSelect( select );
-		} );
-
+		registerBlockStyles( 'core/button', blockStyles );
 		mockUseStyle.mockReturnValue( [ variations, jest.fn() ] );
 
-		const { result } = renderHook( () => useBlockVariations( blockName ) );
+		const { result } = renderHookWithRegistry( () =>
+			useBlockVariations( 'core/button' )
+		);
 
 		expect( result.current ).toEqual( [
-			{
-				name: 'outline',
-				label: 'Outline',
-				source: 'block',
-			},
-			{
-				name: 'fill',
-				label: 'Fill',
-				source: 'theme',
-			},
+			{ name: 'outline', label: 'Outline', source: 'block' },
+			{ name: 'fill', label: 'Fill', source: 'theme' },
 		] );
-		expect( result.current ).not.toContainEqual( {
-			name: 'custom',
-			label: 'Custom',
-			source: 'theme',
-		} );
 	} );
 
-	it( 'should return empty array when block styles is empty', () => {
-		const blockName = 'core/button';
-
-		mockUseSelect.mockImplementation( ( mapSelect ) => {
-			const select = ( store ) => {
-				if ( store === blocksStore ) {
-					return {
-						getBlockStyles: jest.fn().mockReturnValue( [] ),
-					};
-				}
-				return {};
-			};
-			return mapSelect( select );
-		} );
-
+	it( 'should return empty array when block has no styles', () => {
 		mockUseStyle.mockReturnValue( [ {}, jest.fn() ] );
 
-		const { result } = renderHook( () => useBlockVariations( blockName ) );
+		const { result } = renderHookWithRegistry( () =>
+			useBlockVariations( 'core/button' )
+		);
 
 		expect( result.current ).toEqual( [] );
-	} );
-
-	it( 'should return empty array when block styles is null', () => {
-		const blockName = 'core/button';
-
-		mockUseSelect.mockImplementation( ( mapSelect ) => {
-			const select = ( store ) => {
-				if ( store === blocksStore ) {
-					return {
-						getBlockStyles: jest.fn().mockReturnValue( null ),
-					};
-				}
-				return {};
-			};
-			return mapSelect( select );
-		} );
-
-		mockUseStyle.mockReturnValue( [ {}, jest.fn() ] );
-
-		const { result } = renderHook( () => useBlockVariations( blockName ) );
-
-		expect( result.current ).toEqual( [] );
-	} );
-
-	it( 'should return empty array when block styles is undefined', () => {
-		const blockName = 'core/button';
-
-		mockUseSelect.mockImplementation( ( mapSelect ) => {
-			const select = ( store ) => {
-				if ( store === blocksStore ) {
-					return {
-						getBlockStyles: jest.fn().mockReturnValue( undefined ),
-					};
-				}
-				return {};
-			};
-			return mapSelect( select );
-		} );
-
-		mockUseStyle.mockReturnValue( [ {}, jest.fn() ] );
-
-		const { result } = renderHook( () => useBlockVariations( blockName ) );
-
-		expect( result.current ).toEqual( [] );
-	} );
-
-	it( 'should handle empty variations object', () => {
-		const blockName = 'core/button';
-		const blockStyles = [
-			{
-				name: 'outline',
-				label: 'Outline',
-				source: 'block',
-			},
-			{
-				name: 'fill',
-				label: 'Fill',
-				source: 'theme',
-			},
-		];
-
-		mockUseSelect.mockImplementation( ( mapSelect ) => {
-			const select = ( store ) => {
-				if ( store === blocksStore ) {
-					return {
-						getBlockStyles: jest
-							.fn()
-							.mockReturnValue( blockStyles ),
-					};
-				}
-				return {};
-			};
-			return mapSelect( select );
-		} );
-
-		mockUseStyle.mockReturnValue( [ {}, jest.fn() ] );
-
-		const { result } = renderHook( () => useBlockVariations( blockName ) );
-
-		expect( result.current ).toEqual( [
-			{
-				name: 'outline',
-				label: 'Outline',
-				source: 'block',
-			},
-		] );
 	} );
 
 	it( 'should handle null variations', () => {
-		const blockName = 'core/button';
 		const blockStyles = [
-			{
-				name: 'outline',
-				label: 'Outline',
-				source: 'block',
-			},
+			{ name: 'outline', label: 'Outline', source: 'block' },
 		];
 
-		mockUseSelect.mockImplementation( ( mapSelect ) => {
-			const select = ( store ) => {
-				if ( store === blocksStore ) {
-					return {
-						getBlockStyles: jest
-							.fn()
-							.mockReturnValue( blockStyles ),
-					};
-				}
-				return {};
-			};
-			return mapSelect( select );
-		} );
-
+		registerBlockStyles( 'core/button', blockStyles );
 		mockUseStyle.mockReturnValue( [ null, jest.fn() ] );
 
-		const { result } = renderHook( () => useBlockVariations( blockName ) );
+		const { result } = renderHookWithRegistry( () =>
+			useBlockVariations( 'core/button' )
+		);
 
 		expect( result.current ).toEqual( blockStyles );
 	} );
 
 	it( 'should handle undefined variations', () => {
-		const blockName = 'core/button';
 		const blockStyles = [
-			{
-				name: 'outline',
-				label: 'Outline',
-				source: 'block',
-			},
+			{ name: 'outline', label: 'Outline', source: 'block' },
 		];
 
-		mockUseSelect.mockImplementation( ( mapSelect ) => {
-			const select = ( store ) => {
-				if ( store === blocksStore ) {
-					return {
-						getBlockStyles: jest
-							.fn()
-							.mockReturnValue( blockStyles ),
-					};
-				}
-				return {};
-			};
-			return mapSelect( select );
-		} );
-
+		registerBlockStyles( 'core/button', blockStyles );
 		mockUseStyle.mockReturnValue( [ undefined, jest.fn() ] );
 
-		const { result } = renderHook( () => useBlockVariations( blockName ) );
+		const { result } = renderHookWithRegistry( () =>
+			useBlockVariations( 'core/button' )
+		);
 
 		expect( result.current ).toEqual( blockStyles );
 	} );
 
-	it( 'should handle block styles with no source property', () => {
-		const blockName = 'core/button';
+	it( 'should handle empty variations object', () => {
 		const blockStyles = [
-			{
-				name: 'outline',
-				label: 'Outline',
-			},
-			{
-				name: 'fill',
-				label: 'Fill',
-				source: 'block',
-			},
+			{ name: 'outline', label: 'Outline', source: 'block' },
+			{ name: 'fill', label: 'Fill', source: 'theme' },
 		];
-		const variations = {
-			outline: {},
-		};
 
-		mockUseSelect.mockImplementation( ( mapSelect ) => {
-			const select = ( store ) => {
-				if ( store === blocksStore ) {
-					return {
-						getBlockStyles: jest
-							.fn()
-							.mockReturnValue( blockStyles ),
-					};
-				}
-				return {};
-			};
-			return mapSelect( select );
-		} );
+		registerBlockStyles( 'core/button', blockStyles );
+		mockUseStyle.mockReturnValue( [ {}, jest.fn() ] );
 
-		mockUseStyle.mockReturnValue( [ variations, jest.fn() ] );
-
-		const { result } = renderHook( () => useBlockVariations( blockName ) );
+		const { result } = renderHookWithRegistry( () =>
+			useBlockVariations( 'core/button' )
+		);
 
 		expect( result.current ).toEqual( [
-			{
-				name: 'outline',
-				label: 'Outline',
-			},
-			{
-				name: 'fill',
-				label: 'Fill',
-				source: 'block',
-			},
+			{ name: 'outline', label: 'Outline', source: 'block' },
 		] );
 	} );
 
-	it( 'should call useSelect with correct block name dependency', () => {
-		const blockName = 'core/paragraph';
+	it( 'should handle block styles with no source property', () => {
+		const blockStyles = [
+			{ name: 'outline', label: 'Outline' },
+			{ name: 'fill', label: 'Fill', source: 'block' },
+		];
+		const variations = { outline: {} };
 
-		mockUseSelect.mockImplementation( ( mapSelect ) => {
-			const select = ( store ) => {
-				if ( store === blocksStore ) {
-					return {
-						getBlockStyles: jest.fn().mockReturnValue( [] ),
-					};
-				}
-				return {};
-			};
-			return mapSelect( select );
-		} );
+		registerBlockStyles( 'core/button', blockStyles );
+		mockUseStyle.mockReturnValue( [ variations, jest.fn() ] );
 
-		mockUseStyle.mockReturnValue( [ {}, jest.fn() ] );
+		const { result } = renderHookWithRegistry( () =>
+			useBlockVariations( 'core/button' )
+		);
 
-		renderHook( () => useBlockVariations( blockName ) );
-
-		expect( mockUseSelect ).toHaveBeenCalledWith( expect.any( Function ), [
-			blockName,
+		expect( result.current ).toEqual( [
+			{ name: 'outline', label: 'Outline' },
+			{ name: 'fill', label: 'Fill', source: 'block' },
 		] );
 	} );
 
-	it( 'should call useStyle with correct path and block name', () => {
-		const blockName = 'core/button';
+	it( 'should work with different block types', () => {
+		const paragraphStyles = [
+			{ name: 'default', label: 'Default', source: 'block' },
+		];
+		const buttonStyles = [
+			{ name: 'outline', label: 'Outline', source: 'block' },
+		];
 
-		mockUseSelect.mockImplementation( ( mapSelect ) => {
-			const select = ( store ) => {
-				if ( store === blocksStore ) {
-					return {
-						getBlockStyles: jest.fn().mockReturnValue( [] ),
-					};
-				}
-				return {};
-			};
-			return mapSelect( select );
-		} );
-
+		registerBlockStyles( 'core/paragraph', paragraphStyles );
+		registerBlockStyles( 'core/button', buttonStyles );
 		mockUseStyle.mockReturnValue( [ {}, jest.fn() ] );
 
-		renderHook( () => useBlockVariations( blockName ) );
+		const { result: paragraphResult } = renderHookWithRegistry( () =>
+			useBlockVariations( 'core/paragraph' )
+		);
 
-		expect( mockUseStyle ).toHaveBeenCalledWith( 'variations', blockName );
+		const { result: buttonResult } = renderHookWithRegistry( () =>
+			useBlockVariations( 'core/button' )
+		);
+
+		expect( paragraphResult.current ).toEqual( paragraphStyles );
+		expect( buttonResult.current ).toEqual( buttonStyles );
 	} );
 } );
