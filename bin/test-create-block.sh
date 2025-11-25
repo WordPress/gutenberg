@@ -62,9 +62,11 @@ if [ "$expected" -ne "$actual" ]; then
     exit 1
 fi
 
-# Set NODE_PATH to resolve modules from the root node_modules, since this
-# scaffolded project intentionally skips npm install for performance.
-export NODE_PATH="../node_modules"
+# Create a symlink to the root node_modules so that ESLint's import resolver can
+# find @wordpress/ packages. This scaffolded project intentionally skips install
+# for performance, reusing the root's dependencies instead. This uses Node.js
+# for cross-platform compatibility (junction on Windows, symlink on Unix).
+node -e "require('fs').symlinkSync(require('path').resolve('../node_modules'), 'node_modules', 'junction')"
 
 status "Formatting files..."
 ../node_modules/.bin/wp-scripts format
