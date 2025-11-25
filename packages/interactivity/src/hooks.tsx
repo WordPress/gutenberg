@@ -21,6 +21,7 @@ import { store, stores, universalUnlock } from './store';
 import { warn, type SyncAwareFunction } from './utils';
 import { getScope, setScope, resetScope, type Scope } from './scopes';
 import { PENDING_GETTER } from './proxies/state';
+import { signal } from '@preact/signals';
 export interface DirectiveEntry {
 	value: string | object;
 	namespace: string;
@@ -115,7 +116,7 @@ interface DirectivesProps {
 }
 
 // Main context.
-const context = createContext< any >( { client: {}, server: {} } );
+const context = createContext< any >( { client: {}, server: signal( {} ) } );
 
 // WordPress Directives.
 const directiveCallbacks: Record< string, DirectiveCallback > = {};
