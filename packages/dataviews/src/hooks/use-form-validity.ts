@@ -13,7 +13,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import normalizeFields from '../field-types/normalize-fields';
+import normalizeFields from '../field-types';
 import normalizeForm from '../dataform-layouts/normalize-form';
 import type {
 	Field,

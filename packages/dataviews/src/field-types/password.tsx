@@ -13,20 +13,18 @@ function render( { item, field }: DataViewRenderFieldProps< any > ) {
 	);
 }
 
-export default function normalizeField< Item >(): TypeProvidedProps< Item > {
-	return {
-		type: 'password',
-		render,
-		Edit: 'password',
-		sort: () => 0, // Passwords should not be sortable for security reasons
-		isValid: {
-			elements: true,
-			custom: () => null,
-		},
-		enableSorting: false,
-		enableGlobalSearch: false,
-		defaultOperators: [],
-		validOperators: [],
-		getFormat: () => ( {} ),
-	};
-}
+export default {
+	type: 'password',
+	render,
+	Edit: 'password',
+	sort: () => 0, // Passwords should not be sortable for security reasons
+	isValid: {
+		elements: true,
+		custom: () => null,
+	},
+	enableSorting: false,
+	enableGlobalSearch: false,
+	defaultOperators: [],
+	validOperators: [],
+	getFormat: () => ( {} ),
+} satisfies TypeProvidedProps< any >;

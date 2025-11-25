@@ -41,38 +41,36 @@ const sort = ( a: any, b: any, direction: SortDirection ) => {
 	return direction === 'asc' ? timeA - timeB : timeB - timeA;
 };
 
-export default function normalizeField< Item >(): TypeProvidedProps< Item > {
-	return {
-		type: 'datetime',
-		render,
-		Edit: 'datetime',
-		sort,
-		isValid: {
-			elements: true,
-			custom: () => null,
-		},
-		enableSorting: true,
-		enableGlobalSearch: false,
-		defaultOperators: [
-			OPERATOR_ON,
-			OPERATOR_NOT_ON,
-			OPERATOR_BEFORE,
-			OPERATOR_AFTER,
-			OPERATOR_BEFORE_INC,
-			OPERATOR_AFTER_INC,
-			OPERATOR_IN_THE_PAST,
-			OPERATOR_OVER,
-		],
-		validOperators: [
-			OPERATOR_ON,
-			OPERATOR_NOT_ON,
-			OPERATOR_BEFORE,
-			OPERATOR_AFTER,
-			OPERATOR_BEFORE_INC,
-			OPERATOR_AFTER_INC,
-			OPERATOR_IN_THE_PAST,
-			OPERATOR_OVER,
-		],
-		getFormat: () => ( {} ),
-	};
-}
+export default {
+	type: 'datetime',
+	render,
+	Edit: 'datetime',
+	sort,
+	isValid: {
+		elements: true,
+		custom: () => null,
+	},
+	enableSorting: true,
+	enableGlobalSearch: false,
+	defaultOperators: [
+		OPERATOR_ON,
+		OPERATOR_NOT_ON,
+		OPERATOR_BEFORE,
+		OPERATOR_AFTER,
+		OPERATOR_BEFORE_INC,
+		OPERATOR_AFTER_INC,
+		OPERATOR_IN_THE_PAST,
+		OPERATOR_OVER,
+	],
+	validOperators: [
+		OPERATOR_ON,
+		OPERATOR_NOT_ON,
+		OPERATOR_BEFORE,
+		OPERATOR_AFTER,
+		OPERATOR_BEFORE_INC,
+		OPERATOR_AFTER_INC,
+		OPERATOR_IN_THE_PAST,
+		OPERATOR_OVER,
+	],
+	getFormat: () => ( {} ),
+} satisfies TypeProvidedProps< any >;

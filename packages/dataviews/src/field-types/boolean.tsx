@@ -60,17 +60,15 @@ const sort = ( a: any, b: any, direction: SortDirection ) => {
 	return boolA ? -1 : 1;
 };
 
-export default function normalizeField< Item >(): TypeProvidedProps< Item > {
-	return {
-		type: 'boolean',
-		render,
-		Edit: 'checkbox',
-		sort,
-		isValid,
-		enableSorting: true,
-		enableGlobalSearch: false,
-		defaultOperators: [ OPERATOR_IS, OPERATOR_IS_NOT ],
-		validOperators: [ OPERATOR_IS, OPERATOR_IS_NOT ],
-		getFormat: () => ( {} ),
-	};
-}
+export default {
+	type: 'boolean',
+	render,
+	Edit: 'checkbox',
+	sort,
+	isValid,
+	enableSorting: true,
+	enableGlobalSearch: false,
+	defaultOperators: [ OPERATOR_IS, OPERATOR_IS_NOT ],
+	validOperators: [ OPERATOR_IS, OPERATOR_IS_NOT ],
+	getFormat: () => ( {} ),
+} satisfies TypeProvidedProps< any >;

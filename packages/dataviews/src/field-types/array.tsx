@@ -58,22 +58,20 @@ const sort = ( a: any, b: any, direction: SortDirection ) => {
 		: joinedB.localeCompare( joinedA );
 };
 
-export default function normalizeField< Item >(): TypeProvidedProps< Item > {
-	return {
-		type: 'array',
-		render,
-		Edit: 'array',
-		sort,
-		isValid,
-		enableSorting: true,
-		enableGlobalSearch: false,
-		defaultOperators: [ OPERATOR_IS_ANY, OPERATOR_IS_NONE ],
-		validOperators: [
-			OPERATOR_IS_ANY,
-			OPERATOR_IS_NONE,
-			OPERATOR_IS_ALL,
-			OPERATOR_IS_NOT_ALL,
-		],
-		getFormat: () => ( {} ),
-	};
-}
+export default {
+	type: 'array',
+	render,
+	Edit: 'array',
+	sort,
+	isValid,
+	enableSorting: true,
+	enableGlobalSearch: false,
+	defaultOperators: [ OPERATOR_IS_ANY, OPERATOR_IS_NONE ],
+	validOperators: [
+		OPERATOR_IS_ANY,
+		OPERATOR_IS_NONE,
+		OPERATOR_IS_ALL,
+		OPERATOR_IS_NOT_ALL,
+	],
+	getFormat: () => ( {} ),
+} satisfies TypeProvidedProps< any >;

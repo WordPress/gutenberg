@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import normalizeFields from '../field-types/normalize-fields';
+import normalizeFields from '../field-types';
 import type { Field } from '../types';
 
 describe( 'normalizeFields: default getValue', () => {

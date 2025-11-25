@@ -94,22 +94,20 @@ const sort = ( a: any, b: any, direction: SortDirection ) => {
 	return direction === 'asc' ? hslA.l - hslB.l : hslB.l - hslA.l;
 };
 
-export default function normalizeField< Item >(): TypeProvidedProps< Item > {
-	return {
-		type: 'color',
-		render,
-		Edit: 'color',
-		sort,
-		isValid,
-		enableSorting: true,
-		enableGlobalSearch: false,
-		defaultOperators: [ OPERATOR_IS_ANY, OPERATOR_IS_NONE ],
-		validOperators: [
-			OPERATOR_IS,
-			OPERATOR_IS_NOT,
-			OPERATOR_IS_ANY,
-			OPERATOR_IS_NONE,
-		],
-		getFormat: () => ( {} ),
-	};
-}
+export default {
+	type: 'color',
+	render,
+	Edit: 'color',
+	sort,
+	isValid,
+	enableSorting: true,
+	enableGlobalSearch: false,
+	defaultOperators: [ OPERATOR_IS_ANY, OPERATOR_IS_NONE ],
+	validOperators: [
+		OPERATOR_IS,
+		OPERATOR_IS_NOT,
+		OPERATOR_IS_ANY,
+		OPERATOR_IS_NONE,
+	],
+	getFormat: () => ( {} ),
+} satisfies TypeProvidedProps< any >;

@@ -57,39 +57,37 @@ const sort = ( a: any, b: any, direction: SortDirection ) => {
 	return direction === 'asc' ? a - b : b - a;
 };
 
-export default function normalizeField< Item >(): TypeProvidedProps< Item > {
-	return {
-		type: 'number',
-		render,
-		Edit: 'number',
-		sort,
-		isValid,
-		enableSorting: true,
-		enableGlobalSearch: false,
-		defaultOperators: [
-			OPERATOR_IS,
-			OPERATOR_IS_NOT,
-			OPERATOR_LESS_THAN,
-			OPERATOR_GREATER_THAN,
-			OPERATOR_LESS_THAN_OR_EQUAL,
-			OPERATOR_GREATER_THAN_OR_EQUAL,
-			OPERATOR_BETWEEN,
-		],
-		validOperators: [
-			// Single-selection
-			OPERATOR_IS,
-			OPERATOR_IS_NOT,
-			OPERATOR_LESS_THAN,
-			OPERATOR_GREATER_THAN,
-			OPERATOR_LESS_THAN_OR_EQUAL,
-			OPERATOR_GREATER_THAN_OR_EQUAL,
-			OPERATOR_BETWEEN,
-			// Multiple-selection
-			OPERATOR_IS_ANY,
-			OPERATOR_IS_NONE,
-			OPERATOR_IS_ALL,
-			OPERATOR_IS_NOT_ALL,
-		],
-		getFormat: () => ( {} ),
-	};
-}
+export default {
+	type: 'number',
+	render,
+	Edit: 'number',
+	sort,
+	isValid,
+	enableSorting: true,
+	enableGlobalSearch: false,
+	defaultOperators: [
+		OPERATOR_IS,
+		OPERATOR_IS_NOT,
+		OPERATOR_LESS_THAN,
+		OPERATOR_GREATER_THAN,
+		OPERATOR_LESS_THAN_OR_EQUAL,
+		OPERATOR_GREATER_THAN_OR_EQUAL,
+		OPERATOR_BETWEEN,
+	],
+	validOperators: [
+		// Single-selection
+		OPERATOR_IS,
+		OPERATOR_IS_NOT,
+		OPERATOR_LESS_THAN,
+		OPERATOR_GREATER_THAN,
+		OPERATOR_LESS_THAN_OR_EQUAL,
+		OPERATOR_GREATER_THAN_OR_EQUAL,
+		OPERATOR_BETWEEN,
+		// Multiple-selection
+		OPERATOR_IS_ANY,
+		OPERATOR_IS_NONE,
+		OPERATOR_IS_ALL,
+		OPERATOR_IS_NOT_ALL,
+	],
+	getFormat: () => ( {} ),
+} satisfies TypeProvidedProps< any >;

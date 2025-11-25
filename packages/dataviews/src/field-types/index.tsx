@@ -2,12 +2,17 @@
  * Internal dependencies
  */
 import type {
-	DataViewRenderFieldProps,
 	Field,
 	FieldType,
+	NormalizedField,
 	SortDirection,
 } from '../types';
 import type { TypeProvidedProps } from '../types/private';
+import { getControl } from '../dataform-controls';
+import getFilterBy from './utils/get-filter-by';
+import getValueFromId from './utils/get-value-from-id';
+import hasElements from './utils/has-elements';
+import setValueFromId from './utils/set-value-from-id';
 import { default as email } from './email';
 import { default as integer } from './integer';
 import { default as number } from './number';
@@ -21,45 +26,7 @@ import { default as password } from './password';
 import { default as telephone } from './telephone';
 import { default as color } from './color';
 import { default as url } from './url';
-import RenderFromElements from './utils/render-from-elements';
-import { ALL_OPERATORS, OPERATOR_IS, OPERATOR_IS_NOT } from '../constants';
-
-const render = ( {
-	item,
-	field: normalizedField,
-}: DataViewRenderFieldProps< any > ) => {
-	return normalizedField.hasElements ? (
-		<RenderFromElements item={ item } field={ normalizedField } />
-	) : (
-		normalizedField.getValue( { item } )
-	);
-};
-
-const sort = ( a: any, b: any, direction: SortDirection ) => {
-	if ( typeof a === 'number' && typeof b === 'number' ) {
-		return direction === 'asc' ? a - b : b - a;
-	}
-
-	return direction === 'asc' ? a.localeCompare( b ) : b.localeCompare( a );
-};
-
-function normalizeField< Item >(): TypeProvidedProps< Item > {
-	return {
-		// type: no type for this
-		render,
-		Edit: null,
-		sort,
-		isValid: {
-			elements: true,
-			custom: () => null,
-		},
-		enableSorting: true,
-		enableGlobalSearch: false,
-		defaultOperators: [ OPERATOR_IS, OPERATOR_IS_NOT ],
-		validOperators: ALL_OPERATORS,
-		getFormat: () => ( {} ),
-	};
-}
+import { default as noType } from './no-type';
 
 /**
  *
@@ -67,9 +34,9 @@ function normalizeField< Item >(): TypeProvidedProps< Item > {
  *
  * @return A field type definition.
  */
-export default function getNormalizeFieldFunction< Item >(
+function getDefaultProperties< Item >(
 	type?: FieldType
-): ( field: Field< Item > ) => TypeProvidedProps< Item > {
+): TypeProvidedProps< Item > {
 	switch ( type ) {
 		case 'email':
 			return email;
@@ -100,6 +67,63 @@ export default function getNormalizeFieldFunction< Item >(
 		// This is a fallback for fields that don't provide a type.
 		// It can be removed when the field.type is mandatory.
 		default:
-			return normalizeField;
+			return noType;
 	}
+}
+
+/**
+ * Apply default values and normalize the fields config.
+ *
+ * @param fields Fields config.
+ * @return Normalized fields config.
+ */
+export default function normalizeFields< Item >(
+	fields: Field< Item >[]
+): NormalizedField< Item >[] {
+	return fields.map( ( field ) => {
+		const defaultProps = getDefaultProperties< Item >( field.type );
+
+		const getValue = field.getValue || getValueFromId( field.id );
+		const sort = function ( a: any, b: any, direction: SortDirection ) {
+			const aValue = getValue( a );
+			const bValue = getValue( b );
+			return field.sort
+				? field.sort( aValue, bValue, direction )
+				: defaultProps.sort( aValue, bValue, direction );
+		};
+
+		return {
+			id: field.id,
+			label: field.label || field.id,
+			header: field.header || field.label || field.id,
+			description: field.description,
+			placeholder: field.placeholder,
+			getValue,
+			setValue: field.setValue || setValueFromId( field.id ),
+			elements: field.elements,
+			getElements: field.getElements,
+			hasElements: hasElements( field ),
+			isVisible: field.isVisible,
+			enableHiding: field.enableHiding ?? true,
+			readOnly: field.readOnly ?? false,
+			// The type provides defaults for the following props
+			type: defaultProps.type,
+			render: field.render ?? defaultProps.render,
+			Edit: getControl( field, defaultProps.Edit ),
+			sort,
+			enableSorting: field.enableSorting ?? defaultProps.enableSorting,
+			enableGlobalSearch:
+				field.enableGlobalSearch ?? defaultProps.enableGlobalSearch,
+			isValid: {
+				...defaultProps.isValid,
+				...field.isValid,
+			},
+			filterBy: getFilterBy(
+				field,
+				defaultProps.defaultOperators,
+				defaultProps.validOperators
+			),
+			format: defaultProps.getFormat( field ),
+		};
+	} );
 }
