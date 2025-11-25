@@ -5,8 +5,8 @@
 /**
  * Internal dependencies
  */
-import getNormalizeFieldFunction from '..';
-import type { Field, NormalizedField } from '../../types';
+import getNormalizeFieldFunction from '.';
+import type { Field, NormalizedField } from '../types';
 
 /**
  * Apply default values and normalize the fields config.
