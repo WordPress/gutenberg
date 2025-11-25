@@ -495,7 +495,7 @@ Display mathematical notation using LaTeX. ([Source](https://github.com/WordPres
 
 -	**Name:** core/math
 -	**Category:** text
--	**Supports:** ~~html~~
+-	**Supports:** color (background, gradients, link, text), spacing (margin, padding), typography (fontSize), ~~html~~
 -	**Attributes:** latex, mathML
 
 ## Media & Text
