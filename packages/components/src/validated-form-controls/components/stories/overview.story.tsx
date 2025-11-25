@@ -153,23 +153,19 @@ export const AsyncValidation: StoryObj< typeof ValidatedInputControl > = {
 			>( undefined );
 
 		const timeoutRef = useRef< ReturnType< typeof setTimeout > >();
-		const previousValidationValueRef = useRef< unknown >( '' );
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		const debouncedValidate = useCallback(
 			debounce( ( v ) => {
-				if ( v === previousValidationValueRef.current ) {
+				if ( v === '' ) {
 					return;
 				}
-
-				previousValidationValueRef.current = v;
 
 				setCustomValidity( {
 					type: 'validating',
 					message: 'Validating...',
 				} );
 
-				clearTimeout( timeoutRef.current );
 				timeoutRef.current = setTimeout( () => {
 					if ( v?.toString().toLowerCase() === 'error' ) {
 						setCustomValidity( {
@@ -193,6 +189,8 @@ export const AsyncValidation: StoryObj< typeof ValidatedInputControl > = {
 				value={ text }
 				onChange={ ( newValue ) => {
 					setText( newValue ?? '' );
+					setCustomValidity( undefined );
+					clearTimeout( timeoutRef.current );
 					debouncedValidate( newValue );
 				} }
 				customValidity={ customValidity }
@@ -227,14 +225,6 @@ const AsyncValidationWithTest: StoryObj< typeof ValidatedInputControl > = {
 
 		await new Promise( ( resolve ) => setTimeout( resolve, 500 ) );
 		await userEvent.clear( canvas.getByRole( 'textbox' ) );
-
-		// Should show validating state when transitioning from valid to invalid.
-		await waitFor(
-			() => {
-				expect( canvas.getByText( 'Validating...' ) ).toBeVisible();
-			},
-			{ timeout: 2500 }
-		);
 
 		await waitFor(
 			() => {
