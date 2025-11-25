@@ -6,7 +6,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import type { DataViewRenderFieldProps, Rules, SortDirection } from '../types';
+import type { DataViewRenderFieldProps, Rules } from '../types';
 import type { TypeProvidedProps } from '../types/private';
 import {
 	OPERATOR_IS,
@@ -22,6 +22,7 @@ import {
 	OPERATOR_BETWEEN,
 } from '../constants';
 import RenderFromElements from './utils/render-from-elements';
+import sort from './utils/sort-number';
 
 function isEmpty( value: unknown ): value is '' | undefined | null {
 	return value === '' || value === undefined || value === null;
@@ -51,10 +52,6 @@ const isValid: Rules< any > = {
 
 		return null;
 	},
-};
-
-const sort = ( a: any, b: any, direction: SortDirection ) => {
-	return direction === 'asc' ? a - b : b - a;
 };
 
 export default {

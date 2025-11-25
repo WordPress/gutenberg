@@ -85,8 +85,8 @@ export default function normalizeFields< Item >(
 
 		const getValue = field.getValue || getValueFromId( field.id );
 		const sort = function ( a: any, b: any, direction: SortDirection ) {
-			const aValue = getValue( a );
-			const bValue = getValue( b );
+			const aValue = getValue( { item: a } );
+			const bValue = getValue( { item: b } );
 			return field.sort
 				? field.sort( aValue, bValue, direction )
 				: defaultProps.sort( aValue, bValue, direction );

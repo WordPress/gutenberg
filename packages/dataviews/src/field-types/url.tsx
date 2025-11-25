@@ -1,7 +1,6 @@
 /**
  * Internal dependencies
  */
-import type { SortDirection } from '../types';
 import type { TypeProvidedProps } from '../types/private';
 import {
 	OPERATOR_IS,
@@ -15,10 +14,7 @@ import {
 	OPERATOR_STARTS_WITH,
 } from '../constants';
 import render from './utils/render-default';
-
-const sort = ( a: any, b: any, direction: SortDirection ) => {
-	return direction === 'asc' ? a.localeCompare( b ) : b.localeCompare( a );
-};
+import sort from './utils/sort-text';
 
 export default {
 	type: 'url',

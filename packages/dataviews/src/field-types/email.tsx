@@ -6,7 +6,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import type { Rules, SortDirection } from '../types';
+import type { Rules } from '../types';
 import type { TypeProvidedProps } from '../types/private';
 import {
 	OPERATOR_IS,
@@ -20,6 +20,7 @@ import {
 	OPERATOR_STARTS_WITH,
 } from '../constants';
 import render from './utils/render-default';
+import sort from './utils/sort-text';
 
 // Email validation regex based on HTML5 spec
 // https://html.spec.whatwg.org/multipage/input.html#valid-e-mail-address
@@ -40,10 +41,6 @@ const isValid: Rules< any > = {
 
 		return null;
 	},
-};
-
-const sort = ( a: any, b: any, direction: SortDirection ) => {
-	return direction === 'asc' ? a.localeCompare( b ) : b.localeCompare( a );
 };
 
 export default {
