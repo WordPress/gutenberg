@@ -62,11 +62,19 @@ if [ "$expected" -ne "$actual" ]; then
     exit 1
 fi
 
-# Create a symlink to the root node_modules so that ESLint's import resolver can
-# find @wordpress/ packages. This scaffolded project intentionally skips install
-# for performance, reusing the root's dependencies instead. This uses Node.js
-# for cross-platform compatibility (junction on Windows, symlink on Unix).
-node -e "require('fs').symlinkSync(require('path').resolve('../node_modules'), 'node_modules', 'junction')"
+# Create an ESLint config that uses the monorepo's custom import resolver. This
+# is needed because local @wordpress/* packages export paths pointing to built
+# files (build-module/), but we haven't run a build. The custom resolver maps
+# these to source files (src/) instead.
+cat > .eslintrc.js << 'EOF'
+module.exports = {
+	root: true,
+	extends: [ 'plugin:@wordpress/eslint-plugin/recommended' ],
+	settings: {
+		'import/resolver': require.resolve( '../tools/eslint/import-resolver' ),
+	},
+};
+EOF
 
 status "Formatting files..."
 ../node_modules/.bin/wp-scripts format
