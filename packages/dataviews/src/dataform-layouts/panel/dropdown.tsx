@@ -10,7 +10,7 @@ import {
 	Button,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useRef, useEffect } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
 
 /**
@@ -67,6 +67,7 @@ function PanelDropdown< Item >( {
 	summaryFields,
 	fieldDefinition,
 	popoverAnchor,
+	onFieldClick,
 }: {
 	data: Item;
 	field: NormalizedFormField;
@@ -75,8 +76,10 @@ function PanelDropdown< Item >( {
 	summaryFields: NormalizedField< Item >[];
 	fieldDefinition: NormalizedField< Item >;
 	popoverAnchor: HTMLElement | null;
+	onFieldClick?: ( handler: () => void ) => void;
 } ) {
 	const fieldLabel = !! field.children ? field.label : fieldDefinition?.label;
+	const toggleRef = useRef< () => void >( () => {} );
 
 	const form: NormalizedForm = useMemo(
 		() => ( {
@@ -113,6 +116,17 @@ function PanelDropdown< Item >( {
 		[ popoverAnchor ]
 	);
 
+	// Expose the toggle handler to the parent.
+	useEffect( () => {
+		if ( onFieldClick ) {
+			onFieldClick( () => {
+				if ( fieldDefinition.readOnly !== true ) {
+					toggleRef.current();
+				}
+			} );
+		}
+	}, [ onFieldClick, fieldDefinition.readOnly ] );
+
 	return (
 		<Dropdown
 			contentClassName="dataforms-layouts-panel__field-dropdown"
@@ -123,16 +137,20 @@ function PanelDropdown< Item >( {
 				variant: 'tertiary',
 				tooltipPosition: 'middle left',
 			} }
-			renderToggle={ ( { isOpen, onToggle } ) => (
-				<SummaryButton
-					summaryFields={ summaryFields }
-					data={ data }
-					fieldLabel={ fieldLabel }
-					disabled={ fieldDefinition.readOnly === true }
-					onClick={ onToggle }
-					aria-expanded={ isOpen }
-				/>
-			) }
+			renderToggle={ ( { isOpen, onToggle } ) => {
+				// Store the toggle handler in ref so it can be accessed from outside.
+				toggleRef.current = onToggle;
+				return (
+					<SummaryButton
+						summaryFields={ summaryFields }
+						data={ data }
+						fieldLabel={ fieldLabel }
+						disabled={ fieldDefinition.readOnly === true }
+						onClick={ onToggle }
+						aria-expanded={ isOpen }
+					/>
+				);
+			} }
 			renderContent={ ( { onClose } ) => (
 				<>
 					<DropdownHeader title={ fieldLabel } onClose={ onClose } />

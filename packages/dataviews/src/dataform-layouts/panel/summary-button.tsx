@@ -57,8 +57,33 @@ function SummaryButton< Item >( {
 			) )
 		);
 
+	const fieldValues = summaryFields
+		.map( ( summaryField ) => {
+			return summaryField.getValue( { item: data } );
+		} )
+		.filter( ( value ) => {
+			// Skip empty, null, or undefined values.
+			return value !== null && value !== undefined && value !== '';
+		} )
+		.join( ', ' );
+
 	return (
-		<div className="dataforms-layouts-panel__summary-wrapper">
+		<div
+			className="dataforms-layouts-panel__summary-wrapper"
+			// Make focusable for read-only fields so screen readers can discover the content.
+			tabIndex={ disabled ? 0 : undefined }
+			role={ disabled ? 'group' : undefined }
+			aria-label={
+				disabled
+					? sprintf(
+							// translators: %1$s: Field name. %2$s: Field values.
+							_x( '%1$s %2$s (read-only)', 'field' ),
+							fieldLabel || '',
+							fieldValues || ''
+					  )
+					: undefined
+			}
+		>
 			<div
 				id={ summaryId }
 				className="dataforms-layouts-panel__summary-content"

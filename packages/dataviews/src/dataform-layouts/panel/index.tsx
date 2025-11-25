@@ -10,7 +10,7 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { useState, useContext } from '@wordpress/element';
+import { useState, useContext, useRef, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -103,6 +103,28 @@ export default function FormPanelField< Item >( {
 		null
 	);
 
+	// Store the click handler from child components.
+	const clickHandlerRef = useRef< () => void >( () => {} );
+
+	const handleFieldClick = useCallback( ( handler: () => void ) => {
+		clickHandlerRef.current = handler;
+	}, [] );
+
+	// Handle clicks on the field wrapper.
+	const onFieldWrapperClick = ( e: React.MouseEvent ) => {
+		// Only trigger if not clicking on an interactive element.
+		const target = e.target as HTMLElement;
+		if (
+			! target.closest( 'button' ) &&
+			! target.closest( 'a' ) &&
+			! target.closest( 'input' ) &&
+			! target.closest( 'select' ) &&
+			! target.closest( 'textarea' )
+		) {
+			clickHandlerRef.current();
+		}
+	};
+
 	const { fieldDefinition, summaryFields } =
 		getFieldDefinitionAndSummaryFields( layout, field, fields );
 
@@ -116,6 +138,9 @@ export default function FormPanelField< Item >( {
 		`dataforms-layouts-panel__field-label--label-position-${ labelPosition }`
 	);
 	const fieldLabel = !! field.children ? field.label : fieldDefinition?.label;
+	const fieldClassName = clsx( 'dataforms-layouts-panel__field', {
+		'is-read-only': fieldDefinition.readOnly === true,
+	} );
 
 	const renderedControl =
 		layout.openAs === 'modal' ? (
@@ -125,6 +150,7 @@ export default function FormPanelField< Item >( {
 				onChange={ onChange }
 				summaryFields={ summaryFields }
 				fieldDefinition={ fieldDefinition }
+				onFieldClick={ handleFieldClick }
 			/>
 		) : (
 			<PanelDropdown
@@ -135,12 +161,17 @@ export default function FormPanelField< Item >( {
 				summaryFields={ summaryFields }
 				fieldDefinition={ fieldDefinition }
 				popoverAnchor={ popoverAnchor }
+				onFieldClick={ handleFieldClick }
 			/>
 		);
 
 	if ( labelPosition === 'top' ) {
 		return (
-			<VStack className="dataforms-layouts-panel__field" spacing={ 0 }>
+			<VStack
+				className={ fieldClassName }
+				spacing={ 0 }
+				onClick={ onFieldWrapperClick }
+			>
 				<div
 					className={ labelClassName }
 					style={ { paddingBottom: 0 } }
@@ -156,7 +187,8 @@ export default function FormPanelField< Item >( {
 
 	if ( labelPosition === 'none' ) {
 		return (
-			<div className="dataforms-layouts-panel__field">
+			// eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
+			<div className={ fieldClassName } onClick={ onFieldWrapperClick }>
 				{ renderedControl }
 			</div>
 		);
@@ -166,7 +198,8 @@ export default function FormPanelField< Item >( {
 	return (
 		<HStack
 			ref={ setPopoverAnchor }
-			className="dataforms-layouts-panel__field"
+			className={ fieldClassName }
+			onClick={ onFieldWrapperClick }
 		>
 			<div className={ labelClassName }>{ fieldLabel }</div>
 			<div className="dataforms-layouts-panel__field-control">

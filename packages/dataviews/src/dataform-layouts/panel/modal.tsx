@@ -13,7 +13,13 @@ import {
 	Modal,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useContext, useState, useMemo } from '@wordpress/element';
+import {
+	useContext,
+	useState,
+	useMemo,
+	useEffect,
+	useCallback,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -130,16 +136,31 @@ function PanelModal< Item >( {
 	onChange,
 	summaryFields,
 	fieldDefinition,
+	onFieldClick,
 }: {
 	data: Item;
 	field: NormalizedFormField;
 	onChange: ( value: any ) => void;
 	summaryFields: NormalizedField< Item >[];
 	fieldDefinition: NormalizedField< Item >;
+	onFieldClick?: ( handler: () => void ) => void;
 } ) {
 	const [ isOpen, setIsOpen ] = useState( false );
 
 	const fieldLabel = !! field.children ? field.label : fieldDefinition?.label;
+
+	const handleOpen = useCallback( () => {
+		if ( fieldDefinition.readOnly !== true ) {
+			setIsOpen( true );
+		}
+	}, [ fieldDefinition.readOnly ] );
+
+	// Expose the handler to the parent.
+	useEffect( () => {
+		if ( onFieldClick ) {
+			onFieldClick( handleOpen );
+		}
+	}, [ onFieldClick, handleOpen ] );
 
 	return (
 		<>
@@ -148,7 +169,7 @@ function PanelModal< Item >( {
 				data={ data }
 				fieldLabel={ fieldLabel }
 				disabled={ fieldDefinition.readOnly === true }
-				onClick={ () => setIsOpen( true ) }
+				onClick={ handleOpen }
 				aria-expanded={ isOpen }
 			/>
 			{ isOpen && (
