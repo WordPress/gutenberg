@@ -3,7 +3,6 @@
 		"name": "core/accordion-panel",
 		"isValid": true,
 		"attributes": {
-			"templateLock": false,
 			"openByDefault": false,
 			"isSelected": false
 		},
