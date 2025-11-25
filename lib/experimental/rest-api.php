@@ -19,6 +19,15 @@ function gutenberg_register_block_editor_settings() {
 }
 add_action( 'rest_api_init', 'gutenberg_register_block_editor_settings' );
 
+/**
+ * Registers the Block Revision Diff REST API routes.
+ */
+function gutenberg_register_block_revision_diff_routes() {
+	$controller = new WP_REST_Block_Revision_Diff_Controller();
+	$controller->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_block_revision_diff_routes' );
+
 
 /**
  * Shim for get_sample_permalink() to add support for auto-draft status.

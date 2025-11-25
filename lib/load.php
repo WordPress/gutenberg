@@ -47,6 +47,9 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 		require_once __DIR__ . '/experimental/class-wp-rest-block-editor-settings-controller.php';
 	}
 
+	// Block Revision Diff Controller.
+	require_once __DIR__ . '/experimental/class-wp-rest-block-revision-diff-controller.php';
+
 	// WordPress 6.8 compat.
 	require __DIR__ . '/compat/wordpress-6.8/rest-api.php';
 
