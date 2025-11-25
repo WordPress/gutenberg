@@ -37,6 +37,7 @@ function appendRequiredIndicator(
 	}
 	return label;
 }
+const VALIDITY_VISIBLE_ATTRIBUTE = 'data-validity-visible';
 
 /**
  * HTML elements that support the Constraint Validation API.
@@ -100,7 +101,10 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 	// e.g. when a form is submitted or reportValidity() is called.
 	useEffect( () => {
 		const validityTarget = getValidityTarget();
-		const handler = () => setShowMessage( true );
+		const handler = () => {
+			setShowMessage( true );
+			validityTarget?.setAttribute( VALIDITY_VISIBLE_ATTRIBUTE, '' );
+		};
 
 		validityTarget?.addEventListener( 'invalid', handler );
 		return () => validityTarget?.removeEventListener( 'invalid', handler );
@@ -181,6 +185,7 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 			! event.currentTarget.contains( event.relatedTarget )
 		) {
 			setIsTouched( true );
+			getValidityTarget()?.setAttribute( VALIDITY_VISIBLE_ATTRIBUTE, '' );
 		}
 	};
 
