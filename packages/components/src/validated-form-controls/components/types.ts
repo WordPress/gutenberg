@@ -15,6 +15,8 @@ export type ValidatedControlProps< V > = {
 	 *
 	 * Always prefer using standard HTML attributes like `required` and `min`/`max` over
 	 * custom validators when possible, as they are simpler and have localized error messages built in.
+	 *
+	 * @deprecated Use `onChange` instead.
 	 */
 	onValidate?: ( currentValue: V ) => void;
 	/**

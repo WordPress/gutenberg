@@ -1,19 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { usePrevious } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import {
 	cloneElement,
 	forwardRef,
 	useEffect,
 	useState,
+	useMemo,
 } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 import type { ValidatedControlProps } from './components/types';
 import { ValidityIndicator } from './validity-indicator';
 
@@ -72,6 +71,8 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 		markWhenOptional?: boolean;
 		/**
 		 * The callback to run when the input should be validated.
+		 *
+		 * @deprecated Use `onChange` instead.
 		 */
 		onValidate?: () => void;
 		customValidity?: ValidatedControlProps< unknown >[ 'customValidity' ];
@@ -99,31 +100,21 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 		  }
 		| undefined
 	>();
+	const [ showMessage, setShowMessage ] = useState( false );
 	const [ isTouched, setIsTouched ] = useState( false );
-	const previousCustomValidityType = usePrevious( customValidity?.type );
 
-	// Ensure that error messages are visible after user attemps to submit a form
-	// with multiple invalid fields.
+	// Ensure that error messages are visible when an `invalid` event is triggered,
+	// e.g. when a form is submitted or reportValidity() is called.
 	useEffect( () => {
 		const validityTarget = getValidityTarget();
-		const showValidationMessage = () =>
-			setErrorMessage( validityTarget?.validationMessage );
+		const handler = () => setShowMessage( true );
 
-		validityTarget?.addEventListener( 'invalid', showValidationMessage );
-
-		return () => {
-			validityTarget?.removeEventListener(
-				'invalid',
-				showValidationMessage
-			);
-		};
+		validityTarget?.addEventListener( 'invalid', handler );
+		return () => validityTarget?.removeEventListener( 'invalid', handler );
 	} );
 
-	useEffect( (): ReturnType< React.EffectCallback > => {
-		if ( ! isTouched ) {
-			return;
-		}
-
+	// Handle validity messages.
+	useEffect( () => {
 		const validityTarget = getValidityTarget();
 
 		if ( ! customValidity?.type ) {
@@ -135,26 +126,16 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 
 		switch ( customValidity.type ) {
 			case 'validating': {
-				// Wait before showing a validating state.
-				const timer = setTimeout( () => {
-					validityTarget?.setCustomValidity( '' );
-					setErrorMessage( undefined );
+				validityTarget?.setCustomValidity( '' );
+				setErrorMessage( undefined );
 
-					setStatusMessage( {
-						type: 'validating',
-						message: customValidity.message,
-					} );
-				}, 1000 );
-
-				return () => clearTimeout( timer );
+				setStatusMessage( {
+					type: 'validating',
+					message: customValidity.message,
+				} );
+				break;
 			}
 			case 'valid': {
-				// Ensures that we wait for any async responses before showing
-				// a synchronously valid state.
-				if ( previousCustomValidityType === 'valid' ) {
-					break;
-				}
-
 				validityTarget?.setCustomValidity( '' );
 				setErrorMessage( validityTarget?.validationMessage );
 
@@ -174,14 +155,27 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 				break;
 			}
 		}
-	}, [
-		isTouched,
-		customValidity?.type,
-		customValidity?.message,
-		getValidityTarget,
-		previousCustomValidityType,
-	] );
+	}, [ customValidity, getValidityTarget ] );
 
+	// Show messages if field has been touched (i.e. has blurred at least once).
+	useEffect( (): ReturnType< React.EffectCallback > => {
+		if ( ! isTouched || showMessage ) {
+			return;
+		}
+
+		if ( customValidity?.type === 'validating' ) {
+			// Wait before showing a validating state.
+			const timer = setTimeout( () => {
+				setShowMessage( true );
+			}, 1000 );
+
+			return () => clearTimeout( timer );
+		}
+
+		setShowMessage( true );
+	}, [ isTouched, customValidity?.type, showMessage ] );
+
+	// Mark blurred fields as touched.
 	const onBlur = ( event: React.FocusEvent< HTMLDivElement > ) => {
 		if ( isTouched ) {
 			return;
@@ -194,36 +188,36 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 			! event.currentTarget.contains( event.relatedTarget )
 		) {
 			setIsTouched( true );
-			onValidate?.();
 		}
 	};
 
 	const onChange = ( ...args: unknown[] ) => {
 		children.props.onChange?.( ...args );
-
-		// Only validate incrementally if the field has blurred at least once,
-		// or currently has an error message.
-		if ( isTouched || errorMessage ) {
-			onValidate?.();
-		}
+		onValidate?.(); // For back compat
 	};
 
-	const onKeyDown = ( event: React.KeyboardEvent< HTMLDivElement > ) => {
-		// Ensures that custom validators are triggered when the user submits by pressing Enter,
-		// without ever blurring the control.
-		if ( event.key === 'Enter' ) {
-			onValidate?.();
+	const message = useMemo( () => {
+		if ( errorMessage ) {
+			return (
+				<ValidityIndicator type="invalid" message={ errorMessage } />
+			);
 		}
-	};
+		if ( statusMessage?.type ) {
+			return (
+				<ValidityIndicator
+					type={ statusMessage.type }
+					message={ statusMessage.message }
+				/>
+			);
+		}
+		return null;
+	}, [ errorMessage, statusMessage?.type, statusMessage?.message ] );
 
 	return (
-		// Disable reason: Just listening to a bubbled event, not for interaction.
-		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
 			className="components-validated-control"
 			ref={ forwardedRef }
 			onBlur={ onBlur }
-			onKeyDown={ withIgnoreIMEEvents( onKeyDown ) }
 		>
 			{ cloneElement( children, {
 				label: appendRequiredIndicator(
@@ -234,20 +228,7 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 				onChange,
 				required,
 			} ) }
-			<div aria-live="polite">
-				{ errorMessage && (
-					<ValidityIndicator
-						type="invalid"
-						message={ errorMessage }
-					/>
-				) }
-				{ ! errorMessage && statusMessage && (
-					<ValidityIndicator
-						type={ statusMessage.type }
-						message={ statusMessage.message }
-					/>
-				) }
-			</div>
+			<div aria-live="polite">{ showMessage && message }</div>
 		</div>
 	);
 }
