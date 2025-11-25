@@ -38,7 +38,7 @@ describe( 'ControlWithError', () => {
 					>[ 'customValidity' ]
 				>( undefined );
 
-			const onValidate = useCallback(
+			const onChange = useCallback(
 				( value?: string ) => {
 					setCustomValidity( {
 						type: 'validating',
@@ -59,6 +59,8 @@ describe( 'ControlWithError', () => {
 							} );
 						}
 					}, serverDelayMs );
+
+					setText( value ?? '' );
 				},
 				[ serverDelayMs ]
 			);
@@ -67,10 +69,7 @@ describe( 'ControlWithError', () => {
 				<ValidatedInputControl
 					label="Text"
 					value={ text }
-					onChange={ ( newValue ) => {
-						setText( newValue ?? '' );
-					} }
-					onValidate={ onValidate }
+					onChange={ onChange }
 					customValidity={ customValidity }
 					{ ...restProps }
 				/>

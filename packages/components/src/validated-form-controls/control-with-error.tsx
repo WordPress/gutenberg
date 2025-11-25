@@ -75,7 +75,7 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 		 * @deprecated Use `onChange` instead.
 		 */
 		onValidate?: () => void;
-		customValidity?: ValidatedControlProps< unknown >[ 'customValidity' ];
+		customValidity?: ValidatedControlProps[ 'customValidity' ];
 		/**
 		 * A function that returns the actual element on which the validity data should be applied.
 		 */
