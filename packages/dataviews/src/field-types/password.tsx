@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import type { DataViewRenderFieldProps } from '../types';
-import type { TypeProvidedProps } from '../types/private';
+import type { FieldType } from '../types/private';
 import RenderFromElements from './utils/render-from-elements';
 
 function render( { item, field }: DataViewRenderFieldProps< any > ) {
@@ -27,4 +27,4 @@ export default {
 	defaultOperators: [],
 	validOperators: [],
 	getFormat: () => ( {} ),
-} satisfies TypeProvidedProps< any >;
+} satisfies FieldType< any >;

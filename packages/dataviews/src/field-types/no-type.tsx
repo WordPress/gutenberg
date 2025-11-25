@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import type { SortDirection } from '../types';
-import type { TypeProvidedProps } from '../types/private';
+import type { FieldType } from '../types/private';
 import { ALL_OPERATORS, OPERATOR_IS, OPERATOR_IS_NOT } from '../constants';
 import render from './utils/render-default';
 import sortText from './utils/sort-text';
@@ -30,4 +30,4 @@ export default {
 	defaultOperators: [ OPERATOR_IS, OPERATOR_IS_NOT ],
 	validOperators: ALL_OPERATORS,
 	getFormat: () => ( {} ),
-} satisfies TypeProvidedProps< any >;
+} satisfies FieldType< any >;

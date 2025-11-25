@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import type { DataViewRenderFieldProps, SortDirection } from '../types';
-import type { TypeProvidedProps } from '../types/private';
+import type { FieldType } from '../types/private';
 import RenderFromElements from './utils/render-from-elements';
 import parseDateTime from './utils/parse-date-time';
 import {
@@ -73,4 +73,4 @@ export default {
 		OPERATOR_OVER,
 	],
 	getFormat: () => ( {} ),
-} satisfies TypeProvidedProps< any >;
+} satisfies FieldType< any >;

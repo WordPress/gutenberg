@@ -12,7 +12,7 @@ import type {
 	FormatDate,
 	SortDirection,
 } from '../types';
-import type { TypeProvidedProps } from '../types/private';
+import type { FieldType } from '../types/private';
 import RenderFromElements from './utils/render-from-elements';
 import {
 	OPERATOR_ON,
@@ -108,4 +108,4 @@ export default {
 		OPERATOR_BETWEEN,
 	],
 	getFormat,
-} satisfies TypeProvidedProps< any >;
+} satisfies FieldType< any >;

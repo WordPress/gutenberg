@@ -7,7 +7,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import type { DataViewRenderFieldProps, Rules, SortDirection } from '../types';
-import type { TypeProvidedProps } from '../types/private';
+import type { FieldType } from '../types/private';
 import RenderFromElements from './utils/render-from-elements';
 import { OPERATOR_IS, OPERATOR_IS_NOT } from '../constants';
 
@@ -71,4 +71,4 @@ export default {
 	defaultOperators: [ OPERATOR_IS, OPERATOR_IS_NOT ],
 	validOperators: [ OPERATOR_IS, OPERATOR_IS_NOT ],
 	getFormat: () => ( {} ),
-} satisfies TypeProvidedProps< any >;
+} satisfies FieldType< any >;

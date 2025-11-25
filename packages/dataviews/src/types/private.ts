@@ -5,7 +5,7 @@ import type { Field, FormatDate, NormalizedField, Operator } from './field-api';
 
 export type SelectionOrUpdater = string[] | ( ( prev: string[] ) => string[] );
 export type SetSelection = ( selection: SelectionOrUpdater ) => void;
-export type TypeProvidedProps< Item > = Pick<
+export type FieldType< Item > = Pick<
 	NormalizedField< Item >,
 	| 'type'
 	| 'render'

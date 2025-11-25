@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import type { TypeProvidedProps } from '../types/private';
+import type { FieldType } from '../types/private';
 
 export default {
 	type: 'media',
@@ -17,4 +17,4 @@ export default {
 	defaultOperators: [],
 	validOperators: [],
 	getFormat: () => ( {} ),
-} satisfies TypeProvidedProps< any >;
+} satisfies FieldType< any >;

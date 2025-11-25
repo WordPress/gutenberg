@@ -1,13 +1,8 @@
 /**
  * Internal dependencies
  */
-import type {
-	Field,
-	FieldType,
-	NormalizedField,
-	SortDirection,
-} from '../types';
-import type { TypeProvidedProps } from '../types/private';
+import type { Field, Type, NormalizedField, SortDirection } from '../types';
+import type { FieldType } from '../types/private';
 import { getControl } from '../dataform-controls';
 import getFilterBy from './utils/get-filter-by';
 import getValueFromId from './utils/get-value-from-id';
@@ -30,13 +25,11 @@ import { default as noType } from './no-type';
 
 /**
  *
- * @param {FieldType} type The field type definition to get.
+ * @param {Type} type The field type definition to get.
  *
  * @return A field type definition.
  */
-function getFieldTypeByName< Item >(
-	type?: FieldType
-): TypeProvidedProps< Item > {
+function getFieldType< Item >( type?: Type ): FieldType< Item > {
 	const found = [
 		email,
 		integer,
@@ -72,7 +65,7 @@ export default function normalizeFields< Item >(
 	fields: Field< Item >[]
 ): NormalizedField< Item >[] {
 	return fields.map( ( field ) => {
-		const defaultProps = getFieldTypeByName< Item >( field.type );
+		const defaultProps = getFieldType< Item >( field.type );
 
 		const getValue = field.getValue || getValueFromId( field.id );
 		const sort = function ( a: any, b: any, direction: SortDirection ) {
