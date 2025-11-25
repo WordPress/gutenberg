@@ -3,6 +3,7 @@
  */
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from '@storybook/test';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -107,29 +108,44 @@ export const WithHelpTextReplacement: Story = {
 			>( undefined );
 
 		return (
-			<ValidatedInputControl
-				label="Text"
-				required
-				value={ text }
-				help={
-					customValidity
-						? undefined
-						: 'The word "error" is not allowed.'
+			<>
+				<style>
+					{ `
+				.my-control:has(:invalid[data-validity-visible]) .my-control__help:not(.is-visible) {
+					display: none;
 				}
-				onChange={ ( value ) => {
-					if ( value?.toLowerCase() === 'error' ) {
-						setCustomValidity( {
-							type: 'invalid',
-							message: 'The word "error" is not allowed.',
-						} );
-					} else {
-						setCustomValidity( undefined );
+				` }
+				</style>
+				<ValidatedInputControl
+					className="my-control"
+					label="Text"
+					required
+					value={ text }
+					help={
+						<span
+							className={ clsx(
+								'my-control__help',
+								! customValidity && 'is-visible'
+							) }
+						>
+							The word &quot;error&quot; is not allowed.
+						</span>
 					}
+					onChange={ ( value ) => {
+						if ( value?.toLowerCase() === 'error' ) {
+							setCustomValidity( {
+								type: 'invalid',
+								message: 'The word "error" is not allowed.',
+							} );
+						} else {
+							setCustomValidity( undefined );
+						}
 
-					setText( value ?? '' );
-				} }
-				customValidity={ customValidity }
-			/>
+						setText( value ?? '' );
+					} }
+					customValidity={ customValidity }
+				/>
+			</>
 		);
 	},
 };
