@@ -459,6 +459,12 @@ Optional. Pass an object with a list of `perPageSizes` to control the available 
 
 An element to display when the `data` prop is empty. Defaults to `<p>No results</p>`.
 
+### Styling
+
+These are the CSS Custom Properties that can be used to tweak the appearance of the component:
+
+`--wp-dataviews-color-background`: sets the background color.
+
 ### Composition modes
 
 The `DataViews` component supports two composition modes:
