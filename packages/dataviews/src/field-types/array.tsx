@@ -9,7 +9,6 @@ import { __ } from '@wordpress/i18n';
 import type {
 	DataViewRenderFieldProps,
 	Field,
-	Operator,
 	Rules,
 	SortDirection,
 } from '../types';
@@ -20,9 +19,7 @@ import {
 	OPERATOR_IS_NONE,
 	OPERATOR_IS_NOT_ALL,
 } from '../constants';
-import { getControl } from '../dataform-controls';
 import getValueFromId from './utils/get-value-from-id';
-import getFilterBy from './utils/get-filter-by';
 
 function render( { item, field }: DataViewRenderFieldProps< any > ) {
 	const value = field.getValue( { item } ) || [];
@@ -50,14 +47,6 @@ const isValid: Rules< any > = {
 	},
 };
 
-const defaultOperators: Operator[] = [ OPERATOR_IS_ANY, OPERATOR_IS_NONE ];
-const validOperators: Operator[] = [
-	OPERATOR_IS_ANY,
-	OPERATOR_IS_NONE,
-	OPERATOR_IS_ALL,
-	OPERATOR_IS_NOT_ALL,
-];
-
 export default function normalizeField< Item >(
 	field: Field< Item >
 ): TypeProvidedProps< Item > {
@@ -84,16 +73,19 @@ export default function normalizeField< Item >(
 
 	return {
 		type: 'array',
-		render: field.render ?? render,
-		Edit: getControl( field, 'array' ),
-		sort: field.sort ?? sort,
-		isValid: {
-			...isValid,
-			...field.isValid,
-		},
-		enableSorting: field.enableSorting ?? true,
-		enableGlobalSearch: field.enableGlobalSearch ?? false,
-		filterBy: getFilterBy( field, defaultOperators, validOperators ),
-		format: {},
+		render,
+		Edit: 'array',
+		sort,
+		isValid,
+		enableSorting: true,
+		enableGlobalSearch: false,
+		defaultOperators: [ OPERATOR_IS_ANY, OPERATOR_IS_NONE ],
+		validOperators: [
+			OPERATOR_IS_ANY,
+			OPERATOR_IS_NONE,
+			OPERATOR_IS_ALL,
+			OPERATOR_IS_NOT_ALL,
+		],
+		getFormat: () => ( {} ),
 	};
 }

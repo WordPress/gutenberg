@@ -9,7 +9,6 @@ import { __ } from '@wordpress/i18n';
 import type {
 	DataViewRenderFieldProps,
 	Field,
-	Operator,
 	Rules,
 	SortDirection,
 } from '../types';
@@ -28,9 +27,7 @@ import {
 	OPERATOR_BETWEEN,
 } from '../constants';
 import RenderFromElements from './utils/render-from-elements';
-import { getControl } from '../dataform-controls';
 import getValueFromId from './utils/get-value-from-id';
-import getFilterBy from './utils/get-filter-by';
 
 function isEmpty( value: unknown ): value is '' | undefined | null {
 	return value === '' || value === undefined || value === null;
@@ -62,31 +59,6 @@ const isValid: Rules< any > = {
 	},
 };
 
-const defaultOperators: Operator[] = [
-	OPERATOR_IS,
-	OPERATOR_IS_NOT,
-	OPERATOR_LESS_THAN,
-	OPERATOR_GREATER_THAN,
-	OPERATOR_LESS_THAN_OR_EQUAL,
-	OPERATOR_GREATER_THAN_OR_EQUAL,
-	OPERATOR_BETWEEN,
-];
-const validOperators: Operator[] = [
-	// Single-selection
-	OPERATOR_IS,
-	OPERATOR_IS_NOT,
-	OPERATOR_LESS_THAN,
-	OPERATOR_GREATER_THAN,
-	OPERATOR_LESS_THAN_OR_EQUAL,
-	OPERATOR_GREATER_THAN_OR_EQUAL,
-	OPERATOR_BETWEEN,
-	// Multiple-selection
-	OPERATOR_IS_ANY,
-	OPERATOR_IS_NONE,
-	OPERATOR_IS_ALL,
-	OPERATOR_IS_NOT_ALL,
-];
-
 export default function normalizeField< Item >(
 	field: Field< Item >
 ): TypeProvidedProps< Item > {
@@ -100,16 +72,36 @@ export default function normalizeField< Item >(
 
 	return {
 		type: 'number',
-		render: field.render ?? render,
-		Edit: getControl( field, 'number' ),
-		sort: field.sort ?? sort,
-		isValid: {
-			...isValid,
-			...field.isValid,
-		},
-		enableSorting: field.enableSorting ?? true,
-		enableGlobalSearch: field.enableGlobalSearch ?? false,
-		filterBy: getFilterBy( field, defaultOperators, validOperators ),
-		format: {},
+		render,
+		Edit: 'number',
+		sort,
+		isValid,
+		enableSorting: true,
+		enableGlobalSearch: false,
+		defaultOperators: [
+			OPERATOR_IS,
+			OPERATOR_IS_NOT,
+			OPERATOR_LESS_THAN,
+			OPERATOR_GREATER_THAN,
+			OPERATOR_LESS_THAN_OR_EQUAL,
+			OPERATOR_GREATER_THAN_OR_EQUAL,
+			OPERATOR_BETWEEN,
+		],
+		validOperators: [
+			// Single-selection
+			OPERATOR_IS,
+			OPERATOR_IS_NOT,
+			OPERATOR_LESS_THAN,
+			OPERATOR_GREATER_THAN,
+			OPERATOR_LESS_THAN_OR_EQUAL,
+			OPERATOR_GREATER_THAN_OR_EQUAL,
+			OPERATOR_BETWEEN,
+			// Multiple-selection
+			OPERATOR_IS_ANY,
+			OPERATOR_IS_NONE,
+			OPERATOR_IS_ALL,
+			OPERATOR_IS_NOT_ALL,
+		],
+		getFormat: () => ( {} ),
 	};
 }

@@ -5,8 +5,6 @@ import type {
 	DataViewRenderFieldProps,
 	Field,
 	FieldType,
-	NormalizedField,
-	Operator,
 	SortDirection,
 } from '../types';
 import type { TypeProvidedProps } from '../types/private';
@@ -25,14 +23,7 @@ import { default as color } from './color';
 import { default as url } from './url';
 import RenderFromElements from './utils/render-from-elements';
 import { ALL_OPERATORS, OPERATOR_IS, OPERATOR_IS_NOT } from '../constants';
-import { getControl } from '../dataform-controls';
 import getValueFromId from './utils/get-value-from-id';
-import getFilterBy from './utils/get-filter-by';
-
-const isValid = {
-	elements: true,
-	custom: () => null,
-};
 
 const render = ( {
 	item,
@@ -44,9 +35,6 @@ const render = ( {
 		normalizedField.getValue( { item } )
 	);
 };
-
-const defaultOperators: Operator[] = [ OPERATOR_IS, OPERATOR_IS_NOT ];
-const validOperators: Operator[] = ALL_OPERATORS;
 
 function normalizeField< Item >(
 	field: Field< Item >
@@ -68,17 +56,18 @@ function normalizeField< Item >(
 
 	return {
 		// type: no type for this
-		render: field.render ?? render,
-		Edit: getControl( field, null ),
-		sort: field.sort ?? sort,
+		render,
+		Edit: null,
+		sort,
 		isValid: {
-			...isValid,
-			...field.isValid,
+			elements: true,
+			custom: () => null,
 		},
-		enableSorting: field.enableSorting ?? true,
-		enableGlobalSearch: field.enableGlobalSearch ?? false,
-		filterBy: getFilterBy( field, defaultOperators, validOperators ),
-		format: {},
+		enableSorting: true,
+		enableGlobalSearch: false,
+		defaultOperators: [ OPERATOR_IS, OPERATOR_IS_NOT ],
+		validOperators: ALL_OPERATORS,
+		getFormat: () => ( {} ),
 	};
 }
 
@@ -90,20 +79,7 @@ function normalizeField< Item >(
  */
 export default function getNormalizeFieldFunction< Item >(
 	type?: FieldType
-): (
-	field: Field< Item >
-) => Pick<
-	NormalizedField< Item >,
-	| 'type'
-	| 'render'
-	| 'Edit'
-	| 'sort'
-	| 'isValid'
-	| 'enableSorting'
-	| 'enableGlobalSearch'
-	| 'filterBy'
-	| 'format'
-> {
+): ( field: Field< Item > ) => TypeProvidedProps< Item > {
 	switch ( type ) {
 		case 'email':
 			return email;

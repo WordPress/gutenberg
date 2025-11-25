@@ -1,13 +1,7 @@
 /**
  * Internal dependencies
  */
-import type {
-	DataViewRenderFieldProps,
-	Field,
-	Operator,
-	Rules,
-	SortDirection,
-} from '../types';
+import type { DataViewRenderFieldProps, Field, SortDirection } from '../types';
 import type { TypeProvidedProps } from '../types/private';
 import RenderFromElements from './utils/render-from-elements';
 import {
@@ -21,9 +15,7 @@ import {
 	OPERATOR_NOT_CONTAINS,
 	OPERATOR_STARTS_WITH,
 } from '../constants';
-import { getControl } from '../dataform-controls';
 import getValueFromId from './utils/get-value-from-id';
-import getFilterBy from './utils/get-filter-by';
 
 function render( { item, field }: DataViewRenderFieldProps< any > ) {
 	return field.hasElements ? (
@@ -32,25 +24,6 @@ function render( { item, field }: DataViewRenderFieldProps< any > ) {
 		field.getValue( { item } )
 	);
 }
-
-const isValid: Rules< any > = {
-	elements: true,
-	custom: () => null,
-};
-
-const defaultOperators: Operator[] = [ OPERATOR_IS_ANY, OPERATOR_IS_NONE ];
-const validOperators: Operator[] = [
-	OPERATOR_IS,
-	OPERATOR_IS_NOT,
-	OPERATOR_CONTAINS,
-	OPERATOR_NOT_CONTAINS,
-	OPERATOR_STARTS_WITH,
-	// Multiple selection
-	OPERATOR_IS_ANY,
-	OPERATOR_IS_NONE,
-	OPERATOR_IS_ALL,
-	OPERATOR_IS_NOT_ALL,
-];
 
 export default function normalizeField< Item >(
 	field: Field< Item >
@@ -67,16 +40,28 @@ export default function normalizeField< Item >(
 
 	return {
 		type: 'telephone',
-		render: field.render ?? render,
-		Edit: getControl( field, 'telephone' ),
-		sort: field.sort ?? sort,
+		render,
+		Edit: 'telephone',
+		sort,
 		isValid: {
-			...isValid,
-			...field.isValid,
+			elements: true,
+			custom: () => null,
 		},
-		enableSorting: field.enableSorting ?? true,
-		enableGlobalSearch: field.enableGlobalSearch ?? false,
-		filterBy: getFilterBy( field, defaultOperators, validOperators ),
-		format: {},
+		enableSorting: true,
+		enableGlobalSearch: false,
+		defaultOperators: [ OPERATOR_IS_ANY, OPERATOR_IS_NONE ],
+		validOperators: [
+			OPERATOR_IS,
+			OPERATOR_IS_NOT,
+			OPERATOR_CONTAINS,
+			OPERATOR_NOT_CONTAINS,
+			OPERATOR_STARTS_WITH,
+			// Multiple selection
+			OPERATOR_IS_ANY,
+			OPERATOR_IS_NONE,
+			OPERATOR_IS_ALL,
+			OPERATOR_IS_NOT_ALL,
+		],
+		getFormat: () => ( {} ),
 	};
 }

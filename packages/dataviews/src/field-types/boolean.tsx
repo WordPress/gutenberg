@@ -9,16 +9,13 @@ import { __ } from '@wordpress/i18n';
 import type {
 	DataViewRenderFieldProps,
 	Field,
-	Operator,
 	Rules,
 	SortDirection,
 } from '../types';
 import type { TypeProvidedProps } from '../types/private';
 import RenderFromElements from './utils/render-from-elements';
 import { OPERATOR_IS, OPERATOR_IS_NOT } from '../constants';
-import { getControl } from '../dataform-controls';
 import getValueFromId from './utils/get-value-from-id';
-import getFilterBy from './utils/get-filter-by';
 
 function render( { item, field }: DataViewRenderFieldProps< any > ) {
 	if ( field.hasElements ) {
@@ -52,9 +49,6 @@ const isValid: Rules< any > = {
 	},
 };
 
-const defaultOperators: Operator[] = [ OPERATOR_IS, OPERATOR_IS_NOT ];
-const validOperators: Operator[] = [ OPERATOR_IS, OPERATOR_IS_NOT ];
-
 export default function normalizeField< Item >(
 	field: Field< Item >
 ): TypeProvidedProps< Item > {
@@ -81,16 +75,14 @@ export default function normalizeField< Item >(
 
 	return {
 		type: 'boolean',
-		render: field.render ?? render,
-		Edit: getControl( field, 'checkbox' ),
-		sort: field.sort ?? sort,
-		isValid: {
-			...isValid,
-			...field.isValid,
-		},
-		enableSorting: field.enableSorting ?? true,
-		enableGlobalSearch: field.enableGlobalSearch ?? false,
-		filterBy: getFilterBy( field, defaultOperators, validOperators ),
-		format: {},
+		render,
+		Edit: 'checkbox',
+		sort,
+		isValid,
+		enableSorting: true,
+		enableGlobalSearch: false,
+		defaultOperators: [ OPERATOR_IS, OPERATOR_IS_NOT ],
+		validOperators: [ OPERATOR_IS, OPERATOR_IS_NOT ],
+		getFormat: () => ( {} ),
 	};
 }

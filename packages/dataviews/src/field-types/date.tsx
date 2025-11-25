@@ -28,11 +28,9 @@ import {
 	OPERATOR_BETWEEN,
 	DAYS_OF_WEEK,
 } from '../constants';
-import { getControl } from '../dataform-controls';
 import getValueFromId from './utils/get-value-from-id';
-import getFilterBy from './utils/get-filter-by';
 
-function getFormat( field: Field< any > ): Required< FormatDate > {
+function getFormat< Item >( field: Field< Item > ): Required< FormatDate > {
 	return {
 		date:
 			field.format?.date !== undefined &&
@@ -116,16 +114,14 @@ export default function normalizeField< Item >(
 
 	return {
 		type: 'date',
-		render: field.render ?? render,
-		Edit: getControl( field, 'date' ),
-		sort: field.sort ?? sort,
-		isValid: {
-			...isValid,
-			...field.isValid,
-		},
-		enableSorting: field.enableSorting ?? true,
-		enableGlobalSearch: field.enableGlobalSearch ?? false,
-		filterBy: getFilterBy( field, defaultOperators, validOperators ),
-		format: getFormat( field ),
+		render,
+		Edit: 'date',
+		sort,
+		isValid,
+		enableSorting: true,
+		enableGlobalSearch: false,
+		defaultOperators,
+		validOperators,
+		getFormat,
 	};
 }

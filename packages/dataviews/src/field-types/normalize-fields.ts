@@ -6,7 +6,9 @@
  * Internal dependencies
  */
 import getNormalizeFieldFunction from '.';
+import { getControl } from '../dataform-controls';
 import type { Field, NormalizedField } from '../types';
+import getFilterBy from './utils/get-filter-by';
 import getValueFromId from './utils/get-value-from-id';
 import hasElements from './utils/has-elements';
 import setValueFromId from './utils/set-value-from-id';
@@ -22,6 +24,7 @@ export default function normalizeFields< Item >(
 ): NormalizedField< Item >[] {
 	return fields.map( ( field ) => {
 		const normalize = getNormalizeFieldFunction< Item >( field.type );
+		const defaultProps = normalize( field );
 
 		return {
 			id: field.id,
@@ -37,7 +40,24 @@ export default function normalizeFields< Item >(
 			isVisible: field.isVisible,
 			enableHiding: field.enableHiding ?? true,
 			readOnly: field.readOnly ?? false,
-			...normalize( field ),
+			// The type provides defaults for the following props
+			type: defaultProps.type,
+			render: field.render ?? defaultProps.render,
+			Edit: getControl( field, defaultProps.Edit ),
+			sort: field.sort ?? defaultProps.sort,
+			enableSorting: field.enableSorting ?? defaultProps.enableSorting,
+			enableGlobalSearch:
+				field.enableGlobalSearch ?? defaultProps.enableGlobalSearch,
+			isValid: {
+				...defaultProps.isValid,
+				...field.isValid,
+			},
+			filterBy: getFilterBy(
+				field,
+				defaultProps.defaultOperators,
+				defaultProps.validOperators
+			),
+			format: defaultProps.getFormat( field ),
 		};
 	} );
 }
