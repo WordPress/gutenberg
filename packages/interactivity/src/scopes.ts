@@ -123,7 +123,7 @@ export function getServerContext< T extends object >( namespace?: string ): T {
 		}
 	}
 
-	return deepClone( ( scope.serverContext as any ).value )[
-		namespace || getNamespace()
-	];
+	return deepClone(
+		( scope.serverContext as any ).value[ namespace || getNamespace() ]
+	);
 }
