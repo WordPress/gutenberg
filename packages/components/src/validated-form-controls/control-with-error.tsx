@@ -7,7 +7,6 @@ import {
 	forwardRef,
 	useEffect,
 	useState,
-	useMemo,
 } from '@wordpress/element';
 
 /**
@@ -189,7 +188,7 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 		}
 	};
 
-	const message = useMemo( () => {
+	const message = () => {
 		if ( errorMessage ) {
 			return (
 				<ValidityIndicator type="invalid" message={ errorMessage } />
@@ -204,7 +203,7 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 			);
 		}
 		return null;
-	}, [ errorMessage, statusMessage?.type, statusMessage?.message ] );
+	};
 
 	return (
 		<div
@@ -220,7 +219,7 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 				),
 				required,
 			} ) }
-			<div aria-live="polite">{ showMessage && message }</div>
+			<div aria-live="polite">{ showMessage && message() }</div>
 		</div>
 	);
 }
