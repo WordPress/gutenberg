@@ -328,7 +328,6 @@ export const populateServerData = ( data?: {
 			}
 		);
 	}
-	navigationSignal.value += 1; // Triggers invalidations.
 };
 
 // Parse and populate the initial state and config.

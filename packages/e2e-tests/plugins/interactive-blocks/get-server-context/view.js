@@ -9,6 +9,11 @@ import {
 } from '@wordpress/interactivity';
 
 store( 'test/get-server-context', {
+	state: {
+		get serverProp() {
+			return getServerContext().prop;
+		},
+	},
 	actions: {
 		navigate: withSyncEvent( function* ( e ) {
 			e.preventDefault();
