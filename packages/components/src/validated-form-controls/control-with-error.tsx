@@ -56,7 +56,6 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 	{
 		required,
 		markWhenOptional,
-		onValidate,
 		customValidity,
 		getValidityTarget,
 		children,
@@ -69,12 +68,6 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 		 * Label the control as "optional" when _not_ `required`, instead of the inverse.
 		 */
 		markWhenOptional?: boolean;
-		/**
-		 * The callback to run when the input should be validated.
-		 *
-		 * @deprecated Use `onChange` instead.
-		 */
-		onValidate?: () => void;
 		customValidity?: ValidatedControlProps[ 'customValidity' ];
 		/**
 		 * A function that returns the actual element on which the validity data should be applied.
@@ -191,11 +184,6 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 		}
 	};
 
-	const onChange = ( ...args: unknown[] ) => {
-		children.props.onChange?.( ...args );
-		onValidate?.(); // For back compat
-	};
-
 	const message = useMemo( () => {
 		if ( errorMessage ) {
 			return (
@@ -225,7 +213,6 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 					required,
 					markWhenOptional
 				),
-				onChange,
 				required,
 			} ) }
 			<div aria-live="polite">{ showMessage && message }</div>
