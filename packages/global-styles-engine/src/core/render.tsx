@@ -1654,7 +1654,8 @@ export function generateGlobalStyles(
 		hasBlockGapSupport,
 		hasFallbackGapSupport,
 		disableLayoutStyles,
-		disableRootPadding
+		disableRootPadding,
+		{ variationStyles: true }
 	);
 	const svgs = generateSvgFilters( updatedConfig, blockSelectors );
 	const styles = [
