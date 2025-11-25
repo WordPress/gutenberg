@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## Breaking Changes
+
+-   Validated form controls (private API): Removed `onValidate` prop (use `onChange` to set `customValidity` messages instead) ([#73559](https://github.com/WordPress/gutenberg/pull/73559)).
+
 ### Bug Fixes
 
 -   `ExternalLink`: Fix arrow direction for RTL languages. The external link arrow now correctly points to the top-left (↖) instead of top-right (↗) in RTL layouts. ([#73400](https://github.com/WordPress/gutenberg/pull/73400))
