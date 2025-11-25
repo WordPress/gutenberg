@@ -902,7 +902,12 @@ export const getDefaultTemplateId =
 		// Wait for the the entities config to be loaded, otherwise receiving
 		// the template as an entity will not work.
 		await resolveSelect.getEntitiesConfig( 'postType' );
-		const id = template?.wp_id || template?.id;
+		// When active_templates experiment is disabled, use string ID format (theme//slug)
+		// instead of numeric wp_id, as the frontend expects string IDs for templates
+		// when the experiment is disabled.
+		const id = window?.__experimentalTemplateActivate
+			? template?.wp_id || template?.id
+			: template?.id || template?.wp_id;
 		// Endpoint may return an empty object if no template is found.
 		if ( id ) {
 			template.id = id;
