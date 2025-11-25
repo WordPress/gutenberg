@@ -4,18 +4,27 @@
 
 ### Enhancements
 
+- Simplify field normalization and types. [#73387](https://github.com/WordPress/gutenberg/pull/73387)
 - DataViews table layout: make checkboxes permanently visible when bulk actions are available. [#73245](https://github.com/WordPress/gutenberg/pull/73245)
-- Documentation: surface better the `type` property in the documentation. [#73349](https://github.com/WordPress/gutenberg/pull/73349)
+- DataViews: Add insert left/right in table column header. [#72929](https://github.com/WordPress/gutenberg/pull/72929)
 - DataViews: Make sticky elements (table headers, footer, actions column) inherit background colors from parent container. This allows DataViews instances to seamlessly adapt to containers with custom background colors. [#73240](https://github.com/WordPress/gutenberg/pull/73240)
 - DataViews table layout: only apply hover styles when bulk actions are available. [#73248](https://github.com/WordPress/gutenberg/pull/73248)
-- Improve docs for Edit component. [#73202](https://github.com/WordPress/gutenberg/pull/73202)
-- Field API: introduce the `format` prop to format the `date` field type. [#72999](https://github.com/WordPress/gutenberg/pull/72999)
 - DataViews: add support for activity layout. [#72780](https://github.com/WordPress/gutenberg/pull/72780)
-- DataForm Panel Layout: Fix Tags fields issue related to deepMerge. [#73344](https://github.com/WordPress/gutenberg/pull/73344)
+- DataViews: Add grid keyboard navigation. [#72997](https://github.com/WordPress/gutenberg/pull/72997)
+- Field API: introduce the `format` prop to format the `date` field type. [#72999](https://github.com/WordPress/gutenberg/pull/72999)
+- Documentation: improve Edit component. [#73202](https://github.com/WordPress/gutenberg/pull/73202)
+- Documentation: surface better the `type` property in the documentation. [#73349](https://github.com/WordPress/gutenberg/pull/73349)
+- Documentation: improve DataView's `layout` prop. [#73470](https://github.com/WordPress/gutenberg/pull/73470)
+- Documentation: document `readOnly`, `description`, and `placeholder` properties. [#73515](https://github.com/WordPress/gutenberg/pull/73515)
+- DataForm Panel Layout: Focus the first input element when the panel opens. [#72322](https://github.com/WordPress/gutenberg/pull/72322)
+- DataForm: Pattern validation is now supported on all fields that browsers support it in. [#73156](https://github.com/WordPress/gutenberg/pull/73156)
+- Documentation: improve operators docs. [#73523](https://github.com/WordPress/gutenberg/pull/73523)
 
 ### Bug fixes
 
 - Fix: ensure primary actions are not wrapped in the list layout. [#73333](https://github.com/WordPress/gutenberg/pull/73333)
+- Fix: DataViews consistently opens filter section on clicking Add Filter via column header. [#72998](https://github.com/WordPress/gutenberg/pull/72998)
+- DataForm Panel Layout: Fix Tags fields issue related to deepMerge. [#73344](https://github.com/WordPress/gutenberg/pull/73344)
 
 ### Breaking changes
 

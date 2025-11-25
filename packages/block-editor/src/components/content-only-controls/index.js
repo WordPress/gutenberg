@@ -6,7 +6,6 @@ import {
 	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
 import {
-	__experimentalToolsPanel as ToolsPanel,
 	__experimentalHStack as HStack,
 	Icon,
 	Navigator,
@@ -14,6 +13,8 @@ import {
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { arrowLeft, arrowRight } from '@wordpress/icons';
+import { DataForm } from '@wordpress/dataviews';
+import { useState, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -23,46 +24,153 @@ import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import useBlockDisplayInformation from '../use-block-display-information';
-import { useInspectorPopoverPlacement } from './use-inspector-popover-placement';
 const { fieldsKey } = unlock( blocksPrivateApis );
+import FieldsDropdownMenu from './fields-dropdown-menu';
 
 // controls
-import PlainText from './plain-text';
 import RichText from './rich-text';
 import Media from './media';
 import Link from './link';
 
-const controls = {
-	PlainText,
-	RichText,
-	Media,
-	Link,
+const CONTROLS = {
+	richtext: RichText,
+	media: Media,
+	link: Link,
 };
 
-function BlockAttributeToolsPanelItem( {
-	clientId,
-	control,
-	blockType,
-	attributeValues,
-} ) {
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-	const ControlComponent = controls[ control.type ];
+/**
+ * Creates a configured control component that wraps a custom control
+ * and passes configuration as props.
+ *
+ * @param {Object} config         - The control configuration
+ * @param {string} config.control - The control type (key in CONTROLS map)
+ * @return {Function} A wrapped control component
+ */
+function createConfiguredControl( config ) {
+	const { control, ...controlConfig } = config;
+	const ControlComponent = CONTROLS[ control ];
 
 	if ( ! ControlComponent ) {
-		return null;
+		throw new Error( `Control type "${ control }" not found` );
 	}
 
-	return (
-		<ControlComponent
-			clientId={ clientId }
-			control={ control }
-			blockType={ blockType }
-			attributeValues={ attributeValues }
-			updateAttributes={ ( attributes ) =>
-				updateBlockAttributes( clientId, attributes )
-			}
-		/>
-	);
+	return function ConfiguredControl( props ) {
+		return <ControlComponent { ...props } config={ controlConfig } />;
+	};
+}
+
+/**
+ * Normalize a media value to a canonical structure.
+ * Only includes properties that are present in the field's mapping (if provided).
+ *
+ * @param {Object} value    - The mapped value from the block attributes (with canonical keys)
+ * @param {Object} fieldDef - Optional field definition containing the mapping
+ * @return {Object} Normalized media value with canonical properties
+ */
+function normalizeMediaValue( value, fieldDef ) {
+	const defaults = {
+		id: null,
+		url: '',
+		caption: '',
+		alt: '',
+		type: 'image',
+		poster: '',
+		featuredImage: false,
+		link: '',
+	};
+
+	const result = {};
+
+	// If there's a mapping, only include properties that are in it
+	if ( fieldDef?.mapping ) {
+		Object.keys( fieldDef.mapping ).forEach( ( key ) => {
+			result[ key ] = value?.[ key ] ?? defaults[ key ] ?? '';
+		} );
+		return result;
+	}
+
+	// Without mapping, include all default properties
+	Object.keys( defaults ).forEach( ( key ) => {
+		result[ key ] = value?.[ key ] ?? defaults[ key ];
+	} );
+	return result;
+}
+
+/**
+ * Denormalize a media value from canonical structure back to mapped keys.
+ * Only includes properties that are present in the field's mapping.
+ *
+ * @param {Object} value    - The normalized media value
+ * @param {Object} fieldDef - The field definition containing the mapping
+ * @return {Object} Value with only mapped properties
+ */
+function denormalizeMediaValue( value, fieldDef ) {
+	if ( ! fieldDef.mapping ) {
+		return value;
+	}
+
+	const result = {};
+	Object.entries( fieldDef.mapping ).forEach( ( [ key ] ) => {
+		if ( key in value ) {
+			result[ key ] = value[ key ];
+		}
+	} );
+	return result;
+}
+
+/**
+ * Normalize a link value to a canonical structure.
+ * Only includes properties that are present in the field's mapping (if provided).
+ *
+ * @param {Object} value    - The mapped value from the block attributes (with canonical keys)
+ * @param {Object} fieldDef - Optional field definition containing the mapping
+ * @return {Object} Normalized link value with canonical properties
+ */
+function normalizeLinkValue( value, fieldDef ) {
+	const defaults = {
+		url: '',
+		rel: '',
+		linkTarget: '',
+		destination: '',
+	};
+
+	const result = {};
+
+	// If there's a mapping, only include properties that are in it
+	if ( fieldDef?.mapping ) {
+		Object.keys( fieldDef.mapping ).forEach( ( key ) => {
+			result[ key ] = value?.[ key ] ?? defaults[ key ] ?? '';
+		} );
+		return result;
+	}
+
+	// Without mapping, include all default properties
+	Object.keys( defaults ).forEach( ( key ) => {
+		result[ key ] = value?.[ key ] ?? defaults[ key ];
+	} );
+	return result;
+}
+
+/**
+ * Denormalize a link value from canonical structure back to mapped keys.
+ * Only includes properties that are present in the field's mapping.
+ *
+ * @param {Object} value    - The normalized link value
+ * @param {Object} fieldDef - The field definition containing the mapping
+ * @return {Object} Value with only mapped properties
+ */
+function denormalizeLinkValue( value, fieldDef ) {
+	if ( ! fieldDef.mapping ) {
+		return value;
+	}
+
+	const result = {};
+	Object.entries( fieldDef.mapping ).forEach( ( [ key ] ) => {
+		if ( key in value ) {
+			result[ key ] = value[ key ];
+		}
+	} );
+	return result;
 }
 
 function BlockFields( { clientId } ) {
@@ -80,40 +188,201 @@ function BlockFields( { clientId } ) {
 		[ clientId ]
 	);
 
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const blockTitle = useBlockDisplayTitle( {
 		clientId,
 		context: 'list-view',
 	} );
 	const blockInformation = useBlockDisplayInformation( clientId );
-	const popoverPlacementProps = useInspectorPopoverPlacement();
 
-	if ( ! blockType?.[ fieldsKey ]?.length ) {
+	const blockTypeFields = blockType?.[ fieldsKey ];
+
+	// Track visible fields
+	const [ visibleFields, setVisibleFields ] = useState( () => {
+		// Show fields that have shownByDefault: true by default
+		return (
+			blockTypeFields
+				?.filter( ( field ) => field.shownByDefault )
+				.map( ( field ) => field.id ) || []
+		);
+	} );
+
+	// Build DataForm fields with proper structure
+	const dataFormFields = useMemo( () => {
+		if ( ! blockTypeFields?.length ) {
+			return [];
+		}
+
+		return blockTypeFields.map( ( fieldDef ) => {
+			const ControlComponent = CONTROLS[ fieldDef.type ];
+
+			const defaultValues = {};
+			if ( fieldDef.mapping && blockType?.attributes ) {
+				Object.entries( fieldDef.mapping ).forEach(
+					( [ key, attrKey ] ) => {
+						defaultValues[ key ] =
+							blockType.attributes[ attrKey ]?.defaultValue ??
+							undefined;
+					}
+				);
+			}
+
+			const field = {
+				id: fieldDef.id,
+				label: fieldDef.label,
+				type: fieldDef.type, // Use the field's type; DataForm will use built-in or custom Edit
+				config: { ...fieldDef.args, defaultValues },
+				hideLabelFromVision: fieldDef.id === 'content',
+				// getValue and setValue handle the mapping to block attributes
+				getValue: ( { item } ) => {
+					if ( fieldDef.mapping ) {
+						// Extract mapped properties from the block attributes
+						const mappedValue = {};
+						Object.entries( fieldDef.mapping ).forEach(
+							( [ key, attrKey ] ) => {
+								mappedValue[ key ] = item[ attrKey ];
+							}
+						);
+
+						// Normalize to canonical structure based on field type
+						if ( fieldDef.type === 'media' ) {
+							return normalizeMediaValue( mappedValue, fieldDef );
+						}
+						if ( fieldDef.type === 'link' ) {
+							return normalizeLinkValue( mappedValue, fieldDef );
+						}
+
+						// For other types, return as-is
+						return mappedValue;
+					}
+					// For simple id-based fields, use the id as the attribute key
+					return item[ fieldDef.id ];
+				},
+				setValue: ( { item, value } ) => {
+					if ( fieldDef.mapping ) {
+						// Denormalize from canonical structure back to mapped keys
+						let denormalizedValue = value;
+						if ( fieldDef.type === 'media' ) {
+							denormalizedValue = denormalizeMediaValue(
+								value,
+								fieldDef
+							);
+						} else if ( fieldDef.type === 'link' ) {
+							denormalizedValue = denormalizeLinkValue(
+								value,
+								fieldDef
+							);
+						}
+
+						// Build an object with all mapped attributes
+						const updates = {};
+						Object.entries( fieldDef.mapping ).forEach(
+							( [ key, attrKey ] ) => {
+								// If key is explicitly in value, use it (even if undefined to allow clearing)
+								// Otherwise, preserve the old value
+								if ( key in denormalizedValue ) {
+									updates[ attrKey ] =
+										denormalizedValue[ key ];
+								} else {
+									updates[ attrKey ] = item[ attrKey ];
+								}
+							}
+						);
+						return updates;
+					}
+					// For simple id-based fields, use the id as the attribute key
+					return { [ fieldDef.id ]: value };
+				},
+			};
+
+			// Only add custom Edit component if one exists for this type
+			if ( ControlComponent ) {
+				// Use EditConfig pattern: Edit is an object with control type and config props
+				field.Edit = createConfiguredControl( {
+					control: fieldDef.type,
+					clientId,
+					updateBlockAttributes,
+					fieldDef,
+				} );
+			}
+
+			return field;
+		} );
+	}, [
+		blockTypeFields,
+		blockType?.attributes,
+		clientId,
+		updateBlockAttributes,
+	] );
+
+	// Build form config showing only visible fields
+	const form = useMemo(
+		() => ( {
+			fields: dataFormFields
+				.filter( ( field ) => visibleFields.includes( field.id ) )
+				.map( ( field ) => field.id ),
+		} ),
+		[ dataFormFields, visibleFields ]
+	);
+
+	const handleToggleField = ( fieldId ) => {
+		setVisibleFields( ( prev ) => {
+			if ( prev.includes( fieldId ) ) {
+				return prev.filter( ( id ) => id !== fieldId );
+			}
+			return [ ...prev, fieldId ];
+		} );
+	};
+
+	if ( ! blockTypeFields?.length ) {
 		// TODO - we might still want to show a placeholder for blocks with no fields.
 		// for example, a way to select the block.
 		return null;
 	}
 
 	return (
-		<ToolsPanel
-			label={
-				<HStack spacing={ 1 }>
-					<BlockIcon icon={ blockInformation?.icon } />
-					<div>{ blockTitle }</div>
+		<div className="block-editor-content-only-controls__fields-container">
+			<div className="block-editor-content-only-controls__fields-header">
+				<HStack spacing={ 1 } justify="space-between" expanded>
+					<HStack spacing={ 1 } justify="flex-start">
+						<BlockIcon icon={ blockInformation?.icon } />
+						<div>{ blockTitle }</div>
+					</HStack>
+					<FieldsDropdownMenu
+						fields={ dataFormFields }
+						visibleFields={ visibleFields }
+						onToggleField={ handleToggleField }
+					/>
 				</HStack>
-			}
-			panelId={ clientId }
-			dropdownMenuProps={ popoverPlacementProps }
-		>
-			{ blockType?.[ fieldsKey ]?.map( ( field, index ) => (
-				<BlockAttributeToolsPanelItem
-					key={ `${ clientId }/${ index }` }
-					clientId={ clientId }
-					control={ field }
-					blockType={ blockType }
-					attributeValues={ attributes }
-				/>
-			) ) }
-		</ToolsPanel>
+			</div>
+			<DataForm
+				data={ attributes }
+				fields={ dataFormFields }
+				form={ form }
+				onChange={ ( changes ) => {
+					// Map field values to block attributes using field.setValue
+					const mappedChanges = {};
+					Object.entries( changes ).forEach(
+						( [ fieldId, fieldValue ] ) => {
+							const field = dataFormFields.find(
+								( f ) => f.id === fieldId
+							);
+							if ( field && field.setValue ) {
+								const updates = field.setValue( {
+									item: attributes,
+									value: fieldValue,
+								} );
+								Object.assign( mappedChanges, updates );
+							} else {
+								// For fields without setValue, use the value directly
+								mappedChanges[ fieldId ] = fieldValue;
+							}
+						}
+					);
+					updateBlockAttributes( clientId, mappedChanges );
+				} }
+			/>
+		</div>
 	);
 }
 

@@ -3,7 +3,7 @@
  */
 import { type ComponentProps } from '../utils/types';
 
-type SizeToken = 'x-small' | 'small' | 'medium' | 'large';
+type SizeToken = '2xs' | 'xs' | 'sm' | 'md' | 'lg';
 
 type Size = number | SizeToken;
 

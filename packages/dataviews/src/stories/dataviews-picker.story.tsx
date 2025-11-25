@@ -271,18 +271,16 @@ export const WithModal = ( {
 					isFullScreen={ false }
 					size="fill"
 				>
-					<div style={ { padding: '16px' } }>
-						<DataViewsPickerContent
-							perPageSizes={ perPageSizes }
-							isMultiselectable={ isMultiselectable }
-							isGrouped={ isGrouped }
-							infiniteScrollEnabled={ infiniteScrollEnabled }
-							actions={ modalActions }
-							selection={ selectedItems.map( ( item ) =>
-								String( item.id )
-							) }
-						/>
-					</div>
+					<DataViewsPickerContent
+						perPageSizes={ perPageSizes }
+						isMultiselectable={ isMultiselectable }
+						isGrouped={ isGrouped }
+						infiniteScrollEnabled={ infiniteScrollEnabled }
+						actions={ modalActions }
+						selection={ selectedItems.map( ( item ) =>
+							String( item.id )
+						) }
+					/>
 				</Modal>
 			) }
 		</>

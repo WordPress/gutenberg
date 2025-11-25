@@ -39,12 +39,13 @@ export const settings = {
 if ( window.__experimentalContentOnlyPatternInsertion ) {
 	settings[ fieldsKey ] = [
 		{
+			id: 'file',
 			label: __( 'File' ),
-			type: 'Media',
+			type: 'media',
 			shownByDefault: true,
 			mapping: {
 				id: 'id',
-				src: 'href',
+				url: 'href',
 			},
 			args: {
 				allowedTypes: [],
@@ -52,20 +53,16 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 			},
 		},
 		{
+			id: 'fileName',
 			label: __( 'Filename' ),
-			type: 'RichText',
+			type: 'richtext',
 			shownByDefault: false,
-			mapping: {
-				value: 'fileName',
-			},
 		},
 		{
+			id: 'downloadButtonText',
 			label: __( 'Button Text' ),
-			type: 'RichText',
+			type: 'richtext',
 			shownByDefault: false,
-			mapping: {
-				value: 'downloadButtonText',
-			},
 		},
 	];
 }

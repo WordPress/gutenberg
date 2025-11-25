@@ -14,6 +14,7 @@ import {
 } from '@wordpress/components';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -72,7 +73,8 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 					placement="bottom-start"
 					offset={ 8 }
 					anchor={ blockRef }
-					focusOnMount="firstContentElement"
+					focusOnMount={ false }
+					__unstableSlotName="__unstable-block-tools-after"
 				>
 					<div style={ { padding: '4px', minWidth: '300px' } }>
 						<VStack spacing={ 1 }>
@@ -96,6 +98,7 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 										setError( null );
 									} catch ( err ) {
 										setError( err.message );
+										speak( err.message );
 									}
 									setAttributes( {
 										mathML: newMathML,
