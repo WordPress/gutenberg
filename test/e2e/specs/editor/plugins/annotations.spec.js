@@ -164,12 +164,13 @@ test.describe( 'Annotations', () => {
 		editor,
 		page,
 		annotations,
+		pageUtils,
 	} ) => {
 		await editor.canvas
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.fill( 'Title' );
 		await page.keyboard.press( 'Enter' );
-		await page.keyboard.press( 'Mod+i' );
+		await pageUtils.pressKeys( 'primary+i' );
 		await page.keyboard.type( 'Text' );
 
 		await annotations.openAnnotationsSidebar();
