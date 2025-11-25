@@ -4,7 +4,6 @@
 
 ### Enhancements
 
-- Code quality: field types return an object. [#73546](https://github.com/WordPress/gutenberg/pull/73546)
 - Simplify field normalization and types. [#73387](https://github.com/WordPress/gutenberg/pull/73387)
 - DataViews table layout: make checkboxes permanently visible when bulk actions are available. [#73245](https://github.com/WordPress/gutenberg/pull/73245)
 - DataViews: Add insert left/right in table column header. [#72929](https://github.com/WordPress/gutenberg/pull/72929)
@@ -32,6 +31,7 @@
 ### Breaking changes
 
 - DataViews: rename `groupByField` to `groupBy.field` to allow control over both the field and the direction of the grouping. [#72780](https://github.com/WordPress/gutenberg/pull/72780)
+- Types: FieldType is now FieldTypeName. [#73546](https://github.com/WordPress/gutenberg/pull/73546)
 
 ## 10.3.0 (2025-11-12)
 
