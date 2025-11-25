@@ -62,6 +62,10 @@ if [ "$expected" -ne "$actual" ]; then
     exit 1
 fi
 
+# Set NODE_PATH to resolve modules from the root node_modules, since this
+# scaffolded project intentionally skips npm install for performance.
+export NODE_PATH="../node_modules"
+
 status "Formatting files..."
 ../node_modules/.bin/wp-scripts format
 
