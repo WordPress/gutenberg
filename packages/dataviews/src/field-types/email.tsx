@@ -6,9 +6,8 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import type { DataViewRenderFieldProps, Rules, SortDirection } from '../types';
+import type { Rules, SortDirection } from '../types';
 import type { TypeProvidedProps } from '../types/private';
-import RenderFromElements from './utils/render-from-elements';
 import {
 	OPERATOR_IS,
 	OPERATOR_IS_ALL,
@@ -20,19 +19,12 @@ import {
 	OPERATOR_NOT_CONTAINS,
 	OPERATOR_STARTS_WITH,
 } from '../constants';
+import render from './utils/render-default';
 
 // Email validation regex based on HTML5 spec
 // https://html.spec.whatwg.org/multipage/input.html#valid-e-mail-address
 const emailRegex =
 	/^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-
-function render( { item, field }: DataViewRenderFieldProps< any > ) {
-	return field.hasElements ? (
-		<RenderFromElements item={ item } field={ field } />
-	) : (
-		field.getValue( { item } )
-	);
-}
 
 const isValid: Rules< any > = {
 	elements: true,

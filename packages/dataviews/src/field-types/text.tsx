@@ -1,9 +1,8 @@
 /**
  * Internal dependencies
  */
-import type { DataViewRenderFieldProps, SortDirection } from '../types';
+import type { SortDirection } from '../types';
 import type { TypeProvidedProps } from '../types/private';
-import RenderFromElements from './utils/render-from-elements';
 import {
 	OPERATOR_CONTAINS,
 	OPERATOR_IS,
@@ -15,14 +14,7 @@ import {
 	OPERATOR_NOT_CONTAINS,
 	OPERATOR_STARTS_WITH,
 } from '../constants';
-
-function render( { item, field }: DataViewRenderFieldProps< any > ) {
-	return field.hasElements ? (
-		<RenderFromElements item={ item } field={ field } />
-	) : (
-		field.getValue( { item } )
-	);
-}
+import render from './utils/render-default';
 
 const sort = ( a: any, b: any, direction: SortDirection ) => {
 	return direction === 'asc' ? a.localeCompare( b ) : b.localeCompare( a );

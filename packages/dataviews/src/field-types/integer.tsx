@@ -6,9 +6,8 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import type { DataViewRenderFieldProps, Rules, SortDirection } from '../types';
+import type { Rules, SortDirection } from '../types';
 import type { TypeProvidedProps } from '../types/private';
-import RenderFromElements from './utils/render-from-elements';
 import {
 	OPERATOR_IS,
 	OPERATOR_IS_NOT,
@@ -22,14 +21,7 @@ import {
 	OPERATOR_IS_NOT_ALL,
 	OPERATOR_BETWEEN,
 } from '../constants';
-
-function render( { item, field }: DataViewRenderFieldProps< any > ) {
-	return field.hasElements ? (
-		<RenderFromElements item={ item } field={ field } />
-	) : (
-		field.getValue( { item } )
-	);
-}
+import render from './utils/render-default';
 
 const isValid: Rules< any > = {
 	elements: true,
