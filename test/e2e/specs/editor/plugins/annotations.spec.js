@@ -159,6 +159,33 @@ test.describe( 'Annotations', () => {
 			},
 		] );
 	} );
+
+	test( 'preserves active formats when applying annotation', async ( {
+		editor,
+		page,
+		annotations,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.fill( 'Title' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Mod+i' );
+		await page.keyboard.type( 'Text' );
+
+		await annotations.openAnnotationsSidebar();
+		await annotations.annotateFirstBlock( 0, 4 );
+
+		// The selection should still be at the end, and italic should still be active.
+		await page.keyboard.type( ' is Italic' );
+		await annotations.removeAnnotations();
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '<em>Text is Italic</em>' },
+			},
+		] );
+	} );
 } );
 
 class AnnotationsUtils {
