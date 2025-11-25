@@ -54,7 +54,9 @@ export const WithMultipleControls: Story = {
 					required
 					value={ text }
 					help="The word 'error' will trigger an error."
-					onValidate={ ( value ) => {
+					onChange={ ( value ) => {
+						setText( value ?? '' );
+
 						if ( value?.toLowerCase() === 'error' ) {
 							setCustomValidity( {
 								type: 'invalid',
@@ -65,14 +67,15 @@ export const WithMultipleControls: Story = {
 						}
 					} }
 					customValidity={ customValidity }
-					onChange={ ( value ) => setText( value ?? '' ) }
 				/>
 				<ValidatedInputControl
 					label="Text"
 					required
 					value={ text2 }
 					help="The word 'error' will trigger an error."
-					onValidate={ ( value ) => {
+					onChange={ ( value ) => {
+						setText2( value ?? '' );
+
 						if ( value?.toLowerCase() === 'error' ) {
 							setCustomValidity2( {
 								type: 'invalid',
@@ -82,7 +85,6 @@ export const WithMultipleControls: Story = {
 							setCustomValidity2( undefined );
 						}
 					} }
-					onChange={ ( value ) => setText2( value ?? '' ) }
 					customValidity={ customValidity2 }
 				/>
 			</>
@@ -114,7 +116,7 @@ export const WithHelpTextReplacement: Story = {
 						? undefined
 						: 'The word "error" is not allowed.'
 				}
-				onValidate={ ( value ) => {
+				onChange={ ( value ) => {
 					if ( value?.toLowerCase() === 'error' ) {
 						setCustomValidity( {
 							type: 'invalid',
@@ -123,8 +125,9 @@ export const WithHelpTextReplacement: Story = {
 					} else {
 						setCustomValidity( undefined );
 					}
+
+					setText( value ?? '' );
 				} }
-				onChange={ ( value ) => setText( value ?? '' ) }
 				customValidity={ customValidity }
 			/>
 		);
@@ -190,8 +193,8 @@ export const AsyncValidation: StoryObj< typeof ValidatedInputControl > = {
 				value={ text }
 				onChange={ ( newValue ) => {
 					setText( newValue ?? '' );
+					debouncedValidate( newValue );
 				} }
-				onValidate={ debouncedValidate }
 				customValidity={ customValidity }
 			/>
 		);

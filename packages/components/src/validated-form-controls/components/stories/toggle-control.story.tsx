@@ -42,11 +42,7 @@ export const Default: StoryObj< typeof ValidatedToggleControl > = {
 				{ ...args }
 				checked={ checked }
 				onChange={ ( value ) => {
-					setChecked( value );
-					onChange?.( value );
-				} }
-				onValidate={ ( v ) => {
-					if ( v ) {
+					if ( value ) {
 						setCustomValidity( {
 							type: 'invalid',
 							message: 'This toggle may not be enabled.',
@@ -54,6 +50,9 @@ export const Default: StoryObj< typeof ValidatedToggleControl > = {
 					} else {
 						setCustomValidity( undefined );
 					}
+
+					setChecked( value );
+					onChange?.( value );
 				} }
 				customValidity={ customValidity }
 			/>

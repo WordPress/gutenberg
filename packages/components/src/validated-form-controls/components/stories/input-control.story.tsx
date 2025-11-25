@@ -58,11 +58,7 @@ export const Default: StoryObj< typeof ValidatedInputControl > = {
 				{ ...args }
 				value={ value }
 				onChange={ ( newValue, ...rest ) => {
-					setValue( newValue );
-					onChange?.( newValue, ...rest );
-				} }
-				onValidate={ ( v ) => {
-					if ( v?.toLowerCase() === 'error' ) {
+					if ( newValue?.toLowerCase() === 'error' ) {
 						setCustomValidity( {
 							type: 'invalid',
 							message: 'The word "error" is not allowed.',
@@ -70,6 +66,9 @@ export const Default: StoryObj< typeof ValidatedInputControl > = {
 					} else {
 						setCustomValidity( undefined );
 					}
+
+					setValue( newValue );
+					onChange?.( newValue, ...rest );
 				} }
 				customValidity={ customValidity }
 			/>
@@ -119,35 +118,30 @@ export const Password: StoryObj< typeof ValidatedInputControl > = {
 				}
 				value={ value }
 				onChange={ ( newValue, ...rest ) => {
-					setValue( newValue );
-					onChange?.( newValue, ...rest );
-				} }
-				onValidate={ ( v ) => {
-					if ( ! /\d/.test( v ?? '' ) ) {
+					if ( ! /\d/.test( newValue ?? '' ) ) {
 						setCustomValidity( {
 							type: 'invalid',
 							message:
 								'Password must include at least one number.',
 						} );
-						return;
-					}
-					if ( ! /[A-Z]/.test( v ?? '' ) ) {
+					} else if ( ! /[A-Z]/.test( newValue ?? '' ) ) {
 						setCustomValidity( {
 							type: 'invalid',
 							message:
 								'Password must include at least one capital letter.',
 						} );
-						return;
-					}
-					if ( ! /[!@£$%^&*#]/.test( v ?? '' ) ) {
+					} else if ( ! /[!@£$%^&*#]/.test( newValue ?? '' ) ) {
 						setCustomValidity( {
 							type: 'invalid',
 							message:
 								'Password must include at least one symbol.',
 						} );
-						return;
+					} else {
+						setCustomValidity( undefined );
 					}
-					setCustomValidity( undefined );
+
+					setValue( newValue );
+					onChange?.( newValue, ...rest );
 				} }
 				customValidity={ customValidity }
 			/>

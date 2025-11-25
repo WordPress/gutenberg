@@ -47,11 +47,7 @@ export const Default: StoryObj< typeof ValidatedComboboxControl > = {
 				{ ...args }
 				value={ value }
 				onChange={ ( newValue ) => {
-					setValue( newValue );
-					onChange?.( newValue );
-				} }
-				onValidate={ ( v ) => {
-					if ( v === 'a' ) {
+					if ( newValue === 'a' ) {
 						setCustomValidity( {
 							type: 'invalid',
 							message: 'Option A is not allowed.',
@@ -59,6 +55,9 @@ export const Default: StoryObj< typeof ValidatedComboboxControl > = {
 					} else {
 						setCustomValidity( undefined );
 					}
+
+					setValue( newValue );
+					onChange?.( newValue );
 				} }
 				customValidity={ customValidity }
 			/>

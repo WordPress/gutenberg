@@ -48,12 +48,8 @@ export const Default: StoryObj< typeof ValidatedFormTokenField > = {
 				{ ...args }
 				value={ value }
 				onChange={ ( newValue, ...rest ) => {
-					setValue( newValue );
-					onChange?.( newValue, ...rest );
-				} }
-				onValidate={ ( v ) => {
 					if (
-						v?.some( ( token ) => {
+						newValue?.some( ( token ) => {
 							const tokenValue =
 								typeof token === 'string' ? token : token.value;
 							return tokenValue.toLowerCase() === 'error';
@@ -63,10 +59,12 @@ export const Default: StoryObj< typeof ValidatedFormTokenField > = {
 							type: 'invalid',
 							message: 'The tag "error" is not allowed.',
 						} );
-						return;
+					} else {
+						setCustomValidity( undefined );
 					}
 
-					setCustomValidity( undefined );
+					setValue( newValue );
+					onChange?.( newValue, ...rest );
 				} }
 				customValidity={ customValidity }
 			/>

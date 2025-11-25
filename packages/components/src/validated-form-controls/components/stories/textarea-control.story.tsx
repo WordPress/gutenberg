@@ -38,12 +38,7 @@ export const Default: StoryObj< typeof ValidatedTextareaControl > = {
 			<ValidatedTextareaControl
 				{ ...args }
 				onChange={ ( newValue ) => {
-					setValue( newValue );
-					onChange?.( newValue );
-				} }
-				value={ value }
-				onValidate={ ( v ) => {
-					if ( v?.toLowerCase() === 'error' ) {
+					if ( newValue?.toLowerCase() === 'error' ) {
 						setCustomValidity( {
 							type: 'invalid',
 							message: 'The word "error" is not allowed.',
@@ -51,7 +46,11 @@ export const Default: StoryObj< typeof ValidatedTextareaControl > = {
 					} else {
 						setCustomValidity( undefined );
 					}
+
+					setValue( newValue );
+					onChange?.( newValue );
 				} }
+				value={ value }
 				customValidity={ customValidity }
 			/>
 		);

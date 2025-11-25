@@ -47,11 +47,7 @@ export const Default: StoryObj< typeof ValidatedCustomSelectControl > = {
 				{ ...args }
 				value={ value }
 				onChange={ ( newValue ) => {
-					setValue( newValue.selectedItem );
-					onChange?.( newValue );
-				} }
-				onValidate={ ( v ) => {
-					if ( v?.key === 'a' ) {
+					if ( newValue.selectedItem?.key === 'a' ) {
 						setCustomValidity( {
 							type: 'invalid',
 							message: 'Option A is not allowed.',
@@ -59,6 +55,9 @@ export const Default: StoryObj< typeof ValidatedCustomSelectControl > = {
 					} else {
 						setCustomValidity( undefined );
 					}
+
+					setValue( newValue.selectedItem );
+					onChange?.( newValue );
 				} }
 				customValidity={ customValidity }
 			/>

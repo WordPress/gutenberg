@@ -45,11 +45,7 @@ export const Default: StoryObj< typeof ValidatedRangeControl > = {
 				{ ...args }
 				value={ value }
 				onChange={ ( newValue ) => {
-					setValue( newValue );
-					onChange?.( newValue );
-				} }
-				onValidate={ ( v ) => {
-					if ( v && v % 2 !== 0 ) {
+					if ( newValue && newValue % 2 !== 0 ) {
 						setCustomValidity( {
 							type: 'invalid',
 							message: 'Choose an even number.',
@@ -57,6 +53,9 @@ export const Default: StoryObj< typeof ValidatedRangeControl > = {
 					} else {
 						setCustomValidity( undefined );
 					}
+
+					setValue( newValue );
+					onChange?.( newValue );
 				} }
 				customValidity={ customValidity }
 			/>

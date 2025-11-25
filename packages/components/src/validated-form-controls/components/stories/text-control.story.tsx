@@ -42,11 +42,7 @@ export const Default: StoryObj< typeof ValidatedTextControl > = {
 				{ ...args }
 				value={ value }
 				onChange={ ( newValue ) => {
-					setValue( newValue );
-					onChange?.( newValue );
-				} }
-				onValidate={ ( v ) => {
-					if ( v?.toString().toLowerCase() === 'error' ) {
+					if ( newValue?.toString().toLowerCase() === 'error' ) {
 						setCustomValidity( {
 							type: 'invalid',
 							message: 'The word "error" is not allowed.',
@@ -54,6 +50,9 @@ export const Default: StoryObj< typeof ValidatedTextControl > = {
 					} else {
 						setCustomValidity( undefined );
 					}
+
+					setValue( newValue );
+					onChange?.( newValue );
 				} }
 				customValidity={ customValidity }
 			/>

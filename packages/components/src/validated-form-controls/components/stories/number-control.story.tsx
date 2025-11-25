@@ -49,11 +49,10 @@ export const Default: StoryObj< typeof ValidatedNumberControl > = {
 				{ ...args }
 				value={ value }
 				onChange={ ( newValue, ...rest ) => {
-					setValue( newValue );
-					onChange?.( newValue, ...rest );
-				} }
-				onValidate={ ( v ) => {
-					if ( v && parseInt( v.toString(), 10 ) % 2 !== 0 ) {
+					if (
+						newValue &&
+						parseInt( newValue.toString(), 10 ) % 2 !== 0
+					) {
 						setCustomValidity( {
 							type: 'invalid',
 							message: 'Choose an even number.',
@@ -61,6 +60,9 @@ export const Default: StoryObj< typeof ValidatedNumberControl > = {
 					} else {
 						setCustomValidity( undefined );
 					}
+
+					setValue( newValue );
+					onChange?.( newValue, ...rest );
 				} }
 				customValidity={ customValidity }
 			/>

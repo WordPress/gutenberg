@@ -44,10 +44,6 @@ export const Default: StoryObj< typeof ValidatedCheckboxControl > = {
 				{ ...args }
 				checked={ checked }
 				onChange={ ( value ) => {
-					setChecked( value );
-					onChange?.( value );
-				} }
-				onValidate={ ( value ) => {
 					if ( value ) {
 						setCustomValidity( {
 							type: 'invalid',
@@ -56,6 +52,9 @@ export const Default: StoryObj< typeof ValidatedCheckboxControl > = {
 					} else {
 						setCustomValidity( undefined );
 					}
+
+					setChecked( value );
+					onChange?.( value );
 				} }
 				customValidity={ customValidity }
 			/>
