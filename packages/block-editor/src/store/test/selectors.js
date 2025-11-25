@@ -5,6 +5,7 @@ import {
 	registerBlockType,
 	unregisterBlockType,
 	setFreeformContentHandlerName,
+	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
 import { RawHTML } from '@wordpress/element';
 import { symbol } from '@wordpress/icons';
@@ -15,7 +16,10 @@ import { select, dispatch } from '@wordpress/data';
  */
 import * as selectors from '../selectors';
 import { store } from '../';
-import { lock } from '../../lock-unlock';
+import { lock, unlock } from '../../lock-unlock';
+
+// Get access to compositeKey from private APIs
+const { compositeKey } = unlock( blocksPrivateApis );
 
 const {
 	getBlockName,
@@ -58,6 +62,8 @@ const {
 	isSelectionEnabled,
 	canInsertBlockType,
 	canInsertBlocks,
+	canRemoveBlock,
+	canMoveBlock,
 	getBlockTransformItems,
 	isValidTemplate,
 	getTemplate,
@@ -177,6 +183,15 @@ describe( 'selectors', () => {
 			ancestor: [ 'core/test-block-ancestor' ],
 		} );
 
+		registerBlockType( 'core/test-composite-block', {
+			save: ( props ) => props.attributes.text,
+			category: 'text',
+			title: 'Test Composite Block',
+			icon: 'test',
+			keywords: [ 'testing' ],
+			[ compositeKey ]: true,
+		} );
+
 		setFreeformContentHandlerName( 'core/freeform' );
 
 		cachedSelectors.forEach( ( { clear } ) => clear() );
@@ -193,6 +208,7 @@ describe( 'selectors', () => {
 		unregisterBlockType( 'core/test-block-parent' );
 		unregisterBlockType( 'core/test-block-requires-ancestor' );
 		unregisterBlockType( 'core/test-block-requires-ancestor-parent' );
+		unregisterBlockType( 'core/test-composite-block' );
 
 		setFreeformContentHandlerName( undefined );
 	} );
@@ -3293,6 +3309,60 @@ describe( 'selectors', () => {
 				)
 			).toBe( false );
 		} );
+
+		it( 'denies blocks from being inserted into composite blocks', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							block1: { name: 'core/test-composite-block' },
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							block1: {},
+						} )
+					),
+					parents: new Map(),
+					order: new Map( [ [ '', [ 'block1' ] ] ] ),
+				},
+				blockListSettings: {
+					block1: {},
+				},
+				settings: {},
+				blockEditingModes: new Map(),
+			};
+			expect(
+				canInsertBlockType( state, 'core/test-block-a', 'block1' )
+			).toBe( false );
+		} );
+
+		it( 'allows blocks to be inserted into non-composite blocks', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							block1: { name: 'core/test-block-a' },
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							block1: {},
+						} )
+					),
+					parents: new Map(),
+					order: new Map( [ [ '', [ 'block1' ] ] ] ),
+				},
+				blockListSettings: {
+					block1: {},
+				},
+				settings: {},
+				blockEditingModes: new Map(),
+			};
+			expect(
+				canInsertBlockType( state, 'core/test-block-b', 'block1' )
+			).toBe( true );
+		} );
 	} );
 
 	describe( 'canInsertBlocks', () => {
@@ -3359,6 +3429,314 @@ describe( 'selectors', () => {
 				blockEditingModes: new Map(),
 			};
 			expect( canInsertBlocks( state, [ '2', '3' ], '1' ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'canRemoveBlock', () => {
+		it( 'denies removal of blocks from composite parents', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							block1: { name: 'core/test-composite-block' },
+							block2: { name: 'core/test-block-a' },
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							block1: {},
+							block2: {},
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							block2: 'block1',
+						} )
+					),
+					order: new Map( [
+						[ '', [ 'block1' ] ],
+						[ 'block1', [ 'block2' ] ],
+					] ),
+				},
+				blockListSettings: {},
+				settings: {},
+				blockEditingModes: new Map(),
+			};
+			expect( canRemoveBlock( state, 'block2' ) ).toBe( false );
+		} );
+
+		it( 'allows removal of blocks from non-composite parents', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							block1: { name: 'core/test-block-a' },
+							block2: { name: 'core/test-block-b' },
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							block1: {},
+							block2: {},
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							block2: 'block1',
+						} )
+					),
+					order: new Map( [
+						[ '', [ 'block1' ] ],
+						[ 'block1', [ 'block2' ] ],
+					] ),
+				},
+				blockListSettings: {},
+				settings: {},
+				blockEditingModes: new Map(),
+			};
+			expect( canRemoveBlock( state, 'block2' ) ).toBe( true );
+		} );
+
+		it( 'allows removal of root level blocks', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							block1: { name: 'core/test-block-a' },
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							block1: {},
+						} )
+					),
+					parents: new Map(),
+					order: new Map( [ [ '', [ 'block1' ] ] ] ),
+				},
+				blockListSettings: {},
+				settings: {},
+				blockEditingModes: new Map(),
+			};
+			expect( canRemoveBlock( state, 'block1' ) ).toBe( true );
+		} );
+
+		it( 'denies removal when block has lock.remove set to true', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							block1: { name: 'core/test-block-a' },
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							block1: {
+								lock: { remove: true },
+							},
+						} )
+					),
+					parents: new Map(),
+					order: new Map( [ [ '', [ 'block1' ] ] ] ),
+				},
+				blockListSettings: {},
+				settings: {},
+				blockEditingModes: new Map(),
+			};
+			expect( canRemoveBlock( state, 'block1' ) ).toBe( false );
+		} );
+
+		it( 'denies removal when parent has templateLock set to all', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							block1: { name: 'core/test-block-a' },
+							block2: { name: 'core/test-block-b' },
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							block1: {},
+							block2: {},
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							block2: 'block1',
+						} )
+					),
+					order: new Map( [
+						[ '', [ 'block1' ] ],
+						[ 'block1', [ 'block2' ] ],
+					] ),
+				},
+				blockListSettings: {
+					block1: {
+						templateLock: 'all',
+					},
+				},
+				settings: {},
+				blockEditingModes: new Map(),
+			};
+			expect( canRemoveBlock( state, 'block2' ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'canMoveBlock', () => {
+		it( 'denies movement of blocks from composite parents', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							block1: { name: 'core/test-composite-block' },
+							block2: { name: 'core/test-block-a' },
+							block3: { name: 'core/test-block-b' },
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							block1: {},
+							block2: {},
+							block3: {},
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							block2: 'block1',
+							block3: 'block1',
+						} )
+					),
+					order: new Map( [
+						[ '', [ 'block1' ] ],
+						[ 'block1', [ 'block2', 'block3' ] ],
+					] ),
+				},
+				blockListSettings: {},
+				settings: {},
+				blockEditingModes: new Map(),
+			};
+			expect( canMoveBlock( state, 'block2' ) ).toBe( false );
+		} );
+
+		it( 'allows movement of blocks from non-composite parents', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							block1: { name: 'core/test-block-a' },
+							block2: { name: 'core/test-block-b' },
+							block3: { name: 'core/test-block-c' },
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							block1: {},
+							block2: {},
+							block3: {},
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							block2: 'block1',
+							block3: 'block1',
+						} )
+					),
+					order: new Map( [
+						[ '', [ 'block1' ] ],
+						[ 'block1', [ 'block2', 'block3' ] ],
+					] ),
+				},
+				blockListSettings: {},
+				settings: {},
+				blockEditingModes: new Map(),
+			};
+			expect( canMoveBlock( state, 'block2' ) ).toBe( true );
+		} );
+
+		it( 'allows movement of root level blocks', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							block1: { name: 'core/test-block-a' },
+							block2: { name: 'core/test-block-b' },
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							block1: {},
+							block2: {},
+						} )
+					),
+					parents: new Map(),
+					order: new Map( [ [ '', [ 'block1', 'block2' ] ] ] ),
+				},
+				blockListSettings: {},
+				settings: {},
+				blockEditingModes: new Map(),
+			};
+			expect( canMoveBlock( state, 'block1' ) ).toBe( true );
+		} );
+
+		it( 'denies movement when block has lock.move set to true', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							block1: { name: 'core/test-block-a' },
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							block1: {
+								lock: { move: true },
+							},
+						} )
+					),
+					parents: new Map(),
+					order: new Map( [ [ '', [ 'block1' ] ] ] ),
+				},
+				blockListSettings: {},
+				settings: {},
+				blockEditingModes: new Map(),
+			};
+			expect( canMoveBlock( state, 'block1' ) ).toBe( false );
+		} );
+
+		it( 'denies movement when parent has templateLock set to all', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							block1: { name: 'core/test-block-a' },
+							block2: { name: 'core/test-block-b' },
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							block1: {},
+							block2: {},
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							block2: 'block1',
+						} )
+					),
+					order: new Map( [
+						[ '', [ 'block1' ] ],
+						[ 'block1', [ 'block2' ] ],
+					] ),
+				},
+				blockListSettings: {
+					block1: {
+						templateLock: 'all',
+					},
+				},
+				settings: {},
+				blockEditingModes: new Map(),
+			};
+			expect( canMoveBlock( state, 'block2' ) ).toBe( false );
 		} );
 	} );
 
