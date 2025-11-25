@@ -320,6 +320,7 @@ function LinkControl( {
 			setCustomValidity( {
 				type: 'invalid',
 				message: __( 'Please enter a valid URL.' ),
+				force: true, // Force display on submit even if field hasn't been blurred
 			} );
 			return false;
 		}
