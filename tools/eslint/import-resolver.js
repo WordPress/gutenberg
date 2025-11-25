@@ -1,9 +1,9 @@
 /**
  * External dependencies
  */
+const path = require( 'node:path' );
+const { existsSync } = require( 'node:fs' );
 const resolverNode = require( 'eslint-import-resolver-typescript' );
-const path = require( 'path' );
-const fs = require( 'fs' );
 const PACKAGES_DIR = path.resolve( __dirname, '../../packages' );
 
 exports.interfaceVersion = 2;
@@ -17,12 +17,11 @@ exports.resolve = function ( source, file, config ) {
 
 	if ( source.startsWith( '@wordpress/' ) ) {
 		const [ , packageName, ...pathParts ] = source.split( '/' );
-		const subpath = path.join( '.', pathParts.join( '/' ) );
 
 		// Consider whether the package is local to the project. If it's not,
 		// use the default resolution behavior.
 		const packagePath = path.join( PACKAGES_DIR, packageName );
-		if ( ! fs.existsSync( packagePath ) ) {
+		if ( ! existsSync( packagePath ) ) {
 			return resolve( source );
 		}
 
@@ -31,6 +30,7 @@ exports.resolve = function ( source, file, config ) {
 		try {
 			const manifestPath = path.join( packagePath, 'package.json' );
 			const manifest = require( manifestPath );
+			const subpath = path.join( '.', pathParts.join( '/' ) );
 			const exportPath = manifest.exports?.[ subpath ]?.import;
 			const sourcePath = exportPath.replace( 'build-module', 'src' );
 
