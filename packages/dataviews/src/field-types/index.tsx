@@ -34,41 +34,32 @@ import { default as noType } from './no-type';
  *
  * @return A field type definition.
  */
-function getDefaultProperties< Item >(
+function getFieldTypeByName< Item >(
 	type?: FieldType
 ): TypeProvidedProps< Item > {
-	switch ( type ) {
-		case 'email':
-			return email;
-		case 'integer':
-			return integer;
-		case 'number':
-			return number;
-		case 'text':
-			return text;
-		case 'datetime':
-			return datetime;
-		case 'date':
-			return date;
-		case 'boolean':
-			return boolean;
-		case 'media':
-			return media;
-		case 'array':
-			return array;
-		case 'password':
-			return password;
-		case 'telephone':
-			return telephone;
-		case 'color':
-			return color;
-		case 'url':
-			return url;
-		// This is a fallback for fields that don't provide a type.
-		// It can be removed when the field.type is mandatory.
-		default:
-			return noType;
+	const found = [
+		email,
+		integer,
+		number,
+		text,
+		datetime,
+		date,
+		boolean,
+		media,
+		array,
+		password,
+		telephone,
+		color,
+		url,
+	].find( ( fieldType ) => fieldType?.type === type );
+
+	if ( !! found ) {
+		return found;
 	}
+
+	// This is a fallback for fields that don't provide a type.
+	// It can be removed when/if the field.type becomes mandatory.
+	return noType;
 }
 
 /**
@@ -81,7 +72,7 @@ export default function normalizeFields< Item >(
 	fields: Field< Item >[]
 ): NormalizedField< Item >[] {
 	return fields.map( ( field ) => {
-		const defaultProps = getDefaultProperties< Item >( field.type );
+		const defaultProps = getFieldTypeByName< Item >( field.type );
 
 		const getValue = field.getValue || getValueFromId( field.id );
 		const sort = function ( a: any, b: any, direction: SortDirection ) {
