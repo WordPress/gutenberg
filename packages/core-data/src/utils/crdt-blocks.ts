@@ -7,6 +7,7 @@ import fastDeepEqual from 'fast-deep-equal/es6';
 /**
  * WordPress dependencies
  */
+// @ts-ignore No types exported
 import { getBlockTypes } from '@wordpress/blocks';
 import { RichTextData } from '@wordpress/rich-text';
 import { Y, Delta } from '@wordpress/sync';
