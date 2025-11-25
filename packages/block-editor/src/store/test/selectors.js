@@ -3862,6 +3862,7 @@ describe( 'selectors', () => {
 				'core/freeform',
 				'core/test-block-ancestor',
 				'core/test-block-parent',
+				'core/test-composite-block',
 				'core/block/1',
 				'core/block/2',
 			] );
@@ -3881,6 +3882,7 @@ describe( 'selectors', () => {
 				'core/freeform',
 				'core/test-block-ancestor',
 				'core/test-block-parent',
+				'core/test-composite-block',
 				'core/block/1',
 				'core/block/2',
 			] );
