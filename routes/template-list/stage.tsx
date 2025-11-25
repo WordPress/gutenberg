@@ -35,6 +35,7 @@ import { activeField } from './fields/active';
 import { slugField } from './fields/slug';
 import { useTemplates } from './use-templates';
 import { useSetActiveTemplateAction } from './actions/set-active-template';
+import AddNewTemplate from './add-new-template';
 
 // Unlock WordPress private APIs
 const { usePostActions, templateTitleField } = unlock( editorPrivateApis );
@@ -44,6 +45,7 @@ const { Tabs } = unlock( componentsPrivateApis );
  * Style dependencies
  */
 import './style.scss';
+import './add-new-template/style.scss';
 import type { Template } from './types';
 
 function getItemId( item: Template ) {
@@ -304,6 +306,7 @@ function TemplateList() {
 							{ __( 'Reset view' ) }
 						</Button>
 					) }
+					<AddNewTemplate />
 				</>
 			}
 			hasPadding={ false }

@@ -26,7 +26,9 @@
 		"@wordpress/route": "file:../../packages/route",
 		"@wordpress/notices": "file:../../packages/notices",
 		"@wordpress/private-apis": "file:../../packages/private-apis",
+		"@wordpress/url": "file:../../packages/url",
 		"@wordpress/views": "file:../../packages/views",
+		"change-case": "^4.1.2",
 		"clsx": "^2.1.1",
 		"dequal": "^2.0.3"
 	}
