@@ -12,6 +12,7 @@
 - DataViews: add support for activity layout. [#72780](https://github.com/WordPress/gutenberg/pull/72780)
 - DataViews: Add grid keyboard navigation. [#72997](https://github.com/WordPress/gutenberg/pull/72997)
 - Field API: introduce the `format` prop to format the `date` field type. [#72999](https://github.com/WordPress/gutenberg/pull/72999)
+- Field API: fix display format for date. [#73538](https://github.com/WordPress/gutenberg/pull/73538)
 - Documentation: improve Edit component. [#73202](https://github.com/WordPress/gutenberg/pull/73202)
 - Documentation: surface better the `type` property in the documentation. [#73349](https://github.com/WordPress/gutenberg/pull/73349)
 - Documentation: improve DataView's `layout` prop. [#73470](https://github.com/WordPress/gutenberg/pull/73470)
