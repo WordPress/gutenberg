@@ -5,7 +5,8 @@
 ### Bug Fixes
 
 -   Return a deep-clone object from `getServerState` and `getServerContext` functions. ([#73437](https://github.com/WordPress/gutenberg/pull/73437))
--   Fix using `getServerContext` in derived state getters. ([#73518](https://github.com/WordPress/gutenberg/pull/73518))
+-   Fix using `getServerContext` in derived state getters using `useLayoutEffect`. ([#73518](https://github.com/WordPress/gutenberg/pull/73518))
+-   Fix using `getServerContext` in derived state getters using signals. ([#73540](https://github.com/WordPress/gutenberg/pull/73540))
 
 ## 6.35.0 (2025-11-12)
 
