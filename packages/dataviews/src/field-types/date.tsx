@@ -10,11 +10,11 @@ import type {
 	DataViewRenderFieldProps,
 	Field,
 	FormatDate,
-	NormalizedField,
 	Operator,
 	Rules,
 	SortDirection,
 } from '../types';
+import type { TypeProvidedProps } from '../types/private';
 import RenderFromElements from './utils/render-from-elements';
 import {
 	OPERATOR_ON,
@@ -29,9 +29,7 @@ import {
 	DAYS_OF_WEEK,
 } from '../constants';
 import { getControl } from '../dataform-controls';
-import hasElements from './utils/has-elements';
 import getValueFromId from './utils/get-value-from-id';
-import setValueFromId from './utils/set-value-from-id';
 import getFilterBy from './utils/get-filter-by';
 
 function getFormat( field: Field< any > ): Required< FormatDate > {
@@ -74,15 +72,38 @@ function render( { item, field }: DataViewRenderFieldProps< any > ) {
 	return dateI18n( format.date, getDate( value ) );
 }
 
+const isValid: Rules< any > = {
+	elements: true,
+	custom: () => null,
+};
+
+const defaultOperators: Operator[] = [
+	OPERATOR_ON,
+	OPERATOR_NOT_ON,
+	OPERATOR_BEFORE,
+	OPERATOR_AFTER,
+	OPERATOR_BEFORE_INC,
+	OPERATOR_AFTER_INC,
+	OPERATOR_IN_THE_PAST,
+	OPERATOR_OVER,
+	OPERATOR_BETWEEN,
+];
+const validOperators: Operator[] = [
+	OPERATOR_ON,
+	OPERATOR_NOT_ON,
+	OPERATOR_BEFORE,
+	OPERATOR_AFTER,
+	OPERATOR_BEFORE_INC,
+	OPERATOR_AFTER_INC,
+	OPERATOR_IN_THE_PAST,
+	OPERATOR_OVER,
+	OPERATOR_BETWEEN,
+];
+
 export default function normalizeField< Item >(
 	field: Field< Item >
-): NormalizedField< Item > {
+): TypeProvidedProps< Item > {
 	const getValue = field.getValue || getValueFromId( field.id );
-	const setValue = field.setValue || setValueFromId( field.id );
-	const isValid: Rules< Item > = {
-		elements: true,
-		custom: () => null,
-	};
 
 	const sort = ( a: Item, b: Item, direction: SortDirection ) => {
 		const valueA = getValue( { item: a } );
@@ -93,42 +114,8 @@ export default function normalizeField< Item >(
 		return direction === 'asc' ? timeA - timeB : timeB - timeA;
 	};
 
-	const defaultOperators: Operator[] = [
-		OPERATOR_ON,
-		OPERATOR_NOT_ON,
-		OPERATOR_BEFORE,
-		OPERATOR_AFTER,
-		OPERATOR_BEFORE_INC,
-		OPERATOR_AFTER_INC,
-		OPERATOR_IN_THE_PAST,
-		OPERATOR_OVER,
-		OPERATOR_BETWEEN,
-	];
-
-	const validOperators: Operator[] = [
-		OPERATOR_ON,
-		OPERATOR_NOT_ON,
-		OPERATOR_BEFORE,
-		OPERATOR_AFTER,
-		OPERATOR_BEFORE_INC,
-		OPERATOR_AFTER_INC,
-		OPERATOR_IN_THE_PAST,
-		OPERATOR_OVER,
-		OPERATOR_BETWEEN,
-	];
-
 	return {
-		id: field.id,
 		type: 'date',
-		label: field.label || field.id,
-		header: field.header || field.label || field.id,
-		description: field.description,
-		placeholder: field.placeholder,
-		getValue,
-		setValue,
-		elements: field.elements,
-		getElements: field.getElements,
-		hasElements: hasElements( field ),
 		render: field.render ?? render,
 		Edit: getControl( field, 'date' ),
 		sort: field.sort ?? sort,
@@ -136,11 +123,8 @@ export default function normalizeField< Item >(
 			...isValid,
 			...field.isValid,
 		},
-		isVisible: field.isVisible,
 		enableSorting: field.enableSorting ?? true,
 		enableGlobalSearch: field.enableGlobalSearch ?? false,
-		enableHiding: field.enableHiding ?? true,
-		readOnly: field.readOnly ?? false,
 		filterBy: getFilterBy( field, defaultOperators, validOperators ),
 		format: getFormat( field ),
 	};
