@@ -8,7 +8,6 @@ import { dateI18n, getDate, getSettings } from '@wordpress/date';
  */
 import type {
 	DataViewRenderFieldProps,
-	DayString,
 	Field,
 	FormatDate,
 	NormalizedField,
@@ -27,8 +26,8 @@ import {
 	OPERATOR_IN_THE_PAST,
 	OPERATOR_OVER,
 	OPERATOR_BETWEEN,
+	DAYS_OF_WEEK,
 } from '../constants';
-import { DAYS_OF_WEEK, numberToWeekStartsOn } from './utils/week-starts-on';
 import { getControl } from '../dataform-controls';
 import hasElements from './utils/has-elements';
 import getValueFromId from './utils/get-value-from-id';
@@ -44,9 +43,9 @@ function getFormat( field: Field< any > ): Required< FormatDate > {
 				: getSettings().formats.date,
 		weekStartsOn:
 			field.format?.weekStartsOn !== undefined &&
-			DAYS_OF_WEEK.includes( field.format?.weekStartsOn as DayString )
+			DAYS_OF_WEEK.includes( field.format?.weekStartsOn )
 				? field.format.weekStartsOn
-				: numberToWeekStartsOn( getSettings().l10n.startOfWeek ),
+				: getSettings().l10n.startOfWeek,
 	};
 }
 
@@ -72,7 +71,7 @@ function render( { item, field }: DataViewRenderFieldProps< any > ) {
 		format = field.format as Required< FormatDate >;
 	}
 
-	return dateI18n( format.weekStartsOn, getDate( value ) );
+	return dateI18n( format.date, getDate( value ) );
 }
 
 export default function normalizeField< Item >(

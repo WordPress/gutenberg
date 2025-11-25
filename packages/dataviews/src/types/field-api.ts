@@ -256,17 +256,9 @@ export type NormalizedFormat = Required< FormatDate > | {};
  */
 export type FormatDate = {
 	date?: string;
-	weekStartsOn?: DayString;
+	weekStartsOn?: DayNumber;
 };
 export type DayNumber = 0 | 1 | 2 | 3 | 4 | 5 | 6;
-export type DayString =
-	| 'sunday'
-	| 'monday'
-	| 'tuesday'
-	| 'wednesday'
-	| 'thursday'
-	| 'friday'
-	| 'saturday';
 
 type NormalizedFieldBase< Item > = Omit< Field< Item >, 'Edit' > & {
 	label: string;

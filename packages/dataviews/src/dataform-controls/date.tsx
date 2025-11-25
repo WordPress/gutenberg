@@ -52,7 +52,6 @@ import type {
 	NormalizedField,
 } from '../types';
 import getCustomValidity from './utils/get-custom-validity';
-import { weekStartsOnToNumber } from '../field-types/utils/week-starts-on';
 
 const { DateCalendar, DateRangeCalendar } = unlock( componentsPrivateApis );
 
@@ -276,9 +275,7 @@ function CalendarDateControl< Item >( {
 	if ( type === 'date' ) {
 		// If the field type is date, we've already normalized the format,
 		// and so it's safe to tell TypeScript to trust us ("as Required<Format>").
-		weekStartsOn = weekStartsOnToNumber(
-			( fieldFormat as Required< FormatDate > ).weekStartsOn
-		);
+		weekStartsOn = ( fieldFormat as Required< FormatDate > ).weekStartsOn;
 	}
 
 	const fieldValue = getValue( { item: data } );
@@ -444,9 +441,7 @@ function CalendarDateRangeControl< Item >( {
 	if ( type === 'date' ) {
 		// If the field type is date, we've already normalized the format,
 		// and so it's safe to tell TypeScript to trust us ("as Required<Format>").
-		weekStartsOn = weekStartsOnToNumber(
-			( fieldFormat as Required< FormatDate > ).weekStartsOn
-		);
+		weekStartsOn = ( fieldFormat as Required< FormatDate > ).weekStartsOn;
 	}
 
 	const onChangeCallback = useCallback(
