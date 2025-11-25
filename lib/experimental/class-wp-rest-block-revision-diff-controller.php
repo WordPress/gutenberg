@@ -11,6 +11,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Silence is golden.' );
 }
 
+if ( class_exists( 'WP_REST_Block_Revision_Diff_Controller' ) ) {
+	return;
+}
+
 /**
  * Controller for block-aware revision diff endpoint.
  *
@@ -97,9 +101,9 @@ class WP_REST_Block_Revision_Diff_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error on failure.
 	 */
 	public function get_diff( $request ) {
-		$parent_id    = $request['parent_id'];
-		$from_id      = $request['from'];
-		$to_id        = $request['to'];
+		$parent_id = $request['parent_id'];
+		$from_id   = $request['from'];
+		$to_id     = $request['to'];
 
 		// Validate revisions belong to the parent post.
 		$from_revision = $this->get_revision( $from_id, $parent_id );
@@ -198,16 +202,13 @@ class WP_REST_Block_Revision_Diff_Controller extends WP_REST_Controller {
 		$processed_new = array();
 
 		// Process old blocks - find removed and modified.
-		foreach ( $old_index as $i => $old_block ) {
-			$signature = $this->get_block_signature( $old_block );
-			$found     = false;
+		foreach ( $old_index as $old_block ) {
+			$found = false;
 
 			foreach ( $new_index as $j => $new_block ) {
 				if ( isset( $processed_new[ $j ] ) ) {
 					continue;
 				}
-
-				$new_signature = $this->get_block_signature( $new_block );
 
 				// Same block type at similar position.
 				if ( $old_block['blockName'] === $new_block['blockName'] ) {
@@ -220,8 +221,9 @@ class WP_REST_Block_Revision_Diff_Controller extends WP_REST_Controller {
 						$new_block['attrs'] ?? array()
 					);
 
-					$content_changed = $this->normalize_content( $old_block['innerHTML'] ?? '' ) !==
-									   $this->normalize_content( $new_block['innerHTML'] ?? '' );
+					$old_content     = $this->normalize_content( $old_block['innerHTML'] ?? '' );
+					$new_content     = $this->normalize_content( $new_block['innerHTML'] ?? '' );
+					$content_changed = $old_content !== $new_content;
 
 					if ( $content_changed || ! empty( $attribute_changes ) ) {
 						$diff[] = array(
@@ -399,7 +401,7 @@ class WP_REST_Block_Revision_Diff_Controller extends WP_REST_Controller {
 
 			// Count nested changes.
 			if ( ! empty( $item['innerBlocksDiff'] ) ) {
-				$nested = $this->compute_summary( $item['innerBlocksDiff'] );
+				$nested               = $this->compute_summary( $item['innerBlocksDiff'] );
 				$summary['added']     += $nested['added'];
 				$summary['removed']   += $nested['removed'];
 				$summary['modified']  += $nested['modified'];
@@ -463,4 +465,3 @@ class WP_REST_Block_Revision_Diff_Controller extends WP_REST_Controller {
 		);
 	}
 }
-

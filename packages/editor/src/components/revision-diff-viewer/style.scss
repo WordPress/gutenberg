@@ -90,7 +90,7 @@
 
 	&--modified {
 		background: rgba(255, 171, 0, 0.2);
-		color: #996600;
+		color: #960;
 	}
 }
 
@@ -153,7 +153,7 @@
 	}
 
 	.revision-diff-viewer__item--modified & {
-		fill: #996600;
+		fill: #960;
 	}
 
 	.revision-diff-viewer__item--unchanged & {
